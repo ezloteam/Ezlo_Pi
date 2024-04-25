@@ -288,7 +288,6 @@ int ezlopi_scenes_operators_value_strings_operations(uint32_t item_id, l_fields_
     {
         char* item_value = NULL;
         // int item_value_size = 0;
-        cJSON* cj_item_value = cJSON_CreateObject();
         l_ezlopi_device_t* device = ezlopi_device_get_head();
         while (device)
         {
@@ -297,6 +296,7 @@ int ezlopi_scenes_operators_value_strings_operations(uint32_t item_id, l_fields_
             {
                 if (item->cloud_properties.item_id == item_id)
                 {
+                    cJSON* cj_item_value = cJSON_CreateObject();
                     if (cj_item_value)
                     {
                         item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item, (void*)cj_item_value, NULL);
@@ -308,6 +308,7 @@ int ezlopi_scenes_operators_value_strings_operations(uint32_t item_id, l_fields_
                                 item_value = cJSON_GetStringValue(cj_value);
                             }
                         }
+                        cJSON_Delete(cj_item_value);
                     }
 
                     break;
@@ -427,14 +428,6 @@ int ezlopi_scenes_operators_value_strings_operations(uint32_t item_id, l_fields_
             }
         }
 
-        if (cj_item_value)
-        {
-            if (item_value)
-            {
-                free(item_value);
-            }
-            cJSON_Delete(cj_item_value);
-        }
     }
 
     return ret;

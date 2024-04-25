@@ -176,14 +176,6 @@ extern "C"
                 \"id_item\": 70,\
                 \"gpio\": 5,\
                 \"resln_bit\": 3\
-            },\
-            {\
-                \"dev_type\": 10,\
-                \"dev_name\": \"Flame\",\
-                \"id_room\": \"\",\
-                \"id_item\": 57,\
-                \"gpio1\": 1,\
-                \"gpio2\": 2\
             }\
         ], \
         \"dev_total\": 5}";
