@@ -133,7 +133,7 @@ static void factory_reset_write_func(esp_gatt_value_t* value, esp_ble_gatts_cb_p
             }
             }
 
-            cJSON_free(root);
+            cJSON_Delete(root);
         }
     }
 }

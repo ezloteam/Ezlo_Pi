@@ -34,7 +34,7 @@ static int __set_cjson_value(l_ezlopi_item_t* item, void* arg);
 static int __get_cjson_value(l_ezlopi_item_t* item, void* arg);
 
 int device_0038_other_RGB(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
-{
+{ 
     int ret = 0;
 
     switch (action)

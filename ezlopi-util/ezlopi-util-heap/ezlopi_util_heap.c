@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -28,7 +29,7 @@ typedef struct s_heap_trace {
 static s_heap_trace_t* heap_head = NULL;
 
 static s_heap_trace_t * __create_list(void);
-static void __remove_node_if_freed(s_heap_trace_t * heap_node);
+static void __remove_free_node(s_heap_trace_t * heap_node);
 
 void ezlopi_util_heap_free(void *ptr, const char * __file_name, uint32_t line_number)
 {
@@ -39,7 +40,7 @@ void ezlopi_util_heap_free(void *ptr, const char * __file_name, uint32_t line_nu
         {
             if ((curr_node->ptr == ptr) && (0 == curr_node->freed))
             {                
-                printf("\x1B[34mfreed at %s:%u, size: %u\x1B[0m\r\n", __file_name, line_number, curr_node->size);
+                printf("\x1B[34m*** freed at %s:%u, size: %u ***\x1B[0m\r\n", __file_name, line_number, curr_node->size);
                 free(curr_node->ptr);
 
                 curr_node->freed = true;
@@ -54,7 +55,7 @@ void ezlopi_util_heap_free(void *ptr, const char * __file_name, uint32_t line_nu
     }
 }
 
-void* ezlopi_util_heap_malloc(uint32_t size, const char * file_name, uint32_t line_no)
+void* ezlopi_util_heap_malloc(size_t size, const char * file_name, uint32_t line_no)
 {
     void* ret = NULL;
 
@@ -64,7 +65,7 @@ void* ezlopi_util_heap_malloc(uint32_t size, const char * file_name, uint32_t li
         if (new_heap)
         {
             // \x1B[%sm %s[%d]:" X "\x1B[0m\r\n"
-            printf("\x1B[34mmalloc at %s:%u, size: %u\x1B[0m\r\n", file_name, line_no, size);
+            printf("\x1B[34m### malloc at %s:%u, size: %u ###\x1B[0m\r\n", file_name, line_no, size);
             ret = malloc(size);
             if (ret)
             {
@@ -80,12 +81,12 @@ void* ezlopi_util_heap_malloc(uint32_t size, const char * file_name, uint32_t li
     return ret;
 }
 
-void* ezlopi_util_heap_calloc(uint32_t count, uint32_t size, const char * file_name, uint32_t line_no)
+void* ezlopi_util_heap_calloc(size_t count, size_t size, const char * file_name, uint32_t line_no)
 {
     return ezlopi_util_heap_malloc((count * size), file_name, line_no);
 }
 
-void* ezlopi_util_heap_realloc(void *ptr, uint32_t new_size, const char * file_name, uint32_t line_no)
+void* ezlopi_util_heap_realloc(void *ptr, size_t new_size, const char * file_name, uint32_t line_no)
 {
     printf("REALLOC\r\n");
     ezlopi_util_heap_free(ptr, file_name, line_no);
@@ -94,7 +95,7 @@ void* ezlopi_util_heap_realloc(void *ptr, uint32_t new_size, const char * file_n
 
 void ezlopi_util_heap_flush(void)
 {
-    __remove_node_if_freed(heap_head);
+    __remove_free_node(heap_head);
 
     if (heap_head->freed)
     {
@@ -168,11 +169,11 @@ static s_heap_trace_t * __create_list(void)
 }
 
 
-static void __remove_node_if_freed(s_heap_trace_t * heap_node)
+static void __remove_free_node(s_heap_trace_t * heap_node)
 {
     if (heap_node->next)
     {
-        __remove_node_if_freed(heap_node->next);
+        __remove_free_node(heap_node->next);
 
         if ( heap_node->next->freed)
         {

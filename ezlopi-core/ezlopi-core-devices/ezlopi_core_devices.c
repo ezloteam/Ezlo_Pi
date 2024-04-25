@@ -379,6 +379,7 @@ void ezlopi_device_prepare(void)
         {
             ezlopi_device_parse_json_v3(cj_config);
 
+#if 0
             if (g_store_dev_config_with_id)
             {
                 char* updated_config = cJSON_PrintBuffered(cj_config, 1024, false);
@@ -391,6 +392,7 @@ void ezlopi_device_prepare(void)
                     free(updated_config);
                 }
             }
+#endif
 
             cJSON_Delete(cj_config);
         }

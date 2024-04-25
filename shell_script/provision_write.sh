@@ -3,7 +3,7 @@
 
 speed=921600
 port="/dev/ttyUSB0"
-bin="prov_102002011.bin"
+bin="./shell_script/prov_102002011.bin"
 
 while getopts s:p:b:h: flag
 do
@@ -25,5 +25,5 @@ echo "speed: $speed";
 echo "port:  $port";
 echo "bin:   $bin";
 
-echo "esptool.py -p $port -b $speed write_flash 0x18000 ./shell_script/$bin"
-esptool.py -p $port -b $speed write_flash 0x18000 ./shell_script/$bin
+echo "esptool.py -p $port -b $speed write_flash 0x18000 $bin"
+esptool.py -p $port -b $speed write_flash 0x18000 $bin

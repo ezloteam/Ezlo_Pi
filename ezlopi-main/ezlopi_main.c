@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <cjext.h>
 
 #include <esp_system.h>
 #include <driver/adc.h>
@@ -33,7 +34,7 @@ static void __blinky(void* pv);
 
 void app_main(void)
 {
-    #if 1
+#if 1
     ezlopi_service_led_indicator_init();
     gpio_install_isr_service(0);
 
@@ -77,7 +78,7 @@ void app_main(void)
     ezlopi_scenes_meshbot_init();
 #endif
 #endif
-    xTaskCreate(__blinky, "__blinky", 2 * 2048, NULL, 0, NULL);
+    xTaskCreate(__blinky, "__blinky", 5 * 2048, NULL, 0, NULL);
 }
 
 

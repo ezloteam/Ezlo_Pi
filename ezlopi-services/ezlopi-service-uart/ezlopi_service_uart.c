@@ -853,7 +853,7 @@ static void ezlopi_service_uart_response(uint8_t cmd, uint8_t status_write, uint
         {
             cJSON_Minify(my_json_string);
             EZPI_SERVICE_uart_tx_data(strlen(my_json_string), (uint8_t*)my_json_string);
-            cJSON_free(my_json_string);
+            free(my_json_string);
         }
     }
 }
@@ -923,7 +923,7 @@ static void ezlopi_service_uart_read_config(void)
             const int len = strlen(my_json_string);
             EZPI_SERVICE_uart_tx_data(len, (uint8_t*)my_json_string); // Send the data over uart
             // TRACE_D("Sending: %s", my_json_string);
-            cJSON_free(my_json_string);
+            free(my_json_string);
         }
     }
 }
