@@ -109,7 +109,7 @@ typedef struct s_ezlopi_modes
     cJSON* cj_cameras;
     cJSON* cj_devices;
     s_protect_buttons_t* l_protect_buttons;
-
+ 
     s_entry_delay_t entry_delay;
     s_abort_window_t abort_delay;
 
@@ -140,6 +140,7 @@ int ezlopi_core_modes_api_cancel_switch(void);
 int ezlopi_core_modes_api_cancel_entry_delay(void);
 int ezlopi_core_modes_set_switch_to_delay(uint32_t switch_to_delay);
 int ezlopi_core_modes_set_alarm_delay(uint32_t switch_to_delay);
+int ezlopi_core_modes_set_disarmed_default(uint8_t modesID, bool disarmedDefaule);
 
 int ezlopi_core_modes_cjson_get_current_mode(cJSON* cj_result);
 

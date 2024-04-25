@@ -137,9 +137,18 @@ void ezlopi_cloud_modes_notifications_set(cJSON* cj_request, cJSON* cj_response)
 
 void ezlopi_cloud_modes_disarmed_default_set(cJSON* cj_request, cJSON* cj_response)
 {
-    cJSON* cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
-    if (cj_result)
+    cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
+    cJSON* cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
+    if (cj_params)
     {
+        cJSON* cj_modeId = cJSON_GetObjectItem(cj_params, ezlopi_modeId_str);
+        cJSON* cj_disarmedDefault = cJSON_GetObjectItem(cj_params, ezlopi_disarmedDefault_str);
+        if (cj_modeId && cj_disarmedDefault)
+        {
+            uint8_t modeId = strtoul(cj_modeId->valuestring, NULL, 10);
+            bool disarmedDefault = cj_disarmedDefault->type == cJSON_True ? true : false;
+            ezlopi_core_modes_set_disarmed_default(modeId, disarmedDefault);
+        }
     }
 }
 

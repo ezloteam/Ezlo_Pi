@@ -8,6 +8,7 @@
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_modes_cjson.h"
 #include "ezlopi_core_cjson_macros.h"
+#include "ezlopi_core_devices.h"
 
 #include "ezlopi_cloud_constants.h"
 
@@ -19,6 +20,8 @@ static void __cjson_add_entry_delay(cJSON* cj_result, s_entry_delay_t* entry_del
 static void __cjson_add_number_as_hex_string(cJSON* cj_dest, const char* obj_name, uint32_t number);
 static void __cjson_duplicate_add_reference(cJSON* cj_dest, const char* item_name_str, cJSON* cj_item);
 static void __cjson_add_protect_buttons(cJSON* cj_protect_buttons_arr, s_protect_buttons_t* l_protect_buttons);
+static int __cjson_add_disarmed_devices_to_array(cJSON* cj_disarmed_device_array);
+static int __cjson_add_security_device_to_array(cJSON* cj_device_array);
 
 //////////////////////
 
@@ -68,6 +71,8 @@ int ezlopi_core_modes_cjson_get_modes(cJSON* cj_dest)
         {
             __cjson_add_alarmed(cj_alarmed, &_modes->alarmed);
         }
+        cJSON* cj_device_array = cJSON_GetObjectItem(cj_dest, ezlopi_devices_str);
+        __cjson_add_security_device_to_array(cj_device_array);
     }
 
     return ret;
@@ -422,6 +427,9 @@ static void __cjson_add_mode_to_array(cJSON* cj_modes_arr, s_house_modes_t* hous
             __cjson_duplicate_add_reference(cj_house_mode, ezlopi_alarmsOffDevices_str, house_mode->cj_alarms_off_devices);
             __cjson_duplicate_add_reference(cj_house_mode, ezlopi_camerasOffDevices_str, house_mode->cj_cameras_off_devices);
 
+            cJSON* cj_disarmed = cJSON_GetObjectItem(cj_house_mode, ezlopi_disarmedDevices_str);
+            __cjson_add_disarmed_devices_to_array(cj_disarmed);
+
             if (!cJSON_AddItemToArray(cj_modes_arr, cj_house_mode))
             {
                 cJSON_Delete(cj_house_mode);
@@ -477,6 +485,50 @@ static void __cjson_add_alarmed(cJSON* cj_alarmed, s_alarmed_t* alarmed)
             }
         }
     }
+}
+
+static int __cjson_add_disarmed_devices_to_array(cJSON* cj_disarmed_device_array)
+{
+    int ret = 0;
+    if (cj_disarmed_device_array && (cj_disarmed_device_array->type == cJSON_Array))
+    {
+        l_ezlopi_device_t* device_head = ezlopi_device_get_head();
+        while (device_head)
+        {
+            if (!device_head->cloud_properties.armed)
+            {
+                char temp[32];
+                memset(temp, 0, 32);
+                snprintf(temp, 32, "%08X", device_head->cloud_properties.device_id);
+                cJSON_AddItemToArray(cj_disarmed_device_array, cJSON_CreateString(temp));
+            }
+            device_head = device_head->next;
+        }
+        ret = 1;
+    }
+    return ret;
+}
+
+static int __cjson_add_security_device_to_array(cJSON* cj_device_array)
+{
+    int ret = 0;
+    if (cj_device_array && (cj_device_array->type == cJSON_Array))
+    {
+        l_ezlopi_device_t* device_head = ezlopi_device_get_head();
+        while (device_head)
+        {
+            if (0 == strncmp(category_security_sensor, device_head->cloud_properties.category, (strlen(category_security_sensor) + 1)))
+            {
+                char temp[32];
+                memset(temp, 0, 32);
+                snprintf(temp, 32, "%08X", device_head->cloud_properties.device_id);
+                cJSON_AddItemToArray(cj_device_array, cJSON_CreateString(temp));
+            }
+            device_head = device_head->next;
+        }
+        ret = 1;
+    }
+    return ret;
 }
 
 #endif // CONFIG_EZLPI_SERV_ENABLE_MODES

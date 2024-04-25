@@ -163,19 +163,21 @@ extern "C"
         \"dev_detail\":\
         [\
             {\
-                \"dev_type\": 1,\
-                \"dev_name\": \"LED\",\
+                \"dev_type\": 2,\
+                \"dev_name\": \"PIR\",\
                 \"id_room\": \"\",\
-                \"id_item\": 1,\
-                \"gpio_in\": 0,\
-                \"gpio_out\": 5,\
-                \"pullup_ip\": false,\
-                \"pullup_op\": false,\
-                \"is_ip\": false,\
-                \"ip_inv\": false,\
-                \"op_inv\": false,\
-                \"val_ip\": false,\
-                \"val_op\": false\
+                \"id_item\": 19,\
+                \"gpio\": 21,\
+                \"pull_up\": false,\
+                \"logic_inv\": false\
+            },\
+            {\
+                \"dev_type\": 3,\
+                \"dev_name\": \"Water Leak sensor\",\
+                \"id_room\": \"\",\
+                \"id_item\": 27,\
+                \"gpio\": 2,\
+                \"resln_bit\": 10\
             }\
         ], \
         \"dev_total\": 5}";

@@ -234,4 +234,38 @@ void ezlopi_core_modes_init(void)
         }
     }
 }
+
+int ezlopi_core_modes_set_disarmed_default(uint8_t modesID, bool disarmedDefault)
+{
+    int ret = 0;
+    if ((modesID > EZLOPI_HOUSE_MODE_REF_ID_NONE) && (modesID < EZLOPI_HOUSE_MODE_REF_ID_MAX))
+    {
+        ezlopi_service_modes_stop();
+        s_ezlopi_modes_t* custom_modes = ezlopi_core_modes_get_custom_modes();
+        if (custom_modes)
+        {
+            if (modesID == EZLOPI_HOUSE_MODE_REF_ID_HOME)
+            {
+                custom_modes->mode_home.disarmed_default = disarmedDefault;
+            }
+            else if (modesID == EZLOPI_HOUSE_MODE_REF_ID_NIGHT)
+            {
+                custom_modes->mode_night.disarmed_default = disarmedDefault;
+            }
+            else if (modesID == EZLOPI_HOUSE_MODE_REF_ID_AWAY)
+            {
+                custom_modes->mode_away.disarmed_default = disarmedDefault;
+            }
+            else if (modesID == EZLOPI_HOUSE_MODE_REF_ID_VACATION)
+            {
+                custom_modes->mode_vacation.disarmed_default = disarmedDefault;
+            }
+            ezlopi_core_modes_store_to_nvs();
+            ret = 1;
+        }
+        ezlopi_service_modes_start();
+        ret = 1;
+    }
+    return ret;
+}
 #endif // CONFIG_EZLPI_SERV_ENABLE_MODES
