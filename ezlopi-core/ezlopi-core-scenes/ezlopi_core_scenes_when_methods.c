@@ -43,71 +43,59 @@ int ezlopi_scene_when_is_item_state(l_scenes_list_v2_t* scene_node, void* arg)
 
         if (item_id && value_field)
         {
-            l_ezlopi_device_t* curr_device = ezlopi_device_get_head();
-            while (curr_device)
+            l_ezlopi_item_t* curr_item = ezlopi_device_get_item_by_id(item_id);
+            if (curr_item)
             {
-                l_ezlopi_item_t* curr_item = curr_device->items;
-                while (curr_item)
+                cJSON* cj_tmp_value = cJSON_CreateObject();
+                if (cj_tmp_value)
                 {
-                    if (item_id == curr_item->cloud_properties.item_id)
+                    curr_item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, curr_item, (void*)cj_tmp_value, NULL);
+                    cJSON* cj_value = cJSON_GetObjectItem(cj_tmp_value, ezlopi_value_str);
+                    if (cj_value)
                     {
-                        cJSON* cj_tmp_value = cJSON_CreateObject();
-                        if (cj_tmp_value)
+                        switch (cj_value->type)
                         {
-                            curr_item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, curr_item, (void*)cj_tmp_value, NULL);
-                            cJSON* cj_value = cJSON_GetObjectItem(cj_tmp_value, ezlopi_value_str);
-                            if (cj_value)
+                        case cJSON_True:
+                        {
+                            if (true == value_field->field_value.u_value.value_bool)
                             {
-                                switch (cj_value->type)
-                                {
-                                case cJSON_True:
-                                {
-                                    if (true == value_field->field_value.u_value.value_bool)
-                                    {
-                                        ret = 1;
-                                    }
-                                    break;
-                                }
-                                case cJSON_False:
-                                {
-                                    if (false == value_field->field_value.u_value.value_bool)
-                                    {
-                                        ret = 1;
-                                    }
-                                    break;
-                                }
-                                case cJSON_Number:
-                                {
-                                    if (cj_value->valuedouble == value_field->field_value.u_value.value_double)
-                                    {
-                                        ret = 1;
-                                    }
-                                    break;
-                                }
-                                case cJSON_String:
-                                {
-                                    uint32_t cmp_size = (strlen(cj_value->valuestring) > strlen(value_field->field_value.u_value.value_string)) ? strlen(cj_value->valuestring) : strlen(value_field->field_value.u_value.value_string);
-                                    if (0 == strncmp(cj_value->valuestring, value_field->field_value.u_value.value_string, cmp_size))
-                                    {
-                                        ret = 1;
-                                    }
-                                    break;
-                                }
-                                default:
-                                {
-                                    TRACE_E("Value type mis-matched!");
-                                }
-                                }
+                                ret = 1;
                             }
-
-                            cJSON_Delete(cj_tmp_value);
+                            break;
                         }
-                        break;
+                        case cJSON_False:
+                        {
+                            if (false == value_field->field_value.u_value.value_bool)
+                            {
+                                ret = 1;
+                            }
+                            break;
+                        }
+                        case cJSON_Number:
+                        {
+                            if (cj_value->valuedouble == value_field->field_value.u_value.value_double)
+                            {
+                                ret = 1;
+                            }
+                            break;
+                        }
+                        case cJSON_String:
+                        {
+                            uint32_t cmp_size = (strlen(cj_value->valuestring) > strlen(value_field->field_value.u_value.value_string)) ? strlen(cj_value->valuestring) : strlen(value_field->field_value.u_value.value_string);
+                            if (0 == strncmp(cj_value->valuestring, value_field->field_value.u_value.value_string, cmp_size))
+                            {
+                                ret = 1;
+                            }
+                            break;
+                        }
+                        default:
+                        {
+                            TRACE_E("Value type mis-matched!");
+                        }
+                        }
                     }
-                    curr_item = curr_item->next;
+                    cJSON_Delete(cj_tmp_value);
                 }
-
-                curr_device = curr_device->next;
             }
         }
     }
@@ -386,7 +374,7 @@ int ezlopi_scene_when_is_user_lock_operation(l_scenes_list_v2_t* scene_node, voi
 
 int ezlopi_scene_when_is_house_mode_changed_to(l_scenes_list_v2_t* scene_node, void* arg)
 {
-    // TRACE_W(" isHouse_modechanged_to");
+    TRACE_W(" isHouse_modechanged_to");
     int ret = 0;
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
 
@@ -435,7 +423,7 @@ int ezlopi_scene_when_is_house_mode_changed_to(l_scenes_list_v2_t* scene_node, v
 
 int ezlopi_scene_when_is_house_mode_changed_from(l_scenes_list_v2_t* scene_node, void* arg)
 {
-    //TRACE_W(" isHouse_mode_changed_from");
+    TRACE_W(" isHouse_mode_changed_from");
     int ret = 0;
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
 
@@ -483,7 +471,7 @@ int ezlopi_scene_when_is_house_mode_changed_from(l_scenes_list_v2_t* scene_node,
 
 int ezlopi_scene_when_is_House_Mode_Alarm_Phase_Range(l_scenes_list_v2_t* scene_node, void* arg)
 {
-    //TRACE_W(" is_House_Mode_Alarm_Phase_Range ");
+    TRACE_W(" is_House_Mode_Alarm_Phase_Range ");
     int ret = 0;
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
 
@@ -518,7 +506,7 @@ int ezlopi_scene_when_is_House_Mode_Alarm_Phase_Range(l_scenes_list_v2_t* scene_
 
 int ezlopi_scene_when_is_House_Mode_Switch_to_Range(l_scenes_list_v2_t* scene_node, void* arg)
 {
-    // TRACE_W(" is_House_Mode_Switch_to_Range ");
+    TRACE_W(" is_House_Mode_Switch_to_Range ");
     int ret = 0;
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
 
@@ -541,7 +529,7 @@ int ezlopi_scene_when_is_House_Mode_Switch_to_Range(l_scenes_list_v2_t* scene_no
 
 int ezlopi_scene_when_is_device_state(l_scenes_list_v2_t* scene_node, void* arg)
 {
-    // TRACE_W(" isDevice_state. ");
+    TRACE_W(" isDevice_state. ");
     // TRACE_W("Warning: when-method 'is_device_state' not implemented!");
     int ret = 0;
 
@@ -580,21 +568,17 @@ int ezlopi_scene_when_is_device_state(l_scenes_list_v2_t* scene_node, void* arg)
         }
         if (device_id)
         {
-            l_ezlopi_device_t* curr_device = ezlopi_device_get_head();
-            while (curr_device)
+            l_ezlopi_device_t* curr_device = ezlopi_device_get_by_id(device_id);
+            if (curr_device)
             {
-                if (device_id == curr_device->cloud_properties.device_id)
+                s_ezlopi_cloud_controller_t* controller_info = ezlopi_device_get_controller_information();
+                if (controller_info)
                 {
-                    s_ezlopi_cloud_controller_t* controller_info = ezlopi_device_get_controller_information();
-                    if (controller_info)
-                    {
-                        #warning "we need to change from 'controller' to 'device_id' specific";
-                        ret = ((value_armed == controller_info->armed) ? 1 : 0);
-                        ret = ((value_reachable == controller_info->service_notification) ? 1 : 0);
-                    }
+                    #warning "we need to change from 'controller' to 'device_id' specific";
+                    ret = ((value_armed == controller_info->armed) ? 1 : 0);
+                    ret = ((value_reachable == controller_info->service_notification) ? 1 : 0);
                 }
 
-                curr_device = curr_device->next;
             }
         }
         #warning "need to check device_group condition";
@@ -611,7 +595,7 @@ int ezlopi_scene_when_is_network_state(l_scenes_list_v2_t* scene_node, void* arg
 
 int ezlopi_scene_when_is_scene_state(l_scenes_list_v2_t* scene_node, void* arg)
 {
-    // TRACE_W(" isScene_state ");
+    TRACE_W(" isScene_state ");
     // TRACE_W("Warning: when-method 'is_scene_state' not implemented!");
     int ret = 0;
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
@@ -747,7 +731,7 @@ int ezlopi_scene_when_is_battery_level(l_scenes_list_v2_t* scene_node, void* arg
 
 int ezlopi_scene_when_compare_numbers(l_scenes_list_v2_t* scene_node, void* arg)
 {
-    // TRACE_W(" Compare_num ");
+    TRACE_W(" Compare_num ");
     int ret = 0;
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
 
@@ -803,6 +787,7 @@ int ezlopi_scene_when_compare_numbers(l_scenes_list_v2_t* scene_node, void* arg)
 
 int ezlopi_scene_when_compare_number_range(l_scenes_list_v2_t* scene_node, void* arg)
 {
+    TRACE_W(" Compare_num_range");
     int ret = 0;
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
 
@@ -899,7 +884,7 @@ int ezlopi_scene_when_compare_number_range(l_scenes_list_v2_t* scene_node, void*
 
 int ezlopi_scene_when_compare_strings(l_scenes_list_v2_t* scene_node, void* arg)
 {
-    // TRACE_W(" Compare_strings ");
+    TRACE_W(" Compare_strings ");
     //  TRACE_W("Warning: when-method 'compare_strings' not implemented!");
     int ret = 0;
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
@@ -959,7 +944,7 @@ int ezlopi_scene_when_compare_strings(l_scenes_list_v2_t* scene_node, void* arg)
 
 int ezlopi_scene_when_string_operation(l_scenes_list_v2_t* scene_node, void* arg)
 {
-    // TRACE_W(" Compare_string_op ");
+    TRACE_W(" Compare_string_op ");
     //  TRACE_W("Warning: when-method 'string_operation' not implemented!");
     int ret = 0;
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
@@ -1017,7 +1002,7 @@ int ezlopi_scene_when_string_operation(l_scenes_list_v2_t* scene_node, void* arg
 
 int ezlopi_scene_when_in_array(l_scenes_list_v2_t* scene_node, void* arg)
 {
-    // //TRACE_W(" Compare_inArray ");
+    TRACE_W(" Compare_inArray ");
     // TRACE_W("Warning: when-method 'in_array' not implemented!");
     int ret = 0;
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
@@ -1073,7 +1058,7 @@ int ezlopi_scene_when_in_array(l_scenes_list_v2_t* scene_node, void* arg)
 
 int ezlopi_scene_when_compare_values(l_scenes_list_v2_t* scene_node, void* arg)
 {
-    // TRACE_W(" Compare_values ");
+    TRACE_W(" Compare_values ");
     //  TRACE_W("Warning: when-method 'is_group_state' not implemented!");
     int ret = 0;
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
@@ -1140,7 +1125,7 @@ int ezlopi_scene_when_compare_values(l_scenes_list_v2_t* scene_node, void* arg)
 
 int ezlopi_scene_when_has_atleast_one_dictionary_value(l_scenes_list_v2_t* scene_node, void* arg)
 {
-    // TRACE_W(" atleast_one_diction_val ");
+    TRACE_W(" atleast_one_diction_val ");
     // TRACE_W("Warning: when-method 'atleast_one_dictionary_value' not implemented!");
     int ret = 0;
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
@@ -1180,7 +1165,7 @@ int ezlopi_scene_when_has_atleast_one_dictionary_value(l_scenes_list_v2_t* scene
 
 int ezlopi_scene_when_is_firmware_update_state(l_scenes_list_v2_t* scene_node, void* arg)
 {
-    // TRACE_W(" firmware_update ");
+    TRACE_W(" firmware_update ");
     // TRACE_W("Warning: when-method 'firmware_update_state' not implemented!");
     int ret = 0;
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
@@ -1224,7 +1209,7 @@ int ezlopi_scene_when_is_firmware_update_state(l_scenes_list_v2_t* scene_node, v
 
 int ezlopi_scene_when_is_dictionary_changed(l_scenes_list_v2_t* scene_node, void* arg)
 {
-    // TRACE_W(" isDictionary_changed ");
+    TRACE_W(" isDictionary_changed ");
     // TRACE_W("Warning: when-method 'is_dictionary_changed' not implemented!");
     int ret = 0;
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
@@ -1376,7 +1361,6 @@ int ezlopi_scene_when_xor(l_scenes_list_v2_t* scene_node, void* arg)
 int ezlopi_scene_when_function(l_scenes_list_v2_t* scene_node, void* arg)
 {
     /* This funciton can contain only one of the 1. less ,2. least*/
-
     int ret = 0;
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (scene_node && when_block)
