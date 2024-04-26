@@ -230,10 +230,8 @@ extern const char* ezlopi_subtype_str;
 
 extern const char* ezlopi_valueDefault_str;
 extern const char* ezlopi_text_str;
-extern const char* ezlopi_label_str;
 extern const char* ezlopi_lang_tag_str;
 extern const char* ezlopi_description_str;
-extern const char* ezlopi_value_type_str;
 extern const char* ezlopi_valueMin_str;
 extern const char* ezlopi_valueMax_str;
 extern const char* ezlopi_no_str;
