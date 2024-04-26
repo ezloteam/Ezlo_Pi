@@ -4,6 +4,7 @@
 #include "ezlopi_core_modes.h"
 #include "ezlopi_core_modes_cjson.h"
 #include "ezlopi_core_cjson_macros.h"
+#include "ezlopi_core_devices.h"
 
 #include "ezlopi_cloud_constants.h"
 
