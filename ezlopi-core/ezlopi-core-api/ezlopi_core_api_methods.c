@@ -4,7 +4,6 @@
 #include "ezlopi_cloud_room.h"
 #include "ezlopi_cloud_items.h"
 #include "ezlopi_cloud_modes.h"
-#include "ezlopi_cloud_scenes.h"
 #include "ezlopi_cloud_devices.h"
 #include "ezlopi_cloud_network.h"
 #include "ezlopi_cloud_location.h"
@@ -16,6 +15,7 @@
 #include "ezlopi_cloud_registration.h"
 #include "ezlopi_cloud_offline_login.h"
 #include "ezlopi_cloud_modes_updaters.h"
+#include "ezlopi_cloud_scenes.h"
 #include "ezlopi_cloud_scenes_scripts.h"
 #include "ezlopi_cloud_scenes_expressions.h"
 

@@ -1,7 +1,6 @@
 #ifndef __EZLOPI_CLOUD_KEYWORDS_H__
 #define __EZLOPI_CLOUD_KEYWORDS_H__
 
-#include "stdio.h"
 
 extern const char* ezlopi_ezlopi_str;
 extern const char* ezlopi__str;
@@ -68,7 +67,6 @@ extern const char* ezlopi_ipv4_str;
 extern const char* ezlopi_gateways_str;
 extern const char* ezlopi_label_str;
 extern const char* ezlopi_yes_str;
-extern const char* ezlopi_no_str;
 extern const char* ezlopi_ready_str;
 extern const char* ezlopi_not_ready_str;
 extern const char* ezlopi_settings_str;
@@ -166,10 +164,10 @@ extern const char* ezlopi_build_date_str;
 extern const char* ezlopi_unknown_str;
 extern const char* ezlopi_manufacturer_name_str;
 extern const char* ezlopi_build_str;
-const char* ezlopi_firmware_build_str;
+extern const char* ezlopi_firmware_build_str;
 extern const char* ezlopi_chip_str;
 extern const char* ezlopi_provisioned_status_str;
-const char* ezlopi_provisioned_str;
+extern const char* ezlopi_provisioned_str;
 extern const char* ezlopi_model_number_str;
 extern const char* ezlopi_serial_str;
 extern const char* ezlopi_uuid_provisioning_str;

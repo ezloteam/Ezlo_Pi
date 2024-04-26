@@ -35,7 +35,6 @@ extern "C"
     void ezlopi_cloud_modes_entry_delay_set(cJSON* cj_request, cJSON* cj_response);
     void ezlopi_cloud_modes_entry_delay_reset(cJSON* cj_request, cJSON* cj_response);
 
-    void 
 
 #ifdef __cplusplus
 }
