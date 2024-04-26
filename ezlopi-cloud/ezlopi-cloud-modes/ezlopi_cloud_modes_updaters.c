@@ -122,7 +122,20 @@ void ezlopi_cloud_modes_protect_devices_removed(cJSON* cj_request, cJSON* cj_res
 
 void ezlopi_cloud_modes_disarmed_default_set_updater(cJSON* cj_request, cJSON* cj_response)
 {
-    return;
+    cJSON_AddStringToObject(cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
+    cJSON_AddStringToObject(cj_response, ezlopi_msg_subclass_str, ezlopi_modes_changed_str);
+    cJSON* cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
+    if (cj_params)
+    {
+        cJSON* cj_result = cJSON_Duplicate(cj_params, true);
+        if (cj_result)
+        {
+            uint64_t time = EZPI_CORE_sntp_get_current_time_ms();
+            cJSON_AddNumberToObject(cj_result, "fwTimestampMs", time);
+            cJSON_AddItemToObject(cj_response, ezlopi_result_str, cj_result);
+        }
+
+    }
 }
 
 #endif // CONFIG_EZLPI_SERV_ENABLE_MODES

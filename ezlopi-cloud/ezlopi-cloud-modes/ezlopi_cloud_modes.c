@@ -11,6 +11,7 @@
 
 #include "ezlopi_cloud_modes.h"
 #include "ezlopi_cloud_constants.h"
+#include "ezlopi_cloud_modes_updaters.h"
 #include "EZLOPI_USER_CONFIG.h"
 
 #if defined(CONFIG_EZLPI_SERV_ENABLE_MODES)
@@ -148,7 +149,7 @@ void ezlopi_cloud_modes_disarmed_default_set(cJSON* cj_request, cJSON* cj_respon
         cJSON* cj_disarmedDefault = cJSON_GetObjectItem(cj_params, ezlopi_disarmedDefault_str);
         if (cj_modeId && cj_disarmedDefault)
         {
-            uint8_t modeId = strtoul(cj_modeId->valuestring, NULL, 10);
+            uint8_t modeId = strtoul(cj_modeId->valuestring, NULL, 10); 
             bool disarmedDefault = cj_disarmedDefault->type == cJSON_True ? true : false;
             ezlopi_core_modes_set_disarmed_default(modeId, disarmedDefault);
             l_ezlopi_device_t* device_to_change = ezlopi_device_get_head();
@@ -161,7 +162,7 @@ void ezlopi_cloud_modes_disarmed_default_set(cJSON* cj_request, cJSON* cj_respon
                     if (cj_device_armed_broadcast)
                     {
                         cJSON_AddStringToObject(cj_device_armed_broadcast, ezlopi_method_str, "hub.device.armed.set");
-                        cJSON* cj_params = cJSON_AddObjectToObject(cj_device_armed_broadcast, "params");
+                        cJSON* cj_params = cJSON_AddObjectToObject(cj_device_armed_broadcast, ezlopi_params_str);
                         if (cj_params)
                         {
                             char temp[32];
@@ -182,6 +183,7 @@ void ezlopi_cloud_modes_disarmed_default_set(cJSON* cj_request, cJSON* cj_respon
                                     {
                                         cJSON_Delete(cj_response);
                                     }
+                                    
                                 }
                             }
                         }

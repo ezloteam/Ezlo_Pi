@@ -99,7 +99,7 @@ void device_updated(cJSON* cj_request, cJSON* cj_response)
     if (cj_request)
     {
         cJSON_AddStringToObject(cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
-        cJSON_AddStringToObject(cj_response, ezlopi_msg_subclass_str, "hub.device.updated");
+        cJSON_AddStringToObject(cj_response, ezlopi_msg_subclass_str, ezlopi_device_updated_str);
 
         cJSON* cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
         if (cj_result)
@@ -141,9 +141,10 @@ void device_updated(cJSON* cj_request, cJSON* cj_response)
                                 {
                                     cJSON_AddItemToArray(cj_device_changable, cJSON_CreateString(ezlopi_name_str));
                                     cJSON_AddItemToArray(cj_device_changable, cJSON_CreateString(ezlopi_armed_str));
+                                    cJSON_AddItemToArray(cj_device_changable, cJSON_CreateString(ezlopi_reachable_str));
+                                    cJSON_AddItemToArray(cj_device_changable, cJSON_CreateString(ezlopi_room_id_str));
                                 }
                             }
-                            TRACE_E("%s", cJSON_Print(cj_response));
                             break;
                         }
 
