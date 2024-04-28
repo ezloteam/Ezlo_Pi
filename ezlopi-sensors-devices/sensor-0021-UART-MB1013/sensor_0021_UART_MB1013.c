@@ -71,13 +71,7 @@ static int __get_value_cjson(l_ezlopi_item_t* item, void* arg)
         if (mb1013_args)
         {
             cJSON* cj_result = (cJSON*)arg;
-            cJSON_AddNumberToObject(cj_result, ezlopi_value_str, mb1013_args->current_value);
-            char* valueFormatted = ezlopi_valueformatter_float(mb1013_args->current_value);
-            if (valueFormatted)
-            {
-                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                free(valueFormatted);
-            }
+            ezlopi_valueformatter_float_to_cjson(item, cj_result, mb1013_args->current_value);
             ret = 1;
         }
     }
@@ -126,19 +120,15 @@ static int __init(l_ezlopi_item_t* item)
                 item->interface.uart.channel = ezlopi_uart_get_channel(ezlopi_uart_object_handle);
                 ret = 1;
             }
-            // else
-            // {
-            //     ret = -1;
-            //     free(item->user_arg); // this will free ; memory address linked to all items
-            //     item->user_arg = NULL;
-            //     // ezlopi_device_free_device_by_item(item);
-            // }
+            else
+            {
+                ret = -1;
+            }
         }
-        // else
-        // {
-        //     ret = -1;
-        //     ezlopi_device_free_device_by_item(item);
-        // }
+        else
+        {
+            ret = -1;
+        }
     }
 
     return ret;
@@ -146,11 +136,6 @@ static int __init(l_ezlopi_item_t* item)
 
 static void __setup_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    // char *device_name = NULL;
-    // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    // ASSIGN_DEVICE_NAME_V2(device, device_name);
-    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
-
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
     device->cloud_properties.device_type = dev_type_sensor;
@@ -172,9 +157,9 @@ static void __setup_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_devic
 static void __setup_item_interface_properties(l_ezlopi_item_t* item, cJSON* cj_device)
 {
     item->interface_type = EZLOPI_DEVICE_INTERFACE_UART;
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_baud_rate_str, item->interface.uart.baudrate);
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_tx_str, item->interface.uart.tx);
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_rx_str, item->interface.uart.rx);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_baud_str, item->interface.uart.baudrate);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_tx_str, item->interface.uart.tx);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_rx_str, item->interface.uart.rx);
 }
 
 static int __prepare(void* arg)
@@ -186,14 +171,14 @@ static int __prepare(void* arg)
         cJSON* cjson_device = prep_arg->cjson_device;
         if (cjson_device)
         {
-            l_ezlopi_device_t* device = ezlopi_device_add_device(prep_arg->cjson_device);
+            l_ezlopi_device_t* device = ezlopi_device_add_device(prep_arg->cjson_device, NULL);
             if (device)
             {
+                ret = 1;
                 __setup_device_cloud_properties(device, cjson_device);
                 l_ezlopi_item_t* item = ezlopi_device_add_item_to_device(device, sensor_0021_UART_MB1013);
                 if (item)
                 {
-                    item->cloud_properties.device_id = device->cloud_properties.device_id;
                     __setup_item_cloud_properties(item, cjson_device);
                     __setup_item_interface_properties(item, cjson_device);
 
@@ -202,8 +187,8 @@ static int __prepare(void* arg)
                     {
                         mb1030_args->current_value = 0.0;
                         mb1030_args->previous_value = 0.0;
+                        item->is_user_arg_unique = true;
                         item->user_arg = mb1030_args;
-                        ret = 1;
                     }
                 }
                 else
@@ -211,6 +196,10 @@ static int __prepare(void* arg)
                     ezlopi_device_free_device(device);
                     ret = -1;
                 }
+            }
+            else
+            {
+                ret = -1;
             }
         }
     }
@@ -228,7 +217,7 @@ static int __notify(l_ezlopi_item_t* item)
         {
             if (abs(mb1013_args->current_value - mb1013_args->previous_value) > 0.2) // accuracy of 0.5cm (i.e. 5mm)
             {
-                ezlopi_device_value_updated_from_device_v3(item);
+                ezlopi_device_value_updated_from_device_broadcast(item);
                 mb1013_args->previous_value = mb1013_args->current_value;
             }
         }

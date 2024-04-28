@@ -4,7 +4,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-#include "cJSON.h"
+#include "cjext.h"
 #include "zones.h"
 
 #include "ezlopi_cloud_constants.h"
@@ -14,8 +14,6 @@
 
 void EZPI_CLOUD_location_list(cJSON* cj_request, cJSON* cj_response)
 {
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
     cJSON* cjson_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
     if (cjson_result)
     {
@@ -45,8 +43,6 @@ void EZPI_CLOUD_location_list(cJSON* cj_request, cJSON* cj_response)
 
 void EZPI_CLOUD_location_get(cJSON* cj_request, cJSON* cj_response)
 {
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
     cJSON* cjson_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
     if (cjson_result)
     {
@@ -65,9 +61,6 @@ void EZPI_CLOUD_location_get(cJSON* cj_request, cJSON* cj_response)
 
 void EZPI_CLOUD_location_set(cJSON* cj_request, cJSON* cj_response)
 {
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
-
     cJSON* cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
     if (cj_params)
     {

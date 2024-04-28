@@ -3,14 +3,14 @@
 
 #include "esp_netif_types.h"
 #include "esp_wifi_types.h"
-#include "cJSON.h"
+#include "cjext.h"
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
-    typedef void (*f_ezlopi_wifi_event_upcall)(esp_event_base_t event, int32_t event_id, void *arg);
+    typedef void (*f_ezlopi_wifi_event_upcall)(esp_event_base_t event, int32_t event_id, void* arg);
 
     typedef struct ll_ezlopi_wifi_event_upcall
     {
@@ -39,7 +39,7 @@ extern "C"
 
     void ezlopi_wifi_event_add(f_ezlopi_wifi_event_upcall upcall, void* arg);
 
-
+    int ezlopi_wifi_get_wifi_mac(uint8_t mac[6]);
 
     void ezlopi_wifi_scan_start();
     void ezlopi_wifi_scan_stop();

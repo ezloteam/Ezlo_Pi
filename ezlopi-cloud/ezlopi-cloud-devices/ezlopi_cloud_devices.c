@@ -8,13 +8,10 @@
 #include "ezlopi_core_devices_list.h"
 #include "ezlopi_cloud_keywords.h"
 #include "ezlopi_cloud_methods_str.h"
-#include "cJSON.h"
+#include "cjext.h"
 
 void devices_list_v3(cJSON* cj_request, cJSON* cj_response)
 {
-    int count = 0;
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
     cJSON* cjson_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
     if (cjson_result)
     {
@@ -28,7 +25,6 @@ void devices_list_v3(cJSON* cj_request, cJSON* cj_response)
                 cJSON* cj_properties = ezlopi_device_create_device_table_from_prop(curr_device);
                 if (cj_properties)
                 {
-                    // TRACE_W("Device_ID : %s [%d]", cJSON_Print(cj_properties), ++count);
                     if (!cJSON_AddItemToArray(cjson_devices_array, cj_properties))
                     {
                         cJSON_Delete(cj_properties);
@@ -37,22 +33,24 @@ void devices_list_v3(cJSON* cj_request, cJSON* cj_response)
                 curr_device = curr_device->next;
             }
         }
+#if (1 == ENABLE_TRACE)
         else
         {
             TRACE_E("Failed to create devices-array");
         }
+#endif
     }
+
+#if (1 == ENABLE_TRACE)
     else
     {
         TRACE_E("Failed to create 'result'");
     }
+#endif
 }
 
 void device_name_set(cJSON* cj_request, cJSON* cj_response)
 {
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
-
     cJSON* cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
     if (cj_result)
     {
@@ -76,9 +74,6 @@ void device_updated(cJSON* cj_request, cJSON* cj_response)
 {
     if (cj_request)
     {
-        cJSON_DeleteItemFromObject(cj_response, ezlopi_sender_str);
-        cJSON_DeleteItemFromObject(cj_response, ezlopi_error_str);
-
         cJSON_AddStringToObject(cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
         cJSON_AddStringToObject(cj_response, ezlopi_msg_subclass_str, "hub.device.updated");
 

@@ -133,7 +133,14 @@ static int __setting_initialize_hilink_presence_sensor_userdefined_settings(l_ez
             if (NULL != read_value)
             {
                 TRACE_I("Setting already exist.");
-                ESP_ERROR_CHECK(__setting_extract_user_defined_setting(read_value, hilink_presence_sensor_user_defined_setting_val));
+                cJSON* cj_value = cJSON_Parse(read_value);
+                free(read_value);
+
+                if (cj_value)
+                {
+                    __setting_extract_user_defined_setting(cj_value, hilink_presence_sensor_user_defined_setting_val);
+                    cJSON_Delete(cj_value);
+                }
             }
             else
             {
@@ -356,13 +363,13 @@ static int __setting_get_pre_defined_setting(void* arg, l_ezlopi_device_settings
     s_hilink_predefined_setting_value_t* setting_value = (s_hilink_predefined_setting_value_t*)setting->user_arg;
     if (cj_properties && setting_value)
     {
-        cJSON_AddItemToObject(cj_properties, "label", __setting_add_text_and_lang_tag(HILINK_PRESENCE_SENSOR_SETTING_PREDEFINED_LABEL_TEXT, HILINK_PRESENCE_SENSOR_SETTING_PREDEFINED_LABEL_LANG_TAG));
-        cJSON_AddItemToObject(cj_properties, "description", __setting_add_text_and_lang_tag(HILINK_PRESENCE_SENSOR_SETTING_PREDEFINED_DESCRIPTION_TEXT, HILINK_PRESENCE_SENSOR_SETTING_PREDEFINED_DESCRIPTION_LANG_TAG));
+        cJSON_AddItemToObject(cj_properties, ezlopi_label_str, __setting_add_text_and_lang_tag(HILINK_PRESENCE_SENSOR_SETTING_PREDEFINED_LABEL_TEXT, HILINK_PRESENCE_SENSOR_SETTING_PREDEFINED_LABEL_LANG_TAG));
+        cJSON_AddItemToObject(cj_properties, ezlopi_description_str, __setting_add_text_and_lang_tag(HILINK_PRESENCE_SENSOR_SETTING_PREDEFINED_DESCRIPTION_TEXT, HILINK_PRESENCE_SENSOR_SETTING_PREDEFINED_DESCRIPTION_LANG_TAG));
 
-        cJSON_AddStringToObject(cj_properties, "status", "synced");
-        cJSON_AddStringToObject(cj_properties, "valueType", value_type_token);
+        cJSON_AddStringToObject(cj_properties, ezlopi_status_str, ezlopi_synced_str);
+        cJSON_AddStringToObject(cj_properties, ezlopi_valueType_str, value_type_token);
 
-        cJSON* enum_object = cJSON_AddObjectToObject(cj_properties, "enum");
+        cJSON* enum_object = cJSON_AddObjectToObject(cj_properties, ezlopi_enum_str);
         if (enum_object)
         {
 
@@ -380,7 +387,7 @@ static int __setting_get_pre_defined_setting(void* arg, l_ezlopi_device_settings
             ret = 1;
         }
         cJSON_AddStringToObject(cj_properties, ezlopi_value_str, setting_value->setting_value);
-        cJSON_AddStringToObject(cj_properties, "valueDefault", hilink_presence_sensor_setting_enum[7]);
+        cJSON_AddStringToObject(cj_properties, ezlopi_valueDefault_str, hilink_presence_sensor_setting_enum[7]);
     }
     else
     {
@@ -397,18 +404,18 @@ static int __setting_get_user_defined_setting(void* arg, l_ezlopi_device_setting
     s_hilink_userdefined_setting_value_t* setting_value = (s_hilink_userdefined_setting_value_t*)setting->user_arg;
     if (cj_properties && setting_value)
     {
-        cJSON_AddItemToObject(cj_properties, "label", __setting_add_text_and_lang_tag(HILINK_PRESENCE_SENSOR_SETTING_USER_DEFINED_LABEL_TEXT, HILINK_PRESENCE_SENSOR_SETTING_USER_DEFINED_LABEL_LANG_TAG));
-        cJSON_AddItemToObject(cj_properties, "description", __setting_add_text_and_lang_tag(HILINK_PRESENCE_SENSOR_SETTING_USER_DEFINED_DESCRIPTION_TEXT, HILINK_PRESENCE_SENSOR_SETTING_USER_DEFINED_DESCRIPTION_LANG_TAG));
+        cJSON_AddItemToObject(cj_properties, ezlopi_label_str, __setting_add_text_and_lang_tag(HILINK_PRESENCE_SENSOR_SETTING_USER_DEFINED_LABEL_TEXT, HILINK_PRESENCE_SENSOR_SETTING_USER_DEFINED_LABEL_LANG_TAG));
+        cJSON_AddItemToObject(cj_properties, ezlopi_description_str, __setting_add_text_and_lang_tag(HILINK_PRESENCE_SENSOR_SETTING_USER_DEFINED_DESCRIPTION_TEXT, HILINK_PRESENCE_SENSOR_SETTING_USER_DEFINED_DESCRIPTION_LANG_TAG));
 
-        cJSON_AddStringToObject(cj_properties, "status", "synced");
-        cJSON_AddStringToObject(cj_properties, "valueType", value_type_presence_operation_mode);
+        cJSON_AddStringToObject(cj_properties, ezlopi_status_str, ezlopi_synced_str);
+        cJSON_AddStringToObject(cj_properties, ezlopi_valueType_str, value_type_presence_operation_mode);
 
         cJSON* cj_value = cJSON_AddObjectToObject(cj_properties, ezlopi_value_str);
         if (cj_value)
         {
             ESP_ERROR_CHECK(__prepare_user_defined_setting_cjson(cj_value, setting_value));
         }
-        cJSON* cj_value_default = cJSON_AddObjectToObject(cj_properties, "valueDefault");
+        cJSON* cj_value_default = cJSON_AddObjectToObject(cj_properties, ezlopi_valueDefault_str);
         if (cj_value_default)
         {
             ESP_ERROR_CHECK(__prepare_user_defined_setting_cjson(cj_value_default, (s_hilink_userdefined_setting_value_t*)&hilink_user_defined_setting_default_value));
@@ -430,15 +437,15 @@ static int __setting_get_radar_distance_sensitivity_setting(void* arg, l_ezlopi_
     s_hilink_radar_distance_sensitivity_value_t* setting_value = (s_hilink_radar_distance_sensitivity_value_t*)setting->user_arg;
     if (cj_properties && setting_value)
     {
-        cJSON_AddItemToObject(cj_properties, "label", __setting_add_text_and_lang_tag(HILINK_PRESENCE_SENSOR_SETTING_RADAR_DISTANCE_SENSITIVITY_LABEL_TEXT, HILINK_PRESENCE_SENSOR_SETTING_RADAR_DISTANCE_SENSITIVITY_LABEL_LANG_TAG));
-        cJSON_AddItemToObject(cj_properties, "description", __setting_add_text_and_lang_tag(HILINK_PRESENCE_SENSOR_SETTING_RADAR_DISTANCE_SENSITIVITY_DESCRIPTION_TEXT, HILINK_PRESENCE_SENSOR_SETTING_RADAR_DISTANCE_SENSITIVITY_DESCRIPTION_LANG_TAG));
+        cJSON_AddItemToObject(cj_properties, ezlopi_label_str, __setting_add_text_and_lang_tag(HILINK_PRESENCE_SENSOR_SETTING_RADAR_DISTANCE_SENSITIVITY_LABEL_TEXT, HILINK_PRESENCE_SENSOR_SETTING_RADAR_DISTANCE_SENSITIVITY_LABEL_LANG_TAG));
+        cJSON_AddItemToObject(cj_properties, ezlopi_description_str, __setting_add_text_and_lang_tag(HILINK_PRESENCE_SENSOR_SETTING_RADAR_DISTANCE_SENSITIVITY_DESCRIPTION_TEXT, HILINK_PRESENCE_SENSOR_SETTING_RADAR_DISTANCE_SENSITIVITY_DESCRIPTION_LANG_TAG));
 
-        cJSON_AddStringToObject(cj_properties, "status", "synced");
-        cJSON_AddStringToObject(cj_properties, "valueType", value_type_int);
+        cJSON_AddStringToObject(cj_properties, ezlopi_status_str, ezlopi_synced_str);
+        cJSON_AddStringToObject(cj_properties, ezlopi_valueType_str, value_type_int);
         cJSON_AddNumberToObject(cj_properties, ezlopi_value_str, setting_value->distance_sensitivity_value);
-        cJSON_AddNumberToObject(cj_properties, "valueMin", 5);
-        cJSON_AddNumberToObject(cj_properties, "valueMax", 30);
-        cJSON_AddNumberToObject(cj_properties, "valueDefault", 10);
+        cJSON_AddNumberToObject(cj_properties, ezlopi_valueMin_str, 5);
+        cJSON_AddNumberToObject(cj_properties, ezlopi_valueMax_str, 30);
+        cJSON_AddNumberToObject(cj_properties, ezlopi_valueDefault_str, 10);
     }
     else
     {
@@ -524,7 +531,7 @@ static int __setting_set_change_setting_template(ld2410_template_t template, uin
         if (setting_id == hilink_presence_sensor_setting_ids[0])
         {
             __setting_set_change_user_defined_template(true);
-            ezlopi_setting_value_updated_from_device_v3(hilink_presence_sensor_user_defined_setting);
+            ezlopi_core_device_value_updated_settings_broadcast(hilink_presence_sensor_user_defined_setting);
         }
         else
         {
@@ -533,7 +540,7 @@ static int __setting_set_change_setting_template(ld2410_template_t template, uin
             if (predef_value && (0 == strcmp(predef_value->setting_value, hilink_presence_sensor_setting_enum[9])))
             {
                 __setting_set_change_user_defined_template(true);
-                ezlopi_setting_value_updated_from_device_v3(hilink_presence_sensor_predefined_setting);
+                ezlopi_core_device_value_updated_settings_broadcast(hilink_presence_sensor_predefined_setting);
             }
             else
             {
@@ -656,7 +663,8 @@ static int __setting_set_user_defined_setting(void* arg, l_ezlopi_device_setting
         cJSON* cj_value = cJSON_GetObjectItem(cj_properties, ezlopi_value_str);
         if (cj_value)
         {
-            ESP_ERROR_CHECK(__setting_extract_user_defined_setting(cJSON_Print(cj_value), setting_val));
+            __setting_extract_user_defined_setting(cj_value, setting_val);
+
             char* value_str = __prepare_user_defined_setting_str(setting_val);
             if (value_str)
             {
@@ -695,7 +703,7 @@ static int __setting_set_radar_distance_sensitivity_setting(void* arg, l_ezlopi_
     s_hilink_radar_distance_sensitivity_value_t* setting_val = (s_hilink_radar_distance_sensitivity_value_t*)setting->user_arg;
     if (cj_properties && setting && setting_val)
     {
-        CJSON_GET_VALUE_INT(cj_properties, ezlopi_value_str, setting_val->distance_sensitivity_value);
+        CJSON_GET_VALUE_DOUBLE(cj_properties, ezlopi_value_str, setting_val->distance_sensitivity_value);
         if (!ezlopi_nvs_write_int32(setting_val->distance_sensitivity_value, nvs_key_hilink_presence_sensor_radar_distance_sensitivity))
         {
             TRACE_E("Failed to write to NVS");
@@ -727,7 +735,7 @@ static int __settings_set(void* arg, l_ezlopi_device_settings_v3_t* setting)
         ESP_ERROR_CHECK(__setting_set_radar_distance_sensitivity_setting(arg, setting));
     }
 
-    ezlopi_setting_value_updated_from_device_v3(setting);
+    ezlopi_core_device_value_updated_settings_broadcast(setting);
 
     return ret;
 }
@@ -862,7 +870,7 @@ static int __settings_reset(void* arg, l_ezlopi_device_settings_v3_t* setting)
         ESP_ERROR_CHECK(__setting_reset_radar_distance_sensitivity_setting(arg, setting));
     }
 
-    ezlopi_setting_value_updated_from_device_v3(setting);
+    ezlopi_core_device_value_updated_settings_broadcast(setting);
 
     return ret;
 }
@@ -911,7 +919,7 @@ static int __setting_update_user_defined_setting(void* arg, l_ezlopi_device_sett
             }
             else
             {
-                cJSON_AddBoolToObject(cj_value, "is_active", setting_value->is_active);
+                cJSON_AddBoolToObject(cj_value, ezlopi_is_active_str, setting_value->is_active);
             }
         }
         else

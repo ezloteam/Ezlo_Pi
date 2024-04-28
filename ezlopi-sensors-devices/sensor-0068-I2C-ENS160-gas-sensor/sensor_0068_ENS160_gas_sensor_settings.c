@@ -9,6 +9,7 @@
 #include "ezlopi_cloud_settings.h"
 
 #include "ezlopi_cloud_constants.h"
+#include "ezlopi_core_device_value_updated.h"
 
 #include "ens160.h"
 #include "sensor_0068_ENS160_gas_sensor_settings.h"
@@ -334,7 +335,10 @@ static int __settings_set(void* arg, l_ezlopi_device_settings_v3_t* setting)
         ESP_ERROR_CHECK(__settings_set_ens160_gas_sensor_relative_humidity_get(arg, setting));
     }
     setting_changed = true;
-    ezlopi_cloud_settings_updated_from_devices_v3(NULL, setting);
+
+
+    ezlopi_core_device_value_updated_settings_broadcast(setting);
+    // ezlopi_cloud_settings_updated_from_devices_v3(NULL, setting);
     return ret;
 
 }
@@ -460,7 +464,9 @@ static int __settings_reset(void* arg, l_ezlopi_device_settings_v3_t* setting)
         ESP_ERROR_CHECK(__settings_reset_ens160_gas_sensor_relative_humidity_get(arg, setting));
     }
     setting_changed = true;
-    ezlopi_cloud_settings_updated_from_devices_v3(NULL, setting);
+
+    ezlopi_core_device_value_updated_settings_broadcast(setting);
+    // ezlopi_cloud_settings_updated_from_devices_v3(NULL, setting);
     return ret;
 
 }

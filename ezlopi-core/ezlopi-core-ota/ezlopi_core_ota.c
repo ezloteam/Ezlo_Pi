@@ -1,4 +1,4 @@
-// #include "cJSON.h"
+// #include "cjext.h"
 // #include "nvs.h"
 // #include "nvs_flash.h"
 #include <string.h>
@@ -21,6 +21,8 @@
 #include "ezlopi_core_processes.h"
 
 #include "ezlopi_service_ota.h"
+
+#if defined(CONFIG_EZPI_ENABLE_OTA)
 
 #define HASH_LEN 32
 
@@ -128,7 +130,7 @@ static void ezlopi_ota_process(void* pv)
     }
 #endif
 
-    if (true == __get_ota_service_busy_state())
+    if (true == ezlopi_service_ota_get_busy_state())
     {
         __ota_in_process = EZLOPI_OTA_STATE_UPDATING;
     }
@@ -137,7 +139,7 @@ static void ezlopi_ota_process(void* pv)
     if (ret == ESP_OK)
     {
         TRACE_W("Firmware Upgrade Successful, restarting !");
-        EZPI_CORE_reboot();
+        EZPI_CORE_reset_reboot();
     }
     else
     {
@@ -198,3 +200,4 @@ static esp_err_t _http_event_handler(esp_http_client_event_t* evt)
     }
     return ESP_OK;
 }
+#endif // CONFIG_EZPI_ENABLE_OTA

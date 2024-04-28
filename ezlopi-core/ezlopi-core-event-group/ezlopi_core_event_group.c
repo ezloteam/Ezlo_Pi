@@ -44,8 +44,6 @@ int ezlopi_event_group_wait_for_event(e_ezlopi_event_t event, uint32_t wait_time
         {
             ret = 1;
         }
-
-        // TRACE_D("event-bits: %08x, event: %08x", event_bits, event);
     }
     else
     {
@@ -54,3 +52,15 @@ int ezlopi_event_group_wait_for_event(e_ezlopi_event_t event, uint32_t wait_time
 
     return ret;
 }
+
+e_ezlopi_event_t ezlopi_get_event_bit_status()
+{
+    e_ezlopi_event_t ret = 0;
+    if (ezlopi_event_group_handle)
+    {
+        ret = xEventGroupGetBits(ezlopi_event_group_handle);
+    }
+    return ret;
+}
+
+

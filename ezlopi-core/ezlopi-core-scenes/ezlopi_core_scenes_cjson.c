@@ -98,7 +98,7 @@ cJSON* ezlopi_scene_cjson_get_field(l_fields_v2_t* field_node)
                 {
                     cJSON_AddItemToObject(cj_field, ezlopi_value_str, cJSON_Duplicate(field_node->field_value.u_value.cj_value, 1));
                 }
-
+                break;
             }
             case EZLOPI_VALUE_TYPE_CREDENTIAL:
             case EZLOPI_VALUE_TYPE_DICTIONARY:
@@ -110,8 +110,6 @@ cJSON* ezlopi_scene_cjson_get_field(l_fields_v2_t* field_node)
             case EZLOPI_VALUE_TYPE_INT_ARRAY:
             case EZLOPI_VALUE_TYPE_HMS_INTERVAL:
             {
-                // #warning "need to duplicate?"
-                // cJSON_AddItemReferenceToObject(cj_field, ezlopi_value_str, field_node->field_value.u_value.cj_value);
                 cJSON_AddItemToObject(cj_field, ezlopi_value_str, cJSON_Duplicate(field_node->field_value.u_value.cj_value, 1));
                 break;
             }
@@ -173,8 +171,10 @@ cJSON* ezlopi_scene_cjson_get_field(l_fields_v2_t* field_node)
             }
             default:
             {
+#if (1 == ENABLE_TRACE)
                 const char* value_type_name = ezlopi_scene_get_scene_value_type_name(field_node->value_type);
                 TRACE_E("Value type not matched!, curr-type[%d]: %s ", field_node->value_type, value_type_name ? value_type_name : ezlopi_null_str);
+#endif
                 break;
             }
             }
@@ -383,6 +383,7 @@ static void __cjson_add_fields(cJSON* cj_block, l_fields_v2_t* fields)
                         __cjson_add_string(cj_field, ezlopi_value_str, curr_field->field_value.u_value.value_string);
                         break;
                     }
+                    case EZLOPI_VALUE_TYPE_BLOCK:
                     case EZLOPI_VALUE_TYPE_BLOCKS:
                     {
                         cJSON* vlaue_block_array = cJSON_AddArrayToObject(cj_field, ezlopi_value_str);
@@ -507,8 +508,10 @@ static void __cjson_add_fields(cJSON* cj_block, l_fields_v2_t* fields)
                     }
                     default:
                     {
+#if (1 == ENABLE_TRACE)
                         const char* value_type_name = ezlopi_scene_get_scene_value_type_name(curr_field->value_type);
                         TRACE_E("Value type not matched!, curr-type[%d]: %s ", curr_field->value_type, value_type_name ? value_type_name : ezlopi_null_str);
+#endif
                         break;
                     }
                     }
@@ -658,24 +661,6 @@ cJSON* ezlopi_scenes_create_cjson_scene_list(l_scenes_list_v2_t* scenes_list)
     }
 
     return cj_scenes_array;
-}
-
-char* ezlopi_scenes_create_json_string(l_scenes_list_v2_t* scenes_list)
-{
-    char* scenes_list_str = NULL;
-
-    cJSON* cj_scenes_array = ezlopi_scenes_create_cjson_scene_list(scenes_list);
-    if (cj_scenes_array)
-    {
-        scenes_list_str = cJSON_Print(cj_scenes_array);
-        cJSON_Delete(cj_scenes_array);
-
-        if (scenes_list_str)
-        {
-            cJSON_Minify(scenes_list_str);
-        }
-    }
-    return scenes_list_str;
 }
 
 static void __cjson_add_string(cJSON* root, const char* key, const char* value)

@@ -41,9 +41,6 @@ extern "C"
     uint32_t ezlopi_nvs_get_boot_count(void);
     void ezlopi_nvs_set_boot_count(uint32_t boot_count);
 
-    uint32_t ezlopi_nvs_get_provisioning_status(void);
-    void ezlopi_nvs_set_provisioning_status(void);
-
     void ezlopi_nvs_scenes_soft_reset(void);
     void ezlopi_nvs_scenes_factory_info_reset(void);
 
@@ -54,6 +51,8 @@ extern "C"
 
     uint8_t ezlopi_nvs_write_int32(int32_t i, const char* key_name);
     uint8_t ezlopi_nvs_read_int32(int32_t* i, const char* key_name);
+    uint8_t ezlopi_nvs_write_uint32(uint32_t i, const char* key_name);
+    uint8_t ezlopi_nvs_read_uint32(uint32_t* i, const char* key_name);
     uint8_t ezlopi_nvs_write_bool(bool b, const char* key_name);
     uint8_t ezlopi_nvs_read_bool(bool* b, const char* key_name);
     uint8_t ezlopi_nvs_write_float32(float f, const char* key_name);
@@ -93,6 +92,24 @@ extern "C"
 
     char* ezlopi_nvs_read_latidtude_longitude();
     int ezlopi_nvs_write_latitude_longitude(char* data);
+
+    bool EZPI_CORE_nvs_write_baud(uint32_t baud);
+    uint8_t EZPI_CORE_nvs_read_baud(uint32_t* baud);
+
+    bool EZPI_CORE_nvs_write_parity(uint32_t parity);
+    uint8_t EZPI_CORE_nvs_read_parity(uint32_t* parity);
+
+    bool EZPI_CORE_nvs_write_start_bits(uint32_t start_bits);
+    uint8_t EZPI_CORE_nvs_read_start_bits(uint32_t* start_bits);
+
+    bool EZPI_CORE_nvs_write_stop_bits(uint32_t stop_bits);
+    uint8_t EZPI_CORE_nvs_read_stop_bits(uint32_t* stop_bits);
+
+    bool EZPI_CORE_nvs_write_frame_size(uint32_t frame_size);
+    uint8_t EZPI_CORE_nvs_read_frame_size(uint32_t* frame_size);
+
+    bool EZPI_CORE_nvs_write_flow_control(uint32_t flow_control);
+    uint8_t EZPI_CORE_nvs_read_flow_control(uint32_t* flow_control);
 
 #ifdef __cplusplus
 }

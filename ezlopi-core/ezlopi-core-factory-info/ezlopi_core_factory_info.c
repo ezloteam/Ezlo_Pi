@@ -6,15 +6,16 @@
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_factory_info.h"
 
-#if (ID_BIN_VERSION_2 == ID_BIN_VERSION)
-static char* g_ca_certificate = NULL;
-static char* g_ssl_private_key = NULL;
-static char* g_ssl_shared_key = NULL;
-static char* g_ezlopi_config = NULL;
-#endif
+#define UPDATE_STRING_VALUE(buffer, data, offset, length)  \
+    {                                                      \
+        if (data)                                          \
+        {                                                  \
+            snprintf(buffer + offset, length, "%s", data); \
+        }                                                  \
+    }
 
-static const esp_partition_t* partition_ctx_v3 = NULL;
 static uint32_t g_provisioning_status = 0;
+static const esp_partition_t* partition_ctx_v3 = NULL;
 
 static int ezlopi_factory_info_v3_set_4kb(const char* data, uint32_t offset)
 {
@@ -25,7 +26,7 @@ static int ezlopi_factory_info_v3_set_4kb(const char* data, uint32_t offset)
         {
             if (ESP_OK == esp_partition_write(partition_ctx_v3, offset, data, strlen(data) + 1))
             {
-                TRACE_S("Flash write succeessful");
+                TRACE_S("Flash write successful");
                 ret = 1;
             }
             else
@@ -69,17 +70,8 @@ static char* ezlopi_factory_info_v3_read_string(e_ezlopi_factory_info_v3_offset_
         {
             if (ESP_OK == esp_partition_read(partition_ctx_v3, offset, tmp_buffer, length))
             {
-                // dump("tmp_buffer", tmp_buffer, 0, length);
-                // vTaskDelay(1);
-
-                // TRACE_D("esp_get_free_heap_size: %d", esp_get_free_heap_size());
-                // TRACE_D("esp_get_minimum_free_heap_size: %u", esp_get_minimum_free_heap_size());
-
                 int s_length = (strlen(tmp_buffer) < length) ? strlen(tmp_buffer) : length;
                 read_string = (char*)malloc(s_length + 1);
-
-                // TRACE_D("esp_get_free_heap_size: %d", esp_get_free_heap_size());
-                // TRACE_D("esp_get_minimum_free_heap_size: %u", esp_get_minimum_free_heap_size());
 
                 if (NULL != read_string)
                 {
@@ -119,9 +111,6 @@ const esp_partition_t* ezlopi_factory_info_v3_init(void)
     if (NULL == partition_ctx_v3)
     {
         partition_ctx_v3 = esp_partition_find_first(EZLOPI_FACTORY_INFO_V3_PARTITION_TYPE, EZLOPI_FACTORY_INFO_V3_SUBTYPE, EZLOPI_FACTORY_INFO_V3_PARTITION_NAME);
-
-        unsigned long long id = ezlopi_factory_info_v3_get_id();
-        // TRACE_D("SERIAL-ID [off: 0x%04X, size: 0x%04X]:             %llu", ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_DEVICE_ID, E_EZLOPI_FACTORY_INFO_HUB_DATA), EZLOPI_FINFO_LEN_DEVICE_ID, id);
     }
     return partition_ctx_v3;
 }
@@ -137,6 +126,7 @@ void ezlopi_factory_info_v3_free(void* arg)
 
 void print_factory_info_v3(void)
 {
+#if (1 == ENABLE_TRACE)
     // uint16_t version = ezlopi_factory_info_v3_get_version();
     unsigned long long id = ezlopi_factory_info_v3_get_id();
 
@@ -150,13 +140,12 @@ void print_factory_info_v3(void)
     char* wifi_ssid = ezlopi_factory_info_v3_get_ssid();
     char* wifi_password = ezlopi_factory_info_v3_get_password();
     char* cloud_server = ezlopi_factory_info_v3_get_cloud_server();
-    char* provision_server = ezlopi_factory_info_v3_get_provisioning_server();
-    char* device_type = ezlopi_factory_info_v3_get_device_type();
+    // const char* provision_server = ezlopi_factory_info_v3_get_provisioning_server();
+    const char* device_type = ezlopi_factory_info_v3_get_device_type();
     char* ca_certificate = ezlopi_factory_info_v3_get_ca_certificate();
     char* ssl_private_key = ezlopi_factory_info_v3_get_ssl_private_key();
     char* ssl_shared_key = ezlopi_factory_info_v3_get_ssl_shared_key();
     char* ezlopi_config = ezlopi_factory_info_v3_get_ezlopi_config();
-
 
     TRACE_W("----------------- Factory Info -----------------");
     // TRACE_W("VERSION[off: 0x%04X, size: 0x%04X]:                %d", VERSION_OFFSET, VERSION_LENGTH, version);
@@ -172,9 +161,9 @@ void print_factory_info_v3(void)
     TRACE_W("WIFI-PASSWORD [off: 0x%04X, size: 0x%04X]:         %s", ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_WIFI_PASS, E_EZLOPI_FACTORY_INFO_HUB_DATA), EZLOPI_FINFO_LEN_WIFI_PASS, wifi_password ? wifi_password : "null");
     TRACE_W("CLOUD_SERVER [off: 0x%04X, size: 0x%04X]:          %s", ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_CLOUD_SERVER_URL, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_CLOUD_SERVER_URL, cloud_server ? cloud_server : "null");
     TRACE_W("DEVICE_TYPE [off: 0x%04X, size: 0x%04X]:           %s", ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_EZLOPI_DEVICE_TYPE, E_EZLOPI_FACTORY_INFO_HUB_DATA), EZLOPI_FINFO_LEN_EZLOPI_DEVICE_TYPE, device_type ? device_type : "null");
-    TRACE_W("CA_CERTIFICATE [off: 0x%04X, size: 0x%04X]:        %s", ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_CA_CERTIFICATE, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_CA_CERTIFICATE, ca_certificate ? ca_certificate : "null");
-    TRACE_W("SSL_PRIVATE_KEY [off: 0x%04X, size: 0x%04X]:       %s", ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_SSL_PRIVATE_KEY, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_SSL_PRIVATE_KEY, ssl_private_key ? ssl_private_key : "null");
-    TRACE_W("SSL_SHARED_KEY [off: 0x%04X, size: 0x%04X]:        %s", ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_SSL_SHARED_KEY, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_SSL_SHARED_KEY, ssl_shared_key ? ssl_shared_key : "null");
+    // TRACE_W("CA_CERTIFICATE [off: 0x%04X, size: 0x%04X]:        %s", ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_CA_CERTIFICATE, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_CA_CERTIFICATE, ca_certificate ? ca_certificate : "null");
+    // TRACE_W("SSL_PRIVATE_KEY [off: 0x%04X, size: 0x%04X]:       %s", ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_SSL_PRIVATE_KEY, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_SSL_PRIVATE_KEY, ssl_private_key ? ssl_private_key : "null");
+    // TRACE_W("SSL_SHARED_KEY [off: 0x%04X, size: 0x%04X]:        %s", ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_SSL_SHARED_KEY, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_SSL_SHARED_KEY, ssl_shared_key ? ssl_shared_key : "null");
     TRACE_W("EZLOPI_CONFIG [off: 0x%04X, size: 0x%04X]:         %s", ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_EZLOPI_CONFIG_JSON, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_EZLOPI_CONFIG_JSON, ezlopi_config ? ezlopi_config : "null");
     TRACE_W("-------------------------------------------------");
 
@@ -191,11 +180,19 @@ void print_factory_info_v3(void)
     ezlopi_factory_info_v3_free(ca_certificate);
     ezlopi_factory_info_v3_free(ssl_private_key);
     ezlopi_factory_info_v3_free(ssl_shared_key);
+#endif
 }
 
 /** Getter */
 uint32_t ezlopi_factory_info_v3_get_provisioning_status(void)
 {
+    char* cloud_server = ezlopi_factory_info_v3_read_string(ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_CLOUD_SERVER_URL, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_CLOUD_SERVER_URL);
+    if (cloud_server && strstr(cloud_server, "https://"))
+    {
+        g_provisioning_status = 1;
+        free(cloud_server);
+    }
+
     return g_provisioning_status;
 }
 
@@ -207,8 +204,7 @@ uint16_t ezlopi_factory_info_v3_get_version(void)
     {
         uint8_t tmp_version_arr[EZLOPI_FINFO_LEN_VERSION];
         memset(tmp_version_arr, 0, EZLOPI_FINFO_LEN_VERSION);
-        int read_couont = esp_partition_read(partition_ctx_v3, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_FMW_VERSION, E_EZLOPI_FACTORY_INFO_HUB_DATA), &tmp_version_arr, EZLOPI_FINFO_LEN_VERSION);
-        TRACE_I("read-count: %d", read_couont);
+        esp_partition_read(partition_ctx_v3, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_FMW_VERSION, E_EZLOPI_FACTORY_INFO_HUB_DATA), &tmp_version_arr, EZLOPI_FINFO_LEN_VERSION);
 
         for (int i = 0; i < 4; i++)
         {
@@ -313,6 +309,11 @@ uint16_t ezlopi_factory_info_v3_get_config_version(void)
 unsigned long long ezlopi_factory_info_v3_get_id(void)
 {
     unsigned long long _id = 0ULL;
+
+    if (ezlopi_factory_info_v3_get_provisioning_status() != 1)
+    {
+        return 0;
+    }
 
     if (ezlopi_factory_info_v3_init())
     {
@@ -461,15 +462,6 @@ char* ezlopi_factory_info_v3_get_ezlopi_config(void)
     return ret;
 }
 
-
-#define UPDATE_STRING_VALUE(buffer, data, offset, length)  \
-    {                                                      \
-        if (data)                                          \
-        {                                                  \
-            snprintf(buffer + offset, length, "%s", data); \
-        }                                                  \
-    }
-
 int ezlopi_factory_info_v3_set_basic(s_basic_factory_info_t* ezlopi_config_basic)
 {
     int ret = 0;
@@ -593,6 +585,14 @@ int ezlopi_factory_info_v3_set_basic(s_basic_factory_info_t* ezlopi_config_basic
                         {
                             ret = (ret == 1) ? 1 : 0;
                         }
+                        else
+                        {
+                            ret = 0;
+                        }
+                    }
+                    else
+                    {
+                        ret = 0;
                     }
                 }
                 else
@@ -603,7 +603,6 @@ int ezlopi_factory_info_v3_set_basic(s_basic_factory_info_t* ezlopi_config_basic
                 free(tmp_buffer);
             }
         }
-
     }
     return ret;
 }
@@ -632,7 +631,8 @@ int ezlopi_factory_info_v3_set_wifi(char* ssid, char* password)
                             ret = 1;
                         }
                     }
-                    else {
+                    else
+                    {
                         TRACE_E("failed to save wifi");
                     }
                 }

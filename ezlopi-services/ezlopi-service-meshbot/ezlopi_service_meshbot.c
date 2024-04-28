@@ -5,7 +5,6 @@
 
 #include "ezlopi_core_scenes_status_changed.h"
 #include "ezlopi_core_scenes_v2.h"
-#include "ezlopi_core_processes.h"
 
 #include "ezlopi_cloud_constants.h"
 
@@ -85,9 +84,7 @@ uint32_t ezlopi_meshbot_service_start_scene(l_scenes_list_v2_t* scene_node)
         if ((EZLOPI_SCENE_STATUS_NONE == scene_node->status) ||
             (EZLOPI_SCENE_STATUS_STOPPED == scene_node->status))
         {
-            TaskHandle_t ezlopi_service_meshbot_secene_process_1_task_handle = NULL;
-            xTaskCreate(__scenes_process, scene_node->name, EZLOPI_SERVICE_MESHBOT_SCENE_PROCESS_1_TASK_DEPTH, scene_node, 2, &ezlopi_service_meshbot_secene_process_1_task_handle);
-            ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_MESHBOT_SCENE_PROCESS_1_TASK, ezlopi_service_meshbot_secene_process_1_task_handle, EZLOPI_SERVICE_MESHBOT_SCENE_PROCESS_1_TASK_DEPTH);
+            // xTaskCreate(__scenes_process, scene_node->name, 2 * 2048, scene_node, 2, NULL);
             ret = 1;
         }
     }

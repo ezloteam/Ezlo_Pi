@@ -9,9 +9,11 @@
 #include <freertos/task.h>
 
 #include "ezlopi_util_trace.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 #include "ezlopi_core_ezlopi.h"
 #include "ezlopi_service_ota.h"
+
 #include "ezlopi_service_ble.h"
 #include "ezlopi_service_uart.h"
 #include "ezlopi_service_timer.h"
@@ -21,34 +23,59 @@
 #include "ezlopi_service_webprov.h"
 #include "ezlopi_service_ws_server.h"
 #include "ezlopi_service_broadcast.h"
+#include "ezlopi_service_led_indicator.h"
 
+#include "pt.h"
 #include "ezlopi_core_ble_config.h"
 #include "ezlopi_core_processes.h"
 
-#define ENABLE_HEARTBIT_LED 0
-
 static void blinky(void* pv);
+
 
 void app_main(void)
 {
+    ezlopi_service_led_indicator_init();
     gpio_install_isr_service(0);
 
     gpio_isr_service_init();
-    EZPI_SERVICE_uart_init();
 
     ezlopi_init();
 
+#if defined(CONFIG_EZPI_ENABLE_UART_PROVISIONING)
+    EZPI_SERVICE_uart_init();
+#endif
+
     timer_service_init();
+
+#if defined(CONFIG_EZLOPI_BLE_ENABLE)
     ezlopi_ble_service_init();
+#endif
 
-    ezlopi_scenes_meshbot_init();
-    ezlopi_service_modes_init();
-
-    ezlopi_service_ws_server_start();
-    ezlopi_service_web_provisioning_init();
-
-    ota_service_init();
+#if defined(CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER) || defined(EZPI_WEBSOCKET_CLIENT)
     ezlopi_service_broadcast_init();
+#endif
+
+    ezlpi_service_ws_server_dummy();
+
+#if defined(CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER)
+    ezlopi_service_ws_server_start();
+#endif
+
+#if defined(CONFIG_EZPI_WEBSOCKET_CLIENT)
+    ezlopi_service_web_provisioning_init();
+#endif
+
+#if defined(CONFIG_EZPI_ENABLE_OTA)
+    ezlopi_service_ota_init();
+#endif
+
+#if CONFIG_EZLPI_SERV_ENABLE_MODES
+    ezlopi_service_modes_init();
+#endif
+
+#if CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+    ezlopi_scenes_meshbot_init();
+#endif
 
     TaskHandle_t ezlopi_main_blinky_task_handle = NULL;
     xTaskCreate(blinky, "blinky", EZLOPI_MAIN_BLINKY_TASK_DEPTH, NULL, 1, &ezlopi_main_blinky_task_handle);
@@ -57,28 +84,12 @@ void app_main(void)
 
 static void blinky(void* pv)
 {
-#if (1 == ENABLE_HEARTBIT_LED)
-    gpio_config_t io_conf = {
-        .pin_bit_mask = (1ULL << GPIO_NUM_2),
-        .mode = GPIO_MODE_OUTPUT,
-        .pull_up_en = GPIO_PULLUP_DISABLE,
-        .pull_down_en = GPIO_PULLDOWN_DISABLE,
-        .intr_type = GPIO_INTR_DISABLE,
-    };
-
-    uint32_t state = 0;
-    gpio_config(&io_conf);
-#endif
 
     uint32_t count = 0;
+
     while (1)
     {
-#if (1 == ENABLE_HEARTBIT_LED)
-        state ^= 1;
-        gpio_set_level(GPIO_NUM_2, state);
-#endif
-
-        if (count++ > 10)
+        if (count++ > 1000)
         {
             count = 0;
 

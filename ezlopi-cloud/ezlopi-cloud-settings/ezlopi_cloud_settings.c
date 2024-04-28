@@ -13,9 +13,6 @@
 
 void ezlopi_device_settings_list_v3(cJSON* cj_request, cJSON* cj_response)
 {
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
-
     cJSON* cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
     if (cj_result)
     {
@@ -50,10 +47,9 @@ void ezlopi_device_settings_list_v3(cJSON* cj_request, cJSON* cj_response)
         }
     }
 }
+
 void ezlopi_device_settings_value_set_v3(cJSON* cj_request, cJSON* cj_response)
 {
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
     cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
 
     cJSON* cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
@@ -86,10 +82,9 @@ void ezlopi_device_settings_value_set_v3(cJSON* cj_request, cJSON* cj_response)
         }
     }
 }
+
 void ezlopi_device_settings_reset_v3(cJSON* cj_request, cJSON* cj_response)
 {
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
     cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
 
     cJSON* cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
@@ -141,6 +136,7 @@ void ezlopi_device_settings_reset_v3(cJSON* cj_request, cJSON* cj_response)
     }
 }
 
+#if 0
 cJSON* ezlopi_cloud_settings_updated_from_devices_v3(l_ezlopi_device_t* device, l_ezlopi_device_settings_v3_t* setting)
 {
     cJSON* cjson_response = cJSON_CreateObject();
@@ -170,3 +166,4 @@ cJSON* ezlopi_cloud_settings_updated_from_devices_v3(l_ezlopi_device_t* device, 
 
     return cjson_response;
 }
+#endif

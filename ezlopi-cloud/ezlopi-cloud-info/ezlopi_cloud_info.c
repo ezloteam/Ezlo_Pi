@@ -11,42 +11,16 @@
 
 #include "ezlopi_util_version.h"
 
-#include "cJSON.h"
+#include "cjext.h"
 #include "ezlopi_cloud_methods_str.h"
 #include "ezlopi_cloud_keywords.h"
 #include "ezlopi_cloud_coordinates.h"
 #include "ezlopi_core_factory_info.h"
 #include "ezlopi_core_sntp.h"
-
-char* ezlopi_tick_to_time(uint32_t ms)
-{
-    uint32_t seconds = ms / 1000;
-    uint32_t minutes = seconds / 60;
-    uint32_t hours = minutes / 60;
-    uint32_t days = hours / 24;
-
-    seconds %= 60;
-    minutes %= 60;
-    hours %= 24;
-
-    char* time_str = malloc(50);
-    if (time_str)
-    {
-        memset(time_str, 0, 50);
-        snprintf(time_str, 50, "%dd %dh %dm %ds", days, hours, minutes, seconds);
-    }
-    else
-    {
-        time_str = NULL;
-    }
-
-    return time_str;
-}
+#include "ezlopi_core_info.h"
 
 void info_get(cJSON* cj_request, cJSON* cj_response)
 {
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
     cJSON* cjson_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
     if (cjson_result)
     {
@@ -85,16 +59,10 @@ void info_get(cJSON* cj_request, cJSON* cj_response)
         cJSON* cjson_build = cJSON_AddObjectToObject(cjson_result, "build");
         if (cjson_build)
         {
-
-            char* build_time = EZPI_CORE_sntp_epoch_to_iso8601((time_t)BUILD_DATE);
-            if (build_time)
             {
+                char build_time[64];
+                EZPI_CORE_sntp_epoch_to_iso8601(build_time, sizeof(build_time), (time_t)BUILD_DATE);
                 cJSON_AddStringToObject(cjson_build, "time", build_time);
-                free(build_time);
-            }
-            else
-            {
-                cJSON_AddStringToObject(cjson_build, "time", COMPILE_TIME);
             }
 
             cJSON_AddStringToObject(cjson_build, "builder", DEVELOPER);
@@ -110,38 +78,27 @@ void info_get(cJSON* cj_request, cJSON* cj_response)
             cJSON_AddNumberToObject(cjson_battery, "health", 0);
             cJSON_AddStringToObject(cjson_battery, ezlopi_status_str, ezlopi__str);
         }
-        char* local_time = EZPI_CORE_sntp_get_local_time();
-        if (local_time)
+
         {
+            char local_time[100];
+            EZPI_CORE_sntp_get_local_time(local_time, sizeof(local_time));
             cJSON_AddStringToObject(cjson_result, "localtime", local_time);
-            free(local_time);
         }
-        else
-        {
-            cJSON_AddStringToObject(cjson_result, "localtime", ezlopi__str);
-        }
+
 #if 0
-        char* time_string = EZPI_CORE_sntp_get_up_time();
-        if (time_string)
         {
-            cJSON_AddStringToObject(cjson_result, ezlopi_uptime_str, time_string);
-            free(time_string);
-        }
-        else
-        {
-            cJSON_AddStringToObject(cjson_result, ezlopi_uptime_str, ezlopi__str);
+            char local_time[100];
+            EZPI_CORE_sntp_get_up_time(local_time, sizeof(local_time));
+            cJSON_AddStringToObject(cjson_result, ezlopi_uptime_str, local_time);
         }
 #else
-        char* time_string = ezlopi_tick_to_time((uint32_t)(xTaskGetTickCount() / portTICK_PERIOD_MS));
-        if (time_string)
         {
+            char time_string[50];
+            uint32_t tick_count_ms = xTaskGetTickCount() / portTICK_PERIOD_MS;
+            EZPI_CORE_info_get_tick_to_time_name(time_string, sizeof(time_string), tick_count_ms);
             cJSON_AddStringToObject(cjson_result, ezlopi_uptime_str, time_string);
-            free(time_string);
         }
-        else
-        {
-            cJSON_AddStringToObject(cjson_result, ezlopi_uptime_str, ezlopi__str);
-        }
+
 #endif
         ezlopi_factory_info_v3_free(device_uuid);
     }

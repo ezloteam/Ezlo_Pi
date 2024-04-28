@@ -15,18 +15,16 @@ int ezlopi_core_scene_edit_store_updated_to_nvs(cJSON* cj_updated_scene)
     int ret = 0;
     if (cj_updated_scene)
     {
-        char* update_scene_str = cJSON_Print(cj_updated_scene);
+        char* update_scene_str = cJSON_PrintBuffered(cj_updated_scene, 4096, false);
+        TRACE_D("length of 'update_scene_str': %d", strlen(update_scene_str));
+
         if (update_scene_str)
         {
             cJSON* cj_scene_id = cJSON_GetObjectItem(cj_updated_scene, ezlopi__id_str);
             if (cj_scene_id && cj_scene_id->valuestring)
             {
                 ezlopi_nvs_delete_stored_data_by_name(cj_scene_id->valuestring);
-                cJSON_Minify(update_scene_str);
-                if (1 == ezlopi_nvs_write_str(update_scene_str, strlen(update_scene_str), cj_scene_id->valuestring))
-                {
-                    ret = 1;
-                }
+                ret = ezlopi_nvs_write_str(update_scene_str, strlen(update_scene_str), cj_scene_id->valuestring);
             }
 
             free(update_scene_str);
@@ -50,25 +48,32 @@ int ezlopi_core_scene_edit_update_id(uint32_t scene_id, cJSON* cj_updated_scene)
             {
                 ezlopi_meshobot_service_stop_scene(scene_node);
                 _edit_scene(scene_node, cj_updated_scene);
+
+                TRACE_S("HERE : scene_node->enabled = [%s]", (scene_node->enabled) ? "true" : "false");
                 if (scene_node->enabled == true)
                 {
                     ezlopi_meshbot_service_start_scene(scene_node);
                 }
                 ret = 1;
+
+                TRACE_D("----------------------------------------------");
+                TRACE_D("esp_get_free_heap_size - %f kB", esp_get_free_heap_size() / 1024.0);
+                TRACE_D("esp_get_minimum_free_heap_size: %f kB", esp_get_minimum_free_heap_size() / 1024.0);
+                TRACE_D("----------------------------------------------");
+
                 break;
             }
 
             scene_node = scene_node->next;
         }
     }
-
     return ret;
 }
 
 static void _edit_scene(l_scenes_list_v2_t* scene_node, cJSON* cj_scene)
 {
-    CJSON_GET_VALUE_INT(cj_scene, ezlopi_enabled_str, scene_node->enabled);
-    CJSON_GET_VALUE_INT(cj_scene, ezlopi_is_group_str, scene_node->is_group);
+    CJSON_GET_VALUE_DOUBLE(cj_scene, ezlopi_enabled_str, scene_node->enabled);
+    CJSON_GET_VALUE_DOUBLE(cj_scene, ezlopi_is_group_str, scene_node->is_group);
     CJSON_GET_VALUE_STRING_BY_COPY(cj_scene, ezlopi_group_id_str, scene_node->group_id);
 
     CJSON_GET_VALUE_STRING_BY_COPY(cj_scene, ezlopi_name_str, scene_node->name);

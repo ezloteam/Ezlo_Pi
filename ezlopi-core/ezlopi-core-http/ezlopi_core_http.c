@@ -448,23 +448,6 @@ void ezlopi_core_http_mbedtls_req(s_ezlopi_core_http_mbedtls_t* config)
 
             // Ready-Up 'request' buffer
             TRACE_I("request[capacity: %d]:\n\n%s[%d]", request_len, request, strlen(request));
-
-#if 0
-            // char* cloud_server = NULL;  // ezlopi_factory_info_v3_get_cloud_server();
-            // char* ca_certificate = NULL;  // ezlopi_factory_info_v3_get_ca_certificate();
-            // char* ssl_shared_key = NULL;  // ezlopi_factory_info_v3_get_ssl_shared_key();
-            // char* ssl_private_key = NULL; // ezlopi_factory_info_v3_get_ssl_private_key();
-            // s_ezlopi_http_data_t *ws_endpoint = ezlopi_http_get_request(request, NULL, NULL, NULL);
-            // if (ws_endpoint)
-            // {
-            //     if (ws_endpoint->response)
-            //     {
-            //         TRACE_D("=>\n%s[%d]", ws_endpoint->response, strlen(ws_endpoint->response))
-            //         free(ws_endpoint->response);
-            //     }
-            //     free(ws_endpoint);
-            // }
-#endif
             TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
             TRACE_E("&result==[%p]", &(config->response));
             ezlopi_core_http_request_via_mbedTLS(config->web_server, (config->web_port), request, &(config->response));
@@ -500,10 +483,7 @@ s_ezlopi_http_data_t* ezlopi_http_get_request(const char* cloud_url, const char*
             .transport_type = HTTP_TRANSPORT_OVER_SSL,
             .user_data = (void*)(my_data), // my_data will be filled in 'ezlopi_http_event_handler'
         };
-        // TRACE_E("cloud_url: %s", cloud_url);
-        // TRACE_E("ca_certificate: %s", ca_certificate);
-        // TRACE_E("shared_key: %s", shared_key);
-        // TRACE_E("private_key: %s", private_key);
+
         esp_http_client_handle_t client = esp_http_client_init(&config);
         if (NULL != client)
         {
@@ -594,7 +574,7 @@ s_ezlopi_http_data_t* ezlopi_http_post_request(const char* cloud_url, const char
             cJSON* header = headers->child;
             while (header)
             {
-                TRACE_I("%s: %s", header->string, header->valuestring);
+                // TRACE_I("%s: %s", header->string, header->valuestring);
                 esp_http_client_set_header(client, header->string, header->valuestring);
                 header = header->next;
             }
@@ -644,6 +624,7 @@ s_ezlopi_http_data_t* ezlopi_http_post_request(const char* cloud_url, const char
             free(uri);
         }
     }
+
     return http_get_data;
 }
 

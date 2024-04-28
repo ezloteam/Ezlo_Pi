@@ -1,37 +1,40 @@
 #include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_nvs.h"
+#include "ezlopi_core_modes.h"
 #include "ezlopi_core_modes_cjson.h"
 #include "ezlopi_core_cjson_macros.h"
 
 #include "ezlopi_cloud_constants.h"
 
 #include "ezlopi_service_modes.h"
+#include "EZLOPI_USER_CONFIG.h"
 
-#include "ezlopi_core_modes.h"
 
-static s_ezlopi_modes_t *sg_custom_modes = NULL;
-static s_house_modes_t *sg_current_house_mode = NULL;
+#if defined(CONFIG_EZLPI_SERV_ENABLE_MODES)
 
-s_ezlopi_modes_t *ezlopi_core_modes_get_custom_modes(void)
+static s_ezlopi_modes_t* sg_custom_modes = NULL;
+static s_house_modes_t* sg_current_house_mode = NULL;
+
+s_ezlopi_modes_t* ezlopi_core_modes_get_custom_modes(void)
 {
     return sg_custom_modes;
 }
 
-int ezlopi_core_modes_set_current_house_mode(s_house_modes_t *new_house_mode)
+int ezlopi_core_modes_set_current_house_mode(s_house_modes_t* new_house_mode)
 {
     sg_current_house_mode = new_house_mode;
     return 1;
 }
 
-s_house_modes_t *ezlopi_core_modes_get_current_house_modes(void)
+s_house_modes_t* ezlopi_core_modes_get_current_house_modes(void)
 {
     return sg_current_house_mode;
 }
 
-s_house_modes_t *ezlopi_core_modes_get_house_mode_by_id(uint32_t house_mode_id)
+s_house_modes_t* ezlopi_core_modes_get_house_mode_by_id(uint32_t house_mode_id)
 {
-    s_house_modes_t *_house_mode = NULL;
+    s_house_modes_t* _house_mode = NULL;
 
     if (house_mode_id == sg_custom_modes->mode_home._id)
     {
@@ -57,9 +60,9 @@ s_house_modes_t *ezlopi_core_modes_get_house_mode_by_id(uint32_t house_mode_id)
     return _house_mode;
 }
 
-s_house_modes_t *ezlopi_core_modes_get_house_mode_by_name(char *house_mode_name)
+s_house_modes_t* ezlopi_core_modes_get_house_mode_by_name(char* house_mode_name)
 {
-    s_house_modes_t *_house_mode = NULL;
+    s_house_modes_t* _house_mode = NULL;
 
     if (house_mode_name)
     {
@@ -88,17 +91,17 @@ s_house_modes_t *ezlopi_core_modes_get_house_mode_by_name(char *house_mode_name)
     return _house_mode;
 }
 
-int ezlopi_core_modes_api_get_modes(cJSON *cj_result)
+int ezlopi_core_modes_api_get_modes(cJSON* cj_result)
 {
     return ezlopi_core_modes_cjson_get_modes(cj_result);
 }
 
-int ezlopi_core_modes_api_get_current_mode(cJSON *cj_result)
+int ezlopi_core_modes_api_get_current_mode(cJSON* cj_result)
 {
     return ezlopi_core_modes_cjson_get_current_mode(cj_result);
 }
 
-int ezlopi_core_modes_api_switch_mode(s_house_modes_t *switch_to_house_mode)
+int ezlopi_core_modes_api_switch_mode(s_house_modes_t* switch_to_house_mode)
 {
     ezlopi_service_modes_stop();
     sg_custom_modes->switch_to_mode_id = switch_to_house_mode->_id;
@@ -167,13 +170,13 @@ int ezlopi_core_modes_set_alarm_delay(uint32_t alarm_to_delay)
     return ret;
 }
 
-int ezlopi_core_modes_set_notifications(cJSON *cj_params)
+int ezlopi_core_modes_set_notifications(cJSON* cj_params)
 {
     int ret = 0;
     if (cj_params)
     {
         ezlopi_service_modes_stop();
-        
+
         ezlopi_service_modes_start();
     }
     return ret;
@@ -182,16 +185,17 @@ int ezlopi_core_modes_set_notifications(cJSON *cj_params)
 int ezlopi_core_modes_store_to_nvs(void)
 {
     int ret = 0;
-    cJSON *cj_modes = cJSON_CreateObject();
+    cJSON* cj_modes = cJSON_CreateObject();
     if (cj_modes)
     {
         ezlopi_core_modes_cjson_get_modes(cj_modes);
-        char *modes_str = cJSON_Print(cj_modes);
+        char* modes_str = cJSON_PrintBuffered(cj_modes, 4096, false);
+        TRACE_D("length of 'modes_str': %d", strlen(modes_str));
+
         cJSON_Delete(cj_modes);
 
         if (modes_str)
         {
-            cJSON_Minify(modes_str);
             ret = ezlopi_nvs_write_modes(modes_str);
             free(modes_str);
         }
@@ -203,11 +207,11 @@ int ezlopi_core_modes_store_to_nvs(void)
 void ezlopi_core_modes_init(void)
 {
     uint32_t _is_custom_mode_ok = 0;
-    char *custom_modes_str = ezlopi_nvs_read_modes();
+    char* custom_modes_str = ezlopi_nvs_read_modes();
 
     if (custom_modes_str)
     {
-        cJSON *cj_custom_modes = cJSON_Parse(custom_modes_str);
+        cJSON* cj_custom_modes = cJSON_Parse(custom_modes_str);
         free(custom_modes_str);
 
         CJSON_TRACE("cj_custom-modes", cj_custom_modes);
@@ -230,3 +234,4 @@ void ezlopi_core_modes_init(void)
         }
     }
 }
+#endif // CONFIG_EZLPI_SERV_ENABLE_MODES

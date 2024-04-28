@@ -77,19 +77,14 @@ int sensor_0024_other_HCSR04_v3(e_ezlopi_actions_t action, l_ezlopi_item_t* item
 static int __get_value_cjson(l_ezlopi_item_t* item, void* arg)
 {
     int ret = 0;
-    if (item)
+    if (item && arg)
     {
         cJSON* cj_param = (cJSON*)arg;
         s_ultrasonic_sensor_t* ultrasonic_sensor = (s_ultrasonic_sensor_t*)item->user_arg;
         if (cj_param && ultrasonic_sensor)
         {
-            cJSON_AddNumberToObject(cj_param, ezlopi_value_str, ultrasonic_sensor->distance);
-            char* valueFormatted = ezlopi_valueformatter_float(ultrasonic_sensor->distance);
-            if (valueFormatted)
-            {
-                cJSON_AddStringToObject(cj_param, ezlopi_valueFormatted_str, valueFormatted);
-                free(valueFormatted);
-            }
+            ezlopi_valueformatter_float_to_cjson(item, cj_param, ultrasonic_sensor->distance);
+            ret = 1;
         }
     }
     return ret;
@@ -102,7 +97,7 @@ static int __notify(l_ezlopi_item_t* item)
     if (2 == ++count)
     {
         ezlopi_sensor_0024_other_HCSR04_get_from_sensor(item);
-        ezlopi_device_value_updated_from_device_v3(item);
+        ezlopi_device_value_updated_from_device_broadcast(item);
         count = 0;
     }
     return ret;
@@ -131,7 +126,6 @@ static int __init(l_ezlopi_item_t* item)
                                         : GPIO_PULLDOWN_DISABLE,
                     .intr_type = GPIO_INTR_DISABLE,
                 };
-
                 ret = (0 == gpio_config(&io_conf)) ? 1 : -1;
             }
             else if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num))
@@ -154,18 +148,15 @@ static int __init(l_ezlopi_item_t* item)
 
                 ret = (0 == gpio_config(&io_conf)) ? 1 : -1;
             }
-            // if (1 != ret)
-            // {
-            //     free(item->user_arg); // this will free ; memory address linked to all items
-            //     item->user_arg = NULL;
-            //     // ezlopi_device_free_device_by_item(item);
-            // }
+            if (1 != ret)
+            {
+                ret = -1;
+            }
         }
-        // else
-        // {
-        //     ret = -1;
-        //     ezlopi_device_free_device_by_item(item);
-        // }
+        else
+        {
+            ret = -1;
+        }
     }
 
     return ret;
@@ -173,11 +164,6 @@ static int __init(l_ezlopi_item_t* item)
 
 static void __setup_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    // char *device_name = NULL;
-    // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    // ASSIGN_DEVICE_NAME_V2(device, device_name);
-    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
-
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
     device->cloud_properties.device_type = dev_type_sensor;
@@ -222,14 +208,14 @@ static int __prepare(void* arg)
         cJSON* cj_device = prep_arg->cjson_device;
         if (cj_device)
         {
-            l_ezlopi_device_t* device = ezlopi_device_add_device(prep_arg->cjson_device);
+            l_ezlopi_device_t* device = ezlopi_device_add_device(prep_arg->cjson_device, NULL);
             if (device)
             {
+                ret = 1;
                 __setup_device_cloud_properties(device, cj_device);
                 l_ezlopi_item_t* item = ezlopi_device_add_item_to_device(device, sensor_0024_other_HCSR04_v3);
                 if (item)
                 {
-                    item->cloud_properties.device_id = device->cloud_properties.device_id;
                     __setup_item_properties(item, cj_device);
                     s_ultrasonic_sensor_t* ultrasonic_sensor = (s_ultrasonic_sensor_t*)malloc(sizeof(s_ultrasonic_sensor_t));
                     if (ultrasonic_sensor)
@@ -238,14 +224,20 @@ static int __prepare(void* arg)
                         ultrasonic_sensor->distance = 0;
                         ultrasonic_sensor->trigger_pin = item->interface.gpio.gpio_out.gpio_num;
                         ultrasonic_sensor->echo_pin = item->interface.gpio.gpio_in.gpio_num;
+
+                        item->is_user_arg_unique = true;
                         item->user_arg = (void*)ultrasonic_sensor;
-                        ret = 1;
                     }
                 }
                 else
                 {
+                    ezlopi_device_free_device(device);
                     ret = -1;
                 }
+            }
+            else
+            {
+                ret = -1;
             }
         }
     }

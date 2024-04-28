@@ -41,27 +41,27 @@ int sensor_0057_other_KY026_FlameDetector(e_ezlopi_actions_t action, l_ezlopi_it
     {
     case EZLOPI_ACTION_PREPARE:
     {
-        __0057_prepare(arg);
+        ret = __0057_prepare(arg);
         break;
     }
     case EZLOPI_ACTION_INITIALIZE:
     {
-        __0057_init(item);
+        ret = __0057_init(item);
         break;
     }
     case EZLOPI_ACTION_HUB_GET_ITEM:
     {
-        __0057_get_item(item, arg);
+        ret = __0057_get_item(item, arg);
         break;
     }
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
-        __0057_get_cjson_value(item, arg);
+        ret = __0057_get_cjson_value(item, arg);
         break;
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
-        __0057_notify(item);
+        ret = __0057_notify(item);
         break;
     }
     default:
@@ -80,52 +80,62 @@ static int __0057_prepare(void* arg)
     if (device_prep_arg && (NULL != device_prep_arg->cjson_device))
     {
         //---------------------------  DIGI - DEVICE 1 --------------------------------------------
-        l_ezlopi_device_t* flame_device_digi = ezlopi_device_add_device(device_prep_arg->cjson_device);
-        if (flame_device_digi)
+        l_ezlopi_device_t* flame_device_parent_digi = ezlopi_device_add_device(device_prep_arg->cjson_device, "digi");
+        if (flame_device_parent_digi)
         {
-            __prepare_device_digi_cloud_properties(flame_device_digi, device_prep_arg->cjson_device);
-            l_ezlopi_item_t* flame_item_digi = ezlopi_device_add_item_to_device(flame_device_digi, sensor_0057_other_KY026_FlameDetector);
+            ret = 1;
+            TRACE_I("Parent_flame_device_digi-[0x%x] ", flame_device_parent_digi->cloud_properties.device_id);
+            __prepare_device_digi_cloud_properties(flame_device_parent_digi, device_prep_arg->cjson_device);
+            l_ezlopi_item_t* flame_item_digi = ezlopi_device_add_item_to_device(flame_device_parent_digi, sensor_0057_other_KY026_FlameDetector);
             if (flame_item_digi)
             {
-                flame_item_digi->cloud_properties.device_id = flame_device_digi->cloud_properties.device_id;
+                flame_item_digi->cloud_properties.device_id = flame_device_parent_digi->cloud_properties.device_id;
                 __prepare_item_digi_cloud_properties(flame_item_digi, device_prep_arg->cjson_device);
-                ret = 1;
             }
             else
             {
                 ret = -1;
-                ezlopi_device_free_device(flame_device_digi);
             }
-        }
 
-        //---------------------------- ADC - DEVICE 2 -------------------------------------------
-        flame_t* flame_struct = (flame_t*)malloc(sizeof(flame_t));
-        if (NULL != flame_struct)
-        {
-            memset(flame_struct, 0, sizeof(flame_t));
-            l_ezlopi_device_t* flame_device_adc = ezlopi_device_add_device(device_prep_arg->cjson_device);
-            if (flame_device_adc)
+            //---------------------------- ADC - DEVICE 2 -------------------------------------------
+            flame_t* flame_struct = (flame_t*)malloc(sizeof(flame_t));
+            if (NULL != flame_struct)
             {
-                __prepare_device_adc_cloud_properties(flame_device_adc, device_prep_arg->cjson_device);
-                l_ezlopi_item_t* flame_item_adc = ezlopi_device_add_item_to_device(flame_device_adc, sensor_0057_other_KY026_FlameDetector);
-                if (flame_item_adc)
+                memset(flame_struct, 0, sizeof(flame_t));
+                l_ezlopi_device_t* flame_device_child_adc = ezlopi_device_add_device(device_prep_arg->cjson_device, "adc");
+                if (flame_device_child_adc)
                 {
-                    flame_item_adc->cloud_properties.device_id = flame_device_adc->cloud_properties.device_id;
-                    __prepare_item_adc_cloud_properties(flame_item_adc, device_prep_arg->cjson_device, flame_struct);
-                    ret = 1;
+                    TRACE_I("Child_flame_device_adc-[0x%x] ", flame_device_child_adc->cloud_properties.device_id);
+                    __prepare_device_adc_cloud_properties(flame_device_child_adc, device_prep_arg->cjson_device);
+
+                    flame_device_child_adc->cloud_properties.parent_device_id = flame_device_parent_digi->cloud_properties.device_id;
+                    l_ezlopi_item_t* flame_item_adc = ezlopi_device_add_item_to_device(flame_device_child_adc, sensor_0057_other_KY026_FlameDetector);
+                    if (flame_item_adc)
+                    {
+                        flame_item_adc->cloud_properties.device_id = flame_device_child_adc->cloud_properties.device_id;
+                        __prepare_item_adc_cloud_properties(flame_item_adc, device_prep_arg->cjson_device, flame_struct);
+                    }
+                    else
+                    {
+                        ret = -1;
+                        ezlopi_device_free_device(flame_device_child_adc);
+                        free(flame_struct);
+                    }
                 }
                 else
                 {
                     ret = -1;
-                    ezlopi_device_free_device(flame_device_adc);
                     free(flame_struct);
                 }
             }
             else
             {
                 ret = -1;
-                free(flame_struct);
             }
+        }
+        else
+        {
+            ret = -1;
         }
     }
     return ret;
@@ -148,11 +158,10 @@ static int __0057_init(l_ezlopi_item_t* item)
                 input_conf.pull_up_en = GPIO_PULLUP_ENABLE;
                 ret = (0 == gpio_config(&input_conf)) ? 1 : -1;
             }
-            // else
-            // {
-            //     ret = -1;
-            //     // ezlopi_device_free_device_by_item(item);
-            // }
+            else
+            {
+                ret = -1;
+            }
         }
         else if (ezlopi_item_name_temperature_changes == item->cloud_properties.item_name)
         {
@@ -165,27 +174,20 @@ static int __0057_init(l_ezlopi_item_t* item)
                     {
                         ret = 1;
                     }
-                    // else
-                    // {
-                    //     ret = -1;
-                    //     free(item->user_arg); // this will free ; memory address linked to all items
-                    //     item->user_arg = NULL;
-                    //     // ezlopi_device_free_device_by_item(item);
-                    // }
+                    else
+                    {
+                        ret = -1;
+                    }
                 }
-                // else
-                // {
-                //     ret = -1;
-                //     free(item->user_arg); // this will free ; memory address linked to all items
-                //     item->user_arg = NULL;
-                //     // ezlopi_device_free_device_by_item(item);
-                // }
+                else
+                {
+                    ret = -1;
+                }
             }
-            // else
-            // {
-            //     ret = -1;
-            //     // ezlopi_device_free_device_by_item(item);
-            // }
+            else
+            {
+                ret = -1;
+            }
         }
     }
     return ret;
@@ -194,15 +196,13 @@ static int __0057_init(l_ezlopi_item_t* item)
 //------------------------------------------------------------------------------------------------------
 static void __prepare_device_digi_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    // char *device_name = NULL;
-    // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    // ASSIGN_DEVICE_NAME_V2(device, device_name);
-    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
-
     device->cloud_properties.category = category_security_sensor;
     device->cloud_properties.subcategory = subcategory_heat;
     device->cloud_properties.device_type = dev_type_sensor;
+    device->cloud_properties.info = NULL;
+    device->cloud_properties.device_type_id = NULL;
 }
+
 static void __prepare_item_digi_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device)
 {
     item->cloud_properties.has_getter = true;
@@ -213,18 +213,13 @@ static void __prepare_item_digi_cloud_properties(l_ezlopi_item_t* item, cJSON* c
     item->cloud_properties.scale = NULL;
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
     CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio1_str, item->interface.gpio.gpio_in.gpio_num);
     TRACE_S("flame_> DIGITAL_PIN: %d ", item->interface.gpio.gpio_in.gpio_num);
 }
 //------------------------------------------------------------------------------------------------------
 static void __prepare_device_adc_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    // char *device_name = NULL;
-    // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    // ASSIGN_DEVICE_NAME_V2(device, device_name);
-    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
-
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
     device->cloud_properties.device_type = dev_type_sensor;
@@ -241,12 +236,13 @@ static void __prepare_item_adc_cloud_properties(l_ezlopi_item_t* item, cJSON* cj
     item->cloud_properties.scale = scales_percent;
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio2_str, item->interface.adc.gpio_num);
-    TRACE_S("flame-> ADC_PIN: %d ", item->interface.adc.gpio_num);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio2_str, item->interface.adc.gpio_num);
+    TRACE_S("flame_> ADC_PIN: %d ", item->interface.adc.gpio_num);
     item->interface.adc.resln_bit = 3; // ADC 12_bit
 
     // passing the custom data_structure
+    item->is_user_arg_unique = true;
     item->user_arg = user_data;
 }
 
@@ -276,21 +272,15 @@ static int __0057_get_item(l_ezlopi_item_t* item, void* arg)
                     cJSON_AddItemToObject(cj_result, ezlopi_enum_str, json_array_enum);
                 }
                 //--------------------------------------------------------------------------------------
-                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, (char*)item->user_arg ? item->user_arg : "heat_ok");
-                cJSON_AddStringToObject(cj_result, ezlopi_value_str, (char*)item->user_arg ? item->user_arg : "heat_ok");
+                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, (char*)item->user_arg ? item->user_arg : ky206_sensor_heat_alarm_token[0]);
+                cJSON_AddStringToObject(cj_result, ezlopi_value_str, (char*)item->user_arg ? item->user_arg : ky206_sensor_heat_alarm_token[0]);
             }
             else if (ezlopi_item_name_temperature_changes == item->cloud_properties.item_name)
             {
                 flame_t* flame_struct = (flame_t*)item->user_arg;
                 if (flame_struct)
                 {
-                    cJSON_AddNumberToObject(cj_result, ezlopi_value_str, flame_struct->absorbed_percent);
-                    char* valueFormatted = ezlopi_valueformatter_float(flame_struct->absorbed_percent);
-                    if (valueFormatted)
-                    {
-                        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                        free(valueFormatted);
-                    }
+                    ezlopi_valueformatter_float_to_cjson(item, cj_result, flame_struct->absorbed_percent);
                 }
                 ret = 1;
             }
@@ -309,21 +299,15 @@ static int __0057_get_cjson_value(l_ezlopi_item_t* item, void* arg)
         {
             if (ezlopi_item_name_heat_alarm == item->cloud_properties.item_name)
             {
-                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, (char*)item->user_arg ? item->user_arg : "heat_ok");
-                cJSON_AddStringToObject(cj_result, ezlopi_value_str, (char*)item->user_arg ? item->user_arg : "heat_ok");
+                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, (char*)item->user_arg ? item->user_arg : ky206_sensor_heat_alarm_token[0]);
+                cJSON_AddStringToObject(cj_result, ezlopi_value_str, (char*)item->user_arg ? item->user_arg : ky206_sensor_heat_alarm_token[0]);
             }
             else if (ezlopi_item_name_temperature_changes == item->cloud_properties.item_name)
             {
                 flame_t* flame_struct = (flame_t*)item->user_arg;
                 if (flame_struct)
                 {
-                    cJSON_AddNumberToObject(cj_result, ezlopi_value_str, flame_struct->absorbed_percent);
-                    char* valueFormatted = ezlopi_valueformatter_float(flame_struct->absorbed_percent);
-                    if (valueFormatted)
-                    {
-                        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                        free(valueFormatted);
-                    }
+                    ezlopi_valueformatter_float_to_cjson(item, cj_result, flame_struct->absorbed_percent);
                 }
             }
             ret = 1;
@@ -342,7 +326,7 @@ static int __0057_notify(l_ezlopi_item_t* item)
             const char* curret_value = NULL;
             if (0 == gpio_get_level(item->interface.gpio.gpio_in.gpio_num)) // when D0 -> 0V,
             {
-                curret_value = "heat_ok";
+                curret_value = ky206_sensor_heat_alarm_token[0];
             }
             else
             {
@@ -351,7 +335,7 @@ static int __0057_notify(l_ezlopi_item_t* item)
             if (curret_value != (char*)item->user_arg) // calls update only if there is change in state
             {
                 item->user_arg = (void*)curret_value;
-                ezlopi_device_value_updated_from_device_v3(item);
+                ezlopi_device_value_updated_from_device_broadcast(item);
             }
         }
         else if (ezlopi_item_name_temperature_changes == item->cloud_properties.item_name)
@@ -366,7 +350,7 @@ static int __0057_notify(l_ezlopi_item_t* item)
                 // TRACE_E("Heat-detected: %.2f percent", absorbed_percent);
                 if (new_percent != flame_struct->absorbed_percent)
                 {
-                    ezlopi_device_value_updated_from_device_v3(item);
+                    ezlopi_device_value_updated_from_device_broadcast(item);
                     flame_struct->absorbed_percent = new_percent;
                 }
             }

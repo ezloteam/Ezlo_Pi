@@ -8,10 +8,10 @@ set(EZLOPI_CORE_COMPONENTS
         ezlopi-core-factory-info
         ezlopi-core-net
         ezlopi-core-reset
-        ezlopi-core-processes
         ezlopi-core-ezlopi
         ezlopi-core-sntp
-        # ezlopi-core-info
+        ezlopi-core-info
+        ezlopi-core-processes
 )
 set(EZLOPI_HAL_COMPONENTS 
         ezlopi-hal-sysinfo

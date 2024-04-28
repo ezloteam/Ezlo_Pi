@@ -4,6 +4,7 @@
 #include "ezlopi_core_http.h"
 #include "ezlopi_core_reset.h"
 #include "ezlopi_core_devices.h"
+#include "ezlopi_core_scenes_v2.h"
 #include "ezlopi_core_event_group.h"
 #include "ezlopi_core_factory_info.h"
 #include "ezlopi_core_scenes_scripts.h"
@@ -29,11 +30,11 @@ int ezlopi_scene_then_set_item_value(l_scenes_list_v2_t* curr_scene, void* arg)
             l_fields_v2_t* curr_field = curr_then->fields;
             while (curr_field)
             {
-                if (0 == strncmp(curr_field->name, "item", 4))
+                if (0 == strncmp(curr_field->name, "item", 5))
                 {
                     cJSON_AddStringToObject(cj_params, ezlopi__id_str, curr_field->field_value.u_value.value_string);
                     item_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
-                    TRACE_D("item_id: %s", curr_field->field_value.u_value.value_string);
+                    // TRACE_D("item_id: %s", curr_field->field_value.u_value.value_string);
 
                     // cJSON_AddStringToObject(cj_params, ezlopi__id_str, curr_field->field_value.u_value.value_string);
                     // item_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
@@ -76,11 +77,13 @@ int ezlopi_scene_then_set_item_value(l_scenes_list_v2_t* curr_scene, void* arg)
                     }
                     curr_item = curr_item->next;
                 }
+
                 if (found_item)
                 {
-                    TRACE_D("\r\n\r\n FOUND DEVICE \r\n\r\n");
+                    // TRACE_D("\r\n\r\n FOUND DEVICE \r\n\r\n");
                     break;
                 }
+
                 curr_device = curr_device->next;
             }
         }
@@ -128,7 +131,7 @@ int ezlopi_scene_then_set_device_armed(l_scenes_list_v2_t* curr_scene, void* arg
                         s_ezlopi_cloud_controller_t* controller_info = ezlopi_device_get_controller_information();
                         if (controller_info)
                         {
-                            #warning "we need to change from 'controller' to 'device_id' specific"
+                            #warning "we need to change from 'controller' to device-specific [krishna]"
                                 controller_info->armed = (device_armed) ? true : false;
                         }
                         break;
@@ -245,20 +248,16 @@ int ezlopi_scene_then_run_scene(l_scenes_list_v2_t* curr_scene, void* arg)
         l_fields_v2_t* curr_field = curr_then->fields;
         while (curr_field)
         {
-            if (0 == strncmp(curr_field->name, "sceneId", 7))
+            if (0 == strncmp(curr_field->name, ezlopi_sceneId_str, 8))
             {
-                if (curr_field->field_value.e_type == VALUE_TYPE_STRING)
+                if (EZLOPI_VALUE_TYPE_SCENEID == curr_field->value_type)
                 {
                     sceneId = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
                 }
-                else
-                {
-                    ret = 1;
-                }
             }
-            else if (0 == strncmp(curr_field->name, "block", 5))
+            else if (0 == strncmp(curr_field->name, "block", 6))
             {
-                if (curr_field->field_value.e_type == VALUE_TYPE_STRING)
+                if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type)
                 {
                     if (0 == strncmp(curr_field->field_value.u_value.value_string, "else", 4))
                     {
@@ -268,36 +267,36 @@ int ezlopi_scene_then_run_scene(l_scenes_list_v2_t* curr_scene, void* arg)
                     {
                         TRACE_D("Running scene group, yet to be implemented.");
                     }
-                    else
-                    {
-                        ret = 1;
-                    }
                 }
                 else
                 {
-                    ret = 1;
+                    ret = -1;
                 }
             }
-            else if ((0 == strncmp(curr_field->name, "group", 5)) && (curr_field->value_type == EZLOPI_VALUE_TYPE_STRING))
+            else if ((0 == strncmp(curr_field->name, "group", 6)) && (curr_field->value_type == EZLOPI_VALUE_TYPE_STRING))
             {
+                ret = -1;
                 TRACE_D("Running scene group, yet to be implemented.");
             }
             curr_field = curr_field->next;
         }
+
         if (execute_else_condition)
         {
             TRACE_D("Executing else condition");
             ezlopi_meshbot_execute_scene_else_action_group(sceneId);
+            ret = 1;
         }
         else
         {
             TRACE_D("Executing scene, id: %d", sceneId);
             ezlopi_scenes_service_run_by_id(sceneId);
+            ret = 1;
         }
     }
     else
     {
-        ret = 1;
+        ret = -1;
     }
     return ret;
 }
@@ -306,32 +305,28 @@ int ezlopi_scene_then_set_scene_state(l_scenes_list_v2_t* curr_scene, void* arg)
     int ret = 0;
     uint32_t sceneID = 0;
     bool set_scene_enable = false;
+    bool execute_else_condition = false;
     l_action_block_v2_t* curr_then = (l_action_block_v2_t*)arg;
     if (curr_then)
     {
         l_fields_v2_t* curr_field = curr_then->fields;
         while (curr_field)
         {
-            if (0 == strncmp(curr_field->name, "sceneId", 7))
+            if (0 == strncmp(curr_field->name, ezlopi_sceneId_str, 8))
             {
-                if (curr_field->field_value.e_type == VALUE_TYPE_STRING)
+                if (EZLOPI_VALUE_TYPE_SCENEID == curr_field->value_type)
                 {
                     sceneID = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
                 }
-                else
-                {
-                    ret = 1;
-                }
             }
-            else if (0 == strncmp(curr_field->name, "enabled", 5))
+            else if (0 == strncmp(curr_field->name, ezlopi_enabled_str, 8))
             {
-                if (curr_field->field_value.e_type == VALUE_TYPE_BOOL)
+
+                TRACE_W("%s", (curr_field->field_value.u_value.value_bool ? "true" : "false"));
+
+                if (EZLOPI_VALUE_TYPE_BOOL == curr_field->value_type)
                 {
                     set_scene_enable = curr_field->field_value.u_value.value_bool;
-                }
-                else
-                {
-                    ret = 1;
                 }
             }
             curr_field = curr_field->next;
@@ -342,20 +337,15 @@ int ezlopi_scene_then_set_scene_state(l_scenes_list_v2_t* curr_scene, void* arg)
             if (1 == ezlopi_scenes_enable_disable_id_from_list_v2(sceneID, set_scene_enable))
             {
                 ezlopi_scenes_status_change_broadcast(scene_node, scene_status_finished_str);
+                ret = 1;
             }
             else
             {
+                // TRACE_E("Failed : 'set_scene_state'");
                 ezlopi_scenes_status_change_broadcast(scene_node, scene_status_failed_str);
             }
         }
-        else
-        {
-            ret = 1;
-        }
-    }
-    else
-    {
-        ret = 1;
+        TRACE_W("ret = %d", ret);
     }
     return ret;
 }
@@ -371,15 +361,9 @@ int ezlopi_scene_then_reset_scene_latches(l_scenes_list_v2_t* curr_scene, void* 
 }
 int ezlopi_scene_then_reboot_hub(l_scenes_list_v2_t* curr_scene, void* arg)
 {
-    TRACE_W(" reboot_hub ");
-    int ret = 0;
-    l_action_block_v2_t* curr_then = (l_action_block_v2_t*)arg;
-    if (curr_then && curr_scene)
-    {
-        TRACE_E("Rebooting ESP......................... ");
-        EZPI_CORE_reboot();
-    }
-    return ret;
+    TRACE_E("Rebooting ESP......................... ");
+    EZPI_CORE_reset_reboot();
+    return 1;
 }
 int ezlopi_scene_then_reset_hub(l_scenes_list_v2_t* curr_scene, void* arg)
 {
@@ -410,7 +394,7 @@ int ezlopi_scene_then_reset_hub(l_scenes_list_v2_t* curr_scene, void* arg)
 
                             ezlopi_factory_info_v3_scenes_factory_soft_reset(); // 'ID' partition :- 'wifi' sector
                             TRACE_E("Rebooting ESP......................... ");
-                            EZPI_CORE_reboot();
+                            EZPI_CORE_reset_reboot();
                         }
                         else if (0 == strncmp(curr_field->field_value.u_value.value_string, "soft", 5))
                         {
@@ -418,12 +402,12 @@ int ezlopi_scene_then_reset_hub(l_scenes_list_v2_t* curr_scene, void* arg)
 
                             ezlopi_factory_info_v3_scenes_factory_soft_reset(); // 'ID' partition :- 'wifi' sector
                             TRACE_E("Rebooting ESP......................... ");
-                            EZPI_CORE_reboot();
+                            EZPI_CORE_reset_reboot();
                         }
                         else if (0 == strncmp(curr_field->field_value.u_value.value_string, "hard", 5))
                         {
                             #warning "hard reset not in documention.";
-                            EZPI_CORE_factory_restore();
+                            EZPI_CORE_reset_factory_restore();
                         }
                     }
                 }

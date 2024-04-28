@@ -37,18 +37,22 @@ void ezlopi_service_ota_init(void)
     xTaskCreate(ota_service_process, "ota-service-process", EZLOPI_SERVICE_OTA_PROCESS_TASK_DEPTH, NULL, 2, &ezlopi_service_ota_process_task_handle);
     ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_OTA_PROCESS_TASK, &ezlopi_service_ota_process_task_handle, EZLOPI_SERVICE_OTA_PROCESS_TASK_DEPTH);
 }
+
 static void ota_service_process(void* pv)
 {
     ezlopi_wait_for_wifi_to_connect(portMAX_DELAY);
     ezlopi_event_group_set_event(EZLOPI_EVENT_OTA);
     vTaskDelay(5000 / portTICK_RATE_MS);
+
     while (1)
     {
         __ota_busy = true;
         int ret_nma_reg = ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 60000, false);
         int ret_ota = ezlopi_event_group_wait_for_event(EZLOPI_EVENT_OTA, 86400 * 1000, 1); // 86400 seconds in a day (24 hrs)
+
         TRACE_D("Configuration Selection NMA Reg: %d", ret_nma_reg);
         TRACE_D("Configuration Selection OTA Trigger : %d", ret_ota);
+
         if ((-1 != ret_nma_reg) || (-1 != ret_ota))
         {
             TRACE_D("Sending firmware check request...");

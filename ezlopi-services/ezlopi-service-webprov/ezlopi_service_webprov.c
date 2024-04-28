@@ -17,8 +17,8 @@
 #include "ezlopi_core_api_methods.h"
 #include "ezlopi_core_event_group.h"
 #include "ezlopi_core_factory_info.h"
+#include "ezlopi_core_api_methods.h"
 #include "ezlopi_core_cjson_macros.h"
-#include "ezlopi_core_ezlopi_methods.h"
 #include "ezlopi_core_processes.h"
 #include "ezlopi_core_websocket_client.h"
 #include "ezlopi_core_ezlopi_broadcast.h"
@@ -30,14 +30,12 @@
 
 static uint32_t message_counter = 0;
 static xTaskHandle _task_handle = NULL;
-
 static TaskHandle_t ezlopi_update_config_notifier = NULL;
 
 static void __config_check(void* pv);
 static void __fetch_wss_endpoint(void* pv);
 
 static void __connection_upcall(bool connected);
-static void __hub_reboot(cJSON* cj_request, cJSON* cj_response);
 static void __message_upcall(const char* payload, uint32_t len);
 
 static uint8_t __config_update(void* arg);
@@ -425,8 +423,6 @@ static uint8_t __config_update(void* arg)
     {
         TRACE_E("Error parsing JSON.\n");
     }
-
     return ret;
 }
-
 #endif // CONFIG_EZPI_WEBSOCKET_CLIENT

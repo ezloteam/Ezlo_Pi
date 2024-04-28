@@ -73,7 +73,7 @@ static int __notify(l_ezlopi_item_t* item)
         if (fabs(*temperature_prev_value - temperature_current_value) > 0.2)
         {
             *temperature_prev_value = temperature_current_value;
-            ezlopi_device_value_updated_from_device_v3(item);
+            ezlopi_device_value_updated_from_device_broadcast(item);
         }
     }
     return ret;
@@ -83,15 +83,11 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
 {
     int ret = 0;
 
-    if (item && arg)
+    if (item && arg && item->user_arg)
     {
         cJSON* cj_result = (cJSON*)arg;
         double* temperatue_value = (double*)item->user_arg;
-        cJSON_AddNumberToObject(cj_result, ezlopi_value_str, *temperatue_value);
-        char* valueFormatted = ezlopi_valueformatter_double(*temperatue_value);
-        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-        free(valueFormatted);
-        cJSON_AddStringToObject(cj_result, ezlopi_scale_str, scales_celsius);
+        ezlopi_valueformatter_double_to_cjson(item, cj_result, *temperatue_value);
     }
     return ret;
 }
@@ -112,32 +108,21 @@ static int __init(l_ezlopi_item_t* item)
                 ds18b20_get_temperature_data(temperature_prev_value, item->interface.onewire_master.onewire_pin);
                 ret = 1;
             }
-            // else
-            // {
-            //     ret = -1;
-            //     if (item->user_arg)
-            //     {
-            //         free(item->user_arg); // this will free ; memory address linked to all items
-            //         item->user_arg = NULL;
-            //     }
-            // }
+            else
+            {
+                ret = -1;
+            }
         }
-        // else
-        // {
-        //     ret = -1;
-        //     ezlopi_device_free_device_by_item(item);
-        // }
+        else
+        {
+            ret = -1;
+        }
     }
     return ret;
 }
 
 static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    // char *device_name = NULL;
-    // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    // ASSIGN_DEVICE_NAME_V2(device, device_name);
-    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
-
     device->cloud_properties.category = category_temperature;
     device->cloud_properties.subcategory = subcategory_not_defined;
     device->cloud_properties.device_type = dev_type_sensor;
@@ -147,7 +132,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* 
 
 static void __prepare_item_properties(l_ezlopi_item_t* item, cJSON* cj_device)
 {
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type);
     item->cloud_properties.show = true;
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
@@ -158,7 +143,7 @@ static void __prepare_item_properties(l_ezlopi_item_t* item, cJSON* cj_device)
     item->interface_type = EZLOPI_DEVICE_INTERFACE_ONEWIRE_MASTER;
 
     item->interface.onewire_master.enable = true;
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_str, item->interface.onewire_master.onewire_pin);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_str, item->interface.onewire_master.onewire_pin);
 }
 
 static int __prepare(void* arg)
@@ -168,14 +153,14 @@ static int __prepare(void* arg)
 
     if (prep_arg && prep_arg->cjson_device)
     {
-        l_ezlopi_device_t* device = ezlopi_device_add_device(prep_arg->cjson_device);
+        l_ezlopi_device_t* device = ezlopi_device_add_device(prep_arg->cjson_device, NULL);
         if (device)
         {
+            ret = 1;
             __prepare_device_cloud_properties(device, prep_arg->cjson_device);
             l_ezlopi_item_t* item_temperature = ezlopi_device_add_item_to_device(device, sensor_0030_oneWire_DS18B20);
             if (item_temperature)
             {
-                item_temperature->cloud_properties.device_id = device->cloud_properties.device_id;
                 __prepare_item_properties(item_temperature, prep_arg->cjson_device);
 
                 double* temperature_value = (double*)malloc(sizeof(double));
@@ -183,15 +168,19 @@ static int __prepare(void* arg)
                 {
                     memset(temperature_value, 0, sizeof(double));
                     *temperature_value = 65536.0f;
+                    item_temperature->is_user_arg_unique = true;
                     item_temperature->user_arg = (void*)temperature_value;
                 }
-                ret = 1;
             }
             else
             {
                 ezlopi_device_free_device(device);
                 ret = -1;
             }
+        }
+        else
+        {
+            ret = -1;
         }
     }
 

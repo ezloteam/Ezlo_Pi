@@ -30,23 +30,23 @@ int sensor_0017_ADC_potentiometer(e_ezlopi_actions_t action, l_ezlopi_item_t* it
     {
     case EZLOPI_ACTION_PREPARE:
     {
-        __0017_prepare(arg);
+        ret = __0017_prepare(arg);
         break;
     }
     case EZLOPI_ACTION_INITIALIZE:
     {
-        __0017_init(item);
+        ret = __0017_init(item);
         break;
     }
     case EZLOPI_ACTION_HUB_GET_ITEM:
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
-        __0017_get_cjson_value(item, arg);
+        ret = __0017_get_cjson_value(item, arg);
         break;
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
-        __0017_notify(item);
+        ret = __0017_notify(item);
         break;
     }
     default:
@@ -59,10 +59,6 @@ int sensor_0017_ADC_potentiometer(e_ezlopi_actions_t action, l_ezlopi_item_t* it
 //-------------------------------------------------------------------------------------------------------------------------
 static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    char* dev_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, dev_name);
-    ASSIGN_DEVICE_NAME_V2(device, dev_name);
-    device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
     device->cloud_properties.device_type_id = NULL;
@@ -78,10 +74,12 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_dev
     item->cloud_properties.value_type = value_type_electric_potential;
     item->cloud_properties.show = true;
     item->cloud_properties.scale = scales_milli_volt;
+
+    item->is_user_arg_unique = true;
     item->user_arg = user_data;
 
     item->interface_type = EZLOPI_DEVICE_INTERFACE_MAX; // other
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_str, item->interface.adc.gpio_num);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_str, item->interface.adc.gpio_num);
     item->interface.adc.resln_bit = 3;
 }
 //-------------------------------------------------------------------------------------------------------------------------
@@ -96,9 +94,10 @@ static int __0017_prepare(void* arg)
         if (NULL != user_data)
         {
             memset(user_data, 0, sizeof(s_potentiometer_t));
-            l_ezlopi_device_t* potentiometer_device = ezlopi_device_add_device(cj_device);
+            l_ezlopi_device_t* potentiometer_device = ezlopi_device_add_device(cj_device, NULL);
             if (potentiometer_device)
             {
+                ret = 1;
                 __prepare_device_cloud_properties(potentiometer_device, cj_device);
                 l_ezlopi_item_t* potentiometer_item = ezlopi_device_add_item_to_device(potentiometer_device, sensor_0017_ADC_potentiometer);
                 if (potentiometer_item)
@@ -117,7 +116,10 @@ static int __0017_prepare(void* arg)
                 free(user_data);
                 ret = -1;
             }
-            ret = 1;
+        }
+        else
+        {
+            ret = -1;
         }
     }
     return ret;
@@ -128,7 +130,7 @@ static int __0017_init(l_ezlopi_item_t* item)
     int ret = 0;
     if (item)
     {
-        s_potentiometer_t *user_data = (s_potentiometer_t *)item->user_arg;
+        s_potentiometer_t* user_data = (s_potentiometer_t*)item->user_arg;
         if (user_data)
         {
             if (GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
@@ -140,24 +142,17 @@ static int __0017_init(l_ezlopi_item_t* item)
                 else
                 {
                     ret = -1;
-                    free(item->user_arg); // this will free ; memory address linked to all items
-                    item->user_arg = NULL;
-                    // ezlopi_device_free_device_by_item(item);
                 }
             }
-            // else
-            // {
-            //     ret = -1;
-            //     free(item->user_arg); // this will free ; memory address linked to all items
-            //     item->user_arg = NULL;
-            //     // ezlopi_device_free_device_by_item(item);
-            // }
+            else
+            {
+                ret = -1;
+            }
         }
-        // else
-        // {
-        //     ret = -1;
-        //     ezlopi_device_free_device_by_item(item);
-        // }
+        else
+        {
+            ret = -1;
+        }
     }
     return ret;
 }
@@ -170,16 +165,10 @@ static int __0017_get_cjson_value(l_ezlopi_item_t* item, void* arg)
         cJSON* cj_result = (cJSON*)arg;
         if (cj_result)
         {
-            s_potentiometer_t *user_data = (s_potentiometer_t *)item->user_arg;
+            s_potentiometer_t* user_data = (s_potentiometer_t*)item->user_arg;
             if (user_data)
             {
-                cJSON_AddNumberToObject(cj_result, ezlopi_value_str, (user_data->pot_val));
-                char *valueFormatted = ezlopi_valueformatter_float(user_data->pot_val);
-                if (valueFormatted)
-                {
-                    cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                    free(valueFormatted);
-                }
+                ezlopi_valueformatter_float_to_cjson(item, cj_result, user_data->pot_val);
                 ret = 1;
             }
         }
@@ -192,17 +181,17 @@ static int __0017_notify(l_ezlopi_item_t* item)
     int ret = 0;
     if (item)
     {
-        s_potentiometer_t *user_data = (s_potentiometer_t *)item->user_arg;
+        s_potentiometer_t* user_data = (s_potentiometer_t*)item->user_arg;
         if (user_data)
         {
-            s_ezlopi_analog_data_t adc_data = {.value = 0, .voltage = 0};
+            s_ezlopi_analog_data_t adc_data = { .value = 0, .voltage = 0 };
             ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &adc_data);
             float new_pot = (((float)(4095.0f - (adc_data.value)) / 4095.0f) * 100);
 
             if (fabs((user_data->pot_val) - new_pot) > 0.05)
             {
                 user_data->pot_val = new_pot;
-                ezlopi_device_value_updated_from_device_v3(item);
+                ezlopi_device_value_updated_from_device_broadcast(item);
             }
             ret = 1;
         }

@@ -1,6 +1,6 @@
 #include <string.h>
 
-#include "cJSON.h"
+#include "cjext.h"
 #include "lwip/ip_addr.h"
 #include "esp_event_base.h"
 

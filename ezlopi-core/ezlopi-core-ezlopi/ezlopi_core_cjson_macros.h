@@ -17,8 +17,6 @@
         }                                                     \
     }
 
-// TRACE_I("%s: %f", item_name, (double)item_val);
-
 #define CJSON_GET_VALUE_BOOL(root, item_name, item_val)       \
     {                                                         \
         cJSON *o_item = cJSON_GetObjectItem(root, item_name); \
@@ -32,7 +30,7 @@
             {                                                 \
                 item_val = true;                              \
             }                                                 \
-            item_val = o_item->valueint;                      \
+            item_val = o_item->valuedouble;                   \
         }                                                     \
         else                                                  \
         {                                                     \
@@ -40,21 +38,6 @@
             TRACE_E("%s not found!", item_name);              \
         }                                                     \
     }
-
-#define CJSON_GET_VALUE_INT(root, item_name, item_val)        \
-    {                                                         \
-        cJSON *o_item = cJSON_GetObjectItem(root, item_name); \
-        if (o_item)                                           \
-        {                                                     \
-            item_val = o_item->valueint;                      \
-        }                                                     \
-        else                                                  \
-        {                                                     \
-            item_val = 0;                                     \
-            TRACE_E("%s not found!", item_name);              \
-        }                                                     \
-    }
-// TRACE_I("%s: %d", item_name, item_val);
 
 #define CJSON_GET_VALUE_STRING(root, item_name, item_val)     \
     {                                                         \
@@ -69,23 +52,22 @@
             TRACE_E("%s: NULL", item_name);                   \
         }                                                     \
     }
-// TRACE_I("%s: %s", item_name, item_val ? item_val : ezlopi__str);
 
-#define CJSON_TRACE(name, object)                                         \
-    {                                                                     \
-        if (object)                                                       \
-        {                                                                 \
-            char *obj_str = cJSON_Print(object);                          \
-            if (obj_str)                                                  \
-            {                                                             \
-                TRACE_D("%s:\r\n%s", name ? name : ezlopi__str, obj_str); \
-                free(obj_str);                                            \
-            }                                                             \
-        }                                                                 \
-        else                                                              \
-        {                                                                 \
-            TRACE_E("%s: Null", name ? name : "");                        \
-        }                                                                 \
+#define CJSON_TRACE(name, object)                                                           \
+    {                                                                                       \
+        if (object)                                                                         \
+        {                                                                                   \
+            char *obj_str = cJSON_Print(object);                                            \
+            if (obj_str)                                                                    \
+            {                                                                               \
+                TRACE_D("%s[%d]: %s", name ? name : ezlopi__str, strlen(obj_str), obj_str); \
+                free(obj_str);                                                              \
+            }                                                                               \
+        }                                                                                   \
+        else                                                                                \
+        {                                                                                   \
+            TRACE_E("%s: Null", name ? name : "");                                          \
+        }                                                                                   \
     }
 
 #define CJSON_GET_VALUE_STRING_BY_COPY(root, item_name, item_val)     \

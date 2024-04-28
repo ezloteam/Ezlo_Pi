@@ -2,7 +2,7 @@
 #include <stdint.h>
 
 #include "ezlopi_util_trace.h"
-#include "cJSON.h"
+#include "cjext.h"
 #include "ezlopi_cloud_scenes.h"
 
 #include "ezlopi_core_nvs.h"
@@ -22,9 +22,6 @@ static e_scenes_block_type_v2_t __get_block_type_and_create_block_array(cJSON* c
 
 void scenes_blocks_list(cJSON* cj_request, cJSON* cj_response)
 {
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi__id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
-
     cJSON* cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
     if (cj_result)
     {

@@ -88,43 +88,33 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
     int ret = 0;
     if (item && arg)
     {
-        cJSON* cjson_params = (cJSON*)arg;
+        cJSON* cj_properties = (cJSON*)arg;
         s_rgb_args_t* rgb_args = (s_rgb_args_t*)item->user_arg;
 
-        if ((NULL != cjson_params) && (NULL != rgb_args))
+        if ((NULL != cj_properties) && (NULL != rgb_args))
         {
             if (ezlopi_item_name_rgbcolor == item->cloud_properties.item_name)
             {
-                cJSON* color_values = cJSON_AddObjectToObject(cjson_params, ezlopi_value_str);
+                cJSON* color_values = cJSON_AddObjectToObject(cj_properties, ezlopi_value_str);
                 if (color_values)
                 {
-                    cJSON_AddNumberToObject(color_values, "red", rgb_args->red_struct.value);
-                    cJSON_AddNumberToObject(color_values, "green", rgb_args->green_struct.value);
-                    cJSON_AddNumberToObject(color_values, "blue", rgb_args->blue_struct.value);
-                    char* formatted_val = ezlopi_valueformatter_rgb(rgb_args->red_struct.value, rgb_args->green_struct.value, rgb_args->blue_struct.value);
-                    if (formatted_val)
-                    {
-                        cJSON_AddStringToObject(cjson_params, ezlopi_valueFormatted_str, formatted_val);
-                        free(formatted_val);
-                    }
+                    cJSON_AddNumberToObject(color_values, ezlopi_red_str, rgb_args->red_struct.value);
+                    cJSON_AddNumberToObject(color_values, ezlopi_green_str, rgb_args->green_struct.value);
+                    cJSON_AddNumberToObject(color_values, ezlopi_blue_str, rgb_args->blue_struct.value);
+
+                    char formatted_rgb_value[32];
+                    snprintf(formatted_rgb_value, sizeof(formatted_rgb_value), "#%02x%02x%02x", rgb_args->red_struct.value, rgb_args->green_struct.value, rgb_args->blue_struct.value);
+                    cJSON_AddStringToObject(cj_properties, ezlopi_valueFormatted_str, formatted_rgb_value);
                 }
             }
-            if (ezlopi_item_name_switch == item->cloud_properties.item_name)
+            else if (ezlopi_item_name_switch == item->cloud_properties.item_name)
             {
-                int state = ((0 == rgb_args->brightness) ? 0 : 1);
-                cJSON_AddBoolToObject(cjson_params, ezlopi_value_str, state);
-                cJSON_AddStringToObject(cjson_params, ezlopi_valueFormatted_str, ezlopi_valueformatter_bool(state ? true : false));
+                ezlopi_valueformatter_bool_to_cjson(item, cj_properties, rgb_args->brightness);
             }
-            if (ezlopi_item_name_dimmer == item->cloud_properties.item_name)
+            else if (ezlopi_item_name_dimmer == item->cloud_properties.item_name)
             {
                 int dim_percentage = (int)(rgb_args->brightness * 100);
-                cJSON_AddNumberToObject(cjson_params, ezlopi_value_str, dim_percentage);
-                char* formatted_val = ezlopi_valueformatter_int(dim_percentage);
-                if (formatted_val)
-                {
-                    cJSON_AddStringToObject(cjson_params, ezlopi_valueFormatted_str, formatted_val);
-                    free(formatted_val);
-                }
+                ezlopi_valueformatter_int32_to_cjson(item, cj_properties, dim_percentage);
             }
         }
     }
@@ -146,32 +136,32 @@ static int __set_cjson_value(l_ezlopi_item_t* item, void* arg)
 
                 CJSON_TRACE("cjson_params_rgb_values", cjson_params_rgb_values);
 
-                CJSON_GET_VALUE_INT(cjson_params_rgb_values, "red", rgb_args->red_struct.value);
-                CJSON_GET_VALUE_INT(cjson_params_rgb_values, "green", rgb_args->green_struct.value);
-                CJSON_GET_VALUE_INT(cjson_params_rgb_values, "blue", rgb_args->blue_struct.value);
+                CJSON_GET_VALUE_DOUBLE(cjson_params_rgb_values, ezlopi_red_str, rgb_args->red_struct.value);
+                CJSON_GET_VALUE_DOUBLE(cjson_params_rgb_values, ezlopi_green_str, rgb_args->green_struct.value);
+                CJSON_GET_VALUE_DOUBLE(cjson_params_rgb_values, ezlopi_blue_str, rgb_args->blue_struct.value);
 
                 RGB_LED_change_color_value(rgb_args);
             }
             if (ezlopi_item_name_switch == item->cloud_properties.item_name)
             {
                 int led_state = 0;
-                CJSON_GET_VALUE_INT(cjson_params, ezlopi_value_str, led_state);
+                CJSON_GET_VALUE_DOUBLE(cjson_params, ezlopi_value_str, led_state);
                 rgb_args->previous_dim_factor = ((0 == led_state) ? rgb_args->brightness : rgb_args->previous_dim_factor);
                 rgb_args->brightness = ((0 == led_state) ? 0.0 : ((0 == rgb_args->previous_dim_factor) ? 1.0 : rgb_args->previous_dim_factor));
                 TRACE_D("Brightness value is %d, %d, %d", (uint8_t)(rgb_args->red_struct.value * rgb_args->brightness), (uint8_t)(rgb_args->green_struct.value * rgb_args->brightness),
                     (uint8_t)(rgb_args->blue_struct.value * rgb_args->brightness));
                 RGB_LED_change_color_value(rgb_args);
-                ezlopi_device_value_updated_from_device_v3(rgb_args->RGB_LED_dimmer_item);
+                ezlopi_device_value_updated_from_device_broadcast(rgb_args->RGB_LED_dimmer_item);
             }
             if (ezlopi_item_name_dimmer == item->cloud_properties.item_name)
             {
                 int dim_percent = 0;
-                CJSON_GET_VALUE_INT(cjson_params, ezlopi_value_str, dim_percent);
+                CJSON_GET_VALUE_DOUBLE(cjson_params, ezlopi_value_str, dim_percent);
                 float dim_brightness_factor = dim_percent / 100.0;
                 TRACE_D("dim_percent %d, dim_brightness_factor is %f", dim_percent, dim_brightness_factor);
                 rgb_args->brightness = dim_brightness_factor;
                 RGB_LED_change_color_value(rgb_args);
-                ezlopi_device_value_updated_from_device_v3(rgb_args->RGB_LED_onoff_switch_item);
+                ezlopi_device_value_updated_from_device_broadcast(rgb_args->RGB_LED_onoff_switch_item);
             }
         }
     }
@@ -225,22 +215,20 @@ static int __init(l_ezlopi_item_t* item)
                     rgb_args->RGB_LED_initialized = true;
                     ret = 1;
                 }
-                // else
-                // {
-                //     ret = -1;
-                // }
+                else
+                {
+                    ret = -1;
+                }
             }
-            // else
-            // {
-            //     ret = -1;
-            //     ezlopi_device_free_device_by_item(item);
-            // }
+            else
+            {
+                ret = -1;
+            }
         }
-        // else
-        // {
-        //     ret = -1;
-        //     ezlopi_device_free_device_by_item(item);
-        // }
+        else
+        {
+            ret = -1;
+        }
     }
 
     return ret;
@@ -248,11 +236,6 @@ static int __init(l_ezlopi_item_t* item)
 
 static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    // char *device_name = NULL;
-    // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    // ASSIGN_DEVICE_NAME_V2(device, device_name);
-    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
-
     device->cloud_properties.category = category_dimmable_light;
     device->cloud_properties.subcategory = subcategory_dimmable_colored;
     device->cloud_properties.device_type = dev_type_dimmer_outlet;
@@ -262,9 +245,9 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* 
 
 static void __prepare_RGB_LED_user_args(s_rgb_args_t* rgb_args, cJSON* cj_device)
 {
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio1_str, rgb_args->red_struct.gpio_num);
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio2_str, rgb_args->green_struct.gpio_num);
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio3_str, rgb_args->blue_struct.gpio_num);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio1_str, rgb_args->red_struct.gpio_num);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio2_str, rgb_args->green_struct.gpio_num);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio3_str, rgb_args->blue_struct.gpio_num);
 
     rgb_args->red_struct.duty_cycle = 0;
     rgb_args->green_struct.duty_cycle = 0;
@@ -300,6 +283,8 @@ static void __prepare_RGB_LED_item(l_ezlopi_item_t* item, cJSON* cj_device, void
     item->interface.pwm.duty_cycle = 0;
     item->interface.pwm.freq_hz = 5000;
     item->interface.pwm.pwm_resln = 8;
+
+    item->is_user_arg_unique = true;
     item->user_arg = user_arg;
 }
 
@@ -321,6 +306,8 @@ static void __prepare_RGB_LED_onoff_switch_item(l_ezlopi_item_t* item, cJSON* cj
     item->interface.gpio.gpio_out.pull = false;
     item->interface.gpio.gpio_out.value = false;
     item->interface.gpio.gpio_in.enable = false;
+
+    item->is_user_arg_unique = true;
     item->user_arg = user_arg;
 }
 
@@ -340,6 +327,8 @@ static void __prepare_RGB_LED_dimmer_item(l_ezlopi_item_t* item, cJSON* cj_devic
     item->interface.pwm.duty_cycle = 0;
     item->interface.pwm.freq_hz = 5000;
     item->interface.pwm.pwm_resln = 8;
+
+    item->is_user_arg_unique = true;
     item->user_arg = user_arg;
 }
 
@@ -350,9 +339,10 @@ static int __prepare(void* arg)
     s_ezlopi_prep_arg_t* prep_arg = (s_ezlopi_prep_arg_t*)arg;
     if (prep_arg && prep_arg->cjson_device)
     {
-        l_ezlopi_device_t* RGB_device = ezlopi_device_add_device(prep_arg->cjson_device);
+        l_ezlopi_device_t* RGB_device = ezlopi_device_add_device(prep_arg->cjson_device, NULL);
         if (RGB_device)
         {
+            ret = 1;
             s_rgb_args_t* rgb_args = malloc(sizeof(s_rgb_args_t));
             if (rgb_args)
             {
@@ -365,25 +355,20 @@ static int __prepare(void* arg)
                 rgb_args->RGB_LED_item = ezlopi_device_add_item_to_device(RGB_device, device_0038_other_RGB);
                 if (rgb_args->RGB_LED_item)
                 {
-                    rgb_args->RGB_LED_item->cloud_properties.device_id = RGB_device->cloud_properties.device_id;
                     __prepare_RGB_LED_item(rgb_args->RGB_LED_item, prep_arg->cjson_device, rgb_args);
                 }
 
                 rgb_args->RGB_LED_onoff_switch_item = ezlopi_device_add_item_to_device(RGB_device, device_0038_other_RGB);
                 if (rgb_args->RGB_LED_onoff_switch_item)
                 {
-                    rgb_args->RGB_LED_onoff_switch_item->cloud_properties.device_id = RGB_device->cloud_properties.device_id;
                     __prepare_RGB_LED_onoff_switch_item(rgb_args->RGB_LED_onoff_switch_item, prep_arg->cjson_device, rgb_args);
                 }
 
                 rgb_args->RGB_LED_dimmer_item = ezlopi_device_add_item_to_device(RGB_device, device_0038_other_RGB);
                 if (rgb_args->RGB_LED_dimmer_item)
                 {
-                    rgb_args->RGB_LED_dimmer_item->cloud_properties.device_id = RGB_device->cloud_properties.device_id;
                     __prepare_RGB_LED_dimmer_item(rgb_args->RGB_LED_dimmer_item, prep_arg->cjson_device, rgb_args);
                 }
-
-                ret = 1;
 
                 if (!rgb_args->RGB_LED_item && !rgb_args->RGB_LED_onoff_switch_item && !rgb_args->RGB_LED_dimmer_item)
                 {

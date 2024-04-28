@@ -41,6 +41,7 @@ static esp_netif_t* sg_wifi_sta_netif = NULL;
 static int sg_retry_num = 0;
 static volatile int sg_station_got_ip = 0;
 static const char* const scg_wifi_no_error_str = "NO_ERROR";
+static const char* wifi_scanner_task_name = "WiFiScanTask";
 static const char* sg_last_disconnect_reason = scg_wifi_no_error_str;
 
 static ll_ezlopi_wifi_event_upcall_t* __event_upcall_head = NULL;
@@ -388,7 +389,7 @@ static void ezlopi_wifi_scanner_task(void* params)
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
     ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_CORE_WIFI_SCANNER_TASK);
-    scan_handle = NULL;
+    sg_scan_handle = NULL;
     vTaskDelete(NULL);
 }
 

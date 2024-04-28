@@ -7,6 +7,6 @@ set(EZLOPI_CORE_COMPONENTS
         ezlopi-core-event-queue
 )
 
-idf_component_register(SRCS "${files_src}"
+idf_component_register(SRCS "ezlopi_core_timer.c" "${files_src}"
                         INCLUDE_DIRS "."
                         REQUIRES ${EZLOPI_CORE_COMPONENTS})

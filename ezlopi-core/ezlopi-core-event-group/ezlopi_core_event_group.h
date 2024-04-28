@@ -16,5 +16,6 @@ void ezlopi_event_group_create(void);
 void ezlopi_event_group_set_event(e_ezlopi_event_t event);
 void ezlopi_event_group_clear_event(e_ezlopi_event_t event);
 int ezlopi_event_group_wait_for_event(e_ezlopi_event_t event, uint32_t wait_time_ms, uint32_t clear_on_exit);
+e_ezlopi_event_t ezlopi_get_event_bit_status();
 
 #endif // _EZLOPI_CORE_EVENT_GROUP_H_

@@ -3,14 +3,14 @@
 file(GLOB_RECURSE config_src "*.c")
 
 set(EZLOPI_CORE_COMPONENTS 
-        ezlopi-core-wifi
-        ezlopi-core-modes
-        ezlopi-core-sntp
-        ezlopi-core-ble
-        ezlopi-core-scenes    
         ezlopi-util-trace
+        ezlopi-core-ble
+        ezlopi-core-wifi
+        ezlopi-core-sntp
         ezlopi-core-mdns   
-
+        ezlopi-core-modes
+        ezlopi-core-scenes    
+        ezlopi-core-buffer
 )
 
 set(EZLOPI_CLOUD_COMPONENTS
@@ -29,12 +29,14 @@ set(EZLOPI_CLOUD_COMPONENTS
         ezlopi-cloud-ota
         ezlopi-cloud-location
         ezlopi-cloud-coordinates
+        ezlopi-cloud-offline-login
         ezlopi-cloud-status
 )
 
-idf_component_register(SRCS "ezlopi_core_ezlopi.c" "ezlopi_core_ezlopi_broadcast.c" "${config_src}"
+idf_component_register(SRCS "ezlopi_core_ezlopi_broadcast.c" "ezlopi_core_ezlopi.c" "${config_src}"
     INCLUDE_DIRS "."
-    REQUIRES    ${EZLOPI_CORE_COMPONENTS}
+    REQUIRES    freertos
+                ${EZLOPI_CORE_COMPONENTS}
                 ${EZLOPI_CLOUD_COMPONENTS}
 )
 

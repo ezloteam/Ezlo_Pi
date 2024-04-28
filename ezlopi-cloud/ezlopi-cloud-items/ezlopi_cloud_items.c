@@ -6,9 +6,7 @@
 #include "ezlopi_util_trace.h"
 #include "sdkconfig.h"
 
-// #include "ezlopi_service_webprov.h"
-
-#include "cJSON.h"
+#include "cjext.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_devices_list.h"
 #include "ezlopi_cloud_constants.h"
@@ -43,7 +41,7 @@ static cJSON* ezlopi_device_create_item_table_from_prop(l_ezlopi_item_t* item_pr
         {
             cJSON_AddStringToObject(cj_item_properties, ezlopi_scale_str, item_properties->cloud_properties.scale);
         }
-        cJSON_AddStringToObject(cj_item_properties, "status", "idle");
+        cJSON_AddStringToObject(cj_item_properties, ezlopi_status_str, ezlopi_idle_str);
     }
 
     return cj_item_properties;
@@ -51,9 +49,6 @@ static cJSON* ezlopi_device_create_item_table_from_prop(l_ezlopi_item_t* item_pr
 
 void items_list_v3(cJSON* cj_request, cJSON* cj_response)
 {
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
-
     cJSON* cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
     if (cj_result)
     {
@@ -140,8 +135,6 @@ void items_list_v3(cJSON* cj_request, cJSON* cj_response)
 
 void items_set_value_v3(cJSON* cj_request, cJSON* cj_response)
 {
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
     cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
 
     cJSON* cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
@@ -229,6 +222,7 @@ void items_update_v3(cJSON* cj_request, cJSON* cj_response)
     }
 }
 
+#if 0
 cJSON* ezlopi_cloud_items_updated_from_devices_v3(l_ezlopi_device_t* device, l_ezlopi_item_t* item)
 {
     cJSON* cjson_response = cJSON_CreateObject();
@@ -275,3 +269,4 @@ cJSON* ezlopi_cloud_items_updated_from_devices_v3(l_ezlopi_device_t* device, l_e
 
     return cjson_response;
 }
+#endif

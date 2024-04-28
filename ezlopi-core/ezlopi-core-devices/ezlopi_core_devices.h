@@ -1,11 +1,12 @@
 #ifndef EZLOPI_CORE_DEVICES_H
 #define EZLOPI_CORE_DEVICES_H
 
-// #include "cJSON.h"
+// #include "cjext.h"
 
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_actions.h"
 #include "ezlopi_core_settings.h"
+#include "ezlopi_core_cjson_macros.h"
 
 #include "ezlopi_hal_adc.h"
 #include "ezlopi_hal_pwm.h"
@@ -16,41 +17,12 @@
 #include "ezlopi_hal_spi_master.h"
 
 // #include "ezlopi_cloud_settings.h"
-
-#define CJSON_GET_VALUE_DOUBLE(root, item_name, item_val)     \
-    {                                                         \
-        cJSON *o_item = cJSON_GetObjectItem(root, item_name); \
-        if (o_item)                                           \
-        {                                                     \
-            item_val = o_item->valuedouble;                   \
-        }                                                     \
-        else                                                  \
-        {                                                     \
-            item_val = 0;                                     \
-            TRACE_E("%s not found!", item_name);              \
-        }                                                     \
-    }
-
-#define CJSON_GET_VALUE_INT(root, item_name, item_val)        \
-    {                                                         \
-        cJSON *o_item = cJSON_GetObjectItem(root, item_name); \
-        if (o_item)                                           \
-        {                                                     \
-            item_val = o_item->valueint;                      \
-        }                                                     \
-        else                                                  \
-        {                                                     \
-            item_val = 0;                                     \
-            TRACE_E("%s not found!", item_name);              \
-        }                                                     \
-    }
-
 #define CJSON_GET_VALUE_GPIO(root, item_name, item_val)       \
     {                                                         \
         cJSON *o_item = cJSON_GetObjectItem(root, item_name); \
         if (o_item && o_item->type == cJSON_Number)           \
         {                                                     \
-            item_val = o_item->valueint;                      \
+            item_val = o_item->valuedouble;                      \
         }                                                     \
         else                                                  \
         {                                                     \
@@ -142,6 +114,7 @@ typedef struct l_ezlopi_item
     } interface;
 
     void* user_arg;
+    bool is_user_arg_unique;
     int (*func)(e_ezlopi_actions_t action, struct l_ezlopi_item* item, void* arg, void* user_arg);
 
     struct l_ezlopi_item* next;
@@ -167,7 +140,7 @@ typedef struct l_ezlopi_device
 void ezlopi_device_prepare(void);
 
 l_ezlopi_device_t* ezlopi_device_get_head(void);
-l_ezlopi_device_t* ezlopi_device_add_device(cJSON* cj_device);
+l_ezlopi_device_t* ezlopi_device_add_device(cJSON* cj_device, const char* last_name);
 
 l_ezlopi_device_t* ezlopi_device_get_by_id(uint32_t device_id);
 l_ezlopi_item_t* ezlopi_device_get_item_by_id(uint32_t item_id);

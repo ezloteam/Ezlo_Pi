@@ -10,6 +10,7 @@
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_factory_info.h"
 #include "ezlopi_core_scenes_value.h"
+#include "ezlopi_core_scenes_print.h"
 #include "ezlopi_core_scenes_when_methods.h"
 #include "ezlopi_core_scenes_then_methods.h"
 #include "ezlopi_core_scenes_status_changed.h"
@@ -50,7 +51,7 @@ static l_scenes_list_v2_t* _scenes_populate(cJSON* cj_scene, uint32_t scene_id);
 int ezlopi_scene_edit_by_id(uint32_t scene_id, cJSON* cj_scene)
 {
     int ret = 0;
-    // TRACE_E("%s", cJSON_Print(cj_scene));
+
     if (1 == ezlopi_core_scene_edit_update_id(scene_id, cj_scene))
     {
         if (1 == ezlopi_core_scene_edit_store_updated_to_nvs(cj_scene))
@@ -91,7 +92,10 @@ uint32_t ezlopi_store_new_scene_v2(cJSON* cj_new_scene)
         char tmp_buffer[32];
         snprintf(tmp_buffer, sizeof(tmp_buffer), "%08x", new_scene_id);
         cJSON_AddStringToObject(cj_new_scene, ezlopi__id_str, tmp_buffer);
-        char* new_scnee_str = cJSON_Print(cj_new_scene);
+
+        char* new_scnee_str = cJSON_PrintBuffered(cj_new_scene, 4096, false);
+        TRACE_D("length of 'new_scnee_str': %d", strlen(new_scnee_str));
+
         if (new_scnee_str)
         {
             if (ezlopi_nvs_write_str(new_scnee_str, strlen(new_scnee_str) + 1, tmp_buffer))
@@ -116,7 +120,9 @@ uint32_t ezlopi_store_new_scene_v2(cJSON* cj_new_scene)
                     }
                     else
                     {
-                        char* updated_scenes_list = cJSON_Print(cj_scenes_list);
+                        char* updated_scenes_list = cJSON_PrintBuffered(cj_scenes_list, 1024, false);
+                        TRACE_D("length of 'updated_scenes_list': %d", strlen(updated_scenes_list));
+
                         if (updated_scenes_list)
                         {
                             TRACE_D("updated_scenes_list: %s", updated_scenes_list);
@@ -128,6 +134,7 @@ uint32_t ezlopi_store_new_scene_v2(cJSON* cj_new_scene)
                             {
                                 TRACE_E("Scenes list update failed!");
                             }
+
                             free(updated_scenes_list);
                         }
                     }
@@ -172,7 +179,7 @@ uint32_t ezlopi_scenes_get_list_v2(cJSON* cj_scenes_array)
                 if (cj_scene_id && cj_scene_id->valuedouble)
                 {
                     char tmp_buffer[32];
-                    uint32_t scene_id = (uint32_t)cj_scene_id->valueint;
+                    uint32_t scene_id = (uint32_t)cj_scene_id->valuedouble;
                     snprintf(tmp_buffer, sizeof(tmp_buffer), "%08x", scene_id);
                     char* scene_str = ezlopi_nvs_read_str(tmp_buffer);
                     if (scene_str)
@@ -295,18 +302,39 @@ int ezlopi_scenes_enable_disable_id_from_list_v2(uint32_t _id, bool enabled_flag
                             cJSON* cj_scene = cJSON_Parse(scene_str);
                             if (cj_scene)
                             {
-                                cJSON* enable_item = (cJSON_GetObjectItem(cj_scene, "enabled"));
-                                if (enable_item && cJSON_IsBool(enable_item))
+                                cJSON* enable_item = cJSON_GetObjectItem(cj_scene, ezlopi_enabled_str);
+                                TRACE_S("prev_enable => [%s]", (enable_item->type == cJSON_True) ? "True" : "False");
+                                if ((enable_item && cJSON_IsBool(enable_item)) && (enable_item->type != ((enabled_flag) ? cJSON_True : cJSON_False)))
                                 {
-                                    cJSON_ReplaceItemInObject(cj_scene, "enabled", cJSON_CreateBool(enabled_flag));
-                                    if (1 == ezlopi_scene_edit_by_id(_id, cj_scene))
+                                    enable_item->type = (enabled_flag) ? cJSON_True : cJSON_False;
+
+                                    l_scenes_list_v2_t* curr_scene_head = scenes_list_head_v2;
+                                    while (curr_scene_head)
+                                    {
+                                        if (curr_scene_head->_id == _id)
+                                        {
+                                            curr_scene_head->enabled = enabled_flag;
+                                            break;
+                                        }
+
+                                        curr_scene_head = curr_scene_head->next;
+                                    }
+
+                                    CJSON_TRACE("cj_scene----> 2. updated", cj_scene);
+
+                                    if (1 == ezlopi_core_scene_edit_store_updated_to_nvs(cj_scene))
                                     {
                                         ret = 1;
+                                        TRACE_W("nvs enabled successfull");
                                     }
-                                    else 
+                                    else
                                     {
-                                        TRACE_E("HERE");
+                                        TRACE_E("Error!! failed");
                                     }
+                                }
+                                else
+                                {
+                                    TRACE_W("Scene-Already [%s] or, invalid option ", (true == enabled_flag) ? "enabled" : "disabled");
                                 }
                                 cJSON_Delete(cj_scene);
                             }
@@ -343,7 +371,9 @@ void ezlopi_scenes_remove_id_from_list_v2(uint32_t _id)
                     {
                         cJSON_DeleteItemFromArray(cj_scene_id_list, idx);
 
-                        char* updated_id_list_str = cJSON_Print(cj_scene_id_list);
+                        char* updated_id_list_str = cJSON_PrintBuffered(cj_scene_id_list, 1024, false);
+                        TRACE_D("length of 'updated_id_list_str': %d", strlen(updated_id_list_str));
+
                         if (updated_id_list_str)
                         {
                             ezlopi_nvs_scene_set_v2(updated_id_list_str);
@@ -394,7 +424,7 @@ void ezlopi_scenes_init_v2(void)
                 if (cj_scene_id && cj_scene_id->valuedouble)
                 {
                     char tmp_buffer[32];
-                    uint32_t scene_id = (uint32_t)cj_scene_id->valueint;
+                    uint32_t scene_id = (uint32_t)cj_scene_id->valuedouble;
 
                     snprintf(tmp_buffer, sizeof(tmp_buffer), "%08x", scene_id);
                     ezlopi_cloud_update_scene_id((uint32_t)scene_id);
@@ -418,6 +448,7 @@ void ezlopi_scenes_init_v2(void)
                         free(scene_str);
                     }
                 }
+
             }
 
             cJSON_Delete(cj_scenes_ids);
@@ -469,8 +500,8 @@ static l_scenes_list_v2_t* __new_scene_populate(cJSON* cj_scene, uint32_t scene_
             new_scene->task_handle = NULL;
             new_scene->status = EZLOPI_SCENE_STATUS_STOPPED;
 
-            CJSON_GET_VALUE_INT(cj_scene, ezlopi_enabled_str, new_scene->enabled);
-            CJSON_GET_VALUE_INT(cj_scene, ezlopi_is_group_str, new_scene->is_group);
+            CJSON_GET_VALUE_DOUBLE(cj_scene, ezlopi_enabled_str, new_scene->enabled);
+            CJSON_GET_VALUE_DOUBLE(cj_scene, ezlopi_is_group_str, new_scene->is_group);
 
             {
                 CJSON_GET_VALUE_STRING_BY_COPY(cj_scene, ezlopi_group_id_str, new_scene->group_id);
@@ -854,9 +885,30 @@ static void _______fields_get_value(l_fields_v2_t* field, cJSON* cj_value)
         }
         case cJSON_Object:
         {
-            field->field_value.e_type = VALUE_TYPE_CJSON;
-            field->field_value.u_value.cj_value = cJSON_Duplicate(cj_value, cJSON_True);
-            CJSON_TRACE("value", field->field_value.u_value.cj_value);
+            if (EZLOPI_VALUE_TYPE_BLOCK == field->value_type)
+            {
+                field->field_value.e_type = VALUE_TYPE_BLOCK;
+                CJSON_TRACE("cj_single_block", cj_value);
+                if (field->field_value.u_value.when_block)
+                {
+                    l_when_block_v2_t* curr_when_block = field->field_value.u_value.when_block;
+                    while (curr_when_block->next)
+                    {
+                        curr_when_block = curr_when_block->next;
+                    }
+                    curr_when_block->next = ____new_when_block_populate(cj_value);
+                }
+                else
+                {
+                    field->field_value.u_value.when_block = ____new_when_block_populate(cj_value);
+                }
+            }
+            else
+            {
+                field->field_value.e_type = VALUE_TYPE_CJSON;
+                field->field_value.u_value.cj_value = cJSON_Duplicate(cj_value, cJSON_True);
+                CJSON_TRACE("value", field->field_value.u_value.cj_value);
+            }
             break;
         }
         case cJSON_Array:
