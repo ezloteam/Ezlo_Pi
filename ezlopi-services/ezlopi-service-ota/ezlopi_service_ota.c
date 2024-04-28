@@ -1,6 +1,7 @@
 #include <string.h>
+#include <bootloader_random.h>
 
-#include "cJSON.h"
+#include "cjext.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
@@ -8,25 +9,32 @@
 
 #include "ezlopi_core_wifi.h"
 #include "ezlopi_core_event_group.h"
+#include "ezlopi_core_cjson_macros.h"
+#include "ezlopi_core_ezlopi_broadcast.h"
 
 #include "ezlopi_cloud_ota.h"
+#include "ezlopi_cloud_constants.h"
 
 #include "ezlopi_service_ota.h"
 #include "ezlopi_service_webprov.h"
 #include "ezlopi_core_ezlopi_broadcast.h"
 #include "ezlopi_core_processes.h"
 
-static void ota_service_process(void* pv);
+
+#if defined(CONFIG_EZPI_ENABLE_OTA)
 static volatile bool __ota_busy = false;
-bool __get_ota_service_busy_state(void)
+
+static void ota_service_process(void* pv);
+
+bool ezlopi_service_ota_get_busy_state(void)
 {
     return __ota_busy;
 }
 
-void ota_service_init(void)
+void ezlopi_service_ota_init(void)
 {
     TaskHandle_t ezlopi_service_ota_process_task_handle = NULL;
-    xTaskCreate(ota_service_process, "ota-service-process",EZLOPI_SERVICE_OTA_PROCESS_TASK_DEPTH, NULL, 2, &ezlopi_service_ota_process_task_handle);
+    xTaskCreate(ota_service_process, "ota-service-process", EZLOPI_SERVICE_OTA_PROCESS_TASK_DEPTH, NULL, 2, &ezlopi_service_ota_process_task_handle);
     ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_OTA_PROCESS_TASK, &ezlopi_service_ota_process_task_handle, EZLOPI_SERVICE_OTA_PROCESS_TASK_DEPTH);
 }
 static void ota_service_process(void* pv)
@@ -44,23 +52,14 @@ static void ota_service_process(void* pv)
         if ((-1 != ret_nma_reg) || (-1 != ret_ota))
         {
             TRACE_D("Sending firmware check request...");
-            uint32_t message_counter = ezlopi_service_web_provisioning_get_message_count();
-            cJSON* firmware_info_request = firmware_send_firmware_query_to_nma_server(message_counter);
-            if (NULL != firmware_info_request)
-            {
-                char* data_to_send = cJSON_Print(firmware_info_request);
-                cJSON_Delete(firmware_info_request);
-                firmware_info_request = NULL;
+            // uint32_t message_counter = ezlopi_service_web_provisioning_get_message_count();
+            cJSON* cj_firmware_info_request = firmware_send_firmware_query_to_nma_server(esp_random());
 
-                if (data_to_send)
-                {
-                    cJSON_Minify(data_to_send);
-                    ret_ota = ezlopi_service_web_provisioning_send_str_data_to_nma_websocket(data_to_send, TRACE_TYPE_D);
-                    if (0 == ezlopi_core_ezlopi_broadcast_methods_send_to_queue(data_to_send))
-                    {
-                        free(data_to_send);
-                    }
-                }
+            // CJSON_TRACE("----------------- broadcasting - cj_firmware_info_request", cj_firmware_info_request);
+
+            if (0 == ezlopi_core_ezlopi_broadcast_add_to_queue(cj_firmware_info_request))
+            {
+                cJSON_Delete(cj_firmware_info_request);
             }
             __ota_busy = false; // must clear immediately ; if OTA-event is serviced
         }
@@ -71,3 +70,4 @@ static void ota_service_process(void* pv)
         }
     }
 }
+#endif // CONFIG_EZPI_ENABLE_OTA

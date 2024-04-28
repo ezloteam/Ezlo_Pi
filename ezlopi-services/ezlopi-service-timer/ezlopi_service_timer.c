@@ -16,7 +16,7 @@
 
 #include "ezlopi_service_timer.h"
 
-static void event_process_v3(void *pv);
+static void event_process_v3(void* pv);
 
 void timer_service_init(void)
 {
@@ -26,67 +26,41 @@ void timer_service_init(void)
     ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_TIMER_TASK, &ezlopi_service_timer_task_handle, EZLOPI_SERVICE_TIMER_TASK_DEPTH);
 }
 
-static void event_process_v3(void *pv)
+static void event_process_v3(void* pv)
 {
     while (1)
     {
-        s_ezlo_event_t *event = NULL;
+        s_ezlo_event_t* event = NULL;
         if (pdTRUE == ezlopi_event_queue_receive(&event, 2000 / portTICK_PERIOD_MS))
         {
-            if (NULL != event)
+            l_ezlopi_device_t* curr_device = ezlopi_device_get_head();
+            while (curr_device)
             {
-                l_ezlopi_device_t *curr_device = ezlopi_device_get_head();
-                while (curr_device)
+                l_ezlopi_item_t* curr_item = curr_device->items;
+                while (curr_item)
                 {
-                    l_ezlopi_item_t *curr_item = curr_device->items;
-                    while (curr_item)
+                    if (NULL != event)
                     {
                         curr_item->func(event->action, curr_item, event->arg, curr_item->user_arg);
-                        curr_item = curr_item->next;
-                        vTaskDelay(5 / portTICK_RATE_MS);
+                        free(event);
+                        event = NULL;
+                    }
+                    else // in case of default we receive event == NULL, and we pass the action EZLOPI_ACTION_NOTIFY_1000_MS
+                    {
+                        curr_item->func(EZLOPI_ACTION_NOTIFY_1000_MS, curr_item, NULL, curr_item->user_arg);
                     }
 
-                    curr_device = curr_device->next;
+                    curr_item = curr_item->next;
+                    vTaskDelay(5 / portTICK_RATE_MS);
                 }
 
-                free(event);
-                event = NULL;
+                curr_device = curr_device->next;
             }
         }
         else
         {
+            TRACE_E("failed to get timer-event");
             vTaskDelay(5);
         }
     }
 }
-
-#if 0 // v2.x
-static void event_process(void *pv)
-{
-    TickType_t old_tick = xTaskGetTickCount();
-
-    while (1)
-    {
-        s_ezlo_event_t *event = NULL;
-        if (pdTRUE == ezlopi_event_queue_receive(&event, 2000 / portTICK_PERIOD_MS))
-        {
-            TRACE_D("event tick: %d", xTaskGetTickCount() - old_tick);
-            old_tick = xTaskGetTickCount();
-
-            if (NULL != event)
-            {
-                l_ezlopi_configured_devices_t *registered_device = ezlopi_devices_list_get_configured_items();
-                while (NULL != registered_device)
-                {
-                    registered_device->device->func(event->action, registered_device->properties, event->arg, registered_device->user_arg);
-                    registered_device = registered_device->next;
-                    vTaskDelay(50);
-                }
-
-                free(event);
-                event = NULL;
-            }
-        }
-    }
-}
-#endif

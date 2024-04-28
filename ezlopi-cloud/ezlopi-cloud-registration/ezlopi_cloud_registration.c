@@ -3,15 +3,19 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-#include "ezlopi_util_version.h"
 #include "ezlopi_util_trace.h"
 #include "ezlopi_util_version.h"
-#include "ezlopi_cloud_registration.h"
-#include "ezlopi_service_webprov.h"
+#include "ezlopi_util_version.h"
+
 #include "ezlopi_cloud_constants.h"
-#include "ezlopi_core_websocket_client.h"
+#include "ezlopi_cloud_registration.h"
+
 #include "ezlopi_core_event_group.h"
-#include "ezlopi_core_processes.h"
+#include "ezlopi_core_cjson_macros.h"
+#include "ezlopi_core_websocket_client.h"
+#include "ezlopi_core_ezlopi_broadcast.h"
+
+#include "ezlopi_service_webprov.h"
 
 static void registration_process(void* pv);
 
@@ -29,8 +33,6 @@ void register_repeat(cJSON* cj_request, cJSON* cj_response)
 
 void registered(cJSON* cj_request, cJSON* cj_response)
 {
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
     TRACE_S("Device registration successful.");
     ezlopi_event_group_set_event(EZLOPI_EVENT_NMA_REG);
 }
@@ -55,7 +57,7 @@ static void registration_process(void* pv)
         if (cj_params)
         {
             cJSON_AddStringToObject(cj_params, ezlopi_firmware_str, VERSION_STR);
-            cJSON_AddNumberToObject(cj_params, "timeOffset", 18000);
+            cJSON_AddNumberToObject(cj_params, "timeOffset", 20700);
             cJSON_AddStringToObject(cj_params, "media", "radio");
             cJSON_AddStringToObject(cj_params, "hubType", "32.1");
             cJSON_AddStringToObject(cj_params, "mac_address", mac_str);
@@ -67,13 +69,21 @@ static void registration_process(void* pv)
             vTaskDelay(200 / portTICK_RATE_MS);
         }
 
-        while (ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 2000, false) <= 0)
+        while (ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 5000, false) <= 0)
         {
-            ezlopi_service_web_provisioning_send_to_nma_websocket(cj_register, TRACE_TYPE_B);
+            //     CJSON_TRACE("----------------- broadcasting - cj_register", cj_register);
+            cJSON* cj_register_dup = cJSON_CreateObjectReference(cj_register->child);
+            if (cj_register_dup)
+            {
+                if (!ezlopi_core_ezlopi_broadcast_add_to_queue(cj_register_dup))
+                {
+                    cJSON_Delete(cj_register_dup);
+                }
+            }
         }
 
         cJSON_Delete(cj_register);
     }
-    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_CLOUD_REGISTRATION_PROCESS_STACK);
+
     vTaskDelete(NULL);
 }

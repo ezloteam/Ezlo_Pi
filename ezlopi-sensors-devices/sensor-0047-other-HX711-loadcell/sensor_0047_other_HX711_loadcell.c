@@ -54,24 +54,24 @@ int sensor_0047_other_HX711_loadcell(e_ezlopi_actions_t action, l_ezlopi_item_t*
     {
     case EZLOPI_ACTION_PREPARE:
     {
-        __0047_prepare(arg);
+        ret = __0047_prepare(arg);
         break;
     }
     case EZLOPI_ACTION_INITIALIZE:
     {
-        __0047_init(item);
+        ret = __0047_init(item);
         break;
     }
     case EZLOPI_ACTION_HUB_GET_ITEM:
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
-        __0047_get_cjson_value(item, arg);
+        ret = __0047_get_cjson_value(item, arg);
         break;
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
 
-        __0047_notify(item);
+        ret = __0047_notify(item);
 
         break;
     }
@@ -85,10 +85,6 @@ int sensor_0047_other_HX711_loadcell(e_ezlopi_actions_t action, l_ezlopi_item_t*
 //------------------------------------------------------------------------------------------------------
 static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    char* device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    ASSIGN_DEVICE_NAME_V2(device, device_name);
-    device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
     device->cloud_properties.device_type_id = NULL;
@@ -104,13 +100,15 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_dev
     item->cloud_properties.value_type = value_type_mass;
     item->cloud_properties.show = true;
     item->cloud_properties.scale = scales_kilo_gram;
+
+    item->is_user_arg_unique = true;
     item->user_arg = user_data;
 
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio1_str, user_data->HX711_SCK_pin);
-    TRACE_S("hx711_SCL_PIN: %d ", user_data->HX711_SCK_pin);
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio2_str, user_data->HX711_DT_pin);
-    TRACE_S("hx711_DT_PIN: %d ", user_data->HX711_DT_pin);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio1_str, user_data->HX711_SCK_pin);
+    TRACE_I("hx711_SCL_PIN: %d ", user_data->HX711_SCK_pin);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio2_str, user_data->HX711_DT_pin);
+    TRACE_I("hx711_DT_PIN: %d ", user_data->HX711_DT_pin);
 }
 
 static int __0047_prepare(void* arg)
@@ -124,14 +122,14 @@ static int __0047_prepare(void* arg)
         {
             memset(hx711_data, 0, sizeof(s_hx711_data_t));
             //---------------------------  DIGI - DEVICE 1 --------------------------------------------
-            l_ezlopi_device_t* hx711_device = ezlopi_device_add_device(device_prep_arg->cjson_device);
+            l_ezlopi_device_t* hx711_device = ezlopi_device_add_device(device_prep_arg->cjson_device, NULL);
             if (hx711_device)
             {
+                ret = 1;
                 __prepare_device_cloud_properties(hx711_device, device_prep_arg->cjson_device);
                 l_ezlopi_item_t* hx711_item = ezlopi_device_add_item_to_device(hx711_device, sensor_0047_other_HX711_loadcell);
                 if (hx711_item)
                 {
-                    ret = 1;
                     __prepare_item_cloud_properties(hx711_item, device_prep_arg->cjson_device, hx711_data);
                 }
                 else
@@ -156,7 +154,7 @@ static int __0047_init(l_ezlopi_item_t* item)
     int ret = 0;
     if (item)
     {
-        s_hx711_data_t *user_data = (s_hx711_data_t *)item->user_arg;
+        s_hx711_data_t* user_data = (s_hx711_data_t*)item->user_arg;
         if (user_data)
         {
             if (GPIO_IS_VALID_GPIO(user_data->HX711_SCK_pin) && (GPIO_IS_VALID_GPIO(user_data->HX711_DT_pin)))
@@ -169,8 +167,6 @@ static int __0047_init(l_ezlopi_item_t* item)
                 output_conf.pull_down_en = GPIO_PULLDOWN_ENABLE;
                 output_conf.pull_up_en = GPIO_PULLUP_DISABLE;
 
-                ret = (0 == gpio_config(&output_conf)) ? 1 : -1;
-
                 // Configure 'DATA_PIN' ->  GPIO input pins for HX711.
                 gpio_config_t input_conf;
                 input_conf.pin_bit_mask = (1ULL << (user_data->HX711_DT_pin));
@@ -178,38 +174,34 @@ static int __0047_init(l_ezlopi_item_t* item)
                 input_conf.mode = GPIO_MODE_INPUT;
                 input_conf.pull_down_en = GPIO_PULLDOWN_ENABLE;
                 input_conf.pull_up_en = GPIO_PULLUP_DISABLE;
-                ret = (0 == gpio_config(&input_conf)) ? 1 : -1;
 
-                // then initiate calibration task
-                if ((1 == ret) && (false == (user_data->HX711_initialized)))
+                if ((0 == gpio_config(&output_conf)) &&
+                    (0 == gpio_config(&input_conf)))
                 {
-                    __hx711_power_reset(item);
-                    TaskHandle_t ezlopi_sensor_hx711_task_handle = NULL;
-                    xTaskCreate(__Calculate_hx711_tare_wt, "Calculate the Tare weight", EZLOPI_SENSOR_HX711_TASK_DEPTH, item, 1, &ezlopi_sensor_hx711_task_handle);
-                    ezlopi_core_process_set_process_info(ENUM_EZLOPI_SENSOR_HX711_TASK, &ezlopi_sensor_hx711_task_handle, EZLOPI_SENSOR_HX711_TASK_DEPTH);
-                    ret = 1;
+                    // Initiate calibration task
+                    if (false == (user_data->HX711_initialized))
+                    {
+                        __hx711_power_reset(item);
+                        TaskHandle_t ezlopi_sensor_hx711_task_handle = NULL;
+                        xTaskCreate(__Calculate_hx711_tare_wt, "Calculate the Tare weight", EZLOPI_SENSOR_HX711_TASK_DEPTH, item, 1, &ezlopi_sensor_hx711_task_handle);
+                        ezlopi_core_process_set_process_info(ENUM_EZLOPI_SENSOR_HX711_TASK, &ezlopi_sensor_hx711_task_handle, EZLOPI_SENSOR_HX711_TASK_DEPTH);
+                        ret = 1;
+                    }
                 }
-
-                // if (-1 == ret)
-                // {
-                //     free(item->user_arg); // this will free ; memory address linked to all items
-                //     item->user_arg = NULL;
-                //     // ezlopi_device_free_device_by_item(item);
-                // }
+                else
+                {
+                    ret = -1;
+                }
             }
-            // else
-            // {
-            //     ret = -1;
-            //     free(item->user_arg); // this will free ; memory address linked to all items
-            //     item->user_arg = NULL;
-            //     // ezlopi_device_free_device_by_item(item);
-            // }
+            else
+            {
+                ret = -1;
+            }
         }
-        // else
-        // {
-        //     ret = -1;
-        //     ezlopi_device_free_device_by_item(item);
-        // }
+        else
+        {
+            ret = -1;
+        }
     }
     return ret;
 }
@@ -223,16 +215,13 @@ static int __0047_get_cjson_value(l_ezlopi_item_t* item, void* arg)
         cJSON* cj_result = (cJSON*)arg;
         if (cj_result)
         {
-            s_hx711_data_t *user_data = (s_hx711_data_t *)item->user_arg;
+            s_hx711_data_t* user_data = (s_hx711_data_t*)item->user_arg;
             if (user_data)
             {
-                char *valueFormatted = ezlopi_valueformatter_float(user_data->weight);
-                cJSON_AddStringToObject(cj_result, "ValueFormatted", valueFormatted);
-                cJSON_AddNumberToObject(cj_result, "value", user_data->weight);
-                free(valueFormatted);
+                ezlopi_valueformatter_float_to_cjson(item, cj_result, user_data->weight);
+                ret = 1;
             }
         }
-        ret = 1;
     }
     return ret;
 }
@@ -242,7 +231,7 @@ static int __0047_notify(l_ezlopi_item_t* item)
     int ret = 0;
     if (item)
     {
-        s_hx711_data_t *user_data = (s_hx711_data_t *)item->user_arg;
+        s_hx711_data_t* user_data = (s_hx711_data_t*)item->user_arg;
         if ((user_data) && (true == user_data->HX711_initialized))
         {
             float Mass = __hx711_avg_reading(item, 10); /// 1000.0f; // to avoid spikes
@@ -256,7 +245,7 @@ static int __0047_notify(l_ezlopi_item_t* item)
                 }
                 user_data->weight = weight_in_kg;
                 // TRACE_I("Mass : %0.2f unit , _Offset : %0.2f unit , Actual_Mass : %0.2f kg ,", Mass, (user_data->HX711_tare_wt), weight_in_kg);
-                ezlopi_device_value_updated_from_device_v3(item);
+                ezlopi_device_value_updated_from_device_broadcast(item);
             }
             ret = 1;
         }
@@ -270,7 +259,7 @@ static void __Calculate_hx711_tare_wt(void* params)
     l_ezlopi_item_t* item = (l_ezlopi_item_t*)params;
     if (item)
     {
-        s_hx711_data_t *user_data = (s_hx711_data_t *)item->user_arg;
+        s_hx711_data_t* user_data = (s_hx711_data_t*)item->user_arg;
         if (user_data)
         { // For Output settling time ; [10SPS] is 400ms
             // So, wait for 400ms after reset [as per datasheet]
@@ -307,7 +296,7 @@ static float __hx711_rawdata(l_ezlopi_item_t* item, hx711_gain_t _gain)
     unsigned long data = 0;
     if (item)
     {
-        s_hx711_data_t *user_data = (s_hx711_data_t *)item->user_arg;
+        s_hx711_data_t* user_data = (s_hx711_data_t*)item->user_arg;
 
         if (user_data)
         {
@@ -392,7 +381,7 @@ static void __hx711_power_reset(l_ezlopi_item_t* item)
 {
     if (item)
     {
-        s_hx711_data_t *user_data = (s_hx711_data_t *)item->user_arg;
+        s_hx711_data_t* user_data = (s_hx711_data_t*)item->user_arg;
         if (user_data)
         {
             PORT_ENTER_CRITICAL();

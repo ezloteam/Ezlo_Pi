@@ -38,22 +38,22 @@ int sensor_0061_digitalIn_reed_switch(e_ezlopi_actions_t action, l_ezlopi_item_t
     {
     case EZLOPI_ACTION_PREPARE:
     {
-        __0061_prepare(arg);
+        ret = __0061_prepare(arg);
         break;
     }
     case EZLOPI_ACTION_INITIALIZE:
     {
-        __0061_init(item);
+        ret = __0061_init(item);
         break;
     }
     case EZLOPI_ACTION_HUB_GET_ITEM:
     {
-        __0061_get_item(item, arg);
+        ret = __0061_get_item(item, arg);
         break;
     }
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
-        __0061_get_cjson_value(item, arg);
+        ret = __0061_get_cjson_value(item, arg);
         break;
     }
     default:
@@ -67,11 +67,6 @@ int sensor_0061_digitalIn_reed_switch(e_ezlopi_actions_t action, l_ezlopi_item_t
 //----------------------------------------------------------------------------------------
 static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    // char *device_name = NULL;
-    // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    // ASSIGN_DEVICE_NAME_V2(device, device_name);
-    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
-
     device->cloud_properties.category = category_security_sensor;
     device->cloud_properties.subcategory = subcategory_door;
     device->cloud_properties.device_type = dev_type_doorlock;
@@ -88,9 +83,9 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_dev
     item->cloud_properties.scale = NULL;
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
-    CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_str, item->interface.gpio.gpio_in.gpio_num);
-    CJSON_GET_VALUE_INT(cj_device, "logic_inv", item->interface.gpio.gpio_in.invert);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
+    CJSON_GET_VALUE_GPIO(cj_device, ezlopi_dev_name_str, item->interface.gpio.gpio_in.gpio_num);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_logic_inv_str, item->interface.gpio.gpio_in.invert);
 
     item->interface.gpio.gpio_in.enable = true;
     item->interface.gpio.gpio_in.mode = GPIO_MODE_INPUT;
@@ -106,16 +101,15 @@ static int __0061_prepare(void* arg)
         s_ezlopi_prep_arg_t* device_prep_arg = (s_ezlopi_prep_arg_t*)arg;
         if (device_prep_arg && (NULL != device_prep_arg->cjson_device))
         {
-            l_ezlopi_device_t* reed_device = ezlopi_device_add_device(device_prep_arg->cjson_device);
+            l_ezlopi_device_t* reed_device = ezlopi_device_add_device(device_prep_arg->cjson_device, NULL);
             if (reed_device)
             {
+                ret = 1;
                 __prepare_device_cloud_properties(reed_device, device_prep_arg->cjson_device);
                 l_ezlopi_item_t* reed_item = ezlopi_device_add_item_to_device(reed_device, sensor_0061_digitalIn_reed_switch);
                 if (reed_item)
                 {
-                    reed_item->cloud_properties.device_id = reed_device->cloud_properties.device_id;
                     __prepare_item_cloud_properties(reed_item, device_prep_arg->cjson_device);
-                    ret = 1;
                 }
                 else
                 {
@@ -155,18 +149,15 @@ static int __0061_init(l_ezlopi_item_t* item)
                 gpio_isr_service_register_v3(item, _0061_update_from_device, 200);
                 ret = 1;
             }
-            // else
-            // {
-            //     ret = -1;
-            //     // ezlopi_device_free_device_by_item(item);
-            //     TRACE_E("Error initializing Reed switch");
-            // }
+            else
+            {
+                ret = -1;
+            }
         }
-        // else
-        // {
-        //     ret = -1;
-        //     ezlopi_device_free_device_by_item(item);
-        // }
+        else
+        {
+            ret = -1;
+        }
     }
     return ret;
 }
@@ -195,8 +186,8 @@ static int __0061_get_item(l_ezlopi_item_t* item, void* arg)
             }
             //--------------------------------------------------------------------------------------
 
-            cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, (char*)item->user_arg ? item->user_arg : "dw_is_closed");
-            cJSON_AddStringToObject(cj_result, ezlopi_value_str, (char*)item->user_arg ? item->user_arg : "dw_is_closed");
+            cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, (char*)item->user_arg ? item->user_arg : reed_door_window_states[1]);
+            cJSON_AddStringToObject(cj_result, ezlopi_value_str, (char*)item->user_arg ? item->user_arg : reed_door_window_states[1]);
             ret = 1;
         }
     }
@@ -210,8 +201,8 @@ static int __0061_get_cjson_value(l_ezlopi_item_t* item, void* arg)
         cJSON* cj_result = (cJSON*)arg;
         if (cj_result)
         {
-            cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, (char*)item->user_arg ? item->user_arg : "dw_is_closed");
-            cJSON_AddStringToObject(cj_result, ezlopi_value_str, (char*)item->user_arg ? item->user_arg : "dw_is_closed");
+            cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, (char*)item->user_arg ? item->user_arg : reed_door_window_states[1]);
+            cJSON_AddStringToObject(cj_result, ezlopi_value_str, (char*)item->user_arg ? item->user_arg : reed_door_window_states[1]);
             ret = 1;
         }
     }
@@ -233,17 +224,17 @@ static void _0061_update_from_device(void* arg)
 
         if (0 == (item->interface.gpio.gpio_in.value)) // when D0 -> 0V,
         {
-            curret_value = "dw_is_opened";
+            curret_value = reed_door_window_states[0];
         }
         else
         {
-            curret_value = "dw_is_closed";
+            curret_value = reed_door_window_states[1];
         }
 
         if (curret_value != (char*)item->user_arg) // calls update only if there is change in state
         {
             item->user_arg = (void*)curret_value;
-            ezlopi_device_value_updated_from_device_v3(item);
+            ezlopi_device_value_updated_from_device_broadcast(item);
         }
     }
 }
