@@ -500,7 +500,7 @@ int ezlopi_scenes_operators_value_strops_operations(l_fields_v2_t* item_exp_fiel
     {
         char* item_exp_value_str = NULL;
         char* value_to_compare_with = NULL;
-        uint32_t value_to_compare_with_num = NULL;
+        uint32_t value_to_compare_with_num = 0;
 
         //---------------------- LHS -------------------------
         if (EZLOPI_VALUE_TYPE_EXPRESSION == item_exp_field->value_type)
@@ -528,7 +528,7 @@ int ezlopi_scenes_operators_value_strops_operations(l_fields_v2_t* item_exp_fiel
 
         if (item_exp_value_str && (value_to_compare_with || (value_to_compare_with_num > 0)))
         {
-            e_scene_str_cmp_operators_t string_operator = ezlopi_scenes_string_operations_comparator_operators_get_enum(comparator_field->field_value.u_value.value_string);
+            e_scene_strops_cmp_operators_t string_operator = ezlopi_scenes_strops_comparator_operators_get_enum(comparator_field->field_value.u_value.value_string);
             switch (string_operator)
             {
 
