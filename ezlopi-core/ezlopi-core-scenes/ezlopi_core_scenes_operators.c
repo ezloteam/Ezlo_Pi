@@ -500,7 +500,7 @@ int ezlopi_scenes_operators_value_strops_operations(l_fields_v2_t* item_exp_fiel
     {
         char* item_exp_value_str = NULL;
         char* value_to_compare_with = NULL;
-        uint32_t value_to_compare_with_num = NULL;
+        uint32_t value_to_compare_with_num = 0;
 
         //---------------------- LHS -------------------------
         if (EZLOPI_VALUE_TYPE_EXPRESSION == item_exp_field->value_type)
@@ -528,9 +528,8 @@ int ezlopi_scenes_operators_value_strops_operations(l_fields_v2_t* item_exp_fiel
 
         if (item_exp_value_str && (value_to_compare_with || (value_to_compare_with_num > 0)))
         {
-            e_scene_strops_cmp_operators_t string_operator = ezlopi_scenes_strops_comparator_operators_get_enum(comparator_field->field_value.u_value.value_string);
-            
-            switch (string_operator)
+            e_scene_strops_cmp_operators_t strops_operator = ezlopi_scenes_strops_comparator_operators_get_enum(comparator_field->field_value.u_value.value_string);
+            switch (strops_operator)
             {
 
             case SCENES_STROPS_COMP_OPERATORES_BEGINS_WITH:
@@ -602,7 +601,7 @@ int ezlopi_scenes_operators_value_strops_operations(l_fields_v2_t* item_exp_fiel
             }
             default:
             {
-                TRACE_E("'SCENES_STROPS_COMP_OPERATORES_* [%d]' out of range!", string_operator);
+                TRACE_E("'SCENES_STROPS_COMP_OPERATORES_* [%d]' out of range!", strops_operator);
                 break;
             }
             }
@@ -704,8 +703,8 @@ int ezlopi_scenes_operators_value_inarr_operations(l_fields_v2_t* item_exp_field
         {
             cJSON* iterator = NULL;
             char* op_str = (NULL == operation_field) ? "in" : operation_field->field_value.u_value.value_string;
-            e_scene_inarr_cmp_operators_t string_operator = ezlopi_scenes_inarr_comparator_operators_get_enum(op_str);
-            switch (string_operator)
+            e_scene_inarr_cmp_operators_t inarr_operator = ezlopi_scenes_inarr_comparator_operators_get_enum(op_str);
+            switch (inarr_operator)
             {
             case SCENES_IN_ARRAY_OPERATORS_IN:
             {
@@ -753,7 +752,7 @@ int ezlopi_scenes_operators_value_inarr_operations(l_fields_v2_t* item_exp_field
 
             default:
             {
-                TRACE_E("'SCENES_IN_ARRAY_OPERATORS_* [%d]' out of range!", string_operator);
+                TRACE_E("'SCENES_IN_ARRAY_OPERATORS_* [%d]' out of range!", inarr_operator);
                 break;
             }
             }
