@@ -1,3 +1,5 @@
+#ifdef CONFIG_EZLOPI_BLE_ENABLE
+
 #include <string.h>
 #include <ctype.h>
 
@@ -744,3 +746,5 @@ void __add_factory_info_to_root(cJSON* root, char* key, char* value)
         free(value);
     }
 }
+
+#endif // CONFIG_EZLOPI_BLE_ENABLE

@@ -1,3 +1,5 @@
+#ifdef CONFIG_EZLOPI_BLE_ENABLE
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -175,3 +177,4 @@ int ezlopi_ble_service_get_ble_mac(uint8_t mac[6])
     }
     return ret;
 }
+#endif // CONFIG_EZLOPI_BLE_ENABLE

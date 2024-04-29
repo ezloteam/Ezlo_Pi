@@ -1,3 +1,5 @@
+#ifdef CONFIG_EZLOPI_BLE_ENABLE
+
 #include <string.h>
 
 #include "lwip/ip_addr.h"
@@ -221,3 +223,4 @@ static void __process_auth_command(cJSON* root)
     }
 #endif
 }
+#endif // CONFIG_EZLOPI_BLE_ENABLE

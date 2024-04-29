@@ -1,3 +1,5 @@
+#ifdef CONFIG_EZLOPI_BLE_ENABLE
+
 #include <string.h>
 
 #include "ezlopi_util_trace.h"
@@ -13,7 +15,7 @@ e_auth_status_t ezlopi_ble_auth_last_status(void)
     return sg_last_auth_status;
 }
 
-e_auth_status_t ezlopi_ble_auth_store_user_id(char *user_id)
+e_auth_status_t ezlopi_ble_auth_store_user_id(char* user_id)
 {
     if (user_id)
     {
@@ -33,9 +35,9 @@ e_auth_status_t ezlopi_ble_auth_store_user_id(char *user_id)
     return sg_last_auth_status;
 }
 
-e_auth_status_t ezlopi_ble_auth_check_user_id(char *user_id)
+e_auth_status_t ezlopi_ble_auth_check_user_id(char* user_id)
 {
-    char *stored_user_id = ezlopi_nvs_read_user_id_str();
+    char* stored_user_id = ezlopi_nvs_read_user_id_str();
 
     if (NULL != stored_user_id)
     {
@@ -65,9 +67,9 @@ e_auth_status_t ezlopi_ble_auth_check_user_id(char *user_id)
     return sg_last_auth_status;
 }
 
-char *ezlopi_ble_auth_status_to_string(e_auth_status_t status)
+char* ezlopi_ble_auth_status_to_string(e_auth_status_t status)
 {
-    char *ret = "BLE_AUTH_STATUS_UNKNOWN";
+    char* ret = "BLE_AUTH_STATUS_UNKNOWN";
 
     switch (status)
     {
@@ -106,4 +108,4 @@ char *ezlopi_ble_auth_status_to_string(e_auth_status_t status)
     return ret;
 }
 
-// int ezlopi_ble_auth_
+#endif // CONFIG_EZLOPI_BLE_ENABLE

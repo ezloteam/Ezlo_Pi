@@ -30,6 +30,7 @@
 #include "ezlopi_core_sntp.h"
 #include "ezlopi_core_info.h"
 #include "ezlopi_core_processes.h"
+#include "ezlopi_core_ping.h"
 
 #include "ezlopi_hal_system_info.h"
 
@@ -379,7 +380,7 @@ static int ezlopi_service_uart_device_status_info(cJSON* parent)
         cJSON_AddStringToObject(cj_device_state, "wifi_mac", mac_str);
 
         memset(mac, 0, sizeof(mac));
-        ezlopi_ble_service_get_ble_mac(mac);
+        EZPI_CORE_info_get_ble_mac(mac);
         memset(mac_str, 0, sizeof(mac_str));
         snprintf(mac_str, 20, "%02X:%02X:%02X:%02X:%02X:%02X", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
         cJSON_AddStringToObject(cj_device_state, "ble_mac", mac_str);

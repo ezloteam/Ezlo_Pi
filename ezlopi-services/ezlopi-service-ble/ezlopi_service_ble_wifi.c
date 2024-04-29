@@ -1,3 +1,5 @@
+#ifdef CONFIG_EZLOPI_BLE_ENABLE
+
 #include <string.h>
 
 #include "cjext.h"
@@ -119,3 +121,4 @@ static void wifi_creds_parse_and_connect(uint8_t* value, uint32_t len)
         }
     }
 }
+#endif // CONFIG_EZLOPI_BLE_ENABLE

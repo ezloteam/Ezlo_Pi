@@ -1,3 +1,5 @@
+#ifdef CONFIG_EZLOPI_BLE_ENABLE
+
 #include <string.h>
 
 #include "ezlopi_util_trace.h"
@@ -848,3 +850,4 @@ static void ezlopi_ble_setup_service_uuid(void)
 
     // dump("complete-uuid", (all_service_uuid ? (void *)all_service_uuid : (void *)ezlopi__str), 0, all_service_uuid_len);
 }
+#endif // CONFIG_EZLOPI_BLE_ENABLE

@@ -18,5 +18,6 @@ char* EZPI_CORE_info_get_esp_reset_reason_to_name(esp_reset_reason_t reason);
 char* EZPI_CORE_info_get_chip_type_to_name(int chip_type);
 char* EZPI_CORE_info_get_wifi_mode_to_name(const wifi_mode_t mode_val);
 void EZPI_CORE_info_get_tick_to_time_name(char* time_buff, uint32_t buff_len, uint32_t ms);
+int EZPI_CORE_info_get_ble_mac(uint8_t mac[6]);
 
 #endif // EZLOPI_CORE_INFO_H

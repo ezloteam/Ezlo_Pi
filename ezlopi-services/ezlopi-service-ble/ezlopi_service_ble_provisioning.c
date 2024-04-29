@@ -1,3 +1,5 @@
+#ifdef CONFIG_EZLOPI_BLE_ENABLE
+
 #include <string.h>
 #include <time.h>
 
@@ -557,4 +559,7 @@ static char* __provisioning_info_base64(void)
 
     return base64_data;
 }
+
+#endif // CONFIG_EZLOPI_BLE_ENABLE
+
 #endif // EZPI_SERV_BLE_ENABLE_READ_PROV

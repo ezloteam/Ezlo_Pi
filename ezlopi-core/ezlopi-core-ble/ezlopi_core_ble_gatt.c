@@ -1,3 +1,5 @@
+#ifdef CONFIG_EZLOPI_BLE_ENABLE
+
 #include <string.h>
 
 #include "esp_gatt_common_api.h"
@@ -499,4 +501,7 @@ static char* ezlopi_ble_gatt_event_to_string(esp_gatts_cb_event_t event)
     }
     return ret;
 }
+
+#endif // CONFIG_EZLOPI_BLE_ENABLE
+
 #endif // 1 == ENABLE_TRACE
