@@ -7,7 +7,7 @@
 #include "driver/gpio.h"
 #include "esp_idf_version.h"
 #include "ezlopi_util_version.h"
-#include "sdkconfig.h"
+#include "../../build/config/sdkconfig.h"
 
 uart_parity_t EZPI_CORE_info_name_to_parity(const char* parity);
 char EZPI_CORE_info_parity_to_name(const uart_parity_t parity_val);

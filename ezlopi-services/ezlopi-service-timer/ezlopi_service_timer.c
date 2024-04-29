@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include <time.h>
 
-#include "sdkconfig.h"
+#include "../../build/config/sdkconfig.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/queue.h"

@@ -1,7 +1,7 @@
 #ifndef _EZLOPI_UTIL_H_
 #define _EZLOPI_UTIL_H_
 
-#include "sdkconfig.h"
+#include "../../build/config/sdkconfig.h"
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 #include "EZLOPI_USER_CONFIG.h"

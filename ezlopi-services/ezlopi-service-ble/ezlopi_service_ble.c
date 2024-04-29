@@ -9,7 +9,7 @@
 #include "cjext.h"
 #include "lwip/ip_addr.h"
 #include "ezlopi_util_trace.h"
-#include "sdkconfig.h"
+#include "../../build/config/sdkconfig.h"
 
 #include "EZLOPI_USER_CONFIG.h"
 

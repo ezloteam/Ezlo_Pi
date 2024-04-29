@@ -1,6 +1,10 @@
     
 file(GLOB_RECURSE provisioning_src "*.c*")
 
+set(ESP_NATIVE_COMPONENTS 
+        http
+)
+
 set(EZLOPI_UTIL_COMPONENTS
         ezlopi-util-trace
 )

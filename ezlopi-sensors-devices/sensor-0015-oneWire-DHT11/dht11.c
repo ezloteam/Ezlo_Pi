@@ -28,10 +28,10 @@
 
 #define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
 
-#include "sdkconfig.h"
+#include "../../build/config/sdkconfig.h"
 #if (CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32)
 
-// #include "esp_log.h"
+ // #include "esp_log.h"
 #include "driver/gpio.h"
 
 #if CONFIG_IDF_TARGET_ESP32S3

@@ -4,7 +4,7 @@
 
 #include "ezlopi_cloud_items.h"
 #include "ezlopi_util_trace.h"
-#include "sdkconfig.h"
+#include "../../build/config/sdkconfig.h"
 
 #include "cjext.h"
 #include "ezlopi_core_cjson_macros.h"

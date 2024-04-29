@@ -2,10 +2,10 @@
 #include "stdlib.h"
 #include "stdbool.h"
 #include "string.h"
-#include "sdkconfig.h"
+#include "../../build/config/sdkconfig.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "sdkconfig.h"
+#include "../../build/config/sdkconfig.h"
 
 #include "ezlopi_util_trace.h"
 
