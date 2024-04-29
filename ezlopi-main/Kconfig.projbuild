@@ -191,32 +191,11 @@ menu "EzloPi User Config"
 
     endmenu
 
-    choice 
-        prompt "Select Indicator LED"
-
-        config EZPI_ON_OFF_LED
-            bool "Enable ON/OFF LED"
-            default y
-
-        config EZPI_ON_OFF_LED_PIN
-            depends on EZPI_ON_OFF_LED
-            int "ON/OFF LED pin"
-            default 2
-            help 
-                GPIO pin number for ON/OFF LED
-            
-        config EZPI_RGB_LED
-            bool "Enable Addressable LED"
-            default n
-
-        config EZPI_RGB_LED_PIN
-            depends on EZPI_RGB_LED
-            int "RGB LED pin"
-            default 38
-            help 
-                GPIO pin number for ON/OFF LED
-
-    endchoice
+    config EZPI_ENABLE_LED_INDICATOR
+        bool "Enable indicator LED available in the device"
+        default y
+        help 
+            Enable indicator LED available in the device
 
 endmenu
 

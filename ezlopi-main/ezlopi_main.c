@@ -9,6 +9,7 @@
 #include <freertos/task.h>
 
 #include "ezlopi_util_trace.h"
+
 #include "EZLOPI_USER_CONFIG.h"
 
 #include "ezlopi_core_ezlopi.h"
@@ -34,7 +35,9 @@ static void blinky(void* pv);
 
 void app_main(void)
 {
+#ifdef CONFIG_EZPI_ENABLE_LED_INDICATOR
     ezlopi_service_led_indicator_init();
+#endif // CONFIG_EZPI_ENABLE_LED_INDICATOR
     gpio_install_isr_service(0);
 
     gpio_isr_service_init();
