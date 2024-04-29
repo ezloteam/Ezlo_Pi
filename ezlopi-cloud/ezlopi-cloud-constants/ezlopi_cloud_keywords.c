@@ -13,6 +13,7 @@ const char* ezlopi_sender_str = "sender";
 const char* ezlopi_name_str = "name";
 const char* ezlopi_value_str = "value";
 const char* ezlopi_method_str = "method";
+const char* ezlopi_function_str = "function";
 const char* ezlopi_msg_id_str = "msg_id"; // message counter, number of data transferred to ezlopi-cloud
 const char* ezlopi_msg_subclass_str = "msg_subclass";
 const char* ezlopi_ui_broadcast_str = "ui_broadcast";

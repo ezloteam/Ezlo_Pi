@@ -13,7 +13,6 @@
 
 typedef struct s_thread_ctx
 {
-    char* scene_name;
     struct pt pt;
     uint32_t curr_ticks;
     uint32_t start_cond;
@@ -179,7 +178,6 @@ void ezlopi_scenes_meshbot_init(void)
     l_scenes_list_v2_t* scene_node = ezlopi_scenes_get_scenes_head_v2();
     while (scene_node)
     {
-
         scene_node->status = EZLOPI_SCENE_STATUS_STOPPED;
         if (scene_node->enabled && scene_node->when_block && (scene_node->else_block || scene_node->then_block))
             // if (scene_node->when_block && (scene_node->else_block || scene_node->then_block))
@@ -197,25 +195,20 @@ void ezlopi_scenes_meshbot_init(void)
         }
         else
         {
-            TRACE_Dw("scene_en->%s , scene_node->when:%s , (scene_node->then:%s | scene_node->else:%s)",
+            TRACE_S("scene_en ->%s , scene_node->when:%s , (scene_node->then:%s | scene_node->else:%s)",
                 (scene_node->enabled) ? "true" : "false",
                 (NULL == scene_node->when_block) ? "empty" : scene_node->when_block->block_options.method.name,
                 (NULL == scene_node->then_block) ? "empty" : scene_node->then_block->block_options.method.name,
                 (NULL == scene_node->else_block) ? "empty" : scene_node->else_block->block_options.method.name);
 
-            if (NULL != scene_node->when_block->block_options)
+            if (NULL != scene_node->when_block->block_options.cj_function)
             {
-                char* str = cJSON_Print(scene_node->when_block->block_options);
+                char* str = cJSON_Print(scene_node->when_block->block_options.cj_function);
                 if (str)
                 {
-                    TRACE_D(" function_cjson : %s", str);
+                    TRACE_D("function_cjson : %s", str);
                     free(str);
                 }
-
-            }
-            else
-            {
-                TRACE_E("functions_missing in when_block");
             }
             scene_node->status = EZLOPI_SCENE_STATUS_STOPPED;
         }
@@ -254,11 +247,10 @@ PT_THREAD(__scene_proto_thread(l_scenes_list_v2_t* scene_node, uint32_t routine_
                 f_scene_method_v2_t when_method = ezlopi_scene_get_method_v2(when_condition_node->block_options.method.type);
                 if (when_method)
                 {
-                    TRACE_S("when_block_name {%s}", scene_node->when_block->block_options.method.name);
                     when_condition_returned = when_method(scene_node, (void*)when_condition_node);
                     if (when_condition_returned)
                     {
-                        TRACE_S("when_ret=>1");
+                        TRACE_S("when_ret => 1");
                         if (ctx->start_cond < 2)
                         {
                             ctx->stopped_cond = 0;

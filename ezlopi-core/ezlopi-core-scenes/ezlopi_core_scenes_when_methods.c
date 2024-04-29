@@ -1360,8 +1360,6 @@ int ezlopi_scene_when_xor(l_scenes_list_v2_t* scene_node, void* arg)
 
 int ezlopi_scene_when_function(l_scenes_list_v2_t* scene_node, void* arg)
 {
-    TRACE_W("when_func_here!");
-    /* This funciton can contain only one of the 1. less ,2. least*/
     int ret = 0;
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (scene_node && when_block)
@@ -1393,7 +1391,7 @@ int ezlopi_scene_when_function(l_scenes_list_v2_t* scene_node, void* arg)
             {
                 if (NULL != (cj_func_opr = cJSON_GetObjectItem(function_obj, __when_funtion_opr[i].opr_name)))
                 {
-                    TRACE_D("when_func_here![%d]", i);
+                    TRACE_S("when_func_here->[%d]", i);
                     ret = (__when_funtion_opr[i].opr_method)(scene_node, when_block, cj_func_opr);
                     break;
                 }

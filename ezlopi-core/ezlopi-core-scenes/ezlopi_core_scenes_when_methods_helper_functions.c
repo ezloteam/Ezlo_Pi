@@ -969,7 +969,7 @@ int isdate_range_check_flag_result(uint8_t flag_check)
 
 int when_function_for_opr(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* when_block, cJSON* cj_func_opr)
 {
-    TRACE_W("for_least");
+    // TRACE_W("for_least");
     int ret = 0;
     if (scene_node && when_block && cj_func_opr)
     {
@@ -1002,15 +1002,12 @@ int when_function_for_opr(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* whe
 
                 if ((transition_state == 1) && (0 == function_state_info->current_state))
                 {
-                    TRACE_W("Here-1");
                     function_state_info->transtion_instant = (uint32_t)xTaskGetTickCount();
                 }
                 else if ((transition_state == 0) && (1 == function_state_info->current_state))
                 {
-                    TRACE_W("Here-2");
                     if (0 != function_state_info->transtion_instant)
                     {
-                        TRACE_W("Here-3");
                         int threshold_time = cJSON_GetNumberValue(for_interval);
                         if (0 == strncmp(for_less_least, "less", 5))
                         {
@@ -1028,8 +1025,8 @@ int when_function_for_opr(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* whe
                                 ret = 1;
                             }
                         }
+                        // TRACE_I("end_Transtion_time[%d] , duration_time[%d] , threshold[%d]", function_state_info->transtion_instant / 1000, (uint32_t)xTaskGetTickCount() / 1000, threshold_time);
                     }
-                    TRACE_S("for_Transtion_time[%d]", function_state_info->transtion_instant);
                 }
                 function_state_info->current_state = transition_state;
             }
@@ -1039,7 +1036,6 @@ int when_function_for_opr(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* whe
             }
         }
     }
-    TRACE_W("for_least -> ret = %d", ret);
     return ret;
 }
 int when_function_for_repeat(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* when_block, cJSON* cj_func_opr)
