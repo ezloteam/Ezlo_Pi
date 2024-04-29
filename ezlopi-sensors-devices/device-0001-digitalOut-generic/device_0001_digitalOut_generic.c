@@ -529,6 +529,7 @@ static int __set_value(l_ezlopi_item_t* item, void* arg)
                 {
                     __set_gpio_value(item, value);
                     ezlopi_device_value_updated_from_device_v3(item);
+                    ret = 1;
                 }
             }
             else
@@ -545,6 +546,7 @@ static int __set_value(l_ezlopi_item_t* item, void* arg)
                             TRACE_D("value: %d", value);
                             __set_gpio_value(curr_item, value);
                             ezlopi_device_value_updated_from_device_v3(curr_item);
+                            ret = 1;
                         }
                         curr_item = curr_item->next;
                     }

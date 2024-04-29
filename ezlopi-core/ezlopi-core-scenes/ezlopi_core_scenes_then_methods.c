@@ -67,12 +67,13 @@ int ezlopi_scene_then_set_item_value(l_scenes_list_v2_t* curr_scene, void* arg)
                 if (curr_item)
                 {
                     curr_item->func(EZLOPI_ACTION_SET_VALUE, curr_item, cj_params, curr_item->user_arg);
+                    ret = 1;
                 }
             }
         }
         cJSON_Delete(cj_params);
     }
-
+    TRACE_W(" Set_item_value -> ret = %d", ret);
     return ret;
 }
 int ezlopi_scene_then_set_device_armed(l_scenes_list_v2_t* curr_scene, void* arg)

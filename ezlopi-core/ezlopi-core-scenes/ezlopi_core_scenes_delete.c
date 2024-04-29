@@ -77,6 +77,7 @@ void ezlopi_scenes_delete(l_scenes_list_v2_t* scenes_list)
         ezlopi_scenes_delete_action_blocks(scenes_list->else_block);
         ezlopi_scenes_delete_when_blocks(scenes_list->when_block);
 
+        #warning "void* thread_ctx" need to be freed here;
         ezlopi_scenes_delete(scenes_list->next);
         scenes_list->next = NULL;
         free(scenes_list);
