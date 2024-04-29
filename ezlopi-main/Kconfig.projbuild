@@ -35,6 +35,12 @@ menu "EzloPi User Config"
         
     endchoice
 
+    config EZPI_HEAP_ENABLE
+        bool "Enable ezlopi heap"
+        default n
+        help
+            Enables the allocation and free via ezlopi-util, helpful to track-down any memory leak in the stack
+            
     config EZPI_DEV_TYPE_TEST
         bool "Run device in test mode"
         default n
@@ -130,7 +136,12 @@ menu "EzloPi User Config"
         default n
         help
             Enable mode services
-
+    
+    config EZPI_ENABLE_LED_INDICATOR
+        bool "Enable indicator LED available in the device"
+        default y
+        help 
+            Enable indicator LED available in the device
 
     config EZPI_ENABLE_MDNS_SERVICE
         depends on EZPI_DISTRO_FULL_OPTION || EZLOPI_DISTRO_LOCAL || EZLOPI_DISTRO_LOCAL_MESHBOT
@@ -188,14 +199,7 @@ menu "EzloPi User Config"
             default n
             help 
                 Enable name extra service in ezlopi mDNS
-
     endmenu
-
-    config EZPI_ENABLE_LED_INDICATOR
-        bool "Enable indicator LED available in the device"
-        default y
-        help 
-            Enable indicator LED available in the device
 
 endmenu
 

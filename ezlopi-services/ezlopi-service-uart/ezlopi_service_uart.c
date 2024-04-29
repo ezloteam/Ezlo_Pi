@@ -41,9 +41,6 @@
 
 #if defined (CONFIG_EZPI_ENABLE_UART_PROVISIONING)
 
-static const int RX_BUF_SIZE = 3096;
-static const uint8_t EZPI_UART_FLW_CTRL_STR_MAX = 10;
-
 #if defined(CONFIG_IDF_TARGET_ESP32)
 #define TXD_PIN (GPIO_NUM_1)
 #define RXD_PIN (GPIO_NUM_3)
@@ -77,7 +74,7 @@ static int ezlopi_service_uart_reset(cJSON* root)
         {
             TRACE_E("Factory restore command");
             const static char* reboot_response = "{\"cmd\":0, \"sub_cmd\":0,\"status\":1}";
-            EZPI_SERVICE_uart_tx_data(strlen(reboot_response), (uint8_t*)reboot_response);
+            EZPI_SERV_uart_tx_data(strlen(reboot_response), (uint8_t*)reboot_response);
             EZPI_CORE_reset_factory_restore();
             break;
         }
@@ -85,7 +82,7 @@ static int ezlopi_service_uart_reset(cJSON* root)
         {
             TRACE_E("Reboot only command");
             const static char* reboot_response = "{\"cmd\":0, \"sub_cmd\":1, \"status\":1}";
-            EZPI_SERVICE_uart_tx_data(strlen(reboot_response), (uint8_t*)reboot_response);
+            EZPI_SERV_uart_tx_data(strlen(reboot_response), (uint8_t*)reboot_response);
             EZPI_CORE_reset_reboot();
             break;
         }
@@ -203,7 +200,7 @@ static int ezlopi_service_uart_set_uart_config(const cJSON* root)
 
 
         const static char* reboot_response = "{\"cmd\":5, \"status\":1}";
-        EZPI_SERVICE_uart_tx_data(strlen(reboot_response), (uint8_t*)reboot_response);
+        EZPI_SERV_uart_tx_data(strlen(reboot_response), (uint8_t*)reboot_response);
 
         TRACE_W("New config has been applied, device rebooting");
         vTaskDelay(10);
@@ -212,7 +209,7 @@ static int ezlopi_service_uart_set_uart_config(const cJSON* root)
     else
     {
         const static char* reboot_response = "{\"cmd\":5, \"status\":0}";
-        EZPI_SERVICE_uart_tx_data(strlen(reboot_response), (uint8_t*)reboot_response);
+        EZPI_SERV_uart_tx_data(strlen(reboot_response), (uint8_t*)reboot_response);
 
         TRACE_W("Configuration unchanged !");
         vTaskDelay(10);
@@ -412,8 +409,9 @@ static int ezlopi_service_uart_config_info(cJSON* parent)
         cJSON_AddNumberToObject(cj_serial_config, ezlopi_baud_str, baud);
 
         EZPI_CORE_nvs_read_parity((uint32_t*)&parity_val);
-        char parity = get_parity(parity_val);
-        cJSON_AddStringToObject(cj_serial_config, "parity", &parity);
+        parity[0] = EZPI_CORE_info_parity_to_name(parity_val);
+        parity[1] = 0;
+        cJSON_AddStringToObject(cj_serial_config, ezlopi_parity_str, parity);
 
         EZPI_CORE_nvs_read_start_bits(&start_bits);
         cJSON_AddNumberToObject(cj_serial_config, ezlopi_start_bits_str, start_bits);
@@ -552,7 +550,7 @@ static void ezlopi_service_uart_get_info()
             if (serial_data_json_string)
             {
                 cJSON_Minify(serial_data_json_string);
-                EZPI_SERVICE_uart_tx_data(strlen(serial_data_json_string), (uint8_t*)serial_data_json_string);
+                EZPI_SERV_uart_tx_data(strlen(serial_data_json_string), (uint8_t*)serial_data_json_string);
                 free(serial_data_json_string);
             }
 
@@ -644,8 +642,8 @@ static void ezlopi_service_uart_response(uint8_t cmd, uint8_t status_write, uint
         if (my_json_string)
         {
             cJSON_Minify(my_json_string);
-            EZPI_SERVICE_uart_tx_data(strlen(my_json_string), (uint8_t*)my_json_string);
-            cJSON_free(my_json_string);
+            EZPI_SERV_uart_tx_data(strlen(my_json_string), (uint8_t*)my_json_string);
+            free(my_json_string);
         }
     }
 }
@@ -713,15 +711,14 @@ static void ezlopi_service_uart_get_config(void)
             cJSON_Minify(my_json_string);
             cJSON_Delete(root); // free Json string
             const int len = strlen(my_json_string);
-            EZPI_SERVICE_uart_tx_data(len, (uint8_t*)my_json_string); // Send the data over uart
+            EZPI_SERV_uart_tx_data(len, (uint8_t*)my_json_string); // Send the data over uart
             // TRACE_D("Sending: %s", my_json_string);
-            cJSON_free(my_json_string);
+            free(my_json_string);
         }
     }
 }
 
-int EZPI_SERVICE_uart_tx_data(int len, uint8_t* data)
-int EZPI_SERVICE_uart_tx_data(int len, uint8_t* data)
+int EZPI_SERV_uart_tx_data(int len, uint8_t* data)
 {
     int ret = 0;
     ret = uart_write_bytes(EZPI_SERV_UART_NUM_DEFAULT, data, len);
@@ -729,10 +726,10 @@ int EZPI_SERVICE_uart_tx_data(int len, uint8_t* data)
     return ret;
 }
 
-int EZPI_SERV_uart_init(int len, uint8_t* data)
+void EZPI_SERV_uart_init(void)
 {
     TaskHandle_t ezlopi_service_uart_task_handle = NULL;
-    xTaskCreate(ezlopi_service_uart_rx_task, "ezlopi_service_uart_rx_task", EZLOPI_SERVICE_UART_TASK_DEPTH, NULL, configMAX_PRIORITIES, &ezlopi_service_uart_task_handle);
+    xTaskCreate(ezlopi_service_uart_task, "ezlopi_service_uart_task", EZLOPI_SERVICE_UART_TASK_DEPTH, NULL, configMAX_PRIORITIES, &ezlopi_service_uart_task_handle);
     ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_UART_TASK, &ezlopi_service_uart_task_handle, EZLOPI_SERVICE_UART_TASK_DEPTH);
 }
 
