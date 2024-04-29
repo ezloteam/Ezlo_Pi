@@ -5,6 +5,7 @@ set(EZLOPI_CORE_COMPONENTS
         ezlopi-core-actions
         ezlopi-core-event-queue
         ezlopi-core-devices 
+        ezlopi-core-processes
 )
 
 

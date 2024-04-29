@@ -17,6 +17,8 @@
 
 #include "ezlopi_service_ota.h"
 #include "ezlopi_service_webprov.h"
+#include "ezlopi_core_ezlopi_broadcast.h"
+#include "ezlopi_core_processes.h"
 
 
 #if defined(CONFIG_EZPI_ENABLE_OTA)
@@ -31,7 +33,9 @@ bool ezlopi_service_ota_get_busy_state(void)
 
 void ezlopi_service_ota_init(void)
 {
-    xTaskCreate(ota_service_process, "ota-service-process", 2 * 2048, NULL, 2, NULL);
+    TaskHandle_t ezlopi_service_ota_process_task_handle = NULL;
+    xTaskCreate(ota_service_process, "ota-service-process", EZLOPI_SERVICE_OTA_PROCESS_TASK_DEPTH, NULL, 2, &ezlopi_service_ota_process_task_handle);
+    ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_OTA_PROCESS_TASK, &ezlopi_service_ota_process_task_handle, EZLOPI_SERVICE_OTA_PROCESS_TASK_DEPTH);
 }
 
 static void ota_service_process(void* pv)

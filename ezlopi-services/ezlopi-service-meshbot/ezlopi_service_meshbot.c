@@ -374,7 +374,7 @@ PT_THREAD(__scene_proto_thread(l_scenes_list_v2_t* scene_node, uint32_t routine_
         TRACE_D("entering delay: %d", ctx->curr_ticks);
 
         PT_WAIT_UNTIL(&ctx->pt, (xTaskGetTickCount() - ctx->curr_ticks) > routine_delay_ms);
-        
+
         TRACE_D("waited for: %d", (xTaskGetTickCount() - ctx->curr_ticks));
         TRACE_D("exiting delay: %d", xTaskGetTickCount());
     }

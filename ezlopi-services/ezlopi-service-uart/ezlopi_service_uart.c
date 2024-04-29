@@ -29,6 +29,7 @@
 #include "ezlopi_core_event_group.h"
 #include "ezlopi_core_sntp.h"
 #include "ezlopi_core_info.h"
+#include "ezlopi_core_processes.h"
 
 #include "ezlopi_hal_system_info.h"
 
@@ -305,6 +306,7 @@ static void ezlopi_service_uart_task(void* arg)
     }
 
     free(data);
+    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SERVICE_UART_TASK);
     vTaskDelete(NULL);
 }
 
@@ -719,6 +721,7 @@ static void ezlopi_service_uart_get_config(void)
 }
 
 int EZPI_SERVICE_uart_tx_data(int len, uint8_t* data)
+int EZPI_SERVICE_uart_tx_data(int len, uint8_t* data)
 {
     int ret = 0;
     ret = uart_write_bytes(EZPI_SERV_UART_NUM_DEFAULT, data, len);
@@ -726,9 +729,11 @@ int EZPI_SERVICE_uart_tx_data(int len, uint8_t* data)
     return ret;
 }
 
-void EZPI_SERV_uart_init(void)
+int EZPI_SERV_uart_init(int len, uint8_t* data)
 {
-    xTaskCreate(ezlopi_service_uart_task, "ezlopi_service_uart_task", 1024 * 3, NULL, configMAX_PRIORITIES, NULL);
+    TaskHandle_t ezlopi_service_uart_task_handle = NULL;
+    xTaskCreate(ezlopi_service_uart_rx_task, "ezlopi_service_uart_rx_task", EZLOPI_SERVICE_UART_TASK_DEPTH, NULL, configMAX_PRIORITIES, &ezlopi_service_uart_task_handle);
+    ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_UART_TASK, &ezlopi_service_uart_task_handle, EZLOPI_SERVICE_UART_TASK_DEPTH);
 }
 
 #endif // CONFIG_EZPI_ENABLE_UART_PROVISIONING

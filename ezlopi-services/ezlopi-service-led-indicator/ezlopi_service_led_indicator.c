@@ -1,5 +1,11 @@
 
 
+#include "sdkconfig.h"
+
+#ifdef CONFIG_EZPI_ENABLE_LED_INDICATOR
+
+#include "ezlopi_service_led_indicator.h"
+
 #include "driver/rmt.h"
 #include "led_strip.h"
 #include "esp_err.h"
@@ -13,14 +19,13 @@
 
 #include "ezlopi_core_event_group.h"
 #include "ezlopi_core_ping.h"
-
-#include "ezlopi_service_led_indicator.h"
+#include "ezlopi_core_processes.h"
 
 static void __indicator_LED_blinker(void* params);
 
 static e_indicator_led_priority_t __indicator_priority = PRIORITY_CLOUD;
 
-#ifdef CONFIG_EZPI_RGB_LED
+#if defined(CONFIG_IDF_TARGET_ESP32S3) || defined(CONFIG_IDF_TARGET_ESP32C3)
 
 #define COLOR_GET_RED(x) ( 0xFF & ( x >> 16 ))
 #define COLOR_GET_GREEN(x) ( 0xFF & ( x >> 8 ) )
@@ -31,13 +36,28 @@ static e_indicator_led_priority_t __indicator_priority = PRIORITY_CLOUD;
 #define INDICATOR_LED_FADE_TIME_MS 20
 
 #ifdef CONFIG_IDF_TARGET_ESP32S3
-#define INDICATOR_LED_PIN CONFIG_EZPI_RGB_LED_PIN
+#define INDICATOR_LED_PIN 48
 #elif CONFIG_IDF_TARGET_ESP32C3
 #define INDICATOR_LED_PIN 8
 #endif
 #define INDICATOR_RGB_RMT_TX_CHANNEL RMT_CHANNEL_1
 
 static led_strip_t indicator_led;
+
+#elif defined(CONFIG_IDF_TARGET_ESP32) // CONFIG_IDF_TARGET_ESP32S3 OR OR CONFIG_IDF_TARGET_ESP32C3 OR CONFIG_IDF_TARGET_ESP32
+
+#define INDICATOR_LED_PIN 2
+
+#define INDICATTOR_LED_POWER_STATUS_BLINK_MS 20
+#define INDICATTOR_LED_WIFI_STATUS_BLINK_MS 50
+#define INDICATTOR_LED_INTERNET_STATUS_BLINK_MS 100
+#define INDICATTOR_LED_CLOUD_STATUS_BLINK_MS 200
+
+#endif // CONFIG_IDF_TARGET_ESP32S3 OR OR CONFIG_IDF_TARGET_ESP32C3 OR CONFIG_IDF_TARGET_ESP32
+
+static e_indicator_led_priority_t indicator_priority = PRIORITY_CLOUD;
+
+#if defined(CONFIG_IDF_TARGET_ESP32S3) || defined(CONFIG_IDF_TARGET_ESP32C3)
 
 static void indicator_RGB_led_fade_out(uint16_t fade_time_ms)
 {
@@ -143,7 +163,9 @@ static int __indicator_led_init(void)
         {
             if (ESP_OK == (err = led_strip_flush(&indicator_led)))
             {
-                xTaskCreate(__indicator_LED_blinker, "indicator_task", 2048 * 2, NULL, tskIDLE_PRIORITY, NULL);
+                TaskHandle_t ezlopi_service_led_indicator_task_handle = NULL;
+                xTaskCreate(__indicator_LED_blinker, "indicator_task", EZLOPI_SERVICE_LED_INDICATOR_TASK_DEPTH, NULL, tskIDLE_PRIORITY, &ezlopi_service_led_indicator_task_handle);
+                ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_LED_INDICATOR_TASK, &ezlopi_service_led_indicator_task_handle, EZLOPI_SERVICE_LED_INDICATOR_TASK_DEPTH);
                 ret = 1;
             }
         }
@@ -152,11 +174,8 @@ static int __indicator_led_init(void)
     return ret;
 }
 
-#endif // #ifdef CONFIG_EZPI_RGB_LED
 
-#if defined(CONFIG_EZPI_ON_OFF_LED)
-
-#define INDICATOR_LED_PIN CONFIG_EZPI_ON_OFF_LED_PIN
+#elif defined(CONFIG_IDF_TARGET_ESP32) // // CONFIG_IDF_TARGET_ESP32S3 OR OR CONFIG_IDF_TARGET_ESP32C3
 
 static const ledc_timer_config_t indicator_pwm_timer_cfg = {
     .speed_mode = LEDC_LOW_SPEED_MODE,
@@ -227,7 +246,7 @@ static int __indicator_led_init(void)
     return ret;
 }
 
-#endif // #ifdef CONFIG_EZPI_ON_OFF_LED
+#endif // CONFIG_IDF_TARGET_ESP32S3 OR OR CONFIG_IDF_TARGET_ESP32C3
 
 
 static void __process_event(void)
@@ -285,7 +304,7 @@ static void __indicator_LED_blinker(void* params)
 
         vTaskDelay(1 / portTICK_PERIOD_MS);
     }
-
+    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SERVICE_LED_INDICATOR_TASK);
     vTaskDelete(NULL);
 }
 
@@ -295,3 +314,4 @@ int ezlopi_service_led_indicator_init()
 }
 
 
+#endif // CONFIG_EZPI_ENABLE_LED_INDICATOR
