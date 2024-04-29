@@ -13,6 +13,7 @@
 
 #include "ezlopi_core_event_group.h"
 #include "ezlopi_core_ping.h"
+#include "ezlopi_core_processes.h"
 
 #include "ezlopi_service_led_indicator.h"
 
@@ -143,7 +144,9 @@ static int __indicator_led_init(void)
         {
             if (ESP_OK == (err = led_strip_flush(&indicator_led)))
             {
-                xTaskCreate(__indicator_LED_blinker, "indicator_task", 2048 * 2, NULL, tskIDLE_PRIORITY, NULL);
+                TaskHandle_t ezlopi_service_led_indicator_task_handle = NULL;
+                xTaskCreate(__indicator_LED_blinker, "indicator_task", EZLOPI_SERVICE_LED_INDICATOR_TASK_DEPTH, NULL, tskIDLE_PRIORITY, &ezlopi_service_led_indicator_task_handle);
+                ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_LED_INDICATOR_TASK, &ezlopi_service_led_indicator_task_handle, EZLOPI_SERVICE_LED_INDICATOR_TASK_DEPTH);
                 ret = 1;
             }
         }
@@ -285,7 +288,7 @@ static void __indicator_LED_blinker(void* params)
 
         vTaskDelay(1 / portTICK_PERIOD_MS);
     }
-
+    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SERVICE_LED_INDICATOR_TASK);
     vTaskDelete(NULL);
 }
 

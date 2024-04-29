@@ -154,7 +154,7 @@ static void __fetch_wss_endpoint(void* pv)
         vTaskDelay(2000 / portTICK_RATE_MS);
         vTaskDelay(2000 / portTICK_RATE_MS);
     }
-
+    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SERVICE_WEB_PROV_FETCH_WSS_TASK);
     vTaskDelete(NULL);
 }
 

@@ -51,7 +51,7 @@ void app_main(void)
     ezlopi_ble_service_init();
 #endif
 
-#if defined(CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER) || defined(EZPI_WEBSOCKET_CLIENT)
+#if defined(CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER) || defined(CONFIG_EZPI_WEBSOCKET_CLIENT)
     ezlopi_service_broadcast_init();
 #endif
 
@@ -80,6 +80,7 @@ void app_main(void)
     TaskHandle_t ezlopi_main_blinky_task_handle = NULL;
     xTaskCreate(blinky, "blinky", EZLOPI_MAIN_BLINKY_TASK_DEPTH, NULL, 1, &ezlopi_main_blinky_task_handle);
     ezlopi_core_process_set_process_info(ENUM_EZLOPI_MAIN_BLINKY_TASK, &ezlopi_main_blinky_task_handle, EZLOPI_MAIN_BLINKY_TASK_DEPTH);
+
 }
 
 static void blinky(void* pv)

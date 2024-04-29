@@ -72,7 +72,7 @@ static void registration_process(void* pv)
 
         while (ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 5000, false) <= 0)
         {
-            //     CJSON_TRACE("----------------- broadcasting - cj_register", cj_register);
+            // CJSON_TRACE("----------------- broadcasting - cj_register", cj_register);
             cJSON* cj_register_dup = cJSON_CreateObjectReference(cj_register->child);
             if (cj_register_dup)
             {
@@ -86,5 +86,6 @@ static void registration_process(void* pv)
         cJSON_Delete(cj_register);
     }
 
+    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_CLOUD_REGISTRATION_PROCESS_STACK);
     vTaskDelete(NULL);
 }
