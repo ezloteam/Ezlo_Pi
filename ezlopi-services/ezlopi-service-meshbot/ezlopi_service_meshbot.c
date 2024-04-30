@@ -195,6 +195,7 @@ void ezlopi_scenes_meshbot_init(void)
         }
         else
         {
+            #warning "remove these traces";
             TRACE_S("scene_en ->%s , scene_node->when:%s , (scene_node->then:%s | scene_node->else:%s)",
                 (scene_node->enabled) ? "true" : "false",
                 (NULL == scene_node->when_block) ? "empty" : scene_node->when_block->block_options.method.name,
@@ -210,6 +211,7 @@ void ezlopi_scenes_meshbot_init(void)
                     free(str);
                 }
             }
+
             scene_node->status = EZLOPI_SCENE_STATUS_STOPPED;
         }
         TRACE_W("scenes_meshbot init process, [%d]", start_thread);

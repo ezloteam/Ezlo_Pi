@@ -4,6 +4,8 @@
 #include "ezlopi_core_scenes_v2.h"
 #include "ezlopi_core_scenes_when_methods_helper_functions.h"
 
+
+
 //------------------------------- ezlopi_scene_when_is_date ---------------------------------------------
 
 static uint8_t isdate_check_endweek_conditon(e_isdate_modes_t mode_type, struct tm* info)
@@ -965,6 +967,31 @@ int isdate_range_check_flag_result(uint8_t flag_check)
     return ret;
 }
 
+//-----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------------------
+/* This function to extract the result of 'AND' when_blocks */
+static bool __and_when_block_condition(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* when_block)
+{
+    bool transition_state = 1; // to make valid judgements
+    l_when_block_v2_t* value_when_block = when_block->fields->field_value.u_value.when_block;
+    while (value_when_block)
+    {
+        f_scene_method_v2_t scene_method = ezlopi_scene_get_method_v2(value_when_block->block_options.method.type);
+        if (scene_method)
+        {
+            transition_state &= scene_method(scene_node, (void*)value_when_block);
+            if (!transition_state)
+            {
+                break;
+            }
+        }
+        value_when_block = value_when_block->next;
+    }
+    return transition_state;
+}
+//-----------------------------------------------------------------------------------------------------
+
+
 //------------------------------- ezlopi_scene_when_function_method -----------------------------------
 
 int when_function_for_opr(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* when_block, cJSON* cj_func_opr)
@@ -981,21 +1008,7 @@ int when_function_for_opr(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* whe
             if (for_less_least)
             {
                 /* first get the product of all children states*/
-                bool transition_state = 1; // to make valid judgements
-                l_when_block_v2_t* value_when_block = when_block->fields->field_value.u_value.when_block;
-                while (value_when_block)
-                {
-                    f_scene_method_v2_t scene_method = ezlopi_scene_get_method_v2(value_when_block->block_options.method.type);
-                    if (scene_method)
-                    {
-                        transition_state &= scene_method(scene_node, (void*)value_when_block);
-                        if (!transition_state)
-                        {
-                            break;
-                        }
-                    }
-                    value_when_block = value_when_block->next;
-                }
+                bool transition_state = __and_when_block_condition(scene_node, when_block);
 
                 /*now compare the intervals between each transtion result*/
                 s_when_function_t* function_state_info = (s_when_function_t*)scene_node->when_block->fields->user_arg;
@@ -1013,7 +1026,7 @@ int when_function_for_opr(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* whe
                         {
                             if ((((uint32_t)xTaskGetTickCount() - function_state_info->transtion_instant) / 1000) < threshold_time)
                             {
-                                TRACE_W("Here-less");
+                                // TRACE_S("activating-less");
                                 ret = 1;
                             }
                         }
@@ -1021,7 +1034,7 @@ int when_function_for_opr(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* whe
                         {
                             if ((((uint32_t)xTaskGetTickCount() - function_state_info->transtion_instant) / 1000) >= threshold_time)
                             {
-                                TRACE_W("Here-alleast");
+                                // TRACE_S("activating-atleast");
                                 ret = 1;
                             }
                         }
@@ -1029,10 +1042,6 @@ int when_function_for_opr(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* whe
                     }
                 }
                 function_state_info->current_state = transition_state;
-            }
-            else
-            {
-                ret = -1;
             }
         }
     }
@@ -1051,38 +1060,26 @@ int when_function_for_repeat(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* 
             if (for_count)
             {
                 /* first get the product of all children states*/
-                bool transition_state = 1; // to make valid judgements
-                l_when_block_v2_t* value_when_block = when_block->fields->field_value.u_value.when_block;
-                while (value_when_block)
-                {
-                    f_scene_method_v2_t scene_method = ezlopi_scene_get_method_v2(value_when_block->block_options.method.type);
-                    if (scene_method)
-                    {
-                        transition_state &= scene_method(scene_node, (void*)value_when_block);
-                        if (!transition_state)
-                        {
-                            break;
-                        }
-                    }
-                    value_when_block = value_when_block->next;
-                }
+                bool transition_state = __and_when_block_condition(scene_node, when_block);
 
                 s_when_function_t* function_state_info = (s_when_function_t*)scene_node->when_block->fields->user_arg;
 
-                if ((transition_state == 1) && (0 == function_state_info->current_state)) /*previous state?*/
+                if ((transition_state) && (0 == function_state_info->current_state)) /*previous state?*/
                 {
                     if (0 == function_state_info->transtion_instant)
                     { /*store the first trigger time*/
+                        TRACE_W("here!");
                         function_state_info->transtion_instant = (uint32_t)xTaskGetTickCount();
-                        TRACE_S("1st_trigger_time[%d]", function_state_info->transtion_instant);
                     }
 
                     int threshold_time = cJSON_GetNumberValue(for_interval);
                     function_state_info->transition_count++;
+                    TRACE_S("trigger_time[%d] count[%d]", function_state_info->transtion_instant, function_state_info->transition_count);
                     if (function_state_info->transition_count >= for_count)
                     {
                         if ((((uint32_t)xTaskGetTickCount() - function_state_info->transtion_instant) / 1000) <= threshold_time)
                         {
+                            TRACE_W("here2! dur [%d]", (((uint32_t)xTaskGetTickCount() - function_state_info->transtion_instant) / 1000));
                             ret = 1;
                         }
                         function_state_info->transtion_instant = 0;
@@ -1091,10 +1088,6 @@ int when_function_for_repeat(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* 
                 }
                 function_state_info->current_state = transition_state;
             }
-        }
-        else
-        {
-            ret = -1;
         }
     }
 
@@ -1109,53 +1102,42 @@ int when_function_for_follow(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* 
         if (for_delay)
         {
             s_when_function_t* function_state_info = (s_when_function_t*)scene_node->when_block->fields->user_arg;
-            if (0 == function_state_info->transtion_instant) /* trigger phase ---> started */
+            if ((0 == function_state_info->transtion_instant) && (0 == function_state_info->current_state))
             {
                 /* first get the product of all children states*/
-                bool transition_state = 1; // to make valid judgements
-                l_when_block_v2_t* value_when_block = when_block->fields->field_value.u_value.when_block;
-                while (value_when_block)
+                bool transition_state = __and_when_block_condition(scene_node, when_block);
+                if (transition_state) /*previous state?*/
                 {
-                    f_scene_method_v2_t scene_method = ezlopi_scene_get_method_v2(value_when_block->block_options.method.type);
-                    if (scene_method)
-                    {
-                        transition_state &= scene_method(scene_node, (void*)value_when_block);
-                        if (!transition_state)
-                        {
-                            break;
-                        }
-                    }
-                    value_when_block = value_when_block->next;
-                }
-
-                if ((transition_state == 1) && (0 == function_state_info->current_state)) /*previous state?*/
-                {
+                    /* trigger phase ---> started */
                     function_state_info->current_state = transition_state;
                     function_state_info->transtion_instant = (uint32_t)xTaskGetTickCount();
-                    TRACE_S("start_follow_time[%d]", function_state_info->transtion_instant);
+                    // TRACE_W("start_follow_time");
                     ret = 1;
                 }
             }
-            else /* trigger phase ---> started */
+            else
             {
                 int threshold_time = cJSON_GetNumberValue(for_delay);
                 if ((((uint32_t)xTaskGetTickCount() - function_state_info->transtion_instant) / 1000) <= threshold_time)
                 {
                     ret = 1;
+                    // TRACE_S(" Follow -> Active ");
                 }
                 else
                 {
+                    /* trigger phase ---> stop */
                     ret = 0;
-                    TRACE_S("stop_follow_time[%d]", (uint32_t)xTaskGetTickCount());
-                    function_state_info->transtion_instant = 0;
-                    function_state_info->current_state = 0;
+                    // TRACE_W("restart the trigger...");
+
+                    /* now refreshing then block*/
+                    if (false == __and_when_block_condition(scene_node, when_block))
+                    {
+                        function_state_info->transtion_instant = 0;
+                        function_state_info->current_state = 0;
+                    }
                 }
             }
         }
-    }
-    else
-    {
-        ret = -1;
     }
 
     return ret;
@@ -1168,16 +1150,12 @@ int when_function_for_pulse(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* w
         cJSON* for_trueperiod = cJSON_GetObjectItem(cj_func_opr, "truePeriod");
         cJSON* for_falseperiod = cJSON_GetObjectItem(cj_func_opr, "falsePeriod");
         cJSON* for_times = cJSON_GetObjectItem(cj_func_opr, "times");
-        int true_time_dur = cJSON_GetNumberValue(for_trueperiod);
-        if (for_trueperiod)
+        if (for_trueperiod && for_times && for_falseperiod)
         {
-            int false_time_dur = 0;
-            int seq_count = 0;
-            if (for_times && for_falseperiod)
-            {
-                false_time_dur = cJSON_GetNumberValue(for_falseperiod);
-                seq_count = cJSON_GetNumberValue(for_times);
-            }
+            int true_time_dur = cJSON_GetNumberValue(for_trueperiod);
+            int false_time_dur = cJSON_GetNumberValue(for_falseperiod);
+            int seq_count = cJSON_GetNumberValue(for_times);
+
             /*1. check for activation condition for 'pulse_flag' */
             s_when_function_t* function_state_info = (s_when_function_t*)scene_node->when_block->fields->user_arg;
             if ((0 == function_state_info->transition_count) &&
@@ -1185,25 +1163,11 @@ int when_function_for_pulse(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* w
                 (0 == function_state_info->transtion_instant) &&
                 (false == function_state_info->activate_pulse_seq))
             {
-                bool transition_state = 1; // to make valid judgements
-                l_when_block_v2_t* value_when_block = when_block->fields->field_value.u_value.when_block;
-                while (value_when_block)
+                if (__and_when_block_condition(scene_node, when_block))
                 {
-                    f_scene_method_v2_t scene_method = ezlopi_scene_get_method_v2(value_when_block->block_options.method.type);
-                    if (scene_method)
-                    {
-                        transition_state &= scene_method(scene_node, (void*)value_when_block);
-                        if (!transition_state)
-                        {
-                            break;
-                        }
-                    }
-                    value_when_block = value_when_block->next;
-                }
-                if (transition_state == 1)
-                {
+                    TRACE_W("starting Pulse!");
                     function_state_info->activate_pulse_seq = true;
-                    function_state_info->current_state = 1;
+                    function_state_info->current_state = 1; // state you want to start with
                     function_state_info->transtion_instant = (uint32_t)xTaskGetTickCount();
                 }
             }
@@ -1214,43 +1178,80 @@ int when_function_for_pulse(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* w
                 {
                     function_state_info->transition_count = seq_count;  /* If 'SEQ_COUNT' == 0 ; Then loop the sequence forever. */
                 }
+                else
+                {
+                    seq_count = (seq_count * 2) - 1; // 6 -> [0-5]
+                }
 
                 if (function_state_info->transition_count <= seq_count)
                 {
-                    if (1 == function_state_info->current_state)
+                    uint32_t dur = (((uint32_t)xTaskGetTickCount() - function_state_info->transtion_instant) / 1000);
+                    if (true == function_state_info->current_state)
                     {
-                        if ((((uint32_t)xTaskGetTickCount() - function_state_info->transtion_instant) / 1000) >= true_time_dur)
+                        if (dur <= true_time_dur)
                         {
-                            function_state_info->current_state = !function_state_info->current_state;
+                            TRACE_S("high_pulse , true[%dsec]", dur);
+                        }
+                        else
+                        {
                             function_state_info->transtion_instant = (uint32_t)xTaskGetTickCount();     /*in sec*/
+                            if (function_state_info->transition_count < seq_count)
+                            {
+                                function_state_info->transition_count++;
+                            }
+                            function_state_info->current_state = 0;
                         }
                     }
-                    else if (0 == function_state_info->current_state)
+                    else if (false == function_state_info->current_state)
                     {
-                        if ((((uint32_t)xTaskGetTickCount() - function_state_info->transtion_instant) / 1000) >= false_time_dur)
+                        if (dur <= false_time_dur)
                         {
-                            function_state_info->current_state = !function_state_info->current_state;
+                            TRACE_S("low_pulse , false[%dsec]", dur);
+                        }
+                        else
+                        {
                             function_state_info->transtion_instant = (uint32_t)xTaskGetTickCount();  /*in sec*/
+                            if (function_state_info->transition_count < seq_count)
+                            {
+                                function_state_info->current_state = 1;
+                                function_state_info->transition_count++;
+                            }
+                            else
+                            {
+                                function_state_info->current_state = 0;
+                            }
                         }
                     }
-
-                    function_state_info->transition_count++;
                 }
                 else
                 {
-                    TRACE_W("Excceded pulse count ");
+                    TRACE_E("Exceeded pulse count..............");
                     function_state_info->activate_pulse_seq = false;
                     function_state_info->current_state = 0;
                     function_state_info->transition_count = 0;
-                    function_state_info->transtion_instant = 0;
                 }
 
 
-                TRACE_S("pulse_flag=%d -> {%d}.pulse_instant[%d]",
-                    (int)function_state_info->activate_pulse_seq,
-                    function_state_info->transition_count,
-                    function_state_info->transtion_instant);
+
             }
+            else
+            {
+                /* trigger phase ---> stop */
+                TRACE_W("restart the trigger....");
+
+                /* now refreshing pulse*/
+                if (false == __and_when_block_condition(scene_node, when_block))
+                {
+                    function_state_info->transtion_instant = 0;
+                    function_state_info->transition_count = 0;
+                }
+                function_state_info->current_state = 0;
+            }
+
+            TRACE_W("trigger_state= %s , {seq_count: %d}.-----> return =>> [pulse_state = %s]",
+                (function_state_info->activate_pulse_seq) ? "true" : "false",
+                function_state_info->transition_count,
+                (function_state_info->current_state) ? "high" : "low");
             ret = function_state_info->current_state;
         }
     }
@@ -1269,23 +1270,7 @@ int when_function_for_latch(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* w
             if ((0 == function_state_info->current_state) && (cJSON_True == for_enabled->type)) /* if the trigger phase has not started */
             {
                 /* first get the product of all children states*/
-                bool transition_state = 1; // to make valid judgements
-                l_when_block_v2_t* value_when_block = when_block->fields->field_value.u_value.when_block;
-                while (value_when_block)
-                {
-                    f_scene_method_v2_t scene_method = ezlopi_scene_get_method_v2(value_when_block->block_options.method.type);
-                    if (scene_method)
-                    {
-                        transition_state &= scene_method(scene_node, (void*)value_when_block);
-                        if (!transition_state)
-                        {
-                            break;
-                        }
-                    }
-                    value_when_block = value_when_block->next;
-                }
-
-                if (transition_state == 1)  /*if : previous state = 0*/
+                if (__and_when_block_condition(scene_node, when_block))  /*if : previous state = 0*/
                 {
                     function_state_info->current_state = 1;
                     function_state_info->transtion_instant = (uint32_t)xTaskGetTickCount();

@@ -44,17 +44,17 @@ int ezlopi_scene_then_set_item_value(l_scenes_list_v2_t* curr_scene, void* arg)
                     if (EZLOPI_VALUE_TYPE_INT == curr_field->value_type)
                     {
                         cJSON_AddNumberToObject(cj_params, ezlopi_value_str, curr_field->field_value.u_value.value_double);
-                        TRACE_D("value: %f", curr_field->field_value.u_value.value_double);
+                        // TRACE_D("value: %f", curr_field->field_value.u_value.value_double);
                     }
                     else if (EZLOPI_VALUE_TYPE_BOOL == curr_field->value_type)
                     {
                         cJSON_AddBoolToObject(cj_params, ezlopi_value_str, curr_field->field_value.u_value.value_bool);
-                        TRACE_D("value: %s", curr_field->field_value.u_value.value_bool ? ezlopi_true_str : ezlopi_false_str);
+                        // TRACE_D("value: %s", curr_field->field_value.u_value.value_bool ? ezlopi_true_str : ezlopi_false_str);
                     }
                     else if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type)
                     {
                         cJSON_AddStringToObject(cj_params, ezlopi_value_str, curr_field->field_value.u_value.value_string);
-                        TRACE_D("value: %s", curr_field->field_value.u_value.value_string);
+                        // TRACE_D("value: %s", curr_field->field_value.u_value.value_string);
                     }
                 }
 

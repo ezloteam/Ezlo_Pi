@@ -1398,6 +1398,5 @@ int ezlopi_scene_when_function(l_scenes_list_v2_t* scene_node, void* arg)
             }
         }
     }
-
     return ret;
 }
