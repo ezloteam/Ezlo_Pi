@@ -1,8 +1,6 @@
 #ifndef _EZLOPI_CORE_NET_H_
 #define _EZLOPI_CORE_NET_H_
 
-#ifdef CONFIG_EZPI_CORE_ENABLE_ETH
-
 #include <string.h>
 
 #include "ezlopi_core_wifi.h"
@@ -17,8 +15,11 @@ typedef struct s_ezlopi_net_status
     bool nma_cloud_connection_status;
 } s_ezlopi_net_status_t;
 
+#ifdef CONFIG_EZPI_CORE_ENABLE_ETH
+void ezlopi_net_init(void);
+#endif  // CONFIG_EZPI_CORE_ENABLE_ETH
+
 s_ezlopi_net_status_t* ezlopi_get_net_status(void);
 
-#endif // CONFIG_EZPI_CORE_ENABLE_ETH
 
 #endif // _EZLOPI_CORE_NET_H_

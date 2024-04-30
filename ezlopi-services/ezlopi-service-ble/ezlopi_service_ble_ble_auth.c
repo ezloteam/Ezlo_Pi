@@ -1,5 +1,8 @@
-#ifdef CONFIG_EZLOPI_BLE_ENABLE
 
+#include "../../build/config/sdkconfig.h"
+
+#ifdef CONFIG_EZLOPI_BLE_ENABLE
+// #TODO ADD guard for key enable
 #include <string.h>
 
 #include "ezlopi_util_trace.h"

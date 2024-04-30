@@ -1,4 +1,6 @@
 
+#include "../../build/config/sdkconfig.h"
+
 #ifdef CONFIG_EZLOPI_BLE_ENABLE
 
 #include <string.h>

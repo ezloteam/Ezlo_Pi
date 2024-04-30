@@ -1,14 +1,17 @@
 #include "ezlopi_core_net.h"
 
-#ifdef CONFIG_EZPI_CORE_ENABLE_ETH
 
 static s_ezlopi_net_status_t net_stat;
+
+#ifdef CONFIG_EZPI_CORE_ENABLE_ETH
 
 void ezlopi_net_init(void)
 {
     memset(&net_stat, 0, sizeof(s_ezlopi_net_status_t));
     ezlopi_ethernet_init();
 }
+
+#endif  // CONFIG_EZPI_CORE_ENABLE_ETH
 
 s_ezlopi_net_status_t* ezlopi_get_net_status(void)
 {
@@ -20,4 +23,3 @@ s_ezlopi_net_status_t* ezlopi_get_net_status(void)
     return &net_stat;
 }
 
-#endif  // CONFIG_EZPI_CORE_ENABLE_ETH

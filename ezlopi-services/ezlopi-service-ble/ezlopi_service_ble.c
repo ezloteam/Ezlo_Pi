@@ -1,3 +1,6 @@
+
+#include "../../build/config/sdkconfig.h"
+
 #ifdef CONFIG_EZLOPI_BLE_ENABLE
 
 #include <stdio.h>
@@ -9,7 +12,6 @@
 #include "cjext.h"
 #include "lwip/ip_addr.h"
 #include "ezlopi_util_trace.h"
-#include "../../build/config/sdkconfig.h"
 
 #include "EZLOPI_USER_CONFIG.h"
 
