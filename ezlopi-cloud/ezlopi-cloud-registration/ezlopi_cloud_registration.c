@@ -27,7 +27,7 @@ void registration_init(void)
     if (NULL == __registration_task_handle)
     {
         xTaskCreate(registration_process, "registration_process", EZLOPI_CLOUD_REGISTRATION_PROCESS_STACK_DEPTH, NULL, 2, &__registration_task_handle);
-        ezlopi_core_process_set_process_info(ENUM_EZLOPI_CLOUD_REGISTRATION_PROCESS_STACK, &__registration_task_handle, EZLOPI_CLOUD_REGISTRATION_PROCESS_STACK_DEPTH);
+        ezpi_core_process_set_process_info(ENUM_EZLOPI_CLOUD_REGISTRATION_PROCESS_STACK, &__registration_task_handle, EZLOPI_CLOUD_REGISTRATION_PROCESS_STACK_DEPTH);
     }
 }
 
@@ -91,7 +91,9 @@ static void registration_process(void* pv)
         cJSON_Delete(cj_register);
     }
 
+    
+
     __registration_task_handle = NULL;
-    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_CLOUD_REGISTRATION_PROCESS_STACK);
+    ezpi_core_process_set_is_deleted(ENUM_EZLOPI_CLOUD_REGISTRATION_PROCESS_STACK);
     vTaskDelete(NULL);
 }

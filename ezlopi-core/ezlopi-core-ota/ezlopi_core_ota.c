@@ -66,7 +66,7 @@ void ezlopi_ota_start(cJSON* url)
         {
             TaskHandle_t ezlopi_core_ota_process_task_handle = NULL;
             xTaskCreate(ezlopi_ota_process, "EzpiOTAProcess", EZLOPI_CORE_OTA_PROCESS_TASK_DEPTH, ota_url, 3, &ezlopi_core_ota_process_task_handle);
-            ezlopi_core_process_set_process_info(ENUM_EZLOPI_CORE_OTA_PROCESS_TASK, &ezlopi_core_ota_process_task_handle, EZLOPI_CORE_OTA_PROCESS_TASK_DEPTH);
+            ezpi_core_process_set_process_info(ENUM_EZLOPI_CORE_OTA_PROCESS_TASK, &ezlopi_core_ota_process_task_handle, EZLOPI_CORE_OTA_PROCESS_TASK_DEPTH);
         }
         else
         {
@@ -149,7 +149,7 @@ static void ezlopi_ota_process(void* pv)
 
     __ota_in_process = EZLOPI_OTA_STATE_FINISH;
 
-    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_CORE_OTA_PROCESS_TASK);
+    ezpi_core_process_set_is_deleted(ENUM_EZLOPI_CORE_OTA_PROCESS_TASK);
     vTaskDelete(NULL);
 
     if (url)

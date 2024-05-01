@@ -9,9 +9,8 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 
+#include "ezlopi_util_heap.h"
 #include "ezlopi_util_trace.h"
-
-#include "EZLOPI_USER_CONFIG.h"
 
 #include "ezlopi_core_ezlopi.h"
 #include "ezlopi_service_ota.h"
@@ -26,12 +25,12 @@
 #include "ezlopi_service_ws_server.h"
 #include "ezlopi_service_broadcast.h"
 #include "ezlopi_service_led_indicator.h"
-#include "ezlopi_util_heap.h"
 
 #include "pt.h"
-#include "ezlopi_core_ble_config.h"
 #include "ezlopi_core_processes.h"
-#include "ezlopi_util_heap.h"
+#include "ezlopi_core_ble_config.h"
+
+#include "EZLOPI_USER_CONFIG.h"
 
 static void blinky(void* pv);
 
@@ -40,8 +39,8 @@ void app_main(void)
 #ifdef CONFIG_EZPI_ENABLE_LED_INDICATOR
     ezlopi_service_led_indicator_init();
 #endif // CONFIG_EZPI_ENABLE_LED_INDICATOR
-    gpio_install_isr_service(0);
 
+    gpio_install_isr_service(0);
     gpio_isr_service_init();
 
     ezlopi_init();
@@ -82,7 +81,7 @@ void app_main(void)
 
     TaskHandle_t ezlopi_main_blinky_task_handle = NULL;
     xTaskCreate(blinky, "blinky", EZLOPI_MAIN_BLINKY_TASK_DEPTH, NULL, 1, &ezlopi_main_blinky_task_handle);
-    ezlopi_core_process_set_process_info(ENUM_EZLOPI_MAIN_BLINKY_TASK, &ezlopi_main_blinky_task_handle, EZLOPI_MAIN_BLINKY_TASK_DEPTH);
+    ezpi_core_process_set_process_info(ENUM_EZLOPI_MAIN_BLINKY_TASK, &ezlopi_main_blinky_task_handle, EZLOPI_MAIN_BLINKY_TASK_DEPTH);
 
 }
 
@@ -93,8 +92,6 @@ static void blinky(void* pv)
     while (1)
     {
         float free_heap_kb = esp_get_free_heap_size() / 1024.0;
-        UBaseType_t total_task_numbers = uxTaskGetNumberOfTasks();
-        TaskStatus_t task_array[total_task_numbers];
 
         trace_wb("----------------------------------------------");
         trace_wb("esp_get_free_heap_size - %.02f kB", free_heap_kb);
@@ -124,6 +121,8 @@ static void blinky(void* pv)
 #endif // CONFIG_EZPI_HEAP_ENABLE
 
 #if 0
+        UBaseType_t total_task_numbers = uxTaskGetNumberOfTasks();
+        TaskStatus_t task_array[total_task_numbers];
         uxTaskGetSystemState(task_array, total_task_numbers, NULL);
 
         for (int i = 0; i < total_task_numbers; i++) {

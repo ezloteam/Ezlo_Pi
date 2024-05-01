@@ -35,7 +35,7 @@ void gpio_isr_service_init(void)
     gpio_evt_queue = xQueueCreate(20, sizeof(s_event_arg_t*));
     TaskHandle_t ezlopi_service_gpio_isr_task_handle = NULL;
     xTaskCreate(gpio_isr_process_v3, "gpio_isr_process_v3", EZLOPI_SERVICE_GPIO_ISR_TASK_DEPTH, NULL, 3, &ezlopi_service_gpio_isr_task_handle);
-    ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_GPIO_ISR_TASK, &ezlopi_service_gpio_isr_task_handle, EZLOPI_SERVICE_GPIO_ISR_TASK_DEPTH);
+    ezpi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_GPIO_ISR_TASK, &ezlopi_service_gpio_isr_task_handle, EZLOPI_SERVICE_GPIO_ISR_TASK_DEPTH);
     // xTaskCreate(gpio_isr_process, "digital-io-isr-service", EZLOPI_SERVICE_GPIO_ISR_TASK_DEPTH, NULL, 3, &ezlopi_service_gpio_isr_task_handle);
 }
 

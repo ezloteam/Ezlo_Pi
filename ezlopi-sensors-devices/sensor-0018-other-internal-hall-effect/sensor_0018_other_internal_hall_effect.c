@@ -171,7 +171,7 @@ static int __init(l_ezlopi_item_t* item)
                 user_data->hall_state = "dw_is_closed";
                 TaskHandle_t ezlopi_sensor_hall_callibration_task_handle = NULL;
                 xTaskCreate(__hall_calibration_task, "Hall_Calibration_Task", EZLOPI_SENSOR_HALL_CALLIBRATION_TASK_DEPTH, item, 1, &ezlopi_sensor_hall_callibration_task_handle);
-                ezlopi_core_process_set_process_info(ENUM_EZLOPI_SENSOR_HALL_CALLIBRATION_TASK, &ezlopi_sensor_hall_callibration_task_handle, EZLOPI_SENSOR_HALL_CALLIBRATION_TASK_DEPTH);
+                ezpi_core_process_set_process_info(ENUM_EZLOPI_SENSOR_HALL_CALLIBRATION_TASK, &ezlopi_sensor_hall_callibration_task_handle, EZLOPI_SENSOR_HALL_CALLIBRATION_TASK_DEPTH);
                 ret = 1;
             }
             else
@@ -295,7 +295,7 @@ static void __hall_calibration_task(void* params) // calibrate task
             user_data->calibration_complete = true;
         }
     }
-    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SENSOR_HALL_CALLIBRATION_TASK);
+    ezpi_core_process_set_is_deleted(ENUM_EZLOPI_SENSOR_HALL_CALLIBRATION_TASK);
     vTaskDelete(NULL);
 }
 

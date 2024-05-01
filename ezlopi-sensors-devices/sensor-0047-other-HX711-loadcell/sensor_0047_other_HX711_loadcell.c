@@ -186,7 +186,7 @@ static int __0047_init(l_ezlopi_item_t* item)
                         __hx711_power_reset(item);
                         TaskHandle_t ezlopi_sensor_hx711_task_handle = NULL;
                         xTaskCreate(__Calculate_hx711_tare_wt, "Calculate the Tare weight", EZLOPI_SENSOR_HX711_TASK_DEPTH, item, 1, &ezlopi_sensor_hx711_task_handle);
-                        ezlopi_core_process_set_process_info(ENUM_EZLOPI_SENSOR_HX711_TASK, &ezlopi_sensor_hx711_task_handle, EZLOPI_SENSOR_HX711_TASK_DEPTH);
+                        ezpi_core_process_set_process_info(ENUM_EZLOPI_SENSOR_HX711_TASK, &ezlopi_sensor_hx711_task_handle, EZLOPI_SENSOR_HX711_TASK_DEPTH);
                         ret = 1;
                     }
                 }
@@ -288,7 +288,7 @@ static void __Calculate_hx711_tare_wt(void* params)
             }
         }
     }
-    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SENSOR_HX711_TASK);
+    ezpi_core_process_set_is_deleted(ENUM_EZLOPI_SENSOR_HX711_TASK);
     vTaskDelete(NULL);
 }
 

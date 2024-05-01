@@ -23,7 +23,7 @@ void timer_service_init(void)
     TaskHandle_t ezlopi_service_timer_task_handle = NULL;
     // xTaskCreate(event_process, "event_process", EZLOPI_SERVICE_TIMER_TASK_DEPTH, NULL, 4, &ezlopi_service_timer_task_handle);
     xTaskCreate(event_process_v3, "event_process_v3", EZLOPI_SERVICE_TIMER_TASK_DEPTH, NULL, 4, &ezlopi_service_timer_task_handle);
-    ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_TIMER_TASK, &ezlopi_service_timer_task_handle, EZLOPI_SERVICE_TIMER_TASK_DEPTH);
+    ezpi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_TIMER_TASK, &ezlopi_service_timer_task_handle, EZLOPI_SERVICE_TIMER_TASK_DEPTH);
 }
 
 static void event_process_v3(void* pv)

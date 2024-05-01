@@ -186,7 +186,7 @@ static int __0049_init(l_ezlopi_item_t* item)
                         {
                             TaskHandle_t ezlopi_sensor_mq2_task_handle = NULL;
                             xTaskCreate(__calibrate_MQ2_R0_resistance, "Task_to_calculate_R0_air", EZLOPI_SENSOR_MQ2_TASK_DEPTH, item, 1, &ezlopi_sensor_mq2_task_handle);
-                            ezlopi_core_process_set_process_info(ENUM_EZLOPI_SENSOR_MQ2_TASK, &ezlopi_sensor_mq2_task_handle, EZLOPI_SENSOR_MQ2_TASK_DEPTH);
+                            ezpi_core_process_set_process_info(ENUM_EZLOPI_SENSOR_MQ2_TASK, &ezlopi_sensor_mq2_task_handle, EZLOPI_SENSOR_MQ2_TASK_DEPTH);
 
                         }
                         ret = 1;
@@ -480,6 +480,6 @@ void __calibrate_MQ2_R0_resistance(void* params)
             MQ2_value->Calibration_complete_LPG = true;
         }
     }
-    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SENSOR_MQ2_TASK);
+    ezpi_core_process_set_is_deleted(ENUM_EZLOPI_SENSOR_MQ2_TASK);
     vTaskDelete(NULL);
 }

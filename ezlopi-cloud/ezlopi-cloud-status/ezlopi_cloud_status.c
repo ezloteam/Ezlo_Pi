@@ -18,7 +18,7 @@ void EZPI_CLOUD_status_get(cJSON* cj_request, cJSON* cj_response)
         cJSON* processes_array = cJSON_AddArrayToObject(cjson_result, "processes");
         if (processes_array)
         {
-            ezlopi_core_get_processes_details(processes_array);
+            ezpi_core_get_processes_details(processes_array);
         }
         cJSON* cj_ram = cJSON_AddObjectToObject(cjson_result, "ram");
         if (cj_ram)

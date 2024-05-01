@@ -26,7 +26,7 @@ int ezlopi_service_modes_stop(void)
 {
     if (sg_process_handle)
     {
-        ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SERVICE_MODES_TASK);
+        ezpi_core_process_set_is_deleted(ENUM_EZLOPI_SERVICE_MODES_TASK);
         vTaskDelete(sg_process_handle);
         sg_process_handle = NULL;
         TRACE_W("Modes-service: Stopped!");
@@ -43,7 +43,7 @@ int ezlopi_service_modes_start(void)
     {
         ret = 1;
         xTaskCreate(__modes_service, "modes-service", EZLOPI_SERVICE_MODES_TASK_DEPTH, NULL, 3, &sg_process_handle);
-        ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_MODES_TASK, &sg_process_handle, EZLOPI_SERVICE_MODES_TASK_DEPTH);
+        ezpi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_MODES_TASK, &sg_process_handle, EZLOPI_SERVICE_MODES_TASK_DEPTH);
         TRACE_I("Starting modes-service");
     }
 
@@ -104,7 +104,7 @@ static void __modes_service(void* pv)
 
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
-    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SERVICE_MODES_TASK);
+    ezpi_core_process_set_is_deleted(ENUM_EZLOPI_SERVICE_MODES_TASK);
     vTaskDelete(NULL);
 }
 #endif // CONFIG_EZPI_SERV_ENABLE_MODES

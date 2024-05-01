@@ -23,18 +23,20 @@
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_net.h"
 #include "ezlopi_core_wifi.h"
+#include "ezlopi_core_info.h"
 #include "ezlopi_core_reset.h"
 #include "ezlopi_core_buffer.h"
 #include "ezlopi_core_event_group.h"
 #include "ezlopi_core_factory_info.h"
 #include "ezlopi_core_cjson_macros.h"
 
-// #include "ezlopi_core_event_group.h"
-// #include "ezlopi_core_sntp.h"
-// #include "ezlopi_core_info.h"
-// #include "ezlopi_core_processes.h"
-// #include "ezlopi_core_ping.h"
+#include "ezlopi_core_event_group.h"
+#include "ezlopi_core_sntp.h"
+#include "ezlopi_core_info.h"
+#include "ezlopi_core_processes.h"
+#include "ezlopi_core_ping.h"
 
+#include "ezlopi_hal_uart.h"
 #include "ezlopi_hal_system_info.h"
 
 #include "ezlopi_cloud_info.h"
@@ -42,6 +44,7 @@
 
 #include "ezlopi_service_ble.h"
 #include "ezlopi_service_uart.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 #if defined (CONFIG_EZPI_ENABLE_UART_PROVISIONING)
 
@@ -306,7 +309,7 @@ static void ezlopi_service_uart_task(void* arg)
     }
 
     free(data);
-    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SERVICE_UART_TASK);
+    ezpi_core_process_set_is_deleted(ENUM_EZLOPI_SERVICE_UART_TASK);
     vTaskDelete(NULL);
 }
 
@@ -736,7 +739,7 @@ void EZPI_SERV_uart_init(void)
 {
     TaskHandle_t ezlopi_service_uart_task_handle = NULL;
     xTaskCreate(ezlopi_service_uart_task, "ezlopi_service_uart_task", EZLOPI_SERVICE_UART_TASK_DEPTH, NULL, configMAX_PRIORITIES, &ezlopi_service_uart_task_handle);
-    ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_UART_TASK, &ezlopi_service_uart_task_handle, EZLOPI_SERVICE_UART_TASK_DEPTH);
+    ezpi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_UART_TASK, &ezlopi_service_uart_task_handle, EZLOPI_SERVICE_UART_TASK_DEPTH);
 }
 
 #endif // CONFIG_EZPI_ENABLE_UART_PROVISIONING

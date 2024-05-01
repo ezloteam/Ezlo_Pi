@@ -165,7 +165,7 @@ static int __indicator_led_init(void)
             {
                 TaskHandle_t ezlopi_service_led_indicator_task_handle = NULL;
                 xTaskCreate(__indicator_LED_blinker, "indicator_task", EZLOPI_SERVICE_LED_INDICATOR_TASK_DEPTH, NULL, tskIDLE_PRIORITY, &ezlopi_service_led_indicator_task_handle);
-                ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_LED_INDICATOR_TASK, &ezlopi_service_led_indicator_task_handle, EZLOPI_SERVICE_LED_INDICATOR_TASK_DEPTH);
+                ezpi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_LED_INDICATOR_TASK, &ezlopi_service_led_indicator_task_handle, EZLOPI_SERVICE_LED_INDICATOR_TASK_DEPTH);
                 ret = 1;
             }
         }
@@ -304,7 +304,7 @@ static void __indicator_LED_blinker(void* params)
 
         vTaskDelay(1 / portTICK_PERIOD_MS);
     }
-    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SERVICE_LED_INDICATOR_TASK);
+    ezpi_core_process_set_is_deleted(ENUM_EZLOPI_SERVICE_LED_INDICATOR_TASK);
     vTaskDelete(NULL);
 }
 

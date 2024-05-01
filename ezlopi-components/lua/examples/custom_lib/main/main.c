@@ -24,14 +24,14 @@ static void load_custom_libs(lua_State *L)
 }
 
 static const char *prg =
-        "gpio.set_direction(" GPIO_PIN ", 2)\n"
-        "level = 1\n"
-        "for i = 1, 100 do\n"
-        "  print(string.format(\"Iteration %d..., GPIO5=%d\", i, level))\n"
-        "  gpio.set_level(" GPIO_PIN ", level)\n"
-        "  level = 1 - level\n"
-        "  rtos.delay(500)\n"
-        "end\n";
+"gpio.set_direction(" GPIO_PIN ", 2)\n"
+"level = 1\n"
+"for i = 1, 100 do\n"
+"  print(string.format(\"Iteration %d..., GPIO5=%d\", i, level))\n"
+"  gpio.set_level(" GPIO_PIN ", level)\n"
+"  level = 1 - level\n"
+"  rtos.delay(500)\n"
+"end\n";
 
 static void report(lua_State *L, int status)
 {
@@ -83,5 +83,5 @@ void app_main()
 {
     TaskHandle_t ezlopi_component_lua_custom_lib_test_task_handle = NULL;
     xTaskCreate(test, "test", EZLOPI_COMPONENT_LUA_CUSTOM_LIB_TEST_TASK_DEPTH, NULL, 5, &ezlopi_component_lua_custom_lib_test_task_handle);
-    ezlopi_core_process_set_process_info(ENUM_EZLOPI_COMPONENT_LUA_CUSTOM_LIB_TEST_TASK, &ezlopi_component_lua_custom_lib_test_task_handle, EZLOPI_COMPONENT_LUA_CUSTOM_LIB_TEST_TASK_DEPTH);
+    ezpi_core_process_set_process_info(ENUM_EZLOPI_COMPONENT_LUA_CUSTOM_LIB_TEST_TASK, &ezlopi_component_lua_custom_lib_test_task_handle, EZLOPI_COMPONENT_LUA_CUSTOM_LIB_TEST_TASK_DEPTH);
 }
