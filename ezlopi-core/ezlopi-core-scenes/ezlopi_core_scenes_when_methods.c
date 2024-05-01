@@ -425,6 +425,7 @@ int ezlopi_scene_when_is_house_mode_changed_from(l_scenes_list_v2_t* scene_node,
 {
     TRACE_W(" isHouse_mode_changed_from");
     int ret = 0;
+#if 0
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
 
     if (when_block)
@@ -465,7 +466,7 @@ int ezlopi_scene_when_is_house_mode_changed_from(l_scenes_list_v2_t* scene_node,
             }
         }
     }
-
+#endif
     return ret;
 }
 
@@ -473,6 +474,7 @@ int ezlopi_scene_when_is_House_Mode_Alarm_Phase_Range(l_scenes_list_v2_t* scene_
 {
     TRACE_W(" is_House_Mode_Alarm_Phase_Range ");
     int ret = 0;
+#if 0
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
 
     if (when_block)
@@ -500,7 +502,7 @@ int ezlopi_scene_when_is_House_Mode_Alarm_Phase_Range(l_scenes_list_v2_t* scene_
             curr_field = curr_field->next;
         }
     }
-
+#endif
     return ret;
 }
 
@@ -508,6 +510,7 @@ int ezlopi_scene_when_is_House_Mode_Switch_to_Range(l_scenes_list_v2_t* scene_no
 {
     TRACE_W(" is_House_Mode_Switch_to_Range ");
     int ret = 0;
+#if 0
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
 
     if (when_block && scene_node)
@@ -523,7 +526,7 @@ int ezlopi_scene_when_is_House_Mode_Switch_to_Range(l_scenes_list_v2_t* scene_no
             TRACE_E(" Current HouseMode_phase does not have duration ");
         }
     }
-
+#endif
     return ret;
 }
 

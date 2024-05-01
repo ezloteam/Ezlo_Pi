@@ -1064,14 +1064,14 @@ int when_function_for_repeat(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* 
                 if (0 == function_state_info->transtion_instant)
                 {
                     /*store the first trigger time*/
-                    TRACE_W("Start 'repeat' activation Sequence ......!");
+                    // TRACE_W("Start 'repeat' activation Sequence ......!");
                     function_state_info->transtion_instant = (uint32_t)xTaskGetTickCount();
                     TRACE_W("first_trigger_time[%d] ", function_state_info->transtion_instant);
                 }
 
                 /*add the count*/
                 function_state_info->transition_count++;
-                TRACE_W(" count[%d]", function_state_info->transition_count);
+                // TRACE_W(" count[%d]", function_state_info->transition_count);
 
                 /*compare with conditon*/
                 int for_count = cJSON_GetNumberValue(for_times); /*extract the type*/
@@ -1132,7 +1132,7 @@ int when_function_for_follow(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* 
                 {
                     /* trigger phase ---> stop */
                     ret = 0;
-                    // TRACE_W("restart the trigger...");
+                    TRACE_W("restart the trigger...");
 
                     /* now refreshing then block*/
                     if (false == __and_when_block_condition(scene_node, when_block))
