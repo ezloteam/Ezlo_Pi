@@ -18,6 +18,7 @@
 #include "ezlopi_core_ota.h"
 #include "ezlopi_core_reset.h"
 #include "ezlopi_core_factory_info.h"
+#include "ezlopi_core_processes.h"
 
 #include "ezlopi_service_ota.h"
 #include "EZLOPI_USER_CONFIG.h"
@@ -63,7 +64,9 @@ void ezlopi_ota_start(cJSON* url)
         memcpy(ota_url, url->valuestring, OTA_URL_SIZE);
         if (0 == __ota_in_process)
         {
-            xTaskCreate(ezlopi_ota_process, "ezlopi ota process", 4096, ota_url, 3, NULL);
+            TaskHandle_t ezlopi_core_ota_process_task_handle = NULL;
+            xTaskCreate(ezlopi_ota_process, "EzpiOTAProcess", EZLOPI_CORE_OTA_PROCESS_TASK_DEPTH, ota_url, 3, &ezlopi_core_ota_process_task_handle);
+            ezlopi_core_process_set_process_info(ENUM_EZLOPI_CORE_OTA_PROCESS_TASK, &ezlopi_core_ota_process_task_handle, EZLOPI_CORE_OTA_PROCESS_TASK_DEPTH);
         }
         else
         {
@@ -137,7 +140,7 @@ static void ezlopi_ota_process(void* pv)
     if (ret == ESP_OK)
     {
         TRACE_W("Firmware Upgrade Successful, restarting !");
-        EZPI_CORE_reboot();
+        EZPI_CORE_reset_reboot();
     }
     else
     {
@@ -146,6 +149,7 @@ static void ezlopi_ota_process(void* pv)
 
     __ota_in_process = EZLOPI_OTA_STATE_FINISH;
 
+    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_CORE_OTA_PROCESS_TASK);
     vTaskDelete(NULL);
 
     if (url)

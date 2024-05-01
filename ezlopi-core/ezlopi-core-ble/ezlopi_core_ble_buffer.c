@@ -1,11 +1,16 @@
+
+#include "../../build/config/sdkconfig.h"
+
+#ifdef CONFIG_EZPI_BLE_ENABLE
+
 #include <string.h>
 
 #include "ezlopi_core_ble_buffer.h"
 #include "EZLOPI_USER_CONFIG.h"
 
-s_linked_buffer_t *ezlopi_ble_buffer_create(esp_ble_gatts_cb_param_t *param)
+s_linked_buffer_t* ezlopi_ble_buffer_create(esp_ble_gatts_cb_param_t* param)
 {
-    s_linked_buffer_t *linked_buffer = malloc(sizeof(s_linked_buffer_t));
+    s_linked_buffer_t* linked_buffer = malloc(sizeof(s_linked_buffer_t));
     if (linked_buffer)
     {
         memset(linked_buffer, 0, sizeof(s_linked_buffer_t));
@@ -33,7 +38,7 @@ s_linked_buffer_t *ezlopi_ble_buffer_create(esp_ble_gatts_cb_param_t *param)
     return linked_buffer;
 }
 
-void ezlopi_ble_buffer_add_to_buffer(s_linked_buffer_t *buffer, esp_ble_gatts_cb_param_t *param)
+void ezlopi_ble_buffer_add_to_buffer(s_linked_buffer_t* buffer, esp_ble_gatts_cb_param_t* param)
 {
     while (buffer->next)
     {
@@ -43,7 +48,7 @@ void ezlopi_ble_buffer_add_to_buffer(s_linked_buffer_t *buffer, esp_ble_gatts_cb
     buffer->next = ezlopi_ble_buffer_create(param);
 }
 
-void ezlopi_ble_buffer_free_buffer(s_linked_buffer_t *l_buffer)
+void ezlopi_ble_buffer_free_buffer(s_linked_buffer_t* l_buffer)
 {
     if (l_buffer)
     {
@@ -58,19 +63,19 @@ void ezlopi_ble_buffer_free_buffer(s_linked_buffer_t *l_buffer)
     }
 }
 
-void ezlopi_ble_buffer_accumulate_to_start(s_linked_buffer_t *l_buffer)
+void ezlopi_ble_buffer_accumulate_to_start(s_linked_buffer_t* l_buffer)
 {
     if (l_buffer)
     {
         uint32_t tot_len = 0;
-        s_linked_buffer_t *tmp_buffer = l_buffer;
+        s_linked_buffer_t* tmp_buffer = l_buffer;
         while (tmp_buffer)
         {
             tot_len += tmp_buffer->len;
             tmp_buffer = tmp_buffer->next;
         }
 
-        uint8_t *tot_buffer = malloc(tot_len + 1);
+        uint8_t* tot_buffer = malloc(tot_len + 1);
         if (tot_buffer)
         {
             memset(tot_buffer, 0, tot_len + 1);
@@ -97,3 +102,4 @@ void ezlopi_ble_buffer_accumulate_to_start(s_linked_buffer_t *l_buffer)
         l_buffer->next = NULL;
     }
 }
+#endif // CONFIG_EZPI_BLE_ENABLE

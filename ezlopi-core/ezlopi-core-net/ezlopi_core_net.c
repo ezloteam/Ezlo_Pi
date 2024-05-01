@@ -1,6 +1,9 @@
 #include "ezlopi_core_net.h"
 
+
 static s_ezlopi_net_status_t net_stat;
+
+#ifdef CONFIG_EZPI_CORE_ENABLE_ETH
 
 void ezlopi_net_init(void)
 {
@@ -8,7 +11,9 @@ void ezlopi_net_init(void)
     ezlopi_ethernet_init();
 }
 
-s_ezlopi_net_status_t *ezlopi_get_net_status(void)
+#endif  // CONFIG_EZPI_CORE_ENABLE_ETH
+
+s_ezlopi_net_status_t* ezlopi_get_net_status(void)
 {
 
     net_stat.wifi_status = ezlopi_wifi_status();
@@ -17,3 +22,4 @@ s_ezlopi_net_status_t *ezlopi_get_net_status(void)
 
     return &net_stat;
 }
+

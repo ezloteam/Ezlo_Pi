@@ -1,5 +1,5 @@
 #include <math.h>
-#include "sdkconfig.h"
+#include "../../build/config/sdkconfig.h"
 #include "driver/gpio.h"
 #include "ezlopi_util_trace.h"
 

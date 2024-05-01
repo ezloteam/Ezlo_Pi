@@ -1,5 +1,5 @@
 #include <string.h>
-#include "sdkconfig.h"
+#include "../../build/config/sdkconfig.h"
 #include "ezlopi_util_trace.h"
 
 #include "ld2410.h"

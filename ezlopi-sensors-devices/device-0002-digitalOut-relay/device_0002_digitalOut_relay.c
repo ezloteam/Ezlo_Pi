@@ -1,4 +1,4 @@
-#include "sdkconfig.h"
+#include "../../build/config/sdkconfig.h"
 #include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_timer.h"

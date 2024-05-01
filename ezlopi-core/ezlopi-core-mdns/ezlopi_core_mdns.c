@@ -1,4 +1,6 @@
 
+#ifdef CONFIG_EZPI_SERV_MDNS_EN
+
 #include <string.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -11,11 +13,14 @@
 #include "driver/gpio.h"
 #include "netdb.h"
 
-#include "ezlopi_core_factory_info.h"
-#include "ezlopi_core_wifi.h"
-#include "ezlopi_cloud_keywords.h"
 #include "ezlopi_util_trace.h"
+#include "ezlopi_cloud_keywords.h"
+
+#include "ezlopi_core_wifi.h"
 #include "ezlopi_core_mdns.h"
+#include "ezlopi_core_processes.h"
+#include "ezlopi_core_factory_info.h"
+
 #include "EZLOPI_USER_CONFIG.h"
 
 
@@ -28,7 +33,9 @@ int EZPI_core_init_mdns(void)
 {
     int ret = 0;
 
-    xTaskCreate(__mdns_init, "mdns service init", 4 * 2048, NULL, 4, NULL);
+    TaskHandle_t ezlopi_core_mdns_service_task_handle = NULL;
+    xTaskCreate(__mdns_init, "mdns_svc", EZLOPI_CORE_MDNS_SERVICE_TASK_DEPTH, NULL, 4, &ezlopi_core_mdns_service_task_handle);
+    ezlopi_core_process_set_process_info(ENUM_EZLOPI_CORE_MDNS_SERVICE_TASK, &ezlopi_core_mdns_service_task_handle, EZLOPI_CORE_MDNS_SERVICE_TASK_DEPTH);
 
     return ret;
 }
@@ -114,7 +121,7 @@ static void ezlopi_mdns_init_service_context()
     }
 
     // Add manufacturer service
-#if CONFIG_EZPI_MDNS_ENABLE_MANUFACTURER_SERVICE == 1
+#ifdef EZPI_SERV_MDNS_MANUFACTURER_SERVICE_EN
     l_ezlopi_mdns_context_t* ezlopi_mdns_service_cntx_manufacturer = (l_ezlopi_mdns_context_t*)malloc(sizeof(l_ezlopi_mdns_context_t));
     if (ezlopi_mdns_service_cntx_manufacturer)
     {
@@ -131,10 +138,10 @@ static void ezlopi_mdns_init_service_context()
             ezlopi_mdns_add_service_context(ezlopi_mdns_service_cntx_manufacturer);
         }
     }
-#endif // CONFIG_EZPI_MDNS_ENABLE_MANUFACTURER_SERVICE
+#endif // EZPI_SERV_MDNS_MANUFACTURER_SERVICE_EN
 
     // Add brand service
-#if CONFIG_EZPI_MDNS_ENABLE_BRAND_SERVICE == 1
+#ifdef EZPI_SERV_MDNS_BRAND_SERVICE_EN
     l_ezlopi_mdns_context_t* ezlopi_mdns_service_cntx_brand = (l_ezlopi_mdns_context_t*)malloc(sizeof(l_ezlopi_mdns_context_t));
     if (ezlopi_mdns_service_cntx_brand)
     {
@@ -151,10 +158,10 @@ static void ezlopi_mdns_init_service_context()
             ezlopi_mdns_add_service_context(ezlopi_mdns_service_cntx_brand);
         }
     }
-#endif // CONFIG_EZPI_MDNS_ENABLE_BRAND_SERVICE
+#endif // EZPI_SERV_MDNS_BRAND_SERVICE_EN
 
     // Add model service
-#if CONFIG_EZPI_MDNS_ENABLE_MODEL_SERVICE == 1
+#ifdef EZPI_SERV_MDNS_MODEL_SERVICE_EN
     l_ezlopi_mdns_context_t* ezlopi_mdns_service_cntx_model = (l_ezlopi_mdns_context_t*)malloc(sizeof(l_ezlopi_mdns_context_t));
     if (ezlopi_mdns_service_cntx_model)
     {
@@ -171,10 +178,10 @@ static void ezlopi_mdns_init_service_context()
             ezlopi_mdns_add_service_context(ezlopi_mdns_service_cntx_model);
         }
     }
-#endif // CONFIG_EZPI_MDNS_ENABLE_MODEL_SERVICE
+#endif // EZPI_SERV_MDNS_MODEL_SERVICE_EN
 
     // Add name service
-#if CONFIG_EZPI_MDNS_ENABLE_NAME_SERVICE == 1
+#ifdef EZPI_SERV_MDNS_NAME_SERVICE_EN
     l_ezlopi_mdns_context_t* ezlopi_mdns_service_cntx_name = (l_ezlopi_mdns_context_t*)malloc(sizeof(l_ezlopi_mdns_context_t));
     if (ezlopi_mdns_service_cntx_name)
     {
@@ -191,7 +198,7 @@ static void ezlopi_mdns_init_service_context()
             ezlopi_mdns_add_service_context(ezlopi_mdns_service_cntx_name);
         }
     }
-#endif // CONFIG_EZPI_MDNS_ENABLE_NAME_SERVICE
+#endif // EZPI_SERV_MDNS_NAME_SERVICE_EN
 
 }
 
@@ -283,6 +290,9 @@ static void __mdns_init(void* pv)
         }
         vTaskDelay(10000 / portTICK_PERIOD_MS);
     }
+    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_CORE_MDNS_SERVICE_TASK);
     vTaskDelete(NULL);
 
 }
+
+#endif // CONFIG_EZPI_SERV_MDNS_EN

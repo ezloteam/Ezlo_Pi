@@ -7,23 +7,23 @@
    CONDITIONS OF ANY KIND, either express or implied.
 */
 
-#include "cjext.h"
-// #include <esp_log.h>
-#include <esp_eth.h>
-#include <esp_wifi.h>
-#include <esp_event.h>
-#include <sys/param.h>
-#include <esp_netif.h>
-#include <esp_system.h>
-#include <freertos/FreeRTOS.h>
-#include <freertos/task.h>
-#include <freertos/semphr.h>
-#include <esp_http_server.h>
-
 #include "../../build/config/sdkconfig.h"
 
-#include "ezlopi_util_trace.h"
+#ifdef CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER
 
+#include "esp_eth.h"
+#include "esp_wifi.h"
+#include "esp_event.h"
+#include "sys/param.h"
+#include "esp_netif.h"
+#include "esp_system.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "freertos/semphr.h"
+#include "esp_http_server.h"
+
+#include "cjext.h"
+#include "ezlopi_util_trace.h"
 #include "ezlopi_cloud_constants.h"
 
 #include "ezlopi_core_api.h"
@@ -37,8 +37,6 @@
 #include "ezlopi_service_ws_server_clients.h"
 #include "EZLOPI_USER_CONFIG.h"
 
-
-// #if defined(CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER)
 
 typedef struct s_async_resp_arg
 {
@@ -470,10 +468,8 @@ static void __wifi_connection_event(esp_event_base_t event_base, int32_t event_i
     }
 }
 
-
-// #endif // CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER
-
 void ezlpi_service_ws_server_dummy(void)
 {
     TRACE_D("I'm dummy");
 }
+#endif // CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER

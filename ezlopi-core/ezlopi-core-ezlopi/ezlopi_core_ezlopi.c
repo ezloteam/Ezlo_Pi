@@ -19,9 +19,9 @@
 #include "ezlopi_core_scenes_scripts.h"
 #include "ezlopi_core_scenes_expressions.h"
 
-#ifdef CONFIG_EZPI_CORE_ENABLE_ETH
+#ifdef CONFIG_EZPI_CORE_ETHERNET_EN
 #include "ezlopi_core_ethernet.h"
-#endif // CONFIG_EZPI_CORE_ENABLE_ETH
+#endif // CONFIG_EZPI_CORE_ETHERNET_EN
 
 #include "ezlopi_hal_system_info.h"
 
@@ -29,8 +29,9 @@ static void ezlopi_initialize_devices_v3(void);
 
 void ezlopi_init(void)
 {
-    // Init memories
+    // Init memories  
     ezlopi_nvs_init();
+    EZPI_HAL_uart_init();
 
 #if defined(CONFIG_EZPI_WEBSOCKET_CLIENT) || defined(CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER)
     ezlopi_core_buffer_init(CONFIG_EZPI_CORE_STATIC_BUFFER_SIZE); // allocate 10kB
@@ -40,6 +41,7 @@ void ezlopi_init(void)
     ESP_ERROR_CHECK(esp_event_loop_create_default());
 
     ezlopi_factory_info_v3_init();
+
     print_factory_info_v3();
 
     ezlopi_event_group_create();
@@ -55,7 +57,7 @@ void ezlopi_init(void)
     ezlopi_initialize_devices_v3();
     vTaskDelay(10);
 
-#if defined(CONFIG_EZLPI_SERV_ENABLE_MODES)
+#if defined(CONFIG_EZPI_SERV_ENABLE_MODES)
     ezlopi_core_modes_init();
 #endif
 
@@ -65,11 +67,11 @@ void ezlopi_init(void)
     ezlopi_scenes_scripts_init();
     ezlopi_scenes_expressions_init();
     ezlopi_scenes_init_v2();
-#endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+#endif // CONFIG_EZPI_SERV_MESHBOT_EN
 
 #if defined(CONFIG_EZPI_CORE_ENABLE_ETH)
     ezlopi_ethernet_init();
-#endif // CONFIG_EZPI_CORE_ENABLE_ETH
+#endif // CONFIG_EZPI_CORE_ETHERNET_EN
 
     uint32_t boot_count = ezlopi_system_info_get_boot_count();
 

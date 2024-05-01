@@ -394,7 +394,7 @@ int ezlopi_scene_when_is_user_lock_operation(l_scenes_list_v2_t* scene_node, voi
     return 0;
 }
 
-#if defined(CONFIG_EZLPI_SERV_ENABLE_MODES)
+#if defined(CONFIG_EZPI_SERV_ENABLE_MODES)
 int ezlopi_scene_when_is_house_mode_changed_to(l_scenes_list_v2_t* scene_node, void* arg)
 {
     //TRACE_W(" isHouse_mode ");
@@ -443,7 +443,7 @@ int ezlopi_scene_when_is_house_mode_changed_from(l_scenes_list_v2_t* scene_node,
     TRACE_W("Warning: when-method 'is_house_mode_changed_from' not implemented!");
     return 0;
 }
-#endif // CONFIG_EZLPI_SERV_ENABLE_MODES
+#endif // CONFIG_EZPI_SERV_ENABLE_MODES
 
 int ezlopi_scene_when_is_device_state(l_scenes_list_v2_t* scene_node, void* arg)
 {
@@ -632,7 +632,7 @@ int ezlopi_scene_when_is_cloud_state(l_scenes_list_v2_t* scene_node, void* arg)
             else
             {
                 ret = (0 == strncmp(value_field->field_value.u_value.value_string, "disconnected", 14));
-                TRACE_S("NMA_DISCONNECTED, ret = %d", ret);
+                // TRACE_S("NMA_DISCONNECTED, ret = %d", ret);
             }
         }
     }
@@ -1142,7 +1142,6 @@ int ezlopi_scene_when_and(l_scenes_list_v2_t* scene_node, void* arg)
 
 int ezlopi_scene_when_not(l_scenes_list_v2_t* scene_node, void* arg)
 {
-    TRACE_E("not");
     int ret = 0;
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (when_block)
@@ -1155,14 +1154,13 @@ int ezlopi_scene_when_not(l_scenes_list_v2_t* scene_node, void* arg)
             if (scene_method)
             {
                 // TRACE_E("Method Name : %s", ezlopi_scene_get_scene_method_name(value_when_block->block_options.method.type));
-                // iterate through all '_when_blocks_'
                 ret = !(scene_method(scene_node, (void*)value_when_block)); // if all the block-calls are false, then return 1;
             }
 
             value_when_block = value_when_block->next;
         }
     }
-    TRACE_I("not => %d", ret);
+
     return ret;
 }
 

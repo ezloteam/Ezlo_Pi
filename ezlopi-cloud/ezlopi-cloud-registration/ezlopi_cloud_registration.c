@@ -14,6 +14,7 @@
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_websocket_client.h"
 #include "ezlopi_core_ezlopi_broadcast.h"
+#include "ezlopi_core_processes.h"
 
 #include "ezlopi_service_webprov.h"
 
@@ -25,7 +26,8 @@ void registration_init(void)
 {
     if (NULL == __registration_task_handle)
     {
-        xTaskCreate(registration_process, "registration_process", 2 * 2048, NULL, 2, &__registration_task_handle);
+        xTaskCreate(registration_process, "registration_process", EZLOPI_CLOUD_REGISTRATION_PROCESS_STACK_DEPTH, NULL, 2, &__registration_task_handle);
+        ezlopi_core_process_set_process_info(ENUM_EZLOPI_CLOUD_REGISTRATION_PROCESS_STACK, &__registration_task_handle, EZLOPI_CLOUD_REGISTRATION_PROCESS_STACK_DEPTH);
     }
 }
 
@@ -90,5 +92,6 @@ static void registration_process(void* pv)
     }
 
     __registration_task_handle = NULL;
+    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_CLOUD_REGISTRATION_PROCESS_STACK);
     vTaskDelete(NULL);
 }

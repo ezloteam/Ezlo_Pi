@@ -1,3 +1,8 @@
+
+#include "../../build/config/sdkconfig.h"
+
+#ifdef CONFIG_EZPI_BLE_ENABLE
+
 #include <string.h>
 
 #include "ezlopi_util_trace.h"
@@ -437,3 +442,5 @@ void ezlopi_ble_gatt_print_uuid(esp_bt_uuid_t* uuid, char* msg)
     }
 #endif
 }
+
+#endif // CONFIG_EZPI_BLE_ENABLE

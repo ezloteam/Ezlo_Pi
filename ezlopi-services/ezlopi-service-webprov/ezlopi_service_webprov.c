@@ -17,7 +17,9 @@
 #include "ezlopi_core_api_methods.h"
 #include "ezlopi_core_event_group.h"
 #include "ezlopi_core_factory_info.h"
+#include "ezlopi_core_api_methods.h"
 #include "ezlopi_core_cjson_macros.h"
+#include "ezlopi_core_processes.h"
 #include "ezlopi_core_websocket_client.h"
 #include "ezlopi_core_ezlopi_broadcast.h"
 
@@ -49,8 +51,12 @@ uint32_t ezlopi_service_web_provisioning_get_message_count(void)
 
 void ezlopi_service_web_provisioning_init(void)
 {
-    xTaskCreate(__config_check, "web-provisioning config check", 4 * 2048, NULL, 5, NULL);
-    xTaskCreate(__fetch_wss_endpoint, "web-provisioning fetch wss endpoint", 3 * 2048, NULL, 5, &ezlopi_update_config_notifier);
+
+    TaskHandle_t ezlopi_service_web_prov_config_check_task_handle = NULL;
+    xTaskCreate(__config_check, "WebProvCfgChk", EZLOPI_SERVICE_WEB_PROV_CONFIG_CHECK_TASK_DEPTH, NULL, 5, &ezlopi_service_web_prov_config_check_task_handle);
+    ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_WEB_PROV_CONFIG_CHECK_TASK, &ezlopi_service_web_prov_config_check_task_handle, EZLOPI_SERVICE_WEB_PROV_CONFIG_CHECK_TASK_DEPTH);
+    xTaskCreate(__fetch_wss_endpoint, "WebProvFetchWSS", EZLOPI_SERVICE_WEB_PROV_FETCH_WSS_TASK_DEPTH, NULL, 5, &ezlopi_update_config_notifier);
+    ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_WEB_PROV_FETCH_WSS_TASK, &ezlopi_update_config_notifier, EZLOPI_SERVICE_WEB_PROV_FETCH_WSS_TASK_DEPTH);
 }
 
 void ezlopi_service_web_provisioning_deinit(void)
@@ -146,11 +152,11 @@ static void __fetch_wss_endpoint(void* pv)
         free(ca_certificate);
         free(ssl_shared_key);
         free(ssl_private_key);
-        
+
         vTaskDelay(2000 / portTICK_RATE_MS);
         vTaskDelay(2000 / portTICK_RATE_MS);
     }
-
+    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SERVICE_WEB_PROV_FETCH_WSS_TASK);
     vTaskDelete(NULL);
 }
 
@@ -186,6 +192,10 @@ static int __send_cjson_data_to_nma_websocket(cJSON* cj_data)
             if (true == cJSON_PrintPreallocated(cj_data, data_buffer, buffer_len, false))
             {
                 ret = __send_str_data_to_nma_websocket(data_buffer);
+            }
+            else
+            {
+                TRACE_E("FAILED!");
             }
 
             ezlopi_core_buffer_release();
@@ -332,6 +342,11 @@ static void __config_check(void* pv)
     ezlopi_factory_info_v3_free(provision_token);
     ezlopi_factory_info_v3_free(provisioning_server);
 
+    // free(ca_certificate);
+    // free(provision_token);
+    // free(provisioning_server);
+
+    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SERVICE_WEB_PROV_CONFIG_CHECK_TASK);
     vTaskDelete(NULL);
 }
 
@@ -414,8 +429,6 @@ static uint8_t __config_update(void* arg)
     {
         TRACE_E("Error parsing JSON.\n");
     }
-
     return ret;
 }
-
 #endif // CONFIG_EZPI_WEBSOCKET_CLIENT

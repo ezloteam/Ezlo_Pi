@@ -9,9 +9,14 @@ set(EZLOPI_SERVICE_COMPONENTS
         ezlopi-service-uart
 )
 
+set (EZLOPI_CORE_COMPONENTS
+        ezlopi-core-processes
+)
+
 
 idf_component_register(SRCS "ezlopi_core_wifi.c" "ezlopi_core_wifi_ap.c" "${wifi_src}"
     INCLUDE_DIRS "."
     REQUIRES    ${EZLOPI_COMPONENTS}
+                ${EZLOPI_CORE_COMPONENTS}
                 ${EZLOPI_SERVICE_COMPONENTS}
         )

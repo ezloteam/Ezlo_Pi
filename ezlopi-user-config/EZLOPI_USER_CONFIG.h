@@ -1,27 +1,26 @@
 #ifndef _EZLOPI_USER_CONFIG_H_
 #define _EZLOPI_USER_CONFIG_H_
 
-#if 1
 #include "../build/config/sdkconfig.h"
 #include "ezlopi_util_heap.h"
 
 #if defined(CONFIG_EZPI_DISTRO_FULL_OPTION)
 #define CONFIG_EZPI_DISTRO_NAME "EZPI_DISTRO_FULL_OPTION"
-#elif defined(CONFIG_EZLOPI_DISTRO_LOCAL)
+#elif defined(CONFIG_EZPI_DISTRO_LOCAL)
 #define CONFIG_EZPI_DISTRO_NAME "EZLOPI_DISTRO_LOCAL"
-#elif defined(CONFIG_EZLOPI_DISTRO_LOCAL_MESHBOT)
+#elif defined(CONFIG_EZPI_DISTRO_LOCAL_MESHBOT)
 #define CONFIG_EZPI_DISTRO_NAME "EZLOPI_DISTRO_LOCAL_MESHBOT"
 #elif defined(CONFIG_EZLOPI_DISTRO_CLOUD)
 #define CONFIG_EZPI_DISTRO_NAME "EZLOPI_DISTRO_CLOUD"
-#elif defined(CONFIG_EZLOPI_DISTRO_CLOUD_MESHBOT)
+#elif defined(CONFIG_EZPI_DISTRO_CLOUD_MESHBOT)
 #define CONFIG_EZPI_DISTRO_NAME "EZLOPI_DISTRO_CLOUD_MESHBOT"
-#elif defined(CONFIG_EZLOPI_DISTRO_BLE_CLOUD)
+#elif defined(CONFIG_EZPI_DISTRO_BLE_CLOUD)
 #define CONFIG_EZPI_DISTRO_NAME "EZLOPI_DISTRO_BLE_CLOUD"
-#elif defined(CONFIG_EZLOPI_DISTRO_WIFI_HUB)
+#elif defined(CONFIG_EZPI_DISTRO_WIFI_HUB)
 #define CONFIG_EZPI_DISTRO_NAME "EZLOPI_DISTRO_WIFI_HUB"
-#elif defined(CONFIG_EZLOPI_DISTRO_BLE_HUB)
+#elif defined(CONFIG_EZPI_DISTRO_BLE_HUB)
 #define CONFIG_EZPI_DISTRO_NAME "EZLOPI_DISTRO_BLE_HUB"
-#elif defined(CONFIG_EZLOPI_DISTRO_MINIMAL)
+#elif defined(CONFIG_EZPI_DISTRO_MINIMAL)
 #define CONFIG_EZPI_DISTRO_NAME "EZLOPI_DISTRO_MINIMAL"
 #else
 #define CONFIG_EZPI_DISTRO_NAME "EZLOPI_DISTRO_CUSTOM"
@@ -52,12 +51,39 @@
 
 
 
-#define EZLOPI_SERIAL_API_VERSION "1.0.0"
+#if defined(CONFIG_EZPI_HEAP_ENABLE)
+#ifdef malloc
+#undef malloc
+#endif
+#define malloc(x) ezlopi_util_heap_malloc(x, __FILENAME__, __LINE__)
 
-#else
+#ifdef calloc
+#undef calloc
+#endif
+#define calloc(x, y) ezlopi_util_heap_calloc(x, y, __FILENAME__, __LINE__)
+
+#ifdef free
+#undef free
+#endif
+#define free(x) ezlopi_util_heap_free(x, __FILENAME__, __LINE__)
+
+#ifdef realloc
+#undef realloc
+#endif
+#define realloc(x, y) ezlopi_util_heap_realloc(x, y, __FILENAME__, __LINE__)
+
+#endif
+
+
+// #else
 /////////////////////////////////////////////////////////////
 /////////////// Do not change here //////////////////
 ////////////////////////////////////////////////////////////
+
+
+// EzloPi Versions
+#define EZPI_VERSION_API_SERIAL "1.0.0"
+#define EZPI_VERSION_API_BLE "1.0.0"
 
 // User Configs
 #define EZPI_USR_CONFIG_ENABLE_HEARTBIT_LED
@@ -76,11 +102,46 @@
 #define EZPI_SERV_ENABLE_MESHBOTS
 
 // EzloPi BLE Service Pass key 
-#define EZLOPI_BLE_ENALBE_PASSKEY 0
-#define EZLOPI_BLE_ENALBE_PAIRING 1
+#define EZPI_SERV_BLE_PASSKEY_EN 0
+#define EZPI_SERV_BLE_PAIRING_EN 1
+#define EZPI_SERV_BLE_ENABLE_READ_PROV
+#define EZPI_SERV_BLE_ENABLE_STAT_PROV
 
-#define EZLOPI_SERIAL_API_VERSION "1.0.0"
-#define EZLOPI_BLE_API_VERSION "1.0.0"
+// EzloPi WiFi Configuration 
+#define EZPI_CORE_WIFI_CONNECT_TIMEOUT 5000
+#define EZPI_CORE_WIFI_PASS_CHAR_MIN_LEN 8
+#define EZPI_CORE_WIFI_CONN_ATTEMPT_INTERVAL 5000
+#define EZPI_CORE_WIFI_CONN_RETRY_ATTEMPT 2
+
+
+// EzloPi Default Serial Configuartion 
+
+#define EZPI_SERV_UART_NUM_DEFAULT UART_NUM_0
+
+#define EZPI_SERV_UART_NUM EZPI_SERV_UART_NUM_DEFAULT
+
+#define EZPI_SERV_UART_BAUD_DEFAULT      (uint32_t)115200
+#define EZPI_SERV_UART_PARITY_DEFAULT      (uint32_t)UART_PARITY_DISABLE
+#define EZPI_SERV_UART_START_BIT_DEFAULT      (uint32_t)0
+#define EZPI_SERV_UART_STOP_BIT_DEFAULT      (uint32_t)1
+#define EZPI_SERV_UART_FRAME_SIZE_DEFAULT      (uint32_t)8
+#define EZPI_SERV_UART_FLOW_CTRL_DEFAULT      (uint32_t)UART_HW_FLOWCTRL_DISABLE
+
+#define EZPI_SERV_UART_RX_BUFFER_SIZE (uint32_t)3096
+
+#define EZPI_UART_SERV_FLW_CTRL_STR_SIZE 10
+
+#if defined(CONFIG_IDF_TARGET_ESP32)
+#define EZPI_SERV_UART_TXD_PIN (GPIO_NUM_1)
+#define EZPI_SERV_UART_RXD_PIN (GPIO_NUM_3)
+#elif defined(CONFIG_IDF_TARGET_ESP32S2)
+#elif defined(CONFIG_IDF_TARGET_ESP32C3)
+#define EZPI_SERV_UART_TXD_PIN (GPIO_NUM_21)
+#define EZPI_SERV_UART_RXD_PIN (GPIO_NUM_20)
+#elif defined(CONFIG_IDF_TARGET_ESP32S3)
+#define EZPI_SERV_UART_TXD_PIN (GPIO_NUM_43)
+#define EZPI_SERV_UART_RXD_PIN (GPIO_NUM_44)
+#endif
 
 /////////////////////////////////////////////////////////////
 /////////////// Disable user configs here //////////////////
@@ -93,4 +154,7 @@
 #undef EZPI_UTIL_ENABLE_TRACE
 #endif
 
-#endif // _EZLOPI_USER_CONFIG_H_
+#undef EZPI_SERV_BLE_ENABLE_READ_PROV
+#undef EZPI_SERV_BLE_ENABLE_STAT_PROV
+
+// #endif // _EZLOPI_USER_CONFIG_H_

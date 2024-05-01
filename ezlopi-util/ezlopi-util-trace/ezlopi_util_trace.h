@@ -1,7 +1,7 @@
 #ifndef _EZLOPI_UTIL_H_
 #define _EZLOPI_UTIL_H_
 
-#include "sdkconfig.h"
+#include "../../build/config/sdkconfig.h"
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 #include "EZLOPI_USER_CONFIG.h"
@@ -11,11 +11,11 @@ extern "C"
 {
 #endif
 
-#ifdef CONFIG_EZPI_UTIL_ENABLE_TRACE
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
 #define ENABLE_TRACE 1
 #else
 #define ENABLE_TRACE 0
-#endif // CONFIG_EZPI_UTIL_ENABLE_TRACE
+#endif // CONFIG_EZPI_UTIL_TRACE_EN
 
 
     void __dump(const char* file_name, uint32_t line, char* buffer_name, void* _buff, uint32_t ofs, uint32_t cnt);

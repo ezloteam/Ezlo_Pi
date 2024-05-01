@@ -10,6 +10,7 @@
 #include <freertos/task.h>
 
 #include "ezlopi_util_trace.h"
+
 #include "EZLOPI_USER_CONFIG.h"
 
 #include "ezlopi_core_ezlopi.h"
@@ -28,14 +29,17 @@
 #include "ezlopi_util_heap.h"
 
 #include "pt.h"
+#include "ezlopi_core_ble_config.h"
+#include "ezlopi_core_processes.h"
+#include "ezlopi_util_heap.h"
 
-static void __blinky(void* pv);
-
+static void blinky(void* pv);
 
 void app_main(void)
 {
-#if 1
+#ifdef CONFIG_EZPI_ENABLE_LED_INDICATOR
     ezlopi_service_led_indicator_init();
+#endif // CONFIG_EZPI_ENABLE_LED_INDICATOR
     gpio_install_isr_service(0);
 
     gpio_isr_service_init();
@@ -43,20 +47,18 @@ void app_main(void)
     ezlopi_init();
 
 #if defined(CONFIG_EZPI_ENABLE_UART_PROVISIONING)
-    // EZPI_SERVICE_uart_init();
+    EZPI_SERV_uart_init();
 #endif
 
     timer_service_init();
 
-#if defined(CONFIG_EZLOPI_BLE_ENABLE)
+#if defined(CONFIG_EZPI_BLE_ENABLE)
     ezlopi_ble_service_init();
 #endif
 
 #if defined(CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER) || defined(CONFIG_EZPI_WEBSOCKET_CLIENT)
     ezlopi_service_broadcast_init();
 #endif
-
-    ezlpi_service_ws_server_dummy();
 
 #if defined(CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER)
     ezlopi_service_ws_server_start();
@@ -70,31 +72,35 @@ void app_main(void)
     ezlopi_service_ota_init();
 #endif
 
-#if CONFIG_EZLPI_SERV_ENABLE_MODES
+#if CONFIG_EZPI_SERV_ENABLE_MODES
     ezlopi_service_modes_init();
 #endif
 
 #if CONFIG_EZPI_SERV_ENABLE_MESHBOTS
     ezlopi_scenes_meshbot_init();
 #endif
-#endif
-    xTaskCreate(__blinky, "__blinky", 5 * 2048, NULL, 0, NULL);
+
+    TaskHandle_t ezlopi_main_blinky_task_handle = NULL;
+    xTaskCreate(blinky, "blinky", EZLOPI_MAIN_BLINKY_TASK_DEPTH, NULL, 1, &ezlopi_main_blinky_task_handle);
+    ezlopi_core_process_set_process_info(ENUM_EZLOPI_MAIN_BLINKY_TASK, &ezlopi_main_blinky_task_handle, EZLOPI_MAIN_BLINKY_TASK_DEPTH);
+
 }
 
-
-static void __blinky(void* pv)
+static void blinky(void* pv)
 {
     uint32_t low_heap_start_time = xTaskGetTickCount();
 
     while (1)
     {
         float free_heap_kb = esp_get_free_heap_size() / 1024.0;
+        UBaseType_t total_task_numbers = uxTaskGetNumberOfTasks();
+        TaskStatus_t task_array[total_task_numbers];
 
         trace_wb("----------------------------------------------");
         trace_wb("esp_get_free_heap_size - %.02f kB", free_heap_kb);
         trace_wb("esp_get_minimum_free_heap_size: %.02f kB", esp_get_minimum_free_heap_size() / 1024.0);
-        trace_wb("----------------------------------------------");
 
+#ifdef CONFIG_EZPI_HEAP_ENABLE
         ezlopi_util_heap_trace();
 
         if (free_heap_kb <= 10)
@@ -115,7 +121,31 @@ static void __blinky(void* pv)
             low_heap_start_time = xTaskGetTickCount();
         }
 
+#endif // CONFIG_EZPI_HEAP_ENABLE
+
+#if 0
+        uxTaskGetSystemState(task_array, total_task_numbers, NULL);
+
+        for (int i = 0; i < total_task_numbers; i++) {
+            if (task_array[i].pcTaskName)
+            {
+                TRACE_D("Process Name: %s, \tPID: %d, \tBase: %p, \tWatermark: %.2f KB",
+                    task_array[i].pcTaskName,
+                    task_array[i].xTaskNumber,
+                    task_array[i].pxStackBase,
+                    task_array[i].usStackHighWaterMark / 1024.0);
+            }
+        }
+#endif 
+
+        TRACE_D("----------------------------------------------");
+
+#ifdef CONFIG_EZPI_HEAP_ENABLE
+
         ezlopi_util_heap_flush();
+
+#endif // CONFIG_EZPI_HEAP_ENABLE
+
         vTaskDelay(5000 / portTICK_PERIOD_MS);
     }
 }

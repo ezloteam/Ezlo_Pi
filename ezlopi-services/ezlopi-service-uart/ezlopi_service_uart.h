@@ -3,7 +3,6 @@
 
 #include <string.h>
 
-#include "driver/uart.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "EZLOPI_USER_CONFIG.h"
@@ -31,8 +30,8 @@ extern "C"
 #define EZLOPI_WIFI_CONN_RETRY_ATTEMPT 2
 #define EZLOPI_WIFI_CONN_ATTEMPT_INTERVAL 5000
 
-    void EZPI_SERVICE_uart_init(void);
-    int EZPI_SERVICE_uart_tx_data(int len, uint8_t* data);
+    void EZPI_SERV_uart_init(void);
+    int EZPI_SERV_uart_tx_data(int len, uint8_t* data);
 
 #endif
 
