@@ -1056,38 +1056,43 @@ int when_function_for_repeat(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* 
         cJSON* for_interval = cJSON_GetObjectItem(cj_func_opr, "seconds");
         if (for_times && for_interval)
         {
-            int for_count = cJSON_GetNumberValue(for_times); /*extract the type*/
-            if (for_count)
+            /* first get the product of all children states*/
+            s_when_function_t* function_state_info = (s_when_function_t*)scene_node->when_block->fields->user_arg;
+            bool transition_state = __and_when_block_condition(scene_node, when_block);
+            if ((transition_state) && (0 == function_state_info->current_state)) /*previous state?*/
             {
-                /* first get the product of all children states*/
-                bool transition_state = __and_when_block_condition(scene_node, when_block);
-
-                s_when_function_t* function_state_info = (s_when_function_t*)scene_node->when_block->fields->user_arg;
-
-                if ((transition_state) && (0 == function_state_info->current_state)) /*previous state?*/
+                if (0 == function_state_info->transtion_instant)
                 {
-                    if (0 == function_state_info->transtion_instant)
-                    { /*store the first trigger time*/
-                        TRACE_W("here!");
-                        function_state_info->transtion_instant = (uint32_t)xTaskGetTickCount();
-                    }
-
-                    int threshold_time = cJSON_GetNumberValue(for_interval);
-                    function_state_info->transition_count++;
-                    TRACE_S("trigger_time[%d] count[%d]", function_state_info->transtion_instant, function_state_info->transition_count);
-                    if (function_state_info->transition_count >= for_count)
-                    {
-                        if ((((uint32_t)xTaskGetTickCount() - function_state_info->transtion_instant) / 1000) <= threshold_time)
-                        {
-                            TRACE_W("here2! dur [%d]", (((uint32_t)xTaskGetTickCount() - function_state_info->transtion_instant) / 1000));
-                            ret = 1;
-                        }
-                        function_state_info->transtion_instant = 0;
-                        function_state_info->transition_count = 0;
-                    }
+                    /*store the first trigger time*/
+                    TRACE_W("Start 'repeat' activation Sequence ......!");
+                    function_state_info->transtion_instant = (uint32_t)xTaskGetTickCount();
+                    TRACE_W("first_trigger_time[%d] ", function_state_info->transtion_instant);
                 }
-                function_state_info->current_state = transition_state;
+
+                /*add the count*/
+                function_state_info->transition_count++;
+                TRACE_W(" count[%d]", function_state_info->transition_count);
+
+                /*compare with conditon*/
+                int for_count = cJSON_GetNumberValue(for_times); /*extract the type*/
+                if (function_state_info->transition_count >= for_count)
+                {
+                    uint32_t dur = (((uint32_t)xTaskGetTickCount() - function_state_info->transtion_instant) / 1000);
+                    int threshold_time = cJSON_GetNumberValue(for_interval);
+                    if (dur <= threshold_time)// from 'start' till 'now'
+                    {
+                        TRACE_W(" Successful activation sequence within [%dsec] ; threshold [%dsec]", dur, threshold_time);
+                        ret = 1;
+                    }
+                    else
+                    {
+                        TRACE_E(" Time-Out !! consumed[%d (>%dsec)]", dur, threshold_time);
+                    }
+                    function_state_info->transtion_instant = 0;
+                    function_state_info->transition_count = 0;
+                }
             }
+            function_state_info->current_state = transition_state;
         }
     }
 
@@ -1267,7 +1272,7 @@ int when_function_for_latch(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* w
         if (for_enabled)
         {
             s_when_function_t* function_state_info = (s_when_function_t*)scene_node->when_block->fields->user_arg;
-            if ((0 == function_state_info->current_state) && (cJSON_True == for_enabled->type)) /* if the trigger phase has not started */
+            if ((0 == function_state_info->current_state) && (cJSON_True == for_enabled->type) && (0 == function_state_info->transtion_instant)) /* if the trigger phase has not started */
             {
                 /* first get the product of all children states*/
                 if (__and_when_block_condition(scene_node, when_block))  /*if : previous state = 0*/
@@ -1277,18 +1282,14 @@ int when_function_for_latch(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* w
                     TRACE_S("start_latched_time[%d]", (uint32_t)xTaskGetTickCount());
                 }
             }
-            else if ((1 == function_state_info->current_state) && (cJSON_False == for_enabled->type))
+            else if (cJSON_False == for_enabled->type)
             {
                 function_state_info->current_state = 0;
                 function_state_info->transtion_instant = 0;
                 TRACE_S("reset_latched_time[%d]", (uint32_t)xTaskGetTickCount());
             }
-            else
-            {
-                TRACE_W("Latch state already achieved -> current_state = [%d]", function_state_info->current_state);
-
-            }
             ret = function_state_info->current_state;
+            TRACE_W("ret-> current_state = [%d] , active_instant[%d]", function_state_info->current_state, function_state_info->transtion_instant);
         }
     }
 

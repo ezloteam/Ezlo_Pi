@@ -561,7 +561,6 @@ int ezlopi_scene_then_toggle_value(l_scenes_list_v2_t* curr_scene, void* arg)
 
             if (item_id > 0)
             {
-
                 l_ezlopi_item_t* curr_item = ezlopi_device_get_item_by_id(item_id);
                 if ((curr_item) && (EZLOPI_DEVICE_INTERFACE_DIGITAL_OUTPUT == curr_item->interface_type))
                 {
@@ -609,7 +608,7 @@ int ezlopi_scene_then_toggle_value(l_scenes_list_v2_t* curr_scene, void* arg)
                                 }
                                 else
                                 {
-                                    ret = -1;
+                                    ret = 0;
                                     TRACE_E(" 'item_id[%d]' neither 'boolean' nor 'int' ;  Value-type mis-matched!  ", item_id);
                                 }
                                 cJSON_Delete(cj_result_value);
