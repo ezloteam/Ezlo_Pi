@@ -96,7 +96,7 @@ static void __blinky(void* pv)
         trace_wb("----------------------------------------------");
 
         ezlopi_util_heap_trace();
-        
+
         if (free_heap_kb <= 10)
         {
             TRACE_W("CRITICAL-WARNING: low heap detected..");
