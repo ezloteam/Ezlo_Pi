@@ -1,7 +1,7 @@
 #ifndef _EZLOPI_CORE_BLE_CONFIG_H_
 #define _EZLOPI_CORE_BLE_CONFIG_H_
 
-#ifdef CONFIG_EZLOPI_BLE_ENABLE
+#ifdef CONFIG_EZPI_BLE_ENABLE
 
 #include "esp_gatts_api.h"
 
@@ -58,6 +58,6 @@ typedef struct s_gatt_service
     struct s_gatt_service* next;
 } s_gatt_service_t;
 
-#endif  // CONFIG_EZLOPI_BLE_ENABLE
+#endif  // CONFIG_EZPI_BLE_ENABLE
 
 #endif // _EZLOPI_CORE_BLE_CONFIG_H_

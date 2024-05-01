@@ -1,7 +1,7 @@
 
 #include "../../build/config/sdkconfig.h"
 
-#ifdef CONFIG_EZLOPI_BLE_ENABLE
+#ifdef CONFIG_EZPI_BLE_ENABLE
 
 #include <string.h>
 
@@ -101,4 +101,4 @@ void ezlopi_ble_buffer_accumulate_to_start(s_linked_buffer_t* l_buffer)
         l_buffer->next = NULL;
     }
 }
-#endif // CONFIG_EZLOPI_BLE_ENABLE
+#endif // CONFIG_EZPI_BLE_ENABLE

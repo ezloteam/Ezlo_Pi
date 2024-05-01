@@ -2,7 +2,7 @@
 #include "../../build/config/sdkconfig.h"
 
 
-#ifdef CONFIG_EZLOPI_BLE_ENABLE
+#ifdef CONFIG_EZPI_BLE_ENABLE
 
 #include <string.h>
 
@@ -227,4 +227,4 @@ static void __process_auth_command(cJSON* root)
     }
 #endif
 }
-#endif // CONFIG_EZLOPI_BLE_ENABLE
+#endif // CONFIG_EZPI_BLE_ENABLE

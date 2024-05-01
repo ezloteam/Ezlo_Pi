@@ -51,7 +51,7 @@ void app_main(void)
 
     timer_service_init();
 
-#if defined(CONFIG_EZLOPI_BLE_ENABLE)
+#if defined(CONFIG_EZPI_BLE_ENABLE)
     ezlopi_ble_service_init();
 #endif
 

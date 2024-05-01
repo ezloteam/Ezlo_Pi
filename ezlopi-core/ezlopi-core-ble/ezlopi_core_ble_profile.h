@@ -1,7 +1,7 @@
 #ifndef _EZLOPI_CORE_BLE_PROFILE_H_
 #define _EZLOPI_CORE_BLE_PROFILE_H_
 
-#ifdef CONFIG_EZLOPI_BLE_ENABLE
+#ifdef CONFIG_EZPI_BLE_ENABLE
 
 s_gatt_service_t* ezlopi_ble_profile_get_by_app_id(uint16_t app_id);
 s_gatt_service_t* ezlopi_ble_profile_get_service_by_gatts_if(uint16_t gatts_if);
@@ -29,6 +29,6 @@ void ezlopi_ble_gatt_print_service(s_gatt_service_t* service);
 void ezlopi_ble_gatt_print_uuid(esp_bt_uuid_t* uuid, char* msg);
 void ezlopi_ble_profile_print(void);
 
-#endif // CONFIG_EZLOPI_BLE_ENABLE
+#endif // CONFIG_EZPI_BLE_ENABLE
 
 #endif // _EZLOPI_CORE_BLE_PROFILE_H_

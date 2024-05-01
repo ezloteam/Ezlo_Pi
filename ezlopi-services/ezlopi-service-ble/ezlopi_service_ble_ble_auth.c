@@ -1,7 +1,7 @@
 
 #include "../../build/config/sdkconfig.h"
 
-#ifdef CONFIG_EZLOPI_BLE_ENABLE
+#ifdef CONFIG_EZPI_BLE_ENABLE
 // #TODO ADD guard for key enable
 #include <string.h>
 
@@ -111,4 +111,4 @@ char* ezlopi_ble_auth_status_to_string(e_auth_status_t status)
     return ret;
 }
 
-#endif // CONFIG_EZLOPI_BLE_ENABLE
+#endif // CONFIG_EZPI_BLE_ENABLE

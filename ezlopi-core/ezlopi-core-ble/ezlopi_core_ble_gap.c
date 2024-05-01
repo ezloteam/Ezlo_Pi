@@ -1,6 +1,6 @@
 #include "../../build/config/sdkconfig.h"
 
-#ifdef CONFIG_EZLOPI_BLE_ENABLE
+#ifdef CONFIG_EZPI_BLE_ENABLE
 
 #include <string.h>
 
@@ -224,7 +224,7 @@ void ezlopi_ble_gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_p
         break;
     }
 
-#if (1 == CONFIG_EZLOPI_BLE_ENALBE_PAIRING)
+#if (1 == CONFIG_EZPI_BLE_ENALBE_PAIRING)
     case ESP_GAP_BLE_PASSKEY_REQ_EVT: // 12
     {
         break;
@@ -312,7 +312,7 @@ void ezlopi_ble_gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_p
         ezlopi_ble_setup_adv_config();
         break;
     }
-#if (1 == CONFIG_EZLOPI_BLE_ENALBE_PAIRING)
+#if (1 == CONFIG_EZPI_BLE_ENALBE_PAIRING)
     case ESP_GAP_BLE_SET_LOCAL_PRIVACY_COMPLETE_EVT: // 22
     {
         ezlopi_ble_setup_adv_config();
@@ -852,4 +852,4 @@ static void ezlopi_ble_setup_service_uuid(void)
 
     // dump("complete-uuid", (all_service_uuid ? (void *)all_service_uuid : (void *)ezlopi__str), 0, all_service_uuid_len);
 }
-#endif // CONFIG_EZLOPI_BLE_ENABLE
+#endif // CONFIG_EZPI_BLE_ENABLE

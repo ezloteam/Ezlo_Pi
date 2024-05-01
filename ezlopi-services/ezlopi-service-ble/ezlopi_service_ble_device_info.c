@@ -1,7 +1,7 @@
 
 #include "../../build/config/sdkconfig.h"
 
-#ifdef CONFIG_EZLOPI_BLE_ENABLE
+#ifdef CONFIG_EZPI_BLE_ENABLE
 
 #include <string.h>
 #include <ctype.h>
@@ -750,4 +750,4 @@ void __add_factory_info_to_root(cJSON* root, char* key, char* value)
     }
 }
 
-#endif // CONFIG_EZLOPI_BLE_ENABLE
+#endif // CONFIG_EZPI_BLE_ENABLE

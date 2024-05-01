@@ -1,7 +1,7 @@
 
 #include "../../build/config/sdkconfig.h"
 
-#ifdef CONFIG_EZLOPI_BLE_ENABLE
+#ifdef CONFIG_EZPI_BLE_ENABLE
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -44,7 +44,7 @@ static void ezlopi_ble_basic_init(void);
 static void ezlopi_ble_start_secure_gatt_server(void);
 #endif
 
-#if (1 == CONFIG_EZLOPI_BLE_ENALBE_PAIRING)
+#if (1 == CONFIG_EZPI_BLE_ENALBE_PAIRING)
 static void ezlopi_ble_start_secure_gatt_server_open_pairing(void);
 #endif
 
@@ -68,17 +68,17 @@ void ezlopi_ble_service_init(void)
 
     CHECK_PRINT_ERROR(esp_ble_gatt_set_local_mtu(517), "set local  MTU failed");
 
-#if (1 == CONFIG_EZLOPI_BLE_ENALBE_PAIRING)
+#if (1 == CONFIG_EZPI_BLE_ENALBE_PAIRING)
 #if (1 == CONFIG_EZLOPI_BLE_ENALBE_PASSKEY)
     ezlopi_ble_start_secure_gatt_server();
 #else
     ezlopi_ble_start_secure_gatt_server_open_pairing();
 #endif // 1 == CONFIG_EZLOPI_BLE_ENALBE_PASSKEY
-#endif // 1 == CONFIG_EZLOPI_BLE_ENALBE_PAIRING
+#endif // 1 == CONFIG_EZPI_BLE_ENALBE_PAIRING
 }
 
 
-#if (1 == CONFIG_EZLOPI_BLE_ENALBE_PAIRING)
+#if (1 == CONFIG_EZPI_BLE_ENALBE_PAIRING)
 static void ezlopi_ble_start_secure_gatt_server_open_pairing(void)
 {
     const esp_ble_auth_req_t auth_req = ESP_LE_AUTH_REQ_SC_MITM_BOND;
@@ -179,4 +179,4 @@ int ezlopi_ble_service_get_ble_mac(uint8_t mac[6])
     }
     return ret;
 }
-#endif // CONFIG_EZLOPI_BLE_ENABLE
+#endif // CONFIG_EZPI_BLE_ENABLE
