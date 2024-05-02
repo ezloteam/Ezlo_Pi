@@ -133,7 +133,7 @@ static void websocket_event_handler(void* handler_args, esp_event_base_t base, i
     case WEBSOCKET_EVENT_DISCONNECTED:
     {
         TRACE_E("free-heap: %d", esp_get_free_heap_size());
-        TRACE_S("WEBSOCKET_EVENT_DISCONNECTED");
+        TRACE_E("WEBSOCKET_EVENT_DISCONNECTED");
         if (event_arg && event_arg->connection_upcall)
         {
             event_arg->connection_upcall(0);
@@ -150,12 +150,12 @@ static void websocket_event_handler(void* handler_args, esp_event_base_t base, i
     }
     case WEBSOCKET_EVENT_ERROR:
     {
-        TRACE_S("WEBSOCKET_EVENT_ERROR");
+        TRACE_E("WEBSOCKET_EVENT_ERROR");
         break;
     }
     default:
     {
-        TRACE_W("Websocket event type not-implemented! value: %u", event_id);
+        TRACE_E("Websocket event type not-implemented! value: %u", event_id);
         break;
     }
     }

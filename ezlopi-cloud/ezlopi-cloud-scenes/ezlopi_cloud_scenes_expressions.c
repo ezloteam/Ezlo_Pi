@@ -1,3 +1,7 @@
+#include "../../build/config/sdkconfig.h"
+
+#ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+
 #include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_cjson_macros.h"
@@ -65,3 +69,4 @@ void scenes_expressions_set(cJSON* cj_request, cJSON* cj_response)
         }
     }
 }
+#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS

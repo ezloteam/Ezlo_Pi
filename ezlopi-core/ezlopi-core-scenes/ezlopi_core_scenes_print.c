@@ -1,3 +1,7 @@
+#include "../../build/config/sdkconfig.h"
+
+#ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+
 #include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_scenes_v2.h"
@@ -267,3 +271,4 @@ void ezlopi_scenes_print(l_scenes_list_v2_t* scene_link_list)
     }
 #endif
 }
+#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS

@@ -71,7 +71,7 @@ void app_main(void)
     ezlopi_service_ota_init();
 #endif
 
-#if CONFIG_EZLPI_SERV_ENABLE_MODES
+#if CONFIG_EZPI_SERV_ENABLE_MODES
     ezlopi_service_modes_init();
 #endif
 
@@ -98,9 +98,9 @@ static void blinky(void* pv)
         UBaseType_t total_task_numbers = uxTaskGetNumberOfTasks();
         TaskStatus_t task_array[total_task_numbers];
 
-        TRACE_D("----------------------------------------------");
-        TRACE_D("Free Heap Size: %.2f KB", esp_get_free_heap_size() / 1024.0);
-        TRACE_D("Minimum Free Heap Size: %.2f KB", esp_get_minimum_free_heap_size() / 1024.0);
+        trace_wb("----------------------------------------------");
+        trace_wb("Free Heap Size: %.2f KB", esp_get_free_heap_size() / 1024.0);
+        trace_wb("Minimum Free Heap Size: %.2f KB", esp_get_minimum_free_heap_size() / 1024.0);
 
 #ifdef CONFIG_EZPI_HEAP_ENABLE
         ezlopi_util_heap_trace();
@@ -139,7 +139,7 @@ static void blinky(void* pv)
             }
         }
 #endif 
-        TRACE_D("----------------------------------------------");
+        trace_wb("----------------------------------------------");
 #ifdef CONFIG_EZPI_HEAP_ENABLE
         ezlopi_util_heap_flush();
 #endif // CONFIG_EZPI_HEAP_ENABLE        

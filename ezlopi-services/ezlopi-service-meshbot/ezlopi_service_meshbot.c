@@ -1,3 +1,7 @@
+#include "../../build/config/sdkconfig.h"
+
+#ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
@@ -272,7 +276,7 @@ PT_THREAD(__scene_proto_thread(l_scenes_list_v2_t* scene_node, uint32_t routine_
                                     ctx->delay_ms = delay_ms;
                                     ctx->action_node = then_block_node;
 
-                                    ctx->curr_ticks = xTaskGetTickCount(); 
+                                    ctx->curr_ticks = xTaskGetTickCount();
                                     TRACE_D("entering delay: %d", ctx->curr_ticks);
                                     PT_WAIT_UNTIL(&ctx->pt, (xTaskGetTickCount() - ctx->curr_ticks) > ctx->delay_ms);
                                     TRACE_D("exiting delay: %d", xTaskGetTickCount());
@@ -494,3 +498,5 @@ static int __execute_action_block(l_scenes_list_v2_t* scene_node, l_action_block
 
     return ret;
 }
+
+#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS

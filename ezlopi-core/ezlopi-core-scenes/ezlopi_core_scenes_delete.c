@@ -1,3 +1,8 @@
+#include "../../build/config/sdkconfig.h"
+
+#ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+
+
 #include <string.h>
 
 #include "ezlopi_core_scenes_v2.h"
@@ -136,3 +141,4 @@ void ezlopi_scenes_delete_field_value(l_fields_v2_t* field)
     }
     }
 }
+#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS

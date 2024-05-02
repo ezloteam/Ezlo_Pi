@@ -200,7 +200,7 @@ extern "C"
                 \"gpio\": 18\
             }\
         ], \
-        \"dev_total\": 2}";
+        \"dev_total\": 3}";
 #endif
 
 

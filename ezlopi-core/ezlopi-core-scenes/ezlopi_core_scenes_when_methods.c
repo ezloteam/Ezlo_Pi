@@ -1,3 +1,7 @@
+#include "../../build/config/sdkconfig.h"
+
+#ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+
 #include <time.h>
 #include "ezlopi_util_trace.h"
 
@@ -372,7 +376,7 @@ int ezlopi_scene_when_is_user_lock_operation(l_scenes_list_v2_t* scene_node, voi
     return 0;
 }
 
-#if defined(CONFIG_EZLPI_SERV_ENABLE_MODES)
+#if defined(CONFIG_EZPI_SERV_ENABLE_MODES)
 int ezlopi_scene_when_is_house_mode_changed_to(l_scenes_list_v2_t* scene_node, void* arg)
 {
     TRACE_W(" isHouse_modechanged_to");
@@ -530,7 +534,7 @@ int ezlopi_scene_when_is_House_Mode_Switch_to_Range(l_scenes_list_v2_t* scene_no
 #endif
     return ret;
 }
-#endif // CONFIG_EZLPI_SERV_ENABLE_MODES
+#endif // CONFIG_EZPI_SERV_ENABLE_MODES
 
 int ezlopi_scene_when_is_device_state(l_scenes_list_v2_t* scene_node, void* arg)
 {
@@ -1407,3 +1411,4 @@ int ezlopi_scene_when_function(l_scenes_list_v2_t* scene_node, void* arg)
     }
     return ret;
 }
+#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
