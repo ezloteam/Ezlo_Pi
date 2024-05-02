@@ -1,12 +1,14 @@
 //          ("name",           func,          updater_func)
+
 #if (defined(CONFIG_EZPI_WEBSOCKET_CLIENT) || defined(EZPI_LOCAL_WEBSOCKET_SERVER))
+
 CLOUD_METHOD("hub.items.list", items_list_v3, NULL)
 CLOUD_METHOD("hub.item.value.set", items_set_value_v3, NULL)
 
 CLOUD_METHOD("hub.devices.list", devices_list_v3, NULL)
 CLOUD_METHOD("hub.device.name.set", device_name_set, device_updated)
 
-#if defined(CONFIG_EZPI_SERV_ENABLE_MODES)
+#ifdef CONFIG_EZPI_SERV_ENABLE_MODES
 CLOUD_METHOD("hub.modes.get", ezlopi_cloud_modes_get, NULL)
 CLOUD_METHOD("hub.modes.current.get", ezlopi_cloud_modes_current_get, NULL)
 CLOUD_METHOD("hub.modes.switch", ezlopi_cloud_modes_switch, NULL)
@@ -56,7 +58,7 @@ CLOUD_METHOD("hub.time.location.list", EZPI_CLOUD_location_list, NULL)
 CLOUD_METHOD("hub.time.location.set", EZPI_CLOUD_location_set, NULL)
 CLOUD_METHOD("hub.time.location.get", EZPI_CLOUD_location_get, NULL)
 
-#if CONFIG_EZPI_SERV_MESHBOT_EN
+#ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 CLOUD_METHOD("hub.scenes.list", scenes_list, NULL)
 CLOUD_METHOD("hub.scenes.create", scenes_create, scene_added)
 CLOUD_METHOD("hub.scenes.run", scenes_run, NULL)
@@ -70,7 +72,7 @@ CLOUD_METHOD("hub.scenes.notification.add", scenes_notification_add, scene_chang
 CLOUD_METHOD("hub.scenes.notification.remove", scenes_notification_remove, scene_changed)
 CLOUD_METHOD("hub.scenes.status.get", scenes_status_get, NULL) // Incomplete
 CLOUD_METHOD("hub.scenes.block.status.reset", scenes_block_status_reset, NULL)
-#endif
+#endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 CLOUD_METHOD("hub.room.list", room_list, NULL)
 CLOUD_METHOD("hub.room.create", room_create, room_created)
@@ -80,7 +82,7 @@ CLOUD_METHOD("hub.room.get", room_get, NULL)
 CLOUD_METHOD("hub.room.delete", room_delete, room_deleted)
 CLOUD_METHOD("hub.room.all.delete", room_all_delete, NULL)
 
-#if CONFIG_EZPI_SERV_MESHBOT_EN
+#if CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 CLOUD_METHOD("hub.scenes.scripts.list", scenes_scripts_list, NULL)
 CLOUD_METHOD("hub.scenes.scripts.add", scenes_scripts_add, NULL)
 CLOUD_METHOD("hub.scenes.scripts.get", scenes_scripts_get, NULL)
@@ -91,7 +93,7 @@ CLOUD_METHOD("hub.scenes.scripts.run", scenes_scripts_run, NULL)
 CLOUD_METHOD("hub.scenes.expressions.set", scenes_expressions_set, NULL)
 CLOUD_METHOD("hub.scenes.expressions.list", scenes_expressions_list, NULL)
 CLOUD_METHOD("hub.scenes.expressions.delete", scenes_expressions_delete, NULL)
-#endif
+#endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 CLOUD_METHOD("hub.nma.register.repeat", register_repeat, NULL)
 
@@ -104,4 +106,5 @@ CLOUD_METHOD("registered", registered, NULL)
 CLOUD_METHOD("hub.coordinates.set", hub_coordinates_set, NULL)
 CLOUD_METHOD("hub.coordinates.get", hub_coordinates_get, NULL)
 CLOUD_METHOD("hub.offline.login.ui", EZPI_CLOUD_offline_login, NULL)
-#endif
+
+#endif // (defined(CONFIG_EZPI_WEBSOCKET_CLIENT) || defined(EZPI_LOCAL_WEBSOCKET_SERVER))

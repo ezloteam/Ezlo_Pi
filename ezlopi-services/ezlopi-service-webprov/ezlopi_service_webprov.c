@@ -70,7 +70,7 @@ void ezlopi_service_web_provisioning_deinit(void)
 
 static void __connection_upcall(bool connected)
 {
-    TRACE_D("wss-connection: %s", connected ? "connected" : "failed to connect");
+    TRACE_I("wss-connection: %s", connected ? "connected" : "failed to connect");
     static bool prev_status;
     if (connected)
     {
