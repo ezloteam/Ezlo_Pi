@@ -57,22 +57,22 @@
 #ifdef malloc
 #undef malloc
 #endif
-#define malloc(x) ezlopi_util_heap_malloc(x, __FILENAME__, __LINE__)
+#define malloc(who, x) ezlopi_util_heap_malloc(who, x, __FILENAME__, __LINE__)
 
 #ifdef calloc
 #undef calloc
 #endif
-#define calloc(x, y) ezlopi_util_heap_calloc(x, y, __FILENAME__, __LINE__)
+#define calloc(who, x, y) ezlopi_util_heap_calloc(who, x, y, __FILENAME__, __LINE__)
 
 #ifdef free
 #undef free
 #endif
-#define free(x) ezlopi_util_heap_free(x, __FILENAME__, __LINE__)
+#define free(who, x) ezlopi_util_heap_free(who, x, __FILENAME__, __LINE__)
 
 #ifdef realloc
 #undef realloc
 #endif
-#define realloc(x, y) ezlopi_util_heap_realloc(x, y, __FILENAME__, __LINE__)
+#define realloc(who, x, y) ezlopi_util_heap_realloc(who, x, y, __FILENAME__, __LINE__)
 
 #endif
 

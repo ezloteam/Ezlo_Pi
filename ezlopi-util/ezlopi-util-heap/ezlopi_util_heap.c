@@ -9,6 +9,7 @@
 #include "ezlopi_util_heap.h"
 
 typedef struct s_initiator {
+    const char * who;
     const char * file_name;
     uint32_t line_number;
 } s_initiator_t;
@@ -31,16 +32,16 @@ static s_heap_trace_t* heap_head = NULL;
 static s_heap_trace_t * __create_list(void);
 static void __remove_free_node(s_heap_trace_t * heap_node);
 
-void ezlopi_util_heap_free(void *ptr, const char * __file_name, uint32_t line_number)
+void ezlopi_util_heap_free(const char * who, void *ptr, const char * __file_name, uint32_t line_number)
 {
     if (ptr)
     {
-        s_heap_trace_t* curr_node =  heap_head;
+        s_heap_trace_t* curr_node = heap_head;
         while (curr_node)
         {
             if ((curr_node->ptr == ptr) && (0 == curr_node->freed))
-            {                
-                printf("\x1B[34m*** freed at %s:%u, size: %u ***\x1B[0m\r\n", __file_name, line_number, curr_node->size);
+            {
+                printf("\x1B[34m*** freed at %s:%u, size: %u, ptr: %u ***\x1B[0m\r\n", __file_name, line_number, curr_node->size, (uint32_t)curr_node->ptr);
                 free(curr_node->ptr);
 
                 curr_node->freed = true;
@@ -51,11 +52,11 @@ void ezlopi_util_heap_free(void *ptr, const char * __file_name, uint32_t line_nu
             }
             curr_node = curr_node->next;
         }
-        
+
     }
 }
 
-void* ezlopi_util_heap_malloc(size_t size, const char * file_name, uint32_t line_no)
+void* ezlopi_util_heap_malloc(const char * who, size_t size, const char * file_name, uint32_t line_no)
 {
     void* ret = NULL;
 
@@ -65,7 +66,6 @@ void* ezlopi_util_heap_malloc(size_t size, const char * file_name, uint32_t line
         if (new_heap)
         {
             // \x1B[%sm %s[%d]:" X "\x1B[0m\r\n"
-            printf("\x1B[34m### malloc at %s:%u, size: %u ###\x1B[0m\r\n", file_name, line_no, size);
             ret = malloc(size);
             if (ret)
             {
@@ -75,22 +75,24 @@ void* ezlopi_util_heap_malloc(size_t size, const char * file_name, uint32_t line
                 new_heap->allocator.line_number = line_no;
                 new_heap->time_ms = xTaskGetTickCount();
             }
+
+            printf("\x1B[34m### malloc at %s:%u, size: %u, ptr: %u ###\x1B[0m\r\n", file_name, line_no, size, (uint32_t)ret);
         }
     }
 
     return ret;
 }
 
-void* ezlopi_util_heap_calloc(size_t count, size_t size, const char * file_name, uint32_t line_no)
+void* ezlopi_util_heap_calloc(const char * who, size_t count, size_t size, const char * file_name, uint32_t line_no)
 {
-    return ezlopi_util_heap_malloc((count * size), file_name, line_no);
+    return ezlopi_util_heap_malloc(who, (count * size), file_name, line_no);
 }
 
-void* ezlopi_util_heap_realloc(void *ptr, size_t new_size, const char * file_name, uint32_t line_no)
+void* ezlopi_util_heap_realloc(const char * who, void *ptr, size_t new_size, const char * file_name, uint32_t line_no)
 {
     printf("REALLOC\r\n");
-    ezlopi_util_heap_free(ptr, file_name, line_no);
-    return ezlopi_util_heap_malloc(new_size, file_name, line_no);
+    ezlopi_util_heap_free(who, ptr, file_name, line_no);
+    return ezlopi_util_heap_malloc(who, new_size, file_name, line_no);
 }
 
 void ezlopi_util_heap_flush(void)
@@ -129,7 +131,7 @@ void ezlopi_util_heap_trace(void)
             // printf("\033[38:2:255:165:0m%d. --\x1B[0m\r\n", count);
             printf("\033[38:2:255:165:0m%d -> %s(%d): ptr: %u, size %u, hold-time-ms: %u\x1B[0m\r\n", count, curr_node->allocator.file_name, curr_node->allocator.line_number, (uint32_t)curr_node->ptr, curr_node->size, (xTaskGetTickCount() - curr_node->time_ms));
         }
-        
+
         curr_node = curr_node->next;
         count++;
     }
@@ -145,8 +147,8 @@ static s_heap_trace_t * __create_list(void)
 {
     s_heap_trace_t* new_node = (s_heap_trace_t*)malloc(sizeof(s_heap_trace_t));
 
-    if (new_node) 
-    {      
+    if (new_node)
+    {
         memset(new_node, 0, sizeof(s_heap_trace_t));
 
         if (heap_head)
@@ -175,7 +177,7 @@ static void __remove_free_node(s_heap_trace_t * heap_node)
     {
         __remove_free_node(heap_node->next);
 
-        if ( heap_node->next->freed)
+        if (heap_node->next->freed)
         {
             s_heap_trace_t * free_node = heap_node->next;
             heap_node->next = heap_node->next->next;

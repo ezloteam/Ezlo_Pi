@@ -218,7 +218,7 @@ static void ezlopi_device_free_parent_tree(l_ezlopi_device_t* parent_device, uin
 }
 
 void ezlopi_device_free_device(l_ezlopi_device_t* device)
-    {
+{
     if (device && l_device_head)
     {
         if ((NULL != device->next) &&
@@ -373,7 +373,7 @@ void ezlopi_device_prepare(void)
     if (config_string)
     {
         TRACE_D("Initial config:\r\n%s", config_string);
-        cJSON* cj_config = cJSON_Parse(config_string);
+        cJSON* cj_config = cJSON_ParseWithRef(config_string);
         // ezlopi_factory_info_v3_free(config_string);
         if (cj_config)
         {

@@ -9,7 +9,6 @@
 
 #include "../../build/config/sdkconfig.h"
 
-#ifdef CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER
 
 #include "esp_eth.h"
 #include "esp_wifi.h"
@@ -35,8 +34,8 @@
 
 #include "ezlopi_service_ws_server.h"
 #include "ezlopi_service_ws_server_clients.h"
-#include "EZLOPI_USER_CONFIG.h"
 
+#include "EZLOPI_USER_CONFIG.h"
 
 typedef struct s_async_resp_arg
 {
@@ -468,8 +467,5 @@ static void __wifi_connection_event(esp_event_base_t event_base, int32_t event_i
     }
 }
 
-void ezlpi_service_ws_server_dummy(void)
-{
-    TRACE_D("I'm dummy");
-}
-#endif // CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER
+
+

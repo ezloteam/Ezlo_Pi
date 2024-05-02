@@ -28,6 +28,7 @@ extern "C"
 #define EZLOPI_FINFO_OFFSET_HUB_DATA 0x6000
 
 #define EZLOPI_FINFO_READ_LEN_4KB 4096
+
     typedef enum e_factory_info_v3_partition_type
     {
         E_EZLOPI_FACTORY_INFO_CONN_DATA,

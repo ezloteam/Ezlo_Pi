@@ -1,6 +1,3 @@
-. ~/esp/esp-idf/export.sh
-
-
 speed=921600
 port="/dev/ttyUSB0"
 bin="./shell_script/prov_102002011.bin"
@@ -16,6 +13,7 @@ do
             echo "[-s]      serila baud rate, default value is 921600";
             echo "[-p]      serial port, default is /dev/ttyUSB0";
             echo "[-b]      binary file which contains provisioning data";
+            exit 0
 
     esac
 done
