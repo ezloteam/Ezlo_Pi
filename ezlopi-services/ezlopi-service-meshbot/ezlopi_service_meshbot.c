@@ -195,23 +195,6 @@ void ezlopi_scenes_meshbot_init(void)
         }
         else
         {
-            #warning "remove these traces";
-            TRACE_S("scene_en ->%s , scene_node->when:%s , (scene_node->then:%s | scene_node->else:%s)",
-                (scene_node->enabled) ? "true" : "false",
-                (NULL == scene_node->when_block) ? "empty" : scene_node->when_block->block_options.method.name,
-                (NULL == scene_node->then_block) ? "empty" : scene_node->then_block->block_options.method.name,
-                (NULL == scene_node->else_block) ? "empty" : scene_node->else_block->block_options.method.name);
-
-            if (NULL != scene_node->when_block->block_options.cj_function)
-            {
-                char* str = cJSON_Print(scene_node->when_block->block_options.cj_function);
-                if (str)
-                {
-                    TRACE_D("function_cjson : %s", str);
-                    free(str);
-                }
-            }
-
             scene_node->status = EZLOPI_SCENE_STATUS_STOPPED;
         }
         TRACE_W("scenes_meshbot init process, [%d]", start_thread);
@@ -272,7 +255,7 @@ PT_THREAD(__scene_proto_thread(l_scenes_list_v2_t* scene_node, uint32_t routine_
                                     ctx->delay_ms = delay_ms;
                                     ctx->action_node = then_block_node;
 
-                                    ctx->curr_ticks = xTaskGetTickCount(); 
+                                    ctx->curr_ticks = xTaskGetTickCount();
                                     TRACE_D("entering delay: %d", ctx->curr_ticks);
                                     PT_WAIT_UNTIL(&ctx->pt, (xTaskGetTickCount() - ctx->curr_ticks) > ctx->delay_ms);
                                     TRACE_D("exiting delay: %d", xTaskGetTickCount());
