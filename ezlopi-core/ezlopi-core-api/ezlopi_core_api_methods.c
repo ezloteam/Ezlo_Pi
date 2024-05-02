@@ -19,6 +19,7 @@
 #include "ezlopi_cloud_scenes_scripts.h"
 #include "ezlopi_cloud_scenes_expressions.h"
 #include "ezlopi_cloud_status.h"
+#include "ezlopi_cloud_log.h"
 
 #include "ezlopi_core_reset.h"
 #include "ezlopi_util_trace.h"

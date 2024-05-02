@@ -85,7 +85,8 @@ extern "C"
 #define TRACE_E trace_error
 #define dump(buffer_name, buffer, offset, count) __dump(__FILE__, __LINE__, buffer_name, buffer, offset, count)
 
-#else
+
+#else // (1 == ENABLE_TRACE)
 
 #define TRACE_E(X, ...)
 #define TRACE_W(X, ...)
