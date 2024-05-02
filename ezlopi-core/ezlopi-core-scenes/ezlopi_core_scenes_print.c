@@ -22,6 +22,14 @@ void ezlopi_print_block_options(s_block_options_v2_t* block_options, l_fields_v2
         TRACE_D("\t\t\t\t\t|-- %s: %s", fields->name, fields->name);
         fields = fields->next;
     }
+
+    if (0 == strncmp(ezlopi_function_str, block_options->method.name, 9) && (NULL != block_options->cj_function))
+    {
+        TRACE_D("\t\t\t|-- function");
+        CJSON_TRACE("\t\t\t\t|-- ", block_options->cj_function);
+    }
+
+
 #endif
 }
 
@@ -180,7 +188,7 @@ void ezlopi_print_house_modes(l_house_modes_v2_t* house_modes)
     {
         TRACE_D("\t\t|-- %s", house_modes->house_mode);
         house_modes = house_modes->next;
-}
+    }
 #endif
 }
 
@@ -192,7 +200,7 @@ void ezlopi_print_user_notifications(l_user_notification_v2_t* user_notification
     {
         TRACE_D("\t\t|-- %s", user_notification->user_id);
         user_notification = user_notification->next;
-}
+    }
 #endif
 }
 
@@ -206,7 +214,7 @@ void ezlopi_print_when_blocks(l_when_block_v2_t* when_blocks)
         TRACE_D("\t\t|-- blockType: when");
         ezlopi_print_fields(when_blocks->fields);
         when_blocks = when_blocks->next;
-}
+    }
 #endif
 }
 
@@ -229,7 +237,7 @@ void ezlopi_print_action_blocks(l_action_block_v2_t* action_block)
         {
             TRACE_D("\t\t|--");
         }
-}
+    }
 #endif
 }
 
@@ -256,6 +264,6 @@ void ezlopi_scenes_print(l_scenes_list_v2_t* scene_link_list)
         vTaskDelay(10);
 
         scene_link_list = scene_link_list->next;
-}
+    }
 #endif
 }

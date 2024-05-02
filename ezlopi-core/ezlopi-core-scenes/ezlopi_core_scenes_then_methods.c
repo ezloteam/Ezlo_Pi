@@ -2,18 +2,21 @@
 
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_http.h"
+#include "ezlopi_core_modes.h"
 #include "ezlopi_core_reset.h"
 #include "ezlopi_core_devices.h"
 #include "ezlopi_core_scenes_v2.h"
 #include "ezlopi_core_event_group.h"
 #include "ezlopi_core_factory_info.h"
 #include "ezlopi_core_scenes_scripts.h"
+#include "ezlopi_core_scenes_expressions.h"
 #include "ezlopi_core_scenes_then_methods.h"
 #include "ezlopi_core_scenes_status_changed.h"
-#include "ezlopi_service_meshbot.h"
 #include "ezlopi_core_scenes_then_methods_helper_func.h"
+#include "ezlopi_core_scenes_when_methods_helper_functions.h"
 
 #include "ezlopi_cloud_constants.h"
+#include "ezlopi_service_meshbot.h"
 
 int ezlopi_scene_then_set_item_value(l_scenes_list_v2_t* curr_scene, void* arg)
 {
@@ -35,67 +38,47 @@ int ezlopi_scene_then_set_item_value(l_scenes_list_v2_t* curr_scene, void* arg)
                     cJSON_AddStringToObject(cj_params, ezlopi__id_str, curr_field->field_value.u_value.value_string);
                     item_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
                     // TRACE_D("item_id: %s", curr_field->field_value.u_value.value_string);
-
-                    // cJSON_AddStringToObject(cj_params, ezlopi__id_str, curr_field->field_value.u_value.value_string);
-                    // item_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
-                    // TRACE_D("item_id: %s", curr_field->field_value.u_value.value_string);
                 }
                 else if (0 == strncmp(curr_field->name, ezlopi_value_str, 5))
                 {
                     if (EZLOPI_VALUE_TYPE_INT == curr_field->value_type)
                     {
                         cJSON_AddNumberToObject(cj_params, ezlopi_value_str, curr_field->field_value.u_value.value_double);
-                        TRACE_D("value: %f", curr_field->field_value.u_value.value_double);
+                        // TRACE_D("value: %f", curr_field->field_value.u_value.value_double);
                     }
                     else if (EZLOPI_VALUE_TYPE_BOOL == curr_field->value_type)
                     {
                         cJSON_AddBoolToObject(cj_params, ezlopi_value_str, curr_field->field_value.u_value.value_bool);
-                        TRACE_D("value: %s", curr_field->field_value.u_value.value_bool ? ezlopi_true_str : ezlopi_false_str);
+                        // TRACE_D("value: %s", curr_field->field_value.u_value.value_bool ? ezlopi_true_str : ezlopi_false_str);
                     }
                     else if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type)
                     {
                         cJSON_AddStringToObject(cj_params, ezlopi_value_str, curr_field->field_value.u_value.value_string);
-                        TRACE_D("value: %s", curr_field->field_value.u_value.value_string);
+                        // TRACE_D("value: %s", curr_field->field_value.u_value.value_string);
                     }
                 }
 
                 curr_field = curr_field->next;
             }
 
-            l_ezlopi_device_t* curr_device = ezlopi_device_get_head();
-            uint32_t found_item = 0;
-            while (curr_device)
+            if (item_id)
             {
-                l_ezlopi_item_t* curr_item = curr_device->items;
-                while (curr_item)
+                l_ezlopi_item_t* curr_item = ezlopi_device_get_item_by_id(item_id);
+                if (curr_item)
                 {
-                    if (item_id == curr_item->cloud_properties.item_id)
-                    {
-                        curr_item->func(EZLOPI_ACTION_SET_VALUE, curr_item, cj_params, curr_item->user_arg);
-                        found_item = 1;
-                        break;
-                    }
-                    curr_item = curr_item->next;
+                    curr_item->func(EZLOPI_ACTION_SET_VALUE, curr_item, cj_params, curr_item->user_arg);
+                    ret = 1;
                 }
-
-                if (found_item)
-                {
-                    // TRACE_D("\r\n\r\n FOUND DEVICE \r\n\r\n");
-                    break;
-                }
-
-                curr_device = curr_device->next;
             }
         }
-
         cJSON_Delete(cj_params);
     }
-
+    TRACE_W(" Set_item_value -> ret = %d", ret);
     return ret;
 }
 int ezlopi_scene_then_set_device_armed(l_scenes_list_v2_t* curr_scene, void* arg)
 {
-    TRACE_W("Warning: then-method not implemented!");
+    // TRACE_W("Warning: then-method not implemented!");
     int ret = 0;
     if (curr_scene)
     {
@@ -123,20 +106,15 @@ int ezlopi_scene_then_set_device_armed(l_scenes_list_v2_t* curr_scene, void* arg
 
             if (device_id)
             {
-                l_ezlopi_device_t* curr_device = ezlopi_device_get_head();
-                while (curr_device)
+                l_ezlopi_device_t* curr_device = ezlopi_device_get_by_id(device_id);
+                if (curr_device)
                 {
-                    if (device_id == curr_device->cloud_properties.device_id)
+                    s_ezlopi_cloud_controller_t* controller_info = ezlopi_device_get_controller_information();
+                    if (controller_info)
                     {
-                        s_ezlopi_cloud_controller_t* controller_info = ezlopi_device_get_controller_information();
-                        if (controller_info)
-                        {
-                            #warning "we need to change from 'controller' to device-specific [krishna]"
-                                controller_info->armed = (device_armed) ? true : false;
-                        }
-                        break;
+                        #warning "we need to change from 'controller' to device-specific [krishna]"
+                            controller_info->armed = (device_armed) ? true : false;
                     }
-                    curr_device = curr_device->next;
                 }
             }
         }
@@ -152,8 +130,58 @@ int ezlopi_scene_then_send_cloud_abstract_command(l_scenes_list_v2_t* curr_scene
 }
 int ezlopi_scene_then_switch_house_mode(l_scenes_list_v2_t* curr_scene, void* arg)
 {
-    TRACE_W("Warning: then-method not implemented!");
-    return 0;
+    TRACE_W(" switch_house_mode ");
+    int ret = 0;
+    if (curr_scene)
+    {
+        uint32_t house_mode_id = 0;
+        l_action_block_v2_t* curr_then = (l_action_block_v2_t*)arg;
+        if (curr_then)
+        {
+            l_fields_v2_t* curr_field = curr_then->fields;
+            while (curr_field)
+            {
+                if (0 == strncmp(curr_field->name, "houseMode", 10))
+                {
+                    if (EZLOPI_VALUE_TYPE_HOUSE_MODE_ID == curr_field->value_type)
+                    {
+                        if (NULL != curr_field->field_value.u_value.value_string)
+                        {
+                            house_mode_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
+                        }
+                        else
+                        {
+                            house_mode_id = (uint32_t)curr_field->field_value.u_value.value_double;
+                        }
+                    }
+                }
+
+                curr_field = curr_field->next;
+            }
+
+#if defined(CONFIG_EZLPI_SERV_ENABLE_MODES)
+            if (house_mode_id > 0)
+            {
+                // first get the current 
+                s_ezlopi_modes_t* curr_house_mode = ezlopi_core_modes_get_custom_modes();
+
+                // find and match the 'house_mode' you want to switch with.
+                s_house_modes_t* req_mode = ezlopi_core_modes_get_house_mode_by_id(house_mode_id);
+                TRACE_E("req-house-mode-id [%d] : curr->switch_to_mode_id[%d]",
+                    req_mode->_id,
+                    curr_house_mode->switch_to_mode_id);
+                if ((req_mode->_id != curr_house_mode->switch_to_mode_id))
+                {
+                    ezlopi_core_modes_api_switch_mode(req_mode);
+                    ret = 1;
+                }
+            }
+#endif //CONFIG_EZLPI_SERV_ENABLE_MODES
+        }
+
+    }
+
+    return ret;
 }
 int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t* curr_scene, void* arg)
 {
@@ -349,15 +377,74 @@ int ezlopi_scene_then_set_scene_state(l_scenes_list_v2_t* curr_scene, void* arg)
     }
     return ret;
 }
+
 int ezlopi_scene_then_reset_latch(l_scenes_list_v2_t* curr_scene, void* arg)
 {
-    TRACE_W("Warning: then-method not implemented!");
-    return 0;
+    int ret = 0;
+    uint32_t sceneId = 0;
+    l_action_block_v2_t* curr_block = (l_action_block_v2_t*)arg;
+    if (curr_block && curr_scene)
+    {
+        l_fields_v2_t* curr_field = curr_block->fields;
+        while (curr_field)
+        {
+            if (0 == strncmp(curr_field->name, ezlopi_sceneId_str, 8))
+            {
+                if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type)
+                {
+                    sceneId = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
+                    TRACE_E("reset_latch _---> sceneId[%d]", sceneId);
+                    l_scenes_list_v2_t* scene_to_reset_latch = ezlopi_scenes_get_by_id_v2(sceneId);
+                    if (scene_to_reset_latch)
+                    {
+                        s_when_function_t* function_state = (s_when_function_t*)scene_to_reset_latch->when_block->fields->user_arg;
+                        if (function_state)
+                        {
+                            function_state->current_state = false;
+                        }
+                        break;
+                    }
+                }
+            }
+            curr_field = curr_field->next;
+        }
+    }
+    return ret;
 }
 int ezlopi_scene_then_reset_scene_latches(l_scenes_list_v2_t* curr_scene, void* arg)
 {
-    TRACE_W("Warning: then-method not implemented!");
-    return 0;
+    int ret = 0;
+    uint32_t sceneId = 0;
+    l_action_block_v2_t* curr_then = (l_action_block_v2_t*)arg;
+    if (curr_then && curr_scene)
+    {
+        l_fields_v2_t* curr_field = curr_then->fields;
+        while (curr_field)
+        {
+            if (0 == strncmp(curr_field->name, ezlopi_sceneId_str, 8))
+            {
+                if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type)
+                {
+                    sceneId = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
+
+
+                    TRACE_E("reset_latch---> sceneId[%d]", sceneId);
+                    l_scenes_list_v2_t* scene_to_reset_latch = ezlopi_scenes_get_by_id_v2(sceneId);
+                    if (scene_to_reset_latch)
+                    {
+                        s_when_function_t* function_state = (s_when_function_t*)scene_to_reset_latch->when_block->fields->user_arg;
+                        if (function_state)
+                        {
+                            function_state->current_state = false;
+                        }
+                        break;
+                    }
+                }
+            }
+            curr_field = curr_field->next;
+        }
+    }
+    return ret;
 }
 int ezlopi_scene_then_reboot_hub(l_scenes_list_v2_t* curr_scene, void* arg)
 {
@@ -437,6 +524,136 @@ int ezlopi_scene_then_set_variable(l_scenes_list_v2_t* curr_scene, void* arg)
 }
 int ezlopi_scene_then_toggle_value(l_scenes_list_v2_t* curr_scene, void* arg)
 {
-    TRACE_W("Warning: then-method not implemented!");
-    return 0;
+    TRACE_W(" toggle_value ");
+    int ret = 0;
+#if 0
+    if (curr_scene)
+    {
+        uint32_t item_id = 0;       /* item */
+        const char* __id_string = NULL;
+        char* expression_name = NULL; /* expression */
+
+        l_action_block_v2_t* curr_then = (l_action_block_v2_t*)arg;
+        if (curr_then)
+        {
+            l_fields_v2_t* curr_field = curr_then->fields;
+            while (curr_field)
+            {
+                if (0 == strncmp(curr_field->name, ezlopi_item_str, 5))
+                {
+                    if (EZLOPI_VALUE_TYPE_ITEM == curr_field->value_type)
+                    {
+                        item_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
+                        TRACE_W("item_id: %s", curr_field->field_value.u_value.value_string);
+                        TRACE_W("item_id: %d", item_id);
+                    }
+                }
+                else if (0 == strncmp(curr_field->name, "expression", 11)) /*need to add in str*/
+                {
+                    if ((EZLOPI_VALUE_TYPE_EXPRESSION == curr_field->value_type) && (NULL != curr_field->field_value.u_value.value_string))
+                    {
+                        expression_name = curr_field->field_value.u_value.value_string;
+                        TRACE_W("expn_name : '%s'", expression_name);
+                    }
+                }
+                curr_field = curr_field->next;
+            }
+
+            if (item_id > 0)
+            {
+                TRACE_W("item_id: %u", item_id);
+                l_ezlopi_item_t* curr_item = ezlopi_device_get_item_by_id(item_id);
+                if ((curr_item) && (EZLOPI_DEVICE_INTERFACE_DIGITAL_OUTPUT == curr_item->interface_type))
+                {
+                    cJSON* cj_tmp_value = cJSON_CreateObject();
+                    if (cj_tmp_value)
+                    {
+                        if (curr_item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, curr_item, (void*)cj_tmp_value, NULL))
+                        {
+                            CJSON_TRACE("value", cj_tmp_value)/*value formatted & value only*/
+                        }
+                        else
+                        {
+                            TRACE_E("here");
+                        }
+
+                        cJSON* cj_val = cJSON_GetObjectItem(cj_tmp_value, ezlopi_value_str);
+                        cJSON* cj_valuetype = cJSON_GetObjectItem(cj_tmp_value, ezlopi_valueType_str);
+                        if (cj_val && cj_valuetype)
+                        {
+                            TRACE_W("here");
+                            cJSON* cj_result_value = cJSON_CreateObject();
+                            if (cj_result_value)
+                            {
+
+                                cJSON_AddStringToObject(cj_result_value, ezlopi__id_str, __id_string);
+                                if (0 == strncmp(cj_valuetype->valuestring, value_type_bool, 6))
+                                {
+                                    TRACE_S("1. getting 'item_id[%d]' ; bool_value = %s ", item_id, cj_val->valuestring); // "false" or "true"
+                                    if (0 == strncmp(cj_val->valuestring, "false", 6))
+                                    {
+                                        cJSON_AddBoolToObject(cj_result_value, ezlopi_value_str, true);
+                                    }
+                                    else
+                                    {
+                                        cJSON_AddBoolToObject(cj_result_value, ezlopi_value_str, false);
+                                    }
+                                    TRACE_W("here");
+                                    ret = 1;
+                                    curr_item->func(EZLOPI_ACTION_SET_VALUE, curr_item, cj_result_value, curr_item->user_arg);
+                                }
+                                else if (0 == strncmp(cj_valuetype->valuestring, value_type_int, 6))
+                                {
+                                    TRACE_S("2. getting 'item_id[%d]' ; int_value = %d ", item_id, (int)cj_val->valuedouble);
+                                    if (cj_val->valuedouble == 0) // either  '0' or '1'.
+                                    {
+                                        cJSON_AddNumberToObject(cj_result_value, ezlopi_value_str, 1);
+                                    }
+                                    else if (cj_val->valuedouble == 1)
+                                    {
+                                        cJSON_AddNumberToObject(cj_result_value, ezlopi_value_str, 0);
+                                    }
+
+                                    TRACE_W("here");
+                                    ret = 1;
+                                    curr_item->func(EZLOPI_ACTION_SET_VALUE, curr_item, cj_result_value, curr_item->user_arg);
+                                }
+                                else
+                                {
+                                    ret = 0;
+                                    TRACE_E(" 'item_id[%d]' neither 'boolean' nor 'int' ;  Value-type mis-matched!  ", item_id);
+                                }
+                                cJSON_Delete(cj_result_value);
+                            }
+                        }
+                    }
+                    cJSON_Delete(cj_tmp_value);
+                }
+                else
+                {
+                    TRACE_E("wrong item_ID");
+                }
+            }
+            else if (NULL != expression_name)
+            {
+                s_ezlopi_expressions_t* curr_exp = ezlopi_scenes_get_expression_node_by_name(expression_name);
+                if (curr_exp)
+                {
+                    if (EXPRESSION_VALUE_TYPE_NUMBER == curr_exp->exp_value.type)
+                    {
+                        ret = 1;
+                        curr_exp->exp_value.u_value.number_value = (0 == curr_exp->exp_value.u_value.number_value) ? 1 : 0;
+                    }
+                    else if (EXPRESSION_VALUE_TYPE_BOOL)
+                    {
+                        ret = 1;
+                        curr_exp->exp_value.u_value.boolean_value = (false == curr_exp->exp_value.u_value.boolean_value) ? true : false;
+                    }
+                }
+
+            }
+        }
+    }
+#endif
+    return ret;
 }
