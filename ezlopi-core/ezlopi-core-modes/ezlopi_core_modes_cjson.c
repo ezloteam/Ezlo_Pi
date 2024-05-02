@@ -20,7 +20,6 @@ static void __cjson_add_entry_delay(cJSON* cj_result, s_entry_delay_t* entry_del
 static void __cjson_add_number_as_hex_string(cJSON* cj_dest, const char* obj_name, uint32_t number);
 static void __cjson_duplicate_add_reference(cJSON* cj_dest, const char* item_name_str, cJSON* cj_item);
 static void __cjson_add_protect_buttons(cJSON* cj_protect_buttons_arr, s_protect_buttons_t* l_protect_buttons);
-static int __cjson_add_disarmed_devices_to_array(cJSON* cj_disarmed_device_array);
 static int __cjson_add_security_device_to_array(cJSON* cj_device_array);
 
 //////////////////////
@@ -188,8 +187,9 @@ s_ezlopi_modes_t* ezlopi_core_modes_cjson_parse_modes(cJSON* cj_modes)
                 }
 
                 CJSON_GET_VALUE_BOOL(cj_house_mod, ezlopi_disarmedDefault_str, cur_house_mode->disarmed_default);
+            
                 {
-                    cJSON* cj_disarmed_devices = cJSON_GetObjectItem(cj_house_mod, ezlopi_notifications_str);
+                    cJSON* cj_disarmed_devices = cJSON_GetObjectItem(cj_house_mod, ezlopi_disarmedDevices_str);
                     if (cj_disarmed_devices)
                     {
                         cur_house_mode->cj_disarmed_devices = cJSON_Duplicate(cj_disarmed_devices, cJSON_True);
@@ -427,9 +427,6 @@ static void __cjson_add_mode_to_array(cJSON* cj_modes_arr, s_house_modes_t* hous
             __cjson_duplicate_add_reference(cj_house_mode, ezlopi_alarmsOffDevices_str, house_mode->cj_alarms_off_devices);
             __cjson_duplicate_add_reference(cj_house_mode, ezlopi_camerasOffDevices_str, house_mode->cj_cameras_off_devices);
 
-            cJSON* cj_disarmed = cJSON_GetObjectItem(cj_house_mode, ezlopi_disarmedDevices_str);
-            __cjson_add_disarmed_devices_to_array(cj_disarmed);
-
             if (!cJSON_AddItemToArray(cj_modes_arr, cj_house_mode))
             {
                 cJSON_Delete(cj_house_mode);
@@ -485,28 +482,6 @@ static void __cjson_add_alarmed(cJSON* cj_alarmed, s_alarmed_t* alarmed)
             }
         }
     }
-}
-
-static int __cjson_add_disarmed_devices_to_array(cJSON* cj_disarmed_device_array)
-{
-    int ret = 0;
-    if (cj_disarmed_device_array && (cj_disarmed_device_array->type == cJSON_Array))
-    {
-        l_ezlopi_device_t* device_head = ezlopi_device_get_head();
-        while (device_head)
-        {
-            if (!device_head->cloud_properties.armed)
-            {
-                char temp[32];
-                memset(temp, 0, 32);
-                snprintf(temp, 32, "%08X", device_head->cloud_properties.device_id);
-                cJSON_AddItemToArray(cj_disarmed_device_array, cJSON_CreateString(temp));
-            }
-            device_head = device_head->next;
-        }
-        ret = 1;
-    }
-    return ret;
 }
 
 static int __cjson_add_security_device_to_array(cJSON* cj_device_array)

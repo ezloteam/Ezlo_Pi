@@ -209,7 +209,6 @@ void ezlopi_core_modes_init(void)
 {
     uint32_t _is_custom_mode_ok = 0;
     char* custom_modes_str = ezlopi_nvs_read_modes();
-
     if (custom_modes_str)
     {
         cJSON* cj_custom_modes = cJSON_Parse(custom_modes_str);
@@ -269,4 +268,65 @@ int ezlopi_core_modes_set_disarmed_default(uint8_t modesID, bool disarmedDefault
     }
     return ret;
 }
+
+int ezlopi_core_modes_add_disarmed_device(uint8_t modeId, const char* device_id_str)
+{
+    int ret = 0;
+    if ((EZLOPI_HOUSE_MODE_REF_ID_NONE < modeId) && (EZLOPI_HOUSE_MODE_REF_ID_MAX > modeId) && device_id_str)
+    {
+        ezlopi_service_modes_stop();
+        s_house_modes_t* mode_to_update = ezlopi_core_modes_get_house_mode_by_id(modeId);
+        if (mode_to_update)
+        {
+            if (mode_to_update->cj_disarmed_devices && (cJSON_Array == mode_to_update->cj_disarmed_devices->type))
+            {
+#warning("Check for the existance of the device and check for the device to be of security type if required. Needs discussion.")
+                cJSON_AddItemToArray(mode_to_update->cj_disarmed_devices, cJSON_CreateString(device_id_str));
+                ezlopi_core_modes_store_to_nvs();
+                ret = 1;
+            }
+        }
+        ezlopi_service_modes_start();
+    }
+
+    return ret;
+}
+
+int ezlopi_core_modes_remove_disarmed_device(uint8_t modeId, const char* device_id_str)
+{
+    int ret = 0;
+
+    if ((EZLOPI_HOUSE_MODE_REF_ID_NONE < modeId) && (EZLOPI_HOUSE_MODE_REF_ID_MAX > modeId) && device_id_str)
+    {
+        ezlopi_service_modes_stop();
+        s_house_modes_t* mode_to_update = ezlopi_core_modes_get_house_mode_by_id(modeId);
+        if (mode_to_update)
+        {
+            if (mode_to_update->cj_disarmed_devices && (cJSON_Array == mode_to_update->cj_disarmed_devices->type))
+            {
+#warning("Check for the existance of the device and check for the device to be of security type if required. Needs discussion.")
+                cJSON* element = NULL;
+                int array_index = 0;
+                cJSON_ArrayForEach(element, mode_to_update->cj_disarmed_devices)
+                {
+                    TRACE_E("Element: %p: %d", element, element->type);
+                    if(0 == strncmp(device_id_str, element->valuestring, 32))
+                    {
+                        cJSON* cj_device_str = cJSON_DetachItemFromArray(mode_to_update->cj_disarmed_devices, array_index);
+                        TRACE_E("Freeing: %s\nNew json is %s", cJSON_Print(cj_device_str), cJSON_Print(mode_to_update->cj_disarmed_devices));
+                        cJSON_free(cj_device_str);
+                        ezlopi_core_modes_store_to_nvs();
+                        break;
+                    }
+                    array_index++;
+                }
+                ret = 1;
+            }
+        }
+        ezlopi_service_modes_start();
+    }
+
+    return ret;
+}
+
 #endif // CONFIG_EZLPI_SERV_ENABLE_MODES

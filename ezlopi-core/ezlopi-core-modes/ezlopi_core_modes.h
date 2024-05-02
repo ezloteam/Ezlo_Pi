@@ -141,6 +141,8 @@ int ezlopi_core_modes_api_cancel_entry_delay(void);
 int ezlopi_core_modes_set_switch_to_delay(uint32_t switch_to_delay);
 int ezlopi_core_modes_set_alarm_delay(uint32_t switch_to_delay);
 int ezlopi_core_modes_set_disarmed_default(uint8_t modesID, bool disarmedDefaule);
+int ezlopi_core_modes_add_disarmed_device(uint8_t modesId, const char* device_id_str);
+int ezlopi_core_modes_remove_disarmed_device(uint8_t modesId, const char* device_id);
 
 int ezlopi_core_modes_cjson_get_current_mode(cJSON* cj_result);
 

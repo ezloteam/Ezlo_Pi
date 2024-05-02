@@ -25,7 +25,7 @@ void ezlopi_cloud_modes_protect_buttons_updated(cJSON* cj_request, cJSON* cj_res
 void ezlopi_cloud_modes_protect_buttons_removed(cJSON* cj_request, cJSON* cj_response);
 void ezlopi_cloud_modes_protect_devices_added(cJSON* cj_request, cJSON* cj_response);
 void ezlopi_cloud_modes_protect_devices_removed(cJSON* cj_request, cJSON* cj_response);
-void ezlopi_cloud_modes_disarmed_default_set_updater(cJSON* cj_request, cJSON* cj_response);
+void ezlopi_cloud_modes_changed_updater(cJSON* cj_request, cJSON* cj_response);
 
 #endif // CONFIG_EZLPI_SERV_ENABLE_MODES
 

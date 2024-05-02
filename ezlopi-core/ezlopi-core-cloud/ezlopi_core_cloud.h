@@ -25,7 +25,7 @@ typedef struct s_ezlopi_cloud_controller
 
 typedef struct s_ezlopi_cloud_item
 {
-    uint32_t item_id;       // '_id' -> https://api.ezlo.com/hub/items_api/index.html,
+    uint32_t item_id;       // '_id' -> https://api.ezlo.com/hub/items_api/index.html,Ready status of device. true value means device is ready to any changes. false value means device is busy.
     uint32_t device_id;     // deviceID -> https://api.ezlo.com/hub/items_api/index.html,
     bool has_getter;        // 'hasGetter' -> https://api.ezlo.com/hub/items_api/index.html,
     bool has_setter;        // 'haSetter' -> https://api.ezlo.com/hub/items_api/index.html,
@@ -53,7 +53,12 @@ typedef struct s_ezlopi_cloud_device
     const char* device_type; // 'type' -> https://api.ezlo.com/hub/devices_api/index.html, ezlopi-cloud/constants/device_types_str.h
     cJSON* info;             // info -> https://log.ezlo.com/new/hub/devices_api/
     bool armed;                // 'armed' -> https://api.ezlo.com/hub/devices_api/index.html
-
+    bool reachable;            // 'reachable' -> https://api.ezlo.com/hub/devices_api/index.html
+    bool battery_powered;      // 'batteryPowered' -> https://api.ezlo.com/hub/devices_api/index.html
+    // bool ready;              // Ready status of device. true value means device is ready to any changes. false value means device is busy.
+    // const char* security;    // Security level how the device is connected. Possible options: no, low, middle, high.
+    // char* status;            // ideal, broken, updating, rediscovering
+    // const bool service_notification; // 'serviceNotification' -> https://api.ezlo.com/hub/devices_api/index.html
 } s_ezlopi_cloud_device_t;
 
 typedef struct s_ezlopi_cloud_info

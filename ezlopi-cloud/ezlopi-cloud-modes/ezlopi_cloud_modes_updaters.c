@@ -120,7 +120,7 @@ void ezlopi_cloud_modes_protect_devices_removed(cJSON* cj_request, cJSON* cj_res
     cJSON* cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
 }
 
-void ezlopi_cloud_modes_disarmed_default_set_updater(cJSON* cj_request, cJSON* cj_response)
+void ezlopi_cloud_modes_changed_updater(cJSON* cj_request, cJSON* cj_response)
 {
     cJSON_AddStringToObject(cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
     cJSON_AddStringToObject(cj_response, ezlopi_msg_subclass_str, ezlopi_modes_changed_str);

@@ -149,57 +149,75 @@ void ezlopi_cloud_modes_disarmed_default_set(cJSON* cj_request, cJSON* cj_respon
         cJSON* cj_disarmedDefault = cJSON_GetObjectItem(cj_params, ezlopi_disarmedDefault_str);
         if (cj_modeId && cj_disarmedDefault)
         {
-            uint8_t modeId = strtoul(cj_modeId->valuestring, NULL, 10); 
+            uint8_t modeId = strtoul(cj_modeId->valuestring, NULL, 10);
             bool disarmedDefault = cj_disarmedDefault->type == cJSON_True ? true : false;
             ezlopi_core_modes_set_disarmed_default(modeId, disarmedDefault);
-            l_ezlopi_device_t* device_to_change = ezlopi_device_get_head();
-            while (device_to_change)
+#if 0
+            s_house_modes_t* current_house_mode = ezlopi_core_modes_get_current_house_modes();
+            if (current_house_mode->_id == modeId)
             {
-                if (device_to_change->cloud_properties.armed != disarmedDefault)
+                l_ezlopi_device_t* device_to_change = ezlopi_device_get_head();
+                while (device_to_change)
                 {
-                    device_to_change->cloud_properties.armed = disarmedDefault;
-                    cJSON* cj_device_armed_broadcast = cJSON_CreateObject();
-                    if (cj_device_armed_broadcast)
+                    if (device_to_change->cloud_properties.armed != disarmedDefault)
                     {
-                        cJSON_AddStringToObject(cj_device_armed_broadcast, ezlopi_method_str, "hub.device.armed.set");
-                        cJSON* cj_params = cJSON_AddObjectToObject(cj_device_armed_broadcast, ezlopi_params_str);
-                        if (cj_params)
+                        device_to_change->cloud_properties.armed = disarmedDefault;
+                        cJSON* cj_device_armed_broadcast = cJSON_CreateObject();
+                        if (cj_device_armed_broadcast)
                         {
-                            char temp[32];
-                            memset(temp, 0, 32);
-                            snprintf(temp, 32, "%08x", device_to_change->cloud_properties.device_id);
-                            cJSON_AddStringToObject(cj_params, ezlopi__id_str, temp);
-                            cJSON_AddBoolToObject(cj_params, ezlopi_armed_str, disarmedDefault);
-                            uint32_t id = ezlopi_core_ezlopi_methods_search_in_list(cJSON_GetObjectItem(cj_device_armed_broadcast, ezlopi_method_str));
-                            f_method_func_t updater_method = ezlopi_core_ezlopi_methods_get_updater_by_id(id);
-                            if (updater_method)
+                            cJSON_AddStringToObject(cj_device_armed_broadcast, ezlopi_method_str, "hub.device.armed.set");
+                            cJSON* cj_params = cJSON_AddObjectToObject(cj_device_armed_broadcast, ezlopi_params_str);
+                            if (cj_params)
                             {
-                                cj_response = cJSON_CreateObject();
-                                if (NULL != cj_response)
+                                char temp[32];
+                                memset(temp, 0, 32);
+                                snprintf(temp, 32, "%08x", device_to_change->cloud_properties.device_id);
+                                cJSON_AddStringToObject(cj_params, ezlopi__id_str, temp);
+                                cJSON_AddBoolToObject(cj_params, ezlopi_armed_str, disarmedDefault);
+                                uint32_t id = ezlopi_core_ezlopi_methods_search_in_list(cJSON_GetObjectItem(cj_device_armed_broadcast, ezlopi_method_str));
+                                f_method_func_t updater_method = ezlopi_core_ezlopi_methods_get_updater_by_id(id);
+                                if (updater_method)
                                 {
-                                    updater_method(cj_device_armed_broadcast, cj_response);
-
-                                    if (!ezlopi_core_ezlopi_broadcast_add_to_queue(cj_response))
+                                    cj_response = cJSON_CreateObject();
+                                    if (NULL != cj_response)
                                     {
-                                        cJSON_Delete(cj_response);
+                                        updater_method(cj_device_armed_broadcast, cj_response);
+
+                                        if (!ezlopi_core_ezlopi_broadcast_add_to_queue(cj_response))
+                                        {
+                                            cJSON_Delete(cj_response);
+                                        }
+
                                     }
-                                    
                                 }
                             }
                         }
                     }
+                    device_to_change = device_to_change->next;
                 }
-                device_to_change = device_to_change->next;
             }
+#endif
         }
     }
 }
 
 void ezlopi_cloud_modes_disarmed_devices_add(cJSON* cj_request, cJSON* cj_response)
 {
+    #warning("Disarmed devices are added in the cJSON of current mode so, later change the internal implementation of disarmed device in default_disarmed set method. i.e. updating the array")
     cJSON* cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
     if (cj_result)
     {
+        cJSON* cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
+        if (cj_params)
+        {
+            cJSON* cj_modeId = cJSON_GetObjectItem(cj_params, ezlopi_modeId_str);
+            cJSON* cj_deviceId = cJSON_GetObjectItem(cj_params, ezlopi_deviceId_str);
+            if (cj_modeId && cj_deviceId)
+            {
+                uint8_t modeId = strtoul(cj_modeId->valuestring, NULL, 10);
+                ezlopi_core_modes_add_disarmed_device(modeId, cj_deviceId->valuestring);
+            }
+        }
     }
 }
 
@@ -208,6 +226,17 @@ void ezlopi_cloud_modes_disarmed_devices_remove(cJSON* cj_request, cJSON* cj_res
     cJSON* cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
     if (cj_result)
     {
+        cJSON* cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
+        if (cj_params)
+        {
+            cJSON* cj_modeID = cJSON_GetObjectItem(cj_params, ezlopi_modeId_str);
+            cJSON* cj_deviceId = cJSON_GetObjectItem(cj_params, ezlopi_deviceId_str);
+            if (cj_modeID && cj_deviceId)
+            {
+                uint8_t modeId = strtoul(cj_modeID->valuestring, NULL, 10);
+                ezlopi_core_modes_remove_disarmed_device(modeId, cj_deviceId->valuestring);
+            }
+        }
     }
 }
 
