@@ -166,6 +166,7 @@ static int __set_cjson_value(l_ezlopi_item_t* item, void* arg)
                 int target_value = (int)(((value * 17) / 100) + 13);
                 TRACE_I("target value: %d", target_value);
                 ezlopi_pwm_change_duty(item->interface.pwm.channel, item->interface.pwm.speed_mode, target_value);
+                ret = 1;
             }
         }
     }

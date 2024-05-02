@@ -1,6 +1,6 @@
 
 
-#include "sdkconfig.h"
+#include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_ENABLE_LED_INDICATOR
 

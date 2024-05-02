@@ -2,10 +2,10 @@
 #include "stdlib.h"
 #include "stdbool.h"
 #include "string.h"
-
+#include "../../build/config/sdkconfig.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "sdkconfig.h"
+#include "../../build/config/sdkconfig.h"
 
 #include "ezlopi_util_trace.h"
 
@@ -42,14 +42,18 @@ static size_t set_default_task_memory_usage(const char* default_task_name)
         {
             stack_size = CONFIG_FREERTOS_TIMER_TASK_STACK_DEPTH;
         }
+#ifdef CONFIG_EZPI_BLE_ENABLE
         else if (0 == strncmp("BTU_TASK", default_task_name, 9))
         {
-            stack_size = CONFIG_BTU_TASK_STACK_SIZE;
+            // stack_size = CONFIG_BTU_TASK_STACK_SIZE;
+            stack_size = 4096;
         }
         else if (0 == strncmp("BTC_TASK", default_task_name, 9))
         {
-            stack_size = CONFIG_BT_BTC_TASK_STACK_SIZE;
+            // stack_size = CONFIG_BT_BTC_TASK_STACK_SIZE;
+            stack_size = 4096;
         }
+#endif // CONFIG_EZPI_BLE_ENABLE
         else if (0 == strncmp("sys_evt", default_task_name, 8))
         {
             stack_size = CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE;

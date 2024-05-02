@@ -4,7 +4,7 @@
 
 #include "freertos/FreeRTOS.h"
 
-#include "sdkconfig.h"
+#include "../../build/config/sdkconfig.h"
 #include "ezlopi_core_factory_info.h"
 #include "ezlopi_cloud_info.h"
 #include "ezlopi_util_trace.h"

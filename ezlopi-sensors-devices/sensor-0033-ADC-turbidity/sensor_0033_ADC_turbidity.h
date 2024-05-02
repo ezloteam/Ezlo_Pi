@@ -2,7 +2,7 @@
 #define SENSOR_0033_ADC_TURBIDITY_H
 
 #include <stdio.h>
-#include "sdkconfig.h"
+#include "../../build/config/sdkconfig.h"
 // #include "driver/gpio.h"
 // #include "freertos/FreeRTOS.h"
 // #include "freertos/task.h"
@@ -18,6 +18,6 @@ typedef enum
     TURBIDITY__MAX
 } e_water_filter_replacement_alarm_states_t;
 
-int sensor_0033_ADC_turbidity(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
+int sensor_0033_ADC_turbidity(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg);
 
 #endif // SENSOR_0033_ADC_TURBIDITY_H

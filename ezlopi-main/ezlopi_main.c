@@ -29,6 +29,7 @@
 #include "pt.h"
 #include "ezlopi_core_ble_config.h"
 #include "ezlopi_core_processes.h"
+#include "ezlopi_util_heap.h"
 
 static void blinky(void* pv);
 
@@ -45,20 +46,18 @@ void app_main(void)
     ezlopi_init();
 
 #if defined(CONFIG_EZPI_ENABLE_UART_PROVISIONING)
-    EZPI_SERVICE_uart_init();
+    EZPI_SERV_uart_init();
 #endif
 
     timer_service_init();
 
-#if defined(CONFIG_EZLOPI_BLE_ENABLE)
+#if defined(CONFIG_EZPI_BLE_ENABLE)
     ezlopi_ble_service_init();
 #endif
 
 #if defined(CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER) || defined(CONFIG_EZPI_WEBSOCKET_CLIENT)
     ezlopi_service_broadcast_init();
 #endif
-
-    ezlpi_service_ws_server_dummy();
 
 #if defined(CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER)
     ezlopi_service_ws_server_start();
@@ -93,30 +92,57 @@ static void blinky(void* pv)
 
     while (1)
     {
-        if (count++ > 1000)
+        uint32_t low_heap_start_time = xTaskGetTickCount();
+        float free_heap_kb = esp_get_free_heap_size() / 1024.0;
+
+        UBaseType_t total_task_numbers = uxTaskGetNumberOfTasks();
+        TaskStatus_t task_array[total_task_numbers];
+
+        TRACE_D("----------------------------------------------");
+        TRACE_D("Free Heap Size: %.2f KB", esp_get_free_heap_size() / 1024.0);
+        TRACE_D("Minimum Free Heap Size: %.2f KB", esp_get_minimum_free_heap_size() / 1024.0);
+
+#ifdef CONFIG_EZPI_HEAP_ENABLE
+        ezlopi_util_heap_trace();
+
+        if (free_heap_kb <= 10)
         {
-            count = 0;
+            TRACE_W("CRITICAL-WARNING: low heap detected..");
+            ezlopi_util_heap_trace();
+        }
+        else if ((xTaskGetTickCount() - low_heap_start_time) > (15000 / portTICK_PERIOD_MS))
+        {
+            ezlopi_util_heap_trace();
+            vTaskDelay(2000 / portTICK_RATE_MS);
+            TRACE_E("CRITICAL-ERROR: low heap time-out detected!");
+            TRACE_W("Rebooting.....");
+            esp_restart();
+        }
+        else
+        {
+            low_heap_start_time = xTaskGetTickCount();
+        }
+#endif // CONFIG_EZPI_HEAP_ENABLE
 
-            UBaseType_t total_task_numbers = uxTaskGetNumberOfTasks();
-            TaskStatus_t task_array[total_task_numbers];
+#if 0
 
-            TRACE_D("----------------------------------------------");
-            TRACE_D("Free Heap Size: %.2f KB", esp_get_free_heap_size() / 1024.0);
-            TRACE_D("Minimum Free Heap Size: %.2f KB", esp_get_minimum_free_heap_size() / 1024.0);
+        uxTaskGetSystemState(task_array, total_task_numbers, NULL);
 
-            uxTaskGetSystemState(task_array, total_task_numbers, NULL);
-
-            for (int i = 0; i < total_task_numbers; i++) {
+        for (int i = 0; i < total_task_numbers; i++) {
+            if (task_array[i].pcTaskName)
+            {
                 TRACE_D("Process Name: %s, \tPID: %d, \tBase: %p, \tWatermark: %.2f KB",
                     task_array[i].pcTaskName,
                     task_array[i].xTaskNumber,
                     task_array[i].pxStackBase,
                     task_array[i].usStackHighWaterMark / 1024.0);
             }
-
-            TRACE_D("----------------------------------------------");
-
         }
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
+#endif 
+        TRACE_D("----------------------------------------------");
+#ifdef CONFIG_EZPI_HEAP_ENABLE
+        ezlopi_util_heap_flush();
+#endif // CONFIG_EZPI_HEAP_ENABLE        
+        vTaskDelay(5000 / portTICK_PERIOD_MS);
     }
 }

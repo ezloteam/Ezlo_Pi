@@ -1,3 +1,7 @@
+#include "../../build/config/sdkconfig.h"
+
+#ifdef CONFIG_EZPI_BLE_ENABLE
+
 #include <string.h>
 #include <time.h>
 
@@ -342,3 +346,5 @@ static char* __dynamic_config_base64(void)
 
     return base64_data;
 }
+
+#endif // CONFIG_EZPI_BLE_ENABLE

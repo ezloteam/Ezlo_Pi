@@ -13,6 +13,7 @@ set(EZLOPI_SDK_COMPONENTS
 set(EZLOPI_COMPONENTS
         pt
         ezlopi-util-trace
+        ezlopi-util-heap
 )
 
 # Define core components
@@ -38,7 +39,7 @@ set(EZLOPI_SENSOR_DEVICE_COMPONENTS
 
 # Define service components
 set(EZLOPI_SERVICES
-ezlopi-service-ble
+        ezlopi-service-ble
         ezlopi-service-ota
         ezlopi-service-uart
         ezlopi-service-modes
