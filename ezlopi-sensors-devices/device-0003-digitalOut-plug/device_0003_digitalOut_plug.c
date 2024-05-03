@@ -140,7 +140,7 @@ static int __init(l_ezlopi_item_t* item)
     if (item)
     {
 
-        if (GPIO_IS_VALID_OUTPUT_GPIO(item->interface.gpio.gpio_out.gpio_num) &&
+        if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_out.gpio_num) &&
             (255 != item->interface.gpio.gpio_out.gpio_num))
         {
             const gpio_config_t io_conf = {
@@ -268,7 +268,7 @@ static int __set_value(l_ezlopi_item_t* item, void* arg)
 
             if (255 != item->interface.gpio.gpio_out.gpio_num)
             {
-                if (GPIO_IS_VALID_OUTPUT_GPIO(item->interface.gpio.gpio_out.gpio_num))
+                if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_out.gpio_num))
                 {
                     __set_gpio_value(item, value);
                     ezlopi_device_value_updated_from_device_broadcast(item);

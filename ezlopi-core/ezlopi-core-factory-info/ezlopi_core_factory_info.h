@@ -178,12 +178,19 @@ extern "C"
                 \"val_op\": false\
             },\
             {\
+                \"dev_type\": 7,\
+                \"dev_name\": \"temp_humi\",\
+                \"id_room\": \"\",\
+                \"id_item\": 16,\
+                \"gpio\": 18\
+            },\
+            {\
                 \"dev_type\": 1,\
                 \"dev_name\": \"for_test\",\
                 \"id_room\": \"\",\
                 \"id_item\": 2,\
                 \"gpio_in\": 0,\
-                \"gpio_out\": 15,\
+                \"gpio_out\": 32,\
                 \"pullup_ip\": false,\
                 \"pullup_op\": false,\
                 \"is_ip\": false,\
@@ -191,13 +198,6 @@ extern "C"
                 \"op_inv\": false,\
                 \"val_ip\": false,\
                 \"val_op\": false\
-            },\
-            {\
-                \"dev_type\": 7,\
-                \"dev_name\": \"temp_humi\",\
-                \"id_room\": \"\",\
-                \"id_item\": 16,\
-                \"gpio\": 18\
             }\
         ], \
         \"dev_total\": 3}";

@@ -108,7 +108,7 @@ void EZPI_CORE_sntp_get_local_time(char* time_buf, uint32_t buf_len)
         if (setenv("TZ", posix_str, 1) != 0)
         {
             TRACE_E("Error setting time zone: %s", posix_str);
-            return NULL;
+            return ;
         }
         else
         {
