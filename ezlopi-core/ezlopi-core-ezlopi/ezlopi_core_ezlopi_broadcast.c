@@ -34,6 +34,31 @@ int ezlopi_core_ezlopi_broadcast_add_to_queue(cJSON* cj_data)
     return ret;
 }
 
+void ezlopi_core_broadcast_log_cjson(cJSON* cj_log_data)
+{
+    int ret = 0;
+
+    if (cj_log_data)
+    {
+        uint32_t buffer_len = 0;
+        char* data_buffer = ezlopi_core_buffer_acquire(&buffer_len, 5000);
+
+        if (data_buffer && buffer_len)
+        {
+            memset(data_buffer, 0, buffer_len);
+
+            if (true == cJSON_PrintPreallocated(cj_log_data, data_buffer, buffer_len, false))
+            {
+                ret = __call_broadcast_methods(data_buffer);
+            }
+
+            ezlopi_core_buffer_release();
+        }
+    }
+
+    return ret;
+}
+
 int ezlopi_core_ezlopi_broadcast_cjson(cJSON* cj_data)
 {
     int ret = 0;

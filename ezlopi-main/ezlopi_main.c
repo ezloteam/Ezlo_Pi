@@ -16,6 +16,7 @@
 
 #include "ezlopi_core_ezlopi.h"
 #include "ezlopi_service_ota.h"
+#include "ezlopi_core_log.h"
 
 #include "ezlopi_service_ble.h"
 #include "ezlopi_service_uart.h"
@@ -33,14 +34,13 @@
 #include "ezlopi_core_processes.h"
 #include "ezlopi_util_heap.h"
 
-#define NUM_RECORDS 200
-static heap_trace_record_t trace_record[NUM_RECORDS]; // This buffer must be in internal RAM
-
 
 static void blinky(void* pv);
 
 void app_main(void)
 {
+    ezlopi_core_set_log_upcalls();
+
 #ifdef CONFIG_EZPI_ENABLE_LED_INDICATOR
     ezlopi_service_led_indicator_init();
 #endif // CONFIG_EZPI_ENABLE_LED_INDICATOR
@@ -63,7 +63,7 @@ void app_main(void)
 #if defined(CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER) || defined(CONFIG_EZPI_WEBSOCKET_CLIENT)
     ezlopi_service_broadcast_init();
 #endif
-
+    ezlpi_service_ws_server_dummy();
 #if defined(CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER)
     ezlopi_service_ws_server_start();
 #endif
@@ -83,12 +83,11 @@ void app_main(void)
 #if CONFIG_EZPI_SERV_ENABLE_MESHBOTS
     ezlopi_scenes_meshbot_init();
 #endif
+    
 
     TaskHandle_t ezlopi_main_blinky_task_handle = NULL;
     xTaskCreate(blinky, "blinky", EZLOPI_MAIN_BLINKY_TASK_DEPTH, NULL, 1, &ezlopi_main_blinky_task_handle);
     ezlopi_core_process_set_process_info(ENUM_EZLOPI_MAIN_BLINKY_TASK, &ezlopi_main_blinky_task_handle, EZLOPI_MAIN_BLINKY_TASK_DEPTH);
-
-    ESP_ERROR_CHECK(heap_trace_init_standalone(trace_record, NUM_RECORDS));
 
 }
 
@@ -102,8 +101,8 @@ static void blinky(void* pv)
         uint32_t low_heap_start_time = xTaskGetTickCount();
         float free_heap_kb = esp_get_free_heap_size() / 1024.0;
 
-        UBaseType_t total_task_numbers = uxTaskGetNumberOfTasks();
-        TaskStatus_t task_array[total_task_numbers];
+        // UBaseType_t total_task_numbers = uxTaskGetNumberOfTasks();
+        // TaskStatus_t task_array[total_task_numbers];
 
         trace_wb("----------------------------------------------");
         uint32_t free_heap = esp_get_free_heap_size();
