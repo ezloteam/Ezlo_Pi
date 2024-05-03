@@ -3,15 +3,15 @@
 
 #include <string.h>
 
-#include "cJSON.h"
+#include "cjext.h"
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
-    void network_get(cJSON *cj_request, cJSON *cj_response);
-    void network_wifi_scan_start(cJSON *cj_request, cJSON *cj_response);
+    void network_get(cJSON* cj_request, cJSON* cj_response);
+    void network_wifi_scan_start(cJSON* cj_request, cJSON* cj_response);
     void network_wifi_scan_stop(cJSON* cj_request, cJSON* cj_response);
 
 #ifdef __cplusplus

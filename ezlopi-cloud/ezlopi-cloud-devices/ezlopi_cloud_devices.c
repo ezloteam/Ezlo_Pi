@@ -8,7 +8,7 @@
 #include "ezlopi_core_devices_list.h"
 #include "ezlopi_cloud_keywords.h"
 #include "ezlopi_cloud_methods_str.h"
-#include "cJSON.h"
+#include "cjext.h"
 
 void devices_list_v3(cJSON* cj_request, cJSON* cj_response)
 {

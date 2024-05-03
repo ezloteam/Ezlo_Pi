@@ -154,7 +154,7 @@ static int __get_cjson_update_value(l_ezlopi_item_t* item)
                     if (compare_float_values(value_ptr->temperature, value_ptr->gxhtc3->reading_temp_c))
                     {
                         value_ptr->temperature = value_ptr->gxhtc3->reading_temp_c;
-                        ezlopi_device_value_updated_from_device_v3(item);
+                        ezlopi_device_value_updated_from_device_broadcast(item);
                     }
                 }
                 else if (value_type_humidity == item->cloud_properties.value_type)
@@ -162,7 +162,7 @@ static int __get_cjson_update_value(l_ezlopi_item_t* item)
                     if (compare_float_values(value_ptr->humidity, value_ptr->gxhtc3->reading_rh))
                     {
                         value_ptr->humidity = value_ptr->gxhtc3->reading_rh;
-                        ezlopi_device_value_updated_from_device_v3(item);
+                        ezlopi_device_value_updated_from_device_broadcast(item);
                     }
                 }
             }

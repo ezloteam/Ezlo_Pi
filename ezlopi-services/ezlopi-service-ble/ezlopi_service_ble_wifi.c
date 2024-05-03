@@ -1,6 +1,11 @@
+
+#include "../../build/config/sdkconfig.h"
+
+#ifdef CONFIG_EZPI_BLE_ENABLE
+
 #include <string.h>
 
-#include "cJSON.h"
+#include "cjext.h"
 #include "lwip/ip_addr.h"
 #include "esp_event_base.h"
 
@@ -119,3 +124,4 @@ static void wifi_creds_parse_and_connect(uint8_t* value, uint32_t len)
         }
     }
 }
+#endif // CONFIG_EZPI_BLE_ENABLE

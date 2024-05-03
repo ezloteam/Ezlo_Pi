@@ -1,8 +1,11 @@
 #ifndef __EZLOPI_SERVICE_WS_SERVER_H__
 #define __EZLOPI_SERVICE_WS_SERVER_H__
 
-#include <cJSON.h>
+#include "cjext.h"
 #include "ezlopi_service_ws_server_clients.h"
+
+
+#ifdef CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER
 
 typedef enum e_ws_status
 {
@@ -15,5 +18,11 @@ void ezlopi_service_ws_server_stop(void);
 void ezlopi_service_ws_server_start(void);
 
 e_ws_status_t ezlopi_service_ws_server_status(void);
+
+
+
+#endif // CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER
+
+void ezlpi_service_ws_server_dummy(void);
 
 #endif // __EZLOPI_SERVICE_WS_SERVER_H__

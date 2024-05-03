@@ -164,11 +164,33 @@ extern "C"
         [\
             {\
                 \"dev_type\": 1,\
-                \"dev_name\": \"LED\",\
+                \"dev_name\": \"switch_temp\",\
                 \"id_room\": \"\",\
-                \"id_item\": 1,\
+                \"id_item\": 2,\
                 \"gpio_in\": 0,\
-                \"gpio_out\": 5,\
+                \"gpio_out\": 25,\
+                \"pullup_ip\": false,\
+                \"pullup_op\": false,\
+                \"is_ip\": false,\
+                \"ip_inv\": false,\
+                \"op_inv\": false,\
+                \"val_ip\": false,\
+                \"val_op\": false\
+            },\
+            {\
+                \"dev_type\": 7,\
+                \"dev_name\": \"temp_humi\",\
+                \"id_room\": \"\",\
+                \"id_item\": 16,\
+                \"gpio\": 18\
+            },\
+            {\
+                \"dev_type\": 1,\
+                \"dev_name\": \"for_test\",\
+                \"id_room\": \"\",\
+                \"id_item\": 2,\
+                \"gpio_in\": 0,\
+                \"gpio_out\": 32,\
                 \"pullup_ip\": false,\
                 \"pullup_op\": false,\
                 \"is_ip\": false,\
@@ -178,7 +200,7 @@ extern "C"
                 \"val_op\": false\
             }\
         ], \
-        \"dev_total\": 5}";
+        \"dev_total\": 3}";
 #endif
 
 

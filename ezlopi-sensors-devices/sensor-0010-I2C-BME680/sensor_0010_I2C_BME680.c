@@ -333,7 +333,7 @@ static int __notify(l_ezlopi_item_t* item)
                 if (fabs(user_data->temperature - temperature) > 0.05)
                 {
                     user_data->temperature = temperature;
-                    ezlopi_device_value_updated_from_device_v3(item);
+                    ezlopi_device_value_updated_from_device_broadcast(item);
                 }
             }
             if (ezlopi_item_name_humidity == item->cloud_properties.item_name)
@@ -341,7 +341,7 @@ static int __notify(l_ezlopi_item_t* item)
                 if (fabs(user_data->humidity - humidity) > 0.05)
                 {
                     user_data->humidity = humidity;
-                    ezlopi_device_value_updated_from_device_v3(item);
+                    ezlopi_device_value_updated_from_device_broadcast(item);
                 }
             }
             if (ezlopi_item_name_atmospheric_pressure == item->cloud_properties.item_name)
@@ -349,7 +349,7 @@ static int __notify(l_ezlopi_item_t* item)
                 if (fabs((user_data->pressure / 1000.0f) - (pressure / 1000.0f)) > 0.05)
                 {
                     user_data->pressure = pressure;
-                    ezlopi_device_value_updated_from_device_v3(item);
+                    ezlopi_device_value_updated_from_device_broadcast(item);
                 }
             }
             if (ezlopi_item_name_volatile_organic_compound_level == item->cloud_properties.item_name)
@@ -357,7 +357,7 @@ static int __notify(l_ezlopi_item_t* item)
                 if (fabs(user_data->iaq - iaq) > 0.05)
                 {
                     user_data->iaq = iaq;
-                    ezlopi_device_value_updated_from_device_v3(item);
+                    ezlopi_device_value_updated_from_device_broadcast(item);
                 }
             }
             if (ezlopi_item_name_distance == item->cloud_properties.item_name)
@@ -365,7 +365,7 @@ static int __notify(l_ezlopi_item_t* item)
                 if (fabs(user_data->altitude - altitude) > 0.05)
                 {
                     user_data->altitude = altitude;
-                    ezlopi_device_value_updated_from_device_v3(item);
+                    ezlopi_device_value_updated_from_device_broadcast(item);
                 }
             }
             if (ezlopi_item_name_co2_level == item->cloud_properties.item_name)
@@ -373,7 +373,7 @@ static int __notify(l_ezlopi_item_t* item)
                 if (fabs(user_data->co2_equivalent - co2_eqv) > 0.05)
                 {
                     user_data->co2_equivalent = co2_eqv;
-                    ezlopi_device_value_updated_from_device_v3(item);
+                    ezlopi_device_value_updated_from_device_broadcast(item);
                 }
             }
         }

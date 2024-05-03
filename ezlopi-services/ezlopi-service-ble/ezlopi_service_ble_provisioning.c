@@ -1,7 +1,12 @@
+
+#include "../../build/config/sdkconfig.h"
+
+#ifdef CONFIG_EZPI_BLE_ENABLE
+
 #include <string.h>
 #include <time.h>
 
-#include "cJSON.h"
+#include "cjext.h"
 #include "lwip/ip_addr.h"
 #include "esp_event_base.h"
 #include "mbedtls/base64.h"
@@ -26,7 +31,6 @@
 
 #define CJ_GET_STRING(name) cJSON_GetStringValue(cJSON_GetObjectItem(root, name))
 #define CJ_GET_NUMBER(name) cJSON_GetNumberValue(cJSON_GetObjectItem(root, name))
-
 static s_gatt_service_t* g_provisioning_service;
 static s_linked_buffer_t* g_provisioning_linked_buffer = NULL;
 
@@ -558,4 +562,7 @@ static char* __provisioning_info_base64(void)
 
     return base64_data;
 }
+
+#endif // CONFIG_EZPI_BLE_ENABLE
+
 #endif // EZPI_SERV_BLE_ENABLE_READ_PROV

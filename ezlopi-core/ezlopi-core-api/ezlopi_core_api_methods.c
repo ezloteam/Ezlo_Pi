@@ -1,4 +1,3 @@
-
 #include "ezlopi_cloud_ota.h"
 #include "ezlopi_cloud_data.h"
 #include "ezlopi_cloud_info.h"
@@ -13,16 +12,22 @@
 #include "ezlopi_cloud_gateways.h"
 #include "ezlopi_cloud_settings.h"
 #include "ezlopi_cloud_constants.h"
+#include "ezlopi_cloud_methods_str.h"
 #include "ezlopi_cloud_coordinates.h"
 #include "ezlopi_cloud_registration.h"
+#include "ezlopi_cloud_offline_login.h"
 #include "ezlopi_cloud_modes_updaters.h"
 #include "ezlopi_cloud_scenes_scripts.h"
 #include "ezlopi_cloud_scenes_expressions.h"
-#include "ezlopi_cloud_offline_login.h"
+#include "ezlopi_cloud_status.h"
+#include "ezlopi_cloud_log.h"
 
 #include "ezlopi_core_reset.h"
-#include "ezlopi_core_api_methods.h"
 #include "ezlopi_util_trace.h"
+
+#include "ezlopi_util_trace.h"
+
+#include "ezlopi_core_api_methods.h"
 
 static const s_method_list_v2_t method_list_v2[] = {
 #define CLOUD_METHOD(name, _method, _updater) {.method_name = name, .method = _method, .updater = _updater},

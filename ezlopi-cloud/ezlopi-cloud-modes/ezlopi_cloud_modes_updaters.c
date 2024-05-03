@@ -8,6 +8,7 @@
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_cloud_modes_updaters.h"
 
+#if defined(CONFIG_EZPI_SERV_ENABLE_MODES)
 void ezlopi_cloud_modes_switched(cJSON* cj_request, cJSON* cj_response)
 {
     cJSON_DeleteItemFromObject(cj_response, ezlopi_id_str);
@@ -118,3 +119,5 @@ void ezlopi_cloud_modes_protect_devices_removed(cJSON* cj_request, cJSON* cj_res
 {
     cJSON* cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
 }
+
+#endif // CONFIG_EZPI_SERV_ENABLE_MODES

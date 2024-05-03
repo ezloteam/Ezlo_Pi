@@ -1,116 +1,205 @@
 
 menu "EzloPi User Config"
 
+    choice EZPI_DISTRO
+        prompt "Select from available distros:"
+        depends on IDF_TARGET_ESP32S3 || IDF_TARGET_ESP32C3 || IDF_TARGET_ESP32
+        default EZPI_DISTRO_FULL_OPTION
+
+        config EZPI_DISTRO_FULL_OPTION
+            bool "1. EZPI_DISTRO_FULL_OPTION"
+
+        config EZPI_DISTRO_LOCAL
+            bool "2. EZPI_DISTRO_LOCAL"
+
+        config EZPI_DISTRO_LOCAL_MESHBOT
+            bool "3. EZPI_DISTRO_LOCAL_MESHBOT"
+
+        config EZPI_DISTRO_CLOUD
+            bool "4. EZPI_DISTRO_CLOUD"
+
+        config EZPI_DISTRO_CLOUD_MESHBOT
+            bool "5. EZPI_DISTRO_CLOUD_MESHBOT"
+
+        config EZPI_DISTRO_BLE_CLOUD
+            bool "6. EZPI_DISTRO_BLE_CLOUD"
+
+        config EZPI_DISTRO_WIFI_HUB
+            bool "7. EZPI_DISTRO_WIFI_HUB"
+
+        config EZPI_DISTRO_BLE_HUB
+            bool "8. EZPI_DISTRO_BLE_HUB"
+
+        config EZPI_DISTRO_MINIMAL
+            bool "9. EZPI_DISTRO_MINIMAL"
+        
+    endchoice
+
+    config EZPI_HEAP_ENABLE
+        bool "Enable ezlopi heap"
+        default n
+        help
+            Enables the allocation and free via ezlopi-util, helpful to track-down any memory leak in the stack
+            
     config EZPI_DEV_TYPE_TEST
-    bool "Run device in test mode"
-    default n
-    help 
-        Run the device in test mode
+        bool "Run device in test mode"
+        default n
+        help 
+            Run the device in test mode
     
     config EZPI_UTIL_TRACE_EN
     bool "Enable trace component for logging"
     default y
     help
         ezlopi-util-trace component is enabled to log the outputs to the serial monitor
-    
-    config EZPI_CORE_ETHERNET_EN
-    bool "Enable ethernet component"
-    depends on ETH_USE_SPI_ETHERNET
-    default n
-    help 
-        ezlopi-core-ethernet component is enabled
-    
-    config EZPI_SERV_MESHBOT_EN
-    bool "Enable meshbot service"
-    default y
-    help
-        Enable meshbot services for scenes
-    
-    config EZLPI_SERV_MODES_EN
-    bool "Enable mode services"
-    default y
-    help
-        Enable mode services
 
-    config EZPI_SERV_BLE_EN
-    bool "Enable BLE"
-    default y
-    help
-        Enable BLE
-
-    config EZPI_SERV_BLE_PASSKEY_EN
-    bool "Enable BLE pass key"
-    default n
-    depends on EZPI_SERV_BLE_EN
-    help
-        Enable BLE pass key
+    config EZPI_BLE_ENABLE
+        depends on EZPI_DISTRO_FULL_OPTION || EZPI_DISTRO_LOCAL || EZPI_DISTRO_LOCAL_MESHBOT || EZPI_DISTRO_BLE_CLOUD || EZPI_DISTRO_BLE_HUB || EZPI_DISTRO_MINIMAL
+        bool "Enable BLE"
+        default n
+        help
+            Enable BLE
     
-    config EZPI_SERV_BLE_PAIRING_EN
-    bool "Enable BLE pairing"
-    depends on EZPI_SERV_BLE_EN
-    default y
-    help
-        Enable BLE pairing
+    config EZPI_BLE_ENALBE_PAIRING
+        bool "Enable BLE pairing"
+        depends on EZPI_BLE_ENABLE
+        default y
+        help
+            Enable BLE pairing
+                
+    config EZPI_BLE_ENALBE_PASSKEY
+        bool "Enable BLE pass key"
+        default n
+        depends on EZPI_BLE_ENALBE_PAIRING
+        help
+            Enable BLE pass key
+
+    config EZPI_CORE_ENABLE_ETH
+        bool "Enable ethernet"
+        depends on ETH_USE_SPI_ETHERNET || EZPI_DISTRO_FULL_OPTION 
+        default n
+        help 
+            ezlopi-core-ethernet component is enabled
+
+    config EZPI_ENABLE_WIFI
+        bool "Enable Wi-Fi"
+        default y
+        help 
+            ezlopi-core-wifi component is enabled
+
+    
+    config EZPI_ENABLE_OTA 
+        depends on EZPI_ENABLE_WIFI || EZPI_CORE_ENABLE_ETH
+        bool "Enable OTA"
+        default n
+        help
+            Enable OTA
+    
+    config EZPI_ENABLE_UART_PROVISIONING
+        bool "Enable UART provisioning"
+        depends on EZPI_DISTRO_FULL_OPTION
+        default n
+        help
+            Enable provisioning and monitoring via UART    
+
+    config EZPI_LOCAL_WEBSOCKET_SERVER
+        depends on (HTTPD_WS_SUPPORT && (EZPI_CORE_ENABLE_ETH || EZPI_ENABLE_WIFI ) && (EZPI_DISTRO_FULL_OPTION || EZPI_DISTRO_LOCAL || EZPI_DISTRO_LOCAL_MESHBOT))
+        bool "Enable local websocket server"
+        default n
+        help 
+            Enable local websocket server
+
+    config EZPI_WEBSOCKET_CLIENT
+        depends on (EZPI_CORE_ENABLE_ETH || EZPI_ENABLE_WIFI ) && (EZPI_DISTRO_FULL_OPTION || EZPI_DISTRO_CLOUD || EZPI_DISTRO_CLOUD_MESHBOT || EZPI_DISTRO_BLE_CLOUD || EZPI_DISTRO_WIFI_HUB || EZPI_DISTRO_BLE_HUB)
+        bool "Enable Web-Socket client"
+        default n
+        help 
+            Enable Web-Socket client, required for connecting with cloud
+
+    config EZPI_CORE_STATIC_BUFFER_SIZE
+        depends on EZPI_WEBSOCKET_CLIENT || EZPI_LOCAL_WEBSOCKET_SERVER
+        int "Static buffer size:"
+        default 10240
+        help 
+            Static buffer is used to broadcast data. Data is broadcasted by local-websocket-server and websocket-client. Default value is 10KB"
+
+    config EZPI_SERV_ENABLE_MESHBOTS 
+        depends on (EZPI_WEBSOCKET_CLIENT || EZPI_LOCAL_WEBSOCKET_SERVER) && (EZPI_DISTRO_FULL_OPTION || EZPI_DISTRO_LOCAL_MESHBOT || EZPI_DISTRO_CLOUD_MESHBOT )
+        bool "Enable meshbot service"
+        default n
+        help
+            Enable meshbot services for scenes
+    
+    config EZPI_SERV_ENABLE_MODES
+        depends on EZPI_SERV_ENABLE_MESHBOTS
+        bool "Enable mode services"
+        default n
+        help
+            Enable mode services
+    
+    config EZPI_ENABLE_LED_INDICATOR
+        bool "Enable indicator LED available in the device"
+        default y
+        help 
+            Enable indicator LED available in the device
+
+    config EZPI_ENABLE_MDNS_SERVICE
+        depends on EZPI_DISTRO_FULL_OPTION || EZPI_DISTRO_LOCAL || EZPI_DISTRO_LOCAL_MESHBOT
+        bool "Enable mDNS service"
+        default n
+        help 
+            Enable mDNS service. mDNS broadcast informations of device.
+
 
     menu "EzloPi mDNS config"
-        config EZPI_SERV_MDNS_HOSTNAME
-        string "mDNS hostname"
-        default "ezlopi_device"
-        help
-            Set mDNS hostname
-        
-        config EZPI_SERV_MDNS_INSTANCE_NAME
-        string "mDNS instance name"
-        default "ezlopi_serial"
-        help 
-            Set mDNS instance name
+        depends on EZPI_ENABLE_MDNS_SERVICE
 
-        config EZPI_SERV_MDNS_EXTRA_SERVICE_EN
-        bool "mDNS enable extra services"
-        default n
-        help
-            Enable extra services such as manufacturer, brand, etc. 
+        config EZPI_MDNS_HOSTNAME
+            string "mDNS hostname"
+            default "ezlopi_device"
+            help
+                Set mDNS hostname
         
-        config EZPI_SERV_MDNS_MANUFACTURER_SERVICE_EN
-        bool "mDNS enable manufacturer service"
-        depends on EZPI_SERV_MDNS_EXTRA_SERVICE_EN
-        default n
-        help 
-            Enable manufacturer extra service in ezlopi mDNS
-        
-        config EZPI_SERV_MDNS_BRAND_SERVICE_EN
-        bool "mDNS enable brand service"
-        depends on EZPI_SERV_MDNS_EXTRA_SERVICE_EN
-        default n
-        help 
-            Enable brand extra service in ezlopi mDNS
-        
-        config EZPI_SERV_MDNS_MODEL_SERVICE_EN
-        bool "mDNS enable model service"
-        depends on EZPI_SERV_MDNS_EXTRA_SERVICE_EN
-        default n
-        help 
-            Enable model extra service in ezlopi mDNS
-        
-        config EZPI_SERV_MDNS_NAME_SERVICE_EN
-        bool "mDNS enable name service"
-        depends on EZPI_SERV_MDNS_EXTRA_SERVICE_EN
-        default n
-        help 
-            Enable name extra service in ezlopi mDNS
+        config EZPI_MDNS_INSTANCE_NAME
+            string "mDNS instance name"
+            default "ezlopi_serial"
+            help 
+                Set mDNS instance name
 
+        config EZPI_MDNS_ENABLE_EXTRA_SERVICES
+            bool "mDNS enable extra services"
+            default n
+            help
+                Enable extra services such as manufacturer, brand, etc. 
+        
+        config EZPI_MDNS_ENABLE_MANUFACTURER_SERVICE
+            bool "mDNS enable manufacturer service"
+            depends on EZPI_MDNS_ENABLE_EXTRA_SERVICES
+            default n
+            help 
+                Enable manufacturer extra service in ezlopi mDNS
+        
+        config EZPI_MDNS_ENABLE_BRAND_SERVICE
+            bool "mDNS enable brand service"
+            depends on EZPI_MDNS_ENABLE_EXTRA_SERVICES
+            default n
+            help 
+                Enable brand extra service in ezlopi mDNS
+        
+        config EZPI_MDNS_ENABLE_MODEL_SERVICE
+            bool "mDNS enable model service"
+            depends on EZPI_MDNS_ENABLE_EXTRA_SERVICES
+            default n
+            help 
+                Enable model extra service in ezlopi mDNS
+        
+        config EZPI_MDNS_ENABLE_NAME_SERVICE
+            bool "mDNS enable name service"
+            depends on EZPI_MDNS_ENABLE_EXTRA_SERVICES
+            default n
+            help 
+                Enable name extra service in ezlopi mDNS
     endmenu
-
-    choice 
-        prompt "Select the indicator LED available in the device (current target $(IDF_TARGET))"
-        depends on IDF_TARGET_ESP32S3 || IDF_TARGET_ESP32C3 || IDF_TARGET_ESP32
-        config EZPI_ON_OFF_LED
-            bool "Onboard LED"
-            depends on IDF_TARGET_ESP32
-        config EZPI_RGB_LED
-            bool "Onboard addressable LED"
-            depends on IDF_TARGET_ESP32S3 || IDF_TARGET_ESP32C3
-    endchoice
 
 endmenu
 

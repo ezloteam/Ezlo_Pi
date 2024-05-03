@@ -1,6 +1,8 @@
-// #include "cJSON.h"
-// #include "nvs.h"
-// #include "nvs_flash.h"
+
+#include "../../build/config/sdkconfig.h"
+
+#ifdef CONFIG_EZPI_ENABLE_OTA
+
 #include <string.h>
 #include <sys/socket.h>
 
@@ -18,6 +20,7 @@
 #include "ezlopi_core_ota.h"
 #include "ezlopi_core_reset.h"
 #include "ezlopi_core_factory_info.h"
+#include "ezlopi_core_processes.h"
 
 #include "ezlopi_service_ota.h"
 
@@ -60,7 +63,9 @@ void ezlopi_ota_start(cJSON* url)
         memcpy(ota_url, url->valuestring, OTA_URL_SIZE);
         if (0 == __ota_in_process)
         {
-            xTaskCreate(ezlopi_ota_process, "ezlopi ota process", 4096, ota_url, 3, NULL);
+            TaskHandle_t ezlopi_core_ota_process_task_handle = NULL;
+            xTaskCreate(ezlopi_ota_process, "EzpiOTAProcess", EZLOPI_CORE_OTA_PROCESS_TASK_DEPTH, ota_url, 3, &ezlopi_core_ota_process_task_handle);
+            ezlopi_core_process_set_process_info(ENUM_EZLOPI_CORE_OTA_PROCESS_TASK, &ezlopi_core_ota_process_task_handle, EZLOPI_CORE_OTA_PROCESS_TASK_DEPTH);
         }
         else
         {
@@ -143,6 +148,7 @@ static void ezlopi_ota_process(void* pv)
 
     __ota_in_process = EZLOPI_OTA_STATE_FINISH;
 
+    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_CORE_OTA_PROCESS_TASK);
     vTaskDelete(NULL);
 
     if (url)
@@ -194,3 +200,4 @@ static esp_err_t _http_event_handler(esp_http_client_event_t* evt)
     }
     return ESP_OK;
 }
+#endif // CONFIG_EZPI_ENABLE_OTA

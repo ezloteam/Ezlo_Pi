@@ -1,4 +1,8 @@
-#include "cJSON.h"
+#include "../../build/config/sdkconfig.h"
+
+#ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+
+#include "cjext.h"
 #include <stdlib.h>
 
 #include "ezlopi_cloud_scenes_scripts.h"
@@ -147,3 +151,4 @@ void scenes_scripts_run(cJSON* cj_request, cJSON* cj_response)
         }
     }
 }
+#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS

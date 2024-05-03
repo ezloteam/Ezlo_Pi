@@ -1,4 +1,8 @@
-#include <cJSON.h>
+#include "../../build/config/sdkconfig.h"
+
+#ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+
+#include "cjext.h"
 #include <string.h>
 #include <stdlib.h>
 
@@ -15,6 +19,7 @@
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_scenes_scripts.h"
 #include "ezlopi_core_scenes_scripts_custom_libs_includes.h"
+#include "ezlopi_core_processes.h"
 
 #include "ezlopi_cloud_constants.h"
 
@@ -229,7 +234,9 @@ static void __run_script(l_ezlopi_scenes_script_t* script_node)
 {
     if (script_node->code)
     {
-        xTaskCreate(__script_process, script_node->name, 2048 * 2, script_node, 3, NULL);
+        TaskHandle_t ezlopi_core_scenes_script_process_task_handle = NULL;
+        xTaskCreate(__script_process, script_node->name, EZLOPI_CORE_SCENES_SCRIPT_PROCESS_TASK_DEPTH, script_node, 3, &ezlopi_core_scenes_script_process_task_handle);
+        ezlopi_core_process_set_process_info(ENUM_EZLOPI_CORE_SCENES_SCRIPT_PROCESS_TASK, &ezlopi_core_scenes_script_process_task_handle, EZLOPI_CORE_SCENES_SCRIPT_PROCESS_TASK_DEPTH);
     }
 }
 
@@ -284,6 +291,7 @@ static void __script_process(void* arg)
     }
 
     TRACE_W("%s -> {state: %d} -> Stopped", script_node->name, script_node->state);
+    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_CORE_SCENES_SCRIPT_PROCESS_TASK);
     vTaskDelete(NULL);
 }
 
@@ -510,3 +518,4 @@ static void __load_custom_libs(lua_State* lua_state)
         idx++;
     }
 }
+#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS

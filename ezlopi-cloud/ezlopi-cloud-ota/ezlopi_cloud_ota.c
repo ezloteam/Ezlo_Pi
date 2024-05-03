@@ -1,6 +1,11 @@
+
+#include "../../build/config/sdkconfig.h"
+
+#ifdef CONFIG_EZPI_ENABLE_OTA
+
 #include <string.h>
 #include <ctype.h>
-#include <cJSON.h>
+#include "cjext.h"
 
 #include "ezlopi_util_trace.h"
 #include "ezlopi_util_version.h"
@@ -13,6 +18,7 @@
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_devices_list.h"
 #include "ezlopi_core_factory_info.h"
+
 
 void firmware_update_start(cJSON* cj_request, cJSON* cj_response)
 {
@@ -85,7 +91,9 @@ void firmware_info_get(cJSON* cj_request, cJSON* cj_response)
                 // send "cloud.firmware.info.get"
                 // ezlopi_event_group_set_event(EZLOPI_EVENT_OTA);
             }
+            cJSON_Delete(version);
         }
+        cJSON_Delete(result);
     }
 }
 
@@ -126,3 +134,5 @@ cJSON* firmware_send_firmware_query_to_nma_server(uint32_t message_count)
 
     return cj_request;
 }
+
+#endif // CONFIG_EZPI_ENABLE_OTA

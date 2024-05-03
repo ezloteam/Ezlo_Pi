@@ -217,7 +217,7 @@ static int __notify(l_ezlopi_item_t* item)
         {
             if (abs(mb1013_args->current_value - mb1013_args->previous_value) > 0.2) // accuracy of 0.5cm (i.e. 5mm)
             {
-                ezlopi_device_value_updated_from_device_v3(item);
+                ezlopi_device_value_updated_from_device_broadcast(item);
                 mb1013_args->previous_value = mb1013_args->current_value;
             }
         }

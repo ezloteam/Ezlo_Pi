@@ -228,7 +228,7 @@ static int __0054_notify(l_ezlopi_item_t* item)
             __extract_YFS201_Pulse_Count_func(item);
             if (prev_yfs201_dominant_pulse_count != yfs201_data->yfs201_dominant_pulse_count)
             {
-                ezlopi_device_value_updated_from_device_v3(item);
+                ezlopi_device_value_updated_from_device_broadcast(item);
             }
             ret = 1;
         }

@@ -335,7 +335,7 @@ static int __0057_notify(l_ezlopi_item_t* item)
             if (curret_value != (char*)item->user_arg) // calls update only if there is change in state
             {
                 item->user_arg = (void*)curret_value;
-                ezlopi_device_value_updated_from_device_v3(item);
+                ezlopi_device_value_updated_from_device_broadcast(item);
             }
         }
         else if (ezlopi_item_name_temperature_changes == item->cloud_properties.item_name)
@@ -350,7 +350,7 @@ static int __0057_notify(l_ezlopi_item_t* item)
                 // TRACE_E("Heat-detected: %.2f percent", absorbed_percent);
                 if (new_percent != flame_struct->absorbed_percent)
                 {
-                    ezlopi_device_value_updated_from_device_v3(item);
+                    ezlopi_device_value_updated_from_device_broadcast(item);
                     flame_struct->absorbed_percent = new_percent;
                 }
             }

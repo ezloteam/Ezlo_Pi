@@ -1,20 +1,23 @@
+#include "../../build/config/sdkconfig.h"
+
+#ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+
 #include <string.h>
 #include <stdint.h>
-#include <cJSON.h>
-#include "esp_heap_caps.h"
 
 #include "ezlopi_util_trace.h"
-#include "ezlopi_service_meshbot.h"
-
+#include "cjext.h"
 #include "ezlopi_cloud_scenes.h"
-#include "ezlopi_cloud_constants.h"
 
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_devices.h"
 #include "ezlopi_core_scenes_v2.h"
 #include "ezlopi_core_cjson_macros.h"
+#include "ezlopi_service_meshbot.h"
+#include "ezlopi_cloud_constants.h"
 #include "ezlopi_core_scenes_operators.h"
 #include "ezlopi_core_scenes_notifications.h"
+#include "ezlopi_core_scenes_when_methods_helper_functions.h"
 
 void scenes_list(cJSON* cj_request, cJSON* cj_response)
 {
@@ -32,26 +35,19 @@ void scenes_create(cJSON* cj_request, cJSON* cj_response)
     cJSON* cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
     if (cj_params)
     {
-        float curr_free_kb_heap = (float)esp_get_free_heap_size() / 1024.0;
-        if ((int)curr_free_kb_heap > 30)/* (>245760 bytes) = 30kb*/
+        uint32_t new_scene_id = ezlopi_store_new_scene_v2(cj_params);
+        TRACE_D("new-scene-id: %08x", new_scene_id);
+
+        if (new_scene_id)
         {
-            TRACE_E("create_scene : esp_get_free_heap_size = %f kB", curr_free_kb_heap);
-            uint32_t new_scene_id = ezlopi_store_new_scene_v2(cj_params);
-            TRACE_D("new-scene-id: %08x", new_scene_id);
-            if (new_scene_id)
-            {
-                char tmp_buff[32];
-                snprintf(tmp_buff, sizeof(tmp_buff), "%08x", new_scene_id);
-                cJSON_AddStringToObject(cj_request, ezlopi__id_str, tmp_buff);
-                ezlopi_scenes_new_scene_populate(cj_params, new_scene_id);
-            }
-        }
-        else
-        {
-            TRACE_E(" Error!! Not enough memory for scene creation. [Current size - %f kB (<30kb)]", curr_free_kb_heap);
+            char tmp_buff[32];
+            snprintf(tmp_buff, sizeof(tmp_buff), "%08x", new_scene_id);
+            cJSON_AddStringToObject(cj_request, ezlopi__id_str, tmp_buff);
+            ezlopi_scenes_new_scene_populate(cj_params, new_scene_id);
         }
     }
 }
+
 void scenes_get(cJSON* cj_request, cJSON* cj_response)
 {
 
@@ -73,6 +69,7 @@ void scenes_get(cJSON* cj_request, cJSON* cj_response)
 
 void scenes_edit(cJSON* cj_request, cJSON* cj_response)
 {
+
     cJSON* cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
     if (cj_params)
     {
@@ -149,6 +146,7 @@ void scenes_run(cJSON* cj_request, cJSON* cj_response)
 
 void scenes_enable_set(cJSON* cj_request, cJSON* cj_response)
 {
+
     cJSON* cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
     if (cj_params)
     {
@@ -351,6 +349,39 @@ void scenes_notification_remove(cJSON* cj_request, cJSON* cj_response)
     }
 }
 
+void scenes_block_status_reset(cJSON* cj_request, cJSON* cj_response)
+{
+    cJSON* cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
+    cJSON* cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
+    if (cj_result && cj_params)
+    {
+        char* scene_id_str = NULL;
+        CJSON_GET_VALUE_STRING(cj_params, ezlopi_sceneId_str, scene_id_str);
+        if (scene_id_str)
+        {
+            uint32_t scene_id = strtoul(scene_id_str, NULL, 16);
+            if (scene_id)
+            {
+                l_scenes_list_v2_t* scene_node = ezlopi_scenes_get_scenes_head_v2();
+                while (scene_node)
+                {
+                    if (scene_node->_id == scene_id)
+                    {
+                        s_when_function_t* function_state = (s_when_function_t*)scene_node->when_block->fields->user_arg;
+                        if (function_state)
+                        {
+                            function_state->current_state = false;
+                        }
+                        break;
+                    }
+                    scene_node = scene_node->next;
+                }
+            }
+        }
+    }
+}
+
+
 ////// updater for scene
 ////// useful for 'hub.scenes.enabled.set'
 void scene_changed(cJSON* cj_request, cJSON* cj_response)
@@ -416,3 +447,4 @@ void scene_deleted(cJSON* cj_request, cJSON* cj_response)
         cJSON_AddBoolToObject(cj_result, ezlopi_syncNotification_str, true);
     }
 }
+#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS

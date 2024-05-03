@@ -7,45 +7,35 @@
    CONDITIONS OF ANY KIND, either express or implied.
 */
 
-#include <cJSON.h>
-#include <esp_log.h>
-#include <esp_eth.h>
-#include <esp_wifi.h>
-#include <esp_event.h>
-#include <sys/param.h>
-#include <esp_netif.h>
-#include <esp_system.h>
-#include <freertos/FreeRTOS.h>
-#include <freertos/task.h>
-#include <freertos/semphr.h>
-
 #include "../../build/config/sdkconfig.h"
-#include <esp_http_server.h>
 
+#ifdef CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER
+
+#include "esp_eth.h"
+#include "esp_wifi.h"
+#include "esp_event.h"
+#include "sys/param.h"
+#include "esp_netif.h"
+#include "esp_system.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "freertos/semphr.h"
+#include "esp_http_server.h"
+
+#include "cjext.h"
 #include "ezlopi_util_trace.h"
-
 #include "ezlopi_cloud_constants.h"
 
 #include "ezlopi_core_api.h"
 #include "ezlopi_core_wifi.h"
 #include "ezlopi_core_buffer.h"
-#include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_api_methods.h"
+#include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_ezlopi_broadcast.h"
-// #include "ezlopi_core_factory_info.h"
 
 #include "ezlopi_service_ws_server.h"
 #include "ezlopi_service_ws_server_clients.h"
 
-typedef enum e_trace_type
-{
-    TRACE_TYPE_NONE = 0,
-    TRACE_TYPE_W, // Warning (Orange)
-    TRACE_TYPE_B,
-    TRACE_TYPE_D, // debug (White)
-    TRACE_TYPE_I, // Info (Blue)
-    TRACE_TYPE_E  // Error (Red)
-} e_trace_type_t;
 
 typedef struct s_async_resp_arg
 {
@@ -53,11 +43,11 @@ typedef struct s_async_resp_arg
     httpd_handle_t hd;
 } s_async_resp_arg_t;
 
-static char data_buffer[10 * 1024];
+
 static uint32_t message_counter = 0;
 static httpd_handle_t gs_ws_handle = NULL;
-static volatile e_ws_status_t gs_ws_status = WS_STATUS_STOPPED;
 static SemaphoreHandle_t gs_send_lock = NULL;
+static volatile e_ws_status_t gs_ws_status = WS_STATUS_STOPPED;
 
 static void __stop_server(void);
 static void __start_server(void);
@@ -69,7 +59,6 @@ static int __respond_cjson(httpd_req_t* req, cJSON* cj_response);
 static int __ws_server_send(l_ws_server_client_conn_t* client, char* data, uint32_t len);
 
 static esp_err_t __msg_handler(httpd_req_t* req);
-static void __ws_api_handler(httpd_req_t* req, const char* payload, uint32_t payload_len);
 
 static int __ws_server_broadcast(char* data);
 
@@ -129,7 +118,7 @@ static int __ws_server_broadcast(char* data)
 
     if (gs_send_lock && pdTRUE == xSemaphoreTake(gs_send_lock, 5000 / portTICK_RATE_MS))
     {
-        TRACE_S("-----------------------------> acquired send-lock");
+        // TRACE_S("-----------------------------> acquired send-lock");
         if (data)
         {
             ret = 1;
@@ -138,23 +127,23 @@ static int __ws_server_broadcast(char* data)
             while (curr_client)
             {
                 ret = __ws_server_send(curr_client, data, strlen(data));
-                TRACE_D("ret: %d", ret);
+                // TRACE_D("ret: %d", ret);
                 curr_client = curr_client->next;
             }
         }
 
         if (pdTRUE == xSemaphoreGive(gs_send_lock))
         {
-            TRACE_S("-----------------------------> released send-lock");
+            // TRACE_S("-----------------------------> released send-lock");
         }
         else
         {
-            TRACE_E("-----------------------------> release send-lock failed!");
+            // TRACE_E("-----------------------------> release send-lock failed!");
         }
     }
     else
     {
-        TRACE_E("-----------------------------> acquire send-lock failed!");
+        // TRACE_E("-----------------------------> acquire send-lock failed!");
     }
 
     return ret;
@@ -476,4 +465,11 @@ static void __wifi_connection_event(esp_event_base_t event_base, int32_t event_i
             __stop_server();
         }
     }
+}
+
+#endif // CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER
+
+void ezlpi_service_ws_server_dummy(void)
+{
+    TRACE_D("I'm dummy");
 }

@@ -73,7 +73,7 @@ static int __notify(l_ezlopi_item_t* item)
         if (fabs(*temperature_prev_value - temperature_current_value) > 0.2)
         {
             *temperature_prev_value = temperature_current_value;
-            ezlopi_device_value_updated_from_device_v3(item);
+            ezlopi_device_value_updated_from_device_broadcast(item);
         }
     }
     return ret;

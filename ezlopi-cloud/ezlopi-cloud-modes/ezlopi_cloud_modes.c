@@ -8,6 +8,9 @@
 
 #include "ezlopi_cloud_modes.h"
 #include "ezlopi_cloud_constants.h"
+#include "EZLOPI_USER_CONFIG.h"
+
+#if defined(CONFIG_EZPI_SERV_ENABLE_MODES)
 
 void ezlopi_cloud_modes_get(cJSON* cj_request, cJSON* cj_response)
 {
@@ -251,3 +254,5 @@ void ezlopi_cloud_modes_entry_delay_reset(cJSON* cj_request, cJSON* cj_response)
     {
     }
 }
+
+#endif // CONFIG_EZPI_SERV_ENABLE_MODES

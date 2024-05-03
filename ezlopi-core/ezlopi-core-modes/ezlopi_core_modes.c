@@ -1,14 +1,17 @@
 #include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_nvs.h"
+#include "ezlopi_core_modes.h"
 #include "ezlopi_core_modes_cjson.h"
 #include "ezlopi_core_cjson_macros.h"
 
 #include "ezlopi_cloud_constants.h"
 
 #include "ezlopi_service_modes.h"
+#include "EZLOPI_USER_CONFIG.h"
 
-#include "ezlopi_core_modes.h"
+
+#if defined(CONFIG_EZPI_SERV_ENABLE_MODES)
 
 static s_ezlopi_modes_t* sg_custom_modes = NULL;
 static s_house_modes_t* sg_current_house_mode = NULL;
@@ -231,3 +234,4 @@ void ezlopi_core_modes_init(void)
         }
     }
 }
+#endif // CONFIG_EZPI_SERV_ENABLE_MODES

@@ -11,6 +11,8 @@ set(EZLOPI_CORE_COMPONENTS
         ezlopi-core-ezlopi
         ezlopi-core-sntp
         ezlopi-core-info
+        ezlopi-core-processes
+        ezlopi-core-ping
 )
 set(EZLOPI_HAL_COMPONENTS 
         ezlopi-hal-sysinfo

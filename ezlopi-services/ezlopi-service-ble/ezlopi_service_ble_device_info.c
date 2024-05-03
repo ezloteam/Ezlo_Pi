@@ -1,8 +1,12 @@
+
+#include "../../build/config/sdkconfig.h"
+
+#ifdef CONFIG_EZPI_BLE_ENABLE
+
 #include <string.h>
 #include <ctype.h>
 
-#include "cJSON.h"
-#include "sdkconfig.h"
+#include "cjext.h"
 #include "lwip/ip_addr.h"
 #include "esp_event_base.h"
 #include "esp_chip_info.h"
@@ -745,3 +749,5 @@ void __add_factory_info_to_root(cJSON* root, char* key, char* value)
         free(value);
     }
 }
+
+#endif // CONFIG_EZPI_BLE_ENABLE

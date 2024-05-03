@@ -3,14 +3,14 @@
 
 #include <string.h>
 
-#include "cJSON.h"
+#include "cjext.h"
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
-    void gateways_list(cJSON *cj_request, cJSON *cj_response);
+    void gateways_list(cJSON* cj_request, cJSON* cj_response);
 #ifdef __cplusplus
 }
 #endif

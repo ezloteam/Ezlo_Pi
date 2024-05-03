@@ -1,8 +1,12 @@
+#include "../../build/config/sdkconfig.h"
+
+#ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+
 #include <string.h>
 #include <stdint.h>
 
 #include "ezlopi_util_trace.h"
-#include "cJSON.h"
+#include "cjext.h"
 #include "ezlopi_cloud_scenes.h"
 
 #include "ezlopi_core_nvs.h"
@@ -169,16 +173,16 @@ static cJSON* __add_scenes_blocks_by_item_ids(e_scenes_block_type_v2_t block_typ
         l_scenes_list_v2_t* scene_node = ezlopi_scenes_get_scenes_head_v2();
         while (scene_node)
         {
-            TRACE_D("Here");
+            // TRACE_D("Here");
 
             switch (block_type)
             {
             case SCENE_BLOCK_TYPE_WHEN:
             {
-                TRACE_D("Here");
+                // TRACE_D("Here");
                 if (scene_node->when_block)
                 {
-                    TRACE_D("Here");
+                    // TRACE_D("Here");
                     if (__found_item_in_field(scene_node->when_block->fields, item_list->cloud_properties.item_id))
                     {
                         TRACE_D("Here");
@@ -295,3 +299,4 @@ static e_scenes_block_type_v2_t __get_block_type_and_create_block_array(cJSON* c
 
     return block_type;
 }
+#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS

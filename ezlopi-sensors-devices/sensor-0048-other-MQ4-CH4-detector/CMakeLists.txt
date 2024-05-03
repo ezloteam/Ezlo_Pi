@@ -7,6 +7,7 @@ idf_component_register(SRCS "sensor_0048_other_MQ4_CH4_detector.c"
                 ezlopi-core-actions 
                 ezlopi-core-devices 
                 ezlopi-core-valueformatter 
+                ezlopi-core-processes
 
                 ezlopi-hal-adc
 

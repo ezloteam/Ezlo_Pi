@@ -1,4 +1,4 @@
-#include "sdkconfig.h"
+#include "../../build/config/sdkconfig.h"
 #include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_timer.h"
@@ -183,6 +183,6 @@ static void __interrupt_upcall(void* arg)
     if (item)
     {
         item->interface.gpio.gpio_in.value = !item->interface.gpio.gpio_in.value;
-        ezlopi_device_value_updated_from_device_v3(item);
+        ezlopi_device_value_updated_from_device_broadcast(item);
     }
 }

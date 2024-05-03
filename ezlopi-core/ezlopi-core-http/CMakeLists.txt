@@ -3,7 +3,7 @@
 file(GLOB_RECURSE config_src "*.c")
 
 set(ESP_IDF_COMPONENTS 
-        json 
+        cjext 
         mbedtls
         esp-tls
         esp_http_client

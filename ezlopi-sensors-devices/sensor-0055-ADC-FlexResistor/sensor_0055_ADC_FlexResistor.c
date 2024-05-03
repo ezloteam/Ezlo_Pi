@@ -190,7 +190,7 @@ static int __0055_notify(l_ezlopi_item_t* item)
             int new_rs_0055 = (int)(((flex_Vin / Vout) - 1) * flex_Rout);
             if (new_rs_0055 != flex_res_value->rs_0055)
             {
-                ezlopi_device_value_updated_from_device_v3(item);
+                ezlopi_device_value_updated_from_device_broadcast(item);
                 flex_res_value->rs_0055 = new_rs_0055;
             }
             ret = 1;

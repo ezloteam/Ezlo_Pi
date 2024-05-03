@@ -8,8 +8,17 @@
 */
 
 #include "freertos/FreeRTOSConfig.h"
-#include "cJSON.h"
-#include "sdkconfig.h"
+#include "cjext.h"
+#include "esp_log.h"
+#include "nvs_flash.h"
+#include "esp_netif.h"
+#include "esp_system.h"
+#include "driver/gpio.h"
+#include "esp_idf_version.h"
+#include "esp_netif_ip_addr.h"
+
+#include "ezlopi_util_trace.h"
+#include "ezlopi_util_version.h"
 
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_wifi.h"
@@ -20,6 +29,8 @@
 #include "ezlopi_core_event_group.h"
 #include "ezlopi_core_sntp.h"
 #include "ezlopi_core_info.h"
+#include "ezlopi_core_processes.h"
+#include "ezlopi_core_ping.h"
 
 #include "ezlopi_hal_system_info.h"
 
@@ -29,8 +40,19 @@
 #include "ezlopi_service_ble.h"
 #include "ezlopi_service_uart.h"
 
-#include "ezlopi_util_trace.h"
+#if defined (CONFIG_EZPI_ENABLE_UART_PROVISIONING)
 
+#if defined(CONFIG_IDF_TARGET_ESP32)
+#define TXD_PIN (GPIO_NUM_1)
+#define RXD_PIN (GPIO_NUM_3)
+#elif defined(CONFIG_IDF_TARGET_ESP32S2)
+#elif defined(CONFIG_IDF_TARGET_ESP32C3)
+#define TXD_PIN (GPIO_NUM_21)
+#define RXD_PIN (GPIO_NUM_20)
+#elif defined(CONFIG_IDF_TARGET_ESP32S3)
+#define TXD_PIN (GPIO_NUM_43)
+#define RXD_PIN (GPIO_NUM_44)
+#endif
 
 // cJson Types
 
@@ -53,7 +75,7 @@ static int ezlopi_service_uart_reset(cJSON* root)
         {
             TRACE_E("Factory restore command");
             const static char* reboot_response = "{\"cmd\":0, \"sub_cmd\":0,\"status\":1}";
-            EZPI_SERVICE_uart_tx_data(strlen(reboot_response), (uint8_t*)reboot_response);
+            EZPI_SERV_uart_tx_data(strlen(reboot_response), (uint8_t*)reboot_response);
             EZPI_CORE_reset_factory_restore();
             break;
         }
@@ -61,7 +83,7 @@ static int ezlopi_service_uart_reset(cJSON* root)
         {
             TRACE_E("Reboot only command");
             const static char* reboot_response = "{\"cmd\":0, \"sub_cmd\":1, \"status\":1}";
-            EZPI_SERVICE_uart_tx_data(strlen(reboot_response), (uint8_t*)reboot_response);
+            EZPI_SERV_uart_tx_data(strlen(reboot_response), (uint8_t*)reboot_response);
             EZPI_CORE_reset_reboot();
             break;
         }
@@ -179,7 +201,7 @@ static int ezlopi_service_uart_set_uart_config(const cJSON* root)
 
 
         const static char* reboot_response = "{\"cmd\":5, \"status\":1}";
-        EZPI_SERVICE_uart_tx_data(strlen(reboot_response), (uint8_t*)reboot_response);
+        EZPI_SERV_uart_tx_data(strlen(reboot_response), (uint8_t*)reboot_response);
 
         TRACE_W("New config has been applied, device rebooting");
         vTaskDelay(10);
@@ -188,7 +210,7 @@ static int ezlopi_service_uart_set_uart_config(const cJSON* root)
     else
     {
         const static char* reboot_response = "{\"cmd\":5, \"status\":0}";
-        EZPI_SERVICE_uart_tx_data(strlen(reboot_response), (uint8_t*)reboot_response);
+        EZPI_SERV_uart_tx_data(strlen(reboot_response), (uint8_t*)reboot_response);
 
         TRACE_W("Configuration unchanged !");
         vTaskDelay(10);
@@ -282,6 +304,7 @@ static void ezlopi_service_uart_task(void* arg)
     }
 
     free(data);
+    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SERVICE_UART_TASK);
     vTaskDelete(NULL);
 }
 
@@ -357,7 +380,7 @@ static int ezlopi_service_uart_device_status_info(cJSON* parent)
         cJSON_AddStringToObject(cj_device_state, "wifi_mac", mac_str);
 
         memset(mac, 0, sizeof(mac));
-        ezlopi_ble_service_get_ble_mac(mac);
+        EZPI_CORE_info_get_ble_mac(mac);
         memset(mac_str, 0, sizeof(mac_str));
         snprintf(mac_str, 20, "%02X:%02X:%02X:%02X:%02X:%02X", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
         cJSON_AddStringToObject(cj_device_state, "ble_mac", mac_str);
@@ -386,7 +409,7 @@ static int ezlopi_service_uart_config_info(cJSON* parent)
         EZPI_CORE_nvs_read_baud(&baud);
         cJSON_AddNumberToObject(cj_serial_config, ezlopi_baud_str, baud);
 
-        EZPI_CORE_nvs_read_parity(&parity_val);
+        EZPI_CORE_nvs_read_parity((uint32_t*)&parity_val);
         parity[0] = EZPI_CORE_info_parity_to_name(parity_val);
         parity[1] = 0;
         cJSON_AddStringToObject(cj_serial_config, ezlopi_parity_str, parity);
@@ -528,7 +551,7 @@ static void ezlopi_service_uart_get_info()
             if (serial_data_json_string)
             {
                 cJSON_Minify(serial_data_json_string);
-                EZPI_SERVICE_uart_tx_data(strlen(serial_data_json_string), (uint8_t*)serial_data_json_string);
+                EZPI_SERV_uart_tx_data(strlen(serial_data_json_string), (uint8_t*)serial_data_json_string);
                 free(serial_data_json_string);
             }
 
@@ -620,8 +643,8 @@ static void ezlopi_service_uart_response(uint8_t cmd, uint8_t status_write, uint
         if (my_json_string)
         {
             cJSON_Minify(my_json_string);
-            EZPI_SERVICE_uart_tx_data(strlen(my_json_string), (uint8_t*)my_json_string);
-            cJSON_free(my_json_string);
+            EZPI_SERV_uart_tx_data(strlen(my_json_string), (uint8_t*)my_json_string);
+            free(my_json_string);
         }
     }
 }
@@ -689,14 +712,14 @@ static void ezlopi_service_uart_get_config(void)
             cJSON_Minify(my_json_string);
             cJSON_Delete(root); // free Json string
             const int len = strlen(my_json_string);
-            EZPI_SERVICE_uart_tx_data(len, (uint8_t*)my_json_string); // Send the data over uart
+            EZPI_SERV_uart_tx_data(len, (uint8_t*)my_json_string); // Send the data over uart
             // TRACE_D("Sending: %s", my_json_string);
-            cJSON_free(my_json_string);
+            free(my_json_string);
         }
     }
 }
 
-int EZPI_SERVICE_uart_tx_data(int len, uint8_t* data)
+int EZPI_SERV_uart_tx_data(int len, uint8_t* data)
 {
     int ret = 0;
     ret = uart_write_bytes(EZPI_SERV_UART_NUM_DEFAULT, data, len);
@@ -706,5 +729,9 @@ int EZPI_SERVICE_uart_tx_data(int len, uint8_t* data)
 
 void EZPI_SERV_uart_init(void)
 {
-    xTaskCreate(ezlopi_service_uart_task, "ezlopi_service_uart_task", 1024 * 3, NULL, configMAX_PRIORITIES, NULL);
+    TaskHandle_t ezlopi_service_uart_task_handle = NULL;
+    xTaskCreate(ezlopi_service_uart_task, "ezlopi_service_uart_task", EZLOPI_SERVICE_UART_TASK_DEPTH, NULL, configMAX_PRIORITIES, &ezlopi_service_uart_task_handle);
+    ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_UART_TASK, &ezlopi_service_uart_task_handle, EZLOPI_SERVICE_UART_TASK_DEPTH);
 }
+
+#endif // CONFIG_EZPI_ENABLE_UART_PROVISIONING

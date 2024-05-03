@@ -1,4 +1,4 @@
-#include "sdkconfig.h"
+#include "../../build/config/sdkconfig.h"
 #include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_nvs.h"
@@ -90,13 +90,13 @@ static int __settings_callback(e_ezlopi_settings_action_t action, struct l_ezlop
     case EZLOPI_SETTINGS_ACTION_SET_SETTING:
     {
         __settings_set(arg, setting);
-        ezlopi_setting_value_updated_from_device_v3(setting);
+        ezlopi_core_device_value_updated_settings_broadcast(setting);
         break;
     }
     case EZLOPI_SETTINGS_ACTION_RESET_SETTING:
     {
         __settings_reset(arg, setting);
-        ezlopi_setting_value_updated_from_device_v3(setting);
+        ezlopi_core_device_value_updated_settings_broadcast(setting);
         break;
     }
     case EZLOPI_SETTINGS_ACTION_UPDATE_SETTING:
@@ -370,7 +370,7 @@ static int __init(l_ezlopi_item_t* item)
     int ret = 0;
     if (item)
     {
-        if (GPIO_IS_VALID_OUTPUT_GPIO(item->interface.gpio.gpio_out.gpio_num) &&
+        if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_out.gpio_num) &&
             (255 != item->interface.gpio.gpio_out.gpio_num))
         {
             const gpio_config_t io_conf = {
@@ -525,10 +525,11 @@ static int __set_value(l_ezlopi_item_t* item, void* arg)
 
             if (255 != item->interface.gpio.gpio_out.gpio_num)
             {
-                if (GPIO_IS_VALID_OUTPUT_GPIO(item->interface.gpio.gpio_out.gpio_num))
+                if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_out.gpio_num))
                 {
                     __set_gpio_value(item, value);
-                    ezlopi_device_value_updated_from_device_v3(item);
+                    ezlopi_device_value_updated_from_device_broadcast(item);
+                    ret =1;
                 }
             }
             else
@@ -544,7 +545,8 @@ static int __set_value(l_ezlopi_item_t* item, void* arg)
                             TRACE_D("GPIO-pin: %d", curr_item->interface.gpio.gpio_out.gpio_num);
                             TRACE_D("value: %d", value);
                             __set_gpio_value(curr_item, value);
-                            ezlopi_device_value_updated_from_device_v3(curr_item);
+                            ezlopi_device_value_updated_from_device_broadcast(curr_item);
+                            ret = 1;
                         }
                         curr_item = curr_item->next;
                     }
@@ -552,7 +554,7 @@ static int __set_value(l_ezlopi_item_t* item, void* arg)
                 }
 
                 item->interface.gpio.gpio_out.value = value;
-                ezlopi_device_value_updated_from_device_v3(item);
+                ezlopi_device_value_updated_from_device_broadcast(item);
             }
         }
     }
@@ -571,7 +573,7 @@ static void __interrupt_upcall(void* arg)
     if (item)
     {
         __toggle_gpio(item);
-        ezlopi_device_value_updated_from_device_v3(item);
+        ezlopi_device_value_updated_from_device_broadcast(item);
     }
 }
 

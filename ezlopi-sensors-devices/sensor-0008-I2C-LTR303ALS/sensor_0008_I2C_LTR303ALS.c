@@ -1,5 +1,5 @@
 
-#include "sdkconfig.h"
+#include "../../build/config/sdkconfig.h"
 #include <math.h>
 #include "ezlopi_util_trace.h"
 
@@ -86,7 +86,7 @@ static int __notify(l_ezlopi_item_t* item)
                 if (fabs(als_ltr303_data->lux - temp_data.lux) > 0.2)
                 {
                     als_ltr303_data->lux = temp_data.lux;
-                    ezlopi_device_value_updated_from_device_v3(item);
+                    ezlopi_device_value_updated_from_device_broadcast(item);
                 }
             }
         }

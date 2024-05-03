@@ -229,3 +229,14 @@ void EZPI_CORE_info_get_tick_to_time_name(char* time_buff, uint32_t buff_len, ui
         snprintf(time_buff, buff_len, "%dd %dh %dm %ds", days, hours, minutes, seconds);
     }
 }
+
+int EZPI_CORE_info_get_ble_mac(uint8_t mac[6])
+{
+    int ret = 0;
+    if (ESP_OK == esp_read_mac(mac, ESP_MAC_BT))
+    {
+        ret = 1;
+    }
+    return ret;
+}
+

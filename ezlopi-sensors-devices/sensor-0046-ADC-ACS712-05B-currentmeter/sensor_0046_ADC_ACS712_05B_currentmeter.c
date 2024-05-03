@@ -184,7 +184,7 @@ static int __0046_notify(l_ezlopi_item_t* item)
             __calculate_current_value(item); // update amp
             if (fabs(user_data->amp_value - prev_amp) > 0.5)
             {
-                ezlopi_device_value_updated_from_device_v3(item);
+                ezlopi_device_value_updated_from_device_broadcast(item);
             }
         }
     }

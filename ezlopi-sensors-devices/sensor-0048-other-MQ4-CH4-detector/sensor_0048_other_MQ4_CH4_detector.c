@@ -6,6 +6,7 @@
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
+#include "ezlopi_core_processes.h"
 
 #include "ezlopi_hal_adc.h"
 
@@ -180,7 +181,9 @@ static int __0048_init(l_ezlopi_item_t* item)
                     { // calibrate if not done
                         if (false == MQ4_value->Calibration_complete_CH4)
                         {
-                            xTaskCreate(__calibrate_MQ4_R0_resistance, "Task_to_calculate_R0_air", 2048, item, 1, NULL);
+                            TaskHandle_t ezlopi_sensor_mq4_task_handle = NULL;
+                            xTaskCreate(__calibrate_MQ4_R0_resistance, "Task_to_calculate_R0_air", EZLOPI_SENSOR_MQ4_TASK_DEPTH, item, 1, &ezlopi_sensor_mq4_task_handle);
+                            ezlopi_core_process_set_process_info(ENUM_EZLOPI_SENSOR_MQ4_TASK, &ezlopi_sensor_mq4_task_handle, EZLOPI_SENSOR_MQ4_TASK_DEPTH);
                         }
                         ret = 1;
                     }
@@ -344,7 +347,7 @@ static int __0048_notify(l_ezlopi_item_t* item)
             if (curret_value != (char*)item->user_arg) // calls update only if there is change in state
             {
                 item->user_arg = (void*)curret_value;
-                ezlopi_device_value_updated_from_device_v3(item);
+                ezlopi_device_value_updated_from_device_broadcast(item);
             }
         }
         else if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
@@ -357,7 +360,7 @@ static int __0048_notify(l_ezlopi_item_t* item)
                 if (fabs((double)(MQ4_value->_CH4_ppm) - new_value) > 0.0001)
                 {
                     MQ4_value->_CH4_ppm = (float)new_value;
-                    ezlopi_device_value_updated_from_device_v3(item);
+                    ezlopi_device_value_updated_from_device_broadcast(item);
                 }
             }
         }
@@ -474,5 +477,6 @@ static void __calibrate_MQ4_R0_resistance(void* params)
             MQ4_value->Calibration_complete_CH4 = true;
         }
     }
+    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SENSOR_MQ4_TASK);
     vTaskDelete(NULL);
 }

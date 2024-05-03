@@ -1,6 +1,8 @@
+#if 0
+
 #include <string.h>
 
-#include "cJSON.h"
+#include "cjext.h"
 #include "ezlopi_cloud_data.h"
 #include "ezlopi_util_trace.h"
 
@@ -8,23 +10,23 @@
 #include "ezlopi_cloud_keywords.h"
 #include "ezlopi_cloud_methods_str.h"
 
-void data_list(cJSON *cj_request, cJSON *cj_response)
-{    
+void data_list(cJSON* cj_request, cJSON* cj_response)
+{
     cJSON* cjson_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
     if (cjson_result)
     {
-        cJSON *cj_settings = cJSON_AddObjectToObject(cjson_result, ezlopi_settings_str);
+        cJSON* cj_settings = cJSON_AddObjectToObject(cjson_result, ezlopi_settings_str);
         if (cj_settings)
         {
-            cJSON *cj_first_start = cJSON_AddObjectToObject(cj_settings, ezlopi_first_start_str);
+            cJSON* cj_first_start = cJSON_AddObjectToObject(cj_settings, ezlopi_first_start_str);
             if (cj_first_start)
             {
                 cJSON_AddNumberToObject(cj_first_start, ezlopi_value_str, 0);
             }
 
-#warning "WARNING: work required here!"
+            #warning "WARNING: work required here!"
 #if 0
-            l_ezlopi_configured_devices_t *registered_devices = ezlopi_devices_list_get_configured_items();
+                l_ezlopi_configured_devices_t* registered_devices = ezlopi_devices_list_get_configured_items();
             while (NULL != registered_devices)
             {
                 if (NULL != registered_devices->properties)
@@ -40,9 +42,9 @@ void data_list(cJSON *cj_request, cJSON *cj_response)
 }
 
 #if 0
-static cJSON *ezlopi_cloud_data_create_device_list(void)
+static cJSON* ezlopi_cloud_data_create_device_list(void)
 {
-    cJSON *cjson_device_list = cJSON_CreateObject();
+    cJSON* cjson_device_list = cJSON_CreateObject();
 
     if (cjson_device_list)
     {
@@ -52,9 +54,9 @@ static cJSON *ezlopi_cloud_data_create_device_list(void)
     return cjson_device_list;
 }
 
-static cJSON *ezlopi_cloud_data_create_settings_list(void)
+static cJSON* ezlopi_cloud_data_create_settings_list(void)
 {
-    cJSON *cjson_device_list = cJSON_CreateObject();
+    cJSON* cjson_device_list = cJSON_CreateObject();
 
     if (cjson_device_list)
     {
@@ -64,9 +66,9 @@ static cJSON *ezlopi_cloud_data_create_settings_list(void)
     return cjson_device_list;
 }
 
-static cJSON *ezlopi_cloud_data_list_settings(l_ezlopi_configured_devices_t *ezlopi_device)
+static cJSON* ezlopi_cloud_data_list_settings(l_ezlopi_configured_devices_t* ezlopi_device)
 {
-    cJSON *cjson_settings = NULL;
+    cJSON* cjson_settings = NULL;
     if (ezlopi_device)
     {
         cjson_settings = cJSON_CreateObject();
@@ -97,4 +99,6 @@ static cJSON *ezlopi_cloud_data_list_settings(l_ezlopi_configured_devices_t *ezl
 
     return cjson_settings;
 }
+#endif
+
 #endif
