@@ -35,7 +35,7 @@ Install ESP-IDF with taking help from the docs [here](https://docs.espressif.com
 Navigate to your terminal or bash shell and execute the following commands:
 
 ```bash
-git clone --recursive git@github.com:ezloteam/Ezlo_Pi.git ezlopi
+git clone --recursive git@github.com:ezloteam/Ezlo_Pi.git
 cd Ezlo_Pi
 ```
 ### 2. Configure the Projec

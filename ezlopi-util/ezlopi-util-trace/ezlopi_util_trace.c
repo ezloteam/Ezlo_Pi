@@ -4,7 +4,10 @@
 #include <string.h>
 #include "esp_system.h"
 
-static void put_idump(uint8_t *buff, uint32_t ofs, uint32_t cnt)
+f_ezlopi_log_upcall_t cloud_log_upcall_func = NULL;
+f_ezlopi_log_upcall_t serial_log_upcall_func = NULL;
+
+static void put_idump(uint8_t* buff, uint32_t ofs, uint32_t cnt)
 {
     int n;
 
@@ -24,7 +27,7 @@ static void put_idump(uint8_t *buff, uint32_t ofs, uint32_t cnt)
         } while (++n < 16);
     }
 
-    char temp_buff[17] = {0};
+    char temp_buff[17] = { 0 };
 
     memcpy(temp_buff, buff, cnt);
     temp_buff[16] = 0;
@@ -44,9 +47,9 @@ static void put_idump(uint8_t *buff, uint32_t ofs, uint32_t cnt)
     }
 }
 
-void __dump(const char *file_name, uint32_t line, char *buffer_name, void *_buff, uint32_t ofs, uint32_t cnt)
+void __dump(const char* file_name, uint32_t line, char* buffer_name, void* _buff, uint32_t ofs, uint32_t cnt)
 {
-    unsigned char *buff = _buff;
+    unsigned char* buff = _buff;
     int lines = cnt >> 4;
     int l;
 
@@ -64,4 +67,26 @@ void __dump(const char *file_name, uint32_t line, char *buffer_name, void *_buff
 
     ets_printf("\n\n");
     fflush(stdout);
+}
+
+void ezlopi_util_set_log_upcalls(f_ezlopi_log_upcall_t cloud_log_upcall, f_ezlopi_log_upcall_t serial_log_upcall)
+{
+    if (cloud_log_upcall)
+    {
+        cloud_log_upcall_func = cloud_log_upcall;
+    }
+    if (serial_log_upcall)
+    {
+        serial_log_upcall_func = serial_log_upcall;
+    }
+}
+
+f_ezlopi_log_upcall_t ezlopi_util_get_cloud_log_upcall()
+{
+    return cloud_log_upcall_func;
+}
+
+f_ezlopi_log_upcall_t ezlopi_util_get_serial_log_upcall()
+{
+    return serial_log_upcall_func;
 }

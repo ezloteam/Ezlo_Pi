@@ -118,7 +118,7 @@ static int __ws_server_broadcast(char* data)
 
     if (gs_send_lock && pdTRUE == xSemaphoreTake(gs_send_lock, 5000 / portTICK_RATE_MS))
     {
-        TRACE_S("-----------------------------> acquired send-lock");
+        // TRACE_S("-----------------------------> acquired send-lock");
         if (data)
         {
             ret = 1;
@@ -127,23 +127,23 @@ static int __ws_server_broadcast(char* data)
             while (curr_client)
             {
                 ret = __ws_server_send(curr_client, data, strlen(data));
-                TRACE_D("ret: %d", ret);
+                // TRACE_D("ret: %d", ret);
                 curr_client = curr_client->next;
             }
         }
 
         if (pdTRUE == xSemaphoreGive(gs_send_lock))
         {
-            TRACE_S("-----------------------------> released send-lock");
+            // TRACE_S("-----------------------------> released send-lock");
         }
         else
         {
-            TRACE_E("-----------------------------> release send-lock failed!");
+            // TRACE_E("-----------------------------> release send-lock failed!");
         }
     }
     else
     {
-        TRACE_E("-----------------------------> acquire send-lock failed!");
+        // TRACE_E("-----------------------------> acquire send-lock failed!");
     }
 
     return ret;
@@ -467,8 +467,9 @@ static void __wifi_connection_event(esp_event_base_t event_base, int32_t event_i
     }
 }
 
+#endif // CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER
+
 void ezlpi_service_ws_server_dummy(void)
 {
     TRACE_D("I'm dummy");
 }
-#endif // CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER

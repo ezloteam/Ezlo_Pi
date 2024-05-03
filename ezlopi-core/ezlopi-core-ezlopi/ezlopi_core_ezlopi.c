@@ -18,6 +18,7 @@
 #include "ezlopi_core_devices_list.h"
 #include "ezlopi_core_scenes_scripts.h"
 #include "ezlopi_core_scenes_expressions.h"
+#include "ezlopi_core_log.h"
 
 #ifdef CONFIG_EZPI_CORE_ETHERNET_EN
 #include "ezlopi_core_ethernet.h"
@@ -31,6 +32,9 @@ void ezlopi_init(void)
 {
     // Init memories  
     ezlopi_nvs_init();
+
+    ezlopi_core_read_set_log_severities();
+
     EZPI_HAL_uart_init();
 
 #if defined(CONFIG_EZPI_WEBSOCKET_CLIENT) || defined(CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER)
@@ -57,7 +61,7 @@ void ezlopi_init(void)
     ezlopi_initialize_devices_v3();
     vTaskDelay(10);
 
-#if defined(CONFIG_EZLPI_SERV_ENABLE_MODES)
+#if defined(CONFIG_EZPI_SERV_ENABLE_MODES)
     ezlopi_core_modes_init();
 #endif
 
@@ -118,6 +122,7 @@ static void ezlopi_initialize_devices_v3(void)
 
     while (curr_device)
     {
+
         TRACE_S("Device_id_curr_device : [0x%x] ", curr_device->cloud_properties.device_id);
         l_ezlopi_item_t* curr_item = curr_device->items;
         while (curr_item)

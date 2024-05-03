@@ -1,6 +1,8 @@
 #ifndef __HUB_SCENES_LIST_H__
 #define __HUB_SCENES_LIST_H__
 
+#ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+
 #include <string.h>
 #include "cjext.h"
 
@@ -14,7 +16,7 @@ extern "C"
     void scenes_get(cJSON* cj_request, cJSON* cj_response);
     void scenes_edit(cJSON* cj_request, cJSON* cj_response);
     void scenes_delete(cJSON* cj_request, cJSON* cj_response);
-    // void scenes_status_get(cJSON *cj_request, cJSON *cj_response);
+    void scenes_status_get(cJSON* cj_request, cJSON* cj_response);
     void scenes_blocks_list(cJSON* cj_request, cJSON* cj_response);
     void scenes_block_data_list(cJSON* cj_request, cJSON* cj_response);
     void scenes_run(cJSON* cj_request, cJSON* cj_response);
@@ -31,5 +33,7 @@ extern "C"
 #ifdef __cplusplus
 }
 #endif
+
+#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 #endif // __HUB_SCENES_LIST_H__

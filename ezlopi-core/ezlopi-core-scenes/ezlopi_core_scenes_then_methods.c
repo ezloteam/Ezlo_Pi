@@ -1,3 +1,7 @@
+#include "../../build/config/sdkconfig.h"
+
+#ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+
 #include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_nvs.h"
@@ -159,7 +163,7 @@ int ezlopi_scene_then_switch_house_mode(l_scenes_list_v2_t* curr_scene, void* ar
                 curr_field = curr_field->next;
             }
 
-#if defined(CONFIG_EZLPI_SERV_ENABLE_MODES)
+#if defined(CONFIG_EZPI_SERV_ENABLE_MODES)
             if (house_mode_id > 0)
             {
                 // first get the current 
@@ -176,7 +180,7 @@ int ezlopi_scene_then_switch_house_mode(l_scenes_list_v2_t* curr_scene, void* ar
                     ret = 1;
                 }
             }
-#endif //CONFIG_EZLPI_SERV_ENABLE_MODES
+#endif //CONFIG_EZPI_SERV_ENABLE_MODES
         }
 
     }
@@ -657,3 +661,4 @@ int ezlopi_scene_then_toggle_value(l_scenes_list_v2_t* curr_scene, void* arg)
 #endif
     return ret;
 }
+#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS

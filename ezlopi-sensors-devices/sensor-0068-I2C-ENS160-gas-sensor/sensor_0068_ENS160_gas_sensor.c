@@ -203,32 +203,32 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* 
   device->cloud_properties.info = NULL;
   device->cloud_properties.device_type_id = NULL;
 }
-static void __prepare_device_cloud_properties_ens160_parent_aqi(l_ezlopi_device_t* device, cJSON* cj_device)
-{
-  char* device_name = NULL;
-  CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-  char device_full_name[50];
-  snprintf(device_full_name, 50, "%s_%s", device_name, "ENS160 AQI");
-  ASSIGN_DEVICE_NAME_V2(device, device_full_name);
-}
+// static void __prepare_device_cloud_properties_ens160_parent_aqi(l_ezlopi_device_t* device, cJSON* cj_device)
+// {
+//   char* device_name = NULL;
+//   CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
+//   char device_full_name[50];
+//   snprintf(device_full_name, 50, "%s_%s", device_name, "ENS160 AQI");
+//   ASSIGN_DEVICE_NAME_V2(device, device_full_name);
+// }
 
-static void __prepare_device_cloud_properties_ens160_child_voc(l_ezlopi_device_t* device, cJSON* cj_device)
-{
-  char* device_name = NULL;
-  CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-  char device_full_name[50];
-  snprintf(device_full_name, 50, "%s_%s", device_name, "ENS160 VOC");
-  ASSIGN_DEVICE_NAME_V2(device, device_full_name);
-}
+// static void __prepare_device_cloud_properties_ens160_child_voc(l_ezlopi_device_t* device, cJSON* cj_device)
+// {
+//   char* device_name = NULL;
+//   CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
+//   char device_full_name[50];
+//   snprintf(device_full_name, 50, "%s_%s", device_name, "ENS160 VOC");
+//   ASSIGN_DEVICE_NAME_V2(device, device_full_name);
+// }
 
-static void __prepare_device_cloud_properties_ens160_child_co2(l_ezlopi_device_t* device, cJSON* cj_device)
-{
-  char* device_name = NULL;
-  CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-  char device_full_name[50];
-  snprintf(device_full_name, 50, "%s_%s", device_name, "ENS160 C02");
-  ASSIGN_DEVICE_NAME_V2(device, device_full_name);
-}
+// static void __prepare_device_cloud_properties_ens160_child_co2(l_ezlopi_device_t* device, cJSON* cj_device)
+// {
+//   char* device_name = NULL;
+//   CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
+//   char device_full_name[50];
+//   snprintf(device_full_name, 50, "%s_%s", device_name, "ENS160 C02");
+//   ASSIGN_DEVICE_NAME_V2(device, device_full_name);
+// }
 
 static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device, void* user_arg)
 {
