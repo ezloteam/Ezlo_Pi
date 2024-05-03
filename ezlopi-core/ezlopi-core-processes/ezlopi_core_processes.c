@@ -107,6 +107,7 @@ static void ezlopi_set_ezlopi_task_to_arry(cJSON* cj_processes_array)
 int ezlopi_core_get_processes_details(cJSON* cj_processes_array)
 {
     int ret = 0;
+#if 0
     if (cj_processes_array && cj_processes_array->type == cJSON_Array)
     {
         ezlopi_set_ezlopi_task_to_arry(cj_processes_array);
@@ -141,6 +142,8 @@ int ezlopi_core_get_processes_details(cJSON* cj_processes_array)
     {
         ret = 1;
     }
+#endif
+
     return ret;
 }
 

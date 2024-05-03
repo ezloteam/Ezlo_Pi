@@ -69,12 +69,16 @@ void ezlopi_websocket_client_kill(void)
 
 esp_websocket_client_handle_t ezlopi_websocket_client_init(cJSON* uri, void (*msg_upcall)(const char*, uint32_t), void (*connection_upcall)(bool connected))
 {
+    static char* ca_cert;
+    static char* ssl_priv;
+    static char* ssl_shared;
 
     if ((NULL == client) && (NULL != uri) && (NULL != uri->valuestring) && (NULL != msg_upcall))
     {
-        char* ca_cert = ezlopi_factory_info_v3_get_ca_certificate();
-        char* ssl_shared = ezlopi_factory_info_v3_get_ssl_shared_key();
-        char* ssl_priv = ezlopi_factory_info_v3_get_ssl_private_key();
+        if (NULL == ca_cert) ca_cert = ezlopi_factory_info_v3_get_ca_certificate();
+        if (NULL == ssl_priv) ssl_priv = ezlopi_factory_info_v3_get_ssl_private_key();
+        if (NULL == ssl_shared) ssl_shared = ezlopi_factory_info_v3_get_ssl_shared_key();
+
         __msg_upcall = msg_upcall;
 
         static s_ws_event_arg_t event_arg;
@@ -84,14 +88,14 @@ esp_websocket_client_handle_t ezlopi_websocket_client_init(cJSON* uri, void (*ms
 
         esp_websocket_client_config_t websocket_cfg = {
             .uri = uri->valuestring,
-            .task_stack = EZPI_CORE_WSS_TASK_STACK_SIZE,
-            .buffer_size = EZPI_CORE_WSS_DATA_BUFFER_SIZE,
+            .task_stack = 6 * 1024,
+            .buffer_size = 6 * 1024,
             .cert_pem = ca_cert,
             .client_cert = ssl_shared,
             .client_key = ssl_priv,
-            .pingpong_timeout_sec = EZPI_CORE_WSS_PING_PONG_TIMEOUT_SEC,
+            .pingpong_timeout_sec = 21,
             .keep_alive_enable = 1,
-            .ping_interval_sec = EZPI_CORE_WSS_PING_INTERVAL_SEC,
+            .ping_interval_sec = 10,
         };
 
         TRACE_S("Connecting to %s...", websocket_cfg.uri);
@@ -104,9 +108,13 @@ esp_websocket_client_handle_t ezlopi_websocket_client_init(cJSON* uri, void (*ms
         }
         else
         {
-            free(ca_cert);
-            free(ssl_shared);
-            free(ssl_priv);
+            ezlopi_factory_info_v3_free(ca_cert);
+            ezlopi_factory_info_v3_free(ssl_shared);
+            ezlopi_factory_info_v3_free(ssl_priv);
+
+            ca_cert = NULL;
+            ssl_priv = NULL;
+            ssl_shared = NULL;
         }
     }
     else

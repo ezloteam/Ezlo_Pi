@@ -88,7 +88,7 @@ void app_main(void)
     xTaskCreate(blinky, "blinky", EZLOPI_MAIN_BLINKY_TASK_DEPTH, NULL, 1, &ezlopi_main_blinky_task_handle);
     ezlopi_core_process_set_process_info(ENUM_EZLOPI_MAIN_BLINKY_TASK, &ezlopi_main_blinky_task_handle, EZLOPI_MAIN_BLINKY_TASK_DEPTH);
 
-    ESP_ERROR_CHECK(heap_trace_init_standalone(trace_record, NUM_RECORDS));
+    // ESP_ERROR_CHECK(heap_trace_init_standalone(trace_record, NUM_RECORDS));
 
 }
 

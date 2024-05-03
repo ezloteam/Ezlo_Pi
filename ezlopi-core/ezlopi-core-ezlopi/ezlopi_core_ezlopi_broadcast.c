@@ -68,24 +68,39 @@ int ezlopi_core_ezlopi_broadcast_cjson(cJSON* cj_data)
 
 l_broadcast_method_t* ezlopi_core_ezlopi_broadcast_method_add(f_broadcast_method_t broadcast_method, char* method_name, uint32_t retries)
 {
-    l_broadcast_method_t* ret = __method_create(broadcast_method, method_name, retries);
+    int duplicate_method = 0;
+    l_broadcast_method_t* ret = NULL;
+    l_broadcast_method_t* curr_node = __method_head;
 
-    if (ret)
+    while (curr_node)
     {
-        if (__method_head)
+        if (broadcast_method == curr_node->func)
         {
-            l_broadcast_method_t* curr_node = __method_head;
-
-            while (curr_node->next)
-            {
-                curr_node = curr_node->next;
-            }
-
-            curr_node->next = ret;
+            duplicate_method = 1;
         }
-        else
+        curr_node = curr_node->next;
+    }
+
+    if (0 == duplicate_method)
+    {
+        ret = __method_create(broadcast_method, method_name, retries);
+        if (ret)
         {
-            __method_head = ret;
+            if (__method_head)
+            {
+                l_broadcast_method_t* curr_node = __method_head;
+
+                while (curr_node->next)
+                {
+                    curr_node = curr_node->next;
+                }
+
+                curr_node->next = ret;
+            }
+            else
+            {
+                __method_head = ret;
+            }
         }
     }
 

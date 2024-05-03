@@ -715,6 +715,7 @@ static char* device_info_jsonify(void)
         if (ssid)
         {
             cJSON_AddStringToObject(root, ezlopi_wifi_ssid_str, (isprint(ssid[0])) ? ssid : ezlopi__str);
+            free(ssid);
         }
         cJSON_AddNumberToObject(root, ezlopi_wifi_connection_status_str, ezlopi_wifi_got_ip());
         uint8_t flag_internet_status = (EZLOPI_PING_STATUS_LIVE == ezlopi_ping_get_internet_status()) ? 1 : 0;

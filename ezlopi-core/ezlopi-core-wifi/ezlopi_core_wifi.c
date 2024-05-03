@@ -274,6 +274,9 @@ void ezlopi_wifi_connect_from_id_bin(void)
         esp_err_t wifi_error = ezlopi_wifi_connect(wifi_ssid, wifi_password);
         TRACE_W("wifi_error: %u", wifi_error);
     }
+
+    if (wifi_ssid) free(wifi_ssid);
+    if (wifi_password) free(wifi_password);
 }
 
 esp_err_t ezlopi_wifi_connect(const char* ssid, const char* pass)
