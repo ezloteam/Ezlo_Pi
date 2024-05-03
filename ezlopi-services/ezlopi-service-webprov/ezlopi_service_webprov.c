@@ -251,75 +251,72 @@ static void __config_check(void* pv)
     while (1)
     {
         ezlopi_wait_for_wifi_to_connect(portMAX_DELAY);
-        cJSON* root_header_prov_token = cJSON_CreateObject();
-        cJSON_AddStringToObject(root_header_prov_token, "controller-key", provision_token);
 
         if (NULL != provisioning_server)
         {
             int prov_url_len = strlen(provisioning_server);
 
-            if (prov_url_len >= 5 && strcmp(&provisioning_server[prov_url_len - 5], ".com/") == 0)
+            if (prov_url_len >= 5 && strcmp(&provisioning_server[prov_url_len - 5], ".com/") == 0)  provisioning_server[prov_url_len - 1] = '\0'; // Remove trailing "/"
+
+            if ((NULL != ca_certificate) && (NULL != provision_token))
             {
-                provisioning_server[prov_url_len - 1] = '\0'; // Remove trailing "/"
-            }
-        }
-        else
-        {
-            break;
-            xTaskNotifyGive(ezlopi_update_config_notifier);
-        }
 
-        if ((NULL != ca_certificate) && (NULL != provision_token) && (NULL != provisioning_server))
-        {
-            char http_request_location[200];
+                cJSON* root_header_prov_token = cJSON_CreateObject();
 
-            snprintf(http_request_location, sizeof(http_request_location), "api/v1/controller/sync?version=%d", config_version);
-            response = ezlopi_http_post_request(provisioning_server, http_request_location, root_header_prov_token, NULL, NULL, ca_certificate);
-
-            if (NULL != response)
-            {
-                TRACE_S("Status Code : %d", response->status_code);
-
-                switch (response->status_code)
+                if (root_header_prov_token)
                 {
-                case HttpStatus_Ok:
-                {
-                    // re-write all the info into the flash region
-                    TRACE_S("Data : %s", response->response);
-                    if (0 == __config_update(response->response))
+                    char http_request_location[200];
+                    snprintf(http_request_location, sizeof(http_request_location), "api/v1/controller/sync?version=%d", config_version);
+                    cJSON_AddStringToObject(root_header_prov_token, "controller-key", provision_token);
+                    response = ezlopi_http_post_request(provisioning_server, http_request_location, root_header_prov_token, NULL, NULL, ca_certificate);
+
+                    if (NULL != response)
                     {
-                        retry_count++;
-                        if (retry_count >= 5)
+                        TRACE_S("Status Code : %d", response->status_code);
+
+                        switch (response->status_code)
                         {
-                            flag_break_loop = 1;
+                        case HttpStatus_Ok:
+                        {
+                            // re-write all the info into the flash region
+                            // TRACE_S("Data : %s", response->response);
+                            if (0 == __config_update(response->response))
+                            {
+                                retry_count++;
+                                if (retry_count >= 5)
+                                {
+                                    flag_break_loop = 1;
+                                }
+                            }
+                            else
+                            {
+                                flag_break_loop = 1;
+                            }
+                            break;
                         }
-                    }
-                    else
-                    {
-                        flag_break_loop = 1;
-                    }
-                    break;
-                }
-                default:
-                {
-                    if (304 == response->status_code) // HTTP Status not modified
-                    {
-                        TRACE_S("Config data not changed !");
-                        flag_break_loop = 1;
-                    }
-                    break;
-                }
-                }
+                        default:
+                        {
+                            if (304 == response->status_code) // HTTP Status not modified
+                            {
+                                TRACE_S("Config data not changed !");
+                                flag_break_loop = 1;
+                            }
+                            break;
+                        }
+                        }
 
-                free(response->response);
-                free(response);
+                        free(response->response);
+                        free(response);
+                    }
+                    cJSON_Delete(root_header_prov_token);
+                }
+                else
+                {
+                    xTaskNotifyGive(ezlopi_update_config_notifier);
+                    break;
+                }
             }
             else
-            {
-                free(response);
-            }
-
-            if (flag_break_loop)
             {
                 xTaskNotifyGive(ezlopi_update_config_notifier);
                 break;
@@ -330,16 +327,19 @@ static void __config_check(void* pv)
             xTaskNotifyGive(ezlopi_update_config_notifier);
             break;
         }
-
-        vTaskDelay(50000 / portTICK_RATE_MS);
+        if (flag_break_loop)
+        {
+            xTaskNotifyGive(ezlopi_update_config_notifier);
+            break;
+        }
     }
-
     free(ca_certificate);
     free(provision_token);
     free(provisioning_server);
     ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SERVICE_WEB_PROV_CONFIG_CHECK_TASK);
     vTaskDelete(NULL);
 }
+
 
 static uint8_t __config_update(void* arg)
 {
