@@ -34,7 +34,7 @@ static int __set_cjson_value(l_ezlopi_item_t* item, void* arg);
 static int __get_cjson_value(l_ezlopi_item_t* item, void* arg);
 
 int device_0038_other_RGB(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
-{ 
+{
     int ret = 0;
 
     switch (action)
@@ -96,16 +96,16 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
         {
             if (ezlopi_item_name_rgbcolor == item->cloud_properties.item_name)
             {
-                cJSON* color_values = cJSON_AddObjectToObject(cj_properties, ezlopi_value_str);
+                cJSON* color_values = cJSON_AddObjectToObject(__FUNCTION__, cj_properties, ezlopi_value_str);
                 if (color_values)
                 {
-                    cJSON_AddNumberToObject(color_values, ezlopi_red_str, rgb_args->red_struct.value);
-                    cJSON_AddNumberToObject(color_values, ezlopi_green_str, rgb_args->green_struct.value);
-                    cJSON_AddNumberToObject(color_values, ezlopi_blue_str, rgb_args->blue_struct.value);
+                    cJSON_AddNumberToObject(__FUNCTION__, color_values, ezlopi_red_str, rgb_args->red_struct.value);
+                    cJSON_AddNumberToObject(__FUNCTION__, color_values, ezlopi_green_str, rgb_args->green_struct.value);
+                    cJSON_AddNumberToObject(__FUNCTION__, color_values, ezlopi_blue_str, rgb_args->blue_struct.value);
 
                     char formatted_rgb_value[32];
                     snprintf(formatted_rgb_value, sizeof(formatted_rgb_value), "#%02x%02x%02x", rgb_args->red_struct.value, rgb_args->green_struct.value, rgb_args->blue_struct.value);
-                    cJSON_AddStringToObject(cj_properties, ezlopi_valueFormatted_str, formatted_rgb_value);
+                    cJSON_AddStringToObject(__FUNCTION__, cj_properties, ezlopi_valueFormatted_str, formatted_rgb_value);
                 }
             }
             else if (ezlopi_item_name_switch == item->cloud_properties.item_name)
@@ -133,7 +133,7 @@ static int __set_cjson_value(l_ezlopi_item_t* item, void* arg)
         {
             if (ezlopi_item_name_rgbcolor == item->cloud_properties.item_name)
             {
-                cJSON* cjson_params_rgb_values = cJSON_GetObjectItem(cjson_params, ezlopi_value_str);
+                cJSON* cjson_params_rgb_values = cJSON_GetObjectItem(__FUNCTION__, cjson_params, ezlopi_value_str);
 
                 CJSON_TRACE("cjson_params_rgb_values", cjson_params_rgb_values);
 
@@ -190,7 +190,7 @@ static int __init(l_ezlopi_item_t* item)
                         rgb_args->red_struct.channel = RGB_LED_red_channel_speed->channel;
                         rgb_args->red_struct.speed_mode = RGB_LED_red_channel_speed->speed_mode;
                         TRACE_D("red channel is %d", rgb_args->red_struct.channel);
-                        free(RGB_LED_red_channel_speed);
+                        free(__FUNCTION__, RGB_LED_red_channel_speed);
                     }
 
                     s_ezlopi_channel_speed_t* RGB_LED_green_channel_speed = ezlopi_pwm_init(rgb_args->green_struct.gpio_num, rgb_args->green_struct.pwm_resln, rgb_args->green_struct.freq_hz, rgb_args->green_struct.duty_cycle);
@@ -199,7 +199,7 @@ static int __init(l_ezlopi_item_t* item)
                         rgb_args->green_struct.channel = RGB_LED_green_channel_speed->channel;
                         rgb_args->green_struct.speed_mode = RGB_LED_green_channel_speed->speed_mode;
                         TRACE_D("green channel is %d", rgb_args->green_struct.channel);
-                        free(RGB_LED_green_channel_speed);
+                        free(__FUNCTION__, RGB_LED_green_channel_speed);
                     }
 
                     s_ezlopi_channel_speed_t* RGB_LED_blue_channel_speed = ezlopi_pwm_init(rgb_args->blue_struct.gpio_num, rgb_args->blue_struct.pwm_resln, rgb_args->blue_struct.freq_hz, rgb_args->blue_struct.duty_cycle);
@@ -208,7 +208,7 @@ static int __init(l_ezlopi_item_t* item)
                         rgb_args->blue_struct.channel = RGB_LED_blue_channel_speed->channel;
                         rgb_args->blue_struct.speed_mode = RGB_LED_blue_channel_speed->speed_mode;
                         TRACE_D("blue channel is %d", rgb_args->blue_struct.channel);
-                        free(RGB_LED_blue_channel_speed);
+                        free(__FUNCTION__, RGB_LED_blue_channel_speed);
                     }
 
                     RGB_LED_change_color_value(rgb_args);
@@ -340,7 +340,7 @@ static int __prepare(void* arg)
         if (RGB_device)
         {
             ret = 1;
-            s_rgb_args_t* rgb_args = malloc(sizeof(s_rgb_args_t));
+            s_rgb_args_t* rgb_args = malloc(__FUNCTION__, sizeof(s_rgb_args_t));
             if (rgb_args)
             {
                 memset(rgb_args, 0, sizeof(s_rgb_args_t));
@@ -369,7 +369,7 @@ static int __prepare(void* arg)
 
                 if (!rgb_args->RGB_LED_item && !rgb_args->RGB_LED_onoff_switch_item && !rgb_args->RGB_LED_dimmer_item)
                 {
-                    free(rgb_args);
+                    free(__FUNCTION__, rgb_args);
                     ezlopi_device_free_device(RGB_device);
                     ret = -1;
                 }

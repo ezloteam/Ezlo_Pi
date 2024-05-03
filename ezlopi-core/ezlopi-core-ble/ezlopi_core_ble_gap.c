@@ -137,7 +137,7 @@ void ezlopi_ble_gap_dissociate_bonded_devices(void)
 {
     int dev_num = esp_ble_get_bond_device_num();
 
-    esp_ble_bond_dev_t* dev_list = (esp_ble_bond_dev_t*)malloc(sizeof(esp_ble_bond_dev_t) * dev_num);
+    esp_ble_bond_dev_t* dev_list = (esp_ble_bond_dev_t*)malloc(__FUNCTION__, sizeof(esp_ble_bond_dev_t) * dev_num);
     if (dev_list)
     {
         esp_ble_get_bond_device_list(&dev_num, dev_list);
@@ -151,7 +151,7 @@ void ezlopi_ble_gap_dissociate_bonded_devices(void)
             esp_ble_remove_bond_device(dev_list[i].bd_addr);
         }
 
-        free(dev_list);
+        free(__FUNCTION__, dev_list);
     }
 }
 
@@ -810,7 +810,7 @@ static void show_bonded_devices(void)
 {
     int dev_num = esp_ble_get_bond_device_num();
 
-    esp_ble_bond_dev_t* dev_list = (esp_ble_bond_dev_t*)malloc(sizeof(esp_ble_bond_dev_t) * dev_num);
+    esp_ble_bond_dev_t* dev_list = (esp_ble_bond_dev_t*)malloc(__FUNCTION__, sizeof(esp_ble_bond_dev_t) * dev_num);
     if (dev_list)
     {
         esp_ble_get_bond_device_list(&dev_num, dev_list);
@@ -822,7 +822,7 @@ static void show_bonded_devices(void)
             // dump("dev_list[i].bd_addr", dev_list[i].bd_addr, 0, sizeof(esp_bd_addr_t));
         }
 
-        free(dev_list);
+        free(__FUNCTION__, dev_list);
     }
 }
 #endif // 1 == ENABLE_TRACE
@@ -837,7 +837,7 @@ static void ezlopi_ble_setup_service_uuid(void)
 
     if (all_service_uuid_len)
     {
-        all_service_uuid = malloc(all_service_uuid_len);
+        all_service_uuid = malloc(__FUNCTION__, all_service_uuid_len);
         if (all_service_uuid)
         {
             int uuid_pos = 0;

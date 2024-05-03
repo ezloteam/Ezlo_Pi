@@ -4,7 +4,7 @@ static void ____check_and_free(char *to_be_freed)
 {
     if (to_be_freed)
     {
-        free(to_be_freed);
+        free(__FUNCTION__, to_be_freed);
     }
 }
 
@@ -15,17 +15,17 @@ void send_http_request(void)
     char *shared_key = ezlopi_factory_info_v2_get_ssl_shared_key();
     char *ca_cert = ezlopi_factory_info_v2_get_ca_certificate();
 
-    cJSON *headers = cJSON_CreateObject();
+    cJSON *headers = cJSON_CreateObject(__FUNCTION__);
     if (headers && cloud_url && private_key && shared_key && ca_cert)
     {
         char location[256];
         strncpy(location, "api/v1/controller/sync?version=1", 256);
-        cJSON_AddStringToObject(headers, "controller-key", ""); // add controller key here
+        cJSON_AddStringToObject(__FUNCTION__, headers, "controller-key", ""); // add controller key here
         char *response = ezlopi_http_post_request(cloud_url, location, headers, private_key, shared_key, ca_cert);
         if (response)
         {
             TRACE_I("Http post request response:\r\n%s", response);
-            free(response);
+            free(__FUNCTION__, response);
         }
     }
 
@@ -33,5 +33,5 @@ void send_http_request(void)
     ____check_and_free(private_key);
     ____check_and_free(shared_key);
     ____check_and_free(ca_cert);
-    cJSON_Delete(headers);
+    cJSON_Delete(__FUNCTION__, headers);
 }

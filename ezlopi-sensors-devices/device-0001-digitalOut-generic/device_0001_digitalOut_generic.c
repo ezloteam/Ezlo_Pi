@@ -120,56 +120,56 @@ static int __settings_get(void* arg, l_ezlopi_device_settings_v3_t* setting)
         if (setting->cloud_properties.setting_id == settings_ids[0])
         {
 
-            cJSON* label = cJSON_CreateObject();
-            cJSON* description = cJSON_CreateObject();
-            cJSON* value = cJSON_CreateObject();
-            cJSON* value_default = cJSON_CreateObject();
+            cJSON* label = cJSON_CreateObject(__FUNCTION__);
+            cJSON* description = cJSON_CreateObject(__FUNCTION__);
+            cJSON* value = cJSON_CreateObject(__FUNCTION__);
+            cJSON* value_default = cJSON_CreateObject(__FUNCTION__);
 
-            cJSON_AddStringToObject(label, ezlopi_text_str, "User defined mode");
-            cJSON_AddStringToObject(label, ezlopi_lang_tag_str, "ezlopi_presence_user_defined_mode_label");
+            cJSON_AddStringToObject(__FUNCTION__, label, ezlopi_text_str, "User defined mode");
+            cJSON_AddStringToObject(__FUNCTION__, label, ezlopi_lang_tag_str, "ezlopi_presence_user_defined_mode_label");
 
-            cJSON_AddStringToObject(description, ezlopi_text_str, "User defined operation mode, where user can set several distance parameters for setting a custom operation mode");
-            cJSON_AddStringToObject(description, ezlopi_lang_tag_str, "ezlopi_presence_user_defined_mode_description");
+            cJSON_AddStringToObject(__FUNCTION__, description, ezlopi_text_str, "User defined operation mode, where user can set several distance parameters for setting a custom operation mode");
+            cJSON_AddStringToObject(__FUNCTION__, description, ezlopi_lang_tag_str, "ezlopi_presence_user_defined_mode_description");
 
-            cJSON_AddItemToObject(cjson_propertise, ezlopi_label_str, label);
-            cJSON_AddItemToObject(cjson_propertise, "description", description);
-            cJSON_AddStringToObject(cjson_propertise, ezlopi_valueType_str, "presence_operation_mode");
+            cJSON_AddItemToObject(__FUNCTION__, cjson_propertise, ezlopi_label_str, label);
+            cJSON_AddItemToObject(__FUNCTION__, cjson_propertise, "description", description);
+            cJSON_AddStringToObject(__FUNCTION__, cjson_propertise, ezlopi_valueType_str, "presence_operation_mode");
 
-            cJSON_AddNumberToObject(value, ezlopi_min_move_distance_str, 0.75);
-            cJSON_AddNumberToObject(value, ezlopi_max_move_distance_str, 1.5);
-            cJSON_AddNumberToObject(value, ezlopi_min_still_distance_str, 0.75);
-            cJSON_AddNumberToObject(value, ezlopi_max_still_distance_str, 1.5);
-            cJSON_AddTrueToObject(value, ezlopi_is_active_str);
-            cJSON_AddItemToObject(cjson_propertise, ezlopi_value_str, value);
+            cJSON_AddNumberToObject(__FUNCTION__, value, ezlopi_min_move_distance_str, 0.75);
+            cJSON_AddNumberToObject(__FUNCTION__, value, ezlopi_max_move_distance_str, 1.5);
+            cJSON_AddNumberToObject(__FUNCTION__, value, ezlopi_min_still_distance_str, 0.75);
+            cJSON_AddNumberToObject(__FUNCTION__, value, ezlopi_max_still_distance_str, 1.5);
+            cJSON_AddTrueToObject(__FUNCTION__, value, ezlopi_is_active_str);
+            cJSON_AddItemToObject(__FUNCTION__, cjson_propertise, ezlopi_value_str, value);
 
-            cJSON_AddNumberToObject(value_default, ezlopi_min_move_distance_str, 0.75);
-            cJSON_AddNumberToObject(value_default, ezlopi_max_move_distance_str, 6.0);
-            cJSON_AddNumberToObject(value_default, ezlopi_min_still_distance_str, 0.75);
-            cJSON_AddNumberToObject(value_default, ezlopi_max_still_distance_str, 6.0);
-            cJSON_AddFalseToObject(value_default, ezlopi_is_active_str);
-            cJSON_AddItemToObject(cjson_propertise, "valueDefault", value_default);
+            cJSON_AddNumberToObject(__FUNCTION__, value_default, ezlopi_min_move_distance_str, 0.75);
+            cJSON_AddNumberToObject(__FUNCTION__, value_default, ezlopi_max_move_distance_str, 6.0);
+            cJSON_AddNumberToObject(__FUNCTION__, value_default, ezlopi_min_still_distance_str, 0.75);
+            cJSON_AddNumberToObject(__FUNCTION__, value_default, ezlopi_max_still_distance_str, 6.0);
+            cJSON_AddFalseToObject(__FUNCTION__, value_default, ezlopi_is_active_str);
+            cJSON_AddItemToObject(__FUNCTION__, cjson_propertise, "valueDefault", value_default);
         }
         else if (setting->cloud_properties.setting_id == settings_ids[1])
         {
-            cJSON* label = cJSON_CreateObject();
-            cJSON* description = cJSON_CreateObject();
+            cJSON* label = cJSON_CreateObject(__FUNCTION__);
+            cJSON* description = cJSON_CreateObject(__FUNCTION__);
 
-            cJSON_AddStringToObject(label, ezlopi_text_str, "Backlight Brightness");
-            cJSON_AddStringToObject(label, ezlopi_lang_tag_str, "ezlopi_digitalio_pwm_setting_label");
+            cJSON_AddStringToObject(__FUNCTION__, label, ezlopi_text_str, "Backlight Brightness");
+            cJSON_AddStringToObject(__FUNCTION__, label, ezlopi_lang_tag_str, "ezlopi_digitalio_pwm_setting_label");
 
-            cJSON_AddStringToObject(description, ezlopi_text_str, "This is PWM setting value for setting the backlight brightness");
-            cJSON_AddStringToObject(description, ezlopi_lang_tag_str, "ezlopi_digitalio_pwm_setting_description");
+            cJSON_AddStringToObject(__FUNCTION__, description, ezlopi_text_str, "This is PWM setting value for setting the backlight brightness");
+            cJSON_AddStringToObject(__FUNCTION__, description, ezlopi_lang_tag_str, "ezlopi_digitalio_pwm_setting_description");
 
-            cJSON_AddItemToObject(cjson_propertise, ezlopi_label_str, label);
-            cJSON_AddItemToObject(cjson_propertise, "description", description);
-            cJSON_AddStringToObject(cjson_propertise, ezlopi_valueType_str, "int");
+            cJSON_AddItemToObject(__FUNCTION__, cjson_propertise, ezlopi_label_str, label);
+            cJSON_AddItemToObject(__FUNCTION__, cjson_propertise, "description", description);
+            cJSON_AddStringToObject(__FUNCTION__, cjson_propertise, ezlopi_valueType_str, "int");
 
             s_digio_settings_t* settings_data = (s_digio_settings_t*)setting->user_arg;
 
-            cJSON_AddNumberToObject(cjson_propertise, ezlopi_value_str, settings_data->settings_int_data);
-            cJSON_AddNumberToObject(cjson_propertise, "valueMin", 0);
-            cJSON_AddNumberToObject(cjson_propertise, ezlopi_valueMax_str, 100);
-            cJSON_AddNumberToObject(cjson_propertise, "valueDefault", 50);
+            cJSON_AddNumberToObject(__FUNCTION__, cjson_propertise, ezlopi_value_str, settings_data->settings_int_data);
+            cJSON_AddNumberToObject(__FUNCTION__, cjson_propertise, "valueMin", 0);
+            cJSON_AddNumberToObject(__FUNCTION__, cjson_propertise, ezlopi_valueMax_str, 100);
+            cJSON_AddNumberToObject(__FUNCTION__, cjson_propertise, "valueDefault", 50);
         }
 
         ret = 1;
@@ -236,7 +236,7 @@ static int __settings_update(void* arg, l_ezlopi_device_settings_v3_t* setting)
         else if (setting->cloud_properties.setting_id == settings_ids[1])
         {
             s_digio_settings_t* settings_data = (s_digio_settings_t*)setting->user_arg;
-            cJSON_AddNumberToObject(cjson_propertise, ezlopi_value_str, settings_data->settings_int_data);
+            cJSON_AddNumberToObject(__FUNCTION__, cjson_propertise, ezlopi_value_str, settings_data->settings_int_data);
         }
     }
     return ret;
@@ -249,7 +249,7 @@ static void __setup_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj
     // uint32_t device_id = 0;
     // char *device_name = NULL;
     // CJSON_GET_VALUE_STRING(cjson_device, ezlopi_dev_name_str, device_name);
-    // CJSON_GET_ID(device_id, cJSON_GetObjectItem(cjson_device, ezlopi__id_str));
+    // CJSON_GET_ID(device_id, cJSON_GetObjectItem(__FUNCTION__, cjson_device, ezlopi__id_str));
     // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
     // ASSIGN_DEVICE_NAME_V2(device, device_name);
 
@@ -330,7 +330,7 @@ static int __prepare(void* arg)
 
                     setting_brightness->cloud_properties.setting_id = settings_ids[1];
 
-                    s_digio_settings_t* settings_value = (s_digio_settings_t*)malloc(sizeof(s_digio_settings_t));
+                    s_digio_settings_t* settings_value = (s_digio_settings_t*)malloc(__FUNCTION__, sizeof(s_digio_settings_t));
                     memset(settings_value, 0, sizeof(s_digio_settings_t));
 
                     if (ezlopi_nvs_read_int32(&settings_value->settings_int_data, nvs_key_backlight_brightness))
@@ -501,7 +501,7 @@ static int __set_value(l_ezlopi_item_t* item, void* arg)
             // CJSON_TRACE("cjson_params", cjson_params);
 
             int value = 0;
-            cJSON* cj_value = cJSON_GetObjectItem(cjson_params, ezlopi_value_str);
+            cJSON* cj_value = cJSON_GetObjectItem(__FUNCTION__, cjson_params, ezlopi_value_str);
             if (cj_value)
             {
                 switch (cj_value->type)

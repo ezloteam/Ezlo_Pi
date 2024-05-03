@@ -66,10 +66,9 @@
 
 static unsigned char *cJSONUtils_strdup(const char * who, const unsigned char *const string)
 {
-    size_t length = 0;
     unsigned char *copy = NULL;
 
-    length = strlen((const char *)string) + sizeof("");
+    size_t length = strlen((const char *)string) + sizeof("");
     copy = (unsigned char *)malloc(who, length);
     if (copy == NULL)
     {
@@ -729,14 +728,14 @@ static cJSON_bool insert_item_in_array(const char *who, cJSON *array, size_t whi
     return 1;
 }
 
-static cJSON *get_object_item(const cJSON *const object, const char *name, const cJSON_bool case_sensitive)
+static cJSON *get_object_item(const char * who, const cJSON *const object, const char *name, const cJSON_bool case_sensitive)
 {
     if (case_sensitive)
     {
         return cJSON_GetObjectItemCaseSensitive(object, name);
     }
 
-    return cJSON_GetObjectItem(object, name);
+    return cJSON_GetObjectItem(who, object, name);
 }
 
 enum patch_operation
@@ -750,9 +749,9 @@ enum patch_operation
     TEST
 };
 
-static enum patch_operation decode_patch_operation(const cJSON *const patch, const cJSON_bool case_sensitive)
+static enum patch_operation decode_patch_operation(const char *who, const cJSON *const patch, const cJSON_bool case_sensitive)
 {
-    cJSON *operation = get_object_item(patch, "op", case_sensitive);
+    cJSON *operation = get_object_item(who, patch, "op", case_sensitive);
     if (!cJSON_IsString(operation))
     {
         return INVALID;
@@ -825,7 +824,7 @@ static int apply_patch(const char * who, cJSON *object, const cJSON *patch, cons
     unsigned char *child_pointer = NULL;
     int status = 0;
 
-    path = get_object_item(patch, "path", case_sensitive);
+    path = get_object_item(who, patch, "path", case_sensitive);
     if (!cJSON_IsString(path))
     {
         /* malformed patch. */
@@ -833,7 +832,7 @@ static int apply_patch(const char * who, cJSON *object, const cJSON *patch, cons
         goto cleanup;
     }
 
-    opcode = decode_patch_operation(patch, case_sensitive);
+    opcode = decode_patch_operation(who, patch, case_sensitive);
     if (opcode == INVALID)
     {
         status = 3;
@@ -842,7 +841,7 @@ static int apply_patch(const char * who, cJSON *object, const cJSON *patch, cons
     else if (opcode == TEST)
     {
         /* compare value: {...} with the given path */
-        status = !compare_json(get_item_from_pointer(object, path->valuestring, case_sensitive), get_object_item(patch, "value", case_sensitive), case_sensitive);
+        status = !compare_json(get_item_from_pointer(object, path->valuestring, case_sensitive), get_object_item(who, patch, "value", case_sensitive), case_sensitive);
         goto cleanup;
     }
 
@@ -862,7 +861,7 @@ static int apply_patch(const char * who, cJSON *object, const cJSON *patch, cons
 
         if ((opcode == REPLACE) || (opcode == ADD))
         {
-            value = get_object_item(patch, "value", case_sensitive);
+            value = get_object_item(who, patch, "value", case_sensitive);
             if (value == NULL)
             {
                 /* missing "value" for add/replace. */
@@ -917,7 +916,7 @@ static int apply_patch(const char * who, cJSON *object, const cJSON *patch, cons
     /* Copy/Move uses "from". */
     if ((opcode == MOVE) || (opcode == COPY))
     {
-        cJSON *from = get_object_item(patch, "from", case_sensitive);
+        cJSON *from = get_object_item(who, patch, "from", case_sensitive);
         if (from == NULL)
         {
             /* missing "from" for copy/move. */
@@ -952,7 +951,7 @@ static int apply_patch(const char * who, cJSON *object, const cJSON *patch, cons
     }
     else /* Add/Replace uses "value". */
     {
-        value = get_object_item(patch, "value", case_sensitive);
+        value = get_object_item(who, patch, "value", case_sensitive);
         if (value == NULL)
         {
             /* missing "value" for add/replace. */
@@ -1025,7 +1024,7 @@ static int apply_patch(const char * who, cJSON *object, const cJSON *patch, cons
         {
             cJSON_DeleteItemFromObject(who, parent, (char *)child_pointer);
         }
-        cJSON_AddItemToObject(parent, (char *)child_pointer, value);
+        cJSON_AddItemToObject(who, parent, (char *)child_pointer, value);
         value = NULL;
     }
     else /* parent is not an object */
@@ -1120,11 +1119,11 @@ static void compose_patch(const char * who, cJSON *const patches, const unsigned
     {
         return;
     }
-    cJSON_AddItemToObject(patch, "op", cJSON_CreateString(who, (const char *)operation));
+    cJSON_AddItemToObject(who, patch, "op", cJSON_CreateString(who, (const char *)operation));
 
     if (suffix == NULL)
     {
-        cJSON_AddItemToObject( patch, "path", cJSON_CreateString(who, (const char *)path));
+        cJSON_AddItemToObject(who, patch, "path", cJSON_CreateString(who, (const char *)path));
     }
     else
     {

@@ -76,7 +76,7 @@ static int __0015_prepare(void* arg)
         cJSON* cjson_device = prep_arg->cjson_device;
         if (cjson_device)
         {
-            s_ezlopi_dht11_data_t* dht11_sensor_data = (s_ezlopi_dht11_data_t*)malloc(sizeof(s_ezlopi_dht11_data_t));
+            s_ezlopi_dht11_data_t* dht11_sensor_data = (s_ezlopi_dht11_data_t*)malloc(__FUNCTION__, sizeof(s_ezlopi_dht11_data_t));
             if (dht11_sensor_data)
             {
                 memset(dht11_sensor_data, 0, sizeof(s_ezlopi_dht11_data_t));
@@ -116,12 +116,12 @@ static int __0015_prepare(void* arg)
                     {
                         ret = -1;
                         ezlopi_device_free_device(parent_device_temperature);
-                        free(dht11_sensor_data);
+                        free(__FUNCTION__, dht11_sensor_data);
                     }
                 }
                 else
                 {
-                    free(dht11_sensor_data);
+                    free(__FUNCTION__, dht11_sensor_data);
                     ret = -1;
                 }
             }

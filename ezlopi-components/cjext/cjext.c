@@ -152,7 +152,6 @@ static unsigned char* cJSON_strdup(const char * who, const unsigned char* string
     }
 
     memcpy(copy, string, length);
-
     return copy;
 }
 
@@ -359,7 +358,6 @@ char *cJSON_SetValuestring(const char * who, cJSON* object, const char* valuestr
 
     object->valuestring = copy;
     object->is_value_ref = cJSON_False;
-    object->str_value_len = strlen(copy);
 
     return copy;
 }
@@ -2275,7 +2273,7 @@ static cJSON* get_object_item(const cJSON* const object, const char* const name,
     return current_element;
 }
 
-cJSON *cJSON_GetObjectItem(const cJSON* const object, const char* const string)
+cJSON * cJSON_GetObjectItem(const char * who, const cJSON* const object, const char* const string)
 {
     return get_object_item(object, string, false);
 }
@@ -2285,9 +2283,9 @@ cJSON *cJSON_GetObjectItemCaseSensitive(const cJSON* const object, const char* c
     return get_object_item(object, string, true);
 }
 
-cJSON_bool cJSON_HasObjectItem(const cJSON* object, const char* string)
+cJSON_bool cJSON_HasObjectItem(const char * who, const cJSON* object, const char* string)
 {
-    return cJSON_GetObjectItem(object, string) ? 1 : 0;
+    return cJSON_GetObjectItem(who, object, string) ? 1 : 0;
 }
 
 /* Utility for array list handling. */
@@ -2391,11 +2389,13 @@ static cJSON_bool add_item_to_object(const char * who, cJSON* const object, cons
 
     if (constant_key)
     {
+        item->is_key_ref = cJSON_True;
         new_key = (char*)cast_away_const(string);
         new_type = item->type | cJSON_StringIsConst;
     }
     else
     {
+        item->is_key_ref = cJSON_False;
         new_key = (char*)cJSON_strdup(who, (const unsigned char*)string, item->str_key_len);
         if (new_key == NULL)
         {
@@ -2418,35 +2418,35 @@ static cJSON_bool add_item_to_object(const char * who, cJSON* const object, cons
 }
 
 
-cJSON_bool cJSON_AddItemToObject(cJSON* object, const char* string, cJSON* item)
+cJSON_bool cJSON_AddItemToObject(const char * who, cJSON* object, const char* string, cJSON* item)
 {
-    return add_item_to_object(object, string, item, false);
+    return add_item_to_object(who, object, string, item, false);
 }
 
 /* Add an item to an object with constant string as key */
-cJSON_bool cJSON_AddItemToObjectCS(cJSON* object, const char* string, cJSON* item)
+cJSON_bool cJSON_AddItemToObjectCS(const char * who, cJSON* object, const char* string, cJSON* item)
 {
-    return add_item_to_object(object, string, item, true);
+    return add_item_to_object(who, object, string, item, true);
 }
 
-cJSON_bool cJSON_AddItemReferenceToArray(cJSON* array, cJSON* item)
+cJSON_bool cJSON_AddItemReferenceToArray(const char * who, cJSON* array, cJSON* item)
 {
     if (array == NULL)
     {
         return false;
     }
 
-    return add_item_to_array(array, create_reference(item));
+    return add_item_to_array(array, create_reference(who, item));
 }
 
-cJSON_bool cJSON_AddItemReferenceToObject(cJSON* object, const char* string, cJSON* item)
+cJSON_bool cJSON_AddItemReferenceToObject(const char * who, cJSON* object, const char* string, cJSON* item)
 {
     if ((object == NULL) || (string == NULL))
     {
         return false;
     }
 
-    return add_item_to_object(object, string, create_reference(item), false);
+    return add_item_to_object(who, object, string, create_reference(who, item), false);
 }
 
 cJSON *cJSON_AddNullToObject(const char * who, cJSON* const object, const char* const name)
@@ -2463,7 +2463,7 @@ cJSON *cJSON_AddNullToObject(const char * who, cJSON* const object, const char* 
 
 cJSON *cJSON_AddTrueToObject(const char * who, cJSON* const object, const char* const name)
 {
-    cJSON* true_item = cJSON_CreateTrue();
+    cJSON* true_item = cJSON_CreateTrue(who);
     if (add_item_to_object(who, object, name, true_item, false))
     {
         return true_item;
@@ -2522,7 +2522,7 @@ cJSON *cJSON_AddNumberToObjectWithRef(const char * who, cJSON* const object, con
     return NULL;
 }
 
-cJSON *cJSON_AddStringToObject(cJSON* const object, const char* const name, const char* const string)
+cJSON *cJSON_AddStringToObject(const char * who, cJSON* const object, const char* const name, const char* const string)
 {
     cJSON* string_item = cJSON_CreateString(who, string);
     if (add_item_to_object(who, object, name, string_item, false))
@@ -2546,7 +2546,7 @@ cJSON *cJSON_AddStringToObjectWithRef(const char * who, cJSON* const object, con
     return NULL;
 }
 
-cJSON *cJSON_AddRawToObject(cJSON* const object, const char* const name, const char* const raw)
+cJSON *cJSON_AddRawToObject(const char * who, cJSON* const object, const char* const name, const char* const raw)
 {
     cJSON* raw_item = cJSON_CreateRaw(who, raw);
     if (add_item_to_object(who, object, name, raw_item, false))
@@ -2572,7 +2572,7 @@ cJSON *cJSON_AddObjectToObject(const char * who, cJSON* const object, const char
 
 cJSON *cJSON_AddObjectToObjectWithRef(const char * who, cJSON* const object, const char* const name)
 {
-    cJSON* object_item = cJSON_CreateObject();
+    cJSON* object_item = cJSON_CreateObject(who);
     if (add_item_to_object(who, object, name, object_item, true))
     {
         return object_item;
@@ -2664,7 +2664,7 @@ void cJSON_DeleteItemFromObject(const char * who, cJSON* object, const char* str
 
 void cJSON_DeleteItemFromObjectCaseSensitive(const char * who, cJSON* object, const char* string)
 {
-    cJSON_Delete(who, cJSON_DetachItemFromObjectCaseSensitive(object, string));
+    cJSON_Delete(who, cJSON_DetachItemFromObjectCaseSensitive(who, object, string));
 }
 
 /* Replace array/object items with new ones. */
@@ -2703,7 +2703,7 @@ cJSON_bool cJSON_InsertItemInArray(cJSON* array, int which, cJSON* newitem)
     return true;
 }
 
-cJSON_bool cJSON_ReplaceItemViaPointer(cJSON* const parent, cJSON* const item, cJSON* replacement)
+cJSON_bool cJSON_ReplaceItemViaPointer(const char * who, cJSON* const parent, cJSON* const item, cJSON* replacement)
 {
     if ((parent == NULL) || (parent->child == NULL) || (replacement == NULL) || (item == NULL))
     {
@@ -2752,17 +2752,17 @@ cJSON_bool cJSON_ReplaceItemViaPointer(cJSON* const parent, cJSON* const item, c
     return true;
 }
 
-cJSON_bool cJSON_ReplaceItemInArray(cJSON* array, int which, cJSON* newitem)
+cJSON_bool cJSON_ReplaceItemInArray(const char * who, cJSON* array, int which, cJSON* newitem)
 {
     if (which < 0)
     {
         return false;
     }
 
-    return cJSON_ReplaceItemViaPointer(array, get_array_item(array, (size_t)which), newitem);
+    return cJSON_ReplaceItemViaPointer(who, array, get_array_item(array, (size_t)which), newitem);
 }
 
-static cJSON_bool replace_item_in_object(cJSON* object, const char* string, cJSON* replacement, cJSON_bool case_sensitive)
+static cJSON_bool replace_item_in_object(const char * who, cJSON* object, const char* string, cJSON* replacement, cJSON_bool case_sensitive)
 {
     if ((replacement == NULL) || (string == NULL))
     {
@@ -2775,7 +2775,8 @@ static cJSON_bool replace_item_in_object(cJSON* object, const char* string, cJSO
         free(who, replacement->string);
     }
     replacement->str_key_len = strlen(string);
-    replacement->string = (char*)cJSON_strdup((const unsigned char*)string, replacement->str_key_len);
+    replacement->is_key_ref = cJSON_False;
+    replacement->string = (char*)cJSON_strdup(who, (const unsigned char*)string, replacement->str_key_len);
     if (replacement->string == NULL)
     {
         return false;
@@ -2783,21 +2784,21 @@ static cJSON_bool replace_item_in_object(cJSON* object, const char* string, cJSO
 
     replacement->type &= ~cJSON_StringIsConst;
 
-    return cJSON_ReplaceItemViaPointer(object, get_object_item(object, string, case_sensitive), replacement);
+    return cJSON_ReplaceItemViaPointer(who, object, get_object_item(object, string, case_sensitive), replacement);
 }
 
-cJSON_bool cJSON_ReplaceItemInObject(cJSON* object, const char* string, cJSON* newitem)
+cJSON_bool cJSON_ReplaceItemInObject(const char * who, cJSON* object, const char* string, cJSON* newitem)
 {
-    return replace_item_in_object(object, string, newitem, false);
+    return replace_item_in_object(who, object, string, newitem, false);
 }
 
-cJSON_bool cJSON_ReplaceItemInObjectCaseSensitive(cJSON* object, const char* string, cJSON* newitem)
+cJSON_bool cJSON_ReplaceItemInObjectCaseSensitive(const char * who, cJSON* object, const char* string, cJSON* newitem)
 {
-    return replace_item_in_object(object, string, newitem, true);
+    return replace_item_in_object(who, object, string, newitem, true);
 }
 
 /* Create basic types: */
-cJSON *cJSON_CreateNull(void)
+cJSON *cJSON_CreateNull(const char * who)
 {
     cJSON* item = cJSON_New_Item(who);
     if (item)
@@ -2808,7 +2809,7 @@ cJSON *cJSON_CreateNull(void)
     return item;
 }
 
-cJSON *cJSON_CreateTrue(void)
+cJSON *cJSON_CreateTrue(const char * who)
 {
     cJSON* item = cJSON_New_Item(who);
     if (item)
@@ -2819,7 +2820,7 @@ cJSON *cJSON_CreateTrue(void)
     return item;
 }
 
-cJSON *cJSON_CreateFalse(void)
+cJSON *cJSON_CreateFalse(const char * who)
 {
     cJSON* item = cJSON_New_Item(who);
     if (item)
@@ -2830,7 +2831,7 @@ cJSON *cJSON_CreateFalse(void)
     return item;
 }
 
-cJSON *cJSON_CreateBool(cJSON_bool boolean)
+cJSON *cJSON_CreateBool(const char * who, cJSON_bool boolean)
 {
     cJSON* item = cJSON_New_Item(who);
     if (item)
@@ -2841,7 +2842,7 @@ cJSON *cJSON_CreateBool(cJSON_bool boolean)
     return item;
 }
 
-cJSON *cJSON_CreateNumber(double num)
+cJSON *cJSON_CreateNumber(const char * who, double num)
 {
     cJSON* item = cJSON_New_Item(who);
     if (item)
@@ -2867,13 +2868,13 @@ cJSON *cJSON_CreateNumber(double num)
     return item;
 }
 
-cJSON *cJSON_CreateString(const char* string)
+cJSON *cJSON_CreateString(const char * who, const char* string)
 {
     cJSON* item = cJSON_New_Item(who);
     if (item)
     {
         item->str_value_len = strlen(string);
-        item->valuestring = (char*)cJSON_strdup((const unsigned char*)string, item->str_value_len);
+        item->valuestring = (char*)cJSON_strdup(who, (const unsigned char*)string, item->str_value_len);
 
         if (!item->valuestring)
         {
@@ -2882,13 +2883,13 @@ cJSON *cJSON_CreateString(const char* string)
         }
 
         item->type = cJSON_String;
-        item->is_value_ref = cJSON_True;
+        item->is_value_ref = cJSON_False;
     }
 
     return item;
 }
 
-cJSON *cJSON_CreateStringReference(const char* string)
+cJSON *cJSON_CreateStringReference(const char * who, const char* string)
 {
     cJSON* item = cJSON_New_Item(who);
     if (item != NULL)
@@ -2902,7 +2903,7 @@ cJSON *cJSON_CreateStringReference(const char* string)
     return item;
 }
 
-cJSON *cJSON_CreateObjectReference(const cJSON* child)
+cJSON *cJSON_CreateObjectReference(const char * who, const cJSON* child)
 {
     cJSON* item = cJSON_New_Item(who);
     if (item != NULL)
@@ -2914,7 +2915,7 @@ cJSON *cJSON_CreateObjectReference(const cJSON* child)
     return item;
 }
 
-cJSON *cJSON_CreateArrayReference(const cJSON* child)
+cJSON *cJSON_CreateArrayReference(const char * who, const cJSON* child)
 {
     cJSON* item = cJSON_New_Item(who);
     if (item != NULL)
@@ -2926,13 +2927,13 @@ cJSON *cJSON_CreateArrayReference(const cJSON* child)
     return item;
 }
 
-cJSON *cJSON_CreateRaw(const char* raw)
+cJSON *cJSON_CreateRaw(const char * who, const char* raw)
 {
     cJSON* item = cJSON_New_Item(who);
     if (item)
     {
         item->str_value_len = strlen(raw);
-        item->valuestring = (char*)cJSON_strdup((const unsigned char*)raw, item->str_value_len);
+        item->valuestring = (char*)cJSON_strdup(who, (const unsigned char*)raw, item->str_value_len);
 
         if (!item->valuestring)
         {
@@ -2947,7 +2948,7 @@ cJSON *cJSON_CreateRaw(const char* raw)
     return item;
 }
 
-cJSON *cJSON_CreateArray(void)
+cJSON *cJSON_CreateArray(const char * who)
 {
     cJSON* item = cJSON_New_Item(who);
     if (item)
@@ -2958,7 +2959,7 @@ cJSON *cJSON_CreateArray(void)
     return item;
 }
 
-cJSON *cJSON_CreateObject(void)
+cJSON *cJSON_CreateObject(const char * who)
 {
     cJSON* item = cJSON_New_Item(who);
     if (item)
@@ -2970,7 +2971,7 @@ cJSON *cJSON_CreateObject(void)
 }
 
 /* Create Arrays: */
-cJSON *cJSON_CreateIntArray(const int* numbers, int count)
+cJSON *cJSON_CreateIntArray(const char * who, const int* numbers, int count)
 {
     size_t i = 0;
     cJSON* n = NULL;
@@ -2982,11 +2983,11 @@ cJSON *cJSON_CreateIntArray(const int* numbers, int count)
         return NULL;
     }
 
-    a = cJSON_CreateArray();
+    a = cJSON_CreateArray(who);
 
     for (i = 0; a && (i < (size_t)count); i++)
     {
-        n = cJSON_CreateNumber(numbers[i]);
+        n = cJSON_CreateNumber(who, numbers[i]);
         if (!n)
         {
             cJSON_Delete(who, a);
@@ -3011,7 +3012,7 @@ cJSON *cJSON_CreateIntArray(const int* numbers, int count)
     return a;
 }
 
-cJSON *cJSON_CreateFloatArray(const float* numbers, int count)
+cJSON *cJSON_CreateFloatArray(const char *who, const float* numbers, int count)
 {
     size_t i = 0;
     cJSON* n = NULL;
@@ -3023,11 +3024,11 @@ cJSON *cJSON_CreateFloatArray(const float* numbers, int count)
         return NULL;
     }
 
-    a = cJSON_CreateArray();
+    a = cJSON_CreateArray(who);
 
     for (i = 0; a && (i < (size_t)count); i++)
     {
-        n = cJSON_CreateNumber((double)numbers[i]);
+        n = cJSON_CreateNumber(who, (double)numbers[i]);
         if (!n)
         {
             cJSON_Delete(who, a);
@@ -3052,7 +3053,7 @@ cJSON *cJSON_CreateFloatArray(const float* numbers, int count)
     return a;
 }
 
-cJSON *cJSON_CreateDoubleArray(const double* numbers, int count)
+cJSON *cJSON_CreateDoubleArray(const char *who, const double* numbers, int count)
 {
     size_t i = 0;
     cJSON* n = NULL;
@@ -3064,11 +3065,11 @@ cJSON *cJSON_CreateDoubleArray(const double* numbers, int count)
         return NULL;
     }
 
-    a = cJSON_CreateArray();
+    a = cJSON_CreateArray(who);
 
     for (i = 0; a && (i < (size_t)count); i++)
     {
-        n = cJSON_CreateNumber(numbers[i]);
+        n = cJSON_CreateNumber(who, numbers[i]);
         if (!n)
         {
             cJSON_Delete(who, a);
@@ -3093,7 +3094,7 @@ cJSON *cJSON_CreateDoubleArray(const double* numbers, int count)
     return a;
 }
 
-cJSON *cJSON_CreateStringArray(const char* const* strings, int count)
+cJSON *cJSON_CreateStringArray(const char * who, const char* const* strings, int count)
 {
     size_t i = 0;
     cJSON* n = NULL;
@@ -3105,11 +3106,11 @@ cJSON *cJSON_CreateStringArray(const char* const* strings, int count)
         return NULL;
     }
 
-    a = cJSON_CreateArray();
+    a = cJSON_CreateArray(who);
 
     for (i = 0; a && (i < (size_t)count); i++)
     {
-        n = cJSON_CreateString(strings[i]);
+        n = cJSON_CreateString(who, strings[i]);
         if (!n)
         {
             cJSON_Delete(who, a);
@@ -3135,7 +3136,7 @@ cJSON *cJSON_CreateStringArray(const char* const* strings, int count)
 }
 
 /* Duplication */
-cJSON *cJSON_Duplicate(const cJSON* item, cJSON_bool recurse)
+cJSON *cJSON_Duplicate(const char * who, const cJSON* item, cJSON_bool recurse)
 {
     cJSON* newitem = NULL;
     cJSON* child = NULL;
@@ -3163,7 +3164,7 @@ cJSON *cJSON_Duplicate(const cJSON* item, cJSON_bool recurse)
     {
         newitem->is_value_ref = cJSON_False;
         newitem->str_value_len = item->str_value_len;
-        newitem->valuestring = (char*)cJSON_strdup((unsigned char*)item->valuestring, item->str_value_len);
+        newitem->valuestring = (char*)cJSON_strdup(who, (unsigned char*)item->valuestring, item->str_value_len);
 
         if (!newitem->valuestring)
         {
@@ -3174,7 +3175,7 @@ cJSON *cJSON_Duplicate(const cJSON* item, cJSON_bool recurse)
     if (item->string)
     {
         newitem->str_key_len = item->str_key_len;
-        newitem->string = (item->type & cJSON_StringIsConst) ? item->string : (char*)cJSON_strdup((unsigned char*)item->string, item->str_key_len);
+        newitem->string = (item->type & cJSON_StringIsConst) ? item->string : (char*)cJSON_strdup(who, (unsigned char*)item->string, item->str_key_len);
         if (!newitem->string)
         {
             goto fail;
@@ -3191,7 +3192,7 @@ cJSON *cJSON_Duplicate(const cJSON* item, cJSON_bool recurse)
     child = item->child;
     while (child != NULL)
     {
-        newchild = cJSON_Duplicate(child, true); /* Duplicate (with recurse) each item in the ->next chain */
+        newchild = cJSON_Duplicate(who, child, true); /* Duplicate (with recurse) each item in the ->next chain */
         if (!newchild)
         {
             goto fail;
@@ -3557,7 +3558,7 @@ cJSON_bool cJSON_Compare(const cJSON* const a, const cJSON* const b, const cJSON
     }
 }
 
-static int __estimateFromatedPrintLength(cJSON* item, uint32_t child_offset)
+static int __estimateFromatedPrintLength(const char * who, cJSON* item, uint32_t child_offset)
 {
     int ret = 0;
 
@@ -3623,7 +3624,7 @@ static int __estimateFromatedPrintLength(cJSON* item, uint32_t child_offset)
             {
                 if (item->child->type == cJSON_Object)
                 {
-                    ret += __estimateFromatedPrintLength(item->child, child_offset + 1);
+                    ret += __estimateFromatedPrintLength(who, item->child, child_offset + 1);
                     ret--;
                     cJSON* child = item->child;
                     while (child)
@@ -3634,7 +3635,7 @@ static int __estimateFromatedPrintLength(cJSON* item, uint32_t child_offset)
                 }
                 else
                 {
-                    ret += __estimateFromatedPrintLength(item->child, 1);
+                    ret += __estimateFromatedPrintLength(who, item->child, 1);
                     ret--;
                 }
             }
@@ -3651,7 +3652,7 @@ static int __estimateFromatedPrintLength(cJSON* item, uint32_t child_offset)
                 ret += 3 + child_offset;
             }
 
-            ret += __estimateFromatedPrintLength(item->child, child_offset + 1);
+            ret += __estimateFromatedPrintLength(who, item->child, child_offset + 1);
             break;
         }
         default:
@@ -3672,7 +3673,7 @@ static int __estimateFromatedPrintLength(cJSON* item, uint32_t child_offset)
     return ret;
 }
 
-int cJSON_EstimatePrintLength(cJSON* item)
+int cJSON_EstimatePrintLength(const char * who, cJSON* item)
 {
-    return (__estimateFromatedPrintLength(item, 0));
+    return (__estimateFromatedPrintLength(who, item, 0));
 }

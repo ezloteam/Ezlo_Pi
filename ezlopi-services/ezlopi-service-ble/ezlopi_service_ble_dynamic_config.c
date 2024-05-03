@@ -29,8 +29,8 @@
 #include "ezlopi_service_ble.h"
 #include "EZLOPI_USER_CONFIG.h"
 
-#define CJ_GET_STRING(name) cJSON_GetStringValue(cJSON_GetObjectItem(root, name))
-#define CJ_GET_NUMBER(name) cJSON_GetNumberValue(cJSON_GetObjectItem(root, name))
+#define CJ_GET_STRING(name) cJSON_GetStringValue(cJSON_GetObjectItem(__FUNCTION__, root, name))
+#define CJ_GET_NUMBER(name) cJSON_GetNumberValue(cJSON_GetObjectItem(__FUNCTION__, root, name))
 
 static s_gatt_service_t* g_dynamic_config_service = NULL;
 static s_linked_buffer_t* g_dynamic_config_linked_buffer = NULL;
@@ -76,7 +76,7 @@ static void __dynamic_config_write_func(esp_gatt_value_t* value, esp_ble_gatts_c
     {
         if ((NULL != param->write.value) && (param->write.len > 0))
         {
-            cJSON* root = cJSON_ParseWithLength((const char*)param->write.value, param->write.len);
+            cJSON* root = cJSON_ParseWithLength(__FUNCTION__, (const char*)param->write.value, param->write.len);
             if (root)
             {
 
@@ -102,7 +102,7 @@ static void __dynamic_config_write_func(esp_gatt_value_t* value, esp_ble_gatts_c
                                 // vTaskDelay(1000 / portTICK_PERIOD_MS);
                                 // EZPI_CORE_reset_reboot();
                             }
-                            free(decoded_data);
+                            free(__FUNCTION__, decoded_data);
                         }
 
                         ezlopi_ble_buffer_free_buffer(g_dynamic_config_linked_buffer);
@@ -162,19 +162,19 @@ static void __dynamic_config_read_func(esp_gatt_value_t* value, esp_ble_gatts_cb
                 TRACE_I("copy_size: %d", copy_size);
                 TRACE_I("total_data_len: %d", total_data_len);
 
-                cJSON* cj_response = cJSON_CreateObject();
+                cJSON* cj_response = cJSON_CreateObject(__FUNCTION__);
                 if (cj_response)
                 {
                     static char data_buffer[400 + 1];
                     snprintf(data_buffer, sizeof(data_buffer), "%.*s", copy_size, g_dynamic_config_base64 + (g_dynamic_config_sequence_no * 400));
 
-                    cJSON_AddNumberToObject(cj_response, ezlopi_len_str, copy_size);
-                    cJSON_AddNumberToObject(cj_response, ezlopi_total_len_str, total_data_len);
-                    cJSON_AddNumberToObject(cj_response, ezlopi_sequence_str, g_dynamic_config_sequence_no);
-                    cJSON_AddStringToObject(cj_response, ezlopi_data_str, data_buffer);
+                    cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_len_str, copy_size);
+                    cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_total_len_str, total_data_len);
+                    cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_sequence_str, g_dynamic_config_sequence_no);
+                    cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_data_str, data_buffer);
 
-                    cJSON_bool ret = cJSON_PrintPreallocated(cj_response, (char*)value->value, 512, false);
-                    cJSON_Delete(cj_response);
+                    cJSON_bool ret = cJSON_PrintPreallocated(__FUNCTION__, cj_response, (char*)value->value, 512, false);
+                    cJSON_Delete(__FUNCTION__, cj_response);
 
                     if (true == ret)
                     {
@@ -190,7 +190,7 @@ static void __dynamic_config_read_func(esp_gatt_value_t* value, esp_ble_gatts_cb
                             if (copy_size < 400) // Done reading
                             {
                                 status = 1; // non negative for done reading
-                                free(g_dynamic_config_base64);
+                                free(__FUNCTION__, g_dynamic_config_base64);
                                 g_dynamic_config_base64 = NULL;
                             }
                         }
@@ -244,7 +244,7 @@ static void __dynamic_config_read_func(esp_gatt_value_t* value, esp_ble_gatts_cb
 
             if (g_dynamic_config_base64)
             {
-                free(g_dynamic_config_base64);
+                free(__FUNCTION__, g_dynamic_config_base64);
                 g_dynamic_config_base64 = NULL;
             }
         }
@@ -258,7 +258,7 @@ static void __dynamic_config_read_func(esp_gatt_value_t* value, esp_ble_gatts_cb
 static char* __base64_decode_dynamic_config(uint32_t total_size)
 {
     char* decoded_config_json = NULL;
-    char* base64_buffer = malloc(total_size + 1);
+    char* base64_buffer = malloc(__FUNCTION__, total_size + 1);
 
     if (base64_buffer)
     {
@@ -268,7 +268,7 @@ static char* __base64_decode_dynamic_config(uint32_t total_size)
         while (tmp_prov_buffer)
         {
             // TRACE_W("tmp_prov_buffer->buffer[%d]: %.*s", tmp_prov_buffer->len, tmp_prov_buffer->len, (char *)tmp_prov_buffer->buffer);
-            cJSON* root = cJSON_ParseWithLength((const char*)tmp_prov_buffer->buffer, tmp_prov_buffer->len);
+            cJSON* root = cJSON_ParseWithLength(__FUNCTION__, (const char*)tmp_prov_buffer->buffer, tmp_prov_buffer->len);
             if (root)
             {
                 uint32_t len = CJ_GET_NUMBER(ezlopi_len_str);
@@ -296,7 +296,7 @@ static char* __base64_decode_dynamic_config(uint32_t total_size)
 
         TRACE_D("base64_buffer: %s", base64_buffer);
 
-        decoded_config_json = malloc(total_size);
+        decoded_config_json = malloc(__FUNCTION__, total_size);
         if (decoded_config_json)
         {
             size_t o_len = 0;
@@ -309,7 +309,7 @@ static char* __base64_decode_dynamic_config(uint32_t total_size)
             TRACE_E("mALLOC FAILED");
         }
 
-        free(base64_buffer);
+        free(__FUNCTION__, base64_buffer);
     }
 
     return decoded_config_json;
@@ -318,7 +318,7 @@ static char* __base64_decode_dynamic_config(uint32_t total_size)
 static char* __dynamic_config_base64(void)
 {
     const uint32_t base64_data_len = 4096;
-    char* base64_data = malloc(base64_data_len);
+    char* base64_data = malloc(__FUNCTION__, base64_data_len);
     if (base64_data)
     {
         uint32_t out_put_len = 0;
@@ -340,7 +340,7 @@ static char* __dynamic_config_base64(void)
 
         if (0 == out_put_len)
         {
-            free(base64_data);
+            free(__FUNCTION__, base64_data);
             base64_data = NULL;
         }
     }

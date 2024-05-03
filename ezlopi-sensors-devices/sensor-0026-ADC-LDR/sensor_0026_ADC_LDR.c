@@ -165,21 +165,21 @@ static int _get_item_list(l_ezlopi_item_t* item, void* arg)
     cJSON* cj_result = (cJSON*)arg;
     if (cj_result && item)
     {
-        cJSON* json_array_enum = cJSON_CreateArray();
+        cJSON* json_array_enum = cJSON_CreateArray(__FUNCTION__);
         if (NULL != json_array_enum)
         {
             for (uint8_t i = 0; i < LIGHT_ALARM_MAX; i++)
             {
-                cJSON* json_value = cJSON_CreateString(light_alarm_states[i]);
+                cJSON* json_value = cJSON_CreateString(__FUNCTION__, light_alarm_states[i]);
                 if (NULL != json_value)
                 {
                     cJSON_AddItemToArray(json_array_enum, json_value);
                 }
             }
-            cJSON_AddItemToObject(cj_result, ezlopi_enum_str, json_array_enum);
+            cJSON_AddItemToObject(__FUNCTION__, cj_result, ezlopi_enum_str, json_array_enum);
         }
-        cJSON_AddStringToObject(cj_result, ezlopi_value_str, ((char*)item->user_arg) ? item->user_arg : light_alarm_states[0]);
-        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, ((char*)item->user_arg) ? item->user_arg : light_alarm_states[0]);
+        cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, ((char*)item->user_arg) ? item->user_arg : light_alarm_states[0]);
+        cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, ((char*)item->user_arg) ? item->user_arg : light_alarm_states[0]);
         ret = 1;
     }
 
@@ -192,8 +192,8 @@ static int __get_value_cjson(l_ezlopi_item_t* item, void* arg)
     cJSON* cj_result = (cJSON*)arg;
     if (cj_result && item)
     {
-        cJSON_AddStringToObject(cj_result, ezlopi_value_str, ((char*)item->user_arg) ? item->user_arg : light_alarm_states[0]);
-        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, ((char*)item->user_arg) ? item->user_arg : light_alarm_states[0]);
+        cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, ((char*)item->user_arg) ? item->user_arg : light_alarm_states[0]);
+        cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, ((char*)item->user_arg) ? item->user_arg : light_alarm_states[0]);
         ret = 1;
     }
     return ret;

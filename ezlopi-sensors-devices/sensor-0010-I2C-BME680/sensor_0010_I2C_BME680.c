@@ -97,7 +97,7 @@ static int __prepare(void* arg)
     if (prep_arg && prep_arg->cjson_device)
     {
         cJSON* cj_device = prep_arg->cjson_device;
-        bme680_data_t* user_data = (bme680_data_t*)malloc(sizeof(bme680_data_t));
+        bme680_data_t* user_data = (bme680_data_t*)malloc(__FUNCTION__, sizeof(bme680_data_t));
         if (user_data)
         {
             memset(user_data, 0, sizeof(bme680_data_t));
@@ -230,7 +230,7 @@ static int __prepare(void* arg)
                     (NULL == child_co2_device))
                 {
                     ezlopi_device_free_device(parent_temp_humid_device);
-                    free(user_data);
+                    free(__FUNCTION__, user_data);
                     ret = -1;
                 }
             }

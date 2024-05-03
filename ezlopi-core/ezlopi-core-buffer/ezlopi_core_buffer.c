@@ -26,7 +26,7 @@ void ezlopi_core_buffer_deinit(void)
 
     if (__buffer)
     {
-        free(__buffer);
+        free(__FUNCTION__, __buffer);
         __buffer = NULL;
     }
 
@@ -43,13 +43,13 @@ void ezlopi_core_buffer_init(uint32_t len)
 
     if (__buffer)
     {
-        free(__buffer);
+        free(__FUNCTION__, __buffer);
         __buffer = NULL;
         __buffer_len = 0;
         __buffer_lock_state = EZ_BUFFER_STATE_NOT_INITIATED;
     }
 
-    __buffer = malloc(len);
+    __buffer = malloc(__FUNCTION__, len);
 
     if (__buffer)
     {
@@ -66,7 +66,7 @@ void ezlopi_core_buffer_init(uint32_t len)
             else
             {
                 __buffer_len = 0;
-                free(__buffer);
+                free(__FUNCTION__, __buffer);
                 __buffer = NULL;
                 __buffer_lock_state = EZ_BUFFER_STATE_NOT_INITIATED;
             }

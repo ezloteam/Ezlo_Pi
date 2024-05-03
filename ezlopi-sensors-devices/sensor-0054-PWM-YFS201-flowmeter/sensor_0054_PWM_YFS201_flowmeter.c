@@ -125,7 +125,7 @@ static int __0054_prepare(void* arg)
     {
         //---------------------------  DIGI - DEVICE 1 --------------------------------------------
 
-        yfs201_t* yfs201_data = (yfs201_t*)malloc(sizeof(yfs201_t));
+        yfs201_t* yfs201_data = (yfs201_t*)malloc(__FUNCTION__, sizeof(yfs201_t));
         if (NULL != yfs201_data)
         {
             memset(yfs201_data, 0, sizeof(yfs201_t));
@@ -143,13 +143,13 @@ static int __0054_prepare(void* arg)
                 {
                     ret = -1;
                     ezlopi_device_free_device(flowmeter_device);
-                    free(yfs201_data);
+                    free(__FUNCTION__, yfs201_data);
                 }
             }
             else
             {
                 ret = -1;
-                free(yfs201_data);
+                free(__FUNCTION__, yfs201_data);
             }
         }
     }

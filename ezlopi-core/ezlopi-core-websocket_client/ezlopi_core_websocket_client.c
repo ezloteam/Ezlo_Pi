@@ -15,6 +15,7 @@
 
 #include "ezlopi_core_factory_info.h"
 #include "ezlopi_core_websocket_client.h"
+
 #include "EZLOPI_USER_CONFIG.h"
 
 static esp_websocket_client_handle_t client = NULL;
@@ -68,12 +69,16 @@ void ezlopi_websocket_client_kill(void)
 
 esp_websocket_client_handle_t ezlopi_websocket_client_init(cJSON* uri, void (*msg_upcall)(const char*, uint32_t), void (*connection_upcall)(bool connected))
 {
+    static char * ca_cert;
+    static char * ssl_priv;
+    static char * ssl_shared;
 
     if ((NULL == client) && (NULL != uri) && (NULL != uri->valuestring) && (NULL != msg_upcall))
     {
-        char* ca_cert = ezlopi_factory_info_v3_get_ca_certificate();
-        char* ssl_shared = ezlopi_factory_info_v3_get_ssl_shared_key();
-        char* ssl_priv = ezlopi_factory_info_v3_get_ssl_private_key();
+        if (NULL == ca_cert) ca_cert = ezlopi_factory_info_v3_get_ca_certificate();
+        if (NULL == ssl_priv) ssl_priv = ezlopi_factory_info_v3_get_ssl_private_key();
+        if (NULL == ssl_shared) ssl_shared = ezlopi_factory_info_v3_get_ssl_shared_key();
+
         __msg_upcall = msg_upcall;
 
         static s_ws_event_arg_t event_arg;
@@ -103,9 +108,13 @@ esp_websocket_client_handle_t ezlopi_websocket_client_init(cJSON* uri, void (*ms
         }
         else
         {
-            free(ca_cert);
-            free(ssl_shared);
-            free(ssl_priv);
+            ezlopi_factory_info_v3_free(ca_cert);
+            ezlopi_factory_info_v3_free(ssl_shared);
+            ezlopi_factory_info_v3_free(ssl_priv);
+
+            ca_cert = NULL;
+            ssl_priv = NULL;
+            ssl_shared = NULL;
         }
     }
     else
@@ -161,62 +170,3 @@ static void websocket_event_handler(void* handler_args, esp_event_base_t base, i
     }
     }
 }
-
-// static s_ws_data_buffer_t *ezlopi_ws_data_buffer_create(char *data, uint32_t len)
-// {
-//     s_ws_data_buffer_t *new_buffer = malloc(sizeof(s_ws_data_buffer_t));
-//     if (new_buffer)
-//     {
-//         memset(new_buffer, 0, sizeof(s_ws_data_buffer_t));
-//         new_buffer->buffer = malloc(len + 1);
-
-//         if (new_buffer->buffer)
-//         {
-//             new_buffer->len = len;
-//             memcpy(new_buffer->buffer, data, len);
-//             new_buffer->buffer[len] = '\0';
-//         }
-//         else
-//         {
-//             free(new_buffer);
-//             new_buffer = NULL;
-//         }
-//     }
-
-//     return new_buffer;
-// }
-
-// static s_ws_data_buffer_t *ezlopi_ws_data_buffer_add(s_ws_data_buffer_t *head_buffer, s_ws_data_buffer_t *data_buffer)
-// {
-//     if (data_buffer)
-//     {
-//         if (head_buffer)
-//         {
-//             s_ws_data_buffer_t *curr_head = head_buffer;
-//             while (curr_head->next)
-//             {
-//                 curr_head = curr_head->next;
-//             }
-//             curr_head->next = data_buffer;
-//         }
-//         else
-//         {
-//             head_buffer = data_buffer;
-//         }
-//     }
-
-//     return head_buffer;
-// }
-
-// static void ezlopi_ws_data_buffer_free(s_ws_data_buffer_t *buffer)
-// {
-//     if (buffer)
-//     {
-//         ezlopi_ws_data_buffer_free(buffer->next);
-//         if (buffer->buffer)
-//         {
-//             free(buffer->buffer);
-//         }
-//         free(buffer);
-//     }
-// }

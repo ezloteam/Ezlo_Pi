@@ -93,7 +93,7 @@ static int __0046_prepare(void* arg)
     s_ezlopi_prep_arg_t* device_prep_arg = (s_ezlopi_prep_arg_t*)arg;
     if (device_prep_arg && (NULL != device_prep_arg->cjson_device))
     {
-        s_currentmeter_t* user_data = (s_currentmeter_t*)malloc(sizeof(s_currentmeter_t));
+        s_currentmeter_t* user_data = (s_currentmeter_t*)malloc(__FUNCTION__, sizeof(s_currentmeter_t));
         if (user_data)
         {
             ret = 1;
@@ -111,13 +111,13 @@ static int __0046_prepare(void* arg)
                 {
                     ret = -1;
                     ezlopi_device_free_device(currentmeter_device);
-                    free(user_data);
+                    free(__FUNCTION__, user_data);
                 }
             }
             else
             {
                 ret = -1;
-                free(user_data);
+                free(__FUNCTION__, user_data);
             }
         }
     }

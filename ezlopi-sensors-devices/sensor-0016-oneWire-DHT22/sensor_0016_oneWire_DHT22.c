@@ -159,7 +159,7 @@ static int dht22_sensor_prepare_v3(void* arg)
         cJSON* cjson_device = prep_arg->cjson_device;
         if (cjson_device)
         {
-            s_ezlopi_dht22_data_t* dht22_sensor_data = (s_ezlopi_dht22_data_t*)malloc(sizeof(s_ezlopi_dht22_data_t));
+            s_ezlopi_dht22_data_t* dht22_sensor_data = (s_ezlopi_dht22_data_t*)malloc(__FUNCTION__, sizeof(s_ezlopi_dht22_data_t));
             if (dht22_sensor_data)
             {
                 l_ezlopi_device_t* parent_device_temperature = ezlopi_device_add_device(prep_arg->cjson_device, "temp");
@@ -199,12 +199,12 @@ static int dht22_sensor_prepare_v3(void* arg)
                     {
                         ret = -1;
                         ezlopi_device_free_device(parent_device_temperature);
-                        free(dht22_sensor_data);
+                        free(__FUNCTION__, dht22_sensor_data);
                     }
                 }
                 else
                 {
-                    free(dht22_sensor_data);
+                    free(__FUNCTION__, dht22_sensor_data);
                     ret = -1;
                 }
             }

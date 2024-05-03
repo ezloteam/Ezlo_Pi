@@ -10,13 +10,13 @@
 
 s_linked_buffer_t* ezlopi_ble_buffer_create(esp_ble_gatts_cb_param_t* param)
 {
-    s_linked_buffer_t* linked_buffer = malloc(sizeof(s_linked_buffer_t));
+    s_linked_buffer_t* linked_buffer = malloc(__FUNCTION__, sizeof(s_linked_buffer_t));
     if (linked_buffer)
     {
         memset(linked_buffer, 0, sizeof(s_linked_buffer_t));
         if ((NULL != param->write.value) && (param->write.len > 0))
         {
-            linked_buffer->buffer = malloc(param->write.len);
+            linked_buffer->buffer = malloc(__FUNCTION__, param->write.len);
             if (linked_buffer->buffer)
             {
                 linked_buffer->len = param->write.len;
@@ -24,13 +24,13 @@ s_linked_buffer_t* ezlopi_ble_buffer_create(esp_ble_gatts_cb_param_t* param)
             }
             else
             {
-                free(linked_buffer);
+                free(__FUNCTION__, linked_buffer);
                 linked_buffer = NULL;
             }
         }
         else
         {
-            free(linked_buffer);
+            free(__FUNCTION__, linked_buffer);
             linked_buffer = NULL;
         }
     }
@@ -54,12 +54,12 @@ void ezlopi_ble_buffer_free_buffer(s_linked_buffer_t* l_buffer)
     {
         if (l_buffer->buffer)
         {
-            free(l_buffer->buffer);
+            free(__FUNCTION__, l_buffer->buffer);
             l_buffer->buffer = NULL;
         }
         ezlopi_ble_buffer_free_buffer(l_buffer->next);
         l_buffer->next = NULL;
-        free(l_buffer);
+        free(__FUNCTION__, l_buffer);
     }
 }
 
@@ -75,7 +75,7 @@ void ezlopi_ble_buffer_accumulate_to_start(s_linked_buffer_t* l_buffer)
             tmp_buffer = tmp_buffer->next;
         }
 
-        uint8_t* tot_buffer = malloc(tot_len + 1);
+        uint8_t* tot_buffer = malloc(__FUNCTION__, tot_len + 1);
         if (tot_buffer)
         {
             memset(tot_buffer, 0, tot_len + 1);
@@ -90,7 +90,7 @@ void ezlopi_ble_buffer_accumulate_to_start(s_linked_buffer_t* l_buffer)
 
             if (l_buffer->buffer)
             {
-                free(l_buffer->buffer);
+                free(__FUNCTION__, l_buffer->buffer);
                 l_buffer->buffer = NULL;
             }
 

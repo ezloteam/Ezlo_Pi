@@ -119,8 +119,8 @@ static int __list_cjson_value(l_ezlopi_item_t* item, void* arg)
         s_dimmable_bulb_properties_t* dimmable_bulb_arg = (s_dimmable_bulb_properties_t*)item->user_arg;
         if (ezlopi_item_name_dimmer == item->cloud_properties.item_name)
         {
-            cJSON_AddNumberToObject(cj_properties, ezlopi_minValue_str, 0);
-            cJSON_AddNumberToObject(cj_properties, ezlopi_maxValue_str, 100);
+            cJSON_AddNumberToObject(__FUNCTION__, cj_properties, ezlopi_minValue_str, 0);
+            cJSON_AddNumberToObject(__FUNCTION__, cj_properties, ezlopi_maxValue_str, 100);
 
             int dimmable_value_percentage = (int)floor(((dimmable_bulb_arg->current_brightness_value * 100.0) / 4095.0));
             ezlopi_valueformatter_int32_to_cjson(item, cj_properties, dimmable_value_percentage);
@@ -336,7 +336,7 @@ static int __prepare(void* arg)
             ret = 1;
             __prepare_device_cloud_properties(device, prep_arg->cjson_device);
 
-            s_dimmable_bulb_properties_t* dimmable_bulb_arg = malloc(sizeof(s_dimmable_bulb_properties_t));
+            s_dimmable_bulb_properties_t* dimmable_bulb_arg = malloc(__FUNCTION__, sizeof(s_dimmable_bulb_properties_t));
             if (dimmable_bulb_arg)
             {
                 dimmable_bulb_arg->current_brightness_value = 0;
@@ -390,7 +390,7 @@ static int __prepare(void* arg)
                     (NULL == dimmable_bulb_arg->item_dimmer_switch))
                 {
                     ezlopi_device_free_device(device);
-                    free(dimmable_bulb_arg);
+                    free(__FUNCTION__, dimmable_bulb_arg);
                     ret = -1;
                 }
             }

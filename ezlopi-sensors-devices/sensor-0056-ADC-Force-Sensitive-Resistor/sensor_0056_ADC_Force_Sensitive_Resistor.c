@@ -92,7 +92,7 @@ static int __0056_prepare(void* arg)
     s_ezlopi_prep_arg_t* device_prep_arg = (s_ezlopi_prep_arg_t*)arg;
     if (device_prep_arg && (NULL != device_prep_arg->cjson_device))
     {
-        fsr_t* fsr_struct = (fsr_t*)malloc(sizeof(fsr_t));
+        fsr_t* fsr_struct = (fsr_t*)malloc(__FUNCTION__, sizeof(fsr_t));
         if (NULL != fsr_struct)
         {
             memset(fsr_struct, 0, sizeof(fsr_t));
@@ -111,13 +111,13 @@ static int __0056_prepare(void* arg)
                 {
                     ret = -1;
                     ezlopi_device_free_device(FSR_device);
-                    free(fsr_struct);
+                    free(__FUNCTION__, fsr_struct);
                 }
             }
             else
             {
                 ret = -1;
-                free(fsr_struct);
+                free(__FUNCTION__, fsr_struct);
             }
         }
     }

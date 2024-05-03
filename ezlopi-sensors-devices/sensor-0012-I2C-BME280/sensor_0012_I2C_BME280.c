@@ -190,7 +190,7 @@ static int __prepare(void* arg)
     s_ezlopi_prep_arg_t* prep_arg = (s_ezlopi_prep_arg_t*)arg;
     if (prep_arg && prep_arg->cjson_device)
     {
-        s_ezlopi_bmp280_t* bme280_sensor_params = (s_ezlopi_bmp280_t*)malloc(sizeof(s_ezlopi_bmp280_t));
+        s_ezlopi_bmp280_t* bme280_sensor_params = (s_ezlopi_bmp280_t*)malloc(__FUNCTION__, sizeof(s_ezlopi_bmp280_t));
         if (bme280_sensor_params)
         {
             memset(bme280_sensor_params, 0, sizeof(s_ezlopi_bmp280_t));
@@ -240,14 +240,14 @@ static int __prepare(void* arg)
                     (NULL == child_pressure_device))
                 {
                     ret = -1;
-                    free(bme280_sensor_params);
+                    free(__FUNCTION__, bme280_sensor_params);
                     ezlopi_device_free_device(parent_temp_humid_device);
                 }
             }
             else
             {
                 ret = -1;
-                free(bme280_sensor_params);
+                free(__FUNCTION__, bme280_sensor_params);
             }
         }
         else

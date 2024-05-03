@@ -50,11 +50,11 @@ int ezlopi_scene_when_is_item_state(l_scenes_list_v2_t* scene_node, void* arg)
                 {
                     if (item_id == curr_item->cloud_properties.item_id)
                     {
-                        cJSON* cj_tmp_value = cJSON_CreateObject();
+                        cJSON* cj_tmp_value = cJSON_CreateObject(__FUNCTION__);
                         if (cj_tmp_value)
                         {
                             curr_item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, curr_item, (void*)cj_tmp_value, NULL);
-                            cJSON* cj_value = cJSON_GetObjectItem(cj_tmp_value, ezlopi_value_str);
+                            cJSON* cj_value = cJSON_GetObjectItem(__FUNCTION__, cj_tmp_value, ezlopi_value_str);
                             if (cj_value)
                             {
                                 switch (cj_value->type)
@@ -99,7 +99,7 @@ int ezlopi_scene_when_is_item_state(l_scenes_list_v2_t* scene_node, void* arg)
                                 }
                             }
 
-                            cJSON_Delete(cj_tmp_value);
+                            cJSON_Delete(__FUNCTION__, cj_tmp_value);
                         }
                         break;
                     }

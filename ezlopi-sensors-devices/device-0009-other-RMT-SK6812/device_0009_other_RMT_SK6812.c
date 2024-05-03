@@ -87,21 +87,21 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
         {
             if (ezlopi_item_name_rgbcolor == item->cloud_properties.item_name)
             {
-                cJSON* color_json = cJSON_AddObjectToObject(cj_properties, ezlopi_value_str);
+                cJSON* color_json = cJSON_AddObjectToObject(__FUNCTION__, cj_properties, ezlopi_value_str);
                 if (color_json)
                 {
                     int green = sk6812_strip->buf[0];
                     int red = sk6812_strip->buf[1];
                     int blue = sk6812_strip->buf[2];
 
-                    cJSON_AddNumberToObject(color_json, ezlopi_red_str, red);
-                    cJSON_AddNumberToObject(color_json, ezlopi_green_str, green);
-                    cJSON_AddNumberToObject(color_json, ezlopi_blue_str, blue);
-                    cJSON_AddNumberToObject(color_json, ezlopi_cwhite_str, ((red << 16) | (green << 8) | (blue)));
+                    cJSON_AddNumberToObject(__FUNCTION__, color_json, ezlopi_red_str, red);
+                    cJSON_AddNumberToObject(__FUNCTION__, color_json, ezlopi_green_str, green);
+                    cJSON_AddNumberToObject(__FUNCTION__, color_json, ezlopi_blue_str, blue);
+                    cJSON_AddNumberToObject(__FUNCTION__, color_json, ezlopi_cwhite_str, ((red << 16) | (green << 8) | (blue)));
 
                     char formatted_rgb_value[32];
                     snprintf(formatted_rgb_value, sizeof(formatted_rgb_value), "#%02x%02x%02x", red, green, blue);
-                    cJSON_AddStringToObject(cj_properties, ezlopi_valueFormatted_str, formatted_rgb_value);
+                    cJSON_AddStringToObject(__FUNCTION__, cj_properties, ezlopi_valueFormatted_str, formatted_rgb_value);
                 }
             }
             else if (ezlopi_item_name_dimmer == item->cloud_properties.item_name)
@@ -131,7 +131,7 @@ static int __set_cjson_value(l_ezlopi_item_t* item, void* arg)
         {
             if (ezlopi_item_name_rgbcolor == item->cloud_properties.item_name)
             {
-                cJSON* cjson_params_color_values = cJSON_GetObjectItem(cjson_params, ezlopi_value_str);
+                cJSON* cjson_params_color_values = cJSON_GetObjectItem(__FUNCTION__, cjson_params, ezlopi_value_str);
 
                 rgb_t color = {
                     .red = 0,
@@ -368,7 +368,7 @@ static int __prepare(void* arg)
             ret = 1;
             __prepare_device_properties(device, prep_arg->cjson_device);
 
-            s_dimmer_args_t* dimmer_args = malloc(sizeof(s_dimmer_args_t));
+            s_dimmer_args_t* dimmer_args = malloc(__FUNCTION__, sizeof(s_dimmer_args_t));
             if (dimmer_args)
             {
                 memset(dimmer_args, 0, sizeof(s_dimmer_args_t));
@@ -405,7 +405,7 @@ static int __prepare(void* arg)
                 }
                 else
                 {
-                    free(dimmer_args);
+                    free(__FUNCTION__, dimmer_args);
                     ezlopi_device_free_device(device);
                     ret = -1;
                 }

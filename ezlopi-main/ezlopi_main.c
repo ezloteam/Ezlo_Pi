@@ -96,19 +96,20 @@ static void blinky(void* pv)
         trace_wb("esp_get_minimum_free_heap_size: %.02f kB", esp_get_minimum_free_heap_size() / 1024.0);
 
 #ifdef CONFIG_EZPI_HEAP_ENABLE
-        ezlopi_util_heap_trace();
+        ezlopi_util_heap_trace(false);
 
         if (free_heap_kb <= 10)
         {
             TRACE_W("CRITICAL-WARNING: low heap detected..");
-            ezlopi_util_heap_trace();
+            ezlopi_util_heap_trace(false);
         }
         else if ((xTaskGetTickCount() - low_heap_start_time) > (15000 / portTICK_PERIOD_MS))
         {
-            ezlopi_util_heap_trace();
+            ezlopi_util_heap_trace(false);
             vTaskDelay(2000 / portTICK_RATE_MS);
             TRACE_E("CRITICAL-ERROR: low heap time-out detected!");
             TRACE_W("Rebooting.....");
+            vTaskDelay(1000 / portTICK_PERIOD_MS);
             esp_restart();
         }
         else

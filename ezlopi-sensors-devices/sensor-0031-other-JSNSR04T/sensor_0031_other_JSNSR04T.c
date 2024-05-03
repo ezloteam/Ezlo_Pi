@@ -89,7 +89,7 @@ static int __init(l_ezlopi_item_t* item)
     int ret = 0;
     if (item)
     {
-        jsn_sr04t_config_t* jsn_sr04t_config = malloc(sizeof(jsn_sr04t_config_t));
+        jsn_sr04t_config_t* jsn_sr04t_config = malloc(__FUNCTION__, sizeof(jsn_sr04t_config_t));
         if (jsn_sr04t_config)
         {
             jsn_sr04t_config_t tmp_config = (jsn_sr04t_config_t)JSN_SR04T_CONFIG_DEFAULT();

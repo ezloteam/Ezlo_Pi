@@ -21,7 +21,7 @@ int ezlopi_scene_then_set_item_value(l_scenes_list_v2_t* curr_scene, void* arg)
     TRACE_W(" Set_item_value ");
     int ret = 0;
     uint32_t item_id = 0;
-    cJSON* cj_params = cJSON_CreateObject();
+    cJSON* cj_params = cJSON_CreateObject(__FUNCTION__);
 
     if (cj_params)
     {
@@ -33,11 +33,11 @@ int ezlopi_scene_then_set_item_value(l_scenes_list_v2_t* curr_scene, void* arg)
             {
                 if (0 == strncmp(curr_field->name, "item", 5))
                 {
-                    cJSON_AddStringToObject(cj_params, ezlopi__id_str, curr_field->field_value.u_value.value_string);
+                    cJSON_AddStringToObject(__FUNCTION__, cj_params, ezlopi__id_str, curr_field->field_value.u_value.value_string);
                     item_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
                     // TRACE_D("item_id: %s", curr_field->field_value.u_value.value_string);
 
-                    // cJSON_AddStringToObject(cj_params, ezlopi__id_str, curr_field->field_value.u_value.value_string);
+                    // cJSON_AddStringToObject(__FUNCTION__, cj_params, ezlopi__id_str, curr_field->field_value.u_value.value_string);
                     // item_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
                     // TRACE_D("item_id: %s", curr_field->field_value.u_value.value_string);
                 }
@@ -45,17 +45,17 @@ int ezlopi_scene_then_set_item_value(l_scenes_list_v2_t* curr_scene, void* arg)
                 {
                     if (EZLOPI_VALUE_TYPE_INT == curr_field->value_type)
                     {
-                        cJSON_AddNumberToObject(cj_params, ezlopi_value_str, curr_field->field_value.u_value.value_double);
+                        cJSON_AddNumberToObject(__FUNCTION__, cj_params, ezlopi_value_str, curr_field->field_value.u_value.value_double);
                         TRACE_D("value: %f", curr_field->field_value.u_value.value_double);
                     }
                     else if (EZLOPI_VALUE_TYPE_BOOL == curr_field->value_type)
                     {
-                        cJSON_AddBoolToObject(cj_params, ezlopi_value_str, curr_field->field_value.u_value.value_bool);
+                        cJSON_AddBoolToObject(__FUNCTION__, cj_params, ezlopi_value_str, curr_field->field_value.u_value.value_bool);
                         TRACE_D("value: %s", curr_field->field_value.u_value.value_bool ? ezlopi_true_str : ezlopi_false_str);
                     }
                     else if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type)
                     {
-                        cJSON_AddStringToObject(cj_params, ezlopi_value_str, curr_field->field_value.u_value.value_string);
+                        cJSON_AddStringToObject(__FUNCTION__, cj_params, ezlopi_value_str, curr_field->field_value.u_value.value_string);
                         TRACE_D("value: %s", curr_field->field_value.u_value.value_string);
                     }
                 }
@@ -89,7 +89,7 @@ int ezlopi_scene_then_set_item_value(l_scenes_list_v2_t* curr_scene, void* arg)
             }
         }
 
-        cJSON_Delete(cj_params);
+        cJSON_Delete(__FUNCTION__, cj_params);
     }
 
     return ret;
@@ -163,7 +163,7 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t* curr_scene, void* ar
     l_action_block_v2_t* curr_then = (l_action_block_v2_t*)arg;
     if (curr_then)
     {
-        s_ezlopi_core_http_mbedtls_t* tmp_http_data = (s_ezlopi_core_http_mbedtls_t*)malloc(sizeof(s_ezlopi_core_http_mbedtls_t));
+        s_ezlopi_core_http_mbedtls_t* tmp_http_data = (s_ezlopi_core_http_mbedtls_t*)malloc(__FUNCTION__, sizeof(s_ezlopi_core_http_mbedtls_t));
         if (tmp_http_data)
         {
             memset(tmp_http_data, 0, sizeof(s_ezlopi_core_http_mbedtls_t));
@@ -198,7 +198,7 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t* curr_scene, void* ar
             ezlopi_core_http_mbedtls_req(tmp_http_data); // Returns:- [response_buffer = &Memory_block]
             free_http_mbedtls_struct(tmp_http_data);
 
-            free(tmp_http_data);
+            free(__FUNCTION__, tmp_http_data);
         }
     }
 
@@ -370,7 +370,7 @@ int ezlopi_scene_then_reset_hub(l_scenes_list_v2_t* curr_scene, void* arg)
 {
     TRACE_W(" reset_hub ");
     int ret = 0;
-    cJSON* cj_params = cJSON_CreateObject();
+    cJSON* cj_params = cJSON_CreateObject(__FUNCTION__);
 
     if (cj_params)
     {
@@ -417,7 +417,7 @@ int ezlopi_scene_then_reset_hub(l_scenes_list_v2_t* curr_scene, void* arg)
             }
         }
 
-        cJSON_Delete(cj_params);
+        cJSON_Delete(__FUNCTION__, cj_params);
     }
     return ret;
 }

@@ -218,7 +218,7 @@ static int __prepare(void* arg)
                 if (item)
                 {
                     __setup_item_properties(item, cj_device);
-                    s_ultrasonic_sensor_t* ultrasonic_sensor = (s_ultrasonic_sensor_t*)malloc(sizeof(s_ultrasonic_sensor_t));
+                    s_ultrasonic_sensor_t* ultrasonic_sensor = (s_ultrasonic_sensor_t*)malloc(__FUNCTION__, sizeof(s_ultrasonic_sensor_t));
                     if (ultrasonic_sensor)
                     {
                         memset(ultrasonic_sensor, 0, sizeof(s_ultrasonic_sensor_t));

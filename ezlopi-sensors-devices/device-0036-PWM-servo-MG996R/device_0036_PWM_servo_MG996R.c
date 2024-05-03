@@ -274,7 +274,7 @@ static int ezlopi_servo_motor_MG_996R_prepare_and_add(void* args)
         {
             if (0 == ezlopi_devices_list_add(device_prep_arg->device, ezlopi_servo_motor_MG_996R_properties, NULL))
             {
-                free(ezlopi_servo_motor_MG_996R_properties);
+                free(__FUNCTION__, ezlopi_servo_motor_MG_996R_properties);
             }
             else
             {
@@ -288,7 +288,7 @@ static int ezlopi_servo_motor_MG_996R_prepare_and_add(void* args)
 
 static s_ezlopi_device_properties_t* ezlopi_servo_motor_MG_996R_prepare(cJSON* cjson_device)
 {
-    s_ezlopi_device_properties_t* ezlopi_servo_motor_MG_996R_properties = malloc(sizeof(s_ezlopi_device_properties_t));
+    s_ezlopi_device_properties_t* ezlopi_servo_motor_MG_996R_properties = malloc(__FUNCTION__, sizeof(s_ezlopi_device_properties_t));
 
     if (ezlopi_servo_motor_MG_996R_properties)
     {
@@ -378,7 +378,7 @@ static int ezlopi_servo_motor_MG_996R_get_value_cjson(s_ezlopi_device_properties
     {
         uint32_t duty = ezlopi_pwm_get_duty(properties->interface.pwm.channel, properties->interface.pwm.speed_mode);
         int target_duty = (int)(((duty - 13) * 100) / 17);
-        cJSON_AddNumberToObject(cjson_propertise, ezlopi_value_str, target_duty);
+        cJSON_AddNumberToObject(__FUNCTION__, cjson_propertise, ezlopi_value_str, target_duty);
         ret = 1;
     }
     return ret;

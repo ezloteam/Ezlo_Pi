@@ -21,15 +21,15 @@
  * SOFTWARE.
  */
 
-/**
- * @file led_strip.c
- *
- * RMT-based ESP-IDF driver for WS2812B/SK6812/APA106/SM16703 LED strips
- *
- * Copyright (c) 2020 Ruslan V. Uss <unclerus@gmail.com>
- *
- * MIT Licensed as described in the file LICENSE
- */
+ /**
+  * @file led_strip.c
+  *
+  * RMT-based ESP-IDF driver for WS2812B/SK6812/APA106/SM16703 LED strips
+  *
+  * Copyright (c) 2020 Ruslan V. Uss <unclerus@gmail.com>
+  *
+  * MIT Licensed as described in the file LICENSE
+  */
 #include "led_strip.h"
 #include <esp_log.h>
 #include <esp_attr.h>
@@ -37,6 +37,9 @@
 #ifdef CONFIG_IDF_TARGET_ESP32S3
 #include "esp32s3/rom/ets_sys.h"
 #endif
+
+#include "EZLOPI_USER_CONFIG.h"
+
 #ifndef RMT_DEFAULT_CONFIG_TX
 #define RMT_DEFAULT_CONFIG_TX(gpio, channel_id)      \
     {                                                \
@@ -78,8 +81,8 @@ static const char *TAG = "led_strip";
 #define COLOR_SIZE(strip) (3 + ((strip)->is_rgbw != 0))
 
 static void IRAM_ATTR _rmt_adapter(const void *src, rmt_item32_t *dest, size_t src_size,
-                                   size_t wanted_num, size_t *translated_size, size_t *item_num,
-                                   const rmt_item32_t *bit0, const rmt_item32_t *bit1)
+    size_t wanted_num, size_t *translated_size, size_t *item_num,
+    const rmt_item32_t *bit0, const rmt_item32_t *bit1)
 {
     if (!src || !dest)
     {
@@ -122,28 +125,28 @@ typedef struct
     rmt_item32_t bit0, bit1;
 } led_rmt_t;
 
-static led_rmt_t rmt_items[LED_STRIP_TYPE_MAX] = {0};
+static led_rmt_t rmt_items[LED_STRIP_TYPE_MAX] = { 0 };
 
 static void IRAM_ATTR ws2812_rmt_adapter(const void *src, rmt_item32_t *dest, size_t src_size,
-                                         size_t wanted_num, size_t *translated_size, size_t *item_num)
+    size_t wanted_num, size_t *translated_size, size_t *item_num)
 {
     _rmt_adapter(src, dest, src_size, wanted_num, translated_size, item_num, &rmt_items[LED_STRIP_WS2812].bit0, &rmt_items[LED_STRIP_WS2812].bit1);
 }
 
 static void IRAM_ATTR sk6812_rmt_adapter(const void *src, rmt_item32_t *dest, size_t src_size,
-                                         size_t wanted_num, size_t *translated_size, size_t *item_num)
+    size_t wanted_num, size_t *translated_size, size_t *item_num)
 {
     _rmt_adapter(src, dest, src_size, wanted_num, translated_size, item_num, &rmt_items[LED_STRIP_SK6812].bit0, &rmt_items[LED_STRIP_SK6812].bit1);
 }
 
 static void IRAM_ATTR apa106_rmt_adapter(const void *src, rmt_item32_t *dest, size_t src_size,
-                                         size_t wanted_num, size_t *translated_size, size_t *item_num)
+    size_t wanted_num, size_t *translated_size, size_t *item_num)
 {
     _rmt_adapter(src, dest, src_size, wanted_num, translated_size, item_num, &rmt_items[LED_STRIP_APA106].bit0, &rmt_items[LED_STRIP_APA106].bit1);
 }
 
 static void IRAM_ATTR sm16703_rmt_adapter(const void *src, rmt_item32_t *dest, size_t src_size,
-                                          size_t wanted_num, size_t *translated_size, size_t *item_num)
+    size_t wanted_num, size_t *translated_size, size_t *item_num)
 {
     _rmt_adapter(src, dest, src_size, wanted_num, translated_size, item_num, &rmt_items[LED_STRIP_SM16703].bit0, &rmt_items[LED_STRIP_SM16703].bit1);
 }
@@ -193,7 +196,7 @@ esp_err_t led_strip_init(led_strip_t *strip)
 {
     CHECK_ARG(strip && strip->length > 0 && strip->type < LED_STRIP_TYPE_MAX);
 
-    strip->buf = calloc(strip->length, COLOR_SIZE(strip));
+    strip->buf = calloc(__FUNCTION__, strip->length, COLOR_SIZE(strip));
     if (!strip->buf)
     {
         ESP_LOGE(TAG, "Not enough memory");
@@ -218,7 +221,7 @@ esp_err_t led_strip_init(led_strip_t *strip)
 esp_err_t led_strip_free(led_strip_t *strip)
 {
     CHECK_ARG(strip && strip->buf);
-    free(strip->buf);
+    free(__FUNCTION__, strip->buf);
 
     CHECK(rmt_driver_uninstall(strip->channel));
 
@@ -232,7 +235,7 @@ esp_err_t led_strip_flush(led_strip_t *strip)
     CHECK(rmt_wait_tx_done(strip->channel, pdMS_TO_TICKS(CONFIG_LED_STRIP_FLUSH_TIMEOUT)));
     ets_delay_us(CONFIG_LED_STRIP_PAUSE_LENGTH);
     return rmt_write_sample(strip->channel, strip->buf,
-                            strip->length * COLOR_SIZE(strip), false);
+        strip->length * COLOR_SIZE(strip), false);
 }
 
 bool led_strip_busy(led_strip_t *strip)

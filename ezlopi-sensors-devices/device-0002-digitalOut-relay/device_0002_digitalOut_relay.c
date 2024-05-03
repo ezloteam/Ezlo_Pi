@@ -237,7 +237,7 @@ static int __set_value(l_ezlopi_item_t* item, void* arg)
             CJSON_TRACE("cjson_params", cjson_params);
 
             int value = 0;
-            cJSON* cj_value = cJSON_GetObjectItem(cjson_params, ezlopi_value_str);
+            cJSON* cj_value = cJSON_GetObjectItem(__FUNCTION__, cjson_params, ezlopi_value_str);
             if (cj_value)
             {
                 switch (cj_value->type)

@@ -154,9 +154,9 @@ static void __message_upcall(httpd_req_t* req, const char* payload, uint32_t pay
     cJSON* cj_response = ezlopi_core_api_consume(payload, payload_len);
     if (cj_response)
     {
-        cJSON_AddNumberToObject(cj_response, ezlopi_msg_id_str, message_counter);
+        cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_msg_id_str, message_counter);
         __respond_cjson(req, cj_response);
-        cJSON_Delete(cj_response);
+        cJSON_Delete(__FUNCTION__, cj_response);
     }
 }
 
@@ -179,14 +179,14 @@ static void __ws_async_send(void* arg)
             httpd_ws_send_frame_async(resp_arg->hd, resp_arg->fd, &ws_pkt);
         }
 
-        free(resp_arg);
+        free(__FUNCTION__, resp_arg);
     }
 }
 
 static esp_err_t __trigger_async_send(httpd_req_t* req)
 {
     esp_err_t ret = ESP_OK;
-    s_async_resp_arg_t* resp_arg = malloc(sizeof(s_async_resp_arg_t));
+    s_async_resp_arg_t* resp_arg = malloc(__FUNCTION__, sizeof(s_async_resp_arg_t));
 
     if (resp_arg)
     {
@@ -234,7 +234,7 @@ static esp_err_t __msg_handler(httpd_req_t* req)
                 }
                 else if (0 < ws_pkt.len)
                 {
-                    buf = malloc(ws_pkt.len + 1);
+                    buf = malloc(__FUNCTION__, ws_pkt.len + 1);
 
                     if (NULL != buf)
                     {
@@ -269,7 +269,7 @@ static esp_err_t __msg_handler(httpd_req_t* req)
                             TRACE_E("httpd_ws_recv_frame failed with %d", ret);
                         }
 
-                        free(buf);
+                        free(__FUNCTION__, buf);
                     }
                     else
                     {
@@ -363,7 +363,7 @@ static int __respond_cjson(httpd_req_t* req, cJSON* cj_response)
             TRACE_I("-----------------------------> buffer acquired!");
             memset(data_buffer, 0, buffer_len);
 
-            if (cJSON_PrintPreallocated(cj_response, data_buffer, buffer_len, false))
+            if (cJSON_PrintPreallocated(__FUNCTION__, cj_response, data_buffer, buffer_len, false))
             {
                 httpd_ws_frame_t data_frame = {
                     .final = false,

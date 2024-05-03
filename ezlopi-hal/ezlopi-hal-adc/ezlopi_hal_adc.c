@@ -48,7 +48,7 @@ static e_ezlopi_gpio_channel_t ezlopi_channel_to_gpio_map[ADC1_CHANNEL_MAX] = {
 
 int ezlopi_adc_init(uint8_t gpio_num, uint8_t width)
 {
-    ezlopi_analog_object_handle_t* ezlopi_analog_object_handle = (struct s_ezlopi_analog_object*)malloc(sizeof(struct s_ezlopi_analog_object));
+    ezlopi_analog_object_handle_t* ezlopi_analog_object_handle = (struct s_ezlopi_analog_object*)malloc(__FUNCTION__, sizeof(struct s_ezlopi_analog_object));
     memset(ezlopi_analog_object_handle, 0, sizeof(struct s_ezlopi_analog_object));
     int ret = 0;
     int channel = ezlopi_adc_get_channel_number(gpio_num);

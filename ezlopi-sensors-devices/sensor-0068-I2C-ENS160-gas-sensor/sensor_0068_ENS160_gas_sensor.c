@@ -263,7 +263,7 @@ static int __prepare(void* arg, void* user_arg)
   s_ezlopi_prep_arg_t* prep_arg = (s_ezlopi_prep_arg_t*)arg;
   if (prep_arg)
   {
-    ens160_t* ens160_sensor = (ens160_t*)malloc(sizeof(ens160_t));
+    ens160_t* ens160_sensor = (ens160_t*)malloc(__FUNCTION__, sizeof(ens160_t));
     if (ens160_sensor)
     {
       memset(ens160_sensor, 0, sizeof(ens160_t));
@@ -337,7 +337,7 @@ static int __prepare(void* arg, void* user_arg)
           (NULL == child_ens160_co2_device))
         {
           ezlopi_device_free_device(parent_ens160_aqi_device);
-          free(ens160_sensor);
+          free(__FUNCTION__, ens160_sensor);
           ret = -1;
         }
         else
@@ -348,7 +348,7 @@ static int __prepare(void* arg, void* user_arg)
       else
       {
         ret = 1;
-        free(ens160_sensor);
+        free(__FUNCTION__, ens160_sensor);
       }
     }
     else

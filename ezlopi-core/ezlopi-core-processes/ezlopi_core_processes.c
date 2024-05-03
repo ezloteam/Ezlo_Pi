@@ -88,17 +88,16 @@ static void ezlopi_set_ezlopi_task_to_arry(cJSON* cj_processes_array)
     {
         if (!ezlopi_task_info_array[i].is_deleted && ezlopi_task_info_array[i].task_handle)
         {
-            static const char * __who = "task_to_arry";
-            cJSON* cj_process = cJSON_CreateObject(__who);
+            cJSON* cj_process = cJSON_CreateObject(__FUNCTION__);
             if (cj_process)
             {
                 TaskStatus_t task_details;
                 vTaskGetInfo(ezlopi_task_info_array[i].task_handle, &task_details, pdTRUE, eInvalid);
-                cJSON_AddNumberToObject(__who, cj_process, "pid", task_details.xTaskNumber);
-                cJSON_AddStringToObject(__who, cj_process, "processName", (NULL == task_details.pcTaskName ? "" : task_details.pcTaskName));
-                cJSON_AddNumberToObject(__who, cj_process, "memoryUsage", ezlopi_task_info_array[i].stack_depth);
-                cJSON_AddNumberToObject(__who, cj_process, "vmRss", (ezlopi_task_info_array[i].stack_depth - task_details.usStackHighWaterMark));
-                cJSON_AddStringToObject(__who, cj_process, "units", "bytes");
+                cJSON_AddNumberToObject(__FUNCTION__, cj_process, "pid", task_details.xTaskNumber);
+                cJSON_AddStringToObject(__FUNCTION__, cj_process, "processName", (NULL == task_details.pcTaskName ? "" : task_details.pcTaskName));
+                cJSON_AddNumberToObject(__FUNCTION__, cj_process, "memoryUsage", ezlopi_task_info_array[i].stack_depth);
+                cJSON_AddNumberToObject(__FUNCTION__, cj_process, "vmRss", (ezlopi_task_info_array[i].stack_depth - task_details.usStackHighWaterMark));
+                cJSON_AddStringToObject(__FUNCTION__, cj_process, "units", "bytes");
                 cJSON_AddItemToArray(cj_processes_array, cj_process);
             }
         }
@@ -107,8 +106,6 @@ static void ezlopi_set_ezlopi_task_to_arry(cJSON* cj_processes_array)
 
 int ezlopi_core_get_processes_details(cJSON* cj_processes_array)
 {
-    static const char * __who = "processes_details";
-
     int ret = 0;
     if (cj_processes_array && cj_processes_array->type == cJSON_Array)
     {
@@ -123,18 +120,18 @@ int ezlopi_core_get_processes_details(cJSON* cj_processes_array)
         {
             if (!ezlopi_core_check_ezlopi_task(task_array[i].xHandle))
             {
-                cJSON* cj_process = cJSON_CreateObject(__who);
+                cJSON* cj_process = cJSON_CreateObject(__FUNCTION__);
                 if (cj_process)
                 {
-                    cJSON_AddNumberToObject(__who, cj_process, "pid", task_array[i].xTaskNumber);
-                    cJSON_AddStringToObject(__who, cj_process, "processName", task_array[i].pcTaskName);
+                    cJSON_AddNumberToObject(__FUNCTION__, cj_process, "pid", task_array[i].xTaskNumber);
+                    cJSON_AddStringToObject(__FUNCTION__, cj_process, "processName", task_array[i].pcTaskName);
                     size_t default_task_stack_size = set_default_task_memory_usage(task_array[i].pcTaskName);
-                    cJSON_AddNumberToObject(__who, cj_process, "memoryUsage", default_task_stack_size);
+                    cJSON_AddNumberToObject(__FUNCTION__, cj_process, "memoryUsage", default_task_stack_size);
                     if (default_task_stack_size != 0)
                     {
-                        cJSON_AddNumberToObject(__who, cj_process, "vmRss", (default_task_stack_size - task_array[i].usStackHighWaterMark));
+                        cJSON_AddNumberToObject(__FUNCTION__, cj_process, "vmRss", (default_task_stack_size - task_array[i].usStackHighWaterMark));
                     }
-                    cJSON_AddStringToObject(__who, cj_process, "units", "bytes");
+                    cJSON_AddStringToObject(__FUNCTION__, cj_process, "units", "bytes");
                     cJSON_AddItemToArray(cj_processes_array, cj_process);
                 }
             }

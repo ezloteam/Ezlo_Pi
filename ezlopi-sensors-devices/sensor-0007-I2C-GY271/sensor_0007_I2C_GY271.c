@@ -148,7 +148,7 @@ static int __prepare(void* arg)
     if (prep_arg && prep_arg->cjson_device)
     {
         cJSON* cj_device = prep_arg->cjson_device;
-        s_gy271_data_t* user_data = (s_gy271_data_t*)malloc(sizeof(s_gy271_data_t));
+        s_gy271_data_t* user_data = (s_gy271_data_t*)malloc(__FUNCTION__, sizeof(s_gy271_data_t));
         if (user_data)
         {
             memset(user_data, 0, sizeof(s_gy271_data_t));
@@ -266,7 +266,7 @@ static int __prepare(void* arg)
             }
             else // if the parent_device dosenot exsist then dealloc the 'user_data'
             {
-                free(user_data);
+                free(__FUNCTION__, user_data);
                 ret = -1;
             }
         }

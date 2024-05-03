@@ -22,13 +22,13 @@ static e_scenes_block_type_v2_t __get_block_type_and_create_block_array(cJSON* c
 
 void scenes_blocks_list(cJSON* cj_request, cJSON* cj_response)
 {
-    cJSON* cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
+    cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     if (cj_result)
     {
-        cJSON* cj_paramas = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
+        cJSON* cj_paramas = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
         if (cj_paramas)
         {
-            cJSON* cj_block_type = cJSON_GetObjectItem(cj_paramas, ezlopi_blockType_str);
+            cJSON* cj_block_type = cJSON_GetObjectItem(__FUNCTION__, cj_paramas, ezlopi_blockType_str);
             if (cj_block_type && cj_block_type->valuestring)
             {
                 char* block_type_name = NULL;
@@ -36,15 +36,15 @@ void scenes_blocks_list(cJSON* cj_request, cJSON* cj_response)
 
                 if (block_type)
                 {
-                    cJSON* cj_devices_array = cJSON_GetObjectItem(cj_paramas, "devices");
+                    cJSON* cj_devices_array = cJSON_GetObjectItem(__FUNCTION__, cj_paramas, "devices");
                     if (cj_devices_array && (cJSON_Array == cj_devices_array->type))
                     {
                         cJSON* cj_block_array = __add_scenes_blocks_by_device_ids(block_type, cj_devices_array);
                         if (cj_block_array)
                         {
-                            if (!cJSON_AddItemToObject(cj_result, block_type_name, cj_block_array))
+                            if (!cJSON_AddItemToObject(__FUNCTION__, cj_result, block_type_name, cj_block_array))
                             {
-                                cJSON_Delete(cj_block_array);
+                                cJSON_Delete(__FUNCTION__, cj_block_array);
                             }
                         }
                     }
@@ -56,25 +56,25 @@ void scenes_blocks_list(cJSON* cj_request, cJSON* cj_response)
 
 static void __add_block_options_and_fields_cjson(cJSON* cj_block, s_block_options_v2_t* block_options, l_fields_v2_t* fields_node)
 {
-    cJSON* cj_block_opt = cJSON_AddObjectToObject(cj_block, ezlopi_blockOptions_str);
-    cJSON* cj_fields = cJSON_AddArrayToObject(cj_block, ezlopi_fields_str);
+    cJSON* cj_block_opt = cJSON_AddObjectToObject(__FUNCTION__, cj_block, ezlopi_blockOptions_str);
+    cJSON* cj_fields = cJSON_AddArrayToObject(__FUNCTION__, cj_block, ezlopi_fields_str);
     if (cj_block_opt && cj_fields)
     {
-        cJSON* cj_method = cJSON_AddObjectToObject(cj_block_opt, ezlopi_method_str);
+        cJSON* cj_method = cJSON_AddObjectToObject(__FUNCTION__, cj_block_opt, ezlopi_method_str);
         if (cj_method)
         {
-            cJSON_AddStringToObject(cj_method, ezlopi_name_str, block_options->method.name);
-            cJSON* cj_args = cJSON_AddObjectToObject(cj_method, ezlopi_args_str);
+            cJSON_AddStringToObject(__FUNCTION__, cj_method, ezlopi_name_str, block_options->method.name);
+            cJSON* cj_args = cJSON_AddObjectToObject(__FUNCTION__, cj_method, ezlopi_args_str);
             if (cj_args)
             {
                 while (fields_node)
                 {
-                    cJSON_AddStringToObject(cj_args, fields_node->name, fields_node->name);
+                    cJSON_AddStringToObject(__FUNCTION__, cj_args, fields_node->name, fields_node->name);
 
                     cJSON* cj_field_obj = ezlopi_scene_cjson_get_field(fields_node);
                     if (!cJSON_AddItemToArray(cj_fields, cj_field_obj))
                     {
-                        cJSON_Delete(cj_field_obj);
+                        cJSON_Delete(__FUNCTION__, cj_field_obj);
                     }
 
                     fields_node = fields_node->next;
@@ -90,11 +90,11 @@ static cJSON* __create_when_block_cjson(l_when_block_v2_t* when_block)
 
     if (when_block)
     {
-        cj_when_block = cJSON_CreateObject();
+        cj_when_block = cJSON_CreateObject(__FUNCTION__);
         if (cj_when_block)
         {
             __add_block_options_and_fields_cjson(cj_when_block, &when_block->block_options, when_block->fields);
-            cJSON_AddStringToObject(cj_when_block, ezlopi_blockType_str, ezlopi_when_str);
+            cJSON_AddStringToObject(__FUNCTION__, cj_when_block, ezlopi_blockType_str, ezlopi_when_str);
         }
     }
 
@@ -107,11 +107,11 @@ static cJSON* __create_then_block_cjson(l_action_block_v2_t* then_block)
 
     if (then_block)
     {
-        cj_then_block = cJSON_CreateObject();
+        cj_then_block = cJSON_CreateObject(__FUNCTION__);
         if (cj_then_block)
         {
             __add_block_options_and_fields_cjson(cj_then_block, &then_block->block_options, then_block->fields);
-            cJSON_AddStringToObject(cj_then_block, ezlopi_blockType_str, ezlopi_then_str);
+            cJSON_AddStringToObject(__FUNCTION__, cj_then_block, ezlopi_blockType_str, ezlopi_then_str);
         }
     }
 
@@ -124,11 +124,11 @@ static cJSON* __create_else_block_cjson(l_action_block_v2_t* else_block)
 
     if (else_block)
     {
-        cj_else_block = cJSON_CreateObject();
+        cj_else_block = cJSON_CreateObject(__FUNCTION__);
         if (cj_else_block)
         {
             __add_block_options_and_fields_cjson(cj_else_block, &else_block->block_options, else_block->fields);
-            cJSON_AddStringToObject(cj_else_block, ezlopi_blockType_str, ezlopi_else_str);
+            cJSON_AddStringToObject(__FUNCTION__, cj_else_block, ezlopi_blockType_str, ezlopi_else_str);
         }
     }
 
@@ -251,14 +251,14 @@ static cJSON* __add_scenes_blocks_by_device_ids(e_scenes_block_type_v2_t block_t
                 {
                     if (NULL == cj_block_array)
                     {
-                        cj_block_array = cJSON_CreateArray();
+                        cj_block_array = cJSON_CreateArray(__FUNCTION__);
                     }
 
                     if (cj_block_array)
                     {
                         if (!cJSON_AddItemToArray(cj_block_array, cj_block))
                         {
-                            cJSON_Delete(cj_block);
+                            cJSON_Delete(__FUNCTION__, cj_block);
                         }
                     }
                 }

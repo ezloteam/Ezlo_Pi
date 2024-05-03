@@ -42,7 +42,7 @@ static void event_process_v3(void* pv)
                     if (NULL != event)
                     {
                         curr_item->func(event->action, curr_item, event->arg, curr_item->user_arg);
-                        free(event);
+                        free(__FUNCTION__, event);
                         event = NULL;
                     }
                     else // in case of default we receive event == NULL, and we pass the action EZLOPI_ACTION_NOTIFY_1000_MS

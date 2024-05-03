@@ -5,7 +5,7 @@
 
 #define CJSON_GET_VALUE_DOUBLE(root, item_name, item_val)     \
     {                                                         \
-        cJSON *o_item = cJSON_GetObjectItem(root, item_name); \
+        cJSON *o_item = cJSON_GetObjectItem(__FUNCTION__, root, item_name); \
         if (o_item)                                           \
         {                                                     \
             item_val = o_item->valuedouble;                   \
@@ -19,7 +19,7 @@
 
 #define CJSON_GET_VALUE_BOOL(root, item_name, item_val)       \
     {                                                         \
-        cJSON *o_item = cJSON_GetObjectItem(root, item_name); \
+        cJSON *o_item = cJSON_GetObjectItem(__FUNCTION__, root, item_name); \
         if (o_item)                                           \
         {                                                     \
             if (o_item->type == cJSON_False)                  \
@@ -41,7 +41,7 @@
 
 #define CJSON_GET_VALUE_STRING(root, item_name, item_val)     \
     {                                                         \
-        cJSON *o_item = cJSON_GetObjectItem(root, item_name); \
+        cJSON *o_item = cJSON_GetObjectItem(__FUNCTION__, root, item_name); \
         if (o_item && o_item->valuestring)                    \
         {                                                     \
             item_val = o_item->valuestring;                   \
@@ -57,11 +57,11 @@
     {                                                                                       \
         if (object)                                                                         \
         {                                                                                   \
-            char *obj_str = cJSON_Print(object);                                            \
+            char *obj_str = cJSON_Print(__FUNCTION__, object);                                            \
             if (obj_str)                                                                    \
             {                                                                               \
                 TRACE_D("%s[%d]: %s", name ? name : ezlopi__str, strlen(obj_str), obj_str); \
-                free(obj_str);                                                              \
+                free(__FUNCTION__, obj_str);                                                              \
             }                                                                               \
         }                                                                                   \
         else                                                                                \
@@ -130,7 +130,7 @@
         {                                                        \
             char tmp_str[32];                                    \
             snprintf(tmp_str, sizeof(tmp_str), "%08x", id);      \
-            cJSON_AddStringToObject(cj_object, id_str, tmp_str); \
+            cJSON_AddStringToObject(__FUNCTION__, cj_object, id_str, tmp_str); \
         }                                                        \
     }
 
@@ -140,7 +140,7 @@
         {                                                            \
             char tmp_str[32];                                        \
             snprintf(tmp_str, sizeof(tmp_str), "%u", (uint32_t)num); \
-            cJSON_AddStringToObject(cj_obj, name_str, tmp_str);      \
+            cJSON_AddStringToObject(__FUNCTION__, cj_obj, name_str, tmp_str);      \
         }                                                            \
     }
 

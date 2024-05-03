@@ -19,7 +19,7 @@
 // #include "ezlopi_cloud_settings.h"
 #define CJSON_GET_VALUE_GPIO(root, item_name, item_val)       \
     {                                                         \
-        cJSON *o_item = cJSON_GetObjectItem(root, item_name); \
+        cJSON *o_item = cJSON_GetObjectItem(__FUNCTION__, root, item_name); \
         if (o_item && o_item->type == cJSON_Number)           \
         {                                                     \
             item_val = o_item->valuedouble;                      \
@@ -35,7 +35,7 @@
 
 #define CJSON_GET_VALUE_STRING(root, item_name, item_val)     \
     {                                                         \
-        cJSON *o_item = cJSON_GetObjectItem(root, item_name); \
+        cJSON *o_item = cJSON_GetObjectItem(__FUNCTION__, root, item_name); \
         if (o_item && o_item->valuestring)                    \
         {                                                     \
             item_val = o_item->valuestring;                   \

@@ -104,17 +104,17 @@ double ezlopi_core_scenes_operator_get_item_double_value_current(uint32_t item_i
         {
             if (item->cloud_properties.item_id == item_id)
             {
-                cJSON* cj_item_value = cJSON_CreateObject();
+                cJSON* cj_item_value = cJSON_CreateObject(__FUNCTION__);
                 if (cj_item_value)
                 {
                     item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item, (void*)cj_item_value, NULL);
-                    cJSON* cj_value = cJSON_GetObjectItem(cj_item_value, ezlopi_value_str);
+                    cJSON* cj_value = cJSON_GetObjectItem(__FUNCTION__, cj_item_value, ezlopi_value_str);
                     if (cj_value)
                     {
                         item_value = cj_value->valuedouble;
                     }
 
-                    cJSON_Delete(cj_item_value);
+                    cJSON_Delete(__FUNCTION__, cj_item_value);
                 }
 
                 break;
@@ -288,7 +288,7 @@ int ezlopi_scenes_operators_value_strings_operations(uint32_t item_id, l_fields_
     {
         char* item_value = NULL;
         // int item_value_size = 0;
-        cJSON* cj_item_value = cJSON_CreateObject();
+        cJSON* cj_item_value = cJSON_CreateObject(__FUNCTION__);
         l_ezlopi_device_t* device = ezlopi_device_get_head();
         while (device)
         {
@@ -300,7 +300,7 @@ int ezlopi_scenes_operators_value_strings_operations(uint32_t item_id, l_fields_
                     if (cj_item_value)
                     {
                         item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item, (void*)cj_item_value, NULL);
-                        cJSON* cj_value = cJSON_GetObjectItem(cj_item_value, ezlopi_value_str);
+                        cJSON* cj_value = cJSON_GetObjectItem(__FUNCTION__, cj_item_value, ezlopi_value_str);
                         if (cj_value)
                         {
                             if (cJSON_IsString(cj_value))
@@ -431,9 +431,9 @@ int ezlopi_scenes_operators_value_strings_operations(uint32_t item_id, l_fields_
         {
             if (item_value)
             {
-                free(item_value);
+                free(__FUNCTION__, item_value);
             }
-            cJSON_Delete(cj_item_value);
+            cJSON_Delete(__FUNCTION__, cj_item_value);
         }
     }
 
@@ -626,7 +626,7 @@ int ezlopi_scenes_operators_value_inarr_operations(uint32_t item_id, l_fields_v2
     {
         char* item_value = NULL;
         // int item_value_size = 0;
-        cJSON* cj_item_value = cJSON_CreateObject();
+        cJSON* cj_item_value = cJSON_CreateObject(__FUNCTION__);
         l_ezlopi_device_t* device = ezlopi_device_get_head();
         while (device)
         {
@@ -638,7 +638,7 @@ int ezlopi_scenes_operators_value_inarr_operations(uint32_t item_id, l_fields_v2
                     if (cj_item_value)
                     {
                         item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item, (void*)cj_item_value, NULL);
-                        cJSON* cj_value = cJSON_GetObjectItem(cj_item_value, ezlopi_value_str);
+                        cJSON* cj_value = cJSON_GetObjectItem(__FUNCTION__, cj_item_value, ezlopi_value_str);
                         if (cj_value)
                         {
                             if (cJSON_IsString(cj_value))
@@ -718,9 +718,9 @@ int ezlopi_scenes_operators_value_inarr_operations(uint32_t item_id, l_fields_v2
         {
             if (item_value)
             {
-                free(item_value);
+                free(__FUNCTION__, item_value);
             }
-            cJSON_Delete(cj_item_value);
+            cJSON_Delete(__FUNCTION__, cj_item_value);
         }
     }
 
@@ -852,7 +852,7 @@ int ezlopi_scenes_operators_value_with_less_operations(uint32_t item_id, l_field
     if (item_id && value_field && comparator_field)
     {
         double item_value = 0.0;
-        cJSON* cj_item_value = cJSON_CreateObject();
+        cJSON* cj_item_value = cJSON_CreateObject(__FUNCTION__);
         l_ezlopi_device_t* device = ezlopi_device_get_head();
         while (device)
         {
@@ -864,7 +864,7 @@ int ezlopi_scenes_operators_value_with_less_operations(uint32_t item_id, l_field
                     if (cj_item_value)
                     {
                         item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item, (void*)cj_item_value, NULL);
-                        cJSON* cj_value = cJSON_GetObjectItem(cj_item_value, ezlopi_value_str);
+                        cJSON* cj_value = cJSON_GetObjectItem(__FUNCTION__, cj_item_value, ezlopi_value_str);
                         if (cj_value)
                         {
                             #warning "Krishna needs to complete this"
@@ -922,7 +922,7 @@ int ezlopi_scenes_operators_value_with_less_operations(uint32_t item_id, l_field
 
         if (cj_item_value)
         {
-            cJSON_Delete(cj_item_value);
+            cJSON_Delete(__FUNCTION__, cj_item_value);
         }
     }
 
@@ -1004,7 +1004,7 @@ int ezlopi_scenes_operators_value_without_less_operations(uint32_t item_id, l_fi
     if (item_id && value_field && comparator_field)
     {
         double item_value = 0.0;
-        cJSON* cj_item_value = cJSON_CreateObject();
+        cJSON* cj_item_value = cJSON_CreateObject(__FUNCTION__);
         l_ezlopi_device_t* device = ezlopi_device_get_head();
         while (device)
         {
@@ -1016,7 +1016,7 @@ int ezlopi_scenes_operators_value_without_less_operations(uint32_t item_id, l_fi
                     if (cj_item_value)
                     {
                         item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item, (void*)cj_item_value, NULL);
-                        cJSON* cj_value = cJSON_GetObjectItem(cj_item_value, ezlopi_value_str);
+                        cJSON* cj_value = cJSON_GetObjectItem(__FUNCTION__, cj_item_value, ezlopi_value_str);
                         if (cj_value)
                         {
                             #warning "Krishna needs to complete this"
@@ -1056,7 +1056,7 @@ int ezlopi_scenes_operators_value_without_less_operations(uint32_t item_id, l_fi
 
         if (cj_item_value)
         {
-            cJSON_Delete(cj_item_value);
+            cJSON_Delete(__FUNCTION__, cj_item_value);
         }
     }
 
@@ -1072,7 +1072,7 @@ int ezlopi_scenes_operators_value_comparevalues_without_less_operations(uint32_t
     {
         cJSON* item_value = NULL;
 
-        cJSON* cj_item_value = cJSON_CreateObject();
+        cJSON* cj_item_value = cJSON_CreateObject(__FUNCTION__);
         l_ezlopi_device_t* device = ezlopi_device_get_head();
         while (device)
         {
@@ -1086,7 +1086,7 @@ int ezlopi_scenes_operators_value_comparevalues_without_less_operations(uint32_t
                         if (cj_item_value)
                         {
                             item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item, (void*)cj_item_value, NULL);
-                            item_value = cJSON_GetObjectItem(cj_item_value, ezlopi_value_str); // eg. double_type : 5.005  or string_type : "5.005"
+                            item_value = cJSON_GetObjectItem(__FUNCTION__, cj_item_value, ezlopi_value_str); // eg. double_type : 5.005  or string_type : "5.005"
                         }
                     }
                     else
@@ -1140,7 +1140,7 @@ int ezlopi_scenes_operators_value_comparevalues_without_less_operations(uint32_t
 
         if (cj_item_value)
         {
-            cJSON_Delete(cj_item_value);
+            cJSON_Delete(__FUNCTION__, cj_item_value);
         }
     }
 
@@ -1154,7 +1154,7 @@ int ezlopi_scenes_operators_value_comparevalues_with_less_operations(uint32_t it
     {
         cJSON* item_value = NULL;
 
-        cJSON* cj_item_value = cJSON_CreateObject();
+        cJSON* cj_item_value = cJSON_CreateObject(__FUNCTION__);
         l_ezlopi_device_t* device = ezlopi_device_get_head();
         while (device)
         {
@@ -1168,7 +1168,7 @@ int ezlopi_scenes_operators_value_comparevalues_with_less_operations(uint32_t it
                         if (cj_item_value)
                         {
                             item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item, (void*)cj_item_value, NULL);
-                            item_value = cJSON_GetObjectItem(cj_item_value, ezlopi_value_str); // "5.0"
+                            item_value = cJSON_GetObjectItem(__FUNCTION__, cj_item_value, ezlopi_value_str); // "5.0"
                         }
                     }
                     else
@@ -1278,7 +1278,7 @@ int ezlopi_scenes_operators_value_comparevalues_with_less_operations(uint32_t it
 
         if (cj_item_value)
         {
-            cJSON_Delete(cj_item_value);
+            cJSON_Delete(__FUNCTION__, cj_item_value);
         }
     }
 
@@ -1292,7 +1292,7 @@ int ezlopi_scenes_operators_value_number_range_operations(uint32_t item_id, l_fi
     if (item_id && start_value_field && end_value_field)
     {
         cJSON* item_value = NULL;
-        cJSON* cj_item_value = cJSON_CreateObject();
+        cJSON* cj_item_value = cJSON_CreateObject(__FUNCTION__);
         l_ezlopi_device_t* device = ezlopi_device_get_head();
         while (device)
         {
@@ -1304,7 +1304,7 @@ int ezlopi_scenes_operators_value_number_range_operations(uint32_t item_id, l_fi
                     if (cj_item_value)
                     {
                         item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item, (void*)cj_item_value, NULL);
-                        cJSON* item_valuetype = cJSON_GetObjectItem(cj_item_value, ezlopi_valueType_str);
+                        cJSON* item_valuetype = cJSON_GetObjectItem(__FUNCTION__, cj_item_value, ezlopi_valueType_str);
                         const char* str_item_type = NULL;
                         if (item_valuetype && cJSON_IsString(item_valuetype) && (NULL != (str_item_type = cJSON_GetStringValue(item_valuetype))))
                         {
@@ -1316,13 +1316,13 @@ int ezlopi_scenes_operators_value_number_range_operations(uint32_t item_id, l_fi
                             if (STR_OP_COMP(tmp_valuetype, == , str_item_type)) // 'int' == 'int'?
                             {
                                 //now check if scale matches
-                                cJSON* item_scale = cJSON_GetObjectItem(cj_item_value, ezlopi_scale_str);
+                                cJSON* item_scale = cJSON_GetObjectItem(__FUNCTION__, cj_item_value, ezlopi_scale_str);
                                 const char* str_scale_tmp = NULL;
                                 if (item_scale && cJSON_IsString(item_scale) && (NULL != (str_scale_tmp = cJSON_GetStringValue(item_scale))))
                                 {
                                     if (STR_OP_COMP(start_value_field->scale, == , str_scale_tmp))  // 'NULL' == 'NULL'
                                     {
-                                        cJSON* cj_value = cJSON_GetObjectItem(cj_item_value, ezlopi_value_str); // extract the value from " item " within the device
+                                        cJSON* cj_value = cJSON_GetObjectItem(__FUNCTION__, cj_item_value, ezlopi_value_str); // extract the value from " item " within the device
                                         if (cj_value)
                                         {                          // extract the item_value ;
                                             item_value = cj_value; // here the value maybe (int , float , string , bool)
@@ -1403,7 +1403,7 @@ int ezlopi_scenes_operators_value_number_range_operations(uint32_t item_id, l_fi
         }
         if (cj_item_value)
         {
-            cJSON_Delete(cj_item_value);
+            cJSON_Delete(__FUNCTION__, cj_item_value);
         }
     }
 
@@ -1417,7 +1417,7 @@ int ezlopi_scenes_operators_has_atleastone_dictionary_value_operations(uint32_t 
     if (item_id && value_field)
     {
         cJSON* item_value = NULL;
-        cJSON* cj_item_value = cJSON_CreateObject();
+        cJSON* cj_item_value = cJSON_CreateObject(__FUNCTION__);
         l_ezlopi_device_t* device = ezlopi_device_get_head();
         while (device)
         {
@@ -1429,7 +1429,7 @@ int ezlopi_scenes_operators_has_atleastone_dictionary_value_operations(uint32_t 
                     if (cj_item_value)
                     {
                         item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item, (void*)cj_item_value, NULL);
-                        cJSON* cj_valuetype = cJSON_GetObjectItem(cj_item_value, ezlopi_valueType_str); // first check the item_type -> 'valueType'
+                        cJSON* cj_valuetype = cJSON_GetObjectItem(__FUNCTION__, cj_item_value, ezlopi_valueType_str); // first check the item_type -> 'valueType'
                         const char* str_item_type = NULL;
                         if (cj_valuetype && cJSON_IsString(cj_valuetype) && (NULL != (str_item_type = cJSON_GetStringValue(cj_valuetype)))) // type => dictionary
                         {
@@ -1443,7 +1443,7 @@ int ezlopi_scenes_operators_has_atleastone_dictionary_value_operations(uint32_t 
 
                             if (STR_OP_COMP("dictionary", == , str_item_type)) // 'dictionary' == 'dictionary'?
                             {
-                                cJSON* cj_value = cJSON_GetObjectItem(cj_item_value, ezlopi_value_str); // item_value -> dictionary ; [array or object]
+                                cJSON* cj_value = cJSON_GetObjectItem(__FUNCTION__, cj_item_value, ezlopi_value_str); // item_value -> dictionary ; [array or object]
                                 if (cj_value)
                                 {
                                     item_value = cj_value;
@@ -1464,7 +1464,7 @@ int ezlopi_scenes_operators_has_atleastone_dictionary_value_operations(uint32_t 
             if (cJSON_IsObject(item_value))
             {
                 // Check if ["value":"low_battery"] key is present
-                cJSON* dictionaryValue = cJSON_GetObjectItem(item_value, value_field->field_value.u_value.value_string);
+                cJSON* dictionaryValue = cJSON_GetObjectItem(__FUNCTION__, item_value, value_field->field_value.u_value.value_string);
                 if (NULL != dictionaryValue) // if the "eg. low_battery" element exists within the dictionary
                 {
                     ret = 1;
@@ -1473,7 +1473,7 @@ int ezlopi_scenes_operators_has_atleastone_dictionary_value_operations(uint32_t 
         }
         if (cj_item_value)
         {
-            cJSON_Delete(cj_item_value);
+            cJSON_Delete(__FUNCTION__, cj_item_value);
         }
     }
 
@@ -1487,7 +1487,7 @@ int ezlopi_scenes_operators_is_dictionary_changed_operations(l_scenes_list_v2_t*
     if (item_id && key_field && operation_field)
     {
         cJSON* item_value = NULL;
-        cJSON* cj_item_value = cJSON_CreateObject();
+        cJSON* cj_item_value = cJSON_CreateObject(__FUNCTION__);
 
         l_ezlopi_device_t* device = ezlopi_device_get_head();
         while (device)
@@ -1500,13 +1500,13 @@ int ezlopi_scenes_operators_is_dictionary_changed_operations(l_scenes_list_v2_t*
                     if (cj_item_value)
                     {
                         item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item, (void*)cj_item_value, NULL);
-                        cJSON* cj_valuetype = cJSON_GetObjectItem(cj_item_value, ezlopi_valueType_str); // first check the item_type -> 'valueType'
+                        cJSON* cj_valuetype = cJSON_GetObjectItem(__FUNCTION__, cj_item_value, ezlopi_valueType_str); // first check the item_type -> 'valueType'
                         const char* str_item_type = NULL;
                         if (cj_valuetype && cJSON_IsString(cj_valuetype) && (NULL != (str_item_type = cJSON_GetStringValue(cj_valuetype)))) // type => dictionary
                         {
                             if (STR_OP_COMP("dictionary", == , str_item_type)) // 'dictionary' == 'dictionary'?
                             {
-                                cJSON* cj_value = cJSON_GetObjectItem(cj_item_value, ezlopi_value_str); // item_value -> dictionary ; [array or object]
+                                cJSON* cj_value = cJSON_GetObjectItem(__FUNCTION__, cj_item_value, ezlopi_value_str); // item_value -> dictionary ; [array or object]
                                 if (cj_value)
                                 {
                                     item_value = cj_value;
@@ -1529,7 +1529,7 @@ int ezlopi_scenes_operators_is_dictionary_changed_operations(l_scenes_list_v2_t*
                 if (0 == strncmp("added", operation_field->field_value.u_value.value_string, 6))
                 {
                     // Check if ["key":"key_1"] key is present
-                    cJSON* dictionaryValue = cJSON_GetObjectItem(item_value, key_field->field_value.u_value.value_string);
+                    cJSON* dictionaryValue = cJSON_GetObjectItem(__FUNCTION__, item_value, key_field->field_value.u_value.value_string);
                     if (NULL != dictionaryValue) // if the "eg. key_1" element exists within the dictionary
                     {
                         ret = 1;
@@ -1538,7 +1538,7 @@ int ezlopi_scenes_operators_is_dictionary_changed_operations(l_scenes_list_v2_t*
                 else if (0 == strncmp("removed", operation_field->field_value.u_value.value_string, 8))
                 {
                     // Check if ["key":"key_1"] key is absent
-                    cJSON* dictionaryValue = cJSON_GetObjectItem(item_value, key_field->field_value.u_value.value_string);
+                    cJSON* dictionaryValue = cJSON_GetObjectItem(__FUNCTION__, item_value, key_field->field_value.u_value.value_string);
                     if (NULL == dictionaryValue) // if the "eg. key_1" element exists within the dictionary
                     {
                         ret = 1;
@@ -1547,7 +1547,7 @@ int ezlopi_scenes_operators_is_dictionary_changed_operations(l_scenes_list_v2_t*
                 else if (0 == strncmp("updated", operation_field->field_value.u_value.value_string, 8))
                 {
                     // Check if ["key":"key_1"] key is present and its elemnt
-                    cJSON* dictionaryValue = cJSON_GetObjectItem(item_value, key_field->field_value.u_value.value_string);
+                    cJSON* dictionaryValue = cJSON_GetObjectItem(__FUNCTION__, item_value, key_field->field_value.u_value.value_string);
                     if (NULL != dictionaryValue) // if the "eg. key_1" element exists within the dictionary
                     {
                         cJSON* last_dictionary_item = (cJSON*)scene_node->when_block->fields->user_arg;
@@ -1561,7 +1561,7 @@ int ezlopi_scenes_operators_is_dictionary_changed_operations(l_scenes_list_v2_t*
         }
         if (cj_item_value)
         {
-            cJSON_Delete(cj_item_value);
+            cJSON_Delete(__FUNCTION__, cj_item_value);
         }
     }
     return ret;

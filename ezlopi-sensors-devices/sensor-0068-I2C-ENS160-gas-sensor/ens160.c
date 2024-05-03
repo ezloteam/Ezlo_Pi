@@ -32,15 +32,15 @@ static int dfrobot_ens160_begin(ens160_t* ens160);
 static int dfrobot_ens160_begin(ens160_t* ens160)
 {
   ens160->misr = 0;
-  uint8_t id_buf[2] = {0};
-  if(0 == dfrobot_ens160_i2c_read_reg(ens160, ENS160_PART_ID_REG, id_buf, sizeof(id_buf)))   // Judge whether the data bus is successful
+  uint8_t id_buf[2] = { 0 };
+  if (0 == dfrobot_ens160_i2c_read_reg(ens160, ENS160_PART_ID_REG, id_buf, sizeof(id_buf)))   // Judge whether the data bus is successful
   {
     DBG("ERR_DATA_BUS");
     return ERR_DATA_BUS;
   }
 
   DBG("real sensor id= 0x%X", ENS160_CONCAT_BYTES(id_buf[1], id_buf[0]));
-  if(ENS160_PART_ID != ENS160_CONCAT_BYTES(id_buf[1], id_buf[0]))   // Judge whether the chip version matches
+  if (ENS160_PART_ID != ENS160_CONCAT_BYTES(id_buf[1], id_buf[0]))   // Judge whether the chip version matches
   {
     DBG("ERR_IC_VERSION");
     return ERR_IC_VERSION;
@@ -96,14 +96,14 @@ uint8_t dfrobot_ens160_get_aqi(ens160_t* ens160)
 
 uint16_t dfrobot_ens160_get_tvoc(ens160_t* ens160)
 {
-  uint8_t buf[2] = {0};
+  uint8_t buf[2] = { 0 };
   dfrobot_ens160_i2c_read_reg(ens160, ENS160_DATA_TVOC_REG, buf, sizeof(buf));
   return ENS160_CONCAT_BYTES(buf[1], buf[0]);
 }
 
 uint16_t dfrobot_ens160_get_eco2(ens160_t* ens160)
 {
-  uint8_t buf[2]= {0};
+  uint8_t buf[2] = { 0 };
   dfrobot_ens160_i2c_read_reg(ens160, ENS160_DATA_ECO2_REG, buf, sizeof(buf));
   return ENS160_CONCAT_BYTES(buf[1], buf[0]);
 }
@@ -118,8 +118,8 @@ uint8_t dfrobot_ens160_get_misr(ens160_t* ens160)
 
 uint8_t dfrobot_ens160_calc_misr(ens160_t* ens160, uint8_t data)
 {
-  uint8_t misr_xor= ( (ens160->misr<<1) ^ data ) & 0xFF;
-  if( (ens160->misr & 0x80) == 0 )
+  uint8_t misr_xor = ((ens160->misr << 1) ^ data) & 0xFF;
+  if ((ens160->misr & 0x80) == 0)
     ens160->misr = misr_xor;
   else
     ens160->misr = misr_xor ^ POLY;
@@ -131,29 +131,29 @@ uint8_t dfrobot_ens160_calc_misr(ens160_t* ens160, uint8_t data)
 
 int dfrobot_ens160_i2c_begin(ens160_t* ens160)
 {
-	ezlopi_i2c_master_init(ens160->ezlopi_i2c);
+  ezlopi_i2c_master_init(ens160->ezlopi_i2c);
 
   return dfrobot_ens160_begin(ens160);   // Use the initialization function of the parent class
 }
 
 void dfrobot_ens160_i2c_write_reg(ens160_t* ens160, uint8_t reg, const void* p_buf, size_t size)
 {
-  if(p_buf == NULL) {
+  if (p_buf == NULL) {
     DBG("p_buf ERROR!! : null pointer");
   }
 
-  uint8_t* _p_buf = (uint8_t*) malloc(size + sizeof(reg));
+  uint8_t* _p_buf = (uint8_t*)malloc(__FUNCTION__, size + sizeof(reg));
   memcpy(_p_buf, &reg, sizeof(reg));
-  memcpy(_p_buf+1, p_buf, size);
+  memcpy(_p_buf + 1, p_buf, size);
 
   ezlopi_i2c_master_write_to_device(ens160->ezlopi_i2c, _p_buf, size + sizeof(reg));
 
-  free(_p_buf);
+  free(__FUNCTION__, _p_buf);
 }
 
 size_t dfrobot_ens160_i2c_read_reg(ens160_t* ens160, uint8_t reg, void* p_buf, size_t size)
 {
-  if(NULL == p_buf) {
+  if (NULL == p_buf) {
     DBG("p_buf ERROR!! : null pointer");
   }
   uint8_t * _p_buf = (uint8_t*)p_buf;
@@ -168,7 +168,7 @@ void dfrobot_ens160_get_data(ens160_t* ens160)
 {
   /**
    * Get the sensor operating status
-   * Return value: 0-Normal operation, 
+   * Return value: 0-Normal operation,
    *         1-Warm-Up phase, first 3 minutes after power-on.
    *         2-Initial Start-Up phase, first full hour of operation after initial power-on. Only once in the sensor’s lifetime.
    * note: Note that the status will only be stored in the non-volatile memory after an initial 24h of continuous
@@ -195,7 +195,7 @@ void dfrobot_ens160_get_data(ens160_t* ens160)
   /**
    * Get CO2 equivalent concentration calculated according to the detected data of VOCs and hydrogen (eCO2 – Equivalent CO2)
    * Return value range: 400–65000, unit: ppm
-   * Five levels: Excellent(400 - 600), Good(600 - 800), Moderate(800 - 1000), 
+   * Five levels: Excellent(400 - 600), Good(600 - 800), Moderate(800 - 1000),
    *               Poor(1000 - 1500), Unhealthy(> 1500)
    */
   uint16_t eco2 = dfrobot_ens160_get_eco2(ens160);

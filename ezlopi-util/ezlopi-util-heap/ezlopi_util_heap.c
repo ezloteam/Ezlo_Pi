@@ -41,13 +41,14 @@ void ezlopi_util_heap_free(const char * who, void *ptr, const char * __file_name
         {
             if ((curr_node->ptr == ptr) && (0 == curr_node->freed))
             {
-                printf("\x1B[34m*** freed at %s:%u, size: %u, ptr: %u ***\x1B[0m\r\n", __file_name, line_number, curr_node->size, (uint32_t)curr_node->ptr);
+                // printf("\x1B[34m*** freed at %s:%u, size: %u, ptr: %u ***\x1B[0m\r\n", __file_name, line_number, curr_node->size, (uint32_t)curr_node->ptr);
                 free(curr_node->ptr);
 
                 curr_node->freed = true;
                 curr_node->time_ms = (xTaskGetTickCount() - curr_node->time_ms);
                 curr_node->freer.file_name = __file_name;
                 curr_node->freer.line_number = line_number;
+                curr_node->freer.who = who;
                 break;
             }
             curr_node = curr_node->next;
@@ -74,9 +75,10 @@ void* ezlopi_util_heap_malloc(const char * who, size_t size, const char * file_n
                 new_heap->allocator.file_name = file_name;
                 new_heap->allocator.line_number = line_no;
                 new_heap->time_ms = xTaskGetTickCount();
+                new_heap->allocator.who = who;
             }
 
-            printf("\x1B[34m### malloc at %s:%u, size: %u, ptr: %u ###\x1B[0m\r\n", file_name, line_no, size, (uint32_t)ret);
+            // printf("\x1B[34m### malloc at %s:%u, size: %u, ptr: %u ###\x1B[0m\r\n", file_name, line_no, size, (uint32_t)ret);
         }
     }
 
@@ -90,7 +92,6 @@ void* ezlopi_util_heap_calloc(const char * who, size_t count, size_t size, const
 
 void* ezlopi_util_heap_realloc(const char * who, void *ptr, size_t new_size, const char * file_name, uint32_t line_no)
 {
-    printf("REALLOC\r\n");
     ezlopi_util_heap_free(who, ptr, file_name, line_no);
     return ezlopi_util_heap_malloc(who, new_size, file_name, line_no);
 }
@@ -107,7 +108,7 @@ void ezlopi_util_heap_flush(void)
     }
 }
 
-void ezlopi_util_heap_trace(void)
+void ezlopi_util_heap_trace(bool print_freed)
 {
     s_heap_trace_t * curr_node = heap_head;
 
@@ -119,21 +120,34 @@ void ezlopi_util_heap_trace(void)
 
     while (curr_node)
     {
-        if (curr_node->freed)
+        if (curr_node->freed && print_freed)
         {
             printf("%d. --\r\n", count);
-            printf("%s(%d): ptr: %u, size %u, hold-time-ms: %u\r\n", curr_node->allocator.file_name, curr_node->allocator.line_number, (uint32_t)curr_node->ptr, curr_node->size, curr_node->time_ms);
-            printf("%s(%d): freed.\r\n", curr_node->freer.file_name, curr_node->freer.line_number);
+            printf("%s(%d):: ptr: %u, size %u, hold-time-ms: %u\r\n", curr_node->allocator.file_name, curr_node->allocator.line_number, (uint32_t)curr_node->ptr, curr_node->size, curr_node->time_ms);
+
+            if (curr_node->freer.file_name && curr_node->freer.who && curr_node->allocator.who)
+            {
+                printf("%s(%d):: freed, allocator: %s, freerer: %s\r\n", curr_node->freer.file_name, curr_node->freer.line_number, curr_node->allocator.who ? curr_node->allocator.who : "", curr_node->freer.who ? curr_node->freer.who : "");
+            }
+            else
+            {
+                printf("\x1B[31m %s[%d]:: Error -> allocator.file_name: %p, allocator.who: %p, freer.who: %p \x1B[0m\r\n\r\n", curr_node->freer.file_name, curr_node->freer.line_number,
+                    curr_node->freer.file_name, curr_node->allocator.who, curr_node->freer.who);
+                assert(0);
+            }
         }
         else
         {
             total_allocated_memory += curr_node->size;
-            // printf("\033[38:2:255:165:0m%d. --\x1B[0m\r\n", count);
-            printf("\033[38:2:255:165:0m%d -> %s(%d): ptr: %u, size %u, hold-time-ms: %u\x1B[0m\r\n", count, curr_node->allocator.file_name, curr_node->allocator.line_number, (uint32_t)curr_node->ptr, curr_node->size, (xTaskGetTickCount() - curr_node->time_ms));
+            printf("\033[38:2:255:165:0m%d. --\x1B[0m\r\n", count);
+            printf("\033[38:2:255:165:0m%d -> %s(%d):: allocator: %s\r\n", count, curr_node->allocator.file_name, curr_node->allocator.line_number, curr_node->allocator.who ? curr_node->allocator.who : "");
+            printf("\033[38:2:255:165:0m%d -> %s(%d):: ptr: %u, size %u, hold-time-ms: %u\x1B[0m\r\n", count, curr_node->allocator.file_name, curr_node->allocator.line_number, (uint32_t)curr_node->ptr, curr_node->size, (xTaskGetTickCount() - curr_node->time_ms));
         }
 
-        curr_node = curr_node->next;
         count++;
+        curr_node = curr_node->next;
+
+        vTaskDelay(1 / portTICK_PERIOD_MS);
     }
 
     printf("--------> total allocated ram: %u\r\n", total_allocated_memory);

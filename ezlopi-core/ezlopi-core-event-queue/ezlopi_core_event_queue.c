@@ -2,6 +2,8 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/queue.h"
 
+#include "EZLOPI_USER_CONFIG.h"
+
 static QueueHandle_t generic_queue = NULL;
 
 void ezlopi_event_queue_init(void)
@@ -35,9 +37,9 @@ int ezlopi_event_queue_send(s_ezlo_event_t *event_data, int from_isr)
             {
                 if (tmp_evt_data->arg)
                 {
-                    free(tmp_evt_data->arg);
+                    free(__FUNCTION__, tmp_evt_data->arg);
                 }
-                free(tmp_evt_data);
+                free(__FUNCTION__, tmp_evt_data);
             }
         }
 

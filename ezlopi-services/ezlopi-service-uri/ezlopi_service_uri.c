@@ -94,7 +94,7 @@ static esp_err_t ezlopi_capture_base_uri_handler(httpd_req_t* req)
         size_t file_size = ftell(f);
         TRACE_I("file size is %d", file_size);
         fseek(f, 0, SEEK_SET);
-        char* login_data = (char*)malloc(file_size);
+        char* login_data = (char*)malloc(__FUNCTION__, file_size);
         if (NULL != login_data)
         {
             memset(login_data, 0, file_size);
@@ -173,7 +173,7 @@ int ezlopi_get_wifi_cred(char* wifi_cred)
     }
     else
     {
-        free(wifi_cred);
+        free(__FUNCTION__, wifi_cred);
         ret = -1;
     }
     return ret;

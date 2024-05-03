@@ -243,7 +243,7 @@ static int __prepare(void* arg)
 
     if (prep_arg && prep_arg->cjson_device)
     {
-        s_gxhtc3_value_t* value_ptr = malloc(sizeof(s_gxhtc3_value_t));
+        s_gxhtc3_value_t* value_ptr = malloc(__FUNCTION__, sizeof(s_gxhtc3_value_t));
         if (value_ptr)
         {
             memset(value_ptr, 0, sizeof(s_gxhtc3_value_t));
@@ -288,14 +288,14 @@ static int __prepare(void* arg)
                 if ((NULL == item_temperature) &&
                     (NULL == child_device_hum))
                 {
-                    free(value_ptr);
+                    free(__FUNCTION__, value_ptr);
                     ezlopi_device_free_device(parent_device_temp);
                     ret = -1;
                 }
             }
             else
             {
-                free(value_ptr);
+                free(__FUNCTION__, value_ptr);
                 ret = -1;
             }
         }

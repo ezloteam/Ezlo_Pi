@@ -129,9 +129,9 @@ extern "C"
   /* Retrieve item number "index" from array "array". Returns NULL if unsuccessful. */
   cJSON *  cJSON_GetArrayItem(const cJSON *array, int index);
   /* Get item "string" from object. Case insensitive. */
-  cJSON *  cJSON_GetObjectItem(const cJSON *const object, const char *const string);
+  cJSON *  cJSON_GetObjectItem(const char * who, const cJSON *const object, const char *const string);
   cJSON *  cJSON_GetObjectItemCaseSensitive(const cJSON *const object, const char *const string);
-  cJSON_bool  cJSON_HasObjectItem(const cJSON *object, const char *string);
+  cJSON_bool  cJSON_HasObjectItem(const char * who, const cJSON *object, const char *string);
   /* For analysing failed parses. This returns a pointer to the parse error. You'll probably need to look a few chars back to make sense of it. Defined when cJSON_Parse() returns 0. 0 when cJSON_Parse() succeeds. */
   const char *  cJSON_GetErrorPtr(void);
 
@@ -180,7 +180,7 @@ extern "C"
 
   /* Append item to the specified array/object. */
   cJSON_bool  cJSON_AddItemToArray(cJSON *array, cJSON *item);
-  cJSON_bool  cJSON_AddItemToObject(cJSON *object, const char *string, cJSON *item);
+  cJSON_bool  cJSON_AddItemToObject(const char * who, cJSON *object, const char *string, cJSON *item);
   /* Use this when string is definitely const (i.e. a literal, or as good as), and will definitely survive the cJSON object.
    * WARNING: When this function was used, make sure to always check that (item->type & cJSON_StringIsConst) is zero before
    * writing to `item->string` */
@@ -199,7 +199,7 @@ extern "C"
   void  cJSON_DeleteItemFromObjectCaseSensitive(const char * who, cJSON *object, const char *string);
 
   /* Update array items. */
-  cJSON_bool  cJSON_InsertItemInArray(const char * who, cJSON *array, int which, cJSON *newitem); /* Shifts pre-existing items to the right. */
+  cJSON_bool  cJSON_InsertItemInArray(cJSON *array, int which, cJSON *newitem); /* Shifts pre-existing items to the right. */
   cJSON_bool  cJSON_ReplaceItemViaPointer(const char * who, cJSON *const parent, cJSON *const item, cJSON *replacement);
   cJSON_bool  cJSON_ReplaceItemInArray(const char * who, cJSON *array, int which, cJSON *newitem);
   cJSON_bool  cJSON_ReplaceItemInObject(const char * who, cJSON *object, const char *string, cJSON *newitem);

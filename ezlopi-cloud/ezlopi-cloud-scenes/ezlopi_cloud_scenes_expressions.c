@@ -15,12 +15,12 @@ void scenes_expressions_delete(cJSON* cj_request, cJSON* cj_response)
 {
     if (cj_request && cj_response)
     {
-        cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
+        cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
 
-        cJSON* cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
+        cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
         if (cj_params)
         {
-            cJSON* cj_expression_name = cJSON_GetObjectItem(cj_params, ezlopi_name_str);
+            cJSON* cj_expression_name = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_name_str);
             if (cj_expression_name && cj_expression_name->valuestring)
             {
                 ezlopi_scenes_expressions_delete_by_name(cj_expression_name->valuestring);
@@ -33,15 +33,15 @@ void scenes_expressions_list(cJSON* cj_request, cJSON* cj_response)
 {
     if (cj_request && cj_response)
     {
-        cJSON* cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
+        cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
         if (cj_params)
         {
             CJSON_TRACE("exp-params", cj_params);
 
-            cJSON* cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
+            cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
             if (cj_result)
             {
-                cJSON* cj_expressions_array = cJSON_AddArrayToObject(cj_result, ezlopi_expressions_str);
+                cJSON* cj_expressions_array = cJSON_AddArrayToObject(__FUNCTION__, cj_result, ezlopi_expressions_str);
                 if (cj_expressions_array)
                 {
                     ezlopi_scenes_expressions_list_cjson(cj_expressions_array, cj_params);
@@ -55,9 +55,9 @@ void scenes_expressions_set(cJSON* cj_request, cJSON* cj_response)
 {
     if (cj_request && cj_response)
     {
-        cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
+        cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
 
-        cJSON* cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
+        cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
         if (cj_params)
         {
             CJSON_TRACE("expressions params", cj_params);

@@ -25,7 +25,7 @@ static uint8_t get_available_channel();
 s_ezlopi_channel_speed_t *ezlopi_pwm_init(uint8_t pwm_gpio_num, uint8_t pwm_resln, uint32_t freq_hz, uint32_t duty_cycle)
 {
 
-    s_ezlopi_channel_speed_t *ezlopi_channel_speed = (s_ezlopi_channel_speed_t *)malloc(sizeof(s_ezlopi_channel_speed_t));
+    s_ezlopi_channel_speed_t *ezlopi_channel_speed = (s_ezlopi_channel_speed_t *)malloc(__FUNCTION__, sizeof(s_ezlopi_channel_speed_t));
     memset(ezlopi_channel_speed, 0, sizeof(s_ezlopi_channel_speed_t));
 
     uint8_t channel = get_available_channel();
