@@ -1,4 +1,6 @@
 
+#include "../../build/config/sdkconfig.h"
+
 #include <esp_mac.h>
 #include <esp_wifi_types.h>
 #include <esp_idf_version.h>
@@ -8,7 +10,6 @@
 
 #include "ezlopi_util_trace.h"
 #include "ezlopi_cloud_constants.h"
-#include "../../build/config/sdkconfig.h"
 
 #include "ezlopi_core_api.h"
 #include "ezlopi_core_http.h"
@@ -122,10 +123,10 @@ static void __fetch_wss_endpoint(void* pv)
                     if (cjson_uri)
                     {
                         TRACE_D("uri: %s", cjson_uri->valuestring ? cjson_uri->valuestring : "NULL");
-
+#if 1
                         ezlopi_core_ezlopi_broadcast_method_add(__send_str_data_to_nma_websocket, "nma-websocket", 4);
                         ezlopi_websocket_client_init(cjson_uri, __message_upcall, __connection_upcall);
-
+#endif 
                         task_complete = 1;
                     }
                 }
@@ -151,8 +152,7 @@ static void __fetch_wss_endpoint(void* pv)
         free(ca_certificate);
         free(ssl_shared_key);
         free(ssl_private_key);
-        vTaskDelay(2000 / portTICK_RATE_MS);
-        vTaskDelay(2000 / portTICK_RATE_MS);
+        vTaskDelay(500 / portTICK_RATE_MS);
     }
     ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SERVICE_WEB_PROV_FETCH_WSS_TASK);
     vTaskDelete(NULL);

@@ -8,6 +8,8 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 
+#include "esp_heap_trace.h"
+
 #include "ezlopi_util_trace.h"
 
 #include "EZLOPI_USER_CONFIG.h"
@@ -30,6 +32,10 @@
 #include "ezlopi_core_ble_config.h"
 #include "ezlopi_core_processes.h"
 #include "ezlopi_util_heap.h"
+
+#define NUM_RECORDS 200
+static heap_trace_record_t trace_record[NUM_RECORDS]; // This buffer must be in internal RAM
+
 
 static void blinky(void* pv);
 
@@ -82,6 +88,8 @@ void app_main(void)
     xTaskCreate(blinky, "blinky", EZLOPI_MAIN_BLINKY_TASK_DEPTH, NULL, 1, &ezlopi_main_blinky_task_handle);
     ezlopi_core_process_set_process_info(ENUM_EZLOPI_MAIN_BLINKY_TASK, &ezlopi_main_blinky_task_handle, EZLOPI_MAIN_BLINKY_TASK_DEPTH);
 
+    ESP_ERROR_CHECK(heap_trace_init_standalone(trace_record, NUM_RECORDS));
+
 }
 
 static void blinky(void* pv)
@@ -100,7 +108,9 @@ static void blinky(void* pv)
 
         trace_wb("----------------------------------------------");
         trace_wb("Free Heap Size: %.4f KB", esp_get_free_heap_size() / 1024.0);
-        trace_wb("Minimum Free Heap Size: %.4f KB", esp_get_minimum_free_heap_size() / 1024.0);
+        trace_wb("Heap Watermark: %.4f KB", esp_get_minimum_free_heap_size() / 1024.0);
+        // trace_wb("Minimum Free Heap Size: %.4f KB", heap_caps_get_free_size() / 1024.0);
+        trace_wb("----------------------------------------------");
 
 
 #ifdef CONFIG_EZPI_HEAP_ENABLE
@@ -122,7 +132,7 @@ static void blinky(void* pv)
         else
         {
             low_heap_start_time = xTaskGetTickCount();
-        }
+    }
 #endif // CONFIG_EZPI_HEAP_ENABLE
 
 #if 0
@@ -138,9 +148,8 @@ static void blinky(void* pv)
                     task_array[i].pxStackBase,
                     task_array[i].usStackHighWaterMark / 1024.0);
             }
-        }
+}
 #endif 
-        trace_wb("----------------------------------------------");
 #ifdef CONFIG_EZPI_HEAP_ENABLE
         ezlopi_util_heap_flush();
 #endif // CONFIG_EZPI_HEAP_ENABLE        

@@ -12,6 +12,7 @@
 #include "ezlopi_cloud_gateways.h"
 #include "ezlopi_cloud_settings.h"
 #include "ezlopi_cloud_constants.h"
+#include "ezlopi_cloud_methods_str.h"
 #include "ezlopi_cloud_coordinates.h"
 #include "ezlopi_cloud_registration.h"
 #include "ezlopi_cloud_offline_login.h"
