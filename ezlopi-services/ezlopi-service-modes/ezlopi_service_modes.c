@@ -16,7 +16,7 @@
 #include "ezlopi_service_modes.h"
 // #include "ezlopi_service_webprov.h"
 
-#if defined(CONFIG_EZLPI_SERV_ENABLE_MODES)
+#if defined(CONFIG_EZPI_SERV_ENABLE_MODES)
 
 static TaskHandle_t sg_process_handle = NULL;
 
@@ -107,4 +107,4 @@ static void __modes_service(void* pv)
     ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SERVICE_MODES_TASK);
     vTaskDelete(NULL);
 }
-#endif // CONFIG_EZLPI_SERV_ENABLE_MODES
+#endif // CONFIG_EZPI_SERV_ENABLE_MODES

@@ -168,7 +168,7 @@ extern "C"
                 \"id_room\": \"\",\
                 \"id_item\": 2,\
                 \"gpio_in\": 0,\
-                \"gpio_out\": 5,\
+                \"gpio_out\": 25,\
                 \"pullup_ip\": false,\
                 \"pullup_op\": false,\
                 \"is_ip\": false,\
@@ -183,7 +183,7 @@ extern "C"
                 \"id_room\": \"\",\
                 \"id_item\": 2,\
                 \"gpio_in\": 0,\
-                \"gpio_out\": 8,\
+                \"gpio_out\": 15,\
                 \"pullup_ip\": false,\
                 \"pullup_op\": false,\
                 \"is_ip\": false,\
@@ -200,7 +200,7 @@ extern "C"
                 \"gpio\": 18\
             }\
         ], \
-        \"dev_total\": 2}";
+        \"dev_total\": 3}";
 #endif
 
 

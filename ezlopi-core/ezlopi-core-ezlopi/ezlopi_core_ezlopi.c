@@ -61,7 +61,7 @@ void ezlopi_init(void)
     ezlopi_initialize_devices_v3();
     vTaskDelay(10);
 
-#if defined(CONFIG_EZLPI_SERV_ENABLE_MODES)
+#if defined(CONFIG_EZPI_SERV_ENABLE_MODES)
     ezlopi_core_modes_init();
 #endif
 
@@ -122,7 +122,9 @@ static void ezlopi_initialize_devices_v3(void)
 
     while (curr_device)
     {
+
         TRACE_S("Device_id_curr_device : [0x%x] ", curr_device->cloud_properties.device_id);
+        TRACE_E("Here");
         l_ezlopi_item_t* curr_item = curr_device->items;
         while (curr_item)
         {
