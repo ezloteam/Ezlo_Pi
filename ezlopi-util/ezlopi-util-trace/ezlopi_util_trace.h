@@ -44,7 +44,7 @@ extern "C"
 #define COLOR_BG_CYAN "46"
 #define COLOR_BG_WHITE "47"
 
-    typedef int (*ezlopi_log_broadcast_func)(int severity_level, const char* format, ...);
+    typedef int (*f_ezlopi_log_upcall_t)(int severity_level, const char* format, ...);
 
 #define trace_color(txt_color, X, reg...)                                                 \
     {                                                                                     \
@@ -52,17 +52,18 @@ extern "C"
     }
 
 
-#define trace_color_print(txt_color, severity, X, reg...)                                               \
-    {                                                                                                   \
-        ezlopi_log_broadcast_func broadcaster_func = ezlopi_util_get_log_broadcaster();                 \
-        if (NULL != broadcaster_func)                                                                   \
-        {                                                                                               \
-            int success = broadcaster_func(severity, "%s[%d]:" X "", __FILE__, __LINE__, ##reg);        \
-            if(success)                                                                                 \
-            {                                                                                           \
-                trace_color(txt_color, X, ##reg);                                                       \
-            }                                                                                           \
-        }                                                                                               \
+#define trace_color_print(txt_color, severity, X, reg...)                                                                               \
+    {                                                                                                                                   \
+        f_ezlopi_log_upcall_t log_upcall_func = ezlopi_util_get_cloud_log_upcall();                                                     \
+        if (NULL != log_upcall_func)                                                                                                    \
+        {                                                                                                                               \
+            log_upcall_func(severity, "%s[%d]:" X "", __FILE__, __LINE__, ##reg);                                                       \
+        }                                                                                                                               \
+        log_upcall_func = ezlopi_util_get_serial_log_upcall();                                                                          \
+        if (NULL != log_upcall_func)                                                                                                    \
+        {                                                                                                                               \
+            log_upcall_func(severity, "\x1B[%sm %s[%d]:" X "\x1B[0m\r\n", txt_color, __FILE__, __LINE__, ##reg);                        \
+        }                                                                                                                               \
     }
 
 #define trace(X, reg...)                                       \
@@ -118,8 +119,9 @@ extern "C"
 
 #define dump(buffer_name, buffer, offset, count) __dump(__FILE__, __LINE__, buffer_name, buffer, offset, count)
 
-    void ezlopi_util_set_log_broadcaster(ezlopi_log_broadcast_func broadcaster_func);
-    ezlopi_log_broadcast_func ezlopi_util_get_log_broadcaster();
+    void ezlopi_util_set_log_upcalls(f_ezlopi_log_upcall_t cloud_log_upcall, f_ezlopi_log_upcall_t serial_log_upcall);
+    f_ezlopi_log_upcall_t ezlopi_util_get_cloud_log_upcall();
+    f_ezlopi_log_upcall_t ezlopi_util_get_serial_log_upcall();
 
 #else // (1 == ENABLE_TRACE)
 

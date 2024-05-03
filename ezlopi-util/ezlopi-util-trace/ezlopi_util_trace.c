@@ -4,9 +4,10 @@
 #include <string.h>
 #include "esp_system.h"
 
-ezlopi_log_broadcast_func log_broadcaster_func = NULL;
+f_ezlopi_log_upcall_t cloud_log_upcall_func = NULL;
+f_ezlopi_log_upcall_t serial_log_upcall_func = NULL;
 
-static void put_idump(uint8_t *buff, uint32_t ofs, uint32_t cnt)
+static void put_idump(uint8_t* buff, uint32_t ofs, uint32_t cnt)
 {
     int n;
 
@@ -26,7 +27,7 @@ static void put_idump(uint8_t *buff, uint32_t ofs, uint32_t cnt)
         } while (++n < 16);
     }
 
-    char temp_buff[17] = {0};
+    char temp_buff[17] = { 0 };
 
     memcpy(temp_buff, buff, cnt);
     temp_buff[16] = 0;
@@ -46,9 +47,9 @@ static void put_idump(uint8_t *buff, uint32_t ofs, uint32_t cnt)
     }
 }
 
-void __dump(const char *file_name, uint32_t line, char *buffer_name, void *_buff, uint32_t ofs, uint32_t cnt)
+void __dump(const char* file_name, uint32_t line, char* buffer_name, void* _buff, uint32_t ofs, uint32_t cnt)
 {
-    unsigned char *buff = _buff;
+    unsigned char* buff = _buff;
     int lines = cnt >> 4;
     int l;
 
@@ -68,15 +69,24 @@ void __dump(const char *file_name, uint32_t line, char *buffer_name, void *_buff
     fflush(stdout);
 }
 
-void ezlopi_util_set_log_broadcaster(ezlopi_log_broadcast_func broadcaster_func)
+void ezlopi_util_set_log_upcalls(f_ezlopi_log_upcall_t cloud_log_upcall, f_ezlopi_log_upcall_t serial_log_upcall)
 {
-    if(broadcaster_func)
+    if (cloud_log_upcall)
     {
-        log_broadcaster_func = broadcaster_func;
+        cloud_log_upcall_func = cloud_log_upcall;
+    }
+    if (serial_log_upcall)
+    {
+        serial_log_upcall_func = serial_log_upcall;
     }
 }
 
-ezlopi_log_broadcast_func ezlopi_util_get_log_broadcaster()
+f_ezlopi_log_upcall_t ezlopi_util_get_cloud_log_upcall()
 {
-    return log_broadcaster_func;
+    return cloud_log_upcall_func;
+}
+
+f_ezlopi_log_upcall_t ezlopi_util_get_serial_log_upcall()
+{
+    return serial_log_upcall_func;
 }

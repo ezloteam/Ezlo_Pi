@@ -33,7 +33,7 @@ void ezlopi_init(void)
     // Init memories  
     ezlopi_nvs_init();
 
-    ezlopi_core_read_set_log_severity();
+    ezlopi_core_read_set_log_severities();
 
     EZPI_HAL_uart_init();
 
