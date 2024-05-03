@@ -24,6 +24,8 @@
 #include "ezlopi_core_reset.h"
 #include "ezlopi_util_trace.h"
 
+#include "ezlopi_util_trace.h"
+
 #include "ezlopi_core_api_methods.h"
 
 static const s_method_list_v2_t method_list_v2[] = {

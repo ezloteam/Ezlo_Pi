@@ -1,7 +1,7 @@
 //          ("name",           func,          updater_func)
 
-
 #if (defined(CONFIG_EZPI_WEBSOCKET_CLIENT) || defined(EZPI_LOCAL_WEBSOCKET_SERVER))
+
 
 CLOUD_METHOD("hub.items.list", items_list_v3, NULL)
 CLOUD_METHOD("hub.item.value.set", items_set_value_v3, NULL)
@@ -46,10 +46,10 @@ CLOUD_METHOD("hub.network.get", network_get, NULL)
 CLOUD_METHOD("hub.network.wifi.scan.start", network_wifi_scan_start, NULL)
 CLOUD_METHOD("hub.network.wifi.scan.stop", network_wifi_scan_stop, NULL)
 
-#if defined(CONFIG_EZPI_ENABLE_OTA)
+#ifdef CONFIG_EZPI_ENABLE_OTA
 CLOUD_METHOD("cloud.firmware.info.get", firmware_info_get, NULL)
 CLOUD_METHOD("hub.firmware.update.start", firmware_update_start, NULL)
-#endif
+#endif // CONFIG_EZPI_ENABLE_OTA
 
 CLOUD_METHOD("hub.device.settings.list", ezlopi_device_settings_list_v3, NULL)
 CLOUD_METHOD("hub.device.setting.value.set", ezlopi_device_settings_value_set_v3, NULL)
@@ -83,7 +83,7 @@ CLOUD_METHOD("hub.room.get", room_get, NULL)
 CLOUD_METHOD("hub.room.delete", room_delete, room_deleted)
 CLOUD_METHOD("hub.room.all.delete", room_all_delete, NULL)
 
-#if CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+#ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 CLOUD_METHOD("hub.scenes.scripts.list", scenes_scripts_list, NULL)
 CLOUD_METHOD("hub.scenes.scripts.add", scenes_scripts_add, NULL)
 CLOUD_METHOD("hub.scenes.scripts.get", scenes_scripts_get, NULL)
@@ -107,4 +107,5 @@ CLOUD_METHOD("hub.coordinates.get", hub_coordinates_get, NULL)
 CLOUD_METHOD("hub.offline.login.ui", EZPI_CLOUD_offline_login, NULL)
 
 CLOUD_METHOD("registered", registered, NULL)
+
 #endif // (defined(CONFIG_EZPI_WEBSOCKET_CLIENT) || defined(EZPI_LOCAL_WEBSOCKET_SERVER))

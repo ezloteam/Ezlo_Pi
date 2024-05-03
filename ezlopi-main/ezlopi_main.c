@@ -72,9 +72,9 @@ void app_main(void)
     ezlopi_service_web_provisioning_init();
 #endif
 
-#if defined(CONFIG_EZPI_ENABLE_OTA)
+#ifdef CONFIG_EZPI_ENABLE_OTA
     ezlopi_service_ota_init();
-#endif
+#endif // CONFIG_EZPI_ENABLE_OTA
 
 #if CONFIG_EZPI_SERV_ENABLE_MODES
     ezlopi_service_modes_init();
@@ -105,10 +105,11 @@ static void blinky(void* pv)
         UBaseType_t total_task_numbers = uxTaskGetNumberOfTasks();
         TaskStatus_t task_array[total_task_numbers];
 
-
         trace_wb("----------------------------------------------");
-        trace_wb("Free Heap Size: %.4f KB", esp_get_free_heap_size() / 1024.0);
-        trace_wb("Heap Watermark: %.4f KB", esp_get_minimum_free_heap_size() / 1024.0);
+        uint32_t free_heap = esp_get_free_heap_size();
+        uint32_t watermark_heap = esp_get_minimum_free_heap_size();
+        trace_wb("Free Heap Size: %d B     %.4f KB", free_heap, free_heap / 1024.0);
+        trace_wb("Heap Watermark: %d B     %.4f KB", watermark_heap, watermark_heap / 1024.0);
         // trace_wb("Minimum Free Heap Size: %.4f KB", heap_caps_get_free_size() / 1024.0);
         trace_wb("----------------------------------------------");
 
@@ -132,7 +133,7 @@ static void blinky(void* pv)
         else
         {
             low_heap_start_time = xTaskGetTickCount();
-    }
+        }
 #endif // CONFIG_EZPI_HEAP_ENABLE
 
 #if 0
@@ -148,8 +149,9 @@ static void blinky(void* pv)
                     task_array[i].pxStackBase,
                     task_array[i].usStackHighWaterMark / 1024.0);
             }
-}
+        }
 #endif 
+
 #ifdef CONFIG_EZPI_HEAP_ENABLE
         ezlopi_util_heap_flush();
 #endif // CONFIG_EZPI_HEAP_ENABLE        
