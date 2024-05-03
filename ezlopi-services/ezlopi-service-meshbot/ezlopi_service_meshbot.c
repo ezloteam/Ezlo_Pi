@@ -199,23 +199,6 @@ void ezlopi_scenes_meshbot_init(void)
         }
         else
         {
-            #warning "remove these traces";
-            TRACE_S("scene_en ->%s , scene_node->when:%s , (scene_node->then:%s | scene_node->else:%s)",
-                (scene_node->enabled) ? "true" : "false",
-                (NULL == scene_node->when_block) ? "empty" : scene_node->when_block->block_options.method.name,
-                (NULL == scene_node->then_block) ? "empty" : scene_node->then_block->block_options.method.name,
-                (NULL == scene_node->else_block) ? "empty" : scene_node->else_block->block_options.method.name);
-
-            if (NULL != scene_node->when_block->block_options.cj_function)
-            {
-                char* str = cJSON_Print(scene_node->when_block->block_options.cj_function);
-                if (str)
-                {
-                    TRACE_D("function_cjson : %s", str);
-                    free(str);
-                }
-            }
-
             scene_node->status = EZLOPI_SCENE_STATUS_STOPPED;
         }
         TRACE_W("scenes_meshbot init process, [%d]", start_thread);

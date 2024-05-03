@@ -505,11 +505,6 @@ static l_scenes_list_v2_t* __new_scene_populate(cJSON* cj_scene, uint32_t scene_
             new_scene->status = EZLOPI_SCENE_STATUS_STOPPED;
 
             CJSON_GET_VALUE_BOOL(cj_scene, ezlopi_enabled_str, new_scene->enabled);
-            #warning " remove if statement ; only for testing purpose ";
-            if (false == new_scene->enabled) {
-                new_scene->enabled = true;
-            }
-
             CJSON_GET_VALUE_DOUBLE(cj_scene, ezlopi_is_group_str, new_scene->is_group);
 
             {
