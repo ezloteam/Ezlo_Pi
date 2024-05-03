@@ -118,6 +118,7 @@ static void ezlopi_initialize_devices_v3(void)
 
     while (curr_device)
     {
+
         TRACE_S("Device_id_curr_device : [0x%x] ", curr_device->cloud_properties.device_id);
         l_ezlopi_item_t* curr_item = curr_device->items;
         while (curr_item)

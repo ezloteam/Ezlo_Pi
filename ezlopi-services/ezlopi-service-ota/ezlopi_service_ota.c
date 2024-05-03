@@ -1,3 +1,8 @@
+
+#include "../../build/config/sdkconfig.h"
+
+#ifdef CONFIG_EZPI_ENABLE_OTA
+
 #include <string.h>
 #include <bootloader_random.h>
 
@@ -21,7 +26,7 @@
 #include "ezlopi_core_processes.h"
 
 
-#if defined(CONFIG_EZPI_ENABLE_OTA)
+
 static volatile bool __ota_busy = false;
 
 static void ota_service_process(void* pv);
@@ -74,4 +79,5 @@ static void ota_service_process(void* pv)
         }
     }
 }
+
 #endif // CONFIG_EZPI_ENABLE_OTA

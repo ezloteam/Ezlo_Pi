@@ -1,3 +1,5 @@
+#if 0
+
 #include <string.h>
 
 #include "cjext.h"
@@ -97,4 +99,6 @@ static cJSON* ezlopi_cloud_data_list_settings(l_ezlopi_configured_devices_t* ezl
 
     return cjson_settings;
 }
+#endif
+
 #endif

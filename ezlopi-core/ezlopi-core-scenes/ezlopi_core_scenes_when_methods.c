@@ -1177,7 +1177,7 @@ int ezlopi_scene_when_is_firmware_update_state(l_scenes_list_v2_t* scene_node, v
     TRACE_W(" firmware_update ");
     // TRACE_W("Warning: when-method 'firmware_update_state' not implemented!");
     int ret = 0;
-#if defined(CONFIG_EZPI_ENABLE_OTA)
+#ifdef CONFIG_EZPI_ENABLE_OTA
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (scene_node && when_block)
     {

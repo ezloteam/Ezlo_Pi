@@ -36,10 +36,6 @@ typedef struct s_ws_data_buffer
     struct s_ws_data_buffer* next;
 } s_ws_data_buffer_t;
 
-// static char* ca_cert = NULL;
-// static char* ssl_shared = NULL;
-// static char* ssl_priv = NULL;
-
 static void websocket_event_handler(void* handler_args, esp_event_base_t base, int32_t event_id, void* event_data);
 
 int ezlopi_websocket_client_send(char* data, uint32_t len)
