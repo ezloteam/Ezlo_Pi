@@ -111,6 +111,9 @@ extern "C"
     bool EZPI_CORE_nvs_write_flow_control(uint32_t flow_control);
     uint8_t EZPI_CORE_nvs_read_flow_control(uint32_t* flow_control);
 
+    bool EZPI_CORE_nvs_write_log_severity(uint32_t severity);
+    uint8_t EZPI_CORE_nvs_read_log_severity(uint32_t* severity);
+
 #ifdef __cplusplus
 }
 #endif

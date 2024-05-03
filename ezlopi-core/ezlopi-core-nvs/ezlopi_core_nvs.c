@@ -32,6 +32,7 @@ static const char* ezlopi_serial_start_bits = "ezpi_strt_bt";
 static const char* ezlopi_serial_stop_bits = "ezpi_stp_bt";
 static const char* ezlopi_serial_frame_size = "ezpi_frm_sz";
 static const char* ezlopi_serial_flow_control = "ezpi_fl_ctrl";
+static const char* ezlopi_log_severity = "log_svrt";
 
 int ezlopi_nvs_init(void)
 {
@@ -836,3 +837,19 @@ uint8_t EZPI_CORE_nvs_read_flow_control(uint32_t* flow_control)
     return ret;
 }
 
+
+bool EZPI_CORE_nvs_write_log_severity(uint32_t severity)
+{
+    return ezlopi_nvs_write_uint32(severity, ezlopi_log_severity) == 1 ? true : false;
+}
+
+uint8_t EZPI_CORE_nvs_read_log_severity(uint32_t* severity)
+{
+    uint8_t ret = 0;
+    uint8_t err = ezlopi_nvs_read_uint32(severity, ezlopi_log_severity);
+    if(0 == err)
+    {
+        ret = 1;
+    }
+    return ret;
+}

@@ -18,6 +18,7 @@
 #include "ezlopi_core_devices_list.h"
 #include "ezlopi_core_scenes_scripts.h"
 #include "ezlopi_core_scenes_expressions.h"
+#include "ezlopi_core_log.h"
 
 #ifdef CONFIG_EZPI_CORE_ETHERNET_EN
 #include "ezlopi_core_ethernet.h"
@@ -31,6 +32,9 @@ void ezlopi_init(void)
 {
     // Init memories  
     ezlopi_nvs_init();
+
+    ezlopi_core_read_set_log_severity();
+
     EZPI_HAL_uart_init();
 
 #if defined(CONFIG_EZPI_WEBSOCKET_CLIENT) || defined(CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER)

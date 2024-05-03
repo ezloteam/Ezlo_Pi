@@ -4,6 +4,8 @@
 #include <string.h>
 #include "esp_system.h"
 
+ezlopi_log_broadcast_func log_broadcaster_func = NULL;
+
 static void put_idump(uint8_t *buff, uint32_t ofs, uint32_t cnt)
 {
     int n;
@@ -64,4 +66,17 @@ void __dump(const char *file_name, uint32_t line, char *buffer_name, void *_buff
 
     ets_printf("\n\n");
     fflush(stdout);
+}
+
+void ezlopi_util_set_log_broadcaster(ezlopi_log_broadcast_func broadcaster_func)
+{
+    if(broadcaster_func)
+    {
+        log_broadcaster_func = broadcaster_func;
+    }
+}
+
+ezlopi_log_broadcast_func ezlopi_util_get_log_broadcaster()
+{
+    return log_broadcaster_func;
 }
