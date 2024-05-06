@@ -41,7 +41,6 @@ void ezlopi_init(void)
     ESP_ERROR_CHECK(esp_event_loop_create_default());
 
     ezlopi_factory_info_v3_init();
-
     print_factory_info_v3();
 
     ezlopi_event_group_create();

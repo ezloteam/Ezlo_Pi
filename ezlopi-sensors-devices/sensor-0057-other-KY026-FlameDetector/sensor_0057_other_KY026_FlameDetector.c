@@ -99,7 +99,7 @@ static int __0057_prepare(void* arg)
             }
 
             //---------------------------- ADC - DEVICE 2 -------------------------------------------
-            flame_t* flame_struct = (flame_t*)malloc(__FUNCTION__, sizeof(flame_t));
+            flame_t* flame_struct = (flame_t*)ezlopi_malloc(__FUNCTION__, sizeof(flame_t));
             if (NULL != flame_struct)
             {
                 memset(flame_struct, 0, sizeof(flame_t));
@@ -120,13 +120,13 @@ static int __0057_prepare(void* arg)
                     {
                         ret = -1;
                         ezlopi_device_free_device(flame_device_child_adc);
-                        free(__FUNCTION__, flame_struct);
+                        ezlopi_free(__FUNCTION__, flame_struct);
                     }
                 }
                 else
                 {
                     ret = -1;
-                    free(__FUNCTION__, flame_struct);
+                    ezlopi_free(__FUNCTION__, flame_struct);
                 }
             }
             else

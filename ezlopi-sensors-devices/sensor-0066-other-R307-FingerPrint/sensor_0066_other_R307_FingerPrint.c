@@ -217,7 +217,7 @@ static int __0066_prepare(void* arg)
     {
         cJSON* cj_device = (dev_prep_arg->cjson_device);
         /* device-1 */
-        server_packet_t* user_data = (server_packet_t*)malloc(__FUNCTION__, sizeof(server_packet_t));
+        server_packet_t* user_data = (server_packet_t*)ezlopi_malloc(__FUNCTION__, sizeof(server_packet_t));
         if (user_data)
         {
             l_ezlopi_device_t* parent_fingerprint_enroll_device = ezlopi_device_add_device(cj_device, "enroll");
@@ -285,13 +285,13 @@ static int __0066_prepare(void* arg)
                 {
                     ret = -1;
                     ezlopi_device_free_device(parent_fingerprint_enroll_device);
-                    free(__FUNCTION__, user_data);
+                    ezlopi_free(__FUNCTION__, user_data);
                 }
             }
             else
             {
                 ret = -1;
-                free(__FUNCTION__, user_data);
+                ezlopi_free(__FUNCTION__, user_data);
             }
         }
         else
@@ -518,7 +518,7 @@ static int __0066_set_value(l_ezlopi_item_t* item, void* arg)
 
 static void __uart_0066_fingerprint_upcall(uint8_t* buffer, uint32_t output_len, s_ezlopi_uart_object_handle_t uart_object_handle)
 {
-    char* temp_buf = (char*)malloc(__FUNCTION__, 256);
+    char* temp_buf = (char*)ezlopi_malloc(__FUNCTION__, 256);
     if (NULL != temp_buf)
     {
         memset(temp_buf, 0, 256);
@@ -613,7 +613,7 @@ static void __uart_0066_fingerprint_upcall(uint8_t* buffer, uint32_t output_len,
                 }
             }
         }
-        free(__FUNCTION__, temp_buf);
+        ezlopi_free(__FUNCTION__, temp_buf);
     }
 }
 

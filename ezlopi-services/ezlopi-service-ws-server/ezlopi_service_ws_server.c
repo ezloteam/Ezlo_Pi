@@ -151,7 +151,8 @@ static int __ws_server_broadcast(char* data)
 
 static void __message_upcall(httpd_req_t* req, const char* payload, uint32_t payload_len)
 {
-    cJSON* cj_response = ezlopi_core_api_consume(payload, payload_len);
+    static const char * __who = "ws-server-message-upcall";
+    cJSON* cj_response = ezlopi_core_api_consume(__who, payload, payload_len);
     if (cj_response)
     {
         cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_msg_id_str, message_counter);
@@ -179,14 +180,14 @@ static void __ws_async_send(void* arg)
             httpd_ws_send_frame_async(resp_arg->hd, resp_arg->fd, &ws_pkt);
         }
 
-        free(__FUNCTION__, resp_arg);
+        ezlopi_free(__FUNCTION__, resp_arg);
     }
 }
 
 static esp_err_t __trigger_async_send(httpd_req_t* req)
 {
     esp_err_t ret = ESP_OK;
-    s_async_resp_arg_t* resp_arg = malloc(__FUNCTION__, sizeof(s_async_resp_arg_t));
+    s_async_resp_arg_t* resp_arg = ezlopi_malloc(__FUNCTION__, sizeof(s_async_resp_arg_t));
 
     if (resp_arg)
     {
@@ -234,7 +235,7 @@ static esp_err_t __msg_handler(httpd_req_t* req)
                 }
                 else if (0 < ws_pkt.len)
                 {
-                    buf = malloc(__FUNCTION__, ws_pkt.len + 1);
+                    buf = ezlopi_malloc(__FUNCTION__, ws_pkt.len + 1);
 
                     if (NULL != buf)
                     {
@@ -269,7 +270,7 @@ static esp_err_t __msg_handler(httpd_req_t* req)
                             TRACE_E("httpd_ws_recv_frame failed with %d", ret);
                         }
 
-                        free(__FUNCTION__, buf);
+                        ezlopi_free(__FUNCTION__, buf);
                     }
                     else
                     {

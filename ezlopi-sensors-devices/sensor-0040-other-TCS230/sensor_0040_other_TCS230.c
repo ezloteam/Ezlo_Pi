@@ -138,7 +138,7 @@ static int __0040_prepare(void* arg)
     if (device_prep_arg && (NULL != device_prep_arg->cjson_device))
     {
         cJSON* cj_device = device_prep_arg->cjson_device;
-        s_TCS230_data_t* user_data = (s_TCS230_data_t*)malloc(__FUNCTION__, sizeof(s_TCS230_data_t));
+        s_TCS230_data_t* user_data = (s_TCS230_data_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_TCS230_data_t));
         if (user_data)
         {
             l_ezlopi_device_t* tcs230_device = ezlopi_device_add_device(cj_device, NULL);
@@ -156,13 +156,13 @@ static int __0040_prepare(void* arg)
                 {
                     ret = -1;
                     ezlopi_device_free_device(tcs230_device);
-                    free(__FUNCTION__, user_data);
+                    ezlopi_free(__FUNCTION__, user_data);
                 }
             }
             else
             {
                 ret = -1;
-                free(__FUNCTION__, user_data);
+                ezlopi_free(__FUNCTION__, user_data);
             }
         }
         else

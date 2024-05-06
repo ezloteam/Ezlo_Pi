@@ -102,7 +102,7 @@ static void __dynamic_config_write_func(esp_gatt_value_t* value, esp_ble_gatts_c
                                 // vTaskDelay(1000 / portTICK_PERIOD_MS);
                                 // EZPI_CORE_reset_reboot();
                             }
-                            free(__FUNCTION__, decoded_data);
+                            ezlopi_free(__FUNCTION__, decoded_data);
                         }
 
                         ezlopi_ble_buffer_free_buffer(g_dynamic_config_linked_buffer);
@@ -190,7 +190,7 @@ static void __dynamic_config_read_func(esp_gatt_value_t* value, esp_ble_gatts_cb
                             if (copy_size < 400) // Done reading
                             {
                                 status = 1; // non negative for done reading
-                                free(__FUNCTION__, g_dynamic_config_base64);
+                                ezlopi_free(__FUNCTION__, g_dynamic_config_base64);
                                 g_dynamic_config_base64 = NULL;
                             }
                         }
@@ -244,7 +244,7 @@ static void __dynamic_config_read_func(esp_gatt_value_t* value, esp_ble_gatts_cb
 
             if (g_dynamic_config_base64)
             {
-                free(__FUNCTION__, g_dynamic_config_base64);
+                ezlopi_free(__FUNCTION__, g_dynamic_config_base64);
                 g_dynamic_config_base64 = NULL;
             }
         }
@@ -258,7 +258,7 @@ static void __dynamic_config_read_func(esp_gatt_value_t* value, esp_ble_gatts_cb
 static char* __base64_decode_dynamic_config(uint32_t total_size)
 {
     char* decoded_config_json = NULL;
-    char* base64_buffer = malloc(__FUNCTION__, total_size + 1);
+    char* base64_buffer = ezlopi_malloc(__FUNCTION__, total_size + 1);
 
     if (base64_buffer)
     {
@@ -296,7 +296,7 @@ static char* __base64_decode_dynamic_config(uint32_t total_size)
 
         TRACE_D("base64_buffer: %s", base64_buffer);
 
-        decoded_config_json = malloc(__FUNCTION__, total_size);
+        decoded_config_json = ezlopi_malloc(__FUNCTION__, total_size);
         if (decoded_config_json)
         {
             size_t o_len = 0;
@@ -309,7 +309,7 @@ static char* __base64_decode_dynamic_config(uint32_t total_size)
             TRACE_E("mALLOC FAILED");
         }
 
-        free(__FUNCTION__, base64_buffer);
+        ezlopi_free(__FUNCTION__, base64_buffer);
     }
 
     return decoded_config_json;
@@ -318,7 +318,7 @@ static char* __base64_decode_dynamic_config(uint32_t total_size)
 static char* __dynamic_config_base64(void)
 {
     const uint32_t base64_data_len = 4096;
-    char* base64_data = malloc(__FUNCTION__, base64_data_len);
+    char* base64_data = ezlopi_malloc(__FUNCTION__, base64_data_len);
     if (base64_data)
     {
         uint32_t out_put_len = 0;
@@ -340,7 +340,7 @@ static char* __dynamic_config_base64(void)
 
         if (0 == out_put_len)
         {
-            free(__FUNCTION__, base64_data);
+            ezlopi_free(__FUNCTION__, base64_data);
             base64_data = NULL;
         }
     }

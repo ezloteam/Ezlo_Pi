@@ -91,8 +91,6 @@ static void registration_process(void* pv)
         cJSON_Delete(__FUNCTION__, cj_register);
     }
 
-
-
     __registration_task_handle = NULL;
     ezpi_core_process_set_is_deleted(ENUM_EZLOPI_CLOUD_REGISTRATION_PROCESS_STACK);
     vTaskDelete(NULL);

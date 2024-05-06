@@ -164,7 +164,7 @@ static int __prepare(void* arg)
             l_ezlopi_item_t* item_temperature = ezlopi_device_add_item_to_device(device, sensor_0032_ADC_soilMoisture);
             if (item_temperature)
             {
-                double* soil_moisture_data = (double*)malloc(__FUNCTION__, sizeof(double));
+                double* soil_moisture_data = (double*)ezlopi_malloc(__FUNCTION__, sizeof(double));
                 if (soil_moisture_data)
                 {
                     memset(soil_moisture_data, 0, sizeof(double));

@@ -95,7 +95,7 @@ static int __0042_prepare(void* arg)
     s_ezlopi_prep_arg_t* device_prep_arg = (s_ezlopi_prep_arg_t*)arg;
     if (device_prep_arg && (NULL != device_prep_arg->cjson_device))
     {
-        s_voltmeter_t* user_data = (s_voltmeter_t*)malloc(__FUNCTION__, sizeof(s_voltmeter_t));
+        s_voltmeter_t* user_data = (s_voltmeter_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_voltmeter_t));
         if (NULL != user_data)
         {
             memset(user_data, 0, sizeof(s_voltmeter_t));
@@ -114,13 +114,13 @@ static int __0042_prepare(void* arg)
                 {
                     ret = -1;
                     ezlopi_device_free_device(voltmeter_device);
-                    free(__FUNCTION__, user_data);
+                    ezlopi_free(__FUNCTION__, user_data);
                 }
             }
             else
             {
                 ret = -1;
-                free(__FUNCTION__, user_data);
+                ezlopi_free(__FUNCTION__, user_data);
             }
         }
         else

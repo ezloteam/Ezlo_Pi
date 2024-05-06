@@ -37,9 +37,9 @@ int ezlopi_event_queue_send(s_ezlo_event_t *event_data, int from_isr)
             {
                 if (tmp_evt_data->arg)
                 {
-                    free(__FUNCTION__, tmp_evt_data->arg);
+                    ezlopi_free(__FUNCTION__, tmp_evt_data->arg);
                 }
-                free(__FUNCTION__, tmp_evt_data);
+                ezlopi_free(__FUNCTION__, tmp_evt_data);
             }
         }
 

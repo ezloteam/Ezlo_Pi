@@ -55,9 +55,8 @@ void ezlopi_device_settings_value_set_v3(cJSON* cj_request, cJSON* cj_response)
     cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
     if (cj_params)
     {
-        char* setting_id_str = 0;
-        CJSON_GET_VALUE_STRING(cj_params, ezlopi__id_str, setting_id_str);
-        uint32_t setting_id = strtoul(setting_id_str, NULL, 16);
+        uint32_t setting_id = 0;
+        CJSON_GET_ID(setting_id, cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi__id_str));
 
         l_ezlopi_device_t* curr_device = ezlopi_device_get_head();
         uint32_t found_setting = 0;
@@ -96,9 +95,8 @@ void ezlopi_device_settings_reset_v3(cJSON* cj_request, cJSON* cj_response)
         {
             if (cJSON_HasObjectItem(__FUNCTION__, cj_params, ezlopi_deviceId_str))
             {
-                char* device_id_str = 0;
-                CJSON_GET_VALUE_STRING(cj_params, ezlopi_deviceId_str, device_id_str);
-                int device_id = strtol(device_id_str, NULL, 16);
+                uint32_t device_id = 0;
+                CJSON_GET_ID(device_id, cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_deviceId_str));
                 TRACE_E("device_id: %X", device_id);
                 if (device_id == curr_device->cloud_properties.device_id)
                 {
@@ -112,10 +110,9 @@ void ezlopi_device_settings_reset_v3(cJSON* cj_request, cJSON* cj_response)
             }
             else if (cJSON_HasObjectItem(__FUNCTION__, cj_params, ezlopi__id_str))
             {
+                uint32_t setting_id = 0;
+                CJSON_GET_ID(setting_id, cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi__id_str));
 
-                char* setting_id_str = 0;
-                CJSON_GET_VALUE_STRING(cj_params, ezlopi__id_str, setting_id_str);
-                uint32_t setting_id = strtol(setting_id_str, NULL, 16);
                 TRACE_E("setting_id: %X", setting_id);
                 l_ezlopi_device_settings_v3_t* curr_setting = curr_device->settings;
                 while (curr_setting)

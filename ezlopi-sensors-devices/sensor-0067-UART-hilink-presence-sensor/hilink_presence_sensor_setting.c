@@ -86,7 +86,7 @@ static int __setting_initialize_hilink_presence_sensor_predefined_settings(l_ezl
     if (hilink_presence_sensor_predefined_setting)
     {
         hilink_presence_sensor_predefined_setting->cloud_properties.setting_id = hilink_presence_sensor_setting_ids[0];
-        s_hilink_predefined_setting_value_t* hilink_presence_sensor_setting_value = (s_hilink_predefined_setting_value_t*)malloc(__FUNCTION__, sizeof(s_hilink_predefined_setting_value_t));
+        s_hilink_predefined_setting_value_t* hilink_presence_sensor_setting_value = (s_hilink_predefined_setting_value_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_hilink_predefined_setting_value_t));
         if (hilink_presence_sensor_setting_value)
         {
             memset(hilink_presence_sensor_setting_value, 0, sizeof(s_hilink_predefined_setting_value_t));
@@ -110,7 +110,7 @@ static int __setting_initialize_hilink_presence_sensor_predefined_settings(l_ezl
         }
         else
         {
-            free(__FUNCTION__, hilink_presence_sensor_predefined_setting);
+            ezlopi_free(__FUNCTION__, hilink_presence_sensor_predefined_setting);
             ret = 1;
         }
     }
@@ -127,7 +127,7 @@ static int __setting_initialize_hilink_presence_sensor_userdefined_settings(l_ez
     if (hilink_presence_sensor_user_defined_setting)
     {
         hilink_presence_sensor_user_defined_setting->cloud_properties.setting_id = hilink_presence_sensor_setting_ids[1];
-        s_hilink_userdefined_setting_value_t* hilink_presence_sensor_user_defined_setting_val = (s_hilink_userdefined_setting_value_t*)malloc(__FUNCTION__, sizeof(s_hilink_userdefined_setting_value_t));
+        s_hilink_userdefined_setting_value_t* hilink_presence_sensor_user_defined_setting_val = (s_hilink_userdefined_setting_value_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_hilink_userdefined_setting_value_t));
         if (hilink_presence_sensor_user_defined_setting_val)
         {
             memset(hilink_presence_sensor_user_defined_setting_val, 0, sizeof(s_hilink_userdefined_setting_value_t));
@@ -136,7 +136,7 @@ static int __setting_initialize_hilink_presence_sensor_userdefined_settings(l_ez
             {
                 TRACE_I("Setting already exist.");
                 cJSON* cj_value = cJSON_Parse(__FUNCTION__, read_value);
-                free(__FUNCTION__, read_value);
+                ezlopi_free(__FUNCTION__, read_value);
 
                 if (cj_value)
                 {
@@ -166,13 +166,13 @@ static int __setting_initialize_hilink_presence_sensor_userdefined_settings(l_ez
         }
         else
         {
-            free(__FUNCTION__, hilink_presence_sensor_user_defined_setting);
+            ezlopi_free(__FUNCTION__, hilink_presence_sensor_user_defined_setting);
             ret = 1;
         }
     }
     else
     {
-        free(__FUNCTION__, hilink_presence_sensor_user_defined_setting);
+        ezlopi_free(__FUNCTION__, hilink_presence_sensor_user_defined_setting);
         ret = 1;
     }
 
@@ -189,7 +189,7 @@ static int __setting_initialize_hilink_presence_sensor_radar_distance_sensitivit
         if (hilink_presence_sensor_radar_distance_sensitivity_setting)
         {
             hilink_presence_sensor_radar_distance_sensitivity_setting->cloud_properties.setting_id = hilink_presence_sensor_setting_ids[2];
-            s_hilink_radar_distance_sensitivity_value_t* distance_sensitivity_value = (s_hilink_radar_distance_sensitivity_value_t*)malloc(__FUNCTION__, sizeof(s_hilink_radar_distance_sensitivity_value_t));
+            s_hilink_radar_distance_sensitivity_value_t* distance_sensitivity_value = (s_hilink_radar_distance_sensitivity_value_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_hilink_radar_distance_sensitivity_value_t));
             if (distance_sensitivity_value)
             {
                 memset(distance_sensitivity_value, 0, sizeof(s_hilink_radar_distance_sensitivity_value_t));
@@ -214,13 +214,13 @@ static int __setting_initialize_hilink_presence_sensor_radar_distance_sensitivit
             }
             else
             {
-                free(__FUNCTION__, distance_sensitivity_value);
+                ezlopi_free(__FUNCTION__, distance_sensitivity_value);
                 ret = 0;
             }
         }
         else
         {
-            free(__FUNCTION__, hilink_presence_sensor_radar_distance_sensitivity_setting);
+            ezlopi_free(__FUNCTION__, hilink_presence_sensor_radar_distance_sensitivity_setting);
             ret = 1;
         }
     }
@@ -617,24 +617,15 @@ static int __setting_set_pre_defined_setting(void* arg, l_ezlopi_device_settings
         s_hilink_predefined_setting_value_t* setting_value = (s_hilink_predefined_setting_value_t*)setting->user_arg;
         if (setting_value)
         {
-            char* pre_defined_setting_value = NULL;
-            CJSON_GET_VALUE_STRING(cj_properties, ezlopi_value_str, pre_defined_setting_value);
-            if (pre_defined_setting_value)
+            CJSON_GET_VALUE_STRING_BY_COPY(cj_properties, ezlopi_value_str, setting_value->setting_value);
+            if (!ezlopi_nvs_write_str(setting_value->setting_value, strlen(setting_value->setting_value), nvs_key_hilink_presence_sensor_predefined_setting))
             {
-                snprintf(setting_value->setting_value, 50, "%s", pre_defined_setting_value);
-                if (!ezlopi_nvs_write_str(setting_value->setting_value, strlen(setting_value->setting_value), nvs_key_hilink_presence_sensor_predefined_setting))
-                {
-                    TRACE_E("Failed to write to NVS");
-                    ret = 1;
-                }
-                if (!__setting_set_find_predefined_setting_template(setting_value, &template))
-                {
-                    ret = __setting_set_change_setting_template(template, setting->cloud_properties.setting_id);
-                }
-                else
-                {
-                    ret = 1;
-                }
+                TRACE_E("Failed to write to NVS");
+                ret = 1;
+            }
+            if (!__setting_set_find_predefined_setting_template(setting_value, &template))
+            {
+                ret = __setting_set_change_setting_template(template, setting->cloud_properties.setting_id);
             }
             else
             {

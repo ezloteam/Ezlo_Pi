@@ -6,7 +6,8 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-#include "ezlopi_util_heap.h"
+#include "ezlopi_util_trace.h"
+#include "ezlopi_core_heap.h"
 
 typedef struct s_initiator {
     const char * who;
@@ -131,8 +132,8 @@ void ezlopi_util_heap_trace(bool print_freed)
             }
             else
             {
-                printf("\x1B[31m %s[%d]:: Error -> allocator.file_name: %p, allocator.who: %p, freer.who: %p \x1B[0m\r\n\r\n", curr_node->freer.file_name, curr_node->freer.line_number,
-                    curr_node->freer.file_name, curr_node->allocator.who, curr_node->freer.who);
+                printf("\x1B[31m %s[%d]:: Error -> allocator.file_name: %p, allocator.who: %p, freer.who: %p \x1B[0m\r\n\r\n",
+                    curr_node->freer.file_name, curr_node->freer.line_number, curr_node->freer.file_name, curr_node->allocator.who, curr_node->freer.who);
                 assert(0);
             }
         }

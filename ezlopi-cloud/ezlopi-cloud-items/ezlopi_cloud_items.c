@@ -140,9 +140,8 @@ void items_set_value_v3(cJSON* cj_request, cJSON* cj_response)
     cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
     if (cj_params)
     {
-        char* item_id_str = 0;
-        CJSON_GET_VALUE_STRING(cj_params, ezlopi__id_str, item_id_str);
-        int item_id = strtol(item_id_str, NULL, 16);
+        uint32_t item_id = 0;
+        CJSON_GET_ID(item_id, cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi__id_str));
         TRACE_S("item_id: %X", item_id);
 
         l_ezlopi_device_t* curr_device = ezlopi_device_get_head();
@@ -174,9 +173,8 @@ void items_update_v3(cJSON* cj_request, cJSON* cj_response)
     cJSON* cjson_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
     if (cjson_params)
     {
-        char* item_id_str = NULL;
-        CJSON_GET_VALUE_STRING(cjson_params, ezlopi__id_str, item_id_str);
-        int item_id = strtol(item_id_str, NULL, 16);
+        uint32_t item_id = 0;
+        CJSON_GET_ID(item_id, cJSON_GetObjectItem(__FUNCTION__, cjson_params, ezlopi__id_str));
 
         l_ezlopi_device_t* curr_device = ezlopi_device_get_head();
         while (curr_device)
@@ -192,9 +190,13 @@ void items_update_v3(cJSON* cj_request, cJSON* cj_response)
                     if (cj_result)
                     {
                         char tmp_string[64];
-                        cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi__id_str, item_id_str);
+
+                        snprintf(tmp_string, sizeof(tmp_string), "%08x", item_id);
+                        cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi__id_str, tmp_string);
+
                         snprintf(tmp_string, sizeof(tmp_string), "%08x", curr_device->cloud_properties.device_id);
                         cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_deviceId_str, tmp_string);
+
                         cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_deviceName_str, curr_device->cloud_properties.device_name);
                         cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_deviceCategory_str, curr_device->cloud_properties.category);
                         cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_deviceSubcategory_str, curr_device->cloud_properties.subcategory);

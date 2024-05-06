@@ -134,7 +134,7 @@ void EZPI_CORE_sntp_get_local_time(char* time_buf, uint32_t buf_len)
 
         if (location)
         {
-            free(__FUNCTION__, location);
+            ezlopi_free(__FUNCTION__, location);
         }
     }
 }

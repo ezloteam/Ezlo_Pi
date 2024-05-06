@@ -431,7 +431,7 @@ int ezlopi_scenes_operators_value_strings_operations(uint32_t item_id, l_fields_
         {
             if (item_value)
             {
-                free(__FUNCTION__, item_value);
+                ezlopi_free(__FUNCTION__, item_value);
             }
             cJSON_Delete(__FUNCTION__, cj_item_value);
         }
@@ -718,7 +718,7 @@ int ezlopi_scenes_operators_value_inarr_operations(uint32_t item_id, l_fields_v2
         {
             if (item_value)
             {
-                free(__FUNCTION__, item_value);
+                ezlopi_free(__FUNCTION__, item_value);
             }
             cJSON_Delete(__FUNCTION__, cj_item_value);
         }

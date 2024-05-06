@@ -151,7 +151,7 @@ static void ble_device_info_send_data(const cJSON* cj_response_data, esp_gatt_va
         }
         if ((param->read.offset + copy_size) >= total_data_len)
         {
-            free(__FUNCTION__, send_data);
+            ezlopi_free(__FUNCTION__, send_data);
             send_data = NULL;
         }
     }
@@ -189,7 +189,7 @@ static void device_mac_read_func(esp_gatt_value_t* value, esp_ble_gatts_cb_param
             ble_device_info_send_data(cj_device_mac, value, param);
 
             cJSON_Delete(__FUNCTION__, cj_device_mac);
-            free(__FUNCTION__, device_mac);
+            ezlopi_free(__FUNCTION__, device_mac);
         }
         else
         {
@@ -411,8 +411,6 @@ static void EZPI_SERVICE_BLE_serial_config_write(esp_gatt_value_t* value, esp_bl
             cJSON* root = cJSON_ParseWithLength(__FUNCTION__, (const char*)param->write.value, param->write.len);
             if (root)
             {
-                char* parity = NULL;
-                char* flow_control = NULL;
                 uint32_t baud = 0;
                 uint32_t parity_val = EZPI_SERV_UART_PARITY_DEFAULT;
                 uint32_t start_bits = EZPI_SERV_UART_START_BIT_DEFAULT;
@@ -427,14 +425,16 @@ static void EZPI_SERVICE_BLE_serial_config_write(esp_gatt_value_t* value, esp_bl
                 uint32_t frame_size_current = EZPI_SERV_UART_FRAME_SIZE_DEFAULT;
                 uint32_t flow_control_current = EZPI_SERV_UART_FLOW_CTRL_DEFAULT;
 
+                char str_parity[4];
+                char str_flowcontrol[16];
                 bool flag_new_config = false;
 
                 CJSON_GET_VALUE_DOUBLE(root, ezlopi_baud_str, baud);
-                CJSON_GET_VALUE_STRING(root, ezlopi_parity_str, parity);
+                CJSON_GET_VALUE_STRING_BY_COPY(root, ezlopi_parity_str, str_parity);
                 CJSON_GET_VALUE_DOUBLE(root, ezlopi_start_bits_str, start_bits);
                 CJSON_GET_VALUE_DOUBLE(root, ezlopi_stop_bits_str, stop_bits);
                 CJSON_GET_VALUE_DOUBLE(root, ezlopi_frame_size_str, frame_size);
-                CJSON_GET_VALUE_STRING(root, ezlopi_flow_control_str, flow_control);
+                CJSON_GET_VALUE_STRING_BY_COPY(root, ezlopi_flow_control_str, str_flowcontrol);
 
                 EZPI_CORE_nvs_read_baud(&baud_current);
                 EZPI_CORE_nvs_read_parity(&parity_val_current);
@@ -445,11 +445,11 @@ static void EZPI_SERVICE_BLE_serial_config_write(esp_gatt_value_t* value, esp_bl
 
                 if (
                     (baud_current != baud) ||
-                    (parity_val_current != (uint32_t)EZPI_CORE_info_name_to_parity(parity)) ||
+                    (parity_val_current != (uint32_t)EZPI_CORE_info_name_to_parity(str_parity)) ||
                     (start_bits_current != start_bits) ||
                     (stop_bits != stop_bits_current) ||
                     (frame_size != frame_size_current) ||
-                    (flow_control_current != (uint32_t)EZPI_CORE_info_get_flw_ctrl_from_name(flow_control))
+                    (flow_control_current != (uint32_t)EZPI_CORE_info_get_flw_ctrl_from_name(str_flowcontrol))
                     )
                 {
                     flag_new_config = true;
@@ -457,9 +457,9 @@ static void EZPI_SERVICE_BLE_serial_config_write(esp_gatt_value_t* value, esp_bl
 
                 if (flag_new_config)
                 {
-                    if (parity)
+                    if ('\0' != str_parity[0])
                     {
-                        parity_val = (uint32_t)EZPI_CORE_info_name_to_parity(parity);
+                        parity_val = (uint32_t)EZPI_CORE_info_name_to_parity(str_parity);
                     }
                     EZPI_CORE_nvs_write_parity(parity_val);
 
@@ -483,9 +483,9 @@ static void EZPI_SERVICE_BLE_serial_config_write(esp_gatt_value_t* value, esp_bl
                     EZPI_CORE_nvs_write_frame_size(frame_size);
 
 
-                    if (flow_control)
+                    if ('\0' != str_flowcontrol[0])
                     {
-                        flow_control_val = (uint32_t)EZPI_CORE_info_get_flw_ctrl_from_name(flow_control);
+                        flow_control_val = (uint32_t)EZPI_CORE_info_get_flw_ctrl_from_name(str_flowcontrol);
                         TRACE_W("New Flow control: %d", flow_control_val);
                     }
 
@@ -624,7 +624,7 @@ static void EZPI_SERVICE_BLE_net_info(esp_gatt_value_t* value, esp_ble_gatts_cb_
                 ble_device_info_send_data(cj_network, value, param);
 
                 cJSON_Delete(__FUNCTION__, cj_network);
-                free(__FUNCTION__, wifi_status);
+                ezlopi_free(__FUNCTION__, wifi_status);
             }
         }
         else
@@ -672,7 +672,7 @@ static void device_info_read_func(esp_gatt_value_t* value, esp_ble_gatts_cb_para
 
             if ((param->read.offset + copy_size) >= total_data_len)
             {
-                free(__FUNCTION__, json_str_device_info);
+                ezlopi_free(__FUNCTION__, json_str_device_info);
                 json_str_device_info = NULL;
             }
         }
@@ -684,7 +684,7 @@ static void device_info_read_func(esp_gatt_value_t* value, esp_ble_gatts_cb_para
     }
     else
     {
-        free(__FUNCTION__, json_str_device_info);
+        ezlopi_free(__FUNCTION__, json_str_device_info);
         json_str_device_info = NULL;
     }
 }
@@ -715,9 +715,9 @@ static char* device_info_jsonify(void)
         if (ssid)
         {
             cJSON_AddStringToObject(__FUNCTION__, root, ezlopi_wifi_ssid_str, (isprint(ssid[0])) ? ssid : ezlopi__str);
-            free(__FUNCTION__, ssid);
+            ezlopi_free(__FUNCTION__, ssid);
         }
-        
+
         cJSON_AddNumberToObject(__FUNCTION__, root, ezlopi_wifi_connection_status_str, ezlopi_wifi_got_ip());
         uint8_t flag_internet_status = (EZLOPI_PING_STATUS_LIVE == ezlopi_ping_get_internet_status()) ? 1 : 0;
         cJSON_AddNumberToObject(__FUNCTION__, root, ezlopi_internet_status_str, flag_internet_status);
@@ -748,7 +748,7 @@ void __add_factory_info_to_root(cJSON* root, char* key, char* value)
         {
             cJSON_AddStringToObject(__FUNCTION__, root, key, ezlopi_unknown_str);
         }
-        free(__FUNCTION__, value);
+        ezlopi_free(__FUNCTION__, value);
     }
 }
 

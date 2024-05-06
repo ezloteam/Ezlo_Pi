@@ -470,7 +470,7 @@ static void issunsate_update_sunstate_tm(int tm_mday, s_sunstate_data_t* user_da
         {
             TRACE_S("co-ordinate : %s", lat_long_vals);
             snprintf(tmp_url, 95, "%s", "https://api.sunrisesunset.io/json?lat=27.700769&lng=85.300140");
-            free(__FUNCTION__, lat_long_vals);
+            ezlopi_free(__FUNCTION__, lat_long_vals);
         }
         else
         {
@@ -609,7 +609,7 @@ uint8_t issunstate_get_suntime(l_scenes_list_v2_t* scene_node, l_fields_v2_t* cu
         // 1. check for valid data within 'user_arg'
         if (NULL == (scene_node->when_block->fields->user_arg))
         {
-            s_sunstate_data_t* data = (s_sunstate_data_t*)malloc(__FUNCTION__, sizeof(s_sunstate_data_t));
+            s_sunstate_data_t* data = (s_sunstate_data_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_sunstate_data_t));
             if (data)
             {
                 memset(data, 0, sizeof(s_sunstate_data_t));
@@ -640,7 +640,7 @@ uint8_t issunstate_get_suntime(l_scenes_list_v2_t* scene_node, l_fields_v2_t* cu
                 (ISSUNSTATE_UNDEFINED == user_data->tmoffs_type)) // if the curr_day or sunstate or offset is not set properly;
             {
                 TRACE_E(" API extraction unsuccesful... Reseting user_args");
-                free(__FUNCTION__, scene_node->when_block->fields->user_arg); // reset the day
+                ezlopi_free(__FUNCTION__, scene_node->when_block->fields->user_arg); // reset the day
                 return 0;
             }
             TRACE_W("update_day = [%d][%dth] , offset[%d] : intime=0,before=1,after=2,undefined=3 , SunState[%d] : sunrise=1,sunset=2", info->tm_mday, user_data->curr_tm_day, user_data->tmoffs_type, user_data->sunstate_mode);

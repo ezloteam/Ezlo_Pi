@@ -77,7 +77,7 @@ static inline cJSON* __setting_add_text_and_lang_tag(const char* const object_te
     }
     else
     {
-        free(__FUNCTION__, cj_object);
+        ezlopi_free(__FUNCTION__, cj_object);
         cj_object = NULL;
     }
 

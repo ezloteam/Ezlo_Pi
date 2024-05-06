@@ -239,7 +239,7 @@ void ezlopi_scenes_expressions_delete_exp_item(s_exp_items_t* exp_items)
     if (exp_items)
     {
         ezlopi_scenes_expressions_delete_exp_item(exp_items->next);
-        free(__FUNCTION__, exp_items);
+        ezlopi_free(__FUNCTION__, exp_items);
     }
 }
 
@@ -248,7 +248,7 @@ void ezlopi_scenes_expressions_delete_exp_device_item_names(s_exp_device_item_na
     if (exp_device_item_names)
     {
         ezlopi_scenes_expressions_delete_exp_device_item_names(exp_device_item_names->next);
-        free(__FUNCTION__, exp_device_item_names);
+        ezlopi_free(__FUNCTION__, exp_device_item_names);
     }
 }
 
@@ -284,7 +284,7 @@ int ezlopi_scenes_expressions_delete_node(s_ezlopi_expressions_t* exp_node)
 
         if (exp_node->code)
         {
-            free(__FUNCTION__, exp_node->code);
+            ezlopi_free(__FUNCTION__, exp_node->code);
         }
 
         switch (exp_node->exp_value.type)
@@ -293,7 +293,7 @@ int ezlopi_scenes_expressions_delete_node(s_ezlopi_expressions_t* exp_node)
         {
             if (exp_node->exp_value.u_value.str_value)
             {
-                free(__FUNCTION__, exp_node->exp_value.u_value.str_value);
+                ezlopi_free(__FUNCTION__, exp_node->exp_value.u_value.str_value);
                 exp_node->exp_value.u_value.str_value = NULL;
             }
             break;
@@ -315,7 +315,7 @@ int ezlopi_scenes_expressions_delete_node(s_ezlopi_expressions_t* exp_node)
 
         if (exp_node->meta_data)
         {
-            free(__FUNCTION__, exp_node->meta_data);
+            ezlopi_free(__FUNCTION__, exp_node->meta_data);
         }
 
         ezlopi_scenes_expressions_delete_exp_item(exp_node->items);
@@ -326,7 +326,7 @@ int ezlopi_scenes_expressions_delete_node(s_ezlopi_expressions_t* exp_node)
         if (exp_ids)
         {
             cJSON* cj_exp_ids = cJSON_Parse(__FUNCTION__, exp_ids);
-            free(__FUNCTION__, exp_ids);
+            ezlopi_free(__FUNCTION__, exp_ids);
 
             if (cj_exp_ids)
             {
@@ -355,7 +355,7 @@ int ezlopi_scenes_expressions_delete_node(s_ezlopi_expressions_t* exp_node)
                 {
                     TRACE_D("updated-expression-ids: %s", updated_ids_str);
                     ezlopi_nvs_write_scenes_expressions(updated_ids_str);
-                    free(__FUNCTION__, updated_ids_str);
+                    ezlopi_free(__FUNCTION__, updated_ids_str);
                     ret = 1;
                 }
             }
@@ -395,14 +395,14 @@ void ezlopi_scenes_expressions_init(void)
                                 cJSON_Delete(__FUNCTION__, cj_exp);
                             }
 
-                            free(__FUNCTION__, exp_str);
+                            ezlopi_free(__FUNCTION__, exp_str);
                         }
                     }
                 }
             }
         }
 
-        free(__FUNCTION__, exp_id_list_str);
+        ezlopi_free(__FUNCTION__, exp_id_list_str);
     }
 }
 
@@ -412,17 +412,12 @@ static s_exp_items_t* __expressions_items_create(cJSON* cj_item)
 
     if (cj_item)
     {
-        new_item_node = malloc(__FUNCTION__, sizeof(s_exp_items_t));
+        new_item_node = ezlopi_malloc(__FUNCTION__, sizeof(s_exp_items_t));
         if (new_item_node)
         {
             memset(new_item_node, 0, sizeof(s_exp_items_t));
             CJSON_GET_VALUE_STRING_BY_COPY(cj_item, ezlopi_name_str, new_item_node->name);
-            char* item_id_string = NULL;
-            CJSON_GET_VALUE_STRING(cj_item, ezlopi__id_str, item_id_string);
-            if (item_id_string)
-            {
-                new_item_node->_id = strtoul(item_id_string, NULL, 16);
-            }
+            CJSON_GET_ID(new_item_node->_id, cJSON_GetObjectItem(__FUNCTION__, cj_item, ezlopi__id_str));
         }
         else
         {
@@ -479,7 +474,7 @@ static s_exp_device_item_names_t* __expressions_device_item_names_create(cJSON* 
 
     if (cj_device_item_name)
     {
-        new_device_item_name = malloc(__FUNCTION__, sizeof(s_exp_device_item_names_t));
+        new_device_item_name = ezlopi_malloc(__FUNCTION__, sizeof(s_exp_device_item_names_t));
         if (new_device_item_name)
         {
             memset(new_device_item_name, 0, sizeof(s_exp_device_item_names_t));
@@ -549,7 +544,7 @@ static void __get_expressions_value(s_ezlopi_expressions_t* exp_node, cJSON* cj_
         {
             uint32_t value_len = strlen(cj_value->valuestring) + 1;
             exp_node->exp_value.type = EXPRESSION_VALUE_TYPE_STRING;
-            exp_node->exp_value.u_value.str_value = malloc(__FUNCTION__, value_len);
+            exp_node->exp_value.u_value.str_value = ezlopi_malloc(__FUNCTION__, value_len);
             if (exp_node->exp_value.u_value.str_value)
             {
                 snprintf(exp_node->exp_value.u_value.str_value, value_len, "%s", cj_value->valuestring);
@@ -596,7 +591,7 @@ static void __get_expressions_value(s_ezlopi_expressions_t* exp_node, cJSON* cj_
 
 static s_ezlopi_expressions_t* __expressions_create_node(uint32_t exp_id, cJSON* cj_expression)
 {
-    s_ezlopi_expressions_t* new_exp_node = malloc(__FUNCTION__, sizeof(s_ezlopi_expressions_t));
+    s_ezlopi_expressions_t* new_exp_node = ezlopi_malloc(__FUNCTION__, sizeof(s_ezlopi_expressions_t));
 
     if (new_exp_node)
     {
@@ -604,20 +599,14 @@ static s_ezlopi_expressions_t* __expressions_create_node(uint32_t exp_id, cJSON*
         memset(new_exp_node, 0, sizeof(s_ezlopi_expressions_t));
 
         CJSON_GET_VALUE_STRING_BY_COPY(cj_expression, ezlopi_name_str, new_exp_node->name);
-        CJSON_GET_VALUE_STRING(cj_expression, ezlopi_code_str, code_str);
 
-        if (code_str)
+        cJSON * cj_code = cJSON_GetObjectItem(__FUNCTION__, cj_expression, ezlopi_code_str);
+        if (cj_code && cj_code->valuestring && cj_code->str_value_len)
         {
-            uint32_t code_str_len = strlen(code_str) + 1;
-            new_exp_node->code = malloc(__FUNCTION__, code_str_len);
+            new_exp_node->code = ezlopi_malloc(__FUNCTION__, cj_code->str_value_len + 1);
             if (new_exp_node->code)
             {
-                memset(new_exp_node->code, 0, code_str_len);
-                strcpy(new_exp_node->code, code_str);
-            }
-            else
-            {
-                TRACE_E("Error: Failed to alloc code-string!");
+                snprintf(new_exp_node->code, cj_code->str_value_len + 1, "%.*s", cj_code->str_value_len, cj_code->valuestring);
             }
         }
 
@@ -676,7 +665,7 @@ static uint32_t __expression_store_to_nvs(uint32_t exp_id, cJSON* cj_expression)
 
                     if (free_exp_id_list_str)
                     {
-                        free(__FUNCTION__, exp_id_list_str);
+                        ezlopi_free(__FUNCTION__, exp_id_list_str);
                         exp_id_list_str = NULL;
                     }
 
@@ -697,7 +686,7 @@ static uint32_t __expression_store_to_nvs(uint32_t exp_id, cJSON* cj_expression)
                                 if (exp_id_list_str)
                                 {
                                     ezlopi_nvs_write_scenes_expressions(exp_id_list_str);
-                                    free(__FUNCTION__, exp_id_list_str);
+                                    ezlopi_free(__FUNCTION__, exp_id_list_str);
                                 }
                             }
                             else
@@ -714,7 +703,7 @@ static uint32_t __expression_store_to_nvs(uint32_t exp_id, cJSON* cj_expression)
                 }
             }
 
-            free(__FUNCTION__, exp_string);
+            ezlopi_free(__FUNCTION__, exp_string);
         }
     }
     else
@@ -752,7 +741,7 @@ static e_scene_value_type_v2_t* __parse_expression_type_filter(cJSON* cj_params)
     cJSON* cj_types_filter_array = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_filterTypes_str);
     if (cj_types_filter_array)
     {
-        type_filter_array = calloc(__FUNCTION__, sizeof(e_scene_value_type_v2_t), cJSON_GetArraySize(cj_types_filter_array) + 1);
+        type_filter_array = ezlopi_calloc(__FUNCTION__, sizeof(e_scene_value_type_v2_t), cJSON_GetArraySize(cj_types_filter_array) + 1);
         if (type_filter_array)
         {
             uint32_t idx = 0;

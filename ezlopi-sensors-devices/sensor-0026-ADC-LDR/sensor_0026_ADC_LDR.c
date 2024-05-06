@@ -70,15 +70,11 @@ int sensor_0026_ADC_LDR(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* 
 
 static void __setup_device_cloud_params(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    // char* device_name = NULL;
-    // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    // ASSIGN_DEVICE_NAME_V2(device, device_name);
-
-    device->cloud_properties.category = category_light_sensor;
-    device->cloud_properties.subcategory = subcategory_not_defined;
-    device->cloud_properties.device_type = dev_type_device;
     device->cloud_properties.info = NULL;
     device->cloud_properties.device_type_id = NULL;
+    device->cloud_properties.device_type = dev_type_device;
+    device->cloud_properties.category = category_light_sensor;
+    device->cloud_properties.subcategory = subcategory_not_defined;
 }
 
 static void __setup_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device)

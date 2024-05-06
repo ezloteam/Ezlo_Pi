@@ -82,7 +82,7 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
   int ret = 0;
 
   cJSON* cj_params = (cJSON*)arg;
-  char* valueFormatted;
+
   if (cj_params)
   {
     ens160_t* ens160_sensor = (ens160_t*)item->user_arg;
@@ -207,8 +207,8 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* 
 }
 static void __prepare_device_cloud_properties_ens160_parent_aqi(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-  char* device_name = NULL;
-  CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
+  char device_name[32];
+  CJSON_GET_VALUE_STRING_BY_COPY(cj_device, ezlopi_dev_name_str, device_name);
   char device_full_name[50];
   snprintf(device_full_name, 50, "%s_%s", device_name, "ENS160 AQI");
   ASSIGN_DEVICE_NAME_V2(device, device_full_name);
@@ -216,8 +216,8 @@ static void __prepare_device_cloud_properties_ens160_parent_aqi(l_ezlopi_device_
 
 static void __prepare_device_cloud_properties_ens160_child_voc(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-  char* device_name = NULL;
-  CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
+  char device_name[32];
+  CJSON_GET_VALUE_STRING_BY_COPY(cj_device, ezlopi_dev_name_str, device_name);
   char device_full_name[50];
   snprintf(device_full_name, 50, "%s_%s", device_name, "ENS160 VOC");
   ASSIGN_DEVICE_NAME_V2(device, device_full_name);
@@ -225,8 +225,8 @@ static void __prepare_device_cloud_properties_ens160_child_voc(l_ezlopi_device_t
 
 static void __prepare_device_cloud_properties_ens160_child_co2(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-  char* device_name = NULL;
-  CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
+  char device_name[32];
+  CJSON_GET_VALUE_STRING_BY_COPY(cj_device, ezlopi_dev_name_str, device_name);
   char device_full_name[50];
   snprintf(device_full_name, 50, "%s_%s", device_name, "ENS160 C02");
   ASSIGN_DEVICE_NAME_V2(device, device_full_name);
@@ -263,7 +263,7 @@ static int __prepare(void* arg, void* user_arg)
   s_ezlopi_prep_arg_t* prep_arg = (s_ezlopi_prep_arg_t*)arg;
   if (prep_arg)
   {
-    ens160_t* ens160_sensor = (ens160_t*)malloc(__FUNCTION__, sizeof(ens160_t));
+    ens160_t* ens160_sensor = (ens160_t*)ezlopi_malloc(__FUNCTION__, sizeof(ens160_t));
     if (ens160_sensor)
     {
       memset(ens160_sensor, 0, sizeof(ens160_t));
@@ -337,7 +337,7 @@ static int __prepare(void* arg, void* user_arg)
           (NULL == child_ens160_co2_device))
         {
           ezlopi_device_free_device(parent_ens160_aqi_device);
-          free(__FUNCTION__, ens160_sensor);
+          ezlopi_free(__FUNCTION__, ens160_sensor);
           ret = -1;
         }
         else
@@ -348,7 +348,7 @@ static int __prepare(void* arg, void* user_arg)
       else
       {
         ret = 1;
-        free(__FUNCTION__, ens160_sensor);
+        ezlopi_free(__FUNCTION__, ens160_sensor);
       }
     }
     else

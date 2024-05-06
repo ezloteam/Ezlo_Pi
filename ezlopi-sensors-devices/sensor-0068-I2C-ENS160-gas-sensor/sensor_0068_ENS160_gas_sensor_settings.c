@@ -45,7 +45,7 @@ static int __settings_sensor_0068_gas_sensor_setting_initialize_ambient_temperat
         if (ens160_gas_sensor_ambient_temperature_sensor_setting)
         {
             ens160_gas_sensor_ambient_temperature_sensor_setting->cloud_properties.setting_id = ens160_gas_sensor_settings_ids[0];
-            s_sensor_ens160_gas_sensor_setting_ambient_temperature_t* ambient_temperature = (s_sensor_ens160_gas_sensor_setting_ambient_temperature_t*)malloc(__FUNCTION__, sizeof(s_sensor_ens160_gas_sensor_setting_ambient_temperature_t));
+            s_sensor_ens160_gas_sensor_setting_ambient_temperature_t* ambient_temperature = (s_sensor_ens160_gas_sensor_setting_ambient_temperature_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_sensor_ens160_gas_sensor_setting_ambient_temperature_t));
             if (ambient_temperature)
             {
                 memset(ambient_temperature, 0, sizeof(s_sensor_ens160_gas_sensor_setting_ambient_temperature_t));
@@ -71,7 +71,7 @@ static int __settings_sensor_0068_gas_sensor_setting_initialize_ambient_temperat
             }
             else
             {
-                free(__FUNCTION__, ens160_gas_sensor_ambient_temperature_sensor_setting);
+                ezlopi_free(__FUNCTION__, ens160_gas_sensor_ambient_temperature_sensor_setting);
                 ret = 1;
             }
         }
@@ -99,7 +99,7 @@ static int __settings_sensor_0068_gas_sensor_setting_initialize_relative_humidit
         if (ens160_gas_sensor_relative_humidity_sensor_setting)
         {
             ens160_gas_sensor_relative_humidity_sensor_setting->cloud_properties.setting_id = ens160_gas_sensor_settings_ids[1];
-            s_sensor_ens160_gas_sensor_setting_relative_humidity_t* relative_humidity = (s_sensor_ens160_gas_sensor_setting_relative_humidity_t*)malloc(__FUNCTION__, sizeof(s_sensor_ens160_gas_sensor_setting_relative_humidity_t));
+            s_sensor_ens160_gas_sensor_setting_relative_humidity_t* relative_humidity = (s_sensor_ens160_gas_sensor_setting_relative_humidity_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_sensor_ens160_gas_sensor_setting_relative_humidity_t));
             if (relative_humidity)
             {
                 memset(relative_humidity, 0, sizeof(s_sensor_ens160_gas_sensor_setting_relative_humidity_t));
@@ -125,7 +125,7 @@ static int __settings_sensor_0068_gas_sensor_setting_initialize_relative_humidit
             }
             else
             {
-                free(__FUNCTION__, ens160_gas_sensor_relative_humidity_sensor_setting);
+                ezlopi_free(__FUNCTION__, ens160_gas_sensor_relative_humidity_sensor_setting);
                 ret = 1;
             }
         }

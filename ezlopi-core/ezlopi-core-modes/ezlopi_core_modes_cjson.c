@@ -90,7 +90,7 @@ int ezlopi_core_modes_cjson_get_current_mode(cJSON* cj_dest)
 s_ezlopi_modes_t* ezlopi_core_modes_cjson_parse_modes(cJSON* cj_modes)
 {
     int _parsing_status = 0;
-    s_ezlopi_modes_t* parsed_mode = (s_ezlopi_modes_t*)malloc(__FUNCTION__, sizeof(s_ezlopi_modes_t));
+    s_ezlopi_modes_t* parsed_mode = (s_ezlopi_modes_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_ezlopi_modes_t));
     if (parsed_mode)
     {
         memset(parsed_mode, 0, sizeof(s_ezlopi_modes_t));
@@ -167,7 +167,7 @@ s_ezlopi_modes_t* ezlopi_core_modes_cjson_parse_modes(cJSON* cj_modes)
                     if (cj_description && cj_description->valuestring)
                     {
                         uint32_t desc_len = strlen(cj_description->valuestring) + 1;
-                        cur_house_mode->description = (char*)malloc(__FUNCTION__, desc_len);
+                        cur_house_mode->description = (char*)ezlopi_malloc(__FUNCTION__, desc_len);
                         if (cur_house_mode->description)
                         {
                             snprintf(cur_house_mode->description, desc_len, "%s", cj_description->valuestring);
@@ -256,12 +256,12 @@ s_ezlopi_modes_t* ezlopi_core_modes_cjson_parse_modes(cJSON* cj_modes)
                 {
                     if (parsed_mode->l_protect_buttons)
                     {
-                        curr_button->next = (s_protect_buttons_t*)malloc(__FUNCTION__, sizeof(s_protect_buttons_t));
+                        curr_button->next = (s_protect_buttons_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_protect_buttons_t));
                         curr_button = curr_button->next;
                     }
                     else
                     {
-                        parsed_mode->l_protect_buttons = (s_protect_buttons_t*)malloc(__FUNCTION__, sizeof(s_protect_buttons_t));
+                        parsed_mode->l_protect_buttons = (s_protect_buttons_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_protect_buttons_t));
                         curr_button = parsed_mode->l_protect_buttons;
                     }
 
@@ -297,12 +297,12 @@ s_ezlopi_modes_t* ezlopi_core_modes_cjson_parse_modes(cJSON* cj_modes)
                     {
                         if (parsed_mode->alarmed.sources)
                         {
-                            curr_source->next = (s_sources_t*)malloc(__FUNCTION__, sizeof(s_sources_t));
+                            curr_source->next = (s_sources_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_sources_t));
                             curr_source = curr_source->next;
                         }
                         else
                         {
-                            parsed_mode->alarmed.sources = (s_sources_t*)malloc(__FUNCTION__, sizeof(s_sources_t));
+                            parsed_mode->alarmed.sources = (s_sources_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_sources_t));
                             curr_source = parsed_mode->alarmed.sources;
                         }
 

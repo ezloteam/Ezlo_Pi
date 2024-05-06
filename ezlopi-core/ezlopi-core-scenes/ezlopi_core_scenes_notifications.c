@@ -21,7 +21,7 @@ void ezlopi_scenes_notifications_add(cJSON* cj_notifications)
             if (scene_str)
             {
                 cJSON* cj_scene = cJSON_Parse(__FUNCTION__, scene_str);
-                free(__FUNCTION__, scene_str);
+                ezlopi_free(__FUNCTION__, scene_str);
 
                 if (cj_scene)
                 {
@@ -40,7 +40,7 @@ void ezlopi_scenes_notifications_add(cJSON* cj_notifications)
                     if (updated_scene_str)
                     {
                         ezlopi_nvs_write_str(updated_scene_str, strlen(updated_scene_str), cj_scene_id->valuestring);
-                        free(__FUNCTION__, updated_scene_str);
+                        ezlopi_free(__FUNCTION__, updated_scene_str);
                     }
                 }
             }

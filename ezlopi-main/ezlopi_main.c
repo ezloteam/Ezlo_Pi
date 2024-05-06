@@ -9,7 +9,6 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 
-#include "ezlopi_util_heap.h"
 #include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_ezlopi.h"
@@ -78,7 +77,7 @@ void app_main(void)
 #endif
 
     TaskHandle_t ezlopi_main_blinky_task_handle = NULL;
-    xTaskCreate(blinky, "blinky", EZLOPI_MAIN_BLINKY_TASK_DEPTH, NULL, 1, &ezlopi_main_blinky_task_handle);
+    xTaskCreate(blinky, "blinky", 2 * EZLOPI_MAIN_BLINKY_TASK_DEPTH, NULL, 1, &ezlopi_main_blinky_task_handle);
     ezpi_core_process_set_process_info(ENUM_EZLOPI_MAIN_BLINKY_TASK, &ezlopi_main_blinky_task_handle, EZLOPI_MAIN_BLINKY_TASK_DEPTH);
 
 }
@@ -96,21 +95,21 @@ static void blinky(void* pv)
         trace_wb("esp_get_minimum_free_heap_size: %.02f kB", esp_get_minimum_free_heap_size() / 1024.0);
 
 #ifdef CONFIG_EZPI_HEAP_ENABLE
+
         ezlopi_util_heap_trace(false);
 
         if (free_heap_kb <= 10)
         {
             TRACE_W("CRITICAL-WARNING: low heap detected..");
-            ezlopi_util_heap_trace(false);
-        }
-        else if ((xTaskGetTickCount() - low_heap_start_time) > (15000 / portTICK_PERIOD_MS))
-        {
-            ezlopi_util_heap_trace(false);
-            vTaskDelay(2000 / portTICK_RATE_MS);
-            TRACE_E("CRITICAL-ERROR: low heap time-out detected!");
-            TRACE_W("Rebooting.....");
-            vTaskDelay(1000 / portTICK_PERIOD_MS);
-            esp_restart();
+
+            if ((xTaskGetTickCount() - low_heap_start_time) > (15000 / portTICK_PERIOD_MS))
+            {
+                vTaskDelay(2000 / portTICK_RATE_MS);
+                TRACE_E("CRITICAL-ERROR: low heap time-out detected!");
+                // TRACE_W("Rebooting.....");
+                // vTaskDelay(1000 / portTICK_PERIOD_MS);
+                // esp_restart();
+            }
         }
         else
         {

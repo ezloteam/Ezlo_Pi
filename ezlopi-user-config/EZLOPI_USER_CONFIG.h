@@ -2,7 +2,7 @@
 #define _EZLOPI_USER_CONFIG_H_
 
 #include "driver/uart.h"
-#include "ezlopi_util_heap.h"
+#include "ezlopi_core_heap.h"
 #include "../build/config/sdkconfig.h"
 
 
@@ -32,47 +32,29 @@
 #ifdef malloc
 #undef malloc
 #endif
-#define malloc(x) ezlopi_util_heap_malloc(x, __FILENAME__, __LINE__)
+#define ezlopi_malloc(who, x) ezlopi_util_heap_malloc(who, x, __FILENAME__, __LINE__)
 
 #ifdef calloc
 #undef calloc
 #endif
-#define calloc(x, y) ezlopi_util_heap_calloc(x, y, __FILENAME__, __LINE__)
+#define ezlopi_calloc(who, x, y) ezlopi_util_heap_calloc(who, x, y, __FILENAME__, __LINE__)
 
 #ifdef free
 #undef free
 #endif
-#define free(x) ezlopi_util_heap_free(x, __FILENAME__, __LINE__)
+#define ezlopi_free(who, x) ezlopi_util_heap_free(who, x, __FILENAME__, __LINE__)
 
 #ifdef realloc
 #undef realloc
 #endif
-#define realloc(x, y) ezlopi_util_heap_realloc(x, y, __FILENAME__, __LINE__)
+#define ezlopi_realloc(who, x, y) ezlopi_util_heap_realloc(who, x, y, __FILENAME__, __LINE__)
 
-#endif
+#else // CONFIG_EZPI_HEAP_ENABLE
 
-
-
-#if defined(CONFIG_EZPI_HEAP_ENABLE)
-#ifdef malloc
-#undef malloc
-#endif
-#define malloc(who, x) ezlopi_util_heap_malloc(who, x, __FILENAME__, __LINE__)
-
-#ifdef calloc
-#undef calloc
-#endif
-#define calloc(who, x, y) ezlopi_util_heap_calloc(who, x, y, __FILENAME__, __LINE__)
-
-#ifdef free
-#undef free
-#endif
-#define free(who, x) ezlopi_util_heap_free(who, x, __FILENAME__, __LINE__)
-
-#ifdef realloc
-#undef realloc
-#endif
-#define realloc(who, x, y) ezlopi_util_heap_realloc(who, x, y, __FILENAME__, __LINE__)
+#define ezlopi_malloc(who, x) malloc(x)
+#define ezlopi_calloc(who, x, y) calloc(x, y)
+#define ezlopi_free(who, x) free(x)
+#define ezlopi_realloc(who, x, y) realloc(x, y)
 
 #endif
 

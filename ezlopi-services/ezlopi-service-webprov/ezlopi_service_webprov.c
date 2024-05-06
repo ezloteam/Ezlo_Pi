@@ -39,7 +39,7 @@ static void __fetch_wss_endpoint(void* pv);
 static void __connection_upcall(bool connected);
 static void __message_upcall(const char* payload, uint32_t len);
 
-static uint8_t __config_update(void* arg);
+static uint8_t __config_update(char* arg);
 
 static int __send_str_data_to_nma_websocket(char* str_data);
 static int __send_cjson_data_to_nma_websocket(cJSON* cj_data);
@@ -80,6 +80,10 @@ static void __connection_upcall(bool connected)
             TRACE_S("Web-socket re-connected.");
             TRACE_I("Starting registration process....");
             ezlopi_core_ezlopi_methods_registration_init();
+        }
+        else
+        {
+            TRACE_S("Web-socket connected");
         }
     }
     else
@@ -133,10 +137,10 @@ static void __fetch_wss_endpoint(void* pv)
                     cJSON_Delete(__FUNCTION__, root);
                 }
 
-                free(__FUNCTION__, ws_endpoint->response);
+                ezlopi_free(__FUNCTION__, ws_endpoint->response);
             }
 
-            free(__FUNCTION__, ws_endpoint);
+            ezlopi_free(__FUNCTION__, ws_endpoint);
         }
 
         if (task_complete)
@@ -148,9 +152,9 @@ static void __fetch_wss_endpoint(void* pv)
     }
 
     ezlopi_factory_info_v3_free(cloud_server);
-    ezlopi_factory_info_v3_free(ca_certificate);
-    ezlopi_factory_info_v3_free(ssl_shared_key);
-    ezlopi_factory_info_v3_free(ssl_private_key);
+    // ezlopi_factory_info_v3_free(ca_certificate); // allocated once for all, do not free
+    // ezlopi_factory_info_v3_free(ssl_shared_key); // allocated once for all, do not free
+    // ezlopi_factory_info_v3_free(ssl_private_key); // allocated once for all, do not free
 
     ezpi_core_process_set_is_deleted(ENUM_EZLOPI_SERVICE_WEB_PROV_FETCH_WSS_TASK);
     vTaskDelete(NULL);
@@ -158,11 +162,13 @@ static void __fetch_wss_endpoint(void* pv)
 
 static void __message_upcall(const char* payload, uint32_t len)
 {
-    cJSON* cj_response = ezlopi_core_api_consume(payload, len);
+    static const char * __who = "webprov-message-upcall";
+    cJSON* cj_response = ezlopi_core_api_consume(__who, payload, len);
     if (cj_response)
     {
         cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_msg_id_str, message_counter);
         __send_cjson_data_to_nma_websocket(cj_response);
+
         cJSON_Delete(__FUNCTION__, cj_response);
     }
     else
@@ -246,7 +252,6 @@ static void __config_check(void* pv)
     char* provision_token = ezlopi_factory_info_get_v3_provision_token();
     char* provisioning_server = ezlopi_factory_info_v3_get_provisioning_server();
     uint16_t config_version = ezlopi_factory_info_v3_get_config_version();
-    TRACE_D("water_mark: %d", uxTaskGetStackHighWaterMark(NULL));
 
     if (ca_certificate && provision_token && provisioning_server)
     {
@@ -264,7 +269,9 @@ static void __config_check(void* pv)
                 }
 
                 char http_request_location[200];
-                snprintf(http_request_location, sizeof(http_request_location), "api/v1/controller/sync?version=%d", config_version);
+                snprintf(http_request_location, sizeof(http_request_location), "api/v1/controller/sync?version=%d", config_version + 1);
+
+                TRACE_D("web-prov-request: %s", http_request_location);
 
                 ezlopi_wait_for_wifi_to_connect(portMAX_DELAY);
                 s_ezlopi_http_data_t* response = ezlopi_http_post_request(provisioning_server, http_request_location, root_header_prov_token, NULL, NULL, ca_certificate);
@@ -317,91 +324,108 @@ static void __config_check(void* pv)
             }
 
             cJSON_Delete(__FUNCTION__, root_header_prov_token);
+            TRACE_S("root_header_prov_token - deleted");
         }
     }
 
-    ezlopi_factory_info_v3_free(ca_certificate);
-    ezlopi_factory_info_v3_free(provision_token);
+    // ezlopi_factory_info_v3_free(ca_certificate); // allocated once for all, do not free
     ezlopi_factory_info_v3_free(provisioning_server);
+    ezlopi_factory_info_v3_free(provision_token);
 
     ezpi_core_process_set_is_deleted(ENUM_EZLOPI_SERVICE_WEB_PROV_CONFIG_CHECK_TASK);
     vTaskDelete(NULL);
 }
 
-static uint8_t __config_update(void* arg)
+static uint8_t __config_update(char* arg)
 {
-    cJSON* root_prov_data = cJSON_Parse(__FUNCTION__, (char*)arg);
     uint8_t ret = 0;
-    if (NULL != root_prov_data)
+    cJSON* cj_root_prov_data = cJSON_Parse(__FUNCTION__, arg);
+
+    if (NULL != cj_root_prov_data)
     {
-        s_basic_factory_info_t* config_check_factoryInfo = malloc(__FUNCTION__, sizeof(s_basic_factory_info_t));
+        s_basic_factory_info_t config_check_factoryInfo;
+        memset(&config_check_factoryInfo, 0, sizeof(s_basic_factory_info_t));
 
-        if (config_check_factoryInfo)
+        char tmp_dev_uuid[40];
+        char tmp_prov_uuid[40];
+        char tmp_cloud_server[128];
+        char tmp_provision_token[256];
+        char tmp_provision_server[128];
+
+        CJSON_GET_VALUE_DOUBLE(cj_root_prov_data, ezlopi_id_str, config_check_factoryInfo.id);
+        CJSON_GET_VALUE_STRING_BY_COPY(cj_root_prov_data, ezlopi_uuid_str, tmp_dev_uuid);
+        CJSON_GET_VALUE_STRING_BY_COPY(cj_root_prov_data, ezlopi_cloud_uuid_str, tmp_prov_uuid);
+        CJSON_GET_VALUE_DOUBLE(cj_root_prov_data, ezlopi_config_version_str, config_check_factoryInfo.config_version);
+
+        CJSON_GET_VALUE_STRING_BY_COPY(cj_root_prov_data, ezlopi_cloud_server_str, tmp_cloud_server);
+        CJSON_GET_VALUE_STRING_BY_COPY(cj_root_prov_data, ezlopi_provision_token_str, tmp_provision_token);
+        CJSON_GET_VALUE_STRING_BY_COPY(cj_root_prov_data, ezlopi_provision_server_str, tmp_provision_server);
+
+        config_check_factoryInfo.device_uuid = tmp_dev_uuid;
+        config_check_factoryInfo.prov_uuid = tmp_prov_uuid;
+
+        config_check_factoryInfo.cloud_server = tmp_cloud_server;
+        config_check_factoryInfo.provision_token = tmp_provision_token;
+        config_check_factoryInfo.provision_server = tmp_provision_server;
+
+        // TODO  Decide if needs parsing and storing to flash
+        // if (NULL != cJSON_zwave_region_aary)
+        // {
+        //     if (cJSON_IsArray(cJSON_zwave_region_aary))
+        //     {
+        //         cJSON *cJSON_zwave_region = cJSON_GetArrayItem(cJSON_zwave_region_aary, 0); // Get the first item
+        //         if (cJSON_zwave_region)
+        //         {
+        //             const char *zwave_region = cJSON_zwave_region->valuestring;
+        //         }
+        //     }
+        // }
+
+        // uint32_t provision_order = 0;
+        // CJSON_GET_VALUE_DOUBLE(cj_root_prov_data, "provision_order", provision_order);
+
+        config_check_factoryInfo.brand = NULL;
+        config_check_factoryInfo.device_name = NULL;
+        config_check_factoryInfo.device_type = NULL;
+        config_check_factoryInfo.manufacturer = NULL;
+        config_check_factoryInfo.model_number = NULL;
+        // config_check_factoryInfo.prov_uuid = NULL; // NULL since it is not
+
+        if (ezlopi_factory_info_v3_set_basic(&config_check_factoryInfo))
         {
-            memset(config_check_factoryInfo, 0, sizeof(s_basic_factory_info_t));
-
-            CJSON_GET_VALUE_DOUBLE(root_prov_data, ezlopi_id_str, config_check_factoryInfo->id);
-            CJSON_GET_VALUE_STRING(root_prov_data, ezlopi_uuid_str, config_check_factoryInfo->device_uuid);
-            CJSON_GET_VALUE_STRING(root_prov_data, ezlopi_cloud_uuid_str, config_check_factoryInfo->prov_uuid);
-            CJSON_GET_VALUE_DOUBLE(root_prov_data, ezlopi_config_version_str, config_check_factoryInfo->config_version);
-
-            // TODO  Decide if needs parsing and storing to flash
-            // if (NULL != cJSON_zwave_region_aary)
-            // {
-            //     if (cJSON_IsArray(cJSON_zwave_region_aary))
-            //     {
-            //         cJSON *cJSON_zwave_region = cJSON_GetArrayItem(cJSON_zwave_region_aary, 0); // Get the first item
-            //         if (cJSON_zwave_region)
-            //         {
-            //             const char *zwave_region = cJSON_zwave_region->valuestring;
-            //         }
-            //     }
-            // }
-
-            CJSON_GET_VALUE_STRING(root_prov_data, ezlopi_cloud_server_str, config_check_factoryInfo->cloud_server);
-            CJSON_GET_VALUE_STRING(root_prov_data, ezlopi_provision_token_str, config_check_factoryInfo->provision_token);
-            CJSON_GET_VALUE_STRING(root_prov_data, ezlopi_provision_server_str, config_check_factoryInfo->provision_server);
-
-            // uint32_t provision_order = 0;
-            // CJSON_GET_VALUE_DOUBLE(root_prov_data, "provision_order", provision_order);
-
-            config_check_factoryInfo->brand = NULL;
-            config_check_factoryInfo->device_name = NULL;
-            config_check_factoryInfo->device_type = NULL;
-            config_check_factoryInfo->manufacturer = NULL;
-            config_check_factoryInfo->model_number = NULL;
-            // config_check_factoryInfo->prov_uuid = NULL; // NULL since it is not
-
-            if (ezlopi_factory_info_v3_set_basic(config_check_factoryInfo))
-            {
-                TRACE_S("Updated provisioning config");
-                ret = 1;
-            }
-            else
-            {
-                TRACE_E("Error updating provisioning config");
-            }
-
-            free(__FUNCTION__, config_check_factoryInfo);
+            TRACE_S("Updated provisioning config");
+            ret = 1;
+        }
+        else
+        {
+            TRACE_E("Error updating provisioning config");
         }
 
-        const char* ssl_private_key = NULL;
-        CJSON_GET_VALUE_STRING(root_prov_data, ezlopi_ssl_private_key_str, ssl_private_key);
-        ezlopi_factory_info_v3_set_ssl_private_key(ssl_private_key);
+        cJSON * cj_ssl_private_key = cJSON_GetObjectItem(__FUNCTION__, cj_root_prov_data, ezlopi_ssl_private_key_str);
+        if (cj_ssl_private_key && cj_ssl_private_key->valuestring && cj_ssl_private_key->str_value_len)
+        {
+            ezlopi_factory_info_v3_set_ssl_private_key(cj_ssl_private_key);
+        }
 
-        const char* ssl_public_key = NULL;
-        CJSON_GET_VALUE_STRING(root_prov_data, ezlopi_ssl_public_key_str, ssl_public_key);
-        ezlopi_factory_info_v3_set_ssl_public_key(ssl_public_key);
+        cJSON * cj_ssl_public_key = cJSON_GetObjectItem(__FUNCTION__, cj_root_prov_data, ezlopi_ssl_public_key_str);
+        if (cj_ssl_public_key && cj_ssl_public_key->valuestring && cj_ssl_public_key->str_value_len)
+        {
+            ezlopi_factory_info_v3_set_ssl_public_key(cj_ssl_public_key);
+        }
 
-        const char* ssl_shared_key = NULL;
-        CJSON_GET_VALUE_STRING(root_prov_data, ezlopi_ssl_shared_key_str, ssl_shared_key);
-        ezlopi_factory_info_v3_set_ssl_shared_key(ssl_shared_key);
+        cJSON * cj_ssl_shared_key = cJSON_GetObjectItem(__FUNCTION__, cj_root_prov_data, ezlopi_ssl_shared_key_str);
+        if (cj_ssl_shared_key && cj_ssl_shared_key->valuestring && cj_ssl_shared_key->str_value_len)
+        {
+            ezlopi_factory_info_v3_set_ssl_shared_key(cj_ssl_shared_key);
+        }
 
-        const char* signing_ca_certificate = NULL;
-        CJSON_GET_VALUE_STRING(root_prov_data, ezlopi_signing_ca_certificate_str, signing_ca_certificate);
-        ezlopi_factory_info_v3_set_ca_cert(signing_ca_certificate);
+        cJSON * cj_ca_certificate = cJSON_GetObjectItem(__FUNCTION__, cj_root_prov_data, ezlopi_signing_ca_certificate_str);
+        if (cj_ca_certificate && cj_ca_certificate->valuestring && cj_ca_certificate->str_value_len)
+        {
+            ezlopi_factory_info_v3_set_ca_cert(cj_ca_certificate);
+        }
 
-        cJSON_Delete(__FUNCTION__, root_prov_data);
+        cJSON_Delete(__FUNCTION__, cj_root_prov_data);
     }
     else
     {

@@ -4,7 +4,7 @@ static void ____check_and_free(char *to_be_freed)
 {
     if (to_be_freed)
     {
-        free(__FUNCTION__, to_be_freed);
+        ezlopi_free(__FUNCTION__, to_be_freed);
     }
 }
 
@@ -25,7 +25,7 @@ void send_http_request(void)
         if (response)
         {
             TRACE_I("Http post request response:\r\n%s", response);
-            free(__FUNCTION__, response);
+            ezlopi_free(__FUNCTION__, response);
         }
     }
 

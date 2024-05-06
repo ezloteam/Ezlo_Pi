@@ -51,18 +51,18 @@ extern "C"
 // #define cJSON_realloc realloc
 
 /* cJSON Types: */
-#define cJSON_Invalid (0)
-#define cJSON_False (1 << 0)
-#define cJSON_True (1 << 1)
-#define cJSON_NULL (1 << 2)
-#define cJSON_Number (1 << 3)
-#define cJSON_String (1 << 4)
-#define cJSON_Array (1 << 5)
-#define cJSON_Object (1 << 6)
-#define cJSON_Raw (1 << 7) /* raw json */
+#define cJSON_Invalid (0)       // 0
+#define cJSON_False (1 << 0)    // 1
+#define cJSON_True (1 << 1)     // 2
+#define cJSON_NULL (1 << 2)     // 4
+#define cJSON_Number (1 << 3)   // 8
+#define cJSON_String (1 << 4)   // 16
+#define cJSON_Array (1 << 5)    // 32
+#define cJSON_Object (1 << 6)   // 64
+#define cJSON_Raw (1 << 7)      // 128
 
-#define cJSON_IsReference 256
-#define cJSON_StringIsConst 512
+#define cJSON_IsReference 256   // (1 << 8)
+#define cJSON_StringIsConst 512 // (1 << 9)
 
   typedef int cJSON_bool;
 
@@ -109,8 +109,8 @@ extern "C"
   cJSON *  cJSON_ParseWithLength(const char * who, const char *value, size_t buffer_length);
   /* ParseWithOpts allows you to require (and check) that the JSON is null terminated, and to retrieve the pointer to the final byte parsed. */
   /* If you supply a ptr in return_parse_end and parsing fails, then return_parse_end will contain a pointer to the error so will match cJSON_GetErrorPtr(). */
-  cJSON *  cJSON_ParseWithOpts(const char * who, const char *value, const char **return_parse_end, cJSON_bool require_null_terminated);
-  cJSON *  cJSON_ParseWithLengthOpts(const char * who, const char *value, size_t buffer_length, const char **return_parse_end, cJSON_bool require_null_terminated);
+  cJSON * cJSON_ParseWithOpts(const char * who, const char *value, const char **return_parse_end, cJSON_bool require_null_terminated);
+  cJSON * cJSON_ParseWithLengthOpts(const char * who, const char *value, size_t buffer_length, const char **return_parse_end, cJSON_bool require_null_terminated);
 
   /* Render a cJSON entity to text for transfer/storage. */
   char *  cJSON_Print(const char * who, const cJSON *item);
@@ -248,15 +248,16 @@ extern "C"
 
   /* Krishna */
   cJSON * cJSON_ParseWithRef(const char * who, const char *value);
+  cJSON * cJSON_ParseWithRefWithLength(const char * who, const char* value, size_t buffer_length);
   cJSON * cJSON_ParseWithRefOpts(const char * who, const char *value, const char **return_parse_end, cJSON_bool require_null_terminated);
   cJSON * cJSON_ParseWithRefWithLengthOpts(const char * who, const char *value, size_t buffer_length, const char **return_parse_end, cJSON_bool require_null_terminated);
 
-  int  cJSON_EstimatePrintLength(const char * who, cJSON *item);
 
   cJSON * cJSON_AddStringToObjectWithRef(const char * who, cJSON* const object, const char* const name, const char* const string);
   cJSON * cJSON_AddNumberToObjectWithRef(const char * who, cJSON* const object, const char* const name, const double number);
   cJSON * cJSON_AddObjectToObjectWithRef(const char * who, cJSON* const object, const char* const name);
 
+  int  cJSON_EstimatePrintLength(const char * who, cJSON *item);
 #ifdef __cplusplus
 }
 #endif

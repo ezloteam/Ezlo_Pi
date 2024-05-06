@@ -163,7 +163,7 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t* curr_scene, void* ar
     l_action_block_v2_t* curr_then = (l_action_block_v2_t*)arg;
     if (curr_then)
     {
-        s_ezlopi_core_http_mbedtls_t* tmp_http_data = (s_ezlopi_core_http_mbedtls_t*)malloc(__FUNCTION__, sizeof(s_ezlopi_core_http_mbedtls_t));
+        s_ezlopi_core_http_mbedtls_t* tmp_http_data = (s_ezlopi_core_http_mbedtls_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_ezlopi_core_http_mbedtls_t));
         if (tmp_http_data)
         {
             memset(tmp_http_data, 0, sizeof(s_ezlopi_core_http_mbedtls_t));
@@ -198,7 +198,7 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t* curr_scene, void* ar
             ezlopi_core_http_mbedtls_req(tmp_http_data); // Returns:- [response_buffer = &Memory_block]
             free_http_mbedtls_struct(tmp_http_data);
 
-            free(__FUNCTION__, tmp_http_data);
+            ezlopi_free(__FUNCTION__, tmp_http_data);
         }
     }
 

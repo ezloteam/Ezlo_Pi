@@ -196,7 +196,7 @@ esp_err_t led_strip_init(led_strip_t *strip)
 {
     CHECK_ARG(strip && strip->length > 0 && strip->type < LED_STRIP_TYPE_MAX);
 
-    strip->buf = calloc(__FUNCTION__, strip->length, COLOR_SIZE(strip));
+    strip->buf = ezlopi_calloc(__FUNCTION__, strip->length, COLOR_SIZE(strip));
     if (!strip->buf)
     {
         ESP_LOGE(TAG, "Not enough memory");
@@ -221,7 +221,7 @@ esp_err_t led_strip_init(led_strip_t *strip)
 esp_err_t led_strip_free(led_strip_t *strip)
 {
     CHECK_ARG(strip && strip->buf);
-    free(__FUNCTION__, strip->buf);
+    ezlopi_free(__FUNCTION__, strip->buf);
 
     CHECK(rmt_driver_uninstall(strip->channel));
 

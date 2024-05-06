@@ -216,7 +216,7 @@ bool GXHTC3_read_sensor(s_gxhtc3_sensor_handler_t *handler)
 
 s_gxhtc3_sensor_handler_t *GXHTC3_init(int32_t i2c_ch_num, uint8_t i2c_slave_addr)
 {
-    s_gxhtc3_sensor_handler_t *gxhtc3_handler = (s_gxhtc3_sensor_handler_t *)malloc(__FUNCTION__, sizeof(s_gxhtc3_sensor_handler_t));
+    s_gxhtc3_sensor_handler_t *gxhtc3_handler = (s_gxhtc3_sensor_handler_t *)ezlopi_malloc(__FUNCTION__, sizeof(s_gxhtc3_sensor_handler_t));
 
     if (gxhtc3_handler)
     {
@@ -226,7 +226,7 @@ s_gxhtc3_sensor_handler_t *GXHTC3_init(int32_t i2c_ch_num, uint8_t i2c_slave_add
 
         if (!gxhtc3_reset(gxhtc3_handler))
         {
-            free(__FUNCTION__, gxhtc3_handler);
+            ezlopi_free(__FUNCTION__, gxhtc3_handler);
             gxhtc3_handler = NULL;
         }
         else

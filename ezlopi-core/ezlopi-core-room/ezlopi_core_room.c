@@ -51,7 +51,7 @@ int ezlopi_room_name_set(cJSON *cj_room)
                 if (rooms_str)
                 {
                     cJSON *cj_rooms = cJSON_Parse(__FUNCTION__, rooms_str);
-                    free(__FUNCTION__, rooms_str);
+                    ezlopi_free(__FUNCTION__, rooms_str);
 
                     if (cj_rooms)
                     {
@@ -91,7 +91,7 @@ int ezlopi_room_name_set(cJSON *cj_room)
                             if (updated_rooms)
                             {
                                 ezlopi_nvs_write_rooms(updated_rooms);
-                                free(__FUNCTION__, updated_rooms);
+                                ezlopi_free(__FUNCTION__, updated_rooms);
                             }
                         }
 
@@ -164,7 +164,7 @@ int ezlopi_room_add_to_nvs(cJSON *cj_room)
         cJSON *cj_rooms = cJSON_Parse(__FUNCTION__, rooms_str);
         if (room_free)
         {
-            free(__FUNCTION__, rooms_str);
+            ezlopi_free(__FUNCTION__, rooms_str);
         }
 
         CJSON_TRACE("cj_rooms", cj_rooms);
@@ -186,7 +186,7 @@ int ezlopi_room_add_to_nvs(cJSON *cj_room)
                         ret = 1;
                     }
 
-                    free(__FUNCTION__, updated_rooms_str);
+                    ezlopi_free(__FUNCTION__, updated_rooms_str);
                 }
             }
 
@@ -257,7 +257,7 @@ int ezlopi_room_reorder(cJSON *cj_rooms_ids)
                     if (reordered_rooms_str)
                     {
                         ezlopi_nvs_write_rooms(reordered_rooms_str);
-                        free(__FUNCTION__, reordered_rooms_str);
+                        ezlopi_free(__FUNCTION__, reordered_rooms_str);
                     }
                 }
 
@@ -271,7 +271,7 @@ int ezlopi_room_reorder(cJSON *cj_rooms_ids)
 
 s_ezlopi_room_t *ezlopi_room_add_to_list(cJSON *cj_room)
 {
-    s_ezlopi_room_t *new_room = malloc(__FUNCTION__, sizeof(s_ezlopi_room_t));
+    s_ezlopi_room_t *new_room = ezlopi_malloc(__FUNCTION__, sizeof(s_ezlopi_room_t));
     if (new_room)
     {
         memset(new_room, 0, sizeof(s_ezlopi_room_t));
@@ -321,7 +321,7 @@ void ezlopi_room_init(void)
     if (rooms_str)
     {
         cJSON *cj_rooms = cJSON_Parse(__FUNCTION__, rooms_str);
-        free(__FUNCTION__, rooms_str);
+        ezlopi_free(__FUNCTION__, rooms_str);
 
         if (cj_rooms)
         {
@@ -384,7 +384,7 @@ static void __free_nodes(s_ezlopi_room_t *room)
     {
         __free_nodes(room->next);
         __update_cloud_room_deleted(room->_id);
-        free(__FUNCTION__, room);
+        ezlopi_free(__FUNCTION__, room);
     }
 }
 
@@ -461,7 +461,7 @@ static int __free_room_from_list_by_id(uint32_t room_id)
             ret = 1;
             s_ezlopi_room_t *free_node = l_room_head;
             l_room_head = l_room_head->next;
-            free(__FUNCTION__, free_node);
+            ezlopi_free(__FUNCTION__, free_node);
         }
         else
         {
@@ -476,7 +476,7 @@ static int __free_room_from_list_by_id(uint32_t room_id)
                 {
                     ret = 1;
                     room_node->next = free_node->next;
-                    free(__FUNCTION__, free_node);
+                    ezlopi_free(__FUNCTION__, free_node);
                     break;
                 }
 
@@ -497,7 +497,7 @@ static int __remove_room_from_nvs_by_id(uint32_t a_room_id)
     {
         TRACE_I("rooms_str: %s", rooms_str);
         cJSON *cj_rooms = cJSON_Parse(__FUNCTION__, rooms_str);
-        free(__FUNCTION__, rooms_str);
+        ezlopi_free(__FUNCTION__, rooms_str);
 
         if (cj_rooms)
         {
@@ -538,7 +538,7 @@ static int __remove_room_from_nvs_by_id(uint32_t a_room_id)
                 {
                     ret = 1;
                     ezlopi_nvs_write_rooms(updated_rooms);
-                    free(__FUNCTION__, updated_rooms);
+                    ezlopi_free(__FUNCTION__, updated_rooms);
                 }
             }
 

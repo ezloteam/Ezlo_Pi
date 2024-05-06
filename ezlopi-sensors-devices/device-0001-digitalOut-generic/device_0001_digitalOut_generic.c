@@ -246,13 +246,6 @@ static int __settings_update(void* arg, l_ezlopi_device_settings_v3_t* setting)
 
 static void __setup_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cjson_device)
 {
-    // uint32_t device_id = 0;
-    // char *device_name = NULL;
-    // CJSON_GET_VALUE_STRING(cjson_device, ezlopi_dev_name_str, device_name);
-    // CJSON_GET_ID(device_id, cJSON_GetObjectItem(__FUNCTION__, cjson_device, ezlopi__id_str));
-    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
-    // ASSIGN_DEVICE_NAME_V2(device, device_name);
-
     device->cloud_properties.category = category_switch;
     device->cloud_properties.subcategory = subcategory_in_wall;
     device->cloud_properties.device_type = dev_type_switch_inwall;
@@ -330,7 +323,7 @@ static int __prepare(void* arg)
 
                     setting_brightness->cloud_properties.setting_id = settings_ids[1];
 
-                    s_digio_settings_t* settings_value = (s_digio_settings_t*)malloc(__FUNCTION__, sizeof(s_digio_settings_t));
+                    s_digio_settings_t* settings_value = (s_digio_settings_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_digio_settings_t));
                     memset(settings_value, 0, sizeof(s_digio_settings_t));
 
                     if (ezlopi_nvs_read_int32(&settings_value->settings_int_data, nvs_key_backlight_brightness))

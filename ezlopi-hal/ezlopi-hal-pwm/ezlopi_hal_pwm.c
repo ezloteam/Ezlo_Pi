@@ -13,11 +13,11 @@ struct s_ezlopi_pwm_object
 };
 
 #if CONFIG_IDF_TARGET_ESP32 
-static bool available_channels[LEDC_CHANNEL_MAX] = {false, true, true, true, true, true, true};
+static bool available_channels[LEDC_CHANNEL_MAX] = { false, true, true, true, true, true, true };
 #elif CONFIG_IDF_TARGET_ESP32S2 || CONFIG_IDF_TARGET_ESP32S3
-static bool available_channels[LEDC_CHANNEL_MAX] = {true, true, true, true, true, true, true};
+static bool available_channels[LEDC_CHANNEL_MAX] = { true, true, true, true, true, true, true };
 #elif CONFIG_IDF_TARGET_ESP32C2 || CONFIG_IDF_TARGET_ESP32C3
-static bool available_channels[LEDC_CHANNEL_MAX] = {true, true, true, true, true};
+static bool available_channels[LEDC_CHANNEL_MAX] = { true, true, true, true, true };
 #endif
 
 static uint8_t get_available_channel();
@@ -25,7 +25,7 @@ static uint8_t get_available_channel();
 s_ezlopi_channel_speed_t *ezlopi_pwm_init(uint8_t pwm_gpio_num, uint8_t pwm_resln, uint32_t freq_hz, uint32_t duty_cycle)
 {
 
-    s_ezlopi_channel_speed_t *ezlopi_channel_speed = (s_ezlopi_channel_speed_t *)malloc(__FUNCTION__, sizeof(s_ezlopi_channel_speed_t));
+    s_ezlopi_channel_speed_t *ezlopi_channel_speed = (s_ezlopi_channel_speed_t *)ezlopi_malloc(__FUNCTION__, sizeof(s_ezlopi_channel_speed_t));
     memset(ezlopi_channel_speed, 0, sizeof(s_ezlopi_channel_speed_t));
 
     uint8_t channel = get_available_channel();
@@ -70,7 +70,7 @@ s_ezlopi_channel_speed_t *ezlopi_pwm_init(uint8_t pwm_gpio_num, uint8_t pwm_resl
         {
             TRACE_S("LEDC channel configured successfully.");
         }
-        
+
         ezlopi_channel_speed->channel = channel;
         ezlopi_channel_speed->speed_mode = ezlopi_pwm_channel_cfg.speed_mode;
     }

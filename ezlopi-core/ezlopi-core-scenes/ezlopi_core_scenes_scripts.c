@@ -96,10 +96,10 @@ void ezlopi_scenes_scripts_delete_by_id(uint32_t script_id)
 
         if (script_to_delete->code)
         {
-            free(__FUNCTION__, script_to_delete->code);
+            ezlopi_free(__FUNCTION__, script_to_delete->code);
         }
 
-        free(__FUNCTION__, script_to_delete);
+        ezlopi_free(__FUNCTION__, script_to_delete);
     }
 }
 
@@ -177,7 +177,7 @@ void ezlopi_scenes_scripts_update(cJSON* cj_script)
                 {
                     if (script_node->code)
                     {
-                        free(__FUNCTION__, script_node->code);
+                        ezlopi_free(__FUNCTION__, script_node->code);
                     }
 
                     {
@@ -194,7 +194,7 @@ void ezlopi_scenes_scripts_update(cJSON* cj_script)
                         if (cj_code && cj_code->valuestring)
                         {
                             uint32_t len = strlen(cj_code->valuestring) + 1;
-                            script_node->code = malloc(__FUNCTION__, len);
+                            script_node->code = ezlopi_malloc(__FUNCTION__, len);
                             if (script_node->code) {
                                 snprintf(script_node->code, len, "%s", cj_code->valuestring);
                             }
@@ -207,7 +207,7 @@ void ezlopi_scenes_scripts_update(cJSON* cj_script)
                     if (script_to_update)
                     {
                         ezlopi_nvs_write_str(script_to_update, strlen(script_to_update), cj_script_id->valuestring);
-                        free(__FUNCTION__, script_to_update);
+                        ezlopi_free(__FUNCTION__, script_to_update);
                     }
 
                     break;
@@ -316,7 +316,7 @@ static void __scripts_add_script_id(uint32_t script_id)
                 if (script_ids_str_updated)
                 {
                     ezlopi_nvs_write_scenes_scripts(script_ids_str_updated);
-                    free(__FUNCTION__, script_ids_str_updated);
+                    ezlopi_free(__FUNCTION__, script_ids_str_updated);
                 }
             }
             else
@@ -330,7 +330,7 @@ static void __scripts_add_script_id(uint32_t script_id)
 
     if (script_ids_str_free) // only free in case of read from nvs otehrwise do not free
     {
-        free(__FUNCTION__, script_ids_str);
+        ezlopi_free(__FUNCTION__, script_ids_str);
     }
 }
 
@@ -360,7 +360,7 @@ static void __scripts_remove_id_and_update_list(uint32_t script_id)
                         {
                             ezlopi_nvs_write_scenes_scripts(scripts_ids_str_updated);
 
-                            free(__FUNCTION__, scripts_ids_str_updated);
+                            ezlopi_free(__FUNCTION__, scripts_ids_str_updated);
                         }
 
                         break;
@@ -371,7 +371,7 @@ static void __scripts_remove_id_and_update_list(uint32_t script_id)
             cJSON_Delete(__FUNCTION__, cj_scripts_ids);
         }
 
-        free(__FUNCTION__, scripts_ids_str);
+        ezlopi_free(__FUNCTION__, scripts_ids_str);
     }
 }
 
@@ -405,7 +405,7 @@ static void __scripts_nvs_parse(void)
                             ezlopi_scenes_scripts_add_to_head(script_id, cj_script);
                         }
 
-                        free(__FUNCTION__, script_str);
+                        ezlopi_free(__FUNCTION__, script_str);
                     }
                     else
                     {
@@ -417,7 +417,7 @@ static void __scripts_nvs_parse(void)
             cJSON_Delete(__FUNCTION__, cj_script_ids);
         }
 
-        free(__FUNCTION__, script_ids);
+        ezlopi_free(__FUNCTION__, script_ids);
     }
 }
 
@@ -447,12 +447,12 @@ static l_ezlopi_scenes_script_t* __scripts_create_node(uint32_t script_id, cJSON
                     char scrpt_id_str[32];
                     snprintf(scrpt_id_str, sizeof(scrpt_id_str), "%08x", script_id);
                     ezlopi_nvs_write_str(script_str, strlen(script_str), scrpt_id_str);
-                    free(__FUNCTION__, script_str);
+                    ezlopi_free(__FUNCTION__, script_str);
                     __scripts_add_script_id(script_id);
                 }
             }
 
-            new_script = (l_ezlopi_scenes_script_t*)malloc(__FUNCTION__, sizeof(l_ezlopi_scenes_script_t));
+            new_script = (l_ezlopi_scenes_script_t*)ezlopi_malloc(__FUNCTION__, sizeof(l_ezlopi_scenes_script_t));
             if (new_script)
             {
                 memset(new_script, 0, sizeof(l_ezlopi_scenes_script_t));
@@ -465,7 +465,7 @@ static l_ezlopi_scenes_script_t* __scripts_create_node(uint32_t script_id, cJSON
 
 
                 uint32_t script_code_size = strlen(cj_script_code->valuestring) + 1;
-                new_script->code = (char*)malloc(__FUNCTION__, script_code_size);
+                new_script->code = (char*)ezlopi_malloc(__FUNCTION__, script_code_size);
                 if (new_script->code)
                 {
                     snprintf(new_script->code, script_code_size, "%s", cj_script_code->valuestring);

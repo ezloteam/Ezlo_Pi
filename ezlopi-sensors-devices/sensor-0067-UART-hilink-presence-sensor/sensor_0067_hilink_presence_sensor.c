@@ -336,7 +336,7 @@ static int __prepare(void* arg, void* user_arg)
     s_ezlopi_prep_arg_t* prep_arg = (s_ezlopi_prep_arg_t*)arg;
     if (prep_arg)
     {
-        ld2410_outputs_t* hilink_data = (ld2410_outputs_t*)malloc(__FUNCTION__, sizeof(ld2410_outputs_t));
+        ld2410_outputs_t* hilink_data = (ld2410_outputs_t*)ezlopi_malloc(__FUNCTION__, sizeof(ld2410_outputs_t));
         if (hilink_data)
         {
             memset(hilink_data, 0, sizeof(ld2410_outputs_t));
@@ -398,7 +398,7 @@ static int __prepare(void* arg, void* user_arg)
                     (NULL == child_hilink_device_distance))
                 {
                     ezlopi_device_free_device(parent_hilink_device_motion);
-                    free(__FUNCTION__, hilink_data);
+                    ezlopi_free(__FUNCTION__, hilink_data);
                     ret = -1;
                 }
                 else
@@ -409,7 +409,7 @@ static int __prepare(void* arg, void* user_arg)
             else
             {
                 ezlopi_device_free_device(parent_hilink_device_motion);
-                free(__FUNCTION__, hilink_data);
+                ezlopi_free(__FUNCTION__, hilink_data);
                 ret = -1;
             }
         }

@@ -289,7 +289,7 @@ void bsec2_allocate_memory(uint8_t *mem_block)
  */
 void bsec2_clear_memory(void)
 {
-    free(__FUNCTION__, bsec_instance);
+    ezlopi_free(__FUNCTION__, bsec_instance);
     bsec_instance = NULL;
 }
 
@@ -379,7 +379,7 @@ bool bsec2_begin_common()
     if (!bsec_instance)
     {
         /* allocate memory for the instance if not allocated */
-        bsec_instance = (uint8_t*)malloc(__FUNCTION__, sizeof(uint8_t) * bsec_get_instance_size_m());
+        bsec_instance = (uint8_t*)ezlopi_malloc(__FUNCTION__, sizeof(uint8_t) * bsec_get_instance_size_m());
     }
 
     if (BSEC_INSTANCE_SIZE < bsec_get_instance_size_m())

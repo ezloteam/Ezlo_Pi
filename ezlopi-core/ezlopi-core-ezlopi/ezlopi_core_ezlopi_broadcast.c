@@ -120,7 +120,7 @@ void ezlopi_core_ezlopi_broadcast_remove_method(f_broadcast_method_t broadcast_m
         {
             l_broadcast_method_t* remove_node = __method_head;
             __method_head = __method_head->next;
-            free(__FUNCTION__, remove_node);
+            ezlopi_free(__FUNCTION__, remove_node);
         }
         else
         {
@@ -131,7 +131,7 @@ void ezlopi_core_ezlopi_broadcast_remove_method(f_broadcast_method_t broadcast_m
                 {
                     l_broadcast_method_t* remove_node = curr_node->next;
                     curr_node->next = curr_node->next->next;
-                    free(__FUNCTION__, remove_node);
+                    ezlopi_free(__FUNCTION__, remove_node);
 
                     break;
                 }
@@ -179,7 +179,7 @@ static l_broadcast_method_t* __method_create(f_broadcast_method_t method, char* 
 
     if (method)
     {
-        method_node = malloc(__FUNCTION__, sizeof(l_broadcast_method_t));
+        method_node = ezlopi_malloc(__FUNCTION__, sizeof(l_broadcast_method_t));
 
         if (method_node)
         {

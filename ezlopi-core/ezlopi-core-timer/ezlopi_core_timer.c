@@ -85,14 +85,14 @@ static void send_event_to_queue(e_ezlopi_actions_t action)
     }
     else
     {
-        s_ezlo_event_t* event_data = malloc(__FUNCTION__, sizeof(s_ezlo_event_t));
+        s_ezlo_event_t* event_data = ezlopi_malloc(__FUNCTION__, sizeof(s_ezlo_event_t));
         if (NULL != event_data)
         {
             event_data->arg = NULL;
             event_data->action = action;
             if (0 == ezlopi_event_queue_send(event_data, true))
             {
-                free(__FUNCTION__, event_data);
+                ezlopi_free(__FUNCTION__, event_data);
             }
         }
     }
@@ -206,7 +206,7 @@ static void ezlopi_timer_init_timer_event(int timer_num, int time_ms, e_ezlopi_a
 {
     if (timer_num < MAX_TIMER)
     {
-        s_ezlopi_timer_t* timer_config = malloc(__FUNCTION__, sizeof(s_ezlopi_timer_t)); // can't be freed, used by timer-upcall to re-configure timer
+        s_ezlopi_timer_t* timer_config = ezlopi_malloc(__FUNCTION__, sizeof(s_ezlopi_timer_t)); // can't be freed, used by timer-upcall to re-configure timer
 
         if (timer_config)
         {

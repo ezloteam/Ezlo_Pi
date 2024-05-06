@@ -106,8 +106,9 @@ static int ezlopi_service_uart_set_uart_config(const cJSON* root)
 {
     int ret = 0;
 
-    char* parity = NULL;
-    char* flow_control = NULL;
+    char parity[16];
+    char flow_control[16];
+
     uint32_t baud = 0;
     uint32_t parity_val = EZPI_SERV_UART_PARITY_DEFAULT;
     uint32_t start_bits = EZPI_SERV_UART_START_BIT_DEFAULT;
@@ -125,11 +126,11 @@ static int ezlopi_service_uart_set_uart_config(const cJSON* root)
     bool flag_new_config = false;
 
     CJSON_GET_VALUE_DOUBLE(root, ezlopi_baud_str, baud);
-    CJSON_GET_VALUE_STRING(root, ezlopi_parity_str, parity);
+    CJSON_GET_VALUE_STRING_BY_COPY(root, ezlopi_parity_str, parity);
     CJSON_GET_VALUE_DOUBLE(root, ezlopi_start_bits_str, start_bits);
     CJSON_GET_VALUE_DOUBLE(root, ezlopi_stop_bits_str, stop_bits);
     CJSON_GET_VALUE_DOUBLE(root, ezlopi_frame_size_str, frame_size);
-    CJSON_GET_VALUE_STRING(root, ezlopi_flow_control_str, flow_control);
+    CJSON_GET_VALUE_STRING_BY_COPY(root, ezlopi_flow_control_str, flow_control);
 
     EZPI_CORE_nvs_read_baud(&baud_current);
     EZPI_CORE_nvs_read_parity(&parity_val_current);
@@ -168,7 +169,7 @@ static int ezlopi_service_uart_set_uart_config(const cJSON* root)
 
     if (flag_new_config)
     {
-        if (parity)
+        if ('\0' != parity[0])
         {
             parity_val = (uint32_t)EZPI_CORE_info_name_to_parity(parity);
         }
@@ -195,7 +196,7 @@ static int ezlopi_service_uart_set_uart_config(const cJSON* root)
         EZPI_CORE_nvs_write_frame_size(frame_size);
 
 
-        if (flow_control)
+        if ('\0' != flow_control[0])
         {
             flow_control_val = (uint32_t)EZPI_CORE_info_get_flw_ctrl_from_name(flow_control);
             TRACE_W("New Flow control: %d", flow_control_val);
@@ -293,7 +294,7 @@ static void ezlopi_service_uart_task(void* arg)
     static const char* RX_TASK_TAG = "RX_TASK";
     esp_log_level_set(RX_TASK_TAG, ESP_LOG_INFO);
 
-    uint8_t* data = (uint8_t*)malloc(__FUNCTION__, EZPI_SERV_UART_RX_BUFFER_SIZE);
+    uint8_t* data = (uint8_t*)ezlopi_malloc(__FUNCTION__, EZPI_SERV_UART_RX_BUFFER_SIZE);
     memset(data, 0, EZPI_SERV_UART_RX_BUFFER_SIZE);
 
     while (1)
@@ -308,7 +309,7 @@ static void ezlopi_service_uart_task(void* arg)
         }
     }
 
-    free(__FUNCTION__, data);
+    ezlopi_free(__FUNCTION__, data);
     ezpi_core_process_set_is_deleted(ENUM_EZLOPI_SERVICE_UART_TASK);
     vTaskDelete(NULL);
 }
@@ -527,7 +528,7 @@ static int ezlopi_service_uart_newtwork_info(cJSON* parent)
             bool cloud_connection_status = (EZLOPI_EVENT_NMA_REG & events) == EZLOPI_EVENT_NMA_REG;
             cJSON_AddBoolToObject(__FUNCTION__, cj_network, "cloud", cloud_connection_status);
 
-            free(__FUNCTION__, wifi_status);
+            ezlopi_free(__FUNCTION__, wifi_status);
         }
         ret = 1;
     }
@@ -560,7 +561,7 @@ static void ezlopi_service_uart_get_info()
             {
                 cJSON_Minify(serial_data_json_string);
                 EZPI_SERV_uart_tx_data(strlen(serial_data_json_string), (uint8_t*)serial_data_json_string);
-                free(__FUNCTION__, serial_data_json_string);
+                ezlopi_free(__FUNCTION__, serial_data_json_string);
             }
 
             cJSON_Delete(__FUNCTION__, cj_get_info);
@@ -652,7 +653,7 @@ static void ezlopi_service_uart_response(uint8_t cmd, uint8_t status_write, uint
         {
             cJSON_Minify(my_json_string);
             EZPI_SERV_uart_tx_data(strlen(my_json_string), (uint8_t*)my_json_string);
-            free(__FUNCTION__, my_json_string);
+            ezlopi_free(__FUNCTION__, my_json_string);
         }
     }
 }
@@ -722,7 +723,7 @@ static void ezlopi_service_uart_get_config(void)
             const int len = strlen(my_json_string);
             EZPI_SERV_uart_tx_data(len, (uint8_t*)my_json_string); // Send the data over uart
             // TRACE_D("Sending: %s", my_json_string);
-            free(__FUNCTION__, my_json_string);
+            ezlopi_free(__FUNCTION__, my_json_string);
         }
     }
 }

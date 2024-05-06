@@ -2,7 +2,7 @@
 
 file(GLOB_RECURSE config_src "./*.c")
 
-idf_component_register(SRCS "ezlopi_util_heap.c" "${config_src}"
+idf_component_register(SRCS "ezlopi_core_heap.c" "${config_src}"
     INCLUDE_DIRS "."
     REQUIRES 
                 ezlopi-util-trace

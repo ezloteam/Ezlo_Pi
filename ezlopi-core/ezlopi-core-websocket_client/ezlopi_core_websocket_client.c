@@ -19,7 +19,6 @@
 #include "EZLOPI_USER_CONFIG.h"
 
 static esp_websocket_client_handle_t client = NULL;
-static void (*__msg_upcall)(const char*, uint32_t) = NULL;
 
 typedef struct s_ws_event_arg
 {
@@ -69,17 +68,11 @@ void ezlopi_websocket_client_kill(void)
 
 esp_websocket_client_handle_t ezlopi_websocket_client_init(cJSON* uri, void (*msg_upcall)(const char*, uint32_t), void (*connection_upcall)(bool connected))
 {
-    static char * ca_cert;
-    static char * ssl_priv;
-    static char * ssl_shared;
-
     if ((NULL == client) && (NULL != uri) && (NULL != uri->valuestring) && (NULL != msg_upcall))
     {
-        if (NULL == ca_cert) ca_cert = ezlopi_factory_info_v3_get_ca_certificate();
-        if (NULL == ssl_priv) ssl_priv = ezlopi_factory_info_v3_get_ssl_private_key();
-        if (NULL == ssl_shared) ssl_shared = ezlopi_factory_info_v3_get_ssl_shared_key();
-
-        __msg_upcall = msg_upcall;
+        char * ca_cert = ezlopi_factory_info_v3_get_ca_certificate();
+        char * ssl_priv = ezlopi_factory_info_v3_get_ssl_private_key();
+        char * ssl_shared = ezlopi_factory_info_v3_get_ssl_shared_key();
 
         static s_ws_event_arg_t event_arg;
         event_arg.client = client;
@@ -105,16 +98,6 @@ esp_websocket_client_handle_t ezlopi_websocket_client_init(cJSON* uri, void (*ms
         {
             esp_websocket_register_events(client, WEBSOCKET_EVENT_ANY, websocket_event_handler, (void*)&event_arg);
             esp_websocket_client_start(client);
-        }
-        else
-        {
-            ezlopi_factory_info_v3_free(ca_cert);
-            ezlopi_factory_info_v3_free(ssl_shared);
-            ezlopi_factory_info_v3_free(ssl_priv);
-
-            ca_cert = NULL;
-            ssl_priv = NULL;
-            ssl_shared = NULL;
         }
     }
     else

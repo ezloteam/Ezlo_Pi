@@ -113,7 +113,7 @@ static int __0062_prepare(void* arg)
             }
 
             //---------------------------- ADC - DEVICE 2 -------------------------------------------
-            s_mq7_value_t* MQ7_value = (s_mq7_value_t*)malloc(__FUNCTION__, sizeof(s_mq7_value_t));
+            s_mq7_value_t* MQ7_value = (s_mq7_value_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_mq7_value_t));
             if (NULL != MQ7_value)
             {
                 memset(MQ7_value, 0, sizeof(s_mq7_value_t));
@@ -133,13 +133,13 @@ static int __0062_prepare(void* arg)
                     {
                         ret = -1;
                         ezlopi_device_free_device(MQ7_device_child_adc);
-                        free(__FUNCTION__, MQ7_value);
+                        ezlopi_free(__FUNCTION__, MQ7_value);
                     }
                 }
                 else
                 {
                     ret = -1;
-                    free(__FUNCTION__, MQ7_value);
+                    ezlopi_free(__FUNCTION__, MQ7_value);
                 }
             }
             else

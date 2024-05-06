@@ -183,7 +183,7 @@ static int __prepare(void* arg)
                     __setup_item_cloud_properties(item, cjson_device);
                     __setup_item_interface_properties(item, cjson_device);
 
-                    s_mb1013_args_t* mb1030_args = malloc(__FUNCTION__, sizeof(s_mb1013_args_t));
+                    s_mb1013_args_t* mb1030_args = ezlopi_malloc(__FUNCTION__, sizeof(s_mb1013_args_t));
                     if (mb1030_args)
                     {
                         mb1030_args->current_value = 0.0;

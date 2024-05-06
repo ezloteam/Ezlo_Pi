@@ -164,7 +164,7 @@ static int __prepare(void* arg)
             {
                 __prepare_item_properties(item_temperature, prep_arg->cjson_device);
 
-                double* temperature_value = (double*)malloc(__FUNCTION__, sizeof(double));
+                double* temperature_value = (double*)ezlopi_malloc(__FUNCTION__, sizeof(double));
                 if (temperature_value)
                 {
                     memset(temperature_value, 0, sizeof(double));

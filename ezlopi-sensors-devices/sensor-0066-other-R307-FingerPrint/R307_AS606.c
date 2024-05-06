@@ -99,7 +99,7 @@ static int send_uart_packets(int uart_channel_num, fingerprint_packet_t* txPacke
 static bool SEND_PACKET(int uart_channel_num, uint8_t PID, uint16_t length, uint8_t* Combined_data)
 {
     bool ret = false;
-    fingerprint_packet_t* txPacket = (fingerprint_packet_t*)malloc(__FUNCTION__, sizeof(fingerprint_packet_t));
+    fingerprint_packet_t* txPacket = (fingerprint_packet_t*)ezlopi_malloc(__FUNCTION__, sizeof(fingerprint_packet_t));
     if (txPacket)
     {
         txPacket->header_code[0] = FINGERPRINT_HEADER_MSB;
@@ -112,7 +112,7 @@ static bool SEND_PACKET(int uart_channel_num, uint8_t PID, uint16_t length, uint
         {
             ret = true;
         }
-        free(__FUNCTION__, txPacket);
+        ezlopi_free(__FUNCTION__, txPacket);
     }
     return ret;
 }

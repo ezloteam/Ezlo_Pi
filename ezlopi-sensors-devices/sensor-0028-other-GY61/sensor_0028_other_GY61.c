@@ -129,7 +129,7 @@ static int __0028_prepare(void* arg)
     {
         cJSON* cj_device = device_prep_arg->cjson_device;
 
-        s_gy61_data_t* gy61_value = (s_gy61_data_t*)malloc(__FUNCTION__, sizeof(s_gy61_data_t));
+        s_gy61_data_t* gy61_value = (s_gy61_data_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_gy61_data_t));
         if (NULL != gy61_value)
         {
             memset(gy61_value, 0, sizeof(s_gy61_data_t));
@@ -194,13 +194,13 @@ static int __0028_prepare(void* arg)
                     (NULL == gy61_device_z_child))
                 {
                     ezlopi_device_free_device(gy61_device_x_parent);
-                    free(__FUNCTION__, gy61_value);
+                    ezlopi_free(__FUNCTION__, gy61_value);
                     ret = -1;
                 }
             }
             else
             {
-                free(__FUNCTION__, gy61_value);
+                ezlopi_free(__FUNCTION__, gy61_value);
                 ret = -1;
             }
         }

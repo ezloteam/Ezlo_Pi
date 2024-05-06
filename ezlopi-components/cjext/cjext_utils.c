@@ -69,7 +69,7 @@ static unsigned char *cJSONUtils_strdup(const char * who, const unsigned char *c
     unsigned char *copy = NULL;
 
     size_t length = strlen((const char *)string) + sizeof("");
-    copy = (unsigned char *)malloc(who, length);
+    copy = (unsigned char *)ezlopi_malloc(who, length);
     if (copy == NULL)
     {
         return NULL;
@@ -221,35 +221,35 @@ char * cJSONUtils_FindPointerFromObjectTo(const char * who, const cJSON *const o
             if (cJSON_IsArray(object))
             {
                 /* reserve enough memory for a 64 bit integer + '/' and '\0' */
-                unsigned char *full_pointer = (unsigned char *)malloc(who, strlen((char *)target_pointer) + 20 + sizeof("/"));
+                unsigned char *full_pointer = (unsigned char *)ezlopi_malloc(who, strlen((char *)target_pointer) + 20 + sizeof("/"));
                 /* check if conversion to unsigned long is valid
                  * This should be eliminated at compile time by dead code elimination
                  * if size_t is an alias of unsigned long, or if it is bigger */
                 if (child_index > ULONG_MAX)
                 {
-                    free(who, target_pointer);
-                    free(who, full_pointer);
+                    ezlopi_free(who, target_pointer);
+                    ezlopi_free(who, full_pointer);
                     return NULL;
                 }
                 sprintf((char *)full_pointer, "/%lu%s", (unsigned long)child_index, target_pointer); /* /<array_index><path> */
-                free(who, target_pointer);
+                ezlopi_free(who, target_pointer);
 
                 return (char *)full_pointer;
             }
 
             if (cJSON_IsObject(object))
             {
-                unsigned char *full_pointer = (unsigned char *)malloc(who, strlen((char *)target_pointer) + pointer_encoded_length((unsigned char *)current_child->string) + 2);
+                unsigned char *full_pointer = (unsigned char *)ezlopi_malloc(who, strlen((char *)target_pointer) + pointer_encoded_length((unsigned char *)current_child->string) + 2);
                 full_pointer[0] = '/';
                 encode_string_as_pointer(full_pointer + 1, (unsigned char *)current_child->string);
                 strcat((char *)full_pointer, (char *)target_pointer);
-                free(who, target_pointer);
+                ezlopi_free(who, target_pointer);
 
                 return (char *)full_pointer;
             }
 
             /* reached leaf of the tree, found nothing */
-            free(who, target_pointer);
+            ezlopi_free(who, target_pointer);
             return NULL;
         }
     }
@@ -475,7 +475,7 @@ static cJSON *detach_path(const char * who, cJSON *object, const unsigned char *
 cleanup:
     if (parent_pointer != NULL)
     {
-        free(who, parent_pointer);
+        ezlopi_free(who, parent_pointer);
     }
 
     return detached_item;
@@ -800,11 +800,11 @@ static void overwrite_item(const char * who, cJSON *const root, const cJSON repl
 
     if (root->string != NULL)
     {
-        free(who, root->string);
+        ezlopi_free(who, root->string);
     }
     if (root->valuestring != NULL)
     {
-        free(who, root->valuestring);
+        ezlopi_free(who, root->valuestring);
     }
     if (root->child != NULL)
     {
@@ -880,13 +880,13 @@ static int apply_patch(const char * who, cJSON *object, const cJSON *patch, cons
             overwrite_item(who, object, *value);
 
             /* delete the duplicated value */
-            free(who, value);
+            ezlopi_free(who, value);
             value = NULL;
 
             /* the string "value" isn't needed */
             if (object->string != NULL)
             {
-                free(who, object->string);
+                ezlopi_free(who, object->string);
                 object->string = NULL;
             }
 
@@ -1041,7 +1041,7 @@ cleanup:
     }
     if (parent_pointer != NULL)
     {
-        free(who, parent_pointer);
+        ezlopi_free(who, parent_pointer);
     }
 
     return status;
@@ -1129,13 +1129,13 @@ static void compose_patch(const char * who, cJSON *const patches, const unsigned
     {
         size_t suffix_length = pointer_encoded_length(suffix);
         size_t path_length = strlen((const char *)path);
-        unsigned char *full_path = (unsigned char *)malloc(who, path_length + suffix_length + sizeof("/"));
+        unsigned char *full_path = (unsigned char *)ezlopi_malloc(who, path_length + suffix_length + sizeof("/"));
 
         sprintf((char *)full_path, "%s/", (const char *)path);
         encode_string_as_pointer(full_path + path_length + 1, suffix);
 
         cJSON_AddItemToObject(who, patch, "path", cJSON_CreateString(who, (const char *)full_path));
-        free(who, full_path);
+        ezlopi_free(who, full_path);
     }
 
     if (value != NULL)
@@ -1184,7 +1184,7 @@ static void create_patches(const char * who, cJSON *const patches, const unsigne
         size_t index = 0;
         cJSON *from_child = from->child;
         cJSON *to_child = to->child;
-        unsigned char *new_path = (unsigned char *)malloc(who, strlen((const char *)path) + 20 + sizeof("/")); /* Allow space for 64bit int. log10(2^64) = 20 */
+        unsigned char *new_path = (unsigned char *)ezlopi_malloc(who, strlen((const char *)path) + 20 + sizeof("/")); /* Allow space for 64bit int. log10(2^64) = 20 */
 
         /* generate patches for all array elements that exist in both "from" and "to" */
         for (index = 0; (from_child != NULL) && (to_child != NULL); (void)(from_child = from_child->next), (void)(to_child = to_child->next), index++)
@@ -1194,7 +1194,7 @@ static void create_patches(const char * who, cJSON *const patches, const unsigne
              * if size_t is an alias of unsigned long, or if it is bigger */
             if (index > ULONG_MAX)
             {
-                free(who, new_path);
+                ezlopi_free(who, new_path);
                 return;
             }
             sprintf((char *)new_path, "%s/%lu", path, (unsigned long)index); /* path of the current array element */
@@ -1209,7 +1209,7 @@ static void create_patches(const char * who, cJSON *const patches, const unsigne
              * if size_t is an alias of unsigned long, or if it is bigger */
             if (index > ULONG_MAX)
             {
-                free(who, new_path);
+                ezlopi_free(who, new_path);
                 return;
             }
             sprintf((char *)new_path, "%lu", (unsigned long)index);
@@ -1220,7 +1220,7 @@ static void create_patches(const char * who, cJSON *const patches, const unsigne
         {
             compose_patch(who, patches, (const unsigned char *)"add", path, (const unsigned char *)"-", to_child);
         }
-        free(who, new_path);
+        ezlopi_free(who, new_path);
         return;
     }
 
@@ -1255,14 +1255,14 @@ static void create_patches(const char * who, cJSON *const patches, const unsigne
                 /* both object keys are the same */
                 size_t path_length = strlen((const char *)path);
                 size_t from_child_name_length = pointer_encoded_length((unsigned char *)from_child->string);
-                unsigned char *new_path = (unsigned char *)malloc(who, path_length + from_child_name_length + sizeof("/"));
+                unsigned char *new_path = (unsigned char *)ezlopi_malloc(who, path_length + from_child_name_length + sizeof("/"));
 
                 sprintf((char *)new_path, "%s/", path);
                 encode_string_as_pointer(new_path + path_length + 1, (unsigned char *)from_child->string);
 
                 /* create a patch for the element */
                 create_patches(who, patches, new_path, from_child, to_child, case_sensitive);
-                free(who, new_path);
+                ezlopi_free(who, new_path);
 
                 from_child = from_child->next;
                 to_child = to_child->next;

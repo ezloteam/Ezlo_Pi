@@ -18,14 +18,24 @@
 static uint32_t g_provisioning_status = 0;
 static const esp_partition_t* partition_ctx_v3 = NULL;
 
-static int ezlopi_factory_info_v3_set_4kb(const char* data, uint32_t offset)
+/* Should not free, Since these informations are used by web-socket-client and are used to reconnect. */
+/* will help decrease heap-fragmentation */
+static char * __ca_cert = NULL;
+static char * __pvt_key = NULL;
+static char * __pub_key = NULL;
+
+static int ezlopi_factory_info_v3_set_4kb(const char* data, uint32_t offset, uint32_t len)
 {
     int ret = 0;
-    if (data)
+    char * tmp_variable = ezlopi_malloc(__FUNCTION__, len + 1);
+
+    if (tmp_variable)
     {
+        snprintf(tmp_variable, len + 1, "%.*s", len, data);
+
         if (ESP_OK == esp_partition_erase_range(partition_ctx_v3, offset, EZLOPI_FINFO_READ_LEN_4KB))
         {
-            if (ESP_OK == esp_partition_write(partition_ctx_v3, offset, data, strlen(data) + 1))
+            if (ESP_OK == esp_partition_write(partition_ctx_v3, offset, tmp_variable, len + 1))
             {
                 TRACE_S("Flash write successful");
                 ret = 1;
@@ -39,6 +49,8 @@ static int ezlopi_factory_info_v3_set_4kb(const char* data, uint32_t offset)
         {
             TRACE_E("esp-partition erase failed!");
         }
+
+        ezlopi_free(__FUNCTION__, tmp_variable);
     }
 
     return ret;
@@ -67,13 +79,13 @@ static char *ezlopi_factory_info_v3_read_string(const char * name, e_ezlopi_fact
     if (ezlopi_factory_info_v3_init())
     {
         TRACE_D("%s", name);
-        char *tmp_buffer = (char *)malloc(name, length);
+        char *tmp_buffer = (char *)ezlopi_malloc(name, length);
         if (tmp_buffer)
         {
             if (ESP_OK == esp_partition_read(partition_ctx_v3, offset, tmp_buffer, length))
             {
                 int s_length = (strlen(tmp_buffer) < length) ? strlen(tmp_buffer) : length;
-                read_string = (char*)malloc(name, s_length + 1);
+                read_string = (char*)ezlopi_malloc(name, s_length + 1);
 
                 if (NULL != read_string)
                 {
@@ -83,7 +95,7 @@ static char *ezlopi_factory_info_v3_read_string(const char * name, e_ezlopi_fact
                     }
                     else
                     {
-                        free(__FUNCTION__, read_string);
+                        ezlopi_free(__FUNCTION__, read_string);
                         read_string = NULL;
                     }
                 }
@@ -97,7 +109,7 @@ static char *ezlopi_factory_info_v3_read_string(const char * name, e_ezlopi_fact
                 TRACE_E("Couldn't fetch 'string' from id-flash-region!");
             }
 
-            free(__FUNCTION__, tmp_buffer);
+            ezlopi_free(__FUNCTION__, tmp_buffer);
         }
         else
         {
@@ -121,7 +133,7 @@ void ezlopi_factory_info_v3_free(void* arg)
 {
     if (arg)
     {
-        free(__FUNCTION__, arg);
+        ezlopi_free(__FUNCTION__, arg);
         arg = NULL;
     }
 }
@@ -144,9 +156,9 @@ void print_factory_info_v3(void)
     char* cloud_server = ezlopi_factory_info_v3_get_cloud_server();
     // const char* provision_server = ezlopi_factory_info_v3_get_provisioning_server();
     const char* device_type = ezlopi_factory_info_v3_get_device_type();
-    char* ca_certificate = ezlopi_factory_info_v3_get_ca_certificate();
-    char* ssl_private_key = ezlopi_factory_info_v3_get_ssl_private_key();
-    char* ssl_shared_key = ezlopi_factory_info_v3_get_ssl_shared_key();
+    // char* ca_certificate = ezlopi_factory_info_v3_get_ca_certificate();
+    // char* ssl_private_key = ezlopi_factory_info_v3_get_ssl_private_key();
+    // char* ssl_shared_key = ezlopi_factory_info_v3_get_ssl_shared_key();
     char* ezlopi_config = ezlopi_factory_info_v3_get_ezlopi_config();
 
     TRACE_W("----------------- Factory Info -----------------");
@@ -179,9 +191,9 @@ void print_factory_info_v3(void)
     ezlopi_factory_info_v3_free(wifi_ssid);
     ezlopi_factory_info_v3_free(wifi_password);
     ezlopi_factory_info_v3_free(cloud_server);
-    ezlopi_factory_info_v3_free(ca_certificate);
-    ezlopi_factory_info_v3_free(ssl_private_key);
-    ezlopi_factory_info_v3_free(ssl_shared_key);
+    // ezlopi_factory_info_v3_free(ca_certificate); // allocated once for all, do not free
+    // ezlopi_factory_info_v3_free(ssl_private_key); // allocated once for all, do not free
+    // ezlopi_factory_info_v3_free(ssl_shared_key); // allocated once for all, do not free
     ezlopi_factory_info_v3_free(ezlopi_config);
 #endif
 }
@@ -193,7 +205,7 @@ uint32_t ezlopi_factory_info_v3_get_provisioning_status(void)
     if (cloud_server && strstr(cloud_server, "https://"))
     {
         g_provisioning_status = 1;
-        free(__FUNCTION__, cloud_server);
+        ezlopi_free(__FUNCTION__, cloud_server);
     }
 
     return g_provisioning_status;
@@ -229,7 +241,7 @@ char* ezlopi_factory_info_v3_get_name(void)
     {
         if (!isprint(read_data[0]))
         {
-            free(__FUNCTION__, read_data);
+            ezlopi_free(__FUNCTION__, read_data);
             read_data = NULL;
         }
     }
@@ -244,7 +256,7 @@ char* ezlopi_factory_info_v3_get_manufacturer(void)
     {
         if (!isprint(read_data[0]))
         {
-            free(__FUNCTION__, read_data);
+            ezlopi_free(__FUNCTION__, read_data);
             read_data = NULL;
         }
     }
@@ -259,7 +271,7 @@ char* ezlopi_factory_info_v3_get_brand(void)
     {
         if (!isprint(read_data[0]))
         {
-            free(__FUNCTION__, read_data);
+            ezlopi_free(__FUNCTION__, read_data);
             read_data = NULL;
         }
     }
@@ -273,7 +285,7 @@ char* ezlopi_factory_info_v3_get_model(void)
     {
         if (!isprint(read_data[0]))
         {
-            free(__FUNCTION__, read_data);
+            ezlopi_free(__FUNCTION__, read_data);
             read_data = NULL;
         }
     }
@@ -287,7 +299,7 @@ char* ezlopi_factory_info_get_v3_provision_token(void)
     {
         if (!isprint(read_data[0]))
         {
-            free(__FUNCTION__, read_data);
+            ezlopi_free(__FUNCTION__, read_data);
             read_data = NULL;
         }
     }
@@ -340,7 +352,7 @@ char* ezlopi_factory_info_v3_get_device_uuid(void)
     {
         if (!isprint(read_data[0]))
         {
-            free(__FUNCTION__, read_data);
+            ezlopi_free(__FUNCTION__, read_data);
             read_data = NULL;
         }
     }
@@ -354,7 +366,7 @@ char* ezlopi_factory_info_v3_get_provisioning_uuid(void)
     {
         if (!isprint(read_data[0]))
         {
-            free(__FUNCTION__, read_data);
+            ezlopi_free(__FUNCTION__, read_data);
             read_data = NULL;
         }
     }
@@ -368,7 +380,7 @@ char* ezlopi_factory_info_v3_get_ssid(void)
     {
         if (!isprint(read_data[0]))
         {
-            free(__FUNCTION__, read_data);
+            ezlopi_free(__FUNCTION__, read_data);
             read_data = NULL;
         }
     }
@@ -383,7 +395,7 @@ char* ezlopi_factory_info_v3_get_password(void)
     {
         if (!isprint(read_data[0]))
         {
-            free(__FUNCTION__, read_data);
+            ezlopi_free(__FUNCTION__, read_data);
             read_data = NULL;
         }
     }
@@ -399,7 +411,7 @@ char* ezlopi_factory_info_v3_get_ezlopi_mac(void)
     {
         if (!isprint(read_data[0]))
         {
-            free(__FUNCTION__, read_data);
+            ezlopi_free(__FUNCTION__, read_data);
             read_data = NULL;
         }
     }
@@ -434,19 +446,55 @@ const char* ezlopi_factory_info_v3_get_device_type(void)
     return "ezlopi_generic";
 }
 
+void ezlopi_factory_info_v3_free_ca_certificate(void)
+{
+    if (__ca_cert)
+    {
+        ezlopi_free(__FUNCTION__, __ca_cert);
+        __ca_cert = NULL;
+    }
+}
 char* ezlopi_factory_info_v3_get_ca_certificate(void)
 {
-    return ezlopi_factory_info_v3_read_string(__FUNCTION__, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_CA_CERTIFICATE, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_CA_CERTIFICATE);
+    if (NULL == __ca_cert)
+    {
+        __ca_cert = ezlopi_factory_info_v3_read_string(__FUNCTION__, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_CA_CERTIFICATE, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_CA_CERTIFICATE);
+    }
+    return __ca_cert;
 }
 
+void ezlopi_factory_info_v3_free_ssl_private_key(void)
+{
+    if (__pvt_key)
+    {
+        ezlopi_free(__FUNCTION__, __pvt_key);
+        __pvt_key = NULL;
+    }
+}
 char* ezlopi_factory_info_v3_get_ssl_private_key(void)
 {
-    return ezlopi_factory_info_v3_read_string(__FUNCTION__, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_SSL_PRIVATE_KEY, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_SSL_PRIVATE_KEY);
+    if (NULL == __pvt_key)
+    {
+        __pvt_key = ezlopi_factory_info_v3_read_string(__FUNCTION__, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_SSL_PRIVATE_KEY, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_SSL_PRIVATE_KEY);
+    }
+    return __pvt_key;
 }
 
+void  ezlopi_factory_info_v3_free_ssl_shared_key(void)
+{
+    if (__pub_key)
+    {
+        ezlopi_free(__FUNCTION__, __pub_key);
+        __pub_key = NULL;
+    }
+}
 char* ezlopi_factory_info_v3_get_ssl_shared_key(void)
 {
-    return ezlopi_factory_info_v3_read_string(__FUNCTION__, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_SSL_SHARED_KEY, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_SSL_SHARED_KEY);
+    if (NULL == __pub_key)
+    {
+        __pub_key = ezlopi_factory_info_v3_read_string(__FUNCTION__, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_SSL_SHARED_KEY, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_SSL_SHARED_KEY);
+    }
+    return __pub_key;
 }
 
 char* ezlopi_factory_info_v3_get_ezlopi_config(void)
@@ -456,7 +504,7 @@ char* ezlopi_factory_info_v3_get_ezlopi_config(void)
     {
         if (ret)
         {
-            free(__FUNCTION__, ret);
+            ezlopi_free(__FUNCTION__, ret);
             ret = NULL;
         }
     }
@@ -471,7 +519,7 @@ int ezlopi_factory_info_v3_set_basic(s_basic_factory_info_t* ezlopi_config_basic
     {
         if (ezlopi_factory_info_v3_init())
         {
-            char* tmp_buffer = (char*)malloc(__FUNCTION__, EZLOPI_FINFO_READ_LEN_4KB);
+            char* tmp_buffer = (char*)ezlopi_malloc(__FUNCTION__, EZLOPI_FINFO_READ_LEN_4KB);
             if (tmp_buffer)
             {
                 if (ESP_OK == esp_partition_read(partition_ctx_v3, EZLOPI_FINFO_OFFSET_HUB_DATA, tmp_buffer, EZLOPI_FINFO_READ_LEN_4KB))
@@ -601,7 +649,7 @@ int ezlopi_factory_info_v3_set_basic(s_basic_factory_info_t* ezlopi_config_basic
                     TRACE_E("Couldn't fetch 'string' from id-flash-region!");
                 }
                 // ESP_LOG_BUFFER_HEXDUMP("PROV", tmp_buffer, length, ESP_LOG_INFO);
-                free(__FUNCTION__, tmp_buffer);
+                ezlopi_free(__FUNCTION__, tmp_buffer);
             }
         }
     }
@@ -617,7 +665,7 @@ int ezlopi_factory_info_v3_set_wifi(char* ssid, char* password)
         if (ezlopi_factory_info_v3_init())
         {
 
-            char* tmp_buffer = (char*)malloc(__FUNCTION__, EZLOPI_FINFO_READ_LEN_4KB);
+            char* tmp_buffer = (char*)ezlopi_malloc(__FUNCTION__, EZLOPI_FINFO_READ_LEN_4KB);
             if (tmp_buffer)
             {
                 if (ESP_OK == esp_partition_read(partition_ctx_v3, EZLOPI_FINFO_OFFSET_HUB_DATA, tmp_buffer, EZLOPI_FINFO_READ_LEN_4KB))
@@ -642,7 +690,7 @@ int ezlopi_factory_info_v3_set_wifi(char* ssid, char* password)
                     TRACE_E("Couldn't fetch 'string' from id-flash-region!");
                 }
 
-                free(__FUNCTION__, tmp_buffer);
+                ezlopi_free(__FUNCTION__, tmp_buffer);
             }
             else
             {
@@ -654,29 +702,54 @@ int ezlopi_factory_info_v3_set_wifi(char* ssid, char* password)
     return ret;
 }
 
-int ezlopi_factory_info_v3_set_ssl_private_key(const char* data)
+int ezlopi_factory_info_v3_set_ssl_private_key(cJSON * cj_data)
 {
-    return ezlopi_factory_info_v3_set_4kb(data, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_SSL_PRIVATE_KEY, E_EZLOPI_FACTORY_INFO_CONN_DATA));
+    int ret = 0;
+    if (cj_data && cj_data->valuestring && cj_data->str_value_len)
+    {
+        ret = ezlopi_factory_info_v3_set_4kb(cj_data->valuestring, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_SSL_PRIVATE_KEY, E_EZLOPI_FACTORY_INFO_CONN_DATA), cj_data->str_value_len);
+    }
+    return ret;
 }
 
-int ezlopi_factory_info_v3_set_ssl_public_key(const char* data)
+int ezlopi_factory_info_v3_set_ssl_public_key(cJSON * cj_data)
 {
-    return ezlopi_factory_info_v3_set_4kb(data, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_SSL_SHARED_KEY, E_EZLOPI_FACTORY_INFO_CONN_DATA));
+    int ret = 0;
+    if (cj_data && cj_data->valuestring && cj_data->str_value_len)
+    {
+        ret = ezlopi_factory_info_v3_set_4kb(cj_data->valuestring, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_SSL_SHARED_KEY, E_EZLOPI_FACTORY_INFO_CONN_DATA), cj_data->str_value_len);
+    }
+    return ret;
 }
 
-int ezlopi_factory_info_v3_set_ssl_shared_key(const char* data)
+int ezlopi_factory_info_v3_set_ssl_shared_key(cJSON * cj_data)
 {
-    return ezlopi_factory_info_v3_set_4kb(data, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_SSL_SHARED_KEY, E_EZLOPI_FACTORY_INFO_CONN_DATA));
+    int ret = 0;
+    if (cj_data && cj_data->valuestring && cj_data->str_value_len)
+    {
+        ret = ezlopi_factory_info_v3_set_4kb(cj_data->valuestring, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_SSL_SHARED_KEY, E_EZLOPI_FACTORY_INFO_CONN_DATA), cj_data->str_value_len);
+    }
+    return ret;
 }
 
-int ezlopi_factory_info_v3_set_ca_cert(const char* data)
+int ezlopi_factory_info_v3_set_ca_cert(cJSON * cj_data)
 {
-    return ezlopi_factory_info_v3_set_4kb(data, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_CA_CERTIFICATE, E_EZLOPI_FACTORY_INFO_CONN_DATA));
+    int ret = 0;
+    if (cj_data && cj_data->valuestring && cj_data->str_value_len)
+    {
+        ret = ezlopi_factory_info_v3_set_4kb(cj_data->valuestring, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_CA_CERTIFICATE, E_EZLOPI_FACTORY_INFO_CONN_DATA), cj_data->str_value_len);
+    }
+    return ret;
 }
 
-int ezlopi_factory_info_v3_set_ezlopi_config(const char* data)
+int ezlopi_factory_info_v3_set_ezlopi_config(cJSON * cj_data)
 {
-    return ezlopi_factory_info_v3_set_4kb(data, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_EZLOPI_CONFIG_JSON, E_EZLOPI_FACTORY_INFO_CONN_DATA));
+    int ret = 0;
+    if (cj_data && cj_data->valuestring && cj_data->str_value_len)
+    {
+        ret = ezlopi_factory_info_v3_set_4kb(cj_data->valuestring, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_EZLOPI_CONFIG_JSON, E_EZLOPI_FACTORY_INFO_CONN_DATA), cj_data->str_value_len);
+    }
+    return ret;
 }
 
 int ezlopi_factory_info_v3_factory_reset(void)

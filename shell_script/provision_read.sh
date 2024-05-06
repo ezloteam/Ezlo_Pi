@@ -1,6 +1,3 @@
-. ~/esp/esp-idf/export.sh
-
-
 speed=921600
 port="/dev/ttyUSB0"
 
@@ -21,6 +18,7 @@ do
             echo "[-l]      lenght of binary data to be read";
             echo "[-a]      binary file which contains provisioning data";
             echo "[-h]      help";
+            exit 0
 
     esac
 done

@@ -224,7 +224,7 @@ static int __prepare(void* arg)
             l_ezlopi_item_t* item_turbidity = ezlopi_device_add_item_to_device(device, sensor_0033_ADC_turbidity);
             if (item_turbidity)
             {
-                char* turbidity_sensor_states = (char*)malloc(__FUNCTION__, 40 * sizeof(char));
+                char* turbidity_sensor_states = (char*)ezlopi_malloc(__FUNCTION__, 40 * sizeof(char));
                 if (turbidity_sensor_states)
                 {
                     memset(turbidity_sensor_states, 0, sizeof(s_ezlopi_analog_data_t));

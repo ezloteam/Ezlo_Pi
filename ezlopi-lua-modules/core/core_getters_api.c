@@ -22,7 +22,7 @@ int lcore_get_product_name(lua_State *lua_state)
     if (product_name)
     {
         lua_pushstring(lua_state, product_name);
-        free(__FUNCTION__, product_name);
+        ezlopi_free(__FUNCTION__, product_name);
         ret = 1;
     }
     else
@@ -230,15 +230,15 @@ static int __create_lua_table_for_device(lua_State *lua_state, l_ezlopi_device_t
 
     char *manufacturer = ezlopi_factory_info_v3_get_manufacturer();
     lua_create_table_string_key_value(ezlopi_manufacturer_str, manufacturer);
-    free(__FUNCTION__, manufacturer);
+    ezlopi_free(__FUNCTION__, manufacturer);
 
     char *model = ezlopi_factory_info_v3_get_model();
     lua_create_table_string_key_value(ezlopi_model_str, model);
-    free(__FUNCTION__, model);
+    ezlopi_free(__FUNCTION__, model);
 
     char *brand = ezlopi_factory_info_v3_get_brand();
     lua_create_table_string_key_value(ezlopi_brand_str, brand);
-    free(__FUNCTION__, brand);
+    ezlopi_free(__FUNCTION__, brand);
     lua_settable(lua_state, -3);
 
     lua_pushstring(lua_state, ezlopi_firmware_str);

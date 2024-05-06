@@ -101,7 +101,7 @@ static int __0041_prepare(void* arg)
     {
         cJSON* cj_device = device_prep_arg->cjson_device;
 
-        s_fc28_data_t* user_data = (s_fc28_data_t*)malloc(__FUNCTION__, sizeof(s_fc28_data_t));
+        s_fc28_data_t* user_data = (s_fc28_data_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_fc28_data_t));
         if (NULL != user_data)
         {
             memset(user_data, 0, sizeof(s_fc28_data_t));
@@ -121,13 +121,13 @@ static int __0041_prepare(void* arg)
                 {
                     ret = -1;
                     ezlopi_device_free_device(fc28_device);
-                    free(__FUNCTION__, user_data);
+                    ezlopi_free(__FUNCTION__, user_data);
                 }
             }
             else
             {
                 ret = -1;
-                free(__FUNCTION__, user_data);
+                ezlopi_free(__FUNCTION__, user_data);
             }
         }
         else

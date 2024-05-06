@@ -197,7 +197,7 @@ int ezlopi_core_modes_store_to_nvs(void)
         if (modes_str)
         {
             ret = ezlopi_nvs_write_modes(modes_str);
-            free(__FUNCTION__, modes_str);
+            ezlopi_free(__FUNCTION__, modes_str);
         }
     }
 
@@ -212,7 +212,7 @@ void ezlopi_core_modes_init(void)
     if (custom_modes_str)
     {
         cJSON* cj_custom_modes = cJSON_Parse(__FUNCTION__, custom_modes_str);
-        free(__FUNCTION__, custom_modes_str);
+        ezlopi_free(__FUNCTION__, custom_modes_str);
 
         CJSON_TRACE("cj_custom-modes", cj_custom_modes);
 

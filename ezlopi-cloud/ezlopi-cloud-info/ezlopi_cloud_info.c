@@ -47,7 +47,7 @@ void info_get(cJSON* cj_request, cJSON* cj_response)
             {
                 cJSON_AddStringToObject(__FUNCTION__, cjson_location, "timezone", location);
                 cJSON_AddStringToObject(__FUNCTION__, cjson_location, "state", ezlopi_custom_timezone_str);
-                free(__FUNCTION__, location);
+                ezlopi_free(__FUNCTION__, location);
             }
             else
             {

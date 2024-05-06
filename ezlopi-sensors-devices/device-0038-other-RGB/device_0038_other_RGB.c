@@ -190,7 +190,7 @@ static int __init(l_ezlopi_item_t* item)
                         rgb_args->red_struct.channel = RGB_LED_red_channel_speed->channel;
                         rgb_args->red_struct.speed_mode = RGB_LED_red_channel_speed->speed_mode;
                         TRACE_D("red channel is %d", rgb_args->red_struct.channel);
-                        free(__FUNCTION__, RGB_LED_red_channel_speed);
+                        ezlopi_free(__FUNCTION__, RGB_LED_red_channel_speed);
                     }
 
                     s_ezlopi_channel_speed_t* RGB_LED_green_channel_speed = ezlopi_pwm_init(rgb_args->green_struct.gpio_num, rgb_args->green_struct.pwm_resln, rgb_args->green_struct.freq_hz, rgb_args->green_struct.duty_cycle);
@@ -199,7 +199,7 @@ static int __init(l_ezlopi_item_t* item)
                         rgb_args->green_struct.channel = RGB_LED_green_channel_speed->channel;
                         rgb_args->green_struct.speed_mode = RGB_LED_green_channel_speed->speed_mode;
                         TRACE_D("green channel is %d", rgb_args->green_struct.channel);
-                        free(__FUNCTION__, RGB_LED_green_channel_speed);
+                        ezlopi_free(__FUNCTION__, RGB_LED_green_channel_speed);
                     }
 
                     s_ezlopi_channel_speed_t* RGB_LED_blue_channel_speed = ezlopi_pwm_init(rgb_args->blue_struct.gpio_num, rgb_args->blue_struct.pwm_resln, rgb_args->blue_struct.freq_hz, rgb_args->blue_struct.duty_cycle);
@@ -208,7 +208,7 @@ static int __init(l_ezlopi_item_t* item)
                         rgb_args->blue_struct.channel = RGB_LED_blue_channel_speed->channel;
                         rgb_args->blue_struct.speed_mode = RGB_LED_blue_channel_speed->speed_mode;
                         TRACE_D("blue channel is %d", rgb_args->blue_struct.channel);
-                        free(__FUNCTION__, RGB_LED_blue_channel_speed);
+                        ezlopi_free(__FUNCTION__, RGB_LED_blue_channel_speed);
                     }
 
                     RGB_LED_change_color_value(rgb_args);
@@ -340,7 +340,7 @@ static int __prepare(void* arg)
         if (RGB_device)
         {
             ret = 1;
-            s_rgb_args_t* rgb_args = malloc(__FUNCTION__, sizeof(s_rgb_args_t));
+            s_rgb_args_t* rgb_args = ezlopi_malloc(__FUNCTION__, sizeof(s_rgb_args_t));
             if (rgb_args)
             {
                 memset(rgb_args, 0, sizeof(s_rgb_args_t));
@@ -369,7 +369,7 @@ static int __prepare(void* arg)
 
                 if (!rgb_args->RGB_LED_item && !rgb_args->RGB_LED_onoff_switch_item && !rgb_args->RGB_LED_dimmer_item)
                 {
-                    free(__FUNCTION__, rgb_args);
+                    ezlopi_free(__FUNCTION__, rgb_args);
                     ezlopi_device_free_device(RGB_device);
                     ret = -1;
                 }

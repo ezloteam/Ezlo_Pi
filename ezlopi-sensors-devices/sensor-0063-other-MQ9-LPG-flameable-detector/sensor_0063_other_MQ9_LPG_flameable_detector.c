@@ -112,7 +112,7 @@ static int __0063_prepare(void* arg)
             }
 
             //---------------------------- ADC - DEVICE 2 -------------------------------------------
-            s_mq9_value_t* MQ9_value = (s_mq9_value_t*)malloc(__FUNCTION__, sizeof(s_mq9_value_t));
+            s_mq9_value_t* MQ9_value = (s_mq9_value_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_mq9_value_t));
             if (NULL != MQ9_value)
             {
                 memset(MQ9_value, 0, sizeof(s_mq9_value_t));
@@ -132,13 +132,13 @@ static int __0063_prepare(void* arg)
                     {
                         ret = -1;
                         ezlopi_device_free_device(MQ9_device_child_adc);
-                        free(__FUNCTION__, MQ9_value);
+                        ezlopi_free(__FUNCTION__, MQ9_value);
                     }
                 }
                 else
                 {
                     ret = -1;
-                    free(__FUNCTION__, MQ9_value);
+                    ezlopi_free(__FUNCTION__, MQ9_value);
                 }
             }
             else

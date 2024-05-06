@@ -93,7 +93,7 @@ static int __0017_prepare(void* arg)
     if (device_prep_arg && (NULL != device_prep_arg->cjson_device))
     {
         cJSON* cj_device = device_prep_arg->cjson_device;
-        s_potentiometer_t* user_data = (s_potentiometer_t*)malloc(__FUNCTION__, sizeof(s_potentiometer_t));
+        s_potentiometer_t* user_data = (s_potentiometer_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_potentiometer_t));
         if (NULL != user_data)
         {
             memset(user_data, 0, sizeof(s_potentiometer_t));
@@ -110,13 +110,13 @@ static int __0017_prepare(void* arg)
                 else
                 {
                     ezlopi_device_free_device(potentiometer_device);
-                    free(__FUNCTION__, user_data);
+                    ezlopi_free(__FUNCTION__, user_data);
                     ret = -1;
                 }
             }
             else
             {
-                free(__FUNCTION__, user_data);
+                ezlopi_free(__FUNCTION__, user_data);
                 ret = -1;
             }
         }

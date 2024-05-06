@@ -147,7 +147,7 @@ int ezlopi_ble_gatt_number_of_services(void)
 
 s_gatt_service_t* ezlopi_ble_gatt_create_service(uint16_t app_id, esp_bt_uuid_t* service_uuid)
 {
-    s_gatt_service_t* service_obj = malloc(__FUNCTION__, sizeof(s_gatt_service_t));
+    s_gatt_service_t* service_obj = ezlopi_malloc(__FUNCTION__, sizeof(s_gatt_service_t));
     if (service_obj)
     {
         memset(service_obj, 0, sizeof(s_gatt_service_t));
@@ -174,7 +174,7 @@ s_gatt_char_t* ezlopi_ble_gatt_add_characteristic(s_gatt_service_t* service_obj,
     s_gatt_char_t* character_object = NULL;
     if (service_obj)
     {
-        character_object = malloc(__FUNCTION__, sizeof(s_gatt_char_t));
+        character_object = ezlopi_malloc(__FUNCTION__, sizeof(s_gatt_char_t));
         if (character_object)
         {
             memset(character_object, 0, sizeof(s_gatt_char_t));
@@ -206,7 +206,7 @@ s_gatt_descr_t* ezlopi_ble_gatt_add_descriptor(s_gatt_char_t* charcteristic, esp
 
     if (charcteristic)
     {
-        descriptor_obj = malloc(__FUNCTION__, sizeof(s_gatt_descr_t));
+        descriptor_obj = ezlopi_malloc(__FUNCTION__, sizeof(s_gatt_descr_t));
 
         if (descriptor_obj)
         {

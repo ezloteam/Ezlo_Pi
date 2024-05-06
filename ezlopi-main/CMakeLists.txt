@@ -12,9 +12,8 @@ set(EZLOPI_SDK_COMPONENTS
 # Define ezlopi-components
 set(EZLOPI_COMPONENTS
         pt
-        ezlopi-util-heap
+        ezlopi-core-heap
         ezlopi-util-trace
-        ezlopi-util-heap
 )
 
 # Define core components

@@ -76,7 +76,7 @@ static int __0015_prepare(void* arg)
         cJSON* cjson_device = prep_arg->cjson_device;
         if (cjson_device)
         {
-            s_ezlopi_dht11_data_t* dht11_sensor_data = (s_ezlopi_dht11_data_t*)malloc(__FUNCTION__, sizeof(s_ezlopi_dht11_data_t));
+            s_ezlopi_dht11_data_t* dht11_sensor_data = (s_ezlopi_dht11_data_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_ezlopi_dht11_data_t));
             if (dht11_sensor_data)
             {
                 memset(dht11_sensor_data, 0, sizeof(s_ezlopi_dht11_data_t));
@@ -116,12 +116,12 @@ static int __0015_prepare(void* arg)
                     {
                         ret = -1;
                         ezlopi_device_free_device(parent_device_temperature);
-                        free(__FUNCTION__, dht11_sensor_data);
+                        ezlopi_free(__FUNCTION__, dht11_sensor_data);
                     }
                 }
                 else
                 {
-                    free(__FUNCTION__, dht11_sensor_data);
+                    ezlopi_free(__FUNCTION__, dht11_sensor_data);
                     ret = -1;
                 }
             }
@@ -140,12 +140,6 @@ static int __dht11_setup_device_cloud_properties_temperature(l_ezlopi_device_t* 
     int ret = 0;
     if (device && cj_device)
     {
-        char* device_name = NULL;
-        CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-        char device_full_name[50];
-        snprintf(device_full_name, 50, "%s_%s", device_name, "temp");
-        ASSIGN_DEVICE_NAME_V2(device, device_full_name);
-
         device->cloud_properties.category = category_temperature;
         device->cloud_properties.subcategory = subcategory_not_defined;
         device->cloud_properties.device_type_id = NULL;
@@ -160,12 +154,6 @@ static int __dht11_setup_device_cloud_properties_humidity(l_ezlopi_device_t* dev
     int ret = 0;
     if (device && cj_device)
     {
-        char* device_name = NULL;
-        CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-        char device_full_name[50];
-        snprintf(device_full_name, 50, "%s_%s", device_name, "humi");
-        ASSIGN_DEVICE_NAME_V2(device, device_full_name);
-
         device->cloud_properties.category = category_humidity;
         device->cloud_properties.subcategory = subcategory_not_defined;
         device->cloud_properties.device_type_id = NULL;

@@ -336,7 +336,7 @@ static int __prepare(void* arg)
             ret = 1;
             __prepare_device_cloud_properties(device, prep_arg->cjson_device);
 
-            s_dimmable_bulb_properties_t* dimmable_bulb_arg = malloc(__FUNCTION__, sizeof(s_dimmable_bulb_properties_t));
+            s_dimmable_bulb_properties_t* dimmable_bulb_arg = ezlopi_malloc(__FUNCTION__, sizeof(s_dimmable_bulb_properties_t));
             if (dimmable_bulb_arg)
             {
                 dimmable_bulb_arg->current_brightness_value = 0;
@@ -390,7 +390,7 @@ static int __prepare(void* arg)
                     (NULL == dimmable_bulb_arg->item_dimmer_switch))
                 {
                     ezlopi_device_free_device(device);
-                    free(__FUNCTION__, dimmable_bulb_arg);
+                    ezlopi_free(__FUNCTION__, dimmable_bulb_arg);
                     ret = -1;
                 }
             }

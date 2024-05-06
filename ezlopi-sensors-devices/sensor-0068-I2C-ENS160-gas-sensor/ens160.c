@@ -142,13 +142,13 @@ void dfrobot_ens160_i2c_write_reg(ens160_t* ens160, uint8_t reg, const void* p_b
     DBG("p_buf ERROR!! : null pointer");
   }
 
-  uint8_t* _p_buf = (uint8_t*)malloc(__FUNCTION__, size + sizeof(reg));
+  uint8_t* _p_buf = (uint8_t*)ezlopi_malloc(__FUNCTION__, size + sizeof(reg));
   memcpy(_p_buf, &reg, sizeof(reg));
   memcpy(_p_buf + 1, p_buf, size);
 
   ezlopi_i2c_master_write_to_device(ens160->ezlopi_i2c, _p_buf, size + sizeof(reg));
 
-  free(__FUNCTION__, _p_buf);
+  ezlopi_free(__FUNCTION__, _p_buf);
 }
 
 size_t dfrobot_ens160_i2c_read_reg(ens160_t* ens160, uint8_t reg, void* p_buf, size_t size)

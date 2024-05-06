@@ -652,7 +652,7 @@ char* ezlopi_nvs_read_str(const char* nvs_name)
 
             if (buf_len_needed && (ESP_OK == err))
             {
-                return_str = malloc(__FUNCTION__, buf_len_needed + 1);
+                return_str = ezlopi_malloc(__FUNCTION__, buf_len_needed + 1);
 
                 if (return_str)
                 {
@@ -667,7 +667,7 @@ char* ezlopi_nvs_read_str(const char* nvs_name)
                     else
                     {
                         TRACE_E("(nvs_get_str)-%s:: error: %s", nvs_name, esp_err_to_name(err));
-                        free(__FUNCTION__, return_str);
+                        ezlopi_free(__FUNCTION__, return_str);
                         return_str = NULL;
                     }
                 }

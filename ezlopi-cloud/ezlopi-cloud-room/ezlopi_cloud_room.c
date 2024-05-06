@@ -15,7 +15,7 @@ void room_list(cJSON* cj_request, cJSON* cj_response)
     if (rooms_str)
     {
         cJSON_AddRawToObject(__FUNCTION__, cj_response, ezlopi_result_str, rooms_str);
-        free(__FUNCTION__, rooms_str);
+        ezlopi_free(__FUNCTION__, rooms_str);
     }
     else
     {

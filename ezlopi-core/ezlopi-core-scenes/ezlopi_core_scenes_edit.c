@@ -27,7 +27,7 @@ int ezlopi_core_scene_edit_store_updated_to_nvs(cJSON* cj_updated_scene)
                 ret = ezlopi_nvs_write_str(update_scene_str, strlen(update_scene_str), cj_scene_id->valuestring);
             }
 
-            free(__FUNCTION__, update_scene_str);
+            ezlopi_free(__FUNCTION__, update_scene_str);
         }
     }
 

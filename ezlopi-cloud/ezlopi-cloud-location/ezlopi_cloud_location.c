@@ -50,7 +50,7 @@ void EZPI_CLOUD_location_get(cJSON* cj_request, cJSON* cj_response)
         if (location)
         {
             cJSON_AddStringToObject(__FUNCTION__, cjson_result, ezlopi_location_str, location);
-            free(__FUNCTION__, location);
+            ezlopi_free(__FUNCTION__, location);
         }
         else
         {
@@ -64,9 +64,11 @@ void EZPI_CLOUD_location_set(cJSON* cj_request, cJSON* cj_response)
     cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
     if (cj_params)
     {
-        char* location_str = NULL;
-        CJSON_GET_VALUE_STRING(cj_params, ezlopi_location_str, location_str);
-        if (location_str)
+        char location_str[128];
+        memset(location_str, 0, sizeof(location_str));
+        CJSON_GET_VALUE_STRING_BY_COPY(cj_params, ezlopi_location_str, location_str);
+        
+        if ('\0' != location_str[0])
         {
             TRACE_I("Location: %s", location_str);
             EZPI_CORE_sntp_set_location(location_str);

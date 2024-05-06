@@ -93,7 +93,7 @@ static int __0055_prepare(void* arg)
     s_ezlopi_prep_arg_t* device_prep_arg = (s_ezlopi_prep_arg_t*)arg;
     if (device_prep_arg && (NULL != device_prep_arg->cjson_device))
     {
-        flex_t* flex_res_value = (flex_t*)malloc(__FUNCTION__, sizeof(flex_t));
+        flex_t* flex_res_value = (flex_t*)ezlopi_malloc(__FUNCTION__, sizeof(flex_t));
         if (flex_res_value)
         {
             memset(flex_res_value, 0, sizeof(flex_t));
@@ -111,13 +111,13 @@ static int __0055_prepare(void* arg)
                 {
                     ret = -1;
                     ezlopi_device_free_device(device_adc);
-                    free(__FUNCTION__, flex_res_value);
+                    ezlopi_free(__FUNCTION__, flex_res_value);
                 }
             }
             else
             {
                 ret = -1;
-                free(__FUNCTION__, flex_res_value);
+                ezlopi_free(__FUNCTION__, flex_res_value);
             }
         }
     }
@@ -129,7 +129,7 @@ static int __0055_init(l_ezlopi_item_t* item)
     int ret = 0;
     if (NULL != item)
     {
-        flex_t* flex_res_value = (flex_t*)malloc(__FUNCTION__, sizeof(flex_t));
+        flex_t* flex_res_value = (flex_t*)ezlopi_malloc(__FUNCTION__, sizeof(flex_t));
         if (flex_res_value)
         {
             if (GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))

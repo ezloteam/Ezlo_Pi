@@ -152,7 +152,7 @@ static void __prepare_item_properties(l_ezlopi_item_t* item, cJSON* cj_param)
     item->interface.i2c_master.enable = true;
     item->interface.i2c_master.clock_speed = 100000;
     item->interface.i2c_master.address = LTR303_ADDR;
-    ltr303_data_t* als_ltr303_data = (ltr303_data_t*)malloc(__FUNCTION__, sizeof(ltr303_data_t));
+    ltr303_data_t* als_ltr303_data = (ltr303_data_t*)ezlopi_malloc(__FUNCTION__, sizeof(ltr303_data_t));
     if (als_ltr303_data)
     {
         memset(als_ltr303_data, 0, sizeof(ltr303_data_t));

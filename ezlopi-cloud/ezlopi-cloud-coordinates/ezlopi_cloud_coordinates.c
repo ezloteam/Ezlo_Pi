@@ -38,7 +38,7 @@ void hub_coordinates_get(cJSON* cj_request, cJSON* cj_response)
     if (lat_long_vals)
     {
         cJSON_AddRawToObject(__FUNCTION__, cj_response, ezlopi_result_str, lat_long_vals);
-        free(__FUNCTION__, lat_long_vals);
+        ezlopi_free(__FUNCTION__, lat_long_vals);
     }
 }
 

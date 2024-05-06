@@ -102,7 +102,7 @@ static int __0043_prepare(void* arg)
     {
         cJSON* cj_device = device_prep_arg->cjson_device;
 
-        s_gyml8511_data_t* gyml8511_value = (s_gyml8511_data_t*)malloc(__FUNCTION__, sizeof(s_gyml8511_data_t));
+        s_gyml8511_data_t* gyml8511_value = (s_gyml8511_data_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_gyml8511_data_t));
         if (NULL != gyml8511_value)
         {
             memset(gyml8511_value, 0, sizeof(s_gyml8511_data_t));
@@ -122,13 +122,13 @@ static int __0043_prepare(void* arg)
                 {
                     ret = -1;
                     ezlopi_device_free_device(gyml8511_device);
-                    free(__FUNCTION__, gyml8511_value);
+                    ezlopi_free(__FUNCTION__, gyml8511_value);
                 }
             }
             else
             {
                 ret = -1;
-                free(__FUNCTION__, gyml8511_value);
+                ezlopi_free(__FUNCTION__, gyml8511_value);
             }
         }
     }

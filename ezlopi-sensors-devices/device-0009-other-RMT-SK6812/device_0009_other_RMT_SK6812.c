@@ -368,7 +368,7 @@ static int __prepare(void* arg)
             ret = 1;
             __prepare_device_properties(device, prep_arg->cjson_device);
 
-            s_dimmer_args_t* dimmer_args = malloc(__FUNCTION__, sizeof(s_dimmer_args_t));
+            s_dimmer_args_t* dimmer_args = ezlopi_malloc(__FUNCTION__, sizeof(s_dimmer_args_t));
             if (dimmer_args)
             {
                 memset(dimmer_args, 0, sizeof(s_dimmer_args_t));
@@ -405,7 +405,7 @@ static int __prepare(void* arg)
                 }
                 else
                 {
-                    free(__FUNCTION__, dimmer_args);
+                    ezlopi_free(__FUNCTION__, dimmer_args);
                     ezlopi_device_free_device(device);
                     ret = -1;
                 }
