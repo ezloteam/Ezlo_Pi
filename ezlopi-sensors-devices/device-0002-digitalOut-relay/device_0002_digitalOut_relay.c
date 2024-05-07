@@ -96,9 +96,6 @@ static void __setup_item_properties(l_ezlopi_item_t* item, cJSON* cjson_device)
     item->interface.gpio.gpio_out.enable = true;
     CJSON_GET_VALUE_GPIO(cjson_device, ezlopi_gpio_out_str, item->interface.gpio.gpio_out.gpio_num);
 
-    CJSON_TRACE("cjson_device", cjson_device);
-    TRACE_E("item->interface.gpio.gpio_out.gpio_num: %u", item->interface.gpio.gpio_out.gpio_num);
-
     CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_op_inv_str, item->interface.gpio.gpio_out.invert);
     CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_val_op_str, item->interface.gpio.gpio_out.value);
     CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_pullup_op_str, tmp_var);
@@ -273,6 +270,7 @@ static int __set_value(l_ezlopi_item_t* item, void* arg)
                 {
                     __set_gpio_value(item, value);
                     ezlopi_device_value_updated_from_device_broadcast(item);
+                    ret = 1;
                 }
             }
             else
@@ -290,6 +288,7 @@ static int __set_value(l_ezlopi_item_t* item, void* arg)
                             TRACE_D("value: %d", value);
                             __set_gpio_value(curr_item, value);
                             ezlopi_device_value_updated_from_device_broadcast(curr_item);
+                            ret = 1;
                         }
                         curr_item = curr_item->next;
                     }

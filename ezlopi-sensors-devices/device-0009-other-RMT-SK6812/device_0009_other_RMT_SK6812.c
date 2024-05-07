@@ -147,6 +147,7 @@ static int __set_cjson_value(l_ezlopi_item_t* item, void* arg)
                 led_strip_flush(&dimmer_args->sk6812_strip);
 
                 ezlopi_device_value_updated_from_device_broadcast(dimmer_args->dimmer_item);
+                ret = 1;
             }
             else if (ezlopi_item_name_dimmer == item->cloud_properties.item_name)
             {
@@ -157,6 +158,7 @@ static int __set_cjson_value(l_ezlopi_item_t* item, void* arg)
                 led_strip_flush(&dimmer_args->sk6812_strip);
 
                 ezlopi_device_value_updated_from_device_broadcast(dimmer_args->switch_item);
+                ret = 1;
             }
             else if (ezlopi_item_name_switch == item->cloud_properties.item_name)
             {
@@ -168,6 +170,7 @@ static int __set_cjson_value(l_ezlopi_item_t* item, void* arg)
                 led_strip_flush(&dimmer_args->sk6812_strip);
 
                 ezlopi_device_value_updated_from_device_broadcast(dimmer_args->dimmer_item);
+                ret = 1;
             }
             else
             {

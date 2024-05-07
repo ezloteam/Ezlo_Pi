@@ -13,6 +13,7 @@
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_core_scenes_operators.h"
 #include "ezlopi_core_scenes_notifications.h"
+#include "ezlopi_core_scenes_when_methods_helper_functions.h"
 
 void scenes_list(cJSON* cj_request, cJSON* cj_response)
 {
@@ -344,7 +345,37 @@ void scenes_notification_remove(cJSON* cj_request, cJSON* cj_response)
     }
 }
 
-/////////// updater for scene
+void scenes_block_status_reset(cJSON* cj_request, cJSON* cj_response)
+{
+    cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+    cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
+    if (cj_result && cj_params)
+    {
+        uint32_t scene_id = 0;
+        CJSON_GET_ID(scene_id, cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_sceneId_str));
+
+        if (scene_id)
+        {
+            l_scenes_list_v2_t* scene_node = ezlopi_scenes_get_scenes_head_v2();
+            while (scene_node)
+            {
+                if (scene_node->_id == scene_id)
+                {
+                    s_when_function_t* function_state = (s_when_function_t*)scene_node->when_block->fields->user_arg;
+                    if (function_state)
+                    {
+                        function_state->current_state = false;
+                    }
+                    break;
+                }
+                scene_node = scene_node->next;
+            }
+        }
+    }
+}
+
+
+////// updater for scene
 ////// useful for 'hub.scenes.enabled.set'
 void scene_changed(cJSON* cj_request, cJSON* cj_response)
 {

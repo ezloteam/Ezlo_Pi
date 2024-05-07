@@ -325,7 +325,6 @@ static void __config_check(void* pv)
             }
 
             cJSON_Delete(__FUNCTION__, root_header_prov_token);
-            TRACE_S("root_header_prov_token - deleted");
         }
     }
 

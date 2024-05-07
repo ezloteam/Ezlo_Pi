@@ -92,6 +92,7 @@ static int __set_cjson_value(l_ezlopi_item_t* item, void* arg)
                 dimmable_bulb_arg->current_brightness_value = target_value;
                 ezlopi_device_value_updated_from_device_broadcast(dimmable_bulb_arg->item_dimmer);
                 ezlopi_device_value_updated_from_device_broadcast(dimmable_bulb_arg->item_dimmer_switch);
+                ret = 1;
             }
             else if (ezlopi_item_name_switch == item->cloud_properties.item_name)
             {
@@ -102,6 +103,7 @@ static int __set_cjson_value(l_ezlopi_item_t* item, void* arg)
                 ezlopi_pwm_change_duty(dimmable_bulb_arg->item_dimmer->interface.pwm.channel, dimmable_bulb_arg->item_dimmer->interface.pwm.speed_mode, dimmable_bulb_arg->current_brightness_value);
                 ezlopi_device_value_updated_from_device_broadcast(dimmable_bulb_arg->item_dimmer);
                 ezlopi_device_value_updated_from_device_broadcast(dimmable_bulb_arg->item_dimmer_switch);
+                ret = 1;
             }
         }
     }

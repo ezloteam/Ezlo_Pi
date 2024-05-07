@@ -82,7 +82,6 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
   int ret = 0;
 
   cJSON* cj_params = (cJSON*)arg;
-
   if (cj_params)
   {
     ens160_t* ens160_sensor = (ens160_t*)item->user_arg;
