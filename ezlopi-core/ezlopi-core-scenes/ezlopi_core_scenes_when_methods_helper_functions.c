@@ -473,7 +473,7 @@ static void issunsate_update_sunstate_tm(int tm_mday, s_sunstate_data_t* user_da
         char* lat_long_vals = ezlopi_nvs_read_latidtude_longitude();
         if (lat_long_vals)
         {
-            TRACE_S("co-ordinate : %s", lat_long_vals);
+            TRACE_S("long_lat_co-ordinate : %s", lat_long_vals);
             snprintf(tmp_url, 95, "%s", "https://api.sunrisesunset.io/json?lat=27.700769&lng=85.300140");
             free(lat_long_vals);
         }
@@ -500,7 +500,7 @@ static void issunsate_update_sunstate_tm(int tm_mday, s_sunstate_data_t* user_da
         ezlopi_core_http_mbedtls_req(&tmp_config);
         // e.g. after valid extraction
         user_data->curr_tm_day = tm_mday;            // this stores day for which data is extracted
-        user_data->choosen_suntime.tm_hour = 5 + 12; // 24-hr
+        user_data->choosen_suntime.tm_hour = 5 + ((user_data->sunstate_mode == 2) ? 12 : 0); // sunrise = 1 ; sunset = 2
         user_data->choosen_suntime.tm_min = 48;
         user_data->choosen_suntime.tm_sec = 42;
 
@@ -610,7 +610,6 @@ uint8_t issunstate_get_suntime(l_scenes_list_v2_t* scene_node, l_fields_v2_t* cu
             {
                 memset(data, 0, sizeof(s_sunstate_data_t));
                 scene_node->when_block->fields->user_arg = (void*)data;
-                // TRACE_D("created user_data...");
             }
             else
             {
@@ -622,7 +621,11 @@ uint8_t issunstate_get_suntime(l_scenes_list_v2_t* scene_node, l_fields_v2_t* cu
         s_sunstate_data_t* user_data = (s_sunstate_data_t*)(scene_node->when_block->fields->user_arg);
         if (user_data && (info->tm_mday != user_data->curr_tm_day))
         {
-            // TRACE_S("curr_day = [%d] ; [%dth]", info->tm_mday, user_data->curr_tm_day);
+            TRACE_S("curr_day = [%d] ; [%dth]", info->tm_mday, user_data->curr_tm_day);
+
+
+
+
             user_data->sunstate_mode = curr_sunstate_mode;          // this sets target sunstate for curr meshbot
             issunsate_update_sunstate_tm(info->tm_mday, user_data); // assign 'curr_day' & 'suntime' only
             user_data->tmoffs_type = (0 == strncmp(curr_field->field_value.u_value.value_string, "intime", 7)) ? ISSUNSTATE_INTIME_MODE
