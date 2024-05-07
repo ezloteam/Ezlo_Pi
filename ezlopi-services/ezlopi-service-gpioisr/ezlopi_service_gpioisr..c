@@ -1,6 +1,6 @@
 #include <string.h>
 
-#include "sdkconfig.h"
+#include "../../build/config/sdkconfig.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/portmacro.h"
 #include "freertos/task.h"
@@ -9,6 +9,7 @@
 #include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_device_value_updated.h"
+#include "ezlopi_core_processes.h"
 
 #include "ezlopi_service_gpioisr.h"
 
@@ -20,24 +21,26 @@ typedef struct s_event_arg
     TickType_t time;
     TickType_t debounce_ms;
     // s_ezlopi_device_properties_t *properties;
-    l_ezlopi_item_t *item;
+    l_ezlopi_item_t* item;
     f_interrupt_upcall_t __upcall;
 } s_event_arg_t;
 
-static void gpio_isr_process_v3(void *pv);
-static void IRAM_ATTR __gpio_isr_handler(void *arg);
+static void gpio_isr_process_v3(void* pv);
+static void IRAM_ATTR __gpio_isr_handler(void* arg);
 
 void gpio_isr_service_init(void)
 {
     TRACE_S("Started gpio-isr service");
-    gpio_evt_queue = xQueueCreate(20, sizeof(s_event_arg_t *));
-    xTaskCreate(gpio_isr_process_v3, "gpio_isr_process_v3", 2 * 2048, NULL, 3, NULL);
-    // xTaskCreate(gpio_isr_process, "digital-io-isr-service", 2 * 2048, NULL, 3, NULL);
+    gpio_evt_queue = xQueueCreate(20, sizeof(s_event_arg_t*));
+    TaskHandle_t ezlopi_service_gpio_isr_task_handle = NULL;
+    xTaskCreate(gpio_isr_process_v3, "gpio_isr_process_v3", EZLOPI_SERVICE_GPIO_ISR_TASK_DEPTH, NULL, 3, &ezlopi_service_gpio_isr_task_handle);
+    ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_GPIO_ISR_TASK, &ezlopi_service_gpio_isr_task_handle, EZLOPI_SERVICE_GPIO_ISR_TASK_DEPTH);
+    // xTaskCreate(gpio_isr_process, "digital-io-isr-service", EZLOPI_SERVICE_GPIO_ISR_TASK_DEPTH, NULL, 3, &ezlopi_service_gpio_isr_task_handle);
 }
 
-void gpio_isr_service_register_v3(l_ezlopi_item_t *item, f_interrupt_upcall_t __upcall, TickType_t debounce_ms)
+void gpio_isr_service_register_v3(l_ezlopi_item_t* item, f_interrupt_upcall_t __upcall, TickType_t debounce_ms)
 {
-    s_event_arg_t *event_arg = malloc(sizeof(s_event_arg_t));
+    s_event_arg_t* event_arg = malloc(sizeof(s_event_arg_t));
 
     if (event_arg)
     {
@@ -48,7 +51,7 @@ void gpio_isr_service_register_v3(l_ezlopi_item_t *item, f_interrupt_upcall_t __
         event_arg->debounce_ms = (0 == debounce_ms) ? default_debounce_time : debounce_ms;
         gpio_intr_enable(item->interface.gpio.gpio_in.gpio_num);
 
-        if (gpio_isr_handler_add(item->interface.gpio.gpio_in.gpio_num, __gpio_isr_handler, (void *)event_arg))
+        if (gpio_isr_handler_add(item->interface.gpio.gpio_in.gpio_num, __gpio_isr_handler, (void*)event_arg))
         {
             TRACE_E("Error while adding GPIO ISR handler.");
             gpio_reset_pin(item->interface.gpio.gpio_in.gpio_num);
@@ -60,11 +63,11 @@ void gpio_isr_service_register_v3(l_ezlopi_item_t *item, f_interrupt_upcall_t __
     }
 }
 
-static void gpio_isr_process_v3(void *pv)
+static void gpio_isr_process_v3(void* pv)
 {
     while (1)
     {
-        s_event_arg_t *event_arg = NULL;
+        s_event_arg_t* event_arg = NULL;
         xQueueReceive(gpio_evt_queue, &event_arg, portMAX_DELAY);
 
         if (NULL != event_arg)
@@ -82,9 +85,9 @@ static void gpio_isr_process_v3(void *pv)
     }
 }
 
-static void IRAM_ATTR __gpio_isr_handler(void *arg)
+static void IRAM_ATTR __gpio_isr_handler(void* arg)
 {
-    void *tmp_arg = arg;
+    void* tmp_arg = arg;
     if (gpio_evt_queue)
     {
         xQueueSendFromISR(gpio_evt_queue, &tmp_arg, NULL);
@@ -92,9 +95,9 @@ static void IRAM_ATTR __gpio_isr_handler(void *arg)
 }
 
 #if 0
-void gpio_isr_service_register(s_ezlopi_device_properties_t *properties, f_interrupt_upcall_t __upcall, TickType_t debounce_ms)
+void gpio_isr_service_register(s_ezlopi_device_properties_t* properties, f_interrupt_upcall_t __upcall, TickType_t debounce_ms)
 {
-    s_event_arg_t *event_arg = malloc(sizeof(s_event_arg_t));
+    s_event_arg_t* event_arg = malloc(sizeof(s_event_arg_t));
 
     if (event_arg)
     {
@@ -104,7 +107,7 @@ void gpio_isr_service_register(s_ezlopi_device_properties_t *properties, f_inter
         event_arg->debounce_ms = (0 == debounce_ms) ? default_debounce_time : debounce_ms;
         gpio_intr_enable(properties->interface.gpio.gpio_in.gpio_num);
 
-        if (gpio_isr_handler_add(properties->interface.gpio.gpio_in.gpio_num, __gpio_isr_handler, (void *)event_arg))
+        if (gpio_isr_handler_add(properties->interface.gpio.gpio_in.gpio_num, __gpio_isr_handler, (void*)event_arg))
         {
             TRACE_E("Error while adding GPIO ISR handler.");
             gpio_reset_pin(properties->interface.gpio.gpio_in.gpio_num);
@@ -116,11 +119,11 @@ void gpio_isr_service_register(s_ezlopi_device_properties_t *properties, f_inter
     }
 }
 
-static void gpio_isr_process(void *pv)
+static void gpio_isr_process(void* pv)
 {
     while (1)
     {
-        s_event_arg_t *event_arg = NULL;
+        s_event_arg_t* event_arg = NULL;
         xQueueReceive(gpio_evt_queue, &event_arg, portMAX_DELAY);
 
         if (NULL != event_arg)

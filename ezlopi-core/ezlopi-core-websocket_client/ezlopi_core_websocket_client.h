@@ -10,7 +10,7 @@
 #include "nvs_flash.h"
 #include "esp_event.h"
 #include "esp_log.h"
-#include "sdkconfig.h"
+#include "../../build/config/sdkconfig.h"
 #include "cjext.h"
 
 #include "esp_websocket_client.h"

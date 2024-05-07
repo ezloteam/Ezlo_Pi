@@ -18,6 +18,7 @@
 #include "ezlopi_cloud_keywords.h"
 #include "ezlopi_util_trace.h"
 #include "ezlopi_core_mdns.h"
+#include "ezlopi_core_processes.h"
 
 
 const char* ezlopi_mdns_instance_name = "EzloPi, an Open Source IoT Platform";
@@ -29,7 +30,9 @@ int EZPI_core_init_mdns(void)
 {
     int ret = 0;
 
-    xTaskCreate(__mdns_init, "mdns service init", 4 * 2048, NULL, 4, NULL);
+    TaskHandle_t ezlopi_core_mdns_service_task_handle = NULL;
+    xTaskCreate(__mdns_init, "mdns_svc", EZLOPI_CORE_MDNS_SERVICE_TASK_DEPTH, NULL, 4, &ezlopi_core_mdns_service_task_handle);
+    ezlopi_core_process_set_process_info(ENUM_EZLOPI_CORE_MDNS_SERVICE_TASK, &ezlopi_core_mdns_service_task_handle, EZLOPI_CORE_MDNS_SERVICE_TASK_DEPTH);
 
     return ret;
 }
@@ -284,6 +287,7 @@ static void __mdns_init(void* pv)
         }
         vTaskDelay(10000 / portTICK_PERIOD_MS);
     }
+    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_CORE_MDNS_SERVICE_TASK);
     vTaskDelete(NULL);
 
 }

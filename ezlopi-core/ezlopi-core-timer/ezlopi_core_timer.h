@@ -36,7 +36,7 @@
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
-#include "sdkconfig.h"
+#include "../../build/config/sdkconfig.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/queue.h"
@@ -44,9 +44,9 @@
 #include "esp_err.h"
 #include "esp_log.h"
 
-/*******************************************************************************
- *                          Type & Macro Declarations
- *******************************************************************************/
+ /*******************************************************************************
+  *                          Type & Macro Declarations
+  *******************************************************************************/
 #define EZLOPI_TIMER_TAG "EZLOPI TIMER TAG"
 
 #define EZLOPI_TIMER_GRP_0 TIMER_GROUP_0

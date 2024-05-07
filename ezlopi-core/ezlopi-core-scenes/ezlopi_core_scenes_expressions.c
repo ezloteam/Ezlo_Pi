@@ -1,4 +1,7 @@
-// #include <string.h>
+#include "../../build/config/sdkconfig.h"
+
+#ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+
 #include "cjext.h"
 
 #include "ezlopi_core_nvs.h"
@@ -25,6 +28,27 @@ static e_scene_value_type_v2_t* __parse_expression_type_filter(cJSON* cj_params)
 static void __add_expression_value(s_ezlopi_expressions_t* exp_node, cJSON* cj_expr);
 static void __add_expression_items(s_ezlopi_expressions_t* exp_node, cJSON* cj_params);
 static void __add_expression_device_item_names(s_ezlopi_expressions_t* exp_node, cJSON* cj_params);
+
+s_ezlopi_expressions_t* ezlopi_scenes_get_expression_node_by_name(char* expression_name)
+{
+    s_ezlopi_expressions_t* curr_expr = l_expressions_head;
+    if (expression_name && curr_expr)
+    {
+        size_t req_name_len = strlen(expression_name);
+        while (curr_expr)
+        {
+            size_t exp_name_len = strlen(curr_expr->name);
+            size_t cmp_len = (req_name_len > exp_name_len) ? req_name_len : exp_name_len;
+            if (0 == strncmp(curr_expr->name, expression_name, cmp_len))
+            {
+                break;
+            }
+            curr_expr = curr_expr->next;
+        }
+    }
+    return curr_expr;
+}
+
 
 int ezlopi_scenes_expressions_delete_by_name(char* expression_name)
 {
@@ -857,3 +881,4 @@ static void __add_expression_device_item_names(s_ezlopi_expressions_t* exp_node,
         }
     }
 }
+#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS

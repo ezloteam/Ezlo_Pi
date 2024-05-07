@@ -10,6 +10,8 @@
 #include "gpiolib.h"
 #include "rtoslib.h"
 
+#include "ezlopi_core_processes.h"
+
 #define GPIO_PIN "5"
 
 static void load_custom_libs(lua_State *L)
@@ -79,5 +81,7 @@ void test(void *arg)
 
 void app_main()
 {
-    xTaskCreate(test, "test", 0x10000, NULL, 5, NULL);
+    TaskHandle_t ezlopi_component_lua_custom_lib_test_task_handle = NULL;
+    xTaskCreate(test, "test", EZLOPI_COMPONENT_LUA_CUSTOM_LIB_TEST_TASK_DEPTH, NULL, 5, &ezlopi_component_lua_custom_lib_test_task_handle);
+    ezlopi_core_process_set_process_info(ENUM_EZLOPI_COMPONENT_LUA_CUSTOM_LIB_TEST_TASK, &ezlopi_component_lua_custom_lib_test_task_handle, EZLOPI_COMPONENT_LUA_CUSTOM_LIB_TEST_TASK_DEPTH);
 }

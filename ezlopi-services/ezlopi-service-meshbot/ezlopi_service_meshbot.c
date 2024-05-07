@@ -1,3 +1,7 @@
+#include "../../build/config/sdkconfig.h"
+
+#ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
@@ -179,8 +183,8 @@ void ezlopi_scenes_meshbot_init(void)
     while (scene_node)
     {
         scene_node->status = EZLOPI_SCENE_STATUS_STOPPED;
-        // if (scene_node->enabled && scene_node->when_block && (scene_node->else_block || scene_node->then_block))
-        if (scene_node->when_block && (scene_node->else_block || scene_node->then_block))
+        if (scene_node->enabled && scene_node->when_block && (scene_node->else_block || scene_node->then_block))
+            // if (scene_node->when_block && (scene_node->else_block || scene_node->then_block))
         {
             start_thread = 1;
 
@@ -197,6 +201,7 @@ void ezlopi_scenes_meshbot_init(void)
         {
             scene_node->status = EZLOPI_SCENE_STATUS_STOPPED;
         }
+        TRACE_W("scenes_meshbot init process, [%d]", start_thread);
 
         scene_node = scene_node->next;
     }
@@ -234,6 +239,7 @@ PT_THREAD(__scene_proto_thread(l_scenes_list_v2_t* scene_node, uint32_t routine_
                     when_condition_returned = when_method(scene_node, (void*)when_condition_node);
                     if (when_condition_returned)
                     {
+                        TRACE_S("when_ret => 1");
                         if (ctx->start_cond < 2)
                         {
                             ctx->stopped_cond = 0;
@@ -374,7 +380,7 @@ PT_THREAD(__scene_proto_thread(l_scenes_list_v2_t* scene_node, uint32_t routine_
         TRACE_D("entering delay: %d", ctx->curr_ticks);
 
         PT_WAIT_UNTIL(&ctx->pt, (xTaskGetTickCount() - ctx->curr_ticks) > routine_delay_ms);
-        
+
         TRACE_D("waited for: %d", (xTaskGetTickCount() - ctx->curr_ticks));
         TRACE_D("exiting delay: %d", xTaskGetTickCount());
     }
@@ -475,3 +481,5 @@ static int __execute_action_block(l_scenes_list_v2_t* scene_node, l_action_block
 
     return ret;
 }
+
+#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS

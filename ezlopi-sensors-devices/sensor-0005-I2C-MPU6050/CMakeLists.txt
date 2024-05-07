@@ -8,6 +8,7 @@ idf_component_register(SRCS "sensor_0005_I2C_MPU6050.c" "mpu6050.c" "${config_sr
                 ezlopi-core-actions 
                 ezlopi-core-devices 
                 ezlopi-core-valueformatter 
+                ezlopi-core-processes
 
                 ezlopi-hal-i2c
                 

@@ -7,23 +7,24 @@
    CONDITIONS OF ANY KIND, either express or implied.
 */
 
-#include "cjext.h"
-// #include <esp_log.h>
-#include <esp_eth.h>
-#include <esp_wifi.h>
-#include <esp_event.h>
-#include <sys/param.h>
-#include <esp_netif.h>
-#include <esp_system.h>
-#include <freertos/FreeRTOS.h>
-#include <freertos/task.h>
-#include <freertos/semphr.h>
-#include <esp_http_server.h>
-
 #include "../../build/config/sdkconfig.h"
 
-#include "ezlopi_util_trace.h"
 
+#ifdef CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER
+
+#include "esp_eth.h"
+#include "esp_wifi.h"
+#include "esp_event.h"
+#include "sys/param.h"
+#include "esp_netif.h"
+#include "esp_system.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "freertos/semphr.h"
+#include "esp_http_server.h"
+
+#include "cjext.h"
+#include "ezlopi_util_trace.h"
 #include "ezlopi_cloud_constants.h"
 
 #include "ezlopi_core_api.h"
@@ -36,8 +37,6 @@
 #include "ezlopi_service_ws_server.h"
 #include "ezlopi_service_ws_server_clients.h"
 
-
-// #if defined(CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER)
 
 typedef struct s_async_resp_arg
 {
@@ -120,7 +119,7 @@ static int __ws_server_broadcast(char* data)
 
     if (gs_send_lock && pdTRUE == xSemaphoreTake(gs_send_lock, 5000 / portTICK_RATE_MS))
     {
-        TRACE_S("-----------------------------> acquired send-lock");
+        // TRACE_S("-----------------------------> acquired send-lock");
         if (data)
         {
             ret = 1;
@@ -129,23 +128,23 @@ static int __ws_server_broadcast(char* data)
             while (curr_client)
             {
                 ret = __ws_server_send(curr_client, data, strlen(data));
-                TRACE_D("ret: %d", ret);
+                // TRACE_D("ret: %d", ret);
                 curr_client = curr_client->next;
             }
         }
 
         if (pdTRUE == xSemaphoreGive(gs_send_lock))
         {
-            TRACE_S("-----------------------------> released send-lock");
+            // TRACE_S("-----------------------------> released send-lock");
         }
         else
         {
-            TRACE_E("-----------------------------> release send-lock failed!");
+            // TRACE_E("-----------------------------> release send-lock failed!");
         }
     }
     else
     {
-        TRACE_E("-----------------------------> acquire send-lock failed!");
+        // TRACE_E("-----------------------------> acquire send-lock failed!");
     }
 
     return ret;
@@ -470,7 +469,7 @@ static void __wifi_connection_event(esp_event_base_t event_base, int32_t event_i
 }
 
 
-// #endif // CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER
+#endif // CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER
 
 void ezlpi_service_ws_server_dummy(void)
 {

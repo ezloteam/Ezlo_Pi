@@ -9,6 +9,7 @@ idf_component_register(SRCS "sensor_0018_other_internal_hall_effect.c" "${config
                                 ezlopi-core-actions 
                                 ezlopi-core-devices 
                                 ezlopi-core-valueformatter 
+                                ezlopi-core-processes
                                 
                                 ezlopi-cloud-items 
                                 ezlopi-cloud-constants  

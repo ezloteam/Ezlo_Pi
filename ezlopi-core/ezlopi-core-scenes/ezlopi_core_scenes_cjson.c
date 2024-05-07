@@ -1,3 +1,7 @@
+#include "../../build/config/sdkconfig.h"
+
+#ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+
 #include <string.h>
 
 #include "ezlopi_util_trace.h"
@@ -677,3 +681,4 @@ static void __cjson_add_string(cJSON* root, const char* key, const char* value)
         }
     }
 }
+#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS

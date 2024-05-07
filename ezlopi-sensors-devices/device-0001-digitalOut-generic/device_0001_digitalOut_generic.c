@@ -1,4 +1,4 @@
-#include "sdkconfig.h"
+#include "../../build/config/sdkconfig.h"
 #include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_nvs.h"
@@ -370,7 +370,7 @@ static int __init(l_ezlopi_item_t* item)
     int ret = 0;
     if (item)
     {
-        if (GPIO_IS_VALID_OUTPUT_GPIO(item->interface.gpio.gpio_out.gpio_num) &&
+        if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_out.gpio_num) &&
             (255 != item->interface.gpio.gpio_out.gpio_num))
         {
             const gpio_config_t io_conf = {
@@ -525,10 +525,11 @@ static int __set_value(l_ezlopi_item_t* item, void* arg)
 
             if (255 != item->interface.gpio.gpio_out.gpio_num)
             {
-                if (GPIO_IS_VALID_OUTPUT_GPIO(item->interface.gpio.gpio_out.gpio_num))
+                if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_out.gpio_num))
                 {
                     __set_gpio_value(item, value);
                     ezlopi_device_value_updated_from_device_broadcast(item);
+                    ret =1;
                 }
             }
             else
@@ -545,6 +546,7 @@ static int __set_value(l_ezlopi_item_t* item, void* arg)
                             TRACE_D("value: %d", value);
                             __set_gpio_value(curr_item, value);
                             ezlopi_device_value_updated_from_device_broadcast(curr_item);
+                            ret = 1;
                         }
                         curr_item = curr_item->next;
                     }

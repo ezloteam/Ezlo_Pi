@@ -6,7 +6,7 @@
 
 #include "ezlopi_cloud_constants.h"
 
-#if defined(CONFIG_EZLPI_SERV_ENABLE_MODES)
+#if defined(CONFIG_EZPI_SERV_ENABLE_MODES)
 
 static s_ezlopi_modes_t sg_default_mode = {
     .current_mode_id = 0,
@@ -105,4 +105,4 @@ void ezlopi_core_default_init(void)
     sg_default_mode.mode_away.armed = true;
 }
 
-#endif // CONFIG_EZLPI_SERV_ENABLE_MODES
+#endif // CONFIG_EZPI_SERV_ENABLE_MODES

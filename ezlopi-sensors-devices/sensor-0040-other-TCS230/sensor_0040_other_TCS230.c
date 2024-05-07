@@ -9,6 +9,7 @@
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
+#include "ezlopi_core_processes.h"
 
 #include "ezlopi_hal_adc.h"
 
@@ -198,8 +199,11 @@ static int __0040_init(l_ezlopi_item_t* item)
                     // configure Freq_scale at 20%
                     tcs230_set_frequency_scaling(item, COLOR_SENSOR_FREQ_SCALING_20_PERCENT);
 
+                    TaskHandle_t ezlopi_sensor_tcs230_callibration_task_handle = NULL;
+
                     // activate a task to calibrate data
-                    xTaskCreate(__tcs230_calibration_task, "TCS230_Calibration_Task", 2 * 2048, item, 1, NULL);
+                    xTaskCreate(__tcs230_calibration_task, "TCS230_Calibration_Task", EZLOPI_SENSOR_TCS230_CALLIBRATION_TASK_DEPTH, item, 1, &ezlopi_sensor_tcs230_callibration_task_handle);
+                    ezlopi_core_process_set_process_info(ENUM_EZLOPI_SENSOR_TCS230_CALLIBRATION_TASK, &ezlopi_sensor_tcs230_callibration_task_handle, EZLOPI_SENSOR_TCS230_CALLIBRATION_TASK_DEPTH);
                     ret = 1;
                 }
                 else
@@ -352,6 +356,7 @@ static void __tcs230_calibration_task(void* params) // calibration task
             user_data->calibration_complete = true;
         }
     }
+    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SENSOR_TCS230_CALLIBRATION_TASK);
     vTaskDelete(NULL);
 }
 //------------------------------------------------------------------------------

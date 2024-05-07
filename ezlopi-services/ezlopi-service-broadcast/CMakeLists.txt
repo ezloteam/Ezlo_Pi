@@ -9,6 +9,7 @@ set(SDK_COMPONENTS
 
 set(EZLOPI_CORE_COMPONENTS  
         ezlopi-core-ezlopi
+        ezlopi-core-processes
 )
 
 set(EZLOPI_CLOUD_COMPONENTS 

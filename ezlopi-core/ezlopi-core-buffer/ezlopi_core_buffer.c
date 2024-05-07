@@ -98,14 +98,14 @@ char *ezlopi_core_buffer_acquire(uint32_t *len, uint32_t wait_to_acquired_ms)
     {
         if (pdTRUE == xSemaphoreTake(__buffer_lock, wait_to_acquired_ms / portTICK_RATE_MS))
         {
-            TRACE_I("acquired in: %d", xTaskGetTickCount() - start_time);
+            // TRACE_I("acquired in: %d", xTaskGetTickCount() - start_time);
             ret = __buffer;
             *len = __buffer_len;
             __buffer_lock_state = EZ_BUFFER_STATE_BUSY;
         }
         else
         {
-            TRACE_E("waited for: %d", xTaskGetTickCount() - start_time);
+            // TRACE_E("waited for: %d", xTaskGetTickCount() - start_time);
         }
     }
 
@@ -121,6 +121,6 @@ void ezlopi_core_buffer_release(void)
     }
     else
     {
-        TRACE_E("buffer release failed!");
+        // TRACE_E("buffer release failed!");
     }
 }

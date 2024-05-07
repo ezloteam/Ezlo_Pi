@@ -1,5 +1,5 @@
 
-#include "sdkconfig.h"
+#include "../../build/config/sdkconfig.h"
 #include <math.h>
 #include "ezlopi_util_trace.h"
 

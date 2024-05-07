@@ -8,6 +8,7 @@ set(ESP_IDF_COMPONENTS
 )
 set(EZLOPI_CORE_COMPONENTS
         ezlopi-core-reset
+        ezlopi-core-processes
 )
 
 set(EZLOPI_SERVICE_COMPONENTS

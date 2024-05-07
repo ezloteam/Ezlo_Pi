@@ -13,6 +13,7 @@ set(EZLOPI_CORE_COMPONENTS
         ezlopi-core-event-group
         ezlopi-core-factory-info 
         ezlopi-core-websocket_client 
+        ezlopi-core-processes
 )
 
 set(EZLOPI_CLOUD_COMPONENTS 

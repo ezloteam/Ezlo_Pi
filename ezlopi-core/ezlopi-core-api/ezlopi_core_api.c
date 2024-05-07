@@ -1,7 +1,6 @@
 #include "ezlopi_util_trace.h"
 
 #include "ezlopi_cloud_constants.h"
-
 #include "ezlopi_core_api.h"
 #include "ezlopi_core_api_methods.h"
 #include "ezlopi_core_cjson_macros.h"
@@ -47,6 +46,7 @@ cJSON* ezlopi_core_api_consume(const char* payload, uint32_t len)
                     if (updater)
                     {
                         TRACE_W("updater function: %p", updater);
+
                         cJSON* cj_update_response = __execute_method(cj_request, updater);
 
                         if (cj_update_response)

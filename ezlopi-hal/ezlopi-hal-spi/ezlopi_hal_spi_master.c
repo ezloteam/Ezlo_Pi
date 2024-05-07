@@ -1,5 +1,5 @@
 
-#include "sdkconfig.h"
+#include "../../build/config/sdkconfig.h"
 #include "esp_intr_alloc.h"
 
 #include "ezlopi_util_trace.h"
@@ -21,9 +21,9 @@ typedef enum e_spi_state
         }                             \
     }
 
-static e_spi_state_t spi_port_status[3] = {SPI_UNINITIALIZED, SPI_UNINITIALIZED, SPI_UNINITIALIZED};
+static e_spi_state_t spi_port_status[3] = { SPI_UNINITIALIZED, SPI_UNINITIALIZED, SPI_UNINITIALIZED };
 
-int ezlopi_spi_master_init(s_ezlopi_spi_master_t *spi_config)
+int ezlopi_spi_master_init(s_ezlopi_spi_master_t* spi_config)
 {
     int ret = 0;
 
@@ -72,7 +72,7 @@ int ezlopi_spi_master_init(s_ezlopi_spi_master_t *spi_config)
     return ret;
 }
 
-int ezlopi_spi_master_deinit(s_ezlopi_spi_master_t *spi_config)
+int ezlopi_spi_master_deinit(s_ezlopi_spi_master_t* spi_config)
 {
     int ret = 0;
 

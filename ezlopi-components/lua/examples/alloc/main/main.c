@@ -7,6 +7,8 @@
 #include <lua/lauxlib.h>
 #include <lua/lualib.h>
 
+#include "ezlopi_core_processes.h"
+
 #define LUA_MAX_MEMSIZE 0x10000 // 64k
 
 static const char *prg =
@@ -85,5 +87,7 @@ void test(void *arg)
 
 void app_main()
 {
-    xTaskCreate(test, "test", 0x10000, NULL, 5, NULL);
+    TaskHandle_t ezlopi_component_lua_alloc_test_task_handle = NULL;
+    xTaskCreate(test, "test", EZLOPI_COMPONENT_LUA_ALLOC_TEST_TASK_DEPTH, NULL, 5, &ezlopi_component_lua_alloc_test_task_handle);
+    ezlopi_core_process_set_process_info(ENUM_EZLOPI_COMPONENT_LUA_ALLOC_TEST_TASK, &ezlopi_component_lua_alloc_test_task_handle, EZLOPI_COMPONENT_LUA_ALLOC_TEST_TASK_DEPTH);
 }

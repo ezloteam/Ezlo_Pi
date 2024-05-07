@@ -1,6 +1,8 @@
 #ifndef _EZLOPI_CORE_SCENES_V2_H_
 #define _EZLOPI_CORE_SCENES_V2_H_
 
+#ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+
 #include <stdbool.h>
 #include <stdint.h>
 #include <ctype.h>
@@ -45,6 +47,7 @@ typedef struct s_method_v2
 typedef struct s_block_options_v2
 {
     s_method_v2_t method;
+    cJSON* cj_function;
 } s_block_options_v2_t;
 
 typedef struct s_action_delay_v2
@@ -187,5 +190,7 @@ void ezlopi_scenes_remove_id_from_list_v2(uint32_t _id);
 l_scenes_list_v2_t* ezlopi_scenes_pop_by_id_v2(uint32_t _id);
 
 void ezlopi_scenes_notifications_add(cJSON* cj_notifications);
+
+#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 #endif // _EZLOPI_CORE_SCENES_V2_H_

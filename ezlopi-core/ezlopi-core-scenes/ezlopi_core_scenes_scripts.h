@@ -1,6 +1,8 @@
 #ifndef _EZLOPI_CORE_SCENES_SCRIPTS_H_
 #define _EZLOPI_CORE_SCENES_SCRIPTS_H_
 
+#ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+
 #include <inttypes.h>
 
 typedef enum e_script_state
@@ -37,5 +39,7 @@ void ezlopi_scenes_scripts_run_by_id(uint32_t script_id);
 void ezlopi_scenes_scripts_delete_by_id(uint32_t script_id);
 
 void ezlopi_scenes_scripts_factory_info_reset(void);
+
+#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 #endif // _EZLOPI_CORE_SCENES_SCRIPTS_H_

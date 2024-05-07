@@ -12,6 +12,7 @@ set(EZLOPI_COMPONENTS
 set(EZLOPI_CORE_COMPONENTS 
         ezlopi-core-devices 
         ezlopi-core-scenes
+        ezlopi-core-processes
     )
 
 

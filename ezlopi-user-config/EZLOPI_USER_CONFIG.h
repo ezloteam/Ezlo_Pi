@@ -1,33 +1,55 @@
 #ifndef _EZLOPI_USER_CONFIG_H_
 #define _EZLOPI_USER_CONFIG_H_
 
-// #if 1
 #include "../build/config/sdkconfig.h"
+#include "ezlopi_util_heap.h"
 
 #if defined(CONFIG_EZPI_DISTRO_FULL_OPTION)
 #define CONFIG_EZPI_DISTRO_NAME "EZPI_DISTRO_FULL_OPTION"
-#elif defined(CONFIG_EZLOPI_DISTRO_LOCAL)
+#elif defined(CONFIG_EZPI_DISTRO_LOCAL)
 #define CONFIG_EZPI_DISTRO_NAME "EZLOPI_DISTRO_LOCAL"
-#elif defined(CONFIG_EZLOPI_DISTRO_LOCAL_MESHBOT)
+#elif defined(CONFIG_EZPI_DISTRO_LOCAL_MESHBOT)
 #define CONFIG_EZPI_DISTRO_NAME "EZLOPI_DISTRO_LOCAL_MESHBOT"
 #elif defined(CONFIG_EZLOPI_DISTRO_CLOUD)
 #define CONFIG_EZPI_DISTRO_NAME "EZLOPI_DISTRO_CLOUD"
-#elif defined(CONFIG_EZLOPI_DISTRO_CLOUD_MESHBOT)
+#elif defined(CONFIG_EZPI_DISTRO_CLOUD_MESHBOT)
 #define CONFIG_EZPI_DISTRO_NAME "EZLOPI_DISTRO_CLOUD_MESHBOT"
-#elif defined(CONFIG_EZLOPI_DISTRO_BLE_CLOUD)
+#elif defined(CONFIG_EZPI_DISTRO_BLE_CLOUD)
 #define CONFIG_EZPI_DISTRO_NAME "EZLOPI_DISTRO_BLE_CLOUD"
-#elif defined(CONFIG_EZLOPI_DISTRO_WIFI_HUB)
+#elif defined(CONFIG_EZPI_DISTRO_WIFI_HUB)
 #define CONFIG_EZPI_DISTRO_NAME "EZLOPI_DISTRO_WIFI_HUB"
-#elif defined(CONFIG_EZLOPI_DISTRO_BLE_HUB)
+#elif defined(CONFIG_EZPI_DISTRO_BLE_HUB)
 #define CONFIG_EZPI_DISTRO_NAME "EZLOPI_DISTRO_BLE_HUB"
-#elif defined(CONFIG_EZLOPI_DISTRO_MINIMAL)
+#elif defined(CONFIG_EZPI_DISTRO_MINIMAL)
 #define CONFIG_EZPI_DISTRO_NAME "EZLOPI_DISTRO_MINIMAL"
 #else
 #define CONFIG_EZPI_DISTRO_NAME "EZLOPI_DISTRO_CUSTOM"
 #endif
 
 
-// #define EZLOPI_SERIAL_API_VERSION "1.0.0"
+#if defined(CONFIG_EZPI_HEAP_ENABLE)
+#ifdef malloc
+#undef malloc
+#endif
+#define malloc(x) ezlopi_util_heap_malloc(x, __FILENAME__, __LINE__)
+
+#ifdef calloc
+#undef calloc
+#endif
+#define calloc(x, y) ezlopi_util_heap_calloc(x, y, __FILENAME__, __LINE__)
+
+#ifdef free
+#undef free
+#endif
+#define free(x) ezlopi_util_heap_free(x, __FILENAME__, __LINE__)
+
+#ifdef realloc
+#undef realloc
+#endif
+#define realloc(x, y) ezlopi_util_heap_realloc(x, y, __FILENAME__, __LINE__)
+
+#endif
+
 
 // #else
 /////////////////////////////////////////////////////////////
@@ -96,6 +118,13 @@
 #define EZPI_SERV_UART_TXD_PIN (GPIO_NUM_43)
 #define EZPI_SERV_UART_RXD_PIN (GPIO_NUM_44)
 #endif
+
+
+// Web Socket Configurations
+#define EZPI_CORE_WSS_TASK_STACK_SIZE 6144 // 6 * 1024
+#define EZPI_CORE_WSS_DATA_BUFFER_SIZE 6144 // 6 * 1024
+#define EZPI_CORE_WSS_PING_PONG_TIMEOUT_SEC 10
+#define EZPI_CORE_WSS_PING_INTERVAL_SEC 5
 
 /////////////////////////////////////////////////////////////
 /////////////// Disable user configs here //////////////////

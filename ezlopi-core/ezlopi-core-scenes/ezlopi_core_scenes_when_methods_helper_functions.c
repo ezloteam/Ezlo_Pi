@@ -1,9 +1,15 @@
+#include "../../build/config/sdkconfig.h"
+
+#ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+
+
 #include "ezlopi_util_trace.h"
-#include "ezlopi_core_http.h"
 #include "ezlopi_core_nvs.h"
+#include "ezlopi_core_http.h"
 #include "ezlopi_core_scenes_v2.h"
-#include "ezlopi_core_event_group.h"
 #include "ezlopi_core_scenes_when_methods_helper_functions.h"
+
+
 
 //------------------------------- ezlopi_scene_when_is_date ---------------------------------------------
 
@@ -117,7 +123,7 @@ static uint8_t isdate_check_endweek_conditon(e_isdate_modes_t mode_type, struct 
 static uint8_t isdate_find_nth_week_curr_month(struct tm* info)
 {
     // 2. find the fisrt day in this month
-    uint8_t tmp_week_num = 1;                        // starts with 1 ; since are already in one of the week-count
+    uint8_t tmp_week_num = 1; // starts with 1 ; since are already in one of the week-count
     // for this calculation dont change default 'info->tm_wday' -> '0-6'
     int tmp_weekday_of_curr_month = (info->tm_wday); // 0-6 ; sun = 0
     for (uint8_t i = (info->tm_mday); i > 1; i--)    // total_days_in_curr_month - 1
@@ -491,7 +497,6 @@ static void issunsate_update_sunstate_tm(int tm_mday, s_sunstate_data_t* user_da
         };
         /*Make API call here and extract the suntime[according to 'user_data->sunstate_mode']*/
 
-
         ezlopi_core_http_mbedtls_req(&tmp_config);
         // e.g. after valid extraction
         user_data->curr_tm_day = tm_mday;            // this stores day for which data is extracted
@@ -595,17 +600,9 @@ uint8_t issunstate_get_suntime(l_scenes_list_v2_t* scene_node, l_fields_v2_t* cu
     if ((EZLOPI_VALUE_TYPE_STRING == curr_field->value_type) && (NULL != curr_field->field_value.u_value.value_string))
     {
         flag_check |= (1 << 4); // indicates 'MASK_TIME_FLAG'
-        // if (0 < ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 100, false))
-        // {
-        //     TRACE_S("NMA_CONNECTED");
-        // }
-        // else
-        // {
-        //     TRACE_S("NMA_NOTCONNECTED");
-        //     return flag_check;
-        // }
 
         // 1. check for valid data within 'user_arg'
+
         if (NULL == (scene_node->when_block->fields->user_arg))
         {
             s_sunstate_data_t* data = (s_sunstate_data_t*)malloc(sizeof(s_sunstate_data_t));
@@ -628,7 +625,6 @@ uint8_t issunstate_get_suntime(l_scenes_list_v2_t* scene_node, l_fields_v2_t* cu
             // TRACE_S("curr_day = [%d] ; [%dth]", info->tm_mday, user_data->curr_tm_day);
             user_data->sunstate_mode = curr_sunstate_mode;          // this sets target sunstate for curr meshbot
             issunsate_update_sunstate_tm(info->tm_mday, user_data); // assign 'curr_day' & 'suntime' only
-
             user_data->tmoffs_type = (0 == strncmp(curr_field->field_value.u_value.value_string, "intime", 7)) ? ISSUNSTATE_INTIME_MODE
                 : (0 == strncmp(curr_field->field_value.u_value.value_string, "before", 7)) ? ISSUNSTATE_BEFORE_MODE
                 : (0 == strncmp(curr_field->field_value.u_value.value_string, "after", 6)) ? ISSUNSTATE_AFTER_MODE
@@ -645,10 +641,8 @@ uint8_t issunstate_get_suntime(l_scenes_list_v2_t* scene_node, l_fields_v2_t* cu
             TRACE_W("update_day = [%d][%dth] , offset[%d] : intime=0,before=1,after=2,undefined=3 , SunState[%d] : sunrise=1,sunset=2", info->tm_mday, user_data->curr_tm_day, user_data->tmoffs_type, user_data->sunstate_mode);
         }
     }
-
     return flag_check;
 }
-
 uint8_t issunstate_get_offs_tmval(l_scenes_list_v2_t* scene_node, l_fields_v2_t* curr_field, struct tm* info, uint8_t curr_sunstate_mode)
 {
     uint8_t flag_check = 0;
@@ -977,4 +971,334 @@ int isdate_range_check_flag_result(uint8_t flag_check)
     }
     return ret;
 }
-//-------------------------------------------------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------------------
+/* This function to extract the result of 'AND' when_blocks */
+static bool __and_when_block_condition(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* when_block)
+{
+    bool transition_state = 1; // to make valid judgements
+    l_when_block_v2_t* value_when_block = when_block->fields->field_value.u_value.when_block;
+    while (value_when_block)
+    {
+        f_scene_method_v2_t scene_method = ezlopi_scene_get_method_v2(value_when_block->block_options.method.type);
+        if (scene_method)
+        {
+            transition_state &= scene_method(scene_node, (void*)value_when_block);
+            if (!transition_state)
+            {
+                break;
+            }
+        }
+        value_when_block = value_when_block->next;
+    }
+    return transition_state;
+}
+//-----------------------------------------------------------------------------------------------------
+
+
+//------------------------------- ezlopi_scene_when_function_method -----------------------------------
+
+int when_function_for_opr(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* when_block, cJSON* cj_func_opr)
+{
+    // TRACE_W("for_least");
+    int ret = 0;
+    if (scene_node && when_block && cj_func_opr)
+    {
+        cJSON* for_type = cJSON_GetObjectItem(cj_func_opr, "method");
+        cJSON* for_interval = cJSON_GetObjectItem(cj_func_opr, "seconds");
+        if (for_type && for_interval)
+        {
+            const char* for_less_least = cJSON_GetStringValue(for_type); /*extract the type*/
+            if (for_less_least)
+            {
+                /* first get the product of all children states*/
+                bool transition_state = __and_when_block_condition(scene_node, when_block);
+
+                /*now compare the intervals between each transtion result*/
+                s_when_function_t* function_state_info = (s_when_function_t*)scene_node->when_block->fields->user_arg;
+
+                if ((transition_state == 1) && (0 == function_state_info->current_state))
+                {
+                    function_state_info->transtion_instant = (uint32_t)xTaskGetTickCount();
+                }
+                else if ((transition_state == 0) && (1 == function_state_info->current_state))
+                {
+                    if (0 != function_state_info->transtion_instant)
+                    {
+                        int threshold_time = cJSON_GetNumberValue(for_interval);
+                        if (0 == strncmp(for_less_least, "less", 5))
+                        {
+                            if ((((uint32_t)xTaskGetTickCount() - function_state_info->transtion_instant) / 1000) < threshold_time)
+                            {
+                                // TRACE_S("activating-less");
+                                ret = 1;
+                            }
+                        }
+                        else if (0 == strncmp(for_less_least, "least", 6))
+                        {
+                            if ((((uint32_t)xTaskGetTickCount() - function_state_info->transtion_instant) / 1000) >= threshold_time)
+                            {
+                                // TRACE_S("activating-atleast");
+                                ret = 1;
+                            }
+                        }
+                        // TRACE_I("end_Transtion_time[%d] , duration_time[%d] , threshold[%d]", function_state_info->transtion_instant / 1000, (uint32_t)xTaskGetTickCount() / 1000, threshold_time);
+                    }
+                }
+                function_state_info->current_state = transition_state;
+            }
+        }
+    }
+    return ret;
+}
+int when_function_for_repeat(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* when_block, cJSON* cj_func_opr)
+{
+    int ret = 0;
+    if (scene_node && when_block && cj_func_opr)
+    {
+        cJSON* for_times = cJSON_GetObjectItem(cj_func_opr, "times");
+        cJSON* for_interval = cJSON_GetObjectItem(cj_func_opr, "seconds");
+        if (for_times && for_interval)
+        {
+            /* first get the product of all children states*/
+            s_when_function_t* function_state_info = (s_when_function_t*)scene_node->when_block->fields->user_arg;
+            bool transition_state = __and_when_block_condition(scene_node, when_block);
+            if ((transition_state) && (0 == function_state_info->current_state)) /*previous state?*/
+            {
+                if (0 == function_state_info->transtion_instant)
+                {
+                    /*store the first trigger time*/
+                    // TRACE_W("Start 'repeat' activation Sequence ......!");
+                    function_state_info->transtion_instant = (uint32_t)xTaskGetTickCount();
+                    TRACE_W("first_trigger_time[%d] ", function_state_info->transtion_instant);
+                }
+
+                /*add the count*/
+                function_state_info->transition_count++;
+                // TRACE_W(" count[%d]", function_state_info->transition_count);
+
+                /*compare with conditon*/
+                int for_count = cJSON_GetNumberValue(for_times); /*extract the type*/
+                if (function_state_info->transition_count >= for_count)
+                {
+                    uint32_t dur = (((uint32_t)xTaskGetTickCount() - function_state_info->transtion_instant) / 1000);
+                    int threshold_time = cJSON_GetNumberValue(for_interval);
+                    if (dur <= threshold_time)// from 'start' till 'now'
+                    {
+                        TRACE_W(" Successful activation sequence within [%dsec] ; threshold [%dsec]", dur, threshold_time);
+                        ret = 1;
+                    }
+                    else
+                    {
+                        TRACE_E(" Time-Out !! consumed[%d (>%dsec)]", dur, threshold_time);
+                    }
+                    function_state_info->transtion_instant = 0;
+                    function_state_info->transition_count = 0;
+                }
+            }
+            function_state_info->current_state = transition_state;
+        }
+    }
+
+    return ret;
+}
+int when_function_for_follow(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* when_block, cJSON* cj_func_opr)
+{
+    int ret = 0;
+    if (scene_node && when_block && cj_func_opr)
+    {
+        cJSON* for_delay = cJSON_GetObjectItem(cj_func_opr, "delayReset");
+        if (for_delay)
+        {
+            s_when_function_t* function_state_info = (s_when_function_t*)scene_node->when_block->fields->user_arg;
+            if ((0 == function_state_info->transtion_instant) && (0 == function_state_info->current_state))
+            {
+                /* first get the product of all children states*/
+                bool transition_state = __and_when_block_condition(scene_node, when_block);
+                if (transition_state) /*previous state?*/
+                {
+                    /* trigger phase ---> started */
+                    function_state_info->current_state = transition_state;
+                    function_state_info->transtion_instant = (uint32_t)xTaskGetTickCount();
+                    // TRACE_W("start_follow_time");
+                    ret = 1;
+                }
+            }
+            else
+            {
+                int threshold_time = cJSON_GetNumberValue(for_delay);
+                if ((((uint32_t)xTaskGetTickCount() - function_state_info->transtion_instant) / 1000) <= threshold_time)
+                {
+                    ret = 1;
+                    // TRACE_S(" Follow -> Active ");
+                }
+                else
+                {
+                    /* trigger phase ---> stop */
+                    ret = 0;
+                    TRACE_W("restart the trigger...");
+
+                    /* now refreshing then block*/
+                    if (false == __and_when_block_condition(scene_node, when_block))
+                    {
+                        function_state_info->transtion_instant = 0;
+                        function_state_info->current_state = 0;
+                    }
+                }
+            }
+        }
+    }
+
+    return ret;
+}
+int when_function_for_pulse(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* when_block, cJSON* cj_func_opr)
+{
+    int ret = 0;
+    if (scene_node && when_block && cj_func_opr)
+    {
+        cJSON* for_trueperiod = cJSON_GetObjectItem(cj_func_opr, "truePeriod");
+        cJSON* for_falseperiod = cJSON_GetObjectItem(cj_func_opr, "falsePeriod");
+        cJSON* for_times = cJSON_GetObjectItem(cj_func_opr, "times");
+        if (for_trueperiod && for_times && for_falseperiod)
+        {
+            int true_time_dur = cJSON_GetNumberValue(for_trueperiod);
+            int false_time_dur = cJSON_GetNumberValue(for_falseperiod);
+            int seq_count = cJSON_GetNumberValue(for_times);
+
+            /*1. check for activation condition for 'pulse_flag' */
+            s_when_function_t* function_state_info = (s_when_function_t*)scene_node->when_block->fields->user_arg;
+            if ((0 == function_state_info->transition_count) &&
+                (0 == function_state_info->current_state) &&
+                (0 == function_state_info->transtion_instant) &&
+                (false == function_state_info->activate_pulse_seq))
+            {
+                if (__and_when_block_condition(scene_node, when_block))
+                {
+                    TRACE_W("starting Pulse!");
+                    function_state_info->activate_pulse_seq = true;
+                    function_state_info->current_state = 1; // state you want to start with
+                    function_state_info->transtion_instant = (uint32_t)xTaskGetTickCount();
+                }
+            }
+            /*2. Activate pulse_sequence*/
+            if (true == function_state_info->activate_pulse_seq)
+            {
+                if (seq_count == 0)
+                {
+                    function_state_info->transition_count = seq_count;  /* If 'SEQ_COUNT' == 0 ; Then loop the sequence forever. */
+                }
+                else
+                {
+                    seq_count = (seq_count * 2) - 1; // 6 -> [0-5]
+                }
+
+                if (function_state_info->transition_count <= seq_count)
+                {
+                    uint32_t dur = (((uint32_t)xTaskGetTickCount() - function_state_info->transtion_instant) / 1000);
+                    if (true == function_state_info->current_state)
+                    {
+                        if (dur <= true_time_dur)
+                        {
+                            TRACE_S("high_pulse , true[%dsec]", dur);
+                        }
+                        else
+                        {
+                            function_state_info->transtion_instant = (uint32_t)xTaskGetTickCount();     /*in sec*/
+                            if (function_state_info->transition_count < seq_count)
+                            {
+                                function_state_info->transition_count++;
+                            }
+                            function_state_info->current_state = 0;
+                        }
+                    }
+                    else if (false == function_state_info->current_state)
+                    {
+                        if (dur <= false_time_dur)
+                        {
+                            TRACE_S("low_pulse , false[%dsec]", dur);
+                        }
+                        else
+                        {
+                            function_state_info->transtion_instant = (uint32_t)xTaskGetTickCount();  /*in sec*/
+                            if (function_state_info->transition_count < seq_count)
+                            {
+                                function_state_info->current_state = 1;
+                                function_state_info->transition_count++;
+                            }
+                            else
+                            {
+                                function_state_info->current_state = 0;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    TRACE_E("Exceeded pulse count..............");
+                    function_state_info->activate_pulse_seq = false;
+                    function_state_info->current_state = 0;
+                    function_state_info->transition_count = 0;
+                }
+
+
+
+            }
+            else
+            {
+                /* trigger phase ---> stop */
+                TRACE_W("restart the trigger....");
+
+                /* now refreshing pulse*/
+                if (false == __and_when_block_condition(scene_node, when_block))
+                {
+                    function_state_info->transtion_instant = 0;
+                    function_state_info->transition_count = 0;
+                }
+                function_state_info->current_state = 0;
+            }
+
+            TRACE_W("trigger_state= %s , {seq_count: %d}.-----> return =>> [pulse_state = %s]",
+                (function_state_info->activate_pulse_seq) ? "true" : "false",
+                function_state_info->transition_count,
+                (function_state_info->current_state) ? "high" : "low");
+            ret = function_state_info->current_state;
+        }
+    }
+
+    return ret;
+}
+int when_function_for_latch(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* when_block, cJSON* cj_func_opr)
+{
+    int ret = 0;
+    if (scene_node && when_block && cj_func_opr)
+    {
+        cJSON* for_enabled = cJSON_GetObjectItem(cj_func_opr, "enabled");
+        if (for_enabled)
+        {
+            s_when_function_t* function_state_info = (s_when_function_t*)scene_node->when_block->fields->user_arg;
+            if ((0 == function_state_info->current_state) && (cJSON_True == for_enabled->type) && (0 == function_state_info->transtion_instant)) /* if the trigger phase has not started */
+            {
+                /* first get the product of all children states*/
+                if (__and_when_block_condition(scene_node, when_block))  /*if : previous state = 0*/
+                {
+                    function_state_info->current_state = 1;
+                    function_state_info->transtion_instant = (uint32_t)xTaskGetTickCount();
+                    TRACE_S("start_latched_time[%d]", (uint32_t)xTaskGetTickCount());
+                }
+            }
+            else if (cJSON_False == for_enabled->type)
+            {
+                function_state_info->current_state = 0;
+                function_state_info->transtion_instant = 0;
+                TRACE_S("reset_latched_time[%d]", (uint32_t)xTaskGetTickCount());
+            }
+            ret = function_state_info->current_state;
+            TRACE_W("ret-> current_state = [%d] , active_instant[%d]", function_state_info->current_state, function_state_info->transtion_instant);
+        }
+    }
+
+    return ret;
+}
+#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+//-----------------------------------------------------------------------------------------------------

@@ -1,6 +1,8 @@
 #ifndef _EZLOPI_CORE_ETHERNET_H_
 #define _EZLOPI_CORE_ETHERNET_H_
 
+#ifdef CONFIG_EZPI_CORE_ENABLE_ETH
+
 #if (EZLOPI_AMBIENT_TRACKER_PRO_REV_A == EZLOPI_BOARD_TYPE)
 #define EZLOPI_ETHERNET_W5500_EN_PIN 13
 #define EZLOPI_ETHERNET_W5500_RST_PIN 11
@@ -31,6 +33,8 @@ typedef enum e_ethernet_status
 void ezlopi_ethernet_init(void);
 void ezlopi_ethernet_deinit(void);
 e_ethernet_status_t ezlopi_ethernet_get_status(void);
-esp_netif_ip_info_t *ezlopi_ethernet_get_ip_info(void);
+esp_netif_ip_info_t* ezlopi_ethernet_get_ip_info(void);
+
+#endif // CONFIG_EZPI_CORE_ENABLE_ETH
 
 #endif // _EZLOPI_CORE_ETHERNET_H_

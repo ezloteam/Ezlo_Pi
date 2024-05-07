@@ -161,11 +161,12 @@ static int __set_cjson_value(l_ezlopi_item_t* item, void* arg)
             TRACE_I("item_id: %d", item->cloud_properties.item_id);
             TRACE_I("cur value: %d", value);
 
-            if (GPIO_IS_VALID_OUTPUT_GPIO(item->interface.pwm.gpio_num))
+            if (GPIO_IS_VALID_GPIO(item->interface.pwm.gpio_num))
             {
                 int target_value = (int)(((value * 17) / 100) + 13);
                 TRACE_I("target value: %d", target_value);
                 ezlopi_pwm_change_duty(item->interface.pwm.channel, item->interface.pwm.speed_mode, target_value);
+                ret = 1;
             }
         }
     }

@@ -164,15 +164,33 @@ extern "C"
         [\
             {\
                 \"dev_type\": 1,\
-                \"dev_name\": \"Dining Room Main Lamp\",\
-                \"id_room\":\"\",\
+                \"dev_name\": \"switch_temp\",\
+                \"id_room\": \"\",\
                 \"id_item\": 2,\
-                \"val_ip\": false,\
-                \"val_op\": false,\
-                \"gpio_in\": 5,\
+                \"gpio_in\": 0,\
                 \"gpio_out\": 2,\
+                \"pullup_ip\": false,\
+                \"pullup_op\": false,\
                 \"is_ip\": false,\
                 \"ip_inv\": false,\
+                \"op_inv\": false,\
+                \"val_ip\": false,\
+                \"val_op\": false\
+            },\
+            {\
+                \"dev_type\": 7,\
+                \"dev_name\": \"temp_humi\",\
+                \"id_room\": \"\",\
+                \"id_item\": 16,\
+                \"gpio\": 1\
+            },\
+            {\
+                \"dev_type\": 1,\
+                \"dev_name\": \"for_test\",\
+                \"id_room\": \"\",\
+                \"id_item\": 2,\
+                \"gpio_in\": 0,\
+                \"gpio_out\": 3,\
                 \"pullup_ip\": false,\
                 \"pullup_op\": false,\
                 \"op_inv\": false\
@@ -182,12 +200,12 @@ extern "C"
                 \"dev_name\": \"Digita In\",\
                 \"id_room\": \"\",\
                 \"id_item\": 4,\
-                \"gpio\": 21,\
+                \"gpio\": 4,\
                 \"pull_up\": false,\
                 \"logic_inv\": false\
             }\
         ], \
-        \"dev_total\": 5}";
+        \"dev_total\": 3}";
 #endif
 
 

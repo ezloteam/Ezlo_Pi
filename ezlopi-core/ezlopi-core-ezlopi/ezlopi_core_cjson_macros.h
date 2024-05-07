@@ -17,18 +17,25 @@
         }                                                     \
     }
 
-#define CJSON_GET_VALUE_BOOL(root, item_name, item_val)                 \
-    {                                                                   \
-        cJSON *o_item = cJSON_GetObjectItem(root, item_name);           \
-        if (o_item)                                                     \
-        {                                                               \
-            item_val = o_item->type == cJSON_False ? false : true;      \
-        }                                                               \
-        else                                                            \
-        {                                                               \
-            item_val = false;                                           \
-            TRACE_E("%s not found!", item_name);                        \
-        }                                                               \
+#define CJSON_GET_VALUE_BOOL(root, item_name, item_val)       \
+    {                                                         \
+        cJSON *o_item = cJSON_GetObjectItem(root, item_name); \
+        if (o_item)                                           \
+        {                                                     \
+            if (o_item->type == cJSON_False)                  \
+            {                                                 \
+                item_val = false;                             \
+            }                                                 \
+            else                                              \
+            {                                                 \
+                item_val = true;                              \
+            }                                                 \
+        }                                                     \
+        else                                                  \
+        {                                                     \
+            item_val = false;                                 \
+            TRACE_E("%s not found!", item_name);              \
+        }                                                     \
     }
 
 #define CJSON_GET_VALUE_STRING(root, item_name, item_val)     \

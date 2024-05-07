@@ -1,3 +1,6 @@
+#include "../../build/config/sdkconfig.h"
+
+#ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 #include "ezlopi_util_trace.h"
 
@@ -11,6 +14,7 @@
 #include "ezlopi_core_factory_info.h"
 #include "ezlopi_core_scenes_value.h"
 #include "ezlopi_core_scenes_print.h"
+#include "ezlopi_core_scenes_methods.h"
 #include "ezlopi_core_scenes_when_methods.h"
 #include "ezlopi_core_scenes_then_methods.h"
 #include "ezlopi_core_scenes_status_changed.h"
@@ -500,7 +504,7 @@ static l_scenes_list_v2_t* __new_scene_populate(cJSON* cj_scene, uint32_t scene_
             new_scene->task_handle = NULL;
             new_scene->status = EZLOPI_SCENE_STATUS_STOPPED;
 
-            CJSON_GET_VALUE_DOUBLE(cj_scene, ezlopi_enabled_str, new_scene->enabled);
+            CJSON_GET_VALUE_BOOL(cj_scene, ezlopi_enabled_str, new_scene->enabled);
             CJSON_GET_VALUE_DOUBLE(cj_scene, ezlopi_is_group_str, new_scene->is_group);
 
             {
@@ -782,6 +786,16 @@ static void _____new_block_options_populate(s_block_options_v2_t* p_block_option
     {
         __new_method_populate(&p_block_options->method, cj_method);
     }
+
+    if (0 == strncmp(ezlopi_function_str, p_block_options->method.name, 9))
+    {
+        cJSON* cj_func = cJSON_GetObjectItem(cj_block_options, ezlopi_function_str);
+        if (cj_func)
+        {
+            p_block_options->cj_function = cJSON_Duplicate(cj_func, cJSON_True);
+        }
+    }
+
 }
 
 static void __new_method_populate(s_method_v2_t* p_method, cJSON* cj_method)
@@ -915,7 +929,6 @@ static void _______fields_get_value(l_fields_v2_t* field, cJSON* cj_value)
         {
             int block_idx = 0;
             cJSON* cj_block = NULL;
-            CJSON_TRACE("value", cj_value);
 
             switch (field->value_type)
             {
@@ -935,7 +948,7 @@ static void _______fields_get_value(l_fields_v2_t* field, cJSON* cj_value)
                 field->field_value.e_type = VALUE_TYPE_BLOCK;
                 while (NULL != (cj_block = cJSON_GetArrayItem(cj_value, block_idx++)))
                 {
-                    CJSON_TRACE("cj_block", cj_block);
+                    // CJSON_TRACE("cj_block", cj_block);
 
                     if (field->field_value.u_value.when_block)
                     {
@@ -990,3 +1003,5 @@ static l_fields_v2_t* ______new_field_populate(cJSON* cj_field)
 
     return field;
 }
+
+#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
