@@ -294,6 +294,7 @@ int ezlopi_core_modes_add_disarmed_device(uint8_t modeId, const char* device_id_
                 if (add_to_array)
                 {
                     cJSON_AddItemToArray(mode_to_update->cj_disarmed_devices, cJSON_CreateString(device_id_str));
+                    mode_to_update->disarmed_default = false;
                     ezlopi_core_modes_store_to_nvs();
                 }
                 ret = 1;
@@ -321,12 +322,11 @@ int ezlopi_core_modes_remove_disarmed_device(uint8_t modeId, const char* device_
                 int array_index = 0;
                 cJSON_ArrayForEach(element, mode_to_update->cj_disarmed_devices)
                 {
-                    TRACE_E("Element: %p: %d", element, element->type);
                     if (0 == strncmp(device_id_str, element->valuestring, 32))
                     {
                         cJSON* cj_device_str = cJSON_DetachItemFromArray(mode_to_update->cj_disarmed_devices, array_index);
-                        TRACE_E("Freeing: %s\nNew json is %s", cJSON_Print(cj_device_str), cJSON_Print(mode_to_update->cj_disarmed_devices));
                         cJSON_Delete(cj_device_str);
+                        mode_to_update->disarmed_default = false;
                         ezlopi_core_modes_store_to_nvs();
                         break;
                     }
