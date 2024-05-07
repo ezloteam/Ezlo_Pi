@@ -71,27 +71,28 @@ void ezlopi_service_web_provisioning_deinit(void)
 
 static void __connection_upcall(bool connected)
 {
-    TRACE_D("wss-connection: %s", connected ? "connected" : "failed to connect");
-    static bool prev_status;
+    TRACE_D("wss-connection: %s", connected ? "connected." : "disconnected!");
+    static int prev_status; // 0: never connected, 1: Not-connected, 2: connected
     if (connected)
     {
-        if (prev_status != connected)
+        if (0 == prev_status)
         {
-            TRACE_S("Web-socket re-connected.");
-            TRACE_I("Starting registration process....");
-            ezlopi_core_ezlopi_methods_registration_init();
+            TRACE_S("Web-socket Connected.");
         }
         else
         {
-            TRACE_S("Web-socket connected");
+            TRACE_S("Web-socket Re-connected.");
         }
+
+        prev_status = 2;
+        TRACE_I("Starting registration process....");
+        ezlopi_core_ezlopi_methods_registration_init();
     }
     else
     {
+        prev_status = 1;
         ezlopi_event_group_clear_event(EZLOPI_EVENT_NMA_REG);
     }
-
-    prev_status = connected;
 }
 
 static void __fetch_wss_endpoint(void* pv)
@@ -269,7 +270,7 @@ static void __config_check(void* pv)
                 }
 
                 char http_request_location[200];
-                snprintf(http_request_location, sizeof(http_request_location), "api/v1/controller/sync?version=%d", config_version + 1);
+                snprintf(http_request_location, sizeof(http_request_location), "api/v1/controller/sync?version=%d", config_version ? config_version : 1);
 
                 TRACE_D("web-prov-request: %s", http_request_location);
 

@@ -1,3 +1,4 @@
+*.bin.old
 *.bin
 firmware/**
 firmware/v*/**

@@ -575,7 +575,7 @@ s_ezlopi_http_data_t* ezlopi_http_post_request(const char* cloud_url, const char
             cJSON* header = headers->child;
             while (header)
             {
-                // TRACE_I("%s: %s", header->string, header->valuestring);
+                TRACE_I("%s: %s", header->string, header->valuestring);
                 esp_http_client_set_header(client, header->string, header->valuestring);
                 header = header->next;
             }

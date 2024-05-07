@@ -22,7 +22,7 @@
         cJSON *o_item = cJSON_GetObjectItem(__FUNCTION__, root, item_name); \
         if (o_item)                                           \
         {                                                     \
-            if (o_item->type == cJSON_False)                  \
+            if (o_item->type & cJSON_False)                   \
             {                                                 \
                 item_val = false;                             \
             }                                                 \
@@ -30,7 +30,6 @@
             {                                                 \
                 item_val = true;                              \
             }                                                 \
-            item_val = o_item->valuedouble;                   \
         }                                                     \
         else                                                  \
         {                                                     \
@@ -43,11 +42,11 @@
     {                                                                                       \
         if (object)                                                                         \
         {                                                                                   \
-            char *obj_str = cJSON_Print(__FUNCTION__, object);                                            \
+            char *obj_str = cJSON_Print(__FUNCTION__, object);                              \
             if (obj_str)                                                                    \
             {                                                                               \
                 TRACE_D("%s[%d]: %s", name ? name : ezlopi__str, strlen(obj_str), obj_str); \
-                ezlopi_free(__FUNCTION__, obj_str);                                                              \
+                ezlopi_free(__FUNCTION__, obj_str);                                         \
             }                                                                               \
         }                                                                                   \
         else                                                                                \
@@ -111,6 +110,20 @@
             snprintf(tmp_str, sizeof(tmp_str), "%u", (uint32_t)num); \
             cJSON_AddStringToObject(__FUNCTION__, cj_obj, name_str, tmp_str);      \
         }                                                            \
+    }
+
+#define CJSON_GET_VALUE_GPIO(root, item_name, item_val)                     \
+    {                                                                       \
+        cJSON *o_item = cJSON_GetObjectItem(__FUNCTION__, root, item_name); \
+        if (o_item && (o_item->type & cJSON_Number))                        \
+        {                                                                   \
+            item_val = o_item->valuedouble;                                 \
+        }                                                                   \
+        else                                                                \
+        {                                                                   \
+            item_val = -1;                                                  \
+            TRACE_E("%s not found!", item_name);                            \
+        }                                                                   \
     }
 
 #endif // _EZLOPI_CORE_CJSON_MACROS_H_

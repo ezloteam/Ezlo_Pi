@@ -16,26 +16,6 @@
 #include "ezlopi_hal_i2c_master.h"
 #include "ezlopi_hal_spi_master.h"
 
-// #include "ezlopi_cloud_settings.h"
-#define CJSON_GET_VALUE_GPIO(root, item_name, item_val)                     \
-    {                                                                       \
-        cJSON *o_item = cJSON_GetObjectItem(__FUNCTION__, root, item_name); \
-        if (o_item && o_item->type == cJSON_Number)                         \
-        {                                                                   \
-            item_val = o_item->valuedouble;                                 \
-        }                                                                   \
-        else                                                                \
-        {                                                                   \
-            item_val = -1;                                                  \
-            TRACE_E("%s not found!", item_name);                            \
-        }                                                                   \
-    }
-
-// TRACE_I("%s: %d", item_name, item_val);
-
-
-
-// typedef int (*f_item_func_t)(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg, void *user_arg);
 
 typedef enum e_ezlopi_device_interface_type
 {
