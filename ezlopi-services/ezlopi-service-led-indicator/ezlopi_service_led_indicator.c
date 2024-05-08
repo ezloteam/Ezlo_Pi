@@ -256,7 +256,12 @@ static void __process_event(void)
     if ((event & EZLOPI_EVENT_WIFI_CONNECTED) == EZLOPI_EVENT_WIFI_CONNECTED)
     {
         __indicator_priority = PRIORITY_WIFI;
+#ifdef CONFIG_EZPI_ENABLE_PING
         e_ping_status_t ping_status = ezlopi_ping_get_internet_status();
+#else // CONFIG_EZPI_ENABLE_PING
+        e_ping_status_t ping_status = EZLOPI_PING_STATUS_UNKNOWN;
+#endif // CONFIG_EZPI_ENABLE_PING
+
         if (EZLOPI_PING_STATUS_LIVE == ping_status)
         {
             __indicator_priority = PRIORITY_INTERNET;

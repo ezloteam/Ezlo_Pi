@@ -106,9 +106,16 @@ static void blinky(void* pv)
     {
         float free_heap_kb = esp_get_free_heap_size() / 1024.0;
 
-        trace_wb("----------------------------------------------");
-        trace_wb("esp_get_free_heap_size - %.02f kB", free_heap_kb);
-        trace_wb("esp_get_minimum_free_heap_size: %.02f kB", esp_get_minimum_free_heap_size() / 1024.0);
+        // UBaseType_t total_task_numbers = uxTaskGetNumberOfTasks();
+        // TaskStatus_t task_array[total_task_numbers];
+
+        TRACE_I("----------------------------------------------");
+        uint32_t free_heap = esp_get_free_heap_size();
+        uint32_t watermark_heap = esp_get_minimum_free_heap_size();
+        TRACE_I("Free Heap Size: %d B     %.4f KB", free_heap, free_heap / 1024.0);
+        TRACE_I("Heap Watermark: %d B     %.4f KB", watermark_heap, watermark_heap / 1024.0);
+        // trace_wb("Minimum Free Heap Size: %.4f KB", heap_caps_get_free_size() / 1024.0);
+        TRACE_I("----------------------------------------------");
 
 #ifdef CONFIG_EZPI_HEAP_ENABLE
         ezlopi_util_heap_trace(false);
@@ -131,7 +138,24 @@ static void blinky(void* pv)
         {
             low_heap_start_time = xTaskGetTickCount();
         }
-        TRACE_D("----------------------------------------------");
+#endif // CONFIG_EZPI_HEAP_ENABLE
+
+#if 0
+
+        uxTaskGetSystemState(task_array, total_task_numbers, NULL);
+
+        for (int i = 0; i < total_task_numbers; i++) {
+            if (task_array[i].pcTaskName)
+            {
+                TRACE_D("Process Name: %s, \tPID: %d, \tBase: %p, \tWatermark: %.2f KB",
+                    task_array[i].pcTaskName,
+                    task_array[i].xTaskNumber,
+                    task_array[i].pxStackBase,
+                    task_array[i].usStackHighWaterMark / 1024.0);
+            }
+        }
+#endif 
+
 
 #ifdef CONFIG_EZPI_HEAP_ENABLE
         ezlopi_util_heap_flush();

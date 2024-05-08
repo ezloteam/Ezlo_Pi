@@ -127,6 +127,8 @@
 #define EZPI_SERV_UART_RXD_PIN (GPIO_NUM_44)
 #endif
 
+// Log Configuration 
+#define EZPI_CORE_LOG_BUFFER_SIZE     1024
 
 // Web Socket Configurations
 #define EZPI_CORE_WSS_TASK_STACK_SIZE 6144 // 6 * 1024

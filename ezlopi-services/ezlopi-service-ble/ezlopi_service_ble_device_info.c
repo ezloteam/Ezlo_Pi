@@ -614,8 +614,13 @@ static void EZPI_SERVICE_BLE_net_info(esp_gatt_value_t* value, esp_ble_gatts_cb_
 
                 cJSON_AddBoolToObject(__FUNCTION__, cj_network, "wifi", wifi_status->wifi_connection);
 
+#ifdef CONFIG_EZPI_ENABLE_PING
                 e_ping_status_t ping_status = ezlopi_ping_get_internet_status();
                 cJSON_AddBoolToObject(__FUNCTION__, cj_network, "internet", ping_status == EZLOPI_PING_STATUS_LIVE);
+#else // CONFIG_EZPI_ENABLE_PING
+                cJSON_AddBoolToObject(__FUNCTION__, cj_network, "internet", cJSON_False);
+#endif // CONFIG_EZPI_ENABLE_PING
+
 
                 e_ezlopi_event_t events = ezlopi_get_event_bit_status();
                 bool cloud_connection_status = (EZLOPI_EVENT_NMA_REG & events) == EZLOPI_EVENT_NMA_REG;
@@ -719,8 +724,14 @@ static char* device_info_jsonify(void)
         }
 
         cJSON_AddNumberToObject(__FUNCTION__, root, ezlopi_wifi_connection_status_str, ezlopi_wifi_got_ip());
+#ifdef CONFIG_EZPI_ENABLE_PING
         uint8_t flag_internet_status = (EZLOPI_PING_STATUS_LIVE == ezlopi_ping_get_internet_status()) ? 1 : 0;
+#else // CONFIG_EZPI_ENABLE_PING
+        uint8_t flag_internet_status = 0;
+#endif // CONFIG_EZPI_ENABLE_PING
+
         cJSON_AddNumberToObject(__FUNCTION__, root, ezlopi_internet_status_str, flag_internet_status);
+
 
         device_info = cJSON_PrintBuffered(__FUNCTION__, root, 4096, false);
         TRACE_D("length of 'device_info': %d", strlen(device_info));

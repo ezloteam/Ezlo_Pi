@@ -306,8 +306,8 @@ static int __settings_callback(e_ezlopi_settings_action_t action, struct l_ezlop
     }
     case EZLOPI_SETTINGS_ACTION_SET_SETTING:
     {
-        TRACE_I("%s", stringify(EZLOPI_SETTINGS_ACTION_SET_SETTING))
-            __settings_set(arg, setting);
+        TRACE_I("%s", stringify(EZLOPI_SETTINGS_ACTION_SET_SETTING));
+        __settings_set(arg, setting);
         break;
     }
     case EZLOPI_SETTINGS_ACTION_RESET_SETTING:

@@ -193,7 +193,7 @@ extern "C"
                 \"dev_name\": \"temp_humi\",\
                 \"id_room\": \"\",\
                 \"id_item\": 16,\
-                \"gpio\": 18\
+                \"gpio\": 33\
             },\
             {\
                 \"dev_type\": 1,\
@@ -201,7 +201,7 @@ extern "C"
                 \"id_room\": \"\",\
                 \"id_item\": 2,\
                 \"gpio_in\": 0,\
-                \"gpio_out\": 32,\
+                \"gpio_out\": 26,\
                 \"pullup_ip\": false,\
                 \"pullup_op\": false,\
                 \"is_ip\": false,\
