@@ -1,3 +1,5 @@
+#include "../../build/config/sdkconfig.h"
+
 #include "esp_event.h"
 
 #include "EZLOPI_USER_CONFIG.h"
@@ -33,8 +35,9 @@ void ezlopi_init(void)
     // Init memories  
     ezlopi_nvs_init();
 
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
     ezlopi_core_read_set_log_severities();
-
+#endif // CONFIG_EZPI_UTIL_TRACE_EN
     EZPI_HAL_uart_init();
 
 #if defined(CONFIG_EZPI_WEBSOCKET_CLIENT) || defined(CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER)
