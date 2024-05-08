@@ -1,3 +1,7 @@
+#include "../../build/config/sdkconfig.h"
+
+#ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_scenes_value.h"
 #include "ezlopi_core_scenes_populate.h"
@@ -13,7 +17,7 @@ void ezlopi_scenes_populate_scene(l_scenes_list_v2_t* new_scene, cJSON* cj_scene
         new_scene->task_handle = NULL;
         new_scene->status = EZLOPI_SCENE_STATUS_STOPPED;
 
-        CJSON_GET_VALUE_DOUBLE(cj_scene, ezlopi_enabled_str, new_scene->enabled);
+        CJSON_GET_VALUE_BOOL(cj_scene, ezlopi_enabled_str, new_scene->enabled);
         CJSON_GET_VALUE_DOUBLE(cj_scene, ezlopi_is_group_str, new_scene->is_group);
 
         CJSON_GET_VALUE_STRING_BY_COPY(cj_scene, ezlopi_group_id_str, new_scene->group_id);
@@ -466,3 +470,5 @@ void ezlopi_scenes_populate_assign_field(l_fields_v2_t* new_field, cJSON* cj_fie
         ezlopi_scenes_populate_fields_get_value(new_field, cJSON_GetObjectItem(__FUNCTION__, cj_field, ezlopi_value_str));
     }
 }
+
+#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS

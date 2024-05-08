@@ -310,7 +310,7 @@ static void ezlopi_service_uart_task(void* arg)
     }
 
     ezlopi_free(__FUNCTION__, data);
-    ezpi_core_process_set_is_deleted(ENUM_EZLOPI_SERVICE_UART_TASK);
+    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SERVICE_UART_TASK);
     vTaskDelete(NULL);
 }
 
@@ -740,7 +740,7 @@ void EZPI_SERV_uart_init(void)
 {
     TaskHandle_t ezlopi_service_uart_task_handle = NULL;
     xTaskCreate(ezlopi_service_uart_task, "ezlopi_service_uart_task", EZLOPI_SERVICE_UART_TASK_DEPTH, NULL, configMAX_PRIORITIES, &ezlopi_service_uart_task_handle);
-    ezpi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_UART_TASK, &ezlopi_service_uart_task_handle, EZLOPI_SERVICE_UART_TASK_DEPTH);
+    ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_UART_TASK, &ezlopi_service_uart_task_handle, EZLOPI_SERVICE_UART_TASK_DEPTH);
 }
 
 #endif // CONFIG_EZPI_ENABLE_UART_PROVISIONING

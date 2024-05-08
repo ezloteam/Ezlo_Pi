@@ -392,7 +392,7 @@ static void ezlopi_wifi_scanner_task(void* params)
         }
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
-    ezpi_core_process_set_is_deleted(ENUM_EZLOPI_CORE_WIFI_SCANNER_TASK);
+    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_CORE_WIFI_SCANNER_TASK);
     sg_scan_handle = NULL;
     vTaskDelete(NULL);
 }
@@ -405,7 +405,7 @@ void ezlopi_wifi_scan_stop()
     if (sg_scan_handle)
     {
         TRACE_E("Resetting WiFi scanner task.(handle: %p)", sg_scan_handle);
-        ezpi_core_process_set_is_deleted(ENUM_EZLOPI_CORE_WIFI_SCANNER_TASK);
+        ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_CORE_WIFI_SCANNER_TASK);
         vTaskDelete(sg_scan_handle);
         sg_scan_handle = NULL;
     }
@@ -425,7 +425,7 @@ void ezlopi_wifi_scan_start()
     if (NULL == sg_scan_handle)
     {
         xTaskCreate(ezlopi_wifi_scanner_task, wifi_scanner_task_name, EZLOPI_CORE_WIFI_SCANNER_TASK_DEPTH, NULL, 3, &sg_scan_handle);
-        ezpi_core_process_set_process_info(ENUM_EZLOPI_CORE_WIFI_SCANNER_TASK, &sg_scan_handle, EZLOPI_CORE_WIFI_SCANNER_TASK_DEPTH);
+        ezlopi_core_process_set_process_info(ENUM_EZLOPI_CORE_WIFI_SCANNER_TASK, &sg_scan_handle, EZLOPI_CORE_WIFI_SCANNER_TASK_DEPTH);
     }
 }
 

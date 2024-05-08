@@ -25,4 +25,6 @@ void ezlopi_core_ezlopi_broadcast_remove_method(f_broadcast_method_t broadcast_m
 void ezlopi_core_ezlopi_broadcast_methods_set_queue(int (*func)(cJSON*));
 l_broadcast_method_t* ezlopi_core_ezlopi_broadcast_method_add(f_broadcast_method_t broadcast_method, char* method_name, uint32_t retries);
 
+int ezlopi_core_broadcast_log_cjson(cJSON* cj_log_data);
+
 #endif // __EZLOPI_CORE_EZLOPI_BROADCAST_H__

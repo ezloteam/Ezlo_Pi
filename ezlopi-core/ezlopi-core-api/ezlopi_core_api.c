@@ -1,18 +1,17 @@
 #include "ezlopi_util_trace.h"
 
 #include "ezlopi_cloud_constants.h"
-
 #include "ezlopi_core_api.h"
 #include "ezlopi_core_api_methods.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_ezlopi_broadcast.h"
 
-static int __check_for_no_error(cJSON *cj_request);
-static cJSON *__execute_method(cJSON *cj_request, f_method_func_t method_func);
+static int __check_for_no_error(cJSON* cj_request);
+static cJSON* __execute_method(cJSON* cj_request, f_method_func_t method_func);
 
 cJSON *ezlopi_core_api_consume(const char * who, const char *payload, uint32_t len)
 {
-    cJSON *cj_response = NULL;
+    cJSON* cj_response = NULL;
 
     if (payload && len)
     {
@@ -51,7 +50,7 @@ cJSON *ezlopi_core_api_consume(const char * who, const char *payload, uint32_t l
                     {
                         TRACE_W("updater function: %p", updater);
 
-                        cJSON *cj_update_response = __execute_method(cj_request, updater);
+                        cJSON* cj_update_response = __execute_method(cj_request, updater);
 
                         if (cj_update_response)
                         {
@@ -92,9 +91,9 @@ cJSON *ezlopi_core_api_consume(const char * who, const char *payload, uint32_t l
     return cj_response;
 }
 
-static cJSON *__execute_method(cJSON *cj_request, f_method_func_t method_func)
+static cJSON* __execute_method(cJSON* cj_request, f_method_func_t method_func)
 {
-    cJSON *cj_response = NULL;
+    cJSON* cj_response = NULL;
     if (method_func)
     {
         if (ezlopi_core_elzlopi_methods_check_method_register(method_func))
@@ -118,7 +117,7 @@ static cJSON *__execute_method(cJSON *cj_request, f_method_func_t method_func)
     return cj_response;
 }
 
-static int __check_for_no_error(cJSON *cj_request)
+static int __check_for_no_error(cJSON* cj_request)
 {
     int ret = 0;
 

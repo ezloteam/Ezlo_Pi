@@ -1,6 +1,8 @@
 #ifndef __HUB_SCENES_LIST_H__
 #define __HUB_SCENES_LIST_H__
 
+#ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+
 #include <string.h>
 #include "cjext.h"
 
@@ -31,5 +33,7 @@ extern "C"
 #ifdef __cplusplus
 }
 #endif
+
+#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 #endif // __HUB_SCENES_LIST_H__

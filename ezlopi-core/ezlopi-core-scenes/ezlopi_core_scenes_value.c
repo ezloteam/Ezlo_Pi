@@ -1,17 +1,21 @@
+#include "../../build/config/sdkconfig.h"
+
+#ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+
 #include "ezlopi_cloud_constants.h"
 
 #include "ezlopi_core_scenes_v2.h"
 #include "ezlopi_core_scenes_value.h"
 
-static const char *sg_scenes_value_type_name[] = {
+static const char* sg_scenes_value_type_name[] = {
 #define EZLOPI_VALUE_TYPE(type, name) name,
 #include "ezlopi_core_scenes_value_types.h"
 #undef EZLOPI_VALUE_TYPE
 };
 
-const char *ezlopi_scene_get_scene_value_type_name(e_scene_value_type_v2_t value_type)
+const char* ezlopi_scene_get_scene_value_type_name(e_scene_value_type_v2_t value_type)
 {
-    const char *ret = ezlopi__str;
+    const char* ret = ezlopi__str;
     if ((value_type >= EZLOPI_VALUE_TYPE_NONE) && (value_type < EZLOPI_VALUE_TYPE_MAX))
     {
         ret = sg_scenes_value_type_name[value_type];
@@ -20,9 +24,9 @@ const char *ezlopi_scene_get_scene_value_type_name(e_scene_value_type_v2_t value
     return ret;
 }
 
-e_scene_value_type_v2_t ezlopi_core_scenes_value_get_type(cJSON *cj_root, const char *type_key_str)
+e_scene_value_type_v2_t ezlopi_core_scenes_value_get_type(cJSON* cj_root, const char* type_key_str)
 {
-    char *value_type_str = NULL;
+    char* value_type_str = NULL;
     e_scene_value_type_v2_t ret = EZLOPI_VALUE_TYPE_NONE;
 
     if (cj_root && (NULL == cj_root->valuestring))
@@ -53,4 +57,4 @@ e_scene_value_type_v2_t ezlopi_core_scenes_value_get_type(cJSON *cj_root, const 
     return ret;
 }
 
-// void ezlopi_core_scenes_value_parse()
+#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS

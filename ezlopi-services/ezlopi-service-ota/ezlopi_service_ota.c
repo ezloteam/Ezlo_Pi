@@ -1,3 +1,8 @@
+
+#include "../../build/config/sdkconfig.h"
+
+#ifdef CONFIG_EZPI_ENABLE_OTA
+
 #include <string.h>
 #include <bootloader_random.h>
 
@@ -21,7 +26,7 @@
 #include "ezlopi_core_processes.h"
 
 
-#if defined(CONFIG_EZPI_ENABLE_OTA)
+
 static volatile bool __ota_busy = false;
 
 static void ota_service_process(void* pv);
@@ -35,7 +40,7 @@ void ezlopi_service_ota_init(void)
 {
     TaskHandle_t ezlopi_service_ota_process_task_handle = NULL;
     xTaskCreate(ota_service_process, "ota-service-process", EZLOPI_SERVICE_OTA_PROCESS_TASK_DEPTH, NULL, 2, &ezlopi_service_ota_process_task_handle);
-    ezpi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_OTA_PROCESS_TASK, &ezlopi_service_ota_process_task_handle, EZLOPI_SERVICE_OTA_PROCESS_TASK_DEPTH);
+    ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_OTA_PROCESS_TASK, &ezlopi_service_ota_process_task_handle, EZLOPI_SERVICE_OTA_PROCESS_TASK_DEPTH);
 }
 
 static void ota_service_process(void* pv)
@@ -74,4 +79,5 @@ static void ota_service_process(void* pv)
         }
     }
 }
+
 #endif // CONFIG_EZPI_ENABLE_OTA

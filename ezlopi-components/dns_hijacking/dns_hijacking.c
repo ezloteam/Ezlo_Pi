@@ -154,12 +154,12 @@ esp_err_t dns_hijack_srv_start(const ip4_addr_t resolve_ip_addr) {
         ip4_addr4(&resolve_ip_addr));
 
     xTaskCreate(dns_hijack_srv_task, "dns_hijack_srv", EZLOPI_COMPONENT_DNS_HIJACK_SRV_TASK_STACK_DEPTH, NULL, 5, &dns_hijack_srv_handle.task_handle);
-    ezpi_core_process_set_process_info(ENUM_EZLOPI_COMPONENT_DNS_HIJACK_SRV_TASK_STACK, &dns_hijack_srv_handle.task_handle, EZLOPI_COMPONENT_DNS_HIJACK_SRV_TASK_STACK_DEPTH);
+    ezlopi_core_process_set_process_info(ENUM_EZLOPI_COMPONENT_DNS_HIJACK_SRV_TASK_STACK, &dns_hijack_srv_handle.task_handle, EZLOPI_COMPONENT_DNS_HIJACK_SRV_TASK_STACK_DEPTH);
     return ESP_OK;
 }
 
 esp_err_t dns_hijack_srv_stop() {
-    ezpi_core_process_set_is_deleted(ENUM_EZLOPI_COMPONENT_DNS_HIJACK_SRV_TASK_STACK);
+    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_COMPONENT_DNS_HIJACK_SRV_TASK_STACK);
     vTaskDelete(dns_hijack_srv_handle.task_handle);
     dns_hijack_srv_handle.task_handle = NULL;
 

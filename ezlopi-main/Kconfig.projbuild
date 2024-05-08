@@ -100,13 +100,7 @@ menu "EzloPi User Config"
         depends on EZPI_DISTRO_FULL_OPTION
         default n
         help
-            Enable provisioning and monitoring via UART
-    
-    # config HTTPD_WS_SUPPORT
-    #     bool "Enable ESP HTTP Socket support"
-    #     default n
-    #     help 
-    #         Enable local HTTP WS Support
+            Enable provisioning and monitoring via UART    
 
     config EZPI_LOCAL_WEBSOCKET_SERVER
         depends on (HTTPD_WS_SUPPORT && (EZPI_CORE_ENABLE_ETH || EZPI_ENABLE_WIFI ) && (EZPI_DISTRO_FULL_OPTION || EZPI_DISTRO_LOCAL || EZPI_DISTRO_LOCAL_MESHBOT))

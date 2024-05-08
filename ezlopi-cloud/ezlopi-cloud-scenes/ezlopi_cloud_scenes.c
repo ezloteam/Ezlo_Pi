@@ -1,3 +1,7 @@
+#include "../../build/config/sdkconfig.h"
+
+#ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+
 #include <string.h>
 #include <stdint.h>
 
@@ -440,3 +444,4 @@ void scene_deleted(cJSON* cj_request, cJSON* cj_response)
         cJSON_AddBoolToObject(__FUNCTION__, cj_result, ezlopi_syncNotification_str, true);
     }
 }
+#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS

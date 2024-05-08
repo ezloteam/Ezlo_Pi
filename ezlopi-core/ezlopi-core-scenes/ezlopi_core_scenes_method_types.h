@@ -1,3 +1,5 @@
+#ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+
 EZLOPI_SCENE(METHOD_TYPE_NONE, "none", NULL)
 // when
 EZLOPI_SCENE(WHEN_METHOD_IS_ITEM_STATE, "isItemState", ezlopi_scene_when_is_item_state)
@@ -59,3 +61,5 @@ EZLOPI_SCENE(THEN_SET_VARIABLE, "setVariable", ezlopi_scene_then_set_variable)
 EZLOPI_SCENE(THEN_TOGGLE_VALUE, "toggleValue", ezlopi_scene_then_toggle_value)
 //
 EZLOPI_SCENE(METHOD_TYPE_MAX, "max", NULL)
+
+#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS

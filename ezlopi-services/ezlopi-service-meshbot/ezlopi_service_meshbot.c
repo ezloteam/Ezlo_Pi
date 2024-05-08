@@ -1,3 +1,7 @@
+#include "../../build/config/sdkconfig.h"
+
+#ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
@@ -478,3 +482,5 @@ static int __execute_action_block(l_scenes_list_v2_t* scene_node, l_action_block
 
     return ret;
 }
+
+#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS

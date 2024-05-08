@@ -112,7 +112,7 @@ static int __init(l_ezlopi_item_t* item)
         s_ultrasonic_sensor_t* ultrasonic_HCSR04_sensor = (s_ultrasonic_sensor_t*)item->user_arg;
         if (ultrasonic_HCSR04_sensor)
         {
-            if (GPIO_IS_VALID_OUTPUT_GPIO(item->interface.gpio.gpio_out.gpio_num))
+            if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_out.gpio_num))
             {
                 const gpio_config_t io_conf = {
                     .pin_bit_mask = (1ULL << item->interface.gpio.gpio_out.gpio_num),

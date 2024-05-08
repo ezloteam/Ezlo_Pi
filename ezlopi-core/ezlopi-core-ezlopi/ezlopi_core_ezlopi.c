@@ -1,3 +1,5 @@
+#include "../../build/config/sdkconfig.h"
+
 #include "esp_event.h"
 
 #include "EZLOPI_USER_CONFIG.h"
@@ -18,6 +20,7 @@
 #include "ezlopi_core_devices_list.h"
 #include "ezlopi_core_scenes_scripts.h"
 #include "ezlopi_core_scenes_expressions.h"
+#include "ezlopi_core_log.h"
 
 #ifdef CONFIG_EZPI_CORE_ETHERNET_EN
 #include "ezlopi_core_ethernet.h"
@@ -31,6 +34,10 @@ void ezlopi_init(void)
 {
     // Init memories  
     ezlopi_nvs_init();
+
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
+    ezlopi_core_read_set_log_severities();
+#endif // CONFIG_EZPI_UTIL_TRACE_EN
     EZPI_HAL_uart_init();
 
 #if defined(CONFIG_EZPI_WEBSOCKET_CLIENT) || defined(CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER)
@@ -117,6 +124,7 @@ static void ezlopi_initialize_devices_v3(void)
 
     while (curr_device)
     {
+
         TRACE_S("Device_id_curr_device : [0x%x] ", curr_device->cloud_properties.device_id);
         l_ezlopi_item_t* curr_item = curr_device->items;
         while (curr_item)

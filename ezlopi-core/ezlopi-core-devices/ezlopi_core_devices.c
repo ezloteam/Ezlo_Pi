@@ -160,8 +160,6 @@ l_ezlopi_device_t* ezlopi_device_add_device(cJSON* cj_device, const char* last_n
         }
 
         TRACE_D("Device Id (after): %08x", new_device->cloud_properties.device_id);
-        TRACE_S("")
-
 
         if (NULL == l_device_head)
         {

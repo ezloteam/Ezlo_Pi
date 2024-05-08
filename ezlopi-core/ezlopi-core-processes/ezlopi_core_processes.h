@@ -103,22 +103,15 @@ typedef enum {
     ENUM_TASK_MAX
 } e_ezlopi_task_enum_t;
 
-
-#if 0
+#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
 int ezlopi_core_get_processes_details(cJSON* cj_processes_array);
-int ezlopi_core_process_set_process_info(e_ezlopi_task_enum_t task_num, TaskHandle_t *task_handle, size_t task_depth);
+int ezlopi_core_process_set_process_info(e_ezlopi_task_enum_t task_num, TaskHandle_t* task_handle, size_t task_depth);
 int ezlopi_core_process_set_is_deleted(e_ezlopi_task_enum_t task_num);
-
-#define ezpi_core_get_processes_details ezlopi_core_get_processes_details
-#define ezpi_core_process_set_process_info ezlopi_core_process_set_process_info
-#define ezpi_core_process_set_is_deleted ezlopi_core_process_set_is_deleted
-
-#else
-#define ezpi_core_get_processes_details(x) 
-#define ezpi_core_process_set_process_info(x, y, z) 
-#define ezpi_core_process_set_is_deleted(x) 
-#endif
-
+#else // CONFIG_FREERTOS_USE_TRACE_FACILITY
+#define ezlopi_core_get_processes_details(x)
+#define ezlopi_core_process_set_process_info(x, y, z)
+#define ezlopi_core_process_set_is_deleted(x)
+#endif // CONFIG_FREERTOS_USE_TRACE_FACILITY
 #endif // _EZLOPI_CORE_PROCESSES_H
 
 

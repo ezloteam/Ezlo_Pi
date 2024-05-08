@@ -1,7 +1,6 @@
 #include <string.h>
-
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
 
 #include "ezlopi_util_trace.h"
 #include "ezlopi_util_version.h"
@@ -27,7 +26,7 @@ void registration_init(void)
     if (NULL == __registration_task_handle)
     {
         xTaskCreate(registration_process, "registration_process", EZLOPI_CLOUD_REGISTRATION_PROCESS_STACK_DEPTH, NULL, 2, &__registration_task_handle);
-        ezpi_core_process_set_process_info(ENUM_EZLOPI_CLOUD_REGISTRATION_PROCESS_STACK, &__registration_task_handle, EZLOPI_CLOUD_REGISTRATION_PROCESS_STACK_DEPTH);
+        ezlopi_core_process_set_process_info(ENUM_EZLOPI_CLOUD_REGISTRATION_PROCESS_STACK, &__registration_task_handle, EZLOPI_CLOUD_REGISTRATION_PROCESS_STACK_DEPTH);
     }
 }
 
@@ -41,6 +40,7 @@ void registered(cJSON* cj_request, cJSON* cj_response)
     TRACE_S("Device registration successful.");
     ezlopi_event_group_set_event(EZLOPI_EVENT_NMA_REG);
 }
+
 
 static void registration_process(void* pv)
 {
@@ -69,11 +69,6 @@ static void registration_process(void* pv)
             cJSON_AddNumberToObject(__FUNCTION__, cj_params, "maxFrameSize", (20 * 1024));
         }
 
-        while (false == ezlopi_websocket_client_is_connected())
-        {
-            vTaskDelay(200 / portTICK_RATE_MS);
-        }
-
         while (ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 5000, false) <= 0)
         {
             cJSON* cj_register_dup = cJSON_CreateObjectReference(__FUNCTION__, cj_register->child);
@@ -92,6 +87,7 @@ static void registration_process(void* pv)
     }
 
     __registration_task_handle = NULL;
-    ezpi_core_process_set_is_deleted(ENUM_EZLOPI_CLOUD_REGISTRATION_PROCESS_STACK);
+    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_CLOUD_REGISTRATION_PROCESS_STACK);
     vTaskDelete(NULL);
+
 }

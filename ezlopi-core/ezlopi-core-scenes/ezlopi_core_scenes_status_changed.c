@@ -1,3 +1,7 @@
+#include "../../build/config/sdkconfig.h"
+
+#ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+
 #include "ezlopi_util_trace.h"
 
 #include "ezlopi_cloud_constants.h"
@@ -6,7 +10,7 @@
 #include "ezlopi_core_ezlopi_broadcast.h"
 #include "ezlopi_core_scenes_status_changed.h"
 
-int ezlopi_scenes_status_change_broadcast(l_scenes_list_v2_t *scene_node, const char *status_str)
+int ezlopi_scenes_status_change_broadcast(l_scenes_list_v2_t* scene_node, const char* status_str)
 {
     int ret = 0;
     if (scene_node)
@@ -65,9 +69,9 @@ int ezlopi_scenes_status_change_broadcast(l_scenes_list_v2_t *scene_node, const 
     return ret;
 }
 
-const char *ezlopi_scenes_status_to_string(e_scene_status_v2_t scene_status)
+const char* ezlopi_scenes_status_to_string(e_scene_status_v2_t scene_status)
 {
-    const char *ret = "";
+    const char* ret = "";
 #if (1 == ENABLE_TRACE)
     switch (scene_status)
     {
@@ -102,3 +106,4 @@ const char *ezlopi_scenes_status_to_string(e_scene_status_v2_t scene_status)
 
     return ret;
 }
+#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS

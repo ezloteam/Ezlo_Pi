@@ -1,4 +1,6 @@
 
+#include "../../build/config/sdkconfig.h"
+
 #include <esp_mac.h>
 #include <esp_wifi_types.h>
 #include <esp_idf_version.h>
@@ -8,7 +10,6 @@
 
 #include "ezlopi_util_trace.h"
 #include "ezlopi_cloud_constants.h"
-#include "../../build/config/sdkconfig.h"
 
 #include "ezlopi_core_api.h"
 #include "ezlopi_core_http.h"
@@ -17,7 +18,6 @@
 #include "ezlopi_core_api_methods.h"
 #include "ezlopi_core_event_group.h"
 #include "ezlopi_core_factory_info.h"
-#include "ezlopi_core_api_methods.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_processes.h"
 #include "ezlopi_core_websocket_client.h"
@@ -54,9 +54,9 @@ void ezlopi_service_web_provisioning_init(void)
 
     TaskHandle_t ezlopi_service_web_prov_config_check_task_handle = NULL;
     xTaskCreate(__config_check, "WebProvCfgChk", EZLOPI_SERVICE_WEB_PROV_CONFIG_CHECK_TASK_DEPTH, NULL, 5, &ezlopi_service_web_prov_config_check_task_handle);
-    ezpi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_WEB_PROV_CONFIG_CHECK_TASK, &ezlopi_service_web_prov_config_check_task_handle, EZLOPI_SERVICE_WEB_PROV_CONFIG_CHECK_TASK_DEPTH);
+    ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_WEB_PROV_CONFIG_CHECK_TASK, &ezlopi_service_web_prov_config_check_task_handle, EZLOPI_SERVICE_WEB_PROV_CONFIG_CHECK_TASK_DEPTH);
     xTaskCreate(__fetch_wss_endpoint, "WebProvFetchWSS", EZLOPI_SERVICE_WEB_PROV_FETCH_WSS_TASK_DEPTH, NULL, 5, &ezlopi_update_config_notifier);
-    ezpi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_WEB_PROV_FETCH_WSS_TASK, &ezlopi_update_config_notifier, EZLOPI_SERVICE_WEB_PROV_FETCH_WSS_TASK_DEPTH);
+    ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_WEB_PROV_FETCH_WSS_TASK, &ezlopi_update_config_notifier, EZLOPI_SERVICE_WEB_PROV_FETCH_WSS_TASK_DEPTH);
 }
 
 void ezlopi_service_web_provisioning_deinit(void)
@@ -128,10 +128,8 @@ static void __fetch_wss_endpoint(void* pv)
                     if (cjson_uri)
                     {
                         TRACE_D("uri: %s", cjson_uri->valuestring ? cjson_uri->valuestring : "NULL");
-
                         ezlopi_core_ezlopi_broadcast_method_add(__send_str_data_to_nma_websocket, "nma-websocket", 4);
                         ezlopi_websocket_client_init(cjson_uri, __message_upcall, __connection_upcall);
-
                         task_complete = 1;
                     }
 
@@ -157,7 +155,7 @@ static void __fetch_wss_endpoint(void* pv)
     // ezlopi_factory_info_v3_free(ssl_shared_key); // allocated once for all, do not free
     // ezlopi_factory_info_v3_free(ssl_private_key); // allocated once for all, do not free
 
-    ezpi_core_process_set_is_deleted(ENUM_EZLOPI_SERVICE_WEB_PROV_FETCH_WSS_TASK);
+    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SERVICE_WEB_PROV_FETCH_WSS_TASK);
     vTaskDelete(NULL);
 }
 
@@ -189,7 +187,7 @@ static int __send_cjson_data_to_nma_websocket(cJSON* cj_data)
 
         if (data_buffer && buffer_len)
         {
-            TRACE_I("-----------------------------> buffer acquired!");
+            // TRACE_I("-----------------------------> buffer acquired!");
             memset(data_buffer, 0, buffer_len);
 
             if (true == cJSON_PrintPreallocated(__FUNCTION__, cj_data, data_buffer, buffer_len, false))
@@ -202,11 +200,11 @@ static int __send_cjson_data_to_nma_websocket(cJSON* cj_data)
             }
 
             ezlopi_core_buffer_release();
-            TRACE_I("-----------------------------> buffer released!");
+            // TRACE_I("-----------------------------> buffer released!");
         }
         else
         {
-            TRACE_E("-----------------------------> buffer acquired failed!");
+            // TRACE_E("-----------------------------> buffer acquired failed!");
         }
     }
 
@@ -233,11 +231,11 @@ static int __send_str_data_to_nma_websocket(char* str_data)
 
         if (ret)
         {
-            TRACE_S("## WSC-SENDING done >>>>>>>>>>>>>>>>>>>\r\n%s", str_data);
+            // TRACE_S("## WSC-SENDING done >>>>>>>>>>>>>>>>>>>\r\n%s", str_data);
         }
         else
         {
-            TRACE_W("## WSC-SENDING failed >>>>>>>>>>>>>>>>>>>\r\n%s", str_data);
+            // TRACE_W("## WSC-SENDING failed >>>>>>>>>>>>>>>>>>>\r\n%s", str_data);
         }
     }
 
@@ -285,7 +283,7 @@ static void __config_check(void* pv)
                     case HttpStatus_Ok:
                     {
                         // re-write all the info into the flash region
-                        TRACE_S("Data : %s", response->response);
+                        // TRACE_S("Data : %s", response->response);
                         if (0 == __config_update(response->response))
                         {
                             retry_count++;
@@ -310,29 +308,30 @@ static void __config_check(void* pv)
                         break;
                     }
                     }
-
-                    ezlopi_factory_info_v3_free(response->response);
-                    ezlopi_factory_info_v3_free(response);
+                    break;
                 }
+
+                ezlopi_factory_info_v3_free(response->response);
+                ezlopi_factory_info_v3_free(response);
 
                 if (flag_break_loop)
                 {
                     xTaskNotifyGive(ezlopi_update_config_notifier);
                     break;
                 }
-
-                vTaskDelay(50000 / portTICK_RATE_MS);
             }
 
-            cJSON_Delete(__FUNCTION__, root_header_prov_token);
         }
+
+        cJSON_Delete(__FUNCTION__, root_header_prov_token);
+        vTaskDelay(50000 / portTICK_RATE_MS);
     }
 
     // ezlopi_factory_info_v3_free(ca_certificate); // allocated once for all, do not free
     ezlopi_factory_info_v3_free(provisioning_server);
     ezlopi_factory_info_v3_free(provision_token);
+    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SERVICE_WEB_PROV_CONFIG_CHECK_TASK);
 
-    ezpi_core_process_set_is_deleted(ENUM_EZLOPI_SERVICE_WEB_PROV_CONFIG_CHECK_TASK);
     vTaskDelete(NULL);
 }
 

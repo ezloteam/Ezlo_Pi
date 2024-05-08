@@ -1,3 +1,7 @@
+#include "../../build/config/sdkconfig.h"
+
+#ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+
 #include <string.h>
 #include "ezlopi_util_trace.h"
 #include "ezlopi_core_http.h"
@@ -335,3 +339,5 @@ void free_http_mbedtls_struct(s_ezlopi_core_http_mbedtls_t* config)
     FREE_PTR_IF_NOT_NULL(config->password);
     FREE_PTR_IF_NOT_NULL(config->response);
 }
+
+#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS

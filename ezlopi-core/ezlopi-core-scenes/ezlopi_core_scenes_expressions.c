@@ -1,4 +1,7 @@
-// #include <string.h>
+#include "../../build/config/sdkconfig.h"
+
+#ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+
 #include "cjext.h"
 
 #include "ezlopi_core_nvs.h"
@@ -868,3 +871,4 @@ static void __add_expression_device_item_names(s_ezlopi_expressions_t* exp_node,
         }
     }
 }
+#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
