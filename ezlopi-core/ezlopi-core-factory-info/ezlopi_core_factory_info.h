@@ -169,6 +169,7 @@ extern "C"
                 \"id_item\": 2,\
                 \"gpio_in\": 0,\
                 \"gpio_out\": 25,\
+                \"gpio_out\": 25,\
                 \"pullup_ip\": false,\
                 \"pullup_op\": false,\
                 \"is_ip\": false,\

@@ -1,3 +1,6 @@
+#include "../../build/config/sdkconfig.h"
+
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
 
 #include <stdbool.h>
 #include <string.h>
@@ -128,7 +131,7 @@ e_ezlopi_log_severity_t ezlopi_core_serial_log_get_current_severity_enum_val()
 int ezlopi_core_send_cloud_log(int severity, const char* log_str)
 {
     int ret = 0;
-    if(severity == ENUM_EZLOPI_LOG_SEVERITY_NONE)
+    if (severity == ENUM_EZLOPI_LOG_SEVERITY_NONE)
     {
         ret = 1;
     }
@@ -194,3 +197,4 @@ void ezlopi_core_set_log_upcalls()
     ezlopi_util_set_log_upcalls(ezlopi_core_send_cloud_log, ezlopi_core_serial_log_upcall);
 }
 
+#endif // CONFIG_EZPI_UTIL_TRACE_EN

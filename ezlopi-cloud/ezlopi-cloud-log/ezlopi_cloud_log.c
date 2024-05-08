@@ -1,3 +1,6 @@
+#include "../../build/config/sdkconfig.h"
+
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
 
 #include <stdbool.h>
 #include <string.h>
@@ -8,7 +11,6 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "ezlopi_cloud_log.h"
-
 
 
 void ezlopi_hub_cloud_log_set(cJSON* cj_request, cJSON* cj_response)
@@ -73,7 +75,7 @@ void ezlopi_hub_serial_log_set_updater(cJSON* cj_request, cJSON* cj_response)
     cJSON* cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
     if (cj_result)
     {
-       cJSON* cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
+        cJSON* cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
         if (cj_params)
         {
             cJSON* cj_log_severity = cJSON_GetObjectItem(cj_params, ezlopi_severity_str);
@@ -87,3 +89,4 @@ void ezlopi_hub_serial_log_set_updater(cJSON* cj_request, cJSON* cj_response)
     }
 }
 
+#endif  // CONFIG_EZPI_UTIL_TRACE_EN  
