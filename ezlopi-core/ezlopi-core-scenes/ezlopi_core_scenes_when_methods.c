@@ -168,6 +168,12 @@ int ezlopi_scene_when_is_sun_state(l_scenes_list_v2_t* scene_node, void* arg)
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (when_block && scene_node)
     {
+        if (0 < ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 100, false))
+        {
+            TRACE_W("module not online");
+            return 0;
+        }
+
         time_t rawtime = 0;
         time(&rawtime);
         struct tm* info;
