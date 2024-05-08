@@ -174,6 +174,7 @@ int ezlopi_scene_when_is_sun_state(l_scenes_list_v2_t* scene_node, void* arg)
     {
         if (0 < ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 100, false))
         {
+            TRACE_W("module not online");
             return 0;
         }
 
