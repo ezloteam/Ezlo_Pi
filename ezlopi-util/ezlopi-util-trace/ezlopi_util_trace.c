@@ -4,6 +4,7 @@
 #include <string.h>
 #include "esp_system.h"
 
+#if (1 == ENABLE_TRACE)
 f_ezlopi_log_upcall_t cloud_log_upcall_func = NULL;
 f_ezlopi_log_upcall_t serial_log_upcall_func = NULL;
 
@@ -90,3 +91,4 @@ f_ezlopi_log_upcall_t ezlopi_util_get_serial_log_upcall()
 {
     return serial_log_upcall_func;
 }
+#endif // ENABLE_TRACE
