@@ -67,7 +67,7 @@ menu "EzloPi User Config"
         help
             Enable BLE pairing
                 
-    config EZLOPI_BLE_ENALBE_PASSKEY
+    config EZPI_BLE_ENALBE_PASSKEY
         bool "Enable BLE pass key"
         default n
         depends on EZPI_BLE_ENALBE_PAIRING
@@ -100,13 +100,7 @@ menu "EzloPi User Config"
         depends on EZPI_DISTRO_FULL_OPTION
         default n
         help
-            Enable provisioning and monitoring via UART
-    
-    # config HTTPD_WS_SUPPORT
-    #     bool "Enable ESP HTTP Socket support"
-    #     default n
-    #     help 
-    #         Enable local HTTP WS Support
+            Enable provisioning and monitoring via UART    
 
     config EZPI_LOCAL_WEBSOCKET_SERVER
         depends on (HTTPD_WS_SUPPORT && (EZPI_CORE_ENABLE_ETH || EZPI_ENABLE_WIFI ) && (EZPI_DISTRO_FULL_OPTION || EZPI_DISTRO_LOCAL || EZPI_DISTRO_LOCAL_MESHBOT))
@@ -136,7 +130,7 @@ menu "EzloPi User Config"
         help
             Enable meshbot services for scenes
     
-    config EZLPI_SERV_ENABLE_MODES
+    config EZPI_SERV_ENABLE_MODES
         depends on EZPI_SERV_ENABLE_MESHBOTS
         bool "Enable mode services"
         default n

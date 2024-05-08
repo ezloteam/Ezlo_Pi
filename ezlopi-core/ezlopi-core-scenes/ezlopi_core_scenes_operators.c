@@ -1,3 +1,7 @@
+#include "../../build/config/sdkconfig.h"
+
+#ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+
 #include <string.h>
 #include "cjext.h"
 
@@ -1569,3 +1573,4 @@ int ezlopi_scenes_operators_is_dictionary_changed_operations(l_scenes_list_v2_t*
     }
     return ret;
 }
+#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS

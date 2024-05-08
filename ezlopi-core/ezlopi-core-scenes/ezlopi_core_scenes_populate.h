@@ -1,6 +1,8 @@
 #ifndef _EZLOPI_CORE_SCENES_POPULATE_H_
 #define _EZLOPI_CORE_SCENES_POPULATE_H_
 
+#ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+
 #include "cjext.h"
 #include <stdint.h>
 
@@ -26,5 +28,7 @@ l_user_notification_v2_t* ezlopi_scenes_populate_user_notifications(cJSON* cj_us
 void ezlopi_scenes_populate_assign_user_notification(l_user_notification_v2_t* new_user_notification, cJSON* cj_user_notification);
 
 void ezlopi_scenes_populate_scene(l_scenes_list_v2_t* new_scene, cJSON* cj_scene, uint32_t scene_id);
+
+#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 #endif // _EZLOPI_CORE_SCENES_POPULATE_H_

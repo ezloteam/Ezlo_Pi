@@ -16,6 +16,8 @@
 #include "ezlopi_core_factory_info.h"
 #include "ezlopi_core_websocket_client.h"
 
+#include "ezlopi_service_webprov.h"
+
 static esp_websocket_client_handle_t client = NULL;
 static void (*__msg_upcall)(const char*, uint32_t) = NULL;
 
@@ -82,14 +84,14 @@ esp_websocket_client_handle_t ezlopi_websocket_client_init(cJSON* uri, void (*ms
 
         esp_websocket_client_config_t websocket_cfg = {
             .uri = uri->valuestring,
-            .task_stack = 6 * 1024,
-            .buffer_size = 6 * 1024,
+            .task_stack = EZPI_CORE_WSS_TASK_STACK_SIZE,
+            .buffer_size = EZPI_CORE_WSS_DATA_BUFFER_SIZE,
             .cert_pem = ca_cert,
             .client_cert = ssl_shared,
             .client_key = ssl_priv,
-            .pingpong_timeout_sec = 21,
+            .pingpong_timeout_sec = EZPI_CORE_WSS_PING_PONG_TIMEOUT_SEC,
             .keep_alive_enable = 1,
-            .ping_interval_sec = 10,
+            .ping_interval_sec = EZPI_CORE_WSS_PING_INTERVAL_SEC,
         };
 
         TRACE_S("Connecting to %s...", websocket_cfg.uri);
@@ -126,18 +128,20 @@ static void websocket_event_handler(void* handler_args, esp_event_base_t base, i
         TRACE_S("WEBSOCKET_EVENT_CONNECTED");
         if (event_arg && event_arg->connection_upcall)
         {
-            event_arg->connection_upcall(1);
+            event_arg->connection_upcall(true);
         }
         break;
     }
     case WEBSOCKET_EVENT_DISCONNECTED:
     {
-        TRACE_E("free-heap: %d", esp_get_free_heap_size());
-        TRACE_S("WEBSOCKET_EVENT_DISCONNECTED");
+        // TRACE_E("free-heap: %d", esp_get_free_heap_size());
+        TRACE_E("WEBSOCKET_EVENT_DISCONNECTED");
+
         if (event_arg && event_arg->connection_upcall)
         {
-            event_arg->connection_upcall(0);
+            event_arg->connection_upcall(false);
         }
+
         break;
     }
     case WEBSOCKET_EVENT_DATA:
@@ -150,12 +154,12 @@ static void websocket_event_handler(void* handler_args, esp_event_base_t base, i
     }
     case WEBSOCKET_EVENT_ERROR:
     {
-        TRACE_S("WEBSOCKET_EVENT_ERROR");
+        TRACE_E("WEBSOCKET_EVENT_ERROR");
         break;
     }
     default:
     {
-        TRACE_W("Websocket event type not-implemented! value: %u", event_id);
+        TRACE_E("Websocket event type not-implemented! value: %u", event_id);
         break;
     }
     }

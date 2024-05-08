@@ -75,7 +75,7 @@ static char* ezlopi_ble_gap_event_to_str(esp_gap_ble_cb_event_t event);
 #endif
 // static void ezlopi_ble_setup_adv_config(void);
 
-#if (1 == CONFIG_EZLOPI_BLE_ENALBE_PASSKEY)
+#if (1 == CONFIG_EZPI_BLE_ENALBE_PASSKEY)
 void ezlopi_ble_gap_set_passkey(uint32_t passkey)
 {
     esp_ble_gap_set_security_param(ESP_BLE_SM_SET_STATIC_PASSKEY, &passkey, sizeof(uint32_t));

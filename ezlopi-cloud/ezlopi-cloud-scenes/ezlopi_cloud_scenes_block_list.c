@@ -1,3 +1,7 @@
+#include "../../build/config/sdkconfig.h"
+
+#ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+
 #include <string.h>
 #include <stdint.h>
 
@@ -295,3 +299,4 @@ static e_scenes_block_type_v2_t __get_block_type_and_create_block_array(cJSON* c
 
     return block_type;
 }
+#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS

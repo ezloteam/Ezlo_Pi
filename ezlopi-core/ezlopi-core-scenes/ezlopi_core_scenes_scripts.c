@@ -1,3 +1,7 @@
+#include "../../build/config/sdkconfig.h"
+
+#ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+
 #include "cjext.h"
 #include <string.h>
 #include <stdlib.h>
@@ -514,3 +518,4 @@ static void __load_custom_libs(lua_State* lua_state)
         idx++;
     }
 }
+#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS

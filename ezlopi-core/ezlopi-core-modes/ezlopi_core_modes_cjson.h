@@ -7,7 +7,7 @@
 
 #include "ezlopi_core_modes.h"
 
-#if defined(CONFIG_EZLPI_SERV_ENABLE_MODES)
+#if defined(CONFIG_EZPI_SERV_ENABLE_MODES)
 
 int ezlopi_core_modes_cjson_get_modes(cJSON* cj_dest);
 int ezlopi_core_modes_cjson_get_current_mode(cJSON* cj_dest);

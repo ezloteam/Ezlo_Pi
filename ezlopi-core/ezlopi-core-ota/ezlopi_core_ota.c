@@ -1,6 +1,8 @@
-// #include "cjext.h"
-// #include "nvs.h"
-// #include "nvs_flash.h"
+
+#include "../../build/config/sdkconfig.h"
+
+#ifdef CONFIG_EZPI_ENABLE_OTA
+
 #include <string.h>
 #include <sys/socket.h>
 
@@ -21,8 +23,6 @@
 #include "ezlopi_core_processes.h"
 
 #include "ezlopi_service_ota.h"
-
-#if defined(CONFIG_EZPI_ENABLE_OTA)
 
 #define HASH_LEN 32
 

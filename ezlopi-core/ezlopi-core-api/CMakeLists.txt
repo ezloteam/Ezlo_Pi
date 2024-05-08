@@ -24,6 +24,7 @@ set(EZLOPI_CLOUD_COMPONENTS
         ezlopi-cloud-coordinates
         ezlopi-cloud-registration
         ezlopi-cloud-offline-login
+        ezlopi-cloud-log
 )
 
 set(EZLOPI_CORE_COMPONENTS 

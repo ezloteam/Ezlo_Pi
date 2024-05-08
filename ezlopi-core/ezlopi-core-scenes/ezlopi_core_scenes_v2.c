@@ -1,3 +1,6 @@
+#include "../../build/config/sdkconfig.h"
+
+#ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 #include "ezlopi_util_trace.h"
 
@@ -1000,3 +1003,5 @@ static l_fields_v2_t* ______new_field_populate(cJSON* cj_field)
 
     return field;
 }
+
+#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS

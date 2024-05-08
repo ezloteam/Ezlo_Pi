@@ -1,11 +1,11 @@
+#include "../../build/config/sdkconfig.h"
+
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
 
 #include "ezlopi_cloud_items.h"
 #include "ezlopi_util_trace.h"
-#include "../../build/config/sdkconfig.h"
-
 #include "cjext.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_devices_list.h"

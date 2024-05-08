@@ -1,3 +1,8 @@
+
+#include "../../build/config/sdkconfig.h"
+
+#ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+
 #include "cjext.h"
 
 #include "ezlopi_util_trace.h"
@@ -70,3 +75,4 @@ void ezlopi_scenes_notifications_remove(cJSON* cj_notifications)
     {
     }
 }
+#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS

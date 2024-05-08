@@ -11,7 +11,7 @@
 
 #include "ezlopi_cloud_constants.h"
 
-#if defined(CONFIG_EZLPI_SERV_ENABLE_MODES)
+#if defined(CONFIG_EZPI_SERV_ENABLE_MODES)
 
 static void __cjson_add_alarmed(cJSON* cj_alarmed, s_alarmed_t* alarmed);
 static void __cjson_add_mode_to_array(cJSON* cj_modes_arr, s_house_modes_t* mode);
@@ -184,7 +184,7 @@ s_ezlopi_modes_t* ezlopi_core_modes_cjson_parse_modes(cJSON* cj_modes)
 
                 CJSON_GET_VALUE_BOOL(cj_house_mod, ezlopi_disarmedDefault_str, cur_house_mode->disarmed_default);
                 {
-                    cJSON* cj_disarmed_devices = cJSON_GetObjectItem(cj_house_mod, ezlopi_notifications_str);
+                    cJSON* cj_disarmed_devices = cJSON_GetObjectItem(cj_house_mod, ezlopi_disarmedDevices_str);
                     if (cj_disarmed_devices)
                     {
                         cur_house_mode->cj_disarmed_devices = cJSON_Duplicate(cj_disarmed_devices, cJSON_True);
@@ -479,7 +479,7 @@ static void __cjson_add_alarmed(cJSON* cj_alarmed, s_alarmed_t* alarmed)
     }
 }
 
-#endif // CONFIG_EZLPI_SERV_ENABLE_MODES
+#endif // CONFIG_EZPI_SERV_ENABLE_MODES
 
 ///////////////////////////////
 // static

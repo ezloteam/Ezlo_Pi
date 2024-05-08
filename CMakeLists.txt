@@ -62,5 +62,13 @@ LIST(APPEND ALL_COMPONENTS ezlopi-user-config ezlopi-main)
 set(EXTRA_COMPONENT_DIRS ${ALL_COMPONENTS} ) # add the list of directories 'SUBDIRS' to 'EXTRA_COMPONENT_DIRS'(ESP32 VARIABLES), links the external components
 message(STATUS "EXTRA_COMPONENTS_DIRS: ${EXTRA_COMPONENT_DIRS}\r\n")
 
+# Add AddressSanitizer flags
+# set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=address")
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address")
+
+# # Set linker flags for AddressSanitizer
+# set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address")
+
+
 ## ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ##
 project(Ezlo_Pi_v3x)

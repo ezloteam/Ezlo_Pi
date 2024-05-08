@@ -1,5 +1,7 @@
 #include <string.h>
 
+#include "esp_heap_trace.h"
+
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
@@ -38,54 +40,57 @@ void registered(cJSON* cj_request, cJSON* cj_response)
     ezlopi_event_group_set_event(EZLOPI_EVENT_NMA_REG);
 }
 
+
 static void registration_process(void* pv)
 {
-    cJSON* cj_register = cJSON_CreateObject();
-    if (cj_register)
+
+    char mac_str[18];
+    uint8_t mac_addr[6];
+
+    esp_read_mac(mac_addr, ESP_MAC_WIFI_STA);
+    snprintf(mac_str, sizeof(mac_str), "%02X:%02X:%02X:%02X:%02X:%02X",
+        mac_addr[0], mac_addr[1], mac_addr[2], mac_addr[3], mac_addr[4], mac_addr[5]);
+
+    bool flag_break = false;
+    while (1)
     {
-        char mac_str[18];
-        uint8_t mac_addr[6];
-
-        esp_read_mac(mac_addr, ESP_MAC_WIFI_STA);
-        snprintf(mac_str, sizeof(mac_str), "%02X:%02X:%02X:%02X:%02X:%02X",
-            mac_addr[0], mac_addr[1], mac_addr[2], mac_addr[3], mac_addr[4], mac_addr[5]);
-
-        cJSON_AddStringToObject(cj_register, "id", "__ID__");
-        cJSON_AddStringToObject(cj_register, ezlopi_method_str, "register");
-
-        cJSON* cj_params = cJSON_AddObjectToObject(cj_register, ezlopi_params_str);
-
-        if (cj_params)
+        cJSON* cj_register = cJSON_CreateObject();
+        if (cj_register)
         {
-            cJSON_AddStringToObject(cj_params, ezlopi_firmware_str, VERSION_STR);
-            cJSON_AddNumberToObject(cj_params, "timeOffset", 20700);
-            cJSON_AddStringToObject(cj_params, "media", "radio");
-            cJSON_AddStringToObject(cj_params, "hubType", "32.1");
-            cJSON_AddStringToObject(cj_params, "mac_address", mac_str);
-            cJSON_AddNumberToObject(cj_params, "maxFrameSize", (20 * 1024));
-        }
+            cJSON_AddStringToObject(cj_register, "id", "__ID__");
+            cJSON_AddStringToObject(cj_register, ezlopi_method_str, "register");
 
-        while (false == ezlopi_websocket_client_is_connected())
-        {
-            vTaskDelay(200 / portTICK_RATE_MS);
-        }
+            cJSON* cj_params = cJSON_AddObjectToObject(cj_register, ezlopi_params_str);
 
-        while (ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 5000, false) <= 0)
-        {
-            // CJSON_TRACE("----------------- broadcasting - cj_register", cj_register);
-            cJSON* cj_register_dup = cJSON_CreateObjectReference(cj_register->child);
-            if (cj_register_dup)
+            if (cj_params)
             {
-                if (!ezlopi_core_ezlopi_broadcast_add_to_queue(cj_register_dup))
-                {
-                    cJSON_Delete(cj_register_dup);
-                }
+                cJSON_AddStringToObject(cj_params, ezlopi_firmware_str, VERSION_STR);
+                cJSON_AddNumberToObject(cj_params, "timeOffset", 20700);
+                cJSON_AddStringToObject(cj_params, "media", "radio");
+                cJSON_AddStringToObject(cj_params, "hubType", "32.1");
+                cJSON_AddStringToObject(cj_params, "mac_address", mac_str);
+                cJSON_AddNumberToObject(cj_params, "maxFrameSize", (20 * 1024));
+            }
+
+            if (!ezlopi_core_ezlopi_broadcast_add_to_queue(cj_register))
+            {
+                cJSON_Delete(cj_register);
+            }
+
+            e_ezlopi_event_t events = ezlopi_get_event_bit_status();
+            if ((EZLOPI_EVENT_NMA_REG & events) == EZLOPI_EVENT_NMA_REG)
+            {
+                flag_break = true;
             }
         }
-
-        cJSON_Delete(cj_register);
+        if (flag_break)
+        {
+            break;
+        }
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
 
     ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_CLOUD_REGISTRATION_PROCESS_STACK);
     vTaskDelete(NULL);
+
 }

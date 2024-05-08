@@ -1,3 +1,5 @@
+#ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+
 SCENES_STROPS_COMP_OPERATORES(NONE, NULL, NULL, NULL)
 //////////////////////////////////////////////////////////////////////////////
 SCENES_STROPS_COMP_OPERATORES(BEGINS_WITH, "begin", "begins with", "stringOperation")
@@ -10,3 +12,5 @@ SCENES_STROPS_COMP_OPERATORES(NOT_CONTAIN, "not_contain", "doesn't contain", "st
 SCENES_STROPS_COMP_OPERATORES(NOT_LENGTH, "not_length", "length not equal to", "stringOperation")
 //////////////////////////////////////////////////////////////////////////////
 SCENES_STROPS_COMP_OPERATORES(MAX, NULL, NULL, NULL)
+
+#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS

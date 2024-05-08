@@ -1,6 +1,8 @@
 #ifndef _EZLOPI_CORE_SCENES_OPERATORS_H_
 #define _EZLOPI_CORE_SCENES_OPERATORS_H_
 
+#ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+
 #include <string.h>
 #include <stdint.h>
 
@@ -123,5 +125,7 @@ int ezlopi_scenes_operators_value_number_range_operations(uint32_t item_id, l_fi
 int ezlopi_scenes_operators_has_atleastone_dictionary_value_operations(uint32_t item_id, l_fields_v2_t* value_field);
 // IsDictornaryChanged
 int ezlopi_scenes_operators_is_dictionary_changed_operations(l_scenes_list_v2_t* scene_node, uint32_t item_id, l_fields_v2_t* key_field, l_fields_v2_t* operation_field);
+
+#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 #endif // _EZLOPI_CORE_SCENES_OPERATORS_H_

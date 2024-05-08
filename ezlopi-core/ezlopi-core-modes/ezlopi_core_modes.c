@@ -11,7 +11,7 @@
 #include "EZLOPI_USER_CONFIG.h"
 
 
-#if defined(CONFIG_EZLPI_SERV_ENABLE_MODES)
+#if defined(CONFIG_EZPI_SERV_ENABLE_MODES)
 
 static s_ezlopi_modes_t* sg_custom_modes = NULL;
 static s_house_modes_t* sg_current_house_mode = NULL;
@@ -234,4 +234,4 @@ void ezlopi_core_modes_init(void)
         }
     }
 }
-#endif // CONFIG_EZLPI_SERV_ENABLE_MODES
+#endif // CONFIG_EZPI_SERV_ENABLE_MODES

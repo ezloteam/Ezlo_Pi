@@ -1,3 +1,7 @@
+#include "../../build/config/sdkconfig.h"
+
+#ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+
 #include <string.h>
 #include <stdint.h>
 #include "cjext.h"
@@ -1406,3 +1410,4 @@ static void __add_data_src_dest_array_to_object(cJSON* cj_method, char* array_na
         }
     }
 }
+#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS

@@ -1,3 +1,7 @@
+#include "../../build/config/sdkconfig.h"
+
+#ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+
 #include "ezlopi_cloud_constants.h"
 
 #include "ezlopi_core_nvs.h"
@@ -124,3 +128,4 @@ static void _edit_scene(l_scenes_list_v2_t* scene_node, cJSON* cj_scene)
         }
     }
 }
+#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS

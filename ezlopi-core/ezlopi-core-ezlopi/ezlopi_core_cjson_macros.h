@@ -30,7 +30,6 @@
             {                                                 \
                 item_val = true;                              \
             }                                                 \
-            item_val = o_item->valuedouble;                   \
         }                                                     \
         else                                                  \
         {                                                     \
