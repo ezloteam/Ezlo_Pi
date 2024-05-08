@@ -5,6 +5,7 @@ set(EZLOPI_CORE_COMPONENTS
         micro_tz_db  
         ezlopi-util-trace
         ezlopi-core-nvs
+        ezlopi-core-wifi
 )
 set(EZLOPI_HAL_COMPONENTS 
 
