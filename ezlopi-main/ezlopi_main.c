@@ -76,14 +76,14 @@ void app_main(void)
     ezlopi_service_ota_init();
 #endif // CONFIG_EZPI_ENABLE_OTA
 
-#if CONFIG_EZPI_SERV_ENABLE_MODES
+#if defined (CONFIG_EZPI_SERV_ENABLE_MODES)
     ezlopi_service_modes_init();
 #endif
 
-#if CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+#if defined (CONFIG_EZPI_SERV_ENABLE_MESHBOTS)
     ezlopi_scenes_meshbot_init();
 #endif
-    
+
 
     TaskHandle_t ezlopi_main_blinky_task_handle = NULL;
     xTaskCreate(blinky, "blinky", EZLOPI_MAIN_BLINKY_TASK_DEPTH, NULL, 1, &ezlopi_main_blinky_task_handle);
