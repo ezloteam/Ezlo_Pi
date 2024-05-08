@@ -13,6 +13,7 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "sensor_0021_UART_MB1013.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 typedef struct s_mb1013_args
 {
@@ -182,7 +183,7 @@ static int __prepare(void* arg)
                     __setup_item_cloud_properties(item, cjson_device);
                     __setup_item_interface_properties(item, cjson_device);
 
-                    s_mb1013_args_t* mb1030_args = malloc(sizeof(s_mb1013_args_t));
+                    s_mb1013_args_t* mb1030_args = ezlopi_malloc(__FUNCTION__, sizeof(s_mb1013_args_t));
                     if (mb1030_args)
                     {
                         mb1030_args->current_value = 0.0;

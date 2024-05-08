@@ -12,6 +12,8 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "sensor_0047_other_HX711_loadcell.h"
+#include "EZLOPI_USER_CONFIG.h"
+
 /********************************************************************************/
 /*                    global defines                                            */
 /********************************************************************************/
@@ -117,7 +119,7 @@ static int __0047_prepare(void* arg)
     s_ezlopi_prep_arg_t* device_prep_arg = (s_ezlopi_prep_arg_t*)arg;
     if (device_prep_arg && (NULL != device_prep_arg->cjson_device))
     {
-        s_hx711_data_t* hx711_data = (s_hx711_data_t*)malloc(sizeof(s_hx711_data_t));
+        s_hx711_data_t* hx711_data = (s_hx711_data_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_hx711_data_t));
         if (hx711_data)
         {
             memset(hx711_data, 0, sizeof(s_hx711_data_t));
@@ -136,13 +138,13 @@ static int __0047_prepare(void* arg)
                 {
                     ret = -1;
                     ezlopi_device_free_device(hx711_device);
-                    free(hx711_data);
+                    ezlopi_free(__FUNCTION__, hx711_data);
                 }
             }
             else
             {
                 ret = -1;
-                free(hx711_data);
+                ezlopi_free(__FUNCTION__, hx711_data);
             }
         }
     }

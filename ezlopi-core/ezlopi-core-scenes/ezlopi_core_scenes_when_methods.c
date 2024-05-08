@@ -18,20 +18,21 @@
 #include "ezlopi_core_scenes_status_changed.h"
 #include "ezlopi_core_scenes_when_methods_helper_functions.h"
 
+#include "ezlopi_service_meshbot.h"
 #include "ezlopi_cloud_constants.h"
 
 int ezlopi_scene_when_is_item_state(l_scenes_list_v2_t* scene_node, void* arg)
 {
-    // TRACE_W(" is_item_state ");
+    TRACE_W(" is_item_state ");
     int ret = 0;
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (when_block)
     {
         uint32_t item_id = 0;
         l_fields_v2_t* value_field = NULL;
-        #warning "Warning: armed check remains [Krishna]"
+        #warning "Warning: armed check remains [Krishna]";
 
-            l_fields_v2_t* curr_field = when_block->fields;
+        l_fields_v2_t* curr_field = when_block->fields;
         while (curr_field)
         {
             if (0 == strncmp(curr_field->name, "item", 4))
@@ -47,59 +48,71 @@ int ezlopi_scene_when_is_item_state(l_scenes_list_v2_t* scene_node, void* arg)
 
         if (item_id && value_field)
         {
-            l_ezlopi_item_t* curr_item = ezlopi_device_get_item_by_id(item_id);
-            if (curr_item)
+            l_ezlopi_device_t* curr_device = ezlopi_device_get_head();
+            while (curr_device)
             {
-                cJSON* cj_tmp_value = cJSON_CreateObject();
-                if (cj_tmp_value)
+                l_ezlopi_item_t* curr_item = curr_device->items;
+                while (curr_item)
                 {
-                    curr_item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, curr_item, (void*)cj_tmp_value, NULL);
-                    cJSON* cj_value = cJSON_GetObjectItem(cj_tmp_value, ezlopi_value_str);
-                    if (cj_value)
+                    if (item_id == curr_item->cloud_properties.item_id)
                     {
-                        switch (cj_value->type)
+                        cJSON* cj_tmp_value = cJSON_CreateObject(__FUNCTION__);
+                        if (cj_tmp_value)
                         {
-                        case cJSON_True:
-                        {
-                            if (true == value_field->field_value.u_value.value_bool)
+                            curr_item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, curr_item, (void*)cj_tmp_value, NULL);
+                            cJSON* cj_value = cJSON_GetObjectItem(__FUNCTION__, cj_tmp_value, ezlopi_value_str);
+                            if (cj_value)
                             {
-                                ret = 1;
+                                switch (cj_value->type)
+                                {
+                                case cJSON_True:
+                                {
+                                    if (true == value_field->field_value.u_value.value_bool)
+                                    {
+                                        ret = 1;
+                                    }
+                                    break;
+                                }
+                                case cJSON_False:
+                                {
+                                    if (false == value_field->field_value.u_value.value_bool)
+                                    {
+                                        ret = 1;
+                                    }
+                                    break;
+                                }
+                                case cJSON_Number:
+                                {
+                                    if (cj_value->valuedouble == value_field->field_value.u_value.value_double)
+                                    {
+                                        ret = 1;
+                                    }
+                                    break;
+                                }
+                                case cJSON_String:
+                                {
+                                    uint32_t cmp_size = (strlen(cj_value->valuestring) > strlen(value_field->field_value.u_value.value_string)) ? strlen(cj_value->valuestring) : strlen(value_field->field_value.u_value.value_string);
+                                    if (0 == strncmp(cj_value->valuestring, value_field->field_value.u_value.value_string, cmp_size))
+                                    {
+                                        ret = 1;
+                                    }
+                                    break;
+                                }
+                                default:
+                                {
+                                    TRACE_E("Value type mis-matched!");
+                                }
+                                }
                             }
-                            break;
+
+                            cJSON_Delete(__FUNCTION__, cj_tmp_value);
                         }
-                        case cJSON_False:
-                        {
-                            if (false == value_field->field_value.u_value.value_bool)
-                            {
-                                ret = 1;
-                            }
-                            break;
-                        }
-                        case cJSON_Number:
-                        {
-                            if (cj_value->valuedouble == value_field->field_value.u_value.value_double)
-                            {
-                                ret = 1;
-                            }
-                            break;
-                        }
-                        case cJSON_String:
-                        {
-                            uint32_t cmp_size = (strlen(cj_value->valuestring) > strlen(value_field->field_value.u_value.value_string)) ? strlen(cj_value->valuestring) : strlen(value_field->field_value.u_value.value_string);
-                            if (0 == strncmp(cj_value->valuestring, value_field->field_value.u_value.value_string, cmp_size))
-                            {
-                                ret = 1;
-                            }
-                            break;
-                        }
-                        default:
-                        {
-                            TRACE_E("Value type mis-matched!");
-                        }
-                        }
+                        break;
                     }
-                    cJSON_Delete(cj_tmp_value);
+                    curr_item = curr_item->next;
                 }
+
+                curr_device = curr_device->next;
             }
         }
     }
@@ -1397,7 +1410,7 @@ int ezlopi_scene_when_function(l_scenes_list_v2_t* scene_node, void* arg)
             cJSON* cj_func_opr = NULL;
             for (uint8_t i = 0; i < ((sizeof(__when_funtion_opr) / sizeof(__when_funtion_opr[i]))); i++)
             {
-                if (NULL != (cj_func_opr = cJSON_GetObjectItem(function_obj, __when_funtion_opr[i].opr_name)))
+                if (NULL != (cj_func_opr = cJSON_GetObjectItem(__FUNCTION__, function_obj, __when_funtion_opr[i].opr_name)))
                 {
                     TRACE_S("when_func_here->[%d]", i);
                     ret = (__when_funtion_opr[i].opr_method)(scene_node, when_block, cj_func_opr);

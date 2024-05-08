@@ -14,6 +14,7 @@
 
 #include "gyGPS6MV2.h"
 #include "sensor_0053_UART_GYGPS6MV2.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 //------------------------------------------------------------------------
 static int __0053_prepare(void* arg);
@@ -175,7 +176,7 @@ static int __0053_prepare(void* arg)
         cJSON* cjson_device = device_prep_arg->cjson_device;
         if (cjson_device)
         { // the structure to hold GPS_parameter_values
-            GPS6MV2_t* sensor_0053_UART_gps6mv2_data = (GPS6MV2_t*)malloc(sizeof(GPS6MV2_t));
+            GPS6MV2_t* sensor_0053_UART_gps6mv2_data = (GPS6MV2_t*)ezlopi_malloc(__FUNCTION__, sizeof(GPS6MV2_t));
             if (NULL != sensor_0053_UART_gps6mv2_data)
             {
                 memset(sensor_0053_UART_gps6mv2_data, 0, sizeof(GPS6MV2_t));
@@ -281,13 +282,13 @@ static int __0053_prepare(void* arg)
                     {
                         ret = -1;
                         ezlopi_device_free_device(parent_gps_device_lat);
-                        free(sensor_0053_UART_gps6mv2_data);
+                        ezlopi_free(__FUNCTION__, sensor_0053_UART_gps6mv2_data);
                     }
                 }
                 else
                 {
                     ret = -1;
-                    free(sensor_0053_UART_gps6mv2_data);
+                    ezlopi_free(__FUNCTION__, sensor_0053_UART_gps6mv2_data);
                 }
             }
             else
@@ -482,7 +483,7 @@ static int __sensor_uart_gps6mv2_update_values(l_ezlopi_item_t* item)
 static void __uart_gps6mv2_upcall(uint8_t* buffer, uint32_t output_len, s_ezlopi_uart_object_handle_t uart_object_handle)
 {
     // TRACE_E("UART_Buffer => \n%s\n", buffer);
-    char* tmp_buffer = (char*)malloc(256);
+    char* tmp_buffer = (char*)ezlopi_malloc(__FUNCTION__, 256);
     if (tmp_buffer && (uart_object_handle->arg))
     {
         memcpy(tmp_buffer, buffer, 256);
@@ -502,7 +503,7 @@ static void __uart_gps6mv2_upcall(uint8_t* buffer, uint32_t output_len, s_ezlopi
                 memset((sensor_0053_UART_gps6mv2_data->gps_cir_buf), 0, sizeof(sensor_0053_UART_gps6mv2_data->gps_cir_buf)); // reset gps_cir_buf[]
             }
         }
-        free(tmp_buffer);
+        ezlopi_free(__FUNCTION__, tmp_buffer);
     }
 }
 

@@ -13,6 +13,7 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "sensor_0006_I2C_ADXL345.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 static int __prepare(void* arg);
 static int __init(l_ezlopi_item_t* item);
@@ -113,7 +114,7 @@ static int __prepare(void* arg)
     if (prep_arg && prep_arg->cjson_device)
     {
         cJSON* cj_device = prep_arg->cjson_device;
-        s_adxl345_data_t* user_data = (s_adxl345_data_t*)malloc(sizeof(s_adxl345_data_t));
+        s_adxl345_data_t* user_data = (s_adxl345_data_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_adxl345_data_t));
         if (NULL != user_data)
         {
             memset(user_data, 0, sizeof(s_adxl345_data_t));
@@ -176,13 +177,13 @@ static int __prepare(void* arg)
                     (NULL == adxl345_child_z_device))
                 {
                     ezlopi_device_free_device(adxl345_parent_x_device);
-                    free(user_data);
+                    ezlopi_free(__FUNCTION__, user_data);
                     ret = -1;
                 }
             }
             else
             {
-                free(user_data);
+                ezlopi_free(__FUNCTION__, user_data);
                 ret = -1;
             }
         }

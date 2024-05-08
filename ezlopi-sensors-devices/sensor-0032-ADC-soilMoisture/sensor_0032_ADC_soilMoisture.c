@@ -14,6 +14,7 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "sensor_0032_ADC_soilMoisture.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 static int __prepare(void* arg);
 static int __init(l_ezlopi_item_t* item);
@@ -116,12 +117,12 @@ static int __init(l_ezlopi_item_t* item)
 
 static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    // cJSON *cj_info = cJSON_CreateObject();
-    // cJSON_AddStringToObject(cj_info, ezlopi_manufacturer_str, "EzloPi");
-    // cJSON_AddStringToObject(cj_info, ezlopi_model_str, "EzloPi Generic");
-    // cJSON_AddStringToObject(cj_info, "protocol", "WiFi");
-    // cJSON_AddStringToObject(cj_info, "firmware.stack", "3.0.4");
-    // cJSON_AddStringToObject(cj_info, "hardware", "ESP32");
+    // cJSON *cj_info = cJSON_CreateObject(__FUNCTION__);
+    // cJSON_AddStringToObject(__FUNCTION__, cj_info, ezlopi_manufacturer_str, "EzloPi");
+    // cJSON_AddStringToObject(__FUNCTION__, cj_info, ezlopi_model_str, "EzloPi Generic");
+    // cJSON_AddStringToObject(__FUNCTION__, cj_info, "protocol", "WiFi");
+    // cJSON_AddStringToObject(__FUNCTION__, cj_info, "firmware.stack", "3.0.4");
+    // cJSON_AddStringToObject(__FUNCTION__, cj_info, "hardware", "ESP32");
     device->cloud_properties.category = category_generic_sensor;
     device->cloud_properties.subcategory = subcategory_moisture;
     device->cloud_properties.device_type = dev_type_sensor;
@@ -163,7 +164,7 @@ static int __prepare(void* arg)
             l_ezlopi_item_t* item_temperature = ezlopi_device_add_item_to_device(device, sensor_0032_ADC_soilMoisture);
             if (item_temperature)
             {
-                double* soil_moisture_data = (double*)malloc(sizeof(double));
+                double* soil_moisture_data = (double*)ezlopi_malloc(__FUNCTION__, sizeof(double));
                 if (soil_moisture_data)
                 {
                     memset(soil_moisture_data, 0, sizeof(double));

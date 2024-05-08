@@ -10,13 +10,13 @@
 #include "ezlopi_core_processes.h"
 
 static const char *prg =
-    "count = 0\n"
-    "v = {'value1', 'value2', 1.21, 'gigawatts'}\n"
-    "for i = 1, #v do\n"
-    "  print(v[i])\n"
-    "  print(count)\n"
-    "  count = count + 1\n"
-    "end\n";
+"count = 0\n"
+"v = {'value1', 'value2', 1.21, 'gigawatts'}\n"
+"for i = 1, #v do\n"
+"  print(v[i])\n"
+"  print(count)\n"
+"  count = count + 1\n"
+"end\n";
 
 static int report(lua_State *L, int status)
 {

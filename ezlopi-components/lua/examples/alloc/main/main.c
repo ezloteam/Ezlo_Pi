@@ -12,11 +12,11 @@
 #define LUA_MAX_MEMSIZE 0x10000 // 64k
 
 static const char *prg =
-        "local t = {}\n"
-        "for i = 1, 10000 do\n"
-        "  print(string.format(\"Iteration %d...\", i))\n"
-        "  t[i] = string.format(\"Lorem ipsum asklfhskldjf hskljfh slkjfd sdklfjh slkfjh sdkljfjh sdklfjh sdklf %d...\", i)\n"
-        "end\n";
+"local t = {}\n"
+"for i = 1, 10000 do\n"
+"  print(string.format(\"Iteration %d...\", i))\n"
+"  t[i] = string.format(\"Lorem ipsum asklfhskldjf hskljfh slkjfd sdklfjh slkfjh sdkljfjh sdklfjh sdklf %d...\", i)\n"
+"end\n";
 
 static void report(lua_State *L, int status)
 {
@@ -43,11 +43,11 @@ static void* l_alloc(void *ud, void *ptr, size_t osize, size_t nsize)
 
     if (nsize == 0)
     {
-        free(ptr);
+        ezlopi_free(ptr);
         return NULL;
     }
     else
-        return realloc(ptr, nsize);
+        return ezlopi_realloc(ptr, nsize);
 }
 
 void test(void *arg)

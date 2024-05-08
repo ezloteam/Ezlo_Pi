@@ -95,6 +95,7 @@ static void __setup_item_properties(l_ezlopi_item_t* item, cJSON* cjson_device)
 
     item->interface.gpio.gpio_out.enable = true;
     CJSON_GET_VALUE_GPIO(cjson_device, ezlopi_gpio_out_str, item->interface.gpio.gpio_out.gpio_num);
+
     CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_op_inv_str, item->interface.gpio.gpio_out.invert);
     CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_val_op_str, item->interface.gpio.gpio_out.value);
     CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_pullup_op_str, tmp_var);
@@ -236,7 +237,7 @@ static int __set_value(l_ezlopi_item_t* item, void* arg)
             CJSON_TRACE("cjson_params", cjson_params);
 
             int value = 0;
-            cJSON* cj_value = cJSON_GetObjectItem(cjson_params, ezlopi_value_str);
+            cJSON* cj_value = cJSON_GetObjectItem(__FUNCTION__, cjson_params, ezlopi_value_str);
             if (cj_value)
             {
                 switch (cj_value->type)

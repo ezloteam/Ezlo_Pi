@@ -58,7 +58,7 @@ e_auth_status_t ezlopi_ble_auth_check_user_id(char* user_id)
             }
         }
 
-        free(stored_user_id);
+        ezlopi_free(__FUNCTION__, stored_user_id);
     }
     else
     {

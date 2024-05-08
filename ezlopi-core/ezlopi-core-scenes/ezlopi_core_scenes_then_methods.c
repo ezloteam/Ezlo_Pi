@@ -19,15 +19,16 @@
 #include "ezlopi_core_scenes_then_methods_helper_func.h"
 #include "ezlopi_core_scenes_when_methods_helper_functions.h"
 
-#include "ezlopi_cloud_constants.h"
 #include "ezlopi_service_meshbot.h"
+#include "ezlopi_cloud_constants.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 int ezlopi_scene_then_set_item_value(l_scenes_list_v2_t* curr_scene, void* arg)
 {
     TRACE_W(" Set_item_value ");
     int ret = 0;
     uint32_t item_id = 0;
-    cJSON* cj_params = cJSON_CreateObject();
+    cJSON* cj_params = cJSON_CreateObject(__FUNCTION__);
 
     if (cj_params)
     {
@@ -39,7 +40,7 @@ int ezlopi_scene_then_set_item_value(l_scenes_list_v2_t* curr_scene, void* arg)
             {
                 if (0 == strncmp(curr_field->name, "item", 5))
                 {
-                    cJSON_AddStringToObject(cj_params, ezlopi__id_str, curr_field->field_value.u_value.value_string);
+                    cJSON_AddStringToObject(__FUNCTION__, cj_params, ezlopi__id_str, curr_field->field_value.u_value.value_string);
                     item_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
                     // TRACE_D("item_id: %s", curr_field->field_value.u_value.value_string);
                 }
@@ -47,18 +48,18 @@ int ezlopi_scene_then_set_item_value(l_scenes_list_v2_t* curr_scene, void* arg)
                 {
                     if (EZLOPI_VALUE_TYPE_INT == curr_field->value_type)
                     {
-                        cJSON_AddNumberToObject(cj_params, ezlopi_value_str, curr_field->field_value.u_value.value_double);
-                        // TRACE_D("value: %f", curr_field->field_value.u_value.value_double);
+                        cJSON_AddNumberToObject(__FUNCTION__, cj_params, ezlopi_value_str, curr_field->field_value.u_value.value_double);
+                        TRACE_D("value: %f", curr_field->field_value.u_value.value_double);
                     }
                     else if (EZLOPI_VALUE_TYPE_BOOL == curr_field->value_type)
                     {
-                        cJSON_AddBoolToObject(cj_params, ezlopi_value_str, curr_field->field_value.u_value.value_bool);
-                        // TRACE_D("value: %s", curr_field->field_value.u_value.value_bool ? ezlopi_true_str : ezlopi_false_str);
+                        cJSON_AddBoolToObject(__FUNCTION__, cj_params, ezlopi_value_str, curr_field->field_value.u_value.value_bool);
+                        TRACE_D("value: %s", curr_field->field_value.u_value.value_bool ? ezlopi_true_str : ezlopi_false_str);
                     }
                     else if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type)
                     {
-                        cJSON_AddStringToObject(cj_params, ezlopi_value_str, curr_field->field_value.u_value.value_string);
-                        // TRACE_D("value: %s", curr_field->field_value.u_value.value_string);
+                        cJSON_AddStringToObject(__FUNCTION__, cj_params, ezlopi_value_str, curr_field->field_value.u_value.value_string);
+                        TRACE_D("value: %s", curr_field->field_value.u_value.value_string);
                     }
                 }
 
@@ -75,7 +76,8 @@ int ezlopi_scene_then_set_item_value(l_scenes_list_v2_t* curr_scene, void* arg)
                 }
             }
         }
-        cJSON_Delete(cj_params);
+
+        cJSON_Delete(__FUNCTION__, cj_params);
     }
     TRACE_W(" Set_item_value -> ret = %d", ret);
     return ret;
@@ -194,7 +196,7 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t* curr_scene, void* ar
     l_action_block_v2_t* curr_then = (l_action_block_v2_t*)arg;
     if (curr_then)
     {
-        s_ezlopi_core_http_mbedtls_t* tmp_http_data = (s_ezlopi_core_http_mbedtls_t*)malloc(sizeof(s_ezlopi_core_http_mbedtls_t));
+        s_ezlopi_core_http_mbedtls_t* tmp_http_data = (s_ezlopi_core_http_mbedtls_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_ezlopi_core_http_mbedtls_t));
         if (tmp_http_data)
         {
             memset(tmp_http_data, 0, sizeof(s_ezlopi_core_http_mbedtls_t));
@@ -229,7 +231,7 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t* curr_scene, void* ar
             ezlopi_core_http_mbedtls_req(tmp_http_data); // Returns:- [response_buffer = &Memory_block]
             free_http_mbedtls_struct(tmp_http_data);
 
-            free(tmp_http_data);
+            ezlopi_free(__FUNCTION__, tmp_http_data);
         }
     }
 
@@ -337,8 +339,8 @@ int ezlopi_scene_then_set_scene_state(l_scenes_list_v2_t* curr_scene, void* arg)
     int ret = 0;
     uint32_t sceneID = 0;
     bool set_scene_enable = false;
-    bool execute_else_condition = false;
     l_action_block_v2_t* curr_then = (l_action_block_v2_t*)arg;
+
     if (curr_then)
     {
         l_fields_v2_t* curr_field = curr_then->fields;
@@ -460,7 +462,7 @@ int ezlopi_scene_then_reset_hub(l_scenes_list_v2_t* curr_scene, void* arg)
 {
     TRACE_W(" reset_hub ");
     int ret = 0;
-    cJSON* cj_params = cJSON_CreateObject();
+    cJSON* cj_params = cJSON_CreateObject(__FUNCTION__);
 
     if (cj_params)
     {
@@ -507,7 +509,7 @@ int ezlopi_scene_then_reset_hub(l_scenes_list_v2_t* curr_scene, void* arg)
             }
         }
 
-        cJSON_Delete(cj_params);
+        cJSON_Delete(__FUNCTION__, cj_params);
     }
     return ret;
 }
@@ -568,30 +570,31 @@ int ezlopi_scene_then_toggle_value(l_scenes_list_v2_t* curr_scene, void* arg)
                 l_ezlopi_item_t* curr_item = ezlopi_device_get_item_by_id(item_id);
                 if ((curr_item) && (EZLOPI_DEVICE_INTERFACE_DIGITAL_OUTPUT == curr_item->interface_type))
                 {
-                    cJSON* cj_tmp_value = cJSON_CreateObject();
+                    cJSON* cj_tmp_value = cJSON_CreateObject(__FUNCTION__);
                     if (cj_tmp_value)
                     {
                         if (curr_item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, curr_item, (void*)cj_tmp_value, NULL))
                         {
                             CJSON_TRACE("present_gpio_value", cj_tmp_value);/*value formatted & value only*/
 
-                            cJSON* cj_val = cJSON_GetObjectItem(cj_tmp_value, ezlopi_value_str);
+                            cJSON* cj_val = cJSON_GetObjectItem(__FUNCTION__, cj_tmp_value, ezlopi_value_str);
                             if (cj_val)
                             {
-                                cJSON* cj_result_value = cJSON_CreateObject();
+                                cJSON* cj_result_value = cJSON_CreateObject(__FUNCTION__);
                                 if (cj_result_value)
                                 {
-                                    cJSON_AddStringToObject(cj_result_value, ezlopi__id_str, __id_string);
+                                    cJSON_AddStringToObject(__FUNCTION__, cj_result_value, ezlopi__id_str, __id_string);
+
                                     if ((0 == strncmp(curr_item->cloud_properties.value_type, value_type_bool, 5)) && cJSON_IsBool(cj_val))
                                     {
                                         TRACE_S("1. getting 'item_id[%d]' ; bool_value = %s ", item_id, (cj_val->type == cJSON_True) ? "true" : "false"); // "false" or "true"
                                         if (cj_val->type == cJSON_True)
                                         {
-                                            cJSON_AddBoolToObject(cj_result_value, ezlopi_value_str, true);
+                                            cJSON_AddBoolToObject(__FUNCTION__, cj_result_value, ezlopi_value_str, true);
                                         }
                                         else if (cj_val->type == cJSON_False)
                                         {
-                                            cJSON_AddBoolToObject(cj_result_value, ezlopi_value_str, false);
+                                            cJSON_AddBoolToObject(__FUNCTION__, cj_result_value, ezlopi_value_str, false);
                                         }
                                         ret = 1;
                                         curr_item->func(EZLOPI_ACTION_SET_VALUE, curr_item, cj_result_value, curr_item->user_arg);
@@ -601,11 +604,11 @@ int ezlopi_scene_then_toggle_value(l_scenes_list_v2_t* curr_scene, void* arg)
                                         TRACE_S("2. getting 'item_id[%d]' ; int_value = %d ", item_id, (int)cj_val->valuedouble);
                                         if (cj_val->valuedouble == 0) // either  '0' or '1'.
                                         {
-                                            cJSON_AddNumberToObject(cj_result_value, ezlopi_value_str, 1);
+                                            cJSON_AddNumberToObject(__FUNCTION__, cj_result_value, ezlopi_value_str, 1);
                                         }
                                         else if (cj_val->valuedouble == 1)
                                         {
-                                            cJSON_AddNumberToObject(cj_result_value, ezlopi_value_str, 0);
+                                            cJSON_AddNumberToObject(__FUNCTION__, cj_result_value, ezlopi_value_str, 0);
                                         }
                                         ret = 1;
                                         curr_item->func(EZLOPI_ACTION_SET_VALUE, curr_item, cj_result_value, curr_item->user_arg);
@@ -615,12 +618,14 @@ int ezlopi_scene_then_toggle_value(l_scenes_list_v2_t* curr_scene, void* arg)
                                         ret = 0;
                                         TRACE_E(" 'item_id[%d]' neither 'boolean' nor 'int' ;  Value-type mis-matched!  ", item_id);
                                     }
-                                    cJSON_Delete(cj_result_value);
+
+                                    cJSON_Delete(__FUNCTION__, cj_result_value);
                                 }
                             }
                         }
+
+                        cJSON_Delete(__FUNCTION__, cj_tmp_value);
                     }
-                    cJSON_Delete(cj_tmp_value);
                 }
                 else
                 {
