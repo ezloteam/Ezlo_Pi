@@ -17,6 +17,7 @@
 #include "ezlopi_service_gpioisr.h"
 
 #include "sensor_0024_other_HCSR04.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 static portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
 
@@ -217,7 +218,7 @@ static int __prepare(void* arg)
                 if (item)
                 {
                     __setup_item_properties(item, cj_device);
-                    s_ultrasonic_sensor_t* ultrasonic_sensor = (s_ultrasonic_sensor_t*)malloc(sizeof(s_ultrasonic_sensor_t));
+                    s_ultrasonic_sensor_t* ultrasonic_sensor = (s_ultrasonic_sensor_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_ultrasonic_sensor_t));
                     if (ultrasonic_sensor)
                     {
                         memset(ultrasonic_sensor, 0, sizeof(s_ultrasonic_sensor_t));

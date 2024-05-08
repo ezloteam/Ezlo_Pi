@@ -43,19 +43,19 @@ static void mount_fs()
     esp_err_t ret = esp_vfs_spiffs_register(&conf);
     switch (ret)
     {
-        case ESP_OK:
-            break;
-        case ESP_FAIL:
-            ESP_LOGE(TAG, "Failed to mount or format filesystem");
-            halt();
-            break;
-        case ESP_ERR_NOT_FOUND:
-            ESP_LOGE(TAG, "Failed to find SPIFFS partition");
-            halt();
-            break;
-        default:
-            ESP_LOGE(TAG, "Failed to initialize SPIFFS (%s)", esp_err_to_name(ret));
-            halt();
+    case ESP_OK:
+        break;
+    case ESP_FAIL:
+        ESP_LOGE(TAG, "Failed to mount or format filesystem");
+        halt();
+        break;
+    case ESP_ERR_NOT_FOUND:
+        ESP_LOGE(TAG, "Failed to find SPIFFS partition");
+        halt();
+        break;
+    default:
+        ESP_LOGE(TAG, "Failed to initialize SPIFFS (%s)", esp_err_to_name(ret));
+        halt();
     }
     size_t total = 0, used = 0;
     ESP_ERROR_CHECK(esp_spiffs_info(NULL, &total, &used));

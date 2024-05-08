@@ -14,6 +14,7 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "sensor_0049_other_MQ2_LPG_detector.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 //*************************************************************************
 //                          Declaration
@@ -109,7 +110,7 @@ static int __0049_prepare(void* arg)
             }
 
             //---------------------------- ADC - DEVICE 2 -------------------------------------------
-            s_mq2_value_t* MQ2_value = (s_mq2_value_t*)malloc(sizeof(s_mq2_value_t));
+            s_mq2_value_t* MQ2_value = (s_mq2_value_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_mq2_value_t));
             if (NULL != MQ2_value)
             {
                 memset(MQ2_value, 0, sizeof(s_mq2_value_t));
@@ -128,13 +129,13 @@ static int __0049_prepare(void* arg)
                     {
                         ret = -1;
                         ezlopi_device_free_device(MQ2_device_child_adc);
-                        free(MQ2_value);
+                        ezlopi_free(__FUNCTION__, MQ2_value);
                     }
                 }
                 else
                 {
                     ret = -1;
-                    free(MQ2_value);
+                    ezlopi_free(__FUNCTION__, MQ2_value);
                 }
             }
             else
@@ -273,22 +274,22 @@ static int __0049_get_item(l_ezlopi_item_t* item, void* arg)
             if (ezlopi_item_name_gas_alarm == item->cloud_properties.item_name)
             {
                 //-------------------  POSSIBLE JSON ENUM CONTENTS ----------------------------------
-                cJSON* json_array_enum = cJSON_CreateArray();
+                cJSON* json_array_enum = cJSON_CreateArray(__FUNCTION__);
                 if (NULL != json_array_enum)
                 {
                     for (uint8_t i = 0; i < MQ2_GAS_ALARM_MAX; i++)
                     {
-                        cJSON* json_value = cJSON_CreateString(mq2_sensor_gas_alarm_token[i]);
+                        cJSON* json_value = cJSON_CreateString(__FUNCTION__, mq2_sensor_gas_alarm_token[i]);
                         if (NULL != json_value)
                         {
                             cJSON_AddItemToArray(json_array_enum, json_value);
                         }
                     }
-                    cJSON_AddItemToObject(cj_result, ezlopi_enum_str, json_array_enum);
+                    cJSON_AddItemToObject(__FUNCTION__, cj_result, ezlopi_enum_str, json_array_enum);
                 }
                 //--------------------------------------------------------------------------------------
-                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, (char*)item->user_arg ? item->user_arg : "no_gas");
-                cJSON_AddStringToObject(cj_result, ezlopi_value_str, (char*)item->user_arg ? item->user_arg : "no_gas");
+                cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, (char*)item->user_arg ? item->user_arg : "no_gas");
+                cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, (char*)item->user_arg ? item->user_arg : "no_gas");
             }
             else if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
             {
@@ -314,8 +315,8 @@ static int __0049_get_cjson_value(l_ezlopi_item_t* item, void* arg)
         {
             if (ezlopi_item_name_gas_alarm == item->cloud_properties.item_name)
             {
-                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, (char*)item->user_arg ? item->user_arg : "no_gas");
-                cJSON_AddStringToObject(cj_result, ezlopi_value_str, (char*)item->user_arg ? item->user_arg : "no_gas");
+                cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, (char*)item->user_arg ? item->user_arg : "no_gas");
+                cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, (char*)item->user_arg ? item->user_arg : "no_gas");
             }
             else if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
             {

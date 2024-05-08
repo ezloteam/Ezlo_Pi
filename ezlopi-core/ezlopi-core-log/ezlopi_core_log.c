@@ -8,7 +8,7 @@
 #include <stdarg.h>
 
 #include "cjext.h"
-#include "ezlopi_util_heap.h"
+#include "ezlopi_core_heap.h"
 
 #include "ezlopi_core_sntp.h"
 #include "ezlopi_core_ezlopi_broadcast.h"
@@ -146,12 +146,12 @@ int ezlopi_core_send_cloud_log(int severity, const char* log_str)
             // int bytes_written = vsnprintf(formatted_log, 4096, format, arglist);
             // va_end(arglist);
 
-            cJSON* cj_log_broadcast = cJSON_CreateObject();
+            cJSON* cj_log_broadcast = cJSON_CreateObject(__FUNCTION__);
             if (cj_log_broadcast)
             {
-                cJSON_AddStringToObject(cj_log_broadcast, ezlopi_id_str, ezlopi_ui_broadcast_str);
-                cJSON_AddStringToObject(cj_log_broadcast, ezlopi_msg_subclass_str, "hub.log");
-                cJSON* cj_result = cJSON_AddObjectToObject(cj_log_broadcast, ezlopi_result_str);
+                cJSON_AddStringToObject(__FUNCTION__, cj_log_broadcast, ezlopi_id_str, ezlopi_ui_broadcast_str);
+                cJSON_AddStringToObject(__FUNCTION__, cj_log_broadcast, ezlopi_msg_subclass_str, "hub.log");
+                cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_log_broadcast, ezlopi_result_str);
                 if (cj_result)
                 {
                     uint64_t timestamp = EZPI_CORE_sntp_get_current_time_ms();
@@ -160,13 +160,12 @@ int ezlopi_core_send_cloud_log(int severity, const char* log_str)
                     memset(message, 0, total_len);
                     snprintf(message, total_len, "%lld: %s", timestamp, log_str);
 
-                    cJSON_AddStringToObject(cj_result, ezlopi_message_str, message);
+                    cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_message_str, message);
 
                     char severity_str[10];
                     memset(severity_str, 0, 10);
-                    snprintf(severity_str, 10, "%s", ezlopi_log_severity_enum[severity]);
-                    cJSON_AddStringToObject(cj_result, ezlopi_severity_str, severity_str);
-                    printf("HERE\n");
+                    snprintf(severity_str, 10, "%s", cloud_log_severity_enum[severity]);
+                    cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_severity_str, severity_str);
                     ezlopi_core_broadcast_log_cjson(cj_log_broadcast);
 
                     ret = 1;

@@ -34,7 +34,7 @@ static void __broadcast_process(void* pv)
             {
                 vTaskDelay(1000 / portTICK_PERIOD_MS);
                 ezlopi_core_ezlopi_broadcast_cjson(cj_data);
-                cJSON_Delete(cj_data);
+                cJSON_Delete(__FUNCTION__, cj_data);
             }
         }
     }
@@ -53,7 +53,7 @@ static int ezlopi_service_broadcast_send_to_queue(cJSON* cj_broadcast_data)
             {
                 if (cj_tmp_data)
                 {
-                    cJSON_Delete(cj_tmp_data);
+                    cJSON_Delete(__FUNCTION__, cj_tmp_data);
                 }
             }
         }

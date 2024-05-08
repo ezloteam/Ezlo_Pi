@@ -13,6 +13,7 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "sensor_0044_I2C_TSL256_luminosity.h"
+#include "EZLOPI_USER_CONFIG.h"
 //-----------------------------------------------------------------------
 
 static int __prepare(void* arg);
@@ -166,7 +167,7 @@ static int __prepare(void* arg)
     s_ezlopi_prep_arg_t* prep_arg = (s_ezlopi_prep_arg_t*)arg;
     if (prep_arg && prep_arg->cjson_device)
     {
-        TSL256_lum_t* TSL2561_lux_data = (TSL256_lum_t*)malloc(sizeof(TSL256_lum_t));
+        TSL256_lum_t* TSL2561_lux_data = (TSL256_lum_t*)ezlopi_malloc(__FUNCTION__, sizeof(TSL256_lum_t));
         if (TSL2561_lux_data)
         {
             memset(TSL2561_lux_data, 0, sizeof(TSL256_lum_t));
@@ -185,13 +186,13 @@ static int __prepare(void* arg)
                 {
                     ret = -1;
                     ezlopi_device_free_device(tsl256_device);
-                    free(TSL2561_lux_data);
+                    ezlopi_free(__FUNCTION__, TSL2561_lux_data);
                 }
             }
             else
             {
                 ret = -1;
-                free(TSL2561_lux_data);
+                ezlopi_free(__FUNCTION__, TSL2561_lux_data);
             }
         }
     }

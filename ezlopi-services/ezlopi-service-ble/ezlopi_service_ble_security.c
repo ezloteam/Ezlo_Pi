@@ -55,7 +55,7 @@ static void __process_hard_reset_command(void);
 static void factory_reset_write_func(esp_gatt_value_t* value, esp_ble_gatts_cb_param_t* param);
 static void ezlopi_serv_ble_factory_reset_write_func(esp_gatt_value_t* value, esp_ble_gatts_cb_param_t* param);
 
-#define CJ_GET_NUMBER(name) cJSON_GetNumberValue(cJSON_GetObjectItem(root, name))
+#define CJ_GET_NUMBER(name) cJSON_GetNumberValue(cJSON_GetObjectItem(__FUNCTION__, root, name))
 
 void ezlopi_ble_service_security_init(void)
 {
@@ -109,7 +109,7 @@ static void factory_reset_write_func(esp_gatt_value_t* value, esp_ble_gatts_cb_p
 {
     if (param && param->write.len && param->write.value)
     {
-        cJSON* root = cJSON_ParseWithLength((const char*)param->write.value, param->write.len);
+        cJSON* root = cJSON_ParseWithLength(__FUNCTION__, (const char*)param->write.value, param->write.len);
         if (root)
         {
 
@@ -142,7 +142,7 @@ static void factory_reset_write_func(esp_gatt_value_t* value, esp_ble_gatts_cb_p
             }
             }
 
-            cJSON_Delete(root);
+            cJSON_Delete(__FUNCTION__, root);
         }
     }
 }
@@ -151,10 +151,10 @@ static void ezlopi_serv_ble_factory_reset_write_func(esp_gatt_value_t* value, es
 {
     if (param && param->write.len && param->write.value)
     {
-        cJSON* root = cJSON_ParseWithLength((const char*)param->write.value, param->write.len);
+        cJSON* root = cJSON_ParseWithLength(__FUNCTION__, (const char*)param->write.value, param->write.len);
         if (root)
         {
-            cJSON* cj_sub_cmd = cJSON_GetObjectItem(root, ezlopi_sub_cmd_str);
+            cJSON* cj_sub_cmd = cJSON_GetObjectItem(__FUNCTION__, root, ezlopi_sub_cmd_str);
             if (cj_sub_cmd)
             {
                 uint8_t sub_cmd = cj_sub_cmd->valuedouble;
@@ -177,10 +177,10 @@ static void ezlopi_serv_ble_factory_reset_write_func(esp_gatt_value_t* value, es
                     break;
                 }
                 }
-                cJSON_Delete(cj_sub_cmd);
+                cJSON_Delete(__FUNCTION__, cj_sub_cmd);
             }
 
-            cJSON_Delete(root);
+            cJSON_Delete(__FUNCTION__, root);
         }
     }
 }

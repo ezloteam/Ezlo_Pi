@@ -1,5 +1,6 @@
 //          ("name",           func,          updater_func)
 #if (defined(CONFIG_EZPI_WEBSOCKET_CLIENT) || defined(CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER))
+
 CLOUD_METHOD("hub.items.list", items_list_v3, NULL)
 CLOUD_METHOD("hub.item.value.set", items_set_value_v3, NULL)
 
@@ -51,7 +52,7 @@ CLOUD_METHOD("hub.network.wifi.scan.stop", network_wifi_scan_stop, NULL)
 #if defined(CONFIG_EZPI_ENABLE_OTA)
 CLOUD_METHOD("cloud.firmware.info.get", firmware_info_get, NULL)
 CLOUD_METHOD("hub.firmware.update.start", firmware_update_start, NULL)
-#endif //CONFIG_EZPI_ENABLE_OTA
+#endif // CONFIG_EZPI_ENABLE_OTA
 
 CLOUD_METHOD("hub.device.settings.list", ezlopi_device_settings_list_v3, NULL)
 CLOUD_METHOD("hub.device.setting.value.set", ezlopi_device_settings_value_set_v3, NULL)
@@ -64,7 +65,10 @@ CLOUD_METHOD("hub.time.location.get", EZPI_CLOUD_location_get, NULL)
 #if defined(CONFIG_EZPI_SERV_ENABLE_MESHBOTS)
 CLOUD_METHOD("hub.scenes.list", scenes_list, NULL)
 CLOUD_METHOD("hub.scenes.create", scenes_create, scene_added)
-CLOUD_METHOD("hub.scenes.run", scenes_run, NULL)
+
+#warning "firmware crashes due to this method 'hub.scenes.run', need to fix this"
+// CLOUD_METHOD("hub.scenes.run", scenes_run, NULL) // firmware crashes due to this method, need to fix this
+
 CLOUD_METHOD("hub.scenes.get", scenes_get, NULL)
 CLOUD_METHOD("hub.scenes.edit", scenes_edit, scene_changed)
 CLOUD_METHOD("hub.scenes.delete", scenes_delete, scene_deleted)
@@ -75,7 +79,7 @@ CLOUD_METHOD("hub.scenes.notification.add", scenes_notification_add, scene_chang
 CLOUD_METHOD("hub.scenes.notification.remove", scenes_notification_remove, scene_changed)
 CLOUD_METHOD("hub.scenes.status.get", scenes_status_get, NULL) // Incomplete
 CLOUD_METHOD("hub.scenes.block.status.reset", scenes_block_status_reset, NULL)
-#endif //CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+#endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 CLOUD_METHOD("hub.room.list", room_list, NULL)
 CLOUD_METHOD("hub.room.create", room_create, room_created)
