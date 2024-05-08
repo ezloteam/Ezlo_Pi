@@ -467,9 +467,8 @@ static void __wifi_connection_event(esp_event_base_t event_base, int32_t event_i
     }
 }
 
-#endif // CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER
-
 void ezlpi_service_ws_server_dummy(void)
 {
     TRACE_D("I'm dummy");
 }
+#endif // CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER
