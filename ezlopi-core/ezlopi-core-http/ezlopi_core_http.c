@@ -448,14 +448,18 @@ void ezlopi_core_http_mbedtls_req(s_ezlopi_core_http_mbedtls_t* config)
 
             // Ready-Up 'request' buffer
             TRACE_I("request[capacity: %d]:\n\n%s[%d]", request_len, request, strlen(request));
-            TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
-            TRACE_E("&result==[%p]", &(config->response));
+            // TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
+            // TRACE_E("&result==[%p]", &(config->response));
             ezlopi_core_http_request_via_mbedTLS(config->web_server, (config->web_port), request, &(config->response));
             if (config->response)
             {
                 TRACE_D("*result[%p] =>\n[%d]\n%s", config->response, strlen(config->response), config->response);
                 free(config->response); // return to destination buffer
                 config->response = NULL;
+            }
+            else
+            {
+                TRACE_E("*http_result => NULL");
             }
             free(request);
         }
