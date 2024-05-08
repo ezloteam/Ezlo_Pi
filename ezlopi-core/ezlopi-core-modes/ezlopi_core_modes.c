@@ -422,10 +422,12 @@ int ezlopi_core_modes_set_unset_device_armed_status(cJSON* cj_device_array, cons
     int ret = 0;
     if (cj_device_array && cj_device_array->type == cJSON_Array)
     {
-        l_ezlopi_device_t* device_to_change = ezlopi_device_get_head();
-        while (device_to_change)
+        cJSON* element = NULL;
+        cJSON_ArrayForEach(element, cj_device_array)
         {
-            if (set != device_to_change->cloud_properties.armed)
+            uint32_t device_id = strtoul(element->valuestring, NULL, 16);
+            l_ezlopi_device_t* device_to_change = ezlopi_device_get_by_id(device_id);
+            if (device_to_change)
             {
                 device_to_change->cloud_properties.armed = set;
                 cJSON* cj_device_armed_broadcast = cJSON_CreateObject();
@@ -459,7 +461,6 @@ int ezlopi_core_modes_set_unset_device_armed_status(cJSON* cj_device_array, cons
                     }
                 }
             }
-            device_to_change = device_to_change->next;
         }
     }
     return ret;
