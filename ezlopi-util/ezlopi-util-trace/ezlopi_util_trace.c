@@ -99,7 +99,7 @@ void trace_color_print(const char* txt_color, uint8_t severity, const char* file
         va_list args;
         va_start(args, format);
         char cloud_log_format[EZPI_CORE_LOG_BUFFER_SIZE];
-        snprintf(cloud_log_format, sizeof(cloud_log_format), "[%s[%d]: ", txt_color, file, line);
+        snprintf(cloud_log_format, sizeof(cloud_log_format), "\x1B[%sm %s[%d]: ", txt_color, file, line);
         vsnprintf(cloud_log_format + strlen(cloud_log_format), sizeof(cloud_log_format) - strlen(cloud_log_format), format, args);
         log_upcall_func(severity, cloud_log_format);
         va_end(args);
