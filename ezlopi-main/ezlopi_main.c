@@ -39,7 +39,10 @@ static void blinky(void* pv);
 
 void app_main(void)
 {
+
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
     ezlopi_core_set_log_upcalls();
+#endif  // CONFIG_EZPI_UTIL_TRACE_EN
 
 #ifdef CONFIG_EZPI_ENABLE_LED_INDICATOR
     ezlopi_service_led_indicator_init();
@@ -83,7 +86,7 @@ void app_main(void)
 #if CONFIG_EZPI_SERV_ENABLE_MESHBOTS
     ezlopi_scenes_meshbot_init();
 #endif
-    
+
 
     TaskHandle_t ezlopi_main_blinky_task_handle = NULL;
     xTaskCreate(blinky, "blinky", EZLOPI_MAIN_BLINKY_TASK_DEPTH, NULL, 1, &ezlopi_main_blinky_task_handle);
@@ -132,7 +135,7 @@ static void blinky(void* pv)
         else
         {
             low_heap_start_time = xTaskGetTickCount();
-        }
+    }
 #endif // CONFIG_EZPI_HEAP_ENABLE
 
 #if 0
@@ -148,7 +151,7 @@ static void blinky(void* pv)
                     task_array[i].pxStackBase,
                     task_array[i].usStackHighWaterMark / 1024.0);
             }
-        }
+}
 #endif 
 
 #ifdef CONFIG_EZPI_HEAP_ENABLE

@@ -1,3 +1,6 @@
+#include "../../build/config/sdkconfig.h"
+
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
 
 #include <stdbool.h>
 #include <string.h>
@@ -196,3 +199,4 @@ void ezlopi_core_set_log_upcalls()
     ezlopi_util_set_log_upcalls(ezlopi_core_send_cloud_log, ezlopi_core_serial_log_upcall);
 }
 
+#endif // CONFIG_EZPI_UTIL_TRACE_EN
