@@ -68,7 +68,7 @@ static void ota_service_process(void* pv)
 
             if (0 == ezlopi_core_ezlopi_broadcast_add_to_queue(cj_firmware_info_request))
             {
-                cJSON_Delete(cj_firmware_info_request);
+                cJSON_Delete(__FUNCTION__, cj_firmware_info_request);
             }
             __ota_busy = false; // must clear immediately ; if OTA-event is serviced
         }

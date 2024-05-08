@@ -8,6 +8,7 @@
 #include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_nvs.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 static nvs_handle_t ezlopi_nvs_handle = 0;
 static const char* storage_name = "storage";
@@ -44,7 +45,7 @@ int ezlopi_nvs_init(void)
 
         if (ESP_ERR_NVS_NO_FREE_PAGES == err || ESP_ERR_NVS_NEW_VERSION_FOUND == err)
         {
-            TRACE_D("NVS Init Failed once!, Error: %s", esp_err_to_name(err));
+            TRACE_D("```nvs_flash_init``` Failed once!, Error: %s", esp_err_to_name(err));
             ESP_ERROR_CHECK(nvs_flash_erase());
             err = nvs_flash_init();
         }
@@ -52,13 +53,13 @@ int ezlopi_nvs_init(void)
         err = nvs_open(storage_name, NVS_READWRITE, &ezlopi_nvs_handle);
         if (ESP_OK != err)
         {
-            TRACE_E("NVS Open Error!");
+            TRACE_E("```nvs_open``` Error!");
             // vTaskDelay(2000 / portTICK_RATE_MS);
         }
         else
         {
             ret = 1;
-            TRACE_D("NVS Open success");
+            TRACE_D("```nvs_open``` success");
         }
     }
     else
@@ -76,11 +77,10 @@ uint32_t ezlopi_nvs_config_info_update_time_get(void)
     {
         esp_err_t err = nvs_get_u32(ezlopi_nvs_handle, config_info_update_time_name, &ret);
         TRACE_S("config-update-time-get: %d", ret);
-        TRACE_D("Error nvs_get_blob: %s", esp_err_to_name(err));
         if (ESP_OK != err)
         {
             ret = 0;
-            TRACE_W("nvs_set_u32 - error: %s", esp_err_to_name(err));
+            TRACE_W("(nvs_get_u32)-%s:: error: %s", config_info_update_time_name, esp_err_to_name(err));
         }
     }
     return ret;
@@ -89,17 +89,19 @@ uint32_t ezlopi_nvs_config_info_update_time_get(void)
 uint32_t ezlopi_nvs_config_info_version_number_get(void)
 {
     uint32_t ret = 0;
+
     if (ezlopi_nvs_init())
     {
         esp_err_t err = nvs_get_u32(ezlopi_nvs_handle, config_info_version_number, &ret);
         TRACE_S("config-version-number-get: %d", ret);
-        TRACE_D("Error nvs_get_blob: %s", esp_err_to_name(err));
+
         if (ESP_OK != err)
         {
             ret = 0;
-            TRACE_W("nvs_set_u32 - error: %s", esp_err_to_name(err));
+            TRACE_W("(nvs_get_u32)-%s:: error: %s", config_info_version_number, esp_err_to_name(err));
         }
     }
+
     return ret;
 }
 
@@ -109,7 +111,7 @@ void ezlopi_nvs_config_info_update_time_set(uint32_t value)
     {
         nvs_erase_key(ezlopi_nvs_handle, config_info_update_time_name);
         esp_err_t err = nvs_set_u32(ezlopi_nvs_handle, config_info_update_time_name, value);
-        TRACE_W("nvs_set_u32 - error: %s", esp_err_to_name(err));
+        TRACE_W("(nvs_set_u32)-%s:: error: %s", config_info_update_time_name, esp_err_to_name(err));
     }
 }
 
@@ -118,7 +120,7 @@ void ezlopi_nvs_config_info_version_number_set(uint32_t value)
     if (ezlopi_nvs_init())
     {
         esp_err_t err = nvs_set_u32(ezlopi_nvs_handle, config_info_version_number, value);
-        TRACE_W("nvs_set_u32 - error: %s", esp_err_to_name(err));
+        TRACE_W("(nvs_set_u32)-%s:: - error: %s", config_info_version_number, esp_err_to_name(err));
     }
 }
 
@@ -213,7 +215,7 @@ int ezlopi_nvs_read_ble_passkey(uint32_t* passkey)
         {
             esp_err_t err = ESP_OK;
             err = nvs_get_u32(ezlopi_nvs_handle, passkey_nvs_name, passkey);
-            TRACE_W("nvs_get_u32 - error: %s", esp_err_to_name(err));
+            TRACE_W("(nvs_get_u32)-%s:: error: %s", passkey_nvs_name, esp_err_to_name(err));
 
             if (ESP_OK == err)
             {
@@ -239,7 +241,7 @@ int ezlopi_nvs_write_ble_passkey(uint32_t passkey)
     {
         esp_err_t err = ESP_OK;
         err = nvs_set_u32(ezlopi_nvs_handle, passkey_nvs_name, passkey);
-        TRACE_W("nvs_set_u32 - error: %s", esp_err_to_name(err));
+        TRACE_W("(nvs_set_u32)-passkey_nvs_name:: error: %s", esp_err_to_name(err));
 
         if (ESP_OK == err)
         {
@@ -265,7 +267,8 @@ int ezlopi_nvs_read_wifi(char* wifi_info, uint32_t len)
         if ((ESP_OK == err) && (len >= required_size))
         {
             err = nvs_get_blob(ezlopi_nvs_handle, wifi_info_nvs_name, wifi_info, &required_size);
-            TRACE_W("Error nvs_get_blob: %s", esp_err_to_name(err));
+            TRACE_W("(nvs_get_blob)-%s:: Error: %s", wifi_info_nvs_name, esp_err_to_name(err));
+
             if (ESP_OK == err)
             {
                 ret = 1;
@@ -400,23 +403,24 @@ uint8_t ezlopi_nvs_write_int32(int32_t i, const char* key_name)
         esp_err_t err = nvs_set_i32(ezlopi_nvs_handle, key_name, i);
         if (ESP_OK != err)
         {
-            TRACE_W("nvs_set_i32 - error: %s", esp_err_to_name(err));
+            TRACE_W("(nvs_set_i32)-%s:: error: %s", key_name, esp_err_to_name(err));
         }
         else
         {
             err = nvs_commit(ezlopi_nvs_handle);
             if (ESP_OK != err)
             {
-                TRACE_E("NVS commit error - error: %s", esp_err_to_name(err));
+                TRACE_E("(nvs_commit)-%s:: error: %s", key_name, esp_err_to_name(err));
                 ret = 0;
             }
             else
             {
-                TRACE_D("Commit successful.");
+                TRACE_D("(nvs_commit)-%s successful.", key_name);
                 ret = 1;
             }
         }
     }
+
     return ret;
 }
 
@@ -432,7 +436,7 @@ uint8_t ezlopi_nvs_read_int32(int32_t* i, const char* key_name)
         }
         else
         {
-            TRACE_W("nvs_get_i32 - error: %s", esp_err_to_name(err));
+            TRACE_W("(nvs_get_i32)-%s:: error: %s", key_name, esp_err_to_name(err));
         }
     }
     return ret;
@@ -446,19 +450,19 @@ uint8_t ezlopi_nvs_write_uint32(uint32_t i, const char* key_name)
         esp_err_t err = nvs_set_u32(ezlopi_nvs_handle, key_name, (uint32_t)i);
         if (ESP_OK != err)
         {
-            TRACE_W("nvs_set_ui32 - error: %s", esp_err_to_name(err));
+            TRACE_W("(nvs_set_u32)-%s:: error: %s", key_name, esp_err_to_name(err));
         }
         else
         {
             err = nvs_commit(ezlopi_nvs_handle);
             if (ESP_OK != err)
             {
-                TRACE_E("NVS commit error - error: %s", esp_err_to_name(err));
+                TRACE_W("(nvs_commit)-%s:: error: %s", key_name, esp_err_to_name(err));
                 ret = 0;
             }
             else
             {
-                TRACE_D("Commit successful.");
+                TRACE_D("(nvs_commit)-%s:: Success.", key_name);
                 ret = 1;
             }
         }
@@ -474,12 +478,12 @@ uint8_t ezlopi_nvs_read_uint32(uint32_t* i, const char* key_name)
         esp_err_t err = nvs_get_u32(ezlopi_nvs_handle, key_name, i);
         if (ESP_OK == err)
         {
-            TRACE_D("NVS read success");
+            TRACE_D("(nvs_get_u32)-%s - NVS read success", key_name);
             ret = 1;
         }
         else
         {
-            TRACE_E("nvs_get_ui32 - error:: %s: %s", key_name, esp_err_to_name(err));
+            TRACE_E("(nvs_get_u32)-%s - error: %s", key_name, esp_err_to_name(err));
         }
     }
     return ret;
@@ -496,19 +500,19 @@ uint8_t ezlopi_nvs_write_float32(float f, const char* key_name)
         esp_err_t err = nvs_set_u32(ezlopi_nvs_handle, key_name, value);
         if (err != ESP_OK)
         {
-            TRACE_W("nvs_set_u32 - error: %s", esp_err_to_name(err));
+            TRACE_W("(nvs_set_u32)-%s:: error: %s", key_name, esp_err_to_name(err));
         }
         else
         {
             err = nvs_commit(ezlopi_nvs_handle);
             if (ESP_OK != err)
             {
-                TRACE_E("NVS commit error - error: %s", esp_err_to_name(err));
+                TRACE_W("(nvs_commit)-%s:: error: %s", key_name, esp_err_to_name(err));
                 ret = 0;
             }
             else
             {
-                TRACE_D("Commit successful.");
+                TRACE_D("(nvs_commit)-%s:: Success", key_name);
                 ret = 1;
             }
         }
@@ -531,7 +535,7 @@ uint8_t ezlopi_nvs_read_float32(float* f, const char* key_name)
         }
         else
         {
-            TRACE_W("nvs_get_u32 - error: %s", esp_err_to_name(err));
+            TRACE_W("(nvs_get_u32)-%s:: error: %s", key_name, esp_err_to_name(err));
         }
     }
     return ret;
@@ -557,19 +561,19 @@ uint8_t ezlopi_nvs_write_bool(bool b, const char* key_name)
 
         if (ESP_OK != err)
         {
-            TRACE_W("nvs_set_u8 - error: %s", esp_err_to_name(err));
+            TRACE_W("(nvs_set_u8)-%s:: error: %s", key_name, esp_err_to_name(err));
         }
         else
         {
             err = nvs_commit(ezlopi_nvs_handle);
             if (ESP_OK != err)
             {
-                TRACE_E("NVS commit error - error: %s", esp_err_to_name(err));
+                TRACE_W("(nvs_commit)-%s:: error: %s", key_name, esp_err_to_name(err));
                 ret = 0;
             }
             else
             {
-                TRACE_D("Commit successful.");
+                TRACE_W("(nvs_commit)-%s:: Success.", key_name);
                 ret = 1;
             }
         }
@@ -598,7 +602,7 @@ uint8_t ezlopi_nvs_read_bool(bool* b, const char* key_name)
         }
         else
         {
-            TRACE_W("nvs_get_u8 - error: %s", esp_err_to_name(err));
+            TRACE_W("(nvs_get_u8)-%s:: error: %s", key_name, esp_err_to_name(err));
         }
     }
     return ret;
@@ -619,16 +623,16 @@ int ezlopi_nvs_write_str(const char* data, uint32_t len, const char* nvs_name)
                 if (ESP_OK == err)
                 {
                     ret = 1;
-                    TRACE_D("%s commit success.", nvs_name);
+                    TRACE_D("(nvs_commit)-%s:: Success.", nvs_name);
                 }
                 else
                 {
-                    TRACE_E("%s commit error: %s", nvs_name, esp_err_to_name(err));
+                    TRACE_E("(nvs_commit)-%s:: error: %s", nvs_name, esp_err_to_name(err));
                 }
             }
             else
             {
-                TRACE_E("%s write error: %s", nvs_name, esp_err_to_name(err));
+                TRACE_W("(nvs_set_str)-%s:: error: %s", nvs_name, esp_err_to_name(err));
             }
         }
     }
@@ -650,7 +654,7 @@ char* ezlopi_nvs_read_str(const char* nvs_name)
 
             if (buf_len_needed && (ESP_OK == err))
             {
-                return_str = malloc(buf_len_needed + 1);
+                return_str = ezlopi_malloc(__FUNCTION__, buf_len_needed + 1);
 
                 if (return_str)
                 {
@@ -659,12 +663,13 @@ char* ezlopi_nvs_read_str(const char* nvs_name)
 
                     if (ESP_OK == err)
                     {
+                        TRACE_D("(nvs_get_str)-%s:: Success.", nvs_name);
                         // TRACE_D("%s read success. \r\nData[%d]: \r\n%s", nvs_name, buf_len_needed, return_str);
                     }
                     else
                     {
-                        TRACE_E("%s read error: %s", nvs_name, esp_err_to_name(err));
-                        free(return_str);
+                        TRACE_E("(nvs_get_str)-%s:: error: %s", nvs_name, esp_err_to_name(err));
+                        ezlopi_free(__FUNCTION__, return_str);
                         return_str = NULL;
                     }
                 }
@@ -697,7 +702,8 @@ void ezlopi_nvs_delete_stored_data_by_name(char* nvs_name)
         esp_err_t err = ESP_OK;
         if (ESP_OK != (err = nvs_erase_key(ezlopi_nvs_handle, nvs_name)))
         {
-            TRACE_E("Erasing nvs-key '%s' failed!, error: %s", nvs_name, esp_err_to_name(err));
+
+            TRACE_E("(nvs_erase_key)-%s:: error: %s", nvs_name, esp_err_to_name(err));
         }
     }
 }

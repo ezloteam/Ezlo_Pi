@@ -16,6 +16,7 @@
 
 #include "ezlopi_core_http.h"
 #include "ezlopi_core_event_group.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 
 static void ezlopi_http_free_rx_data(s_rx_data_t* rx_data);
@@ -27,7 +28,7 @@ static esp_err_t ezlopi_http_event_handler(esp_http_client_event_t* evt);
     {                         \
         if (ptr)              \
         {                     \
-            free(ptr);        \
+            ezlopi_free(__FUNCTION__, ptr);        \
             ptr = NULL;       \
         }                     \
     }
@@ -62,7 +63,7 @@ int ezlopi_core_http_mem_malloc(char** __dest_ptr, const char* src_ptr)
         FREE_IF_NOT_NULL(*__dest_ptr);
         // Now, do a fresh allocation
         ret += 5; // (must be: n>2)
-        char* tmp_ptr = malloc(ret);
+        char* tmp_ptr = ezlopi_malloc(__FUNCTION__, ret);
         if (tmp_ptr)
         {
             bzero(tmp_ptr, (ret));
@@ -84,7 +85,7 @@ int ezlopi_core_http_dyna_relloc(char** Buf, int reqSize)
     int ret = 0;
     if ((NULL != *Buf) && (reqSize > 0)) // strictly:  (new-size != 0)
     {
-        void* NewBuf = realloc(*Buf, reqSize); // reqSize ≤ 1.6 * n
+        void* NewBuf = ezlopi_realloc(__FUNCTION__, *Buf, reqSize); // reqSize ≤ 1.6 * n
         if (NULL == NewBuf)
         {
             TRACE_E("Reallocation - failed");
@@ -103,7 +104,7 @@ int ezlopi_core_http_dyna_relloc(char** Buf, int reqSize)
 /**
  * @brief Function Trigger http_requests via mbedTLS.
  *
- * @return Address of a memory_block ; (char*)malloc(...)
+ * @return Address of a memory_block ; (char*)ezlopi_malloc(...)
  */
 static void ezlopi_core_http_request_via_mbedTLS(const char* web_server, int web_port_num, const char* url_req, char** resp_buf)
 {
@@ -121,11 +122,11 @@ static void ezlopi_core_http_request_via_mbedTLS(const char* web_server, int web
     mbedtls_ssl_context ssl;
     mbedtls_x509_crt cacert;
     mbedtls_ssl_config conf;
-    // mbedtls_entropy_context* entropy = malloc(sizeof(mbedtls_entropy_context));
-    // mbedtls_ctr_drbg_context* ctr_drbg = malloc(sizeof(mbedtls_ctr_drbg_context));
-    // mbedtls_ssl_context* ssl = malloc(sizeof(mbedtls_ssl_context));
-    // mbedtls_x509_crt* cacert = malloc(sizeof(mbedtls_x509_crt));
-    // mbedtls_ssl_config* conf = malloc(sizeof(mbedtls_ssl_config));
+    // mbedtls_entropy_context* entropy = ezlopi_malloc(sizeof(mbedtls_entropy_context));
+    // mbedtls_ctr_drbg_context* ctr_drbg = ezlopi_malloc(sizeof(mbedtls_ctr_drbg_context));
+    // mbedtls_ssl_context* ssl = ezlopi_malloc(sizeof(mbedtls_ssl_context));
+    // mbedtls_x509_crt* cacert = ezlopi_malloc(sizeof(mbedtls_x509_crt));
+    // mbedtls_ssl_config* conf = ezlopi_malloc(sizeof(mbedtls_ssl_config));
     // if (entropy && ctr_drbg && ssl && cacert && conf)
     // {
     mbedtls_net_context server_fd;
@@ -252,7 +253,7 @@ static void ezlopi_core_http_request_via_mbedTLS(const char* web_server, int web
 
     // TRACE_I("Reading HTTP response...");
     uint32_t resp_buf_size = tmp_buf_size + 1;
-    char* resp_buf_dummy = (char*)malloc(resp_buf_size); // points to a memory-block
+    char* resp_buf_dummy = (char*)ezlopi_malloc(__FUNCTION__, resp_buf_size); // points to a memory-block
     if (resp_buf_dummy)
     {
         bzero(resp_buf_dummy, resp_buf_size); // clear the buffer
@@ -315,7 +316,7 @@ static void ezlopi_core_http_request_via_mbedTLS(const char* web_server, int web
         else
         {
             *resp_buf = NULL;
-            free(resp_buf_dummy);
+            ezlopi_free(__FUNCTION__, resp_buf_dummy);
         }
     }
 
@@ -336,11 +337,11 @@ exit:
     mbedtls_ctr_drbg_free(&ctr_drbg);
     mbedtls_entropy_free(&entropy);
 
-    // free(ssl);
-    // free(conf);
-    // free(ctr_drbg);
-    // free(entropy);
-    // free(cacert);
+    // ezlopi_free(__FUNCTION__, ssl);
+    // ezlopi_free(__FUNCTION__, conf);
+    // ezlopi_free(__FUNCTION__, ctr_drbg);
+    // ezlopi_free(__FUNCTION__, entropy);
+    // ezlopi_free(__FUNCTION__, cacert);
 // }
     TRACE_I("Completed a request");
 }
@@ -438,7 +439,7 @@ void ezlopi_core_http_mbedtls_req(s_ezlopi_core_http_mbedtls_t* config)
     if (config)
     {
         int request_len = (config->url_maxlen) + (config->header_maxlen) + (config->content_maxlen) + 100; // [>25] ; for "skipSecurity: true"
-        char* request = malloc(sizeof(char) * request_len);
+        char* request = ezlopi_malloc(__FUNCTION__, sizeof(char) * request_len);
         if (request)
         {
             bzero(request, request_len);
@@ -454,14 +455,10 @@ void ezlopi_core_http_mbedtls_req(s_ezlopi_core_http_mbedtls_t* config)
             if (config->response)
             {
                 TRACE_D("*result[%p] =>\n[%d]\n%s", config->response, strlen(config->response), config->response);
-                free(config->response); // return to destination buffer
+                ezlopi_free(__FUNCTION__, config->response); // return to destination buffer
                 config->response = NULL;
             }
-            else
-            {
-                TRACE_E("*http_result => NULL");
-            }
-            free(request);
+            ezlopi_free(__FUNCTION__, request);
         }
     }
 }
@@ -472,7 +469,7 @@ s_ezlopi_http_data_t* ezlopi_http_get_request(const char* cloud_url, const char*
 {
     char* ret = NULL;
     int status_code = 0;
-    s_rx_data_t* my_data = (s_rx_data_t*)malloc(sizeof(s_rx_data_t));
+    s_rx_data_t* my_data = (s_rx_data_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_rx_data_t));
     s_ezlopi_http_data_t* http_get_data = NULL;
     if ((NULL != my_data))
     {
@@ -502,7 +499,7 @@ s_ezlopi_http_data_t* ezlopi_http_get_request(const char* cloud_url, const char*
 
                 if (my_data->total_len)
                 {
-                    ret = (char*)malloc(my_data->total_len + 1);
+                    ret = (char*)ezlopi_malloc(__FUNCTION__, my_data->total_len + 1);
                     // TRACE_E("Response lent: %d", my_data->total_len);
                     if (ret)
                     {
@@ -516,7 +513,7 @@ s_ezlopi_http_data_t* ezlopi_http_get_request(const char* cloud_url, const char*
                             cur_d = cur_d->next;
                         }
 
-                        http_get_data = (s_ezlopi_http_data_t*)malloc(sizeof(s_ezlopi_http_data_t));
+                        http_get_data = (s_ezlopi_http_data_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_ezlopi_http_data_t));
                         if (http_get_data)
                         {
                             memset(http_get_data, 0, sizeof(s_ezlopi_http_data_t));
@@ -541,15 +538,15 @@ s_ezlopi_http_data_t* ezlopi_http_get_request(const char* cloud_url, const char*
 s_ezlopi_http_data_t* ezlopi_http_post_request(const char* cloud_url, const char* location, cJSON* headers, const char* private_key, const char* shared_key, const char* ca_certificate)
 {
     char* ret = NULL;
-    s_rx_data_t* my_data = (s_rx_data_t*)malloc(sizeof(s_rx_data_t));
-    s_ezlopi_http_data_t* http_get_data = malloc(sizeof(s_ezlopi_http_data_t));
+    s_rx_data_t* my_data = (s_rx_data_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_rx_data_t));
+    s_ezlopi_http_data_t* http_get_data = ezlopi_malloc(__FUNCTION__, sizeof(s_ezlopi_http_data_t));
     memset(http_get_data, 0, sizeof(s_ezlopi_http_data_t));
 
     if (my_data)
     {
         memset(my_data, 0, sizeof(s_rx_data_t));
 
-        char* uri = malloc(256);
+        char* uri = ezlopi_malloc(__FUNCTION__, 256);
         if (uri)
         {
             snprintf(uri, 256, "%s/%s", cloud_url, location);
@@ -578,7 +575,7 @@ s_ezlopi_http_data_t* ezlopi_http_post_request(const char* cloud_url, const char
             cJSON* header = headers->child;
             while (header)
             {
-                // TRACE_I("%s: %s", header->string, header->valuestring);
+                TRACE_I("%s: %s", header->string, header->valuestring);
                 esp_http_client_set_header(client, header->string, header->valuestring);
                 header = header->next;
             }
@@ -595,7 +592,7 @@ s_ezlopi_http_data_t* ezlopi_http_post_request(const char* cloud_url, const char
 
                 if (my_data->total_len)
                 {
-                    ret = (char*)malloc(my_data->total_len + 1);
+                    ret = (char*)ezlopi_malloc(__FUNCTION__, my_data->total_len + 1);
 
                     if (ret)
                     {
@@ -616,7 +613,7 @@ s_ezlopi_http_data_t* ezlopi_http_post_request(const char* cloud_url, const char
             else
             {
                 TRACE_E("Error perform http request %s", esp_err_to_name(err));
-                free(http_get_data);
+                ezlopi_free(__FUNCTION__, http_get_data);
                 http_get_data = NULL;
             }
 
@@ -625,7 +622,7 @@ s_ezlopi_http_data_t* ezlopi_http_post_request(const char* cloud_url, const char
         }
         if (uri)
         {
-            free(uri);
+            ezlopi_free(__FUNCTION__, uri);
         }
     }
 
@@ -663,7 +660,7 @@ static esp_err_t ezlopi_http_event_handler(esp_http_client_event_t* evt)
         {
             if (evt->user_data)
             {
-                char* tmp_data = (char*)malloc(evt->data_len + 1);
+                char* tmp_data = (char*)ezlopi_malloc(__FUNCTION__, evt->data_len + 1);
                 if (NULL != tmp_data)
                 {
                     memcpy(tmp_data, evt->data, evt->data_len);
@@ -678,7 +675,7 @@ static esp_err_t ezlopi_http_event_handler(esp_http_client_event_t* evt)
                             cur_dh = cur_dh->next;
                         }
 
-                        cur_dh->next = (s_rx_data_t*)malloc(sizeof(s_rx_data_t));
+                        cur_dh->next = (s_rx_data_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_rx_data_t));
                         if (cur_dh->next)
                         {
                             cur_dh->next->len = evt->data_len;
@@ -733,8 +730,8 @@ static void ezlopi_http_free_rx_data(s_rx_data_t* rx_data)
 
         if (rx_data->ptr)
         {
-            free(rx_data->ptr);
+            ezlopi_free(__FUNCTION__, rx_data->ptr);
         }
-        free(rx_data);
+        ezlopi_free(__FUNCTION__, rx_data);
     }
 }

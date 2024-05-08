@@ -1,4 +1,8 @@
+<<<<<<< HEAD
+*.bin.old
+=======
 *.old
+>>>>>>> development
 *.bin
 firmware/**
 firmware/v*/**

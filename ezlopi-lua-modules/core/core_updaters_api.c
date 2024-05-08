@@ -20,12 +20,12 @@ int lcore_update_item_value(lua_State *lua_state)
         l_ezlopi_item_t *item_node = ezlopi_device_get_item_by_id(item_id);
         if (item_node)
         {
-            cJSON *cj_params = cJSON_CreateObject();
+            cJSON *cj_params = cJSON_CreateObject(__FUNCTION__);
             if (cj_params)
             {
                 char tmp_buffer[32];
                 snprintf(tmp_buffer, sizeof(tmp_buffer), "%08x", item_node->cloud_properties.item_id);
-                cJSON_AddStringToObject(cj_params, ezlopi__id_str, tmp_buffer);
+                cJSON_AddStringToObject(__FUNCTION__, cj_params, ezlopi__id_str, tmp_buffer);
 
                 int check_val = lua_type(lua_state, 2);
 
@@ -34,21 +34,21 @@ int lcore_update_item_value(lua_State *lua_state)
                 case LUA_TBOOLEAN:
                 {
                     int bool_val = lua_toboolean(lua_state, 2);
-                    cJSON_AddBoolToObject(cj_params, ezlopi_value_str, bool_val);
+                    cJSON_AddBoolToObject(__FUNCTION__, cj_params, ezlopi_value_str, bool_val);
                     ret = 1;
                     break;
                 }
                 case LUA_TNUMBER:
                 {
                     double number_val = lua_tonumber(lua_state, 2);
-                    cJSON_AddNumberToObject(cj_params, ezlopi_value_str, number_val);
+                    cJSON_AddNumberToObject(__FUNCTION__, cj_params, ezlopi_value_str, number_val);
                     ret = 1;
                     break;
                 }
                 case LUA_TSTRING:
                 {
                     char *string_val = lua_tostring(lua_state, 2);
-                    cJSON_AddStringToObject(cj_params, ezlopi_value_str, string_val);
+                    cJSON_AddStringToObject(__FUNCTION__, cj_params, ezlopi_value_str, string_val);
                     ret = 1;
                     break;
                 }
@@ -69,7 +69,7 @@ int lcore_update_item_value(lua_State *lua_state)
                     item_node->func(EZLOPI_ACTION_SET_VALUE, item_node, cj_params, item_node->user_arg);
                 }
 
-                cJSON_Delete(cj_params);
+                cJSON_Delete(__FUNCTION__, cj_params);
             }
         }
     }
