@@ -91,7 +91,7 @@ int ezlopi_core_cloud_log_severity_process(bool severity_enable, const char* sev
     }
     else
     {
-        cloud_log_severity = ENUM_EZLOPI_CLOUD_LOG_SEVERITY_MAX;
+        cloud_log_severity = ENUM_EZLOPI_CLOUD_LOG_SEVERITY_INFO;
         ret = 1;
     }
     EZPI_CORE_nvs_write_cloud_log_severity(cloud_log_severity);
@@ -135,7 +135,7 @@ e_ezlopi_serial_log_severity_t ezlopi_core_serial_log_get_current_severity_enum_
     return serial_log_severity;
 }
 
-int ezlopi_core_send_cloud_log(int severity, const char* format, ...)
+int ezlopi_core_send_cloud_log(int severity, const char* log_str)
 {
     int ret = 0;
     if (severity <= ENUM_EZLOPI_CLOUD_LOG_SEVERITY_WARNING)
@@ -143,11 +143,11 @@ int ezlopi_core_send_cloud_log(int severity, const char* format, ...)
         e_ezlopi_event_t event = ezlopi_get_event_bit_status();
         if ((event & EZLOPI_EVENT_NMA_REG) == EZLOPI_EVENT_NMA_REG)
         {
-            char formatted_log[500];
-            va_list arglist;
-            va_start(arglist, format);
-            int bytes_written = vsnprintf(formatted_log, 4096, format, arglist);
-            va_end(arglist);
+            // char formatted_log[500];
+            // va_list arglist;
+            // va_start(arglist, format);
+            // int bytes_written = vsnprintf(formatted_log, 4096, format, arglist);
+            // va_end(arglist);
 
             cJSON* cj_log_broadcast = cJSON_CreateObject();
             if (cj_log_broadcast)
@@ -158,10 +158,10 @@ int ezlopi_core_send_cloud_log(int severity, const char* format, ...)
                 if (cj_result)
                 {
                     uint64_t timestamp = EZPI_CORE_sntp_get_current_time_ms();
-                    size_t total_len = 15 + bytes_written + 2;
+                    size_t total_len = 15 + strlen(log_str) + 2;
                     char message[total_len];
                     memset(message, 0, total_len);
-                    snprintf(message, total_len, "%lld: %s", timestamp, formatted_log);
+                    snprintf(message, total_len, "%lld: %s", timestamp, log_str);
 
                     cJSON_AddStringToObject(cj_result, ezlopi_message_str, message);
 
@@ -180,15 +180,16 @@ int ezlopi_core_send_cloud_log(int severity, const char* format, ...)
     return ret;
 }
 
-static int ezlopi_core_serial_log_upcall(int severity, const char* format, ...)
+static int ezlopi_core_serial_log_upcall(int severity, const char* log_str)
 {
     int ret = 0;
     if (severity > ENUM_EZLOPI_SERIAL_LOG_SEVERITY_NONE && severity <= serial_log_severity)
     {
-        va_list arglist;
-        va_start(arglist, format);
-        vprintf(format, arglist);
-        va_end(arglist);
+        // va_list arglist;
+        // va_start(arglist, format);
+        // vprintf(format, arglist);
+        printf("%s", log_str);
+        // va_end(arglist);
         ret = 1;
     }
     return ret;

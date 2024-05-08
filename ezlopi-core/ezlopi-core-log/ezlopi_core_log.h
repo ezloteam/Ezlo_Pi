@@ -32,7 +32,8 @@ void ezlopi_core_read_set_log_severities();
 int ezlopi_core_cloud_log_severity_process(bool severity_enable, const char* severity_str);
 const char* ezlopi_core_cloud_log_get_current_severity_enum_str();
 e_ezlopi_cloud_log_severity_t ezlopi_core_cloud_log_get_current_severity_enum_val();
-int ezlopi_core_send_cloud_log(int severity, const char* format, ...);
+// int ezlopi_core_send_cloud_log(int severity, const char* format, ...);
+int ezlopi_core_send_cloud_log(int severity, const char* log_str);
 void ezlopi_core_set_log_upcalls();
 
 int ezlopi_core_serial_log_severity_process(const char* severity_str);
