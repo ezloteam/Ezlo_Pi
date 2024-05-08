@@ -74,7 +74,7 @@ void ezlopi_init(void)
     ezlopi_scenes_scripts_init();
     ezlopi_scenes_expressions_init();
     ezlopi_scenes_init_v2();
-#endif // CONFIG_EZPI_SERV_MESHBOT_EN
+#endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 #if defined(CONFIG_EZPI_CORE_ENABLE_ETH)
     ezlopi_ethernet_init();

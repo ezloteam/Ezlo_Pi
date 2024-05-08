@@ -34,7 +34,7 @@ int ezlopi_core_ezlopi_broadcast_add_to_queue(cJSON* cj_data)
     return ret;
 }
 
-void ezlopi_core_broadcast_log_cjson(cJSON* cj_log_data)
+int ezlopi_core_broadcast_log_cjson(cJSON* cj_log_data)
 {
     int ret = 0;
 
