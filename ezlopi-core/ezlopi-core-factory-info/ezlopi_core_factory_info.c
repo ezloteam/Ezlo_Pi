@@ -180,6 +180,7 @@ void print_factory_info_v3(void)
     ezlopi_factory_info_v3_free(ca_certificate);
     ezlopi_factory_info_v3_free(ssl_private_key);
     ezlopi_factory_info_v3_free(ssl_shared_key);
+    ezlopi_factory_info_v3_free(ezlopi_config);
 #endif
 }
 

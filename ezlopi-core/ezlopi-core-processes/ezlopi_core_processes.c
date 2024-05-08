@@ -11,7 +11,7 @@
 
 #include "ezlopi_core_processes.h"
 
-
+#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
 typedef struct
 {
     TaskHandle_t task_handle;
@@ -168,3 +168,4 @@ int ezlopi_core_process_set_is_deleted(e_ezlopi_task_enum_t task_num)
     }
     return ret;
 }
+#endif // CONFIG_FREERTOS_USE_TRACE_FACILITY

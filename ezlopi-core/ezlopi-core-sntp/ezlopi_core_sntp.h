@@ -1,6 +1,8 @@
 #ifndef _EZLOPI_CORE_SNTP_H_
 #define _EZLOPI_CORE_SNTP_H_
 
+#include <time.h>
+
 void EZPI_CORE_sntp_init(void);
 int EZPI_CORE_sntp_set_location(const char* location);
 char* EZPI_CORE_sntp_get_location(void);

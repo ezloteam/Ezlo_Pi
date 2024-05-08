@@ -1,3 +1,7 @@
+#include "../../build/config/sdkconfig.h"
+
+#ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_scenes_value.h"
 #include "ezlopi_core_scenes_populate.h"
@@ -465,3 +469,5 @@ void ezlopi_scenes_populate_assign_field(l_fields_v2_t* new_field, cJSON* cj_fie
         ezlopi_scenes_populate_fields_get_value(new_field, cJSON_GetObjectItem(cj_field, ezlopi_value_str));
     }
 }
+
+#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS

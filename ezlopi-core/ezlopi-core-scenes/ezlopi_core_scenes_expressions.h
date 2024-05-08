@@ -1,6 +1,8 @@
 #ifndef _EZLOPI_CORE_SCENES_EXPRESSIONS_H_
 #define _EZLOPI_CORE_SCENES_EXPRESSIONS_H_
 
+#ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+
 #include <string.h>
 #include <inttypes.h>
 #include <stdbool.h>
@@ -139,4 +141,7 @@ int ezlopi_scenes_expressions_delete_by_name(char* expression_name);
  * @return s_ezlopi_expressions_t*
  */
 s_ezlopi_expressions_t* ezlopi_scenes_get_expression_node_by_name(char* expression_name);
+
+#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+
 #endif // _EZLOPI_CORE_SCENES_EXPRESSIONS_H_

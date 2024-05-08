@@ -1,5 +1,8 @@
 #ifndef _EZLOPI_CORE_SCENES_WHEN_METHODS_HELPER_FUNCTIONS_H_
 #define _EZLOPI_CORE_SCENES_WHEN_METHODS_HELPER_FUNCTIONS_H_
+
+#ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+
 #include <time.h>
 #include <stdint.h>
 #include "cjext.h"
@@ -105,4 +108,7 @@ int when_function_for_repeat(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* 
 int when_function_for_follow(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* when_block, cJSON* cj_func_opr);
 int when_function_for_pulse(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* when_block, cJSON* cj_func_opr);
 int when_function_for_latch(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* when_block, cJSON* cj_func_opr);
+
+#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+
 #endif /*_EZLOPI_CORE_SCENES_WHEN_METHODS_HELPER_FUNCTIONS_H_*/
