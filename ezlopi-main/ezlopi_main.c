@@ -14,6 +14,7 @@
 #include "ezlopi_core_ezlopi.h"
 #include "ezlopi_service_ota.h"
 #include "ezlopi_core_log.h"
+#include "ezlopi_core_reset.h"
 
 #include "ezlopi_service_ble.h"
 #include "ezlopi_service_uart.h"
@@ -50,7 +51,7 @@ void app_main(void)
 
     ezlopi_init();
 
-#if defined(CONFIG_EZPI_ENABLE_UART_PROVISIONING)
+#ifdef CONFIG_EZPI_ENABLE_UART_PROVISIONING
     EZPI_SERV_uart_init();
 #endif
 
@@ -104,24 +105,19 @@ static void blinky(void* pv)
 
     while (1)
     {
-        float free_heap_kb = esp_get_free_heap_size() / 1024.0;
-
-        // UBaseType_t total_task_numbers = uxTaskGetNumberOfTasks();
-        // TaskStatus_t task_array[total_task_numbers];
+#if 0
+        UBaseType_t total_task_numbers = uxTaskGetNumberOfTasks();
+        TaskStatus_t task_array[total_task_numbers];
+#endif 
 
         TRACE_I("----------------------------------------------");
         uint32_t free_heap = esp_get_free_heap_size();
         uint32_t watermark_heap = esp_get_minimum_free_heap_size();
-        TRACE_I("Free Heap Size: %d B     %.4f KB", free_heap, free_heap / 1024.0);
-        TRACE_I("Heap Watermark: %d B     %.4f KB", watermark_heap, watermark_heap / 1024.0);
-        // trace_wb("Minimum Free Heap Size: %.4f KB", heap_caps_get_free_size() / 1024.0);
+        TRACE_W("Free Heap Size: %d B     %.4f KB", free_heap, free_heap / 1024.0);
+        TRACE_W("Heap Watermark: %d B     %.4f KB", watermark_heap, watermark_heap / 1024.0);
         TRACE_I("----------------------------------------------");
 
-#ifdef CONFIG_EZPI_HEAP_ENABLE
-        ezlopi_util_heap_trace(false);
-#endif // CONFIG_EZPI_HEAP_ENABLE
-
-        if (free_heap_kb <= 10)
+        if (free_heap <= (10 * 1024))
         {
             TRACE_W("CRITICAL-WARNING: low heap detected..");
 
@@ -129,15 +125,20 @@ static void blinky(void* pv)
             {
                 vTaskDelay(2000 / portTICK_RATE_MS);
                 TRACE_E("CRITICAL-ERROR: low heap time-out detected!");
-                // TRACE_W("Rebooting.....");
-                // vTaskDelay(1000 / portTICK_PERIOD_MS);
-                // esp_restart();
+                TRACE_W("Rebooting.....");
+                vTaskDelay(1000 / portTICK_PERIOD_MS);
+                EZPI_CORE_reset_reboot();
             }
         }
         else
         {
             low_heap_start_time = xTaskGetTickCount();
         }
+
+
+#ifdef CONFIG_EZPI_HEAP_ENABLE
+        ezlopi_util_heap_trace(false);
+        ezlopi_util_heap_flush();
 #endif // CONFIG_EZPI_HEAP_ENABLE
 
 #if 0
@@ -156,10 +157,6 @@ static void blinky(void* pv)
         }
 #endif 
 
-
-#ifdef CONFIG_EZPI_HEAP_ENABLE
-        ezlopi_util_heap_flush();
-#endif // CONFIG_EZPI_HEAP_ENABLE
 
         vTaskDelay(5000 / portTICK_PERIOD_MS);
     }

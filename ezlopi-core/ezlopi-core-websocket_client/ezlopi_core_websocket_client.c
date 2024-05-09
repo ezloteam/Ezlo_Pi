@@ -125,7 +125,7 @@ static void websocket_event_handler(void* handler_args, esp_event_base_t base, i
     }
     case WEBSOCKET_EVENT_DISCONNECTED:
     {
-        trace_wb("esp_get_free_heap_size - %.02f kB", esp_get_free_heap_size() / 1024.0);
+        TRACE_S("esp_get_free_heap_size - %.02f kB", esp_get_free_heap_size() / 1024.0);
         TRACE_E("free-heap: %d", esp_get_free_heap_size());
         TRACE_S("WEBSOCKET_EVENT_DISCONNECTED");
         if (event_arg && event_arg->connection_upcall)

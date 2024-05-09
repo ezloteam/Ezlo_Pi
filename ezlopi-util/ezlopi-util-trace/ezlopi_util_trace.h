@@ -72,11 +72,11 @@ extern "C"
         printf("%s[%d]:" X "\r\n", __FILE__, __LINE__, ##reg); \
     }
 
-#define trace_log_sev_error(X, reg...)  trace_color_print(COLOR_FONT_RED, 0, __FILE__, __LINE__, X, ##reg)
-#define trace_log_sev_warning(X, reg...) trace_color_print(COLOR_FONT_YELLOW, 1, __FILE__, __LINE__, X, ##reg)
-#define trace_log_sev_info(X, reg...) trace_color_print(COLOR_FONT_BLUE, 2, __FILE__, __LINE__, X, ##reg)
-#define trace_log_sev_debug(X, reg...) trace_color_print(COLOR_FONT_WHITE, 3, __FILE__, __LINE__, X, ##reg)
-#define trace_log_sev_trace(X, reg...) trace_color_print(COLOR_FONT_GREEN, 4, __FILE__, __LINE__, X, ##reg)
+#define trace_log_sev_error(X, reg...)  trace_color_print(COLOR_FONT_RED, 1, __FILE__, __LINE__, X, ##reg)
+#define trace_log_sev_warning(X, reg...) trace_color_print(COLOR_FONT_YELLOW, 2, __FILE__, __LINE__, X, ##reg)
+#define trace_log_sev_info(X, reg...) trace_color_print(COLOR_FONT_BLUE, 3, __FILE__, __LINE__, X, ##reg)
+#define trace_log_sev_debug(X, reg...) trace_color_print(COLOR_FONT_WHITE, 4, __FILE__, __LINE__, X, ##reg)
+#define trace_log_sev_trace(X, reg...) trace_color_print(COLOR_FONT_GREEN, 5, __FILE__, __LINE__, X, ##reg)
 
 #define trace_debug(X, reg...) trace_color(COLOR_FONT_WHITE, X, ##reg)
 #define trace_information(X, reg...) trace_color(COLOR_FONT_BLUE, X, ##reg)

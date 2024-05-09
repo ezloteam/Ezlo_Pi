@@ -180,8 +180,8 @@ void ezlopi_util_heap_trace(bool print_freed)
         else
         {
             total_allocated_memory += curr_node->size;
-            printf("\033[38:2:255:165:0m%d -> %s(%d):: who: %s, p: 0x%08x, l: %u, h-ms: %u\x1B[0m\r\n", count, curr_node->allocator.file_name, curr_node->allocator.line_number,
-                (curr_node->allocator.who ? curr_node->allocator.who : ""), (uint32_t)curr_node->ptr, curr_node->size, (xTaskGetTickCount() - curr_node->time_ms));
+            printf("\033[38:2:255:165:0m%d -> %s(%d):: who: %s, p: 0x%08x, l: %u, h-s: %u\x1B[0m\r\n", count + 1, curr_node->allocator.file_name, curr_node->allocator.line_number,
+                (curr_node->allocator.who ? curr_node->allocator.who : ""), (uint32_t)curr_node->ptr, curr_node->size, ((xTaskGetTickCount() - curr_node->time_ms) / 1000));
         }
 
         count++;

@@ -156,7 +156,7 @@ static void ezlopi_ble_basic_init(void)
             mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
     }
 
-    dump("ble_device_name", ble_device_name, 0, sizeof(ble_device_name));
+    // dump("ble_device_name", ble_device_name, 0, sizeof(ble_device_name));
 
     static esp_bt_controller_config_t bt_cfg = BT_CONTROLLER_INIT_CONFIG_DEFAULT();
     ESP_ERROR_CHECK(esp_bt_controller_mem_release(ESP_BT_MODE_CLASSIC_BT));

@@ -278,49 +278,48 @@ static void __config_check(void* pv)
                 if (NULL != response)
                 {
                     TRACE_S("Status Code : %d", response->status_code);
-                    switch (response->status_code)
+                    // if (response->response) 
                     {
-                    case HttpStatus_Ok:
-                    {
-                        // re-write all the info into the flash region
-                        // TRACE_S("Data : %s", response->response);
-                        if (0 == __config_update(response->response))
+                        switch (response->status_code)
                         {
-                            retry_count++;
-                            if (retry_count >= 5)
+                        case HttpStatus_Ok:
+                        {
+                            // re-write all the info into the flash region
+                            // TRACE_S("Data : %s", response->response);
+                            if (0 == __config_update(response->response))
+                            {
+                                retry_count++;
+                                if (retry_count >= 5)
+                                {
+                                    flag_break_loop = 1;
+                                }
+                            }
+                            else
                             {
                                 flag_break_loop = 1;
                             }
+                            break;
                         }
-                        else
+                        default:
                         {
-                            flag_break_loop = 1;
+                            if (304 == response->status_code) // HTTP Status not modified
+                            {
+                                TRACE_S("Config data not changed !");
+                                flag_break_loop = 1;
+                            }
+                            break;
                         }
-                        break;
-                    }
-                    default:
-                    {
-                        if (304 == response->status_code) // HTTP Status not modified
-                        {
-                            TRACE_S("Config data not changed !");
-                            flag_break_loop = 1;
                         }
-                        break;
+                        ezlopi_factory_info_v3_free(response->response);
                     }
-                    }
-                    break;
+                    ezlopi_factory_info_v3_free(response);
                 }
-
-                ezlopi_factory_info_v3_free(response->response);
-                ezlopi_factory_info_v3_free(response);
-
                 if (flag_break_loop)
                 {
                     xTaskNotifyGive(ezlopi_update_config_notifier);
                     break;
                 }
             }
-
         }
 
         cJSON_Delete(__FUNCTION__, root_header_prov_token);

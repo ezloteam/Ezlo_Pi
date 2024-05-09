@@ -25,7 +25,7 @@ void ezlopi_hub_cloud_log_set(cJSON* cj_request, cJSON* cj_response)
             cJSON* cj_log_severity = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_severity_str);
             if (cj_log_enable && cj_log_severity)
             {
-                bool severity_enable = cj_log_enable->type == cJSON_True ? true : false;
+                bool severity_enable = cJSON_IsTrue(cj_log_enable);
                 const char* log_severity_type = cj_log_severity->type == cJSON_String ? cj_log_severity->valuestring : NULL;
                 ezlopi_core_cloud_log_severity_process(severity_enable, log_severity_type);
             }

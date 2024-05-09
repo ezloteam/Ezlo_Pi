@@ -525,7 +525,7 @@ static int ezlopi_service_uart_newtwork_info(cJSON* parent)
             e_ping_status_t ping_status = ezlopi_ping_get_internet_status();
             cJSON_AddBoolToObject(__FUNCTION__, cj_network, "internet", ping_status == EZLOPI_PING_STATUS_LIVE);
 #else // CONFIG_EZPI_ENABLE_PING
-             cJSON_AddBoolToObject(__FUNCTION__, cj_network, "internet", ping_status == EZLOPI_PING_STATUS_LIVE);
+            cJSON_AddBoolToObject(__FUNCTION__, cj_network, "internet", cJSON_False);
 #endif // CONFIG_EZPI_ENABLE_PING
 
 
@@ -744,7 +744,7 @@ int EZPI_SERV_uart_tx_data(int len, uint8_t* data)
 void EZPI_SERV_uart_init(void)
 {
     TaskHandle_t ezlopi_service_uart_task_handle = NULL;
-    xTaskCreate(ezlopi_service_uart_task, "ezlopi_service_uart_task", EZLOPI_SERVICE_UART_TASK_DEPTH, NULL, configMAX_PRIORITIES, &ezlopi_service_uart_task_handle);
+    xTaskCreate(ezlopi_service_uart_task, "serv_uart_task", EZLOPI_SERVICE_UART_TASK_DEPTH, NULL, configMAX_PRIORITIES, &ezlopi_service_uart_task_handle);
     ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_UART_TASK, &ezlopi_service_uart_task_handle, EZLOPI_SERVICE_UART_TASK_DEPTH);
 }
 
