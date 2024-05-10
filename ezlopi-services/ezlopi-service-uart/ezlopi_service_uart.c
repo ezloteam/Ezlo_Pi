@@ -35,6 +35,7 @@
 #include "ezlopi_core_info.h"
 #include "ezlopi_core_processes.h"
 #include "ezlopi_core_ping.h"
+#include "ezlopi_core_log.h"
 
 #include "ezlopi_hal_uart.h"
 #include "ezlopi_hal_system_info.h"
@@ -224,6 +225,54 @@ static int ezlopi_service_uart_set_uart_config(const cJSON* root)
     return ret;
 }
 
+static int ezlopi_service_uart_process_log_severity(const cJSON* root)
+{
+    int ret = 0;
+
+    int target = 0;
+    int severity = 0;
+
+    CJSON_GET_VALUE_DOUBLE(root, "target", target);
+    CJSON_GET_VALUE_DOUBLE(root, ezlopi_severity_str, severity);
+
+    if (0 == target)
+    {
+        // Call cloud log severity setter
+        ret = ezlopi_core_cloud_log_severity_process_id(severity);
+    }
+    else if (1 == target)
+    {
+        // Call serial log severity setter
+        ret = ezlopi_core_serial_log_severity_process_id(severity);
+    }
+
+    cJSON* cj_uart_response = cJSON_CreateObject(__func__);
+    if (cj_uart_response)
+    {
+        cJSON_AddNumberToObject(__func__, cj_uart_response, ezlopi_cmd_str, 6);
+        if (0 == ret)
+        {
+            cJSON_AddNumberToObject(__func__, cj_uart_response, ezlopi_status_str, 0);
+        }
+        else 
+        {
+            cJSON_AddNumberToObject(__func__, cj_uart_response, ezlopi_status_str, 1);   
+        }
+
+        const char* str_uart_response = cJSON_Print(__func__, cj_uart_response);
+        if(str_uart_response)
+        {
+            cJSON_Minify(str_uart_response);
+            EZPI_SERV_uart_tx_data(strlen(str_uart_response), str_uart_response);
+            free(str_uart_response);
+        }
+        cJSON_Delete(__func__, cj_uart_response);
+
+    }
+
+    return ret;
+}
+
 static int ezlopi_service_uart_parser(const char* data)
 {
     cJSON* root = cJSON_ParseWithRef(__FUNCTION__, data);
@@ -265,6 +314,11 @@ static int ezlopi_service_uart_parser(const char* data)
             case 5:
             {
                 ezlopi_service_uart_set_uart_config(root);
+                break;
+            }
+            case 6:
+            {
+                ezlopi_service_uart_process_log_severity(root);
                 break;
             }
             default:
