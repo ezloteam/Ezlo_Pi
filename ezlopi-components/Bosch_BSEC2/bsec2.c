@@ -37,8 +37,9 @@
  */
 
 #include "bsec2.h"
+#include "EZLOPI_USER_CONFIG.h"
 
-/* Stores the version of the BSEC algorithm */
+ /* Stores the version of the BSEC algorithm */
 static bsec_version_t version;
 static bsec_library_return_t status;
 
@@ -86,7 +87,7 @@ void bsec2_setup(s_ezlopi_i2c_master_t* bme68x_i2c_master_conf)
  * @brief Function to initialize the sensor based on custom callbacks
  */
 bool bsec2_begin_custom(bme68x_intf intf, bme68x_read_fptr_t read, bme68x_write_fptr_t write,
-        bme68x_delay_us_fptr_t idle_task, void *intf_ptr)
+    bme68x_delay_us_fptr_t idle_task, void *intf_ptr)
 {
     bme68xlib_begin_custom(intf, read, write, idle_task, intf_ptr);
 
@@ -98,7 +99,7 @@ bool bsec2_begin_custom(bme68x_intf intf, bme68x_read_fptr_t read, bme68x_write_
 
 /**
  * @brief Function to initialize the sensor based on the Wire library
- */ 
+ */
 bool bsec2_begin(void)
 {
     bme68xlib_begin();
@@ -146,8 +147,8 @@ bool bsec2_run(void)
         /* Provides the information about the current sensor configuration that is
            necessary to fulfill the input requirements, eg: operation mode, timestamp
            at which the sensor data shall be fetched etc */
-        // printf("curr_time_ns %lld\n", curr_time_ns);
-        status = bsec_sensor_control_m(bsec_instance ,curr_time_ns, &bme_conf);
+           // printf("curr_time_ns %lld\n", curr_time_ns);
+        status = bsec_sensor_control_m(bsec_instance, curr_time_ns, &bme_conf);
         // printf("Status is %d\n", status);
         if (status != BSEC_OK)
             return false;
@@ -208,7 +209,7 @@ bool bsec2_get_state(uint8_t *state)
     uint32_t n_serialized_state = BSEC_MAX_STATE_BLOB_SIZE;
 
     status = bsec_get_state_m(bsec_instance, 0, state, BSEC_MAX_STATE_BLOB_SIZE, work_buffer, BSEC_MAX_WORKBUFFER_SIZE,
-            &n_serialized_state);
+        &n_serialized_state);
     if (status != BSEC_OK)
         return false;
     return true;
@@ -234,7 +235,7 @@ bool bsec2_set_state(uint8_t *state)
 bool bsec2_get_config(uint8_t *config)
 {
     uint32_t n_serialized_settings = 0;
-    
+
     status = bsec_get_configuration_m(bsec_instance, 0, config, BSEC_MAX_PROPERTY_BLOB_SIZE, work_buffer, BSEC_MAX_WORKBUFFER_SIZE, &n_serialized_settings);
     if (status != BSEC_OK)
         return false;
@@ -265,7 +266,7 @@ int64_t bsec2_get_time_ms(void)
     // printf("last_millis is %d and timeMS is %lld\n", last_millis, timeMs);
 
     if (last_millis > timeMs) /* An overflow occurred */
-    { 
+    {
         ovf_counter++;
     }
 
@@ -288,7 +289,7 @@ void bsec2_allocate_memory(uint8_t *mem_block)
  */
 void bsec2_clear_memory(void)
 {
-    free(bsec_instance);
+    ezlopi_free(__FUNCTION__, bsec_instance);
     bsec_instance = NULL;
 }
 
@@ -336,7 +337,7 @@ bool bsec2_process_data(int64_t curr_time_ns, const bme68x_data* data)
         n_inputs++;
     }
     if (BSEC_CHECK_INPUT(bme_conf.process_data, BSEC_INPUT_GASRESISTOR) &&
-            (data->status & BME68X_GASM_VALID_MSK))
+        (data->status & BME68X_GASM_VALID_MSK))
     {
         inputs[n_inputs].sensor_id = BSEC_INPUT_GASRESISTOR;
         inputs[n_inputs].signal = data->gas_resistance;
@@ -344,7 +345,7 @@ bool bsec2_process_data(int64_t curr_time_ns, const bme68x_data* data)
         n_inputs++;
     }
     if (BSEC_CHECK_INPUT(bme_conf.process_data, BSEC_INPUT_PROFILE_PART) &&
-            (data->status & BME68X_GASM_VALID_MSK))
+        (data->status & BME68X_GASM_VALID_MSK))
     {
         inputs[n_inputs].sensor_id = BSEC_INPUT_PROFILE_PART;
         inputs[n_inputs].signal = (op_mode == BME68X_FORCED_MODE) ? 0 : data->gas_index;
@@ -364,7 +365,7 @@ bool bsec2_process_data(int64_t curr_time_ns, const bme68x_data* data)
         if (status != BSEC_OK)
             return false;
 
-        if(new_data_callback)
+        if (new_data_callback)
             new_data_callback(*data, outputs);
     }
     return true;
@@ -378,7 +379,7 @@ bool bsec2_begin_common()
     if (!bsec_instance)
     {
         /* allocate memory for the instance if not allocated */
-        bsec_instance = (uint8_t*) malloc( sizeof(uint8_t) * bsec_get_instance_size_m() );
+        bsec_instance = (uint8_t*)ezlopi_malloc(__FUNCTION__, sizeof(uint8_t) * bsec_get_instance_size_m());
     }
 
     if (BSEC_INSTANCE_SIZE < bsec_get_instance_size_m())
@@ -439,7 +440,7 @@ void bsec2_set_bme68x_config_parallel(void)
     sharedHeaterDur = BSEC_TOTAL_HEAT_DUR - (bme68xlib_get_meas_dur(BME68X_PARALLEL_MODE) / INT64_C(1000));
 
     bme68xlib_set_heater_prof_p4(bme_conf.heater_temperature_profile, bme_conf.heater_duration_profile, sharedHeaterDur,
-            bme_conf.heater_profile_len);
+        bme_conf.heater_profile_len);
 
     if (bme68xlib_check_status() == BME68X_ERROR)
         return;

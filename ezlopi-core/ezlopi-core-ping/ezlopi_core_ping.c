@@ -1,3 +1,6 @@
+#include "../../build/config/sdkconfig.h"
+#ifdef CONFIG_EZPI_ENABLE_PING
+
 #include <string.h>
 
 #include "freertos/FreeRTOS.h"
@@ -92,8 +95,8 @@ static void ezlopi_ping_on_ping_success(esp_ping_handle_t hdl, void* args)
     esp_ping_get_profile(hdl, ESP_PING_PROF_IPADDR, &target_addr, sizeof(target_addr));
     esp_ping_get_profile(hdl, ESP_PING_PROF_SIZE, &recv_len, sizeof(recv_len));
     esp_ping_get_profile(hdl, ESP_PING_PROF_TIMEGAP, &elapsed_time, sizeof(elapsed_time));
-    TRACE_I("%d bytes from %s icmp_seq=%d ttl=%d time=%d ms\n",
-        recv_len, inet_ntoa(target_addr.u_addr.ip4), seqno, ttl, elapsed_time);
+    // TRACE_I("%d bytes from %s icmp_seq=%d ttl=%d time=%d ms\n",
+    //     recv_len, inet_ntoa(target_addr.u_addr.ip4), seqno, ttl, elapsed_time);
     __ping_fail_count = 0;
     __ping_status = EZLOPI_PING_STATUS_LIVE;
 }
@@ -125,7 +128,7 @@ static void ezlopi_ping_on_ping_end(esp_ping_handle_t hdl, void* args)
     esp_ping_get_profile(hdl, ESP_PING_PROF_IPADDR, &target_addr, sizeof(target_addr));
     esp_ping_get_profile(hdl, ESP_PING_PROF_DURATION, &total_time_ms, sizeof(total_time_ms));
 
-#if (1 == ENABLE_TRACE)
+#if  (1 == ENABLE_TRACE)
     uint32_t loss = (uint32_t)((1 - ((float)received) / transmitted) * 100);
 
     if (IP_IS_V4(&target_addr))
@@ -147,3 +150,5 @@ static void ezlopi_ping_on_ping_end(esp_ping_handle_t hdl, void* args)
 
     // esp_ping_delete_session(hdl);
 }
+
+#endif // CONFIG_EZPI_ENABLE_PING

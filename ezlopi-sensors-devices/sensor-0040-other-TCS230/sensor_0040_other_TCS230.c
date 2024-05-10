@@ -17,6 +17,7 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "sensor_0040_other_TCS230.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 static int __0040_prepare(void* arg);
 static int __0040_init(l_ezlopi_item_t* item);
@@ -137,7 +138,7 @@ static int __0040_prepare(void* arg)
     if (device_prep_arg && (NULL != device_prep_arg->cjson_device))
     {
         cJSON* cj_device = device_prep_arg->cjson_device;
-        s_TCS230_data_t* user_data = (s_TCS230_data_t*)malloc(sizeof(s_TCS230_data_t));
+        s_TCS230_data_t* user_data = (s_TCS230_data_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_TCS230_data_t));
         if (user_data)
         {
             l_ezlopi_device_t* tcs230_device = ezlopi_device_add_device(cj_device, NULL);
@@ -155,13 +156,13 @@ static int __0040_prepare(void* arg)
                 {
                     ret = -1;
                     ezlopi_device_free_device(tcs230_device);
-                    free(user_data);
+                    ezlopi_free(__FUNCTION__, user_data);
                 }
             }
             else
             {
                 ret = -1;
-                free(user_data);
+                ezlopi_free(__FUNCTION__, user_data);
             }
         }
         else
@@ -235,14 +236,14 @@ static int __0040_get_cjson_value(l_ezlopi_item_t* item, void* args)
         {
             if (ezlopi_item_name_rgbcolor == item->cloud_properties.item_name)
             {
-                cJSON* color_values = cJSON_AddObjectToObject(cj_result, ezlopi_value_str);
-                cJSON_AddNumberToObject(color_values, ezlopi_red_str, user_data->red_mapped);
-                cJSON_AddNumberToObject(color_values, ezlopi_green_str, user_data->green_mapped);
-                cJSON_AddNumberToObject(color_values, ezlopi_blue_str, user_data->blue_mapped);
+                cJSON* color_values = cJSON_AddObjectToObject(__FUNCTION__, cj_result, ezlopi_value_str);
+                cJSON_AddNumberToObject(__FUNCTION__, color_values, ezlopi_red_str, user_data->red_mapped);
+                cJSON_AddNumberToObject(__FUNCTION__, color_values, ezlopi_green_str, user_data->green_mapped);
+                cJSON_AddNumberToObject(__FUNCTION__, color_values, ezlopi_blue_str, user_data->blue_mapped);
 
                 char formatted_rgb_value[32];
                 snprintf(formatted_rgb_value, sizeof(formatted_rgb_value), "#%02x%02x%02x", user_data->red_mapped, user_data->green_mapped, user_data->blue_mapped);
-                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, formatted_rgb_value);
+                cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, formatted_rgb_value);
             }
             ret = 1;
         }

@@ -13,6 +13,7 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "sensor_0029_I2C_GXHTC3.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 static int __prepare(void* arg);
 static int __get_cjson_value(l_ezlopi_item_t* item, void* arg);
@@ -242,7 +243,7 @@ static int __prepare(void* arg)
 
     if (prep_arg && prep_arg->cjson_device)
     {
-        s_gxhtc3_value_t* value_ptr = malloc(sizeof(s_gxhtc3_value_t));
+        s_gxhtc3_value_t* value_ptr = ezlopi_malloc(__FUNCTION__, sizeof(s_gxhtc3_value_t));
         if (value_ptr)
         {
             memset(value_ptr, 0, sizeof(s_gxhtc3_value_t));
@@ -287,14 +288,14 @@ static int __prepare(void* arg)
                 if ((NULL == item_temperature) &&
                     (NULL == child_device_hum))
                 {
-                    free(value_ptr);
+                    ezlopi_free(__FUNCTION__, value_ptr);
                     ezlopi_device_free_device(parent_device_temp);
                     ret = -1;
                 }
             }
             else
             {
-                free(value_ptr);
+                ezlopi_free(__FUNCTION__, value_ptr);
                 ret = -1;
             }
         }

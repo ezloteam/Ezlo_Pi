@@ -32,6 +32,7 @@
 #include "ezlopi_core_processes.h"
 
 #include "ezlopi_service_uart.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 #define EXAMPLE_ESP_MAXIMUM_RETRY 5
 
@@ -93,7 +94,7 @@ int ezlopi_wifi_got_ip(void)
 ezlopi_wifi_status_t* ezlopi_wifi_status(void)
 {
 
-    ezlopi_wifi_status_t* wifi_stat = (ezlopi_wifi_status_t*)malloc(sizeof(ezlopi_wifi_status_t));
+    ezlopi_wifi_status_t* wifi_stat = (ezlopi_wifi_status_t*)ezlopi_malloc(__FUNCTION__, sizeof(ezlopi_wifi_status_t));
 
     if (sg_station_got_ip)
     {
@@ -274,6 +275,9 @@ void ezlopi_wifi_connect_from_id_bin(void)
         esp_err_t wifi_error = ezlopi_wifi_connect(wifi_ssid, wifi_password);
         TRACE_W("wifi_error: %u", wifi_error);
     }
+
+    if (wifi_ssid) ezlopi_free(__FUNCTION__, wifi_ssid);
+    if (wifi_password) ezlopi_free(__FUNCTION__, wifi_password);
 }
 
 esp_err_t ezlopi_wifi_connect(const char* ssid, const char* pass)
@@ -336,7 +340,7 @@ int ezlopi_wait_for_wifi_to_connect(uint32_t wait_time_ms)
 
 static ll_ezlopi_wifi_event_upcall_t* ezlopi_wifi_event_upcall_create(f_ezlopi_wifi_event_upcall upcall, void* arg)
 {
-    ll_ezlopi_wifi_event_upcall_t* _upcall = malloc(sizeof(ll_ezlopi_wifi_event_upcall_t));
+    ll_ezlopi_wifi_event_upcall_t* _upcall = ezlopi_malloc(__FUNCTION__, sizeof(ll_ezlopi_wifi_event_upcall_t));
     if (_upcall)
     {
         _upcall->arg = arg;
@@ -410,7 +414,7 @@ void ezlopi_wifi_scan_stop()
 
     if (ap_record)
     {
-        free(ap_record);
+        ezlopi_free(__FUNCTION__, ap_record);
         ap_record = NULL;
     }
 }
@@ -464,27 +468,27 @@ static void __event_wifi_scan_done(void* event_data)
         if (scan_event_param->status == 0)
         {
             total_wifi_APs_available = scan_event_param->number;
-            ap_record = (wifi_ap_record_t*)malloc(total_wifi_APs_available * sizeof(wifi_ap_record_t));
+            ap_record = (wifi_ap_record_t*)ezlopi_malloc(__FUNCTION__, total_wifi_APs_available * sizeof(wifi_ap_record_t));
             ESP_ERROR_CHECK(esp_wifi_scan_get_ap_records(&total_wifi_APs_available, ap_record));
-            cJSON* network_array = cJSON_CreateArray();
+            cJSON* network_array = cJSON_CreateArray(__FUNCTION__);
             if (network_array)
             {
                 char temporary[50];
                 for (int i = 0; i < total_wifi_APs_available; i++)
                 {
-                    cJSON* network_data = cJSON_CreateObject();
+                    cJSON* network_data = cJSON_CreateObject(__FUNCTION__);
                     if (network_data)
                     {
                         memset(temporary, 0, 50);
                         memcpy(temporary, ap_record[i].ssid, 33);
-                        cJSON_AddStringToObject(network_data, "ssid", temporary);
+                        cJSON_AddStringToObject(__FUNCTION__, network_data, "ssid", temporary);
                         memset(temporary, 0, 50);
                         snprintf(temporary, 50, "%02x:%02x:%02x:%02x:%02x:%02x", ap_record[i].bssid[0], ap_record[i].bssid[1], ap_record[i].bssid[2],
                             ap_record[i].bssid[3], ap_record[i].bssid[0], ap_record[i].bssid[5]);
-                        cJSON_AddStringToObject(network_data, "bssid", temporary);
-                        cJSON_AddNumberToObject(network_data, "rssi", ap_record[i].rssi);
+                        cJSON_AddStringToObject(__FUNCTION__, network_data, "bssid", temporary);
+                        cJSON_AddNumberToObject(__FUNCTION__, network_data, "rssi", ap_record[i].rssi);
                         get_auth_mode_str(temporary, ap_record[i].authmode);
-                        cJSON_AddStringToObject(network_data, "security", temporary);
+                        cJSON_AddStringToObject(__FUNCTION__, network_data, "security", temporary);
                         cJSON_AddItemToArray(network_array, network_data);
                     }
                 }
@@ -492,7 +496,7 @@ static void __event_wifi_scan_done(void* event_data)
                 ezlopi_core_device_value_update_wifi_scan_broadcast(network_array);
             }
 
-            free(ap_record);
+            ezlopi_free(__FUNCTION__, ap_record);
             ap_record = NULL;
         }
     }

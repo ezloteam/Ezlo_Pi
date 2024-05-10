@@ -24,14 +24,14 @@ static void load_custom_libs(lua_State *L)
 }
 
 static const char *prg =
-        "gpio.set_direction(" GPIO_PIN ", 2)\n"
-        "level = 1\n"
-        "for i = 1, 100 do\n"
-        "  print(string.format(\"Iteration %d..., GPIO5=%d\", i, level))\n"
-        "  gpio.set_level(" GPIO_PIN ", level)\n"
-        "  level = 1 - level\n"
-        "  rtos.delay(500)\n"
-        "end\n";
+"gpio.set_direction(" GPIO_PIN ", 2)\n"
+"level = 1\n"
+"for i = 1, 100 do\n"
+"  print(string.format(\"Iteration %d..., GPIO5=%d\", i, level))\n"
+"  gpio.set_level(" GPIO_PIN ", level)\n"
+"  level = 1 - level\n"
+"  rtos.delay(500)\n"
+"end\n";
 
 static void report(lua_State *L, int status)
 {

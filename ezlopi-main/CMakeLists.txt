@@ -12,14 +12,15 @@ set(EZLOPI_SDK_COMPONENTS
 # Define ezlopi-components
 set(EZLOPI_COMPONENTS
         pt
+        ezlopi-core-heap
         ezlopi-util-trace
-        ezlopi-util-heap
 )
 
 # Define core components
 set(EZLOPI_CORE_COMPONENTS 
         ezlopi-core-ezlopi
         ezlopi-core-processes
+        ezlopi-core-reset
 )
 
 # Define HAL components

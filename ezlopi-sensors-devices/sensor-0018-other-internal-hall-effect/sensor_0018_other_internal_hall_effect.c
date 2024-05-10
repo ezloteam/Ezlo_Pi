@@ -19,6 +19,7 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "sensor_0018_other_internal_hall_effect.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 const char* hall_door_window_states[] = {
     "dw_is_opened",
@@ -115,7 +116,7 @@ static int __prepare(void* arg)
     if (arg && prep_arg->cjson_device)
     {
         cJSON* cj_device = prep_arg->cjson_device;
-        s_hall_data_t* user_data = (s_hall_data_t*)malloc(sizeof(s_hall_data_t));
+        s_hall_data_t* user_data = (s_hall_data_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_hall_data_t));
         if (user_data)
         {
             memset(user_data, 0, sizeof(s_hall_data_t));
@@ -132,13 +133,13 @@ static int __prepare(void* arg)
                 else
                 {
                     ezlopi_device_free_device(hall_device);
-                    free(user_data);
+                    ezlopi_free(__FUNCTION__, user_data);
                     ret = -1;
                 }
             }
             else
             {
-                free(user_data);
+                ezlopi_free(__FUNCTION__, user_data);
                 ret = -1;
             }
         }
@@ -199,22 +200,22 @@ static int __get_item_cjson(l_ezlopi_item_t* item, void* arg)
             if (cj_result)
             {
                 //-------------------  POSSIBLE JSON ENUM LPGNTENTS ----------------------------------
-                cJSON* json_array_enum = cJSON_CreateArray();
+                cJSON* json_array_enum = cJSON_CreateArray(__FUNCTION__);
                 if (NULL != json_array_enum)
                 {
                     for (uint8_t i = 0; i < HALL_DOOR_WINDOW_MAX; i++)
                     {
-                        cJSON* json_value = cJSON_CreateString(hall_door_window_states[i]);
+                        cJSON* json_value = cJSON_CreateString(__FUNCTION__, hall_door_window_states[i]);
                         if (NULL != json_value)
                         {
                             cJSON_AddItemToArray(json_array_enum, json_value);
                         }
                     }
-                    cJSON_AddItemToObject(cj_result, ezlopi_enum_str, json_array_enum);
+                    cJSON_AddItemToObject(__FUNCTION__, cj_result, ezlopi_enum_str, json_array_enum);
                 }
                 //--------------------------------------------------------------------------------------
-                cJSON_AddStringToObject(cj_result, ezlopi_value_str, user_data->hall_state);
-                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, user_data->hall_state);
+                cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, user_data->hall_state);
+                cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, user_data->hall_state);
             }
             ret = 1;
         }
@@ -233,8 +234,8 @@ static int __get_value_cjson(l_ezlopi_item_t* item, void* arg)
             cJSON* cj_result = (cJSON*)arg;
             if (cj_result)
             {
-                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, user_data->hall_state);
-                cJSON_AddStringToObject(cj_result, ezlopi_value_str, user_data->hall_state);
+                cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, user_data->hall_state);
+                cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, user_data->hall_state);
             }
             ret = 1;
         }

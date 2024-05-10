@@ -23,6 +23,7 @@
 #include "ezlopi_core_processes.h"
 
 #include "ezlopi_service_ota.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 #define HASH_LEN 32
 
@@ -59,7 +60,7 @@ void ezlopi_ota_start(cJSON* url)
 {
     if (url && url->valuestring)
     {
-        char* ota_url = (char*)malloc(OTA_URL_SIZE);
+        char* ota_url = (char*)ezlopi_malloc(__FUNCTION__, OTA_URL_SIZE);
         memcpy(ota_url, url->valuestring, OTA_URL_SIZE);
         if (0 == __ota_in_process)
         {
@@ -70,7 +71,7 @@ void ezlopi_ota_start(cJSON* url)
         else
         {
             TRACE_W("Ota in progress...");
-            free(ota_url);
+            ezlopi_free(__FUNCTION__, ota_url);
             ota_url = NULL;
         }
     }
@@ -152,7 +153,7 @@ static void ezlopi_ota_process(void* pv)
     vTaskDelete(NULL);
 
     if (url)
-        free(url);
+        ezlopi_free(__FUNCTION__, url);
 }
 
 static esp_err_t _http_event_handler(esp_http_client_event_t* evt)

@@ -94,6 +94,13 @@ menu "EzloPi User Config"
         default n
         help
             Enable OTA
+
+    config EZPI_ENABLE_PING 
+        depends on EZPI_ENABLE_WIFI || EZPI_CORE_ENABLE_ETH
+        bool "Enable ping"
+        default n
+        help
+            Enable Ping
     
     config EZPI_ENABLE_UART_PROVISIONING
         bool "Enable UART provisioning"

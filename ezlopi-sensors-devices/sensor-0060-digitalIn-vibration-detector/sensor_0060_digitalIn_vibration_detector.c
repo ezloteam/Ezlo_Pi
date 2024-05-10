@@ -172,23 +172,23 @@ static int __0060_get_item(l_ezlopi_item_t* item, void* arg)
         if (cj_result)
         {
             //-------------------  POSSIBLE JSON ENUM LPGNTENTS ----------------------------------
-            cJSON* json_array_enum = cJSON_CreateArray();
+            cJSON* json_array_enum = cJSON_CreateArray(__FUNCTION__);
             if (NULL != json_array_enum)
             {
                 for (uint8_t i = 0; i < SW420_VIBRATION_ACTIVITY_MAX; i++)
                 {
-                    cJSON* json_value = cJSON_CreateString(Sw420_vibration_activity_state_token[i]);
+                    cJSON* json_value = cJSON_CreateString(__FUNCTION__, Sw420_vibration_activity_state_token[i]);
                     if (NULL != json_value)
                     {
                         cJSON_AddItemToArray(json_array_enum, json_value);
                     }
                 }
-                cJSON_AddItemToObject(cj_result, ezlopi_enum_str, json_array_enum);
+                cJSON_AddItemToObject(__FUNCTION__, cj_result, ezlopi_enum_str, json_array_enum);
             }
             //--------------------------------------------------------------------------------------
 
-            cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, (char*)item->user_arg ? item->user_arg : Sw420_vibration_activity_state_token[0]);
-            cJSON_AddStringToObject(cj_result, ezlopi_value_str, (char*)item->user_arg ? item->user_arg : Sw420_vibration_activity_state_token[0]);
+            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, (char*)item->user_arg ? item->user_arg : Sw420_vibration_activity_state_token[0]);
+            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, (char*)item->user_arg ? item->user_arg : Sw420_vibration_activity_state_token[0]);
             ret = 1;
         }
     }
@@ -202,8 +202,8 @@ static int __0060_get_cjson_value(l_ezlopi_item_t* item, void* arg)
         cJSON* cj_result = (cJSON*)arg;
         if (cj_result)
         {
-            cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, (char*)item->user_arg ? item->user_arg : Sw420_vibration_activity_state_token[0]);
-            cJSON_AddStringToObject(cj_result, ezlopi_value_str, (char*)item->user_arg ? item->user_arg : Sw420_vibration_activity_state_token[0]);
+            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, (char*)item->user_arg ? item->user_arg : Sw420_vibration_activity_state_token[0]);
+            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, (char*)item->user_arg ? item->user_arg : Sw420_vibration_activity_state_token[0]);
             ret = 1;
         }
     }

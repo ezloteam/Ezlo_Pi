@@ -14,6 +14,7 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "sensor_0005_I2C_MPU6050.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 static int __prepare(void* arg);
 static int __init(l_ezlopi_item_t* item);
@@ -112,7 +113,7 @@ static int __prepare(void* arg)
     if (prep_arg && prep_arg->cjson_device)
     {
         cJSON* cj_device = prep_arg->cjson_device;
-        s_mpu6050_data_t* user_data = (s_mpu6050_data_t*)malloc(sizeof(s_mpu6050_data_t));
+        s_mpu6050_data_t* user_data = (s_mpu6050_data_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_mpu6050_data_t));
         if (NULL != user_data)
         {
             memset(user_data, 0, sizeof(s_mpu6050_data_t));
@@ -273,13 +274,13 @@ static int __prepare(void* arg)
                     (NULL == mpu6050_child_gyro_z_device))
                 {
                     ezlopi_device_free_device(mpu6050_parent_acc_x_device);
-                    free(user_data);
+                    ezlopi_free(__FUNCTION__, user_data);
                     ret = -1;
                 }
             }
             else
             {
-                free(user_data);
+                ezlopi_free(__FUNCTION__, user_data);
                 ret = -1;
             }
         }

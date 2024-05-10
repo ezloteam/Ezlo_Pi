@@ -50,7 +50,6 @@ static void ezlopi_ble_start_secure_gatt_server_open_pairing(void);
 
 void ezlopi_ble_service_init(void)
 {
-
     ezlopi_ble_service_wifi_profile_init();
     ezlopi_ble_service_security_init();
     ezlopi_ble_service_provisioning_init();
@@ -157,12 +156,16 @@ static void ezlopi_ble_basic_init(void)
             mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
     }
 
-    // dump("ble_device_name", ble_device_name, 0, 32);
+    // dump("ble_device_name", ble_device_name, 0, sizeof(ble_device_name));
 
     static esp_bt_controller_config_t bt_cfg = BT_CONTROLLER_INIT_CONFIG_DEFAULT();
     ESP_ERROR_CHECK(esp_bt_controller_mem_release(ESP_BT_MODE_CLASSIC_BT));
     CHECK_PRINT_ERROR(esp_bt_controller_init(&bt_cfg), "initialize controller failed");
+#if defined(CONFIG_IDF_TARGET_ESP32S3)
     CHECK_PRINT_ERROR(esp_bt_controller_enable(ESP_BT_MODE_BLE), "enable controller failed");
+#elif defined(CONFIG_IDF_TARGET_ESP32)
+    CHECK_PRINT_ERROR(esp_bt_controller_enable(ESP_BT_MODE_BTDM), "enable controller failed");
+#endif
     CHECK_PRINT_ERROR(esp_bluedroid_init(), "init bluetooth failed");
     CHECK_PRINT_ERROR(esp_bluedroid_enable(), "enable bluetooth failed");
     CHECK_PRINT_ERROR(esp_ble_gatts_register_callback(ezlopi_ble_gatts_event_handler), "gatts register error, error code");

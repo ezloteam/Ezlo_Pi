@@ -4,6 +4,7 @@
 #include "ezlopi_util_trace.h"
 #include "ezlopi_service_ws_server.h"
 #include "ezlopi_service_ws_server_clients.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 static uint32_t __number_of_clients = 0;
 static l_ws_server_client_conn_t *l_client_conn_head = NULL;
@@ -84,7 +85,7 @@ int ezlopi_service_ws_server_clients_remove_by_handle(void *http_handle)
         if (ws_popped_con)
         {
             __number_of_clients--;
-            free(ws_popped_con);
+            ezlopi_free(__FUNCTION__, ws_popped_con);
         }
     }
 
@@ -128,7 +129,7 @@ l_ws_server_client_conn_t *ezlopi_service_ws_server_clients_pop(void *http_handl
 
 l_ws_server_client_conn_t *__create_new_client(void *http_handle, int http_descriptor)
 {
-    l_ws_server_client_conn_t *ws_client_conn = malloc(sizeof(l_ws_server_client_conn_t));
+    l_ws_server_client_conn_t *ws_client_conn = ezlopi_malloc(__FUNCTION__, sizeof(l_ws_server_client_conn_t));
     if (ws_client_conn)
     {
         memset(ws_client_conn, 0, sizeof(l_ws_server_client_conn_t));

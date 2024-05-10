@@ -12,6 +12,7 @@
 #include "ezlopi_core_processes.h"
 
 #include "ezlopi_service_gpioisr.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 static QueueHandle_t gpio_evt_queue = NULL;
 static const uint32_t default_debounce_time = 1000;
@@ -40,7 +41,7 @@ void gpio_isr_service_init(void)
 
 void gpio_isr_service_register_v3(l_ezlopi_item_t* item, f_interrupt_upcall_t __upcall, TickType_t debounce_ms)
 {
-    s_event_arg_t* event_arg = malloc(sizeof(s_event_arg_t));
+    s_event_arg_t* event_arg = ezlopi_malloc(__FUNCTION__, sizeof(s_event_arg_t));
 
     if (event_arg)
     {
@@ -97,7 +98,7 @@ static void IRAM_ATTR __gpio_isr_handler(void* arg)
 #if 0
 void gpio_isr_service_register(s_ezlopi_device_properties_t* properties, f_interrupt_upcall_t __upcall, TickType_t debounce_ms)
 {
-    s_event_arg_t* event_arg = malloc(sizeof(s_event_arg_t));
+    s_event_arg_t* event_arg = ezlopi_malloc(__FUNCTION__, sizeof(s_event_arg_t));
 
     if (event_arg)
     {

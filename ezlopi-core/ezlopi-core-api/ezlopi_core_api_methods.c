@@ -78,15 +78,15 @@ uint32_t ezlopi_core_ezlopi_methods_search_in_list(cJSON* cj_method)
 
 void ezlopi_core_ezlopi_methods_rpc_method_notfound(cJSON* cj_request, cJSON* cj_response)
 {
-    cJSON* cjson_error = cJSON_AddObjectToObject(cj_response, ezlopi_error_str);
+    cJSON* cjson_error = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_error_str);
     if (cjson_error)
     {
-        cJSON_AddNumberToObject(cjson_error, ezlopi_code_str, -32602);
-        cJSON_AddStringToObject(cjson_error, ezlopi_data_str, ezlopi_rpc_method_notfound_str);
-        cJSON_AddStringToObject(cjson_error, ezlopi_message_str, ezlopi_Unknown_method_str);
+        cJSON_AddNumberToObject(__FUNCTION__, cjson_error, ezlopi_code_str, -32602);
+        cJSON_AddStringToObject(__FUNCTION__, cjson_error, ezlopi_data_str, ezlopi_rpc_method_notfound_str);
+        cJSON_AddStringToObject(__FUNCTION__, cjson_error, ezlopi_message_str, ezlopi_Unknown_method_str);
     }
 
-    cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
+    cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
 }
 
 void ezlopi_core_ezlopi_methods_registration_init(void)

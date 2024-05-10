@@ -10,6 +10,7 @@
 
 #include "pms5003.h"
 #include "sensor_0037_pms5003_sensor.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 // Device 0
 static int __prepare_particulate_matter_particles_0_dot_3_um_device_and_items(cJSON *cj_properties, uint32_t *parent_id, void *user_arg)
@@ -482,7 +483,7 @@ int pms5003_sensor_preapre_devices_and_items(cJSON *cj_properties, uint32_t *par
 {
     int ret = 0;
 
-    s_pms5003_sensor_object *pms_object = (s_pms5003_sensor_object *)malloc(sizeof(s_pms5003_sensor_object));
+    s_pms5003_sensor_object *pms_object = (s_pms5003_sensor_object *)ezlopi_malloc(__FUNCTION__, sizeof(s_pms5003_sensor_object));
     if (pms_object)
     {
         pms5003_set_pms_object_details(cj_properties, pms_object);
