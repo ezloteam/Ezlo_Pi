@@ -1,6 +1,7 @@
 #include <string.h>
 #include "ezlopi_util_trace.h"
 #include "gyGPS6MV2.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 //-------------------------------------------------------------------------
 // GPGGA MESSAGE PARSING FUNCTION
@@ -10,7 +11,7 @@ void parse_and_assign_GPGGA_message(GPS6MV2_t *sensor_0053_UART_gps6mv2_data)
 {
     // TRACE_W("GPGGA_sentence => %s", sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.GPGGA_sentence);
     uint8_t len = strlen(sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.GPGGA_sentence); // length => contents
-    char *dummy_container = (char *)malloc((len + 1));
+    char *dummy_container = (char *)ezlopi_malloc(__FUNCTION__, (len + 1));
     if (NULL != dummy_container)
     {
         // duplicate the original message into dummy container ---> to perform parsing
@@ -280,7 +281,7 @@ void parse_and_assign_GPGGA_message(GPS6MV2_t *sensor_0053_UART_gps6mv2_data)
                 break;
             }
         }
-        free(dummy_container);
+        ezlopi_free(__FUNCTION__, dummy_container);
     }
 
     //-------------------------------------------------------------------------

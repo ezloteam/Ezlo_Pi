@@ -2,6 +2,7 @@
 #include "gxhtc3.h"
 #include "driver/i2c.h"
 #include "ezlopi_util_trace.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 static uint8_t gxhtc3_get_crc8(uint8_t *data, int len)
 {
@@ -16,7 +17,7 @@ static uint8_t gxhtc3_get_crc8(uint8_t *data, int len)
         {
             bool xor = crc & 0x80;
             crc = crc << 1;
-            crc = xor? crc ^ crc_poly : crc;
+            crc = xor ? crc ^ crc_poly : crc;
         }
     }
 
@@ -40,7 +41,7 @@ static bool gxhtc3_send_command(s_gxhtc3_sensor_handler_t *handler, uint16_t cmd
     bool ret = true;
     if (handler)
     {
-        uint8_t data[2] = {cmd >> 8, cmd & 0xff};
+        uint8_t data[2] = { cmd >> 8, cmd & 0xff };
         esp_err_t err = i2c_master_write_to_device(handler->i2c_ch_num, handler->i2c_slave_addr, data, 2, GXHTC3_I2C_TIMEOUT);
         if (err != ESP_OK)
         {
@@ -215,7 +216,7 @@ bool GXHTC3_read_sensor(s_gxhtc3_sensor_handler_t *handler)
 
 s_gxhtc3_sensor_handler_t *GXHTC3_init(int32_t i2c_ch_num, uint8_t i2c_slave_addr)
 {
-    s_gxhtc3_sensor_handler_t *gxhtc3_handler = (s_gxhtc3_sensor_handler_t *)malloc(sizeof(s_gxhtc3_sensor_handler_t));
+    s_gxhtc3_sensor_handler_t *gxhtc3_handler = (s_gxhtc3_sensor_handler_t *)ezlopi_malloc(__FUNCTION__, sizeof(s_gxhtc3_sensor_handler_t));
 
     if (gxhtc3_handler)
     {
@@ -225,7 +226,7 @@ s_gxhtc3_sensor_handler_t *GXHTC3_init(int32_t i2c_ch_num, uint8_t i2c_slave_add
 
         if (!gxhtc3_reset(gxhtc3_handler))
         {
-            free(gxhtc3_handler);
+            ezlopi_free(__FUNCTION__, gxhtc3_handler);
             gxhtc3_handler = NULL;
         }
         else

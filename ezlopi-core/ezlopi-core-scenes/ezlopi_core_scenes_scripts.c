@@ -22,6 +22,7 @@
 #include "ezlopi_core_processes.h"
 
 #include "ezlopi_cloud_constants.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 static l_ezlopi_scenes_script_t* script_head = NULL;
 
@@ -99,10 +100,10 @@ void ezlopi_scenes_scripts_delete_by_id(uint32_t script_id)
 
         if (script_to_delete->code)
         {
-            free(script_to_delete->code);
+            ezlopi_free(__FUNCTION__, script_to_delete->code);
         }
 
-        free(script_to_delete);
+        ezlopi_free(__FUNCTION__, script_to_delete);
     }
 }
 
@@ -165,7 +166,7 @@ void ezlopi_scenes_scripts_run_by_id(uint32_t script_id)
 
 void ezlopi_scenes_scripts_update(cJSON* cj_script)
 {
-    cJSON* cj_script_id = cJSON_DetachItemFromObject(cj_script, ezlopi__id_str);
+    cJSON* cj_script_id = cJSON_DetachItemFromObject(__FUNCTION__, cj_script, ezlopi__id_str);
 
     if (cj_script_id)
     {
@@ -180,37 +181,37 @@ void ezlopi_scenes_scripts_update(cJSON* cj_script)
                 {
                     if (script_node->code)
                     {
-                        free(script_node->code);
+                        ezlopi_free(__FUNCTION__, script_node->code);
                     }
 
                     {
-                        cJSON* cj_name = cJSON_GetObjectItem(cj_script, ezlopi_name_str);
+                        cJSON* cj_name = cJSON_GetObjectItem(__FUNCTION__, cj_script, ezlopi_name_str);
                         if (cj_name && cj_name->valuestring)
                         {
-                            uint32_t len = strlen(cj_name->valuestring) + 1;
+                            // uint32_t len = strlen(cj_name->valuestring) + 1;
                             snprintf(script_node->name, sizeof(script_node->name), "%s", cj_name->valuestring);
                         }
                     }
 
                     {
-                        cJSON* cj_code = cJSON_GetObjectItem(cj_script, ezlopi_code_str);
+                        cJSON* cj_code = cJSON_GetObjectItem(__FUNCTION__, cj_script, ezlopi_code_str);
                         if (cj_code && cj_code->valuestring)
                         {
                             uint32_t len = strlen(cj_code->valuestring) + 1;
-                            script_node->code = malloc(len);
+                            script_node->code = ezlopi_malloc(__FUNCTION__, len);
                             if (script_node->code) {
                                 snprintf(script_node->code, len, "%s", cj_code->valuestring);
                             }
                         }
                     }
 
-                    char* script_to_update = cJSON_PrintBuffered(cj_script, 4096, false);
+                    char* script_to_update = cJSON_PrintBuffered(__FUNCTION__, cj_script, 4096, false);
                     TRACE_D("length of 'script_to_update': %d", strlen(script_to_update));
 
                     if (script_to_update)
                     {
                         ezlopi_nvs_write_str(script_to_update, strlen(script_to_update), cj_script_id->valuestring);
-                        free(script_to_update);
+                        ezlopi_free(__FUNCTION__, script_to_update);
                     }
 
                     break;
@@ -220,7 +221,7 @@ void ezlopi_scenes_scripts_update(cJSON* cj_script)
             }
         }
 
-        cJSON_Delete(cj_script_id);
+        cJSON_Delete(__FUNCTION__, cj_script_id);
     }
 }
 
@@ -305,35 +306,35 @@ static void __scripts_add_script_id(uint32_t script_id)
         script_ids_str_free = false;
     }
 
-    cJSON* cj_script_ids = cJSON_Parse(script_ids_str);
+    cJSON* cj_script_ids = cJSON_Parse(__FUNCTION__, script_ids_str);
     if (cj_script_ids)
     {
-        cJSON* cj_script_id = cJSON_CreateNumber(script_id);
+        cJSON* cj_script_id = cJSON_CreateNumber(__FUNCTION__, script_id);
         if (cj_script_id)
         {
             if (cJSON_AddItemToArray(cj_script_ids, cj_script_id))
             {
-                char* script_ids_str_updated = cJSON_PrintBuffered(cj_script_ids, 1024, false);
+                char* script_ids_str_updated = cJSON_PrintBuffered(__FUNCTION__, cj_script_ids, 1024, false);
                 TRACE_D("length of 'script_ids_str_updated': %d", strlen(script_ids_str_updated));
 
                 if (script_ids_str_updated)
                 {
                     ezlopi_nvs_write_scenes_scripts(script_ids_str_updated);
-                    free(script_ids_str_updated);
+                    ezlopi_free(__FUNCTION__, script_ids_str_updated);
                 }
             }
             else
             {
-                cJSON_Delete(cj_script_id);
+                cJSON_Delete(__FUNCTION__, cj_script_id);
             }
         }
 
-        cJSON_Delete(cj_script_ids);
+        cJSON_Delete(__FUNCTION__, cj_script_ids);
     }
 
     if (script_ids_str_free) // only free in case of read from nvs otehrwise do not free
     {
-        free(script_ids_str);
+        ezlopi_free(__FUNCTION__, script_ids_str);
     }
 }
 
@@ -342,7 +343,7 @@ static void __scripts_remove_id_and_update_list(uint32_t script_id)
     char* scripts_ids_str = ezlopi_nvs_read_scenes_scripts();
     if (scripts_ids_str)
     {
-        cJSON* cj_scripts_ids = cJSON_Parse(scripts_ids_str);
+        cJSON* cj_scripts_ids = cJSON_Parse(__FUNCTION__, scripts_ids_str);
         if (cj_scripts_ids)
         {
             int array_size = cJSON_GetArraySize(cj_scripts_ids);
@@ -354,16 +355,16 @@ static void __scripts_remove_id_and_update_list(uint32_t script_id)
                     if (script_id == cj_script_id->valuedouble)
                     {
                         TRACE_D("Removing (%d: %08x) script from list!", i, script_id);
-                        cJSON_DeleteItemFromArray(cj_scripts_ids, i);
+                        cJSON_DeleteItemFromArray(__FUNCTION__, cj_scripts_ids, i);
 
-                        char* scripts_ids_str_updated = cJSON_PrintBuffered(cj_scripts_ids, 1024, false);
+                        char* scripts_ids_str_updated = cJSON_PrintBuffered(__FUNCTION__, cj_scripts_ids, 1024, false);
                         TRACE_D("length of 'scripts_ids_str_updated': %d", strlen(scripts_ids_str_updated));
 
                         if (scripts_ids_str_updated)
                         {
                             ezlopi_nvs_write_scenes_scripts(scripts_ids_str_updated);
 
-                            free(scripts_ids_str_updated);
+                            ezlopi_free(__FUNCTION__, scripts_ids_str_updated);
                         }
 
                         break;
@@ -371,10 +372,10 @@ static void __scripts_remove_id_and_update_list(uint32_t script_id)
                 }
             }
 
-            cJSON_Delete(cj_scripts_ids);
+            cJSON_Delete(__FUNCTION__, cj_scripts_ids);
         }
 
-        free(scripts_ids_str);
+        ezlopi_free(__FUNCTION__, scripts_ids_str);
     }
 }
 
@@ -384,7 +385,7 @@ static void __scripts_nvs_parse(void)
 
     if (script_ids)
     {
-        cJSON* cj_script_ids = cJSON_Parse(script_ids);
+        cJSON* cj_script_ids = cJSON_Parse(__FUNCTION__, script_ids);
         if (cj_script_ids)
         {
             int array_size = cJSON_GetArraySize(cj_script_ids);
@@ -402,13 +403,13 @@ static void __scripts_nvs_parse(void)
                     char* script_str = ezlopi_nvs_read_str(script_id_str);
                     if (script_str)
                     {
-                        cJSON* cj_script = cJSON_Parse(script_str);
+                        cJSON* cj_script = cJSON_Parse(__FUNCTION__, script_str);
                         if (cj_script)
                         {
                             ezlopi_scenes_scripts_add_to_head(script_id, cj_script);
                         }
 
-                        free(script_str);
+                        ezlopi_free(__FUNCTION__, script_str);
                     }
                     else
                     {
@@ -417,10 +418,10 @@ static void __scripts_nvs_parse(void)
                 }
             }
 
-            cJSON_Delete(cj_script_ids);
+            cJSON_Delete(__FUNCTION__, cj_script_ids);
         }
 
-        free(script_ids);
+        ezlopi_free(__FUNCTION__, script_ids);
     }
 }
 
@@ -430,8 +431,8 @@ static l_ezlopi_scenes_script_t* __scripts_create_node(uint32_t script_id, cJSON
 
     if (cj_script)
     {
-        cJSON* cj_script_name = cJSON_GetObjectItem(cj_script, ezlopi_name_str);
-        cJSON* cj_script_code = cJSON_GetObjectItem(cj_script, ezlopi_code_str);
+        cJSON* cj_script_name = cJSON_GetObjectItem(__FUNCTION__, cj_script, ezlopi_name_str);
+        cJSON* cj_script_code = cJSON_GetObjectItem(__FUNCTION__, cj_script, ezlopi_code_str);
 
         if (cj_script_name && cj_script_name->valuestring && cj_script_code && cj_script_code->string)
         {
@@ -442,7 +443,7 @@ static l_ezlopi_scenes_script_t* __scripts_create_node(uint32_t script_id, cJSON
             else
             {
                 script_id = ezlopi_cloud_generate_script_id();
-                char* script_str = cJSON_PrintBuffered(cj_script, 4096, false);
+                char* script_str = cJSON_PrintBuffered(__FUNCTION__, cj_script, 4096, false);
                 TRACE_D("length of 'script_str': %d", strlen(script_str));
 
                 if (script_str)
@@ -450,12 +451,12 @@ static l_ezlopi_scenes_script_t* __scripts_create_node(uint32_t script_id, cJSON
                     char scrpt_id_str[32];
                     snprintf(scrpt_id_str, sizeof(scrpt_id_str), "%08x", script_id);
                     ezlopi_nvs_write_str(script_str, strlen(script_str), scrpt_id_str);
-                    free(script_str);
+                    ezlopi_free(__FUNCTION__, script_str);
                     __scripts_add_script_id(script_id);
                 }
             }
 
-            new_script = (l_ezlopi_scenes_script_t*)malloc(sizeof(l_ezlopi_scenes_script_t));
+            new_script = (l_ezlopi_scenes_script_t*)ezlopi_malloc(__FUNCTION__, sizeof(l_ezlopi_scenes_script_t));
             if (new_script)
             {
                 memset(new_script, 0, sizeof(l_ezlopi_scenes_script_t));
@@ -463,12 +464,12 @@ static l_ezlopi_scenes_script_t* __scripts_create_node(uint32_t script_id, cJSON
                 new_script->script_handle = NULL;
                 new_script->state = SCRIPT_STATE_NONE;
 
-                uint32_t script_name_size = strlen(cj_script_name->valuestring) + 1;
+                // uint32_t script_name_size = strlen(cj_script_name->valuestring) + 1;
                 snprintf(new_script->name, sizeof(new_script->name), "%s", cj_script_name->valuestring);
 
 
                 uint32_t script_code_size = strlen(cj_script_code->valuestring) + 1;
-                new_script->code = (char*)malloc(script_code_size);
+                new_script->code = (char*)ezlopi_malloc(__FUNCTION__, script_code_size);
                 if (new_script->code)
                 {
                     snprintf(new_script->code, script_code_size, "%s", cj_script_code->valuestring);

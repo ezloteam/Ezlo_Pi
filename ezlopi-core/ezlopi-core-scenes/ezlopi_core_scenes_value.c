@@ -31,7 +31,7 @@ e_scene_value_type_v2_t ezlopi_core_scenes_value_get_type(cJSON* cj_root, const 
 
     if (cj_root && (NULL == cj_root->valuestring))
     {
-        cJSON* cj_value_type = cJSON_GetObjectItem(cj_root, type_key_str);
+        cJSON *cj_value_type = cJSON_GetObjectItem(__FUNCTION__, cj_root, type_key_str);
         if (cj_value_type && cj_value_type->valuestring)
         {
             value_type_str = cj_value_type->valuestring;

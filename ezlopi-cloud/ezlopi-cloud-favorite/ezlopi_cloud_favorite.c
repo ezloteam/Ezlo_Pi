@@ -14,12 +14,12 @@ void favorite_list_v3(cJSON* cj_request, cJSON* cj_response)
     cJSON* cj_items_req = NULL;
     // cJSON *cj_rules_req = NULL;
 
-    cJSON* cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
-    cJSON* cj_param = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
+    cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+    cJSON* cj_param = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
 
     if (cj_param && cj_param->valuestring)
     {
-        cJSON* cj_request_list = cJSON_GetObjectItem(cj_param, "request");
+        cJSON* cj_request_list = cJSON_GetObjectItem(__FUNCTION__, cj_param, "request");
         if (cj_request_list && cj_request_list->valuestring)
         {
             int array_size = cJSON_GetArraySize(cj_request_list);
@@ -47,12 +47,12 @@ void favorite_list_v3(cJSON* cj_request, cJSON* cj_response)
 
     if (cj_result)
     {
-        cJSON* cj_favorites = cJSON_AddObjectToObject(cj_result, "favorites");
+        cJSON* cj_favorites = cJSON_AddObjectToObject(__FUNCTION__, cj_result, "favorites");
         if (cj_favorites)
         {
-            cJSON* cj_device_list = cj_devices_req ? cJSON_AddArrayToObject(cj_favorites, "devices") : NULL;
-            // cJSON *cj_items_list = cj_items_req ? cJSON_AddArrayToObject(cj_favorites, ezlopi_items_str) : NULL;
-            // cJSON *cj_rules_list = cj_rules_req ? cJSON_AddArrayToObject(cj_favorites, "rules") : NULL;
+            cJSON* cj_device_list = cj_devices_req ? cJSON_AddArrayToObject(__FUNCTION__, cj_favorites, "devices") : NULL;
+            // cJSON *cj_items_list = cj_items_req ? cJSON_AddArrayToObject(__FUNCTION__, cj_favorites, ezlopi_items_str) : NULL;
+            // cJSON *cj_rules_list = cj_rules_req ? cJSON_AddArrayToObject(__FUNCTION__, cj_favorites, "rules") : NULL;
 
             l_ezlopi_device_t* curr_device = ezlopi_device_get_head();
             while (curr_device)
@@ -61,14 +61,14 @@ void favorite_list_v3(cJSON* cj_request, cJSON* cj_response)
                 while (curr_item)
                 {
                     #warning "Needs works here [Krishna]"
-                        cJSON* cj_device = cJSON_CreateObject();
+                        cJSON* cj_device = cJSON_CreateObject(__FUNCTION__);
                     if (cj_device)
                     {
-                        cJSON_AddStringToObject(cj_device, ezlopi__id_str, ezlopi__str);
+                        cJSON_AddStringToObject(__FUNCTION__, cj_device, ezlopi__id_str, ezlopi__str);
 
                         if (!cJSON_AddItemToArray(cj_device_list, cj_device))
                         {
-                            cJSON_Delete(cj_device);
+                            cJSON_Delete(__FUNCTION__, cj_device);
                         }
                     }
                     curr_item = curr_item->next;

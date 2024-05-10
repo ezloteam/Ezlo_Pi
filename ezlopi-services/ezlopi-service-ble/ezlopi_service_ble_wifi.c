@@ -88,7 +88,7 @@ static void wifi_creds_parse_and_connect(uint8_t* value, uint32_t len)
 {
     if ((NULL != value) && (len > 0))
     {
-        cJSON* root = cJSON_Parse((const char*)value);
+        cJSON* root = cJSON_Parse(__FUNCTION__, (const char*)value);
 
         if (root)
         {
@@ -120,7 +120,7 @@ static void wifi_creds_parse_and_connect(uint8_t* value, uint32_t len)
                 }
             }
 
-            cJSON_Delete(root);
+            cJSON_Delete(__FUNCTION__, root);
         }
     }
 }

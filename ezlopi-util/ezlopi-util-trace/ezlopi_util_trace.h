@@ -17,7 +17,8 @@ extern "C"
 #define ENABLE_TRACE 0
 #endif // CONFIG_EZPI_UTIL_TRACE_EN
 
-
+    // void trace_color_print(const char* txt_color, uint8_t severity, const char* format, ...);
+    void trace_color_print(const char* txt_color, uint8_t severity, const char* file, int line, const char* format, ...);
     void __dump(const char* file_name, uint32_t line, char* buffer_name, void* _buff, uint32_t ofs, uint32_t cnt);
 
 #ifndef __FILENAME__
@@ -44,14 +45,14 @@ extern "C"
 #define COLOR_BG_CYAN "46"
 #define COLOR_BG_WHITE "47"
 
-    typedef int (*f_ezlopi_log_upcall_t)(int severity_level, const char* format, ...);
+    typedef int (*f_ezlopi_log_upcall_t)(int severity_level, const char* log_str);
 
 #define trace_color(txt_color, X, reg...)                                                 \
     {                                                                                     \
         printf("\x1B[%sm %s[%d]:" X "\x1B[0m\r\n", txt_color, __FILE__, __LINE__, ##reg); \
     }
 
-
+#if 0
 #define trace_color_print(txt_color, severity, X, reg...)                                                                               \
     {                                                                                                                                   \
         f_ezlopi_log_upcall_t log_upcall_func = ezlopi_util_get_cloud_log_upcall();                                                     \
@@ -65,17 +66,17 @@ extern "C"
             log_upcall_func(severity, "\x1B[%sm %s[%d]:" X "\x1B[0m\r\n", txt_color, __FILE__, __LINE__, ##reg);                        \
         }                                                                                                                               \
     }
-
+#endif 
 #define trace(X, reg...)                                       \
     {                                                          \
         printf("%s[%d]:" X "\r\n", __FILE__, __LINE__, ##reg); \
     }
 
-#define trace_log_sev_error(X, reg...)  trace_color_print(COLOR_FONT_RED, 0, X, ##reg)
-#define trace_log_sev_warning(X, reg...) trace_color_print(COLOR_FONT_YELLOW, 1, X, ##reg)
-#define trace_log_sev_info(X, reg...) trace_color_print(COLOR_FONT_BLUE, 2, X, ##reg)
-#define trace_log_sev_debug(X, reg...) trace_color_print(COLOR_FONT_WHITE, 3, X, ##reg)
-#define trace_log_sev_trace(X, reg...) trace_color_print(COLOR_FONT_GREEN, 4, X, ##reg)
+#define trace_log_sev_error(X, reg...)  trace_color_print(COLOR_FONT_RED, 1, __FILE__, __LINE__, X, ##reg)
+#define trace_log_sev_warning(X, reg...) trace_color_print(COLOR_FONT_YELLOW, 2, __FILE__, __LINE__, X, ##reg)
+#define trace_log_sev_info(X, reg...) trace_color_print(COLOR_FONT_BLUE, 3, __FILE__, __LINE__, X, ##reg)
+#define trace_log_sev_debug(X, reg...) trace_color_print(COLOR_FONT_WHITE, 4, __FILE__, __LINE__, X, ##reg)
+#define trace_log_sev_trace(X, reg...) trace_color_print(COLOR_FONT_GREEN, 5, __FILE__, __LINE__, X, ##reg)
 
 #define trace_debug(X, reg...) trace_color(COLOR_FONT_WHITE, X, ##reg)
 #define trace_information(X, reg...) trace_color(COLOR_FONT_BLUE, X, ##reg)
@@ -137,7 +138,7 @@ extern "C"
 #define trace_yw(X, reg...)
 #define trace_wb(X, reg...)
 
-#endif
+#endif // (1 == ENABLE_TRACE)
 
 #ifdef __cplusplus
 }

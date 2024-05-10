@@ -84,7 +84,7 @@ static void __modes_service(void* pv)
 
                         if (new_house_mode->cj_bypass_devices)
                         {
-                            cJSON_Delete(new_house_mode->cj_bypass_devices);
+                            cJSON_Delete(__FUNCTION__, new_house_mode->cj_bypass_devices);
                             new_house_mode->cj_bypass_devices = NULL;
                         }
 
@@ -95,7 +95,7 @@ static void __modes_service(void* pv)
 
                         if (0 == ezlopi_core_ezlopi_broadcast_add_to_queue(cj_update))
                         {
-                            cJSON_Delete(cj_update);
+                            cJSON_Delete(__FUNCTION__, cj_update);
                         }
                     }
                 }

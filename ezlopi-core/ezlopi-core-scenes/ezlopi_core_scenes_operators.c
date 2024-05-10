@@ -109,17 +109,17 @@ double ezlopi_core_scenes_operator_get_item_double_value_current(uint32_t item_i
         {
             if (item->cloud_properties.item_id == item_id)
             {
-                cJSON* cj_item_value = cJSON_CreateObject();
+                cJSON* cj_item_value = cJSON_CreateObject(__FUNCTION__);
                 if (cj_item_value)
                 {
                     item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item, (void*)cj_item_value, NULL);
-                    cJSON* cj_value = cJSON_GetObjectItem(cj_item_value, ezlopi_value_str);
+                    cJSON* cj_value = cJSON_GetObjectItem(__FUNCTION__, cj_item_value, ezlopi_value_str);
                     if (cj_value)
                     {
                         item_value = cj_value->valuedouble;
                     }
 
-                    cJSON_Delete(cj_item_value);
+                    cJSON_Delete(__FUNCTION__, cj_item_value);
                 }
 
                 break;
@@ -145,7 +145,7 @@ int ezlopi_scenes_operators_value_number_operations(l_fields_v2_t* item_exp_fiel
         //---------------------- LHS -------------------------
         if (EZLOPI_VALUE_TYPE_EXPRESSION == item_exp_field->value_type)
         {
-            s_ezlopi_expressions_t* curr_expr_left = ezlopi_scenes_get_expression_node_by_name(item_exp_field->field_value.u_value.value_string);
+            // s_ezlopi_expressions_t* curr_expr_left = ezlopi_scenes_get_expression_node_by_name(item_exp_field->field_value.u_value.value_string);
             #warning "extract the double from expression";
             item_exp_value = 0;
         }
@@ -157,7 +157,7 @@ int ezlopi_scenes_operators_value_number_operations(l_fields_v2_t* item_exp_fiel
         //---------------------- RHS -------------------------
         if (EZLOPI_VALUE_TYPE_EXPRESSION == value_field->value_type)
         {
-            s_ezlopi_expressions_t* curr_expr_right = ezlopi_scenes_get_expression_node_by_name(value_field->field_value.u_value.value_string);
+            // s_ezlopi_expressions_t* curr_expr_right = ezlopi_scenes_get_expression_node_by_name(value_field->field_value.u_value.value_string);
             #warning "extract the double from expression";
             value_to_compare_with = 0;
         }
@@ -312,11 +312,11 @@ char* ezlopi_core_scenes_operator_get_item_string_value_current_by_id(uint32_t i
         {
             if (item->cloud_properties.item_id == item_id)
             {
-                cJSON* cj_item_value = cJSON_CreateObject();
+                cJSON* cj_item_value = cJSON_CreateObject(__FUNCTION__);
                 if (cj_item_value)
                 {
                     item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item, (void*)cj_item_value, NULL);
-                    cJSON* cj_value = cJSON_GetObjectItem(cj_item_value, ezlopi_value_str);
+                    cJSON* cj_value = cJSON_GetObjectItem(__FUNCTION__, cj_item_value, ezlopi_value_str);
                     if (cj_value)
                     {
                         if (cJSON_IsString(cj_value))
@@ -324,7 +324,7 @@ char* ezlopi_core_scenes_operator_get_item_string_value_current_by_id(uint32_t i
                             item_value = cJSON_GetStringValue(cj_value);
                         }
                     }
-                    cJSON_Delete(cj_item_value);
+                    cJSON_Delete(__FUNCTION__, cj_item_value);
                 }
                 break;
             }
@@ -683,7 +683,6 @@ const char* ezlopi_scenes_inarr_comparator_operators_get_method(e_scene_inarr_cm
     }
     return ret;
 }
-
 int ezlopi_scenes_operators_value_inarr_operations(l_fields_v2_t* item_exp_field, l_fields_v2_t* value_field, l_fields_v2_t* operation_field)
 {
     int ret = 0;
@@ -693,7 +692,7 @@ int ezlopi_scenes_operators_value_inarr_operations(l_fields_v2_t* item_exp_field
         //------------------------------------------------
         if (EZLOPI_VALUE_TYPE_EXPRESSION == item_exp_field->value_type)
         {
-            s_ezlopi_expressions_t* curr_expr_left = ezlopi_scenes_get_expression_node_by_name(item_exp_field->field_value.u_value.value_string);
+            // s_ezlopi_expressions_t* curr_expr_left = ezlopi_scenes_get_expression_node_by_name(item_exp_field->field_value.u_value.value_string);
             #warning "extract the 'string' from expression";
             item_exp_value_str = NULL;
         }
@@ -842,6 +841,7 @@ int ezlopi_scenes_operators_value_with_less_operations(uint32_t item_id, l_field
     if (item_id && value_field && comparator_field)
     {
         double item_value = 0.0;
+        cJSON* cj_item_value = cJSON_CreateObject(__FUNCTION__);
         l_ezlopi_device_t* device = ezlopi_device_get_head();
         while (device)
         {
@@ -850,11 +850,11 @@ int ezlopi_scenes_operators_value_with_less_operations(uint32_t item_id, l_field
             {
                 if (item->cloud_properties.item_id == item_id)
                 {
-                    cJSON* cj_item_value = cJSON_CreateObject();
+                    cJSON* cj_item_value = cJSON_CreateObject(__FUNCTION__);
                     if (cj_item_value)
                     {
                         item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item, (void*)cj_item_value, NULL);
-                        cJSON* cj_value = cJSON_GetObjectItem(cj_item_value, ezlopi_value_str);
+                        cJSON* cj_value = cJSON_GetObjectItem(__FUNCTION__, cj_item_value, ezlopi_value_str);
                         if (cj_value)
                         {
                             #warning "Krishna needs to complete this"
@@ -910,7 +910,10 @@ int ezlopi_scenes_operators_value_with_less_operations(uint32_t item_id, l_field
         }
         }
 
-
+        if (cj_item_value)
+        {
+            cJSON_Delete(__FUNCTION__, cj_item_value);
+        }
     }
 
     return ret;
@@ -991,6 +994,7 @@ int ezlopi_scenes_operators_value_without_less_operations(uint32_t item_id, l_fi
     if (item_id && value_field && comparator_field)
     {
         double item_value = 0.0;
+        cJSON* cj_item_value = cJSON_CreateObject(__FUNCTION__);
         l_ezlopi_device_t* device = ezlopi_device_get_head();
         while (device)
         {
@@ -999,11 +1003,11 @@ int ezlopi_scenes_operators_value_without_less_operations(uint32_t item_id, l_fi
             {
                 if (item->cloud_properties.item_id == item_id)
                 {
-                    cJSON* cj_item_value = cJSON_CreateObject();
+                    cJSON* cj_item_value = cJSON_CreateObject(__FUNCTION__);
                     if (cj_item_value)
                     {
                         item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item, (void*)cj_item_value, NULL);
-                        cJSON* cj_value = cJSON_GetObjectItem(cj_item_value, ezlopi_value_str);
+                        cJSON* cj_value = cJSON_GetObjectItem(__FUNCTION__, cj_item_value, ezlopi_value_str);
                         if (cj_value)
                         {
                             #warning "Krishna needs to complete this"
@@ -1041,14 +1045,16 @@ int ezlopi_scenes_operators_value_without_less_operations(uint32_t item_id, l_fi
         }
         }
 
-
+        if (cj_item_value)
+        {
+            cJSON_Delete(__FUNCTION__, cj_item_value);
+        }
     }
 
     return ret;
 }
 #endif
 /************* compareValues ************/
-
 int ezlopi_scenes_operators_value_comparevalues_without_less_operations(uint32_t item_id, l_fields_v2_t* value_field, l_fields_v2_t* value_type_field, l_fields_v2_t* comparator_field)
 {
     int ret = 0;
@@ -1066,12 +1072,12 @@ int ezlopi_scenes_operators_value_comparevalues_without_less_operations(uint32_t
                 {
                     if (STR_OP_COMP(value_type_field->field_value.u_value.value_string, == , item->cloud_properties.value_type)) // bool == bool?
                     {
-                        cJSON* cj_item_value = cJSON_CreateObject();
+                        cJSON* cj_item_value = cJSON_CreateObject(__FUNCTION__);
                         if (cj_item_value)
                         {
                             item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item, (void*)cj_item_value, NULL);
-                            item_value = cJSON_GetObjectItem(cj_item_value, ezlopi_value_str); // eg. double_type : 5.005  or string_type : "5.005"
-                            cJSON_Delete(cj_item_value);
+                            item_value = cJSON_GetObjectItem(__FUNCTION__, cj_item_value, ezlopi_value_str); // eg. double_type : 5.005  or string_type : "5.005"
+                            cJSON_Delete(__FUNCTION__, cj_item_value);
                         }
                     }
                     else
@@ -1129,6 +1135,7 @@ int ezlopi_scenes_operators_value_comparevalues_without_less_operations(uint32_t
     return ret;
 }
 
+
 int ezlopi_scenes_operators_value_comparevalues_with_less_operations(l_fields_v2_t* item_exp_field, l_fields_v2_t* value_field, l_fields_v2_t* value_type_field, l_fields_v2_t* comparator_field)
 {
     int ret = 0;
@@ -1141,26 +1148,26 @@ int ezlopi_scenes_operators_value_comparevalues_with_less_operations(l_fields_v2
         {
             s_ezlopi_expressions_t* curr_expr_left = ezlopi_scenes_get_expression_node_by_name(item_exp_field->field_value.u_value.value_string);
 
-            cJSON* cj_item_value = cJSON_CreateObject();
+            cJSON* cj_item_value = cJSON_CreateObject(__FUNCTION__);
             if (cj_item_value)
             {
                 if (0 == strncmp(value_type_field->field_value.u_value.value_string, "bool", 5))
                 {
-                    item_exp_value = cJSON_AddBoolToObject(cj_item_value, ezlopi_value_str, curr_expr_left->exp_value.u_value.boolean_value);
+                    item_exp_value = cJSON_AddBoolToObject(__FUNCTION__, cj_item_value, ezlopi_value_str, curr_expr_left->exp_value.u_value.boolean_value);
                 }
                 else if (0 == strncmp(value_type_field->field_value.u_value.value_string, "number", 7))
                 {
-                    item_exp_value = cJSON_AddNumberToObject(cj_item_value, ezlopi_value_str, curr_expr_left->exp_value.u_value.number_value);
+                    item_exp_value = cJSON_AddNumberToObject(__FUNCTION__, cj_item_value, ezlopi_value_str, curr_expr_left->exp_value.u_value.number_value);
                 }
                 else if (0 == strncmp(value_type_field->field_value.u_value.value_string, "string", 7))
                 {
-                    item_exp_value = cJSON_AddStringToObject(cj_item_value, ezlopi_value_str, curr_expr_left->exp_value.u_value.str_value);
+                    item_exp_value = cJSON_AddStringToObject(__FUNCTION__, cj_item_value, ezlopi_value_str, curr_expr_left->exp_value.u_value.str_value);
                 }
                 else
                 {
                     ret = 0; // SCENES_WHEN_TYPE_MISMATCH error
                 }
-                cJSON_Delete(cj_item_value);
+                cJSON_Delete(__FUNCTION__, cj_item_value);
             }
 
         }
@@ -1179,12 +1186,12 @@ int ezlopi_scenes_operators_value_comparevalues_with_less_operations(l_fields_v2
                     {
                         if (STR_OP_COMP(value_type_field->field_value.u_value.value_string, == , item->cloud_properties.value_type)) // bool == bool?
                         {
-                            cJSON* cj_item_value = cJSON_CreateObject();
+                            cJSON* cj_item_value = cJSON_CreateObject(__FUNCTION__);
                             if (cj_item_value)
                             {
                                 item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item, (void*)cj_item_value, NULL);
-                                item_exp_value = cJSON_GetObjectItem(cj_item_value, ezlopi_value_str); // "5.0"
-                                cJSON_Delete(cj_item_value);
+                                item_exp_value = cJSON_GetObjectItem(__FUNCTION__, cj_item_value, ezlopi_value_str); // "5.0"
+                                cJSON_Delete(__FUNCTION__, cj_item_value);
                             }
                         }
                         else
@@ -1299,6 +1306,7 @@ int ezlopi_scenes_operators_value_comparevalues_with_less_operations(l_fields_v2
     return ret;
 }
 
+
 /************* NUMERIC RANGE *************/
 int ezlopi_scenes_operators_value_number_range_operations(uint32_t item_id, l_fields_v2_t* start_value_field, l_fields_v2_t* end_value_field, l_fields_v2_t* comparator_field)
 {
@@ -1314,11 +1322,11 @@ int ezlopi_scenes_operators_value_number_range_operations(uint32_t item_id, l_fi
             {
                 if (item->cloud_properties.item_id == item_id) // find the correct " item " within the device
                 {
-                    cJSON* cj_item_value = cJSON_CreateObject();
+                    cJSON* cj_item_value = cJSON_CreateObject(__FUNCTION__);
                     if (cj_item_value)
                     {
                         item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item, (void*)cj_item_value, NULL);
-                        cJSON* item_valuetype = cJSON_GetObjectItem(cj_item_value, ezlopi_valueType_str);
+                        cJSON* item_valuetype = cJSON_GetObjectItem(__FUNCTION__, cj_item_value, ezlopi_valueType_str);
                         const char* str_item_type = NULL;
                         if (item_valuetype && cJSON_IsString(item_valuetype) && (NULL != (str_item_type = cJSON_GetStringValue(item_valuetype))))
                         {
@@ -1330,13 +1338,13 @@ int ezlopi_scenes_operators_value_number_range_operations(uint32_t item_id, l_fi
                             if (STR_OP_COMP(tmp_valuetype, == , str_item_type)) // 'int' == 'int'?
                             {
                                 // now check if scale matches
-                                cJSON* item_scale = cJSON_GetObjectItem(cj_item_value, ezlopi_scale_str);
+                                cJSON* item_scale = cJSON_GetObjectItem(__FUNCTION__, cj_item_value, ezlopi_scale_str);
                                 const char* str_scale_tmp = NULL;
                                 if (item_scale && cJSON_IsString(item_scale) && (NULL != (str_scale_tmp = cJSON_GetStringValue(item_scale))))
                                 {
                                     if (STR_OP_COMP(start_value_field->scale, == , str_scale_tmp)) // 'NULL' == 'NULL'
                                     {
-                                        cJSON* cj_value = cJSON_GetObjectItem(cj_item_value, ezlopi_value_str); // extract the value from " item " within the device
+                                        cJSON* cj_value = cJSON_GetObjectItem(__FUNCTION__, cj_item_value, ezlopi_value_str); // extract the value from " item " within the device
                                         if (cj_value)
                                         {                          // extract the item_value ;
                                             item_value = cj_value; // here the value maybe (int , float , string , bool)
@@ -1349,7 +1357,7 @@ int ezlopi_scenes_operators_value_number_range_operations(uint32_t item_id, l_fi
                                 }
                             }
                         }
-                        cJSON_Delete(cj_item_value);
+                        cJSON_Delete(__FUNCTION__, cj_item_value);
                     }
                     break;
                 }
@@ -1422,6 +1430,7 @@ int ezlopi_scenes_operators_value_number_range_operations(uint32_t item_id, l_fi
     return ret;
 }
 
+
 /************* Has atleast one dictornary Value *************/
 int ezlopi_scenes_operators_has_atleastone_dictionary_value_operations(uint32_t item_id, l_fields_v2_t* value_field)
 {
@@ -1437,11 +1446,11 @@ int ezlopi_scenes_operators_has_atleastone_dictionary_value_operations(uint32_t 
             {
                 if (item->cloud_properties.item_id == item_id)
                 {
-                    cJSON* cj_item_value = cJSON_CreateObject();
+                    cJSON* cj_item_value = cJSON_CreateObject(__FUNCTION__);
                     if (cj_item_value)
                     {
                         item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item, (void*)cj_item_value, NULL);
-                        cJSON* cj_valuetype = cJSON_GetObjectItem(cj_item_value, ezlopi_valueType_str); // first check the item_type -> 'valueType'
+                        cJSON* cj_valuetype = cJSON_GetObjectItem(__FUNCTION__, cj_item_value, ezlopi_valueType_str); // first check the item_type -> 'valueType'
                         const char* str_item_type = NULL;
                         if (cj_valuetype && cJSON_IsString(cj_valuetype) && (NULL != (str_item_type = cJSON_GetStringValue(cj_valuetype)))) // type => dictionary
                         {
@@ -1455,14 +1464,14 @@ int ezlopi_scenes_operators_has_atleastone_dictionary_value_operations(uint32_t 
 
                             if (STR_OP_COMP("dictionary", == , str_item_type)) // 'dictionary' == 'dictionary'?
                             {
-                                cJSON* cj_value = cJSON_GetObjectItem(cj_item_value, ezlopi_value_str); // item_value -> dictionary ; [array or object]
+                                cJSON* cj_value = cJSON_GetObjectItem(__FUNCTION__, cj_item_value, ezlopi_value_str); // item_value -> dictionary ; [array or object]
                                 if (cj_value)
                                 {
                                     item_value = cj_value;
                                 }
                             }
                         }
-                        cJSON_Delete(cj_item_value);
+                        cJSON_Delete(__FUNCTION__, cj_item_value);
                     }
                     break;
                 }
@@ -1476,7 +1485,7 @@ int ezlopi_scenes_operators_has_atleastone_dictionary_value_operations(uint32_t 
             if (cJSON_IsObject(item_value))
             {
                 // Check if ["value":"low_battery"] key is present
-                cJSON* dictionaryValue = cJSON_GetObjectItem(item_value, value_field->field_value.u_value.value_string);
+                cJSON* dictionaryValue = cJSON_GetObjectItem(__FUNCTION__, item_value, value_field->field_value.u_value.value_string);
                 if (NULL != dictionaryValue) // if the "eg. low_battery" element exists within the dictionary
                 {
                     ret = 1;
@@ -1488,6 +1497,7 @@ int ezlopi_scenes_operators_has_atleastone_dictionary_value_operations(uint32_t 
 
     return ret;
 }
+
 
 /************* isDictornary Changed *************/
 int ezlopi_scenes_operators_is_dictionary_changed_operations(l_scenes_list_v2_t* scene_node, uint32_t item_id, l_fields_v2_t* key_field, l_fields_v2_t* operation_field)
@@ -1505,24 +1515,24 @@ int ezlopi_scenes_operators_is_dictionary_changed_operations(l_scenes_list_v2_t*
             {
                 if (item->cloud_properties.item_id == item_id)
                 {
-                    cJSON* cj_item_value = cJSON_CreateObject();
+                    cJSON* cj_item_value = cJSON_CreateObject(__FUNCTION__);
                     if (cj_item_value)
                     {
                         item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item, (void*)cj_item_value, NULL);
-                        cJSON* cj_valuetype = cJSON_GetObjectItem(cj_item_value, ezlopi_valueType_str); // first check the item_type -> 'valueType'
+                        cJSON* cj_valuetype = cJSON_GetObjectItem(__FUNCTION__, cj_item_value, ezlopi_valueType_str); // first check the item_type -> 'valueType'
                         const char* str_item_type = NULL;
                         if (cj_valuetype && cJSON_IsString(cj_valuetype) && (NULL != (str_item_type = cJSON_GetStringValue(cj_valuetype)))) // type => dictionary
                         {
                             if (STR_OP_COMP("dictionary", == , str_item_type)) // 'dictionary' == 'dictionary'?
                             {
-                                cJSON* cj_value = cJSON_GetObjectItem(cj_item_value, ezlopi_value_str); // item_value -> dictionary ; [array or object]
+                                cJSON* cj_value = cJSON_GetObjectItem(__FUNCTION__, cj_item_value, ezlopi_value_str); // item_value -> dictionary ; [array or object]
                                 if (cj_value)
                                 {
                                     item_value = cj_value;
                                 }
                             }
                         }
-                        cJSON_Delete(cj_item_value);
+                        cJSON_Delete(__FUNCTION__, cj_item_value);
                     }
 
                     break;
@@ -1539,7 +1549,7 @@ int ezlopi_scenes_operators_is_dictionary_changed_operations(l_scenes_list_v2_t*
                 if (0 == strncmp("added", operation_field->field_value.u_value.value_string, 6))
                 {
                     // Check if ["key":"key_1"] key is present
-                    cJSON* dictionaryValue = cJSON_GetObjectItem(item_value, key_field->field_value.u_value.value_string);
+                    cJSON* dictionaryValue = cJSON_GetObjectItem(__FUNCTION__, item_value, key_field->field_value.u_value.value_string);
                     if (NULL != dictionaryValue) // if the "eg. key_1" element exists within the dictionary
                     {
                         ret = 1;
@@ -1548,7 +1558,7 @@ int ezlopi_scenes_operators_is_dictionary_changed_operations(l_scenes_list_v2_t*
                 else if (0 == strncmp("removed", operation_field->field_value.u_value.value_string, 8))
                 {
                     // Check if ["key":"key_1"] key is absent
-                    cJSON* dictionaryValue = cJSON_GetObjectItem(item_value, key_field->field_value.u_value.value_string);
+                    cJSON* dictionaryValue = cJSON_GetObjectItem(__FUNCTION__, item_value, key_field->field_value.u_value.value_string);
                     if (NULL == dictionaryValue) // if the "eg. key_1" element exists within the dictionary
                     {
                         ret = 1;
@@ -1557,7 +1567,7 @@ int ezlopi_scenes_operators_is_dictionary_changed_operations(l_scenes_list_v2_t*
                 else if (0 == strncmp("updated", operation_field->field_value.u_value.value_string, 8))
                 {
                     // Check if ["key":"key_1"] key is present and its elemnt
-                    cJSON* dictionaryValue = cJSON_GetObjectItem(item_value, key_field->field_value.u_value.value_string);
+                    cJSON* dictionaryValue = cJSON_GetObjectItem(__FUNCTION__, item_value, key_field->field_value.u_value.value_string);
                     if (NULL != dictionaryValue) // if the "eg. key_1" element exists within the dictionary
                     {
                         cJSON* last_dictionary_item = (cJSON*)scene_node->when_block->fields->user_arg;

@@ -3,9 +3,10 @@
 #ifndef _EZLOPI_CORE_PROCESSES_H
 #define _EZLOPI_CORE_PROCESSES_H
 
-#include <cJSON.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
+
+#include "cjext.h"
 
 #define EZLOPI_MINIMAL_STACK_SIZE                                   ( 2048 )
 
@@ -22,7 +23,7 @@
 #define EZLOPI_CORE_SCENES_SCRIPT_PROCESS_TASK_DEPTH                ( 2 * EZLOPI_MINIMAL_STACK_SIZE )
 #define EZLOPI_CORE_WIFI_SCANNER_TASK_DEPTH                         ( 2 * EZLOPI_MINIMAL_STACK_SIZE )
 
-#define EZLOPI_MAIN_BLINKY_TASK_DEPTH                               ( 2 * EZLOPI_MINIMAL_STACK_SIZE )
+#define EZLOPI_MAIN_BLINKY_TASK_DEPTH                               ( 6 * EZLOPI_MINIMAL_STACK_SIZE )
 
 #define EZLOPI_HAL_UART_TASK_DEPTH                                  ( 2 * EZLOPI_MINIMAL_STACK_SIZE )
 
@@ -48,7 +49,7 @@
 #define EZLOPI_SERVICE_MODES_TASK_DEPTH                             ( 2 * EZLOPI_MINIMAL_STACK_SIZE )
 #define EZLOPI_SERVICE_OTA_PROCESS_TASK_DEPTH                       ( 2 * EZLOPI_MINIMAL_STACK_SIZE )
 #define EZLOPI_SERVICE_TIMER_TASK_DEPTH                             ( 2 * EZLOPI_MINIMAL_STACK_SIZE )
-#define EZLOPI_SERVICE_UART_TASK_DEPTH                              ( 1 * EZLOPI_MINIMAL_STACK_SIZE )
+#define EZLOPI_SERVICE_UART_TASK_DEPTH                              ( 2 * EZLOPI_MINIMAL_STACK_SIZE )
 #define EZLOPI_SERVICE_WEB_PROV_CONFIG_CHECK_TASK_DEPTH             ( 4 * EZLOPI_MINIMAL_STACK_SIZE )
 #define EZLOPI_SERVICE_WEB_PROV_FETCH_WSS_TASK_DEPTH                ( 3 * EZLOPI_MINIMAL_STACK_SIZE )
 #define EZLOPI_SERVICE_LED_INDICATOR_TASK_DEPTH                     ( 2 * EZLOPI_MINIMAL_STACK_SIZE )
@@ -100,8 +101,7 @@ typedef enum {
     ENUM_EZLOPI_SERVICE_LED_INDICATOR_TASK,
 
     ENUM_TASK_MAX
-}e_ezlopi_task_enum_t;
-
+} e_ezlopi_task_enum_t;
 
 #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
 int ezlopi_core_get_processes_details(cJSON* cj_processes_array);

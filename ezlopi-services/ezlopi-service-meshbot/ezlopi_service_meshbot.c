@@ -12,8 +12,9 @@
 
 #include "ezlopi_cloud_constants.h"
 
-#include "ezlopi_service_meshbot.h"
 #include "pt.h"
+#include "ezlopi_service_meshbot.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 typedef struct s_thread_ctx
 {
@@ -188,7 +189,7 @@ void ezlopi_scenes_meshbot_init(void)
         {
             start_thread = 1;
 
-            s_thread_ctx_t* thread_ctx = malloc(sizeof(s_thread_ctx_t));
+            s_thread_ctx_t* thread_ctx = ezlopi_malloc(__FUNCTION__, sizeof(s_thread_ctx_t));
             if (thread_ctx)
             {
                 memset(thread_ctx, 0, sizeof(s_thread_ctx_t));
@@ -369,7 +370,7 @@ PT_THREAD(__scene_proto_thread(l_scenes_list_v2_t* scene_node, uint32_t routine_
         if (EZLOPI_SCENE_STATUS_STOP == scene_node->status)
         {
             ezlopi_scenes_status_change_broadcast(scene_node, scene_status_stopped_str);
-            free(scene_node->thread_ctx);
+            ezlopi_free(__FUNCTION__, scene_node->thread_ctx);
             scene_node->thread_ctx = NULL;
             scene_node->status = EZLOPI_SCENE_STATUS_STOPPED;
             break;
@@ -437,7 +438,7 @@ static int __execute_scene_start(l_scenes_list_v2_t* scene_node)
     int ret = 0;
     if (scene_node && (NULL == scene_node->thread_ctx))
     {
-        scene_node->thread_ctx = (void*)malloc(sizeof(s_thread_ctx_t));
+        scene_node->thread_ctx = (void*)ezlopi_malloc(__FUNCTION__, sizeof(s_thread_ctx_t));
         if (scene_node->thread_ctx)
         {
             memset(scene_node->thread_ctx, 0, sizeof(s_thread_ctx_t));

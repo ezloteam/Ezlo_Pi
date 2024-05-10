@@ -12,6 +12,7 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "sensor_0033_ADC_turbidity.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 static int __prepare(void* arg);
 static int __init(l_ezlopi_item_t* item);
@@ -69,18 +70,18 @@ static int __get_item_list(l_ezlopi_item_t* item, void* arg)
     cJSON* cjson_propertise = (cJSON*)arg;
     if (cjson_propertise)
     {
-        cJSON* json_array_enum = cJSON_CreateArray();
+        cJSON* json_array_enum = cJSON_CreateArray(__FUNCTION__);
         if (NULL != json_array_enum)
         {
             for (uint8_t i = 0; i < TURBIDITY__MAX; i++)
             {
-                cJSON* json_value = cJSON_CreateString(water_filter_replacement_alarm_states[i]);
+                cJSON* json_value = cJSON_CreateString(__FUNCTION__, water_filter_replacement_alarm_states[i]);
                 if (NULL != json_value)
                 {
                     cJSON_AddItemToArray(json_array_enum, json_value);
                 }
             }
-            cJSON_AddItemToObject(cjson_propertise, ezlopi_enum_str, json_array_enum);
+            cJSON_AddItemToObject(__FUNCTION__, cjson_propertise, ezlopi_enum_str, json_array_enum);
         }
 
         s_ezlopi_analog_data_t ezlopi_analog_data = { .value = 0, .voltage = 0 };
@@ -99,13 +100,13 @@ static int __get_item_list(l_ezlopi_item_t* item, void* arg)
 
         if (ezlopi_water_present_turbidity_state)
         {
-            cJSON_AddStringToObject(cjson_propertise, ezlopi_value_str, ezlopi_water_present_turbidity_state);
-            cJSON_AddStringToObject(cjson_propertise, ezlopi_valueFormatted_str, ezlopi_water_present_turbidity_state);
+            cJSON_AddStringToObject(__FUNCTION__, cjson_propertise, ezlopi_value_str, ezlopi_water_present_turbidity_state);
+            cJSON_AddStringToObject(__FUNCTION__, cjson_propertise, ezlopi_valueFormatted_str, ezlopi_water_present_turbidity_state);
         }
         else
         {
-            cJSON_AddStringToObject(cjson_propertise, ezlopi_value_str, water_filter_replacement_alarm_states[TURBIDITY__UNKNOWN]);
-            cJSON_AddStringToObject(cjson_propertise, ezlopi_valueFormatted_str, water_filter_replacement_alarm_states[TURBIDITY__UNKNOWN]);
+            cJSON_AddStringToObject(__FUNCTION__, cjson_propertise, ezlopi_value_str, water_filter_replacement_alarm_states[TURBIDITY__UNKNOWN]);
+            cJSON_AddStringToObject(__FUNCTION__, cjson_propertise, ezlopi_valueFormatted_str, water_filter_replacement_alarm_states[TURBIDITY__UNKNOWN]);
         }
         ret = 1;
     }
@@ -149,8 +150,8 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
         char* turbidity_sensor_state = (char*)item->user_arg;
         if (turbidity_sensor_state)
         {
-            cJSON_AddStringToObject(cj_result, ezlopi_value_str, turbidity_sensor_state);
-            cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, turbidity_sensor_state);
+            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, turbidity_sensor_state);
+            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, turbidity_sensor_state);
         }
         ret = 1;
     }
@@ -223,7 +224,7 @@ static int __prepare(void* arg)
             l_ezlopi_item_t* item_turbidity = ezlopi_device_add_item_to_device(device, sensor_0033_ADC_turbidity);
             if (item_turbidity)
             {
-                char* turbidity_sensor_states = (char*)malloc(40 * sizeof(char));
+                char* turbidity_sensor_states = (char*)ezlopi_malloc(__FUNCTION__, 40 * sizeof(char));
                 if (turbidity_sensor_states)
                 {
                     memset(turbidity_sensor_states, 0, sizeof(s_ezlopi_analog_data_t));

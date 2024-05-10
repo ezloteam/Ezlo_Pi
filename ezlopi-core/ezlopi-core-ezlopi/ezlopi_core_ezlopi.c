@@ -1,3 +1,5 @@
+#include "../../build/config/sdkconfig.h"
+
 #include "esp_event.h"
 
 #include "EZLOPI_USER_CONFIG.h"
@@ -33,8 +35,9 @@ void ezlopi_init(void)
     // Init memories  
     ezlopi_nvs_init();
 
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
     ezlopi_core_read_set_log_severities();
-
+#endif // CONFIG_EZPI_UTIL_TRACE_EN
     EZPI_HAL_uart_init();
 
 #if defined(CONFIG_EZPI_WEBSOCKET_CLIENT) || defined(CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER)
@@ -45,7 +48,6 @@ void ezlopi_init(void)
     ESP_ERROR_CHECK(esp_event_loop_create_default());
 
     ezlopi_factory_info_v3_init();
-
     print_factory_info_v3();
 
     ezlopi_event_group_create();
@@ -71,7 +73,7 @@ void ezlopi_init(void)
     ezlopi_scenes_scripts_init();
     ezlopi_scenes_expressions_init();
     ezlopi_scenes_init_v2();
-#endif // CONFIG_EZPI_SERV_MESHBOT_EN
+#endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 #if defined(CONFIG_EZPI_CORE_ENABLE_ETH)
     ezlopi_ethernet_init();
@@ -88,8 +90,10 @@ void ezlopi_init(void)
     ezlopi_event_queue_init();
 
 #if (defined(CONFIG_EZPI_ENABLE_WIFI) || defined(CONFIG_EZPI_CORE_ENABLE_ETH))
-    ezlopi_ping_init();
     EZPI_CORE_sntp_init();
+#ifdef CONFIG_EZPI_ENABLE_PING
+    ezlopi_ping_init();
+#endif // CONFIG_EZPI_ENABLE_PING
 #endif
 
     ezlopi_timer_start_1000ms();

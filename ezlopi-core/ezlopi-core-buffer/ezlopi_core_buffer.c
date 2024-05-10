@@ -4,6 +4,7 @@
 
 #include "ezlopi_util_trace.h"
 #include "ezlopi_core_buffer.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 static char *__buffer = NULL;
 static uint32_t __buffer_len = 0;
@@ -25,7 +26,7 @@ void ezlopi_core_buffer_deinit(void)
 
     if (__buffer)
     {
-        free(__buffer);
+        ezlopi_free(__FUNCTION__, __buffer);
         __buffer = NULL;
     }
 
@@ -42,13 +43,13 @@ void ezlopi_core_buffer_init(uint32_t len)
 
     if (__buffer)
     {
-        free(__buffer);
+        ezlopi_free(__FUNCTION__, __buffer);
         __buffer = NULL;
         __buffer_len = 0;
         __buffer_lock_state = EZ_BUFFER_STATE_NOT_INITIATED;
     }
 
-    __buffer = malloc(len);
+    __buffer = ezlopi_malloc(__FUNCTION__, len);
 
     if (__buffer)
     {
@@ -65,7 +66,7 @@ void ezlopi_core_buffer_init(uint32_t len)
             else
             {
                 __buffer_len = 0;
-                free(__buffer);
+                ezlopi_free(__FUNCTION__, __buffer);
                 __buffer = NULL;
                 __buffer_lock_state = EZ_BUFFER_STATE_NOT_INITIATED;
             }
@@ -92,20 +93,14 @@ void ezlopi_core_buffer_init(uint32_t len)
 char *ezlopi_core_buffer_acquire(uint32_t *len, uint32_t wait_to_acquired_ms)
 {
     char *ret = NULL;
-    uint32_t start_time = xTaskGetTickCount();
-
+    // uint32_t start_time = xTaskGetTickCount();
     if (__buffer_lock)
     {
         if (pdTRUE == xSemaphoreTake(__buffer_lock, wait_to_acquired_ms / portTICK_RATE_MS))
         {
-            // TRACE_I("acquired in: %d", xTaskGetTickCount() - start_time);
             ret = __buffer;
             *len = __buffer_len;
             __buffer_lock_state = EZ_BUFFER_STATE_BUSY;
-        }
-        else
-        {
-            // TRACE_E("waited for: %d", xTaskGetTickCount() - start_time);
         }
     }
 

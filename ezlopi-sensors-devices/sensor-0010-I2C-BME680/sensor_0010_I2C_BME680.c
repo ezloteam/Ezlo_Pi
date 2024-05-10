@@ -14,6 +14,7 @@
 
 #include "bme680_bsec.h"
 #include "sensor_0010_I2C_BME680.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 static int __prepare(void* arg);
 static int __init(l_ezlopi_item_t* item);
@@ -96,7 +97,7 @@ static int __prepare(void* arg)
     if (prep_arg && prep_arg->cjson_device)
     {
         cJSON* cj_device = prep_arg->cjson_device;
-        bme680_data_t* user_data = (bme680_data_t*)malloc(sizeof(bme680_data_t));
+        bme680_data_t* user_data = (bme680_data_t*)ezlopi_malloc(__FUNCTION__, sizeof(bme680_data_t));
         if (user_data)
         {
             memset(user_data, 0, sizeof(bme680_data_t));
@@ -229,7 +230,7 @@ static int __prepare(void* arg)
                     (NULL == child_co2_device))
                 {
                     ezlopi_device_free_device(parent_temp_humid_device);
-                    free(user_data);
+                    ezlopi_free(__FUNCTION__, user_data);
                     ret = -1;
                 }
             }

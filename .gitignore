@@ -70,7 +70,6 @@ _deps
 # Local History for Visual Studio Code
 **/.history/
 
-
 dependencies.lock
 sdkconfig.old
 sdkconfig
