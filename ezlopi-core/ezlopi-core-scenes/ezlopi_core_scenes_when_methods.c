@@ -23,7 +23,7 @@
 
 int ezlopi_scene_when_is_item_state(l_scenes_list_v2_t* scene_node, void* arg)
 {
-    TRACE_W(" is_item_state ");
+    // TRACE_W(" is_item_state ");
     int ret = 0;
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (when_block)
@@ -180,16 +180,16 @@ int ezlopi_scene_when_is_button_state(l_scenes_list_v2_t* scene_node, void* arg)
 
 int ezlopi_scene_when_is_sun_state(l_scenes_list_v2_t* scene_node, void* arg)
 {
-    TRACE_W(" is_SunState ");
+    // TRACE_W(" is_SunState ");
     int ret = 0;
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (when_block && scene_node)
     {
-        if (0 < ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 100, false))
-        {
-            TRACE_W("module not online");
-            return 0;
-        }
+        // if (0 < ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 100, false))
+        // {
+        //     TRACE_W("module not online");
+        //     return 0;
+        // }
 
         time_t rawtime = 0;
         time(&rawtime);
@@ -399,7 +399,7 @@ int ezlopi_scene_when_is_user_lock_operation(l_scenes_list_v2_t* scene_node, voi
 #if defined(CONFIG_EZPI_SERV_ENABLE_MODES)
 int ezlopi_scene_when_is_house_mode_changed_to(l_scenes_list_v2_t* scene_node, void* arg)
 {
-    TRACE_W(" isHouse_modechanged_to");
+    // TRACE_W(" isHouse_modechanged_to");
     int ret = 0;
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
 
@@ -448,7 +448,7 @@ int ezlopi_scene_when_is_house_mode_changed_to(l_scenes_list_v2_t* scene_node, v
 
 int ezlopi_scene_when_is_house_mode_changed_from(l_scenes_list_v2_t* scene_node, void* arg)
 {
-    TRACE_W(" isHouse_mode_changed_from");
+    // TRACE_W(" isHouse_mode_changed_from");
     int ret = 0;
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
 
@@ -500,7 +500,8 @@ int ezlopi_scene_when_is_house_mode_changed_from(l_scenes_list_v2_t* scene_node,
 
 int ezlopi_scene_when_is_House_Mode_Alarm_Phase_Range(l_scenes_list_v2_t* scene_node, void* arg)
 {
-    TRACE_W(" is_House_Mode_Alarm_Phase_Range ");
+    // TRACE_W(" is_House_Mode_Alarm_Phase_Range ");
+    TRACE_W("Warning: when-method 'is_House_Mode_Alarm_Phase_Range' not implemented!");
     int ret = 0;
 #if 0
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
@@ -536,7 +537,8 @@ int ezlopi_scene_when_is_House_Mode_Alarm_Phase_Range(l_scenes_list_v2_t* scene_
 
 int ezlopi_scene_when_is_House_Mode_Switch_to_Range(l_scenes_list_v2_t* scene_node, void* arg)
 {
-    TRACE_W(" is_House_Mode_Switch_to_Range ");
+    // TRACE_W(" is_House_Mode_Switch_to_Range ");
+    TRACE_W("Warning: when-method 'is_House_Mode_Switch_to_Range' not implemented!");
     int ret = 0;
 #if 0
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
@@ -561,7 +563,7 @@ int ezlopi_scene_when_is_House_Mode_Switch_to_Range(l_scenes_list_v2_t* scene_no
 
 int ezlopi_scene_when_is_device_state(l_scenes_list_v2_t* scene_node, void* arg)
 {
-    TRACE_W(" isDevice_state. ");
+    // TRACE_W(" isDevice_state. ");
     int ret = 0;
 
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
@@ -626,7 +628,7 @@ int ezlopi_scene_when_is_network_state(l_scenes_list_v2_t* scene_node, void* arg
 
 int ezlopi_scene_when_is_scene_state(l_scenes_list_v2_t* scene_node, void* arg)
 {
-    TRACE_W(" isScene_state ");
+    // TRACE_W(" isScene_state ");
     int ret = 0;
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (when_block && scene_node)
@@ -758,7 +760,7 @@ int ezlopi_scene_when_is_battery_level(l_scenes_list_v2_t* scene_node, void* arg
 
 int ezlopi_scene_when_compare_numbers(l_scenes_list_v2_t* scene_node, void* arg)
 {
-    TRACE_W(" Compare_num ");
+    // TRACE_W(" Compare_num ");
     int ret = 0;
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
 
@@ -814,7 +816,7 @@ int ezlopi_scene_when_compare_numbers(l_scenes_list_v2_t* scene_node, void* arg)
 
 int ezlopi_scene_when_compare_number_range(l_scenes_list_v2_t* scene_node, void* arg)
 {
-    TRACE_W(" Compare_num_range");
+    // TRACE_W(" Compare_num_range");
     int ret = 0;
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
 
@@ -911,7 +913,7 @@ int ezlopi_scene_when_compare_number_range(l_scenes_list_v2_t* scene_node, void*
 
 int ezlopi_scene_when_compare_strings(l_scenes_list_v2_t* scene_node, void* arg)
 {
-    TRACE_W(" Compare_strings ");
+    // TRACE_W(" Compare_strings ");
     int ret = 0;
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (when_block && scene_node)
@@ -970,7 +972,7 @@ int ezlopi_scene_when_compare_strings(l_scenes_list_v2_t* scene_node, void* arg)
 
 int ezlopi_scene_when_string_operation(l_scenes_list_v2_t* scene_node, void* arg)
 {
-    TRACE_W(" Compare_string_op ");
+    // TRACE_W(" Compare_string_op ");
     int ret = 0;
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (when_block && scene_node)
@@ -1027,7 +1029,7 @@ int ezlopi_scene_when_string_operation(l_scenes_list_v2_t* scene_node, void* arg
 
 int ezlopi_scene_when_in_array(l_scenes_list_v2_t* scene_node, void* arg)
 {
-    TRACE_W(" Compare_inArray ");
+    // TRACE_W(" Compare_inArray ");
     int ret = 0;
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (when_block && scene_node)
@@ -1082,7 +1084,7 @@ int ezlopi_scene_when_in_array(l_scenes_list_v2_t* scene_node, void* arg)
 
 int ezlopi_scene_when_compare_values(l_scenes_list_v2_t* scene_node, void* arg)
 {
-    TRACE_W(" Compare_values ");
+    // TRACE_W(" Compare_values ");
     int ret = 0;
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (when_block && scene_node)
@@ -1148,7 +1150,7 @@ int ezlopi_scene_when_compare_values(l_scenes_list_v2_t* scene_node, void* arg)
 
 int ezlopi_scene_when_has_atleast_one_dictionary_value(l_scenes_list_v2_t* scene_node, void* arg)
 {
-    TRACE_W(" atleast_one_diction_val ");
+    // TRACE_W(" atleast_one_diction_val ");
     int ret = 0;
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (scene_node && when_block)
@@ -1187,7 +1189,7 @@ int ezlopi_scene_when_has_atleast_one_dictionary_value(l_scenes_list_v2_t* scene
 
 int ezlopi_scene_when_is_firmware_update_state(l_scenes_list_v2_t* scene_node, void* arg)
 {
-    TRACE_W(" firmware_update ");
+    // TRACE_W(" firmware_update ");
     int ret = 0;
 #ifdef CONFIG_EZPI_ENABLE_OTA
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
@@ -1232,7 +1234,7 @@ int ezlopi_scene_when_is_firmware_update_state(l_scenes_list_v2_t* scene_node, v
 
 int ezlopi_scene_when_is_dictionary_changed(l_scenes_list_v2_t* scene_node, void* arg)
 {
-    TRACE_W(" isDictionary_changed ");
+    // TRACE_W(" isDictionary_changed ");
     int ret = 0;
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (scene_node && when_block)
