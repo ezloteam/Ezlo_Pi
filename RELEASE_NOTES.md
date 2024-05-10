@@ -18,6 +18,8 @@
 10. Implementation of switchHouseMode_then_method [EZPI-366](https://jira.mios.com/browse/EZPI-366)
 11. Implementation of isHouseModeAlarmPhaseRange [EZPI-367](https://jira.mios.com/browse/EZPI-367)
 12. Implementation of isHouseModeSwitchToRange [EZPI-373](https://jira.mios.com/browse/EZPI-373)
+13. Implementation of Log Control from Serial [EZPI-388](https://jira.mios.com/browse/EZPI-388)
+14. Add chip compatibility for config [EZPI-389](https://jira.mios.com/browse/EZPI-389)
 
 ## Fixes:
 1. Memory leak fixing causing device to go offline [EZPI-369](https://jira.mios.com/browse/EZPI-369)
@@ -29,3 +31,4 @@
 7. Meshbots Branch "review" refactoring [EZPI-261](https://jira.mios.com/browse/EZPI-261)
 8. Test and fixing on 'house-modes' [EZPI-301](https://jira.mios.com/browse/EZPI-301)
 9. When several scenes (more than 6) are created, the next created scenes stop coming from the controller [EZPI-250](https://jira.mios.com/browse/EZPI-250)
+10. Fix invalid '_item_ID' in toggle_value method [EZPI-390](https://jira.mios.com/browse/EZPI-390)

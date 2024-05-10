@@ -57,7 +57,9 @@ static void EZPI_SERVICE_BLE_ezlo_cloud_info(esp_gatt_value_t* value, esp_ble_ga
 static void EZPI_SERVICE_BLE_oem_info(esp_gatt_value_t* value, esp_ble_gatts_cb_param_t* param);
 static void EZPI_SERVICE_BLE_net_info(esp_gatt_value_t* value, esp_ble_gatts_cb_param_t* param);
 
+#if 0 // Not used function
 static void device_mac_read_func(esp_gatt_value_t* value, esp_ble_gatts_cb_param_t* param);
+#endif 
 
 void ezlopi_ble_service_device_info_init(void)
 {
@@ -162,7 +164,7 @@ static void ble_device_info_send_data(const cJSON* cj_response_data, esp_gatt_va
         value->value[0] = 0; // Read 0 if the device not provisioned yet.
     }
 }
-
+#if 0 // Not used function
 static void device_mac_read_func(esp_gatt_value_t* value, esp_ble_gatts_cb_param_t* param)
 {
     if (value)
@@ -199,8 +201,9 @@ static void device_mac_read_func(esp_gatt_value_t* value, esp_ble_gatts_cb_param
     else
     {
         TRACE_E("Value is empty");
-    }
 }
+}
+#endif 
 
 static void EZPI_SERVICE_BLE_ezlopi_api_info(esp_gatt_value_t* value, esp_ble_gatts_cb_param_t* param)
 {

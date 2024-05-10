@@ -188,7 +188,7 @@ void ezlopi_scenes_scripts_update(cJSON* cj_script)
                         cJSON* cj_name = cJSON_GetObjectItem(__FUNCTION__, cj_script, ezlopi_name_str);
                         if (cj_name && cj_name->valuestring)
                         {
-                            uint32_t len = strlen(cj_name->valuestring) + 1;
+                            // uint32_t len = strlen(cj_name->valuestring) + 1;
                             snprintf(script_node->name, sizeof(script_node->name), "%s", cj_name->valuestring);
                         }
                     }
@@ -464,7 +464,7 @@ static l_ezlopi_scenes_script_t* __scripts_create_node(uint32_t script_id, cJSON
                 new_script->script_handle = NULL;
                 new_script->state = SCRIPT_STATE_NONE;
 
-                uint32_t script_name_size = strlen(cj_script_name->valuestring) + 1;
+                // uint32_t script_name_size = strlen(cj_script_name->valuestring) + 1;
                 snprintf(new_script->name, sizeof(new_script->name), "%s", cj_script_name->valuestring);
 
 

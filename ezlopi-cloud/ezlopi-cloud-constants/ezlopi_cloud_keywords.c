@@ -324,8 +324,7 @@ const char* ezlopi_start_bits_str = "start_bits";
 const char* ezlopi_stop_bits_str = "stop_bits";
 const char* ezlopi_frame_size_str = "frame_size";
 const char* ezlopi_flow_control_str = "flow_control";
-
-extern const char *ezlopi_chipset_str = "chipset";
-extern const char *ezlopi_internet_str = "internet";
+const char *ezlopi_chipset_str = "chipset";
+const char *ezlopi_internet_str = "internet";
 
 #endif // __EZLOPI_CLOUD_KEYWORDS_H__

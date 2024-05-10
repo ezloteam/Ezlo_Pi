@@ -15,7 +15,9 @@ static s_ezlopi_cloud_controller_t s_controller_information;
 static void ezlopi_device_parse_json_v3(cJSON* cj_config);
 static void ezlopi_device_free_single(l_ezlopi_device_t* device);
 #if (1 == ENABLE_TRACE)
+#if 0 // Defined but not used
 static void ezlopi_device_print_controller_cloud_information_v3(void);
+#endif 
 #endif
 
 static void ezlopi_device_free_item(l_ezlopi_item_t* items);
@@ -77,7 +79,16 @@ void ezlopi_device_name_set_by_device_id(uint32_t a_device_id, cJSON* cj_new_nam
                 if (updated_device_config)
                 {
                     cJSON_Minify(updated_device_config);
-                    ezlopi_factory_info_v3_set_ezlopi_config(updated_device_config);
+                    cJSON * json_config = cJSON_Parse(__FUNCTION__, updated_device_config);
+                    if (json_config)
+                    {
+                        ezlopi_factory_info_v3_set_ezlopi_config(json_config);
+                        cJSON_Delete(__FUNCTION__, json_config);
+                    }
+                    else
+                    {
+                        TRACE_E("ERROR : Failed parsing JSON for config.");
+                    }
                     ezlopi_free(__FUNCTION__, updated_device_config);
                 }
             }
@@ -389,8 +400,8 @@ void ezlopi_device_prepare(void)
                     cJSON_Minify(updated_config);
                     ezlopi_factory_info_v3_set_ezlopi_config(updated_config);
                     ezlopi_free(__FUNCTION__, updated_config);
-                }
-            }
+    }
+}
 #endif
 
             cJSON_Delete(__FUNCTION__, cj_config);
@@ -405,6 +416,7 @@ void ezlopi_device_prepare(void)
 
 ///////// Print functions start here ////////////
 #if (1 == ENABLE_TRACE)
+#if 0 // Defined but not used 
 static void ezlopi_device_print_controller_cloud_information_v3(void)
 {
     TRACE_I("Armed: %d", s_controller_information.armed);
@@ -497,6 +509,7 @@ static void ezlopi_device_print_interface_onewire_master(l_ezlopi_item_t* item)
     TRACE_D(" |~~~|- item->interface.onewire_master.onewire_pin: %d", item->interface.onewire_master.onewire_pin);
 }
 
+
 static void ezlopi_device_print_interface_type(l_ezlopi_item_t* item)
 {
     switch (item->interface_type)
@@ -548,6 +561,7 @@ static void ezlopi_device_print_interface_type(l_ezlopi_item_t* item)
     }
     }
 }
+#endif 
 #endif
 //////////////////// Print functions end here /////////////////////////
 ///////////////////////////////////////////////////////////////////////

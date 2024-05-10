@@ -619,7 +619,6 @@ static s_ezlopi_expressions_t* __expressions_create_node(uint32_t exp_id, cJSON*
 
     if (new_exp_node)
     {
-        char* code_str = NULL;
         memset(new_exp_node, 0, sizeof(s_ezlopi_expressions_t));
 
         CJSON_GET_VALUE_STRING_BY_COPY(cj_expression, ezlopi_name_str, new_exp_node->name);

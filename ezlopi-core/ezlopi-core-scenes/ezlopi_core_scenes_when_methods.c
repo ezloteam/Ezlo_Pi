@@ -885,7 +885,7 @@ int ezlopi_scene_when_compare_number_range(l_scenes_list_v2_t* scene_node, void*
         }
         else if (expression_name && end_value_field && start_value_field)
         {
-            s_ezlopi_expressions_t* curr_expr_right = ezlopi_scenes_get_expression_node_by_name(expression_name);
+            // s_ezlopi_expressions_t* curr_expr_right = ezlopi_scenes_get_expression_node_by_name(expression_name);
             #warning "extract the double from expression";
             double double_expn_value = 0;
 

@@ -29,7 +29,7 @@ const char* ezlopi_log_severity_enum[ENUM_EZLOPI_LOG_SEVERITY_MAX] = {
 };
 
 
-static volatile e_ezlopi_log_severity_t cloud_log_severity = ENUM_EZLOPI_LOG_SEVERITY_WARNING;
+static e_ezlopi_log_severity_t cloud_log_severity = ENUM_EZLOPI_LOG_SEVERITY_WARNING;
 static e_ezlopi_log_severity_t serial_log_severity = ENUM_EZLOPI_LOG_SEVERITY_MAX;
 
 static int ezlopi_hub_cloud_log_set_severity(const char* severity_str)
@@ -37,11 +37,18 @@ static int ezlopi_hub_cloud_log_set_severity(const char* severity_str)
     int ret = 0;
     if (severity_str)
     {
-        for (int i = 0; i < ENUM_EZLOPI_LOG_SEVERITY_INFO; i++)
+        for (int i = 0; i < ENUM_EZLOPI_LOG_SEVERITY_MAX; i++)
         {
             if (0 == strncmp(ezlopi_log_severity_enum[i], severity_str, strlen(ezlopi_log_severity_enum[i])))
             {
-                cloud_log_severity = i;
+                if (i <= ENUM_EZLOPI_LOG_SEVERITY_WARNING)
+                {
+                    cloud_log_severity = i;
+                }
+                else
+                {
+                    cloud_log_severity = ENUM_EZLOPI_LOG_SEVERITY_WARNING;
+                }
                 ret = 1;
                 break;
             }
@@ -95,7 +102,7 @@ int ezlopi_core_cloud_log_severity_process_id(const e_ezlopi_log_severity_t seve
 {
     int ret = 0;
 
-    if((ENUM_EZLOPI_LOG_SEVERITY_MAX > severity_level_id) && (ENUM_EZLOPI_LOG_SEVERITY_NONE <= severity_level_id))
+    if ((ENUM_EZLOPI_LOG_SEVERITY_MAX > severity_level_id) && (ENUM_EZLOPI_LOG_SEVERITY_NONE <= severity_level_id))
     {
         cloud_log_severity = severity_level_id;
         EZPI_CORE_nvs_write_cloud_log_severity(cloud_log_severity);
@@ -126,7 +133,7 @@ int ezlopi_core_serial_log_severity_process_id(const e_ezlopi_log_severity_t sev
 {
     int ret = 0;
 
-    if((ENUM_EZLOPI_LOG_SEVERITY_MAX > severity_level_id) && (ENUM_EZLOPI_LOG_SEVERITY_NONE <= severity_level_id))
+    if ((ENUM_EZLOPI_LOG_SEVERITY_MAX > severity_level_id) && (ENUM_EZLOPI_LOG_SEVERITY_NONE <= severity_level_id))
     {
         serial_log_severity = severity_level_id;
         EZPI_CORE_nvs_write_serial_log_severity(serial_log_severity);

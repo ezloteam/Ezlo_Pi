@@ -145,7 +145,7 @@ int ezlopi_scenes_operators_value_number_operations(l_fields_v2_t* item_exp_fiel
         //---------------------- LHS -------------------------
         if (EZLOPI_VALUE_TYPE_EXPRESSION == item_exp_field->value_type)
         {
-            s_ezlopi_expressions_t* curr_expr_left = ezlopi_scenes_get_expression_node_by_name(item_exp_field->field_value.u_value.value_string);
+            // s_ezlopi_expressions_t* curr_expr_left = ezlopi_scenes_get_expression_node_by_name(item_exp_field->field_value.u_value.value_string);
             #warning "extract the double from expression";
             item_exp_value = 0;
         }
@@ -157,7 +157,7 @@ int ezlopi_scenes_operators_value_number_operations(l_fields_v2_t* item_exp_fiel
         //---------------------- RHS -------------------------
         if (EZLOPI_VALUE_TYPE_EXPRESSION == value_field->value_type)
         {
-            s_ezlopi_expressions_t* curr_expr_right = ezlopi_scenes_get_expression_node_by_name(value_field->field_value.u_value.value_string);
+            // s_ezlopi_expressions_t* curr_expr_right = ezlopi_scenes_get_expression_node_by_name(value_field->field_value.u_value.value_string);
             #warning "extract the double from expression";
             value_to_compare_with = 0;
         }
@@ -692,7 +692,7 @@ int ezlopi_scenes_operators_value_inarr_operations(l_fields_v2_t* item_exp_field
         //------------------------------------------------
         if (EZLOPI_VALUE_TYPE_EXPRESSION == item_exp_field->value_type)
         {
-            s_ezlopi_expressions_t* curr_expr_left = ezlopi_scenes_get_expression_node_by_name(item_exp_field->field_value.u_value.value_string);
+            // s_ezlopi_expressions_t* curr_expr_left = ezlopi_scenes_get_expression_node_by_name(item_exp_field->field_value.u_value.value_string);
             #warning "extract the 'string' from expression";
             item_exp_value_str = NULL;
         }

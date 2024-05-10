@@ -93,8 +93,7 @@ void ezlopi_core_buffer_init(uint32_t len)
 char *ezlopi_core_buffer_acquire(uint32_t *len, uint32_t wait_to_acquired_ms)
 {
     char *ret = NULL;
-    uint32_t start_time = xTaskGetTickCount();
-
+    // uint32_t start_time = xTaskGetTickCount();
     if (__buffer_lock)
     {
         if (pdTRUE == xSemaphoreTake(__buffer_lock, wait_to_acquired_ms / portTICK_RATE_MS))

@@ -254,17 +254,17 @@ static int ezlopi_service_uart_process_log_severity(const cJSON* root)
         {
             cJSON_AddNumberToObject(__func__, cj_uart_response, ezlopi_status_str, 0);
         }
-        else 
+        else
         {
-            cJSON_AddNumberToObject(__func__, cj_uart_response, ezlopi_status_str, 1);   
+            cJSON_AddNumberToObject(__func__, cj_uart_response, ezlopi_status_str, 1);
         }
 
         const char* str_uart_response = cJSON_Print(__func__, cj_uart_response);
-        if(str_uart_response)
+        if (str_uart_response)
         {
-            cJSON_Minify(str_uart_response);
-            EZPI_SERV_uart_tx_data(strlen(str_uart_response), str_uart_response);
-            free(str_uart_response);
+            cJSON_Minify((char *)str_uart_response);
+            EZPI_SERV_uart_tx_data(strlen(str_uart_response), (uint8_t *)str_uart_response);
+            free((char *)str_uart_response);
         }
         cJSON_Delete(__func__, cj_uart_response);
 
@@ -790,7 +790,7 @@ static void ezlopi_service_uart_get_config(void)
 int EZPI_SERV_uart_tx_data(int len, uint8_t* data)
 {
     int ret = 0;
-    ret = uart_write_bytes(EZPI_SERV_UART_NUM_DEFAULT, data, len);
+    ret = uart_write_bytes(EZPI_SERV_UART_NUM_DEFAULT, (void *)data, len);
     ret += uart_write_bytes(EZPI_SERV_UART_NUM_DEFAULT, "\r\n", 2);
     return ret;
 }

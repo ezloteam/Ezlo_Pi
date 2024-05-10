@@ -95,12 +95,20 @@ static void __dynamic_config_write_func(esp_gatt_value_t* value, esp_ble_gatts_c
                         char* decoded_data = __base64_decode_dynamic_config(tot_len); // uncommente f
                         if (decoded_data)
                         {
-
-                            if (ezlopi_factory_info_v3_set_ezlopi_config(decoded_data))
+                            cJSON *cjson_config = cJSON_Parse(__FUNCTION__, decoded_data);
+                            if (cjson_config)
                             {
-                                // TRACE_W("Restarting .....");
-                                // vTaskDelay(1000 / portTICK_PERIOD_MS);
-                                // EZPI_CORE_reset_reboot();
+                                if (ezlopi_factory_info_v3_set_ezlopi_config(cjson_config))
+                                {
+                                    // TRACE_W("Restarting .....");
+                                    // vTaskDelay(1000 / portTICK_PERIOD_MS);
+                                    // EZPI_CORE_reset_reboot();
+                                }
+                                cJSON_Delete(__FUNCTION__, cjson_config);
+                            }
+                            else
+                            {
+                                TRACE_E("ERROR : Failed parsing JSON for config.");
                             }
                             ezlopi_free(__FUNCTION__, decoded_data);
                         }

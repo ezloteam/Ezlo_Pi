@@ -55,8 +55,6 @@ static led_strip_t indicator_led;
 
 #endif // CONFIG_IDF_TARGET_ESP32S3 OR OR CONFIG_IDF_TARGET_ESP32C3 OR CONFIG_IDF_TARGET_ESP32
 
-static e_indicator_led_priority_t indicator_priority = PRIORITY_CLOUD;
-
 #if defined(CONFIG_IDF_TARGET_ESP32S3) || defined(CONFIG_IDF_TARGET_ESP32C3)
 
 static void indicator_RGB_led_fade_out(uint16_t fade_time_ms)
