@@ -150,7 +150,7 @@ extern "C"
     int ezlopi_factory_info_v3_set_wifi(char* ssid, char* password);
 
     int ezlopi_factory_info_v3_set_basic(s_basic_factory_info_t* ezlopi_config_basic);
-    
+
     int ezlopi_factory_info_v3_set_ezlopi_config(cJSON * cj_data);
     int ezlopi_factory_info_v3_set_ca_cert(cJSON * cj_data);
     int ezlopi_factory_info_v3_set_ssl_shared_key(cJSON * cj_data);
@@ -174,11 +174,25 @@ extern "C"
         [\
             {\
                 \"dev_type\": 1,\
+                \"dev_name\": \"for_test\",\
+                \"id_room\": \"\",\
+                \"id_item\": 2,\
+                \"gpio_in\": 0,\
+                \"gpio_out\": 26,\
+                \"pullup_ip\": false,\
+                \"pullup_op\": false,\
+                \"is_ip\": false,\
+                \"ip_inv\": false,\
+                \"op_inv\": false,\
+                \"val_ip\": false,\
+                \"val_op\": false\
+            },\
+            {\
+                \"dev_type\": 1,\
                 \"dev_name\": \"switch_temp\",\
                 \"id_room\": \"\",\
                 \"id_item\": 2,\
                 \"gpio_in\": 0,\
-                \"gpio_out\": 25,\
                 \"gpio_out\": 25,\
                 \"pullup_ip\": false,\
                 \"pullup_op\": false,\
@@ -194,21 +208,6 @@ extern "C"
                 \"id_room\": \"\",\
                 \"id_item\": 16,\
                 \"gpio\": 33\
-            },\
-            {\
-                \"dev_type\": 1,\
-                \"dev_name\": \"for_test\",\
-                \"id_room\": \"\",\
-                \"id_item\": 2,\
-                \"gpio_in\": 0,\
-                \"gpio_out\": 26,\
-                \"pullup_ip\": false,\
-                \"pullup_op\": false,\
-                \"is_ip\": false,\
-                \"ip_inv\": false,\
-                \"op_inv\": false,\
-                \"val_ip\": false,\
-                \"val_op\": false\
             }\
         ], \
         \"dev_total\": 3}";

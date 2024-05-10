@@ -25,7 +25,7 @@
 
 int ezlopi_scene_then_set_item_value(l_scenes_list_v2_t* curr_scene, void* arg)
 {
-    TRACE_W(" Set_item_value ");
+    // TRACE_W(" Set_item_value ");
     int ret = 0;
     uint32_t item_id = 0;
     cJSON* cj_params = cJSON_CreateObject(__FUNCTION__);
@@ -79,7 +79,6 @@ int ezlopi_scene_then_set_item_value(l_scenes_list_v2_t* curr_scene, void* arg)
 
         cJSON_Delete(__FUNCTION__, cj_params);
     }
-    TRACE_W(" Set_item_value -> ret = %d", ret);
     return ret;
 }
 int ezlopi_scene_then_set_device_armed(l_scenes_list_v2_t* curr_scene, void* arg)
@@ -136,7 +135,7 @@ int ezlopi_scene_then_send_cloud_abstract_command(l_scenes_list_v2_t* curr_scene
 }
 int ezlopi_scene_then_switch_house_mode(l_scenes_list_v2_t* curr_scene, void* arg)
 {
-    TRACE_W(" switch_house_mode ");
+    // TRACE_W(" switch_house_mode ");
     int ret = 0;
     if (curr_scene)
     {
@@ -191,7 +190,7 @@ int ezlopi_scene_then_switch_house_mode(l_scenes_list_v2_t* curr_scene, void* ar
 }
 int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t* curr_scene, void* arg)
 {
-    TRACE_W(" send_http ");
+    // TRACE_W(" send_http ");
     int ret = 0;
     l_action_block_v2_t* curr_then = (l_action_block_v2_t*)arg;
     if (curr_then)
@@ -239,7 +238,7 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t* curr_scene, void* ar
 }
 int ezlopi_scene_then_run_custom_script(l_scenes_list_v2_t* curr_scene, void* arg)
 {
-    TRACE_W(" run_custom_script ");
+    // TRACE_W(" run_custom_script ");
     int ret = 0;
     uint32_t script_id = 0;
     l_action_block_v2_t* curr_then = (l_action_block_v2_t*)arg;
@@ -272,7 +271,7 @@ int ezlopi_scene_then_run_plugin_script(l_scenes_list_v2_t* curr_scene, void* ar
 }
 int ezlopi_scene_then_run_scene(l_scenes_list_v2_t* curr_scene, void* arg)
 {
-    TRACE_W(" run_scene ");
+    // TRACE_W(" run_scene ");
     int ret = 0;
     uint32_t sceneId = 0;
     bool execute_else_condition = false;
@@ -336,6 +335,7 @@ int ezlopi_scene_then_run_scene(l_scenes_list_v2_t* curr_scene, void* arg)
 }
 int ezlopi_scene_then_set_scene_state(l_scenes_list_v2_t* curr_scene, void* arg)
 {
+    // TRACE_W(" set_scene_state ");
     int ret = 0;
     uint32_t sceneID = 0;
     bool set_scene_enable = false;
@@ -530,12 +530,12 @@ int ezlopi_scene_then_set_variable(l_scenes_list_v2_t* curr_scene, void* arg)
 }
 int ezlopi_scene_then_toggle_value(l_scenes_list_v2_t* curr_scene, void* arg)
 {
-    TRACE_W(" toggle_value ");
+    // TRACE_W(" toggle_value ");
     int ret = 0;
     if (curr_scene)
     {
         uint32_t item_id = 0;       /* item */
-        const char* __id_string = NULL;
+        char *  __id_string = NULL;
         char* expression_name = NULL; /* expression */
 
         l_action_block_v2_t* curr_then = (l_action_block_v2_t*)arg;
@@ -546,11 +546,10 @@ int ezlopi_scene_then_toggle_value(l_scenes_list_v2_t* curr_scene, void* arg)
             {
                 if (0 == strncmp(curr_field->name, ezlopi_item_str, 5))
                 {
-                    if (EZLOPI_VALUE_TYPE_ITEM == curr_field->value_type)
+                    if ((EZLOPI_VALUE_TYPE_ITEM == curr_field->value_type) && (NULL != curr_field->field_value.u_value.value_string))
                     {
+                        __id_string = curr_field->field_value.u_value.value_string;
                         item_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
-                        TRACE_W("item_id: %s", curr_field->field_value.u_value.value_string);
-                        TRACE_W("item_id: %d", item_id);
                     }
                 }
                 else if (0 == strncmp(curr_field->name, "expression", 11)) /*need to add in str*/
@@ -566,7 +565,7 @@ int ezlopi_scene_then_toggle_value(l_scenes_list_v2_t* curr_scene, void* arg)
 
             if (item_id > 0)
             {
-                TRACE_W("item_id: %u", item_id);
+                TRACE_W("item_id: %s", __id_string);
                 l_ezlopi_item_t* curr_item = ezlopi_device_get_item_by_id(item_id);
                 if ((curr_item) && (EZLOPI_DEVICE_INTERFACE_DIGITAL_OUTPUT == curr_item->interface_type))
                 {
@@ -585,23 +584,24 @@ int ezlopi_scene_then_toggle_value(l_scenes_list_v2_t* curr_scene, void* arg)
                                 {
                                     cJSON_AddStringToObject(__FUNCTION__, cj_result_value, ezlopi__id_str, __id_string);
 
+
                                     if ((0 == strncmp(curr_item->cloud_properties.value_type, value_type_bool, 5)) && cJSON_IsBool(cj_val))
                                     {
-                                        TRACE_S("1. getting 'item_id[%d]' ; bool_value = %s ", item_id, (cj_val->type == cJSON_True) ? "true" : "false"); // "false" or "true"
+                                        // TRACE_S("1. getting 'item_id[%d]' ; bool_value = %s ", item_id, (cj_val->type == cJSON_True) ? "true" : "false"); // "false" or "true"
                                         if (cj_val->type == cJSON_True)
                                         {
-                                            cJSON_AddBoolToObject(__FUNCTION__, cj_result_value, ezlopi_value_str, true);
+                                            cJSON_AddBoolToObject(__FUNCTION__, cj_result_value, ezlopi_value_str, false);
                                         }
                                         else if (cj_val->type == cJSON_False)
                                         {
-                                            cJSON_AddBoolToObject(__FUNCTION__, cj_result_value, ezlopi_value_str, false);
+                                            cJSON_AddBoolToObject(__FUNCTION__, cj_result_value, ezlopi_value_str, true);
                                         }
                                         ret = 1;
                                         curr_item->func(EZLOPI_ACTION_SET_VALUE, curr_item, cj_result_value, curr_item->user_arg);
                                     }
                                     else if ((0 == strncmp(curr_item->cloud_properties.value_type, value_type_int, 4)) && cJSON_IsNumber(cj_val))
                                     {
-                                        TRACE_S("2. getting 'item_id[%d]' ; int_value = %d ", item_id, (int)cj_val->valuedouble);
+                                        // TRACE_S("2. getting 'item_id[%d]' ; int_value = %d ", item_id, (int)cj_val->valuedouble);
                                         if (cj_val->valuedouble == 0) // either  '0' or '1'.
                                         {
                                             cJSON_AddNumberToObject(__FUNCTION__, cj_result_value, ezlopi_value_str, 1);

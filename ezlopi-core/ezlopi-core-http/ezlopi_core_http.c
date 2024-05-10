@@ -108,7 +108,7 @@ int ezlopi_core_http_dyna_relloc(char** Buf, int reqSize)
  */
 static void ezlopi_core_http_request_via_mbedTLS(const char* web_server, int web_port_num, const char* url_req, char** resp_buf)
 {
-    TRACE_I("&result==[%p] --> *resp_buf=>[%p]", resp_buf, *resp_buf);
+    // TRACE_I("&result==[%p] --> *resp_buf=>[%p]", resp_buf, *resp_buf);
     int ret, flags, len;
     uint32_t tmp_buf_size = 256;
     char tmp_buf[tmp_buf_size];
@@ -311,7 +311,7 @@ static void ezlopi_core_http_request_via_mbedTLS(const char* web_server, int web
         if (strlen(resp_buf_dummy) > 0)
         {
             *resp_buf = resp_buf_dummy;
-            TRACE_I("&result==[%p] --> *resp_buf=>[%p]  ", resp_buf, *resp_buf);
+            // TRACE_I("&result==[%p] --> *resp_buf=>[%p]  ", resp_buf, *resp_buf);
         }
         else
         {
@@ -448,13 +448,13 @@ void ezlopi_core_http_mbedtls_req(s_ezlopi_core_http_mbedtls_t* config)
             ezlopi_core_http_generate_request(config, &request, request_len);
 
             // Ready-Up 'request' buffer
+            TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
             TRACE_I("request[capacity: %d]:\n\n%s[%d]", request_len, request, strlen(request));
-            // TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
             // TRACE_E("&result==[%p]", &(config->response));
             ezlopi_core_http_request_via_mbedTLS(config->web_server, (config->web_port), request, &(config->response));
             if (config->response)
             {
-                TRACE_D("*result[%p] =>\n[%d]\n%s", config->response, strlen(config->response), config->response);
+                TRACE_S("*result[%p] =>\n[%d]\n%s", config->response, strlen(config->response), config->response);
                 ezlopi_free(__FUNCTION__, config->response); // return to destination buffer
                 config->response = NULL;
             }
