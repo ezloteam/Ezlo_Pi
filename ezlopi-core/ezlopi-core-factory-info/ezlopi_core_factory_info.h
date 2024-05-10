@@ -168,7 +168,7 @@ extern "C"
                 \"id_room\": \"\",\
                 \"id_item\": 2,\
                 \"gpio_in\": 0,\
-                \"gpio_out\": 2,\
+                \"gpio_out\": 27,\
                 \"pullup_ip\": false,\
                 \"pullup_op\": false,\
                 \"is_ip\": false,\
@@ -182,7 +182,7 @@ extern "C"
                 \"dev_name\": \"temp_humi\",\
                 \"id_room\": \"\",\
                 \"id_item\": 16,\
-                \"gpio\": 1\
+                \"gpio\": 7\
             },\
             {\
                 \"dev_type\": 1,\
@@ -190,7 +190,7 @@ extern "C"
                 \"id_room\": \"\",\
                 \"id_item\": 2,\
                 \"gpio_in\": 0,\
-                \"gpio_out\": 3,\
+                \"gpio_out\": 14,\
                 \"pullup_ip\": false,\
                 \"pullup_op\": false,\
                 \"op_inv\": false\
@@ -200,7 +200,7 @@ extern "C"
                 \"dev_name\": \"Digita In\",\
                 \"id_room\": \"\",\
                 \"id_item\": 4,\
-                \"gpio\": 4,\
+                \"gpio\": 13,\
                 \"pull_up\": false,\
                 \"logic_inv\": false\
             }\
