@@ -152,23 +152,16 @@ void ezlopi_cloud_modes_disarmed_default_set(cJSON* cj_request, cJSON* cj_respon
             uint8_t modeId = strtoul(cj_modeId->valuestring, NULL, 10);
             bool disarmedDefault = cj_disarmedDefault->type == cJSON_True ? true : false;
             ezlopi_core_modes_set_disarmed_default(modeId, disarmedDefault);
-            s_ezlopi_modes_t* ezlopi_modes = ezlopi_core_modes_get_custom_modes();
-            if (ezlopi_modes)
+            s_house_modes_t* current_house_mode = ezlopi_core_modes_get_current_house_modes();
+            if (current_house_mode && current_house_mode->_id == modeId)
             {
-                s_house_modes_t* current_house_mode = ezlopi_core_modes_get_current_house_modes();
-                if (current_house_mode && current_house_mode->_id == modeId)
+                if (current_house_mode->disarmed_default)
                 {
-                    printf("HERE, %p\n", ezlopi_modes->cj_devices);
-                    if (current_house_mode->disarmed_default)
-                    {
-                        ezlopi_core_modes_set_unset_device_armed_status(ezlopi_modes->cj_devices, false);
-                        ezlopi_core_modes_set_unset_device_armed_status(current_house_mode->cj_disarmed_devices, true);
-                    }
-                    else
-                    {
-                        ezlopi_core_modes_set_unset_device_armed_status(current_house_mode->cj_disarmed_devices, false);
-                        ezlopi_core_modes_set_unset_device_armed_status(ezlopi_modes->cj_devices, true);
-                    }
+                    ezlopi_core_modes_set_unset_device_armed_status(current_house_mode->cj_disarmed_devices, true);
+                }
+                else
+                {
+                    ezlopi_core_modes_set_unset_device_armed_status(current_house_mode->cj_disarmed_devices, false);
                 }
             }
 #if 0
