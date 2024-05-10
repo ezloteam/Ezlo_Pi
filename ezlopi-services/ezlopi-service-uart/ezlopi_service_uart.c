@@ -521,16 +521,16 @@ static int ezlopi_service_uart_newtwork_info(cJSON* parent)
 
             cJSON_AddBoolToObject(__FUNCTION__, cj_network, "wifi", wifi_status->wifi_connection);
 
-#ifdef CONFIG_EZPI_ENABLE_PING
-            e_ping_status_t ping_status = ezlopi_ping_get_internet_status();
-            cJSON_AddBoolToObject(__FUNCTION__, cj_network, "internet", ping_status == EZLOPI_PING_STATUS_LIVE);
-#else // CONFIG_EZPI_ENABLE_PING
-            cJSON_AddBoolToObject(__FUNCTION__, cj_network, "internet", 0);
-#endif // CONFIG_EZPI_ENABLE_PING
-
-
             e_ezlopi_event_t events = ezlopi_get_event_bit_status();
             bool cloud_connection_status = (EZLOPI_EVENT_NMA_REG & events) == EZLOPI_EVENT_NMA_REG;
+
+#ifdef CONFIG_EZPI_ENABLE_PING
+            e_ping_status_t ping_status = ezlopi_ping_get_internet_status();
+            cJSON_AddBoolToObject(__FUNCTION__, cj_network, ezlopi_internet_str, ping_status == EZLOPI_PING_STATUS_LIVE);
+#else // CONFIG_EZPI_ENABLE_PING
+            cJSON_AddBoolToObject(__FUNCTION__, cj_network, ezlopi_internet_str, cloud_connection_status);
+#endif // CONFIG_EZPI_ENABLE_PING
+
             cJSON_AddBoolToObject(__FUNCTION__, cj_network, "cloud", cloud_connection_status);
 
             ezlopi_free(__FUNCTION__, wifi_status);

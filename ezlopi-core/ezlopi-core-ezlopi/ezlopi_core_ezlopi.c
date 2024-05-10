@@ -90,10 +90,10 @@ void ezlopi_init(void)
     ezlopi_event_queue_init();
 
 #if (defined(CONFIG_EZPI_ENABLE_WIFI) || defined(CONFIG_EZPI_CORE_ENABLE_ETH))
+    EZPI_CORE_sntp_init();
 #ifdef CONFIG_EZPI_ENABLE_PING
     ezlopi_ping_init();
 #endif // CONFIG_EZPI_ENABLE_PING
-    EZPI_CORE_sntp_init();
 #endif
 
     ezlopi_timer_start_1000ms();
