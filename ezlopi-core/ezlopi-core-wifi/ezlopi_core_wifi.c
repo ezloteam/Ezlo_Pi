@@ -286,8 +286,6 @@ esp_err_t ezlopi_wifi_connect(const char* ssid, const char* pass)
 
     if ((NULL != ssid) && (NULL != pass))
     {
-        TRACE_D("SSID: %s, Password: %s,\r\n", ssid, pass);
-
         wifi_config_t wifi_config = {
             .sta = {
                 .pmf_cfg = {.capable = true, .required = false},

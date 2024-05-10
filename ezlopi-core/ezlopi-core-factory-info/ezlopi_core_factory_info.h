@@ -167,50 +167,42 @@ extern "C"
 #if (EZLOPI_DEVICE_TYPE_GENERIC == EZLOPI_DEVICE_TYPE)
 
 #elif (EZLOPI_DEVICE_TYPE_TEST_DEVICE == EZLOPI_DEVICE_TYPE)
+    static const char* ezlopi_config_test = "{\"cmd\":3,\"dev_detail\":[{\"dev_type\":1,\"dev_name\":\"switch_temp\",\"id_room\":\"\",\"id_item\":2,\"gpio_in\":0,\"gpio_out\":25,\"pullup_ip\":false,\"pullup_op\":false,\"is_ip\":false,\"ip_inv\":false,\"op_inv\":false,\"val_ip\":false,\"val_op\":false},{\"dev_type\":7,\"dev_name\":\"temp_humi\",\"id_room\":\"\",\"id_item\":16,\"gpio\":12}],\"config_id\":\"1234567\",\"config_time\":1696508363,\"config_name\":\"My moisture sensor\",\"chipset\":\"ESP32\"}";
+#if 0
     static const char* ezlopi_config_test =
         "{\
-        \"cmd\": 3,\
-        \"dev_detail\":\
-        [\
-            {\
-                \"dev_type\": 1,\
-                \"dev_name\": \"for_test\",\
-                \"id_room\": \"\",\
-                \"id_item\": 2,\
-                \"gpio_in\": 0,\
-                \"gpio_out\": 26,\
-                \"pullup_ip\": false,\
-                \"pullup_op\": false,\
-                \"is_ip\": false,\
-                \"ip_inv\": false,\
-                \"op_inv\": false,\
-                \"val_ip\": false,\
-                \"val_op\": false\
-            },\
-            {\
-                \"dev_type\": 1,\
-                \"dev_name\": \"switch_temp\",\
-                \"id_room\": \"\",\
-                \"id_item\": 2,\
-                \"gpio_in\": 0,\
-                \"gpio_out\": 25,\
-                \"pullup_ip\": false,\
-                \"pullup_op\": false,\
-                \"is_ip\": false,\
-                \"ip_inv\": false,\
-                \"op_inv\": false,\
-                \"val_ip\": false,\
-                \"val_op\": false\
-            },\
-            {\
-                \"dev_type\": 7,\
-                \"dev_name\": \"temp_humi\",\
-                \"id_room\": \"\",\
-                \"id_item\": 16,\
-                \"gpio\": 33\
-            }\
-        ], \
-        \"dev_total\": 3}";
+            \"cmd\": 3,\
+            \"dev_detail\":\
+            [\
+                {\
+                    \"dev_type\": 1,\
+                    \"dev_name\": \"switch_temp\",\
+                    \"id_room\": \"\",\
+                    \"id_item\": 2,\
+                    \"gpio_in\": 0,\
+                    \"gpio_out\": 25,\
+                    \"pullup_ip\": false,\
+                    \"pullup_op\": false,\
+                    \"is_ip\": false,\
+                    \"ip_inv\": false,\
+                    \"op_inv\": false,\
+                    \"val_ip\": false,\
+                    \"val_op\": false\
+                },\
+                {\
+                    \"dev_type\": 7,\
+                    \"dev_name\": \"temp_humi\",\
+                    \"id_room\": \"\",\
+                    \"id_item\": 16,\
+                    \"gpio\": 12\
+                }\
+            ],\
+            \"config_id\": \"1234567\",\
+            \"config_time\": 1696508363,\
+            \"config_name\": \"My moisture sensor\",\
+            \"chipset\":\"ESP32S3\"\
+        }";
+#endif 
 #endif
 
 
