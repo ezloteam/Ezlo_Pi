@@ -344,7 +344,7 @@ int ezlopi_core_modes_set_disarmed_default(uint8_t modesID, bool disarmedDefault
     }
     return ret;
 }
-        
+
 int ezlopi_core_modes_add_disarmed_device(uint8_t modeId, const char* device_id_str)
 {
     int ret = 0;
