@@ -75,14 +75,14 @@ void device_name_set(cJSON* cj_request, cJSON* cj_response)
 
 void device_armed_set(cJSON* cj_request, cJSON* cj_response)
 {
-    cJSON* cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
+    cJSON* cj_result = cJSON_AddObjectToObject(__func__, cj_response, ezlopi_result_str);
     if (cj_result)
     {
-        cJSON* cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
+        cJSON* cj_params = cJSON_GetObjectItem(__func__, cj_request, ezlopi_params_str);
         if (cj_params)
         {
-            cJSON* cj_device_id = cJSON_GetObjectItem(cj_params, ezlopi__id_str);
-            cJSON* cj_armed_status = cJSON_GetObjectItem(cj_params, ezlopi_armed_str);
+            cJSON* cj_device_id = cJSON_GetObjectItem(__func__, cj_params, ezlopi__id_str);
+            cJSON* cj_armed_status = cJSON_GetObjectItem(__func__, cj_params, ezlopi_armed_str);
             if (cj_device_id && cj_armed_status)
             {
                 uint32_t device_id = strtoul(cj_device_id->valuestring, NULL, 16);
@@ -131,18 +131,18 @@ void device_updated(cJSON* cj_request, cJSON* cj_response)
                             }
 
                             uint64_t time = EZPI_CORE_sntp_get_current_time_ms();
-                            cJSON_AddNumberToObject(cj_result, "fwTimestampMs", time);
+                            cJSON_AddNumberToObject(__func__, cj_result, "fwTimestampMs", time);
 
-                            cJSON* cj_method = cJSON_GetObjectItem(cj_request, ezlopi_method_str);
+                            cJSON* cj_method = cJSON_GetObjectItem(__func__, cj_request, ezlopi_method_str);
                             if (cj_method)
                             {
-                                cJSON* cj_device_changable = cJSON_AddArrayToObject(cj_result, "__DEVICE_CHANGEABLE_FIELD");
+                                cJSON* cj_device_changable = cJSON_AddArrayToObject(__func__, cj_result, "__DEVICE_CHANGEABLE_FIELD");
                                 if (cj_device_changable)
                                 {
-                                    cJSON_AddItemToArray(cj_device_changable, cJSON_CreateString(ezlopi_name_str));
-                                    cJSON_AddItemToArray(cj_device_changable, cJSON_CreateString(ezlopi_armed_str));
-                                    cJSON_AddItemToArray(cj_device_changable, cJSON_CreateString(ezlopi_reachable_str));
-                                    cJSON_AddItemToArray(cj_device_changable, cJSON_CreateString(ezlopi_room_id_str));
+                                    cJSON_AddItemToArray(cj_device_changable, cJSON_CreateString(__func__, ezlopi_name_str));
+                                    cJSON_AddItemToArray(cj_device_changable, cJSON_CreateString(__func__, ezlopi_armed_str));
+                                    cJSON_AddItemToArray(cj_device_changable, cJSON_CreateString(__func__, ezlopi_reachable_str));
+                                    cJSON_AddItemToArray(cj_device_changable, cJSON_CreateString(__func__, ezlopi_room_id_str));
                                 }
                             }
                             break;

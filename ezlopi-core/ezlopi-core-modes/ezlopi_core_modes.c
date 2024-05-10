@@ -344,7 +344,7 @@ int ezlopi_core_modes_set_disarmed_default(uint8_t modesID, bool disarmedDefault
     }
     return ret;
 }
-
+        
 int ezlopi_core_modes_add_disarmed_device(uint8_t modeId, const char* device_id_str)
 {
     int ret = 0;
@@ -369,7 +369,7 @@ int ezlopi_core_modes_add_disarmed_device(uint8_t modeId, const char* device_id_
                 }
                 if (add_to_array)
                 {
-                    cJSON_AddItemToArray(mode_to_update->cj_disarmed_devices, cJSON_CreateString(device_id_str));
+                    cJSON_AddItemToArray(mode_to_update->cj_disarmed_devices, cJSON_CreateString(__func__, device_id_str));
                     mode_to_update->disarmed_default = false;
                     ezlopi_core_modes_store_to_nvs();
                 }
@@ -400,8 +400,8 @@ int ezlopi_core_modes_remove_disarmed_device(uint8_t modeId, const char* device_
                 {
                     if (0 == strncmp(device_id_str, element->valuestring, 32))
                     {
-                        cJSON* cj_device_str = cJSON_DetachItemFromArray(mode_to_update->cj_disarmed_devices, array_index);
-                        cJSON_Delete(cj_device_str);
+                        cJSON* cj_device_str = cJSON_DetachItemFromArray(__func__, mode_to_update->cj_disarmed_devices, array_index);
+                        cJSON_Delete(__func__, cj_device_str);
                         mode_to_update->disarmed_default = false;
                         ezlopi_core_modes_store_to_nvs();
                         break;
@@ -432,30 +432,30 @@ int ezlopi_core_modes_set_unset_device_armed_status(cJSON* cj_device_array, cons
                 if (device_to_change->cloud_properties.armed != set)
                 {
                     device_to_change->cloud_properties.armed = set;
-                    cJSON* cj_device_armed_broadcast = cJSON_CreateObject();
+                    cJSON* cj_device_armed_broadcast = cJSON_CreateObject(__func__);
                     if (cj_device_armed_broadcast)
                     {
-                        cJSON_AddStringToObject(cj_device_armed_broadcast, ezlopi_method_str, "hub.device.armed.set");
-                        cJSON* cj_params = cJSON_AddObjectToObject(cj_device_armed_broadcast, ezlopi_params_str);
+                        cJSON_AddStringToObject(__func__, cj_device_armed_broadcast, ezlopi_method_str, "hub.device.armed.set");
+                        cJSON* cj_params = cJSON_AddObjectToObject(__func__, cj_device_armed_broadcast, ezlopi_params_str);
                         if (cj_params)
                         {
                             char temp[32];
                             memset(temp, 0, 32);
                             snprintf(temp, 32, "%08x", device_to_change->cloud_properties.device_id);
-                            cJSON_AddStringToObject(cj_params, ezlopi__id_str, temp);
-                            cJSON_AddBoolToObject(cj_params, ezlopi_armed_str, set);
-                            uint32_t id = ezlopi_core_ezlopi_methods_search_in_list(cJSON_GetObjectItem(cj_device_armed_broadcast, ezlopi_method_str));
+                            cJSON_AddStringToObject(__func__, cj_params, ezlopi__id_str, temp);
+                            cJSON_AddBoolToObject(__func__, cj_params, ezlopi_armed_str, set);
+                            uint32_t id = ezlopi_core_ezlopi_methods_search_in_list(cJSON_GetObjectItem(__func__, cj_device_armed_broadcast, ezlopi_method_str));
                             f_method_func_t updater_method = ezlopi_core_ezlopi_methods_get_updater_by_id(id);
                             if (updater_method)
                             {
-                                cJSON* cj_response = cJSON_CreateObject();
+                                cJSON* cj_response = cJSON_CreateObject(__func__);
                                 if (NULL != cj_response)
                                 {
                                     updater_method(cj_device_armed_broadcast, cj_response);
                                     ret = 1;
                                     if (!ezlopi_core_ezlopi_broadcast_add_to_queue(cj_response))
                                     {
-                                        cJSON_Delete(cj_response);
+                                        cJSON_Delete(__func__, cj_response);
                                         ret = 0;
                                     }
                                 }

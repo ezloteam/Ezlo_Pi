@@ -71,7 +71,7 @@ int ezlopi_core_modes_cjson_get_modes(cJSON* cj_dest)
         {
             __cjson_add_alarmed(cj_alarmed, &_modes->alarmed);
         }
-        cJSON* cj_device_array = cJSON_GetObjectItem(cj_dest, ezlopi_devices_str);
+        cJSON* cj_device_array = cJSON_GetObjectItem(__func__, cj_dest, ezlopi_devices_str);
         __cjson_add_security_device_to_array(cj_device_array);
     }
 
@@ -498,7 +498,7 @@ static int __cjson_add_security_device_to_array(cJSON* cj_device_array)
                 char temp[32];
                 memset(temp, 0, 32);
                 snprintf(temp, 32, "%08X", device_head->cloud_properties.device_id);
-                cJSON_AddItemToArray(cj_device_array, cJSON_CreateString(temp));
+                cJSON_AddItemToArray(cj_device_array, cJSON_CreateString(__func__, temp));
             }
             device_head = device_head->next;
         }

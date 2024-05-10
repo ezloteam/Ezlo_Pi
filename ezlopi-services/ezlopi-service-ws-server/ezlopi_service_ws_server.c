@@ -477,4 +477,4 @@ void ezlpi_service_ws_server_dummy(void)
 {
     TRACE_D("I'm dummy");
 }
-#endif // CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER
+// #endif // CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER
