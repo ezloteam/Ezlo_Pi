@@ -400,8 +400,8 @@ void ezlopi_device_prepare(void)
                     cJSON_Minify(updated_config);
                     ezlopi_factory_info_v3_set_ezlopi_config(updated_config);
                     ezlopi_free(__FUNCTION__, updated_config);
-    }
-}
+                }
+            }
 #endif
 
             cJSON_Delete(__FUNCTION__, cj_config);

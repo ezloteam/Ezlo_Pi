@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-*.bin.old
-=======
 *.old
->>>>>>> development
 *.bin
 firmware/**
 firmware/v*/**
@@ -73,7 +69,6 @@ _deps
 
 # Local History for Visual Studio Code
 **/.history/
-
 
 dependencies.lock
 sdkconfig.old
