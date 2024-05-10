@@ -158,7 +158,8 @@ void EZPI_CORE_sntp_epoch_to_iso8601(char* time_buf, uint32_t buf_len, time_t t)
     if (time_buf && buf_len)
     {
         struct tm* timeinfo;
-        timeinfo = gmtime(&t);
+        // timeinfo = gmtime(&t);
+        timeinfo = localtime(&t);
         strftime(time_buf, buf_len, "%Y-%m-%dT%H:%M:%S+545", timeinfo);
         TRACE_I("Build Time: %s", time_buf);
     }
@@ -169,4 +170,11 @@ uint64_t EZPI_CORE_sntp_get_current_time_ms(void)
     time_t now;
     time(&now);
     return (now * 1000LL);
+}
+
+uint64_t EZPI_CORE_sntp_get_current_time_sec(void)
+{
+    time_t now;
+    time(&now);
+    return now;
 }

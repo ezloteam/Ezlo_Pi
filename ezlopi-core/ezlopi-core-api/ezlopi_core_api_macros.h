@@ -8,7 +8,7 @@ CLOUD_METHOD("hub.devices.list", devices_list_v3, NULL)
 CLOUD_METHOD("hub.device.name.set", device_name_set, device_updated)
 
 #ifdef CONFIG_EZPI_UTIL_TRACE_EN
-CLOUD_METHOD("hub.log.set", ezlopi_hub_cloud_log_set, ezlopi_hub_cloud_log_set_updater)
+CLOUD_METHOD("hub.log.set", ezlopi_hub_cloud_log_set, NULL)
 CLOUD_METHOD("hub.log.local.set", ezlopi_hub_serial_log_set, ezlopi_hub_serial_log_set_updater)
 #endif  // CONFIG_EZPI_UTIL_TRACE_EN
 

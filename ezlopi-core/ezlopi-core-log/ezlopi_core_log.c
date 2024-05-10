@@ -74,7 +74,7 @@ void ezlopi_core_read_set_log_severities()
     EZPI_CORE_nvs_read_serial_log_severity(&serial_log_severity);
 }
 
-int ezlopi_core_cloud_log_severity_process(bool severity_enable, const char* severity_str)
+int ezlopi_core_cloud_log_severity_process_str(bool severity_enable, const char* severity_str)
 {
     int ret = 0;
     if (severity_enable)
@@ -91,7 +91,21 @@ int ezlopi_core_cloud_log_severity_process(bool severity_enable, const char* sev
     return ret;
 }
 
-int ezlopi_core_serial_log_severity_process(const char* severity_str)
+int ezlopi_core_cloud_log_severity_process_id(const e_ezlopi_log_severity_t severity_level_id)
+{
+    int ret = 0;
+
+    if((ENUM_EZLOPI_LOG_SEVERITY_MAX > severity_level_id) && (ENUM_EZLOPI_LOG_SEVERITY_NONE <= severity_level_id))
+    {
+        cloud_log_severity = severity_level_id;
+        EZPI_CORE_nvs_write_cloud_log_severity(cloud_log_severity);
+        ret = 1;
+    }
+
+    return ret;
+}
+
+int ezlopi_core_serial_log_severity_process_str(const char* severity_str)
 {
     int ret = 0;
     if (severity_str)
@@ -105,6 +119,20 @@ int ezlopi_core_serial_log_severity_process(const char* severity_str)
         ret = 1;
     }
     EZPI_CORE_nvs_write_serial_log_severity(serial_log_severity);
+    return ret;
+}
+
+int ezlopi_core_serial_log_severity_process_id(const e_ezlopi_log_severity_t severity_level_id)
+{
+    int ret = 0;
+
+    if((ENUM_EZLOPI_LOG_SEVERITY_MAX > severity_level_id) && (ENUM_EZLOPI_LOG_SEVERITY_NONE <= severity_level_id))
+    {
+        serial_log_severity = severity_level_id;
+        EZPI_CORE_nvs_write_serial_log_severity(serial_log_severity);
+        ret = 1;
+    }
+
     return ret;
 }
 
@@ -145,11 +173,16 @@ int ezlopi_core_send_cloud_log(int severity, const char* log_str)
                 cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_log_broadcast, ezlopi_result_str);
                 if (cj_result)
                 {
-                    uint64_t timestamp = EZPI_CORE_sntp_get_current_time_ms();
-                    size_t total_len = 15 + strlen(log_str) + 2;
+                    uint64_t timestamp = EZPI_CORE_sntp_get_current_time_sec();
+
+                    char timestamp_str[64];
+
+                    EZPI_CORE_sntp_epoch_to_iso8601(timestamp_str, sizeof(timestamp_str), (time_t)timestamp);
+
+                    size_t total_len = sizeof(timestamp_str) + strlen(log_str) + 2;
                     char message[total_len];
                     memset(message, 0, total_len);
-                    snprintf(message, total_len, "%lld: %s", timestamp, log_str);
+                    snprintf(message, total_len, "%s: %s", timestamp_str, log_str);
 
                     cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_message_str, message);
 
