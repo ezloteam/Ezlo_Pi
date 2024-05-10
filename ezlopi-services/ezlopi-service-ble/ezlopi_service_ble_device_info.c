@@ -618,7 +618,7 @@ static void EZPI_SERVICE_BLE_net_info(esp_gatt_value_t* value, esp_ble_gatts_cb_
                 e_ping_status_t ping_status = ezlopi_ping_get_internet_status();
                 cJSON_AddBoolToObject(__FUNCTION__, cj_network, "internet", ping_status == EZLOPI_PING_STATUS_LIVE);
 #else // CONFIG_EZPI_ENABLE_PING
-                cJSON_AddBoolToObject(__FUNCTION__, cj_network, "internet", cJSON_False);
+                cJSON_AddBoolToObject(__FUNCTION__, cj_network, "internet", 0);
 #endif // CONFIG_EZPI_ENABLE_PING
 
 
