@@ -2,6 +2,9 @@
 #define __EZLOPI_CLOUD_KEYWORDS_H__
 
 #include "stdio.h"
+const char* ezlopi_ESP32_str = "ESP32";
+const char* ezlopi_ESP32S3_str = "ESP32S3";
+const char* ezlopi_ESP32C3_str = "ESP32C3";
 const char* ezlopi_ezlopi_str = "ezlopi";
 const char* ezlopi__str = "";
 const char* ezlopi_id_str = "id";
@@ -321,5 +324,8 @@ const char* ezlopi_start_bits_str = "start_bits";
 const char* ezlopi_stop_bits_str = "stop_bits";
 const char* ezlopi_frame_size_str = "frame_size";
 const char* ezlopi_flow_control_str = "flow_control";
+
+extern const char *ezlopi_chipset_str = "chipset";
+extern const char *ezlopi_internet_str = "internet";
 
 #endif // __EZLOPI_CLOUD_KEYWORDS_H__

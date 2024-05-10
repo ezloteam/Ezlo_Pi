@@ -3,6 +3,9 @@
 
 #include "stdio.h"
 
+extern const char* ezlopi_ESP32_str;
+extern const char* ezlopi_ESP32S3_str;
+extern const char* ezlopi_ESP32C3_str;
 extern const char* ezlopi_ezlopi_str;
 extern const char* ezlopi__str;
 extern const char* ezlopi_id_str;
@@ -319,10 +322,13 @@ extern const char* ezlopi_longitude_str;
 
 extern const char* ezlopi_urls_str;
 
-const char* ezlopi_parity_str;
-const char* ezlopi_start_bits_str;
-const char* ezlopi_stop_bits_str;
-const char* ezlopi_frame_size_str;
-const char* ezlopi_flow_control_str;
+extern const char* ezlopi_parity_str;
+extern const char* ezlopi_start_bits_str;
+extern const char* ezlopi_stop_bits_str;
+extern const char* ezlopi_frame_size_str;
+extern const char* ezlopi_flow_control_str;
+
+extern const char *ezlopi_chipset_str;
+extern const char *ezlopi_internet_str;
 
 #endif // __EZLOPI_CLOUD_KEYWORDS_H__
