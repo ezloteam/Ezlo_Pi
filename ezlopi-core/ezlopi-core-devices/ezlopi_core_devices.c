@@ -634,8 +634,12 @@ static void ezlopi_device_parse_json_v3(cJSON* cjson_config)
             }
             else
             {
-                TRACE_E("Chipset not defined in the config, Device and Item assignment aborted !");
+                TRACE_E("Error, could not identify the chipset in the config!");
             }
+        }
+        else
+        {
+            TRACE_E("Chipset not defined in the config, Device and Item assignment aborted !");
         }
     }
 }

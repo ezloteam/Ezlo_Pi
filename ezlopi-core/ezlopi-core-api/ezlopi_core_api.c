@@ -2,9 +2,9 @@
 
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_core_api.h"
-#include "ezlopi_core_api_methods.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_ezlopi_broadcast.h"
+#include "ezlopi_core_api_methods.h"
 
 static int __check_for_no_error(cJSON* cj_request);
 static cJSON* __execute_method(cJSON* cj_request, f_method_func_t method_func);

@@ -14,13 +14,14 @@
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_cloud_methods_str.h"
 #include "ezlopi_cloud_coordinates.h"
-#include "ezlopi_cloud_registration.h"
 #include "ezlopi_cloud_offline_login.h"
 #include "ezlopi_cloud_modes_updaters.h"
 #include "ezlopi_cloud_scenes_scripts.h"
 #include "ezlopi_cloud_scenes_expressions.h"
+#include "ezlopi_cloud_registration.h"
 #include "ezlopi_cloud_status.h"
 #include "ezlopi_cloud_log.h"
+
 
 #include "ezlopi_core_reset.h"
 #include "ezlopi_util_trace.h"

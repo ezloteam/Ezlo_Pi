@@ -91,3 +91,8 @@ static void registration_process(void* pv)
     vTaskDelete(NULL);
 
 }
+
+void ezpi_cloud_dummy()
+{
+    TRACE_S("I am just a dummy");
+}

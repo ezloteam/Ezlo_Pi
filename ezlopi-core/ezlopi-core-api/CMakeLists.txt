@@ -22,8 +22,8 @@ set(EZLOPI_CLOUD_COMPONENTS
         ezlopi-cloud-settings
         ezlopi-cloud-constants
         ezlopi-cloud-coordinates
-        ezlopi-cloud-registration
         ezlopi-cloud-offline-login
+        ezlopi-cloud-registration
         ezlopi-cloud-log
 )
 

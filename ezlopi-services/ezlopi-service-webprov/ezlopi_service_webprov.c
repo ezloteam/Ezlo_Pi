@@ -316,6 +316,7 @@ static void __config_check(void* pv)
                 }
                 if (flag_break_loop)
                 {
+                    TRACE_D("Config check task complete!");
                     xTaskNotifyGive(ezlopi_update_config_notifier);
                     break;
                 }
@@ -323,7 +324,7 @@ static void __config_check(void* pv)
         }
 
         cJSON_Delete(__FUNCTION__, root_header_prov_token);
-        vTaskDelay(50000 / portTICK_RATE_MS);
+        vTaskDelay(5000 / portTICK_RATE_MS);
     }
 
     // ezlopi_factory_info_v3_free(ca_certificate); // allocated once for all, do not free
