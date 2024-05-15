@@ -358,14 +358,12 @@ int ezlopi_core_modes_add_disarmed_device(uint8_t modeId, const char* device_id_
             {
                 bool add_to_array = true;
                 cJSON* element = NULL;
-                int array_index = 0;
                 cJSON_ArrayForEach(element, mode_to_update->cj_disarmed_devices)
                 {
                     if (0 == strncmp(device_id_str, element->valuestring, 32))
                     {
                         add_to_array = false;
                     }
-                    array_index++;
                 }
                 if (add_to_array)
                 {
@@ -414,6 +412,77 @@ int ezlopi_core_modes_remove_disarmed_device(uint8_t modeId, const char* device_
         ezlopi_service_modes_start();
     }
 
+    return ret;
+}
+
+
+int ezlopi_core_modesl_bypass_device_add(uint8_t modeId, cJSON* cj_device_id_array)
+{
+    int ret = 0;
+    if ((EZLOPI_HOUSE_MODE_REF_ID_NONE < modeId) && (EZLOPI_HOUSE_MODE_REF_ID_MAX > modeId) && cj_device_id_array && (cJSON_Array == cj_device_id_array->type))
+    {
+        ezlopi_service_modes_stop();
+        s_house_modes_t* mode_to_update = ezlopi_core_modes_get_house_mode_by_id(modeId);
+        if (mode_to_update)
+        {
+            cJSON* element_to_add = NULL;
+            cJSON_ArrayForEach(element_to_add, cj_device_id_array)
+            {
+                cJSON* element_to_check = NULL;
+                bool add_to_array = true;
+                cJSON_ArrayForEach(element_to_check, mode_to_update->cj_bypass_devices)
+                {
+                    if (0 == strncmp(element_to_add->valuestring, element_to_check->valuestring, 32))
+                    {
+                        add_to_array = false;
+                    }
+                }
+                if (add_to_array)
+                {
+                    if (NULL == mode_to_update->cj_bypass_devices)
+                    {
+                        mode_to_update->cj_bypass_devices = cJSON_CreateArray(__func__);
+                    }
+                    cJSON_AddItemToArray(mode_to_update->cj_bypass_devices, cJSON_CreateString(__func__, element_to_add->valuestring));
+                }
+            }
+            ezlopi_core_modes_store_to_nvs();
+            ret = 1;
+        }
+        ezlopi_service_modes_start();
+    }
+    return ret;
+}
+
+int ezlopi_core_modesl_bypass_device_remove(uint8_t modeId, cJSON* cj_device_id_array)
+{
+    int ret = 0;
+    if ((EZLOPI_HOUSE_MODE_REF_ID_NONE < modeId) && (EZLOPI_HOUSE_MODE_REF_ID_MAX > modeId) && cj_device_id_array && (cJSON_Array == cj_device_id_array->type))
+    {
+        ezlopi_service_modes_stop();
+        s_house_modes_t* mode_to_update = ezlopi_core_modes_get_house_mode_by_id(modeId);
+        if (mode_to_update)
+        {
+            cJSON* element_to_add = NULL;
+            cJSON_ArrayForEach(element_to_add, cj_device_id_array)
+            {
+                cJSON* element_to_check = NULL;
+                int array_index = 0;
+                cJSON_ArrayForEach(element_to_check, mode_to_update->cj_bypass_devices)
+                {
+                    if (0 == strncmp(element_to_add->valuestring, element_to_check->valuestring, 32))
+                    {
+                        cJSON_DeleteItemFromArray(__func__, mode_to_update->cj_bypass_devices, array_index);
+                        break;
+                    }
+                    array_index++;
+                }
+            }
+            ezlopi_core_modes_store_to_nvs();
+            ret = 1;
+        }
+        ezlopi_service_modes_start();
+    }
     return ret;
 }
 

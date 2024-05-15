@@ -144,6 +144,8 @@ int ezlopi_core_modes_set_disarmed_default(uint8_t modesID, bool disarmedDefaule
 int ezlopi_core_modes_set_unset_device_armed_status(cJSON* cj_device_array, const bool set);
 int ezlopi_core_modes_add_disarmed_device(uint8_t modesId, const char* device_id_str);
 int ezlopi_core_modes_remove_disarmed_device(uint8_t modesId, const char* device_id);
+int ezlopi_core_modesl_bypass_device_add(uint8_t modesId, cJSON* device_id_array);
+int ezlopi_core_modesl_bypass_device_remove(uint8_t modesId, cJSON* device_id_array);
 
 int ezlopi_core_modes_cjson_get_current_mode(cJSON* cj_result);
 

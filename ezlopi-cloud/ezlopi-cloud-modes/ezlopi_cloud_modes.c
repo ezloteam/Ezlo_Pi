@@ -243,6 +243,17 @@ void ezlopi_cloud_modes_bypass_devices_add(cJSON* cj_request, cJSON* cj_response
     cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     if (cj_result)
     {
+        cJSON* cj_params = cJSON_GetObjectItem(__func__, cj_request, ezlopi_params_str);
+        if (cj_params)
+        {
+            cJSON* cj_modelID = cJSON_GetObjectItem(__func__, cj_params, ezlopi_modeId_str);
+            cJSON* cj_deviceIds = cJSON_GetObjectItem(__func__, cj_params, ezlopi_device_ids_str);
+            if (cj_modelID && cj_deviceIds && (cj_deviceIds->type == cJSON_Array))
+            {
+                uint8_t modeId = strtoul(cj_modelID->valuestring, NULL, 10);
+                ezlopi_core_modesl_bypass_device_add(modeId, cj_deviceIds);
+            }
+        }
     }
 }
 
@@ -251,6 +262,17 @@ void ezlopi_cloud_modes_bypass_devices_remove(cJSON* cj_request, cJSON* cj_respo
     cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     if (cj_result)
     {
+        cJSON* cj_params = cJSON_GetObjectItem(__func__, cj_request, ezlopi_params_str);
+        if (cj_params)
+        {
+            cJSON* cj_modelID = cJSON_GetObjectItem(__func__, cj_params, ezlopi_modeId_str);
+            cJSON* cj_deviceIds = cJSON_GetObjectItem(__func__, cj_params, ezlopi_device_ids_str);
+            if (cj_modelID && cj_deviceIds && (cj_deviceIds->type == cJSON_Array))
+            {
+                uint8_t modeId = strtoul(cj_modelID->valuestring, NULL, 10);
+                ezlopi_core_modesl_bypass_device_remove(modeId, cj_deviceIds);
+            }
+        }
     }
 }
 
