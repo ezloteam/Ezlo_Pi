@@ -45,6 +45,17 @@ cp -p ./build/partition_table/partition-table.bin ${path}
 cp -p ./build/ota_data_initial.bin ${path}
 
 
+bootloader_address=0x0
+if ["ESP32" -eq "${chip}"]; then
+bootloader_address=0x1000
+elif ["ESP32S3" -eq "${chip}"]; then
+elif ["ESP32C3" -eq "${chip}"]; then
+else
+echo "
+exit 0
+fi
+
+
 json_info="{\"version\": \"${version}\",\"build\": $build,\"build_date\": \"$(date)\",\"chip_type\": \"${chip}\",\"flash_size\": [\"4MB\", \"8MB\"],\"binaries\": [{\"address\": \"0x0\",\"file\": \"bootloader.bin\"},{\"address\": \"0x30000\",\"file\": \"Ezlo_Pi_v3x.bin\"},{\"address\": \"0xF000\",\"file\": \"partition-table.bin\"},{\"address\": \"0x1C000\",\"file\": \"ota_data_initial.bin\"}]}"
 echo ${json_info} > ${path}/info.json
 

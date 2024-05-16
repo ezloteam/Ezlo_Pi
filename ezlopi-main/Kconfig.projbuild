@@ -104,7 +104,7 @@ menu "EzloPi User Config"
     
     config EZPI_ENABLE_UART_PROVISIONING
         bool "Enable UART provisioning"
-        depends on EZPI_DISTRO_FULL_OPTION || EZPI_DISTRO_CLOUD_MESHBOT
+        depends on EZPI_DISTRO_FULL_OPTION || EZPI_DISTRO_CLOUD_MESHBOT || EZPI_DISTRO_MINIMAL
         default n
         help
             Enable provisioning and monitoring via UART    
