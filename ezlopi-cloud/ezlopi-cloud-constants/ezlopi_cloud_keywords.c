@@ -188,6 +188,7 @@ const char* ezlopi_total_len_str = "total_len";
 const char* ezlopi_sequence_str = "sequence";
 const char* ezlopi_user_id_str = "user_id";
 const char* ezlopi_userId_str = "userId";
+const char* ezlopi_userIds_str = "userIds";
 const char* ezlopi_coinfig_time_str = "coinfig_time";
 const char* ezlopi_wifi_password_str = "wifi_password";
 const char* ezlopi_ca_cert_str = "ca_cert";
@@ -249,6 +250,7 @@ const char* ezlopi_default_str = "default";
 const char* ezlopi_gmt0_str = "GMT0";
 
 const char* ezlopi_modeId_str = "modeId";
+const char* ezlopi_all_str = "all";
 const char* ezlopi_current_str = "current";
 const char* ezlopi_switchTo_str = "switchTo";
 const char* ezlopi_timeIsLeftToSwitch_str = "timeIsLeftToSwitch";

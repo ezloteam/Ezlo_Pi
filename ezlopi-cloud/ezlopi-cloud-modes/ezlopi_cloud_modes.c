@@ -134,8 +134,18 @@ void ezlopi_cloud_modes_alarm_delay_set(cJSON* cj_request, cJSON* cj_response)
 void ezlopi_cloud_modes_notifications_set(cJSON* cj_request, cJSON* cj_response)
 {
     cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
-    if (cj_result)
+    cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
+    if (cj_result && cj_params)
     {
+        bool all;
+        CJSON_GET_VALUE_BOOL(cj_params, ezlopi_all_str, all);
+        cJSON* cj_modeId = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_modeId_str);
+        cJSON* cj_userIds = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_userIds_str);
+        if (cj_userIds && cj_modeId)
+        {
+            uint8_t modeId = strtoul(cj_modeId->valuestring, NULL, 10);
+            ezlopi_core_modes_notification_set(modeId, all, cj_userIds);
+        }
     }
 }
 
@@ -251,7 +261,7 @@ void ezlopi_cloud_modes_bypass_devices_add(cJSON* cj_request, cJSON* cj_response
             if (cj_modelID && cj_deviceIds && (cj_deviceIds->type == cJSON_Array))
             {
                 uint8_t modeId = strtoul(cj_modelID->valuestring, NULL, 10);
-                ezlopi_core_modesl_bypass_device_add(modeId, cj_deviceIds);
+                ezlopi_core_modes_bypass_device_add(modeId, cj_deviceIds);
             }
         }
     }
@@ -262,7 +272,7 @@ void ezlopi_cloud_modes_bypass_devices_remove(cJSON* cj_request, cJSON* cj_respo
     cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     if (cj_result)
     {
-        cJSON* cj_params = cJSON_GetObjectItem(__func__, cj_request, ezlopi_params_str);
+        cJSON* cj_params = cJSON_GetObjectItem(__func__, cj_request, ezlopi_params_str); 
         if (cj_params)
         {
             cJSON* cj_modelID = cJSON_GetObjectItem(__func__, cj_params, ezlopi_modeId_str);
@@ -270,7 +280,7 @@ void ezlopi_cloud_modes_bypass_devices_remove(cJSON* cj_request, cJSON* cj_respo
             if (cj_modelID && cj_deviceIds && (cj_deviceIds->type == cJSON_Array))
             {
                 uint8_t modeId = strtoul(cj_modelID->valuestring, NULL, 10);
-                ezlopi_core_modesl_bypass_device_remove(modeId, cj_deviceIds);
+                ezlopi_core_modes_bypass_device_remove(modeId, cj_deviceIds);
             }
         }
     }
