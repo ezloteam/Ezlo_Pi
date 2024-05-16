@@ -15,11 +15,11 @@
 #include "ezlopi_core_http.h"
 #include "ezlopi_core_wifi.h"
 #include "ezlopi_core_buffer.h"
+#include "ezlopi_core_processes.h"
 #include "ezlopi_core_api_methods.h"
 #include "ezlopi_core_event_group.h"
 #include "ezlopi_core_factory_info.h"
 #include "ezlopi_core_cjson_macros.h"
-#include "ezlopi_core_processes.h"
 #include "ezlopi_core_websocket_client.h"
 #include "ezlopi_core_ezlopi_broadcast.h"
 

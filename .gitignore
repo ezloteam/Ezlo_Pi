@@ -1,3 +1,5 @@
+key/
+key/*
 *.old
 *.bin
 firmware/**

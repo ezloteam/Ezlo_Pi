@@ -5,8 +5,8 @@
 #include "esp_system.h"
 
 #if (1 == ENABLE_TRACE)
-f_ezlopi_log_upcall_t cloud_log_upcall_func = NULL;
-f_ezlopi_log_upcall_t serial_log_upcall_func = NULL;
+static f_ezlopi_log_upcall_t cloud_log_upcall_func = NULL;
+static f_ezlopi_log_upcall_t serial_log_upcall_func = NULL;
 
 static void put_idump(uint8_t* buff, uint32_t ofs, uint32_t cnt)
 {
@@ -76,6 +76,7 @@ void ezlopi_util_set_log_upcalls(f_ezlopi_log_upcall_t cloud_log_upcall, f_ezlop
     {
         cloud_log_upcall_func = cloud_log_upcall;
     }
+    
     if (serial_log_upcall)
     {
         serial_log_upcall_func = serial_log_upcall;
@@ -104,6 +105,7 @@ void trace_color_print(const char* txt_color, uint8_t severity, const char* file
         log_upcall_func(severity, cloud_log_format);
         va_end(args);
     }
+
     log_upcall_func = ezlopi_util_get_serial_log_upcall();
     if (log_upcall_func != NULL) {
         va_list args;

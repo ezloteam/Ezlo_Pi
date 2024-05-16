@@ -1,3 +1,5 @@
+#!/bin/bash
+
 speed=921600
 port="/dev/ttyUSB0"
 
