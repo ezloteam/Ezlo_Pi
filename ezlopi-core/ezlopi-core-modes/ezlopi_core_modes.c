@@ -528,6 +528,26 @@ int ezlopi_core_modes_notification_set(uint8_t modesId, bool all, cJSON* user_id
     return ret;
 }
 
+int ezlopi_core_modes_protect_set(uint8_t modesId, bool protect)
+{
+    int ret = 0;
+
+    if ((EZLOPI_HOUSE_MODE_REF_ID_NONE < modesId) && (EZLOPI_HOUSE_MODE_REF_ID_MAX > modesId))
+    {
+        ezlopi_service_modes_stop();
+        s_house_modes_t* mode_to_update = ezlopi_core_modes_get_house_mode_by_id(modesId);
+        if(mode_to_update)
+        {
+            mode_to_update->protect = protect;
+            ezlopi_core_modes_store_to_nvs();
+            ret = 1;
+        }
+        ezlopi_service_modes_start();
+    }
+
+    return ret;
+}
+
 int ezlopi_core_modes_set_unset_device_armed_status(cJSON* cj_device_array, const bool set)
 {
     int ret = 0;

@@ -31,7 +31,7 @@ CLOUD_METHOD("hub.modes.cameras_off.add", ezlopi_cloud_modes_cameras_off_add, NU
 CLOUD_METHOD("hub.modes.cameras_off.remove", ezlopi_cloud_modes_cameras_off_remove, NULL)
 CLOUD_METHOD("hub.modes.bypass_devices.add", ezlopi_cloud_modes_bypass_devices_add, ezlopi_cloud_modes_bypass_device_added_updater)
 CLOUD_METHOD("hub.modes.bypass_devices.remove", ezlopi_cloud_modes_bypass_devices_remove, ezlopi_cloud_modes_bypass_device_removed_updater)
-CLOUD_METHOD("hub.modes.protect.set", ezlopi_cloud_modes_protect_set, NULL)
+CLOUD_METHOD("hub.modes.protect.set", ezlopi_cloud_modes_protect_set, ezlopi_cloud_modes_changed_updater)
 CLOUD_METHOD("hub.modes.protect.buttons.set", ezlopi_cloud_modes_protect_buttons_set, NULL)
 CLOUD_METHOD("hub.modes.protect.devices.add", ezlopi_cloud_modes_protect_devices_add, NULL)
 CLOUD_METHOD("hub.modes.protect.devices.remove", ezlopi_cloud_modes_protect_devices_remove, NULL)

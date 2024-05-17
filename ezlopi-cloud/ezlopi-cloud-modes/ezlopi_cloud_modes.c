@@ -291,6 +291,19 @@ void ezlopi_cloud_modes_protect_set(cJSON* cj_request, cJSON* cj_response)
     cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     if (cj_result)
     {
+        cJSON* cj_params = cJSON_GetObjectItem(__func__, cj_request, ezlopi_params_str);
+        if (cj_params)
+        {
+            cJSON* cj_modelID = cJSON_GetObjectItem(__func__, cj_params, ezlopi_modeId_str);
+            cJSON* cj_protect = cJSON_GetObjectItem(__func__, cj_params, ezlopi_protect_str);
+            cJSON* cj_timestamp = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_timestamp_str);
+            if (cj_modelID && cj_protect)
+            {
+                uint8_t modeId = strtoul(cj_modelID->valuestring, NULL, 10);
+                bool protect = cj_protect->type == cJSON_True ? true : false;
+                // ezlopi_core_modes_protect_add(modeId, cj_protect);
+            }
+        }
     }
 }
 
