@@ -580,14 +580,14 @@ static void ezlopi_device_parse_json_v3(cJSON* cjson_config)
                 // strncpy(chipset_name, cjson_chipset->valuestring, cjson_chipset->str_value_len);
 
 #if defined(CONFIG_IDF_TARGET_ESP32)
-                uint32_t compare_len = strlen(ezlopi_ESP32_str) > cjson_chipset->str_value_len ? strlen(ezlopi_ESP32_str) : cjson_chipset->str_value_len;
+                // uint32_t compare_len = strlen(ezlopi_ESP32_str) > cjson_chipset->str_value_len ? strlen(ezlopi_ESP32_str) : cjson_chipset->str_value_len;
                 // if (strncmp(chipset_name, ezlopi_ESP32_str, compare_len) == 0)
 #elif  defined (CONFIG_IDF_TARGET_ESP32S3)
-                uint32_t compare_len = strlen(ezlopi_ESP32S3_str) > cjson_chipset->str_value_len ? strlen(ezlopi_ESP32S3_str) : cjson_chipset->str_value_len;
-                if (strncmp(chipset_name, ezlopi_ESP32S3_str, compare_len) == 0)
+                // uint32_t compare_len = strlen(ezlopi_ESP32S3_str) > cjson_chipset->str_value_len ? strlen(ezlopi_ESP32S3_str) : cjson_chipset->str_value_len;
+                // if (strncmp(chipset_name, ezlopi_ESP32S3_str, compare_len) == 0)
 #elif defined (CONFIG_IDF_TARGET_ESP32C3)
-                uint32_t compare_len = strlen(ezlopi_ESP32C3_str) > cjson_chipset->str_value_len ? strlen(ezlopi_ESP32C3_str) : cjson_chipset->str_value_len;
-                if (strncmp(chipset_name, ezlopi_ESP32C3_str, compare_len) == 0)
+                // uint32_t compare_len = strlen(ezlopi_ESP32C3_str) > cjson_chipset->str_value_len ? strlen(ezlopi_ESP32C3_str) : cjson_chipset->str_value_len;
+                // if (strncmp(chipset_name, ezlopi_ESP32C3_str, compare_len) == 0)
 #endif // Chipset 
                 {
                     cJSON* cjson_device_list = cJSON_GetObjectItem(__FUNCTION__, cjson_config, ezlopi_dev_detail_str);

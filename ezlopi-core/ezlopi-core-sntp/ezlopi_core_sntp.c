@@ -45,6 +45,7 @@ void EZPI_CORE_sntp_init(void)
     // ezlopi_wait_for_wifi_to_connect(portMAX_DELAY);
 
     TRACE_I("Initializing SNTP");
+
     esp_sntp_setoperatingmode(ESP_SNTP_OPMODE_POLL);
     esp_sntp_setservername(0, "pool.ntp.org");
     // esp_sntp_setservername(1, "ntp-b.nist.gov");
