@@ -54,7 +54,7 @@ cJSON *ezlopi_core_api_consume(const char * who, const char *payload, uint32_t l
 
                         if (cj_update_response)
                         {
-                            cJSON_AddNullToObject(who, cj_update_response, ezlopi_error_str);
+                            // cJSON_AddNullToObject(who, cj_update_response, ezlopi_error_str);
 
                             if (!ezlopi_core_ezlopi_broadcast_add_to_queue(cj_update_response))
                             {

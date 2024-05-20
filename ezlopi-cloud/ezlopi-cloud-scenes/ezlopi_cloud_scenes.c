@@ -436,12 +436,18 @@ void scene_deleted(cJSON* cj_request, cJSON* cj_response)
     cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, ezlopi_hub_scene_deleted_str);
 
     cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
-    cJSON_AddItemToObject(__FUNCTION__, cj_response, ezlopi_result_str, cJSON_Duplicate(__FUNCTION__, cj_params, cJSON_True));
-
-    cJSON* cj_result = cJSON_GetObjectItem(__FUNCTION__, cj_response, ezlopi_result_str);
-    if (cj_result)
+    if (cj_params)
     {
-        cJSON_AddBoolToObject(__FUNCTION__, cj_result, ezlopi_syncNotification_str, true);
+        cJSON* tmp__id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi__id_str);
+        if (tmp__id)
+        {
+            cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+            if (cj_result)
+            {
+                cJSON_AddItemToObject(__FUNCTION__, cj_result, ezlopi__id_str, cJSON_Duplicate(__FUNCTION__, tmp__id, pdTRUE));
+                cJSON_AddBoolToObject(__FUNCTION__, cj_result, ezlopi_syncNotification_str, true);
+            }
+        }
     }
 }
 #endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
