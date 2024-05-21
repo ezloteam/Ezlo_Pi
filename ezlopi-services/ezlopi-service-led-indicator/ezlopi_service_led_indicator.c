@@ -236,7 +236,9 @@ static int __indicator_led_init(void)
     {
         if (ESP_OK == ledc_channel_config(&indicator_pwm_channel_cfg))
         {
-            xTaskCreate(__indicator_LED_blinker, "indicator_task", 2048 * 2, NULL, 1, NULL);
+            TaskHandle_t indicator_task_handle = NULL;
+            xTaskCreate(__indicator_LED_blinker, "indicator_task", 2048 * 2, NULL, 1, &indicator_task_handle);
+            ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_LED_INDICATOR_TASK, &indicator_task_handle, EZLOPI_SERVICE_LED_INDICATOR_TASK_DEPTH);
             ret = 1;
         }
     }
