@@ -126,13 +126,16 @@ int ezlopi_core_get_processes_details(cJSON* cj_processes_array)
                     cJSON_AddNumberToObject(__FUNCTION__, cj_process, "pid", task_array[i].xTaskNumber);
                     cJSON_AddStringToObject(__FUNCTION__, cj_process, "processName", task_array[i].pcTaskName);
                     size_t default_task_stack_size = set_default_task_memory_usage(task_array[i].pcTaskName);
-                    cJSON_AddNumberToObject(__FUNCTION__, cj_process, "memoryUsage", default_task_stack_size);
                     if (default_task_stack_size != 0)
                     {
-                        cJSON_AddNumberToObject(__FUNCTION__, cj_process, "vmRss", (default_task_stack_size - task_array[i].usStackHighWaterMark));
+                        cJSON_AddNumberToObject(__FUNCTION__, cj_process, "memoryUsage", default_task_stack_size);
+                        if (default_task_stack_size != 0)
+                        {
+                            cJSON_AddNumberToObject(__FUNCTION__, cj_process, "vmRss", (default_task_stack_size - task_array[i].usStackHighWaterMark));
+                        }
+                        cJSON_AddStringToObject(__FUNCTION__, cj_process, "units", "bytes");
+                        cJSON_AddItemToArray(cj_processes_array, cj_process);
                     }
-                    cJSON_AddStringToObject(__FUNCTION__, cj_process, "units", "bytes");
-                    cJSON_AddItemToArray(cj_processes_array, cj_process);
                 }
             }
         }
