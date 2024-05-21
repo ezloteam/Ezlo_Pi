@@ -69,6 +69,8 @@ message(STATUS "EXTRA_COMPONENTS_DIRS: ${EXTRA_COMPONENT_DIRS}\r\n")
 # # Set linker flags for AddressSanitizer
 # set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address")
 
+# Add components that needs to be excluded
+set(EXCLUDE_COMPONENTS freemodbus)
 
 ## ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ##
 project(Ezlo_Pi_v3x)

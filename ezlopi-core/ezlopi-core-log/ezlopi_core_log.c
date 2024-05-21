@@ -1,6 +1,5 @@
 #include "../../build/config/sdkconfig.h"
 
-#ifdef CONFIG_EZPI_CORE_LOG_EN
 
 #include <stdbool.h>
 #include <string.h>
@@ -230,4 +229,3 @@ void ezlopi_core_set_log_upcalls()
     ezlopi_util_set_log_upcalls(NULL, ezlopi_core_serial_log_upcall);
 #endif
 }
-#endif // CONFIG_EZPI_CORE_LOG_EN
