@@ -595,35 +595,43 @@ static void ezlopi_device_parse_json_v3(cJSON* cjson_config)
         {
             int config_dev_idx = 0;
             cJSON* cjson_device = NULL;
-
-            TRACE_I("---------------------------------------------");
-            while (NULL != (cjson_device = cJSON_GetArrayItem(cjson_device_list, config_dev_idx)))
-            {
-                TRACE_I("Device-%d:", config_dev_idx);
-
-                int id_item = 0;
-                CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_id_item_str, id_item);
-
-                if (0 != id_item)
                 {
-                    s_ezlopi_device_v3_t* v3_sensor_list = ezlopi_devices_list_get_list_v3();
-                    int dev_idx = 0;
+                    cJSON* cjson_device_list = cJSON_GetObjectItem(__FUNCTION__, cjson_config, ezlopi_dev_detail_str);
 
-                    while (NULL != v3_sensor_list[dev_idx].func)
+                    if (cjson_device_list)
                     {
-                        if (id_item == v3_sensor_list[dev_idx].id)
+                        int config_dev_idx = 0;
+                        cJSON* cjson_device = NULL;
+
+                        TRACE_I("---------------------------------------------");
+                        while (NULL != (cjson_device = cJSON_GetArrayItem(cjson_device_list, config_dev_idx)))
                         {
-                            s_ezlopi_prep_arg_t device_prep_arg = { .device = &v3_sensor_list[dev_idx], .cjson_device = cjson_device };
-                            v3_sensor_list[dev_idx].func(EZLOPI_ACTION_PREPARE, NULL, (void*)&device_prep_arg, NULL);
+                            TRACE_I("Device-%d:", config_dev_idx);
+
+                            int id_item = 0;
+                            CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_id_item_str, id_item);
+
+                            if (0 != id_item)
+                            {
+                                s_ezlopi_device_v3_t* v3_sensor_list = ezlopi_devices_list_get_list_v3();
+                                int dev_idx = 0;
+
+                                while (NULL != v3_sensor_list[dev_idx].func)
+                                {
+                                    if (id_item == v3_sensor_list[dev_idx].id)
+                                    {
+                                        s_ezlopi_prep_arg_t device_prep_arg = { .device = &v3_sensor_list[dev_idx], .cjson_device = cjson_device };
+                                        v3_sensor_list[dev_idx].func(EZLOPI_ACTION_PREPARE, NULL, (void*)&device_prep_arg, NULL);
+                                    }
+                                    dev_idx++;
+                                }
+                            }
+                            config_dev_idx++;
+                            TRACE_I("---------------------------------------------");
                         }
-                        dev_idx++;
                     }
                 }
-                config_dev_idx++;
-                TRACE_I("---------------------------------------------");
-            }
-        }
-    }
+
     #if (defined(CONFIG_IDF_TARGET_ESP32) || defined(CONFIG_IDF_TARGET_ESP32S3) || defined(CONFIG_IDF_TARGET_ESP32C3))
         else
         {

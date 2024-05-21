@@ -48,35 +48,35 @@ menu "EzloPi User Config"
             Run the device in test mode
     
     config EZPI_UTIL_TRACE_EN
-    bool "Enable trace component for logging"
-    default y
-    help
-        ezlopi-util-trace component is enabled to log the outputs to the serial monitor
+        bool "Enable trace component for logging"
+        default y
+        help
+            ezlopi-util-trace component is enabled to log the outputs to the serial monitor
 
     config EZPI_BLE_ENABLE
-        depends on EZPI_DISTRO_FULL_OPTION || EZPI_DISTRO_LOCAL || EZPI_DISTRO_LOCAL_MESHBOT || EZPI_DISTRO_BLE_CLOUD || EZPI_DISTRO_BLE_HUB || EZPI_DISTRO_MINIMAL
+        depends on EZPI_DISTRO_FULL_OPTION || EZPI_DISTRO_LOCAL || EZPI_DISTRO_LOCAL_MESHBOT || EZPI_DISTRO_CLOUD_MESHBOT || EZPI_DISTRO_BLE_CLOUD || EZPI_DISTRO_BLE_HUB || EZPI_DISTRO_MINIMAL
         bool "Enable BLE"
         default n
         help
             Enable BLE
     
-    config EZPI_BLE_ENALBE_PAIRING
-        bool "Enable BLE pairing"
-        depends on EZPI_BLE_ENABLE
-        default y
-        help
-            Enable BLE pairing
-                
-    config EZPI_BLE_ENALBE_PASSKEY
-        bool "Enable BLE pass key"
-        default n
-        depends on EZPI_BLE_ENALBE_PAIRING
-        help
-            Enable BLE pass key
+        config EZPI_BLE_ENALBE_PAIRING
+            bool "Enable BLE pairing"
+            depends on EZPI_BLE_ENABLE
+            default y
+            help
+                Enable BLE pairing
+                    
+        config EZPI_BLE_ENALBE_PASSKEY
+            bool "Enable BLE pass key"
+            default n
+            depends on EZPI_BLE_ENALBE_PAIRING
+            help
+                Enable BLE pass key
 
     config EZPI_CORE_ENABLE_ETH
         bool "Enable ethernet"
-        depends on ETH_USE_SPI_ETHERNET || EZPI_DISTRO_FULL_OPTION 
+        depends on ETH_USE_SPI_ETHERNET || EZPI_DISTRO_FULL_OPTION || EZPI_DISTRO_LOCAL
         default n
         help 
             ezlopi-core-ethernet component is enabled
@@ -104,7 +104,7 @@ menu "EzloPi User Config"
     
     config EZPI_ENABLE_UART_PROVISIONING
         bool "Enable UART provisioning"
-        depends on EZPI_DISTRO_FULL_OPTION
+        depends on EZPI_DISTRO_FULL_OPTION || EZPI_DISTRO_CLOUD_MESHBOT || EZPI_DISTRO_MINIMAL
         default n
         help
             Enable provisioning and monitoring via UART    
@@ -117,11 +117,17 @@ menu "EzloPi User Config"
             Enable local websocket server
 
     config EZPI_WEBSOCKET_CLIENT
-        depends on (EZPI_CORE_ENABLE_ETH || EZPI_ENABLE_WIFI ) && (EZPI_DISTRO_FULL_OPTION || EZPI_DISTRO_CLOUD || EZPI_DISTRO_CLOUD_MESHBOT || EZPI_DISTRO_BLE_CLOUD || EZPI_DISTRO_WIFI_HUB || EZPI_DISTRO_BLE_HUB)
+        depends on (EZPI_CORE_ENABLE_ETH || EZPI_ENABLE_WIFI ) && (EZPI_DISTRO_FULL_OPTION || EZPI_DISTRO_CLOUD || EZPI_DISTRO_CLOUD_MESHBOT || EZPI_DISTRO_BLE_CLOUD || EZPI_DISTRO_WIFI_HUB || EZPI_DISTRO_BLE_HUB || EZPI_DISTRO_MINIMAL)
         bool "Enable Web-Socket client"
         default n
         help 
             Enable Web-Socket client, required for connecting with cloud
+
+    config EZPI_CORE_LOG_EN
+        bool "Enable cloud-logging"
+        default n
+        help 
+            Enable core for cloud-loging
 
     config EZPI_CORE_STATIC_BUFFER_SIZE
         depends on EZPI_WEBSOCKET_CLIENT || EZPI_LOCAL_WEBSOCKET_SERVER
@@ -137,12 +143,12 @@ menu "EzloPi User Config"
         help
             Enable meshbot services for scenes
     
-    config EZPI_SERV_ENABLE_MODES
-        depends on EZPI_SERV_ENABLE_MESHBOTS
-        bool "Enable mode services"
-        default n
-        help
-            Enable mode services
+        config EZPI_SERV_ENABLE_MODES
+            depends on EZPI_SERV_ENABLE_MESHBOTS
+            bool "Enable mode services"
+            default n
+            help
+                Enable mode services
     
     config EZPI_ENABLE_LED_INDICATOR
         bool "Enable indicator LED available in the device"

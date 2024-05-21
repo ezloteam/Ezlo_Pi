@@ -11,7 +11,7 @@ extern "C"
 {
 #endif
 
-#ifdef CONFIG_EZPI_UTIL_TRACE_EN
+#if defined(CONFIG_EZPI_UTIL_TRACE_EN) || defined(CONFIG_EZPI_CORE_LOG_EN)
 #define ENABLE_TRACE 1
 #else
 #define ENABLE_TRACE 0
@@ -53,6 +53,7 @@ extern "C"
     }
 
 #if 0
+
 #define trace_color_print(txt_color, severity, X, reg...)                                                                               \
     {                                                                                                                                   \
         f_ezlopi_log_upcall_t log_upcall_func = ezlopi_util_get_cloud_log_upcall();                                                     \
@@ -67,6 +68,7 @@ extern "C"
         }                                                                                                                               \
     }
 #endif 
+
 #define trace(X, reg...)                                       \
     {                                                          \
         printf("%s[%d]:" X "\r\n", __FILE__, __LINE__, ##reg); \
