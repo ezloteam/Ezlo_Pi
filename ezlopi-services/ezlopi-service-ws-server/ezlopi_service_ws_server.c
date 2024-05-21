@@ -7,7 +7,6 @@
    CONDITIONS OF ANY KIND, either express or implied.
 */
 
-#include "../../build/config/sdkconfig.h"
 
 
 #include "esp_eth.h"
@@ -35,9 +34,10 @@
 #include "ezlopi_service_ws_server.h"
 #include "ezlopi_service_ws_server_clients.h"
 
+#include "../../build/config/sdkconfig.h"
 #include "EZLOPI_USER_CONFIG.h"
 
-#if defined(CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER)
+
 typedef struct s_async_resp_arg
 {
     int fd;
@@ -468,9 +468,9 @@ static void __wifi_connection_event(esp_event_base_t event_base, int32_t event_i
         }
     }
 }
-#else // CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER
+
 void ezlpi_service_ws_server_dummy(void)
 {
-    TRACE_D("I'm dummy");
+    TRACE_D("I'm dummy. I do nothing.");
 }
-#endif // CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER
+
