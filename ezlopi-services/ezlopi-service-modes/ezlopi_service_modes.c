@@ -71,6 +71,7 @@ static void __modes_service(void* pv)
                 }
                 else
                 {
+                    printf("service: %d\n", ez_mode->switch_to_mode_id);
                     s_house_modes_t* new_house_mode = ezlopi_core_modes_get_house_mode_by_id(ez_mode->switch_to_mode_id);
 
                     if (new_house_mode)

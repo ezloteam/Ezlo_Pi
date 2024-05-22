@@ -57,7 +57,7 @@ s_house_modes_t* ezlopi_core_modes_get_house_mode_by_id(uint32_t house_mode_id)
     }
     else
     {
-        TRACE_E("house-mode-id does not match with existing house-modes!");
+        TRACE_E("house-mode-id(%d) does not match with existing house-modes!", house_mode_id);
     }
 
     return _house_mode;
@@ -287,11 +287,10 @@ void ezlopi_core_modes_init(void)
     {
         cJSON* cj_custom_modes = cJSON_Parse(__FUNCTION__, custom_modes_str);
         ezlopi_free(__FUNCTION__, custom_modes_str);
-
         CJSON_TRACE("cj_custom-modes", cj_custom_modes);
-
         if (cj_custom_modes)
         {
+
             _is_custom_mode_ok = 1;
             sg_custom_modes = ezlopi_core_modes_cjson_parse_modes(cj_custom_modes);
             ezlopi_core_set_current_house_mode();
@@ -536,11 +535,72 @@ int ezlopi_core_modes_protect_set(uint8_t modesId, bool protect)
     {
         ezlopi_service_modes_stop();
         s_house_modes_t* mode_to_update = ezlopi_core_modes_get_house_mode_by_id(modesId);
-        if(mode_to_update)
+        if (mode_to_update)
         {
             mode_to_update->protect = protect;
             ezlopi_core_modes_store_to_nvs();
             ret = 1;
+        }
+        ezlopi_service_modes_start();
+    }
+
+    return ret;
+}
+
+int ezlopi_core_modes_protect_button_service_set(char* service_str, uint32_t deviceId)
+{
+    int ret = 0;
+    if (service_str && deviceId)
+    {
+        ezlopi_service_modes_stop();
+
+        if (sg_custom_modes)
+        {
+            if (NULL == sg_custom_modes->l_protect_buttons)
+            {
+                sg_custom_modes->l_protect_buttons = (s_protect_buttons_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_protect_buttons_t));
+                if (sg_custom_modes->l_protect_buttons)
+                {
+                    memset(sg_custom_modes->l_protect_buttons, 0, sizeof(s_protect_buttons_t));
+                    sg_custom_modes->l_protect_buttons->device_id = deviceId;
+                    snprintf(sg_custom_modes->l_protect_buttons->service_name, sizeof(sg_custom_modes->l_protect_buttons->service_name), "%s", service_str);
+                    sg_custom_modes->l_protect_buttons->func = NULL;
+                    sg_custom_modes->l_protect_buttons->next = NULL;
+                }
+            }
+            else
+            {
+                bool add_new_device = true;
+                s_protect_buttons_t* protect_head = sg_custom_modes->l_protect_buttons;
+                s_protect_buttons_t* previous_potect_button = sg_custom_modes->l_protect_buttons;
+                while (NULL != protect_head)
+                {
+                    if (deviceId == protect_head->device_id)
+                    {
+                        memset(protect_head->service_name, 0, sizeof(protect_head->service_name));
+                        snprintf(protect_head->service_name, sizeof(protect_head->service_name), "%s", service_str);
+                        protect_head->func = NULL;
+                        add_new_device = false;
+                        break;
+                    }
+                    previous_potect_button = protect_head;
+                    protect_head = protect_head->next;
+                }
+                if (add_new_device)
+                {
+                    s_protect_buttons_t* new_button = (s_protect_buttons_t*)ezlopi_malloc(__FUNCCTION__, sizeof(s_protect_buttons_t));
+                    if (new_button)
+                    {
+                        memset(new_button, 0, sizeof(s_protect_buttons_t));
+                        new_button->device_id = deviceId;
+                        snprintf(new_button->service_name, sizeof(new_button->service_name), "%s", service_str);
+                        new_button->func = NULL;
+                        new_button->next = NULL;
+                        previous_potect_button->next = new_button;
+                    }
+                }
+            }
+            ezlopi_core_modes_store_to_nvs();
         }
         ezlopi_service_modes_start();
     }

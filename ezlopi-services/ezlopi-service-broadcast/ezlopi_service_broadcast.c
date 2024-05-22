@@ -18,8 +18,8 @@ void ezlopi_service_broadcast_init(void)
     __broadcast_queue = xQueueCreate(sizeof(char*), 10);
     if (__broadcast_queue)
     {
-        TaskHandle_t ezlopi_service_broadcast_task_handle = NULL;
         ezlopi_core_ezlopi_broadcast_methods_set_queue(ezlopi_service_broadcast_send_to_queue);
+        TaskHandle_t ezlopi_service_broadcast_task_handle = NULL;
         xTaskCreate(__broadcast_process, "broadcast-service", EZLOPI_SERVICE_BROADCAST_TASK_DEPTH, NULL, 2, &ezlopi_service_broadcast_task_handle);
         ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_BROADCAST_TASK, &ezlopi_service_broadcast_task_handle, EZLOPI_SERVICE_BROADCAST_TASK_DEPTH);
     }

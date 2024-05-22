@@ -272,7 +272,7 @@ void ezlopi_cloud_modes_bypass_devices_remove(cJSON* cj_request, cJSON* cj_respo
     cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     if (cj_result)
     {
-        cJSON* cj_params = cJSON_GetObjectItem(__func__, cj_request, ezlopi_params_str); 
+        cJSON* cj_params = cJSON_GetObjectItem(__func__, cj_request, ezlopi_params_str);
         if (cj_params)
         {
             cJSON* cj_modelID = cJSON_GetObjectItem(__func__, cj_params, ezlopi_modeId_str);
@@ -296,12 +296,12 @@ void ezlopi_cloud_modes_protect_set(cJSON* cj_request, cJSON* cj_response)
         {
             cJSON* cj_modelID = cJSON_GetObjectItem(__func__, cj_params, ezlopi_modeId_str);
             cJSON* cj_protect = cJSON_GetObjectItem(__func__, cj_params, ezlopi_protect_str);
-            cJSON* cj_timestamp = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_timestamp_str);
+            // cJSON* cj_timestamp = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_timestamp_str); // Its usage is unknown so it is commented.
             if (cj_modelID && cj_protect)
             {
                 uint8_t modeId = strtoul(cj_modelID->valuestring, NULL, 10);
                 bool protect = cj_protect->type == cJSON_True ? true : false;
-                // ezlopi_core_modes_protect_add(modeId, cj_protect);
+                ezlopi_core_modes_protect_set(modeId, cj_protect);
             }
         }
     }
@@ -312,6 +312,18 @@ void ezlopi_cloud_modes_protect_buttons_set(cJSON* cj_request, cJSON* cj_respons
     cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     if (cj_result)
     {
+        cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
+        if (cj_params)
+        {
+            cJSON* cj_service = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_service_str);
+            cJSON* cj_deviceId = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_deviceId_str);
+            if (cj_service && (cj_service->type == cJSON_String) && cj_deviceId && (cj_deviceId->type == cJSON_String))
+            {
+                uint32_t deviceId = strtoul(cj_deviceId->valuestring, NULL, 16);
+                bool protect = cj_deviceId->type == cJSON_True ? true : false;
+                ezlopi_core_modes_protect_button_service_set(cj_service->valuestring, deviceId);
+            }
+        }
     }
 }
 

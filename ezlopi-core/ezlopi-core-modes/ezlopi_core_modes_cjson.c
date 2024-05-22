@@ -190,7 +190,7 @@ s_ezlopi_modes_t* ezlopi_core_modes_cjson_parse_modes(cJSON* cj_modes)
                 }
 
                 CJSON_GET_VALUE_BOOL(cj_house_mod, ezlopi_disarmedDefault_str, cur_house_mode->disarmed_default);
-            
+
                 {
                     cJSON* cj_disarmed_devices = cJSON_GetObjectItem(__FUNCTION__, cj_house_mod, ezlopi_disarmedDevices_str);
                     if (cj_disarmed_devices)
@@ -201,7 +201,7 @@ s_ezlopi_modes_t* ezlopi_core_modes_cjson_parse_modes(cJSON* cj_modes)
 
                 {
                     cJSON* cj_bypass_devices = cJSON_GetObjectItem(__FUNCTION__, cj_house_mod, ezlopi_bypassDevices_str);
-                    if(cj_bypass_devices)
+                    if (cj_bypass_devices)
                     {
                         cur_house_mode->cj_bypass_devices = cJSON_Duplicate(__FUNCTION__, cj_bypass_devices, cJSON_True);
                     }
@@ -261,33 +261,36 @@ s_ezlopi_modes_t* ezlopi_core_modes_cjson_parse_modes(cJSON* cj_modes)
 
         {
             cJSON* cj_protect_buttons = cJSON_GetObjectItem(__FUNCTION__, cj_modes, ezlopi_protectButtons_str);
-            if (cj_protect_buttons)
+            if (cj_protect_buttons && (cJSON_Array == cj_protect_buttons->type))
             {
-                uint32_t idx = 0;
                 cJSON* cj_button = NULL;
-                s_protect_buttons_t* curr_button = NULL;
-
-                while (NULL != (cj_button = cJSON_GetArrayItem(cj_protect_buttons, idx)))
+                cJSON_ArrayForEach(cj_button, cj_protect_buttons)
                 {
-                    if (parsed_mode->l_protect_buttons)
+                    if (NULL == parsed_mode->l_protect_buttons)
                     {
-                        curr_button->next = (s_protect_buttons_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_protect_buttons_t));
-                        curr_button = curr_button->next;
+                        parsed_mode->l_protect_buttons = (s_protect_buttons_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_protect_buttons_t));
+                        memset(parsed_mode->l_protect_buttons, 0, sizeof(s_protect_buttons_t));
+                        CJSON_GET_ID(parsed_mode->l_protect_buttons->device_id, cJSON_GetObjectItem(__FUNCTION__, cj_button, ezlopi_id_str));
+                        CJSON_GET_VALUE_STRING_BY_COPY(cj_button, ezlopi_service_str, parsed_mode->l_protect_buttons->service_name);
+                        parsed_mode->l_protect_buttons->next = NULL;
                     }
                     else
                     {
-                        parsed_mode->l_protect_buttons = (s_protect_buttons_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_protect_buttons_t));
-                        curr_button = parsed_mode->l_protect_buttons;
+                        s_protect_buttons_t* protect_buttons = parsed_mode->l_protect_buttons;
+                        while (protect_buttons->next)
+                        {
+                            protect_buttons = protect_buttons->next;
+                        }
+                        protect_buttons->next = (s_protect_buttons_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_protect_buttons_t));
+                        if (protect_buttons->next)
+                        {
+                            memset(protect_buttons->next, 0, sizeof(s_protect_buttons_t));
+                            protect_buttons->next = (s_protect_buttons_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_protect_buttons_t));
+                            CJSON_GET_ID(protect_buttons->next->device_id, cJSON_GetObjectItem(__FUNCTION__, cj_button, ezlopi_id_str));
+                            CJSON_GET_VALUE_STRING_BY_COPY(cj_button, ezlopi_service_str, protect_buttons->next->service_name);
+                            protect_buttons->next->next = NULL;
+                        }
                     }
-
-                    if (curr_button)
-                    {
-                        memset(curr_button, 0, sizeof(s_protect_buttons_t));
-                        CJSON_GET_ID(curr_button->device_id, cJSON_GetObjectItem(__FUNCTION__, cj_modes, ezlopi_id_str));
-                        CJSON_GET_VALUE_STRING_BY_COPY(cj_modes, ezlopi_service_str, curr_button->service_name);
-                    }
-
-                    idx++;
                 }
             }
         }
@@ -380,7 +383,7 @@ cJSON* ezlopi_core_modes_cjson_changed(void)
 
 ////////////////////////////////
 
-static void __cjson_add_number_as_hex_string(cJSON* cj_dest, const char* obj_name, uint32_t number)
+static void __cjson_add_number_as_hex_string(cJSON * cj_dest, const char* obj_name, uint32_t number)
 {
     if (cj_dest && obj_name)
     {
@@ -390,7 +393,7 @@ static void __cjson_add_number_as_hex_string(cJSON* cj_dest, const char* obj_nam
     }
 }
 
-static void __cjson_add_entry_delay(cJSON* cj_result, s_entry_delay_t* entry_delay)
+static void __cjson_add_entry_delay(cJSON * cj_result, s_entry_delay_t * entry_delay)
 {
     cJSON* cj_entry_delay = cJSON_AddObjectToObject(__FUNCTION__, cj_result, ezlopi_entryDelay_str);
     if (cj_entry_delay)
@@ -402,7 +405,7 @@ static void __cjson_add_entry_delay(cJSON* cj_result, s_entry_delay_t* entry_del
     }
 }
 
-static void __cjson_duplicate_add_reference(cJSON* cj_dest, const char* item_name_str, cJSON* cj_item)
+static void __cjson_duplicate_add_reference(cJSON * cj_dest, const char* item_name_str, cJSON * cj_item)
 {
     if (cj_dest)
     {
@@ -417,7 +420,7 @@ static void __cjson_duplicate_add_reference(cJSON* cj_dest, const char* item_nam
     }
 }
 
-static void __cjson_add_mode_to_array(cJSON* cj_modes_arr, s_house_modes_t* house_mode)
+static void __cjson_add_mode_to_array(cJSON * cj_modes_arr, s_house_modes_t * house_mode)
 {
     if (house_mode)
     {
@@ -448,7 +451,7 @@ static void __cjson_add_mode_to_array(cJSON* cj_modes_arr, s_house_modes_t* hous
     }
 }
 
-static void __cjson_add_protect_buttons(cJSON* cj_protect_buttons_arr, s_protect_buttons_t* l_protect_buttons)
+static void __cjson_add_protect_buttons(cJSON * cj_protect_buttons_arr, s_protect_buttons_t * l_protect_buttons)
 {
     while (l_protect_buttons)
     {
@@ -463,12 +466,11 @@ static void __cjson_add_protect_buttons(cJSON* cj_protect_buttons_arr, s_protect
                 cJSON_Delete(__FUNCTION__, cj_protect_button);
             }
         }
-
         l_protect_buttons = l_protect_buttons->next;
     }
 }
 
-static void __cjson_add_alarmed(cJSON* cj_alarmed, s_alarmed_t* alarmed)
+static void __cjson_add_alarmed(cJSON * cj_alarmed, s_alarmed_t * alarmed)
 {
     if (alarmed)
     {
@@ -497,7 +499,7 @@ static void __cjson_add_alarmed(cJSON* cj_alarmed, s_alarmed_t* alarmed)
     }
 }
 
-static int __cjson_add_security_device_to_array(cJSON* cj_device_array)
+static int __cjson_add_security_device_to_array(cJSON * cj_device_array)
 {
     int ret = 0;
     if (cj_device_array && (cj_device_array->type == cJSON_Array))

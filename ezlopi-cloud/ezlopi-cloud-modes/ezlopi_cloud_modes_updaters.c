@@ -143,10 +143,10 @@ void ezlopi_cloud_modes_bypass_device_added_updater(cJSON* cj_request, cJSON* cj
     cJSON_AddStringToObject(__func__, cj_response, ezlopi__id_str, ezlopi_ui_broadcast_str);
     cJSON_AddStringToObject(__func__, cj_response, ezlopi_msg_subclass_str, ezlopi_modes_bypass_device_added);
     cJSON* cj_params = cJSON_GetObjectItem(__func__, cj_request, ezlopi_params_str);
-    if(cj_params)
+    if (cj_params)
     {
         cJSON* cj_result = cJSON_Duplicate(__func__, cj_params, true);
-        if(cj_result)
+        if (cj_result)
         {
             cJSON_AddItemToObject(__func__, cj_response, ezlopi_result_str, cj_result);
         }
@@ -158,14 +158,54 @@ void ezlopi_cloud_modes_bypass_device_removed_updater(cJSON* cj_request, cJSON* 
     cJSON_AddStringToObject(__func__, cj_response, ezlopi__id_str, ezlopi_ui_broadcast_str);
     cJSON_AddStringToObject(__func__, cj_response, ezlopi_msg_subclass_str, ezlopi_modes_bypass_device_removed);
     cJSON* cj_params = cJSON_GetObjectItem(__func__, cj_request, ezlopi_params_str);
-    if(cj_params)
+    if (cj_params)
     {
         cJSON* cj_result = cJSON_Duplicate(__func__, cj_params, true);
-        if(cj_result)
+        if (cj_result)
         {
             cJSON_AddItemToObject(__func__, cj_response, ezlopi_result_str, cj_result);
         }
     }
+}
+
+static void ezlopi_cloud_modes_send_protect_buttons_add_boradcast(cJSON* cj_request)
+{
+    cJSON* cj_response = cJSON_CreateObject(__FUNCTION__);
+    if (cj_response)
+    {
+        cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi__id_str, ezlopi_ui_broadcast_str);
+        cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, "hub.modes.protect.buttons.added");
+        cJSON* cj_params = cJSON_GetObjectItem(__func__, cj_request, ezlopi_params_str);
+        if (cj_params)
+        {
+            cJSON* cj_result = cJSON_Duplicate(__func__, cj_params, true);
+            if (cj_result)
+            {
+                cJSON_AddItemToObject(__func__, cj_response, ezlopi_result_str, cj_result);
+            }
+        }
+    }
+}
+
+
+void ezlopi_cloud_modes_protect_button_set_updater(cJSON* cj_request, cJSON* cj_response)
+{
+    ezlopi_cloud_modes_send_protect_buttons_add_boradcast(cj_request);
+    if (cj_response)
+    {
+        cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi__id_str, ezlopi_ui_broadcast_str);
+        cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, "hub.modes.protect.buttons.updated");
+        cJSON* cj_params = cJSON_GetObjectItem(__func__, cj_request, ezlopi_params_str);
+        if (cj_params)
+        {
+            cJSON* cj_result = cJSON_Duplicate(__func__, cj_params, true);
+            if (cj_result)
+            {
+                cJSON_AddItemToObject(__func__, cj_response, ezlopi_result_str, cj_result);
+            }
+        }
+    }
+#warning("hub.modes.protect.buttons removed udpated")
 }
 
 #endif // CONFIG_EZPI_SERV_ENABLE_MODES
