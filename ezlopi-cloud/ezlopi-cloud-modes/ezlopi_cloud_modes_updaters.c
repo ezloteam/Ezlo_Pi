@@ -3,6 +3,7 @@
 #include "ezlopi_core_sntp.h"
 #include "ezlopi_core_modes.h"
 #include "ezlopi_core_cjson_macros.h"
+#include "ezlopi_core_ezlopi_broadcast.h"
 
 #include "ezlopi_cloud_modes.h"
 #include "ezlopi_cloud_constants.h"
@@ -182,6 +183,10 @@ static void ezlopi_cloud_modes_send_protect_buttons_add_boradcast(cJSON* cj_requ
             if (cj_result)
             {
                 cJSON_AddItemToObject(__func__, cj_response, ezlopi_result_str, cj_result);
+                if (!ezlopi_core_ezlopi_broadcast_add_to_queue(cj_response))
+                {
+                    cJSON_Delete(__func__, cj_response);
+                }
             }
         }
     }
@@ -205,7 +210,7 @@ void ezlopi_cloud_modes_protect_button_set_updater(cJSON* cj_request, cJSON* cj_
             }
         }
     }
-#warning("hub.modes.protect.buttons removed udpated")
+    #warning("hub.modes.protect.buttons removed udpated")
 }
 
 #endif // CONFIG_EZPI_SERV_ENABLE_MODES
