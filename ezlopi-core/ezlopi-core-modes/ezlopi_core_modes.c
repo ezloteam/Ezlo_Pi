@@ -651,6 +651,35 @@ int ezlopi_core_modes_protect_devices_add(cJSON* user_id_aray)
     return 1;
 }
 
+int ezlopi_core_modes_protect_devices_remove(cJSON* user_id_aray)
+{
+    int ret = 0;
+    if(user_id_aray && (cJSON_Array == user_id_aray->type) && sg_custom_modes)
+    {
+        ezlopi_service_modes_stop();
+        cJSON* element_to_remove = NULL;
+        cJSON_ArrayForEach(element_to_remove, user_id_aray)
+        {
+            cJSON* element_to_check = NULL;
+            int element_index = 0;
+            cJSON_ArrayForEach(element_to_check, sg_custom_modes->cj_devices)
+            {
+                if (0 == strncmp(element_to_remove->valuestring, element_to_check->valuestring, 32))
+                {
+                    cJSON_DeleteItemFromArray(__FUNCTION__, sg_custom_modes->cj_devices, element_index);
+                    break;
+                }
+                element_index++;
+            }
+            
+        }
+        ezlopi_core_modes_store_to_nvs();
+        ezlopi_service_modes_start();
+        ret = 1;
+    }
+    return ret;
+}
+
 int ezlopi_core_modes_set_unset_device_armed_status(cJSON* cj_device_array, const bool set)
 {
     int ret = 0;

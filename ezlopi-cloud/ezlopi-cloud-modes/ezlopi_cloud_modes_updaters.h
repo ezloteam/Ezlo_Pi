@@ -30,6 +30,7 @@ void ezlopi_cloud_modes_bypass_device_added_updater(cJSON* cj_request, cJSON* cj
 void ezlopi_cloud_modes_bypass_device_removed_updater(cJSON* cj_request, cJSON* cj_response);
 void ezlopi_cloud_modes_protect_button_set_updater(cJSON* cj_reuest, cJSON* cj_response);
 void ezlopi_cloud_modes_protect_device_add_updater(cJSON* cj_reuest, cJSON* cj_response);
+void ezlopi_cloud_modes_protect_device_remove_updater(cJSON* cj_reuest, cJSON* cj_response);
 
 #endif // CONFIG_EZPI_SERV_ENABLE_MODES
 
