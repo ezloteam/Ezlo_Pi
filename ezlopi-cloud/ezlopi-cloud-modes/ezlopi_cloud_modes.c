@@ -332,6 +332,15 @@ void ezlopi_cloud_modes_protect_devices_add(cJSON* cj_request, cJSON* cj_respons
     cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     if (cj_result)
     {
+        cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
+        if(cj_params)
+        {
+            cJSON* cj_deviceIds = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_device_ids_str);
+            if(cj_deviceIds && (cJSON_Array == cj_deviceIds->type))
+            {
+                ezlopi_core_modes_protect_devices_add(cj_deviceIds);
+            }
+        }
     }
 }
 

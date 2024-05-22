@@ -150,6 +150,7 @@ int ezlopi_core_modes_bypass_device_remove(uint8_t modesId, cJSON* device_id_arr
 int ezlopi_core_modes_notification_set(uint8_t modesId, bool all, cJSON* user_id_aray);
 int ezlopi_core_modes_protect_set(uint8_t modesId, bool protect);
 int ezlopi_core_modes_protect_button_service_set(char* service_str, uint32_t deviceId);
+int ezlopi_core_modes_protect_devices_add(cJSON* user_id_aray);
 
 int ezlopi_core_modes_cjson_get_current_mode(cJSON* cj_result);
 

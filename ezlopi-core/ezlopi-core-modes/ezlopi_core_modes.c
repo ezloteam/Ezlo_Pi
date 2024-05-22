@@ -601,11 +601,55 @@ int ezlopi_core_modes_protect_button_service_set(char* service_str, uint32_t dev
                 }
             }
             ezlopi_core_modes_store_to_nvs();
+            ret = 1;
         }
         ezlopi_service_modes_start();
     }
 
     return ret;
+}
+
+int ezlopi_core_modes_protect_devices_add(cJSON* user_id_aray)
+{
+    int ret = 0;
+
+    if(user_id_aray && (cJSON_Array == user_id_aray->type))
+    {
+        ezlopi_service_modes_stop();
+
+        if(sg_custom_modes)
+        {
+            cJSON* device_element_to_add = NULL;
+            cJSON_ArrayForEach(device_element_to_add, user_id_aray)
+            {
+                bool add_to_array = true;
+                cJSON* device_element_added = NULL;
+                cJSON_ArrayForEach(device_element_added, sg_custom_modes->cj_devices)
+                {
+                    if(0 == strncmp(device_element_to_add->valuestring, device_element_added->valuestring, 32))
+                    {
+                        add_to_array = false;
+                        break;
+                    }
+                }
+                if(add_to_array)
+                {
+                    if (NULL == sg_custom_modes->cj_devices)
+                    {
+                        sg_custom_modes->cj_devices = cJSON_CreateArray(__FUNCTION__);
+                    }
+                    cJSON_AddItemToArray(sg_custom_modes->cj_devices, cJSON_CreateString(__FUNCTION__, device_element_to_add->valuestring));
+                }
+            }
+            printf("HERE, %s\n", cJSON_Print(__FUNCTION__, sg_custom_modes->cj_devices));
+            ezlopi_core_modes_store_to_nvs();
+            ret = 1;
+        }
+
+        ezlopi_service_modes_start();
+    }
+
+    return 1;
 }
 
 int ezlopi_core_modes_set_unset_device_armed_status(cJSON* cj_device_array, const bool set)
