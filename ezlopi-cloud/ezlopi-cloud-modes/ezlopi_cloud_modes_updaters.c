@@ -213,4 +213,22 @@ void ezlopi_cloud_modes_protect_button_set_updater(cJSON* cj_request, cJSON* cj_
     #warning("hub.modes.protect.buttons removed udpated")
 }
 
+void ezlopi_cloud_modes_protect_device_add_updater(cJSON* cj_reuest, cJSON* cj_response)
+{
+    if(cj_response)
+    {
+        cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi__id_str, ezlopi_ui_broadcast_str);
+        cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, "hub.modes.protect.devices.added");
+        cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_reuest, ezlopi_params_str);
+        if(cj_params)
+        {
+            cJSON* cj_result = cJSON_Duplicate(__FUNCTION__, cj_params, true);
+            if(cj_result)
+            {
+                cJSON_AddItemToObject(__FUNCTION__, cj_response, ezlopi_result_str, cj_result);
+            }
+        }
+    }
+}
+
 #endif // CONFIG_EZPI_SERV_ENABLE_MODES

@@ -641,7 +641,6 @@ int ezlopi_core_modes_protect_devices_add(cJSON* user_id_aray)
                     cJSON_AddItemToArray(sg_custom_modes->cj_devices, cJSON_CreateString(__FUNCTION__, device_element_to_add->valuestring));
                 }
             }
-            printf("HERE, %s\n", cJSON_Print(__FUNCTION__, sg_custom_modes->cj_devices));
             ezlopi_core_modes_store_to_nvs();
             ret = 1;
         }
