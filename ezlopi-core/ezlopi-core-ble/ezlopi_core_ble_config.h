@@ -1,6 +1,8 @@
 #ifndef _EZLOPI_CORE_BLE_CONFIG_H_
 #define _EZLOPI_CORE_BLE_CONFIG_H_
 
+#include "../../build/config/sdkconfig.h"
+
 #ifdef CONFIG_EZPI_BLE_ENABLE
 
 #include "esp_gatts_api.h"

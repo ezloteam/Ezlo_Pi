@@ -123,12 +123,6 @@ menu "EzloPi User Config"
         help 
             Enable Web-Socket client, required for connecting with cloud
 
-    config EZPI_CORE_LOG_EN
-        bool "Enable cloud-logging"
-        default n
-        help 
-            Enable core for cloud-loging
-
     config EZPI_CORE_STATIC_BUFFER_SIZE
         depends on EZPI_WEBSOCKET_CLIENT || EZPI_LOCAL_WEBSOCKET_SERVER
         int "Static buffer size:"
