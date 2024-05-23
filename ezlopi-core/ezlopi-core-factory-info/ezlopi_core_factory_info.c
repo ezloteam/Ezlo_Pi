@@ -747,12 +747,13 @@ int ezlopi_factory_info_v3_set_ezlopi_config(cJSON * cj_data)
     int ret = 0;
     if (cj_data)
     {
-        ret = ezlopi_factory_info_v3_set_4kb(cj_data->valuestring, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_EZLOPI_CONFIG_JSON, E_EZLOPI_FACTORY_INFO_CONN_DATA), cj_data->str_value_len);
-        TRACE_E("ret: %d", ret);
-    }
-    else
-    {
-        TRACE_E("ret: %d", ret);
+        char * tmp_data = ezlopi_malloc(__FUNCTION__, 4 * 1024);
+        if (tmp_data)
+        {
+            cJSON_PrintPreallocated(__FUNCTION__, cj_data, tmp_data, 4 * 1024, false);
+            ret = ezlopi_factory_info_v3_set_4kb(tmp_data, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_EZLOPI_CONFIG_JSON, E_EZLOPI_FACTORY_INFO_CONN_DATA), cj_data->str_value_len);
+            ezlopi_free(__FUNCTION__, tmp_data);
+        }
     }
 
     return ret;
