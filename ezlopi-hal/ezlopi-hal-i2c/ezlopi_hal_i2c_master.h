@@ -15,8 +15,8 @@ typedef enum e_ezlopi_i2c_channel
 typedef struct s_ezlopi_i2c_master
 {
     bool enable;
-    uint32_t sda;
-    uint32_t scl;
+    int sda;
+    int scl;
     uint32_t clock_speed;
     uint32_t channel;
     uint32_t address;

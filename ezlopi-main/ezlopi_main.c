@@ -33,11 +33,11 @@
 
 #include "EZLOPI_USER_CONFIG.h"
 
-static void blinky(void* pv);
+static void __blinky(void* pv);
 
 void app_main(void)
 {
-
+#if 1
 #ifdef CONFIG_EZPI_UTIL_TRACE_EN
     ezlopi_core_set_log_upcalls();
 #endif  // CONFIG_EZPI_UTIL_TRACE_EN
@@ -86,20 +86,20 @@ void app_main(void)
 #if defined (CONFIG_EZPI_SERV_ENABLE_MESHBOTS)
     ezlopi_scenes_meshbot_init();
 #endif
-
+#endif
 
     TaskHandle_t ezlopi_main_blinky_task_handle = NULL;
 #if defined(CONFIG_EZPI_HEAP_ENABLE)
     xTaskCreate(blinky, "blinky", 3 * EZLOPI_MAIN_BLINKY_TASK_DEPTH, NULL, 1, &ezlopi_main_blinky_task_handle);
     ezlopi_core_process_set_process_info(ENUM_EZLOPI_MAIN_BLINKY_TASK, &ezlopi_main_blinky_task_handle, 3 * EZLOPI_MAIN_BLINKY_TASK_DEPTH);
 #else
-    xTaskCreate(blinky, "blinky", EZLOPI_MAIN_BLINKY_TASK_DEPTH, NULL, 1, &ezlopi_main_blinky_task_handle);
+    xTaskCreate(__blinky, "blinky", EZLOPI_MAIN_BLINKY_TASK_DEPTH, NULL, 1, &ezlopi_main_blinky_task_handle);
     ezlopi_core_process_set_process_info(ENUM_EZLOPI_MAIN_BLINKY_TASK, &ezlopi_main_blinky_task_handle, EZLOPI_MAIN_BLINKY_TASK_DEPTH);
 #endif
 
 }
 
-static void blinky(void* pv)
+static void __blinky(void* pv)
 {
     uint32_t low_heap_start_time = xTaskGetTickCount();
 

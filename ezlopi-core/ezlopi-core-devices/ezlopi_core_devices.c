@@ -3,6 +3,7 @@
 #include "ezlopi_core_factory_info.h"
 #include "ezlopi_core_cjson_macros.h"
 
+#include "ezlopi_core_reset.h"
 #include "ezlopi_cloud_items.h"
 #include "ezlopi_cloud_constants.h"
 
@@ -12,7 +13,7 @@ static l_ezlopi_device_t* l_device_head = NULL;
 static volatile uint32_t g_store_dev_config_with_id = 0;
 static s_ezlopi_cloud_controller_t s_controller_information;
 
-static void ezlopi_device_parse_json_v3(cJSON* cj_config);
+static int ezlopi_device_parse_json_v3(cJSON* cj_config);
 static void ezlopi_device_free_single(l_ezlopi_device_t* device);
 #if (1 == ENABLE_TRACE)
 #if 0 // Defined but not used
@@ -369,14 +370,9 @@ void ezlopi_device_prepare(void)
     s_controller_information.ready = true;
     s_controller_information.status = "idle";
 
-#if (EZLOPI_DEVICE_TYPE_GENERIC == EZLOPI_DEVICE_TYPE)
-    int free_config = 1;
-    char* config_string = ezlopi_factory_info_v3_get_ezlopi_config();
-#elif (EZLOPI_DEVICE_TYPE_TEST_DEVICE == EZLOPI_DEVICE_TYPE)
-    int free_config = 0;
+#if (EZLOPI_DEVICE_TYPE_TEST_DEVICE == EZLOPI_DEVICE_TYPE)
     char* config_string = ezlopi_config_test;
 #else
-    int free_config = 1;
     char* config_string = ezlopi_factory_info_v3_get_ezlopi_config();
 #endif
 
@@ -387,7 +383,23 @@ void ezlopi_device_prepare(void)
         // ezlopi_factory_info_v3_free(config_string);
         if (cj_config)
         {
-            ezlopi_device_parse_json_v3(cj_config);
+            if (ezlopi_device_parse_json_v3(cj_config) < 0)
+            {
+                TRACE_E("parsing devices-config failed!!!!");
+#if 0
+                cJSON_AddStringToObject(__FUNCTION__, cj_config, ezlopi_chipset_str, ezlopi_ESP32S3_str);
+
+                char * tmp_str = cJSON_Print(__FUNCTION__, cj_config);
+                if (tmp_str)
+                {
+                    ezlopi_factory_info_v3_set_ezlopi_config(cj_config);
+                    TRACE_D("added-chipset: %s", tmp_str);
+                    vTaskDelay(1000);
+                    free(tmp_str);
+                    EZPI_CORE_reset_reboot();
+                }
+#endif
+            }
 
 #if 0
             if (g_store_dev_config_with_id)
@@ -408,14 +420,17 @@ void ezlopi_device_prepare(void)
         }
     }
 
-    if ((1 == free_config) && config_string)
+#if (EZLOPI_DEVICE_TYPE_TEST_DEVICE != EZLOPI_DEVICE_TYPE)
+    if (config_string)
     {
         ezlopi_free(__FUNCTION__, config_string);
     }
+#endif
 }
 
 ///////// Print functions start here ////////////
 #if (1 == ENABLE_TRACE)
+
 #if 0 // Defined but not used 
 static void ezlopi_device_print_controller_cloud_information_v3(void)
 {
@@ -565,36 +580,31 @@ static void ezlopi_device_print_interface_type(l_ezlopi_item_t* item)
 #endif
 //////////////////// Print functions end here /////////////////////////
 ///////////////////////////////////////////////////////////////////////
-static void ezlopi_device_parse_json_v3(cJSON* cjson_config)
+static int ezlopi_device_parse_json_v3(cJSON* cjson_config)
 {
+    int ret = 0;
+
     if (cjson_config)
     {
-                cJSON* cjson_chipset = cJSON_GetObjectItem(__FUNCTION__, cjson_config, ezlopi_chipset_str);
-                if (cjson_chipset)
-                {
-                    if (cJSON_IsString(cjson_chipset) && (cjson_chipset->valuestring != NULL))
-                    {
-                        TRACE_D("Chipset Value : %.*s", cjson_chipset->str_value_len, cjson_chipset->valuestring);
-                        char chipset_name[10];
-                        strncpy(chipset_name, cjson_chipset->valuestring, cjson_chipset->str_value_len);
-
-        #if defined(CONFIG_IDF_TARGET_ESP32)
-                        uint32_t compare_len = strlen(ezlopi_ESP32_str) > cjson_chipset->str_value_len ? strlen(ezlopi_ESP32_str) : cjson_chipset->str_value_len;
-                        if (strncmp(chipset_name, ezlopi_ESP32_str, compare_len) == 0)
-        #elif  defined (CONFIG_IDF_TARGET_ESP32S3)
-                        uint32_t compare_len = strlen(ezlopi_ESP32S3_str) > cjson_chipset->str_value_len ? strlen(ezlopi_ESP32S3_str) : cjson_chipset->str_value_len;
-                        if (strncmp(chipset_name, ezlopi_ESP32S3_str, compare_len) == 0)
-        #elif defined (CONFIG_IDF_TARGET_ESP32C3)
-                        uint32_t compare_len = strlen(ezlopi_ESP32C3_str) > cjson_chipset->str_value_len ? strlen(ezlopi_ESP32C3_str) : cjson_chipset->str_value_len;
-                        if (strncmp(chipset_name, ezlopi_ESP32C3_str, compare_len) == 0)
-        #endif // Chipset 
-                        {
-        cJSON* cjson_device_list = cJSON_GetObjectItem(__FUNCTION__, cjson_config, ezlopi_dev_detail_str);
-
-        if (cjson_device_list)
+        cJSON* cjson_chipset = cJSON_GetObjectItem(__FUNCTION__, cjson_config, ezlopi_chipset_str);
+        if (cjson_chipset)
         {
-            int config_dev_idx = 0;
-            cJSON* cjson_device = NULL;
+            if (cJSON_IsString(cjson_chipset) && (cjson_chipset->valuestring != NULL))
+            {
+                TRACE_D("Chipset Value : %.*s", cjson_chipset->str_value_len, cjson_chipset->valuestring);
+                char chipset_name[10];
+                strncpy(chipset_name, cjson_chipset->valuestring, cjson_chipset->str_value_len);
+
+#if defined(CONFIG_IDF_TARGET_ESP32)
+                uint32_t compare_len = strlen(ezlopi_ESP32_str) > cjson_chipset->str_value_len ? strlen(ezlopi_ESP32_str) : cjson_chipset->str_value_len;
+                if (strncmp(chipset_name, ezlopi_ESP32_str, compare_len) == 0)
+#elif  defined (CONFIG_IDF_TARGET_ESP32S3)
+                uint32_t compare_len = strlen(ezlopi_ESP32S3_str) > cjson_chipset->str_value_len ? strlen(ezlopi_ESP32S3_str) : cjson_chipset->str_value_len;
+                if (strncmp(chipset_name, ezlopi_ESP32S3_str, compare_len) == 0)
+#elif defined (CONFIG_IDF_TARGET_ESP32C3)
+                uint32_t compare_len = strlen(ezlopi_ESP32C3_str) > cjson_chipset->str_value_len ? strlen(ezlopi_ESP32C3_str) : cjson_chipset->str_value_len;
+                if (strncmp(chipset_name, ezlopi_ESP32C3_str, compare_len) == 0)
+#endif // Chipset 
                 {
                     cJSON* cjson_device_list = cJSON_GetObjectItem(__FUNCTION__, cjson_config, ezlopi_dev_detail_str);
 
@@ -626,31 +636,36 @@ static void ezlopi_device_parse_json_v3(cJSON* cjson_config)
                                     dev_idx++;
                                 }
                             }
+
                             config_dev_idx++;
                             TRACE_I("---------------------------------------------");
                         }
                     }
                 }
 
-    #if (defined(CONFIG_IDF_TARGET_ESP32) || defined(CONFIG_IDF_TARGET_ESP32S3) || defined(CONFIG_IDF_TARGET_ESP32C3))
-        else
-        {
-            TRACE_E("Device configuration and chipset mismatch ! Device and Item assignment aborted !");
-        }
-    #endif // CONFIG_IDF_TARGET_ESP32 OR CONFIG_IDF_TARGET_ESP32S3 OR CONFIG_IDF_TARGET_ESP32C3
-    }
+#if (defined(CONFIG_IDF_TARGET_ESP32) || defined(CONFIG_IDF_TARGET_ESP32S3) || defined(CONFIG_IDF_TARGET_ESP32C3))
                 else
                 {
-                    TRACE_E("Error, could not identify the chipset in the config!");
+                    ret = -3;
+                    TRACE_E("Device configuration and chipset mismatch ! Device and Item assignment aborted !");
                 }
+#endif // CONFIG_IDF_TARGET_ESP32 OR CONFIG_IDF_TARGET_ESP32S3 OR CONFIG_IDF_TARGET_ESP32C3
             }
             else
             {
-                TRACE_E("Chipset not defined in the config, Device and Item assignment aborted !");
+                ret = -2;
+                TRACE_E("Error, could not identify the chipset in the config!");
             }
-}
-}
+        }
+        else
+        {
+            ret = -1;
+            TRACE_E("Chipset not defined in the config, Device and Item assignment aborted !");
+        }
+    }
 
+    return ret;
+}
 
 static void ezlopi_device_free_item(l_ezlopi_item_t * items)
 {
@@ -733,7 +748,6 @@ void ezlopi_device_factory_info_reset(void)
         ezlopi_device_free_all_device_setting(curr_device);
     }
 }
-
 
 l_ezlopi_device_settings_v3_t* ezlopi_device_add_settings_to_device_v3(l_ezlopi_device_t * device, int (*setting_func)(e_ezlopi_settings_action_t action, struct l_ezlopi_device_settings_v3* setting, void* arg, void* user_arg))
 {

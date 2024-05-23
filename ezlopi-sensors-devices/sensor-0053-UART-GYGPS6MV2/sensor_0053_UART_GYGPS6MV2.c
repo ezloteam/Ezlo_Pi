@@ -148,8 +148,8 @@ static void __prepare_geiod_item_cloud_properties(l_ezlopi_item_t* item, cJSON* 
 static void __prepare_item_interface_properties(l_ezlopi_item_t* item, cJSON* cj_device)
 {
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type);
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_tx_str, item->interface.uart.tx);
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_rx_str, item->interface.uart.rx);
+    CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_tx_str, item->interface.uart.tx);
+    CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_rx_str, item->interface.uart.rx);
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_baud_str, item->interface.uart.baudrate);
 
     /*Here we decide, when uart is allowed to initialize*/

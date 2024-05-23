@@ -104,17 +104,17 @@ static void __prepare_item_interface_properties(l_ezlopi_item_t* item, cJSON* cj
         item->interface.adc.resln_bit = 3;
         if (ezlopi_item_name_acceleration_x_axis == item->cloud_properties.item_name)
         {
-            CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio1_str, item->interface.adc.gpio_num);
+            CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio1_str, item->interface.adc.gpio_num);
             TRACE_S("Accel X-axis gpio1: %d ", item->interface.adc.gpio_num);
         }
         else if (ezlopi_item_name_acceleration_y_axis == item->cloud_properties.item_name)
         {
-            CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio2_str, item->interface.adc.gpio_num);
+            CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio2_str, item->interface.adc.gpio_num);
             TRACE_S("Accel Y-axis gpio2: %d ", item->interface.adc.gpio_num);
         }
         else if (ezlopi_item_name_acceleration_z_axis == item->cloud_properties.item_name)
         {
-            CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio3_str, item->interface.adc.gpio_num);
+            CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio3_str, item->interface.adc.gpio_num);
             TRACE_S("Accel Z-axis gpio3: %d ", item->interface.adc.gpio_num);
         }
     }

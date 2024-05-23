@@ -26,10 +26,10 @@ typedef enum e_ezlopi_spi_mode
 typedef struct s_ezlopi_spi_master
 {
     bool enable;
-    uint32_t cs;
-    uint32_t miso;
-    uint32_t mosi;
-    uint32_t sck;
+    int cs;
+    int miso;
+    int mosi;
+    int sck;
     uint32_t mode;
     uint32_t clock_speed_mhz;
     uint8_t addr_bits;

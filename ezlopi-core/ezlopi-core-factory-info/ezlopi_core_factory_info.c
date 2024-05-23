@@ -745,10 +745,16 @@ int ezlopi_factory_info_v3_set_ca_cert(cJSON * cj_data)
 int ezlopi_factory_info_v3_set_ezlopi_config(cJSON * cj_data)
 {
     int ret = 0;
-    if (cj_data && cj_data->valuestring && cj_data->str_value_len)
+    if (cj_data)
     {
         ret = ezlopi_factory_info_v3_set_4kb(cj_data->valuestring, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_EZLOPI_CONFIG_JSON, E_EZLOPI_FACTORY_INFO_CONN_DATA), cj_data->str_value_len);
+        TRACE_E("ret: %d", ret);
     }
+    else
+    {
+        TRACE_E("ret: %d", ret);
+    }
+
     return ret;
 }
 

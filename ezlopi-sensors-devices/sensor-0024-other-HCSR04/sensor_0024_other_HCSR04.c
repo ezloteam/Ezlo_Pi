@@ -26,8 +26,8 @@ static portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
  */
 typedef struct
 {
-    uint32_t trigger_pin; //!< GPIO output pin for trigger
-    uint32_t echo_pin;    //!< GPIO input pin for echo
+    int trigger_pin; //!< GPIO output pin for trigger
+    int echo_pin;    //!< GPIO input pin for echo
     uint32_t distance;    // distance in cm
 } s_ultrasonic_sensor_t;
 

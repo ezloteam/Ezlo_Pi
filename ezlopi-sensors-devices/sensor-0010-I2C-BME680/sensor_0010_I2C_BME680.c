@@ -80,8 +80,8 @@ static void __prepare_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device, 
         item->is_user_arg_unique = true;
         item->interface.i2c_master.enable = true;
         item->interface.i2c_master.clock_speed = 100000;
-        CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_scl_str, item->interface.i2c_master.scl);
-        CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_sda_str, item->interface.i2c_master.sda);
+        CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_scl_str, item->interface.i2c_master.scl);
+        CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_sda_str, item->interface.i2c_master.sda);
         CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_slave_addr_str, item->interface.i2c_master.address);
     }
     else

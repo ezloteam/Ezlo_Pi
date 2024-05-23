@@ -43,15 +43,16 @@ typedef struct l_ezlopi_item
     s_ezlopi_saved_item_info_t saved_info;
     s_ezlopi_cloud_item_t cloud_properties;
     e_ezlopi_device_interface_type_t interface_type;
+
     union
     {
+        s_ezlopi_adc_t adc;
+        s_ezlopi_pwm_t pwm;
         s_ezlopi_uart_t uart;
+        s_ezlopi_gpios_t gpio;
         s_ezlopi_i2c_master_t i2c_master;
         s_ezlopi_spi_master_t spi_master;
         s_ezlopi_onewire_t onewire_master;
-        s_ezlopi_gpios_t gpio;
-        s_ezlopi_pwm_t pwm;
-        s_ezlopi_adc_t adc;
     } interface;
 
     void* user_arg;
@@ -96,6 +97,7 @@ l_ezlopi_device_settings_v3_t* ezlopi_device_add_settings_to_device_v3(l_ezlopi_
 
 void ezlopi_device_free_device(l_ezlopi_device_t* device);
 void ezlopi_device_free_device_by_item(l_ezlopi_item_t* item);
+
 void ezlopi_device_factory_info_reset(void);
 cJSON* ezlopi_device_create_device_table_from_prop(l_ezlopi_device_t* device_prop);
 s_ezlopi_cloud_controller_t* ezlopi_device_get_controller_information(void);
