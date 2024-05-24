@@ -82,7 +82,7 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_dev
     item->user_arg = user_data;
 
     item->interface_type = EZLOPI_DEVICE_INTERFACE_MAX; // other
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_str, item->interface.adc.gpio_num);
+    CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_str, item->interface.adc.gpio_num);
     item->interface.adc.resln_bit = 3;
 }
 //-------------------------------------------------------------------------------------------------------------------------

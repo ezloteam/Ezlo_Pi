@@ -263,7 +263,7 @@ static void __prepare_SK6812_RGB_color_item(l_ezlopi_item_t* item, cJSON* cj_dev
     item->interface_type = EZLOPI_DEVICE_INTERFACE_PWM;
     item->interface.pwm.channel = 0;
     item->interface.pwm.value = 0;
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio1_str, item->interface.pwm.gpio_num);
+    CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio1_str, item->interface.pwm.gpio_num);
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_duty_cycle_str, item->interface.pwm.duty_cycle);
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_freq_hz_str, item->interface.pwm.freq_hz);
     item->interface.pwm.pwm_resln = 12;
@@ -281,7 +281,7 @@ static void __prepare_SK6812_RGB_dimmer_item(l_ezlopi_item_t* item, cJSON* cj_de
     item->interface_type = EZLOPI_DEVICE_INTERFACE_PWM;
     item->interface.pwm.channel = 0;
     item->interface.pwm.value = 0;
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio1_str, item->interface.pwm.gpio_num);
+    CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio1_str, item->interface.pwm.gpio_num);
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_duty_cycle_str, item->interface.pwm.duty_cycle);
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_freq_hz_str, item->interface.pwm.freq_hz);
     item->interface.pwm.pwm_resln = 12;
@@ -298,7 +298,7 @@ static void __prepare_SK6812_RGB_dimmer_up_item(l_ezlopi_item_t* item, cJSON* cj
     item->cloud_properties.value_type = value_type_int;
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio1_str, item->interface.pwm.gpio_num);
+    CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio1_str, item->interface.pwm.gpio_num);
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_duty_cycle_str, item->interface.pwm.duty_cycle);
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_freq_hz_str, item->interface.pwm.freq_hz);
     item->interface.pwm.pwm_resln = 12;
@@ -315,7 +315,7 @@ static void __prepare_SK6812_RGB_dimmer_down_item(l_ezlopi_item_t* item, cJSON* 
     item->cloud_properties.value_type = value_type_int;
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio1_str, item->interface.pwm.gpio_num);
+    CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio1_str, item->interface.pwm.gpio_num);
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_duty_cycle_str, item->interface.pwm.duty_cycle);
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_freq_hz_str, item->interface.pwm.freq_hz);
     item->interface.pwm.pwm_resln = 12;
@@ -332,7 +332,7 @@ static void __prepare_SK6812_RGB_dimmer_stop_item(l_ezlopi_item_t* item, cJSON* 
     item->cloud_properties.value_type = value_type_int;
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio1_str, item->interface.pwm.gpio_num);
+    CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio1_str, item->interface.pwm.gpio_num);
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_duty_cycle_str, item->interface.pwm.duty_cycle);
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_freq_hz_str, item->interface.pwm.freq_hz);
     item->interface.pwm.pwm_resln = 12;

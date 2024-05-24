@@ -78,7 +78,7 @@ static char *ezlopi_factory_info_v3_read_string(const char * name, e_ezlopi_fact
 
     if (ezlopi_factory_info_v3_init())
     {
-        TRACE_D("%s", name);
+        // TRACE_D("%s", name);
         char *tmp_buffer = (char *)ezlopi_malloc(name, length);
         if (tmp_buffer)
         {
@@ -109,6 +109,7 @@ static char *ezlopi_factory_info_v3_read_string(const char * name, e_ezlopi_fact
                 TRACE_E("Couldn't fetch 'string' from id-flash-region!");
             }
 
+            // dump("tmp_buffer", tmp_buffer, 0, length);
             ezlopi_free(__FUNCTION__, tmp_buffer);
         }
         else
@@ -499,6 +500,7 @@ char* ezlopi_factory_info_v3_get_ssl_shared_key(void)
 
 char* ezlopi_factory_info_v3_get_ezlopi_config(void)
 {
+    // TRACE_E("ezlopi-config address: %d", ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_EZLOPI_CONFIG_JSON, E_EZLOPI_FACTORY_INFO_CONN_DATA));
     char *ret = ezlopi_factory_info_v3_read_string(__FUNCTION__, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_EZLOPI_CONFIG_JSON, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_EZLOPI_CONFIG_JSON);
     if (false == isprint(ret[0]))
     {
@@ -745,10 +747,21 @@ int ezlopi_factory_info_v3_set_ca_cert(cJSON * cj_data)
 int ezlopi_factory_info_v3_set_ezlopi_config(cJSON * cj_data)
 {
     int ret = 0;
-    if (cj_data && cj_data->valuestring && cj_data->str_value_len)
+    if (cj_data)
     {
-        ret = ezlopi_factory_info_v3_set_4kb(cj_data->valuestring, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_EZLOPI_CONFIG_JSON, E_EZLOPI_FACTORY_INFO_CONN_DATA), cj_data->str_value_len);
+        char * tmp_data = ezlopi_malloc(__FUNCTION__, 4 * 1024);
+        if (tmp_data)
+        {
+            if (cJSON_PrintPreallocated(__FUNCTION__, cj_data, tmp_data, 4 * 1024, false))
+            {
+                TRACE_D("added-chipset: %.*s", tmp_data);
+                ret = ezlopi_factory_info_v3_set_4kb(tmp_data, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_EZLOPI_CONFIG_JSON, E_EZLOPI_FACTORY_INFO_CONN_DATA), strlen(tmp_data) + 1);
+            }
+
+            ezlopi_free(__FUNCTION__, tmp_data);
+        }
     }
+
     return ret;
 }
 

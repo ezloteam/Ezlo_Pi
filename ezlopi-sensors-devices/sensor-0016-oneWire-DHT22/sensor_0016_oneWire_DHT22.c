@@ -101,9 +101,9 @@ static int dht22_sensor_notify(l_ezlopi_item_t* item)
         if (dht22_data)
         {
             readDHT22();
+
             if (ezlopi_item_name_temp == item->cloud_properties.item_name)
             {
-
                 float temperature = getTemperature_dht22();
                 // TRACE_E("Temperature: %.2f", temperature);
                 if (fabs(dht22_data->temperature - temperature) > 0.5)
@@ -266,7 +266,7 @@ static int dht22_sensor_setup_item_properties_temperature(l_ezlopi_item_t* item,
         CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type);
 
         item->interface.onewire_master.enable = true;
-        CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_str, item->interface.onewire_master.onewire_pin);
+        CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_str, item->interface.onewire_master.onewire_pin);
     }
 
     return ret;
@@ -292,7 +292,7 @@ static int dht22_sensor_setup_item_properties_humidity(l_ezlopi_item_t* item, cJ
         CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type);
 
         item->interface.onewire_master.enable = true;
-        CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_name_str, item->interface.onewire_master.onewire_pin);
+        CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_str, item->interface.onewire_master.onewire_pin);
     }
 
     return ret;

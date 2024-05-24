@@ -257,7 +257,7 @@ static void __prepare_item_adc_cloud_properties(l_ezlopi_item_t* item, cJSON* cj
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio2_str, item->interface.adc.gpio_num);
+    CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio2_str, item->interface.adc.gpio_num);
     TRACE_S("MQ9-> ADC_PIN: %d ", item->interface.adc.gpio_num);
     item->interface.adc.resln_bit = 3; // ADC 12_bit
 
@@ -383,7 +383,7 @@ static float __extract_MQ9_sensor_ppm(l_ezlopi_item_t* item)
     if (MQ9_value)
     { // calculation process
       //-------------------------------------------------
-        uint32_t mq9_adc_pin = item->interface.adc.gpio_num;
+        int mq9_adc_pin = item->interface.adc.gpio_num;
         s_ezlopi_analog_data_t ezlopi_analog_data = { .value = 0, .voltage = 0 };
         // extract the mean_sensor_analog_output_voltage
         float analog_sensor_volt = 0;
@@ -435,7 +435,7 @@ static void __calibrate_MQ9_R0_resistance(void* params)
         s_mq9_value_t* MQ9_value = (s_mq9_value_t*)item->user_arg;
         if (MQ9_value)
         {
-            uint32_t mq9_adc_pin = item->interface.adc.gpio_num;
+            int mq9_adc_pin = item->interface.adc.gpio_num;
             //-------------------------------------------------
             // let the sensor to heat for 20seconds
             for (uint8_t j = 20; j > 0; j--)

@@ -211,8 +211,8 @@ static void __prepare_temperature_item_properties(l_ezlopi_item_t* item, cJSON* 
     item->interface.i2c_master.enable = true;
     item->interface.i2c_master.channel = 0;
     item->interface.i2c_master.clock_speed = 400000;
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_scl_str, item->interface.i2c_master.scl);
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_sda_str, item->interface.i2c_master.sda);
+    CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_scl_str, item->interface.i2c_master.scl);
+    CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_sda_str, item->interface.i2c_master.sda);
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_slave_addr_str, item->interface.i2c_master.address);
 }
 
@@ -231,8 +231,8 @@ static void __prepare_humidity_item_properties(l_ezlopi_item_t* item, cJSON* cj_
     item->interface.i2c_master.enable = false;
     item->interface.i2c_master.channel = 0;
     item->interface.i2c_master.clock_speed = 400000;
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_scl_str, item->interface.i2c_master.scl);
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_sda_str, item->interface.i2c_master.sda);
+    CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_scl_str, item->interface.i2c_master.scl);
+    CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_sda_str, item->interface.i2c_master.sda);
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_slave_addr_str, item->interface.i2c_master.address);
 }
 

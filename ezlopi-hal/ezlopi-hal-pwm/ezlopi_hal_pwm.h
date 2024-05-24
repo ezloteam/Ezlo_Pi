@@ -13,7 +13,7 @@ typedef struct s_ezlopi_channel_speed
 
 typedef struct ezlopi_pwm
 {
-    uint8_t gpio_num;
+    int gpio_num;
     uint32_t channel;
     uint32_t speed_mode;
     uint8_t pwm_resln; // pwm resolution

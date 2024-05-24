@@ -733,12 +733,12 @@ static void ezlopi_service_uart_set_config(const char* data)
 static void ezlopi_service_uart_get_config(void)
 {
     cJSON* root = NULL;
-    char* buf = ezlopi_factory_info_v3_get_ezlopi_config();
+    char* current_config = ezlopi_factory_info_v3_get_ezlopi_config();
 
-    if (buf)
+    if (current_config)
     {
-        TRACE_D("buf[len: %d]: %s", strlen(buf), buf);
-        root = cJSON_Parse(__FUNCTION__, buf);
+        TRACE_D("current_config[len: %d]: %s", strlen(current_config), current_config);
+        root = cJSON_Parse(__FUNCTION__, current_config);
 
         if (root)
         {
@@ -752,7 +752,7 @@ static void ezlopi_service_uart_get_config(void)
     }
     else
     {
-        TRACE_E("'buf' is null!");
+        TRACE_E("'current_config' is null!");
     }
 
     if (NULL == root)
