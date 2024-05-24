@@ -6,6 +6,11 @@
 #include <stdbool.h>
 #include "../../build/config/sdkconfig.h"
 
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
+
+
+#include <stdbool.h>
+
 typedef enum {
     ENUM_EZLOPI_LOG_SEVERITY_NONE = 0,
     ENUM_EZLOPI_LOG_SEVERITY_ERROR,
@@ -31,5 +36,6 @@ int ezlopi_core_serial_log_severity_process_id(const e_ezlopi_log_severity_t sev
 const char* ezlopi_core_serial_log_get_current_severity_enum_str();
 e_ezlopi_log_severity_t ezlopi_core_serial_log_get_current_severity_enum_val();
 
-#endif // _EZLOPI_CORE_LOG_H_
+#endif // CONFIG_EZPI_UTIL_TRACE_EN
 
+#endif // _EZLOPI_CORE_LOG_H_

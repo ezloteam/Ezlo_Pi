@@ -380,7 +380,7 @@ static int ezlopi_service_uart_firmware_info(cJSON* parent)
         cJSON_AddStringToObjectWithRef(__FUNCTION__, cj_firmware_info, ezlopi_version_str, VERSION_STR);
         cJSON_AddNumberToObjectWithRef(__FUNCTION__, cj_firmware_info, ezlopi_build_str, BUILD);
         EZPI_CORE_sntp_epoch_to_iso8601(build_time, sizeof(build_time), (time_t)BUILD_DATE);
-        cJSON_AddStringToObjectWithRef(__FUNCTION__, cj_firmware_info, ezlopi_build_date_str, build_time);
+        cJSON_AddStringToObject(__FUNCTION__, cj_firmware_info, ezlopi_build_date_str, build_time);
 
         ret = 1;
     }

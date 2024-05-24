@@ -593,6 +593,7 @@ static int ezlopi_device_parse_json_v3(cJSON* cjson_config)
     if (cjson_config)
     {
         cJSON* cjson_chipset = cJSON_GetObjectItem(__FUNCTION__, cjson_config, ezlopi_chipset_str);
+
         if (cjson_chipset)
         {
             if (cJSON_IsString(cjson_chipset) && (cjson_chipset->valuestring != NULL))

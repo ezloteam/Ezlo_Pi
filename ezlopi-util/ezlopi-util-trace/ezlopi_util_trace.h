@@ -11,7 +11,7 @@ extern "C"
 {
 #endif
 
-#if defined(CONFIG_EZPI_UTIL_TRACE_EN) || defined(CONFIG_EZPI_CORE_LOG_EN)
+#if defined(CONFIG_EZPI_UTIL_TRACE_EN) || defined(CONFIG_EZPI_LOG_CLOUD_EN)
 #define ENABLE_TRACE 1
 #else
 #define ENABLE_TRACE 0

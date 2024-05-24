@@ -5,7 +5,6 @@
 #include "../../build/config/sdkconfig.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "../../build/config/sdkconfig.h"
 
 #include "ezlopi_util_trace.h"
 
@@ -45,7 +44,7 @@ static size_t set_default_task_memory_usage(const char* default_task_name)
 #ifdef CONFIG_EZPI_BLE_ENABLE
         else if (0 == strncmp("BTU_TASK", default_task_name, 9))
         {
-            // stack_size = CONFIG_BTU_TASK_STACK_SIZE;
+            stack_size = CONFIG_BTU_TASK_STACK_SIZE;
             stack_size = 4096;
         }
         else if (0 == strncmp("BTC_TASK", default_task_name, 9))
