@@ -98,9 +98,9 @@ void ezlopi_init(void)
 
     ezlopi_timer_start_1000ms();
 
-#if defined(EZPI_ENABLE_MDNS_SERVICE)
+    // #if defined(EZPI_ENABLE_MDNS_SERVICE)
     EZPI_core_init_mdns();
-#endif
+    // #endif
 }
 
 l_ezlopi_device_t* link_next_parent_id(uint32_t target_to_clear_parent_id)

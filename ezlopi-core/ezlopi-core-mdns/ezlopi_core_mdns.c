@@ -1,5 +1,5 @@
 
-#ifdef CONFIG_EZPI_SERV_MDNS_EN
+#if 1 // def CONFIG_EZPI_SERV_MDNS_EN
 
 #include <string.h>
 #include "freertos/FreeRTOS.h"
@@ -286,7 +286,7 @@ static void __mdns_init(void* pv)
         }
         else
         {
-            TRACE_E("Error mDNS Initialization")
+            TRACE_E("Error mDNS Initialization");
         }
         vTaskDelay(10000 / portTICK_PERIOD_MS);
     }

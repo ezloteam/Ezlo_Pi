@@ -8,6 +8,8 @@
 */
 
 
+#include "../../build/config/sdkconfig.h"
+
 
 #include "esp_eth.h"
 #include "esp_wifi.h"
@@ -34,7 +36,6 @@
 #include "ezlopi_service_ws_server.h"
 #include "ezlopi_service_ws_server_clients.h"
 
-#include "../../build/config/sdkconfig.h"
 #include "EZLOPI_USER_CONFIG.h"
 
 
@@ -61,12 +62,6 @@ static int __ws_server_send(l_ws_server_client_conn_t* client, char* data, uint3
 
 static esp_err_t __msg_handler(httpd_req_t* req);
 static int __ws_server_broadcast(char* data);
-
-///////// Global Functions Definations
-void ezlpi_service_ws_server_dummy(void)
-{
-    TRACE_D("I'm dummy. I do nothing.");
-}
 
 e_ws_status_t ezlopi_service_ws_server_status(void)
 {
@@ -169,6 +164,7 @@ static void __message_upcall(httpd_req_t* req, const char* payload, uint32_t pay
 
 static void __ws_async_send(void* arg)
 {
+#if 1 // def CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER
     static const char* data = "Async data";
     s_async_resp_arg_t* resp_arg = (s_async_resp_arg_t*)arg;
 
@@ -188,6 +184,7 @@ static void __ws_async_send(void* arg)
 
         ezlopi_free(__FUNCTION__, resp_arg);
     }
+#endif // CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER
 }
 
 static esp_err_t __trigger_async_send(httpd_req_t* req)
@@ -208,6 +205,7 @@ static esp_err_t __trigger_async_send(httpd_req_t* req)
 static esp_err_t __msg_handler(httpd_req_t* req)
 {
     esp_err_t ret = ESP_FAIL;
+#if 1 //def CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER
 
     if (__send_lock && (pdTRUE == xSemaphoreTake(__send_lock, 5000 / portTICK_RATE_MS)))
     {
@@ -304,12 +302,13 @@ static esp_err_t __msg_handler(httpd_req_t* req)
     {
         TRACE_E("-----------------------------> acquire send-lock failed!");
     }
-
+#endif // CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER
     return ret;
 }
 
 static void __start_server(void)
 {
+#if 1//def CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER
     __ws_status = WS_STATUS_STARTED;
 
     static const httpd_uri_t ws = {
@@ -343,6 +342,7 @@ static void __start_server(void)
     {
         TRACE_E("Error starting server!, err: %d", err);
     }
+#endif // CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER
 }
 
 static void __stop_server(void)
@@ -359,6 +359,7 @@ static void __stop_server(void)
 static int __respond_cjson(httpd_req_t* req, cJSON* cj_response)
 {
     int ret = 0;
+#if 1 // def CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER
     if (req && cj_response)
     {
         uint32_t buffer_len = 0;
@@ -400,13 +401,14 @@ static int __respond_cjson(httpd_req_t* req, cJSON* cj_response)
             TRACE_E("-----------------------------> buffer acquired failed!");
         }
     }
-
+#endif // CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER
     return ret;
 }
 
 static int __ws_server_send(l_ws_server_client_conn_t* client, char* data, uint32_t len)
 {
     int ret = 0;
+#if 1 //def CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER
     if (data && len && client && client->http_handle)
     {
         httpd_ws_frame_t frm_pkt;
@@ -442,7 +444,7 @@ static int __ws_server_send(l_ws_server_client_conn_t* client, char* data, uint3
             }
         }
     }
-
+#endif // CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER
     return ret;
 }
 
@@ -473,4 +475,10 @@ static void __wifi_connection_event(esp_event_base_t event_base, int32_t event_i
     }
 }
 
+void ezlpi_service_ws_server_dummy(void)
+{
+    TRACE_D("I'm dummy. I do nothing.");
+}
+
+///////// Global Functions Definations
 

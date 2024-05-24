@@ -150,8 +150,7 @@ menu "EzloPi User Config"
         help 
             Enable indicator LED available in the device
 
-    config EZPI_ENABLE_MDNS_SERVICE
-        depends on EZPI_DISTRO_FULL_OPTION || EZPI_DISTRO_LOCAL || EZPI_DISTRO_LOCAL_MESHBOT
+    config EZPI_SERV_MDNS_EN
         bool "Enable mDNS service"
         default n
         help 
@@ -159,7 +158,7 @@ menu "EzloPi User Config"
 
 
     menu "EzloPi mDNS config"
-        depends on EZPI_ENABLE_MDNS_SERVICE
+        depends on EZPI_SERV_MDNS_EN
 
         config EZPI_MDNS_HOSTNAME
             string "mDNS hostname"
