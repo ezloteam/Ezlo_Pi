@@ -76,7 +76,7 @@ void ezlopi_util_set_log_upcalls(f_ezlopi_log_upcall_t cloud_log_upcall, f_ezlop
     {
         cloud_log_upcall_func = cloud_log_upcall;
     }
-    
+
     if (serial_log_upcall)
     {
         serial_log_upcall_func = serial_log_upcall;
@@ -96,7 +96,7 @@ f_ezlopi_log_upcall_t ezlopi_util_get_serial_log_upcall()
 void trace_color_print(const char* txt_color, uint8_t severity, const char* file, int line, const char* format, ...) {
 
     f_ezlopi_log_upcall_t log_upcall_func = ezlopi_util_get_cloud_log_upcall();
-    
+
     if (log_upcall_func != NULL) {
         va_list args;
         va_start(args, format);
@@ -114,7 +114,7 @@ void trace_color_print(const char* txt_color, uint8_t severity, const char* file
         char serial_log_format[EZPI_CORE_LOG_BUFFER_SIZE];
         snprintf(serial_log_format, sizeof(serial_log_format), "\x1B[%sm %s[%d]: ", txt_color, file, line);
         vsnprintf(serial_log_format + strlen(serial_log_format), sizeof(serial_log_format) - strlen(serial_log_format), format, args);
-        snprintf(serial_log_format + strlen(serial_log_format), sizeof(serial_log_format) - strlen(serial_log_format), "\x1B[0m\r\n");
+        snprintf(serial_log_format + strlen(serial_log_format), sizeof(serial_log_format) - strlen(serial_log_format), "\x1B[0m");
         log_upcall_func(severity, serial_log_format);
         va_end(args);
     }

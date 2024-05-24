@@ -221,7 +221,7 @@ static int ezlopi_core_serial_log_upcall(int severity, const char* log_str)
     int ret = 0;
     if ((severity > ENUM_EZLOPI_LOG_SEVERITY_NONE) && (severity <= ezlopi_core_serial_log_get_current_severity_enum_val()))
     {
-        printf("%s", log_str);
+        printf("%s\n", log_str);
         ret = 1;
     }
     return ret;

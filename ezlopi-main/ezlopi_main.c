@@ -116,6 +116,8 @@ static void __blinky(void* pv)
         TRACE_W("Free Heap Size: %d B     %.4f KB", free_heap, free_heap / 1024.0);
         TRACE_W("Heap Watermark: %d B     %.4f KB", watermark_heap, watermark_heap / 1024.0);
         TRACE_I("----------------------------------------------");
+        // char heartbeat[100];
+        printf("{\"cmd\":99,\"free_heap\":%d,\"heap_watermark\":%d}\n", free_heap, watermark_heap);
 
         if (free_heap <= (10 * 1024))
         {
