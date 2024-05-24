@@ -159,8 +159,8 @@ void EZPI_CORE_sntp_epoch_to_iso8601(char* time_buf, uint32_t buf_len, time_t t)
     if (time_buf && buf_len)
     {
         struct tm* timeinfo;
-        // timeinfo = gmtime(&t);
-        timeinfo = localtime(&t);
+        timeinfo = gmtime(&t);
+        // timeinfo = localtime(&t);
         strftime(time_buf, buf_len, "%Y-%m-%dT%H:%M:%S%z", timeinfo);
         // TRACE_I("Build Time: %s", time_buf);
     }

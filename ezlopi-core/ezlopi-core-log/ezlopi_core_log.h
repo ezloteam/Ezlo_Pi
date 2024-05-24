@@ -4,7 +4,8 @@
 
 #include "../../build/config/sdkconfig.h"
 
-#if defined(CONFIG_EZPI_CORE_LOG_EN)
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
+
 
 #include <stdbool.h>
 
@@ -33,28 +34,6 @@ int ezlopi_core_serial_log_severity_process_id(const e_ezlopi_log_severity_t sev
 const char* ezlopi_core_serial_log_get_current_severity_enum_str();
 e_ezlopi_log_severity_t ezlopi_core_serial_log_get_current_severity_enum_val();
 
-#else // CONFIG_EZPI_CORE_LOG_EN
-
-#include "stdbool.h"
-
-static int __serial_process_str(const char *x) { return 0; }
-static int __cloud_process_str(bool severity_enable, const char* severity_str) { return 0; }
-
-#define ezlopi_core_read_set_log_severities()
-#define ezlopi_core_cloud_log_severity_process_str __cloud_process_str
-#define ezlopi_core_cloud_log_severity_process_id(x) 0
-
-#define ezlopi_core_cloud_log_get_current_severity_enum_str ""
-#define ezlopi_core_cloud_log_get_current_severity_enum_val 0
-#define ezlopi_core_send_cloud_log(x, y) 0
-#define ezlopi_core_set_log_upcalls()
-
-#define ezlopi_core_serial_log_severity_process_str __serial_process_str
-#define ezlopi_core_serial_log_severity_process_id(x) 0
-#define ezlopi_core_serial_log_get_current_severity_enum_str() ""
-#define ezlopi_core_serial_log_get_current_severity_enum_val() 0
-
-#endif // CONFIG_EZPI_CORE_LOG_EN
+#endif // CONFIG_EZPI_UTIL_TRACE_EN
 
 #endif // _EZLOPI_CORE_LOG_H_
-

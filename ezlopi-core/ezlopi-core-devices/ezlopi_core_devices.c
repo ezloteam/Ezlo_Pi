@@ -569,32 +569,26 @@ static void ezlopi_device_parse_json_v3(cJSON* cjson_config)
 {
     if (cjson_config)
     {
-                cJSON* cjson_chipset = cJSON_GetObjectItem(__FUNCTION__, cjson_config, ezlopi_chipset_str);
-                if (cjson_chipset)
-                {
-                    if (cJSON_IsString(cjson_chipset) && (cjson_chipset->valuestring != NULL))
-                    {
-                        TRACE_D("Chipset Value : %.*s", cjson_chipset->str_value_len, cjson_chipset->valuestring);
-                        char chipset_name[10];
-                        strncpy(chipset_name, cjson_chipset->valuestring, cjson_chipset->str_value_len);
+        cJSON* cjson_chipset = cJSON_GetObjectItem(__FUNCTION__, cjson_config, ezlopi_chipset_str);
 
-        #if defined(CONFIG_IDF_TARGET_ESP32)
-                        uint32_t compare_len = strlen(ezlopi_ESP32_str) > cjson_chipset->str_value_len ? strlen(ezlopi_ESP32_str) : cjson_chipset->str_value_len;
-                        if (strncmp(chipset_name, ezlopi_ESP32_str, compare_len) == 0)
-        #elif  defined (CONFIG_IDF_TARGET_ESP32S3)
-                        uint32_t compare_len = strlen(ezlopi_ESP32S3_str) > cjson_chipset->str_value_len ? strlen(ezlopi_ESP32S3_str) : cjson_chipset->str_value_len;
-                        if (strncmp(chipset_name, ezlopi_ESP32S3_str, compare_len) == 0)
-        #elif defined (CONFIG_IDF_TARGET_ESP32C3)
-                        uint32_t compare_len = strlen(ezlopi_ESP32C3_str) > cjson_chipset->str_value_len ? strlen(ezlopi_ESP32C3_str) : cjson_chipset->str_value_len;
-                        if (strncmp(chipset_name, ezlopi_ESP32C3_str, compare_len) == 0)
-        #endif // Chipset 
-                        {
-        cJSON* cjson_device_list = cJSON_GetObjectItem(__FUNCTION__, cjson_config, ezlopi_dev_detail_str);
-
-        if (cjson_device_list)
+        if (cjson_chipset)
         {
-            int config_dev_idx = 0;
-            cJSON* cjson_device = NULL;
+            if (cJSON_IsString(cjson_chipset) && (cjson_chipset->valuestring != NULL))
+            {
+                TRACE_D("Chipset Value : %.*s", cjson_chipset->str_value_len, cjson_chipset->valuestring);
+                char chipset_name[10];
+                strncpy(chipset_name, cjson_chipset->valuestring, cjson_chipset->str_value_len);
+
+#if defined(CONFIG_IDF_TARGET_ESP32)
+                uint32_t compare_len = strlen(ezlopi_ESP32_str) > cjson_chipset->str_value_len ? strlen(ezlopi_ESP32_str) : cjson_chipset->str_value_len;
+                if (strncmp(chipset_name, ezlopi_ESP32_str, compare_len) == 0)
+#elif  defined (CONFIG_IDF_TARGET_ESP32S3)
+                uint32_t compare_len = strlen(ezlopi_ESP32S3_str) > cjson_chipset->str_value_len ? strlen(ezlopi_ESP32S3_str) : cjson_chipset->str_value_len;
+                if (strncmp(chipset_name, ezlopi_ESP32S3_str, compare_len) == 0)
+#elif defined (CONFIG_IDF_TARGET_ESP32C3)
+                uint32_t compare_len = strlen(ezlopi_ESP32C3_str) > cjson_chipset->str_value_len ? strlen(ezlopi_ESP32C3_str) : cjson_chipset->str_value_len;
+                if (strncmp(chipset_name, ezlopi_ESP32C3_str, compare_len) == 0)
+#endif // Chipset 
                 {
                     cJSON* cjson_device_list = cJSON_GetObjectItem(__FUNCTION__, cjson_config, ezlopi_dev_detail_str);
 
@@ -631,24 +625,19 @@ static void ezlopi_device_parse_json_v3(cJSON* cjson_config)
                         }
                     }
                 }
-
-    #if (defined(CONFIG_IDF_TARGET_ESP32) || defined(CONFIG_IDF_TARGET_ESP32S3) || defined(CONFIG_IDF_TARGET_ESP32C3))
-        else
-        {
-            TRACE_E("Device configuration and chipset mismatch ! Device and Item assignment aborted !");
-        }
-    #endif // CONFIG_IDF_TARGET_ESP32 OR CONFIG_IDF_TARGET_ESP32S3 OR CONFIG_IDF_TARGET_ESP32C3
-    }
+#if (defined(CONFIG_IDF_TARGET_ESP32) || defined(CONFIG_IDF_TARGET_ESP32S3) || defined(CONFIG_IDF_TARGET_ESP32C3))
                 else
                 {
-                    TRACE_E("Error, could not identify the chipset in the config!");
+                    TRACE_E("Device configuration and chipset mismatch ! Device and Item assignment aborted !");
                 }
+#endif // CONFIG_IDF_TARGET_ESP32 OR CONFIG_IDF_TARGET_ESP32S3 OR CONFIG_IDF_TARGET_ESP32C3
             }
             else
             {
                 TRACE_E("Chipset not defined in the config, Device and Item assignment aborted !");
             }
-}
+        }
+    }
 }
 
 
