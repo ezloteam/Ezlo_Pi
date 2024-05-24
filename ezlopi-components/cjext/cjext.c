@@ -1453,7 +1453,7 @@ cJSON_bool cJSON_PrintPreallocated(const char * who, cJSON* item, char* buffer, 
 
     if ((length < 0) || (buffer == NULL))
     {
-        return false;
+        return cJSON_False;
     }
 
     p.buffer = (unsigned char*)buffer;
