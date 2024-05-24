@@ -104,7 +104,14 @@ int ezlopi_core_cloud_log_severity_process_id(const e_ezlopi_log_severity_t seve
 
     if ((ENUM_EZLOPI_LOG_SEVERITY_MAX > severity_level_id) && (ENUM_EZLOPI_LOG_SEVERITY_NONE <= severity_level_id))
     {
-        cloud_log_severity = severity_level_id;
+        if (severity_level_id <= ENUM_EZLOPI_LOG_SEVERITY_WARNING)
+        {
+            cloud_log_severity = severity_level_id;
+        }
+        else
+        {
+            cloud_log_severity = ENUM_EZLOPI_LOG_SEVERITY_WARNING;
+        }
         EZPI_CORE_nvs_write_cloud_log_severity(cloud_log_severity);
         ret = 1;
     }

@@ -37,7 +37,7 @@ static void __blinky(void* pv);
 
 void app_main(void)
 {
-#if 1
+
 #ifdef CONFIG_EZPI_UTIL_TRACE_EN
     ezlopi_core_set_log_upcalls();
 #endif  // CONFIG_EZPI_UTIL_TRACE_EN
@@ -86,7 +86,7 @@ void app_main(void)
 #if defined (CONFIG_EZPI_SERV_ENABLE_MESHBOTS)
     ezlopi_scenes_meshbot_init();
 #endif
-#endif
+
 
     TaskHandle_t ezlopi_main_blinky_task_handle = NULL;
 #if defined(CONFIG_EZPI_HEAP_ENABLE)

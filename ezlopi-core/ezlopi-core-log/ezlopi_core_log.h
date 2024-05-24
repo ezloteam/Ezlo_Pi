@@ -2,8 +2,6 @@
 #ifndef _EZLOPI_CORE_LOG_H_
 #define _EZLOPI_CORE_LOG_H_
 
-
-#include <stdbool.h>
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_UTIL_TRACE_EN
@@ -39,3 +37,4 @@ e_ezlopi_log_severity_t ezlopi_core_serial_log_get_current_severity_enum_val();
 #endif // CONFIG_EZPI_UTIL_TRACE_EN
 
 #endif // _EZLOPI_CORE_LOG_H_
+
