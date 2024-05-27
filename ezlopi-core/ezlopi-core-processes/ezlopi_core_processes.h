@@ -23,7 +23,7 @@
 #define EZLOPI_CORE_SCENES_SCRIPT_PROCESS_TASK_DEPTH                ( 2 * EZLOPI_MINIMAL_STACK_SIZE )
 #define EZLOPI_CORE_WIFI_SCANNER_TASK_DEPTH                         ( 2 * EZLOPI_MINIMAL_STACK_SIZE )
 
-#define EZLOPI_MAIN_BLINKY_TASK_DEPTH                               ( 6 * EZLOPI_MINIMAL_STACK_SIZE )
+#define EZLOPI_MAIN_BLINKY_TASK_DEPTH                               ( 2 * EZLOPI_MINIMAL_STACK_SIZE )
 
 #define EZLOPI_HAL_UART_TASK_DEPTH                                  ( 2 * EZLOPI_MINIMAL_STACK_SIZE )
 

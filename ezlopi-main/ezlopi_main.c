@@ -89,8 +89,9 @@ void app_main(void)
 
 
     TaskHandle_t ezlopi_main_blinky_task_handle = NULL;
+
 #if defined(CONFIG_EZPI_HEAP_ENABLE)
-    xTaskCreate(blinky, "blinky", 3 * EZLOPI_MAIN_BLINKY_TASK_DEPTH, NULL, 1, &ezlopi_main_blinky_task_handle);
+    xTaskCreate(__blinky, "blinky", 3 * EZLOPI_MAIN_BLINKY_TASK_DEPTH, NULL, 1, &ezlopi_main_blinky_task_handle);
     ezlopi_core_process_set_process_info(ENUM_EZLOPI_MAIN_BLINKY_TASK, &ezlopi_main_blinky_task_handle, 3 * EZLOPI_MAIN_BLINKY_TASK_DEPTH);
 #else
     xTaskCreate(__blinky, "blinky", EZLOPI_MAIN_BLINKY_TASK_DEPTH, NULL, 1, &ezlopi_main_blinky_task_handle);
@@ -105,10 +106,6 @@ static void __blinky(void* pv)
 
     while (1)
     {
-#if 0
-        UBaseType_t total_task_numbers = uxTaskGetNumberOfTasks();
-        TaskStatus_t task_array[total_task_numbers];
-#endif 
 
         TRACE_I("----------------------------------------------");
         uint32_t free_heap = esp_get_free_heap_size();
@@ -116,7 +113,6 @@ static void __blinky(void* pv)
         TRACE_W("Free Heap Size: %d B     %.4f KB", free_heap, free_heap / 1024.0);
         TRACE_W("Heap Watermark: %d B     %.4f KB", watermark_heap, watermark_heap / 1024.0);
         TRACE_I("----------------------------------------------");
-        // char heartbeat[100];
         printf("{\"cmd\":99,\"free_heap\":%d,\"heap_watermark\":%d}\n", free_heap, watermark_heap);
 
         if (free_heap <= (10 * 1024))
@@ -137,28 +133,10 @@ static void __blinky(void* pv)
             low_heap_start_time = xTaskGetTickCount();
         }
 
-
 #ifdef CONFIG_EZPI_HEAP_ENABLE
         ezlopi_util_heap_trace(false);
         ezlopi_util_heap_flush();
 #endif // CONFIG_EZPI_HEAP_ENABLE
-
-#if 0
-
-        uxTaskGetSystemState(task_array, total_task_numbers, NULL);
-
-        for (int i = 0; i < total_task_numbers; i++) {
-            if (task_array[i].pcTaskName)
-            {
-                TRACE_D("Process Name: %s, \tPID: %d, \tBase: %p, \tWatermark: %.2f KB",
-                    task_array[i].pcTaskName,
-                    task_array[i].xTaskNumber,
-                    task_array[i].pxStackBase,
-                    task_array[i].usStackHighWaterMark / 1024.0);
-            }
-        }
-#endif 
-
 
         vTaskDelay(5000 / portTICK_PERIOD_MS);
     }

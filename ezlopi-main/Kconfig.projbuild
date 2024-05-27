@@ -1,40 +1,6 @@
 
 menu "EzloPi User Config"
 
-    choice EZPI_DISTRO
-        prompt "Select from available distros:"
-        depends on IDF_TARGET_ESP32S3 || IDF_TARGET_ESP32C3 || IDF_TARGET_ESP32
-        default EZPI_DISTRO_FULL_OPTION
-
-        config EZPI_DISTRO_FULL_OPTION
-            bool "1. EZPI_DISTRO_FULL_OPTION"
-
-        config EZPI_DISTRO_LOCAL
-            bool "2. EZPI_DISTRO_LOCAL"
-
-        config EZPI_DISTRO_LOCAL_MESHBOT
-            bool "3. EZPI_DISTRO_LOCAL_MESHBOT"
-
-        config EZPI_DISTRO_CLOUD
-            bool "4. EZPI_DISTRO_CLOUD"
-
-        config EZPI_DISTRO_CLOUD_MESHBOT
-            bool "5. EZPI_DISTRO_CLOUD_MESHBOT"
-
-        config EZPI_DISTRO_BLE_CLOUD
-            bool "6. EZPI_DISTRO_BLE_CLOUD"
-
-        config EZPI_DISTRO_WIFI_HUB
-            bool "7. EZPI_DISTRO_WIFI_HUB"
-
-        config EZPI_DISTRO_BLE_HUB
-            bool "8. EZPI_DISTRO_BLE_HUB"
-
-        config EZPI_DISTRO_MINIMAL
-            bool "9. EZPI_DISTRO_MINIMAL"
-        
-    endchoice
-
     config EZPI_HEAP_ENABLE
         bool "Enable ezlopi heap"
         default n
@@ -53,8 +19,7 @@ menu "EzloPi User Config"
         help
             ezlopi-util-trace component is enabled to log the outputs to the serial monitor
 
-    config EZPI_BLE_ENABLE
-        depends on EZPI_DISTRO_FULL_OPTION || EZPI_DISTRO_LOCAL || EZPI_DISTRO_LOCAL_MESHBOT || EZPI_DISTRO_CLOUD_MESHBOT || EZPI_DISTRO_BLE_CLOUD || EZPI_DISTRO_BLE_HUB || EZPI_DISTRO_MINIMAL
+    config EZPI_BLE_ENABLE        
         bool "Enable BLE"
         default n
         help
@@ -76,7 +41,7 @@ menu "EzloPi User Config"
 
     config EZPI_CORE_ENABLE_ETH
         bool "Enable ethernet"
-        depends on ETH_USE_SPI_ETHERNET || EZPI_DISTRO_FULL_OPTION || EZPI_DISTRO_LOCAL
+        depends on ETH_USE_SPI_ETHERNET
         default n
         help 
             ezlopi-core-ethernet component is enabled
@@ -86,7 +51,6 @@ menu "EzloPi User Config"
         default y
         help 
             ezlopi-core-wifi component is enabled
-
     
     config EZPI_ENABLE_OTA 
         depends on EZPI_ENABLE_WIFI || EZPI_CORE_ENABLE_ETH
@@ -104,20 +68,19 @@ menu "EzloPi User Config"
     
     config EZPI_ENABLE_UART_PROVISIONING
         bool "Enable UART provisioning"
-        depends on EZPI_DISTRO_FULL_OPTION || EZPI_DISTRO_CLOUD_MESHBOT || EZPI_DISTRO_MINIMAL
         default n
         help
             Enable provisioning and monitoring via UART    
 
     config EZPI_LOCAL_WEBSOCKET_SERVER
-        depends on (HTTPD_WS_SUPPORT && (EZPI_CORE_ENABLE_ETH || EZPI_ENABLE_WIFI ) && (EZPI_DISTRO_FULL_OPTION || EZPI_DISTRO_LOCAL || EZPI_DISTRO_LOCAL_MESHBOT))
+        depends on (HTTPD_WS_SUPPORT && (EZPI_CORE_ENABLE_ETH || EZPI_ENABLE_WIFI ))
         bool "Enable local websocket server"
         default n
         help 
             Enable local websocket server
 
     config EZPI_WEBSOCKET_CLIENT
-        depends on (EZPI_CORE_ENABLE_ETH || EZPI_ENABLE_WIFI ) && (EZPI_DISTRO_FULL_OPTION || EZPI_DISTRO_CLOUD || EZPI_DISTRO_CLOUD_MESHBOT || EZPI_DISTRO_BLE_CLOUD || EZPI_DISTRO_WIFI_HUB || EZPI_DISTRO_BLE_HUB || EZPI_DISTRO_MINIMAL)
+        depends on (EZPI_CORE_ENABLE_ETH || EZPI_ENABLE_WIFI )
         bool "Enable Web-Socket client"
         default n
         help 
@@ -131,7 +94,7 @@ menu "EzloPi User Config"
             Static buffer is used to broadcast data. Data is broadcasted by local-websocket-server and websocket-client. Default value is 10KB"
 
     config EZPI_SERV_ENABLE_MESHBOTS 
-        depends on (EZPI_WEBSOCKET_CLIENT || EZPI_LOCAL_WEBSOCKET_SERVER) && (EZPI_DISTRO_FULL_OPTION || EZPI_DISTRO_LOCAL_MESHBOT || EZPI_DISTRO_CLOUD_MESHBOT )
+        depends on (EZPI_WEBSOCKET_CLIENT || EZPI_LOCAL_WEBSOCKET_SERVER)
         bool "Enable meshbot service"
         default n
         help
