@@ -182,7 +182,7 @@ static int __0070_set_value(l_ezlopi_item_t* item, void* arg)
 
                 float value_double = 0;
                 bool update_flag = false;
-                cJSON* cj_value = cJSON_GetObjectItem(cjson_params, ezlopi_value_str);
+                cJSON* cj_value = cJSON_GetObjectItem(__FUNCTION__, cjson_params, ezlopi_value_str);
                 if (cj_value)
                 {
                     switch (cj_value->type)
@@ -210,7 +210,7 @@ static int __0070_set_value(l_ezlopi_item_t* item, void* arg)
                         TRACE_S("curr_pot_state: [%.2f]", value_double);
 
                         user_data->pot_val = value_double;
-                        ezlopi_device_value_updated_from_device_v3(item);
+                        ezlopi_device_value_updated_from_device_broadcast(item);
                         ret = 1;
                     }
                 }
@@ -237,18 +237,18 @@ static int __0070_get_cjson_value(l_ezlopi_item_t* item, void* arg)
             {
                 if (user_data->pot_val > 70)
                 {
-                    cJSON_AddStringToObject(cj_result, ezlopi_value_str, "high_volume");
-                    cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, "high_volume");
+                    cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, "high_volume");
+                    cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, "high_volume");
                 }
                 else if (user_data->pot_val > 30)
                 {
-                    cJSON_AddStringToObject(cj_result, ezlopi_value_str, "mid_volume");
-                    cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, "mid_volume");
+                    cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, "mid_volume");
+                    cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, "mid_volume");
                 }
                 else
                 {
-                    cJSON_AddStringToObject(cj_result, ezlopi_value_str, "low_volume");
-                    cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, "low_volume");
+                    cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, "low_volume");
+                    cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, "low_volume");
                 }
                 ret = 1;
             }
@@ -278,7 +278,7 @@ static int __0070_notify(l_ezlopi_item_t* item)
             if (fabs((user_data->pot_val) - new_pot) > 0.05)
             {
                 user_data->pot_val = new_pot;
-                ezlopi_device_value_updated_from_device_v3(item);
+                ezlopi_device_value_updated_from_device_broadcast(item);
             }
             ret = 1;
         }
