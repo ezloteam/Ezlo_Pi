@@ -59,6 +59,12 @@ menu "EzloPi User Config"
         help
             Enable OTA
 
+    config EZPI_SERV_MDNS_EN
+        bool "Enable mDNS service"
+        default y
+        help 
+            Enable mDNS service. mDNS broadcast informations of device.
+
     config EZPI_ENABLE_PING 
         depends on EZPI_ENABLE_WIFI || EZPI_CORE_ENABLE_ETH
         bool "Enable ping"
@@ -113,27 +119,9 @@ menu "EzloPi User Config"
         help 
             Enable indicator LED available in the device
 
-    config EZPI_SERV_MDNS_EN
-        bool "Enable mDNS service"
-        default n
-        help 
-            Enable mDNS service. mDNS broadcast informations of device.
-
 
     menu "EzloPi mDNS config"
         depends on EZPI_SERV_MDNS_EN
-
-        config EZPI_MDNS_HOSTNAME
-            string "mDNS hostname"
-            default "ezlopi_device"
-            help
-                Set mDNS hostname
-        
-        config EZPI_MDNS_INSTANCE_NAME
-            string "mDNS instance name"
-            default "ezlopi_serial"
-            help 
-                Set mDNS instance name
 
         config EZPI_MDNS_ENABLE_EXTRA_SERVICES
             bool "mDNS enable extra services"

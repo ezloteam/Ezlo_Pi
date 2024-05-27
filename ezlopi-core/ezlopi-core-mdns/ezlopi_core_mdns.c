@@ -1,5 +1,7 @@
 
-#if 1 // def CONFIG_EZPI_SERV_MDNS_EN
+#include "../../build/config/sdkconfig.h"
+
+#ifdef CONFIG_EZPI_SERV_MDNS_EN
 
 #include <string.h>
 #include "freertos/FreeRTOS.h"
