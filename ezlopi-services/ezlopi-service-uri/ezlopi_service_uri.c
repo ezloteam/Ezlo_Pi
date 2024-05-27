@@ -4,14 +4,15 @@
 #include "nvs_flash.h"
 #include "esp_spiffs.h"
 #include "esp_wifi.h"
-#include "cJSON.h"
+#include "cjext.h"
 
 #include "ezlopi_util_trace.h"
 #include "dns_hijacking.h"
 
 #include "ezlopi_service_uri.h"
+#include "EZLOPI_USER_CONFIG.h"
 
-static const char *error_page_data = "\
+static const char* error_page_data = "\
     <!DOCTYPE html>\
         <html>\
             <body>\
@@ -20,7 +21,7 @@ static const char *error_page_data = "\
         </html>\
 ";
 
-static const char *success_page_data = "\
+static const char* success_page_data = "\
     <!DOCTYPE html>\
         <html>\
             <body>\
@@ -30,9 +31,9 @@ static const char *success_page_data = "\
         </html>\
 ";
 
-static esp_err_t ezlopi_capture_base_uri_handler(httpd_req_t *req);
-static esp_err_t ezlopi_capture_config_uri_handle(httpd_req_t *req);
-esp_err_t ezlopi_http_404_error_handler(httpd_req_t *req, httpd_err_code_t err);
+static esp_err_t ezlopi_capture_base_uri_handler(httpd_req_t* req);
+static esp_err_t ezlopi_capture_config_uri_handle(httpd_req_t* req);
+esp_err_t ezlopi_http_404_error_handler(httpd_req_t* req, httpd_err_code_t err);
 
 static httpd_uri_t ezlopi_capture_base_uri = {
     .uri = "/",
@@ -62,7 +63,7 @@ void ezlopi_begin_ap_server_service()
     wifi_cred_available = false;
 }
 
-static esp_err_t ezlopi_capture_base_uri_handler(httpd_req_t *req)
+static esp_err_t ezlopi_capture_base_uri_handler(httpd_req_t* req)
 {
     esp_err_t error = ESP_OK;
     TRACE_I("%s", __func__);
@@ -86,14 +87,14 @@ static esp_err_t ezlopi_capture_base_uri_handler(httpd_req_t *req)
     TRACE_I("Partition size: total available = %d, total used = %d", total_available, total_used);
     TRACE_I("Reading spiffs content.");
 
-    FILE *f = fopen("/spiffs/login.html", "r");
+    FILE* f = fopen("/spiffs/login.html", "r");
     if (NULL != f)
     {
         fseek(f, 0, SEEK_END);
         size_t file_size = ftell(f);
         TRACE_I("file size is %d", file_size);
         fseek(f, 0, SEEK_SET);
-        char *login_data = (char *)malloc(file_size);
+        char* login_data = (char*)ezlopi_malloc(__FUNCTION__, file_size);
         if (NULL != login_data)
         {
             memset(login_data, 0, file_size);
@@ -117,7 +118,7 @@ static esp_err_t ezlopi_capture_base_uri_handler(httpd_req_t *req)
     return error;
 }
 
-static esp_err_t ezlopi_capture_config_uri_handle(httpd_req_t *req)
+static esp_err_t ezlopi_capture_config_uri_handle(httpd_req_t* req)
 {
     esp_err_t error = ESP_OK;
     TRACE_I("%s", __func__);
@@ -143,7 +144,7 @@ static esp_err_t ezlopi_capture_config_uri_handle(httpd_req_t *req)
 }
 
 // HTTP Error (404) Handler - Redirects all requests to the root page
-esp_err_t ezlopi_http_404_error_handler(httpd_req_t *req, httpd_err_code_t err)
+esp_err_t ezlopi_http_404_error_handler(httpd_req_t* req, httpd_err_code_t err)
 {
     // Set status
     httpd_resp_set_status(req, "302 Temporary Redirect");
@@ -162,7 +163,7 @@ void ezlopi_end_ap_server_service()
     ESP_ERROR_CHECK(httpd_stop(httpd_server_handle));
 }
 
-int ezlopi_get_wifi_cred(char *wifi_cred)
+int ezlopi_get_wifi_cred(char* wifi_cred)
 {
     int ret = 0;
     if (wifi_cred_available)
@@ -172,7 +173,7 @@ int ezlopi_get_wifi_cred(char *wifi_cred)
     }
     else
     {
-        free(wifi_cred);
+        ezlopi_free(__FUNCTION__, wifi_cred);
         ret = -1;
     }
     return ret;

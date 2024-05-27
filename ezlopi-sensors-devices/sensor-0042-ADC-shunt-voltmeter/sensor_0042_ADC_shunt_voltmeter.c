@@ -13,6 +13,7 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "sensor_0042_ADC_shunt_voltmeter.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 typedef struct s_voltmeter
 {
@@ -79,7 +80,7 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_dev
     item->cloud_properties.scale = scales_volt;
 
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_str, item->interface.adc.gpio_num);
+    CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_str, item->interface.adc.gpio_num);
     item->interface.adc.resln_bit = 3; // ADC 12_bit
 
     // passing the custom data_structure
@@ -94,7 +95,7 @@ static int __0042_prepare(void* arg)
     s_ezlopi_prep_arg_t* device_prep_arg = (s_ezlopi_prep_arg_t*)arg;
     if (device_prep_arg && (NULL != device_prep_arg->cjson_device))
     {
-        s_voltmeter_t* user_data = (s_voltmeter_t*)malloc(sizeof(s_voltmeter_t));
+        s_voltmeter_t* user_data = (s_voltmeter_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_voltmeter_t));
         if (NULL != user_data)
         {
             memset(user_data, 0, sizeof(s_voltmeter_t));
@@ -113,13 +114,13 @@ static int __0042_prepare(void* arg)
                 {
                     ret = -1;
                     ezlopi_device_free_device(voltmeter_device);
-                    free(user_data);
+                    ezlopi_free(__FUNCTION__, user_data);
                 }
             }
             else
             {
                 ret = -1;
-                free(user_data);
+                ezlopi_free(__FUNCTION__, user_data);
             }
         }
         else
@@ -201,7 +202,7 @@ static int __0042_notify(l_ezlopi_item_t* item)
             if (fabs(Vout - (user_data->volt)) > 0.5)
             {
                 user_data->volt = Vout;
-                ezlopi_device_value_updated_from_device_v3(item);
+                ezlopi_device_value_updated_from_device_broadcast(item);
             }
             ret = 1;
         }

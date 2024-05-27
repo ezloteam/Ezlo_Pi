@@ -111,7 +111,7 @@ static void touch_switch_callback(void* arg)
 {
     l_ezlopi_item_t* item = (l_ezlopi_item_t*)arg;
     item->interface.gpio.gpio_in.value = !item->interface.gpio.gpio_in.value;
-    ezlopi_device_value_updated_from_device_v3(item);
+    ezlopi_device_value_updated_from_device_broadcast(item);
 }
 
 static int __prepare(void* arg)

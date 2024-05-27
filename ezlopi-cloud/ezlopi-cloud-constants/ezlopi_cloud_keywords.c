@@ -2,6 +2,9 @@
 #define __EZLOPI_CLOUD_KEYWORDS_H__
 
 #include "stdio.h"
+const char* ezlopi_ESP32_str = "ESP32";
+const char* ezlopi_ESP32S3_str = "ESP32S3";
+const char* ezlopi_ESP32C3_str = "ESP32C3";
 const char* ezlopi_ezlopi_str = "ezlopi";
 const char* ezlopi__str = "";
 const char* ezlopi_id_str = "id";
@@ -13,11 +16,13 @@ const char* ezlopi_sender_str = "sender";
 const char* ezlopi_name_str = "name";
 const char* ezlopi_value_str = "value";
 const char* ezlopi_method_str = "method";
+const char* ezlopi_function_str = "function";
 const char* ezlopi_msg_id_str = "msg_id"; // message counter, number of data transferred to ezlopi-cloud
 const char* ezlopi_msg_subclass_str = "msg_subclass";
 const char* ezlopi_ui_broadcast_str = "ui_broadcast";
 const char* ezlopi_result_str = "result";
 const char* ezlopi_params_str = "params";
+const char* ezlopi_severity_str = "severity";
 const char* ezlopi_gateway_id_str = "gateway_id";
 const char* ezlopi_scene_id_str = "scene_id";
 const char* ezlopi_scene_name_str = "scene_name";
@@ -40,6 +45,7 @@ const char* ezlopi_fields_str = "fields";
 const char* ezlopi_blockType_str = "blockType";
 const char* ezlopi_when_str = "when";
 const char* ezlopi_enabled_str = "enabled";
+const char* ezlopi_enable_str = "enable";
 const char* ezlopi_group_id_str = "group_id";
 const char* ezlopi_parent_id_str = "parent_id";
 const char* ezlopi_then_str = "then";
@@ -318,5 +324,7 @@ const char* ezlopi_start_bits_str = "start_bits";
 const char* ezlopi_stop_bits_str = "stop_bits";
 const char* ezlopi_frame_size_str = "frame_size";
 const char* ezlopi_flow_control_str = "flow_control";
+const char *ezlopi_chipset_str = "chipset";
+const char *ezlopi_internet_str = "internet";
 
 #endif // __EZLOPI_CLOUD_KEYWORDS_H__

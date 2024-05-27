@@ -10,8 +10,9 @@ set(EZLOPI_COMPONENTS
 set(EZLOPI_CORE_COMPONENTS 
         ezlopi-core-devices 
         ezlopi-core-scenes
-        ezlopi-cloud-modes
+        ezlopi-core-processes
         ezlopi-core-modes
+        ezlopi-cloud-modes
     )
 
 

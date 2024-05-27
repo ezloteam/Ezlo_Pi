@@ -12,6 +12,7 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "sensor_0056_ADC_Force_Sensitive_Resistor.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 //------------------------------------------------------------------------------------------------------------------------------
 static int __0056_prepare(void* arg);
@@ -76,7 +77,7 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_dev
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_str, item->interface.adc.gpio_num);
+    CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_str, item->interface.adc.gpio_num);
     item->interface.adc.resln_bit = 3; // ADC 12_bit
 
     // passing the custom data_structure
@@ -91,7 +92,7 @@ static int __0056_prepare(void* arg)
     s_ezlopi_prep_arg_t* device_prep_arg = (s_ezlopi_prep_arg_t*)arg;
     if (device_prep_arg && (NULL != device_prep_arg->cjson_device))
     {
-        fsr_t* fsr_struct = (fsr_t*)malloc(sizeof(fsr_t));
+        fsr_t* fsr_struct = (fsr_t*)ezlopi_malloc(__FUNCTION__, sizeof(fsr_t));
         if (NULL != fsr_struct)
         {
             memset(fsr_struct, 0, sizeof(fsr_t));
@@ -110,13 +111,13 @@ static int __0056_prepare(void* arg)
                 {
                     ret = -1;
                     ezlopi_device_free_device(FSR_device);
-                    free(fsr_struct);
+                    ezlopi_free(__FUNCTION__, fsr_struct);
                 }
             }
             else
             {
                 ret = -1;
-                free(fsr_struct);
+                ezlopi_free(__FUNCTION__, fsr_struct);
             }
         }
     }
@@ -180,7 +181,7 @@ static int __0056_notify(l_ezlopi_item_t* item)
             if (new_force != fsr_struct->fsr_value)
             {
                 fsr_struct->fsr_value = new_force;
-                ezlopi_device_value_updated_from_device_v3(item);
+                ezlopi_device_value_updated_from_device_broadcast(item);
             }
             ret = 1;
         }

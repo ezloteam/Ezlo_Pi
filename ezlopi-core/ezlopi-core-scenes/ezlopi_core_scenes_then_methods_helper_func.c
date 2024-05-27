@@ -1,8 +1,13 @@
+#include "../../build/config/sdkconfig.h"
+
+#ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+
 #include <string.h>
 #include "ezlopi_util_trace.h"
 #include "ezlopi_core_http.h"
 #include "ezlopi_core_scenes_v2.h"
 #include "ezlopi_core_scenes_then_methods_helper_func.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 #define STR_SIZE(str) ((NULL != str) ? (strlen(str)) : 0)
 
@@ -13,7 +18,7 @@
     {                             \
         if (ptr)                  \
         {                         \
-            free(ptr);            \
+            ezlopi_free(__FUNCTION__, ptr);            \
             ptr = NULL;           \
         }                         \
     }
@@ -69,14 +74,14 @@ static void __ezlopi_core_scenes_then_sendhttp_parse_host_name(s_ezlopi_core_htt
                 if (length > 0)
                 {
                     length++;                                         // include null character
-                    char* tmp_string = malloc(length); // tmp_string != NULL
+                    char* tmp_string = ezlopi_malloc(__FUNCTION__, length); // tmp_string != NULL
                     if (tmp_string)
                     {
                         bzero(tmp_string, length);
                         snprintf(tmp_string, length, "%s", start);
                         // TRACE_I("web_host_name : %s", tmp_string);
                         tmp_http_data->web_server_maxlen = (uint16_t)ezlopi_core_http_mem_malloc(&(tmp_http_data->web_server), tmp_string);
-                        free(tmp_string);
+                        ezlopi_free(__FUNCTION__, tmp_string);
                     }
                 }
             }
@@ -87,14 +92,14 @@ static void __ezlopi_core_scenes_then_sendhttp_parse_host_name(s_ezlopi_core_htt
                 if (length > 0)
                 {
                     length++;                                         // include null character
-                    char* tmp_string = malloc(length); // tmp_string != NULL
+                    char* tmp_string = ezlopi_malloc(__FUNCTION__, length); // tmp_string != NULL
                     if (tmp_string)
                     {
                         bzero(tmp_string, length);
                         snprintf(tmp_string, length, "%s", (ptr + ((int)(start - ptr))));
                         // TRACE_I("web_host_name : %s", tmp_string);
                         tmp_http_data->web_server_maxlen = (uint16_t)ezlopi_core_http_mem_malloc(&(tmp_http_data->web_server), tmp_string);
-                        free(tmp_string);
+                        ezlopi_free(__FUNCTION__, tmp_string);
                     }
                 }
             }
@@ -131,7 +136,7 @@ static void __ezlopi_core_scenes_then_append_to_header(s_ezlopi_core_http_mbedtl
     }
     else // We reallocate:- 'tmp_http_data->header'
     {
-        char* append_str = malloc(append_size); // append_str != NULL
+        char* append_str = ezlopi_malloc(__FUNCTION__, append_size); // append_str != NULL
         if (append_str)
         {
             bzero(append_str, append_size);
@@ -143,7 +148,7 @@ static void __ezlopi_core_scenes_then_append_to_header(s_ezlopi_core_http_mbedtl
             tmp_http_data->header_maxlen = (uint16_t)__ezlopi_core_scenes_then_sendhttp_relloc_header(tmp_http_data, append_size, append_str);
             // TRACE_D("-> After => Realloc_Header:-[capacity:%d (occupied:%d)]", tmp_http_data->header_maxlen, STR_SIZE(tmp_http_data->header));
             //-----------------------------------------------------------------------------------
-            free(append_str);
+            ezlopi_free(__FUNCTION__, append_str);
         }
     }
 }
@@ -311,8 +316,8 @@ void parse_http_creds(s_ezlopi_core_http_mbedtls_t* tmp_http_data, l_fields_v2_t
     const cJSON* cj_value = curr_field->field_value.u_value.cj_value;
     if ((EZLOPI_VALUE_TYPE_CREDENTIAL == curr_field->value_type) && cJSON_IsObject(cj_value))
     {
-        cJSON* userItem = cJSON_GetObjectItem(cj_value, "user");
-        cJSON* passwordItem = cJSON_GetObjectItem(cj_value, "password");
+        cJSON* userItem = cJSON_GetObjectItem(__FUNCTION__, cj_value, "user");
+        cJSON* passwordItem = cJSON_GetObjectItem(__FUNCTION__, cj_value, "password");
         if ((NULL != userItem) && (NULL != passwordItem))
         {
             const char* userValue = cJSON_GetStringValue(userItem);
@@ -334,3 +339,5 @@ void free_http_mbedtls_struct(s_ezlopi_core_http_mbedtls_t* config)
     FREE_PTR_IF_NOT_NULL(config->password);
     FREE_PTR_IF_NOT_NULL(config->response);
 }
+
+#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS

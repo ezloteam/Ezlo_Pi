@@ -1,4 +1,9 @@
-#include <cJSON.h>
+
+#include "../../build/config/sdkconfig.h"
+
+#ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+
+#include "cjext.h"
 
 #include "ezlopi_util_trace.h"
 
@@ -12,35 +17,35 @@ void ezlopi_scenes_notifications_add(cJSON* cj_notifications)
 {
     if (cj_notifications)
     {
-        cJSON* cj_scene_id = cJSON_GetObjectItem(cj_notifications, ezlopi_notifications_str);
-        cJSON* cj_user_id = cJSON_GetObjectItem(cj_notifications, ezlopi_userId_str);
+        cJSON* cj_scene_id = cJSON_GetObjectItem(__FUNCTION__, cj_notifications, ezlopi_notifications_str);
+        cJSON* cj_user_id = cJSON_GetObjectItem(__FUNCTION__, cj_notifications, ezlopi_userId_str);
 
         if (cj_scene_id && cj_scene_id->valuestring && cj_user_id && cj_user_id->valuestring)
         {
             char* scene_str = ezlopi_nvs_read_str(cj_scene_id->valuestring);
             if (scene_str)
             {
-                cJSON* cj_scene = cJSON_Parse(scene_str);
-                free(scene_str);
+                cJSON* cj_scene = cJSON_Parse(__FUNCTION__, scene_str);
+                ezlopi_free(__FUNCTION__, scene_str);
 
                 if (cj_scene)
                 {
-                    cJSON* cj_user_notifications = cJSON_GetObjectItem(cj_scene, ezlopi_user_notifications_str);
+                    cJSON* cj_user_notifications = cJSON_GetObjectItem(__FUNCTION__, cj_scene, ezlopi_user_notifications_str);
                     if (cj_user_notifications)
                     {
-                        cJSON_AddItemReferenceToArray(cj_user_notifications, cj_user_id);
+                        cJSON_AddItemReferenceToArray(__FUNCTION__, cj_user_notifications, cj_user_id);
                     }
 
                     CJSON_TRACE("updated-scene", cj_scene);
-                    char* updated_scene_str = cJSON_PrintBuffered(cj_scene, 4096, false);
+                    char* updated_scene_str = cJSON_PrintBuffered(__FUNCTION__, cj_scene, 4096, false);
                     TRACE_D("length of 'updated_scene_str': %d", strlen(updated_scene_str));
 
-                    cJSON_Delete(cj_scene);
+                    cJSON_Delete(__FUNCTION__, cj_scene);
 
                     if (updated_scene_str)
                     {
                         ezlopi_nvs_write_str(updated_scene_str, strlen(updated_scene_str), cj_scene_id->valuestring);
-                        free(updated_scene_str);
+                        ezlopi_free(__FUNCTION__, updated_scene_str);
                     }
                 }
             }
@@ -70,3 +75,4 @@ void ezlopi_scenes_notifications_remove(cJSON* cj_notifications)
     {
     }
 }
+#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS

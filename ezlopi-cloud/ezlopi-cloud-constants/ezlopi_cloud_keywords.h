@@ -3,6 +3,9 @@
 
 #include "stdio.h"
 
+extern const char* ezlopi_ESP32_str;
+extern const char* ezlopi_ESP32S3_str;
+extern const char* ezlopi_ESP32C3_str;
 extern const char* ezlopi_ezlopi_str;
 extern const char* ezlopi__str;
 extern const char* ezlopi_id_str;
@@ -14,11 +17,13 @@ extern const char* ezlopi_sender_str;
 extern const char* ezlopi_name_str;
 extern const char* ezlopi_value_str;
 extern const char* ezlopi_method_str;
+extern const char* ezlopi_function_str;
 extern const char* ezlopi_msg_id_str; // message counter, number of data transferred to ezlopi-cloud
 extern const char* ezlopi_msg_subclass_str;
 extern const char* ezlopi_ui_broadcast_str;
 extern const char* ezlopi_result_str;
 extern const char* ezlopi_params_str;
+extern const char* ezlopi_severity_str;
 extern const char* ezlopi_gateway_id_str;
 extern const char* ezlopi_scene_id_str;
 extern const char* ezlopi_scene_name_str;
@@ -41,6 +46,7 @@ extern const char* ezlopi_fields_str;
 extern const char* ezlopi_blockType_str;
 extern const char* ezlopi_when_str;
 extern const char* ezlopi_enabled_str;
+extern const char* ezlopi_enable_str;
 extern const char* ezlopi_group_id_str;
 extern const char* ezlopi_parent_id_str;
 extern const char* ezlopi_then_str;
@@ -316,10 +322,13 @@ extern const char* ezlopi_longitude_str;
 
 extern const char* ezlopi_urls_str;
 
-const char* ezlopi_parity_str;
-const char* ezlopi_start_bits_str;
-const char* ezlopi_stop_bits_str;
-const char* ezlopi_frame_size_str;
-const char* ezlopi_flow_control_str;
+extern const char* ezlopi_parity_str;
+extern const char* ezlopi_start_bits_str;
+extern const char* ezlopi_stop_bits_str;
+extern const char* ezlopi_frame_size_str;
+extern const char* ezlopi_flow_control_str;
+
+extern const char *ezlopi_chipset_str;
+extern const char *ezlopi_internet_str;
 
 #endif // __EZLOPI_CLOUD_KEYWORDS_H__

@@ -13,6 +13,7 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "sensor_0029_I2C_GXHTC3.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 static int __prepare(void* arg);
 static int __get_cjson_value(l_ezlopi_item_t* item, void* arg);
@@ -154,7 +155,7 @@ static int __get_cjson_update_value(l_ezlopi_item_t* item)
                     if (compare_float_values(value_ptr->temperature, value_ptr->gxhtc3->reading_temp_c))
                     {
                         value_ptr->temperature = value_ptr->gxhtc3->reading_temp_c;
-                        ezlopi_device_value_updated_from_device_v3(item);
+                        ezlopi_device_value_updated_from_device_broadcast(item);
                     }
                 }
                 else if (value_type_humidity == item->cloud_properties.value_type)
@@ -162,7 +163,7 @@ static int __get_cjson_update_value(l_ezlopi_item_t* item)
                     if (compare_float_values(value_ptr->humidity, value_ptr->gxhtc3->reading_rh))
                     {
                         value_ptr->humidity = value_ptr->gxhtc3->reading_rh;
-                        ezlopi_device_value_updated_from_device_v3(item);
+                        ezlopi_device_value_updated_from_device_broadcast(item);
                     }
                 }
             }
@@ -210,8 +211,8 @@ static void __prepare_temperature_item_properties(l_ezlopi_item_t* item, cJSON* 
     item->interface.i2c_master.enable = true;
     item->interface.i2c_master.channel = 0;
     item->interface.i2c_master.clock_speed = 400000;
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_scl_str, item->interface.i2c_master.scl);
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_sda_str, item->interface.i2c_master.sda);
+    CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_scl_str, item->interface.i2c_master.scl);
+    CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_sda_str, item->interface.i2c_master.sda);
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_slave_addr_str, item->interface.i2c_master.address);
 }
 
@@ -230,8 +231,8 @@ static void __prepare_humidity_item_properties(l_ezlopi_item_t* item, cJSON* cj_
     item->interface.i2c_master.enable = false;
     item->interface.i2c_master.channel = 0;
     item->interface.i2c_master.clock_speed = 400000;
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_scl_str, item->interface.i2c_master.scl);
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_sda_str, item->interface.i2c_master.sda);
+    CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_scl_str, item->interface.i2c_master.scl);
+    CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_sda_str, item->interface.i2c_master.sda);
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_slave_addr_str, item->interface.i2c_master.address);
 }
 
@@ -242,7 +243,7 @@ static int __prepare(void* arg)
 
     if (prep_arg && prep_arg->cjson_device)
     {
-        s_gxhtc3_value_t* value_ptr = malloc(sizeof(s_gxhtc3_value_t));
+        s_gxhtc3_value_t* value_ptr = ezlopi_malloc(__FUNCTION__, sizeof(s_gxhtc3_value_t));
         if (value_ptr)
         {
             memset(value_ptr, 0, sizeof(s_gxhtc3_value_t));
@@ -287,14 +288,14 @@ static int __prepare(void* arg)
                 if ((NULL == item_temperature) &&
                     (NULL == child_device_hum))
                 {
-                    free(value_ptr);
+                    ezlopi_free(__FUNCTION__, value_ptr);
                     ezlopi_device_free_device(parent_device_temp);
                     ret = -1;
                 }
             }
             else
             {
-                free(value_ptr);
+                ezlopi_free(__FUNCTION__, value_ptr);
                 ret = -1;
             }
         }

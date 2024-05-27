@@ -1,5 +1,5 @@
 
-#include "sdkconfig.h"
+#include "../../build/config/sdkconfig.h"
 #include <math.h>
 #include "ezlopi_util_trace.h"
 
@@ -16,6 +16,7 @@
 
 #include "ALS_LTR303.h"
 #include "sensor_0008_I2C_LTR303ALS.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 static int __prepare(void* arg);
 static int __init(l_ezlopi_item_t* item);
@@ -86,7 +87,7 @@ static int __notify(l_ezlopi_item_t* item)
                 if (fabs(als_ltr303_data->lux - temp_data.lux) > 0.2)
                 {
                     als_ltr303_data->lux = temp_data.lux;
-                    ezlopi_device_value_updated_from_device_v3(item);
+                    ezlopi_device_value_updated_from_device_broadcast(item);
                 }
             }
         }
@@ -145,13 +146,13 @@ static void __prepare_item_properties(l_ezlopi_item_t* item, cJSON* cj_param)
     item->cloud_properties.show = true;
     item->cloud_properties.scale = scales_lux;
 
-    CJSON_GET_VALUE_DOUBLE(cj_param, ezlopi_gpio_sda_str, item->interface.i2c_master.sda);
-    CJSON_GET_VALUE_DOUBLE(cj_param, ezlopi_gpio_scl_str, item->interface.i2c_master.scl);
+    CJSON_GET_VALUE_GPIO(cj_param, ezlopi_gpio_sda_str, item->interface.i2c_master.sda);
+    CJSON_GET_VALUE_GPIO(cj_param, ezlopi_gpio_scl_str, item->interface.i2c_master.scl);
 
     item->interface.i2c_master.enable = true;
     item->interface.i2c_master.clock_speed = 100000;
     item->interface.i2c_master.address = LTR303_ADDR;
-    ltr303_data_t* als_ltr303_data = (ltr303_data_t*)malloc(sizeof(ltr303_data_t));
+    ltr303_data_t* als_ltr303_data = (ltr303_data_t*)ezlopi_malloc(__FUNCTION__, sizeof(ltr303_data_t));
     if (als_ltr303_data)
     {
         memset(als_ltr303_data, 0, sizeof(ltr303_data_t));

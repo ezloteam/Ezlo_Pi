@@ -16,7 +16,7 @@
 #include "esp_event.h"
 #include "esp_event_base.h"
 #include "esp_log.h"
-#include "cJSON.h"
+#include "cjext.h"
 
 #include "lwip/err.h"
 #include "lwip/sys.h"
@@ -29,8 +29,10 @@
 #include "ezlopi_core_wifi_err_reason.h"
 #include "ezlopi_core_event_group.h"
 #include "ezlopi_core_device_value_updated.h"
+#include "ezlopi_core_processes.h"
 
 #include "ezlopi_service_uart.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 #define EXAMPLE_ESP_MAXIMUM_RETRY 5
 
@@ -40,6 +42,7 @@ static esp_netif_t* sg_wifi_sta_netif = NULL;
 static int sg_retry_num = 0;
 static volatile int sg_station_got_ip = 0;
 static const char* const scg_wifi_no_error_str = "NO_ERROR";
+static const char* wifi_scanner_task_name = "WiFiScanTask";
 static const char* sg_last_disconnect_reason = scg_wifi_no_error_str;
 
 static ll_ezlopi_wifi_event_upcall_t* __event_upcall_head = NULL;
@@ -91,7 +94,7 @@ int ezlopi_wifi_got_ip(void)
 ezlopi_wifi_status_t* ezlopi_wifi_status(void)
 {
 
-    ezlopi_wifi_status_t* wifi_stat = (ezlopi_wifi_status_t*)malloc(sizeof(ezlopi_wifi_status_t));
+    ezlopi_wifi_status_t* wifi_stat = (ezlopi_wifi_status_t*)ezlopi_malloc(__FUNCTION__, sizeof(ezlopi_wifi_status_t));
 
     if (sg_station_got_ip)
     {
@@ -272,6 +275,9 @@ void ezlopi_wifi_connect_from_id_bin(void)
         esp_err_t wifi_error = ezlopi_wifi_connect(wifi_ssid, wifi_password);
         TRACE_W("wifi_error: %u", wifi_error);
     }
+
+    if (wifi_ssid) ezlopi_free(__FUNCTION__, wifi_ssid);
+    if (wifi_password) ezlopi_free(__FUNCTION__, wifi_password);
 }
 
 esp_err_t ezlopi_wifi_connect(const char* ssid, const char* pass)
@@ -280,8 +286,6 @@ esp_err_t ezlopi_wifi_connect(const char* ssid, const char* pass)
 
     if ((NULL != ssid) && (NULL != pass))
     {
-        TRACE_D("SSID: %s, Password: %s,\r\n", ssid, pass);
-
         wifi_config_t wifi_config = {
             .sta = {
                 .pmf_cfg = {.capable = true, .required = false},
@@ -334,7 +338,7 @@ int ezlopi_wait_for_wifi_to_connect(uint32_t wait_time_ms)
 
 static ll_ezlopi_wifi_event_upcall_t* ezlopi_wifi_event_upcall_create(f_ezlopi_wifi_event_upcall upcall, void* arg)
 {
-    ll_ezlopi_wifi_event_upcall_t* _upcall = malloc(sizeof(ll_ezlopi_wifi_event_upcall_t));
+    ll_ezlopi_wifi_event_upcall_t* _upcall = ezlopi_malloc(__FUNCTION__, sizeof(ll_ezlopi_wifi_event_upcall_t));
     if (_upcall)
     {
         _upcall->arg = arg;
@@ -386,6 +390,8 @@ static void ezlopi_wifi_scanner_task(void* params)
         }
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
+    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_CORE_WIFI_SCANNER_TASK);
+    sg_scan_handle = NULL;
     vTaskDelete(NULL);
 }
 
@@ -397,6 +403,7 @@ void ezlopi_wifi_scan_stop()
     if (sg_scan_handle)
     {
         TRACE_E("Resetting WiFi scanner task.(handle: %p)", sg_scan_handle);
+        ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_CORE_WIFI_SCANNER_TASK);
         vTaskDelete(sg_scan_handle);
         sg_scan_handle = NULL;
     }
@@ -405,7 +412,7 @@ void ezlopi_wifi_scan_stop()
 
     if (ap_record)
     {
-        free(ap_record);
+        ezlopi_free(__FUNCTION__, ap_record);
         ap_record = NULL;
     }
 }
@@ -415,7 +422,8 @@ void ezlopi_wifi_scan_start()
     ezlopi_wifi_scan_stop();
     if (NULL == sg_scan_handle)
     {
-        xTaskCreate(ezlopi_wifi_scanner_task, "wifi-scanner", 2 * 2048, NULL, 3, &sg_scan_handle);
+        xTaskCreate(ezlopi_wifi_scanner_task, wifi_scanner_task_name, EZLOPI_CORE_WIFI_SCANNER_TASK_DEPTH, NULL, 3, &sg_scan_handle);
+        ezlopi_core_process_set_process_info(ENUM_EZLOPI_CORE_WIFI_SCANNER_TASK, &sg_scan_handle, EZLOPI_CORE_WIFI_SCANNER_TASK_DEPTH);
     }
 }
 
@@ -458,35 +466,35 @@ static void __event_wifi_scan_done(void* event_data)
         if (scan_event_param->status == 0)
         {
             total_wifi_APs_available = scan_event_param->number;
-            ap_record = (wifi_ap_record_t*)malloc(total_wifi_APs_available * sizeof(wifi_ap_record_t));
+            ap_record = (wifi_ap_record_t*)ezlopi_malloc(__FUNCTION__, total_wifi_APs_available * sizeof(wifi_ap_record_t));
             ESP_ERROR_CHECK(esp_wifi_scan_get_ap_records(&total_wifi_APs_available, ap_record));
-            cJSON* network_array = cJSON_CreateArray();
+            cJSON* network_array = cJSON_CreateArray(__FUNCTION__);
             if (network_array)
             {
                 char temporary[50];
                 for (int i = 0; i < total_wifi_APs_available; i++)
                 {
-                    cJSON* network_data = cJSON_CreateObject();
+                    cJSON* network_data = cJSON_CreateObject(__FUNCTION__);
                     if (network_data)
                     {
                         memset(temporary, 0, 50);
                         memcpy(temporary, ap_record[i].ssid, 33);
-                        cJSON_AddStringToObject(network_data, "ssid", temporary);
+                        cJSON_AddStringToObject(__FUNCTION__, network_data, "ssid", temporary);
                         memset(temporary, 0, 50);
                         snprintf(temporary, 50, "%02x:%02x:%02x:%02x:%02x:%02x", ap_record[i].bssid[0], ap_record[i].bssid[1], ap_record[i].bssid[2],
                             ap_record[i].bssid[3], ap_record[i].bssid[0], ap_record[i].bssid[5]);
-                        cJSON_AddStringToObject(network_data, "bssid", temporary);
-                        cJSON_AddNumberToObject(network_data, "rssi", ap_record[i].rssi);
+                        cJSON_AddStringToObject(__FUNCTION__, network_data, "bssid", temporary);
+                        cJSON_AddNumberToObject(__FUNCTION__, network_data, "rssi", ap_record[i].rssi);
                         get_auth_mode_str(temporary, ap_record[i].authmode);
-                        cJSON_AddStringToObject(network_data, "security", temporary);
+                        cJSON_AddStringToObject(__FUNCTION__, network_data, "security", temporary);
                         cJSON_AddItemToArray(network_array, network_data);
                     }
                 }
 
-                ezlopi_network_update_wifi_scan_process(network_array);
+                ezlopi_core_device_value_update_wifi_scan_broadcast(network_array);
             }
 
-            free(ap_record);
+            ezlopi_free(__FUNCTION__, ap_record);
             ap_record = NULL;
         }
     }

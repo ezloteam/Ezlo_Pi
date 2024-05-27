@@ -13,8 +13,8 @@
 // #include "ezlopi_cloud_value_type_str.h"
 #include "ezlopi_cloud_device_types_str.h"
 #include "ezlopi_cloud_item_name_str.h"
-#include "sdkconfig.h"
-#include "cJSON.h"
+#include "../../build/config/sdkconfig.h"
+#include "cjext.h"
 
 #define minimum_detection_value_in_cm 25
 #define maximum_detection_value_in_cm 600
@@ -72,17 +72,17 @@ typedef struct
     }
 
 // void jsn_sr04t_print_data(jsn_sr04t_data_t jsn_sr04t_data);
-esp_err_t init_JSN_SR04T(jsn_sr04t_config_t *jsn_sr04t_config);
-esp_err_t raw_measeurement(jsn_sr04t_config_t *jsn_sr04t_config, jsn_sr04t_raw_data_t *jsn_sr04t_raw_data);
-esp_err_t measurement(jsn_sr04t_config_t *jsn_sr04t_config, jsn_sr04t_data_t *jsn_sr04t_data);
+esp_err_t init_JSN_SR04T(jsn_sr04t_config_t* jsn_sr04t_config);
+esp_err_t raw_measeurement(jsn_sr04t_config_t* jsn_sr04t_config, jsn_sr04t_raw_data_t* jsn_sr04t_raw_data);
+esp_err_t measurement(jsn_sr04t_config_t* jsn_sr04t_config, jsn_sr04t_data_t* jsn_sr04t_data);
 
 #if 0 // v2.x
-static int ezlopi_JSN_SR04T_prepare_and_add(void *args);
-static s_ezlopi_device_properties_t *JSN_SR04T_sensor_prepare(cJSON *cjson_device);
-static int ezlopi_JSN_SR04T_init(s_ezlopi_device_properties_t *properties);
-static int ezlopi_JSN_SR04T_update_value(s_ezlopi_device_properties_t *properties, void *arg);
-static int ezlopi_JSN_SR04T_get_value_cjson(s_ezlopi_device_properties_t *properties, void *args);
-int JSN_SR04T(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg, void *user_arg);
+static int ezlopi_JSN_SR04T_prepare_and_add(void* args);
+static s_ezlopi_device_properties_t* JSN_SR04T_sensor_prepare(cJSON* cjson_device);
+static int ezlopi_JSN_SR04T_init(s_ezlopi_device_properties_t* properties);
+static int ezlopi_JSN_SR04T_update_value(s_ezlopi_device_properties_t* properties, void* arg);
+static int ezlopi_JSN_SR04T_get_value_cjson(s_ezlopi_device_properties_t* properties, void* args);
+int JSN_SR04T(e_ezlopi_actions_t action, s_ezlopi_device_properties_t* properties, void* arg, void* user_arg);
 #endif
 
 #endif //_JSN_SR04T_H_

@@ -1,3 +1,5 @@
+#include "../../build/config/sdkconfig.h"
+
 #include "esp_event.h"
 
 #include "EZLOPI_USER_CONFIG.h"
@@ -18,6 +20,7 @@
 #include "ezlopi_core_devices_list.h"
 #include "ezlopi_core_scenes_scripts.h"
 #include "ezlopi_core_scenes_expressions.h"
+#include "ezlopi_core_log.h"
 
 #ifdef CONFIG_EZPI_CORE_ETHERNET_EN
 #include "ezlopi_core_ethernet.h"
@@ -32,49 +35,72 @@ void ezlopi_init(void)
     // Init memories  
     ezlopi_nvs_init();
 
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
+    ezlopi_core_read_set_log_severities();
+#endif // CONFIG_EZPI_UTIL_TRACE_EN
     EZPI_HAL_uart_init();
 
-    ezlopi_core_buffer_init(10 * 1024); // allocate 10kB
+#if defined(CONFIG_EZPI_WEBSOCKET_CLIENT) || defined(CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER)
+    ezlopi_core_buffer_init(CONFIG_EZPI_CORE_STATIC_BUFFER_SIZE); // allocate 10kB
+#endif
 
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
 
     ezlopi_factory_info_v3_init();
-
     print_factory_info_v3();
 
     ezlopi_event_group_create();
+
+#if defined(CONFIG_EZPI_ENABLE_WIFI)
     ezlopi_wifi_initialize();
+#endif
+
     vTaskDelay(10);
     // Init devices
     ezlopi_device_prepare();
     vTaskDelay(10);
     ezlopi_initialize_devices_v3();
     vTaskDelay(10);
-#if CONFIG_EZLPI_SERV_MODES_EN
+
+#if defined(CONFIG_EZPI_SERV_ENABLE_MODES)
     ezlopi_core_modes_init();
 #endif
+
     ezlopi_room_init();
 
-#ifdef CONFIG_EZPI_SERV_MESHBOT_EN
+#if defined(CONFIG_EZPI_SERV_ENABLE_MESHBOTS)
     ezlopi_scenes_scripts_init();
     ezlopi_scenes_expressions_init();
     ezlopi_scenes_init_v2();
-#endif // CONFIG_EZPI_SERV_MESHBOT_EN
+#endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
-#ifdef CONFIG_EZPI_CORE_ETHERNET_EN
+#if defined(CONFIG_EZPI_CORE_ENABLE_ETH)
     ezlopi_ethernet_init();
 #endif // CONFIG_EZPI_CORE_ETHERNET_EN
 
     uint32_t boot_count = ezlopi_system_info_get_boot_count();
 
+#if defined(CONFIG_EZPI_ENABLE_WIFI)
     ezlopi_wifi_connect_from_id_bin();
+#endif
+
     ezlopi_nvs_set_boot_count(boot_count + 1);
+
     ezlopi_event_queue_init();
-    ezlopi_ping_init();
+
+#if (defined(CONFIG_EZPI_ENABLE_WIFI) || defined(CONFIG_EZPI_CORE_ENABLE_ETH))
     EZPI_CORE_sntp_init();
+#ifdef CONFIG_EZPI_ENABLE_PING
+    ezlopi_ping_init();
+#endif // CONFIG_EZPI_ENABLE_PING
+#endif
+
     ezlopi_timer_start_1000ms();
+
+    // #if defined(EZPI_ENABLE_MDNS_SERVICE)
     EZPI_core_init_mdns();
+    // #endif
 }
 
 l_ezlopi_device_t* link_next_parent_id(uint32_t target_to_clear_parent_id)
@@ -100,6 +126,7 @@ static void ezlopi_initialize_devices_v3(void)
 
     while (curr_device)
     {
+
         TRACE_S("Device_id_curr_device : [0x%x] ", curr_device->cloud_properties.device_id);
         l_ezlopi_item_t* curr_item = curr_device->items;
         while (curr_item)

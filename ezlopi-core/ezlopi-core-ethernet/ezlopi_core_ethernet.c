@@ -1,3 +1,5 @@
+#ifdef CONFIG_EZPI_CORE_ENABLE_ETH
+
 #include <string.h>
 
 #include "esp_event.h"
@@ -9,10 +11,10 @@
 
 #include "ezlopi_hal_spi_master.h"
 
-static const char *eth_key_desc_str = "ezlopi_eth";
-static esp_netif_t *eth_netif_spi = NULL;
-static esp_eth_mac_t *eth_mac_spi = NULL;
-static esp_eth_phy_t *eth_phy_spi = NULL;
+static const char* eth_key_desc_str = "ezlopi_eth";
+static esp_netif_t* eth_netif_spi = NULL;
+static esp_eth_mac_t* eth_mac_spi = NULL;
+static esp_eth_phy_t* eth_phy_spi = NULL;
 static esp_eth_handle_t eth_handle_spi = NULL;
 static esp_eth_netif_glue_handle_t eth_glue = NULL;
 static e_ethernet_status_t eth_last_status = ETHERNET_STATUS_UNKNOWN;
@@ -37,15 +39,15 @@ static s_ezlopi_spi_master_t spi_config = {
 static void ezlopi_ethernet_reset(void);
 static void ezlopi_ethernet_gpio_setup(void);
 static void ezlopi_ethernet_setup_basic(void);
-static void eth_event_handler(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data);
-static void __ip_event_handler(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data);
+static void eth_event_handler(void* arg, esp_event_base_t event_base, int32_t event_id, void* event_data);
+static void __ip_event_handler(void* arg, esp_event_base_t event_base, int32_t event_id, void* event_data);
 
 e_ethernet_status_t ezlopi_ethernet_get_status(void)
 {
     return eth_last_status;
 }
 
-esp_netif_ip_info_t *ezlopi_ethernet_get_ip_info(void)
+esp_netif_ip_info_t* ezlopi_ethernet_get_ip_info(void)
 {
     memset(&eth_ip_info, 0, sizeof(esp_netif_ip_info_t));
 
@@ -89,11 +91,11 @@ void ezlopi_ethernet_init(void)
     ezlopi_ethernet_setup_basic();
 }
 
-static void eth_event_handler(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
+static void eth_event_handler(void* arg, esp_event_base_t event_base, int32_t event_id, void* event_data)
 {
-    uint8_t mac_addr[6] = {0};
+    uint8_t mac_addr[6] = { 0 };
     /* we can get the ethernet driver handle from event data */
-    esp_eth_handle_t eth_handle = *(esp_eth_handle_t *)event_data;
+    esp_eth_handle_t eth_handle = *(esp_eth_handle_t*)event_data;
 
     switch (event_id)
     {
@@ -102,7 +104,7 @@ static void eth_event_handler(void *arg, esp_event_base_t event_base, int32_t ev
         esp_eth_ioctl(eth_handle, ETH_CMD_G_MAC_ADDR, mac_addr);
         TRACE_I("Ethernet Link Up");
         TRACE_I("Ethernet HW Addr %02x:%02x:%02x:%02x:%02x:%02x",
-                mac_addr[0], mac_addr[1], mac_addr[2], mac_addr[3], mac_addr[4], mac_addr[5]);
+            mac_addr[0], mac_addr[1], mac_addr[2], mac_addr[3], mac_addr[4], mac_addr[5]);
         eth_last_status = ETHERNET_STATUS_LINK_UP;
         break;
     }
@@ -132,9 +134,9 @@ static void eth_event_handler(void *arg, esp_event_base_t event_base, int32_t ev
     }
 }
 
-static void __ip_event_handler(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
+static void __ip_event_handler(void* arg, esp_event_base_t event_base, int32_t event_id, void* event_data)
 {
-    ip_event_got_ip_t *event = (ip_event_got_ip_t *)event_data;
+    ip_event_got_ip_t* event = (ip_event_got_ip_t*)event_data;
 
     switch (event_id)
     {
@@ -223,3 +225,4 @@ static void ezlopi_ethernet_reset(void)
     gpio_set_level(EZLOPI_ETHERNET_W5500_RST_PIN, 1);
     vTaskDelay(10 / portTICK_RATE_MS);
 }
+#endif // CONFIG_EZPI_CORE_ENABLE_ETH

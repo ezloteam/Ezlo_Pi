@@ -13,6 +13,7 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "sensor_0021_UART_MB1013.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 typedef struct s_mb1013_args
 {
@@ -158,8 +159,8 @@ static void __setup_item_interface_properties(l_ezlopi_item_t* item, cJSON* cj_d
 {
     item->interface_type = EZLOPI_DEVICE_INTERFACE_UART;
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_baud_str, item->interface.uart.baudrate);
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_tx_str, item->interface.uart.tx);
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_rx_str, item->interface.uart.rx);
+    CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_tx_str, item->interface.uart.tx);
+    CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_rx_str, item->interface.uart.rx);
 }
 
 static int __prepare(void* arg)
@@ -182,7 +183,7 @@ static int __prepare(void* arg)
                     __setup_item_cloud_properties(item, cjson_device);
                     __setup_item_interface_properties(item, cjson_device);
 
-                    s_mb1013_args_t* mb1030_args = malloc(sizeof(s_mb1013_args_t));
+                    s_mb1013_args_t* mb1030_args = ezlopi_malloc(__FUNCTION__, sizeof(s_mb1013_args_t));
                     if (mb1030_args)
                     {
                         mb1030_args->current_value = 0.0;
@@ -217,7 +218,7 @@ static int __notify(l_ezlopi_item_t* item)
         {
             if (abs(mb1013_args->current_value - mb1013_args->previous_value) > 0.2) // accuracy of 0.5cm (i.e. 5mm)
             {
-                ezlopi_device_value_updated_from_device_v3(item);
+                ezlopi_device_value_updated_from_device_broadcast(item);
                 mb1013_args->previous_value = mb1013_args->current_value;
             }
         }

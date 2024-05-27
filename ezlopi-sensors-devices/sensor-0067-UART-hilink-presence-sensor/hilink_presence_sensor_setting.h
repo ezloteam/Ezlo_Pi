@@ -3,7 +3,7 @@
 #define _HILINK_PRESENCE_SENSOR_SETTINGS_H_
 
 #include "ezlopi_util_trace.h"
-#include "cJSON.h"
+#include "cjext.h"
 #include "ezlopi_core_devices.h"
 
 #define HILINK_PRESENCE_SENSOR_SETTING_PREDEFINED_LABEL_TEXT "Pre-defined operation mode"
@@ -69,15 +69,15 @@ bool hilink_presence_sensor_target_in_detectable_range(const uint16_t moving_tar
 static inline cJSON* __setting_add_text_and_lang_tag(const char* const object_text, const char* const object_lang_tag)
 {
 
-    cJSON* cj_object = cJSON_CreateObject();
+    cJSON* cj_object = cJSON_CreateObject(__FUNCTION__);
     if (cj_object)
     {
-        cJSON_AddStringToObject(cj_object, ezlopi_text_str, object_text);
-        cJSON_AddStringToObject(cj_object, ezlopi_lang_tag_str, object_lang_tag);
+        cJSON_AddStringToObject(__FUNCTION__, cj_object, ezlopi_text_str, object_text);
+        cJSON_AddStringToObject(__FUNCTION__, cj_object, ezlopi_lang_tag_str, object_lang_tag);
     }
     else
     {
-        free(cj_object);
+        ezlopi_free(__FUNCTION__, cj_object);
         cj_object = NULL;
     }
 
@@ -99,12 +99,12 @@ static inline int __prepare_user_defined_setting_cjson(cJSON* cj_value, s_hilink
     int ret = 0;
     if (cj_value && setting_val)
     {
-        cJSON_AddNumberToObject(cj_value, ezlopi_min_move_distance_str, setting_val->min_move_distance);
-        cJSON_AddNumberToObject(cj_value, ezlopi_max_move_distance_str, setting_val->max_move_distance);
-        cJSON_AddNumberToObject(cj_value, ezlopi_min_still_distance_str, setting_val->min_still_distance);
-        cJSON_AddNumberToObject(cj_value, ezlopi_max_still_distance_str, setting_val->max_still_distance);
-        cJSON_AddNumberToObject(cj_value, ezlopi_timeout_str, setting_val->timeout);
-        cJSON_AddBoolToObject(cj_value, ezlopi_is_active_str, setting_val->is_active);
+        cJSON_AddNumberToObject(__FUNCTION__, cj_value, ezlopi_min_move_distance_str, setting_val->min_move_distance);
+        cJSON_AddNumberToObject(__FUNCTION__, cj_value, ezlopi_max_move_distance_str, setting_val->max_move_distance);
+        cJSON_AddNumberToObject(__FUNCTION__, cj_value, ezlopi_min_still_distance_str, setting_val->min_still_distance);
+        cJSON_AddNumberToObject(__FUNCTION__, cj_value, ezlopi_max_still_distance_str, setting_val->max_still_distance);
+        cJSON_AddNumberToObject(__FUNCTION__, cj_value, ezlopi_timeout_str, setting_val->timeout);
+        cJSON_AddBoolToObject(__FUNCTION__, cj_value, ezlopi_is_active_str, setting_val->is_active);
     }
     else
     {
@@ -117,11 +117,11 @@ static inline char* __prepare_user_defined_setting_str(s_hilink_userdefined_sett
 {
     char* ret = NULL;
 
-    cJSON* cj_setting = cJSON_CreateObject();
+    cJSON* cj_setting = cJSON_CreateObject(__FUNCTION__);
     if (cj_setting && setting_val)
     {
         ESP_ERROR_CHECK(__prepare_user_defined_setting_cjson(cj_setting, setting_val));
-        ret = cJSON_PrintBuffered(cj_setting, 1024, false);
+        ret = cJSON_PrintBuffered(__FUNCTION__, cj_setting, 1024, false);
         TRACE_D("length of 'ret': %d", strlen(ret));
     }
 

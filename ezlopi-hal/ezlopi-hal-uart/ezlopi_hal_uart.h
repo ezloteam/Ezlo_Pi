@@ -30,8 +30,8 @@ typedef struct s_ezlopi_uart
 {
     ezlo_uart_channel_t channel;
     uint32_t baudrate;
-    uint32_t tx;
-    uint32_t rx;
+    int tx;
+    int rx;
     bool enable;
 } s_ezlopi_uart_t;
 

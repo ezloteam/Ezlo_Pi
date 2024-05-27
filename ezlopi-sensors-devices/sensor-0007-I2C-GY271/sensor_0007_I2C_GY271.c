@@ -6,6 +6,7 @@
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
+#include "ezlopi_core_processes.h"
 
 #include "ezlopi_hal_i2c_master.h"
 
@@ -13,6 +14,7 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "sensor_0007_I2C_GY271.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 static int __prepare(void* arg);
@@ -122,8 +124,8 @@ static void __prepare_item_interface_properties(l_ezlopi_item_t* item, cJSON* cj
             item->is_user_arg_unique = true;
             item->interface.i2c_master.enable = true;
             CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type);
-            CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_sda_str, item->interface.i2c_master.sda);
-            CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_scl_str, item->interface.i2c_master.scl);
+            CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_sda_str, item->interface.i2c_master.sda);
+            CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_scl_str, item->interface.i2c_master.scl);
             CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_slave_addr_str, item->interface.i2c_master.address);
 
             item->interface.i2c_master.clock_speed = 100000;
@@ -146,7 +148,7 @@ static int __prepare(void* arg)
     if (prep_arg && prep_arg->cjson_device)
     {
         cJSON* cj_device = prep_arg->cjson_device;
-        s_gy271_data_t* user_data = (s_gy271_data_t*)malloc(sizeof(s_gy271_data_t));
+        s_gy271_data_t* user_data = (s_gy271_data_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_gy271_data_t));
         if (user_data)
         {
             memset(user_data, 0, sizeof(s_gy271_data_t));
@@ -264,7 +266,7 @@ static int __prepare(void* arg)
             }
             else // if the parent_device dosenot exsist then dealloc the 'user_data'
             {
-                free(user_data);
+                ezlopi_free(__FUNCTION__, user_data);
                 ret = -1;
             }
         }
@@ -291,7 +293,9 @@ static int __init(l_ezlopi_item_t* item)
                 if (0 == __gy271_configure(item)) // ESP_OK
                 {
                     // TRACE_D(" CONFIGURATION  Compplete _____ Calibration Started _____");
-                    xTaskCreate(__gy271_calibration_task, "GY271_Calibration_Task", 2 * 2048, item, 1, NULL);
+                    TaskHandle_t ezlopi_sensor_gy271_callibrationb_task_handle = NULL;
+                    xTaskCreate(__gy271_calibration_task, "GY271_Calibration_Task", EZLOPI_SENSOR_GY271_CALLIBRATION_TASK_DEPTH, item, 1, &ezlopi_sensor_gy271_callibrationb_task_handle);
+                    ezlopi_core_process_set_process_info(ENUM_EZLOPI_SENSOR_GY271_CALLIBRATION_TASK, &ezlopi_sensor_gy271_callibrationb_task_handle, EZLOPI_SENSOR_GY271_CALLIBRATION_TASK_DEPTH);
                     ret = 1;
                 }
                 else
@@ -378,7 +382,7 @@ static int __notify(l_ezlopi_item_t* item)
                     {
                         if (fabs(__prev[0] - user_data->X) > 0.1)
                         {
-                            ezlopi_device_value_updated_from_device_v3(item);
+                            ezlopi_device_value_updated_from_device_broadcast(item);
                         }
                     }
                 }
@@ -386,28 +390,28 @@ static int __notify(l_ezlopi_item_t* item)
                 {
                     if (fabs(__prev[1] - user_data->Y) > 0.1)
                     {
-                        ezlopi_device_value_updated_from_device_v3(item);
+                        ezlopi_device_value_updated_from_device_broadcast(item);
                     }
                 }
                 if (ezlopi_item_name_magnetic_strength_z_axis == item->cloud_properties.item_name)
                 {
                     if (fabs(__prev[2] - user_data->Z) > 0.1)
                     {
-                        ezlopi_device_value_updated_from_device_v3(item);
+                        ezlopi_device_value_updated_from_device_broadcast(item);
                     }
                 }
                 if (ezlopi_item_name_temp == item->cloud_properties.item_name)
                 {
                     if (fabs(__prev[3] - user_data->T) > 0.5)
                     {
-                        ezlopi_device_value_updated_from_device_v3(item);
+                        ezlopi_device_value_updated_from_device_broadcast(item);
                     }
                 }
                 if (ezlopi_item_name_angle_position == item->cloud_properties.item_name)
                 {
                     if (fabs(__prev[4] - user_data->azimuth) > 1)
                     {
-                        ezlopi_device_value_updated_from_device_v3(item);
+                        ezlopi_device_value_updated_from_device_broadcast(item);
                     }
                 }
             }
@@ -478,5 +482,6 @@ static void __gy271_calibration_task(void* params) // calibrate task
             user_data->calibration_complete = true;
         }
     }
+    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SENSOR_GY271_CALLIBRATION_TASK);
     vTaskDelete(NULL);
 }

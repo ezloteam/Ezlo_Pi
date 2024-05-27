@@ -11,6 +11,7 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "sensor_0055_ADC_FlexResistor.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 //--------------------------------------------------------------------------------------------------------
 static int __0055_prepare(void* arg);
@@ -76,7 +77,7 @@ static void __prepare_item_adc_cloud_properties(l_ezlopi_item_t* item, cJSON* cj
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_str, item->interface.adc.gpio_num);
+    CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_str, item->interface.adc.gpio_num);
     item->interface.adc.resln_bit = 3; // ADC 12_bit
 
     // passing the custom data_structure
@@ -92,7 +93,7 @@ static int __0055_prepare(void* arg)
     s_ezlopi_prep_arg_t* device_prep_arg = (s_ezlopi_prep_arg_t*)arg;
     if (device_prep_arg && (NULL != device_prep_arg->cjson_device))
     {
-        flex_t* flex_res_value = (flex_t*)malloc(sizeof(flex_t));
+        flex_t* flex_res_value = (flex_t*)ezlopi_malloc(__FUNCTION__, sizeof(flex_t));
         if (flex_res_value)
         {
             memset(flex_res_value, 0, sizeof(flex_t));
@@ -110,13 +111,13 @@ static int __0055_prepare(void* arg)
                 {
                     ret = -1;
                     ezlopi_device_free_device(device_adc);
-                    free(flex_res_value);
+                    ezlopi_free(__FUNCTION__, flex_res_value);
                 }
             }
             else
             {
                 ret = -1;
-                free(flex_res_value);
+                ezlopi_free(__FUNCTION__, flex_res_value);
             }
         }
     }
@@ -128,7 +129,7 @@ static int __0055_init(l_ezlopi_item_t* item)
     int ret = 0;
     if (NULL != item)
     {
-        flex_t* flex_res_value = (flex_t*)malloc(sizeof(flex_t));
+        flex_t* flex_res_value = (flex_t*)ezlopi_malloc(__FUNCTION__, sizeof(flex_t));
         if (flex_res_value)
         {
             if (GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
@@ -190,7 +191,7 @@ static int __0055_notify(l_ezlopi_item_t* item)
             int new_rs_0055 = (int)(((flex_Vin / Vout) - 1) * flex_Rout);
             if (new_rs_0055 != flex_res_value->rs_0055)
             {
-                ezlopi_device_value_updated_from_device_v3(item);
+                ezlopi_device_value_updated_from_device_broadcast(item);
                 flex_res_value->rs_0055 = new_rs_0055;
             }
             ret = 1;

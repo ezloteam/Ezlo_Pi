@@ -11,6 +11,7 @@
 
 #include "jsn_sr04t.h"
 #include "sensor_0031_other_JSNSR04T.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 static int __prepare(void* arg);
 static int __init(l_ezlopi_item_t* item);
@@ -53,7 +54,7 @@ int sensor_0031_other_JSNSR04T(e_ezlopi_actions_t action, l_ezlopi_item_t* item,
 
 static int __notify(l_ezlopi_item_t* item)
 {
-    return ezlopi_device_value_updated_from_device_v3(item);
+    return ezlopi_device_value_updated_from_device_broadcast(item);
 }
 
 static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
@@ -88,7 +89,7 @@ static int __init(l_ezlopi_item_t* item)
     int ret = 0;
     if (item)
     {
-        jsn_sr04t_config_t* jsn_sr04t_config = malloc(sizeof(jsn_sr04t_config_t));
+        jsn_sr04t_config_t* jsn_sr04t_config = ezlopi_malloc(__FUNCTION__, sizeof(jsn_sr04t_config_t));
         if (jsn_sr04t_config)
         {
             jsn_sr04t_config_t tmp_config = (jsn_sr04t_config_t)JSN_SR04T_CONFIG_DEFAULT();

@@ -6,6 +6,7 @@
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
+#include "ezlopi_core_processes.h"
 
 #include "ezlopi_hal_i2c_master.h"
 
@@ -13,6 +14,7 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "sensor_0005_I2C_MPU6050.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 static int __prepare(void* arg);
 static int __init(l_ezlopi_item_t* item);
@@ -87,8 +89,8 @@ static void __prepare_item_interface_properties(l_ezlopi_item_t* item, cJSON* cj
             item->is_user_arg_unique = true;
             item->interface.i2c_master.enable = true;
             CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type);
-            CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_sda_str, item->interface.i2c_master.sda);
-            CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_scl_str, item->interface.i2c_master.scl);
+            CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_sda_str, item->interface.i2c_master.sda);
+            CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_scl_str, item->interface.i2c_master.scl);
             CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_slave_addr_str, item->interface.i2c_master.address);
 
             item->interface.i2c_master.clock_speed = 100000;
@@ -111,7 +113,7 @@ static int __prepare(void* arg)
     if (prep_arg && prep_arg->cjson_device)
     {
         cJSON* cj_device = prep_arg->cjson_device;
-        s_mpu6050_data_t* user_data = (s_mpu6050_data_t*)malloc(sizeof(s_mpu6050_data_t));
+        s_mpu6050_data_t* user_data = (s_mpu6050_data_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_mpu6050_data_t));
         if (NULL != user_data)
         {
             memset(user_data, 0, sizeof(s_mpu6050_data_t));
@@ -272,13 +274,13 @@ static int __prepare(void* arg)
                     (NULL == mpu6050_child_gyro_z_device))
                 {
                     ezlopi_device_free_device(mpu6050_parent_acc_x_device);
-                    free(user_data);
+                    ezlopi_free(__FUNCTION__, user_data);
                     ret = -1;
                 }
             }
             else
             {
-                free(user_data);
+                ezlopi_free(__FUNCTION__, user_data);
                 ret = -1;
             }
         }
@@ -303,7 +305,9 @@ static int __init(l_ezlopi_item_t* item)
                 if (MPU6050_ERR_OK == __mpu6050_config_device(item))
                 {
                     TRACE_I("Configuration Complete.... ");
-                    xTaskCreate(__mpu6050_calibration_task, "MPU6050_Calibration_Task", 2048, item, 1, NULL);
+                    TaskHandle_t ezlopi_sensor_mpu6050_task_handle = NULL;
+                    xTaskCreate(__mpu6050_calibration_task, "MPU6050_Calibration_Task", EZLOPI_SENSOR_MPU6050_TASK_DEPTH, item, 1, &ezlopi_sensor_mpu6050_task_handle);
+                    ezlopi_core_process_set_process_info(ENUM_EZLOPI_SENSOR_MPU6050_TASK, &ezlopi_sensor_mpu6050_task_handle, EZLOPI_SENSOR_MPU6050_TASK_DEPTH);
                     ret = 1;
                 }
                 else
@@ -394,14 +398,14 @@ static int __notify(l_ezlopi_item_t* item)
                 // {
                 //     user_data->extract_counts = 0;
                 //     user_data->calibration_complete = false;
-                //     xTaskCreate(__mpu6050_calibration_task, "MPU6050_ReCalibration_Task", 2048, item, 1, NULL);
+                //     xTaskCreate(__mpu6050_calibration_task, "MPU6050_ReCalibration_Task", EZLOPI_SENSOR_MPU6050_TASK_DEPTH, item, 1, &ezlopi_sensor_mpu6050_task_handle);
                 // }
                 // else
                 // {
                 __mpu6050_get_data(item); // update the sensor data
                 if (fabs(__prev[0] - user_data->ax) > 0.5)
                 {
-                    ezlopi_device_value_updated_from_device_v3(item);
+                    ezlopi_device_value_updated_from_device_broadcast(item);
                 }
                 // }
             }
@@ -409,42 +413,42 @@ static int __notify(l_ezlopi_item_t* item)
             {
                 if (fabs(__prev[1] - user_data->ay) > 0.5)
                 {
-                    ezlopi_device_value_updated_from_device_v3(item);
+                    ezlopi_device_value_updated_from_device_broadcast(item);
                 }
             }
             else if (ezlopi_item_name_acceleration_z_axis == item->cloud_properties.item_name)
             {
                 if (fabs(__prev[2] - user_data->az) > 0.5)
                 {
-                    ezlopi_device_value_updated_from_device_v3(item);
+                    ezlopi_device_value_updated_from_device_broadcast(item);
                 }
             }
             else if (ezlopi_item_name_temp == item->cloud_properties.item_name)
             {
                 if (fabs(__prev[3] - user_data->tmp) > 0.5)
                 {
-                    ezlopi_device_value_updated_from_device_v3(item);
+                    ezlopi_device_value_updated_from_device_broadcast(item);
                 }
             }
             else if (ezlopi_item_name_gyroscope_x_axis == item->cloud_properties.item_name)
             {
                 if (fabs(__prev[4] - user_data->gx) > 0.5)
                 {
-                    ezlopi_device_value_updated_from_device_v3(item);
+                    ezlopi_device_value_updated_from_device_broadcast(item);
                 }
             }
             else if (ezlopi_item_name_gyroscope_y_axis == item->cloud_properties.item_name)
             {
                 if (fabs(__prev[5] - user_data->gy) > 0.5)
                 {
-                    ezlopi_device_value_updated_from_device_v3(item);
+                    ezlopi_device_value_updated_from_device_broadcast(item);
                 }
             }
             else if (ezlopi_item_name_gyroscope_z_axis == item->cloud_properties.item_name)
             {
                 if (fabs(__prev[6] - user_data->gz) > 0.5)
                 {
-                    ezlopi_device_value_updated_from_device_v3(item);
+                    ezlopi_device_value_updated_from_device_broadcast(item);
                 }
             }
         }
@@ -528,5 +532,6 @@ static void __mpu6050_calibration_task(void* params) // calibrate task
             user_data->calibration_complete = true;
         }
     }
+    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SENSOR_MPU6050_TASK);
     vTaskDelete(NULL);
 }

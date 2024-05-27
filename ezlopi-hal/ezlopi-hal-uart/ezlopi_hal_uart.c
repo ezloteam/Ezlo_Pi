@@ -12,7 +12,10 @@
 
 #include "ezlopi_util_trace.h"
 
+#include "ezlopi_core_processes.h"
+
 #include "ezlopi_hal_uart.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 static void ezlopi_uart_channel_task(void* args);
 static ezlo_uart_channel_t get_available_channel();
@@ -20,7 +23,7 @@ static ezlo_uart_channel_t get_available_channel();
 s_ezlopi_uart_object_handle_t ezlopi_uart_init(uint32_t baudrate, uint32_t tx, uint32_t rx, __uart_upcall upcall, void* arg)
 {
     static QueueHandle_t ezlo_uart_channel_queue;
-    s_ezlopi_uart_object_handle_t uart_object_handle = (struct s_ezlopi_uart_object*)malloc(sizeof(struct s_ezlopi_uart_object));
+    s_ezlopi_uart_object_handle_t uart_object_handle = (struct s_ezlopi_uart_object*)ezlopi_malloc(__FUNCTION__, sizeof(struct s_ezlopi_uart_object));
     memset(uart_object_handle, 0, sizeof(struct s_ezlopi_uart_object));
     uart_object_handle->arg = arg;
     ezlo_uart_channel_t channel = get_available_channel();
@@ -62,7 +65,8 @@ s_ezlopi_uart_object_handle_t ezlopi_uart_init(uint32_t baudrate, uint32_t tx, u
         uart_object_handle->ezlopi_uart.enable = true;
         uart_object_handle->upcall = upcall;
 
-        xTaskCreate(ezlopi_uart_channel_task, "ezlopi_uart_channel_task", 2048 * 2, (void*)uart_object_handle, 13, &(uart_object_handle->taskHandle));
+        xTaskCreate(ezlopi_uart_channel_task, "EzpiUartChnTask", EZLOPI_HAL_UART_TASK_DEPTH, (void*)uart_object_handle, 13, &(uart_object_handle->taskHandle));
+        ezlopi_core_process_set_process_info(ENUM_EZLOPI_HAL_UART_TASK, &uart_object_handle->taskHandle, EZLOPI_HAL_UART_TASK_DEPTH);
     }
     else
     {
@@ -107,7 +111,7 @@ static void ezlopi_uart_channel_task(void* args)
                 uart_get_buffered_data_len(ezlopi_uart_object->ezlopi_uart.channel, &bufferred_data_len);
                 if (bufferred_data_len)
                 {
-                    buffer = malloc(bufferred_data_len);
+                    buffer = ezlopi_malloc(__FUNCTION__, bufferred_data_len);
                     if (buffer)
                     {
                         data_len = uart_read_bytes(ezlopi_uart_object->ezlopi_uart.channel, buffer, event.size, 100 / portTICK_PERIOD_MS);
@@ -137,7 +141,7 @@ static void ezlopi_uart_channel_task(void* args)
         ezlopi_uart_object->upcall(buffer, data_len, ezlopi_uart_object);
         if (buffer)
         {
-            free(buffer);
+            ezlopi_free(__FUNCTION__, buffer);
             buffer = NULL;
         }
         data_len = 0;

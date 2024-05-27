@@ -156,7 +156,7 @@ typedef struct server_packet_t
     volatile e_fingerprint_op_mode_t opmode;                    /* Hold current operation mode*/
     volatile bool __busy_guard;                                 /* Gaurd_flag used during notification actions*/
     volatile bool notify_flag;                                  /* It triggers a reply after set_action*/
-    uint8_t intr_pin;                                           /* Stores custom interrupt pin num*/
+    int intr_pin;                                           /* Stores custom interrupt pin num*/
     uint16_t confidence_level;                                  /* 0~100*/
     uint16_t matched_confidence_level;                          /* Used to store most recently matched confidence*/
     uint16_t user_id;                                           /* Stores: Template or character_page ID (0~999)*/

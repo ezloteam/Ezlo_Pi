@@ -3,17 +3,19 @@
 #include <time.h>
 #include <sys/time.h>
 
-#include "sdkconfig.h"
+#include "../../build/config/sdkconfig.h"
+
 #include "esp_sntp.h"
 #include "zones.h"
 
 #include "ezlopi_util_trace.h"
 #include "ezlopi_core_sntp.h"
 #include "ezlopi_core_nvs.h"
+#include "ezlopi_core_wifi.h"
 
 static time_t start_time = 0;
 
-static void sntp_sync_time_call_back(struct timeval *tv)
+static void sntp_sync_time_call_back(struct timeval* tv)
 {
 
     char strftime_buf[64];
@@ -40,7 +42,10 @@ void EZPI_CORE_sntp_init(void)
     int retry = 0;
     const int retry_count = 10;
 
+    // ezlopi_wait_for_wifi_to_connect(portMAX_DELAY);
+
     TRACE_I("Initializing SNTP");
+
     esp_sntp_setoperatingmode(ESP_SNTP_OPMODE_POLL);
     esp_sntp_setservername(0, "pool.ntp.org");
     // esp_sntp_setservername(1, "ntp-b.nist.gov");
@@ -52,14 +57,14 @@ void EZPI_CORE_sntp_init(void)
     sntp_set_sync_interval(15 * 1000);
     esp_sntp_init();
 
-    while (sntp_get_sync_status() == SNTP_SYNC_STATUS_RESET && ++retry < retry_count)
+    while ((sntp_get_sync_status() == SNTP_SYNC_STATUS_RESET) && (++retry < retry_count))
     {
         TRACE_I("Waiting for system time to be set... (%d/%d)", retry, retry_count);
-        vTaskDelay(2000 / portTICK_PERIOD_MS);
+        vTaskDelay(500 / portTICK_PERIOD_MS);
     }
 }
 
-int EZPI_CORE_sntp_set_location(const char *location)
+int EZPI_CORE_sntp_set_location(const char* location)
 {
     int ret = 1;
     if (location)
@@ -67,7 +72,7 @@ int EZPI_CORE_sntp_set_location(const char *location)
         if (EZPI_CORE_nvs_write_time_location(location, strlen(location)))
         {
 
-            const char *posix_str = micro_tz_db_get_posix_str(location);
+            const char* posix_str = micro_tz_db_get_posix_str(location);
 
             if (NULL == posix_str)
             {
@@ -87,17 +92,17 @@ int EZPI_CORE_sntp_set_location(const char *location)
     return ret;
 }
 
-char *EZPI_CORE_sntp_get_location(void)
+char* EZPI_CORE_sntp_get_location(void)
 {
     return EZPI_CORE_nvs_read_time_location();
 }
 
-void EZPI_CORE_sntp_get_local_time(char *time_buf, uint32_t buf_len)
+void EZPI_CORE_sntp_get_local_time(char* time_buf, uint32_t buf_len)
 {
     if (time_buf && buf_len)
     {
-        char *location = EZPI_CORE_nvs_read_time_location();
-        const char *posix_str = (location) ? micro_tz_db_get_posix_str(location) : NULL;
+        char* location = EZPI_CORE_nvs_read_time_location();
+        const char* posix_str = (location) ? micro_tz_db_get_posix_str(location) : NULL;
 
         if (!posix_str)
         {
@@ -108,7 +113,7 @@ void EZPI_CORE_sntp_get_local_time(char *time_buf, uint32_t buf_len)
         if (setenv("TZ", posix_str, 1) != 0)
         {
             TRACE_E("Error setting time zone: %s", posix_str);
-            return NULL;
+            return;
         }
         else
         {
@@ -134,12 +139,12 @@ void EZPI_CORE_sntp_get_local_time(char *time_buf, uint32_t buf_len)
 
         if (location)
         {
-            free(location);
+            ezlopi_free(__FUNCTION__, location);
         }
     }
 }
 
-void EZPI_CORE_sntp_get_up_time(char *up_time_buf, uint32_t buf_len)
+void EZPI_CORE_sntp_get_up_time(char* up_time_buf, uint32_t buf_len)
 {
     if (up_time_buf && buf_len)
     {
@@ -149,14 +154,15 @@ void EZPI_CORE_sntp_get_up_time(char *up_time_buf, uint32_t buf_len)
     }
 }
 
-void EZPI_CORE_sntp_epoch_to_iso8601(char *time_buf, uint32_t buf_len, time_t t)
+void EZPI_CORE_sntp_epoch_to_iso8601(char* time_buf, uint32_t buf_len, time_t t)
 {
     if (time_buf && buf_len)
     {
-        struct tm *timeinfo;
-        timeinfo = gmtime(&t);
-        strftime(time_buf, buf_len, "%Y-%m-%dT%H:%M:%S+545", timeinfo);
-        TRACE_I("Build Time: %s", time_buf);
+        struct tm* timeinfo;
+        // timeinfo = gmtime(&t);
+        timeinfo = localtime(&t);
+        strftime(time_buf, buf_len, "%Y-%m-%dT%H:%M:%S%z", timeinfo);
+        // TRACE_I("Build Time: %s", time_buf);
     }
 }
 
@@ -165,4 +171,11 @@ uint64_t EZPI_CORE_sntp_get_current_time_ms(void)
     time_t now;
     time(&now);
     return (now * 1000LL);
+}
+
+uint64_t EZPI_CORE_sntp_get_current_time_sec(void)
+{
+    time_t now;
+    time(&now);
+    return now;
 }

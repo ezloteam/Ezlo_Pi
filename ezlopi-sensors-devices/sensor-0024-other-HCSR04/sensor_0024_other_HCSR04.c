@@ -17,6 +17,7 @@
 #include "ezlopi_service_gpioisr.h"
 
 #include "sensor_0024_other_HCSR04.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 static portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
 
@@ -25,8 +26,8 @@ static portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
  */
 typedef struct
 {
-    uint32_t trigger_pin; //!< GPIO output pin for trigger
-    uint32_t echo_pin;    //!< GPIO input pin for echo
+    int trigger_pin; //!< GPIO output pin for trigger
+    int echo_pin;    //!< GPIO input pin for echo
     uint32_t distance;    // distance in cm
 } s_ultrasonic_sensor_t;
 
@@ -97,7 +98,7 @@ static int __notify(l_ezlopi_item_t* item)
     if (2 == ++count)
     {
         ezlopi_sensor_0024_other_HCSR04_get_from_sensor(item);
-        ezlopi_device_value_updated_from_device_v3(item);
+        ezlopi_device_value_updated_from_device_broadcast(item);
         count = 0;
     }
     return ret;
@@ -111,7 +112,7 @@ static int __init(l_ezlopi_item_t* item)
         s_ultrasonic_sensor_t* ultrasonic_HCSR04_sensor = (s_ultrasonic_sensor_t*)item->user_arg;
         if (ultrasonic_HCSR04_sensor)
         {
-            if (GPIO_IS_VALID_OUTPUT_GPIO(item->interface.gpio.gpio_out.gpio_num))
+            if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_out.gpio_num))
             {
                 const gpio_config_t io_conf = {
                     .pin_bit_mask = (1ULL << item->interface.gpio.gpio_out.gpio_num),
@@ -217,7 +218,7 @@ static int __prepare(void* arg)
                 if (item)
                 {
                     __setup_item_properties(item, cj_device);
-                    s_ultrasonic_sensor_t* ultrasonic_sensor = (s_ultrasonic_sensor_t*)malloc(sizeof(s_ultrasonic_sensor_t));
+                    s_ultrasonic_sensor_t* ultrasonic_sensor = (s_ultrasonic_sensor_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_ultrasonic_sensor_t));
                     if (ultrasonic_sensor)
                     {
                         memset(ultrasonic_sensor, 0, sizeof(s_ultrasonic_sensor_t));

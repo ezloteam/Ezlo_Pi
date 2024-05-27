@@ -13,6 +13,7 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "sensor_0006_I2C_ADXL345.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 static int __prepare(void* arg);
 static int __init(l_ezlopi_item_t* item);
@@ -90,8 +91,8 @@ static void __prepare_item_interface_properties(l_ezlopi_item_t* item, cJSON* cj
         {
             item->interface.i2c_master.enable = true;
             CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type);
-            CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_sda_str, item->interface.i2c_master.sda);
-            CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_scl_str, item->interface.i2c_master.scl);
+            CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_sda_str, item->interface.i2c_master.sda);
+            CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_scl_str, item->interface.i2c_master.scl);
             CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_slave_addr_str, item->interface.i2c_master.address);
             item->interface.i2c_master.clock_speed = 100000;
             if (0 == item->interface.i2c_master.address)
@@ -113,7 +114,7 @@ static int __prepare(void* arg)
     if (prep_arg && prep_arg->cjson_device)
     {
         cJSON* cj_device = prep_arg->cjson_device;
-        s_adxl345_data_t* user_data = (s_adxl345_data_t*)malloc(sizeof(s_adxl345_data_t));
+        s_adxl345_data_t* user_data = (s_adxl345_data_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_adxl345_data_t));
         if (NULL != user_data)
         {
             memset(user_data, 0, sizeof(s_adxl345_data_t));
@@ -176,13 +177,13 @@ static int __prepare(void* arg)
                     (NULL == adxl345_child_z_device))
                 {
                     ezlopi_device_free_device(adxl345_parent_x_device);
-                    free(user_data);
+                    ezlopi_free(__FUNCTION__, user_data);
                     ret = -1;
                 }
             }
             else
             {
-                free(user_data);
+                ezlopi_free(__FUNCTION__, user_data);
                 ret = -1;
             }
         }
@@ -271,7 +272,7 @@ static int __notify(l_ezlopi_item_t* item)
                 __adxl345_get_axis_value(item);
                 if (fabs((__prev[0] - user_data->acc_x) > 0.5))
                 {
-                    ezlopi_device_value_updated_from_device_v3(item);
+                    ezlopi_device_value_updated_from_device_broadcast(item);
                 }
             }
             if (ezlopi_item_name_acceleration_y_axis == item->cloud_properties.item_name)
@@ -279,7 +280,7 @@ static int __notify(l_ezlopi_item_t* item)
                 __prev[1] = user_data->acc_y;
                 if (fabs((__prev[1] - user_data->acc_x) > 0.5))
                 {
-                    ezlopi_device_value_updated_from_device_v3(item);
+                    ezlopi_device_value_updated_from_device_broadcast(item);
                 }
             }
             if (ezlopi_item_name_acceleration_z_axis == item->cloud_properties.item_name)
@@ -287,7 +288,7 @@ static int __notify(l_ezlopi_item_t* item)
                 __prev[2] = user_data->acc_z;
                 if (fabs((__prev[2] - user_data->acc_x) > 0.5))
                 {
-                    ezlopi_device_value_updated_from_device_v3(item);
+                    ezlopi_device_value_updated_from_device_broadcast(item);
                 }
             }
         }

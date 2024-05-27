@@ -14,6 +14,7 @@
 
 #include "bme680_bsec.h"
 #include "sensor_0010_I2C_BME680.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 static int __prepare(void* arg);
 static int __init(l_ezlopi_item_t* item);
@@ -79,8 +80,8 @@ static void __prepare_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device, 
         item->is_user_arg_unique = true;
         item->interface.i2c_master.enable = true;
         item->interface.i2c_master.clock_speed = 100000;
-        CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_scl_str, item->interface.i2c_master.scl);
-        CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_sda_str, item->interface.i2c_master.sda);
+        CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_scl_str, item->interface.i2c_master.scl);
+        CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_sda_str, item->interface.i2c_master.sda);
         CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_slave_addr_str, item->interface.i2c_master.address);
     }
     else
@@ -96,7 +97,7 @@ static int __prepare(void* arg)
     if (prep_arg && prep_arg->cjson_device)
     {
         cJSON* cj_device = prep_arg->cjson_device;
-        bme680_data_t* user_data = (bme680_data_t*)malloc(sizeof(bme680_data_t));
+        bme680_data_t* user_data = (bme680_data_t*)ezlopi_malloc(__FUNCTION__, sizeof(bme680_data_t));
         if (user_data)
         {
             memset(user_data, 0, sizeof(bme680_data_t));
@@ -229,7 +230,7 @@ static int __prepare(void* arg)
                     (NULL == child_co2_device))
                 {
                     ezlopi_device_free_device(parent_temp_humid_device);
-                    free(user_data);
+                    ezlopi_free(__FUNCTION__, user_data);
                     ret = -1;
                 }
             }
@@ -333,7 +334,7 @@ static int __notify(l_ezlopi_item_t* item)
                 if (fabs(user_data->temperature - temperature) > 0.05)
                 {
                     user_data->temperature = temperature;
-                    ezlopi_device_value_updated_from_device_v3(item);
+                    ezlopi_device_value_updated_from_device_broadcast(item);
                 }
             }
             if (ezlopi_item_name_humidity == item->cloud_properties.item_name)
@@ -341,7 +342,7 @@ static int __notify(l_ezlopi_item_t* item)
                 if (fabs(user_data->humidity - humidity) > 0.05)
                 {
                     user_data->humidity = humidity;
-                    ezlopi_device_value_updated_from_device_v3(item);
+                    ezlopi_device_value_updated_from_device_broadcast(item);
                 }
             }
             if (ezlopi_item_name_atmospheric_pressure == item->cloud_properties.item_name)
@@ -349,7 +350,7 @@ static int __notify(l_ezlopi_item_t* item)
                 if (fabs((user_data->pressure / 1000.0f) - (pressure / 1000.0f)) > 0.05)
                 {
                     user_data->pressure = pressure;
-                    ezlopi_device_value_updated_from_device_v3(item);
+                    ezlopi_device_value_updated_from_device_broadcast(item);
                 }
             }
             if (ezlopi_item_name_volatile_organic_compound_level == item->cloud_properties.item_name)
@@ -357,7 +358,7 @@ static int __notify(l_ezlopi_item_t* item)
                 if (fabs(user_data->iaq - iaq) > 0.05)
                 {
                     user_data->iaq = iaq;
-                    ezlopi_device_value_updated_from_device_v3(item);
+                    ezlopi_device_value_updated_from_device_broadcast(item);
                 }
             }
             if (ezlopi_item_name_distance == item->cloud_properties.item_name)
@@ -365,7 +366,7 @@ static int __notify(l_ezlopi_item_t* item)
                 if (fabs(user_data->altitude - altitude) > 0.05)
                 {
                     user_data->altitude = altitude;
-                    ezlopi_device_value_updated_from_device_v3(item);
+                    ezlopi_device_value_updated_from_device_broadcast(item);
                 }
             }
             if (ezlopi_item_name_co2_level == item->cloud_properties.item_name)
@@ -373,7 +374,7 @@ static int __notify(l_ezlopi_item_t* item)
                 if (fabs(user_data->co2_equivalent - co2_eqv) > 0.05)
                 {
                     user_data->co2_equivalent = co2_eqv;
-                    ezlopi_device_value_updated_from_device_v3(item);
+                    ezlopi_device_value_updated_from_device_broadcast(item);
                 }
             }
         }

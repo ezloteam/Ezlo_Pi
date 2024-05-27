@@ -16,6 +16,7 @@
 #include "sensor_0069_ze08_ch02_gas_sensor.h"
 
 #include "ze08_ch2o.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 static int __prepare(void* arg, void* user_arg);
 static int __init(l_ezlopi_item_t* item);
@@ -93,7 +94,7 @@ static int __notify(l_ezlopi_item_t* item)
     ze08_ch2o_sensor_data_t* ze08_ch2o_sensor = (ze08_ch2o_sensor_data_t*)item->user_arg;
     if (ze08_ch2o_sensor && ze08_ch2o_sensor->available)
     {
-        ezlopi_device_value_updated_from_device_v3(item);
+        ezlopi_device_value_updated_from_device_broadcast(item);
         ze08_ch2o_sensor->available = false;
     }
     else
@@ -145,8 +146,8 @@ static void __prepare_ze08_ch2o_sensor_ppm_item_cloud_properties(l_ezlopi_item_t
     item->cloud_properties.value_type = value_type_substance_amount;
     item->cloud_properties.scale = scales_parts_per_million;
 
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_tx_str, item->interface.uart.tx);
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_rx_str, item->interface.uart.rx);
+    CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_tx_str, item->interface.uart.tx);
+    CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_rx_str, item->interface.uart.rx);
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_baud_str, item->interface.uart.baudrate);
     item->interface.uart.enable = true;
     item->user_arg = user_arg;
@@ -159,7 +160,7 @@ static int __prepare(void* arg, void* user_arg)
     s_ezlopi_prep_arg_t* prep_arg = (s_ezlopi_prep_arg_t*)arg;
     if (prep_arg)
     {
-        ze08_ch2o_sensor_data_t* ze08_ch2o_sensor = (ze08_ch2o_sensor_data_t*)malloc(sizeof(ze08_ch2o_sensor_data_t));
+        ze08_ch2o_sensor_data_t* ze08_ch2o_sensor = (ze08_ch2o_sensor_data_t*)ezlopi_malloc(__FUNCTION__, sizeof(ze08_ch2o_sensor_data_t));
         if (ze08_ch2o_sensor)
         {
             memset(ze08_ch2o_sensor, 0, sizeof(ze08_ch2o_sensor_data_t));
@@ -178,13 +179,13 @@ static int __prepare(void* arg, void* user_arg)
                 {
                     ret = -1;
                     ezlopi_device_free_device(ze08_ch2o_sensor_device);
-                    free(ze08_ch2o_sensor);
+                    ezlopi_free(__FUNCTION__, ze08_ch2o_sensor);
                 }
             }
             else
             {
                 ret = -1;
-                free(ze08_ch2o_sensor);
+                ezlopi_free(__FUNCTION__, ze08_ch2o_sensor);
             }
         }
         else

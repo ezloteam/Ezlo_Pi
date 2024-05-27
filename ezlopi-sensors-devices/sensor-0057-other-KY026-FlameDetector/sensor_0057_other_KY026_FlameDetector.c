@@ -12,6 +12,7 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "sensor_0057_other_KY026_FlameDetector.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 //------------------------------------------------------------------------------
 const char* ky206_sensor_heat_alarm_token[] = {
@@ -98,7 +99,7 @@ static int __0057_prepare(void* arg)
             }
 
             //---------------------------- ADC - DEVICE 2 -------------------------------------------
-            flame_t* flame_struct = (flame_t*)malloc(sizeof(flame_t));
+            flame_t* flame_struct = (flame_t*)ezlopi_malloc(__FUNCTION__, sizeof(flame_t));
             if (NULL != flame_struct)
             {
                 memset(flame_struct, 0, sizeof(flame_t));
@@ -119,13 +120,13 @@ static int __0057_prepare(void* arg)
                     {
                         ret = -1;
                         ezlopi_device_free_device(flame_device_child_adc);
-                        free(flame_struct);
+                        ezlopi_free(__FUNCTION__, flame_struct);
                     }
                 }
                 else
                 {
                     ret = -1;
-                    free(flame_struct);
+                    ezlopi_free(__FUNCTION__, flame_struct);
                 }
             }
             else
@@ -237,7 +238,7 @@ static void __prepare_item_adc_cloud_properties(l_ezlopi_item_t* item, cJSON* cj
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio2_str, item->interface.adc.gpio_num);
+    CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio2_str, item->interface.adc.gpio_num);
     TRACE_S("flame_> ADC_PIN: %d ", item->interface.adc.gpio_num);
     item->interface.adc.resln_bit = 3; // ADC 12_bit
 
@@ -258,22 +259,22 @@ static int __0057_get_item(l_ezlopi_item_t* item, void* arg)
             if (ezlopi_item_name_heat_alarm == item->cloud_properties.item_name)
             {
                 //-------------------  POSSIBLE JSON ENUM CONTENTS ----------------------------------
-                cJSON* json_array_enum = cJSON_CreateArray();
+                cJSON* json_array_enum = cJSON_CreateArray(__FUNCTION__);
                 if (NULL != json_array_enum)
                 {
                     for (uint8_t i = 0; i < KY206_HEAT_ALARM_MAX; i++)
                     {
-                        cJSON* json_value = cJSON_CreateString(ky206_sensor_heat_alarm_token[i]);
+                        cJSON* json_value = cJSON_CreateString(__FUNCTION__, ky206_sensor_heat_alarm_token[i]);
                         if (NULL != json_value)
                         {
                             cJSON_AddItemToArray(json_array_enum, json_value);
                         }
                     }
-                    cJSON_AddItemToObject(cj_result, ezlopi_enum_str, json_array_enum);
+                    cJSON_AddItemToObject(__FUNCTION__, cj_result, ezlopi_enum_str, json_array_enum);
                 }
                 //--------------------------------------------------------------------------------------
-                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, (char*)item->user_arg ? item->user_arg : ky206_sensor_heat_alarm_token[0]);
-                cJSON_AddStringToObject(cj_result, ezlopi_value_str, (char*)item->user_arg ? item->user_arg : ky206_sensor_heat_alarm_token[0]);
+                cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, (char*)item->user_arg ? item->user_arg : ky206_sensor_heat_alarm_token[0]);
+                cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, (char*)item->user_arg ? item->user_arg : ky206_sensor_heat_alarm_token[0]);
             }
             else if (ezlopi_item_name_temperature_changes == item->cloud_properties.item_name)
             {
@@ -299,8 +300,8 @@ static int __0057_get_cjson_value(l_ezlopi_item_t* item, void* arg)
         {
             if (ezlopi_item_name_heat_alarm == item->cloud_properties.item_name)
             {
-                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, (char*)item->user_arg ? item->user_arg : ky206_sensor_heat_alarm_token[0]);
-                cJSON_AddStringToObject(cj_result, ezlopi_value_str, (char*)item->user_arg ? item->user_arg : ky206_sensor_heat_alarm_token[0]);
+                cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, (char*)item->user_arg ? item->user_arg : ky206_sensor_heat_alarm_token[0]);
+                cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, (char*)item->user_arg ? item->user_arg : ky206_sensor_heat_alarm_token[0]);
             }
             else if (ezlopi_item_name_temperature_changes == item->cloud_properties.item_name)
             {
@@ -335,7 +336,7 @@ static int __0057_notify(l_ezlopi_item_t* item)
             if (curret_value != (char*)item->user_arg) // calls update only if there is change in state
             {
                 item->user_arg = (void*)curret_value;
-                ezlopi_device_value_updated_from_device_v3(item);
+                ezlopi_device_value_updated_from_device_broadcast(item);
             }
         }
         else if (ezlopi_item_name_temperature_changes == item->cloud_properties.item_name)
@@ -350,7 +351,7 @@ static int __0057_notify(l_ezlopi_item_t* item)
                 // TRACE_E("Heat-detected: %.2f percent", absorbed_percent);
                 if (new_percent != flame_struct->absorbed_percent)
                 {
-                    ezlopi_device_value_updated_from_device_v3(item);
+                    ezlopi_device_value_updated_from_device_broadcast(item);
                     flame_struct->absorbed_percent = new_percent;
                 }
             }

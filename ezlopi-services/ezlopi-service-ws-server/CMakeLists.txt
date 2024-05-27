@@ -1,5 +1,6 @@
     
-file(GLOB_RECURSE provisioning_src "*.c*")
+file(GLOB_RECURSE src_files "*.c*")
+
 
 set(EZLOPI_UTIL_COMPONENTS
         ezlopi-util-trace
@@ -10,7 +11,9 @@ set(SDK_COMPONENTS
 )
 
 set(EZLOPI_CORE_COMPONENTS  
+        ezlopi-core-api
         ezlopi-core-wifi
+        ezlopi-core-buffer
         ezlopi-core-ezlopi
         ezlopi-core-factory-info
 )
@@ -21,10 +24,10 @@ set(EZLOPI_CLOUD_COMPONENTS
 
 
 
-idf_component_register(SRCS "ezlopi_service_ws_server.c" "ezlopi_service_ws_server_clients.c" "${provisioning_src}"
+idf_component_register(SRCS "ezlopi_service_ws_server.c" "${src_files}"
     INCLUDE_DIRS "."
     REQUIRES    ${SDK_COMPONENTS}
                 ${EZLOPI_CORE_COMPONENTS} 
                 ${EZLOPI_UTIL_COMPONENTS}
-                ${EZLOPI_CLOUD_COMPONENTS} 
+                # ${EZLOPI_CLOUD_COMPONENTS} 
     )

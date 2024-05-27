@@ -1,5 +1,5 @@
 #include "ezlopi_util_trace.h"
-#include "cJSON.h"
+#include "cjext.h"
 #include <math.h>
 
 #include "ezlopi_core_timer.h"
@@ -14,6 +14,7 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "sensor_0041_ADC_FC28_soilMoisture.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 typedef struct s_fc28_data
 {
@@ -86,7 +87,7 @@ static void __prepare_item_interface_properties(l_ezlopi_item_t* item, cJSON* cj
     if (item && cj_device)
     {
         item->interface_type = EZLOPI_DEVICE_INTERFACE_MAX; // other
-        CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_str, item->interface.adc.gpio_num);
+        CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_str, item->interface.adc.gpio_num);
         item->interface.adc.resln_bit = 3;
     }
 }
@@ -100,7 +101,7 @@ static int __0041_prepare(void* arg)
     {
         cJSON* cj_device = device_prep_arg->cjson_device;
 
-        s_fc28_data_t* user_data = (s_fc28_data_t*)malloc(sizeof(s_fc28_data_t));
+        s_fc28_data_t* user_data = (s_fc28_data_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_fc28_data_t));
         if (NULL != user_data)
         {
             memset(user_data, 0, sizeof(s_fc28_data_t));
@@ -120,13 +121,13 @@ static int __0041_prepare(void* arg)
                 {
                     ret = -1;
                     ezlopi_device_free_device(fc28_device);
-                    free(user_data);
+                    ezlopi_free(__FUNCTION__, user_data);
                 }
             }
             else
             {
                 ret = -1;
-                free(user_data);
+                ezlopi_free(__FUNCTION__, user_data);
             }
         }
         else
@@ -205,7 +206,7 @@ static int __0041_notify(l_ezlopi_item_t* item)
             if (fabs((user_data->hum_val) - new_hum) > 0.5) // percent
             {
                 user_data->hum_val = new_hum;
-                ezlopi_device_value_updated_from_device_v3(item);
+                ezlopi_device_value_updated_from_device_broadcast(item);
             }
             ret = 1;
         }

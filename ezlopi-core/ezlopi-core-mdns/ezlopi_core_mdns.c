@@ -1,4 +1,6 @@
 
+#if 1 // def CONFIG_EZPI_SERV_MDNS_EN
+
 #include <string.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -11,11 +13,15 @@
 #include "driver/gpio.h"
 #include "netdb.h"
 
-#include "ezlopi_core_factory_info.h"
-#include "ezlopi_core_wifi.h"
-#include "ezlopi_cloud_keywords.h"
 #include "ezlopi_util_trace.h"
+#include "ezlopi_cloud_keywords.h"
+
+#include "ezlopi_core_wifi.h"
 #include "ezlopi_core_mdns.h"
+#include "ezlopi_core_processes.h"
+#include "ezlopi_core_factory_info.h"
+
+#include "EZLOPI_USER_CONFIG.h"
 
 
 const char* ezlopi_mdns_instance_name = "EzloPi, an Open Source IoT Platform";
@@ -27,7 +33,9 @@ int EZPI_core_init_mdns(void)
 {
     int ret = 0;
 
-    xTaskCreate(__mdns_init, "mdns service init", 4 * 2048, NULL, 4, NULL);
+    TaskHandle_t ezlopi_core_mdns_service_task_handle = NULL;
+    xTaskCreate(__mdns_init, "mdns_svc", EZLOPI_CORE_MDNS_SERVICE_TASK_DEPTH, NULL, 4, &ezlopi_core_mdns_service_task_handle);
+    ezlopi_core_process_set_process_info(ENUM_EZLOPI_CORE_MDNS_SERVICE_TASK, &ezlopi_core_mdns_service_task_handle, EZLOPI_CORE_MDNS_SERVICE_TASK_DEPTH);
 
     return ret;
 }
@@ -64,11 +72,11 @@ static void ezlopi_mdns_init_service_context()
 {
 
     // Add one service about EzloPi Device Type
-    l_ezlopi_mdns_context_t* ezlopi_mdns_service_cntx_device_type = (l_ezlopi_mdns_context_t*)malloc(sizeof(l_ezlopi_mdns_context_t));
+    l_ezlopi_mdns_context_t* ezlopi_mdns_service_cntx_device_type = (l_ezlopi_mdns_context_t*)ezlopi_malloc(__FUNCTION__, sizeof(l_ezlopi_mdns_context_t));
     if (ezlopi_mdns_service_cntx_device_type)
     {
         memset(ezlopi_mdns_service_cntx_device_type, 0, sizeof(l_ezlopi_mdns_context_t));
-        mdns_txt_item_t* service_cntx_device_type = (mdns_txt_item_t*)malloc(sizeof(mdns_txt_item_t));
+        mdns_txt_item_t* service_cntx_device_type = (mdns_txt_item_t*)ezlopi_malloc(__FUNCTION__, sizeof(mdns_txt_item_t));
         if (service_cntx_device_type)
         {
             memset(service_cntx_device_type, 0, sizeof(mdns_txt_item_t));
@@ -83,20 +91,20 @@ static void ezlopi_mdns_init_service_context()
 
 
     // Add one service about EzloPi Serial
-    l_ezlopi_mdns_context_t* ezlopi_mdns_service_cntx_device_id = (l_ezlopi_mdns_context_t*)malloc(sizeof(l_ezlopi_mdns_context_t));
+    l_ezlopi_mdns_context_t* ezlopi_mdns_service_cntx_device_id = (l_ezlopi_mdns_context_t*)ezlopi_malloc(__FUNCTION__, sizeof(l_ezlopi_mdns_context_t));
 
     if (ezlopi_mdns_service_cntx_device_id)
     {
         memset(ezlopi_mdns_service_cntx_device_id, 0, sizeof(l_ezlopi_mdns_context_t));
 
-        mdns_txt_item_t* service_cntx_device_id = (mdns_txt_item_t*)malloc(sizeof(mdns_txt_item_t));
+        mdns_txt_item_t* service_cntx_device_id = (mdns_txt_item_t*)ezlopi_malloc(__FUNCTION__, sizeof(mdns_txt_item_t));
         if (service_cntx_device_id)
         {
             memset(service_cntx_device_id, 0, sizeof(mdns_txt_item_t));
             uint64_t id_val = ezlopi_factory_info_v3_get_id();
             if (id_val)
             {
-                char* id_val_str = (char*)malloc(EZPI_MDNS_SERIAL_SIZE);
+                char* id_val_str = (char*)ezlopi_malloc(__FUNCTION__, EZPI_MDNS_SERIAL_SIZE);
                 if (id_val_str)
                 {
                     service_cntx_device_id->key = "Serial";
@@ -114,11 +122,11 @@ static void ezlopi_mdns_init_service_context()
 
     // Add manufacturer service
 #ifdef EZPI_SERV_MDNS_MANUFACTURER_SERVICE_EN
-    l_ezlopi_mdns_context_t* ezlopi_mdns_service_cntx_manufacturer = (l_ezlopi_mdns_context_t*)malloc(sizeof(l_ezlopi_mdns_context_t));
+    l_ezlopi_mdns_context_t* ezlopi_mdns_service_cntx_manufacturer = (l_ezlopi_mdns_context_t*)ezlopi_malloc(__FUNCTION__, sizeof(l_ezlopi_mdns_context_t));
     if (ezlopi_mdns_service_cntx_manufacturer)
     {
         memset(ezlopi_mdns_service_cntx_manufacturer, 0, sizeof(l_ezlopi_mdns_context_t));
-        mdns_txt_item_t* service_cntx_manufacturer = (mdns_txt_item_t*)malloc(sizeof(mdns_txt_item_t));
+        mdns_txt_item_t* service_cntx_manufacturer = (mdns_txt_item_t*)ezlopi_malloc(__FUNCTION__, sizeof(mdns_txt_item_t));
         if (service_cntx_manufacturer)
         {
             memset(service_cntx_manufacturer, 0, sizeof(mdns_txt_item_t));
@@ -134,11 +142,11 @@ static void ezlopi_mdns_init_service_context()
 
     // Add brand service
 #ifdef EZPI_SERV_MDNS_BRAND_SERVICE_EN
-    l_ezlopi_mdns_context_t* ezlopi_mdns_service_cntx_brand = (l_ezlopi_mdns_context_t*)malloc(sizeof(l_ezlopi_mdns_context_t));
+    l_ezlopi_mdns_context_t* ezlopi_mdns_service_cntx_brand = (l_ezlopi_mdns_context_t*)ezlopi_malloc(__FUNCTION__, sizeof(l_ezlopi_mdns_context_t));
     if (ezlopi_mdns_service_cntx_brand)
     {
         memset(ezlopi_mdns_service_cntx_brand, 0, sizeof(l_ezlopi_mdns_context_t));
-        mdns_txt_item_t* service_cntx_brand = (mdns_txt_item_t*)malloc(sizeof(mdns_txt_item_t));
+        mdns_txt_item_t* service_cntx_brand = (mdns_txt_item_t*)ezlopi_malloc(__FUNCTION__, sizeof(mdns_txt_item_t));
         if (service_cntx_brand)
         {
             memset(service_cntx_brand, 0, sizeof(mdns_txt_item_t));
@@ -154,11 +162,11 @@ static void ezlopi_mdns_init_service_context()
 
     // Add model service
 #ifdef EZPI_SERV_MDNS_MODEL_SERVICE_EN
-    l_ezlopi_mdns_context_t* ezlopi_mdns_service_cntx_model = (l_ezlopi_mdns_context_t*)malloc(sizeof(l_ezlopi_mdns_context_t));
+    l_ezlopi_mdns_context_t* ezlopi_mdns_service_cntx_model = (l_ezlopi_mdns_context_t*)ezlopi_malloc(__FUNCTION__, sizeof(l_ezlopi_mdns_context_t));
     if (ezlopi_mdns_service_cntx_model)
     {
         memset(ezlopi_mdns_service_cntx_model, 0, sizeof(l_ezlopi_mdns_context_t));
-        mdns_txt_item_t* service_cntx_model = (mdns_txt_item_t*)malloc(sizeof(mdns_txt_item_t));
+        mdns_txt_item_t* service_cntx_model = (mdns_txt_item_t*)ezlopi_malloc(__FUNCTION__, sizeof(mdns_txt_item_t));
         if (service_cntx_model)
         {
             memset(service_cntx_model, 0, sizeof(mdns_txt_item_t));
@@ -174,11 +182,11 @@ static void ezlopi_mdns_init_service_context()
 
     // Add name service
 #ifdef EZPI_SERV_MDNS_NAME_SERVICE_EN
-    l_ezlopi_mdns_context_t* ezlopi_mdns_service_cntx_name = (l_ezlopi_mdns_context_t*)malloc(sizeof(l_ezlopi_mdns_context_t));
+    l_ezlopi_mdns_context_t* ezlopi_mdns_service_cntx_name = (l_ezlopi_mdns_context_t*)ezlopi_malloc(__FUNCTION__, sizeof(l_ezlopi_mdns_context_t));
     if (ezlopi_mdns_service_cntx_name)
     {
         memset(ezlopi_mdns_service_cntx_name, 0, sizeof(l_ezlopi_mdns_context_t));
-        mdns_txt_item_t* service_cntx_name = (mdns_txt_item_t*)malloc(sizeof(mdns_txt_item_t));
+        mdns_txt_item_t* service_cntx_name = (mdns_txt_item_t*)ezlopi_malloc(__FUNCTION__, sizeof(mdns_txt_item_t));
         if (service_cntx_name)
         {
             memset(service_cntx_name, 0, sizeof(mdns_txt_item_t));
@@ -207,7 +215,7 @@ static mdns_txt_item_t* prepare_mdns_item_service_context(int* service_size)
             mdns_context_head = mdns_context_head->next;
         }
         *service_size = size;
-        mdns_context = (mdns_txt_item_t*)malloc(size * sizeof(mdns_txt_item_t));
+        mdns_context = (mdns_txt_item_t*)ezlopi_malloc(__FUNCTION__, size * sizeof(mdns_txt_item_t));
         if (mdns_context)
         {
             int i = 0;
@@ -278,10 +286,13 @@ static void __mdns_init(void* pv)
         }
         else
         {
-            TRACE_E("Error mDNS Initialization")
+            TRACE_E("Error mDNS Initialization");
         }
         vTaskDelay(10000 / portTICK_PERIOD_MS);
     }
+    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_CORE_MDNS_SERVICE_TASK);
     vTaskDelete(NULL);
 
 }
+
+#endif // CONFIG_EZPI_SERV_MDNS_EN

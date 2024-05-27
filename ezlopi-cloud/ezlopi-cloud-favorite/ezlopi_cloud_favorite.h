@@ -3,16 +3,16 @@
 
 #include <string.h>
 
-#include "cJSON.h"
+#include "cjext.h"
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
-    void favorite_list_v3(cJSON *cj_request, cJSON *cj_response);
+    void favorite_list_v3(cJSON* cj_request, cJSON* cj_response);
 #if 0 // v2.x
-    void favorite_list(cJSON *cj_request, cJSON *cj_response);
+    void favorite_list(cJSON* cj_request, cJSON* cj_response);
 #endif
 
 #ifdef __cplusplus

@@ -15,24 +15,24 @@
 
 #include "sensor_0065_digitalIn_float_switch.h"
 //-----------------------------------------------------------------------
-const char *water_level_alarm_token[] = {
+const char* water_level_alarm_token[] = {
     "water_level_ok",
     "water_level_below_low_threshold",
     "water_level_above_high_threshold",
     "unknown",
 };
 //-----------------------------------------------------------------------
-static int __0065_prepare(void *arg);
-static int __0065_init(l_ezlopi_item_t *item);
-static int __0065_get_item(l_ezlopi_item_t *item, void *arg);
-static int __0065_get_cjson_value(l_ezlopi_item_t *item, void *arg);
+static int __0065_prepare(void* arg);
+static int __0065_init(l_ezlopi_item_t* item);
+static int __0065_get_item(l_ezlopi_item_t* item, void* arg);
+static int __0065_get_cjson_value(l_ezlopi_item_t* item, void* arg);
 
-static void __0065_update_from_device(void *arg);
-static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device);
-static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
+static void __0065_update_from_device(void* arg);
+static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device);
+static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device);
 //-----------------------------------------------------------------------
 
-int sensor_0065_digitalIn_float_switch(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+int sensor_0065_digitalIn_float_switch(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
 {
     int ret = 0;
     switch (action)
@@ -66,7 +66,7 @@ int sensor_0065_digitalIn_float_switch(e_ezlopi_actions_t action, l_ezlopi_item_
 }
 
 //----------------------------------------------------------------------------------------
-static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
+static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_water;
@@ -74,7 +74,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
     device->cloud_properties.info = NULL;
     device->cloud_properties.device_type_id = NULL;
 }
-static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device)
+static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device)
 {
     item->cloud_properties.show = true;
     item->cloud_properties.has_getter = true;
@@ -94,20 +94,20 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_dev
     item->interface.gpio.gpio_in.pull = GPIO_PULLDOWN_ONLY;
     item->interface.gpio.gpio_in.interrupt = GPIO_INTR_ANYEDGE;
 }
-static int __0065_prepare(void *arg)
+static int __0065_prepare(void* arg)
 {
     int ret = 0;
     if (arg)
     {
-        s_ezlopi_prep_arg_t *device_prep_arg = (s_ezlopi_prep_arg_t *)arg;
+        s_ezlopi_prep_arg_t* device_prep_arg = (s_ezlopi_prep_arg_t*)arg;
         if (device_prep_arg && (NULL != device_prep_arg->cjson_device))
         {
-            l_ezlopi_device_t *float_device = ezlopi_device_add_device(device_prep_arg->cjson_device, NULL);
+            l_ezlopi_device_t* float_device = ezlopi_device_add_device(device_prep_arg->cjson_device, NULL);
             if (float_device)
             {
                 ret = 1;
                 __prepare_device_cloud_properties(float_device, device_prep_arg->cjson_device);
-                l_ezlopi_item_t *float_item = ezlopi_device_add_item_to_device(float_device, sensor_0065_digitalIn_float_switch);
+                l_ezlopi_item_t* float_item = ezlopi_device_add_item_to_device(float_device, sensor_0065_digitalIn_float_switch);
                 if (float_item)
                 {
                     __prepare_item_cloud_properties(float_item, device_prep_arg->cjson_device);
@@ -124,7 +124,7 @@ static int __0065_prepare(void *arg)
     return ret;
 }
 
-static int __0065_init(l_ezlopi_item_t *item)
+static int __0065_init(l_ezlopi_item_t* item)
 {
     int ret = 0;
     if (NULL != item)
@@ -164,48 +164,48 @@ static int __0065_init(l_ezlopi_item_t *item)
     }
     return ret;
 }
-static int __0065_get_item(l_ezlopi_item_t *item, void *arg)
+static int __0065_get_item(l_ezlopi_item_t* item, void* arg)
 {
     int ret = 0;
     if (item && arg)
     {
-        cJSON *cj_result = (cJSON *)arg;
+        cJSON* cj_result = (cJSON*)arg;
         if (cj_result)
         {
             //-------------------  POSSIBLE JSON ENUM LPGNTENTS ----------------------------------
-            cJSON *json_array_enum = cJSON_CreateArray();
+            cJSON* json_array_enum = cJSON_CreateArray(__FUNCTION__);
             if (NULL != json_array_enum)
             {
                 for (uint8_t i = 0; i < WATER_LEVEL_ALARM_MAX; i++)
                 {
-                    cJSON *json_value = cJSON_CreateString(water_level_alarm_token[i]);
+                    cJSON* json_value = cJSON_CreateString(__FUNCTION__, water_level_alarm_token[i]);
                     if (NULL != json_value)
                     {
                         cJSON_AddItemToArray(json_array_enum, json_value);
                     }
                 }
-                cJSON_AddItemToObject(cj_result, ezlopi_enum_str, json_array_enum);
+                cJSON_AddItemToObject(__FUNCTION__, cj_result, ezlopi_enum_str, json_array_enum);
             }
             //--------------------------------------------------------------------------------------
 
-            cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, (char *)item->user_arg ? item->user_arg : water_level_alarm_token[0]);
-            cJSON_AddStringToObject(cj_result, ezlopi_value_str, (char *)item->user_arg ? item->user_arg : water_level_alarm_token[0]);
+            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, (char*)item->user_arg ? item->user_arg : water_level_alarm_token[0]);
+            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, (char*)item->user_arg ? item->user_arg : water_level_alarm_token[0]);
             ret = 1;
         }
     }
     return ret;
 }
 
-static int __0065_get_cjson_value(l_ezlopi_item_t *item, void *arg)
+static int __0065_get_cjson_value(l_ezlopi_item_t* item, void* arg)
 {
     int ret = 0;
     if (item && arg)
     {
-        cJSON *cj_result = (cJSON *)arg;
+        cJSON* cj_result = (cJSON*)arg;
         if (cj_result)
         {
-            cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, (char *)item->user_arg ? item->user_arg : water_level_alarm_token[0]);
-            cJSON_AddStringToObject(cj_result, ezlopi_value_str, (char *)item->user_arg ? item->user_arg : water_level_alarm_token[0]);
+            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, (char*)item->user_arg ? item->user_arg : water_level_alarm_token[0]);
+            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, (char*)item->user_arg ? item->user_arg : water_level_alarm_token[0]);
             ret = 1;
         }
     }
@@ -213,12 +213,12 @@ static int __0065_get_cjson_value(l_ezlopi_item_t *item, void *arg)
 }
 
 //------------------------------------------------------------------------------------------------------------
-static void __0065_update_from_device(void *arg)
+static void __0065_update_from_device(void* arg)
 {
-    l_ezlopi_item_t *item = (l_ezlopi_item_t *)arg;
+    l_ezlopi_item_t* item = (l_ezlopi_item_t*)arg;
     if (item)
     {
-        const char *curret_value = NULL;
+        const char* curret_value = NULL;
         item->interface.gpio.gpio_in.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
         item->interface.gpio.gpio_in.value = (false == item->interface.gpio.gpio_in.invert) ? (item->interface.gpio.gpio_in.value) : (!item->interface.gpio.gpio_in.value);
         if (0 == (item->interface.gpio.gpio_in.value)) // when D0 -> 0V,
@@ -229,10 +229,10 @@ static void __0065_update_from_device(void *arg)
         {
             curret_value = water_level_alarm_token[2];
         }
-        if (curret_value != (char *)item->user_arg) // calls update only if there is change in state
+        if (curret_value != (char*)item->user_arg) // calls update only if there is change in state
         {
-            item->user_arg = (void *)curret_value;
-            ezlopi_device_value_updated_from_device_v3(item);
+            item->user_arg = (void*)curret_value;
+            ezlopi_device_value_updated_from_device_broadcast(item);
         }
     }
 }

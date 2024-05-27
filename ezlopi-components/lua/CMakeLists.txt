@@ -31,4 +31,7 @@ set(srcs "lua/lapi.c"
          "lua/lvm.c"
          "lua/lzio.c")
 
-idf_component_register(SRCS "${srcs}" INCLUDE_DIRS .)
+idf_component_register( SRCS            "${srcs}" 
+                        INCLUDE_DIRS    .
+                        REQUIRES ezlopi-core-heap
+)
