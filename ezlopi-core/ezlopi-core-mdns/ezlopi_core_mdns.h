@@ -2,7 +2,9 @@
 #ifndef __EZLOPI_CORE_MDNS_H_
 #define __EZLOPI_CORE_MDNS_H_
 
-// #ifdef CONFIG_EZPI_SERV_MDNS_EN
+#include "../../build/config/sdkconfig.h"
+
+#ifdef CONFIG_EZPI_SERV_MDNS_EN
 
 #include "mdns.h"
 
@@ -18,6 +20,6 @@ typedef struct l_ezlopi_mdns_context
 
 int EZPI_core_init_mdns();
 
-// #endif // __EZLOPI_CORE_MDNS_H_
 #endif // CONFIG_EZPI_SERV_MDNS_EN
+#endif // __EZLOPI_CORE_MDNS_H_
 

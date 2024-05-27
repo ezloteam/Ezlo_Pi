@@ -54,7 +54,7 @@ void __dump(const char* file_name, uint32_t line, char* buffer_name, void* _buff
     int lines = cnt >> 4;
     int l;
 
-    printf("%s (%d):: %s: Total Size: %d\r\n", file_name, line, buffer_name, cnt);
+    printf("%s (%d):: %s: Total Size: %d\n", file_name, line, buffer_name, cnt);
 
     for (l = 0; l < lines; l++)
     {
@@ -66,7 +66,7 @@ void __dump(const char* file_name, uint32_t line, char* buffer_name, void* _buff
         put_idump(&buff[l * 16], ofs + l * 16, cnt & 0x0F);
     }
 
-    ets_printf("\n\n");
+    ets_printf("\n");
     fflush(stdout);
 }
 
