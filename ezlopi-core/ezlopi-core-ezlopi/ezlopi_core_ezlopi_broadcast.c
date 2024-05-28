@@ -81,7 +81,7 @@ int ezlopi_core_ezlopi_broadcast_cjson(cJSON* cj_data)
 
             if (true == cJSON_PrintPreallocated(__FUNCTION__, cj_data, data_buffer, buffer_len, false))
             {
-                TRACE_D("----------------- broadcasting:\r\n%s", data_buffer);
+                TRACE_D("----------------- broadcasting: %s", data_buffer);
                 ret = __call_broadcast_methods(data_buffer);
             }
 
