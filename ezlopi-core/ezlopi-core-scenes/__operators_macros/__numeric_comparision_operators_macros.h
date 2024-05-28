@@ -1,5 +1,6 @@
 
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+
 SCENES_NUM_COMP_OPERATORS(NONE, NULL, NULL, NULL)
 //////////////////////////////////////////////////////////////////////////////
 SCENES_NUM_COMP_OPERATORS(LESS, "<", "less", "compareNumbers")
@@ -15,4 +16,5 @@ SCENES_NUM_COMP_OPERATORS(NOT_BETWEEN, "not_between", "not between", "compareNum
 // SCENES_NUM_COMP_OPERATORS(NONE_OF, "none_of", "none of", "numbersArray")
 //////////////////////////////////////////////////////////////////////////////
 SCENES_NUM_COMP_OPERATORS(MAX, NULL, NULL, NULL)
+
 #endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
