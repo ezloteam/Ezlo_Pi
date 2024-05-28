@@ -27,7 +27,7 @@ extern const char *ezlopi_item_name_dw_state;
 // extern const  char *ezlopi_item_name_maintenance_state;
 extern const char *ezlopi_item_name_sounding_mode;
 // extern const  char *ezlopi_item_name_sound_list;
-// extern const  char *ezlopi_item_name_sound_volume;
+extern const  char *ezlopi_item_name_sound_volume;
 // extern const  char *ezlopi_item_name_sound_select;
 // extern const  char *ezlopi_item_name_sound_playback;
 // extern const  char *ezlopi_item_name_periodic_inspection_state;

@@ -2,6 +2,8 @@
 #include "freertos/task.h"
 #include "freertos/queue.h"
 
+#include "ezlopi_cloud_constants.h"
+#include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_service_broadcast.h"
 #include "ezlopi_core_ezlopi_broadcast.h"
 #include "ezlopi_core_processes.h"
