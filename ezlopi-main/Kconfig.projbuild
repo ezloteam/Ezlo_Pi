@@ -68,7 +68,7 @@ menu "EzloPi User Config"
     config EZPI_ENABLE_PING 
         depends on EZPI_ENABLE_WIFI || EZPI_CORE_ENABLE_ETH
         bool "Enable ping"
-        default n
+        default y
         help
             Enable Ping
     
