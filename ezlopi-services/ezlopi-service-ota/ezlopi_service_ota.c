@@ -1,3 +1,8 @@
+
+#include "../../build/config/sdkconfig.h"
+
+#ifdef CONFIG_EZPI_ENABLE_OTA
+
 #include <string.h>
 #include <bootloader_random.h>
 
@@ -17,9 +22,11 @@
 
 #include "ezlopi_service_ota.h"
 #include "ezlopi_service_webprov.h"
+#include "ezlopi_core_ezlopi_broadcast.h"
+#include "ezlopi_core_processes.h"
 
 
-#if defined(CONFIG_EZPI_ENABLE_OTA)
+
 static volatile bool __ota_busy = false;
 
 static void ota_service_process(void* pv);
@@ -31,7 +38,9 @@ bool ezlopi_service_ota_get_busy_state(void)
 
 void ezlopi_service_ota_init(void)
 {
-    xTaskCreate(ota_service_process, "ota-service-process", 2 * 2048, NULL, 2, NULL);
+    TaskHandle_t ezlopi_service_ota_process_task_handle = NULL;
+    xTaskCreate(ota_service_process, "ota-service-process", EZLOPI_SERVICE_OTA_PROCESS_TASK_DEPTH, NULL, 2, &ezlopi_service_ota_process_task_handle);
+    ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_OTA_PROCESS_TASK, &ezlopi_service_ota_process_task_handle, EZLOPI_SERVICE_OTA_PROCESS_TASK_DEPTH);
 }
 
 static void ota_service_process(void* pv)
@@ -59,7 +68,7 @@ static void ota_service_process(void* pv)
 
             if (0 == ezlopi_core_ezlopi_broadcast_add_to_queue(cj_firmware_info_request))
             {
-                cJSON_Delete(cj_firmware_info_request);
+                cJSON_Delete(__FUNCTION__, cj_firmware_info_request);
             }
             __ota_busy = false; // must clear immediately ; if OTA-event is serviced
         }
@@ -70,4 +79,5 @@ static void ota_service_process(void* pv)
         }
     }
 }
+
 #endif // CONFIG_EZPI_ENABLE_OTA

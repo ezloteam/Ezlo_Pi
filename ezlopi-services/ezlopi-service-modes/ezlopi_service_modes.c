@@ -11,11 +11,12 @@
 #include "ezlopi_core_modes_cjson.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_ezlopi_broadcast.h"
+#include "ezlopi_core_processes.h"
 
 #include "ezlopi_service_modes.h"
 // #include "ezlopi_service_webprov.h"
 
-#if defined(CONFIG_EZLPI_SERV_ENABLE_MODES)
+#if defined(CONFIG_EZPI_SERV_ENABLE_MODES)
 
 static TaskHandle_t sg_process_handle = NULL;
 
@@ -25,6 +26,7 @@ int ezlopi_service_modes_stop(void)
 {
     if (sg_process_handle)
     {
+        ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SERVICE_MODES_TASK);
         vTaskDelete(sg_process_handle);
         sg_process_handle = NULL;
         TRACE_W("Modes-service: Stopped!");
@@ -40,7 +42,8 @@ int ezlopi_service_modes_start(void)
     if ((NULL == sg_process_handle) && ezlopi_core_modes_get_custom_modes())
     {
         ret = 1;
-        xTaskCreate(__modes_service, "modes-service", 1024 * 4, NULL, 3, &sg_process_handle);
+        xTaskCreate(__modes_service, "modes-service", EZLOPI_SERVICE_MODES_TASK_DEPTH, NULL, 3, &sg_process_handle);
+        ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_MODES_TASK, &sg_process_handle, EZLOPI_SERVICE_MODES_TASK_DEPTH);
         TRACE_I("Starting modes-service");
     }
 
@@ -81,7 +84,7 @@ static void __modes_service(void* pv)
 
                         if (new_house_mode->cj_bypass_devices)
                         {
-                            cJSON_Delete(new_house_mode->cj_bypass_devices);
+                            cJSON_Delete(__FUNCTION__, new_house_mode->cj_bypass_devices);
                             new_house_mode->cj_bypass_devices = NULL;
                         }
 
@@ -92,7 +95,7 @@ static void __modes_service(void* pv)
 
                         if (0 == ezlopi_core_ezlopi_broadcast_add_to_queue(cj_update))
                         {
-                            cJSON_Delete(cj_update);
+                            cJSON_Delete(__FUNCTION__, cj_update);
                         }
                     }
                 }
@@ -101,7 +104,7 @@ static void __modes_service(void* pv)
 
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
-
+    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SERVICE_MODES_TASK);
     vTaskDelete(NULL);
 }
-#endif // CONFIG_EZLPI_SERV_ENABLE_MODES
+#endif // CONFIG_EZPI_SERV_ENABLE_MODES

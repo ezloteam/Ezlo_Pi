@@ -14,6 +14,9 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "sensor_0054_PWM_YFS201_flowmeter.h"
+#include "EZLOPI_USER_CONFIG.h"
+
+
 //*************************************************************************
 //                          Declaration
 //*************************************************************************
@@ -107,7 +110,7 @@ static void __prepare_item_properties(l_ezlopi_item_t* item, cJSON* cj_device, v
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_str, item->interface.pwm.gpio_num);
+    CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_str, item->interface.pwm.gpio_num);
 
     // passing the custom data_structure
     item->is_user_arg_unique = true;
@@ -122,7 +125,7 @@ static int __0054_prepare(void* arg)
     {
         //---------------------------  DIGI - DEVICE 1 --------------------------------------------
 
-        yfs201_t* yfs201_data = (yfs201_t*)malloc(sizeof(yfs201_t));
+        yfs201_t* yfs201_data = (yfs201_t*)ezlopi_malloc(__FUNCTION__, sizeof(yfs201_t));
         if (NULL != yfs201_data)
         {
             memset(yfs201_data, 0, sizeof(yfs201_t));
@@ -140,13 +143,13 @@ static int __0054_prepare(void* arg)
                 {
                     ret = -1;
                     ezlopi_device_free_device(flowmeter_device);
-                    free(yfs201_data);
+                    ezlopi_free(__FUNCTION__, yfs201_data);
                 }
             }
             else
             {
                 ret = -1;
-                free(yfs201_data);
+                ezlopi_free(__FUNCTION__, yfs201_data);
             }
         }
     }

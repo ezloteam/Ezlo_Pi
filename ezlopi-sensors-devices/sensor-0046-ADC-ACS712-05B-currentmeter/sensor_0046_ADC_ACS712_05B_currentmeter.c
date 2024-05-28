@@ -12,6 +12,8 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "sensor_0046_ADC_ACS712_05B_currentmeter.h"
+#include "EZLOPI_USER_CONFIG.h"
+
 typedef struct s_currentmeter
 {
     float amp_value;
@@ -76,7 +78,7 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_dev
     item->cloud_properties.scale = scales_ampere;
 
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_str, item->interface.adc.gpio_num);
+    CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_str, item->interface.adc.gpio_num);
     item->interface.adc.resln_bit = 3; // ADC 12_bit
 
     // passing the custom data_structure
@@ -91,7 +93,7 @@ static int __0046_prepare(void* arg)
     s_ezlopi_prep_arg_t* device_prep_arg = (s_ezlopi_prep_arg_t*)arg;
     if (device_prep_arg && (NULL != device_prep_arg->cjson_device))
     {
-        s_currentmeter_t* user_data = (s_currentmeter_t*)malloc(sizeof(s_currentmeter_t));
+        s_currentmeter_t* user_data = (s_currentmeter_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_currentmeter_t));
         if (user_data)
         {
             ret = 1;
@@ -109,13 +111,13 @@ static int __0046_prepare(void* arg)
                 {
                     ret = -1;
                     ezlopi_device_free_device(currentmeter_device);
-                    free(user_data);
+                    ezlopi_free(__FUNCTION__, user_data);
                 }
             }
             else
             {
                 ret = -1;
-                free(user_data);
+                ezlopi_free(__FUNCTION__, user_data);
             }
         }
     }

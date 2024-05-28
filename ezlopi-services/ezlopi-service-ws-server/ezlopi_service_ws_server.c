@@ -7,23 +7,23 @@
    CONDITIONS OF ANY KIND, either express or implied.
 */
 
-#include "cjext.h"
-// #include <esp_log.h>
-#include <esp_eth.h>
-#include <esp_wifi.h>
-#include <esp_event.h>
-#include <sys/param.h>
-#include <esp_netif.h>
-#include <esp_system.h>
-#include <freertos/FreeRTOS.h>
-#include <freertos/task.h>
-#include <freertos/semphr.h>
-#include <esp_http_server.h>
 
 #include "../../build/config/sdkconfig.h"
 
-#include "ezlopi_util_trace.h"
 
+#include "esp_eth.h"
+#include "esp_wifi.h"
+#include "esp_event.h"
+#include "sys/param.h"
+#include "esp_netif.h"
+#include "esp_system.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "freertos/semphr.h"
+#include "esp_http_server.h"
+
+#include "cjext.h"
+#include "ezlopi_util_trace.h"
 #include "ezlopi_cloud_constants.h"
 
 #include "ezlopi_core_api.h"
@@ -36,8 +36,8 @@
 #include "ezlopi_service_ws_server.h"
 #include "ezlopi_service_ws_server_clients.h"
 
+#include "EZLOPI_USER_CONFIG.h"
 
-// #if defined(CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER)
 
 typedef struct s_async_resp_arg
 {
@@ -45,12 +45,12 @@ typedef struct s_async_resp_arg
     httpd_handle_t hd;
 } s_async_resp_arg_t;
 
+static uint32_t __message_counter = 0;
+static httpd_handle_t __ws_handle = NULL;
+static SemaphoreHandle_t __send_lock = NULL;
+static volatile e_ws_status_t __ws_status = WS_STATUS_STOPPED;
 
-static uint32_t message_counter = 0;
-static httpd_handle_t gs_ws_handle = NULL;
-static SemaphoreHandle_t gs_send_lock = NULL;
-static volatile e_ws_status_t gs_ws_status = WS_STATUS_STOPPED;
-
+///////// Static Functions Definations 
 static void __stop_server(void);
 static void __start_server(void);
 static void __wifi_connection_event(esp_event_base_t event, int32_t event_id, void* arg);
@@ -61,12 +61,11 @@ static int __respond_cjson(httpd_req_t* req, cJSON* cj_response);
 static int __ws_server_send(l_ws_server_client_conn_t* client, char* data, uint32_t len);
 
 static esp_err_t __msg_handler(httpd_req_t* req);
-
 static int __ws_server_broadcast(char* data);
 
 e_ws_status_t ezlopi_service_ws_server_status(void)
 {
-    return gs_ws_status;
+    return __ws_status;
 }
 
 void ezlopi_service_ws_server_start(void)
@@ -75,25 +74,25 @@ void ezlopi_service_ws_server_start(void)
 
     if (ezlopi_wifi_got_ip())
     {
-        if (WS_STATUS_STOPPED == gs_ws_status)
+        if (WS_STATUS_STOPPED == __ws_status)
         {
             __start_server();
         }
     }
 
-    if (NULL == gs_send_lock)
+    if (NULL == __send_lock)
     {
-        gs_send_lock = xSemaphoreCreateMutex();
-        if (gs_send_lock)
+        __send_lock = xSemaphoreCreateMutex();
+        if (__send_lock)
         {
-            xSemaphoreGive(gs_send_lock);
+            xSemaphoreGive(__send_lock);
         }
     }
 
     ezlopi_wifi_event_add(__wifi_connection_event, NULL);
     if (ezlopi_wifi_got_ip())
     {
-        if (WS_STATUS_STOPPED == gs_ws_status)
+        if (WS_STATUS_STOPPED == __ws_status)
         {
             __start_server();
         }
@@ -102,25 +101,26 @@ void ezlopi_service_ws_server_start(void)
 
 void ezlopi_service_ws_server_stop(void)
 {
-    if (gs_send_lock)
+    if (__send_lock)
     {
-        if (pdTRUE == xSemaphoreTake(gs_send_lock, portMAX_DELAY))
+        if (pdTRUE == xSemaphoreTake(__send_lock, portMAX_DELAY))
         {
-            vSemaphoreDelete(gs_send_lock);
-            gs_send_lock = NULL;
+            vSemaphoreDelete(__send_lock);
+            __send_lock = NULL;
 
             __stop_server();
         }
     }
 }
 
+///////// Static Functions Definations 
 static int __ws_server_broadcast(char* data)
 {
     int ret = 0;
 
-    if (gs_send_lock && pdTRUE == xSemaphoreTake(gs_send_lock, 5000 / portTICK_RATE_MS))
+    if (__send_lock && pdTRUE == xSemaphoreTake(__send_lock, 5000 / portTICK_RATE_MS))
     {
-        TRACE_S("-----------------------------> acquired send-lock");
+        // TRACE_S("-----------------------------> acquired send-lock");
         if (data)
         {
             ret = 1;
@@ -129,23 +129,23 @@ static int __ws_server_broadcast(char* data)
             while (curr_client)
             {
                 ret = __ws_server_send(curr_client, data, strlen(data));
-                TRACE_D("ret: %d", ret);
+                // TRACE_D("ret: %d", ret);
                 curr_client = curr_client->next;
             }
         }
 
-        if (pdTRUE == xSemaphoreGive(gs_send_lock))
+        if (pdTRUE == xSemaphoreGive(__send_lock))
         {
-            TRACE_S("-----------------------------> released send-lock");
+            // TRACE_S("-----------------------------> released send-lock");
         }
         else
         {
-            TRACE_E("-----------------------------> release send-lock failed!");
+            // TRACE_E("-----------------------------> release send-lock failed!");
         }
     }
     else
     {
-        TRACE_E("-----------------------------> acquire send-lock failed!");
+        // TRACE_E("-----------------------------> acquire send-lock failed!");
     }
 
     return ret;
@@ -153,23 +153,24 @@ static int __ws_server_broadcast(char* data)
 
 static void __message_upcall(httpd_req_t* req, const char* payload, uint32_t payload_len)
 {
-    cJSON* cj_response = ezlopi_core_api_consume(payload, payload_len);
+    cJSON* cj_response = ezlopi_core_api_consume(__FUNCTION__, payload, payload_len);
     if (cj_response)
     {
-        cJSON_AddNumberToObject(cj_response, ezlopi_msg_id_str, message_counter);
+        cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_msg_id_str, __message_counter);
         __respond_cjson(req, cj_response);
-        cJSON_Delete(cj_response);
+        cJSON_Delete(__FUNCTION__, cj_response);
     }
 }
 
 static void __ws_async_send(void* arg)
 {
+#if 1 // def CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER
     static const char* data = "Async data";
     s_async_resp_arg_t* resp_arg = (s_async_resp_arg_t*)arg;
 
     if (resp_arg)
     {
-        if (gs_send_lock && pdTRUE == xSemaphoreTake(gs_send_lock, 5000 / portTICK_RATE_MS))
+        if (__send_lock && pdTRUE == xSemaphoreTake(__send_lock, 5000 / portTICK_RATE_MS))
         {
             httpd_ws_frame_t ws_pkt;
             memset(&ws_pkt, 0, sizeof(httpd_ws_frame_t));
@@ -181,14 +182,15 @@ static void __ws_async_send(void* arg)
             httpd_ws_send_frame_async(resp_arg->hd, resp_arg->fd, &ws_pkt);
         }
 
-        free(resp_arg);
+        ezlopi_free(__FUNCTION__, resp_arg);
     }
+#endif // CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER
 }
 
 static esp_err_t __trigger_async_send(httpd_req_t* req)
 {
     esp_err_t ret = ESP_OK;
-    s_async_resp_arg_t* resp_arg = malloc(sizeof(s_async_resp_arg_t));
+    s_async_resp_arg_t* resp_arg = ezlopi_malloc(__FUNCTION__, sizeof(s_async_resp_arg_t));
 
     if (resp_arg)
     {
@@ -203,15 +205,16 @@ static esp_err_t __trigger_async_send(httpd_req_t* req)
 static esp_err_t __msg_handler(httpd_req_t* req)
 {
     esp_err_t ret = ESP_FAIL;
+#if 1 //def CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER
 
-    if (gs_send_lock && (pdTRUE == xSemaphoreTake(gs_send_lock, 5000 / portTICK_RATE_MS)))
+    if (__send_lock && (pdTRUE == xSemaphoreTake(__send_lock, 5000 / portTICK_RATE_MS)))
     {
         TRACE_S("-----------------------------> acquired send-lock");
 
         if (req->method == HTTP_GET)
         {
             TRACE_I("Handshake done, the new connection was opened, id: %p", req);
-            ezlopi_service_ws_server_clients_add((void*)req->handle, httpd_req_to_sockfd(req));
+            // ezlopi_service_ws_server_clients_add((void*)req->handle, httpd_req_to_sockfd(req));
             ret = ESP_OK;
         }
         else
@@ -236,7 +239,7 @@ static esp_err_t __msg_handler(httpd_req_t* req)
                 }
                 else if (0 < ws_pkt.len)
                 {
-                    buf = malloc(ws_pkt.len + 1);
+                    buf = ezlopi_malloc(__FUNCTION__, ws_pkt.len + 1);
 
                     if (NULL != buf)
                     {
@@ -271,7 +274,7 @@ static esp_err_t __msg_handler(httpd_req_t* req)
                             TRACE_E("httpd_ws_recv_frame failed with %d", ret);
                         }
 
-                        free(buf);
+                        ezlopi_free(__FUNCTION__, buf);
                     }
                     else
                     {
@@ -286,7 +289,7 @@ static esp_err_t __msg_handler(httpd_req_t* req)
             }
         }
 
-        if (pdTRUE == xSemaphoreGive(gs_send_lock))
+        if (pdTRUE == xSemaphoreGive(__send_lock))
         {
             TRACE_S("-----------------------------> released send-lock");
         }
@@ -299,13 +302,14 @@ static esp_err_t __msg_handler(httpd_req_t* req)
     {
         TRACE_E("-----------------------------> acquire send-lock failed!");
     }
-
+#endif // CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER
     return ret;
 }
 
 static void __start_server(void)
 {
-    gs_ws_status = WS_STATUS_STARTED;
+#if 1//def CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER
+    __ws_status = WS_STATUS_STARTED;
 
     static const httpd_uri_t ws = {
         .uri = "/",
@@ -318,43 +322,44 @@ static void __start_server(void)
 
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
 
-    config.server_port = 17001;
-
     config.task_priority = 8;
+    config.server_port = 17001;
     config.stack_size = 1024 * 4;
 
     TRACE_I("Starting ws-server on port: '%d'", config.server_port);
 
-    esp_err_t err = httpd_start(&gs_ws_handle, &config);
+    esp_err_t err = httpd_start(&__ws_handle, &config);
 
     if (ESP_OK == err)
     {
         TRACE_I("Registering URI handlers");
-        if (ESP_OK == httpd_register_uri_handler(gs_ws_handle, &ws))
+        if (ESP_OK == httpd_register_uri_handler(__ws_handle, &ws))
         {
-            gs_ws_status = WS_STATUS_RUNNING;
+            __ws_status = WS_STATUS_RUNNING;
         }
     }
     else
     {
         TRACE_E("Error starting server!, err: %d", err);
     }
+#endif // CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER
 }
 
 static void __stop_server(void)
 {
-    if (gs_ws_handle)
+    if (__ws_handle)
     {
         TRACE_E("stopping ws-server!");
-        httpd_stop(gs_ws_handle);
-        gs_ws_handle = NULL;
-        gs_ws_status = WS_STATUS_STOPPED;
+        httpd_stop(__ws_handle);
+        __ws_handle = NULL;
+        __ws_status = WS_STATUS_STOPPED;
     }
 }
 
 static int __respond_cjson(httpd_req_t* req, cJSON* cj_response)
 {
     int ret = 0;
+#if 1 // def CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER
     if (req && cj_response)
     {
         uint32_t buffer_len = 0;
@@ -365,7 +370,7 @@ static int __respond_cjson(httpd_req_t* req, cJSON* cj_response)
             TRACE_I("-----------------------------> buffer acquired!");
             memset(data_buffer, 0, buffer_len);
 
-            if (cJSON_PrintPreallocated(cj_response, data_buffer, buffer_len, false))
+            if (cJSON_PrintPreallocated(__FUNCTION__, cj_response, data_buffer, buffer_len, false))
             {
                 httpd_ws_frame_t data_frame = {
                     .final = false,
@@ -379,7 +384,7 @@ static int __respond_cjson(httpd_req_t* req, cJSON* cj_response)
 
                 if (ret)
                 {
-                    message_counter++;
+                    __message_counter++;
                     TRACE_S("## WSS-SENDING >>>>>>>>>>\r\n%s", data_buffer);
                 }
                 else
@@ -396,13 +401,14 @@ static int __respond_cjson(httpd_req_t* req, cJSON* cj_response)
             TRACE_E("-----------------------------> buffer acquired failed!");
         }
     }
-
+#endif // CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER
     return ret;
 }
 
 static int __ws_server_send(l_ws_server_client_conn_t* client, char* data, uint32_t len)
 {
     int ret = 0;
+#if 1 //def CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER
     if (data && len && client && client->http_handle)
     {
         httpd_ws_frame_t frm_pkt;
@@ -420,7 +426,7 @@ static int __ws_server_send(l_ws_server_client_conn_t* client, char* data, uint3
         {
             ret = 1;
             client->fail_count = 0;
-            message_counter++;
+            __message_counter++;
 
             TRACE_S("## WSS-SENDING done >>>>>>>>>>>>>>>>>>>\r\n%s", data);
         }
@@ -438,7 +444,7 @@ static int __ws_server_send(l_ws_server_client_conn_t* client, char* data, uint3
             }
         }
     }
-
+#endif // CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER
     return ret;
 }
 
@@ -450,7 +456,7 @@ static void __wifi_connection_event(esp_event_base_t event_base, int32_t event_i
     {
         if (IP_EVENT_STA_GOT_IP == event_id)
         {
-            if (WS_STATUS_STOPPED == gs_ws_status)
+            if (WS_STATUS_STOPPED == __ws_status)
             {
                 __start_server();
             }
@@ -469,10 +475,10 @@ static void __wifi_connection_event(esp_event_base_t event_base, int32_t event_i
     }
 }
 
-
-// #endif // CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER
-
 void ezlpi_service_ws_server_dummy(void)
 {
-    TRACE_D("I'm dummy");
+    TRACE_D("I'm dummy. I do nothing.");
 }
+
+///////// Global Functions Definations
+

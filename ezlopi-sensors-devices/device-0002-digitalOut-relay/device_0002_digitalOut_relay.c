@@ -1,4 +1,4 @@
-#include "sdkconfig.h"
+#include "../../build/config/sdkconfig.h"
 #include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_timer.h"
@@ -86,7 +86,7 @@ static void __setup_item_properties(l_ezlopi_item_t* item, cJSON* cjson_device)
     CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_dev_type_str, item->interface_type);
 
     CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_is_ip_str, item->interface.gpio.gpio_in.enable);
-    CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_gpio_in_str, item->interface.gpio.gpio_in.gpio_num);
+    CJSON_GET_VALUE_GPIO(cjson_device, ezlopi_gpio_in_str, item->interface.gpio.gpio_in.gpio_num);
     CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_ip_inv_str, item->interface.gpio.gpio_in.invert);
     CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_val_ip_str, item->interface.gpio.gpio_in.value);
     CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_pullup_ip_str, tmp_var);
@@ -95,6 +95,7 @@ static void __setup_item_properties(l_ezlopi_item_t* item, cJSON* cjson_device)
 
     item->interface.gpio.gpio_out.enable = true;
     CJSON_GET_VALUE_GPIO(cjson_device, ezlopi_gpio_out_str, item->interface.gpio.gpio_out.gpio_num);
+
     CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_op_inv_str, item->interface.gpio.gpio_out.invert);
     CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_val_op_str, item->interface.gpio.gpio_out.value);
     CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_pullup_op_str, tmp_var);
@@ -138,7 +139,7 @@ static int __init(l_ezlopi_item_t* item)
     int ret = 0;
     if (item)
     {
-        if (GPIO_IS_VALID_OUTPUT_GPIO(item->interface.gpio.gpio_out.gpio_num) &&
+        if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_out.gpio_num) &&
             (255 != item->interface.gpio.gpio_out.gpio_num))
         {
             const gpio_config_t io_conf = {
@@ -154,7 +155,6 @@ static int __init(l_ezlopi_item_t* item)
                                     : GPIO_PULLDOWN_DISABLE,
                 .intr_type = GPIO_INTR_DISABLE,
             };
-
             if (0 == gpio_config(&io_conf))
             {
                 // digital_io_write_gpio_value(item);
@@ -237,7 +237,7 @@ static int __set_value(l_ezlopi_item_t* item, void* arg)
             CJSON_TRACE("cjson_params", cjson_params);
 
             int value = 0;
-            cJSON* cj_value = cJSON_GetObjectItem(cjson_params, ezlopi_value_str);
+            cJSON* cj_value = cJSON_GetObjectItem(__FUNCTION__, cjson_params, ezlopi_value_str);
             if (cj_value)
             {
                 switch (cj_value->type)
@@ -265,10 +265,11 @@ static int __set_value(l_ezlopi_item_t* item, void* arg)
 
             if (255 != item->interface.gpio.gpio_out.gpio_num)
             {
-                if (GPIO_IS_VALID_OUTPUT_GPIO(item->interface.gpio.gpio_out.gpio_num))
+                if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_out.gpio_num))
                 {
                     __set_gpio_value(item, value);
                     ezlopi_device_value_updated_from_device_broadcast(item);
+                    ret = 1;
                 }
             }
             else
@@ -286,6 +287,7 @@ static int __set_value(l_ezlopi_item_t* item, void* arg)
                             TRACE_D("value: %d", value);
                             __set_gpio_value(curr_item, value);
                             ezlopi_device_value_updated_from_device_broadcast(curr_item);
+                            ret = 1;
                         }
                         curr_item = curr_item->next;
                     }

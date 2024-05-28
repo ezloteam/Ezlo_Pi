@@ -70,15 +70,11 @@ int sensor_0026_ADC_LDR(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* 
 
 static void __setup_device_cloud_params(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    // char* device_name = NULL;
-    // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    // ASSIGN_DEVICE_NAME_V2(device, device_name);
-
-    device->cloud_properties.category = category_light_sensor;
-    device->cloud_properties.subcategory = subcategory_not_defined;
-    device->cloud_properties.device_type = dev_type_device;
     device->cloud_properties.info = NULL;
     device->cloud_properties.device_type_id = NULL;
+    device->cloud_properties.device_type = dev_type_device;
+    device->cloud_properties.category = category_light_sensor;
+    device->cloud_properties.subcategory = subcategory_not_defined;
 }
 
 static void __setup_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device)
@@ -95,7 +91,7 @@ static void __setup_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_devic
 
         item->interface_type = EZLOPI_DEVICE_INTERFACE_ANALOG_INPUT;
         item->interface.adc.resln_bit = 3;
-        CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_str, item->interface.adc.gpio_num);
+        CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_str, item->interface.adc.gpio_num);
     }
 }
 
@@ -165,21 +161,21 @@ static int _get_item_list(l_ezlopi_item_t* item, void* arg)
     cJSON* cj_result = (cJSON*)arg;
     if (cj_result && item)
     {
-        cJSON* json_array_enum = cJSON_CreateArray();
+        cJSON* json_array_enum = cJSON_CreateArray(__FUNCTION__);
         if (NULL != json_array_enum)
         {
             for (uint8_t i = 0; i < LIGHT_ALARM_MAX; i++)
             {
-                cJSON* json_value = cJSON_CreateString(light_alarm_states[i]);
+                cJSON* json_value = cJSON_CreateString(__FUNCTION__, light_alarm_states[i]);
                 if (NULL != json_value)
                 {
                     cJSON_AddItemToArray(json_array_enum, json_value);
                 }
             }
-            cJSON_AddItemToObject(cj_result, ezlopi_enum_str, json_array_enum);
+            cJSON_AddItemToObject(__FUNCTION__, cj_result, ezlopi_enum_str, json_array_enum);
         }
-        cJSON_AddStringToObject(cj_result, ezlopi_value_str, ((char*)item->user_arg) ? item->user_arg : light_alarm_states[0]);
-        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, ((char*)item->user_arg) ? item->user_arg : light_alarm_states[0]);
+        cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, ((char*)item->user_arg) ? item->user_arg : light_alarm_states[0]);
+        cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, ((char*)item->user_arg) ? item->user_arg : light_alarm_states[0]);
         ret = 1;
     }
 
@@ -192,8 +188,8 @@ static int __get_value_cjson(l_ezlopi_item_t* item, void* arg)
     cJSON* cj_result = (cJSON*)arg;
     if (cj_result && item)
     {
-        cJSON_AddStringToObject(cj_result, ezlopi_value_str, ((char*)item->user_arg) ? item->user_arg : light_alarm_states[0]);
-        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, ((char*)item->user_arg) ? item->user_arg : light_alarm_states[0]);
+        cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, ((char*)item->user_arg) ? item->user_arg : light_alarm_states[0]);
+        cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, ((char*)item->user_arg) ? item->user_arg : light_alarm_states[0]);
         ret = 1;
     }
     return ret;

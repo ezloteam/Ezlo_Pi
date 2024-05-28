@@ -1,3 +1,7 @@
+#include "../../build/config/sdkconfig.h"
+
+#ifdef CONFIG_EZPI_BLE_ENABLE
+
 #include <string.h>
 
 #include "ezlopi_util_trace.h"
@@ -6,6 +10,7 @@
 #include "ezlopi_core_ble_profile.h"
 
 #include "ezlopi_cloud_constants.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 static uint8_t adv_config_done = 0;
 #define ADV_CONFIG_FLAG (1 << 0)
@@ -71,7 +76,7 @@ static char* ezlopi_ble_gap_event_to_str(esp_gap_ble_cb_event_t event);
 #endif
 // static void ezlopi_ble_setup_adv_config(void);
 
-#if (1 == CONFIG_EZLOPI_BLE_ENALBE_PASSKEY)
+#if (1 == CONFIG_EZPI_BLE_ENALBE_PASSKEY)
 void ezlopi_ble_gap_set_passkey(uint32_t passkey)
 {
     esp_ble_gap_set_security_param(ESP_BLE_SM_SET_STATIC_PASSKEY, &passkey, sizeof(uint32_t));
@@ -132,7 +137,7 @@ void ezlopi_ble_gap_dissociate_bonded_devices(void)
 {
     int dev_num = esp_ble_get_bond_device_num();
 
-    esp_ble_bond_dev_t* dev_list = (esp_ble_bond_dev_t*)malloc(sizeof(esp_ble_bond_dev_t) * dev_num);
+    esp_ble_bond_dev_t* dev_list = (esp_ble_bond_dev_t*)ezlopi_malloc(__FUNCTION__, sizeof(esp_ble_bond_dev_t) * dev_num);
     if (dev_list)
     {
         esp_ble_get_bond_device_list(&dev_num, dev_list);
@@ -146,7 +151,7 @@ void ezlopi_ble_gap_dissociate_bonded_devices(void)
             esp_ble_remove_bond_device(dev_list[i].bd_addr);
         }
 
-        free(dev_list);
+        ezlopi_free(__FUNCTION__, dev_list);
     }
 }
 
@@ -220,7 +225,7 @@ void ezlopi_ble_gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_p
         break;
     }
 
-#if (1 == CONFIG_EZLOPI_BLE_ENALBE_PAIRING)
+#if (1 == CONFIG_EZPI_BLE_ENALBE_PAIRING)
     case ESP_GAP_BLE_PASSKEY_REQ_EVT: // 12
     {
         break;
@@ -308,7 +313,7 @@ void ezlopi_ble_gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_p
         ezlopi_ble_setup_adv_config();
         break;
     }
-#if (1 == CONFIG_EZLOPI_BLE_ENALBE_PAIRING)
+#if (1 == CONFIG_EZPI_BLE_ENALBE_PAIRING)
     case ESP_GAP_BLE_SET_LOCAL_PRIVACY_COMPLETE_EVT: // 22
     {
         ezlopi_ble_setup_adv_config();
@@ -805,7 +810,7 @@ static void show_bonded_devices(void)
 {
     int dev_num = esp_ble_get_bond_device_num();
 
-    esp_ble_bond_dev_t* dev_list = (esp_ble_bond_dev_t*)malloc(sizeof(esp_ble_bond_dev_t) * dev_num);
+    esp_ble_bond_dev_t* dev_list = (esp_ble_bond_dev_t*)ezlopi_malloc(__FUNCTION__, sizeof(esp_ble_bond_dev_t) * dev_num);
     if (dev_list)
     {
         esp_ble_get_bond_device_list(&dev_num, dev_list);
@@ -817,7 +822,7 @@ static void show_bonded_devices(void)
             // dump("dev_list[i].bd_addr", dev_list[i].bd_addr, 0, sizeof(esp_bd_addr_t));
         }
 
-        free(dev_list);
+        ezlopi_free(__FUNCTION__, dev_list);
     }
 }
 #endif // 1 == ENABLE_TRACE
@@ -832,7 +837,7 @@ static void ezlopi_ble_setup_service_uuid(void)
 
     if (all_service_uuid_len)
     {
-        all_service_uuid = malloc(all_service_uuid_len);
+        all_service_uuid = ezlopi_malloc(__FUNCTION__, all_service_uuid_len);
         if (all_service_uuid)
         {
             int uuid_pos = 0;
@@ -848,3 +853,4 @@ static void ezlopi_ble_setup_service_uuid(void)
 
     // dump("complete-uuid", (all_service_uuid ? (void *)all_service_uuid : (void *)ezlopi__str), 0, all_service_uuid_len);
 }
+#endif // CONFIG_EZPI_BLE_ENABLE

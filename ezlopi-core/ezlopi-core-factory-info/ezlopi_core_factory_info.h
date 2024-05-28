@@ -6,8 +6,10 @@ extern "C"
 {
 #endif
 
+#include <esp_partition.h>
+
+#include "cjext.h"
 #include "EZLOPI_USER_CONFIG.h"
-#include "esp_partition.h"
 
 
 #define EZLOPI_DEVICE_TYPE_TEST_DEVICE -1
@@ -28,6 +30,7 @@ extern "C"
 #define EZLOPI_FINFO_OFFSET_HUB_DATA 0x6000
 
 #define EZLOPI_FINFO_READ_LEN_4KB 4096
+
     typedef enum e_factory_info_v3_partition_type
     {
         E_EZLOPI_FACTORY_INFO_CONN_DATA,
@@ -130,9 +133,15 @@ extern "C"
     char* ezlopi_factory_info_v3_get_ezlopi_mac(void);
     char* ezlopi_factory_info_v3_get_cloud_server(void);
     const char* ezlopi_factory_info_v3_get_device_type(void);
+
+    void ezlopi_factory_info_v3_free_ca_certificate(void);
+    void ezlopi_factory_info_v3_free_ssl_private_key(void);
+    void  ezlopi_factory_info_v3_free_ssl_shared_key(void);
+
     char* ezlopi_factory_info_v3_get_ca_certificate(void);
     char* ezlopi_factory_info_v3_get_ssl_private_key(void);
     char* ezlopi_factory_info_v3_get_ssl_shared_key(void);
+
     char* ezlopi_factory_info_v3_get_ezlopi_config(void);
     char* ezlopi_factory_info_get_v3_provision_token(void);
     char* ezlopi_factory_info_v3_get_provisioning_server(void);
@@ -141,11 +150,12 @@ extern "C"
     int ezlopi_factory_info_v3_set_wifi(char* ssid, char* password);
 
     int ezlopi_factory_info_v3_set_basic(s_basic_factory_info_t* ezlopi_config_basic);
-    int ezlopi_factory_info_v3_set_ezlopi_config(const char* data);
-    int ezlopi_factory_info_v3_set_ca_cert(const char* data);
-    int ezlopi_factory_info_v3_set_ssl_shared_key(const char* data);
-    int ezlopi_factory_info_v3_set_ssl_public_key(const char* data);
-    int ezlopi_factory_info_v3_set_ssl_private_key(const char* data);
+
+    int ezlopi_factory_info_v3_set_ezlopi_config(cJSON * cj_data);
+    int ezlopi_factory_info_v3_set_ca_cert(cJSON * cj_data);
+    int ezlopi_factory_info_v3_set_ssl_shared_key(cJSON * cj_data);
+    int ezlopi_factory_info_v3_set_ssl_public_key(cJSON * cj_data);
+    int ezlopi_factory_info_v3_set_ssl_private_key(cJSON * cj_data);
 
     void ezlopi_factory_info_v3_free(void* arg);
     int ezlopi_factory_info_v3_factory_reset(void);
@@ -157,31 +167,14 @@ extern "C"
 #if (EZLOPI_DEVICE_TYPE_GENERIC == EZLOPI_DEVICE_TYPE)
 
 #elif (EZLOPI_DEVICE_TYPE_TEST_DEVICE == EZLOPI_DEVICE_TYPE)
-    static const char* ezlopi_config_test =
-        "{\
-        \"cmd\": 3,\
-        \"dev_detail\":\
-        [\
-            {\
-                \"dev_type\": 7,\
-                \"dev_name\": \"Temp Hum\",\
-                \"id_room\": \"\",\
-                \"id_item\": 16,\
-                \"gpio\": 18\
-            },\
-            {\
-                \"dev_type\": 3,\
-                \"dev_name\": \"POT\",\
-                \"id_room\": \"\",\
-                \"id_item\": 70,\
-                \"gpio\": 5,\
-                \"resln_bit\": 3\
-            }\
-        ], \
-        \"dev_total\": 5}";
+#if defined(CONFIG_IDF_TARGET_ESP32)
+    static const char* ezlopi_config_test = "{\"cmd\":3,\"dev_detail\":[{\"dev_type\":1,\"dev_name\":\"switch_temp\",\"id_room\":\"\",\"id_item\":2,\"gpio_in\":0,\"gpio_out\":25,\"pullup_ip\":false,\"pullup_op\":false,\"is_ip\":false,\"ip_inv\":false,\"op_inv\":false,\"val_ip\":false,\"val_op\":false},{\"dev_type\":7,\"dev_name\":\"temp_humi\",\"id_room\":\"\",\"id_item\":16,\"gpio\":12}],\"config_id\":\"1234567\",\"config_time\":1696508363,\"config_name\":\"My moisture sensor\",\"chipset\":\"ESP32\"}";
+#elif defined (CONFIG_IDF_TARGET_ESP32S3)
+    static const char* ezlopi_config_test = "{\"cmd\":3,\"dev_detail\":[{\"dev_type\":7,\"dev_name\":\"Temp Hum\",\"id_room\":\"\",\"id_item\":16,\"gpio\":18},{\"dev_type\":3,\"dev_name\":\"POT\",\"id_room\":\"\",\"id_item\":70,\"gpio\":5,\"resln_bit\":3}],\"chipset\":\"ESP32S3\"}";
+#elif defined(CONFIG_IDF_TARGET_ESP32C3)
+    static const char* ezlopi_config_test = "{\"cmd\":3,\"dev_detail\":[{\"dev_type\":1,\"dev_name\":\"switch_temp\",\"id_room\":\"\",\"id_item\":2,\"gpio_in\":0,\"gpio_out\":25,\"pullup_ip\":false,\"pullup_op\":false,\"is_ip\":false,\"ip_inv\":false,\"op_inv\":false,\"val_ip\":false,\"val_op\":false},{\"dev_type\":7,\"dev_name\":\"temp_humi\",\"id_room\":\"\",\"id_item\":16,\"gpio\":12}],\"config_id\":\"1234567\",\"config_time\":1696508363,\"config_name\":\"My moisture sensor\",\"chipset\":\"ESP32C3\"}";
+#endif 
 #endif
-
-
 
 #ifdef __cplusplus
 }

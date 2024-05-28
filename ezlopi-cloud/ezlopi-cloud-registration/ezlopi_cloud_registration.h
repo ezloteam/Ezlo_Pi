@@ -12,7 +12,7 @@ extern "C"
     void registration_init(void);
     void register_repeat(cJSON* cj_request, cJSON* cj_response);
     void registered(cJSON* cj_request, cJSON* cj_response);
-
+    void ezpi_cloud_dummy(void);
 #ifdef __cplusplus
 }
 #endif

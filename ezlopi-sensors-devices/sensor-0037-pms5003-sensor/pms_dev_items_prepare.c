@@ -10,6 +10,7 @@
 
 #include "pms5003.h"
 #include "sensor_0037_pms5003_sensor.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 // Device 0
 static int __prepare_particulate_matter_particles_0_dot_3_um_device_and_items(cJSON *cj_properties, uint32_t *parent_id, void *user_arg)
@@ -41,8 +42,8 @@ static int __prepare_particulate_matter_particles_0_dot_3_um_device_and_items(cJ
 
             particles_0_dot_3_um_item->interface_type = EZLOPI_DEVICE_INTERFACE_UART;
             particles_0_dot_3_um_item->interface.uart.enable = true;
-            CJSON_GET_VALUE_DOUBLE(cj_properties, ezlopi_gpio1_str, particles_0_dot_3_um_item->interface.uart.tx);
-            CJSON_GET_VALUE_DOUBLE(cj_properties, ezlopi_gpio2_str, particles_0_dot_3_um_item->interface.uart.rx);
+            CJSON_GET_VALUE_GPIO(cj_properties, ezlopi_gpio1_str, particles_0_dot_3_um_item->interface.uart.tx);
+            CJSON_GET_VALUE_GPIO(cj_properties, ezlopi_gpio2_str, particles_0_dot_3_um_item->interface.uart.rx);
             particles_0_dot_3_um_item->interface.uart.baudrate = 9600;
 
             particles_0_dot_3_um_item->user_arg = user_arg;
@@ -91,8 +92,8 @@ static int __prepare_particulate_matter_particles_0_dot_5_um_device_and_items(cJ
 
             particles_0_dot_5_um_item->interface_type = EZLOPI_DEVICE_INTERFACE_UART;
             particles_0_dot_5_um_item->interface.uart.enable = false;
-            CJSON_GET_VALUE_DOUBLE(cj_properties, ezlopi_gpio1_str, particles_0_dot_5_um_item->interface.uart.tx);
-            CJSON_GET_VALUE_DOUBLE(cj_properties, ezlopi_gpio2_str, particles_0_dot_5_um_item->interface.uart.rx);
+            CJSON_GET_VALUE_GPIO(cj_properties, ezlopi_gpio1_str, particles_0_dot_5_um_item->interface.uart.tx);
+            CJSON_GET_VALUE_GPIO(cj_properties, ezlopi_gpio2_str, particles_0_dot_5_um_item->interface.uart.rx);
             particles_0_dot_5_um_item->interface.uart.baudrate = 9600;
 
             particles_0_dot_5_um_item->user_arg = user_arg;
@@ -140,8 +141,8 @@ static int __prepare_particulate_matter_particles_1_um_device_and_items(cJSON *c
 
             particles_1_um_item->interface_type = EZLOPI_DEVICE_INTERFACE_UART;
             particles_1_um_item->interface.uart.enable = false;
-            CJSON_GET_VALUE_DOUBLE(cj_properties, ezlopi_gpio1_str, particles_1_um_item->interface.uart.tx);
-            CJSON_GET_VALUE_DOUBLE(cj_properties, ezlopi_gpio2_str, particles_1_um_item->interface.uart.rx);
+            CJSON_GET_VALUE_GPIO(cj_properties, ezlopi_gpio1_str, particles_1_um_item->interface.uart.tx);
+            CJSON_GET_VALUE_GPIO(cj_properties, ezlopi_gpio2_str, particles_1_um_item->interface.uart.rx);
             particles_1_um_item->interface.uart.baudrate = 9600;
 
             particles_1_um_item->user_arg = user_arg;
@@ -189,8 +190,8 @@ static int __prepare_particulate_matter_particles_2_dot_5_um_device_and_items(cJ
 
             particles_2_dot_5_um_item->interface_type = EZLOPI_DEVICE_INTERFACE_UART;
             particles_2_dot_5_um_item->interface.uart.enable = false;
-            CJSON_GET_VALUE_DOUBLE(cj_properties, ezlopi_gpio1_str, particles_2_dot_5_um_item->interface.uart.tx);
-            CJSON_GET_VALUE_DOUBLE(cj_properties, ezlopi_gpio2_str, particles_2_dot_5_um_item->interface.uart.rx);
+            CJSON_GET_VALUE_GPIO(cj_properties, ezlopi_gpio1_str, particles_2_dot_5_um_item->interface.uart.tx);
+            CJSON_GET_VALUE_GPIO(cj_properties, ezlopi_gpio2_str, particles_2_dot_5_um_item->interface.uart.rx);
             particles_2_dot_5_um_item->interface.uart.baudrate = 9600;
 
             particles_2_dot_5_um_item->user_arg = user_arg;
@@ -238,8 +239,8 @@ static int __prepare_particulate_matter_particles_5_um_device_and_items(cJSON *c
 
             particles_5_um_item->interface_type = EZLOPI_DEVICE_INTERFACE_UART;
             particles_5_um_item->interface.uart.enable = false;
-            CJSON_GET_VALUE_DOUBLE(cj_properties, ezlopi_gpio1_str, particles_5_um_item->interface.uart.tx);
-            CJSON_GET_VALUE_DOUBLE(cj_properties, ezlopi_gpio2_str, particles_5_um_item->interface.uart.rx);
+            CJSON_GET_VALUE_GPIO(cj_properties, ezlopi_gpio1_str, particles_5_um_item->interface.uart.tx);
+            CJSON_GET_VALUE_GPIO(cj_properties, ezlopi_gpio2_str, particles_5_um_item->interface.uart.rx);
             particles_5_um_item->interface.uart.baudrate = 9600;
 
             particles_5_um_item->user_arg = user_arg;
@@ -287,8 +288,8 @@ static int __prepare_particulate_matter_particles_10_um_device_and_items(cJSON *
 
             particles_10_um_item->interface_type = EZLOPI_DEVICE_INTERFACE_UART;
             particles_10_um_item->interface.uart.enable = false;
-            CJSON_GET_VALUE_DOUBLE(cj_properties, ezlopi_gpio1_str, particles_10_um_item->interface.uart.tx);
-            CJSON_GET_VALUE_DOUBLE(cj_properties, ezlopi_gpio2_str, particles_10_um_item->interface.uart.rx);
+            CJSON_GET_VALUE_GPIO(cj_properties, ezlopi_gpio1_str, particles_10_um_item->interface.uart.tx);
+            CJSON_GET_VALUE_GPIO(cj_properties, ezlopi_gpio2_str, particles_10_um_item->interface.uart.rx);
             particles_10_um_item->interface.uart.baudrate = 9600;
 
             particles_10_um_item->user_arg = user_arg;
@@ -336,8 +337,8 @@ static int __prepare_particulate_matter_standard_particles_1_um_device_and_items
 
             standard_particles_1_um_item->interface_type = EZLOPI_DEVICE_INTERFACE_UART;
             standard_particles_1_um_item->interface.uart.enable = false;
-            CJSON_GET_VALUE_DOUBLE(cj_properties, ezlopi_gpio1_str, standard_particles_1_um_item->interface.uart.tx);
-            CJSON_GET_VALUE_DOUBLE(cj_properties, ezlopi_gpio2_str, standard_particles_1_um_item->interface.uart.rx);
+            CJSON_GET_VALUE_GPIO(cj_properties, ezlopi_gpio1_str, standard_particles_1_um_item->interface.uart.tx);
+            CJSON_GET_VALUE_GPIO(cj_properties, ezlopi_gpio2_str, standard_particles_1_um_item->interface.uart.rx);
             standard_particles_1_um_item->interface.uart.baudrate = 9600;
 
             standard_particles_1_um_item->user_arg = user_arg;
@@ -385,8 +386,8 @@ static int __prepare_particulate_matter_standard_particles_2_dot_5_um_device_and
 
             standard_particles_2_dot_5_um_item->interface_type = EZLOPI_DEVICE_INTERFACE_UART;
             standard_particles_2_dot_5_um_item->interface.uart.enable = false;
-            CJSON_GET_VALUE_DOUBLE(cj_properties, ezlopi_gpio1_str, standard_particles_2_dot_5_um_item->interface.uart.tx);
-            CJSON_GET_VALUE_DOUBLE(cj_properties, ezlopi_gpio2_str, standard_particles_2_dot_5_um_item->interface.uart.rx);
+            CJSON_GET_VALUE_GPIO(cj_properties, ezlopi_gpio1_str, standard_particles_2_dot_5_um_item->interface.uart.tx);
+            CJSON_GET_VALUE_GPIO(cj_properties, ezlopi_gpio2_str, standard_particles_2_dot_5_um_item->interface.uart.rx);
             standard_particles_2_dot_5_um_item->interface.uart.baudrate = 9600;
 
             standard_particles_2_dot_5_um_item->user_arg = user_arg;
@@ -434,8 +435,8 @@ static int __prepare_particulate_matter_standard_particles_10_um_device_and_item
 
             standard_particles_10_um_item->interface_type = EZLOPI_DEVICE_INTERFACE_UART;
             standard_particles_10_um_item->interface.uart.enable = false;
-            CJSON_GET_VALUE_DOUBLE(cj_properties, ezlopi_gpio1_str, standard_particles_10_um_item->interface.uart.tx);
-            CJSON_GET_VALUE_DOUBLE(cj_properties, ezlopi_gpio2_str, standard_particles_10_um_item->interface.uart.rx);
+            CJSON_GET_VALUE_GPIO(cj_properties, ezlopi_gpio1_str, standard_particles_10_um_item->interface.uart.tx);
+            CJSON_GET_VALUE_GPIO(cj_properties, ezlopi_gpio2_str, standard_particles_10_um_item->interface.uart.rx);
             standard_particles_10_um_item->interface.uart.baudrate = 9600;
 
             standard_particles_10_um_item->user_arg = user_arg;
@@ -482,7 +483,7 @@ int pms5003_sensor_preapre_devices_and_items(cJSON *cj_properties, uint32_t *par
 {
     int ret = 0;
 
-    s_pms5003_sensor_object *pms_object = (s_pms5003_sensor_object *)malloc(sizeof(s_pms5003_sensor_object));
+    s_pms5003_sensor_object *pms_object = (s_pms5003_sensor_object *)ezlopi_malloc(__FUNCTION__, sizeof(s_pms5003_sensor_object));
     if (pms_object)
     {
         pms5003_set_pms_object_details(cj_properties, pms_object);

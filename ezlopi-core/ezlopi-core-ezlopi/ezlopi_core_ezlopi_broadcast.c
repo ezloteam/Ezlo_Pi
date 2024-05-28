@@ -11,6 +11,7 @@
 #include "ezlopi_util_trace.h"
 #include "ezlopi_core_buffer.h"
 #include "ezlopi_core_ezlopi_broadcast.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 // static uint32_t __message_count = 0;
 static l_broadcast_method_t* __method_head = NULL;
@@ -31,8 +32,38 @@ int ezlopi_core_ezlopi_broadcast_add_to_queue(cJSON* cj_data)
     {
         ret = __broadcast_queue_func(cj_data);
     }
+    else
+    {
+        TRACE_E("cj_data: %p, __broadcast_queue_func: %p", cj_data, __broadcast_queue_func);
+    }
     return ret;
 }
+#if 0
+int ezlopi_core_broadcast_log_cjson(cJSON* cj_log_data)
+{
+    int ret = 0;
+
+    if (cj_log_data)
+    {
+        uint32_t buffer_len = 0;
+        char* data_buffer = ezlopi_core_buffer_acquire(&buffer_len, 5000);
+
+        if (data_buffer && buffer_len)
+        {
+            memset(data_buffer, 0, buffer_len);
+
+            if (true == cJSON_PrintPreallocated(__FUNCTION__, cj_log_data, data_buffer, buffer_len, false))
+            {
+                ret = __call_broadcast_methods(data_buffer);
+            }
+
+            ezlopi_core_buffer_release();
+        }
+    }
+
+    return ret;
+}
+#endif 
 
 int ezlopi_core_ezlopi_broadcast_cjson(cJSON* cj_data)
 {
@@ -48,7 +79,7 @@ int ezlopi_core_ezlopi_broadcast_cjson(cJSON* cj_data)
             TRACE_I("-----------------------------> buffer acquired!");
             memset(data_buffer, 0, buffer_len);
 
-            if (true == cJSON_PrintPreallocated(cj_data, data_buffer, buffer_len, false))
+            if (true == cJSON_PrintPreallocated(__FUNCTION__, cj_data, data_buffer, buffer_len, false))
             {
                 TRACE_D("----------------- broadcasting:\r\n%s", data_buffer);
                 ret = __call_broadcast_methods(data_buffer);
@@ -68,24 +99,39 @@ int ezlopi_core_ezlopi_broadcast_cjson(cJSON* cj_data)
 
 l_broadcast_method_t* ezlopi_core_ezlopi_broadcast_method_add(f_broadcast_method_t broadcast_method, char* method_name, uint32_t retries)
 {
-    l_broadcast_method_t* ret = __method_create(broadcast_method, method_name, retries);
+    int duplicate_method = 0;
+    l_broadcast_method_t* ret = NULL;
+    l_broadcast_method_t* curr_node = __method_head;
 
-    if (ret)
+    while (curr_node)
     {
-        if (__method_head)
+        if (broadcast_method == curr_node->func)
         {
-            l_broadcast_method_t* curr_node = __method_head;
-
-            while (curr_node->next)
-            {
-                curr_node = curr_node->next;
-            }
-
-            curr_node->next = ret;
+            duplicate_method = 1;
         }
-        else
+        curr_node = curr_node->next;
+    }
+
+    if (0 == duplicate_method)
+    {
+        ret = __method_create(broadcast_method, method_name, retries);
+        if (ret)
         {
-            __method_head = ret;
+            if (__method_head)
+            {
+                l_broadcast_method_t* curr_node = __method_head;
+
+                while (curr_node->next)
+                {
+                    curr_node = curr_node->next;
+                }
+
+                curr_node->next = ret;
+            }
+            else
+            {
+                __method_head = ret;
+            }
         }
     }
 
@@ -100,7 +146,7 @@ void ezlopi_core_ezlopi_broadcast_remove_method(f_broadcast_method_t broadcast_m
         {
             l_broadcast_method_t* remove_node = __method_head;
             __method_head = __method_head->next;
-            free(remove_node);
+            ezlopi_free(__FUNCTION__, remove_node);
         }
         else
         {
@@ -111,7 +157,7 @@ void ezlopi_core_ezlopi_broadcast_remove_method(f_broadcast_method_t broadcast_m
                 {
                     l_broadcast_method_t* remove_node = curr_node->next;
                     curr_node->next = curr_node->next->next;
-                    free(remove_node);
+                    ezlopi_free(__FUNCTION__, remove_node);
 
                     break;
                 }
@@ -159,7 +205,7 @@ static l_broadcast_method_t* __method_create(f_broadcast_method_t method, char* 
 
     if (method)
     {
-        method_node = malloc(sizeof(l_broadcast_method_t));
+        method_node = ezlopi_malloc(__FUNCTION__, sizeof(l_broadcast_method_t));
 
         if (method_node)
         {

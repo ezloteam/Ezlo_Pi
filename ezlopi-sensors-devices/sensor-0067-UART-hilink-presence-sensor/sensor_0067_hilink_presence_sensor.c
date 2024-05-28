@@ -1,5 +1,5 @@
 #include <string.h>
-#include "sdkconfig.h"
+#include "../../build/config/sdkconfig.h"
 #include "ezlopi_util_trace.h"
 
 #include "ld2410.h"
@@ -15,6 +15,7 @@
 
 #include "sensor_0067_hilink_presence_sensor.h"
 #include "hilink_presence_sensor_setting.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 static const char* hilink_presence_sensor_motion_direction_enum[] = {
     "unknown",
@@ -140,8 +141,8 @@ static int __add_array_to_object(cJSON* cj_params, const char* const* arr, const
     int ret = 0;
     if (cj_params && arr)
     {
-        cJSON* enum_array = cJSON_CreateStringArray(arr, count);
-        cJSON_AddItemToObject(cj_params, "enum", enum_array);
+        cJSON* enum_array = cJSON_CreateStringArray(__FUNCTION__, arr, count);
+        cJSON_AddItemToObject(__FUNCTION__, cj_params, "enum", enum_array);
     }
     else
     {
@@ -164,8 +165,8 @@ static int __add_value_to_cjson(l_ezlopi_item_t* item, cJSON* cj_params, bool is
             {
                 motion = true;
             }
-            cJSON_AddBoolToObject(cj_params, ezlopi_valueFormatted_str, motion);
-            cJSON_AddBoolToObject(cj_params, ezlopi_value_str, motion);
+            cJSON_AddBoolToObject(__FUNCTION__, cj_params, ezlopi_valueFormatted_str, motion);
+            cJSON_AddBoolToObject(__FUNCTION__, cj_params, ezlopi_value_str, motion);
         }
         else if (ezlopi_item_name_motion_direction == item->cloud_properties.item_name)
         {
@@ -173,13 +174,13 @@ static int __add_value_to_cjson(l_ezlopi_item_t* item, cJSON* cj_params, bool is
             {
                 ESP_ERROR_CHECK(__add_array_to_object(cj_params, hilink_presence_sensor_motion_direction_enum, 4));
             }
-            cJSON_AddStringToObject(cj_params, ezlopi_valueFormatted_str, hilink_presence_sensor_motion_direction_enum[hilink_data->direction + 1]);
-            cJSON_AddStringToObject(cj_params, ezlopi_value_str, hilink_presence_sensor_motion_direction_enum[hilink_data->direction + 1]);
+            cJSON_AddStringToObject(__FUNCTION__, cj_params, ezlopi_valueFormatted_str, hilink_presence_sensor_motion_direction_enum[hilink_data->direction + 1]);
+            cJSON_AddStringToObject(__FUNCTION__, cj_params, ezlopi_value_str, hilink_presence_sensor_motion_direction_enum[hilink_data->direction + 1]);
         }
         else if (ezlopi_item_name_distance == item->cloud_properties.item_name)
         {
-            cJSON_AddNumberToObject(cj_params, ezlopi_valueFormatted_str, hilink_data->moving_target_distance);
-            cJSON_AddNumberToObject(cj_params, ezlopi_value_str, hilink_data->moving_target_distance);
+            cJSON_AddNumberToObject(__FUNCTION__, cj_params, ezlopi_valueFormatted_str, hilink_data->moving_target_distance);
+            cJSON_AddNumberToObject(__FUNCTION__, cj_params, ezlopi_value_str, hilink_data->moving_target_distance);
         }
     }
 
@@ -280,8 +281,8 @@ static void __prepare_hilink_motion_item_cloud_properties(l_ezlopi_item_t* item,
     item->interface.uart.channel = 0;
 
     CJSON_GET_VALUE_DOUBLE(cj_properties, ezlopi_baud_str, item->interface.uart.baudrate);
-    CJSON_GET_VALUE_DOUBLE(cj_properties, ezlopi_gpio_tx_str, item->interface.uart.tx);
-    CJSON_GET_VALUE_DOUBLE(cj_properties, ezlopi_gpio_rx_str, item->interface.uart.rx);
+    CJSON_GET_VALUE_GPIO(cj_properties, ezlopi_gpio_tx_str, item->interface.uart.tx);
+    CJSON_GET_VALUE_GPIO(cj_properties, ezlopi_gpio_rx_str, item->interface.uart.rx);
 
     item->is_user_arg_unique = true;
     item->user_arg = user_args;
@@ -302,8 +303,8 @@ static void __prepare_hilink_motion_direction_item_cloud_properties(l_ezlopi_ite
     item->interface.uart.channel = 0;
 
     CJSON_GET_VALUE_DOUBLE(cj_properties, ezlopi_baud_str, item->interface.uart.baudrate);
-    CJSON_GET_VALUE_DOUBLE(cj_properties, ezlopi_gpio_tx_str, item->interface.uart.tx);
-    CJSON_GET_VALUE_DOUBLE(cj_properties, ezlopi_gpio_rx_str, item->interface.uart.rx);
+    CJSON_GET_VALUE_GPIO(cj_properties, ezlopi_gpio_tx_str, item->interface.uart.tx);
+    CJSON_GET_VALUE_GPIO(cj_properties, ezlopi_gpio_rx_str, item->interface.uart.rx);
 
     item->user_arg = user_arg;
 }
@@ -323,8 +324,8 @@ static void __prepare_hilink_distance_item_cloud_properties(l_ezlopi_item_t* ite
     item->interface.uart.channel = 0;
 
     CJSON_GET_VALUE_DOUBLE(cj_properties, ezlopi_baud_str, item->interface.uart.baudrate);
-    CJSON_GET_VALUE_DOUBLE(cj_properties, ezlopi_gpio_tx_str, item->interface.uart.tx);
-    CJSON_GET_VALUE_DOUBLE(cj_properties, ezlopi_gpio_rx_str, item->interface.uart.rx);
+    CJSON_GET_VALUE_GPIO(cj_properties, ezlopi_gpio_tx_str, item->interface.uart.tx);
+    CJSON_GET_VALUE_GPIO(cj_properties, ezlopi_gpio_rx_str, item->interface.uart.rx);
 
     item->user_arg = user_arg;
 }
@@ -335,7 +336,7 @@ static int __prepare(void* arg, void* user_arg)
     s_ezlopi_prep_arg_t* prep_arg = (s_ezlopi_prep_arg_t*)arg;
     if (prep_arg)
     {
-        ld2410_outputs_t* hilink_data = (ld2410_outputs_t*)malloc(sizeof(ld2410_outputs_t));
+        ld2410_outputs_t* hilink_data = (ld2410_outputs_t*)ezlopi_malloc(__FUNCTION__, sizeof(ld2410_outputs_t));
         if (hilink_data)
         {
             memset(hilink_data, 0, sizeof(ld2410_outputs_t));
@@ -397,7 +398,7 @@ static int __prepare(void* arg, void* user_arg)
                     (NULL == child_hilink_device_distance))
                 {
                     ezlopi_device_free_device(parent_hilink_device_motion);
-                    free(hilink_data);
+                    ezlopi_free(__FUNCTION__, hilink_data);
                     ret = -1;
                 }
                 else
@@ -408,7 +409,7 @@ static int __prepare(void* arg, void* user_arg)
             else
             {
                 ezlopi_device_free_device(parent_hilink_device_motion);
-                free(hilink_data);
+                ezlopi_free(__FUNCTION__, hilink_data);
                 ret = -1;
             }
         }

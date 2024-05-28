@@ -12,6 +12,7 @@
 
 #include "ds18b20_onewire.h"
 #include "sensor_0030_oneWire_DS18B20.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 static int __prepare(void* arg);
 static int __init(l_ezlopi_item_t* item);
@@ -143,7 +144,7 @@ static void __prepare_item_properties(l_ezlopi_item_t* item, cJSON* cj_device)
     item->interface_type = EZLOPI_DEVICE_INTERFACE_ONEWIRE_MASTER;
 
     item->interface.onewire_master.enable = true;
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_str, item->interface.onewire_master.onewire_pin);
+    CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_str, item->interface.onewire_master.onewire_pin);
 }
 
 static int __prepare(void* arg)
@@ -163,7 +164,7 @@ static int __prepare(void* arg)
             {
                 __prepare_item_properties(item_temperature, prep_arg->cjson_device);
 
-                double* temperature_value = (double*)malloc(sizeof(double));
+                double* temperature_value = (double*)ezlopi_malloc(__FUNCTION__, sizeof(double));
                 if (temperature_value)
                 {
                     memset(temperature_value, 0, sizeof(double));

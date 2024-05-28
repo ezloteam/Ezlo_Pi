@@ -4,8 +4,6 @@
 #include "cjext.h"
 #include "ezlopi_service_ws_server_clients.h"
 
-
-// #if defined(CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER)
 typedef enum e_ws_status
 {
     WS_STATUS_RUNNING = 0,
@@ -17,9 +15,6 @@ void ezlopi_service_ws_server_stop(void);
 void ezlopi_service_ws_server_start(void);
 
 e_ws_status_t ezlopi_service_ws_server_status(void);
-
-// #endif //  CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER
-
 void ezlpi_service_ws_server_dummy(void);
 
 #endif // __EZLOPI_SERVICE_WS_SERVER_H__

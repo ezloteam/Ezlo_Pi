@@ -88,7 +88,7 @@ static void prepare_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_devic
 static void prepare_item_interface_properties(l_ezlopi_item_t* item, cJSON* cj_device)
 {
     item->interface_type = EZLOPI_DEVICE_INTERFACE_ANALOG_INPUT;
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_str, item->interface.adc.gpio_num);
+    CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_str, item->interface.adc.gpio_num);
     item->interface.adc.resln_bit = 3;
 }
 
@@ -135,22 +135,22 @@ static int __get_item_list(l_ezlopi_item_t* item, void* arg)
     cJSON* cjson_propertise = (cJSON*)arg;
     if (cjson_propertise)
     {
-        cJSON* json_array_enum = cJSON_CreateArray();
+        cJSON* json_array_enum = cJSON_CreateArray(__FUNCTION__);
         if (NULL != json_array_enum)
         {
             for (uint8_t i = 0; i < WATERLEAK_MAX; i++)
             {
-                cJSON* json_value = cJSON_CreateString(water_leak_alarm_states[i]);
+                cJSON* json_value = cJSON_CreateString(__FUNCTION__, water_leak_alarm_states[i]);
                 if (NULL != json_value)
                 {
                     cJSON_AddItemToArray(json_array_enum, json_value);
                 }
             }
-            cJSON_AddItemToObject(cjson_propertise, ezlopi_enum_str, json_array_enum);
+            cJSON_AddItemToObject(__FUNCTION__, cjson_propertise, ezlopi_enum_str, json_array_enum);
         }
 
-        cJSON_AddStringToObject(cjson_propertise, ezlopi_value_str, (char*)item->user_arg ? item->user_arg : "no_water_leak");
-        cJSON_AddStringToObject(cjson_propertise, ezlopi_valueFormatted_str, (char*)item->user_arg ? item->user_arg : "no_water_leak");
+        cJSON_AddStringToObject(__FUNCTION__, cjson_propertise, ezlopi_value_str, (char*)item->user_arg ? item->user_arg : "no_water_leak");
+        cJSON_AddStringToObject(__FUNCTION__, cjson_propertise, ezlopi_valueFormatted_str, (char*)item->user_arg ? item->user_arg : "no_water_leak");
 
         ret = 1;
     }
@@ -165,8 +165,8 @@ static int __get_ezlopi_value(l_ezlopi_item_t* item, void* arg)
         cJSON* cj_result = (cJSON*)arg;
         if (cj_result)
         {
-            cJSON_AddStringToObject(cj_result, ezlopi_value_str, (char*)item->user_arg ? item->user_arg : "no_water_leak");
-            cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, (char*)item->user_arg ? item->user_arg : "no_water_leak");
+            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, (char*)item->user_arg ? item->user_arg : "no_water_leak");
+            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, (char*)item->user_arg ? item->user_arg : "no_water_leak");
             ret = 1;
         }
     }

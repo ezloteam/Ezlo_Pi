@@ -6,11 +6,14 @@
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
+#include "ezlopi_core_processes.h"
 
 #include "ezlopi_cloud_items.h"
 #include "ezlopi_cloud_constants.h"
 
 #include "sensor_0047_other_HX711_loadcell.h"
+#include "EZLOPI_USER_CONFIG.h"
+
 /********************************************************************************/
 /*                    global defines                                            */
 /********************************************************************************/
@@ -116,7 +119,7 @@ static int __0047_prepare(void* arg)
     s_ezlopi_prep_arg_t* device_prep_arg = (s_ezlopi_prep_arg_t*)arg;
     if (device_prep_arg && (NULL != device_prep_arg->cjson_device))
     {
-        s_hx711_data_t* hx711_data = (s_hx711_data_t*)malloc(sizeof(s_hx711_data_t));
+        s_hx711_data_t* hx711_data = (s_hx711_data_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_hx711_data_t));
         if (hx711_data)
         {
             memset(hx711_data, 0, sizeof(s_hx711_data_t));
@@ -135,13 +138,13 @@ static int __0047_prepare(void* arg)
                 {
                     ret = -1;
                     ezlopi_device_free_device(hx711_device);
-                    free(hx711_data);
+                    ezlopi_free(__FUNCTION__, hx711_data);
                 }
             }
             else
             {
                 ret = -1;
-                free(hx711_data);
+                ezlopi_free(__FUNCTION__, hx711_data);
             }
         }
     }
@@ -181,7 +184,9 @@ static int __0047_init(l_ezlopi_item_t* item)
                     if (false == (user_data->HX711_initialized))
                     {
                         __hx711_power_reset(item);
-                        xTaskCreate(__Calculate_hx711_tare_wt, "Calculate the Tare weight", 2 * 2048, item, 1, NULL);
+                        TaskHandle_t ezlopi_sensor_hx711_task_handle = NULL;
+                        xTaskCreate(__Calculate_hx711_tare_wt, "Calculate the Tare weight", EZLOPI_SENSOR_HX711_TASK_DEPTH, item, 1, &ezlopi_sensor_hx711_task_handle);
+                        ezlopi_core_process_set_process_info(ENUM_EZLOPI_SENSOR_HX711_TASK, &ezlopi_sensor_hx711_task_handle, EZLOPI_SENSOR_HX711_TASK_DEPTH);
                         ret = 1;
                     }
                 }
@@ -283,6 +288,7 @@ static void __Calculate_hx711_tare_wt(void* params)
             }
         }
     }
+    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SENSOR_HX711_TASK);
     vTaskDelete(NULL);
 }
 

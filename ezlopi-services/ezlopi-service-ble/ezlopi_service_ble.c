@@ -1,3 +1,8 @@
+
+#include "../../build/config/sdkconfig.h"
+
+#ifdef CONFIG_EZPI_BLE_ENABLE
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -7,7 +12,6 @@
 #include "cjext.h"
 #include "lwip/ip_addr.h"
 #include "ezlopi_util_trace.h"
-#include "sdkconfig.h"
 
 #include "EZLOPI_USER_CONFIG.h"
 
@@ -36,17 +40,16 @@ extern void ezlopi_ble_service_dynamic_config_init(void);
 
 static void ezlopi_ble_basic_init(void);
 
-#if (1 == CONFIG_EZLOPI_BLE_ENALBE_PASSKEY)
+#if (1 == CONFIG_EZPI_BLE_ENALBE_PASSKEY)
 static void ezlopi_ble_start_secure_gatt_server(void);
 #endif
 
-#if (1 == CONFIG_EZLOPI_BLE_ENALBE_PAIRING)
+#if (1 == CONFIG_EZPI_BLE_ENALBE_PAIRING)
 static void ezlopi_ble_start_secure_gatt_server_open_pairing(void);
 #endif
 
 void ezlopi_ble_service_init(void)
 {
-
     ezlopi_ble_service_wifi_profile_init();
     ezlopi_ble_service_security_init();
     ezlopi_ble_service_provisioning_init();
@@ -64,17 +67,17 @@ void ezlopi_ble_service_init(void)
 
     CHECK_PRINT_ERROR(esp_ble_gatt_set_local_mtu(517), "set local  MTU failed");
 
-#if (1 == CONFIG_EZLOPI_BLE_ENALBE_PAIRING)
-#if (1 == CONFIG_EZLOPI_BLE_ENALBE_PASSKEY)
+#if (1 == CONFIG_EZPI_BLE_ENALBE_PAIRING)
+#if (1 == CONFIG_EZPI_BLE_ENALBE_PASSKEY)
     ezlopi_ble_start_secure_gatt_server();
 #else
     ezlopi_ble_start_secure_gatt_server_open_pairing();
-#endif // 1 == CONFIG_EZLOPI_BLE_ENALBE_PASSKEY
-#endif // 1 == CONFIG_EZLOPI_BLE_ENALBE_PAIRING
+#endif // 1 == CONFIG_EZPI_BLE_ENALBE_PASSKEY
+#endif // 1 == CONFIG_EZPI_BLE_ENALBE_PAIRING
 }
 
 
-#if (1 == CONFIG_EZLOPI_BLE_ENALBE_PAIRING)
+#if (1 == CONFIG_EZPI_BLE_ENALBE_PAIRING)
 static void ezlopi_ble_start_secure_gatt_server_open_pairing(void)
 {
     const esp_ble_auth_req_t auth_req = ESP_LE_AUTH_REQ_SC_MITM_BOND;
@@ -101,7 +104,7 @@ static void ezlopi_ble_start_secure_gatt_server_open_pairing(void)
 }
 #endif
 
-#if (1 == CONFIG_EZLOPI_BLE_ENALBE_PASSKEY)
+#if (1 == CONFIG_EZPI_BLE_ENALBE_PASSKEY)
 static void ezlopi_ble_start_secure_gatt_server(void)
 {
     const uint32_t default_passkey = 123456;
@@ -153,12 +156,18 @@ static void ezlopi_ble_basic_init(void)
             mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
     }
 
-    // dump("ble_device_name", ble_device_name, 0, 32);
+    // dump("ble_device_name", ble_device_name, 0, sizeof(ble_device_name));
 
     static esp_bt_controller_config_t bt_cfg = BT_CONTROLLER_INIT_CONFIG_DEFAULT();
     ESP_ERROR_CHECK(esp_bt_controller_mem_release(ESP_BT_MODE_CLASSIC_BT));
     CHECK_PRINT_ERROR(esp_bt_controller_init(&bt_cfg), "initialize controller failed");
+
+    // #if defined(CONFIG_IDF_TARGET_ESP32S3) || defined(CONFIG_IDF_TARGET_ESP32C3)
     CHECK_PRINT_ERROR(esp_bt_controller_enable(ESP_BT_MODE_BLE), "enable controller failed");
+    // #elif defined(CONFIG_IDF_TARGET_ESP32)
+    //     CHECK_PRINT_ERROR(esp_bt_controller_enable(ESP_BT_MODE_BTDM), "enable controller failed");
+    // #endif
+
     CHECK_PRINT_ERROR(esp_bluedroid_init(), "init bluetooth failed");
     CHECK_PRINT_ERROR(esp_bluedroid_enable(), "enable bluetooth failed");
     CHECK_PRINT_ERROR(esp_ble_gatts_register_callback(ezlopi_ble_gatts_event_handler), "gatts register error, error code");
@@ -175,3 +184,4 @@ int ezlopi_ble_service_get_ble_mac(uint8_t mac[6])
     }
     return ret;
 }
+#endif // CONFIG_EZPI_BLE_ENABLE

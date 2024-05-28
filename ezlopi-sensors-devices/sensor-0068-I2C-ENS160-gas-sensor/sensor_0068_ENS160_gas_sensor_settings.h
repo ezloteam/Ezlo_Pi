@@ -41,15 +41,15 @@ void set_setting_changed_to_false();
 static inline cJSON* __setting_add_text_and_lang_tag(const char* const object_text, const char* const object_lang_tag)
 {
 
-    cJSON* cj_object = cJSON_CreateObject();
+    cJSON* cj_object = cJSON_CreateObject(__FUNCTION__);
     if (cj_object)
     {
-        cJSON_AddStringToObject(cj_object, ezlopi_text_str, object_text);
-        cJSON_AddStringToObject(cj_object, ezlopi_lang_tag_str, object_lang_tag);
+        cJSON_AddStringToObject(__FUNCTION__, cj_object, ezlopi_text_str, object_text);
+        cJSON_AddStringToObject(__FUNCTION__, cj_object, ezlopi_lang_tag_str, object_lang_tag);
     }
     else
     {
-        free(cj_object);
+        ezlopi_free(__FUNCTION__, cj_object);
         cj_object = NULL;
     }
 

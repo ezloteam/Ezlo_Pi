@@ -1,3 +1,7 @@
+#include "../../build/config/sdkconfig.h"
+
+#ifdef CONFIG_EZPI_BLE_ENABLE
+
 #include <string.h>
 
 #include "esp_gatt_common_api.h"
@@ -187,7 +191,7 @@ void ezlopi_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t ga
         ezlopi_ble_gatt_call_write_exec_by_handle(gatts_if, param);
         break;
     }
-#if (1 == CONFIG_EZLOPI_BLE_ENALBE_PAIRING)
+#if (1 == CONFIG_EZPI_BLE_ENALBE_PAIRING)
     case ESP_GATTS_CONNECT_EVT:
     {
         TRACE_S("ESP_GATTS_CONNECT_EVT");
@@ -499,4 +503,7 @@ static char* ezlopi_ble_gatt_event_to_string(esp_gatts_cb_event_t event)
     }
     return ret;
 }
+
+#endif // CONFIG_EZPI_BLE_ENABLE
+
 #endif // 1 == ENABLE_TRACE

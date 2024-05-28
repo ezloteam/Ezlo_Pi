@@ -8,7 +8,7 @@
 
 #include "EZLOPI_USER_CONFIG.h"
 
-#if defined (CONFIG_EZLPI_SERV_ENABLE_MODES)
+#if defined (CONFIG_EZPI_SERV_ENABLE_MODES)
 typedef enum e_modes_ref_id_idx
 {
     EZLOPI_HOUSE_MODE_REF_ID_NONE = 0,
@@ -146,7 +146,7 @@ int ezlopi_core_modes_cjson_get_current_mode(cJSON* cj_result);
 ///
 cJSON* ezlopi_core_modes_cjson_changed(void);
 
-#endif // CONFIG_EZLPI_SERV_ENABLE_MODES
+#endif // CONFIG_EZPI_SERV_ENABLE_MODES
 
 
 #endif // __EZLOPI_HOME_MODES_H__
