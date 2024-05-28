@@ -25,7 +25,7 @@ cJSON *ezlopi_core_api_consume(const char * who, const char *payload, uint32_t l
                 cJSON *cj_method = cJSON_GetObjectItem(who, cj_request, ezlopi_method_str);
 
 #if (1 == ENABLE_TRACE)
-                TRACE_D("## WS Rx <<<<<<<<<< '%s'\r\n%.*s", (cj_method ? cj_method->valuestring : ezlopi__str), len, payload);
+                TRACE_D("## WS Rx <<<<<<<<<< '%s' \n %.*s", (cj_method ? cj_method->valuestring : ezlopi__str), len, payload);
 #endif
                 uint32_t method_id = ezlopi_core_ezlopi_methods_search_in_list(cj_method);
 
@@ -41,7 +41,7 @@ cJSON *ezlopi_core_api_consume(const char * who, const char *payload, uint32_t l
                             cJSON_AddNullToObject(who, cj_response, ezlopi_error_str);
                             cJSON_AddItemToObject(who, cj_response, ezlopi_id_str, cJSON_Duplicate(who, cj_id, cJSON_True));
                             cJSON_AddItemToObject(who, cj_response, ezlopi_sender_str, cJSON_Duplicate(who, cj_sender, cJSON_True));
-                            cJSON_AddItemToObject(who, cj_response, ezlopi_method_str, cJSON_Duplicate(who, cj_method, cJSON_True));              
+                            cJSON_AddItemToObject(who, cj_response, ezlopi_method_str, cJSON_Duplicate(who, cj_method, cJSON_True));
                         }
                     }
 
@@ -81,7 +81,7 @@ cJSON *ezlopi_core_api_consume(const char * who, const char *payload, uint32_t l
             else
             {
                 cJSON *cj_method = cJSON_GetObjectItem(who, cj_request, ezlopi_method_str);
-                TRACE_E("## WS Rx <<<<<<<<<< '%s'\r\n%.*s", (NULL != cj_method) ? (cj_method->valuestring ? cj_method->valuestring : ezlopi__str) : ezlopi__str, len, payload);
+                TRACE_E("## WS Rx <<<<<<<<<< '%s' \n%.*s", (NULL != cj_method) ? (cj_method->valuestring ? cj_method->valuestring : ezlopi__str) : ezlopi__str, len, payload);
             }
 #endif
             cJSON_Delete(who, cj_request);
