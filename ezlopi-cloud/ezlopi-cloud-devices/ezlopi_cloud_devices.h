@@ -12,6 +12,7 @@ extern "C"
 
     void devices_list_v3(cJSON* cj_request, cJSON* cj_response);
     void device_name_set(cJSON* cj_request, cJSON* cj_response);
+    void device_armed_set(cJSON* cj_request, cJSON* cj_response);
     void device_updated(cJSON* cj_request, cJSON* cj_response);
 
     // char *devices_settings_list(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count);

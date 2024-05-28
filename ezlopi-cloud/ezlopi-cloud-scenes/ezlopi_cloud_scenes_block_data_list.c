@@ -301,6 +301,7 @@ static cJSON* __comparision_operators_strings(void)
         cJSON* cj_methods_array = cJSON_AddArrayToObject(__FUNCTION__, cj_family, "methods");
         if (cj_methods_array)
         {
+            /* <1> Adding for 'Strings' within 'family : strings' */
             e_scene_str_cmp_operators_t op_idx = SCENES_STRINGS_OPERATORS_NONE + 1;
             while (ezlopi_scenes_strings_comparator_operators_get_op(op_idx))
             {
@@ -317,7 +318,26 @@ static cJSON* __comparision_operators_strings(void)
                         cj_method = NULL;
                     }
                 }
+                op_idx++;
+            }
 
+            /* <2> Adding for 'StringOperators' within 'family : strings' */
+            op_idx = SCENES_STROPS_COMP_OPERATORES_NONE + 1;
+            while (ezlopi_scenes_strops_comparator_operators_get_op(op_idx))
+            {
+                cJSON* cj_method = cJSON_CreateObject(__FUNCTION__);
+                if (cj_method)
+                {
+                    cJSON_AddStringToObject(__FUNCTION__, cj_method, "op", ezlopi_scenes_strops_comparator_operators_get_op(op_idx));
+                    cJSON_AddStringToObject(__FUNCTION__, cj_method, ezlopi_name_str, ezlopi_scenes_strops_comparator_operators_get_name(op_idx));
+                    cJSON_AddStringToObject(__FUNCTION__, cj_method, ezlopi_method_str, ezlopi_scenes_strops_comparator_operators_get_method(op_idx));
+
+                    if (!cJSON_AddItemToArray(cj_methods_array, cj_method))
+                    {
+                        cJSON_Delete(__FUNCTION__, cj_method);
+                        cj_method = NULL;
+                    }
+                }
                 op_idx++;
             }
         }

@@ -28,7 +28,7 @@ extern const char *method_cloud_firmware_info_get;
 // extern const  char *method_hub_device_force_remove ;
 // extern const  char *method_hub_device_firmware_update ;
 extern const char *method_hub_devices_list;
-// extern const  char *method_hub_device_armed_set ;
+extern const  char *method_hub_device_armed_set ;
 // extern const  char *method_hub_device_name_set  ;
 // extern const  char *method_hub_device_room_set ;
 // extern const  char *method_hub_device_setting_dictionary_value_set ;
