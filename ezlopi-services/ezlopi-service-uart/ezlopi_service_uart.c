@@ -235,6 +235,7 @@ static int ezlopi_service_uart_process_log_severity(const cJSON* root)
     CJSON_GET_VALUE_DOUBLE(root, "target", target);
     CJSON_GET_VALUE_DOUBLE(root, ezlopi_severity_str, severity);
 
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
     if (0 == target)
     {
         // Call cloud log severity setter
@@ -245,6 +246,7 @@ static int ezlopi_service_uart_process_log_severity(const cJSON* root)
         // Call serial log severity setter
         ret = ezlopi_core_serial_log_severity_process_id(severity);
     }
+#endif // CONFIG_EZPI_UTIL_TRACE_EN
 
     cJSON* cj_uart_response = cJSON_CreateObject(__func__);
     if (cj_uart_response)

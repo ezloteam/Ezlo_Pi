@@ -138,6 +138,6 @@ static void __blinky(void* pv)
         ezlopi_util_heap_flush();
 #endif // CONFIG_EZPI_HEAP_ENABLE
 
-        vTaskDelay(5000 / portTICK_PERIOD_MS);
+        vTaskDelay(10000 / portTICK_PERIOD_MS);
     }
 }
