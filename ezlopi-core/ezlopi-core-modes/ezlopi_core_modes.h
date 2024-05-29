@@ -140,8 +140,14 @@ int ezlopi_core_modes_api_cancel_switch(void);
 int ezlopi_core_modes_api_cancel_entry_delay(void);
 int ezlopi_core_modes_set_switch_to_delay(uint32_t switch_to_delay);
 int ezlopi_core_modes_set_alarm_delay(uint32_t switch_to_delay);
+int ezlopi_core_modes_set_protect(const char* cj_mode_id, bool protect_state);
+
+int ezlopi_core_modes_add_alarm_off(uint8_t mode_id, cJSON*  device_id);
+int ezlopi_core_modes_remove_alarm_off(uint32_t mode_id, cJSON* device_id);
 
 int ezlopi_core_modes_cjson_get_current_mode(cJSON* cj_result);
+int ezlopi_core_modes_set_entry_delay(uint32_t normal_sec, uint32_t short_sec, uint32_t extended_sec, uint32_t instant_sec);
+int ezlopi_core_modes_reset_entry_delay(void);
 
 ///
 cJSON* ezlopi_core_modes_cjson_changed(void);

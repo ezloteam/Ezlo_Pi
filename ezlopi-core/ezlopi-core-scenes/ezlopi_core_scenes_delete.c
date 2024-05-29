@@ -82,6 +82,12 @@ void ezlopi_scenes_delete(l_scenes_list_v2_t* scenes_list)
         ezlopi_scenes_delete_action_blocks(scenes_list->else_block);
         ezlopi_scenes_delete_when_blocks(scenes_list->when_block);
 
+        if (NULL != scenes_list->thread_ctx)
+        {
+            ezlopi_free(__FUNCTION__, scenes_list->thread_ctx);
+            scenes_list->thread_ctx = NULL;
+        }
+
         ezlopi_scenes_delete(scenes_list->next);
         scenes_list->next = NULL;
         ezlopi_free(__FUNCTION__, scenes_list);

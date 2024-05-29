@@ -164,6 +164,17 @@ void ezlopi_cloud_modes_alarms_off_add(cJSON* cj_request, cJSON* cj_response)
     cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     if (cj_result)
     {
+        cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
+        if (cj_params)
+        {
+            cJSON* cj_mode_id = cJSON_GetObjectItem(__func__, cj_params, ezlopi_modeId_str);
+            cJSON*  cj_device_id = cJSON_GetObjectItem(__func__, cj_params, ezlopi_deviceId_str);
+            if (cj_mode_id && cj_device_id && cJSON_IsString(cj_mode_id) && cJSON_IsString(cj_device_id))
+            {
+                uint8_t mode_id = strtoul(cj_mode_id->valuestring, NULL, 10);
+                ezlopi_core_modes_add_alarm_off(mode_id, cj_device_id);
+            }
+        }
     }
 }
 
@@ -172,6 +183,17 @@ void ezlopi_cloud_modes_alarms_off_remove(cJSON* cj_request, cJSON* cj_response)
     cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     if (cj_result)
     {
+        cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
+        if (cj_params)
+        {
+            cJSON* cj_mode_id = cJSON_GetObjectItem(__func__, cj_params, ezlopi_modeId_str);
+            cJSON*  cj_device_id = cJSON_GetObjectItem(__func__, cj_params, ezlopi_deviceId_str);
+            if (cj_mode_id && cj_device_id && cJSON_IsString(cj_mode_id) && cJSON_IsString(cj_device_id))
+            {
+                uint32_t mode_id = strtoul(cj_mode_id->valuestring, NULL, 16);
+                ezlopi_core_modes_remove_alarm_off(mode_id, cj_device_id);
+            }
+        }
     }
 }
 
@@ -212,6 +234,22 @@ void ezlopi_cloud_modes_protect_set(cJSON* cj_request, cJSON* cj_response)
     cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     if (cj_result)
     {
+        bool protect_state = false;
+        double timestamp = 0;
+
+        cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
+        if (cj_params)
+        {
+            CJSON_GET_VALUE_BOOL(cj_request, ezlopi_protect_str, protect_state);
+            CJSON_GET_VALUE_DOUBLE(cj_request, ezlopi_timestamp_str, timestamp);
+
+            cJSON* cj_mode_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_modeId_str);
+            if (cj_mode_id && cj_mode_id->valuestring)
+            {
+                ezlopi_core_modes_set_protect(cj_mode_id->valuestring, protect_state);
+            }
+        }
+
     }
 }
 
@@ -244,6 +282,29 @@ void ezlopi_cloud_modes_entry_delay_set(cJSON* cj_request, cJSON* cj_response)
     cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     if (cj_result)
     {
+        cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
+        if (cj_params)
+        {
+            double normal_sec = 30;
+            double short_sec = 30;
+            double extended_sec = 30;
+            double instant_sec = 0;
+
+            CJSON_GET_VALUE_DOUBLE(cj_params, ezlopi_normal_str, normal_sec);
+            normal_sec = (normal_sec > 240) ? 240 : normal_sec;
+
+            CJSON_GET_VALUE_DOUBLE(cj_params, ezlopi_short_str, short_sec);
+            short_sec = (short_sec > 240) ? 240 : short_sec;
+
+            CJSON_GET_VALUE_DOUBLE(cj_params, ezlopi_extended_str, extended_sec);
+            extended_sec = (extended_sec > 240) ? 240 : extended_sec;
+
+            CJSON_GET_VALUE_DOUBLE(cj_params, ezlopi_instant_str, instant_sec);
+            instant_sec = (instant_sec > 240) ? 240 : instant_sec;
+
+            ezlopi_core_modes_set_entry_delay((uint32_t)normal_sec, (uint32_t)short_sec, (uint32_t)extended_sec, (uint32_t)instant_sec);
+
+        }
     }
 }
 
@@ -252,6 +313,7 @@ void ezlopi_cloud_modes_entry_delay_reset(cJSON* cj_request, cJSON* cj_response)
     cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     if (cj_result)
     {
+        ezlopi_core_modes_reset_entry_delay();
     }
 }
 
