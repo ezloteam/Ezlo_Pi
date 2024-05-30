@@ -125,6 +125,7 @@ void ezlopi_cloud_update_script_id(uint32_t a_script_id)
     g_script_id = (a_script_id > g_script_id) ? a_script_id : g_script_id;
 }
 
+
 uint32_t ezlopi_cloud_generate_script_id(void)
 {
     g_script_id = (0 == g_script_id) ? (SCRIPT_ID_START + ezlopi_get_mac_crc()) : (g_script_id + 1);
@@ -157,4 +158,9 @@ uint32_t ezlopi_cloud_generate_scene_group_id(void)
 {
     g_scene_group_id = (0 == g_scene_group_id) ? (SCENE_GROUP_ID_START + ezlopi_get_mac_crc()) : (g_scene_group_id + 1);
     return g_scene_group_id;
+}
+
+void ezlopi_cloud_update_group_id(uint32_t a_group_id)
+{
+    g_scene_group_id = (a_group_id > g_scene_group_id) ? a_group_id : g_scene_group_id;
 }

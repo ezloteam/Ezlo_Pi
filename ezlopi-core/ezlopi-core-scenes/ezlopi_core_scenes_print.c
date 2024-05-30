@@ -254,7 +254,7 @@ void ezlopi_scenes_print(l_scenes_list_v2_t* scene_link_list)
         TRACE_D("\t----------------------- scene_count: %d ------------------------", ++scene_count);
         TRACE_D("\t|-- id: 0x%08x", scene_link_list->_id);
         TRACE_D("\t|-- enabled: %d", scene_link_list->enabled);
-        TRACE_D("\t|-- is_group: %s", (scene_link_list->is_group ? "true" : "false"));
+        TRACE_D("\t|-- is_group: %s", ((true == scene_link_list->is_group) ? "true" : "false"));
         TRACE_D("\t|-- group_id: %s", scene_link_list->group_id);
         TRACE_D("\t|-- name: %s", scene_link_list->name);
         TRACE_D("\t|-- parent_id: %s", scene_link_list->parent_id);

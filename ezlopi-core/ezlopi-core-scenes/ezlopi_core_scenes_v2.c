@@ -103,7 +103,7 @@ uint32_t ezlopi_store_new_scene_v2(cJSON* cj_new_scene)
 
         if (__new_scene_add_group_id_if_reqd(cj_new_scene))
         {
-            TRACE_S("------> Added new_group_id ");
+            TRACE_S("------> Added new_group_id : SUCCESS");
         }
 
         char* new_scnee_str = cJSON_PrintBuffered(__FUNCTION__, cj_new_scene, 4096, false);
@@ -519,6 +519,10 @@ static l_scenes_list_v2_t* __new_scene_populate(cJSON* cj_scene, uint32_t scene_
             {
                 CJSON_GET_VALUE_STRING_BY_COPY(cj_scene, ezlopi_group_id_str, new_scene->group_id);
                 TRACE_D("group_id: %s", new_scene->group_id);
+                if (NULL != new_scene->group_id)
+                {
+                    ezlopi_cloud_update_group_id((uint32_t)strtoul(new_scene->group_id, NULL, 16));
+                }
             }
 
             CJSON_GET_VALUE_STRING_BY_COPY(cj_scene, ezlopi_name_str, new_scene->name);
@@ -1029,13 +1033,13 @@ static int __new_scene_add_group_id_if_reqd(cJSON* cj_new_scene)
         cJSON* cj_when_block = NULL;
         while (NULL != (cj_when_block = cJSON_GetArrayItem(cj_when_blocks, when_block_idx++)))
         {
-            printf("\n----- [%d] when :", when_block_idx);
+            // printf("\n----- [%d] when :", when_block_idx);
 
             cJSON * cj_block_name_single = cJSON_GetObjectItem(__FUNCTION__, cj_when_block, ezlopi_blockName_str);
             if (cj_block_name_single && (NULL != cj_block_name_single->valuestring))
             {
                 // <1> For single group case
-                printf("\n--------------------- block_name: %s\n", cj_block_name_single->valuestring);
+                // printf("\n--------------------- block_name: %s\n", cj_block_name_single->valuestring);
                 add_group_flag = true;
                 break;
             }
@@ -1047,7 +1051,7 @@ static int __new_scene_add_group_id_if_reqd(cJSON* cj_new_scene)
                     cJSON * cj_fields_block = NULL;
                     while (NULL != (cj_fields_block = cJSON_GetArrayItem(cj_fields_blocks, fields_block_idx++)))
                     {
-                        printf("\n---------- [%d] fields :", fields_block_idx);
+                        // printf("\n---------- [%d] fields :", fields_block_idx);
 
                         cJSON * name = cJSON_GetObjectItem(__FUNCTION__, cj_fields_block, ezlopi_name_str);
                         cJSON * type = cJSON_GetObjectItem(__FUNCTION__, cj_fields_block, ezlopi_type_str);
@@ -1066,11 +1070,11 @@ static int __new_scene_add_group_id_if_reqd(cJSON* cj_new_scene)
                                 cJSON* cj_value_block = NULL;
                                 while (NULL != (cj_value_block = cJSON_GetArrayItem(cj_value_blocks, value_block_idx++)))
                                 {
-                                    printf("\n--------------- [%d] value :", value_block_idx);
+                                    // printf("\n--------------- [%d] value :", value_block_idx);
                                     cJSON * cj_block_name = cJSON_GetObjectItem(__FUNCTION__, cj_value_block, ezlopi_blockName_str);
                                     if (cj_block_name && (NULL != cj_block_name->valuestring))
                                     {
-                                        printf("\n--------------------- block_name: %s\n", cj_block_name->valuestring);
+                                        // printf("\n--------------------- block_name: %s\n", cj_block_name->valuestring);
                                         add_group_flag = true;
                                         break;
                                     }
@@ -1096,7 +1100,7 @@ static int __new_scene_add_group_id_if_reqd(cJSON* cj_new_scene)
                     uint32_t group_id = ezlopi_cloud_generate_scene_group_id();
                     char group_id_str[32];
                     snprintf(group_id_str, sizeof(group_id_str), "%08x", group_id);
-                    TRACE_S("---> new block_group_id:  %s", group_id_str);
+                    TRACE_S("new block_group_id:  %s", group_id_str);
 
                     cJSON_DeleteItemFromObject(__FUNCTION__, cj_new_scene, ezlopi_group_id_str);
                     cJSON_AddStringToObject(__FUNCTION__, cj_new_scene, ezlopi_group_id_str, group_id_str);
