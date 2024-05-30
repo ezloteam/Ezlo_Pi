@@ -174,7 +174,20 @@ void ezlopi_cloud_modes_entry_delay_changed(cJSON* cj_request, cJSON* cj_respons
         cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
         if (cj_params)
         {
-            cJSON_AddItemToObject(__FUNCTION__, cj_result, ezlopi_entryDelay_str, cJSON_Duplicate(__FUNCTION__, cj_params, true));
+            // cJSON_AddItemToObject(__FUNCTION__, cj_result, ezlopi_entryDelay_str, cJSON_Duplicate(__FUNCTION__, cj_params, true));
+
+            cJSON * cj_entryDelay = cJSON_AddObjectToObject(__FUNCTION__, cj_result, ezlopi_entryDelay_str);
+            if (cj_entryDelay)
+            {
+                s_ezlopi_modes_t* curr_mode = ezlopi_core_modes_get_custom_modes();
+                if (curr_mode)
+                {
+                    cJSON_AddNumberToObject(__FUNCTION__, cj_entryDelay, ezlopi_normal_str, curr_mode->entry_delay.normal_delay_sec);
+                    cJSON_AddNumberToObject(__FUNCTION__, cj_entryDelay, ezlopi_short_str, curr_mode->entry_delay.short_delay_sec);
+                    cJSON_AddNumberToObject(__FUNCTION__, cj_entryDelay, ezlopi_extended_str, curr_mode->entry_delay.extended_delay_sec);
+                    cJSON_AddNumberToObject(__FUNCTION__, cj_entryDelay, ezlopi_instant_str, curr_mode->entry_delay.instant_delay_sec);
+                }
+            }
             cJSON_AddItemToObject(__FUNCTION__, cj_result, ezlopi_timestamp_str, cJSON_CreateNumber(__FUNCTION__, (double)EZPI_CORE_sntp_get_current_time_ms()));
         }
     }

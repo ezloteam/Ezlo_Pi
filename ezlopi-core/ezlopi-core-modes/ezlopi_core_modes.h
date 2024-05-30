@@ -140,7 +140,7 @@ int ezlopi_core_modes_api_cancel_switch(void);
 int ezlopi_core_modes_api_cancel_entry_delay(void);
 int ezlopi_core_modes_set_switch_to_delay(uint32_t switch_to_delay);
 int ezlopi_core_modes_set_alarm_delay(uint32_t switch_to_delay);
-int ezlopi_core_modes_set_protect(const char* cj_mode_id, bool protect_state);
+int ezlopi_core_modes_set_protect(uint32_t mode_id, bool protect_state);
 
 int ezlopi_core_modes_add_alarm_off(uint8_t mode_id, cJSON*  device_id);
 int ezlopi_core_modes_remove_alarm_off(uint32_t mode_id, cJSON* device_id);

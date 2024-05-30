@@ -240,13 +240,14 @@ void ezlopi_cloud_modes_protect_set(cJSON* cj_request, cJSON* cj_response)
         cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
         if (cj_params)
         {
-            CJSON_GET_VALUE_BOOL(cj_request, ezlopi_protect_str, protect_state);
-            CJSON_GET_VALUE_DOUBLE(cj_request, ezlopi_timestamp_str, timestamp);
+            CJSON_GET_VALUE_BOOL(cj_params, ezlopi_protect_str, protect_state);
+            CJSON_GET_VALUE_DOUBLE(cj_params, ezlopi_timestamp_str, timestamp);
 
             cJSON* cj_mode_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_modeId_str);
             if (cj_mode_id && cj_mode_id->valuestring)
             {
-                ezlopi_core_modes_set_protect(cj_mode_id->valuestring, protect_state);
+                uint32_t mode_id = strtoul(cj_mode_id->valuestring, NULL, 16);
+                ezlopi_core_modes_set_protect(mode_id, protect_state);
             }
         }
 

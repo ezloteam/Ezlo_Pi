@@ -253,14 +253,13 @@ int ezlopi_core_modes_remove_alarm_off(uint32_t mode_id, cJSON* device_id)
     return ret;
 }
 
-int ezlopi_core_modes_set_protect(const char* cj_mode_id, bool protect_state)
+int ezlopi_core_modes_set_protect(uint32_t mode_id, bool protect_state)
 {
     int ret = 0;
-    if (cj_mode_id)
+    if (sg_custom_modes)
     {
         ezlopi_service_modes_stop();
         s_house_modes_t* house_mode = NULL; /*0,1,2,3*/
-        uint32_t mode_id = strtoul(cj_mode_id, NULL, 16);
         if (NULL != (house_mode = ezlopi_core_modes_get_house_mode_by_id(mode_id)))
         {
             house_mode->protect = protect_state;
