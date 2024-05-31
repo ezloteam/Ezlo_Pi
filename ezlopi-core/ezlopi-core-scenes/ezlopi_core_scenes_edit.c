@@ -60,10 +60,10 @@ int ezlopi_core_scene_edit_update_id(uint32_t scene_id, cJSON* cj_updated_scene)
                 }
                 ret = 1;
 
-                TRACE_D("----------------------------------------------");
-                TRACE_D("esp_get_free_heap_size - %f kB", esp_get_free_heap_size() / 1024.0);
-                TRACE_D("esp_get_minimum_free_heap_size: %f kB", esp_get_minimum_free_heap_size() / 1024.0);
-                TRACE_D("----------------------------------------------");
+                // TRACE_D("----------------------------------------------");
+                // TRACE_D("esp_get_free_heap_size - %f kB", esp_get_free_heap_size() / 1024.0);
+                // TRACE_D("esp_get_minimum_free_heap_size: %f kB", esp_get_minimum_free_heap_size() / 1024.0);
+                // TRACE_D("----------------------------------------------");
 
                 break;
             }
