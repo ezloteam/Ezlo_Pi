@@ -7,6 +7,7 @@
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_http.h"
 #include "ezlopi_core_scenes_v2.h"
+#include "ezlopi_core_scenes_edit.h"
 #include "ezlopi_core_scenes_when_methods_helper_functions.h"
 #include "EZLOPI_USER_CONFIG.h"
 
@@ -1304,5 +1305,159 @@ int when_function_for_latch(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* w
 
     return ret;
 }
+
+
+//-----------------------------------------------------------------------------------------------------
+/* Only for latch operations */
+
+static bool ___extract_cj_blockOptions_for_latch_disable(cJSON* cj_when_block)
+{
+    bool ret = false;
+    cJSON * cj_blockOptions = cJSON_GetObjectItem(__FUNCTION__, cj_when_block, "blockOptions");
+    if (cj_blockOptions)
+    {
+        cJSON * cj_function = cJSON_GetObjectItem(__FUNCTION__, cj_blockOptions, "function");
+        if (cj_function)
+        {
+            cJSON * cj_latch = cJSON_GetObjectItem(__FUNCTION__, cj_function, "latch");
+            if (cj_latch)
+            {
+                cJSON* cj_enabled = cJSON_GetObjectItem(__FUNCTION__, cj_latch, "enabled");
+                if (cJSON_IsBool(cj_enabled) && (cJSON_True == cj_enabled->type))
+                {
+                    ret = true;
+                    cj_enabled->type = cJSON_False; /* diabled latch in nvs*/
+                }
+
+                char * str = cJSON_Print("latch", cj_latch);
+                if (str)
+                {
+                    printf("latch : %s", str);
+                    free(str);
+                }
+            }
+        }
+        else
+        {
+            TRACE_E("error !! no function");
+        }
+    }
+    return ret;
+}
+static bool __find_and_diable_latch_with_specific_blockId(cJSON* cj_when_block, const char* blockId_str)
+{
+    bool latch_cleared = false;
+    int fields_block_idx = 0;
+    int value_block_idx = 0;
+
+    /* <1> single scene function */
+    cJSON * cj_blockId = cJSON_GetObjectItem(__FUNCTION__, cj_when_block, "blockId");
+    if ((cj_blockId->valuestring) && (0 == strncmp(cj_blockId->valuestring, blockId_str, strlen(cj_blockId->valuestring) + 1)))
+    {
+        latch_cleared = ___extract_cj_blockOptions_for_latch_disable(cj_when_block);
+    }
+    else
+    {
+        /* <2> nested scene with function combined by 'And/OR' */
+        cJSON* cj_fields_blocks = cJSON_GetObjectItem(__FUNCTION__, cj_when_block, "fields");
+        if (cj_fields_blocks && (cJSON_Array == cj_fields_blocks->type))
+        {
+            cJSON * cj_fields_block = NULL;
+            while (NULL != (cj_fields_block = cJSON_GetArrayItem(cj_fields_blocks, fields_block_idx++)))
+            {
+                printf("\n---------- [%d] fields :", fields_block_idx);
+                cJSON * name = cJSON_GetObjectItem(__FUNCTION__, cj_fields_block, "name");
+                cJSON * type = cJSON_GetObjectItem(__FUNCTION__, cj_fields_block, "type");
+                if (name && type)
+                {
+                    if ((0 != strncmp(name->valuestring, "blocks", 7)) ||
+                        (0 != strncmp(type->valuestring, "blocks", 7)))
+                    {
+                        TRACE_D("Error!!");
+                        break;
+                    }
+
+                    /* now scanning the value-section within 'fields-block'*/
+                    cJSON* cj_value_blocks = cJSON_GetObjectItem(__FUNCTION__, cj_fields_block, "value");
+                    if (cj_value_blocks && (cJSON_Array == cj_value_blocks->type))
+                    {
+                        cJSON* cj_value_block = NULL;
+                        while (NULL != (cj_value_block = cJSON_GetArrayItem(cj_value_blocks, value_block_idx++)))
+                        {
+                            printf("\n--------------- [%d] value :", value_block_idx);
+                            latch_cleared = __find_and_diable_latch_with_specific_blockId(cj_value_block, blockId_str);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return latch_cleared;
+}
+
+
+
+int ezlopi_scene_reset_specific_latch(const char* sceneId_str, const char* blockId_str)
+{
+    int ret = 0;
+    uint32_t sceneId = strtoul(sceneId_str, NULL, 16);
+    l_scenes_list_v2_t* scene_to_reset_latch = ezlopi_scenes_get_by_id_v2(sceneId);
+    if (scene_to_reset_latch)
+    {
+        /*first diable in linked list*/
+        s_when_function_t* function_state = (s_when_function_t*)scene_to_reset_latch->when_block->fields->user_arg;
+        if (function_state)
+        {
+            function_state->current_state = false;
+        }
+
+        /* secondly change the flag in nvs*/
+        char* scene_str = ezlopi_nvs_read_str(sceneId_str);
+        if (scene_str)
+        {
+            // converting string to cJSON format
+            cJSON* cj_scene = cJSON_Parse(__FUNCTION__, scene_str); /* "params" : {...}*/
+            if (cj_scene)
+            {
+                bool latch_cleared = false;
+                int when_block_idx = 0;
+                cJSON* cj_when_block = NULL;
+                cJSON* cj_when_blocks = cJSON_GetObjectItem(__FUNCTION__, cj_scene, "when");
+                while (NULL != (cj_when_block = cJSON_GetArrayItem(cj_when_blocks, when_block_idx++)))
+                {
+                    latch_cleared = __find_and_diable_latch_with_specific_blockId(cj_when_block, blockId_str);
+                }
+
+
+                if (latch_cleared)
+                {
+                    char * str = cJSON_Print("cj_scene----> 2. updated", cj_scene);
+                    if (str)
+                    {
+                        printf("latch : %s", str);
+                        free(str);
+                    }
+
+                    if (1 == ezlopi_core_scene_edit_store_updated_to_nvs(cj_scene))
+                    {
+                        ret = 1;
+                        TRACE_W("nvs enabled successfull");
+                    }
+                    else
+                    {
+                        TRACE_E("Error!! failed");
+                    }
+                }
+                cJSON_Delete(__FUNCTION__, cj_scene);
+            }
+            ezlopi_free(__FUNCTION__, scene_str);
+        }
+
+    }
+    return ret;
+}
+//-----------------------------------------------------------------------------------------------------
+
+
 #endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 //-----------------------------------------------------------------------------------------------------

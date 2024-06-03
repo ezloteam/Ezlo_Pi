@@ -109,6 +109,9 @@ int when_function_for_follow(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* 
 int when_function_for_pulse(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* when_block, cJSON* cj_func_opr);
 int when_function_for_latch(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* when_block, cJSON* cj_func_opr);
 
+//-------------------------------- Only for latch operations  ----------------------------------------
+int ezlopi_scene_reset_specific_latch(const char* sceneId_str, const char* blockId_str);
+
 #endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 #endif /*_EZLOPI_CORE_SCENES_WHEN_METHODS_HELPER_FUNCTIONS_H_*/

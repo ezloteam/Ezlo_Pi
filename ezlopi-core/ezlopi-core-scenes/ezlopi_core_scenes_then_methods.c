@@ -384,37 +384,15 @@ int ezlopi_scene_then_set_scene_state(l_scenes_list_v2_t* curr_scene, void* arg)
     }
     return ret;
 }
-
-static void __check_cj_blockOptions_for_latch(cJSON* cj_blockOptions, bool* clear_latch_en)
-{
-    cJSON * cj_function = cJSON_GetObjectItem(__FUNCTION__, cj_blockOptions, ezlopi_function_str);
-    if (cj_function)
-    {
-        cJSON * cj_latch = cJSON_GetObjectItem(__FUNCTION__, cj_function, "latch");
-        if (cj_latch)
-        {
-            cJSON* cj_enabled = cJSON_GetObjectItem(__FUNCTION__, cj_latch, ezlopi_enabled_str);
-            if (cJSON_IsBool(cj_enabled) && (cJSON_True == cj_enabled->type))
-            {
-                clear_latch_en = true;
-                cj_enabled->type = cJSON_False;
-            }
-        }
-        else
-        {
-            *clear_latch_en = false;
-            CJSON_TRACE("--> latch", cj_latch);
-        }
-    }
-}
-
 int ezlopi_scene_then_reset_latch(l_scenes_list_v2_t* curr_scene, void* arg)
 {
     int ret = 0;
-    uint32_t sceneId = 0;
+
     l_action_block_v2_t* curr_block = (l_action_block_v2_t*)arg;
     if (curr_block && curr_scene)
     {
+        char * sceneId_str = NULL;
+        char * blockId_str = NULL;
         l_fields_v2_t* curr_field = curr_block->fields;
         while (curr_field)
         {
@@ -422,102 +400,24 @@ int ezlopi_scene_then_reset_latch(l_scenes_list_v2_t* curr_scene, void* arg)
             {
                 if ((EZLOPI_VALUE_TYPE_STRING == curr_field->value_type) && (NULL != curr_field->field_value.u_value.value_string))
                 {
-                    sceneId = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
-                    TRACE_E("reset_latch _---> sceneId[%d]", sceneId);
-                    l_scenes_list_v2_t* scene_to_reset_latch = ezlopi_scenes_get_by_id_v2(sceneId);
-                    if (scene_to_reset_latch)
-                    {
-                        s_when_function_t* function_state = (s_when_function_t*)scene_to_reset_latch->when_block->fields->user_arg;
-                        if (function_state)
-                        {
-                            function_state->current_state = false;
-                        }
-
-                        char* scene_str = ezlopi_nvs_read_str(curr_field->field_value.u_value.value_string);
-                        if (scene_str)
-                        {
-                            // converting string to cJSON format
-                            cJSON* cj_scene = cJSON_Parse(__FUNCTION__, scene_str); /* "params" : {...}*/
-                            if (cj_scene)
-                            {
-                                bool clear_latch_en = false;
-
-                                int when_block_idx = 0;
-                                int fields_block_idx = 0;
-                                int value_block_idx = 0;
-
-                                cJSON* cj_when_block = NULL;
-                                cJSON* cj_when_blocks = cJSON_GetObjectItem(__FUNCTION__, cj_scene, ezlopi_when_str);
-                                while (NULL != (cj_when_block = cJSON_GetArrayItem(cj_when_blocks, when_block_idx++)))
-                                {
-                                    cJSON * cj_blockOptions = cJSON_GetObjectItem(__FUNCTION__, cj_when_block, ezlopi_blockOptions_str);
-                                    if (cj_blockOptions)
-                                    {   /* <1> single scene with function */
-                                        __check_cj_blockOptions_for_latch(cj_blockOptions, &clear_latch_en);
-                                    }
-                                    else
-                                    {   /* <2> multiple scene combined by 'And/OR'  */
-                                        cJSON* cj_fields_blocks = cJSON_GetObjectItem(__FUNCTION__, cj_when_block, ezlopi_fields_str);
-                                        if (cj_fields_blocks && (cJSON_Array == cj_fields_blocks->type))
-                                        {
-                                            cJSON * cj_fields_block = NULL;
-                                            while (NULL != (cj_fields_block = cJSON_GetArrayItem(cj_fields_blocks, fields_block_idx++)))
-                                            {
-                                                printf("\n---------- [%d] fields :", fields_block_idx);
-                                                cJSON * name = cJSON_GetObjectItem(__FUNCTION__, cj_fields_block, ezlopi_name_str);
-                                                cJSON * type = cJSON_GetObjectItem(__FUNCTION__, cj_fields_block, ezlopi_type_str);
-                                                if (name && type)
-                                                {
-                                                    if ((0 != strncmp(name->valuestring, "blocks", 7)) ||
-                                                        (0 != strncmp(type->valuestring, "blocks", 7)))
-                                                    {
-                                                        TRACE_D("Error!!");
-                                                        break;
-                                                    }
-
-                                                    cJSON* cj_value_blocks = cJSON_GetObjectItem(__FUNCTION__, cj_fields_block, ezlopi_value_str);
-                                                    if (cj_value_blocks && (cJSON_Array == cj_value_blocks->type))
-                                                    {
-                                                        cJSON* cj_value_block = NULL;
-                                                        while (NULL != (cj_value_block = cJSON_GetArrayItem(cj_value_blocks, value_block_idx++)))
-                                                        {
-                                                            printf("\n--------------- [%d] value :", value_block_idx);
-                                                            cJSON * cj_blockOptions = cJSON_GetObjectItem(__FUNCTION__, cj_value_block, ezlopi_blockOptions_str);
-                                                            if (cj_blockOptions)
-                                                            {
-                                                                __check_cj_blockOptions_for_latch(cj_blockOptions, &clear_latch_en);
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                    if (clear_latch_en)
-                                    {
-                                        CJSON_TRACE("cj_scene----> 2. updated", cj_scene);
-
-                                        if (1 == ezlopi_core_scene_edit_store_updated_to_nvs(cj_scene))
-                                        {
-                                            ret = 1;
-                                            TRACE_W("nvs enabled successfull");
-                                        }
-                                        else
-                                        {
-                                            TRACE_E("Error!! failed");
-                                        }
-                                    }
-                                }
-                                cJSON_Delete(__FUNCTION__, cj_scene);
-                            }
-                            ezlopi_free(__FUNCTION__, scene_str);
-                        }
-                        break;
-                    }
+                    sceneId_str = curr_field->field_value.u_value.value_string;
+                    // TRACE_S("sceneId[%s]", sceneId);
+                }
+            }
+            else if (0 == strncmp(curr_field->name, ezlopi_blockId_str, 8))
+            {
+                if ((EZLOPI_VALUE_TYPE_STRING == curr_field->value_type) && (NULL != curr_field->field_value.u_value.value_string))
+                {
+                    blockId_str = curr_field->field_value.u_value.value_string;
+                    // TRACE_S("blockId[%s]", blockId_str);
                 }
             }
             curr_field = curr_field->next;
+        }
+
+        if (sceneId_str && blockId_str)
+        {
+            ezlopi_scene_reset_specific_latch(sceneId_str, blockId_str);
         }
     }
     return ret;

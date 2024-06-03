@@ -269,6 +269,12 @@ void ezlopi_scenes_populate_assign_when_block(l_when_block_v2_t* new_when_block,
 {
     if (new_when_block)
     {
+        CJSON_GET_VALUE_STRING_BY_COPY(cj_when_block, ezlopi_blockId_str, new_when_block->blockId);
+        if (NULL != new_when_block->blockId)
+        {
+            TRACE_D("when_blockId: %s", new_when_block->blockId);
+        }
+
         cJSON* cj_block_options = cJSON_GetObjectItem(__FUNCTION__, cj_when_block, ezlopi_blockOptions_str);
         if (cj_block_options)
         {
