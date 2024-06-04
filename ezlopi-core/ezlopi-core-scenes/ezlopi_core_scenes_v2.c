@@ -1084,7 +1084,7 @@ static int __new_scene_add_group_id_if_reqd(cJSON* cj_new_scene)
                                     if (cj_block_name && (NULL != cj_block_name->valuestring))
                                     {
                                         add_when_blockId_flag = true;
-                                        break;
+                                        break;  // this break neglects furthur inpections within 'cj_value_blocks' array. 
                                     }
                                 }
                             }
@@ -1305,7 +1305,7 @@ int ezlopi_core_scene_set_reset_latch(const char* sceneId_str, const char* block
     l_scenes_list_v2_t* scene_to_reset_latch = ezlopi_scenes_get_by_id_v2(sceneId);
     if (scene_to_reset_latch)
     {
-        /*first diable in linked list*/
+        /*first disable in scene-linked-list*/
         s_when_function_t* function_state = (s_when_function_t*)scene_to_reset_latch->when_block->fields->user_arg;
         if (function_state)
         {
@@ -1328,7 +1328,6 @@ int ezlopi_core_scene_set_reset_latch(const char* sceneId_str, const char* block
                 {
                     latch_cleared = ___enable_disable_latch_with_blockId(cj_when_block, blockId_str, enable_status);
                 }
-
 
                 if (latch_cleared)
                 {

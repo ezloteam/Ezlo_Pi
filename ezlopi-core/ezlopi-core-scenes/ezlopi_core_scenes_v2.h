@@ -208,7 +208,7 @@ void ezlopi_scenes_notifications_add(cJSON* cj_notifications);
  *
  * @param sceneId_str contains required sceneId value
  * @param blockId_str contains required blockId value (when-condition). If (blockID == NULL) ; means to delete all latches contained within sceneId.
- * @param enable_status indicated what status is to be set
+ * @param enable_status enable [true or false] -> [1 or 0]
  * @return successful reset => 1 / else => 0.
  */
 int ezlopi_core_scene_set_reset_latch(const char* sceneId_str, const char* blockId_str, bool enable_status);
