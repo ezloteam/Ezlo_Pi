@@ -425,7 +425,7 @@ int ezlopi_scene_then_reset_latch(l_scenes_list_v2_t* curr_scene, void* arg)
 int ezlopi_scene_then_reset_scene_latches(l_scenes_list_v2_t* curr_scene, void* arg)
 {
     int ret = 0;
-    uint32_t sceneId = 0;
+    char * sceneId_str = 0;
     l_action_block_v2_t* curr_then = (l_action_block_v2_t*)arg;
     if (curr_then && curr_scene)
     {
@@ -436,23 +436,16 @@ int ezlopi_scene_then_reset_scene_latches(l_scenes_list_v2_t* curr_scene, void* 
             {
                 if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type)
                 {
-                    sceneId = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
-
-
-                    TRACE_E("reset_latch---> sceneId[%d]", sceneId);
-                    l_scenes_list_v2_t* scene_to_reset_latch = ezlopi_scenes_get_by_id_v2(sceneId);
-                    if (scene_to_reset_latch)
-                    {
-                        s_when_function_t* function_state = (s_when_function_t*)scene_to_reset_latch->when_block->fields->user_arg;
-                        if (function_state)
-                        {
-                            function_state->current_state = false;
-                        }
-                        break;
-                    }
+                    sceneId_str = curr_field->field_value.u_value.value_string;
+                    // TRACE_S("sceneId[%s]", sceneId);
                 }
             }
             curr_field = curr_field->next;
+        }
+
+        if (sceneId_str)
+        {
+            ezlopi_scene_reset_specific_latch(sceneId_str, NULL);
         }
     }
     return ret;

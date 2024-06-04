@@ -1352,7 +1352,7 @@ static bool __find_and_diable_latch_with_specific_blockId(cJSON* cj_when_block, 
 
     /* <1> single scene function */
     cJSON * cj_blockId = cJSON_GetObjectItem(__FUNCTION__, cj_when_block, "blockId");
-    if ((cj_blockId->valuestring) && (0 == strncmp(cj_blockId->valuestring, blockId_str, strlen(cj_blockId->valuestring) + 1)))
+    if ((cj_blockId && cj_blockId->valuestring) && (0 == strncmp(cj_blockId->valuestring, ((NULL == blockId_str) ? cj_blockId->valuestring : blockId_str), strlen(cj_blockId->valuestring) + 1)))
     {
         latch_cleared = ___extract_cj_blockOptions_for_latch_disable(cj_when_block);
     }
