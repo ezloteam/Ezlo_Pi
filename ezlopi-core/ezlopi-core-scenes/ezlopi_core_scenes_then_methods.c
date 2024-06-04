@@ -417,7 +417,7 @@ int ezlopi_scene_then_reset_latch(l_scenes_list_v2_t* curr_scene, void* arg)
 
         if (sceneId_str && blockId_str)
         {
-            ezlopi_scene_reset_specific_latch(sceneId_str, blockId_str);
+            ezlopi_core_scene_set_reset_latch(sceneId_str, blockId_str, false);
         }
     }
     return ret;
@@ -445,7 +445,7 @@ int ezlopi_scene_then_reset_scene_latches(l_scenes_list_v2_t* curr_scene, void* 
 
         if (sceneId_str)
         {
-            ezlopi_scene_reset_specific_latch(sceneId_str, NULL);
+            ezlopi_core_scene_set_reset_latch(sceneId_str, NULL, false);
         }
     }
     return ret;

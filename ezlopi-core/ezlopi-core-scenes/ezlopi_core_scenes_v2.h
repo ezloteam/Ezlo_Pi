@@ -12,6 +12,15 @@
 
 #include "ezlopi_core_scenes_methods.h"
 
+//------------ when-block: 'cj_function' -----------------------
+typedef struct s_when_function
+{
+    uint32_t transtion_instant;
+    uint32_t transition_count;
+    bool current_state;
+    bool activate_pulse_seq;    /* used only in 'for_pulse_method' */
+} s_when_function_t;
+//--------------------------------------------------------------
 typedef enum e_scenes_block_type_v2
 {
     SCENE_BLOCK_TYPE_NONE = 0,
@@ -137,6 +146,7 @@ typedef struct l_house_modes_v2
     struct l_house_modes_v2* next;
 } l_house_modes_v2_t;
 
+
 typedef struct l_scenes_list_v2
 {
     e_scene_status_v2_t status;
@@ -191,6 +201,17 @@ void ezlopi_scenes_remove_id_from_list_v2(uint32_t _id);
 l_scenes_list_v2_t* ezlopi_scenes_pop_by_id_v2(uint32_t _id);
 
 void ezlopi_scenes_notifications_add(cJSON* cj_notifications);
+
+//-------------------------------- Only for latch operations  ----------------------------------------
+/**
+ * @brief This function checks for 'latch' struct within nvs_scenes. The scenes are filtered out using 'sceneId[necessary]' & 'blockId[optional]'
+ *
+ * @param sceneId_str contains required sceneId value
+ * @param blockId_str contains required blockId value (when-condition). If (blockID == NULL) ; means to delete all latches contained within sceneId.
+ * @param enable_status indicated what status is to be set
+ * @return successful reset => 1 / else => 0.
+ */
+int ezlopi_core_scene_set_reset_latch(const char* sceneId_str, const char* blockId_str, bool enable_status);
 
 #endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 

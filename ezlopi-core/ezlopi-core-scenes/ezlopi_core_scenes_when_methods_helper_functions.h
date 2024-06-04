@@ -56,14 +56,6 @@ typedef struct s_function_opr
     int(*opr_method)(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* when_block, cJSON* cj_func_opr);
 } s_function_opr_t;
 
-typedef struct s_when_function
-{
-    uint32_t transtion_instant;
-    uint32_t transition_count;
-    bool current_state;
-    bool activate_pulse_seq;    /* used only in 'for_pulse_method' */
-} s_when_function_t;
-
 //------------------------------- ezlopi_scene_when_is_date -----------------------------------------------
 uint8_t isdate_type_check(e_isdate_modes_t* mode_type, struct tm* info, l_fields_v2_t* curr_field);
 uint8_t isdate_tm_check(e_isdate_modes_t* mode_type, struct tm* info, l_fields_v2_t* curr_field);
@@ -108,9 +100,6 @@ int when_function_for_repeat(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* 
 int when_function_for_follow(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* when_block, cJSON* cj_func_opr);
 int when_function_for_pulse(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* when_block, cJSON* cj_func_opr);
 int when_function_for_latch(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* when_block, cJSON* cj_func_opr);
-
-//-------------------------------- Only for latch operations  ----------------------------------------
-int ezlopi_scene_reset_specific_latch(const char* sceneId_str, const char* blockId_str);
 
 #endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
