@@ -38,12 +38,11 @@ Navigate to your terminal or bash shell and execute the following commands:
 git clone --recursive git@github.com:ezloteam/Ezlo_Pi.git
 cd Ezlo_Pi
 ```
-### 2. Configure the Projec
+### 2. Configure the Project
 You need to configure the project as per the chip type you are using. It needs to be renamed the file ```sdkconfig.<chip type>.<flash size>``` to ```sdkconfig``` and then build the project with IDF command.
-* __[ESP32 4MB Standard](sdkconfig.esp32.4mb)__
-* __[ESP32-S3 4MB ](sdkconfig.esp32s3.4mb)__
-* __[ESP32-S3 8MB](sdkconfig.esp32s3.8mb)__
-* __[ESP32-C3 4MB](sdkconfig.esp32c3.4mb)__
+* __[ESP32](sdkconfig.esp32.4mb)__
+* __[ESP32-S3](sdkconfig.esp32s3.4mb)__
+* __[ESP32-C3](sdkconfig.esp32c3.4mb)__
 
 
 ### 3. Build the Project
