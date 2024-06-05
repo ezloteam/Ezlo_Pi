@@ -1163,11 +1163,11 @@ static int _____check_and_add_when_blockId(cJSON* cj_new_scene_when_block)
                     add_when_blockId_flag = true;
                 }
             }
-    }
+        }
 #endif
         TRACE_D("-------> blockName found : [%s]", cj_blockName->valuestring);
         add_when_blockId_flag = true;
-}
+    }
 
     // <2> For multiple nested when-case
     cJSON* cj_fields_blocks = cJSON_GetObjectItem(__FUNCTION__, cj_new_scene_when_block, ezlopi_fields_str);
@@ -1274,7 +1274,8 @@ static bool ___enable_disable_latch_with_blockId(cJSON* cj_when_block, const cha
 
     /* <1> single scene function */
     cJSON * cj_blockId = cJSON_GetObjectItem(__FUNCTION__, cj_when_block, "blockId");
-    if ((cj_blockId && cj_blockId->valuestring) && (0 == strncmp(cj_blockId->valuestring, ((NULL == blockId_str) ? cj_blockId->valuestring : blockId_str), strlen(cj_blockId->valuestring) + 1)))
+    if ((cj_blockId && cj_blockId->valuestring) &&
+        ((NULL == blockId_str) ? (true) : (0 == strncmp(cj_blockId->valuestring, blockId_str, strlen(cj_blockId->valuestring) + 1))))
     {
         latch_cleared = ____change_latch_status_in_blockOptions(cj_when_block, enable_status);
     }
@@ -1346,12 +1347,12 @@ int ezlopi_core_scene_set_reset_latch(const char* sceneId_str, const char* block
 
                 if (latch_cleared)
                 {
-                    char * str = cJSON_Print("cj_scene----> 2. updated", cj_scene);
-                    if (str)
-                    {
-                        printf("latch : %s", str);
-                        free(str);
-                    }
+                    // char * str = cJSON_Print("cj_scene----> 2. updated", cj_scene);
+                    // if (str)
+                    // {
+                    //     printf("latch : %s", str);
+                    //     free(str);
+                    // }
 
                     if (1 == ezlopi_core_scene_edit_store_updated_to_nvs(cj_scene))
                     {
