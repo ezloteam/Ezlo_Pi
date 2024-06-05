@@ -62,12 +62,52 @@ void ezlopi_cloud_modes_disarmed_devices_removed(cJSON* cj_request, cJSON* cj_re
 
 void ezlopi_cloud_modes_alarms_off_added(cJSON* cj_request, cJSON* cj_response)
 {
-    cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+    cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_id_str);
+    cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_method_str);
+
+    cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
+    cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, "hub.modes.alarms_off.added");
+
+    cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
+    if (cj_params)
+    {
+        cJSON* cj_mode_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_modeId_str);
+        cJSON* cj_device_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_deviceId_str);
+        if (cj_mode_id && cj_device_id)
+        {
+            cJSON * cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+            if (cj_result)
+            {
+                cJSON_AddItemToObject(__FUNCTION__, cj_result, ezlopi_modeId_str, cJSON_Duplicate(__FUNCTION__, cj_mode_id, true));
+                cJSON_AddItemToObject(__FUNCTION__, cj_result, "alarmsOffDevice", cJSON_Duplicate(__FUNCTION__, cj_device_id, true));
+            }
+        }
+    }
 }
 
 void ezlopi_cloud_modes_alarms_off_removed(cJSON* cj_request, cJSON* cj_response)
 {
-    cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+    cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_id_str);
+    cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_method_str);
+
+    cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
+    cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, "hub.modes.alarms_off.removed");
+
+    cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
+    if (cj_params)
+    {
+        cJSON* cj_mode_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_modeId_str);
+        cJSON* cj_device_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_deviceId_str);
+        if (cj_mode_id && cj_device_id)
+        {
+            cJSON * cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+            if (cj_result)
+            {
+                cJSON_AddItemToObject(__FUNCTION__, cj_result, ezlopi_modeId_str, cJSON_Duplicate(__FUNCTION__, cj_mode_id, true));
+                cJSON_AddItemToObject(__FUNCTION__, cj_result, "alarmsOffDevice", cJSON_Duplicate(__FUNCTION__, cj_device_id, true));
+            }
+        }
+    }
 }
 
 void ezlopi_cloud_modes_cameras_off_added(cJSON* cj_request, cJSON* cj_response)
@@ -118,6 +158,39 @@ void ezlopi_cloud_modes_protect_devices_added(cJSON* cj_request, cJSON* cj_respo
 void ezlopi_cloud_modes_protect_devices_removed(cJSON* cj_request, cJSON* cj_response)
 {
     cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+}
+
+void ezlopi_cloud_modes_entry_delay_changed(cJSON* cj_request, cJSON* cj_response)
+{
+    cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_id_str);
+    cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_method_str);
+
+    cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
+    cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, "hub.modes.entry_delay.changed");
+
+    cJSON * cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+    if (cj_result)
+    {
+        cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
+        if (cj_params)
+        {
+            // cJSON_AddItemToObject(__FUNCTION__, cj_result, ezlopi_entryDelay_str, cJSON_Duplicate(__FUNCTION__, cj_params, true));
+
+            cJSON * cj_entryDelay = cJSON_AddObjectToObject(__FUNCTION__, cj_result, ezlopi_entryDelay_str);
+            if (cj_entryDelay)
+            {
+                s_ezlopi_modes_t* curr_mode = ezlopi_core_modes_get_custom_modes();
+                if (curr_mode)
+                {
+                    cJSON_AddNumberToObject(__FUNCTION__, cj_entryDelay, ezlopi_normal_str, curr_mode->entry_delay.normal_delay_sec);
+                    cJSON_AddNumberToObject(__FUNCTION__, cj_entryDelay, ezlopi_short_str, curr_mode->entry_delay.short_delay_sec);
+                    cJSON_AddNumberToObject(__FUNCTION__, cj_entryDelay, ezlopi_extended_str, curr_mode->entry_delay.extended_delay_sec);
+                    cJSON_AddNumberToObject(__FUNCTION__, cj_entryDelay, ezlopi_instant_str, curr_mode->entry_delay.instant_delay_sec);
+                }
+            }
+            cJSON_AddItemToObject(__FUNCTION__, cj_result, ezlopi_timestamp_str, cJSON_CreateNumber(__FUNCTION__, (double)EZPI_CORE_sntp_get_current_time_ms()));
+        }
+    }
 }
 
 #endif // CONFIG_EZPI_SERV_ENABLE_MODES

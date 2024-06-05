@@ -143,7 +143,7 @@ typedef struct l_scenes_list_v2
 
     uint32_t _id;
     bool enabled;
-    uint32_t is_group;
+    bool is_group;
     char group_id[32];
     char name[32];
     char parent_id[32];
