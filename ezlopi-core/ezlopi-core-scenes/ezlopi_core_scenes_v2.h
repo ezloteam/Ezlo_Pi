@@ -117,7 +117,9 @@ typedef struct l_action_block_v2
 
 typedef struct l_when_block_v2
 {
-    char blockId[40];   /* need for latch functionality and */
+    bool block_enable;
+    char blockId[40];   /* if (blockName == !NULL) */
+    char blockName[40];
     e_scenes_block_type_v2_t block_type;
     s_block_options_v2_t block_options;
     l_fields_v2_t* fields;

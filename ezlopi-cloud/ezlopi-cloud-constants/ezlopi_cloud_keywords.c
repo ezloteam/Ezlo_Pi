@@ -37,6 +37,7 @@ const char* ezlopi_expressions_str = "expressions";
 const char* ezlopi_is_group_str = "is_group";
 const char* ezlopi_user_notifications_str = "user_notifications";
 const char* ezlopi_house_modes_str = "house_modes";
+const char* ezlopi_block_enable_str = "block_enable";
 const char* ezlopi_blockId_str = "blockId";
 const char* ezlopi_blockOptions_str = "blockOptions";
 const char* ezlopi_blockName_str = "blockName";
