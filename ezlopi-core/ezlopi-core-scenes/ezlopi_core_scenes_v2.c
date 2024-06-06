@@ -1385,28 +1385,14 @@ int ezlopi_core_scene_set_reset_latch(const char* sceneId_str, const char* block
 static bool _____change_block_en_status(cJSON* cj_when_block, bool enable_status)
 {
     bool ret = false;
-    cJSON * cj_blockOptions = cJSON_GetObjectItem(__FUNCTION__, cj_when_block, "blockOptions");
-    if (cj_blockOptions)
+
+    cJSON* cj_block_en = cJSON_GetObjectItem(__FUNCTION__, cj_when_block, "block_enable");
+    if (cJSON_IsBool(cj_block_en) && cj_block_en)
     {
-        cJSON * cj_function = cJSON_GetObjectItem(__FUNCTION__, cj_blockOptions, "function");
-        if (cj_function)
-        {
-            cJSON * cj_latch = cJSON_GetObjectItem(__FUNCTION__, cj_function, "latch");
-            if (cj_latch)
-            {
-                cJSON* cj_enabled = cJSON_GetObjectItem(__FUNCTION__, cj_latch, "enabled");
-                if (cJSON_IsBool(cj_enabled) && cj_enabled)
-                {
-                    ret = true;
-                    cj_enabled->type = (enable_status ? cJSON_True : cJSON_False); /* change latch-status in nvs*/
-                }
-            }
-        }
-        else
-        {
-            TRACE_E("error !! no function");
-        }
+        ret = true;
+        cj_block_en->type = (enable_status ? cJSON_True : cJSON_False); /* change latch-status in nvs*/
     }
+
     return ret;
 }
 static bool ___enable_disable_block_en_with_blockId(cJSON* cj_when_block, const char* blockId_str, bool enable_status)
@@ -1417,8 +1403,7 @@ static bool ___enable_disable_block_en_with_blockId(cJSON* cj_when_block, const 
 
     /* <1> single scene function */
     cJSON * cj_blockId = cJSON_GetObjectItem(__FUNCTION__, cj_when_block, "blockId");
-    if ((cj_blockId && cj_blockId->valuestring) &&
-        ((NULL == blockId_str) ? (true) : (0 == strncmp(cj_blockId->valuestring, blockId_str, strlen(cj_blockId->valuestring) + 1))))
+    if ((cj_blockId && cj_blockId->valuestring) && (0 == strncmp(cj_blockId->valuestring, blockId_str, strlen(cj_blockId->valuestring) + 1)))
     {
         block_en_changed = _____change_block_en_status(cj_when_block, enable_status);
     }
@@ -1447,7 +1432,10 @@ static bool ___enable_disable_block_en_with_blockId(cJSON* cj_when_block, const 
                         cJSON* cj_value_block = NULL;
                         while (NULL != (cj_value_block = cJSON_GetArrayItem(cj_value_blocks, value_block_idx++)))
                         {
-                            block_en_changed = ___enable_disable_block_en_with_blockId(cj_value_block, blockId_str, enable_status);
+                            if (true == (block_en_changed = ___enable_disable_block_en_with_blockId(cj_value_block, blockId_str, enable_status)))
+                            {
+                                break; // changed only targeted blockID.
+                            }
                         }
                     }
                 }
@@ -1478,7 +1466,7 @@ int ezlopi_core_scene_block_enable_set_reset(const char* sceneId_str, const char
                 cJSON* cj_when_blocks = cJSON_GetObjectItem(__FUNCTION__, cj_scene, "when");
                 while (NULL != (cj_when_block = cJSON_GetArrayItem(cj_when_blocks, when_block_idx++)))
                 {
-                    block_enabled_changed = ___enable_disable_latch_with_blockId(cj_when_block, blockId_str, enable_status);
+                    block_enabled_changed = ___enable_disable_block_en_with_blockId(cj_when_block, blockId_str, enable_status);
                 }
 
                 if (block_enabled_changed)

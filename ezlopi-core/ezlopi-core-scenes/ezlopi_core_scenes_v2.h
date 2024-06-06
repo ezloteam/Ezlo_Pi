@@ -215,6 +215,8 @@ void ezlopi_scenes_notifications_add(cJSON* cj_notifications);
  */
 int ezlopi_core_scene_set_reset_latch(const char* sceneId_str, const char* blockId_str, bool enable_status);
 
+int ezlopi_core_scene_block_enable_set_reset(const char* sceneId_str, const char* blockId_str, bool enable_status);
+
 #endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 #endif // _EZLOPI_CORE_SCENES_V2_H_
