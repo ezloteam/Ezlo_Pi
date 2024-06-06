@@ -36,6 +36,7 @@ extern "C"
     const char* ezlopi_wifi_get_last_disconnect_reason(void);
 
     ezlopi_wifi_status_t* ezlopi_wifi_status(void);
+    int ezlopi_populate_wifi_ap_info(cJSON* cj_info);
 
     void ezlopi_wifi_event_add(f_ezlopi_wifi_event_upcall upcall, void* arg);
 

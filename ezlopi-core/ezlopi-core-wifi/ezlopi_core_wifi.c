@@ -367,7 +367,7 @@ static void ezlopi_wifi_scanner_task(void* params)
         .scan_time.active.min = 120,
         .scan_time.active.max = 150,
     };
-
+    ezlopi_core_device_broadcast_wifi_start_scan();
     while (1)
     {
         current_time = (xTaskGetTickCount() - start_time);
@@ -390,6 +390,7 @@ static void ezlopi_wifi_scanner_task(void* params)
         }
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
+    ezlopi_core_device_broadcast_wifi_stop_scan();
     ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_CORE_WIFI_SCANNER_TASK);
     sg_scan_handle = NULL;
     vTaskDelete(NULL);
@@ -406,6 +407,7 @@ void ezlopi_wifi_scan_stop()
         ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_CORE_WIFI_SCANNER_TASK);
         vTaskDelete(sg_scan_handle);
         sg_scan_handle = NULL;
+        // ezlopi_core_device_broadcast_wifi_stop_scan();
     }
 
     TRACE_E("Deleting previous record.");
@@ -517,6 +519,49 @@ static void __event_ip_got_ip(void* event_data)
 
         memcpy(&sg_my_ip, &event->ip_info, sizeof(esp_netif_ip_info_t));
     }
+}
+
+int ezlopi_populate_wifi_ap_info(cJSON* cj_info)
+{
+    int ret = 0;
+    if (cj_info)
+    {
+        char temporary[50];
+        wifi_ap_record_t ap_info;
+        esp_err_t error = esp_wifi_sta_get_ap_info(&ap_info);
+        if (ESP_OK == error)
+        {
+            cJSON_AddStringToObject(__FUNCTION__, cj_info, "mode", "sta");
+            cJSON_AddNumberToObject(__FUNCTION__, cj_info, "channel", ap_info.primary);
+            cJSON* cj_network = cJSON_AddObjectToObject(__FUNCTION__, cj_info, "network");
+            if (cj_network)
+            {
+                memset(temporary, 0, 50);
+                snprintf(temporary, 50, "%02x:%02x:%02x:%02x:%02x:%02x", ap_info.bssid[0], ap_info.bssid[1], ap_info.bssid[2],
+                    ap_info.bssid[3], ap_info.bssid[0], ap_info.bssid[5]);
+                cJSON_AddStringToObject(__FUNCTION__, cj_network, "bssid", temporary);
+                memset(temporary, 0, 50);
+
+                get_auth_mode_str(temporary, ap_info.authmode);
+                cJSON_AddStringToObject(__FUNCTION__, cj_network, "encryption", temporary);
+                memcpy(temporary, ap_info.ssid, 33);
+
+                cJSON_AddStringToObject(__FUNCTION__, cj_network, "ssid", temporary);
+                memset(temporary, 0, 50);
+
+                char *password = ezlopi_factory_info_v3_get_password();
+                if (password)
+                {
+                    cJSON_AddStringToObject(__FUNCTION__, cj_network, "key", password);
+                }
+
+                free(password);
+
+            }
+            cJSON_AddStringToObject(__FUNCTION__, cj_info, "region", "00");
+        }
+    }
+    return ret;
 }
 
 int ezlopi_wifi_get_wifi_mac(uint8_t mac[6])

@@ -37,7 +37,7 @@ int ezlopi_device_value_updated_from_device_broadcast(l_ezlopi_item_t* item)
                             cJSON_Delete(__FUNCTION__, cj_response);
                         }
                     }
-                    
+
                     break;
                 }
 
@@ -164,7 +164,7 @@ int ezlopi_core_device_value_update_wifi_scan_broadcast(cJSON* network_array)
         {
             cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
             cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, method_hub_network_wifi_scan_progress);
-            // cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_msg_id_str, ezlopi_service_web_provisioning_get_message_count());
+            cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_msg_id_str, ezlopi_service_web_provisioning_get_message_count());
 
             cJSON* result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, "result");
             if (result)
@@ -194,6 +194,59 @@ int ezlopi_core_device_value_update_wifi_scan_broadcast(cJSON* network_array)
     else
     {
         ret = 1;
+    }
+    return ret;
+}
+
+int ezlopi_core_device_broadcast_wifi_start_scan()
+{
+    int ret = 0;
+
+    cJSON* cj_response = cJSON_CreateObject(__FUNCTION__);
+    if (cj_response)
+    {
+        cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_id_str, ezlopi_ui_broadcast_str);
+        cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, method_hub_network_wifi_scan_progress);
+        cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_msg_id_str, ezlopi_service_web_provisioning_get_message_count());
+        cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+        if (cj_result)
+        {
+            cJSON_AddStringToObject(__FUNCTION__, cj_result, "interfaceId", "wlan0");
+            cJSON_AddStringToObject(__FUNCTION__, cj_result, "status", "started");
+        }
+        CJSON_TRACE("----------------- broadcasting - cj_response", cj_response);
+        ret = ezlopi_core_ezlopi_broadcast_add_to_queue(cj_response);
+
+        if (0 == ret)
+        {
+            cJSON_Delete(__FUNCTION__, cj_response);
+        }
+    }
+
+    return ret;
+}
+
+int ezlopi_core_device_broadcast_wifi_stop_scan()
+{
+    int ret = 0;
+    cJSON* cj_response = cJSON_CreateObject(__FUNCTION__);
+    if (cj_response)
+    {
+        cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_id_str, ezlopi_ui_broadcast_str);
+        cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, method_hub_network_wifi_scan_progress);
+        cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+        if (cj_result)
+        {
+            cJSON_AddStringToObject(__FUNCTION__, cj_result, "interfaceId", "wlan0");
+            cJSON_AddStringToObject(__FUNCTION__, cj_result, "status", "finished");
+        }
+        CJSON_TRACE("----------------- broadcasting - cj_response", cj_response);
+        ret = ezlopi_core_ezlopi_broadcast_add_to_queue(cj_response);
+
+        if (0 == ret)
+        {
+            cJSON_Delete(__FUNCTION__, cj_response);
+        }
     }
     return ret;
 }

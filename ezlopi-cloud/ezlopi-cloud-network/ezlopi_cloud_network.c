@@ -24,7 +24,7 @@ void network_get(cJSON* cj_request, cJSON* cj_response)
             if (wifi_properties)
             {
                 char tmp_string[64];
-                cJSON_AddStringToObject(__FUNCTION__, wifi_properties, ezlopi__id_str, ezlopi_wifi_str);
+                cJSON_AddStringToObject(__FUNCTION__, wifi_properties, ezlopi__id_str, "wlan0");
                 cJSON_AddStringToObject(__FUNCTION__, wifi_properties, ezlopi_enabled_str, ezlopi_auto_str);
 
                 uint8_t mac_addr[6];
@@ -33,6 +33,7 @@ void network_get(cJSON* cj_request, cJSON* cj_response)
                 cJSON_AddStringToObject(__FUNCTION__, wifi_properties, ezlopi_hwaddr_str, tmp_string);
                 cJSON_AddBoolToObject(__FUNCTION__, wifi_properties, ezlopi_internetAvailable_str, true);
                 cJSON_AddStringToObject(__FUNCTION__, wifi_properties, ezlopi_network_str, ezlopi_wan_str);
+                cJSON_AddNumberToObject(__FUNCTION__, wifi_properties, "priority", 0);
                 cJSON_AddStringToObject(__FUNCTION__, wifi_properties, ezlopi_status_str, ezlopi_up_str);
                 cJSON_AddStringToObject(__FUNCTION__, wifi_properties, ezlopi_type_str, ezlopi_wifi_str);
 
@@ -40,12 +41,15 @@ void network_get(cJSON* cj_request, cJSON* cj_response)
                 if (wifi_ipv4)
                 {
                     esp_netif_ip_info_t* ip_info = ezlopi_wifi_get_ip_infos();
-                    snprintf(tmp_string, sizeof(tmp_string), IPSTR, IP2STR(&ip_info->gw));
-                    cJSON_AddStringToObject(__FUNCTION__, wifi_ipv4, ezlopi_ip_str, tmp_string);
                     snprintf(tmp_string, sizeof(tmp_string), IPSTR, IP2STR(&ip_info->ip));
-                    cJSON_AddStringToObject(__FUNCTION__, wifi_ipv4, ezlopi_mask_str, tmp_string);
+                    cJSON_AddStringToObject(__FUNCTION__, wifi_ipv4, ezlopi_ip_str, tmp_string);
+
                     snprintf(tmp_string, sizeof(tmp_string), IPSTR, IP2STR(&ip_info->netmask));
+                    cJSON_AddStringToObject(__FUNCTION__, wifi_ipv4, ezlopi_mask_str, tmp_string);
+
+                    snprintf(tmp_string, sizeof(tmp_string), IPSTR, IP2STR(&ip_info->gw));
                     cJSON_AddStringToObject(__FUNCTION__, wifi_ipv4, ezlopi_gateway_str, tmp_string);
+
                     cJSON_AddStringToObject(__FUNCTION__, wifi_ipv4, ezlopi_mode_str, ezlopi_dhcp_str);
 
                     if (!cJSON_AddItemToObjectCS(__FUNCTION__, wifi_properties, ezlopi_ipv4_str, wifi_ipv4))
@@ -55,6 +59,12 @@ void network_get(cJSON* cj_request, cJSON* cj_response)
                     }
                 }
 
+                cJSON* cj_wifi = cJSON_AddObjectToObject(__FUNCTION__, wifi_properties, ezlopi_wifi_str);
+                if(cj_wifi)
+                {
+                    ezlopi_populate_wifi_ap_info(cj_wifi);
+                }
+
                 if (!cJSON_AddItemToArray(interfaces_array, wifi_properties))
                 {
                     cJSON_Delete(__FUNCTION__, wifi_properties);
@@ -62,6 +72,7 @@ void network_get(cJSON* cj_request, cJSON* cj_response)
             }
         }
     }
+    printf("Here: %s", cJSON_Print(__func__, cj_response));
 }
 
 #if 0
