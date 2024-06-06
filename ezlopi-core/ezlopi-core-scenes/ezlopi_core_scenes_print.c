@@ -213,12 +213,17 @@ void ezlopi_print_when_blocks(l_when_block_v2_t* when_blocks)
     TRACE_D("\t|-- when: ");
     while (when_blocks)
     {
-        if ((when_blocks->blockName) && (0 < strlen(when_blocks->blockName)))
+        if (when_blocks->blockId && (0 < strlen(when_blocks->blockId)))
         {
             TRACE_D("\t\t|-- block_enable: %d", when_blocks->block_enable);
-            TRACE_D("\t\t|-- blockName: %s", when_blocks->blockName);
             TRACE_D("\t\t|-- blockId: %s", when_blocks->blockId);
         }
+
+        if (when_blocks->blockName && (0 < strlen(when_blocks->blockName)))
+        {
+            TRACE_D("\t\t|-- blockName: %s", when_blocks->blockName);
+        }
+
         ezlopi_print_block_options(&when_blocks->block_options, when_blocks->fields);
         TRACE_D("\t\t|-- blockType: when");
         ezlopi_print_fields(when_blocks->fields);
