@@ -247,12 +247,14 @@ static void __config_check(void* pv)
     uint8_t flag_break_loop = 0;
     static uint8_t retry_count = 0;
 
+    char *ssl_private_key = ezlopi_factory_info_v3_get_ssl_private_key();
+    char *ssl_shared_key = ezlopi_factory_info_v3_get_ssl_shared_key();
     char* ca_certificate = ezlopi_factory_info_v3_get_ca_certificate();
     char* provision_token = ezlopi_factory_info_get_v3_provision_token();
     char* provisioning_server = ezlopi_factory_info_v3_get_provisioning_server();
     uint16_t config_version = ezlopi_factory_info_v3_get_config_version();
 
-    if (ca_certificate && provision_token && provisioning_server)
+    if (ssl_private_key && ssl_shared_key && ca_certificate && provision_token && provisioning_server)
     {
         cJSON* root_header_prov_token = cJSON_CreateObject(__FUNCTION__);
         if (root_header_prov_token)
@@ -267,19 +269,18 @@ static void __config_check(void* pv)
                     provisioning_server[prov_url_len - 1] = '\0'; // Remove trailing "/"
                 }
 
-                char http_request_location[200];
-                snprintf(http_request_location, sizeof(http_request_location), "api/v1/controller/sync?version=%d", config_version ? config_version : 1);
-
-                TRACE_D("web-prov-request: %s", http_request_location);
+                char http_request_location[1000];
+                snprintf(http_request_location, sizeof(http_request_location), "%s/up.mios.com/provision-sync/?token=%s&version=%d", provisioning_server, root_header_prov_token, config_version ? config_version : 1);
 
                 ezlopi_wait_for_wifi_to_connect(portMAX_DELAY);
-                s_ezlopi_http_data_t* response = ezlopi_http_post_request(provisioning_server, http_request_location, root_header_prov_token, NULL, NULL, ca_certificate);
+                s_ezlopi_http_data_t* response = ezlopi_http_get_request(http_request_location, ssl_private_key, ssl_shared_key, ca_certificate);
 
                 if (NULL != response)
                 {
                     TRACE_S("Status Code : %d", response->status_code);
-                    // if (response->response) 
+                    if (response->response)
                     {
+                        TRACE_S("Config Response: %s", response->response);
                         switch (response->status_code)
                         {
                         case HttpStatus_Ok:
@@ -342,93 +343,103 @@ static uint8_t __config_update(char* arg)
 
     if (NULL != cj_root_prov_data)
     {
-        s_basic_factory_info_t config_check_factoryInfo;
-        memset(&config_check_factoryInfo, 0, sizeof(s_basic_factory_info_t));
+        cJSON * cj_root_data = cJSON_GetObjectItem(__FUNCTION__, cj_root_prov_data, ezlopi_data_str);
 
-        char tmp_dev_uuid[40];
-        char tmp_prov_uuid[40];
-        char tmp_cloud_server[128];
-        char tmp_provision_token[256];
-        char tmp_provision_server[128];
-
-        CJSON_GET_VALUE_DOUBLE(cj_root_prov_data, ezlopi_id_str, config_check_factoryInfo.id);
-        CJSON_GET_VALUE_STRING_BY_COPY(cj_root_prov_data, ezlopi_uuid_str, tmp_dev_uuid);
-        CJSON_GET_VALUE_STRING_BY_COPY(cj_root_prov_data, ezlopi_cloud_uuid_str, tmp_prov_uuid);
-        CJSON_GET_VALUE_DOUBLE(cj_root_prov_data, ezlopi_config_version_str, config_check_factoryInfo.config_version);
-
-        CJSON_GET_VALUE_STRING_BY_COPY(cj_root_prov_data, ezlopi_cloud_server_str, tmp_cloud_server);
-        CJSON_GET_VALUE_STRING_BY_COPY(cj_root_prov_data, ezlopi_provision_token_str, tmp_provision_token);
-        CJSON_GET_VALUE_STRING_BY_COPY(cj_root_prov_data, ezlopi_provision_server_str, tmp_provision_server);
-
-        config_check_factoryInfo.device_uuid = tmp_dev_uuid;
-        config_check_factoryInfo.prov_uuid = tmp_prov_uuid;
-
-        config_check_factoryInfo.cloud_server = tmp_cloud_server;
-        config_check_factoryInfo.provision_token = tmp_provision_token;
-        config_check_factoryInfo.provision_server = tmp_provision_server;
-
-        // TODO  Decide if needs parsing and storing to flash
-        // if (NULL != cJSON_zwave_region_aary)
-        // {
-        //     if (cJSON_IsArray(cJSON_zwave_region_aary))
-        //     {
-        //         cJSON *cJSON_zwave_region = cJSON_GetArrayItem(cJSON_zwave_region_aary, 0); // Get the first item
-        //         if (cJSON_zwave_region)
-        //         {
-        //             const char *zwave_region = cJSON_zwave_region->valuestring;
-        //         }
-        //     }
-        // }
-
-        // uint32_t provision_order = 0;
-        // CJSON_GET_VALUE_DOUBLE(cj_root_prov_data, "provision_order", provision_order);
-
-        config_check_factoryInfo.brand = NULL;
-        config_check_factoryInfo.device_name = NULL;
-        config_check_factoryInfo.device_type = NULL;
-        config_check_factoryInfo.manufacturer = NULL;
-        config_check_factoryInfo.model_number = NULL;
-        // config_check_factoryInfo.prov_uuid = NULL; // NULL since it is not
-
-        if (ezlopi_factory_info_v3_set_basic(&config_check_factoryInfo))
+        if (NULL != cj_root_data)
         {
-            TRACE_S("Updated provisioning config");
-            ret = 1;
+            s_basic_factory_info_t config_check_factoryInfo;
+            memset(&config_check_factoryInfo, 0, sizeof(s_basic_factory_info_t));
+
+            char tmp_dev_uuid[40];
+            char tmp_prov_uuid[40];
+            char tmp_cloud_server[128];
+            char tmp_provision_token[256];
+            char tmp_provision_server[128];
+
+            CJSON_GET_VALUE_DOUBLE(cj_root_data, ezlopi_id_str, config_check_factoryInfo.id);
+            CJSON_GET_VALUE_STRING_BY_COPY(cj_root_data, ezlopi_uuid_str, tmp_dev_uuid);
+            CJSON_GET_VALUE_STRING_BY_COPY(cj_root_data, ezlopi_cloud_uuid_str, tmp_prov_uuid);
+            CJSON_GET_VALUE_DOUBLE(cj_root_data, ezlopi_config_version_str, config_check_factoryInfo.config_version);
+
+            CJSON_GET_VALUE_STRING_BY_COPY(cj_root_data, ezlopi_cloud_server_str, tmp_cloud_server);
+            CJSON_GET_VALUE_STRING_BY_COPY(cj_root_data, ezlopi_provision_token_str, tmp_provision_token);
+            CJSON_GET_VALUE_STRING_BY_COPY(cj_root_data, ezlopi_provision_server_str, tmp_provision_server);
+
+            config_check_factoryInfo.device_uuid = tmp_dev_uuid;
+            config_check_factoryInfo.prov_uuid = tmp_prov_uuid;
+
+            config_check_factoryInfo.cloud_server = tmp_cloud_server;
+            config_check_factoryInfo.provision_token = tmp_provision_token;
+            config_check_factoryInfo.provision_server = tmp_provision_server;
+
+            // TODO  Decide if needs parsing and storing to flash
+            // if (NULL != cJSON_zwave_region_aary)
+            // {
+            //     if (cJSON_IsArray(cJSON_zwave_region_aary))
+            //     {
+            //         cJSON *cJSON_zwave_region = cJSON_GetArrayItem(cJSON_zwave_region_aary, 0); // Get the first item
+            //         if (cJSON_zwave_region)
+            //         {
+            //             const char *zwave_region = cJSON_zwave_region->valuestring;
+            //         }
+            //     }
+            // }
+
+            // uint32_t provision_order = 0;
+            // CJSON_GET_VALUE_DOUBLE(cj_root_prov_data, "provision_order", provision_order);
+
+            config_check_factoryInfo.brand = NULL;
+            config_check_factoryInfo.device_name = NULL;
+            config_check_factoryInfo.device_type = NULL;
+            config_check_factoryInfo.manufacturer = NULL;
+            config_check_factoryInfo.model_number = NULL;
+            // config_check_factoryInfo.prov_uuid = NULL; // NULL since it is not
+
+            if (ezlopi_factory_info_v3_set_basic(&config_check_factoryInfo))
+            {
+                TRACE_S("Updated provisioning config");
+                ret = 1;
+            }
+            else
+            {
+                TRACE_E("Error updating provisioning config");
+            }
+
+            cJSON * cj_ssl_private_key = cJSON_GetObjectItem(__FUNCTION__, cj_root_data, ezlopi_ssl_private_key_str);
+            if (cj_ssl_private_key && cj_ssl_private_key->valuestring && cj_ssl_private_key->str_value_len)
+            {
+                ezlopi_factory_info_v3_set_ssl_private_key(cj_ssl_private_key);
+            }
+
+            cJSON * cj_ssl_public_key = cJSON_GetObjectItem(__FUNCTION__, cj_root_data, ezlopi_ssl_public_key_str);
+            if (cj_ssl_public_key && cj_ssl_public_key->valuestring && cj_ssl_public_key->str_value_len)
+            {
+                ezlopi_factory_info_v3_set_ssl_public_key(cj_ssl_public_key);
+            }
+
+            cJSON * cj_ssl_shared_key = cJSON_GetObjectItem(__FUNCTION__, cj_root_data, ezlopi_ssl_shared_key_str);
+            if (cj_ssl_shared_key && cj_ssl_shared_key->valuestring && cj_ssl_shared_key->str_value_len)
+            {
+                ezlopi_factory_info_v3_set_ssl_shared_key(cj_ssl_shared_key);
+            }
+
+            cJSON * cj_ca_certificate = cJSON_GetObjectItem(__FUNCTION__, cj_root_data, ezlopi_signing_ca_certificate_str);
+            if (cj_ca_certificate && cj_ca_certificate->valuestring && cj_ca_certificate->str_value_len)
+            {
+                ezlopi_factory_info_v3_set_ca_cert(cj_ca_certificate);
+            }
+
+            cJSON_Delete(__FUNCTION__, cj_root_data);
         }
         else
         {
-            TRACE_E("Error updating provisioning config");
+            TRACE_E("key \"data\" not found.\n");
         }
-
-        cJSON * cj_ssl_private_key = cJSON_GetObjectItem(__FUNCTION__, cj_root_prov_data, ezlopi_ssl_private_key_str);
-        if (cj_ssl_private_key && cj_ssl_private_key->valuestring && cj_ssl_private_key->str_value_len)
-        {
-            ezlopi_factory_info_v3_set_ssl_private_key(cj_ssl_private_key);
-        }
-
-        cJSON * cj_ssl_public_key = cJSON_GetObjectItem(__FUNCTION__, cj_root_prov_data, ezlopi_ssl_public_key_str);
-        if (cj_ssl_public_key && cj_ssl_public_key->valuestring && cj_ssl_public_key->str_value_len)
-        {
-            ezlopi_factory_info_v3_set_ssl_public_key(cj_ssl_public_key);
-        }
-
-        cJSON * cj_ssl_shared_key = cJSON_GetObjectItem(__FUNCTION__, cj_root_prov_data, ezlopi_ssl_shared_key_str);
-        if (cj_ssl_shared_key && cj_ssl_shared_key->valuestring && cj_ssl_shared_key->str_value_len)
-        {
-            ezlopi_factory_info_v3_set_ssl_shared_key(cj_ssl_shared_key);
-        }
-
-        cJSON * cj_ca_certificate = cJSON_GetObjectItem(__FUNCTION__, cj_root_prov_data, ezlopi_signing_ca_certificate_str);
-        if (cj_ca_certificate && cj_ca_certificate->valuestring && cj_ca_certificate->str_value_len)
-        {
-            ezlopi_factory_info_v3_set_ca_cert(cj_ca_certificate);
-        }
-
         cJSON_Delete(__FUNCTION__, cj_root_prov_data);
     }
     else
     {
-        TRACE_E("Error parsing JSON.\n");
+        TRACE_E("Failed parsing JSON .\n");
     }
     return ret;
 }
