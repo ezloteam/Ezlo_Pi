@@ -112,7 +112,7 @@ static void __fetch_wss_endpoint(void* pv)
         vTaskDelay(100 / portTICK_RATE_MS);
 
         char http_request[128];
-        snprintf(http_request, sizeof(http_request), "%s/getserver?json=true", cloud_server);
+        snprintf(http_request, sizeof(http_request), "%s?json=true", cloud_server);
         TRACE_D("http_request: %s", http_request);
 
         s_ezlopi_http_data_t * ws_endpoint = ezlopi_http_get_request(http_request, ssl_private_key, ssl_shared_key, ca_certificate);
@@ -246,90 +246,84 @@ static void __config_check(void* pv)
 {
     uint8_t flag_break_loop = 0;
     static uint8_t retry_count = 0;
+    static uint8_t retry_count_failure = 0;
 
     char *ssl_private_key = ezlopi_factory_info_v3_get_ssl_private_key();
     char *ssl_shared_key = ezlopi_factory_info_v3_get_ssl_shared_key();
     char* ca_certificate = ezlopi_factory_info_v3_get_ca_certificate();
     char* provision_token = ezlopi_factory_info_get_v3_provision_token();
-    char* provisioning_server = ezlopi_factory_info_v3_get_provisioning_server();
+    // char* provisioning_server = ezlopi_factory_info_v3_get_provisioning_server();
     uint16_t config_version = ezlopi_factory_info_v3_get_config_version();
 
-    if (ssl_private_key && ssl_shared_key && ca_certificate && provision_token && provisioning_server)
+    if (ssl_private_key && ssl_shared_key && ca_certificate && provision_token)
     {
-        cJSON* root_header_prov_token = cJSON_CreateObject(__FUNCTION__);
-        if (root_header_prov_token)
+        while (1)
         {
-            cJSON_AddStringToObject(__FUNCTION__, root_header_prov_token, "controller-key", provision_token);
+            char http_request_location[500];
+            snprintf(http_request_location, sizeof(http_request_location), "https://ezlopiesp32.up.mios.com/provision-sync?token=%s&version=%d", provision_token, config_version ? config_version : 1);
 
-            while (1)
+            TRACE_I("Config Check URL : %s", http_request_location);
+
+            ezlopi_wait_for_wifi_to_connect(portMAX_DELAY);
+            s_ezlopi_http_data_t* response = ezlopi_http_get_request(http_request_location, ssl_private_key, ssl_shared_key, ca_certificate);
+
+            if (NULL != response)
             {
-                int prov_url_len = strlen(provisioning_server);
-                if ((prov_url_len >= 5) && (0 == strcmp(&provisioning_server[prov_url_len - 5], ".com/")))
+                TRACE_S("Status Code : %d", response->status_code);
+                if (response->response)
                 {
-                    provisioning_server[prov_url_len - 1] = '\0'; // Remove trailing "/"
-                }
-
-                char http_request_location[1000];
-                snprintf(http_request_location, sizeof(http_request_location), "%s/up.mios.com/provision-sync/?token=%s&version=%d", provisioning_server, root_header_prov_token, config_version ? config_version : 1);
-
-                ezlopi_wait_for_wifi_to_connect(portMAX_DELAY);
-                s_ezlopi_http_data_t* response = ezlopi_http_get_request(http_request_location, ssl_private_key, ssl_shared_key, ca_certificate);
-
-                if (NULL != response)
-                {
-                    TRACE_S("Status Code : %d", response->status_code);
-                    if (response->response)
+                    TRACE_S("Config Response: %s", response->response);
+                    switch (response->status_code)
                     {
-                        TRACE_S("Config Response: %s", response->response);
-                        switch (response->status_code)
+                    case HttpStatus_Ok:
+                    {
+                        // re-write all the info into the flash region
+                        // TRACE_S("Data : %s", response->response);
+                        if (0 == __config_update(response->response))
                         {
-                        case HttpStatus_Ok:
-                        {
-                            // re-write all the info into the flash region
-                            // TRACE_S("Data : %s", response->response);
-                            if (0 == __config_update(response->response))
-                            {
-                                retry_count++;
-                                if (retry_count >= 5)
-                                {
-                                    flag_break_loop = 1;
-                                }
-                            }
-                            else
+                            retry_count++;
+                            if (retry_count >= 5)
                             {
                                 flag_break_loop = 1;
                             }
-                            break;
                         }
-                        default:
+                        else
                         {
-                            if (304 == response->status_code) // HTTP Status not modified
-                            {
-                                TRACE_S("Config data not changed !");
-                                flag_break_loop = 1;
-                            }
-                            break;
+                            flag_break_loop = 1;
                         }
-                        }
-                        ezlopi_factory_info_v3_free(response->response);
+                        break;
                     }
-                    ezlopi_factory_info_v3_free(response);
+                    default:
+                    {
+                        if (304 == response->status_code) // HTTP Status not modified
+                        {
+                            TRACE_S("Config data not changed !");
+                            flag_break_loop = 1;
+                        }
+                        break;
+                    }
+                    }
+                    ezlopi_factory_info_v3_free(response->response);
                 }
-                if (flag_break_loop)
-                {
-                    TRACE_D("Config check task complete!");
-                    xTaskNotifyGive(ezlopi_update_config_notifier);
-                    break;
-                }
+                ezlopi_factory_info_v3_free(response);
+            }
+            else
+            {
+                retry_count_failure++;
+                if (retry_count_failure >= 10) flag_break_loop = true;
+            }
+
+            if (flag_break_loop)
+            {
+                TRACE_D("Config check task complete!");
+                xTaskNotifyGive(ezlopi_update_config_notifier);
+                break;
             }
         }
-
-        cJSON_Delete(__FUNCTION__, root_header_prov_token);
         vTaskDelay(5000 / portTICK_RATE_MS);
     }
 
     // ezlopi_factory_info_v3_free(ca_certificate); // allocated once for all, do not free
-    ezlopi_factory_info_v3_free(provisioning_server);
     ezlopi_factory_info_v3_free(provision_token);
     ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SERVICE_WEB_PROV_CONFIG_CHECK_TASK);
 
@@ -359,18 +353,18 @@ static uint8_t __config_update(char* arg)
             CJSON_GET_VALUE_DOUBLE(cj_root_data, ezlopi_id_str, config_check_factoryInfo.id);
             CJSON_GET_VALUE_STRING_BY_COPY(cj_root_data, ezlopi_uuid_str, tmp_dev_uuid);
             CJSON_GET_VALUE_STRING_BY_COPY(cj_root_data, ezlopi_cloud_uuid_str, tmp_prov_uuid);
-            CJSON_GET_VALUE_DOUBLE(cj_root_data, ezlopi_config_version_str, config_check_factoryInfo.config_version);
+            CJSON_GET_VALUE_DOUBLE(cj_root_data, ezlopi_version_str, config_check_factoryInfo.config_version);
 
-            CJSON_GET_VALUE_STRING_BY_COPY(cj_root_data, ezlopi_cloud_server_str, tmp_cloud_server);
+            CJSON_GET_VALUE_STRING_BY_COPY(cj_root_data, ezlopi_coordinator_url_str, tmp_cloud_server);
             CJSON_GET_VALUE_STRING_BY_COPY(cj_root_data, ezlopi_provision_token_str, tmp_provision_token);
-            CJSON_GET_VALUE_STRING_BY_COPY(cj_root_data, ezlopi_provision_server_str, tmp_provision_server);
+            // CJSON_GET_VALUE_STRING_BY_COPY(cj_root_data, ezlopi_provision_server_str, tmp_provision_server);
 
             config_check_factoryInfo.device_uuid = tmp_dev_uuid;
             config_check_factoryInfo.prov_uuid = tmp_prov_uuid;
 
             config_check_factoryInfo.cloud_server = tmp_cloud_server;
             config_check_factoryInfo.provision_token = tmp_provision_token;
-            config_check_factoryInfo.provision_server = tmp_provision_server;
+            config_check_factoryInfo.provision_server = NULL;
 
             // TODO  Decide if needs parsing and storing to flash
             // if (NULL != cJSON_zwave_region_aary)
