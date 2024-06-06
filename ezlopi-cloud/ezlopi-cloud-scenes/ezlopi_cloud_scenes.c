@@ -349,6 +349,23 @@ void scenes_notification_remove(cJSON* cj_request, cJSON* cj_response)
     }
 }
 
+void scenes_block_enabled_set(cJSON* cj_request, cJSON* cj_response)
+{
+    cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+    cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
+    if (cj_result && cj_params)
+    {
+        cJSON *cj_scene_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_sceneId_str);
+        cJSON *cj_block_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_blockId_str);
+        bool block_en = false;
+        CJSON_GET_VALUE_BOOL(cj_params, "enabled", block_en);
+        if (cj_scene_id && (NULL != cj_scene_id->valuestring) && cj_block_id && (NULL != cj_block_id->valuestring))
+        {
+            ezlopi_core_scene_block_enable_set_reset(cj_scene_id->valuestring, cj_block_id->valuestring, block_en);
+        }
+    }
+}
+
 void scenes_block_status_reset(cJSON* cj_request, cJSON* cj_response)
 {
     cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
