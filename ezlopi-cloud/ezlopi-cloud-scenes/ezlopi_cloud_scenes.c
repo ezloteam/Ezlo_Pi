@@ -351,9 +351,9 @@ void scenes_notification_remove(cJSON* cj_request, cJSON* cj_response)
 
 void scenes_block_enabled_set(cJSON* cj_request, cJSON* cj_response)
 {
-    cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+    // cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
-    if (cj_result && cj_params)
+    if (cj_params)
     {
         cJSON *cj_scene_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_sceneId_str);
         cJSON *cj_block_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_blockId_str);
@@ -368,9 +368,9 @@ void scenes_block_enabled_set(cJSON* cj_request, cJSON* cj_response)
 
 void scenes_block_status_reset(cJSON* cj_request, cJSON* cj_response)
 {
-    cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+    // cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
-    if (cj_result && cj_params)
+    if (cj_params)
     {
         cJSON *cj_scene_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_sceneId_str);
         cJSON *cj_block_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_blockId_str);
@@ -404,6 +404,7 @@ void scene_changed(cJSON* cj_request, cJSON* cj_response)
             if (scene_str)
             {
                 cJSON_AddRawToObject(__FUNCTION__, cj_response, ezlopi_result_str, scene_str);
+                ezlopi_free(__FUNCTION__, scene_str);
             }
         }
     }
@@ -426,6 +427,24 @@ void scene_added(cJSON* cj_request, cJSON* cj_response)
             cJSON_AddRawToObject(__FUNCTION__, cj_response, ezlopi_result_str, new_scene);
             ezlopi_free(__FUNCTION__, new_scene);
         }
+    }
+    else    /* sometime request contain the key: 'sceneId' instead of '_id' */
+    {
+        cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
+        if (cj_params)
+        {
+            cJSON* new_scene_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_sceneId_str);
+            if (new_scene_id && new_scene_id->valuestring)
+            {
+                char* new_scene = ezlopi_nvs_read_str(new_scene_id->valuestring);
+                if (new_scene)
+                {
+                    cJSON_AddRawToObject(__FUNCTION__, cj_response, ezlopi_result_str, new_scene);
+                    ezlopi_free(__FUNCTION__, new_scene);
+                }
+            }
+        }
+
     }
 }
 

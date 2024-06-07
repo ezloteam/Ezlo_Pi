@@ -1378,7 +1378,6 @@ int ezlopi_core_scene_set_reset_latch(const char* sceneId_str, const char* block
     return ret;
 }
 
-
 //--------------------------------------------------------------------------------------------------
 //                  Functions for : scene block-en-changes only
 //--------------------------------------------------------------------------------------------------
@@ -1422,7 +1421,7 @@ static bool ___enable_disable_block_en_with_blockId(cJSON* cj_when_block, const 
                     if ((0 != strncmp(name->valuestring, "blocks", 7)) ||
                         (0 != strncmp(type->valuestring, "blocks", 7)))
                     {
-                        TRACE_D("No further ----> Blocks!!");
+                        // TRACE_D("No further ----> Blocks!!");
                         break;
                     }
                     /* now scanning the value-section within 'fields-block'*/
@@ -1474,7 +1473,7 @@ int ezlopi_core_scene_block_enable_set_reset(const char* sceneId_str, const char
                     if (1 == ezlopi_core_scene_edit_store_updated_to_nvs(cj_scene))
                     {
                         ret = 1;
-                        TRACE_W("nvs enabled successfull");
+                        TRACE_W("nvs updated successfull");
                     }
                     else
                     {
@@ -1489,8 +1488,6 @@ int ezlopi_core_scene_block_enable_set_reset(const char* sceneId_str, const char
     }
     return ret;
 }
-
-
 
 //-----------------------------------------------------------------------------------------------------
 
