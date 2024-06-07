@@ -14,6 +14,7 @@
 #include "ezlopi_core_websocket_client.h"
 #include "ezlopi_core_ezlopi_broadcast.h"
 #include "ezlopi_core_processes.h"
+#include "ezlopi_core_errors.h"
 
 #include "ezlopi_service_webprov.h"
 
@@ -69,7 +70,7 @@ static void registration_process(void* pv)
             cJSON_AddNumberToObject(__FUNCTION__, cj_params, "maxFrameSize", (20 * 1024));
         }
 
-        while (ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 5000, false) <= 0)
+        while (ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 5000, false) != EZPI_SUCCESS)
         {
             cJSON* cj_register_dup = cJSON_CreateObjectReference(__FUNCTION__, cj_register->child);
             if (cj_register_dup)

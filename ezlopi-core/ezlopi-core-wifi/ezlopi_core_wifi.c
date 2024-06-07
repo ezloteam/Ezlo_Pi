@@ -30,6 +30,7 @@
 #include "ezlopi_core_event_group.h"
 #include "ezlopi_core_device_value_updated.h"
 #include "ezlopi_core_processes.h"
+#include "ezlopi_core_errors.h"
 
 #include "ezlopi_service_uart.h"
 #include "EZLOPI_USER_CONFIG.h"
@@ -324,16 +325,16 @@ esp_err_t ezlopi_wifi_connect(const char* ssid, const char* pass)
     return err;
 }
 
-int ezlopi_wait_for_wifi_to_connect(uint32_t wait_time_ms)
+ezlopi_error_t ezlopi_wait_for_wifi_to_connect(uint32_t wait_time_ms)
 {
-    uint32_t ret = 0;
-    while (-1 == ezlopi_event_group_wait_for_event(EZLOPI_EVENT_WIFI_CONNECTED, wait_time_ms, false))
+    ezlopi_error_t error = 0;
+    while (EZPI_SUCCESS != ezlopi_event_group_wait_for_event(EZLOPI_EVENT_WIFI_CONNECTED, wait_time_ms, false))
     {
         vTaskDelay(100 / portTICK_PERIOD_MS);
     }
 
-    ret = ezlopi_event_group_wait_for_event(EZLOPI_EVENT_WIFI_CONNECTED, wait_time_ms, false);
-    return ret;
+    error = ezlopi_event_group_wait_for_event(EZLOPI_EVENT_WIFI_CONNECTED, wait_time_ms, false);
+    return error;
 }
 
 static ll_ezlopi_wifi_event_upcall_t* ezlopi_wifi_event_upcall_create(f_ezlopi_wifi_event_upcall upcall, void* arg)

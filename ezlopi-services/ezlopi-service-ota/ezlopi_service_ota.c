@@ -24,6 +24,7 @@
 #include "ezlopi_service_webprov.h"
 #include "ezlopi_core_ezlopi_broadcast.h"
 #include "ezlopi_core_processes.h"
+#include "ezlopi_core_errors.h"
 
 
 
@@ -52,13 +53,13 @@ static void ota_service_process(void* pv)
     while (1)
     {
         __ota_busy = true;
-        int ret_nma_reg = ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 60000, false);
-        int ret_ota = ezlopi_event_group_wait_for_event(EZLOPI_EVENT_OTA, 86400 * 1000, 1); // 86400 seconds in a day (24 hrs)
+        ezlopi_error_t ret_nma_reg = ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 60000, false);
+        ezlopi_error_t ret_ota = ezlopi_event_group_wait_for_event(EZLOPI_EVENT_OTA, 86400 * 1000, 1); // 86400 seconds in a day (24 hrs)
 
         TRACE_D("Configuration Selection NMA Reg: %d", ret_nma_reg);
         TRACE_D("Configuration Selection OTA Trigger : %d", ret_ota);
 
-        if ((-1 != ret_nma_reg) || (-1 != ret_ota))
+        if ((EZPI_SUCCESS != ret_nma_reg) || (EZPI_SUCCESS != ret_ota))
         {
             TRACE_D("Sending firmware check request...");
             // uint32_t message_counter = ezlopi_service_web_provisioning_get_message_count();

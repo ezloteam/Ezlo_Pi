@@ -11,6 +11,7 @@ set(EZLOPI_SERVICE_COMPONENTS
 
 set (EZLOPI_CORE_COMPONENTS
         ezlopi-core-processes
+        ezlopi-core-errors
 )
 
 

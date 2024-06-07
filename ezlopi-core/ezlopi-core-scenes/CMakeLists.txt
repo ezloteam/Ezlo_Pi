@@ -10,6 +10,7 @@ set(EZLOPI_CORE_COMPONENTS
         ezlopi-core-http
         ezlopi-core-nvs
         ezlopi-core-modes
+        ezlopi-core-errors
 )
 
 # # Define HAL components

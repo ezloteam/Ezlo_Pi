@@ -2,6 +2,7 @@
 #define _EZLOPI_CORE_NVS_H_
 
 #include "nvs_flash.h"
+#include "ezlopi_core_errors.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -10,7 +11,7 @@ extern "C"
 
 #define NVS_WIFI_MAGIC 0x5647ABCD
 
-    int ezlopi_nvs_init(void);
+    ezlopi_error_t ezlopi_nvs_init(void);
     void ezlopi_nvs_deinit(void);
 
     uint32_t ezlopi_nvs_config_info_update_time_get(void);

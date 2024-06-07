@@ -2,6 +2,7 @@
 
 #include "ezlopi_core_factory_info.h"
 #include "ezlopi_core_cjson_macros.h"
+#include "ezlopi_core_errors.h"
 
 #include "ezlopi_core_reset.h"
 #include "ezlopi_cloud_items.h"
@@ -13,7 +14,7 @@ static l_ezlopi_device_t* l_device_head = NULL;
 static volatile uint32_t g_store_dev_config_with_id = 0;
 static s_ezlopi_cloud_controller_t s_controller_information;
 
-static int ezlopi_device_parse_json_v3(cJSON* cj_config);
+static ezlopi_error_t ezlopi_device_parse_json_v3(cJSON* cj_config);
 static void ezlopi_device_free_single(l_ezlopi_device_t* device);
 #if (1 == ENABLE_TRACE)
 #if 0 // Defined but not used
@@ -397,7 +398,7 @@ void ezlopi_device_prepare(void)
         cJSON* cj_config = cJSON_ParseWithRef(__FUNCTION__, config_string);
         if (cj_config)
         {
-            if (ezlopi_device_parse_json_v3(cj_config) < 0)
+            if (EZPI_SUCCESS != ezlopi_device_parse_json_v3(cj_config))
             {
                 TRACE_E("parsing devices-config failed!!!!");
 #if 1
@@ -590,9 +591,9 @@ static void ezlopi_device_print_interface_type(l_ezlopi_item_t* item)
 #endif
 //////////////////// Print functions end here /////////////////////////
 ///////////////////////////////////////////////////////////////////////
-static int ezlopi_device_parse_json_v3(cJSON* cjson_config)
+static ezlopi_error_t ezlopi_device_parse_json_v3(cJSON* cjson_config)
 {
-    int ret = 0;
+    ezlopi_error_t error = EZPI_SUCCESS;
 
     if (cjson_config)
     {
@@ -657,25 +658,25 @@ static int ezlopi_device_parse_json_v3(cJSON* cjson_config)
 #if (defined(CONFIG_IDF_TARGET_ESP32) || defined(CONFIG_IDF_TARGET_ESP32S3) || defined(CONFIG_IDF_TARGET_ESP32C3))
                 else
                 {
-                    ret = -3;
+                    error = EZPI_ERR_PREP_DEVICE_CONFIG_PARSE_FAILED;
                     TRACE_E("Device configuration and chipset mismatch ! Device and Item assignment aborted !");
                 }
 #endif // CONFIG_IDF_TARGET_ESP32 OR CONFIG_IDF_TARGET_ESP32S3 OR CONFIG_IDF_TARGET_ESP32C3
             }
             else
             {
-                ret = -2;
+                error = EZPI_ERR_PREP_DEVICE_CONFIG_PARSE_FAILED;
                 TRACE_E("Error, could not identify the chipset in the config!");
             }
         }
         else
         {
-            ret = -1;
+            error = EZPI_ERR_PREP_DEVICE_CONFIG_PARSE_FAILED;
             TRACE_E("Chipset not defined in the config, Device and Item assignment aborted !");
         }
     }
 
-    return ret;
+    return error;
 }
 
 static void ezlopi_device_free_item(l_ezlopi_item_t * items)

@@ -36,9 +36,9 @@ static const char* ezlopi_serial_flow_control = "ezpi_fl_ctrl";
 static const char* ezlopi_cloud_log_severity = "cld_log_svrt";
 static const char* ezlopi_serial_log_severity = "srl_log_svrt";
 
-int ezlopi_nvs_init(void)
+ezlopi_error_t ezlopi_nvs_init(void)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_SUCCESS;
     if (0 == ezlopi_nvs_handle)
     {
         esp_err_t err = nvs_flash_init();
@@ -54,19 +54,15 @@ int ezlopi_nvs_init(void)
         if (ESP_OK != err)
         {
             TRACE_E("```nvs_open``` Error!");
+            ret = EZPI_ERR_NVS_INIT_FAILED;
+
             // vTaskDelay(2000 / portTICK_RATE_MS);
         }
         else
         {
-            ret = 1;
             TRACE_D("```nvs_open``` success");
         }
     }
-    else
-    {
-        ret = 1;
-    }
-
     return ret;
 }
 

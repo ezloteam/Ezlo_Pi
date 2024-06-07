@@ -353,7 +353,7 @@ int ezlopi_core_modes_store_to_nvs(void)
 
     return ret;
 }
-
+    
 void ezlopi_core_modes_init(void)
 {
     uint32_t _is_custom_mode_ok = 0;

@@ -21,6 +21,7 @@
 #include "ezlopi_core_scenes_scripts.h"
 #include "ezlopi_core_scenes_expressions.h"
 #include "ezlopi_core_log.h"
+#include "ezlopi_core_errors.h"
 
 #ifdef CONFIG_EZPI_CORE_ETHERNET_EN
 #include "ezlopi_core_ethernet.h"
@@ -33,7 +34,8 @@ static void ezlopi_initialize_devices_v3(void);
 void ezlopi_init(void)
 {
     // Init memories  
-    ezlopi_nvs_init();
+    ezlopi_error_t error = ezlopi_nvs_init();
+    EZPI_core_error_assert_on_error(error, EZPI_ERR_NVS_INIT_FAILED);
 
 #ifdef CONFIG_EZPI_UTIL_TRACE_EN
     ezlopi_core_read_set_log_severities();
