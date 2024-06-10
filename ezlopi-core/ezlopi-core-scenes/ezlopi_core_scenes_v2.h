@@ -77,7 +77,7 @@ typedef union u_field_value_v2
     bool value_bool;
     cJSON* cj_value;
     struct l_when_block_v2* when_block;
-    struct l_house_modes_v2_t* house_modes;
+    struct l_house_modes_v2* house_modes;
 } u_field_value_v2_t;
 
 typedef struct s_field_value {
@@ -185,7 +185,7 @@ void ezlopi_scenes_delete_action_blocks(l_action_block_v2_t* action_blocks);
 void ezlopi_scenes_delete_user_notifications(l_user_notification_v2_t* user_notifications);
 
 void ezlopi_scenes_depopulate_by_id_v2(uint32_t _id);
-int ezlopi_scenes_enable_disable_id_from_list_v2(uint32_t _id, bool enabled_flag);
+int ezlopi_scenes_enable_disable_scene_by_id_v2(uint32_t _id, bool enabled_flag);
 void ezlopi_scenes_remove_id_from_list_v2(uint32_t _id);
 l_scenes_list_v2_t* ezlopi_scenes_pop_by_id_v2(uint32_t _id);
 

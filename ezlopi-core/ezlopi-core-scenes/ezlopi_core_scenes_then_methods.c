@@ -368,7 +368,7 @@ int ezlopi_scene_then_set_scene_state(l_scenes_list_v2_t* curr_scene, void* arg)
         l_scenes_list_v2_t* scene_node = ezlopi_scenes_get_by_id_v2(sceneID);
         if (scene_node)
         {
-            if (1 == ezlopi_scenes_enable_disable_id_from_list_v2(sceneID, set_scene_enable))
+            if (1 == ezlopi_scenes_enable_disable_scene_by_id_v2(sceneID, set_scene_enable))
             {
                 ezlopi_scenes_status_change_broadcast(scene_node, scene_status_finished_str);
                 ret = 1;
