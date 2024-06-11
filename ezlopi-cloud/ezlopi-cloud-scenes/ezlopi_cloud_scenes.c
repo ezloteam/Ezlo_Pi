@@ -12,13 +12,13 @@
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_devices.h"
 #include "ezlopi_core_scenes_v2.h"
-#include "ezlopi_core_http.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_service_meshbot.h"
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_core_scenes_populate.h"
 #include "ezlopi_core_scenes_operators.h"
 #include "ezlopi_core_scenes_notifications.h"
+#include "ezlopi_core_scenes_then_methods_helper_func.h"
 #include "ezlopi_core_scenes_when_methods_helper_functions.h"
 
 void scenes_list(cJSON* cj_request, cJSON* cj_response)
@@ -416,45 +416,78 @@ void scenes_house_modes_set(cJSON* cj_request, cJSON* cj_response)
 void scenes_action_block_test(cJSON * cj_request, cJSON * cj_response)
 {
     cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
-    cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
-    if (cj_result && cj_params)
+    if (cj_result)
     {
-        cJSON * cj_block = cJSON_GetObjectItem(__FUNCTION__, cj_params, "block");
-        if (cj_block)
+        cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
+        if (cj_result && cj_params)
         {
-            cJSON * cj_fields = cJSON_GetObjectItem(__FUNCTION__, cj_block, ezlopi_fields_str);
-            if (cj_fields && cJSON_IsArray(cj_fields))
+            cJSON* cj_block = cJSON_GetObjectItem(__FUNCTION__, cj_params, "block");
+            if (cj_block)
             {
-                uint32_t idx = 0;
-                cJSON* cj_field = NULL;
-                while (NULL != (cj_field = cJSON_GetArrayItem(cj_fields, idx)))
+                // 1. populate --> 'test_then_block' ;
+                l_action_block_v2_t * test_then_block = (l_action_block_v2_t*)ezlopi_malloc(__FUNCTION__, sizeof(l_action_block_v2_t));
+                if (test_then_block)
                 {
-                    if ()
+                    memset(test_then_block, 0, sizeof(l_action_block_v2_t));
+
+
+                    cJSON* dupli = cJSON_Duplicate(__FUNCTION__, cj_block, true);
+                    if (dupli) // duplicate the 'cj_block' to avoid crashes
                     {
-
-
-
+                        ezlopi_scenes_populate_assign_action_block(test_then_block, dupli, SCENE_BLOCK_TYPE_THEN);
+                        // CJSON_TRACE("test_then:", dupli);
+                        cJSON_Delete(__FUNCTION__, dupli);
                     }
-                    idx++;
-                }
 
-                while (cj_fields)
-                {
-                    if (0 == strncmp(curr_field->name, "device", 7))
+                    // 2. Now to fill the 's_ezlopi_core_http_mbedtls_t' variable and execute 'send_http_request'.
+                    s_ezlopi_core_http_mbedtls_t* tmp_http_data = (s_ezlopi_core_http_mbedtls_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_ezlopi_core_http_mbedtls_t));
+                    if (tmp_http_data)
                     {
-                        device_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
-                    }
-                    else if (0 == strncmp(curr_field->name, "deviceFlag", 11))
-                    {
-                        if (EZLOPI_VALUE_TYPE_BOOL == curr_field->value_type)
+                        memset(tmp_http_data, 0, sizeof(s_ezlopi_core_http_mbedtls_t));
+                        l_fields_v2_t* curr_field = test_then_block->fields;
+
+                        const s_sendhttp_method_t __sendhttp_method[] = {
+                            {.field_name = "request", .field_func = parse_http_request_type},
+                            {.field_name = "url", .field_func = parse_http_url},
+                            {.field_name = "credential", .field_func = parse_http_creds},
+                            {.field_name = "contentType", .field_func = parse_http_content_type},
+                            {.field_name = "content", .field_func = parse_http_content},
+                            {.field_name = "headers", .field_func = parse_http_headers},
+                            {.field_name = "skipSecurity", .field_func = parse_http_skipsecurity},
+                            {.field_name = NULL, .field_func = NULL},
+                        };
+
+                        while (NULL != curr_field) // fields
                         {
-                            device_armed = curr_field->field_value.u_value.value_bool;
+                            for (uint8_t i = 0; i < ((sizeof(__sendhttp_method) / sizeof(__sendhttp_method[i]))); i++)
+                            {
+                                if (0 == strncmp(__sendhttp_method[i].field_name, curr_field->name, strlen(__sendhttp_method[i].field_name) + 1))
+                                {
+                                    (__sendhttp_method[i].field_func)(tmp_http_data, curr_field);
+                                    break;
+                                }
+                            }
+                            curr_field = curr_field->next;
                         }
+                        // now to trigger http_request and extract the response.
+                        tmp_http_data->response = NULL;
+                        tmp_http_data->response_maxlen = 0;
+                        ezlopi_core_http_mbedtls_req(tmp_http_data); // Returns:- [response_buffer = &Memory_block]
+
+                        if (tmp_http_data->response)
+                        {
+
+                            cJSON_AddNumberToObject(__FUNCTION__, cj_result, "httpAnswerCode", 200);
+                            TRACE_S("response  [%d] ", strlen((tmp_http_data->response)));
+                        }
+
+                        free_http_mbedtls_struct(tmp_http_data);
+
+                        ezlopi_free(__FUNCTION__, tmp_http_data);
                     }
-                    curr_field = curr_field->next;
+
+                    ezlopi_scenes_delete_action_blocks(test_then_block);
                 }
-
-
             }
         }
     }

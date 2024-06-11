@@ -13,6 +13,7 @@ set(EZLOPI_COMPONENTS
 set(EZLOPI_CORE_COMPONENTS 
             ezlopi-core-factory-info 
             ezlopi-core-scenes
+            ezlopi-core-http
 )
 # Define cloud components
 set(EZLOPI_CLOUD_COMPONENTS 
