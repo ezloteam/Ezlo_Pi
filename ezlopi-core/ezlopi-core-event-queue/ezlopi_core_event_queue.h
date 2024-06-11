@@ -2,6 +2,7 @@
 #define _EZLOPI_CORE_EVENT_QUEUE_H_
 
 #include "ezlopi_core_actions.h"
+#include "ezlopi_core_errors.h"
 
 typedef struct s_ezlo_event
 {
@@ -9,8 +10,8 @@ typedef struct s_ezlo_event
     void *arg;
 } s_ezlo_event_t;
 
-void ezlopi_event_queue_init(void);
-int ezlopi_event_queue_send(s_ezlo_event_t *event_data, int from_isr);
-int ezlopi_event_queue_receive(s_ezlo_event_t **event_data, int time_out_ms);
+ezlopi_error_t ezlopi_event_queue_init(void);
+ezlopi_error_t ezlopi_event_queue_send(s_ezlo_event_t *event_data, int from_isr);
+ezlopi_error_t ezlopi_event_queue_receive(s_ezlo_event_t **event_data, int time_out_ms);
 
 #endif // _EZLOPI_CORE_EVENT_QUEUE_H_

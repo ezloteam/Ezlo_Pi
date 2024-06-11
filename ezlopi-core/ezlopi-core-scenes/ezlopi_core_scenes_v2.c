@@ -18,6 +18,7 @@
 #include "ezlopi_core_scenes_when_methods.h"
 #include "ezlopi_core_scenes_then_methods.h"
 #include "ezlopi_core_scenes_status_changed.h"
+#include "ezlopi_core_errors.h"
 
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_service_meshbot.h"
@@ -111,7 +112,7 @@ uint32_t ezlopi_store_new_scene_v2(cJSON* cj_new_scene)
 
         if (new_scnee_str)
         {
-            if (ezlopi_nvs_write_str(new_scnee_str, strlen(new_scnee_str) + 1, tmp_buffer))
+            if (EZPI_SUCCESS == ezlopi_nvs_write_str(new_scnee_str, strlen(new_scnee_str) + 1, tmp_buffer))
             {
                 bool free_scene_list_str = 1;
                 char* scenes_list_str = ezlopi_nvs_scene_get_v2();
@@ -421,8 +422,9 @@ f_scene_method_v2_t ezlopi_scene_get_method_v2(e_scene_method_type_t scene_metho
  * @brief main functions to initiated scenes-nodes
  *
  */
-void ezlopi_scenes_init_v2(void)
+ezlopi_error_t ezlopi_scenes_init_v2(void)
 {
+    ezlopi_error_t error = EZPI_ERR_SCENES_JSON_PARSE_ERROR;
     char* scenes_id_list_str = ezlopi_nvs_scene_get_v2();
 
     if (scenes_id_list_str)
@@ -463,7 +465,7 @@ void ezlopi_scenes_init_v2(void)
                 }
 
             }
-
+            error = EZPI_SUCCESS;
             cJSON_Delete(__FUNCTION__, cj_scenes_ids);
         }
 
@@ -471,6 +473,7 @@ void ezlopi_scenes_init_v2(void)
     }
 
     ezlopi_scenes_print(scenes_list_head_v2);
+    return error;
 }
 
 static l_scenes_list_v2_t* _scenes_populate(cJSON* cj_scene, uint32_t scene_id)

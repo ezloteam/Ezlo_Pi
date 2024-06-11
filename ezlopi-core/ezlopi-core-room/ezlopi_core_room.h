@@ -7,6 +7,8 @@
 
 #include "cjext.h"
 
+#include "ezlopi_core_errors.h"
+
 typedef enum e_room_subtype
 {
 #ifndef ROOM_SUBTYPE
@@ -28,7 +30,7 @@ typedef struct s_ezlopi_room
 
 s_ezlopi_room_t* ezlopi_room_get_room_head(void);
 
-void ezlopi_room_init(void);
+ezlopi_error_t ezlopi_room_init(void);
 int ezlopi_room_delete(cJSON* cj_room);
 int ezlopi_room_delete_all(void);
 int ezlopi_room_name_set(cJSON* cj_room);

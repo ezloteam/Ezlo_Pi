@@ -47,14 +47,19 @@ extern "C"
     /*******************************************************************************
      *                          Type & Macro Declarations
      *******************************************************************************/
-typedef uint32_t ezlopi_error_t;
+typedef int32_t ezlopi_error_t;
 
 #define EZPI_SUCCESS                                                    0
+#define EZPI_FAILED                                                     -1
 // NVS Related errors
 #define EZPI_ERR_NVS_INIT_FAILED                                        0x00000001
+// Not implemented
 #define EZPI_ERR_NVS_READ_FAILED                                        0x00000002
+// Not implemented
 #define EZPI_ERR_NVS_WRITE_FAILED                                       0x00000004
+
 // Factory info init related errors
+// Not implemented
 #define EZPI_ERR_FACTORY_INFO_READ_FAILED                               0x00000008
 // Event group related errors
 #define EZPI_ERR_EVENT_GROUP_UNINITIALIZED                              0x00000010 // It is returned if event group handle is uninitialized
@@ -63,22 +68,27 @@ typedef uint32_t ezlopi_error_t;
 // Generic/Test device preperation errors
 #define EZPI_ERR_PREP_DEVICE_CONFIG_PARSE_FAILED                        0x00000080 // It is returned when device configuration parsing fails
 // Device intitaliation errors
-#define EZPI_ERR_INIT_DEVICE_FAILED                                     0x00000100 // If any error occurs during initialization, this error is returned to abort futher initialization of the device in case it has to be deleted from the tree
+#define EZPI_ERR_PREP_DEVICE_PREP_FAILED                                0x00000100 // It is returned when device preperation fails when PREPARE event is called on every devices
+// Not implemented
+#define EZPI_ERR_INIT_DEVICE_FAILED                                     0x00000200 // If any error occurs during initialization, this error is returned to abort futher initialization of the device in case it has to be deleted from the tree
 // Room related errors
-#define EZPI_ERR_ROOM_INIT_FAILED                                       0x00000200 // If any error occured duing the initialization of the core room module this error is returned
+#define EZPI_ERR_ROOM_INIT_FAILED                                       0x00000400 // If any error occured duing the initialization of the core room module this error is returned
 // Core scene script init related errors
-#define EZPI_ERR_SCENES_SCRIPT_JSON_PARSE_ERROR                         0x00000400 // If json parse fails, this error is returned
+#define EZPI_ERR_SCENES_SCRIPT_JSON_PARSE_ERROR                         0x00000800 // If json parse fails, this error is returned
 // Core scene expression init errors
-#define EZPI_ERR_SCENES_EXPRESSION_JSON_PARSE_ERROR                     0x00000800 // Error for json parsing on scene expression
+#define EZPI_ERR_SCENES_EXPRESSION_JSON_PARSE_ERROR                     0x00001000 // Error for json parsing on scene expression
 //  Core scene init related errors
-#define EZPI_ERR_SCENES_JSON_PARSE_ERROR                                0x00001000 // Error for json parsing on scene initialiation process
+#define EZPI_ERR_SCENES_JSON_PARSE_ERROR                                0x00002000 // Error for json parsing on scene initialiation process
 // Core event queue related errors
-#define EZPI_ERR_EVENT_QUEUE_INIT_FAILED                                0x00002000 // Failed to initialized event queue
-#define EZPI_ERR_EVENT_QUEUE_UNINITIALIZED                              0x00004000 // For uninitialized event queue
+#define EZPI_ERR_EVENT_QUEUE_INIT_FAILED                                0x00004000 // Failed to initialized event queue
+#define EZPI_ERR_EVENT_QUEUE_UNINITIALIZED                              0x00008000 // For uninitialized event queue
+#define EZPI_ERR_EVENT_QUEUE_RECV_SEND_ERROR                            0x00010000 // For queue if send or receive fails
 // Core SNTP init sync related errors
-#define EZPI_ERR_SNTP_INIT_FAILED                                       0x00008000 // For SNTP if failed to sync the status
-#define EZPI_ERR_SNTP_LOCATION_SET_FAILED                               0x00010000 // For SNTP if failed to set location
+#define EZPI_ERR_SNTP_INIT_FAILED                                       0x00020000 // For SNTP if failed to sync the status
+#define EZPI_ERR_SNTP_LOCATION_SET_FAILED                               0x00040000 // For SNTP if failed to set location
 
+
+#define EZPI_ERR_LOG_ON_ERROR(err, msg) (EZPI_SUCCESS != err ? TRACE_E(msg) : 0)
 
 // #warning("Create error code for invalid and empty params")
 

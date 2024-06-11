@@ -11,6 +11,7 @@
 #include <freertos/task.h>
 
 #include "ezlopi_core_scenes_methods.h"
+#include "ezlopi_core_errors.h"
 
 typedef enum e_scenes_block_type_v2
 {
@@ -161,7 +162,7 @@ typedef struct l_scenes_list_v2
 
 typedef int (*f_scene_method_v2_t)(l_scenes_list_v2_t* curr_scene, void* arg);
 
-void ezlopi_scenes_init_v2(void);
+ezlopi_error_t ezlopi_scenes_init_v2(void);
 uint32_t ezlopi_store_new_scene_v2(cJSON* cj_new_scene);
 uint32_t ezlopi_scenes_get_list_v2(cJSON* cj_scenes_array);
 int ezlopi_scene_edit_by_id(uint32_t scene_id, cJSON* cj_scene);

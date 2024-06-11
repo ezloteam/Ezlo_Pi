@@ -20,6 +20,7 @@
 #include "ezlopi_core_scenes_scripts.h"
 #include "ezlopi_core_scenes_scripts_custom_libs_includes.h"
 #include "ezlopi_core_processes.h"
+#include "ezlopi_core_errors.h"
 
 #include "ezlopi_cloud_constants.h"
 #include "EZLOPI_USER_CONFIG.h"
@@ -32,7 +33,7 @@ typedef struct s_lua_scripts_modules
     lua_CFunction func;
 } s_lua_scripts_modules_t;
 
-static void __scripts_nvs_parse(void);
+static ezlopi_error_t __scripts_nvs_parse(void);
 static void __script_process(void* arg);
 static void __scripts_process_runner(void);
 static void __load_custom_libs(lua_State* lua_state);
@@ -379,8 +380,9 @@ static void __scripts_remove_id_and_update_list(uint32_t script_id)
     }
 }
 
-static void __scripts_nvs_parse(void)
+static ezlopi_error_t __scripts_nvs_parse(void)
 {
+    ezlopi_error_t error = EZPI_ERR_SCENES_SCRIPT_JSON_PARSE_ERROR;
     char* script_ids = ezlopi_nvs_read_scenes_scripts();
 
     if (script_ids)
@@ -417,12 +419,13 @@ static void __scripts_nvs_parse(void)
                     }
                 }
             }
-
+            error = EZPI_SUCCESS;
             cJSON_Delete(__FUNCTION__, cj_script_ids);
         }
 
         ezlopi_free(__FUNCTION__, script_ids);
     }
+    return error;
 }
 
 static l_ezlopi_scenes_script_t* __scripts_create_node(uint32_t script_id, cJSON* cj_script)

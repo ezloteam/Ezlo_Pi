@@ -38,6 +38,7 @@
 #include "ezlopi_core_timer.h"
 #include "ezlopi_core_event_queue.h"
 #include "EZLOPI_USER_CONFIG.h"
+#include "ezlopi_core_errors.h"
 
 typedef struct s_ezlopi_timer
 {
@@ -90,7 +91,7 @@ static void send_event_to_queue(e_ezlopi_actions_t action)
         {
             event_data->arg = NULL;
             event_data->action = action;
-            if (0 == ezlopi_event_queue_send(event_data, true))
+            if (EZPI_SUCCESS == ezlopi_event_queue_send(event_data, true))
             {
                 ezlopi_free(__FUNCTION__, event_data);
             }

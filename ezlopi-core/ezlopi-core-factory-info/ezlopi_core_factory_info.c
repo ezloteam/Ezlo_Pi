@@ -5,6 +5,7 @@
 
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_factory_info.h"
+#include "ezlopi_core_errors.h"
 #include "EZLOPI_USER_CONFIG.h"
 
 #define UPDATE_STRING_VALUE(buffer, data, offset, length)  \
@@ -765,19 +766,19 @@ int ezlopi_factory_info_v3_set_ezlopi_config(cJSON * cj_data)
     return ret;
 }
 
-int ezlopi_factory_info_v3_factory_reset(void)
+ezlopi_error_t ezlopi_factory_info_v3_factory_reset(void)
 {
-    int ret = 0;
+    ezlopi_error_t error = EZPI_FAILED;
     if (ezlopi_factory_info_v3_init())
     {
 
         if (ESP_OK == esp_partition_erase_range(partition_ctx_v3, 0, EZLOPI_FACTORY_INFO_V3_PARTITION_SIZE))
         {
-            ret = 1;
+            error = EZPI_SUCCESS;
         }
     }
 
-    return ret;
+    return error;
 }
 
 int ezlopi_factory_info_v3_scenes_factory_soft_reset(void)

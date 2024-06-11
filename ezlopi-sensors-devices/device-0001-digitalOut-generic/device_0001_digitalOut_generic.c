@@ -7,6 +7,7 @@
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
+#include "ezlopi_core_errors.h"
 
 #include "ezlopi_hal_gpio.h"
 
@@ -195,7 +196,7 @@ static int __settings_set(void* arg, l_ezlopi_device_settings_v3_t* setting)
             s_digio_settings_t* settings_data = (s_digio_settings_t*)setting->user_arg;
             settings_data->settings_int_data = value;
 
-            if (!ezlopi_nvs_write_int32(value, nvs_key_backlight_brightness))
+            if (EZPI_SUCCESS != ezlopi_nvs_write_int32(value, nvs_key_backlight_brightness))
             {
                 TRACE_E("Error Updating settings values to NVS");
             }
@@ -216,7 +217,7 @@ static int __settings_reset(void* arg, l_ezlopi_device_settings_v3_t* setting)
         s_digio_settings_t* settings_data = (s_digio_settings_t*)setting->user_arg;
         settings_data->settings_int_data = 50; // 50 being default value
 
-        if (!ezlopi_nvs_write_int32(settings_data->settings_int_data, nvs_key_backlight_brightness))
+        if (EZPI_SUCCESS !=ezlopi_nvs_write_int32(settings_data->settings_int_data, nvs_key_backlight_brightness))
         {
             TRACE_E("Error Updating settings values to NVS");
         }
@@ -326,13 +327,13 @@ static int __prepare(void* arg)
                     s_digio_settings_t* settings_value = (s_digio_settings_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_digio_settings_t));
                     memset(settings_value, 0, sizeof(s_digio_settings_t));
 
-                    if (ezlopi_nvs_read_int32(&settings_value->settings_int_data, nvs_key_backlight_brightness))
+                    if (EZPI_SUCCESS == ezlopi_nvs_read_int32(&settings_value->settings_int_data, nvs_key_backlight_brightness))
                     {
                     }
                     else
                     {
                         settings_value->settings_int_data = 50;
-                        if (!ezlopi_nvs_write_int32(settings_value->settings_int_data, nvs_key_backlight_brightness))
+                        if (EZPI_SUCCESS != ezlopi_nvs_write_int32(settings_value->settings_int_data, nvs_key_backlight_brightness))
                         {
                             TRACE_E("Error Updating settings values to NVS");
                         }

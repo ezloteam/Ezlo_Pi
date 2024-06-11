@@ -8,6 +8,7 @@
 #include <stdbool.h>
 
 #include "ezlopi_core_scenes_v2.h"
+#include "ezlopi_core_errors.h"
 
 typedef struct s_exp_items
 {
@@ -73,7 +74,7 @@ typedef struct s_ezlopi_expressions
  * @brief Fetch expressions from NVS flash and populate to linklist
  *
  */
-void ezlopi_scenes_expressions_init(void);
+ezlopi_error_t ezlopi_scenes_expressions_init(void);
 
 /**
  * @brief Populate new expression to the linklist, and store it to the flash

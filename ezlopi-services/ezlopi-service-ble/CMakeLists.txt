@@ -8,6 +8,7 @@ set(EZLOPI_CORE_COMPONENTS
         ezlopi-core-ping
         ezlopi-core-sntp
         ezlopi-core-info
+        ezlopi-core-errors
         # ezlopi-user-config
 )
 

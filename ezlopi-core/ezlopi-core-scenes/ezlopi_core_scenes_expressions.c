@@ -9,6 +9,7 @@
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_scenes_value.h"
 #include "ezlopi_core_scenes_expressions.h"
+#include "ezlopi_core_errors.h"
 
 #include "ezlopi_cloud_constants.h"
 #include "EZLOPI_USER_CONFIG.h"
@@ -389,8 +390,9 @@ int ezlopi_scenes_expressions_delete_node(s_ezlopi_expressions_t* exp_node)
     return ret;
 }
 
-void ezlopi_scenes_expressions_init(void)
+ezlopi_error_t ezlopi_scenes_expressions_init(void)
 {
+    ezlopi_error_t error = EZPI_ERR_SCENES_EXPRESSION_JSON_PARSE_ERROR;
     char* exp_id_list_str = ezlopi_nvs_read_scenes_expressions();
     if (exp_id_list_str)
     {
@@ -424,10 +426,12 @@ void ezlopi_scenes_expressions_init(void)
                     }
                 }
             }
+            error = EZPI_SUCCESS;
         }
 
         ezlopi_free(__FUNCTION__, exp_id_list_str);
     }
+    return error;
 }
 
 static s_exp_items_t* __expressions_items_create(cJSON* cj_item)
@@ -672,7 +676,7 @@ static uint32_t __expression_store_to_nvs(uint32_t exp_id, cJSON* cj_expression)
                 char exp_id_str[32];
                 snprintf(exp_id_str, sizeof(exp_id_str), "%08x", exp_id);
 
-                if (ezlopi_nvs_write_str(exp_string, strlen(exp_string), exp_id_str))
+                if (EZPI_SUCCESS == ezlopi_nvs_write_str(exp_string, strlen(exp_string), exp_id_str))
                 {
                     bool free_exp_id_list_str = 1;
                     char* exp_id_list_str = ezlopi_nvs_read_scenes_expressions();

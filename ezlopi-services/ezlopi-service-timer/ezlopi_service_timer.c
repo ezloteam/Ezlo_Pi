@@ -13,6 +13,7 @@
 #include "ezlopi_core_devices_list.h"
 #include "ezlopi_core_event_queue.h"
 #include "ezlopi_core_processes.h"
+#include "ezlopi_core_errors.h"
 
 #include "ezlopi_service_timer.h"
 
@@ -31,7 +32,7 @@ static void event_process_v3(void* pv)
     while (1)
     {
         s_ezlo_event_t* event = NULL;
-        if (pdTRUE == ezlopi_event_queue_receive(&event, 2000 / portTICK_PERIOD_MS))
+        if (EZPI_SUCCESS == ezlopi_event_queue_receive(&event, 2000 / portTICK_PERIOD_MS))
         {
             l_ezlopi_device_t* curr_device = ezlopi_device_get_head();
             while (curr_device)

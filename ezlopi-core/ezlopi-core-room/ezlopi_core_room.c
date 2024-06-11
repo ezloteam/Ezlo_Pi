@@ -5,6 +5,7 @@
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_ezlopi_broadcast.h"
+#include "ezlopi_core_errors.h"
 
 #include "ezlopi_cloud_constants.h"
 #include "EZLOPI_USER_CONFIG.h"
@@ -315,8 +316,9 @@ s_ezlopi_room_t *ezlopi_room_add_to_list(cJSON *cj_room)
     return new_room;
 }
 
-void ezlopi_room_init(void)
+ezlopi_error_t ezlopi_room_init(void)
 {
+    ezlopi_error_t error = EZPI_ERR_ROOM_INIT_FAILED;
     char *rooms_str = ezlopi_nvs_read_rooms();
     if (rooms_str)
     {
@@ -349,8 +351,10 @@ void ezlopi_room_init(void)
 
                 idx++;
             }
+            error = EZPI_SUCCESS;
         }
     }
+    return error;
 }
 
 static void __update_cloud_room_deleted(uint32_t room_id)
