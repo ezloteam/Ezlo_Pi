@@ -161,7 +161,7 @@ static void __prepare_touch_sensor_properties(l_ezlopi_item_t* item, cJSON* cj_d
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
     item->cloud_properties.scale = NULL;
 
-    CJSON_GET_VALUE_GPIO(cj_device, ezlopi_dev_name_str, item->interface.gpio.gpio_in.gpio_num);
+    CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_str, item->interface.gpio.gpio_in.gpio_num);
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_ip_inv_str, item->interface.gpio.gpio_in.invert);
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_val_ip_str, item->interface.gpio.gpio_in.value);
 
