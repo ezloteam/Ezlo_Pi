@@ -12,6 +12,7 @@
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_devices.h"
 #include "ezlopi_core_scenes_v2.h"
+#include "ezlopi_core_http.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_service_meshbot.h"
 #include "ezlopi_cloud_constants.h"
@@ -407,6 +408,53 @@ void scenes_house_modes_set(cJSON* cj_request, cJSON* cj_response)
                         TRACE_S("Updating ... House_modes ; Success");
                     }
                 }
+            }
+        }
+    }
+}
+
+void scenes_action_block_test(cJSON * cj_request, cJSON * cj_response)
+{
+    cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+    cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
+    if (cj_result && cj_params)
+    {
+        cJSON * cj_block = cJSON_GetObjectItem(__FUNCTION__, cj_params, "block");
+        if (cj_block)
+        {
+            cJSON * cj_fields = cJSON_GetObjectItem(__FUNCTION__, cj_block, ezlopi_fields_str);
+            if (cj_fields && cJSON_IsArray(cj_fields))
+            {
+                uint32_t idx = 0;
+                cJSON* cj_field = NULL;
+                while (NULL != (cj_field = cJSON_GetArrayItem(cj_fields, idx)))
+                {
+                    if ()
+                    {
+
+
+
+                    }
+                    idx++;
+                }
+
+                while (cj_fields)
+                {
+                    if (0 == strncmp(curr_field->name, "device", 7))
+                    {
+                        device_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
+                    }
+                    else if (0 == strncmp(curr_field->name, "deviceFlag", 11))
+                    {
+                        if (EZLOPI_VALUE_TYPE_BOOL == curr_field->value_type)
+                        {
+                            device_armed = curr_field->field_value.u_value.value_bool;
+                        }
+                    }
+                    curr_field = curr_field->next;
+                }
+
+
             }
         }
     }
