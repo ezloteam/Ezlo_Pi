@@ -235,7 +235,8 @@ static void __provisioning_info_write_func(esp_gatt_value_t* value, esp_ble_gatt
                                         memset(device_type, 0, sizeof(device_type));
 
 
-                                        CJSON_GET_ID(ezlopi_config_basic->id, cJSON_GetObjectItem(__FUNCTION__, cj_config, ezlopi_serial_str));
+                                        CJSON_GET_VALUE_DOUBLE(cj_config, ezlopi_serial_str, ezlopi_config_basic->id);
+                                        CJSON_GET_VALUE_DOUBLE(cj_config, ezlopi_version_str, ezlopi_config_basic->config_version);
 
                                         CJSON_GET_VALUE_STRING_BY_COPY(cj_config, ezlopi_device_name_str, device_name);
                                         CJSON_GET_VALUE_STRING_BY_COPY(cj_config, ezlopi_manufacturer_name_str, manufacturer);
@@ -275,9 +276,9 @@ static void __provisioning_info_write_func(esp_gatt_value_t* value, esp_ble_gatt
                                         ezlopi_free(__FUNCTION__, ezlopi_config_basic);
                                     }
 
-                                    ezlopi_factory_info_v3_set_ca_cert(cJSON_GetObjectItem(__FUNCTION__, cj_config, ezlopi_ssl_private_key_str));
+                                    ezlopi_factory_info_v3_set_ca_cert(cJSON_GetObjectItem(__FUNCTION__, cj_config, ezlopi_signing_ca_certificate_str));
                                     ezlopi_factory_info_v3_set_ssl_shared_key(cJSON_GetObjectItem(__FUNCTION__, cj_config, ezlopi_ssl_shared_key_str));
-                                    ezlopi_factory_info_v3_set_ssl_private_key(cJSON_GetObjectItem(__FUNCTION__, cj_config, ezlopi_signing_ca_certificate_str));
+                                    ezlopi_factory_info_v3_set_ssl_private_key(cJSON_GetObjectItem(__FUNCTION__, cj_config, ezlopi_ssl_private_key_str));
 
                                 }
                                 else
