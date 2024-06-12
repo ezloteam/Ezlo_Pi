@@ -201,7 +201,7 @@ static void device_mac_read_func(esp_gatt_value_t* value, esp_ble_gatts_cb_param
     else
     {
         TRACE_E("Value is empty");
-}
+    }
 }
 #endif 
 
@@ -524,7 +524,14 @@ static void EZPI_SERVICE_BLE_ezlo_cloud_info(esp_gatt_value_t* value, esp_ble_ga
             unsigned long long serial_id = ezlopi_factory_info_v3_get_id();
             const char* device_type = ezlopi_factory_info_v3_get_device_type();
 
-            cJSON_AddBoolToObject(__FUNCTION__, cj_ezlopi, ezlopi_provisioned_str, ezlopi_factory_info_v3_get_provisioning_status());
+            if (ezlopi_factory_info_v3_get_provisioning_status() != 1)
+            {
+                cJSON_AddFalseToObject(__FUNCTION__, cj_ezlopi, ezlopi_provisioned_str);
+            }
+            else
+            {
+                cJSON_AddTrueToObject(__FUNCTION__, cj_ezlopi, ezlopi_provisioned_str);
+            }
             cJSON_AddStringToObject(__FUNCTION__, cj_ezlopi, ezlopi_uuid_str, controller_uuid ? controller_uuid : "");
             cJSON_AddStringToObject(__FUNCTION__, cj_ezlopi, ezlopi_uuid_prov_str, provisioning_uuid ? provisioning_uuid : "");
             cJSON_AddStringToObject(__FUNCTION__, cj_ezlopi, ezlopi_type_str, device_type ? device_type : "");

@@ -342,6 +342,10 @@ unsigned long long ezlopi_factory_info_v3_get_id(void)
             _id |= tmp_id_arr[i] << (i * 8);
         }
     }
+    else
+    {
+        TRACE_E("Factory info un-initialized!");
+    }
 
     return _id;
 }

@@ -143,7 +143,8 @@ static void ezlopi_ble_basic_init(void)
     // snprintf(ble_device_name, sizeof(ble_device_name), "ezlopi_%llu", ezlopi_factory_info_v3_get_id());
 
     const char* device_type = ezlopi_factory_info_v3_get_device_type();
-    if ((NULL != device_type))
+
+    if ((1 == ezlopi_factory_info_v3_get_provisioning_status()) && (NULL != device_type))
     {
         snprintf(ble_device_name, sizeof(ble_device_name), "%s_%llu", device_type, ezlopi_factory_info_v3_get_id());
     }
