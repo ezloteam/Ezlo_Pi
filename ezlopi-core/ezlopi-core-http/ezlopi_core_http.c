@@ -366,30 +366,30 @@ static void ezlopi_core_http_generate_request(s_ezlopi_core_http_mbedtls_t* conf
             if (((NULL != config->username) && (GET_STRING_SIZE(config->username) > 0)) &&
                 ((NULL != config->password) && (GET_STRING_SIZE(config->password) > 0)))
             {
-                snprintf(*request, request_len, "GET %s?username=%s&password=%s HTTP/1.0\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->url, config->username, config->password);
+                snprintf(*request, request_len, "GET /%s?username=%s&password=%s HTTP/1.1\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->url, config->username, config->password);
             }
             else
             {
-                snprintf(*request, request_len, "GET %s HTTP/1.0\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->url);
+                snprintf(*request, request_len, "GET /%s HTTP/1.1\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->web_server);
             }
             break;
         }
         case HTTP_METHOD_POST:
         {
             // TRACE_S("HTTP POST-METHOD [%d]", config->method);
-            snprintf(*request, request_len, "POST %s HTTP/1.0\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->url);
+            snprintf(*request, request_len, "POST /%s HTTP/1.1\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->web_server);
             break;
         }
         case HTTP_METHOD_PUT:
         {
             // TRACE_S("HTTP PUT-METHOD [%d]", config->method);
-            snprintf(*request, request_len, "PUT %s HTTP/1.0\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->url);
+            snprintf(*request, request_len, "PUT /%s HTTP/1.1\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->web_server);
             break;
         }
         case HTTP_METHOD_DELETE:
         {
             // TRACE_S("HTTP DELETE-METHOD [%d]", config->method);
-            snprintf(*request, request_len, "DELETE %s HTTP/1.0\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->url);
+            snprintf(*request, request_len, "DELETE /%s HTTP/1.1\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->web_server);
             break;
         }
         default:

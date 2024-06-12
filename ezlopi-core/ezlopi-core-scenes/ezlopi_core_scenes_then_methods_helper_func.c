@@ -266,7 +266,7 @@ void parse_http_url(s_ezlopi_core_http_mbedtls_t* tmp_http_data, l_fields_v2_t* 
                 TRACE_S("port = '%d'", port);
                 TRACE_S("page = '%s'", page);
 
-                tmp_http_data->web_server_maxlen = (uint16_t)ezlopi_core_http_mem_malloc(&(tmp_http_data->web_server), host);
+                tmp_http_data->web_server_maxlen = (uint16_t)ezlopi_core_http_mem_malloc(&(tmp_http_data->web_server), page);
                 tmp_http_data->web_port = port;
             }
             else
@@ -274,14 +274,12 @@ void parse_http_url(s_ezlopi_core_http_mbedtls_t* tmp_http_data, l_fields_v2_t* 
                 TRACE_E("failed to parse URL");
             }
 
-
-
             int content_size = __ezlopi_core_scenes_then_create_fresh_header(tmp_http_data);
             if (content_size > 0) // if this characters exsists in the 'tmp_http_data->header'
             {
                 // 1. adding 'host' to header-buffer
                 // TRACE_W("Appending!! webserver -> header");
-                __ezlopi_core_scenes_then_append_to_header(tmp_http_data, "Host", tmp_http_data->web_server);
+                __ezlopi_core_scenes_then_append_to_header(tmp_http_data, "Host", host);
             }
             else
             {

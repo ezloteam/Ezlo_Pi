@@ -378,7 +378,6 @@ void scenes_house_modes_set(cJSON* cj_request, cJSON* cj_response)
 
                     cJSON_AddItemToObject(__FUNCTION__, cj_scene, ezlopi_house_modes_str, cJSON_Duplicate(__FUNCTION__, cj_house_mode_arr, true));
 
-                    #warning "testing";
                     cJSON* cj_test = cJSON_GetObjectItem(__FUNCTION__, cj_scene, ezlopi_house_modes_str);
                     if (cj_test)
                     {
@@ -476,11 +475,21 @@ void scenes_action_block_test(cJSON * cj_request, cJSON * cj_response)
 
                         if (tmp_http_data->response)
                         {
-
-                            cJSON_AddNumberToObject(__FUNCTION__, cj_result, "httpAnswerCode", 200);
-                            TRACE_S("response  [%d] ", strlen((tmp_http_data->response)));
+                            int code = 400;
+                            char detail[100] = { 0 };
+                            if (sscanf(tmp_http_data->response, "HTTP/1.1 %d %99s[^\n]", &code, detail) == 2)
+                            {
+                                cJSON_AddNumberToObject(__FUNCTION__, cj_result, "httpAnswerCode", code);
+                            }
+                            else
+                            {
+                                cJSON_AddNumberToObject(__FUNCTION__, cj_result, "httpAnswerCode", code);
+                            }
                         }
-
+                        else
+                        {
+                            cJSON_AddNumberToObject(__FUNCTION__, cj_result, "httpAnswerCode", 404);
+                        }
                         free_http_mbedtls_struct(tmp_http_data);
 
                         ezlopi_free(__FUNCTION__, tmp_http_data);
