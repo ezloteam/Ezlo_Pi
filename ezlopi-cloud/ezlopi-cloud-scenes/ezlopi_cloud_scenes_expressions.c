@@ -100,7 +100,7 @@ static void ____common_part_of_scenes_expressions_added_and_changed(cJSON * cj_r
             }
 
             cJSON* cj_metadata = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_metadata_str);
-            if (cj_metadata && cJSON_IsObject(cj_metadata))
+            if (cj_metadata)
             {
                 cJSON_AddItemToObject(__FUNCTION__, cj_result, ezlopi_metadata_str, cJSON_Duplicate(__FUNCTION__, cj_metadata, cJSON_True));
             }
@@ -184,9 +184,6 @@ void scenes_expressions_added_changed(cJSON * cj_request, cJSON * cj_response)
     if (response1)
     {
         scenes_expressions_added(cj_request, response1);
-
-        CJSON_TRACE("----------------- broadcasting - 'hub.expression,added'", response1);
-
         if (0 == ezlopi_core_ezlopi_broadcast_add_to_queue(response1))
         {
             cJSON_Delete(__FUNCTION__, response1);
@@ -196,4 +193,28 @@ void scenes_expressions_added_changed(cJSON * cj_request, cJSON * cj_response)
     // 2. for 'changed' - return  'cj_response'
     scenes_expressions_changed(cj_request, cj_response);
 }
+
+void scenes_expressions_deleted(cJSON* cj_request, cJSON* cj_response)
+{
+    cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_sender_str);
+    cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_error_str);
+
+    cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
+    cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, ezlopi_hub_scene_deleted_str);
+
+    cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+    if (cj_result)
+    {
+        cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
+        if (cj_params)
+        {
+            cJSON* cj_expression_name = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_name_str);
+            if (cj_expression_name && cj_expression_name->valuestring)
+            {
+                cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_name_str, cj_expression_name->valuestring);
+            }
+        }
+    }
+}
+
 #endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS

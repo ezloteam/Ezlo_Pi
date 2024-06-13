@@ -100,7 +100,7 @@ CLOUD_METHOD("hub.scenes.scripts.run", scenes_scripts_run, NULL)
 
 CLOUD_METHOD("hub.scenes.expressions.set", scenes_expressions_set, scenes_expressions_added_changed)
 CLOUD_METHOD("hub.scenes.expressions.list", scenes_expressions_list, NULL)
-CLOUD_METHOD("hub.scenes.expressions.delete", scenes_expressions_delete, NULL)
+CLOUD_METHOD("hub.scenes.expressions.delete", scenes_expressions_delete, scenes_expressions_deleted)
 #endif //CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 CLOUD_METHOD("hub.nma.register.repeat", register_repeat, NULL)

@@ -646,7 +646,13 @@ static s_ezlopi_expressions_t* __expressions_create_node(uint32_t exp_id, cJSON*
 
         CJSON_GET_VALUE_BOOL(cj_expression, ezlopi_variable_str, new_exp_node->variable);
 
-        new_exp_node->meta_data = cJSON_DetachItemFromObject(__FUNCTION__, cj_expression, ezlopi_metadata_str);
+        cJSON* cj_metaData = cJSON_GetObjectItem(__FUNCTION__, cj_expression, ezlopi_metadata_str);
+        if (cj_metaData)
+        {
+            new_exp_node->meta_data = cJSON_Duplicate(__FUNCTION__, cj_metaData, cJSON_True);
+        }
+
+
         new_exp_node->value_type = ezlopi_core_scenes_value_get_type(cj_expression, ezlopi_valueType_str);
         __get_expressions_value(new_exp_node, cJSON_GetObjectItem(__FUNCTION__, cj_expression, ezlopi_value_str), new_exp_node->value_type);
 

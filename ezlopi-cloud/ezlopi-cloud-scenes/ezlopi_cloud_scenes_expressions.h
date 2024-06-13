@@ -13,7 +13,7 @@ void scenes_expressions_delete(cJSON* cj_request, cJSON* cj_response);
 
 ///////////// updaters
 void scenes_expressions_added_changed(cJSON* cj_request, cJSON* cj_response);
-// void scene_expressions_deleted(cJSON* cj_request, cJSON* cj_response);
+void scenes_expressions_deleted(cJSON* cj_request, cJSON* cj_response);
 
 #endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
