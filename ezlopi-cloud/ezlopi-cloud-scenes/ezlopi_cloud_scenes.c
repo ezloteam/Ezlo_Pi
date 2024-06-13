@@ -402,6 +402,7 @@ void scene_changed(cJSON* cj_request, cJSON* cj_response)
             if (scene_str)
             {
                 cJSON_AddRawToObject(__FUNCTION__, cj_response, ezlopi_result_str, scene_str);
+                ezlopi_free(__FUNCTION__, scene_str);
             }
         }
     }
