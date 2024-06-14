@@ -106,7 +106,7 @@ int ezlopi_core_http_dyna_relloc(char** Buf, int reqSize)
  *
  * @return Address of a memory_block ; (char*)ezlopi_malloc(...)
  */
-static void ezlopi_core_http_request_via_mbedTLS(const char* web_server, int web_port_num, const char* url_req, char** resp_buf)
+static void ezlopi_core_http_request_via_mbedTLS(const char* host_web_server, int web_port_num, const char* url_req, char** resp_buf)
 {
     // TRACE_I("&result==[%p] --> *resp_buf=>[%p]", resp_buf, *resp_buf);
     int ret, flags, len;
@@ -153,7 +153,7 @@ static void ezlopi_core_http_request_via_mbedTLS(const char* web_server, int web
     // TRACE_I("Setting hostname for TLS session...");
 
     /* Hostname set here should match CN in server certificate */
-    if (0 != (ret = mbedtls_ssl_set_hostname(&ssl, web_server)))
+    if (0 != (ret = mbedtls_ssl_set_hostname(&ssl, host_web_server)))
     {
         TRACE_E("mbedtls_ssl_set_hostname returned -0x%x", -ret);
         goto exit;
@@ -188,9 +188,9 @@ static void ezlopi_core_http_request_via_mbedTLS(const char* web_server, int web
     }
 
     mbedtls_net_init(&server_fd);
-    // TRACE_I("Connecting to %s:%s...", web_server, web_port);
+    // TRACE_I("Connecting to %s:%s...", host_web_server, web_port);
 
-    if (0 != (ret = mbedtls_net_connect(&server_fd, web_server,
+    if (0 != (ret = mbedtls_net_connect(&server_fd, host_web_server,
         web_port, MBEDTLS_NET_PROTO_TCP)))
     {
         TRACE_E("mbedtls_net_connect returned -%x", -ret);
@@ -366,30 +366,30 @@ static void ezlopi_core_http_generate_request(s_ezlopi_core_http_mbedtls_t* conf
             if (((NULL != config->username) && (GET_STRING_SIZE(config->username) > 0)) &&
                 ((NULL != config->password) && (GET_STRING_SIZE(config->password) > 0)))
             {
-                snprintf(*request, request_len, "GET /%s?username=%s&password=%s HTTP/1.1\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->url, config->username, config->password);
+                snprintf(*request, request_len, "GET %s?username=%s&password=%s HTTP/1.1\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->url, config->username, config->password);
             }
             else
             {
-                snprintf(*request, request_len, "GET /%s HTTP/1.1\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->web_server);
+                snprintf(*request, request_len, "GET /%s HTTP/1.1\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->target_page);
             }
             break;
         }
         case HTTP_METHOD_POST:
         {
             // TRACE_S("HTTP POST-METHOD [%d]", config->method);
-            snprintf(*request, request_len, "POST /%s HTTP/1.1\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->web_server);
+            snprintf(*request, request_len, "POST /%s HTTP/1.1\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->target_page);
             break;
         }
         case HTTP_METHOD_PUT:
         {
             // TRACE_S("HTTP PUT-METHOD [%d]", config->method);
-            snprintf(*request, request_len, "PUT /%s HTTP/1.1\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->web_server);
+            snprintf(*request, request_len, "PUT /%s HTTP/1.1\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->target_page);
             break;
         }
         case HTTP_METHOD_DELETE:
         {
             // TRACE_S("HTTP DELETE-METHOD [%d]", config->method);
-            snprintf(*request, request_len, "DELETE /%s HTTP/1.1\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->web_server);
+            snprintf(*request, request_len, "DELETE /%s HTTP/1.1\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->target_page);
             break;
         }
         default:
@@ -451,7 +451,7 @@ void ezlopi_core_http_mbedtls_req(s_ezlopi_core_http_mbedtls_t* config)
             TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
             TRACE_I("request[capacity: %d]:\n\n%s[%d]", request_len, request, strlen(request));
             // TRACE_E("&result==[%p]", &(config->response));
-            ezlopi_core_http_request_via_mbedTLS(config->web_server, (config->web_port), request, &(config->response));
+            ezlopi_core_http_request_via_mbedTLS(config->web_server, (config->web_port), request, &(config->response)); // (  web_server['host'] , port_num , http_request , *response_ptr] ) 
             if (config->response)
             {
                 TRACE_S("*result[%p] =>\n[%d]\n%s", config->response, strlen(config->response), config->response);

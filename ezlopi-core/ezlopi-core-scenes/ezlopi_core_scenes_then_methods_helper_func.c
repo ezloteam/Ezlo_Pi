@@ -266,7 +266,8 @@ void parse_http_url(s_ezlopi_core_http_mbedtls_t* tmp_http_data, l_fields_v2_t* 
                 TRACE_S("port = '%d'", port);
                 TRACE_S("page = '%s'", page);
 
-                tmp_http_data->web_server_maxlen = (uint16_t)ezlopi_core_http_mem_malloc(&(tmp_http_data->web_server), page);
+                tmp_http_data->web_server_maxlen = (uint16_t)ezlopi_core_http_mem_malloc(&(tmp_http_data->web_server), host);
+                tmp_http_data->targe_page_maxlen = (uint16_t)ezlopi_core_http_mem_malloc(&(tmp_http_data->target_page), page);
                 tmp_http_data->web_port = port;
             }
             else
@@ -411,7 +412,8 @@ void parse_http_creds(s_ezlopi_core_http_mbedtls_t* tmp_http_data, l_fields_v2_t
 void free_http_mbedtls_struct(s_ezlopi_core_http_mbedtls_t* config)
 {
     FREE_PTR_IF_NOT_NULL(config->url);
-    FREE_PTR_IF_NOT_NULL(config->web_server);
+    FREE_PTR_IF_NOT_NULL(config->web_server);   
+    FREE_PTR_IF_NOT_NULL(config->target_page);
     FREE_PTR_IF_NOT_NULL(config->header);
     FREE_PTR_IF_NOT_NULL(config->content);
     FREE_PTR_IF_NOT_NULL(config->username);

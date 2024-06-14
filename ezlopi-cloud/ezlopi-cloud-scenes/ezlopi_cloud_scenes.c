@@ -490,8 +490,8 @@ void scenes_action_block_test(cJSON * cj_request, cJSON * cj_response)
                         {
                             cJSON_AddNumberToObject(__FUNCTION__, cj_result, "httpAnswerCode", 404);
                         }
+                        
                         free_http_mbedtls_struct(tmp_http_data);
-
                         ezlopi_free(__FUNCTION__, tmp_http_data);
                     }
 

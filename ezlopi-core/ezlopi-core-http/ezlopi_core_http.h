@@ -41,6 +41,7 @@ extern "C"
         int web_port;
         char* url;        // ptr => complete_url [.eg. https://www.google.com/json?username=qqqq&password=zzzz ]
         char* web_server; // ptr => web_sever_name [.eg. www.google.com]
+        char* target_page; // ptr => target_page [.eg. ...src/page... ]
         char* header;     // ptr => headers [.eg. {"Accept" : "*/*", ....}]
         char* content;
         char* username;
@@ -50,6 +51,7 @@ extern "C"
         uint8_t password_maxlen;
         uint16_t url_maxlen; // max @ 65536 = 60Kb
         uint16_t web_server_maxlen;
+        uint16_t targe_page_maxlen;
         uint16_t header_maxlen;
         uint16_t content_maxlen;
         uint16_t response_maxlen;
