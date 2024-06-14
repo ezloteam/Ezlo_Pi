@@ -121,6 +121,7 @@ const char *ezlopi_rpc_method_notfound_str = "rpc.method.notfound";
 
 const char *ezlopi_hub_expression_added_str = "hub.expression.added";
 const char *ezlopi_hub_expression_changed_str = "hub.expression.changed";
+const char *ezlopi_hub_expression_deleted_str = "hub.expression.deleted";
 
 const char *ezlopi_hub_scene_changed_str = "hub.scene.changed";
 const char *ezlopi_hub_scene_added_str = "hub.scene.added";

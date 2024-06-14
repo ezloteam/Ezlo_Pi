@@ -200,7 +200,7 @@ void scenes_expressions_deleted(cJSON* cj_request, cJSON* cj_response)
     cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_error_str);
 
     cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
-    cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, ezlopi_hub_scene_deleted_str);
+    cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, ezlopi_hub_expression_deleted_str);
 
     cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     if (cj_result)

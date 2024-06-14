@@ -121,6 +121,7 @@ extern const char *ezlopi_rpc_method_notfound_str;
 
 extern const char *ezlopi_hub_expression_added_str;
 extern const char *ezlopi_hub_expression_changed_str;
+extern const char *ezlopi_hub_expression_deleted_str;
 
 extern const char *ezlopi_hub_scene_changed_str;
 extern const char *ezlopi_hub_scene_added_str;
