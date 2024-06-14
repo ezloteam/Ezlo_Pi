@@ -490,7 +490,7 @@ void scenes_action_block_test(cJSON * cj_request, cJSON * cj_response)
                         {
                             cJSON_AddNumberToObject(__FUNCTION__, cj_result, "httpAnswerCode", 404);
                         }
-                        
+
                         free_http_mbedtls_struct(tmp_http_data);
                         ezlopi_free(__FUNCTION__, tmp_http_data);
                     }
@@ -534,6 +534,20 @@ void scenes_block_status_reset(cJSON * cj_request, cJSON * cj_response)
     }
 }
 
+void scenes_stop(cJSON* cj_request, cJSON* cj_response)
+{
+    cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+    cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
+    if (cj_params)
+    {
+        cJSON* cj_scene_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_sceneId_str);
+        if (cj_scene_id && cj_scene_id->valuestring)
+        {
+            uint32_t u32_scene_id = strtoul(cj_scene_id->valuestring, NULL, 16);
+            ezlopi_meshbot_service_stop_for_scene_id(u32_scene_id);
+        }
+    }
+}
 
 ////// updater for scene
 ////// useful for 'hub.scenes.enabled.set'

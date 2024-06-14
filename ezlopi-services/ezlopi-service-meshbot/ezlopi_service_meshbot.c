@@ -51,7 +51,7 @@ uint32_t ezlopi_meshbot_service_stop_for_scene_id(uint32_t _id)
             vTaskDelay(50 / portTICK_RATE_MS);
         }
 
-        ezlopi_scenes_status_change_broadcast(scene_node, scene_status_stopped_str);
+        // ezlopi_scenes_status_change_broadcast(scene_node, scene_status_stopped_str);
 
         ret = 1;
     }

@@ -76,6 +76,7 @@ void ezlopi_print_fields(l_fields_v2_t* fields)
         case EZLOPI_VALUE_TYPE_INTERVAL:
         case EZLOPI_VALUE_TYPE_HMS_INTERVAL:
         case EZLOPI_VALUE_TYPE_SCENEID:
+        case EZLOPI_VALUE_TYPE_EXPRESSION:
         {
             TRACE_D("\t\t\t|-- value: %s", fields->field_value.u_value.value_string);
             break;
@@ -163,7 +164,6 @@ void ezlopi_print_fields(l_fields_v2_t* fields)
         case EZLOPI_VALUE_TYPE_AMOUNT_OF_USEFUL_ENERGY:
         case EZLOPI_VALUE_TYPE_REACTIVE_POWER_CONSUMPTION:
         case EZLOPI_VALUE_TYPE_DEVICE:
-        case EZLOPI_VALUE_TYPE_EXPRESSION:
         case EZLOPI_VALUE_TYPE_NONE:
         case EZLOPI_VALUE_TYPE_MAX:
         {

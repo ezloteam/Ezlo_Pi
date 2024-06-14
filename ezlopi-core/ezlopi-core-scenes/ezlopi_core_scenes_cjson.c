@@ -62,6 +62,7 @@ cJSON* ezlopi_scene_cjson_get_field(l_fields_v2_t* field_node)
             case EZLOPI_VALUE_TYPE_STRING:
             case EZLOPI_VALUE_TYPE_INTERVAL:
             case EZLOPI_VALUE_TYPE_SCENEID:
+            case EZLOPI_VALUE_TYPE_EXPRESSION:
             {
                 __cjson_add_string(cj_field, ezlopi_value_str, field_node->field_value.u_value.value_string);
                 // __cjson_add_string(cj_field, ezlopi_value_str, field_node->field_value.u_value.value_string);
@@ -166,7 +167,6 @@ cJSON* ezlopi_scene_cjson_get_field(l_fields_v2_t* field_node)
             case EZLOPI_VALUE_TYPE_AMOUNT_OF_USEFUL_ENERGY:
             case EZLOPI_VALUE_TYPE_REACTIVE_POWER_CONSUMPTION:
             case EZLOPI_VALUE_TYPE_DEVICE:
-            case EZLOPI_VALUE_TYPE_EXPRESSION:
             case EZLOPI_VALUE_TYPE_NONE:
             case EZLOPI_VALUE_TYPE_MAX:
             {
@@ -372,17 +372,10 @@ static void __cjson_add_fields(cJSON* cj_block, l_fields_v2_t* fields)
                         cJSON_AddNumberToObject(__FUNCTION__, cj_field, ezlopi_value_str, curr_field->field_value.u_value.value_double);
                         break;
                     }
-                    case EZLOPI_VALUE_TYPE_STRING:
-                    {
-                        __cjson_add_string(cj_field, ezlopi_value_str, curr_field->field_value.u_value.value_string);
-                        break;
-                    }
                     case EZLOPI_VALUE_TYPE_ITEM:
-                    {
-                        __cjson_add_string(cj_field, ezlopi_value_str, curr_field->field_value.u_value.value_string);
-                        break;
-                    }
+                    case EZLOPI_VALUE_TYPE_STRING:
                     case EZLOPI_VALUE_TYPE_INTERVAL:
+                    case EZLOPI_VALUE_TYPE_EXPRESSION:
                     {
                         __cjson_add_string(cj_field, ezlopi_value_str, curr_field->field_value.u_value.value_string);
                         break;
@@ -504,7 +497,6 @@ static void __cjson_add_fields(cJSON* cj_block, l_fields_v2_t* fields)
                     case EZLOPI_VALUE_TYPE_AMOUNT_OF_USEFUL_ENERGY:
                     case EZLOPI_VALUE_TYPE_REACTIVE_POWER_CONSUMPTION:
                     case EZLOPI_VALUE_TYPE_DEVICE:
-                    case EZLOPI_VALUE_TYPE_EXPRESSION:
                     case EZLOPI_VALUE_TYPE_MAX:
                     {
                         TRACE_W("Value type not implemented!, curr-type: %d", curr_field->value_type);
