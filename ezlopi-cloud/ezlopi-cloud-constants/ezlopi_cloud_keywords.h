@@ -38,6 +38,8 @@ extern const char* ezlopi_expressions_str;
 extern const char* ezlopi_is_group_str;
 extern const char* ezlopi_user_notifications_str;
 extern const char* ezlopi_house_modes_str;
+extern const char* ezlopi_block_enable_str;
+extern const char* ezlopi_blockId_str;
 extern const char* ezlopi_blockOptions_str;
 extern const char* ezlopi_blockName_str;
 extern const char* ezlopi_version_str;

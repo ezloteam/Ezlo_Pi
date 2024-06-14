@@ -12,6 +12,7 @@
 #include "ezlopi_core_scenes_v2.h"
 #include "ezlopi_core_event_group.h"
 #include "ezlopi_core_factory_info.h"
+#include "ezlopi_core_scenes_edit.h"
 #include "ezlopi_core_scenes_scripts.h"
 #include "ezlopi_core_scenes_expressions.h"
 #include "ezlopi_core_scenes_then_methods.h"
@@ -383,36 +384,40 @@ int ezlopi_scene_then_set_scene_state(l_scenes_list_v2_t* curr_scene, void* arg)
     }
     return ret;
 }
-
 int ezlopi_scene_then_reset_latch(l_scenes_list_v2_t* curr_scene, void* arg)
 {
     int ret = 0;
-    uint32_t sceneId = 0;
+
     l_action_block_v2_t* curr_block = (l_action_block_v2_t*)arg;
     if (curr_block && curr_scene)
     {
+        char * sceneId_str = NULL;
+        char * blockId_str = NULL;
         l_fields_v2_t* curr_field = curr_block->fields;
         while (curr_field)
         {
             if (0 == strncmp(curr_field->name, ezlopi_sceneId_str, 8))
             {
-                if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type)
+                if ((EZLOPI_VALUE_TYPE_STRING == curr_field->value_type) && (NULL != curr_field->field_value.u_value.value_string))
                 {
-                    sceneId = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
-                    TRACE_E("reset_latch _---> sceneId[%d]", sceneId);
-                    l_scenes_list_v2_t* scene_to_reset_latch = ezlopi_scenes_get_by_id_v2(sceneId);
-                    if (scene_to_reset_latch)
-                    {
-                        s_when_function_t* function_state = (s_when_function_t*)scene_to_reset_latch->when_block->fields->user_arg;
-                        if (function_state)
-                        {
-                            function_state->current_state = false;
-                        }
-                        break;
-                    }
+                    sceneId_str = curr_field->field_value.u_value.value_string;
+                    // TRACE_S("sceneId[%s]", sceneId);
+                }
+            }
+            else if (0 == strncmp(curr_field->name, ezlopi_blockId_str, 8))
+            {
+                if ((EZLOPI_VALUE_TYPE_STRING == curr_field->value_type) && (NULL != curr_field->field_value.u_value.value_string))
+                {
+                    blockId_str = curr_field->field_value.u_value.value_string;
+                    // TRACE_S("blockId[%s]", blockId_str);
                 }
             }
             curr_field = curr_field->next;
+        }
+
+        if (sceneId_str && blockId_str)
+        {
+            ezlopi_core_scene_set_reset_latch(sceneId_str, blockId_str, false);
         }
     }
     return ret;
@@ -420,7 +425,7 @@ int ezlopi_scene_then_reset_latch(l_scenes_list_v2_t* curr_scene, void* arg)
 int ezlopi_scene_then_reset_scene_latches(l_scenes_list_v2_t* curr_scene, void* arg)
 {
     int ret = 0;
-    uint32_t sceneId = 0;
+    char * sceneId_str = 0;
     l_action_block_v2_t* curr_then = (l_action_block_v2_t*)arg;
     if (curr_then && curr_scene)
     {
@@ -431,23 +436,16 @@ int ezlopi_scene_then_reset_scene_latches(l_scenes_list_v2_t* curr_scene, void* 
             {
                 if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type)
                 {
-                    sceneId = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
-
-
-                    TRACE_E("reset_latch---> sceneId[%d]", sceneId);
-                    l_scenes_list_v2_t* scene_to_reset_latch = ezlopi_scenes_get_by_id_v2(sceneId);
-                    if (scene_to_reset_latch)
-                    {
-                        s_when_function_t* function_state = (s_when_function_t*)scene_to_reset_latch->when_block->fields->user_arg;
-                        if (function_state)
-                        {
-                            function_state->current_state = false;
-                        }
-                        break;
-                    }
+                    sceneId_str = curr_field->field_value.u_value.value_string;
+                    // TRACE_S("sceneId[%s]", sceneId);
                 }
             }
             curr_field = curr_field->next;
+        }
+
+        if (sceneId_str)
+        {
+            ezlopi_core_scene_set_reset_latch(sceneId_str, NULL, false);
         }
     }
     return ret;
