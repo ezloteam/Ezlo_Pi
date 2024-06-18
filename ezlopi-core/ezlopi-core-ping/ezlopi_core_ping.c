@@ -59,8 +59,11 @@ void ezlopi_ping_init(void)
         struct in6_addr addr6 = ((struct sockaddr_in6*)(res->ai_addr))->sin6_addr;
         inet6_addr_to_ip6addr(ip_2_ip6(&target_addr), &addr6);
     }
+
     freeaddrinfo(res);
+
     config.target_addr = target_addr;
+    config.task_stack_size = 4096;
 
     /* set callback functions */
     esp_ping_callbacks_t cbs = {

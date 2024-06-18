@@ -26,6 +26,12 @@
 #include "ezlopi_service_webprov.h"
 #include "EZLOPI_USER_CONFIG.h"
 
+#define TEST_PROV 1
+
+#if (1 == TEST_PROV)
+#include "ezlopi_test_prov.h"
+#endif
+
 
 #if defined(CONFIG_EZPI_WEBSOCKET_CLIENT)
 
@@ -248,24 +254,36 @@ static void __config_check(void* pv)
     static uint8_t retry_count = 0;
     static uint8_t retry_count_failure = 0;
 
+#if (1 == TEST_PROV)
+    char *ssl_private_key = test_ssl_pvt_key;
+    char *ssl_shared_key = test_ssl_shared_key;
+    char* ca_certificate = test_ca_cert;
+    char* provision_token = test_prov_token;
+    // char* provisioning_server = ezlopi_factory_info_v3_get_provisioning_server();
+    uint16_t config_version = test_version_num;
+#else
     char *ssl_private_key = ezlopi_factory_info_v3_get_ssl_private_key();
     char *ssl_shared_key = ezlopi_factory_info_v3_get_ssl_shared_key();
     char* ca_certificate = ezlopi_factory_info_v3_get_ca_certificate();
     char* provision_token = ezlopi_factory_info_get_v3_provision_token();
     // char* provisioning_server = ezlopi_factory_info_v3_get_provisioning_server();
     uint16_t config_version = ezlopi_factory_info_v3_get_config_version();
+#endif
 
     if (ssl_private_key && ssl_shared_key && ca_certificate && provision_token)
     {
         while (1)
         {
             char http_request_location[500];
-            snprintf(http_request_location, sizeof(http_request_location), "https://ezlopiesp32.up.mios.com/provision-sync?token=%s&version=%d", provision_token, config_version ? config_version : 1);
+            // snprintf(http_request_location, sizeof(http_request_location), "https://ezlopiesp32.up.mios.com/provision-sync?token=%s&version=%d", provision_token, config_version ? config_version : 1);
+
+            snprintf(http_request_location, sizeof(http_request_location), "https://%s.%s/provision-sync?token=%s&version=%d", test_hardware_type, test_up_domain, provision_token, config_version ? config_version + 1 : 1);
 
             TRACE_I("Config Check URL : %s", http_request_location);
 
             ezlopi_wait_for_wifi_to_connect(portMAX_DELAY);
-            s_ezlopi_http_data_t* response = ezlopi_http_get_request(http_request_location, ssl_private_key, ssl_shared_key, ca_certificate);
+            s_ezlopi_http_data_t* response = ezlopi_http_get_request(http_request_location, NULL, NULL, NULL);
+            // s_ezlopi_http_data_t* response = ezlopi_http_get_request(http_request_location, ssl_private_key, ssl_shared_key, ca_certificate);
 
             if (NULL != response)
             {
@@ -319,12 +337,17 @@ static void __config_check(void* pv)
                 xTaskNotifyGive(ezlopi_update_config_notifier);
                 break;
             }
+
+            vTaskDelay(100 / portTICK_RATE_MS);
         }
+
         vTaskDelay(5000 / portTICK_RATE_MS);
     }
 
     // ezlopi_factory_info_v3_free(ca_certificate); // allocated once for all, do not free
+#if (0 == TEST_PROV)
     ezlopi_factory_info_v3_free(provision_token);
+#endif
     ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SERVICE_WEB_PROV_CONFIG_CHECK_TASK);
 
     vTaskDelete(NULL);
