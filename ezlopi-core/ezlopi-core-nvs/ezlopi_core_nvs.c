@@ -869,9 +869,10 @@ uint8_t EZPI_CORE_nvs_read_serial_log_severity(uint32_t* severity)
 {
     uint8_t ret = 0;
     uint8_t err = ezlopi_nvs_read_uint32(severity, ezlopi_serial_log_severity);
-    if(0 == err)
+    if (0 == err)
     {
         ret = 1;
     }
+
     return ret;
 }

@@ -490,6 +490,8 @@ s_ezlopi_http_data_t* ezlopi_http_get_request(const char* cloud_url, const char*
         {
             esp_err_t err = esp_http_client_perform(client);
             status_code = esp_http_client_get_status_code(client);
+            TRACE_W("status ret: %d", status_code);
+            
             if (err == ESP_OK)
             {
                 while (!esp_http_client_is_complete_data_received(client))

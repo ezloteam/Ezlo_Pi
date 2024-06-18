@@ -37,6 +37,8 @@ void ezlopi_init(void)
 
 #ifdef CONFIG_EZPI_UTIL_TRACE_EN
     ezlopi_core_read_set_log_severities();
+    // #warning "remove this in release"
+        ezlopi_core_read_set_log_severities_internal(ENUM_EZLOPI_LOG_SEVERITY_TRACE);
 #endif // CONFIG_EZPI_UTIL_TRACE_EN
     EZPI_HAL_uart_init();
 

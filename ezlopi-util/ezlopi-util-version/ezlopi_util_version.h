@@ -13,7 +13,7 @@ extern "C" {
 #define BATCH 9
 #define BUILD 189
 #define VERSION_STR "3.5.9"
-#define DEVELOPER "lomas.subedi@ezlo.com"
+#define DEVELOPER "krishna.kumar@ezlo.com"
 #define COMPILE_TIME "Tue 28 May 2024 05:20:23 PM +0545"
 #define CURRENT_BRANCH "development"
 #define COMMIT_HASH "ded49c4d6ff77edf6a7ac28f40e62de10349597c"

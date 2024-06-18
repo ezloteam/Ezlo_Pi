@@ -75,6 +75,11 @@ static int ezlopi_hub_serial_log_set_severity(const char* severity_str)
     return ret;
 }
 
+void ezlopi_core_read_set_log_severities_internal(e_ezlopi_log_severity_t severity)
+{
+    serial_log_severity = severity;
+}
+
 void ezlopi_core_read_set_log_severities()
 {
     EZPI_CORE_nvs_read_cloud_log_severity(&cloud_log_severity);
