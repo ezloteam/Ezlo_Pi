@@ -34,7 +34,7 @@
 }\
 */
 
-static uint32_t parent_device_id = 0;
+// static uint32_t parent_device_id = 0;
 static uint32_t aqi_item_id = 0;
 static uint32_t voc_item_id = 0;
 static uint32_t co2_item_id = 0;
