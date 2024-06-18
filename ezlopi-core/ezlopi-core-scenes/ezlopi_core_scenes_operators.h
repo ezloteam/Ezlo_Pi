@@ -63,10 +63,10 @@ e_scene_num_cmp_operators_t ezlopi_scenes_numeric_comparator_operators_get_enum(
 const char* ezlopi_scenes_numeric_comparator_operators_get_op(e_scene_num_cmp_operators_t operator);
 const char* ezlopi_scenes_numeric_comparator_operators_get_name(e_scene_num_cmp_operators_t operator);
 const char* ezlopi_scenes_numeric_comparator_operators_get_method(e_scene_num_cmp_operators_t operator);
-double ezlopi_core_scenes_operator_get_item_double_value_current(uint32_t item_id);
+double ezlopi_core_scenes_operator_get_item_value_by_id(uint32_t item_id);
 
 int ezlopi_scenes_operators_value_number_operations(l_fields_v2_t* item_exp_field, l_fields_v2_t* value_field, l_fields_v2_t* comparator_field);
-
+int ezlopi_scenes_operators_value_number_range_operations(l_fields_v2_t* item_exp_field, l_fields_v2_t* start_value_field, l_fields_v2_t* end_value_field, bool comparator_choice);
 //-------------------------------------------------------------------
 //Numeric-Range Operators
 

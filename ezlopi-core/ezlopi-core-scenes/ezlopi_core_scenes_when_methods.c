@@ -822,8 +822,6 @@ int ezlopi_scene_when_compare_number_range(l_scenes_list_v2_t* scene_node, void*
 
     if (when_block && scene_node)
     {
-        uint32_t item_id = 0;
-        char* expression_name = NULL;
         l_fields_v2_t* item_exp_field = NULL;
         l_fields_v2_t* end_value_field = NULL;
         l_fields_v2_t* start_value_field = NULL;
@@ -834,15 +832,16 @@ int ezlopi_scene_when_compare_number_range(l_scenes_list_v2_t* scene_node, void*
         {
             if (0 == strncmp(curr_field->name, ezlopi_item_str, 5))
             {
-                item_exp_field = curr_field;
-                item_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
+                if (EZLOPI_VALUE_TYPE_ITEM == curr_field->value_type && (NULL != (curr_field->field_value.u_value.value_string)))
+                {
+                    item_exp_field = curr_field;
+                }
             }
             else if (0 == strncmp(curr_field->name, "expression", 11))
             {
                 if (EZLOPI_VALUE_TYPE_EXPRESSION == curr_field->value_type && (NULL != (curr_field->field_value.u_value.value_string)))
                 {
                     item_exp_field = curr_field;
-                    expression_name = curr_field->field_value.u_value.value_string; // expression_name
                 }
             }
             else if (0 == strncmp(curr_field->name, ezlopi_comparator_str, 11))
@@ -863,49 +862,34 @@ int ezlopi_scene_when_compare_number_range(l_scenes_list_v2_t* scene_node, void*
             curr_field = curr_field->next;
         }
 
-        if (item_id && end_value_field && start_value_field)
+
+        //-----------------------------------------------------------------------------------------------------------------
+        // if (item_exp_field && end_value_field && start_value_field)
+        // {
+        //     double double_item_value = ezlopi_core_scenes_operator_get_item_value_by_id(item_id);
+
+        //     if ((start_value_field->field_value.u_value.value_double <= double_item_value) &&
+        //         (end_value_field->field_value.u_value.value_double >= double_item_value))
+        //     {
+        //         if (0 == comparator_choice) //between
+        //         {
+        //             ret = 1;
+        //         }
+        //     }
+        //     else
+        //     {
+        //         if (1 == comparator_choice) // not between
+        //         {
+        //             ret = 1;
+        //         }
+        //     }
+        // }
+
+        if (item_exp_field && end_value_field && start_value_field)
         {
-            double double_item_value = ezlopi_core_scenes_operator_get_item_double_value_current(item_id);
-
-            if ((start_value_field->field_value.u_value.value_double <= double_item_value) &&
-                (end_value_field->field_value.u_value.value_double >= double_item_value))
-            {
-                if (0 == comparator_choice) //between
-                {
-                    ret = 1;
-                }
-            }
-            else
-            {
-                if (1 == comparator_choice) // not between
-                {
-                    ret = 1;
-                }
-            }
+            ezlopi_scenes_operators_value_number_range_operations(item_exp_field, start_value_field, end_value_field, comparator_choice);
         }
-        else if (expression_name && end_value_field && start_value_field)
-        {
-            // s_ezlopi_expressions_t* curr_expr_right = ezlopi_scenes_get_expression_node_by_name(expression_name);
-            #warning "extract the double from expression";
-            double double_expn_value = 0;
-
-            if ((start_value_field->field_value.u_value.value_double <= double_expn_value) &&
-                (end_value_field->field_value.u_value.value_double >= double_expn_value))
-            {
-
-                if (0 == comparator_choice) //between
-                {
-                    ret = 1;
-                }
-            }
-            else
-            {
-                if (1 == comparator_choice) // not between
-                {
-                    ret = 1;
-                }
-            }
-        }
+        //-----------------------------------------------------------------------------------------------------------------
     }
 
     return ret;
