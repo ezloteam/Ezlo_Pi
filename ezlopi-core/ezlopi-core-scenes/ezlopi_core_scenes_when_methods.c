@@ -825,7 +825,7 @@ int ezlopi_scene_when_compare_number_range(l_scenes_list_v2_t* scene_node, void*
         l_fields_v2_t* item_exp_field = NULL;
         l_fields_v2_t* end_value_field = NULL;
         l_fields_v2_t* start_value_field = NULL;
-        bool comparator_choice = 0; /* 0->'between' | 1->'not_between'*/
+        bool comparator_choice = false; /* 0->'between' | 1->'not_between'*/
 
         l_fields_v2_t* curr_field = when_block->fields;
         while (curr_field)
@@ -848,7 +848,7 @@ int ezlopi_scene_when_compare_number_range(l_scenes_list_v2_t* scene_node, void*
             {
                 if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != (curr_field->field_value.u_value.value_string)))
                 {
-                    comparator_choice = (0 == strncmp(curr_field->field_value.u_value.value_string, "notbetween", 11)) ? 1 : 0;
+                    comparator_choice = (0 == strncmp(curr_field->field_value.u_value.value_string, "notbetween", 11)) ? true : false; // 0->between (default) ; 1->not_between
                 }
             }
             else if (0 == strncmp(curr_field->name, ezlopi_startValue_str, strlen(ezlopi_startValue_str)))
@@ -861,29 +861,6 @@ int ezlopi_scene_when_compare_number_range(l_scenes_list_v2_t* scene_node, void*
             }
             curr_field = curr_field->next;
         }
-
-
-        //-----------------------------------------------------------------------------------------------------------------
-        // if (item_exp_field && end_value_field && start_value_field)
-        // {
-        //     double double_item_value = ezlopi_core_scenes_operator_get_item_value_by_id(item_id);
-
-        //     if ((start_value_field->field_value.u_value.value_double <= double_item_value) &&
-        //         (end_value_field->field_value.u_value.value_double >= double_item_value))
-        //     {
-        //         if (0 == comparator_choice) //between
-        //         {
-        //             ret = 1;
-        //         }
-        //     }
-        //     else
-        //     {
-        //         if (1 == comparator_choice) // not between
-        //         {
-        //             ret = 1;
-        //         }
-        //     }
-        // }
 
         if (item_exp_field && end_value_field && start_value_field)
         {
