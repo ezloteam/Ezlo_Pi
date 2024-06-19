@@ -54,7 +54,7 @@ void __dump(const char* file_name, uint32_t line, char* buffer_name, void* _buff
     int lines = cnt >> 4;
     int l;
 
-    printf("%s (%d):: %s: Total Size: %d\n", file_name, line, buffer_name, cnt);
+    ets_printf("%s (%d):: %s: Total Size: %d\n", file_name, line, buffer_name, cnt);
 
     for (l = 0; l < lines; l++)
     {
@@ -111,7 +111,11 @@ void trace_color_print(const char* txt_color, uint8_t severity, const char* file
     if (log_upcall_func != NULL) {
         va_list args;
         va_start(args, format);
-        char serial_log_format[EZPI_CORE_LOG_BUFFER_SIZE];
+
+        #warning "No remedies for buffer over 'EZPI_CORE_LOG_BUFFER_SIZE'";
+
+        static char serial_log_format[10240];
+        // char serial_log_format[EZPI_CORE_LOG_BUFFER_SIZE];
         snprintf(serial_log_format, sizeof(serial_log_format), "\x1B[%sm %s[%d]: ", txt_color, file, line);
         vsnprintf(serial_log_format + strlen(serial_log_format), sizeof(serial_log_format) - strlen(serial_log_format), format, args);
         snprintf(serial_log_format + strlen(serial_log_format), sizeof(serial_log_format) - strlen(serial_log_format), "\x1B[0m");

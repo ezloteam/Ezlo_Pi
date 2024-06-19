@@ -11,7 +11,10 @@
 #include "../../build/config/sdkconfig.h"
 
 
+#if defined (CONFIG_ETH_USE_ESP32_EMAC)
 #include "esp_eth.h"
+#endif
+
 #include "esp_wifi.h"
 #include "esp_event.h"
 #include "sys/param.h"

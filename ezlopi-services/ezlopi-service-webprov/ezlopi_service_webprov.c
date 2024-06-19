@@ -26,7 +26,7 @@
 #include "ezlopi_service_webprov.h"
 #include "EZLOPI_USER_CONFIG.h"
 
-#define TEST_PROV 1
+#define TEST_PROV 0
 
 #if (1 == TEST_PROV)
 #include "ezlopi_test_prov.h"
@@ -37,15 +37,15 @@
 
 static uint32_t message_counter = 0;
 static xTaskHandle _task_handle = NULL;
-static TaskHandle_t ezlopi_update_config_notifier = NULL;
+static TaskHandle_t __web_socket_initialize_handler = NULL;
 
-static void __config_check(void* pv);
+static uint8_t __provision_update(char* arg);
+
+static void __provision_check(void* pv);
 static void __fetch_wss_endpoint(void* pv);
 
 static void __connection_upcall(bool connected);
 static void __message_upcall(const char* payload, uint32_t len);
-
-static uint8_t __config_update(char* arg);
 
 static int __send_str_data_to_nma_websocket(char* str_data);
 static int __send_cjson_data_to_nma_websocket(cJSON* cj_data);
@@ -57,12 +57,11 @@ uint32_t ezlopi_service_web_provisioning_get_message_count(void)
 
 void ezlopi_service_web_provisioning_init(void)
 {
-
     TaskHandle_t ezlopi_service_web_prov_config_check_task_handle = NULL;
-    xTaskCreate(__config_check, "WebProvCfgChk", EZLOPI_SERVICE_WEB_PROV_CONFIG_CHECK_TASK_DEPTH, NULL, 5, &ezlopi_service_web_prov_config_check_task_handle);
+    xTaskCreate(__provision_check, "WebProvCfgChk", EZLOPI_SERVICE_WEB_PROV_CONFIG_CHECK_TASK_DEPTH, NULL, 5, &ezlopi_service_web_prov_config_check_task_handle);
     ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_WEB_PROV_CONFIG_CHECK_TASK, &ezlopi_service_web_prov_config_check_task_handle, EZLOPI_SERVICE_WEB_PROV_CONFIG_CHECK_TASK_DEPTH);
-    xTaskCreate(__fetch_wss_endpoint, "WebProvFetchWSS", EZLOPI_SERVICE_WEB_PROV_FETCH_WSS_TASK_DEPTH, NULL, 5, &ezlopi_update_config_notifier);
-    ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_WEB_PROV_FETCH_WSS_TASK, &ezlopi_update_config_notifier, EZLOPI_SERVICE_WEB_PROV_FETCH_WSS_TASK_DEPTH);
+    xTaskCreate(__fetch_wss_endpoint, "WebProvFetchWSS", EZLOPI_SERVICE_WEB_PROV_FETCH_WSS_TASK_DEPTH, NULL, 5, &__web_socket_initialize_handler);
+    ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_WEB_PROV_FETCH_WSS_TASK, &__web_socket_initialize_handler, EZLOPI_SERVICE_WEB_PROV_FETCH_WSS_TASK_DEPTH);
 }
 
 void ezlopi_service_web_provisioning_deinit(void)
@@ -248,7 +247,7 @@ static int __send_str_data_to_nma_websocket(char* str_data)
     return ret;
 }
 
-static void __config_check(void* pv)
+static void __provision_check(void* pv)
 {
     uint8_t flag_break_loop = 0;
     static uint8_t retry_count = 0;
@@ -275,11 +274,9 @@ static void __config_check(void* pv)
         while (1)
         {
             char http_request_location[500];
-            // snprintf(http_request_location, sizeof(http_request_location), "https://ezlopiesp32.up.mios.com/provision-sync?token=%s&version=%d", provision_token, config_version ? config_version : 1);
+            snprintf(http_request_location, sizeof(http_request_location), "https://ezlopiesp32.up.mios.com/provision-sync?token=%s&version=%d", provision_token, config_version ? config_version : 1);
 
-            snprintf(http_request_location, sizeof(http_request_location), "https://%s.%s/provision-sync?token=%s&version=%d", test_hardware_type, test_up_domain, provision_token, config_version ? config_version + 1 : 1);
-
-            TRACE_I("Config Check URL : %s", http_request_location);
+            TRACE_I("Config sync URL : %s", http_request_location);
 
             ezlopi_wait_for_wifi_to_connect(portMAX_DELAY);
             s_ezlopi_http_data_t* response = ezlopi_http_get_request(http_request_location, NULL, NULL, NULL);
@@ -287,17 +284,17 @@ static void __config_check(void* pv)
 
             if (NULL != response)
             {
-                TRACE_S("Status Code : %d", response->status_code);
-                if (response->response)
+                // TRACE_S("Status Code : %d", response->status_code);
+                // TRACE_S("Response len : %d", response->response_len);
+                // TRACE_S("response : %s", response->response);
+
+                switch (response->status_code)
                 {
-                    TRACE_S("Config Response: %s", response->response);
-                    switch (response->status_code)
+                case HttpStatus_Ok:
+                {
+                    if (response->response)
                     {
-                    case HttpStatus_Ok:
-                    {
-                        // re-write all the info into the flash region
-                        // TRACE_S("Data : %s", response->response);
-                        if (0 == __config_update(response->response))
+                        if (0 == __provision_update(response->response))
                         {
                             retry_count++;
                             if (retry_count >= 5)
@@ -309,32 +306,37 @@ static void __config_check(void* pv)
                         {
                             flag_break_loop = 1;
                         }
-                        break;
+
+                        ezlopi_factory_info_v3_free(response->response);
                     }
-                    default:
-                    {
-                        if (304 == response->status_code) // HTTP Status not modified
-                        {
-                            TRACE_S("Config data not changed !");
-                            flag_break_loop = 1;
-                        }
-                        break;
-                    }
-                    }
-                    ezlopi_factory_info_v3_free(response->response);
+
+                    break;
                 }
+                default:
+                {
+                    if (304 == response->status_code) // HTTP Status not modified
+                    {
+                        TRACE_S("Config data not changed !");
+                        flag_break_loop = 1;
+                    }
+                    break;
+                }
+                }
+
                 ezlopi_factory_info_v3_free(response);
             }
             else
             {
-                retry_count_failure++;
-                if (retry_count_failure >= 10) flag_break_loop = true;
+                if (++retry_count_failure >= 10)
+                {
+                    break;
+                }
             }
 
             if (flag_break_loop)
             {
-                TRACE_D("Config check task complete!");
-                xTaskNotifyGive(ezlopi_update_config_notifier);
+                TRACE_D("Terminating provison-check task!");
+                xTaskNotifyGive(__web_socket_initialize_handler);
                 break;
             }
 
@@ -353,7 +355,7 @@ static void __config_check(void* pv)
     vTaskDelete(NULL);
 }
 
-static uint8_t __config_update(char* arg)
+static uint8_t __provision_update(char* arg)
 {
     uint8_t ret = 0;
     cJSON* cj_root_prov_data = cJSON_Parse(__FUNCTION__, arg);
@@ -367,13 +369,14 @@ static uint8_t __config_update(char* arg)
             s_basic_factory_info_t config_check_factoryInfo;
             memset(&config_check_factoryInfo, 0, sizeof(s_basic_factory_info_t));
 
+            char tmp_id_str[20];
             char tmp_dev_uuid[40];
             char tmp_prov_uuid[40];
             char tmp_cloud_server[128];
-            char tmp_provision_token[256];
+            char tmp_provision_token[300];
             char tmp_provision_server[128];
 
-            CJSON_GET_VALUE_DOUBLE(cj_root_data, ezlopi_id_str, config_check_factoryInfo.id);
+            CJSON_GET_VALUE_STRING_BY_COPY(cj_root_data, ezlopi_id_str, tmp_id_str);
             CJSON_GET_VALUE_STRING_BY_COPY(cj_root_data, ezlopi_uuid_str, tmp_dev_uuid);
             CJSON_GET_VALUE_STRING_BY_COPY(cj_root_data, ezlopi_cloud_uuid_str, tmp_prov_uuid);
             CJSON_GET_VALUE_DOUBLE(cj_root_data, ezlopi_version_str, config_check_factoryInfo.config_version);
@@ -382,6 +385,7 @@ static uint8_t __config_update(char* arg)
             CJSON_GET_VALUE_STRING_BY_COPY(cj_root_data, ezlopi_provision_token_str, tmp_provision_token);
             // CJSON_GET_VALUE_STRING_BY_COPY(cj_root_data, ezlopi_provision_server_str, tmp_provision_server);
 
+            config_check_factoryInfo.id = strtoul(tmp_id_str, NULL, 10);
             config_check_factoryInfo.device_uuid = tmp_dev_uuid;
             config_check_factoryInfo.prov_uuid = tmp_prov_uuid;
 
@@ -389,21 +393,23 @@ static uint8_t __config_update(char* arg)
             config_check_factoryInfo.provision_token = tmp_provision_token;
             config_check_factoryInfo.provision_server = NULL;
 
+#if 0
             // TODO  Decide if needs parsing and storing to flash
-            // if (NULL != cJSON_zwave_region_aary)
-            // {
-            //     if (cJSON_IsArray(cJSON_zwave_region_aary))
-            //     {
-            //         cJSON *cJSON_zwave_region = cJSON_GetArrayItem(cJSON_zwave_region_aary, 0); // Get the first item
-            //         if (cJSON_zwave_region)
-            //         {
-            //             const char *zwave_region = cJSON_zwave_region->valuestring;
-            //         }
-            //     }
-            // }
+            if (NULL != cJSON_zwave_region_aary)
+            {
+                if (cJSON_IsArray(cJSON_zwave_region_aary))
+                {
+                    cJSON *cJSON_zwave_region = cJSON_GetArrayItem(cJSON_zwave_region_aary, 0); // Get the first item
+                    if (cJSON_zwave_region)
+                    {
+                        const char *zwave_region = cJSON_zwave_region->valuestring;
+                    }
+                }
+            }
 
-            // uint32_t provision_order = 0;
-            // CJSON_GET_VALUE_DOUBLE(cj_root_prov_data, "provision_order", provision_order);
+            uint32_t provision_order = 0;
+            CJSON_GET_VALUE_DOUBLE(cj_root_prov_data, "provision_order", provision_order);
+#endif
 
             config_check_factoryInfo.brand = NULL;
             config_check_factoryInfo.device_name = NULL;
@@ -414,12 +420,12 @@ static uint8_t __config_update(char* arg)
 
             if (ezlopi_factory_info_v3_set_basic(&config_check_factoryInfo))
             {
-                TRACE_S("Updated provisioning config");
+                TRACE_S("Updated basic config");
                 ret = 1;
             }
             else
             {
-                TRACE_E("Error updating provisioning config");
+                TRACE_E("Error updating basic config");
             }
 
             cJSON * cj_ssl_private_key = cJSON_GetObjectItem(__FUNCTION__, cj_root_data, ezlopi_ssl_private_key_str);
@@ -445,13 +451,12 @@ static uint8_t __config_update(char* arg)
             {
                 ezlopi_factory_info_v3_set_ca_cert(cj_ca_certificate);
             }
-
-            cJSON_Delete(__FUNCTION__, cj_root_data);
         }
         else
         {
             TRACE_E("key \"data\" not found.\n");
         }
+
         cJSON_Delete(__FUNCTION__, cj_root_prov_data);
     }
     else
@@ -461,3 +466,4 @@ static uint8_t __config_update(char* arg)
     return ret;
 }
 #endif // CONFIG_EZPI_WEBSOCKET_CLIENT
+

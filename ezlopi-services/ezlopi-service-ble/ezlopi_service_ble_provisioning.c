@@ -494,8 +494,11 @@ static char* __base64_decode_provisioning_info(uint32_t total_size)
         // decoded_config_json = ezlopi_malloc(__FUNCTION__, total_size);
         uint32_t buffer_len = 0;
         decoded_config_json = ezlopi_core_buffer_acquire(&buffer_len, 5000);
-        if (decoded_config_json) {
-            if (buffer_len >= total_size) {
+
+        if (decoded_config_json)
+        {
+            if (buffer_len >= total_size) 
+            {
                 size_t o_len = 0;
                 bzero(decoded_config_json, total_size);
                 mbedtls_base64_decode((uint8_t*)decoded_config_json, (size_t)total_size, &o_len, (uint8_t*)base64_buffer, strlen(base64_buffer));
