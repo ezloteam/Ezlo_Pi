@@ -51,24 +51,18 @@ typedef enum e_scene_value_without_less_cmp_operators
 #undef SCENES_VALUES_WITHOUT_LESS_OPERATORS
 } e_scene_value_without_less_cmp_operators_t;
 
-// typedef enum e_scene_when_function_operators
-// {
-// #define SCENES_WHEN_FUNCTION_OPERATORS(OPERATOR, op, name, method) SCENES_WHEN_FUNCTION_OPERATORS_##OPERATOR,
-// #include "__operators_macros/__scene_function_operators_macros.h"
-// #undef SCENES_WHEN_FUNCTION_OPERATORS
-// } e_scene_when_function_operators_t;
-
+//-------------------------------------------------------------------
 // Numeric Operators
 e_scene_num_cmp_operators_t ezlopi_scenes_numeric_comparator_operators_get_enum(char* operator_str);
 const char* ezlopi_scenes_numeric_comparator_operators_get_op(e_scene_num_cmp_operators_t operator);
 const char* ezlopi_scenes_numeric_comparator_operators_get_name(e_scene_num_cmp_operators_t operator);
 const char* ezlopi_scenes_numeric_comparator_operators_get_method(e_scene_num_cmp_operators_t operator);
-double ezlopi_core_scenes_operator_get_item_value_by_id(uint32_t item_id);
 
 int ezlopi_scenes_operators_value_number_operations(l_fields_v2_t* item_exp_field, l_fields_v2_t* value_field, l_fields_v2_t* comparator_field);
-int ezlopi_scenes_operators_value_number_range_operations(l_fields_v2_t* item_exp_field, l_fields_v2_t* start_value_field, l_fields_v2_t* end_value_field, bool comparator_choice);
+
 //-------------------------------------------------------------------
-//Numeric-Range Operators
+//Number-Range Operators
+int ezlopi_scenes_operators_value_number_range_operations(l_fields_v2_t* item_exp_field, l_fields_v2_t* start_value_field, l_fields_v2_t* end_value_field, bool comparator_choice);
 
 
 //-------------------------------------------------------------------
