@@ -1,6 +1,6 @@
 #include "ezlopi_util_trace.h"
 
-#include "ezlopi_core_timer.h"
+// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
@@ -59,7 +59,7 @@ static int sensor_pir_get_value_cjson_v3(l_ezlopi_item_t* item, void* args)
     if (cj_result)
     {
         item->interface.gpio.gpio_out.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
-        ezlopi_valueformatter_bool_to_cjson(item, cj_result, item->interface.gpio.gpio_out.value);
+        ezlopi_valueformatter_bool_to_cjson(cj_result, item->interface.gpio.gpio_out.value, item->cloud_properties.scale);
         ret = 1;
     }
 

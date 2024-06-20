@@ -15,10 +15,15 @@ set(EZLOPI_CORE_COMPONENTS
         ezlopi-core-processes
     )
 
+set(EZLOPI_SERVICES
+    ezlopi-service-loop
+)
+
 
 idf_component_register(SRCS  "${src_files}"
     INCLUDE_DIRS "."
     REQUIRES    ${ESP_IDF_COMPONENTS} 
                 ${EZLOPI_COMPONENTS} 
                 ${EZLOPI_CORE_COMPONENTS} 
+                ${EZLOPI_SERVICES}
  )

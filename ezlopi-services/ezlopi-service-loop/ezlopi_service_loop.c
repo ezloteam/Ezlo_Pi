@@ -1,0 +1,104 @@
+#include <string.h>
+#include <stdint.h>
+#include <time.h>
+
+#include "../../build/config/sdkconfig.h"
+
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+
+#include "ezlopi_util_trace.h"
+
+#include "ezlopi_core_heap.h"
+#include "ezlopi_core_actions.h"
+#include "ezlopi_core_processes.h"
+#include "ezlopi_core_devices_list.h"
+
+#include "ezlopi_service_loop.h"
+
+
+typedef struct s_loop_node {
+    f_loop_t loop;
+    const char * name;
+    uint32_t period_ms;
+
+    uint32_t _timer_ms;
+
+    struct s_loop_node * next;
+} s_loop_node_t;
+
+static s_loop_node_t * __loop_head = NULL;
+
+static void __loop(void* pv);
+static s_loop_node_t * __create_node(const char * name, f_loop_t loop, uint32_t period_ms);
+
+void ezlopi_service_loop_add(const char * name, f_loop_t loop, uint32_t period_ms)
+{
+    if (loop)
+    {
+        if (__loop_head)
+        {
+            s_loop_node_t * __loop_node = __loop_head;
+            while (__loop_node->next)
+            {
+                __loop_node = __loop_node->next;
+            }
+
+            __loop_node->next = __create_node(name, loop, period_ms / portTICK_RATE_MS);
+        }
+        else
+        {
+            __loop_head = __create_node(name, loop, period_ms / portTICK_RATE_MS);
+        }
+    }
+}
+
+void ezlopi_service_loop_init(void)
+{
+    TaskHandle_t ezlopi_service_timer_task_handle = NULL;
+    // xTaskCreate(event_process, "event_process", EZLOPI_SERVICE_TIMER_TASK_DEPTH, NULL, 4, &ezlopi_service_timer_task_handle);
+    xTaskCreate(__loop, "__loop", EZLOPI_SERVICE_LOOP_TASK_DEPTH, NULL, 4, &ezlopi_service_timer_task_handle);
+    ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_LOOP_TASK, &ezlopi_service_timer_task_handle, EZLOPI_SERVICE_LOOP_TASK_DEPTH);
+}
+
+static void __loop(void* pv)
+{
+    while (1)
+    {
+        s_loop_node_t * __loop_node = __loop_head;
+
+        while (__loop_node)
+        {
+            if ((NULL != __loop_node->loop) && ((xTaskGetTickCount() - __loop_node->_timer_ms) >= __loop_node->period_ms))
+            {
+                __loop_node->loop();
+                __loop_node->_timer_ms = xTaskGetTickCount();
+
+                vTaskDelay(5 / portTICK_RATE_MS);
+            }
+
+            __loop_node = __loop_node->next;
+        }
+
+        vTaskDelay(5 / portTICK_RATE_MS);
+    }
+}
+
+static s_loop_node_t * __create_node(const char * name, f_loop_t loop, uint32_t period_ms)
+{
+    s_loop_node_t * __loop_node = ezlopi_malloc(__FUNCTION__, sizeof(s_loop_node_t));
+
+    if (__loop_node)
+    {
+        __loop_node->name = name;
+        __loop_node->loop = loop;
+        __loop_node->_timer_ms = 0;
+        __loop_node->period_ms = period_ms;
+
+        __loop_node->next = NULL;
+    }
+
+    return __loop_node;
+}
+
+

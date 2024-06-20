@@ -1,7 +1,7 @@
 #include <math.h>
 #include "ezlopi_util_trace.h"
 
-#include "ezlopi_core_timer.h"
+// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
@@ -238,17 +238,17 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
                 if (ezlopi_item_name_acceleration_x_axis == item->cloud_properties.item_name)
                 {
                     acceleration_value = (user_data->acc_x * ADXL345_CONVERTER_FACTOR_MG_TO_G * ADXL345_STANDARD_G_TO_ACCEL_CONVERSION_VALUE);
-                    ezlopi_valueformatter_float_to_cjson(item, cj_result, acceleration_value);
+                    ezlopi_valueformatter_float_to_cjson(cj_result, acceleration_value, item->cloud_properties.scale);
                 }
                 if (ezlopi_item_name_acceleration_y_axis == item->cloud_properties.item_name)
                 {
                     acceleration_value = (user_data->acc_y * ADXL345_CONVERTER_FACTOR_MG_TO_G * ADXL345_STANDARD_G_TO_ACCEL_CONVERSION_VALUE);
-                    ezlopi_valueformatter_float_to_cjson(item, cj_result, acceleration_value);
+                    ezlopi_valueformatter_float_to_cjson(cj_result, acceleration_value, item->cloud_properties.scale);
                 }
                 if (ezlopi_item_name_acceleration_z_axis == item->cloud_properties.item_name)
                 {
                     acceleration_value = (user_data->acc_z * ADXL345_CONVERTER_FACTOR_MG_TO_G * ADXL345_STANDARD_G_TO_ACCEL_CONVERSION_VALUE);
-                    ezlopi_valueformatter_float_to_cjson(item, cj_result, acceleration_value);
+                    ezlopi_valueformatter_float_to_cjson(cj_result, acceleration_value, item->cloud_properties.scale);
                 }
                 ret = 1;
             }

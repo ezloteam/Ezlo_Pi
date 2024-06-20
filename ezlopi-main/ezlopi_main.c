@@ -18,7 +18,7 @@
 
 #include "ezlopi_service_ble.h"
 #include "ezlopi_service_uart.h"
-#include "ezlopi_service_timer.h"
+#include "ezlopi_service_loop.h"
 #include "ezlopi_service_modes.h"
 #include "ezlopi_service_meshbot.h"
 #include "ezlopi_service_gpioisr.h"
@@ -55,7 +55,7 @@ void app_main(void)
     EZPI_SERV_uart_init();
 #endif
 
-    timer_service_init();
+    ezlopi_service_loop_init();
 
 #if defined(CONFIG_EZPI_BLE_ENABLE)
     ezlopi_ble_service_init();

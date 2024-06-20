@@ -4,6 +4,7 @@
 
 #ifdef CONFIG_EZPI_ENABLE_LED_INDICATOR
 
+#include "ezlopi_service_loop.h"
 #include "ezlopi_service_led_indicator.h"
 
 #include "driver/rmt.h"
@@ -21,7 +22,8 @@
 #include "ezlopi_core_ping.h"
 #include "ezlopi_core_processes.h"
 
-static void __indicator_LED_blinker(void* params);
+static void __indicator_LED_blinker(void);
+// static void __indicator_LED_blinker(void* params);
 
 static e_indicator_led_priority_t __indicator_priority = PRIORITY_CLOUD;
 
@@ -161,9 +163,12 @@ static int __indicator_led_init(void)
         {
             if (ESP_OK == (err = led_strip_flush(&indicator_led)))
             {
+                ezlopi_service_loop_add("indicator-loop", __indicator_LED_blinker_loop, );
+#if 0
                 TaskHandle_t ezlopi_service_led_indicator_task_handle = NULL;
                 xTaskCreate(__indicator_LED_blinker, "indicator_task", EZLOPI_SERVICE_LED_INDICATOR_TASK_DEPTH, NULL, tskIDLE_PRIORITY, &ezlopi_service_led_indicator_task_handle);
                 ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_LED_INDICATOR_TASK, &ezlopi_service_led_indicator_task_handle, EZLOPI_SERVICE_LED_INDICATOR_TASK_DEPTH);
+#endif
                 ret = 1;
             }
         }
@@ -236,9 +241,12 @@ static int __indicator_led_init(void)
     {
         if (ESP_OK == ledc_channel_config(&indicator_pwm_channel_cfg))
         {
+            ezlopi_service_loop_add("indicator-loop", __indicator_LED_blinker, 1);
+#if 0
             TaskHandle_t indicator_task_handle = NULL;
             xTaskCreate(__indicator_LED_blinker, "indicator_task", 2048 * 2, NULL, 1, &indicator_task_handle);
             ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_LED_INDICATOR_TASK, &indicator_task_handle, EZLOPI_SERVICE_LED_INDICATOR_TASK_DEPTH);
+#endif
             ret = 1;
         }
     }
@@ -273,50 +281,57 @@ static void __process_event(void)
     }
 }
 
-static void __indicator_LED_blinker(void* params)
+static void __indicator_LED_blinker(void)
 {
-    while (1)
+#if 0
+    static void __indicator_LED_blinker(void* params)
     {
-        __process_event();
+        while (1)
+#endif
+        {
+            __process_event();
 
-        switch (__indicator_priority)
-        {
-        case PRIORITY_POWER:
-        {
-            __indicator_LED_power_on_effect();
-            break;
-        }
-        case PRIORITY_WIFI:
-        {
-            __indicator_LED_wifi_connected_effect();
-            break;
-        }
-        case PRIORITY_INTERNET:
-        {
-            __indicator_LED_internet_connected_effect();
-            break;
-        }
-        case PRIORITY_CLOUD:
-        {
-            __indicator_LED_cloud_connected_effect();
-            break;
-        }
-        default:
-        {
-            break;
-        }
+            switch (__indicator_priority)
+            {
+            case PRIORITY_POWER:
+            {
+                __indicator_LED_power_on_effect();
+                break;
+            }
+            case PRIORITY_WIFI:
+            {
+                __indicator_LED_wifi_connected_effect();
+                break;
+            }
+            case PRIORITY_INTERNET:
+            {
+                __indicator_LED_internet_connected_effect();
+                break;
+            }
+            case PRIORITY_CLOUD:
+            {
+                __indicator_LED_cloud_connected_effect();
+                break;
+            }
+            default:
+            {
+                break;
+            }
+            }
+
+            // vTaskDelay(1 / portTICK_PERIOD_MS);
         }
 
-        vTaskDelay(1 / portTICK_PERIOD_MS);
+#if 0
+        ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SERVICE_LED_INDICATOR_TASK);
+        vTaskDelete(NULL);
+#endif
+}
+
+    int ezlopi_service_led_indicator_init()
+    {
+        return __indicator_led_init();
     }
-    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SERVICE_LED_INDICATOR_TASK);
-    vTaskDelete(NULL);
-}
-
-int ezlopi_service_led_indicator_init()
-{
-    return __indicator_led_init();
-}
 
 
 #endif // CONFIG_EZPI_ENABLE_LED_INDICATOR

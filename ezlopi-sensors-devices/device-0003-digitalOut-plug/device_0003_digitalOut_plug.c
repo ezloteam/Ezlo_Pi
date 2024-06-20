@@ -2,7 +2,7 @@
 #include "../../build/config/sdkconfig.h"
 #include "ezlopi_util_trace.h"
 
-#include "ezlopi_core_timer.h"
+// // #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
@@ -215,7 +215,7 @@ static int __get_value_cjson(l_ezlopi_item_t* item, void* arg)
         cJSON* cj_propertise = (cJSON*)arg;
         if (cj_propertise)
         {
-            ezlopi_valueformatter_bool_to_cjson(item, cj_propertise, item->interface.gpio.gpio_out.value);
+            ezlopi_valueformatter_bool_to_cjson(cj_propertise, item->interface.gpio.gpio_out.value, item->cloud_properties.scale);
             ret = 1;
         }
     }

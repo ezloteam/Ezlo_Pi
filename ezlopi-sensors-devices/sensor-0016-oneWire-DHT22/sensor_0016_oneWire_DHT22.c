@@ -2,7 +2,7 @@
 #include "cjext.h"
 #include "ezlopi_util_trace.h"
 
-#include "ezlopi_core_timer.h"
+// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
@@ -139,11 +139,11 @@ static int dht22_sensor_get_sensor_value_v3(l_ezlopi_item_t* item, void* args)
 
         if (ezlopi_item_name_temp == item->cloud_properties.item_name)
         {
-            ezlopi_valueformatter_float_to_cjson(item, cj_properties, dht22_data->temperature);
+            ezlopi_valueformatter_float_to_cjson(cj_properties, dht22_data->temperature, item->cloud_properties.scale);
         }
         else if (ezlopi_item_name_humidity == item->cloud_properties.item_name)
         {
-            ezlopi_valueformatter_float_to_cjson(item, cj_properties, dht22_data->humidity);
+            ezlopi_valueformatter_float_to_cjson(cj_properties, dht22_data->humidity, item->cloud_properties.scale);
         }
     }
 

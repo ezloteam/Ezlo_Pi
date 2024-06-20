@@ -11,7 +11,7 @@
 #include "ezlopi_core_ping.h"
 #include "ezlopi_core_sntp.h"
 #include "ezlopi_core_room.h"
-#include "ezlopi_core_timer.h"
+// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_modes.h"
 #include "ezlopi_core_buffer.h"
 #include "ezlopi_core_event_queue.h"
@@ -38,7 +38,7 @@ void ezlopi_init(void)
 #ifdef CONFIG_EZPI_UTIL_TRACE_EN
     ezlopi_core_read_set_log_severities();
     // #warning "remove this in release"
-        ezlopi_core_read_set_log_severities_internal(ENUM_EZLOPI_LOG_SEVERITY_TRACE);
+    ezlopi_core_read_set_log_severities_internal(ENUM_EZLOPI_LOG_SEVERITY_TRACE);
 #endif // CONFIG_EZPI_UTIL_TRACE_EN
     EZPI_HAL_uart_init();
 
@@ -98,7 +98,7 @@ void ezlopi_init(void)
 #endif // CONFIG_EZPI_ENABLE_PING
 #endif
 
-    ezlopi_timer_start_1000ms();
+    // ezlopi_timer_start_1000ms();
 
 #ifdef CONFIG_EZPI_SERV_MDNS_EN
     EZPI_core_init_mdns();

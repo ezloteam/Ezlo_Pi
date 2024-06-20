@@ -6,7 +6,7 @@ idf_component_register(SRCS "bme680_bsec.c" "sensor_0010_I2C_BME680.c" "${config
                 Bosch_BSEC2
                 BME68x_Sensor_library
                  
-                ezlopi-core-timer 
+                # ezlopi-core-timer 
                 ezlopi-core-cloud 
                 ezlopi-core-actions
                 ezlopi-core-valueformatter

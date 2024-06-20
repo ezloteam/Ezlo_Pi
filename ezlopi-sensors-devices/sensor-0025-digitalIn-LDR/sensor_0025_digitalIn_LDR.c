@@ -1,7 +1,7 @@
 #include "driver/gpio.h"
 #include "ezlopi_util_trace.h"
 
-#include "ezlopi_core_timer.h"
+// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
@@ -61,7 +61,7 @@ static int __get_value_cjson(l_ezlopi_item_t* item, void* arg)
         int gpio_level = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
         item->interface.gpio.gpio_in.value = (0 == item->interface.gpio.gpio_in.invert) ? gpio_level : !gpio_level;
 
-        ezlopi_valueformatter_bool_to_cjson(item, cj_value_obj, item->interface.gpio.gpio_in.value);
+        ezlopi_valueformatter_bool_to_cjson(cj_value_obj, item->interface.gpio.gpio_in.value, item->cloud_properties.scale);
         ret = 1;
     }
 

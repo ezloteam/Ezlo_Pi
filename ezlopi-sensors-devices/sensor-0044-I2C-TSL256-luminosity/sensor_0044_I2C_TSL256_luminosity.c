@@ -1,7 +1,7 @@
 #include <math.h>
 #include "ezlopi_util_trace.h"
 
-#include "ezlopi_core_timer.h"
+// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
@@ -85,7 +85,7 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
         TSL256_lum_t* illuminance_value = ((TSL256_lum_t*)item->user_arg);
         if (illuminance_value)
         {
-            ezlopi_valueformatter_uint32_to_cjson(item, cj_result, illuminance_value->lux_val);
+            ezlopi_valueformatter_uint32_to_cjson(cj_result, illuminance_value->lux_val, item->cloud_properties.scale);
             ret = 1;
         }
     }

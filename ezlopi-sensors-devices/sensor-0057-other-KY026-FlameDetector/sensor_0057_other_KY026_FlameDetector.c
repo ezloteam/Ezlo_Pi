@@ -1,6 +1,6 @@
 #include "ezlopi_util_trace.h"
 
-#include "ezlopi_core_timer.h"
+// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
@@ -281,7 +281,7 @@ static int __0057_get_item(l_ezlopi_item_t* item, void* arg)
                 flame_t* flame_struct = (flame_t*)item->user_arg;
                 if (flame_struct)
                 {
-                    ezlopi_valueformatter_float_to_cjson(item, cj_result, flame_struct->absorbed_percent);
+                    ezlopi_valueformatter_float_to_cjson(cj_result, flame_struct->absorbed_percent, item->cloud_properties.scale);
                 }
                 ret = 1;
             }
@@ -308,7 +308,7 @@ static int __0057_get_cjson_value(l_ezlopi_item_t* item, void* arg)
                 flame_t* flame_struct = (flame_t*)item->user_arg;
                 if (flame_struct)
                 {
-                    ezlopi_valueformatter_float_to_cjson(item, cj_result, flame_struct->absorbed_percent);
+                    ezlopi_valueformatter_float_to_cjson(cj_result, flame_struct->absorbed_percent, item->cloud_properties.scale);
                 }
             }
             ret = 1;
