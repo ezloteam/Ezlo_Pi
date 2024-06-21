@@ -57,7 +57,7 @@ int ezlopi_scenes_status_change_broadcast(l_scenes_list_v2_t* scene_node, const 
 
             CJSON_TRACE("----------------- broadcasting - cj_response", cj_response);
 
-            ret = ezlopi_core_ezlopi_broadcast_add_to_queue(cj_response);
+            ret = ezlopi_core_broadcast_add_to_queue(cj_response);
 
             if (0 == ret)
             {

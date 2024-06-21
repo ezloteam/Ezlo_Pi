@@ -32,9 +32,9 @@
 #include "ezlopi_core_api.h"
 #include "ezlopi_core_wifi.h"
 #include "ezlopi_core_buffer.h"
+#include "ezlopi_core_broadcast.h"
 #include "ezlopi_core_api_methods.h"
 #include "ezlopi_core_cjson_macros.h"
-#include "ezlopi_core_ezlopi_broadcast.h"
 
 #include "ezlopi_service_ws_server.h"
 #include "ezlopi_service_ws_server_clients.h"
@@ -73,7 +73,7 @@ e_ws_status_t ezlopi_service_ws_server_status(void)
 
 void ezlopi_service_ws_server_start(void)
 {
-    ezlopi_core_ezlopi_broadcast_method_add(__ws_server_broadcast, "wss-method", 2);
+    ezlopi_core_broadcast_method_add(__ws_server_broadcast, "wss-method", 2);
 
     if (ezlopi_wifi_got_ip())
     {
@@ -121,9 +121,8 @@ static int __ws_server_broadcast(char* data)
 {
     int ret = 0;
 
-    if (__send_lock && pdTRUE == xSemaphoreTake(__send_lock, 5000 / portTICK_RATE_MS))
+    if (__send_lock && pdTRUE == xSemaphoreTake(__send_lock, 0))
     {
-        // TRACE_S("-----------------------------> acquired send-lock");
         if (data)
         {
             ret = 1;
@@ -132,23 +131,16 @@ static int __ws_server_broadcast(char* data)
             while (curr_client)
             {
                 ret = __ws_server_send(curr_client, data, strlen(data));
-                // TRACE_D("ret: %d", ret);
-                curr_client = curr_client->next;
+                if (NULL == (curr_client = curr_client->next))
+                {
+                    break;
+                }
+
+                vTaskDelay(1 / portTICK_RATE_MS);
             }
         }
 
-        if (pdTRUE == xSemaphoreGive(__send_lock))
-        {
-            // TRACE_S("-----------------------------> released send-lock");
-        }
-        else
-        {
-            // TRACE_E("-----------------------------> release send-lock failed!");
-        }
-    }
-    else
-    {
-        // TRACE_E("-----------------------------> acquire send-lock failed!");
+        xSemaphoreGive(__send_lock);
     }
 
     return ret;

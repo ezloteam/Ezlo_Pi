@@ -9,11 +9,11 @@
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_cloud_registration.h"
 
+#include "ezlopi_core_broadcast.h"
+#include "ezlopi_core_processes.h"
 #include "ezlopi_core_event_group.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_websocket_client.h"
-#include "ezlopi_core_ezlopi_broadcast.h"
-#include "ezlopi_core_processes.h"
 
 #include "ezlopi_service_webprov.h"
 
@@ -75,7 +75,7 @@ static void registration_process(void* pv)
             if (cj_register_dup)
             {
                 CJSON_TRACE("----------------- sent to broadcast - cj_register_dup", cj_register_dup);
-                if (!ezlopi_core_ezlopi_broadcast_add_to_queue(cj_register_dup))
+                if (!ezlopi_core_broadcast_add_to_queue(cj_register_dup))
                 {
                     TRACE_E("Error adding to broadcast queue!");
                     cJSON_Delete(__FUNCTION__, cj_register_dup);

@@ -1,5 +1,5 @@
+#include "ezlopi_core_broadcast.h"
 #include "ezlopi_core_devices_list.h"
-#include "ezlopi_core_ezlopi_broadcast.h"
 
 #include "ezlopi_cloud_items.h"
 #include "ezlopi_cloud_settings.h"
@@ -32,12 +32,12 @@ int ezlopi_device_value_updated_from_device_broadcast(l_ezlopi_item_t* item)
                     // CJSON_TRACE("----------------- broadcasting - cj_response", cj_response);
                     if (cj_response)
                     {
-                        if (!ezlopi_core_ezlopi_broadcast_add_to_queue(cj_response))
+                        if (!ezlopi_core_broadcast_add_to_queue(cj_response))
                         {
                             cJSON_Delete(__FUNCTION__, cj_response);
                         }
                     }
-                    
+
                     break;
                 }
 
@@ -68,7 +68,7 @@ int ezlopi_device_value_updated_from_device_broadcast_by_item_id(uint32_t item_i
                 cJSON* cj_response = __broadcast_message_items_updated_from_device(curr_device, curr_item);
                 CJSON_TRACE("----------------- broadcasting - cj_response", cj_response);
 
-                ret = ezlopi_core_ezlopi_broadcast_add_to_queue(cj_response);
+                ret = ezlopi_core_broadcast_add_to_queue(cj_response);
                 if (0 == ret)
                 {
                     cJSON_Delete(__FUNCTION__, cj_response);
@@ -102,7 +102,7 @@ int ezlopi_core_device_value_updated_settings_broadcast(l_ezlopi_device_settings
                 {
                     cJSON* cj_response = __broadcast_message_settings_updated_from_devices_v3(curr_device, setting);
                     CJSON_TRACE("----------------- broadcasting - cj_response", cj_response);
-                    ret = ezlopi_core_ezlopi_broadcast_add_to_queue(cj_response);
+                    ret = ezlopi_core_broadcast_add_to_queue(cj_response);
 
                     if (0 == ret)
                     {
@@ -136,7 +136,7 @@ int ezlopi_setting_value_updated_from_device_settings_id_v3(uint32_t setting_id)
                 {
                     cJSON* cj_response = __broadcast_message_settings_updated_from_devices_v3(curr_device, curr_setting);
                     CJSON_TRACE("----------------- broadcasting - cj_response", cj_response);
-                    ret = ezlopi_core_ezlopi_broadcast_add_to_queue(cj_response);
+                    ret = ezlopi_core_broadcast_add_to_queue(cj_response);
 
                     if (0 == ret)
                     {
@@ -179,7 +179,7 @@ int ezlopi_core_device_value_update_wifi_scan_broadcast(cJSON* network_array)
             }
 
             CJSON_TRACE("----------------- broadcasting - cj_response", cj_response);
-            ret = ezlopi_core_ezlopi_broadcast_add_to_queue(cj_response);
+            ret = ezlopi_core_broadcast_add_to_queue(cj_response);
 
             if (0 == ret)
             {

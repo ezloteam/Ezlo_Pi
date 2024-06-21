@@ -65,22 +65,31 @@ static void __loop(void* pv)
 {
     while (1)
     {
+        uint32_t __run_time = xTaskGetTickCount();
         s_loop_node_t * __loop_node = __loop_head;
 
         while (__loop_node)
         {
             if ((NULL != __loop_node->loop) && ((xTaskGetTickCount() - __loop_node->_timer_ms) >= __loop_node->period_ms))
             {
+                uint32_t __loop_time = xTaskGetTickCount();
+
                 __loop_node->loop();
                 __loop_node->_timer_ms = xTaskGetTickCount();
+                __loop_time = xTaskGetTickCount() - __loop_time;
 
-                vTaskDelay(5 / portTICK_RATE_MS);
+                // TRACE_D("'%s': \t\t %u", __loop_node->name ? __loop_node->name : "", __loop_time);
+
+                vTaskDelay(1 / portTICK_RATE_MS);
             }
 
             __loop_node = __loop_node->next;
         }
 
-        vTaskDelay(5 / portTICK_RATE_MS);
+        __run_time = xTaskGetTickCount() - __run_time;
+        // TRACE_I("loop runtime: %u", __run_time);
+
+        vTaskDelay(1 / portTICK_RATE_MS);
     }
 }
 

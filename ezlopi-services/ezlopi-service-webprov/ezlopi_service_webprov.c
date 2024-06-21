@@ -16,12 +16,12 @@
 #include "ezlopi_core_wifi.h"
 #include "ezlopi_core_buffer.h"
 #include "ezlopi_core_processes.h"
+#include "ezlopi_core_broadcast.h"
 #include "ezlopi_core_api_methods.h"
 #include "ezlopi_core_event_group.h"
 #include "ezlopi_core_factory_info.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_websocket_client.h"
-#include "ezlopi_core_ezlopi_broadcast.h"
 
 #include "ezlopi_service_webprov.h"
 #include "EZLOPI_USER_CONFIG.h"
@@ -133,7 +133,7 @@ static void __fetch_wss_endpoint(void* pv)
                     if (cjson_uri)
                     {
                         TRACE_D("uri: %s", cjson_uri->valuestring ? cjson_uri->valuestring : "NULL");
-                        ezlopi_core_ezlopi_broadcast_method_add(__send_str_data_to_nma_websocket, "nma-websocket", 4);
+                        ezlopi_core_broadcast_method_add(__send_str_data_to_nma_websocket, "nma-websocket", 4);
                         ezlopi_websocket_client_init(cjson_uri, __message_upcall, __connection_upcall);
                         task_complete = 1;
                     }
@@ -231,7 +231,7 @@ static int __send_str_data_to_nma_websocket(char* str_data)
                 break;
             }
 
-            vTaskDelay(50 / portTICK_PERIOD_MS);
+            vTaskDelay(1 / portTICK_PERIOD_MS);
         }
 
         if (ret)
@@ -374,7 +374,7 @@ static uint8_t __provision_update(char* arg)
             char tmp_prov_uuid[40];
             char tmp_cloud_server[128];
             char tmp_provision_token[300];
-            char tmp_provision_server[128];
+            // char tmp_provision_server[128];
 
             CJSON_GET_VALUE_STRING_BY_COPY(cj_root_data, ezlopi_id_str, tmp_id_str);
             CJSON_GET_VALUE_STRING_BY_COPY(cj_root_data, ezlopi_uuid_str, tmp_dev_uuid);

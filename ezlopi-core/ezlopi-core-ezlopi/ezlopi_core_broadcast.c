@@ -10,7 +10,8 @@
 
 #include "ezlopi_util_trace.h"
 #include "ezlopi_core_buffer.h"
-#include "ezlopi_core_ezlopi_broadcast.h"
+#include "ezlopi_core_broadcast.h"
+
 #include "EZLOPI_USER_CONFIG.h"
 
 // static uint32_t __message_count = 0;
@@ -20,12 +21,12 @@ static int (*__broadcast_queue_func)(cJSON* cj_data) = NULL;
 static int __call_broadcast_methods(char* data);
 static l_broadcast_method_t* __method_create(f_broadcast_method_t method, char* name, uint32_t retries);
 
-void ezlopi_core_ezlopi_broadcast_methods_set_queue(int (*func)(cJSON*))
+void ezlopi_core_broadcast_methods_set_queue(int (*func)(cJSON*))
 {
     __broadcast_queue_func = func;
 }
 
-int ezlopi_core_ezlopi_broadcast_add_to_queue(cJSON* cj_data)
+int ezlopi_core_broadcast_add_to_queue(cJSON* cj_data)
 {
     int ret = 0;
     if (cj_data && __broadcast_queue_func)
@@ -65,7 +66,7 @@ int ezlopi_core_broadcast_log_cjson(cJSON* cj_log_data)
 }
 #endif 
 
-int ezlopi_core_ezlopi_broadcast_cjson(cJSON* cj_data)
+int ezlopi_core_broadcast_cjson(cJSON* cj_data)
 {
     int ret = 0;
 
@@ -97,7 +98,7 @@ int ezlopi_core_ezlopi_broadcast_cjson(cJSON* cj_data)
     return ret;
 }
 
-l_broadcast_method_t* ezlopi_core_ezlopi_broadcast_method_add(f_broadcast_method_t broadcast_method, char* method_name, uint32_t retries)
+l_broadcast_method_t* ezlopi_core_broadcast_method_add(f_broadcast_method_t broadcast_method, char* method_name, uint32_t retries)
 {
     int duplicate_method = 0;
     l_broadcast_method_t* ret = NULL;
@@ -138,7 +139,7 @@ l_broadcast_method_t* ezlopi_core_ezlopi_broadcast_method_add(f_broadcast_method
     return ret;
 }
 
-void ezlopi_core_ezlopi_broadcast_remove_method(f_broadcast_method_t broadcast_method)
+void ezlopi_core_broadcast_remove_method(f_broadcast_method_t broadcast_method)
 {
     if (__method_head)
     {

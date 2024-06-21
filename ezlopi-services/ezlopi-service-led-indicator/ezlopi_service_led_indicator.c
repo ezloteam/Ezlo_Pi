@@ -200,17 +200,39 @@ static const ledc_channel_config_t indicator_pwm_channel_cfg = {
 static void indicator_LED_fade_effect(uint32_t fade_ms)
 {
     static int i = 0;
-    for (; i < 4095; i += 117)
+    static uint32_t __state = 0;
+    static uint32_t __fade_time_stamp = 0;
+
+    if ((xTaskGetTickCount() - __fade_time_stamp) >= (fade_ms / portTICK_RATE_MS))
     {
-        ESP_ERROR_CHECK_WITHOUT_ABORT(ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, i));
-        ESP_ERROR_CHECK_WITHOUT_ABORT(ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0));
-        vTaskDelay(fade_ms / portTICK_PERIOD_MS);
-    }
-    for (; i > 0; i -= 117)
-    {
-        ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, i);
-        ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
-        vTaskDelay(fade_ms / portTICK_PERIOD_MS);
+        if (0 == __state)
+        {
+            if (i < 4095)
+            {
+                i += 117;
+                ESP_ERROR_CHECK_WITHOUT_ABORT(ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, i));
+                ESP_ERROR_CHECK_WITHOUT_ABORT(ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0));
+            }
+            else
+            {
+                __state = 1;
+            }
+        }
+        else
+        {
+            if (i > 0)
+            {
+                i -= 117;
+                ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, i);
+                ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
+            }
+            else
+            {
+                __state = 0;
+            }
+        }
+
+        __fade_time_stamp = xTaskGetTickCount();
     }
 }
 
@@ -283,55 +305,43 @@ static void __process_event(void)
 
 static void __indicator_LED_blinker(void)
 {
-#if 0
-    static void __indicator_LED_blinker(void* params)
+    __process_event();
+
+    switch (__indicator_priority)
     {
-        while (1)
-#endif
-        {
-            __process_event();
+    case PRIORITY_POWER:
+    {
+        __indicator_LED_power_on_effect();
+        break;
+    }
+    case PRIORITY_WIFI:
+    {
+        __indicator_LED_wifi_connected_effect();
+        break;
+    }
+    case PRIORITY_INTERNET:
+    {
+        __indicator_LED_internet_connected_effect();
+        break;
+    }
+    case PRIORITY_CLOUD:
+    {
+        __indicator_LED_cloud_connected_effect();
+        break;
+    }
+    default:
+    {
+        break;
+    }
+    }
 
-            switch (__indicator_priority)
-            {
-            case PRIORITY_POWER:
-            {
-                __indicator_LED_power_on_effect();
-                break;
-            }
-            case PRIORITY_WIFI:
-            {
-                __indicator_LED_wifi_connected_effect();
-                break;
-            }
-            case PRIORITY_INTERNET:
-            {
-                __indicator_LED_internet_connected_effect();
-                break;
-            }
-            case PRIORITY_CLOUD:
-            {
-                __indicator_LED_cloud_connected_effect();
-                break;
-            }
-            default:
-            {
-                break;
-            }
-            }
-
-            // vTaskDelay(1 / portTICK_PERIOD_MS);
-        }
-
-#if 0
-        ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SERVICE_LED_INDICATOR_TASK);
-        vTaskDelete(NULL);
-#endif
+    // vTaskDelay(1 / portTICK_PERIOD_MS);
 }
 
-    int ezlopi_service_led_indicator_init()
-    {
-        return __indicator_led_init();
-    }
+int ezlopi_service_led_indicator_init()
+{
+    return __indicator_led_init();
+}
 
 
 #endif // CONFIG_EZPI_ENABLE_LED_INDICATOR
