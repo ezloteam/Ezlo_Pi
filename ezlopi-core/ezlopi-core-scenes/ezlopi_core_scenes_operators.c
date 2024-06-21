@@ -23,7 +23,7 @@
      : (NULL == STR2) ? false       \
                       : OPERATE_ON_STRINGS(STR1, op, STR2))
 //-------------------------------------------------
-static int __evaluate_compareNumber_or_compareStrings(l_fields_v2_t* item_exp_field, l_fields_v2_t* value_field, l_fields_v2_t* comparator_field);
+static int __evaluate_compareNumber_or_compareStrings(l_fields_v2_t* item_exp_field, l_fields_v2_t* value_field, char* comparator_str);
 
 /************* Numeric ************/
 static const char* const ezlopi_scenes_num_cmp_operators_op[] = {
@@ -291,21 +291,21 @@ static int ____compare_exp_vs_exp(s_ezlopi_expressions_t* curr_expr_left, s_ezlo
     return ret;
 }
 
-static int ____compare_item_vs_other(l_ezlopi_item_t* item, l_fields_v2_t * value_field, char * comparator_field_str)
+static int ____compare_item_vs_other(l_ezlopi_item_t* item_left, l_fields_v2_t * value_field, char * comparator_field_str)
 {
     int ret = 0;
 
-    if (0 == strncmp(item->cloud_properties.value_type, ezlopi_scene_get_scene_value_type_name(value_field->value_type), strlen(item->cloud_properties.value_type)))
+    if (0 == strncmp(item_left->cloud_properties.value_type, ezlopi_scene_get_scene_value_type_name(value_field->value_type), strlen(item_left->cloud_properties.value_type)))
     {// making sure :- 'temperature' == 'temperature'
 
         cJSON* cj_item = cJSON_CreateObject(__FUNCTION__);
         if (cj_item)
         {
-            item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item, (void*)cj_item, NULL);
+            item_left->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item_left, (void*)cj_item, NULL);
             cJSON* cj_item_value = cJSON_GetObjectItem(__FUNCTION__, cj_item, ezlopi_value_str);
             if (cj_item_value)
             {
-                switch (cj_item_value->type) // from item [char ,cj, bool , num]
+                switch (cj_item_value->type) // from item_left [char ,cj, bool , num]
                 {
                 case cJSON_String:
                 {
@@ -358,21 +358,21 @@ static int ____compare_item_vs_other(l_ezlopi_item_t* item, l_fields_v2_t * valu
 
     return ret;
 }
-static int ____compare_item_vs_exp(l_ezlopi_item_t* item, s_ezlopi_expressions_t* curr_expr_right, char * comparator_field_str)
+static int ____compare_item_vs_exp(l_ezlopi_item_t* item_left, s_ezlopi_expressions_t* curr_expr_right, char * comparator_field_str)
 {
     int ret = 0;
 
-    if (0 == strncmp(item->cloud_properties.value_type, ezlopi_scene_get_scene_value_type_name(curr_expr_right->value_type), strlen(item->cloud_properties.value_type)))
+    if (0 == strncmp(item_left->cloud_properties.value_type, ezlopi_scene_get_scene_value_type_name(curr_expr_right->value_type), strlen(item_left->cloud_properties.value_type)))
     {// making sure :- 'temperature' == 'temperature'
 
         cJSON* cj_item = cJSON_CreateObject(__FUNCTION__);
         if (cj_item)
         {
-            item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item, (void*)cj_item, NULL);
+            item_left->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item_left, (void*)cj_item, NULL);
             cJSON* cj_item_value = cJSON_GetObjectItem(__FUNCTION__, cj_item, ezlopi_value_str);
             if (cj_item_value)
             {
-                switch (cj_item_value->type) // from item [char ,cj, bool , num]
+                switch (cj_item_value->type) // from item_left [char ,cj, bool , num]
                 {
                 case cJSON_String:
                 {
@@ -430,8 +430,10 @@ int ezlopi_scenes_operators_value_number_operations(l_fields_v2_t* item_exp_fiel
 {
     int ret = 0;
     // compare for all compareNumber possibilities
-    ret = __evaluate_compareNumber_or_compareStrings(item_exp_field, value_field, comparator_field);
-    return ret;
+    if (item_exp_field && value_field && comparator_field)
+    {
+        ret = __evaluate_compareNumber_or_compareStrings(item_exp_field, value_field, comparator_field->field_value.u_value.value_string);
+    } return ret;
 }
 
 
@@ -903,7 +905,10 @@ int ezlopi_scenes_operators_value_strings_operations(l_fields_v2_t * item_exp_fi
 {
     int ret = 0;
     // compare for all compareStrings possibilities
-    ret = __evaluate_compareNumber_or_compareStrings(item_exp_field, value_field, comparator_field);
+    if (item_exp_field && value_field && comparator_field)
+    {
+        ret = __evaluate_compareNumber_or_compareStrings(item_exp_field, value_field, comparator_field->field_value.u_value.value_string);
+    }
     return ret;
 }
 
@@ -1110,6 +1115,7 @@ int ezlopi_scenes_operators_value_strops_operations(l_fields_v2_t * item_exp_fie
 
 
 /************* Values in_array ************/
+#if 0
 static const char* const ezlopi_scenes_inarr_cmp_operators_op[] = {
 #define SCENES_IN_ARRAY_OPERATORS(OPERATOR, op, name, method) op,
 #include "__operators_macros/__in_array_comparision_operators_macros.h"
@@ -1170,72 +1176,21 @@ const char* ezlopi_scenes_inarr_comparator_operators_get_method(e_scene_inarr_cm
     }
     return ret;
 }
+#endif
 
-static int __evaluate_inarry_str(char * item_exp_value_str, l_fields_v2_t * value_field, char * op_str)
+static int __evaluate_inarry_str(char * item_exp_value_str, l_fields_v2_t * value_field, bool operation)
 {
     int ret = 0;
-    if (item_exp_value_str && op_str)
+    if (item_exp_value_str)
     {
         cJSON* iterator = NULL;
-        e_scene_inarr_cmp_operators_t inarr_operator = ezlopi_scenes_inarr_comparator_operators_get_enum(op_str);
-        switch (inarr_operator)
+        switch (operation)
         {
-        case SCENES_IN_ARRAY_OPERATORS_IN:
-        {
-            cJSON_ArrayForEach(iterator, value_field->field_value.u_value.cj_value)
-            {
-                const char* string_item = cJSON_GetStringValue(iterator);
-                if (NULL != string_item)
-                {
-                    if (STR_OP_COMP(item_exp_value_str, == , string_item)) // check for all array elements ; if exists then break
-                    {
-                        ret = 1;
-                        break;
-                    }
-                }
-
-            }
-            break;
-        }
-        case SCENES_IN_ARRAY_OPERATORS_NOT_IN:
-        {
-            // iterate through the array elements
-            cJSON_ArrayForEach(iterator, value_field->field_value.u_value.cj_value)
-            {
-                const char* string_item = cJSON_GetStringValue(iterator);
-                if (NULL != string_item)
-                {
-                    ret = 1;
-                    if (STR_OP_COMP(item_exp_value_str, == , string_item)) // check for all array elements ; if exists then break
-                    {
-                        ret = 0;
-                        break;
-                    }
-                }
-            }
-            break;
-        }
-        default:
-            break;
-        }
-    }
-    return ret;
-}
-static int __evaluate_inarry_num(double item_exp_value, l_fields_v2_t * value_field, char * op_str)
-{
-    int ret = 0;
-    if (NULL != op_str)
-    {
-        cJSON* iterator = NULL;
-        e_scene_inarr_cmp_operators_t inarr_operator = ezlopi_scenes_inarr_comparator_operators_get_enum(op_str);
-        switch (inarr_operator)
-        {
-        case SCENES_IN_ARRAY_OPERATORS_IN:
+        case 0: // IN
         {
             cJSON_ArrayForEach(iterator, value_field->field_value.u_value.cj_value)
             {
-                double rhs_val = (cJSON_IsBool(iterator)) ? ((cJSON_True == iterator->type) ? 1 : 0) : cJSON_GetNumberValue(iterator);
-                if (item_exp_value == rhs_val) // check for all array elements ; if exists then 'ret = 1' & break
+                if (STR_OP_COMP(item_exp_value_str, == , cJSON_GetStringValue(iterator))) // check for all array elements ; if exists then break
                 {
                     ret = 1;
                     break;
@@ -1243,14 +1198,12 @@ static int __evaluate_inarry_num(double item_exp_value, l_fields_v2_t * value_fi
             }
             break;
         }
-        case SCENES_IN_ARRAY_OPERATORS_NOT_IN:
+        case 1: // NOT_IN
         {
-            // iterate through the array elements
             cJSON_ArrayForEach(iterator, value_field->field_value.u_value.cj_value)
             {
                 ret = 1;
-                double rhs_val = (cJSON_IsBool(iterator)) ? ((cJSON_True == iterator->type) ? 1 : 0) : cJSON_GetNumberValue(iterator);
-                if (item_exp_value == rhs_val) // check for all array elements ; if exists then 'ret = 0' & break
+                if (STR_OP_COMP(item_exp_value_str, == , cJSON_GetStringValue(iterator))) // check for all array elements ; if exists then break
                 {
                     ret = 0;
                     break;
@@ -1258,85 +1211,110 @@ static int __evaluate_inarry_num(double item_exp_value, l_fields_v2_t * value_fi
             }
             break;
         }
-        default:
-            break;
         }
     }
     return ret;
 }
-static int __evaluate_inarry_cj(cJSON* item_exp_value, l_fields_v2_t * value_field, char * op_str)
+static int __evaluate_inarry_num(double item_exp_value, l_fields_v2_t * value_field, bool operation)
 {
     int ret = 0;
-    if (item_exp_value && op_str)
+
+    cJSON* iterator = NULL;
+    switch (operation)
+    {
+    case 0: // IN
+    {
+        cJSON_ArrayForEach(iterator, value_field->field_value.u_value.cj_value)
+        {
+            double rhs_val = (cJSON_IsBool(iterator)) ? ((cJSON_True == iterator->type) ? 1 : 0) : cJSON_GetNumberValue(iterator);
+            if (item_exp_value == rhs_val) // check for all array elements ; if exists then 'ret = 1' & break
+            {
+                ret = 1;
+                break;
+            }
+        }
+        break;
+    }
+    case 1: // NOT_IN
+    {
+        cJSON_ArrayForEach(iterator, value_field->field_value.u_value.cj_value)
+        {
+            ret = 1;
+            double rhs_val = (cJSON_IsBool(iterator)) ? ((cJSON_True == iterator->type) ? 1 : 0) : cJSON_GetNumberValue(iterator);
+            if (item_exp_value == rhs_val) // check for all array elements ; if exists then 'ret = 0' & break
+            {
+                ret = 0;
+                break;
+            }
+        }
+        break;
+    }
+    }
+
+    return ret;
+}
+static int __evaluate_inarry_cj(cJSON* item_exp_value, l_fields_v2_t * value_field, bool operation)
+{
+    int ret = 0;
+    if (item_exp_value)
     {
         cJSON* iterator = NULL;
-        e_scene_inarr_cmp_operators_t inarr_operator = ezlopi_scenes_inarr_comparator_operators_get_enum(op_str);
-        switch (inarr_operator)
+        switch (operation)
         {
-        case SCENES_IN_ARRAY_OPERATORS_IN:
+        case 0: // IN
         {
             cJSON_ArrayForEach(iterator, value_field->field_value.u_value.cj_value)
             {
-                if (cJSON_IsObject(iterator))
-                {
-                    if (cJSON_Compare(item_exp_value, iterator, cJSON_False)) // check for all array elements ; if exists then 'ret = 1' & break
-                    {
-                        ret = 1;
-                        break;
-                    }
-                }
-            }
-            break;
-        }
-        case SCENES_IN_ARRAY_OPERATORS_NOT_IN:
-        {
-            // iterate through the array elements
-            cJSON_ArrayForEach(iterator, value_field->field_value.u_value.cj_value)
-            {
-                if (cJSON_IsObject(iterator))
+                if (cJSON_Compare(item_exp_value, iterator, cJSON_False)) // check for all array elements ; if exists then 'ret = 1' & break
                 {
                     ret = 1;
-                    if (cJSON_Compare(item_exp_value, iterator, cJSON_False)) // check for all array elements ; if exists then 'ret = 0' & break
-                    {
-                        ret = 0;
-                        break;
-                    }
+                    break;
                 }
             }
             break;
         }
-        default:
+        case 1: // NOT_IN
+        {
+            cJSON_ArrayForEach(iterator, value_field->field_value.u_value.cj_value)
+            {
+                ret = 1;
+                if (cJSON_Compare(item_exp_value, iterator, cJSON_False)) // check for all array elements ; if exists then 'ret = 0' & break
+                {
+                    ret = 0;
+                    break;
+                }
+
+            }
             break;
+        }
         }
     }
     return ret;
 }
-
 
 int ezlopi_scenes_operators_value_inarr_operations(l_fields_v2_t * item_exp_field, l_fields_v2_t * value_field, l_fields_v2_t * operation_field)
 {
     int ret = 0;
     if (item_exp_field && value_field && operation_field)
     {
-        char* op_str = (NULL == operation_field) ? "in" : operation_field->field_value.u_value.value_string;
+        bool operation = (0 == strncmp(operation_field->field_value.u_value.value_string, "not_in", 7)) ? 1 : 0; // default = 0 [IN]
         //------------------------------------------------
         if (EZLOPI_VALUE_TYPE_EXPRESSION == item_exp_field->value_type)
         {
             s_ezlopi_expressions_t* curr_expr_left = ezlopi_scenes_get_expression_node_by_name(item_exp_field->field_value.u_value.value_string);
-
             switch (curr_expr_left->exp_value.type)
             {
             case EXPRESSION_VALUE_TYPE_STRING:
-                ret = __evaluate_inarry_str(curr_expr_left->exp_value.u_value.str_value, value_field, op_str);
+                ret = __evaluate_inarry_str(curr_expr_left->exp_value.u_value.str_value, value_field, operation);
                 break;
             case EXPRESSION_VALUE_TYPE_CJ:
-                ret = __evaluate_inarry_cj(curr_expr_left->exp_value.u_value.cj_value, value_field, op_str);
+                ret = __evaluate_inarry_cj(curr_expr_left->exp_value.u_value.cj_value, value_field, operation);
                 break;
             case EXPRESSION_VALUE_TYPE_NUMBER:
-                ret = __evaluate_inarry_num(curr_expr_left->exp_value.u_value.number_value, value_field, op_str);
+                ret = __evaluate_inarry_num(curr_expr_left->exp_value.u_value.number_value, value_field, operation);
                 break;
             case EXPRESSION_VALUE_TYPE_BOOL:
-                ret = __evaluate_inarry_num((double)curr_expr_left->exp_value.u_value.boolean_value, value_field, op_str);
+                ret = __evaluate_inarry_num((double)curr_expr_left->exp_value.u_value.boolean_value, value_field, operation);
                 break;
             default:
                 break;
@@ -1358,17 +1336,17 @@ int ezlopi_scenes_operators_value_inarr_operations(l_fields_v2_t * item_exp_fiel
                         switch (cj_item_value->type)
                         {
                         case cJSON_String:
-                            ret = __evaluate_inarry_str(cj_item_value->valuestring, value_field, op_str);
+                            ret = __evaluate_inarry_str(cj_item_value->valuestring, value_field, operation);
                             break;
                         case cJSON_Object:
-                            ret = __evaluate_inarry_cj(cj_item_value, value_field, op_str);
+                            ret = __evaluate_inarry_cj(cj_item_value, value_field, operation);
                             break;
                         case cJSON_Number:
-                            ret = __evaluate_inarry_num(cj_item_value->valuedouble, value_field, op_str);
+                            ret = __evaluate_inarry_num(cj_item_value->valuedouble, value_field, operation);
                             break;
                         case cJSON_True:
                         case cJSON_False:
-                            ret = __evaluate_inarry_num((cJSON_True == cj_item_value->type) ? 1 : 0, value_field, op_str);
+                            ret = __evaluate_inarry_num((cJSON_True == cj_item_value->type) ? 1 : 0, value_field, operation);
                             break;
                         default:
                             break;
@@ -1376,11 +1354,8 @@ int ezlopi_scenes_operators_value_inarr_operations(l_fields_v2_t * item_exp_fiel
                     }
                     cJSON_Delete(__FUNCTION__, cj_item);
                 }
-
-
             }
         }
-
     }
 
     return ret;
@@ -1539,6 +1514,7 @@ int ezlopi_scenes_operators_value_with_less_operations(uint32_t item_id, l_field
     return ret;
 }
 #endif
+
 /************* Values without less ************/
 
 static const char* const ezlopi_scenes_value_without_less_cmp_operators_op[] = {
@@ -1607,6 +1583,7 @@ const char* ezlopi_scenes_value_without_less_comparator_operators_get_method(e_s
     }
     return ret;
 }
+
 #if 0
 int ezlopi_scenes_operators_value_without_less_operations(uint32_t item_id, l_fields_v2_t * value_field, l_fields_v2_t * comparator_field)
 {
@@ -1675,11 +1652,7 @@ int ezlopi_scenes_operators_value_without_less_operations(uint32_t item_id, l_fi
 }
 #endif
 /************* compareValues ************/
-static int ____check_req_lhs_rhs_valuetypes()
-{
-
-}
-
+#if 0
 int ezlopi_scenes_operators_value_comparevalues_without_less_operations(uint32_t item_id, l_fields_v2_t * value_field, l_fields_v2_t * value_type_field, l_fields_v2_t * comparator_field)
 {
     int ret = 0;
@@ -1759,8 +1732,19 @@ int ezlopi_scenes_operators_value_comparevalues_without_less_operations(uint32_t
 
     return ret;
 }
+#endif
 
+static bool __check_valuetypes(const char * lhs_type_str, const char * rhs_type_str, const char * required_type_str)
+{
+    bool ret = false;
+    if ((0 == strncmp(lhs_type_str, required_type_str, strlen(required_type_str))) &&
+        (0 == strncmp(rhs_type_str, required_type_str, strlen(required_type_str))))
+    {
+        ret = true;
+    }
+    return ret;
 
+}
 
 int ezlopi_scenes_operators_value_comparevalues_with_less_operations(l_fields_v2_t * item_exp_field, l_fields_v2_t * value_field, l_fields_v2_t * value_type_field, l_fields_v2_t * comparator_field)
 {
@@ -1768,38 +1752,51 @@ int ezlopi_scenes_operators_value_comparevalues_with_less_operations(l_fields_v2
     if (item_exp_field && value_field && value_type_field && comparator_field)
     {
         cJSON* req_item_exp_value = NULL;
+        cJSON* req_value_field = NULL;
 
         // 1. LHS = expression
         if (EZLOPI_VALUE_TYPE_EXPRESSION == item_exp_field->value_type)
         {
             s_ezlopi_expressions_t* curr_expr_left = ezlopi_scenes_get_expression_node_by_name(item_exp_field->field_value.u_value.value_string);
 
-            // if (0 == strncmp(value_type_field->field_value.u_value.value_string, "bool", 5))
-            // {
-            //     cJSON_AddBoolToObject(__FUNCTION__, req_item_exp_value, ezlopi_value_str, curr_expr_left->exp_value.u_value.boolean_value);
-            // }
-            // else if (0 == strncmp(value_type_field->field_value.u_value.value_string, "number", 7))
-            // {
-            //     cJSON_AddNumberToObject(__FUNCTION__, req_item_exp_value, ezlopi_value_str, curr_expr_left->exp_value.u_value.number_value);
-            // }
-            // else if (0 == strncmp(value_type_field->field_value.u_value.value_string, "temperature", 7))
-            // {
-            //     cJSON_AddStringToObject(__FUNCTION__, req_item_exp_value, ezlopi_value_str, curr_expr_left->exp_value.u_value.str_value);
-            // }
-
             if (EZLOPI_VALUE_TYPE_EXPRESSION == value_field->value_type)
             { // 2. exp vs exp
                 s_ezlopi_expressions_t* curr_expr_right = ezlopi_scenes_get_expression_node_by_name(value_field->field_value.u_value.value_string);
+
+                // check if all have same data-type
+                if (__check_valuetypes(ezlopi_scene_get_scene_value_type_name(curr_expr_left->value_type), ezlopi_scene_get_scene_value_type_name(curr_expr_right->value_type), value_type_field->field_value.u_value.value_string))
+                {
+                    ret = ____compare_exp_vs_exp(curr_expr_left, curr_expr_right, comparator_field->field_value.u_value.value_string);
+
+                }
 
             }
             else if (EZLOPI_VALUE_TYPE_ITEM == value_field->value_type)
             { // 2. exp vs item
 
+                // extract item
+                uint32_t item_id = stroul(value_field->field_value.u_value.value_string, 16);
+                l_ezlopi_item_t * item = ezlopi_device_get_item_by_id(item_id);
+                if (item)
+                {
+                    if (____check_req_lhs_rhs_valuetypes(ezlopi_scene_get_scene_value_type_name(curr_expr_left->value_type),
+                        ezlopi_scene_get_scene_value_type_name(value_field->value_type),
+                        value_type_field->field_value.u_value.value_string))
+                    {
+
+
+                    }
+                }
             }
             else
             { // 2. exp vs other
 
-
+                if (____check_req_lhs_rhs_valuetypes(ezlopi_scene_get_scene_value_type_name(curr_expr_left->value_type),
+                    ezlopi_scene_get_scene_value_type_name(value_field->value_type),
+                    value_type_field->field_value.u_value.value_string))
+                {
+                    ret = ____compare_exp_vs_other(curr_expr_left, value_field, comparator_field->field_value.u_value.value_string);
+                }
 
             }
 
@@ -1811,27 +1808,31 @@ int ezlopi_scenes_operators_value_comparevalues_with_less_operations(l_fields_v2
             if (item)
             {
                 // Now compare if LHS has correct dataType or not
-                if (STR_OP_COMP(value_type_field->field_value.u_value.value_string, == , item->cloud_properties.value_type)) // bool == bool?
+                if (EZLOPI_VALUE_TYPE_EXPRESSION == value_field->value_type)
                 {
-                    cJSON* cj_item_value = cJSON_CreateObject(__FUNCTION__);
-                    if (cj_item_value)
+                    if (STR_OP_COMP(value_type_field->field_value.u_value.value_string, == , item->cloud_properties.value_type)) // bool == bool?
                     {
-                        item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item, (void*)cj_item_value, NULL);
+                        cJSON* cj_item_value = cJSON_CreateObject(__FUNCTION__);
+                        if (cj_item_value)
+                        {
+                            item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item, (void*)cj_item_value, NULL);
 
-                        req_item_exp_value = cJSON_GetObjectItem(__FUNCTION__, cj_item_value, ezlopi_value_str); // "5.0"
+                            req_item_exp_value = cJSON_GetObjectItem(__FUNCTION__, cj_item_value, ezlopi_value_str); // "5.0"
 
-                        cJSON_Delete(__FUNCTION__, cj_item_value);
+                            cJSON_Delete(__FUNCTION__, cj_item_value);
+                        }
                     }
-                }
-                else
-                {
-                    ret = 0; // SCENES_WHEN_TYPE_MISMATCH error
+                    else
+                    {
+                        ret = 0; // SCENES_WHEN_TYPE_MISMATCH error
+                    }
                 }
             }
         }
 
+#if 0
         // ## 'req_item_exp_value --> LHS'
-        if (NULL != req_item_exp_value) // this cjson contains actual -> data_category [cj/bool/int/str]  => representing "item" or "expression" or "temperature" ...
+        if (NULL != req_item_exp_value && NULL != req_value_field) // this cjson contains actual -> data_category [cj/bool/int/str]  => representing "item" or "expression" or "temperature" ...
         { // operating according to 'with-less or without-less' comparator
 
             char* op_str = (NULL == comparator_field) ? "==" : comparator_field->field_value.u_value.value_string;
@@ -1909,8 +1910,9 @@ int ezlopi_scenes_operators_value_comparevalues_with_less_operations(l_fields_v2
             TRACE_E("ValueType mismatch ; against 'Value-Type field requirement'");
         }
 
-    }
+#endif
 
+    }
     return ret;
 }
 
@@ -2074,11 +2076,11 @@ int ezlopi_scenes_operators_is_dictionary_changed_operations(l_scenes_list_v2_t 
 //--------------------------------------------------------------------------------------------------------------------------------------------------
 //      This function is only used for bool/number/string comparision
 //--------------------------------------------------------------------------------------------------------------------------------------------------
-static int __evaluate_compareNumber_or_compareStrings(l_fields_v2_t* item_exp_field, l_fields_v2_t* value_field, l_fields_v2_t* comparator_field)
+static int __evaluate_compareNumber_or_compareStrings(l_fields_v2_t* item_exp_field, l_fields_v2_t* value_field, char* comparator_str)
 {
     int ret = 0;
 
-    if (item_exp_field && value_field && (NULL != comparator_field->field_value.u_value.value_string))
+    if (item_exp_field && value_field && (NULL != comparator_str))
     {
         // 1. LHS = expression
         if (EZLOPI_VALUE_TYPE_EXPRESSION == item_exp_field->value_type)
@@ -2088,7 +2090,7 @@ static int __evaluate_compareNumber_or_compareStrings(l_fields_v2_t* item_exp_fi
             if (EZLOPI_VALUE_TYPE_EXPRESSION != value_field->value_type)
             {
                 //---------------  expression_valueType  VS  other_valueType  --------------------
-                ret = ____compare_exp_vs_other(curr_expr_left, value_field, comparator_field->field_value.u_value.value_string);
+                ret = ____compare_exp_vs_other(curr_expr_left, value_field, comparator_str);
                 //--------------------------------------------------------------------------------
             }
             else if (EZLOPI_VALUE_TYPE_EXPRESSION == value_field->value_type)
@@ -2096,7 +2098,7 @@ static int __evaluate_compareNumber_or_compareStrings(l_fields_v2_t* item_exp_fi
                 s_ezlopi_expressions_t* curr_expr_right = ezlopi_scenes_get_expression_node_by_name(value_field->field_value.u_value.value_string);
 
                 //---------------  expression_valueType  VS  expression_valueType  ---------------
-                ret = ____compare_exp_vs_exp(curr_expr_left, curr_expr_right, comparator_field->field_value.u_value.value_string);
+                ret = ____compare_exp_vs_exp(curr_expr_left, curr_expr_right, comparator_str);
                 //--------------------------------------------------------------------------------
             }
         }
@@ -2105,12 +2107,12 @@ static int __evaluate_compareNumber_or_compareStrings(l_fields_v2_t* item_exp_fi
             uint32_t item_id = strtoul(item_exp_field->field_value.u_value.value_string, NULL, 16);
 
             l_ezlopi_item_t* item = ezlopi_device_get_item_by_id(item_id);
-            if (item && (NULL != comparator_field->field_value.u_value.value_string))
+            if (item)
             {
                 if (EZLOPI_VALUE_TYPE_EXPRESSION != value_field->value_type)
                 {
                     //---------------  item_valueType  VS  other_valueType  --------------------
-                    ret = ____compare_item_vs_other(item, value_field, comparator_field->field_value.u_value.value_string);
+                    ret = ____compare_item_vs_other(item, value_field, comparator_str);
                     //--------------------------------------------------------------------------
                 }
                 else if (EZLOPI_VALUE_TYPE_EXPRESSION == value_field->value_type)
@@ -2118,7 +2120,7 @@ static int __evaluate_compareNumber_or_compareStrings(l_fields_v2_t* item_exp_fi
                     s_ezlopi_expressions_t* curr_expr_right = ezlopi_scenes_get_expression_node_by_name(value_field->field_value.u_value.value_string);
 
                     //---------------  item_valueType  VS  expression_valueType  --------------------
-                    ret = ____compare_item_vs_exp(item, curr_expr_right, comparator_field->field_value.u_value.value_string);
+                    ret = ____compare_item_vs_exp(item, curr_expr_right, comparator_str);
                     //--------------------------------------------------------------------------
                 }
 
