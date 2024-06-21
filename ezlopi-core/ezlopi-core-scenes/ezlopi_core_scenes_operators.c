@@ -1675,6 +1675,11 @@ int ezlopi_scenes_operators_value_without_less_operations(uint32_t item_id, l_fi
 }
 #endif
 /************* compareValues ************/
+static int ____check_req_lhs_rhs_valuetypes()
+{
+
+}
+
 int ezlopi_scenes_operators_value_comparevalues_without_less_operations(uint32_t item_id, l_fields_v2_t * value_field, l_fields_v2_t * value_type_field, l_fields_v2_t * comparator_field)
 {
     int ret = 0;
@@ -1756,78 +1761,77 @@ int ezlopi_scenes_operators_value_comparevalues_without_less_operations(uint32_t
 }
 
 
+
 int ezlopi_scenes_operators_value_comparevalues_with_less_operations(l_fields_v2_t * item_exp_field, l_fields_v2_t * value_field, l_fields_v2_t * value_type_field, l_fields_v2_t * comparator_field)
 {
     int ret = 0;
     if (item_exp_field && value_field && value_type_field && comparator_field)
     {
-        cJSON* item_exp_value = NULL;
+        cJSON* req_item_exp_value = NULL;
 
-        //---------------------- LHS -------------------------
+        // 1. LHS = expression
         if (EZLOPI_VALUE_TYPE_EXPRESSION == item_exp_field->value_type)
         {
             s_ezlopi_expressions_t* curr_expr_left = ezlopi_scenes_get_expression_node_by_name(item_exp_field->field_value.u_value.value_string);
 
-            cJSON* cj_item_value = cJSON_CreateObject(__FUNCTION__);
-            if (cj_item_value)
-            {
-                if (0 == strncmp(value_type_field->field_value.u_value.value_string, "bool", 5))
-                {
-                    item_exp_value = cJSON_AddBoolToObject(__FUNCTION__, cj_item_value, ezlopi_value_str, curr_expr_left->exp_value.u_value.boolean_value);
-                }
-                else if (0 == strncmp(value_type_field->field_value.u_value.value_string, "number", 7))
-                {
-                    item_exp_value = cJSON_AddNumberToObject(__FUNCTION__, cj_item_value, ezlopi_value_str, curr_expr_left->exp_value.u_value.number_value);
-                }
-                else if (0 == strncmp(value_type_field->field_value.u_value.value_string, "NUMVALUE_TYPE_NUMBER", 7))
-                {
-                    item_exp_value = cJSON_AddStringToObject(__FUNCTION__, cj_item_value, ezlopi_value_str, curr_expr_left->exp_value.u_value.str_value);
-                }
-                else
-                {
-                    ret = 0; // SCENES_WHEN_TYPE_MISMATCH error
-                }
-                cJSON_Delete(__FUNCTION__, cj_item_value);
+            // if (0 == strncmp(value_type_field->field_value.u_value.value_string, "bool", 5))
+            // {
+            //     cJSON_AddBoolToObject(__FUNCTION__, req_item_exp_value, ezlopi_value_str, curr_expr_left->exp_value.u_value.boolean_value);
+            // }
+            // else if (0 == strncmp(value_type_field->field_value.u_value.value_string, "number", 7))
+            // {
+            //     cJSON_AddNumberToObject(__FUNCTION__, req_item_exp_value, ezlopi_value_str, curr_expr_left->exp_value.u_value.number_value);
+            // }
+            // else if (0 == strncmp(value_type_field->field_value.u_value.value_string, "temperature", 7))
+            // {
+            //     cJSON_AddStringToObject(__FUNCTION__, req_item_exp_value, ezlopi_value_str, curr_expr_left->exp_value.u_value.str_value);
+            // }
+
+            if (EZLOPI_VALUE_TYPE_EXPRESSION == value_field->value_type)
+            { // 2. exp vs exp
+                s_ezlopi_expressions_t* curr_expr_right = ezlopi_scenes_get_expression_node_by_name(value_field->field_value.u_value.value_string);
+
+            }
+            else if (EZLOPI_VALUE_TYPE_ITEM == value_field->value_type)
+            { // 2. exp vs item
+
+            }
+            else
+            { // 2. exp vs other
+
+
+
             }
 
         }
         else
         {
-            uint32_t item_id = 0;
-            item_id = strtoul(item_exp_field->field_value.u_value.value_string, NULL, 16);
-
-            l_ezlopi_device_t* device = ezlopi_device_get_head();
-            while (device)
+            uint32_t item_id = strtoul(item_exp_field->field_value.u_value.value_string, NULL, 16);
+            l_ezlopi_item_t* item = ezlopi_device_get_item_by_id(item_id);
+            if (item)
             {
-                l_ezlopi_item_t* item = device->items;
-                while (item)
+                // Now compare if LHS has correct dataType or not
+                if (STR_OP_COMP(value_type_field->field_value.u_value.value_string, == , item->cloud_properties.value_type)) // bool == bool?
                 {
-                    if (item->cloud_properties.item_id == item_id) // unique
+                    cJSON* cj_item_value = cJSON_CreateObject(__FUNCTION__);
+                    if (cj_item_value)
                     {
-                        if (STR_OP_COMP(value_type_field->field_value.u_value.value_string, == , item->cloud_properties.value_type)) // bool == bool?
-                        {
-                            cJSON* cj_item_value = cJSON_CreateObject(__FUNCTION__);
-                            if (cj_item_value)
-                            {
-                                item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item, (void*)cj_item_value, NULL);
-                                item_exp_value = cJSON_GetObjectItem(__FUNCTION__, cj_item_value, ezlopi_value_str); // "5.0"
-                                cJSON_Delete(__FUNCTION__, cj_item_value);
-                            }
-                        }
-                        else
-                        {
-                            ret = 0; // SCENES_WHEN_TYPE_MISMATCH error
-                        }
-                        break;
+                        item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item, (void*)cj_item_value, NULL);
+
+                        req_item_exp_value = cJSON_GetObjectItem(__FUNCTION__, cj_item_value, ezlopi_value_str); // "5.0"
+
+                        cJSON_Delete(__FUNCTION__, cj_item_value);
                     }
-                    item = item->next;
                 }
-                device = device->next;
+                else
+                {
+                    ret = 0; // SCENES_WHEN_TYPE_MISMATCH error
+                }
             }
         }
-        //----------------------------------------------------
 
-        if (NULL != item_exp_value)
+        // ## 'req_item_exp_value --> LHS'
+        if (NULL != req_item_exp_value) // this cjson contains actual -> data_category [cj/bool/int/str]  => representing "item" or "expression" or "temperature" ...
         { // operating according to 'with-less or without-less' comparator
 
             char* op_str = (NULL == comparator_field) ? "==" : comparator_field->field_value.u_value.value_string;
@@ -1835,90 +1839,74 @@ int ezlopi_scenes_operators_value_comparevalues_with_less_operations(l_fields_v2
 
             switch (value_with_less_operator)
             {
-
             case SCENES_VALUES_WITH_LESS_OPERATORS_LESS:
             {
-                ret = ((item_exp_value->type == cJSON_Number) ? (item_exp_value->valuedouble < value_field->field_value.u_value.value_double)
-                    : (item_exp_value->type == cJSON_String) ? STR_OP_COMP(item_exp_value->valuestring, < , value_field->field_value.u_value.value_string)
+                ret = ((req_item_exp_value->type == cJSON_Number) ? (req_item_exp_value->valuedouble < value_field->field_value.u_value.value_double)
+                    : (req_item_exp_value->type == cJSON_String) ? STR_OP_COMP(req_item_exp_value->valuestring, < , value_field->field_value.u_value.value_string)
                     : 0);
-                if (0 == ret)
-                {
-                    TRACE_E("Value type mis-matched!");
-                }
+
                 break;
             }
             case SCENES_VALUES_WITH_LESS_OPERATORS_GREATER:
             {
-                ret = ((item_exp_value->type == cJSON_Number) ? (item_exp_value->valuedouble > value_field->field_value.u_value.value_double)
-                    : (item_exp_value->type == cJSON_String) ? STR_OP_COMP(item_exp_value->valuestring, > , value_field->field_value.u_value.value_string)
+                ret = ((req_item_exp_value->type == cJSON_Number) ? (req_item_exp_value->valuedouble > value_field->field_value.u_value.value_double)
+                    : (req_item_exp_value->type == cJSON_String) ? STR_OP_COMP(req_item_exp_value->valuestring, > , value_field->field_value.u_value.value_string)
                     : 0);
-                if (0 == ret)
-                {
-                    TRACE_E("Value type mis-matched!");
-                }
+
 
                 break;
             }
             case SCENES_VALUES_WITH_LESS_OPERATORS_LESS_EQUAL:
             {
-                ret = ((item_exp_value->type == cJSON_Number) ? (item_exp_value->valuedouble <= value_field->field_value.u_value.value_double)
-                    : (item_exp_value->type == cJSON_String) ? STR_OP_COMP(item_exp_value->valuestring, <= , value_field->field_value.u_value.value_string)
+                ret = ((req_item_exp_value->type == cJSON_Number) ? (req_item_exp_value->valuedouble <= value_field->field_value.u_value.value_double)
+                    : (req_item_exp_value->type == cJSON_String) ? STR_OP_COMP(req_item_exp_value->valuestring, <= , value_field->field_value.u_value.value_string)
                     : 0);
-                if (0 == ret)
-                {
-                    TRACE_E("Value type mis-matched!");
-                }
+
 
                 break;
             }
             case SCENES_VALUES_WITH_LESS_OPERATORS_GREATER_EQUAL:
             {
-                ret = ((item_exp_value->type == cJSON_Number) ? (item_exp_value->valuedouble >= value_field->field_value.u_value.value_double)
-                    : (item_exp_value->type == cJSON_String) ? STR_OP_COMP(item_exp_value->valuestring, >= , value_field->field_value.u_value.value_string)
+                ret = ((req_item_exp_value->type == cJSON_Number) ? (req_item_exp_value->valuedouble >= value_field->field_value.u_value.value_double)
+                    : (req_item_exp_value->type == cJSON_String) ? STR_OP_COMP(req_item_exp_value->valuestring, >= , value_field->field_value.u_value.value_string)
                     : 0);
-                if (0 == ret)
-                {
-                    TRACE_E("Value type mis-matched!");
-                }
+
 
                 break;
             }
 
             case SCENES_VALUES_WITH_LESS_OPERATORS_EQUAL:
             {
-                ret = ((item_exp_value->type == cJSON_True) ? (true == value_field->field_value.u_value.value_bool)
-                    : (item_exp_value->type == cJSON_False) ? (false == value_field->field_value.u_value.value_bool)
-                    : (item_exp_value->type == cJSON_Number) ? (item_exp_value->valuedouble == value_field->field_value.u_value.value_double)
-                    : (item_exp_value->type == cJSON_String) ? STR_OP_COMP(item_exp_value->valuestring, == , value_field->field_value.u_value.value_string)
+                ret = ((req_item_exp_value->type == cJSON_True) ? (true == value_field->field_value.u_value.value_bool)
+                    : (req_item_exp_value->type == cJSON_False) ? (false == value_field->field_value.u_value.value_bool)
+                    : (req_item_exp_value->type == cJSON_Number) ? (req_item_exp_value->valuedouble == value_field->field_value.u_value.value_double)
+                    : (req_item_exp_value->type == cJSON_String) ? STR_OP_COMP(req_item_exp_value->valuestring, == , value_field->field_value.u_value.value_string)
                     : 0);
-                if (0 == ret)
-                {
-                    TRACE_E("Value type mis-matched!");
-                }
+
 
                 break;
             }
 
             case SCENES_VALUES_WITH_LESS_OPERATORS_NOT_EQUAL:
             {
-                ret = ((item_exp_value->type == cJSON_True) ? (true != value_field->field_value.u_value.value_bool)
-                    : (item_exp_value->type == cJSON_False) ? (false != value_field->field_value.u_value.value_bool)
-                    : (item_exp_value->type == cJSON_Number) ? (item_exp_value->valuedouble != value_field->field_value.u_value.value_double)
-                    : (item_exp_value->type == cJSON_String) ? STR_OP_COMP(item_exp_value->valuestring, != , value_field->field_value.u_value.value_string)
+                ret = ((req_item_exp_value->type == cJSON_True) ? (true != value_field->field_value.u_value.value_bool)
+                    : (req_item_exp_value->type == cJSON_False) ? (false != value_field->field_value.u_value.value_bool)
+                    : (req_item_exp_value->type == cJSON_Number) ? (req_item_exp_value->valuedouble != value_field->field_value.u_value.value_double)
+                    : (req_item_exp_value->type == cJSON_String) ? STR_OP_COMP(req_item_exp_value->valuestring, != , value_field->field_value.u_value.value_string)
                     : 0);
-                if (0 == ret)
-                {
-                    TRACE_E("Value type mis-matched!");
-                }
+
 
                 break;
             }
             default:
-            {
                 TRACE_E("'SCENES_VALUES_WITH_LESS_OPERATORS_* [%d]' out of range!", value_with_less_operator);
                 break;
+
             }
-            }
+        }
+        else
+        {
+            TRACE_E("ValueType mismatch ; against 'Value-Type field requirement'");
         }
 
     }
