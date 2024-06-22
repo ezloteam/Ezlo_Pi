@@ -6,8 +6,8 @@
 
 #include "ezlopi_cloud_constants.h"
 
+#include "ezlopi_core_broadcast.h"
 #include "ezlopi_core_cjson_macros.h"
-#include "ezlopi_core_ezlopi_broadcast.h"
 #include "ezlopi_core_scenes_status_changed.h"
 
 int ezlopi_scenes_status_change_broadcast(l_scenes_list_v2_t* scene_node, const char* status_str)

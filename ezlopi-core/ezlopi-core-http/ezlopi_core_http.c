@@ -464,7 +464,6 @@ void ezlopi_core_http_mbedtls_req(s_ezlopi_core_http_mbedtls_t* config)
 }
 //------------------------------------------------------------------------------------------------------------------------------------------------------
 
-
 s_ezlopi_http_data_t* ezlopi_http_get_request(const char* cloud_url, const char* private_key, const char* shared_key, const char* ca_certificate)
 {
     int status_code = 0;
@@ -488,6 +487,8 @@ s_ezlopi_http_data_t* ezlopi_http_get_request(const char* cloud_url, const char*
     {
         esp_err_t err = esp_http_client_perform(client);
         status_code = esp_http_client_get_status_code(client);
+
+        TRACE_D("get_status_code: %d", status_code);
 
         http_response = (s_ezlopi_http_data_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_ezlopi_http_data_t));
         if (http_response)
@@ -542,6 +543,10 @@ s_ezlopi_http_data_t* ezlopi_http_get_request(const char* cloud_url, const char*
             {
                 TRACE_E("Error perform http request %s", esp_err_to_name(err));
             }
+        }
+        else
+        {
+            TRACE_D("get_status_code: %d", status_code);
         }
 
         ezlopi_http_free_rx_data(my_data.rx_chunks);

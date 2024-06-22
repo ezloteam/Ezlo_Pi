@@ -8,6 +8,7 @@
 */
 
 #include "freertos/FreeRTOSConfig.h"
+
 #include "cjext.h"
 #include "esp_log.h"
 #include "nvs_flash.h"
@@ -45,6 +46,7 @@
 
 #include "ezlopi_service_ble.h"
 #include "ezlopi_service_uart.h"
+#include "ezlopi_service_loop.h"
 #include "EZLOPI_USER_CONFIG.h"
 
 #if defined (CONFIG_EZPI_ENABLE_UART_PROVISIONING)
@@ -60,6 +62,8 @@
 #define TXD_PIN (GPIO_NUM_43)
 #define RXD_PIN (GPIO_NUM_44)
 #endif
+
+static uint8_t __uart_data[EZPI_SERV_UART_RX_BUFFER_SIZE];
 
 static void ezlopi_service_uart_get_info();
 static void ezlopi_service_uart_set_wifi(const char* data);
@@ -345,6 +349,29 @@ static int ezlopi_service_uart_parser(const char* data)
     return 1;
 }
 
+static void __uart_loop(void)
+{
+    uint32_t cur_len = 0;
+    static uint32_t __rx_len;
+
+    uart_get_buffered_data_len(EZPI_SERV_UART_NUM_DEFAULT, &cur_len);
+
+    if (cur_len && (cur_len > __rx_len))
+    {
+        memset(__uart_data, 0, EZPI_SERV_UART_RX_BUFFER_SIZE);
+
+        int rxBytes = uart_read_bytes(EZPI_SERV_UART_NUM_DEFAULT, __uart_data, (EZPI_SERV_UART_RX_BUFFER_SIZE - 1), 1000 / portTICK_RATE_MS);
+
+        if (rxBytes > (strlen(ezlopi_cmd_str) + 6))
+        {
+            __uart_data[rxBytes] = 0;
+            TRACE_I("%s", __uart_data);
+            ezlopi_service_uart_parser((const char*)__uart_data);
+        }
+    }
+}
+
+#if 0
 static void ezlopi_service_uart_task(void* arg)
 {
     static const char* RX_TASK_TAG = "RX_TASK";
@@ -366,9 +393,10 @@ static void ezlopi_service_uart_task(void* arg)
     }
 
     ezlopi_free(__FUNCTION__, data);
-    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SERVICE_UART_TASK);
+    ezlopi_core_process_set_is_deleted(ENUM___uart_loop);
     vTaskDelete(NULL);
 }
+#endif
 
 static int ezlopi_service_uart_firmware_info(cJSON* parent)
 {
@@ -799,9 +827,12 @@ int EZPI_SERV_uart_tx_data(int len, uint8_t* data)
 
 void EZPI_SERV_uart_init(void)
 {
-    TaskHandle_t ezlopi_service_uart_task_handle = NULL;
-    xTaskCreate(ezlopi_service_uart_task, "serv_uart_task", EZLOPI_SERVICE_UART_TASK_DEPTH, NULL, configMAX_PRIORITIES, &ezlopi_service_uart_task_handle);
-    ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_UART_TASK, &ezlopi_service_uart_task_handle, EZLOPI_SERVICE_UART_TASK_DEPTH);
+    ezlopi_service_loop_add("uart-loop", __uart_loop, 1);
+#if 0
+    TaskHandle_t __uart_loop_handle = NULL;
+    xTaskCreate(__uart_loop, "serv_uart_task", __uart_loop_DEPTH, NULL, configMAX_PRIORITIES, &__uart_loop_handle);
+    ezlopi_core_process_set_process_info(ENUM___uart_loop, &__uart_loop_handle, __uart_loop_DEPTH);
+#endif
 }
 
 #endif // CONFIG_EZPI_ENABLE_UART_PROVISIONING

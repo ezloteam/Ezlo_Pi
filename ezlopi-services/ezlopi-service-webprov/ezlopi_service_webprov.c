@@ -14,6 +14,7 @@
 #include "ezlopi_core_api.h"
 #include "ezlopi_core_http.h"
 #include "ezlopi_core_wifi.h"
+#include "ezlopi_core_reset.h"
 #include "ezlopi_core_buffer.h"
 #include "ezlopi_core_processes.h"
 #include "ezlopi_core_broadcast.h"
@@ -26,7 +27,7 @@
 #include "ezlopi_service_webprov.h"
 #include "EZLOPI_USER_CONFIG.h"
 
-#define TEST_PROV 0
+#define TEST_PROV 1
 
 #if (1 == TEST_PROV)
 #include "ezlopi_test_prov.h"
@@ -254,9 +255,10 @@ static void __provision_check(void* pv)
     static uint8_t retry_count_failure = 0;
 
 #if (1 == TEST_PROV)
+    char* ca_certificate = test_ca_cert;
     char *ssl_private_key = test_ssl_pvt_key;
     char *ssl_shared_key = test_ssl_shared_key;
-    char* ca_certificate = test_ca_cert;
+
     char* provision_token = test_prov_token;
     // char* provisioning_server = ezlopi_factory_info_v3_get_provisioning_server();
     uint16_t config_version = test_version_num;
@@ -305,6 +307,7 @@ static void __provision_check(void* pv)
                         else
                         {
                             flag_break_loop = 1;
+                            EZPI_CORE_reset_reboot();
                         }
 
                         ezlopi_factory_info_v3_free(response->response);

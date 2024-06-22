@@ -22,8 +22,7 @@
 #include "ezlopi_core_ping.h"
 #include "ezlopi_core_processes.h"
 
-static void __indicator_LED_blinker(void);
-// static void __indicator_LED_blinker(void* params);
+static void __indicator_LED_loop(void);
 
 static e_indicator_led_priority_t __indicator_priority = PRIORITY_CLOUD;
 
@@ -140,11 +139,11 @@ static void __indicator_LED_cloud_connected_effect()
 static int __indicator_led_init(void)
 {
     int ret = 0;
-    indicator_led.type = LED_STRIP_WS2812;
     indicator_led.length = 1;
-    indicator_led.gpio = INDICATOR_LED_PIN;
     indicator_led.buf = NULL;
     indicator_led.brightness = 255;
+    indicator_led.type = LED_STRIP_WS2812;
+    indicator_led.gpio = INDICATOR_LED_PIN;
     indicator_led.channel = INDICATOR_RGB_RMT_TX_CHANNEL;
 
     led_strip_install();
@@ -163,10 +162,10 @@ static int __indicator_led_init(void)
         {
             if (ESP_OK == (err = led_strip_flush(&indicator_led)))
             {
-                ezlopi_service_loop_add("indicator-loop", __indicator_LED_blinker_loop, );
+                ezlopi_service_loop_add("indicator-loop", __indicator_LED_loop, 10);
 #if 0
                 TaskHandle_t ezlopi_service_led_indicator_task_handle = NULL;
-                xTaskCreate(__indicator_LED_blinker, "indicator_task", EZLOPI_SERVICE_LED_INDICATOR_TASK_DEPTH, NULL, tskIDLE_PRIORITY, &ezlopi_service_led_indicator_task_handle);
+                xTaskCreate(__indicator_LED_loop, "indicator_task", EZLOPI_SERVICE_LED_INDICATOR_TASK_DEPTH, NULL, tskIDLE_PRIORITY, &ezlopi_service_led_indicator_task_handle);
                 ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_LED_INDICATOR_TASK, &ezlopi_service_led_indicator_task_handle, EZLOPI_SERVICE_LED_INDICATOR_TASK_DEPTH);
 #endif
                 ret = 1;
@@ -263,13 +262,8 @@ static int __indicator_led_init(void)
     {
         if (ESP_OK == ledc_channel_config(&indicator_pwm_channel_cfg))
         {
-            ezlopi_service_loop_add("indicator-loop", __indicator_LED_blinker, 1);
-#if 0
-            TaskHandle_t indicator_task_handle = NULL;
-            xTaskCreate(__indicator_LED_blinker, "indicator_task", 2048 * 2, NULL, 1, &indicator_task_handle);
-            ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_LED_INDICATOR_TASK, &indicator_task_handle, EZLOPI_SERVICE_LED_INDICATOR_TASK_DEPTH);
-#endif
             ret = 1;
+            ezlopi_service_loop_add("indicator-loop", __indicator_LED_loop, 1);
         }
     }
 
@@ -303,7 +297,7 @@ static void __process_event(void)
     }
 }
 
-static void __indicator_LED_blinker(void)
+static void __indicator_LED_loop(void)
 {
     __process_event();
 

@@ -65,8 +65,9 @@ static void registration_process(void* pv)
             cJSON_AddNumberToObject(__FUNCTION__, cj_params, "timeOffset", 20700);
             cJSON_AddStringToObject(__FUNCTION__, cj_params, "media", "radio");
             cJSON_AddStringToObject(__FUNCTION__, cj_params, "hubType", "32.1");
-            cJSON_AddStringToObject(__FUNCTION__, cj_params, "mac_address", mac_str);
+            // cJSON_AddStringToObject(__FUNCTION__, cj_params, "mac_address", mac_str);
             cJSON_AddNumberToObject(__FUNCTION__, cj_params, "maxFrameSize", (20 * 1024));
+            cJSON_AddStringToObject(__FUNCTION__, cj_params, "mac_address", "11:22:33:44:55:66");
         }
 
         while (ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 5000, false) <= 0)
