@@ -42,13 +42,11 @@ cJSON* ezlopi_scene_cjson_get_field(l_fields_v2_t* field_node)
             case EZLOPI_VALUE_TYPE_FLOAT:
             {
                 cJSON_AddNumberToObject(__FUNCTION__, cj_field, ezlopi_value_str, field_node->field_value.u_value.value_double);
-                // cJSON_AddNumberToObject(__FUNCTION__, cj_field, ezlopi_value_str, field_node->field_value.u_value.value_double);
                 break;
             }
             case EZLOPI_VALUE_TYPE_BOOL:
             {
                 if (0 == field_node->field_value.u_value.value_double)
-                    // if (0 == field_node->field_value.u_value.value_double)
                 {
                     cJSON_AddFalseToObject(__FUNCTION__, cj_field, ezlopi_value_str);
                 }
@@ -64,7 +62,6 @@ cJSON* ezlopi_scene_cjson_get_field(l_fields_v2_t* field_node)
             case EZLOPI_VALUE_TYPE_SCENEID:
             {
                 __cjson_add_string(cj_field, ezlopi_value_str, field_node->field_value.u_value.value_string);
-                // __cjson_add_string(cj_field, ezlopi_value_str, field_node->field_value.u_value.value_string);
                 break;
             }
             case EZLOPI_VALUE_TYPE_BLOCKS:
@@ -73,7 +70,6 @@ cJSON* ezlopi_scene_cjson_get_field(l_fields_v2_t* field_node)
                 if (vlaue_block_array)
                 {
                     l_when_block_v2_t* curr_when_block = field_node->field_value.u_value.when_block;
-                    // l_when_block_v2_t* curr_when_block = field_node->value.when_block;
                     while (curr_when_block)
                     {
                         cJSON* cj_when_block = ezlopi_scenes_cjson_create_when_block(curr_when_block);
@@ -350,9 +346,9 @@ static void __cjson_add_fields(cJSON* cj_block, l_fields_v2_t* fields)
                         break;
                     }
                     case EZLOPI_VALUE_TYPE_INT:
+                    case EZLOPI_VALUE_TYPE_FLOAT:
                     {
                         cJSON_AddNumberToObject(__FUNCTION__, cj_field, ezlopi_value_str, curr_field->field_value.u_value.value_double);
-                        // cJSON_AddNumberToObject(__FUNCTION__, cj_field, ezlopi_value_str, curr_field->field_value.u_value.value_double);
                         break;
                     }
                     case EZLOPI_VALUE_TYPE_BOOL:
@@ -367,21 +363,8 @@ static void __cjson_add_fields(cJSON* cj_block, l_fields_v2_t* fields)
                         }
                         break;
                     }
-                    case EZLOPI_VALUE_TYPE_FLOAT:
-                    {
-                        cJSON_AddNumberToObject(__FUNCTION__, cj_field, ezlopi_value_str, curr_field->field_value.u_value.value_double);
-                        break;
-                    }
                     case EZLOPI_VALUE_TYPE_STRING:
-                    {
-                        __cjson_add_string(cj_field, ezlopi_value_str, curr_field->field_value.u_value.value_string);
-                        break;
-                    }
                     case EZLOPI_VALUE_TYPE_ITEM:
-                    {
-                        __cjson_add_string(cj_field, ezlopi_value_str, curr_field->field_value.u_value.value_string);
-                        break;
-                    }
                     case EZLOPI_VALUE_TYPE_INTERVAL:
                     {
                         __cjson_add_string(cj_field, ezlopi_value_str, curr_field->field_value.u_value.value_string);
@@ -398,6 +381,8 @@ static void __cjson_add_fields(cJSON* cj_block, l_fields_v2_t* fields)
                             {
                                 cJSON* cj_when_block = NULL;
                                 // ezlopi_scenes_cjson_create_when_block(curr_when_block);
+
+                                #warning "cj_when_block == NULL";
                                 if (cj_when_block)
                                 {
                                     if (!cJSON_AddItemToArray(vlaue_block_array, cj_when_block))
@@ -416,6 +401,9 @@ static void __cjson_add_fields(cJSON* cj_block, l_fields_v2_t* fields)
                     {
                         char id_str[32];
                         snprintf(id_str, sizeof(id_str), "%u", (uint32_t)curr_field->field_value.u_value.value_double);
+                        #warning "cj_field : empty --->>  'id_str' has not been stored ";
+
+
                         break;
                     }
                     case EZLOPI_VALUE_TYPE_ARRAY:

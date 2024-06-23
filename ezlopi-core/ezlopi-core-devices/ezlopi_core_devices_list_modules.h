@@ -89,6 +89,5 @@ EZLOPI_DEVICE_LIST("sensor-ze08-ch02-gas-sensor         ", 69, sensor_0069_ze08_
 
 EZLOPI_DEVICE_LIST("sensor-dummy-potentiometer-ADC      ", 70, sensor_0070_ADC_dummy_potentiometer)
 
-#warning "need to uncomment necessary modules";
 //////// End of sensor/device list
 EZLOPI_DEVICE_LIST(NULL, 0, NULL)
