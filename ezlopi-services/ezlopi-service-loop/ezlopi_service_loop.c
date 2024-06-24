@@ -53,6 +53,35 @@ void ezlopi_service_loop_add(const char * name, f_loop_t loop, uint32_t period_m
     }
 }
 
+void ezlopi_service_loop_remove(f_loop_t loop)
+{
+    if (loop && __loop_head)
+    {
+        if (__loop_head->loop == loop)
+        {
+            s_loop_node_t * __del_node = __loop_head;
+            __loop_head = __loop_head->next;
+            ezlopi_free(__FUNCTION__, __del_node);
+        }
+        else
+        {
+            s_loop_node_t * __loop_node = __loop_head;
+            while (__loop_node->next)
+            {
+                if (__loop_node->next->loop == loop)
+                {
+                    s_loop_node_t * __del_node = __loop_node->next;
+                    __loop_node->next = __loop_node->next->next;
+                    ezlopi_free(__FUNCTION__, __del_node);
+                    break;
+                }
+                
+                __loop_node = __loop_node->next;
+            }
+        }
+    }
+}
+
 void ezlopi_service_loop_init(void)
 {
     TaskHandle_t ezlopi_service_timer_task_handle = NULL;

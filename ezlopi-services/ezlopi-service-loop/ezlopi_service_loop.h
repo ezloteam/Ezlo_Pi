@@ -7,6 +7,7 @@
 typedef void (*f_loop_t)(void);
 
 void ezlopi_service_loop_init(void);
+void ezlopi_service_loop_remove(f_loop_t loop);
 void ezlopi_service_loop_add(const char * name, f_loop_t loop, uint32_t period_ms);
 
 #endif // _EZLOPI_SERVICE_TIMER_H_
