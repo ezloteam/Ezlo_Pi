@@ -376,15 +376,22 @@ static void __cjson_add_fields(cJSON* cj_block, l_fields_v2_t* fields)
                         cJSON* vlaue_block_array = cJSON_AddArrayToObject(__FUNCTION__, cj_field, ezlopi_value_str);
                         if (vlaue_block_array)
                         {
-                            l_when_block_v2_t* curr_when_block = curr_field->field_value.u_value.when_block;
+                            TRACE_E("Here!! found block_value_array");
+                            if (curr_field->field_value.u_value.cj_value)
+                            {
+                                CJSON_TRACE(ezlopi_value_str, curr_field->field_value.u_value.cj_value);
+                            }
+                            l_when_block_v2_t* curr_when_block = curr_field->field_value.u_value.when_block;// cj_value?
                             while (curr_when_block)
                             {
+                                TRACE_S("Here!! found block_value_array");
                                 cJSON* cj_when_block = NULL;
                                 // ezlopi_scenes_cjson_create_when_block(curr_when_block);
 
                                 #warning "cj_when_block == NULL";
                                 if (cj_when_block)
                                 {
+                                    TRACE_S("---->>>> adding when-block");
                                     if (!cJSON_AddItemToArray(vlaue_block_array, cj_when_block))
                                     {
                                         cJSON_Delete(__FUNCTION__, cj_when_block);
@@ -392,7 +399,6 @@ static void __cjson_add_fields(cJSON* cj_block, l_fields_v2_t* fields)
                                 }
                                 curr_when_block = curr_when_block->next;
                             }
-
                             CJSON_TRACE(ezlopi_value_str, vlaue_block_array);
                         }
                         break;
@@ -402,8 +408,8 @@ static void __cjson_add_fields(cJSON* cj_block, l_fields_v2_t* fields)
                         char id_str[32];
                         snprintf(id_str, sizeof(id_str), "%u", (uint32_t)curr_field->field_value.u_value.value_double);
                         #warning "cj_field : empty --->>  'id_str' has not been stored ";
-
-
+                        TRACE_E("house_mode_id :  %s", id_str);
+                        __cjson_add_string(cj_field, ezlopi_value_str, id_str);
                         break;
                     }
                     case EZLOPI_VALUE_TYPE_ARRAY:
