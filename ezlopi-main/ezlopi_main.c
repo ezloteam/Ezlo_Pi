@@ -35,12 +35,22 @@
 
 static void __blinky(void* pv);
 
+static void __print_mac_address(void)
+{
+    uint8_t __base_mac[6] = { 0, 0, 0, 0, 0, 0 };
+
+    esp_read_mac(__base_mac, ESP_MAC_WIFI_STA);
+    dump("base-mac", __base_mac, 0, 6);
+}
+
 void app_main(void)
 {
 
 #ifdef CONFIG_EZPI_UTIL_TRACE_EN
     ezlopi_core_set_log_upcalls();
 #endif  // CONFIG_EZPI_UTIL_TRACE_EN
+
+    __print_mac_address();
 
 #ifdef CONFIG_EZPI_ENABLE_LED_INDICATOR
     ezlopi_service_led_indicator_init();

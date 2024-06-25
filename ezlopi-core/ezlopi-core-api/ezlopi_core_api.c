@@ -25,7 +25,7 @@ cJSON *ezlopi_core_api_consume(const char * who, const char *payload, uint32_t l
                 cJSON *cj_method = cJSON_GetObjectItem(who, cj_request, ezlopi_method_str);
 
 #if (1 == ENABLE_TRACE)
-                TRACE_D("## WS Rx <<<<<<<<<< '%s' \n %.*s", (cj_method ? cj_method->valuestring : ezlopi__str), len, payload);
+                TRACE_I("## WS Rx <<<<<<<<<< '%s' \n %.*s", (cj_method ? cj_method->valuestring : ezlopi__str), len, payload);
 #endif
                 uint32_t method_id = ezlopi_core_ezlopi_methods_search_in_list(cj_method);
 

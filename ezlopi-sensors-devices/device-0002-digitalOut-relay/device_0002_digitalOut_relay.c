@@ -319,7 +319,7 @@ static void __interrupt_upcall(void* arg)
     l_ezlopi_item_t* item = (l_ezlopi_item_t*)arg;
     if (item)
     {
-        TRACE_D("Got interrupt!");
+        TRACE_D("%d -> Got interrupt!", xTaskGetTickCount());
         __toggle_gpio(item);
         ezlopi_device_value_updated_from_device_broadcast(item);
     }

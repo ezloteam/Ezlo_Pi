@@ -168,7 +168,8 @@ static int __init(l_ezlopi_item_t* item)
                 ret = -1;
             }
         }
-        else if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num) &&
+
+        if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num) &&
             (-1 != item->interface.gpio.gpio_in.gpio_num) &&
             (255 != item->interface.gpio.gpio_in.gpio_num))
         {

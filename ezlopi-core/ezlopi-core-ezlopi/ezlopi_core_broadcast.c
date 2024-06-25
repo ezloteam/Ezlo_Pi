@@ -73,11 +73,13 @@ int ezlopi_core_broadcast_cjson(cJSON* cj_data)
     if (cj_data)
     {
         uint32_t buffer_len = 0;
+
+        TRACE_I("%d -> -----------------------------> waiting for static buffer!", xTaskGetTickCount());
         char* data_buffer = ezlopi_core_buffer_acquire(&buffer_len, 5000);
 
         if (data_buffer && buffer_len)
         {
-            TRACE_I("-----------------------------> buffer acquired!");
+            TRACE_I("%d -> -----------------------------> buffer acquired!", xTaskGetTickCount());
             memset(data_buffer, 0, buffer_len);
 
             if (true == cJSON_PrintPreallocated(__FUNCTION__, cj_data, data_buffer, buffer_len, false))
@@ -87,7 +89,7 @@ int ezlopi_core_broadcast_cjson(cJSON* cj_data)
             }
 
             ezlopi_core_buffer_release();
-            TRACE_I("-----------------------------> buffer released!");
+            TRACE_I("%d -> -----------------------------> buffer released!", xTaskGetTickCount());
         }
         else
         {

@@ -27,7 +27,7 @@
 #include "ezlopi_service_webprov.h"
 #include "EZLOPI_USER_CONFIG.h"
 
-#define TEST_PROV 1
+#define TEST_PROV 0
 
 #if (1 == TEST_PROV)
 #include "ezlopi_test_prov.h"
@@ -276,7 +276,11 @@ static void __provision_check(void* pv)
         while (1)
         {
             char http_request_location[500];
+#if (1 == TEST_PROV)
+            snprintf(http_request_location, sizeof(http_request_location), "https://ezlopiesp32.up.mios.com/provision-sync?token=%s&version=%d", provision_token, config_version ? config_version + 1 : 1);
+#else
             snprintf(http_request_location, sizeof(http_request_location), "https://ezlopiesp32.up.mios.com/provision-sync?token=%s&version=%d", provision_token, config_version ? config_version : 1);
+#endif
 
             TRACE_I("Config sync URL : %s", http_request_location);
 

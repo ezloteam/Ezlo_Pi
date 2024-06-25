@@ -17,6 +17,8 @@ int ezlopi_device_value_updated_from_device_broadcast(l_ezlopi_item_t* item)
 {
     int ret = 0;
 
+    TRACE_D("%d -> here", xTaskGetTickCount());
+
     if (item)
     {
         l_ezlopi_device_t* curr_device = ezlopi_device_get_head();
@@ -28,7 +30,10 @@ int ezlopi_device_value_updated_from_device_broadcast(l_ezlopi_item_t* item)
             {
                 if (item == curr_item)
                 {
-                        cJSON* cj_response = __broadcast_message_items_updated_from_device(curr_device, item);
+                    cJSON* cj_response = __broadcast_message_items_updated_from_device(curr_device, item);
+
+                    TRACE_D("%d -> here", xTaskGetTickCount());
+
                     // CJSON_TRACE("----------------- broadcasting - cj_response", cj_response);
                     if (cj_response)
                     {
@@ -36,6 +41,8 @@ int ezlopi_device_value_updated_from_device_broadcast(l_ezlopi_item_t* item)
                         {
                             cJSON_Delete(__FUNCTION__, cj_response);
                         }
+
+                        TRACE_D("%d -> here", xTaskGetTickCount());
                     }
 
                     break;
@@ -201,10 +208,12 @@ int ezlopi_core_device_value_update_wifi_scan_broadcast(cJSON* network_array)
 /// static methods
 static cJSON* __broadcast_message_items_updated_from_device(l_ezlopi_device_t* device, l_ezlopi_item_t* item)
 {
-    cJSON* cjson_response = cJSON_CreateObject(__FUNCTION__);
-    if (cjson_response)
+    cJSON* cjson_response = NULL;
+
+    if (NULL != item && NULL != device)
     {
-        if (NULL != item)
+        cjson_response = cJSON_CreateObject(__FUNCTION__);
+        if (cjson_response)
         {
             cJSON_AddStringToObject(__FUNCTION__, cjson_response, ezlopi_msg_subclass_str, method_hub_item_updated);
             // cJSON_AddNumberToObject(__FUNCTION__, cjson_response, ezlopi_msg_id_str, ezlopi_service_web_provisioning_get_message_count());
