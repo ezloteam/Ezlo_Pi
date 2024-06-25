@@ -150,7 +150,7 @@ static int __0065_init(l_ezlopi_item_t* item)
             {
                 ret = 1;
                 item->interface.gpio.gpio_in.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
-                gpio_isr_service_register_v3(item, __0065_update_from_device, 200);
+                ezlopi_service_gpioisr_register_v3(item, __0065_update_from_device, 200);
             }
             else
             {

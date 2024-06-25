@@ -28,7 +28,7 @@ int ezlopi_device_value_updated_from_device_broadcast(l_ezlopi_item_t* item)
             {
                 if (item == curr_item)
                 {
-                    cJSON* cj_response = __broadcast_message_items_updated_from_device(curr_device, item);
+                        cJSON* cj_response = __broadcast_message_items_updated_from_device(curr_device, item);
                     // CJSON_TRACE("----------------- broadcasting - cj_response", cj_response);
                     if (cj_response)
                     {

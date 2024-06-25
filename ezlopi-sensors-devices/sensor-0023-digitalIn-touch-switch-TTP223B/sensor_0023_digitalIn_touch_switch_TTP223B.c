@@ -90,7 +90,7 @@ static int __init(l_ezlopi_item_t* item)
 
             if (0 == gpio_config(&touch_switch_config)) // ESP_OK
             {
-                gpio_isr_service_register_v3(item, touch_switch_callback, 200);
+                ezlopi_service_gpioisr_register_v3(item, touch_switch_callback, 200);
                 ret = 1;
             }
             else

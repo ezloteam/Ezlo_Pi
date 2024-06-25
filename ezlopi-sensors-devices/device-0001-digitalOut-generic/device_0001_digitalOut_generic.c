@@ -281,6 +281,9 @@ static void __setup_item_properties(l_ezlopi_item_t* item, cJSON* cjson_device)
     CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_pullup_op_str, tmp_var);
     item->interface.gpio.gpio_out.interrupt = GPIO_INTR_DISABLE;
     item->interface.gpio.gpio_out.pull = tmp_var ? GPIO_PULLUP_ONLY : GPIO_PULLDOWN_ONLY;
+
+    TRACE_D("item->interface.gpio.gpio_in.gpio_num:  %u", item->interface.gpio.gpio_in.gpio_num);
+    TRACE_D("item->interface.gpio.gpio_out.gpio_num: %u", item->interface.gpio.gpio_out.gpio_num);
 }
 
 static int __prepare(void* arg)
@@ -417,7 +420,7 @@ static int __init(l_ezlopi_item_t* item)
         TRACE_D("enabling interrup for pin: %d", item->interface.gpio.gpio_in.gpio_num);
 
         gpio_config(&io_conf);
-        gpio_isr_service_register_v3(item, __interrupt_upcall, 1000);
+        ezlopi_service_gpioisr_register_v3(item, __interrupt_upcall, 1000);
         ret = 1;
     }
 
@@ -444,7 +447,7 @@ static int __init(l_ezlopi_item_t* item)
 
             if (0 == gpio_config(&io_conf))
             {
-                gpio_isr_service_register_v3(item, __interrupt_upcall, 1000);
+                ezlopi_service_gpioisr_register_v3(item, __interrupt_upcall, 1000);
                 ret = 1;
             }
             else

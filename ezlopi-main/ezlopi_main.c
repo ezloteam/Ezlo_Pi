@@ -47,7 +47,7 @@ void app_main(void)
 #endif // CONFIG_EZPI_ENABLE_LED_INDICATOR
 
     gpio_install_isr_service(0);
-    gpio_isr_service_init();
+    ezlopi_service_gpioisr_init();
 
     ezlopi_init();
 
