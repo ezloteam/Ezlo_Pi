@@ -76,8 +76,8 @@ int ezlopi_core_scene_edit_update_id(uint32_t scene_id, cJSON* cj_updated_scene)
 
 static void _edit_scene(l_scenes_list_v2_t* scene_node, cJSON* cj_scene)
 {
-    CJSON_GET_VALUE_DOUBLE(cj_scene, ezlopi_enabled_str, scene_node->enabled);
-    CJSON_GET_VALUE_DOUBLE(cj_scene, ezlopi_is_group_str, scene_node->is_group);
+    CJSON_GET_VALUE_BOOL(cj_scene, ezlopi_enabled_str, scene_node->enabled);
+    CJSON_GET_VALUE_BOOL(cj_scene, ezlopi_is_group_str, scene_node->is_group);
     CJSON_GET_VALUE_STRING_BY_COPY(cj_scene, ezlopi_group_id_str, scene_node->group_id);
 
     CJSON_GET_VALUE_STRING_BY_COPY(cj_scene, ezlopi_name_str, scene_node->name);

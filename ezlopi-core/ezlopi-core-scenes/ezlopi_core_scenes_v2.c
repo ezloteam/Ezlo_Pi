@@ -912,7 +912,7 @@ static void _______fields_get_value(l_fields_v2_t* field, cJSON* cj_value)
         }
         case cJSON_Object:
         {
-            if (EZLOPI_VALUE_TYPE_BLOCK == field->value_type)
+            if (EZLOPI_VALUE_TYPE_BLOCK == field->value_type)    // there is only one-blocks [since 'cJSON_Object' ]
             {
                 field->field_value.e_type = VALUE_TYPE_BLOCK;
                 CJSON_TRACE("cj_single_block", cj_value);
@@ -956,13 +956,12 @@ static void _______fields_get_value(l_fields_v2_t* field, cJSON* cj_value)
                 field->field_value.u_value.cj_value = cJSON_Duplicate(__FUNCTION__, cj_value, cJSON_True);
                 break;
             }
-            case EZLOPI_VALUE_TYPE_BLOCK:
-            case EZLOPI_VALUE_TYPE_BLOCKS:
+            case EZLOPI_VALUE_TYPE_BLOCKS:  // there are more than one-blocks [since 'cJSON_Array' ]
             {
                 field->field_value.e_type = VALUE_TYPE_BLOCK;
                 while (NULL != (cj_block = cJSON_GetArrayItem(cj_value, block_idx++)))
                 {
-                    CJSON_TRACE("cj_block", cj_block);
+                    // CJSON_TRACE("cj_block", cj_block);
 
                     if (field->field_value.u_value.when_block)
                     {
