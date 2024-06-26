@@ -43,9 +43,12 @@ typedef enum e_ezlopi_ota_state
     EZLOPI_OTA_STATE_FINISH = 0,
     EZLOPI_OTA_STATE_STARTED,
     EZLOPI_OTA_STATE_UPDATING,
+    EZLOPI_OTA_STATE_FAILED,
     EZLOPI_OTA_STATE_MAX,
 } e_ezlopi_ota_state_t;
 
+
+static int32_t __byte_count = 0;
 static volatile uint32_t __ota_in_process = 0;
 
 static void ezlopi_ota_process(void* pv);
@@ -131,29 +134,28 @@ static void ezlopi_ota_process(void* pv)
     }
 #endif
 
-    if (true == ezlopi_service_ota_get_busy_state())
-    {
-        __ota_in_process = EZLOPI_OTA_STATE_UPDATING;
-    }
+    __byte_count = 0;
 
     esp_err_t ret = esp_https_ota(&config);
     if (ret == ESP_OK)
     {
+        __ota_in_process = EZLOPI_OTA_STATE_FINISH;
         TRACE_W("Firmware Upgrade Successful, restarting !");
         EZPI_CORE_reset_reboot();
     }
     else
     {
+        __ota_in_process = EZLOPI_OTA_STATE_FAILED;
         TRACE_E("Firmware upgrade failed");
     }
-
-    __ota_in_process = EZLOPI_OTA_STATE_FINISH;
 
     ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_CORE_OTA_PROCESS_TASK);
     vTaskDelete(NULL);
 
     if (url)
+    {
         ezlopi_free(__FUNCTION__, url);
+    }
 }
 
 static esp_err_t _http_event_handler(esp_http_client_event_t* evt)
@@ -177,15 +179,17 @@ static esp_err_t _http_event_handler(esp_http_client_event_t* evt)
     }
     case HTTP_EVENT_ON_HEADER:
     {
+        __ota_in_process = EZLOPI_OTA_STATE_STARTED;
         TRACE_D("HTTP_EVENT_ON_HEADER, key=%s, value=%s", evt->header_key, evt->header_value);
         break;
     }
     case HTTP_EVENT_ON_DATA:
     {
-        static int32_t byte_count;
+        __ota_in_process = EZLOPI_OTA_STATE_UPDATING;
+
         TRACE_D("HTTP_EVENT_ON_DATA, len=%d", evt->data_len);
-        byte_count += evt->data_len;
-        TRACE_D("Received Bytes: %d", byte_count);
+        __byte_count += evt->data_len;
+        TRACE_D("Received Bytes: %d", __byte_count);
         break;
     }
     case HTTP_EVENT_ON_FINISH:

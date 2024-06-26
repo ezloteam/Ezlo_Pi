@@ -19,7 +19,7 @@
 #include "EZLOPI_USER_CONFIG.h"
 
 
-static void ezlopi_http_free_rx_data(s_rx_data_t* rx_data);
+static void ezlopi_http_free_rx_data(s_rx_chunk_t* rx_chunks);
 static esp_err_t ezlopi_http_event_handler(esp_http_client_event_t* evt);
 
 #define TAG __FILE__
@@ -464,98 +464,110 @@ void ezlopi_core_http_mbedtls_req(s_ezlopi_core_http_mbedtls_t* config)
 }
 //------------------------------------------------------------------------------------------------------------------------------------------------------
 
-
 s_ezlopi_http_data_t* ezlopi_http_get_request(const char* cloud_url, const char* private_key, const char* shared_key, const char* ca_certificate)
 {
-    char* ret = NULL;
     int status_code = 0;
-    s_rx_data_t* my_data = (s_rx_data_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_rx_data_t));
-    s_ezlopi_http_data_t* http_get_data = NULL;
-    if ((NULL != my_data))
+    s_rx_data_t my_data;
+    s_ezlopi_http_data_t* http_response = NULL;
+
+    memset(&my_data, 0, sizeof(s_rx_data_t));
+
+    esp_http_client_config_t config = {
+        .url = cloud_url,
+        .cert_pem = ca_certificate,
+        .client_cert_pem = shared_key,
+        .client_key_pem = private_key,
+        .event_handler = ezlopi_http_event_handler,
+        .transport_type = HTTP_TRANSPORT_OVER_SSL,
+        .user_data = (void*)(&my_data), // my_data will be filled in 'ezlopi_http_event_handler'
+    };
+
+    esp_http_client_handle_t client = esp_http_client_init(&config);
+    if (NULL != client)
     {
-        memset(my_data, 0, sizeof(s_rx_data_t));
+        esp_err_t err = esp_http_client_perform(client);
+        status_code = esp_http_client_get_status_code(client);
 
-        esp_http_client_config_t config = {
-            .url = cloud_url,
-            .cert_pem = ca_certificate,
-            .client_cert_pem = shared_key,
-            .client_key_pem = private_key,
-            .event_handler = ezlopi_http_event_handler,
-            .transport_type = HTTP_TRANSPORT_OVER_SSL,
-            .user_data = (void*)(my_data), // my_data will be filled in 'ezlopi_http_event_handler'
-        };
+        TRACE_D("get_status_code: %d", status_code);
 
-        esp_http_client_handle_t client = esp_http_client_init(&config);
-        if (NULL != client)
+        http_response = (s_ezlopi_http_data_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_ezlopi_http_data_t));
+        if (http_response)
         {
-            esp_err_t err = esp_http_client_perform(client);
-            status_code = esp_http_client_get_status_code(client);
+            memset(http_response, 0, sizeof(s_ezlopi_http_data_t));
+            http_response->status_code = status_code;
+
             if (err == ESP_OK)
             {
                 while (!esp_http_client_is_complete_data_received(client))
                 {
+                    if (my_data.status < 0)
+                    {
+                        break;
+                    }
+
                     vTaskDelay(50 / portTICK_RATE_MS);
                 }
 
-                if (my_data->total_len)
+                if (my_data.rx_len >= my_data.content_length)
                 {
-                    ret = (char*)ezlopi_malloc(__FUNCTION__, my_data->total_len + 1);
-                    // TRACE_E("Response lent: %d", my_data->total_len);
-                    if (ret)
+                    char * _data_buffer = (char*)ezlopi_malloc(__FUNCTION__, my_data.content_length + 1);
+                    if (_data_buffer)
                     {
-                        s_rx_data_t* cur_d = my_data;
-                        memset(ret, 0, my_data->total_len + 1);
+                        memset(_data_buffer, 0, my_data.content_length + 1);
 
-                        while (cur_d)
+                        s_rx_chunk_t * curr_chunk = my_data.rx_chunks;
+                        uint32_t _copied_len = 0;
+
+                        while (curr_chunk)
                         {
-                            strcat(ret, cur_d->ptr);
-                            TRACE_D("%.*s", cur_d->len, cur_d->ptr);
-                            cur_d = cur_d->next;
+                            // _copied_len += curr_chunk->len;
+                            _copied_len += snprintf(_data_buffer + _copied_len, my_data.content_length + 1 - _copied_len, "%.*s", curr_chunk->len, curr_chunk->ptr);
+                            curr_chunk = curr_chunk->next;
                         }
 
-                        http_get_data = (s_ezlopi_http_data_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_ezlopi_http_data_t));
-                        if (http_get_data)
+                        http_response->response = _data_buffer;
+                        http_response->response_len = strlen(_data_buffer);
+
+                        if (_copied_len == my_data.content_length)
                         {
-                            memset(http_get_data, 0, sizeof(s_ezlopi_http_data_t));
-                            http_get_data->response = ret;
-                            http_get_data->status_code = status_code;
+                            TRACE_S("data received successfully.");
                         }
                     }
+                }
+                else
+                {
+                    TRACE_E("Mismatched Content length and received length!");
                 }
             }
             else
             {
                 TRACE_E("Error perform http request %s", esp_err_to_name(err));
             }
-
-            ezlopi_http_free_rx_data(my_data);
-            esp_http_client_cleanup(client);
         }
+        else
+        {
+            TRACE_D("get_status_code: %d", status_code);
+        }
+
+        ezlopi_http_free_rx_data(my_data.rx_chunks);
+        esp_http_client_cleanup(client);
     }
-    return http_get_data;
+
+    return http_response;
 }
 
 s_ezlopi_http_data_t* ezlopi_http_post_request(const char* cloud_url, const char* location, cJSON* headers, const char* private_key, const char* shared_key, const char* ca_certificate)
 {
-    char* ret = NULL;
-    s_rx_data_t* my_data = (s_rx_data_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_rx_data_t));
     s_ezlopi_http_data_t* http_get_data = ezlopi_malloc(__FUNCTION__, sizeof(s_ezlopi_http_data_t));
-    memset(http_get_data, 0, sizeof(s_ezlopi_http_data_t));
 
-    if (my_data)
+    if (cloud_url && http_get_data)
     {
-        memset(my_data, 0, sizeof(s_rx_data_t));
+        s_rx_data_t my_data;
+        memset(&my_data, 0, sizeof(s_rx_data_t));
 
-        char* uri = ezlopi_malloc(__FUNCTION__, 256);
-        if (uri)
-        {
-            snprintf(uri, 256, "%s/%s", cloud_url, location);
-            TRACE_D("URL: %s", uri);
-        }
-        else
-        {
-            uri = (char*)cloud_url;
-        }
+        char uri[256];
+        snprintf(uri, sizeof(uri), "%s/%s", cloud_url, location ? location : "");
+        TRACE_D("URL: %s", uri);
 
         esp_http_client_config_t config = {
             .url = uri,
@@ -564,7 +576,7 @@ s_ezlopi_http_data_t* ezlopi_http_post_request(const char* cloud_url, const char
             .client_key_pem = private_key,
             .event_handler = ezlopi_http_event_handler,
             .transport_type = HTTP_TRANSPORT_OVER_SSL,
-            .user_data = (void*)(my_data), // my_data will be filled in 'ezlopi_http_event_handler'
+            .user_data = (void*)(&my_data), // my_data will be filled in 'ezlopi_http_event_handler'
         };
 
         esp_http_client_handle_t client = esp_http_client_init(&config);
@@ -584,47 +596,53 @@ s_ezlopi_http_data_t* ezlopi_http_post_request(const char* cloud_url, const char
 
             if (err == ESP_OK)
             {
-                http_get_data->status_code = esp_http_client_get_status_code(client);;
+                http_get_data->status_code = esp_http_client_get_status_code(client);
+
                 while (!esp_http_client_is_complete_data_received(client))
                 {
+                    if (my_data.status < 0)
+                    {
+                        break;
+                    }
+
                     vTaskDelay(10 / portTICK_RATE_MS);
                 }
 
-                if (my_data->total_len)
+                if (my_data.content_length == my_data.rx_len)
                 {
-                    ret = (char*)ezlopi_malloc(__FUNCTION__, my_data->total_len + 1);
+                    char * _tmp_buffer = (char*)ezlopi_malloc(__FUNCTION__, my_data.content_length + 1);
 
-                    if (ret)
+                    if (_tmp_buffer)
                     {
-                        s_rx_data_t* cur_d = my_data;
-                        memset(ret, 0, my_data->total_len + 1);
+                        memset(_tmp_buffer, 0, my_data.content_length + 1);
 
-                        while (cur_d)
+                        s_rx_chunk_t* curr_chunk = my_data.rx_chunks;
+
+                        while (curr_chunk)
                         {
-                            strcat(ret, cur_d->ptr);
-                            TRACE_D("%.*s", cur_d->len, cur_d->ptr);
-                            cur_d = cur_d->next;
+                            strcat(_tmp_buffer, curr_chunk->ptr);
+                            TRACE_D("%.*s", curr_chunk->len, curr_chunk->ptr);
+                            curr_chunk = curr_chunk->next;
                         }
-                    }
 
-                    http_get_data->response = ret;
+                        http_get_data->response = _tmp_buffer;
+                    }
+                }
+                else
+                {
+                    TRACE_E("Mismatched 'Content length' and 'Received length'!");
                 }
             }
             else
             {
                 TRACE_E("Error perform http request %s", esp_err_to_name(err));
-                ezlopi_free(__FUNCTION__, http_get_data);
-                http_get_data = NULL;
             }
 
-            ezlopi_http_free_rx_data(my_data);
+            ezlopi_http_free_rx_data(my_data.rx_chunks);
             esp_http_client_cleanup(client);
         }
-        if (uri)
-        {
-            ezlopi_free(__FUNCTION__, uri);
-        }
     }
+
 
     return http_get_data;
 }
@@ -650,50 +668,85 @@ static esp_err_t ezlopi_http_event_handler(esp_http_client_event_t* evt)
     }
     case HTTP_EVENT_ON_HEADER:
     {
-        TRACE_D("HTTP_EVENT_ON_HEADER, key=%s, value=%s", evt->header_key, evt->header_value);
+        TRACE_D("HTTP_EVENT_ON_HEADER, key=%s, value=%s\r\n", evt->header_key, evt->header_value);
+        if (0 == strcmp("Content-Length", evt->header_key))
+        {
+            s_rx_data_t* my_data = evt->user_data;
+            if (my_data)
+            {
+                my_data->content_length = strtoul(evt->header_value, NULL, 10);
+            }
+        }
         break;
     }
     case HTTP_EVENT_ON_DATA:
     {
-        TRACE_D("HTTP_EVENT_ON_DATA, len=%d, data: %.*s", evt->data_len, evt->data_len, (char*)evt->data);
-        // if (!esp_http_client_is_chunked_response(evt->client))
+        TRACE_D("HTTP_EVENT_ON_DATA, len=%d, data: %.*s\r\n", evt->data_len, evt->data_len, (char*)evt->data);
+
+        s_rx_data_t* my_data = (s_rx_data_t*)evt->user_data;
+        if (my_data)
         {
-            if (evt->user_data)
+            char* tmp_data = (char*)ezlopi_malloc(__FUNCTION__, evt->data_len);
+            if (NULL != tmp_data)
             {
-                char* tmp_data = (char*)ezlopi_malloc(__FUNCTION__, evt->data_len + 1);
-                if (NULL != tmp_data)
+                memcpy(tmp_data, evt->data, evt->data_len);
+
+                if (NULL == my_data->rx_chunks)
                 {
-                    memcpy(tmp_data, evt->data, evt->data_len);
-                    tmp_data[evt->data_len] = '\0';
-
-                    s_rx_data_t* my_data = (s_rx_data_t*)evt->user_data;
-                    if (my_data->len || my_data->total_len || my_data->ptr)
+                    my_data->rx_chunks = ezlopi_malloc(__FUNCTION__, sizeof(s_rx_chunk_t));
+                    if (my_data->rx_chunks)
                     {
-                        s_rx_data_t* cur_dh = my_data;
-                        while (cur_dh->next)
-                        {
-                            cur_dh = cur_dh->next;
-                        }
+                        my_data->rx_chunks->ptr = tmp_data;
+                        my_data->rx_chunks->len = evt->data_len;
+                        my_data->rx_chunks->next = NULL;
 
-                        cur_dh->next = (s_rx_data_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_rx_data_t));
-                        if (cur_dh->next)
-                        {
-                            cur_dh->next->len = evt->data_len;
-                            cur_dh->next->ptr = (char*)tmp_data;
-                            cur_dh->next->total_len = 0;
-                            my_data->total_len += evt->data_len;
-                            cur_dh->next->next = NULL;
-                        }
+                        my_data->rx_len += evt->data_len;
+                        my_data->status = 0;
+                        TRACE_W("chunk-count: 1");
                     }
                     else
                     {
-                        my_data->len = evt->data_len;
-                        my_data->total_len = evt->data_len;
-                        my_data->ptr = (char*)tmp_data;
-                        my_data->next = NULL;
+                        my_data->status = -1;
+                        TRACE_E("malloc-failed!");
+                    }
+                }
+                else
+                {
+                    int count = 1;
+                    s_rx_chunk_t * curr_chunk = my_data->rx_chunks;
+                    while (curr_chunk->next)
+                    {
+                        count += 1;
+                        curr_chunk = curr_chunk->next;
+                    }
+
+                    curr_chunk->next = ezlopi_malloc(__FUNCTION__, sizeof(s_rx_chunk_t));
+                    if (curr_chunk->next)
+                    {
+                        curr_chunk->next->ptr = tmp_data;
+                        curr_chunk->next->len = evt->data_len;
+                        curr_chunk->next->next = NULL;
+
+                        my_data->rx_len += evt->data_len;
+                        my_data->status = 0;
+                        TRACE_W("chunk-count: %d", count + 1);
+                    }
+                    else
+                    {
+                        my_data->status = -1;
+                        TRACE_E("malloc-failed!");
                     }
                 }
             }
+            else
+            {
+                my_data->status = -1;
+                TRACE_E("malloc-failed!");
+            }
+        }
+        else
+        {
+            TRACE_E("my_data: NULL");
         }
 
         break;
@@ -716,22 +769,24 @@ static esp_err_t ezlopi_http_event_handler(esp_http_client_event_t* evt)
         break;
     }
     }
+
+    vTaskDelay(10 / portTICK_RATE_MS);
     return ESP_OK;
 }
 
-static void ezlopi_http_free_rx_data(s_rx_data_t* rx_data)
+static void ezlopi_http_free_rx_data(s_rx_chunk_t* rx_chunks)
 {
-    if (rx_data)
+    if (rx_chunks)
     {
-        if (rx_data->next)
+        if (rx_chunks->next)
         {
-            ezlopi_http_free_rx_data(rx_data->next);
+            ezlopi_http_free_rx_data(rx_chunks->next);
         }
 
-        if (rx_data->ptr)
+        if (rx_chunks->ptr)
         {
-            ezlopi_free(__FUNCTION__, rx_data->ptr);
+            ezlopi_free(__FUNCTION__, rx_chunks->ptr);
         }
-        ezlopi_free(__FUNCTION__, rx_data);
+        ezlopi_free(__FUNCTION__, rx_chunks);
     }
 }

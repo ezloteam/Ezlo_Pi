@@ -30,7 +30,7 @@ void ezlopi_ble_gatts_characteristic_notify(s_gatt_service_t* service, s_gatt_ch
 
 void ezlopi_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t* param)
 {
-    TRACE_I("BLE GATT Event: %s, gatts_if: %d", ezlopi_ble_gatt_event_to_string(event), gatts_if);
+    // TRACE_I("BLE GATT Event: %s, gatts_if: %d", ezlopi_ble_gatt_event_to_string(event), gatts_if);
 
     switch (event)
     {
@@ -39,18 +39,18 @@ void ezlopi_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t ga
         s_gatt_service_t* service = ezlopi_ble_profile_get_by_app_id(param->reg.app_id);
         if (service)
         {
-            TRACE_D("Found app-id: %d", service->app_id);
+            // TRACE_D("Found app-id: %d", service->app_id);
             ezlopi_ble_gap_config_adv_data();
             // ezlopi_ble_gap_config_scan_rsp_data();
 
             service->gatts_if = gatts_if;
             service->status = GATT_STATUS_PROCESSING;
             esp_ble_gatts_create_service(gatts_if, &service->service_id, service->num_handles);
-            TRACE_D("service->num_handles: %d", service->num_handles);
+            // TRACE_D("service->num_handles: %d", service->num_handles);
         }
         else
         {
-            TRACE_D("service is null");
+            TRACE_E("service is null");
         }
         break;
     }
@@ -60,12 +60,12 @@ void ezlopi_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t ga
         service->service_handle = param->create.service_handle;
         service->status = GATT_STATUS_DONE;
         esp_ble_gatts_start_service(service->service_handle);
-        TRACE_D("service->service_handle: %d", service->service_handle);
+        // TRACE_D("service->service_handle: %d", service->service_handle);
         break;
     }
     case ESP_GATTS_START_EVT:
     {
-        TRACE_S("SERVICE_START_EVT, status %d, service_handle %d", param->start.status, param->start.service_handle);
+        // TRACE_S("SERVICE_START_EVT, status %d, service_handle %d", param->start.status, param->start.service_handle);
         s_gatt_service_t* service = ezlopi_ble_profile_get_service_by_gatts_if(gatts_if);
         s_gatt_char_t* char_to_add = ezlopi_ble_profile_get_characterstics_to_init(service);
         if (char_to_add)
@@ -82,8 +82,8 @@ void ezlopi_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t ga
     }
     case ESP_GATTS_ADD_CHAR_EVT:
     {
-        TRACE_S("ADD_CHAR_EVT, status %d,  attr_handle %d, service_handle %d",
-            param->add_char.status, param->add_char.attr_handle, param->add_char.service_handle);
+        // TRACE_S("ADD_CHAR_EVT, status %d,  attr_handle %d, service_handle %d",
+        //     param->add_char.status, param->add_char.attr_handle, param->add_char.service_handle);
 
         s_gatt_service_t* service = ezlopi_ble_profile_get_service_by_gatts_if(gatts_if);
         s_gatt_char_t* char_initiating = ezlopi_ble_profile_get_initiating_characterstics(service);
@@ -126,8 +126,8 @@ void ezlopi_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t ga
     }
     case ESP_GATTS_ADD_CHAR_DESCR_EVT:
     {
-        TRACE_S("ADD_DESCR_EVT, status %d, attr_handle %d, service_handle %d",
-            param->add_char_descr.status, param->add_char_descr.attr_handle, param->add_char_descr.service_handle);
+        // TRACE_S("ADD_DESCR_EVT, status %d, attr_handle %d, service_handle %d",
+        //     param->add_char_descr.status, param->add_char_descr.attr_handle, param->add_char_descr.service_handle);
 
         s_gatt_service_t* service = ezlopi_ble_profile_get_service_by_gatts_if(gatts_if);
         s_gatt_char_t* char_initiating = ezlopi_ble_profile_get_initiating_characterstics(service);

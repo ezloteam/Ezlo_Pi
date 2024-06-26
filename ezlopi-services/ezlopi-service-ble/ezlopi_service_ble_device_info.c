@@ -70,14 +70,14 @@ void ezlopi_ble_service_device_info_init(void)
     uuid.len = ESP_UUID_LEN_16;
     uuid.uuid.uuid16 = BLE_DEVICE_INFO_SERVICE_UUID;
     g_device_info_service = ezlopi_ble_gatt_create_service(BLE_DEVICE_INFO_ID_HANDLE, &uuid);
-    TRACE_W("'provisioning_service' service added to ezlopi-ble-stack");
+    // TRACE_W("'provisioning_service' service added to ezlopi-ble-stack");
 
     uuid.uuid.uuid16 = BLE_DEVICE_INFO_CHAR_UUID;
     uuid.len = ESP_UUID_LEN_16;
     permission = ESP_GATT_PERM_READ;
     properties = ESP_GATT_CHAR_PROP_BIT_READ;
     ezlopi_ble_gatt_add_characteristic(g_device_info_service, &uuid, permission, properties, device_info_read_func, NULL, NULL);
-    TRACE_W("'provisioning_service' character added to ezlopi-ble-stack");
+    // TRACE_W("'provisioning_service' character added to ezlopi-ble-stack");
 
     uuid.uuid.uuid16 = EZPI_BLE_CHAR_API_VERSION_INFO_UUID;
     uuid.len = ESP_UUID_LEN_16;
@@ -201,7 +201,7 @@ static void device_mac_read_func(esp_gatt_value_t* value, esp_ble_gatts_cb_param
     else
     {
         TRACE_E("Value is empty");
-}
+    }
 }
 #endif 
 
@@ -524,7 +524,14 @@ static void EZPI_SERVICE_BLE_ezlo_cloud_info(esp_gatt_value_t* value, esp_ble_ga
             unsigned long long serial_id = ezlopi_factory_info_v3_get_id();
             const char* device_type = ezlopi_factory_info_v3_get_device_type();
 
-            cJSON_AddBoolToObject(__FUNCTION__, cj_ezlopi, ezlopi_provisioned_str, ezlopi_factory_info_v3_get_provisioning_status());
+            if (ezlopi_factory_info_v3_get_provisioning_status() != 1)
+            {
+                cJSON_AddFalseToObject(__FUNCTION__, cj_ezlopi, ezlopi_provisioned_str);
+            }
+            else
+            {
+                cJSON_AddTrueToObject(__FUNCTION__, cj_ezlopi, ezlopi_provisioned_str);
+            }
             cJSON_AddStringToObject(__FUNCTION__, cj_ezlopi, ezlopi_uuid_str, controller_uuid ? controller_uuid : "");
             cJSON_AddStringToObject(__FUNCTION__, cj_ezlopi, ezlopi_uuid_prov_str, provisioning_uuid ? provisioning_uuid : "");
             cJSON_AddStringToObject(__FUNCTION__, cj_ezlopi, ezlopi_type_str, device_type ? device_type : "");

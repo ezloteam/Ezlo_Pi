@@ -1,7 +1,7 @@
 
 #include "ezlopi_util_trace.h"
 
-#include "ezlopi_core_timer.h"
+// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
@@ -72,7 +72,7 @@ static int __get_value_cjson(l_ezlopi_item_t* item, void* arg)
         if (mb1013_args)
         {
             cJSON* cj_result = (cJSON*)arg;
-            ezlopi_valueformatter_float_to_cjson(item, cj_result, mb1013_args->current_value);
+            ezlopi_valueformatter_float_to_cjson(cj_result, mb1013_args->current_value, item->cloud_properties.scale);
             ret = 1;
         }
     }

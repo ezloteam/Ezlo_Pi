@@ -8,10 +8,10 @@
 
 #include "ezlopi_core_modes.h"
 #include "ezlopi_core_devices.h"
+#include "ezlopi_core_broadcast.h"
+#include "ezlopi_core_processes.h"
 #include "ezlopi_core_modes_cjson.h"
 #include "ezlopi_core_cjson_macros.h"
-#include "ezlopi_core_ezlopi_broadcast.h"
-#include "ezlopi_core_processes.h"
 
 #include "ezlopi_service_modes.h"
 // #include "ezlopi_service_webprov.h"
@@ -93,7 +93,7 @@ static void __modes_service(void* pv)
                         cJSON* cj_update = ezlopi_core_modes_cjson_changed();
                         CJSON_TRACE("----------------- broadcasting - cj_update", cj_update);
 
-                        if (0 == ezlopi_core_ezlopi_broadcast_add_to_queue(cj_update))
+                        if (0 == ezlopi_core_broadcast_add_to_queue(cj_update))
                         {
                             cJSON_Delete(__FUNCTION__, cj_update);
                         }

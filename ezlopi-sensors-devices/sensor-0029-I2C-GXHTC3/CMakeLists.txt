@@ -4,7 +4,7 @@ file(GLOB_RECURSE config_src "*.c")
 idf_component_register(SRCS "sensor_0029_I2C_GXHTC3.c" "gxhtc3.c" "${config_src}"
     INCLUDE_DIRS "."
     REQUIRES    ezlopi-util-trace 
-                ezlopi-core-timer 
+                # ezlopi-core-timer 
                 ezlopi-core-cloud
                 ezlopi-core-actions  
                 ezlopi-core-devices 

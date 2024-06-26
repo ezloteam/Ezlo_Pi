@@ -1,7 +1,7 @@
 
 #include "ezlopi_util_trace.h"
 
-#include "ezlopi_core_timer.h"
+// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
@@ -146,7 +146,7 @@ static int __0061_init(l_ezlopi_item_t* item)
             if (ESP_OK == gpio_config(&input_conf))
             {
                 item->interface.gpio.gpio_in.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
-                gpio_isr_service_register_v3(item, _0061_update_from_device, 200);
+                ezlopi_service_gpioisr_register_v3(item, _0061_update_from_device, 200);
                 ret = 1;
             }
             else

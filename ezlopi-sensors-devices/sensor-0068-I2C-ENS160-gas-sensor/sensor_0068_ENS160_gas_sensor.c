@@ -34,7 +34,7 @@
 }\
 */
 
-static uint32_t parent_device_id = 0;
+// static uint32_t parent_device_id = 0;
 static uint32_t aqi_item_id = 0;
 static uint32_t voc_item_id = 0;
 static uint32_t co2_item_id = 0;
@@ -89,15 +89,15 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
     {
       if (item->cloud_properties.item_id == aqi_item_id)
       {
-        ezlopi_valueformatter_uint32_to_cjson(item, cj_params, ens160_sensor->data.aqi);
+        ezlopi_valueformatter_uint32_to_cjson(cj_params, ens160_sensor->data.aqi, item->cloud_properties.scale);
       }
       else if (item->cloud_properties.item_id == voc_item_id)
       {
-        ezlopi_valueformatter_uint32_to_cjson(item, cj_params, ens160_sensor->data.tvoc);
+        ezlopi_valueformatter_uint32_to_cjson(cj_params, ens160_sensor->data.tvoc, item->cloud_properties.scale);
       }
       else if (item->cloud_properties.item_id == co2_item_id)
       {
-        ezlopi_valueformatter_uint32_to_cjson(item, cj_params, ens160_sensor->data.eco2);
+        ezlopi_valueformatter_uint32_to_cjson(cj_params, ens160_sensor->data.eco2, item->cloud_properties.scale);
       }
     }
     else

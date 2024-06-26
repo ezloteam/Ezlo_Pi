@@ -1,7 +1,7 @@
 #include <math.h>
 #include "ezlopi_util_trace.h"
 
-#include "ezlopi_core_timer.h"
+// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
@@ -88,7 +88,7 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
     {
         cJSON* cj_result = (cJSON*)arg;
         double* temperatue_value = (double*)item->user_arg;
-        ezlopi_valueformatter_double_to_cjson(item, cj_result, *temperatue_value);
+        ezlopi_valueformatter_double_to_cjson(cj_result, *temperatue_value, item->cloud_properties.scale);
     }
     return ret;
 }

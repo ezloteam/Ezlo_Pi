@@ -5,7 +5,7 @@ idf_component_register(SRCS "sensor_0025_digitalIn_LDR.c" "${config_src}"
     INCLUDE_DIRS "."
     REQUIRES    ezlopi-util-trace
                 driver
-                ezlopi-core-timer 
+                # ezlopi-core-timer 
                 ezlopi-core-cloud 
                 ezlopi-core-actions 
                 ezlopi-core-devices 

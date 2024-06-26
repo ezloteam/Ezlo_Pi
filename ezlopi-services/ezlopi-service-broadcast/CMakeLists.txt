@@ -24,4 +24,5 @@ idf_component_register(SRCS "ezlopi_service_broadcast.c" "${provisioning_src}"
                 ${EZLOPI_CORE_COMPONENTS} 
                 ${EZLOPI_UTIL_COMPONENTS}
                 ${EZLOPI_CLOUD_COMPONENTS} 
+                ezlopi-service-loop
 )
