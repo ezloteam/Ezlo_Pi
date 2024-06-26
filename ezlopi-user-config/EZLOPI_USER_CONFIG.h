@@ -53,7 +53,7 @@
 
 #define ezlopi_malloc(who, x) malloc(x)
 #define ezlopi_calloc(who, x, y) calloc(x, y)
-#define ezlopi_free(who, x) free(x)
+#define ezlopi_free(who, x) (NULL != x)? free(x) : printf(" ### \n%s[%d] : already_freed \n ###\n",__FILE__,__LINE__ )
 #define ezlopi_realloc(who, x, y) realloc(x, y)
 
 #endif
