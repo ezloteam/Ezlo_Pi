@@ -349,7 +349,7 @@ static int ezlopi_service_uart_parser(const char* data)
     return 1;
 }
 
-static void __uart_loop(void)
+static void __uart_loop(void *arg)
 {
     uint32_t cur_len = 0;
     static uint32_t __rx_len;
@@ -827,7 +827,7 @@ int EZPI_SERV_uart_tx_data(int len, uint8_t* data)
 
 void EZPI_SERV_uart_init(void)
 {
-    ezlopi_service_loop_add("uart-loop", __uart_loop, 1);
+    ezlopi_service_loop_add("uart-loop", __uart_loop, 1, NULL);
 #if 0
     TaskHandle_t __uart_loop_handle = NULL;
     xTaskCreate(__uart_loop, "serv_uart_task", __uart_loop_DEPTH, NULL, configMAX_PRIORITIES, &__uart_loop_handle);

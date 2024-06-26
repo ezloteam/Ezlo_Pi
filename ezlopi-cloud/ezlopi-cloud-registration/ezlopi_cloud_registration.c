@@ -13,19 +13,19 @@
 #include "ezlopi_service_loop.h"
 #include "ezlopi_service_webprov.h"
 
-static void __reg_loop(void);
+static void __reg_loop(void *arg);
 
 static cJSON * cj_reg_data = NULL;
 static const char * __reg_loop_str = "reg-loop";
 
 void registration_init(void)
 {
-    ezlopi_service_loop_add(__reg_loop_str, __reg_loop, 5000);
+    ezlopi_service_loop_add(__reg_loop_str, __reg_loop, 5000, NULL);
 }
 
 void register_repeat(cJSON* cj_request, cJSON* cj_response)
 {
-    ezlopi_service_loop_add(__reg_loop_str, __reg_loop, 5000);
+    ezlopi_service_loop_add(__reg_loop_str, __reg_loop, 5000, NULL);
 }
 
 void registered(cJSON* cj_request, cJSON* cj_response)
@@ -85,7 +85,7 @@ static void __create_reg_packet(void)
     }
 }
 
-static void __reg_loop(void)
+static void __reg_loop(void *arg)
 {
     if (ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 5000, false) <= 0)
     {

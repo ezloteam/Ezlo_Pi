@@ -22,7 +22,7 @@
 #include "ezlopi_core_ping.h"
 #include "ezlopi_core_processes.h"
 
-static void __indicator_LED_loop(void);
+static void __indicator_LED_loop(void *arg);
 
 static e_indicator_led_priority_t __indicator_priority = PRIORITY_CLOUD;
 
@@ -58,72 +58,151 @@ static led_strip_t indicator_led;
 
 #if defined(CONFIG_IDF_TARGET_ESP32S3) || defined(CONFIG_IDF_TARGET_ESP32C3)
 
-static void indicator_RGB_led_fade_out(uint16_t fade_time_ms)
+static int indicator_RGB_led_fade_out(uint16_t fade_time_ms)
 {
-    for (int i = 255; i >= 0; i -= 5)
+    static int _brightness = 255;
+    static uint32_t _time_stamp = 0;
+
+    if ((xTaskGetTickCount() - _time_stamp) >= (fade_time_ms / portTICK_RATE_MS))
     {
-        led_strip_set_brightness(&indicator_led, i);
+        led_strip_set_brightness(&indicator_led, _brightness);
         led_strip_flush(&indicator_led);
-        vTaskDelay(fade_time_ms / portTICK_PERIOD_MS);
+
+        _brightness -= 5;
+        _brightness = (_brightness < 0) ? 255 : _brightness;
+
+        _time_stamp = xTaskGetTickCount();
     }
+
+    return _brightness;
 }
 
-static void indicator_RGB_led_fade_up(uint16_t fade_time_ms)
+static int indicator_RGB_led_fade_up(uint16_t fade_time_ms)
 {
-    for (int i = 0; i < 255; i += 5)
+    static int _brightness = 0;
+    static uint32_t _time_stamp = 0;
+
+    if ((xTaskGetTickCount() - _time_stamp) >= (fade_time_ms / portTICK_RATE_MS))
     {
-        led_strip_set_brightness(&indicator_led, i);
+        led_strip_set_brightness(&indicator_led, _brightness);
         led_strip_flush(&indicator_led);
-        vTaskDelay(fade_time_ms / portTICK_PERIOD_MS);
+
+        _brightness += 5;
+        _brightness = (_brightness > 255) ? 0 : _brightness;
     }
+
+    return _brightness;
 }
 
-static void indicator_LED_fade_red(uint16_t fade_time_ms)
+// fade HIGH-LOW-HIGH
+static int __LED_fade(uint16_t fade_time_ms, rgb_t _color)
 {
-    rgb_t color = {
-            .red = COLOR_GET_RED(DEVICE_POWERED_ON_LED_COLOR),
-            .green = 0,
-            .blue = 0,
-    };
-    led_strip_fill(&indicator_led, 0, indicator_led.length, color);
-    indicator_RGB_led_fade_out(fade_time_ms);
-    indicator_RGB_led_fade_up(fade_time_ms);
+    int ret = 0;
+    static uint32_t _state = 0;
+
+    led_strip_fill(&indicator_led, 0, indicator_led.length, _color);
+
+    if (0 == _state)
+    {
+        if (255 == indicator_RGB_led_fade_out(fade_time_ms)) // we switch state if fade-out is completed once. On completion _brightness reset to 255, which indicates 'cycle complete'
+        {
+            _state = 1;
+        }
+    }
+    else
+    {
+        if (0 == indicator_RGB_led_fade_up(fade_time_ms)) // we switch state if fade-up is completed once. On completion _brightness reset to 0, which indicates 'cycle complete'
+        {
+            ret = 1;
+            _state = 0;
+        }
+    }
+
+    return ret;
 }
 
-static void indicator_LED_fade_green(uint16_t fade_time_ms)
+static int indicator_LED_fade_orange(uint16_t fade_time_ms)
 {
-    rgb_t color = {
-            .red = 0,
-            .green = COLOR_GET_GREEN(DEVICE_POWERED_ON_LED_COLOR),
-            .blue = 0,
+    rgb_t _color = {
+        .red = COLOR_GET_RED(COLOR_DARKORANGE),
+        .green = COLOR_GET_GREEN(COLOR_DARKORANGE),
+        .blue = COLOR_GET_BLUE(COLOR_DARKORANGE),
     };
-    led_strip_fill(&indicator_led, 0, indicator_led.length, color);
-    indicator_RGB_led_fade_out(fade_time_ms);
-    indicator_RGB_led_fade_up(fade_time_ms);
+
+    return __LED_fade(fade_time_ms, _color);
 }
 
-static void indicator_LED_fade_blue(uint16_t fade_time_ms)
+static int indicator_LED_fade_red(uint16_t fade_time_ms)
 {
-    rgb_t color = {
-            .red = 0,
-            .green = 0,
-            .blue = COLOR_GET_BLUE(DEVICE_POWERED_ON_LED_COLOR),
+    rgb_t _color = {
+        .red = COLOR_GET_RED(DEVICE_POWERED_ON_LED_COLOR),
+        .green = 0,
+        .blue = 0,
     };
-    led_strip_fill(&indicator_led, 0, indicator_led.length, color);
-    indicator_RGB_led_fade_out(fade_time_ms);
-    indicator_RGB_led_fade_up(fade_time_ms);
+
+    return __LED_fade(fade_time_ms, _color);
+}
+
+static int indicator_LED_fade_green(uint16_t fade_time_ms)
+{
+    rgb_t _color = {
+        .red = COLOR_GET_GREEN(DEVICE_POWERED_ON_LED_COLOR),
+        .green = 0,
+        .blue = 0,
+    };
+
+    return __LED_fade(fade_time_ms, _color);
+}
+
+static int indicator_LED_fade_blue(uint16_t fade_time_ms)
+{
+    rgb_t _color = {
+        .red = COLOR_GET_BLUE(DEVICE_POWERED_ON_LED_COLOR),
+        .green = 0,
+        .blue = 0,
+    };
+
+    return __LED_fade(fade_time_ms, _color);
 }
 
 static void __indicator_LED_power_on_effect()
 {
-    indicator_LED_fade_red(INDICATOR_LED_FADE_TIME_MS);
-    indicator_LED_fade_green(INDICATOR_LED_FADE_TIME_MS);
-    indicator_LED_fade_blue(INDICATOR_LED_FADE_TIME_MS);
+    static uint32_t _state = 0;
+    // TRACE_D("state: %d", _state);
+
+    switch (_state)
+    {
+    case 0:
+    {
+        if (1 == indicator_LED_fade_red(INDICATOR_LED_FADE_TIME_MS))
+        {
+            _state = 1;
+        }
+        break;
+    }
+    case 1:
+    {
+        if (1 == indicator_LED_fade_green(INDICATOR_LED_FADE_TIME_MS))
+        {
+            _state = 2;
+        }
+        break;
+    }
+    case 2:
+    {
+        if (1 == indicator_LED_fade_blue(INDICATOR_LED_FADE_TIME_MS))
+        {
+            _state = 0;
+        }
+        break;
+    }
+    }
+
 }
 
 static void __indicator_LED_wifi_connected_effect()
 {
-    indicator_LED_fade_red(INDICATOR_LED_FADE_TIME_MS);
+    indicator_LED_fade_orange(INDICATOR_LED_FADE_TIME_MS);
 }
 
 static void __indicator_LED_internet_connected_effect()
@@ -139,6 +218,7 @@ static void __indicator_LED_cloud_connected_effect()
 static int __indicator_led_init(void)
 {
     int ret = 0;
+
     indicator_led.length = 1;
     indicator_led.buf = NULL;
     indicator_led.brightness = 255;
@@ -162,12 +242,7 @@ static int __indicator_led_init(void)
         {
             if (ESP_OK == (err = led_strip_flush(&indicator_led)))
             {
-                ezlopi_service_loop_add("indicator-loop", __indicator_LED_loop, 10);
-#if 0
-                TaskHandle_t ezlopi_service_led_indicator_task_handle = NULL;
-                xTaskCreate(__indicator_LED_loop, "indicator_task", EZLOPI_SERVICE_LED_INDICATOR_TASK_DEPTH, NULL, tskIDLE_PRIORITY, &ezlopi_service_led_indicator_task_handle);
-                ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_LED_INDICATOR_TASK, &ezlopi_service_led_indicator_task_handle, EZLOPI_SERVICE_LED_INDICATOR_TASK_DEPTH);
-#endif
+                ezlopi_service_loop_add("indicator-loop", __indicator_LED_loop, 10, NULL);
                 ret = 1;
             }
         }
@@ -263,7 +338,7 @@ static int __indicator_led_init(void)
         if (ESP_OK == ledc_channel_config(&indicator_pwm_channel_cfg))
         {
             ret = 1;
-            ezlopi_service_loop_add("indicator-loop", __indicator_LED_loop, 1);
+            ezlopi_service_loop_add("indicator-loop", __indicator_LED_loop, 1, NULL);
         }
     }
 
@@ -297,7 +372,7 @@ static void __process_event(void)
     }
 }
 
-static void __indicator_LED_loop(void)
+static void __indicator_LED_loop(void *arg)
 {
     __process_event();
 

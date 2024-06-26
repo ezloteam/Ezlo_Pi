@@ -70,14 +70,14 @@ void ezlopi_ble_service_device_info_init(void)
     uuid.len = ESP_UUID_LEN_16;
     uuid.uuid.uuid16 = BLE_DEVICE_INFO_SERVICE_UUID;
     g_device_info_service = ezlopi_ble_gatt_create_service(BLE_DEVICE_INFO_ID_HANDLE, &uuid);
-    TRACE_W("'provisioning_service' service added to ezlopi-ble-stack");
+    // TRACE_W("'provisioning_service' service added to ezlopi-ble-stack");
 
     uuid.uuid.uuid16 = BLE_DEVICE_INFO_CHAR_UUID;
     uuid.len = ESP_UUID_LEN_16;
     permission = ESP_GATT_PERM_READ;
     properties = ESP_GATT_CHAR_PROP_BIT_READ;
     ezlopi_ble_gatt_add_characteristic(g_device_info_service, &uuid, permission, properties, device_info_read_func, NULL, NULL);
-    TRACE_W("'provisioning_service' character added to ezlopi-ble-stack");
+    // TRACE_W("'provisioning_service' character added to ezlopi-ble-stack");
 
     uuid.uuid.uuid16 = EZPI_BLE_CHAR_API_VERSION_INFO_UUID;
     uuid.len = ESP_UUID_LEN_16;

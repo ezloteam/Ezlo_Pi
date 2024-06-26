@@ -16,12 +16,11 @@
 
 #include "ezlopi_service_loop.h"
 
-
 typedef struct s_loop_node {
+    void *arg;
     f_loop_t loop;
     const char * name;
     uint32_t period_ms;
-
     uint32_t _timer_ms;
 
     struct s_loop_node * next;
@@ -30,9 +29,9 @@ typedef struct s_loop_node {
 static s_loop_node_t * __loop_head = NULL;
 
 static void __loop(void* pv);
-static s_loop_node_t * __create_node(const char * name, f_loop_t loop, uint32_t period_ms);
+static s_loop_node_t * __create_node(const char * name, f_loop_t loop, uint32_t period_ms, void *arg);
 
-void ezlopi_service_loop_add(const char * name, f_loop_t loop, uint32_t period_ms)
+void ezlopi_service_loop_add(const char * name, f_loop_t loop, uint32_t period_ms, void *arg)
 {
     if (loop)
     {
@@ -44,11 +43,11 @@ void ezlopi_service_loop_add(const char * name, f_loop_t loop, uint32_t period_m
                 __loop_node = __loop_node->next;
             }
 
-            __loop_node->next = __create_node(name, loop, period_ms / portTICK_RATE_MS);
+            __loop_node->next = __create_node(name, loop, (period_ms / portTICK_RATE_MS), arg);
         }
         else
         {
-            __loop_head = __create_node(name, loop, period_ms / portTICK_RATE_MS);
+            __loop_head = __create_node(name, loop, (period_ms / portTICK_RATE_MS), arg);
         }
     }
 }
@@ -75,7 +74,7 @@ void ezlopi_service_loop_remove(f_loop_t loop)
                     ezlopi_free(__FUNCTION__, __del_node);
                     break;
                 }
-                
+
                 __loop_node = __loop_node->next;
             }
         }
@@ -103,9 +102,9 @@ static void __loop(void* pv)
             {
                 uint32_t __loop_time = xTaskGetTickCount();
 
-                __loop_node->loop();
+                __loop_node->loop(__loop_node->arg);
                 __loop_node->_timer_ms = xTaskGetTickCount();
-                __loop_time = xTaskGetTickCount() - __loop_time;
+                __loop_time = (xTaskGetTickCount() - __loop_time);
 
                 // TRACE_D("'%s': \t\t %u", __loop_node->name ? __loop_node->name : "", __loop_time);
 
@@ -122,12 +121,13 @@ static void __loop(void* pv)
     }
 }
 
-static s_loop_node_t * __create_node(const char * name, f_loop_t loop, uint32_t period_ms)
+static s_loop_node_t * __create_node(const char * name, f_loop_t loop, uint32_t period_ms, void *arg)
 {
     s_loop_node_t * __loop_node = ezlopi_malloc(__FUNCTION__, sizeof(s_loop_node_t));
 
     if (__loop_node)
     {
+        __loop_node->arg = arg;
         __loop_node->name = name;
         __loop_node->loop = loop;
         __loop_node->_timer_ms = 0;

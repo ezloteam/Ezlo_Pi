@@ -29,7 +29,7 @@ typedef struct s_thread_ctx
 } s_thread_ctx_t;
 
 ///////////// Static functions /////////////////////
-static void __scenes_loop(void);
+static void __scenes_loop(void *arg);
 // static void __scenes_loop(void* pv);
 static char __scene_proto_thread(l_scenes_list_v2_t* scene_node, uint32_t routine_delay_ms);
 
@@ -214,7 +214,7 @@ void ezlopi_scenes_meshbot_init(void)
     {
         // TRACE_D("starting thread process");
         // xTaskCreate(__scenes_loop, "Scene-task", 3 * 2048, NULL, 2, NULL);
-        ezlopi_service_loop_add("meshbot-loop", __scenes_loop, 1000);
+        ezlopi_service_loop_add("meshbot-loop", __scenes_loop, 1000, NULL);
     }
     else
     {
@@ -393,7 +393,7 @@ PT_THREAD(__scene_proto_thread(l_scenes_list_v2_t* scene_node, uint32_t routine_
     PT_END(&ctx->pt);
 }
 
-static void __scenes_loop(void)
+static void __scenes_loop(void *arg)
 {
     l_scenes_list_v2_t* scene_node = ezlopi_scenes_get_scenes_head_v2();
 

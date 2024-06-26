@@ -26,20 +26,20 @@
 #include "ezlopi_service_webprov.h"
 
 
-static void __ota_loop(void);
+static void __ota_loop(void *arg);
 
 
 void ezlopi_service_ota_init(void)
 {
     ezlopi_event_group_set_event(EZLOPI_EVENT_OTA);
-    ezlopi_service_loop_add("ota-loop", __ota_loop, 1000);
+    ezlopi_service_loop_add("ota-loop", __ota_loop, 1000, NULL);
 
     // TaskHandle_t ezlopi_service_ota_process_task_handle = NULL;
     // xTaskCreate(ota_service_process, "ota-service-process", EZLOPI_SERVICE_OTA_PROCESS_TASK_DEPTH, NULL, 2, &ezlopi_service_ota_process_task_handle);
     // ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_OTA_PROCESS_TASK, &ezlopi_service_ota_process_task_handle, EZLOPI_SERVICE_OTA_PROCESS_TASK_DEPTH);
 }
 
-static void __ota_loop(void)
+static void __ota_loop(void *arg)
 {
     if (1 == ezlopi_wait_for_wifi_to_connect(0))
     {

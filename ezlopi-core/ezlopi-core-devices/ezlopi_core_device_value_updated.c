@@ -30,6 +30,8 @@ int ezlopi_device_value_updated_from_device_broadcast(l_ezlopi_item_t* item)
             {
                 if (item == curr_item)
                 {
+                    TRACE_D("%d -> here", xTaskGetTickCount());
+
                     cJSON* cj_response = __broadcast_message_items_updated_from_device(curr_device, item);
 
                     TRACE_D("%d -> here", xTaskGetTickCount());

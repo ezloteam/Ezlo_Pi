@@ -57,15 +57,15 @@ void app_main(void)
 #endif // CONFIG_EZPI_ENABLE_LED_INDICATOR
 
     gpio_install_isr_service(0);
-    ezlopi_service_gpioisr_init();
+
+    ezlopi_service_loop_init();
+    ezlopi_service_gpioisr_init(); // this is time critical, Do not add to loop
 
     ezlopi_init();
 
 #ifdef CONFIG_EZPI_ENABLE_UART_PROVISIONING
     EZPI_SERV_uart_init();
 #endif
-
-    ezlopi_service_loop_init();
 
 #if defined(CONFIG_EZPI_BLE_ENABLE)
     ezlopi_ble_service_init();

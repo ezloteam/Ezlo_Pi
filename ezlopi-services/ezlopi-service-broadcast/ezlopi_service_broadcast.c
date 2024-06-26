@@ -13,7 +13,7 @@
 
 static QueueHandle_t __broadcast_queue = NULL;
 
-static void __broadcast_loop(void);
+static void __broadcast_loop(void *arg);
 static int ezlopi_service_broadcast_send_to_queue(cJSON* cj_broadcast_data);
 
 void ezlopi_service_broadcast_init(void)
@@ -22,7 +22,7 @@ void ezlopi_service_broadcast_init(void)
     if (__broadcast_queue)
     {
         ezlopi_core_broadcast_methods_set_queue(ezlopi_service_broadcast_send_to_queue);
-        ezlopi_service_loop_add("broadcast-loop", __broadcast_loop, 1);
+        ezlopi_service_loop_add("broadcast-loop", __broadcast_loop, 1, NULL);
 
 #if 0
         TaskHandle_t ezlopi_service_broadcast_task_handle = NULL;
@@ -33,7 +33,7 @@ void ezlopi_service_broadcast_init(void)
     }
 }
 
-static void __broadcast_loop(void)
+static void __broadcast_loop(void *arg)
 {
     static cJSON* cj_data = NULL;
     static uint32_t broadcast_wait_start = 0;

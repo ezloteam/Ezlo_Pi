@@ -56,7 +56,7 @@ void ezlopi_ble_service_init(void)
     ezlopi_ble_service_device_info_init();
     ezlopi_ble_service_dynamic_config_init();
 
-    ezlopi_ble_profile_print();
+    // ezlopi_ble_profile_print();
     ezlopi_ble_basic_init();
 
     CHECK_PRINT_ERROR(esp_ble_gatts_app_register(BLE_WIFI_SERVICE_HANDLE), "gatts 'wifi-app' register error");
