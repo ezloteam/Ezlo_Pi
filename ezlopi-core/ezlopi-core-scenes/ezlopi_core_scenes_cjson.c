@@ -166,6 +166,7 @@ cJSON* ezlopi_scene_cjson_get_field(l_fields_v2_t* field_node)
             case EZLOPI_VALUE_TYPE_INT_ARRAY:
             case EZLOPI_VALUE_TYPE_HMS_INTERVAL:
             case EZLOPI_VALUE_TYPE_RGB:
+            case EZLOPI_VALUE_TYPE_OBJECT:
             {
                 cJSON_AddItemToObject(__FUNCTION__, cj_field, ezlopi_value_str, cJSON_Duplicate(__FUNCTION__, field_node->field_value.u_value.cj_value, 1));
                 break;
@@ -483,6 +484,7 @@ static void __cjson_add_fields(cJSON* cj_block, l_fields_v2_t* fields)
                     case EZLOPI_VALUE_TYPE_HMS_INTERVAL:
                     case EZLOPI_VALUE_TYPE_HOUSE_MODE_ID_ARRAY:
                     case EZLOPI_VALUE_TYPE_RGB:
+                    case EZLOPI_VALUE_TYPE_OBJECT:
                     {
                         // "adding reference === duplicating the object";
                         cJSON_AddItemReferenceToObject(__FUNCTION__, cj_field, ezlopi_value_str, curr_field->field_value.u_value.cj_value);

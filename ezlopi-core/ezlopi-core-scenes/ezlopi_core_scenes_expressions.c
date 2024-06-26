@@ -638,7 +638,7 @@ static s_ezlopi_expressions_t* __expressions_create_node(uint32_t exp_id, cJSON*
         if (cj_params)
         {
             cJSON* cj_items = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_items_str);
-            __get_expressions_items(new_exp_node, cj_items);
+            __get_expre     ssions_items(new_exp_node, cj_items);
 
             cJSON* cj_device_item_names = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_device_item_names_str);
             __get_expressions_device_item_names(new_exp_node, cj_device_item_names);

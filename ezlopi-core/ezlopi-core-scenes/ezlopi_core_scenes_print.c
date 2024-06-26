@@ -132,6 +132,7 @@ void ezlopi_print_fields(l_fields_v2_t* fields)
         case EZLOPI_VALUE_TYPE_INT_ARRAY:
         case EZLOPI_VALUE_TYPE_HOUSE_MODE_ID_ARRAY:
         case EZLOPI_VALUE_TYPE_RGB:
+        case EZLOPI_VALUE_TYPE_OBJECT:
         {
             CJSON_TRACE("\t\t\t|-- value", fields->field_value.u_value.cj_value);
             break;

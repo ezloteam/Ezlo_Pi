@@ -10,6 +10,7 @@
 #include "ezlopi_core_reset.h"
 #include "ezlopi_core_devices.h"
 #include "ezlopi_core_scenes_v2.h"
+#include "ezlopi_core_scenes_value.h"
 #include "ezlopi_core_event_group.h"
 #include "ezlopi_core_factory_info.h"
 #include "ezlopi_core_scenes_scripts.h"
@@ -520,7 +521,125 @@ int ezlopi_scene_then_cloud_api(l_scenes_list_v2_t* curr_scene, void* arg)
 }
 int ezlopi_scene_then_set_expression(l_scenes_list_v2_t* curr_scene, void* arg)
 {
-    TRACE_W("Warning: then-method not implemented!");
+    int ret = 0;
+    if (curr_scene)
+    {
+        uint32_t item_id = 0;       /* item */
+        char* expression_name = NULL;
+        char* code_str = NULL;
+        char* value_type = NULL;
+        cJSON* cj_metadata = NULL;
+        cJSON* cj_params = NULL;
+
+        l_action_block_v2_t* curr_then = (l_action_block_v2_t*)arg;
+        if (curr_then)
+        {
+            l_fields_v2_t* curr_field = curr_then->fields;
+            while (curr_field)
+            {
+                if (0 == strncmp(curr_field->name, ezlopi_name_str, 5))
+                {
+                    if ((EZLOPI_VALUE_TYPE_STRING == curr_field->value_type) && (NULL != curr_field->field_value.u_value.value_string))
+                    {
+                        expression_name = curr_field->field_value.u_value.value_string;
+                    }
+                }
+                else if (0 == strncmp(curr_field->name, ezlopi_code_str, 5))
+                {
+                    if ((EZLOPI_VALUE_TYPE_STRING == curr_field->value_type) && (NULL != curr_field->field_value.u_value.value_string))
+                    {
+                        code_str = curr_field->field_value.u_value.value_string;
+                    }
+                }
+                else if (0 == strncmp(curr_field->name, ezlopi_valueType_str, 10))
+                {
+                    if ((EZLOPI_VALUE_TYPE_STRING == curr_field->value_type) && (NULL != curr_field->field_value.u_value.value_string))
+                    {
+                        value_type = curr_field->field_value.u_value.value_string;
+                    }
+                }
+                if (0 == strncmp(curr_field->name, ezlopi_metadata_str, 9))
+                {
+                    if ((EZLOPI_VALUE_TYPE_OBJECT == curr_field->value_type) && (NULL != curr_field->field_value.u_value.cj_value))
+                    {
+                        cj_metadata = curr_field->field_value.u_value.cj_value;
+                        CJSON_TRACE("params", cj_metadata);
+                    }
+                }
+                else if (0 == strncmp(curr_field->name, ezlopi_params_str, 7))
+                {
+                    if ((EZLOPI_VALUE_TYPE_EXPRESSION == curr_field->value_type) && (NULL != curr_field->field_value.u_value.cj_value))
+                    {
+                        cj_params = curr_field->field_value.u_value.cj_value;
+                        CJSON_TRACE("params", cj_params);
+                    }
+                }
+                curr_field = curr_field->next;
+            }
+        }
+
+        if (expression_name)
+        {
+            s_ezlopi_expressions_t* curr_expr = ezlopi_scenes_get_expression_node_by_name(expression_name);
+            if (curr_expr)
+            {
+                // 1. set new code
+                if (code_str)
+                {
+                    if (NULL != curr_expr->code)
+                    {
+                        ezlopi_free(__FUNCTION__, curr_expr->code);
+                        curr_expr->code = NULL;
+                    }
+                    curr_expr->code = ezlopi_malloc(__FUNCTION__, strlen(code_str) + 1);
+                    if (curr_expr->code)
+                    {
+                        snprintf(curr_expr->code, strlen(code_str) + 1, "%.*s", strlen(code_str), code_str);
+                    }
+                }
+
+                // 2. set new valueType
+                if (value_type)
+                {
+                    curr_expr->value_type = ezlopi_scene_get_scene_value_type_enum(value_type);
+                }
+
+                // 3. replace metadata CJSON
+                if (cj_metadata)
+                {
+                    if (NULL != curr_expr->meta_data)
+                    {
+                        cJSON_Delete(__FUNCTION__, curr_expr->meta_data);
+                    }
+
+                    curr_expr->meta_data = cJSON_Duplicate(__FUNCTION__, cj_metadata, 1);
+                }
+
+                // 4. replace Params CJSON
+                if (cj_params)
+                {
+
+
+                    ezlopi_scenes_expressions_delete_exp_device_item_names(curr_expr->device_item_names);
+                    cJSON* cj_new_items = NULL;
+                    if ((NULL != curr_expr->items) && (NULL != (cj_new_items = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_items_str))))
+                    {
+                        ezlopi_scenes_expressions_delete_exp_item(curr_expr->items);
+                        
+
+                    }
+                    if (NULL != curr_expr->item)
+                    {
+                        cJSON_Delete(__FUNCTION__, curr_expr->meta_data);
+                    }
+
+                    curr_expr->meta_data = cJSON_Duplicate(__FUNCTION__, cj_metadata, 1);
+                }
+            }
+        }
+
+
+    }
     return 0;
 }
 int ezlopi_scene_then_set_variable(l_scenes_list_v2_t* curr_scene, void* arg)
