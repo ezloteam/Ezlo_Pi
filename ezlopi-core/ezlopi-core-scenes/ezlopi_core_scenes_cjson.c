@@ -64,6 +64,8 @@ cJSON* ezlopi_scene_cjson_get_field(l_fields_v2_t* field_node)
                 __cjson_add_string(cj_field, ezlopi_value_str, field_node->field_value.u_value.value_string);
                 break;
             }
+            case EZLOPI_VALUE_TYPE_BLOCK:
+                TRACE_E(" extracting : __ EZLOPI_VALUE_TYPE_BLOCK __");
             case EZLOPI_VALUE_TYPE_BLOCKS:
             {
                 cJSON* vlaue_block_array = cJSON_AddArrayToObject(__FUNCTION__, cj_field, ezlopi_value_str);
@@ -376,22 +378,16 @@ static void __cjson_add_fields(cJSON* cj_block, l_fields_v2_t* fields)
                         cJSON* vlaue_block_array = cJSON_AddArrayToObject(__FUNCTION__, cj_field, ezlopi_value_str);
                         if (vlaue_block_array)
                         {
-                            TRACE_E("Here!! found block_value_array");
-                            if (curr_field->field_value.u_value.cj_value)
-                            {
-                                CJSON_TRACE(ezlopi_value_str, curr_field->field_value.u_value.cj_value);
-                            }
                             l_when_block_v2_t* curr_when_block = curr_field->field_value.u_value.when_block;// cj_value?
                             while (curr_when_block)
                             {
-                                TRACE_S("Here!! found block_value_array");
-                                cJSON* cj_when_block = NULL;
-                                // ezlopi_scenes_cjson_create_when_block(curr_when_block);
+                                TRACE_S("Here!! found when - block");
 
-                                #warning "cj_when_block == NULL";
+                                cJSON* cj_when_block = NULL;
+                                cj_when_block = ezlopi_scenes_cjson_create_when_block(curr_when_block);
                                 if (cj_when_block)
                                 {
-                                    TRACE_S("---->>>> adding when-block");
+                                    TRACE_S("---->> adding when-block");
                                     if (!cJSON_AddItemToArray(vlaue_block_array, cj_when_block))
                                     {
                                         cJSON_Delete(__FUNCTION__, cj_when_block);
@@ -407,7 +403,6 @@ static void __cjson_add_fields(cJSON* cj_block, l_fields_v2_t* fields)
                     {
                         char id_str[32];
                         snprintf(id_str, sizeof(id_str), "%u", (uint32_t)curr_field->field_value.u_value.value_double);
-                        #warning "cj_field : empty --->>  'id_str' has not been stored ";
                         TRACE_E("house_mode_id :  %s", id_str);
                         __cjson_add_string(cj_field, ezlopi_value_str, id_str);
                         break;
@@ -419,7 +414,7 @@ static void __cjson_add_fields(cJSON* cj_block, l_fields_v2_t* fields)
                     case EZLOPI_VALUE_TYPE_HMS_INTERVAL:
                     case EZLOPI_VALUE_TYPE_HOUSE_MODE_ID_ARRAY:
                     {
-                        // #warning "adding reference vs duplicating the object?";
+                        // "adding reference === duplicating the object";
                         cJSON_AddItemReferenceToObject(__FUNCTION__, cj_field, ezlopi_value_str, curr_field->field_value.u_value.cj_value);
                         break;
                     }

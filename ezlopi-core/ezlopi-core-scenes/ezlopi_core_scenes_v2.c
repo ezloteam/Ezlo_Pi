@@ -956,12 +956,13 @@ static void _______fields_get_value(l_fields_v2_t* field, cJSON* cj_value)
                 field->field_value.u_value.cj_value = cJSON_Duplicate(__FUNCTION__, cj_value, cJSON_True);
                 break;
             }
+            case EZLOPI_VALUE_TYPE_BLOCK:
             case EZLOPI_VALUE_TYPE_BLOCKS:
             {
                 field->field_value.e_type = VALUE_TYPE_BLOCK;
                 while (NULL != (cj_block = cJSON_GetArrayItem(cj_value, block_idx++)))
                 {
-                    // CJSON_TRACE("cj_block", cj_block);
+                    CJSON_TRACE("cj_block", cj_block);
 
                     if (field->field_value.u_value.when_block)
                     {

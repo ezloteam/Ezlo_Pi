@@ -56,13 +56,11 @@ void ezlopi_print_fields(l_fields_v2_t* fields)
         case EZLOPI_VALUE_TYPE_HOUSE_MODE_ID:
         {
             TRACE_D("\t\t\t|-- value: %d", (int)fields->field_value.u_value.value_double);
-            // TRACE_D("\t\t\t|-- value: %f", fields->field_value.u_value.value_double);
             break;
         }
         case EZLOPI_VALUE_TYPE_BOOL:
         {
             TRACE_D("\t\t\t|-- value: [%d]%s", fields->field_value.u_value.value_bool, fields->field_value.u_value.value_bool ? ezlopi_true_str : ezlopi_false_str);
-            // TRACE_D("\t\t\t|-- value: [%d]%s", fields->field_value.u_value.value_bool, fields->field_value.u_value.value_bool ? ezlopi_true_str : ezlopi_false_str);
             break;
         }
         case EZLOPI_VALUE_TYPE_FLOAT:
