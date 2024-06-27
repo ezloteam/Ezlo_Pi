@@ -32,7 +32,7 @@ static void __ota_loop(void *arg);
 void ezlopi_service_ota_init(void)
 {
     ezlopi_event_group_set_event(EZLOPI_EVENT_OTA);
-    ezlopi_service_loop_add("ota-loop", __ota_loop, 1000, NULL);
+    ezlopi_service_loop_add("ota-loop", __ota_loop, 30000, NULL);
 
     // TaskHandle_t ezlopi_service_ota_process_task_handle = NULL;
     // xTaskCreate(ota_service_process, "ota-service-process", EZLOPI_SERVICE_OTA_PROCESS_TASK_DEPTH, NULL, 2, &ezlopi_service_ota_process_task_handle);
@@ -41,16 +41,16 @@ void ezlopi_service_ota_init(void)
 
 static void __ota_loop(void *arg)
 {
-    if (1 == ezlopi_wait_for_wifi_to_connect(0))
+    if (1 == ezlopi_event_group_wait_for_event(EZLOPI_EVENT_WIFI_CONNECTED, 0, false))
     {
         // TRACE_D("here");
         if (1 == ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 0, false))
         {
-            TRACE_D("OTA - Got reg event.");
+            // TRACE_D("OTA - Got reg event.");
             static uint32_t __ota_time_stamp = 0;
-            int ret_ota = ezlopi_event_group_wait_for_event(EZLOPI_EVENT_OTA, 86400 * 1000, 1); // 86400 seconds in a day (24 hrs)
+            int ret_ota = ezlopi_event_group_wait_for_event(EZLOPI_EVENT_OTA, 0, true);
 
-            if ((-1 != ret_ota) || ((xTaskGetTickCount() - __ota_time_stamp) > (86400 * 1000 / portTICK_RATE_MS)))
+            if ((ret_ota > 0) || ((xTaskGetTickCount() - __ota_time_stamp) > (86400 * 1000 / portTICK_RATE_MS))) // 86400 seconds in a day (24 hrs)
             {
                 cJSON* cj_firmware_info_request = firmware_send_firmware_query_to_nma_server(esp_random());
 

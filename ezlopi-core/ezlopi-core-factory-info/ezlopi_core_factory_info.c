@@ -344,6 +344,8 @@ unsigned long long ezlopi_factory_info_v3_get_id(void)
         {
             _id |= tmp_id_arr[i] << (i * 8);
         }
+
+        dump("serial-id", tmp_id_arr, 0, 8);
     }
     else
     {

@@ -54,6 +54,8 @@ static int __ezlopi_core_scenes_then_sendhttp_relloc_header(s_ezlopi_core_http_m
     } while (retry > 0);
     return ret;
 }
+
+#if 0
 /**
  * @brief Function to extract "web_host" from "field_value_string".
  */
@@ -106,6 +108,8 @@ static void __ezlopi_core_scenes_then_sendhttp_parse_host_name(s_ezlopi_core_htt
         }
     }
 }
+#endif
+
 /**
  * @brief Function to Clear and Malloc the header_member (within 's_ezlopi_core_http_mbedtls_t') only.
  * @return Size of content in 's_ezlopi_core_http_mbedtls_t'->header
@@ -190,17 +194,93 @@ void parse_http_url(s_ezlopi_core_http_mbedtls_t* tmp_http_data, l_fields_v2_t* 
         tmp_http_data->url_maxlen = (uint16_t)ezlopi_core_http_mem_malloc(&(tmp_http_data->url), field_value_string);
         if (tmp_http_data->url_maxlen > 0)
         {
-            tmp_http_data->web_port = ((NULL != strstr(field_value_string, "https")) ? 443 : 80);
             //--------------------------------------------
-            __ezlopi_core_scenes_then_sendhttp_parse_host_name(tmp_http_data, field_value_string);
+            // tmp_http_data->web_port = ((NULL != strstr(field_value_string, "https")) ? 443 : 80);
+            // __ezlopi_core_scenes_then_sendhttp_parse_host_name(tmp_http_data, field_value_string);
             //--------------------------------------------
+
+            // tests[0] = "http://www.testhttp.com:8090/foo_page";
+            // tests[1] = "https://www.testhttp.com:8090/foo_page";
+            // tests[2] = "http://www.testhttp.com/foo_page";
+            // tests[3] = "https://www.testhttp.com/foo_page";
+            // tests[4] = "http://www.testhttp.com:8090";
+            // tests[5] = "https://www.testhttp.com:8090";
+            // tests[6] = "http://www.testhttp.com";
+            // tests[7] = "https://www.testhttp.com";
+            int succ_parsing = 0; // Whether the parsing has been
+            int port = 80;  // Port field of the HTTP uri if found
+            char host[100] = { 0 }; // IP field of the HTTP uri
+            char page[200] = { 0 }; // Page field of the uri if found
+            if (sscanf(field_value_string, "http://%99[^:]:%i/%199[^\n]", host, &port, page) == 3)
+            {
+                succ_parsing = 1;
+            }
+            else if (sscanf(field_value_string, "https://%99[^:]:%i/%199[^\n]", host, &port, page) == 3)
+            {
+                // port = 443;
+                succ_parsing = 1;
+            }
+            else if (sscanf(field_value_string, "http://%99[^:]:%i[^\n]", host, &port) == 2)
+            {
+                succ_parsing = 1;
+            }
+            else if (sscanf(field_value_string, "https://%99[^:]:%i[^\n]", host, &port) == 2)
+            {
+                // port = 443;
+                succ_parsing = 1;
+            }
+            else if (sscanf(field_value_string, "http://%99[^/]/%199[^\n]", host, page) == 2)
+            {
+                succ_parsing = 1;
+            }
+            else if (sscanf(field_value_string, "https://%99[^/]/%199[^\n]", host, page) == 2)
+            {
+                port = 443;
+                succ_parsing = 1;
+            }
+            else if (sscanf(field_value_string, "http://%99[^\n]", host) == 1)
+            {
+                succ_parsing = 1;
+            }
+            else if (sscanf(field_value_string, "https://%99[^\n]", host) == 1)
+            {
+                port = 443;
+                succ_parsing = 1;
+            }
+            else if (sscanf(field_value_string, "%*[^:]%*[:/]%[^:]:%d%s", host, &port, page) == 3)
+            {
+                succ_parsing = 1;
+            }
+            else
+            {
+                TRACE_E("ERROR !! Unknown REQUEST-format. ");
+            }
+
+
+            TRACE_W("url scan status: %d\n", succ_parsing);
+
+            if (succ_parsing)
+            {
+                TRACE_D("*source = '%s'", field_value_string);
+                TRACE_S("host = '%s'", host);
+                TRACE_S("port = '%d'", port);
+                TRACE_S("page = '%s'", page);
+
+                tmp_http_data->web_server_maxlen = (uint16_t)ezlopi_core_http_mem_malloc(&(tmp_http_data->web_server), host);
+                tmp_http_data->targe_page_maxlen = (uint16_t)ezlopi_core_http_mem_malloc(&(tmp_http_data->target_page), page);
+                tmp_http_data->web_port = port;
+            }
+            else
+            {
+                TRACE_E("failed to parse URL");
+            }
 
             int content_size = __ezlopi_core_scenes_then_create_fresh_header(tmp_http_data);
             if (content_size > 0) // if this characters exsists in the 'tmp_http_data->header'
             {
                 // 1. adding 'host' to header-buffer
                 // TRACE_W("Appending!! webserver -> header");
-                __ezlopi_core_scenes_then_append_to_header(tmp_http_data, "Host", tmp_http_data->web_server);
+                __ezlopi_core_scenes_then_append_to_header(tmp_http_data, "Host", host);
             }
             else
             {
@@ -332,7 +412,8 @@ void parse_http_creds(s_ezlopi_core_http_mbedtls_t* tmp_http_data, l_fields_v2_t
 void free_http_mbedtls_struct(s_ezlopi_core_http_mbedtls_t* config)
 {
     FREE_PTR_IF_NOT_NULL(config->url);
-    FREE_PTR_IF_NOT_NULL(config->web_server);
+    FREE_PTR_IF_NOT_NULL(config->web_server);   
+    FREE_PTR_IF_NOT_NULL(config->target_page);
     FREE_PTR_IF_NOT_NULL(config->header);
     FREE_PTR_IF_NOT_NULL(config->content);
     FREE_PTR_IF_NOT_NULL(config->username);

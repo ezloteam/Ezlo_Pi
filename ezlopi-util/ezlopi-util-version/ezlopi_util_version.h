@@ -11,8 +11,8 @@ extern "C" {
 #define MAJOR 3
 #define MINOR 5
 #define BATCH 9
-#define BUILD 189
-#define VERSION_STR "3.5.9"
+#define BUILD 190
+#define VERSION_STR "4.1.1"
 #define DEVELOPER "krishna.kumar@ezlo.com"
 #define COMPILE_TIME "Tue 28 May 2024 05:20:23 PM +0545"
 #define CURRENT_BRANCH "development"

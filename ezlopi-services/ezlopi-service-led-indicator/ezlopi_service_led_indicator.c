@@ -124,9 +124,9 @@ static int __LED_fade(uint16_t fade_time_ms, rgb_t _color)
 static int indicator_LED_fade_orange(uint16_t fade_time_ms)
 {
     rgb_t _color = {
-        .red = COLOR_GET_RED(COLOR_DARKORANGE),
-        .green = COLOR_GET_GREEN(COLOR_DARKORANGE),
-        .blue = COLOR_GET_BLUE(COLOR_DARKORANGE),
+        .red = COLOR_GET_RED(COLOR_YELLOW),
+        .green = COLOR_GET_GREEN(COLOR_YELLOW),
+        .blue = COLOR_GET_BLUE(COLOR_YELLOW),
     };
 
     return __LED_fade(fade_time_ms, _color);
@@ -146,8 +146,8 @@ static int indicator_LED_fade_red(uint16_t fade_time_ms)
 static int indicator_LED_fade_green(uint16_t fade_time_ms)
 {
     rgb_t _color = {
-        .red = COLOR_GET_GREEN(DEVICE_POWERED_ON_LED_COLOR),
-        .green = 0,
+        .red = 0,
+        .green = COLOR_GET_GREEN(DEVICE_POWERED_ON_LED_COLOR),
         .blue = 0,
     };
 
@@ -157,9 +157,9 @@ static int indicator_LED_fade_green(uint16_t fade_time_ms)
 static int indicator_LED_fade_blue(uint16_t fade_time_ms)
 {
     rgb_t _color = {
-        .red = COLOR_GET_BLUE(DEVICE_POWERED_ON_LED_COLOR),
+        .red = 0,
         .green = 0,
-        .blue = 0,
+        .blue = COLOR_GET_BLUE(DEVICE_POWERED_ON_LED_COLOR),
     };
 
     return __LED_fade(fade_time_ms, _color);
@@ -351,6 +351,7 @@ static int __indicator_led_init(void)
 static void __process_event(void)
 {
     e_ezlopi_event_t event = ezlopi_get_event_bit_status();
+
     __indicator_priority = PRIORITY_POWER;
     if ((event & EZLOPI_EVENT_WIFI_CONNECTED) == EZLOPI_EVENT_WIFI_CONNECTED)
     {
@@ -375,6 +376,8 @@ static void __process_event(void)
 static void __indicator_LED_loop(void *arg)
 {
     __process_event();
+
+    // TRACE_D("__indicator_priority: %d", __indicator_priority);
 
     switch (__indicator_priority)
     {

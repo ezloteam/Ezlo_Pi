@@ -18,7 +18,7 @@ void ezlopi_scenes_populate_scene(l_scenes_list_v2_t* new_scene, cJSON* cj_scene
         new_scene->status = EZLOPI_SCENE_STATUS_STOPPED;
 
         CJSON_GET_VALUE_BOOL(cj_scene, ezlopi_enabled_str, new_scene->enabled);
-        CJSON_GET_VALUE_DOUBLE(cj_scene, ezlopi_is_group_str, new_scene->is_group);
+        CJSON_GET_VALUE_BOOL(cj_scene, ezlopi_is_group_str, new_scene->is_group);
 
         CJSON_GET_VALUE_STRING_BY_COPY(cj_scene, ezlopi_group_id_str, new_scene->group_id);
         CJSON_GET_VALUE_STRING_BY_COPY(cj_scene, ezlopi_name_str, new_scene->name);
@@ -269,6 +269,12 @@ void ezlopi_scenes_populate_assign_when_block(l_when_block_v2_t* new_when_block,
 {
     if (new_when_block)
     {
+        CJSON_GET_VALUE_STRING_BY_COPY(cj_when_block, ezlopi_blockId_str, new_when_block->blockId);
+        if (NULL != new_when_block->blockId)
+        {
+            TRACE_D("when_blockId: %s", new_when_block->blockId);
+        }
+
         cJSON* cj_block_options = cJSON_GetObjectItem(__FUNCTION__, cj_when_block, ezlopi_blockOptions_str);
         if (cj_block_options)
         {

@@ -116,8 +116,13 @@ const char *method_hub_reboot = "hub.reboot";
 // const  char *method_hub_network_enabled_set = "hub.network.enabled.set";
 // const  char *method_hub_detection_devices_scan_start = "hub.detection.devices.scan.start";
 // const  char *method_hub_detection_devices_scans_top = "hub.detection.devices.scan.stop";
-const char *method_hub_scene_run_progress = "hub.scene.run.progress";   
+const char *method_hub_scene_run_progress = "hub.scene.run.progress";
 const char *ezlopi_rpc_method_notfound_str = "rpc.method.notfound";
+
+const char *ezlopi_hub_expression_added_str = "hub.expression.added";
+const char *ezlopi_hub_expression_changed_str = "hub.expression.changed";
+const char *ezlopi_hub_expression_deleted_str = "hub.expression.deleted";
+
 const char *ezlopi_hub_scene_changed_str = "hub.scene.changed";
 const char *ezlopi_hub_scene_added_str = "hub.scene.added";
 const char *ezlopi_hub_scene_deleted_str = "hub.scene.deleted";

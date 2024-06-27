@@ -708,7 +708,7 @@ static char* device_info_jsonify(void)
 {
     #warning "This info will be only available till Version 3.4.6 !"
 
-        char* device_info = NULL;
+    char* device_info = NULL;
     cJSON* root = cJSON_CreateObject(__FUNCTION__);
     if (root)
     {

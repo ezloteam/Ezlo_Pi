@@ -40,7 +40,7 @@ static uint32_t message_counter = 0;
 static xTaskHandle _task_handle = NULL;
 static TaskHandle_t __web_socket_initialize_handler = NULL;
 
-static uint8_t __provision_update(char* arg);
+static int __provision_update(char* arg);
 
 static void __provision_check(void* pv);
 static void __fetch_wss_endpoint(void* pv);
@@ -122,6 +122,8 @@ static void __fetch_wss_endpoint(void* pv)
         TRACE_D("http_request: %s", http_request);
 
         s_ezlopi_http_data_t * ws_endpoint = ezlopi_http_get_request(http_request, ssl_private_key, ssl_shared_key, ca_certificate);
+        // s_ezlopi_http_data_t * ws_endpoint = ezlopi_http_get_request(http_request, NULL, NULL, NULL);
+
         if (ws_endpoint)
         {
             if (ws_endpoint->response)
@@ -300,7 +302,13 @@ static void __provision_check(void* pv)
                 {
                     if (response->response)
                     {
-                        if (0 == __provision_update(response->response))
+                        int _update_ret = __provision_update(response->response);
+
+                        if (_update_ret > 0)
+                        {
+                            EZPI_CORE_reset_reboot();
+                        }
+                        else if (_update_ret < 0)
                         {
                             retry_count++;
                             if (retry_count >= 5)
@@ -311,7 +319,7 @@ static void __provision_check(void* pv)
                         else
                         {
                             flag_break_loop = 1;
-                            EZPI_CORE_reset_reboot();
+                            TRACE_W("Data not available on cloud!");
                         }
 
                         ezlopi_factory_info_v3_free(response->response);
@@ -362,14 +370,15 @@ static void __provision_check(void* pv)
     vTaskDelete(NULL);
 }
 
-static uint8_t __provision_update(char* arg)
+static int __provision_update(char* arg)
 {
-    uint8_t ret = 0;
+    int ret = 0;
     cJSON* cj_root_prov_data = cJSON_Parse(__FUNCTION__, arg);
 
     if (NULL != cj_root_prov_data)
     {
         cJSON * cj_root_data = cJSON_GetObjectItem(__FUNCTION__, cj_root_prov_data, ezlopi_data_str);
+        cJSON * cj_error_code = cJSON_GetObjectItem(__FUNCTION__, cj_root_prov_data, "error_code");
 
         if (NULL != cj_root_data)
         {
@@ -459,17 +468,24 @@ static uint8_t __provision_update(char* arg)
                 ezlopi_factory_info_v3_set_ca_cert(cj_ca_certificate);
             }
         }
+        else if (cj_error_code && cj_error_code->string)
+        {
+            ret = 0;
+        }
         else
         {
-            TRACE_E("key \"data\" not found.\n");
+            ret = -1;
+            TRACE_E("key \"%s\" not found.\n", cj_root_prov_data);
         }
 
         cJSON_Delete(__FUNCTION__, cj_root_prov_data);
     }
     else
     {
+        ret = -1;
         TRACE_E("Failed parsing JSON .\n");
     }
+
     return ret;
 }
 #endif // CONFIG_EZPI_WEBSOCKET_CLIENT
