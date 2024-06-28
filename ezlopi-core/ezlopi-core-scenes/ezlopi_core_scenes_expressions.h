@@ -85,6 +85,23 @@ void ezlopi_scenes_expressions_init(void);
 uint32_t ezlopi_scenes_expressions_add_to_head(uint32_t exp_id, cJSON* cj_expression);
 
 /**
+ * @brief Populate 'items' information contained within 'params' , of the new expresssion
+ *
+ * @param exp_node ptr to new_expression
+ * @param cj_items CJSON containing :- items_ll
+ */
+void __get_expressions_items(s_ezlopi_expressions_t* exp_node, cJSON* cj_items);
+
+
+/**
+ * @brief Populate 'device_item_names' information contained within 'params' , of the new expresssion
+ *
+ * @param exp_node ptr to new_expression
+ * @param cj_items CJSON containing :- device_item_names_ll
+ */
+void __get_expressions_device_item_names(s_ezlopi_expressions_t* exp_node, cJSON* cj_device_item_names);
+
+/**
  * @brief POP the expression from linklist
  *
  * @return s_ezlopi_expressions_t*

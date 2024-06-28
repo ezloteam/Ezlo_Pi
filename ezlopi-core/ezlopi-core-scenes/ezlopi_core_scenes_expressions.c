@@ -18,10 +18,10 @@ static s_ezlopi_expressions_t* l_expressions_head = NULL;
 static uint32_t __expression_store_to_nvs(uint32_t exp_id, cJSON* cj_expression);
 static void __get_expressions_value(s_ezlopi_expressions_t* exp_node, cJSON* cj_value, e_scene_value_type_v2_t value_type);
 static s_exp_items_t* __expressions_items_create(cJSON* cj_item);
-static void __get_expressions_items(s_ezlopi_expressions_t* exp_node, cJSON* cj_items);
+void __get_expressions_items(s_ezlopi_expressions_t* exp_node, cJSON* cj_items);
 
 static s_exp_device_item_names_t* __expressions_device_item_names_create(cJSON* cj_device_item_name);
-static void __get_expressions_device_item_names(s_ezlopi_expressions_t* exp_node, cJSON* cj_device_item_names);
+void __get_expressions_device_item_names(s_ezlopi_expressions_t* exp_node, cJSON* cj_device_item_names);
 static s_ezlopi_expressions_t* __expressions_create_node(uint32_t exp_id, cJSON* cj_expression);
 
 static bool __check_expression_type_filter(s_ezlopi_expressions_t* exp_node, e_scene_value_type_v2_t* type_filter_arr);
@@ -452,7 +452,7 @@ static s_exp_items_t* __expressions_items_create(cJSON* cj_item)
     return new_item_node;
 }
 
-static void __get_expressions_items(s_ezlopi_expressions_t* exp_node, cJSON* cj_items)
+void __get_expressions_items(s_ezlopi_expressions_t* exp_node, cJSON* cj_items)
 {
     if (cj_items)
     {
@@ -511,7 +511,7 @@ static s_exp_device_item_names_t* __expressions_device_item_names_create(cJSON* 
     return new_device_item_name;
 }
 
-static void __get_expressions_device_item_names(s_ezlopi_expressions_t* exp_node, cJSON* cj_device_item_names)
+void __get_expressions_device_item_names(s_ezlopi_expressions_t* exp_node, cJSON* cj_device_item_names)
 {
     if (cj_device_item_names)
     {
@@ -638,7 +638,7 @@ static s_ezlopi_expressions_t* __expressions_create_node(uint32_t exp_id, cJSON*
         if (cj_params)
         {
             cJSON* cj_items = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_items_str);
-            __get_expre     ssions_items(new_exp_node, cj_items);
+            __get_expressions_items(new_exp_node, cj_items);
 
             cJSON* cj_device_item_names = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_device_item_names_str);
             __get_expressions_device_item_names(new_exp_node, cj_device_item_names);

@@ -618,23 +618,139 @@ int ezlopi_scene_then_set_expression(l_scenes_list_v2_t* curr_scene, void* arg)
                 // 4. replace Params CJSON
                 if (cj_params)
                 {
-
-
-                    ezlopi_scenes_expressions_delete_exp_device_item_names(curr_expr->device_item_names);
                     cJSON* cj_new_items = NULL;
                     if ((NULL != curr_expr->items) && (NULL != (cj_new_items = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_items_str))))
                     {
                         ezlopi_scenes_expressions_delete_exp_item(curr_expr->items);
-                        
-
+                        __get_expressions_items(curr_expr, cj_new_items);
                     }
-                    if (NULL != curr_expr->item)
+                    cJSON* cj_new_device_item_names = NULL;
+                    if ((NULL != curr_expr->device_item_names) && (NULL != (cj_new_device_item_names = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_device_item_names_str))))
                     {
-                        cJSON_Delete(__FUNCTION__, curr_expr->meta_data);
+                        ezlopi_scenes_expressions_delete_exp_device_item_names(curr_expr->device_item_names);
+                        __get_expressions_device_item_names(curr_expr, cj_new_device_item_names);
+                    }
+                }
+
+
+
+                // 5. Now to edit in nvs
+                // A. read from  nvs
+                char* exp_id_list_str = ezlopi_nvs_read_scenes_expressions();
+                if (exp_id_list_str)
+                {
+                    TRACE_D("exp_id_list_str: %s", exp_id_list_str);
+
+                    cJSON* cj_exp_id_list = cJSON_Parse(__FUNCTION__, exp_id_list_str);
+                    if (cj_exp_id_list)
+                    {
+                        uint32_t exp_idx = 0;
+                        cJSON* cj_exp_id = NULL;
+                        while (NULL != (cj_exp_id = cJSON_GetArrayItem(cj_exp_id_list, exp_idx++)))
+                        {
+                            if (cj_exp_id && cj_exp_id->valuestring)
+                            {
+                                uint32_t exp_id = strtoul(cj_exp_id->valuestring, NULL, 16);
+                                if (exp_id == curr_expr->exp_id)
+                                {
+                                    TRACE_S("Found [%#x] in nvs ; req[%#x]", exp_id, curr_expr->exp_id);
+                                    char* exp_str = ezlopi_nvs_read_str(cj_exp_id->valuestring); // modify and store this 'cj_exp'
+                                    if (exp_str)
+                                    {
+                                        // This new 'cj_nvs_exp' holds expression data
+                                        cJSON* cj_nvs_exp = cJSON_Parse(__FUNCTION__, exp_str);
+                                        if (cj_nvs_exp)
+                                        {
+                                            // delete the expression from nvs ; 
+                                            ezlopi_nvs_delete_stored_data_by_name(cj_exp_id->valuestring);
+
+                                            char* exp_id_list_after_delete = ezlopi_nvs_read_scenes_expressions();
+                                            if (exp_id_list_after_delete)
+                                            {
+                                                TRACE_D("exp_id_list_after_delete: %s", exp_id_list_after_delete);
+                                                ezlopi_free(__FUNCTION__, exp_id_list_after_delete);
+                                            }
+
+                                            // CJSON_TRACE("old_nvs_expr", cj_nvs_exp);
+
+                                            // 1. code
+                                            if (code_str)
+                                            {
+                                                cJSON  * get_cj_code = cJSON_GetObjectItem(__FUNCTION__, cj_nvs_exp, ezlopi_code_str);
+                                                if (get_cj_code && get_cj_code->valuestring)
+                                                {
+                                                    cJSON_Delete(__FUNCTION__, get_cj_code);
+                                                }
+                                                cJSON_AddStringToObject(__FUNCTION__, cj_nvs_exp, ezlopi_code_str, code_str);
+                                            }
+
+                                            // 2. valueType
+                                            if (value_type)
+                                            {
+                                                cJSON  * get_cj_valueType = cJSON_GetObjectItem(__FUNCTION__, cj_nvs_exp, ezlopi_valueType_str);
+                                                if (get_cj_valueType && get_cj_valueType->valuestring)
+                                                {
+                                                    cJSON_Delete(__FUNCTION__, get_cj_valueType);
+                                                }
+                                                cJSON_AddStringToObject(__FUNCTION__, cj_nvs_exp, ezlopi_valueType_str, value_type);
+                                            }
+
+                                            // 3. metadata
+                                            if (cj_metadata)
+                                            {
+                                                cJSON  * get_cj_metadata = cJSON_GetObjectItem(__FUNCTION__, cj_nvs_exp, ezlopi_metadata_str);
+                                                if (get_cj_metadata && cJSON_IsObject(get_cj_metadata))
+                                                {
+                                                    cJSON_Delete(__FUNCTION__, get_cj_metadata);
+                                                }
+                                                cJSON_AddItemToObject(__FUNCTION__, cj_nvs_exp, ezlopi_metadata_str, cJSON_Duplicate(__FUNCTION__, cj_metadata, 1));
+                                            }
+
+                                            // 4. params
+                                            if (cj_params)
+                                            {
+                                                cJSON  * get_cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_nvs_exp, ezlopi_params_str);
+                                                if (get_cj_params && cJSON_IsObject(get_cj_params))
+                                                {
+                                                    cJSON_Delete(__FUNCTION__, get_cj_params);
+                                                }
+                                                cJSON_AddItemToObject(__FUNCTION__, cj_nvs_exp, ezlopi_metadata_str, cJSON_Duplicate(__FUNCTION__, cj_params, 1));
+                                            }
+
+
+                                            // printing the new/modified expression 'cj_nvs_exp'
+                                            CJSON_TRACE("updated_expr", cj_nvs_exp);
+
+                                            // store the  modified expression into nvs
+                                            char* exp_string = cJSON_PrintBuffered(__FUNCTION__, cj_nvs_exp, 1024, false);
+                                            TRACE_D("length of 'exp_string': %d", strlen(exp_string));
+
+                                            if (exp_string)
+                                            {
+                                                if (ezlopi_nvs_write_str(exp_string, strlen(exp_string), cj_exp_id->valuestring))
+                                                {
+                                                    TRACE_S("successfully saved/modified expression in nvs");
+                                                }
+                                            }
+
+                                            cJSON_Delete(__FUNCTION__, cj_nvs_exp);
+                                        }
+
+                                        ezlopi_free(__FUNCTION__, exp_str);
+                                    }
+
+                                    break;
+                                }
+                            }
+                        }
+
+                        cJSON_Delete(__FUNCTION__, cj_exp_id_list);
                     }
 
-                    curr_expr->meta_data = cJSON_Duplicate(__FUNCTION__, cj_metadata, 1);
+                    ezlopi_free(__FUNCTION__, exp_id_list_str);
                 }
+
+
             }
         }
 
