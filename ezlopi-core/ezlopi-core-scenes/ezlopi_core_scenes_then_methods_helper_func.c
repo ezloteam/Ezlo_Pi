@@ -4,6 +4,7 @@
 
 #include <string.h>
 #include "ezlopi_util_trace.h"
+#include "ezlopi_core_nvs.h"
 #include "ezlopi_core_http.h"
 #include "ezlopi_core_scenes_v2.h"
 #include "ezlopi_core_scenes_value.h"
@@ -344,7 +345,7 @@ void free_http_mbedtls_struct(s_ezlopi_core_http_mbedtls_t* config)
 
 
 //------------------------------ SetExpression / SetVariable -------------------------------------------------------
-int ezlopi_core_scene_then_helper_setexpression_setvariable(const char * expression_name, const char * code_str, const char * value_type, cJSON * cj_metadata, cJSON * cj_params, l_fields_v2_t * var_value)
+int ezlopi_core_scene_then_helper_setexpression_setvariable(char * expression_name, const char * code_str, const char * value_type, cJSON * cj_metadata, cJSON * cj_params, l_fields_v2_t * var_value)
 {
     int ret = 0;
     s_ezlopi_expressions_t* curr_expr = ezlopi_scenes_get_expression_node_by_name(expression_name);
@@ -406,26 +407,56 @@ int ezlopi_core_scene_then_helper_setexpression_setvariable(const char * express
             {
             case VALUE_TYPE_NUMBER:
             {
-                if(EXPRESSION_VALUE_TYPE_NUMBER == curr_expr->)
-                curr_expr->exp_value=
+                if (EXPRESSION_VALUE_TYPE_NUMBER == curr_expr->exp_value.type)
+                {
+                    curr_expr->exp_value.u_value.number_value = var_value->field_value.u_value.value_double;
+                }
                 break;
             }
             case VALUE_TYPE_STRING:
-            { /* code */
+            {
+                if (EXPRESSION_VALUE_TYPE_STRING == curr_expr->exp_value.type)
+                {
+                    if (NULL != curr_expr->exp_value.u_value.str_value)
+                    {
+                        ezlopi_free(__FUNCTION__, curr_expr->exp_value.u_value.str_value);
+                        curr_expr->exp_value.u_value.str_value = NULL;
+                    }
+
+                    const char * variable_str = var_value->field_value.u_value.value_string;
+
+                    curr_expr->exp_value.u_value.str_value = ezlopi_malloc(__FUNCTION__, strlen(variable_str) + 1);
+                    if (curr_expr->exp_value.u_value.str_value)
+                    {
+                        snprintf(curr_expr->exp_value.u_value.str_value, strlen(variable_str) + 1, "%.*s", strlen(variable_str), variable_str);
+                    }
+                }
                 break;
             }
             case VALUE_TYPE_BOOL:
-            { /* code */
+            {
+                if (EXPRESSION_VALUE_TYPE_BOOL == curr_expr->exp_value.type)
+                {
+                    curr_expr->exp_value.u_value.boolean_value = var_value->field_value.u_value.value_bool;
+                }
                 break;
             }
             case VALUE_TYPE_CJSON:
-            { /* code */
+            {
+                if (EXPRESSION_VALUE_TYPE_CJ == curr_expr->exp_value.type)
+                {
+                    if (NULL != curr_expr->exp_value.u_value.cj_value)
+                    {
+                        cJSON_Delete(__FUNCTION__, curr_expr->exp_value.u_value.cj_value);
+                    }
+
+                    curr_expr->exp_value.u_value.cj_value = cJSON_Duplicate(__FUNCTION__, var_value->field_value.u_value.cj_value, 1);
+                }
                 break;
             }
             default:
                 break;
             }
-
         }
 
         // 5. Now to edit in nvs
@@ -510,14 +541,48 @@ int ezlopi_core_scene_then_helper_setexpression_setvariable(const char * express
                                         cJSON_AddItemToObject(__FUNCTION__, cj_nvs_exp, "params", cJSON_Duplicate(__FUNCTION__, cj_params, 1));
                                     }
 
-                                    // 4. value
-                                    if (cj_value)
+                                    // 4. value (int/bool/string/cjson)
+                                    if (NULL != var_value)
                                     {
+                                        int req_type_nvs = 0;
+                                        cJSON  * get_cj_var_value = cJSON_GetObjectItem(__FUNCTION__, cj_nvs_exp, "value");
+                                        if (get_cj_var_value && cJSON_IsObject(get_cj_var_value))
+                                        {
+                                            req_type_nvs = get_cj_var_value->type;
+                                            cJSON_Delete(__FUNCTION__, get_cj_var_value);
+                                        }
 
+                                        switch (req_type_nvs)
+                                        {
+                                        case cJSON_Number:
+                                        {
+                                            cJSON_AddNumberToObject(__FUNCTION__, cj_nvs_exp, "value", var_value->field_value.u_value.value_double);
+                                            break;
+                                        }
+                                        case cJSON_String:
+                                        {
+                                            cJSON_AddStringToObject(__FUNCTION__, cj_nvs_exp, "value", var_value->field_value.u_value.value_string);
+                                            break;
+                                        }
+                                        case cJSON_False:
+                                        case cJSON_True:
+                                        {
+                                            cJSON_AddBoolToObject(__FUNCTION__, cj_nvs_exp, "value", var_value->field_value.u_value.value_bool);
+                                            break;
+                                        }
+                                        case cJSON_Object:
+                                        case cJSON_Array:
+                                        {
+                                            cJSON_AddItemToObject(__FUNCTION__, cj_nvs_exp, "value", cJSON_Duplicate(__FUNCTION__, var_value->field_value.u_value.cj_value, 1));
+                                            break;
+                                        }
+                                        default:
+                                            break;
+                                        }
                                     }
 
                                     // printing the new/modified expression 'cj_nvs_exp'
-                                    CJSON_TRACE("updated_expr", cj_nvs_exp);
+                                    // CJSON_TRACE("updated_expr", cj_nvs_exp);
 
                                     // store the  modified expression into nvs
                                     char* exp_string = cJSON_PrintBuffered(__FUNCTION__, cj_nvs_exp, 1024, false);
@@ -534,24 +599,17 @@ int ezlopi_core_scene_then_helper_setexpression_setvariable(const char * express
 
                                     cJSON_Delete(__FUNCTION__, cj_nvs_exp);
                                 }
-
                                 ezlopi_free(__FUNCTION__, exp_str);
                             }
-
                             break;
                         }
                     }
                 }
-
                 cJSON_Delete(__FUNCTION__, cj_exp_id_list);
             }
-
             ezlopi_free(__FUNCTION__, exp_id_list_str);
         }
-
-
     }
     return ret;
-
 }
 #endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS

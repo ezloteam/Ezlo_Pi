@@ -593,7 +593,7 @@ int ezlopi_scene_then_set_variable(l_scenes_list_v2_t* curr_scene, void* arg)
         char* value_type = NULL;
         cJSON* cj_metadata = NULL;
         cJSON* cj_params = NULL;
-        l_fields_v2_t* cj_var_value = NULL;
+        l_fields_v2_t* field_var_value = NULL;
 
         l_action_block_v2_t* curr_then = (l_action_block_v2_t*)arg;
         if (curr_then)
@@ -612,7 +612,7 @@ int ezlopi_scene_then_set_variable(l_scenes_list_v2_t* curr_scene, void* arg)
                 {
                     if ((EZLOPI_VALUE_TYPE_NONE < curr_field->value_type && EZLOPI_VALUE_TYPE_MAX > curr_field->value_type) && (NULL != curr_field->field_value.u_value.cj_value))
                     {
-                        cj_var_value = curr_field;
+                        field_var_value = curr_field;
                     }
                 }
                 else if (0 == strncmp(curr_field->name, ezlopi_valueType_str, 10))
@@ -644,7 +644,7 @@ int ezlopi_scene_then_set_variable(l_scenes_list_v2_t* curr_scene, void* arg)
 
         if (expression_name)
         {
-            ret = ezlopi_core_scene_then_helper_setexpression_setvariable(expression_name, NULL, value_type, cj_metadata, cj_params, NULL);
+            ret = ezlopi_core_scene_then_helper_setexpression_setvariable(expression_name, NULL, value_type, cj_metadata, cj_params, field_var_value);
         }
     }
     return ret;
