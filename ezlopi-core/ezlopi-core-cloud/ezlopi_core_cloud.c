@@ -12,6 +12,8 @@ const uint32_t SCENE_ID_START = 0x60000000;
 const uint32_t SCRIPT_ID_START = 0x70000000;
 const uint32_t EXPRESSION_ID_START = 0x80000000;
 const uint32_t MODES_ID_START = 0x90000000;
+const uint32_t SCENE_GROUP_ID_START = 0xA0000000;
+const uint32_t SCENE_WHEN_BLOCKID_START = 0xB0000000;
 
 static uint32_t g_device_id = 0;
 static uint32_t g_item_id = 0;
@@ -21,6 +23,8 @@ static uint32_t g_settings_id = 0;
 static uint32_t g_scene_id = 0;
 static uint32_t g_script_id = 0;
 static uint32_t g_expression_id = 0;
+static uint32_t g_scene_group_id = 0;
+static uint32_t g_scene_when_blockId = 0;
 
 static uint32_t ezlopi_get_mac_crc(void)
 {
@@ -118,10 +122,22 @@ uint32_t ezlopi_cloud_generate_scene_id(void)
     return g_scene_id;
 }
 
+void ezlopi_cloud_update_when_blockId(uint32_t a_when_blockId)
+{
+    g_scene_when_blockId = (a_when_blockId > g_scene_when_blockId) ? a_when_blockId : g_scene_when_blockId;
+}
+
+uint32_t ezlopi_cloud_generate_scene_when_blockId(void)
+{
+    g_scene_when_blockId = (0 == g_scene_when_blockId) ? (SCENE_WHEN_BLOCKID_START + ezlopi_get_mac_crc()) : (g_scene_when_blockId + 1);
+    return g_scene_when_blockId;
+}
+
 void ezlopi_cloud_update_script_id(uint32_t a_script_id)
 {
     g_script_id = (a_script_id > g_script_id) ? a_script_id : g_script_id;
 }
+
 
 uint32_t ezlopi_cloud_generate_script_id(void)
 {
@@ -149,5 +165,16 @@ uint32_t ezlopi_cloud_generate_room_id(void)
 {
     g_room_id = (0 == g_room_id) ? (ROOM_ID_START + ezlopi_get_mac_crc()) : (g_room_id + 1);
     return g_room_id;
+}
+
+uint32_t ezlopi_cloud_generate_scene_group_id(void)
+{
+    g_scene_group_id = (0 == g_scene_group_id) ? (SCENE_GROUP_ID_START + ezlopi_get_mac_crc()) : (g_scene_group_id + 1);
+    return g_scene_group_id;
+}
+
+void ezlopi_cloud_update_group_id(uint32_t a_group_id)
+{
+    g_scene_group_id = (a_group_id > g_scene_group_id) ? a_group_id : g_scene_group_id;
 }
 

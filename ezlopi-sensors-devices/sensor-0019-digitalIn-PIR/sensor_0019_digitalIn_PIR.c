@@ -1,6 +1,6 @@
 #include "ezlopi_util_trace.h"
 
-#include "ezlopi_core_timer.h"
+// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
@@ -59,7 +59,7 @@ static int sensor_pir_get_value_cjson_v3(l_ezlopi_item_t* item, void* args)
     if (cj_result)
     {
         item->interface.gpio.gpio_out.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
-        ezlopi_valueformatter_bool_to_cjson(item, cj_result, item->interface.gpio.gpio_out.value);
+        ezlopi_valueformatter_bool_to_cjson(cj_result, item->interface.gpio.gpio_out.value, item->cloud_properties.scale);
         ret = 1;
     }
 
@@ -94,7 +94,7 @@ static int sensor_pir_init_v3(l_ezlopi_item_t* item)
             {
                 TRACE_I("PIR sensor initialize successfully.");
                 item->interface.gpio.gpio_in.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
-                gpio_isr_service_register_v3(item, sensor_pir_value_updated_from_device_v3, 200);
+                ezlopi_service_gpioisr_register_v3(item, sensor_pir_value_updated_from_device_v3, 200);
                 ret = 1;
             }
             else
@@ -176,7 +176,7 @@ static void sensor_pir_setup_item_properties_v3(l_ezlopi_item_t* item, cJSON* cj
 
     item->interface.gpio.gpio_in.enable = true;
     item->interface.gpio.gpio_in.mode = GPIO_MODE_INPUT;
-    CJSON_GET_VALUE_GPIO(cj_device, ezlopi_dev_name_str, item->interface.gpio.gpio_in.gpio_num);
+    CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_str, item->interface.gpio.gpio_in.gpio_num);
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_logic_inv_str, item->interface.gpio.gpio_in.invert);
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_pull_up_str, tmp_var);
     item->interface.gpio.gpio_in.pull = tmp_var ? GPIO_PULLUP_ONLY : GPIO_PULLDOWN_ONLY;

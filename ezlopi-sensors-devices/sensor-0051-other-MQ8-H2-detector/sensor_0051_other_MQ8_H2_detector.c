@@ -1,7 +1,7 @@
 #include <math.h>
 #include "ezlopi_util_trace.h"
 
-#include "ezlopi_core_timer.h"
+// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
@@ -298,7 +298,7 @@ static int __0051_get_item(l_ezlopi_item_t* item, void* arg)
                 s_mq8_value_t* MQ8_value = ((s_mq8_value_t*)item->user_arg);
                 if (MQ8_value)
                 {
-                    ezlopi_valueformatter_float_to_cjson(item, cj_result, MQ8_value->_H2_ppm);
+                    ezlopi_valueformatter_float_to_cjson(cj_result, MQ8_value->_H2_ppm, item->cloud_properties.scale);
                 }
             }
             ret = 1;
@@ -325,7 +325,7 @@ static int __0051_get_cjson_value(l_ezlopi_item_t* item, void* arg)
                 s_mq8_value_t* MQ8_value = ((s_mq8_value_t*)item->user_arg);
                 if (MQ8_value)
                 {
-                    ezlopi_valueformatter_float_to_cjson(item, cj_result, MQ8_value->_H2_ppm);
+                    ezlopi_valueformatter_float_to_cjson(cj_result, MQ8_value->_H2_ppm, item->cloud_properties.scale);
                 }
             }
             ret = 1;

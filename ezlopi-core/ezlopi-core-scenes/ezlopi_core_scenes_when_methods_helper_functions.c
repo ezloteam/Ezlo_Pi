@@ -7,6 +7,7 @@
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_http.h"
 #include "ezlopi_core_scenes_v2.h"
+#include "ezlopi_core_scenes_edit.h"
 #include "ezlopi_core_scenes_when_methods_helper_functions.h"
 #include "EZLOPI_USER_CONFIG.h"
 
@@ -440,7 +441,7 @@ int isonce_check_flag_result(l_scenes_list_v2_t* scene_node, uint8_t flag_check)
         TRACE_W("here! once and time");
         // now to disable the scene and also store in ezlopi_nvs
         scene_node->enabled = false;
-        ezlopi_scenes_enable_disable_id_from_list_v2(scene_node->_id, false);
+        ezlopi_scenes_enable_disable_scene_by_id_v2(scene_node->_id, false);
         ret = 1;
     }
     return ret;
@@ -1304,5 +1305,6 @@ int when_function_for_latch(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* w
 
     return ret;
 }
+
 #endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 //-----------------------------------------------------------------------------------------------------

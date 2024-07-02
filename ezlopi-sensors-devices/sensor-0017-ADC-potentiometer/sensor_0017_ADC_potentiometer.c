@@ -1,7 +1,7 @@
 #include <math.h>
 #include "ezlopi_util_trace.h"
 
-#include "ezlopi_core_timer.h"
+// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
@@ -171,7 +171,7 @@ static int __0017_get_cjson_value(l_ezlopi_item_t* item, void* arg)
             s_potentiometer_t* user_data = (s_potentiometer_t*)item->user_arg;
             if (user_data)
             {
-                ezlopi_valueformatter_float_to_cjson(item, cj_result, user_data->pot_val);
+                ezlopi_valueformatter_float_to_cjson(cj_result, user_data->pot_val, item->cloud_properties.scale);
                 ret = 1;
             }
         }

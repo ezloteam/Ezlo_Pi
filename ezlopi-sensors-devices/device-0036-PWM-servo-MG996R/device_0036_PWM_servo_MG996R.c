@@ -1,6 +1,6 @@
 #include "ezlopi_util_trace.h"
 
-#include "ezlopi_core_timer.h"
+// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
@@ -199,7 +199,7 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
                 TRACE_W("new _ target duty value: %d", duty);
             }
 
-            ezlopi_valueformatter_int32_to_cjson(item, cj_result, target_duty);
+            ezlopi_valueformatter_int32_to_cjson(cj_result, target_duty, item->cloud_properties.scale);
             ret = 1;
         }
     }

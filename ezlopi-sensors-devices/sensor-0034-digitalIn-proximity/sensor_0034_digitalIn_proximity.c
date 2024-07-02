@@ -1,6 +1,6 @@
 #include "ezlopi_util_trace.h"
 
-#include "ezlopi_core_timer.h"
+// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
@@ -78,7 +78,7 @@ static void proximity_sensor_setup_item_properties(l_ezlopi_item_t* item, cJSON*
 
         item->interface.gpio.gpio_in.enable = true;
         item->interface.gpio.gpio_in.mode = GPIO_MODE_INPUT;
-        CJSON_GET_VALUE_GPIO(cj_device, ezlopi_dev_name_str, item->interface.gpio.gpio_in.gpio_num);
+        CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_str, item->interface.gpio.gpio_in.gpio_num);
         CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_logic_inv_str, item->interface.gpio.gpio_in.invert);
         // CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_pull_up_str, tmp_var);
         item->interface.gpio.gpio_in.pull = GPIO_PULLUP_ONLY; // tmp_var ? GPIO_PULLUP_ONLY : GPIO_PULLDOWN_ONLY;
@@ -135,7 +135,7 @@ static int proximity_sensor_init(l_ezlopi_item_t* item)
 
             if (ESP_OK == gpio_config(&io_conf))
             {
-                gpio_isr_service_register_v3(item, proximity_sensor_value_updated_from_device, 200);
+                ezlopi_service_gpioisr_register_v3(item, proximity_sensor_value_updated_from_device, 200);
                 item->interface.gpio.gpio_in.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
                 TRACE_I("Proximity sensor initialize successfully.");
                 ret = 1;
@@ -176,7 +176,7 @@ static int proximity_sensor_get_value_cjson(l_ezlopi_item_t* item, void* args)
             item->interface.gpio.gpio_in.value = item->interface.gpio.gpio_in.value ? false : true;
         }
 
-        ezlopi_valueformatter_bool_to_cjson(item, cj_result, item->interface.gpio.gpio_in.value);
+        ezlopi_valueformatter_bool_to_cjson(cj_result, item->interface.gpio.gpio_in.value, item->cloud_properties.scale);
         ret = 1;
         // TRACE_D("value: %d", item->interface.gpio.gpio_in.value);
     }

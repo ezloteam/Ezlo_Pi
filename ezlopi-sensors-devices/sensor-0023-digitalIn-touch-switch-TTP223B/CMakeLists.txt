@@ -5,7 +5,7 @@ idf_component_register(SRCS "sensor_0023_digitalIn_touch_switch_TTP223B.c" "${co
     INCLUDE_DIRS "."
     REQUIRES    ezlopi-util-trace 
                 driver 
-                ezlopi-core-timer 
+                # ezlopi-core-timer 
                 ezlopi-core-cloud 
                 ezlopi-core-actions 
                 ezlopi-core-devices 

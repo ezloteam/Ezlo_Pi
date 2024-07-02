@@ -1,7 +1,7 @@
 #include "../../build/config/sdkconfig.h"
 #include "ezlopi_util_trace.h"
 
-#include "ezlopi_core_timer.h"
+// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
@@ -136,6 +136,8 @@ static int __prepare(void* arg)
 
 static int __init(l_ezlopi_item_t* item)
 {
+    TRACE_D("Init called!");
+
     int ret = 0;
     if (item)
     {
@@ -166,7 +168,8 @@ static int __init(l_ezlopi_item_t* item)
                 ret = -1;
             }
         }
-        else if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num) &&
+
+        if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num) &&
             (-1 != item->interface.gpio.gpio_in.gpio_num) &&
             (255 != item->interface.gpio.gpio_in.gpio_num))
         {
@@ -187,7 +190,7 @@ static int __init(l_ezlopi_item_t* item)
             };
             if (0 == gpio_config(&io_conf))
             {
-                gpio_isr_service_register_v3(item, __interrupt_upcall, 1000);
+                ezlopi_service_gpioisr_register_v3(item, __interrupt_upcall, 1000);
                 ret = 1;
             }
             else
@@ -199,6 +202,10 @@ static int __init(l_ezlopi_item_t* item)
         {
             ret = -1;
         }
+    }
+    else
+    {
+        TRACE_E("Error argument!");
     }
 
     return ret;
@@ -212,7 +219,7 @@ static int __get_value_cjson(l_ezlopi_item_t* item, void* arg)
         cJSON* cj_propertise = (cJSON*)arg;
         if (cj_propertise)
         {
-            ezlopi_valueformatter_bool_to_cjson(item, cj_propertise, item->interface.gpio.gpio_out.value);
+            ezlopi_valueformatter_bool_to_cjson(cj_propertise, item->interface.gpio.gpio_out.value, item->cloud_properties.scale);
             ret = 1;
         }
     }
@@ -234,8 +241,6 @@ static int __set_value(l_ezlopi_item_t* item, void* arg)
 
         if (NULL != cjson_params)
         {
-            CJSON_TRACE("cjson_params", cjson_params);
-
             int value = 0;
             cJSON* cj_value = cJSON_GetObjectItem(__FUNCTION__, cjson_params, ezlopi_value_str);
             if (cj_value)
@@ -299,6 +304,7 @@ static int __set_value(l_ezlopi_item_t* item, void* arg)
             }
         }
     }
+    
     return ret;
 }
 
@@ -313,6 +319,7 @@ static void __interrupt_upcall(void* arg)
     l_ezlopi_item_t* item = (l_ezlopi_item_t*)arg;
     if (item)
     {
+        TRACE_D("%d -> Got interrupt!", xTaskGetTickCount());
         __toggle_gpio(item);
         ezlopi_device_value_updated_from_device_broadcast(item);
     }

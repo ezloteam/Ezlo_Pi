@@ -2,7 +2,7 @@
 
 #include "ezlopi_util_trace.h"
 
-#include "ezlopi_core_timer.h"
+// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
@@ -252,11 +252,11 @@ static int __0015_get_value(l_ezlopi_item_t* item, void* args)
         s_ezlopi_dht11_data_t* dht11_data = (s_ezlopi_dht11_data_t*)item->user_arg;
         if (ezlopi_item_name_temp == item->cloud_properties.item_name)
         {
-            ezlopi_valueformatter_float_to_cjson(item, cj_properties, dht11_data->temperature);
+            ezlopi_valueformatter_float_to_cjson(cj_properties, dht11_data->temperature, item->cloud_properties.scale);
         }
         else if (ezlopi_item_name_humidity == item->cloud_properties.item_name)
         {
-            ezlopi_valueformatter_float_to_cjson(item, cj_properties, dht11_data->humidity);
+            ezlopi_valueformatter_float_to_cjson(cj_properties, dht11_data->humidity, item->cloud_properties.scale);
         }
     }
     return ret;

@@ -26,8 +26,8 @@ CLOUD_METHOD("hub.modes.notifications.set", ezlopi_cloud_modes_notifications_set
 CLOUD_METHOD("hub.modes.disarmed_default.set", ezlopi_cloud_modes_disarmed_default_set, NULL)
 CLOUD_METHOD("hub.modes.disarmed_devices.add", ezlopi_cloud_modes_disarmed_devices_add, NULL)
 CLOUD_METHOD("hub.modes.disarmed_devices.remove", ezlopi_cloud_modes_disarmed_devices_remove, NULL)
-CLOUD_METHOD("hub.modes.alarms_off.add", ezlopi_cloud_modes_alarms_off_add, NULL)
-CLOUD_METHOD("hub.modes.alarms_off.remove", ezlopi_cloud_modes_alarms_off_remove, NULL)
+CLOUD_METHOD("hub.modes.alarms_off.add", ezlopi_cloud_modes_alarms_off_add, ezlopi_cloud_modes_alarms_off_added)
+CLOUD_METHOD("hub.modes.alarms_off.remove", ezlopi_cloud_modes_alarms_off_remove, ezlopi_cloud_modes_alarms_off_removed)
 CLOUD_METHOD("hub.modes.cameras_off.add", ezlopi_cloud_modes_cameras_off_add, NULL)
 CLOUD_METHOD("hub.modes.cameras_off.remove", ezlopi_cloud_modes_cameras_off_remove, NULL)
 CLOUD_METHOD("hub.modes.bypass_devices.add", ezlopi_cloud_modes_bypass_devices_add, NULL)
@@ -36,8 +36,8 @@ CLOUD_METHOD("hub.modes.protect.set", ezlopi_cloud_modes_protect_set, NULL)
 CLOUD_METHOD("hub.modes.protect.buttons.set", ezlopi_cloud_modes_protect_buttons_set, NULL)
 CLOUD_METHOD("hub.modes.protect.devices.add", ezlopi_cloud_modes_protect_devices_add, NULL)
 CLOUD_METHOD("hub.modes.protect.devices.remove", ezlopi_cloud_modes_protect_devices_remove, NULL)
-CLOUD_METHOD("hub.modes.entry_delay.set", ezlopi_cloud_modes_entry_delay_set, NULL)
-CLOUD_METHOD("hub.modes.entry_delay.reset", ezlopi_cloud_modes_entry_delay_reset, NULL)
+CLOUD_METHOD("hub.modes.entry_delay.set", ezlopi_cloud_modes_entry_delay_set, ezlopi_cloud_modes_entry_delay_changed)
+CLOUD_METHOD("hub.modes.entry_delay.reset", ezlopi_cloud_modes_entry_delay_reset, ezlopi_cloud_modes_entry_delay_changed)
 #endif // CONFIG_EZPI_SERV_ENABLE_MODES
 
 CLOUD_METHOD("hub.favorite.list", favorite_list_v3, NULL)
@@ -79,7 +79,11 @@ CLOUD_METHOD("hub.scenes.enabled.set", scenes_enable_set, scene_changed)
 CLOUD_METHOD("hub.scenes.notification.add", scenes_notification_add, scene_changed)
 CLOUD_METHOD("hub.scenes.notification.remove", scenes_notification_remove, scene_changed)
 CLOUD_METHOD("hub.scenes.status.get", scenes_status_get, NULL) // Incomplete
+CLOUD_METHOD("hub.scenes.house_modes.set", scenes_house_modes_set, NULL)
+CLOUD_METHOD("hub.scenes.action.block.test", scenes_action_block_test, NULL)
+CLOUD_METHOD("hub.scenes.block.enabled.set", scenes_block_enabled_set, scene_added)
 CLOUD_METHOD("hub.scenes.block.status.reset", scenes_block_status_reset, NULL)
+
 #endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 CLOUD_METHOD("hub.room.list", room_list, NULL)
@@ -98,9 +102,9 @@ CLOUD_METHOD("hub.scenes.scripts.delete", scenes_scripts_delete, NULL)
 CLOUD_METHOD("hub.scenes.scripts.set", scenes_scripts_set, NULL)
 CLOUD_METHOD("hub.scenes.scripts.run", scenes_scripts_run, NULL)
 
-CLOUD_METHOD("hub.scenes.expressions.set", scenes_expressions_set, NULL)
+CLOUD_METHOD("hub.scenes.expressions.set", scenes_expressions_set, scenes_expressions_added_changed)
 CLOUD_METHOD("hub.scenes.expressions.list", scenes_expressions_list, NULL)
-CLOUD_METHOD("hub.scenes.expressions.delete", scenes_expressions_delete, NULL)
+CLOUD_METHOD("hub.scenes.expressions.delete", scenes_expressions_delete, scenes_expressions_deleted)
 #endif //CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 CLOUD_METHOD("hub.nma.register.repeat", register_repeat, NULL)

@@ -8,6 +8,7 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "EZLOPI_USER_CONFIG.h"
+#include "../../build/config/sdkconfig.h"
 
 static l_ezlopi_device_t* l_device_head = NULL;
 static volatile uint32_t g_store_dev_config_with_id = 0;
@@ -460,7 +461,7 @@ static void ezlopi_device_print_controller_cloud_information_v3(void)
 
 static void ezlopi_device_print_interface_digital_io(l_ezlopi_item_t* item)
 {
-    TRACE_D(" |~~~|- item->interface.gpio.gpio_in.enable: %s", item->interface.gpio.gpio_in.enable ? ezlopi_true_str : ezlopi_false_str);
+    _D(" |~~~|- item->interface.gpio.gpio_in.enable: %s", item->interface.gpio.gpio_in.enable ? ezlopi_true_str : ezlopi_false_str);
     TRACE_D(" |~~~|- item->interface.gpio.gpio_in.gpio_num: %d", item->interface.gpio.gpio_in.gpio_num);
     TRACE_D(" |~~~|- item->interface.gpio.gpio_in.invert: %s", item->interface.gpio.gpio_in.invert ? ezlopi_true_str : ezlopi_false_str);
     TRACE_D(" |~~~|- item->interface.gpio.gpio_in.value: %d", item->interface.gpio.gpio_in.value);
@@ -596,6 +597,7 @@ static int ezlopi_device_parse_json_v3(cJSON* cjson_config)
 
     if (cjson_config)
     {
+        CJSON_TRACE("cjson-config", cjson_config);
         cJSON* cjson_chipset = cJSON_GetObjectItem(__FUNCTION__, cjson_config, ezlopi_chipset_str);
 
         if (cjson_chipset)

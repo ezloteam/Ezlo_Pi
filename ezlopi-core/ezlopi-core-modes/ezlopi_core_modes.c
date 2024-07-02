@@ -148,6 +148,7 @@ int ezlopi_core_modes_set_switch_to_delay(uint32_t switch_to_delay)
     int ret = 0;
     if (sg_current_house_mode)
     {
+        ret = 1;
         ezlopi_service_modes_stop();
         sg_current_house_mode->switch_to_delay_sec = switch_to_delay;
         ezlopi_core_modes_store_to_nvs();
@@ -181,6 +182,155 @@ int ezlopi_core_modes_set_notifications(cJSON* cj_params)
     }
     return ret;
 }
+
+int ezlopi_core_modes_add_alarm_off(uint8_t mode_id, cJSON*  device_id)
+{
+    int ret = 0;
+    if ((EZLOPI_HOUSE_MODE_REF_ID_NONE < mode_id) && (EZLOPI_HOUSE_MODE_REF_ID_MAX > mode_id) && device_id)
+    {
+        ezlopi_service_modes_stop();
+        s_house_modes_t* targe_house_mode = ezlopi_core_modes_get_house_mode_by_id(mode_id);
+        if (targe_house_mode)
+        {
+            cJSON* element_to_check = NULL;
+            bool add_to_array = true;
+            cJSON_ArrayForEach(element_to_check, targe_house_mode->cj_alarms_off_devices)
+            {
+                if (0 == strncmp(device_id->valuestring, element_to_check->valuestring, 32))
+                {
+                    add_to_array = false;
+                }
+            }
+            if (add_to_array)
+            {
+                if (NULL == targe_house_mode->cj_alarms_off_devices)
+                {
+                    targe_house_mode->cj_alarms_off_devices = cJSON_CreateArray(__func__);
+                }
+                cJSON_AddItemToArray(targe_house_mode->cj_alarms_off_devices, cJSON_CreateString(__func__, device_id->valuestring));
+
+                ret = 1;
+                if (!ezlopi_core_modes_store_to_nvs())
+                {
+                    TRACE_D("Error!! when adding alarm_off");
+                }
+            }
+        }
+        ezlopi_service_modes_start();
+    }
+    return ret;
+}
+
+int ezlopi_core_modes_remove_alarm_off(uint32_t mode_id, cJSON* device_id)
+{
+    int ret = 0;
+    if ((EZLOPI_HOUSE_MODE_REF_ID_NONE < mode_id) && (EZLOPI_HOUSE_MODE_REF_ID_MAX > mode_id) && device_id)
+    {
+        ezlopi_service_modes_stop();
+        s_house_modes_t* targe_house_mode = ezlopi_core_modes_get_house_mode_by_id(mode_id);
+        if (targe_house_mode)
+        {
+            cJSON* element_to_check = NULL;
+            int array_index = 0;
+            cJSON_ArrayForEach(element_to_check, targe_house_mode->cj_alarms_off_devices)
+            {
+                if (0 == strncmp(device_id->valuestring, element_to_check->valuestring, 32))
+                {
+                    cJSON_DeleteItemFromArray(__func__, targe_house_mode->cj_alarms_off_devices, array_index);
+                    break;
+                }
+                array_index++;
+            }
+
+            ret = 1;
+            if (ezlopi_core_modes_store_to_nvs())
+            {
+                TRACE_D("Error!! when removing alarm_off");
+            }
+        }
+        ezlopi_service_modes_start();
+    }
+    return ret;
+}
+
+int ezlopi_core_modes_set_protect(uint32_t mode_id, bool protect_state)
+{
+    int ret = 0;
+    if (sg_custom_modes)
+    {
+        ezlopi_service_modes_stop();
+        s_house_modes_t* house_mode = NULL; /*0,1,2,3*/
+        if (NULL != (house_mode = ezlopi_core_modes_get_house_mode_by_id(mode_id)))
+        {
+            house_mode->protect = protect_state;
+
+            ret = 1;
+            if (!ezlopi_core_modes_store_to_nvs())
+            {
+                TRACE_E("Error!! , [id = %d] protection failed", mode_id);
+                ret = 0;
+            }
+        }
+        ezlopi_service_modes_start();
+    }
+    return ret;
+}
+
+
+int ezlopi_core_modes_set_entry_delay(uint32_t normal_sec, uint32_t short_sec, uint32_t extended_sec, uint32_t instant_sec)
+{
+    int ret = 0;
+    if (sg_custom_modes)
+    {
+        ezlopi_service_modes_stop();
+        s_ezlopi_modes_t* curr_mode = ezlopi_core_modes_get_custom_modes();
+        if (curr_mode)
+        {
+            curr_mode->entry_delay.normal_delay_sec = normal_sec;
+            curr_mode->entry_delay.short_delay_sec = short_sec;
+            curr_mode->entry_delay.extended_delay_sec = extended_sec;
+            curr_mode->entry_delay.instant_delay_sec = instant_sec;
+
+            ret = 1;
+            if (!ezlopi_core_modes_store_to_nvs())
+            {
+                ret = 0;
+                TRACE_E("Error!! , failed to set new entry_dalay");
+            }
+        }
+        ezlopi_service_modes_start();
+    }
+
+    return ret;
+}
+
+int ezlopi_core_modes_reset_entry_delay(void)
+{
+    int ret = 0;
+    if (sg_custom_modes)
+    {
+        ezlopi_service_modes_stop();
+        s_ezlopi_modes_t * curr_mode = ezlopi_core_modes_get_custom_modes();
+        if (curr_mode)
+        {
+            curr_mode->entry_delay.normal_delay_sec = 30;
+            curr_mode->entry_delay.short_delay_sec = 30;
+            curr_mode->entry_delay.extended_delay_sec = 30;
+            curr_mode->entry_delay.instant_delay_sec = 0;
+
+            ret = 1;
+            if (!ezlopi_core_modes_store_to_nvs())
+            {
+                ret = 0;
+                TRACE_E("Error!! , failed to set new entry_dalay");
+            }
+        }
+        ezlopi_service_modes_start();
+    }
+
+    return ret;
+}
+
 
 int ezlopi_core_modes_store_to_nvs(void)
 {

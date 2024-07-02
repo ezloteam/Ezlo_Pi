@@ -8,11 +8,11 @@
 #include <stdarg.h>
 
 #include "cjext.h"
-#include "ezlopi_core_heap.h"
 
-#include "ezlopi_core_sntp.h"
-#include "ezlopi_core_ezlopi_broadcast.h"
 #include "ezlopi_core_nvs.h"
+#include "ezlopi_core_heap.h"
+#include "ezlopi_core_sntp.h"
+#include "ezlopi_core_broadcast.h"
 #include "ezlopi_core_event_group.h"
 
 #include "ezlopi_cloud_constants.h"
@@ -73,6 +73,11 @@ static int ezlopi_hub_serial_log_set_severity(const char* severity_str)
         }
     }
     return ret;
+}
+
+void ezlopi_core_read_set_log_severities_internal(e_ezlopi_log_severity_t severity)
+{
+    serial_log_severity = severity;
 }
 
 void ezlopi_core_read_set_log_severities()
@@ -204,7 +209,7 @@ int ezlopi_core_send_cloud_log(int severity, const char* log_str)
                     memset(severity_str, 0, 10);
                     snprintf(severity_str, 10, "%s", ezlopi_log_severity_enum[severity]);
                     cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_severity_str, severity_str);
-                    if (!ezlopi_core_ezlopi_broadcast_add_to_queue(cj_log_broadcast))
+                    if (!ezlopi_core_broadcast_add_to_queue(cj_log_broadcast))
                     {
                         cJSON_Delete(__FUNCTION__, cj_log_broadcast);
                     }

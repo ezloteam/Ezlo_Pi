@@ -29,6 +29,7 @@
 #include "ezlopi_service_ble_ble_auth.h"
 #include "ezlopi_service_ble.h"
 #include "EZLOPI_USER_CONFIG.h"
+#include "ezlopi_core_buffer.h"
 
 #define CJ_GET_STRING(name) cJSON_GetStringValue(cJSON_GetObjectItem(__FUNCTION__, root, name))
 #define CJ_GET_NUMBER(name) cJSON_GetNumberValue(cJSON_GetObjectItem(__FUNCTION__, root, name))
@@ -198,6 +199,8 @@ static void __provisioning_info_write_func(esp_gatt_value_t* value, esp_ble_gatt
                         if (decoded_data)
                         {
                             cJSON* cj_config = cJSON_Parse(__FUNCTION__, decoded_data);
+                            ezlopi_core_buffer_release();
+
                             if (cj_config)
                             {
                                 char user_id[32];
@@ -235,7 +238,8 @@ static void __provisioning_info_write_func(esp_gatt_value_t* value, esp_ble_gatt
                                         memset(device_type, 0, sizeof(device_type));
 
 
-                                        CJSON_GET_ID(ezlopi_config_basic->id, cJSON_GetObjectItem(__FUNCTION__, cj_config, ezlopi_serial_str));
+                                        CJSON_GET_VALUE_DOUBLE(cj_config, ezlopi_serial_str, ezlopi_config_basic->id);
+                                        CJSON_GET_VALUE_DOUBLE(cj_config, ezlopi_version_str, ezlopi_config_basic->config_version);
 
                                         CJSON_GET_VALUE_STRING_BY_COPY(cj_config, ezlopi_device_name_str, device_name);
                                         CJSON_GET_VALUE_STRING_BY_COPY(cj_config, ezlopi_manufacturer_name_str, manufacturer);
@@ -275,9 +279,9 @@ static void __provisioning_info_write_func(esp_gatt_value_t* value, esp_ble_gatt
                                         ezlopi_free(__FUNCTION__, ezlopi_config_basic);
                                     }
 
-                                    ezlopi_factory_info_v3_set_ca_cert(cJSON_GetObjectItem(__FUNCTION__, cj_config, ezlopi_ssl_private_key_str));
+                                    ezlopi_factory_info_v3_set_ca_cert(cJSON_GetObjectItem(__FUNCTION__, cj_config, ezlopi_signing_ca_certificate_str));
                                     ezlopi_factory_info_v3_set_ssl_shared_key(cJSON_GetObjectItem(__FUNCTION__, cj_config, ezlopi_ssl_shared_key_str));
-                                    ezlopi_factory_info_v3_set_ssl_private_key(cJSON_GetObjectItem(__FUNCTION__, cj_config, ezlopi_signing_ca_certificate_str));
+                                    ezlopi_factory_info_v3_set_ssl_private_key(cJSON_GetObjectItem(__FUNCTION__, cj_config, ezlopi_ssl_private_key_str));
 
                                 }
                                 else
@@ -295,7 +299,7 @@ static void __provisioning_info_write_func(esp_gatt_value_t* value, esp_ble_gatt
                                 cJSON_Delete(__FUNCTION__, cj_config);
                             }
 
-                            ezlopi_free(__FUNCTION__, decoded_data);
+                            // ezlopi_free(__FUNCTION__, decoded_data);
                         }
 
                         ezlopi_ble_buffer_free_buffer(g_provisioning_linked_buffer);
@@ -452,6 +456,8 @@ static char* __base64_decode_provisioning_info(uint32_t total_size)
     char* decoded_config_json = NULL;
     char* base64_buffer = ezlopi_malloc(__FUNCTION__, total_size + 1);
 
+    TRACE_W("tatal data length: %d", total_size);
+
     if (base64_buffer)
     {
         uint32_t pos = 0;
@@ -485,17 +491,28 @@ static char* __base64_decode_provisioning_info(uint32_t total_size)
 
         TRACE_D("base64_buffer: %s", base64_buffer);
 
-        decoded_config_json = ezlopi_malloc(__FUNCTION__, total_size);
+        // decoded_config_json = ezlopi_malloc(__FUNCTION__, total_size);
+        uint32_t buffer_len = 0;
+        decoded_config_json = ezlopi_core_buffer_acquire(&buffer_len, 5000);
+
         if (decoded_config_json)
         {
-            size_t o_len = 0;
-            bzero(decoded_config_json, total_size);
-            mbedtls_base64_decode((uint8_t*)decoded_config_json, (size_t)total_size, &o_len, (uint8_t*)base64_buffer, strlen(base64_buffer));
-            TRACE_D("Decoded data: %s", decoded_config_json);
+            if (buffer_len >= total_size) 
+            {
+                size_t o_len = 0;
+                bzero(decoded_config_json, total_size);
+                mbedtls_base64_decode((uint8_t*)decoded_config_json, (size_t)total_size, &o_len, (uint8_t*)base64_buffer, strlen(base64_buffer));
+                TRACE_D("Decoded data: %s", decoded_config_json);
+
+            }
+            else
+            {
+                TRACE_E("decoding buffer underflow!");
+            }
         }
         else
         {
-            TRACE_E("mALLOC FAILED");
+            TRACE_E("decoding bufffer acquire failed!");
         }
 
         ezlopi_free(__FUNCTION__, base64_buffer);

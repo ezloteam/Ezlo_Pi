@@ -1,7 +1,7 @@
 #include <math.h>
 #include "ezlopi_util_trace.h"
 
-#include "ezlopi_core_timer.h"
+// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
@@ -142,15 +142,15 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
         {
             if (ezlopi_item_name_temp == item->cloud_properties.item_name)
             {
-                ezlopi_valueformatter_float_to_cjson(item, cj_device, bmp280_sensor_params->temperature);
+                ezlopi_valueformatter_float_to_cjson(cj_device, bmp280_sensor_params->temperature, item->cloud_properties.scale);
             }
             else if (ezlopi_item_name_humidity == item->cloud_properties.item_name)
             {
-                ezlopi_valueformatter_float_to_cjson(item, cj_device, bmp280_sensor_params->humidity);
+                ezlopi_valueformatter_float_to_cjson(cj_device, bmp280_sensor_params->humidity, item->cloud_properties.scale);
             }
             else if (ezlopi_item_name_atmospheric_pressure == item->cloud_properties.item_name)
             {
-                ezlopi_valueformatter_float_to_cjson(item, cj_device, (bmp280_sensor_params->pressure / 1000.0));
+                ezlopi_valueformatter_float_to_cjson(cj_device, (bmp280_sensor_params->pressure / 1000.0), item->cloud_properties.scale);
             }
         }
     }

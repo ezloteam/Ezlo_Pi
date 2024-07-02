@@ -73,4 +73,4 @@ message(STATUS "EXTRA_COMPONENTS_DIRS: ${EXTRA_COMPONENT_DIRS}\r\n")
 set(EXCLUDE_COMPONENTS freemodbus)
 
 ## ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ##
-project(Ezlo_Pi_v3x)
+project(Ezlo_Pi_v4x)

@@ -3,7 +3,7 @@
 #include "esp_err.h"
 #include "driver/gpio.h"
 
-#include "ezlopi_core_timer.h"
+// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
@@ -59,7 +59,7 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
     cJSON* cj_result = (cJSON*)arg;
     if (item && cj_result)
     {
-        ezlopi_valueformatter_bool_to_cjson(item, cj_result, item->interface.gpio.gpio_in.value);
+        ezlopi_valueformatter_bool_to_cjson(cj_result, item->interface.gpio.gpio_in.value, item->cloud_properties.scale);
     }
 
     return ret;
@@ -84,7 +84,7 @@ static int __init(l_ezlopi_item_t* item)
             {
                 int gpio_level = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
                 item->interface.gpio.gpio_in.value = (false == item->interface.gpio.gpio_in.invert) ? gpio_level : !gpio_level;
-                gpio_isr_service_register_v3(item, __touch_switch_callback, 200);
+                ezlopi_service_gpioisr_register_v3(item, __touch_switch_callback, 200);
                 ret = 1;
             }
             else
@@ -161,7 +161,7 @@ static void __prepare_touch_sensor_properties(l_ezlopi_item_t* item, cJSON* cj_d
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
     item->cloud_properties.scale = NULL;
 
-    CJSON_GET_VALUE_GPIO(cj_device, ezlopi_dev_name_str, item->interface.gpio.gpio_in.gpio_num);
+    CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_str, item->interface.gpio.gpio_in.gpio_num);
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_ip_inv_str, item->interface.gpio.gpio_in.invert);
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_val_ip_str, item->interface.gpio.gpio_in.value);
 

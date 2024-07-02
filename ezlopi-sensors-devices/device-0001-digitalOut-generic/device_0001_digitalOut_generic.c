@@ -2,7 +2,7 @@
 #include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_nvs.h"
-#include "ezlopi_core_timer.h"
+// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
@@ -281,6 +281,9 @@ static void __setup_item_properties(l_ezlopi_item_t* item, cJSON* cjson_device)
     CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_pullup_op_str, tmp_var);
     item->interface.gpio.gpio_out.interrupt = GPIO_INTR_DISABLE;
     item->interface.gpio.gpio_out.pull = tmp_var ? GPIO_PULLUP_ONLY : GPIO_PULLDOWN_ONLY;
+
+    TRACE_D("item->interface.gpio.gpio_in.gpio_num:  %u", item->interface.gpio.gpio_in.gpio_num);
+    TRACE_D("item->interface.gpio.gpio_out.gpio_num: %u", item->interface.gpio.gpio_out.gpio_num);
 }
 
 static int __prepare(void* arg)
@@ -417,7 +420,7 @@ static int __init(l_ezlopi_item_t* item)
         TRACE_D("enabling interrup for pin: %d", item->interface.gpio.gpio_in.gpio_num);
 
         gpio_config(&io_conf);
-        gpio_isr_service_register_v3(item, __interrupt_upcall, 1000);
+        ezlopi_service_gpioisr_register_v3(item, __interrupt_upcall, 1000);
         ret = 1;
     }
 
@@ -444,7 +447,7 @@ static int __init(l_ezlopi_item_t* item)
 
             if (0 == gpio_config(&io_conf))
             {
-                gpio_isr_service_register_v3(item, __interrupt_upcall, 1000);
+                ezlopi_service_gpioisr_register_v3(item, __interrupt_upcall, 1000);
                 ret = 1;
             }
             else
@@ -469,7 +472,7 @@ static int __get_value_cjson(l_ezlopi_item_t* item, void* arg)
         cJSON* cj_propertise = (cJSON*)arg;
         if (cj_propertise)
         {
-            ezlopi_valueformatter_bool_to_cjson(item, cj_propertise, item->interface.gpio.gpio_out.value);
+            ezlopi_valueformatter_bool_to_cjson(cj_propertise, item->interface.gpio.gpio_out.value, item->cloud_properties.scale);
             ret = 1;
         }
     }
@@ -523,7 +526,7 @@ static int __set_value(l_ezlopi_item_t* item, void* arg)
                 {
                     __set_gpio_value(item, value);
                     ezlopi_device_value_updated_from_device_broadcast(item);
-                    ret =1;
+                    ret = 1;
                 }
             }
             else

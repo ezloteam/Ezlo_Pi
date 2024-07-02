@@ -78,7 +78,7 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
 
     if (ze08_ch2o_sensor && cj_params)
     {
-        ezlopi_valueformatter_float_to_cjson(item, cj_params, ze08_ch2o_sensor->ppm);
+        ezlopi_valueformatter_float_to_cjson(cj_params, ze08_ch2o_sensor->ppm, item->cloud_properties.scale);
     }
     else
     {

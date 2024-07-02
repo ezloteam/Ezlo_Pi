@@ -1,6 +1,6 @@
 #include "ezlopi_util_trace.h"
 
-#include "ezlopi_core_timer.h"
+// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
@@ -110,12 +110,12 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
             }
             else if (ezlopi_item_name_switch == item->cloud_properties.item_name)
             {
-                ezlopi_valueformatter_bool_to_cjson(item, cj_properties, rgb_args->brightness);
+                ezlopi_valueformatter_bool_to_cjson(cj_properties, rgb_args->brightness, item->cloud_properties.scale);
             }
             else if (ezlopi_item_name_dimmer == item->cloud_properties.item_name)
             {
                 int dim_percentage = (int)(rgb_args->brightness * 100);
-                ezlopi_valueformatter_int32_to_cjson(item, cj_properties, dim_percentage);
+                ezlopi_valueformatter_int32_to_cjson(cj_properties, dim_percentage, item->cloud_properties.scale);
             }
         }
     }

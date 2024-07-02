@@ -3,8 +3,8 @@
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_room.h"
 #include "ezlopi_core_cloud.h"
+#include "ezlopi_core_broadcast.h"
 #include "ezlopi_core_cjson_macros.h"
-#include "ezlopi_core_ezlopi_broadcast.h"
 
 #include "ezlopi_cloud_constants.h"
 #include "EZLOPI_USER_CONFIG.h"
@@ -371,7 +371,7 @@ static void __update_cloud_room_deleted(uint32_t room_id)
 
         CJSON_TRACE("----------------- broadcasting - cj_response", cj_response);
 
-        if (0 == ezlopi_core_ezlopi_broadcast_add_to_queue(cj_response))
+        if (0 == ezlopi_core_broadcast_add_to_queue(cj_response))
         {
             cJSON_Delete(__FUNCTION__, cj_response);
         }

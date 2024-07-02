@@ -2,7 +2,7 @@
 #include "../../build/config/sdkconfig.h"
 #include "ezlopi_util_trace.h"
 
-#include "ezlopi_core_timer.h"
+// // #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
@@ -168,7 +168,8 @@ static int __init(l_ezlopi_item_t* item)
                 ret = -1;
             }
         }
-        else if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num) &&
+
+        if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num) &&
             (-1 != item->interface.gpio.gpio_in.gpio_num) &&
             (255 != item->interface.gpio.gpio_in.gpio_num))
         {
@@ -190,7 +191,7 @@ static int __init(l_ezlopi_item_t* item)
 
             if (0 == gpio_config(&io_conf))
             {
-                gpio_isr_service_register_v3(item, __interrupt_upcall, 1000);
+                ezlopi_service_gpioisr_register_v3(item, __interrupt_upcall, 1000);
                 ret = 1;
             }
             else
@@ -215,7 +216,7 @@ static int __get_value_cjson(l_ezlopi_item_t* item, void* arg)
         cJSON* cj_propertise = (cJSON*)arg;
         if (cj_propertise)
         {
-            ezlopi_valueformatter_bool_to_cjson(item, cj_propertise, item->interface.gpio.gpio_out.value);
+            ezlopi_valueformatter_bool_to_cjson(cj_propertise, item->interface.gpio.gpio_out.value, item->cloud_properties.scale);
             ret = 1;
         }
     }

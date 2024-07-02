@@ -1,7 +1,7 @@
 #include <math.h>
 #include "ezlopi_util_trace.h"
 
-#include "ezlopi_core_timer.h"
+// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
@@ -176,9 +176,9 @@ static int __0042_get_cjson_value(l_ezlopi_item_t* item, void* arg)
             if (user_data)
             {
 #if VOLTAGE_DIVIDER_EN
-                ezlopi_valueformatter_float_to_cjson(item, cj_result, (user_data->volt) * 9.52f);
+                ezlopi_valueformatter_float_to_cjson(cj_result, (user_data->volt) * 9.52f, item->cloud_properties.scale);
 #else
-                ezlopi_valueformatter_float_to_cjson(item, cj_result, (user_data->volt) * 4.2f);
+                ezlopi_valueformatter_float_to_cjson(cj_result, (user_data->volt) * 4.2f, item->cloud_properties.scale);
 #endif
                 ret = 1;
             }

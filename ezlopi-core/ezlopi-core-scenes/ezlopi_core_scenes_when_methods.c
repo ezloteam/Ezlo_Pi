@@ -28,6 +28,12 @@ int ezlopi_scene_when_is_item_state(l_scenes_list_v2_t* scene_node, void* arg)
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (when_block)
     {
+        if (false == when_block->block_enable)
+        {
+            TRACE_D("Block-disabled [%s]", when_block->block_options.method.name);
+            return 0;
+        }
+
         uint32_t item_id = 0;
         l_fields_v2_t* value_field = NULL;
         #warning "Warning: armed check remains [Krishna]";
@@ -124,9 +130,15 @@ int ezlopi_scene_when_is_interval(l_scenes_list_v2_t* scene_node, void* arg)
 {
     // TRACE_W(" is_interval ");
     int ret = 0;
-
-    if (scene_node)
+    l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
+    if (when_block && scene_node)
     {
+        if (false == when_block->block_enable)
+        {
+            TRACE_D("Block-disabled [%s]", when_block->block_options.method.name);
+            return 0;
+        }
+
         char* end_prt = NULL;
         uint32_t interval = strtoul(scene_node->when_block->fields->field_value.u_value.value_string, &end_prt, 10);
         if (end_prt)
@@ -161,8 +173,8 @@ int ezlopi_scene_when_is_interval(l_scenes_list_v2_t* scene_node, void* arg)
             ret = 1;
             scene_node->when_block->fields->user_arg = (void*)xTaskGetTickCount();
         }
-    }
 
+    }
     return ret;
 }
 
@@ -185,6 +197,12 @@ int ezlopi_scene_when_is_sun_state(l_scenes_list_v2_t* scene_node, void* arg)
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (when_block && scene_node)
     {
+        if (false == when_block->block_enable)
+        {
+            TRACE_D("Block-disabled [%s]", when_block->block_options.method.name);
+            return 0;
+        }
+
         // if (0 < ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 100, false))
         // {
         //     TRACE_W("module not online");
@@ -237,6 +255,12 @@ int ezlopi_scene_when_is_date(l_scenes_list_v2_t* scene_node, void* arg)
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (when_block && scene_node)
     {
+        if (false == when_block->block_enable)
+        {
+            TRACE_D("Block-disabled [%s]", when_block->block_options.method.name);
+            return 0;
+        }
+
         time_t rawtime = 0;
         time(&rawtime);
         struct tm* info;
@@ -282,6 +306,12 @@ int ezlopi_scene_when_is_once(l_scenes_list_v2_t* scene_node, void* arg)
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (when_block && scene_node)
     {
+        if (false == when_block->block_enable)
+        {
+            TRACE_D("Block-disabled [%s]", when_block->block_options.method.name);
+            return 0;
+        }
+
         time_t rawtime = 0;
         time(&rawtime);
         struct tm* info;
@@ -327,6 +357,12 @@ int ezlopi_scene_when_is_date_range(l_scenes_list_v2_t* scene_node, void* arg)
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (when_block && scene_node)
     {
+        if (false == when_block->block_enable)
+        {
+            TRACE_D("Block-disabled [%s]", when_block->block_options.method.name);
+            return 0;
+        }
+
         time_t rawtime = 0;
         time(&rawtime);
         struct tm* info;
@@ -569,6 +605,12 @@ int ezlopi_scene_when_is_device_state(l_scenes_list_v2_t* scene_node, void* arg)
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (when_block && scene_node)
     {
+        if (false == when_block->block_enable)
+        {
+            TRACE_D("Block-disabled [%s]", when_block->block_options.method.name);
+            return 0;
+        }
+
         uint32_t device_id = 0;
         bool value_armed = false;
         bool value_reachable = false;
@@ -633,6 +675,12 @@ int ezlopi_scene_when_is_scene_state(l_scenes_list_v2_t* scene_node, void* arg)
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (when_block && scene_node)
     {
+        if (false == when_block->block_enable)
+        {
+            TRACE_D("Block-disabled [%s]", when_block->block_options.method.name);
+            return 0;
+        }
+
         uint32_t scene_id = 0;
         l_fields_v2_t* value_field = NULL;
 
@@ -717,6 +765,12 @@ int ezlopi_scene_when_is_cloud_state(l_scenes_list_v2_t* scene_node, void* arg)
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (when_block && scene_node)
     {
+        if (false == when_block->block_enable)
+        {
+            TRACE_D("Block-disabled [%s]", when_block->block_options.method.name);
+            return 0;
+        }
+
         l_fields_v2_t* value_field = NULL;
         l_fields_v2_t* curr_field = when_block->fields;
         while (curr_field)
@@ -763,9 +817,14 @@ int ezlopi_scene_when_compare_numbers(l_scenes_list_v2_t* scene_node, void* arg)
     // TRACE_W(" Compare_num ");
     int ret = 0;
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
-
     if (when_block && scene_node)
     {
+        if (false == when_block->block_enable)
+        {
+            TRACE_D("Block-disabled [%s]", when_block->block_options.method.name);
+            return 0;
+        }
+
         l_fields_v2_t* item_or_expression_field = NULL;
         l_fields_v2_t* value_field = NULL;
         l_fields_v2_t* comparator_field = NULL;
@@ -819,9 +878,14 @@ int ezlopi_scene_when_compare_number_range(l_scenes_list_v2_t* scene_node, void*
     // TRACE_W(" Compare_num_range");
     int ret = 0;
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
-
     if (when_block && scene_node)
     {
+        if (false == when_block->block_enable)
+        {
+            TRACE_D("Block-disabled [%s]", when_block->block_options.method.name);
+            return 0;
+        }
+
         uint32_t item_id = 0;
         char* expression_name = NULL;
         l_fields_v2_t* item_exp_field = NULL;
@@ -918,6 +982,11 @@ int ezlopi_scene_when_compare_strings(l_scenes_list_v2_t* scene_node, void* arg)
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (when_block && scene_node)
     {
+        if (false == when_block->block_enable)
+        {
+            TRACE_D("Block-disabled [%s]", when_block->block_options.method.name);
+            return 0;
+        }
 
         l_fields_v2_t* item_exp_field = NULL;
         l_fields_v2_t* value_field = NULL;
@@ -977,6 +1046,12 @@ int ezlopi_scene_when_string_operation(l_scenes_list_v2_t* scene_node, void* arg
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (when_block && scene_node)
     {
+        if (false == when_block->block_enable)
+        {
+            TRACE_D("Block-disabled [%s]", when_block->block_options.method.name);
+            return 0;
+        }
+
         l_fields_v2_t* item_exp_field = NULL;
         l_fields_v2_t* value_field = NULL;
         l_fields_v2_t* operation_field = NULL;
@@ -1034,6 +1109,12 @@ int ezlopi_scene_when_in_array(l_scenes_list_v2_t* scene_node, void* arg)
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (when_block && scene_node)
     {
+        if (false == when_block->block_enable)
+        {
+            TRACE_D("Block-disabled [%s]", when_block->block_options.method.name);
+            return 0;
+        }
+
         l_fields_v2_t* item_exp_field = NULL;
         l_fields_v2_t* value_field = NULL;
         l_fields_v2_t* operation_field = NULL;
@@ -1089,6 +1170,12 @@ int ezlopi_scene_when_compare_values(l_scenes_list_v2_t* scene_node, void* arg)
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (when_block && scene_node)
     {
+        if (false == when_block->block_enable)
+        {
+            TRACE_D("Block-disabled [%s]", when_block->block_options.method.name);
+            return 0;
+        }
+
         l_fields_v2_t* value_type_field = NULL;
         l_fields_v2_t* value_field = NULL;
         l_fields_v2_t* comparator_field = NULL;
@@ -1155,6 +1242,12 @@ int ezlopi_scene_when_has_atleast_one_dictionary_value(l_scenes_list_v2_t* scene
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (scene_node && when_block)
     {
+        if (false == when_block->block_enable)
+        {
+            TRACE_D("Block-disabled [%s]", when_block->block_options.method.name);
+            return 0;
+        }
+
         uint32_t item_id = 0;
         l_fields_v2_t* value_field = NULL;
 
@@ -1195,6 +1288,12 @@ int ezlopi_scene_when_is_firmware_update_state(l_scenes_list_v2_t* scene_node, v
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (scene_node && when_block)
     {
+        if (false == when_block->block_enable)
+        {
+            TRACE_D("Block-disabled [%s]", when_block->block_options.method.name);
+            return 0;
+        }
+
         uint32_t item_id = 0;
         char* state_value = NULL;
 
@@ -1239,6 +1338,12 @@ int ezlopi_scene_when_is_dictionary_changed(l_scenes_list_v2_t* scene_node, void
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (scene_node && when_block)
     {
+        if (false == when_block->block_enable)
+        {
+            TRACE_D("Block-disabled [%s]", when_block->block_options.method.name);
+            return 0;
+        }
+
         uint32_t item_id = 0;
         l_fields_v2_t* key_field = NULL;
         l_fields_v2_t* operation_field = NULL;
@@ -1303,7 +1408,6 @@ int ezlopi_scene_when_and(l_scenes_list_v2_t* scene_node, void* arg)
                     break;
                 }
             }
-
             value_when_block = value_when_block->next;
         }
     }
@@ -1325,7 +1429,6 @@ int ezlopi_scene_when_not(l_scenes_list_v2_t* scene_node, void* arg)
             {
                 ret = !(scene_method(scene_node, (void*)value_when_block)); // if all the block-calls are false, then return 1;
             }
-
             value_when_block = value_when_block->next;
         }
     }
@@ -1350,7 +1453,6 @@ int ezlopi_scene_when_or(l_scenes_list_v2_t* scene_node, void* arg)
                     break;
                 }
             }
-
             value_when_block = value_when_block->next;
         }
     }
@@ -1374,7 +1476,6 @@ int ezlopi_scene_when_xor(l_scenes_list_v2_t* scene_node, void* arg)
                 ret ^= scene_method(scene_node, (void*)value_when_block);
                 // return 1 ; if odd no of '_when_block_' conditions are true
             }
-
             value_when_block = value_when_block->next;
         }
     }
@@ -1401,6 +1502,7 @@ int ezlopi_scene_when_function(l_scenes_list_v2_t* scene_node, void* arg)
                     scene_node->when_block->fields->user_arg = (void*)function_state_info;
                 }
             }
+
             const s_function_opr_t __when_funtion_opr[] = {
                 {.opr_name = "for", .opr_method = when_function_for_opr},
                 {.opr_name = "repeat", .opr_method = when_function_for_repeat},

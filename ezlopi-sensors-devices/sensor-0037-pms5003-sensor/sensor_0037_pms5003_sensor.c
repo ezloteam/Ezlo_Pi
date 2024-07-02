@@ -5,7 +5,7 @@
 
 #include "ezlopi_util_trace.h"
 
-#include "ezlopi_core_timer.h"
+// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_devices_list.h"
 #include "ezlopi_core_device_value_updated.h"
 #include "ezlopi_core_cloud.h"
@@ -20,7 +20,7 @@ static int __init(l_ezlopi_item_t* item);
 static int __cjson_get_value(l_ezlopi_item_t* item, void* arg);
 static int __notify(l_ezlopi_item_t* item);
 
-int sensor_pms5003_v3(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
+int sensor_0037_pms5003_v3(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
 {
     int ret = 0;
 
@@ -95,39 +95,39 @@ static int __cjson_get_value(l_ezlopi_item_t* item, void* arg)
     {
         if (ezlopi_item_name_particulate_matter_1 == item->cloud_properties.item_name)
         {
-            ezlopi_valueformatter_uint32_to_cjson(item, cj_param, pms_object->pms_data.pm10_standard);
+            ezlopi_valueformatter_uint32_to_cjson(cj_param, pms_object->pms_data.pm10_standard, item->cloud_properties.scale);
         }
         else if (ezlopi_item_name_particulate_matter_2_dot_5 == item->cloud_properties.item_name)
         {
-            ezlopi_valueformatter_uint32_to_cjson(item, cj_param, pms_object->pms_data.pm25_standard);
+            ezlopi_valueformatter_uint32_to_cjson(cj_param, pms_object->pms_data.pm25_standard, item->cloud_properties.scale);
         }
         else if (ezlopi_item_name_particulate_matter_10 == item->cloud_properties.item_name)
         {
-            ezlopi_valueformatter_uint32_to_cjson(item, cj_param, pms_object->pms_data.pm100_standard);
+            ezlopi_valueformatter_uint32_to_cjson(cj_param, pms_object->pms_data.pm100_standard, item->cloud_properties.scale);
         }
         else if (ezlopi_item_name_particles_0_dot_3_um == item->cloud_properties.item_name)
         {
-            ezlopi_valueformatter_uint32_to_cjson(item, cj_param, pms_object->pms_data.particles_03um);
+            ezlopi_valueformatter_uint32_to_cjson(cj_param, pms_object->pms_data.particles_03um, item->cloud_properties.scale);
         }
         else if (ezlopi_item_name_particles_0_dot_5_um == item->cloud_properties.item_name)
         {
-            ezlopi_valueformatter_uint32_to_cjson(item, cj_param, pms_object->pms_data.particles_05um);
+            ezlopi_valueformatter_uint32_to_cjson(cj_param, pms_object->pms_data.particles_05um, item->cloud_properties.scale);
         }
         else if (ezlopi_item_name_particles_1_um == item->cloud_properties.item_name)
         {
-            ezlopi_valueformatter_uint32_to_cjson(item, cj_param, pms_object->pms_data.particles_10um);
+            ezlopi_valueformatter_uint32_to_cjson(cj_param, pms_object->pms_data.particles_10um, item->cloud_properties.scale);
         }
         else if (ezlopi_item_name_particles_2_dot_5_um == item->cloud_properties.item_name)
         {
-            ezlopi_valueformatter_uint32_to_cjson(item, cj_param, pms_object->pms_data.particles_25um);
+            ezlopi_valueformatter_uint32_to_cjson(cj_param, pms_object->pms_data.particles_25um, item->cloud_properties.scale);
         }
         else if (ezlopi_item_name_particles_5_um == item->cloud_properties.item_name)
         {
-            ezlopi_valueformatter_uint32_to_cjson(item, cj_param, pms_object->pms_data.particles_50um);
+            ezlopi_valueformatter_uint32_to_cjson(cj_param, pms_object->pms_data.particles_50um, item->cloud_properties.scale);
         }
         else if (ezlopi_item_name_particles_10_um == item->cloud_properties.item_name)
         {
-            ezlopi_valueformatter_uint32_to_cjson(item, cj_param, pms_object->pms_data.particles_100um);
+            ezlopi_valueformatter_uint32_to_cjson(cj_param, pms_object->pms_data.particles_100um, item->cloud_properties.scale);
         }
     }
 

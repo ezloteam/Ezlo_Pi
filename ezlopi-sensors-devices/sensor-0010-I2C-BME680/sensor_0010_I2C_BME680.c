@@ -1,7 +1,7 @@
 #include <math.h>
 #include "ezlopi_util_trace.h"
 
-#include "ezlopi_core_timer.h"
+// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
@@ -284,27 +284,27 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
             {
                 if (ezlopi_item_name_temp == item->cloud_properties.item_name)
                 {
-                    ezlopi_valueformatter_float_to_cjson(item, cj_device, user_data->temperature);
+                    ezlopi_valueformatter_float_to_cjson(cj_device, user_data->temperature, item->cloud_properties.scale);
                 }
                 else if (ezlopi_item_name_humidity == item->cloud_properties.item_name)
                 {
-                    ezlopi_valueformatter_float_to_cjson(item, cj_device, user_data->humidity);
+                    ezlopi_valueformatter_float_to_cjson(cj_device, user_data->humidity, item->cloud_properties.scale);
                 }
                 else if (ezlopi_item_name_atmospheric_pressure == item->cloud_properties.item_name)
                 {
-                    ezlopi_valueformatter_float_to_cjson(item, cj_device, user_data->pressure / 1000.0);
+                    ezlopi_valueformatter_float_to_cjson(cj_device, user_data->pressure / 1000.0, item->cloud_properties.scale);
                 }
                 else if (ezlopi_item_name_volatile_organic_compound_level == item->cloud_properties.item_name)
                 {
-                    ezlopi_valueformatter_float_to_cjson(item, cj_device, user_data->iaq);
+                    ezlopi_valueformatter_float_to_cjson(cj_device, user_data->iaq, item->cloud_properties.scale);
                 }
                 else if (ezlopi_item_name_distance == item->cloud_properties.item_name)
                 {
-                    ezlopi_valueformatter_float_to_cjson(item, cj_device, user_data->altitude);
+                    ezlopi_valueformatter_float_to_cjson(cj_device, user_data->altitude, item->cloud_properties.scale);
                 }
                 else if (ezlopi_item_name_co2_level == item->cloud_properties.item_name)
                 {
-                    ezlopi_valueformatter_float_to_cjson(item, cj_device, user_data->co2_equivalent);
+                    ezlopi_valueformatter_float_to_cjson(cj_device, user_data->co2_equivalent, item->cloud_properties.scale);
                 }
             }
         }

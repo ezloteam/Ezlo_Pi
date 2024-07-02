@@ -49,7 +49,7 @@ extern "C"
 
 #define trace_color(txt_color, X, reg...)                                                 \
     {                                                                                     \
-        printf("\x1B[%sm %s[%d]:" X "\x1B[0m\n", txt_color, __FILE__, __LINE__, ##reg); \
+        ets_printf("\x1B[%sm %s[%d]:" X "\x1B[0m\n", txt_color, __FILE__, __LINE__, ##reg); \
     }
 
 #if 0
@@ -71,7 +71,7 @@ extern "C"
 
 #define trace(X, reg...)                                       \
     {                                                          \
-        printf("%s[%d]:" X "\n", __FILE__, __LINE__, ##reg); \
+        ets_printf("%s[%d]:" X "\n", __FILE__, __LINE__, ##reg); \
     }
 
 #define trace_log_sev_error(X, reg...)  trace_color_print(COLOR_FONT_RED, 1, __FILE__, __LINE__, X, ##reg)
@@ -98,7 +98,7 @@ extern "C"
 
 #define TRACE_Dg(bg, txt, X, reg...)                                                       \
     {                                                                                      \
-        printf("\x1B[%s;%sm %s[%d]:" X "\x1B[0m\n", txt, bg, __FILE__, __LINE__, ##reg); \
+        ets_printf("\x1B[%s;%sm %s[%d]:" X "\x1B[0m\n", txt, bg, __FILE__, __LINE__, ##reg); \
     }
 
 #define TRACE_Dw(X, reg...) TRACE_Dg(COLOR_BG_BLACK, COLOR_FONT_WHITE, X, ##reg)

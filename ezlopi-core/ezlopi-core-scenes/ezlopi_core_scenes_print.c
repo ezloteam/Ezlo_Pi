@@ -54,15 +54,15 @@ void ezlopi_print_fields(l_fields_v2_t* fields)
         {
         case EZLOPI_VALUE_TYPE_INT:
         case EZLOPI_VALUE_TYPE_HOUSE_MODE_ID:
+        case EZLOPI_VALUE_TYPE_TEMPERATURE:
+        case EZLOPI_VALUE_TYPE_HUMIDITY:
         {
             TRACE_D("\t\t\t|-- value: %d", (int)fields->field_value.u_value.value_double);
-            // TRACE_D("\t\t\t|-- value: %f", fields->field_value.u_value.value_double);
             break;
         }
         case EZLOPI_VALUE_TYPE_BOOL:
         {
             TRACE_D("\t\t\t|-- value: [%d]%s", fields->field_value.u_value.value_bool, fields->field_value.u_value.value_bool ? ezlopi_true_str : ezlopi_false_str);
-            // TRACE_D("\t\t\t|-- value: [%d]%s", fields->field_value.u_value.value_bool, fields->field_value.u_value.value_bool ? ezlopi_true_str : ezlopi_false_str);
             break;
         }
         case EZLOPI_VALUE_TYPE_FLOAT:
@@ -83,6 +83,7 @@ void ezlopi_print_fields(l_fields_v2_t* fields)
         case EZLOPI_VALUE_TYPE_BLOCK:
         case EZLOPI_VALUE_TYPE_BLOCKS:
         {
+            TRACE_D("\t\t\t|-- value:");
             ezlopi_print_when_blocks((l_when_block_v2_t*)fields->field_value.u_value.when_block);
             break;
         }
@@ -157,8 +158,6 @@ void ezlopi_print_fields(l_fields_v2_t* fields)
         case EZLOPI_VALUE_TYPE_BLOOD_PRESSURE:
         case EZLOPI_VALUE_TYPE_ENERGY:
         case EZLOPI_VALUE_TYPE_RF_SIGNAL_STRENGTH:
-        case EZLOPI_VALUE_TYPE_TEMPERATURE:
-        case EZLOPI_VALUE_TYPE_HUMIDITY:
         case EZLOPI_VALUE_TYPE_KILO_VOLT_AMPERE_HOUR:
         case EZLOPI_VALUE_TYPE_REACTIVE_POWER_INSTANT:
         case EZLOPI_VALUE_TYPE_AMOUNT_OF_USEFUL_ENERGY:
@@ -214,6 +213,17 @@ void ezlopi_print_when_blocks(l_when_block_v2_t* when_blocks)
     TRACE_D("\t|-- when: ");
     while (when_blocks)
     {
+        if (when_blocks->blockId && (0 < strlen(when_blocks->blockId)))
+        {
+            TRACE_D("\t\t|-- block_enable: %d", when_blocks->block_enable);
+            TRACE_D("\t\t|-- blockId: %s", when_blocks->blockId);
+        }
+
+        if (when_blocks->blockName && (0 < strlen(when_blocks->blockName)))
+        {
+            TRACE_D("\t\t|-- blockName: %s", when_blocks->blockName);
+        }
+
         ezlopi_print_block_options(&when_blocks->block_options, when_blocks->fields);
         TRACE_D("\t\t|-- blockType: when");
         ezlopi_print_fields(when_blocks->fields);
