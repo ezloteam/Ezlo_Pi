@@ -184,6 +184,7 @@ extern const char* ezlopi_serial_str;
 extern const char* ezlopi_uuid_provisioning_str;
 extern const char* ezlopi_provision_server_str;
 extern const char* ezlopi_cloud_server_str;
+extern const char* ezlopi_coordinator_url_str;
 extern const char* ezlopi_provision_token_str;
 extern const char* ezlopi_device_type_ezlopi_str;
 extern const char* ezlopi_ssl_private_key_str;

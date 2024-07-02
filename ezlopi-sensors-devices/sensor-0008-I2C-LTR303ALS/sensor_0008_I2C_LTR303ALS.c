@@ -3,7 +3,7 @@
 #include <math.h>
 #include "ezlopi_util_trace.h"
 
-#include "ezlopi_core_timer.h"
+// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
@@ -67,7 +67,7 @@ static int __get_value_cjson(l_ezlopi_item_t* item, void* arg)
         ltr303_data_t* als_ltr303_data = (ltr303_data_t*)item->user_arg;
         if (cj_param && als_ltr303_data)
         {
-            ezlopi_valueformatter_double_to_cjson(item, cj_param, als_ltr303_data->lux);
+            ezlopi_valueformatter_double_to_cjson(cj_param, als_ltr303_data->lux, item->cloud_properties.scale);
         }
     }
     return ret;

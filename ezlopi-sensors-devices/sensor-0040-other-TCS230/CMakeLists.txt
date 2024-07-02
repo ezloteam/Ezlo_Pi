@@ -5,7 +5,7 @@ idf_component_register(SRCS "TCS230.c" "sensor_0040_other_TCS230.c" "${config_sr
                     REQUIRES   
                                 ezlopi-util-trace 
                                 freertos
-                                ezlopi-core-timer 
+                                # ezlopi-core-timer 
                                 ezlopi-core-cloud 
                                 ezlopi-core-actions 
                                 ezlopi-core-devices 

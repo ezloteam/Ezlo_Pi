@@ -7,4 +7,6 @@ idf_component_register(SRCS "ezlopi_cloud_registration.c" "${src_files}"
                         ezlopi-core-websocket_client 
                         ezlopi-core-processes 
                         ezlopi-service-webprov 
-                        ezlopi-util-version)
+                        ezlopi-util-version
+                        ezlopi-service-loop
+    )

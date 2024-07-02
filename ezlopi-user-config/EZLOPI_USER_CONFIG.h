@@ -53,7 +53,7 @@
 
 #define ezlopi_malloc(who, x) malloc(x)
 #define ezlopi_calloc(who, x, y) calloc(x, y)
-#define ezlopi_free(who, x) free(x)
+#define ezlopi_free(who, x) if(NULL != x) free(x);
 #define ezlopi_realloc(who, x, y) realloc(x, y)
 
 #endif

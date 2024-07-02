@@ -7,6 +7,11 @@ chip="ESP32S3"
 app="Ezlo_Pi_v3x"
 distro="full_option"
 
+bootloader_address=0x0
+firmware_address="0x20000"
+partition_table_address="0x8000"
+ota_data_address="0x15000"
+
 echo "current arguments value:"
 echo "chip: ${chip}"
 echo "version: ${version}"
@@ -37,6 +42,8 @@ do
 done
 
 path="./firmware/v${version}.${build}/${chip}/${distro}"
+echo "firmware-destination: ${path}"
+echo ""
 mkdir -p ${path}
 
 cp -p ./build/${app}.bin ${path}
@@ -45,17 +52,19 @@ cp -p ./build/partition_table/partition-table.bin ${path}
 cp -p ./build/ota_data_initial.bin ${path}
 
 
-bootloader_address=0x0
-if ["ESP32" -eq "${chip}"]; then
+if [ "ESP32" = "${chip}" ]; then
 bootloader_address=0x1000
-elif ["ESP32S3" -eq "${chip}"]; then
-elif ["ESP32C3" -eq "${chip}"]; then
+elif [ "ESP32S3" = "${chip}" ]; then
+echo ""
+elif [ "ESP32C3" = "${chip}" ]; then
+echo ""
 else
-echo "
+echo ""
 exit 0
 fi
 
 
-json_info="{\"version\": \"${version}\",\"build\": $build,\"build_date\": \"$(date)\",\"chip_type\": \"${chip}\",\"flash_size\": [\"4MB\", \"8MB\"],\"binaries\": [{\"address\": \"0x0\",\"file\": \"bootloader.bin\"},{\"address\": \"0x30000\",\"file\": \"Ezlo_Pi_v3x.bin\"},{\"address\": \"0xF000\",\"file\": \"partition-table.bin\"},{\"address\": \"0x1C000\",\"file\": \"ota_data_initial.bin\"}]}"
+json_info="{\"version\": \"${version}\",\"build\": $build,\"build_date\": \"$(date)\",\"chip_type\": \"${chip}\",\"flash_size\": \"4MB\",\"binaries\": [{\"address\": \"${bootloader_address}\",\"file\": \"bootloader.bin\"},{\"address\": \"${firmware_address}\",\"file\": \"${app}.bin\"},{\"address\": \"${partition_table_address}\",\"file\": \"partition-table.bin\"},{\"address\": \"${ota_data_address}\",\"file\": \"ota_data_initial.bin\"}]}"
+echo "json-info:${json_info}"
 echo ${json_info} > ${path}/info.json
 

@@ -1,6 +1,6 @@
 #include "ezlopi_util_trace.h"
 
-#include "ezlopi_core_timer.h"
+// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
@@ -166,7 +166,7 @@ static int __0055_get_cjson_value(l_ezlopi_item_t* item, void* arg)
             flex_t* flex_res_value = (flex_t*)item->user_arg;
             if (flex_res_value)
             {
-                ezlopi_valueformatter_int32_to_cjson(item, cj_result, flex_res_value->rs_0055);
+                ezlopi_valueformatter_int32_to_cjson(cj_result, flex_res_value->rs_0055, item->cloud_properties.scale);
                 ret = 1;
             }
         }

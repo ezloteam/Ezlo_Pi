@@ -1,7 +1,7 @@
 #include <math.h>
 #include "ezlopi_util_trace.h"
 
-#include "ezlopi_core_timer.h"
+// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
@@ -155,7 +155,7 @@ static int __0056_get_cjson_value(l_ezlopi_item_t* item, void* arg)
         fsr_t* fsr_struct = (fsr_t*)item->user_arg;
         if (fsr_struct)
         {
-            ezlopi_valueformatter_float_to_cjson(item, cj_result, fsr_struct->fsr_value);
+            ezlopi_valueformatter_float_to_cjson(cj_result, fsr_struct->fsr_value, item->cloud_properties.scale);
             ret = 1;
         }
     }

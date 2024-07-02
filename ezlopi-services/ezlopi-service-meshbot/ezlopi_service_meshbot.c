@@ -12,8 +12,10 @@
 
 #include "ezlopi_cloud_constants.h"
 
-#include "pt.h"
+#include "ezlopi_service_loop.h"
 #include "ezlopi_service_meshbot.h"
+
+#include "pt.h"
 #include "EZLOPI_USER_CONFIG.h"
 
 typedef struct s_thread_ctx
@@ -27,7 +29,8 @@ typedef struct s_thread_ctx
 } s_thread_ctx_t;
 
 ///////////// Static functions /////////////////////
-static void __scenes_thread_process(void* pv);
+static void __scenes_loop(void *arg);
+// static void __scenes_loop(void* pv);
 static char __scene_proto_thread(l_scenes_list_v2_t* scene_node, uint32_t routine_delay_ms);
 
 static int __execute_scene_stop(l_scenes_list_v2_t* scene_node);
@@ -207,15 +210,16 @@ void ezlopi_scenes_meshbot_init(void)
         {
             scene_node->status = EZLOPI_SCENE_STATUS_STOPPED;
         }
-        TRACE_W("scenes_meshbot init process, [%d]", start_thread);
 
+        TRACE_W("scenes_meshbot init process, [%d]", start_thread);
         scene_node = scene_node->next;
     }
 
     if (start_thread)
     {
-        TRACE_D("starting thread process");
-        xTaskCreate(__scenes_thread_process, "Scene-task", 3 * 2048, NULL, 2, NULL);
+        // TRACE_D("starting thread process");
+        // xTaskCreate(__scenes_loop, "Scene-task", 3 * 2048, NULL, 2, NULL);
+        ezlopi_service_loop_add("meshbot-loop", __scenes_loop, 1000, NULL);
     }
     else
     {
@@ -396,23 +400,39 @@ PT_THREAD(__scene_proto_thread(l_scenes_list_v2_t* scene_node, uint32_t routine_
     PT_END(&ctx->pt);
 }
 
-static void __scenes_thread_process(void* pv)
+static void __scenes_loop(void *arg)
 {
-    while (1)
-    {
-        l_scenes_list_v2_t* scene_node = ezlopi_scenes_get_scenes_head_v2();
-        while (scene_node)
-        {
-            if (scene_node->thread_ctx)
-            {
-                __scene_proto_thread(scene_node, 1000); //
-            }
+    l_scenes_list_v2_t* scene_node = ezlopi_scenes_get_scenes_head_v2();
 
-            vTaskDelay(100);
-            scene_node = scene_node->next;
+    while (scene_node)
+    {
+        if (scene_node->thread_ctx)
+        {
+            __scene_proto_thread(scene_node, 1000); //
         }
+
+        scene_node = scene_node->next;
+        vTaskDelay(10 / portTICK_RATE_MS);
     }
 }
+
+#if 0
+static void __scenes_loop(void* pv)
+{
+    l_scenes_list_v2_t* scene_node = ezlopi_scenes_get_scenes_head_v2();
+
+    while (scene_node)
+    {
+        if (scene_node->thread_ctx)
+        {
+            __scene_proto_thread(scene_node, 1000); //
+        }
+
+        scene_node = scene_node->next;
+        vTaskDelay(10 / portTICK_RATE_MS);
+    }
+}
+#endif
 
 static int __execute_scene_stop(l_scenes_list_v2_t* scene_node)
 {

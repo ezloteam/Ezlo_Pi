@@ -1,7 +1,7 @@
 #include "driver/gpio.h"
 #include "ezlopi_util_trace.h"
 
-#include "ezlopi_core_timer.h"
+// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
@@ -65,7 +65,7 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
         cJSON* cj_result = (cJSON*)arg;
         if (cj_result)
         {
-            ezlopi_valueformatter_bool_to_cjson(item, cj_result, item->interface.gpio.gpio_in.value);
+            ezlopi_valueformatter_bool_to_cjson(cj_result, item->interface.gpio.gpio_in.value, item->cloud_properties.scale);
         }
     }
 
@@ -90,7 +90,7 @@ static int __init(l_ezlopi_item_t* item)
 
             if (0 == gpio_config(&touch_switch_config)) // ESP_OK
             {
-                gpio_isr_service_register_v3(item, touch_switch_callback, 200);
+                ezlopi_service_gpioisr_register_v3(item, touch_switch_callback, 200);
                 ret = 1;
             }
             else

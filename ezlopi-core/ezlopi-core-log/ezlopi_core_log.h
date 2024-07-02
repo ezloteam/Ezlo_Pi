@@ -21,6 +21,7 @@ typedef enum {
 
 
 void ezlopi_core_read_set_log_severities();
+void ezlopi_core_read_set_log_severities_internal(e_ezlopi_log_severity_t severity);
 int ezlopi_core_cloud_log_severity_process_str(bool severity_enable, const char* severity_str);
 int ezlopi_core_cloud_log_severity_process_id(const e_ezlopi_log_severity_t severity_level_id);
 

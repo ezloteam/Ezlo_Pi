@@ -168,7 +168,7 @@ extern "C"
 
 #elif (EZLOPI_DEVICE_TYPE_TEST_DEVICE == EZLOPI_DEVICE_TYPE)
 #if defined(CONFIG_IDF_TARGET_ESP32)
-    static const char* ezlopi_config_test = "{\"cmd\":3,\"dev_detail\":[{\"dev_type\":1,\"dev_name\":\"switch_temp\",\"id_room\":\"\",\"id_item\":2,\"gpio_in\":0,\"gpio_out\":25,\"pullup_ip\":false,\"pullup_op\":false,\"is_ip\":false,\"ip_inv\":false,\"op_inv\":false,\"val_ip\":false,\"val_op\":false},{\"dev_type\":7,\"dev_name\":\"temp_humi\",\"id_room\":\"\",\"id_item\":16,\"gpio\":12}],\"config_id\":\"1234567\",\"config_time\":1696508363,\"config_name\":\"My moisture sensor\",\"chipset\":\"ESP32\"}";
+    static const char* ezlopi_config_test = "{\"cmd\":3,\"dev_detail\":[{\"dev_type\":1,\"dev_name\":\"switch_temp\",\"id_room\":\"\",\"id_item\":2,\"gpio_in\":0,\"gpio_out\":25,\"pullup_ip\":false,\"pullup_op\":false,\"is_ip\":false,\"ip_inv\":false,\"op_inv\":false,\"val_ip\":false,\"val_op\":false},{\"dev_type\":7,\"dev_name\":\"DHT22_temp_humi\",\"id_room\":\"\",\"id_item\":16,\"gpio\":21}],\"config_id\":\"1234567\",\"config_time\":1696508363,\"config_name\":\"My moisture sensor\",\"chipset\":\"ESP32\"}";
 #elif defined (CONFIG_IDF_TARGET_ESP32S3)
     static const char* ezlopi_config_test = "{\"cmd\":3,\"dev_detail\":[{\"dev_type\":7,\"dev_name\":\"Temp Hum\",\"id_room\":\"\",\"id_item\":16,\"gpio\":18},{\"dev_type\":3,\"dev_name\":\"POT\",\"id_room\":\"\",\"id_item\":70,\"gpio\":5,\"resln_bit\":3}],\"chipset\":\"ESP32S3\"}";
 #elif defined(CONFIG_IDF_TARGET_ESP32C3)

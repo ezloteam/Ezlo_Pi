@@ -19,17 +19,26 @@ extern "C"
 {
 #endif
 
-    typedef struct s_rx_data
+    typedef struct s_rx_chunk
     {
-        char* ptr;
         int len;
-        int total_len;
-        struct s_rx_data* next;
+        char* ptr;
+        struct s_rx_chunk* next;
+    } s_rx_chunk_t;
 
+
+    typedef struct
+    {
+        int status;
+        int content_length;
+        int rx_len;
+        s_rx_chunk_t * rx_chunks;
     } s_rx_data_t;
+
     typedef struct ezlopi_http_data
     {
         char* response;
+        int response_len;
         HttpStatus_Code status_code;
 
     } s_ezlopi_http_data_t;

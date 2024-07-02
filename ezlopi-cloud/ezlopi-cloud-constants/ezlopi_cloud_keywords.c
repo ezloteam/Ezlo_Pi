@@ -182,6 +182,7 @@ const char* ezlopi_serial_str = "serial";
 const char* ezlopi_uuid_provisioning_str = "uuid_provisioning";
 const char* ezlopi_provision_server_str = "provision_server";
 const char* ezlopi_cloud_server_str = "cloud_server";
+const char* ezlopi_coordinator_url_str = "coordinator_url";
 const char* ezlopi_provision_token_str = "provision_token";
 const char* ezlopi_device_type_ezlopi_str = "device_type_ezlopi";
 const char* ezlopi_ssl_private_key_str = "ssl_private_key";

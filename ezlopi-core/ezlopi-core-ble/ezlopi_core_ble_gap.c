@@ -101,7 +101,7 @@ void ezlopi_ble_gap_config_adv_data(void)
     esp_err_t ret = esp_ble_gap_config_adv_data(&adv_data);
     if (ESP_OK == ret)
     {
-        TRACE_S("Adv-data set complete");
+        // TRACE_S("Adv-data set complete");
     }
     else
     {
@@ -190,7 +190,7 @@ void ezlopi_ble_setup_adv_config(void)
 
 void ezlopi_ble_gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t* param)
 {
-    TRACE_I("BLE GAP Eevent: [%d]-%s", event, ezlopi_ble_gap_event_to_str(event));
+    // TRACE_I("BLE GAP Eevent: [%d]-%s", event, ezlopi_ble_gap_event_to_str(event));
     switch (event)
     {
     case ESP_GAP_BLE_ADV_DATA_SET_COMPLETE_EVT: // 0
@@ -220,7 +220,7 @@ void ezlopi_ble_gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_p
         }
         else
         {
-            TRACE_S("Start adv success.");
+            // TRACE_S("Start adv success.");
         }
         break;
     }
@@ -239,7 +239,7 @@ void ezlopi_ble_gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_p
     case ESP_GAP_BLE_NC_REQ_EVT: // 16
     {
         esp_ble_confirm_reply(param->ble_security.ble_req.bd_addr, true);
-        TRACE_S("ESP_GAP_BLE_NC_REQ_EVT, the passkey Notify number: %d", param->ble_security.key_notif.passkey);
+        // TRACE_S("ESP_GAP_BLE_NC_REQ_EVT, the passkey Notify number: %d", param->ble_security.key_notif.passkey);
         break;
     }
     case ESP_GAP_BLE_SEC_REQ_EVT: // 10
@@ -249,12 +249,12 @@ void ezlopi_ble_gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_p
     }
     case ESP_GAP_BLE_PASSKEY_NOTIF_EVT: // 11
     {
-        TRACE_S("The passkey Notify number:%06d", param->ble_security.key_notif.passkey);
+        // TRACE_S("The passkey Notify number:%06d", param->ble_security.key_notif.passkey);
         break;
     }
     case ESP_GAP_BLE_KEY_EVT: // 9
     {
-        TRACE_S("key type = %s", esp_key_type_to_str(param->ble_security.ble_key.key_type));
+        // TRACE_S("key type = %s", esp_key_type_to_str(param->ble_security.ble_key.key_type));
         break;
     }
     case ESP_GAP_BLE_AUTH_CMPL_EVT: // 8
@@ -262,7 +262,7 @@ void ezlopi_ble_gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_p
         esp_bd_addr_t bd_addr;
         memcpy(bd_addr, param->ble_security.auth_cmpl.bd_addr, sizeof(esp_bd_addr_t));
         // dump("remote BD_ADDR", bd_addr, 0, 6);
-        TRACE_I("address type = %d", param->ble_security.auth_cmpl.addr_type);
+        // TRACE_I("address type = %d", param->ble_security.auth_cmpl.addr_type);
         if (!param->ble_security.auth_cmpl.success)
         {
             TRACE_W("pair status = fail");

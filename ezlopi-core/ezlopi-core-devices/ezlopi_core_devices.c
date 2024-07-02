@@ -8,6 +8,7 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "EZLOPI_USER_CONFIG.h"
+#include "../../build/config/sdkconfig.h"
 
 static l_ezlopi_device_t* l_device_head = NULL;
 static volatile uint32_t g_store_dev_config_with_id = 0;
@@ -596,6 +597,7 @@ static int ezlopi_device_parse_json_v3(cJSON* cjson_config)
 
     if (cjson_config)
     {
+        CJSON_TRACE("cjson-config", cjson_config);
         cJSON* cjson_chipset = cJSON_GetObjectItem(__FUNCTION__, cjson_config, ezlopi_chipset_str);
 
         if (cjson_chipset)
