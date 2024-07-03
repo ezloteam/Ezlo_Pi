@@ -13,6 +13,7 @@ idf_component_register(SRCS "device_0009_other_RMT_SK6812.c"
                         ezlopi-core-actions 
                         ezlopi-core-devices 
                         ezlopi-core-valueformatter 
+                        ezlopi-core-errors
 
                         #ezlopi-hal-i2c
                         #ezlopi-hal-spi

@@ -6,6 +6,7 @@
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
+#include "ezlopi_core_errors.h"
 
 #include "ezlopi_hal_gpio.h"
 
@@ -15,14 +16,14 @@
 #include "ezlopi_service_gpioisr.h"
 
 #include "device_0004_digitalIn_generic.h"
-static int __prepare(void* arg);
-static int __init(l_ezlopi_item_t* item);
+static ezlopi_error_t __prepare(void* arg);
+static ezlopi_error_t __init(l_ezlopi_item_t* item);
 static void __interrupt_upcall(void* arg);
-static int __get_value_cjson(l_ezlopi_item_t* item, void* arg);
+static ezlopi_error_t __get_value_cjson(l_ezlopi_item_t* item, void* arg);
 
-int device_0004_digitalIn_generic(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
+ezlopi_error_t device_0004_digitalIn_generic(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_SUCCESS;
 
     switch (action)
     {
@@ -86,9 +87,9 @@ static void __setup_item_properties(l_ezlopi_item_t* item, cJSON* cjson_device)
     item->interface.gpio.gpio_in.interrupt = GPIO_INTR_DISABLE;
 }
 
-static int __prepare(void* arg)
+static ezlopi_error_t __prepare(void* arg)
 {
-    int ret = 0;
+    int ret = EZPI_SUCCESS;
     if (arg)
     {
         s_ezlopi_prep_arg_t* prep_arg = (s_ezlopi_prep_arg_t*)arg;
@@ -108,7 +109,7 @@ static int __prepare(void* arg)
                 else
                 {
                     ezlopi_device_free_device(device);
-                    ret = -1;
+                    ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                 }
             }
         }
@@ -117,9 +118,9 @@ static int __prepare(void* arg)
     return ret;
 }
 
-static int __init(l_ezlopi_item_t* item)
+static ezlopi_error_t __init(l_ezlopi_item_t* item)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_SUCCESS;
     if (item)
     {
         if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num) &&
@@ -145,32 +146,31 @@ static int __init(l_ezlopi_item_t* item)
             if (0 == gpio_config(&io_conf))
             {
                 gpio_isr_service_register_v3(item, __interrupt_upcall, 1000);
-                ret = 1;
             }
             else
             {
-                ret = -1;
+                ret = EZPI_ERR_INIT_DEVICE_FAILED;
             }
         }
         else
         {
-            ret = -1;
+            ret = EZPI_ERR_INIT_DEVICE_FAILED;
         }
     }
 
     return ret;
 }
 
-static int __get_value_cjson(l_ezlopi_item_t* item, void* arg)
+static ezlopi_error_t __get_value_cjson(l_ezlopi_item_t* item, void* arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
     if (item && arg)
     {
         cJSON* cj_propertise = (cJSON*)arg;
         if (cj_propertise)
         {
             ezlopi_valueformatter_bool_to_cjson(item, cj_propertise, item->interface.gpio.gpio_out.value);
-            ret = 1;
+            ret = EZPI_SUCCESS;
         }
     }
 
