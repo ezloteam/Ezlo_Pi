@@ -75,6 +75,9 @@ extern "C"
     char* ezlopi_nvs_read_scenes_expressions(void);
     int ezlopi_nvs_write_scenes_expressions(char* data);
 
+    char* ezlopi_nvs_read_device_groups(void);
+    int ezlopi_nvs_write_device_groups(char* data);
+
     char* ezlopi_nvs_read_rooms(void);
     int ezlopi_nvs_write_rooms(char* data);
 

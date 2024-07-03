@@ -158,23 +158,6 @@ void device_updated(cJSON* cj_request, cJSON* cj_response)
 
 void device_group_create(cJSON* cj_request, cJSON* cj_response)
 {
-    // cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
-    // if (cj_result)
-    // {
-    //     cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
-    //     if (cj_params)
-    //     {
-    //         cJSON* cj_device_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi__id_str);
-    //         cJSON* cj_armed_status = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_armed_str);
-    //         if (cj_device_id && cj_armed_status)
-    //         {
-    //             uint32_t device_id = strtoul(cj_device_id->valuestring, NULL, 16);
-    //             bool armed_status = cj_armed_status->type == cJSON_True ? true : false;
-    //             ezlopi_device_set_reset_device_armed_status(device_id, armed_status);
-    //         }
-    //     }
-    // }
-    // return;
     if (cj_request && cj_response)
     {
         cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
@@ -182,8 +165,8 @@ void device_group_create(cJSON* cj_request, cJSON* cj_response)
         cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
         if (cj_params)
         {
-            CJSON_TRACE("expressions params", cj_params);
-            ezlopi_scenes_expressions_add_to_head(0, cj_params);
+            CJSON_TRACE("device_group params", cj_params);
+            ezlopi_device_grp_add_to_head(0, cj_params);
         }
     }
 }
