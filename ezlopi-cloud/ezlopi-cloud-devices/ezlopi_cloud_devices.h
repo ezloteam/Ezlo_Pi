@@ -25,7 +25,11 @@ extern "C"
     void device_group_update(cJSON* cj_request, cJSON* cj_response);
     void device_groups_list(cJSON* cj_request, cJSON* cj_response);
     void device_group_get(cJSON* cj_request, cJSON* cj_response);
-    
+
+
+
+    ///////////// device-grp updaters
+
 
 
 #ifdef __cplusplus
