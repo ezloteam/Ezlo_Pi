@@ -30,6 +30,8 @@
 #include "ezlopi_core_event_group.h"
 #include "ezlopi_core_device_value_updated.h"
 #include "ezlopi_core_processes.h"
+#include "ezlopi_core_broadcast.h"
+#include "ezlopi_cloud_constants.h"
 
 #include "ezlopi_service_uart.h"
 #include "EZLOPI_USER_CONFIG.h"
@@ -120,7 +122,7 @@ static esp_err_t set_wifi_station_host_name(void)
     return err;
 }
 
-static int get_auth_mode_str(char auth_str[50], wifi_auth_mode_t mode)
+int get_auth_mode_str(char auth_str[50], wifi_auth_mode_t mode)
 {
     int ret = 0;
     memset(auth_str, 0, 50);
@@ -139,37 +141,37 @@ static int get_auth_mode_str(char auth_str[50], wifi_auth_mode_t mode)
     }
     case WIFI_AUTH_WPA_PSK:
     {
-        auth_mode_str = "wpa-psk";
+        auth_mode_str = "psk";
         break;
     }
     case WIFI_AUTH_WPA2_PSK:
     {
-        auth_mode_str = "wpa2-psk";
+        auth_mode_str = "psk2";
         break;
     }
     case WIFI_AUTH_WPA_WPA2_PSK:
     {
-        auth_mode_str = "wpa-wpa2-psk";
+        auth_mode_str = "psk2";
         break;
     }
     case WIFI_AUTH_WPA2_ENTERPRISE:
     {
-        auth_mode_str = "wpa2-enterprise";
+        auth_mode_str = "enterprise";
         break;
     }
     case WIFI_AUTH_WPA3_PSK:
     {
-        auth_mode_str = "wpa2-psk";
+        auth_mode_str = "psk3";
         break;
     }
     case WIFI_AUTH_WPA2_WPA3_PSK:
     {
-        auth_mode_str = "wpa2-wpa3-psk";
+        auth_mode_str = "psk3";
         break;
     }
     case WIFI_AUTH_WAPI_PSK:
     {
-        auth_mode_str = "wapi-psk";
+        auth_mode_str = "psk3";
         break;
     }
     case WIFI_AUTH_MAX:
@@ -353,6 +355,50 @@ static ll_ezlopi_wifi_event_upcall_t* ezlopi_wifi_event_upcall_create(f_ezlopi_w
     return _upcall;
 }
 
+static void ezlopi_core_device_broadcast_wifi_start_scan()
+{
+    cJSON *cj_scan_start = cJSON_CreateObject(__FUNCTION__);
+    if (cj_scan_start)
+    {
+        cJSON_AddStringToObject(__FUNCTION__, cj_scan_start, ezlopi_id_str, ezlopi_ui_broadcast_str);
+        cJSON_AddStringToObject(__FUNCTION__, cj_scan_start, ezlopi_msg_subclass_str, method_hub_network_wifi_scan_progress);
+        
+        cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_scan_start, ezlopi_result_str);
+        if(cj_result)
+        {
+            cJSON_AddStringToObject(__FUNCTION__, cj_result, "interfaceId", "wlan0");
+            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_status_str, "started");
+        }
+
+        if(!ezlopi_core_broadcast_add_to_queue(cj_scan_start))
+        {
+            cJSON_Delete(__FUNCTION__, cj_scan_start);
+        }
+    }
+}
+
+static void ezlopi_core_device_broadcast_wifi_stop_scan()
+{
+    cJSON *cj_scan_stop = cJSON_CreateObject(__FUNCTION__);
+    if (cj_scan_stop)
+    {
+        cJSON_AddStringToObject(__FUNCTION__, cj_scan_stop, ezlopi_id_str, ezlopi_ui_broadcast_str);
+        cJSON_AddStringToObject(__FUNCTION__, cj_scan_stop, ezlopi_msg_subclass_str, method_hub_network_wifi_scan_progress);
+        
+        cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_scan_stop, ezlopi_result_str);
+        if(cj_result)
+        {
+            cJSON_AddStringToObject(__FUNCTION__, cj_result, "interfaceId", "wlan0");
+            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_status_str, "finished");
+        }
+
+        if(!ezlopi_core_broadcast_add_to_queue(cj_scan_stop))
+        {
+            cJSON_Delete(__FUNCTION__, cj_scan_stop);
+        }
+    }
+}
+
 static void ezlopi_wifi_scanner_task(void* params)
 {
     TickType_t start_time = xTaskGetTickCount();
@@ -368,6 +414,7 @@ static void ezlopi_wifi_scanner_task(void* params)
         .scan_time.active.max = 150,
     };
 
+    ezlopi_core_device_broadcast_wifi_start_scan();
     while (1)
     {
         current_time = (xTaskGetTickCount() - start_time);
@@ -390,6 +437,7 @@ static void ezlopi_wifi_scanner_task(void* params)
         }
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
+    ezlopi_core_device_broadcast_wifi_stop_scan();
     ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_CORE_WIFI_SCANNER_TASK);
     sg_scan_handle = NULL;
     vTaskDelete(NULL);
