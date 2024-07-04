@@ -134,4 +134,8 @@ extern const char *ezlopi_hub_room_reordered_str;
 
 extern const char *ezlopi_hub_modes_changed_str;
 
+extern const char *ezlopi_hub_device_group_created;
+extern const char *ezlopi_hub_device_group_deleted;
+extern const char *ezlopi_hub_device_group_updated;
+
 #endif // __EZLOPI_METHODS_STR_H__

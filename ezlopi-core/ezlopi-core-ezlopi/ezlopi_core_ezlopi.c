@@ -17,6 +17,7 @@
 #include "ezlopi_core_event_queue.h"
 #include "ezlopi_core_event_group.h"
 #include "ezlopi_core_factory_info.h"
+#include "ezlopi_core_device_group.h"
 #include "ezlopi_core_devices_list.h"
 #include "ezlopi_core_scenes_scripts.h"
 #include "ezlopi_core_scenes_expressions.h"
@@ -61,6 +62,9 @@ void ezlopi_init(void)
     vTaskDelay(10);
     // Init devices
     ezlopi_device_prepare();
+    vTaskDelay(10);
+    // Init device_groups
+    ezlopi_device_group_init();
     vTaskDelay(10);
     ezlopi_initialize_devices_v3();
     vTaskDelay(10);

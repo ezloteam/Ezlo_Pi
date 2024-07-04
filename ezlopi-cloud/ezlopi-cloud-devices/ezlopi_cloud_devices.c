@@ -4,10 +4,11 @@
 #include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_factory_info.h"
-#include "ezlopi_core_devices.h"
 #include "ezlopi_core_devices_list.h"
 #include "ezlopi_core_api_methods.h"
 #include "ezlopi_core_sntp.h"
+#include "ezlopi_core_nvs.h"
+#include "ezlopi_core_device_group.h"
 
 #include "ezlopi_cloud_keywords.h"
 #include "ezlopi_cloud_methods_str.h"
@@ -155,7 +156,6 @@ void device_updated(cJSON* cj_request, cJSON* cj_response)
     }
 }
 
-
 void device_group_create(cJSON* cj_request, cJSON* cj_response)
 {
     if (cj_request && cj_response)
@@ -165,13 +165,177 @@ void device_group_create(cJSON* cj_request, cJSON* cj_response)
         cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
         if (cj_params)
         {
-            CJSON_TRACE("device_group params", cj_params);
-            ezlopi_device_grp_add_to_head(0, cj_params);
+            uint32_t new_device_grp_id = ezlopi_core_device_group_store_nvs_devgrp(cj_params);
+            TRACE_D("new-device-grp-id: %08x", new_device_grp_id);
+
+            if (new_device_grp_id)
+            {
+                char tmp_buff[32];
+                snprintf(tmp_buff, sizeof(tmp_buff), "%08x", new_device_grp_id);
+                cJSON_AddStringToObject(__FUNCTION__, cj_request, ezlopi__id_str, tmp_buff); // _id -> group_id
+                ezlopi_core_device_group_new_devgrp_populate(cj_params, new_device_grp_id);
+            }
+        }
+    }
+}
+
+void device_group_get(cJSON* cj_request, cJSON* cj_response)
+{
+    cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
+    if (cj_params)
+    {
+        cJSON* cj_devgrp_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, "id");
+        if (cj_devgrp_id && cj_devgrp_id->valuestring)
+        {
+            char* devgrp_str = ezlopi_nvs_read_str(cj_devgrp_id->valuestring);
+            if (devgrp_str)
+            {
+                cJSON_AddRawToObject(__FUNCTION__, cj_response, ezlopi_result_str, devgrp_str);
+                ezlopi_free(__FUNCTION__, devgrp_str);
+            }
+        }
+    }
+}
+
+void device_groups_list(cJSON* cj_request, cJSON* cj_response)
+{
+    cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+    if (cj_result)
+    {
+        ezlopi_core_device_group_get_list(cJSON_AddArrayToObject(__FUNCTION__, cj_result, "deviceGroups"));
+        cJSON* cj_ver_str = cJSON_GetObjectItem(__FUNCTION__, cj_request, "version");
+        if (cj_ver_str && cj_ver_str->valuestring && cj_ver_str->str_value_len)
+        {
+            cJSON_AddStringToObject(__FUNCTION__, cj_result, "version", cj_ver_str->valuestring);
+        }
+    }
+}
+
+void device_group_delete(cJSON* cj_request, cJSON* cj_response)
+{
+    cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+
+    cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
+    if (cj_params)
+    {
+        cJSON* cj_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, "id");
+        if (cj_id && cj_id->valuestring)
+        {
+            uint32_t dev_grp_id = strtoul(cj_id->valuestring, NULL, 16);
+
+            // 1. check if 'dev_grp' is persistant
+            l_ezlopi_device_grp_t* curr_devgrp = ezlopi_core_device_group_get_by_id(dev_grp_id);
+            if (curr_devgrp->persistent)
+            {   // if 'true'
+                cJSON * cj_force = cJSON_GetObjectItem(__FUNCTION__, cj_params, "force");
+                if (cj_force && cJSON_IsTrue(cj_force))
+                {
+                    ezlopi_nvs_delete_stored_data_by_id(dev_grp_id);  // from nvs
+                    ezlopi_core_device_group_depopulate_by_id_v2(dev_grp_id);   // from ll
+                    ezlopi_core_device_group_remove_id_from_list(dev_grp_id);   // from nvs-list
+                }
+                else
+                {
+                    TRACE_E("Error!! , Unable to delete 'device_group_id' : [%d]", dev_grp_id);
+                }
+            }
+            else
+            {
+                ezlopi_nvs_delete_stored_data_by_id(dev_grp_id);
+                ezlopi_core_device_group_depopulate_by_id_v2(dev_grp_id);
+                ezlopi_core_device_group_remove_id_from_list(dev_grp_id);
+            }
+        }
+    }
+}
+
+void device_group_update(cJSON* cj_request, cJSON* cj_response)
+{
+    cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
+    if (cj_params)
+    {
+        cJSON* cj_devgrp_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, "id");
+        if (cj_devgrp_id && cj_devgrp_id->valuestring)
+        {
+            // CJSON_TRACE("dev-grp [new] : ", cj_devgrp_id);
+            uint32_t req_devgrp_id = strtoul(cj_devgrp_id->valuestring, NULL, 16);
+
+            // edit in nvs and populate again
+            ezlopi_core_device_group_edit_by_id(req_devgrp_id, cj_params);
         }
     }
 }
 
 ////// updater for device-grps
 ////// for 'hub.device.group.created'
+
+void device_group_created(cJSON * cj_request, cJSON * cj_response)
+{
+    cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_sender_str);
+    cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_error_str);
+
+    cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
+    cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, ezlopi_hub_device_group_created);
+
+    cJSON* new_devgrp_id = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi__id_str);
+    if (new_devgrp_id && new_devgrp_id->valuestring)
+    {
+        char* new_devgrp = ezlopi_nvs_read_str(new_devgrp_id->valuestring);
+        if (new_devgrp)
+        {
+            cJSON_AddRawToObject(__FUNCTION__, cj_response, ezlopi_result_str, new_devgrp);
+            ezlopi_free(__FUNCTION__, new_devgrp);
+        }
+    }
+}
+
+void device_group_deleted(cJSON * cj_request, cJSON * cj_response)
+{
+    cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_sender_str);
+    cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_error_str);
+
+    cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
+    cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, ezlopi_hub_device_group_deleted);
+
+    cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+    if (cj_result)
+    {
+        cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
+        if (cj_params)
+        {
+            cJSON* tmp__id = cJSON_GetObjectItem(__FUNCTION__, cj_params, "id");
+            if (tmp__id)
+            {
+                cJSON_AddItemToObject(__FUNCTION__, cj_result, ezlopi__id_str, cJSON_Duplicate(__FUNCTION__, tmp__id, pdTRUE));
+            }
+        }
+    }
+}
+
+void device_group_updated(cJSON * cj_request, cJSON * cj_response)
+{
+    cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_sender_str);
+    cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_error_str);
+
+    cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
+    cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, ezlopi_hub_device_group_updated);
+
+    cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
+    if (cj_params)
+    {
+        cJSON* cj_devgrp_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, "id");
+        if (cj_devgrp_id && cj_devgrp_id->valuestring)
+        {
+            char* devgrp_str = ezlopi_nvs_read_str(cj_devgrp_id->valuestring);
+            if (devgrp_str)
+            {
+                cJSON_AddRawToObject(__FUNCTION__, cj_response, ezlopi_result_str, devgrp_str);
+                ezlopi_free(__FUNCTION__, devgrp_str);
+            }
+        }
+    }
+}
+
+
 
 

@@ -208,7 +208,7 @@ uint32_t ezlopi_scenes_get_list_v2(cJSON* cj_scenes_array)
                         {
                             char scene_id_str[32];
                             snprintf(scene_id_str, sizeof(scene_id_str), "%08x", (uint32_t)cj_scene_id->valuedouble);
-                            cJSON_AddStringToObject(__FUNCTION__, cj_scene, ezlopi__id_str, scene_id_str);
+                            cJSON_AddStringToObject(__FUNCTION__, cj_scene, ezlopi__id_str, scene_id_str);// NVS already might have '_id'
                             if (!cJSON_AddItemToArray(cj_scenes_array, cj_scene))
                             {
                                 cJSON_Delete(__FUNCTION__, cj_scene);

@@ -178,7 +178,7 @@ char* ezlopi_nvs_read_scenes_expressions(void)
 
 int ezlopi_nvs_write_device_groups(char* data)
 {
-    return ezlopi_nvs_write_str(data, strlen(data), ezlopi_device_groups);
+    return ezlopi_nvs_write_str(data, strlen(data) + 1, ezlopi_device_groups);
 }
 
 char* ezlopi_nvs_read_device_groups(void)
