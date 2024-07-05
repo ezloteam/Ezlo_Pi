@@ -1,32 +1,30 @@
 
-
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_device_group.h"
 
 #include "ezlopi_cloud_constants.h"
 
+#include "EZLOPI_USER_CONFIG.h"
+
+//--------------------------------------------------------------------------------
+//      Static Functions.
+//--------------------------------------------------------------------------------
+
 static l_ezlopi_device_grp_t* l_device_grp_head = NULL;
+static l_ezlopi_item_grp_t* l_item_grp_head = NULL;
 
-////// Device Groups ////////
-
-l_ezlopi_device_grp_t* ezlopi_core_device_group_get_head(void)
+static void __ezlopi_core_device_group_print(l_ezlopi_device_grp_t* device_grp_node)
 {
-    return l_device_grp_head;
-}
-
-//--------------------------------------------------------------------------------
-//  Function to Print the 'device_grp_node'
-//--------------------------------------------------------------------------------
-
-void ezlopi_core_device_group_print(l_ezlopi_device_grp_t* device_grp_node)
-{
-#if (ENABLE_TRACE)
+#if (1 == ENABLE_TRACE)
     if (device_grp_node)
     {
         TRACE_D("----------------- DEVICE-GROUP --------------------");
         TRACE_D("Group_id: %08x", device_grp_node->_id);
         TRACE_D("Group_name: %s", device_grp_node->name);
         CJSON_TRACE("Categories", device_grp_node->categories);
+        CJSON_TRACE("Devices", device_grp_node->devices);
+        CJSON_TRACE("Exceptions", device_grp_node->exceptions);
+#if 0
         // cJSON * categories_arr = NULL;
         // if (NULL != (categories_arr = cJSON_GetObjectItem(__FUNCTION__, device_grp_node->categories, "categories")))
         // {
@@ -39,8 +37,6 @@ void ezlopi_core_device_group_print(l_ezlopi_device_grp_t* device_grp_node)
         //         CJSON_TRACE("\t\t -", categories);
         //     }
         // }
-
-        CJSON_TRACE("Devices", device_grp_node->devices);
         // cJSON * devices_arr = NULL;
         // if (NULL != (devices_arr = cJSON_GetObjectItem(__FUNCTION__, device_grp_node->devices, "devices")))
         // {
@@ -53,8 +49,6 @@ void ezlopi_core_device_group_print(l_ezlopi_device_grp_t* device_grp_node)
         //         CJSON_TRACE("\t\t -", device);
         //     }
         // }
-
-        CJSON_TRACE("Exceptions", device_grp_node->exceptions);
         // cJSON * exceptions_arr = NULL;
         // if (NULL != (exceptions_arr = cJSON_GetObjectItem(__FUNCTION__, device_grp_node->exceptions, "exceptions")))
         // {
@@ -67,6 +61,7 @@ void ezlopi_core_device_group_print(l_ezlopi_device_grp_t* device_grp_node)
         //         CJSON_TRACE("\t\t -", exception);
         //     }
         // }
+#endif
 
         TRACE_D("Persistent: %s", device_grp_node->persistent ? "True" : "False");
         TRACE_D("Entry_Delay: %s", (EZLOPI_DEVICE_GRP_ENTRYDELAY_NORMAL == device_grp_node->entry_delay) ? "normal"
@@ -81,34 +76,33 @@ void ezlopi_core_device_group_print(l_ezlopi_device_grp_t* device_grp_node)
     }
 #endif
 }
-
-/**
- * @brief Returns the node associated with required 'device_group_id'
- *
- * @param _id  'device_group_id'
- * @return l_ezlopi_device_grp_t*
- */
-l_ezlopi_device_grp_t* ezlopi_core_device_group_get_by_id(uint32_t _id)
+static void __ezlopi_core_item_group_print(l_ezlopi_item_grp_t* item_grp_node)
 {
-    l_ezlopi_device_grp_t* ret_devgrp_node = NULL;
-    l_ezlopi_device_grp_t* devgrp_list = l_device_grp_head;
-    while (devgrp_list)
+#if (1 == ENABLE_TRACE)
+    if (item_grp_node)
     {
-        if (_id == devgrp_list->_id)
-        {
-            ret_devgrp_node = devgrp_list;
-            break;
-        }
-        devgrp_list = devgrp_list->next;
+        TRACE_D("----------------- item-GROUP --------------------");
+        TRACE_D("Group_id: %08x", item_grp_node->_id);
+        TRACE_D("Group_name: %s", item_grp_node->name);
+        TRACE_D("Has_Getter: %s", item_grp_node->has_getter ? "True" : "False");
+        TRACE_D("Has_Setter: %s", item_grp_node->has_setter ? "True" : "False");
+        TRACE_D("Persistent: %s", item_grp_node->persistent ? "True" : "False");
+        CJSON_TRACE("Item_Names", item_grp_node->item_names);
+        TRACE_D("Value_Type: %s", item_grp_node->value_type);
+        CJSON_TRACE("Enum", item_grp_node->enum_values);
+        CJSON_TRACE("Value_Type_Family", item_grp_node->value_type_family);
+        TRACE_D("Role: %s", (EZLOPI_ITEM_GRP_ROLE_HOUSE_MODES == item_grp_node->role) ? "house_modes" : (EZLOPI_ITEM_GRP_ROLE_LIFE_SAFETY == item_grp_node->role) ? "lifeSafety" : "empty");
+        CJSON_TRACE(ezlopi_info_str, item_grp_node->info);
+        TRACE_D("----------------- ---------- --------------------");
     }
-
-    return ret_devgrp_node;
+#endif
 }
+
 
 static void __edit_devgrp_from_ll(l_ezlopi_device_grp_t* req_devgrp_node, cJSON* cj_devgrp_new)
 {
     CJSON_GET_VALUE_STRING_BY_COPY(cj_devgrp_new, ezlopi_name_str, req_devgrp_node->name);
-    CJSON_GET_VALUE_BOOL(cj_devgrp_new, "persistent", req_devgrp_node->persistent);
+    CJSON_GET_VALUE_BOOL(cj_devgrp_new, ezlopi_persistent_str, req_devgrp_node->persistent);
     CJSON_GET_VALUE_BOOL(cj_devgrp_new, "followEntry", req_devgrp_node->follow_entry);
     CJSON_GET_VALUE_STRING_BY_COPY(cj_devgrp_new, "packageId", req_devgrp_node->package_id);
 
@@ -163,6 +157,67 @@ static void __edit_devgrp_from_ll(l_ezlopi_device_grp_t* req_devgrp_node, cJSON*
             req_devgrp_node->role = ((0 == strncmp(cj_role->valuestring, "house_modes", 12)) ? EZLOPI_DEVICE_GRP_ROLE_HOUSE_MODES : EZLOPI_DEVICE_GRP_ROLE_USER);
         }
     }
+    __ezlopi_core_device_group_print(req_devgrp_node);
+}
+static void __edit_itemgrp_from_ll(l_ezlopi_item_grp_t* req_itemgrp_node, cJSON* cj_itemgrp_new)
+{
+    CJSON_GET_VALUE_STRING_BY_COPY(cj_itemgrp_new, ezlopi_name_str, req_itemgrp_node->name);
+    CJSON_GET_VALUE_BOOL(cj_itemgrp_new, "hasGetter", req_itemgrp_node->has_getter);
+    CJSON_GET_VALUE_BOOL(cj_itemgrp_new, "hasSetter", req_itemgrp_node->has_setter);
+    CJSON_GET_VALUE_BOOL(cj_itemgrp_new, ezlopi_persistent_str, req_itemgrp_node->persistent);
+    CJSON_GET_VALUE_STRING_BY_COPY(cj_itemgrp_new, "valueType", req_itemgrp_node->value_type);
+
+    // ------------- itemNames -------------
+    {
+        cJSON_Delete(__FUNCTION__, req_itemgrp_node->item_names);
+        cJSON * cj_item_names = cJSON_GetObjectItem(__FUNCTION__, cj_itemgrp_new, "itemNames");
+        if (cj_item_names && cJSON_IsArray(cj_item_names))
+        {
+            req_itemgrp_node->item_names = cJSON_Duplicate(__FUNCTION__, cj_item_names, cJSON_True);
+        }
+    }
+
+    // ------------- enums -------------
+    {
+        cJSON_Delete(__FUNCTION__, req_itemgrp_node->enum_values);
+        cJSON * cj_enums = cJSON_GetObjectItem(__FUNCTION__, cj_itemgrp_new, ezlopi_enum_str);
+        if (cj_enums && cJSON_IsArray(cj_enums))
+        {
+            req_itemgrp_node->enum_values = cJSON_Duplicate(__FUNCTION__, cj_enums, cJSON_True);
+        }
+    }
+
+    // ------------- valueType_Family -------------
+    {
+        cJSON_Delete(__FUNCTION__, req_itemgrp_node->enum_values);
+        cJSON * cj_valuetype_family = cJSON_GetObjectItem(__FUNCTION__, cj_itemgrp_new, "valueTypeFamily");
+        if (cj_valuetype_family && cJSON_IsArray(cj_valuetype_family))
+        {
+            req_itemgrp_node->value_type_family = cJSON_Duplicate(__FUNCTION__, cj_valuetype_family, cJSON_True);
+        }
+    }
+
+    // ------------- role -------------
+    {
+        cJSON *cj_role = cJSON_GetObjectItem(__FUNCTION__, cj_itemgrp_new, "role");
+        if (cj_role && cj_role->valuestring && cj_role->str_value_len)
+        {
+            req_itemgrp_node->role = ((0 == strncmp(cj_role->valuestring, "house_modes", 12)) ? EZLOPI_ITEM_GRP_ROLE_HOUSE_MODES
+                : (0 == strncmp(cj_role->valuestring, "lifeSafety", 12)) ? EZLOPI_ITEM_GRP_ROLE_LIFE_SAFETY
+                : EZLOPI_ITEM_GRP_ROLE_EMPTY);
+        }
+    }
+
+    // ------------- info -------------
+    {
+        cJSON_Delete(__FUNCTION__, req_itemgrp_node->enum_values);
+        cJSON * cj_info = cJSON_GetObjectItem(__FUNCTION__, cj_itemgrp_new, ezlopi_info_str);
+        if (cj_info && cJSON_IsArray(cj_info))
+        {
+            req_itemgrp_node->info = cJSON_Duplicate(__FUNCTION__, cj_info, cJSON_True);
+        }
+    }
+    __ezlopi_core_item_group_print(req_itemgrp_node);
 }
 
 /**
@@ -188,6 +243,23 @@ static int __ezlopi_core_device_group_edit_update_id(uint32_t devgrp_id, cJSON* 
     }
     return ret;
 }
+static int __ezlopi_core_item_group_edit_update_id(uint32_t itemgrp_id, cJSON* cj_itemgrp_new)
+{
+    int ret = 0;
+    CJSON_TRACE("cj_updated_devgrp_node :", cj_itemgrp_new);
+
+    if (itemgrp_id && cj_itemgrp_new)
+    {
+        l_ezlopi_item_grp_t* req_itemgrp_node = ezlopi_core_item_group_get_by_id(itemgrp_id);
+        if (req_itemgrp_node)
+        {
+            __edit_itemgrp_from_ll(req_itemgrp_node, cj_itemgrp_new);
+            ret = 1;
+        }
+    }
+    return ret;
+}
+
 
 /**
  * @brief This function replaces 'new_devgrp' with old
@@ -195,7 +267,7 @@ static int __ezlopi_core_device_group_edit_update_id(uint32_t devgrp_id, cJSON* 
  * @param cj_devgrp_new 'new_devgrp' in cjson format
  * @return int
  */
-static int __ezlopi_core_device_group_edit_store_updated_to_nvs(cJSON* cj_devgrp_new)
+static int __ezlopi_core_device_group_edit_store_updated_to_nvs(cJSON* cj_devgrp_new)   // input from ll
 {
     int ret = 0;
     if (cj_devgrp_new)
@@ -218,28 +290,29 @@ static int __ezlopi_core_device_group_edit_store_updated_to_nvs(cJSON* cj_devgrp
 
     return ret;
 }
-
-/**
- * @brief This function handles editing of req_id in ll & nvs
- *
- * @param devgrp_id required 'devgrp_id'
- * @param cj_devgrp_new cjson of 'new_devgrp'
- * @return int
- */
-int ezlopi_core_device_group_edit_by_id(uint32_t devgrp_id, cJSON* cj_devgrp_new)
+static int __ezlopi_core_item_group_edit_store_updated_to_nvs(cJSON* cj_itemgrp_new) // input from ll
 {
     int ret = 0;
-
-    if (1 == __ezlopi_core_device_group_edit_update_id(devgrp_id, cj_devgrp_new))
+    if (cj_itemgrp_new)
     {
-        if (1 == __ezlopi_core_device_group_edit_store_updated_to_nvs(cj_devgrp_new))
+        char* update_itemgrp_str = cJSON_PrintBuffered(__FUNCTION__, cj_itemgrp_new, 1024, false);
+        TRACE_D("length of 'update_itemgrp_str': %d", strlen(update_itemgrp_str));
+
+        if (update_itemgrp_str)
         {
-            ret = 1;
+            cJSON* cj_itemgrp_id = cJSON_GetObjectItem(__FUNCTION__, cj_itemgrp_new, "id");  // according to docs --> 'id'
+            if (cj_itemgrp_id && cj_itemgrp_id->valuestring)
+            {
+                ezlopi_nvs_delete_stored_data_by_name(cj_itemgrp_id->valuestring); // delete --> '0x0..devgrp ' : '{}'
+                ret = ezlopi_nvs_write_str(update_itemgrp_str, strlen(update_itemgrp_str), cj_itemgrp_id->valuestring); // write --> '0x0..devgrp ' : '{}'
+            }
+
+            ezlopi_free(__FUNCTION__, update_itemgrp_str);
         }
     }
-
     return ret;
 }
+
 
 /**
  * @brief   This function de-links a specific node having req '_id'
@@ -275,6 +348,35 @@ static l_ezlopi_device_grp_t* __device_group_pop_by_id(uint32_t _id)
 
     return ret_devgrp;
 }
+static l_ezlopi_item_grp_t* __item_group_pop_by_id(uint32_t _id)
+{
+    l_ezlopi_item_grp_t* ret_itemgrp = NULL;
+
+    if (_id == l_item_grp_head->_id)
+    {
+        ret_itemgrp = l_item_grp_head;
+        l_item_grp_head = l_item_grp_head->next;
+        ret_itemgrp->next = NULL;
+    }
+    else
+    {
+        l_ezlopi_item_grp_t* curr_itemgrp = l_item_grp_head;
+        while (curr_itemgrp->next)
+        {
+            if (_id == curr_itemgrp->next->_id)
+            {
+                ret_itemgrp = curr_itemgrp->next;
+                curr_itemgrp->next = curr_itemgrp->next->next;
+                ret_itemgrp->next = NULL;
+                break;
+            }
+            curr_itemgrp = curr_itemgrp->next;
+        }
+    }
+
+    return ret_itemgrp;
+}
+
 
 static void __device_group_delete_node(l_ezlopi_device_grp_t* devgrp_node)
 {
@@ -303,12 +405,310 @@ static void __device_group_delete_node(l_ezlopi_device_grp_t* devgrp_node)
         ezlopi_free(__FUNCTION__, devgrp_node);
     }
 }
+static void __item_group_delete_node(l_ezlopi_item_grp_t* itemgrp_node)
+{
+    if (itemgrp_node)
+    {
+        if (NULL != itemgrp_node->item_names)
+        {
+            cJSON_Delete(__FUNCTION__, itemgrp_node->item_names);
+            itemgrp_node->item_names = NULL;
+        }
 
-/**
- * @brief This function removes perticular 'devgrp_id' from nvs list
- *
- * @param _id
- */
+        if (NULL != itemgrp_node->value_type_family)
+        {
+            cJSON_Delete(__FUNCTION__, itemgrp_node->value_type_family);
+            itemgrp_node->value_type_family = NULL;
+        }
+
+        if (NULL != itemgrp_node->enum_values)
+        {
+            cJSON_Delete(__FUNCTION__, itemgrp_node->enum_values);
+            itemgrp_node->enum_values = NULL;
+        }
+
+        if (NULL != itemgrp_node->info)
+        {
+            cJSON_Delete(__FUNCTION__, itemgrp_node->info);
+            itemgrp_node->info = NULL;
+        }
+
+        __item_group_delete_node(itemgrp_node->next);
+        itemgrp_node->next = NULL;
+        ezlopi_free(__FUNCTION__, itemgrp_node);
+    }
+}
+
+
+static l_ezlopi_device_grp_t* ____device_grp_create_node(cJSON* cj_device_grp, uint32_t device_grp_id)
+{
+    l_ezlopi_device_grp_t* new_device_grp_node = NULL;
+    if (cj_device_grp)
+    {
+        new_device_grp_node = ezlopi_malloc(__FUNCTION__, sizeof(l_ezlopi_device_grp_t));
+        if (new_device_grp_node)
+        {
+            memset(new_device_grp_node, 0, sizeof(l_ezlopi_device_grp_t));
+
+            new_device_grp_node->_id = device_grp_id;
+
+            CJSON_GET_VALUE_STRING_BY_COPY(cj_device_grp, ezlopi_name_str, new_device_grp_node->name);
+            CJSON_GET_VALUE_BOOL(cj_device_grp, ezlopi_persistent_str, new_device_grp_node->persistent);
+            CJSON_GET_VALUE_BOOL(cj_device_grp, "followEntry", new_device_grp_node->follow_entry);
+            CJSON_GET_VALUE_STRING_BY_COPY(cj_device_grp, "packageId", new_device_grp_node->package_id);
+
+            {
+                cJSON * cj_categories = cJSON_GetObjectItem(__FUNCTION__, cj_device_grp, "categories");
+                if (cj_categories && cJSON_IsArray(cj_categories))
+                {
+                    new_device_grp_node->categories = cJSON_Duplicate(__FUNCTION__, cj_categories, cJSON_True);
+                }
+            }
+
+            {
+                cJSON * cj_devices = cJSON_GetObjectItem(__FUNCTION__, cj_device_grp, "devices");
+                if (cj_devices && cJSON_IsArray(cj_devices))
+                {
+                    new_device_grp_node->devices = cJSON_Duplicate(__FUNCTION__, cj_devices, cJSON_True);
+                }
+            }
+
+            {
+                cJSON * cj_exceptions = cJSON_GetObjectItem(__FUNCTION__, cj_device_grp, "exceptions");
+                if (cj_exceptions && cJSON_IsArray(cj_exceptions))
+                {
+                    new_device_grp_node->exceptions = cJSON_Duplicate(__FUNCTION__, cj_exceptions, cJSON_True);
+                }
+            }
+
+            {
+                cJSON *cj_entry_delay = cJSON_GetObjectItem(__FUNCTION__, cj_device_grp, "entryDelay");
+                if (cj_entry_delay && cj_entry_delay->valuestring && cj_entry_delay->str_value_len)
+                {
+                    new_device_grp_node->entry_delay = ((0 == strncmp(cj_entry_delay->valuestring, "normal", 7)) ? EZLOPI_DEVICE_GRP_ENTRYDELAY_NORMAL
+                        : (0 == strncmp(cj_entry_delay->valuestring, "long_extended", 14)) ? EZLOPI_DEVICE_GRP_ENTRYDELAY_LONG_EXTENDED
+                        : (0 == strncmp(cj_entry_delay->valuestring, "extended", 9)) ? EZLOPI_DEVICE_GRP_ENTRYDELAY_EXTENDED
+                        : (0 == strncmp(cj_entry_delay->valuestring, "instant", 8)) ? EZLOPI_DEVICE_GRP_ENTRYDELAY_INSTANT
+                        : EZLOPI_DEVICE_GRP_ENTRYDELAY_NONE);
+                }
+            }
+
+            {
+                cJSON *cj_role = cJSON_GetObjectItem(__FUNCTION__, cj_device_grp, "role");
+                if (cj_role && cj_role->valuestring && cj_role->str_value_len)
+                {
+                    new_device_grp_node->role = ((0 == strncmp(cj_role->valuestring, "house_modes", 12)) ? EZLOPI_DEVICE_GRP_ROLE_HOUSE_MODES : EZLOPI_DEVICE_GRP_ROLE_USER);
+                }
+            }
+
+            __ezlopi_core_device_group_print(new_device_grp_node);
+        }
+    }
+    return new_device_grp_node;
+}
+static l_ezlopi_item_grp_t* ____item_grp_create_node(cJSON* cj_item_grp, uint32_t item_grp_id)
+{
+    l_ezlopi_item_grp_t* new_item_grp_node = NULL;
+    if (cj_item_grp)
+    {
+        new_item_grp_node = ezlopi_malloc(__FUNCTION__, sizeof(l_ezlopi_item_grp_t));
+        if (new_item_grp_node)
+        {
+            memset(new_item_grp_node, 0, sizeof(l_ezlopi_item_grp_t));
+
+            new_item_grp_node->_id = item_grp_id;
+
+            CJSON_GET_VALUE_STRING_BY_COPY(cj_item_grp, ezlopi_name_str, new_item_grp_node->name);
+            CJSON_GET_VALUE_BOOL(cj_item_grp, "hasGetter", new_item_grp_node->has_getter);
+            CJSON_GET_VALUE_BOOL(cj_item_grp, "hasSetter", new_item_grp_node->has_setter);
+            CJSON_GET_VALUE_BOOL(cj_item_grp, ezlopi_persistent_str, new_item_grp_node->persistent);
+            CJSON_GET_VALUE_STRING_BY_COPY(cj_item_grp, ezlopi_valueType_str, new_item_grp_node->value_type);
+
+            {
+                cJSON * cj_item_names = cJSON_GetObjectItem(__FUNCTION__, cj_item_grp, "itemNames");
+                if (cj_item_names && cJSON_IsArray(cj_item_names))
+                {
+                    new_item_grp_node->item_names = cJSON_Duplicate(__FUNCTION__, cj_item_names, cJSON_True);
+                }
+            }
+
+            {
+                cJSON * cj_enum = cJSON_GetObjectItem(__FUNCTION__, cj_item_grp, ezlopi_enum_str);
+                if (cj_enum && cJSON_IsArray(cj_enum))
+                {
+                    new_item_grp_node->enum_values = cJSON_Duplicate(__FUNCTION__, cj_enum, cJSON_True);
+                }
+            }
+
+            {// valueType_Family [cjson]
+                if (NULL == new_item_grp_node->value_type)
+                {
+                    cJSON * cj_valuetype_family_list = cJSON_GetObjectItem(__FUNCTION__, cj_item_grp, "valueTypeFamily");
+                    if (cj_valuetype_family_list && cJSON_IsArray(cj_valuetype_family_list))
+                    {
+                        new_item_grp_node->value_type_family = cJSON_Duplicate(__FUNCTION__, cj_valuetype_family_list, cJSON_True);
+                    }
+                }
+            }
+
+            {
+                cJSON *cj_role = cJSON_GetObjectItem(__FUNCTION__, cj_item_grp, "role");
+                if (cj_role && cj_role->valuestring && cj_role->str_value_len)
+                {
+                    new_item_grp_node->role = ((0 == strncmp(cj_role->valuestring, "house_modes", 12)) ? EZLOPI_ITEM_GRP_ROLE_HOUSE_MODES
+                        : (0 == strncmp(cj_role->valuestring, "lifeSafety", 12)) ? EZLOPI_ITEM_GRP_ROLE_LIFE_SAFETY
+                        : EZLOPI_ITEM_GRP_ROLE_EMPTY);
+                }
+            }
+
+            {
+                cJSON * cj_info = cJSON_GetObjectItem(__FUNCTION__, cj_item_grp, ezlopi_info_str);
+                if (cj_info && cJSON_IsArray(cj_info))
+                {
+                    new_item_grp_node->info = cJSON_Duplicate(__FUNCTION__, cj_info, cJSON_True);
+                }
+            }
+
+            __ezlopi_core_item_group_print(new_item_grp_node);
+        }
+    }
+    return new_item_grp_node;
+}
+
+
+static l_ezlopi_device_grp_t* __device_group_populate(cJSON* cj_device_grp, uint32_t device_grp_id)
+{
+    l_ezlopi_device_grp_t* new_device_grp_node = NULL;
+    if (l_device_grp_head)
+    {
+        l_ezlopi_device_grp_t* current_device_grp = l_device_grp_head;
+        while (current_device_grp->next)
+        {
+            current_device_grp = current_device_grp->next;
+        }
+
+        current_device_grp->next = ____device_grp_create_node(cj_device_grp, device_grp_id);
+        new_device_grp_node = current_device_grp->next;
+    }
+    else
+    {
+        CJSON_TRACE("new-device-group", cj_device_grp);
+        l_device_grp_head = ____device_grp_create_node(cj_device_grp, device_grp_id);
+        new_device_grp_node = l_device_grp_head;
+    }
+
+    return new_device_grp_node;
+}
+static l_ezlopi_item_grp_t* __item_group_populate(cJSON* cj_item_grp, uint32_t item_grp_id)
+{
+    l_ezlopi_item_grp_t* new_item_grp_node = NULL;
+    if (l_item_grp_head)
+    {
+        l_ezlopi_item_grp_t* current_item_grp = l_item_grp_head;
+        while (current_item_grp->next)
+        {
+            current_item_grp = current_item_grp->next;
+        }
+
+        current_item_grp->next = ____item_grp_create_node(cj_item_grp, item_grp_id);
+        new_item_grp_node = current_item_grp->next;
+    }
+    else
+    {
+        CJSON_TRACE("new-item-group", cj_item_grp);
+        l_item_grp_head = ____item_grp_create_node(cj_item_grp, item_grp_id);
+        new_item_grp_node = l_item_grp_head;
+    }
+
+    return new_item_grp_node;
+}
+
+//--------------------------------------------------------------------------------
+//      Device-Group Functions
+//--------------------------------------------------------------------------------
+
+l_ezlopi_device_grp_t* ezlopi_core_device_group_get_head(void)
+{
+    return l_device_grp_head;
+}
+l_ezlopi_item_grp_t* ezlopi_core_item_group_get_head(void)
+{
+    return l_item_grp_head;
+}
+
+
+l_ezlopi_device_grp_t* ezlopi_core_device_group_get_by_id(uint32_t _id)
+{
+    l_ezlopi_device_grp_t* ret_devgrp_node = NULL;
+    l_ezlopi_device_grp_t* devgrp_list = l_device_grp_head;
+    while (devgrp_list)
+    {
+        if (_id == devgrp_list->_id)
+        {
+            ret_devgrp_node = devgrp_list;
+            break;
+        }
+        devgrp_list = devgrp_list->next;
+    }
+
+    return ret_devgrp_node;
+}
+l_ezlopi_item_grp_t* ezlopi_core_item_group_get_by_id(uint32_t _id)
+{
+    l_ezlopi_item_grp_t* ret_itemgrp_node = NULL;
+    l_ezlopi_item_grp_t* itemgrp_list = l_item_grp_head;
+    while (itemgrp_list)
+    {
+        if (_id == itemgrp_list->_id)
+        {
+            ret_itemgrp_node = itemgrp_list;
+            break;
+        }
+        itemgrp_list = itemgrp_list->next;
+    }
+
+    return ret_itemgrp_node;
+}
+
+
+int ezlopi_core_device_group_edit_by_id(uint32_t devgrp_id, cJSON* cj_devgrp_new)
+{
+    int ret = 0;
+
+    if (1 == __ezlopi_core_device_group_edit_update_id(devgrp_id, cj_devgrp_new))   // modifies the ll-node with, 'devgrp_id'
+    {
+        l_ezlopi_device_grp_t* req_devgrp_node = ezlopi_core_device_group_get_by_id(devgrp_id); // this extract the latest ll-node
+        if (req_devgrp_node)
+        {
+            if (1 == __ezlopi_core_device_group_edit_store_updated_to_nvs(ezlopi_core_device_group_create_cjson(req_devgrp_node)))
+            {
+                ret = 1;
+            }
+        }
+    }
+
+    return ret;
+}
+int ezlopi_core_item_group_edit_by_id(uint32_t itemgrp_id, cJSON* cj_itemgrp_new)
+{
+    int ret = 0;
+
+    if (1 == __ezlopi_core_item_group_edit_update_id(itemgrp_id, cj_itemgrp_new))   // modifies the ll-node with, 'itemgrp_id'
+    {
+        l_ezlopi_item_grp_t* req_itemgrp_node = ezlopi_core_item_group_get_by_id(itemgrp_id); // this extract the latest ll-node
+        if (req_itemgrp_node)
+        {
+            if (1 == __ezlopi_core_item_group_edit_store_updated_to_nvs(ezlopi_core_item_group_create_cjson(req_itemgrp_node)))
+            {
+                ret = 1;
+            }
+        }
+    }
+
+    return ret;
+}
+
+
 void ezlopi_core_device_group_remove_id_from_list(uint32_t _id)
 {
     char* devgrp_id_list = ezlopi_nvs_read_device_groups();
@@ -345,16 +745,53 @@ void ezlopi_core_device_group_remove_id_from_list(uint32_t _id)
         ezlopi_free(__FUNCTION__, devgrp_id_list);
     }
 }
+void ezlopi_core_item_group_remove_id_from_list(uint32_t _id)
+{
+    char* itemgrp_id_list = ezlopi_nvs_read_item_groups();
+    if (itemgrp_id_list)
+    {
+        cJSON* cj_itemgrp_id_list = cJSON_Parse(__FUNCTION__, itemgrp_id_list);
+        if (cj_itemgrp_id_list)
+        {
+            uint32_t list_len = cJSON_GetArraySize(cj_itemgrp_id_list);
 
-/**
- * @brief Depopulate perticular node with 'device-group-id'
- *
- * @param _id 'device-group-id'
- */
+            for (int idx = list_len; idx < list_len; idx++)
+            {
+                cJSON* cj_id = cJSON_GetArrayItem(cj_itemgrp_id_list, idx);
+                if (cj_id)
+                {
+                    if (cj_id->valuedouble == _id)
+                    {
+                        cJSON_DeleteItemFromArray(__FUNCTION__, cj_itemgrp_id_list, idx);
+
+                        char* updated_id_list_str = cJSON_PrintBuffered(__FUNCTION__, cj_itemgrp_id_list, 1024, false);
+                        TRACE_D("length of 'updated_id_list_str': %d", strlen(updated_id_list_str));
+
+                        if (updated_id_list_str)
+                        {
+                            ezlopi_nvs_write_item_groups(updated_id_list_str);
+                            ezlopi_free(__FUNCTION__, updated_id_list_str);
+                        }
+                    }
+                }
+            }
+
+            cJSON_Delete(__FUNCTION__, cj_itemgrp_id_list);
+        }
+        ezlopi_free(__FUNCTION__, itemgrp_id_list);
+    }
+}
+
+
 void ezlopi_core_device_group_depopulate_by_id_v2(uint32_t _id)
 {
     __device_group_delete_node(__device_group_pop_by_id(_id));
 }
+void ezlopi_core_item_group_depopulate_by_id_v2(uint32_t _id)
+{
+    __item_group_delete_node(__item_group_pop_by_id(_id));
+}
+
 
 uint32_t ezlopi_core_device_group_get_list(cJSON* cj_devgrp_array)
 {
@@ -407,10 +844,58 @@ uint32_t ezlopi_core_device_group_get_list(cJSON* cj_devgrp_array)
 
     return ret;
 }
+uint32_t ezlopi_core_item_group_get_list(cJSON* cj_itemgrp_array)
+{
+    int ret = 0;
+    char* itemgrp_id_list = ezlopi_nvs_read_item_groups();
+    if (itemgrp_id_list)
+    {
+        cJSON* cj_itemgrp_id_list = cJSON_Parse(__FUNCTION__, itemgrp_id_list);
+        if (cj_itemgrp_id_list)
+        {
+            int array_size = cJSON_GetArraySize(cj_itemgrp_id_list);
+            for (int i = 0; i < array_size; i++)
+            {
+                cJSON* cj_itemgrp_id = cJSON_GetArrayItem(cj_itemgrp_id_list, i);
+                if (cj_itemgrp_id && cj_itemgrp_id->valuedouble)
+                {
+                    char tmp_buffer[32];
+                    uint32_t itemgrp_id = (uint32_t)cj_itemgrp_id->valuedouble;
+                    snprintf(tmp_buffer, sizeof(tmp_buffer), "%08x", itemgrp_id);
+                    char* itemgrp_str = ezlopi_nvs_read_str(tmp_buffer);
+                    if (itemgrp_str)
+                    {
+                        cJSON* cj_itemgrp_node = cJSON_Parse(__FUNCTION__, itemgrp_str);
+                        if (cj_itemgrp_node)
+                        {
+                            char itemgrp_id_str[32];
+                            snprintf(itemgrp_id_str, sizeof(itemgrp_id_str), "%08x", (uint32_t)cj_itemgrp_id->valuedouble);
+                            cJSON_AddStringToObject(__FUNCTION__, cj_itemgrp_node, ezlopi__id_str, itemgrp_id_str);
 
-//--------------------------------------------------------------------------------
-// Functions related to 'device-group' & 'nvs'
-//--------------------------------------------------------------------------------
+                            if (!cJSON_AddItemToArray(cj_itemgrp_array, cj_itemgrp_node))
+                            {
+                                cJSON_Delete(__FUNCTION__, cj_itemgrp_node);
+                            }
+                            else
+                            {
+                                ret += 1;   // return total number of scenes
+                            }
+                        }
+
+                        ezlopi_free(__FUNCTION__, itemgrp_str);
+                    }
+                }
+            }
+
+            cJSON_Delete(__FUNCTION__, cj_itemgrp_id_list);
+        }
+
+        ezlopi_free(__FUNCTION__, itemgrp_id_list);
+    }
+
+    return ret;
+}
+
 
 uint32_t ezlopi_core_device_group_store_nvs_devgrp(cJSON* cj_new_device_grp)
 {
@@ -491,109 +976,97 @@ uint32_t ezlopi_core_device_group_store_nvs_devgrp(cJSON* cj_new_device_grp)
 
     return new_dev_grp_id;
 }
-
-//--------------------------------------------------------------------------------
-//  Functions related to 'device_groups' and 'new_node_population'
-//--------------------------------------------------------------------------------
-
-static l_ezlopi_device_grp_t* ____device_grp_create_node(cJSON* cj_device_grp, uint32_t device_grp_id)
+uint32_t ezlopi_core_item_group_store_nvs_itemgrp(cJSON* cj_new_item_grp)
 {
-    l_ezlopi_device_grp_t* new_device_grp_node = NULL;
-    if (cj_device_grp)
+    uint32_t new_item_grp_id = 0;
+    if (cj_new_item_grp)
     {
-        new_device_grp_node = ezlopi_malloc(__FUNCTION__, sizeof(l_ezlopi_device_grp_t));
-        if (new_device_grp_node)
+        uint32_t new_item_grp_id = ezlopi_cloud_generate_item_group_id();
+        char tmp_buf[32];
+        snprintf(tmp_buf, sizeof(tmp_buf), "%08x", new_item_grp_id);
+        cJSON_AddStringToObject(__FUNCTION__, cj_new_item_grp, ezlopi__id_str, tmp_buf); // _id -> group_id
+
+        char* new_itemgrp_str = cJSON_PrintBuffered(__FUNCTION__, cj_new_item_grp, 1024, false);
+        TRACE_D("length of 'new_itemgrp_str': %d", strlen(new_itemgrp_str));
+
+        if (new_itemgrp_str)
         {
-            memset(new_device_grp_node, 0, sizeof(l_ezlopi_device_grp_t));
-
-            new_device_grp_node->_id = device_grp_id;
-
-            CJSON_GET_VALUE_STRING_BY_COPY(cj_device_grp, ezlopi_name_str, new_device_grp_node->name);
-            CJSON_GET_VALUE_BOOL(cj_device_grp, "persistent", new_device_grp_node->persistent);
-            CJSON_GET_VALUE_BOOL(cj_device_grp, "followEntry", new_device_grp_node->follow_entry);
-            CJSON_GET_VALUE_STRING_BY_COPY(cj_device_grp, "packageId", new_device_grp_node->package_id);
-
+            if (ezlopi_nvs_write_str(new_itemgrp_str, strlen(new_itemgrp_str) + 1, tmp_buf))
             {
-                cJSON * cj_categories = cJSON_GetObjectItem(__FUNCTION__, cj_device_grp, "categories");
-                if (cj_categories && cJSON_IsArray(cj_categories))
+                bool free_exp_id_list_str = 1;
+                char* item_grp_id_list_str = ezlopi_nvs_read_item_groups();
+                if (NULL == item_grp_id_list_str)
                 {
-                    new_device_grp_node->categories = cJSON_Duplicate(__FUNCTION__, cj_categories, cJSON_True);
+                    item_grp_id_list_str = "[]";
+                    free_exp_id_list_str = 0;
+                }
+
+                cJSON* cj_item_grp_id_list = cJSON_Parse(__FUNCTION__, item_grp_id_list_str);
+                if (cj_item_grp_id_list)
+                {
+                    cJSON* cj_new_item_grp_id = cJSON_CreateNumber(__FUNCTION__, new_item_grp_id);
+                    if (!cJSON_AddItemToArray(cj_item_grp_id_list, cj_new_item_grp_id))
+                    {   // if 'new_item_grp_id' doesnot exist, then erase the falsly store 'new_itemgrp_str' in nvs.
+                        cJSON_Delete(__FUNCTION__, cj_new_item_grp_id);
+                        ezlopi_nvs_delete_stored_data_by_id(new_item_grp_id);
+                        new_item_grp_id = 0;
+                    }
+                    else
+                    {
+                        char* updated_itemgrp_id_list_str = cJSON_PrintBuffered(__FUNCTION__, cj_item_grp_id_list, 1024, false);
+                        TRACE_D("length of 'updated_itemgrp_id_list_str': %d", strlen(updated_itemgrp_id_list_str));
+
+                        if (updated_itemgrp_id_list_str)
+                        {
+                            TRACE_D("updated_itemgrp_id_list_str: %s", updated_itemgrp_id_list_str);
+                            if (ezlopi_nvs_write_item_groups(updated_itemgrp_id_list_str))
+                            {
+                                TRACE_D("Scenes list updated.");
+                            }
+                            else
+                            {
+                                TRACE_E("Scenes list update failed!");
+                            }
+
+                            ezlopi_free(__FUNCTION__, updated_itemgrp_id_list_str);
+                        }
+                    }
+
+                    cJSON_Delete(__FUNCTION__, cj_item_grp_id_list);
+                }
+
+                if (free_exp_id_list_str)
+                {
+                    ezlopi_free(__FUNCTION__, item_grp_id_list_str);
                 }
             }
-
+            else
             {
-                cJSON * cj_devices = cJSON_GetObjectItem(__FUNCTION__, cj_device_grp, "devices");
-                if (cj_devices && cJSON_IsArray(cj_devices))
-                {
-                    new_device_grp_node->devices = cJSON_Duplicate(__FUNCTION__, cj_devices, cJSON_True);
-                }
+                new_item_grp_id = 0;
             }
 
-            {
-                cJSON * cj_exceptions = cJSON_GetObjectItem(__FUNCTION__, cj_device_grp, "exceptions");
-                if (cj_exceptions && cJSON_IsArray(cj_exceptions))
-                {
-                    new_device_grp_node->exceptions = cJSON_Duplicate(__FUNCTION__, cj_exceptions, cJSON_True);
-                }
-            }
-
-            {
-                cJSON *cj_entry_delay = cJSON_GetObjectItem(__FUNCTION__, cj_device_grp, "entryDelay");
-                if (cj_entry_delay && cj_entry_delay->valuestring && cj_entry_delay->str_value_len)
-                {
-                    new_device_grp_node->entry_delay = ((0 == strncmp(cj_entry_delay->valuestring, "normal", 7)) ? EZLOPI_DEVICE_GRP_ENTRYDELAY_NORMAL
-                        : (0 == strncmp(cj_entry_delay->valuestring, "long_extended", 14)) ? EZLOPI_DEVICE_GRP_ENTRYDELAY_LONG_EXTENDED
-                        : (0 == strncmp(cj_entry_delay->valuestring, "extended", 9)) ? EZLOPI_DEVICE_GRP_ENTRYDELAY_EXTENDED
-                        : (0 == strncmp(cj_entry_delay->valuestring, "instant", 8)) ? EZLOPI_DEVICE_GRP_ENTRYDELAY_INSTANT
-                        : EZLOPI_DEVICE_GRP_ENTRYDELAY_NONE);
-                }
-            }
-
-            {
-                cJSON *cj_role = cJSON_GetObjectItem(__FUNCTION__, cj_device_grp, "role");
-                if (cj_role && cj_role->valuestring && cj_role->str_value_len)
-                {
-                    new_device_grp_node->role = ((0 == strncmp(cj_role->valuestring, "house_modes", 12)) ? EZLOPI_DEVICE_GRP_ROLE_HOUSE_MODES : EZLOPI_DEVICE_GRP_ROLE_USER);
-                }
-            }
-
-            ezlopi_core_device_group_print(new_device_grp_node);
+            ezlopi_free(__FUNCTION__, new_itemgrp_str);
+        }
+        else
+        {
+            new_item_grp_id = 0;
         }
     }
-    return new_device_grp_node;
-}
-static l_ezlopi_device_grp_t* __device_group_populate(cJSON* cj_device_grp, uint32_t device_grp_id)
-{
-    l_ezlopi_device_grp_t* new_device_grp_node = NULL;
-    if (l_device_grp_head)
-    {
-        l_ezlopi_device_grp_t* current_device_grp = l_device_grp_head;
-        while (current_device_grp->next)
-        {
-            current_device_grp = current_device_grp->next;
-        }
 
-        current_device_grp->next = ____device_grp_create_node(cj_device_grp, device_grp_id);
-        new_device_grp_node = current_device_grp->next;
-    }
-    else
-    {
-        CJSON_TRACE("new-device-group", cj_device_grp);
-        l_device_grp_head = ____device_grp_create_node(cj_device_grp, device_grp_id);
-        new_device_grp_node = l_device_grp_head;
-    }
-
-    return new_device_grp_node;
+    return new_item_grp_id;
 }
+
 
 l_ezlopi_device_grp_t * ezlopi_core_device_group_new_devgrp_populate(cJSON *cj_new_dev_grp, uint32_t new_device_grp_id)
 {
     return __device_group_populate(cj_new_dev_grp, new_device_grp_id);
 }
+l_ezlopi_item_grp_t * ezlopi_core_item_group_new_itemgrp_populate(cJSON *cj_new_item_grp, uint32_t new_item_grp_id)
+{
+    return __item_group_populate(cj_new_item_grp, new_item_grp_id);
+}
 
-//--------------------------------------------------------------------------------
-//  Functions to convert 'l_ezlopi_device_grp_t*' to cjson object
-//--------------------------------------------------------------------------------
+
 cJSON* ezlopi_core_device_group_create_cjson(l_ezlopi_device_grp_t* devgrp_node)
 {
     cJSON* cj_devgrp = NULL;
@@ -661,7 +1134,7 @@ cJSON* ezlopi_core_device_group_create_cjson(l_ezlopi_device_grp_t* devgrp_node)
                 }
             }
 
-            cJSON_AddBoolToObject(__FUNCTION__, cj_devgrp, "persistent", devgrp_node->persistent);
+            cJSON_AddBoolToObject(__FUNCTION__, cj_devgrp, ezlopi_persistent_str, devgrp_node->persistent);
             cJSON_AddBoolToObject(__FUNCTION__, cj_devgrp, "followEntry", devgrp_node->follow_entry);
             cJSON_AddStringToObject(__FUNCTION__, cj_devgrp, "packageId", devgrp_node->package_id);
         }
@@ -669,13 +1142,58 @@ cJSON* ezlopi_core_device_group_create_cjson(l_ezlopi_device_grp_t* devgrp_node)
 
     return cj_devgrp;
 }
+cJSON* ezlopi_core_item_group_create_cjson(l_ezlopi_item_grp_t* itemgrp_node)
+{
+    cJSON* cj_itemgrp = NULL;
+    if (itemgrp_node)
+    {
+        cj_itemgrp = cJSON_CreateObject(__FUNCTION__);
+        if (cj_itemgrp)
+        {
+            char tmp_str[16] = { 0 };
+            snprintf(tmp_str, sizeof(tmp_str), "%08x", itemgrp_node->_id);
+            cJSON_AddStringToObject(__FUNCTION__, cj_itemgrp, ezlopi__id_str, tmp_str);
+            cJSON_AddStringToObject(__FUNCTION__, cj_itemgrp, ezlopi_name_str, itemgrp_node->name);
+            cJSON_AddBoolToObject(__FUNCTION__, cj_itemgrp, ezlopi_hasGetter_str, itemgrp_node->has_getter);
+            cJSON_AddBoolToObject(__FUNCTION__, cj_itemgrp, ezlopi_hasSetter_str, itemgrp_node->has_setter);
+            cJSON_AddBoolToObject(__FUNCTION__, cj_itemgrp, ezlopi_persistent_str, itemgrp_node->persistent);
+            cJSON_AddStringToObject(__FUNCTION__, cj_itemgrp, ezlopi_valueType_str, itemgrp_node->value_type);
+
+            cJSON_AddItemToObject(__FUNCTION__, cj_itemgrp, "itemNames", cJSON_Duplicate(__FUNCTION__, itemgrp_node->item_names, cJSON_True));
+            cJSON_AddItemToObject(__FUNCTION__, cj_itemgrp, ezlopi_enum_str, cJSON_Duplicate(__FUNCTION__, itemgrp_node->enum_values, cJSON_True));
+            cJSON_AddItemToObject(__FUNCTION__, cj_itemgrp, "valueTypeFamily", cJSON_Duplicate(__FUNCTION__, itemgrp_node->value_type_family, cJSON_True));
+            cJSON_AddItemToObject(__FUNCTION__, cj_itemgrp, ezlopi_info_str, cJSON_Duplicate(__FUNCTION__, itemgrp_node->value_type_family, cJSON_True));
+
+            {   // add 'role'
+                switch (itemgrp_node->role)
+                {
+                case EZLOPI_ITEM_GRP_ROLE_LIFE_SAFETY:
+                {
+                    cJSON_AddStringToObject(__FUNCTION__, cj_itemgrp, "role", "lifeSafety");
+                    break;
+                }
+                case EZLOPI_ITEM_GRP_ROLE_HOUSE_MODES:
+                {
+                    cJSON_AddStringToObject(__FUNCTION__, cj_itemgrp, "role", "house_modes");
+                    break;
+                }
+                case EZLOPI_ITEM_GRP_ROLE_EMPTY:
+                {
+                    cJSON_AddStringToObject(__FUNCTION__, cj_itemgrp, "role", "empty");
+                    break;
+                }
+                default:
+                    break;
+                }
+            }
+        }
+    }
+
+    return cj_itemgrp;
+}
 
 
-
-/**
- * @brief main functions to initialize the device-groups
- *
- */
+//------- Main Init_Function -------------------------------------------------
 void ezlopi_device_group_init(void)
 {
     char* devgrp_id_list_str = ezlopi_nvs_read_device_groups();
@@ -725,5 +1243,56 @@ void ezlopi_device_group_init(void)
         ezlopi_free(__FUNCTION__, devgrp_id_list_str);
     }
 
-    ezlopi_core_device_group_print(l_device_grp_head);
+    __ezlopi_core_device_group_print(l_device_grp_head);
+}
+void ezlopi_item_group_init(void)
+{
+    char* itemgrp_id_list_str = ezlopi_nvs_read_item_groups();
+    if (itemgrp_id_list_str)
+    {
+        cJSON* cj_itemgrp_ids = cJSON_Parse(__FUNCTION__, itemgrp_id_list_str);
+        if (cj_itemgrp_ids)
+        {
+            int array_size = cJSON_GetArraySize(cj_itemgrp_ids);
+            for (int i = 0; i < array_size; i++)
+            {
+                cJSON* cj_itemgrp_id = cJSON_GetArrayItem(cj_itemgrp_ids, i);
+                if (cj_itemgrp_id && cj_itemgrp_id->valuedouble)
+                {
+                    uint32_t tmp_itemgrp_id = (uint32_t)cj_itemgrp_id->valuedouble;
+
+                    char tmp_buffer[32];
+                    snprintf(tmp_buffer, sizeof(tmp_buffer), "%08x", tmp_itemgrp_id);
+                    ezlopi_cloud_update_item_group_id((uint32_t)tmp_itemgrp_id);
+
+                    char* itemgrp_str = ezlopi_nvs_read_str(tmp_buffer);
+                    if (itemgrp_str)
+                    {
+                        cJSON* cj_itemgrp = cJSON_Parse(__FUNCTION__, itemgrp_str);
+                        if (cj_itemgrp)
+                        {
+                            l_ezlopi_item_grp_t* new_itemgrp_node = __item_group_populate(cj_itemgrp, tmp_itemgrp_id);
+                            cJSON_Delete(__FUNCTION__, cj_itemgrp);
+
+                            if (new_itemgrp_node)
+                            {
+                                cJSON* cj_new_itemgrp_node = ezlopi_core_item_group_create_cjson(new_itemgrp_node);
+                                // CJSON_TRACE("new_itemgrp_node", cj_new_scene);
+                                cJSON_Delete(__FUNCTION__, cj_new_itemgrp_node);
+                            }
+                        }
+
+                        ezlopi_free(__FUNCTION__, itemgrp_str);
+                    }
+                }
+
+            }
+
+            cJSON_Delete(__FUNCTION__, cj_itemgrp_ids);
+        }
+
+        ezlopi_free(__FUNCTION__, itemgrp_id_list_str);
+    }
+
+    __ezlopi_core_item_group_print(l_item_grp_head);
 }

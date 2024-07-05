@@ -125,6 +125,9 @@ void ezlopi_cloud_update_group_id(uint32_t a_group_id);
 uint32_t ezlopi_cloud_generate_device_group_id(void);
 void ezlopi_cloud_update_device_group_id(uint32_t a_device_group_id);
 
+uint32_t ezlopi_cloud_generate_item_group_id(void);
+void ezlopi_cloud_update_item_group_id(uint32_t a_item_group_id);
+
 // uint32_t ezlopi_cloud_get_modes_initial_id(void);
 
 #endif // _EZLOPI_CORE_CLOUD_H_

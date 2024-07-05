@@ -44,7 +44,7 @@ void scenes_create(cJSON* cj_request, cJSON* cj_response)
         {
             char tmp_buff[32];
             snprintf(tmp_buff, sizeof(tmp_buff), "%08x", new_scene_id);
-            cJSON_AddStringToObject(__FUNCTION__, cj_request, ezlopi__id_str, tmp_buff);
+            cJSON_AddStringToObject(__FUNCTION__, cj_request, ezlopi__id_str, tmp_buff);// this is for (reply_broadcast)
             ezlopi_scenes_new_scene_populate(cj_params, new_scene_id);
         }
     }
@@ -490,7 +490,7 @@ void scenes_action_block_test(cJSON * cj_request, cJSON * cj_response)
                         {
                             cJSON_AddNumberToObject(__FUNCTION__, cj_result, "httpAnswerCode", 404);
                         }
-                        
+
                         free_http_mbedtls_struct(tmp_http_data);
                         ezlopi_free(__FUNCTION__, tmp_http_data);
                     }

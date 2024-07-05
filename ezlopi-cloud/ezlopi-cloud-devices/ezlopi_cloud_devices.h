@@ -32,6 +32,18 @@ extern "C"
     void device_group_updated(cJSON * cj_request, cJSON * cj_response);
 
 
+    //--------- item-groups-------
+    void item_group_create(cJSON* cj_request, cJSON* cj_response);
+    void item_group_get(cJSON* cj_request, cJSON* cj_response);
+    void item_group_delete(cJSON* cj_request, cJSON* cj_response);
+    void item_group_update(cJSON* cj_request, cJSON* cj_response);
+    void item_groups_list(cJSON* cj_request, cJSON* cj_response);
+    ///////////// item-grp updaters
+    void item_group_created(cJSON * cj_request, cJSON * cj_response);
+    void item_group_deleted(cJSON * cj_request, cJSON * cj_response);
+    void item_group_updated(cJSON * cj_request, cJSON * cj_response);
+
+
 
 #ifdef __cplusplus
 }

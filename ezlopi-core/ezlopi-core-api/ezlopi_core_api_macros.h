@@ -8,11 +8,18 @@ CLOUD_METHOD("hub.devices.list", devices_list_v3, NULL)
 CLOUD_METHOD("hub.device.name.set", device_name_set, device_updated)
 CLOUD_METHOD("hub.device.armed.set", device_armed_set, device_updated)
 
-CLOUD_METHOD("hub.device.group.create", device_group_create, device_group_created)//hub.device.group.created
-CLOUD_METHOD("hub.device.group.delete", NULL, NULL)//hub.device.group.deleted
-CLOUD_METHOD("hub.device.group.update", NULL, NULL)//hub.device.group.updated
+CLOUD_METHOD("hub.device.group.create", device_group_create, device_group_created)
+CLOUD_METHOD("hub.device.group.delete", device_group_delete, device_group_deleted)
+CLOUD_METHOD("hub.device.group.update", device_group_update, device_group_updated)
 CLOUD_METHOD("hub.device.group.get", device_group_get, NULL)
 CLOUD_METHOD("hub.device.groups.list", device_groups_list, NULL)
+
+
+CLOUD_METHOD("hub.item.group.create", item_group_create, item_group_created)
+CLOUD_METHOD("hub.item.group.delete", item_group_delete, item_group_deleted)
+CLOUD_METHOD("hub.item.group.update", item_group_update, item_group_updated)
+CLOUD_METHOD("hub.item.group.get", item_group_get, NULL)
+CLOUD_METHOD("hub.item.groups.list", item_groups_list, NULL)
 
 #ifdef CONFIG_EZPI_UTIL_TRACE_EN
 CLOUD_METHOD("hub.log.set", ezlopi_hub_cloud_log_set, NULL)

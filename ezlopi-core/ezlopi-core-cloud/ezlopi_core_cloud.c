@@ -15,6 +15,7 @@ const uint32_t MODES_ID_START = 0x90000000;
 const uint32_t SCENE_GROUP_ID_START = 0xA0000000;
 const uint32_t SCENE_WHEN_BLOCKID_START = 0xB0000000;
 const uint32_t DEVICE_GROUPID_START = 0xC0000000;
+const uint32_t ITEM_GROUPID_START = 0xC0000000;
 
 
 static uint32_t g_device_id = 0;
@@ -28,6 +29,7 @@ static uint32_t g_expression_id = 0;
 static uint32_t g_scene_group_id = 0;
 static uint32_t g_scene_when_blockId = 0;
 static uint32_t g_device_group_id = 0;
+static uint32_t g_item_group_id = 0;
 
 static uint32_t ezlopi_get_mac_crc(void)
 {
@@ -182,11 +184,22 @@ void ezlopi_cloud_update_group_id(uint32_t a_device_group_id)
 
 uint32_t ezlopi_cloud_generate_device_group_id(void)
 {
-    g_device_group_id = (0 == g_device_group_id) ? (SCENE_GROUP_ID_START + ezlopi_get_mac_crc()) : (g_device_group_id + 1);
+    g_device_group_id = (0 == g_device_group_id) ? (DEVICE_GROUPID_START + ezlopi_get_mac_crc()) : (g_device_group_id + 1);
     return g_device_group_id;
 }
 
 void ezlopi_cloud_update_device_group_id(uint32_t a_device_group_id)
 {
     g_device_group_id = (a_device_group_id > g_device_group_id) ? a_device_group_id : g_device_group_id;
+}
+
+uint32_t ezlopi_cloud_generate_item_group_id(void)
+{
+    g_item_group_id = (0 == g_item_group_id) ? (ITEM_GROUPID_START + ezlopi_get_mac_crc()) : (g_item_group_id + 1);
+    return g_item_group_id;
+}
+
+void ezlopi_cloud_update_item_group_id(uint32_t a_item_group_id)
+{
+    g_item_group_id = (a_item_group_id > g_item_group_id) ? a_item_group_id : g_item_group_id;
 }

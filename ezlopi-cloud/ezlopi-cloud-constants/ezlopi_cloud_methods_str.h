@@ -138,4 +138,8 @@ extern const char *ezlopi_hub_device_group_created;
 extern const char *ezlopi_hub_device_group_deleted;
 extern const char *ezlopi_hub_device_group_updated;
 
+extern const char *ezlopi_hub_item_group_created;
+extern const char *ezlopi_hub_item_group_deleted;
+extern const char *ezlopi_hub_item_group_updated;
+
 #endif // __EZLOPI_METHODS_STR_H__
