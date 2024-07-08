@@ -58,6 +58,7 @@ int device_0038_other_RGB(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void
     case EZLOPI_ACTION_HUB_GET_ITEM:
     {
         ret = __get_cjson_items(item, arg);
+        break;
     }
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
