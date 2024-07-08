@@ -30,6 +30,7 @@ typedef struct s_rgb_args
 
 static int __prepare(void* arg);
 static int __init(l_ezlopi_item_t* item);
+static int __get_cjson_items(l_ezlopi_item_t* item, void* arg);
 static int __set_cjson_value(l_ezlopi_item_t* item, void* arg);
 static int __get_cjson_value(l_ezlopi_item_t* item, void* arg);
 
@@ -55,6 +56,9 @@ int device_0038_other_RGB(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void
         break;
     }
     case EZLOPI_ACTION_HUB_GET_ITEM:
+    {
+        ret = __get_cjson_items(item, arg);
+    }
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
         ret = __get_cjson_value(item, arg);
@@ -80,6 +84,46 @@ static int RGB_LED_change_color_value(s_rgb_args_t* rgb_args)
         ezlopi_pwm_change_duty(rgb_args->red_struct.channel, rgb_args->red_struct.speed_mode, (uint8_t)(rgb_args->red_struct.value * rgb_args->brightness));
         ezlopi_pwm_change_duty(rgb_args->green_struct.channel, rgb_args->green_struct.speed_mode, (uint8_t)(rgb_args->green_struct.value * rgb_args->brightness));
         ezlopi_pwm_change_duty(rgb_args->blue_struct.channel, rgb_args->blue_struct.speed_mode, (uint8_t)(rgb_args->blue_struct.value * rgb_args->brightness));
+    }
+    return ret;
+}
+
+static int __get_cjson_items(l_ezlopi_item_t* item, void* arg)
+{
+    int ret = 0;
+    if (item && arg)
+    {
+        cJSON* cj_properties = (cJSON*)arg;
+        s_rgb_args_t* rgb_args = (s_rgb_args_t*)item->user_arg;
+
+        if ((NULL != cj_properties) && (NULL != rgb_args))
+        {
+            if (ezlopi_item_name_rgbcolor == item->cloud_properties.item_name)
+            {
+                cJSON* color_values = cJSON_AddObjectToObject(__FUNCTION__, cj_properties, ezlopi_value_str);
+                if (color_values)
+                {
+                    cJSON_AddNumberToObject(__FUNCTION__, color_values, ezlopi_red_str, rgb_args->red_struct.value);
+                    cJSON_AddNumberToObject(__FUNCTION__, color_values, ezlopi_green_str, rgb_args->green_struct.value);
+                    cJSON_AddNumberToObject(__FUNCTION__, color_values, ezlopi_blue_str, rgb_args->blue_struct.value);
+
+                    char formatted_rgb_value[32];
+                    snprintf(formatted_rgb_value, sizeof(formatted_rgb_value), "#%02x%02x%02x", rgb_args->red_struct.value, rgb_args->green_struct.value, rgb_args->blue_struct.value);
+                    cJSON_AddStringToObject(__FUNCTION__, cj_properties, ezlopi_valueFormatted_str, formatted_rgb_value);
+                }
+            }
+            else if (ezlopi_item_name_switch == item->cloud_properties.item_name)
+            {
+                ezlopi_valueformatter_bool_to_cjson(cj_properties, rgb_args->brightness, item->cloud_properties.scale);
+            }
+            else if (ezlopi_item_name_dimmer == item->cloud_properties.item_name)
+            {
+                int dim_percentage = (int)(rgb_args->brightness * 100);
+                cJSON_AddNumberToObject(__FUNCTION__, cj_properties, ezlopi_minValue_str, 0);
+                cJSON_AddNumberToObject(__FUNCTION__, cj_properties, ezlopi_maxValue_str, 100);
+                ezlopi_valueformatter_int32_to_cjson(cj_properties, dim_percentage, item->cloud_properties.scale);
+            }
+        }
     }
     return ret;
 }
