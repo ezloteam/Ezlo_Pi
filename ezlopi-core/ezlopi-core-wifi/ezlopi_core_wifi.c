@@ -32,6 +32,7 @@
 #include "ezlopi_core_processes.h"
 #include "ezlopi_core_broadcast.h"
 #include "ezlopi_cloud_constants.h"
+#include "ezlopi_core_ping.h"
 
 #include "ezlopi_service_uart.h"
 #include "EZLOPI_USER_CONFIG.h"
@@ -45,6 +46,7 @@ static int sg_retry_num = 0;
 static volatile int sg_station_got_ip = 0;
 static const char* const scg_wifi_no_error_str = "NO_ERROR";
 static const char* wifi_scanner_task_name = "WiFiScanTask";
+static const char* wifi_try_connect_task_name = "WiFitrycnttask";
 static const char* sg_last_disconnect_reason = scg_wifi_no_error_str;
 
 static ll_ezlopi_wifi_event_upcall_t* __event_upcall_head = NULL;
@@ -338,6 +340,92 @@ int ezlopi_wait_for_wifi_to_connect(uint32_t wait_time_ms)
     return ret;
 }
 
+static int ezlopi_wifi_wait_for_wifi_and_registration()
+{
+    int ret = 0;
+    int count = 0;
+    ret = ezlopi_wait_for_wifi_to_connect(15000 / portTICK_PERIOD_MS);
+    if (-1 == ret)
+    {
+        TRACE_E("Failed to connect to the wifi");
+    }
+    else
+    {
+        TRACE_I("WiFi connected successully");
+        do
+        {
+            count++;
+            TRACE_D("Waiting for device internet connection to complete...(%d)", count);
+            e_ezlopi_event_t event = ezlopi_get_event_bit_status();
+            if (EZLOPI_EVENT_NMA_REG == (event & EZLOPI_EVENT_NMA_REG))
+            {
+                TRACE_Dw("Device registered successfully");
+                ret = 0;
+                break;
+            }
+            else if (count == 15)
+            {
+                TRACE_Dw("Couldn't register the device with new wifi");
+                ret = -1;
+                break;
+            }
+            vTaskDelay(1500 / portTICK_PERIOD_MS);
+        } while (1);
+    }
+    return ret;
+}
+
+
+void ezlopi_wifi_try_connect_task(void *params)
+{
+    cJSON *cj_network = (cJSON*)params;
+    if (cj_network)
+    {
+        while (1)
+        {
+            char ssid[32];
+            char pass[32];
+            CJSON_GET_VALUE_STRING_BY_COPY(cj_network, ezlopi_ssid_str, ssid);
+            CJSON_GET_VALUE_STRING_BY_COPY(cj_network, "key", pass);
+            if (('\0' != ssid[0]) && ('\0' != pass))
+            {
+                TRACE_D("Trying to connect to %s with password %s", ssid, pass);
+                esp_err_t error = ezlopi_wifi_connect(ssid, pass);
+                if (ESP_OK == error)
+                {
+                    int ret = ezlopi_wifi_wait_for_wifi_and_registration();
+                    TRACE_Dw("Ret: %d", ret);
+                    if (-1 == ret)
+                    {
+                        TRACE_E("Error connecting to wifi with new WiFi SSID");
+                        ezlopi_wifi_connect_from_id_bin();
+                        ezlopi_wifi_wait_for_wifi_and_registration();
+                    }
+                }
+                else
+                {
+                    TRACE_E("Error connecting to wifi with new WiFi SSID");
+                    ezlopi_wifi_connect_from_id_bin();
+                    ezlopi_wifi_wait_for_wifi_and_registration();
+                }
+            }
+            break;
+        }
+    }
+    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_CORE_WIFI_TRY_CONNECT_TASK);
+    vTaskDelete(NULL);
+}
+
+int ezlopi_wifi_try_connect(cJSON *cj_network)
+{
+    int ret = 0;
+    cJSON* cj_network_copy = cJSON_Duplicate(__FUNCTION__, cj_network, true);
+    static TaskHandle_t try_connect_task_handle = NULL;
+    xTaskCreate(ezlopi_wifi_try_connect_task, wifi_try_connect_task_name, EZLOPI_CORE_WIFI_TRY_CONNECT_TASK_DEPTH, cj_network_copy, 3, &try_connect_task_handle);
+    ezlopi_core_process_set_process_info(ENUM_EZLOPI_CORE_WIFI_TRY_CONNECT_TASK, &try_connect_task_handle, EZLOPI_CORE_WIFI_TRY_CONNECT_TASK_DEPTH);
+    return ret;
+}
+
 static ll_ezlopi_wifi_event_upcall_t* ezlopi_wifi_event_upcall_create(f_ezlopi_wifi_event_upcall upcall, void* arg)
 {
     ll_ezlopi_wifi_event_upcall_t* _upcall = ezlopi_malloc(__FUNCTION__, sizeof(ll_ezlopi_wifi_event_upcall_t));
@@ -362,15 +450,15 @@ static void ezlopi_core_device_broadcast_wifi_start_scan()
     {
         cJSON_AddStringToObject(__FUNCTION__, cj_scan_start, ezlopi_id_str, ezlopi_ui_broadcast_str);
         cJSON_AddStringToObject(__FUNCTION__, cj_scan_start, ezlopi_msg_subclass_str, method_hub_network_wifi_scan_progress);
-        
+
         cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_scan_start, ezlopi_result_str);
-        if(cj_result)
+        if (cj_result)
         {
             cJSON_AddStringToObject(__FUNCTION__, cj_result, "interfaceId", "wlan0");
             cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_status_str, "started");
         }
 
-        if(!ezlopi_core_broadcast_add_to_queue(cj_scan_start))
+        if (!ezlopi_core_broadcast_add_to_queue(cj_scan_start))
         {
             cJSON_Delete(__FUNCTION__, cj_scan_start);
         }
@@ -384,15 +472,15 @@ static void ezlopi_core_device_broadcast_wifi_stop_scan()
     {
         cJSON_AddStringToObject(__FUNCTION__, cj_scan_stop, ezlopi_id_str, ezlopi_ui_broadcast_str);
         cJSON_AddStringToObject(__FUNCTION__, cj_scan_stop, ezlopi_msg_subclass_str, method_hub_network_wifi_scan_progress);
-        
+
         cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_scan_stop, ezlopi_result_str);
-        if(cj_result)
+        if (cj_result)
         {
             cJSON_AddStringToObject(__FUNCTION__, cj_result, "interfaceId", "wlan0");
             cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_status_str, "finished");
         }
 
-        if(!ezlopi_core_broadcast_add_to_queue(cj_scan_stop))
+        if (!ezlopi_core_broadcast_add_to_queue(cj_scan_stop))
         {
             cJSON_Delete(__FUNCTION__, cj_scan_stop);
         }

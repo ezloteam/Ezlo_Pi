@@ -5,6 +5,7 @@
 #include "ezlopi_core_wifi.h"
 #include "ezlopi_core_ethernet.h"
 #include "ezlopi_core_factory_info.h"
+#include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_util_trace.h"
 
 #include "cjext.h"
@@ -134,3 +135,22 @@ void network_wifi_scan_stop(cJSON* cj_request, cJSON* cj_response)
     cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
 }
 
+void network_wifi_try_connect(cJSON* cj_request, cJSON* cj_response)
+{
+    cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+
+    cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
+    if (cj_params)
+    {
+        char interfaceId[16];
+        CJSON_GET_VALUE_STRING_BY_COPY(cj_params, "interfaceId", interfaceId);
+        if (0 == strncmp("wlan0", interfaceId, 6))
+        {
+            cJSON* cj_network = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_network_str);
+            if (cj_network)
+            {
+                ezlopi_wifi_try_connect(cj_network);
+            }
+        }
+    }
+}
