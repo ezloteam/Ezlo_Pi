@@ -1,3 +1,4 @@
+#if 0
 #include "ezlopi_core_event_queue.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/queue.h"
@@ -66,3 +67,4 @@ int ezlopi_event_queue_receive(s_ezlo_event_t **event_data, int time_out_ms)
     }
     return ret;
 }
+#endif
