@@ -257,6 +257,7 @@ void ezlopi_wifi_initialize(void)
     sg_wifi_sta_netif = esp_netif_create_default_wifi_sta();
 
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
+    esp_wifi_set_ps(WIFI_PS_MIN_MODEM);
     ESP_ERROR_CHECK(esp_wifi_init(&cfg));
 
     esp_event_handler_instance_t instance_any_id;

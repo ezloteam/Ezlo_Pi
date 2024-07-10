@@ -234,7 +234,7 @@ static int __send_str_data_to_nma_websocket(char* str_data)
                 break;
             }
 
-            vTaskDelay(1 / portTICK_PERIOD_MS);
+            vTaskDelay(10 / portTICK_PERIOD_MS);
         }
 
         if (ret)
