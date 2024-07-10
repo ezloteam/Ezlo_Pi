@@ -33,6 +33,7 @@
 #include "ezlopi_core_wifi.h"
 #include "ezlopi_core_buffer.h"
 #include "ezlopi_core_broadcast.h"
+#include "ezlopi_core_event_group.h"
 #include "ezlopi_core_api_methods.h"
 #include "ezlopi_core_cjson_macros.h"
 
@@ -189,6 +190,8 @@ static esp_err_t __trigger_async_send(httpd_req_t* req)
 
     if (resp_arg)
     {
+        #warning "resp_arg needs to find out wether 'resp_arg' is freed or not";
+
         resp_arg->hd = req->handle;
         resp_arg->fd = httpd_req_to_sockfd(req);
         ret = httpd_queue_work(req->handle, __ws_async_send, resp_arg);
