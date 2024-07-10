@@ -17,7 +17,7 @@ int ezlopi_device_value_updated_from_device_broadcast(l_ezlopi_item_t* item)
 {
     int ret = 0;
 
-    TRACE_D("%d -> here", xTaskGetTickCount());
+    // TRACE_D("%d -> here", xTaskGetTickCount());
 
     if (item)
     {
@@ -30,11 +30,11 @@ int ezlopi_device_value_updated_from_device_broadcast(l_ezlopi_item_t* item)
             {
                 if (item == curr_item)
                 {
-                    TRACE_D("%d -> here", xTaskGetTickCount());
+                    // TRACE_D("%d -> here", xTaskGetTickCount());
 
                     cJSON* cj_response = __broadcast_message_items_updated_from_device(curr_device, item);
 
-                    TRACE_D("%d -> here", xTaskGetTickCount());
+                    // TRACE_D("%d -> here", xTaskGetTickCount());
 
                     // CJSON_TRACE("----------------- broadcasting - cj_response", cj_response);
                     if (cj_response)
@@ -44,7 +44,7 @@ int ezlopi_device_value_updated_from_device_broadcast(l_ezlopi_item_t* item)
                             cJSON_Delete(__FUNCTION__, cj_response);
                         }
 
-                        TRACE_D("%d -> here", xTaskGetTickCount());
+                        // TRACE_D("%d -> here", xTaskGetTickCount());
                     }
 
                     break;

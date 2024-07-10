@@ -13,6 +13,7 @@ extern "C"
     void network_get(cJSON* cj_request, cJSON* cj_response);
     void network_wifi_scan_start(cJSON* cj_request, cJSON* cj_response);
     void network_wifi_scan_stop(cJSON* cj_request, cJSON* cj_response);
+    void network_wifi_try_connect(cJSON* cj_request, cJSON* cj_response);
 
 #ifdef __cplusplus
 }

@@ -45,7 +45,7 @@ int ezlopi_websocket_client_send(char* data, uint32_t len)
     {
         if (esp_websocket_client_is_connected(client) && (len > 0) && (NULL != data))
         {
-            ret = esp_websocket_client_send_text(client, data, len, 1000 / portTICK_RATE_MS);
+            ret = esp_websocket_client_send_text(client, data, len, 10000 / portTICK_RATE_MS);
             ret = (ret > 0) ? 1 : 0;
         }
     }

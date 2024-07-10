@@ -5,13 +5,13 @@
 #include "EZLOPI_USER_CONFIG.h"
 #include "ezlopi_util_trace.h"
 
+#include "ezlopi_core_log.h"
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_mdns.h"
 #include "ezlopi_core_wifi.h"
 #include "ezlopi_core_ping.h"
 #include "ezlopi_core_sntp.h"
 #include "ezlopi_core_room.h"
-// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_modes.h"
 #include "ezlopi_core_buffer.h"
 #include "ezlopi_core_event_queue.h"
@@ -20,14 +20,14 @@
 #include "ezlopi_core_devices_list.h"
 #include "ezlopi_core_scenes_scripts.h"
 #include "ezlopi_core_scenes_expressions.h"
-#include "ezlopi_core_log.h"
-
 #ifdef CONFIG_EZPI_CORE_ETHERNET_EN
 #include "ezlopi_core_ethernet.h"
 #endif // CONFIG_EZPI_CORE_ETHERNET_EN
 
 #include "ezlopi_hal_system_info.h"
+#include "ezlopi_service_loop.h"
 
+static void __device_loop(void * arg);
 static void ezlopi_initialize_devices_v3(void);
 
 void ezlopi_init(void)
@@ -81,15 +81,12 @@ void ezlopi_init(void)
     ezlopi_ethernet_init();
 #endif // CONFIG_EZPI_CORE_ETHERNET_EN
 
-    uint32_t boot_count = ezlopi_system_info_get_boot_count();
+    ezlopi_nvs_set_boot_count(ezlopi_system_info_get_boot_count() + 1);
 
 #if defined(CONFIG_EZPI_ENABLE_WIFI)
     ezlopi_wifi_connect_from_id_bin();
 #endif
 
-    ezlopi_nvs_set_boot_count(boot_count + 1);
-
-    ezlopi_event_queue_init();
 
 #if (defined(CONFIG_EZPI_ENABLE_WIFI) || defined(CONFIG_EZPI_CORE_ENABLE_ETH))
     EZPI_CORE_sntp_init();
@@ -98,11 +95,11 @@ void ezlopi_init(void)
 #endif // CONFIG_EZPI_ENABLE_PING
 #endif
 
-    // ezlopi_timer_start_1000ms();
-
 #ifdef CONFIG_EZPI_SERV_MDNS_EN
     EZPI_core_init_mdns();
 #endif // CONFIG_EZPI_SERV_MDNS_EN
+
+    ezlopi_service_loop_add("core-device-loop", __device_loop, 1000, NULL);
 }
 
 l_ezlopi_device_t* link_next_parent_id(uint32_t target_to_clear_parent_id)
@@ -170,5 +167,33 @@ static void ezlopi_initialize_devices_v3(void)
         {
             curr_device = curr_device->next;
         }
+    }
+}
+
+static void __device_loop(void * arg)
+{
+    static l_ezlopi_device_t * device_node;
+    if (NULL == device_node)
+    {
+        device_node = ezlopi_device_get_head();
+    }
+    else
+    {
+        if (device_node && device_node->items)
+        {
+            l_ezlopi_item_t * item_node = device_node->items;
+            while (item_node)
+            {
+                if (item_node->func)
+                {
+                    item_node->func(EZLOPI_ACTION_NOTIFY_1000_MS, item_node, NULL, item_node->user_arg);
+                    vTaskDelay(1 / portTICK_PERIOD_MS);
+                }
+
+                item_node = item_node->next;
+            }
+        }
+
+        device_node = device_node->next;
     }
 }
