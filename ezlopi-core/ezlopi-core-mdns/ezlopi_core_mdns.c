@@ -121,7 +121,7 @@ static void ezlopi_mdns_init_service_context()
     }
 
     // Add manufacturer service
-#ifdef EZPI_SERV_MDNS_MANUFACTURER_SERVICE_EN
+#ifdef CONFIG_EZPI_MDNS_ENABLE_MANUFACTURER_SERVICE
     l_ezlopi_mdns_context_t* ezlopi_mdns_service_cntx_manufacturer = (l_ezlopi_mdns_context_t*)ezlopi_malloc(__FUNCTION__, sizeof(l_ezlopi_mdns_context_t));
     if (ezlopi_mdns_service_cntx_manufacturer)
     {
@@ -138,10 +138,10 @@ static void ezlopi_mdns_init_service_context()
             ezlopi_mdns_add_service_context(ezlopi_mdns_service_cntx_manufacturer);
         }
     }
-#endif // EZPI_SERV_MDNS_MANUFACTURER_SERVICE_EN
+#endif // CONFIG_EZPI_MDNS_ENABLE_MANUFACTURER_SERVICE
 
     // Add brand service
-#ifdef EZPI_SERV_MDNS_BRAND_SERVICE_EN
+#ifdef CONFIG_EZPI_MDNS_ENABLE_BRAND_SERVICE
     l_ezlopi_mdns_context_t* ezlopi_mdns_service_cntx_brand = (l_ezlopi_mdns_context_t*)ezlopi_malloc(__FUNCTION__, sizeof(l_ezlopi_mdns_context_t));
     if (ezlopi_mdns_service_cntx_brand)
     {
@@ -158,10 +158,10 @@ static void ezlopi_mdns_init_service_context()
             ezlopi_mdns_add_service_context(ezlopi_mdns_service_cntx_brand);
         }
     }
-#endif // EZPI_SERV_MDNS_BRAND_SERVICE_EN
+#endif // CONFIG_EZPI_MDNS_ENABLE_BRAND_SERVICE
 
     // Add model service
-#ifdef EZPI_SERV_MDNS_MODEL_SERVICE_EN
+#ifdef CONFIG_EZPI_MDNS_ENABLE_MODEL_SERVICE
     l_ezlopi_mdns_context_t* ezlopi_mdns_service_cntx_model = (l_ezlopi_mdns_context_t*)ezlopi_malloc(__FUNCTION__, sizeof(l_ezlopi_mdns_context_t));
     if (ezlopi_mdns_service_cntx_model)
     {
@@ -178,10 +178,10 @@ static void ezlopi_mdns_init_service_context()
             ezlopi_mdns_add_service_context(ezlopi_mdns_service_cntx_model);
         }
     }
-#endif // EZPI_SERV_MDNS_MODEL_SERVICE_EN
+#endif // CONFIG_EZPI_MDNS_ENABLE_MODEL_SERVICE
 
     // Add name service
-#ifdef EZPI_SERV_MDNS_NAME_SERVICE_EN
+#ifdef CONFIG_EZPI_MDNS_ENABLE_NAME_SERVICE
     l_ezlopi_mdns_context_t* ezlopi_mdns_service_cntx_name = (l_ezlopi_mdns_context_t*)ezlopi_malloc(__FUNCTION__, sizeof(l_ezlopi_mdns_context_t));
     if (ezlopi_mdns_service_cntx_name)
     {
@@ -198,7 +198,7 @@ static void ezlopi_mdns_init_service_context()
             ezlopi_mdns_add_service_context(ezlopi_mdns_service_cntx_name);
         }
     }
-#endif // EZPI_SERV_MDNS_NAME_SERVICE_EN
+#endif // CONFIG_EZPI_MDNS_ENABLE_NAME_SERVICE
 
 }
 
