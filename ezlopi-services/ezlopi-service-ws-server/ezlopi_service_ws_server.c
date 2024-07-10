@@ -120,13 +120,13 @@ void ezlopi_service_ws_server_stop(void)
 static int __ws_server_broadcast(char* data)
 {
     int ret = 0;
-
     if (__send_lock && pdTRUE == xSemaphoreTake(__send_lock, 0))
     {
         if (data)
         {
             ret = 1;
             l_ws_server_client_conn_t* curr_client = ezlopi_service_ws_server_clients_get_head();
+            printf("%s and curr-client: %p\n", __func__, curr_client);
 
             while (curr_client)
             {
@@ -209,7 +209,7 @@ static esp_err_t __msg_handler(httpd_req_t* req)
         if (req->method == HTTP_GET)
         {
             TRACE_I("Handshake done, the new connection was opened, id: %p", req);
-            // ezlopi_service_ws_server_clients_add((void*)req->handle, httpd_req_to_sockfd(req));
+            ezlopi_service_ws_server_clients_add((void*)req->handle, httpd_req_to_sockfd(req));
             ret = ESP_OK;
         }
         else
