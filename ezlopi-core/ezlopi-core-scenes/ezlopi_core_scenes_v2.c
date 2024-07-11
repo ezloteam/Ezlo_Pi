@@ -913,7 +913,7 @@ static void _______fields_get_value(l_fields_v2_t* field, cJSON* cj_value)
         }
         case cJSON_Object:
         {
-            if (EZLOPI_VALUE_TYPE_BLOCK == field->value_type)
+            if (EZLOPI_VALUE_TYPE_BLOCK == field->value_type)    // there is only one-blocks [since 'cJSON_Object' ]
             {
                 field->field_value.e_type = VALUE_TYPE_BLOCK;
                 CJSON_TRACE("cj_single_block", cj_value);
@@ -957,7 +957,7 @@ static void _______fields_get_value(l_fields_v2_t* field, cJSON* cj_value)
                 field->field_value.u_value.cj_value = cJSON_Duplicate(__FUNCTION__, cj_value, cJSON_True);
                 break;
             }
-            case EZLOPI_VALUE_TYPE_BLOCKS:
+            case EZLOPI_VALUE_TYPE_BLOCKS:  // there are more than one-blocks [since 'cJSON_Array' ]
             {
                 field->field_value.e_type = VALUE_TYPE_BLOCK;
                 while (NULL != (cj_block = cJSON_GetArrayItem(cj_value, block_idx++)))
@@ -1072,8 +1072,8 @@ static bool ____check_and_append_group_id(cJSON*cj_when_block)
             cJSON * type = cJSON_GetObjectItem(__FUNCTION__, cj_fields_block, ezlopi_type_str);
             if (name && type)
             {
-                if ((0 != strncmp(name->valuestring, "blocks", 7)) ||
-                    (0 != strncmp(type->valuestring, "blocks", 7)))
+                if ((!EZPI_STRNCMP_IF_EQUAL(name->valuestring, "blocks", strlen(name->valuestring), 7)) ||
+                    (!EZPI_STRNCMP_IF_EQUAL(type->valuestring, "blocks", strlen(type->valuestring), 7)))
                 {
                     // TRACE_D("No further ----> groups!!");
                     break;
@@ -1165,8 +1165,8 @@ static int _____check_and_add_when_blockId(cJSON* cj_new_scene_when_block)
             cJSON * type = cJSON_GetObjectItem(__FUNCTION__, cj_fields_block, ezlopi_type_str);
             if (name && type)
             {
-                if ((0 != strncmp(name->valuestring, "blocks", 7)) ||
-                    (0 != strncmp(type->valuestring, "blocks", 7)))
+                if ((!EZPI_STRNCMP_IF_EQUAL(name->valuestring, "blocks", strlen(name->valuestring), 7)) ||
+                    (!EZPI_STRNCMP_IF_EQUAL(type->valuestring, "blocks", strlen(type->valuestring), 7)))
                 {
                     // TRACE_D("No further ----> Blocks!!");
                     break;
@@ -1276,8 +1276,8 @@ static bool ___enable_disable_latch_with_blockId(cJSON* cj_when_block, const cha
                 cJSON * type = cJSON_GetObjectItem(__FUNCTION__, cj_fields_block, "type");
                 if (name && type)
                 {
-                    if ((0 != strncmp(name->valuestring, "blocks", 7)) ||
-                        (0 != strncmp(type->valuestring, "blocks", 7)))
+                    if ((!EZPI_STRNCMP_IF_EQUAL(name->valuestring, "blocks", strlen(name->valuestring), 7)) ||
+                        (!EZPI_STRNCMP_IF_EQUAL(type->valuestring, "blocks", strlen(type->valuestring), 7)))
                     {
                         TRACE_D("No further ----> Blocks!!");
                         break;
@@ -1391,8 +1391,8 @@ static bool ___enable_disable_block_en_with_blockId(cJSON* cj_when_block, const 
                 cJSON * type = cJSON_GetObjectItem(__FUNCTION__, cj_fields_block, "type");
                 if (name && type)
                 {
-                    if ((0 != strncmp(name->valuestring, "blocks", 7)) ||
-                        (0 != strncmp(type->valuestring, "blocks", 7)))
+                    if ((!EZPI_STRNCMP_IF_EQUAL(name->valuestring, "blocks", strlen(name->valuestring), 7)) ||
+                        (!EZPI_STRNCMP_IF_EQUAL(type->valuestring, "blocks", strlen(type->valuestring), 7)))
                     {
                         // TRACE_D("No further ----> Blocks!!");
                         break;
