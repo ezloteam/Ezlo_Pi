@@ -78,7 +78,7 @@ void scenes_edit(cJSON* cj_request, cJSON* cj_response)
         cJSON* cj_eo = cJSON_GetObjectItem(__FUNCTION__, cj_params, "eo");
         if (cj_eo)
         {
-            CJSON_TRACE("scene-edit eo", cj_eo);
+            // CJSON_TRACE("scene-edit eo", cj_eo);
 
             cJSON* cj_id = cJSON_GetObjectItem(__FUNCTION__, cj_eo, ezlopi__id_str);
             if (cj_id && cj_id->valuestring)
