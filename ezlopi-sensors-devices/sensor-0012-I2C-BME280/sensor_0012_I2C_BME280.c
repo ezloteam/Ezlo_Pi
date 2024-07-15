@@ -6,6 +6,7 @@
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
+#include "ezlopi_core_errors.h"
 
 #include "ezlopi_hal_i2c_master.h"
 
@@ -31,21 +32,21 @@ static void __prepare_item_temperature_properties(l_ezlopi_item_t* item, cJSON* 
 static void __prepare_device_cloud_properties_child_pressure(l_ezlopi_device_t* device, cJSON* cj_device);
 static void __prepare_device_cloud_properties_parent_temp_humid(l_ezlopi_device_t* device, cJSON* cj_device);
 
-static int __init(l_ezlopi_item_t* item);
-static int __notify(l_ezlopi_item_t* item);
-static int __prepare(void* arg);
-static int __get_cjson_value(l_ezlopi_item_t* item, void* arg);
+static ezlopi_error_t __init(l_ezlopi_item_t* item);
+static ezlopi_error_t __notify(l_ezlopi_item_t* item);
+static ezlopi_error_t __prepare(void* arg);
+static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t* item, void* arg);
 
 /**
  * @brief Public function to interface bme280. This is used to handles all the action on the bme280 sensor and is the entry point to interface the sensor.
  *
  * @param action e_ezlopi_actions_t
  * @param arg Other arguments if needed
- * @return int
+ * @return ezlopi_error_t
  */
-int sensor_0012_I2C_BME280(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
+ezlopi_error_t sensor_0012_I2C_BME280(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_SUCCESS;
     switch (action)
     {
     case EZLOPI_ACTION_PREPARE:
@@ -92,9 +93,9 @@ static bool check_double_val_equal(double first, double second)
     }
     return ret;
 }
-static int __notify(l_ezlopi_item_t* item)
+static ezlopi_error_t __notify(l_ezlopi_item_t* item)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
     if (item)
     {
         s_ezlopi_bmp280_t* sensor_params = (s_ezlopi_bmp280_t*)item->user_arg;
@@ -124,6 +125,7 @@ static int __notify(l_ezlopi_item_t* item)
                 sensor_params->pressure = pressure;
                 ezlopi_device_value_updated_from_device_broadcast(item);
                 update_cloud = false;
+                ret = EZPI_SUCCESS;
             }
         }
     }
@@ -131,9 +133,9 @@ static int __notify(l_ezlopi_item_t* item)
     return ret;
 }
 
-static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
+static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t* item, void* arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
     if (item && arg)
     {
         cJSON* cj_device = (cJSON*)arg;
@@ -143,23 +145,26 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
             if (ezlopi_item_name_temp == item->cloud_properties.item_name)
             {
                 ezlopi_valueformatter_float_to_cjson(item, cj_device, bmp280_sensor_params->temperature);
+                ret = EZPI_SUCCESS;
             }
             else if (ezlopi_item_name_humidity == item->cloud_properties.item_name)
             {
                 ezlopi_valueformatter_float_to_cjson(item, cj_device, bmp280_sensor_params->humidity);
+                ret = EZPI_SUCCESS;
             }
             else if (ezlopi_item_name_atmospheric_pressure == item->cloud_properties.item_name)
             {
                 ezlopi_valueformatter_float_to_cjson(item, cj_device, (bmp280_sensor_params->pressure / 1000.0));
+                ret = EZPI_SUCCESS;
             }
         }
     }
     return ret;
 }
 
-static int __init(l_ezlopi_item_t* item)
+static ezlopi_error_t __init(l_ezlopi_item_t* item)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_ERR_INIT_DEVICE_FAILED;
     if (item)
     {
         s_ezlopi_bmp280_t* bmp280_sensor_params = (s_ezlopi_bmp280_t*)item->user_arg;
@@ -171,21 +176,17 @@ static int __init(l_ezlopi_item_t* item)
                 bmp280_init_default_params(&bmp280_sensor_params->bmp280_params);
                 bmp280_init(&bmp280_sensor_params->bmp280_dev, &bmp280_sensor_params->bmp280_params, &item->interface.i2c_master);
                 bmp280_read_float(&item->interface.i2c_master, &bmp280_sensor_params->bmp280_dev, &bmp280_sensor_params->temperature, &bmp280_sensor_params->pressure, &bmp280_sensor_params->humidity);
-                ret = 1;
+                ret = EZPI_SUCCESS;
             }
-        }
-        else
-        {
-            ret = -1;
         }
     }
 
     return ret;
 }
 
-static int __prepare(void* arg)
+static ezlopi_error_t __prepare(void* arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_SUCCESS;
 
     s_ezlopi_prep_arg_t* prep_arg = (s_ezlopi_prep_arg_t*)arg;
     if (prep_arg && prep_arg->cjson_device)
@@ -197,7 +198,6 @@ static int __prepare(void* arg)
             l_ezlopi_device_t* parent_temp_humid_device = ezlopi_device_add_device(prep_arg->cjson_device, "temp_hum");
             if (parent_temp_humid_device)
             {
-                ret = 1;
                 TRACE_I("Parent_temp_humid_device-[0x%x] ", parent_temp_humid_device->cloud_properties.device_id);
                 __prepare_device_cloud_properties_parent_temp_humid(parent_temp_humid_device, prep_arg->cjson_device);
 
@@ -231,7 +231,7 @@ static int __prepare(void* arg)
                     else
                     {
                         ezlopi_device_free_device(child_pressure_device);
-                        ret = -1;
+                        ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                     }
                 }
 
@@ -239,21 +239,25 @@ static int __prepare(void* arg)
                     (NULL == humidity_item) &&
                     (NULL == child_pressure_device))
                 {
-                    ret = -1;
+                    ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                     ezlopi_free(__FUNCTION__, bme280_sensor_params);
                     ezlopi_device_free_device(parent_temp_humid_device);
                 }
             }
             else
             {
-                ret = -1;
+                ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                 ezlopi_free(__FUNCTION__, bme280_sensor_params);
             }
         }
         else
         {
-            ret = -1;
+            ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
         }
+    }
+    else 
+    {
+        ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
     }
 
     return ret;

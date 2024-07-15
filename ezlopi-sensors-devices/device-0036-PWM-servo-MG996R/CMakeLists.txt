@@ -6,6 +6,7 @@ idf_component_register(SRCS "device_0036_PWM_servo_MG996R.c"
                                 ezlopi-core-actions 
                                 ezlopi-core-devices 
                                 ezlopi-core-valueformatter 
+                                ezlopi-core-errors
 
                                 ezlopi-hal-pwm
 

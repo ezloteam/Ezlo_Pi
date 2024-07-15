@@ -7,6 +7,7 @@
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
 #include "ezlopi_core_processes.h"
+#include "ezlopi_core_errors.h"
 
 #include "ezlopi_hal_i2c_master.h"
 
@@ -17,17 +18,17 @@
 #include "EZLOPI_USER_CONFIG.h"
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-static int __prepare(void* arg);
-static int __init(l_ezlopi_item_t* item);
-static int __get_cjson_value(l_ezlopi_item_t* item, void* arg);
-static int __notify(l_ezlopi_item_t* item);
+static ezlopi_error_t __prepare(void* arg);
+static ezlopi_error_t __init(l_ezlopi_item_t* item);
+static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t* item, void* arg);
+static ezlopi_error_t __notify(l_ezlopi_item_t* item);
 static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, void* user_data);
 static void __prepare_item_interface_properties(l_ezlopi_item_t* item, cJSON* cj_device);
 static void __gy271_calibration_task(void* params);
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-int sensor_0007_I2C_GY271(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
+ezlopi_error_t sensor_0007_I2C_GY271(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_SUCCESS;
     switch (action)
     {
     case EZLOPI_ACTION_PREPARE:
@@ -141,9 +142,9 @@ static void __prepare_item_interface_properties(l_ezlopi_item_t* item, cJSON* cj
     }
 }
 
-static int __prepare(void* arg)
+static ezlopi_error_t __prepare(void* arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_SUCCESS;
     s_ezlopi_prep_arg_t* prep_arg = (s_ezlopi_prep_arg_t*)arg;
     if (prep_arg && prep_arg->cjson_device)
     {
@@ -185,7 +186,7 @@ static int __prepare(void* arg)
                     }
                     else
                     {
-                        ret = -1;
+                        ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                         ezlopi_device_free_device(gy271_device_child_y_device);
                     }
                 }
@@ -207,7 +208,7 @@ static int __prepare(void* arg)
                     }
                     else
                     {
-                        ret = -1;
+                        ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                         ezlopi_device_free_device(gy271_device_child_z_device);
                     }
                 }
@@ -228,7 +229,7 @@ static int __prepare(void* arg)
                     }
                     else
                     {
-                        ret = -1;
+                        ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                         ezlopi_device_free_device(gy271_device_child_azi_device);
                     }
                 }
@@ -249,7 +250,7 @@ static int __prepare(void* arg)
                     }
                     else
                     {
-                        ret = -1;
+                        ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                         ezlopi_device_free_device(gy271_device_child_temp_device);
                     }
                 }
@@ -260,27 +261,31 @@ static int __prepare(void* arg)
                     (NULL == gy271_device_child_azi_device) &&
                     (NULL == gy271_device_child_temp_device))
                 {
-                    ret = -1;
+                    ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                     ezlopi_device_free_device(gy271_device_parent_x_device);
                 }
             }
             else // if the parent_device dosenot exsist then dealloc the 'user_data'
             {
                 ezlopi_free(__FUNCTION__, user_data);
-                ret = -1;
+                ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
             }
         }
         else
         {
-            ret = -1;
+            ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
         }
+    }
+    else
+    {
+        ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
     }
     return ret;
 }
 
-static int __init(l_ezlopi_item_t* item)
+static ezlopi_error_t __init(l_ezlopi_item_t* item)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_SUCCESS;
     if (item)
     {
         s_gy271_data_t* user_data = (s_gy271_data_t*)item->user_arg;
@@ -296,7 +301,6 @@ static int __init(l_ezlopi_item_t* item)
                     TaskHandle_t ezlopi_sensor_gy271_callibrationb_task_handle = NULL;
                     xTaskCreate(__gy271_calibration_task, "GY271_Calibration_Task", EZLOPI_SENSOR_GY271_CALLIBRATION_TASK_DEPTH, item, 1, &ezlopi_sensor_gy271_callibrationb_task_handle);
                     ezlopi_core_process_set_process_info(ENUM_EZLOPI_SENSOR_GY271_CALLIBRATION_TASK, &ezlopi_sensor_gy271_callibrationb_task_handle, EZLOPI_SENSOR_GY271_CALLIBRATION_TASK_DEPTH);
-                    ret = 1;
                 }
                 else
                 {
@@ -352,18 +356,28 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
                     ezlopi_valueformatter_float_to_cjson(item, cj_result, user_data->T);
                 }
             }
-
-            ret = 1;
+            else
+            {
+                ret = EZPI_ERR_INIT_DEVICE_FAILED;
+            }
         }
+        else
+        {
+            ret = EZPI_ERR_INIT_DEVICE_FAILED;
+        }
+    }
+    else
+    {
+        ret = EZPI_ERR_INIT_DEVICE_FAILED;
     }
 
     return ret;
 }
 
-static int __notify(l_ezlopi_item_t* item)
+static ezlopi_error_t __notify(l_ezlopi_item_t* item)
 {
     static float __prev[5] = { 0 };
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
     if (item)
     {
         s_gy271_data_t* user_data = (s_gy271_data_t*)item->user_arg;
@@ -414,10 +428,9 @@ static int __notify(l_ezlopi_item_t* item)
                         ezlopi_device_value_updated_from_device_broadcast(item);
                     }
                 }
+                ret = EZPI_SUCCESS;
             }
         }
-
-        ret = 1;
     }
     return ret;
 }

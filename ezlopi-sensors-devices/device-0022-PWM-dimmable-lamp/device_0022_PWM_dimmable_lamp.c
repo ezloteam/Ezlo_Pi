@@ -144,7 +144,7 @@ static ezlopi_error_t __list_cjson_value(l_ezlopi_item_t* item, void* arg)
         {
             ezlopi_valueformatter_bool_to_cjson(item, cj_properties, dimmable_bulb_arg->current_brightness_value);
         }
-        ret = EZPI_SUCCESS
+        ret = EZPI_SUCCESS;
     }
 
     return ret;
