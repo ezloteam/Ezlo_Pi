@@ -92,6 +92,7 @@ uint32_t ezlopi_meshbot_service_start_scene(l_scenes_list_v2_t* scene_node)
         if ((EZLOPI_SCENE_STATUS_NONE == scene_node->status) ||
             (EZLOPI_SCENE_STATUS_STOPPED == scene_node->status))
         {
+            __execute_scene_start(scene_node);
             // xTaskCreate(__scenes_process, scene_node->name, 2 * 2048, scene_node, 2, NULL);
             ret = 1;
         }
@@ -379,6 +380,8 @@ PT_THREAD(__scene_proto_thread(l_scenes_list_v2_t* scene_node, uint32_t routine_
             scene_node->status = EZLOPI_SCENE_STATUS_STOPPED;
             break;
         }
+        
+        
 
         ctx->curr_ticks = xTaskGetTickCount();
         TRACE_D("routine delay: %d", routine_delay_ms);
@@ -456,14 +459,21 @@ static int __execute_scene_stop(l_scenes_list_v2_t* scene_node)
 static int __execute_scene_start(l_scenes_list_v2_t* scene_node)
 {
     int ret = 0;
-    if (scene_node && (NULL == scene_node->thread_ctx))
+    if (scene_node)
     {
-        scene_node->thread_ctx = (void*)ezlopi_malloc(__FUNCTION__, sizeof(s_thread_ctx_t));
-        if (scene_node->thread_ctx)
+        if (NULL == scene_node->thread_ctx)
         {
-            memset(scene_node->thread_ctx, 0, sizeof(s_thread_ctx_t));
-            scene_node->status = EZLOPI_SCENE_STATUS_RUN;
-            ret = 1;
+            scene_node->thread_ctx = (void*)ezlopi_malloc(__FUNCTION__, sizeof(s_thread_ctx_t));
+            if (scene_node->thread_ctx)
+            {
+                memset(scene_node->thread_ctx, 0, sizeof(s_thread_ctx_t));
+                scene_node->status = EZLOPI_SCENE_STATUS_RUN;
+                ret = 1;
+            }
+        }
+        else
+        {
+            TRACE_E(" name[%s] --> status[%d]  :-  THREAD_CTX exists..", scene_node->name, scene_node->status);
         }
     }
 
