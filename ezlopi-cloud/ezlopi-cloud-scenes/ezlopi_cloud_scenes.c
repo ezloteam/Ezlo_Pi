@@ -78,7 +78,7 @@ void scenes_edit(cJSON* cj_request, cJSON* cj_response)
         cJSON* cj_eo = cJSON_GetObjectItem(__FUNCTION__, cj_params, "eo");
         if (cj_eo)
         {
-            CJSON_TRACE("scene-edit eo", cj_eo);
+            // CJSON_TRACE("scene-edit eo", cj_eo);
 
             cJSON* cj_id = cJSON_GetObjectItem(__FUNCTION__, cj_eo, ezlopi__id_str);
             if (cj_id && cj_id->valuestring)
@@ -172,7 +172,7 @@ void scenes_enable_set(cJSON* cj_request, cJSON* cj_response)
                         cJSON_DeleteItemFromObject(__FUNCTION__, cj_scene, ezlopi_enabled_str);
                         cJSON_AddBoolToObject(__FUNCTION__, cj_scene, ezlopi_enabled_str, enabled_flag);
 
-                        char* updated_scene_str = cJSON_PrintBuffered(__FUNCTION__, cj_scene, 2048, false);
+                        char* updated_scene_str = cJSON_PrintBuffered(__FUNCTION__, cj_scene, 4096, false);
                         cJSON_Delete(__FUNCTION__, cj_scene);
 
                         if (updated_scene_str)
@@ -232,7 +232,7 @@ void scenes_notification_add(cJSON* cj_request, cJSON* cj_response)
                     }
 
                     CJSON_TRACE("updated-scene", cj_scene);
-                    char* updated_scene_str = cJSON_PrintBuffered(__FUNCTION__, cj_scene, 2048, false);
+                    char* updated_scene_str = cJSON_PrintBuffered(__FUNCTION__, cj_scene, 4096, false);
                     cJSON_Delete(__FUNCTION__, cj_scene);
 
                     if (updated_scene_str)
@@ -298,7 +298,7 @@ void scenes_notification_remove(cJSON* cj_request, cJSON* cj_response)
                     }
 
                     CJSON_TRACE("updated-scene", cj_scene);
-                    char* updated_scene_str = cJSON_PrintBuffered(__FUNCTION__, cj_scene, 2048, false);
+                    char* updated_scene_str = cJSON_PrintBuffered(__FUNCTION__, cj_scene, 4096, false);
                     cJSON_Delete(__FUNCTION__, cj_scene);
 
                     if (updated_scene_str)
@@ -521,19 +521,44 @@ void scenes_block_enabled_set(cJSON* cj_request, cJSON* cj_response)
 
 void scenes_block_status_reset(cJSON * cj_request, cJSON * cj_response)
 {
-    // cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
-    cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
-    if (cj_params)
+    cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+    if (cj_result)
     {
-        cJSON *cj_scene_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_sceneId_str);
-        cJSON *cj_block_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_blockId_str);
-        if (cj_scene_id && (NULL != cj_scene_id->valuestring) && cj_block_id && (NULL != cj_block_id->valuestring))
+        cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
+        if (cj_params)
         {
-            ezlopi_core_scene_set_reset_latch(cj_scene_id->valuestring, cj_block_id->valuestring, false);
+            cJSON *cj_scene_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_sceneId_str);
+            if (cj_scene_id && (NULL != cj_scene_id->valuestring))
+            {
+                cJSON *cj_block_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_blockId_str);
+                if (cj_block_id && (NULL != cj_block_id->valuestring))
+                {
+                    ezlopi_core_scene_reset_block_status(cj_scene_id->valuestring, cj_block_id->valuestring);
+                }
+                else
+                {
+                    ezlopi_core_scene_reset_block_status(cj_scene_id->valuestring, NULL);
+                }
+            }
         }
     }
 }
 
+void scenes_stop(cJSON* cj_request, cJSON* cj_response)
+{
+    cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+    cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
+    if (cj_params)
+    {
+        TRACE_D("Stop executed");
+        cJSON* cj_scene_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_sceneId_str);
+        if (cj_scene_id && cj_scene_id->valuestring)
+        {
+            uint32_t u32_scene_id = strtoul(cj_scene_id->valuestring, NULL, 16);
+            ezlopi_meshbot_service_stop_for_scene_id(u32_scene_id);
+        }
+    }
+}
 
 ////// updater for scene
 ////// useful for 'hub.scenes.enabled.set'

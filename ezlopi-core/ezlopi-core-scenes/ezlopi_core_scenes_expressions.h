@@ -76,6 +76,23 @@ typedef struct s_ezlopi_expressions
 void ezlopi_scenes_expressions_init(void);
 
 /**
+ * @brief Generate the expression node in cjson object
+ *
+ * @param exp_node node to be converted
+ * @return cJSON*
+ */
+cJSON* generate_expression_node_in_cjson(s_ezlopi_expressions_t* exp_node);
+
+/**
+ * @brief This function updates expresson in nvs associated with target :- 'nvs_exp_id_key'.
+ *
+ * @param nvs_exp_id_key This is string of actual 'exp_id' to replace [must be in nvs_exp_list]
+ * @param cj_updated_exp This 'cjson' is 'new_exp_node' to be stored in nvs
+ * @return int
+ */
+int ezlopi_scenes_expressions_update_nvs(char* nvs_exp_id_key, cJSON * cj_updated_exp);
+
+/**
  * @brief Populate new expression to the linklist, and store it to the flash
  *
  * @param exp_id expression id, if is zero then 'cj_expression' is cosidered as new expression and stored to nvs
@@ -85,11 +102,29 @@ void ezlopi_scenes_expressions_init(void);
 uint32_t ezlopi_scenes_expressions_add_to_head(uint32_t exp_id, cJSON* cj_expression);
 
 /**
- * @brief POP the expression from linklist
+ * @brief Populate 'items' information contained within 'params' , of the new expresssion
  *
+ * @param exp_node ptr to new_expression
+ * @param cj_items CJSON containing :- items_ll
+ */
+void __get_expressions_items(s_ezlopi_expressions_t* exp_node, cJSON* cj_items);
+
+
+/**
+ * @brief Populate 'device_item_names' information contained within 'params' , of the new expresssion
+ *
+ * @param exp_node ptr to new_expression
+ * @param cj_items CJSON containing :- device_item_names_ll
+ */
+void __get_expressions_device_item_names(s_ezlopi_expressions_t* exp_node, cJSON* cj_device_item_names);
+
+/**
+ * @brief Pop expression with '_id'
+ *
+ * @param _id target 'exp_id' to be popped from ll
  * @return s_ezlopi_expressions_t*
  */
-s_ezlopi_expressions_t* ezlopi_scenes_expressions_node_pop(void);
+s_ezlopi_expressions_t* ezlopi_scenes_expressions_node_pop_by_id(uint32_t _id);
 
 /**
  * @brief Delete the expression-item and its childs
@@ -120,9 +155,9 @@ void ezlopi_scenes_expressions_list_cjson(cJSON* cj_expresson_array, cJSON* cj_p
 void ezlopi_scenes_expressions_print(s_ezlopi_expressions_t* exp_node);
 
 /**
- * @brief Delete all the expressions in the linked list
+ * @brief Delete perticular 'expression' from linked list
  *
- * @param exp_node
+ * @param exp_node Target_exp_node
  */
 int ezlopi_scenes_expressions_delete_node(s_ezlopi_expressions_t* exp_node);
 

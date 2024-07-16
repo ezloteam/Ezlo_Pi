@@ -241,7 +241,7 @@ void ezlopi_cloud_modes_protect_set(cJSON* cj_request, cJSON* cj_response)
         if (cj_params)
         {
             CJSON_GET_VALUE_BOOL(cj_params, ezlopi_protect_str, protect_state);
-            CJSON_GET_VALUE_DOUBLE(cj_params, ezlopi_timestamp_str, timestamp);
+            CJSON_GET_VALUE_DOUBLE(cj_params, ezlopi_timestamp_str, timestamp); // timestamp not needed rightnow
 
             cJSON* cj_mode_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_modeId_str);
             if (cj_mode_id && cj_mode_id->valuestring)

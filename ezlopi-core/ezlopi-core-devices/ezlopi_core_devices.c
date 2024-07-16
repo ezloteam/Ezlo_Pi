@@ -46,7 +46,7 @@ void ezlopi_device_name_set_by_device_id(uint32_t a_device_id, cJSON* cj_new_nam
         char* device_config_str = ezlopi_factory_info_v3_get_ezlopi_config();
         if (device_config_str)
         {
-            TRACE_D("device-config: \r\n%s", device_config_str);
+            // TRACE_D("device-config: \r\n%s", device_config_str);
             cJSON* cj_device_config = cJSON_Parse(__FUNCTION__, device_config_str);
             ezlopi_factory_info_v3_free(device_config_str);
 
@@ -402,7 +402,6 @@ void ezlopi_device_prepare(void)
             if (ezlopi_device_parse_json_v3(cj_config) < 0)
             {
                 TRACE_E("parsing devices-config failed!!!!");
-#if 1
 
 #if defined(CONFIG_IDF_TARGET_ESP32)
                 cJSON_AddStringToObject(__FUNCTION__, cj_config, ezlopi_chipset_str, ezlopi_ESP32_str);
@@ -411,7 +410,6 @@ void ezlopi_device_prepare(void)
 #elif defined (CONFIG_IDF_TARGET_ESP32C3)
                 cJSON_AddStringToObject(__FUNCTION__, cj_config, ezlopi_chipset_str, ezlopi_ESP32C3_str);
 #endif 
-
                 char * tmp_str = cJSON_PrintUnformatted(__FUNCTION__, cj_config);
                 if (tmp_str)
                 {
@@ -421,9 +419,7 @@ void ezlopi_device_prepare(void)
                     free(tmp_str);
                     EZPI_CORE_reset_reboot();
                 }
-#endif
             }
-
             cJSON_Delete(__FUNCTION__, cj_config);
         }
     }
