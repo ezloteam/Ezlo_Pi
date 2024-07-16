@@ -234,8 +234,8 @@ PT_THREAD(__scene_proto_thread(l_scenes_list_v2_t* scene_node, uint32_t routine_
 
     while (1)
     {
-        TRACE_W("start_cond => %d", ctx->start_cond);
-        TRACE_W("stopped_cond => %d", ctx->stopped_cond);
+        // TRACE_W("start_cond => %d", ctx->start_cond);
+        // TRACE_W("stopped_cond => %d", ctx->stopped_cond);
         if ((EZLOPI_SCENE_STATUS_RUN == scene_node->status) || (EZLOPI_SCENE_STATUS_RUNNING == scene_node->status))
         {
             scene_node->status = EZLOPI_SCENE_STATUS_RUNNING;
@@ -386,8 +386,8 @@ PT_THREAD(__scene_proto_thread(l_scenes_list_v2_t* scene_node, uint32_t routine_
             scene_node->status = EZLOPI_SCENE_STATUS_STOPPED;
             break;
         }
-        
-        
+
+
 
         ctx->curr_ticks = xTaskGetTickCount();
         TRACE_D("routine delay: %d", routine_delay_ms);

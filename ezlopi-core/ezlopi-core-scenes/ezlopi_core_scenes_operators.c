@@ -16,8 +16,7 @@
 #include "ezlopi_cloud_constants.h"
 
 //----------------------------- This Macro is used only in this File --------------------------------------------------------
-#define MAX_STRING_LEN(str1, str2) ((strlen(str1) > strlen(str2)) ? strlen(str1) : strlen(str2))
-#define OPERATE_ON_STRINGS(STR1, op, STR2) (strncmp(STR1, STR2, MAX_STRING_LEN(STR1, STR2)) op 0) // logical-arrangement of '__ op 0' returns correct results
+#define OPERATE_ON_STRINGS(STR1, op, STR2) (strncmp(STR1, STR2, BIGGER_LEN(strlen(str1), strlen(str1))) op 0) // logical-arrangement of '__ op 0' returns correct results
 #define STR_OP_COMP(STR1, op, STR2) \
     ((NULL == STR1)   ? false       \
      : (NULL == STR2) ? false       \

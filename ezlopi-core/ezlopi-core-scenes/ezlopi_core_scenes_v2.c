@@ -1345,6 +1345,7 @@ int ezlopi_core_scene_set_reset_latch_enable(const char* sceneId_str, const char
         s_when_function_t* function_state = (s_when_function_t*)scene_to_reset_latch->when_block->fields->user_arg;
         if (function_state)
         {
+            function_state->transtion_instant = 0;
             function_state->current_state = false;
         }
 
@@ -1412,12 +1413,14 @@ int ezlopi_core_scene_reset_latch_status(const char* sceneId_str, const char* bl
                     if (0 == strncmp(curr_when_block->blockId, blockId_str, sizeof(curr_when_block->blockId)))
                     {
                         /* Now reset the curr_function_state of this latch */
+                        function_state->transtion_instant = 0;
                         function_state->current_state = false;
                         break;
                     }
                 }
                 else
                 {
+                    function_state->transtion_instant = 0;
                     function_state->current_state = false;
                 }
 
