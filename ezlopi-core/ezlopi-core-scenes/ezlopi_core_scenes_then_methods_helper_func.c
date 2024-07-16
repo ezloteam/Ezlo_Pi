@@ -334,7 +334,7 @@ void parse_http_content(s_ezlopi_core_http_mbedtls_t* tmp_http_data, l_fields_v2
                 uint16_t i = (int)strlen(field_value_string);
                 if (i > 0)
                 {
-                    char str[10];
+                    char str[10 + 1];
                     snprintf(str, 10, "%d", (int)i); // write length value in string
                     str[10] = '\0';
                     // 3. adding 'Content-Length' to header-buffer

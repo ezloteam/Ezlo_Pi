@@ -34,6 +34,12 @@ int ezlopi_scene_when_is_item_state(l_scenes_list_v2_t* scene_node, void* arg)
             return 0;
         }
 
+        if (true == when_block->block_status_reset_once)
+        {
+            when_block->block_status_reset_once = false;
+            return 0;
+        }
+
         uint32_t item_id = 0;
         l_fields_v2_t* value_field = NULL;
         #warning "Warning: armed check remains [Krishna]";
@@ -139,6 +145,12 @@ int ezlopi_scene_when_is_interval(l_scenes_list_v2_t* scene_node, void* arg)
             return 0;
         }
 
+        if (true == when_block->block_status_reset_once)
+        {
+            when_block->block_status_reset_once = false;
+            return 0;
+        }
+
         char* end_prt = NULL;
         uint32_t interval = strtoul(scene_node->when_block->fields->field_value.u_value.value_string, &end_prt, 10);
         if (end_prt)
@@ -203,6 +215,12 @@ int ezlopi_scene_when_is_sun_state(l_scenes_list_v2_t* scene_node, void* arg)
             return 0;
         }
 
+        if (true == when_block->block_status_reset_once)
+        {
+            when_block->block_status_reset_once = false;
+            return 0;
+        }
+
         // if (0 < ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 100, false))
         // {
         //     TRACE_W("module not online");
@@ -261,6 +279,12 @@ int ezlopi_scene_when_is_date(l_scenes_list_v2_t* scene_node, void* arg)
             return 0;
         }
 
+        if (true == when_block->block_status_reset_once)
+        {
+            when_block->block_status_reset_once = false;
+            return 0;
+        }
+
         time_t rawtime = 0;
         time(&rawtime);
         struct tm* info;
@@ -312,6 +336,12 @@ int ezlopi_scene_when_is_once(l_scenes_list_v2_t* scene_node, void* arg)
             return 0;
         }
 
+        if (true == when_block->block_status_reset_once)
+        {
+            when_block->block_status_reset_once = false;
+            return 0;
+        }
+
         time_t rawtime = 0;
         time(&rawtime);
         struct tm* info;
@@ -360,6 +390,12 @@ int ezlopi_scene_when_is_date_range(l_scenes_list_v2_t* scene_node, void* arg)
         if (false == when_block->block_enable)
         {
             TRACE_D("Block-disabled [%s]", when_block->block_options.method.name);
+            return 0;
+        }
+
+        if (true == when_block->block_status_reset_once)
+        {
+            when_block->block_status_reset_once = false;
             return 0;
         }
 
@@ -446,6 +482,13 @@ int ezlopi_scene_when_is_house_mode_changed_to(l_scenes_list_v2_t* scene_node, v
             TRACE_D("Block-disabled [%s]", when_block->block_options.method.name);
             return 0;
         }
+
+        if (true == when_block->block_status_reset_once)
+        {
+            when_block->block_status_reset_once = false;
+            return 0;
+        }
+
         l_fields_v2_t* house_mode_id_array = NULL;
         l_fields_v2_t* curr_field = when_block->fields;
 
@@ -500,6 +543,13 @@ int ezlopi_scene_when_is_house_mode_changed_from(l_scenes_list_v2_t* scene_node,
             TRACE_D("Block-disabled [%s]", when_block->block_options.method.name);
             return 0;
         }
+
+        if (true == when_block->block_status_reset_once)
+        {
+            when_block->block_status_reset_once = false;
+            return 0;
+        }
+
         l_fields_v2_t* house_mode_id_array = NULL;
         l_fields_v2_t* curr_field = when_block->fields;
 
@@ -631,6 +681,12 @@ int ezlopi_scene_when_is_device_state(l_scenes_list_v2_t* scene_node, void* arg)
             return 0;
         }
 
+        if (true == when_block->block_status_reset_once)
+        {
+            when_block->block_status_reset_once = false;
+            return 0;
+        }
+
         uint32_t device_id = 0;
         bool value_armed = false;
         bool value_reachable = false;
@@ -698,6 +754,12 @@ int ezlopi_scene_when_is_scene_state(l_scenes_list_v2_t* scene_node, void* arg)
         if (false == when_block->block_enable)
         {
             TRACE_D("Block-disabled [%s]", when_block->block_options.method.name);
+            return 0;
+        }
+
+        if (true == when_block->block_status_reset_once)
+        {
+            when_block->block_status_reset_once = false;
             return 0;
         }
 
@@ -791,6 +853,12 @@ int ezlopi_scene_when_is_cloud_state(l_scenes_list_v2_t* scene_node, void* arg)
             return 0;
         }
 
+        if (true == when_block->block_status_reset_once)
+        {
+            when_block->block_status_reset_once = false;
+            return 0;
+        }
+
         l_fields_v2_t* value_field = NULL;
         l_fields_v2_t* curr_field = when_block->fields;
         while (curr_field)
@@ -842,6 +910,12 @@ int ezlopi_scene_when_compare_numbers(l_scenes_list_v2_t* scene_node, void* arg)
         if (false == when_block->block_enable)
         {
             TRACE_D("Block-disabled [%s]", when_block->block_options.method.name);
+            return 0;
+        }
+
+        if (true == when_block->block_status_reset_once)
+        {
+            when_block->block_status_reset_once = false;
             return 0;
         }
 
@@ -906,6 +980,12 @@ int ezlopi_scene_when_compare_number_range(l_scenes_list_v2_t* scene_node, void*
             return 0;
         }
 
+        if (true == when_block->block_status_reset_once)
+        {
+            when_block->block_status_reset_once = false;
+            return 0;
+        }
+
         l_fields_v2_t* item_exp_field = NULL;
         l_fields_v2_t* end_value_field = NULL;
         l_fields_v2_t* start_value_field = NULL;
@@ -966,6 +1046,12 @@ int ezlopi_scene_when_compare_strings(l_scenes_list_v2_t* scene_node, void* arg)
         if (false == when_block->block_enable)
         {
             TRACE_D("Block-disabled [%s]", when_block->block_options.method.name);
+            return 0;
+        }
+
+        if (true == when_block->block_status_reset_once)
+        {
+            when_block->block_status_reset_once = false;
             return 0;
         }
 
@@ -1033,6 +1119,12 @@ int ezlopi_scene_when_string_operation(l_scenes_list_v2_t* scene_node, void* arg
             return 0;
         }
 
+        if (true == when_block->block_status_reset_once)
+        {
+            when_block->block_status_reset_once = false;
+            return 0;
+        }
+
         l_fields_v2_t* item_exp_field = NULL;
         l_fields_v2_t* value_field = NULL;
         l_fields_v2_t* operation_field = NULL;
@@ -1096,6 +1188,12 @@ int ezlopi_scene_when_in_array(l_scenes_list_v2_t* scene_node, void* arg)
             return 0;
         }
 
+        if (true == when_block->block_status_reset_once)
+        {
+            when_block->block_status_reset_once = false;
+            return 0;
+        }
+
         l_fields_v2_t* item_exp_field = NULL;
         l_fields_v2_t* value_field = NULL;
         l_fields_v2_t* operation_field = NULL;
@@ -1154,6 +1252,12 @@ int ezlopi_scene_when_compare_values(l_scenes_list_v2_t* scene_node, void* arg)
         if (false == when_block->block_enable)
         {
             TRACE_D("Block-disabled [%s]", when_block->block_options.method.name);
+            return 0;
+        }
+
+        if (true == when_block->block_status_reset_once)
+        {
+            when_block->block_status_reset_once = false;
             return 0;
         }
 
@@ -1229,6 +1333,12 @@ int ezlopi_scene_when_has_atleast_one_dictionary_value(l_scenes_list_v2_t* scene
             return 0;
         }
 
+        if (true == when_block->block_status_reset_once)
+        {
+            when_block->block_status_reset_once = false;
+            return 0;
+        }
+
         uint32_t item_id = 0;
         l_fields_v2_t* value_field = NULL;
 
@@ -1272,6 +1382,12 @@ int ezlopi_scene_when_is_firmware_update_state(l_scenes_list_v2_t* scene_node, v
         if (false == when_block->block_enable)
         {
             TRACE_D("Block-disabled [%s]", when_block->block_options.method.name);
+            return 0;
+        }
+
+        if (true == when_block->block_status_reset_once)
+        {
+            when_block->block_status_reset_once = false;
             return 0;
         }
 
@@ -1322,6 +1438,12 @@ int ezlopi_scene_when_is_dictionary_changed(l_scenes_list_v2_t* scene_node, void
         if (false == when_block->block_enable)
         {
             TRACE_D("Block-disabled [%s]", when_block->block_options.method.name);
+            return 0;
+        }
+
+        if (true == when_block->block_status_reset_once)
+        {
+            when_block->block_status_reset_once = false;
             return 0;
         }
 
@@ -1470,37 +1592,56 @@ int ezlopi_scene_when_function(l_scenes_list_v2_t* scene_node, void* arg)
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (scene_node && when_block)
     {
+        if (true == when_block->block_status_reset_once)
+        {
+            when_block->block_status_reset_once = false;
+            return 0;
+        }
+
         cJSON* function_obj = scene_node->when_block->block_options.cj_function;
         if (function_obj)
         {
-            /*fill the 'fields->user-arg' with 'function_state_info'*/
-            if (NULL == scene_node->when_block->fields->user_arg)
+            cJSON * cj_latch = cJSON_GetObjectItem(__FUNCTION__, function_obj, "latch");
+            if (cj_latch)
             {
-                s_when_function_t* function_state_info = (s_when_function_t*)malloc(sizeof(s_when_function_t));
-                if (function_state_info)
+                cJSON * cj_enabled_latch = cJSON_GetObjectItem(__FUNCTION__, cj_latch, "enabled");
+                if (cj_enabled_latch && cJSON_IsTrue(cj_enabled_latch))
                 {
-                    memset(function_state_info, 0, sizeof(s_when_function_t));
-                    scene_node->when_block->fields->user_arg = (void*)function_state_info;
+
+                    /*fill the 'fields->user-arg' with 'function_state_info'*/
+                    if (NULL == scene_node->when_block->fields->user_arg)
+                    {
+                        s_when_function_t* function_state_info = (s_when_function_t*)malloc(sizeof(s_when_function_t));
+                        if (function_state_info)
+                        {
+                            memset(function_state_info, 0, sizeof(s_when_function_t));
+                            scene_node->when_block->fields->user_arg = (void*)function_state_info;
+                        }
+                    }
+
+                    const s_function_opr_t __when_funtion_opr[] = {
+                        {.opr_name = "for", .opr_method = when_function_for_opr},
+                        {.opr_name = "repeat", .opr_method = when_function_for_repeat},
+                        {.opr_name = "follow", .opr_method = when_function_for_follow},
+                        {.opr_name = "pulse", .opr_method = when_function_for_pulse},
+                        {.opr_name = "latch", .opr_method = when_function_for_latch},
+                        {.opr_name = NULL, .opr_method = NULL},
+                    };
+
+                    cJSON* cj_func_opr = NULL;
+                    for (uint8_t i = 0; i < ((sizeof(__when_funtion_opr) / sizeof(__when_funtion_opr[i]))); i++)
+                    {
+                        if (NULL != (cj_func_opr = cJSON_GetObjectItem(__FUNCTION__, function_obj, __when_funtion_opr[i].opr_name)))
+                        {
+                            // TRACE_S("when_func_here->[%d]", i);
+                            ret = (__when_funtion_opr[i].opr_method)(scene_node, when_block, cj_func_opr);
+                            break;
+                        }
+                    }
                 }
-            }
-
-            const s_function_opr_t __when_funtion_opr[] = {
-                {.opr_name = "for", .opr_method = when_function_for_opr},
-                {.opr_name = "repeat", .opr_method = when_function_for_repeat},
-                {.opr_name = "follow", .opr_method = when_function_for_follow},
-                {.opr_name = "pulse", .opr_method = when_function_for_pulse},
-                {.opr_name = "latch", .opr_method = when_function_for_latch},
-                {.opr_name = NULL, .opr_method = NULL},
-            };
-
-            cJSON* cj_func_opr = NULL;
-            for (uint8_t i = 0; i < ((sizeof(__when_funtion_opr) / sizeof(__when_funtion_opr[i]))); i++)
-            {
-                if (NULL != (cj_func_opr = cJSON_GetObjectItem(__FUNCTION__, function_obj, __when_funtion_opr[i].opr_name)))
+                else
                 {
-                    TRACE_S("when_func_here->[%d]", i);
-                    ret = (__when_funtion_opr[i].opr_method)(scene_node, when_block, cj_func_opr);
-                    break;
+                    TRACE_E("when-Function ['%s'] --> Disabled", cJSON_GetStringValue(cJSON_GetObjectItem(__FUNCTION__, cj_latch, "name")));
                 }
             }
         }
