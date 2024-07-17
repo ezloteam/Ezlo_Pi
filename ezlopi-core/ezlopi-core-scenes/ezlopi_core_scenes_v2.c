@@ -98,9 +98,9 @@ uint32_t ezlopi_store_new_scene_v2(cJSON* cj_new_scene)
     if (cj_new_scene)
     {
         new_scene_id = ezlopi_cloud_generate_scene_id();
-        char tmp_buffer[32];
-        snprintf(tmp_buffer, sizeof(tmp_buffer), "%08x", new_scene_id);
-        cJSON_AddStringToObject(__FUNCTION__, cj_new_scene, ezlopi__id_str, tmp_buffer);
+        char new_scene_id_str[32];
+        snprintf(new_scene_id_str, sizeof(new_scene_id_str), "%08x", new_scene_id);
+        cJSON_AddStringToObject(__FUNCTION__, cj_new_scene, ezlopi__id_str, new_scene_id_str);
 
         if (__new_scene_add_when_blockId_if_reqd(cj_new_scene))
         {
@@ -117,7 +117,7 @@ uint32_t ezlopi_store_new_scene_v2(cJSON* cj_new_scene)
 
         if (new_scnee_str)
         {
-            if (ezlopi_nvs_write_str(new_scnee_str, strlen(new_scnee_str) + 1, tmp_buffer))
+            if (ezlopi_nvs_write_str(new_scnee_str, strlen(new_scnee_str) + 1, new_scene_id_str))
             {
                 bool free_scene_list_str = 1;
                 char* scenes_list_str = ezlopi_nvs_scene_get_v2();
@@ -131,30 +131,33 @@ uint32_t ezlopi_store_new_scene_v2(cJSON* cj_new_scene)
                 if (cj_scenes_list)
                 {
                     cJSON* cj_new_scene_id = cJSON_CreateNumber(__FUNCTION__, new_scene_id);
-                    if (!cJSON_AddItemToArray(cj_scenes_list, cj_new_scene_id))
+                    if (cj_new_scene_id)
                     {
-                        cJSON_Delete(__FUNCTION__, cj_new_scene_id);
-                        ezlopi_nvs_delete_stored_data_by_id(new_scene_id);
-                        new_scene_id = 0;
-                    }
-                    else
-                    {
-                        char* updated_scenes_list = cJSON_PrintBuffered(__FUNCTION__, cj_scenes_list, 1024, false);
-                        TRACE_D("length of 'updated_scenes_list': %d", strlen(updated_scenes_list));
-
-                        if (updated_scenes_list)
+                        if (!cJSON_AddItemToArray(cj_scenes_list, cj_new_scene_id))
                         {
-                            TRACE_D("updated_scenes_list: %s", updated_scenes_list);
-                            if (ezlopi_nvs_scene_set_v2(updated_scenes_list))
-                            {
-                                TRACE_D("Scenes list updated.");
-                            }
-                            else
-                            {
-                                TRACE_E("Scenes list update failed!");
-                            }
+                            cJSON_Delete(__FUNCTION__, cj_new_scene_id);
+                            ezlopi_nvs_delete_stored_data_by_id(new_scene_id);
+                            new_scene_id = 0;
+                        }
+                        else
+                        {
+                            char* updated_scenes_list = cJSON_PrintBuffered(__FUNCTION__, cj_scenes_list, 1024, false);
+                            TRACE_D("length of 'updated_scenes_list': %d", strlen(updated_scenes_list));
 
-                            ezlopi_free(__FUNCTION__, updated_scenes_list);
+                            if (updated_scenes_list)
+                            {
+                                TRACE_D("updated_scenes_list: %s", updated_scenes_list);
+                                if (ezlopi_nvs_scene_set_v2(updated_scenes_list))
+                                {
+                                    TRACE_D("Scenes list updated.");
+                                }
+                                else
+                                {
+                                    TRACE_E("Scenes list update failed!");
+                                }
+
+                                ezlopi_free(__FUNCTION__, updated_scenes_list);
+                            }
                         }
                     }
 
@@ -406,6 +409,7 @@ void ezlopi_scenes_init_v2(void)
 
     if (scenes_id_list_str)
     {
+        TRACE_D("scenes_id_list_str : %s", scenes_id_list_str);
         cJSON* cj_scenes_ids = cJSON_Parse(__FUNCTION__, scenes_id_list_str);
         if (cj_scenes_ids)
         {

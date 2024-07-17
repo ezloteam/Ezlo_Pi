@@ -15,7 +15,7 @@ const uint32_t MODES_ID_START = 0x90000000;
 const uint32_t SCENE_GROUP_ID_START = 0xA0000000;
 const uint32_t SCENE_WHEN_BLOCKID_START = 0xB0000000;
 const uint32_t DEVICE_GROUPID_START = 0xC0000000;
-const uint32_t ITEM_GROUPID_START = 0xC0000000;
+const uint32_t ITEM_GROUPID_START = 0xD0000000;
 
 
 static uint32_t g_device_id = 0;

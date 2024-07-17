@@ -23,8 +23,8 @@ static const char* ezlopi_scripts_nvs_ids = "ezlopi_scripts";
 static const char* config_info_update_time_name = "config_time";
 static const char* config_info_version_number = "conf_ver_no";
 static const char* ezlopi_scenes_expression_ids = "ezlopi_exp";
-static const char* ezlopi_device_groups = "ezlopi_device_grp";
-static const char* ezlopi_item_groups = "ezlopi_item_grp";
+static const char* ezlopi_device_groups_ids = "dev_grp_list";
+static const char* ezlopi_item_groups_ids = "item_grp_list";
 static const char* ezlopi_room_ids_nvs_name = "ezlopi_room";
 static const char* ezlopi_time_location_nvs_name = "time.local";
 static const char* ezlopi_modes_nvs_name = "ezlopi_modes";
@@ -179,22 +179,22 @@ char* ezlopi_nvs_read_scenes_expressions(void)
 
 int ezlopi_nvs_write_device_groups(char* data)
 {
-    return ezlopi_nvs_write_str(data, strlen(data) + 1, ezlopi_device_groups);
+    return ezlopi_nvs_write_str(data, strlen(data) + 1, ezlopi_device_groups_ids);
 }
 
 char* ezlopi_nvs_read_device_groups(void)
 {
-    return ezlopi_nvs_read_str(ezlopi_device_groups);
+    return ezlopi_nvs_read_str(ezlopi_device_groups_ids);
 }
 
 int ezlopi_nvs_write_item_groups(char* data)
 {
-    return ezlopi_nvs_write_str(data, strlen(data) + 1, ezlopi_item_groups);
+    return ezlopi_nvs_write_str(data, strlen(data) + 1, ezlopi_item_groups_ids);
 }
 
 char* ezlopi_nvs_read_item_groups(void)
 {
-    return ezlopi_nvs_read_str(ezlopi_item_groups);
+    return ezlopi_nvs_read_str(ezlopi_item_groups_ids);
 }
 
 char* ezlopi_nvs_read_rooms(void)

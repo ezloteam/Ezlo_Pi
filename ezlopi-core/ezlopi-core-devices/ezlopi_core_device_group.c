@@ -18,61 +18,22 @@ static void __ezlopi_core_device_group_print(l_ezlopi_device_grp_t* device_grp_n
 #if (1 == ENABLE_TRACE)
     if (device_grp_node)
     {
-        TRACE_D("----------------- DEVICE-GROUP --------------------");
-        TRACE_D("Group_id: %08x", device_grp_node->_id);
-        TRACE_D("Group_name: %s", device_grp_node->name);
-        CJSON_TRACE("Categories", device_grp_node->categories);
-        CJSON_TRACE("Devices", device_grp_node->devices);
-        CJSON_TRACE("Exceptions", device_grp_node->exceptions);
-#if 0
-        // cJSON * categories_arr = NULL;
-        // if (NULL != (categories_arr = cJSON_GetObjectItem(__FUNCTION__, device_grp_node->categories, "categories")))
-        // {
-        //     TRACE_D("-- Categories:");
-        //     int idx = 0;
-        //     cJSON* categories = NULL;
-        //     while (NULL != (categories = cJSON_GetArrayItem(categories_arr, idx)))
-        //     {
-        //         idx++;
-        //         CJSON_TRACE("\t\t -", categories);
-        //     }
-        // }
-        // cJSON * devices_arr = NULL;
-        // if (NULL != (devices_arr = cJSON_GetObjectItem(__FUNCTION__, device_grp_node->devices, "devices")))
-        // {
-        //     TRACE_D("-- Devices:");
-        //     int idx = 0;
-        //     cJSON* device = NULL;
-        //     while (NULL != (device = cJSON_GetArrayItem(devices_arr, idx)))
-        //     {
-        //         idx++;
-        //         CJSON_TRACE("\t\t -", device);
-        //     }
-        // }
-        // cJSON * exceptions_arr = NULL;
-        // if (NULL != (exceptions_arr = cJSON_GetObjectItem(__FUNCTION__, device_grp_node->exceptions, "exceptions")))
-        // {
-        //     TRACE_D("-- Exceptions:");
-        //     int idx = 0;
-        //     cJSON* exception = NULL;
-        //     while (NULL != (exception = cJSON_GetArrayItem(exceptions_arr, idx)))
-        //     {
-        //         idx++;
-        //         CJSON_TRACE("\t\t -", exception);
-        //     }
-        // }
-#endif
-
-        TRACE_D("Persistent: %s", device_grp_node->persistent ? "True" : "False");
-        TRACE_D("Entry_Delay: %s", (EZLOPI_DEVICE_GRP_ENTRYDELAY_NORMAL == device_grp_node->entry_delay) ? "normal"
+        TRACE_D("\t-------------------- DEVICE-GROUP --------------------");
+        TRACE_D("\t|-- Group_id: %08x", device_grp_node->_id);
+        TRACE_D("\t|-- Group_name: %s", device_grp_node->name);
+        CJSON_TRACE("\t|-- Categories", device_grp_node->categories);
+        CJSON_TRACE("\t|-- Devices", device_grp_node->devices);
+        CJSON_TRACE("\t|-- Exceptions", device_grp_node->exceptions);
+        TRACE_D("\t|-- Persistent: %s", device_grp_node->persistent ? "True" : "False");
+        TRACE_D("\t|-- Entry_Delay: %s", (EZLOPI_DEVICE_GRP_ENTRYDELAY_NORMAL == device_grp_node->entry_delay) ? "normal"
             : (EZLOPI_DEVICE_GRP_ENTRYDELAY_LONG_EXTENDED == device_grp_node->entry_delay) ? "long_extended"
             : (EZLOPI_DEVICE_GRP_ENTRYDELAY_EXTENDED == device_grp_node->entry_delay) ? "extended"
             : (EZLOPI_DEVICE_GRP_ENTRYDELAY_INSTANT == device_grp_node->entry_delay) ? "instant"
             : "none");
-        TRACE_D("Follow_Entry: %s", device_grp_node->follow_entry ? "True" : "False");
-        TRACE_D("Role: %s", (EZLOPI_DEVICE_GRP_ROLE_HOUSE_MODES == device_grp_node->role) ? "house_modes" : "user");
-        TRACE_D("Package_Id: %s", device_grp_node->package_id);
-        TRACE_D("----------------- ---------- --------------------");
+        TRACE_D("\t|-- Follow_Entry: %s", device_grp_node->follow_entry ? "True" : "False");
+        TRACE_D("\t|-- Role: %s", (EZLOPI_DEVICE_GRP_ROLE_HOUSE_MODES == device_grp_node->role) ? "house_modes" : "user");
+        TRACE_D("\t|-- Package_Id: %s", device_grp_node->package_id);
+        TRACE_D("\t|-- ----------------- ----------- --------------------");
     }
 #endif
 }
@@ -81,19 +42,19 @@ static void __ezlopi_core_item_group_print(l_ezlopi_item_grp_t* item_grp_node)
 #if (1 == ENABLE_TRACE)
     if (item_grp_node)
     {
-        TRACE_D("----------------- item-GROUP --------------------");
-        TRACE_D("Group_id: %08x", item_grp_node->_id);
-        TRACE_D("Group_name: %s", item_grp_node->name);
-        TRACE_D("Has_Getter: %s", item_grp_node->has_getter ? "True" : "False");
-        TRACE_D("Has_Setter: %s", item_grp_node->has_setter ? "True" : "False");
-        TRACE_D("Persistent: %s", item_grp_node->persistent ? "True" : "False");
-        CJSON_TRACE("Item_Names", item_grp_node->item_names);
-        TRACE_D("Value_Type: %s", item_grp_node->value_type);
-        CJSON_TRACE("Enum", item_grp_node->enum_values);
-        CJSON_TRACE("Value_Type_Family", item_grp_node->value_type_family);
-        TRACE_D("Role: %s", (EZLOPI_ITEM_GRP_ROLE_HOUSE_MODES == item_grp_node->role) ? "house_modes" : (EZLOPI_ITEM_GRP_ROLE_LIFE_SAFETY == item_grp_node->role) ? "lifeSafety" : "empty");
-        CJSON_TRACE(ezlopi_info_str, item_grp_node->info);
-        TRACE_D("----------------- ---------- --------------------");
+        TRACE_D("\t|------------------- ITEM-GROUP --------------------");
+        TRACE_D("\t|-- Group_id: %08x", item_grp_node->_id);
+        TRACE_D("\t|-- Group_name: %s", item_grp_node->name);
+        TRACE_D("\t|-- Has_Getter: %s", item_grp_node->has_getter ? "True" : "False");
+        TRACE_D("\t|-- Has_Setter: %s", item_grp_node->has_setter ? "True" : "False");
+        TRACE_D("\t|-- Persistent: %s", item_grp_node->persistent ? "True" : "False");
+        CJSON_TRACE("\t|-- Item_Names", item_grp_node->item_names);
+        TRACE_D("\t|-- Value_Type: %s", item_grp_node->value_type);
+        CJSON_TRACE("\t|-- Enum", item_grp_node->enum_values);
+        CJSON_TRACE("\t|-- Value_Type_Family", item_grp_node->value_type_family);
+        TRACE_D("\t|-- Role: %s", (EZLOPI_ITEM_GRP_ROLE_HOUSE_MODES == item_grp_node->role) ? "house_modes" : (EZLOPI_ITEM_GRP_ROLE_LIFE_SAFETY == item_grp_node->role) ? "lifeSafety" : "empty");
+        CJSON_TRACE("\t|-- Info", item_grp_node->info);
+        TRACE_D("\t|-- ----------------- ----------- --------------------");
     }
 #endif
 }
@@ -592,7 +553,7 @@ static l_ezlopi_device_grp_t* __device_group_populate(cJSON* cj_device_grp, uint
     }
     else
     {
-        CJSON_TRACE("new-device-group", cj_device_grp);
+        // CJSON_TRACE("new-device-group", cj_device_grp);
         l_device_grp_head = ____device_grp_create_node(cj_device_grp, device_grp_id);
         new_device_grp_node = l_device_grp_head;
     }
@@ -714,29 +675,70 @@ void ezlopi_core_device_group_remove_id_from_list(uint32_t _id)
     char* devgrp_id_list = ezlopi_nvs_read_device_groups();
     if (devgrp_id_list)
     {
+        TRACE_S("list_str: [%s]", devgrp_id_list);
         cJSON* cj_devgrp_id_list = cJSON_Parse(__FUNCTION__, devgrp_id_list);
         if (cj_devgrp_id_list)
         {
+            CJSON_TRACE("dev_grp_list", cj_devgrp_id_list);
             uint32_t list_len = cJSON_GetArraySize(cj_devgrp_id_list);
 
+            TRACE_E("Here {%d}", list_len);
             for (int idx = list_len; idx < list_len; idx++)
             {
                 cJSON* cj_id = cJSON_GetArrayItem(cj_devgrp_id_list, idx);
                 if (cj_id)
                 {
-                    if (cj_id->valuedouble == _id)
+                    TRACE_E("Here");
+                    switch (cj_id->type)
                     {
-                        cJSON_DeleteItemFromArray(__FUNCTION__, cj_devgrp_id_list, idx);
-
-                        char* updated_id_list_str = cJSON_PrintBuffered(__FUNCTION__, cj_devgrp_id_list, 1024, false);
-                        TRACE_D("length of 'updated_id_list_str': %d", strlen(updated_id_list_str));
-
-                        if (updated_id_list_str)
+                    case cJSON_Number:
+                    {
+                        TRACE_S("devGrp_list ---> value is number : [%d]", cj_id->valuedouble);
+                        TRACE_D("[%d.] -->  %d vs %d", idx, cj_id->valuedouble, _id);
+                        if (cj_id->valuedouble == _id)
                         {
-                            ezlopi_nvs_write_device_groups(updated_id_list_str);
-                            ezlopi_free(__FUNCTION__, updated_id_list_str);
+                            cJSON_DeleteItemFromArray(__FUNCTION__, cj_devgrp_id_list, idx);
+
+                            char* updated_id_list_str = cJSON_PrintBuffered(__FUNCTION__, cj_devgrp_id_list, 1024, false);
+                            TRACE_D("length of 'updated_id_list_str': %d", strlen(updated_id_list_str));
+
+                            if (updated_id_list_str)
+                            {
+                                TRACE_S("new_list_devGrp --> %s", updated_id_list_str);
+                                ezlopi_nvs_write_device_groups(updated_id_list_str);
+                                ezlopi_free(__FUNCTION__, updated_id_list_str);
+                            }
                         }
+                        break;
                     }
+                    case cJSON_String:
+                    {
+                        TRACE_S("devGrp_list ---> value is string : [%s]", cj_id->valuestring);
+
+                        uint32_t curr_id = strtoul(cj_id->valuestring, NULL, 16);
+                        TRACE_D("[%d.] -->  %d vs %d", idx, curr_id, _id);
+                        if (curr_id == _id)
+                        {
+                            cJSON_DeleteItemFromArray(__FUNCTION__, cj_devgrp_id_list, idx);
+
+                            char* updated_id_list_str = cJSON_PrintBuffered(__FUNCTION__, cj_devgrp_id_list, 1024, false);
+                            TRACE_D("length of 'updated_id_list_str': %d", strlen(updated_id_list_str));
+
+                            if (updated_id_list_str)
+                            {
+                                TRACE_S("new_list_devGrp --> %s", updated_id_list_str);
+                                ezlopi_nvs_write_device_groups(updated_id_list_str);
+                                ezlopi_free(__FUNCTION__, updated_id_list_str);
+                            }
+                        }
+                        break;
+                    }
+                    default:
+                        break;
+                    }
+
+
+
                 }
             }
 
@@ -802,6 +804,7 @@ uint32_t ezlopi_core_device_group_get_list(cJSON* cj_devgrp_array)
         cJSON* cj_devgrp_id_list = cJSON_Parse(__FUNCTION__, devgrp_id_list);
         if (cj_devgrp_id_list)
         {
+            CJSON_TRACE("In-cjson :", cj_devgrp_id_list);
             int array_size = cJSON_GetArraySize(cj_devgrp_id_list);
             for (int i = 0; i < array_size; i++)
             {
@@ -827,7 +830,7 @@ uint32_t ezlopi_core_device_group_get_list(cJSON* cj_devgrp_array)
                             }
                             else
                             {
-                                ret += 1;   // return total number of scenes
+                                ret += 1;   // return total number of device-grp
                             }
                         }
 
@@ -853,6 +856,7 @@ uint32_t ezlopi_core_item_group_get_list(cJSON* cj_itemgrp_array)
         cJSON* cj_itemgrp_id_list = cJSON_Parse(__FUNCTION__, itemgrp_id_list);
         if (cj_itemgrp_id_list)
         {
+            CJSON_TRACE("In-cjson :", cj_itemgrp_id_list);
             int array_size = cJSON_GetArraySize(cj_itemgrp_id_list);
             for (int i = 0; i < array_size; i++)
             {
@@ -878,7 +882,7 @@ uint32_t ezlopi_core_item_group_get_list(cJSON* cj_itemgrp_array)
                             }
                             else
                             {
-                                ret += 1;   // return total number of scenes
+                                ret += 1;   // return total number of item-grp
                             }
                         }
 
@@ -902,61 +906,64 @@ uint32_t ezlopi_core_device_group_store_nvs_devgrp(cJSON* cj_new_device_grp)
     uint32_t new_dev_grp_id = 0;
     if (cj_new_device_grp)
     {
-        uint32_t new_dev_grp_id = ezlopi_cloud_generate_device_group_id();
-        char tmp_buf[32];
-        snprintf(tmp_buf, sizeof(tmp_buf), "%08x", new_dev_grp_id);
-        cJSON_AddStringToObject(__FUNCTION__, cj_new_device_grp, ezlopi__id_str, tmp_buf); // _id -> group_id
+        new_dev_grp_id = ezlopi_cloud_generate_device_group_id();
+        char devgrp_id_str[32];
+        snprintf(devgrp_id_str, sizeof(devgrp_id_str), "%08x", new_dev_grp_id); // convert (uint32_t) to (0xC002e....)
+        cJSON_AddStringToObject(__FUNCTION__, cj_new_device_grp, ezlopi__id_str, devgrp_id_str); // _id -> group_id
 
         char* new_devgrp_str = cJSON_PrintBuffered(__FUNCTION__, cj_new_device_grp, 1024, false);
         TRACE_D("length of 'new_devgrp_str': %d", strlen(new_devgrp_str));
 
         if (new_devgrp_str)
         {
-            if (ezlopi_nvs_write_str(new_devgrp_str, strlen(new_devgrp_str) + 1, tmp_buf))
+            if (ezlopi_nvs_write_str(new_devgrp_str, strlen(new_devgrp_str) + 1, devgrp_id_str))
             {
-                bool free_exp_id_list_str = 1;
+                bool free_devGrp_id_list_str = 1;
                 char* device_grp_id_list_str = ezlopi_nvs_read_device_groups();
                 if (NULL == device_grp_id_list_str)
                 {
                     device_grp_id_list_str = "[]";
-                    free_exp_id_list_str = 0;
+                    free_devGrp_id_list_str = 0;
+                    TRACE_W("DeviceGroup ids-list not found in NVS");
                 }
 
                 cJSON* cj_device_grp_id_list = cJSON_Parse(__FUNCTION__, device_grp_id_list_str);
                 if (cj_device_grp_id_list)
                 {
-                    cJSON* cj_new_dev_grp_id = cJSON_CreateNumber(__FUNCTION__, new_dev_grp_id);
-                    if (!cJSON_AddItemToArray(cj_device_grp_id_list, cj_new_dev_grp_id))
-                    {   // if 'new_dev_grp_id' doesnot exist, then erase the falsly store 'new_devgrp_str' in nvs.
-                        cJSON_Delete(__FUNCTION__, cj_new_dev_grp_id);
-                        ezlopi_nvs_delete_stored_data_by_id(new_dev_grp_id);
-                        new_dev_grp_id = 0;
-                    }
-                    else
+                    cJSON* cj_devgrp_id_str = cJSON_CreateNumber(__FUNCTION__, new_dev_grp_id);
+                    if (cj_devgrp_id_str)
                     {
-                        char* updated_devgrp_id_list_str = cJSON_PrintBuffered(__FUNCTION__, cj_device_grp_id_list, 1024, false);
-                        TRACE_D("length of 'updated_devgrp_id_list_str': %d", strlen(updated_devgrp_id_list_str));
-
-                        if (updated_devgrp_id_list_str)
+                        if (!cJSON_AddItemToArray(cj_device_grp_id_list, cj_devgrp_id_str))
+                        {   // if 'new_dev_grp_id' doesnot exist, then erase the falsly store 'new_devgrp_str' in nvs.
+                            cJSON_Delete(__FUNCTION__, cj_devgrp_id_str);
+                            ezlopi_nvs_delete_stored_data_by_id(new_dev_grp_id);
+                            new_dev_grp_id = 0;
+                        }
+                        else
                         {
-                            TRACE_D("updated_devgrp_id_list_str: %s", updated_devgrp_id_list_str);
-                            if (ezlopi_nvs_write_device_groups(updated_devgrp_id_list_str))
-                            {
-                                TRACE_D("Scenes list updated.");
-                            }
-                            else
-                            {
-                                TRACE_E("Scenes list update failed!");
-                            }
+                            char* updated_devgrp_id_list_str = cJSON_PrintBuffered(__FUNCTION__, cj_device_grp_id_list, 1024, false);
+                            TRACE_D("length of 'updated_devgrp_id_list_str': %d", strlen(updated_devgrp_id_list_str));
 
-                            ezlopi_free(__FUNCTION__, updated_devgrp_id_list_str);
+                            if (updated_devgrp_id_list_str)
+                            {
+                                TRACE_D("updated_devgrp_id_list_str: %s", updated_devgrp_id_list_str);
+                                if (ezlopi_nvs_write_device_groups(updated_devgrp_id_list_str))
+                                {
+                                    TRACE_S("Device-grp list updated.");
+                                }
+                                else
+                                {
+                                    TRACE_E("Device-grp list update failed!");
+                                }
+
+                                ezlopi_free(__FUNCTION__, updated_devgrp_id_list_str);
+                            }
                         }
                     }
 
                     cJSON_Delete(__FUNCTION__, cj_device_grp_id_list);
                 }
-
-                if (free_exp_id_list_str)
+                if (free_devGrp_id_list_str)
                 {
                     ezlopi_free(__FUNCTION__, device_grp_id_list_str);
                 }
@@ -981,61 +988,64 @@ uint32_t ezlopi_core_item_group_store_nvs_itemgrp(cJSON* cj_new_item_grp)
     uint32_t new_item_grp_id = 0;
     if (cj_new_item_grp)
     {
-        uint32_t new_item_grp_id = ezlopi_cloud_generate_item_group_id();
-        char tmp_buf[32];
-        snprintf(tmp_buf, sizeof(tmp_buf), "%08x", new_item_grp_id);
-        cJSON_AddStringToObject(__FUNCTION__, cj_new_item_grp, ezlopi__id_str, tmp_buf); // _id -> group_id
+        new_item_grp_id = ezlopi_cloud_generate_item_group_id();
+        char itemGrp_id_str[32];
+        snprintf(itemGrp_id_str, sizeof(itemGrp_id_str), "%08x", new_item_grp_id);
+        cJSON_AddStringToObject(__FUNCTION__, cj_new_item_grp, ezlopi__id_str, itemGrp_id_str); // _id -> group_id
 
         char* new_itemgrp_str = cJSON_PrintBuffered(__FUNCTION__, cj_new_item_grp, 1024, false);
         TRACE_D("length of 'new_itemgrp_str': %d", strlen(new_itemgrp_str));
 
         if (new_itemgrp_str)
         {
-            if (ezlopi_nvs_write_str(new_itemgrp_str, strlen(new_itemgrp_str) + 1, tmp_buf))
+            if (ezlopi_nvs_write_str(new_itemgrp_str, strlen(new_itemgrp_str) + 1, itemGrp_id_str))
             {
-                bool free_exp_id_list_str = 1;
+                bool free_itemGrp_id_list_str = 1;
                 char* item_grp_id_list_str = ezlopi_nvs_read_item_groups();
                 if (NULL == item_grp_id_list_str)
                 {
                     item_grp_id_list_str = "[]";
-                    free_exp_id_list_str = 0;
+                    free_itemGrp_id_list_str = 0;
+                    TRACE_W("ItemGroup ids-list not found in NVS");
                 }
 
                 cJSON* cj_item_grp_id_list = cJSON_Parse(__FUNCTION__, item_grp_id_list_str);
                 if (cj_item_grp_id_list)
                 {
-                    cJSON* cj_new_item_grp_id = cJSON_CreateNumber(__FUNCTION__, new_item_grp_id);
-                    if (!cJSON_AddItemToArray(cj_item_grp_id_list, cj_new_item_grp_id))
-                    {   // if 'new_item_grp_id' doesnot exist, then erase the falsly store 'new_itemgrp_str' in nvs.
-                        cJSON_Delete(__FUNCTION__, cj_new_item_grp_id);
-                        ezlopi_nvs_delete_stored_data_by_id(new_item_grp_id);
-                        new_item_grp_id = 0;
-                    }
-                    else
+                    cJSON* cj_itemGrp_id_str = cJSON_CreateNumber(__FUNCTION__, new_item_grp_id);
+                    if (cj_itemGrp_id_str)
                     {
-                        char* updated_itemgrp_id_list_str = cJSON_PrintBuffered(__FUNCTION__, cj_item_grp_id_list, 1024, false);
-                        TRACE_D("length of 'updated_itemgrp_id_list_str': %d", strlen(updated_itemgrp_id_list_str));
-
-                        if (updated_itemgrp_id_list_str)
+                        if (!cJSON_AddItemToArray(cj_item_grp_id_list, cj_itemGrp_id_str))
+                        {   // if 'new_item_grp_id' doesnot exist, then erase the falsly store 'new_itemgrp_str' in nvs.
+                            cJSON_Delete(__FUNCTION__, cj_itemGrp_id_str);
+                            ezlopi_nvs_delete_stored_data_by_id(new_item_grp_id);
+                            new_item_grp_id = 0;
+                        }
+                        else
                         {
-                            TRACE_D("updated_itemgrp_id_list_str: %s", updated_itemgrp_id_list_str);
-                            if (ezlopi_nvs_write_item_groups(updated_itemgrp_id_list_str))
-                            {
-                                TRACE_D("Scenes list updated.");
-                            }
-                            else
-                            {
-                                TRACE_E("Scenes list update failed!");
-                            }
+                            char* updated_itemgrp_id_list_str = cJSON_PrintBuffered(__FUNCTION__, cj_item_grp_id_list, 1024, false);
+                            TRACE_D("length of 'updated_itemgrp_id_list_str': %d", strlen(updated_itemgrp_id_list_str));
 
-                            ezlopi_free(__FUNCTION__, updated_itemgrp_id_list_str);
+                            if (updated_itemgrp_id_list_str)
+                            {
+                                TRACE_D("updated_itemgrp_id_list_str: %s", updated_itemgrp_id_list_str);
+                                if (ezlopi_nvs_write_item_groups(updated_itemgrp_id_list_str))
+                                {
+                                    TRACE_S("Item-grp list updated.");
+                                }
+                                else
+                                {
+                                    TRACE_E("Item-grp list update failed!");
+                                }
+
+                                ezlopi_free(__FUNCTION__, updated_itemgrp_id_list_str);
+                            }
                         }
                     }
-
                     cJSON_Delete(__FUNCTION__, cj_item_grp_id_list);
                 }
 
-                if (free_exp_id_list_str)
+                if (free_itemGrp_id_list_str)
                 {
                     ezlopi_free(__FUNCTION__, item_grp_id_list_str);
                 }
@@ -1199,6 +1209,7 @@ void ezlopi_device_group_init(void)
     char* devgrp_id_list_str = ezlopi_nvs_read_device_groups();
     if (devgrp_id_list_str)
     {
+        TRACE_D("devGrp_id_list_str : %s", devgrp_id_list_str);
         cJSON* cj_devgrp_ids = cJSON_Parse(__FUNCTION__, devgrp_id_list_str);
         if (cj_devgrp_ids)
         {
@@ -1226,30 +1237,26 @@ void ezlopi_device_group_init(void)
                             if (new_devgrp_node)
                             {
                                 cJSON* cj_new_devgrp_node = ezlopi_core_device_group_create_cjson(new_devgrp_node);
-                                // CJSON_TRACE("new_devgrp_node", cj_new_scene);
+                                // CJSON_TRACE("new_devgrp_node", cj_new_devgrp_node);
                                 cJSON_Delete(__FUNCTION__, cj_new_devgrp_node);
                             }
                         }
-
                         ezlopi_free(__FUNCTION__, devgrp_str);
                     }
                 }
-
             }
-
             cJSON_Delete(__FUNCTION__, cj_devgrp_ids);
         }
 
         ezlopi_free(__FUNCTION__, devgrp_id_list_str);
     }
-
-    __ezlopi_core_device_group_print(l_device_grp_head);
 }
 void ezlopi_item_group_init(void)
 {
     char* itemgrp_id_list_str = ezlopi_nvs_read_item_groups();
     if (itemgrp_id_list_str)
     {
+        TRACE_D("itemGrp_id_list_str : %s", itemgrp_id_list_str);
         cJSON* cj_itemgrp_ids = cJSON_Parse(__FUNCTION__, itemgrp_id_list_str);
         if (cj_itemgrp_ids)
         {
@@ -1277,7 +1284,7 @@ void ezlopi_item_group_init(void)
                             if (new_itemgrp_node)
                             {
                                 cJSON* cj_new_itemgrp_node = ezlopi_core_item_group_create_cjson(new_itemgrp_node);
-                                // CJSON_TRACE("new_itemgrp_node", cj_new_scene);
+                                // CJSON_TRACE("new_itemgrp_node", cj_new_itemgrp_node);
                                 cJSON_Delete(__FUNCTION__, cj_new_itemgrp_node);
                             }
                         }
@@ -1293,6 +1300,4 @@ void ezlopi_item_group_init(void)
 
         ezlopi_free(__FUNCTION__, itemgrp_id_list_str);
     }
-
-    __ezlopi_core_item_group_print(l_item_grp_head);
 }
