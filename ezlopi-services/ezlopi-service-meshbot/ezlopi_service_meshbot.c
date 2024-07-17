@@ -93,13 +93,14 @@ uint32_t ezlopi_meshbot_service_start_scene(l_scenes_list_v2_t* scene_node)
             (EZLOPI_SCENE_STATUS_STOPPED == scene_node->status))
         {
             // xTaskCreate(__scenes_process, scene_node->name, 2 * 2048, scene_node, 2, NULL);
+            __execute_scene_start(scene_node);
             ret = 1;
         }
     }
     return ret;
 }
 
-uint32_t ezlopi_scenes_service_run_by_id(uint32_t _id)
+uint32_t ezlopi_scenes_service_run_by_id(uint32_t _id) // Run once 
 {
     uint32_t ret = 0;
     TRACE_D("Scene-id: %d", _id);

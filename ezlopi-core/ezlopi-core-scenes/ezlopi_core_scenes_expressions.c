@@ -1,5 +1,6 @@
 #include "../../build/config/sdkconfig.h"
 
+
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 #include "cjext.h"
@@ -413,13 +414,13 @@ void ezlopi_scenes_expressions_init(void)
                         if (exp_str)
                         {
                             cJSON* cj_exp = cJSON_Parse(__FUNCTION__, exp_str);
+                            ezlopi_free(__FUNCTION__, exp_str);
+
                             if (cj_exp)
                             {
                                 ezlopi_scenes_expressions_add_to_head(exp_id, cj_exp);
                                 cJSON_Delete(__FUNCTION__, cj_exp);
                             }
-
-                            ezlopi_free(__FUNCTION__, exp_str);
                         }
                     }
                 }
@@ -656,7 +657,7 @@ static s_ezlopi_expressions_t* __expressions_create_node(uint32_t exp_id, cJSON*
         new_exp_node->value_type = ezlopi_core_scenes_value_get_type(cj_expression, ezlopi_valueType_str);
         __get_expressions_value(new_exp_node, cJSON_GetObjectItem(__FUNCTION__, cj_expression, ezlopi_value_str), new_exp_node->value_type);
 
-        new_exp_node->exp_id = __expression_store_to_nvs(exp_id, cj_expression);
+        new_exp_node->exp_id = __expression_store_to_nvs(exp_id, cj_expression); // 
         ezlopi_scenes_expressions_print(new_exp_node);
     }
 
