@@ -105,7 +105,7 @@ static int dht22_sensor_notify(l_ezlopi_item_t* item)
             if (ezlopi_item_name_temp == item->cloud_properties.item_name)
             {
                 float temperature = getTemperature_dht22();
-                TRACE_E("Temperature: %.2f", temperature);
+                // TRACE_E("Temperature: %.2f", temperature);
                 if (fabs(dht22_data->temperature - temperature) > 0.5)
                 {
                     dht22_data->temperature = temperature;
@@ -115,7 +115,7 @@ static int dht22_sensor_notify(l_ezlopi_item_t* item)
             else if (ezlopi_item_name_humidity == item->cloud_properties.item_name)
             {
                 float humidity = getHumidity_dht22();
-                TRACE_E("Humidity: %.2f", humidity);
+                // TRACE_E("Humidity: %.2f", humidity);
                 if (fabs(dht22_data->humidity - humidity) > 0.5)
                 {
                     dht22_data->humidity = humidity;
