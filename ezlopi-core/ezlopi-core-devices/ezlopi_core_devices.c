@@ -47,7 +47,7 @@ static void __factory_info_device_update(cJSON * cj_device_config)
         {
             TRACE_E("ERROR : Failed parsing JSON for config.");
         }
-        
+
         ezlopi_free(__FUNCTION__, updated_device_config);
     }
 }
@@ -478,6 +478,11 @@ void ezlopi_device_prepare(void)
         TRACE_D("device-config: \r\n%s", config_string);
 
         cJSON* cj_config = cJSON_ParseWithRef(__FUNCTION__, config_string);
+
+#if (EZLOPI_DEVICE_TYPE_TEST_DEVICE != EZLOPI_DEVICE_TYPE)
+        ezlopi_free(__FUNCTION__, config_string);
+#endif
+
         if (cj_config)
         {
             if (ezlopi_device_parse_json_v3(cj_config) < 0)
@@ -512,13 +517,6 @@ void ezlopi_device_prepare(void)
     {
         TRACE_E("device-config: null");
     }
-
-#if (EZLOPI_DEVICE_TYPE_TEST_DEVICE != EZLOPI_DEVICE_TYPE)
-    if (config_string)
-    {
-        ezlopi_free(__FUNCTION__, config_string);
-    }
-#endif
 }
 
 ///////// Print functions start here ////////////
