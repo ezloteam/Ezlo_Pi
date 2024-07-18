@@ -13,6 +13,7 @@ CLOUD_METHOD("hub.device.group.delete", device_group_delete, device_group_delete
 CLOUD_METHOD("hub.device.group.update", device_group_update, device_group_updated)
 CLOUD_METHOD("hub.device.group.get", device_group_get, NULL)
 CLOUD_METHOD("hub.device.groups.list", device_groups_list, NULL)
+CLOUD_METHOD("hub.device.group.find", device_group_find, NULL)
 
 
 CLOUD_METHOD("hub.item.group.create", item_group_create, item_group_created)

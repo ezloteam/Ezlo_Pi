@@ -201,6 +201,10 @@ void device_group_get(cJSON* cj_request, cJSON* cj_response)
                     cJSON_AddRawToObject(__FUNCTION__, cj_response, ezlopi_result_str, devgrp_str);
                     ezlopi_free(__FUNCTION__, devgrp_str);
                 }
+                else
+                {
+                    cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+                }
             }
         }
 
@@ -291,6 +295,22 @@ void device_group_update(cJSON* cj_request, cJSON* cj_response)
                     // edit in nvs and populate again
                     ezlopi_core_device_group_edit_by_id(req_devgrp_id, cj_params);
                 }
+            }
+        }
+    }
+}
+
+void device_group_find(cJSON* cj_request, cJSON* cj_response)
+{
+    if (cj_request && cj_response)
+    {
+        cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+        if (cj_result)
+        {
+            cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
+            if (cj_params)
+            {
+                ezlopi_core_device_group_find(cJSON_AddArrayToObject(__FUNCTION__, cj_result, "deviceGroups"), cj_params);
             }
         }
     }
@@ -399,14 +419,18 @@ void item_group_get(cJSON* cj_request, cJSON* cj_response)
         cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
         if (cj_params)
         {
-            cJSON* cj_devgrp_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_id_str);
-            if (cj_devgrp_id && cj_devgrp_id->valuestring)
+            cJSON* cj_itemgrp_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_id_str);
+            if (cj_itemgrp_id && cj_itemgrp_id->valuestring)
             {
-                char* devgrp_str = ezlopi_nvs_read_str(cj_devgrp_id->valuestring);
+                char* devgrp_str = ezlopi_nvs_read_str(cj_itemgrp_id->valuestring);
                 if (devgrp_str)
                 {
                     cJSON_AddRawToObject(__FUNCTION__, cj_response, ezlopi_result_str, devgrp_str);
                     ezlopi_free(__FUNCTION__, devgrp_str);
+                }
+                else
+                {
+                    cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
                 }
             }
         }
@@ -488,11 +512,11 @@ void item_group_update(cJSON* cj_request, cJSON* cj_response)
             cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
             if (cj_params)
             {
-                cJSON* cj_devgrp_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_id_str);
-                if (cj_devgrp_id && cj_devgrp_id->valuestring)
+                cJSON* cj_itemgrp_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_id_str);
+                if (cj_itemgrp_id && cj_itemgrp_id->valuestring)
                 {
-                    // CJSON_TRACE("dev-grp [new] : ", cj_devgrp_id);
-                    uint32_t req_devgrp_id = strtoul(cj_devgrp_id->valuestring, NULL, 16);
+                    // CJSON_TRACE("dev-grp [new] : ", cj_itemgrp_id);
+                    uint32_t req_devgrp_id = strtoul(cj_itemgrp_id->valuestring, NULL, 16);
 
                     // edit in nvs and populate again
                     ezlopi_core_item_group_edit_by_id(req_devgrp_id, cj_params);
@@ -555,10 +579,10 @@ void item_group_updated(cJSON * cj_request, cJSON * cj_response)
     cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
     if (cj_params)
     {
-        cJSON* cj_devgrp_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_id_str);
-        if (cj_devgrp_id && cj_devgrp_id->valuestring)
+        cJSON* cj_itemgrp_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_id_str);
+        if (cj_itemgrp_id && cj_itemgrp_id->valuestring)
         {
-            char* devgrp_str = ezlopi_nvs_read_str(cj_devgrp_id->valuestring);
+            char* devgrp_str = ezlopi_nvs_read_str(cj_itemgrp_id->valuestring);
             if (devgrp_str)
             {
                 cJSON_AddRawToObject(__FUNCTION__, cj_response, ezlopi_result_str, devgrp_str);

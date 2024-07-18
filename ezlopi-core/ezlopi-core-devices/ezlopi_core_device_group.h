@@ -97,7 +97,7 @@ uint32_t ezlopi_core_item_group_store_nvs_itemgrp(cJSON* cj_new_item_grp);
  * @brief This function returns all the 'device_groups' stored in nvs
  *
  * @param cj_devgrp_array This will contain all the 'dev_grps' in cjson format
- * @return uint32_t
+ * @return uint32_t -> Total devGrps in nvs
  */
 uint32_t ezlopi_core_device_group_get_list(cJSON* cj_devgrp_array);
 uint32_t ezlopi_core_item_group_get_list(cJSON* cj_itemgrp_array);
@@ -147,6 +147,14 @@ void ezlopi_core_item_group_remove_id_from_list(uint32_t _id);
 cJSON* ezlopi_core_device_group_create_cjson(l_ezlopi_device_grp_t* devgrp_node);
 cJSON* ezlopi_core_item_group_create_cjson(l_ezlopi_item_grp_t* itemgrp_node);
 
+/**
+ * @brief This function returns list of valid dev_groups
+ * 
+ * @param cj_devgrp_array constains the array of valid dev_groups
+ * @param params cjson with Conditions to be checked
+ * @return uint32_t  Total count of valid device_groups returned
+ */
+uint32_t ezlopi_core_device_group_find(cJSON* cj_devgrp_array , cJSON* params);
 // ------------ Item-group --------------------
 
 
