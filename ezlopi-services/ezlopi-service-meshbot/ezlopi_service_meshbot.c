@@ -96,7 +96,6 @@ uint32_t ezlopi_meshbot_service_start_scene(l_scenes_list_v2_t* scene_node)
         {
             __execute_scene_start(scene_node);
             // xTaskCreate(__scenes_process, scene_node->name, 2 * 2048, scene_node, 2, NULL);
-
             TRACE_D("start scene_id : %#x [%d] ", scene_node->_id, scene_node->status);
             ret = 1;
         }
@@ -104,7 +103,7 @@ uint32_t ezlopi_meshbot_service_start_scene(l_scenes_list_v2_t* scene_node)
     return ret;
 }
 
-uint32_t ezlopi_scenes_service_run_by_id(uint32_t _id)
+uint32_t ezlopi_scenes_service_run_by_id(uint32_t _id) // Run once 
 {
     uint32_t ret = 0;
     TRACE_D("Scene-id: %d", _id);

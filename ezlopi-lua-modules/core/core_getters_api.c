@@ -222,7 +222,18 @@ static int __create_lua_table_for_device(lua_State *lua_state, l_ezlopi_device_t
     lua_create_table_string_key_value(ezlopi_subcategory_str, device_prop->cloud_properties.subcategory);
     lua_create_table_string_key_value(ezlopi_type_str, device_prop->cloud_properties.device_type);
     lua_create_table_string_key_value(ezlopi_device_type_id_str, controller_info->device_type_id);
-    lua_create_table_string_key_value(ezlopi_room_id_str, controller_info->room_id);
+
+    if (device_prop->cloud_properties.room_id)
+    {
+        snprintf(tmp_str, sizeof(tmp_str), "%08x", device_prop->cloud_properties.room_id);
+        lua_create_table_string_key_value(ezlopi_room_id_str, &tmp_str[0]);
+    }
+    else
+    {
+        lua_create_table_string_key_value(ezlopi_room_id_str, "");
+    }
+    // lua_create_table_string_key_value(ezlopi_room_id_str, controller_info->room_id);
+
     lua_create_table_string_key_value(ezlopi_parent_device_id_str, controller_info->parent_device_id);
 
     lua_pushstring(lua_state, ezlopi_info_str);

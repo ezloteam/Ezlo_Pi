@@ -1,5 +1,6 @@
 #include "../../build/config/sdkconfig.h"
 
+
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 #include "cjext.h"
@@ -564,13 +565,13 @@ void ezlopi_scenes_expressions_init(void)
                         if (exp_str)
                         {
                             cJSON* cj_exp = cJSON_Parse(__FUNCTION__, exp_str);
+                            ezlopi_free(__FUNCTION__, exp_str);
+
                             if (cj_exp)
                             {
                                 ezlopi_scenes_expressions_add_to_head(exp_id, cj_exp);
                                 cJSON_Delete(__FUNCTION__, cj_exp);
                             }
-
-                            ezlopi_free(__FUNCTION__, exp_str);
                         }
                     }
                 }
