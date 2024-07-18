@@ -379,28 +379,18 @@ PT_THREAD(__scene_proto_thread(l_scenes_list_v2_t* scene_node, uint32_t routine_
         }
         else if (EZLOPI_SCENE_STATUS_STOP == scene_node->status)
         {
+            scene_node->status = EZLOPI_SCENE_STATUS_STOPPED;
+            ezlopi_scenes_status_change_broadcast(scene_node, scene_status_stopped_str);
+
+            TRACE_E("here");
+            ezlopi_free(__FUNCTION__, scene_node->thread_ctx);
+            scene_node->thread_ctx = NULL;
             if (ctx)
             {
                 TRACE_S("stopped_cond => %d", ctx->stopped_cond);
             }
-            if (scene_node)
-            {
-                TRACE_E("here");
-                scene_node->status = EZLOPI_SCENE_STATUS_STOPPED;
-                ezlopi_scenes_status_change_broadcast(scene_node, scene_status_stopped_str);
-                if (scene_node->thread_ctx)
-                {
-                    TRACE_E("here");
-                    if (ctx)
-                    {
-                        TRACE_S("stopped_cond => %d", ctx->stopped_cond);
-                    }
-                    ezlopi_free(__FUNCTION__, scene_node->thread_ctx);
-                    scene_node->thread_ctx = NULL;
-                    TRACE_E("here");
-                }
-                break;
-            }
+            TRACE_E("here");
+            break;
         }
 
 
