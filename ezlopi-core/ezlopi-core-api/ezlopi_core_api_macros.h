@@ -7,7 +7,7 @@ CLOUD_METHOD("hub.item.value.set", items_set_value_v3, NULL)
 CLOUD_METHOD("hub.devices.list", devices_list_v3, NULL)
 CLOUD_METHOD("hub.device.name.set", device_name_set, device_updated)
 CLOUD_METHOD("hub.device.armed.set", device_armed_set, device_updated)
-CLOUD_METHOD("method_hub_device_room_set", device_room_set, device_updated)
+CLOUD_METHOD("hub.device.room.set", device_room_set, device_updated)
 
 #ifdef CONFIG_EZPI_UTIL_TRACE_EN
 CLOUD_METHOD("hub.log.set", ezlopi_hub_cloud_log_set, NULL)

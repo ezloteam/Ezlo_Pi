@@ -30,7 +30,7 @@ static void ezlopi_device_free_all_device_setting(l_ezlopi_device_t* curr_device
 static void __factory_info_device_update(cJSON * cj_device_config)
 {
     char* updated_device_config = cJSON_PrintBuffered(__FUNCTION__, cj_device_config, 4 * 1024, false);
-    TRACE_D("length of 'updated_device_config': %d", strlen(updated_device_config));
+    TRACE_D("length of 'updated_device_config': %d", updated_device_config);
 
     cJSON_Delete(__FUNCTION__, cj_device_config);
 
@@ -66,19 +66,25 @@ static void __factory_info_update_property_by_cjson(l_ezlopi_device_t * device_n
 
             if (cj_device_config)
             {
+                TRACE_W("HERE");
                 cJSON* cj_devices = cJSON_GetObjectItem(__FUNCTION__, cj_device_config, ezlopi_dev_detail_str);
                 if (cj_devices)
                 {
+                    TRACE_W("HERE");
                     uint32_t idx = 0;
                     cJSON* cj_device = NULL;
                     while (NULL != (cj_device = cJSON_GetArrayItem(cj_devices, idx)))
                     {
+                        TRACE_W("HERE");
                         cJSON* cj_device_id = cJSON_GetObjectItem(__FUNCTION__, cj_device, ezlopi_device_id_str);
                         if (cj_device_id && cj_device_id->valuestring)
                         {
+                            TRACE_W("HERE");
                             uint32_t device_id = strtoul(cj_device_id->valuestring, NULL, 16);
                             if (device_id == device_node->cloud_properties.device_id)
                             {
+                                TRACE_W("HERE");
+                                TRACE_D("Deleting key: %.*s", new_prop->str_key_len, new_prop->string);
                                 cJSON_DeleteItemFromObject(__FUNCTION__, cj_device, new_prop->string);
                                 cJSON_AddItemToObject(__FUNCTION__, cj_device, new_prop->string, new_prop);
                                 break;
@@ -189,6 +195,7 @@ void ezlopi_device_set_device_room_id(uint32_t device_id, cJSON *cj_room_id)
         if (device_to_change)
         {
             device_to_change->cloud_properties.room_id = strtoul(cj_room_id->valuestring, NULL, 16);
+            TRACE_D("ROOM-ID: %08X", device_to_change->cloud_properties.room_id);
             __factory_info_update_property_by_cjson(device_to_change, cj_room_id);
         }
     }
@@ -283,6 +290,12 @@ l_ezlopi_device_t* ezlopi_device_add_device(cJSON* cj_device, const char* last_n
             }
 
             curr_device->next = new_device;
+        }
+
+        cJSON * cj_roomId = cJSON_GetObjectItem(__FUNCTION__, cj_device, ezlopi_roomId_str);
+        if (cj_roomId && cj_roomId->valuestring)
+        {
+            new_device->cloud_properties.room_id = strtoul(cj_roomId->valuestring, NULL, 16);
         }
     }
 
@@ -485,7 +498,8 @@ void ezlopi_device_prepare(void)
 
         if (cj_config)
         {
-            if (ezlopi_device_parse_json_v3(cj_config) < 0)
+            int ret = ezlopi_device_parse_json_v3(cj_config);
+            if (ret < 0)
             {
                 TRACE_E("parsing devices-config failed!!!!");
 
@@ -506,6 +520,11 @@ void ezlopi_device_prepare(void)
                     EZPI_CORE_reset_reboot();
                 }
             }
+            else if (ret > 1)
+            {
+                ezlopi_factory_info_v3_set_ezlopi_config(cj_config);
+            }
+
             cJSON_Delete(__FUNCTION__, cj_config);
         }
     }
@@ -708,19 +727,25 @@ static int ezlopi_device_parse_json_v3(cJSON* cjson_config)
                             TRACE_I("Device-%d:", config_dev_idx);
 
                             int id_item = 0;
+                            cJSON * cj_device_id = cJSON_GetObjectItem(__FUNCTION__, cjson_device, ezlopi_device_id_str);
+                            if (NULL == cj_device_id || NULL == cj_device_id->valuestring)
+                            {
+                                ret = 2;
+                            }
+
                             CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_id_item_str, id_item);
 
                             if (0 != id_item)
                             {
-                                s_ezlopi_device_v3_t* v3_sensor_list = ezlopi_devices_list_get_list_v3();
+                                s_ezlopi_device_v3_t* v3_device_list = ezlopi_devices_list_get_list_v3();
                                 int dev_idx = 0;
 
-                                while (NULL != v3_sensor_list[dev_idx].func)
+                                while (NULL != v3_device_list[dev_idx].func)
                                 {
-                                    if (id_item == v3_sensor_list[dev_idx].id)
+                                    if (id_item == v3_device_list[dev_idx].id)
                                     {
-                                        s_ezlopi_prep_arg_t device_prep_arg = { .device = &v3_sensor_list[dev_idx], .cjson_device = cjson_device };
-                                        v3_sensor_list[dev_idx].func(EZLOPI_ACTION_PREPARE, NULL, (void*)&device_prep_arg, NULL);
+                                        s_ezlopi_prep_arg_t device_prep_arg = { .device = &v3_device_list[dev_idx], .cjson_device = cjson_device };
+                                        v3_device_list[dev_idx].func(EZLOPI_ACTION_PREPARE, NULL, (void*)&device_prep_arg, NULL);
                                     }
                                     dev_idx++;
                                 }

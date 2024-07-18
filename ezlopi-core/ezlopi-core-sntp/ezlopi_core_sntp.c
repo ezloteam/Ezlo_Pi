@@ -57,11 +57,11 @@ void EZPI_CORE_sntp_init(void)
     sntp_set_sync_interval(15 * 1000);
     esp_sntp_init();
 
-    while ((sntp_get_sync_status() == SNTP_SYNC_STATUS_RESET) && (++retry < retry_count))
-    {
-        TRACE_I("Waiting for system time to be set... (%d/%d)", retry, retry_count);
-        vTaskDelay(500 / portTICK_PERIOD_MS);
-    }
+    // while ((sntp_get_sync_status() == SNTP_SYNC_STATUS_RESET) && (++retry < retry_count))
+    // {
+    //     TRACE_I("Waiting for system time to be set... (%d/%d)", retry, retry_count);
+    //     vTaskDelay(500 / portTICK_PERIOD_MS);
+    // }
 }
 
 int EZPI_CORE_sntp_set_location(const char* location)
