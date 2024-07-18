@@ -131,30 +131,33 @@ uint32_t ezlopi_store_new_scene_v2(cJSON* cj_new_scene)
                 if (cj_scenes_list)
                 {
                     cJSON* cj_new_scene_id = cJSON_CreateNumber(__FUNCTION__, new_scene_id);
-                    if (!cJSON_AddItemToArray(cj_scenes_list, cj_new_scene_id))
+                    if (cj_new_scene_id)
                     {
-                        cJSON_Delete(__FUNCTION__, cj_new_scene_id);
-                        ezlopi_nvs_delete_stored_data_by_id(new_scene_id);
-                        new_scene_id = 0;
-                    }
-                    else
-                    {
-                        char* updated_scenes_list = cJSON_PrintBuffered(__FUNCTION__, cj_scenes_list, 1024, false);
-                        TRACE_D("length of 'updated_scenes_list': %d", strlen(updated_scenes_list));
-
-                        if (updated_scenes_list)
+                        if (!cJSON_AddItemToArray(cj_scenes_list, cj_new_scene_id))
                         {
-                            TRACE_D("updated_scenes_list: %s", updated_scenes_list);
-                            if (ezlopi_nvs_scene_set_v2(updated_scenes_list))
-                            {
-                                TRACE_D("Scenes list updated.");
-                            }
-                            else
-                            {
-                                TRACE_E("Scenes list update failed!");
-                            }
+                            cJSON_Delete(__FUNCTION__, cj_new_scene_id);
+                            ezlopi_nvs_delete_stored_data_by_id(new_scene_id);
+                            new_scene_id = 0;
+                        }
+                        else
+                        {
+                            char* updated_scenes_list = cJSON_PrintBuffered(__FUNCTION__, cj_scenes_list, 1024, false);
+                            TRACE_D("length of 'updated_scenes_list': %d", strlen(updated_scenes_list));
 
-                            ezlopi_free(__FUNCTION__, updated_scenes_list);
+                            if (updated_scenes_list)
+                            {
+                                TRACE_D("updated_scenes_list: %s", updated_scenes_list);
+                                if (ezlopi_nvs_scene_set_v2(updated_scenes_list))
+                                {
+                                    TRACE_D("Scenes list updated.");
+                                }
+                                else
+                                {
+                                    TRACE_E("Scenes list update failed!");
+                                }
+
+                                ezlopi_free(__FUNCTION__, updated_scenes_list);
+                            }
                         }
                     }
 
@@ -354,7 +357,7 @@ void ezlopi_scenes_remove_id_from_list_v2(uint32_t _id)
         {
             uint32_t list_len = cJSON_GetArraySize(cj_scene_id_list);
 
-            for (int idx = list_len; idx < list_len; idx++)
+            for (int idx = 0; idx < list_len; idx++)
             {
                 cJSON* cj_id = cJSON_GetArrayItem(cj_scene_id_list, idx);
                 if (cj_id)
@@ -1391,7 +1394,7 @@ int ezlopi_core_scene_set_reset_latch_enable(const char* sceneId_str, const char
 //--------------------------------------------------------------------------------------------------
 //                  Functions for : scene block-reset-when-condition --> ret_state only
 //--------------------------------------------------------------------------------------------------
-int ezlopi_core_scene_reset_latch_status(const char* sceneId_str, const char* blockId_str)
+int ezlopi_core_scene_reset_latch_state(const char* sceneId_str, const char* blockId_str)
 {
     int ret = 0;
 
@@ -1470,7 +1473,7 @@ int ezlopi_core_scene_reset_block_status(const char* sceneId_str, const char* bl
     }
 
     /* 2. reset latch with ->> sceneId & blockId*/
-    ret = ezlopi_core_scene_reset_latch_status(sceneId_str, blockId_str);
+    ret = ezlopi_core_scene_reset_latch_state(sceneId_str, blockId_str);
 
 
     return ret;

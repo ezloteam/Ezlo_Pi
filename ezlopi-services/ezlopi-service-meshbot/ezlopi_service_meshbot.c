@@ -97,7 +97,7 @@ uint32_t ezlopi_meshbot_service_start_scene(l_scenes_list_v2_t* scene_node)
             __execute_scene_start(scene_node);
             // xTaskCreate(__scenes_process, scene_node->name, 2 * 2048, scene_node, 2, NULL);
 
-            TRACE_D("stop scene_id : %#x [%d] ", scene_node->_id, scene_node->status);
+            TRACE_D("start scene_id : %#x [%d] ", scene_node->_id, scene_node->status);
             ret = 1;
         }
     }
@@ -379,12 +379,28 @@ PT_THREAD(__scene_proto_thread(l_scenes_list_v2_t* scene_node, uint32_t routine_
         }
         else if (EZLOPI_SCENE_STATUS_STOP == scene_node->status)
         {
-            TRACE_S("stopped_cond => %d", ctx->stopped_cond);
-            ezlopi_scenes_status_change_broadcast(scene_node, scene_status_stopped_str);
-            ezlopi_free(__FUNCTION__, scene_node->thread_ctx);
-            scene_node->thread_ctx = NULL;
-            scene_node->status = EZLOPI_SCENE_STATUS_STOPPED;
-            break;
+            if (ctx)
+            {
+                TRACE_S("stopped_cond => %d", ctx->stopped_cond);
+            }
+            if (scene_node)
+            {
+                TRACE_E("here");
+                scene_node->status = EZLOPI_SCENE_STATUS_STOPPED;
+                ezlopi_scenes_status_change_broadcast(scene_node, scene_status_stopped_str);
+                if (scene_node->thread_ctx)
+                {
+                    TRACE_E("here");
+                    if (ctx)
+                    {
+                        TRACE_S("stopped_cond => %d", ctx->stopped_cond);
+                    }
+                    ezlopi_free(__FUNCTION__, scene_node->thread_ctx);
+                    scene_node->thread_ctx = NULL;
+                    TRACE_E("here");
+                }
+                break;
+            }
         }
 
 

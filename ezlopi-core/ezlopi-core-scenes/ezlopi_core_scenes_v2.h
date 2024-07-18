@@ -223,7 +223,9 @@ int ezlopi_core_scene_set_reset_latch_enable(const char* sceneId_str, const char
 #endif
 
 int ezlopi_core_scene_block_enable_set_reset(const char* sceneId_str, const char* blockId_str, bool enable_status);
-int ezlopi_core_scene_reset_latch_status(const char* sceneId_str, const char* blockId_str);
+
+int ezlopi_core_scene_reset_latch_state(const char* sceneId_str, const char* blockId_str);
+
 int ezlopi_core_scene_reset_block_status(const char* sceneId_str, const char* blockId_str);
 
 #endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
