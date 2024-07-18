@@ -64,7 +64,19 @@ void scenes_expressions_set(cJSON* cj_request, cJSON* cj_response)
         if (cj_params)
         {
             CJSON_TRACE("expressions params", cj_params);
+            // cJSON* cj_name = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_name_str);
+            // if (cj_name && cj_name->valuestring)
+            // {
+                // s_ezlopi_expressions_t* curr_node = ezlopi_scenes_expression_get_by_name(cj_name->valuestring);
+                // if (NULL != curr_node)
+                // {
+                //     // ezlopi_scenes_expression_update_expr(curr_node, cj_params);
+                // }
+                // else
+                // {
             ezlopi_scenes_expressions_add_to_head(0, cj_params);
+            // }
+        // }
         }
     }
 }

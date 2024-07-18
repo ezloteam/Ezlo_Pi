@@ -27,7 +27,8 @@ extern "C"
     void scenes_house_modes_set(cJSON* cj_request, cJSON* cj_response);
     void scenes_action_block_test(cJSON * cj_request, cJSON * cj_response);
     void scenes_block_status_reset(cJSON* cj_request, cJSON* cj_response);
-
+    void scenes_stop(cJSON* cj_request, cJSON* cj_response);
+    
     ///////////// updaters
     void scene_changed(cJSON* cj_request, cJSON* cj_response);
     void scene_added(cJSON* cj_request, cJSON* cj_response);
