@@ -50,6 +50,7 @@ CLOUD_METHOD("hub.info.get", info_get, NULL)
 CLOUD_METHOD("hub.network.get", network_get, NULL)
 CLOUD_METHOD("hub.network.wifi.scan.start", network_wifi_scan_start, NULL)
 CLOUD_METHOD("hub.network.wifi.scan.stop", network_wifi_scan_stop, NULL)
+CLOUD_METHOD("hub.network.wifi.try_connect", network_wifi_try_connect, NULL)
 
 #if defined(CONFIG_EZPI_ENABLE_OTA)
 CLOUD_METHOD("cloud.firmware.info.get", firmware_info_get, NULL)

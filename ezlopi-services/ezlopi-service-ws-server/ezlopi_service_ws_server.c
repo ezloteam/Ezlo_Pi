@@ -121,13 +121,13 @@ void ezlopi_service_ws_server_stop(void)
 static int __ws_server_broadcast(char* data)
 {
     int ret = 0;
-
     if (__send_lock && pdTRUE == xSemaphoreTake(__send_lock, 0))
     {
         if (data)
         {
             ret = 1;
             l_ws_server_client_conn_t* curr_client = ezlopi_service_ws_server_clients_get_head();
+            printf("%s and curr-client: %p\n", __func__, curr_client);
 
             while (curr_client)
             {
@@ -207,7 +207,7 @@ static esp_err_t __msg_handler(httpd_req_t* req)
 
     if (__send_lock && (pdTRUE == xSemaphoreTake(__send_lock, 5000 / portTICK_RATE_MS)))
     {
-        TRACE_S("-----------------------------> acquired send-lock");
+        TRACE_S("WSL: -----------------------------> acquired send-lock");
 
         if (req->method == HTTP_GET)
         {
@@ -264,41 +264,41 @@ static esp_err_t __msg_handler(httpd_req_t* req)
                             }
                             else
                             {
-                                TRACE_W("packet type un-handled!");
+                                TRACE_W("WSL: packet type un-handled!");
                             }
                         }
                         else
                         {
-                            TRACE_E("httpd_ws_recv_frame failed with %d", ret);
+                            TRACE_E("WSL: httpd_ws_recv_frame failed with %d", ret);
                         }
 
                         ezlopi_free(__FUNCTION__, buf);
                     }
                     else
                     {
-                        TRACE_E("malloc failed!");
+                        TRACE_E("WSL: malloc failed!");
                         ret = ESP_ERR_NO_MEM;
                     }
                 }
                 else
                 {
-                    TRACE_E("httpd_ws_recv_frame failed to get frame len with %d", ret);
+                    TRACE_E("WSL: httpd_ws_recv_frame failed to get frame len with %d", ret);
                 }
             }
         }
 
         if (pdTRUE == xSemaphoreGive(__send_lock))
         {
-            TRACE_S("-----------------------------> released send-lock");
+            TRACE_S("WSL: -----------------------------> released send-lock");
         }
         else
         {
-            TRACE_E("-----------------------------> release send-lock failed!");
+            TRACE_E("WSL: -----------------------------> release send-lock failed!");
         }
     }
     else
     {
-        TRACE_E("-----------------------------> acquire send-lock failed!");
+        TRACE_E("WSL: -----------------------------> acquire send-lock failed!");
     }
 #endif // CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER
     return ret;
@@ -330,7 +330,7 @@ static void __start_server(void)
 
     if (ESP_OK == err)
     {
-        TRACE_I("Registering URI handlers");
+        TRACE_I("WSL: Registering URI handlers");
         if (ESP_OK == httpd_register_uri_handler(__ws_handle, &ws))
         {
             __ws_status = WS_STATUS_RUNNING;
@@ -338,7 +338,7 @@ static void __start_server(void)
     }
     else
     {
-        TRACE_E("Error starting server!, err: %d", err);
+        TRACE_E("WSL: Error starting server!, err: %d", err);
     }
 #endif // CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER
 }
@@ -357,7 +357,7 @@ static void __stop_server(void)
 static int __respond_cjson(httpd_req_t* req, cJSON* cj_response)
 {
     int ret = 0;
-#if 1 // def CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER
+#ifdef CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER
     if (req && cj_response)
     {
         uint32_t buffer_len = 0;
@@ -365,7 +365,7 @@ static int __respond_cjson(httpd_req_t* req, cJSON* cj_response)
 
         if (data_buffer && buffer_len)
         {
-            TRACE_I("-----------------------------> buffer acquired!");
+            TRACE_I("WSL-----------------------------> buffer acquired!");
             memset(data_buffer, 0, buffer_len);
 
             if (cJSON_PrintPreallocated(__FUNCTION__, cj_response, data_buffer, buffer_len, false))
@@ -383,20 +383,20 @@ static int __respond_cjson(httpd_req_t* req, cJSON* cj_response)
                 if (ret)
                 {
                     __message_counter++;
-                    TRACE_S("## WSS-SENDING >>>>>>>>>>\r\n%s", data_buffer);
+                    TRACE_S("## WSL:WSS-SENDING >>>>>>>>>>\r\n%s", data_buffer);
                 }
                 else
                 {
-                    TRACE_E("## WSS-SENDING >>>>>>>>>>\r\n%s", data_buffer);
+                    TRACE_E("## WSL:WSS-SENDING >>>>>>>>>>\r\n%s", data_buffer);
                 }
             }
 
             ezlopi_core_buffer_release();
-            TRACE_I("-----------------------------> buffer released!");
+            TRACE_I("WSL: -----------------------------> buffer released!");
         }
         else
         {
-            TRACE_E("-----------------------------> buffer acquired failed!");
+            TRACE_E("WSL: -----------------------------> buffer acquired failed!");
         }
     }
 #endif // CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER
@@ -406,7 +406,7 @@ static int __respond_cjson(httpd_req_t* req, cJSON* cj_response)
 static int __ws_server_send(l_ws_server_client_conn_t* client, char* data, uint32_t len)
 {
     int ret = 0;
-#if 1 //def CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER
+#ifdef CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER
     if (data && len && client && client->http_handle)
     {
         httpd_ws_frame_t frm_pkt;
@@ -426,11 +426,11 @@ static int __ws_server_send(l_ws_server_client_conn_t* client, char* data, uint3
             client->fail_count = 0;
             __message_counter++;
 
-            TRACE_S("## WSS-SENDING done >>>>>>>>>>>>>>>>>>>\r\n%s", data);
+            TRACE_S("## LOCAL WSS-SENDING done >>>>>>>>>>>>>>>>>>>\r\n%s", data);
         }
         else
         {
-            TRACE_E("## WSS-SENDING failed >>>>>>>>>>>>>>>>>>>\r\n%s", data);
+            TRACE_E("## LOCAL WSS-SENDING failed >>>>>>>>>>>>>>>>>>>\r\n%s", data);
 
             ret = 0;
             client->fail_count += 1;

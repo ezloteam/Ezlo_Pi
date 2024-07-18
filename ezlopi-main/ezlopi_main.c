@@ -94,7 +94,7 @@ void app_main(void)
 #endif
 
 #if defined (CONFIG_EZPI_SERV_ENABLE_MESHBOTS)
-    // ezlopi_scenes_meshbot_init();
+    ezlopi_scenes_meshbot_init();
 #endif
 
 

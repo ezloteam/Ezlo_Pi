@@ -1218,6 +1218,37 @@ static int __new_scene_add_when_blockId_if_reqd(cJSON* cj_new_scene)
 //--------------------------------------------------------------------------------------------------
 //                  Functions for : scene latch-status changes only
 //--------------------------------------------------------------------------------------------------
+static void ____modify_function_in_blockmeta(cJSON* cj_when_block, bool enable_status)
+{
+    cJSON * cj_blockMeta = cJSON_GetObjectItem(__FUNCTION__, cj_when_block, "blockMeta");
+    if (cj_blockMeta)
+    {
+        cJSON * cj_ruleTrigger = cJSON_GetObjectItem(__FUNCTION__, cj_blockMeta, "ruleTrigger");
+        if (cj_ruleTrigger)
+        {
+            cJSON * cj_function = cJSON_GetObjectItem(__FUNCTION__, cj_ruleTrigger, "function");
+            if (cj_function)
+            {
+                cJSON * cj_latch = cJSON_GetObjectItem(__FUNCTION__, cj_function, "latch");
+                if (cj_latch)
+                {
+                    cJSON* cj_enabled = cJSON_GetObjectItem(__FUNCTION__, cj_latch, "enabled");
+                    if (cJSON_IsBool(cj_enabled) && cj_enabled)
+                    {
+                        // may need to include 'naming' filter 
+                        cj_enabled->type = (enable_status ? cJSON_True : cJSON_False); /* change latch-status in nvs*/
+                        CJSON_TRACE("blockMeta", cj_blockMeta);
+                    }
+                }
+            }
+            else
+            {
+                TRACE_E("error !! no function in BlockMeta");
+            }
+        }
+    }
+}
+
 static bool ____change_latch_status_in_blockOptions(cJSON* cj_when_block, bool enable_status)
 {
     bool ret = false;
@@ -1233,20 +1264,16 @@ static bool ____change_latch_status_in_blockOptions(cJSON* cj_when_block, bool e
                 cJSON* cj_enabled = cJSON_GetObjectItem(__FUNCTION__, cj_latch, "enabled");
                 if (cJSON_IsBool(cj_enabled) && cj_enabled)
                 {
+                    // may need to include 'naming' filter
                     ret = true;
                     cj_enabled->type = (enable_status ? cJSON_True : cJSON_False); /* change latch-status in nvs*/
+                    CJSON_TRACE("blockOptions", cj_blockOptions);
                 }
-                // char * str = cJSON_Print("latch", cj_latch);
-                // if (str)
-                // {
-                //     printf("latch : %s", str);
-                //     free(str);
-                // }
             }
         }
         else
         {
-            TRACE_E("error !! no function");
+            TRACE_E("error !! no function in BLOCK-Options");
         }
     }
     return ret;
@@ -1262,16 +1289,19 @@ static bool ___enable_disable_latch_with_blockId(cJSON* cj_when_block, const cha
     if ((cj_blockId && cj_blockId->valuestring) &&
         ((NULL == blockId_str) ? (true) : (0 == strncmp(cj_blockId->valuestring, blockId_str, strlen(cj_blockId->valuestring) + 1))))
     {
+        ____modify_function_in_blockmeta(cj_when_block, enable_status);
         latch_cleared = ____change_latch_status_in_blockOptions(cj_when_block, enable_status);
     }
     else
-    {   /* <2> nested scene with function combined by 'And/OR' */
+    {
+        /* <2> nested scene with function combined by 'And/OR' */
         cJSON* cj_fields_blocks = cJSON_GetObjectItem(__FUNCTION__, cj_when_block, "fields");
         if (cj_fields_blocks && (cJSON_Array == cj_fields_blocks->type))
         {
             cJSON * cj_fields_block = NULL;
             while (NULL != (cj_fields_block = cJSON_GetArrayItem(cj_fields_blocks, fields_block_idx++)))
             {
+
                 cJSON * name = cJSON_GetObjectItem(__FUNCTION__, cj_fields_block, "name");
                 cJSON * type = cJSON_GetObjectItem(__FUNCTION__, cj_fields_block, "type");
                 if (name && type)
@@ -1294,6 +1324,11 @@ static bool ___enable_disable_latch_with_blockId(cJSON* cj_when_block, const cha
                     }
                 }
             }
+        }
+
+        if (NULL == blockId_str) /* This case arrives when -->> [1. no-block-id is given]  ;  [2. 'Main-when-block' has function.]  */
+        {
+            latch_cleared = ____change_latch_status_in_blockOptions(cj_when_block, enable_status);
         }
     }
     return latch_cleared;
