@@ -61,10 +61,7 @@ uint32_t ezlopi_core_ezlopi_methods_search_in_list(cJSON* cj_method)
     {
         while (method_list_v2[idx].method_name)
         {
-            uint32_t request_method_name_len = strlen(cj_method->valuestring);
-            uint32_t list_method_name_len = strlen(method_list_v2[idx].method_name);
-            uint32_t comp_len = list_method_name_len > request_method_name_len ? list_method_name_len : request_method_name_len;
-            if (0 == strncmp(cj_method->valuestring, method_list_v2[idx].method_name, comp_len))
+            if (EZPI_STRNCMP_IF_EQUAL(cj_method->valuestring, method_list_v2[idx].method_name, strlen(cj_method->valuestring), strlen(method_list_v2[idx].method_name)))
             {
                 found_method = 1;
                 break;

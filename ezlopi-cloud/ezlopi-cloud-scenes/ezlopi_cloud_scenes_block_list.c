@@ -149,9 +149,6 @@ static bool __found_item_in_field(l_fields_v2_t* field_node, uint32_t item_id)
             uint32_t item_id_check = strtoul(field_node->field_value.u_value.value_string, NULL, 16);
             TRACE_D("item-id: %s | %08x", field_node->field_value.u_value.value_string, item_id);
 
-            // uint32_t item_id_check = strtoul(field_node->field_value.u_value.value_string, NULL, 16);
-            // TRACE_D("item-id: %s | %08x", field_node->field_value.u_value.value_string, item_id);
-
             if (item_id_check == item_id)
             {
                 ret = 1;
@@ -249,7 +246,7 @@ static cJSON* __add_scenes_blocks_by_device_ids(e_scenes_block_type_v2_t block_t
             l_ezlopi_device_t* device_node = ezlopi_device_get_by_id(device_id);
             if (device_node)
             {
-                TRACE_D("Here");
+                // TRACE_D("Here");
                 cJSON* cj_block = __add_scenes_blocks_by_item_ids(block_type, device_node->items);
                 if (cj_block)
                 {
