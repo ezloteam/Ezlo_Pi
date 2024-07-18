@@ -266,11 +266,6 @@ void device_group_delete(cJSON* cj_request, cJSON* cj_response)
                             ezlopi_core_device_group_remove_id_from_list(dev_grp_id);
                         }
                     }
-                    // else
-                    // {
-                    //     TRACE_E("here");
-                    //     ezlopi_nvs_delete_stored_data_by_name("dev_grp_list");
-                    // }
                 }
             }
         }
@@ -318,7 +313,6 @@ void device_group_created(cJSON * cj_request, cJSON * cj_response)
         char* new_devgrp = ezlopi_nvs_read_str(new_devgrp_id->valuestring);
         if (new_devgrp)
         {
-            TRACE_D(" new_grp_json ", new_devgrp);
             cJSON_AddRawToObject(__FUNCTION__, cj_response, ezlopi_result_str, new_devgrp);
             ezlopi_free(__FUNCTION__, new_devgrp);
         }
@@ -525,7 +519,6 @@ void item_group_created(cJSON * cj_request, cJSON * cj_response)
         char* new_itemgrp = ezlopi_nvs_read_str(new_itemgrp_id->valuestring);
         if (new_itemgrp)
         {
-            TRACE_D(" new_grp_json ", new_itemgrp);
             cJSON_AddRawToObject(__FUNCTION__, cj_response, ezlopi_result_str, new_itemgrp);
             ezlopi_free(__FUNCTION__, new_itemgrp);
         }

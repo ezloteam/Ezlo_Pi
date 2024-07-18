@@ -675,71 +675,29 @@ void ezlopi_core_device_group_remove_id_from_list(uint32_t _id)
     char* devgrp_id_list = ezlopi_nvs_read_device_groups();
     if (devgrp_id_list)
     {
-        TRACE_S("list_str: [%s]", devgrp_id_list);
         cJSON* cj_devgrp_id_list = cJSON_Parse(__FUNCTION__, devgrp_id_list);
         if (cj_devgrp_id_list)
         {
-            CJSON_TRACE("dev_grp_list", cj_devgrp_id_list);
-            uint32_t list_len = cJSON_GetArraySize(cj_devgrp_id_list);
-
-            TRACE_E("Here {%d}", list_len);
-            for (int idx = list_len; idx < list_len; idx++)
+            uint32_t idx = 0;
+            cJSON* cj_id = NULL;
+            while (NULL != (cj_id = cJSON_GetArrayItem(cj_devgrp_id_list, idx)))   // since all the elements are all-ready in 'cJSON_Number'
             {
-                cJSON* cj_id = cJSON_GetArrayItem(cj_devgrp_id_list, idx);
-                if (cj_id)
+                if (cj_id->valuedouble == _id)
                 {
-                    TRACE_E("Here");
-                    switch (cj_id->type)
-                    {
-                    case cJSON_Number:
-                    {
-                        TRACE_S("devGrp_list ---> value is number : [%d]", cj_id->valuedouble);
-                        TRACE_D("[%d.] -->  %d vs %d", idx, cj_id->valuedouble, _id);
-                        if (cj_id->valuedouble == _id)
-                        {
-                            cJSON_DeleteItemFromArray(__FUNCTION__, cj_devgrp_id_list, idx);
-
-                            char* updated_id_list_str = cJSON_PrintBuffered(__FUNCTION__, cj_devgrp_id_list, 1024, false);
-                            TRACE_D("length of 'updated_id_list_str': %d", strlen(updated_id_list_str));
-
-                            if (updated_id_list_str)
-                            {
-                                TRACE_S("new_list_devGrp --> %s", updated_id_list_str);
-                                ezlopi_nvs_write_device_groups(updated_id_list_str);
-                                ezlopi_free(__FUNCTION__, updated_id_list_str);
-                            }
-                        }
-                        break;
-                    }
-                    case cJSON_String:
-                    {
-                        TRACE_S("devGrp_list ---> value is string : [%s]", cj_id->valuestring);
-
-                        uint32_t curr_id = strtoul(cj_id->valuestring, NULL, 16);
-                        TRACE_D("[%d.] -->  %d vs %d", idx, curr_id, _id);
-                        if (curr_id == _id)
-                        {
-                            cJSON_DeleteItemFromArray(__FUNCTION__, cj_devgrp_id_list, idx);
-
-                            char* updated_id_list_str = cJSON_PrintBuffered(__FUNCTION__, cj_devgrp_id_list, 1024, false);
-                            TRACE_D("length of 'updated_id_list_str': %d", strlen(updated_id_list_str));
-
-                            if (updated_id_list_str)
-                            {
-                                TRACE_S("new_list_devGrp --> %s", updated_id_list_str);
-                                ezlopi_nvs_write_device_groups(updated_id_list_str);
-                                ezlopi_free(__FUNCTION__, updated_id_list_str);
-                            }
-                        }
-                        break;
-                    }
-                    default:
-                        break;
-                    }
-
-
-
+                    cJSON_DeleteItemFromArray(__FUNCTION__, cj_devgrp_id_list, idx);
                 }
+                // iterate upto the last elements (incase -->  for doubles)
+                idx++;
+            }
+
+            // Now to rewrite the item_group list into NVS
+            char* updated_devGrpid_list_str = cJSON_PrintBuffered(__FUNCTION__, cj_devgrp_id_list, 1024, false);
+            TRACE_D("length of 'updated_devGrpid_list_str': %d", strlen(updated_devGrpid_list_str));
+
+            if (updated_devGrpid_list_str)
+            {
+                ezlopi_nvs_write_device_groups(updated_devGrpid_list_str);
+                ezlopi_free(__FUNCTION__, updated_devGrpid_list_str);
             }
 
             cJSON_Delete(__FUNCTION__, cj_devgrp_id_list);
@@ -755,27 +713,26 @@ void ezlopi_core_item_group_remove_id_from_list(uint32_t _id)
         cJSON* cj_itemgrp_id_list = cJSON_Parse(__FUNCTION__, itemgrp_id_list);
         if (cj_itemgrp_id_list)
         {
-            uint32_t list_len = cJSON_GetArraySize(cj_itemgrp_id_list);
-
-            for (int idx = list_len; idx < list_len; idx++)
+            uint32_t idx = 0;
+            cJSON* cj_id = NULL;
+            while (NULL != (cj_id = cJSON_GetArrayItem(cj_itemgrp_id_list, idx)))   // since all the elements are all-ready in 'cJSON_Number'
             {
-                cJSON* cj_id = cJSON_GetArrayItem(cj_itemgrp_id_list, idx);
-                if (cj_id)
+                if (cj_id->valuedouble == _id)
                 {
-                    if (cj_id->valuedouble == _id)
-                    {
-                        cJSON_DeleteItemFromArray(__FUNCTION__, cj_itemgrp_id_list, idx);
-
-                        char* updated_id_list_str = cJSON_PrintBuffered(__FUNCTION__, cj_itemgrp_id_list, 1024, false);
-                        TRACE_D("length of 'updated_id_list_str': %d", strlen(updated_id_list_str));
-
-                        if (updated_id_list_str)
-                        {
-                            ezlopi_nvs_write_item_groups(updated_id_list_str);
-                            ezlopi_free(__FUNCTION__, updated_id_list_str);
-                        }
-                    }
+                    cJSON_DeleteItemFromArray(__FUNCTION__, cj_itemgrp_id_list, idx);
                 }
+                // iterate upto the last elements (incase -->  for doubles)
+                idx++;
+            }
+
+            // Now to rewrite the item_group list into NVS
+            char* updated_itemGrp_id_list_str = cJSON_PrintBuffered(__FUNCTION__, cj_itemgrp_id_list, 1024, false);
+            TRACE_D("length of 'updated_itemGrp_id_list_str': %d", strlen(updated_itemGrp_id_list_str));
+
+            if (updated_itemGrp_id_list_str)
+            {
+                ezlopi_nvs_write_item_groups(updated_itemGrp_id_list_str);
+                ezlopi_free(__FUNCTION__, updated_itemGrp_id_list_str);
             }
 
             cJSON_Delete(__FUNCTION__, cj_itemgrp_id_list);

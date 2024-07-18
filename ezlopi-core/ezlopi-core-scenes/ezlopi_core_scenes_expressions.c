@@ -924,9 +924,9 @@ static int __remove_exp_id_from_nvs_exp_list(uint32_t target_id)
                 if (_id == target_id)
                 {
                     cJSON_DeleteItemFromArray(__FUNCTION__, cj_exp_ids, idx);
-                    break;
                 }
 
+                // iterate upto last elements (incase -->  for doubles)
                 idx++;
             }
 

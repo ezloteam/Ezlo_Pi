@@ -357,7 +357,7 @@ void ezlopi_scenes_remove_id_from_list_v2(uint32_t _id)
         {
             uint32_t list_len = cJSON_GetArraySize(cj_scene_id_list);
 
-            for (int idx = list_len; idx < list_len; idx++)
+            for (int idx = 0; idx < list_len; idx++)
             {
                 cJSON* cj_id = cJSON_GetArrayItem(cj_scene_id_list, idx);
                 if (cj_id)
