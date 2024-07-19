@@ -316,6 +316,32 @@ void device_group_find(cJSON* cj_request, cJSON* cj_response)
     }
 }
 
+void device_group_devitem_expand(cJSON* cj_request, cJSON* cj_response)
+{
+    if (cj_request && cj_response)
+    {
+        cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+        if (cj_result)
+        {
+            cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
+            if (cj_params)
+            {
+                cJSON* cj_show_item = cJSON_GetObjectItem(__FUNCTION__, cj_request, "showItems");
+                if (cj_show_item && cJSON_IsBool(cj_show_item) && (cj_show_item->type == cJSON_True))
+                {
+                    ezlopi_core_device_group_devitem_expand(cJSON_AddArrayToObject(__FUNCTION__, cj_result, "devices"), cj_params);
+                }
+
+                // cJSON* cj_ver_str = cJSON_GetObjectItem(__FUNCTION__, cj_request, "version");
+                // if (cj_ver_str && cj_ver_str->valuestring && cj_ver_str->str_value_len)
+                // {
+                //     cJSON_AddStringToObject(__FUNCTION__, cj_result, "version", cj_ver_str->valuestring);
+                // }
+            }
+        }
+    }
+}
+
 ////// updater for device-grps
 ////// for 'hub.device.group.__'
 

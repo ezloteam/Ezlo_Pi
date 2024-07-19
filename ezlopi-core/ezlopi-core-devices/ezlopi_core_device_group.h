@@ -149,12 +149,22 @@ cJSON* ezlopi_core_item_group_create_cjson(l_ezlopi_item_grp_t* itemgrp_node);
 
 /**
  * @brief This function returns list of valid dev_groups
- * 
+ *
  * @param cj_devgrp_array constains the array of valid dev_groups
  * @param params cjson with Conditions to be checked
  * @return uint32_t  Total count of valid device_groups returned
  */
-uint32_t ezlopi_core_device_group_find(cJSON* cj_devgrp_array , cJSON* params);
+uint32_t ezlopi_core_device_group_find(cJSON* cj_devgrp_array, cJSON* params);
+
+
+/**
+ * @brief This function return list of device, that contains desired items
+ *
+ * @param cj_request The array to be written to.
+ * @param cj_response contains conditions to be validated.
+ * @return uint32_t
+ */
+uint32_t ezlopi_core_device_group_devitem_expand(cJSON* cj_destination_array, cJSON* cj_params);
 // ------------ Item-group --------------------
 
 

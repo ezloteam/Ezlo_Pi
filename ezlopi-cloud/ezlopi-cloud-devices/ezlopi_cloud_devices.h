@@ -27,6 +27,8 @@ extern "C"
     void device_group_update(cJSON* cj_request, cJSON* cj_response);
     void device_groups_list(cJSON* cj_request, cJSON* cj_response);
     void device_group_find(cJSON* cj_request, cJSON* cj_response);
+    void device_group_devitem_expand(cJSON* cj_request, cJSON* cj_response);
+
     ///////////// device-grp updaters
     void device_group_created(cJSON * cj_request, cJSON * cj_response);
     void device_group_deleted(cJSON * cj_request, cJSON * cj_response);
