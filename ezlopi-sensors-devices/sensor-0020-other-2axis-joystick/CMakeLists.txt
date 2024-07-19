@@ -9,6 +9,7 @@ idf_component_register(SRCS "sensor_0020_other_2axis_joystick.c" "${config_src}"
                 ezlopi-core-actions 
                 ezlopi-core-devices 
                 ezlopi-core-valueformatter 
+                ezlopi-core-errors
                 
                 ezlopi-hal-adc
                 ezlopi-hal-gpio
