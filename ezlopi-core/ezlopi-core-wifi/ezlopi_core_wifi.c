@@ -212,6 +212,11 @@ static void __event_handler(void* arg, esp_event_base_t event_base, int32_t even
             TRACE_D("wifi-stopped!");
             break;
         }
+        case WIFI_EVENT_STA_CONNECTED:
+        {
+            TRACE_D("wifi-connected!");
+            break;
+        }
         default:
         {
             TRACE_W("un-known wifi-event received: %d", event_id);
