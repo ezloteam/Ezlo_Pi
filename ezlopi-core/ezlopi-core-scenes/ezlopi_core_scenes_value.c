@@ -24,6 +24,23 @@ const char* ezlopi_scene_get_scene_value_type_name(e_scene_value_type_v2_t value
     return ret;
 }
 
+e_scene_value_type_v2_t ezlopi_scene_get_scene_value_type_enum(const char * value_type_str)
+{
+    e_scene_value_type_v2_t ret = EZLOPI_VALUE_TYPE_NONE;
+    if (value_type_str)
+    {
+        for (int i = EZLOPI_VALUE_TYPE_NONE; i < EZLOPI_VALUE_TYPE_MAX; i++)
+        {
+            if (0 == strcmp(sg_scenes_value_type_name[i], value_type_str))
+            {
+                ret = i;
+                break;
+            }
+        }
+    }
+    return ret;
+}
+
 e_scene_value_type_v2_t ezlopi_core_scenes_value_get_type(cJSON* cj_root, const char* type_key_str)
 {
     char* value_type_str = NULL;
@@ -42,17 +59,7 @@ e_scene_value_type_v2_t ezlopi_core_scenes_value_get_type(cJSON* cj_root, const 
         value_type_str = cj_root->valuestring;
     }
 
-    if (value_type_str)
-    {
-        for (int i = EZLOPI_VALUE_TYPE_NONE; i < EZLOPI_VALUE_TYPE_MAX; i++)
-        {
-            if (0 == strcmp(sg_scenes_value_type_name[i], value_type_str))
-            {
-                ret = i;
-                break;
-            }
-        }
-    }
+    ret = ezlopi_scene_get_scene_value_type_enum(value_type_str);
 
     return ret;
 }

@@ -395,39 +395,10 @@ static int __init(l_ezlopi_item_t* item)
                 ret = -1;
             }
         }
-    }
-
-    if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num) &&
-        (-1 != item->interface.gpio.gpio_in.gpio_num) &&
-        (255 != item->interface.gpio.gpio_in.gpio_num))
-    {
-        const gpio_config_t io_conf = {
-            .pin_bit_mask = (1ULL << item->interface.gpio.gpio_in.gpio_num),
-            .mode = GPIO_MODE_INPUT,
-            .pull_up_en = ((item->interface.gpio.gpio_in.pull == GPIO_PULLUP_ONLY) ||
-                           (item->interface.gpio.gpio_in.pull == GPIO_PULLUP_PULLDOWN))
-                              ? GPIO_PULLUP_ENABLE
-                              : GPIO_PULLUP_DISABLE,
-            .pull_down_en = ((item->interface.gpio.gpio_in.pull == GPIO_PULLDOWN_ONLY) ||
-                             (item->interface.gpio.gpio_in.pull == GPIO_PULLUP_PULLDOWN))
-                                ? GPIO_PULLDOWN_ENABLE
-                                : GPIO_PULLDOWN_DISABLE,
-            .intr_type = (GPIO_PULLUP_ONLY == item->interface.gpio.gpio_in.pull)
-                             ? GPIO_INTR_POSEDGE
-                             : GPIO_INTR_NEGEDGE,
-        };
-
-        TRACE_D("enabling interrup for pin: %d", item->interface.gpio.gpio_in.gpio_num);
-
-        gpio_config(&io_conf);
-        ezlopi_service_gpioisr_register_v3(item, __interrupt_upcall, 1000);
-        ret = 1;
-    }
-
-    if (0 == ret)
-    {
-        ret = -1;
-        if (item->user_arg)
+        
+        if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num) &&
+            (-1 != item->interface.gpio.gpio_in.gpio_num) &&
+            (255 != item->interface.gpio.gpio_in.gpio_num))
         {
             const gpio_config_t io_conf = {
                 .pin_bit_mask = (1ULL << item->interface.gpio.gpio_in.gpio_num),
@@ -445,26 +416,54 @@ static int __init(l_ezlopi_item_t* item)
                                  : GPIO_INTR_NEGEDGE,
             };
 
-            if (0 == gpio_config(&io_conf))
+            TRACE_D("enabling interrup for pin: %d", item->interface.gpio.gpio_in.gpio_num);
+
+            gpio_config(&io_conf);
+            ezlopi_service_gpioisr_register_v3(item, __interrupt_upcall, 1000);
+            ret = 1;
+        }
+
+        if (0 == ret)
+        {
+            ret = -1;
+            if (item->user_arg)
             {
-                ezlopi_service_gpioisr_register_v3(item, __interrupt_upcall, 1000);
-                ret = 1;
+                const gpio_config_t io_conf = {
+                    .pin_bit_mask = (1ULL << item->interface.gpio.gpio_in.gpio_num),
+                    .mode = GPIO_MODE_INPUT,
+                    .pull_up_en = ((item->interface.gpio.gpio_in.pull == GPIO_PULLUP_ONLY) ||
+                                   (item->interface.gpio.gpio_in.pull == GPIO_PULLUP_PULLDOWN))
+                                      ? GPIO_PULLUP_ENABLE
+                                      : GPIO_PULLUP_DISABLE,
+                    .pull_down_en = ((item->interface.gpio.gpio_in.pull == GPIO_PULLDOWN_ONLY) ||
+                                     (item->interface.gpio.gpio_in.pull == GPIO_PULLUP_PULLDOWN))
+                                        ? GPIO_PULLDOWN_ENABLE
+                                        : GPIO_PULLDOWN_DISABLE,
+                    .intr_type = (GPIO_PULLUP_ONLY == item->interface.gpio.gpio_in.pull)
+                                     ? GPIO_INTR_POSEDGE
+                                     : GPIO_INTR_NEGEDGE,
+                };
+
+                if (0 == gpio_config(&io_conf))
+                {
+                    ezlopi_service_gpioisr_register_v3(item, __interrupt_upcall, 1000);
+                    ret = 1;
+                }
+                else
+                {
+                    ret = -1;
+                }
             }
             else
             {
                 ret = -1;
             }
         }
-        else
-        {
-            ret = -1;
-        }
     }
-
     return ret;
 }
 
-static int __get_value_cjson(l_ezlopi_item_t* item, void* arg)
+static int __get_value_cjson(l_ezlopi_item_t * item, void* arg)
 {
     int ret = 0;
     if (item && arg)
@@ -479,13 +478,13 @@ static int __get_value_cjson(l_ezlopi_item_t* item, void* arg)
     return ret;
 }
 
-static void __set_gpio_value(l_ezlopi_item_t* item, int value)
+static void __set_gpio_value(l_ezlopi_item_t * item, int value)
 {
     gpio_set_level(item->interface.gpio.gpio_out.gpio_num, value);
     item->interface.gpio.gpio_out.value = value;
 }
 
-static int __set_value(l_ezlopi_item_t* item, void* arg)
+static int __set_value(l_ezlopi_item_t * item, void* arg)
 {
     int ret = 0;
     if (item && arg)
@@ -558,7 +557,7 @@ static int __set_value(l_ezlopi_item_t* item, void* arg)
     return ret;
 }
 
-static void __write_gpio_value(l_ezlopi_item_t* item)
+static void __write_gpio_value(l_ezlopi_item_t * item)
 {
     uint32_t write_value = (0 == item->interface.gpio.gpio_out.invert) ? item->interface.gpio.gpio_out.value : (item->interface.gpio.gpio_out.value ? 0 : 1);
     gpio_set_level(item->interface.gpio.gpio_out.gpio_num, write_value);
@@ -574,7 +573,7 @@ static void __interrupt_upcall(void* arg)
     }
 }
 
-static void __toggle_gpio(l_ezlopi_item_t* item)
+static void __toggle_gpio(l_ezlopi_item_t * item)
 {
     uint32_t write_value = !(item->interface.gpio.gpio_out.value);
     gpio_set_level(item->interface.gpio.gpio_out.gpio_num, write_value);

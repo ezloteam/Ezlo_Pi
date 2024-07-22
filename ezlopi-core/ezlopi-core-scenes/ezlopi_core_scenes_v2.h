@@ -117,13 +117,14 @@ typedef struct l_action_block_v2
 
 typedef struct l_when_block_v2
 {
-    bool block_enable;  //  actual -> '_enable'     //  flag that allows blocks to return 1; 
-    char blockId[40];   //  actual -> '_ID'         //  The ID of a normal when-condition scene-block;
-    char blockName[40]; //  actual -> 'groupName'   //  The Group-Name provided by UI ; to indicate a group // e.g. ["blockName" : "group-A"] 
+    bool block_enable;      //  actual -> '_enable'     //  flag that allows blocks to return 1; 
+    char blockId[40];       //  actual -> '_ID'         //  The ID of a normal when-condition scene-block;
+    char blockName[40];     //  actual -> 'groupName'   //  The Group-Name provided by UI ; to indicate a group // e.g. ["blockName" : "group-A"] 
 #if 0  
-    bool is_group;      // may be used in future    //  currently not-populated from nvs
-    char * group_id;    // may be used in future    //  currently not-populated from nvs
+    bool is_group;          // may be used in future    //  currently not-populated from nvs
+    char * group_id;        // may be used in future    //  currently not-populated from nvs
 #endif
+    bool block_status_reset_once;  // set this flag if you want to reset this 'when-block' once.
     e_scenes_block_type_v2_t block_type;
     s_block_options_v2_t block_options;
     l_fields_v2_t* fields;
@@ -208,6 +209,7 @@ l_scenes_list_v2_t* ezlopi_scenes_pop_by_id_v2(uint32_t _id);
 
 void ezlopi_scenes_notifications_add(cJSON* cj_notifications);
 
+#if 0
 //-------------------------------- Only for latch operations  ----------------------------------------
 /**
  * @brief This function checks for 'latch' struct within nvs_scenes. The scenes are filtered out using 'sceneId[necessary]' & 'blockId[optional]'
@@ -217,9 +219,14 @@ void ezlopi_scenes_notifications_add(cJSON* cj_notifications);
  * @param enable_status enable [true or false] -> [1 or 0]
  * @return successful reset => 1 / else => 0.
  */
-int ezlopi_core_scene_set_reset_latch(const char* sceneId_str, const char* blockId_str, bool enable_status);
+int ezlopi_core_scene_set_reset_latch_enable(const char* sceneId_str, const char* blockId_str, bool enable_status);
+#endif
 
 int ezlopi_core_scene_block_enable_set_reset(const char* sceneId_str, const char* blockId_str, bool enable_status);
+
+int ezlopi_core_scene_reset_latch_state(const char* sceneId_str, const char* blockId_str);
+
+int ezlopi_core_scene_reset_block_status(const char* sceneId_str, const char* blockId_str);
 
 #endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
