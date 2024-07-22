@@ -219,11 +219,11 @@ void device_groups_list(cJSON* cj_request, cJSON* cj_response)
         if (cj_result)
         {
             ezlopi_core_device_group_get_list(cJSON_AddArrayToObject(__FUNCTION__, cj_result, "deviceGroups"));
-            cJSON* cj_ver_str = cJSON_GetObjectItem(__FUNCTION__, cj_request, "version");
-            if (cj_ver_str && cj_ver_str->valuestring && cj_ver_str->str_value_len)
-            {
-                cJSON_AddStringToObject(__FUNCTION__, cj_result, "version", cj_ver_str->valuestring);
-            }
+            // cJSON* cj_ver_str = cJSON_GetObjectItem(__FUNCTION__, cj_request, "version");
+            // if (cj_ver_str && cj_ver_str->valuestring && cj_ver_str->str_value_len)
+            // {
+            //     cJSON_AddStringToObject(__FUNCTION__, cj_result, "version", cj_ver_str->valuestring);
+            // }
         }
     }
 }
@@ -471,11 +471,11 @@ void item_groups_list(cJSON* cj_request, cJSON* cj_response)
         if (cj_result)
         {
             ezlopi_core_item_group_get_list(cJSON_AddArrayToObject(__FUNCTION__, cj_result, "itemGroups"));
-            cJSON* cj_ver_str = cJSON_GetObjectItem(__FUNCTION__, cj_request, "version");
-            if (cj_ver_str && cj_ver_str->valuestring && cj_ver_str->str_value_len)
-            {
-                cJSON_AddStringToObject(__FUNCTION__, cj_result, "version", cj_ver_str->valuestring);
-            }
+            // cJSON* cj_ver_str = cJSON_GetObjectItem(__FUNCTION__, cj_request, "version");
+            // if (cj_ver_str && cj_ver_str->valuestring && cj_ver_str->str_value_len)
+            // {
+            //     cJSON_AddStringToObject(__FUNCTION__, cj_result, "version", cj_ver_str->valuestring);
+            // }
         }
     }
 }

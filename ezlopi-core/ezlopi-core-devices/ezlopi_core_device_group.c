@@ -1505,6 +1505,76 @@ uint32_t ezlopi_core_device_group_find(cJSON* cj_destination_array, cJSON* cj_pa
 
 uint32_t ezlopi_core_device_group_devitem_expand(cJSON* cj_destination_array, cJSON* cj_params)
 {
+    int ret = 0;
+    char* devgrp_id_list = ezlopi_nvs_read_device_groups();
+    if (devgrp_id_list)
+    {
+        cJSON* cj_devgrp_id_list = cJSON_Parse(__FUNCTION__, devgrp_id_list);
+        if (cj_devgrp_id_list)
+        {
+            int  idx = 0;
+            cJSON* cj_devgrp_id = NULL;
+            while (NULL != (cj_devgrp_id = cJSON_GetArrayItem(cj_devgrp_id_list, idx)))// the list elements are in 'cJSON_number'
+            {
+                char devgrp_id_str[32];
+                snprintf(devgrp_id_str, sizeof(devgrp_id_str), "%08x", (uint32_t)cj_devgrp_id->valuedouble);    // convert to "0xc02e00.."
+
+                char* devgrp_str = ezlopi_nvs_read_str(devgrp_id_str);  // to exxtract the dev_grp from nvs ; if exists
+                if (devgrp_str)
+                {
+                    cJSON* cj_curr_devgrp_node = cJSON_Parse(__FUNCTION__, devgrp_str);
+                    if (cj_curr_devgrp_node)
+                    {
+                        CJSON_TRACE("Inspecting --> curr_devgrp", cj_curr_devgrp_node);
+                        bool validity_success = ____check_for_deviceGroupId(cj_curr_devgrp_node, cj_params);   // deciding flag
+                        //------------------------------------------------------------------------------------------------
+                        // 2. if Yes create add object with fields "_id" & "name"
+                        if (validity_success)
+                        {
+                            cJSON * cj_add_valid_devGrp = cJSON_CreateObject(__FUNCTION__);
+                            if (cj_add_valid_devGrp)
+                            {
+                                // 1. add : _id
+                                cJSON_AddStringToObject(__FUNCTION__, cj_add_valid_devGrp, ezlopi__id_str, devgrp_id_str);
+
+                                // 2. add : name
+                                cJSON * cj_name = cJSON_GetObjectItem(__FUNCTION__, cj_curr_devgrp_node, ezlopi_name_str);
+                                if (cj_name && cj_name->valuestring)
+                                {
+                                    cJSON_AddStringToObject(__FUNCTION__, cj_add_valid_devGrp, ezlopi_name_str, cj_name->valuestring);
+                                }
+                                else
+                                {
+                                    cJSON_AddStringToObject(__FUNCTION__, cj_add_valid_devGrp, ezlopi_name_str, ezlopi__str);
+                                }
+
+                                // 3. delete if not added
+                                if (!cJSON_AddItemToArray(cj_destination_array, cj_add_valid_devGrp))
+                                {
+                                    cJSON_Delete(__FUNCTION__, cj_add_valid_devGrp);
+                                }
+                                else
+                                {
+                                    ret += 1;   // return total number of device-grp added
+                                }
+                            }
+                        }
+
+                        cJSON_Delete(__FUNCTION__, cj_curr_devgrp_node);
+                    }
+
+                    ezlopi_free(__FUNCTION__, devgrp_str);
+                }
+                idx++;
+            }
+
+
+            cJSON_Delete(__FUNCTION__, cj_devgrp_id_list);
+        }
+
+        ezlopi_free(__FUNCTION__, devgrp_id_list);
+    }
+
     return 0;
 }
 

@@ -32,8 +32,8 @@ typedef enum e_ezlopi_item_grp_role_type
 
 typedef struct l_ezlopi_device_grp
 {
-    uint32_t _id;
-    char name[128];
+    uint32_t _id;               // perticular device_group_id
+    char name[128];             // device_group_name
     cJSON * categories;         // array containing required categories/sub-categories
     cJSON * devices;            // array containing DeviceIds to be added
     cJSON * exceptions;         // array of DeviceIds to exclude from this group
