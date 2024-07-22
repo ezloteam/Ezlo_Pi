@@ -46,14 +46,15 @@ uint32_t ezlopi_meshbot_service_stop_for_scene_id(uint32_t _id)
         if (EZLOPI_SCENE_STATUS_RUNNING == scene_node->status)
         {
             scene_node->status = EZLOPI_SCENE_STATUS_STOP;
+            TRACE_D("stop scene_id : %#x [%d] ", scene_node->_id, scene_node->status);
         }
 
-        while (EZLOPI_SCENE_STATUS_STOPPED != scene_node->status)
-        {
-            vTaskDelay(50 / portTICK_RATE_MS);
-        }
+        // while (EZLOPI_SCENE_STATUS_STOPPED != scene_node->status)
+        // {
+        //     vTaskDelay(10 / portTICK_RATE_MS);
+        // }
 
-        ezlopi_scenes_status_change_broadcast(scene_node, scene_status_stopped_str);
+        // ezlopi_scenes_status_change_broadcast(scene_node, scene_status_stopped_str);
 
         ret = 1;
     }
@@ -69,14 +70,15 @@ uint32_t ezlopi_meshobot_service_stop_scene(l_scenes_list_v2_t* scene_node)
         if (EZLOPI_SCENE_STATUS_RUNNING == scene_node->status)
         {
             scene_node->status = EZLOPI_SCENE_STATUS_STOP;
+            TRACE_D("stop scene_id : %#x [%d] ", scene_node->_id, scene_node->status);
         }
 
-        while (EZLOPI_SCENE_STATUS_STOPPED != scene_node->status)
-        {
-            vTaskDelay(50 / portTICK_RATE_MS);
-        }
+        // while (EZLOPI_SCENE_STATUS_STOPPED != scene_node->status)
+        // {
+        //     vTaskDelay(10 / portTICK_RATE_MS);
+        // }
 
-        ezlopi_scenes_status_change_broadcast(scene_node, scene_status_stopped_str);
+        // ezlopi_scenes_status_change_broadcast(scene_node, scene_status_stopped_str);
 
         ret = 1;
     }
@@ -91,8 +93,9 @@ uint32_t ezlopi_meshbot_service_start_scene(l_scenes_list_v2_t* scene_node)
         if ((EZLOPI_SCENE_STATUS_NONE == scene_node->status) ||
             (EZLOPI_SCENE_STATUS_STOPPED == scene_node->status))
         {
-            // xTaskCreate(__scenes_process, scene_node->name, 2 * 2048, scene_node, 2, NULL);
             __execute_scene_start(scene_node);
+            // xTaskCreate(__scenes_process, scene_node->name, 2 * 2048, scene_node, 2, NULL);
+            TRACE_D("start scene_id : %#x [%d] ", scene_node->_id, scene_node->status);
             ret = 1;
         }
     }
@@ -210,13 +213,12 @@ void ezlopi_scenes_meshbot_init(void)
 
 PT_THREAD(__scene_proto_thread(l_scenes_list_v2_t* scene_node, uint32_t routine_delay_ms))
 {
-    s_thread_ctx_t* ctx = scene_node->thread_ctx;
+    s_thread_ctx_t* ctx = (s_thread_ctx_t*)scene_node->thread_ctx;
     PT_BEGIN(&ctx->pt);
 
     if ((EZLOPI_SCENE_STATUS_RUN == scene_node->status) || (EZLOPI_SCENE_STATUS_RUNNING == scene_node->status))
     {
         scene_node->status = EZLOPI_SCENE_STATUS_RUNNING;
-
         uint32_t when_condition_returned = 0;
         l_when_block_v2_t* when_condition_node = scene_node->when_block;
 
@@ -342,6 +344,23 @@ PT_THREAD(__scene_proto_thread(l_scenes_list_v2_t* scene_node, uint32_t routine_
             }
 
             when_condition_node = when_condition_node->next;
+// EZPI 442 =======
+//         }
+//         else if (EZLOPI_SCENE_STATUS_STOP == scene_node->status)
+//         {
+//             scene_node->status = EZLOPI_SCENE_STATUS_STOPPED;
+//             ezlopi_scenes_status_change_broadcast(scene_node, scene_status_stopped_str);
+
+//             TRACE_E("here");
+//             ezlopi_free(__FUNCTION__, scene_node->thread_ctx);
+//             scene_node->thread_ctx = NULL;
+//             if (ctx)
+//             {
+//                 TRACE_S("stopped_cond => %d", ctx->stopped_cond);
+//             }
+//             TRACE_E("here");
+//             break;
+// >>>>>>> EZPI 442
         }
     }
 
@@ -349,7 +368,19 @@ PT_THREAD(__scene_proto_thread(l_scenes_list_v2_t* scene_node, uint32_t routine_
     {
         scene_node->status = EZLOPI_SCENE_STATUS_STOPPED;
         ezlopi_scenes_status_change_broadcast(scene_node, scene_status_stopped_str);
-        // break;
+        break;
+// 442 =======
+
+
+//         ctx->curr_ticks = xTaskGetTickCount();
+//         TRACE_D("routine delay: %d", routine_delay_ms);
+//         TRACE_D("entering delay: %d", ctx->curr_ticks);
+
+//         PT_WAIT_UNTIL(&ctx->pt, (xTaskGetTickCount() - ctx->curr_ticks) > routine_delay_ms);
+
+//         TRACE_D("waited for: %d", (xTaskGetTickCount() - ctx->curr_ticks));
+//         TRACE_D("exiting delay: %d", xTaskGetTickCount());
+//  >>>>>>> 442 development
     }
 
     ctx->curr_ticks = xTaskGetTickCount();
@@ -410,15 +441,27 @@ static int __execute_scene_stop(l_scenes_list_v2_t* scene_node)
 static int __execute_scene_start(l_scenes_list_v2_t* scene_node)
 {
     int ret = 0;
-    if (scene_node && (NULL == scene_node->thread_ctx))
+    if (scene_node)
     {
-        scene_node->thread_ctx = (void*)ezlopi_malloc(__FUNCTION__, sizeof(s_thread_ctx_t));
-        if (scene_node->thread_ctx)
+        if (NULL == scene_node->thread_ctx)
         {
             memset(scene_node->thread_ctx, 0, sizeof(s_thread_ctx_t));
             PT_INIT(&((s_thread_ctx_t*)scene_node->thread_ctx)->pt);
             scene_node->status = EZLOPI_SCENE_STATUS_RUN;
             ret = 1;
+// 442 =======
+//             scene_node->thread_ctx = (void*)ezlopi_malloc(__FUNCTION__, sizeof(s_thread_ctx_t));
+//             if (scene_node->thread_ctx)
+//             {
+//                 memset(scene_node->thread_ctx, 0, sizeof(s_thread_ctx_t));
+//                 scene_node->status = EZLOPI_SCENE_STATUS_RUN;
+//                 ret = 1;
+//             }
+//         }
+//         else
+//         {
+//             TRACE_E(" name[%s] --> status[%d]  :-  THREAD_CTX exists..", scene_node->name, scene_node->status);
+// >>>>>>> 445 development
         }
     }
 
