@@ -349,7 +349,7 @@ PT_THREAD(__scene_proto_thread(l_scenes_list_v2_t* scene_node, uint32_t routine_
     {
         scene_node->status = EZLOPI_SCENE_STATUS_STOPPED;
         ezlopi_scenes_status_change_broadcast(scene_node, scene_status_stopped_str);
-        break;
+        // break;
     }
 
     ctx->curr_ticks = xTaskGetTickCount();
