@@ -31,12 +31,12 @@ int ezlopi_core_broadcast_add_to_queue(cJSON* cj_data)
     int ret = 0;
     if (cj_data && __broadcast_queue_func)
     {
-        TRACE_S("cj_data: %p, __broadcast_queue_func: %p", cj_data, __broadcast_queue_func);
+        // TRACE_S("cj_data: %p, __broadcast_queue_func: %p", cj_data, __broadcast_queue_func);
         ret = __broadcast_queue_func(cj_data);
     }
     else
     {
-        TRACE_E("cj_data: %p, __broadcast_queue_func: %p", cj_data, __broadcast_queue_func);
+        // TRACE_E("cj_data: %p, __broadcast_queue_func: %p", cj_data, __broadcast_queue_func);
     }
     return ret;
 }

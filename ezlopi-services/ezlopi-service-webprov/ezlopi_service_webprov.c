@@ -195,7 +195,7 @@ static int __send_cjson_data_to_nma_websocket(cJSON* cj_data)
 
         if (data_buffer && buffer_len)
         {
-            // TRACE_I("-----------------------------> buffer acquired!");
+            TRACE_I("-----------------------------> buffer acquired!");
             memset(data_buffer, 0, buffer_len);
 
             if (true == cJSON_PrintPreallocated(__FUNCTION__, cj_data, data_buffer, buffer_len, false))
@@ -208,7 +208,7 @@ static int __send_cjson_data_to_nma_websocket(cJSON* cj_data)
             }
 
             ezlopi_core_buffer_release();
-            // TRACE_I("-----------------------------> buffer released!");
+            TRACE_I("-----------------------------> buffer released!");
         }
         else
         {
