@@ -12,6 +12,7 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "ezlopi_core_api.h"
+#include "ezlopi_core_wsc.h"
 #include "ezlopi_core_http.h"
 #include "ezlopi_core_wifi.h"
 #include "ezlopi_core_reset.h"
@@ -32,6 +33,8 @@
 #if (1 == TEST_PROV)
 #include "ezlopi_test_prov.h"
 #endif
+
+#define USE_WSC_LIB 0
 
 
 #if defined(CONFIG_EZPI_WEBSOCKET_CLIENT)
@@ -72,7 +75,11 @@ void ezlopi_service_web_provisioning_deinit(void)
         vTaskDelete(_task_handle);
     }
 
+#if (1 == USE_WSC_LIB)
+    ezlopi_core_wsc_kill();
+#else
     ezlopi_websocket_client_kill();
+#endif
 }
 
 static void __connection_upcall(bool connected)
@@ -137,7 +144,11 @@ static void __fetch_wss_endpoint(void* pv)
                     {
                         TRACE_D("uri: %s", cjson_uri->valuestring ? cjson_uri->valuestring : "NULL");
                         ezlopi_core_broadcast_method_add(__send_str_data_to_nma_websocket, "nma-websocket", 4);
+#if (1 == USE_WSC_LIB)
+                        ezlopi_core_wsc_init(cjson_uri, __message_upcall, __connection_upcall);
+#else
                         ezlopi_websocket_client_init(cjson_uri, __message_upcall, __connection_upcall);
+#endif
                         task_complete = 1;
                     }
 
@@ -222,12 +233,21 @@ static int __send_cjson_data_to_nma_websocket(cJSON* cj_data)
 static int __send_str_data_to_nma_websocket(char* str_data)
 {
     int ret = 0;
+
+#if (1 == USE_WSC_LIB)
+    if (str_data && ezlopi_core_wsc_is_connected())
+#else
     if (str_data && ezlopi_websocket_client_is_connected())
+#endif
     {
         int retries = 3;
         while (--retries)
         {
+#if (1 == USE_WSC_LIB)
+            if (ezlopi_core_wsc_send(str_data, strlen(str_data)) > 0)
+#else
             if (ezlopi_websocket_client_send(str_data, strlen(str_data)))
+#endif
             {
                 ret = 1;
                 message_counter++;
