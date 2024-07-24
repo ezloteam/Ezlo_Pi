@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <string.h>
 #include "esp_system.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 
 #if (1 == ENABLE_TRACE)
 static f_ezlopi_log_upcall_t cloud_log_upcall_func = NULL;
@@ -116,7 +118,7 @@ void trace_color_print(const char* txt_color, uint8_t severity, const char* file
 
         static char serial_log_format[10240];
         // char serial_log_format[EZPI_CORE_LOG_BUFFER_SIZE];
-        snprintf(serial_log_format, sizeof(serial_log_format), "\x1B[%sm %s[%d]: ", txt_color, file, line);
+        snprintf(serial_log_format, sizeof(serial_log_format), "\x1B[%sm %d - %s[%d]: ", txt_color, xTaskGetTickCount(), file, line);
         vsnprintf(serial_log_format + strlen(serial_log_format), sizeof(serial_log_format) - strlen(serial_log_format), format, args);
         snprintf(serial_log_format + strlen(serial_log_format), sizeof(serial_log_format) - strlen(serial_log_format), "\x1B[0m");
         log_upcall_func(severity, serial_log_format);

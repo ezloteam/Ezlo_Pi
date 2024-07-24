@@ -34,7 +34,7 @@ int EZPI_core_init_mdns(void)
     int ret = 0;
 
     TaskHandle_t ezlopi_core_mdns_service_task_handle = NULL;
-    xTaskCreate(__mdns_init, "mdns_svc", EZLOPI_CORE_MDNS_SERVICE_TASK_DEPTH, NULL, 4, &ezlopi_core_mdns_service_task_handle);
+    xTaskCreate(__mdns_init, "mdns_svc", EZLOPI_CORE_MDNS_SERVICE_TASK_DEPTH, NULL, 3, &ezlopi_core_mdns_service_task_handle);
     ezlopi_core_process_set_process_info(ENUM_EZLOPI_CORE_MDNS_SERVICE_TASK, &ezlopi_core_mdns_service_task_handle, EZLOPI_CORE_MDNS_SERVICE_TASK_DEPTH);
 
     return ret;

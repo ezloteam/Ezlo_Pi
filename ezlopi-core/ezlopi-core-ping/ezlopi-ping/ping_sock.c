@@ -40,15 +40,15 @@
 
 const static char *TAG = "ping_sock";
 
-#define PING_CHECK(a, str, goto_tag, ret_value, ...)                              \
-    do                                                                            \
-    {                                                                             \
-        if (!(a))                                                                 \
-        {                                                                         \
-            TRACE_E(TAG, "%s(%d): " str, __FUNCTION__, __LINE__, ##__VA_ARGS__); \
-            ret = ret_value;                                                      \
-            goto goto_tag;                                                        \
-        }                                                                         \
+#define PING_CHECK(a, str, goto_tag, ret_value, ...)                                \
+    do                                                                              \
+    {                                                                               \
+        if (!(a))                                                                   \
+        {                                                                           \
+            TRACE_E(TAG, "%s(%d): " str, __FUNCTION__, __LINE__, ##__VA_ARGS__);    \
+            ret = ret_value;                                                        \
+            goto goto_tag;                                                          \
+        }                                                                           \
     } while (0)
 
 #define PING_TIME_DIFF_MS(_end, _start) ((uint32_t)(((_end).tv_sec - (_start).tv_sec) * 1000 + \
@@ -264,69 +264,6 @@ static void __ping_loop(void *arg)
     }
 }
 
-static void __ping_thread(void *args)
-{
-    esp_ping_t *ep = (esp_ping_t *)(args);
-    TickType_t last_wake;
-    struct timeval start_time, end_time;
-    int recv_ret;
-
-    while (1) {
-        /* wait for ping start signal */
-        if (ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(PING_CHECK_START_TIMEOUT_MS))) {
-            /* initialize runtime statistics */
-            ep->packet_hdr->seqno = 0;
-            ep->transmitted = 0;
-            ep->received = 0;
-            ep->total_time_ms = 0;
-
-            last_wake = xTaskGetTickCount();
-            while ((ep->flags & PING_FLAGS_START) && ((ep->count == 0) || (ep->packet_hdr->seqno < ep->count))) {
-                __ping_send(ep);
-                gettimeofday(&start_time, NULL);
-                recv_ret = __ping_receive(ep, 0);
-                gettimeofday(&end_time, NULL);
-                ep->elapsed_time_ms = PING_TIME_DIFF_MS(end_time, start_time);
-                ep->total_time_ms += ep->elapsed_time_ms;
-                if (recv_ret >= 0) {
-                    if (ep->on_ping_success) {
-                        ep->on_ping_success((esp_ping_handle_t)ep, ep->cb_args);
-                    }
-                }
-                else {
-                    if (ep->on_ping_timeout) {
-                        ep->on_ping_timeout((esp_ping_handle_t)ep, ep->cb_args);
-                    }
-                }
-
-                if (pdMS_TO_TICKS(ep->interval_ms)) {
-                    vTaskDelayUntil(&last_wake, pdMS_TO_TICKS(ep->interval_ms)); // to get a more accurate delay
-                }
-            }
-
-            /* batch of ping operations finished */
-            if (ep->on_ping_end) {
-                ep->on_ping_end((esp_ping_handle_t)ep, ep->cb_args);
-            }
-        }
-        else {
-            // check if ping has been de-initialized
-            if (!(ep->flags & PING_FLAGS_INIT)) {
-                break;
-            }
-        }
-    }
-    /* before exit task, free all resources */
-    if (ep->packet_hdr) {
-        free(ep->packet_hdr);
-    }
-    if (ep->sock > 0) {
-        close(ep->sock);
-    }
-    free(ep);
-    vTaskDelete(NULL);
-}
-
 esp_err_t ezlopi_ping_new_session(const ezlopi_ping_config_t *config, const ezlopi_ping_callbacks_t *cbs, esp_ping_handle_t *hdl_out)
 {
     esp_ping_t *ep = NULL;
@@ -343,13 +280,6 @@ esp_err_t ezlopi_ping_new_session(const ezlopi_ping_config_t *config, const ezlo
 
     /* create ping thread */
     ezlopi_service_loop_add("ping-loop", __ping_loop, 1, ep);
-
-#if 0
-    BaseType_t xReturned = xTaskCreate(__ping_thread, "ping", config->task_stack_size, ep,
-        config->task_prio, &ep->ping_task_hdl);
-    PING_CHECK(xReturned == pdTRUE, "create ping task failed", err, ESP_ERR_NO_MEM);
-#endif
-
 
     /* callback functions */
     if (cbs) {

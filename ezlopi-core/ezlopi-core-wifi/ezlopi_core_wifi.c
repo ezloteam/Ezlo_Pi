@@ -509,6 +509,7 @@ static void ezlopi_wifi_scanner_task(void* params)
     };
 
     ezlopi_core_device_broadcast_wifi_start_scan();
+    
     while (1)
     {
         current_time = (xTaskGetTickCount() - start_time);
@@ -531,6 +532,7 @@ static void ezlopi_wifi_scanner_task(void* params)
         }
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
+
     ezlopi_core_device_broadcast_wifi_stop_scan();
     ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_CORE_WIFI_SCANNER_TASK);
     sg_scan_handle = NULL;

@@ -7,6 +7,7 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <freertos/semphr.h>
+#include <freertos/queue.h>
 
 #include "ezlopi_util_trace.h"
 #include "ezlopi_cloud_constants.h"
@@ -28,22 +29,24 @@
 #include "EZLOPI_USER_CONFIG.h"
 
 #define TEST_PROV 0
+#define TEST_UPCALL 1
 
 #if (1 == TEST_PROV)
 #include "ezlopi_test_prov.h"
 #endif
 
-
 #if defined(CONFIG_EZPI_WEBSOCKET_CLIENT)
 
 static uint32_t message_counter = 0;
 static xTaskHandle _task_handle = NULL;
+static QueueHandle_t __msg_queue_handle = NULL;
 static TaskHandle_t __web_socket_initialize_handler = NULL;
 
 static int __provision_update(char* arg);
 
 static void __provision_check(void* pv);
 static void __fetch_wss_endpoint(void* pv);
+static void __message_handler_task(void *pv);
 
 static void __connection_upcall(bool connected);
 static void __message_upcall(const char* payload, uint32_t len);
@@ -59,10 +62,44 @@ uint32_t ezlopi_service_web_provisioning_get_message_count(void)
 void ezlopi_service_web_provisioning_init(void)
 {
     TaskHandle_t ezlopi_service_web_prov_config_check_task_handle = NULL;
-    xTaskCreate(__provision_check, "WebProvCfgChk", EZLOPI_SERVICE_WEB_PROV_CONFIG_CHECK_TASK_DEPTH, NULL, 5, &ezlopi_service_web_prov_config_check_task_handle);
+    xTaskCreate(__provision_check, "WebProvCfgChk", EZLOPI_SERVICE_WEB_PROV_CONFIG_CHECK_TASK_DEPTH, NULL, 3, &ezlopi_service_web_prov_config_check_task_handle);
     ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_WEB_PROV_CONFIG_CHECK_TASK, &ezlopi_service_web_prov_config_check_task_handle, EZLOPI_SERVICE_WEB_PROV_CONFIG_CHECK_TASK_DEPTH);
-    xTaskCreate(__fetch_wss_endpoint, "WebProvFetchWSS", EZLOPI_SERVICE_WEB_PROV_FETCH_WSS_TASK_DEPTH, NULL, 5, &__web_socket_initialize_handler);
+
+    xTaskCreate(__fetch_wss_endpoint, "WebProvFetchWSS", EZLOPI_SERVICE_WEB_PROV_FETCH_WSS_TASK_DEPTH, NULL, 3, &__web_socket_initialize_handler);
     ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_WEB_PROV_FETCH_WSS_TASK, &__web_socket_initialize_handler, EZLOPI_SERVICE_WEB_PROV_FETCH_WSS_TASK_DEPTH);
+
+    __msg_queue_handle = xQueueCreate(5, sizeof(void *));
+    xTaskCreate(__message_handler_task, "wsc-message-handler", 6 * 2048, NULL, 3, NULL);
+}
+
+static void __message_handler_task(void *pv)
+{
+    while (1)
+    {
+        char * payload = NULL;
+        if (pdTRUE == xQueueReceive(__msg_queue_handle, &payload, portMAX_DELAY))
+        {
+            if (payload)
+            {
+                cJSON* cj_response = ezlopi_core_api_consume(NULL, payload, strlen(payload));
+                if (cj_response)
+                {
+                    cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_msg_id_str, message_counter);
+                    __send_cjson_data_to_nma_websocket(cj_response);
+
+                    cJSON_Delete(__FUNCTION__, cj_response);
+                }
+                else
+                {
+                    TRACE_W("no response!");
+                }
+
+                free(payload);
+            }
+        }
+
+        vTaskDelay(1 / portTICK_RATE_MS);
+    }
 }
 
 void ezlopi_service_web_provisioning_deinit(void)
@@ -103,7 +140,6 @@ static void __connection_upcall(bool connected)
 
 static void __fetch_wss_endpoint(void* pv)
 {
-
     char* cloud_server = ezlopi_factory_info_v3_get_cloud_server();
     char* ca_certificate = ezlopi_factory_info_v3_get_ca_certificate();
     char* ssl_shared_key = ezlopi_factory_info_v3_get_ssl_shared_key();
@@ -167,21 +203,131 @@ static void __fetch_wss_endpoint(void* pv)
     vTaskDelete(NULL);
 }
 
+#if (1 == TEST_UPCALL)
+static int __str_max_len(char *str1, char *str2)
+{
+    int ret = 0;
+
+    if (str1 && str2)
+    {
+        ret = (strlen(str1) > strlen(str2)) ? strlen(str1) : strlen(str2);
+    }
+
+    return ret;
+}
+
+static void __test(char * payload, uint32_t len)
+{
+    static uint32_t __msg_counter;
+    static char __ws_buffer[2048];
+    static const char *__device_list = "{\"error\":null,\"id\":\"%s\",\"sender\":%s,\"method\":\"hub.devices.list\",\"msg_id\":%d,\"result\":{\"devices\":[{\"_id\":\"109bc000\",\"deviceTypeId\":\"ezlopi\",\"parentDeviceId\":\"\",\"category\":\"switch\",\"subcategory\":\"relay\",\"gatewayId\":\"457a5069\",\"batteryPowered\":false,\"name\":\"Digital Output 1\",\"type\":\"switch.inwall\",\"reachable\":true,\"persistent\":true,\"serviceNotification\":false,\"armed\":false,\"roomId\":\"\",\"security\":\"no\",\"ready\":true,\"status\":\"idle\"},{\"_id\":\"109bc001\",\"deviceTypeId\":\"ezlopi\",\"parentDeviceId\":\"\",\"category\":\"temperature\",\"subcategory\":\"\",\"gatewayId\":\"457a5069\",\"batteryPowered\":false,\"name\":\"One wire 1_temp\",\"type\":\"sensor\",\"reachable\":true,\"persistent\":true,\"serviceNotification\":false,\"armed\":false,\"roomId\":\"\",\"security\":\"no\",\"ready\":true,\"status\":\"idle\"},{\"_id\":\"109bc002\",\"deviceTypeId\":\"ezlopi\",\"parentDeviceId\":\"109bc001\",\"category\":\"humidity\",\"subcategory\":\"\",\"gatewayId\":\"457a5069\",\"batteryPowered\":false,\"name\":\"One wire 1_humi\",\"type\":\"sensor\",\"reachable\":true,\"persistent\":true,\"serviceNotification\":false,\"armed\":false,\"roomId\":\"\",\"security\":\"no\",\"ready\":true,\"status\":\"idle\"}]}}";
+    static const char *__items_list = "{\"error\":null,\"id\":\"%s\",\"sender\":%s,\"method\":\"hub.items.list\",\"msg_id\":%d,\"result\":{\"items\":[{\"_id\":\"209bc000\",\"deviceId\":\"109bc000\",\"hasGetter\":true,\"hasSetter\":true,\"name\":\"switch\",\"show\":true,\"valueType\":\"bool\",\"value\":false,\"valueFormatted\":\"false\",\"status\":\"idle\"},{\"_id\":\"209bc001\",\"deviceId\":\"109bc001\",\"hasGetter\":true,\"hasSetter\":false,\"name\":\"temp\",\"show\":true,\"valueType\":\"temperature\",\"scale\":\"celsius\",\"value\":0,\"valueFormatted\":\"0.00\",\"scale\":\"celsius\",\"scale\":\"celsius\",\"status\":\"idle\"},{\"_id\":\"209bc002\",\"deviceId\":\"109bc002\",\"hasGetter\":true,\"hasSetter\":false,\"name\":\"humidity\",\"show\":true,\"valueType\":\"humidity\",\"scale\":\"percent\",\"value\":0,\"valueFormatted\":\"0.00\",\"scale\":\"percent\",\"scale\":\"percent\",\"status\":\"idle\"}]}}";
+
+    if (payload && len)
+    {
+        cJSON *cj_data = cJSON_ParseWithLength(__FUNCTION__, payload, len);
+        if (cj_data)
+        {
+            cJSON *cj_id = cJSON_GetObjectItem(__FUNCTION__, cj_data, "id");
+            cJSON *cj_error = cJSON_GetObjectItem(__FUNCTION__, cj_data, "error");
+            cJSON *cj_method = cJSON_GetObjectItem(__FUNCTION__, cj_data, "method");
+            cJSON *cj_sender = cJSON_GetObjectItem(__FUNCTION__, cj_data, "sender");
+
+            CJSON_TRACE("id", cj_id);
+            CJSON_TRACE("error", cj_error);
+            CJSON_TRACE("method", cj_method);
+            CJSON_TRACE("sender", cj_sender);
+
+            if (cj_method && cj_method->valuestring)
+            {
+                int __send_flag = 0;
+                char *wss_format = NULL;
+
+                if (0 == strncmp(cj_method->valuestring, "hub.devices.list",
+                    __str_max_len(cj_method->valuestring, "hub.devices.list")))
+                {
+                    wss_format = __device_list;
+                    __send_flag = 1;
+                }
+                else if (0 == strncmp(cj_method->valuestring, "hub.items.list",
+                    __str_max_len(cj_method->valuestring, "hub.items.list")))
+                {
+                    wss_format = __items_list;
+                    __send_flag = 1;
+                }
+                else if (0 == strncmp(cj_method->valuestring, "registered",
+                    __str_max_len(cj_method->valuestring, "registered")))
+                {
+                    // __register_status = true;
+                    extern void registered(cJSON * a, cJSON * b);
+                    registered(NULL, NULL);
+                }
+
+                if ((__send_flag == 1) && (NULL != wss_format))
+                {
+                    char *id_str = cJSON_Print(__FUNCTION__, cj_id);
+                    char *sender_str = cJSON_Print(__FUNCTION__, cj_sender);
+
+                    snprintf(__ws_buffer, sizeof(__ws_buffer), wss_format, cj_id->valuestring ? cj_id->valuestring : "", sender_str ? sender_str : "null", __msg_counter++);
+
+                    if (id_str)
+                        free(id_str);
+
+                    if (sender_str)
+                        free(sender_str);
+
+                    // TRACE_I("sending: %s", __ws_buffer);
+
+                    if (1 == ezlopi_websocket_client_send(__ws_buffer, strlen(__ws_buffer)))
+                    {
+                        TRACE_S("Sending Success: %s", __ws_buffer);
+                    }
+                    else
+                    {
+                        TRACE_S("Sending failed: %s", __ws_buffer);
+                    }
+                }
+            }
+            else if (cj_error)
+            {
+                if (cj_error->valuestring)
+                {
+                    TRACE_E("error received: %s", cj_error->valuestring);
+                }
+            }
+
+            cJSON_Delete(__FUNCTION__, cj_data);
+        }
+    }
+}
+#endif
+
 static void __message_upcall(const char* payload, uint32_t len)
 {
-    static const char * __who = "webprov-message-upcall";
-    cJSON* cj_response = ezlopi_core_api_consume(__who, payload, len);
-    if (cj_response)
+#if (1 == TEST_UPCALL)
+    __test(payload, len);
+#else
+    if (pdTRUE == xQueueIsQueueFullFromISR(__msg_queue_handle))
     {
-        cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_msg_id_str, message_counter);
-        __send_cjson_data_to_nma_websocket(cj_response);
+        char * ex_payload = NULL;
+        xQueueReceive(__msg_queue_handle, &ex_payload, 0);
+        if (ex_payload)
+        {
+            ezlopi_free(__FUNCTION__, ex_payload);
+        }
+    }
 
-        cJSON_Delete(__FUNCTION__, cj_response);
-    }
-    else
+    char * __payload = ezlopi_malloc(__FUNCTION__, len + 1);
+    if (__payload)
     {
-        TRACE_W("no response!");
+        memcpy(__payload, payload, len);
+        __payload[len] = '\0';
+        if (pdTRUE != xQueueSend(__msg_queue_handle, (void *)&__payload, 10))
+        {
+            ezlopi_free(__FUNCTION__, __payload);
+        }
     }
+#endif
 }
 
 static int __send_cjson_data_to_nma_websocket(cJSON* cj_data)
@@ -222,10 +368,10 @@ static int __send_cjson_data_to_nma_websocket(cJSON* cj_data)
 static int __send_str_data_to_nma_websocket(char* str_data)
 {
     int ret = 0;
-    if (str_data && ezlopi_websocket_client_is_connected())
+    if (str_data)
     {
         int retries = 3;
-        while (--retries)
+        while (--retries && ezlopi_websocket_client_is_connected())
         {
             if (ezlopi_websocket_client_send(str_data, strlen(str_data)))
             {
@@ -289,12 +435,13 @@ static void __provision_check(void* pv)
             ezlopi_wait_for_wifi_to_connect(portMAX_DELAY);
             s_ezlopi_http_data_t* response = ezlopi_http_get_request(http_request_location, NULL, NULL, NULL);
             // s_ezlopi_http_data_t* response = ezlopi_http_get_request(http_request_location, ssl_private_key, ssl_shared_key, ca_certificate);
+            TRACE_D("response: %d", response ? response : "null");
 
             if (NULL != response)
             {
-                // TRACE_S("Status Code : %d", response->status_code);
-                // TRACE_S("Response len : %d", response->response_len);
-                // TRACE_S("response : %s", response->response);
+                TRACE_S("Status Code : %d", response->status_code);
+                TRACE_S("Response len : %d", response->response_len);
+                TRACE_S("response : %s", response->response);
 
                 switch (response->status_code)
                 {
@@ -306,7 +453,11 @@ static void __provision_check(void* pv)
 
                         if (_update_ret > 0)
                         {
+#if (0 == TEST_PROV)
                             EZPI_CORE_reset_reboot();
+#else
+                            flag_break_loop = 1;
+#endif
                         }
                         else if (_update_ret < 0)
                         {
@@ -321,8 +472,6 @@ static void __provision_check(void* pv)
                             flag_break_loop = 1;
                             TRACE_W("Data not available on cloud!");
                         }
-
-                        ezlopi_factory_info_v3_free(response->response);
                     }
 
                     break;
@@ -338,6 +487,7 @@ static void __provision_check(void* pv)
                 }
                 }
 
+                ezlopi_factory_info_v3_free(response->response);
                 ezlopi_factory_info_v3_free(response);
             }
             else

@@ -488,13 +488,9 @@ void ezlopi_device_prepare(void)
 
     if (config_string)
     {
-        TRACE_D("device-config: \r\n%s", config_string);
+        TRACE_D("device-config[len: %d]: \r\n%s", strlen(config_string), config_string);
 
         cJSON* cj_config = cJSON_ParseWithRef(__FUNCTION__, config_string);
-
-#if (EZLOPI_DEVICE_TYPE_TEST_DEVICE != EZLOPI_DEVICE_TYPE)
-        ezlopi_free(__FUNCTION__, config_string);
-#endif
 
         if (cj_config)
         {
@@ -527,6 +523,10 @@ void ezlopi_device_prepare(void)
 
             cJSON_Delete(__FUNCTION__, cj_config);
         }
+
+#if (EZLOPI_DEVICE_TYPE_TEST_DEVICE != EZLOPI_DEVICE_TYPE)
+        ezlopi_free(__FUNCTION__, config_string);
+#endif
     }
     else
     {
@@ -686,14 +686,14 @@ static void ezlopi_device_print_interface_type(l_ezlopi_item_t* item)
 #endif
 //////////////////// Print functions end here /////////////////////////
 ///////////////////////////////////////////////////////////////////////
-static int ezlopi_device_parse_json_v3(cJSON* cjson_config)
+static int ezlopi_device_parse_json_v3(cJSON* cj_config)
 {
     int ret = 0;
 
-    if (cjson_config)
+    if (cj_config)
     {
-        CJSON_TRACE("cjson-config", cjson_config);
-        cJSON* cjson_chipset = cJSON_GetObjectItem(__FUNCTION__, cjson_config, ezlopi_chipset_str);
+        CJSON_TRACE("cjson-config", cj_config);
+        cJSON* cjson_chipset = cJSON_GetObjectItem(__FUNCTION__, cj_config, ezlopi_chipset_str);
 
         if (cjson_chipset)
         {
@@ -714,7 +714,7 @@ static int ezlopi_device_parse_json_v3(cJSON* cjson_config)
                 if (strncmp(chipset_name, ezlopi_ESP32C3_str, compare_len) == 0)
 #endif // Chipset 
                 {
-                    cJSON* cjson_device_list = cJSON_GetObjectItem(__FUNCTION__, cjson_config, ezlopi_dev_detail_str);
+                    cJSON* cjson_device_list = cJSON_GetObjectItem(__FUNCTION__, cj_config, ezlopi_dev_detail_str);
 
                     if (cjson_device_list)
                     {
