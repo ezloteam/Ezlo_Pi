@@ -65,6 +65,8 @@ void ezlopi_init(void)
     vTaskDelay(10);
     // Init device_groups
     ezlopi_device_group_init();
+    // Init item_groups
+    ezlopi_item_group_init();
     vTaskDelay(10);
     ezlopi_initialize_devices_v3();
     vTaskDelay(10);
