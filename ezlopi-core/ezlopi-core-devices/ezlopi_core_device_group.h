@@ -83,7 +83,7 @@ l_ezlopi_item_grp_t* ezlopi_core_item_group_get_by_id(uint32_t _id);
  * @brief This function generates equivalent 'cjson' object of the input 'l_ezlopi_device_grp_t*'
  *
  * @param devgrp_node The node to be converted
- * @return cJSON*
+ * @return cJSON* : ( NOTE!! Must be freed after use )
  */
 cJSON* ezlopi_core_device_group_create_cjson(l_ezlopi_device_grp_t* devgrp_node);
 cJSON* ezlopi_core_item_group_create_cjson(l_ezlopi_item_grp_t* itemgrp_node);
