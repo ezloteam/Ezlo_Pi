@@ -122,7 +122,6 @@ static void __edit_devgrp_from_ll(l_ezlopi_device_grp_t* req_devgrp_node, cJSON*
                 : (0 == strncmp(cj_entry_delay->valuestring, "instant", 8)) ? EZLOPI_DEVICE_GRP_ENTRYDELAY_INSTANT
                 : EZLOPI_DEVICE_GRP_ENTRYDELAY_NONE);
         }
-
     }
 
     // ------------- role -------------
@@ -749,11 +748,32 @@ int ezlopi_core_device_group_edit_by_id(uint32_t devgrp_id, cJSON* cj_devgrp_new
 
     if (1 == __edit_and_update_ll_devgrp_by_id(devgrp_id, cj_devgrp_new))   // modifies the ll-node with, 'devgrp_id'
     {
-       if (1 == __edit_group_and_store_updated_to_nvs(cj_devgrp_new))
+        // this should contain the "modified_devgrp_ll_node".
+        l_ezlopi_device_grp_t* req_devgrp_node = ezlopi_core_device_group_get_by_id(devgrp_id);
+        if (req_devgrp_node)
         {
-            ret = 1;
+            __ezlopi_core_device_group_print(req_devgrp_node);  // check this
+
+            cJSON* cj_new = ezlopi_core_device_group_create_cjson(req_devgrp_node);
+            if (cj_new)
+            {
+                CJSON_TRACE("_new_cj", cj_new);
+                if (1 == __edit_group_and_store_updated_to_nvs(cj_new))
+                {
+                    ret = 1;
+                }
+                cJSON_Delete(__FUNCTION__, cj_new);
+            }
         }
     }
+
+    //  if (1 == __edit_and_update_ll_devgrp_by_id(devgrp_id, cj_devgrp_new))   // modifies the ll-node with, 'devgrp_id'
+    // {
+    //    if (1 == __edit_group_and_store_updated_to_nvs(cj_devgrp_new))
+    //     {
+    //         ret = 1;
+    //     }
+    // }
 
     return ret;
 }
