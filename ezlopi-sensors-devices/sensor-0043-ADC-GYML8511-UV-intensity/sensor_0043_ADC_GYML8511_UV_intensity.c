@@ -6,6 +6,7 @@
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
+#include "ezlopi_core_errors.h"
 
 #include "ezlopi_hal_adc.h"
 
@@ -21,16 +22,16 @@ typedef struct s_gyml8511_data
     float uv_data;
 } s_gyml8511_data_t;
 
-static int __0043_prepare(void* arg);
-static int __0043_init(l_ezlopi_item_t* item);
-static int __0043_get_cjson_value(l_ezlopi_item_t* item, void* arg);
-static int __0043_notify(l_ezlopi_item_t* item);
+static ezlopi_error_t __0043_prepare(void* arg);
+static ezlopi_error_t __0043_init(l_ezlopi_item_t* item);
+static ezlopi_error_t __0043_get_cjson_value(l_ezlopi_item_t* item, void* arg);
+static ezlopi_error_t __0043_notify(l_ezlopi_item_t* item);
 static float mapfloat(float x, float in_min, float in_max, float out_min, float out_max);
 
 //--------------------------------------------------------------------------------------------------------
-int sensor_0043_ADC_GYML8511_UV_intensity(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
+ezlopi_error_t sensor_0043_ADC_GYML8511_UV_intensity(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_SUCCESS;
     switch (action)
     {
     case EZLOPI_ACTION_PREPARE:
@@ -94,9 +95,9 @@ static void __prepare_item_interface_properties(l_ezlopi_item_t* item, cJSON* cj
 }
 //-------------------------------------------------------------------------------------------------------------------------
 
-static int __0043_prepare(void* arg)
+static ezlopi_error_t __0043_prepare(void* arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
     s_ezlopi_prep_arg_t* device_prep_arg = (s_ezlopi_prep_arg_t*)arg;
     if (device_prep_arg && (NULL != device_prep_arg->cjson_device))
     {
@@ -109,7 +110,6 @@ static int __0043_prepare(void* arg)
             l_ezlopi_device_t* gyml8511_device = ezlopi_device_add_device(cj_device, NULL);
             if (gyml8511_device)
             {
-                ret = 1;
                 __prepare_device_cloud_properties(gyml8511_device, cj_device);
 
                 l_ezlopi_item_t* gyml8511_item = ezlopi_device_add_item_to_device(gyml8511_device, sensor_0043_ADC_GYML8511_UV_intensity);
@@ -117,17 +117,16 @@ static int __0043_prepare(void* arg)
                 {
                     __prepare_item_cloud_properties(gyml8511_item, gyml8511_value);
                     __prepare_item_interface_properties(gyml8511_item, cj_device);
+                    ret = EZPI_SUCCESS;
                 }
                 else
                 {
-                    ret = -1;
                     ezlopi_device_free_device(gyml8511_device);
                     ezlopi_free(__FUNCTION__, gyml8511_value);
                 }
             }
             else
             {
-                ret = -1;
                 ezlopi_free(__FUNCTION__, gyml8511_value);
             }
         }
@@ -135,9 +134,9 @@ static int __0043_prepare(void* arg)
     return ret;
 }
 
-static int __0043_init(l_ezlopi_item_t* item)
+static ezlopi_error_t __0043_init(l_ezlopi_item_t* item)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_ERR_INIT_DEVICE_FAILED;
     if (NULL != item)
     {
         s_gyml8511_data_t* user_data = (s_gyml8511_data_t*)item->user_arg;
@@ -147,29 +146,17 @@ static int __0043_init(l_ezlopi_item_t* item)
             {
                 if (0 == ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
                 {
-                    ret = 1;
-                }
-                else
-                {
-                    ret = -1;
+                    ret = EZPI_SUCCESS;
                 }
             }
-            else
-            {
-                ret = -1;
-            }
-        }
-        else
-        {
-            ret = -1;
         }
     }
     return ret;
 }
 
-static int __0043_get_cjson_value(l_ezlopi_item_t* item, void* arg)
+static ezlopi_error_t __0043_get_cjson_value(l_ezlopi_item_t* item, void* arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
     if (item && arg)
     {
         cJSON* cj_result = (cJSON*)arg;
@@ -179,16 +166,16 @@ static int __0043_get_cjson_value(l_ezlopi_item_t* item, void* arg)
             if (user_data)
             {
                 ezlopi_valueformatter_float_to_cjson(item, cj_result, (user_data->uv_data) / 10);
-                ret = 1;
+                ret = EZPI_SUCCESS;
             }
         }
     }
     return ret;
 }
 
-static int __0043_notify(l_ezlopi_item_t* item)
+static ezlopi_error_t __0043_notify(l_ezlopi_item_t* item)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
     if (item)
     {
         s_gyml8511_data_t* user_data = (s_gyml8511_data_t*)item->user_arg;
@@ -202,8 +189,8 @@ static int __0043_notify(l_ezlopi_item_t* item)
             {
                 user_data->uv_data = new_uvIntensity;
                 ezlopi_device_value_updated_from_device_broadcast(item);
+                ret = EZPI_SUCCESS;
             }
-            ret = 1;
         }
     }
     return ret;

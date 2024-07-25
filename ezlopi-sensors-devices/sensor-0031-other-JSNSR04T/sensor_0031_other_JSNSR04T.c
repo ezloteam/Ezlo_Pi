@@ -5,6 +5,7 @@
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
+#include "ezlopi_core_errors.h"
 
 #include "ezlopi_cloud_items.h"
 #include "ezlopi_cloud_constants.h"
@@ -13,14 +14,14 @@
 #include "sensor_0031_other_JSNSR04T.h"
 #include "EZLOPI_USER_CONFIG.h"
 
-static int __prepare(void* arg);
-static int __init(l_ezlopi_item_t* item);
-static int __notify(l_ezlopi_item_t* item);
-static int __get_cjson_value(l_ezlopi_item_t* item, void* arg);
+static ezlopi_error_t __prepare(void* arg);
+static ezlopi_error_t __init(l_ezlopi_item_t* item);
+static ezlopi_error_t __notify(l_ezlopi_item_t* item);
+static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t* item, void* arg);
 
-int sensor_0031_other_JSNSR04T(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
+ezlopi_error_t sensor_0031_other_JSNSR04T(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_SUCCESS;
     switch (action)
     {
     case EZLOPI_ACTION_PREPARE:
@@ -52,14 +53,14 @@ int sensor_0031_other_JSNSR04T(e_ezlopi_actions_t action, l_ezlopi_item_t* item,
     return ret;
 }
 
-static int __notify(l_ezlopi_item_t* item)
+static ezlopi_error_t __notify(l_ezlopi_item_t* item)
 {
     return ezlopi_device_value_updated_from_device_broadcast(item);
 }
 
-static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
+static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t* item, void* arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
     if (item && arg)
     {
         cJSON* cj_result = (cJSON*)arg;
@@ -72,7 +73,7 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
             {
                 float distance = (jsn_sr04t_data.distance_cm / 100.0f);
                 ezlopi_valueformatter_float_to_cjson(item, cj_result, distance);
-                ret = 1;
+                ret = EZPI_SUCCESS;
             }
             else
             {
@@ -84,9 +85,9 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
     return ret;
 }
 
-static int __init(l_ezlopi_item_t* item)
+static ezlopi_error_t __init(l_ezlopi_item_t* item)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_ERR_INIT_DEVICE_FAILED;
     if (item)
     {
         jsn_sr04t_config_t* jsn_sr04t_config = ezlopi_malloc(__FUNCTION__, sizeof(jsn_sr04t_config_t));
@@ -103,16 +104,8 @@ static int __init(l_ezlopi_item_t* item)
             if (ESP_OK == init_JSN_SR04T(jsn_sr04t_config))
             {
                 TRACE_S("JSN_SR04T initialized");
-                ret = 1;
+                ret = EZPI_SUCCESS;
             }
-            else
-            {
-                ret = -1;
-            }
-        }
-        else
-        {
-            ret = -1;
         }
     }
 
@@ -161,9 +154,9 @@ static void __prepare_item_interface_properties(l_ezlopi_item_t* item, cJSON* cj
     item->interface.gpio.gpio_in.value = 0;
 }
 
-static int __prepare(void* arg)
+static ezlopi_error_t __prepare(void* arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
     s_ezlopi_prep_arg_t* prep_arg = (s_ezlopi_prep_arg_t*)arg;
 
     if (prep_arg && prep_arg->cjson_device)
@@ -171,25 +164,19 @@ static int __prepare(void* arg)
         l_ezlopi_device_t* device = ezlopi_device_add_device(prep_arg->cjson_device, NULL);
         if (device)
         {
-            ret = 1;
             __prepare_device_cloud_properties(device, prep_arg->cjson_device);
             l_ezlopi_item_t* item_temperature = ezlopi_device_add_item_to_device(device, sensor_0031_other_JSNSR04T);
             if (item_temperature)
             {
                 __prepare_item_cloud_properties(item_temperature, prep_arg->cjson_device);
                 __prepare_item_interface_properties(item_temperature, prep_arg->cjson_device);
+                ret = EZPI_SUCCESS;
             }
             else
             {
                 ezlopi_device_free_device(device);
-                ret = -1;
             }
         }
-        else
-        {
-            ret = -1;
-        }
     }
-
     return ret;
 }

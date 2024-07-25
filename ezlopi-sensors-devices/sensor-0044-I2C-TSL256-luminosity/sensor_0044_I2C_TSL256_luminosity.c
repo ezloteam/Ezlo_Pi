@@ -6,6 +6,7 @@
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
+#include "ezlopi_core_errors.h"
 
 #include "ezlopi_hal_i2c_master.h"
 
@@ -16,16 +17,16 @@
 #include "EZLOPI_USER_CONFIG.h"
 //-----------------------------------------------------------------------
 
-static int __prepare(void* arg);
-static int __init(l_ezlopi_item_t* item);
-static int __get_cjson_value(l_ezlopi_item_t* item, void* arg);
-static int __notify(l_ezlopi_item_t* item);
+static ezlopi_error_t __prepare(void* arg);
+static ezlopi_error_t __init(l_ezlopi_item_t* item);
+static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t* item, void* arg);
+static ezlopi_error_t __notify(l_ezlopi_item_t* item);
 static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device);
 static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device, void* user_data);
 
-int sensor_0044_I2C_TSL256_luminosity(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
+ezlopi_error_t sensor_0044_I2C_TSL256_luminosity(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_SUCCESS;
     switch (action)
     {
     case EZLOPI_ACTION_PREPARE:
@@ -57,9 +58,9 @@ int sensor_0044_I2C_TSL256_luminosity(e_ezlopi_actions_t action, l_ezlopi_item_t
     return ret;
 }
 
-static int __notify(l_ezlopi_item_t* item)
+static ezlopi_error_t __notify(l_ezlopi_item_t* item)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
 
     // Allow only significant changes in values to be posted
     double new_value = (double)tsl2561_get_intensity_value(&item->interface.i2c_master);
@@ -70,15 +71,16 @@ static int __notify(l_ezlopi_item_t* item)
         {
             ezlopi_device_value_updated_from_device_broadcast(item);
             TSL2561_lux_data->lux_val = (uint32_t)new_value;
+            ret = EZPI_SUCCESS;
         }
     }
 
     return ret;
 }
 
-static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
+static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t* item, void* arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
     cJSON* cj_result = (cJSON*)arg;
     if (cj_result)
     {
@@ -86,15 +88,15 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
         if (illuminance_value)
         {
             ezlopi_valueformatter_uint32_to_cjson(item, cj_result, illuminance_value->lux_val);
-            ret = 1;
+            ret = EZPI_SUCCESS;
         }
     }
     return ret;
 }
 
-static int __init(l_ezlopi_item_t* item)
+static ezlopi_error_t __init(l_ezlopi_item_t* item)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_ERR_INIT_DEVICE_FAILED;
 
     if (item)
     {
@@ -109,17 +111,9 @@ static int __init(l_ezlopi_item_t* item)
                 {
                     TRACE_I("TSL561 initialization finished.........");
                     sensor_0044_tsl2561_configure_device(&item->interface.i2c_master);
-                    ret = 1;
-                }
-                else
-                {
-                    ret = -1;
+                    ret = EZPI_SUCCESS;
                 }
             }
-        }
-        else
-        {
-            ret = -1;
         }
     }
     return ret;
@@ -160,9 +154,9 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_dev
     item->user_arg = user_data;
 }
 
-static int __prepare(void* arg)
+static ezlopi_error_t __prepare(void* arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
 
     s_ezlopi_prep_arg_t* prep_arg = (s_ezlopi_prep_arg_t*)arg;
     if (prep_arg && prep_arg->cjson_device)
@@ -174,24 +168,22 @@ static int __prepare(void* arg)
             l_ezlopi_device_t* tsl256_device = ezlopi_device_add_device(prep_arg->cjson_device, NULL);
             if (tsl256_device)
             {
-                ret = 1;
                 __prepare_device_cloud_properties(tsl256_device, prep_arg->cjson_device);
 
                 l_ezlopi_item_t* tsl256_item = ezlopi_device_add_item_to_device(tsl256_device, sensor_0044_I2C_TSL256_luminosity);
                 if (tsl256_item)
                 {
                     __prepare_item_cloud_properties(tsl256_item, prep_arg->cjson_device, TSL2561_lux_data);
+                    ret = EZPI_SUCCESS;
                 }
                 else
                 {
-                    ret = -1;
                     ezlopi_device_free_device(tsl256_device);
                     ezlopi_free(__FUNCTION__, TSL2561_lux_data);
                 }
             }
             else
             {
-                ret = -1;
                 ezlopi_free(__FUNCTION__, TSL2561_lux_data);
             }
         }

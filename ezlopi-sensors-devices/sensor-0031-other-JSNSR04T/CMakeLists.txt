@@ -10,6 +10,7 @@ idf_component_register(SRCS "sensor_0031_other_JSNSR04T.c" "jsn_sr04t.c"
                                 ezlopi-core-actions 
                                 ezlopi-core-devices 
                                 ezlopi-core-valueformatter 
+                                ezlopi-core-errors
 
                                 ezlopi-cloud-items
                                 ezlopi-cloud-constants 

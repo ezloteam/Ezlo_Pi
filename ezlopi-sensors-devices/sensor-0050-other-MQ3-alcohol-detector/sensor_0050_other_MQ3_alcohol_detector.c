@@ -7,6 +7,7 @@
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
 #include "ezlopi_core_processes.h"
+#include "ezlopi_core_errors.h"
 
 #include "ezlopi_hal_adc.h"
 
@@ -34,11 +35,11 @@ const char* mq3_sensor_gas_alarm_token[] = {
     "unknown",
 };
 //--------------------------------------------------------------------------------------------------------
-static int __0050_prepare(void* arg);
-static int __0050_init(l_ezlopi_item_t* item);
-static int __0050_get_item(l_ezlopi_item_t* item, void* arg);
-static int __0050_get_cjson_value(l_ezlopi_item_t* item, void* arg);
-static int __0050_notify(l_ezlopi_item_t* item);
+static ezlopi_error_t __0050_prepare(void* arg);
+static ezlopi_error_t __0050_init(l_ezlopi_item_t* item);
+static ezlopi_error_t __0050_get_item(l_ezlopi_item_t* item, void* arg);
+static ezlopi_error_t __0050_get_cjson_value(l_ezlopi_item_t* item, void* arg);
+static ezlopi_error_t __0050_notify(l_ezlopi_item_t* item);
 
 static void __calibrate_MQ3_R0_resistance(void* params);
 static float __extract_MQ3_sensor_ppm(l_ezlopi_item_t* item);
@@ -48,9 +49,9 @@ static void __prepare_device_digi_cloud_properties(l_ezlopi_device_t* device, cJ
 static void __prepare_item_adc_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device, void* user_data);
 //--------------------------------------------------------------------------------------------------------
 
-int sensor_0050_other_MQ3_alcohol_detector(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
+ezlopi_error_t sensor_0050_other_MQ3_alcohol_detector(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_SUCCESS;
     switch (action)
     {
     case EZLOPI_ACTION_PREPARE:
@@ -87,9 +88,9 @@ int sensor_0050_other_MQ3_alcohol_detector(e_ezlopi_actions_t action, l_ezlopi_i
 }
 
 //----------------------------------------------------
-static int __0050_prepare(void* arg)
+static ezlopi_error_t __0050_prepare(void* arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
     s_ezlopi_prep_arg_t* device_prep_arg = (s_ezlopi_prep_arg_t*)arg;
     if (device_prep_arg && (NULL != device_prep_arg->cjson_device))
     {
@@ -97,17 +98,17 @@ static int __0050_prepare(void* arg)
         l_ezlopi_device_t* MQ3_device_parent_digi = ezlopi_device_add_device(device_prep_arg->cjson_device, "digi");
         if (MQ3_device_parent_digi)
         {
-            ret = 1;
             TRACE_I("Parent_MQ3_device_digi-[0x%x] ", MQ3_device_parent_digi->cloud_properties.device_id);
             __prepare_device_digi_cloud_properties(MQ3_device_parent_digi, device_prep_arg->cjson_device);
             l_ezlopi_item_t* MQ3_item_digi = ezlopi_device_add_item_to_device(MQ3_device_parent_digi, sensor_0050_other_MQ3_alcohol_detector);
             if (MQ3_item_digi)
             {
                 __prepare_item_digi_cloud_properties(MQ3_item_digi, device_prep_arg->cjson_device);
+                ret = EZPI_SUCCESS;
             }
             else
             {
-                ret = -1;
+                ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
             }
 
             //---------------------------- ADC - DEVICE 2 -------------------------------------------
@@ -126,36 +127,37 @@ static int __0050_prepare(void* arg)
                     if (MQ3_item_adc)
                     {
                         __prepare_item_adc_cloud_properties(MQ3_item_adc, device_prep_arg->cjson_device, MQ3_value);
+                        ret = EZPI_SUCCESS;
                     }
                     else
                     {
-                        ret = -1;
+                        ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                         ezlopi_device_free_device(MQ3_device_child_adc);
                         ezlopi_free(__FUNCTION__, MQ3_value);
                     }
                 }
                 else
                 {
-                    ret = -1;
+                    ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                     ezlopi_free(__FUNCTION__, MQ3_value);
                 }
             }
             else
             {
-                ret = -1;
+                ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
             }
         }
         else
         {
-            ret = -1;
+            ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
         }
     }
     return ret;
 }
 
-static int __0050_init(l_ezlopi_item_t* item)
+static ezlopi_error_t __0050_init(l_ezlopi_item_t* item)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_ERR_INIT_DEVICE_FAILED;
     if (item)
     {
         if (ezlopi_item_name_gas_alarm == item->cloud_properties.item_name)
@@ -169,11 +171,7 @@ static int __0050_init(l_ezlopi_item_t* item)
                 input_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
                 input_conf.pull_up_en = GPIO_PULLUP_ENABLE;
                 gpio_config(&input_conf);
-                ret = 1;
-            }
-            else
-            {
-                ret = -1;
+                ret = EZPI_SUCCESS;
             }
         }
         else if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
@@ -190,23 +188,21 @@ static int __0050_init(l_ezlopi_item_t* item)
                             TaskHandle_t ezlopi_sensor_mq3_task_handle = NULL;
                             xTaskCreate(__calibrate_MQ3_R0_resistance, "Task_to_calculate_R0_air", EZLOPI_SENSOR_MQ3_TASK_DEPTH, item, 1, &ezlopi_sensor_mq3_task_handle);
                             ezlopi_core_process_set_process_info(ENUM_EZLOPI_SENSOR_MQ3_TASK, &ezlopi_sensor_mq3_task_handle, EZLOPI_SENSOR_MQ3_TASK_DEPTH);
-
                         }
-                        ret = 1;
                     }
                     else
                     {
-                        ret = -1;
+                        ret = EZPI_ERR_INIT_DEVICE_FAILED;
                     }
                 }
                 else
                 {
-                    ret = -1;
+                    ret = EZPI_ERR_INIT_DEVICE_FAILED;
                 }
             }
             else
             {
-                ret = -1;
+                ret = EZPI_ERR_INIT_DEVICE_FAILED;
             }
         }
     }
@@ -267,9 +263,9 @@ static void __prepare_item_adc_cloud_properties(l_ezlopi_item_t* item, cJSON* cj
 }
 
 //------------------------------------------------------------------------------------------------------
-static int __0050_get_item(l_ezlopi_item_t* item, void* arg)
+static ezlopi_error_t __0050_get_item(l_ezlopi_item_t* item, void* arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
     if (item && arg)
     {
         cJSON* cj_result = (cJSON*)arg;
@@ -303,15 +299,15 @@ static int __0050_get_item(l_ezlopi_item_t* item, void* arg)
                     ezlopi_valueformatter_float_to_cjson(item, cj_result, MQ3_value->_alcohol_ppm);
                 }
             }
-            ret = 1;
+            ret = EZPI_SUCCESS;
         }
     }
     return ret;
 }
 
-static int __0050_get_cjson_value(l_ezlopi_item_t* item, void* arg)
+static ezlopi_error_t __0050_get_cjson_value(l_ezlopi_item_t* item, void* arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
     if (item && arg)
     {
         cJSON* cj_result = (cJSON*)arg;
@@ -330,15 +326,15 @@ static int __0050_get_cjson_value(l_ezlopi_item_t* item, void* arg)
                     ezlopi_valueformatter_float_to_cjson(item, cj_result, MQ3_value->_alcohol_ppm);
                 }
             }
-            ret = 1;
+            ret = EZPI_SUCCESS;
         }
     }
     return ret;
 }
 
-static int __0050_notify(l_ezlopi_item_t* item)
+static ezlopi_error_t __0050_notify(l_ezlopi_item_t* item)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
     if (item)
     {
         if (ezlopi_item_name_gas_alarm == item->cloud_properties.item_name)
@@ -372,7 +368,7 @@ static int __0050_notify(l_ezlopi_item_t* item)
                 }
             }
         }
-        ret = 1;
+        ret = EZPI_SUCCESS;
     }
     return ret;
 }

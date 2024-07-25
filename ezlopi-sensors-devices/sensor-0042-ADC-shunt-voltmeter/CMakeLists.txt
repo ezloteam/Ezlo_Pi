@@ -8,6 +8,7 @@ idf_component_register(SRCS "sensor_0042_ADC_shunt_voltmeter.c" "${config_src}"
                                     ezlopi-core-actions 
                                     ezlopi-core-devices 
                                     ezlopi-core-valueformatter 
+                                    ezlopi-core-errors
 
                                     ezlopi-hal-adc
 

@@ -10,6 +10,7 @@ idf_component_register(SRCS "sensor_0025_digitalIn_LDR.c" "${config_src}"
                 ezlopi-core-actions 
                 ezlopi-core-devices 
                 ezlopi-core-valueformatter 
+                ezlopi-core-errors
 
                 ezlopi-cloud-items 
                 ezlopi-cloud-constants 

@@ -8,6 +8,7 @@
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_device_value_updated.h"
 #include "ezlopi_core_valueformatter.h"
+#include "ezlopi_core_errors.h"
 
 #include "ezlopi_hal_i2c_master.h"
 
@@ -39,14 +40,14 @@ static uint32_t aqi_item_id = 0;
 static uint32_t voc_item_id = 0;
 static uint32_t co2_item_id = 0;
 
-static int __prepare(void* arg, void* user_arg);
-static int __init(l_ezlopi_item_t* item);
-static int __get_cjson_value(l_ezlopi_item_t* item, void* arg);
-static int __notify(l_ezlopi_item_t* item);
+static ezlopi_error_t __prepare(void* arg, void* user_arg);
+static ezlopi_error_t __init(l_ezlopi_item_t* item);
+static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t* item, void* arg);
+static ezlopi_error_t __notify(l_ezlopi_item_t* item);
 
-int sensor_0068_ENS160_gas_sensor(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
+ezlopi_error_t sensor_0068_ENS160_gas_sensor(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
 {
-  int ret = 0;
+  ezlopi_error_t ret = EZPI_SUCCESS;
   switch (action)
   {
   case EZLOPI_ACTION_PREPARE:
@@ -77,9 +78,9 @@ int sensor_0068_ENS160_gas_sensor(e_ezlopi_actions_t action, l_ezlopi_item_t* it
   return ret;
 }
 
-static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
+static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t* item, void* arg)
 {
-  int ret = 0;
+  ezlopi_error_t ret = EZPI_FAILED;
 
   cJSON* cj_params = (cJSON*)arg;
   if (cj_params)
@@ -99,23 +100,15 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
       {
         ezlopi_valueformatter_uint32_to_cjson(item, cj_params, ens160_sensor->data.eco2);
       }
-    }
-    else
-    {
-      ret = 1;
+      ret = EZPI_SUCCESS;
     }
   }
-  else
-  {
-    ret = 1;
-  }
-
   return ret;
 }
 
-static int __notify(l_ezlopi_item_t* item)
+static ezlopi_error_t __notify(l_ezlopi_item_t* item)
 {
-  int ret = 0;
+  ezlopi_error_t ret = EZPI_FAILED;
   ens160_t* ens160_sensor = (ens160_t*)item->user_arg;
   if (ens160_sensor)
   {
@@ -152,30 +145,24 @@ static int __notify(l_ezlopi_item_t* item)
         ezlopi_device_value_updated_from_device_broadcast(item);
       }
     }
+    ret = EZPI_SUCCESS;
   }
-  else
-  {
-    ret = 1;
-  }
-
   return ret;
 }
 
-static int __init(l_ezlopi_item_t* item)
+static ezlopi_error_t __init(l_ezlopi_item_t* item)
 {
-  int ret = 0;
+  ezlopi_error_t ret = EZPI_ERR_INIT_DEVICE_FAILED;
 
   ens160_t* ens160_sensor = (ens160_t*)item->user_arg;
   if (ens160_sensor)
   {
-    ret = 1;
     if (item->interface.i2c_master.enable)
     {
       ens160_sensor->ezlopi_i2c = &item->interface.i2c_master;
       if (NO_ERR != dfrobot_ens160_i2c_begin(ens160_sensor))
       {
         TRACE_E("Communication with device failed, please check connection");
-        ret = -1;
         vTaskDelay(3000 / portTICK_PERIOD_MS);
       }
       else
@@ -186,12 +173,9 @@ static int __init(l_ezlopi_item_t* item)
         float relative_humidity = get_relative_humidity_setting();
         // dfrobot_ens160_set_temp_and_hum(ens160_sensor, /*temperature=*/25.0, /*humidity=*/50.0); // These should be able to be changed froms settings.
         dfrobot_ens160_set_temp_and_hum(ens160_sensor, ambient_temperature, relative_humidity);
+        ret = EZPI_SUCCESS;
       }
     }
-  }
-  else
-  {
-    ret = -1;
   }
   return ret;
 }
@@ -229,9 +213,9 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_dev
   }
 }
 
-static int __prepare(void* arg, void* user_arg)
+static ezlopi_error_t __prepare(void* arg, void* user_arg)
 {
-  int ret = 0;
+  ezlopi_error_t ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
 
   s_ezlopi_prep_arg_t* prep_arg = (s_ezlopi_prep_arg_t*)arg;
   if (prep_arg)
@@ -244,7 +228,7 @@ static int __prepare(void* arg, void* user_arg)
       l_ezlopi_device_t* parent_ens160_aqi_device = ezlopi_device_add_device(prep_arg->cjson_device, "aqi");
       if (parent_ens160_aqi_device)
       {
-        ret = 1;
+        ret = EZPI_SUCCESS;
         TRACE_I("Parent_ens160_aqi_device-[0x%x] ", parent_ens160_aqi_device->cloud_properties.device_id);
         __prepare_device_cloud_properties(parent_ens160_aqi_device, prep_arg->cjson_device);
 
@@ -277,7 +261,7 @@ static int __prepare(void* arg, void* user_arg)
           }
           else
           {
-            ret = -1;
+            ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
             ezlopi_device_free_device(child_ens160_voc_device);
           }
         }
@@ -300,7 +284,7 @@ static int __prepare(void* arg, void* user_arg)
           }
           else
           {
-            ret = -1;
+            ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
             ezlopi_device_free_device(child_ens160_co2_device);
           }
         }
@@ -311,7 +295,7 @@ static int __prepare(void* arg, void* user_arg)
         {
           ezlopi_device_free_device(parent_ens160_aqi_device);
           ezlopi_free(__FUNCTION__, ens160_sensor);
-          ret = -1;
+          ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
         }
         else
         {
@@ -320,13 +304,13 @@ static int __prepare(void* arg, void* user_arg)
       }
       else
       {
-        ret = 1;
+        ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
         ezlopi_free(__FUNCTION__, ens160_sensor);
       }
     }
     else
     {
-      ret = 1;
+      ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
     }
   }
   return ret;

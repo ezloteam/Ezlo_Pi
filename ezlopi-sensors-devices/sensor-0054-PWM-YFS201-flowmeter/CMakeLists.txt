@@ -9,6 +9,7 @@ idf_component_register(SRCS "sensor_0054_PWM_YFS201_flowmeter.c"
                 ezlopi-core-actions 
                 ezlopi-core-devices 
                 ezlopi-core-valueformatter 
+                ezlopi-core-errors
 
                 ezlopi-hal-pwm
 

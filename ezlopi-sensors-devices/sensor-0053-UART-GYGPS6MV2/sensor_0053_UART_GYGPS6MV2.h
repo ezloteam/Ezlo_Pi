@@ -4,6 +4,7 @@
 
 #include "ezlopi_core_actions.h"
 #include "ezlopi_core_devices.h"
+#include "ezlopi_core_errors.h"
 
 /* 3.3V operating voltage */
 //-----------------------------------------------------------------------------------------
@@ -246,6 +247,6 @@ typedef struct GPS6MV2_t
 } GPS6MV2_t;
 
 //--------------------------------------------------------------------------------------------------------------------
-int sensor_0053_UART_GYGPS6MV2(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
+ezlopi_error_t sensor_0053_UART_GYGPS6MV2(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
 #endif //_SENSOR_0053_UART_GYGPS6MV2_H_

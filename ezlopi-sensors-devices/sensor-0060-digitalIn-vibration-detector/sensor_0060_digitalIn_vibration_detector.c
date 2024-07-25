@@ -4,6 +4,7 @@
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
+#include "ezlopi_core_errors.h"
 
 #include "ezlopi_hal_gpio.h"
 
@@ -21,18 +22,18 @@ const char* Sw420_vibration_activity_state_token[] = {
     "drop",
 };
 
-static int __0060_prepare(void* arg);
-static int __0060_init(l_ezlopi_item_t* item);
-static int __0060_get_item(l_ezlopi_item_t* item, void* arg);
-static int __0060_get_cjson_value(l_ezlopi_item_t* item, void* arg);
-static int __0060_notify(l_ezlopi_item_t* item);
+static ezlopi_error_t __0060_prepare(void* arg);
+static ezlopi_error_t __0060_init(l_ezlopi_item_t* item);
+static ezlopi_error_t __0060_get_item(l_ezlopi_item_t* item, void* arg);
+static ezlopi_error_t __0060_get_cjson_value(l_ezlopi_item_t* item, void* arg);
+static ezlopi_error_t __0060_notify(l_ezlopi_item_t* item);
 
 static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device);
 static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device);
 //---------------------------------------------------------------------------------------------------------
-int sensor_0060_digitalIn_vibration_detector(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
+ezlopi_error_t sensor_0060_digitalIn_vibration_detector(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_SUCCESS;
     switch (action)
     {
     case EZLOPI_ACTION_PREPARE:
@@ -97,9 +98,9 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_dev
     item->interface.gpio.gpio_in.pull = GPIO_PULLDOWN_ONLY;
     item->interface.gpio.gpio_in.interrupt = GPIO_INTR_ANYEDGE;
 }
-static int __0060_prepare(void* arg)
+static ezlopi_error_t __0060_prepare(void* arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
     if (arg)
     {
         s_ezlopi_prep_arg_t* dev_prep_arg = (s_ezlopi_prep_arg_t*)arg;
@@ -108,16 +109,15 @@ static int __0060_prepare(void* arg)
             l_ezlopi_device_t* vibration_device = ezlopi_device_add_device(dev_prep_arg->cjson_device, NULL);
             if (vibration_device)
             {
-                ret = 1;
                 __prepare_device_cloud_properties(vibration_device, dev_prep_arg->cjson_device);
                 l_ezlopi_item_t* vibration_item = ezlopi_device_add_item_to_device(vibration_device, sensor_0060_digitalIn_vibration_detector);
                 if (vibration_item)
                 {
                     __prepare_item_cloud_properties(vibration_item, dev_prep_arg->cjson_device);
+                    ret = EZPI_SUCCESS;
                 }
                 else
                 {
-                    ret = -1;
                     ezlopi_device_free_device(vibration_device);
                 }
             }
@@ -126,9 +126,9 @@ static int __0060_prepare(void* arg)
     return ret;
 }
 
-static int __0060_init(l_ezlopi_item_t* item)
+static ezlopi_error_t __0060_init(l_ezlopi_item_t* item)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_ERR_INIT_DEVICE_FAILED;
     if (NULL != item)
     {
         if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num))
@@ -149,23 +149,15 @@ static int __0060_init(l_ezlopi_item_t* item)
             if (0 == gpio_config(&io_config))
             {
                 item->interface.gpio.gpio_in.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
-                ret = 1;
+                ret = EZPI_SUCCESS;
             }
-            else
-            {
-                ret = -1;
-            }
-        }
-        else
-        {
-            ret = -1;
-        }
+        }   
     }
     return ret;
 }
-static int __0060_get_item(l_ezlopi_item_t* item, void* arg)
+static ezlopi_error_t __0060_get_item(l_ezlopi_item_t* item, void* arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
     if (item && arg)
     {
         cJSON* cj_result = (cJSON*)arg;
@@ -189,14 +181,14 @@ static int __0060_get_item(l_ezlopi_item_t* item, void* arg)
 
             cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, (char*)item->user_arg ? item->user_arg : Sw420_vibration_activity_state_token[0]);
             cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, (char*)item->user_arg ? item->user_arg : Sw420_vibration_activity_state_token[0]);
-            ret = 1;
+            ret = EZPI_SUCCESS;
         }
     }
     return ret;
 }
-static int __0060_get_cjson_value(l_ezlopi_item_t* item, void* arg)
+static ezlopi_error_t __0060_get_cjson_value(l_ezlopi_item_t* item, void* arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
     if (item && arg)
     {
         cJSON* cj_result = (cJSON*)arg;
@@ -204,15 +196,15 @@ static int __0060_get_cjson_value(l_ezlopi_item_t* item, void* arg)
         {
             cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, (char*)item->user_arg ? item->user_arg : Sw420_vibration_activity_state_token[0]);
             cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, (char*)item->user_arg ? item->user_arg : Sw420_vibration_activity_state_token[0]);
-            ret = 1;
+            ret = EZPI_SUCCESS;
         }
     }
     return ret;
 }
 //------------------------------------------------------------------------------------------------------------
-static int __0060_notify(l_ezlopi_item_t* item)
+static ezlopi_error_t __0060_notify(l_ezlopi_item_t* item)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
     const char* curret_value = NULL;
     item->interface.gpio.gpio_in.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
     item->interface.gpio.gpio_in.value = (false == item->interface.gpio.gpio_in.invert) ? (item->interface.gpio.gpio_in.value) : (!item->interface.gpio.gpio_in.value);
@@ -230,7 +222,7 @@ static int __0060_notify(l_ezlopi_item_t* item)
     {
         item->user_arg = (void*)curret_value;
         ezlopi_device_value_updated_from_device_broadcast(item);
-        ret = 1;
+        ret = EZPI_SUCCESS;
     }
 
     return ret;

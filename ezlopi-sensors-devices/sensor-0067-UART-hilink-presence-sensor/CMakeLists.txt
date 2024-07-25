@@ -10,6 +10,7 @@ idf_component_register(SRCS "hilink_presence_sensor_setting.c" "sensor_0067_hili
                                 ezlopi-core-actions  
                                 ezlopi-core-devices 
                                 ezlopi-core-valueformatter
+                                ezlopi-core-errors
 
                                 ezlopi-cloud-items
                                 ezlopi-cloud-constants 

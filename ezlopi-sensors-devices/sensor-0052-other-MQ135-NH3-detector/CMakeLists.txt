@@ -8,6 +8,7 @@ idf_component_register(SRCS "sensor_0052_other_MQ135_NH3_detector.c"
                 ezlopi-core-devices 
                 ezlopi-core-valueformatter 
                 ezlopi-core-processes
+                ezlopi-core-errors
 
                 ezlopi-hal-adc
 

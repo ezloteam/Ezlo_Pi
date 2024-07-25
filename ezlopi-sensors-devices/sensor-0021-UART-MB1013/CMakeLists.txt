@@ -9,6 +9,7 @@ idf_component_register(SRCS "sensor_0021_UART_MB1013.c" "${config_src}"
                 ezlopi-core-actions 
                 ezlopi-core-devices 
                 ezlopi-core-valueformatter 
+                ezlopi-core-errors
                 
                 ezlopi-hal-uart
 

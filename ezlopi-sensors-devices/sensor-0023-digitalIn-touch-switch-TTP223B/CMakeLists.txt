@@ -10,6 +10,7 @@ idf_component_register(SRCS "sensor_0023_digitalIn_touch_switch_TTP223B.c" "${co
                 ezlopi-core-actions 
                 ezlopi-core-devices 
                 ezlopi-core-valueformatter 
+                ezlopi-core-errors
                 
                 ezlopi-cloud-items 
                 ezlopi-cloud-constants 

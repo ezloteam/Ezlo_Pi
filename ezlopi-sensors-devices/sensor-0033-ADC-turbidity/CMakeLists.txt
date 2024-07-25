@@ -10,6 +10,7 @@ idf_component_register(SRCS "sensor_0033_ADC_turbidity.c"
                                     ezlopi-core-actions 
                                     ezlopi-core-devices 
                                     ezlopi-core-valueformatter 
+                                    ezlopi-core-errors
 
                                     ezlopi-hal-adc
 
