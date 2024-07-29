@@ -34,13 +34,14 @@
 #include "ezlopi_test_prov.h"
 #endif
 
-#define USE_WSC_LIB 0
+#define USE_WSC_LIB 1
 
 
 #if defined(CONFIG_EZPI_WEBSOCKET_CLIENT)
 
 static uint32_t message_counter = 0;
 static xTaskHandle _task_handle = NULL;
+static s_ssl_websocket_t * __wsc_ssl = NULL;
 static TaskHandle_t __web_socket_initialize_handler = NULL;
 
 static int __provision_update(char* arg);
@@ -59,6 +60,8 @@ uint32_t ezlopi_service_web_provisioning_get_message_count(void)
     return message_counter;
 }
 
+
+
 void ezlopi_service_web_provisioning_init(void)
 {
     TaskHandle_t ezlopi_service_web_prov_config_check_task_handle = NULL;
@@ -76,7 +79,7 @@ void ezlopi_service_web_provisioning_deinit(void)
     }
 
 #if (1 == USE_WSC_LIB)
-    ezlopi_core_wsc_kill();
+    ezlopi_core_wsc_kill(__wsc_ssl);
 #else
     ezlopi_websocket_client_kill();
 #endif
@@ -145,7 +148,7 @@ static void __fetch_wss_endpoint(void* pv)
                         TRACE_D("uri: %s", cjson_uri->valuestring ? cjson_uri->valuestring : "NULL");
                         ezlopi_core_broadcast_method_add(__send_str_data_to_nma_websocket, "nma-websocket", 4);
 #if (1 == USE_WSC_LIB)
-                        ezlopi_core_wsc_init(cjson_uri, __message_upcall, __connection_upcall);
+                        __wsc_ssl = ezlopi_core_wsc_init(cjson_uri, __message_upcall, __connection_upcall);
 #else
                         ezlopi_websocket_client_init(cjson_uri, __message_upcall, __connection_upcall);
 #endif
@@ -193,6 +196,8 @@ static void __message_upcall(const char* payload, uint32_t len)
     {
         TRACE_W("no response!");
     }
+
+    vTaskDelay(10 / portTICK_RATE_MS);
 }
 
 static int __send_cjson_data_to_nma_websocket(cJSON* cj_data)
@@ -235,7 +240,7 @@ static int __send_str_data_to_nma_websocket(char* str_data)
     int ret = 0;
 
 #if (1 == USE_WSC_LIB)
-    if (str_data && ezlopi_core_wsc_is_connected())
+    if (str_data && ezlopi_core_wsc_is_connected(__wsc_ssl))
 #else
     if (str_data && ezlopi_websocket_client_is_connected())
 #endif
@@ -244,7 +249,7 @@ static int __send_str_data_to_nma_websocket(char* str_data)
         while (--retries)
         {
 #if (1 == USE_WSC_LIB)
-            if (ezlopi_core_wsc_send(str_data, strlen(str_data)) > 0)
+            if (ezlopi_core_wsc_send(__wsc_ssl, str_data, strlen(str_data)) > 0)
 #else
             if (ezlopi_websocket_client_send(str_data, strlen(str_data)))
 #endif

@@ -178,7 +178,7 @@ static void ezlopi_core_http_request_via_mbedTLS(const char* host_web_server, in
     mbedtls_ssl_conf_ca_chain(&conf, &cacert, NULL);
     mbedtls_ssl_conf_rng(&conf, mbedtls_ctr_drbg_random, &ctr_drbg);
 #ifdef CONFIG_MBEDTLS_DEBUG
-    mbedtls_esp_enable_debug_log(conf, CONFIG_MBEDTLS_DEBUG_LEVEL);
+    mbedtls_esp_enable_debug_log(&conf, CONFIG_MBEDTLS_DEBUG_LEVEL);
 #endif
 
     if (0 != (ret = mbedtls_ssl_setup(&ssl, &conf)))
