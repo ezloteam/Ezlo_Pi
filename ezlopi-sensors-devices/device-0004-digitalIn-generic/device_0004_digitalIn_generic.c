@@ -145,7 +145,7 @@ static ezlopi_error_t __init(l_ezlopi_item_t* item)
 
             if (0 == gpio_config(&io_conf))
             {
-                gpio_isr_service_register_v3(item, __interrupt_upcall, 1000);
+                ezlopi_service_gpioisr_register_v3(item, __interrupt_upcall, 1000);
             }
             else
             {
@@ -169,7 +169,7 @@ static ezlopi_error_t __get_value_cjson(l_ezlopi_item_t* item, void* arg)
         cJSON* cj_propertise = (cJSON*)arg;
         if (cj_propertise)
         {
-            ezlopi_valueformatter_bool_to_cjson(item, cj_propertise, item->interface.gpio.gpio_out.value);
+            ezlopi_valueformatter_bool_to_cjson(cj_propertise, item->interface.gpio.gpio_out.value, NULL);
             ret = EZPI_SUCCESS;
         }
     }

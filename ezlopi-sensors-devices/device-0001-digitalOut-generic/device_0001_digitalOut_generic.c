@@ -180,7 +180,7 @@ static ezlopi_error_t __settings_get(void* arg, l_ezlopi_device_settings_v3_t* s
 }
 static ezlopi_error_t __settings_set(void* arg, l_ezlopi_device_settings_v3_t* setting)
 {
-    ezlopi_error_t error= EZPI_FAILED;
+    ezlopi_error_t error = EZPI_FAILED;
     cJSON* cjson_propertise = (cJSON*)arg;
     if (cjson_propertise)
     {
@@ -202,7 +202,7 @@ static ezlopi_error_t __settings_set(void* arg, l_ezlopi_device_settings_v3_t* s
             }
         }
 
-        error= EZPI_SUCCESS;
+        error = EZPI_SUCCESS;
     }
     return error
 }
@@ -419,10 +419,10 @@ static ezlopi_error_t __init(l_ezlopi_item_t* item)
                              : GPIO_INTR_NEGEDGE,
         };
 
-            TRACE_D("enabling interrup for pin: %d", item->interface.gpio.gpio_in.gpio_num);
+        TRACE_D("enabling interrup for pin: %d", item->interface.gpio.gpio_in.gpio_num);
 
         gpio_config(&io_conf);
-        gpio_isr_service_register_v3(item, __interrupt_upcall, 1000);
+        ezlopi_service_gpioisr_register_v3(item, __interrupt_upcall, 1000);
         error = EZPI_SUCCESS;
     }
 
@@ -449,7 +449,7 @@ static ezlopi_error_t __init(l_ezlopi_item_t* item)
 
             if (0 == gpio_config(&io_conf))
             {
-                gpio_isr_service_register_v3(item, __interrupt_upcall, 1000);
+                ezlopi_service_gpioisr_register_v3(item, __interrupt_upcall, 1000);
                 error = EZPI_SUCCESS;
             }
             else
@@ -474,7 +474,7 @@ static ezlopi_error_t __get_value_cjson(l_ezlopi_item_t* item, void* arg)
         cJSON* cj_propertise = (cJSON*)arg;
         if (cj_propertise)
         {
-            ezlopi_valueformatter_bool_to_cjson(item, cj_propertise, item->interface.gpio.gpio_out.value);
+            ezlopi_valueformatter_bool_to_cjson(cj_propertise, item->interface.gpio.gpio_out.value, NULL);
             error = EZPI_SUCCESS;
         }
     }

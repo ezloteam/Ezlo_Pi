@@ -90,7 +90,7 @@ static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t* item, void* arg)
     {
         cJSON* cj_result = (cJSON*)arg;
         double* temperatue_value = (double*)item->user_arg;
-        ezlopi_valueformatter_double_to_cjson(item, cj_result, *temperatue_value);
+        ezlopi_valueformatter_double_to_cjson(cj_result, *temperatue_value, scales_celsius);
         ret = EZPI_SUCCESS;
     }
     return ret;

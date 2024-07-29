@@ -60,7 +60,7 @@ static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t* item, void* arg)
     cJSON* cj_result = (cJSON*)arg;
     if (item && cj_result)
     {
-        ezlopi_valueformatter_bool_to_cjson(item, cj_result, item->interface.gpio.gpio_in.value);
+        ezlopi_valueformatter_bool_to_cjson(cj_result, item->interface.gpio.gpio_in.value, NULL);
         ret = EZPI_SUCCESS;
     }
 
@@ -86,7 +86,7 @@ static ezlopi_error_t __init(l_ezlopi_item_t* item)
             {
                 int gpio_level = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
                 item->interface.gpio.gpio_in.value = (false == item->interface.gpio.gpio_in.invert) ? gpio_level : !gpio_level;
-                gpio_isr_service_register_v3(item, __touch_switch_callback, 200);
+                ezlopi_service_gpioisr_register_v3(item, __touch_switch_callback, 200);
                 ret = EZPI_SUCCESS;
             }
         }

@@ -154,7 +154,7 @@ static ezlopi_error_t __0056_get_cjson_value(l_ezlopi_item_t* item, void* arg)
         fsr_t* fsr_struct = (fsr_t*)item->user_arg;
         if (fsr_struct)
         {
-            ezlopi_valueformatter_float_to_cjson(item, cj_result, fsr_struct->fsr_value);
+            ezlopi_valueformatter_float_to_cjson(cj_result, fsr_struct->fsr_value, scales_newton);
             ret = EZPI_SUCCESS;
         }
     }

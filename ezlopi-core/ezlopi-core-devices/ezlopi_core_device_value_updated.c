@@ -1,5 +1,6 @@
 #include "ezlopi_core_broadcast.h"
 #include "ezlopi_core_devices_list.h"
+#include "ezlopi_core_errors.h"
 
 #include "ezlopi_cloud_items.h"
 #include "ezlopi_cloud_settings.h"
@@ -13,9 +14,9 @@ static cJSON* __broadcast_message_settings_updated_from_devices_v3(l_ezlopi_devi
 
 
 /// Global methods
-int ezlopi_device_value_updated_from_device_broadcast(l_ezlopi_item_t* item)
+ezlopi_error_t ezlopi_device_value_updated_from_device_broadcast(l_ezlopi_item_t* item)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_SUCCESS;
 
     // TRACE_D("%d -> here", xTaskGetTickCount());
 
@@ -39,8 +40,9 @@ int ezlopi_device_value_updated_from_device_broadcast(l_ezlopi_item_t* item)
                     // CJSON_TRACE("----------------- broadcasting - cj_response", cj_response);
                     if (cj_response)
                     {
-                        if (!ezlopi_core_broadcast_add_to_queue(cj_response))
+                        if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(cj_response))
                         {
+                            ret = EZPI_FAILED;
                             cJSON_Delete(__FUNCTION__, cj_response);
                         }
 
@@ -60,9 +62,9 @@ int ezlopi_device_value_updated_from_device_broadcast(l_ezlopi_item_t* item)
     return ret;
 }
 
-int ezlopi_device_value_updated_from_device_broadcast_by_item_id(uint32_t item_id)
+ezlopi_error_t ezlopi_device_value_updated_from_device_broadcast_by_item_id(uint32_t item_id)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_SUCCESS;
 
     l_ezlopi_device_t* curr_device = ezlopi_device_get_head();
     while (curr_device)
@@ -78,8 +80,9 @@ int ezlopi_device_value_updated_from_device_broadcast_by_item_id(uint32_t item_i
                 CJSON_TRACE("----------------- broadcasting - cj_response", cj_response);
 
                 ret = ezlopi_core_broadcast_add_to_queue(cj_response);
-                if (0 == ret)
+                if (EZPI_SUCCESS != ret)
                 {
+                    ret = EZPI_FAILED;
                     cJSON_Delete(__FUNCTION__, cj_response);
                 }
 
@@ -95,9 +98,9 @@ int ezlopi_device_value_updated_from_device_broadcast_by_item_id(uint32_t item_i
     return ret;
 }
 
-int ezlopi_core_device_value_updated_settings_broadcast(l_ezlopi_device_settings_v3_t* setting)
+ezlopi_error_t ezlopi_core_device_value_updated_settings_broadcast(l_ezlopi_device_settings_v3_t* setting)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_SUCCESS;
 
     if (setting)
     {
@@ -113,8 +116,9 @@ int ezlopi_core_device_value_updated_settings_broadcast(l_ezlopi_device_settings
                     CJSON_TRACE("----------------- broadcasting - cj_response", cj_response);
                     ret = ezlopi_core_broadcast_add_to_queue(cj_response);
 
-                    if (0 == ret)
+                    if (EZPI_SUCCESS != ret)
                     {
+                        ret = EZPI_FAILED;
                         cJSON_Delete(__FUNCTION__, cj_response);
                     }
                     break;
@@ -163,9 +167,9 @@ int ezlopi_setting_value_updated_from_device_settings_id_v3(uint32_t setting_id)
 }
 #endif
 
-int ezlopi_core_device_value_update_wifi_scan_broadcast(cJSON* network_array)
+ezlopi_error_t ezlopi_core_device_value_update_wifi_scan_broadcast(cJSON* network_array)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_SUCCESS;
     if (network_array)
     {
         cJSON* cj_response = cJSON_CreateObject(__FUNCTION__);
@@ -182,27 +186,16 @@ int ezlopi_core_device_value_update_wifi_scan_broadcast(cJSON* network_array)
                 cJSON_AddStringToObject(__FUNCTION__, result, "status", "process");
                 cJSON_AddItemToObject(__FUNCTION__, result, "networks", network_array);
             }
-            else
-            {
-                ret = 1;
-            }
 
             CJSON_TRACE("----------------- broadcasting - cj_response", cj_response);
             ret = ezlopi_core_broadcast_add_to_queue(cj_response);
 
-            if (0 == ret)
+            if (EZPI_SUCCESS != ret)
             {
+                ret = EZPI_SUCCESS;
                 cJSON_Delete(__FUNCTION__, cj_response);
             }
         }
-        else
-        {
-            ret = 1;
-        }
-    }
-    else
-    {
-        ret = 1;
     }
     return ret;
 }

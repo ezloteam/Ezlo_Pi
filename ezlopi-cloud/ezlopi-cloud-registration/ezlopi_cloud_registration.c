@@ -95,7 +95,7 @@ static void __reg_loop(void *arg)
         cJSON* cj_register_dup = cJSON_CreateObjectReference(__FUNCTION__, cj_reg_data->child);
         if (cj_register_dup)
         {
-            if (!ezlopi_core_broadcast_add_to_queue(cj_register_dup))
+            if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(cj_register_dup))
             {
                 TRACE_E("Error adding to broadcast queue!");
                 cJSON_Delete(__FUNCTION__, cj_register_dup);

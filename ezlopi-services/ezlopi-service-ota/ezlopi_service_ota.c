@@ -24,7 +24,7 @@
 #include "ezlopi_service_ota.h"
 #include "ezlopi_service_loop.h"
 #include "ezlopi_service_webprov.h"
-#include "ezlopi_core_ezlopi_broadcast.h"
+#include "ezlopi_core_broadcast.h"
 #include "ezlopi_core_processes.h"
 #include "ezlopi_core_errors.h"
 
@@ -57,7 +57,7 @@ static void __ota_loop(void *arg)
             {
                 cJSON* cj_firmware_info_request = firmware_send_firmware_query_to_nma_server(esp_random());
 
-                if (0 == ezlopi_core_broadcast_add_to_queue(cj_firmware_info_request))
+                if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(cj_firmware_info_request))
                 {
                     cJSON_Delete(__FUNCTION__, cj_firmware_info_request);
                 }

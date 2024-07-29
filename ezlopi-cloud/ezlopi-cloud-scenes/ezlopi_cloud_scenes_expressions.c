@@ -7,6 +7,7 @@
 #include "ezlopi_core_broadcast.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_scenes_expressions.h"
+#include "ezlopi_core_errors.h"
 
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_cloud_scenes_expressions.h"
@@ -196,7 +197,7 @@ void scenes_expressions_added_changed(cJSON * cj_request, cJSON * cj_response)
     if (response1)
     {
         scenes_expressions_added(cj_request, response1);
-        if (0 == ezlopi_core_broadcast_add_to_queue(response1))
+        if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(response1))
         {
             cJSON_Delete(__FUNCTION__, response1);
         }

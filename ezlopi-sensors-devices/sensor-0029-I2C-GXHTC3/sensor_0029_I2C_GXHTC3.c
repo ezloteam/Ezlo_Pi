@@ -121,12 +121,12 @@ static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t* item, void* arg)
         {
             if (value_type_temperature == item->cloud_properties.value_type)
             {
-                ezlopi_valueformatter_float_to_cjson(item, cj_result, value_ptr->temperature);
+                ezlopi_valueformatter_float_to_cjson(cj_result, value_ptr->temperature, scales_celsius);
                 ret = EZPI_SUCCESS;
             }
             else if (value_type_humidity == item->cloud_properties.value_type)
             {
-                ezlopi_valueformatter_float_to_cjson(item, cj_result, value_ptr->humidity);
+                ezlopi_valueformatter_float_to_cjson(cj_result, value_ptr->humidity, scales_percent);
                 ret = EZPI_SUCCESS;
             }
         }

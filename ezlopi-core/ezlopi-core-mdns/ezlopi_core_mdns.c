@@ -29,9 +29,9 @@ static l_ezlopi_mdns_context_t* ezlopi_mdns_service_cntx = NULL;
 
 static void __mdns_init(void* pv);
 
-int EZPI_core_init_mdns(void)
+ezlopi_error_t EZPI_core_init_mdns(void)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_SUCCESS;
 
     TaskHandle_t ezlopi_core_mdns_service_task_handle = NULL;
     xTaskCreate(__mdns_init, "mdns_svc", EZLOPI_CORE_MDNS_SERVICE_TASK_DEPTH, NULL, 4, &ezlopi_core_mdns_service_task_handle);

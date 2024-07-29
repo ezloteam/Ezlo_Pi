@@ -134,12 +134,12 @@ static ezlopi_error_t dht22_sensor_get_sensor_value_v3(l_ezlopi_item_t* item, vo
 
         if (ezlopi_item_name_temp == item->cloud_properties.item_name)
         {
-            ezlopi_valueformatter_float_to_cjson(item, cj_properties, dht22_data->temperature);
+            ezlopi_valueformatter_float_to_cjson(cj_properties, dht22_data->temperature, scales_celsius);
             ret = EZPI_SUCCESS;
         }
         else if (ezlopi_item_name_humidity == item->cloud_properties.item_name)
         {
-            ezlopi_valueformatter_float_to_cjson(item, cj_properties, dht22_data->humidity);
+            ezlopi_valueformatter_float_to_cjson(cj_properties, dht22_data->humidity, scales_percent);
             ret = EZPI_SUCCESS;
         }
     }

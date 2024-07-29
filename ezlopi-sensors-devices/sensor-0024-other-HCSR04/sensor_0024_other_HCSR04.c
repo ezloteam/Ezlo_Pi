@@ -85,7 +85,7 @@ static ezlopi_error_t __get_value_cjson(l_ezlopi_item_t* item, void* arg)
         s_ultrasonic_sensor_t* ultrasonic_sensor = (s_ultrasonic_sensor_t*)item->user_arg;
         if (cj_param && ultrasonic_sensor)
         {
-            ezlopi_valueformatter_float_to_cjson(item, cj_param, ultrasonic_sensor->distance);
+            ezlopi_valueformatter_float_to_cjson(cj_param, ultrasonic_sensor->distance, scales_meter);
             ret = EZPI_SUCCESS;
         }
     }

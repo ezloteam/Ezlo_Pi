@@ -274,7 +274,7 @@ static ezlopi_error_t __0048_get_item(l_ezlopi_item_t* item, void* arg)
                 s_mq4_value_t* MQ4_value = ((s_mq4_value_t*)item->user_arg);
                 if (MQ4_value)
                 {
-                    ezlopi_valueformatter_float_to_cjson(item, cj_result, MQ4_value->_CH4_ppm);
+                    ezlopi_valueformatter_float_to_cjson(cj_result, MQ4_value->_CH4_ppm, scales_parts_per_million);
                     ret = EZPI_SUCCESS;
                 }
             }

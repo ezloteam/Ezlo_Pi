@@ -93,7 +93,7 @@ static void __modes_service(void* pv)
                         cJSON* cj_update = ezlopi_core_modes_cjson_changed();
                         CJSON_TRACE("----------------- broadcasting - cj_update", cj_update);
 
-                        if (0 == ezlopi_core_broadcast_add_to_queue(cj_update))
+                        if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(cj_update))
                         {
                             cJSON_Delete(__FUNCTION__, cj_update);
                         }

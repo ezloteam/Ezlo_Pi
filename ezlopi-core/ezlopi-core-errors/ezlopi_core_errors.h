@@ -79,12 +79,13 @@ typedef int32_t ezlopi_error_t;
 #define EZPI_ERR_EVENT_QUEUE_RECV_SEND_ERROR                            0x00002000 // For queue if send or receive fails
 // Core SNTP init sync related errors
 #define EZPI_ERR_SNTP_INIT_FAILED                                       0x00004000 // For SNTP if failed to sync the status
-#define EZPI_ERR_SNTP_LOCATION_SET_FAILED                               0x00000800 // For SNTP if failed to set location
+#define EZPI_ERR_SNTP_LOCATION_SET_FAILED                               0x00008000 // For SNTP if failed to set location
 
-#define EZPI_ERR_HAL_INIT_FAILED                                        0x00001000 // For HAL init failed 
+#define EZPI_ERR_HAL_INIT_FAILED                                        0x00010000 // For HAL init failed 
 
-#define EZPI_ERR_BROADCAST_FAILED                                       0x00002000 // Any error occuring during broadcast throws this error
+#define EZPI_ERR_BROADCAST_FAILED                                       0x00020000 // Any error occuring during broadcast throws this error
 
+#define EZPI_ERR_MODES_FAILED                                           0x00040000 // Any error occcured during modes related operations
 
 #define EZPI_ERR_LOG_ON_ERROR(err, msg) (EZPI_SUCCESS != err ? TRACE_E(msg) : 0)
 

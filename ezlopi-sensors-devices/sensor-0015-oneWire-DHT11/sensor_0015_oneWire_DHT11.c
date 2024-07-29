@@ -254,12 +254,12 @@ static ezlopi_error_t __0015_get_value(l_ezlopi_item_t* item, void* args)
         s_ezlopi_dht11_data_t* dht11_data = (s_ezlopi_dht11_data_t*)item->user_arg;
         if (ezlopi_item_name_temp == item->cloud_properties.item_name)
         {
-            ezlopi_valueformatter_float_to_cjson(item, cj_properties, dht11_data->temperature);
+            ezlopi_valueformatter_float_to_cjson(cj_properties, dht11_data->temperature, scales_celsius);
             ret = EZPI_SUCCESS;
         }
         else if (ezlopi_item_name_humidity == item->cloud_properties.item_name)
         {
-            ezlopi_valueformatter_float_to_cjson(item, cj_properties, dht11_data->humidity);
+            ezlopi_valueformatter_float_to_cjson(cj_properties, dht11_data->humidity, scales_percent);
             ret = EZPI_SUCCESS;
         }
     }

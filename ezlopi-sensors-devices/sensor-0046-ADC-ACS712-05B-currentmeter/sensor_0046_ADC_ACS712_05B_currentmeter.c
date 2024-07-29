@@ -152,7 +152,7 @@ static ezlopi_error_t __0046_get_cjson_value(l_ezlopi_item_t* item, void* arg)
         s_currentmeter_t* user_data = (s_currentmeter_t*)item->user_arg;
         if (user_data)
         {
-            ezlopi_valueformatter_float_to_cjson(item, cj_result, user_data->amp_value);
+            ezlopi_valueformatter_float_to_cjson(cj_result, user_data->amp_value, scales_ampere);
             ret = EZPI_SUCCESS;
         }
     }

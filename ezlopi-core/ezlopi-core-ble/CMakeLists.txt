@@ -9,6 +9,7 @@ set(EZLOPI_COMPONENTS
 set(EZLOPI_CORE_COMPONENTS 
         ezlopi-core-nvs 
         ezlopi-core-ble
+        ezlopi-core-errors
 )
 
 

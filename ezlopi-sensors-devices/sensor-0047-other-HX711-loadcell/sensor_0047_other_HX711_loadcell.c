@@ -207,7 +207,7 @@ static ezlopi_error_t __0047_get_cjson_value(l_ezlopi_item_t* item, void* arg)
             s_hx711_data_t* user_data = (s_hx711_data_t*)item->user_arg;
             if (user_data)
             {
-                ezlopi_valueformatter_float_to_cjson(item, cj_result, user_data->weight);
+                ezlopi_valueformatter_float_to_cjson(cj_result, user_data->weight, scales_kilo_gram);
                 ret = EZPI_SUCCESS;
             }
         }

@@ -435,7 +435,7 @@ l_ezlopi_item_t* ezlopi_device_get_item_by_id(uint32_t item_id)
     return item_to_return;
 }
 
-l_ezlopi_item_t* ezlopi_device_add_item_to_device(l_ezlopi_device_t* device, int (*item_func)(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg))
+l_ezlopi_item_t* ezlopi_device_add_item_to_device(l_ezlopi_device_t* device, ezlopi_error_t (*item_func)(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg))
 {
     l_ezlopi_item_t* new_item = NULL;
     if (device)
@@ -520,7 +520,7 @@ void ezlopi_device_prepare(void)
                     EZPI_CORE_reset_reboot();
                 }
             }
-            else if (ret > 1)
+            else 
             {
                 ezlopi_factory_info_v3_set_ezlopi_config(cj_config);
             }
@@ -730,7 +730,7 @@ static ezlopi_error_t ezlopi_device_parse_json_v3(cJSON* cjson_config)
                             cJSON * cj_device_id = cJSON_GetObjectItem(__FUNCTION__, cjson_device, ezlopi_device_id_str);
                             if (NULL == cj_device_id || NULL == cj_device_id->valuestring)
                             {
-                                ret = 2;
+                                error = EZPI_ERR_JSON_PARSE_FAILED;
                             }
 
                             CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_id_item_str, id_item);
@@ -746,6 +746,7 @@ static ezlopi_error_t ezlopi_device_parse_json_v3(cJSON* cjson_config)
                                     {
                                         s_ezlopi_prep_arg_t device_prep_arg = { .device = &v3_device_list[dev_idx], .cjson_device = cjson_device };
                                         v3_device_list[dev_idx].func(EZLOPI_ACTION_PREPARE, NULL, (void*)&device_prep_arg, NULL);
+                                        error = EZPI_SUCCESS;
                                     }
                                     dev_idx++;
                                 }

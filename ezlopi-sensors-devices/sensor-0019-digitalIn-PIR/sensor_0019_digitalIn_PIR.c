@@ -60,7 +60,7 @@ static ezlopi_error_t sensor_pir_get_value_cjson_v3(l_ezlopi_item_t* item, void*
     if (cj_result)
     {
         item->interface.gpio.gpio_out.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
-        ezlopi_valueformatter_bool_to_cjson(item, cj_result, item->interface.gpio.gpio_out.value);
+        ezlopi_valueformatter_bool_to_cjson(cj_result, item->interface.gpio.gpio_out.value, NULL);
         ret = EZPI_SUCCESS;
     }
 
@@ -95,7 +95,7 @@ static ezlopi_error_t sensor_pir_init_v3(l_ezlopi_item_t* item)
             {
                 TRACE_I("PIR sensor initialize successfully.");
                 item->interface.gpio.gpio_in.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
-                gpio_isr_service_register_v3(item, sensor_pir_value_updated_from_device_v3, 200);
+                ezlopi_service_gpioisr_register_v3(item, sensor_pir_value_updated_from_device_v3, 200);
             }
             else
             {
@@ -108,7 +108,7 @@ static ezlopi_error_t sensor_pir_init_v3(l_ezlopi_item_t* item)
             ret = EZPI_ERR_INIT_DEVICE_FAILED;
         }
     }
-    else 
+    else
     {
         ret = EZPI_ERR_INIT_DEVICE_FAILED;
     }

@@ -72,7 +72,7 @@ static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t* item, void* arg)
             if (ret)
             {
                 float distance = (jsn_sr04t_data.distance_cm / 100.0f);
-                ezlopi_valueformatter_float_to_cjson(item, cj_result, distance);
+                ezlopi_valueformatter_float_to_cjson(cj_result, distance, scales_meter);
                 ret = EZPI_SUCCESS;
             }
             else

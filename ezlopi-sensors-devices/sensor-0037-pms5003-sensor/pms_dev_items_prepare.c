@@ -30,7 +30,7 @@ static int __prepare_particulate_matter_particles_0_dot_3_um_device_and_items(cJ
         particles_0_dot_3_um_device->cloud_properties.parent_device_id = particles_0_dot_3_um_device->cloud_properties.device_id;
         *parent_id = particles_0_dot_3_um_device->cloud_properties.parent_device_id;
 
-        l_ezlopi_item_t *particles_0_dot_3_um_item = ezlopi_device_add_item_to_device(particles_0_dot_3_um_device, sensor_0037_pms5003_v3);
+        l_ezlopi_item_t *particles_0_dot_3_um_item = ezlopi_device_add_item_to_device(particles_0_dot_3_um_device, sensor_pms5003_v3);
         if (particles_0_dot_3_um_item)
         {
             particles_0_dot_3_um_item->cloud_properties.has_getter = true;
@@ -80,7 +80,7 @@ static int __prepare_particulate_matter_particles_0_dot_5_um_device_and_items(cJ
         particles_0_dot_5_um_device->cloud_properties.device_type = dev_type_sensor;
         particles_0_dot_5_um_device->cloud_properties.parent_device_id = parent_id;
 
-        l_ezlopi_item_t *particles_0_dot_5_um_item = ezlopi_device_add_item_to_device(particles_0_dot_5_um_device, sensor_0037_pms5003_v3);
+        l_ezlopi_item_t *particles_0_dot_5_um_item = ezlopi_device_add_item_to_device(particles_0_dot_5_um_device, sensor_pms5003_v3);
         if (particles_0_dot_5_um_item)
         {
             particles_0_dot_5_um_item->cloud_properties.has_getter = true;
@@ -129,7 +129,7 @@ static int __prepare_particulate_matter_particles_1_um_device_and_items(cJSON *c
         particles_1_um_device->cloud_properties.device_type = dev_type_sensor;
         particles_1_um_device->cloud_properties.parent_device_id = parent_id;
 
-        l_ezlopi_item_t *particles_1_um_item = ezlopi_device_add_item_to_device(particles_1_um_device, sensor_0037_pms5003_v3);
+        l_ezlopi_item_t *particles_1_um_item = ezlopi_device_add_item_to_device(particles_1_um_device, sensor_pms5003_v3);
         if (particles_1_um_item)
         {
             particles_1_um_item->cloud_properties.has_getter = true;
@@ -178,7 +178,7 @@ static int __prepare_particulate_matter_particles_2_dot_5_um_device_and_items(cJ
         particles_2_dot_5_um_device->cloud_properties.device_type = dev_type_sensor;
         particles_2_dot_5_um_device->cloud_properties.parent_device_id = parent_id;
 
-        l_ezlopi_item_t *particles_2_dot_5_um_item = ezlopi_device_add_item_to_device(particles_2_dot_5_um_device, sensor_0037_pms5003_v3);
+        l_ezlopi_item_t *particles_2_dot_5_um_item = ezlopi_device_add_item_to_device(particles_2_dot_5_um_device, sensor_pms5003_v3);
         if (particles_2_dot_5_um_item)
         {
             particles_2_dot_5_um_item->cloud_properties.has_getter = true;
@@ -227,7 +227,7 @@ static int __prepare_particulate_matter_particles_5_um_device_and_items(cJSON *c
         particles_5_um_device->cloud_properties.device_type = dev_type_sensor;
         particles_5_um_device->cloud_properties.parent_device_id = parent_id;
 
-        l_ezlopi_item_t *particles_5_um_item = ezlopi_device_add_item_to_device(particles_5_um_device, sensor_0037_pms5003_v3);
+        l_ezlopi_item_t *particles_5_um_item = ezlopi_device_add_item_to_device(particles_5_um_device, sensor_pms5003_v3);
         if (particles_5_um_item)
         {
             particles_5_um_item->cloud_properties.has_getter = true;
@@ -276,7 +276,7 @@ static int __prepare_particulate_matter_particles_10_um_device_and_items(cJSON *
         particles_10_um_device->cloud_properties.device_type = dev_type_sensor;
         particles_10_um_device->cloud_properties.parent_device_id = parent_id;
 
-        l_ezlopi_item_t *particles_10_um_item = ezlopi_device_add_item_to_device(particles_10_um_device, sensor_0037_pms5003_v3);
+        l_ezlopi_item_t *particles_10_um_item = ezlopi_device_add_item_to_device(particles_10_um_device, sensor_pms5003_v3);
         if (particles_10_um_item)
         {
             particles_10_um_item->cloud_properties.has_getter = true;
@@ -325,7 +325,7 @@ static int __prepare_particulate_matter_standard_particles_1_um_device_and_items
         standard_particles_1_um_device->cloud_properties.device_type = dev_type_sensor;
         standard_particles_1_um_device->cloud_properties.parent_device_id = parent_id;
 
-        l_ezlopi_item_t *standard_particles_1_um_item = ezlopi_device_add_item_to_device(standard_particles_1_um_device, sensor_0037_pms5003_v3);
+        l_ezlopi_item_t *standard_particles_1_um_item = ezlopi_device_add_item_to_device(standard_particles_1_um_device, sensor_pms5003_v3);
         if (standard_particles_1_um_item)
         {
             standard_particles_1_um_item->cloud_properties.has_getter = true;
@@ -374,7 +374,7 @@ static int __prepare_particulate_matter_standard_particles_2_dot_5_um_device_and
         standard_particles_2_dot_5_um_device->cloud_properties.device_type = dev_type_sensor;
         standard_particles_2_dot_5_um_device->cloud_properties.parent_device_id = parent_id;
 
-        l_ezlopi_item_t *standard_particles_2_dot_5_um_item = ezlopi_device_add_item_to_device(standard_particles_2_dot_5_um_device, sensor_0037_pms5003_v3);
+        l_ezlopi_item_t *standard_particles_2_dot_5_um_item = ezlopi_device_add_item_to_device(standard_particles_2_dot_5_um_device, sensor_pms5003_v3);
         if (standard_particles_2_dot_5_um_item)
         {
             standard_particles_2_dot_5_um_item->cloud_properties.has_getter = true;
@@ -423,7 +423,7 @@ static int __prepare_particulate_matter_standard_particles_10_um_device_and_item
         standard_particles_10_um_device->cloud_properties.device_type = dev_type_sensor;
         standard_particles_10_um_device->cloud_properties.parent_device_id = parent_id;
 
-        l_ezlopi_item_t *standard_particles_10_um_item = ezlopi_device_add_item_to_device(standard_particles_10_um_device, sensor_0037_pms5003_v3);
+        l_ezlopi_item_t *standard_particles_10_um_item = ezlopi_device_add_item_to_device(standard_particles_10_um_device, sensor_pms5003_v3);
         if (standard_particles_10_um_item)
         {
             standard_particles_10_um_item->cloud_properties.has_getter = true;

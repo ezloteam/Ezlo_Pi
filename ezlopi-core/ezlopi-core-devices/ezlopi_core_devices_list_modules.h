@@ -144,7 +144,7 @@ EZLOPI_DEVICE_LIST("device-PWM-servo-MG996R             ", 36, device_0036_PWM_s
 #endif // DEVICE_0036_PWM_SERVO_MG996R
 
 #if (1 == SENSOR_0037_PMS5003_SENSOR)
-EZLOPI_DEVICE_LIST("sensor-PMS5003                      ", 37, sensor_0037_pms5003_v3)
+EZLOPI_DEVICE_LIST("sensor-PMS5003                      ", 37, sensor_pms5003_v3)
 #endif // SENSOR_0037_PMS5003_SENSOR
 
 #if (1 == DEVICE_0038_OTHER_RGB)

@@ -16,6 +16,7 @@
 
 #include "ezlopi_core_http.h"
 #include "ezlopi_core_event_group.h"
+#include "ezlopi_core_errors.h"
 #include "EZLOPI_USER_CONFIG.h"
 
 
@@ -80,9 +81,9 @@ int ezlopi_core_http_mem_malloc(char** __dest_ptr, const char* src_ptr)
     return ret;
 }
 
-int ezlopi_core_http_dyna_relloc(char** Buf, int reqSize)
+ezlopi_error_t ezlopi_core_http_dyna_relloc(char** Buf, int reqSize)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
     if ((NULL != *Buf) && (reqSize > 0)) // strictly:  (new-size != 0)
     {
         void* NewBuf = ezlopi_realloc(__FUNCTION__, *Buf, reqSize); // reqSize ≤ 1.6 * n
@@ -94,7 +95,7 @@ int ezlopi_core_http_dyna_relloc(char** Buf, int reqSize)
         {
             // TRACE_D("Relocating [%p] to [%p]: NewBuf[%d]", *Buf, NewBuf, reqSize);
             *Buf = NewBuf;
-            ret = 1; // return success
+            ret = EZPI_SUCCESS; // return success
         }
     }
     return ret;
@@ -292,7 +293,7 @@ static void ezlopi_core_http_request_via_mbedTLS(const char* host_web_server, in
                 if (reply_count > 1)
                 {
                     resp_buf_size += (len + 5); // (+2)makes sure ; additional space for '\0'
-                    if (ezlopi_core_http_dyna_relloc(&resp_buf_dummy, resp_buf_size))
+                    if (EZPI_SUCCESS == ezlopi_core_http_dyna_relloc(&resp_buf_dummy, resp_buf_size))
                     {
                         snprintf(resp_buf_dummy + strlen(resp_buf_dummy), len, "%s", tmp_buf);
                     }
