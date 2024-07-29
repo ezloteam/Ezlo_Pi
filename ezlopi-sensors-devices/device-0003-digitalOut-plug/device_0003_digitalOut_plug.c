@@ -2,7 +2,7 @@
 #include "../../build/config/sdkconfig.h"
 #include "ezlopi_util_trace.h"
 
-#include "ezlopi_core_timer.h"
+// // #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
@@ -168,7 +168,8 @@ static ezlopi_error_t __init(l_ezlopi_item_t* item)
                 error = EZPI_ERR_INIT_DEVICE_FAILED;
             }
         }
-        else if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num) &&
+
+        if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num) &&
             (-1 != item->interface.gpio.gpio_in.gpio_num) &&
             (255 != item->interface.gpio.gpio_in.gpio_num))
         {

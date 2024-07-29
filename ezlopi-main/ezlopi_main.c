@@ -18,7 +18,7 @@
 
 #include "ezlopi_service_ble.h"
 #include "ezlopi_service_uart.h"
-#include "ezlopi_service_timer.h"
+#include "ezlopi_service_loop.h"
 #include "ezlopi_service_modes.h"
 #include "ezlopi_service_meshbot.h"
 #include "ezlopi_service_gpioisr.h"
@@ -35,6 +35,14 @@
 
 static void __blinky(void* pv);
 
+static void __print_mac_address(void)
+{
+    uint8_t __base_mac[6] = { 0, 0, 0, 0, 0, 0 };
+
+    esp_read_mac(__base_mac, ESP_MAC_WIFI_STA);
+    dump("base-mac", __base_mac, 0, 6);
+}
+
 void app_main(void)
 {
 
@@ -42,20 +50,22 @@ void app_main(void)
     ezlopi_core_set_log_upcalls();
 #endif  // CONFIG_EZPI_UTIL_TRACE_EN
 
+    __print_mac_address();
+
 #ifdef CONFIG_EZPI_ENABLE_LED_INDICATOR
     ezlopi_service_led_indicator_init();
 #endif // CONFIG_EZPI_ENABLE_LED_INDICATOR
 
     gpio_install_isr_service(0);
-    gpio_isr_service_init();
+
+    ezlopi_service_loop_init();
+    ezlopi_service_gpioisr_init(); // this is time critical, Do not add to loop
 
     ezlopi_init();
 
 #ifdef CONFIG_EZPI_ENABLE_UART_PROVISIONING
     EZPI_SERV_uart_init();
 #endif
-
-    timer_service_init();
 
 #if defined(CONFIG_EZPI_BLE_ENABLE)
     ezlopi_ble_service_init();
@@ -137,7 +147,6 @@ static void __blinky(void* pv)
         ezlopi_util_heap_trace(false);
         ezlopi_util_heap_flush();
 #endif // CONFIG_EZPI_HEAP_ENABLE
-
         vTaskDelay(10000 / portTICK_PERIOD_MS);
     }
 }

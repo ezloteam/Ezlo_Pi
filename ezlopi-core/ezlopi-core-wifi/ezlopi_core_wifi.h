@@ -36,8 +36,10 @@ extern "C"
     ezlopi_error_t ezlopi_wait_for_wifi_to_connect(uint32_t wait_time_ms);
     esp_netif_ip_info_t* ezlopi_wifi_get_ip_infos(void);
     const char* ezlopi_wifi_get_last_disconnect_reason(void);
+    int ezlopi_wifi_try_connect(cJSON *cj_network);
 
     ezlopi_wifi_status_t* ezlopi_wifi_status(void);
+    int get_auth_mode_str(char auth_str[50], wifi_auth_mode_t mode);
 
     void ezlopi_wifi_event_add(f_ezlopi_wifi_event_upcall upcall, void* arg);
 
@@ -45,6 +47,7 @@ extern "C"
 
     void ezlopi_wifi_scan_start();
     void ezlopi_wifi_scan_stop();
+
 
 #ifdef __cplusplus
 }

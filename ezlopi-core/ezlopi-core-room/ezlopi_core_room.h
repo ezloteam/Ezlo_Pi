@@ -29,6 +29,7 @@ typedef struct s_ezlopi_room
 } s_ezlopi_room_t;
 
 s_ezlopi_room_t* ezlopi_room_get_room_head(void);
+char * ezlopi_core_room_get_name_by_id(uint32_t room_id);
 
 ezlopi_error_t ezlopi_room_init(void);
 int ezlopi_room_delete(cJSON* cj_room);

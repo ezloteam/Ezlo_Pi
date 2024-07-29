@@ -5,7 +5,7 @@ idf_component_register(SRCS "sensor_0030_oneWire_DS18B20.c" "ds18b20_onewire.c" 
     INCLUDE_DIRS "."
     REQUIRES    ezlopi-util-trace  
                 driver
-                ezlopi-core-timer 
+                # ezlopi-core-timer 
                 ezlopi-core-cloud 
                 ezlopi-core-actions 
                 ezlopi-core-devices 

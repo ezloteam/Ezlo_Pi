@@ -29,8 +29,8 @@ extern const char *method_cloud_firmware_info_get;
 // extern const  char *method_hub_device_firmware_update ;
 extern const char *method_hub_devices_list;
 extern const  char *method_hub_device_armed_set;
-// extern const  char *method_hub_device_name_set  ;
-// extern const  char *method_hub_device_room_set ;
+// extern const  char *method_hub_device_name_set;
+extern const  char *method_hub_device_room_set;
 // extern const  char *method_hub_device_setting_dictionary_value_set ;
 // extern const  char *method_hub_device_setting_value_set ;
 // extern const  char *method_hub_gateway_setting_value_set ;
@@ -118,6 +118,11 @@ extern const char *method_hub_reboot;
 // extern const  char *method_hub_detection_devices_scans_top;
 extern const char *method_hub_scene_run_progress;
 extern const char *ezlopi_rpc_method_notfound_str;
+
+extern const char *ezlopi_hub_expression_added_str;
+extern const char *ezlopi_hub_expression_changed_str;
+extern const char *ezlopi_hub_expression_deleted_str;
+
 extern const char *ezlopi_hub_scene_changed_str;
 extern const char *ezlopi_hub_scene_added_str;
 extern const char *ezlopi_hub_scene_deleted_str;

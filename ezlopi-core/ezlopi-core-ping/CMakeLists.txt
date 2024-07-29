@@ -1,9 +1,10 @@
 # set(config_src "config.cpp")
 
-file(GLOB_RECURSE config_src "./*.c*")
+file(GLOB_RECURSE config_src "./*.c*" "./ezlopi-ping/*.c*")
 
 set(EZLOPI_COMPONENTS 
         ezlopi-util-trace
+        ezlopi-service-loop
 )
 
 

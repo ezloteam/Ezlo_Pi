@@ -1,7 +1,7 @@
 #include <math.h>
 #include "ezlopi_util_trace.h"
 
-#include "ezlopi_core_timer.h"
+// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
@@ -333,27 +333,27 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
             {
                 if (ezlopi_item_name_magnetic_strength_x_axis == item->cloud_properties.item_name)
                 {
-                    ezlopi_valueformatter_float_to_cjson(item, cj_result, user_data->X);
+                    ezlopi_valueformatter_float_to_cjson(cj_result, user_data->X, item->cloud_properties.scale);
                 }
 
                 if (ezlopi_item_name_magnetic_strength_y_axis == item->cloud_properties.item_name)
                 {
-                    ezlopi_valueformatter_float_to_cjson(item, cj_result, user_data->Y);
+                    ezlopi_valueformatter_float_to_cjson(cj_result, user_data->Y, item->cloud_properties.scale);
                 }
 
                 if (ezlopi_item_name_magnetic_strength_z_axis == item->cloud_properties.item_name)
                 {
-                    ezlopi_valueformatter_float_to_cjson(item, cj_result, user_data->Z);
+                    ezlopi_valueformatter_float_to_cjson(cj_result, user_data->Z, item->cloud_properties.scale);
                 }
 
                 if (ezlopi_item_name_angle_position == item->cloud_properties.item_name)
                 {
-                    ezlopi_valueformatter_int32_to_cjson(item, cj_result, user_data->azimuth);
+                    ezlopi_valueformatter_int32_to_cjson(cj_result, user_data->azimuth, item->cloud_properties.scale);
                 }
 
                 if (ezlopi_item_name_temp == item->cloud_properties.item_name)
                 {
-                    ezlopi_valueformatter_float_to_cjson(item, cj_result, user_data->T);
+                    ezlopi_valueformatter_float_to_cjson(cj_result, user_data->T, item->cloud_properties.scale);
                 }
             }
             else

@@ -1,7 +1,7 @@
 #include <math.h>
 #include "ezlopi_util_trace.h"
 
-#include "ezlopi_core_timer.h"
+// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_devices_list.h"
@@ -238,15 +238,15 @@ static ezlopi_error_t __0028_get_cjson_value(l_ezlopi_item_t* item, void* arg)
 
             if (ezlopi_item_name_acceleration_x_axis == item->cloud_properties.item_name)
             {
-                ezlopi_valueformatter_float_to_cjson(item, cj_result, user_data->x_data);
+                ezlopi_valueformatter_float_to_cjson(cj_result, user_data->x_data, item->cloud_properties.scale);
             }
             else if (ezlopi_item_name_acceleration_y_axis == item->cloud_properties.item_name)
             {
-                ezlopi_valueformatter_float_to_cjson(item, cj_result, user_data->y_data);
+                ezlopi_valueformatter_float_to_cjson(cj_result, user_data->y_data, item->cloud_properties.scale);
             }
             else if (ezlopi_item_name_acceleration_z_axis == item->cloud_properties.item_name)
             {
-                ezlopi_valueformatter_float_to_cjson(item, cj_result, user_data->z_data);
+                ezlopi_valueformatter_float_to_cjson(cj_result, user_data->z_data, item->cloud_properties.scale);
             }
 
             ret = EZPI_SUCCESS;

@@ -2,7 +2,7 @@
 #include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_nvs.h"
-#include "ezlopi_core_timer.h"
+// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
@@ -283,6 +283,9 @@ static void __setup_item_properties(l_ezlopi_item_t* item, cJSON* cjson_device)
     CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_pullup_op_str, tmp_var);
     item->interface.gpio.gpio_out.interrupt = GPIO_INTR_DISABLE;
     item->interface.gpio.gpio_out.pull = tmp_var ? GPIO_PULLUP_ONLY : GPIO_PULLDOWN_ONLY;
+
+    TRACE_D("item->interface.gpio.gpio_in.gpio_num:  %u", item->interface.gpio.gpio_in.gpio_num);
+    TRACE_D("item->interface.gpio.gpio_out.gpio_num: %u", item->interface.gpio.gpio_out.gpio_num);
 }
 
 static ezlopi_error_t __prepare(void* arg)
@@ -416,7 +419,7 @@ static ezlopi_error_t __init(l_ezlopi_item_t* item)
                              : GPIO_INTR_NEGEDGE,
         };
 
-        TRACE_D("enabling interrup for pin: %d", item->interface.gpio.gpio_in.gpio_num);
+            TRACE_D("enabling interrup for pin: %d", item->interface.gpio.gpio_in.gpio_num);
 
         gpio_config(&io_conf);
         gpio_isr_service_register_v3(item, __interrupt_upcall, 1000);
@@ -478,7 +481,7 @@ static ezlopi_error_t __get_value_cjson(l_ezlopi_item_t* item, void* arg)
     return error;
 }
 
-static void __set_gpio_value(l_ezlopi_item_t* item, int value)
+static void __set_gpio_value(l_ezlopi_item_t * item, int value)
 {
     gpio_set_level(item->interface.gpio.gpio_out.gpio_num, value);
     item->interface.gpio.gpio_out.value = value;
@@ -557,7 +560,7 @@ static ezlopi_error_t __set_value(l_ezlopi_item_t* item, void* arg)
     return error;
 }
 
-static void __write_gpio_value(l_ezlopi_item_t* item)
+static void __write_gpio_value(l_ezlopi_item_t * item)
 {
     uint32_t write_value = (0 == item->interface.gpio.gpio_out.invert) ? item->interface.gpio.gpio_out.value : (item->interface.gpio.gpio_out.value ? 0 : 1);
     gpio_set_level(item->interface.gpio.gpio_out.gpio_num, write_value);
@@ -573,7 +576,7 @@ static void __interrupt_upcall(void* arg)
     }
 }
 
-static void __toggle_gpio(l_ezlopi_item_t* item)
+static void __toggle_gpio(l_ezlopi_item_t * item)
 {
     uint32_t write_value = !(item->interface.gpio.gpio_out.value);
     gpio_set_level(item->interface.gpio.gpio_out.gpio_num, write_value);

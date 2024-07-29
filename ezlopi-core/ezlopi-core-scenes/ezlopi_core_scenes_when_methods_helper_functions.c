@@ -7,6 +7,7 @@
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_http.h"
 #include "ezlopi_core_scenes_v2.h"
+#include "ezlopi_core_scenes_edit.h"
 #include "ezlopi_core_scenes_when_methods_helper_functions.h"
 #include "EZLOPI_USER_CONFIG.h"
 
@@ -440,7 +441,7 @@ int isonce_check_flag_result(l_scenes_list_v2_t* scene_node, uint8_t flag_check)
         TRACE_W("here! once and time");
         // now to disable the scene and also store in ezlopi_nvs
         scene_node->enabled = false;
-        ezlopi_scenes_enable_disable_id_from_list_v2(scene_node->_id, false);
+        ezlopi_scenes_enable_disable_scene_by_id_v2(scene_node->_id, false);
         ret = 1;
     }
     return ret;
@@ -623,9 +624,6 @@ uint8_t issunstate_get_suntime(l_scenes_list_v2_t* scene_node, l_fields_v2_t* cu
         if (user_data && (info->tm_mday != user_data->curr_tm_day))
         {
             TRACE_S("curr_day = [%d] ; [%dth]", info->tm_mday, user_data->curr_tm_day);
-
-
-
 
             user_data->sunstate_mode = curr_sunstate_mode;          // this sets target sunstate for curr meshbot
             issunsate_update_sunstate_tm(info->tm_mday, user_data); // assign 'curr_day' & 'suntime' only
@@ -1304,5 +1302,6 @@ int when_function_for_latch(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* w
 
     return ret;
 }
+
 #endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 //-----------------------------------------------------------------------------------------------------

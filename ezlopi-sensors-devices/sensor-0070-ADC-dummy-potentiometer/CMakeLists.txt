@@ -4,7 +4,7 @@ idf_component_register(SRCS "sensor_0070_ADC_dummy_potentiometer.c" "${config_sr
     INCLUDE_DIRS "."
     REQUIRES    ezlopi-util-trace 
     
-                ezlopi-core-timer 
+                # ezlopi-core-timer 
                 ezlopi-core-cloud 
                 ezlopi-core-actions 
                 ezlopi-core-devices 

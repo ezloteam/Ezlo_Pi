@@ -1,7 +1,7 @@
 #include <math.h>
 #include "ezlopi_util_trace.h"
 
-#include "ezlopi_core_timer.h"
+// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
@@ -68,7 +68,7 @@ static ezlopi_error_t gxhtc3_sensor_init(l_ezlopi_item_t* item)
 //         cJSON* cj_result = (cJSON*)arg;
 //         s_gxhtc3_value_t* value_ptr = (s_gxhtc3_value_t*)item->user_arg;
 
-//         ezlopi_valueformatter_float_to_cjson(item, cj_result, value_ptr->temperature);
+//         ezlopi_valueformatter_float_to_cjson(cj_result, value_ptr->temperature, item->cloud_properties.scale);
 //     }
 
 //     return ret;

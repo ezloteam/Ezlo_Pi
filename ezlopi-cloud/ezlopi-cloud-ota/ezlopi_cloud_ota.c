@@ -91,9 +91,10 @@ void firmware_info_get(cJSON* cj_request, cJSON* cj_response)
                 // send "cloud.firmware.info.get"
                 // ezlopi_event_group_set_event(EZLOPI_EVENT_OTA);
             }
-            cJSON_Delete(__FUNCTION__, version);
+            // # warning "since it deletes the cjson pointed by version itself ; thus creating redundant 'CJSON_delete' when exiting this funtion [firmware_info_get]";
+            // cJSON_Delete(__FUNCTION__, version);
         }
-        cJSON_Delete(__FUNCTION__, result);
+        // cJSON_Delete(__FUNCTION__, result);
     }
 }
 

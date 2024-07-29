@@ -6,7 +6,7 @@ set(EZLOPI_COMPONENTS
 set(EZLOPI_CORE_COMPONENTS
         ezlopi-core-actions
         ezlopi-core-devices
-        ezlopi-core-timer
+        # ezlopi-core-timer
         ezlopi-core-valueformatter 
         ezlopi-core-errors
 )

@@ -2,11 +2,11 @@
 #include <math.h>
 #include "ezlopi_util_trace.h"
 
-#include "ezlopi_core_timer.h"
+// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_actions.h"
+#include "ezlopi_core_processes.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
-#include "ezlopi_core_processes.h"
 #include "ezlopi_core_device_value_updated.h"
 #include "ezlopi_core_errors.h"
 
@@ -287,7 +287,7 @@ static ezlopi_error_t __0062_get_item(l_ezlopi_item_t* item, void* arg)
                 s_mq7_value_t* MQ7_value = ((s_mq7_value_t*)item->user_arg);
                 if (MQ7_value)
                 {
-                    ezlopi_valueformatter_float_to_cjson(item, cj_result, MQ7_value->_CO_ppm);
+                    ezlopi_valueformatter_float_to_cjson(cj_result, MQ7_value->_CO_ppm, item->cloud_properties.scale);
                 }
             }
             ret = EZPI_SUCCESS;
@@ -314,7 +314,7 @@ static ezlopi_error_t __0062_get_cjson_value(l_ezlopi_item_t* item, void* arg)
                 s_mq7_value_t* MQ7_value = ((s_mq7_value_t*)item->user_arg);
                 if (MQ7_value)
                 {
-                    ezlopi_valueformatter_float_to_cjson(item, cj_result, MQ7_value->_CO_ppm);
+                    ezlopi_valueformatter_float_to_cjson(cj_result, MQ7_value->_CO_ppm, item->cloud_properties.scale);
                 }
             }
             ret = EZPI_SUCCESS;

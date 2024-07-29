@@ -6,7 +6,7 @@ file(GLOB_RECURSE config_src "*.c")
 idf_component_register(SRCS "sensor_0012_I2C_BME280.c" "${config_src}"
     INCLUDE_DIRS "."
     REQUIRES    ezlopi-util-trace 
-                ezlopi-core-timer 
+                # ezlopi-core-timer 
                 ezlopi-core-cloud 
                 ezlopi-core-actions 
                 ezlopi-core-devices 

@@ -8,7 +8,7 @@ idf_component_register(SRCS "device_0001_digitalOut_generic.c" "${config_src}"
     REQUIRES 
                 ezlopi-util-trace 
                 ezlopi-core-nvs
-                ezlopi-core-timer 
+                # # ezlopi-core-timer 
                 ezlopi-core-cloud 
                 ezlopi-core-actions
                 ezlopi-core-devices 

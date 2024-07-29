@@ -35,7 +35,7 @@ set(EZLOPI_CLOUD_COMPONENTS
         ezlopi-cloud-status
 )
 
-idf_component_register(SRCS "ezlopi_core_ezlopi_broadcast.c" "ezlopi_core_ezlopi.c" "${config_src}"
+idf_component_register(SRCS "ezlopi_core_broadcast.c" "ezlopi_core_ezlopi.c" "${config_src}"
     INCLUDE_DIRS "."
     REQUIRES    freertos
                 ${EZLOPI_CORE_COMPONENTS}

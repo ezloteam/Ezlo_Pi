@@ -10,32 +10,33 @@
 
 #include "ezlopi_util_trace.h"
 #include "ezlopi_core_buffer.h"
-#include "ezlopi_core_ezlopi_broadcast.h"
-#include "ezlopi_core_errors.h"
+#include "ezlopi_core_broadcast.h"
+
 #include "EZLOPI_USER_CONFIG.h"
 
 // static uint32_t __message_count = 0;
 static l_broadcast_method_t* __method_head = NULL;
 static int (*__broadcast_queue_func)(cJSON* cj_data) = NULL;
 
-static ezlopi_error_t __call_broadcast_methods(char* data);
+static int __call_broadcast_methods(char* data);
 static l_broadcast_method_t* __method_create(f_broadcast_method_t method, char* name, uint32_t retries);
 
-void ezlopi_core_ezlopi_broadcast_methods_set_queue(ezlopi_error_t (*func)(cJSON*))
+void ezlopi_core_broadcast_methods_set_queue(int (*func)(cJSON*))
 {
     __broadcast_queue_func = func;
 }
 
-ezlopi_error_t ezlopi_core_ezlopi_broadcast_add_to_queue(cJSON* cj_data)
+int ezlopi_core_broadcast_add_to_queue(cJSON* cj_data)
 {
-    ezlopi_error_t ret = EZPI_ERR_BROADCAST_FAILED;
+    int ret = 0;
     if (cj_data && __broadcast_queue_func)
     {
+        // TRACE_S("cj_data: %p, __broadcast_queue_func: %p", cj_data, __broadcast_queue_func);
         ret = __broadcast_queue_func(cj_data);
     }
     else
     {
-        TRACE_E("cj_data: %p, __broadcast_queue_func: %p", cj_data, __broadcast_queue_func);
+        // TRACE_E("cj_data: %p, __broadcast_queue_func: %p", cj_data, __broadcast_queue_func);
     }
     return ret;
 }
@@ -66,28 +67,39 @@ int ezlopi_core_broadcast_log_cjson(cJSON* cj_log_data)
 }
 #endif 
 
-ezlopi_error_t ezlopi_core_ezlopi_broadcast_cjson(cJSON* cj_data)
+int ezlopi_core_broadcast_cjson(cJSON* cj_data)
 {
-    ezlopi_error_t ret = EZPI_ERR_BROADCAST_FAILED;
+    int ret = 0;
 
     if (cj_data)
     {
+        // char * tmp = cJSON_PrintUnformatted(__FUNCTION__, cj_data);
+        // if (tmp)
+        // {
+        //     printf("\n ### %s[%d] ; cj_data : ### \n ### \n %s \n ### \n\n", __FILE__, __LINE__, tmp);
+        //     free(tmp);
+        // }
+
         uint32_t buffer_len = 0;
+
+        TRACE_I("%d -> -----------------------------> waiting for static buffer!", xTaskGetTickCount());
         char* data_buffer = ezlopi_core_buffer_acquire(&buffer_len, 5000);
 
         if (data_buffer && buffer_len)
         {
-            TRACE_I("-----------------------------> buffer acquired!");
+            TRACE_I("%d -> -----------------------------> buffer acquired!", xTaskGetTickCount());
             memset(data_buffer, 0, buffer_len);
+
+            TRACE_D("buffer_len = [%d]", buffer_len);
 
             if (true == cJSON_PrintPreallocated(__FUNCTION__, cj_data, data_buffer, buffer_len, false))
             {
-                TRACE_D("----------------- broadcasting: %s", data_buffer);
+                TRACE_D("----------------- broadcasting: \r\n%s", data_buffer);
                 ret = __call_broadcast_methods(data_buffer);
             }
 
             ezlopi_core_buffer_release();
-            TRACE_I("-----------------------------> buffer released!");
+            TRACE_I("%d -> -----------------------------> buffer released!", xTaskGetTickCount());
         }
         else
         {
@@ -98,7 +110,7 @@ ezlopi_error_t ezlopi_core_ezlopi_broadcast_cjson(cJSON* cj_data)
     return ret;
 }
 
-l_broadcast_method_t* ezlopi_core_ezlopi_broadcast_method_add(f_broadcast_method_t broadcast_method, char* method_name, uint32_t retries)
+l_broadcast_method_t* ezlopi_core_broadcast_method_add(f_broadcast_method_t broadcast_method, char* method_name, uint32_t retries)
 {
     int duplicate_method = 0;
     l_broadcast_method_t* ret = NULL;
@@ -139,7 +151,7 @@ l_broadcast_method_t* ezlopi_core_ezlopi_broadcast_method_add(f_broadcast_method
     return ret;
 }
 
-void ezlopi_core_ezlopi_broadcast_remove_method(f_broadcast_method_t broadcast_method)
+void ezlopi_core_broadcast_remove_method(f_broadcast_method_t broadcast_method)
 {
     if (__method_head)
     {
@@ -169,23 +181,24 @@ void ezlopi_core_ezlopi_broadcast_remove_method(f_broadcast_method_t broadcast_m
     }
 }
 
-static ezlopi_error_t __call_broadcast_methods(char* data)
+static int __call_broadcast_methods(char* data)
 {
-    ezlopi_error_t ret = EZPI_ERR_BROADCAST_FAILED;
+    int ret = 0;
     l_broadcast_method_t* curr_method = __method_head;
 
     while (curr_method)
     {
         if (curr_method->func)
         {
-            ret = EZPI_SUCCESS;
+            ret = 1;
             uint32_t retries = curr_method->fail_retry;
 
             do
             {
-                if (curr_method->func(data))
+                int mret = curr_method->func(data);
+                if (mret)
                 {
-                    // TRACE_S("broadcasted - method:'%s'\r\ndata: %s", curr_method->method_name ? curr_method->method_name : "", data);
+                    TRACE_S("broadcasted - method:'%s'\r\ndata: %s", curr_method->method_name ? curr_method->method_name : "", data);
                     break;
                 }
 

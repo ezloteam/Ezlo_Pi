@@ -8,7 +8,7 @@ idf_component_register(SRCS "device_0009_other_RMT_SK6812.c"
 
                         ezlopi-util-trace 
 
-                        ezlopi-core-timer 
+                        # ezlopi-core-timer 
                         ezlopi-core-cloud 
                         ezlopi-core-actions 
                         ezlopi-core-devices 

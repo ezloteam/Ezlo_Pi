@@ -2,7 +2,7 @@
 #include <math.h>
 #include "ezlopi_util_trace.h"
 
-#include "ezlopi_core_timer.h"
+// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
@@ -353,15 +353,15 @@ static ezlopi_error_t __get_value_cjson(l_ezlopi_item_t* item, void* arg)
         s_joystick_data_t* user_data = (s_joystick_data_t*)item->user_arg;
         if (user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_X] == item->cloud_properties.item_id)
         {
-            ezlopi_valueformatter_uint32_to_cjson(item, cj_result, user_data->adc_x);
+            ezlopi_valueformatter_uint32_to_cjson(cj_result, user_data->adc_x, item->cloud_properties.scale);
         }
         else if (user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_Y] == item->cloud_properties.item_id)
         {
-            ezlopi_valueformatter_uint32_to_cjson(item, cj_result, user_data->adc_y);
+            ezlopi_valueformatter_uint32_to_cjson(cj_result, user_data->adc_y, item->cloud_properties.scale);
         }
         else if (user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_SWITCH] == item->cloud_properties.item_id)
         {
-            ezlopi_valueformatter_bool_to_cjson(item, cj_result, (0 == item->interface.gpio.gpio_in.value) ? true : false);
+            ezlopi_valueformatter_bool_to_cjson(cj_result, (0 == item->interface.gpio.gpio_in.value) ? true : false, item->cloud_properties.scale);
         }
         ret = EZPI_SUCCESS;
     }

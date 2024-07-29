@@ -5,7 +5,7 @@ idf_component_register(SRCS "hilink_presence_sensor_setting.c" "sensor_0067_hili
                     INCLUDE_DIRS .
                     REQUIRES    ezlopi-util-trace 
                                 ld2410
-                                ezlopi-core-timer 
+                                # ezlopi-core-timer 
                                 ezlopi-core-cloud 
                                 ezlopi-core-actions  
                                 ezlopi-core-devices 

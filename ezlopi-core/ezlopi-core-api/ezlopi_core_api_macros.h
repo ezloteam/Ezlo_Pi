@@ -7,6 +7,7 @@ CLOUD_METHOD("hub.item.value.set", items_set_value_v3, NULL)
 CLOUD_METHOD("hub.devices.list", devices_list_v3, NULL)
 CLOUD_METHOD("hub.device.name.set", device_name_set, device_updated)
 CLOUD_METHOD("hub.device.armed.set", device_armed_set, device_updated)
+CLOUD_METHOD("hub.device.room.set", device_room_set, device_updated)
 
 #ifdef CONFIG_EZPI_UTIL_TRACE_EN
 CLOUD_METHOD("hub.log.set", ezlopi_hub_cloud_log_set, NULL)
@@ -49,6 +50,7 @@ CLOUD_METHOD("hub.info.get", info_get, NULL)
 CLOUD_METHOD("hub.network.get", network_get, NULL)
 CLOUD_METHOD("hub.network.wifi.scan.start", network_wifi_scan_start, NULL)
 CLOUD_METHOD("hub.network.wifi.scan.stop", network_wifi_scan_stop, NULL)
+CLOUD_METHOD("hub.network.wifi.try_connect", network_wifi_try_connect, NULL)
 
 #if defined(CONFIG_EZPI_ENABLE_OTA)
 CLOUD_METHOD("cloud.firmware.info.get", firmware_info_get, NULL)
@@ -79,7 +81,12 @@ CLOUD_METHOD("hub.scenes.enabled.set", scenes_enable_set, scene_changed)
 CLOUD_METHOD("hub.scenes.notification.add", scenes_notification_add, scene_changed)
 CLOUD_METHOD("hub.scenes.notification.remove", scenes_notification_remove, scene_changed)
 CLOUD_METHOD("hub.scenes.status.get", scenes_status_get, NULL) // Incomplete
+CLOUD_METHOD("hub.scenes.house_modes.set", scenes_house_modes_set, NULL)
+CLOUD_METHOD("hub.scenes.action.block.test", scenes_action_block_test, NULL)
+CLOUD_METHOD("hub.scenes.block.enabled.set", scenes_block_enabled_set, scene_added)
 CLOUD_METHOD("hub.scenes.block.status.reset", scenes_block_status_reset, NULL)
+CLOUD_METHOD("hub.scenes.stop", scenes_stop, NULL)
+
 #endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 CLOUD_METHOD("hub.room.list", room_list, NULL)
@@ -97,10 +104,11 @@ CLOUD_METHOD("hub.scenes.scripts.get", scenes_scripts_get, NULL)
 CLOUD_METHOD("hub.scenes.scripts.delete", scenes_scripts_delete, NULL)
 CLOUD_METHOD("hub.scenes.scripts.set", scenes_scripts_set, NULL)
 CLOUD_METHOD("hub.scenes.scripts.run", scenes_scripts_run, NULL)
-
-CLOUD_METHOD("hub.scenes.expressions.set", scenes_expressions_set, NULL)
+CLOUD_METHOD("hub.scenes.expressions.set", scenes_expressions_set, scenes_expressions_added_changed)
 CLOUD_METHOD("hub.scenes.expressions.list", scenes_expressions_list, NULL)
-CLOUD_METHOD("hub.scenes.expressions.delete", scenes_expressions_delete, NULL)
+CLOUD_METHOD("hub.scenes.expressions.delete", scenes_expressions_delete, scenes_expressions_deleted)
+
+
 #endif //CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 CLOUD_METHOD("hub.nma.register.repeat", register_repeat, NULL)

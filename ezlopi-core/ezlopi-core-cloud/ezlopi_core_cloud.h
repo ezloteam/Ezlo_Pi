@@ -14,7 +14,7 @@ typedef struct s_ezlopi_cloud_controller
     bool battery_powered;      // 'batteryPowered' -> https://api.ezlo.com/hub/devices_api/index.html
     bool reachable;            // 'reachable' -> https://api.ezlo.com/hub/devices_api/index.html
     bool armed;                // 'armed' -> https://api.ezlo.com/hub/devices_api/index.html
-    char room_id[40];          // 'roomId' -> https://api.ezlo.com/hub/devices_api/index.html
+    // char room_id[40];          // 'roomId' -> https://api.ezlo.com/hub/devices_api/index.html
     bool persistent;           // 'persistent' -> https://api.ezlo.com/hub/devices_api/index.html
     bool service_notification; // 'serviceNotification' -> https://api.ezlo.com/hub/devices_api/index.html
     const char* security;      // 'security' -> https://api.ezlo.com/hub/devices_api/index.html, ezlopi-cloud/ezlopi_cloud_constants/ezlopi_cloud_security_str.h
@@ -46,6 +46,7 @@ typedef struct s_ezlopi_cloud_device
 {
     uint32_t device_id; // '_id' -> https://api.ezlo.com/hub/devices_api/index.html
     uint32_t parent_device_id;
+    uint32_t room_id;          // 'roomId' -> https://api.ezlo.com/hub/devices_api/index.html
     char device_name[64];    // 'name' -> https://api.ezlo.com/hub/devices_api/index.html
     char* device_type_id;    // deviceTypeId -> https://log.ezlo.com/new/hub/devices_api/
     const char* category;    // 'category' -> https://api.ezlo.com/hub/devices_api/index.html, ezlopi-cloud/constants/category_str.h
@@ -86,6 +87,9 @@ extern const uint32_t SETTINGS_ID_START;
 extern const uint32_t SCENE_ID_START;
 extern const uint32_t SCRIPT_ID_START;
 extern const uint32_t EXPRESSION_ID_START;
+extern const uint32_t MODES_ID_START;
+extern const uint32_t SCENE_GROUP_ID_START;
+extern const uint32_t SCENE_WHEN_BLOCKID_START;
 
 uint32_t ezlopi_cloud_generate_device_id(void);
 void ezlopi_cloud_update_device_id(uint32_t device_id);
@@ -101,6 +105,9 @@ uint32_t ezlopi_cloud_generate_settings_id(void);
 
 uint32_t ezlopi_cloud_generate_scene_id(void);
 void ezlopi_cloud_update_scene_id(uint32_t a_scene_id);
+
+uint32_t ezlopi_cloud_generate_scene_when_blockId(void);
+void ezlopi_cloud_update_when_blockId(uint32_t a_when_blockId);
 
 uint32_t ezlopi_cloud_generate_script_id(void);
 void ezlopi_cloud_update_script_id(uint32_t a_script_id);

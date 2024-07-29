@@ -196,7 +196,7 @@ int ezlopi_core_modes_add_alarm_off(uint8_t mode_id, cJSON*  device_id)
             bool add_to_array = true;
             cJSON_ArrayForEach(element_to_check, targe_house_mode->cj_alarms_off_devices)
             {
-                if (0 == strncmp(device_id->valuestring, element_to_check->valuestring, 32))
+                if (EZPI_STRNCMP_IF_EQUAL(device_id->valuestring, element_to_check->valuestring, strlen(device_id->valuestring), strlen(element_to_check->valuestring)))
                 {
                     add_to_array = false;
                 }
@@ -234,7 +234,7 @@ int ezlopi_core_modes_remove_alarm_off(uint32_t mode_id, cJSON* device_id)
             int array_index = 0;
             cJSON_ArrayForEach(element_to_check, targe_house_mode->cj_alarms_off_devices)
             {
-                if (0 == strncmp(device_id->valuestring, element_to_check->valuestring, 32))
+                if (EZPI_STRNCMP_IF_EQUAL(device_id->valuestring, element_to_check->valuestring, strlen(device_id->valuestring), strlen(element_to_check->valuestring)))
                 {
                     cJSON_DeleteItemFromArray(__func__, targe_house_mode->cj_alarms_off_devices, array_index);
                     break;

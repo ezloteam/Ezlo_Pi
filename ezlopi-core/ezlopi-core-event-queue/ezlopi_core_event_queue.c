@@ -1,3 +1,4 @@
+#if 0
 #include "ezlopi_core_event_queue.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/queue.h"
@@ -73,4 +74,4 @@ ezlopi_error_t ezlopi_event_queue_receive(s_ezlo_event_t **event_data, int time_
     }
     return error;
 }
-
+#endif

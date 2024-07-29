@@ -29,7 +29,7 @@ typedef struct s_event_arg
 static void gpio_isr_process_v3(void* pv);
 static void IRAM_ATTR __gpio_isr_handler(void* arg);
 
-void gpio_isr_service_init(void)
+void ezlopi_service_gpioisr_init(void)
 {
     TRACE_S("Started gpio-isr service");
     gpio_evt_queue = xQueueCreate(20, sizeof(s_event_arg_t*));
@@ -39,7 +39,7 @@ void gpio_isr_service_init(void)
     // xTaskCreate(gpio_isr_process, "digital-io-isr-service", EZLOPI_SERVICE_GPIO_ISR_TASK_DEPTH, NULL, 3, &ezlopi_service_gpio_isr_task_handle);
 }
 
-void gpio_isr_service_register_v3(l_ezlopi_item_t* item, f_interrupt_upcall_t __upcall, TickType_t debounce_ms)
+void ezlopi_service_gpioisr_register_v3(l_ezlopi_item_t* item, f_interrupt_upcall_t __upcall, TickType_t debounce_ms)
 {
     s_event_arg_t* event_arg = ezlopi_malloc(__FUNCTION__, sizeof(s_event_arg_t));
 
@@ -61,6 +61,10 @@ void gpio_isr_service_register_v3(l_ezlopi_item_t* item, f_interrupt_upcall_t __
         {
             TRACE_S("Successfully added GPIO ISR handler for pin: %d.", item->interface.gpio.gpio_in.gpio_num);
         }
+    }
+    else
+    {
+        TRACE_E("Malloc failed!");
     }
 }
 

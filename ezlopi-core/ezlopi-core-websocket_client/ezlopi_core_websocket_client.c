@@ -45,7 +45,7 @@ int ezlopi_websocket_client_send(char* data, uint32_t len)
     {
         if (esp_websocket_client_is_connected(client) && (len > 0) && (NULL != data))
         {
-            ret = esp_websocket_client_send_text(client, data, len, 1000 / portTICK_RATE_MS);
+            ret = esp_websocket_client_send_text(client, data, len, 10000 / portTICK_RATE_MS);
             ret = (ret > 0) ? 1 : 0;
         }
     }
@@ -125,9 +125,8 @@ static void websocket_event_handler(void* handler_args, esp_event_base_t base, i
     }
     case WEBSOCKET_EVENT_DISCONNECTED:
     {
-        TRACE_S("esp_get_free_heap_size - %.02f kB", esp_get_free_heap_size() / 1024.0);
-        TRACE_E("free-heap: %d", esp_get_free_heap_size());
-        TRACE_S("WEBSOCKET_EVENT_DISCONNECTED");
+        TRACE_W("free-heap: %.02f KB", esp_get_free_heap_size() / 1024.0);
+        TRACE_E("WEBSOCKET_EVENT_DISCONNECTED");
         if (event_arg && event_arg->connection_upcall)
         {
             event_arg->connection_upcall(false);

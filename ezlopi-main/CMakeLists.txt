@@ -43,11 +43,11 @@ set(EZLOPI_SERVICES
         ezlopi-service-ble
         ezlopi-service-ota
         ezlopi-service-uart
+        ezlopi-service-loop
         ezlopi-service-modes
-        ezlopi-service-timer
         ezlopi-service-webprov
         ezlopi-service-gpioisr
-        ezlopi-service-meshbot 
+        ezlopi-service-meshbot
         ezlopi-service-ws-server
         ezlopi-service-broadcast
         ezlopi-service-led-indicator

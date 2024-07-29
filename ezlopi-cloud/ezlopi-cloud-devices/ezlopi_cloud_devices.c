@@ -33,6 +33,7 @@ void devices_list_v3(cJSON* cj_request, cJSON* cj_response)
                         cJSON_Delete(__FUNCTION__, cj_properties);
                     }
                 }
+
                 curr_device = curr_device->next;
             }
         }
@@ -94,6 +95,27 @@ void device_armed_set(cJSON* cj_request, cJSON* cj_response)
     return;
 }
 
+void device_room_set(cJSON *cj_request, cJSON *cj_response)
+{
+    cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+    if (cj_result)
+    {
+        cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
+        if (cj_params)
+        {
+            cJSON* cj_device_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi__id_str);
+            cJSON* cj_room_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_roomId_str);
+
+            if (cj_device_id && cj_room_id)
+            {
+                uint32_t device_id = strtoul(cj_device_id->valuestring, NULL, 16);
+                ezlopi_device_set_device_room_id(device_id, cJSON_Duplicate(__FUNCTION__, cj_room_id, true));
+            }
+        }
+    }
+}
+
+
 void device_updated(cJSON* cj_request, cJSON* cj_response)
 {
     if (cj_request)
@@ -122,6 +144,16 @@ void device_updated(cJSON* cj_request, cJSON* cj_response)
                             cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_name_str, device_node->cloud_properties.device_name);
                             cJSON_AddTrueToObject(__FUNCTION__, cj_result, ezlopi_syncNotification_str);
 
+                            if (device_node->cloud_properties.room_id)
+                            {
+                                snprintf(tmp_str, sizeof(tmp_str), "%08x", device_node->cloud_properties.room_id);
+                                cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_roomId_str, tmp_str);
+                            }
+                            else
+                            {
+                                cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_roomId_str, "");
+                            }
+
                             s_ezlopi_cloud_controller_t* controller_info = ezlopi_device_get_controller_information();
 
                             if (controller_info)
@@ -141,9 +173,10 @@ void device_updated(cJSON* cj_request, cJSON* cj_response)
                                 {
                                     cJSON_AddItemToArray(cj_device_changable, cJSON_CreateString(__FUNCTION__, ezlopi_name_str));
                                     cJSON_AddItemToArray(cj_device_changable, cJSON_CreateString(__FUNCTION__, ezlopi_armed_str));
+                                    cJSON_AddItemToArray(cj_device_changable, cJSON_CreateString(__FUNCTION__, ezlopi_roomId_str));
                                 }
                             }
-                            TRACE_E("%s", cJSON_Print(__FUNCTION__, cj_response));
+
                             break;
                         }
 

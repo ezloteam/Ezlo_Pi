@@ -5,7 +5,7 @@ idf_component_register(SRCS "sensor_0024_other_HCSR04.c" "${config_src}"
     INCLUDE_DIRS "."
     REQUIRES    ezlopi-util-trace 
                 driver
-                ezlopi-core-timer 
+                # ezlopi-core-timer 
                 ezlopi-core-cloud 
                 ezlopi-core-actions 
                 ezlopi-core-devices 

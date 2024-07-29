@@ -1,7 +1,7 @@
 #include "../../build/config/sdkconfig.h"
 #include "ezlopi_util_trace.h"
 
-#include "ezlopi_core_timer.h"
+// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
@@ -165,7 +165,8 @@ static ezlopi_error_t __init(l_ezlopi_item_t* item)
                 error = EZPI_ERR_INIT_DEVICE_FAILED;
             }
         }
-        else if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num) &&
+
+        if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num) &&
             (-1 != item->interface.gpio.gpio_in.gpio_num) &&
             (255 != item->interface.gpio.gpio_in.gpio_num))
         {
@@ -198,6 +199,10 @@ static ezlopi_error_t __init(l_ezlopi_item_t* item)
         {
             error = EZPI_ERR_INIT_DEVICE_FAILED;
         }
+    }
+    else
+    {
+        TRACE_E("Error argument!");
     }
 
     return error;
@@ -233,8 +238,6 @@ static ezlopi_error_t __set_value(l_ezlopi_item_t* item, void* arg)
 
         if (NULL != cjson_params)
         {
-            CJSON_TRACE("cjson_params", cjson_params);
-
             int value = 0;
             cJSON* cj_value = cJSON_GetObjectItem(__FUNCTION__, cjson_params, ezlopi_value_str);
             if (cj_value)
@@ -312,6 +315,7 @@ static void __interrupt_upcall(void* arg)
     l_ezlopi_item_t* item = (l_ezlopi_item_t*)arg;
     if (item)
     {
+        TRACE_D("%d -> Got interrupt!", xTaskGetTickCount());
         __toggle_gpio(item);
         ezlopi_device_value_updated_from_device_broadcast(item);
     }

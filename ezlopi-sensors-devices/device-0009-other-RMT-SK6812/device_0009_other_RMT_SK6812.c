@@ -3,7 +3,7 @@
 #include "driver/gpio.h"
 #include "ezlopi_util_trace.h"
 
-#include "ezlopi_core_timer.h"
+// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
@@ -108,12 +108,12 @@ static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t* item, void* arg)
             else if (ezlopi_item_name_dimmer == item->cloud_properties.item_name)
             {
                 item->interface.pwm.duty_cycle = (int)ceil(((sk6812_strip->brightness * 100.0) / 255.0));
-                ezlopi_valueformatter_uint32_to_cjson(item, cj_properties, item->interface.pwm.duty_cycle);
+                ezlopi_valueformatter_uint32_to_cjson(cj_properties, item->interface.pwm.duty_cycle, item->cloud_properties.scale);
             }
             else if (ezlopi_item_name_switch == item->cloud_properties.item_name)
             {
                 item->interface.gpio.gpio_in.value = (0 == sk6812_strip->brightness) ? 0 : 1;
-                ezlopi_valueformatter_bool_to_cjson(item, cj_properties, item->interface.gpio.gpio_out.value);
+                ezlopi_valueformatter_bool_to_cjson(cj_properties, item->interface.gpio.gpio_out.value, item->cloud_properties.scale);
             }
             ret = EZPI_SUCCESS;
         }

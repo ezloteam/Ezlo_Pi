@@ -1,7 +1,7 @@
 #include <math.h>
 #include "ezlopi_util_trace.h"
 
-#include "ezlopi_core_timer.h"
+// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
@@ -278,7 +278,7 @@ static ezlopi_error_t __0049_get_item(l_ezlopi_item_t* item, void* arg)
                 s_mq2_value_t* MQ2_value = ((s_mq2_value_t*)item->user_arg);
                 if (MQ2_value)
                 {
-                    ezlopi_valueformatter_float_to_cjson(item, cj_result, MQ2_value->_LPG_ppm);
+                    ezlopi_valueformatter_float_to_cjson(cj_result, MQ2_value->_LPG_ppm, item->cloud_properties.scale);
                 }
             }
             ret = EZPI_SUCCESS;
@@ -305,7 +305,7 @@ static ezlopi_error_t __0049_get_cjson_value(l_ezlopi_item_t* item, void* arg)
                 s_mq2_value_t* MQ2_value = ((s_mq2_value_t*)item->user_arg);
                 if (MQ2_value)
                 {
-                    ezlopi_valueformatter_float_to_cjson(item, cj_result, MQ2_value->_LPG_ppm);
+                    ezlopi_valueformatter_float_to_cjson(cj_result, MQ2_value->_LPG_ppm, item->cloud_properties.scale);
                 }
             }
             ret = EZPI_SUCCESS;

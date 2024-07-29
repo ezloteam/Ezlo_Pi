@@ -1,6 +1,6 @@
 #include "ezlopi_util_trace.h"
 
-#include "ezlopi_core_timer.h"
+// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
@@ -89,7 +89,7 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_dev
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
-    CJSON_GET_VALUE_GPIO(cj_device, ezlopi_dev_name_str, item->interface.gpio.gpio_in.gpio_num);
+    CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_str, item->interface.gpio.gpio_in.gpio_num);
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_logic_inv_str, item->interface.gpio.gpio_in.invert);
 
     item->interface.gpio.gpio_in.enable = true;
