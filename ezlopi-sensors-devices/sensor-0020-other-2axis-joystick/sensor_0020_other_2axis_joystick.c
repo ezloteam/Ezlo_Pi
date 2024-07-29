@@ -276,7 +276,7 @@ static ezlopi_error_t __init(l_ezlopi_item_t* item)
                 if (GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
                 {
                     TRACE_I("adc GPIO_NUM is %d", item->interface.adc.gpio_num);
-                    if (0 == ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
+                    if (EZPI_SUCCESS == ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
                     {
                         ret = EZPI_SUCCESS;
                     }

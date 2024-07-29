@@ -392,7 +392,7 @@ int ezlopi_scenes_expressions_delete_node(s_ezlopi_expressions_t* exp_node)
 
 ezlopi_error_t ezlopi_scenes_expressions_init(void)
 {
-    ezlopi_error_t error = EZPI_ERR_SCENES_EXPRESSION_JSON_PARSE_ERROR;
+    ezlopi_error_t error = EZPI_ERR_JSON_PARSE_FAILED;
     char* exp_id_list_str = ezlopi_nvs_read_scenes_expressions();
     if (exp_id_list_str)
     {

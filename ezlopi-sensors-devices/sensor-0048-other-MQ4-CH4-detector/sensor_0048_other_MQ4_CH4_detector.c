@@ -167,7 +167,7 @@ static ezlopi_error_t __0048_init(l_ezlopi_item_t* item)
             {
                 if (GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
                 { // initialize analog_pin
-                    if (0 == ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
+                    if (EZPI_SUCCESS == ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
                     { // calibrate if not done
                         if (false == MQ4_value->Calibration_complete_CH4)
                         {

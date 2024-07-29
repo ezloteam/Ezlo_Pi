@@ -424,7 +424,7 @@ f_scene_method_v2_t ezlopi_scene_get_method_v2(e_scene_method_type_t scene_metho
  */
 ezlopi_error_t ezlopi_scenes_init_v2(void)
 {
-    ezlopi_error_t error = EZPI_ERR_SCENES_JSON_PARSE_ERROR;
+    ezlopi_error_t error = EZPI_ERR_JSON_PARSE_FAILED;
     char* scenes_id_list_str = ezlopi_nvs_scene_get_v2();
 
     if (scenes_id_list_str)

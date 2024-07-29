@@ -658,20 +658,20 @@ static ezlopi_error_t ezlopi_device_parse_json_v3(cJSON* cjson_config)
 #if (defined(CONFIG_IDF_TARGET_ESP32) || defined(CONFIG_IDF_TARGET_ESP32S3) || defined(CONFIG_IDF_TARGET_ESP32C3))
                 else
                 {
-                    error = EZPI_ERR_PREP_DEVICE_CONFIG_PARSE_FAILED;
+                    error = EZPI_ERR_JSON_PARSE_FAILED;
                     TRACE_E("Device configuration and chipset mismatch ! Device and Item assignment aborted !");
                 }
 #endif // CONFIG_IDF_TARGET_ESP32 OR CONFIG_IDF_TARGET_ESP32S3 OR CONFIG_IDF_TARGET_ESP32C3
             }
             else
             {
-                error = EZPI_ERR_PREP_DEVICE_CONFIG_PARSE_FAILED;
+                error = EZPI_ERR_JSON_PARSE_FAILED;
                 TRACE_E("Error, could not identify the chipset in the config!");
             }
         }
         else
         {
-            error = EZPI_ERR_PREP_DEVICE_CONFIG_PARSE_FAILED;
+            error = EZPI_ERR_JSON_PARSE_FAILED;
             TRACE_E("Chipset not defined in the config, Device and Item assignment aborted !");
         }
     }

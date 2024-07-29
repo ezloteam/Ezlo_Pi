@@ -42,7 +42,7 @@ static void __broadcast_process(void* pv)
     }
 }
 
-static int ezlopi_service_broadcast_send_to_queue(cJSON* cj_broadcast_data)
+static ezlopi_error_t ezlopi_service_broadcast_send_to_queue(cJSON* cj_broadcast_data)
 {
     int ret = 0;
 

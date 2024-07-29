@@ -382,7 +382,7 @@ static void __scripts_remove_id_and_update_list(uint32_t script_id)
 
 static ezlopi_error_t __scripts_nvs_parse(void)
 {
-    ezlopi_error_t error = EZPI_ERR_SCENES_SCRIPT_JSON_PARSE_ERROR;
+    ezlopi_error_t error = EZPI_ERR_JSON_PARSE_FAILED;
     char* script_ids = ezlopi_nvs_read_scenes_scripts();
 
     if (script_ids)

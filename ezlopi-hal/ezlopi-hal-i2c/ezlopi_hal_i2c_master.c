@@ -2,6 +2,7 @@
 #include <stdint.h>
 
 #include "ezlopi_util_trace.h"
+#include "ezlopi_core_errors.h"
 
 #include "ezlopi_hal_i2c_master.h"
 
@@ -21,9 +22,9 @@ static s_ezlopi_i2c_master_t *i2c_master_conf_ptr[I2C_NUM_MAX] = {NULL, NULL};
 //     return ret;
 // }
 
-int ezlopi_i2c_master_init(s_ezlopi_i2c_master_t *i2c_master_conf)
+ezlopi_error_t ezlopi_i2c_master_init(s_ezlopi_i2c_master_t *i2c_master_conf)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_ERR_HAL_INIT_FAILED;
     if (NULL != i2c_master_conf)
     {
         if (true == i2c_master_conf->enable)
@@ -46,6 +47,7 @@ int ezlopi_i2c_master_init(s_ezlopi_i2c_master_t *i2c_master_conf)
                 ESP_ERROR_CHECK(i2c_param_config(I2C_NUM_0, &i2c_config));
                 ESP_ERROR_CHECK(i2c_driver_install(I2C_NUM_0, I2C_MODE_MASTER, 0, 0, 0));
                 i2c_master_conf_ptr[i2c_master_conf->channel] = i2c_master_conf;
+                ret = EZPI_SUCCESS;
             }
         }
     }

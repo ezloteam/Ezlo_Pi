@@ -111,7 +111,7 @@ static ezlopi_error_t __0065_prepare(void* arg)
                 if (float_item)
                 {
                     __prepare_item_cloud_properties(float_item, device_prep_arg->cjson_device);
-                    ret = EZPI_SUCCESS
+                    ret = EZPI_SUCCESS;
                 }
                 else
                 {
