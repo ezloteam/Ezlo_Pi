@@ -256,7 +256,7 @@ static int ezlopi_service_uart_process_log_severity(const cJSON* root)
     if (cj_uart_response)
     {
         cJSON_AddNumberToObject(__func__, cj_uart_response, ezlopi_cmd_str, 6);
-        if (0 == ret)
+        if (EZPI_SUCCESS != ret)
         {
             cJSON_AddNumberToObject(__func__, cj_uart_response, ezlopi_status_str, 0);
         }

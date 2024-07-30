@@ -744,7 +744,7 @@ ezlopi_error_t ezlopi_nvs_write_latitude_longitude(char* data)
 ezlopi_error_t EZPI_CORE_nvs_write_baud(uint32_t baud)
 {
     // Key ezlopi_serial_baud_name
-    return ezlopi_nvs_write_uint32(baud, ezlopi_serial_baud_name) == EZPI_SUCCESS ? true : false;
+    return ezlopi_nvs_write_uint32(baud, ezlopi_serial_baud_name);
 }
 
 ezlopi_error_t EZPI_CORE_nvs_read_baud(uint32_t* baud)
@@ -754,7 +754,7 @@ ezlopi_error_t EZPI_CORE_nvs_read_baud(uint32_t* baud)
 
 ezlopi_error_t EZPI_CORE_nvs_write_parity(uint32_t parity)
 {
-    return ezlopi_nvs_write_uint32(parity, ezlopi_serial_parity) == EZPI_SUCCESS ? true : false;
+    return ezlopi_nvs_write_uint32(parity, ezlopi_serial_parity);
 }
 
 ezlopi_error_t EZPI_CORE_nvs_read_parity(uint32_t* parity)
@@ -764,7 +764,7 @@ ezlopi_error_t EZPI_CORE_nvs_read_parity(uint32_t* parity)
 
 ezlopi_error_t EZPI_CORE_nvs_write_start_bits(uint32_t start_bits)
 {
-    return ezlopi_nvs_write_uint32(start_bits, ezlopi_serial_start_bits) == EZPI_SUCCESS ? true : false;
+    return ezlopi_nvs_write_uint32(start_bits, ezlopi_serial_start_bits);
 }
 ezlopi_error_t EZPI_CORE_nvs_read_start_bits(uint32_t* start_bits)
 {
@@ -773,7 +773,7 @@ ezlopi_error_t EZPI_CORE_nvs_read_start_bits(uint32_t* start_bits)
 
 ezlopi_error_t EZPI_CORE_nvs_write_stop_bits(uint32_t stop_bits)
 {
-    return ezlopi_nvs_write_uint32(stop_bits, ezlopi_serial_stop_bits) == EZPI_SUCCESS ? true : false;
+    return ezlopi_nvs_write_uint32(stop_bits, ezlopi_serial_stop_bits);
 }
 
 ezlopi_error_t EZPI_CORE_nvs_read_stop_bits(uint32_t* stop_bits)
@@ -783,7 +783,7 @@ ezlopi_error_t EZPI_CORE_nvs_read_stop_bits(uint32_t* stop_bits)
 
 ezlopi_error_t EZPI_CORE_nvs_write_frame_size(uint32_t frame_size)
 {
-    return ezlopi_nvs_write_uint32(frame_size, ezlopi_serial_frame_size) == EZPI_SUCCESS ? true : false;
+    return ezlopi_nvs_write_uint32(frame_size, ezlopi_serial_frame_size);
 }
 
 ezlopi_error_t EZPI_CORE_nvs_read_frame_size(uint32_t* frame_size)
@@ -793,7 +793,7 @@ ezlopi_error_t EZPI_CORE_nvs_read_frame_size(uint32_t* frame_size)
 
 ezlopi_error_t EZPI_CORE_nvs_write_flow_control(uint32_t flow_control)
 {
-    return ezlopi_nvs_write_uint32(flow_control, ezlopi_serial_flow_control) == EZPI_SUCCESS ? true : false;
+    return ezlopi_nvs_write_uint32(flow_control, ezlopi_serial_flow_control);
 }
 
 ezlopi_error_t EZPI_CORE_nvs_read_flow_control(uint32_t* flow_control)
@@ -803,7 +803,7 @@ ezlopi_error_t EZPI_CORE_nvs_read_flow_control(uint32_t* flow_control)
 
 ezlopi_error_t EZPI_CORE_nvs_write_cloud_log_severity(uint32_t severity)
 {
-    return ezlopi_nvs_write_uint32(severity, ezlopi_cloud_log_severity) == EZPI_SUCCESS ? true : false;
+    return ezlopi_nvs_write_uint32(severity, ezlopi_cloud_log_severity);
 }
 
 ezlopi_error_t EZPI_CORE_nvs_read_cloud_log_severity(uint32_t* severity)
@@ -813,17 +813,10 @@ ezlopi_error_t EZPI_CORE_nvs_read_cloud_log_severity(uint32_t* severity)
 
 ezlopi_error_t EZPI_CORE_nvs_write_serial_log_severity(uint32_t severity)
 {
-    return ezlopi_nvs_write_uint32(severity, ezlopi_serial_log_severity) == EZPI_SUCCESS ? true : false;
+    return ezlopi_nvs_write_uint32(severity, ezlopi_serial_log_severity);
 }
 
 ezlopi_error_t EZPI_CORE_nvs_read_serial_log_severity(uint32_t* severity)
 {
-    uint8_t ret = 0;
-    uint8_t err = ezlopi_nvs_read_uint32(severity, ezlopi_serial_log_severity);
-    if (0 == err)
-    {
-        ret = 1;
-    }
-
-    return ret;
+    return ezlopi_nvs_read_uint32(severity, ezlopi_serial_log_severity);
 }
