@@ -286,7 +286,7 @@ void device_group_update(cJSON* cj_request, cJSON* cj_response)
             cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
             if (cj_params)
             {
-                cJSON* cj_devgrp_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_id_str);
+                cJSON* cj_devgrp_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_id_str);  // "id"
                 if (cj_devgrp_id && cj_devgrp_id->valuestring)
                 {
                     // CJSON_TRACE("dev-grp [new] : ", cj_devgrp_id);
@@ -326,11 +326,11 @@ void device_group_devitem_expand(cJSON* cj_request, cJSON* cj_response)
             cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
             if (cj_params)
             {
-                cJSON* cj_show_item = cJSON_GetObjectItem(__FUNCTION__, cj_request, "showItems");
-                if (cj_show_item && cJSON_IsBool(cj_show_item) && (cj_show_item->type == cJSON_True))
-                {
-                    ezlopi_core_device_group_devitem_expand(cJSON_AddArrayToObject(__FUNCTION__, cj_result, "devices"), cj_params);
-                }
+                // cJSON* cj_show_item = cJSON_GetObjectItem(__FUNCTION__, cj_request, "showItems");
+                // if (cj_show_item && cJSON_IsBool(cj_show_item) && (cj_show_item->type == cJSON_True))
+                // {
+                ezlopi_core_device_group_devitem_expand(cJSON_AddArrayToObject(__FUNCTION__, cj_result, "devices"), cj_params);
+                // }
 
                 // cJSON* cj_ver_str = cJSON_GetObjectItem(__FUNCTION__, cj_request, "version");
                 // if (cj_ver_str && cj_ver_str->valuestring && cj_ver_str->str_value_len)
