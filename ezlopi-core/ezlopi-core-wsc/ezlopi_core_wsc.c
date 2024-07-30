@@ -105,7 +105,6 @@ static int __init_mbedtls(s_ssl_websocket_t * wsc_ssl)
     int ret = 0;
 
     do {
-
         wsc_ssl->conf = ezlopi_malloc(__FUNCTION__, sizeof(mbedtls_ssl_config));
         wsc_ssl->ssl_ctx = ezlopi_malloc(__FUNCTION__, sizeof(mbedtls_ssl_context));
         wsc_ssl->server_fd = ezlopi_malloc(__FUNCTION__, sizeof(mbedtls_net_context));
@@ -209,23 +208,42 @@ static int __deinit_mbedtls(s_ssl_websocket_t * wsc_ssl)
 
     if (wsc_ssl)
     {
-
-        mbedtls_ssl_config_free();
-
-        // wsc_ssl->conf && wsc_ssl->ssl_ctx && wsc_ssl->server_fd && wsc_ssl->entropy && wsc_ssl->ctr_drbg &&
-        //     wsc_ssl->cacert && wsc_ssl->shared_cert && wsc_ssl->private_key &&
-        //     wsc_ssl->str_cacert && wsc_ssl->str_shared_cert && wsc_ssl->str_private_key &&
-        //     wsc_ssl->buffer
-
-        ezlopi_free(__FUNCTION__, wsc_ssl->ssl_ctx);
+        mbedtls_ssl_config_free(wsc_ssl->conf);
         ezlopi_free(__FUNCTION__, wsc_ssl->conf);
+        wsc_ssl->conf = NULL;
+
+        mbedtls_ssl_free(wsc_ssl->ssl_ctx);
+        ezlopi_free(__FUNCTION__, wsc_ssl->ssl_ctx);
+        wsc_ssl->ssl_ctx = NULL;
+
+        mbedtls_net_free(wsc_ssl->server_fd);
+        ezlopi_free(__FUNCTION__, wsc_ssl->server_fd);
+        wsc_ssl->server_fd = NULL;
+
+        mbedtls_entropy_free(wsc_ssl->entropy);
         ezlopi_free(__FUNCTION__, wsc_ssl->entropy);
+        wsc_ssl->entropy = NULL;
+
+        mbedtls_ctr_drbg_free(wsc_ssl->ctr_drbg);
         ezlopi_free(__FUNCTION__, wsc_ssl->ctr_drbg);
+        wsc_ssl->ctr_drbg = NULL;
+
+
+        mbedtls_x509_crt_free(wsc_ssl->cacert);
         ezlopi_free(__FUNCTION__, wsc_ssl->cacert);
-        ezlopi_free(__FUNCTION__, wsc_ssl->private_key);
+        wsc_ssl->cacert = NULL;
+
+        mbedtls_x509_crt_free(wsc_ssl->shared_cert);
         ezlopi_free(__FUNCTION__, wsc_ssl->shared_cert);
+        wsc_ssl->shared_cert = NULL;
+
+        mbedtls_pk_free(wsc_ssl->private_key);
+        ezlopi_free(__FUNCTION__, wsc_ssl->private_key);
+        wsc_ssl->private_key = NULL;
 
         ezlopi_free(__FUNCTION__, wsc_ssl->buffer);
+        wsc_ssl->buffer = NULL;
+        wsc_ssl->buffer_len = 0;
 
         ret = 1;
     }
@@ -281,6 +299,8 @@ static int __send_internal(s_ssl_websocket_t * wsc_ssl, char *buf_s, size_t len)
 
         do
         {
+            // mbedtls_net_poll();
+
             ret = mbedtls_ssl_write(wsc_ssl->ssl_ctx, (const unsigned char *)buf + written_bytes, len - written_bytes);
             if (ret >= 0)
             {
@@ -352,7 +372,6 @@ static void __rx_task(void *arg)
                 {
                     TRACE_D("mbedtls-init success.");
 
-
                     mbedtls_net_init(__ssl_wsc->server_fd);
 
                     TRACE_I("Connecting to  '%s:%s'...", __ssl_wsc->url, __ssl_wsc->port);
@@ -406,7 +425,7 @@ static void __rx_task(void *arg)
 
                         while (__ssl_wsc->is_connected)
                         {
-                            vTaskDelay(100 / portTICK_RATE_MS);
+                            vTaskDelay(10 / portTICK_RATE_MS);
 
                             if (__rx_func(__ssl_wsc) < 0)
                             {
@@ -426,14 +445,20 @@ static void __rx_task(void *arg)
                         }
                     }
 
-                    mbedtls_net_free(__ssl_wsc->server_fd);
-                    __ssl_wsc->server_fd = NULL;
+                    TRACE_E("Web-socket disconnected!");
+                    TRACE_W("Releasing 'mbedtls' resources!");
+
+                    mbedtls_ssl_close_notify(__ssl_wsc->ssl_ctx);
+                    mbedtls_ssl_session_reset(__ssl_wsc->ssl_ctx);
+
+                    // mbedtls_net_free(__ssl_wsc->server_fd);
+                    // __ssl_wsc->server_fd = NULL;
                 }
 
             } while (0);
 
-            vTaskDelay(100 / portTICK_RATE_MS);
             __deinit_mbedtls(__ssl_wsc);
+            vTaskDelay(1000 / portTICK_RATE_MS);
         }
     }
 
@@ -549,91 +574,96 @@ static int __rx_func(s_ssl_websocket_t * ssl_wsc)
 
     if (ssl_wsc && ssl_wsc->is_connected)
     {
-        struct timeval time_val;
-        fd_set read_fds;
-        int fd = ssl_wsc->server_fd->fd;
+        do {
+            struct timeval time_val;
+            fd_set read_fds;
+            int fd = ssl_wsc->server_fd->fd;
 
-        if (fd < 0)
-        {
-            return (-1);
-        }
-
-        FD_ZERO(&read_fds);
-        FD_SET(fd, &read_fds);
-
-        time_val.tv_sec = 0;
-        time_val.tv_usec = 1;
-
-        ret = select(fd + 1, &read_fds, NULL, NULL, &time_val);
-
-        TRACE_E("select ret: %d", ret);
-
-        /* Zero fds ready means we timed out */
-        if (ret == 0)
-        {
-            return 0;
-        }
-        else if (ret < 0)
-        {
-            return (-1);
-        }
-
-        int retry = 2;
-
-        do
-        {
-            ret = mbedtls_ssl_read(ssl_wsc->ssl_ctx, (uint8_t *)ssl_wsc->buffer, ssl_wsc->buffer_len);
-            TRACE_I("mbedtls_ssl_read returned: -0x%04x [%d]", -ret, ret);
-
-            if (ret > 0) {
-                dump("rx_data", ssl_wsc->buffer, 0, ret);
+            if (fd < 0)
+            {
+                return (-1);
             }
 
-            if (ret < 0 && retry)
+            FD_ZERO(&read_fds);
+            FD_SET(fd, &read_fds);
+
+            time_val.tv_sec = 0;
+            time_val.tv_usec = 1;
+
+            ret = select(fd + 1, &read_fds, NULL, NULL, &time_val);
+
+            /* Zero fds ready means we timed out */
+            if (ret == 0)
             {
-                return ret = -1;
+                return 0;
             }
-            else
+            else if (ret < 0)
             {
-                break;
-            }
-
-            vTaskDelay(5);
-
-        } while (--retry);
-
-        if (ssl_wsc->e_state == STATE_HEADER)
-        {
-            if (ssl_wsc->buffer[0] == 0x88)
-            {
-                return -1;
+                return (-1);
             }
 
-            if (ssl_wsc->buffer[0] == 0x89) // if PING then PONG
+            // TRACE_E("select ret: %d", ret);
+
+            int retry = 2;
+
+            do
             {
-                TRACE_I("PING PONG");
-                ssl_wsc->buffer[0] = 0x8A;
-                mbedtls_ssl_write(ssl_wsc->ssl_ctx, (uint8_t *)ssl_wsc->buffer, ret);
-            }
-            else
-            {
-                if (ssl_wsc->buffer[0] == 0x81 || ssl_wsc->buffer[0] == 0x01)
+                ret = mbedtls_ssl_read(ssl_wsc->ssl_ctx, (uint8_t *)ssl_wsc->buffer, ssl_wsc->buffer_len);
+
+                // if (ret > 0) {
+                //     dump("rx_data", ssl_wsc->buffer, 0, ret);
+                // }
+
+                if (ret < 0)
                 {
-                    ssl_wsc->e_state = STATE_DATA;
+                    TRACE_I("mbedtls_ssl_read returned: -0x%04x [%d]", -ret, ret);
+                    if (retry == 0) {
+                        return (-1);
+                    }
+                }
+                else if (ret >= 0)
+                {
+                    break;
+                }
+
+                vTaskDelay(5);
+
+            } while (--retry);
+
+            if (ssl_wsc->e_state == STATE_HEADER)
+            {
+                if (ssl_wsc->buffer[0] == 0x88)
+                {
+                    return -1;
+                }
+
+                if (ssl_wsc->buffer[0] == 0x89) // if PING then PONG
+                {
+                    TRACE_I("PING PONG");
+                    ssl_wsc->buffer[0] = 0x8A;
+                    mbedtls_ssl_write(ssl_wsc->ssl_ctx, (uint8_t *)ssl_wsc->buffer, ret);
+                }
+                else
+                {
+                    if (ssl_wsc->buffer[0] == 0x81 || ssl_wsc->buffer[0] == 0x01)
+                    {
+                        ssl_wsc->e_state = STATE_DATA;
+                    }
                 }
             }
-        }
-        else
-        {
-            ssl_wsc->buffer[ret] = 0;
-            // TRACE_I("<< WSS-Rx:%s\r\n", __wsc_buffer);
-            if (ssl_wsc->message_upcall_func)
+            else
             {
-                ssl_wsc->message_upcall_func(ssl_wsc->buffer, strlen(ssl_wsc->buffer));
+                ssl_wsc->buffer[ret] = 0;
+                // TRACE_I("<< WSS-Rx:%s\r\n", __wsc_buffer);
+                if (ssl_wsc->message_upcall_func)
+                {
+                    ssl_wsc->message_upcall_func(ssl_wsc->buffer, strlen(ssl_wsc->buffer));
+                }
+
+                ssl_wsc->e_state = STATE_HEADER;
             }
 
-            ssl_wsc->e_state = STATE_HEADER;
-        }
+        } while (1);
     }
 
     return ret;

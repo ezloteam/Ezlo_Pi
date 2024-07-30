@@ -492,10 +492,6 @@ void ezlopi_device_prepare(void)
 
         cJSON* cj_config = cJSON_ParseWithRef(__FUNCTION__, config_string);
 
-#if (EZLOPI_DEVICE_TYPE_TEST_DEVICE != EZLOPI_DEVICE_TYPE)
-        ezlopi_free(__FUNCTION__, config_string);
-#endif
-
         if (cj_config)
         {
             int ret = ezlopi_device_parse_json_v3(cj_config);
@@ -527,6 +523,10 @@ void ezlopi_device_prepare(void)
 
             cJSON_Delete(__FUNCTION__, cj_config);
         }
+
+#if (EZLOPI_DEVICE_TYPE_TEST_DEVICE != EZLOPI_DEVICE_TYPE)
+        ezlopi_free(__FUNCTION__, config_string);
+#endif
     }
     else
     {
