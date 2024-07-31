@@ -84,7 +84,7 @@ CLOUD_METHOD("hub.scenes.list", scenes_list, NULL)
 CLOUD_METHOD("hub.scenes.create", scenes_create, scene_added)
 
 #warning "firmware crashes due to this method 'hub.scenes.run', need to fix this"
-// CLOUD_METHOD("hub.scenes.run", scenes_run, NULL) // firmware crashes due to this method, need to fix this
+CLOUD_METHOD("hub.scenes.run", scenes_run, NULL) // firmware crashes due to this method, need to fix this
 
 CLOUD_METHOD("hub.scenes.get", scenes_get, NULL)
 CLOUD_METHOD("hub.scenes.edit", scenes_edit, scene_changed)

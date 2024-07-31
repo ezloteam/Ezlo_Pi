@@ -209,7 +209,7 @@ l_scenes_list_v2_t* ezlopi_scenes_pop_by_id_v2(uint32_t _id);
 
 void ezlopi_scenes_notifications_add(cJSON* cj_notifications);
 
-#if 0
+#if 0 // for future usage
 //-------------------------------- Only for latch operations  ----------------------------------------
 /**
  * @brief This function checks for 'latch' struct within nvs_scenes. The scenes are filtered out using 'sceneId[necessary]' & 'blockId[optional]'

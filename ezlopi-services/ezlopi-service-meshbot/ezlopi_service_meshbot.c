@@ -414,7 +414,7 @@ static int __execute_scene_stop(l_scenes_list_v2_t* scene_node)
 static int __execute_scene_start(l_scenes_list_v2_t* scene_node)
 {
     int ret = 0;
-    if (scene_node && (NULL == scene_node->thread_ctx))
+    if (scene_node && (true == scene_node->enabled) && (NULL == scene_node->thread_ctx))
     {
         scene_node->thread_ctx = (void*)ezlopi_malloc(__FUNCTION__, sizeof(s_thread_ctx_t));
         if (scene_node->thread_ctx)
