@@ -340,6 +340,8 @@ static int __send_internal(s_ssl_websocket_t * wsc_ssl, char *buf_s, size_t len,
                 ret = select(fd + 1, NULL, &write_fds, NULL, &time_val);
             } while (ret == 4);
 
+            // mbedtls_net_poll(wsc_ssl->server_fd, MBEDTLS_NET_POLL_WRITE, timeout);
+
             /* Zero fds ready means we timed out */
             if (ret <= 0)
             {
@@ -357,7 +359,7 @@ static int __send_internal(s_ssl_websocket_t * wsc_ssl, char *buf_s, size_t len,
             else if (ret != MBEDTLS_ERR_SSL_WANT_WRITE && ret != MBEDTLS_ERR_SSL_WANT_READ)
             {
                 TRACE_E("mbedtls_ssl_write returned -0x%x", -ret);
-                return written_bytes;
+                return ret;
             }
         } while (written_bytes < len);
 
@@ -471,7 +473,7 @@ static void __rx_task(void *arg)
 
                     if (__upgrade_to_websocket(__ssl_wsc))
                     {
-                        int retry = 20;
+                        int retry = 30;
 
                         while (__ssl_wsc->is_connected)
                         {
@@ -479,8 +481,7 @@ static void __rx_task(void *arg)
 
                             if (__rx_func(__ssl_wsc) < 0)
                             {
-                                TRACE_E("rx-func ret: failed!, retry: %d", retry);
-                                TRACE_E("__ssl_wsc->is_connected: %d", __ssl_wsc->is_connected);
+                                TRACE_E("'rx-func' failed!, retry: %d", retry);
 
                                 if (0 == retry--)
                                 {
