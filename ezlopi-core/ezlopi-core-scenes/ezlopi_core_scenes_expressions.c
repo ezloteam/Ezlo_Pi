@@ -446,7 +446,7 @@ uint32_t ezlopi_scenes_expressions_add_to_head(uint32_t exp_id, cJSON* cj_expres
         current_exp->next = __expressions_create_node(exp_id, cj_expression);
         if (current_exp->next)
         {
-            ezlopi_scenes_expressions_print(current_exp->next);
+            // ezlopi_scenes_expressions_print(current_exp->next);
             new_exp_id = current_exp->next->exp_id;
         }
     }
@@ -455,7 +455,7 @@ uint32_t ezlopi_scenes_expressions_add_to_head(uint32_t exp_id, cJSON* cj_expres
         l_expressions_head = __expressions_create_node(exp_id, cj_expression);
         if (l_expressions_head)
         {
-            ezlopi_scenes_expressions_print(l_expressions_head);
+            // ezlopi_scenes_expressions_print(l_expressions_head);
             new_exp_id = l_expressions_head->exp_id;
         }
     }
@@ -1052,9 +1052,9 @@ static int __remove_exp_id_from_nvs_exp_list(uint32_t target_id)
                 if (_id == target_id)
                 {
                     cJSON_DeleteItemFromArray(__FUNCTION__, cj_exp_ids, idx);
-                    break;
                 }
 
+                // iterate upto last elements (incase -->  for doubles)
                 idx++;
             }
 

@@ -140,6 +140,16 @@ void ezlopi_scenes_delete_field_value(l_fields_v2_t* field)
         }
         break;
     }
+    case VALUE_TYPE_HOUSE_MODE_ID_ARRAY:
+    {
+        if (field->field_value.u_value.house_modes)
+        {
+            TRACE_S("here : free house_mode_arr");
+            ezlopi_scenes_delete_house_modes(field->field_value.u_value.house_modes);
+            field->field_value.u_value.house_modes = NULL;
+        }
+        break;
+    }
     default:
     {
         break;

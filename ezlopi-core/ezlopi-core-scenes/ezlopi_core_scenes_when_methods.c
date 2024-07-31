@@ -10,6 +10,7 @@
 #include "ezlopi_core_ota.h"
 #include "ezlopi_core_http.h"
 #include "ezlopi_core_devices.h"
+#include "ezlopi_core_device_group.h"
 #include "ezlopi_core_event_group.h"
 #include "ezlopi_core_scenes_operators.h"
 #include "ezlopi_core_scenes_expressions.h"
@@ -26,7 +27,7 @@ int ezlopi_scene_when_is_item_state(l_scenes_list_v2_t* scene_node, void* arg)
     // TRACE_W(" is_item_state ");
     int ret = 0;
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
-    if (when_block)
+    if (when_block && scene_node)
     {
         if (false == when_block->block_enable)
         {
@@ -41,92 +42,44 @@ int ezlopi_scene_when_is_item_state(l_scenes_list_v2_t* scene_node, void* arg)
         }
 
         uint32_t item_id = 0;
+        uint32_t device_group_id = 0;
+        uint32_t item_group_id = 0;
+
         l_fields_v2_t* value_field = NULL;
         #warning "Warning: armed check remains [Krishna]";
 
         l_fields_v2_t* curr_field = when_block->fields;
         while (curr_field)
         {
-            if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "item", strlen(curr_field->name), 5))
+            if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "item", strlen(curr_field->name), 5) && (NULL != curr_field->field_value.u_value.value_string))
             {
                 item_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
             }
-            else if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, ezlopi_value_str, strlen(curr_field->name), 6))
+            else if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, ezlopi_value_str, strlen(curr_field->name), 6) && (NULL != curr_field->field_value.u_value.value_string))
             {
                 value_field = curr_field;
             }
+            else if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "deviceGroup", strlen(curr_field->name), 12) && (NULL != curr_field->field_value.u_value.value_string))
+            {
+                device_group_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
+            }
+            else if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "itemGroup", strlen(curr_field->name), 10) && (NULL != curr_field->field_value.u_value.value_string))
+            {
+                item_group_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
+            }
+
             curr_field = curr_field->next;
         }
 
         if (item_id && value_field)
         {
-            l_ezlopi_device_t* curr_device = ezlopi_device_get_head();
-            while (curr_device)
-            {
-                l_ezlopi_item_t* curr_item = curr_device->items;
-                while (curr_item)
-                {
-                    if (item_id == curr_item->cloud_properties.item_id)
-                    {
-                        cJSON* cj_tmp_value = cJSON_CreateObject(__FUNCTION__);
-                        if (cj_tmp_value)
-                        {
-                            curr_item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, curr_item, (void*)cj_tmp_value, NULL);
-                            cJSON* cj_value = cJSON_GetObjectItem(__FUNCTION__, cj_tmp_value, ezlopi_value_str);
-                            if (cj_value)
-                            {
-                                switch (cj_value->type)
-                                {
-                                case cJSON_True:
-                                {
-                                    if (true == value_field->field_value.u_value.value_bool)
-                                    {
-                                        ret = 1;
-                                    }
-                                    break;
-                                }
-                                case cJSON_False:
-                                {
-                                    if (false == value_field->field_value.u_value.value_bool)
-                                    {
-                                        ret = 1;
-                                    }
-                                    break;
-                                }
-                                case cJSON_Number:
-                                {
-                                    if (cj_value->valuedouble == value_field->field_value.u_value.value_double)
-                                    {
-                                        ret = 1;
-                                    }
-                                    break;
-                                }
-                                case cJSON_String:
-                                {
-                                    uint32_t cmp_size = (strlen(cj_value->valuestring) > strlen(value_field->field_value.u_value.value_string)) ? strlen(cj_value->valuestring) : strlen(value_field->field_value.u_value.value_string);
-                                    if (0 == strncmp(cj_value->valuestring, value_field->field_value.u_value.value_string, cmp_size))
-                                    {
-                                        ret = 1;
-                                    }
-                                    break;
-                                }
-                                default:
-                                {
-                                    TRACE_E("Value type mis-matched!");
-                                }
-                                }
-                            }
-
-                            cJSON_Delete(__FUNCTION__, cj_tmp_value);
-                        }
-                        break;
-                    }
-                    curr_item = curr_item->next;
-                }
-
-                curr_device = curr_device->next;
-            }
+            ret = is_item_state_single_condition(item_id, value_field);
         }
+        else if (device_group_id && item_group_id && value_field)    // since device_and_item group both need to exist
+        {
+            ret = is_item_state_with_grp_condition(device_group_id, item_group_id, value_field);
+        }
+
     }
 
     return ret;
@@ -631,7 +584,7 @@ int ezlopi_scene_when_is_House_Mode_Alarm_Phase_Range(l_scenes_list_v2_t* scene_
             }
             curr_field = curr_field->next;
         }
-    }
+}
 #endif
     return ret;
 }
@@ -661,7 +614,7 @@ int ezlopi_scene_when_is_House_Mode_Switch_to_Range(l_scenes_list_v2_t* scene_no
         {
             TRACE_E(" Current HouseMode_phase does not have duration ");
         }
-    }
+}
 #endif
     return ret;
 }
