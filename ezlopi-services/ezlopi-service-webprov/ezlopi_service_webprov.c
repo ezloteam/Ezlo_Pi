@@ -66,12 +66,12 @@ uint32_t ezlopi_service_web_provisioning_get_message_count(void)
 void ezlopi_service_web_provisioning_init(void)
 {
     TaskHandle_t ezlopi_service_web_prov_config_check_task_handle = NULL;
-    xTaskCreate(__provision_check, "WebProvCfgChk", EZLOPI_SERVICE_WEB_PROV_CONFIG_CHECK_TASK_DEPTH, NULL, 5, &ezlopi_service_web_prov_config_check_task_handle);
+    xTaskCreate(__provision_check, "WebProvCfgChk", EZLOPI_SERVICE_WEB_PROV_CONFIG_CHECK_TASK_DEPTH, NULL, 4, &ezlopi_service_web_prov_config_check_task_handle);
     ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_WEB_PROV_CONFIG_CHECK_TASK, &ezlopi_service_web_prov_config_check_task_handle, EZLOPI_SERVICE_WEB_PROV_CONFIG_CHECK_TASK_DEPTH);
 
     _wss_message_queue = xQueueCreate(10, sizeof(char *));
 
-    xTaskCreate(__fetch_wss_endpoint, "WebProvFetchWSS", EZLOPI_SERVICE_WEB_PROV_FETCH_WSS_TASK_DEPTH, NULL, 5, &__web_socket_initialize_handler);
+    xTaskCreate(__fetch_wss_endpoint, "WebProvFetchWSS", EZLOPI_SERVICE_WEB_PROV_FETCH_WSS_TASK_DEPTH, NULL, 4, &__web_socket_initialize_handler);
     ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_WEB_PROV_FETCH_WSS_TASK, &__web_socket_initialize_handler, EZLOPI_SERVICE_WEB_PROV_FETCH_WSS_TASK_DEPTH);
 }
 
@@ -91,7 +91,6 @@ void ezlopi_service_web_provisioning_deinit(void)
 
 static void __connection_upcall(bool connected)
 {
-    TRACE_D("wss-connection: %s", connected ? "connected." : "disconnected!");
     static int prev_status; // 0: never connected, 1: Not-connected, 2: connected
     if (connected)
     {
@@ -127,8 +126,8 @@ static void __fetch_wss_endpoint(void* pv)
     while (1)
     {
         uint32_t task_complete = 0;
-        ulTaskNotifyTake(pdFALSE, portMAX_DELAY);
-        vTaskDelay(100 / portTICK_RATE_MS);
+        // ulTaskNotifyTake(pdFALSE, portMAX_DELAY);
+        // vTaskDelay(100 / portTICK_RATE_MS);
 
         char http_request[128];
         snprintf(http_request, sizeof(http_request), "%s?json=true", cloud_server);

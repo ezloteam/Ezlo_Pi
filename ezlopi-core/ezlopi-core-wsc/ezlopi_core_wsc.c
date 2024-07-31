@@ -2,13 +2,15 @@
 
 #include "time.h"
 #include "lwip/apps/sntp.h"
+#include "mbedtls/net_sockets.h"
 
-#include "ezlopi_core_wsc.h"
 #include "ezlopi_core_heap.h"
 #include "ezlopi_core_factory_info.h"
 
 #include "ezlopi_util_trace.h"
 #include "EZLOPI_USER_CONFIG.h"
+
+#include "ezlopi_core_wsc.h"
 
 static const char *__request_format = "GET / HTTP/1.1\n"
 "Host: %s\n"
@@ -24,7 +26,7 @@ static int __init_mbedtls(s_ssl_websocket_t *ssl_wsc);
 static int __deinit_mbedtls(s_ssl_websocket_t * wsc_ssl);
 static int __zap_aut(unsigned char *ttx, unsigned char *text);
 static void __setup_wsc_request(cJSON * cj_uri, s_ssl_websocket_t * ssl_ws);
-static int __send_internal(s_ssl_websocket_t * wsc_ssl, char *buf_s, size_t len);
+static int __send_internal(s_ssl_websocket_t * wsc_ssl, char *buf_s, size_t len, uint32_t timeout_ms);
 static void __timer_callback(TimerHandle_t timer);
 static int __upgrade_to_websocket(s_ssl_websocket_t * ssl_wsc);
 static int __rx_func(s_ssl_websocket_t * ssl_wsc);
@@ -46,17 +48,36 @@ int ezlopi_core_wsc_kill(s_ssl_websocket_t * wsc_ssl)
 {
     int ret = 0;
 
+    // if (wsc_ssl)
+    // {
+    //     mbedtls_net_close(wsc_ssl->server_fd);
+    // }
+
+    return ret;
+}
+
+int ezlopi_core_wsc_stop(s_ssl_websocket_t * wsc_ssl)
+{
+    int ret = 0;
+
+    if (wsc_ssl)
+    {
+        close(wsc_ssl->server_fd->fd);
+    }
+
     return ret;
 }
 
 int ezlopi_core_wsc_send(s_ssl_websocket_t * ssl_wsc, char *buf, size_t len)
 {
+    int ret = 0;
+
     if (ssl_wsc && ssl_wsc->is_connected && buf && len)
     {
-        return __send_internal(ssl_wsc, buf, len);
+        ret = __send_internal(ssl_wsc, buf, len, 2000);
     }
 
-    return 0;
+    return ret;
 }
 
 s_ssl_websocket_t * ezlopi_core_wsc_init(cJSON * uri, f_wsc_msg_upcall_t __message_upcall, f_wsc_conn_upcall_t __connection_upcall)
@@ -75,7 +96,6 @@ s_ssl_websocket_t * ezlopi_core_wsc_init(cJSON * uri, f_wsc_msg_upcall_t __messa
             ssl_ws->connection_upcall_func = __connection_upcall;
 
             __setup_wsc_request(uri, ssl_ws);
-
 #if 0
             snprintf(__wsc_buffer, sizeof(__wsc_buffer), "%.*s", uri->str_value_len, uri->valuestring);
             char *port_start = strrchr(__wsc_buffer, ':');
@@ -92,8 +112,8 @@ s_ssl_websocket_t * ezlopi_core_wsc_init(cJSON * uri, f_wsc_msg_upcall_t __messa
             TRACE_D("__request_format: %s", __request);
 #endif
 
+            ssl_ws->timer = xTimerCreate("wsc-timer", (1000 / portTICK_RATE_MS), pdTRUE, ssl_ws, __timer_callback);
             xTaskCreate(__rx_task, "wsc-rx_task", 6 * 1024, ssl_ws, 5, &ssl_ws->task_handle);
-            ssl_ws->timer = xTimerCreate("wsc-timer", (10000 / portTICK_RATE_MS), pdTRUE, ssl_ws, __timer_callback);
         }
     }
 
@@ -274,7 +294,7 @@ static void __setup_wsc_request(cJSON * cj_uri, s_ssl_websocket_t * ssl_wsc)
     }
 }
 
-static int __send_internal(s_ssl_websocket_t * wsc_ssl, char *buf_s, size_t len)
+static int __send_internal(s_ssl_websocket_t * wsc_ssl, char *buf_s, size_t len, uint32_t timeout)
 {
     int ret = 0;
 
@@ -299,7 +319,35 @@ static int __send_internal(s_ssl_websocket_t * wsc_ssl, char *buf_s, size_t len)
 
         do
         {
-            // mbedtls_net_poll();
+            struct timeval time_val;
+            fd_set write_fds;
+            int fd = wsc_ssl->server_fd->fd;
+
+            if (fd < 0)
+            {
+                return (-1);
+            }
+
+            FD_ZERO(&write_fds);
+            FD_SET(fd, &write_fds);
+
+            time_val.tv_sec = timeout / 1000;
+            time_val.tv_usec = timeout ? ((timeout % 1000) * 1000) : 1;
+
+            do {
+                TRACE_W("waiting for write-ready.......");
+                vTaskDelay(1 / portTICK_RATE_MS);
+                ret = select(fd + 1, NULL, &write_fds, NULL, &time_val);
+            } while (ret == 4);
+
+            /* Zero fds ready means we timed out */
+            if (ret <= 0)
+            {
+                TRACE_E("POLL FAILED!");
+                return (-1);
+            }
+
+            TRACE_W("POLL SUCCESS");
 
             ret = mbedtls_ssl_write(wsc_ssl->ssl_ctx, (const unsigned char *)buf + written_bytes, len - written_bytes);
             if (ret >= 0)
@@ -311,8 +359,9 @@ static int __send_internal(s_ssl_websocket_t * wsc_ssl, char *buf_s, size_t len)
                 TRACE_E("mbedtls_ssl_write returned -0x%x", -ret);
                 return written_bytes;
             }
-
         } while (written_bytes < len);
+
+        TRACE_W("write-success");
 
         if ((char *)buf != buf_s)
         {
@@ -373,6 +422,7 @@ static void __rx_task(void *arg)
                     TRACE_D("mbedtls-init success.");
 
                     mbedtls_net_init(__ssl_wsc->server_fd);
+                    mbedtls_net_set_nonblock(__ssl_wsc->server_fd);
 
                     TRACE_I("Connecting to  '%s:%s'...", __ssl_wsc->url, __ssl_wsc->port);
 
@@ -421,22 +471,27 @@ static void __rx_task(void *arg)
 
                     if (__upgrade_to_websocket(__ssl_wsc))
                     {
-                        int retry = 3;
+                        int retry = 20;
 
                         while (__ssl_wsc->is_connected)
                         {
-                            vTaskDelay(10 / portTICK_RATE_MS);
+                            vTaskDelay(20 / portTICK_RATE_MS);
 
                             if (__rx_func(__ssl_wsc) < 0)
                             {
+                                TRACE_E("rx-func ret: failed!, retry: %d", retry);
+                                TRACE_E("__ssl_wsc->is_connected: %d", __ssl_wsc->is_connected);
+
                                 if (0 == retry--)
                                 {
                                     __ssl_wsc->is_connected = false;
                                     if (__ssl_wsc->connection_upcall_func) {
                                         __ssl_wsc->connection_upcall_func(false);
                                     }
+
+                                    break;
                                 }
-                                break;
+
                             }
                             else
                             {
@@ -454,9 +509,9 @@ static void __rx_task(void *arg)
                     // mbedtls_net_free(__ssl_wsc->server_fd);
                     // __ssl_wsc->server_fd = NULL;
                 }
-
             } while (0);
 
+            TRACE_I("--deinit-mbedtls");
             __deinit_mbedtls(__ssl_wsc);
             vTaskDelay(1000 / portTICK_RATE_MS);
         }
@@ -478,7 +533,7 @@ static int __upgrade_to_websocket(s_ssl_websocket_t * ssl_wsc)
             snprintf(ssl_wsc->buffer, ssl_wsc->buffer_len, __request_format, ssl_wsc->url, ssl_wsc->url, ezlopi_factory_info_v3_get_id());
             TRACE_D("__request_format: \r\n%s", ssl_wsc->buffer ? ssl_wsc->buffer : "null");
 
-            ret = __send_internal(ssl_wsc, ssl_wsc->buffer, strlen(ssl_wsc->buffer));
+            ret = __send_internal(ssl_wsc, ssl_wsc->buffer, strlen(ssl_wsc->buffer), 5000);
 
             if (ret > 0)
             {
@@ -565,7 +620,9 @@ static int __upgrade_to_websocket(s_ssl_websocket_t * ssl_wsc)
 
 static void __timer_callback(TimerHandle_t timer)
 {
-
+    TRACE_I("timer-callback");
+    s_ssl_websocket_t* wss_ssl = (s_ssl_websocket_t *)pvTimerGetTimerID(timer);
+    ezlopi_core_wsc_stop(wss_ssl);
 }
 
 static int __rx_func(s_ssl_websocket_t * ssl_wsc)
@@ -574,49 +631,47 @@ static int __rx_func(s_ssl_websocket_t * ssl_wsc)
 
     if (ssl_wsc && ssl_wsc->is_connected)
     {
-        do {
-            struct timeval time_val;
-            fd_set read_fds;
-            int fd = ssl_wsc->server_fd->fd;
+        while (1)
+        {
 
-            if (fd < 0)
-            {
-                return (-1);
-            }
-
-            FD_ZERO(&read_fds);
-            FD_SET(fd, &read_fds);
-
-            time_val.tv_sec = 0;
-            time_val.tv_usec = 1;
-
-            ret = select(fd + 1, &read_fds, NULL, NULL, &time_val);
-
-            /* Zero fds ready means we timed out */
-            if (ret == 0)
-            {
-                return 0;
-            }
-            else if (ret < 0)
-            {
-                return (-1);
-            }
-
-            // TRACE_E("select ret: %d", ret);
-
-            int retry = 2;
+            int retry = 5;
 
             do
             {
-                ret = mbedtls_ssl_read(ssl_wsc->ssl_ctx, (uint8_t *)ssl_wsc->buffer, ssl_wsc->buffer_len);
+                struct timeval time_val;
+                fd_set read_fds;
+                int fd = ssl_wsc->server_fd->fd;
 
-                // if (ret > 0) {
-                //     dump("rx_data", ssl_wsc->buffer, 0, ret);
-                // }
+                if (fd < 0)
+                {
+                    return (-1);
+                }
+
+                FD_ZERO(&read_fds);
+                FD_SET(fd, &read_fds);
+
+                time_val.tv_sec = 0;
+                time_val.tv_usec = 1;
+
+                ret = select(fd + 1, &read_fds, NULL, NULL, &time_val);
+
+                /* Zero fds ready means we timed out */
+                if (ret == 0)
+                {
+                    return 0;
+                }
+                else if (ret < 0)
+                {
+                    return (-1);
+                }
+
+
+                ret = mbedtls_ssl_read(ssl_wsc->ssl_ctx, (uint8_t *)ssl_wsc->buffer, ssl_wsc->buffer_len);
 
                 if (ret < 0)
                 {
                     TRACE_I("mbedtls_ssl_read returned: -0x%04x [%d]", -ret, ret);
+
                     if (retry == 0) {
                         return (-1);
                     }
@@ -628,7 +683,7 @@ static int __rx_func(s_ssl_websocket_t * ssl_wsc)
 
                 vTaskDelay(5);
 
-            } while (--retry);
+            } while (retry--);
 
             if (ssl_wsc->e_state == STATE_HEADER)
             {
@@ -663,7 +718,7 @@ static int __rx_func(s_ssl_websocket_t * ssl_wsc)
                 ssl_wsc->e_state = STATE_HEADER;
             }
 
-        } while (1);
+        }
     }
 
     return ret;

@@ -66,24 +66,19 @@ static void __factory_info_update_property_by_cjson(l_ezlopi_device_t * device_n
 
             if (cj_device_config)
             {
-                TRACE_W("HERE");
                 cJSON* cj_devices = cJSON_GetObjectItem(__FUNCTION__, cj_device_config, ezlopi_dev_detail_str);
                 if (cj_devices)
                 {
-                    TRACE_W("HERE");
                     uint32_t idx = 0;
                     cJSON* cj_device = NULL;
                     while (NULL != (cj_device = cJSON_GetArrayItem(cj_devices, idx)))
                     {
-                        TRACE_W("HERE");
                         cJSON* cj_device_id = cJSON_GetObjectItem(__FUNCTION__, cj_device, ezlopi_device_id_str);
                         if (cj_device_id && cj_device_id->valuestring)
                         {
-                            TRACE_W("HERE");
                             uint32_t device_id = strtoul(cj_device_id->valuestring, NULL, 16);
                             if (device_id == device_node->cloud_properties.device_id)
                             {
-                                TRACE_W("HERE");
                                 TRACE_D("Deleting key: %.*s", new_prop->str_key_len, new_prop->string);
                                 cJSON_DeleteItemFromObject(__FUNCTION__, cj_device, new_prop->string);
                                 cJSON_AddItemToObject(__FUNCTION__, cj_device, new_prop->string, new_prop);
