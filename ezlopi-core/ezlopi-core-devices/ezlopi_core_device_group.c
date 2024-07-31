@@ -572,7 +572,7 @@ static l_ezlopi_device_grp_t* ____device_grp_create_node(cJSON* cj_device_grp, u
                 }
             }
 
-            __ezlopi_core_device_group_print(new_device_grp_node);
+            // __ezlopi_core_device_group_print(new_device_grp_node);
         }
     }
     return new_device_grp_node;
@@ -636,7 +636,7 @@ static l_ezlopi_item_grp_t* ____item_grp_create_node(cJSON* cj_item_grp, uint32_
                 }
             }
 
-            __ezlopi_core_item_group_print(new_item_grp_node);
+            // __ezlopi_core_item_group_print(new_item_grp_node);
         }
     }
     return new_item_grp_node;

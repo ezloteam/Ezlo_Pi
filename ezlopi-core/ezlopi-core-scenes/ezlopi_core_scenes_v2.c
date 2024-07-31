@@ -1544,6 +1544,7 @@ static bool ___enable_disable_block_en_with_blockId(cJSON* cj_when_block, const 
             }
         }
     }
+
     return block_en_changed;
 }
 
@@ -1568,7 +1569,7 @@ int ezlopi_core_scene_block_enable_set_reset(const char* sceneId_str, const char
                 cJSON* cj_when_blocks = cJSON_GetObjectItem(__FUNCTION__, cj_scene, "when");
                 while (NULL != (cj_when_block = cJSON_GetArrayItem(cj_when_blocks, when_block_idx++)))
                 {
-                    block_enabled_changed = ___enable_disable_block_en_with_blockId(cj_when_block, blockId_str, enable_status);
+                    block_enabled_changed |= ___enable_disable_block_en_with_blockId(cj_when_block, blockId_str, enable_status);
                 }
 
                 if (block_enabled_changed)

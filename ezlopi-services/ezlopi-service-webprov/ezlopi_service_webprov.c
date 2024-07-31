@@ -222,7 +222,7 @@ static int __send_cjson_data_to_nma_websocket(cJSON* cj_data)
 static int __send_str_data_to_nma_websocket(char* str_data)
 {
     int ret = 0;
-    if (str_data)
+    if (str_data && ezlopi_websocket_client_is_connected())
     {
         int retries = 3;
         while (--retries)

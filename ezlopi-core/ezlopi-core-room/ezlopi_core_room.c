@@ -29,6 +29,28 @@ static e_room_subtype_t __get_subtype_enum(char *subtype_str);
 
 // static const char *__get_subtype_name(e_room_subtype_t subtype);
 
+char * ezlopi_core_room_get_name_by_id(uint32_t room_id)
+{
+    char * ret = NULL;
+
+    if (room_id && l_room_head)
+    {
+        s_ezlopi_room_t * cur_room = l_room_head;
+        while (cur_room)
+        {
+            if (room_id == cur_room->_id)
+            {
+                ret = cur_room->name;
+                break;
+            }
+
+            cur_room = cur_room->next;
+        }
+    }
+
+    return ret;
+}
+
 s_ezlopi_room_t *ezlopi_room_get_room_head(void)
 {
     return l_room_head;
@@ -278,8 +300,6 @@ s_ezlopi_room_t *ezlopi_room_add_to_list(cJSON *cj_room)
 
         if (cj_room)
         {
-            CJSON_TRACE("room", cj_room);
-
             cJSON *cj_room_id = cJSON_GetObjectItem(__FUNCTION__, cj_room, ezlopi__id_str);
             if (cj_room_id && cj_room_id->valuestring)
             {
@@ -320,6 +340,8 @@ void ezlopi_room_init(void)
     char *rooms_str = ezlopi_nvs_read_rooms();
     if (rooms_str)
     {
+        TRACE_D("rooms: %s", rooms_str);
+
         cJSON *cj_rooms = cJSON_Parse(__FUNCTION__, rooms_str);
         ezlopi_free(__FUNCTION__, rooms_str);
 
@@ -331,7 +353,7 @@ void ezlopi_room_init(void)
 
             while (NULL != (cj_room = cJSON_GetArrayItem(cj_rooms, idx)))
             {
-                s_ezlopi_room_t *new_room = ezlopi_room_add_to_list(cj_rooms);
+                s_ezlopi_room_t *new_room = ezlopi_room_add_to_list(cj_room);
                 if (new_room)
                 {
                     new_room->_pos = idx;
