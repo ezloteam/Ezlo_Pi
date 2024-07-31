@@ -136,8 +136,6 @@ static int __prepare(void* arg)
 
 static int __init(l_ezlopi_item_t* item)
 {
-    TRACE_D("Init called!");
-
     int ret = 0;
     if (item)
     {
@@ -304,7 +302,7 @@ static int __set_value(l_ezlopi_item_t* item, void* arg)
             }
         }
     }
-    
+
     return ret;
 }
 

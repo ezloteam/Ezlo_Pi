@@ -165,13 +165,13 @@ static int __init_mbedtls(s_ssl_websocket_t * wsc_ssl)
             }
 
             ret = mbedtls_x509_crt_parse(wsc_ssl->cacert, (uint8_t *)wsc_ssl->str_cacert, strlen(wsc_ssl->str_cacert) + 1);
-            TRACE_W("RET: -0x%04x [%d]", -ret, ret);
+            // TRACE_W("RET: -0x%04x [%d]", -ret, ret);
 
             ret |= mbedtls_x509_crt_parse(wsc_ssl->shared_cert, (uint8_t *)wsc_ssl->str_shared_cert, strlen(wsc_ssl->str_shared_cert) + 1);
-            TRACE_W("RET: -0x%04x [%d]", -ret, ret);
+            // TRACE_W("RET: -0x%04x [%d]", -ret, ret);
 
             ret |= mbedtls_pk_parse_key(wsc_ssl->private_key, (uint8_t *)wsc_ssl->str_private_key, strlen(wsc_ssl->str_private_key) + 1, NULL, 0);
-            TRACE_W("RET: -0x%04x [%d]", -ret, ret);
+            // TRACE_W("RET: -0x%04x [%d]", -ret, ret);
 
             if (ret >= 0)
             {
@@ -335,7 +335,7 @@ static int __send_internal(s_ssl_websocket_t * wsc_ssl, char *buf_s, size_t len,
             time_val.tv_usec = timeout ? ((timeout % 1000) * 1000) : 1;
 
             do {
-                TRACE_W("waiting for write-ready.......");
+                // TRACE_W("waiting for write-ready.......");
                 vTaskDelay(1 / portTICK_RATE_MS);
                 ret = select(fd + 1, NULL, &write_fds, NULL, &time_val);
             } while (ret == 4);
@@ -349,7 +349,7 @@ static int __send_internal(s_ssl_websocket_t * wsc_ssl, char *buf_s, size_t len,
                 return (-1);
             }
 
-            TRACE_W("POLL SUCCESS");
+            // TRACE_W("POLL SUCCESS");
 
             ret = mbedtls_ssl_write(wsc_ssl->ssl_ctx, (const unsigned char *)buf + written_bytes, len - written_bytes);
             if (ret >= 0)
@@ -363,7 +363,7 @@ static int __send_internal(s_ssl_websocket_t * wsc_ssl, char *buf_s, size_t len,
             }
         } while (written_bytes < len);
 
-        TRACE_W("write-success");
+        // TRACE_W("write-success");
 
         if ((char *)buf != buf_s)
         {
@@ -529,16 +529,16 @@ static int __upgrade_to_websocket(s_ssl_websocket_t * ssl_wsc)
     {
         do {
             ssl_wsc->is_connected = false;
-            TRACE_I("Writing HTTP __request...");
+            // TRACE_I("Writing HTTP __request...");
 
             snprintf(ssl_wsc->buffer, ssl_wsc->buffer_len, __request_format, ssl_wsc->url, ssl_wsc->url, ezlopi_factory_info_v3_get_id());
-            TRACE_D("__request_format: \r\n%s", ssl_wsc->buffer ? ssl_wsc->buffer : "null");
+            // TRACE_D("__request_format: \r\n%s", ssl_wsc->buffer ? ssl_wsc->buffer : "null");
 
             ret = __send_internal(ssl_wsc, ssl_wsc->buffer, strlen(ssl_wsc->buffer), 5000);
 
             if (ret > 0)
             {
-                TRACE_S("WSC-upgrade request sent. ret: %d", ret);
+                // TRACE_S("WSC-upgrade request sent. ret: %d", ret);
 
                 int read_len = 0;
                 memset(ssl_wsc->buffer, 0, ssl_wsc->buffer_len);
@@ -590,15 +590,15 @@ static int __upgrade_to_websocket(s_ssl_websocket_t * ssl_wsc)
                 }
 
                 read_len = ret;
-                TRACE_I("%d bytes read", read_len);
+                // TRACE_I("%d bytes read", read_len);
                 ssl_wsc->buffer[read_len] = 0;
 
-                TRACE_I("%s", ssl_wsc->buffer);
+                // TRACE_I("%s", ssl_wsc->buffer);
 
                 if (strstr(ssl_wsc->buffer, "websocket"))
                 {
                     ret = 1;
-                    TRACE_I("WSC Connected.");
+                    // TRACE_I("WSC Connected.");
                     ssl_wsc->is_connected = true;
                     if (ssl_wsc->connection_upcall_func) {
                         ssl_wsc->connection_upcall_func(true);

@@ -87,9 +87,9 @@ static void __create_reg_packet(void)
 
 static void __reg_loop(void *arg)
 {
-    TRACE_D("reg-loop");
+    // TRACE_D("reg-loop");
     int reg_event = ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 0, false);
-    TRACE_D("reg-event: %d", reg_event);
+    // TRACE_D("reg-event: %d", reg_event);
 
     if (reg_event <= 0)
     {

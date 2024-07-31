@@ -484,8 +484,6 @@ void ezlopi_device_prepare(void)
 
     if (config_string)
     {
-        TRACE_D("device-config: \r\n%s", config_string);
-
         cJSON* cj_config = cJSON_ParseWithRef(__FUNCTION__, config_string);
 
         if (cj_config)
@@ -695,7 +693,6 @@ static int ezlopi_device_parse_json_v3(cJSON* cjson_config)
         {
             if (cJSON_IsString(cjson_chipset) && (cjson_chipset->valuestring != NULL))
             {
-                TRACE_D("Chipset Value : %.*s", cjson_chipset->str_value_len, cjson_chipset->valuestring);
                 char chipset_name[10];
                 strncpy(chipset_name, cjson_chipset->valuestring, cjson_chipset->str_value_len);
 

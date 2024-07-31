@@ -357,8 +357,6 @@ static void __provision_check(void* pv)
             snprintf(http_request_location, sizeof(http_request_location), "https://ezlopiesp32.up.mios.com/provision-sync?token=%s&version=%d", provision_token, config_version ? config_version : 1);
 #endif
 
-            TRACE_I("Config sync URL : %s", http_request_location);
-
             ezlopi_wait_for_wifi_to_connect(portMAX_DELAY);
             s_ezlopi_http_data_t* response = ezlopi_http_get_request(http_request_location, NULL, NULL, NULL);
             // s_ezlopi_http_data_t* response = ezlopi_http_get_request(http_request_location, ssl_private_key, ssl_shared_key, ca_certificate);

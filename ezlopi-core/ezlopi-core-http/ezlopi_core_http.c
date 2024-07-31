@@ -699,7 +699,7 @@ static esp_err_t ezlopi_http_event_handler(esp_http_client_event_t* evt)
 
                         my_data->rx_len += evt->data_len;
                         my_data->status = 0;
-                        TRACE_W("chunk-count: 1");
+                        // TRACE_W("chunk-count: 1");
                     }
                     else
                     {

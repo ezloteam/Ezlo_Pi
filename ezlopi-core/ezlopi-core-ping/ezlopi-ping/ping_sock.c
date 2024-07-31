@@ -99,7 +99,6 @@ static esp_err_t __ping_send(esp_ping_t *ep)
         int opt_val;
         socklen_t opt_len = sizeof(opt_val);
         getsockopt(ep->sock, SOL_SOCKET, SO_ERROR, &opt_val, &opt_len);
-        TRACE_E(TAG, "send error=%d", opt_val);
         ret = ESP_FAIL;
     }
     else {

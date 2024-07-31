@@ -1,6 +1,12 @@
 #ifndef _EZLOPI_SERVICE_UART_H_
 #define _EZLOPI_SERVICE_UART_H_
 
+
+
+#include "../../build/config/sdkconfig.h"
+
+#ifdef CONFIG_EZPI_ENABLE_UART_PROVISIONING
+
 #include <string.h>
 
 #include "freertos/FreeRTOS.h"
@@ -8,12 +14,13 @@
 #include "EZLOPI_USER_CONFIG.h"
 
 
+
+
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
-#if defined(CONFIG_EZPI_ENABLE_UART_PROVISIONING)
 
     // typedef enum e_ezlopi_item_type
     // {
@@ -33,10 +40,11 @@ extern "C"
     void EZPI_SERV_uart_init(void);
     int EZPI_SERV_uart_tx_data(int len, uint8_t* data);
 
-#endif
 
 #ifdef __cplusplus
 }
 #endif
+
+#endif // CONFIG_EZPI_ENABLE_UART_PROVISIONING
 
 #endif // _EZLOPI_SERVICE_UART_H_

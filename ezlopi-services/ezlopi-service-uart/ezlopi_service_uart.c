@@ -1,11 +1,6 @@
-/* UART asynchronous example, that uses separate RX and TX tasks
+#include "../../build/config/sdkconfig.h"
 
-   This example code is in the Public Domain (or CC0 licensed, at your option.)
-
-   Unless required by applicable law or agreed to in writing, this
-   software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-   CONDITIONS OF ANY KIND, either express or implied.
-*/
+#ifdef CONFIG_EZPI_ENABLE_UART_PROVISIONING
 
 #include "freertos/FreeRTOSConfig.h"
 
@@ -49,7 +44,6 @@
 #include "ezlopi_service_loop.h"
 #include "EZLOPI_USER_CONFIG.h"
 
-#if defined (CONFIG_EZPI_ENABLE_UART_PROVISIONING)
 
 #if defined(CONFIG_IDF_TARGET_ESP32)
 #define TXD_PIN (GPIO_NUM_1)
@@ -734,8 +728,6 @@ static void ezlopi_service_uart_response(uint8_t cmd, uint8_t status_write, uint
         cJSON_AddNumberToObject(__FUNCTION__, response, "status_connect", status_connect);
 
         char* my_json_string = cJSON_Print(__FUNCTION__, response);
-        TRACE_D("length of 'my_json_string': %d", strlen(my_json_string));
-
         cJSON_Delete(__FUNCTION__, response); // free Json string
 
         if (my_json_string)
