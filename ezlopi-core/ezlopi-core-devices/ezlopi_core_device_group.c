@@ -1115,13 +1115,11 @@ static uint32_t __store_new_grp_in_nvs(cJSON* cj_new_grp, bool choice_of_trigger
 }
 uint32_t ezlopi_core_device_group_store_nvs_devgrp(cJSON* cj_new_device_grp)
 {
-    uint32_t new_dev_grp_id = __store_new_grp_in_nvs(cj_new_device_grp, DEVICE_GROUP_SELECTED);
-    return new_dev_grp_id;
+    return __store_new_grp_in_nvs(cj_new_device_grp, DEVICE_GROUP_SELECTED);
 }
 uint32_t ezlopi_core_item_group_store_nvs_itemgrp(cJSON* cj_new_item_grp)
 {
-    uint32_t new_item_grp_id = __store_new_grp_in_nvs(cj_new_item_grp, ITEM_GROUP_SELECTED);
-    return new_item_grp_id;
+    return __store_new_grp_in_nvs(cj_new_item_grp, ITEM_GROUP_SELECTED);
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 

@@ -124,7 +124,7 @@ typedef struct l_when_block_v2
     bool is_group;          // may be used in future    //  currently not-populated from nvs
     char * group_id;        // may be used in future    //  currently not-populated from nvs
 #endif
-    bool block_status_reset_once;  // set this flag if you want to reset this 'when-block' once.
+    bool block_status_reset_once;  // 'NOT-NVS parameter' [don't populate ; since not needed] // just a dummy flag to trigger function reset.
     e_scenes_block_type_v2_t block_type;
     s_block_options_v2_t block_options;
     l_fields_v2_t* fields;
@@ -224,8 +224,12 @@ int ezlopi_core_scene_set_reset_latch_enable(const char* sceneId_str, const char
 
 int ezlopi_core_scene_block_enable_set_reset(const char* sceneId_str, const char* blockId_str, bool enable_status);
 int ezlopi_core_scene_reset_latch_status(const char* sceneId_str, const char* blockId_str);
-int ezlopi_core_scene_reset_block_status(const char* sceneId_str, const char* blockId_str);
+int ezlopi_core_scene_reset_when_block(const char* sceneId_str, const char* blockId_str);
 
+// ----- # below function are called when 'creating' and 'editing' scene # ---------
+int ezlopi_core_scene_add_group_id_if_reqd(cJSON* cj_new_scene);
+int ezlopi_core_scene_add_when_blockId_if_reqd(cJSON* cj_new_scene);
+// ---------------------------------------------------------------------------------
 #endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 #endif // _EZLOPI_CORE_SCENES_V2_H_

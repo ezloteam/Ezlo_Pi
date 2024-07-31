@@ -105,8 +105,8 @@ void scenes_delete(cJSON* cj_request, cJSON* cj_response)
         {
             uint32_t u_id = strtoul(cj_id->valuestring, NULL, 16);
             ezlopi_nvs_delete_stored_data_by_id(u_id);
-            ezlopi_scenes_depopulate_by_id_v2(u_id);
             ezlopi_scenes_remove_id_from_list_v2(u_id);
+            ezlopi_scenes_depopulate_by_id_v2(u_id);
         }
     }
 }
@@ -533,11 +533,11 @@ void scenes_block_status_reset(cJSON * cj_request, cJSON * cj_response)
                 cJSON *cj_block_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_blockId_str);
                 if (cj_block_id && (NULL != cj_block_id->valuestring))
                 {
-                    ezlopi_core_scene_reset_block_status(cj_scene_id->valuestring, cj_block_id->valuestring);
+                    ezlopi_core_scene_reset_when_block(cj_scene_id->valuestring, cj_block_id->valuestring);
                 }
                 else
                 {
-                    ezlopi_core_scene_reset_block_status(cj_scene_id->valuestring, NULL);
+                    ezlopi_core_scene_reset_when_block(cj_scene_id->valuestring, NULL);
                 }
             }
         }

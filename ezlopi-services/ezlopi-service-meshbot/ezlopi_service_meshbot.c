@@ -46,9 +46,10 @@ uint32_t ezlopi_meshbot_service_stop_for_scene_id(uint32_t _id)
         if (EZLOPI_SCENE_STATUS_RUNNING == scene_node->status)
         {
             scene_node->status = EZLOPI_SCENE_STATUS_STOP;
-            TRACE_D("stop scene_id : %#x [%d] ", scene_node->_id, scene_node->status);
+            TRACE_S("stop scene_id : %#x [%d] ", scene_node->_id, scene_node->status);
         }
 
+        #warning "Donot comment below : Remove this warning when merging into development";
         while (EZLOPI_SCENE_STATUS_STOPPED != scene_node->status)
         {
             vTaskDelay(10 / portTICK_RATE_MS);
@@ -70,9 +71,10 @@ uint32_t ezlopi_meshobot_service_stop_scene(l_scenes_list_v2_t* scene_node)
         if (EZLOPI_SCENE_STATUS_RUNNING == scene_node->status)
         {
             scene_node->status = EZLOPI_SCENE_STATUS_STOP;
-            TRACE_D("stop scene_id : %#x [%d] ", scene_node->_id, scene_node->status);
+            TRACE_S("stop scene_id : %#x [%d] ", scene_node->_id, scene_node->status);
         }
 
+        #warning "Donot comment below : Remove this warning when merging into development";
         while (EZLOPI_SCENE_STATUS_STOPPED != scene_node->status)
         {
             vTaskDelay(10 / portTICK_RATE_MS);
@@ -96,7 +98,7 @@ uint32_t ezlopi_meshbot_service_start_scene(l_scenes_list_v2_t* scene_node)
             __execute_scene_start(scene_node);
             // xTaskCreate(__scenes_process, scene_node->name, 2 * 2048, scene_node, 2, NULL);
 
-            TRACE_D("start scene_id : %#x [%d] ", scene_node->_id, scene_node->status);
+            TRACE_S("start scene_id : %#x [%d] ", scene_node->_id, scene_node->status);
             ret = 1;
         }
     }

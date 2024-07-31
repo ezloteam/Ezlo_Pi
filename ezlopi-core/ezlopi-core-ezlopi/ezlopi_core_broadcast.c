@@ -90,7 +90,7 @@ int ezlopi_core_broadcast_cjson(cJSON* cj_data)
             TRACE_I("%d -> -----------------------------> buffer acquired!", xTaskGetTickCount());
             memset(data_buffer, 0, buffer_len);
 
-            TRACE_D("buffer_len = [%d]", buffer_len);
+            // TRACE_D("buffer_len = [%d]", buffer_len);
 
             if (true == cJSON_PrintPreallocated(__FUNCTION__, cj_data, data_buffer, buffer_len, false))
             {
