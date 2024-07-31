@@ -92,7 +92,6 @@ void ezlopi_init(void)
 
 #if (defined(CONFIG_EZPI_ENABLE_WIFI) || defined(CONFIG_EZPI_CORE_ENABLE_ETH))
     ezlopi_error_t sntp_error = EZPI_CORE_sntp_init();
-    EZPI_ERR_LOG_ON_ERROR(sntp_error, "SNTP initialization error");
 #ifdef CONFIG_EZPI_ENABLE_PING
     ezlopi_ping_init();
 #endif // CONFIG_EZPI_ENABLE_PING

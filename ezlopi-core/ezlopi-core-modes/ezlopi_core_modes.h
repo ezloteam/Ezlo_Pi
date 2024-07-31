@@ -133,7 +133,7 @@ s_house_modes_t* ezlopi_core_modes_get_house_mode_by_name(char* house_mode_name)
 
 s_ezlopi_modes_t* ezlopi_core_modes_get_custom_modes(void);
 s_house_modes_t* ezlopi_core_modes_get_current_house_modes(void);
-ezlopi_error_t  (s_house_modes_t* new_house_mode);
+ezlopi_error_t  ezlopi_core_modes_set_current_house_mode(s_house_modes_t* new_house_mode);
 
 ezlopi_error_t ezlopi_core_modes_api_get_modes(cJSON* cj_result);
 ezlopi_error_t ezlopi_core_modes_api_get_current_mode(cJSON* cj_result);

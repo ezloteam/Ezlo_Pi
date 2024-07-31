@@ -499,6 +499,7 @@ void ezlopi_device_prepare(void)
 
         if (cj_config)
         {
+
             if (EZPI_SUCCESS != ezlopi_device_parse_json_v3(cj_config))
             {
                 TRACE_E("parsing devices-config failed!!!!");

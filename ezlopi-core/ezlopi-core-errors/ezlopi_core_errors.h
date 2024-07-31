@@ -87,7 +87,6 @@ typedef int32_t ezlopi_error_t;
 
 #define EZPI_ERR_MODES_FAILED                                           0x00040000 // Any error occcured during modes related operations
 
-#define EZPI_ERR_LOG_ON_ERROR(err, msg) (EZPI_SUCCESS != err ? TRACE_E(msg) : 0)
 
 // #warning("Create error code for invalid and empty params")
 

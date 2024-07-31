@@ -17,9 +17,9 @@
 
 // static uint32_t __message_count = 0;
 static l_broadcast_method_t* __method_head = NULL;
-static int (*__broadcast_queue_func)(cJSON* cj_data) = NULL;
+static ezlopi_error_t (*__broadcast_queue_func)(cJSON* cj_data) = NULL;
 
-static int __call_broadcast_methods(char* data);
+static ezlopi_error_t __call_broadcast_methods(char* data);
 static l_broadcast_method_t* __method_create(f_broadcast_method_t method, char* name, uint32_t retries);
 
 void ezlopi_core_broadcast_methods_set_queue(ezlopi_error_t (*func)(cJSON*))

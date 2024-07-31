@@ -285,7 +285,7 @@ static ezlopi_error_t __prepare(void* arg)
 
 static ezlopi_error_t __init(l_ezlopi_item_t* item)
 {
-    ezlopi_error_t ret = EZPI_SUCCESS;
+    ezlopi_error_t ret = EZPI_ERR_INIT_DEVICE_FAILED;
     if (item)
     {
         s_gy271_data_t* user_data = (s_gy271_data_t*)item->user_arg;
@@ -301,28 +301,17 @@ static ezlopi_error_t __init(l_ezlopi_item_t* item)
                     TaskHandle_t ezlopi_sensor_gy271_callibrationb_task_handle = NULL;
                     xTaskCreate(__gy271_calibration_task, "GY271_Calibration_Task", EZLOPI_SENSOR_GY271_CALLIBRATION_TASK_DEPTH, item, 1, &ezlopi_sensor_gy271_callibrationb_task_handle);
                     ezlopi_core_process_set_process_info(ENUM_EZLOPI_SENSOR_GY271_CALLIBRATION_TASK, &ezlopi_sensor_gy271_callibrationb_task_handle, EZLOPI_SENSOR_GY271_CALLIBRATION_TASK_DEPTH);
-                }
-                else
-                {
-                    ret = -1;
+                    ret = EZPI_SUCCESS;
                 }
             }
-            else
-            {
-                ret = -1;
-            }
-        }
-        else
-        {
-            ret = -1;
         }
     }
     return ret;
 }
 
-static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
+static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t* item, void* arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
     if (item && arg)
     {
         cJSON* cj_result = (cJSON*)arg;
@@ -355,22 +344,10 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
                 {
                     ezlopi_valueformatter_float_to_cjson(cj_result, user_data->T, item->cloud_properties.scale);
                 }
-            }
-            else
-            {
-                ret = EZPI_ERR_INIT_DEVICE_FAILED;
+                ret = EZPI_SUCCESS;
             }
         }
-        else
-        {
-            ret = EZPI_ERR_INIT_DEVICE_FAILED;
-        }
     }
-    else
-    {
-        ret = EZPI_ERR_INIT_DEVICE_FAILED;
-    }
-
     return ret;
 }
 

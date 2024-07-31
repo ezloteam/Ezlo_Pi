@@ -15,7 +15,7 @@
 static QueueHandle_t __broadcast_queue = NULL;
 
 static void __broadcast_loop(void *arg);
-static int ezlopi_service_broadcast_send_to_queue(cJSON* cj_broadcast_data);
+static ezlopi_error_t ezlopi_service_broadcast_send_to_queue(cJSON* cj_broadcast_data);
 
 void ezlopi_service_broadcast_init(void)
 {
