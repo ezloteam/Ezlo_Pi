@@ -40,7 +40,6 @@ static void __print_mac_address(void)
     uint8_t __base_mac[6] = { 0, 0, 0, 0, 0, 0 };
 
     esp_read_mac(__base_mac, ESP_MAC_WIFI_STA);
-    dump("base-mac", __base_mac, 0, 6);
 }
 
 void app_main(void)

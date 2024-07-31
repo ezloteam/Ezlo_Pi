@@ -198,7 +198,7 @@ static int __call_broadcast_methods(char* data)
                 int mret = curr_method->func(data);
                 if (mret)
                 {
-                    TRACE_S("broadcasted - method:'%s'\r\ndata: %s", curr_method->method_name ? curr_method->method_name : "", data);
+                    // TRACE_S("broadcasted - method:'%s'\r\ndata: %s", curr_method->method_name ? curr_method->method_name : "", data);
                     break;
                 }
 
