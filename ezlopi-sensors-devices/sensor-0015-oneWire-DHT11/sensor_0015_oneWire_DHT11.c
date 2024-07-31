@@ -225,7 +225,6 @@ static int __0015_init(l_ezlopi_item_t* item)
             {
                 if (GPIO_IS_VALID_GPIO((gpio_num_t)item->interface.onewire_master.onewire_pin))
                 {
-                    TRACE_S("HERE");
                     setDHT11gpio(item->interface.onewire_master.onewire_pin);
                     ret = 1;
                 }
@@ -270,7 +269,6 @@ static int __0015_notify(l_ezlopi_item_t* item)
         s_ezlopi_dht11_data_t* dht11_data = (s_ezlopi_dht11_data_t*)item->user_arg;
         if (dht11_data)
         {
-            // TRACE_S("HERE");
             readDHT11();
             if (ezlopi_item_name_temp == item->cloud_properties.item_name)
             {

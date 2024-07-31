@@ -33,10 +33,10 @@ typedef enum e_scenes_block_type_v2
 typedef enum e_scene_status_v2
 {
     EZLOPI_SCENE_STATUS_NONE = 0,
-    EZLOPI_SCENE_STATUS_RUN,
-    EZLOPI_SCENE_STATUS_RUNNING,
-    EZLOPI_SCENE_STATUS_STOP,
-    EZLOPI_SCENE_STATUS_STOPPED,
+    EZLOPI_SCENE_STATUS_RUN, // command
+    EZLOPI_SCENE_STATUS_RUNNING, // state
+    EZLOPI_SCENE_STATUS_STOP, // command
+    EZLOPI_SCENE_STATUS_STOPPED, // state
     EZLOPI_SCENE_STATUS_MAX
 } e_scene_status_v2_t;
 
