@@ -134,4 +134,12 @@ const char *ezlopi_hub_room_reordered_str = "hub.room.reordered";
 
 const char *ezlopi_hub_modes_changed_str = "hub.modes.changed";
 
+const char *ezlopi_hub_device_group_created = "hub.device.group.created";
+const char *ezlopi_hub_device_group_deleted = "hub.device.group.deleted";
+const char *ezlopi_hub_device_group_updated = "hub.device.group.updated";
+
+const char *ezlopi_hub_item_group_created = "hub.item.group.created";
+const char *ezlopi_hub_item_group_deleted = "hub.item.group.deleted";
+const char *ezlopi_hub_item_group_updated = "hub.item.group.updated";
+
 #endif // __EZLOPI_METHODS_STR_H__

@@ -116,6 +116,6 @@ void ezlopi_core_buffer_release(void)
     }
     else
     {
-        // TRACE_E("buffer release failed!");
+        TRACE_E("buffer release failed!");
     }
 }

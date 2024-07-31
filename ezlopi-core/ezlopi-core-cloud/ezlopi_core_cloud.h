@@ -90,6 +90,8 @@ extern const uint32_t EXPRESSION_ID_START;
 extern const uint32_t MODES_ID_START;
 extern const uint32_t SCENE_GROUP_ID_START;
 extern const uint32_t SCENE_WHEN_BLOCKID_START;
+extern const uint32_t DEVICE_GROUPID_START;
+
 
 uint32_t ezlopi_cloud_generate_device_id(void);
 void ezlopi_cloud_update_device_id(uint32_t device_id);
@@ -120,6 +122,12 @@ void ezlopi_cloud_update_room_id(uint32_t a_room_id);
 
 uint32_t ezlopi_cloud_generate_scene_group_id(void);
 void ezlopi_cloud_update_group_id(uint32_t a_group_id);
+
+uint32_t ezlopi_cloud_generate_device_group_id(void);
+void ezlopi_cloud_update_device_group_id(uint32_t a_device_group_id);
+
+uint32_t ezlopi_cloud_generate_item_group_id(void);
+void ezlopi_cloud_update_item_group_id(uint32_t a_item_group_id);
 
 // uint32_t ezlopi_cloud_get_modes_initial_id(void);
 

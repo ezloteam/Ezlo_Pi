@@ -445,7 +445,7 @@ static void __cjson_add_fields(cJSON* cj_block, l_fields_v2_t* fields)
                     }
                     case EZLOPI_VALUE_TYPE_BLOCKS:
                     {
-                        TRACE_S(" adding : __ EZLOPI_VALUE_TYPE_BLOCKS __");
+                        TRACE_D(" adding : __ EZLOPI_VALUE_TYPE_BLOCKS __");
                         cJSON* vlaue_block_array = cJSON_AddArrayToObject(__FUNCTION__, cj_field, ezlopi_value_str);
                         if (vlaue_block_array)
                         {

@@ -11,6 +11,7 @@
 #include "../../build/config/sdkconfig.h"
 
 static l_ezlopi_device_t* l_device_head = NULL;
+
 static volatile uint32_t g_store_dev_config_with_id = 0;
 static s_ezlopi_cloud_controller_t s_controller_information;
 

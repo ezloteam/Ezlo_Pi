@@ -6,11 +6,141 @@
 #include "ezlopi_util_trace.h"
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_http.h"
+#include "ezlopi_core_devices.h"
+#include "ezlopi_core_device_group.h"
 #include "ezlopi_core_scenes_v2.h"
 #include "ezlopi_core_scenes_edit.h"
 #include "ezlopi_core_scenes_when_methods_helper_functions.h"
+
+#include "ezlopi_cloud_constants.h"
 #include "EZLOPI_USER_CONFIG.h"
 
+//------------------------------- ezlopi_scene_when_is_itemState ------------------------------------------
+static int __compare_item_values(l_ezlopi_item_t* curr_item, l_fields_v2_t* value_field)
+{
+    int ret = 0;
+    cJSON* cj_tmp_value = cJSON_CreateObject(__FUNCTION__);
+    if (cj_tmp_value)
+    {
+        curr_item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, curr_item, (void*)cj_tmp_value, NULL);
+        cJSON* cj_value = cJSON_GetObjectItem(__FUNCTION__, cj_tmp_value, ezlopi_value_str);
+        if (cj_value)
+        {
+            switch (cj_value->type)
+            {
+            case cJSON_True:
+            {
+                if (true == value_field->field_value.u_value.value_bool)
+                {
+                    ret = 1;
+                }
+                break;
+            }
+            case cJSON_False:
+            {
+                if (false == value_field->field_value.u_value.value_bool)
+                {
+                    ret = 1;
+                }
+                break;
+            }
+            case cJSON_Number:
+            {
+                if (cj_value->valuedouble == value_field->field_value.u_value.value_double)
+                {
+                    ret = 1;
+                }
+                break;
+            }
+            case cJSON_String:
+            {
+                if (EZPI_STRNCMP_IF_EQUAL(cj_value->valuestring, value_field->field_value.u_value.value_string, strlen(cj_value->valuestring), strlen(value_field->field_value.u_value.value_string)))
+                {
+                    ret = 1;
+                }
+                break;
+            }
+            default:
+            {
+                TRACE_E("Value type mis-matched!");
+            }
+            }
+        }
+
+        cJSON_Delete(__FUNCTION__, cj_tmp_value);
+    }
+
+    return ret;
+}
+
+int is_item_state_single_condition(uint32_t item_id, l_fields_v2_t* value_field)
+{
+    int ret = 0;
+    l_ezlopi_device_t* curr_device = ezlopi_device_get_head();
+    while (curr_device)
+    {
+        l_ezlopi_item_t* curr_item = curr_device->items;
+        while (curr_item)
+        {
+            if (item_id == curr_item->cloud_properties.item_id)
+            {
+                ret = __compare_item_values(curr_item, value_field);
+                break;
+            }
+            curr_item = curr_item->next;
+        }
+        curr_device = curr_device->next;
+    }
+
+    return ret;
+}
+
+int is_item_state_with_grp_condition(uint32_t device_group_id, uint32_t item_group_id, l_fields_v2_t* value_field)
+{
+    int ret = 0;
+
+    l_ezlopi_device_grp_t * curr_devgrp = ezlopi_core_device_group_get_by_id(device_group_id);
+    if (curr_devgrp)
+    {
+        int idx = 0;
+        cJSON * cj_get_devarr = NULL;
+        while (NULL != (cj_get_devarr = cJSON_GetArrayItem(curr_devgrp->devices, idx)))   // ["102ec000" , "102ec001" ,..]
+        {
+            uint32_t curr_devce_id = strtoul(cj_get_devarr->valuestring, NULL, 16);
+            l_ezlopi_device_t * curr_device = ezlopi_device_get_by_id(curr_devce_id);   // immediately goto "102ec000" ...
+            if (curr_device)
+            {
+                l_ezlopi_item_t* curr_item_node = curr_device->items;   // perform operation on items of above device --> "102ec000"
+                while (curr_item_node)
+                {
+                    // compare with items_list stored in item_group_id
+                    l_ezlopi_item_grp_t * curr_item_grp = ezlopi_core_item_group_get_by_id(item_group_id);  // get  "ll_itemgrp_node"
+                    if (curr_item_grp)
+                    {
+                        int count = 0;
+                        cJSON * cj_item_names = NULL;
+                        while (NULL != (cj_item_names = cJSON_GetArrayItem(curr_item_grp->item_names, count)))  // ["202ec000" , "202ec001" ,..]
+                        {
+                            uint32_t req_item_id_from_itemgrp = strtoul(cj_item_names->valuestring, NULL, 16);
+                            // if the item_ids match ; Then compare the "item_values" with that of the "scene's" requirement
+                            if (req_item_id_from_itemgrp == curr_item_node->cloud_properties.item_id)
+                            {
+                                // compare the values of "when-condition"  & the "ll_item_node"
+                                ret = __compare_item_values(curr_item_node, value_field);
+                                break;
+                            }
+                            count++;
+                        }
+                    }
+                    curr_item_node = curr_item_node->next;
+                }
+            }
+            idx++;
+        }
+    }
+
+    return ret;
+}
 
 
 //------------------------------- ezlopi_scene_when_is_date ---------------------------------------------
