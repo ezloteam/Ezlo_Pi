@@ -390,6 +390,7 @@ void ezlopi_scenes_populate_fields_get_value(l_fields_v2_t* field, cJSON* cj_val
 {
     if (field && cj_value)
     {
+        // CJSON_TRACE("cj_value (edit)", cj_value);
         TRACE_I("type: %s", ezlopi_scene_get_scene_value_type_name(field->value_type));
         switch (cj_value->type)
         {
@@ -433,7 +434,6 @@ void ezlopi_scenes_populate_fields_get_value(l_fields_v2_t* field, cJSON* cj_val
         }
         case cJSON_Object:
         {
-
             if (EZLOPI_VALUE_TYPE_BLOCK == field->value_type)
             {
                 field->field_value.e_type = VALUE_TYPE_BLOCK;
@@ -452,40 +452,61 @@ void ezlopi_scenes_populate_fields_get_value(l_fields_v2_t* field, cJSON* cj_val
                 field->field_value.u_value.cj_value = cJSON_Duplicate(__FUNCTION__, cj_value, cJSON_True);
                 CJSON_TRACE("value", field->field_value.u_value.cj_value);
             }
-
             break;
-
         }
         case cJSON_Array:
         {
             int block_idx = 0;
             cJSON* cj_block = NULL;
-            field->field_value.e_type = VALUE_TYPE_BLOCK;
-            CJSON_TRACE("value", cj_value);
-            l_when_block_v2_t* curr_when_block = NULL;
 
-            while (NULL != (cj_block = cJSON_GetArrayItem(cj_value, block_idx++)))
+            switch (field->value_type)
             {
-                if (field->field_value.u_value.when_block)
+            case EZLOPI_VALUE_TYPE_ARRAY:
+            case EZLOPI_VALUE_TYPE_24_HOURS_TIME:
+            case EZLOPI_VALUE_TYPE_24_HOURS_TIME_ARRAY:
+            case EZLOPI_VALUE_TYPE_INT_ARRAY:
+            case EZLOPI_VALUE_TYPE_HMS_INTERVAL:
+            case EZLOPI_VALUE_TYPE_HOUSE_MODE_ID_ARRAY:
+            {
+                field->field_value.e_type = VALUE_TYPE_CJSON;
+                field->field_value.u_value.cj_value = cJSON_Duplicate(__FUNCTION__, cj_value, cJSON_True);
+                break;
+            }
+            case EZLOPI_VALUE_TYPE_BLOCKS:  // there are more than one-blocks [since 'cJSON_Array' ]
+            {
+                field->field_value.e_type = VALUE_TYPE_BLOCK;
+                // CJSON_TRACE("blocks_value (edit)", cj_value);
+                l_when_block_v2_t* curr_when_block = NULL;
+
+                while (NULL != (cj_block = cJSON_GetArrayItem(cj_value, block_idx++)))
                 {
-                    curr_when_block->next = (l_when_block_v2_t*)ezlopi_malloc(__FUNCTION__, sizeof(l_when_block_v2_t));
-                    if (curr_when_block->next)
-                    {
-                        memset(curr_when_block->next, 0, sizeof(l_when_block_v2_t));
-                        ezlopi_scenes_populate_assign_when_block(curr_when_block->next, cj_block);
-                        curr_when_block = curr_when_block->next;
-                    }
-                }
-                else
-                {
-                    field->field_value.u_value.when_block = (l_when_block_v2_t*)ezlopi_malloc(__FUNCTION__, sizeof(l_when_block_v2_t));
                     if (field->field_value.u_value.when_block)
                     {
-                        memset(field->field_value.u_value.when_block, 0, sizeof(l_when_block_v2_t));
-                        ezlopi_scenes_populate_assign_when_block(field->field_value.u_value.when_block, cj_block);
-                        curr_when_block = field->field_value.u_value.when_block;
+                        curr_when_block->next = (l_when_block_v2_t*)ezlopi_malloc(__FUNCTION__, sizeof(l_when_block_v2_t));
+                        if (curr_when_block->next)
+                        {
+                            memset(curr_when_block->next, 0, sizeof(l_when_block_v2_t));
+                            ezlopi_scenes_populate_assign_when_block(curr_when_block->next, cj_block);
+                            curr_when_block = curr_when_block->next;
+                        }
+                    }
+                    else
+                    {
+                        field->field_value.u_value.when_block = (l_when_block_v2_t*)ezlopi_malloc(__FUNCTION__, sizeof(l_when_block_v2_t));
+                        if (field->field_value.u_value.when_block)
+                        {
+                            memset(field->field_value.u_value.when_block, 0, sizeof(l_when_block_v2_t));
+                            ezlopi_scenes_populate_assign_when_block(field->field_value.u_value.when_block, cj_block);
+                            curr_when_block = field->field_value.u_value.when_block;
+                        }
                     }
                 }
+                break;
+            }
+            default:
+            {
+                TRACE_W("Value type not implemented");
+            }
             }
             break;
         }

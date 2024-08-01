@@ -23,7 +23,7 @@
 
 void scenes_list(cJSON* cj_request, cJSON* cj_response)
 {
-    cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+    cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str); // For NULL broadcast
     if (cj_result)
     {
         ezlopi_scenes_get_list_v2(cJSON_AddArrayToObject(__FUNCTION__, cj_result, ezlopi_scenes_str));
@@ -32,8 +32,6 @@ void scenes_list(cJSON* cj_request, cJSON* cj_response)
 
 void scenes_create(cJSON* cj_request, cJSON* cj_response)
 {
-    cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
-
     cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
     if (cj_params)
     {
@@ -52,7 +50,6 @@ void scenes_create(cJSON* cj_request, cJSON* cj_response)
 
 void scenes_get(cJSON* cj_request, cJSON* cj_response)
 {
-
     cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
     if (cj_params)
     {
@@ -67,11 +64,16 @@ void scenes_get(cJSON* cj_request, cJSON* cj_response)
             }
         }
     }
+
+    // Finally, Make sure 'result : {}' is present in broadcast
+    if (NULL == cJSON_GetObjectItem(__FUNCTION__, cj_response, ezlopi_result_str))
+    {
+        cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+    }
 }
 
 void scenes_edit(cJSON* cj_request, cJSON* cj_response)
 {
-
     cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
     if (cj_params)
     {
@@ -95,8 +97,6 @@ void scenes_edit(cJSON* cj_request, cJSON* cj_response)
 
 void scenes_delete(cJSON* cj_request, cJSON* cj_response)
 {
-    cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
-
     cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
     if (cj_params)
     {
@@ -113,7 +113,6 @@ void scenes_delete(cJSON* cj_request, cJSON* cj_response)
 
 void scenes_status_get(cJSON* cj_request, cJSON* cj_response)
 {
-
     cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
     if (cj_params)
     {
@@ -128,11 +127,17 @@ void scenes_status_get(cJSON* cj_request, cJSON* cj_response)
             }
         }
     }
+
+    // Finally, Make sure 'result : {}' is present in broadcast
+    if (NULL == cJSON_GetObjectItem(__FUNCTION__, cj_response, ezlopi_result_str))
+    {
+        cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+    }
 }
 
 void scenes_run(cJSON* cj_request, cJSON* cj_response)
 {
-    cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+    cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str); // For NULL broadcast
 
     cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
     if (cj_params)
@@ -148,7 +153,6 @@ void scenes_run(cJSON* cj_request, cJSON* cj_response)
 
 void scenes_enable_set(cJSON* cj_request, cJSON* cj_response)
 {
-
     cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
     if (cj_params)
     {
@@ -201,14 +205,10 @@ void scenes_enable_set(cJSON* cj_request, cJSON* cj_response)
             }
         }
     }
-
-    cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
 }
 
 void scenes_notification_add(cJSON* cj_request, cJSON* cj_response)
 {
-    cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
-
     cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
     if (cj_params)
     {
@@ -264,8 +264,6 @@ void scenes_notification_add(cJSON* cj_request, cJSON* cj_response)
 
 void scenes_notification_remove(cJSON* cj_request, cJSON* cj_response)
 {
-    cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
-
     cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
     if (cj_params)
     {
@@ -312,39 +310,33 @@ void scenes_notification_remove(cJSON* cj_request, cJSON* cj_response)
             uint32_t scene_id = strtoul(cj_scene_id->valuestring, NULL, 16);
             if (scene_id)
             {
-                l_scenes_list_v2_t* scene_node = ezlopi_scenes_get_scenes_head_v2();
-                while (scene_node)
+                l_scenes_list_v2_t* scene_node = ezlopi_scenes_get_by_id_v2(scene_id);
+                if (scene_node)
                 {
-                    if (scene_node->_id == scene_id)
+                    if (0 == strcmp(scene_node->user_notifications->user_id, cj_user_id_del->valuestring))
                     {
-                        if (0 == strcmp(scene_node->user_notifications->user_id, cj_user_id_del->valuestring))
-                        {
-                            l_user_notification_v2_t* user_id_del = scene_node->user_notifications;
-                            scene_node->user_notifications = scene_node->user_notifications->next;
-                            user_id_del->next = NULL;
-                            ezlopi_scenes_delete_user_notifications(user_id_del);
-                        }
-                        else
-                        {
-                            l_user_notification_v2_t* user_node = scene_node->user_notifications;
-                            while (user_node->next)
-                            {
-                                if (0 == strcmp(user_node->user_id, cj_user_id_del->valuestring))
-                                {
-                                    l_user_notification_v2_t* user_id_del = user_node;
-                                    user_node = user_node->next;
-                                    user_id_del->next = NULL;
-                                    ezlopi_scenes_delete_user_notifications(user_id_del);
-                                    break;
-                                }
-
-                                user_node = user_node->next;
-                            }
-                        }
-
-                        break;
+                        l_user_notification_v2_t* user_id_del = scene_node->user_notifications;
+                        scene_node->user_notifications = scene_node->user_notifications->next;
+                        user_id_del->next = NULL;
+                        ezlopi_scenes_delete_user_notifications(user_id_del);
                     }
-                    scene_node = scene_node->next;
+                    else
+                    {
+                        l_user_notification_v2_t* user_node = scene_node->user_notifications;
+                        while (user_node->next)
+                        {
+                            if (0 == strcmp(user_node->user_id, cj_user_id_del->valuestring))
+                            {
+                                l_user_notification_v2_t* user_id_del = user_node;
+                                user_node = user_node->next;
+                                user_id_del->next = NULL;
+                                ezlopi_scenes_delete_user_notifications(user_id_del);
+                                break;
+                            }
+
+                            user_node = user_node->next;
+                        }
+                    }
                 }
             }
         }
@@ -353,7 +345,7 @@ void scenes_notification_remove(cJSON* cj_request, cJSON* cj_response)
 
 void scenes_house_modes_set(cJSON* cj_request, cJSON* cj_response)
 {
-    cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+    cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);// For NULL Broadcast
     cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
     if (cj_result && cj_params)
     {
@@ -414,11 +406,11 @@ void scenes_house_modes_set(cJSON* cj_request, cJSON* cj_response)
 
 void scenes_action_block_test(cJSON * cj_request, cJSON * cj_response)
 {
-    cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+    cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);// For NULL Broadcast
     if (cj_result)
     {
         cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
-        if (cj_result && cj_params)
+        if (cj_params)
         {
             cJSON* cj_block = cJSON_GetObjectItem(__FUNCTION__, cj_params, "block");
             if (cj_block)
@@ -504,7 +496,6 @@ void scenes_action_block_test(cJSON * cj_request, cJSON * cj_response)
 
 void scenes_block_enabled_set(cJSON* cj_request, cJSON* cj_response)
 {
-    // cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
     if (cj_params)
     {
@@ -521,7 +512,7 @@ void scenes_block_enabled_set(cJSON* cj_request, cJSON* cj_response)
 
 void scenes_block_status_reset(cJSON * cj_request, cJSON * cj_response)
 {
-    cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+    cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);   // For NULL broadcast
     if (cj_result)
     {
         cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
@@ -546,16 +537,19 @@ void scenes_block_status_reset(cJSON * cj_request, cJSON * cj_response)
 
 void scenes_stop(cJSON* cj_request, cJSON* cj_response)
 {
-    cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
-    cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
-    if (cj_params)
+    cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);// For NULL Broadcast
+    if (cj_result)
     {
-        TRACE_D("Stop executed");
-        cJSON* cj_scene_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_sceneId_str);
-        if (cj_scene_id && cj_scene_id->valuestring)
+        cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
+        if (cj_params)
         {
-            uint32_t u32_scene_id = strtoul(cj_scene_id->valuestring, NULL, 16);
-            ezlopi_meshbot_service_stop_for_scene_id(u32_scene_id);
+            TRACE_D("Stop executed");
+            cJSON* cj_scene_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_sceneId_str);
+            if (cj_scene_id && cj_scene_id->valuestring)
+            {
+                uint32_t u32_scene_id = strtoul(cj_scene_id->valuestring, NULL, 16);
+                ezlopi_meshbot_service_stop_for_scene_id(u32_scene_id);
+            }
         }
     }
 }
@@ -586,6 +580,12 @@ void scene_changed(cJSON * cj_request, cJSON * cj_response)
                 ezlopi_free(__FUNCTION__, scene_str);
             }
         }
+    }
+
+    // Finally, Make sure 'result : {}' is present in broadcast
+    if (NULL == cJSON_GetObjectItem(__FUNCTION__, cj_response, ezlopi_result_str))
+    {
+        cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     }
 }
 
@@ -625,6 +625,12 @@ void scene_added(cJSON * cj_request, cJSON * cj_response)
         }
 
     }
+
+    // Finally, Make sure 'result : {}' is present in broadcast
+    if (NULL == cJSON_GetObjectItem(__FUNCTION__, cj_response, ezlopi_result_str))
+    {
+        cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+    }
 }
 
 void scene_deleted(cJSON * cj_request, cJSON * cj_response)
@@ -648,6 +654,12 @@ void scene_deleted(cJSON * cj_request, cJSON * cj_response)
                 cJSON_AddBoolToObject(__FUNCTION__, cj_result, ezlopi_syncNotification_str, true);
             }
         }
+    }
+
+    // Finally, Make sure 'result : {}' is present in broadcast
+    if (NULL == cJSON_GetObjectItem(__FUNCTION__, cj_response, ezlopi_result_str))
+    {
+        cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     }
 }
 #endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
