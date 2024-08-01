@@ -86,13 +86,21 @@ static void __setup_item_properties(l_ezlopi_item_t* item, cJSON* cjson_device)
 
     CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_dev_type_str, item->interface_type);
 
-    CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_is_ip_str, item->interface.gpio.gpio_in.enable);
-    CJSON_GET_VALUE_GPIO(cjson_device, ezlopi_gpio_in_str, item->interface.gpio.gpio_in.gpio_num);
-    CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_ip_inv_str, item->interface.gpio.gpio_in.invert);
-    CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_val_ip_str, item->interface.gpio.gpio_in.value);
-    CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_pullup_ip_str, tmp_var);
-    item->interface.gpio.gpio_in.pull = tmp_var ? GPIO_PULLUP_ONLY : GPIO_PULLDOWN_ONLY;
-    item->interface.gpio.gpio_in.interrupt = GPIO_INTR_DISABLE;
+    CJSON_GET_VALUE_BOOL(cjson_device, ezlopi_is_ip_str, item->interface.gpio.gpio_in.enable);
+
+    if (item->interface.gpio.gpio_in.enable)
+    {
+        CJSON_GET_VALUE_GPIO(cjson_device, ezlopi_gpio_in_str, item->interface.gpio.gpio_in.gpio_num);
+        CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_ip_inv_str, item->interface.gpio.gpio_in.invert);
+        CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_val_ip_str, item->interface.gpio.gpio_in.value);
+        CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_pullup_ip_str, tmp_var);
+        item->interface.gpio.gpio_in.pull = tmp_var ? GPIO_PULLUP_ONLY : GPIO_PULLDOWN_ONLY;
+        item->interface.gpio.gpio_in.interrupt = GPIO_INTR_DISABLE;
+    }
+    // else
+    // {
+    //     item->interface.gpio.gpio_in.interrupt = GPIO_INTR_DISABLE;
+    // }
 
     item->interface.gpio.gpio_out.enable = true;
     CJSON_GET_VALUE_GPIO(cjson_device, ezlopi_gpio_out_str, item->interface.gpio.gpio_out.gpio_num);
@@ -168,41 +176,44 @@ static int __init(l_ezlopi_item_t* item)
                 ret = -1;
             }
         }
-
-        if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num) &&
-            (-1 != item->interface.gpio.gpio_in.gpio_num) &&
-            (255 != item->interface.gpio.gpio_in.gpio_num))
+        if (item->interface.gpio.gpio_in.enable)
         {
-            const gpio_config_t io_conf = {
-                .pin_bit_mask = (1ULL << item->interface.gpio.gpio_in.gpio_num),
-                .mode = GPIO_MODE_INPUT,
-                .pull_up_en = ((item->interface.gpio.gpio_in.pull == GPIO_PULLUP_ONLY) ||
-                               (item->interface.gpio.gpio_in.pull == GPIO_PULLUP_PULLDOWN))
-                                  ? GPIO_PULLUP_ENABLE
-                                  : GPIO_PULLUP_DISABLE,
-                .pull_down_en = ((item->interface.gpio.gpio_in.pull == GPIO_PULLDOWN_ONLY) ||
-                                 (item->interface.gpio.gpio_in.pull == GPIO_PULLUP_PULLDOWN))
-                                    ? GPIO_PULLDOWN_ENABLE
-                                    : GPIO_PULLDOWN_DISABLE,
-                .intr_type = (GPIO_PULLUP_ONLY == item->interface.gpio.gpio_in.pull)
-                                 ? GPIO_INTR_POSEDGE
-                                 : GPIO_INTR_NEGEDGE,
-            };
-
-            if (0 == gpio_config(&io_conf))
+            if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num) &&
+                (-1 != item->interface.gpio.gpio_in.gpio_num) &&
+                (255 != item->interface.gpio.gpio_in.gpio_num))
             {
-                ezlopi_service_gpioisr_register_v3(item, __interrupt_upcall, 1000);
-                ret = 1;
+                const gpio_config_t io_conf = {
+                    .pin_bit_mask = (1ULL << item->interface.gpio.gpio_in.gpio_num),
+                    .mode = GPIO_MODE_INPUT,
+                    .pull_up_en = ((item->interface.gpio.gpio_in.pull == GPIO_PULLUP_ONLY) ||
+                                   (item->interface.gpio.gpio_in.pull == GPIO_PULLUP_PULLDOWN))
+                                      ? GPIO_PULLUP_ENABLE
+                                      : GPIO_PULLUP_DISABLE,
+                    .pull_down_en = ((item->interface.gpio.gpio_in.pull == GPIO_PULLDOWN_ONLY) ||
+                                     (item->interface.gpio.gpio_in.pull == GPIO_PULLUP_PULLDOWN))
+                                        ? GPIO_PULLDOWN_ENABLE
+                                        : GPIO_PULLDOWN_DISABLE,
+                    .intr_type = (GPIO_PULLUP_ONLY == item->interface.gpio.gpio_in.pull)
+                                     ? GPIO_INTR_POSEDGE
+                                     : GPIO_INTR_NEGEDGE,
+                };
+
+                if (0 == gpio_config(&io_conf))
+                {
+                    ezlopi_service_gpioisr_register_v3(item, __interrupt_upcall, 1000);
+                    ret = 1;
+                }
+                else
+                {
+                    ret = -1;
+                }
             }
             else
             {
                 ret = -1;
             }
         }
-        else
-        {
-            ret = -1;
-        }
+
     }
 
     return ret;

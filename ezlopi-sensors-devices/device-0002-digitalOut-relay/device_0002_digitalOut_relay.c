@@ -94,11 +94,12 @@ static void __setup_item_properties(l_ezlopi_item_t* item, cJSON* cjson_device)
         CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_val_ip_str, item->interface.gpio.gpio_in.value);
         CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_pullup_ip_str, tmp_var);
         item->interface.gpio.gpio_in.pull = tmp_var ? GPIO_PULLUP_ONLY : GPIO_PULLDOWN_ONLY;
-    }
-    else
-    {
         item->interface.gpio.gpio_in.interrupt = GPIO_INTR_DISABLE;
     }
+    // else
+    // {
+    //     item->interface.gpio.gpio_in.interrupt = GPIO_INTR_DISABLE;
+    // }
 
     item->interface.gpio.gpio_out.enable = true;
     CJSON_GET_VALUE_GPIO(cjson_device, ezlopi_gpio_out_str, item->interface.gpio.gpio_out.gpio_num);
