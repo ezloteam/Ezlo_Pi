@@ -562,8 +562,6 @@ static int ezlopi_service_uart_oem_info(cJSON* parent)
         char* device_brand = ezlopi_factory_info_v3_get_brand();
         char* device_manufacturer = ezlopi_factory_info_v3_get_manufacturer();
 
-        TRACE_E("model: %p, brand: %p and manufacturer: %p", device_model, device_brand, device_manufacturer);
-
         cJSON_AddStringToObject(__FUNCTION__, cj_oem, ezlopi_brand_str, device_brand ? device_brand : "");
         cJSON_AddStringToObject(__FUNCTION__, cj_oem, ezlopi_manufacturer_str, device_manufacturer ? device_manufacturer : "");
         cJSON_AddStringToObject(__FUNCTION__, cj_oem, ezlopi_model_str, device_model ? device_model : "");
