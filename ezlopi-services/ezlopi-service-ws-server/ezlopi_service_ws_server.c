@@ -322,7 +322,7 @@ static void __start_server(void)
 
     config.task_priority = 8;
     config.server_port = 17001;
-    config.stack_size = 1024 * 4;
+    config.stack_size = 1024 * 5;
 
     TRACE_I("Starting ws-server on port: '%d'", config.server_port);
 
