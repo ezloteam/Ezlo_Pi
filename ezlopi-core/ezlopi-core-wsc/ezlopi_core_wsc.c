@@ -695,7 +695,6 @@ static int __rx_func(s_ssl_websocket_t * ssl_wsc)
 
                 if (ssl_wsc->buffer[0] == 0x89) // if PING then PONG
                 {
-                    TRACE_I("PING PONG");
                     ssl_wsc->buffer[0] = 0x8A;
                     mbedtls_ssl_write(ssl_wsc->ssl_ctx, (uint8_t *)ssl_wsc->buffer, ret);
                 }

@@ -45,7 +45,7 @@ static void __ota_loop(void *arg)
     {
         if (1 == ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 0, false))
         {
-            TRACE_D("OTA - Got reg event.");
+            // TRACE_D("OTA - Got reg event.");
             static uint32_t __ota_time_stamp = 0;
             int ret_ota = ezlopi_event_group_wait_for_event(EZLOPI_EVENT_OTA, 0, true);
 

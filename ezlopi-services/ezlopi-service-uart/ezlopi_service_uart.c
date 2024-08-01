@@ -604,7 +604,14 @@ static int ezlopi_service_uart_newtwork_info(cJSON* parent)
 
 #ifdef CONFIG_EZPI_ENABLE_PING
             e_ping_status_t ping_status = ezlopi_ping_get_internet_status();
-            cJSON_AddBoolToObject(__FUNCTION__, cj_network, ezlopi_internet_str, ping_status == EZLOPI_PING_STATUS_LIVE);
+            if (ping_status == EZLOPI_PING_STATUS_LIVE)
+            {
+                cJSON_AddTrueToObject(__FUNCTION__, cj_network, ezlopi_internet_str);
+            }
+            else
+            {
+                cJSON_AddFalseToObject(__FUNCTION__, cj_network, ezlopi_internet_str);
+            }
 #else // CONFIG_EZPI_ENABLE_PING
             cJSON_AddBoolToObject(__FUNCTION__, cj_network, ezlopi_internet_str, cloud_connection_status);
 #endif // CONFIG_EZPI_ENABLE_PING
