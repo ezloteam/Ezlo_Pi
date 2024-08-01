@@ -891,25 +891,17 @@ static void _______fields_get_value(l_fields_v2_t* field, cJSON* cj_value)
         }
         case cJSON_String:
         {
-            if (EZLOPI_VALUE_TYPE_HOUSE_MODE_ID == field->value_type)
+            field->field_value.e_type = VALUE_TYPE_STRING;
+            uint32_t value_len = strlen(cj_value->valuestring) + 1;
+            field->field_value.u_value.value_string = ezlopi_malloc(__FUNCTION__, value_len);
+            if (field->field_value.u_value.value_string)
             {
-                field->field_value.e_type = VALUE_TYPE_NUMBER;
-                field->field_value.u_value.value_double = strtoul(cj_value->valuestring, NULL, 16);
+                snprintf(field->field_value.u_value.value_string, value_len, "%s", cj_value->valuestring);
+                TRACE_I("value: %s", field->field_value.u_value.value_string);
             }
             else
             {
-                field->field_value.e_type = VALUE_TYPE_STRING;
-                uint32_t value_len = strlen(cj_value->valuestring) + 1;
-                field->field_value.u_value.value_string = ezlopi_malloc(__FUNCTION__, value_len);
-                if (field->field_value.u_value.value_string)
-                {
-                    snprintf(field->field_value.u_value.value_string, value_len, "%s", cj_value->valuestring);
-                    TRACE_I("value: %s", field->field_value.u_value.value_string);
-                }
-                else
-                {
-                    TRACE_E("Malloc failed!");
-                }
+                TRACE_E("Malloc failed!");
             }
             break;
         }
