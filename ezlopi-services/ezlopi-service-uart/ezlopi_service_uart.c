@@ -766,13 +766,22 @@ static void ezlopi_service_uart_get_config(void)
 
     if (current_config)
     {
-        TRACE_D("current_config[len: %d]: %s", strlen(current_config), current_config);
+        // TRACE_D("current_config[len: %d]: %s", strlen(current_config), current_config);
         root = cJSON_Parse(__FUNCTION__, current_config);
 
         if (root)
         {
-            cJSON_DeleteItemFromObject(__FUNCTION__, root, "cmd");
-            cJSON_AddNumberToObject(__FUNCTION__, root, "cmd", 4);
+            cJSON_DeleteItemFromObject(__FUNCTION__, root, ezlopi_cmd_str);
+
+            cJSON* device_total = cJSON_GetObjectItem(__FUNCTION__, root, "dev_total");
+
+            if (cJSON_IsNumber(device_total))
+            {
+                cJSON_DeleteItemFromObject(__FUNCTION__, root, "dev_total");
+            }
+            cJSON_Delete(__FUNCTION__, device_total);
+            cJSON_AddNumberToObject(__FUNCTION__, root, ezlopi_cmd_str, 4);
+            cJSON_AddNumberToObject(__FUNCTION__, root, ezlopi_status_str, 1);
         }
         else
         {
@@ -790,8 +799,8 @@ static void ezlopi_service_uart_get_config(void)
         root = cJSON_CreateObject(__FUNCTION__);
         if (root)
         {
-            cJSON_AddNumberToObject(__FUNCTION__, root, "cmd", 4);
-            TRACE_D("'root'");
+            cJSON_AddNumberToObject(__FUNCTION__, root, ezlopi_cmd_str, 4);
+            cJSON_AddNumberToObject(__FUNCTION__, root, ezlopi_status_str, 0);
         }
         else
         {

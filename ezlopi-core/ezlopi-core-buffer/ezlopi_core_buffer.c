@@ -116,6 +116,8 @@ void ezlopi_core_buffer_release(void)
     }
     else
     {
+        TRACE_E("__buffer_lock: %p", __buffer_lock);
+        TRACE_E("__buffer_lock_state: %d", __buffer_lock_state);
         TRACE_E("buffer release failed!");
     }
 }
