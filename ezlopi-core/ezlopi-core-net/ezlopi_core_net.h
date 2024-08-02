@@ -1,12 +1,19 @@
 #ifndef _EZLOPI_CORE_NET_H_
 #define _EZLOPI_CORE_NET_H_
 
+#include "../../build/config/sdkconfig.h"
+
 #include <string.h>
 
 #include "ezlopi_core_wifi.h"
 #include "ezlopi_core_ethernet.h"
 #include "ezlopi_core_ping.h"
+
+#if defined(CONFIG_EZPI_CORE_CUSTOM_WSC_LIB)
+#include "ezlopi_core_wsc.h"
+#elif defined(CONFIG_EZPI_CORE_IDF_WSC_LIB)
 #include "ezlopi_core_websocket_client.h"
+#endif
 
 typedef struct s_ezlopi_net_status
 {

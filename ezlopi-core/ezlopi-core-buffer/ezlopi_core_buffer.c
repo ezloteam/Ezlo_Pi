@@ -92,19 +92,22 @@ void ezlopi_core_buffer_init(uint32_t len)
 
 char *ezlopi_core_buffer_acquire(uint32_t *len, uint32_t wait_to_acquired_ms)
 {
-    char *ret = NULL;
+    char *buffer_ptr = NULL;
     // uint32_t start_time = xTaskGetTickCount();
     if (__buffer_lock)
     {
-        if (pdTRUE == xSemaphoreTake(__buffer_lock, wait_to_acquired_ms / portTICK_RATE_MS))
+        int smphr_ret = xSemaphoreTake(__buffer_lock, wait_to_acquired_ms / portTICK_RATE_MS);
+        TRACE_W("--buffer-lock: smphr_ret = %d", smphr_ret);
+
+        if (pdTRUE == smphr_ret)
         {
-            ret = __buffer;
+            buffer_ptr = __buffer;
             *len = __buffer_len;
             __buffer_lock_state = EZ_BUFFER_STATE_BUSY;
         }
     }
 
-    return ret;
+    return buffer_ptr;
 }
 
 void ezlopi_core_buffer_release(void)

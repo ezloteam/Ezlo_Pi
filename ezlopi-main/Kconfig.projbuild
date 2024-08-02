@@ -92,6 +92,21 @@ menu "EzloPi User Config"
         help 
             Enable Web-Socket client, required for connecting with cloud
 
+        choice
+            prompt "Choose websocket client lib:"
+            depends on EZPI_WEBSOCKET_CLIENT
+            default EZPI_CORE_CUSTOM_WSC_LIB
+
+            config EZPI_CORE_CUSTOM_WSC_LIB
+                bool
+                prompt "Use custom websocket-client lib"
+
+            config EZPI_CORE_IDF_WSC_LIB
+                bool 
+                prompt "Use IDF websocket-client lib"
+        endchoice
+
+
     config EZPI_CORE_STATIC_BUFFER_SIZE
         depends on EZPI_WEBSOCKET_CLIENT || EZPI_LOCAL_WEBSOCKET_SERVER
         int "Static buffer size:"

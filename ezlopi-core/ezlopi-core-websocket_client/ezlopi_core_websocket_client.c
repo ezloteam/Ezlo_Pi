@@ -1,11 +1,21 @@
-/* ESP HTTP Client Example
+/**
+ * @file ezlopi_core_websocket_client.c
+ * @author Krishna Kumar Sah
+ * @brief
+ * @version 1.1
+ * @date July 29, 2023
+ *
+ * @copyright Copyright (c) 2023
+ *
+ * @author Krishna Kumar Sah (work.krishnasah@gmail.com)
+ * @date
+ *
+ */
 
-   This example code is in the Public Domain (or CC0 licensed, at your option.)
+#include "../../build/config/sdkconfig.h"
 
-   Unless required by applicable law or agreed to in writing, this
-   software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-   CONDITIONS OF ANY KIND, either express or implied.
-*/
+#ifdef CONFIG_EZPI_CORE_IDF_WSC_LIB
+
 #include <stdio.h>
 
 #include "freertos/FreeRTOS.h"
@@ -154,3 +164,5 @@ static void websocket_event_handler(void* handler_args, esp_event_base_t base, i
     }
     }
 }
+
+#endif // CONFIG_EZPI_CORE_IDF_WSC_LIB

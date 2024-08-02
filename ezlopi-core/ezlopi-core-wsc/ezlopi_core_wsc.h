@@ -1,19 +1,23 @@
 /**
- * @file wss.h
- * @author samogon
+ * @file ezlopi_core_wsc.h
+ * @author Krishna Kumar Sah
  * @brief
- * @version 0.1
- * @date 11.02.20
+ * @version 1.1
+ * @date July 29, 2024
  *
- * @copyright Copyright (c) 2022
+ * @copyright Copyright (c) 2024
  *
- * @author Krishna Kumar Sah (krriss.shah@gmail.com)
- * @date Modified: 29-7-2022
+ * @author Krishna Kumar Sah (work.krishnasah@gmail.com)
+ * @date
  *
  */
 
 #ifndef __WSS_H__
 #define __WSS_H__
+
+#include "../../build/config/sdkconfig.h"
+
+#ifdef CONFIG_EZPI_CORE_CUSTOM_WSC_LIB
 
 #include <stdio.h>
 #include "string.h"
@@ -98,5 +102,7 @@ extern "C"
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
+#endif // CONFIG_EZPI_CORE_CUSTOM_WSC_LIB
 
 #endif // __WSS_H__

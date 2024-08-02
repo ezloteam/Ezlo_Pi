@@ -1,5 +1,20 @@
-// Created by krishna on July 29, 2024.
+/**
+ * @file ezlopi_core_wsc.c
+ * @author Krishna Kumar Sah
+ * @brief
+ * @version 1.1
+ * @date July 29, 2024
+ *
+ * @copyright Copyright (c) 2024
+ *
+ * @author Krishna Kumar Sah (work.krishnasah@gmail.com)
+ * @date
+ *
+ */
 
+#include "../../build/config/sdkconfig.h"
+
+#ifdef CONFIG_EZPI_CORE_CUSTOM_WSC_LIB
 #include "time.h"
 #include "lwip/apps/sntp.h"
 #include "mbedtls/net_sockets.h"
@@ -723,3 +738,5 @@ static int __rx_func(s_ssl_websocket_t * ssl_wsc)
 
     return ret;
 }
+
+#endif // CONFIG_EZPI_CORE_CUSTOM_WSC_LIB
