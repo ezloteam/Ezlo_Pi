@@ -1,5 +1,7 @@
 
 #include "../../build/config/sdkconfig.h"
+#include "EZLOPI_USER_CONFIG.h"
+
 
 #include <esp_mac.h>
 #include <esp_wifi_types.h>
@@ -13,7 +15,7 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "ezlopi_core_api.h"
-#include "ezlopi_core_wsc.h"
+
 #include "ezlopi_core_http.h"
 #include "ezlopi_core_wifi.h"
 #include "ezlopi_core_reset.h"
@@ -27,7 +29,10 @@
 #include "ezlopi_core_websocket_client.h"
 
 #include "ezlopi_service_webprov.h"
-#include "EZLOPI_USER_CONFIG.h"
+
+#ifndef EZPI_CORE_WSS_USE_WSC_LIB 
+#include "ezlopi_core_wsc.h"
+#endif // EZPI_CORE_WSS_USE_WSC_LIB
 
 #define TEST_PROV 0
 
@@ -35,14 +40,16 @@
 #include "ezlopi_test_prov.h"
 #endif
 
-#define USE_WSC_LIB 1
-
 
 #if defined(CONFIG_EZPI_WEBSOCKET_CLIENT)
 
 static uint32_t message_counter = 0;
 static xTaskHandle _task_handle = NULL;
+
+#if (1 == EZPI_CORE_WSS_USE_WSC_LIB)
 static s_ssl_websocket_t * __wsc_ssl = NULL;
+#endif // EZPI_CORE_WSS_USE_WSC_LIB
+
 static QueueHandle_t _wss_message_queue = NULL;
 static TaskHandle_t __web_socket_initialize_handler = NULL;
 
@@ -82,7 +89,7 @@ void ezlopi_service_web_provisioning_deinit(void)
         vTaskDelete(_task_handle);
     }
 
-#if (1 == USE_WSC_LIB)
+#if (1 == EZPI_CORE_WSS_USE_WSC_LIB)
     ezlopi_core_wsc_kill(__wsc_ssl);
 #else
     ezlopi_websocket_client_kill();
@@ -149,11 +156,11 @@ static void __fetch_wss_endpoint(void* pv)
                     {
                         TRACE_D("uri: %s", cjson_uri->valuestring ? cjson_uri->valuestring : "NULL");
                         ezlopi_core_broadcast_method_add(__send_str_data_to_nma_websocket, "nma-websocket", 4);
-#if (1 == USE_WSC_LIB)
+#if (1 == EZPI_CORE_WSS_USE_WSC_LIB)
                         __wsc_ssl = ezlopi_core_wsc_init(cjson_uri, __message_upcall, __connection_upcall);
-#else
+#else // EZPI_CORE_WSS_USE_WSC_LIB
                         ezlopi_websocket_client_init(cjson_uri, __message_upcall, __connection_upcall);
-#endif
+#endif // EZPI_CORE_WSS_USE_WSC_LIB
                         task_complete = 1;
                     }
 
@@ -187,10 +194,6 @@ static void __fetch_wss_endpoint(void* pv)
     }
 
     ezlopi_factory_info_v3_free(cloud_server);
-
-    // ezlopi_factory_info_v3_free(ca_certificate); // allocated once for all, do not free
-    // ezlopi_factory_info_v3_free(ssl_shared_key); // allocated once for all, do not free
-    // ezlopi_factory_info_v3_free(ssl_private_key); // allocated once for all, do not free
 
     ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SERVICE_WEB_PROV_FETCH_WSS_TASK);
     vTaskDelete(NULL);
@@ -264,6 +267,7 @@ static int __send_cjson_data_to_nma_websocket(cJSON* cj_data)
 
             if (true == cJSON_PrintPreallocated(__FUNCTION__, cj_data, data_buffer, buffer_len, false))
             {
+                // trace_warning("data-buffer: %s", data_buffer);
                 ret = __send_str_data_to_nma_websocket(data_buffer);
             }
             else
@@ -287,20 +291,20 @@ static int __send_str_data_to_nma_websocket(char* str_data)
 {
     int ret = 0;
 
-#if (1 == USE_WSC_LIB)
+#if (1 == EZPI_CORE_WSS_USE_WSC_LIB)
     if (str_data && ezlopi_core_wsc_is_connected(__wsc_ssl))
-#else
+#else // EZPI_CORE_WSS_USE_WSC_LIB
     if (str_data && ezlopi_websocket_client_is_connected())
-#endif
+#endif // EZPI_CORE_WSS_USE_WSC_LIB
     {
         int retries = 3;
         while (--retries)
         {
-#if (1 == USE_WSC_LIB)
+#if (1 == EZPI_CORE_WSS_USE_WSC_LIB)
             if (ezlopi_core_wsc_send(__wsc_ssl, str_data, strlen(str_data)) > 0)
-#else
+#else // EZPI_CORE_WSS_USE_WSC_LIB
             if (ezlopi_websocket_client_send(str_data, strlen(str_data)))
-#endif
+#endif // EZPI_CORE_WSS_USE_WSC_LIB
             {
                 ret = 1;
                 message_counter++;
