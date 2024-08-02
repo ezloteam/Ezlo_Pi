@@ -26,12 +26,10 @@ e_auth_status_t ezlopi_ble_auth_store_user_id(char* user_id)
         TRACE_D("here");
         if (EZPI_SUCCESS == ezlopi_nvs_write_user_id_str(user_id))
         {
-            TRACE_D("here");
             sg_last_auth_status = BLE_AUTH_SUCCESS;
         }
         else
         {
-            TRACE_D("here");
             sg_last_auth_status = BLE_AUTH_USER_ID_NVS_WRITE_FAILED;
         }
     }

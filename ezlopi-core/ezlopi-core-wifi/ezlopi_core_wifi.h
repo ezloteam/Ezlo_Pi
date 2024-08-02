@@ -29,7 +29,6 @@ extern "C"
     } ezlopi_wifi_status_t;
 
     int ezlopi_wifi_got_ip(void);
-    void ezlopi_wifi_set_new_wifi_flag(void);
     void ezlopi_wifi_initialize(void);
     esp_err_t ezlopi_wifi_connect(const char* ssid, const char* pass);
     void ezlopi_wifi_connect_from_id_bin(void);

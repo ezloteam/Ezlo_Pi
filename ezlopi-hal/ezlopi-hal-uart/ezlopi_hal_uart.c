@@ -220,7 +220,7 @@ void EZPI_HAL_uart_init(void)
     // uart_driver_delete(EZPI_SERV_UART_NUM_DEFAULT);
     // vTaskDelay(10);
     // We won't use a buffer for sending data.
-    uart_driver_install(EZPI_SERV_UART_NUM_DEFAULT, EZPI_SERV_UART_RX_BUFFER_SIZE * 2, 0, 0, NULL, 0);
+    uart_driver_install(EZPI_SERV_UART_NUM_DEFAULT, EZPI_SERV_UART_RX_BUFFER_SIZE, EZPI_SERV_UART_RX_BUFFER_SIZE, 0, NULL, 0);
     vTaskDelay(10);
     uart_param_config(EZPI_SERV_UART_NUM_DEFAULT, &uart_config);
     uart_set_pin(EZPI_SERV_UART_NUM_DEFAULT, EZPI_SERV_UART_TXD_PIN, EZPI_SERV_UART_RXD_PIN, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);

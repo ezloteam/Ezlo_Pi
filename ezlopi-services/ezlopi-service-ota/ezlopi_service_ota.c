@@ -46,7 +46,6 @@ static void __ota_loop(void *arg)
 {
     if (1 == ezlopi_event_group_wait_for_event(EZLOPI_EVENT_WIFI_CONNECTED, 0, false))
     {
-        // TRACE_D("here");
         if (1 == ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 0, false))
         {
             // TRACE_D("OTA - Got reg event.");

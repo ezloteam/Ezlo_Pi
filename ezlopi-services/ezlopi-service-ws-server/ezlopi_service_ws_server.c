@@ -127,7 +127,7 @@ static int __ws_server_broadcast(char* data)
         {
             ret = 1;
             l_ws_server_client_conn_t* curr_client = ezlopi_service_ws_server_clients_get_head();
-            printf("%s and curr-client: %p\n", __func__, curr_client);
+            // printf("%s and curr-client: %p\n", __func__, curr_client);
 
             while (curr_client)
             {

@@ -91,7 +91,7 @@ ezlopi_error_t ezlopi_core_broadcast_cjson(cJSON* cj_data)
             TRACE_I("%d -> -----------------------------> buffer acquired!", xTaskGetTickCount());
             memset(data_buffer, 0, buffer_len);
 
-            TRACE_D("buffer_len = [%d]", buffer_len);
+            // TRACE_D("buffer_len = [%d]", buffer_len);
 
             if (true == cJSON_PrintPreallocated(__FUNCTION__, cj_data, data_buffer, buffer_len, false))
             {
@@ -199,7 +199,7 @@ static ezlopi_error_t __call_broadcast_methods(char* data)
                 int mret = curr_method->func(data);
                 if (mret)
                 {
-                    TRACE_S("broadcasted - method:'%s'\r\ndata: %s", curr_method->method_name ? curr_method->method_name : "", data);
+                    // TRACE_S("broadcasted - method:'%s'\r\ndata: %s", curr_method->method_name ? curr_method->method_name : "", data);
                     break;
                 }
 

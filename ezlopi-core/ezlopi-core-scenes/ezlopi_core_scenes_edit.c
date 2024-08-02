@@ -20,6 +20,16 @@ ezlopi_error_t ezlopi_core_scene_edit_store_updated_to_nvs(cJSON* cj_updated_sce
     ezlopi_error_t error = EZPI_SUCCESS;
     if (cj_updated_scene)
     {
+        if (ezlopi_core_scene_add_when_blockId_if_reqd(cj_updated_scene))
+        {
+            TRACE_S("==> Added new_blockIds (Edit) : SUCCESS");
+        }
+
+        if (ezlopi_core_scene_add_group_id_if_reqd(cj_updated_scene))
+        {
+            TRACE_S("==> Added new_group_id (Edit) : SUCCESS");
+        }
+
         char* update_scene_str = cJSON_PrintBuffered(__FUNCTION__, cj_updated_scene, 4096, false);
         TRACE_D("length of 'update_scene_str': %d", strlen(update_scene_str));
 
@@ -42,7 +52,7 @@ ezlopi_error_t ezlopi_core_scene_edit_store_updated_to_nvs(cJSON* cj_updated_sce
 int ezlopi_core_scene_edit_update_id(uint32_t scene_id, cJSON* cj_updated_scene)
 {
     int ret = 0;
-    CJSON_TRACE("cj_updated_scene", cj_updated_scene);
+    // CJSON_TRACE("cj_updated_scene", cj_updated_scene);
 
     if (scene_id && cj_updated_scene)
     {
@@ -54,7 +64,7 @@ int ezlopi_core_scene_edit_update_id(uint32_t scene_id, cJSON* cj_updated_scene)
                 ezlopi_meshobot_service_stop_scene(scene_node);
                 _edit_scene(scene_node, cj_updated_scene);
 
-                TRACE_S("HERE : scene_node->enabled = [%s]", (scene_node->enabled) ? "true" : "false");
+                // TRACE_S("HERE : scene_node->enabled = [%s]", (scene_node->enabled) ? "true" : "false");
                 if (scene_node->enabled == true)
                 {
                     ezlopi_meshbot_service_start_scene(scene_node);
@@ -79,7 +89,15 @@ static void _edit_scene(l_scenes_list_v2_t* scene_node, cJSON* cj_scene)
 {
     CJSON_GET_VALUE_BOOL(cj_scene, ezlopi_enabled_str, scene_node->enabled);
     CJSON_GET_VALUE_BOOL(cj_scene, ezlopi_is_group_str, scene_node->is_group);
-    CJSON_GET_VALUE_STRING_BY_COPY(cj_scene, ezlopi_group_id_str, scene_node->group_id);
+
+    {
+        CJSON_GET_VALUE_STRING_BY_COPY(cj_scene, ezlopi_group_id_str, scene_node->group_id);
+        if ((NULL != scene_node->group_id) && (0 < strlen(scene_node->group_id)))
+        {
+            TRACE_S("new_group_id (edit): %s", scene_node->group_id);
+            ezlopi_cloud_update_group_id((uint32_t)strtoul(scene_node->group_id, NULL, 16));
+        }
+    }
 
     CJSON_GET_VALUE_STRING_BY_COPY(cj_scene, ezlopi_name_str, scene_node->name);
     CJSON_GET_VALUE_STRING_BY_COPY(cj_scene, ezlopi_parent_id_str, scene_node->parent_id);

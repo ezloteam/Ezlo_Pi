@@ -274,7 +274,6 @@ static ezlopi_error_t __0015_notify(l_ezlopi_item_t* item)
         s_ezlopi_dht11_data_t* dht11_data = (s_ezlopi_dht11_data_t*)item->user_arg;
         if (dht11_data)
         {
-            // TRACE_S("HERE");
             readDHT11();
             if (ezlopi_item_name_temp == item->cloud_properties.item_name)
             {

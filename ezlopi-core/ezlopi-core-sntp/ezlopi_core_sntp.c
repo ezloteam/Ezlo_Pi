@@ -43,8 +43,6 @@ ezlopi_error_t EZPI_CORE_sntp_init(void)
     int retry = 0;
     const int retry_count = 10;
 
-    // ezlopi_wait_for_wifi_to_connect(portMAX_DELAY);
-
     TRACE_I("Initializing SNTP");
 
     esp_sntp_setoperatingmode(ESP_SNTP_OPMODE_POLL);

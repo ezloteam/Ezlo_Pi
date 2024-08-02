@@ -53,7 +53,7 @@ void ezlopi_print_fields(l_fields_v2_t* fields)
         switch (fields->value_type)
         {
         case EZLOPI_VALUE_TYPE_INT:
-        case EZLOPI_VALUE_TYPE_HOUSE_MODE_ID:
+        /*case EZLOPI_VALUE_TYPE_HOUSE_MODE_ID:*/
         case EZLOPI_VALUE_TYPE_TEMPERATURE:
         case EZLOPI_VALUE_TYPE_HUMIDITY:
         case EZLOPI_VALUE_TYPE_VELOCITY:
@@ -113,6 +113,7 @@ void ezlopi_print_fields(l_fields_v2_t* fields)
         case EZLOPI_VALUE_TYPE_HMS_INTERVAL:
         case EZLOPI_VALUE_TYPE_SCENEID:
         case EZLOPI_VALUE_TYPE_EXPRESSION:
+        case EZLOPI_VALUE_TYPE_HOUSE_MODE_ID:
         {
             TRACE_D("\t\t\t|-- value: %s", fields->field_value.u_value.value_string);
             break;

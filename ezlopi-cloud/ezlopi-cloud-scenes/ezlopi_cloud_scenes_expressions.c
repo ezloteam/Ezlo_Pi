@@ -40,7 +40,7 @@ void scenes_expressions_list(cJSON* cj_request, cJSON* cj_response)
         cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
         if (cj_params)
         {
-            CJSON_TRACE("exp-params", cj_params);
+            // CJSON_TRACE("exp-params", cj_params);
 
             cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
             if (cj_result)

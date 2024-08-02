@@ -9,6 +9,20 @@ CLOUD_METHOD("hub.device.name.set", device_name_set, device_updated)
 CLOUD_METHOD("hub.device.armed.set", device_armed_set, device_updated)
 CLOUD_METHOD("hub.device.room.set", device_room_set, device_updated)
 
+CLOUD_METHOD("hub.device.group.create", device_group_create, device_group_created)
+CLOUD_METHOD("hub.device.group.delete", device_group_delete, device_group_deleted)
+CLOUD_METHOD("hub.device.group.update", device_group_update, device_group_updated)
+CLOUD_METHOD("hub.device.group.get", device_group_get, NULL)
+CLOUD_METHOD("hub.device.groups.list", device_groups_list, NULL)
+CLOUD_METHOD("hub.device.group.find", device_group_find, NULL)
+CLOUD_METHOD("hub.device.item.group.expand", device_group_devitem_expand, NULL)
+
+CLOUD_METHOD("hub.item.group.create", item_group_create, item_group_created)
+CLOUD_METHOD("hub.item.group.delete", item_group_delete, item_group_deleted)
+CLOUD_METHOD("hub.item.group.update", item_group_update, item_group_updated)
+CLOUD_METHOD("hub.item.group.get", item_group_get, NULL)
+CLOUD_METHOD("hub.item.groups.list", item_groups_list, NULL)
+
 #ifdef CONFIG_EZPI_UTIL_TRACE_EN
 CLOUD_METHOD("hub.log.set", ezlopi_hub_cloud_log_set, NULL)
 CLOUD_METHOD("hub.log.local.set", ezlopi_hub_serial_log_set, ezlopi_hub_serial_log_set_updater)
@@ -70,7 +84,7 @@ CLOUD_METHOD("hub.scenes.list", scenes_list, NULL)
 CLOUD_METHOD("hub.scenes.create", scenes_create, scene_added)
 
 #warning "firmware crashes due to this method 'hub.scenes.run', need to fix this"
-// CLOUD_METHOD("hub.scenes.run", scenes_run, NULL) // firmware crashes due to this method, need to fix this
+CLOUD_METHOD("hub.scenes.run", scenes_run, NULL) // firmware crashes due to this method, need to fix this
 
 CLOUD_METHOD("hub.scenes.get", scenes_get, NULL)
 CLOUD_METHOD("hub.scenes.edit", scenes_edit, scene_changed)

@@ -34,10 +34,10 @@ typedef enum e_scenes_block_type_v2
 typedef enum e_scene_status_v2
 {
     EZLOPI_SCENE_STATUS_NONE = 0,
-    EZLOPI_SCENE_STATUS_RUN,
-    EZLOPI_SCENE_STATUS_RUNNING,
-    EZLOPI_SCENE_STATUS_STOP,
-    EZLOPI_SCENE_STATUS_STOPPED,
+    EZLOPI_SCENE_STATUS_RUN, // command
+    EZLOPI_SCENE_STATUS_RUNNING, // state
+    EZLOPI_SCENE_STATUS_STOP, // command
+    EZLOPI_SCENE_STATUS_STOPPED, // state
     EZLOPI_SCENE_STATUS_MAX
 } e_scene_status_v2_t;
 
@@ -125,7 +125,7 @@ typedef struct l_when_block_v2
     bool is_group;          // may be used in future    //  currently not-populated from nvs
     char * group_id;        // may be used in future    //  currently not-populated from nvs
 #endif
-    bool block_status_reset_once;  // set this flag if you want to reset this 'when-block' once.
+    bool block_status_reset_once;  // 'NOT-NVS parameter' [don't populate ; since not needed] // just a dummy flag to trigger function reset.
     e_scenes_block_type_v2_t block_type;
     s_block_options_v2_t block_options;
     l_fields_v2_t* fields;
@@ -210,7 +210,7 @@ l_scenes_list_v2_t* ezlopi_scenes_pop_by_id_v2(uint32_t _id);
 
 void ezlopi_scenes_notifications_add(cJSON* cj_notifications);
 
-#if 0
+#if 0 // for future usage
 //-------------------------------- Only for latch operations  ----------------------------------------
 /**
  * @brief This function checks for 'latch' struct within nvs_scenes. The scenes are filtered out using 'sceneId[necessary]' & 'blockId[optional]'
@@ -224,11 +224,13 @@ int ezlopi_core_scene_set_reset_latch_enable(const char* sceneId_str, const char
 #endif
 
 int ezlopi_core_scene_block_enable_set_reset(const char* sceneId_str, const char* blockId_str, bool enable_status);
-
 int ezlopi_core_scene_reset_latch_state(const char* sceneId_str, const char* blockId_str);
+int ezlopi_core_scene_reset_when_block(const char* sceneId_str, const char* blockId_str);
 
-int ezlopi_core_scene_reset_block_status(const char* sceneId_str, const char* blockId_str);
-
+// ----- # below function are called when 'creating' and 'editing' scene # ---------
+int ezlopi_core_scene_add_group_id_if_reqd(cJSON* cj_new_scene);
+int ezlopi_core_scene_add_when_blockId_if_reqd(cJSON* cj_new_scene);
+// ---------------------------------------------------------------------------------
 #endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 #endif // _EZLOPI_CORE_SCENES_V2_H_

@@ -1,11 +1,6 @@
-/* UART asynchronous example, that uses separate RX and TX tasks
+#include "../../build/config/sdkconfig.h"
 
-   This example code is in the Public Domain (or CC0 licensed, at your option.)
-
-   Unless required by applicable law or agreed to in writing, this
-   software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-   CONDITIONS OF ANY KIND, either express or implied.
-*/
+#ifdef CONFIG_EZPI_ENABLE_UART_PROVISIONING
 
 #include "freertos/FreeRTOSConfig.h"
 
@@ -49,7 +44,6 @@
 #include "ezlopi_service_loop.h"
 #include "EZLOPI_USER_CONFIG.h"
 
-#if defined (CONFIG_EZPI_ENABLE_UART_PROVISIONING)
 
 #if defined(CONFIG_IDF_TARGET_ESP32)
 #define TXD_PIN (GPIO_NUM_1)
@@ -610,7 +604,14 @@ static int ezlopi_service_uart_newtwork_info(cJSON* parent)
 
 #ifdef CONFIG_EZPI_ENABLE_PING
             e_ping_status_t ping_status = ezlopi_ping_get_internet_status();
-            cJSON_AddBoolToObject(__FUNCTION__, cj_network, ezlopi_internet_str, ping_status == EZLOPI_PING_STATUS_LIVE);
+            if (ping_status == EZLOPI_PING_STATUS_LIVE)
+            {
+                cJSON_AddTrueToObject(__FUNCTION__, cj_network, ezlopi_internet_str);
+            }
+            else
+            {
+                cJSON_AddFalseToObject(__FUNCTION__, cj_network, ezlopi_internet_str);
+            }
 #else // CONFIG_EZPI_ENABLE_PING
             cJSON_AddBoolToObject(__FUNCTION__, cj_network, ezlopi_internet_str, cloud_connection_status);
 #endif // CONFIG_EZPI_ENABLE_PING
@@ -735,8 +736,6 @@ static void ezlopi_service_uart_response(uint8_t cmd, uint8_t status_write, uint
         cJSON_AddNumberToObject(__FUNCTION__, response, "status_connect", status_connect);
 
         char* my_json_string = cJSON_Print(__FUNCTION__, response);
-        TRACE_D("length of 'my_json_string': %d", strlen(my_json_string));
-
         cJSON_Delete(__FUNCTION__, response); // free Json string
 
         if (my_json_string)
@@ -768,13 +767,22 @@ static void ezlopi_service_uart_get_config(void)
 
     if (current_config)
     {
-        TRACE_D("current_config[len: %d]: %s", strlen(current_config), current_config);
+        // TRACE_D("current_config[len: %d]: %s", strlen(current_config), current_config);
         root = cJSON_Parse(__FUNCTION__, current_config);
 
         if (root)
         {
-            cJSON_DeleteItemFromObject(__FUNCTION__, root, "cmd");
-            cJSON_AddNumberToObject(__FUNCTION__, root, "cmd", 4);
+            cJSON_DeleteItemFromObject(__FUNCTION__, root, ezlopi_cmd_str);
+
+            cJSON* device_total = cJSON_GetObjectItem(__FUNCTION__, root, "dev_total");
+
+            if (cJSON_IsNumber(device_total))
+            {
+                cJSON_DeleteItemFromObject(__FUNCTION__, root, "dev_total");
+            }
+            cJSON_Delete(__FUNCTION__, device_total);
+            cJSON_AddNumberToObject(__FUNCTION__, root, ezlopi_cmd_str, 4);
+            cJSON_AddNumberToObject(__FUNCTION__, root, ezlopi_status_str, 1);
         }
         else
         {
@@ -792,8 +800,8 @@ static void ezlopi_service_uart_get_config(void)
         root = cJSON_CreateObject(__FUNCTION__);
         if (root)
         {
-            cJSON_AddNumberToObject(__FUNCTION__, root, "cmd", 4);
-            TRACE_D("'root'");
+            cJSON_AddNumberToObject(__FUNCTION__, root, ezlopi_cmd_str, 4);
+            cJSON_AddNumberToObject(__FUNCTION__, root, ezlopi_status_str, 0);
         }
         else
         {
