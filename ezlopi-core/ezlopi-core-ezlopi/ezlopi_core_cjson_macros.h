@@ -13,7 +13,7 @@
         else                                                  \
         {                                                     \
             item_val = 0;                                     \
-            TRACE_E("%s not found!", item_name);              \
+            trace_error("%s not found!", item_name);              \
         }                                                     \
     }
 
@@ -34,7 +34,7 @@
         else                                                  \
         {                                                     \
             item_val = false;                                 \
-            TRACE_E("%s not found!", item_name);              \
+            trace_error("%s not found!", item_name);              \
         }                                                     \
     }
 
@@ -45,13 +45,13 @@
             char *obj_str = cJSON_Print(__FUNCTION__, object);                              \
             if (obj_str)                                                                    \
             {                                                                               \
-                TRACE_D("%s[%d]: %s", name ? name : ezlopi__str, strlen(obj_str), obj_str); \
+                trace_debug("%s[%d]: %s", name ? name : ezlopi__str, strlen(obj_str), obj_str); \
                 ezlopi_free(__FUNCTION__, obj_str);                                         \
             }                                                                               \
         }                                                                                   \
         else                                                                                \
         {                                                                                   \
-            TRACE_E("%s: Null", name ? name : "");                                          \
+            trace_error("%s: Null", name ? name : "");                                          \
         }                                                                                   \
     }
 
@@ -122,7 +122,7 @@
         else                                                                \
         {                                                                   \
             item_val = -1;                                                  \
-            TRACE_E("%s not found!", item_name);                            \
+            trace_error("%s not found!", item_name);                            \
         }                                                                   \
     }
 

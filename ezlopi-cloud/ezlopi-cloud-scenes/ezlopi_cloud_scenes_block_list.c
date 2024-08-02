@@ -246,7 +246,6 @@ static cJSON* __add_scenes_blocks_by_device_ids(e_scenes_block_type_v2_t block_t
             l_ezlopi_device_t* device_node = ezlopi_device_get_by_id(device_id);
             if (device_node)
             {
-                // TRACE_D("Here");
                 cJSON* cj_block = __add_scenes_blocks_by_item_ids(block_type, device_node->items);
                 if (cj_block)
                 {

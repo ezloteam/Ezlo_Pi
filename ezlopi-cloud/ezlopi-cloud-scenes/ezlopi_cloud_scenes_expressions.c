@@ -156,7 +156,7 @@ static void ____common_part_of_scenes_expressions_added_and_changed(cJSON * cj_r
                 }
                 default:
                 {
-                    TRACE_E("Error: Undefined value type: %d", cj_value->type);
+                    TRACE_E("Error: Undefined value cjson-type: %d", cj_value->type);
                     break;
                 }
                 }

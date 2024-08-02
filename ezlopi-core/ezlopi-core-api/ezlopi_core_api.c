@@ -26,7 +26,7 @@ cJSON *ezlopi_core_api_consume(const char * who, const char *payload, uint32_t l
                 cJSON *cj_method = cJSON_GetObjectItem(who, cj_request, ezlopi_method_str);
 
 #if (1 == ENABLE_TRACE)
-                TRACE_I("## WS Rx <<<<<<<<<< '%s' \n %.*s", (cj_method ? cj_method->valuestring : ezlopi__str), len, payload);
+                trace_information("## WS Rx <<<<<<<<<< '%s' \n %.*s", (cj_method ? cj_method->valuestring : ezlopi__str), len, payload);
 #endif
                 uint32_t method_id = ezlopi_core_ezlopi_methods_search_in_list(cj_method);
 
@@ -49,7 +49,7 @@ cJSON *ezlopi_core_api_consume(const char * who, const char *payload, uint32_t l
                     f_method_func_t updater = ezlopi_core_ezlopi_methods_get_updater_by_id(method_id);
                     if (updater)
                     {
-                        TRACE_W("updater function: %p", updater);
+                        trace_warning("updater function: %p", updater);
 
                         cJSON* cj_update_response = __execute_method(cj_request, updater);
 
@@ -75,14 +75,14 @@ cJSON *ezlopi_core_api_consume(const char * who, const char *payload, uint32_t l
                         cJSON_AddItemToObject(who, cj_response, ezlopi_method_str, cJSON_Duplicate(who, cj_method, cJSON_True));
                     }
 
-                    // CJSON_TRACE("x-cj_response", cj_response);
+                    CJSON_TRACE("x-cj_response", cj_response);
                 }
             }
 #if (1 == ENABLE_TRACE)
             else
             {
                 cJSON *cj_method = cJSON_GetObjectItem(who, cj_request, ezlopi_method_str);
-                TRACE_E("## WS Rx <<<<<<<<<< '%s' \n%.*s", (NULL != cj_method) ? (cj_method->valuestring ? cj_method->valuestring : ezlopi__str) : ezlopi__str, len, payload);
+                trace_error("## WS Rx <<<<<<<<<< '%s' \n%.*s", (NULL != cj_method) ? (cj_method->valuestring ? cj_method->valuestring : ezlopi__str) : ezlopi__str, len, payload);
             }
 #endif
             cJSON_Delete(who, cj_request);
@@ -109,10 +109,6 @@ static cJSON* __execute_method(cJSON* cj_request, f_method_func_t method_func)
             {
                 method_func(cj_request, cj_response);
             }
-            else
-            {
-                TRACE_E("Error - cj_response: %d", (uint32_t)cj_response);
-            }
         }
     }
 
@@ -126,6 +122,7 @@ static int __check_for_no_error(cJSON* cj_request)
     if (cj_request)
     {
         cJSON *cj_error = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_error_str);
+
         if ((NULL == cj_error) || (cJSON_NULL == cj_error->type) ||
             ((NULL != cj_error->valuestring) && (0 == strncmp(cj_error->valuestring, ezlopi_null_str, 4))))
         {
@@ -134,7 +131,7 @@ static int __check_for_no_error(cJSON* cj_request)
 #if (1 == ENABLE_TRACE)
         else
         {
-            TRACE_E("cj_error: %p, cj_error->type: %u, cj_error->value_string: %s", cj_error, cj_error->type, cj_error ? (cj_error->valuestring ? cj_error->valuestring : ezlopi_null_str) : ezlopi_null_str);
+            trace_error("cj_error: %p, cj_error->type: %u, cj_error->value_string: %s", cj_error, cj_error->type, cj_error ? (cj_error->valuestring ? cj_error->valuestring : ezlopi_null_str) : ezlopi_null_str);
         }
 #endif
     }

@@ -71,7 +71,7 @@ bool ezlopi_websocket_client_is_connected(void)
 void ezlopi_websocket_client_kill(void)
 {
     esp_websocket_client_stop(client);
-    TRACE_S("Websocket Stopped");
+    trace_success("Websocket Stopped");
     esp_websocket_client_destroy(client);
     client = NULL;
 }
@@ -101,7 +101,7 @@ esp_websocket_client_handle_t ezlopi_websocket_client_init(cJSON* uri, void (*ms
             .ping_interval_sec = EZPI_CORE_WSS_PING_INTERVAL_SEC,
         };
 
-        TRACE_S("Connecting to %s...", websocket_cfg.uri);
+        trace_success("Connecting to %s...", websocket_cfg.uri);
 
         client = esp_websocket_client_init(&websocket_cfg);
         if (client)
@@ -112,7 +112,7 @@ esp_websocket_client_handle_t ezlopi_websocket_client_init(cJSON* uri, void (*ms
     }
     else
     {
-        TRACE_I("Client already active!");
+        trace_information("Client already active!");
     }
 
     return client;
@@ -126,7 +126,7 @@ static void websocket_event_handler(void* handler_args, esp_event_base_t base, i
     {
     case WEBSOCKET_EVENT_CONNECTED:
     {
-        TRACE_S("WEBSOCKET_EVENT_CONNECTED");
+        trace_success("WEBSOCKET_EVENT_CONNECTED");
         if (event_arg && event_arg->connection_upcall)
         {
             event_arg->connection_upcall(true);
@@ -135,8 +135,8 @@ static void websocket_event_handler(void* handler_args, esp_event_base_t base, i
     }
     case WEBSOCKET_EVENT_DISCONNECTED:
     {
-        TRACE_W("free-heap: %.02f KB", esp_get_free_heap_size() / 1024.0);
-        TRACE_E("WEBSOCKET_EVENT_DISCONNECTED");
+        trace_warning("free-heap: %.02f KB", esp_get_free_heap_size() / 1024.0);
+        trace_error("WEBSOCKET_EVENT_DISCONNECTED");
         if (event_arg && event_arg->connection_upcall)
         {
             event_arg->connection_upcall(false);
@@ -154,12 +154,12 @@ static void websocket_event_handler(void* handler_args, esp_event_base_t base, i
     }
     case WEBSOCKET_EVENT_ERROR:
     {
-        TRACE_E("WEBSOCKET_EVENT_ERROR");
+        trace_error("WEBSOCKET_EVENT_ERROR");
         break;
     }
     default:
     {
-        TRACE_E("Websocket event type not-implemented! value: %u", event_id);
+        trace_error("Websocket event type not-implemented! value: %u", event_id);
         break;
     }
     }

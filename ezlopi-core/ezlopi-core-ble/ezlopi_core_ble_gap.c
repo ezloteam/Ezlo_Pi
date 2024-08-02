@@ -105,7 +105,7 @@ void ezlopi_ble_gap_config_adv_data(void)
     }
     else
     {
-        TRACE_E("config adv data failed, error code = %x", ret);
+        TRACE_E("'esp_ble_gap_config_adv_data' failed! error code = %x", ret);
     }
 
     adv_config_done |= ADV_CONFIG_FLAG;
@@ -124,7 +124,7 @@ void ezlopi_ble_gap_config_scan_rsp_data(void)
     esp_err_t ret = esp_ble_gap_config_adv_data(&scan_rsp_data);
     if (ret)
     {
-        TRACE_E("config scan response data failed, error code = %x", ret);
+        TRACE_E("'esp_ble_gap_config_adv_data' failed! error code = %x", ret);
     }
     else
     {
@@ -168,7 +168,7 @@ void ezlopi_ble_setup_adv_config(void)
     esp_err_t ret = esp_ble_gap_config_adv_data(&adv_data);
     if (ret)
     {
-        TRACE_E("config adv data failed, error code = %x", ret);
+        TRACE_E("'esp_ble_gap_config_adv_data' failed! error code = %x", ret);
     }
     else
     {
@@ -177,10 +177,11 @@ void ezlopi_ble_setup_adv_config(void)
 
     scan_rsp_data.p_service_uuid = all_service_uuid;
     scan_rsp_data.service_uuid_len = all_service_uuid_len;
+
     ret = esp_ble_gap_config_adv_data(&scan_rsp_data);
     if (ret)
     {
-        TRACE_E("config adv data failed, error code = %x", ret);
+        TRACE_E("'esp_ble_gap_config_adv_data' failed! error code = %x", ret);
     }
     else
     {
@@ -317,42 +318,6 @@ void ezlopi_ble_gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_p
     case ESP_GAP_BLE_SET_LOCAL_PRIVACY_COMPLETE_EVT: // 22
     {
         ezlopi_ble_setup_adv_config();
-#if 0
-        if (param->local_privacy_cmpl.status != ESP_BT_STATUS_SUCCESS)
-        {
-            TRACE_E("config local privacy failed, error status = %x", param->local_privacy_cmpl.status);
-            break;
-        }
-
-        if (NULL == all_service_uuid)
-        {
-            ezlopi_ble_setup_service_uuid();
-        }
-        adv_data.p_service_uuid = all_service_uuid;
-        adv_data.service_uuid_len = all_service_uuid_len;
-
-        esp_err_t ret = esp_ble_gap_config_adv_data(&adv_data);
-        if (ret)
-        {
-            TRACE_E("config adv data failed, error code = %x", ret);
-        }
-        else
-        {
-            adv_config_done |= ADV_CONFIG_FLAG;
-        }
-
-        scan_rsp_data.p_service_uuid = all_service_uuid;
-        scan_rsp_data.service_uuid_len = all_service_uuid_len;
-        ret = esp_ble_gap_config_adv_data(&scan_rsp_data);
-        if (ret)
-        {
-            TRACE_E("config adv data failed, error code = %x", ret);
-        }
-        else
-        {
-            adv_config_done |= SCAN_RSP_CONFIG_FLAG;
-        }
-#endif
         break;
     }
 #endif

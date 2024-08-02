@@ -27,7 +27,7 @@ static void ezlopi_device_free_item(l_ezlopi_item_t* items);
 static void ezlopi_device_free_setting(l_ezlopi_device_settings_v3_t* settings);
 static void ezlopi_device_free_all_device_setting(l_ezlopi_device_t* curr_device);
 
-
+#if 0
 static void __factory_info_device_update(cJSON * cj_device_config)
 {
     char* updated_device_config = cJSON_PrintBuffered(__FUNCTION__, cj_device_config, 4 * 1024, false);
@@ -52,6 +52,7 @@ static void __factory_info_device_update(cJSON * cj_device_config)
         ezlopi_free(__FUNCTION__, updated_device_config);
     }
 }
+#endif
 
 
 static void __factory_info_update_property_by_cjson(l_ezlopi_device_t * device_node, cJSON * new_prop)
@@ -91,8 +92,21 @@ static void __factory_info_update_property_by_cjson(l_ezlopi_device_t * device_n
                     }
                 }
 
-                __factory_info_device_update(cj_device_config);
+                ezlopi_factory_info_v3_set_ezlopi_config(cj_device_config);
+                cJSON_Delete(__FUNCTION__, cj_device_config);
+                // __factory_info_device_update(cj_device_config);
             }
+
+            ezlopi_free(__FUNCTION__, device_config_str);
+
+#if 1 // to verify only 
+            device_config_str = ezlopi_factory_info_v3_get_ezlopi_config();
+            if (device_config_str)
+            {
+                trace_warning("updated-device-config: %s", device_config_str);
+                ezlopi_free(__FUNCTION__, device_config_str);
+            }
+#endif
         }
     }
 }
@@ -117,11 +131,12 @@ void ezlopi_device_name_set_by_device_id(uint32_t a_device_id, cJSON* cj_new_nam
         if (device_config_str)
         {
             // TRACE_D("device-config: \r\n%s", device_config_str);
-            cJSON* cj_device_config = cJSON_Parse(__FUNCTION__, device_config_str);
-            ezlopi_factory_info_v3_free(device_config_str);
+            cJSON* cj_device_config = cJSON_ParseWithRef(__FUNCTION__, device_config_str);
 
             if (cj_device_config)
             {
+                bool config_is_updated = false;
+
                 cJSON* cj_devices = cJSON_GetObjectItem(__FUNCTION__, cj_device_config, ezlopi_dev_detail_str);
                 if (cj_devices)
                 {
@@ -135,6 +150,7 @@ void ezlopi_device_name_set_by_device_id(uint32_t a_device_id, cJSON* cj_new_nam
                             uint32_t device_id = strtoul(cj_device_id->valuestring, NULL, 16);
                             if (device_id == a_device_id)
                             {
+                                config_is_updated = true;
                                 cJSON_DeleteItemFromObject(__FUNCTION__, cj_device, ezlopi_dev_name_str);
                                 cJSON_AddItemToObject(__FUNCTION__, cj_device, ezlopi_dev_name_str, cJSON_Duplicate(__FUNCTION__, cj_new_name, cJSON_True));
                                 break;
@@ -145,6 +161,13 @@ void ezlopi_device_name_set_by_device_id(uint32_t a_device_id, cJSON* cj_new_nam
                     }
                 }
 
+                if (config_is_updated)
+                {
+                    ezlopi_factory_info_v3_set_ezlopi_config(cj_device_config);
+                }
+
+                cJSON_Delete(__FUNCTION__, cj_device_config);
+#if 0
                 char* updated_device_config = cJSON_PrintBuffered(__FUNCTION__, cj_device_config, 4 * 1024, false);
                 TRACE_D("length of 'updated_device_config': %d", strlen(updated_device_config));
 
@@ -163,9 +186,13 @@ void ezlopi_device_name_set_by_device_id(uint32_t a_device_id, cJSON* cj_new_nam
                     {
                         TRACE_E("ERROR : Failed parsing JSON for config.");
                     }
+
                     ezlopi_free(__FUNCTION__, updated_device_config);
                 }
+#endif
             }
+
+            ezlopi_free(__FUNCTION__, device_config_str);
         }
     }
 }

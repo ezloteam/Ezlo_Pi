@@ -87,9 +87,9 @@ static void __create_reg_packet(void)
 
 static void __reg_loop(void *arg)
 {
-    // TRACE_D("reg-loop");
+    // trace_debug("reg-loop");
     int reg_event = ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 0, false);
-    // TRACE_D("reg-event: %d", reg_event);
+    // trace_debug("reg-event: %d", reg_event);
 
     if (reg_event <= 0)
     {
@@ -100,7 +100,7 @@ static void __reg_loop(void *arg)
         {
             if (!ezlopi_core_broadcast_add_to_queue(cj_register_dup))
             {
-                TRACE_E("Error adding to broadcast queue!");
+                trace_error("Error adding to broadcast queue!");
                 cJSON_Delete(__FUNCTION__, cj_register_dup);
             }
         }
@@ -109,5 +109,5 @@ static void __reg_loop(void *arg)
 
 void ezpi_cloud_dummy()
 {
-    TRACE_S("I am just a dummy");
+    trace_information("I am just a dummy");
 }

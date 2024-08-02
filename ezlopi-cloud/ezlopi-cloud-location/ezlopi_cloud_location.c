@@ -36,6 +36,7 @@ void EZPI_CLOUD_location_list(cJSON* cj_request, cJSON* cj_response)
                 vTaskDelay(1);
                 i++;
             }
+            
             cJSON_AddItemToObject(__FUNCTION__, cjson_result, ezlopi_locations_str, json_array_tzs);
         }
     }

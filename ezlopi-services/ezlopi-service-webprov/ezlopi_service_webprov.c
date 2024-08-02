@@ -104,15 +104,15 @@ static void __connection_upcall(bool connected)
     {
         if (0 == prev_status)
         {
-            TRACE_S("Web-socket Connected.");
+            trace_success("Web-socket Connected.");
         }
         else
         {
-            TRACE_S("Web-socket Re-connected.");
+            trace_success("Web-socket Re-connected.");
         }
 
         prev_status = 2;
-        TRACE_I("Starting registration process....");
+        trace_information("Starting registration process....");
         ezlopi_core_ezlopi_methods_registration_init();
     }
     else
@@ -139,7 +139,7 @@ static void __fetch_wss_endpoint(void* pv)
 
         char http_request[128];
         snprintf(http_request, sizeof(http_request), "%s?json=true", cloud_server);
-        TRACE_D("http_request: %s", http_request);
+        trace_debug("http_request: %s", http_request);
 
         s_ezlopi_http_data_t * ws_endpoint = ezlopi_http_get_request(http_request, ssl_private_key, ssl_shared_key, ca_certificate);
         // s_ezlopi_http_data_t * ws_endpoint = ezlopi_http_get_request(http_request, NULL, NULL, NULL);
@@ -148,14 +148,14 @@ static void __fetch_wss_endpoint(void* pv)
         {
             if (ws_endpoint->response)
             {
-                TRACE_D("ws_endpoint: %s", ws_endpoint->response); // {"uri": "wss://endpoint:port"}
+                trace_debug("ws_endpoint: %s", ws_endpoint->response); // {"uri": "wss://endpoint:port"}
                 cJSON* root = cJSON_Parse(__FUNCTION__, ws_endpoint->response);
                 if (root)
                 {
                     cJSON* cjson_uri = cJSON_GetObjectItem(__FUNCTION__, root, "uri");
                     if (cjson_uri)
                     {
-                        TRACE_D("uri: %s", cjson_uri->valuestring ? cjson_uri->valuestring : "NULL");
+                        trace_debug("uri: %s", cjson_uri->valuestring ? cjson_uri->valuestring : "NULL");
                         ezlopi_core_broadcast_method_add(__send_str_data_to_nma_websocket, "nma-websocket", 4);
 
 #if defined(CONFIG_EZPI_CORE_CUSTOM_WSC_LIB)
@@ -220,7 +220,7 @@ static void __message_process(const char * payload, uint32_t len)
         }
         else
         {
-            TRACE_W("no response!");
+            trace_warning("no response!");
         }
     }
 
@@ -269,7 +269,7 @@ static int __send_cjson_data_to_nma_websocket(cJSON* cj_data)
 
         if (data_buffer && buffer_len)
         {
-            TRACE_I("-----------------------------> buffer acquired!");
+            trace_information("-----------------------------> buffer acquired!");
             memset(data_buffer, 0, buffer_len);
 
             if (true == cJSON_PrintPreallocated(__FUNCTION__, cj_data, data_buffer, buffer_len, false))
@@ -278,15 +278,15 @@ static int __send_cjson_data_to_nma_websocket(cJSON* cj_data)
             }
             else
             {
-                TRACE_E("FAILED!");
+                trace_error("FAILED!");
             }
 
             ezlopi_core_buffer_release();
-            TRACE_I("-----------------------------> buffer released!");
+            trace_information("-----------------------------> buffer released!");
         }
         else
         {
-            TRACE_E("-----------------------------> buffer acquired failed!");
+            trace_error("-----------------------------> buffer acquired failed!");
         }
     }
 
@@ -323,11 +323,11 @@ static int __send_str_data_to_nma_websocket(char* str_data)
 
         if (ret)
         {
-            TRACE_S("## WSC-SENDING done >>>>>>>>>>>>>>>>>>>\r\n%s", str_data);
+            trace_success("## WSC-SENDING done >>>>>>>>>>>>>>>>>>>\r\n%s", str_data);
         }
         else
         {
-            TRACE_W("## WSC-SENDING failed >>>>>>>>>>>>>>>>>>>\r\n%s", str_data);
+            trace_warning("## WSC-SENDING failed >>>>>>>>>>>>>>>>>>>\r\n%s", str_data);
         }
     }
 
@@ -374,9 +374,9 @@ static void __provision_check(void* pv)
 
             if (NULL != response)
             {
-                // TRACE_S("Status Code : %d", response->status_code);
-                // TRACE_S("Response len : %d", response->response_len);
-                // TRACE_S("response : %s", response->response);
+                // trace_success("Status Code : %d", response->status_code);
+                // trace_success("Response len : %d", response->response_len);
+                // trace_success("response : %s", response->response);
 
                 switch (response->status_code)
                 {
@@ -401,7 +401,7 @@ static void __provision_check(void* pv)
                         else
                         {
                             flag_break_loop = 1;
-                            TRACE_W("Data not available on cloud!");
+                            trace_warning("Data not available on cloud!");
                         }
 
                         ezlopi_factory_info_v3_free(response->response);
@@ -413,7 +413,7 @@ static void __provision_check(void* pv)
                 {
                     if (304 == response->status_code) // HTTP Status not modified
                     {
-                        TRACE_S("Config data not changed !");
+                        trace_success("Config data not changed !");
                         flag_break_loop = 1;
                     }
                     break;
@@ -432,7 +432,7 @@ static void __provision_check(void* pv)
 
             if (flag_break_loop)
             {
-                TRACE_D("Terminating provison-check task!");
+                trace_debug("Terminating provison-check task!");
                 xTaskNotifyGive(__web_socket_initialize_handler);
                 break;
             }
@@ -519,12 +519,12 @@ static int __provision_update(char* arg)
 
             if (ezlopi_factory_info_v3_set_basic(&config_check_factoryInfo))
             {
-                TRACE_S("Updated basic config");
+                trace_success("Updated basic config");
                 ret = 1;
             }
             else
             {
-                TRACE_E("Error updating basic config");
+                trace_error("Error updating basic config");
             }
 
             cJSON * cj_ssl_private_key = cJSON_GetObjectItem(__FUNCTION__, cj_root_data, ezlopi_ssl_private_key_str);
@@ -558,7 +558,7 @@ static int __provision_update(char* arg)
         else
         {
             ret = -1;
-            TRACE_E("key \"%s\" not found.\n", cj_root_prov_data);
+            trace_error("key \"%s\" not found.\n", cj_root_prov_data);
         }
 
         cJSON_Delete(__FUNCTION__, cj_root_prov_data);
@@ -566,7 +566,7 @@ static int __provision_update(char* arg)
     else
     {
         ret = -1;
-        TRACE_E("Failed parsing JSON .\n");
+        trace_error("Failed parsing JSON .\n");
     }
 
     return ret;

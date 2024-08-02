@@ -427,7 +427,8 @@ static const micro_tz_db_pair micro_tz_db_tzs[] = {
     {"Pacific/Tongatapu", "GMT-13"},
     {"Pacific/Wake", "GMT-12"},
     {"Pacific/Wallis", "GMT-12"},
-    {NULL, NULL}};
+    {NULL, NULL},
+};
 
 static char lower(char start)
 {

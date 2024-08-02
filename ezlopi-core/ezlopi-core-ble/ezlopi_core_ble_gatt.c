@@ -50,7 +50,7 @@ void ezlopi_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t ga
         }
         else
         {
-            TRACE_E("service is null");
+            TRACE_E("service is null for app-id: %d", param->reg.app_id);
         }
         break;
     }
@@ -75,7 +75,7 @@ void ezlopi_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t ga
             // ezlopi_ble_gatt_print_characteristic(char_to_add);
             if (err)
             {
-                TRACE_E("esp_ble_gatts_add_char: %s", esp_err_to_name(err));
+                TRACE_E("'esp_ble_gatts_add_char' error: %s", esp_err_to_name(err));
             }
         }
         break;
@@ -98,7 +98,7 @@ void ezlopi_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t ga
                 esp_err_t add_descr_ret = esp_ble_gatts_add_char_descr(service->service_handle, &desc_to_init->uuid, desc_to_init->permission, NULL, NULL);
                 if (add_descr_ret)
                 {
-                    TRACE_E("add char descr failed, error code =%x", add_descr_ret);
+                    TRACE_E("'esp_ble_gatts_add_char_descr' failed! error code =%x", add_descr_ret);
                 }
             }
             else
@@ -112,7 +112,7 @@ void ezlopi_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t ga
                         char_to_add->property, NULL, NULL);
                     if (err)
                     {
-                        TRACE_E("esp_ble_gatts_add_char: %s", esp_err_to_name(err));
+                        TRACE_E("'esp_ble_gatts_add_char' failed!, error: %s", esp_err_to_name(err));
                     }
                 }
                 else
@@ -163,7 +163,7 @@ void ezlopi_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t ga
                 // ezlopi_ble_gatt_print_characteristic(char_to_add);
                 if (err)
                 {
-                    TRACE_E("esp_ble_gatts_add_char: %s", esp_err_to_name(err));
+                    TRACE_E("'esp_ble_gatts_add_char' failed!, error: %s", esp_err_to_name(err));
                 }
             }
             else

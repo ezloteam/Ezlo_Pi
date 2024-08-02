@@ -121,7 +121,7 @@ esp_err_t ld2410_set_template(ld2410_template_t template, ld2410_settings_t* p_s
         break;
 
     default:
-        TRACE_E("unknown template");
+        TRACE_E("unknown ld2410 template");
         return ESP_FAIL;
         break;
     }
@@ -176,12 +176,12 @@ esp_err_t ld2410_get_data(ld2410_outputs_t* output)
             if (output->moving_target_distance < new_distance)
             {
                 output->direction = MOVING_AWAY;
-                TRACE_E(stringify(MOVING_AWAY));
+                trace_debug(stringify(MOVING_AWAY));
             }
             else if (output->moving_target_distance > new_distance)
             {
                 output->direction = APPROACHING;
-                TRACE_E(stringify(APPROACHING));
+                trace_debug(stringify(APPROACHING));
             }
 
             output->moving_target_distance = new_distance;

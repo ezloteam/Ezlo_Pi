@@ -1329,80 +1329,82 @@ static bool __check_devgroup_validity(cJSON * cj_curr_devgrp_node, cJSON * cj_pa
 {
     bool validity_success = true;
 
-    // 1. Check the condition from "cj_params"
-    for (int i = 0; i < 5; i++)
-    {
-        switch (1 << i)
-        {
-        case (1 << 0):  // cat_flag
-        {
-            cJSON * cj_category_param = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_category_str);
-            if (cj_category_param && cj_category_param->valuestring)
-            {
-                if (false == ((1 << 0) && (____check_for_category_in_devGrp(cj_curr_devgrp_node, cj_category_param->valuestring))))
-                {
-                    validity_success = false;
-                }
-            }
-            break;
-        }
-        case (1 << 1): // subcat_flag
-        {
-            cJSON * cj_subcategory_param = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_subcategory_str);
-            if (cj_subcategory_param && cj_subcategory_param->valuestring)
-            {
-                if (false == ((1 << 1) && (____check_for_subcategory_in_devGrp(cj_curr_devgrp_node, cj_subcategory_param->valuestring))))
-                {
-                    validity_success = false;
-                }
-            }
-            break;
-        }
-        case (1 << 2): // deviceId_flag
-        {
-            cJSON * cj_deviceId_param = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_deviceId_str);
-            if (cj_deviceId_param && cj_deviceId_param->valuestring)
-            {
-                if (false == ((1 << 2) && (____check_for_device_id_in_devGrp(cj_curr_devgrp_node, cj_deviceId_param->valuestring))))
-                {
-                    validity_success = false;
-                }
-            }
-            break;
-        }
-        case (1 << 3): // deviceGroupIds_flag
-        {
-            cJSON * cj_deviceGroupIds_param = cJSON_GetObjectItem(__FUNCTION__, cj_params, "deviceGroupIds");
-            if (cj_deviceGroupIds_param && cJSON_IsArray(cj_deviceGroupIds_param))
-            {
-                if (false == ((1 << 3) && (____check_for_deviceGroupIds_list(cj_curr_devgrp_node, cj_deviceGroupIds_param))))
-                {
-                    validity_success = false;
-                }
-            }
-            break;
-        }
-        case (1 << 4): // deviceGroup_flag
-        {
-            cJSON * cj_deviceGroupId_param = cJSON_GetObjectItem(__FUNCTION__, cj_params, "deviceGroupId");
-            if (cj_deviceGroupId_param && cj_deviceGroupId_param->valuestring)
-            {
-                if (false == ((1 << 4) && (____check_for_deviceGroupId(cj_curr_devgrp_node, cj_deviceGroupId_param->valuestring))))
-                {
-                    validity_success = false;
-                }
-            }
-            break;
-        }
-        }
+    #warning "RIKEN:: Fix these: remove for loop, remove switch-case, and modify required!"
 
-        // break immediately --> if one gives invalid
-        if (!validity_success)
+        // 1. Check the condition from "cj_params"
+        for (int i = 0; i < 5; i++)
         {
-            TRACE_E(" error at --> [%#x]", (1 << i));
-            break;
+            switch (1 << i)
+            {
+            case (1 << 0):  // cat_flag
+            {
+                cJSON * cj_category_param = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_category_str);
+                if (cj_category_param && cj_category_param->valuestring)
+                {
+                    if (false == ((1 << 0) && (____check_for_category_in_devGrp(cj_curr_devgrp_node, cj_category_param->valuestring))))
+                    {
+                        validity_success = false;
+                    }
+                }
+                break;
+            }
+            case (1 << 1): // subcat_flag
+            {
+                cJSON * cj_subcategory_param = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_subcategory_str);
+                if (cj_subcategory_param && cj_subcategory_param->valuestring)
+                {
+                    if (false == ((1 << 1) && (____check_for_subcategory_in_devGrp(cj_curr_devgrp_node, cj_subcategory_param->valuestring))))
+                    {
+                        validity_success = false;
+                    }
+                }
+                break;
+            }
+            case (1 << 2): // deviceId_flag
+            {
+                cJSON * cj_deviceId_param = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_deviceId_str);
+                if (cj_deviceId_param && cj_deviceId_param->valuestring)
+                {
+                    if (false == ((1 << 2) && (____check_for_device_id_in_devGrp(cj_curr_devgrp_node, cj_deviceId_param->valuestring))))
+                    {
+                        validity_success = false;
+                    }
+                }
+                break;
+            }
+            case (1 << 3): // deviceGroupIds_flag
+            {
+                cJSON * cj_deviceGroupIds_param = cJSON_GetObjectItem(__FUNCTION__, cj_params, "deviceGroupIds");
+                if (cj_deviceGroupIds_param && cJSON_IsArray(cj_deviceGroupIds_param))
+                {
+                    if (false == ((1 << 3) && (____check_for_deviceGroupIds_list(cj_curr_devgrp_node, cj_deviceGroupIds_param))))
+                    {
+                        validity_success = false;
+                    }
+                }
+                break;
+            }
+            case (1 << 4): // deviceGroup_flag
+            {
+                cJSON * cj_deviceGroupId_param = cJSON_GetObjectItem(__FUNCTION__, cj_params, "deviceGroupId");
+                if (cj_deviceGroupId_param && cj_deviceGroupId_param->valuestring)
+                {
+                    if (false == ((1 << 4) && (____check_for_deviceGroupId(cj_curr_devgrp_node, cj_deviceGroupId_param->valuestring))))
+                    {
+                        validity_success = false;
+                    }
+                }
+                break;
+            }
+            }
+
+            // break immediately --> if one gives invalid
+            if (!validity_success)
+            {
+                TRACE_E(" error at --> [%#x]", (1 << i));
+                break;
+            }
         }
-    }
 
     return validity_success;
 }
@@ -1603,8 +1605,6 @@ static void __generate_device_list_with_specific_itemgroup_id(cJSON* cj_destinat
                             cJSON * cj_showitems = cJSON_GetObjectItem(__FUNCTION__, cj_params, "showItems");
                             if (cj_showitems && (cj_showitems->type == cJSON_True))
                             {
-                                TRACE_E("Since, [showItems==TRUE] ; attaching items_list ");
-
                                 // C2 . add "items" : [...]
                                 ______add_items_list_to_dest_array(cj_main_device_list, curr_dev_node);
                             }

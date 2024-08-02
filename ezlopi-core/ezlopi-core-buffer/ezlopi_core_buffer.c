@@ -97,7 +97,7 @@ char *ezlopi_core_buffer_acquire(uint32_t *len, uint32_t wait_to_acquired_ms)
     if (__buffer_lock)
     {
         int smphr_ret = xSemaphoreTake(__buffer_lock, wait_to_acquired_ms / portTICK_RATE_MS);
-        TRACE_W("--buffer-lock: smphr_ret = %d", smphr_ret);
+        trace_warning("--buffer-lock: smphr_ret = %d", smphr_ret);
 
         if (pdTRUE == smphr_ret)
         {
@@ -119,8 +119,8 @@ void ezlopi_core_buffer_release(void)
     }
     else
     {
-        TRACE_E("__buffer_lock: %p", __buffer_lock);
-        TRACE_E("__buffer_lock_state: %d", __buffer_lock_state);
-        TRACE_E("buffer release failed!");
+        trace_error("__buffer_lock: %p", __buffer_lock);
+        trace_error("__buffer_lock_state: %d", __buffer_lock_state);
+        trace_error("buffer release failed!");
     }
 }

@@ -31,12 +31,12 @@ int ezlopi_core_broadcast_add_to_queue(cJSON* cj_data)
     int ret = 0;
     if (cj_data && __broadcast_queue_func)
     {
-        // TRACE_S("cj_data: %p, __broadcast_queue_func: %p", cj_data, __broadcast_queue_func);
+        // trace_success("cj_data: %p, __broadcast_queue_func: %p", cj_data, __broadcast_queue_func);
         ret = __broadcast_queue_func(cj_data);
     }
     else
     {
-        // TRACE_E("cj_data: %p, __broadcast_queue_func: %p", cj_data, __broadcast_queue_func);
+        // trace_error("cj_data: %p, __broadcast_queue_func: %p", cj_data, __broadcast_queue_func);
     }
     return ret;
 }
@@ -73,37 +73,30 @@ int ezlopi_core_broadcast_cjson(cJSON* cj_data)
 
     if (cj_data)
     {
-        // char * tmp = cJSON_PrintUnformatted(__FUNCTION__, cj_data);
-        // if (tmp)
-        // {
-        //     printf("\n ### %s[%d] ; cj_data : ### \n ### \n %s \n ### \n\n", __FILE__, __LINE__, tmp);
-        //     free(tmp);
-        // }
-
         uint32_t buffer_len = 0;
 
-        TRACE_I("%d -> -----------------------------> waiting for static buffer!", xTaskGetTickCount());
+        trace_information("%d -> -----------------------------> waiting for static buffer!", xTaskGetTickCount());
         char* data_buffer = ezlopi_core_buffer_acquire(&buffer_len, 5000);
 
         if (data_buffer && buffer_len)
         {
-            TRACE_I("%d -> -----------------------------> buffer acquired!", xTaskGetTickCount());
+            trace_information("%d -> -----------------------------> buffer acquired!", xTaskGetTickCount());
             memset(data_buffer, 0, buffer_len);
 
-            // TRACE_D("buffer_len = [%d]", buffer_len);
+            // trace_debug("buffer_len = [%d]", buffer_len);
 
             if (true == cJSON_PrintPreallocated(__FUNCTION__, cj_data, data_buffer, buffer_len, false))
             {
-                TRACE_D("----------------- broadcasting: \r\n%s", data_buffer);
+                trace_debug("----------------- broadcasting: \r\n%s", data_buffer);
                 ret = __call_broadcast_methods(data_buffer);
             }
 
             ezlopi_core_buffer_release();
-            TRACE_I("%d -> -----------------------------> buffer released!", xTaskGetTickCount());
+            trace_information("%d -> -----------------------------> buffer released!", xTaskGetTickCount());
         }
         else
         {
-            TRACE_E("-----------------------------> buffer acquired failed!");
+            trace_error("-----------------------------> buffer acquired failed!");
         }
     }
 
@@ -198,7 +191,7 @@ static int __call_broadcast_methods(char* data)
                 int mret = curr_method->func(data);
                 if (mret)
                 {
-                    // TRACE_S("broadcasted - method:'%s'\r\ndata: %s", curr_method->method_name ? curr_method->method_name : "", data);
+                    // trace_success("broadcasted - method:'%s'\r\ndata: %s", curr_method->method_name ? curr_method->method_name : "", data);
                     break;
                 }
 
@@ -235,12 +228,12 @@ static l_broadcast_method_t* __method_create(f_broadcast_method_t method, char* 
         }
         else
         {
-            TRACE_E("malloc failed");
+            trace_error("malloc failed");
         }
     }
     else
     {
-        TRACE_E("method is NULL");
+        trace_error("method is NULL");
     }
 
     return method_node;
