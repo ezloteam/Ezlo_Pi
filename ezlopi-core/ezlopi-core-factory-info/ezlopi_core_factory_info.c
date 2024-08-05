@@ -212,6 +212,10 @@ uint32_t ezlopi_factory_info_v3_get_provisioning_status(void)
         g_provisioning_status = 1;
         ezlopi_free(__FUNCTION__, cloud_server);
     }
+    else
+    {
+        g_provisioning_status = 1;
+    }
 
     return g_provisioning_status;
 }

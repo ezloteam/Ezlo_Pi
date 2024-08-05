@@ -108,7 +108,7 @@ void EZPI_CORE_sntp_get_local_time(char* time_buf, uint32_t buf_len)
 
         if (!posix_str)
         {
-            TRACE_E("Unknown time zone location or invalid location, setting GMT0!!");
+            TRACE_W("Unknown time zone location or invalid location, setting GMT0!!");
             posix_str = "GMT0";
         }
 
