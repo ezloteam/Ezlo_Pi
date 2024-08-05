@@ -198,19 +198,20 @@ static ezlopi_error_t __init(l_ezlopi_item_t* item)
                                      : GPIO_INTR_NEGEDGE,
                 };
 
-            if (0 == gpio_config(&io_conf))
-            {
-                ezlopi_service_gpioisr_register_v3(item, __interrupt_upcall, 1000);
-                error = EZPI_SUCCESS;
+                if (0 == gpio_config(&io_conf))
+                {
+                    ezlopi_service_gpioisr_register_v3(item, __interrupt_upcall, 1000);
+                    error = EZPI_SUCCESS;
+                }
+                else
+                {
+                    error = EZPI_ERR_INIT_DEVICE_FAILED;
+                }
             }
             else
             {
                 error = EZPI_ERR_INIT_DEVICE_FAILED;
             }
-        }
-        else
-        {
-            error = EZPI_ERR_INIT_DEVICE_FAILED;
         }
     }
 

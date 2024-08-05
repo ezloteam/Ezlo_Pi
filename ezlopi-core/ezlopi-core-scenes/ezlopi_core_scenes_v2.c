@@ -116,7 +116,7 @@ uint32_t ezlopi_store_new_scene_v2(cJSON* cj_new_scene)
 
         if (new_scnee_str)
         {
-            if (EZPI_SUCCESS == ezlopi_nvs_write_str(new_scnee_str, strlen(new_scnee_str) + 1, tmp_buffer))
+            if (EZPI_SUCCESS == ezlopi_nvs_write_str(new_scnee_str, strlen(new_scnee_str) + 1, new_scene_id_str))
             {
                 bool free_scene_list_str = 1;
                 char* scenes_list_str = ezlopi_nvs_scene_get_v2();

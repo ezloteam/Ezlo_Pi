@@ -218,7 +218,7 @@ static ezlopi_error_t __dht11_setup_item_properties_humidity(l_ezlopi_item_t* it
 
         CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type);
 
-        item->interface.onewire_master.enable = true;
+        item->interface.onewire_master.enable = false;
         CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_str, item->interface.onewire_master.onewire_pin);
         ret = EZPI_SUCCESS;
     }
@@ -228,14 +228,13 @@ static ezlopi_error_t __dht11_setup_item_properties_humidity(l_ezlopi_item_t* it
 static ezlopi_error_t __0015_init(l_ezlopi_item_t* item)
 {
     ezlopi_error_t ret = EZPI_ERR_INIT_DEVICE_FAILED;
-    if (item)
+    if (item && item->interface.onewire_master.enable)
     {
         s_ezlopi_dht11_data_t* dht11_data = (s_ezlopi_dht11_data_t*)item->user_arg;
         if (dht11_data)
         {
             if (GPIO_IS_VALID_GPIO((gpio_num_t)item->interface.onewire_master.onewire_pin))
             {
-                TRACE_S("HERE");
                 setDHT11gpio(item->interface.onewire_master.onewire_pin);
                 ret = EZPI_SUCCESS;
             }
@@ -278,8 +277,10 @@ static ezlopi_error_t __0015_notify(l_ezlopi_item_t* item)
             if (ezlopi_item_name_temp == item->cloud_properties.item_name)
             {
                 float temperature = getTemperature_dht11();
+                TRACE_S("HERE: Temp: %f", temperature);
                 if (temperature > 15)
-                { // TRACE_S("Temperature: %.2f", temperature);
+                {
+                    TRACE_S("Temperature: %.2f", temperature);
                     if (fabs(dht11_data->temperature - temperature) > 1)
                     {
                         dht11_data->temperature = temperature;
@@ -290,8 +291,10 @@ static ezlopi_error_t __0015_notify(l_ezlopi_item_t* item)
             else if (ezlopi_item_name_humidity == item->cloud_properties.item_name)
             {
                 float humidity = getHumidity_dht11();
+                TRACE_S("HERE: Humidity: %f", humidity);
                 if (humidity > 20)
-                { // TRACE_S("Humidity: %.2f", humidity);
+                {
+                    TRACE_S("Humidity: %.2f", humidity);
                     if (fabs(dht11_data->humidity - humidity) > 1)
                     {
                         dht11_data->humidity = humidity;

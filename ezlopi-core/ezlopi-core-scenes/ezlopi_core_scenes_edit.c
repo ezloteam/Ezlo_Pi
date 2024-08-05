@@ -10,6 +10,7 @@
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_scenes_populate.h"
 #include "ezlopi_core_errors.h"
+#include "ezlopi_core_cloud.h"
 
 #include "ezlopi_service_meshbot.h"
 
