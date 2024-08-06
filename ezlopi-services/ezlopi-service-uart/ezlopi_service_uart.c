@@ -773,13 +773,16 @@ static void ezlopi_service_uart_get_config(void)
         {
             cJSON_DeleteItemFromObject(__FUNCTION__, root, ezlopi_cmd_str);
 
-            cJSON* device_total = cJSON_GetObjectItem(__FUNCTION__, root, "dev_total");
+            // cJSON* device_total = cJSON_GetObjectItem(__FUNCTION__, root, "dev_total");
+            // if (device_total)
+            // {
+            //     if (cJSON_IsNumber(device_total))
+            //     {
+            //         cJSON_DeleteItemFromObject(__FUNCTION__, root, "dev_total");
+            //     }
+            //     cJSON_Delete(__FUNCTION__, device_total);
+            // }
 
-            if (cJSON_IsNumber(device_total))
-            {
-                cJSON_DeleteItemFromObject(__FUNCTION__, root, "dev_total");
-            }
-            cJSON_Delete(__FUNCTION__, device_total);
             cJSON_AddNumberToObject(__FUNCTION__, root, ezlopi_cmd_str, 4);
             cJSON_AddNumberToObject(__FUNCTION__, root, ezlopi_status_str, 1);
         }
