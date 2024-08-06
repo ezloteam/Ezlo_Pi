@@ -129,6 +129,7 @@ static void __fetch_wss_endpoint(void* pv)
     char* ssl_private_key = ezlopi_factory_info_v3_get_ssl_private_key();
 
     ezlopi_wait_for_wifi_to_connect(portMAX_DELAY);
+    vTaskDelay(2);
 
     while (1)
     {
