@@ -584,7 +584,7 @@ int ezlopi_scene_when_is_House_Mode_Alarm_Phase_Range(l_scenes_list_v2_t* scene_
             }
             curr_field = curr_field->next;
         }
-}
+    }
 #endif
     return ret;
 }
@@ -614,7 +614,7 @@ int ezlopi_scene_when_is_House_Mode_Switch_to_Range(l_scenes_list_v2_t* scene_no
         {
             TRACE_E(" Current HouseMode_phase does not have duration ");
         }
-}
+    }
 #endif
     return ret;
 }
@@ -641,8 +641,11 @@ int ezlopi_scene_when_is_device_state(l_scenes_list_v2_t* scene_node, void* arg)
         }
 
         uint32_t device_id = 0;
+        uint32_t device_group_id = 0;
+
         bool value_armed = false;
         bool value_reachable = false;
+
 
         l_fields_v2_t* curr_field = when_block->fields;
         while (curr_field)
@@ -668,8 +671,13 @@ int ezlopi_scene_when_is_device_state(l_scenes_list_v2_t* scene_node, void* arg)
                     value_reachable = curr_field->field_value.u_value.value_bool;
                 }
             }
+            else if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "deviceGroup", strlen(curr_field->name), 12) && (NULL != curr_field->field_value.u_value.value_string))
+            {
+                device_group_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
+            }
             curr_field = curr_field->next;
         }
+
         if (device_id)
         {
             l_ezlopi_device_t* curr_device = ezlopi_device_get_by_id(device_id);
@@ -679,13 +687,39 @@ int ezlopi_scene_when_is_device_state(l_scenes_list_v2_t* scene_node, void* arg)
                 if (controller_info)
                 {
                     #warning "we need to change from 'controller' to 'device_id' specific";
-                    ret = ((value_armed == controller_info->armed) ? 1 : 0);
-                    ret = ((value_reachable == controller_info->service_notification) ? 1 : 0);
+                    ret = ((value_armed == controller_info->armed) ? 1 : 0) && ((value_reachable == controller_info->service_notification) ? 1 : 0);
                 }
-
             }
         }
-        #warning "need to check device_group condition";
+        else if (device_group_id)
+        {
+            l_ezlopi_device_grp_t * curr_devgrp = ezlopi_core_device_group_get_by_id(device_group_id);
+            if (curr_devgrp)
+            {
+                int idx = 0;
+                cJSON * cj_device = NULL;
+                while (NULL != (cj_device = cJSON_GetArrayItem(curr_devgrp->devices, idx)))   // ["102ec000" , "102ec001" ,..]
+                {
+                    uint32_t curr_devce_id = strtoul(cj_device->valuestring, NULL, 16);
+                    l_ezlopi_device_t * curr_device = ezlopi_device_get_by_id(curr_devce_id);   // immediately goto "102ec000" ...
+                    if (curr_device)
+                    {
+                        s_ezlopi_cloud_controller_t* controller_info = ezlopi_device_get_controller_information();
+                        if (controller_info)
+                        {
+                            #warning "we need to change from 'controller' to 'device_id' specific";
+                            ret = ((value_armed == controller_info->armed) ? 1 : 0) && ((value_reachable == controller_info->service_notification) ? 1 : 0);
+                        }
+                    }
+
+                    if ((0 < device_id) && (device_id != curr_devce_id))
+                    {
+                        ret = 0;
+                    }
+                    idx++;
+                }
+            }
+        }
     }
 
     return ret;
@@ -872,9 +906,12 @@ int ezlopi_scene_when_compare_numbers(l_scenes_list_v2_t* scene_node, void* arg)
             return 0;
         }
 
+
         l_fields_v2_t* item_or_expression_field = NULL;
         l_fields_v2_t* value_field = NULL;
         l_fields_v2_t* comparator_field = NULL;
+        l_fields_v2_t* devgrp_field = NULL;
+        l_fields_v2_t* itemgrp_field = NULL;
 
         l_fields_v2_t* curr_field = when_block->fields;
         while (curr_field)
@@ -908,12 +945,24 @@ int ezlopi_scene_when_compare_numbers(l_scenes_list_v2_t* scene_node, void* arg)
                     value_field = curr_field; // this field has expression_name
                 }
             }
+            else if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "deviceGroup", strlen(curr_field->name), 12) && (NULL != curr_field->field_value.u_value.value_string))
+            {
+                devgrp_field = curr_field;
+            }
+            else if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "itemGroup", strlen(curr_field->name), 10) && (NULL != curr_field->field_value.u_value.value_string))
+            {
+                itemgrp_field = curr_field;
+            }
             curr_field = curr_field->next;
         }
 
         if (item_or_expression_field && value_field && comparator_field) // item_or_expression_field vs value_field
         {
-            ret = ezlopi_scenes_operators_value_number_operations(item_or_expression_field, value_field, comparator_field);
+            ret = ezlopi_scenes_operators_value_number_operations(item_or_expression_field, value_field, comparator_field, NULL, NULL);
+        }
+        else if (devgrp_field && itemgrp_field && value_field && comparator_field)
+        {
+            ret = ezlopi_scenes_operators_value_number_operations(NULL, value_field, comparator_field, devgrp_field, itemgrp_field);
         }
     }
 
@@ -942,6 +991,8 @@ int ezlopi_scene_when_compare_number_range(l_scenes_list_v2_t* scene_node, void*
         l_fields_v2_t* item_exp_field = NULL;
         l_fields_v2_t* end_value_field = NULL;
         l_fields_v2_t* start_value_field = NULL;
+        l_fields_v2_t* devgrp_field = NULL;
+        l_fields_v2_t* itemgrp_field = NULL;
         bool comparator_choice = false; /* 0->'between' | 1->'not_between'*/
 
         l_fields_v2_t* curr_field = when_block->fields;
@@ -976,12 +1027,24 @@ int ezlopi_scene_when_compare_number_range(l_scenes_list_v2_t* scene_node, void*
             {
                 end_value_field = curr_field;
             }
+            else if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "deviceGroup", strlen(curr_field->name), 12) && (NULL != curr_field->field_value.u_value.value_string))
+            {
+                devgrp_field = curr_field;
+            }
+            else if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "itemGroup", strlen(curr_field->name), 10) && (NULL != curr_field->field_value.u_value.value_string))
+            {
+                itemgrp_field = curr_field;
+            }
             curr_field = curr_field->next;
         }
 
         if (item_exp_field && end_value_field && start_value_field)
         {
-            ezlopi_scenes_operators_value_number_range_operations(item_exp_field, start_value_field, end_value_field, comparator_choice);
+            ret = ezlopi_scenes_operators_value_number_range_operations(item_exp_field, start_value_field, end_value_field, comparator_choice, NULL, NULL);
+        }
+        else if (devgrp_field && itemgrp_field && end_value_field && start_value_field)
+        {
+            ret = ezlopi_scenes_operators_value_number_range_operations(NULL, start_value_field, end_value_field, comparator_choice, devgrp_field, itemgrp_field);
         }
         //-----------------------------------------------------------------------------------------------------------------
     }
@@ -1011,6 +1074,8 @@ int ezlopi_scene_when_compare_strings(l_scenes_list_v2_t* scene_node, void* arg)
         l_fields_v2_t* item_exp_field = NULL;
         l_fields_v2_t* value_field = NULL;
         l_fields_v2_t* comparator_field = NULL;
+        l_fields_v2_t* devgrp_field = NULL;
+        l_fields_v2_t* itemgrp_field = NULL;
 
         l_fields_v2_t* curr_field = when_block->fields;
         while (curr_field)
@@ -1047,12 +1112,24 @@ int ezlopi_scene_when_compare_strings(l_scenes_list_v2_t* scene_node, void* arg)
                     value_field = curr_field; // this field has expression_name
                 }
             }
+            else if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "deviceGroup", strlen(curr_field->name), 12) && (NULL != curr_field->field_value.u_value.value_string))
+            {
+                devgrp_field = curr_field;
+            }
+            else if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "itemGroup", strlen(curr_field->name), 10) && (NULL != curr_field->field_value.u_value.value_string))
+            {
+                itemgrp_field = curr_field;
+            }
             curr_field = curr_field->next;
         }
 
         if (item_exp_field && value_field && comparator_field) // only for item_id vs item_value 'string comparisions'
         {
-            ret = ezlopi_scenes_operators_value_strings_operations(item_exp_field, value_field, comparator_field);
+            ret = ezlopi_scenes_operators_value_strings_operations(item_exp_field, value_field, comparator_field, NULL, NULL);
+        }
+        else if (devgrp_field && itemgrp_field && value_field && comparator_field)
+        {
+            ret = ezlopi_scenes_operators_value_strings_operations(NULL, value_field, comparator_field, devgrp_field, itemgrp_field);
         }
     }
 

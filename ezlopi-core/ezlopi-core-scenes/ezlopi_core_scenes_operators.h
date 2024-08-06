@@ -58,11 +58,11 @@ const char* ezlopi_scenes_numeric_comparator_operators_get_op(e_scene_num_cmp_op
 const char* ezlopi_scenes_numeric_comparator_operators_get_name(e_scene_num_cmp_operators_t operator);
 const char* ezlopi_scenes_numeric_comparator_operators_get_method(e_scene_num_cmp_operators_t operator);
 
-int ezlopi_scenes_operators_value_number_operations(l_fields_v2_t* item_exp_field, l_fields_v2_t* value_field, l_fields_v2_t* comparator_field);
+int ezlopi_scenes_operators_value_number_operations(l_fields_v2_t* item_exp_field, l_fields_v2_t* value_field, l_fields_v2_t* comparator_field, l_fields_v2_t* devgrp_field, l_fields_v2_t* itemgrp_field);
 
 //-------------------------------------------------------------------
 //Number-Range Operators
-int ezlopi_scenes_operators_value_number_range_operations(l_fields_v2_t* item_exp_field, l_fields_v2_t* start_value_field, l_fields_v2_t* end_value_field, bool comparator_choice);
+int ezlopi_scenes_operators_value_number_range_operations(l_fields_v2_t* item_exp_field, l_fields_v2_t* start_value_field, l_fields_v2_t* end_value_field, bool comparator_choice, l_fields_v2_t* devgrp_field, l_fields_v2_t* itemgrp_field);
 
 
 //-------------------------------------------------------------------
@@ -72,7 +72,7 @@ const char* ezlopi_scenes_strings_comparator_operators_get_op(e_scene_str_cmp_op
 const char* ezlopi_scenes_strings_comparator_operators_get_name(e_scene_str_cmp_operators_t operator);
 const char* ezlopi_scenes_strings_comparator_operators_get_method(e_scene_str_cmp_operators_t operator);
 
-int ezlopi_scenes_operators_value_strings_operations(l_fields_v2_t* item_exp_field, l_fields_v2_t* value_field, l_fields_v2_t* comparator_field);
+int ezlopi_scenes_operators_value_strings_operations(l_fields_v2_t* item_exp_field, l_fields_v2_t* value_field, l_fields_v2_t* comparator_field, l_fields_v2_t* devgrp_field, l_fields_v2_t* itemgrp_field);
 
 //-------------------------------------------------------------------
 // String-Operation Operators
@@ -113,9 +113,6 @@ const char* ezlopi_scenes_value_without_less_comparator_operators_get_method(e_s
 // CompareValues Operators 'without-less' (default)
 // int ezlopi_scenes_operators_value_comparevalues_without_less_operations(uint32_t item_id, l_fields_v2_t* value_field, l_fields_v2_t* value_type_field, l_fields_v2_t* comparator_field);
 int ezlopi_scenes_operators_value_comparevalues_with_less_operations(l_fields_v2_t* item_exp_field, l_fields_v2_t* value_field, l_fields_v2_t* value_type_field, l_fields_v2_t* comparator_field);
-
-// CompareNumberRange Operators
-int ezlopi_scenes_operators_value_number_range_operations(l_fields_v2_t * item_exp_field, l_fields_v2_t * start_value_field, l_fields_v2_t * end_value_field, bool comparator_choice);
 
 // HasAtleastOneDictionaryValue
 int ezlopi_scenes_operators_has_atleastone_dictionary_value_operations(uint32_t item_id, l_fields_v2_t* value_field);

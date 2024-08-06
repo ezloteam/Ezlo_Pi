@@ -75,7 +75,7 @@ static int ezlopi_service_broadcast_send_to_queue(cJSON * cj_broadcast_data)
         }
         else
         {
-            TRACE_S(" ----- Adding to broadcast queue -----");
+            // TRACE_S(" ----- Adding to broadcast queue -----");
         }
 
         cJSON* cj_data = cj_broadcast_data;
@@ -85,7 +85,7 @@ static int ezlopi_service_broadcast_send_to_queue(cJSON * cj_broadcast_data)
         }
         else
         {
-            TRACE_E(" ----- Failed adding to queue -----");
+            // TRACE_E(" ----- Failed adding to queue -----");
         }
     }
 
