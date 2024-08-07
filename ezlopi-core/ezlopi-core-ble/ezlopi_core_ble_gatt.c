@@ -57,10 +57,18 @@ void ezlopi_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t ga
     case ESP_GATTS_CREATE_EVT:
     {
         s_gatt_service_t* service = ezlopi_ble_profile_get_service_by_gatts_if(gatts_if);
-        service->service_handle = param->create.service_handle;
-        service->status = GATT_STATUS_DONE;
-        esp_ble_gatts_start_service(service->service_handle);
-        // TRACE_D("service->service_handle: %d", service->service_handle);
+        if (service)
+        {
+            service->service_handle = param->create.service_handle;
+            service->status = GATT_STATUS_DONE;
+            esp_ble_gatts_start_service(service->service_handle);
+            // TRACE_D("service->service_handle: %d", service->service_handle);
+
+        }
+        else
+        {
+            TRACE_E("service is null");
+        }
         break;
     }
     case ESP_GATTS_START_EVT:
@@ -68,7 +76,7 @@ void ezlopi_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t ga
         // TRACE_S("SERVICE_START_EVT, status %d, service_handle %d", param->start.status, param->start.service_handle);
         s_gatt_service_t* service = ezlopi_ble_profile_get_service_by_gatts_if(gatts_if);
         s_gatt_char_t* char_to_add = ezlopi_ble_profile_get_characterstics_to_init(service);
-        if (char_to_add)
+        if (char_to_add && service)
         {
             char_to_add->status = GATT_STATUS_PROCESSING;
             esp_err_t err = esp_ble_gatts_add_char(service->service_handle, &char_to_add->uuid, char_to_add->permission, char_to_add->property, NULL, NULL);
@@ -77,6 +85,10 @@ void ezlopi_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t ga
             {
                 TRACE_E("esp_ble_gatts_add_char: %s", esp_err_to_name(err));
             }
+        }
+        else
+        {
+            TRACE_E("Characteristics or Service is null");
         }
         break;
     }
@@ -88,7 +100,7 @@ void ezlopi_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t ga
         s_gatt_service_t* service = ezlopi_ble_profile_get_service_by_gatts_if(gatts_if);
         s_gatt_char_t* char_initiating = ezlopi_ble_profile_get_initiating_characterstics(service);
 
-        if (char_initiating)
+        if (char_initiating && service)
         {
             char_initiating->handle = param->add_char.attr_handle;
             s_gatt_descr_t* desc_to_init = ezlopi_ble_profile_get_descriptor_to_init(char_initiating);
@@ -132,7 +144,7 @@ void ezlopi_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t ga
         s_gatt_service_t* service = ezlopi_ble_profile_get_service_by_gatts_if(gatts_if);
         s_gatt_char_t* char_initiating = ezlopi_ble_profile_get_initiating_characterstics(service);
         s_gatt_descr_t* desc_initiating = ezlopi_ble_profile_get_initiating_descriptor(char_initiating);
-        if (desc_initiating)
+        if (desc_initiating && char_initiating && service)
         {
             desc_initiating->status = GATT_STATUS_DONE;
             desc_initiating->handle = param->add_char_descr.attr_handle;

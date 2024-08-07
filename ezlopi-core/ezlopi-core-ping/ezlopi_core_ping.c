@@ -79,6 +79,7 @@ void ezlopi_ping_init(void)
     ezlopi_ping_new_session(&config, &cbs, &__ping_handle);
     ezlopi_ping_start_by_handle(__ping_handle);
 
+    TRACE_I("Ping initialized !!");
     return;
 }
 

@@ -95,6 +95,9 @@ f_ezlopi_log_upcall_t ezlopi_util_get_serial_log_upcall()
 
 void trace_color_print(const char* txt_color, uint8_t severity, const char* file, int line, const char* format, ...) {
 
+    f_ezlopi_log_upcall_t log_upcall_func;
+
+#if 0
     f_ezlopi_log_upcall_t log_upcall_func = ezlopi_util_get_cloud_log_upcall();
 
     if (log_upcall_func != NULL) {
@@ -106,6 +109,7 @@ void trace_color_print(const char* txt_color, uint8_t severity, const char* file
         log_upcall_func(severity, cloud_log_format);
         va_end(args);
     }
+#endif 
 
     log_upcall_func = ezlopi_util_get_serial_log_upcall();
     if (log_upcall_func != NULL) {

@@ -18,7 +18,6 @@ int ezlopi_scenes_status_change_broadcast(l_scenes_list_v2_t* scene_node, const 
         cJSON *cj_response = cJSON_CreateObject(__FUNCTION__);
         if (cj_response)
         {
-            // vTaskDelay(5000);
             cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
             cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, method_hub_scene_run_progress);
             cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
@@ -37,12 +36,14 @@ int ezlopi_scenes_status_change_broadcast(l_scenes_list_v2_t* scene_node, const 
                     l_user_notification_v2_t *user_notification_node = scene_node->user_notifications;
                     while (user_notification_node)
                     {
-                        cJSON *cj_notf = cJSON_CreateString(__FUNCTION__, user_notification_node->user_id);
-                        if (!cJSON_AddItemToArray(cj_notifications, cj_notf))
+                        if (NULL != user_notification_node->user_id)
                         {
-                            cJSON_Delete(__FUNCTION__, cj_notf);
+                            cJSON *cj_notf = cJSON_CreateString(__FUNCTION__, user_notification_node->user_id);
+                            if (!cJSON_AddItemToArray(cj_notifications, cj_notf))
+                            {
+                                cJSON_Delete(__FUNCTION__, cj_notf);
+                            }
                         }
-
                         user_notification_node = user_notification_node->next;
                     }
                 }

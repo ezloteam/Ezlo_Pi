@@ -14,7 +14,7 @@ typedef struct s_ezlopi_cloud_controller
     bool battery_powered;      // 'batteryPowered' -> https://api.ezlo.com/hub/devices_api/index.html
     bool reachable;            // 'reachable' -> https://api.ezlo.com/hub/devices_api/index.html
     bool armed;                // 'armed' -> https://api.ezlo.com/hub/devices_api/index.html
-    char room_id[40];          // 'roomId' -> https://api.ezlo.com/hub/devices_api/index.html
+    // char room_id[40];          // 'roomId' -> https://api.ezlo.com/hub/devices_api/index.html
     bool persistent;           // 'persistent' -> https://api.ezlo.com/hub/devices_api/index.html
     bool service_notification; // 'serviceNotification' -> https://api.ezlo.com/hub/devices_api/index.html
     const char* security;      // 'security' -> https://api.ezlo.com/hub/devices_api/index.html, ezlopi-cloud/ezlopi_cloud_constants/ezlopi_cloud_security_str.h
@@ -46,6 +46,7 @@ typedef struct s_ezlopi_cloud_device
 {
     uint32_t device_id; // '_id' -> https://api.ezlo.com/hub/devices_api/index.html
     uint32_t parent_device_id;
+    uint32_t room_id;          // 'roomId' -> https://api.ezlo.com/hub/devices_api/index.html
     char device_name[64];    // 'name' -> https://api.ezlo.com/hub/devices_api/index.html
     char* device_type_id;    // deviceTypeId -> https://log.ezlo.com/new/hub/devices_api/
     const char* category;    // 'category' -> https://api.ezlo.com/hub/devices_api/index.html, ezlopi-cloud/constants/category_str.h
@@ -89,6 +90,8 @@ extern const uint32_t EXPRESSION_ID_START;
 extern const uint32_t MODES_ID_START;
 extern const uint32_t SCENE_GROUP_ID_START;
 extern const uint32_t SCENE_WHEN_BLOCKID_START;
+extern const uint32_t DEVICE_GROUPID_START;
+
 
 uint32_t ezlopi_cloud_generate_device_id(void);
 void ezlopi_cloud_update_device_id(uint32_t device_id);
@@ -119,6 +122,12 @@ void ezlopi_cloud_update_room_id(uint32_t a_room_id);
 
 uint32_t ezlopi_cloud_generate_scene_group_id(void);
 void ezlopi_cloud_update_group_id(uint32_t a_group_id);
+
+uint32_t ezlopi_cloud_generate_device_group_id(void);
+void ezlopi_cloud_update_device_group_id(uint32_t a_device_group_id);
+
+uint32_t ezlopi_cloud_generate_item_group_id(void);
+void ezlopi_cloud_update_item_group_id(uint32_t a_item_group_id);
 
 // uint32_t ezlopi_cloud_get_modes_initial_id(void);
 

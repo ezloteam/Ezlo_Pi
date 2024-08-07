@@ -17,6 +17,7 @@
 #include "ezlopi_core_event_queue.h"
 #include "ezlopi_core_event_group.h"
 #include "ezlopi_core_factory_info.h"
+#include "ezlopi_core_device_group.h"
 #include "ezlopi_core_devices_list.h"
 #include "ezlopi_core_scenes_scripts.h"
 #include "ezlopi_core_scenes_expressions.h"
@@ -41,7 +42,6 @@ void ezlopi_init(void)
     ezlopi_core_read_set_log_severities_internal(ENUM_EZLOPI_LOG_SEVERITY_TRACE);
 #endif // CONFIG_EZPI_UTIL_TRACE_EN
     EZPI_HAL_uart_init();
-
 #if defined(CONFIG_EZPI_WEBSOCKET_CLIENT) || defined(CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER)
     ezlopi_core_buffer_init(CONFIG_EZPI_CORE_STATIC_BUFFER_SIZE); // allocate 10kB
 #endif
@@ -51,7 +51,6 @@ void ezlopi_init(void)
 
     ezlopi_factory_info_v3_init();
     print_factory_info_v3();
-
     ezlopi_event_group_create();
 
 #if defined(CONFIG_EZPI_ENABLE_WIFI)
@@ -61,6 +60,11 @@ void ezlopi_init(void)
     vTaskDelay(10);
     // Init devices
     ezlopi_device_prepare();
+    vTaskDelay(10);
+    // Init device_groups
+    ezlopi_device_group_init();
+    // Init item_groups
+    ezlopi_item_group_init();
     vTaskDelay(10);
     ezlopi_initialize_devices_v3();
     vTaskDelay(10);

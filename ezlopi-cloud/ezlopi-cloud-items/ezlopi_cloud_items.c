@@ -4,17 +4,20 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "ezlopi_cloud_items.h"
-#include "ezlopi_util_trace.h"
 #include "cjext.h"
+#include "ezlopi_util_trace.h"
+
+#include "ezlopi_core_room.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_devices_list.h"
+
+#include "ezlopi_cloud_items.h"
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_cloud_methods_str.h"
 
 #include "ezlopi_service_webprov.h"
 
-static cJSON* ezlopi_device_create_item_table_from_prop(l_ezlopi_item_t* item_properties)
+static cJSON* ezlopi_device_create_item_table_from_prop(l_ezlopi_device_t *device_prop, l_ezlopi_item_t* item_properties)
 {
     cJSON* cj_item_properties = cJSON_CreateObject(__FUNCTION__);
     if (cj_item_properties)
@@ -84,7 +87,7 @@ void items_list_v3(cJSON* cj_request, cJSON* cj_response)
                                             l_ezlopi_item_t* curr_item = curr_device->items;
                                             while (curr_item)
                                             {
-                                                cJSON* cj_item_properties = ezlopi_device_create_item_table_from_prop(curr_item);
+                                                cJSON* cj_item_properties = ezlopi_device_create_item_table_from_prop(curr_device, curr_item);
                                                 if (cj_item_properties)
                                                 {
                                                     if (!cJSON_AddItemToArray(cj_items_array, cj_item_properties))
@@ -112,7 +115,7 @@ void items_list_v3(cJSON* cj_request, cJSON* cj_response)
                         l_ezlopi_item_t* curr_item = curr_device->items;
                         while (curr_item)
                         {
-                            cJSON* cj_item_properties = ezlopi_device_create_item_table_from_prop(curr_item);
+                            cJSON* cj_item_properties = ezlopi_device_create_item_table_from_prop(curr_device, curr_item);
                             if (cj_item_properties)
                             {
 
@@ -200,6 +203,17 @@ void items_update_v3(cJSON* cj_request, cJSON* cj_response)
                         cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_deviceName_str, curr_device->cloud_properties.device_name);
                         cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_deviceCategory_str, curr_device->cloud_properties.category);
                         cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_deviceSubcategory_str, curr_device->cloud_properties.subcategory);
+
+                        char * room_name = ezlopi_core_room_get_name_by_id(curr_device->cloud_properties.room_id);
+                        if (room_name)
+                        {
+                            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_roomName_str, room_name);
+                        }
+                        else
+                        {
+                            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_roomName_str, ezlopi__str);
+                        }
+
                         cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_roomName_str, ezlopi__str);
                         cJSON_AddFalseToObject(__FUNCTION__, cj_result, ezlopi_serviceNotification_str);
                         cJSON_AddTrueToObject(__FUNCTION__, cj_result, ezlopi_userNotification_str);

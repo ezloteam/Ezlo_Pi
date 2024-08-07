@@ -42,8 +42,6 @@ void EZPI_CORE_sntp_init(void)
     int retry = 0;
     const int retry_count = 10;
 
-    // ezlopi_wait_for_wifi_to_connect(portMAX_DELAY);
-
     TRACE_I("Initializing SNTP");
 
     esp_sntp_setoperatingmode(ESP_SNTP_OPMODE_POLL);
@@ -57,11 +55,11 @@ void EZPI_CORE_sntp_init(void)
     sntp_set_sync_interval(15 * 1000);
     esp_sntp_init();
 
-    while ((sntp_get_sync_status() == SNTP_SYNC_STATUS_RESET) && (++retry < retry_count))
-    {
-        TRACE_I("Waiting for system time to be set... (%d/%d)", retry, retry_count);
-        vTaskDelay(500 / portTICK_PERIOD_MS);
-    }
+    // while ((sntp_get_sync_status() == SNTP_SYNC_STATUS_RESET) && (++retry < retry_count))
+    // {
+    //     TRACE_I("Waiting for system time to be set... (%d/%d)", retry, retry_count);
+    //     vTaskDelay(500 / portTICK_PERIOD_MS);
+    // }
 }
 
 int EZPI_CORE_sntp_set_location(const char* location)
@@ -106,7 +104,7 @@ void EZPI_CORE_sntp_get_local_time(char* time_buf, uint32_t buf_len)
 
         if (!posix_str)
         {
-            TRACE_E("Unknown time zone location or invalid location, setting GMT0!!");
+            TRACE_W("Unknown time zone location or invalid location, setting GMT0!!");
             posix_str = "GMT0";
         }
 

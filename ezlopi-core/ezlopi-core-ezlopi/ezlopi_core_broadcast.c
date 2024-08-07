@@ -31,11 +31,12 @@ int ezlopi_core_broadcast_add_to_queue(cJSON* cj_data)
     int ret = 0;
     if (cj_data && __broadcast_queue_func)
     {
+        // TRACE_S("cj_data: %p, __broadcast_queue_func: %p", cj_data, __broadcast_queue_func);
         ret = __broadcast_queue_func(cj_data);
     }
     else
     {
-        TRACE_E("cj_data: %p, __broadcast_queue_func: %p", cj_data, __broadcast_queue_func);
+        // TRACE_E("cj_data: %p, __broadcast_queue_func: %p", cj_data, __broadcast_queue_func);
     }
     return ret;
 }
@@ -72,6 +73,13 @@ int ezlopi_core_broadcast_cjson(cJSON* cj_data)
 
     if (cj_data)
     {
+        // char * tmp = cJSON_PrintUnformatted(__FUNCTION__, cj_data);
+        // if (tmp)
+        // {
+        //     printf("\n ### %s[%d] ; cj_data : ### \n ### \n %s \n ### \n\n", __FILE__, __LINE__, tmp);
+        //     free(tmp);
+        // }
+
         uint32_t buffer_len = 0;
 
         TRACE_I("%d -> -----------------------------> waiting for static buffer!", xTaskGetTickCount());
@@ -81,6 +89,8 @@ int ezlopi_core_broadcast_cjson(cJSON* cj_data)
         {
             TRACE_I("%d -> -----------------------------> buffer acquired!", xTaskGetTickCount());
             memset(data_buffer, 0, buffer_len);
+
+            // TRACE_D("buffer_len = [%d]", buffer_len);
 
             if (true == cJSON_PrintPreallocated(__FUNCTION__, cj_data, data_buffer, buffer_len, false))
             {
