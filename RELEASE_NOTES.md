@@ -5,7 +5,7 @@
 
 # RELEASE NOTES
 
-# Version 4.1.4 Build 194git 
+# Version 4.1.4 Build 194
 
 ## New 
 1. Added 'setVariable' - Meshbot then_method [EZPI-426](https://jira.mios.com/browse/EZPI-426)
@@ -16,6 +16,23 @@
 1. Fix issue about device apperaing offline when WiFi network changed with changing device IP [EZPI-443](https://jira.mios.com/browse/EZPI-443) 
 2. Fix EzloPi WS connection ON and OFF [EZPI-439](https://jira.mios.com/browse/EZPI-439) 
 3. Fix issue of appearing `ezlopi_generic_0` on BLE client devices
+4. Fix timer issue with custom loop implementation within the core
+
+## What's Changed
+* Development by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/147
+* Pre release test meshbot with funtion fix by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/149
+* Ezpi 441 complete room integration by @krishna-ezlo in https://github.com/ezloteam/Ezlo_Pi/pull/148
+* fixed meshbot-crashing issue on enable-true/false by @krishna-ezlo in https://github.com/ezloteam/Ezlo_Pi/pull/150
+* scenes_enable/disable_testing_complete by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/151
+* Ezpi 443 keep tcp conn on ip change by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/154
+* Ezpi 44 x ws integration by @krishna-ezlo in https://github.com/ezloteam/Ezlo_Pi/pull/155
+* Dev merge ezpi 375 422 425 426 427 by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/156
+* Task Completed : https://jira.mios.com/browse/EZPI-445  by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/157
+* Development revert wss by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/159
+* Development by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/160
+
+
+**Full Changelog**: https://github.com/ezloteam/Ezlo_Pi/compare/v4.1.3...v4.1.4
 
 # Version 4.1.3 Build 191
 
