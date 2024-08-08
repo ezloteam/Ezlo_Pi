@@ -317,11 +317,11 @@ static int __send_str_data_to_nma_websocket(char* str_data)
 
         if (ret)
         {
-            TRACE_S("## WSC-SENDING done >>>>>>>>>>>>>>>>>>>\r\n%s", str_data);
+            TRACE_S("## WSC-SENDING done >>>>>>>>>>>>>>>>>>>\r%s", str_data);
         }
         else
         {
-            TRACE_W("## WSC-SENDING failed >>>>>>>>>>>>>>>>>>>\r\n%s", str_data);
+            TRACE_W("## WSC-SENDING failed >>>>>>>>>>>>>>>>>>>\r%s", str_data);
         }
     }
 
