@@ -670,7 +670,7 @@ static void ezlopi_service_uart_set_wifi(const char *data)
 
             if (strlen(pass) >= EZPI_CORE_WIFI_PASS_CHAR_MIN_LEN)
             {
-                // TRACE_S("SSID: %s\tPass : %s\r\n", ssid, pass);
+                // TRACE_S("SSID: %s\tPass : %s", ssid, pass);
                 if (ezlopi_factory_info_v3_set_wifi(ssid, pass))
                 {
                     status_write = 1;
@@ -691,13 +691,14 @@ static void ezlopi_service_uart_set_wifi(const char *data)
                         }
                         else
                         {
+                            #warning "DO NOT user printf on production !"
                             TRACE_E("WiFi Connection to AP: %s failed !", ssid);
-                            // printf("WiFi Connection to AP: %s failed !\r\n", ssid);
+                            // printf("WiFi Connection to AP: %s failed !\n", ssid);
                             status = 0;
                         }
                     }
                     TRACE_W("Trying to connect to AP : %s, attempt %d ....", ssid, attempt);
-                    // printf("Trying to connect to AP : %s, attempt %d ....\r\n", ssid, attempt);
+                    // printf("Trying to connect to AP : %s, attempt %d ....\n", ssid, attempt);
                     attempt++;
                     // vTaskDelay(EZLOPI_WIFI_CONNECT_ATTEMPT_INTERVAL / portTICK_PERIOD_MS);
                 }
@@ -707,7 +708,7 @@ static void ezlopi_service_uart_set_wifi(const char *data)
             else
             {
                 TRACE_E("Invalid WiFi SSID or Password, aborting!");
-                // printf("Invalid WiFi SSID or Password, aborting!\r\n");
+                // printf("Invalid WiFi SSID or Password, aborting! \n");
                 ezlopi_service_uart_response(2, 0, 0);
             }
         }
