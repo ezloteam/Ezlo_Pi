@@ -82,7 +82,7 @@ cJSON *ezlopi_core_api_consume(const char * who, const char *payload, uint32_t l
             else
             {
                 cJSON *cj_method = cJSON_GetObjectItem(who, cj_request, ezlopi_method_str);
-                TRACE_E("## WS Rx <<<<<<<<<< '%s' \n%.*s", (NULL != cj_method) ? (cj_method->valuestring ? cj_method->valuestring : ezlopi__str) : ezlopi__str, len, payload);
+                TRACE_E("## WS Rx <<<<<<<<<< '%s' \n %.*s", (NULL != cj_method) ? (cj_method->valuestring ? cj_method->valuestring : ezlopi__str) : ezlopi__str, len, payload);
             }
 #endif
             cJSON_Delete(who, cj_request);

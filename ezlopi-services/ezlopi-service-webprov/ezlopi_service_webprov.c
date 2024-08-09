@@ -317,11 +317,11 @@ static int __send_str_data_to_nma_websocket(char* str_data)
 
         if (ret)
         {
-            TRACE_S("## WSC-SENDING done >>>>>>>>>>>>>>>>>>>\r\n%s", str_data);
+            TRACE_S("## WSC-SENDING done >>>>>>>>>>>>>>>>>>> \n %s", str_data);
         }
         else
         {
-            TRACE_W("## WSC-SENDING failed >>>>>>>>>>>>>>>>>>>\r\n%s", str_data);
+            TRACE_W("## WSC-SENDING failed >>>>>>>>>>>>>>>>>>> \n %s", str_data);
         }
     }
 
@@ -552,7 +552,7 @@ static int __provision_update(char* arg)
         else
         {
             ret = -1;
-            TRACE_E("key \"%s\" not found.\n", cj_root_prov_data);
+            TRACE_E("key \"%s\" not found.", cj_root_prov_data);
         }
 
         cJSON_Delete(__FUNCTION__, cj_root_prov_data);
@@ -560,7 +560,7 @@ static int __provision_update(char* arg)
     else
     {
         ret = -1;
-        TRACE_E("Failed parsing JSON .\n");
+        TRACE_E("Failed parsing JSON!");
     }
 
     return ret;

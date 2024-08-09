@@ -10,7 +10,7 @@
 #define ZE08_CH2O_RX_PIN          GPIO_NUM_45
 #define ZE08_CH2O_TX_PIN          GPIO_NUM_48
 #define ZE08_CH2O_UART_BUAD_RATE  9600
-#define DEBUG_ZE08_CH2O           1
+#define DEBUG_ZE08_CH2O           0
 
 typedef struct ze08_ch2o_sensor_data
 {

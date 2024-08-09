@@ -195,7 +195,7 @@ esp_err_t ld2410_get_data(ld2410_outputs_t* output)
     else
     {
         output->presence = false;
-        TRACE_S("No target\n");
+        TRACE_S("No target");
     }
 
     return ESP_OK;

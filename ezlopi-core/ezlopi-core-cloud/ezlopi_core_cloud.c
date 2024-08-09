@@ -73,7 +73,7 @@ uint32_t ezlopi_cloud_generate_device_id(void)
     {
         g_device_id++;
     }
-    // TRACE_D("g_device_id: %u\r\n", g_device_id);
+    // TRACE_D("g_device_id: %u", g_device_id);
     return g_device_id;
 }
 
@@ -87,7 +87,7 @@ uint32_t ezlopi_cloud_generate_item_id(void)
     {
         g_item_id++;
     }
-    // TRACE_D("g_item_id: %u\r\n", g_item_id);
+    // TRACE_D("g_item_id: %u", g_item_id);
 
     return g_item_id;
 }
@@ -98,7 +98,7 @@ uint32_t ezlopi_cloud_generate_gateway_id(void)
     {
         g_gateway_id = 0x457a5069;
     }
-    // TRACE_D("g_gateway_id: %u\r\n", g_gateway_id);
+    // TRACE_D("g_gateway_id: %u", g_gateway_id);
     return g_gateway_id;
 }
 
@@ -112,7 +112,7 @@ uint32_t ezlopi_cloud_generate_settings_id(void)
     {
         g_settings_id++;
     }
-    // TRACE_D("g_settings_id: %u\r\n", g_gateway_id);
+    // TRACE_D("g_settings_id: %u", g_gateway_id);
     return g_settings_id;
 }
 

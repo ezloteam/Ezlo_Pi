@@ -1,5 +1,7 @@
 #include "bme680_bsec.h"
 
+#warning "################### DO NOT USE printf ON PRODUCTION ###################"
+
 /**
  * @brief : This function is called by the BSEC library when a new output is available
  * @param[in] input     : BME68X sensor data before processing
@@ -7,6 +9,8 @@
  * @param[in] bsec      : Instance of BSEC2 calling the callback
  */
 static void bme680_data_callback(const bme68x_data data, const bsec_outputs outputs);
+
+
 
 static bool callback_status = false;
 static bme680_data_t bme680_data;
@@ -66,7 +70,7 @@ void bme680_setup(uint32_t sda, uint32_t scl, bool initialize_i2c)
     bsec2_attach_callback(bme680_data_callback);
 
     bsec_version_t bsec2_version = bsec2_get_version();
-    printf("BSEC library version %d.%d.%d.%d\n", bsec2_version.major, bsec2_version.minor, bsec2_version.major_bugfix, bsec2_version.minor_bugfix);
+    // printf("BSEC library version %d.%d.%d.%d\n", bsec2_version.major, bsec2_version.minor, bsec2_version.major_bugfix, bsec2_version.minor_bugfix);
 }
 
 /* Function to copy sensor data */
@@ -212,20 +216,20 @@ void check_bsec_status()
 {
     if (bsec2_get_status() < BSEC_OK)
     {
-        printf("BSEC error code : %d\n", bsec2_get_status());
+        // printf("BSEC error code : %d\n", bsec2_get_status());
     }
     else if (bsec2_get_status() > BSEC_OK)
     {
-        printf("BSEC warning code : %d\n", bsec2_get_status());
+        // printf("BSEC warning code : %d\n", bsec2_get_status());
     }
 
     if (bsec2_get_sensor_status() < BME68X_OK)
     {
-        printf("BME68X error code : %d\n", bsec2_get_sensor_status());
+        // printf("BME68X error code : %d\n", bsec2_get_sensor_status());
     }
     else if (bsec2_get_sensor_status() > BME68X_OK)
     {
-        printf("BME68X warning code : 0x%X\n", bsec2_get_sensor_status());
+        // printf("BME68X warning code : 0x%X\n", bsec2_get_sensor_status());
     }
 }
 
@@ -236,18 +240,18 @@ bool bme680_print_data(bme680_data_t *data)
         return false;
     }
 
-    printf("BSEC Outputs:\n");
-    printf("\tiaq = %0.2f\n", data->iaq);
-    printf("\tiaq accuracy = %d\n", (int)data->iaq_accuracy);
-    printf("\ttemperature = %0.2f °C\n", data->temperature);
-    printf("\tpressure = %0.2f hPa\n", data->pressure / 100.0f);
-    printf("\thumidity = %0.2f %%\n", data->humidity);
-    printf("\tgas resistance = %0.2f KΩ\n", data->gas_resistance / 1000.0);
-    printf("\taltitude = %0.2f m\n", data->altitude);
-    printf("\tCO2 Equivalent = %0.2f\n", data->co2_equivalent);
-    printf("\tVOC Equivalent = %0.2f\n", data->voc_equivalent);
-    printf("\tstabilization status = %d\n", data->stabilization_status);
-    printf("\trun in status = %d\n", data->run_in_status);
+    // printf("BSEC Outputs:\n");
+    // printf("\tiaq = %0.2f\n", data->iaq);
+    // printf("\tiaq accuracy = %d\n", (int)data->iaq_accuracy);
+    // printf("\ttemperature = %0.2f °C\n", data->temperature);
+    // printf("\tpressure = %0.2f hPa\n", data->pressure / 100.0f);
+    // printf("\thumidity = %0.2f %%\n", data->humidity);
+    // printf("\tgas resistance = %0.2f KΩ\n", data->gas_resistance / 1000.0);
+    // printf("\taltitude = %0.2f m\n", data->altitude);
+    // printf("\tCO2 Equivalent = %0.2f\n", data->co2_equivalent);
+    // printf("\tVOC Equivalent = %0.2f\n", data->voc_equivalent);
+    // printf("\tstabilization status = %d\n", data->stabilization_status);
+    // printf("\trun in status = %d\n", data->run_in_status);
     return true;
 }
 

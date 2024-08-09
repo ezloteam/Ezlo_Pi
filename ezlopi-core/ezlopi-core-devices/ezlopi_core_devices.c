@@ -61,7 +61,7 @@ static void __factory_info_update_property_by_cjson(l_ezlopi_device_t * device_n
         char* device_config_str = ezlopi_factory_info_v3_get_ezlopi_config();
         if (device_config_str)
         {
-            TRACE_D("device-config: \r\n%s", device_config_str);
+            TRACE_D("device-config: \n%s", device_config_str);
             cJSON* cj_device_config = cJSON_Parse(__FUNCTION__, device_config_str);
             ezlopi_factory_info_v3_free(device_config_str);
 
@@ -116,7 +116,7 @@ void ezlopi_device_name_set_by_device_id(uint32_t a_device_id, cJSON* cj_new_nam
         char* device_config_str = ezlopi_factory_info_v3_get_ezlopi_config();
         if (device_config_str)
         {
-            // TRACE_D("device-config: \r\n%s", device_config_str);
+            // TRACE_D("device-config: \r\n %s", device_config_str);
             cJSON* cj_device_config = cJSON_Parse(__FUNCTION__, device_config_str);
             ezlopi_factory_info_v3_free(device_config_str);
 

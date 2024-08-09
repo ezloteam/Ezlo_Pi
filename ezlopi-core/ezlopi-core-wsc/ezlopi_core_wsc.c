@@ -709,7 +709,7 @@ static int __rx_func(s_ssl_websocket_t * ssl_wsc)
             else
             {
                 ssl_wsc->buffer[ret] = 0;
-                // TRACE_I("<< WSS-Rx:%s\r\n", __wsc_buffer);
+                // TRACE_I("<< WSS-Rx:%s \n", __wsc_buffer);
                 if (ssl_wsc->message_upcall_func)
                 {
                     ssl_wsc->message_upcall_func(ssl_wsc->buffer, strlen(ssl_wsc->buffer));

@@ -333,7 +333,7 @@ static char *__dynamic_config_base64(void)
         char *str_ezlopi_config = ezlopi_factory_info_v3_get_ezlopi_config(); // do not free 'str_provisioning_data', it is used by other modules
         if (str_ezlopi_config)
         {
-            TRACE_D("device-config: [len: %d]\r\n%s", strlen(str_ezlopi_config), str_ezlopi_config);
+            TRACE_D("device-config: [len: %d]\n%s", strlen(str_ezlopi_config), str_ezlopi_config);
 
             int ret = mbedtls_base64_encode((unsigned char *)base64_data, base64_data_len, &out_put_len,
                                             (const unsigned char *)str_ezlopi_config, strlen(str_ezlopi_config));

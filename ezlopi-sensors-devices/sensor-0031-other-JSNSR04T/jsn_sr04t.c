@@ -105,7 +105,7 @@ err:
 esp_err_t raw_measeurement(jsn_sr04t_config_t *jsn_sr04t_config, jsn_sr04t_raw_data_t *jsn_sr04t_raw_data)
 {
     esp_err_t ret = ESP_OK;
-    ESP_LOGD(TAG1, "%s()", __FUNCTION__);
+    // ESP_LOGD(TAG1, "%s()", __FUNCTION__);
 
     // Reset receive values
     jsn_sr04t_raw_data->data_received = false;
@@ -229,16 +229,18 @@ esp_err_t measurement(jsn_sr04t_config_t *jsn_sr04t_config, jsn_sr04t_data_t *js
         // distance += sample[i].distance_cm;
         vTaskDelay(500 / portTICK_PERIOD_MS);
     }
-    printf("[ ");
+    #warning "DO NOT user printf"
+    // printf("[ ");
     for (int i = 0; i < jsn_sr04t_config->no_of_samples; i++)
     {
-        printf("%.2f ", sample[i].distance_cm);
+        // printf("%.2f ", sample[i].distance_cm);
         if (!sample[i].is_an_error)
         {
             distance += sample[i].distance_cm;
         }
     }
-    printf("]\n");
+    #warning "DO NOT user printf"
+    // printf("]\n");
 
     // if (count_errors > 0)
     // {

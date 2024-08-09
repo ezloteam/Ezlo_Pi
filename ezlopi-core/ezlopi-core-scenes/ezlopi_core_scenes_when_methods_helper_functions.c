@@ -789,7 +789,7 @@ uint8_t issunstate_get_offs_tmval(l_scenes_list_v2_t* scene_node, l_fields_v2_t*
             {
                 TRACE_D(".... Adding offset:  +/- (hh:mm:ss) ....");
                 issunstate_add_offs(user_data->tmoffs_type, &(user_data->choosen_suntime), &(user_data->defined_moment), curr_field->field_value.u_value.value_string);
-                TRACE_S("\nSunMode[%d]{sunrise=1,sunset=2,0=NULL},\nChoosen_suntime(hh:mm:ss = %d:%d:%d),\ndefined_moment(hh:mm:ss = %d:%d:%d),\nOffset(%s)\n",
+                TRACE_S("\r\nSunMode[%d]{sunrise=1,sunset=2,0=NULL},\r\nChoosen_suntime(hh:mm:ss = %d:%d:%d),\r\ndefined_moment(hh:mm:ss = %d:%d:%d),\r\nOffset(%s)\r\n",
                     user_data->sunstate_mode,
                     user_data->choosen_suntime.tm_hour,
                     user_data->choosen_suntime.tm_min,

@@ -8,6 +8,9 @@
 #define BME680_SCL GPIO_NUM_17
 #define ACTIVE_I2C I2C_NUM_0
 
+
+#warning "################### DO NOT USE printf ON PRODUCTION ###################"
+
 #define BME680_TEST 0
 #define SEALEVELPRESSURE_HPA (1013.25)
 
