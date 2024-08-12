@@ -4,4 +4,4 @@ idf_component_register(SRCS
 
                             "${src_files}"
     INCLUDE_DIRS "."
-    REQUIRES )
+    REQUIRES ezlopi-user-config)

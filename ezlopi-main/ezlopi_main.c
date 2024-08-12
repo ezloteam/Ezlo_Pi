@@ -16,6 +16,8 @@
 #include "ezlopi_core_log.h"
 #include "ezlopi_core_reset.h"
 
+#include "ezlopi_cloud_constants.h"
+
 #include "ezlopi_service_ble.h"
 #include "ezlopi_service_uart.h"
 #include "ezlopi_service_loop.h"
@@ -95,7 +97,6 @@ void app_main(void)
 #if defined (CONFIG_EZPI_SERV_ENABLE_MESHBOTS)
     ezlopi_scenes_meshbot_init();
 #endif
-
 
     TaskHandle_t ezlopi_main_blinky_task_handle = NULL;
 

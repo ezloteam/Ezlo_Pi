@@ -613,6 +613,7 @@ static int ________compare_numeric_range_num(double extract_data, double start_v
     }
     return ret;
 }
+
 static int ________compare_numeric_range_str(const char * extract_data, const char * start_value_field_str, const char * end_value_field_str, bool comparator_choice)
 {
     int ret = 0;
