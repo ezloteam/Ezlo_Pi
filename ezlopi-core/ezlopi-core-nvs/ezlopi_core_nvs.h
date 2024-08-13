@@ -123,6 +123,9 @@ extern "C"
     bool EZPI_CORE_nvs_write_serial_log_severity(uint32_t severity);
     uint8_t EZPI_CORE_nvs_read_serial_log_severity(uint32_t* severity);
 
+    bool EZPI_CORE_nvs_write_temperature_scale(uint32_t scale);
+    uint8_t EZPI_CORE_nvs_read_temperature_scale(uint32_t* scale);
+
 #ifdef __cplusplus
 }
 #endif
