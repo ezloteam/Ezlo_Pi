@@ -12,6 +12,7 @@
 
 #include "ezlopi_cloud_items.h"
 #include "ezlopi_cloud_constants.h"
+#include "ezlopi_cloud_strs.h"
 
 #include "ezlopi_service_gpioisr.h"
 #include "device_0001_digitalOut_generic.h"
@@ -246,9 +247,32 @@ static int __settings_update(void* arg, l_ezlopi_device_settings_v3_t* setting)
 
 static void __setup_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cjson_device)
 {
-    device->cloud_properties.category = category_switch;
-    device->cloud_properties.subcategory = subcategory_in_wall;
-    device->cloud_properties.device_type = dev_type_switch_inwall;
+    int ret = -1;
+    char *category_str = (char*)ezlopi_malloc(__FUNCTION__, 16);
+    if(category_str)
+    {
+        ret = ezlopi_create_cloud_strs(category_str, 16, "%s", ezlopi_switch_str);
+    }
+
+    char *subcategory_str = (char*)ezlopi_malloc(__FUNCTION__, 16);
+    if(subcategory_str)
+    {
+        ret = ezlopi_create_cloud_strs(subcategory_str, 16, "%s%s", ezlopi_in_str, ezlopi_wall_str);
+    }
+
+    char *dev_type_str = (char*)ezlopi_malloc(__FUNCTION__, 16);
+    if(dev_type_str)
+    {
+        ret = ezlopi_create_cloud_strs(dev_type_str, 16, "%s%s%s%s", ezlopi_switch_str, ezlopi_dot_str, ezlopi_in_str, ezlopi_wall_str);
+    }
+
+    device->cloud_properties.category = category_str;
+    device->cloud_properties.subcategory = subcategory_str;
+    device->cloud_properties.device_type = dev_type_str;
+
+    // device->cloud_properties.category = category_switch;
+    // device->cloud_properties.subcategory = subcategory_in_wall;
+    // device->cloud_properties.device_type = dev_type_switch_inwall;
     device->cloud_properties.info = NULL;
     device->cloud_properties.device_type_id = NULL;
 }

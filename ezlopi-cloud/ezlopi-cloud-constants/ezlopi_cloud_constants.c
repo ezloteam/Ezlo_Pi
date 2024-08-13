@@ -18,18 +18,19 @@
 
 #include "EZLOPI_USER_CONFIG.h"
 
-char* ezlopi_create_cloud_strs(const char* format, ...)
+int ezlopi_create_cloud_strs(char *cloud_char, size_t cloud_char_size, const char* format, ...)
 {
-    char *cloud_char = ezlopi_malloc(__FUNCTION__, 128);
+    int ret = -1;
     if(cloud_char)
     {
-        memset(cloud_char, 0, 128);
+        memset(cloud_char, 0, cloud_char_size);
         va_list args;
         va_start(args, format);
-        vsnprintf(cloud_char, 128, format, args);
+        vsnprintf(cloud_char, cloud_char_size, format, args);
         va_end(args);
+        ret = 0;
     }
-    return cloud_char;
+    return ret;
 }
 
 

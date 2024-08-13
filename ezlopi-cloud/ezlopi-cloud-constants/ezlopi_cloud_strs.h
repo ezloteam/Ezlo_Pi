@@ -284,7 +284,7 @@ extern const char *ezlopi_motion_str;
 // extern const char *ezlopi_thermostat_str;
 extern const char *ezlopi_outlet_str;
 extern const char *ezlopi_dimmer_str;
-extern const char *ezlopi_inwall_str;
+extern const char *ezlopi_wall_str;
 // extern const char *ezlopi_multi_str;
 // extern const char *ezlopi_repeater_str;
 // extern const char *ezlopi_shutter_str;

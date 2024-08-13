@@ -23,6 +23,6 @@
 #include "ezlopi_cloud_subcategory_str.h"
 #include "ezlopi_cloud_device_types_str.h"
 
-char* ezlopi_create_cloud_strs(const char* format, ...);
+int ezlopi_create_cloud_strs(char *cloud_char, size_t cloud_char_size, const char* format, ...);
 
 #endif // __EZLOPI_CLOUD_CONSTANTS_H__
