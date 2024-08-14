@@ -47,7 +47,15 @@ uint8_t ezlopi_core_setting_get_temperature_scale();
     "params": {
         "name": "scale.temperature",
         "value": "celsius",
-        "valueType": "token"
+    }
+}
+
+{
+    "method": "hub.setting.value.set",
+    "id": "_ID_",
+    "params": {
+        "name": "logs.level",
+        "value": "DEBUG"
     }
 }
 */

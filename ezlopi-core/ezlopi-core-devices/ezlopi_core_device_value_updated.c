@@ -288,3 +288,5 @@ static cJSON* __broadcast_message_settings_updated_from_devices_v3(l_ezlopi_devi
 
     return cjson_response;
 }
+
+

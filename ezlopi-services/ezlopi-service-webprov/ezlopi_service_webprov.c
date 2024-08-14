@@ -30,7 +30,9 @@
 
 #include "ezlopi_service_webprov.h"
 
-#ifndef EZPI_CORE_WSS_USE_WSC_LIB 
+#define EZPI_CORE_WSS_USE_WSC_LIB 1
+
+#ifdef EZPI_CORE_WSS_USE_WSC_LIB 
 #include "ezlopi_core_wsc.h"
 #endif // EZPI_CORE_WSS_USE_WSC_LIB
 
