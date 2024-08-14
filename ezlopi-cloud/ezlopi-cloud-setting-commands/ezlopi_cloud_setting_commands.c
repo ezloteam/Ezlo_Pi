@@ -21,4 +21,13 @@ void setting_value_set(cJSON* cj_request, cJSON* cj_response)
     }
 }
 
+void settings_list(cJSON* cj_request, cJSON* cj_response)
+{
+    cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+    if(cj_result)
+    {
+        ezlopi_core_setting_commands_populate_settings(cj_result);
+    }
+}
+
 

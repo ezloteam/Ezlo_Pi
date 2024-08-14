@@ -15,6 +15,7 @@
 #include "ezlopi_service_ota.h"
 #include "ezlopi_core_log.h"
 #include "ezlopi_core_reset.h"
+#include "ezlopi_core_setting_commands.h"
 
 #include "ezlopi_service_ble.h"
 #include "ezlopi_service_uart.h"
@@ -62,6 +63,8 @@ void app_main(void)
 
     ezlopi_init();
 
+    ezlopi_core_setting_commands_read_settings();
+    
 #ifdef CONFIG_EZPI_ENABLE_UART_PROVISIONING
     EZPI_SERV_uart_init();
 #endif
