@@ -32,7 +32,6 @@ int ezlopi_scene_then_set_item_value(l_scenes_list_v2_t* curr_scene, void* arg)
     int ret = 0;
     uint32_t item_id = 0;
     cJSON* cj_params = cJSON_CreateObject(__FUNCTION__);
-
     if (cj_params)
     {
         l_action_block_v2_t* curr_then = (l_action_block_v2_t*)arg;
@@ -84,6 +83,119 @@ int ezlopi_scene_then_set_item_value(l_scenes_list_v2_t* curr_scene, void* arg)
     }
     return ret;
 }
+int ezlopi_scene_then_group_set_item_value(l_scenes_list_v2_t* curr_scene, void* arg)
+{
+    // TRACE_W("Warning: then-method not implemented!");
+    int ret = 0;
+    uint32_t device_group_id = 0;
+    uint32_t item_group_id = 0;
+    char * item_id_str = NULL;
+
+    cJSON* cj_params = cJSON_CreateObject(__FUNCTION__);
+    if (cj_params)
+    {
+        l_action_block_v2_t* curr_then = (l_action_block_v2_t*)arg;
+        if (curr_then)
+        {
+            l_fields_v2_t* curr_field = curr_then->fields;
+            while (curr_field)
+            {
+                if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "deviceGroup", strlen(curr_field->name), 12))
+                {
+                    device_group_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
+                    // TRACE_D("item_id: %s", curr_field->field_value.u_value.value_string);
+                }
+                else if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "itemGroup", strlen(curr_field->name), 10))
+                {
+                    item_group_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
+                    // TRACE_D("item_id: %s", curr_field->field_value.u_value.value_string);
+                }
+                else if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, ezlopi_value_str, strlen(curr_field->name), 6))
+                {
+                    #warning "need to add more item_value_types";
+                    switch (curr_field->value_type)
+                    {
+                    case EZLOPI_VALUE_TYPE_INT:
+                    case EZLOPI_VALUE_TYPE_FLOAT:
+                    {
+                        cJSON_AddNumberToObject(__FUNCTION__, cj_params, ezlopi_value_str, curr_field->field_value.u_value.value_double);
+                        TRACE_D("value: %f", curr_field->field_value.u_value.value_double);
+                        break;
+                    }
+                    case EZLOPI_VALUE_TYPE_BOOL:
+                    {
+                        cJSON_AddBoolToObject(__FUNCTION__, cj_params, ezlopi_value_str, curr_field->field_value.u_value.value_bool);
+                        TRACE_D("value: %s", curr_field->field_value.u_value.value_bool ? ezlopi_true_str : ezlopi_false_str);
+                        break;
+                    }
+                    case EZLOPI_VALUE_TYPE_STRING:
+                    case EZLOPI_VALUE_TYPE_TOKEN:
+                    {
+                        cJSON_AddStringToObject(__FUNCTION__, cj_params, ezlopi_value_str, curr_field->field_value.u_value.value_string);
+                        TRACE_D("value: %s", curr_field->field_value.u_value.value_string);
+                        break;
+                    }
+                    default:
+                        break;
+                    }
+
+                }
+
+                curr_field = curr_field->next;
+            }
+
+            if (device_group_id && item_group_id)
+            {
+                l_ezlopi_device_grp_t * curr_devgrp = ezlopi_core_device_group_get_by_id(device_group_id);
+                if (curr_devgrp)
+                {
+                    int idx = 0;
+                    cJSON * cj_get_devarr = NULL;
+                    while (NULL != (cj_get_devarr = cJSON_GetArrayItem(curr_devgrp->devices, idx)))   // ["102ec000" , "102ec001" ,..]
+                    {
+                        uint32_t curr_device_id = strtoul(cj_get_devarr->valuestring, NULL, 16);
+                        l_ezlopi_device_t * curr_device = ezlopi_device_get_by_id(curr_device_id);   // immediately goto "102ec000" ...
+                        if (curr_device)
+                        {
+                            l_ezlopi_item_t* curr_item_node = curr_device->items;   // perform operation on items of above device --> "102ec000"
+                            while (curr_item_node)
+                            {
+                                // compare with items_list stored in item_group_id
+                                l_ezlopi_item_grp_t * curr_item_grp = ezlopi_core_item_group_get_by_id(item_group_id);  // get  "ll_itemgrp_node"
+                                if (curr_item_grp)
+                                {
+                                    int count = 0;
+                                    cJSON * cj_item_names = NULL;
+                                    while (NULL != (cj_item_names = cJSON_GetArrayItem(curr_item_grp->item_names, count)))  // ["202ec000" , "202ec001" ,..]
+                                    {
+                                        uint32_t req_item_id_from_itemgrp = strtoul(cj_item_names->valuestring, NULL, 16);
+                                        if (req_item_id_from_itemgrp == curr_item_node->cloud_properties.item_id)
+                                        {
+                                            l_ezlopi_item_t* curr_item = ezlopi_device_get_item_by_id(req_item_id_from_itemgrp);
+                                            if (curr_item)
+                                            {
+                                                cJSON_AddStringToObject(__FUNCTION__, cj_params, ezlopi__id_str, cj_item_names->valuestring);
+                                                curr_item->func(EZLOPI_ACTION_SET_VALUE, curr_item, cj_params, curr_item->user_arg);
+                                                ret = 1;
+                                            }
+                                        }
+                                        count++;
+                                    }
+                                }
+                                curr_item_node = curr_item_node->next;
+                            }
+                        }
+                        idx++;
+                    }
+                }
+            }
+        }
+
+        cJSON_Delete(__FUNCTION__, cj_params);
+    }
+    return ret;
+}
+
 int ezlopi_scene_then_set_device_armed(l_scenes_list_v2_t* curr_scene, void* arg)
 {
     // TRACE_W("Warning: then-method not implemented!");
@@ -146,7 +258,7 @@ int ezlopi_scene_then_group_set_device_armed(l_scenes_list_v2_t* curr_scene, voi
             l_fields_v2_t* curr_field = curr_then->fields;
             while (curr_field)
             {
-                if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "deviceGroup", strlen(curr_field->name), 7))
+                if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "deviceGroup", strlen(curr_field->name), 12))
                 {
                     device_group_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
                 }
@@ -776,14 +888,14 @@ int ezlopi_scene_then_group_toggle_value(l_scenes_list_v2_t* curr_scene, void* a
             l_fields_v2_t* curr_field = curr_then->fields;
             while (curr_field)
             {
-                if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "deviceGroup", strlen(curr_field->name), 5))
+                if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "deviceGroup", strlen(curr_field->name), 12))
                 {
                     if ((EZLOPI_VALUE_TYPE_DEVICE_GROUP == curr_field->value_type) && (NULL != curr_field->field_value.u_value.value_string))
                     {
                         device_group_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
                     }
                 }
-                else if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "itemGroup", strlen(curr_field->name), 5))
+                else if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "itemGroup", strlen(curr_field->name), 10))
                 {
                     if ((EZLOPI_VALUE_TYPE_ITEM_GROUP == curr_field->value_type) && (NULL != curr_field->field_value.u_value.value_string))
                     {
