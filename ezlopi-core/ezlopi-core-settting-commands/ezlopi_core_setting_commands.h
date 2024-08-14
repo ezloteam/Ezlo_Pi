@@ -40,24 +40,4 @@ int ezlopi_core_setting_commands_populate_settings(cJSON *cj_result);
 int ezlopi_core_setting_commands_read_settings();
 uint8_t ezlopi_core_setting_get_temperature_scale();
 
-/*
-{
-    "method": "hub.setting.value.set",
-    "id": "_ID_",
-    "params": {
-        "name": "scale.temperature",
-        "value": "celsius",
-    }
-}
-
-{
-    "method": "hub.setting.value.set",
-    "id": "_ID_",
-    "params": {
-        "name": "logs.level",
-        "value": "DEBUG"
-    }
-}
-*/
-
 #endif /// __EZLOPI_CORE_SETTING_COMMANDS_H__
