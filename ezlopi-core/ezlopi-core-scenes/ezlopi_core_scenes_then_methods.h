@@ -22,6 +22,7 @@ int ezlopi_scene_then_cloud_api(l_scenes_list_v2_t* scene_node, void* arg);
 int ezlopi_scene_then_set_expression(l_scenes_list_v2_t* scene_node, void* arg);
 int ezlopi_scene_then_set_variable(l_scenes_list_v2_t* scene_node, void* arg);
 int ezlopi_scene_then_toggle_value(l_scenes_list_v2_t* scene_node, void* arg);
+int ezlopi_scene_then_group_toggle_value(l_scenes_list_v2_t* curr_scene, void* arg);
 
 #endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
