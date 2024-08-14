@@ -117,11 +117,12 @@ int ezlopi_scene_then_set_device_armed(l_scenes_list_v2_t* curr_scene, void* arg
                 l_ezlopi_device_t* curr_device = ezlopi_device_get_by_id(device_id);
                 if (curr_device)
                 {
+                    curr_device->cloud_properties.armed = (device_armed) ? true : false;
                     s_ezlopi_cloud_controller_t* controller_info = ezlopi_device_get_controller_information();
                     if (controller_info)
                     {
-                        #warning "we need to change from 'controller' to device-specific [krishna]"
-                            controller_info->armed = (device_armed) ? true : false;
+                        #warning "we need to change from 'controller' to device-specific [krishna]";
+                        controller_info->armed = (device_armed) ? true : false;
                     }
                 }
             }
@@ -131,6 +132,65 @@ int ezlopi_scene_then_set_device_armed(l_scenes_list_v2_t* curr_scene, void* arg
 
     return ret;
 }
+int ezlopi_scene_then_group_set_device_armed(l_scenes_list_v2_t* curr_scene, void* arg)
+{
+    // TRACE_W("Warning: then-method not implemented!");
+    int ret = 0;
+    if (curr_scene)
+    {
+        uint32_t device_group_id = 0;
+        bool device_armed = false;
+        l_action_block_v2_t* curr_then = (l_action_block_v2_t*)arg;
+        if (curr_then)
+        {
+            l_fields_v2_t* curr_field = curr_then->fields;
+            while (curr_field)
+            {
+                if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "deviceGroup", strlen(curr_field->name), 7))
+                {
+                    device_group_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
+                }
+                else if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "deviceFlag", strlen(curr_field->name), 11))
+                {
+                    if (EZLOPI_VALUE_TYPE_BOOL == curr_field->value_type)
+                    {
+                        device_armed = curr_field->field_value.u_value.value_bool;
+                    }
+                }
+                curr_field = curr_field->next;
+            }
+
+            if (device_group_id)
+            {
+                l_ezlopi_device_grp_t * curr_devgrp = ezlopi_core_device_group_get_by_id(device_group_id);
+                if (curr_devgrp)
+                {
+                    int idx = 0;
+                    cJSON * cj_get_devarr = NULL;
+                    while (NULL != (cj_get_devarr = cJSON_GetArrayItem(curr_devgrp->devices, idx)))   // ["102ec000" , "102ec001" ,..]
+                    {
+                        uint32_t curr_device_id = strtoul(cj_get_devarr->valuestring, NULL, 16);
+                        l_ezlopi_device_t * curr_device = ezlopi_device_get_by_id(curr_device_id);   // immediately goto "102ec000" ...
+                        if (curr_device)
+                        {
+                            curr_device->cloud_properties.armed = (device_armed) ? true : false;
+                            s_ezlopi_cloud_controller_t* controller_info = ezlopi_device_get_controller_information();
+                            if (controller_info)
+                            {
+                                #warning "we need to change from 'controller' to device-specific [krishna]";
+                                controller_info->armed = (device_armed) ? true : false;
+                            }
+                        }
+                        idx++;
+                    }
+                }
+            }
+        }
+    }
+
+    return ret;
+}
+
 int ezlopi_scene_then_send_cloud_abstract_command(l_scenes_list_v2_t* curr_scene, void* arg)
 {
     TRACE_W("Warning: then-method not implemented!");
@@ -744,8 +804,8 @@ int ezlopi_scene_then_group_toggle_value(l_scenes_list_v2_t* curr_scene, void* a
                     cJSON * cj_get_devarr = NULL;
                     while (NULL != (cj_get_devarr = cJSON_GetArrayItem(curr_devgrp->devices, idx)))   // ["102ec000" , "102ec001" ,..]
                     {
-                        uint32_t curr_devce_id = strtoul(cj_get_devarr->valuestring, NULL, 16);
-                        l_ezlopi_device_t * curr_device = ezlopi_device_get_by_id(curr_devce_id);   // immediately goto "102ec000" ...
+                        uint32_t curr_device_id = strtoul(cj_get_devarr->valuestring, NULL, 16);
+                        l_ezlopi_device_t * curr_device = ezlopi_device_get_by_id(curr_device_id);   // immediately goto "102ec000" ...
                         if (curr_device)
                         {
                             l_ezlopi_item_t* curr_item_node = curr_device->items;   // perform operation on items of above device --> "102ec000"
