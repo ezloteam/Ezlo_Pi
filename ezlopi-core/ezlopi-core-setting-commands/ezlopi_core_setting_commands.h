@@ -38,6 +38,10 @@ typedef enum
 int ezlopi_core_setting_commands_process(cJSON *cj_params);
 int ezlopi_core_setting_commands_populate_settings(cJSON *cj_result);
 int ezlopi_core_setting_commands_read_settings();
-uint8_t ezlopi_core_setting_get_temperature_scale();
+e_enum_temperature_scale_t ezlopi_core_setting_get_temperature_scale();
+e_enum_date_format_t ezlopi_core_setting_get_date_format();
+e_enum_time_format_t ezlopi_core_setting_get_time_format();
+int ezlopi_core_setting_get_network_ping_timeout();
+
 
 #endif /// __EZLOPI_CORE_SETTING_COMMANDS_H__

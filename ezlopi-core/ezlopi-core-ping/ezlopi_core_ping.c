@@ -16,6 +16,7 @@
 
 #include "./ezlopi-ping/ping_sock.h"
 
+#include "ezlopi_core_setting_commands.h"
 #include "ezlopi_core_ping.h"
 
 static uint32_t __ping_fail_count = 0;
@@ -36,7 +37,11 @@ void ezlopi_ping_init(void)
     ezlopi_ping_config_t config = ESP_PING_DEFAULT_CONFIG();
 
     config.count = 0; // 0 : run forever
-    config.timeout_ms = 2000;
+
+    int timeout_sec = ezlopi_core_setting_get_network_ping_timeout();
+
+    // config.timeout_ms = 2000;
+    config.timeout_ms = timeout_sec * 1000;
     config.interval_ms = 10000;
 
     // parse IP address

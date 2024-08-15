@@ -193,7 +193,7 @@ static void __ping_loop(void *arg)
                 {
                     int recv_ret = __ping_receive(ep, 5);
 
-                    if ((recv_ret >= 0) || (xTaskGetTickCount() - last_wake) >= ep->on_ping_timeout)
+                    if ((recv_ret >= 0) || (xTaskGetTickCount() - last_wake) >= ep->interval_ms)
                     {
                         gettimeofday(&end_time, NULL);
                         ep->elapsed_time_ms = PING_TIME_DIFF_MS(end_time, start_time);

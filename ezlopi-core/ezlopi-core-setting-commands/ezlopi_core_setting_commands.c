@@ -391,7 +391,23 @@ int ezlopi_core_setting_commands_read_settings()
     return ret;
 }
 
-uint8_t ezlopi_core_setting_get_temperature_scale()
+e_enum_temperature_scale_t ezlopi_core_setting_get_temperature_scale()
 {
-    return (uint8_t)temperature_scale_to_user;
+    return temperature_scale_to_user;
 }
+
+e_enum_date_format_t ezlopi_core_setting_get_date_format()
+{
+    return date_format_to_user;
+}
+
+e_enum_time_format_t ezlopi_core_setting_get_time_format()
+{
+    return time_format_to_user;
+}
+
+int ezlopi_core_setting_get_network_ping_timeout()
+{
+    return network_ping_timeout_to_user;
+}
+
