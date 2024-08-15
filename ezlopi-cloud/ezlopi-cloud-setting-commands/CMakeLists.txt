@@ -7,7 +7,7 @@ idf_component_register(SRCS "ezlopi_cloud_setting_commands.c"
 
                                     ezlopi-cloud-constants
                                     
-                                    ezlopi-core-settting-commands
+                                    ezlopi-core-setting-commands
 )
 
 

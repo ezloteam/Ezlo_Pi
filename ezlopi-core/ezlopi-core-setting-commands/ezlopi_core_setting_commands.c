@@ -290,7 +290,7 @@ static void ezlopi_core_setting_updated_broadcast(cJSON *cj_params)
                 cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, "hub.setting.updated");
                 cJSON_AddItemToObject(__FUNCTION__, cj_response, "result", cj_result);
                 int ret = ezlopi_core_broadcast_add_to_queue(cj_response);
-                if(0 == ret)
+                if (0 == ret)
                 {
                     cJSON_Delete(__FUNCTION__, cj_response);
                 }
@@ -370,16 +370,23 @@ int ezlopi_core_setting_commands_read_settings()
     int ret = 0;
 
     EZPI_CORE_nvs_read_temperature_scale((uint32_t *)&temperature_scale_to_user);
-    printf("Temperature scale: %s\n", temperature_scale_enum[temperature_scale_to_user]);
+    // printf("Temperature scale: %s\n", temperature_scale_enum[temperature_scale_to_user]);
 
     EZPI_CORE_nvs_read_date_format((uint32_t *)&date_format_to_user);
-    printf("Date format: %s\n", date_format_enum[date_format_to_user]);
+    // printf("Date format: %s\n", date_format_enum[date_format_to_user]);
 
     EZPI_CORE_nvs_read_time_format((uint32_t *)&time_format_to_user);
-    printf("Time format: %s\n", time_format_enum[time_format_to_user]);
+    // printf("Time format: %s\n", time_format_enum[time_format_to_user]);
 
     EZPI_CORE_nvs_read_network_ping_timeout((uint32_t *)&network_ping_timeout_to_user);
-    printf("Network Ping Timeout: %d\n", network_ping_timeout_to_user);
+    // printf("Network Ping Timeout: %d\n", network_ping_timeout_to_user);
+    
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
+    ezlopi_core_read_set_log_severities();
+    // #warning "remove this in release"
+    ezlopi_core_read_set_log_severities_internal(ENUM_EZLOPI_LOG_SEVERITY_TRACE);
+    // printf("Log severity/level set to: %s\n", ezlopi_core_cloud_log_get_current_severity_enum_str());
+#endif // CONFIG_EZPI_UTIL_TRACE_EN
 
     return ret;
 }
