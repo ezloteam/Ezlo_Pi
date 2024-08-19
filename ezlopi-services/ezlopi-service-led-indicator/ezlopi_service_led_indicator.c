@@ -26,7 +26,7 @@ static void __indicator_LED_loop(void *arg);
 
 static e_indicator_led_priority_t __indicator_priority = PRIORITY_CLOUD;
 
-#if defined(CONFIG_IDF_TARGET_ESP32S3) || defined(CONFIG_IDF_TARGET_ESP32C3)
+#if defined(CONFIG_IDF_TARGET_ESP32S3) || defined(CONFIG_IDF_TARGET_ESP32C3) || defined(CONFIG_IDF_TARGET_ESP32S2)
 
 #define COLOR_GET_RED(x) ( 0xFF & ( x >> 16 ))
 #define COLOR_GET_GREEN(x) ( 0xFF & ( x >> 8 ) )
@@ -40,6 +40,8 @@ static e_indicator_led_priority_t __indicator_priority = PRIORITY_CLOUD;
 #define INDICATOR_LED_PIN 48
 #elif CONFIG_IDF_TARGET_ESP32C3
 #define INDICATOR_LED_PIN 8
+#elif CONFIG_IDF_TARGET_ESP32S2
+#define INDICATOR_LED_PIN 18
 #endif
 #define INDICATOR_RGB_RMT_TX_CHANNEL RMT_CHANNEL_1
 
@@ -56,7 +58,7 @@ static led_strip_t indicator_led;
 
 #endif // CONFIG_IDF_TARGET_ESP32S3 OR OR CONFIG_IDF_TARGET_ESP32C3 OR CONFIG_IDF_TARGET_ESP32
 
-#if defined(CONFIG_IDF_TARGET_ESP32S3) || defined(CONFIG_IDF_TARGET_ESP32C3)
+#if defined(CONFIG_IDF_TARGET_ESP32S3) || defined(CONFIG_IDF_TARGET_ESP32C3) || defined(CONFIG_IDF_TARGET_ESP32S2)
 
 static int indicator_RGB_led_fade_out(uint16_t fade_time_ms)
 {
