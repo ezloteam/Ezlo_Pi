@@ -171,13 +171,9 @@ int ezlopi_scene_then_group_set_item_value(l_scenes_list_v2_t* curr_scene, void*
                                         uint32_t req_item_id_from_itemgrp = strtoul(cj_item_names->valuestring, NULL, 16);
                                         if (req_item_id_from_itemgrp == curr_item_node->cloud_properties.item_id)
                                         {
-                                            l_ezlopi_item_t* curr_item = ezlopi_device_get_item_by_id(req_item_id_from_itemgrp);
-                                            if (curr_item)
-                                            {
-                                                cJSON_AddStringToObject(__FUNCTION__, cj_params, ezlopi__id_str, cj_item_names->valuestring);
-                                                curr_item->func(EZLOPI_ACTION_SET_VALUE, curr_item, cj_params, curr_item->user_arg);
-                                                ret = 1;
-                                            }
+                                            cJSON_AddStringToObject(__FUNCTION__, cj_params, ezlopi__id_str, cj_item_names->valuestring);
+                                            curr_item_node->func(EZLOPI_ACTION_SET_VALUE, curr_item_node, cj_params, curr_item_node->user_arg);
+                                            ret = 1;
                                         }
                                         count++;
                                     }
