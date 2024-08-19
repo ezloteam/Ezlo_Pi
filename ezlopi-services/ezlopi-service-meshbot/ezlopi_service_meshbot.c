@@ -50,12 +50,12 @@ uint32_t ezlopi_meshbot_service_stop_for_scene_id(uint32_t _id)
             TRACE_D("stop scene_id : %#x [%d] ", scene_node->_id, scene_node->status);
         }
 
-        // while (EZLOPI_SCENE_STATUS_STOPPED != scene_node->status)
-        // {
-        //     vTaskDelay(10 / portTICK_RATE_MS);
-        // }
+        while (EZLOPI_SCENE_STATUS_STOPPED != scene_node->status)
+        {
+            vTaskDelay(10 / portTICK_RATE_MS);
+        }
 
-        // ezlopi_scenes_status_change_broadcast(scene_node, scene_status_stopped_str);
+        ezlopi_scenes_status_change_broadcast(scene_node, scene_status_stopped_str);
 
         ret = 1;
     }
@@ -74,12 +74,12 @@ uint32_t ezlopi_meshobot_service_stop_scene(l_scenes_list_v2_t* scene_node)
             TRACE_D("stop scene_id : %#x [%d] ", scene_node->_id, scene_node->status);
         }
 
-        // while (EZLOPI_SCENE_STATUS_STOPPED != scene_node->status)
-        // {
-        //     vTaskDelay(10 / portTICK_RATE_MS);
-        // }
+        while (EZLOPI_SCENE_STATUS_STOPPED != scene_node->status)
+        {
+            vTaskDelay(10 / portTICK_RATE_MS);
+        }
 
-        // ezlopi_scenes_status_change_broadcast(scene_node, scene_status_stopped_str);
+        ezlopi_scenes_status_change_broadcast(scene_node, scene_status_stopped_str);
 
         ret = 1;
     }

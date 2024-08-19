@@ -554,6 +554,7 @@ void scenes_stop(cJSON* cj_request, cJSON* cj_response)
         cJSON* cj_scene_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_sceneId_str);
         if (cj_scene_id && cj_scene_id->valuestring)
         {
+            #warning "add support for 'thenGroups' or 'elseGroups' ";
             uint32_t u32_scene_id = strtoul(cj_scene_id->valuestring, NULL, 16);
             ezlopi_meshbot_service_stop_for_scene_id(u32_scene_id);
         }

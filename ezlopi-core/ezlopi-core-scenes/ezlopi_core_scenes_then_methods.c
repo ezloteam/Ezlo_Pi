@@ -235,7 +235,6 @@ int ezlopi_scene_then_set_device_armed(l_scenes_list_v2_t* curr_scene, void* arg
                 }
             }
         }
-
     }
 
     return ret;
