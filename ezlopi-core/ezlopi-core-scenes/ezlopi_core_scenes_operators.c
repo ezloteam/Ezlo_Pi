@@ -168,13 +168,13 @@ static int ____compare_exp_vs_other(s_ezlopi_expressions_t * curr_expr_left, l_f
             break;
         }
         default:
-            TRACE_W("Comparison --->>> can compare only :- string / bool / number ");
+            TRACE_W("Error!! can compare only :- string / bool / number ");
             break;
         }
     }
     else
     {
-        TRACE_E("Comparison --->>> value_types of LHS != RHS [ '%s' vs '%s' ]", ezlopi_scene_get_scene_value_type_name(curr_expr_left->value_type), ezlopi_scene_get_scene_value_type_name(value_field->value_type));
+        TRACE_E(" LHS != RHS [ '%s' vs '%s' ]", ezlopi_scene_get_scene_value_type_name(curr_expr_left->value_type), ezlopi_scene_get_scene_value_type_name(value_field->value_type));
     }
 
     return ret;
@@ -223,13 +223,13 @@ static int ____compare_exp_vs_exp(s_ezlopi_expressions_t * curr_expr_left, s_ezl
             break;
         }
         default:
-            TRACE_W("Comparison --->>> can compare only :- string / bool / number ");
+            TRACE_W("Error!! can compare only :- string / bool / number ");
             break;
         }
     }
     else
     {
-        TRACE_E("Comparison --->>> value_types of LHS != RHS [ '%s' vs '%s' ]", ezlopi_scene_get_scene_value_type_name(curr_expr_left->value_type), ezlopi_scene_get_scene_value_type_name(curr_expr_right->value_type));
+        TRACE_E(" LHS != RHS [ '%s' vs '%s' ]", ezlopi_scene_get_scene_value_type_name(curr_expr_left->value_type), ezlopi_scene_get_scene_value_type_name(curr_expr_right->value_type));
     }
 
     return ret;
@@ -287,7 +287,7 @@ static int ____compare_exp_vs_item(s_ezlopi_expressions_t * curr_expr_left, l_ez
                     break;
                 }
                 default:
-                    TRACE_W("Comparison --->>> can compare only :- string / bool / number ");
+                    TRACE_W("Error!! can compare only :- string / bool / number ");
                     break;
                 }
             }
@@ -296,7 +296,7 @@ static int ____compare_exp_vs_item(s_ezlopi_expressions_t * curr_expr_left, l_ez
     }
     else
     {
-        TRACE_E("Comparison --->>> value_types of LHS != RHS [ '%s' vs '%s' ]", lhs_str, rhs_str);
+        TRACE_E(" LHS != RHS [ '%s' vs '%s' ]", lhs_str, rhs_str);
     }
 
     return ret;
@@ -358,7 +358,7 @@ static int ____compare_item_vs_other(l_ezlopi_item_t * item_left, l_fields_v2_t 
                     break;
                 }
                 default:
-                    TRACE_W("Comparison --->>> can compare only :- string / bool / number ");
+                    TRACE_W("Error!! can compare only :- string / bool / number ");
                     break;
                 }
             }
@@ -367,7 +367,7 @@ static int ____compare_item_vs_other(l_ezlopi_item_t * item_left, l_fields_v2_t 
     }
     else
     {
-        TRACE_E("Comparison --->>> value_types of LHS != RHS [ '%s' vs '%s' ]", lhs_str, rhs_str);
+        TRACE_E(" LHS != RHS [ '%s' vs '%s' ]", lhs_str, rhs_str);
     }
 
     return ret;
@@ -427,7 +427,7 @@ static int ____compare_item_vs_exp(l_ezlopi_item_t * item_left, s_ezlopi_express
                     break;
                 }
                 default:
-                    TRACE_W("Comparison --->>> can compare only :- string / bool / number ");
+                    TRACE_W("Error!! can compare only :- string / bool / number ");
                     break;
                 }
             }
@@ -436,7 +436,7 @@ static int ____compare_item_vs_exp(l_ezlopi_item_t * item_left, s_ezlopi_express
     }
     else
     {
-        TRACE_E("Comparison --->>> value_types of LHS != RHS [ '%s' vs '%s' ]", lhs_str, rhs_str);
+        TRACE_E(" LHS != RHS [ '%s' vs '%s' ]", lhs_str, rhs_str);
     }
 
     return ret;
@@ -504,7 +504,7 @@ static int ____compare_item_vs_item(l_ezlopi_item_t * item_left, l_ezlopi_item_t
                             break;
                         }
                         default:
-                            TRACE_W("Comparison --->>> can compare only :- string / bool / number ");
+                            TRACE_W("Error!! can compare only :- string / bool / number ");
                             break;
                         }
 
@@ -517,7 +517,7 @@ static int ____compare_item_vs_item(l_ezlopi_item_t * item_left, l_ezlopi_item_t
     }
     else
     {
-        TRACE_E("Comparison --->>> value_types of LHS != RHS [ '%s' vs '%s' ]", lhs_str, rhs_str);
+        TRACE_E(" LHS != RHS [ '%s' vs '%s' ]", lhs_str, rhs_str);
     }
 
     return ret;
@@ -794,13 +794,13 @@ static int ____compare_range_exp_vs_other(s_ezlopi_expressions_t * curr_expr_lef
             break;
         }
         default:
-            TRACE_W("Comparison --->>> can compare only :- string / bool / number ");
+            TRACE_W("Error!! can compare only :- string / bool / number ");
             break;
         }
     }
     else
     {
-        TRACE_E("Comparison --->>> value_types of LHS != RHS [ '%s' vs '%s' ]", ezlopi_scene_get_scene_value_type_name(start_value_field->value_type), ezlopi_scene_get_scene_value_type_name(end_value_field->value_type));
+        TRACE_E(" LHS != RHS [ '%s' vs '%s' ]", ezlopi_scene_get_scene_value_type_name(start_value_field->value_type), ezlopi_scene_get_scene_value_type_name(end_value_field->value_type));
     }
 
     return ret;
@@ -857,13 +857,13 @@ static int ____compare_range_exp_vs_exp(s_ezlopi_expressions_t * curr_expr_left,
             break;
         }
         default:
-            TRACE_W("Comparison --->>> can compare only :- string / bool / number ");
+            TRACE_W("Error!! can compare only :- string / bool / number ");
             break;
         }
     }
     else
     {
-        TRACE_E("Comparison --->>> value_types of LHS != RHS [ '%s' vs '%s' ]", ezlopi_scene_get_scene_value_type_name(curr_expr_right_start->value_type), ezlopi_scene_get_scene_value_type_name(curr_expr_right_end->value_type));
+        TRACE_E(" LHS != RHS [ '%s' vs '%s' ]", ezlopi_scene_get_scene_value_type_name(curr_expr_right_start->value_type), ezlopi_scene_get_scene_value_type_name(curr_expr_right_end->value_type));
     }
 
     return ret;
@@ -932,7 +932,7 @@ static int ____compare_range_item_vs_other(l_ezlopi_item_t * item, l_fields_v2_t
                     break;
                 }
                 default:
-                    TRACE_W("Comparison --->>> can compare only :- string / bool / number ");
+                    TRACE_W("Error!! can compare only :- string / bool / number ");
                     break;
                 }
             }
@@ -941,7 +941,7 @@ static int ____compare_range_item_vs_other(l_ezlopi_item_t * item, l_fields_v2_t
     }
     else
     {
-        TRACE_E("Comparison --->>> value_types of LHS != RHS [ '%s' vs '%s' ]", lhs_str, rhs_str);
+        TRACE_E(" LHS != RHS [ '%s' vs '%s' ]", lhs_str, rhs_str);
     }
     return ret;
 }
@@ -1008,7 +1008,7 @@ static int ____compare_range_item_vs_exp(l_ezlopi_item_t * item, s_ezlopi_expres
                     break;
                 }
                 default:
-                    TRACE_W("Comparison --->>> can compare only :- string / bool / number ");
+                    TRACE_W("Error!! can compare only :- string / bool / number ");
                     break;
                 }
             }
@@ -1017,7 +1017,7 @@ static int ____compare_range_item_vs_exp(l_ezlopi_item_t * item, s_ezlopi_expres
     }
     else
     {
-        TRACE_E("Comparison --->>> value_types of LHS != RHS [ '%s' vs '%s' ]", lhs_str, rhs_str);
+        TRACE_E(" LHS != RHS [ '%s' vs '%s' ]", lhs_str, rhs_str);
     }
 
     return ret;

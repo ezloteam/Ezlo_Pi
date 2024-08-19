@@ -7,16 +7,16 @@ extern "C" {
 #endif
 
 
-#define BUILD_DATE 1720622547
+#define BUILD_DATE 1723012554
 #define MAJOR 4
 #define MINOR 1
-#define BATCH 3
-#define BUILD 191
-#define VERSION_STR "4.1.3"
+#define BATCH 4
+#define BUILD 194
+#define VERSION_STR "4.1.4"
 #define DEVELOPER "lomas.subedi@ezlo.com"
-#define COMPILE_TIME "Wed Jul 10 08:27:27 PM +0545 2024"
+#define COMPILE_TIME "Wed Aug  7 12:20:54 PM +0545 2024"
 #define CURRENT_BRANCH "development"
-#define COMMIT_HASH "c2fbb27a518900e391a060655358b9f06429b0c0"
+#define COMMIT_HASH "8544c9de2fac4ed5ec406d43a8a6ae365784a940"
 
 
 #ifdef __cplusplus

@@ -177,9 +177,9 @@ uint32_t ezlopi_cloud_generate_scene_group_id(void)
     return g_scene_group_id;
 }
 
-void ezlopi_cloud_update_group_id(uint32_t a_device_group_id)
+void ezlopi_cloud_update_group_id(uint32_t a_device_id)
 {
-    g_scene_group_id = (a_device_group_id > g_scene_group_id) ? a_device_group_id : g_scene_group_id;
+    g_scene_group_id = (a_device_id > g_scene_group_id) ? a_device_id : g_scene_group_id;
 }
 
 uint32_t ezlopi_cloud_generate_device_group_id(void)

@@ -99,6 +99,7 @@ cJSON* ezlopi_scene_cjson_get_field(l_fields_v2_t* field_node)
             case EZLOPI_VALUE_TYPE_INTERVAL:
             case EZLOPI_VALUE_TYPE_SCENEID:
             case EZLOPI_VALUE_TYPE_EXPRESSION:
+            case EZLOPI_VALUE_TYPE_HOUSE_MODE_ID:
             {
                 __cjson_add_string(cj_field, ezlopi_value_str, field_node->field_value.u_value.value_string);
                 break;
@@ -471,10 +472,11 @@ static void __cjson_add_fields(cJSON* cj_block, l_fields_v2_t* fields)
                     }
                     case EZLOPI_VALUE_TYPE_HOUSE_MODE_ID:
                     {
-                        char id_str[32];
-                        snprintf(id_str, sizeof(id_str), "%u", (uint32_t)curr_field->field_value.u_value.value_double);
-                        TRACE_E("house_mode_id :  %s", id_str);
-                        __cjson_add_string(cj_field, ezlopi_value_str, id_str);
+                        // char id_str[32];
+                        // snprintf(id_str, sizeof(id_str), "%u", (uint32_t)curr_field->field_value.u_value.value_double);
+                        // TRACE_E("house_mode_id :  %s", id_str);
+                        // __cjson_add_string(cj_field, ezlopi_value_str, id_str);
+                        __cjson_add_string(cj_field, ezlopi_value_str, curr_field->field_value.u_value.value_string);
                         break;
                     }
                     case EZLOPI_VALUE_TYPE_ARRAY:

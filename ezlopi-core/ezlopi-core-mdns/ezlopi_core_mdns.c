@@ -274,7 +274,7 @@ static void __mdns_init(void* pv)
                 TRACE_I("\tKEY\t\t\t\tValue");
                 for (int i = 0; i < service_size; i++)
                 {
-                    TRACE_I("\t%s\t%s", mdns_context[i].key, mdns_context[i].value);
+                    TRACE_I("\t%s\t\t\t\t%s", mdns_context[i].key, mdns_context[i].value);
                 }
                 mdns_service_add("EzloPi", "_ezlo", "_tcp", 17001, mdns_context, service_size);
                 break;

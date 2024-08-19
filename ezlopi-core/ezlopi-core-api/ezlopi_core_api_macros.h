@@ -7,6 +7,7 @@ CLOUD_METHOD("hub.item.value.set", items_set_value_v3, NULL)
 CLOUD_METHOD("hub.devices.list", devices_list_v3, NULL)
 CLOUD_METHOD("hub.device.name.set", device_name_set, device_updated)
 CLOUD_METHOD("hub.device.armed.set", device_armed_set, device_updated)
+CLOUD_METHOD("hub.device.room.set", device_room_set, device_updated)
 
 CLOUD_METHOD("hub.device.group.create", device_group_create, device_group_created)
 CLOUD_METHOD("hub.device.group.delete", device_group_delete, device_group_deleted)
@@ -83,7 +84,7 @@ CLOUD_METHOD("hub.scenes.list", scenes_list, NULL)
 CLOUD_METHOD("hub.scenes.create", scenes_create, scene_added)
 
 #warning "firmware crashes due to this method 'hub.scenes.run', need to fix this"
-// CLOUD_METHOD("hub.scenes.run", scenes_run, NULL) // firmware crashes due to this method, need to fix this
+CLOUD_METHOD("hub.scenes.run", scenes_run, NULL) // firmware crashes due to this method, need to fix this
 
 CLOUD_METHOD("hub.scenes.get", scenes_get, NULL)
 CLOUD_METHOD("hub.scenes.edit", scenes_edit, scene_changed)

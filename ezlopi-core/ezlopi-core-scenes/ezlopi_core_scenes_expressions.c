@@ -1,5 +1,6 @@
 #include "../../build/config/sdkconfig.h"
 
+
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 #include "cjext.h"
@@ -303,6 +304,133 @@ void ezlopi_scenes_expressions_print(s_ezlopi_expressions_t* exp_node)
 #endif
 }
 
+s_ezlopi_expressions_t * ezlopi_scenes_expression_get_by_name(char * target_exp_name)
+{
+    s_ezlopi_expressions_t * curr_node = NULL;
+
+    if (l_expressions_head)
+    {
+        curr_node = l_expressions_head;
+        while (curr_node)
+        {
+            if (EZPI_STRNCMP_IF_EQUAL(curr_node->name, target_exp_name, strlen(curr_node->name), strlen(target_exp_name)))
+            {
+                break;
+            }
+            curr_node = curr_node->next;
+        }
+    }
+
+    return curr_node;
+}
+
+#if 0
+int ezlopi_scenes_expression_update_expr(s_ezlopi_expressions_t* expression_node, cJSON* cj_new_expression)
+{
+    int ret = 0;
+    if (expression_node && cj_new_expression)
+    {
+        char id_str[32];
+        snprintf(id_str, sizeof(id_str), "%08x", expression_node->exp_id);
+        ret = ezlopi_scenes_expressions_update_nvs(id_str, cj_new_expression);
+
+        // now update in ll
+        {
+            // 1. code
+            if (expression_node->code)
+            {
+                ezlopi_free(__FUNCTION__, expression_node->code);
+                cJSON * cj_code = cJSON_GetObjectItem(__FUNCTION__, cj_new_expression, ezlopi_code_str);
+                if (cj_code && cj_code->valuestring && cj_code->str_value_len)
+                {
+                    expression_node->code = ezlopi_malloc(__FUNCTION__, cj_code->str_value_len + 1);
+                    if (expression_node->code)
+                    {
+                        snprintf(expression_node->code, cj_code->str_value_len + 1, "%.*s", cj_code->str_value_len, cj_code->valuestring);
+                    }
+                }
+            }
+
+            // 2. params
+            cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_new_expression, ezlopi_params_str);
+            if (cj_params)
+            {
+                //1. items
+                if (expression_node->items)
+                {
+                    ezlopi_scenes_expressions_delete_exp_item(expression_node->items);
+
+                    cJSON* cj_items = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_items_str);
+                    __get_expressions_items(expression_node, cj_items);
+                }
+
+                // 2. device_items
+                if (expression_node->device_item_names)
+                {
+                    ezlopi_scenes_expressions_delete_exp_device_item_names(expression_node->device_item_names);
+
+                    cJSON* cj_device_item_names = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_device_item_names_str);
+                    __get_expressions_device_item_names(expression_node, cj_device_item_names);
+                }
+            }
+
+            // 3 .  is_variable
+            CJSON_GET_VALUE_BOOL(cj_new_expression, ezlopi_variable_str, expression_node->variable);
+
+            // 4. Metadata
+            if (expression_node->meta_data)
+            {
+                ezlopi_free(__FUNCTION__, expression_node->meta_data);
+                cJSON* cj_metaData = cJSON_GetObjectItem(__FUNCTION__, cj_new_expression, ezlopi_metadata_str);
+                if (cj_metaData)
+                {
+                    expression_node->meta_data = cJSON_Duplicate(__FUNCTION__, cj_metaData, cJSON_True);
+                }
+
+            }
+
+            // 5. valueType
+            expression_node->value_type = ezlopi_core_scenes_value_get_type(cj_new_expression, ezlopi_valueType_str);
+
+            // 6. Value  [exp_value]
+            {
+                // delete value if :- string or object
+
+                switch (expression_node->exp_value.type)
+                {
+                case EXPRESSION_VALUE_TYPE_STRING:
+                {
+                    if (expression_node->exp_value.u_value.str_value)
+                    {
+                        ezlopi_free(__FUNCTION__, expression_node->exp_value.u_value.str_value);
+                        expression_node->exp_value.u_value.str_value = NULL;
+                    }
+                    break;
+                }
+                case EXPRESSION_VALUE_TYPE_CJ:
+                {
+                    if (expression_node->exp_value.u_value.cj_value)
+                    {
+                        cJSON_Delete(__FUNCTION__, expression_node->exp_value.u_value.cj_value);
+                        expression_node->exp_value.u_value.cj_value = NULL;
+                    }
+                    break;
+                }
+                default:
+                {
+                    TRACE_D("No string or Object in 'expression_value' fields ");
+                    break;
+                }
+                }
+
+                __get_expressions_value(expression_node, cJSON_GetObjectItem(__FUNCTION__, cj_new_expression, ezlopi_value_str), expression_node->value_type);
+            }
+        }
+    }
+    return ret;
+}
+#endif
+
 uint32_t ezlopi_scenes_expressions_add_to_head(uint32_t exp_id, cJSON* cj_expression)
 {
     uint32_t new_exp_id = 0;
@@ -437,13 +565,13 @@ void ezlopi_scenes_expressions_init(void)
                         if (exp_str)
                         {
                             cJSON* cj_exp = cJSON_Parse(__FUNCTION__, exp_str);
+                            ezlopi_free(__FUNCTION__, exp_str);
+
                             if (cj_exp)
                             {
                                 ezlopi_scenes_expressions_add_to_head(exp_id, cj_exp);
                                 cJSON_Delete(__FUNCTION__, cj_exp);
                             }
-
-                            ezlopi_free(__FUNCTION__, exp_str);
                         }
                     }
                 }

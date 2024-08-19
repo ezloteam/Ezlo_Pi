@@ -5,6 +5,70 @@
 
 # RELEASE NOTES
 
+# Version 4.1.4 Build 194
+
+## New 
+1. Added 'setVariable' - Meshbot then_method [EZPI-426](https://jira.mios.com/browse/EZPI-426)
+2. Added 'setExpression' - Meshbot then_method [EZPI-425](https://jira.mios.com/browse/EZPI-425)
+3. Added 'itemGroup' and 'DeviceGroups' [EZPI-427](https://jira.mios.com/browse/EZPI-427)
+
+## Fixes
+1. Fix issue about device apperaing offline when WiFi network changed with changing device IP [EZPI-443](https://jira.mios.com/browse/EZPI-443) 
+2. Fix EzloPi WS connection ON and OFF [EZPI-439](https://jira.mios.com/browse/EZPI-439) 
+3. Fix issue of appearing `ezlopi_generic_0` on BLE client devices
+4. Fix timer issue with custom loop implementation within the core
+
+## What's Changed
+* Development by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/147
+* Pre release test meshbot with funtion fix by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/149
+* Ezpi 441 complete room integration by @krishna-ezlo in https://github.com/ezloteam/Ezlo_Pi/pull/148
+* fixed meshbot-crashing issue on enable-true/false by @krishna-ezlo in https://github.com/ezloteam/Ezlo_Pi/pull/150
+* scenes_enable/disable_testing_complete by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/151
+* Ezpi 443 keep tcp conn on ip change by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/154
+* Ezpi 44 x ws integration by @krishna-ezlo in https://github.com/ezloteam/Ezlo_Pi/pull/155
+* Dev merge ezpi 375 422 425 426 427 by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/156
+* Task Completed : https://jira.mios.com/browse/EZPI-445  by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/157
+* Development revert wss by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/159
+* Development by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/160
+
+
+**Full Changelog**: https://github.com/ezloteam/Ezlo_Pi/compare/v4.1.3...v4.1.4
+
+# Version 4.1.3 Build 191
+
+## New 
+1. Enrollment of first-provisioning-api
+2. Implemented __loop to minimize the heap consumption. Followings has been added to loop:
+        2.1: ping
+        2.2: device/item routine call
+        2.3: removed timer-events
+        2.4: Cloud registration 
+        2.5: broadcast service
+        2.6: LED indicator 
+        2.7: meshbot
+        2.8: ota
+        2.9: uart 
+3. Fixed touch-switch input
+4. Cloud syncing for provisioning 
+5. Reset_scene_latches [https://jira.mios.com/browse/EZPI-371]
+6. Added nvs update when activating : 'hub.scenes.block.status.reset' .  [https://jira.mios.com/browse/EZPI-411]
+7. Added 'hub.scenes.block.enabled.set' method .  [https://jira.mios.com/browse/EZPI-413]
+8. Added 'hub.scenes.house_modes.set' method . [https://jira.mios.com/browse/EZPI-415]
+9. Added 'hub.scenes.action.block.test' method . [https://jira.mios.com/browse/EZPI-417]
+10. Added 2-broadcast methods for :- 'hub.scenes.expressions.set' . [https://jira.mios.com/browse/EZPI-419]
+11. Added broadcast method for :- 'hub.expression.deleted' . [https://jira.mios.com/browse/EZPI-420]
+
+## What's Changed
+* Update README.md by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/140
+* Combined ezpi 381 400 401 402 403 404 by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/139
+* 1. bug_fixed in 'firmware_info_get' function by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/142
+* Dev merge ezpi 371 411 413 415 417 419 420 by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/141
+* Development by @krishna-ezlo in https://github.com/ezloteam/Ezlo_Pi/pull/143
+* Ezpi wifi scanner issue by @NDJ-EZLO in https://github.com/ezloteam/Ezlo_Pi/pull/144
+* added device/item to loop in every 1-seconds by @krishna-ezlo in https://github.com/ezloteam/Ezlo_Pi/pull/145
+* Pre release ezlopi core 4.x.x by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/146
+
+
 # Version 3.5.9 Build 189
 
 ## New 

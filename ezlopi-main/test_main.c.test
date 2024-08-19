@@ -1,0 +1,55 @@
+#include <stdio.h>
+#include "freertos/FreeRTOS.h"
+#include "esp_log.h"
+#include "freertos/timers.h"
+#include "esp_random.h"
+
+#define TAG "TIME"
+
+/* timer calls the function ping after interval time. xTimerCreate() takes interval in TICKs so
+pdMS_TO_TICKS() converts ms interval to appropriate TICKS. pdTRUE will set timer to call periodically and if Set pdFALSE,
+function is called once only */
+
+TimerHandle_t tmr;
+int id = 1;
+int interval = 5000;
+uint32_t last_ping = 0;
+
+void ping(TimerHandle_t xTimer)
+{
+    printf("\r\n\r\nping %d\r\n", xTaskGetTickCount() - last_ping);
+    printf("tring tring!!!\r\n\r\n\r\n");
+    last_ping = xTaskGetTickCount();
+}
+
+static void __test(void *pv)
+{
+    while (1)
+    {
+        xTimerReset(tmr, 0);
+        int ret = xTimerStart(tmr, 0);
+        printf("timer-start: ret = %d\r\n", ret);
+
+        uint32_t random = esp_random() % 10;
+        printf("random value: %d\r\n", random);
+        vTaskDelay(1000 * random / portTICK_RATE_MS);
+
+
+        ret = xTimerStop(tmr, 0);
+        printf("timer-stop: ret = %d\r\n", ret);
+
+        vTaskDelay(3000);
+    }
+}
+
+void app_main()
+{
+    printf("Timer Test.\n");
+
+    tmr = xTimerCreate("MyTimer", pdMS_TO_TICKS(interval), pdTRUE, (void *)id, &ping);
+    // if (xTimerStart(tmr, 10) != pdPASS) {
+    //     printf("Timer start error\r\n");
+    // }
+
+    xTaskCreate(__test, "test", 2048, NULL, 4, NULL);
+}

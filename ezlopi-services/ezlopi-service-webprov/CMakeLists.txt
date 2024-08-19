@@ -6,14 +6,15 @@ set(EZLOPI_UTIL_COMPONENTS
 )
 set(EZLOPI_CORE_COMPONENTS  
         ezlopi-core-api
+        ezlopi-core-wsc
         ezlopi-core-wifi
         ezlopi-core-http
         ezlopi-core-buffer
         ezlopi-core-ezlopi
+        ezlopi-core-processes
         ezlopi-core-event-group
         ezlopi-core-factory-info 
         ezlopi-core-websocket_client 
-        ezlopi-core-processes
 )
 
 set(EZLOPI_CLOUD_COMPONENTS 

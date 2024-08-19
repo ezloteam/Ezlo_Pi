@@ -54,6 +54,7 @@ static void __broadcast_loop(void *arg)
             broadcast_wait_start = xTaskGetTickCount();
         }
     }
+    vTaskDelay(1);
 }
 
 static int ezlopi_service_broadcast_send_to_queue(cJSON * cj_broadcast_data)
@@ -65,7 +66,7 @@ static int ezlopi_service_broadcast_send_to_queue(cJSON * cj_broadcast_data)
         if (xQueueIsQueueFullFromISR(__broadcast_queue))
         {
             cJSON* cj_tmp_data = NULL;
-            if (pdTRUE == xQueueReceive(__broadcast_queue, &cj_tmp_data, 50 / portTICK_PERIOD_MS))
+            if (pdTRUE == xQueueReceive(__broadcast_queue, &cj_tmp_data, 5 / portTICK_PERIOD_MS))
             {
                 if (cj_tmp_data)
                 {
@@ -75,7 +76,7 @@ static int ezlopi_service_broadcast_send_to_queue(cJSON * cj_broadcast_data)
         }
         else
         {
-            // TRACE_S(" ----- Adding to broadcast queue -----");
+            TRACE_S(" ----- Adding to broadcast queue -----");
         }
 
         cJSON* cj_data = cj_broadcast_data;
@@ -85,7 +86,7 @@ static int ezlopi_service_broadcast_send_to_queue(cJSON * cj_broadcast_data)
         }
         else
         {
-            // TRACE_E(" ----- Failed adding to queue -----");
+            TRACE_D(" ----- Failed adding to queue -----");
         }
     }
 

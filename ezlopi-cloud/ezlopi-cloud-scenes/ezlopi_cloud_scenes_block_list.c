@@ -26,7 +26,7 @@ static e_scenes_block_type_v2_t __get_block_type_and_create_block_array(cJSON* c
 
 void scenes_blocks_list(cJSON* cj_request, cJSON* cj_response)
 {
-    cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+    cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);   // For NULL broadcast
     if (cj_result)
     {
         cJSON* cj_paramas = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);

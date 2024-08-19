@@ -93,6 +93,14 @@ cJSON* generate_expression_node_in_cjson(s_ezlopi_expressions_t* exp_node);
 int ezlopi_scenes_expressions_update_nvs(char* nvs_exp_id_key, cJSON * cj_updated_exp);
 
 /**
+ * @brief This function returns expression with "targe_exp_name"
+ *
+ * @param target_exp_name  name of the expression
+ * @return s_ezlopi_expressions_t* (Null if invalid)
+ */
+s_ezlopi_expressions_t * ezlopi_scenes_expression_get_by_name(char * target_exp_name);
+
+/**
  * @brief Populate new expression to the linklist, and store it to the flash
  *
  * @param exp_id expression id, if is zero then 'cj_expression' is cosidered as new expression and stored to nvs
@@ -176,6 +184,15 @@ int ezlopi_scenes_expressions_delete_by_name(char* expression_name);
  * @return s_ezlopi_expressions_t*
  */
 s_ezlopi_expressions_t* ezlopi_scenes_get_expression_node_by_name(char* expression_name);
+
+/**
+ * @brief This function replaces the 'old_nvs_exp' with 'new_nvs_exp'
+ *
+ * @param expression_node   The  'll_expression_node' containing 'target_exp_id' that indicated 'nvs_exp_target_id' to
+ * @param cj_new_expression     cjson of the 'new_expn' which replace 'older_nvs_exp'
+ * @return int
+ */
+ // int ezlopi_scenes_expression_update_expr(s_ezlopi_expressions_t* expression_node, cJSON* cj_new_expression);
 
 #endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 

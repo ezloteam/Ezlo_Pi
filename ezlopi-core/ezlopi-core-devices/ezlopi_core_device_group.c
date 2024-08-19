@@ -572,7 +572,7 @@ static l_ezlopi_device_grp_t* ____device_grp_create_node(cJSON* cj_device_grp, u
                 }
             }
 
-            __ezlopi_core_device_group_print(new_device_grp_node);
+            // __ezlopi_core_device_group_print(new_device_grp_node);
         }
     }
     return new_device_grp_node;
@@ -636,7 +636,7 @@ static l_ezlopi_item_grp_t* ____item_grp_create_node(cJSON* cj_item_grp, uint32_
                 }
             }
 
-            __ezlopi_core_item_group_print(new_item_grp_node);
+            // __ezlopi_core_item_group_print(new_item_grp_node);
         }
     }
     return new_item_grp_node;
@@ -1115,13 +1115,11 @@ static uint32_t __store_new_grp_in_nvs(cJSON* cj_new_grp, bool choice_of_trigger
 }
 uint32_t ezlopi_core_device_group_store_nvs_devgrp(cJSON* cj_new_device_grp)
 {
-    uint32_t new_dev_grp_id = __store_new_grp_in_nvs(cj_new_device_grp, DEVICE_GROUP_SELECTED);
-    return new_dev_grp_id;
+    return __store_new_grp_in_nvs(cj_new_device_grp, DEVICE_GROUP_SELECTED);
 }
 uint32_t ezlopi_core_item_group_store_nvs_itemgrp(cJSON* cj_new_item_grp)
 {
-    uint32_t new_item_grp_id = __store_new_grp_in_nvs(cj_new_item_grp, ITEM_GROUP_SELECTED);
-    return new_item_grp_id;
+    return __store_new_grp_in_nvs(cj_new_item_grp, ITEM_GROUP_SELECTED);
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 

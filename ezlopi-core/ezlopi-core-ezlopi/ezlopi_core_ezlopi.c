@@ -42,7 +42,6 @@ void ezlopi_init(void)
     ezlopi_core_read_set_log_severities_internal(ENUM_EZLOPI_LOG_SEVERITY_TRACE);
 #endif // CONFIG_EZPI_UTIL_TRACE_EN
     EZPI_HAL_uart_init();
-
 #if defined(CONFIG_EZPI_WEBSOCKET_CLIENT) || defined(CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER)
     ezlopi_core_buffer_init(CONFIG_EZPI_CORE_STATIC_BUFFER_SIZE); // allocate 10kB
 #endif
@@ -52,7 +51,6 @@ void ezlopi_init(void)
 
     ezlopi_factory_info_v3_init();
     print_factory_info_v3();
-
     ezlopi_event_group_create();
 
 #if defined(CONFIG_EZPI_ENABLE_WIFI)
