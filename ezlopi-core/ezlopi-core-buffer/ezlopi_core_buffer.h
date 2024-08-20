@@ -17,7 +17,10 @@ e_buffer_state_t ezlopi_core_buffer_status(void);
 void ezlopi_core_buffer_deinit(void);
 void ezlopi_core_buffer_init(uint32_t len);
 
-void ezlopi_core_buffer_release(void);
-char *ezlopi_core_buffer_acquire(uint32_t *len, uint32_t wait_to_acquired_ms);
+// void ezlopi_core_buffer_release(void);
+void ezlopi_core_buffer_release(const char *who);
+
+// char *ezlopi_core_buffer_acquire(uint32_t *len, uint32_t wait_to_acquired_ms);
+char *ezlopi_core_buffer_acquire(const char *who, uint32_t *len, uint32_t wait_to_acquired_ms);
 
 #endif // __EZLOPI_CORE_BUFFER_H__

@@ -12,7 +12,7 @@ extern "C"
 #endif
     void items_list_v3(cJSON* cj_request, cJSON* cj_response);
     void items_set_value_v3(cJSON* cj_request, cJSON* cj_response);
-    void items_update_v3(cJSON* cj_request, cJSON* cj_response);
+    // void items_update_v3(cJSON* cj_request, cJSON* cj_response);
 
     void items_list(cJSON* cj_request, cJSON* cj_response);
     void items_update(cJSON* cj_request, cJSON* cj_response);

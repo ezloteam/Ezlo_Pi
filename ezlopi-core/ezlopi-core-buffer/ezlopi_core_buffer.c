@@ -24,11 +24,8 @@ void ezlopi_core_buffer_deinit(void)
         __buffer_lock = NULL;
     }
 
-    if (__buffer)
-    {
-        ezlopi_free(__FUNCTION__, __buffer);
-        __buffer = NULL;
-    }
+    ezlopi_free(__FUNCTION__, __buffer);
+    __buffer = NULL;
 
     __buffer_len = 0;
     __buffer_lock_state = EZ_BUFFER_STATE_NOT_INITIATED;
@@ -90,7 +87,7 @@ void ezlopi_core_buffer_init(uint32_t len)
     }
 }
 
-char *ezlopi_core_buffer_acquire(uint32_t *len, uint32_t wait_to_acquired_ms)
+char *ezlopi_core_buffer_acquire(const char *who, uint32_t *len, uint32_t wait_to_acquired_ms)
 {
     char *ret = NULL;
     // uint32_t start_time = xTaskGetTickCount();
@@ -101,23 +98,48 @@ char *ezlopi_core_buffer_acquire(uint32_t *len, uint32_t wait_to_acquired_ms)
             ret = __buffer;
             *len = __buffer_len;
             __buffer_lock_state = EZ_BUFFER_STATE_BUSY;
+            TRACE_I("(%s): buffer acquired", who);
         }
+        else
+        {
+            TRACE_E("(%s): buffer acquire failed!", who);
+        }
+    }
+    else
+    {
+        TRACE_E("(%s): __buffer_lock = NULL!", who);
     }
 
     return ret;
 }
 
-void ezlopi_core_buffer_release(void)
+void ezlopi_core_buffer_release(const char *who)
 {
+#if 0
     if (__buffer_lock && (EZ_BUFFER_STATE_BUSY == __buffer_lock_state))
     {
         xSemaphoreGive(__buffer_lock);
         __buffer_lock_state = EZ_BUFFER_STATE_AVAILABLE;
+        TRACE_I("(%s): buffer release success", who);
     }
     else
     {
         TRACE_E("__buffer_lock: %p", __buffer_lock);
         TRACE_E("__buffer_lock_state: %d", __buffer_lock_state);
-        TRACE_E("buffer release failed!");
+        TRACE_E("(%s): buffer release failed!", who);
+    }
+#endif
+
+    if (__buffer_lock && (pdTRUE == xSemaphoreGive(__buffer_lock)))
+    {
+        // xSemaphoreGive(__buffer_lock);
+        __buffer_lock_state = EZ_BUFFER_STATE_AVAILABLE;
+        TRACE_I("(%s): buffer release success", who);
+    }
+    else
+    {
+        TRACE_E("__buffer_lock: %p", __buffer_lock);
+        // TRACE_E("__buffer_lock_state: %d", __buffer_lock_state);
+        TRACE_E("(%s): buffer release failed!", who);
     }
 }
