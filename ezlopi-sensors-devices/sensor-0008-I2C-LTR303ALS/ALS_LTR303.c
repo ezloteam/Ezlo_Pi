@@ -1,5 +1,7 @@
 #include "ALS_LTR303.h"
 
+#warning "################### DO NOT USE printf ON PRODUCTION ###################"
+
 unsigned char gain = LTR3XX_GAIN_1;                    // Gain setting, values = 0-7
 unsigned char integration_time = LTR3XX_INTEGTIME_200; // Integration ("shutter") time in milliseconds
 unsigned char measurement_rate = LTR3XX_MEASRATE_200;  // Interval between DATA_REGISTERS update
@@ -31,20 +33,20 @@ esp_err_t ltr303_setup(uint32_t sda, uint32_t scl, bool initialize_i2c)
 
     if (ltr303_get_part_id(&ID))
     {
-        printf("Got Sensor Part ID: %02X\n", ID);
+        // printf("Got Sensor Part ID: %02X\n", ID);
     }
     if (ltr303_get_manufac_id(&ID))
     {
-        printf("Got Manuf Part ID: %02X\n", ID);
+        // printf("Got Manuf Part ID: %02X\n", ID);
     }
 
-    printf("Setting Gain...\n");
+    // printf("Setting Gain...\n");
     ltr303_set_control(gain, false, false);
 
-    printf("Set timing...\n");
+    // printf("Set timing...\n");
     ltr303_set_measurement_rate(integration_time, measurement_rate);
 
-    printf("Powerup...\n");
+    // printf("Powerup...\n");
     ltr303_set_powerup();
 
     return ESP_OK;
