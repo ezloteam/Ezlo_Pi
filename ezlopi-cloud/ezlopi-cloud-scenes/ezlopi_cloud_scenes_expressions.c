@@ -64,10 +64,10 @@ void scenes_expressions_set(cJSON *cj_request, cJSON *cj_response)
             cJSON *cj_name = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_name_str);
             if (cj_name && cj_name->valuestring)
             {
-                s_ezlopi_expressions_t *curr_node = ezlopi_scenes_expression_get_by_name(cj_name->valuestring);
-                if (NULL != curr_node)
+                s_ezlopi_expressions_t *curr_expn_node = ezlopi_scenes_expression_get_by_name(cj_name->valuestring);
+                if (NULL != curr_expn_node)
                 {
-                    ezlopi_scenes_expression_update_expr(curr_node, cj_params);
+                    ezlopi_scenes_expression_update_expr(curr_expn_node, cj_params);
                 }
                 else
                 {

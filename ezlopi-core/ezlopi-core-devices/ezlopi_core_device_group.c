@@ -1561,7 +1561,7 @@ static void __remove_residue_ids_from_list(bool choice_of_trigger) // 0 => devGr
 {
     TRACE_D("---------- # Removing [%s_Group] residue-Ids # ----------", (choice_of_trigger) ? "Item" : "Device");
     // check --> nvs_devgrp_list for unncessary "residue-IDs" & update the list
-    uint32_t invalid_nvs_grp_id = 0;
+    uint32_t residue_nvs_grp_id = 0;
     bool grp_list_has_residue = false; // this indicates absence of residue-IDs // those IDs which are still in the "nvs-list" but doesnot not exists in "nvs-body"
     char *list_ptr = NULL;
 
@@ -1569,9 +1569,9 @@ static void __remove_residue_ids_from_list(bool choice_of_trigger) // 0 => devGr
     {
         if (grp_list_has_residue)
         {
-            if (0 != invalid_nvs_grp_id)
+            if (0 != residue_nvs_grp_id)
             {
-                (choice_of_trigger) ? ezlopi_core_item_group_remove_id_from_list(invalid_nvs_grp_id) : ezlopi_core_device_group_remove_id_from_list(invalid_nvs_grp_id);
+                ____remove_id_from_group_list(residue_nvs_grp_id, choice_of_trigger);
             }
             grp_list_has_residue = false;
         }
@@ -1593,7 +1593,7 @@ static void __remove_residue_ids_from_list(bool choice_of_trigger) // 0 => devGr
 
                         if (NULL == ezlopi_nvs_read_str(tmp_buffer))
                         {
-                            invalid_nvs_grp_id = (uint32_t)cj_id->valuedouble; // A residue_id is found..
+                            residue_nvs_grp_id = (uint32_t)cj_id->valuedouble; // A residue_id is found..
                             grp_list_has_residue = true;                       // this will trigger a removal of "invalid_nvs_devgrp_id" .
                             break;                                             // get out of for
                         }
