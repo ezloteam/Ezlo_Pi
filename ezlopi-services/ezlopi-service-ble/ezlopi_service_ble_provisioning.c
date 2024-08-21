@@ -212,29 +212,29 @@ static void __provisioning_info_write_func(esp_gatt_value_t *value, esp_ble_gatt
                                     {
                                         memset(ezlopi_config_basic, 0, sizeof(s_basic_factory_info_t));
 
-                                        char device_name[32];
-                                        char manufacturer[32];
-                                        char brand[32];
-                                        char model_number[32];
-                                        char device_uuid[40];
-                                        char prov_uuid[40];
-                                        char device_mac[32];
-                                        char provision_server[128];
-                                        char cloud_server[128];
-                                        char provision_toke[256];
-                                        char device_type[32];
+                                        char device_name[EZLOPI_FINFO_LEN_DEVICE_NAME];
+                                        char manufacturer[EZLOPI_FINFO_LEN_MANUF_NAME];
+                                        char brand[EZLOPI_FINFO_LEN_BRAND_NAME];
+                                        char model_number[EZLOPI_FINFO_LEN_MODEL_NAME];
+                                        char device_uuid[EZLOPI_FINFO_LEN_DEVICE_UUID];
+                                        char prov_uuid[EZLOPI_FINFO_LEN_PROV_UUID];
+                                        char device_mac[EZLOPI_FINFO_LEN_DEVICE_MAC];
+                                        char provision_server[EZLOPI_FINFO_LEN_PROVISIONING_SERVER_URL];
+                                        char cloud_server[EZLOPI_FINFO_LEN_CLOUD_SERVER_URL];
+                                        char provision_toke[EZLOPI_FINFO_LEN_PROVISIONING_TOKEN];
+                                        // char device_type[32];
 
-                                        memset(device_name, 0, sizeof(device_name));
-                                        memset(manufacturer, 0, sizeof(manufacturer));
-                                        memset(brand, 0, sizeof(brand));
-                                        memset(model_number, 0, sizeof(model_number));
-                                        memset(device_uuid, 0, sizeof(device_uuid));
-                                        memset(prov_uuid, 0, sizeof(prov_uuid));
-                                        memset(device_mac, 0, sizeof(device_mac));
-                                        memset(provision_server, 0, sizeof(provision_server));
-                                        memset(cloud_server, 0, sizeof(cloud_server));
-                                        memset(provision_toke, 0, sizeof(provision_toke));
-                                        memset(device_type, 0, sizeof(device_type));
+                                        memset(device_name, 0, EZLOPI_FINFO_LEN_DEVICE_NAME);
+                                        memset(manufacturer, 0, EZLOPI_FINFO_LEN_MANUF_NAME);
+                                        memset(brand, 0, EZLOPI_FINFO_LEN_BRAND_NAME);
+                                        memset(model_number, 0, EZLOPI_FINFO_LEN_MODEL_NAME);
+                                        memset(device_uuid, 0, EZLOPI_FINFO_LEN_DEVICE_UUID);
+                                        memset(prov_uuid, 0, EZLOPI_FINFO_LEN_PROV_UUID);
+                                        memset(device_mac, 0, EZLOPI_FINFO_LEN_DEVICE_MAC);
+                                        memset(provision_server, 0, EZLOPI_FINFO_LEN_PROVISIONING_SERVER_URL);
+                                        memset(cloud_server, 0, EZLOPI_FINFO_LEN_CLOUD_SERVER_URL);
+                                        memset(provision_toke, 0, EZLOPI_FINFO_LEN_PROVISIONING_TOKEN);
+                                        // memset(device_type, 0, sizeof(device_type));
 
                                         CJSON_GET_VALUE_DOUBLE(cj_config, ezlopi_serial_str, ezlopi_config_basic->id);
                                         CJSON_GET_VALUE_DOUBLE(cj_config, ezlopi_version_str, ezlopi_config_basic->config_version);
@@ -249,7 +249,7 @@ static void __provisioning_info_write_func(esp_gatt_value_t *value, esp_ble_gatt
                                         CJSON_GET_VALUE_STRING_BY_COPY(cj_config, ezlopi_provision_server_str, provision_server);
                                         CJSON_GET_VALUE_STRING_BY_COPY(cj_config, ezlopi_cloud_server_str, cloud_server);
                                         CJSON_GET_VALUE_STRING_BY_COPY(cj_config, ezlopi_provision_token_str, provision_toke);
-                                        CJSON_GET_VALUE_STRING_BY_COPY(cj_config, ezlopi_device_type_ezlopi_str, device_type);
+                                        // CJSON_GET_VALUE_STRING_BY_COPY(cj_config, ezlopi_device_type_ezlopi_str, device_type);
 
                                         ezlopi_config_basic->device_name = device_name;
                                         ezlopi_config_basic->manufacturer = manufacturer;
@@ -261,7 +261,7 @@ static void __provisioning_info_write_func(esp_gatt_value_t *value, esp_ble_gatt
                                         ezlopi_config_basic->provision_server = provision_server;
                                         ezlopi_config_basic->cloud_server = cloud_server;
                                         ezlopi_config_basic->provision_token = provision_toke;
-                                        ezlopi_config_basic->device_type = device_type;
+                                        ezlopi_config_basic->device_type = NULL;
 
                                         ezlopi_factory_info_v3_set_basic(ezlopi_config_basic);
                                         uint32_t version_no = ezlopi_nvs_config_info_version_number_get() + 1;

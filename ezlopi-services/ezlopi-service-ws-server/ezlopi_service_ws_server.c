@@ -123,7 +123,8 @@ static int __ws_server_broadcast(char *data)
         if (data)
         {
             ret = 1;
-            l_ws_server_client_conn_t *curr_client = ezlopi_service_ws_server_clients_get_head();
+            l_ws_server_client_conn_t* curr_client = ezlopi_service_ws_server_clients_get_head();
+            #warning "DO NOT USE printf ON PRODUCTION"
             // printf("%s and curr-client: %p\n", __func__, curr_client);
 
             while (curr_client)
@@ -379,11 +380,11 @@ static int __respond_cjson(httpd_req_t *req, cJSON *cj_response)
                 if (ret)
                 {
                     __message_counter++;
-                    TRACE_S("## WSL:WSS-SENDING >>>>>>>>>>\r\n%s", data_buffer);
+                    TRACE_S("## WSL:WSS-SENDING >>>>>>>>>> \n%s", data_buffer);
                 }
                 else
                 {
-                    TRACE_E("## WSL:WSS-SENDING >>>>>>>>>>\r\n%s", data_buffer);
+                    TRACE_E("## WSL:WSS-SENDING >>>>>>>>>> \n%s", data_buffer);
                 }
             }
 
@@ -417,11 +418,11 @@ static int __ws_server_send(l_ws_server_client_conn_t *client, char *data, uint3
             client->fail_count = 0;
             __message_counter++;
 
-            TRACE_S("## LOCAL WSS-SENDING done >>>>>>>>>>>>>>>>>>>\r\n%s", data);
+            TRACE_S("## LOCAL WSS-SENDING done >>>>>>>>>>>>>>>>>>> \n%s", data);
         }
         else
         {
-            TRACE_E("## LOCAL WSS-SENDING failed >>>>>>>>>>>>>>>>>>>\r\n%s", data);
+            TRACE_E("## LOCAL WSS-SENDING failed >>>>>>>>>>>>>>>>>>> \n%s", data);
 
             ret = 0;
             client->fail_count += 1;
