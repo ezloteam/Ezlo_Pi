@@ -1552,6 +1552,7 @@ uint32_t ezlopi_core_device_group_devitem_expand(cJSON *cj_destination_array, cJ
 //--------------------------------------------------------------------------------------------------------------------------------
 
 //------------------------------------------- Main Init_Function -----------------------------------------------------------------
+#if 0 // may be required in future
 /**
  * @brief This function (if present) removes any unwanted residue-IDs from the nvs_list
  *
@@ -1604,10 +1605,10 @@ static void __remove_residue_ids_from_list(bool choice_of_trigger) // 0 => devGr
     } while (grp_list_has_residue);
     TRACE_D("---------- # --------------------------------- # ----------");
 }
+#endif
 void ezlopi_device_group_init(void)
 {
-    __remove_residue_ids_from_list(DEVICE_GROUP_SELECTED);
-
+    // __remove_residue_ids_from_list(DEVICE_GROUP_SELECTED);
     char *devgrp_id_list_str = ezlopi_nvs_read_device_groups();
     if (devgrp_id_list_str)
     {
@@ -1655,8 +1656,7 @@ void ezlopi_device_group_init(void)
 }
 void ezlopi_item_group_init(void)
 {
-    __remove_residue_ids_from_list(ITEM_GROUP_SELECTED);
-
+    // __remove_residue_ids_from_list(ITEM_GROUP_SELECTED);
     char *itemgrp_id_list_str = ezlopi_nvs_read_item_groups();
     if (itemgrp_id_list_str)
     {
