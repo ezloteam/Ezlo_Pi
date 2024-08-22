@@ -278,7 +278,7 @@ void ezlopi_scenes_print(l_scenes_list_v2_t* scene_link_list)
         ezlopi_print_action_blocks(scene_link_list->else_block);
         TRACE_D("\t---------------------------------------------------------------");
 
-        vTaskDelay(10);
+        vTaskDelay(5);
 
         scene_link_list = scene_link_list->next;
     }
