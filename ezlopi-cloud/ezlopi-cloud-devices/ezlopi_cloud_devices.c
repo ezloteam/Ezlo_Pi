@@ -66,9 +66,10 @@ void device_name_set(cJSON *cj_request, cJSON *cj_response)
             if (cj_device_id)
             {
                 uint32_t device_id = strtoul(cj_device_id->valuestring, NULL, 16);
-                if (device_id)
+                cJSON *new_dev_name = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_name_str);
+                if (device_id && new_dev_name && cJSON_IsString(new_dev_name))
                 {
-                    ezlopi_device_name_set_by_device_id(device_id, cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_name_str));
+                    ezlopi_device_name_set_by_device_id(device_id, new_dev_name);
                 }
             }
         }
