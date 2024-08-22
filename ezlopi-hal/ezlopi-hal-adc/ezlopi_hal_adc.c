@@ -179,15 +179,15 @@ static void __fill_adc_characteristics(esp_adc_cal_characteristics_t* chars, adc
         esp_adc_cal_value_t value = esp_adc_cal_characterize(unit, attenuation, width, vRef, chars);
         if (value == ESP_ADC_CAL_VAL_EFUSE_TP)
         {
-            TRACE_S("Characterized using Two Point Value\n");
+            TRACE_S("Characterized using Two Point Value");
         }
         else if (value == ESP_ADC_CAL_VAL_EFUSE_VREF)
         {
-            TRACE_S("Characterized using eFuse Vref\n");
+            TRACE_S("Characterized using eFuse Vref");
         }
         else
         {
-            TRACE_S("Characterized using Default Vref\n");
+            TRACE_S("Characterized using Default Vref");
         }
     }
 }
