@@ -3,6 +3,10 @@
  * Copyright Alija Bobija, 2019.
  */
 
+#include "sdkconfig.h"
+
+#ifdef CONFIG_EZPI_ENABLE_CAPTIVE_PORTAL
+
 #pragma once
 
 #ifdef __cplusplus
@@ -55,3 +59,5 @@ esp_err_t dns_hijack_srv_stop();
 #ifdef __cplusplus
 }
 #endif
+
+#endif // CONFIG_EZPI_ENABLE_CAPTIVE_PORTAL

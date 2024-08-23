@@ -1,3 +1,8 @@
+
+#include "sdkconfig.h"
+
+#ifdef CONFIG_EZPI_ENABLE_CAPTIVE_PORTAL
+
 #include <string.h>
 #include <sys/param.h>
 #include "freertos/FreeRTOS.h"
@@ -168,3 +173,5 @@ esp_err_t dns_hijack_srv_stop() {
 
     return ESP_OK;
 }
+
+#endif // CONFIG_EZPI_ENABLE_CAPTIVE_PORTAL

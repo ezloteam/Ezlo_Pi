@@ -118,7 +118,12 @@ menu "EzloPi User Config"
         default y
         help 
             Enable indicator LED available in the device
-
+    
+    config EZPI_ENABLE_CAPTIVE_PORTAL
+        bool "Enable captive portal"
+        default n
+        help
+            Enable captive portal in EzloPi firmware
 
     menu "EzloPi mDNS config"
         depends on EZPI_SERV_MDNS_EN

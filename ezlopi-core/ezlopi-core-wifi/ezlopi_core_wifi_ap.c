@@ -1,4 +1,8 @@
 
+#include "sdkconfig.h"
+
+#ifdef CONFIG_EZPI_ENABLE_CAPTIVE_PORTAL
+
 #include <string.h>
 
 #include "freertos/FreeRTOS.h"
@@ -84,3 +88,5 @@ void ezlopi_start_dns_server()
         TRACE_E("DNS hijack server has not started");
     }
 }
+
+#endif // CONFIG_EZPI_ENABLE_CAPTIVE_PORTAL
