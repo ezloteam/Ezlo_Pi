@@ -8,7 +8,7 @@
 static f_ezlopi_log_upcall_t cloud_log_upcall_func = NULL;
 static f_ezlopi_log_upcall_t serial_log_upcall_func = NULL;
 
-static void put_idump(uint8_t* buff, uint32_t ofs, uint32_t cnt)
+static void put_idump(uint8_t *buff, uint32_t ofs, uint32_t cnt)
 {
     int n;
 
@@ -28,7 +28,7 @@ static void put_idump(uint8_t* buff, uint32_t ofs, uint32_t cnt)
         } while (++n < 16);
     }
 
-    char temp_buff[17] = { 0 };
+    char temp_buff[17] = {0};
 
     memcpy(temp_buff, buff, cnt);
     temp_buff[16] = 0;
@@ -48,9 +48,9 @@ static void put_idump(uint8_t* buff, uint32_t ofs, uint32_t cnt)
     }
 }
 
-void __dump(const char* file_name, uint32_t line, char* buffer_name, void* _buff, uint32_t ofs, uint32_t cnt)
+void __dump(const char *file_name, uint32_t line, char *buffer_name, void *_buff, uint32_t ofs, uint32_t cnt)
 {
-    unsigned char* buff = _buff;
+    unsigned char *buff = _buff;
     int lines = cnt >> 4;
     int l;
 
@@ -93,7 +93,8 @@ f_ezlopi_log_upcall_t ezlopi_util_get_serial_log_upcall()
     return serial_log_upcall_func;
 }
 
-void trace_color_print(const char* txt_color, uint8_t severity, const char* file, int line, const char* format, ...) {
+void trace_color_print(const char *txt_color, uint8_t severity, const char *file, int line, const char *format, ...)
+{
 
     f_ezlopi_log_upcall_t log_upcall_func;
 
@@ -109,14 +110,15 @@ void trace_color_print(const char* txt_color, uint8_t severity, const char* file
         log_upcall_func(severity, cloud_log_format);
         va_end(args);
     }
-#endif 
+#endif
 
     log_upcall_func = ezlopi_util_get_serial_log_upcall();
-    if (log_upcall_func != NULL) {
+    if (log_upcall_func != NULL)
+    {
         va_list args;
         va_start(args, format);
 
-        #warning "No remedies for buffer over 'EZPI_CORE_LOG_BUFFER_SIZE'";
+#warning "No remedies for buffer over 'EZPI_CORE_LOG_BUFFER_SIZE'";
 
         static char serial_log_format[10240];
         // char serial_log_format[EZPI_CORE_LOG_BUFFER_SIZE];

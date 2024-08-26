@@ -72,9 +72,9 @@ int ezlopi_adc_init(uint8_t gpio_num, uint8_t width)
         ezlopi_analog_object_handle->adc_channel = channel;
         ezlopi_analog_object_handle->unit = ADC_UNIT_1;
         ezlopi_analog_object_handle->attenuation = ADC_ATTEN_11db;
-#if CONFIG_IDF_TARGET_ESP32
+#if CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32S2
         ezlopi_analog_object_handle->width = width;
-#elif CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32S2 || CONFIG_IDF_TARGET_ESP32C3
+#elif CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32C3
         ezlopi_analog_object_handle->width = ADC_WIDTH_BIT_12;
 #endif
         ezlopi_analog_object_handle->vRef = 1100;
@@ -179,15 +179,15 @@ static void __fill_adc_characteristics(esp_adc_cal_characteristics_t* chars, adc
         esp_adc_cal_value_t value = esp_adc_cal_characterize(unit, attenuation, width, vRef, chars);
         if (value == ESP_ADC_CAL_VAL_EFUSE_TP)
         {
-            TRACE_S("Characterized using Two Point Value\n");
+            TRACE_S("Characterized using Two Point Value");
         }
         else if (value == ESP_ADC_CAL_VAL_EFUSE_VREF)
         {
-            TRACE_S("Characterized using eFuse Vref\n");
+            TRACE_S("Characterized using eFuse Vref");
         }
         else
         {
-            TRACE_S("Characterized using Default Vref\n");
+            TRACE_S("Characterized using Default Vref");
         }
     }
 }

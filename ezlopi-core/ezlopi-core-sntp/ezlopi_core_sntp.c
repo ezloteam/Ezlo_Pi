@@ -15,7 +15,7 @@
 
 static time_t start_time = 0;
 
-static void sntp_sync_time_call_back(struct timeval* tv)
+static void sntp_sync_time_call_back(struct timeval *tv)
 {
 
     char strftime_buf[64];
@@ -62,7 +62,7 @@ void EZPI_CORE_sntp_init(void)
     // }
 }
 
-int EZPI_CORE_sntp_set_location(const char* location)
+int EZPI_CORE_sntp_set_location(const char *location)
 {
     int ret = 1;
     if (location)
@@ -70,12 +70,16 @@ int EZPI_CORE_sntp_set_location(const char* location)
         if (EZPI_CORE_nvs_write_time_location(location, strlen(location)))
         {
 
-            const char* posix_str = micro_tz_db_get_posix_str(location);
+            const char *posix_str = micro_tz_db_get_posix_str(location);
 
             if (NULL == posix_str)
             {
                 TRACE_I("%s is not a known timezone!\n", location);
                 ret = 0;
+            }
+            else
+            {
+                TRACE_I("POSIX String for location: %s is %s: ", location, posix_str);
             }
         }
         else
@@ -90,17 +94,17 @@ int EZPI_CORE_sntp_set_location(const char* location)
     return ret;
 }
 
-char* EZPI_CORE_sntp_get_location(void)
+char *EZPI_CORE_sntp_get_location(void)
 {
     return EZPI_CORE_nvs_read_time_location();
 }
 
-void EZPI_CORE_sntp_get_local_time(char* time_buf, uint32_t buf_len)
+void EZPI_CORE_sntp_get_local_time(char *time_buf, uint32_t buf_len)
 {
     if (time_buf && buf_len)
     {
-        char* location = EZPI_CORE_nvs_read_time_location();
-        const char* posix_str = (location) ? micro_tz_db_get_posix_str(location) : NULL;
+        char *location = EZPI_CORE_nvs_read_time_location();
+        const char *posix_str = (location) ? micro_tz_db_get_posix_str(location) : NULL;
 
         if (!posix_str)
         {
@@ -142,7 +146,7 @@ void EZPI_CORE_sntp_get_local_time(char* time_buf, uint32_t buf_len)
     }
 }
 
-void EZPI_CORE_sntp_get_up_time(char* up_time_buf, uint32_t buf_len)
+void EZPI_CORE_sntp_get_up_time(char *up_time_buf, uint32_t buf_len)
 {
     if (up_time_buf && buf_len)
     {
@@ -152,11 +156,11 @@ void EZPI_CORE_sntp_get_up_time(char* up_time_buf, uint32_t buf_len)
     }
 }
 
-void EZPI_CORE_sntp_epoch_to_iso8601(char* time_buf, uint32_t buf_len, time_t t)
+void EZPI_CORE_sntp_epoch_to_iso8601(char *time_buf, uint32_t buf_len, time_t t)
 {
     if (time_buf && buf_len)
     {
-        struct tm* timeinfo;
+        struct tm *timeinfo;
         // timeinfo = gmtime(&t);
         timeinfo = localtime(&t);
         strftime(time_buf, buf_len, "%Y-%m-%dT%H:%M:%S%z", timeinfo);

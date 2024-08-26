@@ -32,13 +32,17 @@ static void ezlopi_ze08_ch2o_upcall(uint8_t* buffer, uint32_t output_len, s_ezlo
 {
     ze08_ch2o_sensor_data_t* data = (ze08_ch2o_sensor_data_t*) uart_object_handle->arg;
 
+#warning "DO NOT user printf"
+#if 0
 #if DEBUG_ZE08_CH2O
     for (size_t i = 0; i < ZE08_BUFFER_MAXLENGTH; i++)
     {
         printf("0x%X ", buffer[i]);
     }
+    
     printf("\n");
 #endif
+#endif 
     ze08_ch2o_parse(buffer, data);
 }
 
