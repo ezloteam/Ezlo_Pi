@@ -4,6 +4,7 @@
 #include "stdio.h"
 const char *ezlopi_ESP32_str = "ESP32";
 const char *ezlopi_ESP32S3_str = "ESP32S3";
+const char* ezlopi_ESP32S2_str = "ESP32S2";
 const char *ezlopi_ESP32C3_str = "ESP32C3";
 const char *ezlopi_ezlopi_str = "ezlopi";
 const char *ezlopi__str = "";

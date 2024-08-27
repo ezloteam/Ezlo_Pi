@@ -810,6 +810,8 @@ void ezlopi_device_prepare(void)
                 cJSON_AddStringToObject(__FUNCTION__, cj_config, ezlopi_chipset_str, ezlopi_ESP32_str);
 #elif defined(CONFIG_IDF_TARGET_ESP32S3)
                 cJSON_AddStringToObject(__FUNCTION__, cj_config, ezlopi_chipset_str, ezlopi_ESP32S3_str);
+#elif defined(CONFIG_IDF_TARGET_ESP32S2)
+                cJSON_AddStringToObject(__FUNCTION__, cj_config, ezlopi_chipset_str, ezlopi_ESP32S2_str);
 #elif defined(CONFIG_IDF_TARGET_ESP32C3)
                 cJSON_AddStringToObject(__FUNCTION__, cj_config, ezlopi_chipset_str, ezlopi_ESP32C3_str);
 #endif
