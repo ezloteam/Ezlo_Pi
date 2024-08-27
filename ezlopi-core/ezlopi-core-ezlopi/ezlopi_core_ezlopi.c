@@ -28,12 +28,12 @@
 #include "ezlopi_hal_system_info.h"
 #include "ezlopi_service_loop.h"
 
-static void __device_loop(void * arg);
+static void __device_loop(void *arg);
 static void ezlopi_initialize_devices_v3(void);
 
 void ezlopi_init(void)
 {
-    // Init memories  
+    // Init memories
     ezlopi_nvs_init();
 
 #ifdef CONFIG_EZPI_UTIL_TRACE_EN
@@ -91,7 +91,6 @@ void ezlopi_init(void)
     ezlopi_wifi_connect_from_id_bin();
 #endif
 
-
 #if (defined(CONFIG_EZPI_ENABLE_WIFI) || defined(CONFIG_EZPI_CORE_ENABLE_ETH))
     EZPI_CORE_sntp_init();
 #ifdef CONFIG_EZPI_ENABLE_PING
@@ -106,9 +105,9 @@ void ezlopi_init(void)
     ezlopi_service_loop_add("core-device-loop", __device_loop, 1000, NULL);
 }
 
-l_ezlopi_device_t* link_next_parent_id(uint32_t target_to_clear_parent_id)
+static l_ezlopi_device_t *__link_next_parent_id(uint32_t target_to_clear_parent_id)
 {
-    l_ezlopi_device_t* pre_devs = ezlopi_device_get_head();
+    l_ezlopi_device_t *pre_devs = ezlopi_device_get_head();
     while (pre_devs)
     {
         if ((NULL != pre_devs->next) &&
@@ -125,13 +124,13 @@ l_ezlopi_device_t* link_next_parent_id(uint32_t target_to_clear_parent_id)
 static void ezlopi_initialize_devices_v3(void)
 {
     int device_init_ret = 0;
-    l_ezlopi_device_t* curr_device = ezlopi_device_get_head();
+    l_ezlopi_device_t *curr_device = ezlopi_device_get_head();
 
     while (curr_device)
     {
 
         TRACE_S("Device_id_curr_device : [0x%x] ", curr_device->cloud_properties.device_id);
-        l_ezlopi_item_t* curr_item = curr_device->items;
+        l_ezlopi_item_t *curr_item = curr_device->items;
         while (curr_item)
         {
             if (curr_item->func)
@@ -151,14 +150,14 @@ static void ezlopi_initialize_devices_v3(void)
         if (0 > device_init_ret)
         {
             device_init_ret = 0;
-            l_ezlopi_device_t* device_to_free = curr_device;
+            l_ezlopi_device_t *device_to_free = curr_device;
 
             if (NULL != curr_device->next &&
                 curr_device->cloud_properties.parent_device_id == 0 &&
                 curr_device->cloud_properties.device_id == curr_device->next->cloud_properties.parent_device_id)
             {
                 /* if 'device_to_free' is parent_with_child_nodes */
-                curr_device = link_next_parent_id(curr_device->cloud_properties.device_id);
+                curr_device = __link_next_parent_id(curr_device->cloud_properties.device_id);
             }
             else
             {
@@ -174,9 +173,9 @@ static void ezlopi_initialize_devices_v3(void)
     }
 }
 
-static void __device_loop(void * arg)
+static void __device_loop(void *arg)
 {
-    static l_ezlopi_device_t * device_node;
+    static l_ezlopi_device_t *device_node;
     if (NULL == device_node)
     {
         device_node = ezlopi_device_get_head();
@@ -185,7 +184,7 @@ static void __device_loop(void * arg)
     {
         if (device_node && device_node->items)
         {
-            l_ezlopi_item_t * item_node = device_node->items;
+            l_ezlopi_item_t *item_node = device_node->items;
             while (item_node)
             {
                 if (item_node->func)

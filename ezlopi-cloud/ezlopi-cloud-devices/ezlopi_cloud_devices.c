@@ -72,7 +72,7 @@ void device_name_set(cJSON *cj_request, cJSON *cj_response)
                     ezlopi_device_name_set_by_device_id(device_id, cj_device_name_str->valuestring);
                 }
             }
-        } 
+        }
     }
 }
 
@@ -108,10 +108,11 @@ void device_room_set(cJSON *cj_request, cJSON *cj_response)
             cJSON *cj_device_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi__id_str);
             cJSON *cj_room_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_roomId_str);
 
-            if (cj_device_id && cj_room_id)
+            if (cj_device_id && cj_room_id && cj_room_id->valuestring)
             {
                 uint32_t device_id = strtoul(cj_device_id->valuestring, NULL, 16);
-                ezlopi_device_set_device_room_id(device_id, cJSON_Duplicate(__FUNCTION__, cj_room_id, true));
+
+                ezlopi_device_set_device_room_id(device_id, cj_room_id->valuestring, cJSON_GetObjectItem(__FUNCTION__, cj_params, "separateChildDevices"));
             }
         }
     }
@@ -178,6 +179,10 @@ void device_updated(cJSON *cj_request, cJSON *cj_response)
                                 }
                             }
 
+                            if (device_node->cloud_properties.protect_config && (strlen(device_node->cloud_properties.protect_config) > 0))
+                            {
+                                cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_protect_config_str, device_node->cloud_properties.protect_config);
+                            }
                             break;
                         }
 
