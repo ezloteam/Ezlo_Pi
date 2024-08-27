@@ -21,7 +21,6 @@ enum e_devicGrp_vs_itemGrp_choice
 //              Static functions
 //--------------------------------------------------------------------------------
 static void __ezlopi_core_device_group_print(l_ezlopi_device_grp_t *device_grp_node)
-static void __ezlopi_core_device_group_print(l_ezlopi_device_grp_t *device_grp_node)
 {
 #if (1 == ENABLE_TRACE)
     if (device_grp_node)

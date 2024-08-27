@@ -293,9 +293,10 @@ static void __change_room_id_in_device_ll_and_nvs(l_ezlopi_device_t *curr_node, 
             bool change_to_new_room_id = true;
             int idx = 0;
             cJSON *cj_separate_child = NULL;
-            while (NULL != (cj_separate_child = cJSON_GetArrayItem(cj_separate_child_devices, idx)))
+            while (NULL != (cj_separate_child = cJSON_GetArrayItem(cj_separate_child_devices, idx))) // ["102ea001" , "102ea002" ...]
             {
-                if (EZPI_STRNCMP_IF_EQUAL(cj_separate_child->valuestring, curr_node->cloud_properties.device_id, cj_separate_child->str_key_len, strlen(curr_node->cloud_properties.device_id)))
+                uint32_t _id_to_avoid = strtoul(cj_separate_child->valuestring, NULL, 16);
+                if (_id_to_avoid == curr_node->cloud_properties.device_id)
                 {
                     change_to_new_room_id = false; // 'child_node_device_id' should not be listed in 'cj_separate_child_devices'
                     break;
@@ -596,7 +597,6 @@ l_ezlopi_device_t *ezlopi_device_add_device(cJSON *cj_device, const char *last_n
         else
         {
             l_ezlopi_device_t *curr_device = l_device_head;
-            l_ezlopi_device_t *curr_device = l_device_head;
             while (curr_device->next)
             {
                 curr_device = curr_device->next;
@@ -619,14 +619,12 @@ static void ____ezlopi_device_clear_bottom_children(l_ezlopi_device_t *curr_node
         }
 
         l_ezlopi_device_t *curr_device = l_device_head;
-        l_ezlopi_device_t *curr_device = l_device_head;
         while (curr_device->next)
         {
             // TRACE_D("Child-Device-ID: %08x", curr_device->next->cloud_properties.device_id);
             if (curr_device->next == curr_node)
             {
                 // TRACE_E("tree_member_id: %08x", curr_device->next->cloud_properties.device_id);
-                l_ezlopi_device_t *free_device = curr_device->next;
                 l_ezlopi_device_t *free_device = curr_device->next;
                 curr_device->next = curr_device->next->next;
                 free_device->next = NULL;
