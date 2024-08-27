@@ -105,6 +105,9 @@ int when_function_for_follow(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* 
 int when_function_for_pulse(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* when_block, cJSON* cj_func_opr);
 int when_function_for_latch(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* when_block, cJSON* cj_func_opr);
 
+//------------------------------- ezlopi_scene_when_isDeviceItemGroup_method -----------------------------------
+int isdeviceitem_group_value_check(l_scenes_list_v2_t* scene_node, uint32_t device_group_id, uint32_t item_group_id);
+
 #endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 #endif /*_EZLOPI_CORE_SCENES_WHEN_METHODS_HELPER_FUNCTIONS_H_*/

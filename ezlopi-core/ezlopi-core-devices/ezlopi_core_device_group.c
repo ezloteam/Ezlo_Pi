@@ -21,6 +21,7 @@ enum e_devicGrp_vs_itemGrp_choice
 //              Static functions
 //--------------------------------------------------------------------------------
 static void __ezlopi_core_device_group_print(l_ezlopi_device_grp_t *device_grp_node)
+static void __ezlopi_core_device_group_print(l_ezlopi_device_grp_t *device_grp_node)
 {
 #if (1 == ENABLE_TRACE)
     if (device_grp_node)
@@ -1104,9 +1105,9 @@ l_ezlopi_item_grp_t *ezlopi_core_item_group_new_itemgrp_populate(cJSON *cj_new_i
 //----------------------------------------------------------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------------------------------------------------------
-static uint8_t ____check_for_category_in_devGrp(cJSON *cj_curr_devGrp_node, const char *req_category_name)
+static bool ____check_for_category_in_devGrp(cJSON *cj_curr_devGrp_node, const char *req_category_name)
 {
-    uint8_t flags = 0;
+    bool ret = false;
     if (cj_curr_devGrp_node && req_category_name)
     {
         cJSON *cj_categories_arr = cJSON_GetObjectItem(__FUNCTION__, cj_curr_devGrp_node, "categories");
@@ -1122,31 +1123,21 @@ static uint8_t ____check_for_category_in_devGrp(cJSON *cj_curr_devGrp_node, cons
                 {
                     if (EZPI_STRNCMP_IF_EQUAL(cj_category->valuestring, req_category_name, strlen(cj_category->valuestring), strlen(req_category_name)))
                     {
-                        flags |= (1 << 0);
+                        ret = true;
                         // TRACE_S("found Category --> '%s'", req_category_name);
+                        // TRACE_S("Category criteria completed... ; flags -> [%#x]", flags);
+                        break;
                     }
-                }
-
-                // Break if the condition is valid.
-                if (flags && (1 << 0))
-                {
-                    // TRACE_S("Category criteria completed... ; flags -> [%#x]", flags);
-                    break;
-                }
-                else
-                {
-                    // TRACE_E(" flags -> [%#x]", flags);
-                    flags = 0;
                 }
                 idx++;
             }
         }
     }
-    return flags;
+    return ret;
 }
-static uint8_t ____check_for_subcategory_in_devGrp(cJSON *cj_curr_devGrp_node, const char *req_subcategory_name)
+static bool ____check_for_subcategory_in_devGrp(cJSON *cj_curr_devGrp_node, const char *req_subcategory_name)
 {
-    uint8_t flags = 0;
+    bool ret = false;
     if (cj_curr_devGrp_node && req_subcategory_name)
     {
         cJSON *cj_categories_arr = cJSON_GetObjectItem(__FUNCTION__, cj_curr_devGrp_node, "categories");
@@ -1166,34 +1157,29 @@ static uint8_t ____check_for_subcategory_in_devGrp(cJSON *cj_curr_devGrp_node, c
                     {
                         if (EZPI_STRNCMP_IF_EQUAL(cj_subcat_element->valuestring, req_subcategory_name, strlen(cj_subcat_element->valuestring), strlen(req_subcategory_name)))
                         {
-                            flags |= (1 << 1);
-                            // TRACE_S("found Sub-Category --> '%s'", req_subcategory_name);
+                            ret = true;
                             break;
+                            // TRACE_S("found Sub-Category --> '%s'", req_subcategory_name);
                         }
                         count++;
                     }
                 }
 
                 // Break if the condition is valid.
-                if (flags && (1 << 1))
+                if (ret)
                 {
-                    // TRACE_S("Sub-Category criteria completed... ; flags -> [%#x]", flags);
+                    // TRACE_S("Sub-Category criteria completed...  ");
                     break;
-                }
-                else
-                {
-                    // TRACE_E(" flags -> [%#x]", flags);
-                    flags = 0;
                 }
                 idx++;
             }
         }
     }
-    return flags;
+    return ret;
 }
-static uint8_t ____check_for_device_id_in_devGrp(cJSON *cj_curr_devGrp_node, const char *req_device_id_str)
+static bool ____check_for_device_id_in_devGrp(cJSON *cj_curr_devGrp_node, const char *req_device_id_str)
 {
-    uint8_t flags = 0;
+    bool ret = false;
     if (cj_curr_devGrp_node && req_device_id_str)
     {
         cJSON *cj_devices_arr = cJSON_GetObjectItem(__FUNCTION__, cj_curr_devGrp_node, ezlopi_devices_str); // arr-obj
@@ -1206,30 +1192,20 @@ static uint8_t ____check_for_device_id_in_devGrp(cJSON *cj_curr_devGrp_node, con
                 // 3. compare devices string-elements {string}
                 if (EZPI_STRNCMP_IF_EQUAL(cj_device->valuestring, req_device_id_str, strlen(cj_device->valuestring), strlen(req_device_id_str)))
                 {
-                    flags |= (1 << 2);
+                    ret = true;
                     // TRACE_S("found Device-Id : %s", req_device_id_str);
+                    // TRACE_S("DeviceGroupId criteria completed... ; ", ret);
                     break;
                 }
-
                 idx++;
-            }
-            // Break if the condition is valid.
-            if (flags && (1 << 2))
-            {
-                // TRACE_S("DeviceGroupId criteria completed... ; flags -> [%#x]", flags);
-            }
-            else
-            {
-                // TRACE_E(" flags -> [%#x]", flags);
-                flags = 0;
             }
         }
     }
-    return flags;
+    return ret;
 }
-static uint8_t ____check_for_deviceGroupIds_list(cJSON *cj_curr_devGrp_node, cJSON *deviceGroupIds_list)
+static bool ____check_for_deviceGroupIds_list(cJSON *cj_curr_devGrp_node, cJSON *deviceGroupIds_list)
 {
-    uint8_t flags = 0;
+    bool ret = false;
     if (cj_curr_devGrp_node && deviceGroupIds_list)
     {
         cJSON *cj_curr_devGrp_id = cJSON_GetObjectItem(__FUNCTION__, cj_curr_devGrp_node, "id"); // "c02ea004"
@@ -1242,30 +1218,20 @@ static uint8_t ____check_for_deviceGroupIds_list(cJSON *cj_curr_devGrp_node, cJS
             {
                 if (EZPI_STRNCMP_IF_EQUAL(cj_curr_devGrp_id->valuestring, cj_devId_element->valuestring, strlen(cj_curr_devGrp_id->valuestring), strlen(cj_devId_element->valuestring)))
                 {
-                    flags |= (1 << 3);
+                    ret = true;
                     // TRACE_S("found list Device-Id matched : %s", cj_curr_devGrp_id->valuestring);
+                    // TRACE_S("DeviceGroupIds criteria completed... ; ", ret);
                     break;
                 }
                 idx++;
             }
-
-            // Break if the condition is valid.
-            if (flags && (1 << 3))
-            {
-                // TRACE_S("DeviceGroupIds criteria completed... ; flags -> [%#x]", flags);
-            }
-            else
-            {
-                // TRACE_E(" flags -> [%#x]", flags);
-                flags = 0;
-            }
         }
     }
-    return flags;
+    return ret;
 }
-static uint8_t ____check_for_deviceGroupId(cJSON *cj_curr_devGrp_node, const char *req_deviceGroupId)
+static bool ____check_for_deviceGroupId(cJSON *cj_curr_devGrp_node, const char *req_deviceGroupId)
 {
-    uint8_t flags = 0;
+    bool ret = true;
     if (cj_curr_devGrp_node && req_deviceGroupId)
     {
         cJSON *cj_curr_devGrp_id = cJSON_GetObjectItem(__FUNCTION__, cj_curr_devGrp_node, "id"); // string // "c02ea004"
@@ -1274,104 +1240,68 @@ static uint8_t ____check_for_deviceGroupId(cJSON *cj_curr_devGrp_node, const cha
             // 5. compare devices string-elements {string}
             if (EZPI_STRNCMP_IF_EQUAL(cj_curr_devGrp_id->valuestring, req_deviceGroupId, strlen(cj_curr_devGrp_id->valuestring), strlen(req_deviceGroupId)))
             {
-                flags |= (1 << 4);
+                ret = true;
+                // TRACE_S("DeviceGroupId criteria completed... ; ", ret);
                 // TRACE_S("found Device-Id : %s", req_deviceGroupId);
-            }
-
-            // Break if the condition is valid.
-            if (flags && (1 << 4))
-            {
-                // TRACE_S("DeviceGroupId criteria completed... ; flags -> [%#x]", flags);
-            }
-            else
-            {
-                // TRACE_E(" flags -> [%#x]", flags);
-                flags = 0;
             }
         }
     }
-    return flags;
+    return ret;
 }
 static bool __check_devgroup_validity(cJSON *cj_curr_devgrp_node, cJSON *cj_params)
 {
-    bool validity_success = true;
-
-    // 1. Check the condition from "cj_params"
-    for (int i = 0; i < 5; i++)
+    // # Check the condition from "cj_params"
+    cJSON *cj_category_param = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_category_str);
+    if (cj_category_param && cj_category_param->valuestring)
     {
-        switch (1 << i)
+        if (!____check_for_category_in_devGrp(cj_curr_devgrp_node, cj_category_param->valuestring))
         {
-        case (1 << 0): // cat_flag
-        {
-            cJSON *cj_category_param = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_category_str);
-            if (cj_category_param && cj_category_param->valuestring)
-            {
-                if (false == ((1 << 0) && (____check_for_category_in_devGrp(cj_curr_devgrp_node, cj_category_param->valuestring))))
-                {
-                    validity_success = false;
-                }
-            }
-            break;
-        }
-        case (1 << 1): // subcat_flag
-        {
-            cJSON *cj_subcategory_param = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_subcategory_str);
-            if (cj_subcategory_param && cj_subcategory_param->valuestring)
-            {
-                if (false == ((1 << 1) && (____check_for_subcategory_in_devGrp(cj_curr_devgrp_node, cj_subcategory_param->valuestring))))
-                {
-                    validity_success = false;
-                }
-            }
-            break;
-        }
-        case (1 << 2): // deviceId_flag
-        {
-            cJSON *cj_deviceId_param = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_deviceId_str);
-            if (cj_deviceId_param && cj_deviceId_param->valuestring)
-            {
-                if (false == ((1 << 2) && (____check_for_device_id_in_devGrp(cj_curr_devgrp_node, cj_deviceId_param->valuestring))))
-                {
-                    validity_success = false;
-                }
-            }
-            break;
-        }
-        case (1 << 3): // deviceGroupIds_flag
-        {
-            cJSON *cj_deviceGroupIds_param = cJSON_GetObjectItem(__FUNCTION__, cj_params, "deviceGroupIds");
-            if (cj_deviceGroupIds_param && cJSON_IsArray(cj_deviceGroupIds_param))
-            {
-                if (false == ((1 << 3) && (____check_for_deviceGroupIds_list(cj_curr_devgrp_node, cj_deviceGroupIds_param))))
-                {
-                    validity_success = false;
-                }
-            }
-            break;
-        }
-        case (1 << 4): // deviceGroup_flag
-        {
-            cJSON *cj_deviceGroupId_param = cJSON_GetObjectItem(__FUNCTION__, cj_params, "deviceGroupId");
-            if (cj_deviceGroupId_param && cj_deviceGroupId_param->valuestring)
-            {
-                if (false == ((1 << 4) && (____check_for_deviceGroupId(cj_curr_devgrp_node, cj_deviceGroupId_param->valuestring))))
-                {
-                    validity_success = false;
-                }
-            }
-            break;
-        }
-        }
-
-        // break immediately --> if one gives invalid
-        if (!validity_success)
-        {
-            TRACE_E(" error at --> [%#x]", (1 << i));
-            break;
+            trace_error(" error at --> [devGrp : category]");
+            return false;
         }
     }
 
-    return validity_success;
+    cJSON *cj_subcategory_param = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_subcategory_str);
+    if (cj_subcategory_param && cj_subcategory_param->valuestring)
+    {
+        if (!____check_for_subcategory_in_devGrp(cj_curr_devgrp_node, cj_subcategory_param->valuestring))
+        {
+            trace_error(" error at --> [devGrp : sub-category]");
+            return false;
+        }
+    }
+
+    cJSON *cj_deviceId_param = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_deviceId_str);
+    if (cj_deviceId_param && cj_deviceId_param->valuestring)
+    {
+        if (!____check_for_device_id_in_devGrp(cj_curr_devgrp_node, cj_deviceId_param->valuestring))
+        {
+            trace_error(" error at --> [devGrp : deviceId]");
+            return false;
+        }
+    }
+
+    cJSON *cj_deviceGroupIds_param = cJSON_GetObjectItem(__FUNCTION__, cj_params, "deviceGroupIds");
+    if (cj_deviceGroupIds_param && cJSON_IsArray(cj_deviceGroupIds_param))
+    {
+        if (!____check_for_deviceGroupIds_list(cj_curr_devgrp_node, cj_deviceGroupIds_param))
+        {
+            trace_error(" error at --> [devGrp : deviceGroupIds]");
+            return false;
+        }
+    }
+
+    cJSON *cj_deviceGroupId_param = cJSON_GetObjectItem(__FUNCTION__, cj_params, "deviceGroupId");
+    if (cj_deviceGroupId_param && cj_deviceGroupId_param->valuestring)
+    {
+        if (!____check_for_deviceGroupId(cj_curr_devgrp_node, cj_deviceGroupId_param->valuestring))
+        {
+            trace_error(" error at --> [devGrp : deviceGroupId]");
+            return false;
+        }
+    }
+
+    return true;
 }
 uint32_t ezlopi_core_device_group_find(cJSON *cj_destination_array, cJSON *cj_params)
 {
@@ -1396,10 +1326,9 @@ uint32_t ezlopi_core_device_group_find(cJSON *cj_destination_array, cJSON *cj_pa
                     if (cj_curr_devgrp_node)
                     {
                         CJSON_TRACE(" Checking ---> ", cj_curr_devgrp_node);
-                        bool validity_success = __check_devgroup_validity(cj_curr_devgrp_node, cj_params); // deciding flag
                         //------------------------------------------------------------------------------------------------
                         // 2. if Yes create add object with fields "_id" & "name"
-                        if (validity_success)
+                        if (__check_devgroup_validity(cj_curr_devgrp_node, cj_params))
                         {
                             cJSON *cj_add_valid_devGrp = cJSON_CreateObject(__FUNCTION__);
                             if (cj_add_valid_devGrp)
@@ -1624,7 +1553,7 @@ uint32_t ezlopi_core_device_group_devitem_expand(cJSON *cj_destination_array, cJ
 //--------------------------------------------------------------------------------------------------------------------------------
 
 //------------------------------------------- Main Init_Function -----------------------------------------------------------------
-#if 0 // for future use
+#if 0 // may be required in future
 /**
  * @brief This function (if present) removes any unwanted residue-IDs from the nvs_list
  *
@@ -1634,17 +1563,17 @@ static void __remove_residue_ids_from_list(bool choice_of_trigger) // 0 => devGr
 {
     TRACE_D("---------- # Removing [%s_Group] residue-Ids # ----------", (choice_of_trigger) ? "Item" : "Device");
     // check --> nvs_devgrp_list for unncessary "residue-IDs" & update the list
-    uint32_t invalid_nvs_grp_id = 0;
-    bool grp_list_has_residue = false;  // this indicates absence of residue-IDs // those IDs which are still in the "nvs-list" but doesnot not exists in "nvs-body"
-    char * list_ptr = NULL;
+    uint32_t residue_nvs_grp_id = 0;
+    bool grp_list_has_residue = false; // this indicates absence of residue-IDs // those IDs which are still in the "nvs-list" but doesnot not exists in "nvs-body"
+    char *list_ptr = NULL;
 
     do
     {
         if (grp_list_has_residue)
         {
-            if (0 != invalid_nvs_grp_id)
+            if (0 != residue_nvs_grp_id)
             {
-                (choice_of_trigger) ? ezlopi_core_item_group_remove_id_from_list(invalid_nvs_grp_id) : ezlopi_core_device_group_remove_id_from_list(invalid_nvs_grp_id);
+                ____remove_id_from_group_list(residue_nvs_grp_id, choice_of_trigger);
             }
             grp_list_has_residue = false;
         }
@@ -1652,13 +1581,13 @@ static void __remove_residue_ids_from_list(bool choice_of_trigger) // 0 => devGr
         list_ptr = (choice_of_trigger) ? ezlopi_nvs_read_item_groups() : ezlopi_nvs_read_device_groups();
         if (list_ptr)
         {
-            cJSON* cj_id_list = cJSON_Parse(__FUNCTION__, list_ptr);
+            cJSON *cj_id_list = cJSON_Parse(__FUNCTION__, list_ptr);
             if (cj_id_list)
             {
                 int array_size = cJSON_GetArraySize(cj_id_list);
                 for (int i = 0; i < array_size; i++)
                 {
-                    cJSON* cj_id = cJSON_GetArrayItem(cj_id_list, i);
+                    cJSON *cj_id = cJSON_GetArrayItem(cj_id_list, i);
                     if (cj_id && cj_id->valuedouble)
                     {
                         char tmp_buffer[32];
@@ -1666,9 +1595,9 @@ static void __remove_residue_ids_from_list(bool choice_of_trigger) // 0 => devGr
 
                         if (NULL == ezlopi_nvs_read_str(tmp_buffer))
                         {
-                            invalid_nvs_grp_id = (uint32_t)cj_id->valuedouble;   // A residue_id is found..
-                            grp_list_has_residue = true; // this will trigger a removal of "invalid_nvs_devgrp_id" .
-                            break; // get out of for
+                            residue_nvs_grp_id = (uint32_t)cj_id->valuedouble; // A residue_id is found..
+                            grp_list_has_residue = true;                       // this will trigger a removal of "invalid_nvs_devgrp_id" .
+                            break;                                             // get out of for
                         }
                     }
                 }
@@ -1681,7 +1610,6 @@ static void __remove_residue_ids_from_list(bool choice_of_trigger) // 0 => devGr
 void ezlopi_device_group_init(void)
 {
     // __remove_residue_ids_from_list(DEVICE_GROUP_SELECTED);
-
     char *devgrp_id_list_str = ezlopi_nvs_read_device_groups();
     if (devgrp_id_list_str)
     {
@@ -1730,7 +1658,6 @@ void ezlopi_device_group_init(void)
 void ezlopi_item_group_init(void)
 {
     // __remove_residue_ids_from_list(ITEM_GROUP_SELECTED);
-
     char *itemgrp_id_list_str = ezlopi_nvs_read_item_groups();
     if (itemgrp_id_list_str)
     {

@@ -6,7 +6,9 @@
 #include "ezlopi_core_scenes_v2.h"
 
 int ezlopi_scene_then_set_item_value(l_scenes_list_v2_t* scene_node, void* arg);
+int ezlopi_scene_then_group_set_item_value(l_scenes_list_v2_t* curr_scene, void* arg);
 int ezlopi_scene_then_set_device_armed(l_scenes_list_v2_t* scene_node, void* arg);
+int ezlopi_scene_then_group_set_device_armed(l_scenes_list_v2_t* curr_scene, void* arg);
 int ezlopi_scene_then_send_cloud_abstract_command(l_scenes_list_v2_t* scene_node, void* arg);
 int ezlopi_scene_then_switch_house_mode(l_scenes_list_v2_t* scene_node, void* arg);
 int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t* scene_node, void* arg);
@@ -22,6 +24,7 @@ int ezlopi_scene_then_cloud_api(l_scenes_list_v2_t* scene_node, void* arg);
 int ezlopi_scene_then_set_expression(l_scenes_list_v2_t* scene_node, void* arg);
 int ezlopi_scene_then_set_variable(l_scenes_list_v2_t* scene_node, void* arg);
 int ezlopi_scene_then_toggle_value(l_scenes_list_v2_t* scene_node, void* arg);
+int ezlopi_scene_then_group_toggle_value(l_scenes_list_v2_t* curr_scene, void* arg);
 
 #endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 

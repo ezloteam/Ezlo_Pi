@@ -596,6 +596,7 @@ l_ezlopi_device_t *ezlopi_device_add_device(cJSON *cj_device, const char *last_n
         else
         {
             l_ezlopi_device_t *curr_device = l_device_head;
+            l_ezlopi_device_t *curr_device = l_device_head;
             while (curr_device->next)
             {
                 curr_device = curr_device->next;
@@ -618,12 +619,14 @@ static void ____ezlopi_device_clear_bottom_children(l_ezlopi_device_t *curr_node
         }
 
         l_ezlopi_device_t *curr_device = l_device_head;
+        l_ezlopi_device_t *curr_device = l_device_head;
         while (curr_device->next)
         {
             // TRACE_D("Child-Device-ID: %08x", curr_device->next->cloud_properties.device_id);
             if (curr_device->next == curr_node)
             {
                 // TRACE_E("tree_member_id: %08x", curr_device->next->cloud_properties.device_id);
+                l_ezlopi_device_t *free_device = curr_device->next;
                 l_ezlopi_device_t *free_device = curr_device->next;
                 curr_device->next = curr_device->next->next;
                 free_device->next = NULL;
