@@ -10,7 +10,6 @@
 #include "ezlopi_core_heap.h"
 
 #warning "################### DO NOT USE printf ON PRODUCTION ###################"
-#warning "################### DO NOT USE printf ON PRODUCTION ###################"
 
 typedef struct s_initiator {
     const char * who;
