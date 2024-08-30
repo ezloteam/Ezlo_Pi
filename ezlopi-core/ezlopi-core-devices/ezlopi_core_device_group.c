@@ -948,7 +948,7 @@ static uint32_t __grp_get_list(cJSON *cj_grp_array, bool choice_of_trigger) // 0
         cJSON *cj_grp_id_list = cJSON_Parse(__FUNCTION__, grp_id_list);
         if (cj_grp_id_list)
         {
-            CJSON_TRACE("In-cjson :", cj_grp_id_list);
+            // CJSON_TRACE("In-cjson :", cj_grp_id_list);
             int array_size = cJSON_GetArraySize(cj_grp_id_list);
             for (int i = 0; i < array_size; i++)
             {

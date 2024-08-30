@@ -26,20 +26,36 @@ static char *__generate_sha1_of_src(const char *src)
             mbedtls_sha1_context sha1_ctx;
 
             mbedtls_sha1_init(&sha1_ctx);
-            if (mbedtls_sha1_starts_ret(&sha1_ctx))
+            if (0 == mbedtls_sha1_starts_ret(&sha1_ctx))
             {
-                if (mbedtls_sha1_update_ret(&sha1_ctx, (const unsigned char *)src, strlen(src)))
+                if (0 == mbedtls_sha1_update_ret(&sha1_ctx, (const unsigned char *)src, strlen(src)))
                 {
-                    if (mbedtls_sha1_finish_ret(&sha1_ctx, sha1))
+                    if (0 == mbedtls_sha1_finish_ret(&sha1_ctx, sha1))
                     {
-                        if (NULL != (ret = ezlopi_malloc(__FUNCTION__, sizeof(sha1) + 1))) // 20 + 1
+                        size_t len = (4 * sizeof(sha1)) + 1;
+                        ret = (char *)ezlopi_malloc(__FUNCTION__, len);
+                        if (ret)
                         {
-                            memset(ret, 0, sizeof(sha1));
-                            snprintf(ret, sizeof(sha1), "%s", sha1);
+                            memset(ret, 0, len);
+                            for (int i = 0; i < sizeof(sha1); i++)
+                            {
+                                size_t l = (len - (strlen(ret) + 1));
+                                if (l > 0)
+                                {
+                                    ((int)sha1[i] / 100 > 0)  ? (snprintf(ret + strlen(ret), l, "%u", (uint8_t)sha1[i]))    // tripple digit
+                                    : ((int)sha1[i] / 10 > 0) ? (snprintf(ret + strlen(ret), l, "0%u", (uint8_t)sha1[i]))   // double digit
+                                                              : (snprintf(ret + strlen(ret), l, "00%u", (uint8_t)sha1[i])); // single digit
+                                }
+                                else
+                                {
+                                    break;
+                                }
+                            }
                         }
                     }
                 }
             }
+
             mbedtls_sha1_free(&sha1_ctx);
         }
     }
@@ -294,32 +310,28 @@ void device_groups_list(cJSON *cj_request, cJSON *cj_response)
             }
 
             // check if the version is identical to the ones from request.
-            cJSON *cj_ver_str = cJSON_GetObjectItem(__FUNCTION__, cj_request, "version");
-            if (cj_ver_str && cj_ver_str->valuestring && cj_ver_str->str_value_len)
+            char *res_str = cJSON_PrintBuffered(__FUNCTION__, cj_result, 1024, false);
+            if (res_str)
             {
-                char *res_str = cJSON_PrintBuffered(__FUNCTION__, cj_result, 1024, false);
-                if (res_str)
+                char *hash_str = NULL;
+                if (NULL != (hash_str = __generate_sha1_of_src(res_str))) // returns malloc ; need to free
                 {
-
-                    char *hash_str = NULL;
-                    if (NULL != (hash_str = __generate_sha1_of_src(res_str))) // returns malloc ; need to free
+                    // TRACE_S("'hash': %s [%d]", hash_str, strlen(hash_str));
+                    cJSON *cj_ver_str = cJSON_GetObjectItem(__FUNCTION__, (cJSON_GetObjectItem(__FUNCTION__, cj_request, "params")), "version");
+                    if (cj_ver_str && cj_ver_str->valuestring && cj_ver_str->str_value_len)
                     {
-                        TRACE_D("'version': %s [%d]", cj_ver_str->valuestring, cj_ver_str->str_value_len);
-                        TRACE_S("'hash': %s [%d]", res_str, strlen(res_str));
-
-                        // remove the 'deviceGroups' array , if the generated 'version_hash' is identical
-                        if (EZPI_STRNCMP_IF_EQUAL(hash_str, cj_ver_str->valuestring, strlen(hash_str), cj_ver_str->str_value_len))
+                        // TRACE_D("'req_version': '%s'[%d]", cj_ver_str->valuestring, strlen(cj_ver_str->valuestring));
+                        if (EZPI_STRNCMP_IF_EQUAL(hash_str, cj_ver_str->valuestring, strlen(hash_str), strlen(cj_ver_str->valuestring)))
                         {
                             cJSON_DeleteItemFromObject(__FUNCTION__, cj_result, "deviceGroups");
                         }
-
-                        // now add the 'version_hash' into result.
-                        cJSON_AddStringToObject(__FUNCTION__, cj_result, "version", cj_ver_str->valuestring);
-
-                        ezlopi_free(__FUNCTION__, hash_str);
                     }
-                    ezlopi_free(__FUNCTION__, res_str);
+                    // now add the 'version_hash' into result.
+                    cJSON_AddStringToObject(__FUNCTION__, cj_result, "version", hash_str);
+
+                    ezlopi_free(__FUNCTION__, hash_str);
                 }
+                ezlopi_free(__FUNCTION__, res_str);
             }
         }
     }
@@ -430,31 +442,28 @@ void device_group_devitem_expand(cJSON *cj_request, cJSON *cj_response)
                 }
 
                 // check if the version is identical to the ones from request.
-                cJSON *cj_ver_str = cJSON_GetObjectItem(__FUNCTION__, cj_request, "version");
-                if (cj_ver_str && cj_ver_str->valuestring && cj_ver_str->str_value_len)
+                char *res_str = cJSON_PrintBuffered(__FUNCTION__, cj_result, 1024, false);
+                if (res_str)
                 {
-                    char *res_str = cJSON_PrintBuffered(__FUNCTION__, cj_result, 1024, false);
-                    if (res_str)
+                    char *hash_str = NULL;
+                    if (NULL != (hash_str = __generate_sha1_of_src(res_str))) // returns malloc ; need to free
                     {
-                        char *hash_str = NULL;
-                        if (NULL != (hash_str = __generate_sha1_of_src(res_str))) // returns malloc ; need to free
+                        // TRACE_S("'hash': %s [%d]", hash_str, strlen(hash_str));
+                        cJSON *cj_ver_str = cJSON_GetObjectItem(__FUNCTION__, cj_params, "version");
+                        if (cj_ver_str && cj_ver_str->valuestring && cj_ver_str->str_value_len)
                         {
-                            TRACE_D("'version': %s [%d]", cj_ver_str->valuestring, cj_ver_str->str_value_len);
-                            TRACE_S("'hash': %s [%d]", res_str, strlen(res_str));
-
-                            // remove the 'deviceGroups' array , if the generated 'version_hash' is identical
-                            if (EZPI_STRNCMP_IF_EQUAL(hash_str, cj_ver_str->valuestring, strlen(hash_str), cj_ver_str->str_value_len))
+                            // TRACE_D("'version': %s [%d]", cj_ver_str->valuestring, cj_ver_str->str_value_len);
+                            if (EZPI_STRNCMP_IF_EQUAL(hash_str, cj_ver_str->valuestring, strlen(hash_str), strlen(cj_ver_str->valuestring)))
                             {
                                 cJSON_DeleteItemFromObject(__FUNCTION__, cj_result, "devices");
                             }
-
-                            // now add the 'version_hash' into result.
-                            cJSON_AddStringToObject(__FUNCTION__, cj_result, "version", cj_ver_str->valuestring);
-
-                            ezlopi_free(__FUNCTION__, hash_str);
                         }
-                        ezlopi_free(__FUNCTION__, res_str);
+                        // now add the 'version_hash' into result.
+                        cJSON_AddStringToObject(__FUNCTION__, cj_result, "version", hash_str);
+
+                        ezlopi_free(__FUNCTION__, hash_str);
                     }
+                    ezlopi_free(__FUNCTION__, res_str);
                 }
             }
         }
@@ -591,32 +600,30 @@ void item_groups_list(cJSON *cj_request, cJSON *cj_response)
             {
                 ezlopi_core_item_group_get_list(cj_item_groups);
             }
-            // check if the version is identical to the ones from request.
-            cJSON *cj_ver_str = cJSON_GetObjectItem(__FUNCTION__, cj_request, "version");
-            if (cj_ver_str && cj_ver_str->valuestring && cj_ver_str->str_value_len)
-            {
-                char *res_str = cJSON_PrintBuffered(__FUNCTION__, cj_result, 1024, false);
-                if (res_str)
-                {
-                    char *hash_str = NULL;
-                    if (NULL != (hash_str = __generate_sha1_of_src(res_str))) // returns malloc ; need to free
-                    {
-                        TRACE_D("'version': %s [%d]", cj_ver_str->valuestring, cj_ver_str->str_value_len);
-                        TRACE_S("'hash': %s [%d]", res_str, strlen(res_str));
 
-                        // remove the 'deviceGroups' array , if the generated 'version_hash' is identical
-                        if (EZPI_STRNCMP_IF_EQUAL(hash_str, cj_ver_str->valuestring, strlen(hash_str), cj_ver_str->str_value_len))
+            // check if the version is identical to the ones from request.
+            char *res_str = cJSON_PrintBuffered(__FUNCTION__, cj_result, 1024, false);
+            if (res_str)
+            {
+                char *hash_str = NULL;
+                if (NULL != (hash_str = __generate_sha1_of_src(res_str))) // returns malloc ; need to free
+                {
+                    // TRACE_S("'hash': %s [%d]", hash_str, strlen(hash_str));
+                    cJSON *cj_ver_str = cJSON_GetObjectItem(__FUNCTION__, (cJSON_GetObjectItem(__FUNCTION__, cj_request, "params")), "version");
+                    if (cj_ver_str && cj_ver_str->valuestring && cj_ver_str->str_value_len)
+                    {
+                        // TRACE_D("'version': %s [%d]", cj_ver_str->valuestring, cj_ver_str->str_value_len);
+                        if (EZPI_STRNCMP_IF_EQUAL(hash_str, cj_ver_str->valuestring, strlen(hash_str), strlen(cj_ver_str->valuestring)))
                         {
                             cJSON_DeleteItemFromObject(__FUNCTION__, cj_result, "itemGroups");
                         }
-
-                        // now add the 'version_hash' into result.
-                        cJSON_AddStringToObject(__FUNCTION__, cj_result, "version", cj_ver_str->valuestring);
-
-                        ezlopi_free(__FUNCTION__, hash_str);
                     }
-                    ezlopi_free(__FUNCTION__, res_str);
+                    // now add the 'version_hash' into result.
+                    cJSON_AddStringToObject(__FUNCTION__, cj_result, "version", hash_str);
+
+                    ezlopi_free(__FUNCTION__, hash_str);
                 }
+                ezlopi_free(__FUNCTION__, res_str);
             }
         }
     }
