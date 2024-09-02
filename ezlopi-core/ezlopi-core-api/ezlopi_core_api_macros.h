@@ -99,6 +99,7 @@ CLOUD_METHOD("hub.scenes.house_modes.set", scenes_house_modes_set, NULL)
 CLOUD_METHOD("hub.scenes.action.block.test", scenes_action_block_test, NULL)
 CLOUD_METHOD("hub.scenes.block.enabled.set", scenes_block_enabled_set, scene_added)
 CLOUD_METHOD("hub.scenes.block.status.reset", scenes_block_status_reset, NULL)
+// CLOUD_METHOD("hub.scenes.meta.set", scenes_meta_set, scene_changed)
 CLOUD_METHOD("hub.scenes.stop", scenes_stop, NULL)
 
 #endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
