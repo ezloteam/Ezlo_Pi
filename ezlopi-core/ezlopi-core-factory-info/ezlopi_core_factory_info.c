@@ -24,6 +24,36 @@ static char * __ca_cert = NULL;
 static char * __pvt_key = NULL;
 static char * __pub_key = NULL;
 
+int ezlopi_calculate_certificate_length(const char *certificate_string, const char* end_marker) 
+{
+    char *end_pos = strstr(certificate_string, end_marker);
+    if (end_pos != NULL) 
+    {
+        int length_up_to_end_marker = (end_pos - certificate_string) + strlen(end_marker);
+        return length_up_to_end_marker;
+    } 
+    else 
+    {
+        return 0;
+    }
+}
+
+static void ezlopi_replace_newline_escape(char *str) 
+{
+    int i = 0, j = 0;
+
+    while (str[i] != '\0') {
+        if (str[i] == '\\' && str[i + 1] == 'n') {
+            str[j++] = '\n';  // Replace "\\n" with '\n'
+            i += 2;  // Skip past the '\\' and 'n'
+        } else {
+            str[j++] = str[i++];  
+        }
+    }
+
+    str[j] = '\0';  
+}
+
 static int ezlopi_factory_info_v3_set_4kb(const char* data, uint32_t offset, uint32_t len)
 {
     int ret = 0;
@@ -158,9 +188,9 @@ void print_factory_info_v3(void)
     char * provisioning_token = ezlopi_factory_info_get_v3_provision_token();
     // const char* provision_server = ezlopi_factory_info_v3_get_provisioning_server();
     const char* device_type = ezlopi_factory_info_v3_get_device_type();
-    // char* ca_certificate = ezlopi_factory_info_v3_get_ca_certificate();
-    // char* ssl_private_key = ezlopi_factory_info_v3_get_ssl_private_key();
-    // char* ssl_shared_key = ezlopi_factory_info_v3_get_ssl_shared_key();
+    char* ca_certificate = ezlopi_factory_info_v3_get_ca_certificate();
+    char* ssl_private_key = ezlopi_factory_info_v3_get_ssl_private_key();
+    char* ssl_shared_key = ezlopi_factory_info_v3_get_ssl_shared_key();
     // char* ezlopi_config = ezlopi_factory_info_v3_get_ezlopi_config();
 
     TRACE_W("----------------- Factory Info -----------------");
@@ -178,9 +208,9 @@ void print_factory_info_v3(void)
     // TRACE_W("PROVISIONING-TOKEN [off: 0x%04X, size: 0x%04X]:    %s", ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_PROVISIONING_TOKEN, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_PROVISIONING_TOKEN, provisioning_token ? provisioning_token : "null");
     TRACE_W("CLOUD_SERVER [off: 0x%04X, size: 0x%04X]:          %s", ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_CLOUD_SERVER_URL, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_CLOUD_SERVER_URL, cloud_server ? cloud_server : "null");
     TRACE_W("DEVICE_TYPE [off: 0x%04X, size: 0x%04X]:           %s", ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_EZLOPI_DEVICE_TYPE, E_EZLOPI_FACTORY_INFO_HUB_DATA), EZLOPI_FINFO_LEN_EZLOPI_DEVICE_TYPE, device_type ? device_type : "null");
-    // TRACE_W("CA_CERTIFICATE [off: 0x%04X, size: 0x%04X]:        \n%s", ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_CA_CERTIFICATE, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_CA_CERTIFICATE, ca_certificate ? ca_certificate : "null");
-    // TRACE_W("SSL_PRIVATE_KEY [off: 0x%04X, size: 0x%04X]:       \n%s", ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_SSL_PRIVATE_KEY, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_SSL_PRIVATE_KEY, ssl_private_key ? ssl_private_key : "null");
-    // TRACE_W("SSL_SHARED_KEY [off: 0x%04X, size: 0x%04X]:        \n%s", ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_SSL_SHARED_KEY, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_SSL_SHARED_KEY, ssl_shared_key ? ssl_shared_key : "null");
+    TRACE_W("CA_CERTIFICATE [off: 0x%04X, size: 0x%04X]:        \n%s", ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_CA_CERTIFICATE, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_CA_CERTIFICATE, ca_certificate ? ca_certificate : "null");
+    TRACE_W("SSL_PRIVATE_KEY [off: 0x%04X, size: 0x%04X]:       \n%s", ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_SSL_PRIVATE_KEY, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_SSL_PRIVATE_KEY, ssl_private_key ? ssl_private_key : "null");
+    TRACE_W("SSL_SHARED_KEY [off: 0x%04X, size: 0x%04X]:        \n%s", ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_SSL_SHARED_KEY, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_SSL_SHARED_KEY, ssl_shared_key ? ssl_shared_key : "null");
     // TRACE_W("EZLOPI_CONFIG [off: 0x%04X, size: 0x%04X]:         \n%s", ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_EZLOPI_CONFIG_JSON, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_EZLOPI_CONFIG_JSON, ezlopi_config ? ezlopi_config : "null");
     TRACE_W("-------------------------------------------------");
 
@@ -474,6 +504,7 @@ char* ezlopi_factory_info_v3_get_ca_certificate(void)
     if (NULL == __ca_cert)
     {
         __ca_cert = ezlopi_factory_info_v3_read_string(__FUNCTION__, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_CA_CERTIFICATE, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_CA_CERTIFICATE);
+        ezlopi_replace_newline_escape(__ca_cert); // Workaround : Escape Sequence "\n"
     }
     return __ca_cert;
 }
@@ -491,7 +522,8 @@ char* ezlopi_factory_info_v3_get_ssl_private_key(void)
     if (NULL == __pvt_key)
     {
         __pvt_key = ezlopi_factory_info_v3_read_string(__FUNCTION__, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_SSL_PRIVATE_KEY, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_SSL_PRIVATE_KEY);
-    }
+        ezlopi_replace_newline_escape(__pvt_key); // Workaround : Escape Sequence "\n"
+    } 
     return __pvt_key;
 }
 
@@ -508,6 +540,7 @@ char* ezlopi_factory_info_v3_get_ssl_shared_key(void)
     if (NULL == __pub_key)
     {
         __pub_key = ezlopi_factory_info_v3_read_string(__FUNCTION__, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_SSL_SHARED_KEY, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_SSL_SHARED_KEY);
+        ezlopi_replace_newline_escape(__pub_key); // Workaround : Escape Sequence "\n"
     }
     return __pub_key;
 }
@@ -723,6 +756,8 @@ int ezlopi_factory_info_v3_set_ssl_private_key(cJSON * cj_data)
     int ret = 0;
     if (cj_data && cj_data->valuestring && cj_data->str_value_len)
     {
+        cj_data->str_value_len = ezlopi_calculate_certificate_length(cj_data->valuestring, "-----END PRIVATE KEY-----"); // Workaround : cJSON is not giving correct length
+        // TRACE_E("%.*s", cj_data->str_value_len, cj_data->valuestring);
         ret = ezlopi_factory_info_v3_set_4kb(cj_data->valuestring, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_SSL_PRIVATE_KEY, E_EZLOPI_FACTORY_INFO_CONN_DATA), cj_data->str_value_len);
     }
     return ret;
@@ -733,6 +768,8 @@ int ezlopi_factory_info_v3_set_ssl_public_key(cJSON * cj_data)
     int ret = 0;
     if (cj_data && cj_data->valuestring && cj_data->str_value_len)
     {
+        cj_data->str_value_len = ezlopi_calculate_certificate_length(cj_data->valuestring, "-----END PUBLIC KEY-----"); // Workaround : cJSON is not giving correct length
+        // TRACE_E("%.*s", cj_data->str_value_len, cj_data->valuestring);
         ret = ezlopi_factory_info_v3_set_4kb(cj_data->valuestring, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_SSL_SHARED_KEY, E_EZLOPI_FACTORY_INFO_CONN_DATA), cj_data->str_value_len);
     }
     return ret;
@@ -743,6 +780,8 @@ int ezlopi_factory_info_v3_set_ssl_shared_key(cJSON * cj_data)
     int ret = 0;
     if (cj_data && cj_data->valuestring && cj_data->str_value_len)
     {
+        cj_data->str_value_len = ezlopi_calculate_certificate_length(cj_data->valuestring, "-----END CERTIFICATE-----"); // Workaround : cJSON is not giving correct length
+        // TRACE_E("%.*s", cj_data->str_value_len, cj_data->valuestring);
         ret = ezlopi_factory_info_v3_set_4kb(cj_data->valuestring, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_SSL_SHARED_KEY, E_EZLOPI_FACTORY_INFO_CONN_DATA), cj_data->str_value_len);
     }
     return ret;
@@ -753,6 +792,8 @@ int ezlopi_factory_info_v3_set_ca_cert(cJSON * cj_data)
     int ret = 0;
     if (cj_data && cj_data->valuestring && cj_data->str_value_len)
     {
+        cj_data->str_value_len = ezlopi_calculate_certificate_length(cj_data->valuestring, "-----END CERTIFICATE-----"); // Workaround : cJSON is not giving correct length
+        // TRACE_E("%.*s", cj_data->str_value_len, cj_data->valuestring);
         ret = ezlopi_factory_info_v3_set_4kb(cj_data->valuestring, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_CA_CERTIFICATE, E_EZLOPI_FACTORY_INFO_CONN_DATA), cj_data->str_value_len);
     }
     return ret;
