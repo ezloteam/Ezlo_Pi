@@ -2,12 +2,11 @@
 
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
-
 #include <string.h>
 
 #include "ezlopi_core_scenes_v2.h"
 
-void ezlopi_scenes_delete_user_notifications(l_user_notification_v2_t* user_notifications)
+void ezlopi_scenes_delete_user_notifications(l_user_notification_v2_t *user_notifications)
 {
     if (user_notifications)
     {
@@ -17,7 +16,7 @@ void ezlopi_scenes_delete_user_notifications(l_user_notification_v2_t* user_noti
     }
 }
 
-void ezlopi_scenes_delete_house_modes(l_house_modes_v2_t* house_modes)
+void ezlopi_scenes_delete_house_modes(l_house_modes_v2_t *house_modes)
 {
     if (house_modes)
     {
@@ -27,7 +26,7 @@ void ezlopi_scenes_delete_house_modes(l_house_modes_v2_t* house_modes)
     }
 }
 
-void ezlopi_scenes_delete_fields(l_fields_v2_t* fields)
+void ezlopi_scenes_delete_fields(l_fields_v2_t *fields)
 {
     if (fields)
     {
@@ -42,7 +41,7 @@ void ezlopi_scenes_delete_fields(l_fields_v2_t* fields)
     }
 }
 
-void ezlopi_scenes_delete_action_blocks(l_action_block_v2_t* action_blocks)
+void ezlopi_scenes_delete_action_blocks(l_action_block_v2_t *action_blocks)
 {
     if (action_blocks)
     {
@@ -57,7 +56,7 @@ void ezlopi_scenes_delete_action_blocks(l_action_block_v2_t* action_blocks)
     }
 }
 
-void ezlopi_scenes_delete_when_blocks(l_when_block_v2_t* when_blocks)
+void ezlopi_scenes_delete_when_blocks(l_when_block_v2_t *when_blocks)
 {
     if (when_blocks)
     {
@@ -72,7 +71,7 @@ void ezlopi_scenes_delete_when_blocks(l_when_block_v2_t* when_blocks)
     }
 }
 
-void ezlopi_scenes_delete(l_scenes_list_v2_t* scenes_list)
+void ezlopi_scenes_delete(l_scenes_list_v2_t *scenes_list)
 {
     if (scenes_list)
     {
@@ -88,6 +87,12 @@ void ezlopi_scenes_delete(l_scenes_list_v2_t* scenes_list)
             scenes_list->thread_ctx = NULL;
         }
 
+        if (NULL != scenes_list->meta)
+        {
+            cJSON_Delete(__FUNCTION__, scenes_list->meta);
+            scenes_list->meta = NULL;
+        }
+
         ezlopi_scenes_delete(scenes_list->next);
         scenes_list->next = NULL;
         ezlopi_free(__FUNCTION__, scenes_list);
@@ -99,7 +104,7 @@ void ezlopi_scenes_delete(l_scenes_list_v2_t* scenes_list)
 //     ezlopi_scenes_delete(ezlopi_scenes_pop_by_id_v2(_id));
 // }
 
-void ezlopi_scenes_delete_field_value(l_fields_v2_t* field)
+void ezlopi_scenes_delete_field_value(l_fields_v2_t *field)
 {
     switch (field->field_value.e_type)
     {
@@ -156,4 +161,4 @@ void ezlopi_scenes_delete_field_value(l_fields_v2_t* field)
     }
     }
 }
-#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+#endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS

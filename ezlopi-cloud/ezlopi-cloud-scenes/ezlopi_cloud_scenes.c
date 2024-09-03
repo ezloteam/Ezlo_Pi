@@ -534,6 +534,25 @@ void scenes_block_status_reset(cJSON *cj_request, cJSON *cj_response)
     }
 }
 
+void scenes_meta_set(cJSON *cj_request, cJSON *cj_response)
+{
+    cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
+    if (cj_params)
+    {
+        cJSON *cj_meta = cJSON_GetObjectItem(__FUNCTION__, cj_params, "meta");
+        if (cj_meta)
+        {
+            cJSON *cj_scene_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_sceneId_str);
+            if (cj_scene_id && cj_scene_id->valuestring)
+            {
+                uint32_t u_id = strtoul(cj_scene_id->valuestring, NULL, 16);
+               
+                ezlopi_core_scene_meta_by_id(u_id, cj_meta);
+            }
+        }
+    }
+}
+
 void scenes_stop(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str); // For NULL Broadcast
