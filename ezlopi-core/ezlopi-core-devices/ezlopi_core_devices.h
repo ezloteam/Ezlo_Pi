@@ -1,7 +1,7 @@
 #ifndef EZLOPI_CORE_DEVICES_H
 #define EZLOPI_CORE_DEVICES_H
 
-// #include "cjext.h"
+#include "cjext.h"
 
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_actions.h"

@@ -5,7 +5,7 @@
 
 extern const char *ezlopi_ESP32_str;
 extern const char *ezlopi_ESP32S3_str;
-extern const char* ezlopi_ESP32S2_str;
+extern const char *ezlopi_ESP32S2_str;
 extern const char *ezlopi_ESP32C3_str;
 extern const char *ezlopi_ezlopi_str;
 extern const char *ezlopi__str;
@@ -154,11 +154,13 @@ extern const char *ezlopi_gpio_in_str;
 extern const char *ezlopi_dev_detail_str;
 extern const char *ezlopi_id_item_str;
 extern const char *ezlopi_showCode_str;
+extern const char *ezlopi_showValue_str;
 extern const char *ezlopi_deviceName_str;
 extern const char *ezlopi_items_str;
 extern const char *ezlopi_itemName_str;
 extern const char *ezlopi_device_item_names_str;
 extern const char *ezlopi_variable_str;
+extern const char *ezlopi_names_str;
 extern const char *ezlopi_filterTypes_str;
 extern const char *ezlopi_deviceCategory_str;
 extern const char *ezlopi_deviceSubcategory_str;
