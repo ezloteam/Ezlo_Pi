@@ -489,7 +489,7 @@ static char *__base64_decode_provisioning_info(uint32_t total_size)
 
         uint32_t buffer_len = 0;
         decoded_config_json = ezlopi_malloc(__FUNCTION__, total_size);
-        // decoded_config_json = ezlopi_core_buffer_acquire(__FUNCTION__, &buffer_len, 5000);
+        decoded_config_json = ezlopi_core_buffer_acquire(__FUNCTION__, &buffer_len, 5000);
 
         if (decoded_config_json)
         {
