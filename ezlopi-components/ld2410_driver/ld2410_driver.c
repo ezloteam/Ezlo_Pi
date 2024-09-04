@@ -11,9 +11,6 @@
  *
  */
 
-
-#warning " ------------------ DO NOT USE printf ON PRODUCTION ------------------"
-#warning "################### DO NOT USE printf ON PRODUCTION ###################"
 #warning "################### DO NOT USE printf ON PRODUCTION ###################"
 
 #include "ld2410_driver.h"
@@ -318,7 +315,7 @@ static void ld2410_print_frame_()
 	}
 }
 
-#endif 
+#endif
 
 static bool ld2410_parse_data_frame_()
 {
@@ -337,7 +334,7 @@ static bool ld2410_parse_data_frame_()
 		if (radar_data_frame_[6] == 0x01 && radar_data_frame_[7] == 0xAA) // Engineering mode data
 		{
 			target_type_ = radar_data_frame_[8];
-#if 0			
+#if 0
 #ifdef LD2410_DEBUG_PARSE
 			printf("\nEngineering data - ");
 			if (target_type_ == 0x00)
@@ -357,7 +354,7 @@ static bool ld2410_parse_data_frame_()
 				printf("moving & stationary targets:");
 			}
 #endif
-#endif 
+#endif
 
 			/*
 			 *
@@ -374,7 +371,7 @@ static bool ld2410_parse_data_frame_()
 			moving_target_energy_ = radar_data_frame_[11];
 			// stationary_target_distance_ = radar_data_frame_[12] + (radar_data_frame_[13] << 8);
 			moving_target_distance_ = radar_data_frame_[15] + (radar_data_frame_[16] << 8);
-#if 0			
+#if 0
 #ifdef LD2410_DEBUG_PARSE
 			printf("\nNormal data - ");
 			if (target_type_ == 0x00)
@@ -404,24 +401,23 @@ static bool ld2410_parse_data_frame_()
 				// printf(stationary_target_energy_);
 			}
 #endif
-#endif 
+#endif
 			radar_uart_last_packet_ = millis();
 			return true;
 		}
 		else
 		{
-// #ifdef LD2410_DEBUG_DATA
-// 			printf("\nUnknown frame type");
-// ld2410_print_frame_();
-// #endif
-			
+			// #ifdef LD2410_DEBUG_DATA
+			// 			printf("\nUnknown frame type");
+			// ld2410_print_frame_();
+			// #endif
 		}
 	}
 	else
 	{
-// #ifdef LD2410_DEBUG_DATA
-// 		printf("\nFrame length unexpected: %d not %d", radar_data_frame_position_, intra_frame_data_length_ + 10);
-// #endif
+		// #ifdef LD2410_DEBUG_DATA
+		// 		printf("\nFrame length unexpected: %d not %d", radar_data_frame_position_, intra_frame_data_length_ + 10);
+		// #endif
 	}
 	return false;
 }
@@ -429,23 +425,23 @@ static bool ld2410_parse_data_frame_()
 static bool ld2410_parse_command_frame_()
 {
 	uint16_t intra_frame_data_length_ = radar_data_frame_[4] + (radar_data_frame_[5] << 8);
-// #ifdef LD2410_DEBUG_COMMANDS
-// 	ld2410_print_frame_();
-// 	printf("\nACK frame payload: %d bytes", intra_frame_data_length_);
-// #endif
+	// #ifdef LD2410_DEBUG_COMMANDS
+	// 	ld2410_print_frame_();
+	// 	printf("\nACK frame payload: %d bytes", intra_frame_data_length_);
+	// #endif
 	latest_ack_ = radar_data_frame_[6];
 	latest_command_success_ = (radar_data_frame_[8] == 0x00 && radar_data_frame_[9] == 0x00);
 	if (intra_frame_data_length_ == 8 && latest_ack_ == 0xFF)
 	{
-// #ifdef LD2410_DEBUG_COMMANDS
-// 		printf("\nACK for entering configuration mode: ");
-// #endif
+		// #ifdef LD2410_DEBUG_COMMANDS
+		// 		printf("\nACK for entering configuration mode: ");
+		// #endif
 		if (latest_command_success_)
 		{
 			radar_uart_last_packet_ = millis();
-// #ifdef LD2410_DEBUG_COMMANDS
-// 			printf("OK");
-// #endif
+			// #ifdef LD2410_DEBUG_COMMANDS
+			// 			printf("OK");
+			// #endif
 			return true;
 		}
 		else
@@ -456,15 +452,15 @@ static bool ld2410_parse_command_frame_()
 	}
 	else if (intra_frame_data_length_ == 4 && latest_ack_ == 0xFE)
 	{
-// #ifdef LD2410_DEBUG_COMMANDS
-// 		printf("\nACK for leaving configuration mode: ");
-// #endif
+		// #ifdef LD2410_DEBUG_COMMANDS
+		// 		printf("\nACK for leaving configuration mode: ");
+		// #endif
 		if (latest_command_success_)
 		{
 			radar_uart_last_packet_ = millis();
-// #ifdef LD2410_DEBUG_COMMANDS
-// 			printf("OK");
-// #endif
+			// #ifdef LD2410_DEBUG_COMMANDS
+			// 			printf("OK");
+			// #endif
 			return true;
 		}
 		else
@@ -475,15 +471,15 @@ static bool ld2410_parse_command_frame_()
 	}
 	else if (intra_frame_data_length_ == 4 && latest_ack_ == 0x60)
 	{
-// #ifdef LD2410_DEBUG_COMMANDS
-// 		printf("\nACK for setting max values: ");
-// #endif
+		// #ifdef LD2410_DEBUG_COMMANDS
+		// 		printf("\nACK for setting max values: ");
+		// #endif
 		if (latest_command_success_)
 		{
 			radar_uart_last_packet_ = millis();
-// #ifdef LD2410_DEBUG_COMMANDS
-// 			printf("OK");
-// #endif
+			// #ifdef LD2410_DEBUG_COMMANDS
+			// 			printf("OK");
+			// #endif
 			return true;
 		}
 		else
@@ -494,15 +490,15 @@ static bool ld2410_parse_command_frame_()
 	}
 	else if (intra_frame_data_length_ == 28 && latest_ack_ == 0x61)
 	{
-// #ifdef LD2410_DEBUG_COMMANDS
-// 		printf("\nACK for current configuration: ");
-// #endif
+		// #ifdef LD2410_DEBUG_COMMANDS
+		// 		printf("\nACK for current configuration: ");
+		// #endif
 		if (latest_command_success_)
 		{
 			radar_uart_last_packet_ = millis();
-// #ifdef LD2410_DEBUG_COMMANDS
-// 			printf("OK");
-// #endif
+			// #ifdef LD2410_DEBUG_COMMANDS
+			// 			printf("OK");
+			// #endif
 			max_gate = radar_data_frame_[11];
 			max_moving_gate = radar_data_frame_[12];
 			max_stationary_gate = radar_data_frame_[13];
@@ -526,7 +522,7 @@ static bool ld2410_parse_command_frame_()
 			stationary_sensitivity[8] = radar_data_frame_[31];
 			sensor_idle_time = radar_data_frame_[32];
 			sensor_idle_time += (radar_data_frame_[33] << 8);
-#if 0			
+#if 0
 #ifdef LD2410_DEBUG_COMMANDS
 			printf("\nMax gate distance: %d", max_gate);
 			printf("\nMax motion detecting gate distance: %d", max_moving_gate);
@@ -552,15 +548,15 @@ static bool ld2410_parse_command_frame_()
 	}
 	else if (intra_frame_data_length_ == 4 && latest_ack_ == 0x64)
 	{
-// #ifdef LD2410_DEBUG_COMMANDS
-// 		printf("\nACK for setting sensitivity values: ");
-// #endif
+		// #ifdef LD2410_DEBUG_COMMANDS
+		// 		printf("\nACK for setting sensitivity values: ");
+		// #endif
 		if (latest_command_success_)
 		{
 			radar_uart_last_packet_ = millis();
-// #ifdef LD2410_DEBUG_COMMANDS
-// 			printf("OK");
-// #endif
+			// #ifdef LD2410_DEBUG_COMMANDS
+			// 			printf("OK");
+			// #endif
 			return true;
 		}
 		else
@@ -571,9 +567,9 @@ static bool ld2410_parse_command_frame_()
 	}
 	else if (intra_frame_data_length_ == 12 && latest_ack_ == 0xA0)
 	{
-// #ifdef LD2410_DEBUG_COMMANDS
-// 		printf("\nACK for firmware version: ");
-// #endif
+		// #ifdef LD2410_DEBUG_COMMANDS
+		// 		printf("\nACK for firmware version: ");
+		// #endif
 		if (latest_command_success_)
 		{
 			firmware_major_version = radar_data_frame_[13];
@@ -583,9 +579,9 @@ static bool ld2410_parse_command_frame_()
 			firmware_bugfix_version += radar_data_frame_[16] << 16;
 			firmware_bugfix_version += radar_data_frame_[17] << 24;
 			radar_uart_last_packet_ = millis();
-// #ifdef LD2410_DEBUG_COMMANDS
-// 			printf("OK");
-// #endif
+			// #ifdef LD2410_DEBUG_COMMANDS
+			// 			printf("OK");
+			// #endif
 			return true;
 		}
 		else
@@ -596,15 +592,15 @@ static bool ld2410_parse_command_frame_()
 	}
 	else if (intra_frame_data_length_ == 4 && latest_ack_ == 0xA2)
 	{
-// #ifdef LD2410_DEBUG_COMMANDS
-// 		printf("\nACK for factory reset: ");
-// #endif
+		// #ifdef LD2410_DEBUG_COMMANDS
+		// 		printf("\nACK for factory reset: ");
+		// #endif
 		if (latest_command_success_)
 		{
 			radar_uart_last_packet_ = millis();
-// #ifdef LD2410_DEBUG_COMMANDS
-// 			printf("OK");
-// #endif
+			// #ifdef LD2410_DEBUG_COMMANDS
+			// 			printf("OK");
+			// #endif
 			return true;
 		}
 		else
@@ -615,15 +611,15 @@ static bool ld2410_parse_command_frame_()
 	}
 	else if (intra_frame_data_length_ == 4 && latest_ack_ == 0xA3)
 	{
-// #ifdef LD2410_DEBUG_COMMANDS
-// 		printf("\nACK for restart: ");
-// #endif
+		// #ifdef LD2410_DEBUG_COMMANDS
+		// 		printf("\nACK for restart: ");
+		// #endif
 		if (latest_command_success_)
 		{
 			radar_uart_last_packet_ = millis();
-// #ifdef LD2410_DEBUG_COMMANDS
-// 			printf("OK");
-// #endif
+			// #ifdef LD2410_DEBUG_COMMANDS
+			// 			printf("OK");
+			// #endif
 			return true;
 		}
 		else
@@ -634,9 +630,9 @@ static bool ld2410_parse_command_frame_()
 	}
 	else
 	{
-// #ifdef LD2410_DEBUG_COMMANDS
-// 		printf("\nUnknown ACK");
-// #endif
+		// #ifdef LD2410_DEBUG_COMMANDS
+		// 		printf("\nUnknown ACK");
+		// #endif
 	}
 	return false;
 }

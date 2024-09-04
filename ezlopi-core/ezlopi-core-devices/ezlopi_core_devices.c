@@ -29,6 +29,7 @@ static void ezlopi_device_free_item(l_ezlopi_item_t *items);
 static void ezlopi_device_free_setting(l_ezlopi_device_settings_v3_t *settings);
 static void ezlopi_device_free_all_device_setting(l_ezlopi_device_t *curr_device);
 
+#if 0
 static void __factory_info_device_update(cJSON *cj_device_config)
 {
     char *updated_device_config = cJSON_PrintBuffered(__FUNCTION__, cj_device_config, 4 * 1024, false);
@@ -53,7 +54,6 @@ static void __factory_info_device_update(cJSON *cj_device_config)
         ezlopi_free(__FUNCTION__, updated_device_config);
     }
 }
-
 static void __factory_info_update_property_by_cjson(l_ezlopi_device_t *device_node, cJSON *new_prop)
 {
     if (device_node && new_prop && new_prop->string)
@@ -96,109 +96,270 @@ static void __factory_info_update_property_by_cjson(l_ezlopi_device_t *device_no
         }
     }
 }
+#endif
+//-------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------
+static int ____store_bool_in_nvs_dev_mod_info(uint32_t nvs_device_id, const char *string_key, bool bool_value)
+{
+    int ret = 0;
+    char __device_id_str[32];
+    snprintf(__device_id_str, sizeof(__device_id_str), "%08x", nvs_device_id); // convert (uint32_t) to ('0x1002e001')
 
-static int ____store_new_dev_mod_name_in_nvs(uint32_t device_id, const char *new_dev_name) // this should contain new modificaton data for '_id'
+    char *device_mod_str = ezlopi_nvs_read_str(__device_id_str);
+    if (device_mod_str)
+    {
+        cJSON *cj_target_dev_mod = cJSON_Parse(__FUNCTION__, device_mod_str);
+        if (cj_target_dev_mod)
+        {
+            // CJSON_TRACE("Prev_dev_mod:", cj_target_dev_mod);
+
+            cJSON *cj_get_dev_name = cJSON_GetObjectItem(__FUNCTION__, cj_target_dev_mod, string_key);
+            if (cj_get_dev_name)
+            {
+                cJSON_DeleteItemFromObject(__FUNCTION__, cj_target_dev_mod, string_key); // delete the old info
+            }
+
+            cJSON_AddBoolToObject(__FUNCTION__, cj_target_dev_mod, string_key, bool_value); // add the new info
+
+            CJSON_TRACE("new_dev_mod:", cj_target_dev_mod);
+
+            // Now update the 'nvs_dev_id'
+            char *updated_target_dev_mod_str = cJSON_PrintBuffered(__FUNCTION__, cj_target_dev_mod, 1024, false);
+            TRACE_D("length of 'updated_target_dev_mod_str': %d", strlen(updated_target_dev_mod_str));
+
+            if (updated_target_dev_mod_str)
+            {
+                if (ezlopi_nvs_write_str(updated_target_dev_mod_str, strlen(updated_target_dev_mod_str), (const char *)__device_id_str))
+                {
+                    TRACE_S("Device_modification info updated.");
+                    ret = 1;
+                }
+                else
+                {
+                    TRACE_E("Device_modification info update failed!");
+                }
+
+                ezlopi_free(__FUNCTION__, updated_target_dev_mod_str);
+            }
+
+            cJSON_Delete(__FUNCTION__, cj_target_dev_mod);
+        }
+
+        ezlopi_free(__FUNCTION__, device_mod_str);
+    }
+    else
+    {
+        // create 'new_dev_mod' cjson and store info into nvs
+        cJSON *cj_new_dev_mod = cJSON_CreateObject(__FUNCTION__);
+        if (cj_new_dev_mod)
+        {
+            cJSON_AddBoolToObject(__FUNCTION__, cj_new_dev_mod, string_key, bool_value); // add the new info
+            CJSON_TRACE("new_dev_mod:", cj_new_dev_mod);
+
+            char *new_dev_mod_str = cJSON_PrintBuffered(__FUNCTION__, cj_new_dev_mod, 1024, false);
+            TRACE_D("length of 'new_dev_mod_str': %d", strlen(new_dev_mod_str));
+
+            if (new_dev_mod_str)
+            {
+                if (ezlopi_nvs_write_str(new_dev_mod_str, strlen(new_dev_mod_str), (const char *)__device_id_str))
+                {
+                    TRACE_S("New Device_modification info stored.");
+                    ret = 1;
+                }
+                else
+                {
+                    TRACE_E("New Device_modification info store failed!");
+                }
+
+                ezlopi_free(__FUNCTION__, new_dev_mod_str);
+            }
+
+            cJSON_Delete(__FUNCTION__, cj_new_dev_mod);
+        }
+    }
+    return ret;
+}
+static int ____store_string_in_nvs_dev_mod_info(uint32_t nvs_device_id, const char *string_key, const char *string_value)
+{
+    int ret = 0;
+    char __device_id_str[32];
+    snprintf(__device_id_str, sizeof(__device_id_str), "%08x", nvs_device_id); // convert (uint32_t) to ('0x1002e001')
+
+    char *device_mod_str = ezlopi_nvs_read_str(__device_id_str);
+    if (device_mod_str)
+    {
+        cJSON *cj_target_dev_mod = cJSON_Parse(__FUNCTION__, device_mod_str);
+        if (cj_target_dev_mod)
+        {
+            // CJSON_TRACE("Prev_dev_mod:", cj_target_dev_mod);
+
+            cJSON *cj_get_dev_name = cJSON_GetObjectItem(__FUNCTION__, cj_target_dev_mod, string_key);
+            if (cj_get_dev_name)
+            {
+                cJSON_DeleteItemFromObject(__FUNCTION__, cj_target_dev_mod, string_key); // delete the old info
+            }
+
+            cJSON_AddStringToObject(__FUNCTION__, cj_target_dev_mod, string_key, string_value); // add the new info
+
+            CJSON_TRACE("new_dev_mod:", cj_target_dev_mod);
+
+            // Now update the 'nvs_dev_id'
+            char *updated_target_dev_mod_str = cJSON_PrintBuffered(__FUNCTION__, cj_target_dev_mod, 1024, false);
+            TRACE_D("length of 'updated_target_dev_mod_str': %d", strlen(updated_target_dev_mod_str));
+
+            if (updated_target_dev_mod_str)
+            {
+                if (ezlopi_nvs_write_str(updated_target_dev_mod_str, strlen(updated_target_dev_mod_str), (const char *)__device_id_str))
+                {
+                    TRACE_S("Device_modification info updated.");
+                    ret = 1;
+                }
+                else
+                {
+                    TRACE_E("Device_modification info update failed!");
+                }
+
+                ezlopi_free(__FUNCTION__, updated_target_dev_mod_str);
+            }
+
+            cJSON_Delete(__FUNCTION__, cj_target_dev_mod);
+        }
+
+        ezlopi_free(__FUNCTION__, device_mod_str);
+    }
+    else
+    {
+        // create 'new_dev_mod' cjson and store info into nvs
+        cJSON *cj_new_dev_mod = cJSON_CreateObject(__FUNCTION__);
+        if (cj_new_dev_mod)
+        {
+            cJSON_AddStringToObject(__FUNCTION__, cj_new_dev_mod, string_key, string_value);
+
+            CJSON_TRACE("new_dev_mod:", cj_new_dev_mod);
+
+            char *new_dev_mod_str = cJSON_PrintBuffered(__FUNCTION__, cj_new_dev_mod, 1024, false);
+            TRACE_D("length of 'new_dev_mod_str': %d", strlen(new_dev_mod_str));
+
+            if (new_dev_mod_str)
+            {
+                if (ezlopi_nvs_write_str(new_dev_mod_str, strlen(new_dev_mod_str), (const char *)__device_id_str))
+                {
+                    TRACE_S("New Device_modification info stored.");
+                    ret = 1;
+                }
+                else
+                {
+                    TRACE_E("New Device_modification info store failed!");
+                }
+
+                ezlopi_free(__FUNCTION__, new_dev_mod_str);
+            }
+
+            cJSON_Delete(__FUNCTION__, cj_new_dev_mod);
+        }
+    }
+    return ret;
+}
+//-------------------------------------------------------------------------------------------------------
+static int ____store_dev_mod_room_id_in_nvs(uint32_t device_id, const char *new_room_id_str) // this should contain new modificaton data for '_id'
+{
+    int ret = 0;
+    if ((0 < device_id) && new_room_id_str)
+    {
+        ret = ____store_string_in_nvs_dev_mod_info(device_id, "dev_mod_room_id", new_room_id_str); //  { "dev_mod_xx" : "...new_room_id..." }
+    }
+    return ret;
+}
+static int ____store_dev_mod_parent_room_flag_in_nvs(uint32_t device_id, bool parent_room_flag) // this should contain new modificaton data for '_id'
+{
+    int ret = 0;
+    if (0 < device_id)
+    {
+        ret = ____store_bool_in_nvs_dev_mod_info(device_id, "dev_mod_parent_room", parent_room_flag); //  { "dev_mod_xx" : "...new_room_id..." }
+    }
+    return ret;
+}
+
+static void __change_room_id_in_device_ll_and_nvs(l_ezlopi_device_t *curr_node, uint32_t compare_parent_id, const char *room_id_str, cJSON *cj_separate_child_devices)
+{
+    if (curr_node && compare_parent_id && room_id_str)
+    {
+        if ((NULL != curr_node->next) && (curr_node->next->cloud_properties.parent_device_id == compare_parent_id))
+        {
+            __change_room_id_in_device_ll_and_nvs(curr_node->next, compare_parent_id, room_id_str, cj_separate_child_devices);
+        }
+
+        // assign same 'room_id' to 'child_device_node' as jn 'parent_device_node'
+        if (cj_separate_child_devices)
+        {
+            bool change_to_new_room_id = true;
+            int idx = 0;
+            cJSON *cj_separate_child = NULL;
+            while (NULL != (cj_separate_child = cJSON_GetArrayItem(cj_separate_child_devices, idx))) // ["102ea001" , "102ea002" ...]
+            {
+                uint32_t _id_to_avoid = strtoul(cj_separate_child->valuestring, NULL, 16);
+                if (_id_to_avoid == curr_node->cloud_properties.device_id)
+                {
+                    change_to_new_room_id = false; // 'child_node_device_id' should not be listed in 'cj_separate_child_devices'
+                    break;
+                }
+                idx++;
+            }
+
+            if (!change_to_new_room_id)
+            {
+                if (true == curr_node->cloud_properties.parent_room)
+                {
+                    curr_node->cloud_properties.parent_room = false; // child_node is id
+                    ____store_dev_mod_parent_room_flag_in_nvs(curr_node->cloud_properties.device_id, curr_node->cloud_properties.parent_room);
+                }
+            }
+            else
+            {
+                curr_node->cloud_properties.room_id = strtoul(room_id_str, NULL, 16);                 // modify in ll
+                ____store_dev_mod_room_id_in_nvs(curr_node->cloud_properties.device_id, room_id_str); // modify in nvs
+
+                if (false == curr_node->cloud_properties.parent_room)
+                {
+                    curr_node->cloud_properties.parent_room = true;
+                    ____store_dev_mod_parent_room_flag_in_nvs(curr_node->cloud_properties.device_id, curr_node->cloud_properties.parent_room);
+                }
+            }
+        }
+        else
+        {
+            curr_node->cloud_properties.room_id = strtoul(room_id_str, NULL, 16);                 // modify in ll
+            ____store_dev_mod_room_id_in_nvs(curr_node->cloud_properties.device_id, room_id_str); // modify in nvs
+
+            if (false == curr_node->cloud_properties.parent_room)
+            {
+                curr_node->cloud_properties.parent_room = true;
+                ____store_dev_mod_parent_room_flag_in_nvs(curr_node->cloud_properties.device_id, curr_node->cloud_properties.parent_room);
+            }
+        }
+    }
+}
+
+//-------------------------------------------------------------------------------------------------------
+static int __modify_dev_mod_name_in_nvs(uint32_t device_id, const char *new_dev_name) // this should contain new modificaton data for '_id'
 {
     int ret = 0;
     if ((0 < device_id) && new_dev_name)
     {
-        char __device_id_str[32];
-        snprintf(__device_id_str, sizeof(__device_id_str), "%08x", device_id); // convert (uint32_t) to ('0x1002e001')
-
-        char *device_mod_str = ezlopi_nvs_read_str(__device_id_str);
-        if (device_mod_str)
-        {
-            cJSON *cj_target_dev_mod = cJSON_Parse(__FUNCTION__, device_mod_str);
-            if (cj_target_dev_mod)
-            {
-                CJSON_TRACE("Prev_dev_mod:", cj_target_dev_mod);
-
-                cJSON *cj_get_dev_name = cJSON_GetObjectItem(__FUNCTION__, cj_target_dev_mod, "dev_mod_name");
-                if (cj_get_dev_name)
-                {
-                    cJSON_DeleteItemFromObject(__FUNCTION__, cj_target_dev_mod, "dev_mod_name"); // delete the old info
-                }
-
-                cJSON_AddStringToObject(__FUNCTION__, cj_target_dev_mod, "dev_mod_name", new_dev_name); // add the new info
-
-                CJSON_TRACE("new_dev_mod:", cj_target_dev_mod);
-
-                // Now update the 'nvs_dev_id'
-                char *updated_target_dev_mod_str = cJSON_PrintBuffered(__FUNCTION__, cj_target_dev_mod, 1024, false);
-                TRACE_D("length of 'updated_target_dev_mod_str': %d", strlen(updated_target_dev_mod_str));
-
-                if (updated_target_dev_mod_str)
-                {
-                    if (ezlopi_nvs_write_str(updated_target_dev_mod_str, strlen(updated_target_dev_mod_str), (const char *)__device_id_str))
-                    {
-                        TRACE_S("Device_modification info updated.");
-                        ret = 1;
-                    }
-                    else
-                    {
-                        TRACE_E("Device_modification info update failed!");
-                    }
-
-                    ezlopi_free(__FUNCTION__, updated_target_dev_mod_str);
-                }
-
-                cJSON_Delete(__FUNCTION__, cj_target_dev_mod);
-            }
-
-            ezlopi_free(__FUNCTION__, device_mod_str);
-        }
-        else
-        {
-            // create 'new_dev_mod' cjson and store info into nvs
-            cJSON *cj_new_dev_mod = cJSON_CreateObject(__FUNCTION__);
-            if (cj_new_dev_mod)
-            {
-                cJSON_AddStringToObject(__FUNCTION__, cj_new_dev_mod, "dev_mod_name", new_dev_name);
-
-                CJSON_TRACE("new_dev_mod:", cj_new_dev_mod);
-
-                char *new_dev_mod_str = cJSON_PrintBuffered(__FUNCTION__, cj_new_dev_mod, 1024, false);
-                TRACE_D("length of 'new_dev_mod_str': %d", strlen(new_dev_mod_str));
-
-                if (new_dev_mod_str)
-                {
-                    if (ezlopi_nvs_write_str(new_dev_mod_str, strlen(new_dev_mod_str), (const char *)__device_id_str))
-                    {
-                        TRACE_S("New Device_modification info stored.");
-                        ret = 1;
-                    }
-                    else
-                    {
-                        TRACE_E("New Device_modification info store failed!");
-                    }
-
-                    ezlopi_free(__FUNCTION__, new_dev_mod_str);
-                }
-
-                cJSON_Delete(__FUNCTION__, cj_new_dev_mod);
-            }
-        }
+        ret = ____store_string_in_nvs_dev_mod_info(device_id, "dev_mod_name", new_dev_name); //  { "dev_mod_name" : "...new_dev_name..." }
     }
-
     return ret;
 }
-
 void ezlopi_device_name_set_by_device_id(uint32_t a_device_id, const char *new_dev_name)
 {
     if (a_device_id && new_dev_name)
     {
-        l_ezlopi_device_t *l_device_node = l_device_head;
-        while (l_device_node)
+        l_ezlopi_device_t *device_to_change = ezlopi_device_get_by_id(a_device_id);
+        if (device_to_change)
         {
-            if (a_device_id == l_device_node->cloud_properties.device_id)
-            {
-                snprintf(l_device_node->cloud_properties.device_name, sizeof(l_device_node->cloud_properties.device_name), "%s", new_dev_name);
-                ____store_new_dev_mod_name_in_nvs(a_device_id, new_dev_name);
-                break;
-            }
-            l_device_node = l_device_node->next;
+            snprintf(device_to_change->cloud_properties.device_name, sizeof(device_to_change->cloud_properties.device_name), "%s", new_dev_name);
+            __modify_dev_mod_name_in_nvs(a_device_id, new_dev_name);
         }
-
 #if 0
         // char *device_config_str = ezlopi_factory_info_v3_get_ezlopi_config();
         // if (device_config_str)
@@ -256,7 +417,7 @@ void ezlopi_device_name_set_by_device_id(uint32_t a_device_id, const char *new_d
 #endif
     }
 }
-
+//-------------------------------------------------------------------------------------------------------
 void ezlopi_device_set_reset_device_armed_status(uint32_t device_id, bool armed)
 {
     if (device_id)
@@ -270,16 +431,28 @@ void ezlopi_device_set_reset_device_armed_status(uint32_t device_id, bool armed)
     }
 }
 
-void ezlopi_device_set_device_room_id(uint32_t device_id, cJSON *cj_room_id)
+void ezlopi_device_set_device_room_id(uint32_t device_id, const char *room_id_str, cJSON *cj_separate_child_devices)
 {
-    if (device_id && cj_room_id && cj_room_id->valuestring)
+    if (device_id && room_id_str)
     {
         l_ezlopi_device_t *device_to_change = ezlopi_device_get_by_id(device_id);
         if (device_to_change)
         {
-            device_to_change->cloud_properties.room_id = strtoul(cj_room_id->valuestring, NULL, 16);
-            TRACE_D("ROOM-ID: %08X", device_to_change->cloud_properties.room_id);
-            __factory_info_update_property_by_cjson(device_to_change, cj_room_id);
+            if ((NULL != device_to_change->next) &&
+                (device_to_change->cloud_properties.device_id == device_to_change->next->cloud_properties.parent_device_id) &&
+                (0 == device_to_change->cloud_properties.parent_device_id))
+            { // if 'device_id' is parent
+                TRACE_W("PARENT_TREE_ID: [%#x]", device_to_change->cloud_properties.device_id);
+                __change_room_id_in_device_ll_and_nvs(device_to_change, device_to_change->cloud_properties.device_id, room_id_str, cj_separate_child_devices);
+            }
+            else
+            { // if 'device_id' is child
+                device_to_change->cloud_properties.room_id = strtoul(room_id_str, NULL, 16);
+                ____store_dev_mod_room_id_in_nvs(device_to_change->cloud_properties.device_id, room_id_str);
+
+                device_to_change->cloud_properties.parent_room = false;
+                ____store_dev_mod_parent_room_flag_in_nvs(device_to_change->cloud_properties.device_id, device_to_change->cloud_properties.parent_room);
+            }
         }
     }
 }
@@ -349,7 +522,28 @@ l_ezlopi_device_t *ezlopi_device_add_device(cJSON *cj_device, const char *last_n
             TRACE_D("Device Id (after): %08x", new_device->cloud_properties.device_id);
         }
 
-        // 2. Check for modified names , stored in nvs. If not ; procced as usual.
+        // 2. Add default Values
+        {
+            // A. Populate Device_name
+            CJSON_GET_VALUE_STRING_BY_COPY(cj_device, ezlopi_dev_name_str, tmp_device_name);
+            if (NULL != last_name)
+            {
+                snprintf(new_device->cloud_properties.device_name, sizeof(new_device->cloud_properties.device_name), "%s_%s", tmp_device_name, last_name);
+            }
+            else
+            {
+                snprintf(new_device->cloud_properties.device_name, sizeof(new_device->cloud_properties.device_name), "%s", tmp_device_name);
+            }
+
+            // B. Populate 'room_id' & 'parent_room' flag
+            new_device->cloud_properties.room_id = 0;
+            new_device->cloud_properties.parent_room = true;
+
+            // C. Populate 'Security config link.'
+            snprintf(new_device->cloud_properties.protect_config, sizeof(new_device->cloud_properties.protect_config), "%s", ezlopi_default_str);
+        }
+
+        // 3. Check for modified info , stored in nvs. If not ; procced as usual.
         {
             char __device_id_str[32];
             snprintf(__device_id_str, sizeof(__device_id_str), "%08x", new_device->cloud_properties.device_id); // convert (uint32_t) to ('0x1002e001')
@@ -360,23 +554,29 @@ l_ezlopi_device_t *ezlopi_device_add_device(cJSON *cj_device, const char *last_n
                 cJSON *cj_target_dev_mod = cJSON_Parse(__FUNCTION__, device_mod_str);
                 if (cj_target_dev_mod)
                 {
-                    // check for "dev_mod_name" in ('0x1002e001') ---> use the modified name
-                    cJSON *cj_get_dev_name = cJSON_GetObjectItem(__FUNCTION__, cj_target_dev_mod, "dev_mod_name"); // {key--> "dev_mod_name" : value--> "..."}
-                    if (cj_get_dev_name && cj_get_dev_name->valuestring && cj_get_dev_name->str_value_len)
+                    // A. check for "dev_mod_name" in ('0x1002e001') ---> use the modified name
+                    cJSON *cj_name = cJSON_GetObjectItem(__FUNCTION__, cj_target_dev_mod, "dev_mod_name");
+                    if (cj_name && cj_name->valuestring && cj_name->str_value_len)
                     {
-                        snprintf(new_device->cloud_properties.device_name, sizeof(new_device->cloud_properties.device_name), "%s", cj_get_dev_name->valuestring);
+                        if (0 < strlen(new_device->cloud_properties.device_name))
+                        {
+                            memset(new_device->cloud_properties.device_name, 0, sizeof(new_device->cloud_properties.device_name));
+                        }
+                        snprintf(new_device->cloud_properties.device_name, sizeof(new_device->cloud_properties.device_name), "%s", cj_name->valuestring);
                     }
-                    else
-                    { // if ('0x1002e001') info  doesnot have ---> "dev_mod_name" string;    Then proceed as usual.
-                        CJSON_GET_VALUE_STRING_BY_COPY(cj_device, ezlopi_dev_name_str, tmp_device_name);
-                        if (NULL != last_name)
-                        {
-                            snprintf(new_device->cloud_properties.device_name, sizeof(new_device->cloud_properties.device_name), "%s_%s", tmp_device_name, last_name);
-                        }
-                        else
-                        {
-                            snprintf(new_device->cloud_properties.device_name, sizeof(new_device->cloud_properties.device_name), "%s", tmp_device_name);
-                        }
+
+                    // B. check for "dev_mod_room_id" in ('0x1002e001') ---> use the modified room_id
+                    cJSON *cj_room_id = cJSON_GetObjectItem(__FUNCTION__, cj_target_dev_mod, "dev_mod_room_id");
+                    if (cj_room_id && cj_room_id->valuestring && cj_room_id->str_value_len)
+                    {
+                        new_device->cloud_properties.room_id = strtoul(cj_room_id->valuestring, NULL, 16);
+                    }
+
+                    // C. Check for 'dev_mod_parent_room_flag'
+                    cJSON *cj_parent_room_flag = cJSON_GetObjectItem(__FUNCTION__, cj_target_dev_mod, "dev_mod_parent_room");
+                    if (cj_parent_room_flag && cJSON_IsBool(cj_parent_room_flag))
+                    {
+                        new_device->cloud_properties.parent_room = (cJSON_False == cj_parent_room_flag->type) ? false : true;
                     }
 
                     cJSON_Delete(__FUNCTION__, cj_target_dev_mod);
@@ -384,21 +584,14 @@ l_ezlopi_device_t *ezlopi_device_add_device(cJSON *cj_device, const char *last_n
 
                 ezlopi_free(__FUNCTION__, device_mod_str);
             }
-            else
-            {
-                CJSON_GET_VALUE_STRING_BY_COPY(cj_device, ezlopi_dev_name_str, tmp_device_name);
-                if (NULL != last_name)
-                {
-                    snprintf(new_device->cloud_properties.device_name, sizeof(new_device->cloud_properties.device_name), "%s_%s", tmp_device_name, last_name);
-                }
-                else
-                {
-                    snprintf(new_device->cloud_properties.device_name, sizeof(new_device->cloud_properties.device_name), "%s", tmp_device_name);
-                }
-            }
-            TRACE_D("Device name: %s", new_device->cloud_properties.device_name);
         }
 
+        TRACE_D("Device name: %s", new_device->cloud_properties.device_name);
+        TRACE_D("Device_room_id: %08x", new_device->cloud_properties.room_id);
+        TRACE_D("Device parentRoom: %d", new_device->cloud_properties.parent_room);
+        // TRACE_D("Device protectConfig: %s", new_device->cloud_properties.protect_config);
+
+        // 4. Add the "NODE" to ll
         if (NULL == l_device_head)
         {
             l_device_head = new_device;
@@ -412,12 +605,6 @@ l_ezlopi_device_t *ezlopi_device_add_device(cJSON *cj_device, const char *last_n
             }
 
             curr_device->next = new_device;
-        }
-
-        cJSON *cj_roomId = cJSON_GetObjectItem(__FUNCTION__, cj_device, ezlopi_roomId_str);
-        if (cj_roomId && cj_roomId->valuestring)
-        {
-            new_device->cloud_properties.room_id = strtoul(cj_roomId->valuestring, NULL, 16);
         }
     }
 
@@ -465,8 +652,8 @@ void ezlopi_device_free_device(l_ezlopi_device_t *device)
     if (device && l_device_head)
     {
         if ((NULL != device->next) &&
-            device->cloud_properties.device_id == device->next->cloud_properties.parent_device_id &&
-            device->cloud_properties.parent_device_id == 0)
+            (device->cloud_properties.device_id == device->next->cloud_properties.parent_device_id) &&
+            (0 == device->cloud_properties.parent_device_id))
         {
             TRACE_W("PARENT_TREE_ID: [%#x]", device->cloud_properties.device_id);
 
@@ -1071,7 +1258,11 @@ cJSON *ezlopi_device_create_device_table_from_prop(l_ezlopi_device_t *device_pro
             cJSON_AddStringToObject(__FUNCTION__, cj_device, ezlopi_security_str, ezlopi_no_str);
             cJSON_AddBoolToObject(__FUNCTION__, cj_device, ezlopi_ready_str, true);
             cJSON_AddStringToObject(__FUNCTION__, cj_device, ezlopi_status_str, ezlopi_idle_str);
-
+            cJSON_AddBoolToObject(__FUNCTION__, cj_device, ezlopi_parent_room_str, device_prop->cloud_properties.parent_room);
+            if (device_prop->cloud_properties.protect_config && (strlen(device_prop->cloud_properties.protect_config) > 0))
+            {
+                cJSON_AddStringToObject(__FUNCTION__, cj_device, ezlopi_protect_config_str, device_prop->cloud_properties.protect_config);
+            }
             if (NULL != device_prop->cloud_properties.info)
             {
                 cJSON_AddItemReferenceToObject(__FUNCTION__, cj_device, ezlopi_info_str, device_prop->cloud_properties.info);
