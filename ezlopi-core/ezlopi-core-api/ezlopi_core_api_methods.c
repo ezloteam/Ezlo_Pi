@@ -22,6 +22,7 @@
 #include "ezlopi_cloud_status.h"
 #include "ezlopi_cloud_log.h"
 #include "ezlopi_cloud_setting_commands.h"
+#include "ezlopi_cloud_hub_data_list.h"
 
 
 #include "ezlopi_core_reset.h"
