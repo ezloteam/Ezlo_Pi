@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "cjext.h"
+// #include "cjext.h"
 #include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_room.h"

@@ -121,10 +121,11 @@ static void __connection_upcall(bool connected)
 
 static void __fetch_wss_endpoint(void *pv)
 {
-    char *cloud_server = ezlopi_factory_info_v3_get_cloud_server();
+
     char *ca_certificate = ezlopi_factory_info_v3_get_ca_certificate();
     char *ssl_shared_key = ezlopi_factory_info_v3_get_ssl_shared_key();
     char *ssl_private_key = ezlopi_factory_info_v3_get_ssl_private_key();
+    char *cloud_server = ezlopi_factory_info_v3_get_cloud_server();
 
     ezlopi_wait_for_wifi_to_connect(portMAX_DELAY);
     vTaskDelay(2);
@@ -135,41 +136,44 @@ static void __fetch_wss_endpoint(void *pv)
         // ulTaskNotifyTake(pdFALSE, portMAX_DELAY);
         // vTaskDelay(100 / portTICK_RATE_MS);
 
-        char http_request[128];
-        snprintf(http_request, sizeof(http_request), "%s?json=true", cloud_server);
-        TRACE_D("http_request: %s", http_request);
-
-        s_ezlopi_http_data_t *ws_endpoint = ezlopi_http_get_request(http_request, ssl_private_key, ssl_shared_key, ca_certificate);
-        // s_ezlopi_http_data_t * ws_endpoint = ezlopi_http_get_request(http_request, NULL, NULL, NULL);
-
-        if (ws_endpoint)
+        if (ca_certificate && ssl_shared_key && ssl_private_key && cloud_server)
         {
-            if (ws_endpoint->response)
+            char http_request[128];
+            snprintf(http_request, sizeof(http_request), "%s?json=true", cloud_server);
+            TRACE_D("http_request: %s", http_request);
+
+            s_ezlopi_http_data_t *ws_endpoint = ezlopi_http_get_request(http_request, ssl_private_key, ssl_shared_key, ca_certificate);
+            // s_ezlopi_http_data_t * ws_endpoint = ezlopi_http_get_request(http_request, NULL, NULL, NULL);
+
+            if (ws_endpoint)
             {
-                TRACE_D("ws_endpoint: %s", ws_endpoint->response); // {"uri": "wss://endpoint:port"}
-                cJSON *root = cJSON_Parse(__FUNCTION__, ws_endpoint->response);
-                if (root)
+                if (ws_endpoint->response)
                 {
-                    cJSON *cjson_uri = cJSON_GetObjectItem(__FUNCTION__, root, "uri");
-                    if (cjson_uri)
+                    TRACE_D("ws_endpoint: %s", ws_endpoint->response); // {"uri": "wss://endpoint:port"}
+                    cJSON *root = cJSON_Parse(__FUNCTION__, ws_endpoint->response);
+                    if (root)
                     {
-                        TRACE_D("uri: %s", cjson_uri->valuestring ? cjson_uri->valuestring : "NULL");
-                        ezlopi_core_broadcast_method_add(__send_str_data_to_nma_websocket, "nma-websocket", 4);
+                        cJSON *cjson_uri = cJSON_GetObjectItem(__FUNCTION__, root, "uri");
+                        if (cjson_uri)
+                        {
+                            TRACE_D("uri: %s", cjson_uri->valuestring ? cjson_uri->valuestring : "NULL");
+                            ezlopi_core_broadcast_method_add(__send_str_data_to_nma_websocket, "nma-websocket", 4);
 #if (1 == EZPI_CORE_WSS_USE_WSC_LIB)
-                        __wsc_ssl = ezlopi_core_wsc_init(cjson_uri, __message_upcall, __connection_upcall);
+                            __wsc_ssl = ezlopi_core_wsc_init(cjson_uri, __message_upcall, __connection_upcall);
 #else  // EZPI_CORE_WSS_USE_WSC_LIB
-                        ezlopi_websocket_client_init(cjson_uri, __message_upcall, __connection_upcall);
+                            ezlopi_websocket_client_init(cjson_uri, __message_upcall, __connection_upcall);
 #endif // EZPI_CORE_WSS_USE_WSC_LIB
-                        task_complete = 1;
+                            task_complete = 1;
+                        }
+
+                        cJSON_Delete(__FUNCTION__, root);
                     }
 
-                    cJSON_Delete(__FUNCTION__, root);
+                    ezlopi_free(__FUNCTION__, ws_endpoint->response);
                 }
 
-                ezlopi_free(__FUNCTION__, ws_endpoint->response);
+                ezlopi_free(__FUNCTION__, ws_endpoint);
             }
-
-            ezlopi_free(__FUNCTION__, ws_endpoint);
         }
 
         if (task_complete)

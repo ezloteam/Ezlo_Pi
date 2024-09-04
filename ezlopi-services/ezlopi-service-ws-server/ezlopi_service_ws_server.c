@@ -123,8 +123,8 @@ static int __ws_server_broadcast(char *data)
         if (data)
         {
             ret = 1;
-            l_ws_server_client_conn_t* curr_client = ezlopi_service_ws_server_clients_get_head();
-            #warning "DO NOT USE printf ON PRODUCTION"
+            l_ws_server_client_conn_t *curr_client = ezlopi_service_ws_server_clients_get_head();
+#warning "DO NOT USE printf ON PRODUCTION"
             // printf("%s and curr-client: %p\n", __func__, curr_client);
 
             while (curr_client)
@@ -440,7 +440,7 @@ static int __ws_server_send(l_ws_server_client_conn_t *client, char *data, uint3
 
 static void __wifi_connection_event(esp_event_base_t event_base, int32_t event_id, void *arg)
 {
-    TRACE_D("event-base: %d, event-id: %d", (uint32_t)event_base, event_id);
+    // TRACE_D("event-base: %d, event-id: %d", (uint32_t)event_base, event_id);
 
     if (IP_EVENT == event_base)
     {
