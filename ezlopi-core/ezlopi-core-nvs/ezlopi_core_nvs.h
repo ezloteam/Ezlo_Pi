@@ -59,8 +59,8 @@ extern "C"
     ezlopi_error_t ezlopi_nvs_write_float32(float f, const char* key_name);
     ezlopi_error_t ezlopi_nvs_read_float32(float* f, const char* key_name);
 
-    // char* ezlopi_nvs_scene_get_v2(void);
-    // int ezlopi_nvs_scene_set_v2(char* scene);
+    char *ezlopi_nvs_scene_get_v2(void);
+    int ezlopi_nvs_scene_set_v2(char *scene);
 
     char* ezlopi_nvs_scene_get(void);
     ezlopi_error_t ezlopi_nvs_scene_set(char* scene);
@@ -76,20 +76,20 @@ extern "C"
     char* ezlopi_nvs_read_scenes_expressions(void);
     ezlopi_error_t ezlopi_nvs_write_scenes_expressions(char* data);
 
-    char* ezlopi_nvs_read_device_groups(void);
-    int ezlopi_nvs_write_device_groups(char* data);
+    char *ezlopi_nvs_read_device_groups(void);
+    int ezlopi_nvs_write_device_groups(char *data);
 
-    char* ezlopi_nvs_read_item_groups(void);
-    int ezlopi_nvs_write_item_groups(char* data);
+    char *ezlopi_nvs_read_item_groups(void);
+    int ezlopi_nvs_write_item_groups(char *data);
 
     char* ezlopi_nvs_read_rooms(void);
     ezlopi_error_t ezlopi_nvs_write_rooms(char* data);
 
-    // int EZPI_CORE_nvs_write_time_location(const char* time_loc, uint32_t len);
-    // char* EZPI_CORE_nvs_read_time_location(void);
+    int EZPI_CORE_nvs_write_time_location(const char *time_loc, uint32_t len);
+    char *EZPI_CORE_nvs_read_time_location(void);
 
-    // char* ezlopi_nvs_read_modes(void);
-    // int ezlopi_nvs_write_modes(char* data);
+    char *ezlopi_nvs_read_modes(void);
+    int ezlopi_nvs_write_modes(char *data);
 
     ezlopi_error_t EZPI_CORE_nvs_write_time_location(const char* time_loc, uint32_t len);
     char* EZPI_CORE_nvs_read_time_location(void);

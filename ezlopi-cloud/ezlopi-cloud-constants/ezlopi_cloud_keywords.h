@@ -5,6 +5,7 @@
 
 extern const char* ezlopi_ESP32_str;
 extern const char* ezlopi_ESP32S3_str;
+extern const char* ezlopi_ESP32S2_str;
 extern const char* ezlopi_ESP32C3_str;
 extern const char* ezlopi_ezlopi_str;
 extern const char* ezlopi__str;

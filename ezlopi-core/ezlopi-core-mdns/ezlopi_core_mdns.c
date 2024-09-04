@@ -288,7 +288,7 @@ static void __mdns_init(void* pv)
         {
             TRACE_E("Error mDNS Initialization");
         }
-        vTaskDelay(10000 / portTICK_PERIOD_MS);
+        vTaskDelay(5000 / portTICK_PERIOD_MS);
     }
     ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_CORE_MDNS_SERVICE_TASK);
     vTaskDelete(NULL);

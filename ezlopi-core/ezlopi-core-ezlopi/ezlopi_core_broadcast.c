@@ -41,6 +41,7 @@ ezlopi_error_t ezlopi_core_broadcast_add_to_queue(cJSON* cj_data)
     }
     return ret;
 }
+
 #if 0
 int ezlopi_core_broadcast_log_cjson(cJSON* cj_log_data)
 {
@@ -66,7 +67,7 @@ int ezlopi_core_broadcast_log_cjson(cJSON* cj_log_data)
 
     return ret;
 }
-#endif 
+#endif
 
 ezlopi_error_t ezlopi_core_broadcast_cjson(cJSON* cj_data)
 {
@@ -84,38 +85,32 @@ ezlopi_error_t ezlopi_core_broadcast_cjson(cJSON* cj_data)
         uint32_t buffer_len = 0;
 
         TRACE_I("%d -> -----------------------------> waiting for static buffer!", xTaskGetTickCount());
-        char* data_buffer = ezlopi_core_buffer_acquire(&buffer_len, 5000);
+        char *data_buffer = ezlopi_core_buffer_acquire(__FUNCTION__, &buffer_len, 5000);
 
         if (data_buffer && buffer_len)
         {
-            TRACE_I("%d -> -----------------------------> buffer acquired!", xTaskGetTickCount());
             memset(data_buffer, 0, buffer_len);
 
             // TRACE_D("buffer_len = [%d]", buffer_len);
 
             if (true == cJSON_PrintPreallocated(__FUNCTION__, cj_data, data_buffer, buffer_len, false))
             {
-                TRACE_D("----------------- broadcasting: \r\n%s", data_buffer);
+                TRACE_D("----------------- broadcasting: \n%s", data_buffer);
                 ret = __call_broadcast_methods(data_buffer);
             }
 
-            ezlopi_core_buffer_release();
-            TRACE_I("%d -> -----------------------------> buffer released!", xTaskGetTickCount());
-        }
-        else
-        {
-            TRACE_E("-----------------------------> buffer acquired failed!");
+            ezlopi_core_buffer_release(__FUNCTION__);
         }
     }
 
     return ret;
 }
 
-l_broadcast_method_t* ezlopi_core_broadcast_method_add(f_broadcast_method_t broadcast_method, char* method_name, uint32_t retries)
+l_broadcast_method_t *ezlopi_core_broadcast_method_add(f_broadcast_method_t broadcast_method, char *method_name, uint32_t retries)
 {
     int duplicate_method = 0;
-    l_broadcast_method_t* ret = NULL;
-    l_broadcast_method_t* curr_node = __method_head;
+    l_broadcast_method_t *ret = NULL;
+    l_broadcast_method_t *curr_node = __method_head;
 
     while (curr_node)
     {
@@ -133,7 +128,7 @@ l_broadcast_method_t* ezlopi_core_broadcast_method_add(f_broadcast_method_t broa
         {
             if (__method_head)
             {
-                l_broadcast_method_t* curr_node = __method_head;
+                l_broadcast_method_t *curr_node = __method_head;
 
                 while (curr_node->next)
                 {
@@ -158,18 +153,18 @@ void ezlopi_core_broadcast_remove_method(f_broadcast_method_t broadcast_method)
     {
         if (broadcast_method == __method_head->func)
         {
-            l_broadcast_method_t* remove_node = __method_head;
+            l_broadcast_method_t *remove_node = __method_head;
             __method_head = __method_head->next;
             ezlopi_free(__FUNCTION__, remove_node);
         }
         else
         {
-            l_broadcast_method_t* curr_node = __method_head;
+            l_broadcast_method_t *curr_node = __method_head;
             while (curr_node->next)
             {
                 if (curr_node->next->func == broadcast_method)
                 {
-                    l_broadcast_method_t* remove_node = curr_node->next;
+                    l_broadcast_method_t *remove_node = curr_node->next;
                     curr_node->next = curr_node->next->next;
                     ezlopi_free(__FUNCTION__, remove_node);
 
@@ -214,9 +209,9 @@ static ezlopi_error_t __call_broadcast_methods(char* data)
     return ret;
 }
 
-static l_broadcast_method_t* __method_create(f_broadcast_method_t method, char* method_name, uint32_t retries)
+static l_broadcast_method_t *__method_create(f_broadcast_method_t method, char *method_name, uint32_t retries)
 {
-    l_broadcast_method_t* method_node = NULL;
+    l_broadcast_method_t *method_node = NULL;
 
     if (method)
     {

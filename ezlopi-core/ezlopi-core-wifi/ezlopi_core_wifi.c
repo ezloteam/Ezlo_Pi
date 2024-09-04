@@ -645,7 +645,7 @@ static void __event_wifi_scan_done(void* event_data)
 
 static void __event_ip_got_ip(void* event_data)
 {
-    ezlopi_event_group_set_event(EZLOPI_EVENT_WIFI_CONNECTED);
+
 
     if (event_data)
     {
@@ -660,6 +660,8 @@ static void __event_ip_got_ip(void* event_data)
 
         memcpy(&sg_my_ip, &event->ip_info, sizeof(esp_netif_ip_info_t));
     }
+    vTaskDelay(1);
+    ezlopi_event_group_set_event(EZLOPI_EVENT_WIFI_CONNECTED);
 }
 
 int ezlopi_wifi_get_wifi_mac(uint8_t mac[6])

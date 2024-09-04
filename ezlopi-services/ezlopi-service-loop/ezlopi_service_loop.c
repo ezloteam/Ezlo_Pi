@@ -104,7 +104,6 @@ static void __loop(void* pv)
             {
                 
                 uint32_t __loop_time = xTaskGetTickCount();
-
                 __loop_node->loop(__loop_node->arg);
                 __loop_node->_timer_ms = xTaskGetTickCount();
                 __loop_time = (xTaskGetTickCount() - __loop_time);
