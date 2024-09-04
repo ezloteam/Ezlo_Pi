@@ -545,9 +545,30 @@ void scenes_meta_set(cJSON *cj_request, cJSON *cj_response)
             cJSON *cj_scene_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_sceneId_str);
             if (cj_scene_id && cj_scene_id->valuestring)
             {
-                uint32_t u_id = strtoul(cj_scene_id->valuestring, NULL, 16);
-               
-                ezlopi_core_scene_meta_by_id(u_id, cj_meta);
+                uint32_t scene_id = strtoul(cj_scene_id->valuestring, NULL, 16);
+
+                ezlopi_core_scene_meta_by_id(scene_id, NULL, cj_meta);
+            }
+        }
+    }
+}
+
+void scenes_blockmeta_set(cJSON *cj_request, cJSON *cj_response)
+{
+    cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
+    if (cj_params)
+    {
+        cJSON *cj_meta = cJSON_GetObjectItem(__FUNCTION__, cj_params, "meta");
+        if (cj_meta)
+        {
+            cJSON *cj_scene_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_sceneId_str);
+            cJSON *cj_block_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_blockId_str);
+            if ((cj_scene_id && cj_scene_id->valuestring) && (cj_block_id && cj_block_id->valuestring))
+            {
+                uint32_t scene_id = strtoul(cj_scene_id->valuestring, NULL, 16);
+                uint32_t block_id = strtoul(cj_scene_id->valuestring, NULL, 16);
+
+                ezlopi_core_scene_meta_by_id(scene_id, block_id, cj_meta);
             }
         }
     }

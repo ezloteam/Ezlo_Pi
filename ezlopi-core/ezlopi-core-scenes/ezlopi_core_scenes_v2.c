@@ -1695,13 +1695,16 @@ int ezlopi_core_scene_block_enable_set_reset(const char *sceneId_str, const char
 static bool _____modify_block_metadata(cJSON *cj_when_block, cJSON *cj_new_blockmeta)
 {
     bool ret = false;
-    cJSON *cj_prev_meta = cJSON_GetObjectItem(__FUNCTION__, cj_when_block, "blockMeta");
-    if (cj_prev_meta)
+    if (cj_when_block && cj_new_blockmeta)
     {
-        cJSON_DeleteItemFromObject(__FUNCTION__, cj_when_block, "blockMeta");
-    }
+        cJSON *cj_prev_meta = cJSON_GetObjectItem(__FUNCTION__, cj_when_block, "blockMeta");
+        if (cj_prev_meta)
+        {
+            cJSON_DeleteItemFromObject(__FUNCTION__, cj_when_block, "blockMeta");
+        }
 
-    ret = cJSON_AddItemToObject(__FUNCTION__, cj_when_block, "blockMeta", cj_new_blockmeta);
+        ret = cJSON_AddItemToObject(__FUNCTION__, cj_when_block, "blockMeta", cj_new_blockmeta);
+    }
     return ret;
 }
 static bool ___set_blockid_metadata(cJSON *cj_when_block, const char *blockId_str, cJSON *cj_blockmeta)
@@ -1753,7 +1756,7 @@ static bool ___set_blockid_metadata(cJSON *cj_when_block, const char *blockId_st
         }
     }
 
-    return block_en_changed;
+    return block_meta_changed;
 }
 
 int ezlopi_core_scene_meta_by_id(const char *sceneId_str, const char *blockId_str, cJSON *cj_new_meta)
@@ -1770,7 +1773,7 @@ int ezlopi_core_scene_meta_by_id(const char *sceneId_str, const char *blockId_st
             if (cj_scene)
             {
                 bool meta_data_added = false;
-                if (blockId_str)
+                if (NULL != blockId_str)
                 {
                     int when_block_idx = 0;
                     cJSON *cj_when_block = NULL;
@@ -1788,38 +1791,36 @@ int ezlopi_core_scene_meta_by_id(const char *sceneId_str, const char *blockId_st
                         cJSON_DeleteItemFromObject(__FUNCTION__, cj_scene, "meta");
                     }
 
-                    cJSON_AddItemToObject(__FUNCTION__, cj_scene, "meta", cj_new_meta);
+                    meta_data_added = (bool)cJSON_AddItemToObject(__FUNCTION__, cj_scene, "meta", cj_new_meta);
                 }
 
                 if (meta_data_added)
                 {
                     /*  DONOT use : 'ezlopi_core_scene_edit_store_updated_to_nvs' .. Here */
+                    char *update_scene_str = cJSON_PrintBuffered(__FUNCTION__, cj_scene, 4096, false);
+                    TRACE_D("length of 'update_scene_str': %d", strlen(update_scene_str));
+
+                    if (update_scene_str)
                     {
-                        char *update_scene_str = cJSON_PrintBuffered(__FUNCTION__, cj_scene, 4096, false);
-                        TRACE_D("length of 'update_scene_str': %d", strlen(update_scene_str));
-
-                        if (update_scene_str)
+                        cJSON *cj_scene_id = cJSON_GetObjectItem(__FUNCTION__, cj_scene, ezlopi__id_str);
+                        if (cj_scene_id && cj_scene_id->valuestring)
                         {
-                            cJSON *cj_scene_id = cJSON_GetObjectItem(__FUNCTION__, cj_scene, ezlopi__id_str);
-                            if (cj_scene_id && cj_scene_id->valuestring)
+                            ezlopi_nvs_delete_stored_data_by_name(cj_scene_id->valuestring);
+                            ret = ezlopi_nvs_write_str(update_scene_str, strlen(update_scene_str), cj_scene_id->valuestring);
+
+                            if (ret)
                             {
-                                ezlopi_nvs_delete_stored_data_by_name(cj_scene_id->valuestring);
-                                ret = ezlopi_nvs_write_str(update_scene_str, strlen(update_scene_str), cj_scene_id->valuestring);
-
-                                if (ret)
-                                {
-                                    TRACE_W("nvs updated successfull");
-                                    /*secondly Change in ll */
-                                    ezlopi_core_scene_edit_update_id(sceneId, cj_scene);
-                                }
-                                else
-                                {
-                                    TRACE_E("Error!! failed");
-                                }
+                                TRACE_W("nvs updated successfull");
+                                /*secondly Change in ll */
+                                ezlopi_core_scene_edit_update_id(sceneId, cj_scene);
                             }
-
-                            ezlopi_free(__FUNCTION__, update_scene_str);
+                            else
+                            {
+                                TRACE_E("Error!! failed");
+                            }
                         }
+
+                        ezlopi_free(__FUNCTION__, update_scene_str);
                     }
                 }
                 cJSON_Delete(__FUNCTION__, cj_scene);
