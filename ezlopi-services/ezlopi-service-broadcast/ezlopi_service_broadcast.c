@@ -44,8 +44,6 @@ static void __broadcast_loop(void *arg)
         if ((xTaskGetTickCount() - broadcast_wait_start) > 1000 / portTICK_RATE_MS)
         {
             ezlopi_core_broadcast_cjson(cj_data);
-            printf("HERE: %p\n", cj_data);
-            printf("HERE\n\n %s\n", cJSON_Print(__FUNCTION__, cj_data));
             cJSON_Delete(__FUNCTION__, cj_data);
             cj_data = NULL;
         }
