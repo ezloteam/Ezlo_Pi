@@ -16,48 +16,52 @@
     }
 
 static uint32_t g_provisioning_status = 0;
-static const esp_partition_t* partition_ctx_v3 = NULL;
+static const esp_partition_t *partition_ctx_v3 = NULL;
 
 /* Should not free, Since these informations are used by web-socket-client and are used to reconnect. */
 /* will help decrease heap-fragmentation */
-static char * __ca_cert = NULL;
-static char * __pvt_key = NULL;
-static char * __pub_key = NULL;
+static char *__ca_cert = NULL;
+static char *__pvt_key = NULL;
+static char *__pub_key = NULL;
 
-int ezlopi_calculate_certificate_length(const char *certificate_string, const char* end_marker) 
+int ezlopi_calculate_certificate_length(const char *certificate_string, const char *end_marker)
 {
     char *end_pos = strstr(certificate_string, end_marker);
-    if (end_pos != NULL) 
+    if (end_pos != NULL)
     {
         int length_up_to_end_marker = (end_pos - certificate_string) + strlen(end_marker);
         return length_up_to_end_marker;
-    } 
-    else 
+    }
+    else
     {
         return 0;
     }
 }
 
-static void ezlopi_replace_newline_escape(char *str) 
+static void ezlopi_replace_newline_escape(char *str)
 {
     int i = 0, j = 0;
 
-    while (str[i] != '\0') {
-        if (str[i] == '\\' && str[i + 1] == 'n') {
-            str[j++] = '\n';  // Replace "\\n" with '\n'
-            i += 2;  // Skip past the '\\' and 'n'
-        } else {
-            str[j++] = str[i++];  
+    while (str[i] != '\0')
+    {
+        if (str[i] == '\\' && str[i + 1] == 'n')
+        {
+            str[j++] = '\n'; // Replace "\\n" with '\n'
+            i += 2;          // Skip past the '\\' and 'n'
+        }
+        else
+        {
+            str[j++] = str[i++];
         }
     }
 
-    str[j] = '\0';  
+    str[j] = '\0';
 }
 
-static int ezlopi_factory_info_v3_set_4kb(const char* data, uint32_t offset, uint32_t len)
+static int ezlopi_factory_info_v3_set_4kb(const char *data, uint32_t offset, uint32_t len)
 {
     int ret = 0;
-    char * tmp_variable = ezlopi_malloc(__FUNCTION__, len + 1);
+    char *tmp_variable = ezlopi_malloc(__FUNCTION__, len + 1);
 
     if (tmp_variable)
     {
@@ -102,9 +106,9 @@ uint32_t ezlopi_factory_info_v3_get_abs_address(uint32_t relative_offset, e_fact
     }
 }
 
-static char *ezlopi_factory_info_v3_read_string(const char * name, e_ezlopi_factory_info_v3_offset_t offset, e_ezlopi_factory_info_v3_length_t length)
+static char *ezlopi_factory_info_v3_read_string(const char *name, e_ezlopi_factory_info_v3_offset_t offset, e_ezlopi_factory_info_v3_length_t length)
 {
-    char* read_string = NULL;
+    char *read_string = NULL;
 
     if (ezlopi_factory_info_v3_init())
     {
@@ -115,7 +119,7 @@ static char *ezlopi_factory_info_v3_read_string(const char * name, e_ezlopi_fact
             if (ESP_OK == esp_partition_read(partition_ctx_v3, offset, tmp_buffer, length))
             {
                 int s_length = (strlen(tmp_buffer) < length) ? strlen(tmp_buffer) : length;
-                read_string = (char*)ezlopi_malloc(name, s_length + 1);
+                read_string = (char *)ezlopi_malloc(name, s_length + 1);
 
                 if (NULL != read_string)
                 {
@@ -151,7 +155,7 @@ static char *ezlopi_factory_info_v3_read_string(const char * name, e_ezlopi_fact
     return read_string;
 }
 
-const esp_partition_t* ezlopi_factory_info_v3_init(void)
+const esp_partition_t *ezlopi_factory_info_v3_init(void)
 {
     if (NULL == partition_ctx_v3)
     {
@@ -160,7 +164,7 @@ const esp_partition_t* ezlopi_factory_info_v3_init(void)
     return partition_ctx_v3;
 }
 
-void ezlopi_factory_info_v3_free(void* arg)
+void ezlopi_factory_info_v3_free(void *arg)
 {
     if (arg)
     {
@@ -175,22 +179,22 @@ void print_factory_info_v3(void)
     // uint16_t version = ezlopi_factory_info_v3_get_version();
     unsigned long long id = ezlopi_factory_info_v3_get_id();
 
-    char* mac = ezlopi_factory_info_v3_get_ezlopi_mac();
-    char* name = ezlopi_factory_info_v3_get_name();
-    char* manufacturer = ezlopi_factory_info_v3_get_manufacturer();
-    char* brand = ezlopi_factory_info_v3_get_brand();
-    char* model = ezlopi_factory_info_v3_get_model();
-    char* device_uuid = ezlopi_factory_info_v3_get_device_uuid();
-    char* provisioning_uuid = ezlopi_factory_info_v3_get_provisioning_uuid();
-    char* wifi_ssid = ezlopi_factory_info_v3_get_ssid();
-    char* wifi_password = ezlopi_factory_info_v3_get_password();
-    char* cloud_server = ezlopi_factory_info_v3_get_cloud_server();
-    char * provisioning_token = ezlopi_factory_info_get_v3_provision_token();
+    char *mac = ezlopi_factory_info_v3_get_ezlopi_mac();
+    char *name = ezlopi_factory_info_v3_get_name();
+    char *manufacturer = ezlopi_factory_info_v3_get_manufacturer();
+    char *brand = ezlopi_factory_info_v3_get_brand();
+    char *model = ezlopi_factory_info_v3_get_model();
+    char *device_uuid = ezlopi_factory_info_v3_get_device_uuid();
+    char *provisioning_uuid = ezlopi_factory_info_v3_get_provisioning_uuid();
+    char *wifi_ssid = ezlopi_factory_info_v3_get_ssid();
+    char *wifi_password = ezlopi_factory_info_v3_get_password();
+    char *cloud_server = ezlopi_factory_info_v3_get_cloud_server();
+    char *provisioning_token = ezlopi_factory_info_get_v3_provision_token();
     // const char* provision_server = ezlopi_factory_info_v3_get_provisioning_server();
-    const char* device_type = ezlopi_factory_info_v3_get_device_type();
-    char* ca_certificate = ezlopi_factory_info_v3_get_ca_certificate();
-    char* ssl_private_key = ezlopi_factory_info_v3_get_ssl_private_key();
-    char* ssl_shared_key = ezlopi_factory_info_v3_get_ssl_shared_key();
+    const char *device_type = ezlopi_factory_info_v3_get_device_type();
+    char *ca_certificate = ezlopi_factory_info_v3_get_ca_certificate();
+    char *ssl_private_key = ezlopi_factory_info_v3_get_ssl_private_key();
+    char *ssl_shared_key = ezlopi_factory_info_v3_get_ssl_shared_key();
     // char* ezlopi_config = ezlopi_factory_info_v3_get_ezlopi_config();
 
     TRACE_W("----------------- Factory Info -----------------");
@@ -237,7 +241,7 @@ uint32_t ezlopi_factory_info_v3_get_provisioning_status(void)
 {
     if (ezlopi_factory_info_v3_init())
     {
-        char* cloud_server = ezlopi_factory_info_v3_read_string(__FUNCTION__, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_CLOUD_SERVER_URL, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_CLOUD_SERVER_URL);
+        char *cloud_server = ezlopi_factory_info_v3_read_string(__FUNCTION__, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_CLOUD_SERVER_URL, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_CLOUD_SERVER_URL);
         if (cloud_server && strstr(cloud_server, "https://"))
         {
             g_provisioning_status = 1;
@@ -275,7 +279,7 @@ uint16_t ezlopi_factory_info_v3_get_version(void)
     return _version;
 }
 
-char* ezlopi_factory_info_v3_get_name(void)
+char *ezlopi_factory_info_v3_get_name(void)
 {
     char *read_data = ezlopi_factory_info_v3_read_string(__FUNCTION__, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_DEVICE_NAME, E_EZLOPI_FACTORY_INFO_HUB_DATA), EZLOPI_FINFO_LEN_DEVICE_NAME);
     if (read_data)
@@ -289,7 +293,7 @@ char* ezlopi_factory_info_v3_get_name(void)
     return read_data;
 }
 
-char* ezlopi_factory_info_v3_get_manufacturer(void)
+char *ezlopi_factory_info_v3_get_manufacturer(void)
 {
     char *read_data = ezlopi_factory_info_v3_read_string(__FUNCTION__, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_MANUF_NAME, E_EZLOPI_FACTORY_INFO_HUB_DATA), EZLOPI_FINFO_LEN_MANUF_NAME);
 
@@ -304,7 +308,7 @@ char* ezlopi_factory_info_v3_get_manufacturer(void)
     return read_data;
 }
 
-char* ezlopi_factory_info_v3_get_brand(void)
+char *ezlopi_factory_info_v3_get_brand(void)
 {
     char *read_data = ezlopi_factory_info_v3_read_string(__FUNCTION__, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_BRAND_NAME, E_EZLOPI_FACTORY_INFO_HUB_DATA), EZLOPI_FINFO_LEN_BRAND_NAME);
 
@@ -319,7 +323,7 @@ char* ezlopi_factory_info_v3_get_brand(void)
     return read_data;
 }
 
-char* ezlopi_factory_info_v3_get_model(void)
+char *ezlopi_factory_info_v3_get_model(void)
 {
     char *read_data = ezlopi_factory_info_v3_read_string(__FUNCTION__, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_MODEL_NAME, E_EZLOPI_FACTORY_INFO_HUB_DATA), EZLOPI_FINFO_LEN_MODEL_NAME);
     if (read_data)
@@ -333,7 +337,7 @@ char* ezlopi_factory_info_v3_get_model(void)
     return read_data;
 }
 
-char* ezlopi_factory_info_get_v3_provision_token(void)
+char *ezlopi_factory_info_get_v3_provision_token(void)
 {
     char *read_data = ezlopi_factory_info_v3_read_string(__FUNCTION__, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_PROVISIONING_TOKEN, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_PROVISIONING_TOKEN);
     if (read_data)
@@ -390,7 +394,7 @@ unsigned long long ezlopi_factory_info_v3_get_id(void)
     return _id;
 }
 
-char* ezlopi_factory_info_v3_get_device_uuid(void)
+char *ezlopi_factory_info_v3_get_device_uuid(void)
 {
     char *read_data = ezlopi_factory_info_v3_read_string(__FUNCTION__, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_DEVICE_UUID, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_DEVICE_UUID);
     if (read_data)
@@ -404,7 +408,7 @@ char* ezlopi_factory_info_v3_get_device_uuid(void)
     return read_data;
 }
 
-char* ezlopi_factory_info_v3_get_provisioning_uuid(void)
+char *ezlopi_factory_info_v3_get_provisioning_uuid(void)
 {
     char *read_data = ezlopi_factory_info_v3_read_string(__FUNCTION__, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_PROVISIONING_UUID, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_PROV_UUID);
     if (read_data)
@@ -418,7 +422,7 @@ char* ezlopi_factory_info_v3_get_provisioning_uuid(void)
     return read_data;
 }
 
-char* ezlopi_factory_info_v3_get_ssid(void)
+char *ezlopi_factory_info_v3_get_ssid(void)
 {
     char *read_data = ezlopi_factory_info_v3_read_string(__FUNCTION__, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_WIFI_SSID, E_EZLOPI_FACTORY_INFO_HUB_DATA), EZLOPI_FINFO_LEN_WIFI_SSID);
     if (read_data)
@@ -432,7 +436,7 @@ char* ezlopi_factory_info_v3_get_ssid(void)
     return read_data;
 }
 
-char* ezlopi_factory_info_v3_get_password(void)
+char *ezlopi_factory_info_v3_get_password(void)
 {
 
     char *read_data = ezlopi_factory_info_v3_read_string(__FUNCTION__, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_WIFI_PASS, E_EZLOPI_FACTORY_INFO_HUB_DATA), EZLOPI_FINFO_LEN_WIFI_PASS);
@@ -448,7 +452,7 @@ char* ezlopi_factory_info_v3_get_password(void)
     return read_data;
 }
 
-char* ezlopi_factory_info_v3_get_ezlopi_mac(void)
+char *ezlopi_factory_info_v3_get_ezlopi_mac(void)
 {
 
     char *read_data = ezlopi_factory_info_v3_read_string(__FUNCTION__, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_DEVICE_MAC, E_EZLOPI_FACTORY_INFO_HUB_DATA), EZLOPI_FINFO_LEN_DEVICE_MAC);
@@ -463,17 +467,22 @@ char* ezlopi_factory_info_v3_get_ezlopi_mac(void)
     return read_data;
 }
 
-char* ezlopi_factory_info_v3_get_cloud_server(void)
+char *ezlopi_factory_info_v3_get_cloud_server(void)
 {
     char *cloud_server = ezlopi_factory_info_v3_read_string(__FUNCTION__, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_CLOUD_SERVER_URL, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_CLOUD_SERVER_URL);
     if (cloud_server && strstr(cloud_server, "https://"))
     {
         g_provisioning_status = 1;
+        return cloud_server;
     }
-    return cloud_server;
+    else
+    {
+        ezlopi_free(__FUNCTION__, cloud_server);
+        return NULL;
+    }
 }
 
-char* ezlopi_factory_info_v3_get_provisioning_server(void)
+char *ezlopi_factory_info_v3_get_provisioning_server(void)
 {
     char *provisioning_server = ezlopi_factory_info_v3_read_string(__FUNCTION__, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_PROVISIONING_SERVER_URL, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_PROVISIONING_SERVER_URL);
     if (provisioning_server && strstr(provisioning_server, "https://"))
@@ -482,11 +491,12 @@ char* ezlopi_factory_info_v3_get_provisioning_server(void)
     }
     else
     {
+        ezlopi_free(__FUNCTION__, provisioning_server);
         return NULL;
     }
 }
 
-const char* ezlopi_factory_info_v3_get_device_type(void)
+const char *ezlopi_factory_info_v3_get_device_type(void)
 {
     return "ezlopi_generic";
 }
@@ -499,7 +509,7 @@ void ezlopi_factory_info_v3_free_ca_certificate(void)
         __ca_cert = NULL;
     }
 }
-char* ezlopi_factory_info_v3_get_ca_certificate(void)
+char *ezlopi_factory_info_v3_get_ca_certificate(void)
 {
     if (NULL == __ca_cert)
     {
@@ -517,17 +527,17 @@ void ezlopi_factory_info_v3_free_ssl_private_key(void)
         __pvt_key = NULL;
     }
 }
-char* ezlopi_factory_info_v3_get_ssl_private_key(void)
+char *ezlopi_factory_info_v3_get_ssl_private_key(void)
 {
     if (NULL == __pvt_key)
     {
         __pvt_key = ezlopi_factory_info_v3_read_string(__FUNCTION__, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_SSL_PRIVATE_KEY, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_SSL_PRIVATE_KEY);
         ezlopi_replace_newline_escape(__pvt_key); // Workaround : Escape Sequence "\n"
-    } 
+    }
     return __pvt_key;
 }
 
-void  ezlopi_factory_info_v3_free_ssl_shared_key(void)
+void ezlopi_factory_info_v3_free_ssl_shared_key(void)
 {
     if (__pub_key)
     {
@@ -535,7 +545,7 @@ void  ezlopi_factory_info_v3_free_ssl_shared_key(void)
         __pub_key = NULL;
     }
 }
-char* ezlopi_factory_info_v3_get_ssl_shared_key(void)
+char *ezlopi_factory_info_v3_get_ssl_shared_key(void)
 {
     if (NULL == __pub_key)
     {
@@ -545,7 +555,7 @@ char* ezlopi_factory_info_v3_get_ssl_shared_key(void)
     return __pub_key;
 }
 
-char* ezlopi_factory_info_v3_get_ezlopi_config(void)
+char *ezlopi_factory_info_v3_get_ezlopi_config(void)
 {
     // TRACE_E("ezlopi-config address: %d", ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_EZLOPI_CONFIG_JSON, E_EZLOPI_FACTORY_INFO_CONN_DATA));
     char *ret = ezlopi_factory_info_v3_read_string(__FUNCTION__, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_EZLOPI_CONFIG_JSON, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_EZLOPI_CONFIG_JSON);
@@ -560,7 +570,7 @@ char* ezlopi_factory_info_v3_get_ezlopi_config(void)
     return ret;
 }
 
-int ezlopi_factory_info_v3_set_basic(s_basic_factory_info_t* ezlopi_config_basic)
+int ezlopi_factory_info_v3_set_basic(s_basic_factory_info_t *ezlopi_config_basic)
 {
     int ret = 0;
 
@@ -568,7 +578,7 @@ int ezlopi_factory_info_v3_set_basic(s_basic_factory_info_t* ezlopi_config_basic
     {
         if (ezlopi_factory_info_v3_init())
         {
-            char* tmp_buffer = (char*)ezlopi_malloc(__FUNCTION__, EZLOPI_FINFO_READ_LEN_4KB);
+            char *tmp_buffer = (char *)ezlopi_malloc(__FUNCTION__, EZLOPI_FINFO_READ_LEN_4KB);
             if (tmp_buffer)
             {
                 if (ESP_OK == esp_partition_read(partition_ctx_v3, EZLOPI_FINFO_OFFSET_HUB_DATA, tmp_buffer, EZLOPI_FINFO_READ_LEN_4KB))
@@ -637,7 +647,7 @@ int ezlopi_factory_info_v3_set_basic(s_basic_factory_info_t* ezlopi_config_basic
                 {
                     if (0 != ezlopi_config_basic->config_version)
                     {
-                        uint8_t config_version_arry[2] = { 0 };
+                        uint8_t config_version_arry[2] = {0};
                         config_version_arry[0] = (uint8_t)((ezlopi_config_basic->config_version & 0xFF00) >> 8);
                         config_version_arry[1] = (uint8_t)(ezlopi_config_basic->config_version & 0x00FF);
                         memset(tmp_buffer + EZLOPI_FINFO_REL_OFFSET_CONFIG_VERSION, 0, EZLOPI_FINFO_LEN_CONFIG_VERSION);
@@ -705,7 +715,7 @@ int ezlopi_factory_info_v3_set_basic(s_basic_factory_info_t* ezlopi_config_basic
     return ret;
 }
 
-int ezlopi_factory_info_v3_set_wifi(char* ssid, char* password)
+int ezlopi_factory_info_v3_set_wifi(char *ssid, char *password)
 {
     int ret = 0;
 
@@ -714,7 +724,7 @@ int ezlopi_factory_info_v3_set_wifi(char* ssid, char* password)
         if (ezlopi_factory_info_v3_init())
         {
 
-            char* tmp_buffer = (char*)ezlopi_malloc(__FUNCTION__, EZLOPI_FINFO_READ_LEN_4KB);
+            char *tmp_buffer = (char *)ezlopi_malloc(__FUNCTION__, EZLOPI_FINFO_READ_LEN_4KB);
             if (tmp_buffer)
             {
                 if (ESP_OK == esp_partition_read(partition_ctx_v3, EZLOPI_FINFO_OFFSET_HUB_DATA, tmp_buffer, EZLOPI_FINFO_READ_LEN_4KB))
@@ -751,7 +761,7 @@ int ezlopi_factory_info_v3_set_wifi(char* ssid, char* password)
     return ret;
 }
 
-int ezlopi_factory_info_v3_set_ssl_private_key(cJSON * cj_data)
+int ezlopi_factory_info_v3_set_ssl_private_key(cJSON *cj_data)
 {
     int ret = 0;
     if (cj_data && cj_data->valuestring && cj_data->str_value_len)
@@ -763,7 +773,7 @@ int ezlopi_factory_info_v3_set_ssl_private_key(cJSON * cj_data)
     return ret;
 }
 
-int ezlopi_factory_info_v3_set_ssl_public_key(cJSON * cj_data)
+int ezlopi_factory_info_v3_set_ssl_public_key(cJSON *cj_data)
 {
     int ret = 0;
     if (cj_data && cj_data->valuestring && cj_data->str_value_len)
@@ -775,7 +785,7 @@ int ezlopi_factory_info_v3_set_ssl_public_key(cJSON * cj_data)
     return ret;
 }
 
-int ezlopi_factory_info_v3_set_ssl_shared_key(cJSON * cj_data)
+int ezlopi_factory_info_v3_set_ssl_shared_key(cJSON *cj_data)
 {
     int ret = 0;
     if (cj_data && cj_data->valuestring && cj_data->str_value_len)
@@ -787,7 +797,7 @@ int ezlopi_factory_info_v3_set_ssl_shared_key(cJSON * cj_data)
     return ret;
 }
 
-int ezlopi_factory_info_v3_set_ca_cert(cJSON * cj_data)
+int ezlopi_factory_info_v3_set_ca_cert(cJSON *cj_data)
 {
     int ret = 0;
     if (cj_data && cj_data->valuestring && cj_data->str_value_len)
@@ -799,12 +809,12 @@ int ezlopi_factory_info_v3_set_ca_cert(cJSON * cj_data)
     return ret;
 }
 
-int ezlopi_factory_info_v3_set_ezlopi_config(cJSON * cj_data)
+int ezlopi_factory_info_v3_set_ezlopi_config(cJSON *cj_data)
 {
     int ret = 0;
     if (cj_data)
     {
-        char * tmp_data = ezlopi_malloc(__FUNCTION__, 4 * 1024);
+        char *tmp_data = ezlopi_malloc(__FUNCTION__, 4 * 1024);
         if (tmp_data)
         {
             if (cJSON_PrintPreallocated(__FUNCTION__, cj_data, tmp_data, 4 * 1024, false))
