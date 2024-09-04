@@ -44,6 +44,14 @@ void scenes_create(cJSON *cj_request, cJSON *cj_response)
             snprintf(tmp_buff, sizeof(tmp_buff), "%08x", new_scene_id);
             cJSON_AddStringToObject(__FUNCTION__, cj_request, ezlopi__id_str, tmp_buff); // this is for (reply_broadcast)
             ezlopi_scenes_new_scene_populate(cj_params, new_scene_id);
+
+            // Trigger new-scene to 'start'
+            l_scenes_list_v2_t * new_scene_node = ezlopi_scenes_get_by_id_v2(new_scene_id);
+            if (new_scene_node)
+            {
+                ezlopi_meshbot_service_start_scene(new_scene_node);
+            }
+
         }
     }
 }
@@ -467,7 +475,7 @@ void scenes_action_block_test(cJSON *cj_request, cJSON *cj_response)
                         if (tmp_http_data->response)
                         {
                             int code = 400;
-                            char detail[100] = {0};
+                            char detail[100] = { 0 };
                             if (sscanf(tmp_http_data->response, "HTTP/1.1 %d %99s[^\n]", &code, detail) == 2)
                             {
                                 cJSON_AddNumberToObject(__FUNCTION__, cj_result, "httpAnswerCode", code);
@@ -539,15 +547,13 @@ void scenes_meta_set(cJSON *cj_request, cJSON *cj_response)
     cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
     if (cj_params)
     {
-        cJSON *cj_meta = cJSON_GetObjectItem(__FUNCTION__, cj_params, "meta");
+        cJSON *cj_meta = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_meta_str);
         if (cj_meta)
         {
             cJSON *cj_scene_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_sceneId_str);
             if (cj_scene_id && cj_scene_id->valuestring)
             {
-                uint32_t scene_id = strtoul(cj_scene_id->valuestring, NULL, 16);
-
-                ezlopi_core_scene_meta_by_id(scene_id, NULL, cj_meta);
+                ezlopi_core_scene_meta_by_id(cj_scene_id->valuestring, NULL, cj_meta);
             }
         }
     }
@@ -558,17 +564,15 @@ void scenes_blockmeta_set(cJSON *cj_request, cJSON *cj_response)
     cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
     if (cj_params)
     {
-        cJSON *cj_meta = cJSON_GetObjectItem(__FUNCTION__, cj_params, "meta");
+        cJSON *cj_meta = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_meta_str);
         if (cj_meta)
         {
             cJSON *cj_scene_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_sceneId_str);
             cJSON *cj_block_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_blockId_str);
             if ((cj_scene_id && cj_scene_id->valuestring) && (cj_block_id && cj_block_id->valuestring))
             {
-                uint32_t scene_id = strtoul(cj_scene_id->valuestring, NULL, 16);
-                uint32_t block_id = strtoul(cj_scene_id->valuestring, NULL, 16);
-
-                ezlopi_core_scene_meta_by_id(scene_id, block_id, cj_meta);
+                #warning "The 'block_id' facility is only for 'when-blocks' [ 'Action-blocks' is not added in UI ]";
+                ezlopi_core_scene_meta_by_id(cj_scene_id->valuestring, cj_block_id->valuestring, cj_meta);
             }
         }
     }
@@ -586,7 +590,7 @@ void scenes_stop(cJSON *cj_request, cJSON *cj_response)
             cJSON *cj_scene_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_sceneId_str);
             if (cj_scene_id && cj_scene_id->valuestring)
             {
-#warning "add support for thenGroup or elseGroups";
+                #warning "add support for thenGroup or elseGroups";
                 uint32_t u32_scene_id = strtoul(cj_scene_id->valuestring, NULL, 16);
                 ezlopi_meshbot_service_stop_for_scene_id(u32_scene_id);
             }

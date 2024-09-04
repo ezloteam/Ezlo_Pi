@@ -34,7 +34,7 @@ void ezlopi_scenes_populate_scene(l_scenes_list_v2_t *new_scene, cJSON *cj_scene
         CJSON_GET_VALUE_STRING_BY_COPY(cj_scene, ezlopi_parent_id_str, new_scene->parent_id);
 
         {
-            cJSON *cj_meta = cJSON_GetObjectItem(__FUNCTION__, cj_scene, "meta");
+            cJSON *cj_meta = cJSON_GetObjectItem(__FUNCTION__, cj_scene, ezlopi_meta_str);
             if (cj_meta && (cJSON_Object == cj_meta->type))
             {
                 if (new_scene->meta)

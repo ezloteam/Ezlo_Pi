@@ -53,7 +53,7 @@ void ezlopi_print_fields(l_fields_v2_t* fields)
         switch (fields->value_type)
         {
         case EZLOPI_VALUE_TYPE_INT:
-        /*case EZLOPI_VALUE_TYPE_HOUSE_MODE_ID:*/
+            /*case EZLOPI_VALUE_TYPE_HOUSE_MODE_ID:*/
         case EZLOPI_VALUE_TYPE_TEMPERATURE:
         case EZLOPI_VALUE_TYPE_HUMIDITY:
         case EZLOPI_VALUE_TYPE_VELOCITY:
@@ -227,6 +227,9 @@ void ezlopi_print_when_blocks(l_when_block_v2_t* when_blocks)
             TRACE_D("\t\t|-- blockName: %s", when_blocks->blockName);
         }
 
+        TRACE_D("\t\t|-- block_status_reset_once: %d", when_blocks->block_status_reset_once);
+        CJSON_TRACE("\t\t|-- block_meta: ", when_blocks->cj_block_meta);
+
         ezlopi_print_block_options(&when_blocks->block_options, when_blocks->fields);
         TRACE_D("\t\t|-- blockType: when");
         ezlopi_print_fields(when_blocks->fields);
@@ -270,6 +273,8 @@ void ezlopi_scenes_print(l_scenes_list_v2_t* scene_link_list)
         TRACE_D("\t|-- is_group: %d", scene_link_list->is_group);
         TRACE_D("\t|-- group_id: %s", scene_link_list->group_id);
         TRACE_D("\t|-- name: %s", scene_link_list->name);
+        CJSON_TRACE("\t|-- meta: ", scene_link_list->meta);
+
         TRACE_D("\t|-- parent_id: %s", scene_link_list->parent_id);
         ezlopi_print_user_notifications(scene_link_list->user_notifications);
         ezlopi_print_house_modes(scene_link_list->house_modes);

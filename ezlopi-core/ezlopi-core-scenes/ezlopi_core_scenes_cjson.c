@@ -647,7 +647,7 @@ cJSON *ezlopi_scenes_create_cjson_scene(l_scenes_list_v2_t *scene)
         cj_scene = cJSON_CreateObject(__FUNCTION__);
         if (cj_scene)
         {
-            char tmp_str[16] = {0};
+            char tmp_str[16] = { 0 };
             snprintf(tmp_str, sizeof(tmp_str), "%08x", scene->_id);
             cJSON_AddStringToObject(__FUNCTION__, cj_scene, ezlopi__id_str, tmp_str);
             cJSON_AddBoolToObject(__FUNCTION__, cj_scene, ezlopi_enabled_str, scene->enabled);
@@ -657,7 +657,7 @@ cJSON *ezlopi_scenes_create_cjson_scene(l_scenes_list_v2_t *scene)
             __cjson_add_string(cj_scene, ezlopi_parent_id_str, scene->parent_id);
             if (scene->meta)
             {
-                cJSON_AddItemToObject(__FUNCTION__, cj_scene, "meta", cJSON_Duplicate(__FUNCTION__, scene->meta, 1));
+                cJSON_AddItemToObject(__FUNCTION__, cj_scene, ezlopi_meta_str, cJSON_Duplicate(__FUNCTION__, scene->meta, 1));
             }
             ezlopi_scenes_cjson_add_user_notifications(cj_scene, scene->user_notifications);
             ezlopi_scenes_cjson_add_house_modes(cj_scene, scene->house_modes);

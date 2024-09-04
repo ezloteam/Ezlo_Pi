@@ -42,9 +42,9 @@ static char *__generate_sha1_of_src(const char *src)
                                 size_t l = (len - (strlen(ret) + 1));
                                 if (l > 0)
                                 {
-                                    ((int)sha1[i] / 100 > 0)  ? (snprintf(ret + strlen(ret), l, "%u", (uint8_t)sha1[i]))    // tripple digit
-                                    : ((int)sha1[i] / 10 > 0) ? (snprintf(ret + strlen(ret), l, "0%u", (uint8_t)sha1[i]))   // double digit
-                                                              : (snprintf(ret + strlen(ret), l, "00%u", (uint8_t)sha1[i])); // single digit
+                                    ((int)sha1[i] / 100 > 0) ? (snprintf(ret + strlen(ret), l, "%u", (uint8_t)sha1[i]))    // tripple digit
+                                        : ((int)sha1[i] / 10 > 0) ? (snprintf(ret + strlen(ret), l, "0%u", (uint8_t)sha1[i]))   // double digit
+                                        : (snprintf(ret + strlen(ret), l, "00%u", (uint8_t)sha1[i])); // single digit
                                 }
                                 else
                                 {

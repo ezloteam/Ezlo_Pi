@@ -52,7 +52,6 @@ int ezlopi_core_scene_edit_store_updated_to_nvs(cJSON *cj_updated_scene)
 int ezlopi_core_scene_edit_update_id(uint32_t scene_id, cJSON *cj_updated_scene)
 {
     int ret = 0;
-    // CJSON_TRACE("cj_updated_scene", cj_updated_scene);
 
     if (scene_id && cj_updated_scene)
     {
@@ -61,6 +60,7 @@ int ezlopi_core_scene_edit_update_id(uint32_t scene_id, cJSON *cj_updated_scene)
         {
             if (scene_id == scene_node->_id)
             {
+                CJSON_TRACE("cj_updated_scene", cj_updated_scene);
                 ezlopi_meshobot_service_stop_scene(scene_node);
                 _edit_scene(scene_node, cj_updated_scene);
 
@@ -103,12 +103,14 @@ static void _edit_scene(l_scenes_list_v2_t *scene_node, cJSON *cj_scene)
     CJSON_GET_VALUE_STRING_BY_COPY(cj_scene, ezlopi_parent_id_str, scene_node->parent_id);
 
     {
-        cJSON *cj_meta = cJSON_GetObjectItem(__FUNCTION__, cj_scene, "meta");
+        cJSON *cj_meta = cJSON_GetObjectItem(__FUNCTION__, cj_scene, ezlopi_meta_str);
         if (cj_meta && (cJSON_Object == cj_meta->type))
         {
             if (scene_node->meta)
             {
+                TRACE_D("here");
                 cJSON_Delete(__FUNCTION__, scene_node->meta);
+                scene_node->meta = NULL;
             }
             scene_node->meta = cJSON_Duplicate(__FUNCTION__, cj_meta, 1);
         }

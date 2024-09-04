@@ -125,8 +125,8 @@ typedef struct l_when_block_v2
     char * group_id;        // may be used in future    //  currently not-populated from nvs
 #endif
     bool block_status_reset_once;  // 'NOT-NVS parameter' [don't populate ; since not needed] // just a dummy flag to trigger function reset.
-    e_scenes_block_type_v2_t block_type;
     cJSON* cj_block_meta;                // Block metadata information. Intended to save data needed for user interfaces
+    e_scenes_block_type_v2_t block_type;
     s_block_options_v2_t block_options;
     l_fields_v2_t* fields;
     struct l_when_block_v2* next;
