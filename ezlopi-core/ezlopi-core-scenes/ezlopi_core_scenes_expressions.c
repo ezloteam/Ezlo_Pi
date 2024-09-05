@@ -3,12 +3,16 @@
 
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
+#include "lua/lua.h"
+#include "lua/lualib.h"
+#include "lua/lauxlib.h"
 #include "cjext.h"
 
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_devices.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_scenes_value.h"
+#include "ezlopi_core_scenes_scripts.h"
 #include "ezlopi_core_scenes_expressions.h"
 
 #include "ezlopi_cloud_constants.h"
@@ -59,8 +63,8 @@ cJSON* generate_expression_node_in_cjson(s_ezlopi_expressions_t* exp_node)
         {
             cJSON_AddStringToObject(__FUNCTION__, ret_cj_exp, ezlopi_name_str, exp_node->name);
             cJSON_AddStringToObject(__FUNCTION__, ret_cj_exp, ezlopi_code_str, exp_node->code);
-            cJSON_AddBoolToObject(__FUNCTION__, ret_cj_exp, ezlopi_variable_str, exp_node->variable);
             __add_expression_value(exp_node, ret_cj_exp);
+            cJSON_AddBoolToObject(__FUNCTION__, ret_cj_exp, ezlopi_variable_str, exp_node->variable);
 
             cJSON* cj_params = cJSON_AddObjectToObject(__FUNCTION__, ret_cj_exp, ezlopi_params_str);
             if (cj_params)
@@ -99,7 +103,7 @@ static int __edit_expression_ll(s_ezlopi_expressions_t* expn_node, cJSON* cj_new
             cJSON* cj_code = cJSON_GetObjectItem(__FUNCTION__, cj_new_expression, ezlopi_code_str);
             if (cj_code && cj_code->valuestring && cj_code->str_value_len)
             {
-                expn_node->code = (char* )ezlopi_malloc(__FUNCTION__, cj_code->str_value_len + 1);
+                expn_node->code = (char*)ezlopi_malloc(__FUNCTION__, cj_code->str_value_len + 1);
                 if (expn_node->code)
                 {
                     snprintf(expn_node->code, cj_code->str_value_len + 1, "%.*s", cj_code->str_value_len, cj_code->valuestring);
@@ -169,34 +173,41 @@ static int __edit_expression_ll(s_ezlopi_expressions_t* expn_node, cJSON* cj_new
 
         // 6. Value  [exp_value]
         {
-            cJSON* cj_value = cJSON_GetObjectItem(__FUNCTION__, cj_new_expression, ezlopi_value_str);
-            if (cj_value)
+            // First delete value if :- string or object
+            switch (expn_node->exp_value.type)
             {
-                // First delete value if :- string or object
-                switch (expn_node->exp_value.type)
+            case EXPRESSION_VALUE_TYPE_STRING:
+            {
+                TRACE_D("here");
+                if (expn_node->exp_value.u_value.str_value)
                 {
-                case EXPRESSION_VALUE_TYPE_STRING:
+                    ezlopi_free(__FUNCTION__, expn_node->exp_value.u_value.str_value);
+                    expn_node->exp_value.u_value.str_value = NULL;
+                }
+                break;
+            }
+            case EXPRESSION_VALUE_TYPE_CJ:
+            {
+                TRACE_D("here");
+                if (expn_node->exp_value.u_value.cj_value)
                 {
-                    if (expn_node->exp_value.u_value.str_value)
-                    {
-                        ezlopi_free(__FUNCTION__, expn_node->exp_value.u_value.str_value);
-                        expn_node->exp_value.u_value.str_value = NULL;
-                    }
-                    break;
+                    cJSON_Delete(__FUNCTION__, expn_node->exp_value.u_value.cj_value);
+                    expn_node->exp_value.u_value.cj_value = NULL;
                 }
-                case EXPRESSION_VALUE_TYPE_CJ:
+                break;
+            }
+            default:
+                TRACE_D("expn_valueType [%d]", expn_node->exp_value.type);
+                break;
+            }
+
+            if (true == expn_node->variable)// only if variable--> store the 'constant' variable-value.
+            {
+                cJSON* cj_value = cJSON_GetObjectItem(__FUNCTION__, cj_new_expression, ezlopi_value_str);
+                if (cj_value)
                 {
-                    if (expn_node->exp_value.u_value.cj_value)
-                    {
-                        cJSON_Delete(__FUNCTION__, expn_node->exp_value.u_value.cj_value);
-                        expn_node->exp_value.u_value.cj_value = NULL;
-                    }
-                    break;
+                    __get_expressions_value(expn_node, cj_value);
                 }
-                default:
-                    break;
-                }
-                __get_expressions_value(expn_node, cj_value);
             }
         }
     }
@@ -278,6 +289,64 @@ int ezlopi_scenes_expressions_delete_by_name(char *expression_name)
     return ret;
 }
 
+static void __expn_load_custom_libs(lua_State* lua_state)
+{
+    uint32_t idx = 0;
+    while (lua_scripts_modules[idx].name && lua_scripts_modules[idx].func)
+    {
+        TRACE_D("loading custom lib -> %s : %p", lua_scripts_modules[idx].name, lua_scripts_modules[idx].func);
+        luaL_requiref(lua_state, lua_scripts_modules[idx].name, lua_scripts_modules[idx].func, 1);
+        lua_pop(lua_state, 1);
+        idx++;
+    }
+}
+static const char* __expn_script_report(lua_State* lua_state, int status)
+{
+    if (status == LUA_OK)
+    {
+        return NULL;
+    }
+
+    const char* msg = lua_tostring(lua_state, -1);
+    lua_pop(lua_state, 1);
+    return msg;
+}
+static char* __evaluate_lua_expression(s_ezlopi_expressions_t *curr_exp)
+{
+    lua_State* lua_state = luaL_newstate();
+    if (lua_state)
+    {
+        luaL_openlibs(lua_state);
+        __expn_load_custom_libs(lua_state);
+
+        int tmp_ret = luaL_loadstring(lua_state, curr_exp->code);
+        if (tmp_ret)
+        {
+            const char* script_report = __expn_script_report(lua_state, tmp_ret);
+            if (script_report)
+            {
+                TRACE_E("Error in '%s' -> %s", curr_exp->name, script_report);
+            }
+        }
+
+        tmp_ret = lua_pcall(lua_state, 0, 1, 0);
+        if (tmp_ret)
+        {
+            const char* script_report = __expn_script_report(lua_state, tmp_ret);
+            if (script_report)
+            {
+                TRACE_E("Error in '%s' -> %s", curr_exp->name, script_report);
+            }
+        }
+
+        lua_close(lua_state);
+    }
+    else
+    {
+        TRACE_E("Couldn't create lua state for -> %s", curr_exp->name);
+    }
+}
+
 void ezlopi_scenes_expressions_list_cjson(cJSON *cj_expresson_array, cJSON *cj_params)
 {
     if (cj_expresson_array)
@@ -326,7 +395,22 @@ void ezlopi_scenes_expressions_list_cjson(cJSON *cj_expresson_array, cJSON *cj_p
 
                     if (show_value)
                     {
-                        __add_expression_value(curr_exp, cj_expr);
+                        if (curr_exp->variable)
+                        {   // For variable-only
+                            __add_expression_value(curr_exp, cj_expr);  // adds valueType + value
+                        }
+                        else
+                        {   // For expression-only
+                            if ((EZLOPI_VALUE_TYPE_NONE < curr_exp->value_type) && (EZLOPI_VALUE_TYPE_MAX > curr_exp->value_type))
+                            {
+                                cJSON_AddStringToObject(__FUNCTION__, cj_expr, ezlopi_valueType_str, ezlopi_scene_get_scene_value_type_name(curr_exp->value_type));
+                            }
+                            // evaluate the lua script 
+
+
+                            // add the 'result' [value or error]
+
+                        }
                     }
 
                     cJSON_AddBoolToObject(__FUNCTION__, cj_expr, ezlopi_variable_str, curr_exp->variable);
@@ -490,11 +574,15 @@ int ezlopi_scenes_expression_update_expr(s_ezlopi_expressions_t* expression_node
     int ret = 0;
     if (expression_node && cj_new_expression)
     {
+        TRACE_D("here");
         if (1 == __edit_expression_ll(expression_node, cj_new_expression)) // if successfully updated in ll
         {
-            // ezlopi_scenes_expressions_print(expression_node);
+            TRACE_D("new_expn-ll");
+            ezlopi_scenes_expressions_print(expression_node);
             char id_str[32];
             snprintf(id_str, sizeof(id_str), "%08x", expression_node->exp_id);
+
+            CJSON_TRACE("NEW_EXPN_stored", cj_new_expression);
             ret = ezlopi_scenes_expressions_update_nvs(id_str, cj_new_expression); // update in nvs
         }
     }
@@ -658,8 +746,8 @@ static void __remove_residue_expn_ids_from_list(void)
                             residue_nvs_expn_id = (uint32_t)strtoul(cj_id->valuestring, NULL, 16); // A residue_id is found..
                             expn_list_has_residue = true;                                          // this will trigger a removal of "invalid_nvs_devgrp_id" .
                             break;                                                                 // get out of for
-                        }
-                    }
+    }
+}
                 }
             }
         }
@@ -935,10 +1023,14 @@ static s_ezlopi_expressions_t *__expressions_create_node(uint32_t exp_id, cJSON 
         }
 
         new_exp_node->value_type = ezlopi_core_scenes_value_get_type(cj_expression, ezlopi_valueType_str);
-        __get_expressions_value(new_exp_node, cJSON_GetObjectItem(__FUNCTION__, cj_expression, ezlopi_value_str));
+
+        if (new_exp_node->variable) // if true ; incoming 'Value' should be saved into nvs 
+        {
+            __get_expressions_value(new_exp_node, cJSON_GetObjectItem(__FUNCTION__, cj_expression, ezlopi_value_str));
+        }
 
         new_exp_node->exp_id = __expression_store_to_nvs(exp_id, cj_expression);
-        // ezlopi_scenes_expressions_print(new_exp_node);
+        ezlopi_scenes_expressions_print(new_exp_node);
     }
 
     return new_exp_node;
@@ -983,11 +1075,11 @@ static uint32_t __expression_store_to_nvs(uint32_t exp_id, cJSON *cj_expression)
 
                     if (cj_exp_id_list)
                     {
-                        // TRACE_D("Here");
+                        TRACE_D("Here");
                         cJSON *cj_exp_id = cJSON_CreateString(__FUNCTION__, exp_id_str);
                         if (cj_exp_id)
                         {
-                            // TRACE_D("Here");
+                            TRACE_D("Here");
                             if (cJSON_AddItemToArray(cj_exp_id_list, cj_exp_id))
                             {
                                 exp_id_list_str = cJSON_PrintBuffered(__FUNCTION__, cj_exp_id_list, 1024, false);
@@ -1010,6 +1102,7 @@ static uint32_t __expression_store_to_nvs(uint32_t exp_id, cJSON *cj_expression)
                 }
                 else
                 {
+                    TRACE_E("failed to store new_exprn [%s]", exp_id_str);
                 }
             }
 
