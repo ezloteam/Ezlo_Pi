@@ -109,6 +109,7 @@ typedef int32_t ezlopi_error_t;
        */
        // void EZPI_core_errors_functiontitle(type_t arg);
     void EZPI_core_error_assert_on_error(ezlopi_error_t error, uint32_t error_to_assert_on);
+    const char *EZPI_core_error_code_to_str(ezlopi_error_t error_code);
 
 #ifdef __cplusplus
 }

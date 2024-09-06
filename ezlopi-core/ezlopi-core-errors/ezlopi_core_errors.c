@@ -86,6 +86,122 @@ void EZPI_core_error_assert_on_error(ezlopi_error_t error, uint32_t error_to_ass
     assert(error != error_to_assert_on);
 }
 
+const char *EZPI_core_error_code_to_str(ezlopi_error_t error_code)
+{
+    const char *code_str = NULL;
+    switch (error_code)
+    {
+    case EZPI_SUCCESS:
+    {
+        code_str = "EZPI_SUCCESS";
+        break;
+    }
+    case EZPI_FAILED:
+    {
+        code_str = "EZPI_FAILED";
+        break;
+    }
+    case EZPI_ERR_NVS_INIT_FAILED:
+    {
+        code_str = "EZPI_ERR_NVS_INIT_FAILED";
+        break;
+    }
+    case EZPI_ERR_NVS_READ_FAILED:
+    {
+        code_str = "EZPI_ERR_NVS_READ_FAILED";
+        break;
+    }
+    case EZPI_ERR_NVS_WRITE_FAILED:
+    {
+        code_str = "EZPI_ERR_NVS_WRITE_FAILED";
+        break;
+    }
+    case EZPI_ERR_FACTORY_INFO_READ_FAILED:
+    {
+        code_str = "EZPI_ERR_FACTORY_INFO_READ_FAILED";
+        break;
+    }
+    case EZPI_ERR_EVENT_GROUP_UNINITIALIZED:
+    {
+        code_str = "EZPI_ERR_EVENT_GROUP_UNINITIALIZED";
+        break;
+    }
+    case EZPI_ERR_EVENT_GROUP_BIT_WAIT_FAILED:
+    {
+        code_str = "EZPI_ERR_EVENT_GROUP_BIT_WAIT_FAILED";
+        break;
+    }
+    case EZPI_ERR_EVENT_GROUP_BIT_UNDEFINED:
+    {
+        code_str = "EZPI_ERR_EVENT_GROUP_BIT_UNDEFINED";
+        break;
+    }
+    case EZPI_ERR_JSON_PARSE_FAILED:
+    {
+        code_str = "EZPI_ERR_JSON_PARSE_FAILED";
+        break;
+    }
+    case EZPI_ERR_PREP_DEVICE_PREP_FAILED:
+    {
+        code_str = "EZPI_ERR_PREP_DEVICE_PREP_FAILED";
+        break;
+    }
+    case EZPI_ERR_INIT_DEVICE_FAILED:
+    {
+        code_str = "EZPI_ERR_INIT_DEVICE_FAILED";
+        break;
+    }
+    case EZPI_ERR_ROOM_INIT_FAILED:
+    {
+        code_str = "EZPI_ERR_ROOM_INIT_FAILED";
+        break;
+    }
+    case EZPI_ERR_EVENT_QUEUE_INIT_FAILED:
+    {
+        code_str = "EZPI_ERR_EVENT_QUEUE_INIT_FAILED";
+        break;
+    }
+    case EZPI_ERR_EVENT_QUEUE_UNINITIALIZED:
+    {
+        code_str = "EZPI_ERR_EVENT_QUEUE_UNINITIALIZED";
+        break;
+    }
+    case EZPI_ERR_EVENT_QUEUE_RECV_SEND_ERROR:
+    {
+        code_str = "EZPI_ERR_EVENT_QUEUE_RECV_SEND_ERROR";
+        break;
+    }
+    case EZPI_ERR_SNTP_INIT_FAILED:
+    {
+        code_str = "EZPI_ERR_SNTP_INIT_FAILED";
+        break;
+    }
+    case EZPI_ERR_SNTP_LOCATION_SET_FAILED:
+    {
+        code_str = "EZPI_ERR_SNTP_LOCATION_SET_FAILED";
+        break;
+    }
+    case EZPI_ERR_HAL_INIT_FAILED:
+    {
+        code_str = "EZPI_ERR_HAL_INIT_FAILED";
+        break;
+    }
+    case EZPI_ERR_BROADCAST_FAILED:
+    {
+        code_str = "EZPI_ERR_BROADCAST_FAILED";
+        break;
+    }
+    case EZPI_ERR_MODES_FAILED:
+    {
+        code_str = "EZPI_ERR_MODES_FAILED";
+        break;
+    }
+    default:
+        break;
+    }
+    return code_str;
+}
+
 /*******************************************************************************
  *                         Static Function Definitions
  *******************************************************************************/
