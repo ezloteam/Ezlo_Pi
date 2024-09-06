@@ -136,4 +136,10 @@ CLOUD_METHOD("hub.offline.login.ui", EZPI_CLOUD_offline_login, NULL)
 
 CLOUD_METHOD("registered", registered, NULL)
 
+CLOUD_METHOD("hub.data.list", hub_data_list, NULL)
+
+CLOUD_METHOD("hub.setting.value.set", setting_value_set, NULL)
+CLOUD_METHOD("hub.settings.list", settings_list, NULL)
+
+
 #endif // (defined(CONFIG_EZPI_WEBSOCKET_CLIENT) || defined(EZPI_LOCAL_WEBSOCKET_SERVER))
