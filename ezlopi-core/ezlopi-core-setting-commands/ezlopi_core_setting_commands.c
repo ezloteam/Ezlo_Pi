@@ -281,8 +281,8 @@ static void ezlopi_core_setting_updated_broadcast(cJSON *cj_params)
                 cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi__id_str, ezlopi_ui_broadcast_str);
                 cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, "hub.setting.updated");
                 cJSON_AddItemToObject(__FUNCTION__, cj_response, "result", cj_result);
-                int ret = ezlopi_core_broadcast_add_to_queue(cj_response);
-                if (0 == ret)
+                ezlopi_error_t ret = ezlopi_core_broadcast_add_to_queue(cj_response);
+                if (EZPI_SUCCESS != ret)
                 {
                     cJSON_Delete(__FUNCTION__, cj_response);
                 }

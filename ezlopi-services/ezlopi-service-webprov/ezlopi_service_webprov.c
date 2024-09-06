@@ -283,7 +283,7 @@ static int __send_cjson_data_to_nma_websocket(cJSON *cj_data)
     return ret;
 }
 
-static int __send_str_data_to_nma_websocket(char *str_data)
+static ezlopi_error_t __send_str_data_to_nma_websocket(char *str_data)
 {
     ezlopi_error_t ret = EZPI_FAILED;
 

@@ -9,7 +9,7 @@
 
 #include "ezlopi_core_errors.h"
 
-typedef int (*f_broadcast_method_t)(char* data);
+typedef ezlopi_error_t (*f_broadcast_method_t)(char* data);
 
 typedef struct l_broadcast_method
 {

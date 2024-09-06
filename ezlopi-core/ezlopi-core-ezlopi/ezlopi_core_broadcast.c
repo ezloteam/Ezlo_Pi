@@ -71,7 +71,7 @@ int ezlopi_core_broadcast_log_cjson(cJSON* cj_log_data)
 
 ezlopi_error_t ezlopi_core_broadcast_cjson(cJSON* cj_data)
 {
-    ezlopi_error_t ret = EZPI_SUCCESS;
+    ezlopi_error_t ret = EZPI_FAILED;
 
     if (cj_data)
     {
@@ -192,9 +192,10 @@ static ezlopi_error_t __call_broadcast_methods(char* data)
             do
             {
                 int mret = curr_method->func(data);
-                if (mret)
+                if (EZPI_SUCCESS == mret)
                 {
-                    // TRACE_S("broadcasted - method:'%s'\r\ndata: %s", curr_method->method_name ? curr_method->method_name : "", data);
+                    TRACE_S("broadcasted - method:'%s'\r\ndata: %s", curr_method->method_name ? curr_method->method_name : "", data);
+                    ret = EZPI_SUCCESS;
                     break;
                 }
 

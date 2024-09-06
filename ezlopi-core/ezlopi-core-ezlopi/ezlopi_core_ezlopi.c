@@ -23,6 +23,7 @@
 #include "ezlopi_core_scenes_expressions.h"
 #include "ezlopi_core_log.h"
 #include "ezlopi_core_errors.h"
+#include "ezlopi_core_setting_commands.h"
 
 #ifdef CONFIG_EZPI_CORE_ETHERNET_EN
 #include "ezlopi_core_ethernet.h"

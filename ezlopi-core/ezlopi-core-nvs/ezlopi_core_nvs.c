@@ -37,6 +37,10 @@ static const char* ezlopi_serial_frame_size = "ezpi_frm_sz";
 static const char* ezlopi_serial_flow_control = "ezpi_fl_ctrl";
 static const char* ezlopi_cloud_log_severity = "cld_log_svrt";
 static const char* ezlopi_serial_log_severity = "srl_log_svrt";
+static const char* ezlopi_temp_scale = "tmp_scale";
+static const char* ezlopi_date_format = "date_fmt";
+static const char* ezlopi_time_format = "time_fmt";
+static const char* ezlopi_network_ping_timeout = "png_tm_out";
 
 ezlopi_error_t ezlopi_nvs_init(void)
 {
@@ -428,7 +432,6 @@ void ezlopi_nvs_scenes_factory_info_reset(void)
 ezlopi_error_t ezlopi_nvs_write_int32(int32_t i, const char* key_name)
 {
     ezlopi_error_t error = EZPI_ERR_NVS_WRITE_FAILED;
-    uint8_t ret = 0;
     if (ezlopi_nvs_handle)
     {
         esp_err_t err = nvs_set_i32(ezlopi_nvs_handle, key_name, i);
@@ -835,10 +838,50 @@ ezlopi_error_t EZPI_CORE_nvs_read_cloud_log_severity(uint32_t* severity)
 
 ezlopi_error_t EZPI_CORE_nvs_write_serial_log_severity(uint32_t severity)
 {
-    return ezlopi_nvs_write_uint32(ping_timeout, ezlopi_network_ping_timeout);
+    return ezlopi_nvs_write_uint32(severity, ezlopi_serial_log_severity);
 }
 
 ezlopi_error_t EZPI_CORE_nvs_read_serial_log_severity(uint32_t* severity)
 {
     return ezlopi_nvs_read_uint32(severity, ezlopi_serial_log_severity);
+}
+
+ezlopi_error_t EZPI_CORE_nvs_write_temperature_scale(uint32_t scale)
+{
+    return ezlopi_nvs_write_uint32(scale, ezlopi_temp_scale);
+}
+
+ezlopi_error_t EZPI_CORE_nvs_read_temperature_scale(uint32_t *scale)
+{
+    return ezlopi_nvs_read_uint32(scale, ezlopi_temp_scale);
+}
+
+ezlopi_error_t EZPI_CORE_nvs_write_date_format(uint32_t format)
+{
+    return ezlopi_nvs_write_uint32(format, ezlopi_date_format);
+}
+
+ezlopi_error_t EZPI_CORE_nvs_read_date_format(uint32_t *format)
+{
+    return ezlopi_nvs_read_uint32(format, ezlopi_date_format);
+}
+
+ezlopi_error_t EZPI_CORE_nvs_write_time_format(uint32_t format)
+{
+    return ezlopi_nvs_write_uint32(format, ezlopi_time_format);
+}
+
+ezlopi_error_t EZPI_CORE_nvs_read_time_format(uint32_t *format)
+{
+    return ezlopi_nvs_read_uint32(format, ezlopi_time_format);
+}
+
+ezlopi_error_t EZPI_CORE_nvs_write_network_ping_timeout(uint32_t ping_timeout)
+{
+    return ezlopi_nvs_write_uint32(ping_timeout, ezlopi_network_ping_timeout);
+}
+
+ezlopi_error_t EZPI_CORE_nvs_read_network_ping_timeout(uint32_t *ping_timeout)
+{
+    return ezlopi_nvs_read_uint32(ping_timeout, ezlopi_network_ping_timeout);
 }
