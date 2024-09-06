@@ -36,9 +36,10 @@ static void ezlopi_initialize_devices_v3(void);
 
 void ezlopi_init(void)
 {
-    // Init memories  
+    // Init memories
     ezlopi_error_t error = ezlopi_nvs_init();
     EZPI_core_error_assert_on_error(error, EZPI_ERR_NVS_INIT_FAILED);
+    ezlopi_core_setting_commands_read_settings();
 
 #ifdef CONFIG_EZPI_UTIL_TRACE_EN
     ezlopi_core_read_set_log_severities();

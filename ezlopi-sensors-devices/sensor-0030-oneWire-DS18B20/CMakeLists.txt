@@ -11,6 +11,7 @@ idf_component_register(SRCS "sensor_0030_oneWire_DS18B20.c" "ds18b20_onewire.c" 
                 ezlopi-core-devices 
                 ezlopi-core-valueformatter 
                 ezlopi-core-errors
+                ezlopi-core-setting-commands
 
                 ezlopi-cloud-items
                 ezlopi-cloud-constants 

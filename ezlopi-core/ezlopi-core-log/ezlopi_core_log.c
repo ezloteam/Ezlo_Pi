@@ -125,6 +125,11 @@ ezlopi_error_t ezlopi_core_cloud_log_severity_process_id(const e_ezlopi_log_seve
     return ret;
 }
 
+const char** ezlopi_core_cloud_log_get_severity_enums()
+{
+    return ezlopi_log_severity_enum;
+}
+
 ezlopi_error_t ezlopi_core_serial_log_severity_process_str(const char* severity_str)
 {
     ezlopi_error_t ret = EZPI_FAILED;

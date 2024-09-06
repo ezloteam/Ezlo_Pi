@@ -133,7 +133,7 @@ ezlopi_error_t ezlopi_nvs_scene_set_v2(char* scene)
     return ezlopi_nvs_write_str(scene, strlen(scene) + 1, ezlopi_scenes_v2_nvs_name);
 }
 
-char* ezlopi_nvs_scene_get_v2(void)
+char *ezlopi_nvs_scene_get_v2(void)
 {
     return ezlopi_nvs_read_str(ezlopi_scenes_v2_nvs_name);
 }
@@ -143,7 +143,7 @@ ezlopi_error_t ezlopi_nvs_scene_set(char* scene)
     return ezlopi_nvs_write_str(scene, strlen(scene) + 1, ezlopi_scenes_nvs_name);
 }
 
-char* ezlopi_nvs_scene_get(void)
+char *ezlopi_nvs_scene_get(void)
 {
     return ezlopi_nvs_read_str(ezlopi_scenes_nvs_name);
 }
@@ -161,10 +161,10 @@ ezlopi_error_t ezlopi_nvs_factory_reset(void)
 
 ezlopi_error_t ezlopi_nvs_write_scenes_scripts(char* data)
 {
-    return ezlopi_nvs_write_str(data, strlen(data), (char*)ezlopi_scripts_nvs_ids);
+    return ezlopi_nvs_write_str(data, strlen(data), (char *)ezlopi_scripts_nvs_ids);
 }
 
-char* ezlopi_nvs_read_scenes_scripts(void)
+char *ezlopi_nvs_read_scenes_scripts(void)
 {
     return ezlopi_nvs_read_str(ezlopi_scripts_nvs_ids);
 }
@@ -174,32 +174,32 @@ ezlopi_error_t ezlopi_nvs_write_scenes_expressions(char* data)
     return ezlopi_nvs_write_str(data, strlen(data), ezlopi_scenes_expression_ids);
 }
 
-char* ezlopi_nvs_read_scenes_expressions(void)
+char *ezlopi_nvs_read_scenes_expressions(void)
 {
     return ezlopi_nvs_read_str(ezlopi_scenes_expression_ids);
 }
 
-int ezlopi_nvs_write_device_groups(char* data)
+int ezlopi_nvs_write_device_groups(char *data)
 {
     return ezlopi_nvs_write_str(data, strlen(data) + 1, ezlopi_device_groups_ids);
 }
 
-char* ezlopi_nvs_read_device_groups(void)
+char *ezlopi_nvs_read_device_groups(void)
 {
     return ezlopi_nvs_read_str(ezlopi_device_groups_ids);
 }
 
-int ezlopi_nvs_write_item_groups(char* data)
+int ezlopi_nvs_write_item_groups(char *data)
 {
     return ezlopi_nvs_write_str(data, strlen(data) + 1, ezlopi_item_groups_ids);
 }
 
-char* ezlopi_nvs_read_item_groups(void)
+char *ezlopi_nvs_read_item_groups(void)
 {
     return ezlopi_nvs_read_str(ezlopi_item_groups_ids);
 }
 
-char* ezlopi_nvs_read_rooms(void)
+char *ezlopi_nvs_read_rooms(void)
 {
     return ezlopi_nvs_read_str(ezlopi_room_ids_nvs_name);
 }
@@ -209,7 +209,7 @@ ezlopi_error_t ezlopi_nvs_write_rooms(char* data)
     return ezlopi_nvs_write_str(data, strlen(data), ezlopi_room_ids_nvs_name);
 }
 
-char* ezlopi_nvs_read_modes(void)
+char *ezlopi_nvs_read_modes(void)
 {
     return ezlopi_nvs_read_str(ezlopi_modes_nvs_name);
 }
@@ -224,7 +224,7 @@ ezlopi_error_t ezlopi_nvs_write_config_data_str(char* data)
     return ezlopi_nvs_write_str(data, strlen(data), config_nvs_name);
 }
 
-char* ezlopi_nvs_read_config_data_str(void)
+char *ezlopi_nvs_read_config_data_str(void)
 {
     return ezlopi_nvs_read_str(config_nvs_name);
 }
@@ -334,7 +334,7 @@ ezlopi_error_t ezlopi_nvs_write_user_id_str(char* data)
     return error;
 }
 
-char* ezlopi_nvs_read_user_id_str(void)
+char *ezlopi_nvs_read_user_id_str(void)
 {
     return ezlopi_nvs_read_str(user_id_nvs_name);
 }
@@ -667,9 +667,9 @@ ezlopi_error_t ezlopi_nvs_write_str(const char* data, uint32_t len, const char* 
     return error;
 }
 
-char* ezlopi_nvs_read_str(const char* nvs_name)
+char *ezlopi_nvs_read_str(const char *nvs_name)
 {
-    char* return_str = NULL;
+    char *return_str = NULL;
 
     if (nvs_name)
     {
@@ -722,7 +722,7 @@ void ezlopi_nvs_delete_stored_data_by_id(uint32_t script_id)
     ezlopi_nvs_delete_stored_data_by_name(script_id_str);
 }
 
-void ezlopi_nvs_delete_stored_data_by_name(char* nvs_name)
+void ezlopi_nvs_delete_stored_data_by_name(char *nvs_name)
 {
     if (EZPI_SUCCESS == ezlopi_nvs_init())
     {
@@ -739,12 +739,12 @@ ezlopi_error_t EZPI_CORE_nvs_write_time_location(const char* time_loc, uint32_t 
     return ezlopi_nvs_write_str(time_loc, len, ezlopi_time_location_nvs_name);
 }
 
-char* EZPI_CORE_nvs_read_time_location(void)
+char *EZPI_CORE_nvs_read_time_location(void)
 {
     return ezlopi_nvs_read_str(ezlopi_time_location_nvs_name);
 }
 
-char* ezlopi_nvs_read_latidtude_longitude()
+char *ezlopi_nvs_read_latidtude_longitude()
 {
     return ezlopi_nvs_read_str(ezlopi_coordinates_nvs_name);
 }
@@ -835,7 +835,7 @@ ezlopi_error_t EZPI_CORE_nvs_read_cloud_log_severity(uint32_t* severity)
 
 ezlopi_error_t EZPI_CORE_nvs_write_serial_log_severity(uint32_t severity)
 {
-    return ezlopi_nvs_write_uint32(severity, ezlopi_serial_log_severity);
+    return ezlopi_nvs_write_uint32(ping_timeout, ezlopi_network_ping_timeout);
 }
 
 ezlopi_error_t EZPI_CORE_nvs_read_serial_log_severity(uint32_t* severity)

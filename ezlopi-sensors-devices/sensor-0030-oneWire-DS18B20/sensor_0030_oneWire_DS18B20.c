@@ -6,6 +6,7 @@
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
+#include "ezlopi_core_setting_commands.h"
 #include "ezlopi_core_errors.h"
 
 #include "ezlopi_cloud_items.h"
@@ -20,13 +21,13 @@ static ezlopi_error_t __init(l_ezlopi_item_t* item);
 static ezlopi_error_t __notify(l_ezlopi_item_t* item);
 static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t* item, void* arg);
 
-static esp_err_t ds18b20_write_data(uint8_t* data, uint32_t gpio_pin);
-static esp_err_t ds18b20_read_data(uint8_t* data, uint32_t gpio_pin);
+static esp_err_t ds18b20_write_data(uint8_t *data, uint32_t gpio_pin);
+static esp_err_t ds18b20_read_data(uint8_t *data, uint32_t gpio_pin);
 static bool ds18b20_reset_line(uint32_t gpio_pin);
 static esp_err_t ds18b20_write_to_scratchpad(uint8_t th_val, uint8_t tl_val, uint8_t resolution, uint8_t gpio_pin);
 static bool ds18b20_recognize_device(uint32_t gpio_pin);
-static esp_err_t ds18b20_get_temperature_data(double* temperature_data, uint32_t gpio_pin);
-static uint8_t ds18b20_calculate_crc(const uint8_t* data, uint8_t len);
+static esp_err_t ds18b20_get_temperature_data(double *temperature_data, uint32_t gpio_pin);
+static uint8_t ds18b20_calculate_crc(const uint8_t *data, uint8_t len);
 
 ezlopi_error_t sensor_0030_oneWire_DS18B20(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
 {
@@ -73,6 +74,14 @@ static ezlopi_error_t __notify(l_ezlopi_item_t* item)
     {
         // TRACE_I("Current %f, prev %f", temperature_current_value, *temperature_prev_value);
         // TRACE_I("Diff is %f", fabs(*temperature_prev_value - temperature_current_value));
+        e_enum_temperature_scale_t scale_to_use = ezlopi_core_setting_get_temperature_scale();
+        item->cloud_properties.scale = (TEMPERATURE_SCALE_FAHRENHEIT == scale_to_use) ? scales_fahrenheit : scales_celsius;
+
+        if (TEMPERATURE_SCALE_FAHRENHEIT == scale_to_use)
+        {
+            temperature_current_value = (temperature_current_value * (9.0f / 5.0f)) + 32.0f;
+        }
+
         if (fabs(*temperature_prev_value - temperature_current_value) > 0.2)
         {
             *temperature_prev_value = temperature_current_value;
@@ -123,7 +132,7 @@ static ezlopi_error_t __init(l_ezlopi_item_t* item)
     return ret;
 }
 
-static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
+static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     device->cloud_properties.category = category_temperature;
     device->cloud_properties.subcategory = subcategory_not_defined;
@@ -132,7 +141,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* 
     device->cloud_properties.device_type_id = NULL;
 }
 
-static void __prepare_item_properties(l_ezlopi_item_t* item, cJSON* cj_device)
+static void __prepare_item_properties(l_ezlopi_item_t *item, cJSON *cj_device)
 {
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type);
     item->cloud_properties.show = true;
@@ -141,7 +150,10 @@ static void __prepare_item_properties(l_ezlopi_item_t* item, cJSON* cj_device)
     item->cloud_properties.item_name = ezlopi_item_name_temp;
     item->cloud_properties.value_type = value_type_temperature;
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
-    item->cloud_properties.scale = scales_celsius;
+
+    e_enum_temperature_scale_t scale_to_use = ezlopi_core_setting_get_temperature_scale();
+    item->cloud_properties.scale = (TEMPERATURE_SCALE_FAHRENHEIT == scale_to_use) ? scales_fahrenheit : scales_celsius;
+
     item->interface_type = EZLOPI_DEVICE_INTERFACE_ONEWIRE_MASTER;
 
     item->interface.onewire_master.enable = true;
@@ -155,16 +167,16 @@ static ezlopi_error_t __prepare(void* arg)
 
     if (prep_arg && prep_arg->cjson_device)
     {
-        l_ezlopi_device_t* device = ezlopi_device_add_device(prep_arg->cjson_device, NULL);
+        l_ezlopi_device_t *device = ezlopi_device_add_device(prep_arg->cjson_device, NULL);
         if (device)
         {
             __prepare_device_cloud_properties(device, prep_arg->cjson_device);
-            l_ezlopi_item_t* item_temperature = ezlopi_device_add_item_to_device(device, sensor_0030_oneWire_DS18B20);
+            l_ezlopi_item_t *item_temperature = ezlopi_device_add_item_to_device(device, sensor_0030_oneWire_DS18B20);
             if (item_temperature)
             {
                 __prepare_item_properties(item_temperature, prep_arg->cjson_device);
 
-                double* temperature_value = (double*)ezlopi_malloc(__FUNCTION__, sizeof(double));
+                double *temperature_value = (double *)ezlopi_malloc(__FUNCTION__, sizeof(double));
                 if (temperature_value)
                 {
                     memset(temperature_value, 0, sizeof(double));
@@ -184,14 +196,14 @@ static ezlopi_error_t __prepare(void* arg)
     return ret;
 }
 
-static esp_err_t ds18b20_write_data(uint8_t* data, uint32_t gpio_pin)
+static esp_err_t ds18b20_write_data(uint8_t *data, uint32_t gpio_pin)
 {
     esp_err_t error = ESP_OK;
     error = one_wire_write_byte_to_line(data, gpio_pin);
     return error;
 }
 
-static esp_err_t ds18b20_read_data(uint8_t* data, uint32_t gpio_pin)
+static esp_err_t ds18b20_read_data(uint8_t *data, uint32_t gpio_pin)
 {
     esp_err_t error = ESP_OK;
     error = one_wire_read_byte_from_line(data, gpio_pin);
@@ -264,7 +276,7 @@ static bool ds18b20_recognize_device(uint32_t gpio_pin)
     return (data_from_ds18b20 == DS18B20_FAMILY_CODE) ? true : false;
 }
 
-static esp_err_t ds18b20_get_temperature_data(double* temperature_data, uint32_t gpio_pin)
+static esp_err_t ds18b20_get_temperature_data(double *temperature_data, uint32_t gpio_pin)
 {
     esp_err_t error = ESP_OK;
     uint8_t ds18b20_skip_rom = DS18B20_ROM_COMMAND_SKIP_ROM;
@@ -332,7 +344,7 @@ static esp_err_t ds18b20_get_temperature_data(double* temperature_data, uint32_t
     return error;
 }
 
-static uint8_t ds18b20_calculate_crc(const uint8_t* data, uint8_t len)
+static uint8_t ds18b20_calculate_crc(const uint8_t *data, uint8_t len)
 {
     uint8_t crc = 0;
     uint8_t length = len;
