@@ -18,15 +18,15 @@
 #include "sensor_0010_I2C_BME680.h"
 #include "EZLOPI_USER_CONFIG.h"
 
-static ezlopi_error_t __prepare(void* arg);
-static ezlopi_error_t __init(l_ezlopi_item_t* item);
-static ezlopi_error_t __notify(l_ezlopi_item_t* item);
-static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t* item, void* arg);
+static ezlopi_error_t __prepare(void *arg);
+static ezlopi_error_t __init(l_ezlopi_item_t *item);
+static ezlopi_error_t __notify(l_ezlopi_item_t *item);
+static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg);
 
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
 static void __prepare_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_arg);
 
-ezlopi_error_t sensor_0010_I2C_BME680(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
+ezlopi_error_t sensor_0010_I2C_BME680(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
     switch (action)
@@ -92,10 +92,10 @@ static void __prepare_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, 
     }
 }
 
-static ezlopi_error_t __prepare(void* arg)
+static ezlopi_error_t __prepare(void *arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
-    s_ezlopi_prep_arg_t* prep_arg = (s_ezlopi_prep_arg_t*)arg;
+    s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
     if (prep_arg && prep_arg->cjson_device)
     {
         cJSON *cj_device = prep_arg->cjson_device;
@@ -254,7 +254,7 @@ static ezlopi_error_t __prepare(void* arg)
     return ret;
 }
 
-static ezlopi_error_t __init(l_ezlopi_item_t * item)
+static ezlopi_error_t __init(l_ezlopi_item_t *item)
 {
     ezlopi_error_t ret = EZPI_ERR_INIT_DEVICE_FAILED;
     if (item)
@@ -273,7 +273,7 @@ static ezlopi_error_t __init(l_ezlopi_item_t * item)
     return ret;
 }
 
-static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t * item, void* arg)
+static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
     if (item && arg)
@@ -315,7 +315,7 @@ static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t * item, void* arg)
     return ret;
 }
 
-static ezlopi_error_t __notify(l_ezlopi_item_t * item)
+static ezlopi_error_t __notify(l_ezlopi_item_t *item)
 {
     ezlopi_error_t ret = EZPI_FAILED;
     if (item)
@@ -330,68 +330,69 @@ static ezlopi_error_t __notify(l_ezlopi_item_t * item)
             float altitude = user_data->altitude;
             float co2_eqv = user_data->co2_equivalent;
 
-            bme680_get_data(user_data);
+            if(true == bme680_get_data(user_data))
+            {
+                if (ezlopi_item_name_temp == item->cloud_properties.item_name)
+                {
+                    e_enum_temperature_scale_t scale_to_use = ezlopi_core_setting_get_temperature_scale();
+                    item->cloud_properties.scale = (TEMPERATURE_SCALE_FAHRENHEIT == scale_to_use) ? scales_fahrenheit : scales_celsius;
+                    if (TEMPERATURE_SCALE_FAHRENHEIT == scale_to_use)
+                    {
+                        user_data->temperature = (user_data->temperature * (9.0f / 5.0f)) + 32.0f;
+                    }
 
-            if (ezlopi_item_name_temp == item->cloud_properties.item_name)
-            {
-                e_enum_temperature_scale_t scale_to_use = ezlopi_core_setting_get_temperature_scale();
-                item->cloud_properties.scale = (TEMPERATURE_SCALE_FAHRENHEIT == scale_to_use) ? scales_fahrenheit : scales_celsius;
-                if (TEMPERATURE_SCALE_FAHRENHEIT == scale_to_use)
-                {
-                    user_data->temperature = (user_data->temperature * (9.0f / 5.0f)) + 32.0f;
+                    if (fabs(user_data->temperature - temperature) > 0.05)
+                    {
+                        // this might be an issue, updating new temperature value with previous temperature value
+                        user_data->temperature = temperature;
+                        ezlopi_device_value_updated_from_device_broadcast(item);
+                        ret = EZPI_SUCCESS;
+                    }
                 }
-
-                if (fabs(user_data->temperature - temperature) > 0.05)
+                if (ezlopi_item_name_humidity == item->cloud_properties.item_name)
                 {
-                    // this might be an issue, updating new temperature value with previous temperature value
-                    user_data->temperature = temperature;
-                    ezlopi_device_value_updated_from_device_broadcast(item);
-                    ret = EZPI_SUCCESS;
+                    if (fabs(user_data->humidity - humidity) > 0.05)
+                    {
+                        user_data->humidity = humidity;
+                        ezlopi_device_value_updated_from_device_broadcast(item);
+                        ret = EZPI_SUCCESS;
+                    }
                 }
-            }
-            if (ezlopi_item_name_humidity == item->cloud_properties.item_name)
-            {
-                if (fabs(user_data->humidity - humidity) > 0.05)
+                if (ezlopi_item_name_atmospheric_pressure == item->cloud_properties.item_name)
                 {
-                    user_data->humidity = humidity;
-                    ezlopi_device_value_updated_from_device_broadcast(item);
-                    ret = EZPI_SUCCESS;
+                    if (fabs((user_data->pressure / 1000.0f) - (pressure / 1000.0f)) > 0.05)
+                    {
+                        user_data->pressure = pressure;
+                        ezlopi_device_value_updated_from_device_broadcast(item);
+                        ret = EZPI_SUCCESS;
+                    }
                 }
-            }
-            if (ezlopi_item_name_atmospheric_pressure == item->cloud_properties.item_name)
-            {
-                if (fabs((user_data->pressure / 1000.0f) - (pressure / 1000.0f)) > 0.05)
+                if (ezlopi_item_name_volatile_organic_compound_level == item->cloud_properties.item_name)
                 {
-                    user_data->pressure = pressure;
-                    ezlopi_device_value_updated_from_device_broadcast(item);
-                    ret = EZPI_SUCCESS;
+                    if (fabs(user_data->iaq - iaq) > 0.05)
+                    {
+                        user_data->iaq = iaq;
+                        ezlopi_device_value_updated_from_device_broadcast(item);
+                        ret = EZPI_SUCCESS;
+                    }
                 }
-            }
-            if (ezlopi_item_name_volatile_organic_compound_level == item->cloud_properties.item_name)
-            {
-                if (fabs(user_data->iaq - iaq) > 0.05)
+                if (ezlopi_item_name_distance == item->cloud_properties.item_name)
                 {
-                    user_data->iaq = iaq;
-                    ezlopi_device_value_updated_from_device_broadcast(item);
-                    ret = EZPI_SUCCESS;
+                    if (fabs(user_data->altitude - altitude) > 0.05)
+                    {
+                        user_data->altitude = altitude;
+                        ezlopi_device_value_updated_from_device_broadcast(item);
+                        ret = EZPI_SUCCESS;
+                    }
                 }
-            }
-            if (ezlopi_item_name_distance == item->cloud_properties.item_name)
-            {
-                if (fabs(user_data->altitude - altitude) > 0.05)
+                if (ezlopi_item_name_co2_level == item->cloud_properties.item_name)
                 {
-                    user_data->altitude = altitude;
-                    ezlopi_device_value_updated_from_device_broadcast(item);
-                    ret = EZPI_SUCCESS;
-                }
-            }
-            if (ezlopi_item_name_co2_level == item->cloud_properties.item_name)
-            {
-                if (fabs(user_data->co2_equivalent - co2_eqv) > 0.05)
-                {
-                    user_data->co2_equivalent = co2_eqv;
-                    ezlopi_device_value_updated_from_device_broadcast(item);
-                    ret = EZPI_SUCCESS;
+                    if (fabs(user_data->co2_equivalent - co2_eqv) > 0.05)
+                    {
+                        user_data->co2_equivalent = co2_eqv;
+                        ezlopi_device_value_updated_from_device_broadcast(item);
+                        ret = EZPI_SUCCESS;
+                    }
                 }
             }
         }
