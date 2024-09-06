@@ -74,6 +74,6 @@ _deps
 **/shell_script/
 
 dependencies.lock
-
+.editorconfig
 sdkconfig.old
 sdkconfig

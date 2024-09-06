@@ -1,84 +1,109 @@
-
 <picture>
   <img src="ezlopi-doc/ezlopi_logo.png" >
 </picture>
 
 # RELEASE NOTES
 
+# Version 4.1.5 Build 195
+
+## New
+
+1. Added 'itemGroup' and 'DeviceGroups' [EZPI-427](https://jira.mios.com/browse/EZPI-427)
+2. Add support for ESP32S2 - Beta [EZPI-471](https://jira.mios.com/browse/EZPI-471)
+
+## Fixes
+
+1.  Fix Timer getting error when there is no device. [EZPI-393](https://jira.mios.com/browse/EZPI-393)
+2.  Store and optimize string constants to Flash memory [EZPI-396](https://jira.mios.com/browse/EZPI-396)
+3.  Firmware RAM and Flash optimization [EZPI-424](https://jira.mios.com/browse/EZPI-424)
+4.  EzloPi WS connection ON and OFF [EZPI-439](https://jira.mios.com/browse/EZPI-439)
+5.  RAM optimization for Cloud Constants [EZPI-449](https://jira.mios.com/browse/EZPI-449)
+6.  CRLF improper setting for ESP32 and C3 [EZPI-451](https://jira.mios.com/browse/EZPI-451)
+7.  BLE Stack Optimization [EZPI-452](https://jira.mios.com/browse/EZPI-452)
+8.  EzloPi Heap Shrink debug [EZPI-462](https://jira.mios.com/browse/EZPI-462)
+9.  Fix EzloPi Buffer Rlease Fail [EZPI-463](https://jira.mios.com/browse/EZPI-463)
+10. Fix Renaming devices never sticks and they get renamed back to their default names [EZPI-468](https://jira.mios.com/browse/EZPI-468)
+11. Disable captive portal [EZPI-469](https://jira.mios.com/browse/EZPI-469)
+
 # Version 4.1.4 Build 194
 
-## New 
+## New
+
 1. Added 'setVariable' - Meshbot then_method [EZPI-426](https://jira.mios.com/browse/EZPI-426)
 2. Added 'setExpression' - Meshbot then_method [EZPI-425](https://jira.mios.com/browse/EZPI-425)
 3. Added 'itemGroup' and 'DeviceGroups' [EZPI-427](https://jira.mios.com/browse/EZPI-427)
 
 ## Fixes
-1. Fix issue about device apperaing offline when WiFi network changed with changing device IP [EZPI-443](https://jira.mios.com/browse/EZPI-443) 
-2. Fix EzloPi WS connection ON and OFF [EZPI-439](https://jira.mios.com/browse/EZPI-439) 
+
+1. Fix issue about device apperaing offline when WiFi network changed with changing device IP [EZPI-443](https://jira.mios.com/browse/EZPI-443)
+2. Fix EzloPi WS connection ON and OFF [EZPI-439](https://jira.mios.com/browse/EZPI-439)
 3. Fix issue of appearing `ezlopi_generic_0` on BLE client devices
 4. Fix timer issue with custom loop implementation within the core
 
 ## What's Changed
-* Development by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/147
-* Pre release test meshbot with funtion fix by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/149
-* Ezpi 441 complete room integration by @krishna-ezlo in https://github.com/ezloteam/Ezlo_Pi/pull/148
-* fixed meshbot-crashing issue on enable-true/false by @krishna-ezlo in https://github.com/ezloteam/Ezlo_Pi/pull/150
-* scenes_enable/disable_testing_complete by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/151
-* Ezpi 443 keep tcp conn on ip change by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/154
-* Ezpi 44 x ws integration by @krishna-ezlo in https://github.com/ezloteam/Ezlo_Pi/pull/155
-* Dev merge ezpi 375 422 425 426 427 by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/156
-* Task Completed : https://jira.mios.com/browse/EZPI-445  by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/157
-* Development revert wss by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/159
-* Development by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/160
 
+- Development by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/147
+- Pre release test meshbot with funtion fix by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/149
+- Ezpi 441 complete room integration by @krishna-ezlo in https://github.com/ezloteam/Ezlo_Pi/pull/148
+- fixed meshbot-crashing issue on enable-true/false by @krishna-ezlo in https://github.com/ezloteam/Ezlo_Pi/pull/150
+- scenes_enable/disable_testing_complete by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/151
+- Ezpi 443 keep tcp conn on ip change by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/154
+- Ezpi 44 x ws integration by @krishna-ezlo in https://github.com/ezloteam/Ezlo_Pi/pull/155
+- Dev merge ezpi 375 422 425 426 427 by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/156
+- Task Completed : https://jira.mios.com/browse/EZPI-445 by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/157
+- Development revert wss by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/159
+- Development by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/160
 
 **Full Changelog**: https://github.com/ezloteam/Ezlo_Pi/compare/v4.1.3...v4.1.4
 
 # Version 4.1.3 Build 191
 
-## New 
+## New
+
 1. Enrollment of first-provisioning-api
-2. Implemented __loop to minimize the heap consumption. Followings has been added to loop:
-        2.1: ping
-        2.2: device/item routine call
-        2.3: removed timer-events
-        2.4: Cloud registration 
-        2.5: broadcast service
-        2.6: LED indicator 
-        2.7: meshbot
-        2.8: ota
-        2.9: uart 
+2. Implemented \_\_loop to minimize the heap consumption. Followings has been added to loop:
+   2.1: ping
+   2.2: device/item routine call
+   2.3: removed timer-events
+   2.4: Cloud registration
+   2.5: broadcast service
+   2.6: LED indicator
+   2.7: meshbot
+   2.8: ota
+   2.9: uart
 3. Fixed touch-switch input
-4. Cloud syncing for provisioning 
+4. Cloud syncing for provisioning
 5. Reset_scene_latches [https://jira.mios.com/browse/EZPI-371]
-6. Added nvs update when activating : 'hub.scenes.block.status.reset' .  [https://jira.mios.com/browse/EZPI-411]
-7. Added 'hub.scenes.block.enabled.set' method .  [https://jira.mios.com/browse/EZPI-413]
+6. Added nvs update when activating : 'hub.scenes.block.status.reset' . [https://jira.mios.com/browse/EZPI-411]
+7. Added 'hub.scenes.block.enabled.set' method . [https://jira.mios.com/browse/EZPI-413]
 8. Added 'hub.scenes.house_modes.set' method . [https://jira.mios.com/browse/EZPI-415]
 9. Added 'hub.scenes.action.block.test' method . [https://jira.mios.com/browse/EZPI-417]
 10. Added 2-broadcast methods for :- 'hub.scenes.expressions.set' . [https://jira.mios.com/browse/EZPI-419]
 11. Added broadcast method for :- 'hub.expression.deleted' . [https://jira.mios.com/browse/EZPI-420]
 
 ## What's Changed
-* Update README.md by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/140
-* Combined ezpi 381 400 401 402 403 404 by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/139
-* 1. bug_fixed in 'firmware_info_get' function by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/142
-* Dev merge ezpi 371 411 413 415 417 419 420 by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/141
-* Development by @krishna-ezlo in https://github.com/ezloteam/Ezlo_Pi/pull/143
-* Ezpi wifi scanner issue by @NDJ-EZLO in https://github.com/ezloteam/Ezlo_Pi/pull/144
-* added device/item to loop in every 1-seconds by @krishna-ezlo in https://github.com/ezloteam/Ezlo_Pi/pull/145
-* Pre release ezlopi core 4.x.x by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/146
 
+- Update README.md by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/140
+- Combined ezpi 381 400 401 402 403 404 by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/139
+- 1. bug_fixed in 'firmware_info_get' function by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/142
+- Dev merge ezpi 371 411 413 415 417 419 420 by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/141
+- Development by @krishna-ezlo in https://github.com/ezloteam/Ezlo_Pi/pull/143
+- Ezpi wifi scanner issue by @NDJ-EZLO in https://github.com/ezloteam/Ezlo_Pi/pull/144
+- added device/item to loop in every 1-seconds by @krishna-ezlo in https://github.com/ezloteam/Ezlo_Pi/pull/145
+- Pre release ezlopi core 4.x.x by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/146
 
 # Version 3.5.9 Build 189
 
-## New 
+## New
+
 1. Added `cmd 99` as an heartbeat on UART
-2. Configurable cloud log and trace [EZPI-405](https://jira.mios.com/browse/EZPI-405) 
+2. Configurable cloud log and trace [EZPI-405](https://jira.mios.com/browse/EZPI-405)
 
 ## Fixes
-1. Fix ping issue with expanding the idle task stack [EZPI-392](https://jira.mios.com/browse/EZPI-392) 
-2. EzloPi Distros cleanup [EZPI-395](https://jira.mios.com/browse/EZPI-395) 
-3. Fixed broadcast issues when  activating hub.scenes.delete
+
+1. Fix ping issue with expanding the idle task stack [EZPI-392](https://jira.mios.com/browse/EZPI-392)
+2. EzloPi Distros cleanup [EZPI-395](https://jira.mios.com/browse/EZPI-395)
+3. Fixed broadcast issues when activating hub.scenes.delete
 4. Found fixed a possible bug case in 'scenes.changed' broadcast method
 5. fixed an error in ` cjext : 'isCJSON_NULL'`--> always returns 'null'.
 6. Replaced `CJSON_GET_VALUE_DOUBLE` with `CJSON_GET_VALUE_GPIO` for all gpios
@@ -87,22 +112,23 @@
 9. Cleaned multiple occurrence of `\r\n`
 
 ## What's Changed
-* Soved the issue of 0 memory usage in status get API by @NDJ-EZLO in https://github.com/ezloteam/Ezlo_Pi/pull/130
-* Ezpi 405 cofigurable cloud log and trace by @krishna-ezlo in https://github.com/ezloteam/Ezlo_Pi/pull/131
-* Fixed incorrect broadcast problem : https://jira.mios.com/browse/EZPI… by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/132
-* Ezpi 392 ping issue by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/133
-* Ezpi 405 cofigurable cloud log and trace by @krishna-ezlo in https://github.com/ezloteam/Ezlo_Pi/pull/134
-* Ezpi 395 distro clean by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/135
-* Ezpi 395 distro clean by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/137
-* Dev old compare string   by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/136
-* Development by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/138
+
+- Soved the issue of 0 memory usage in status get API by @NDJ-EZLO in https://github.com/ezloteam/Ezlo_Pi/pull/130
+- Ezpi 405 cofigurable cloud log and trace by @krishna-ezlo in https://github.com/ezloteam/Ezlo_Pi/pull/131
+- Fixed incorrect broadcast problem : https://jira.mios.com/browse/EZPI… by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/132
+- Ezpi 392 ping issue by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/133
+- Ezpi 405 cofigurable cloud log and trace by @krishna-ezlo in https://github.com/ezloteam/Ezlo_Pi/pull/134
+- Ezpi 395 distro clean by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/135
+- Ezpi 395 distro clean by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/137
+- Dev old compare string by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/136
+- Development by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/138
 
 **Full Changelog**: https://github.com/ezloteam/Ezlo_Pi/compare/v3.5.8...v3.5.9
-
 
 # Version 3.5.8 Build 187
 
 ## New
+
 1. Implementation of 6-function-APIs (for less, for at-least, repeat, follow, pulse, latch): [EZPI-351](https://jira.mios.com/browse/EZPI-351)
 2. Implement EzloPi Device Statuses API [EZPI-254](https://jira.mios.com/browse/EZPI-254)
 3. Change Serial Config, Update NVS and Reboot EzloPi Device if only new config [EZPI-365](https://jira.mios.com/browse/EZPI-365)
@@ -117,45 +143,47 @@
 12. Add chip compatibility for config [EZPI-389](https://jira.mios.com/browse/EZPI-389)
 
 ## Fixes
+
 1. Memory leak fixing causing device to go offline [EZPI-369](https://jira.mios.com/browse/EZPI-369)
 2. Add Filter on serial info such that if not provisioned send data 0 [EZPI-353](https://jira.mios.com/browse/EZPI-353)
-3. Implement cloud API controlled logs for cloud and serial on EzloPi	 [EZPI-370](https://jira.mios.com/browse/EZPI-370)
+3. Implement cloud API controlled logs for cloud and serial on EzloPi [EZPI-370](https://jira.mios.com/browse/EZPI-370)
 4. Cleanup distro merge [EZPI-378](https://jira.mios.com/browse/EZPI-378)
 5. Fix Flash overflow with converting LOG macros into a function based implementaion [EZPI-384](https://jira.mios.com/browse/EZPI-384)
 6. Connect to SNTP if only WiFi connected and reduce delay time [EZPI-386](https://jira.mios.com/browse/EZPI-386)
 7. Meshbots Branch "review" refactoring [EZPI-261](https://jira.mios.com/browse/EZPI-261)
 8. Test and fixing on 'house-modes' [EZPI-301](https://jira.mios.com/browse/EZPI-301)
 9. When several scenes (more than 6) are created, the next created scenes stop coming from the controller [EZPI-250](https://jira.mios.com/browse/EZPI-250)
-10. Fix invalid '_item_ID' in toggle_value method [EZPI-390](https://jira.mios.com/browse/EZPI-390)
+10. Fix invalid '\_item_ID' in toggle_value method [EZPI-390](https://jira.mios.com/browse/EZPI-390)
 
 ## What's Changed
-* Development by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/109
-* release note. by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/110
-* added mDNS config disable in K-Config. by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/111
-* Ezlopi distros by @krishna-ezlo in https://github.com/ezloteam/Ezlo_Pi/pull/112
-* Ezpi 308 hub status get ii by @NDJ-EZLO in https://github.com/ezloteam/Ezlo_Pi/pull/113
-* Dev function to be merged into 3.5.7 by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/114
-* Pre release 3.5.7 by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/115
-* removed unneccessary warnings by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/116
-* Ezpi 370 implement hub log by @NDJ-EZLO in https://github.com/ezloteam/Ezlo_Pi/pull/117
-* Device free bug fix   pre release 3.5.7 by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/118
-* Pre release 3.5.7 by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/119
-* Development by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/120
-* fixed core-processess when disabled by @krishna-ezlo in https://github.com/ezloteam/Ezlo_Pi/pull/121
-* Dev adding toggle value and housemode changed from   by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/122
-* Ezpi 376 fix memory leak by @krishna-ezlo in https://github.com/ezloteam/Ezlo_Pi/pull/123
-* Pre release next by @NDJ-EZLO in https://github.com/ezloteam/Ezlo_Pi/pull/124
-* Pre release 3.5.8 by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/125
-* Fixed : invalid_item_id in 'toggle_value_method' ; https://jira.mio.com/browse/EZPI-390 by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/126
-* Added UART service for log severity by @NDJ-EZLO in https://github.com/ezloteam/Ezlo_Pi/pull/127
-* Development by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/128
 
+- Development by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/109
+- release note. by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/110
+- added mDNS config disable in K-Config. by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/111
+- Ezlopi distros by @krishna-ezlo in https://github.com/ezloteam/Ezlo_Pi/pull/112
+- Ezpi 308 hub status get ii by @NDJ-EZLO in https://github.com/ezloteam/Ezlo_Pi/pull/113
+- Dev function to be merged into 3.5.7 by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/114
+- Pre release 3.5.7 by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/115
+- removed unneccessary warnings by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/116
+- Ezpi 370 implement hub log by @NDJ-EZLO in https://github.com/ezloteam/Ezlo_Pi/pull/117
+- Device free bug fix pre release 3.5.7 by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/118
+- Pre release 3.5.7 by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/119
+- Development by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/120
+- fixed core-processess when disabled by @krishna-ezlo in https://github.com/ezloteam/Ezlo_Pi/pull/121
+- Dev adding toggle value and housemode changed from by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/122
+- Ezpi 376 fix memory leak by @krishna-ezlo in https://github.com/ezloteam/Ezlo_Pi/pull/123
+- Pre release next by @NDJ-EZLO in https://github.com/ezloteam/Ezlo_Pi/pull/124
+- Pre release 3.5.8 by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/125
+- Fixed : invalid_item_id in 'toggle_value_method' ; https://jira.mio.com/browse/EZPI-390 by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/126
+- Added UART service for log severity by @NDJ-EZLO in https://github.com/ezloteam/Ezlo_Pi/pull/127
+- Development by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/128
 
 **Full Changelog**: https://github.com/ezloteam/Ezlo_Pi/compare/v3.4.7...v3.5.8
 
 # Version 3.4.7 Build 186
 
 ## New:
+
 1. Implementation of heap-memory guard when 'scene_create' triggered: [EZPI-358](https://jira.mios.com/browse/EZPI-358)
 2. Implementation of 'toggle-value' method; [testing remained] [EZPI-349](https://jira.mios.com/browse/EZPI-349)
 3. Implementation fake Token based security on local API [EZPI-341](https://jira.mios.com/browse/EZPI-341)
@@ -165,6 +193,7 @@
 7. Implementation of UART (serial) configuration from serial and BLE [EZPI-347](https://jira.mios.com/browse/EZPI-347)
 
 ## Fixes:
+
 1. Fix device tree free-issue when initialization: [EZPI-333](https://jira.mios.com/browse/EZPI-333)
 2. Fix 'NOT' scene method parsing failure: [EZPI-363](https://jira.mios.com/browse/EZPI-363)
 3. Fix 'Scene_State' enable/disable not update in NVS: [EZPI-364](https://jira.mios.com/browse/EZPI-364)
@@ -173,90 +202,98 @@
 6. WiFi SSID and PSW to be matched len with factory info [EZPI-316](https://jira.mios.com/browse/EZPI-316)
 
 ## What's Changed
-* Implemented scene state change by @NDJ-EZLO in https://github.com/ezloteam/Ezlo_Pi/pull/88
-* Meshbot edit ezpi 324 by @NDJ-EZLO in https://github.com/ezloteam/Ezlo_Pi/pull/87
-* Sensor device init bug fix by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/89
-* Hotfix heap fragmentation by @krishna-ezlo in https://github.com/ezloteam/Ezlo_Pi/pull/90
-* Development merge add parent by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/92
-* refactored parent_child_device naming by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/94
-* implementation of https://jira.mios.com/browse/EZPI-341 by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/95
-* Hotfix heap fragmentation v3 by @krishna-ezlo in https://github.com/ezloteam/Ezlo_Pi/pull/96
-* Baud rate config ezpi 347 by @NDJ-EZLO in https://github.com/ezloteam/Ezlo_Pi/pull/97
-* implemented https://jira.mios.com/browse/EZPI-356 by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/99
-* Uart info command issue for new device serial parameters solved by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/100
-* Ezpi344 ble service addition by @NDJ-EZLO in https://github.com/ezloteam/Ezlo_Pi/pull/98
-* ESP32 indicator led dimmable by @NDJ-EZLO in https://github.com/ezloteam/Ezlo_Pi/pull/101
-* finalized serial config https://jira.mios.com/browse/EZPI-347 by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/102
-* added not_method by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/103
-* added fix for setSceneState by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/104
-* Development fix scene get status and run scene.EZPI-358 by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/105
-* Development new scene 30kb guard by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/106
-* Wrap up api for initiative by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/107
-* Pre release v3.4.7 by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/108
 
+- Implemented scene state change by @NDJ-EZLO in https://github.com/ezloteam/Ezlo_Pi/pull/88
+- Meshbot edit ezpi 324 by @NDJ-EZLO in https://github.com/ezloteam/Ezlo_Pi/pull/87
+- Sensor device init bug fix by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/89
+- Hotfix heap fragmentation by @krishna-ezlo in https://github.com/ezloteam/Ezlo_Pi/pull/90
+- Development merge add parent by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/92
+- refactored parent_child_device naming by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/94
+- implementation of https://jira.mios.com/browse/EZPI-341 by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/95
+- Hotfix heap fragmentation v3 by @krishna-ezlo in https://github.com/ezloteam/Ezlo_Pi/pull/96
+- Baud rate config ezpi 347 by @NDJ-EZLO in https://github.com/ezloteam/Ezlo_Pi/pull/97
+- implemented https://jira.mios.com/browse/EZPI-356 by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/99
+- Uart info command issue for new device serial parameters solved by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/100
+- Ezpi344 ble service addition by @NDJ-EZLO in https://github.com/ezloteam/Ezlo_Pi/pull/98
+- ESP32 indicator led dimmable by @NDJ-EZLO in https://github.com/ezloteam/Ezlo_Pi/pull/101
+- finalized serial config https://jira.mios.com/browse/EZPI-347 by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/102
+- added not_method by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/103
+- added fix for setSceneState by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/104
+- Development fix scene get status and run scene.EZPI-358 by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/105
+- Development new scene 30kb guard by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/106
+- Wrap up api for initiative by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/107
+- Pre release v3.4.7 by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/108
 
 **Full Changelog**: https://github.com/ezloteam/Ezlo_Pi/compare/v3.3.6...v3.4.7
-
 
 # Version 3.3.6 Build 185
 
 ## Supported Ezlo Cloud APIs
 
 1. [Items](https://api.ezlo.com/hub/items_api/index.html)
+
    - [hub.items.list](https://api.ezlo.com/hub/items_api/index.html#hubitemslist)
    - [hub.item.value.set (single item)](https://api.ezlo.com/hub/items_api/index.html#hubitemvalueset-single-item)
 
 2. [Devices](https://api.ezlo.com/hub/devices_api/index.html)
+
    - [hub.devices.list](https://api.ezlo.com/hub/devices_api/index.html#hubdeviceslist)
    - [hub.device.name.set](https://api.ezlo.com/hub/devices_api/index.html#hubdevicenameset)
    - [hub.device.room.set](https://api.ezlo.com/hub/devices_api/index.html#hubdeviceroomset)
 
 3. [Device Settings](https://api.ezlo.com/hub/settings_api/index.html)
+
    - [hub.device.settings.list](https://api.ezlo.com/hub/settings_api/index.html#hubdevicesettingslist)
    - [hub.device.setting.value.set](https://api.ezlo.com/hub/settings_api/index.html#hubdevicesettingvalueset)
    - [hub.device.setting.reset](https://api.ezlo.com/hub/settings_api/index.html#hubdevicesettingreset)
 
 4. [Room](https://api.ezlo.com/hub/room/index.html)
-    - [hub.room.list](https://api.ezlo.com/hub/room/index.html#hubroomlist)
-    - [hub.room.create](https://api.ezlo.com/hub/room/index.html#hubroomcreate)
-    - [hub.room.name.set](https://api.ezlo.com/hub/room/index.html#hubroomnameset)
-    - [hub.room.get](https://api.ezlo.com/hub/room/index.html#hubroomget)
-    - [hub.room.delete](https://api.ezlo.com/hub/room/index.html#hubroomdelete)
+
+   - [hub.room.list](https://api.ezlo.com/hub/room/index.html#hubroomlist)
+   - [hub.room.create](https://api.ezlo.com/hub/room/index.html#hubroomcreate)
+   - [hub.room.name.set](https://api.ezlo.com/hub/room/index.html#hubroomnameset)
+   - [hub.room.get](https://api.ezlo.com/hub/room/index.html#hubroomget)
+   - [hub.room.delete](https://api.ezlo.com/hub/room/index.html#hubroomdelete)
 
 5. [Common commands](https://api.ezlo.com/hub/common/index.html)
-    - [hub.info.get](https://api.ezlo.com/hub/common/index.html#hubinfoget)
-    - [hub.reboot](https://api.ezlo.com/hub/common/index.html#hubreboot)
+
+   - [hub.info.get](https://api.ezlo.com/hub/common/index.html#hubinfoget)
+   - [hub.reboot](https://api.ezlo.com/hub/common/index.html#hubreboot)
 
 6. [Network](https://log.ezlo.com/new/hub/network/)
-    - [hub.network.get](https://log.ezlo.com/new/hub/network/#hubnetworkget)
-    - [hub.network.wifi.scan.start](https://log.ezlo.com/new/hub/network/#hubnetworkwifiscanstart)
-    - [hub.network.wifi.scan.stop](https://log.ezlo.com/new/hub/network/#hubnetworkwifiscanstop)
+
+   - [hub.network.get](https://log.ezlo.com/new/hub/network/#hubnetworkget)
+   - [hub.network.wifi.scan.start](https://log.ezlo.com/new/hub/network/#hubnetworkwifiscanstart)
+   - [hub.network.wifi.scan.stop](https://log.ezlo.com/new/hub/network/#hubnetworkwifiscanstop)
 
 7. [Time configuration](https://api.ezlo.com/hub/time/index.html)
-    - [hub.time.location.set](https://api.ezlo.com/hub/time/index.html#hubtimelocationset)
-    - [hub.time.location.get](https://api.ezlo.com/hub/time/index.html#hubtimelocationget)
-    - [hub.time.location.list](https://api.ezlo.com/hub/time/index.html#hubtimelocationlist)
 
-7. [House Modes commands](https://api.ezlo.com/hub/house_modes_manager/index.html#house-modes-commands)
-    - [hub.modes.get](https://api.ezlo.com/hub/house_modes_manager/index.html#hubmodesget)
-    - [hub.modes.current.get](https://api.ezlo.com/hub/house_modes_manager/index.html#hubmodescurrentget)
-    - [hub.modes.switch](https://api.ezlo.com/hub/house_modes_manager/index.html#hubmodesswitch)
+   - [hub.time.location.set](https://api.ezlo.com/hub/time/index.html#hubtimelocationset)
+   - [hub.time.location.get](https://api.ezlo.com/hub/time/index.html#hubtimelocationget)
+   - [hub.time.location.list](https://api.ezlo.com/hub/time/index.html#hubtimelocationlist)
 
+8. [House Modes commands](https://api.ezlo.com/hub/house_modes_manager/index.html#house-modes-commands)
 
-8. [Broadcasts](https://api.ezlo.com/hub/broadcasts/index.html)
-    - [hub.item.updated](https://api.ezlo.com/hub/broadcasts/index.html#hubitemupdated)
-    - [hub.room.created](https://api.ezlo.com/hub/broadcasts/index.html#hubroomcreated)
-    - [hub.room.deleted](https://api.ezlo.com/hub/broadcasts/index.html#hubroomdeleted)
-    - [hub.room.reordered](https://api.ezlo.com/hub/broadcasts/index.html#hubroomreordered)
-    - [hub.room.edited](https://api.ezlo.com/hub/broadcasts/index.html#hubroomedited)
-    - [hub.scene.added](https://api.ezlo.com/hub/broadcasts/index.html#hubsceneadded)
-    - [hub.scene.deleted](https://api.ezlo.com/hub/broadcasts/index.html#hubscenedeleted)
-    - [hub.scene.changed](https://api.ezlo.com/hub/broadcasts/index.html#hubscenechanged)
-    - [hub.scene.run.progress](https://api.ezlo.com/hub/broadcasts/index.html#hubscenerunprogress)
-    - [hub.network.wifi.scan.progress](https://api.ezlo.com/hub/broadcasts/index.html#hubnetworkwifiscanprogress)
-    - [hub.device.setting.updated](https://api.ezlo.com/hub/broadcasts/index.html#hubdevicesettingupdated)    
+   - [hub.modes.get](https://api.ezlo.com/hub/house_modes_manager/index.html#hubmodesget)
+   - [hub.modes.current.get](https://api.ezlo.com/hub/house_modes_manager/index.html#hubmodescurrentget)
+   - [hub.modes.switch](https://api.ezlo.com/hub/house_modes_manager/index.html#hubmodesswitch)
 
-9. [Scenes](https://api.ezlo.com/hub/scenes/local_scenes_api/index.html)
+9. [Broadcasts](https://api.ezlo.com/hub/broadcasts/index.html)
+
+   - [hub.item.updated](https://api.ezlo.com/hub/broadcasts/index.html#hubitemupdated)
+   - [hub.room.created](https://api.ezlo.com/hub/broadcasts/index.html#hubroomcreated)
+   - [hub.room.deleted](https://api.ezlo.com/hub/broadcasts/index.html#hubroomdeleted)
+   - [hub.room.reordered](https://api.ezlo.com/hub/broadcasts/index.html#hubroomreordered)
+   - [hub.room.edited](https://api.ezlo.com/hub/broadcasts/index.html#hubroomedited)
+   - [hub.scene.added](https://api.ezlo.com/hub/broadcasts/index.html#hubsceneadded)
+   - [hub.scene.deleted](https://api.ezlo.com/hub/broadcasts/index.html#hubscenedeleted)
+   - [hub.scene.changed](https://api.ezlo.com/hub/broadcasts/index.html#hubscenechanged)
+   - [hub.scene.run.progress](https://api.ezlo.com/hub/broadcasts/index.html#hubscenerunprogress)
+   - [hub.network.wifi.scan.progress](https://api.ezlo.com/hub/broadcasts/index.html#hubnetworkwifiscanprogress)
+   - [hub.device.setting.updated](https://api.ezlo.com/hub/broadcasts/index.html#hubdevicesettingupdated)
+
+10. [Scenes](https://api.ezlo.com/hub/scenes/local_scenes_api/index.html)
+
     - [hub.scenes.create](https://api.ezlo.com/hub/scenes/local_scenes_api/index.html#hubscenescreate)
     - [hub.scenes.get](https://api.ezlo.com/hub/scenes/local_scenes_api/index.html#hubscenesget)
     - [hub.scenes.list](https://api.ezlo.com/hub/scenes/local_scenes_api/index.html#hubsceneslist)
@@ -272,8 +309,8 @@
     - [hub.scenes.expressions.delete](https://api.ezlo.com/hub/scenes/local_scenes_api/index.html#hubscenesexpressionsdelete)
     - [hub.scenes.expressions.list](https://api.ezlo.com/hub/scenes/local_scenes_api/index.html#hubscenesexpressionslist)
 
+11. [Scenes : When blocks](https://api.ezlo.com/hub/scenes/when_blocks/index.html)
 
-10. [Scenes : When blocks](https://api.ezlo.com/hub/scenes/when_blocks/index.html)
     - [isItemState](https://api.ezlo.com/hub/scenes/when_blocks/index.html#isitemstate)
     - [isItemStateChanged](https://api.ezlo.com/hub/scenes/when_blocks/index.html#isitemstatechanged)
     - [isInterval](https://api.ezlo.com/hub/scenes/when_blocks/index.html#isinterval)
@@ -296,17 +333,15 @@
     - [not](https://api.ezlo.com/hub/scenes/when_blocks/index.html#not)
     - [or](https://api.ezlo.com/hub/scenes/when_blocks/index.html#or)
     - [xor](https://api.ezlo.com/hub/scenes/when_blocks/index.html#xor)
-  
-11. [Scenes : Action blocks](https://api.ezlo.com/hub/scenes/action_blocks/index.html#action-blocks)
+
+12. [Scenes : Action blocks](https://api.ezlo.com/hub/scenes/action_blocks/index.html#action-blocks)
     - [setItemValue](https://api.ezlo.com/hub/scenes/action_blocks/index.html#setitemvalue)
     - [sendHttpRequest](https://api.ezlo.com/hub/scenes/action_blocks/index.html#sendhttprequest)
     - [runCustomScript](https://api.ezlo.com/hub/scenes/action_blocks/index.html#runcustomscript)
     - [rebootHub](https://api.ezlo.com/hub/scenes/action_blocks/index.html#reboothub)
     - [resetHub](https://api.ezlo.com/hub/scenes/action_blocks/index.html#resethub)
 
-
 ## Supported Sensors
-
 
 1. MPU6050 Accelerometer and Gyroscope
 2. ADXL345 3-Axis Accelerometer
@@ -365,20 +400,26 @@
 55. ENS160 gas sensor
 56. ZE08 ch02 gas sensor
 
-## Supported Controllable Devices 
-1. PWM Dimmable 
-2. RGB Dimmable 
+## Supported Controllable Devices
+
+1. PWM Dimmable
+2. RGB Dimmable
 3. Smart Plug / Relay
 4. Servo Mot0r
 5. Addressable LEDs
 
 ## Firmware Features
+
 ### Serial Command
-EzloPi can be configured with serial interface as well. Following are common serial interface commands : 
+
+EzloPi can be configured with serial interface as well. Following are common serial interface commands :
+
 #### Action: Device management
+
 This command is for device administrative purpose such as device restart, device factory restart etc
+
 ```
-Request 
+Request
 
 Factory Restore
 {
@@ -392,15 +433,17 @@ Just Reboot
     "sub_cmd": 1 // Reboot only
 }
 
-Response : 
+Response :
 {
   "cmd": 0,
-  "status": 1 // Status of the command execution, 0 = failed, 1 = success 
+  "status": 1 // Status of the command execution, 0 = failed, 1 = success
 }
 ```
+
 #### Action: Get Info
+
 ```
-Request 
+Request
 
 {
 "cmd": 1
@@ -411,7 +454,7 @@ Just Reboot
     "sub_cmd": 1 // Reboot only
 }
 
-Response : 
+Response :
 
 {
     "cmd": 1,
@@ -449,9 +492,11 @@ Response :
     }
 }
 ```
+
 #### Action: Set Wi-Fi
+
 ```
-Request 
+Request
 
 {
   "cmd": 2,
@@ -459,23 +504,25 @@ Request
   "ssid": "my wifi ssid"
 }
 
-Response : 
+Response :
 {
   "cmd": 2,
   "status_write": 1,
   "status_connect": 1
 }
 ```
+
 #### Action Device Config
+
 ```
-Request 
+Request
 
 {
   "cmd": 4
 }
 
-Response : 
-	
+Response :
+
 {
     "config_id": "_ID_",
     "config_time": 1696508363,
@@ -521,67 +568,78 @@ Response :
 }
 ```
 
-### BLE WiFi Onboarding 
-BLE (Bluetooth Low Energy) WiFi on-boarding for EzloPi Devices simplifies the process of connecting EzloPi devices to a WiFi network. Using BLE technology, the device can initiate a secure and user-friendly on-boarding process without the need for direct user input on the device. 
-### BLE Provisioning 
+### BLE WiFi Onboarding
+
+BLE (Bluetooth Low Energy) WiFi on-boarding for EzloPi Devices simplifies the process of connecting EzloPi devices to a WiFi network. Using BLE technology, the device can initiate a secure and user-friendly on-boarding process without the need for direct user input on the device.
+
+### BLE Provisioning
+
 BLE provisioning for EzloPi devices enhances user convenience by providing a wireless and user-friendly method for initial setup, eliminating the need for complex manual configurations directly on the device.
-### BLE Pin Configurations 
+
+### BLE Pin Configurations
+
 BLE Configuration simplifies the process of configuring the GPIOs of a hardware microcontroller employed by EzloPi, enhancing user convenience.
-### OTA 
+
+### OTA
+
 This feature allows for convenient and remote firmware upgrades, ensuring that EzloPi devices can receive the latest software improvements and enhancements without the need for manual intervention or physical access.
 
 ### mDNS Discovery
-The EzloPi can be discovered locally with following services. The hostname would be ```ezlopi_<last 4 digits of Serial id>```
+
+The EzloPi can be discovered locally with following services. The hostname would be `ezlopi_<last 4 digits of Serial id>`
 
 ## Local Meshbot (Scene)
+
 Scenes provide the possibility to make the relations between devices and make some actions with them. A scene consists of "conditions" and "actions" represented by (when blocks and action blocks respectively. All of them, except action groups, have Json Array representation.
 
 In the perfect case when and exceptions ("conditions") block must form Abstract Syntax Tree (AST) from the Json and be executable. Currently, it's represented as a list of possible single-argument function.
 then and else (action) blocks contain the list of actions. Each functional element actually is the item. As far as you can see there are read only items such as : temperature, pressure, humidity, etc. and there are read-write items : switch, dimmer, light(switch), doorlock, etc...
 
 ## Changes
-* TSL256 Lux sensor V3 by @NDJ-EZLO in https://github.com/ezloteam/Ezlo_Pi/pull/37
-* Dev v3 device config by @krishna-ezlo in https://github.com/ezloteam/Ezlo_Pi/pull/40
-* Feature scenes expression by @krishna-ezlo in https://github.com/ezloteam/Ezlo_Pi/pull/42
-* Dev v3 scene merge by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/43
-* Dev v3 sensor hilink ezpi 268 by @NDJ-EZLO in https://github.com/ezloteam/Ezlo_Pi/pull/44
-* Dev v3 dir refactor ezpi 271 by @NDJ-EZLO in https://github.com/ezloteam/Ezlo_Pi/pull/45
-* Refactoring  sensor-device driver files. by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/46
-* PMS5003 integration to EzloPi(issue: https://jira.mios.com/browse/EZP… by @NDJ-EZLO in https://github.com/ezloteam/Ezlo_Pi/pull/47
-* sensor-devices dir_name re-structured by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/48
-* Dev v3 dir refactor ezpi 265 by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/49
-* Dev v3 dir refactor by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/50
-* Worked on warning : https://jira.mios.com/browse/EZPI-273 by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/51
-* Dev v3 by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/52
-* Removed static variables and worked on warning in sensor drivers by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/53
-* Feature hub scene edit by @krishna-ezlo in https://github.com/ezloteam/Ezlo_Pi/pull/54
-* Development ezpi255 by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/55
-* fixed mac address. by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/56
-* Development ezpi255 by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/57
-* Development pr template ezpi 286 by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/58
-* Implement Factory Restore Feature on Serial Command  by @NDJ-EZLO in https://github.com/ezloteam/Ezlo_Pi/pull/62
-* Ble heap consumption ezpi 287 by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/63
-* complete : https://jira.mios.com/browse/EZPI-299 by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/66
-* Feature house modes by @krishna-ezlo in https://github.com/ezloteam/Ezlo_Pi/pull/64
-* Ezpi 300 integrate test new sensors by @NDJ-EZLO in https://github.com/ezloteam/Ezlo_Pi/pull/65
-* EZPI issue: https://jira.mios.com/browse/EZPI-303 by @NDJ-EZLO in https://github.com/ezloteam/Ezlo_Pi/pull/67
-* Added nvs read and write. by @NDJ-EZLO in https://github.com/ezloteam/Ezlo_Pi/pull/69
-* Ezpi 305 implement network scan command by @NDJ-EZLO in https://github.com/ezloteam/Ezlo_Pi/pull/68
-* Development fix by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/73
-* Ezpi312 run scene implementation by @NDJ-EZLO in https://github.com/ezloteam/Ezlo_Pi/pull/72
-* added necessary 'item->user_arg' and valueFormatted malloc guards. EZ… by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/70
-* https://jira.mios.com/browse/EZPI-316 by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/74
-* added runCustomScript .EZPI-313: https://jira.mios.com/browse/EZPI-313 by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/76
-* Mdns implementation by @NDJ-EZLO in https://github.com/ezloteam/Ezlo_Pi/pull/78
-* Development gpio not found fix by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/81
-* Mdns ws implementation by @NDJ-EZLO in https://github.com/ezloteam/Ezlo_Pi/pull/82
-* ble tested : https://jira.mios.com/browse/EZPI-323 by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/83
-* Development gpio num fix by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/84
-* modified mdns structure. by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/85
-* Development by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/86
+
+- TSL256 Lux sensor V3 by @NDJ-EZLO in https://github.com/ezloteam/Ezlo_Pi/pull/37
+- Dev v3 device config by @krishna-ezlo in https://github.com/ezloteam/Ezlo_Pi/pull/40
+- Feature scenes expression by @krishna-ezlo in https://github.com/ezloteam/Ezlo_Pi/pull/42
+- Dev v3 scene merge by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/43
+- Dev v3 sensor hilink ezpi 268 by @NDJ-EZLO in https://github.com/ezloteam/Ezlo_Pi/pull/44
+- Dev v3 dir refactor ezpi 271 by @NDJ-EZLO in https://github.com/ezloteam/Ezlo_Pi/pull/45
+- Refactoring sensor-device driver files. by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/46
+- PMS5003 integration to EzloPi(issue: https://jira.mios.com/browse/EZP… by @NDJ-EZLO in https://github.com/ezloteam/Ezlo_Pi/pull/47
+- sensor-devices dir_name re-structured by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/48
+- Dev v3 dir refactor ezpi 265 by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/49
+- Dev v3 dir refactor by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/50
+- Worked on warning : https://jira.mios.com/browse/EZPI-273 by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/51
+- Dev v3 by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/52
+- Removed static variables and worked on warning in sensor drivers by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/53
+- Feature hub scene edit by @krishna-ezlo in https://github.com/ezloteam/Ezlo_Pi/pull/54
+- Development ezpi255 by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/55
+- fixed mac address. by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/56
+- Development ezpi255 by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/57
+- Development pr template ezpi 286 by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/58
+- Implement Factory Restore Feature on Serial Command by @NDJ-EZLO in https://github.com/ezloteam/Ezlo_Pi/pull/62
+- Ble heap consumption ezpi 287 by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/63
+- complete : https://jira.mios.com/browse/EZPI-299 by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/66
+- Feature house modes by @krishna-ezlo in https://github.com/ezloteam/Ezlo_Pi/pull/64
+- Ezpi 300 integrate test new sensors by @NDJ-EZLO in https://github.com/ezloteam/Ezlo_Pi/pull/65
+- EZPI issue: https://jira.mios.com/browse/EZPI-303 by @NDJ-EZLO in https://github.com/ezloteam/Ezlo_Pi/pull/67
+- Added nvs read and write. by @NDJ-EZLO in https://github.com/ezloteam/Ezlo_Pi/pull/69
+- Ezpi 305 implement network scan command by @NDJ-EZLO in https://github.com/ezloteam/Ezlo_Pi/pull/68
+- Development fix by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/73
+- Ezpi312 run scene implementation by @NDJ-EZLO in https://github.com/ezloteam/Ezlo_Pi/pull/72
+- added necessary 'item->user_arg' and valueFormatted malloc guards. EZ… by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/70
+- https://jira.mios.com/browse/EZPI-316 by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/74
+- added runCustomScript .EZPI-313: https://jira.mios.com/browse/EZPI-313 by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/76
+- Mdns implementation by @NDJ-EZLO in https://github.com/ezloteam/Ezlo_Pi/pull/78
+- Development gpio not found fix by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/81
+- Mdns ws implementation by @NDJ-EZLO in https://github.com/ezloteam/Ezlo_Pi/pull/82
+- ble tested : https://jira.mios.com/browse/EZPI-323 by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/83
+- Development gpio num fix by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/84
+- modified mdns structure. by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/85
+- Development by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/86
 
 ## New Contributors
-* @lomasSE89 made their first contribution in https://github.com/ezloteam/Ezlo_Pi/pull/43
-* @ezlo-rikenm made their first contribution in https://github.com/ezloteam/Ezlo_Pi/pull/46
+
+- @lomasSE89 made their first contribution in https://github.com/ezloteam/Ezlo_Pi/pull/43
+- @ezlo-rikenm made their first contribution in https://github.com/ezloteam/Ezlo_Pi/pull/46
 
 **Full Changelog**: https://github.com/ezloteam/Ezlo_Pi/compare/v3.0.1...v3.3.6

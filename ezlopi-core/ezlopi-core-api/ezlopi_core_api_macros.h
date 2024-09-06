@@ -26,7 +26,7 @@ CLOUD_METHOD("hub.item.groups.list", item_groups_list, NULL)
 #ifdef CONFIG_EZPI_UTIL_TRACE_EN
 CLOUD_METHOD("hub.log.set", ezlopi_hub_cloud_log_set, NULL)
 CLOUD_METHOD("hub.log.local.set", ezlopi_hub_serial_log_set, ezlopi_hub_serial_log_set_updater)
-#endif  // CONFIG_EZPI_UTIL_TRACE_EN
+#endif // CONFIG_EZPI_UTIL_TRACE_EN
 
 #if defined(CONFIG_EZPI_SERV_ENABLE_MODES)
 CLOUD_METHOD("hub.modes.get", ezlopi_cloud_modes_get, NULL)
@@ -122,8 +122,7 @@ CLOUD_METHOD("hub.scenes.expressions.set", scenes_expressions_set, scenes_expres
 CLOUD_METHOD("hub.scenes.expressions.list", scenes_expressions_list, NULL)
 CLOUD_METHOD("hub.scenes.expressions.delete", scenes_expressions_delete, scenes_expressions_deleted)
 
-
-#endif //CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+#endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 CLOUD_METHOD("hub.nma.register.repeat", register_repeat, NULL)
 

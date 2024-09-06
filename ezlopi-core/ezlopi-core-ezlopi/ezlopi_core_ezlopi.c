@@ -103,7 +103,7 @@ void ezlopi_init(void)
     ezlopi_service_loop_add("core-device-loop", __device_loop, 1000, NULL);
 }
 
-l_ezlopi_device_t *link_next_parent_id(uint32_t target_to_clear_parent_id)
+static l_ezlopi_device_t *__link_next_parent_id(uint32_t target_to_clear_parent_id)
 {
     l_ezlopi_device_t *pre_devs = ezlopi_device_get_head();
     while (pre_devs)
@@ -155,7 +155,7 @@ static void ezlopi_initialize_devices_v3(void)
                 curr_device->cloud_properties.device_id == curr_device->next->cloud_properties.parent_device_id)
             {
                 /* if 'device_to_free' is parent_with_child_nodes */
-                curr_device = link_next_parent_id(curr_device->cloud_properties.device_id);
+                curr_device = __link_next_parent_id(curr_device->cloud_properties.device_id);
             }
             else
             {

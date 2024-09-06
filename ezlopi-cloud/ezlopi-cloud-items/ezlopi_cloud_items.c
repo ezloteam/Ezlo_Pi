@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "cjext.h"
+// #include "cjext.h"
 #include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_room.h"
@@ -17,7 +17,7 @@
 
 #include "ezlopi_service_webprov.h"
 
-static cJSON* ezlopi_device_create_item_table_from_prop(l_ezlopi_device_t *device_prop, l_ezlopi_item_t* item_properties)
+static cJSON* ezlopi_device_create_item_table_from_prop(l_ezlopi_device_t* device_prop, l_ezlopi_item_t* item_properties)
 {
     cJSON* cj_item_properties = cJSON_CreateObject(__FUNCTION__);
     if (cj_item_properties)
@@ -171,8 +171,11 @@ void items_set_value_v3(cJSON* cj_request, cJSON* cj_response)
     }
 }
 
+#if 0
 void items_update_v3(cJSON* cj_request, cJSON* cj_response)
 {
+    bool _break_loop = false;
+
     cJSON* cjson_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
     if (cjson_params)
     {
@@ -204,7 +207,7 @@ void items_update_v3(cJSON* cj_request, cJSON* cj_response)
                         cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_deviceCategory_str, curr_device->cloud_properties.category);
                         cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_deviceSubcategory_str, curr_device->cloud_properties.subcategory);
 
-                        char * room_name = ezlopi_core_room_get_name_by_id(curr_device->cloud_properties.room_id);
+                        char* room_name = ezlopi_core_room_get_name_by_id(curr_device->cloud_properties.room_id);
                         if (room_name)
                         {
                             cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_roomName_str, room_name);
@@ -227,10 +230,16 @@ void items_update_v3(cJSON* cj_request, cJSON* cj_response)
                         cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueType_str, curr_item->cloud_properties.value_type);
                     }
 
+                    _break_loop = true;
                     break;
                 }
 
                 curr_item = curr_item->next;
+            }
+
+            if (_break_loop == true)
+            {
+                break;
             }
 
             curr_device = curr_device->next;
@@ -238,7 +247,6 @@ void items_update_v3(cJSON* cj_request, cJSON* cj_response)
     }
 }
 
-#if 0
 cJSON* ezlopi_cloud_items_updated_from_devices_v3(l_ezlopi_device_t* device, l_ezlopi_item_t* item)
 {
     cJSON* cjson_response = cJSON_CreateObject(__FUNCTION__);

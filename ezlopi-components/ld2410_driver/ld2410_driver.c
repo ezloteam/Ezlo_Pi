@@ -10,6 +10,9 @@
  *	Released under LGPL-2.1 see https://github.com/ncmreynolds/ld2410/LICENSE for full license
  *
  */
+
+#warning "################### DO NOT USE printf ON PRODUCTION ###################"
+
 #include "ld2410_driver.h"
 #include "ezlopi_hal_uart.h"
 
@@ -47,7 +50,7 @@ static size_t ld2410_uart_write_byte(uint8_t byte);
 static bool ld2410_read_frame_(uint8_t l_byte); // Try to read a frame from the UART
 static bool ld2410_parse_data_frame_();			// Is the current data frame valid?
 static bool ld2410_parse_command_frame_();		// Is the current command frame valid?
-static void ld2410_print_frame_();				// Print the frame for debugging
+// static void ld2410_print_frame_();				// Print the frame for debugging
 static void ld2410_send_command_preamble_();	// Commands have the same preamble
 static void ld2410_send_command_postamble_();	// Commands have the same postamble
 static bool ld2410_enter_configuration_mode_(); // Necessary before sending any command
@@ -70,13 +73,15 @@ bool ld2410_begin(bool wait_for_radar, s_ezlopi_uart_t uart_settings)
 {
 	ezlo_ld2410_uart_handle = ezlopi_uart_init(uart_settings.baudrate, uart_settings.tx, uart_settings.rx, ld2410_callback, NULL);
 
+#warning "DO NOT USE printf ON PRODUCTION"
+
 #ifdef LD2410_DEBUG_INITIALIZATION
-	printf("ld2410 started");
+	// printf("ld2410 started");
 #endif
 	if (wait_for_radar)
 	{
 #ifdef LD2410_DEBUG_INITIALIZATION
-		printf("\nLD2410 firmware: ");
+		// printf("\nLD2410 firmware: ");
 #endif
 		if (ld2410_request_firmware_version())
 		{
@@ -88,14 +93,14 @@ bool ld2410_begin(bool wait_for_radar, s_ezlopi_uart_t uart_settings)
 		else
 		{
 #ifdef LD2410_DEBUG_INITIALIZATION
-			printf("no response\n");
+			// printf("no response\n");
 #endif
 		}
 	}
 	else
 	{
 #ifdef LD2410_DEBUG_INITIALIZATION
-		printf("\nLD2410 library configured");
+		// printf("\nLD2410 library configured");
 #endif
 		return true;
 	}
@@ -289,25 +294,28 @@ static bool ld2410_read_frame_(uint8_t l_byte)
 	return false;
 }
 
+#if 0
 static void ld2410_print_frame_()
 {
 	if (ack_frame_ == true)
 	{
-		printf("\nCmnd : ");
+		// printf("\nCmnd : ");
 	}
 	else
 	{
-		printf("\nData : ");
+		// printf("\nData : ");
 	}
 	for (uint8_t i = 0; i < radar_data_frame_position_; i++)
 	{
 		if (radar_data_frame_[i] < 0x10)
 		{
-			printf("0");
+			// printf("0");
 		}
-		printf("%x ", radar_data_frame_[i]);
+		// printf("%x ", radar_data_frame_[i]);
 	}
 }
+
+#endif
 
 static bool ld2410_parse_data_frame_()
 {
@@ -315,17 +323,18 @@ static bool ld2410_parse_data_frame_()
 	if (radar_data_frame_position_ == intra_frame_data_length_ + 10)
 	{
 #ifdef LD2410_DEBUG_DATA
-		ld2410_print_frame_();
+		// ld2410_print_frame_();
 #endif
 #ifdef LD2410_DEBUG_COMMANDS
 		if (ack_frame_ == true)
 		{
-			ld2410_print_frame_();
+			// ld2410_print_frame_();
 		}
 #endif
 		if (radar_data_frame_[6] == 0x01 && radar_data_frame_[7] == 0xAA) // Engineering mode data
 		{
 			target_type_ = radar_data_frame_[8];
+#if 0
 #ifdef LD2410_DEBUG_PARSE
 			printf("\nEngineering data - ");
 			if (target_type_ == 0x00)
@@ -345,6 +354,8 @@ static bool ld2410_parse_data_frame_()
 				printf("moving & stationary targets:");
 			}
 #endif
+#endif
+
 			/*
 			 *
 			 *	To-do support engineering mode
@@ -360,6 +371,7 @@ static bool ld2410_parse_data_frame_()
 			moving_target_energy_ = radar_data_frame_[11];
 			// stationary_target_distance_ = radar_data_frame_[12] + (radar_data_frame_[13] << 8);
 			moving_target_distance_ = radar_data_frame_[15] + (radar_data_frame_[16] << 8);
+#if 0
 #ifdef LD2410_DEBUG_PARSE
 			printf("\nNormal data - ");
 			if (target_type_ == 0x00)
@@ -389,22 +401,23 @@ static bool ld2410_parse_data_frame_()
 				// printf(stationary_target_energy_);
 			}
 #endif
+#endif
 			radar_uart_last_packet_ = millis();
 			return true;
 		}
 		else
 		{
-#ifdef LD2410_DEBUG_DATA
-			printf("\nUnknown frame type");
-#endif
-			ld2410_print_frame_();
+			// #ifdef LD2410_DEBUG_DATA
+			// 			printf("\nUnknown frame type");
+			// ld2410_print_frame_();
+			// #endif
 		}
 	}
 	else
 	{
-#ifdef LD2410_DEBUG_DATA
-		printf("\nFrame length unexpected: %d not %d", radar_data_frame_position_, intra_frame_data_length_ + 10);
-#endif
+		// #ifdef LD2410_DEBUG_DATA
+		// 		printf("\nFrame length unexpected: %d not %d", radar_data_frame_position_, intra_frame_data_length_ + 10);
+		// #endif
 	}
 	return false;
 }
@@ -412,80 +425,80 @@ static bool ld2410_parse_data_frame_()
 static bool ld2410_parse_command_frame_()
 {
 	uint16_t intra_frame_data_length_ = radar_data_frame_[4] + (radar_data_frame_[5] << 8);
-#ifdef LD2410_DEBUG_COMMANDS
-	ld2410_print_frame_();
-	printf("\nACK frame payload: %d bytes", intra_frame_data_length_);
-#endif
+	// #ifdef LD2410_DEBUG_COMMANDS
+	// 	ld2410_print_frame_();
+	// 	printf("\nACK frame payload: %d bytes", intra_frame_data_length_);
+	// #endif
 	latest_ack_ = radar_data_frame_[6];
 	latest_command_success_ = (radar_data_frame_[8] == 0x00 && radar_data_frame_[9] == 0x00);
 	if (intra_frame_data_length_ == 8 && latest_ack_ == 0xFF)
 	{
-#ifdef LD2410_DEBUG_COMMANDS
-		printf("\nACK for entering configuration mode: ");
-#endif
+		// #ifdef LD2410_DEBUG_COMMANDS
+		// 		printf("\nACK for entering configuration mode: ");
+		// #endif
 		if (latest_command_success_)
 		{
 			radar_uart_last_packet_ = millis();
-#ifdef LD2410_DEBUG_COMMANDS
-			printf("OK");
-#endif
+			// #ifdef LD2410_DEBUG_COMMANDS
+			// 			printf("OK");
+			// #endif
 			return true;
 		}
 		else
 		{
-			printf("failed");
+			// printf("failed");
 			return false;
 		}
 	}
 	else if (intra_frame_data_length_ == 4 && latest_ack_ == 0xFE)
 	{
-#ifdef LD2410_DEBUG_COMMANDS
-		printf("\nACK for leaving configuration mode: ");
-#endif
+		// #ifdef LD2410_DEBUG_COMMANDS
+		// 		printf("\nACK for leaving configuration mode: ");
+		// #endif
 		if (latest_command_success_)
 		{
 			radar_uart_last_packet_ = millis();
-#ifdef LD2410_DEBUG_COMMANDS
-			printf("OK");
-#endif
+			// #ifdef LD2410_DEBUG_COMMANDS
+			// 			printf("OK");
+			// #endif
 			return true;
 		}
 		else
 		{
-			printf("failed");
+			// printf("failed");
 			return false;
 		}
 	}
 	else if (intra_frame_data_length_ == 4 && latest_ack_ == 0x60)
 	{
-#ifdef LD2410_DEBUG_COMMANDS
-		printf("\nACK for setting max values: ");
-#endif
+		// #ifdef LD2410_DEBUG_COMMANDS
+		// 		printf("\nACK for setting max values: ");
+		// #endif
 		if (latest_command_success_)
 		{
 			radar_uart_last_packet_ = millis();
-#ifdef LD2410_DEBUG_COMMANDS
-			printf("OK");
-#endif
+			// #ifdef LD2410_DEBUG_COMMANDS
+			// 			printf("OK");
+			// #endif
 			return true;
 		}
 		else
 		{
-			printf("failed");
+			// printf("failed");
 			return false;
 		}
 	}
 	else if (intra_frame_data_length_ == 28 && latest_ack_ == 0x61)
 	{
-#ifdef LD2410_DEBUG_COMMANDS
-		printf("\nACK for current configuration: ");
-#endif
+		// #ifdef LD2410_DEBUG_COMMANDS
+		// 		printf("\nACK for current configuration: ");
+		// #endif
 		if (latest_command_success_)
 		{
 			radar_uart_last_packet_ = millis();
-#ifdef LD2410_DEBUG_COMMANDS
-			printf("OK");
-#endif
+			// #ifdef LD2410_DEBUG_COMMANDS
+			// 			printf("OK");
+			// #endif
 			max_gate = radar_data_frame_[11];
 			max_moving_gate = radar_data_frame_[12];
 			max_stationary_gate = radar_data_frame_[13];
@@ -509,6 +522,7 @@ static bool ld2410_parse_command_frame_()
 			stationary_sensitivity[8] = radar_data_frame_[31];
 			sensor_idle_time = radar_data_frame_[32];
 			sensor_idle_time += (radar_data_frame_[33] << 8);
+#if 0
 #ifdef LD2410_DEBUG_COMMANDS
 			printf("\nMax gate distance: %d", max_gate);
 			printf("\nMax motion detecting gate distance: %d", max_moving_gate);
@@ -522,38 +536,40 @@ static bool ld2410_parse_command_frame_()
 			}
 			printf("\nSensor idle timeout: %ds", sensor_idle_time);
 #endif
+#endif
+
 			return true;
 		}
 		else
 		{
-			printf("failed");
+			// printf("failed");
 			return false;
 		}
 	}
 	else if (intra_frame_data_length_ == 4 && latest_ack_ == 0x64)
 	{
-#ifdef LD2410_DEBUG_COMMANDS
-		printf("\nACK for setting sensitivity values: ");
-#endif
+		// #ifdef LD2410_DEBUG_COMMANDS
+		// 		printf("\nACK for setting sensitivity values: ");
+		// #endif
 		if (latest_command_success_)
 		{
 			radar_uart_last_packet_ = millis();
-#ifdef LD2410_DEBUG_COMMANDS
-			printf("OK");
-#endif
+			// #ifdef LD2410_DEBUG_COMMANDS
+			// 			printf("OK");
+			// #endif
 			return true;
 		}
 		else
 		{
-			printf("failed");
+			// printf("failed");
 			return false;
 		}
 	}
 	else if (intra_frame_data_length_ == 12 && latest_ack_ == 0xA0)
 	{
-#ifdef LD2410_DEBUG_COMMANDS
-		printf("\nACK for firmware version: ");
-#endif
+		// #ifdef LD2410_DEBUG_COMMANDS
+		// 		printf("\nACK for firmware version: ");
+		// #endif
 		if (latest_command_success_)
 		{
 			firmware_major_version = radar_data_frame_[13];
@@ -563,60 +579,60 @@ static bool ld2410_parse_command_frame_()
 			firmware_bugfix_version += radar_data_frame_[16] << 16;
 			firmware_bugfix_version += radar_data_frame_[17] << 24;
 			radar_uart_last_packet_ = millis();
-#ifdef LD2410_DEBUG_COMMANDS
-			printf("OK");
-#endif
+			// #ifdef LD2410_DEBUG_COMMANDS
+			// 			printf("OK");
+			// #endif
 			return true;
 		}
 		else
 		{
-			printf("failed");
+			// printf("failed");
 			return false;
 		}
 	}
 	else if (intra_frame_data_length_ == 4 && latest_ack_ == 0xA2)
 	{
-#ifdef LD2410_DEBUG_COMMANDS
-		printf("\nACK for factory reset: ");
-#endif
+		// #ifdef LD2410_DEBUG_COMMANDS
+		// 		printf("\nACK for factory reset: ");
+		// #endif
 		if (latest_command_success_)
 		{
 			radar_uart_last_packet_ = millis();
-#ifdef LD2410_DEBUG_COMMANDS
-			printf("OK");
-#endif
+			// #ifdef LD2410_DEBUG_COMMANDS
+			// 			printf("OK");
+			// #endif
 			return true;
 		}
 		else
 		{
-			printf("failed");
+			// printf("failed");
 			return false;
 		}
 	}
 	else if (intra_frame_data_length_ == 4 && latest_ack_ == 0xA3)
 	{
-#ifdef LD2410_DEBUG_COMMANDS
-		printf("\nACK for restart: ");
-#endif
+		// #ifdef LD2410_DEBUG_COMMANDS
+		// 		printf("\nACK for restart: ");
+		// #endif
 		if (latest_command_success_)
 		{
 			radar_uart_last_packet_ = millis();
-#ifdef LD2410_DEBUG_COMMANDS
-			printf("OK");
-#endif
+			// #ifdef LD2410_DEBUG_COMMANDS
+			// 			printf("OK");
+			// #endif
 			return true;
 		}
 		else
 		{
-			printf("failed");
+			// printf("failed");
 			return false;
 		}
 	}
 	else
 	{
-#ifdef LD2410_DEBUG_COMMANDS
-		printf("\nUnknown ACK");
-#endif
+		// #ifdef LD2410_DEBUG_COMMANDS
+		// 		printf("\nUnknown ACK");
+		// #endif
 	}
 	return false;
 }
