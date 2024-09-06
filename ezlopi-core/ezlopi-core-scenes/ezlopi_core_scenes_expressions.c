@@ -3,16 +3,15 @@
 
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
+#include "cjext.h"
 #include "lua/lua.h"
 #include "lua/lualib.h"
 #include "lua/lauxlib.h"
-#include "cjext.h"
 
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_devices.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_scenes_value.h"
-#include "ezlopi_core_scenes_scripts.h"
 #include "ezlopi_core_scenes_expressions.h"
 
 #include "ezlopi_cloud_constants.h"
@@ -178,7 +177,6 @@ static int __edit_expression_ll(s_ezlopi_expressions_t *expn_node, cJSON *cj_new
             {
             case EXPRESSION_VALUE_TYPE_STRING:
             {
-                TRACE_D("here");
                 if (expn_node->exp_value.u_value.str_value)
                 {
                     ezlopi_free(__FUNCTION__, expn_node->exp_value.u_value.str_value);
@@ -188,7 +186,6 @@ static int __edit_expression_ll(s_ezlopi_expressions_t *expn_node, cJSON *cj_new
             }
             case EXPRESSION_VALUE_TYPE_CJ:
             {
-                TRACE_D("here");
                 if (expn_node->exp_value.u_value.cj_value)
                 {
                     cJSON_Delete(__FUNCTION__, expn_node->exp_value.u_value.cj_value);
@@ -197,7 +194,7 @@ static int __edit_expression_ll(s_ezlopi_expressions_t *expn_node, cJSON *cj_new
                 break;
             }
             default:
-                TRACE_D("expn_valueType [%d]", expn_node->exp_value.type);
+                // TRACE_D("expn_valueType [%d]", expn_node->exp_value.type);
                 break;
             }
 
@@ -289,6 +286,167 @@ int ezlopi_scenes_expressions_delete_by_name(char *expression_name)
     return ret;
 }
 
+static s_ezlopi_core_lua_data_t *______expression_eval_report(lua_State *lua_state, int status)
+{
+    s_ezlopi_core_lua_data_t * msg = (s_ezlopi_core_lua_data_t *)ezlopi_malloc(__FUNCTION__, sizeof(s_ezlopi_core_lua_data_t));
+    if (msg)
+    {
+        memset(msg, 0, sizeof(s_ezlopi_core_lua_data_t));
+
+        if (LUA_OK == status)
+        {
+            lua_checkstack(lua_state,1);
+            switch (lua_type(lua_state, -1))
+            {
+            case LUA_TBOOLEAN:
+            {
+                msg->val_type = EZPI_LUA_VAL_BOOL;
+                msg->lua.value_bool = (bool)lua_toboolean(lua_state, -1);
+                TRACE_D("LUA_TO_BOOL : '%s'", (msg->lua.value_bool) ? "true" : "false");
+                break;
+            }
+            case LUA_TNUMBER:
+            {
+                msg->val_type = EZPI_LUA_VAL_NUM;
+                msg->lua.value_num = lua_tonumber(lua_state, -1);
+                TRACE_D("LUA_TO_NUM : '%i'", lua_tonumber(lua_state, -1));
+                break;
+            }
+            case LUA_TSTRING:
+            {
+                msg->val_type = EZPI_LUA_VAL_STR;
+                msg->lua.value_str = lua_tostring(lua_state, -1);
+                TRACE_D("LUA_TO_STRING : '%s'", msg->lua.value_str);
+                break;
+            }
+            default:
+            {
+                ezlopi_free(__FUNCTION__, msg);
+                msg = NULL;
+                break;
+            }
+            }
+        }
+        else if (LUA_ERRERR == status)
+        {
+            msg->val_type = EZPI_LUA_VAL_ERR;
+            msg->lua.value_str = lua_tostring(lua_state, -1);
+            TRACE_D("LUA_TO_STRING : [ERROR] '%s'", msg->lua.value_str);
+        }
+        else
+        {  // for status other than 'LUA_OK' & 'LUA_ERRERR'
+            TRACE_W("lua_type(lua_state, -1)", lua_type(lua_state, -1));
+            (LUA_TSTRING == lua_type(lua_state, -1)) ? TRACE_D("LUA_unknown : [STATUS : %d] '%s'", status, lua_tostring(lua_state, -1))
+                : TRACE_D(" LUA_unknown : [STATUS : %d]", status);
+        }
+    }
+
+    lua_pop(lua_state, 1);
+    return msg;
+}
+static int ____extract_expn_res_into_cjson(cJSON *cj_des, const char *name, lua_State *lua_state, int tmp_ret)
+{
+    int ret = 1;
+    s_ezlopi_core_lua_data_t *script_report = ______expression_eval_report(lua_state, tmp_ret);
+    if (script_report)
+    {
+        TRACE_D("script_report->val_type = %d", (int)(script_report->val_type));
+        switch (script_report->val_type)
+        {
+        case EZPI_LUA_VAL_BOOL:
+        {
+            if (cj_des && (LUA_OK == tmp_ret))
+            {
+                cJSON_AddBoolToObject(__FUNCTION__, cj_des, "value", script_report->lua.value_bool);
+            }
+            TRACE_D("Result in '%s' -> %s", name, (script_report->lua.value_bool) ? "true" : "false");
+            break;
+        }
+        case EZPI_LUA_VAL_NUM:
+        {
+            if (cj_des && (LUA_OK == tmp_ret))
+            {
+                cJSON_AddNumberToObject(__FUNCTION__, cj_des, "value", script_report->lua.value_num);
+                TRACE_D("val [%p]", (script_report->lua.value_num));
+            }
+            TRACE_D("Result in '%s' -> %d", name, script_report->lua.value_num);
+            break;
+        }
+        case EZPI_LUA_VAL_STR:
+        {
+            if (script_report->lua.value_str)
+            {
+                if (cj_des && (LUA_OK == tmp_ret))
+                {
+                    cJSON_AddStringToObject(__FUNCTION__, cj_des, "value", script_report->lua.value_str);
+                }
+                TRACE_D("Result in '%s' -> %s", name, script_report->lua.value_str);
+                ezlopi_free(__FUNCTION__, script_report->lua.value_str);
+            }
+            break;
+        }
+        case EZPI_LUA_VAL_ERR:
+        {
+            ret = 0;
+            if (script_report->lua.value_str)
+            {
+                if (cj_des && (LUA_ERRERR == tmp_ret))
+                {
+                    cJSON_AddStringToObject(__FUNCTION__, cj_des, "error", script_report->lua.value_str);
+                }
+                TRACE_D("Error in '%s' -> %s", name, script_report->lua.value_str);
+                ezlopi_free(__FUNCTION__, script_report->lua.value_str);
+            }
+            break;
+        }
+        case EZPI_LUA_VAL_NULL:
+        case EZPI_LUA_VAL_MAX:
+        default:
+            break;
+        }
+        ezlopi_free(__FUNCTION__, script_report);
+    }
+    return ret;
+}
+static int __ezlopi_scenes_scripts_evaluate_nvs_expression(cJSON *cj_des, const char *exp_name, const char *exp_code)
+{
+    int ret = 0;
+    lua_State *lua_state = luaL_newstate();
+    if (lua_state)
+    {
+        luaL_openlibs(lua_state);
+
+        int tmp_ret = luaL_loadstring(lua_state, exp_code);
+        if (tmp_ret == LUA_OK)
+        {
+            tmp_ret = lua_pcall(lua_state, 0, 1, 0);
+            if (tmp_ret == LUA_OK)
+            {
+                TRACE_D("here1 [%d]", tmp_ret);
+                ret = ____extract_expn_res_into_cjson(cj_des, exp_name, lua_state, tmp_ret);
+            }
+            else
+            {
+                const char* error_msg = lua_tostring(lua_state, -1);
+                TRACE_D("Runtime error [%d]: %s", tmp_ret, error_msg);
+                lua_pop(lua_state, 1); // Remove the error message from the stack
+            }
+        }
+        else
+        {
+            const char* error_msg = lua_tostring(lua_state, -1);
+            TRACE_D("Compile error [%d]: %s", tmp_ret, error_msg);
+            lua_pop(lua_state, 1); // Remove the error message from the stack
+        }
+
+        lua_close(lua_state);
+    }
+    else
+    {
+        TRACE_E("Couldn't create lua state for -> %s", exp_name);
+    }
+    return ret;
+}
 
 void ezlopi_scenes_expressions_list_cjson(cJSON *cj_expresson_array, cJSON *cj_params)
 {
@@ -329,21 +487,26 @@ void ezlopi_scenes_expressions_list_cjson(cJSON *cj_expresson_array, cJSON *cj_p
                         cJSON_AddItemReferenceToObject(__FUNCTION__, cj_expr, ezlopi_metadata_str, curr_exp->meta_data);
                     }
 
-                    cJSON *cj_val_params = cJSON_AddObjectToObject(__FUNCTION__, cj_expr, ezlopi_params_str);
-                    if (cj_val_params)
+                    if ((NULL != curr_exp->items) || (NULL != curr_exp->device_item_names))
                     {
-                        __add_expression_items(curr_exp, cj_val_params);
-                        __add_expression_device_item_names(curr_exp, cj_val_params);
+                        cJSON *cj_val_params = cJSON_AddObjectToObject(__FUNCTION__, cj_expr, ezlopi_params_str);
+                        if (cj_val_params)
+                        {
+                            __add_expression_items(curr_exp, cj_val_params);
+                            __add_expression_device_item_names(curr_exp, cj_val_params);
+                        }
                     }
 
                     if (show_value)
                     {
                         if (curr_exp->variable)
-                        {   // For variable-only
+                        {
+                            TRACE_S("FOUND --> Variable");
                             __add_expression_value(curr_exp, cj_expr);  // adds valueType + value
                         }
                         else
-                        {   // For expression-only
+                        {
+                            TRACE_S("FOUND --> Expression");
                             if ((EZLOPI_VALUE_TYPE_NONE < curr_exp->value_type) && (EZLOPI_VALUE_TYPE_MAX > curr_exp->value_type))
                             {
                                 cJSON_AddStringToObject(__FUNCTION__, cj_expr, ezlopi_valueType_str, ezlopi_scene_get_scene_value_type_name(curr_exp->value_type));
@@ -351,7 +514,7 @@ void ezlopi_scenes_expressions_list_cjson(cJSON *cj_expresson_array, cJSON *cj_p
                             // evaluate the lua script 
                             if (curr_exp->code)
                             {
-                                ezlopi_scenes_scripts_evaluate_nvs_expression(curr_exp->name, curr_exp->code);
+                                __ezlopi_scenes_scripts_evaluate_nvs_expression(cj_expr, curr_exp->name, curr_exp->code);
                             }
                             // add the 'result' [value or error]
 
@@ -519,10 +682,8 @@ int ezlopi_scenes_expression_update_expr(s_ezlopi_expressions_t *expression_node
     int ret = 0;
     if (expression_node && cj_new_expression)
     {
-        TRACE_D("here");
         if (1 == __edit_expression_ll(expression_node, cj_new_expression)) // if successfully updated in ll
         {
-            TRACE_D("new_expn-ll");
             ezlopi_scenes_expressions_print(expression_node);
             char id_str[32];
             snprintf(id_str, sizeof(id_str), "%08x", expression_node->exp_id);
@@ -975,7 +1136,7 @@ static s_ezlopi_expressions_t *__expressions_create_node(uint32_t exp_id, cJSON 
         }
 
         new_exp_node->exp_id = __expression_store_to_nvs(exp_id, cj_expression);
-        ezlopi_scenes_expressions_print(new_exp_node);
+        // ezlopi_scenes_expressions_print(new_exp_node);
     }
 
     return new_exp_node;

@@ -38,7 +38,7 @@ static void __scripts_process_runner(void);
 static void __load_custom_libs(lua_State *lua_state);
 static void __run_script(l_ezlopi_scenes_script_t *script_node);
 static void __scripts_remove_id_and_update_list(uint32_t script_id);
-static const char *__script_report(lua_State *lua_state, int status);
+static const char * __script_report(lua_State *lua_state, int status);
 static void __exit_script_hook(lua_State *lua_state, lua_Debug *ar);
 static l_ezlopi_scenes_script_t *__scripts_create_node(uint32_t script_id, cJSON *cj_script);
 
@@ -265,7 +265,7 @@ static void __script_process(void *arg)
         int tmp_ret = luaL_loadstring(lua_state, script_node->code);
         if (tmp_ret)
         {
-            const char *script_report = __script_report(lua_state, tmp_ret);
+            const char* script_report = __script_report(lua_state, tmp_ret);
             if (script_report)
             {
                 TRACE_E("Error in '%s' -> %s", script_node->name, script_report);
@@ -275,7 +275,7 @@ static void __script_process(void *arg)
         tmp_ret = lua_pcall(lua_state, 0, 1, 0);
         if (tmp_ret)
         {
-            const char *script_report = __script_report(lua_state, tmp_ret);
+            const char* script_report = __script_report(lua_state, tmp_ret);
             if (script_report)
             {
                 TRACE_E("Error in '%s' -> %s", script_node->name, script_report);
@@ -489,15 +489,14 @@ static void __exit_script_hook(lua_State *lua_state, lua_Debug *ar)
     luaL_error(lua_state, "Exited from software call");
 }
 
-static const char *__script_report(lua_State *lua_state, int status)
+static const char * __script_report(lua_State *lua_state, int status)
 {
     if (status == LUA_OK)
     {
         return NULL;
     }
 
-    const char *msg = lua_tostring(lua_state, -1);
-    TRACE_D("LUA_TO_STRING : '%s'", msg);
+    const char* msg = lua_tostring(lua_state, -1);
     lua_pop(lua_state, 1);
     return msg;
 }
@@ -520,56 +519,5 @@ static void __load_custom_libs(lua_State *lua_state)
         idx++;
     }
 }
-
-// static void __expn_load_custom_libs(lua_State *lua_state)
-// {
-//     uint32_t idx = 0;
-//     while (lua_scripts_modules[idx].name && lua_scripts_modules[idx].func)
-//     {
-//         TRACE_D("loading custom lib -> %s : %p", lua_scripts_modules[idx].name, lua_scripts_modules[idx].func);
-//         luaL_requiref(lua_state, lua_scripts_modules[idx].name, lua_scripts_modules[idx].func, 1);
-//         lua_pop(lua_state, 1);
-//         idx++;
-//     }
-// }
-
-char *ezlopi_scenes_scripts_evaluate_nvs_expression(const char *exp_name, const char *exp_code)
-{
-    char *ret = NULL;
-    lua_State *lua_state = luaL_newstate();
-    if (lua_state)
-    {
-        luaL_openlibs(lua_state);
-        // __expn_load_custom_libs(lua_state);
-
-        int tmp_ret = luaL_loadstring(lua_state, exp_code);
-        if (tmp_ret)
-        {
-            const char *script_report = __script_report(lua_state, tmp_ret);
-            if (script_report)
-            {
-                TRACE_E("Error in '%s' -> %s", exp_name, script_report);
-            }
-        }
-
-        tmp_ret = lua_pcall(lua_state, 0, 1, 0);
-        if (tmp_ret)
-        {
-            const char *script_report = __script_report(lua_state, tmp_ret);
-            if (script_report)
-            {
-                TRACE_E("Error in '%s' -> %s", exp_name, script_report);
-            }
-        }
-
-        lua_close(lua_state);
-    }
-    else
-    {
-        TRACE_E("Couldn't create lua state for -> %s", exp_name);
-    }
-    return ret;
-}
-
 
 #endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS

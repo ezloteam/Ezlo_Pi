@@ -40,7 +40,6 @@ void ezlopi_scenes_scripts_delete_by_id(uint32_t script_id);
 
 void ezlopi_scenes_scripts_factory_info_reset(void);
 
-char *ezlopi_scenes_scripts_evaluate_nvs_expression(const char *exp_name, const char *exp_code);
 #endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 #endif // _EZLOPI_CORE_SCENES_SCRIPTS_H_

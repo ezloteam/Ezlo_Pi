@@ -9,6 +9,29 @@
 
 #include "ezlopi_core_scenes_v2.h"
 
+
+typedef enum e_lua_res_valuetype
+{
+    EZPI_LUA_VAL_NULL = 0,
+    EZPI_LUA_VAL_BOOL,
+    EZPI_LUA_VAL_NUM,
+    EZPI_LUA_VAL_STR,
+    EZPI_LUA_VAL_ERR,
+    EZPI_LUA_VAL_MAX
+}e_lua_res_valuetype_t;
+typedef union u_lua_value
+{
+    bool value_bool;
+    double value_num;
+    char *value_str;
+}u_lua_value_t;
+
+typedef struct s_ezlopi_core_lua_data
+{
+    e_lua_res_valuetype_t val_type;
+    u_lua_value_t lua;
+}s_ezlopi_core_lua_data_t;
+
 typedef struct s_exp_items
 {
     char name[48];
@@ -192,6 +215,7 @@ s_ezlopi_expressions_t *ezlopi_scenes_get_expression_node_by_name(char *expressi
  * @return int
  */
 int ezlopi_scenes_expression_update_expr(s_ezlopi_expressions_t *expression_node, cJSON *cj_new_expression);
+
 
 #endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 

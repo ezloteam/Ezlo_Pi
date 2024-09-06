@@ -536,7 +536,7 @@ static l_scenes_list_v2_t *_scenes_populate(cJSON *cj_scene, uint32_t scene_id)
     }
     else
     {
-        CJSON_TRACE("new-scene", cj_scene);
+        // CJSON_TRACE("new-scene", cj_scene);
         scenes_list_head_v2 = __new_scene_populate(cj_scene, scene_id);
         new_scene_node = scenes_list_head_v2;
     }
