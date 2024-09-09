@@ -4,9 +4,12 @@
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 #include "cjext.h"
-#include "lua/lua.h"
+// #include "lua/lua.h"
 #include "lua/lualib.h"
 #include "lua/lauxlib.h"
+
+#include "core_getters_api.h"
+#include "lua_helper_functions.h"
 
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_devices.h"
@@ -198,7 +201,7 @@ static int __edit_expression_ll(s_ezlopi_expressions_t *expn_node, cJSON *cj_new
                 break;
             }
 
-            if (true == expn_node->variable)// only if variable--> store the 'constant' variable-value.
+            if (true == expn_node->variable) // only if variable--> store the 'constant' variable-value.
             {
                 cJSON *cj_value = cJSON_GetObjectItem(__FUNCTION__, cj_new_expression, ezlopi_value_str);
                 if (cj_value)
@@ -301,7 +304,7 @@ static s_ezlopi_core_lua_data_t *______expression_eval_report(lua_State *lua_sta
             case LUA_TBOOLEAN:
             {
                 msg->val_type = EZPI_LUA_VAL_BOOL;
-                msg->lua.value_bool = (bool)lua_toboolean(lua_state, -1);
+                msg->lua.value_bool = lua_toboolean(lua_state, -1);
                 TRACE_D("LUA_TO_BOOL : '%s'", (msg->lua.value_bool) ? "true" : "false");
                 break;
             }
@@ -334,10 +337,10 @@ static s_ezlopi_core_lua_data_t *______expression_eval_report(lua_State *lua_sta
             TRACE_D("LUA_TO_STRING : [ERROR] '%s'", msg->lua.value_str);
         }
         else
-        {  // for status other than 'LUA_OK' & 'LUA_ERRERR'
+        { // for status other than 'LUA_OK' & 'LUA_ERRERR'
             TRACE_W("lua_type(lua_state, -1)", lua_type(lua_state, -1));
             (LUA_TSTRING == lua_type(lua_state, -1)) ? TRACE_D("LUA_unknown : [STATUS : %d] '%s'", status, lua_tostring(lua_state, -1))
-                : TRACE_D(" LUA_unknown : [STATUS : %d]", status);
+                                                     : TRACE_D(" LUA_unknown : [STATUS : %d]", status);
         }
     }
 
@@ -408,7 +411,7 @@ static int ____extract_expn_res_into_cjson(cJSON *cj_des, const char *name, lua_
     }
     return ret;
 }
-static int __ezlopi_scenes_scripts_evaluate_nvs_expression(cJSON *cj_des, cJSON *src_lua_params, const char *exp_name, const char *exp_code)
+static int __ezlopi_scenes_scripts_evaluate_nvs_expression(cJSON *cj_des, cJSON *lua_prop_params, const char *exp_name, const char *exp_code)
 {
     int ret = 0;
     lua_State *lua_state = luaL_newstate();
@@ -416,7 +419,7 @@ static int __ezlopi_scenes_scripts_evaluate_nvs_expression(cJSON *cj_des, cJSON 
     {
         luaL_openlibs(lua_state);
 
-        if (NULL == src_lua_params)
+        if (NULL == lua_prop_params)
         {
             int tmp_ret = luaL_loadstring(lua_state, exp_code);
             if (tmp_ret == LUA_OK)
@@ -441,9 +444,109 @@ static int __ezlopi_scenes_scripts_evaluate_nvs_expression(cJSON *cj_des, cJSON 
                 lua_pop(lua_state, 1); // Remove the error message from the stack
             }
         }
-        else
+        else // if , params exits
         {
+            uint8_t total_key_count = 0;
 
+            // create 'params' tables.
+            lua_newtable(lua_state);
+
+            // if 'device_item_names' exists
+            cJSON *cj_device_item_names = NULL;
+            cJSON *cj_items = NULL;
+
+            cj_device_item_names = cJSON_GetObjectItem(__FUNCTION__, lua_prop_params, ezlopi_device_item_names_str);
+            if (cj_device_item_names && cJSON_IsArray(cj_device_item_names))
+            {
+                int idx = 0;
+                cJSON *cj_device_item = NULL;
+                while (NULL != (cj_device_item = cJSON_GetArrayItem(cj_device_item_names, idx)))
+                {
+                    // get the item id
+                    cJSON *cj_target_name = cJSON_GetObjectItem(__FUNCTION__, cj_device_item, "name");
+                    cJSON *cj_dev_name = cJSON_GetObjectItem(__FUNCTION__, cj_device_item, "deviceName");
+                    cJSON *cj_item_name = cJSON_GetObjectItem(__FUNCTION__, cj_device_item, "itemName");
+                    if ((cj_target_name && cj_target_name->valuestring) && (cj_dev_name && cj_dev_name->valuestring) && (cj_item_name && cj_item_name->valuestring))
+                    {
+                        l_ezlopi_device_t *curr_dev_node = ezlopi_device_get_head();
+                        while (curr_dev_node)
+                        {
+                            if (EZPI_STRNCMP_IF_EQUAL(cj_dev_name->valuestring, curr_dev_node->cloud_properties.device_name, cj_dev_name->str_value_len, strlen(curr_dev_node->cloud_properties.device_name))) // "deviceName" == "siren"
+                            {
+                                l_ezlopi_item_t *item_prop = curr_dev_node->items;
+                                while (item_prop)
+                                {
+                                    if (EZPI_STRNCMP_IF_EQUAL(cj_item_name->valuestring, item_prop->cloud_properties.item_name, cj_item_name->str_value_len, strlen(item_prop->cloud_properties.item_name))) // "itemName" == "sound_level"
+                                    {
+                                        // create the sub-table
+                                        lua_newtable(lua_state); // kitchenTemperatureSetpoint
+                                        cJSON *cj_result = cJSON_CreateObject(__FUNCTION__);
+                                        if (cj_result)
+                                        {
+                                            item_prop->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item_prop, cj_result, item_prop->user_arg);
+                                            cJSON *cj_value = cJSON_GetObjectItem(__FUNCTION__, cj_result, ezlopi_value_str);
+                                            if (cj_value)
+                                            {
+                                                switch (cj_value->type)
+                                                {
+                                                case cJSON_True:
+                                                case cJSON_False:
+                                                {
+                                                    lua_create_table_bool_key_value(ezlopi_value_str, cj_value->valuedouble ? true : false);
+                                                    break;
+                                                }
+                                                case cJSON_Number:
+                                                {
+                                                    lua_create_table_number_key_value(ezlopi_value_str, cj_value->valuedouble);
+                                                    break;
+                                                }
+                                                case cJSON_String:
+                                                {
+                                                    if (cj_value->valuestring)
+                                                    {
+                                                        lua_create_table_string_key_value(ezlopi_value_str, cj_value->valuestring);
+                                                    }
+                                                    break;
+                                                }
+                                                default:
+                                                {
+                                                    break;
+                                                }
+                                                }
+                                            }
+                                            cJSON_Delete(__FUNCTION__, cj_result);
+                                        }
+                                        lua_create_table_string_key_value(ezlopi_scale_str, item_prop->cloud_properties.scale);
+                                        lua_setfield(L, -2, (const char *)cj_target_name->valuestring); // Set 'kitchenTemperatureSetpoint' in 'params'
+
+                                        // creating the table in lua
+
+
+
+                                        total_key_count++;
+                                        break;
+                                    }
+
+                                    item_prop = item_prop->next;
+                                }
+
+                                break;
+                            }
+
+                            curr_dev_node = curr_dev_node->next;
+                        }
+                    }
+
+                    idx++;
+                }
+            }
+
+            if ((NULL == cj_device_item_names) && (NULL != (cj_items = cJSON_GetObjectItem(__FUNCTION__, lua_prop_params, ezlopi_items_str))))
+            {
+                if (cj_items && cJSON_IsArray(cj_items))
+                {
+                }
+            }
         }
         lua_close(lua_state);
     }
@@ -493,7 +596,7 @@ void ezlopi_scenes_expressions_list_cjson(cJSON *cj_expresson_array, cJSON *cj_p
                         cJSON_AddItemReferenceToObject(__FUNCTION__, cj_expr, ezlopi_metadata_str, curr_exp->meta_data);
                     }
 
-                    cJSON *lua_operate_params = NULL;
+                    cJSON *lua_prop_params = NULL;
                     if ((NULL != curr_exp->items) || (NULL != curr_exp->device_item_names))
                     {
                         cJSON *cj_val_params = cJSON_AddObjectToObject(__FUNCTION__, cj_expr, ezlopi_params_str);
@@ -501,7 +604,7 @@ void ezlopi_scenes_expressions_list_cjson(cJSON *cj_expresson_array, cJSON *cj_p
                         {
                             __add_expression_items(curr_exp, cj_val_params);
                             __add_expression_device_item_names(curr_exp, cj_val_params);
-                            lua_operate_params = cj_val_params;
+                            lua_prop_params = cj_val_params;
                         }
                     }
 
@@ -510,7 +613,7 @@ void ezlopi_scenes_expressions_list_cjson(cJSON *cj_expresson_array, cJSON *cj_p
                         if (curr_exp->variable)
                         {
                             TRACE_S("FOUND --> Variable");
-                            __add_expression_value(curr_exp, cj_expr);  // adds valueType + value
+                            __add_expression_value(curr_exp, cj_expr); // adds valueType + value
                         }
                         else
                         {
@@ -519,13 +622,12 @@ void ezlopi_scenes_expressions_list_cjson(cJSON *cj_expresson_array, cJSON *cj_p
                             {
                                 cJSON_AddStringToObject(__FUNCTION__, cj_expr, ezlopi_valueType_str, ezlopi_scene_get_scene_value_type_name(curr_exp->value_type));
                             }
-                            // evaluate the lua script 
+                            // evaluate the lua script
                             if (curr_exp->code)
                             {
-                                __ezlopi_scenes_scripts_evaluate_nvs_expression(cj_expr, lua_operate_params, curr_exp->name, curr_exp->code);
+                                __ezlopi_scenes_scripts_evaluate_nvs_expression(cj_expr, lua_prop_params, curr_exp->name, curr_exp->code);
                             }
                             // add the 'result' [value or error]
-
                         }
                     }
 
@@ -1138,7 +1240,7 @@ static s_ezlopi_expressions_t *__expressions_create_node(uint32_t exp_id, cJSON 
 
         new_exp_node->value_type = ezlopi_core_scenes_value_get_type(cj_expression, ezlopi_valueType_str);
 
-        if (new_exp_node->variable) // if true ; incoming 'Value' should be saved into nvs 
+        if (new_exp_node->variable) // if true ; incoming 'Value' should be saved into nvs
         {
             __get_expressions_value(new_exp_node, cJSON_GetObjectItem(__FUNCTION__, cj_expression, ezlopi_value_str));
         }
