@@ -27,6 +27,7 @@
 #include "ezlopi_service_ws_server.h"
 #include "ezlopi_service_broadcast.h"
 #include "ezlopi_service_led_indicator.h"
+#include "ezlopi_service_system_temperature_sensor.h"
 
 #include "pt.h"
 #include "ezlopi_core_processes.h"
@@ -64,7 +65,7 @@ void app_main(void)
     ezlopi_init();
 
     ezlopi_core_setting_commands_read_settings();
-    
+
 #ifdef CONFIG_EZPI_ENABLE_UART_PROVISIONING
     EZPI_SERV_uart_init();
 #endif
@@ -122,8 +123,8 @@ static void __blinky(void *pv)
         uint32_t watermark_heap = esp_get_minimum_free_heap_size();
         TRACE_W("Free Heap Size: %d B     %.4f KB", free_heap, free_heap / 1024.0);
         TRACE_W("Heap Watermark: %d B     %.4f KB", watermark_heap, watermark_heap / 1024.0);
-        TRACE_I("----------------------------------------------");        
-        
+        TRACE_I("----------------------------------------------");
+
         char cmd99_str[100] = {0};
         snprintf(cmd99_str, 100, "{\"cmd\":99,\"free_heap\":%d,\"heap_watermark\":%d}", free_heap, watermark_heap);
         EZPI_SERV_uart_tx_data(strlen(cmd99_str), (uint8_t *)cmd99_str);
