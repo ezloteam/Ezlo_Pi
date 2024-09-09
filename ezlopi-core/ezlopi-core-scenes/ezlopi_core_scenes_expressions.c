@@ -288,14 +288,14 @@ int ezlopi_scenes_expressions_delete_by_name(char *expression_name)
 
 static s_ezlopi_core_lua_data_t *______expression_eval_report(lua_State *lua_state, int status)
 {
-    s_ezlopi_core_lua_data_t * msg = (s_ezlopi_core_lua_data_t *)ezlopi_malloc(__FUNCTION__, sizeof(s_ezlopi_core_lua_data_t));
+    s_ezlopi_core_lua_data_t *msg = (s_ezlopi_core_lua_data_t *)ezlopi_malloc(__FUNCTION__, sizeof(s_ezlopi_core_lua_data_t));
     if (msg)
     {
         memset(msg, 0, sizeof(s_ezlopi_core_lua_data_t));
 
         if (LUA_OK == status)
         {
-            lua_checkstack(lua_state,1);
+            lua_checkstack(lua_state, 1);
             switch (lua_type(lua_state, -1))
             {
             case LUA_TBOOLEAN:
@@ -408,7 +408,7 @@ static int ____extract_expn_res_into_cjson(cJSON *cj_des, const char *name, lua_
     }
     return ret;
 }
-static int __ezlopi_scenes_scripts_evaluate_nvs_expression(cJSON *cj_des, const char *exp_name, const char *exp_code)
+static int __ezlopi_scenes_scripts_evaluate_nvs_expression(cJSON *cj_des, cJSON *src_lua_params, const char *exp_name, const char *exp_code)
 {
     int ret = 0;
     lua_State *lua_state = luaL_newstate();
@@ -416,29 +416,35 @@ static int __ezlopi_scenes_scripts_evaluate_nvs_expression(cJSON *cj_des, const 
     {
         luaL_openlibs(lua_state);
 
-        int tmp_ret = luaL_loadstring(lua_state, exp_code);
-        if (tmp_ret == LUA_OK)
+        if (NULL == src_lua_params)
         {
-            tmp_ret = lua_pcall(lua_state, 0, 1, 0);
+            int tmp_ret = luaL_loadstring(lua_state, exp_code);
             if (tmp_ret == LUA_OK)
             {
-                TRACE_D("here1 [%d]", tmp_ret);
-                ret = ____extract_expn_res_into_cjson(cj_des, exp_name, lua_state, tmp_ret);
+                tmp_ret = lua_pcall(lua_state, 0, 1, 0);
+                if (tmp_ret == LUA_OK)
+                {
+                    TRACE_D("here1 [%d]", tmp_ret);
+                    ret = ____extract_expn_res_into_cjson(cj_des, exp_name, lua_state, tmp_ret);
+                }
+                else
+                {
+                    const char *error_msg = lua_tostring(lua_state, -1);
+                    TRACE_D("Runtime error [%d]: %s", tmp_ret, error_msg);
+                    lua_pop(lua_state, 1); // Remove the error message from the stack
+                }
             }
             else
             {
-                const char* error_msg = lua_tostring(lua_state, -1);
-                TRACE_D("Runtime error [%d]: %s", tmp_ret, error_msg);
+                const char *error_msg = lua_tostring(lua_state, -1);
+                TRACE_D("Compile error [%d]: %s", tmp_ret, error_msg);
                 lua_pop(lua_state, 1); // Remove the error message from the stack
             }
         }
         else
         {
-            const char* error_msg = lua_tostring(lua_state, -1);
-            TRACE_D("Compile error [%d]: %s", tmp_ret, error_msg);
-            lua_pop(lua_state, 1); // Remove the error message from the stack
-        }
 
+        }
         lua_close(lua_state);
     }
     else
@@ -487,6 +493,7 @@ void ezlopi_scenes_expressions_list_cjson(cJSON *cj_expresson_array, cJSON *cj_p
                         cJSON_AddItemReferenceToObject(__FUNCTION__, cj_expr, ezlopi_metadata_str, curr_exp->meta_data);
                     }
 
+                    cJSON *lua_operate_params = NULL;
                     if ((NULL != curr_exp->items) || (NULL != curr_exp->device_item_names))
                     {
                         cJSON *cj_val_params = cJSON_AddObjectToObject(__FUNCTION__, cj_expr, ezlopi_params_str);
@@ -494,6 +501,7 @@ void ezlopi_scenes_expressions_list_cjson(cJSON *cj_expresson_array, cJSON *cj_p
                         {
                             __add_expression_items(curr_exp, cj_val_params);
                             __add_expression_device_item_names(curr_exp, cj_val_params);
+                            lua_operate_params = cj_val_params;
                         }
                     }
 
@@ -514,7 +522,7 @@ void ezlopi_scenes_expressions_list_cjson(cJSON *cj_expresson_array, cJSON *cj_p
                             // evaluate the lua script 
                             if (curr_exp->code)
                             {
-                                __ezlopi_scenes_scripts_evaluate_nvs_expression(cj_expr, curr_exp->name, curr_exp->code);
+                                __ezlopi_scenes_scripts_evaluate_nvs_expression(cj_expr, lua_operate_params, curr_exp->name, curr_exp->code);
                             }
                             // add the 'result' [value or error]
 
