@@ -22,7 +22,7 @@
 #define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
 
 #include "../../build/config/sdkconfig.h"
-#if (CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32)
+#if (CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32S2)
 
 // #include "esp_log.h"
 #include "driver/gpio.h"
@@ -30,6 +30,8 @@
 #include "esp32s3/rom/ets_sys.h"
 #elif CONFIG_IDF_TARGET_ESP32
 #include "esp32/rom/ets_sys.h"
+#elif CONFIG_IDF_TARGET_ESP32S2
+#include "esp32s2/rom/ets_sys.h"
 #endif
 
 #include "dht22.h"

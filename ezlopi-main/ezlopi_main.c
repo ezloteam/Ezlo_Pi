@@ -61,10 +61,7 @@ void app_main(void)
     ezlopi_service_loop_init();
     ezlopi_service_gpioisr_init(); // this is time critical, Do not add to loop
 
-    ezlopi_init();
-
-    ezlopi_core_setting_commands_read_settings();
-    
+    ezlopi_init();    
 #ifdef CONFIG_EZPI_ENABLE_UART_PROVISIONING
     EZPI_SERV_uart_init();
 #endif
