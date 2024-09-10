@@ -59,7 +59,9 @@ void ezlopi_init(void)
     vTaskDelay(10);
     // Init devices
     ezlopi_device_prepare();
+#if defined(CONFIG_EZPI_ENABLE_SYSTEM_TEMPERATURE)
     ezlopi_system_temperature_device(EZLOPI_ACTION_PREPARE, NULL, NULL, NULL);
+#endif // EZPI_ENABLE_SYSTEM_TEMPERATURE
     vTaskDelay(10);
     // Init device_groups
     ezlopi_device_group_init();

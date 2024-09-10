@@ -1,4 +1,7 @@
 
+#include "sdkconfig.h"
+#if defined(CONFIG_EZPI_ENABLE_SYSTEM_TEMPERATURE)
+
 #include <math.h>
 
 #include "driver/temp_sensor.h"
@@ -148,11 +151,11 @@ static int __notify(l_ezlopi_item_t *item)
 
         if (fabs(system_temperature - system_temperature_current_value) > 0.5)
         {
-            printf("\n\nFirst: %f and %f\n", system_temperature, system_temperature_current_value);
             system_temperature = system_temperature_current_value;
-            printf("Second: %f and %f\n\n", system_temperature, system_temperature_current_value);
             ezlopi_device_value_updated_from_device_broadcast(item);
         }
     }
     return ret;
 }
+
+#endif // CONFIG_EZPI_ENABLE_SYSTEM_TEMPERATURE
