@@ -536,7 +536,7 @@ static l_scenes_list_v2_t *_scenes_populate(cJSON *cj_scene, uint32_t scene_id)
     }
     else
     {
-        CJSON_TRACE("new-scene", cj_scene);
+        // CJSON_TRACE("new-scene", cj_scene);
         scenes_list_head_v2 = __new_scene_populate(cj_scene, scene_id);
         new_scene_node = scenes_list_head_v2;
     }
@@ -558,7 +558,7 @@ static l_scenes_list_v2_t *__new_scene_populate(cJSON *cj_scene, uint32_t scene_
 
             new_scene->_id = scene_id;
             new_scene->task_handle = NULL;
-            new_scene->status = EZLOPI_SCENE_STATUS_STOPPED; // should be run??
+            new_scene->status = EZLOPI_SCENE_STATUS_STOPPED;
 
             CJSON_GET_VALUE_BOOL(cj_scene, ezlopi_enabled_str, new_scene->enabled);
             CJSON_GET_VALUE_BOOL(cj_scene, ezlopi_is_group_str, new_scene->is_group);
