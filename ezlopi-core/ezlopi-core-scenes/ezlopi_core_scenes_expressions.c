@@ -288,11 +288,10 @@ int ezlopi_scenes_expressions_delete_by_name(char *expression_name)
 
     return ret;
 }
-
+//----------------------------------------------------------------------------------------------------------------------
 static int ____get_simple_expn_result(cJSON *cj_des, lua_State *lua_state, const char *name, int status)
 {
     int ret = 1;
-    // add to cjson according to 'data-type'
     if (LUA_OK == status)
     {
         if (lua_isnumber(lua_state, -1))
@@ -324,14 +323,12 @@ static int ____get_simple_expn_result(cJSON *cj_des, lua_State *lua_state, const
 
     return ret;
 }
-
 static void ____get_devitem_expn_result(cJSON *cj_expr_val, lua_State *lua_state, const char *member_str)
 {
     if (cj_expr_val && member_str)
     {
-        lua_pushstring(lua_state, member_str); // Push key
-        lua_gettable(lua_state, -2);           // Get 'value' from result table
-
+        lua_pushstring(lua_state, member_str);
+        lua_gettable(lua_state, -2);
         if (!lua_isnil(lua_state, -1))
         {
             if (lua_isnumber(lua_state, -1))
@@ -364,18 +361,60 @@ static void ____get_devitem_expn_result(cJSON *cj_expr_val, lua_State *lua_state
         }
     }
 }
-
-static int __ezlopi_scenes_scripts_evaluate_nvs_expression(cJSON *cj_des, cJSON *lua_prop_params, const char *exp_name, const char *exp_code)
+static void ___create_lua_subtable(lua_State *lua_state, l_ezlopi_item_t *item_prop, const char *sub_table_name)
+{
+    if (item_prop && sub_table_name)
+    {
+        lua_newtable(lua_state);
+        cJSON *cj_result = cJSON_CreateObject(__FUNCTION__);
+        if (cj_result)
+        {
+            item_prop->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item_prop, cj_result, item_prop->user_arg);
+            cJSON *cj_value = cJSON_GetObjectItem(__FUNCTION__, cj_result, ezlopi_value_str);
+            if (cj_value)
+            {
+                switch (cj_value->type)
+                {
+                case cJSON_True:
+                case cJSON_False:
+                {
+                    lua_create_table_bool_key_value(ezlopi_value_str, cj_value->valuedouble ? true : false);
+                    break;
+                }
+                case cJSON_Number:
+                {
+                    lua_create_table_number_key_value(ezlopi_value_str, cj_value->valuedouble);
+                    break;
+                }
+                case cJSON_String:
+                {
+                    if (cj_value->valuestring)
+                    {
+                        lua_create_table_string_key_value(ezlopi_value_str, cj_value->valuestring);
+                    }
+                    break;
+                }
+                default:
+                    break;
+                }
+            }
+            cJSON_Delete(__FUNCTION__, cj_result);
+        }
+        lua_create_table_string_key_value(ezlopi_scale_str, item_prop->cloud_properties.scale);
+        lua_setfield(lua_state, -2, sub_table_name);
+    }
+}
+static int __evaluate_expression(cJSON *cj_des, cJSON *lua_prop_params, const char *exp_name, const char *exp_code)
 {
     int ret = 0;
     lua_State *lua_state = luaL_newstate();
-    if (lua_state)
+    if (lua_state && exp_name && exp_code)
     {
         luaL_openlibs(lua_state);
         {
             if (lua_prop_params && (NULL != cJSON_GetObjectItem(__FUNCTION__, lua_prop_params, ezlopi_device_item_names_str) || NULL != cJSON_GetObjectItem(__FUNCTION__, lua_prop_params, ezlopi_items_str))) // if , params exits
             {
-                uint8_t total_key_count = 0;
+                // uint8_t total_key_count = 0;
                 // create 'params' tables.
                 lua_newtable(lua_state); // params
 
@@ -409,45 +448,8 @@ static int __ezlopi_scenes_scripts_evaluate_nvs_expression(cJSON *cj_des, cJSON 
                                     {
                                         if (EZPI_STRNCMP_IF_EQUAL(cj_item_name->valuestring, item_prop->cloud_properties.item_name, cj_item_name->str_value_len, strlen(item_prop->cloud_properties.item_name))) // "itemName" == "sound_level"
                                         {                                                                                                                                                                        // create the sub-table
-                                            lua_newtable(lua_state);                                                                                                                                             // kitchenTemperatureSetpoint
-                                            cJSON *cj_result = cJSON_CreateObject(__FUNCTION__);
-                                            if (cj_result)
-                                            {
-                                                item_prop->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item_prop, cj_result, item_prop->user_arg);
-                                                cJSON *cj_value = cJSON_GetObjectItem(__FUNCTION__, cj_result, ezlopi_value_str);
-                                                if (cj_value)
-                                                {
-                                                    switch (cj_value->type)
-                                                    {
-                                                    case cJSON_True:
-                                                    case cJSON_False:
-                                                    {
-                                                        lua_create_table_bool_key_value(ezlopi_value_str, cj_value->valuedouble ? true : false);
-                                                        break;
-                                                    }
-                                                    case cJSON_Number:
-                                                    {
-                                                        lua_create_table_number_key_value(ezlopi_value_str, cj_value->valuedouble);
-                                                        break;
-                                                    }
-                                                    case cJSON_String:
-                                                    {
-                                                        if (cj_value->valuestring)
-                                                        {
-                                                            lua_create_table_string_key_value(ezlopi_value_str, cj_value->valuestring);
-                                                        }
-                                                        break;
-                                                    }
-                                                    default:
-                                                        break;
-                                                    }
-                                                }
-                                                cJSON_Delete(__FUNCTION__, cj_result);
-                                            }
-                                            lua_create_table_string_key_value(ezlopi_scale_str, item_prop->cloud_properties.scale);
-                                            lua_setfield(lua_state, -2, (const char *)cj_target_name->valuestring);
-
-                                            total_key_count++;
+                                            ___create_lua_subtable(lua_state, item_prop, cj_target_name->valuestring);
+                                            // total_key_count++;
                                             // TRACE_D(" [items_%d] : adding '%s'.", total_key_count, cj_target_name->valuestring);
                                             break;
                                         }
@@ -479,45 +481,8 @@ static int __ezlopi_scenes_scripts_evaluate_nvs_expression(cJSON *cj_des, cJSON 
 
                             if (item_prop)
                             {
-                                lua_newtable(lua_state); // kitchenTemperatureSetpoint
-                                cJSON *cj_result = cJSON_CreateObject(__FUNCTION__);
-                                if (cj_result)
-                                {
-                                    item_prop->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item_prop, cj_result, item_prop->user_arg);
-                                    cJSON *cj_value = cJSON_GetObjectItem(__FUNCTION__, cj_result, ezlopi_value_str);
-                                    if (cj_value)
-                                    {
-                                        switch (cj_value->type)
-                                        {
-                                        case cJSON_True:
-                                        case cJSON_False:
-                                        {
-                                            lua_create_table_bool_key_value(ezlopi_value_str, cj_value->valuedouble ? true : false);
-                                            break;
-                                        }
-                                        case cJSON_Number:
-                                        {
-                                            lua_create_table_number_key_value(ezlopi_value_str, cj_value->valuedouble);
-                                            break;
-                                        }
-                                        case cJSON_String:
-                                        {
-                                            if (cj_value->valuestring)
-                                            {
-                                                lua_create_table_string_key_value(ezlopi_value_str, cj_value->valuestring);
-                                            }
-                                            break;
-                                        }
-                                        default:
-                                            break;
-                                        }
-                                    }
-                                    cJSON_Delete(__FUNCTION__, cj_result);
-                                }
-                                lua_create_table_string_key_value(ezlopi_scale_str, item_prop->cloud_properties.scale);
-                                lua_setfield(lua_state, -2, (const char *)cj_item_name->valuestring); // Set 'kitchenTemperatureSetpoint' in 'params'
-
-                                total_key_count++;
+                                ___create_lua_subtable(lua_state, item_prop, cj_item_name->valuestring);
+                                // total_key_count++;
                                 // TRACE_D(" [items_%d] : adding '%s'.", total_key_count, cj_item_name->valuestring);
                             }
                         }
@@ -537,7 +502,6 @@ static int __ezlopi_scenes_scripts_evaluate_nvs_expression(cJSON *cj_des, cJSON 
                 {
                     if (lua_istable(lua_state, -1)) // checks if 'params' is a table
                     {
-                        // TRACE_S("----- Tabular expression ------");
                         cJSON *cj_expr_val = cJSON_AddObjectToObject(__FUNCTION__, cj_des, ezlopi_value_str);
                         if (cj_expr_val)
                         {
@@ -548,14 +512,13 @@ static int __ezlopi_scenes_scripts_evaluate_nvs_expression(cJSON *cj_des, cJSON 
                     }
                     else
                     {
-                        // TRACE_S("----- Simple expression ------");
                         ret = ____get_simple_expn_result(cj_des, lua_state, exp_name, tmp_ret);
                     }
                 }
                 else
                 {
                     const char *error_msg = lua_tostring(lua_state, -1);
-                    TRACE_D("Runtime error [%d]: %s", tmp_ret, error_msg);
+                    TRACE_D("LUA Runtime error [%d]: %s", tmp_ret, error_msg);
                     cJSON_AddStringToObject(__FUNCTION__, cj_des, ezlopi_error_str, error_msg);
                     lua_pop(lua_state, -1); // Remove the error message from the stack
                 }
@@ -563,7 +526,7 @@ static int __ezlopi_scenes_scripts_evaluate_nvs_expression(cJSON *cj_des, cJSON 
             else
             {
                 const char *error_msg = lua_tostring(lua_state, -1);
-                TRACE_D("Compile error [%d]: %s", tmp_ret, error_msg);
+                TRACE_D("LUA Compile error [%d]: %s", tmp_ret, error_msg);
                 cJSON_AddStringToObject(__FUNCTION__, cj_des, ezlopi_error_str, error_msg);
                 lua_pop(lua_state, -1); // Remove the error message from the stack
             }
@@ -576,7 +539,6 @@ static int __ezlopi_scenes_scripts_evaluate_nvs_expression(cJSON *cj_des, cJSON 
     }
     return ret;
 }
-
 void ezlopi_scenes_expressions_list_cjson(cJSON *cj_expresson_array, cJSON *cj_params)
 {
     if (cj_expresson_array)
@@ -632,20 +594,17 @@ void ezlopi_scenes_expressions_list_cjson(cJSON *cj_expresson_array, cJSON *cj_p
                     {
                         if (curr_exp->variable)
                         {
-                            // TRACE_D("Performing --> Variable Operation");
                             __add_expression_value(curr_exp, cj_expr); // adds valueType + value
                         }
                         else
                         {
-                            // TRACE_D("Performing --> Expression Operation");
                             if ((EZLOPI_VALUE_TYPE_NONE < curr_exp->value_type) && (EZLOPI_VALUE_TYPE_MAX > curr_exp->value_type))
                             {
                                 cJSON_AddStringToObject(__FUNCTION__, cj_expr, ezlopi_valueType_str, ezlopi_scene_get_scene_value_type_name(curr_exp->value_type));
                             }
-                            // evaluate the lua script
                             if (curr_exp->code)
                             {
-                                __ezlopi_scenes_scripts_evaluate_nvs_expression(cj_expr, lua_prop_params, curr_exp->name, curr_exp->code);
+                                __evaluate_expression(cj_expr, lua_prop_params, curr_exp->name, curr_exp->code);
                             }
                         }
                     }
@@ -708,7 +667,7 @@ void ezlopi_scenes_expressions_list_cjson(cJSON *cj_expresson_array, cJSON *cj_p
         }
     }
 }
-
+//----------------------------------------------------------------------------------------------------------------------
 void ezlopi_scenes_expressions_print(s_ezlopi_expressions_t *exp_node)
 {
 #if (ENABLE_TRACE)
