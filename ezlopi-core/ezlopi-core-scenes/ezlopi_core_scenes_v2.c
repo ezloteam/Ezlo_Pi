@@ -1704,7 +1704,7 @@ int ezlopi_core_scene_block_enable_set_reset(const char *sceneId_str, const char
 }
 
 //--------------------------------------------------------------------------------------------------
-//                  Functions for : Adding scene-Meta & metaBlock 
+//                  Functions for : Adding scene-Meta & metaBlock
 //--------------------------------------------------------------------------------------------------
 static bool _____put_new_block_meta(cJSON *cj_when_block, cJSON *cj_new_blockmeta)
 {
@@ -1717,7 +1717,7 @@ static bool _____put_new_block_meta(cJSON *cj_when_block, cJSON *cj_new_blockmet
             cJSON_DeleteItemFromObject(__FUNCTION__, cj_when_block, "blockMeta");
         }
 
-        ret = cJSON_AddItemToObject(__FUNCTION__, cj_when_block, "blockMeta", cj_new_blockmeta);
+        ret = cJSON_AddItemToObject(__FUNCTION__, cj_when_block, "blockMeta", cJSON_Duplicate(__FUNCTION__, cj_new_blockmeta, 1));
     }
     return ret;
 }
@@ -1799,18 +1799,16 @@ int ezlopi_core_scene_meta_by_id(const char *sceneId_str, const char *blockId_st
                 }
                 else
                 {
-                    cJSON *cj_old_meta = cJSON_GetObjectItem(__FUNCTION__, cj_scene, ezlopi_meta_str);
-                    if (cj_old_meta)
+                    if (cJSON_GetObjectItem(__FUNCTION__, cj_scene, ezlopi_meta_str))
                     {
                         cJSON_DeleteItemFromObject(__FUNCTION__, cj_scene, ezlopi_meta_str);
                     }
-
-                    meta_data_added = (bool)cJSON_AddItemToObject(__FUNCTION__, cj_scene, ezlopi_meta_str, cj_new_meta);
+                    meta_data_added = (bool)cJSON_AddItemToObject(__FUNCTION__, cj_scene, ezlopi_meta_str, cJSON_Duplicate(__FUNCTION__, cj_new_meta, 1));
                 }
 
                 if (meta_data_added)
                 {
-                    CJSON_TRACE("new_cj_scene", cj_scene);
+                    // CJSON_TRACE("new_cj_scene", cj_scene);
                     /*  DONOT use : 'ezlopi_core_scene_edit_store_updated_to_nvs' .. Here */
                     char *update_scene_str = cJSON_PrintBuffered(__FUNCTION__, cj_scene, 4096, false);
                     TRACE_D("length of 'update_scene_str': %d", strlen(update_scene_str));
