@@ -560,9 +560,9 @@ int ezlopi_core_scene_then_helper_setexpression_setvariable(char * expression_na
             }
         }
 
-        // TRACE_S("-------------- Updated_exp_name : %s  ------------", expression_name);
-        // ezlopi_scenes_expressions_print(ezlopi_scenes_get_expression_node_by_name(expression_name));
-        // TRACE_S("----------------- ll --------------------");
+        TRACE_S("-------------- Updated_exp_name : %s  ------------", expression_name);
+        ezlopi_scenes_expressions_print(ezlopi_scenes_get_expression_node_by_name(expression_name));
+        TRACE_S("----------------- ll --------------------");
 
         // 5. Now to edit in nvs
         // A. read from  nvs
