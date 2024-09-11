@@ -5,6 +5,7 @@
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 #include "EZLOPI_USER_CONFIG.h"
+#include "ezlopi_core_errors.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -45,7 +46,7 @@ extern "C"
 #define COLOR_BG_CYAN "46"
 #define COLOR_BG_WHITE "47"
 
-    typedef int (*f_ezlopi_log_upcall_t)(int severity_level, const char* log_str);
+    typedef ezlopi_error_t (*f_ezlopi_log_upcall_t)(int severity_level, const char* log_str);
 
 #define trace_color(txt_color, X, reg...)                                                 \
     {                                                                                     \

@@ -10,6 +10,7 @@ idf_component_register(SRCS "sensor_0024_other_HCSR04.c" "${config_src}"
                 ezlopi-core-actions 
                 ezlopi-core-devices 
                 ezlopi-core-valueformatter 
+                ezlopi-core-errors
                 
                 ezlopi-hal-gpio
 

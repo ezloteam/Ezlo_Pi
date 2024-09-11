@@ -9,6 +9,7 @@ idf_component_register(SRCS "sensor_0047_other_HX711_loadcell.c" "${config_src}"
                                     ezlopi-core-devices 
                                     ezlopi-core-valueformatter 
                                     ezlopi-core-processes
+                                    ezlopi-core-errors
                                     
                                     ezlopi-cloud-items
                                     ezlopi-cloud-constants 

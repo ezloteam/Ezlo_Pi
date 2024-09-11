@@ -11,6 +11,9 @@ extern "C"
 #include "cjext.h"
 #include "EZLOPI_USER_CONFIG.h"
 
+#include "ezlopi_core_errors.h"
+
+
 #define EZLOPI_DEVICE_TYPE_TEST_DEVICE -1
 #define EZLOPI_DEVICE_TYPE_GENERIC 0
 
@@ -156,8 +159,8 @@ extern "C"
     int ezlopi_factory_info_v3_set_ssl_public_key(cJSON *cj_data);
     int ezlopi_factory_info_v3_set_ssl_private_key(cJSON *cj_data);
 
-    void ezlopi_factory_info_v3_free(void *arg);
-    int ezlopi_factory_info_v3_factory_reset(void);
+    void ezlopi_factory_info_v3_free(void* arg);
+    ezlopi_error_t ezlopi_factory_info_v3_factory_reset(void);
 
     int ezlopi_factory_info_v3_scenes_factory_soft_reset(void);
 

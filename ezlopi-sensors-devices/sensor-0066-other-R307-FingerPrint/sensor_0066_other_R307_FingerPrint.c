@@ -10,6 +10,7 @@
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
 #include "ezlopi_core_processes.h"
+#include "ezlopi_core_errors.h"
 
 #include "ezlopi_hal_uart.h"
 
@@ -36,10 +37,10 @@ static void IRAM_ATTR gpio_notify_isr(void* param)
     }
 }
 
-static int __0066_prepare(void* arg);
-static int __0066_init(l_ezlopi_item_t* item);
-static int __0066_set_value(l_ezlopi_item_t* item, void* arg);
-static int __0066_get_value_cjson(l_ezlopi_item_t* item, void* arg);
+static ezlopi_error_t __0066_prepare(void* arg);
+static ezlopi_error_t __0066_init(l_ezlopi_item_t* item);
+static ezlopi_error_t __0066_set_value(l_ezlopi_item_t* item, void* arg);
+static ezlopi_error_t __0066_get_value_cjson(l_ezlopi_item_t* item, void* arg);
 
 static void __fingerprint_operation_task(void* params);
 static void __uart_0066_fingerprint_upcall(uint8_t* buffer, uint32_t output_len, s_ezlopi_uart_object_handle_t uart_object_handle);
@@ -82,9 +83,9 @@ static void __timer_callback(void* param)
 }
 
 //---------------------------------------------------------------------------------------------------------------
-int sensor_0066_other_R307_FingerPrint(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
+ezlopi_error_t sensor_0066_other_R307_FingerPrint(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_SUCCESS;
     // TRACE_E("%s", ezlopi_actions_to_string(action));
     switch (action)
     {
@@ -208,9 +209,9 @@ static void __prepare_item_interface_properties(l_ezlopi_item_t* item, cJSON* cj
 }
 //-------------------------------------------------------------------------------------------------------------------------
 
-static int __0066_prepare(void* arg)
+static ezlopi_error_t __0066_prepare(void* arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
     s_ezlopi_prep_arg_t* dev_prep_arg = (s_ezlopi_prep_arg_t*)arg;
 
     if (dev_prep_arg && (dev_prep_arg->cjson_device))
@@ -223,7 +224,7 @@ static int __0066_prepare(void* arg)
             l_ezlopi_device_t* parent_fingerprint_enroll_device = ezlopi_device_add_device(cj_device, "enroll");
             if (parent_fingerprint_enroll_device)
             {
-                ret = 1;
+                ret = EZPI_SUCCESS;
                 memset(user_data, 0, sizeof(server_packet_t));
                 for (uint8_t i = 0; i < SENSOR_FP_ITEM_ID_MAX; i++)
                 {
@@ -255,7 +256,7 @@ static int __0066_prepare(void* arg)
                     else
                     {
                         ezlopi_device_free_device(child_fingerprint_action_device);
-                        ret = -1;
+                        ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                     }
                 }
 
@@ -275,7 +276,7 @@ static int __0066_prepare(void* arg)
                     else
                     {
                         ezlopi_device_free_device(child_fingerprint_ids_device);
-                        ret = -1;
+                        ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                     }
                 }
 
@@ -283,28 +284,28 @@ static int __0066_prepare(void* arg)
                     (NULL == child_fingerprint_action_device) &&
                     (NULL == child_fingerprint_ids_device))
                 {
-                    ret = -1;
+                    ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                     ezlopi_device_free_device(parent_fingerprint_enroll_device);
                     ezlopi_free(__FUNCTION__, user_data);
                 }
             }
             else
             {
-                ret = -1;
+                ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                 ezlopi_free(__FUNCTION__, user_data);
             }
         }
         else
         {
-            ret = -1;
+            ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
         }
     }
     return ret;
 }
 
-static int __0066_init(l_ezlopi_item_t* item)
+static ezlopi_error_t __0066_init(l_ezlopi_item_t* item)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_ERR_INIT_DEVICE_FAILED;
     if ((NULL != item))
     {
         server_packet_t* user_data = (server_packet_t*)item->user_arg;
@@ -326,7 +327,7 @@ static int __0066_init(l_ezlopi_item_t* item)
                         .pull_up_en = GPIO_PULLUP_DISABLE,
                         .pull_down_en = GPIO_PULLDOWN_DISABLE,
                     };
-                    ret = 1;
+                    ret = EZPI_SUCCESS;
                     if (0 == gpio_config(&FingerPrint_intr_gpio_config))
                     {
                         if (FINGERPRINT_OK == r307_as606_fingerprint_config(item))
@@ -351,40 +352,40 @@ static int __0066_init(l_ezlopi_item_t* item)
                             }
                             else
                             {
-                                ret = -1;
+                                ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                                 gpio_isr_handler_remove(intr_pin);
                                 TRACE_E("Error!! : Failed to add GPIO ISR handler.");
                             }
                         }
                         else
                         {
-                            ret = -1;
+                            ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                             TRACE_E("Need to Reconfigure : Fingerprint sensor ..... Please, Reset ESP32.");
                         }
                     }
                     else
                     {
-                        ret = -1;
+                        ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                         TRACE_E("Error!! : Problem is 'GPIO_intr_pin' Config......");
                     }
                 }
             }
             else
             {
-                ret = -1;
+                ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
             }
         }
         else
         {
-            ret = -1;
+            ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
         }
     }
     return ret;
 }
 
-static int __0066_get_value_cjson(l_ezlopi_item_t* item, void* arg)
+static ezlopi_error_t __0066_get_value_cjson(l_ezlopi_item_t* item, void* arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
     cJSON* cj_result = (cJSON*)arg;
     if (cj_result && item)
     {
@@ -429,14 +430,14 @@ static int __0066_get_value_cjson(l_ezlopi_item_t* item, void* arg)
             }
             user_data->notify_flag = false;
         }
-        ret = 1;
+        ret = EZPI_SUCCESS;
     }
     return ret;
 }
 
-static int __0066_set_value(l_ezlopi_item_t* item, void* arg)
+static ezlopi_error_t __0066_set_value(l_ezlopi_item_t* item, void* arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
     cJSON* cjson_params = (cJSON*)arg;
     if ((NULL != cjson_params) && (NULL != item))
     {
@@ -511,7 +512,7 @@ static int __0066_set_value(l_ezlopi_item_t* item, void* arg)
                 }
             }
         }
-        ret = 1;
+        ret = EZPI_SUCCESS;
     }
     return ret;
 }

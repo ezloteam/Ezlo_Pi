@@ -115,14 +115,14 @@ void ezlopi_service_ws_server_stop(void)
 }
 
 ///////// Static Functions Definations
-static int __ws_server_broadcast(char *data)
+static ezlopi_error_t __ws_server_broadcast(char *data)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
     if (__send_lock && pdTRUE == xSemaphoreTake(__send_lock, 0))
     {
         if (data)
         {
-            ret = 1;
+            ret = EZPI_SUCCESS;
             l_ws_server_client_conn_t *curr_client = ezlopi_service_ws_server_clients_get_head();
 #warning "DO NOT USE printf ON PRODUCTION"
             // printf("%s and curr-client: %p\n", __func__, curr_client);
@@ -395,9 +395,9 @@ static int __respond_cjson(httpd_req_t *req, cJSON *cj_response)
     return ret;
 }
 
-static int __ws_server_send(l_ws_server_client_conn_t *client, char *data, uint32_t len)
+static ezlopi_error_t __ws_server_send(l_ws_server_client_conn_t *client, char *data, uint32_t len)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
 #ifdef CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER
     if (data && len && client && client->http_handle)
     {
@@ -414,7 +414,7 @@ static int __ws_server_send(l_ws_server_client_conn_t *client, char *data, uint3
 
         if (ESP_OK == httpd_ws_send_data(client->http_handle, client->http_descriptor, &frm_pkt))
         {
-            ret = 1;
+            ret = EZPI_SUCCESS;
             client->fail_count = 0;
             __message_counter++;
 
@@ -424,7 +424,6 @@ static int __ws_server_send(l_ws_server_client_conn_t *client, char *data, uint3
         {
             TRACE_E("## LOCAL WSS-SENDING failed >>>>>>>>>>>>>>>>>>> \n%s", data);
 
-            ret = 0;
             client->fail_count += 1;
 
             if (client->fail_count > 5)

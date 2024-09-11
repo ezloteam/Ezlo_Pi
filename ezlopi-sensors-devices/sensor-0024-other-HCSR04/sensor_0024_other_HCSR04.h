@@ -5,6 +5,7 @@
 
 #include "ezlopi_core_actions.h"
 #include "ezlopi_core_devices.h"
+#include "ezlopi_core_errors.h"
 
 #define ESP_ERR_ULTRASONIC_PING 0x200
 #define ESP_ERR_ULTRASONIC_PING_TIMEOUT 0x201
@@ -42,6 +43,6 @@
         return RES;          \
     } while (0)
 
-int sensor_0024_other_HCSR04_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
+ezlopi_error_t sensor_0024_other_HCSR04_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
 #endif //_SENSOR_0024_OTHER_HCSR04_H_

@@ -2,8 +2,9 @@
 #define _EZLOPI_CORE_DEVICES_LIST_H_
 
 #include "ezlopi_core_devices.h"
+#include "ezlopi_core_errors.h"
 
-typedef int (*f_sensor_call_v3_t)(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
+typedef ezlopi_error_t (*f_sensor_call_v3_t)(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
 typedef struct s_ezlopi_device_v3
 {

@@ -6,6 +6,7 @@
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
+#include "ezlopi_core_errors.h"
 
 #include "ezlopi_hal_pwm.h"
 
@@ -28,15 +29,15 @@ typedef struct s_dimmable_bulb_properties
 
 } s_dimmable_bulb_properties_t;
 
-static int __prepare(void *arg);
-static int __init(l_ezlopi_item_t *item);
-static int __list_cjson_value(l_ezlopi_item_t *item, void *arg);
-static int __get_cjson_value(l_ezlopi_item_t *item, void *arg);
-static int __set_cjson_value(l_ezlopi_item_t *item, void *arg);
+static ezlopi_error_t __prepare(void* arg);
+static ezlopi_error_t __init(l_ezlopi_item_t* item);
+static ezlopi_error_t __list_cjson_value(l_ezlopi_item_t* item, void* arg);
+static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t* item, void* arg);
+static ezlopi_error_t __set_cjson_value(l_ezlopi_item_t* item, void* arg);
 
-int device_0022_PWM_dimmable_lamp(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+ezlopi_error_t device_0022_PWM_dimmable_lamp(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_SUCCESS;
 
     switch (action)
     {
@@ -72,9 +73,9 @@ int device_0022_PWM_dimmable_lamp(e_ezlopi_actions_t action, l_ezlopi_item_t *it
     return ret;
 }
 
-static int __set_cjson_value(l_ezlopi_item_t *item, void *arg)
+static ezlopi_error_t __set_cjson_value(l_ezlopi_item_t* item, void* arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
 
     cJSON *device_details = (cJSON *)arg;
     if (device_details)
@@ -92,7 +93,7 @@ static int __set_cjson_value(l_ezlopi_item_t *item, void *arg)
                 dimmable_bulb_arg->current_brightness_value = target_value;
                 ezlopi_device_value_updated_from_device_broadcast(dimmable_bulb_arg->item_dimmer);
                 ezlopi_device_value_updated_from_device_broadcast(dimmable_bulb_arg->item_dimmer_switch);
-                ret = 1;
+                ret = EZPI_SUCCESS;
             }
             else if (ezlopi_item_name_switch == item->cloud_properties.item_name)
             {
@@ -103,7 +104,7 @@ static int __set_cjson_value(l_ezlopi_item_t *item, void *arg)
                 ezlopi_pwm_change_duty(dimmable_bulb_arg->item_dimmer->interface.pwm.channel, dimmable_bulb_arg->item_dimmer->interface.pwm.speed_mode, dimmable_bulb_arg->current_brightness_value);
                 ezlopi_device_value_updated_from_device_broadcast(dimmable_bulb_arg->item_dimmer);
                 ezlopi_device_value_updated_from_device_broadcast(dimmable_bulb_arg->item_dimmer_switch);
-                ret = 1;
+                ret = EZPI_SUCCESS;
             }
         }
     }
@@ -111,9 +112,9 @@ static int __set_cjson_value(l_ezlopi_item_t *item, void *arg)
     return ret;
 }
 
-static int __list_cjson_value(l_ezlopi_item_t *item, void *arg)
+static ezlopi_error_t __list_cjson_value(l_ezlopi_item_t* item, void* arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
 
     cJSON *cj_properties = (cJSON *)arg;
     if (cj_properties && item && item->user_arg)
@@ -143,14 +144,16 @@ static int __list_cjson_value(l_ezlopi_item_t *item, void *arg)
         {
             ezlopi_valueformatter_bool_to_cjson(cj_properties, dimmable_bulb_arg->current_brightness_value, item->cloud_properties.scale);
         }
+        ret = EZPI_SUCCESS;
     }
 
     return ret;
 }
 
-static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
+
+static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t* item, void* arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
 
     cJSON *cj_properties = (cJSON *)arg;
     if (cj_properties && item && item->user_arg)
@@ -177,14 +180,16 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
         {
             ezlopi_valueformatter_bool_to_cjson(cj_properties, dimmable_bulb_arg->current_brightness_value, item->cloud_properties.scale);
         }
+        ret = EZPI_SUCCESS;
     }
 
     return ret;
 }
 
-static int __init(l_ezlopi_item_t *item)
+
+static ezlopi_error_t __init(l_ezlopi_item_t* item)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_SUCCESS;
     if (item)
     {
         if (GPIO_IS_VALID_GPIO(item->interface.pwm.gpio_num))
@@ -205,22 +210,21 @@ static int __init(l_ezlopi_item_t *item)
                         dimmable_bulb_arg->previous_brightness_value = item->interface.pwm.duty_cycle;
                         dimmable_bulb_arg->dimmable_bulb_initialized = true;
                         ezlopi_pwm_change_duty(item->interface.pwm.channel, item->interface.pwm.speed_mode, item->interface.pwm.duty_cycle);
-                        ret = 1;
                     }
                     else
                     {
-                        ret = -1;
+                        ret = EZPI_ERR_INIT_DEVICE_FAILED;
                     }
                 }
             }
             else
             {
-                ret = -1;
+                ret = EZPI_ERR_INIT_DEVICE_FAILED;
             }
         }
         else
         {
-            ret = -1;
+            ret = EZPI_ERR_INIT_DEVICE_FAILED;
         }
     }
     return ret;
@@ -325,9 +329,9 @@ static void __prepare_dimmer_switch_item_properties(l_ezlopi_item_t *item, cJSON
     item->interface.gpio.gpio_out.value = true;
 }
 
-static int __prepare(void *arg)
+static ezlopi_error_t __prepare(void* arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_SUCCESS;
 
     s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
     if (prep_arg && prep_arg->cjson_device)
@@ -393,13 +397,13 @@ static int __prepare(void *arg)
                 {
                     ezlopi_device_free_device(device);
                     ezlopi_free(__FUNCTION__, dimmable_bulb_arg);
-                    ret = -1;
+                    ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                 }
             }
             else
             {
                 ezlopi_device_free_device(device);
-                ret = -1;
+                ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
             }
         }
     }

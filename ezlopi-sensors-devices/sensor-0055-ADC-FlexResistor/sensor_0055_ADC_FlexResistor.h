@@ -3,6 +3,7 @@
 
 #include "ezlopi_core_actions.h"
 #include "ezlopi_core_devices.h"
+#include "ezlopi_core_errors.h"
 
 /**
  *  NOTE : FlexResistor module gives (0V - 5V) as analog output .
@@ -52,6 +53,6 @@ typedef struct flex_t
     int rs_0055;
 } flex_t;
 //-----------------------------------------------------------------------------------------------------------------------------
-int sensor_0055_ADC_FlexResistor(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
+ezlopi_error_t sensor_0055_ADC_FlexResistor(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
 #endif //_SENSOR_0055_ADC_FLEXRESISTOR_H_

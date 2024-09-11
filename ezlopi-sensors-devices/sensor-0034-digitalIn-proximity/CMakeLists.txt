@@ -9,7 +9,8 @@ idf_component_register(SRCS "sensor_0034_digitalIn_proximity.c"
                                     ezlopi-core-actions 
                                     ezlopi-core-devices 
                                     ezlopi-core-valueformatter 
-
+                                    ezlopi-core-errors
+                                    
                                     ezlopi-cloud-items
                                     ezlopi-cloud-constants 
 

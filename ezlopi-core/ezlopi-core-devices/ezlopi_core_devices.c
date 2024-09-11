@@ -2,7 +2,9 @@
 
 #include "ezlopi_core_factory_info.h"
 #include "ezlopi_core_cjson_macros.h"
+#include "ezlopi_core_errors.h"
 #include "ezlopi_core_nvs.h"
+
 #include "ezlopi_core_reset.h"
 #include "ezlopi_cloud_items.h"
 #include "ezlopi_cloud_constants.h"
@@ -15,8 +17,8 @@ static l_ezlopi_device_t *l_device_head = NULL;
 static volatile uint32_t g_store_dev_config_with_id = 0;
 static s_ezlopi_cloud_controller_t s_controller_information;
 
-static int ezlopi_device_parse_json_v3(cJSON *cj_config);
-static void ezlopi_device_free_single(l_ezlopi_device_t *device);
+static ezlopi_error_t ezlopi_device_parse_json_v3(cJSON* cj_config);
+static void ezlopi_device_free_single(l_ezlopi_device_t* device);
 #if (1 == ENABLE_TRACE)
 #if 0 // Defined but not used
 static void ezlopi_device_print_controller_cloud_information_v3(void);
@@ -799,8 +801,8 @@ void ezlopi_device_prepare(void)
 
         if (cj_config)
         {
-            int ret = ezlopi_device_parse_json_v3(cj_config);
-            if (ret < 0)
+
+            if (EZPI_SUCCESS != ezlopi_device_parse_json_v3(cj_config))
             {
                 TRACE_E("parsing devices-config failed!!!!");
 
@@ -823,7 +825,7 @@ void ezlopi_device_prepare(void)
                     EZPI_CORE_reset_reboot();
                 }
             }
-            else if (ret > 1)
+            else 
             {
                 ezlopi_factory_info_v3_set_ezlopi_config(cj_config);
             }
@@ -993,9 +995,9 @@ static void ezlopi_device_print_interface_type(l_ezlopi_item_t* item)
 #endif
 //////////////////// Print functions end here /////////////////////////
 ///////////////////////////////////////////////////////////////////////
-static int ezlopi_device_parse_json_v3(cJSON *cjson_config)
+static ezlopi_error_t ezlopi_device_parse_json_v3(cJSON* cjson_config)
 {
-    int ret = 0;
+    ezlopi_error_t error = EZPI_SUCCESS;
 
     if (cjson_config)
     {
@@ -1036,7 +1038,7 @@ static int ezlopi_device_parse_json_v3(cJSON *cjson_config)
                             cJSON *cj_device_id = cJSON_GetObjectItem(__FUNCTION__, cjson_device, ezlopi_device_id_str);
                             if (NULL == cj_device_id || NULL == cj_device_id->valuestring)
                             {
-                                ret = 2;
+                                error = EZPI_ERR_JSON_PARSE_FAILED;
                             }
 
                             CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_id_item_str, id_item);
@@ -1050,8 +1052,9 @@ static int ezlopi_device_parse_json_v3(cJSON *cjson_config)
                                 {
                                     if (id_item == v3_device_list[dev_idx].id)
                                     {
-                                        s_ezlopi_prep_arg_t device_prep_arg = {.device = &v3_device_list[dev_idx], .cjson_device = cjson_device};
-                                        v3_device_list[dev_idx].func(EZLOPI_ACTION_PREPARE, NULL, (void *)&device_prep_arg, NULL);
+                                        s_ezlopi_prep_arg_t device_prep_arg = { .device = &v3_device_list[dev_idx], .cjson_device = cjson_device };
+                                        v3_device_list[dev_idx].func(EZLOPI_ACTION_PREPARE, NULL, (void*)&device_prep_arg, NULL);
+                                        error = EZPI_SUCCESS;
                                     }
                                     dev_idx++;
                                 }
@@ -1066,25 +1069,25 @@ static int ezlopi_device_parse_json_v3(cJSON *cjson_config)
 #if (defined(CONFIG_IDF_TARGET_ESP32) || defined(CONFIG_IDF_TARGET_ESP32S3) || defined(CONFIG_IDF_TARGET_ESP32C3))
                 else
                 {
-                    ret = -3;
+                    error = EZPI_ERR_JSON_PARSE_FAILED;
                     TRACE_E("Device configuration and chipset mismatch ! Device and Item assignment aborted !");
                 }
 #endif // CONFIG_IDF_TARGET_ESP32 OR CONFIG_IDF_TARGET_ESP32S3 OR CONFIG_IDF_TARGET_ESP32C3
             }
             else
             {
-                ret = -2;
+                error = EZPI_ERR_JSON_PARSE_FAILED;
                 TRACE_E("Error, could not identify the chipset in the config!");
             }
         }
         else
         {
-            ret = -1;
+            error = EZPI_ERR_JSON_PARSE_FAILED;
             TRACE_E("Chipset not defined in the config, Device and Item assignment aborted !");
         }
     }
 
-    return ret;
+    return error;
 }
 
 static void ezlopi_device_free_item(l_ezlopi_item_t *items)

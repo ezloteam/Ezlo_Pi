@@ -5,6 +5,7 @@ idf_component_register(SRCS "sensor_0065_digitalIn_float_switch.c"
                                 # ezlopi-core-timer 
                                 ezlopi-core-devices 
                                 ezlopi-core-valueformatter
+                                ezlopi-core-errors
 
                                 ezlopi-hal-gpio
 

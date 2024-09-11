@@ -4,6 +4,7 @@
 #define _EZLOPI_PWM_H_
 
 #include "driver/ledc.h"
+#include "ezlopi_core_errors.h"
 
 typedef struct s_ezlopi_channel_speed
 {

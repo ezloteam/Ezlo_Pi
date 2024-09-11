@@ -7,4 +7,5 @@ idf_component_register(SRCS "ezlopi_util_trace.c" "${config_src}"
     REQUIRES 
                 log
                 ezlopi-user-config
+                ezlopi-core-errors
                 )

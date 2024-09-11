@@ -5,6 +5,7 @@
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
+#include "ezlopi_core_errors.h"
 
 #include "ezlopi_hal_adc.h"
 
@@ -22,11 +23,11 @@ const char* ky206_sensor_heat_alarm_token[] = {
     "unknown",
 };
 //------------------------------------------------------------------------------
-static int __0057_prepare(void* arg);
-static int __0057_init(l_ezlopi_item_t* item);
-static int __0057_get_item(l_ezlopi_item_t* item, void* arg);
-static int __0057_get_cjson_value(l_ezlopi_item_t* item, void* arg);
-static int __0057_notify(l_ezlopi_item_t* item);
+static ezlopi_error_t __0057_prepare(void* arg);
+static ezlopi_error_t __0057_init(l_ezlopi_item_t* item);
+static ezlopi_error_t __0057_get_item(l_ezlopi_item_t* item, void* arg);
+static ezlopi_error_t __0057_get_cjson_value(l_ezlopi_item_t* item, void* arg);
+static ezlopi_error_t __0057_notify(l_ezlopi_item_t* item);
 
 static void __prepare_device_digi_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device);
 static void __prepare_item_digi_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device);
@@ -35,9 +36,9 @@ static void __prepare_item_adc_cloud_properties(l_ezlopi_item_t* item, cJSON* cj
 static void __extract_KY026_sensor_value(uint32_t flame_adc_pin, float* analog_sensor_volt, float* max_reading);
 //----------------------------------------------------------------------------------------------------------------
 
-int sensor_0057_other_KY026_FlameDetector(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
+ezlopi_error_t sensor_0057_other_KY026_FlameDetector(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_SUCCESS;
     switch (action)
     {
     case EZLOPI_ACTION_PREPARE:
@@ -74,9 +75,9 @@ int sensor_0057_other_KY026_FlameDetector(e_ezlopi_actions_t action, l_ezlopi_it
 }
 
 //----------------------------------------------------
-static int __0057_prepare(void* arg)
+static ezlopi_error_t __0057_prepare(void* arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
     s_ezlopi_prep_arg_t* device_prep_arg = (s_ezlopi_prep_arg_t*)arg;
     if (device_prep_arg && (NULL != device_prep_arg->cjson_device))
     {
@@ -84,7 +85,6 @@ static int __0057_prepare(void* arg)
         l_ezlopi_device_t* flame_device_parent_digi = ezlopi_device_add_device(device_prep_arg->cjson_device, "digi");
         if (flame_device_parent_digi)
         {
-            ret = 1;
             TRACE_I("Parent_flame_device_digi-[0x%x] ", flame_device_parent_digi->cloud_properties.device_id);
             __prepare_device_digi_cloud_properties(flame_device_parent_digi, device_prep_arg->cjson_device);
             l_ezlopi_item_t* flame_item_digi = ezlopi_device_add_item_to_device(flame_device_parent_digi, sensor_0057_other_KY026_FlameDetector);
@@ -92,10 +92,7 @@ static int __0057_prepare(void* arg)
             {
                 flame_item_digi->cloud_properties.device_id = flame_device_parent_digi->cloud_properties.device_id;
                 __prepare_item_digi_cloud_properties(flame_item_digi, device_prep_arg->cjson_device);
-            }
-            else
-            {
-                ret = -1;
+                ret = EZPI_SUCCESS;
             }
 
             //---------------------------- ADC - DEVICE 2 -------------------------------------------
@@ -118,33 +115,29 @@ static int __0057_prepare(void* arg)
                     }
                     else
                     {
-                        ret = -1;
+                        ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                         ezlopi_device_free_device(flame_device_child_adc);
                         ezlopi_free(__FUNCTION__, flame_struct);
                     }
                 }
                 else
                 {
-                    ret = -1;
+                    ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                     ezlopi_free(__FUNCTION__, flame_struct);
                 }
             }
             else
             {
-                ret = -1;
+                ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
             }
-        }
-        else
-        {
-            ret = -1;
         }
     }
     return ret;
 }
 
-static int __0057_init(l_ezlopi_item_t* item)
+static ezlopi_error_t __0057_init(l_ezlopi_item_t* item)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_ERR_INIT_DEVICE_FAILED;
     if (NULL != item)
     {
         if (ezlopi_item_name_heat_alarm == item->cloud_properties.item_name)
@@ -157,11 +150,7 @@ static int __0057_init(l_ezlopi_item_t* item)
                 input_conf.mode = GPIO_MODE_INPUT;
                 input_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
                 input_conf.pull_up_en = GPIO_PULLUP_ENABLE;
-                ret = (0 == gpio_config(&input_conf)) ? 1 : -1;
-            }
-            else
-            {
-                ret = -1;
+                ret = (0 == gpio_config(&input_conf)) ? EZPI_ERR_INIT_DEVICE_FAILED : ret;
             }
         }
         else if (ezlopi_item_name_temperature_changes == item->cloud_properties.item_name)
@@ -171,23 +160,23 @@ static int __0057_init(l_ezlopi_item_t* item)
             {
                 if (GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
                 { // initialize analog_pin
-                    if (0 == ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
+                    if (EZPI_SUCCESS == ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
                     {
-                        ret = 1;
+                        ret = EZPI_SUCCESS;
                     }
                     else
                     {
-                        ret = -1;
+                        ret = EZPI_ERR_INIT_DEVICE_FAILED;
                     }
                 }
                 else
                 {
-                    ret = -1;
+                    ret = EZPI_ERR_INIT_DEVICE_FAILED;
                 }
             }
             else
             {
-                ret = -1;
+                ret = EZPI_ERR_INIT_DEVICE_FAILED;
             }
         }
     }
@@ -248,9 +237,9 @@ static void __prepare_item_adc_cloud_properties(l_ezlopi_item_t* item, cJSON* cj
 }
 
 //------------------------------------------------------------------------------------------------------
-static int __0057_get_item(l_ezlopi_item_t* item, void* arg)
+static ezlopi_error_t __0057_get_item(l_ezlopi_item_t* item, void* arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
     if (item && arg)
     {
         cJSON* cj_result = (cJSON*)arg;
@@ -283,16 +272,16 @@ static int __0057_get_item(l_ezlopi_item_t* item, void* arg)
                 {
                     ezlopi_valueformatter_float_to_cjson(cj_result, flame_struct->absorbed_percent, item->cloud_properties.scale);
                 }
-                ret = 1;
+                ret = EZPI_SUCCESS;
             }
         }
     }
     return ret;
 }
 
-static int __0057_get_cjson_value(l_ezlopi_item_t* item, void* arg)
+static ezlopi_error_t __0057_get_cjson_value(l_ezlopi_item_t* item, void* arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
     if (item && arg)
     {
         cJSON* cj_result = (cJSON*)arg;
@@ -311,15 +300,15 @@ static int __0057_get_cjson_value(l_ezlopi_item_t* item, void* arg)
                     ezlopi_valueformatter_float_to_cjson(cj_result, flame_struct->absorbed_percent, item->cloud_properties.scale);
                 }
             }
-            ret = 1;
+            ret = EZPI_SUCCESS;
         }
     }
     return ret;
 }
 
-static int __0057_notify(l_ezlopi_item_t* item)
+static ezlopi_error_t __0057_notify(l_ezlopi_item_t* item)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
     if (item)
     {
         if (ezlopi_item_name_heat_alarm == item->cloud_properties.item_name)
@@ -356,7 +345,7 @@ static int __0057_notify(l_ezlopi_item_t* item)
                 }
             }
         }
-        ret = 1;
+        ret = EZPI_SUCCESS;
     }
     return ret;
 }

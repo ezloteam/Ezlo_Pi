@@ -6,6 +6,7 @@ set(ESP_IDF_COMPONENTS
 )
 set(EZLOPI_CORE_COMPONENTS
         ezlopi-core-factory-info 
+        ezlopi-core-errors
 )
 
 set(EZLOPI_SERV_COMPONENTS

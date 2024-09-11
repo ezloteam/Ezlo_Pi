@@ -9,6 +9,7 @@
 
 #include "ezlopi_core_actions.h"
 #include "ezlopi_core_devices.h"
+#include "ezlopi_core_errors.h"
 
 #include "ezlopi_hal_gpio.h"
 
@@ -455,6 +456,6 @@ fingerprint_status_t r307_as606_fingerprint_config(l_ezlopi_item_t *item);
 bool r307_as606_wait_till_system_free(l_ezlopi_item_t *item, uint32_t timeout);
 
 //-------------------------------------------------------------------------------------------------------------------
-int sensor_0066_other_R307_FingerPrint(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
+ezlopi_error_t sensor_0066_other_R307_FingerPrint(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
 #endif //_SENSOR_0066_OTHER_R307_FINGERPRINT_H_

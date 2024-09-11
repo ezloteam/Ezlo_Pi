@@ -8,6 +8,7 @@ idf_component_register(SRCS "ens160.c" "sensor_0068_ENS160_gas_sensor.c" "${conf
                                 ezlopi-core-actions
                                 ezlopi-core-valueformatter
                                 ezlopi-core-nvs
+                                ezlopi-core-errors
 
                                 ezlopi-cloud-constants
                                 

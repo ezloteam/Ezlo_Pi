@@ -1,10 +1,11 @@
 #ifndef _SENSOR_0007_I2C_GY271_H_
 #define _SENSOR_0007_I2C_GY271_H_
 
+#include <stdbool.h>
+
 #include "ezlopi_core_actions.h"
 #include "ezlopi_core_devices.h"
-#include <stdbool.h>
-// #include "esp_err.h"
+#include "ezlopi_core_errors.h"
 
 // Calculation parameters
 #define PI (3.1416f)
@@ -114,12 +115,12 @@ typedef struct s_gy271_data
     int azimuth;
 } s_gy271_data_t;
 
-int __gy271_configure(l_ezlopi_item_t *item);
+ezlopi_error_t __gy271_configure(l_ezlopi_item_t *item);
 bool __gy271_update_value(l_ezlopi_item_t *item);
 void __gy271_get_raw_max_min_values(l_ezlopi_item_t *item, int (*calibrationData)[2]);
 //-----------------------------------------------------------------------------------------------
 
 // Action
-int sensor_0007_I2C_GY271(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
+ezlopi_error_t sensor_0007_I2C_GY271(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
 #endif // _SENSOR_0007_I2C_GY271_H_

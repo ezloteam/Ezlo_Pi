@@ -8,6 +8,8 @@
 
 #include "EZLOPI_USER_CONFIG.h"
 
+#include "ezlopi_core_errors.h"
+
 #if defined (CONFIG_EZPI_SERV_ENABLE_MODES)
 typedef enum e_modes_ref_id_idx
 {
@@ -124,30 +126,30 @@ typedef struct s_ezlopi_modes
 
 void ezlopi_core_modes_init(void);
 void ezlopi_core_default_init(void);
-int ezlopi_core_modes_store_to_nvs(void);
+ezlopi_error_t ezlopi_core_modes_store_to_nvs(void);
 s_ezlopi_modes_t* ezlopi_core_default_mode_get(void);
 s_house_modes_t* ezlopi_core_modes_get_house_mode_by_id(uint32_t house_mode_id);
 s_house_modes_t* ezlopi_core_modes_get_house_mode_by_name(char* house_mode_name);
 
 s_ezlopi_modes_t* ezlopi_core_modes_get_custom_modes(void);
 s_house_modes_t* ezlopi_core_modes_get_current_house_modes(void);
-int ezlopi_core_modes_set_current_house_mode(s_house_modes_t* new_house_mode);
+ezlopi_error_t  ezlopi_core_modes_set_current_house_mode(s_house_modes_t* new_house_mode);
 
-int ezlopi_core_modes_api_get_modes(cJSON* cj_result);
-int ezlopi_core_modes_api_get_current_mode(cJSON* cj_result);
-int ezlopi_core_modes_api_switch_mode(s_house_modes_t* switch_to_house_mode);
-int ezlopi_core_modes_api_cancel_switch(void);
-int ezlopi_core_modes_api_cancel_entry_delay(void);
-int ezlopi_core_modes_set_switch_to_delay(uint32_t switch_to_delay);
-int ezlopi_core_modes_set_alarm_delay(uint32_t switch_to_delay);
-int ezlopi_core_modes_set_protect(uint32_t mode_id, bool protect_state);
+ezlopi_error_t ezlopi_core_modes_api_get_modes(cJSON* cj_result);
+ezlopi_error_t ezlopi_core_modes_api_get_current_mode(cJSON* cj_result);
+ezlopi_error_t ezlopi_core_modes_api_switch_mode(s_house_modes_t* switch_to_house_mode);
+ezlopi_error_t ezlopi_core_modes_api_cancel_switch(void);
+ezlopi_error_t ezlopi_core_modes_api_cancel_entry_delay(void);
+ezlopi_error_t ezlopi_core_modes_set_switch_to_delay(uint32_t switch_to_delay);
+ezlopi_error_t ezlopi_core_modes_set_alarm_delay(uint32_t switch_to_delay);
+ezlopi_error_t ezlopi_core_modes_set_protect(uint32_t mode_id, bool protect_state);
 
-int ezlopi_core_modes_add_alarm_off(uint8_t mode_id, cJSON*  device_id);
-int ezlopi_core_modes_remove_alarm_off(uint32_t mode_id, cJSON* device_id);
+ezlopi_error_t ezlopi_core_modes_add_alarm_off(uint8_t mode_id, cJSON*  device_id);
+ezlopi_error_t ezlopi_core_modes_remove_alarm_off(uint32_t mode_id, cJSON* device_id);
 
-int ezlopi_core_modes_cjson_get_current_mode(cJSON* cj_result);
-int ezlopi_core_modes_set_entry_delay(uint32_t normal_sec, uint32_t short_sec, uint32_t extended_sec, uint32_t instant_sec);
-int ezlopi_core_modes_reset_entry_delay(void);
+ezlopi_error_t ezlopi_core_modes_cjson_get_current_mode(cJSON* cj_result);
+ezlopi_error_t ezlopi_core_modes_set_entry_delay(uint32_t normal_sec, uint32_t short_sec, uint32_t extended_sec, uint32_t instant_sec);
+ezlopi_error_t ezlopi_core_modes_reset_entry_delay(void);
 
 ///
 cJSON* ezlopi_core_modes_cjson_changed(void);

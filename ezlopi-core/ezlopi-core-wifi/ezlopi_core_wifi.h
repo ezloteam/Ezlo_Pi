@@ -5,6 +5,7 @@
 #include "esp_wifi_types.h"
 #include "cjext.h"
 
+#include "ezlopi_core_errors.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -31,7 +32,7 @@ extern "C"
     void ezlopi_wifi_initialize(void);
     esp_err_t ezlopi_wifi_connect(const char* ssid, const char* pass);
     void ezlopi_wifi_connect_from_id_bin(void);
-    int ezlopi_wait_for_wifi_to_connect(uint32_t wait_time_ms);
+    ezlopi_error_t ezlopi_wait_for_wifi_to_connect(uint32_t wait_time_ms);
     esp_netif_ip_info_t* ezlopi_wifi_get_ip_infos(void);
     const char* ezlopi_wifi_get_last_disconnect_reason(void);
     int ezlopi_wifi_try_connect(cJSON *cj_network);
