@@ -3,7 +3,8 @@
 
 #include "ezlopi_core_actions.h"
 #include "ezlopi_core_devices.h"
+#include "ezlopi_core_errors.h"
 
-int sensor_0015_oneWire_DHT11(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
+ezlopi_error_t sensor_0015_oneWire_DHT11(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
 #endif // _SENSOR_0015_ONEWIRE_DHT11_H_

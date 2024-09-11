@@ -56,7 +56,7 @@ typedef struct l_ezlopi_item
 
     void *user_arg;
     bool is_user_arg_unique;
-    int (*func)(e_ezlopi_actions_t action, struct l_ezlopi_item *item, void *arg, void *user_arg);
+    ezlopi_error_t (*func)(e_ezlopi_actions_t action, struct l_ezlopi_item* item, void* arg, void* user_arg);
 
     struct l_ezlopi_item *next;
 } l_ezlopi_item_t;
@@ -88,8 +88,8 @@ l_ezlopi_item_t *ezlopi_device_get_item_by_id(uint32_t item_id);
 l_ezlopi_device_settings_v3_t *ezlopi_device_settings_get_by_id(uint32_t settings_id);
 
 // l_ezlopi_item_t *ezlopi_device_add_item_to_device(l_ezlopi_device_t *device);
-l_ezlopi_item_t *ezlopi_device_add_item_to_device(l_ezlopi_device_t *device,
-                                                  int (*item_func)(e_ezlopi_actions_t action, struct l_ezlopi_item *item, void *arg, void *user_arg));
+l_ezlopi_item_t* ezlopi_device_add_item_to_device(l_ezlopi_device_t* device,
+    ezlopi_error_t (*item_func)(e_ezlopi_actions_t action, struct l_ezlopi_item* item, void* arg, void* user_arg));
 
 l_ezlopi_device_settings_v3_t *ezlopi_device_add_settings_to_device_v3(l_ezlopi_device_t *device,
                                                                        int (*setting_func)(e_ezlopi_settings_action_t action, struct l_ezlopi_device_settings_v3 *setting, void *arg, void *user_arg));

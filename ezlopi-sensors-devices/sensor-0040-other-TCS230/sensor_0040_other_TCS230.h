@@ -1,9 +1,11 @@
 #ifndef _SENSOR_0040_OTHER_TCS230_H_
 #define _SENSOR_0040_OTHER_TCS230_H_
 
+#include "driver/gpio.h"
+
 #include "ezlopi_core_actions.h"
 #include "ezlopi_core_devices.h"
-#include "driver/gpio.h"
+#include "ezlopi_core_errors.h"
 
 /**
  * ESP32 sample connections
@@ -84,6 +86,6 @@ bool get_tcs230_sensor_value(l_ezlopi_item_t *item);
 //------------------------------------------------------------------------
 //              Action
 //------------------------------------------------------------------------
-int sensor_0040_other_TCS230(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
+ezlopi_error_t sensor_0040_other_TCS230(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
 #endif // _SENSOR_0040_OTHER_TCS230_H_

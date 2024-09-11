@@ -193,7 +193,7 @@ static void __ping_loop(void *arg)
                 {
                     int recv_ret = __ping_receive(ep, 5);
 
-                    if ((recv_ret >= 0) || (xTaskGetTickCount() - last_wake) >= ep->interval_ms)
+                    if ((recv_ret >= 0) || (xTaskGetTickCount() - last_wake) >= (ep->interval_ms / portTICK_PERIOD_MS))
                     {
                         gettimeofday(&end_time, NULL);
                         ep->elapsed_time_ms = PING_TIME_DIFF_MS(end_time, start_time);
@@ -341,7 +341,7 @@ esp_err_t ezlopi_ping_new_session(const ezlopi_ping_config_t *config, const ezlo
     ep->flags |= PING_FLAGS_INIT;
 
     /* create ping thread */
-    ezlopi_service_loop_add("ping-loop", __ping_loop, 1, ep);
+    ezlopi_service_loop_add("ping-loop", __ping_loop, 10000, ep);
 
 #if 0
     BaseType_t xReturned = xTaskCreate(__ping_thread, "ping", config->task_stack_size, ep,

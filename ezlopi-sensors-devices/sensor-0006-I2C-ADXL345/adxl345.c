@@ -2,6 +2,7 @@
 #include "esp_err.h"
 #include "ezlopi_cloud_item_name_str.h"
 #include "sensor_0006_I2C_ADXL345.h"
+#include "ezlopi_core_errors.h"
 
 //------------------------------------------------------------------------------
 
@@ -78,9 +79,9 @@ static esp_err_t adxl345_check_data_ready_INTR(l_ezlopi_item_t *item, uint8_t *t
     return err;
 }
 
-int __adxl345_configure_device(l_ezlopi_item_t *item)
+ezlopi_error_t __adxl345_configure_device(l_ezlopi_item_t *item)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
     if (item)
     {
         ret = (int)(reset_measure_mode(item));
@@ -88,6 +89,7 @@ int __adxl345_configure_device(l_ezlopi_item_t *item)
         ret = (int)(get_device_id(item));
         ret = (int)(set_to_measure_mode(item));
         ret = (int)(enable_data_ready_interrupt(item));
+        ret = EZPI_SUCCESS;
     }
     return ret;
 }

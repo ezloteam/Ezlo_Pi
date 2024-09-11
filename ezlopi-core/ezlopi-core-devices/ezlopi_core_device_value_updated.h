@@ -1,11 +1,12 @@
 #ifndef _EZLOPI_CORE_DEVICE_VALUE_UPDATED_H_
 #define _EZLOPI_CORE_DEVICE_VALUE_UPDATED_H_
 #include "ezlopi_core_devices_list.h"
+#include "ezlopi_core_errors.h"
 
-int ezlopi_device_value_updated_from_device_broadcast(l_ezlopi_item_t* item);
-int ezlopi_device_value_updated_from_device_broadcast_by_item_id(uint32_t item_id);
-int ezlopi_core_device_value_updated_settings_broadcast(l_ezlopi_device_settings_v3_t* setting);
+ezlopi_error_t ezlopi_device_value_updated_from_device_broadcast(l_ezlopi_item_t* item);
+ezlopi_error_t ezlopi_device_value_updated_from_device_broadcast_by_item_id(uint32_t item_id);
+ezlopi_error_t ezlopi_core_device_value_updated_settings_broadcast(l_ezlopi_device_settings_v3_t* setting);
 // int ezlopi_setting_value_updated_from_device_settings_id_v3(uint32_t setting_id);
-int ezlopi_core_device_value_update_wifi_scan_broadcast(cJSON* network_array);
+ezlopi_error_t ezlopi_core_device_value_update_wifi_scan_broadcast(cJSON* network_array);
 
 #endif // _EZLOPI_CORE_DEVICE_VALUE_UPDATED_H_

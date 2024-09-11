@@ -8,6 +8,7 @@
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_modes_cjson.h"
 #include "ezlopi_core_cjson_macros.h"
+#include "ezlopi_core_errors.h"
 
 #include "ezlopi_cloud_constants.h"
 #include "EZLOPI_USER_CONFIG.h"
@@ -23,9 +24,9 @@ static void __cjson_add_protect_buttons(cJSON* cj_protect_buttons_arr, s_protect
 
 //////////////////////
 
-int ezlopi_core_modes_cjson_get_modes(cJSON* cj_dest)
+ezlopi_error_t ezlopi_core_modes_cjson_get_modes(cJSON* cj_dest)
 {
-    uint32_t ret = 0;
+    ezlopi_error_t ret = EZPI_SUCCESS;
     s_ezlopi_modes_t* _modes = ezlopi_core_modes_get_custom_modes();
     if (_modes)
     {
@@ -74,13 +75,13 @@ int ezlopi_core_modes_cjson_get_modes(cJSON* cj_dest)
     return ret;
 }
 
-int ezlopi_core_modes_cjson_get_current_mode(cJSON* cj_dest)
+ezlopi_error_t ezlopi_core_modes_cjson_get_current_mode(cJSON* cj_dest)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
     s_ezlopi_modes_t* modes = ezlopi_core_modes_get_custom_modes();
     if (modes)
     {
-        ret = 1;
+        ret = EZPI_SUCCESS;
         CJSON_ASSIGN_NUMBER_AS_STRING(cj_dest, modes->current_mode_id, ezlopi_modeId_str);
     }
 

@@ -12,6 +12,7 @@ idf_component_register(SRCS "device_0004_digitalIn_generic.c" "${config_src}"
                 ezlopi-core-actions
                 ezlopi-core-devices 
                 ezlopi-core-valueformatter
+                ezlopi-core-errors
 
                 ezlopi-hal-gpio
 

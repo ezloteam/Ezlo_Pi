@@ -7,6 +7,7 @@
 #include "ezlopi_core_processes.h"
 #include "ezlopi_core_broadcast.h"
 #include "ezlopi_core_cjson_macros.h"
+#include "ezlopi_core_errors.h"
 
 #include "ezlopi_service_loop.h"
 #include "ezlopi_service_broadcast.h"
@@ -14,7 +15,7 @@
 static QueueHandle_t __broadcast_queue = NULL;
 
 static void __broadcast_loop(void *arg);
-static int ezlopi_service_broadcast_send_to_queue(cJSON* cj_broadcast_data);
+static ezlopi_error_t ezlopi_service_broadcast_send_to_queue(cJSON* cj_broadcast_data);
 
 void ezlopi_service_broadcast_init(void)
 {
@@ -57,9 +58,9 @@ static void __broadcast_loop(void *arg)
     vTaskDelay(1);
 }
 
-static int ezlopi_service_broadcast_send_to_queue(cJSON * cj_broadcast_data)
+static ezlopi_error_t ezlopi_service_broadcast_send_to_queue(cJSON* cj_broadcast_data)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
 
     if (__broadcast_queue && cj_broadcast_data)
     {
@@ -82,7 +83,7 @@ static int ezlopi_service_broadcast_send_to_queue(cJSON * cj_broadcast_data)
         cJSON* cj_data = cj_broadcast_data;
         if (pdTRUE == xQueueSend(__broadcast_queue, &cj_data, 500 / portTICK_PERIOD_MS))
         {
-            ret = 1;
+            ret = EZPI_SUCCESS;
         }
         else
         {

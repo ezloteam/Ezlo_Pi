@@ -246,7 +246,7 @@ static int ezlopi_service_uart_process_log_severity(const cJSON *root)
     if (cj_uart_response)
     {
         cJSON_AddNumberToObject(__func__, cj_uart_response, ezlopi_cmd_str, 6);
-        if (0 == ret)
+        if (EZPI_SUCCESS != ret)
         {
             cJSON_AddNumberToObject(__func__, cj_uart_response, ezlopi_status_str, 0);
         }
@@ -637,6 +637,7 @@ static void ezlopi_service_uart_get_info()
             ezlopi_service_uart_ezlopi_info(cj_info);
             ezlopi_service_uart_oem_info(cj_info);
             ezlopi_service_uart_newtwork_info(cj_info);
+
 
             cJSON_AddItemToObject(__FUNCTION__, cj_get_info, ezlopi_info_str, cj_info);
 

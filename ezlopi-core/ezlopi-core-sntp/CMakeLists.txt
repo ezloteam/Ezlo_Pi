@@ -6,6 +6,7 @@ set(EZLOPI_CORE_COMPONENTS
         ezlopi-util-trace
         ezlopi-core-nvs
         ezlopi-core-wifi
+        ezlopi-core-errors
 )
 set(EZLOPI_HAL_COMPONENTS 
 

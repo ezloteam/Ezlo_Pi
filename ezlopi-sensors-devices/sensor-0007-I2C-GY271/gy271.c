@@ -2,6 +2,9 @@
 #include "esp_err.h"
 #include "ezlopi_util_trace.h"
 #include "time.h"
+
+#include "ezlopi_core_errors.h"
+
 #include "ezlopi_hal_i2c_master.h"
 #include "sensor_0007_I2C_GY271.h"
 
@@ -88,16 +91,17 @@ static esp_err_t __gy271_check_status(l_ezlopi_item_t *item, uint8_t *temp)
     return err;
 }
 
-int __gy271_configure(l_ezlopi_item_t *item)
+ezlopi_error_t __gy271_configure(l_ezlopi_item_t *item)
 {
-    esp_err_t ret = ESP_FAIL;
+    ezlopi_error_t ret = EZPI_FAILED;
     if (item)
     {
         ret = activate_set_reset_period(item);
         ret = set_to_measure_mode(item);
         ret = enable_data_ready_interrupt(item);
+        ret = EZPI_SUCCESS;
     }
-    return (int)ret;
+    return ret;
 }
 
 bool __gy271_update_value(l_ezlopi_item_t *item)

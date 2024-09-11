@@ -6,6 +6,7 @@
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
+#include "ezlopi_core_errors.h"
 
 #include "ezlopi_hal_gpio.h"
 
@@ -22,18 +23,18 @@ const char* reed_door_window_states[] = {
     "unknown",
 };
 
-static int __0061_prepare(void* arg);
-static int __0061_init(l_ezlopi_item_t* item);
-static int __0061_get_item(l_ezlopi_item_t* item, void* arg);
-static int __0061_get_cjson_value(l_ezlopi_item_t* item, void* arg);
+static ezlopi_error_t __0061_prepare(void* arg);
+static ezlopi_error_t __0061_init(l_ezlopi_item_t* item);
+static ezlopi_error_t __0061_get_item(l_ezlopi_item_t* item, void* arg);
+static ezlopi_error_t __0061_get_cjson_value(l_ezlopi_item_t* item, void* arg);
 static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device);
 static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device);
 static void _0061_update_from_device(void* arg);
 //-----------------------------------------------------------------------
 
-int sensor_0061_digitalIn_reed_switch(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
+ezlopi_error_t sensor_0061_digitalIn_reed_switch(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_SUCCESS;
     switch (action)
     {
     case EZLOPI_ACTION_PREPARE:
@@ -93,9 +94,9 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_dev
     item->interface.gpio.gpio_in.pull = GPIO_PULLDOWN_ONLY;
     item->interface.gpio.gpio_in.interrupt = GPIO_INTR_ANYEDGE;
 }
-static int __0061_prepare(void* arg)
+static ezlopi_error_t __0061_prepare(void* arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
     if (arg)
     {
         s_ezlopi_prep_arg_t* device_prep_arg = (s_ezlopi_prep_arg_t*)arg;
@@ -104,16 +105,15 @@ static int __0061_prepare(void* arg)
             l_ezlopi_device_t* reed_device = ezlopi_device_add_device(device_prep_arg->cjson_device, NULL);
             if (reed_device)
             {
-                ret = 1;
                 __prepare_device_cloud_properties(reed_device, device_prep_arg->cjson_device);
                 l_ezlopi_item_t* reed_item = ezlopi_device_add_item_to_device(reed_device, sensor_0061_digitalIn_reed_switch);
                 if (reed_item)
                 {
                     __prepare_item_cloud_properties(reed_item, device_prep_arg->cjson_device);
+                    ret = EZPI_SUCCESS;
                 }
                 else
                 {
-                    ret = -1;
                     ezlopi_device_free_device(reed_device);
                 }
             }
@@ -122,9 +122,9 @@ static int __0061_prepare(void* arg)
     return ret;
 }
 
-static int __0061_init(l_ezlopi_item_t* item)
+static ezlopi_error_t __0061_init(l_ezlopi_item_t* item)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_ERR_INIT_DEVICE_FAILED;
     if (NULL != item)
     {
         if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num))
@@ -147,24 +147,16 @@ static int __0061_init(l_ezlopi_item_t* item)
             {
                 item->interface.gpio.gpio_in.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
                 ezlopi_service_gpioisr_register_v3(item, _0061_update_from_device, 200);
-                ret = 1;
+                ret = EZPI_SUCCESS;
             }
-            else
-            {
-                ret = -1;
-            }
-        }
-        else
-        {
-            ret = -1;
         }
     }
     return ret;
 }
 
-static int __0061_get_item(l_ezlopi_item_t* item, void* arg)
+static ezlopi_error_t __0061_get_item(l_ezlopi_item_t* item, void* arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
     if (item && arg)
     {
         cJSON* cj_result = (cJSON*)arg;
@@ -188,14 +180,14 @@ static int __0061_get_item(l_ezlopi_item_t* item, void* arg)
 
             cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, (char*)item->user_arg ? item->user_arg : reed_door_window_states[1]);
             cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, (char*)item->user_arg ? item->user_arg : reed_door_window_states[1]);
-            ret = 1;
+            ret = EZPI_SUCCESS;
         }
     }
     return ret;
 }
-static int __0061_get_cjson_value(l_ezlopi_item_t* item, void* arg)
+static ezlopi_error_t __0061_get_cjson_value(l_ezlopi_item_t* item, void* arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
     if (item && arg)
     {
         cJSON* cj_result = (cJSON*)arg;
@@ -203,7 +195,7 @@ static int __0061_get_cjson_value(l_ezlopi_item_t* item, void* arg)
         {
             cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, (char*)item->user_arg ? item->user_arg : reed_door_window_states[1]);
             cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, (char*)item->user_arg ? item->user_arg : reed_door_window_states[1]);
-            ret = 1;
+            ret = EZPI_SUCCESS;
         }
     }
     return ret;

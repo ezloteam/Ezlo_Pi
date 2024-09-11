@@ -18,6 +18,7 @@
 #include "ezlopi_core_scenes_when_methods.h"
 #include "ezlopi_core_scenes_status_changed.h"
 #include "ezlopi_core_scenes_when_methods_helper_functions.h"
+#include "ezlopi_core_errors.h"
 
 #include "ezlopi_service_meshbot.h"
 #include "ezlopi_cloud_constants.h"
@@ -862,7 +863,7 @@ int ezlopi_scene_when_is_cloud_state(l_scenes_list_v2_t* scene_node, void* arg)
 
         if (value_field)
         {
-            if (0 < ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 100, false))
+            if (EZPI_SUCCESS == ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 100, false))
             {
                 ret = (0 == strncmp(value_field->field_value.u_value.value_string, "connected", 10));
             }
