@@ -84,6 +84,7 @@ extern const char *ezlopi_not_ready_str;
 extern const char *ezlopi_settings_str;
 extern const char *ezlopi_valueType_str;
 extern const char *ezlopi_metadata_str;
+extern const char *ezlopi_meta_str;
 extern const char *ezlopi_code_str;
 extern const char *ezlopi_data_str;
 extern const char *ezlopi_message_str;

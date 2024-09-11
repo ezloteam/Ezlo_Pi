@@ -85,6 +85,7 @@ const char *ezlopi_not_ready_str = "not ready";
 const char *ezlopi_settings_str = "settings";
 const char *ezlopi_valueType_str = "valueType";
 const char *ezlopi_metadata_str = "metadata";
+const char *ezlopi_meta_str = "meta";
 const char *ezlopi_code_str = "code";
 const char *ezlopi_data_str = "data";
 const char *ezlopi_message_str = "message";
