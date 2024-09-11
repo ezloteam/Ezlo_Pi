@@ -9,6 +9,7 @@ idf_component_register(SRCS "dht11.c" "sensor_0015_oneWire_DHT11.c" "${config_sr
                                         ezlopi-core-devices 
                                         ezlopi-core-valueformatter 
                                         ezlopi-core-setting-commands
+                                        ezlopi-core-errors
                 
                                         ezlopi-cloud-items 
                                         ezlopi-cloud-constants 

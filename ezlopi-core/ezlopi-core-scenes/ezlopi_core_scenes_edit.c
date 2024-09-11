@@ -9,15 +9,16 @@
 #include "ezlopi_core_scenes_edit.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_scenes_populate.h"
+#include "ezlopi_core_errors.h"
 #include "ezlopi_core_cloud.h"
 
 #include "ezlopi_service_meshbot.h"
 
 static void _edit_scene(l_scenes_list_v2_t* scene_node, cJSON* cj_scene);
 
-int ezlopi_core_scene_edit_store_updated_to_nvs(cJSON* cj_updated_scene)
+ezlopi_error_t ezlopi_core_scene_edit_store_updated_to_nvs(cJSON* cj_updated_scene)
 {
-    int ret = 0;
+    ezlopi_error_t error = EZPI_SUCCESS;
     if (cj_updated_scene)
     {
         if (ezlopi_core_scene_add_when_blockId_if_reqd(cj_updated_scene))
@@ -39,14 +40,14 @@ int ezlopi_core_scene_edit_store_updated_to_nvs(cJSON* cj_updated_scene)
             if (cj_scene_id && cj_scene_id->valuestring)
             {
                 ezlopi_nvs_delete_stored_data_by_name(cj_scene_id->valuestring);
-                ret = ezlopi_nvs_write_str(update_scene_str, strlen(update_scene_str), cj_scene_id->valuestring);
+                error = ezlopi_nvs_write_str(update_scene_str, strlen(update_scene_str), cj_scene_id->valuestring);
             }
 
             ezlopi_free(__FUNCTION__, update_scene_str);
         }
     }
 
-    return ret;
+    return error;
 }
 
 int ezlopi_core_scene_edit_update_id(uint32_t scene_id, cJSON* cj_updated_scene)

@@ -7,6 +7,9 @@
 #include "freertos/task.h"
 
 #include "ezlopi_util_trace.h"
+
+#include "ezlopi_core_errors.h"
+
 #include "ezlopi_hal_adc.h"
 #include "EZLOPI_USER_CONFIG.h"
 
@@ -46,26 +49,23 @@ static e_ezlopi_gpio_channel_t ezlopi_channel_to_gpio_map[ADC1_CHANNEL_MAX] = {
 };
 #endif
 
-int ezlopi_adc_init(uint8_t gpio_num, uint8_t width)
+ezlopi_error_t ezlopi_adc_init(uint8_t gpio_num, uint8_t width)
 {
     ezlopi_analog_object_handle_t* ezlopi_analog_object_handle = (struct s_ezlopi_analog_object*)ezlopi_malloc(__FUNCTION__, sizeof(struct s_ezlopi_analog_object));
     memset(ezlopi_analog_object_handle, 0, sizeof(struct s_ezlopi_analog_object));
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_ERR_HAL_INIT_FAILED;
     int channel = ezlopi_adc_get_channel_number(gpio_num);
     if (-1 == channel)
     {
         TRACE_E("gpio_num %d is invalid for ADC.", gpio_num);
-        ret = -1;
     }
     else if (ADC_WIDTH_MAX <= width)
     {
         TRACE_E("Invalid width(%d) for ADC; must be less than %d", width, ADC_WIDTH_MAX);
-        ret = -1;
     }
     else if (NULL != ezlopi_analog_object_array[channel])
     {
         TRACE_E("Invalid gpio_num(%d) for ADC; it is already in use.", gpio_num);
-        ret = -1;
     }
     else
     {
@@ -90,7 +90,7 @@ int ezlopi_adc_init(uint8_t gpio_num, uint8_t width)
 
         ezlopi_analog_object_array[ezlopi_analog_object_handle->adc_channel] = ezlopi_analog_object_handle;
 
-        ret = 0;
+        ret = EZPI_SUCCESS;
     }
 
     return ret;

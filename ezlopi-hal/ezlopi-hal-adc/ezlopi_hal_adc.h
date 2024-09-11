@@ -4,6 +4,8 @@
 #include "driver/adc.h"
 #include "esp_adc_cal.h"
 
+#include "ezlopi_core_errors.h"
+
 
 #if CONFIG_IDF_TARGET_ESP32
 typedef enum e_ezlopi_gpio_channel {
@@ -54,7 +56,7 @@ typedef struct s_ezlopi_adc {
 }s_ezlopi_adc_t;
 
 
-int ezlopi_adc_init(uint8_t gpio_num, uint8_t width);
+ezlopi_error_t ezlopi_adc_init(uint8_t gpio_num, uint8_t width);
 int ezlopi_adc_get_adc_data(uint8_t gpio_num, s_ezlopi_analog_data_t* ezlopi_analog_data);
 int ezlopi_adc_get_channel_number(uint8_t gpio_num);
 

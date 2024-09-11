@@ -15,6 +15,7 @@
 
 #include "ezlopi_core_factory_info.h"
 #include "ezlopi_core_websocket_client.h"
+#include "ezlopi_core_errors.h"
 
 #include "EZLOPI_USER_CONFIG.h"
 
@@ -37,16 +38,16 @@ typedef struct s_ws_data_buffer
 
 static void websocket_event_handler(void* handler_args, esp_event_base_t base, int32_t event_id, void* event_data);
 
-int ezlopi_websocket_client_send(char* data, uint32_t len)
+ezlopi_error_t ezlopi_websocket_client_send(char* data, uint32_t len)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
 
     if ((NULL != data) && (len > 0) && (NULL != client))
     {
         if (esp_websocket_client_is_connected(client) && (len > 0) && (NULL != data))
         {
             ret = esp_websocket_client_send_text(client, data, len, 10000 / portTICK_RATE_MS);
-            ret = (ret > 0) ? 1 : 0;
+            ret = (ret > 0) ? EZPI_SUCCESS : EZPI_FAILED;
         }
     }
 

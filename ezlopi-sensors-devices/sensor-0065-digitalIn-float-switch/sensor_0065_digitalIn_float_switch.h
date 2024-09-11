@@ -3,6 +3,7 @@
 
 #include "ezlopi_core_actions.h"
 #include "ezlopi_core_devices.h"
+#include "ezlopi_core_errors.h"
 
 /**
  *   5v/3v+-------------------------------+------< (+) float s/w (-) >----+ 5v/3v
@@ -24,6 +25,6 @@ typedef enum
 } e_water_level_alarm_states_t;
 //-------------------------------------------------------------------
 
-int sensor_0065_digitalIn_float_switch(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
+ezlopi_error_t sensor_0065_digitalIn_float_switch(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
 #endif //_SENSOR_0065_DIGITALIN_FLOAT_SWITCH_H_

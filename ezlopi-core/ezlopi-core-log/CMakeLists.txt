@@ -6,6 +6,7 @@ idf_component_register(SRCS "ezlopi_core_log.c" "${src_files}"
                 ezlopi-core-ezlopi
                 ezlopi-core-ezlopi
                 ezlopi-cloud-constants
+                ezlopi-core-errors
                 )
 
 

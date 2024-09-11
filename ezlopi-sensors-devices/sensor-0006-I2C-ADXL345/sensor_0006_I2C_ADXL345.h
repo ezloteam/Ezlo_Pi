@@ -3,6 +3,7 @@
 
 #include "ezlopi_core_actions.h"
 #include "ezlopi_core_devices.h"
+#include "ezlopi_core_errors.h"
 
 // Datasheet can be found at:
 // https://www.sparkfun.com/datasheets/Sensors/Accelerometer/ADXL345.pdf
@@ -70,9 +71,9 @@ typedef struct s_adxl345_data
 } s_adxl345_data_t;
 
 void __adxl345_get_axis_value(l_ezlopi_item_t *item);
-int __adxl345_configure_device(l_ezlopi_item_t *item);
+ezlopi_error_t __adxl345_configure_device(l_ezlopi_item_t *item);
 
 // Action function
-int sensor_0006_I2C_ADXL345(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
+ezlopi_error_t sensor_0006_I2C_ADXL345(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
 #endif // _SENSOR_0006_I2C_ADXL345_H_

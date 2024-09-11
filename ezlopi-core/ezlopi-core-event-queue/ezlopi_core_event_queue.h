@@ -3,6 +3,7 @@
 
 #if 0
 #include "ezlopi_core_actions.h"
+#include "ezlopi_core_errors.h"
 
 typedef struct s_ezlo_event
 {

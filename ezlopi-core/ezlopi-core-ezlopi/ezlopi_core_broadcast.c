@@ -11,24 +11,25 @@
 #include "ezlopi_util_trace.h"
 #include "ezlopi_core_buffer.h"
 #include "ezlopi_core_broadcast.h"
+#include "ezlopi_core_errors.h" 
 
 #include "EZLOPI_USER_CONFIG.h"
 
 // static uint32_t __message_count = 0;
-static l_broadcast_method_t *__method_head = NULL;
-static int (*__broadcast_queue_func)(cJSON *cj_data) = NULL;
+static l_broadcast_method_t* __method_head = NULL;
+static ezlopi_error_t (*__broadcast_queue_func)(cJSON* cj_data) = NULL;
 
-static int __call_broadcast_methods(char *data);
-static l_broadcast_method_t *__method_create(f_broadcast_method_t method, char *name, uint32_t retries);
+static ezlopi_error_t __call_broadcast_methods(char* data);
+static l_broadcast_method_t* __method_create(f_broadcast_method_t method, char* name, uint32_t retries);
 
-void ezlopi_core_broadcast_methods_set_queue(int (*func)(cJSON *))
+void ezlopi_core_broadcast_methods_set_queue(ezlopi_error_t (*func)(cJSON*))
 {
     __broadcast_queue_func = func;
 }
 
-int ezlopi_core_broadcast_add_to_queue(cJSON *cj_data)
+ezlopi_error_t ezlopi_core_broadcast_add_to_queue(cJSON* cj_data)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_ERR_BROADCAST_FAILED;
     if (cj_data && __broadcast_queue_func)
     {
         // TRACE_S("cj_data: %p, __broadcast_queue_func: %p", cj_data, __broadcast_queue_func);
@@ -68,9 +69,9 @@ int ezlopi_core_broadcast_log_cjson(cJSON* cj_log_data)
 }
 #endif
 
-int ezlopi_core_broadcast_cjson(cJSON *cj_data)
+ezlopi_error_t ezlopi_core_broadcast_cjson(cJSON* cj_data)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
 
     if (cj_data)
     {
@@ -176,24 +177,25 @@ void ezlopi_core_broadcast_remove_method(f_broadcast_method_t broadcast_method)
     }
 }
 
-static int __call_broadcast_methods(char *data)
+static ezlopi_error_t __call_broadcast_methods(char* data)
 {
-    int ret = 0;
-    l_broadcast_method_t *curr_method = __method_head;
+    ezlopi_error_t ret = EZPI_ERR_BROADCAST_FAILED;
+    l_broadcast_method_t* curr_method = __method_head;
 
     while (curr_method)
     {
         if (curr_method->func)
         {
-            ret = 1;
+            ret = EZPI_SUCCESS;
             uint32_t retries = curr_method->fail_retry;
 
             do
             {
                 int mret = curr_method->func(data);
-                if (mret)
+                if (EZPI_SUCCESS == mret)
                 {
-                    // TRACE_S("broadcasted - method:'%s'\r\ndata: %s", curr_method->method_name ? curr_method->method_name : "", data);
+                    TRACE_S("broadcasted - method:'%s'\r\ndata: %s", curr_method->method_name ? curr_method->method_name : "", data);
+                    ret = EZPI_SUCCESS;
                     break;
                 }
 

@@ -12,6 +12,7 @@
 #include "ezlopi_core_sntp.h"
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_wifi.h"
+#include "ezlopi_core_errors.h"
 
 static time_t start_time = 0;
 
@@ -37,7 +38,7 @@ static void sntp_sync_time_call_back(struct timeval *tv)
     TRACE_I("Time now[%ld]: %s", now, strftime_buf);
 }
 
-void EZPI_CORE_sntp_init(void)
+ezlopi_error_t EZPI_CORE_sntp_init(void)
 {
     int retry = 0;
     const int retry_count = 10;
@@ -55,19 +56,22 @@ void EZPI_CORE_sntp_init(void)
     sntp_set_sync_interval(15 * 1000);
     esp_sntp_init();
 
-    // while ((sntp_get_sync_status() == SNTP_SYNC_STATUS_RESET) && (++retry < retry_count))
-    // {
-    //     TRACE_I("Waiting for system time to be set... (%d/%d)", retry, retry_count);
-    //     vTaskDelay(500 / portTICK_PERIOD_MS);
-    // }
+    sntp_sync_status_t sync_status = SNTP_SYNC_STATUS_RESET;
+    while ((sync_status == SNTP_SYNC_STATUS_RESET) && (++retry < retry_count))
+    {
+        sync_status = sntp_get_sync_status();
+        TRACE_I("Waiting for system time to be set... (%d/%d)", retry, retry_count);
+        vTaskDelay(700 / portTICK_PERIOD_MS);
+    }
+    return (sync_status == SNTP_SYNC_STATUS_COMPLETED) ? EZPI_SUCCESS : EZPI_ERR_SNTP_INIT_FAILED;
 }
 
-int EZPI_CORE_sntp_set_location(const char *location)
+ezlopi_error_t EZPI_CORE_sntp_set_location(const char* location)
 {
-    int ret = 1;
+    ezlopi_error_t error = EZPI_SUCCESS;
     if (location)
     {
-        if (EZPI_CORE_nvs_write_time_location(location, strlen(location)))
+        if (EZPI_SUCCESS == EZPI_CORE_nvs_write_time_location(location, strlen(location)))
         {
 
             const char *posix_str = micro_tz_db_get_posix_str(location);
@@ -75,7 +79,7 @@ int EZPI_CORE_sntp_set_location(const char *location)
             if (NULL == posix_str)
             {
                 TRACE_I("%s is not a known timezone!\n", location);
-                ret = 0;
+                error = EZPI_ERR_SNTP_LOCATION_SET_FAILED;
             }
             else
             {
@@ -84,14 +88,14 @@ int EZPI_CORE_sntp_set_location(const char *location)
         }
         else
         {
-            ret = 0;
+            error = EZPI_ERR_SNTP_LOCATION_SET_FAILED;
         }
     }
     else
     {
-        ret = 0;
+        error = EZPI_ERR_SNTP_LOCATION_SET_FAILED;
     }
-    return ret;
+    return error;
 }
 
 char *EZPI_CORE_sntp_get_location(void)

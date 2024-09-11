@@ -5,6 +5,7 @@
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
+#include "ezlopi_core_errors.h"
 
 #include "ezlopi_hal_adc.h"
 
@@ -19,15 +20,15 @@ const char* water_leak_alarm_states[] = {
     "unknown",
 };
 
-static int __prepare(void* arg);
-static int __init(l_ezlopi_item_t* item);
-static int __get_ezlopi_value(l_ezlopi_item_t* item, void* arg);
-static int __notify(l_ezlopi_item_t* item);
-static int __get_item_list(l_ezlopi_item_t* item, void* arg);
+static ezlopi_error_t __prepare(void* arg);
+static ezlopi_error_t __init(l_ezlopi_item_t* item);
+static ezlopi_error_t __get_ezlopi_value(l_ezlopi_item_t* item, void* arg);
+static ezlopi_error_t __notify(l_ezlopi_item_t* item);
+static ezlopi_error_t __get_item_list(l_ezlopi_item_t* item, void* arg);
 
-int sensor_0027_ADC_waterLeak(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
+ezlopi_error_t sensor_0027_ADC_waterLeak(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_SUCCESS;
 
     switch (action)
     {
@@ -92,9 +93,9 @@ static void prepare_item_interface_properties(l_ezlopi_item_t* item, cJSON* cj_d
     item->interface.adc.resln_bit = 3;
 }
 
-static int __prepare(void* arg)
+static ezlopi_error_t __prepare(void* arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
 
     s_ezlopi_prep_arg_t* prep_arg = (s_ezlopi_prep_arg_t*)arg;
     if (prep_arg)
@@ -105,23 +106,18 @@ static int __prepare(void* arg)
             l_ezlopi_device_t* parent_device = ezlopi_device_add_device(prep_arg->cjson_device, NULL);
             if (parent_device)
             {
-                ret = 1;
                 prepare_device_cloud_properties(parent_device, cj_device);
                 l_ezlopi_item_t* item = ezlopi_device_add_item_to_device(parent_device, sensor_0027_ADC_waterLeak);
                 if (item)
                 {
                     prepare_item_cloud_properties(item, cj_device);
                     prepare_item_interface_properties(item, cj_device);
+                    ret = EZPI_SUCCESS;
                 }
                 else
                 {
                     ezlopi_device_free_device(parent_device);
-                    ret = -1;
                 }
-            }
-            else
-            {
-                ret = -1;
             }
         }
     }
@@ -129,9 +125,9 @@ static int __prepare(void* arg)
     return ret;
 }
 
-static int __get_item_list(l_ezlopi_item_t* item, void* arg)
+static ezlopi_error_t __get_item_list(l_ezlopi_item_t* item, void* arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
     cJSON* cjson_propertise = (cJSON*)arg;
     if (cjson_propertise)
     {
@@ -152,14 +148,14 @@ static int __get_item_list(l_ezlopi_item_t* item, void* arg)
         cJSON_AddStringToObject(__FUNCTION__, cjson_propertise, ezlopi_value_str, (char*)item->user_arg ? item->user_arg : "no_water_leak");
         cJSON_AddStringToObject(__FUNCTION__, cjson_propertise, ezlopi_valueFormatted_str, (char*)item->user_arg ? item->user_arg : "no_water_leak");
 
-        ret = 1;
+        ret = EZPI_SUCCESS;
     }
     return ret;
 }
 
-static int __get_ezlopi_value(l_ezlopi_item_t* item, void* arg)
+static ezlopi_error_t __get_ezlopi_value(l_ezlopi_item_t* item, void* arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
     if (item && arg)
     {
         cJSON* cj_result = (cJSON*)arg;
@@ -167,15 +163,15 @@ static int __get_ezlopi_value(l_ezlopi_item_t* item, void* arg)
         {
             cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, (char*)item->user_arg ? item->user_arg : "no_water_leak");
             cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, (char*)item->user_arg ? item->user_arg : "no_water_leak");
-            ret = 1;
+            ret = EZPI_SUCCESS;
         }
     }
     return ret;
 }
 
-static int __notify(l_ezlopi_item_t* item)
+static ezlopi_error_t __notify(l_ezlopi_item_t* item)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
 
     if (item)
     {
@@ -198,31 +194,24 @@ static int __notify(l_ezlopi_item_t* item)
         {
             item->user_arg = (void*)curret_value;
             ezlopi_device_value_updated_from_device_broadcast(item);
+            ret = EZPI_FAILED;
         }
     }
 
     return ret;
 }
 
-static int __init(l_ezlopi_item_t* item)
+static ezlopi_error_t __init(l_ezlopi_item_t* item)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_ERR_INIT_DEVICE_FAILED;
     if (item)
     {
         if (GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
         {
-            if (0 == ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
+            if (EZPI_SUCCESS == ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
             {
-                ret = 1;
+                ret = EZPI_SUCCESS;
             }
-            else
-            {
-                ret = -1;
-            }
-        }
-        else
-        {
-            ret = -1;
         }
     }
 

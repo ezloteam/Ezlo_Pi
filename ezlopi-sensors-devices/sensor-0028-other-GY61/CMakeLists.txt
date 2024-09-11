@@ -9,6 +9,7 @@ idf_component_register(SRCS "sensor_0028_other_GY61.c" "${config_src}"
                 ezlopi-core-actions 
                 ezlopi-core-devices 
                 ezlopi-core-valueformatter
+                ezlopi-core-errors
                  
                 ezlopi-hal-adc
                 

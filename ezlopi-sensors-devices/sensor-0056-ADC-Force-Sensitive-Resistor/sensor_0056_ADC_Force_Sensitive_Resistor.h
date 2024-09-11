@@ -3,6 +3,7 @@
 
 #include "ezlopi_core_actions.h"
 #include "ezlopi_core_devices.h"
+#include "ezlopi_core_errors.h"
 
 /**
  *  NOTE : 1) FSR - works with [3.3V]. {Don't use 5V. The pins are only 3.3V tolerant}
@@ -96,6 +97,6 @@ typedef struct fsr_t
     float fsr_value;
 } fsr_t;
 //-----------------------------------------------------------------------------------------------------------------------------
-int sensor_0056_ADC_Force_Sensitive_Resistor(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
+ezlopi_error_t sensor_0056_ADC_Force_Sensitive_Resistor(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
 #endif //_SENSOR_0056_ADC_FORCE_SENSITIVE_RESISTOR_H_

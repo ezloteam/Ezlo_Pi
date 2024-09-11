@@ -9,6 +9,7 @@
 
 #include "ezlopi_core_actions.h"
 #include "ezlopi_core_devices.h"
+#include "ezlopi_core_errors.h"
 
 typedef enum
 {
@@ -18,6 +19,6 @@ typedef enum
     TURBIDITY__MAX
 } e_water_filter_replacement_alarm_states_t;
 
-int sensor_0033_ADC_turbidity(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg);
+ezlopi_error_t sensor_0033_ADC_turbidity(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg);
 
 #endif // SENSOR_0033_ADC_TURBIDITY_H
