@@ -95,6 +95,7 @@ cJSON *ezlopi_scene_cjson_get_field(l_fields_v2_t *field_node)
                 break;
             }
             case EZLOPI_VALUE_TYPE_ITEM:
+            case EZLOPI_VALUE_TYPE_DEVICE:
             case EZLOPI_VALUE_TYPE_STRING:
             case EZLOPI_VALUE_TYPE_INTERVAL:
             case EZLOPI_VALUE_TYPE_SCENEID:
@@ -181,7 +182,6 @@ cJSON *ezlopi_scene_cjson_get_field(l_fields_v2_t *field_node)
             case EZLOPI_VALUE_TYPE_CAMERA_HOTZONE:
             case EZLOPI_VALUE_TYPE_HOTZONE_MATCH:
             case EZLOPI_VALUE_TYPE_GEOFENCE:
-            case EZLOPI_VALUE_TYPE_DEVICE:
             case EZLOPI_VALUE_TYPE_NONE:
             case EZLOPI_VALUE_TYPE_MAX:
             {
@@ -422,6 +422,7 @@ static void __cjson_add_fields(cJSON *cj_block, l_fields_v2_t *fields)
                     }
                     case EZLOPI_VALUE_TYPE_STRING:
                     case EZLOPI_VALUE_TYPE_ITEM:
+                    case EZLOPI_VALUE_TYPE_DEVICE:
                     case EZLOPI_VALUE_TYPE_INTERVAL:
                     case EZLOPI_VALUE_TYPE_EXPRESSION:
                     {
@@ -527,7 +528,6 @@ static void __cjson_add_fields(cJSON *cj_block, l_fields_v2_t *fields)
                     case EZLOPI_VALUE_TYPE_CAMERA_HOTZONE:
                     case EZLOPI_VALUE_TYPE_HOTZONE_MATCH:
                     case EZLOPI_VALUE_TYPE_GEOFENCE:
-                    case EZLOPI_VALUE_TYPE_DEVICE:
                     case EZLOPI_VALUE_TYPE_MAX:
                     {
                         TRACE_W("Value type not implemented!, curr-type: %d", curr_field->value_type);
@@ -647,7 +647,7 @@ cJSON *ezlopi_scenes_create_cjson_scene(l_scenes_list_v2_t *scene)
         cj_scene = cJSON_CreateObject(__FUNCTION__);
         if (cj_scene)
         {
-            char tmp_str[16] = { 0 };
+            char tmp_str[16] = {0};
             snprintf(tmp_str, sizeof(tmp_str), "%08x", scene->_id);
             cJSON_AddStringToObject(__FUNCTION__, cj_scene, ezlopi__id_str, tmp_str);
             cJSON_AddBoolToObject(__FUNCTION__, cj_scene, ezlopi_enabled_str, scene->enabled);

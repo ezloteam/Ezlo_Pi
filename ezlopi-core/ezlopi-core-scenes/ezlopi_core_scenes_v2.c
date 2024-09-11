@@ -60,7 +60,7 @@ int ezlopi_scene_edit_by_id(uint32_t scene_id, cJSON *cj_scene)
 {
     int ret = 0;
 
-    if (1 == ezlopi_core_scene_edit_store_updated_to_nvs(cj_scene)) // first store in nvs // add the new-block-id
+    if (EZPI_SUCCESS == ezlopi_core_scene_edit_store_updated_to_nvs(cj_scene)) // first store in nvs // add the new-block-id
     {
         if (1 == ezlopi_core_scene_edit_update_id(scene_id, cj_scene)) // then populate to nvs
         {
@@ -471,7 +471,7 @@ static void __remove_residue_scenes_ids_from_list(void)
 ezlopi_error_t ezlopi_scenes_init_v2(void)
 {
     ezlopi_error_t error = EZPI_ERR_JSON_PARSE_FAILED;
-    char* scenes_id_list_str = ezlopi_nvs_scene_get_v2();
+    char *scenes_id_list_str = ezlopi_nvs_scene_get_v2();
 
     if (scenes_id_list_str)
     {

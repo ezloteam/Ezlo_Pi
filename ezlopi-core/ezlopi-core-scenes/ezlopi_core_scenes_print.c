@@ -12,8 +12,7 @@
 
 #include "ezlopi_core_scenes_print.h"
 
-
-void ezlopi_print_block_options(s_block_options_v2_t* block_options, l_fields_v2_t* fields)
+void ezlopi_print_block_options(s_block_options_v2_t *block_options, l_fields_v2_t *fields)
 {
 #if (1 == ENABLE_TRACE)
     TRACE_D("\t\t|-- blockOptions:");
@@ -33,11 +32,10 @@ void ezlopi_print_block_options(s_block_options_v2_t* block_options, l_fields_v2
         CJSON_TRACE("\t\t\t\t|-- ", block_options->cj_function);
     }
 
-
 #endif
 }
 
-void ezlopi_print_fields(l_fields_v2_t* fields)
+void ezlopi_print_fields(l_fields_v2_t *fields)
 {
 #if (1 == ENABLE_TRACE)
     TRACE_D("\t\t|-- fields: ");
@@ -47,7 +45,7 @@ void ezlopi_print_fields(l_fields_v2_t* fields)
         TRACE_D("\t\t\t|---------- field_count: %d ----------", ++field_count);
         TRACE_D("\t\t\t|-- name: %s", fields->name);
 
-        const char* value_type_name = ezlopi_scene_get_scene_value_type_name(fields->value_type);
+        const char *value_type_name = ezlopi_scene_get_scene_value_type_name(fields->value_type);
         TRACE_D("\t\t\t|-- type: %s", value_type_name ? value_type_name : ezlopi__str);
 
         switch (fields->value_type)
@@ -108,6 +106,7 @@ void ezlopi_print_fields(l_fields_v2_t* fields)
         }
         case EZLOPI_VALUE_TYPE_STRING:
         case EZLOPI_VALUE_TYPE_ITEM:
+        case EZLOPI_VALUE_TYPE_DEVICE:
         case EZLOPI_VALUE_TYPE_24_HOURS_TIME:
         case EZLOPI_VALUE_TYPE_INTERVAL:
         case EZLOPI_VALUE_TYPE_HMS_INTERVAL:
@@ -122,7 +121,7 @@ void ezlopi_print_fields(l_fields_v2_t* fields)
         case EZLOPI_VALUE_TYPE_BLOCKS:
         {
             TRACE_D("\t\t\t|-- value:");
-            ezlopi_print_when_blocks((l_when_block_v2_t*)fields->field_value.u_value.when_block);
+            ezlopi_print_when_blocks((l_when_block_v2_t *)fields->field_value.u_value.when_block);
             break;
         }
         case EZLOPI_VALUE_TYPE_CREDENTIAL:
@@ -165,8 +164,6 @@ void ezlopi_print_fields(l_fields_v2_t* fields)
         case EZLOPI_VALUE_TYPE_CAMERA_HOTZONE:
         case EZLOPI_VALUE_TYPE_HOTZONE_MATCH:
         case EZLOPI_VALUE_TYPE_GEOFENCE:
-
-        case EZLOPI_VALUE_TYPE_DEVICE:
         case EZLOPI_VALUE_TYPE_NONE:
         case EZLOPI_VALUE_TYPE_MAX:
         {
@@ -186,7 +183,7 @@ void ezlopi_print_fields(l_fields_v2_t* fields)
 #endif
 }
 
-void ezlopi_print_house_modes(l_house_modes_v2_t* house_modes)
+void ezlopi_print_house_modes(l_house_modes_v2_t *house_modes)
 {
 #if (1 == ENABLE_TRACE)
     TRACE_D("\t|-- house_modes: ");
@@ -198,7 +195,7 @@ void ezlopi_print_house_modes(l_house_modes_v2_t* house_modes)
 #endif
 }
 
-void ezlopi_print_user_notifications(l_user_notification_v2_t* user_notification)
+void ezlopi_print_user_notifications(l_user_notification_v2_t *user_notification)
 {
 #if (1 == ENABLE_TRACE)
     TRACE_D("\t|-- user_notifications: ");
@@ -210,7 +207,7 @@ void ezlopi_print_user_notifications(l_user_notification_v2_t* user_notification
 #endif
 }
 
-void ezlopi_print_when_blocks(l_when_block_v2_t* when_blocks)
+void ezlopi_print_when_blocks(l_when_block_v2_t *when_blocks)
 {
 #if (1 == ENABLE_TRACE)
     TRACE_D("\t|-- when: ");
@@ -238,7 +235,7 @@ void ezlopi_print_when_blocks(l_when_block_v2_t* when_blocks)
 #endif
 }
 
-void ezlopi_print_action_blocks(l_action_block_v2_t* action_block)
+void ezlopi_print_action_blocks(l_action_block_v2_t *action_block)
 {
 #if (1 == ENABLE_TRACE)
     while (action_block)
@@ -261,7 +258,7 @@ void ezlopi_print_action_blocks(l_action_block_v2_t* action_block)
 #endif
 }
 
-void ezlopi_scenes_print(l_scenes_list_v2_t* scene_link_list)
+void ezlopi_scenes_print(l_scenes_list_v2_t *scene_link_list)
 {
 #if (1 == ENABLE_TRACE)
     int scene_count = 0;
@@ -289,4 +286,4 @@ void ezlopi_scenes_print(l_scenes_list_v2_t* scene_link_list)
     }
 #endif
 }
-#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+#endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
