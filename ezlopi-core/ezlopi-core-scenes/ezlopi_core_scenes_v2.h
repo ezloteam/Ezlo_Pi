@@ -126,6 +126,7 @@ typedef struct l_when_block_v2
     char * group_id;        // may be used in future    //  currently not-populated from nvs
 #endif
     bool block_status_reset_once;  // 'NOT-NVS parameter' [don't populate ; since not needed] // just a dummy flag to trigger function reset.
+    cJSON* cj_block_meta;                // Block metadata information. Intended to save data needed for user interfaces
     e_scenes_block_type_v2_t block_type;
     s_block_options_v2_t block_options;
     l_fields_v2_t* fields;
@@ -165,6 +166,7 @@ typedef struct l_scenes_list_v2
     bool is_group;
     char group_id[32];
     char name[32];
+    cJSON* meta;
     char parent_id[32];
 
     l_user_notification_v2_t* user_notifications;
@@ -230,6 +232,8 @@ int ezlopi_core_scene_reset_when_block(const char* sceneId_str, const char* bloc
 // ----- # below function are called when 'creating' and 'editing' scene # ---------
 int ezlopi_core_scene_add_group_id_if_reqd(cJSON* cj_new_scene);
 int ezlopi_core_scene_add_when_blockId_if_reqd(cJSON* cj_new_scene);
+
+int ezlopi_core_scene_meta_by_id(const char* sceneId_str, const char* blockId_str, cJSON* cj_meta);
 // ---------------------------------------------------------------------------------
 #endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
