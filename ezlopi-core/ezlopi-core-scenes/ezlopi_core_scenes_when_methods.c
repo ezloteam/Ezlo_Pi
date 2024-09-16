@@ -548,7 +548,6 @@ int ezlopi_scene_when_is_house_mode_changed_from(l_scenes_list_v2_t *scene_node,
 int ezlopi_scene_when_is_House_Mode_Alarm_Phase_Range(l_scenes_list_v2_t *scene_node, void *arg)
 {
     // TRACE_W(" is_House_Mode_Alarm_Phase_Range ");
-    // TRACE_W("Warning: when-method 'is_House_Mode_Alarm_Phase_Range' not implemented!");
     int ret = 0;
     l_when_block_v2_t *when_block = (l_when_block_v2_t *)arg;
 
@@ -573,16 +572,46 @@ int ezlopi_scene_when_is_House_Mode_Alarm_Phase_Range(l_scenes_list_v2_t *scene_
         {
             if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "phase", strlen(curr_field->name), 10))
             {
-                if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type)
+                if ((EZLOPI_VALUE_TYPE_STRING == curr_field->value_type) && (NULL != (phase_name = curr_field->field_value.u_value.value_string)))
                 {
-                    if (NULL != (phase_name = curr_field->field_value.u_value.value_string))
-                    {
-                        s_ezlopi_modes_t *curr_mode = ezlopi_core_default_mode_get();
+                    s_ezlopi_modes_t *curr_mode = ezlopi_core_modes_get_custom_modes();
 
-                        if (0 == strcmp(curr_mode->alarmed.type, phase_name))
+                    switch (curr_mode->alarmed.phase)
+                    {
+                    case EZLOPI_MODES_ALARM_PHASE_IDLE:
+                    {
+                        if (EZPI_STRNCMP_IF_EQUAL("idle", phase_name, 5, strlen(phase_name)))
                         {
                             ret = 1;
                         }
+                        break;
+                    }
+                    case EZLOPI_MODES_ALARM_PHASE_BYPASS:
+                    {
+                        if (EZPI_STRNCMP_IF_EQUAL("bypass", phase_name, 7, strlen(phase_name)))
+                        {
+                            ret = 1;
+                        }
+                        break;
+                    }
+                    case EZLOPI_MODES_ALARM_PHASE_ENTRYDELAY:
+                    {
+                        if (EZPI_STRNCMP_IF_EQUAL("entryDelay", phase_name, 11, strlen(phase_name)))
+                        {
+                            ret = 1;
+                        }
+                        break;
+                    }
+                    case EZLOPI_MODES_ALARM_PHASE_MAIN:
+                    {
+                        if (EZPI_STRNCMP_IF_EQUAL("main", phase_name, 5, strlen(phase_name)))
+                        {
+                            ret = 1;
+                        }
+                        break;
+                    }
+                    default:
+                        break;
                     }
                 }
             }
@@ -614,7 +643,7 @@ int ezlopi_scene_when_is_House_Mode_Switch_to_Range(l_scenes_list_v2_t *scene_no
         }
 
         s_ezlopi_modes_t *curr_mode = ezlopi_core_modes_get_custom_modes();
-        if (curr_mode->alarmed.time_is_left_sec > 0)
+        if ((curr_mode->alarmed.time_is_left_sec > 0) && (EZLOPI_MODES_ALARM_PHASE_NONE < curr_mode->alarmed.phase && curr_mode->alarmed.phase < EZLOPI_MODES_ALARM_PHASE_MAX))
         {
             TRACE_S(" Current HouseMode_phase has [%d]sec time before switch.(Duration confirmed) ", curr_mode->alarmed.time_is_left_sec);
             ret = 1;
