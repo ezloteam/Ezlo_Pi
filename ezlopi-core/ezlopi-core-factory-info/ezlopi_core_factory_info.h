@@ -170,6 +170,7 @@ extern "C"
 
 #elif (EZLOPI_DEVICE_TYPE_TEST_DEVICE == EZLOPI_DEVICE_TYPE)
 #if defined(CONFIG_IDF_TARGET_ESP32)
+
 static const char *ezlopi_config_test =
     "{\
     \"cmd\":3,\
