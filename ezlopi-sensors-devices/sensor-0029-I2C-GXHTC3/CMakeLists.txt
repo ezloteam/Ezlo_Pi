@@ -9,6 +9,8 @@ idf_component_register(SRCS "sensor_0029_I2C_GXHTC3.c" "gxhtc3.c" "${config_src}
                 ezlopi-core-actions  
                 ezlopi-core-devices 
                 ezlopi-core-valueformatter 
+                ezlopi-core-errors
+        
                 
                 ezlopi-hal-i2c
 

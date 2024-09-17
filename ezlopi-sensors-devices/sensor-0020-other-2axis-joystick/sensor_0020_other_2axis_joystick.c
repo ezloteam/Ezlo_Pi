@@ -7,6 +7,7 @@
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
+#include "ezlopi_core_errors.h"
 
 #include "ezlopi_hal_adc.h"
 #include "ezlopi_hal_gpio.h"
@@ -26,15 +27,15 @@ typedef struct s_joystick_data
     uint32_t adc_y;
 } s_joystick_data_t;
 
-static int __prepare(void* arg);
-static int __init(l_ezlopi_item_t* item);
-static int __get_value_cjson(l_ezlopi_item_t* item, void* arg);
-static int __notify(l_ezlopi_item_t* item);
+static ezlopi_error_t __prepare(void* arg);
+static ezlopi_error_t __init(l_ezlopi_item_t* item);
+static ezlopi_error_t __get_value_cjson(l_ezlopi_item_t* item, void* arg);
+static ezlopi_error_t __notify(l_ezlopi_item_t* item);
 static void __joystick_intr_callback(void* arg);
 
-int sensor_0020_other_2axis_joystick(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
+ezlopi_error_t sensor_0020_other_2axis_joystick(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_SUCCESS;
 
     switch (action)
     {
@@ -140,9 +141,9 @@ static void __setup_item_interface_properties(l_ezlopi_item_t* item, cJSON* cj_d
     }
 }
 
-static int __prepare(void* arg)
+static ezlopi_error_t __prepare(void* arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_SUCCESS;
     s_ezlopi_prep_arg_t* dev_prep_arg = (s_ezlopi_prep_arg_t*)arg;
     if (dev_prep_arg && (dev_prep_arg->cjson_device))
     {
@@ -199,7 +200,7 @@ static int __prepare(void* arg)
                         else
                         {
                             ezlopi_device_free_device(joystick_child_y_device);
-                            ret = -1;
+                            ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                         }
                     }
 
@@ -225,7 +226,7 @@ static int __prepare(void* arg)
                         else
                         {
                             ezlopi_device_free_device(joystick_child_sw_device);
-                            ret = -1;
+                            ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                         }
                     }
 
@@ -233,29 +234,37 @@ static int __prepare(void* arg)
                         (NULL == joystick_child_y_device) &&
                         (NULL == joystick_child_sw_device))
                     {
-                        ret = -1;
+                        ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                         ezlopi_device_free_device(joystick_parent_x_device);
                     }
                 }
                 else
                 {
-                    ret = -1;
+                    ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                     ezlopi_free(__FUNCTION__, user_data); // needed here only
                 }
             }
             else
             {
-                ret = -1;
+                ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
             }
         }
+        else
+        {
+            ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
+        }
+    }
+    else
+    {
+        ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
     }
 
     return ret;
 }
 
-static int __init(l_ezlopi_item_t* item)
+static ezlopi_error_t __init(l_ezlopi_item_t* item)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_SUCCESS;
     if (item)
     {
         s_joystick_data_t* user_data = (s_joystick_data_t*)item->user_arg;
@@ -267,18 +276,18 @@ static int __init(l_ezlopi_item_t* item)
                 if (GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
                 {
                     TRACE_I("adc GPIO_NUM is %d", item->interface.adc.gpio_num);
-                    if (0 == ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
+                    if (EZPI_SUCCESS == ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
                     {
-                        ret = 1;
+                        ret = EZPI_SUCCESS;
                     }
                     else
                     {
-                        ret = -1;
+                        ret = EZPI_ERR_INIT_DEVICE_FAILED;
                     }
                 }
                 else
                 {
-                    ret = -1;
+                    ret = EZPI_ERR_INIT_DEVICE_FAILED;
                 }
             }
             else if (item->cloud_properties.item_id == user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_SWITCH] &&
@@ -305,35 +314,38 @@ static int __init(l_ezlopi_item_t* item)
                         item->interface.gpio.gpio_in.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
                         // TRACE_D("Value is %d", (int)item->interface.gpio.gpio_in.value);
                         ezlopi_service_gpioisr_register_v3(item, __joystick_intr_callback, 200);
-                        ret = 1;
                     }
                     else
                     {
-                        ret = -1;
+                        ret = EZPI_ERR_INIT_DEVICE_FAILED;
                     }
                 }
                 else
                 {
-                    ret = -1;
+                    ret = EZPI_ERR_INIT_DEVICE_FAILED;
                 }
             }
             else
             {
                 TRACE_E("Unknown....Item_id : [%d]", item->cloud_properties.item_id);
-                ret = -1;
+                ret = EZPI_ERR_INIT_DEVICE_FAILED;
             }
         }
         else
         {
-            ret = -1;
+            ret = EZPI_ERR_INIT_DEVICE_FAILED;
         }
+    }
+    else
+    {
+        ret = EZPI_ERR_INIT_DEVICE_FAILED;
     }
     return ret;
 }
 
-static int __get_value_cjson(l_ezlopi_item_t* item, void* arg)
+static ezlopi_error_t __get_value_cjson(l_ezlopi_item_t* item, void* arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
     cJSON* cj_result = (cJSON*)arg;
     if (cj_result && item)
     {
@@ -351,14 +363,14 @@ static int __get_value_cjson(l_ezlopi_item_t* item, void* arg)
         {
             ezlopi_valueformatter_bool_to_cjson(cj_result, (0 == item->interface.gpio.gpio_in.value) ? true : false, item->cloud_properties.scale);
         }
-        ret = 1;
+        ret = EZPI_SUCCESS;
     }
     return ret;
 }
 
-static int __notify(l_ezlopi_item_t* item)
+static ezlopi_error_t __notify(l_ezlopi_item_t* item)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
     if (item)
     {
         if (ezlopi_item_name_switch != item->cloud_properties.item_name)
@@ -390,7 +402,7 @@ static int __notify(l_ezlopi_item_t* item)
                 }
             }
         }
-        ret = 1;
+        ret = EZPI_SUCCESS;
     }
     return ret;
 }

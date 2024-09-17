@@ -44,6 +44,13 @@ void scenes_create(cJSON *cj_request, cJSON *cj_response)
             snprintf(tmp_buff, sizeof(tmp_buff), "%08x", new_scene_id);
             cJSON_AddStringToObject(__FUNCTION__, cj_request, ezlopi__id_str, tmp_buff); // this is for (reply_broadcast)
             ezlopi_scenes_new_scene_populate(cj_params, new_scene_id);
+
+            // Trigger new-scene to 'start'
+            l_scenes_list_v2_t *new_scene_node = ezlopi_scenes_get_by_id_v2(new_scene_id);
+            if (new_scene_node)
+            {
+                ezlopi_meshbot_service_start_scene(new_scene_node);
+            }
         }
     }
 }
@@ -78,19 +85,12 @@ void scenes_edit(cJSON *cj_request, cJSON *cj_response)
     if (cj_params)
     {
         cJSON *cj_eo = cJSON_GetObjectItem(__FUNCTION__, cj_params, "eo");
-        if (cj_eo)
+        cJSON *cj_id = cJSON_GetObjectItem(__FUNCTION__, cj_eo, ezlopi__id_str);
+        // CJSON_TRACE("scene-edit eo", cj_eo);
+        if (cj_eo && (cj_id && cj_id->valuestring))
         {
-            // CJSON_TRACE("scene-edit eo", cj_eo);
-
-            cJSON *cj_id = cJSON_GetObjectItem(__FUNCTION__, cj_eo, ezlopi__id_str);
-            if (cj_id && cj_id->valuestring)
-            {
-                if (cj_id && cj_id->valuestring)
-                {
-                    uint32_t u_id = strtoul(cj_id->valuestring, NULL, 16);
-                    ezlopi_scene_edit_by_id(u_id, cj_eo);
-                }
-            }
+            uint32_t u_id = strtoul(cj_id->valuestring, NULL, 16);
+            ezlopi_scene_edit_by_id(u_id, cj_eo);
         }
     }
 }
@@ -467,7 +467,7 @@ void scenes_action_block_test(cJSON *cj_request, cJSON *cj_response)
                         if (tmp_http_data->response)
                         {
                             int code = 400;
-                            char detail[100] = {0};
+                            char detail[100] = { 0 };
                             if (sscanf(tmp_http_data->response, "HTTP/1.1 %d %99s[^\n]", &code, detail) == 2)
                             {
                                 cJSON_AddNumberToObject(__FUNCTION__, cj_result, "httpAnswerCode", code);
@@ -534,6 +534,42 @@ void scenes_block_status_reset(cJSON *cj_request, cJSON *cj_response)
     }
 }
 
+void scenes_meta_set(cJSON *cj_request, cJSON *cj_response)
+{
+    cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
+    if (cj_params)
+    {
+        cJSON *cj_meta = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_meta_str);
+        if (cj_meta)
+        {
+            cJSON *cj_scene_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_sceneId_str);
+            if (cj_scene_id && cj_scene_id->valuestring)
+            {
+                ezlopi_core_scene_meta_by_id(cj_scene_id->valuestring, NULL, cj_meta);
+            }
+        }
+    }
+}
+
+void scenes_blockmeta_set(cJSON *cj_request, cJSON *cj_response)
+{
+    cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
+    if (cj_params)
+    {
+        cJSON *cj_meta = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_meta_str);
+        if (cj_meta)
+        {
+            cJSON *cj_scene_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_sceneId_str);
+            cJSON *cj_block_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_blockId_str);
+            if ((cj_scene_id && cj_scene_id->valuestring) && (cj_block_id && cj_block_id->valuestring))
+            {
+#warning "The 'block_id' facility is only for 'when-blocks' [ 'Action-blocks' is not added in UI ]";
+                ezlopi_core_scene_meta_by_id(cj_scene_id->valuestring, cj_block_id->valuestring, cj_meta);
+            }
+        }
+    }
+}
+
 void scenes_stop(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str); // For NULL Broadcast
@@ -546,7 +582,7 @@ void scenes_stop(cJSON *cj_request, cJSON *cj_response)
             cJSON *cj_scene_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_sceneId_str);
             if (cj_scene_id && cj_scene_id->valuestring)
             {
-#warning "add support for thenGroup or elseGroups";
+                #warning "add support for thenGroup or elseGroups";
                 uint32_t u32_scene_id = strtoul(cj_scene_id->valuestring, NULL, 16);
                 ezlopi_meshbot_service_stop_for_scene_id(u32_scene_id);
             }
@@ -570,14 +606,18 @@ void scene_changed(cJSON *cj_request, cJSON *cj_response)
     cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
     if (cj_params)
     {
-        cJSON *cj_scene_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi__id_str);
-        if (cj_scene_id && cj_scene_id->valuestring)
+        cJSON *cj_scene_id = NULL;
+        if (NULL != (cj_scene_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi__id_str)) ||
+            NULL != (cj_scene_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_sceneId_str))) //  sometimes 'cj_request' contain the key: [either 'sceneId' or '_id']
         {
-            char *scene_str = ezlopi_nvs_read_str(cj_scene_id->valuestring);
-            if (scene_str)
+            if (cj_scene_id && cj_scene_id->valuestring)
             {
-                cJSON_AddRawToObject(__FUNCTION__, cj_response, ezlopi_result_str, scene_str);
-                ezlopi_free(__FUNCTION__, scene_str);
+                char *scene_str = ezlopi_nvs_read_str(cj_scene_id->valuestring);
+                if (scene_str)
+                {
+                    cJSON_AddRawToObject(__FUNCTION__, cj_response, ezlopi_result_str, scene_str);
+                    ezlopi_free(__FUNCTION__, scene_str);
+                }
             }
         }
     }

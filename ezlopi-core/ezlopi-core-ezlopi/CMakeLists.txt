@@ -12,6 +12,7 @@ set(EZLOPI_CORE_COMPONENTS
         ezlopi-core-scenes    
         ezlopi-core-buffer
         ezlopi-core-log
+        ezlopi-core-errors
 )
 
 set(EZLOPI_CLOUD_COMPONENTS

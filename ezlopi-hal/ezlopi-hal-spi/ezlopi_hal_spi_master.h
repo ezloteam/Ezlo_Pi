@@ -7,6 +7,8 @@
 
 #include "driver/spi_master.h"
 
+#include "ezlopi_core_errors.h" 
+
 typedef enum e_ezlopi_spi_channel
 {
     EZLOPI_SPI_1 = 0,
@@ -42,6 +44,6 @@ typedef struct s_ezlopi_spi_master
 
 } s_ezlopi_spi_master_t;
 
-int ezlopi_spi_master_init(s_ezlopi_spi_master_t *spi_config);
+ezlopi_error_t ezlopi_spi_master_init(s_ezlopi_spi_master_t *spi_config);
 
 #endif // _EZLOPI_HAL_SPI_MASTER_H_

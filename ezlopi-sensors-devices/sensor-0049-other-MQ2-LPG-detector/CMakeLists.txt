@@ -8,6 +8,7 @@ idf_component_register(SRCS "sensor_0049_other_MQ2_LPG_detector.c"
                 ezlopi-core-devices 
                 ezlopi-core-valueformatter 
                 ezlopi-core-processes
+                ezlopi-core-errors
 
                 ezlopi-hal-adc
 

@@ -5,6 +5,7 @@
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
+#include "ezlopi_core_errors.h"
 
 #include "ezlopi_hal_adc.h"
 
@@ -19,15 +20,15 @@ typedef struct s_currentmeter
     float amp_value;
 } s_currentmeter_t;
 
-static int __0046_prepare(void* arg);
-static int __0046_init(l_ezlopi_item_t* item);
-static int __0046_get_cjson_value(l_ezlopi_item_t* item, void* arg);
-static int __0046_notify(l_ezlopi_item_t* item);
+static ezlopi_error_t __0046_prepare(void* arg);
+static ezlopi_error_t __0046_init(l_ezlopi_item_t* item);
+static ezlopi_error_t __0046_get_cjson_value(l_ezlopi_item_t* item, void* arg);
+static ezlopi_error_t __0046_notify(l_ezlopi_item_t* item);
 static void __calculate_current_value(l_ezlopi_item_t* item);
 
-int sensor_0046_ADC_ACS712_05B_currentmeter(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
+ezlopi_error_t sensor_0046_ADC_ACS712_05B_currentmeter(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_SUCCESS;
     switch (action)
     {
     case EZLOPI_ACTION_PREPARE:
@@ -87,16 +88,15 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_dev
 }
 
 //----------------------------------------------------
-static int __0046_prepare(void* arg)
+static ezlopi_error_t __0046_prepare(void* arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
     s_ezlopi_prep_arg_t* device_prep_arg = (s_ezlopi_prep_arg_t*)arg;
     if (device_prep_arg && (NULL != device_prep_arg->cjson_device))
     {
         s_currentmeter_t* user_data = (s_currentmeter_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_currentmeter_t));
         if (user_data)
         {
-            ret = 1;
             memset(user_data, 0, sizeof(s_currentmeter_t));
             l_ezlopi_device_t* currentmeter_device = ezlopi_device_add_device(device_prep_arg->cjson_device, NULL);
             if (currentmeter_device)
@@ -106,17 +106,16 @@ static int __0046_prepare(void* arg)
                 if (currentmeter_item)
                 {
                     __prepare_item_cloud_properties(currentmeter_item, device_prep_arg->cjson_device, user_data);
+                    ret = EZPI_SUCCESS;
                 }
                 else
                 {
-                    ret = -1;
                     ezlopi_device_free_device(currentmeter_device);
                     ezlopi_free(__FUNCTION__, user_data);
                 }
             }
             else
             {
-                ret = -1;
                 ezlopi_free(__FUNCTION__, user_data);
             }
         }
@@ -124,9 +123,9 @@ static int __0046_prepare(void* arg)
     return ret;
 }
 
-static int __0046_init(l_ezlopi_item_t* item)
+static ezlopi_error_t __0046_init(l_ezlopi_item_t* item)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_ERR_INIT_DEVICE_FAILED;
     if (item)
     {
         s_currentmeter_t* user_data = (s_currentmeter_t*)item->user_arg;
@@ -134,49 +133,37 @@ static int __0046_init(l_ezlopi_item_t* item)
         {
             if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num))
             {
-                if (0 == ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
+                if (EZPI_SUCCESS == ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
                 {
-                    ret = 1;
-                }
-                else
-                {
-                    ret = -1;
+                    ret = EZPI_SUCCESS;
                 }
             }
-            else
-            {
-                ret = -1;
-            }
-        }
-        else
-        {
-            ret = -1;
         }
     }
     return ret;
 }
 
-static int __0046_get_cjson_value(l_ezlopi_item_t* item, void* arg)
+static ezlopi_error_t __0046_get_cjson_value(l_ezlopi_item_t* item, void* arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
     if (item && arg)
     {
         cJSON* cj_result = (cJSON*)arg;
         s_currentmeter_t* user_data = (s_currentmeter_t*)item->user_arg;
         if (user_data)
         {
-            ezlopi_valueformatter_float_to_cjson(cj_result, user_data->amp_value, item->cloud_properties.scale);
-            ret = 1;
+            ezlopi_valueformatter_float_to_cjson(cj_result, user_data->amp_value, scales_ampere);
+            ret = EZPI_SUCCESS;
         }
     }
 
     return ret;
 }
 
-static int __0046_notify(l_ezlopi_item_t* item)
+static ezlopi_error_t __0046_notify(l_ezlopi_item_t* item)
 {
     // During this calculation the system is polled for 20mS
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
     if (item)
     {
         s_currentmeter_t* user_data = (s_currentmeter_t*)item->user_arg;
@@ -187,6 +174,7 @@ static int __0046_notify(l_ezlopi_item_t* item)
             if (fabs(user_data->amp_value - prev_amp) > 0.5)
             {
                 ezlopi_device_value_updated_from_device_broadcast(item);
+                ret = EZPI_SUCCESS;
             }
         }
     }

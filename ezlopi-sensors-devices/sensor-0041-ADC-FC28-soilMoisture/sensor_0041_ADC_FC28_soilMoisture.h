@@ -3,6 +3,7 @@
 
 #include "ezlopi_core_actions.h"
 #include "ezlopi_core_devices.h"
+#include "ezlopi_core_errors.h"
 
 /**
  *  NOTE : FC28 - module gives (0V - 4.2V) as analog output .
@@ -24,6 +25,6 @@
  *
  **/
 //------------------------------------------
-int sensor_0041_ADC_FC28_soilMoisture(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
+ezlopi_error_t sensor_0041_ADC_FC28_soilMoisture(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
 #endif // _SENSOR_0041_ADC_FC28_SOILMOISTURE_H_

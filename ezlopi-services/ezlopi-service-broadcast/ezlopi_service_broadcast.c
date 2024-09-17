@@ -7,6 +7,7 @@
 #include "ezlopi_core_processes.h"
 #include "ezlopi_core_broadcast.h"
 #include "ezlopi_core_cjson_macros.h"
+#include "ezlopi_core_errors.h"
 
 #include "ezlopi_service_loop.h"
 #include "ezlopi_service_broadcast.h"
@@ -14,11 +15,11 @@
 static QueueHandle_t __broadcast_queue = NULL;
 
 static void __broadcast_loop(void *arg);
-static int ezlopi_service_broadcast_send_to_queue(cJSON* cj_broadcast_data);
+static ezlopi_error_t ezlopi_service_broadcast_send_to_queue(cJSON *cj_broadcast_data);
 
 void ezlopi_service_broadcast_init(void)
 {
-    __broadcast_queue = xQueueCreate(10, sizeof(cJSON*));
+    __broadcast_queue = xQueueCreate(10, sizeof(cJSON *));
     if (__broadcast_queue)
     {
         ezlopi_core_broadcast_methods_set_queue(ezlopi_service_broadcast_send_to_queue);
@@ -35,7 +36,7 @@ void ezlopi_service_broadcast_init(void)
 
 static void __broadcast_loop(void *arg)
 {
-    static cJSON* cj_data = NULL;
+    static cJSON *cj_data = NULL;
     static uint32_t broadcast_wait_start = 0;
 
     if (cj_data)
@@ -57,15 +58,15 @@ static void __broadcast_loop(void *arg)
     vTaskDelay(1);
 }
 
-static int ezlopi_service_broadcast_send_to_queue(cJSON * cj_broadcast_data)
+static ezlopi_error_t ezlopi_service_broadcast_send_to_queue(cJSON *cj_broadcast_data)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
 
     if (__broadcast_queue && cj_broadcast_data)
     {
         if (xQueueIsQueueFullFromISR(__broadcast_queue))
         {
-            cJSON* cj_tmp_data = NULL;
+            cJSON *cj_tmp_data = NULL;
             if (pdTRUE == xQueueReceive(__broadcast_queue, &cj_tmp_data, 5 / portTICK_PERIOD_MS))
             {
                 if (cj_tmp_data)
@@ -76,17 +77,17 @@ static int ezlopi_service_broadcast_send_to_queue(cJSON * cj_broadcast_data)
         }
         else
         {
-            TRACE_S(" ----- Adding to broadcast queue -----");
+            // TRACE_S(" ----- Adding to broadcast queue -----");
         }
 
-        cJSON* cj_data = cj_broadcast_data;
+        cJSON *cj_data = cj_broadcast_data;
         if (pdTRUE == xQueueSend(__broadcast_queue, &cj_data, 500 / portTICK_PERIOD_MS))
         {
-            ret = 1;
+            ret = EZPI_SUCCESS;
         }
         else
         {
-            TRACE_D(" ----- Failed adding to queue -----");
+            // TRACE_D(" ----- Failed adding to queue -----");
         }
     }
 
