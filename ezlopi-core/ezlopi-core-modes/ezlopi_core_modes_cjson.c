@@ -106,7 +106,7 @@ s_ezlopi_modes_t *ezlopi_core_modes_cjson_parse_modes(cJSON *cj_modes)
         if (cj_entry_delay)
         {
             CJSON_GET_VALUE_DOUBLE(cj_entry_delay, ezlopi_normal_str, parsed_mode->entry_delay.normal_delay_sec);
-            CJSON_GET_VALUE_DOUBLE(cj_entry_delay, ezlopi_short_str, parsed_mode->entry_delay.short_delay_sec);
+            CJSON_GET_VALUE_DOUBLE(cj_entry_delay, ezlopi_long_extended_str, parsed_mode->entry_delay.long_extended_delay_sec);
             CJSON_GET_VALUE_DOUBLE(cj_entry_delay, ezlopi_extended_str, parsed_mode->entry_delay.extended_delay_sec);
             CJSON_GET_VALUE_DOUBLE(cj_entry_delay, ezlopi_instant_str, parsed_mode->entry_delay.instant_delay_sec);
         }
@@ -286,6 +286,7 @@ s_ezlopi_modes_t *ezlopi_core_modes_cjson_parse_modes(cJSON *cj_modes)
                 CJSON_GET_VALUE_DOUBLE(cj_alarmed, ezlopi_timeIsLeft_str, parsed_mode->alarmed.time_is_left_sec);
 
                 CJSON_GET_VALUE_STRING_BY_COPY(cj_alarmed, ezlopi_type_str, parsed_mode->alarmed.type);
+                CJSON_GET_VALUE_BOOL(cj_alarmed, "silent", parsed_mode->alarmed.silent);
 
                 cJSON *cj_sources_arr = cJSON_GetObjectItem(__FUNCTION__, cj_alarmed, ezlopi_sources_str);
                 if (cj_sources_arr)
@@ -382,7 +383,8 @@ static void __cjson_add_entry_delay(cJSON *cj_result, s_entry_delay_t *entry_del
     if (cj_entry_delay)
     {
         cJSON_AddNumberToObject(__FUNCTION__, cj_entry_delay, ezlopi_normal_str, entry_delay->normal_delay_sec);
-        cJSON_AddNumberToObject(__FUNCTION__, cj_entry_delay, ezlopi_short_str, entry_delay->short_delay_sec);
+        // cJSON_AddNumberToObject(__FUNCTION__, cj_entry_delay, ezlopi_short_str, entry_delay->short_delay_sec);
+        cJSON_AddNumberToObject(__FUNCTION__, cj_entry_delay, ezlopi_long_extended_str, entry_delay->long_extended_delay_sec);
         cJSON_AddNumberToObject(__FUNCTION__, cj_entry_delay, ezlopi_extended_str, entry_delay->extended_delay_sec);
         cJSON_AddNumberToObject(__FUNCTION__, cj_entry_delay, ezlopi_instant_str, entry_delay->instant_delay_sec);
     }
@@ -459,7 +461,8 @@ static void __cjson_add_alarmed(cJSON *cj_alarmed, s_alarmed_t *alarmed)
         cJSON_AddNumberToObject(__FUNCTION__, cj_alarmed, ezlopi_entryDelay_str, alarmed->entry_delay_sec);
         cJSON_AddNumberToObject(__FUNCTION__, cj_alarmed, ezlopi_timeIsLeft_str, alarmed->time_is_left_sec);
         cJSON_AddStringToObject(__FUNCTION__, cj_alarmed, ezlopi_type_str, alarmed->type);
-#warning "silent v3.0";
+        cJSON_AddBoolToObject(__FUNCTION__, cj_alarmed, "silent", alarmed->silent);
+
         cJSON *cj_sources_arr = cJSON_AddArrayToObject(__FUNCTION__, cj_alarmed, ezlopi_sources_str);
         if (cj_sources_arr)
         {

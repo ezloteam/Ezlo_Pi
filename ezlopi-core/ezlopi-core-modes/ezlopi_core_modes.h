@@ -73,7 +73,8 @@ typedef struct s_house_modes
 
 typedef struct s_entry_delay
 {
-    uint32_t short_delay_sec;
+    uint32_t long_extended_delay_sec;
+    // uint32_t short_delay_sec; // not short should be'long_extentded' in (hub.modes v3.0)
     uint32_t normal_delay_sec;
     uint32_t extended_delay_sec;
     uint32_t instant_delay_sec;
@@ -168,7 +169,7 @@ ezlopi_error_t ezlopi_core_modes_add_alarm_off(uint8_t mode_id, cJSON *device_id
 ezlopi_error_t ezlopi_core_modes_remove_alarm_off(uint32_t mode_id, cJSON *device_id);
 
 ezlopi_error_t ezlopi_core_modes_cjson_get_current_mode(cJSON *cj_result);
-ezlopi_error_t ezlopi_core_modes_set_entry_delay(uint32_t normal_sec, uint32_t short_sec, uint32_t extended_sec, uint32_t instant_sec);
+ezlopi_error_t ezlopi_core_modes_set_entry_delay(uint32_t normal_sec, uint32_t extended_sec, uint32_t long_extended_sec, uint32_t instant_sec);
 ezlopi_error_t ezlopi_core_modes_reset_entry_delay(void);
 
 ///

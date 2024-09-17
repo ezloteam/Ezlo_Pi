@@ -21,7 +21,7 @@ s_ezlopi_modes_t *ezlopi_core_modes_get_custom_modes(void)
     return sg_custom_modes;
 }
 
-ezlopi_error_t ezlopi_core_modes_set_current_house_mode(s_house_modes_t* new_house_mode)
+ezlopi_error_t ezlopi_core_modes_set_current_house_mode(s_house_modes_t *new_house_mode)
 {
     sg_current_house_mode = new_house_mode;
     return EZPI_SUCCESS;
@@ -91,17 +91,17 @@ s_house_modes_t *ezlopi_core_modes_get_house_mode_by_name(char *house_mode_name)
     return _house_mode;
 }
 
-ezlopi_error_t ezlopi_core_modes_api_get_modes(cJSON* cj_result)
+ezlopi_error_t ezlopi_core_modes_api_get_modes(cJSON *cj_result)
 {
     return ezlopi_core_modes_cjson_get_modes(cj_result);
 }
 
-ezlopi_error_t ezlopi_core_modes_api_get_current_mode(cJSON* cj_result)
+ezlopi_error_t ezlopi_core_modes_api_get_current_mode(cJSON *cj_result)
 {
     return ezlopi_core_modes_cjson_get_current_mode(cj_result);
 }
 
-ezlopi_error_t ezlopi_core_modes_api_switch_mode(s_house_modes_t* switch_to_house_mode)
+ezlopi_error_t ezlopi_core_modes_api_switch_mode(s_house_modes_t *switch_to_house_mode)
 {
     ezlopi_service_modes_stop(5000);
     sg_custom_modes->switch_to_mode_id = switch_to_house_mode->_id;
@@ -133,9 +133,9 @@ ezlopi_error_t ezlopi_core_modes_api_cancel_entry_delay(void)
     {
         ret = EZPI_SUCCESS;
         ezlopi_service_modes_stop(5000);
-        sg_custom_modes->entry_delay.short_delay_sec = 0;
         sg_custom_modes->entry_delay.normal_delay_sec = 0;
         sg_custom_modes->entry_delay.extended_delay_sec = 0;
+        sg_custom_modes->entry_delay.long_extended_delay_sec = 0;
         sg_custom_modes->entry_delay.instant_delay_sec = 0;
         ezlopi_service_modes_start(5000);
     }
@@ -171,7 +171,7 @@ ezlopi_error_t ezlopi_core_modes_set_alarm_delay(uint32_t alarm_to_delay)
     return ret;
 }
 
-ezlopi_error_t ezlopi_core_modes_set_notifications(cJSON* cj_params)
+ezlopi_error_t ezlopi_core_modes_set_notifications(cJSON *cj_params)
 {
     ezlopi_error_t ret = EZPI_ERR_MODES_FAILED;
     if (cj_params)
@@ -184,7 +184,7 @@ ezlopi_error_t ezlopi_core_modes_set_notifications(cJSON* cj_params)
     return ret;
 }
 
-ezlopi_error_t ezlopi_core_modes_add_alarm_off(uint8_t mode_id, cJSON*  device_id)
+ezlopi_error_t ezlopi_core_modes_add_alarm_off(uint8_t mode_id, cJSON *device_id)
 {
     ezlopi_error_t ret = EZPI_ERR_MODES_FAILED;
     if ((EZLOPI_HOUSE_MODE_REF_ID_NONE < mode_id) && (EZLOPI_HOUSE_MODE_REF_ID_MAX > mode_id) && device_id)
@@ -210,7 +210,6 @@ ezlopi_error_t ezlopi_core_modes_add_alarm_off(uint8_t mode_id, cJSON*  device_i
                 }
                 cJSON_AddItemToArray(targe_house_mode->cj_alarms_off_devices, cJSON_CreateString(__func__, device_id->valuestring));
 
-
                 if (EZPI_SUCCESS != ezlopi_core_modes_store_to_nvs())
                 {
                     TRACE_D("Error!! when adding alarm_off");
@@ -226,7 +225,7 @@ ezlopi_error_t ezlopi_core_modes_add_alarm_off(uint8_t mode_id, cJSON*  device_i
     return ret;
 }
 
-ezlopi_error_t ezlopi_core_modes_remove_alarm_off(uint32_t mode_id, cJSON* device_id)
+ezlopi_error_t ezlopi_core_modes_remove_alarm_off(uint32_t mode_id, cJSON *device_id)
 {
     ezlopi_error_t ret = EZPI_ERR_MODES_FAILED;
     if ((EZLOPI_HOUSE_MODE_REF_ID_NONE < mode_id) && (EZLOPI_HOUSE_MODE_REF_ID_MAX > mode_id) && device_id)
@@ -286,8 +285,7 @@ ezlopi_error_t ezlopi_core_modes_set_protect(uint32_t mode_id, bool protect_stat
     return ret;
 }
 
-
-ezlopi_error_t ezlopi_core_modes_set_entry_delay(uint32_t normal_sec, uint32_t short_sec, uint32_t extended_sec, uint32_t instant_sec)
+ezlopi_error_t ezlopi_core_modes_set_entry_delay(uint32_t normal_sec, uint32_t extended_sec, uint32_t long_extended_sec, uint32_t instant_sec)
 {
     ezlopi_error_t ret = EZPI_ERR_MODES_FAILED;
     if (sg_custom_modes)
@@ -297,8 +295,8 @@ ezlopi_error_t ezlopi_core_modes_set_entry_delay(uint32_t normal_sec, uint32_t s
         if (curr_mode)
         {
             curr_mode->entry_delay.normal_delay_sec = normal_sec;
-            curr_mode->entry_delay.short_delay_sec = short_sec;
             curr_mode->entry_delay.extended_delay_sec = extended_sec;
+            curr_mode->entry_delay.long_extended_delay_sec = long_extended_sec;
             curr_mode->entry_delay.instant_delay_sec = instant_sec;
 
             if (EZPI_SUCCESS != ezlopi_core_modes_store_to_nvs())
@@ -326,8 +324,8 @@ ezlopi_error_t ezlopi_core_modes_reset_entry_delay(void)
         if (curr_mode)
         {
             curr_mode->entry_delay.normal_delay_sec = 30;
-            curr_mode->entry_delay.short_delay_sec = 30;
-            curr_mode->entry_delay.extended_delay_sec = 30;
+            curr_mode->entry_delay.extended_delay_sec = 60;
+            curr_mode->entry_delay.long_extended_delay_sec = 120;
             curr_mode->entry_delay.instant_delay_sec = 0;
 
             if (EZPI_SUCCESS != ezlopi_core_modes_store_to_nvs())
@@ -345,11 +343,10 @@ ezlopi_error_t ezlopi_core_modes_reset_entry_delay(void)
     return ret;
 }
 
-
 ezlopi_error_t ezlopi_core_modes_store_to_nvs(void)
 {
     ezlopi_error_t ret = EZPI_ERR_MODES_FAILED;
-    cJSON* cj_modes = cJSON_CreateObject(__FUNCTION__);
+    cJSON *cj_modes = cJSON_CreateObject(__FUNCTION__);
     if (cj_modes)
     {
         ezlopi_core_modes_cjson_get_modes(cj_modes);

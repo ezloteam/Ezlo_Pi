@@ -22,9 +22,9 @@ static s_ezlopi_modes_t sg_default_mode = {
     .l_protect_buttons = NULL,
 
     .entry_delay = {
-        .short_delay_sec = 30,
         .normal_delay_sec = 30,
-        .extended_delay_sec = 30,
+        .extended_delay_sec = 60,
+        .long_extended_delay_sec = 120,
         .instant_delay_sec = 0,
     },
 

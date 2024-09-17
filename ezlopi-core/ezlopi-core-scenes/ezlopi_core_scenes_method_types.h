@@ -15,8 +15,8 @@ EZLOPI_SCENE(WHEN_METHOD_IS_USER_LOCK_OPERATION, "isUserLockOperation", ezlopi_s
 #if defined(CONFIG_EZPI_SERV_ENABLE_MODES)
 EZLOPI_SCENE(WHEN_METHOD_IS_HOUSE_MODE_CHANGED_TO, "isHouseModeChangedTo", ezlopi_scene_when_is_house_mode_changed_to)
 EZLOPI_SCENE(WHEN_METHOD_IS_HOUSE_MODE_CHANGED_FROM, "isHouseModeChangedFrom", ezlopi_scene_when_is_house_mode_changed_from)
-EZLOPI_SCENE(WHEN_METHOD_IS_HOUSE_MODE_ALARM_PHASE_RANGE, "isHouseModeAlarmPhaseRange", ezlopi_scene_when_is_House_Mode_Alarm_Phase_Range)
-EZLOPI_SCENE(WHEN_METHOD_IS_HOUSE_MODE_SWTICH_TO_RANGE, "isHouseModeSwitchtoRange", ezlopi_scene_when_is_House_Mode_Switch_to_Range)
+EZLOPI_SCENE(WHEN_METHOD_IS_HOUSE_MODE_ALARM_PHASE_RANGE, "isHouseModeAlarmPhaseRange", ezlopi_scene_when_is_house_mode_alarm_phase_range)
+EZLOPI_SCENE(WHEN_METHOD_IS_HOUSE_MODE_SWTICH_TO_RANGE, "isHouseModeSwitchtoRange", ezlopi_scene_when_is_house_mode_switch_to_range)
 #endif // CONFIG_EZPI_SERV_ENABLE_MODES
 
 EZLOPI_SCENE(WHEN_METHOD_IS_DEVICE_STATE, "isDeviceState", ezlopi_scene_when_is_device_state)
@@ -62,4 +62,4 @@ EZLOPI_SCENE(THEN_TOGGLE_VALUE, "toggleValue", ezlopi_scene_then_toggle_value)
 //
 EZLOPI_SCENE(METHOD_TYPE_MAX, "max", NULL)
 
-#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+#endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS

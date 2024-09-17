@@ -97,7 +97,7 @@ void ezlopi_cloud_modes_entry_delay_skip(cJSON *cj_request, cJSON *cj_response)
     cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     if (cj_result)
     {
-#warning "Implementation required"
+#warning "Implementation required";
     }
 }
 
@@ -286,15 +286,19 @@ void ezlopi_cloud_modes_entry_delay_set(cJSON *cj_request, cJSON *cj_response)
         if (cj_params)
         {
             double normal_sec = 30;
-            double short_sec = 30;
-            double extended_sec = 30;
+            // double short_sec = 30;
+            double extended_sec = 60;
+            double long_extended_sec = 120;
             double instant_sec = 0;
 
             CJSON_GET_VALUE_DOUBLE(cj_params, ezlopi_normal_str, normal_sec);
             normal_sec = (normal_sec > 240) ? 240 : normal_sec;
 
-            CJSON_GET_VALUE_DOUBLE(cj_params, ezlopi_short_str, short_sec);
-            short_sec = (short_sec > 240) ? 240 : short_sec;
+            // CJSON_GET_VALUE_DOUBLE(cj_params, ezlopi_short_str, short_sec);
+            // short_sec = (short_sec > 240) ? 240 : short_sec;
+
+            CJSON_GET_VALUE_DOUBLE(cj_params, ezlopi_long_extended_str, long_extended_sec);
+            long_extended_sec = (long_extended_sec > 240) ? 240 : long_extended_sec;
 
             CJSON_GET_VALUE_DOUBLE(cj_params, ezlopi_extended_str, extended_sec);
             extended_sec = (extended_sec > 240) ? 240 : extended_sec;
@@ -302,7 +306,7 @@ void ezlopi_cloud_modes_entry_delay_set(cJSON *cj_request, cJSON *cj_response)
             CJSON_GET_VALUE_DOUBLE(cj_params, ezlopi_instant_str, instant_sec);
             instant_sec = (instant_sec > 240) ? 240 : instant_sec;
 
-            ezlopi_core_modes_set_entry_delay((uint32_t)normal_sec, (uint32_t)short_sec, (uint32_t)extended_sec, (uint32_t)instant_sec);
+            ezlopi_core_modes_set_entry_delay((uint32_t)normal_sec, (uint32_t)extended_sec, (uint32_t)long_extended_sec, (uint32_t)instant_sec);
         }
     }
 }
