@@ -5,6 +5,8 @@
 
 #include "driver/i2c.h"
 
+#include "ezlopi_core_errors.h"
+
 typedef enum e_ezlopi_i2c_channel
 {
     EZLOPI_I2C_0 = 0,
@@ -27,7 +29,7 @@ typedef struct s_ezlopi_i2c_master
         .sda = 9, .scl = 10, .clock_speed = 100000, .channel = EZLOPI_I2C_0 \
     }
 
-int ezlopi_i2c_master_init(s_ezlopi_i2c_master_t *i2c_master_conf);
+ezlopi_error_t ezlopi_i2c_master_init(s_ezlopi_i2c_master_t *i2c_master_conf);
 void ezlopi_i2c_master_deinit(s_ezlopi_i2c_master_t *i2c_master_conf);
 
 esp_err_t ezlopi_i2c_master_write_to_device(s_ezlopi_i2c_master_t *i2c_master_conf, uint8_t *write_buffer, uint32_t write_len);

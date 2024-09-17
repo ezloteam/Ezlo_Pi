@@ -3,6 +3,7 @@
 
 #include "ezlopi_core_actions.h"
 #include "ezlopi_core_devices.h"
+#include "ezlopi_core_errors.h"
 
 /**
  *  NOTE : MQ4_methane_gas - module gives (0V - 4.2V) as analog output .
@@ -140,7 +141,7 @@ typedef enum
 //      ACTION FUNCTION
 //--------------------------------------------------------------------------------------------------------
 
-int sensor_0048_other_MQ4_CH4_detector(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
+ezlopi_error_t sensor_0048_other_MQ4_CH4_detector(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
 //--------------------------------------------------------------------------------------------------------
 

@@ -9,6 +9,7 @@ idf_component_register(SRCS "sensor_0008_I2C_LTR303ALS.c" "LTR303.c" "ALS_LTR303
                 ezlopi-core-actions 
                 ezlopi-core-devices 
                 ezlopi-core-valueformatter 
+                ezlopi-core-errors
 
                 ezlopi-hal-i2c
                 

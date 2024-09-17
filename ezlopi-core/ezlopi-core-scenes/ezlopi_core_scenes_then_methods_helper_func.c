@@ -14,6 +14,7 @@
 #include "ezlopi_core_scenes_value.h"
 #include "ezlopi_core_scenes_expressions.h"
 #include "ezlopi_core_scenes_then_methods_helper_func.h"
+#include "ezlopi_core_errors.h"
 
 #include "ezlopi_cloud_constants.h"
 #include "EZLOPI_USER_CONFIG.h"
@@ -48,7 +49,7 @@ static int __ezlopi_core_scenes_then_sendhttp_relloc_header(s_ezlopi_core_http_m
     uint8_t retry = 5;
     do
     {
-        if (1 == ezlopi_core_http_dyna_relloc(&(tmp_http_data->header), new_size)) // rellocate: 'tmp_http_data->header' with  'new_size'
+        if (EZPI_SUCCESS == ezlopi_core_http_dyna_relloc(&(tmp_http_data->header), new_size)) // rellocate: 'tmp_http_data->header' with  'new_size'
         {
             snprintf((tmp_http_data->header) + strlen(tmp_http_data->header), append_size, "%s", append_str);
             ret = new_size; // return new memory-block size
@@ -559,9 +560,9 @@ int ezlopi_core_scene_then_helper_setexpression_setvariable(char * expression_na
             }
         }
 
-        // TRACE_S("-------------- Updated_exp_name : %s  ------------", expression_name);
-        // ezlopi_scenes_expressions_print(ezlopi_scenes_get_expression_node_by_name(expression_name));
-        // TRACE_S("----------------- ll --------------------");
+        TRACE_S("-------------- Updated_exp_name : %s  ------------", expression_name);
+        ezlopi_scenes_expressions_print(ezlopi_scenes_get_expression_node_by_name(expression_name));
+        TRACE_S("----------------- ll --------------------");
 
         // 5. Now to edit in nvs
         // A. read from  nvs

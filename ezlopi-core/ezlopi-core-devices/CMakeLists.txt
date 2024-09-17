@@ -4,6 +4,7 @@ set(EZLOPI_CORE_COMPONENTS
         ezlopi-core-cloud 
         ezlopi-core-actions
         ezlopi-core-devices 
+        ezlopi-core-errors
 )
 set(EZLOPI_HAL_COMPONENTS 
         ezlopi-hal-gpio
@@ -91,7 +92,7 @@ set(EZLOPI_SENSOR_DEVICE_COMPONENTS
 )
 
 
-idf_component_register(SRCS "ezlopi_core_devices.c" "ezlopi_core_device_group.c" "${config_src}"
+idf_component_register(SRCS "ezlopi_core_device_value_updated.c" "ezlopi_core_devices.c" "ezlopi_core_device_group.c" "${config_src}"
                         INCLUDE_DIRS "."
                         REQUIRES        ${EZLOPI_CORE_COMPONENTS}
                                         ${EZLOPI_HAL_COMPONENTS}

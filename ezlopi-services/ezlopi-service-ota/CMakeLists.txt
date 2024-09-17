@@ -7,6 +7,7 @@ set(EZLOPI_SDK_COMPONENTS
 set(EZLOPI_CORE_COMPONENTS 
         ezlopi-core-wifi
         ezlopi-core-processes
+        ezlopi-core-errors
 )
 set(EZLOPI_CLOUD_COMPONENTS 
         ezlopi-cloud-ota

@@ -5,6 +5,7 @@
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
+#include "ezlopi_core_errors.h"
 
 #include "ezlopi_cloud_items.h"
 #include "ezlopi_cloud_constants.h"
@@ -13,14 +14,14 @@
 
 #include "sensor_0034_digitalIn_proximity.h"
 
-static int proximity_sensor_prepare(void* args);
-static int proximity_sensor_init(l_ezlopi_item_t* item);
+static ezlopi_error_t proximity_sensor_prepare(void* args);
+static ezlopi_error_t proximity_sensor_init(l_ezlopi_item_t* item);
 static void proximity_sensor_value_updated_from_device(void* arg);
-static int proximity_sensor_get_value_cjson(l_ezlopi_item_t* item, void* args);
+static ezlopi_error_t proximity_sensor_get_value_cjson(l_ezlopi_item_t* item, void* args);
 
-int sensor_0034_digitalIn_proximity(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* args, void* user_arg)
+ezlopi_error_t sensor_0034_digitalIn_proximity(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* args, void* user_arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_SUCCESS;
 
     switch (action)
     {
@@ -86,9 +87,9 @@ static void proximity_sensor_setup_item_properties(l_ezlopi_item_t* item, cJSON*
     }
 }
 
-static int proximity_sensor_prepare(void* args)
+static ezlopi_error_t proximity_sensor_prepare(void* args)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
     s_ezlopi_prep_arg_t* device_prep_arg = (s_ezlopi_prep_arg_t*)args;
 
     if ((NULL != device_prep_arg) && (NULL != device_prep_arg->cjson_device))
@@ -96,31 +97,25 @@ static int proximity_sensor_prepare(void* args)
         l_ezlopi_device_t* device = ezlopi_device_add_device(device_prep_arg->cjson_device, NULL);
         if (device)
         {
-            ret = 1;
             proximity_sensor_setup_device_cloud_properties(device, device_prep_arg->cjson_device);
             l_ezlopi_item_t* item = ezlopi_device_add_item_to_device(device, sensor_0034_digitalIn_proximity);
             if (item)
             {
                 proximity_sensor_setup_item_properties(item, device_prep_arg->cjson_device);
+                ret = EZPI_SUCCESS;
             }
             else
             {
                 ezlopi_device_free_device(device);
-                ret = -1;
             }
         }
-        else
-        {
-            ret = -1;
-        }
     }
-
     return ret;
 }
 
-static int proximity_sensor_init(l_ezlopi_item_t* item)
+static ezlopi_error_t proximity_sensor_init(l_ezlopi_item_t* item)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_ERR_INIT_DEVICE_FAILED;
     if (item)
     {
         if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num))
@@ -138,17 +133,12 @@ static int proximity_sensor_init(l_ezlopi_item_t* item)
                 ezlopi_service_gpioisr_register_v3(item, proximity_sensor_value_updated_from_device, 200);
                 item->interface.gpio.gpio_in.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
                 TRACE_I("Proximity sensor initialize successfully.");
-                ret = 1;
+                ret = EZPI_SUCCESS;
             }
             else
             {
-                ret = -1;
                 TRACE_E("Error initializing Proximity sensor");
             }
-        }
-        else
-        {
-            ret = -1;
         }
     }
 
@@ -164,9 +154,9 @@ static void proximity_sensor_value_updated_from_device(void* arg)
     }
 }
 
-static int proximity_sensor_get_value_cjson(l_ezlopi_item_t* item, void* args)
+static ezlopi_error_t proximity_sensor_get_value_cjson(l_ezlopi_item_t* item, void* args)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
     cJSON* cj_result = (cJSON*)args;
     if (cj_result)
     {
@@ -176,8 +166,8 @@ static int proximity_sensor_get_value_cjson(l_ezlopi_item_t* item, void* args)
             item->interface.gpio.gpio_in.value = item->interface.gpio.gpio_in.value ? false : true;
         }
 
-        ezlopi_valueformatter_bool_to_cjson(cj_result, item->interface.gpio.gpio_in.value, item->cloud_properties.scale);
-        ret = 1;
+        ezlopi_valueformatter_bool_to_cjson(cj_result, item->interface.gpio.gpio_in.value, NULL);
+        ret = EZPI_SUCCESS;
         // TRACE_D("value: %d", item->interface.gpio.gpio_in.value);
     }
 

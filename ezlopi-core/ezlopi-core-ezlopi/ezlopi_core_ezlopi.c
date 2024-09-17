@@ -21,13 +21,17 @@
 #include "ezlopi_core_devices_list.h"
 #include "ezlopi_core_scenes_scripts.h"
 #include "ezlopi_core_scenes_expressions.h"
+#include "ezlopi_core_log.h"
+#include "ezlopi_core_errors.h"
 #include "ezlopi_core_setting_commands.h"
+
 #ifdef CONFIG_EZPI_CORE_ETHERNET_EN
 #include "ezlopi_core_ethernet.h"
 #endif // CONFIG_EZPI_CORE_ETHERNET_EN
 
 #include "ezlopi_hal_system_info.h"
 #include "ezlopi_service_loop.h"
+#include "ezlopi_service_system_temperature_sensor.h"
 
 static void __device_loop(void *arg);
 static void ezlopi_initialize_devices_v3(void);
@@ -36,9 +40,13 @@ void ezlopi_init(void)
 {
     // Init memories
     ezlopi_nvs_init();
-
     ezlopi_core_setting_commands_read_settings();
 
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
+    ezlopi_core_read_set_log_severities();
+    // #warning "remove this in release"
+    ezlopi_core_read_set_log_severities_internal(ENUM_EZLOPI_LOG_SEVERITY_TRACE);
+#endif // CONFIG_EZPI_UTIL_TRACE_EN
     EZPI_HAL_uart_init();
 #if defined(CONFIG_EZPI_WEBSOCKET_CLIENT) || defined(CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER)
     ezlopi_core_buffer_init(CONFIG_EZPI_CORE_STATIC_BUFFER_SIZE); // allocate 10kB
@@ -58,6 +66,9 @@ void ezlopi_init(void)
     vTaskDelay(10);
     // Init devices
     ezlopi_device_prepare();
+#if defined(CONFIG_EZPI_ENABLE_SYSTEM_TEMPERATURE)
+    ezlopi_system_temperature_device(EZLOPI_ACTION_PREPARE, NULL, NULL, NULL);
+#endif // EZPI_ENABLE_SYSTEM_TEMPERATURE
     vTaskDelay(10);
     // Init device_groups
     ezlopi_device_group_init();
@@ -90,7 +101,7 @@ void ezlopi_init(void)
 #endif
 
 #if (defined(CONFIG_EZPI_ENABLE_WIFI) || defined(CONFIG_EZPI_CORE_ENABLE_ETH))
-    EZPI_CORE_sntp_init();
+    ezlopi_error_t sntp_error = EZPI_CORE_sntp_init();
 #ifdef CONFIG_EZPI_ENABLE_PING
     ezlopi_ping_init();
 #endif // CONFIG_EZPI_ENABLE_PING

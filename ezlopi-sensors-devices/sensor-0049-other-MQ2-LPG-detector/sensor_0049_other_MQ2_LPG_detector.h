@@ -3,6 +3,8 @@
 
 #include "ezlopi_core_actions.h"
 #include "ezlopi_core_devices.h"
+#include "ezlopi_core_errors.h"
+
 /**
  *  NOTE : MQ2_LPG_gas - module gives (0V - 4.2V) as analog output .
  *  But ESP32- only allows upto 2.4V max input.
@@ -139,7 +141,7 @@ typedef enum
 //      ACTION FUNCTION
 //--------------------------------------------------------------------------------------------------------
 
-int sensor_0049_other_MQ2_LPG_detector(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
+ezlopi_error_t sensor_0049_other_MQ2_LPG_detector(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
 //--------------------------------------------------------------------------------------------------------
 

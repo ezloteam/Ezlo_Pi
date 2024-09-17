@@ -5,6 +5,7 @@
 
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_factory_info.h"
+#include "ezlopi_core_errors.h"
 
 #include "ezlopi_service_webprov.h"
 #include "ezlopi_service_ws_server.h"
@@ -27,14 +28,14 @@ void EZPI_CORE_reset_reboot(void)
 
 void EZPI_CORE_reset_factory_restore(void)
 {
-    int ret = ezlopi_factory_info_v3_factory_reset();
-    if (ret)
+    ezlopi_error_t ret = ezlopi_factory_info_v3_factory_reset();
+    if (EZPI_SUCCESS == ret)
     {
         TRACE_I("FLASH RESET WAS DONE SUCCESSFULLY");
     }
 
     ret = ezlopi_nvs_factory_reset();
-    if (ret)
+    if (EZPI_SUCCESS == ret)
     {
         TRACE_I("NVS-RESET WAS DONE SUCCESSFULLY");
     }

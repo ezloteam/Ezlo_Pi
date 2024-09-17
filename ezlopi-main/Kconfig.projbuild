@@ -21,6 +21,7 @@ menu "EzloPi User Config"
 
     config EZPI_BLE_ENABLE        
         bool "Enable BLE"
+        depends on IDF_TARGET_ESP32 || IDF_TARGET_ESP32C3 || IDF_TARGET_ESP32S3
         default n
         help
             Enable BLE
@@ -124,6 +125,13 @@ menu "EzloPi User Config"
         default n
         help
             Enable captive portal in EzloPi firmware
+    
+    config EZPI_ENABLE_SYSTEM_TEMPERATURE
+        depends on IDF_TARGET_ESP32S3 || IDF_TARGET_ESP32C3 || IDF_TARGET_ESP32S2
+        bool "Enable system temperature monitoring uisng inbuilt temperature sensor"
+        default n
+        help 
+            Enable system temperature monitoring uisng inbuilt temperature sensor
 
     menu "EzloPi mDNS config"
         depends on EZPI_SERV_MDNS_EN

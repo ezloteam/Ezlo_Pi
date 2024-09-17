@@ -15,6 +15,7 @@ set(EZLOPI_COMPONENTS
 
 set(EZLOPI_CORE_COMPONENTS 
         ezlopi-core-event-group
+        ezlopi-core-errors
 )
 
 idf_component_register(SRCS "ezlopi_core_http.c" "${config_src}"

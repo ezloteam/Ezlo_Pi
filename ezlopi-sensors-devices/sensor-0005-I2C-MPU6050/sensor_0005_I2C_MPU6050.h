@@ -3,6 +3,7 @@
 
 #include "ezlopi_core_actions.h"
 #include "ezlopi_core_devices.h"
+#include "ezlopi_core_errors.h"
 
 #define MPU6050_REG_COUNT_LEN 14 // the accelerometer , temperature and gyrodata is to be in one go .
 
@@ -148,6 +149,6 @@ void __mpu6050_get_data(l_ezlopi_item_t *item);
 e_mpu6050_err_t __mpu6050_config_device(l_ezlopi_item_t *item);
 
 // Action function declaration
-int sensor_0005_I2C_MPU6050(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
+ezlopi_error_t sensor_0005_I2C_MPU6050(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
 #endif //_SENSOR_0005_I2C_MPU6050_H_

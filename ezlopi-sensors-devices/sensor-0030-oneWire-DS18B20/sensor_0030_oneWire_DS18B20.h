@@ -5,7 +5,7 @@
 
 #include "ezlopi_core_actions.h"
 #include "ezlopi_core_devices.h"
-// #include <stdbool.h>
+#include "ezlopi_core_errors.h"
 
 #define DS18B20_TEMPERATURE_LSB 0
 #define DS18B20_TEMPERATURE_HSB 1
@@ -49,6 +49,6 @@ static const uint8_t dscrc2x16_table[] = {
 #if 0 // v2.x
 int ds18b20_sensor(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *ezlo_device, void *arg, void *user_arg);
 #endif
-int sensor_0030_oneWire_DS18B20(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
+ezlopi_error_t sensor_0030_oneWire_DS18B20(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
 #endif // SENSOR_0030_ONEWIRE_DS18B20_H
