@@ -146,7 +146,7 @@ uint32_t ezlopi_store_new_scene_v2(cJSON *cj_new_scene)
                             if (updated_scenes_list)
                             {
                                 TRACE_D("updated_scenes_list: %s", updated_scenes_list);
-                                if (ezlopi_nvs_scene_set_v2(updated_scenes_list))
+                                if (EZPI_SUCCESS == ezlopi_nvs_scene_set_v2(updated_scenes_list))
                                 {
                                     TRACE_D("Scenes list updated.");
                                 }

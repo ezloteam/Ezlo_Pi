@@ -15,11 +15,11 @@
 static QueueHandle_t __broadcast_queue = NULL;
 
 static void __broadcast_loop(void *arg);
-static ezlopi_error_t ezlopi_service_broadcast_send_to_queue(cJSON* cj_broadcast_data);
+static ezlopi_error_t ezlopi_service_broadcast_send_to_queue(cJSON *cj_broadcast_data);
 
 void ezlopi_service_broadcast_init(void)
 {
-    __broadcast_queue = xQueueCreate(10, sizeof(cJSON*));
+    __broadcast_queue = xQueueCreate(10, sizeof(cJSON *));
     if (__broadcast_queue)
     {
         ezlopi_core_broadcast_methods_set_queue(ezlopi_service_broadcast_send_to_queue);
@@ -36,7 +36,7 @@ void ezlopi_service_broadcast_init(void)
 
 static void __broadcast_loop(void *arg)
 {
-    static cJSON* cj_data = NULL;
+    static cJSON *cj_data = NULL;
     static uint32_t broadcast_wait_start = 0;
 
     if (cj_data)
@@ -58,7 +58,7 @@ static void __broadcast_loop(void *arg)
     vTaskDelay(1);
 }
 
-static ezlopi_error_t ezlopi_service_broadcast_send_to_queue(cJSON* cj_broadcast_data)
+static ezlopi_error_t ezlopi_service_broadcast_send_to_queue(cJSON *cj_broadcast_data)
 {
     ezlopi_error_t ret = EZPI_FAILED;
 
@@ -66,7 +66,7 @@ static ezlopi_error_t ezlopi_service_broadcast_send_to_queue(cJSON* cj_broadcast
     {
         if (xQueueIsQueueFullFromISR(__broadcast_queue))
         {
-            cJSON* cj_tmp_data = NULL;
+            cJSON *cj_tmp_data = NULL;
             if (pdTRUE == xQueueReceive(__broadcast_queue, &cj_tmp_data, 5 / portTICK_PERIOD_MS))
             {
                 if (cj_tmp_data)
@@ -77,17 +77,17 @@ static ezlopi_error_t ezlopi_service_broadcast_send_to_queue(cJSON* cj_broadcast
         }
         else
         {
-            TRACE_S(" ----- Adding to broadcast queue -----");
+            // TRACE_S(" ----- Adding to broadcast queue -----");
         }
 
-        cJSON* cj_data = cj_broadcast_data;
+        cJSON *cj_data = cj_broadcast_data;
         if (pdTRUE == xQueueSend(__broadcast_queue, &cj_data, 500 / portTICK_PERIOD_MS))
         {
             ret = EZPI_SUCCESS;
         }
         else
         {
-            TRACE_D(" ----- Failed adding to queue -----");
+            // TRACE_D(" ----- Failed adding to queue -----");
         }
     }
 
