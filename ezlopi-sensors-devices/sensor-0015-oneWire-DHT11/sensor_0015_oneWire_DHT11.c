@@ -269,7 +269,7 @@ static ezlopi_error_t __0015_get_value(l_ezlopi_item_t *item, void *args)
 
 static ezlopi_error_t __0015_notify(l_ezlopi_item_t *item)
 {
-    ezlopi_error_t ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
     if (item)
     {
         s_ezlopi_dht11_data_t *dht11_data = (s_ezlopi_dht11_data_t *)item->user_arg;

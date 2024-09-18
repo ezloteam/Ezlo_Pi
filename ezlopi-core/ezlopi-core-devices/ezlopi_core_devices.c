@@ -17,8 +17,8 @@ static l_ezlopi_device_t *l_device_head = NULL;
 static volatile uint32_t g_store_dev_config_with_id = 0;
 static s_ezlopi_cloud_controller_t s_controller_information;
 
-static ezlopi_error_t ezlopi_device_parse_json_v3(cJSON* cj_config);
-static void ezlopi_device_free_single(l_ezlopi_device_t* device);
+static ezlopi_error_t ezlopi_device_parse_json_v3(cJSON *cj_config);
+static void ezlopi_device_free_single(l_ezlopi_device_t *device);
 #if (1 == ENABLE_TRACE)
 #if 0 // Defined but not used
 static void ezlopi_device_print_controller_cloud_information_v3(void);
@@ -61,7 +61,7 @@ static int ____store_bool_in_nvs_dev_mod_info(uint32_t nvs_device_id, const char
 
             if (updated_target_dev_mod_str)
             {
-                if (ezlopi_nvs_write_str(updated_target_dev_mod_str, strlen(updated_target_dev_mod_str), (const char *)__device_id_str))
+                if (EZPI_SUCCESS == ezlopi_nvs_write_str(updated_target_dev_mod_str, strlen(updated_target_dev_mod_str), (const char *)__device_id_str))
                 {
                     TRACE_S("Device_modification info updated.");
                     ret = 1;
@@ -93,7 +93,7 @@ static int ____store_bool_in_nvs_dev_mod_info(uint32_t nvs_device_id, const char
 
             if (new_dev_mod_str)
             {
-                if (ezlopi_nvs_write_str(new_dev_mod_str, strlen(new_dev_mod_str), (const char *)__device_id_str))
+                if (EZPI_SUCCESS == ezlopi_nvs_write_str(new_dev_mod_str, strlen(new_dev_mod_str), (const char *)__device_id_str))
                 {
                     TRACE_S("New Device_modification info stored.");
                     ret = 1;
@@ -141,7 +141,7 @@ static int ____store_string_in_nvs_dev_mod_info(uint32_t nvs_device_id, const ch
 
             if (updated_target_dev_mod_str)
             {
-                if (ezlopi_nvs_write_str(updated_target_dev_mod_str, strlen(updated_target_dev_mod_str), (const char *)__device_id_str))
+                if (EZPI_SUCCESS == ezlopi_nvs_write_str(updated_target_dev_mod_str, strlen(updated_target_dev_mod_str), (const char *)__device_id_str))
                 {
                     TRACE_S("Device_modification info updated.");
                     ret = 1;
@@ -174,7 +174,7 @@ static int ____store_string_in_nvs_dev_mod_info(uint32_t nvs_device_id, const ch
 
             if (new_dev_mod_str)
             {
-                if (ezlopi_nvs_write_str(new_dev_mod_str, strlen(new_dev_mod_str), (const char *)__device_id_str))
+                if (EZPI_SUCCESS == ezlopi_nvs_write_str(new_dev_mod_str, strlen(new_dev_mod_str), (const char *)__device_id_str))
                 {
                     TRACE_S("New Device_modification info stored.");
                     ret = 1;
@@ -725,7 +725,7 @@ void ezlopi_device_prepare(void)
                     EZPI_CORE_reset_reboot();
                 }
             }
-            else 
+            else
             {
                 ezlopi_factory_info_v3_set_ezlopi_config(cj_config);
             }
@@ -895,7 +895,7 @@ static void ezlopi_device_print_interface_type(l_ezlopi_item_t* item)
 #endif
 //////////////////// Print functions end here /////////////////////////
 ///////////////////////////////////////////////////////////////////////
-static ezlopi_error_t ezlopi_device_parse_json_v3(cJSON* cjson_config)
+static ezlopi_error_t ezlopi_device_parse_json_v3(cJSON *cjson_config)
 {
     ezlopi_error_t error = EZPI_SUCCESS;
 
@@ -952,8 +952,8 @@ static ezlopi_error_t ezlopi_device_parse_json_v3(cJSON* cjson_config)
                                 {
                                     if (id_item == v3_device_list[dev_idx].id)
                                     {
-                                        s_ezlopi_prep_arg_t device_prep_arg = { .device = &v3_device_list[dev_idx], .cjson_device = cjson_device };
-                                        v3_device_list[dev_idx].func(EZLOPI_ACTION_PREPARE, NULL, (void*)&device_prep_arg, NULL);
+                                        s_ezlopi_prep_arg_t device_prep_arg = {.device = &v3_device_list[dev_idx], .cjson_device = cjson_device};
+                                        v3_device_list[dev_idx].func(EZLOPI_ACTION_PREPARE, NULL, (void *)&device_prep_arg, NULL);
                                         error = EZPI_SUCCESS;
                                     }
                                     dev_idx++;

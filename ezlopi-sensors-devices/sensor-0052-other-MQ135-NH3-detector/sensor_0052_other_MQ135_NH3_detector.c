@@ -50,7 +50,7 @@ static void __prepare_item_adc_cloud_properties(l_ezlopi_item_t* item, cJSON* cj
 
 ezlopi_error_t sensor_0052_other_MQ135_NH3_detector(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
 {
-    ezlopi_error_t ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
     switch (action)
     {
     case EZLOPI_ACTION_PREPARE:

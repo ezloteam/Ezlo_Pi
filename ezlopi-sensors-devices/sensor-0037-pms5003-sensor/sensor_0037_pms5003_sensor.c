@@ -157,7 +157,7 @@ static ezlopi_error_t __init(l_ezlopi_item_t* item)
 
 static ezlopi_error_t __prepare(void* arg, void* user_arg)
 {
-    ezlopi_error_t ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
 
     s_ezlopi_prep_arg_t* prep_arg = (s_ezlopi_prep_arg_t*)arg;
     if (prep_arg)

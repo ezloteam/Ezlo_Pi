@@ -433,9 +433,9 @@ void free_http_mbedtls_struct(s_ezlopi_core_http_mbedtls_t* config)
 
 
 //------------------------------ SetExpression / SetVariable -------------------------------------------------------
-int ezlopi_core_scene_then_helper_setexpression_setvariable(char * expression_name, const char * code_str, const char * value_type, cJSON * cj_metadata, cJSON * cj_params, l_fields_v2_t * var_value)
+ezlopi_error_t ezlopi_core_scene_then_helper_setexpression_setvariable(char * expression_name, const char * code_str, const char * value_type, cJSON * cj_metadata, cJSON * cj_params, l_fields_v2_t * var_value)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
     s_ezlopi_expressions_t* curr_expr = ezlopi_scenes_get_expression_node_by_name(expression_name);
     if (curr_expr)
     {
@@ -560,9 +560,9 @@ int ezlopi_core_scene_then_helper_setexpression_setvariable(char * expression_na
             }
         }
 
-        TRACE_S("-------------- Updated_exp_name : %s  ------------", expression_name);
-        ezlopi_scenes_expressions_print(ezlopi_scenes_get_expression_node_by_name(expression_name));
-        TRACE_S("----------------- ll --------------------");
+        // TRACE_S("-------------- Updated_exp_name : %s  ------------", expression_name);
+        // ezlopi_scenes_expressions_print(ezlopi_scenes_get_expression_node_by_name(expression_name));
+        // TRACE_S("----------------- ll --------------------");
 
         // 5. Now to edit in nvs
         // A. read from  nvs

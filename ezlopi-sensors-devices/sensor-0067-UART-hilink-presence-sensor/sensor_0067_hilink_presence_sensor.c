@@ -185,7 +185,7 @@ static ezlopi_error_t __add_value_to_cjson(l_ezlopi_item_t* item, cJSON* cj_para
 
 static ezlopi_error_t __get_hub_item_value(l_ezlopi_item_t* item, void* args)
 {
-    ezlopi_error_t ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
 
     cJSON* cj_params = (cJSON*)args;
     if (cj_params)

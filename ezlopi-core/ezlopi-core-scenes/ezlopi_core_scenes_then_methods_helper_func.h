@@ -20,7 +20,7 @@ void parse_http_skipsecurity(s_ezlopi_core_http_mbedtls_t* tmp_http_data, l_fiel
 void parse_http_creds(s_ezlopi_core_http_mbedtls_t* tmp_http_data, l_fields_v2_t* curr_field);
 void free_http_mbedtls_struct(s_ezlopi_core_http_mbedtls_t* config);
 
-int ezlopi_core_scene_then_helper_setexpression_setvariable(char * expression_name, const char * code_str, const char * value_type, cJSON * cj_metadata, cJSON * cj_params, l_fields_v2_t * var_value);
+ezlopi_error_t ezlopi_core_scene_then_helper_setexpression_setvariable(char * expression_name, const char * code_str, const char * value_type, cJSON * cj_metadata, cJSON * cj_params, l_fields_v2_t * var_value);
 
 int ezlopi_core_scene_then_helper_toggleValue(uint32_t item_id, const char * item_id_str);
 #endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS

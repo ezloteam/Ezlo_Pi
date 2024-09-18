@@ -50,9 +50,9 @@ ezlopi_error_t ezlopi_core_scene_edit_store_updated_to_nvs(cJSON *cj_updated_sce
     return error;
 }
 
-int ezlopi_core_scene_edit_update_id(uint32_t scene_id, cJSON *cj_updated_scene)
+ezlopi_error_t ezlopi_core_scene_edit_update_id(uint32_t scene_id, cJSON *cj_updated_scene)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
 
     if (scene_id && cj_updated_scene)
     {
@@ -70,7 +70,7 @@ int ezlopi_core_scene_edit_update_id(uint32_t scene_id, cJSON *cj_updated_scene)
                 {
                     ezlopi_meshbot_service_start_scene(scene_node);
                 }
-                ret = 1;
+                ret = EZPI_SUCCESS;
 
                 // TRACE_D("----------------------------------------------");
                 // TRACE_D("esp_get_free_heap_size - %f kB", esp_get_free_heap_size() / 1024.0);
