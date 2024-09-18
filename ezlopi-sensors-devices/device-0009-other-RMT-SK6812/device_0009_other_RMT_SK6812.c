@@ -26,22 +26,22 @@
 typedef struct s_dimmer_args
 {
     led_strip_t sk6812_strip;
-    l_ezlopi_item_t* switch_item;
-    l_ezlopi_item_t* dimmer_item;
-    l_ezlopi_item_t* dimmer_up_item;
-    l_ezlopi_item_t* dimmer_down_item;
-    l_ezlopi_item_t* dimmer_stop_item;
-    l_ezlopi_item_t* rgb_color_item;
+    l_ezlopi_item_t *switch_item;
+    l_ezlopi_item_t *dimmer_item;
+    l_ezlopi_item_t *dimmer_up_item;
+    l_ezlopi_item_t *dimmer_down_item;
+    l_ezlopi_item_t *dimmer_stop_item;
+    l_ezlopi_item_t *rgb_color_item;
     uint8_t previous_brightness;
     bool sk6812_led_strip_initialized;
 } s_dimmer_args_t;
 
-static ezlopi_error_t __prepare(void* arg);
-static ezlopi_error_t __init(l_ezlopi_item_t* item);
-static ezlopi_error_t __set_cjson_value(l_ezlopi_item_t* item, void* arg);
-static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t* item, void* arg);
+static ezlopi_error_t __prepare(void *arg);
+static ezlopi_error_t __init(l_ezlopi_item_t *item);
+static ezlopi_error_t __set_cjson_value(l_ezlopi_item_t *item, void *arg);
+static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg);
 
-ezlopi_error_t device_0009_other_RMT_SK6812(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
+ezlopi_error_t device_0009_other_RMT_SK6812(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
 
@@ -77,18 +77,18 @@ ezlopi_error_t device_0009_other_RMT_SK6812(e_ezlopi_actions_t action, l_ezlopi_
     return ret;
 }
 
-static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t* item, void* arg)
+static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 {
     ezlopi_error_t ret = EZPI_FAILED;
     if (item && arg)
     {
-        led_strip_t* sk6812_strip = (led_strip_t*)item->user_arg;
-        cJSON* cj_properties = (cJSON*)arg;
+        led_strip_t *sk6812_strip = (led_strip_t *)item->user_arg;
+        cJSON *cj_properties = (cJSON *)arg;
         if ((NULL != cj_properties) && (NULL != sk6812_strip))
         {
             if (ezlopi_item_name_rgbcolor == item->cloud_properties.item_name)
             {
-                cJSON* color_json = cJSON_AddObjectToObject(__FUNCTION__, cj_properties, ezlopi_value_str);
+                cJSON *color_json = cJSON_AddObjectToObject(__FUNCTION__, cj_properties, ezlopi_value_str);
                 if (color_json)
                 {
                     int green = sk6812_strip->buf[0];
@@ -121,19 +121,19 @@ static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t* item, void* arg)
     return ret;
 }
 
-static ezlopi_error_t __set_cjson_value(l_ezlopi_item_t* item, void* arg)
+static ezlopi_error_t __set_cjson_value(l_ezlopi_item_t *item, void *arg)
 {
     ezlopi_error_t ret = EZPI_FAILED;
 
     if (item && arg)
     {
-        cJSON* cjson_params = (cJSON*)arg;
-        s_dimmer_args_t* dimmer_args = (s_dimmer_args_t*)item->user_arg;
+        cJSON *cjson_params = (cJSON *)arg;
+        s_dimmer_args_t *dimmer_args = (s_dimmer_args_t *)item->user_arg;
         if ((dimmer_args) && (cjson_params))
         {
             if (ezlopi_item_name_rgbcolor == item->cloud_properties.item_name)
             {
-                cJSON* cjson_params_color_values = cJSON_GetObjectItem(__FUNCTION__, cjson_params, ezlopi_value_str);
+                cJSON *cjson_params_color_values = cJSON_GetObjectItem(__FUNCTION__, cjson_params, ezlopi_value_str);
 
                 rgb_t color = {
                     .red = 0,
@@ -184,14 +184,14 @@ static ezlopi_error_t __set_cjson_value(l_ezlopi_item_t* item, void* arg)
     return ret;
 }
 
-static ezlopi_error_t __init(l_ezlopi_item_t* item)
+static ezlopi_error_t __init(l_ezlopi_item_t *item)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
     if (item)
     {
         if (GPIO_IS_VALID_GPIO(item->interface.pwm.gpio_num))
         {
-            s_dimmer_args_t* dimmer_args = (s_dimmer_args_t*)item->user_arg;
+            s_dimmer_args_t *dimmer_args = (s_dimmer_args_t *)item->user_arg;
             if (dimmer_args)
             {
                 if (0 == dimmer_args->sk6812_led_strip_initialized)
@@ -243,7 +243,7 @@ static ezlopi_error_t __init(l_ezlopi_item_t* item)
     return ret;
 }
 
-static void __prepare_device_properties(l_ezlopi_device_t* device, cJSON* cj_device)
+static void __prepare_device_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     device->cloud_properties.category = category_dimmable_light;
     device->cloud_properties.subcategory = subcategory_dimmable_colored;
@@ -252,7 +252,7 @@ static void __prepare_device_properties(l_ezlopi_device_t* device, cJSON* cj_dev
     device->cloud_properties.device_type_id = NULL;
 }
 
-static void __prepare_SK6812_RGB_color_item(l_ezlopi_item_t* item, cJSON* cj_device)
+static void __prepare_SK6812_RGB_color_item(l_ezlopi_item_t *item, cJSON *cj_device)
 {
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = true;
@@ -270,7 +270,7 @@ static void __prepare_SK6812_RGB_color_item(l_ezlopi_item_t* item, cJSON* cj_dev
     item->interface.pwm.pwm_resln = 12;
 }
 
-static void __prepare_SK6812_RGB_dimmer_item(l_ezlopi_item_t* item, cJSON* cj_device)
+static void __prepare_SK6812_RGB_dimmer_item(l_ezlopi_item_t *item, cJSON *cj_device)
 {
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = true;
@@ -288,7 +288,7 @@ static void __prepare_SK6812_RGB_dimmer_item(l_ezlopi_item_t* item, cJSON* cj_de
     item->interface.pwm.pwm_resln = 12;
 }
 
-static void __prepare_SK6812_RGB_dimmer_up_item(l_ezlopi_item_t* item, cJSON* cj_device)
+static void __prepare_SK6812_RGB_dimmer_up_item(l_ezlopi_item_t *item, cJSON *cj_device)
 {
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type);
     item->cloud_properties.has_getter = true;
@@ -305,7 +305,7 @@ static void __prepare_SK6812_RGB_dimmer_up_item(l_ezlopi_item_t* item, cJSON* cj
     item->interface.pwm.pwm_resln = 12;
 }
 
-static void __prepare_SK6812_RGB_dimmer_down_item(l_ezlopi_item_t* item, cJSON* cj_device)
+static void __prepare_SK6812_RGB_dimmer_down_item(l_ezlopi_item_t *item, cJSON *cj_device)
 {
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type);
     item->cloud_properties.has_getter = true;
@@ -322,7 +322,7 @@ static void __prepare_SK6812_RGB_dimmer_down_item(l_ezlopi_item_t* item, cJSON* 
     item->interface.pwm.pwm_resln = 12;
 }
 
-static void __prepare_SK6812_RGB_dimmer_stop_item(l_ezlopi_item_t* item, cJSON* cj_device)
+static void __prepare_SK6812_RGB_dimmer_stop_item(l_ezlopi_item_t *item, cJSON *cj_device)
 {
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type);
     item->cloud_properties.has_getter = true;
@@ -339,7 +339,7 @@ static void __prepare_SK6812_RGB_dimmer_stop_item(l_ezlopi_item_t* item, cJSON* 
     item->interface.pwm.pwm_resln = 12;
 }
 
-static void __prepare_SK6812_LED_onoff_switch_item(l_ezlopi_item_t* item, cJSON* cj_device)
+static void __prepare_SK6812_LED_onoff_switch_item(l_ezlopi_item_t *item, cJSON *cj_device)
 {
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = true;
@@ -359,19 +359,19 @@ static void __prepare_SK6812_LED_onoff_switch_item(l_ezlopi_item_t* item, cJSON*
     item->interface.gpio.gpio_in.enable = false;
 }
 
-static ezlopi_error_t __prepare(void* arg)
+static ezlopi_error_t __prepare(void *arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
 
-    s_ezlopi_prep_arg_t* prep_arg = (s_ezlopi_prep_arg_t*)arg;
+    s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
     if (prep_arg && prep_arg->cjson_device)
     {
-        l_ezlopi_device_t* device = ezlopi_device_add_device(prep_arg->cjson_device, NULL);
+        l_ezlopi_device_t *device = ezlopi_device_add_device(prep_arg->cjson_device, NULL, 0);
         if (device)
         {
             __prepare_device_properties(device, prep_arg->cjson_device);
 
-            s_dimmer_args_t* dimmer_args = ezlopi_malloc(__FUNCTION__, sizeof(s_dimmer_args_t));
+            s_dimmer_args_t *dimmer_args = ezlopi_malloc(__FUNCTION__, sizeof(s_dimmer_args_t));
             if (dimmer_args)
             {
                 memset(dimmer_args, 0, sizeof(s_dimmer_args_t));

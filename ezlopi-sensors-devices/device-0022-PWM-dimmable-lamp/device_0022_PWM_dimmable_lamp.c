@@ -29,13 +29,13 @@ typedef struct s_dimmable_bulb_properties
 
 } s_dimmable_bulb_properties_t;
 
-static ezlopi_error_t __prepare(void* arg);
-static ezlopi_error_t __init(l_ezlopi_item_t* item);
-static ezlopi_error_t __list_cjson_value(l_ezlopi_item_t* item, void* arg);
-static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t* item, void* arg);
-static ezlopi_error_t __set_cjson_value(l_ezlopi_item_t* item, void* arg);
+static ezlopi_error_t __prepare(void *arg);
+static ezlopi_error_t __init(l_ezlopi_item_t *item);
+static ezlopi_error_t __list_cjson_value(l_ezlopi_item_t *item, void *arg);
+static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg);
+static ezlopi_error_t __set_cjson_value(l_ezlopi_item_t *item, void *arg);
 
-ezlopi_error_t device_0022_PWM_dimmable_lamp(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
+ezlopi_error_t device_0022_PWM_dimmable_lamp(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
 
@@ -73,7 +73,7 @@ ezlopi_error_t device_0022_PWM_dimmable_lamp(e_ezlopi_actions_t action, l_ezlopi
     return ret;
 }
 
-static ezlopi_error_t __set_cjson_value(l_ezlopi_item_t* item, void* arg)
+static ezlopi_error_t __set_cjson_value(l_ezlopi_item_t *item, void *arg)
 {
     ezlopi_error_t ret = EZPI_FAILED;
 
@@ -112,7 +112,7 @@ static ezlopi_error_t __set_cjson_value(l_ezlopi_item_t* item, void* arg)
     return ret;
 }
 
-static ezlopi_error_t __list_cjson_value(l_ezlopi_item_t* item, void* arg)
+static ezlopi_error_t __list_cjson_value(l_ezlopi_item_t *item, void *arg)
 {
     ezlopi_error_t ret = EZPI_FAILED;
 
@@ -151,7 +151,7 @@ static ezlopi_error_t __list_cjson_value(l_ezlopi_item_t* item, void* arg)
 }
 
 
-static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t* item, void* arg)
+static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 {
     ezlopi_error_t ret = EZPI_FAILED;
 
@@ -187,7 +187,7 @@ static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t* item, void* arg)
 }
 
 
-static ezlopi_error_t __init(l_ezlopi_item_t* item)
+static ezlopi_error_t __init(l_ezlopi_item_t *item)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
     if (item)
@@ -200,7 +200,7 @@ static ezlopi_error_t __init(l_ezlopi_item_t* item)
                 if (0 == dimmable_bulb_arg->dimmable_bulb_initialized)
                 {
                     s_ezlopi_channel_speed_t *ezlopi_dimmable_channel_speed = ezlopi_pwm_init(item->interface.pwm.gpio_num, item->interface.pwm.pwm_resln,
-                                                                                              item->interface.pwm.freq_hz, item->interface.pwm.duty_cycle);
+                        item->interface.pwm.freq_hz, item->interface.pwm.duty_cycle);
                     if (ezlopi_dimmable_channel_speed)
                     {
                         item->interface.pwm.channel = ezlopi_dimmable_channel_speed->channel;
@@ -329,14 +329,14 @@ static void __prepare_dimmer_switch_item_properties(l_ezlopi_item_t *item, cJSON
     item->interface.gpio.gpio_out.value = true;
 }
 
-static ezlopi_error_t __prepare(void* arg)
+static ezlopi_error_t __prepare(void *arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
 
     s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
     if (prep_arg && prep_arg->cjson_device)
     {
-        l_ezlopi_device_t *device = ezlopi_device_add_device(prep_arg->cjson_device, NULL);
+        l_ezlopi_device_t *device = ezlopi_device_add_device(prep_arg->cjson_device, NULL, 0);
         if (device)
         {
             ret = 1;

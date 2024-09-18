@@ -16,12 +16,12 @@
 #include "ezlopi_service_gpioisr.h"
 
 #include "device_0004_digitalIn_generic.h"
-static ezlopi_error_t __prepare(void* arg);
-static ezlopi_error_t __init(l_ezlopi_item_t* item);
-static void __interrupt_upcall(void* arg);
-static ezlopi_error_t __get_value_cjson(l_ezlopi_item_t* item, void* arg);
+static ezlopi_error_t __prepare(void *arg);
+static ezlopi_error_t __init(l_ezlopi_item_t *item);
+static void __interrupt_upcall(void *arg);
+static ezlopi_error_t __get_value_cjson(l_ezlopi_item_t *item, void *arg);
 
-ezlopi_error_t device_0004_digitalIn_generic(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
+ezlopi_error_t device_0004_digitalIn_generic(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
 
@@ -58,7 +58,7 @@ ezlopi_error_t device_0004_digitalIn_generic(e_ezlopi_actions_t action, l_ezlopi
     return ret;
 }
 
-static void __setup_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cjson_device)
+static void __setup_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cjson_device)
 {
     device->cloud_properties.category = category_switch;
     device->cloud_properties.subcategory = subcategory_in_wall;
@@ -67,7 +67,7 @@ static void __setup_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj
     device->cloud_properties.device_type_id = NULL;
 }
 
-static void __setup_item_properties(l_ezlopi_item_t* item, cJSON* cjson_device)
+static void __setup_item_properties(l_ezlopi_item_t *item, cJSON *cjson_device)
 {
     int tmp_var = 0;
     item->cloud_properties.has_getter = true;
@@ -87,21 +87,21 @@ static void __setup_item_properties(l_ezlopi_item_t* item, cJSON* cjson_device)
     item->interface.gpio.gpio_in.interrupt = GPIO_INTR_DISABLE;
 }
 
-static ezlopi_error_t __prepare(void* arg)
+static ezlopi_error_t __prepare(void *arg)
 {
     int ret = EZPI_SUCCESS;
     if (arg)
     {
-        s_ezlopi_prep_arg_t* prep_arg = (s_ezlopi_prep_arg_t*)arg;
-        cJSON* cjson_device = prep_arg->cjson_device;
+        s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
+        cJSON *cjson_device = prep_arg->cjson_device;
         if (cjson_device)
         {
-            l_ezlopi_device_t* device = ezlopi_device_add_device(cjson_device, NULL);
+            l_ezlopi_device_t *device = ezlopi_device_add_device(cjson_device, NULL, 0);
             if (device)
             {
                 ret = 1;
                 __setup_device_cloud_properties(device, cjson_device);
-                l_ezlopi_item_t* item = ezlopi_device_add_item_to_device(device, device_0004_digitalIn_generic);
+                l_ezlopi_item_t *item = ezlopi_device_add_item_to_device(device, device_0004_digitalIn_generic);
                 if (item)
                 {
                     __setup_item_properties(item, cjson_device);
@@ -118,7 +118,7 @@ static ezlopi_error_t __prepare(void* arg)
     return ret;
 }
 
-static ezlopi_error_t __init(l_ezlopi_item_t* item)
+static ezlopi_error_t __init(l_ezlopi_item_t *item)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
     if (item)
@@ -161,12 +161,12 @@ static ezlopi_error_t __init(l_ezlopi_item_t* item)
     return ret;
 }
 
-static ezlopi_error_t __get_value_cjson(l_ezlopi_item_t* item, void* arg)
+static ezlopi_error_t __get_value_cjson(l_ezlopi_item_t *item, void *arg)
 {
     ezlopi_error_t ret = EZPI_FAILED;
     if (item && arg)
     {
-        cJSON* cj_propertise = (cJSON*)arg;
+        cJSON *cj_propertise = (cJSON *)arg;
         if (cj_propertise)
         {
             ezlopi_valueformatter_bool_to_cjson(cj_propertise, item->interface.gpio.gpio_out.value, NULL);
@@ -177,9 +177,9 @@ static ezlopi_error_t __get_value_cjson(l_ezlopi_item_t* item, void* arg)
     return ret;
 }
 
-static void __interrupt_upcall(void* arg)
+static void __interrupt_upcall(void *arg)
 {
-    l_ezlopi_item_t* item = (l_ezlopi_item_t*)arg;
+    l_ezlopi_item_t *item = (l_ezlopi_item_t *)arg;
     if (item)
     {
         item->interface.gpio.gpio_in.value = !item->interface.gpio.gpio_in.value;

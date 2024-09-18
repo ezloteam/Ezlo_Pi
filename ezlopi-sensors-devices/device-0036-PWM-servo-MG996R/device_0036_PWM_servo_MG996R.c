@@ -15,15 +15,15 @@
 #include "device_0036_PWM_servo_MG996R.h"
 #include "EZLOPI_USER_CONFIG.h"
 
-static ezlopi_error_t __prepare(void* arg);
-static ezlopi_error_t __init(l_ezlopi_item_t* item);
-static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t* item, void* arg);
-static ezlopi_error_t __set_cjson_value(l_ezlopi_item_t* item, void* arg);
+static ezlopi_error_t __prepare(void *arg);
+static ezlopi_error_t __init(l_ezlopi_item_t *item);
+static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg);
+static ezlopi_error_t __set_cjson_value(l_ezlopi_item_t *item, void *arg);
 
-static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device);
-static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device);
+static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
+static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device);
 
-ezlopi_error_t device_0036_PWM_servo_MG996R(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
+ezlopi_error_t device_0036_PWM_servo_MG996R(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
 
@@ -56,7 +56,7 @@ ezlopi_error_t device_0036_PWM_servo_MG996R(e_ezlopi_actions_t action, l_ezlopi_
     return ret;
 }
 
-static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
+static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     device->cloud_properties.category = category_dimmable_light;
     device->cloud_properties.subcategory = subcategory_dimmable_bulb;
@@ -65,7 +65,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* 
     device->cloud_properties.device_type_id = NULL;
 }
 
-static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device)
+static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device)
 {
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type);
     item->cloud_properties.item_name = ezlopi_item_name_dimmer;
@@ -86,20 +86,20 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_dev
 #endif
 }
 
-static ezlopi_error_t __prepare(void* arg)
+static ezlopi_error_t __prepare(void *arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
 
-    s_ezlopi_prep_arg_t* dev_prep_arg = (s_ezlopi_prep_arg_t*)arg;
+    s_ezlopi_prep_arg_t *dev_prep_arg = (s_ezlopi_prep_arg_t *)arg;
     if (dev_prep_arg->cjson_device)
     {
-        cJSON* cj_device = dev_prep_arg->cjson_device;
+        cJSON *cj_device = dev_prep_arg->cjson_device;
 
-        l_ezlopi_device_t* servo_device = ezlopi_device_add_device(dev_prep_arg->cjson_device, NULL);
+        l_ezlopi_device_t *servo_device = ezlopi_device_add_device(dev_prep_arg->cjson_device, NULL, 0);
         if (servo_device)
         {
             __prepare_device_cloud_properties(servo_device, cj_device);
-            l_ezlopi_item_t* servo_item = ezlopi_device_add_item_to_device(servo_device, device_0036_PWM_servo_MG996R);
+            l_ezlopi_item_t *servo_item = ezlopi_device_add_item_to_device(servo_device, device_0036_PWM_servo_MG996R);
             if (servo_item)
             {
                 __prepare_item_cloud_properties(servo_item, cj_device);
@@ -118,14 +118,14 @@ static ezlopi_error_t __prepare(void* arg)
     return ret;
 }
 
-static ezlopi_error_t __init(l_ezlopi_item_t* item)
+static ezlopi_error_t __init(l_ezlopi_item_t *item)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
     if (item)
     {
         if (GPIO_IS_VALID_GPIO(item->interface.pwm.gpio_num))
         {
-            static s_ezlopi_channel_speed_t* servo_item = NULL;
+            static s_ezlopi_channel_speed_t *servo_item = NULL;
             servo_item = ezlopi_pwm_init(item->interface.pwm.gpio_num, item->interface.pwm.pwm_resln,
                 item->interface.pwm.freq_hz, item->interface.pwm.duty_cycle);
             if (servo_item)
@@ -146,12 +146,12 @@ static ezlopi_error_t __init(l_ezlopi_item_t* item)
     return ret;
 }
 
-static ezlopi_error_t __set_cjson_value(l_ezlopi_item_t* item, void* arg)
+static ezlopi_error_t __set_cjson_value(l_ezlopi_item_t *item, void *arg)
 {
     ezlopi_error_t ret = EZPI_FAILED;
     if (item && arg)
     {
-        cJSON* cj_result = (cJSON*)arg;
+        cJSON *cj_result = (cJSON *)arg;
         if (cj_result && item)
         {
             int value = 0;
@@ -173,12 +173,12 @@ static ezlopi_error_t __set_cjson_value(l_ezlopi_item_t* item, void* arg)
     return ret;
 }
 
-static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t* item, void* arg)
+static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 {
     ezlopi_error_t ret = EZPI_FAILED;
     if (item && arg)
     {
-        cJSON* cj_result = (cJSON*)arg;
+        cJSON *cj_result = (cJSON *)arg;
         if (cj_result)
         {
             uint32_t duty = ezlopi_pwm_get_duty(item->interface.pwm.channel, item->interface.pwm.speed_mode);
