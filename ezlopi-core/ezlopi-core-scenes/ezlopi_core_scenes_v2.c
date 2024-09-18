@@ -897,6 +897,12 @@ static void __new_method_populate(s_method_v2_t *p_method, cJSON *cj_method)
 {
     CJSON_GET_VALUE_STRING_BY_COPY(cj_method, ezlopi_name_str, p_method->name);
     p_method->type = ezlopi_scenes_method_get_type_enum(p_method->name);
+
+    // cJSON *method_name = cJSON_GetObjectItem(__FUNCTION__, cj_method, ezlopi_name_str);
+    // if (method_name && method_name->valuestring)
+    // {
+    //     TRACE_S("p_method->name : [%s] -> ll_method_name:[%s] -> type:[%d]", method_name->valuestring, p_method->name, p_method->type);
+    // }
 }
 
 static void _____new_action_delay(s_action_delay_v2_t *action_delay, cJSON *cj_delay)

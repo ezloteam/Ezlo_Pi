@@ -30,8 +30,10 @@ e_scene_method_type_t ezlopi_scenes_method_get_type_enum(char* method_name)
     {
         for (e_scene_method_type_t i = EZLOPI_SCENE_WHEN_METHOD_IS_ITEM_STATE; i < EZLOPI_SCENE_METHOD_TYPE_MAX; i++)
         {
-            if (0 == strncmp(method_name, ezlopi_scenes_methods_name[i], strlen(ezlopi_scenes_methods_name[i])))
+            size_t max_len = (strlen(method_name) > strlen(ezlopi_scenes_methods_name[i])) ? strlen(method_name) : strlen(ezlopi_scenes_methods_name[i]);
+            if (0 == strncmp(method_name, ezlopi_scenes_methods_name[i], max_len))
             {
+            // TRACE_D("max_len [%d]" , max_len);
                 method_type = i;
             }
         }
