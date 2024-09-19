@@ -101,7 +101,7 @@ static ezlopi_error_t __0070_prepare(void *arg)
         if (NULL != user_data)
         {
             memset(user_data, 0, sizeof(s_dummy_potentiometer_t));
-            l_ezlopi_device_t *dummy_potentiometer_device = ezlopi_device_add_device(cj_device, NULL, 0);
+            l_ezlopi_device_t *dummy_potentiometer_device = ezlopi_device_add_device(cj_device, NULL);
             if (dummy_potentiometer_device)
             {
                 __prepare_device_cloud_properties(dummy_potentiometer_device, cj_device);

@@ -225,7 +225,7 @@ static ezlopi_error_t __prepare(void *arg, void *user_arg)
     {
       memset(ens160_sensor, 0, sizeof(ens160_t));
       /* Prepare AQI device. */
-      l_ezlopi_device_t *parent_ens160_aqi_device = ezlopi_device_add_device(prep_arg->cjson_device, "aqi", 0);
+      l_ezlopi_device_t *parent_ens160_aqi_device = ezlopi_device_add_device(prep_arg->cjson_device, "aqi");
       if (parent_ens160_aqi_device)
       {
         ret = EZPI_SUCCESS;
@@ -244,7 +244,7 @@ static ezlopi_error_t __prepare(void *arg, void *user_arg)
         }
 
         /* Prepare VOC device. */
-        l_ezlopi_device_t *child_ens160_voc_device = ezlopi_device_add_device(prep_arg->cjson_device, "voc", parent_ens160_aqi_device->cloud_properties.device_id);
+        l_ezlopi_device_t *child_ens160_voc_device = ezlopi_device_add_device(prep_arg->cjson_device, "voc");
         if (child_ens160_voc_device)
         {
           TRACE_I("Child_ens160_aqi_device-[0x%x] ", child_ens160_voc_device->cloud_properties.device_id);
@@ -266,7 +266,7 @@ static ezlopi_error_t __prepare(void *arg, void *user_arg)
         }
 
         /* Prepare CO2 device. */
-        l_ezlopi_device_t *child_ens160_co2_device = ezlopi_device_add_device(prep_arg->cjson_device, "co2", parent_ens160_aqi_device->cloud_properties.device_id);
+        l_ezlopi_device_t *child_ens160_co2_device = ezlopi_device_add_device(prep_arg->cjson_device, "co2");
         if (child_ens160_co2_device)
         {
           TRACE_I("Child_ens160_co2_device-[0x%x] ", child_ens160_co2_device->cloud_properties.device_id);
@@ -288,8 +288,8 @@ static ezlopi_error_t __prepare(void *arg, void *user_arg)
         }
 
         if ((NULL == aqi_item) &&
-          (NULL == child_ens160_voc_device) &&
-          (NULL == child_ens160_co2_device))
+            (NULL == child_ens160_voc_device) &&
+            (NULL == child_ens160_co2_device))
         {
           ezlopi_device_free_device(parent_ens160_aqi_device);
           ezlopi_free(__FUNCTION__, ens160_sensor);

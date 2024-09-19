@@ -153,7 +153,7 @@ static ezlopi_error_t __prepare(void *arg)
         if (user_data)
         {
             memset(user_data, 0, sizeof(s_gy271_data_t));
-            l_ezlopi_device_t *gy271_device_parent_x_device = ezlopi_device_add_device(cj_device, "Mag_strength_X", 0);
+            l_ezlopi_device_t *gy271_device_parent_x_device = ezlopi_device_add_device(cj_device, "Mag_strength_X");
             if (gy271_device_parent_x_device)
             {
                 ret = 1;
@@ -169,7 +169,7 @@ static ezlopi_error_t __prepare(void *arg)
                     __prepare_item_interface_properties(gyro_x_item, cj_device);
                 }
 
-                l_ezlopi_device_t *gy271_device_child_y_device = ezlopi_device_add_device(cj_device, "Mag_strength_Y", gy271_device_parent_x_device->cloud_properties.device_id);
+                l_ezlopi_device_t *gy271_device_child_y_device = ezlopi_device_add_device(cj_device, "Mag_strength_Y");
                 if (gy271_device_child_y_device)
                 {
                     TRACE_I("Child_gy271-y-[0x%x] ", gy271_device_child_y_device->cloud_properties.device_id);
@@ -191,7 +191,7 @@ static ezlopi_error_t __prepare(void *arg)
                     }
                 }
 
-                l_ezlopi_device_t *gy271_device_child_z_device = ezlopi_device_add_device(cj_device, "Mag_strength_Z", gy271_device_parent_x_device->cloud_properties.device_id);
+                l_ezlopi_device_t *gy271_device_child_z_device = ezlopi_device_add_device(cj_device, "Mag_strength_Z");
                 if (gy271_device_child_z_device)
                 {
                     TRACE_I("Child_gy271-z-[0x%x] ", gy271_device_child_z_device->cloud_properties.device_id);
@@ -212,7 +212,7 @@ static ezlopi_error_t __prepare(void *arg)
                         ezlopi_device_free_device(gy271_device_child_z_device);
                     }
                 }
-                l_ezlopi_device_t *gy271_device_child_azi_device = ezlopi_device_add_device(cj_device, "Azimuth_Angle", gy271_device_parent_x_device->cloud_properties.device_id);
+                l_ezlopi_device_t *gy271_device_child_azi_device = ezlopi_device_add_device(cj_device, "Azimuth_Angle");
                 if (gy271_device_child_azi_device)
                 {
                     TRACE_I("Child_gy271-azi-[0x%x] ", gy271_device_child_azi_device->cloud_properties.device_id);
@@ -233,7 +233,7 @@ static ezlopi_error_t __prepare(void *arg)
                         ezlopi_device_free_device(gy271_device_child_azi_device);
                     }
                 }
-                l_ezlopi_device_t *gy271_device_child_temp_device = ezlopi_device_add_device(cj_device, "Temp", gy271_device_parent_x_device->cloud_properties.device_id);
+                l_ezlopi_device_t *gy271_device_child_temp_device = ezlopi_device_add_device(cj_device, "Temp");
                 if (gy271_device_child_temp_device)
                 {
                     TRACE_I("Child_gy271-temp-[0x%x] ", gy271_device_child_temp_device->cloud_properties.device_id);

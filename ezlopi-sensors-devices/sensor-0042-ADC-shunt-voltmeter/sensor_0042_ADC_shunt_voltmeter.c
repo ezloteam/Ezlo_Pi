@@ -101,7 +101,7 @@ static ezlopi_error_t __0042_prepare(void *arg)
         {
             memset(user_data, 0, sizeof(s_voltmeter_t));
 
-            l_ezlopi_device_t *voltmeter_device = ezlopi_device_add_device(device_prep_arg->cjson_device, NULL, 0);
+            l_ezlopi_device_t *voltmeter_device = ezlopi_device_add_device(device_prep_arg->cjson_device, NULL);
             if (voltmeter_device)
             {
                 __prepare_device_cloud_properties(voltmeter_device, device_prep_arg->cjson_device);

@@ -94,7 +94,7 @@ static ezlopi_error_t __0049_prepare(void *arg)
     if (device_prep_arg && (NULL != device_prep_arg->cjson_device))
     {
         //---------------------------  DIGI - DEVICE 1 --------------------------------------------
-        l_ezlopi_device_t *MQ2_device_parent_digi = ezlopi_device_add_device(device_prep_arg->cjson_device, "adc", 0);
+        l_ezlopi_device_t *MQ2_device_parent_digi = ezlopi_device_add_device(device_prep_arg->cjson_device, "adc");
         if (MQ2_device_parent_digi)
         {
             TRACE_I("Parent_MQ2_device_digi-[0x%x] ", MQ2_device_parent_digi->cloud_properties.device_id);
@@ -111,7 +111,7 @@ static ezlopi_error_t __0049_prepare(void *arg)
             if (NULL != MQ2_value)
             {
                 memset(MQ2_value, 0, sizeof(s_mq2_value_t));
-                l_ezlopi_device_t *MQ2_device_child_adc = ezlopi_device_add_device(device_prep_arg->cjson_device, "digi", MQ2_device_parent_digi->cloud_properties.device_id);
+                l_ezlopi_device_t *MQ2_device_child_adc = ezlopi_device_add_device(device_prep_arg->cjson_device, "digi");
                 if (MQ2_device_child_adc)
                 {
                     TRACE_I("Child_MQ2_device_adc-[0x%x] ", MQ2_device_child_adc->cloud_properties.device_id);

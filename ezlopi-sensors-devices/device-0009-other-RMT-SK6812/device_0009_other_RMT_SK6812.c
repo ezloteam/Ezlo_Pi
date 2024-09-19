@@ -366,7 +366,7 @@ static ezlopi_error_t __prepare(void *arg)
     s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
     if (prep_arg && prep_arg->cjson_device)
     {
-        l_ezlopi_device_t *device = ezlopi_device_add_device(prep_arg->cjson_device, NULL, 0);
+        l_ezlopi_device_t *device = ezlopi_device_add_device(prep_arg->cjson_device, NULL);
         if (device)
         {
             __prepare_device_properties(device, prep_arg->cjson_device);

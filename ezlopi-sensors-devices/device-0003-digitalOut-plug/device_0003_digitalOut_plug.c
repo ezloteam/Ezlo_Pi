@@ -121,7 +121,7 @@ static ezlopi_error_t __prepare(void *arg)
         cJSON *cjson_device = prep_arg->cjson_device;
         if (cjson_device)
         {
-            l_ezlopi_device_t *device = ezlopi_device_add_device(cjson_device, NULL, 0);
+            l_ezlopi_device_t *device = ezlopi_device_add_device(cjson_device, NULL);
             if (device)
             {
                 __setup_device_cloud_properties(device, cjson_device);

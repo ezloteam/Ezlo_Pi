@@ -118,7 +118,7 @@ static ezlopi_error_t __prepare(void *arg)
         if (NULL != user_data)
         {
             memset(user_data, 0, sizeof(s_mpu6050_data_t));
-            l_ezlopi_device_t *mpu6050_parent_acc_x_device = ezlopi_device_add_device(cj_device, "Acc_x", 0);
+            l_ezlopi_device_t *mpu6050_parent_acc_x_device = ezlopi_device_add_device(cj_device, "Acc_x");
             if (mpu6050_parent_acc_x_device)
             {
                 TRACE_I("Parent_mpu6050_acc-x-[0x%x] ", mpu6050_parent_acc_x_device->cloud_properties.device_id);
@@ -133,7 +133,7 @@ static ezlopi_error_t __prepare(void *arg)
                     __prepare_item_interface_properties(mpu6050_acc_x_item, cj_device);
                 }
 
-                l_ezlopi_device_t *mpu6050_child_acc_y_device = ezlopi_device_add_device(cj_device, "Acc_y", mpu6050_parent_acc_x_device->cloud_properties.device_id);
+                l_ezlopi_device_t *mpu6050_child_acc_y_device = ezlopi_device_add_device(cj_device, "Acc_y");
                 if (mpu6050_child_acc_y_device)
                 {
                     TRACE_I("child_mpu6050_acc-y-[0x%x] ", mpu6050_child_acc_y_device->cloud_properties.device_id);
@@ -155,7 +155,7 @@ static ezlopi_error_t __prepare(void *arg)
                     }
                 }
 
-                l_ezlopi_device_t *mpu6050_child_acc_z_device = ezlopi_device_add_device(cj_device, "Acc_z", mpu6050_parent_acc_x_device->cloud_properties.device_id);
+                l_ezlopi_device_t *mpu6050_child_acc_z_device = ezlopi_device_add_device(cj_device, "Acc_z");
                 if (mpu6050_child_acc_z_device)
                 {
                     TRACE_I("child_mpu6050_acc-z-[0x%x] ", mpu6050_child_acc_z_device->cloud_properties.device_id);
@@ -177,7 +177,7 @@ static ezlopi_error_t __prepare(void *arg)
                     }
                 }
 
-                l_ezlopi_device_t *mpu6050_child_temp_device = ezlopi_device_add_device(cj_device, "Temp", mpu6050_parent_acc_x_device->cloud_properties.device_id);
+                l_ezlopi_device_t *mpu6050_child_temp_device = ezlopi_device_add_device(cj_device, "Temp");
                 if (mpu6050_child_temp_device)
                 {
                     TRACE_I("child_mpu6050_acc-z-[0x%x] ", mpu6050_child_temp_device->cloud_properties.device_id);
@@ -199,7 +199,7 @@ static ezlopi_error_t __prepare(void *arg)
                     }
                 }
 
-                l_ezlopi_device_t *mpu6050_child_gyro_x_device = ezlopi_device_add_device(cj_device, "Gyro_x", mpu6050_parent_acc_x_device->cloud_properties.device_id);
+                l_ezlopi_device_t *mpu6050_child_gyro_x_device = ezlopi_device_add_device(cj_device, "Gyro_x");
                 if (mpu6050_child_gyro_x_device)
                 {
                     TRACE_I("child_mpu6050_gyro-x-[0x%x] ", mpu6050_child_gyro_x_device->cloud_properties.device_id);
@@ -221,7 +221,7 @@ static ezlopi_error_t __prepare(void *arg)
                     }
                 }
 
-                l_ezlopi_device_t *mpu6050_child_gyro_y_device = ezlopi_device_add_device(cj_device, "Gyro_y", mpu6050_parent_acc_x_device->cloud_properties.device_id);
+                l_ezlopi_device_t *mpu6050_child_gyro_y_device = ezlopi_device_add_device(cj_device, "Gyro_y");
                 if (mpu6050_child_gyro_y_device)
                 {
                     TRACE_I("child_mpu6050_gyro-y-[0x%x] ", mpu6050_child_gyro_y_device->cloud_properties.device_id);
@@ -243,7 +243,7 @@ static ezlopi_error_t __prepare(void *arg)
                     }
                 }
 
-                l_ezlopi_device_t *mpu6050_child_gyro_z_device = ezlopi_device_add_device(cj_device, "Gyro_z", mpu6050_parent_acc_x_device->cloud_properties.device_id);
+                l_ezlopi_device_t *mpu6050_child_gyro_z_device = ezlopi_device_add_device(cj_device, "Gyro_z");
                 if (mpu6050_child_gyro_z_device)
                 {
                     TRACE_I("child_mpu6050_gyro-z-[0x%x] ", mpu6050_child_gyro_z_device->cloud_properties.device_id);

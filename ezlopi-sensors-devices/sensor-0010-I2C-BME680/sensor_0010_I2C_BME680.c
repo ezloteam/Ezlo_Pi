@@ -103,7 +103,7 @@ static ezlopi_error_t __prepare(void *arg)
         if (user_data)
         {
             memset(user_data, 0, sizeof(bme680_data_t));
-            l_ezlopi_device_t *parent_temp_humid_device = ezlopi_device_add_device(cj_device, "temp_humid", 0);
+            l_ezlopi_device_t *parent_temp_humid_device = ezlopi_device_add_device(cj_device, "temp_humid");
             if (parent_temp_humid_device)
             {
                 TRACE_I("Parent_temp_humid_device-[0x%x] ", parent_temp_humid_device->cloud_properties.device_id);
@@ -129,7 +129,7 @@ static ezlopi_error_t __prepare(void *arg)
                     __prepare_cloud_properties(humidity_item, cj_device, user_data);
                 }
 
-                l_ezlopi_device_t *child_pressure_device = ezlopi_device_add_device(cj_device, "pressure", parent_temp_humid_device->cloud_properties.device_id);
+                l_ezlopi_device_t *child_pressure_device = ezlopi_device_add_device(cj_device, "pressure");
                 if (child_pressure_device)
                 {
                     TRACE_I("Child_pressure_device-[0x%x] ", child_pressure_device->cloud_properties.device_id);
@@ -151,7 +151,7 @@ static ezlopi_error_t __prepare(void *arg)
                     }
                 }
 
-                l_ezlopi_device_t *child_aqi_device = ezlopi_device_add_device(cj_device, "aqi", parent_temp_humid_device->cloud_properties.device_id);
+                l_ezlopi_device_t *child_aqi_device = ezlopi_device_add_device(cj_device, "aqi");
                 if (child_aqi_device)
                 {
                     TRACE_I("Child_aqi_device-[0x%x] ", child_aqi_device->cloud_properties.device_id);
@@ -173,7 +173,7 @@ static ezlopi_error_t __prepare(void *arg)
                     }
                 }
 
-                l_ezlopi_device_t *child_altitude_device = ezlopi_device_add_device(cj_device, "altitude", parent_temp_humid_device->cloud_properties.device_id);
+                l_ezlopi_device_t *child_altitude_device = ezlopi_device_add_device(cj_device, "altitude");
                 if (child_altitude_device)
                 {
                     TRACE_I("Child_altitude_device-[0x%x] ", child_altitude_device->cloud_properties.device_id);
@@ -195,7 +195,7 @@ static ezlopi_error_t __prepare(void *arg)
                     }
                 }
 
-                l_ezlopi_device_t *child_co2_device = ezlopi_device_add_device(cj_device, "co2", parent_temp_humid_device->cloud_properties.device_id);
+                l_ezlopi_device_t *child_co2_device = ezlopi_device_add_device(cj_device, "co2");
                 if (child_co2_device)
                 {
                     TRACE_I("Child_co2_device-[0x%x] ", child_co2_device->cloud_properties.device_id);

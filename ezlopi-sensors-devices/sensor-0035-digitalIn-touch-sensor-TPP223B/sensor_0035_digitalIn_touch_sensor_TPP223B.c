@@ -110,7 +110,7 @@ static ezlopi_error_t __prepare(void *arg)
     s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
     if (prep_arg && prep_arg->cjson_device)
     {
-        l_ezlopi_device_t *touch_device = ezlopi_device_add_device(prep_arg->cjson_device, NULL, 0);
+        l_ezlopi_device_t *touch_device = ezlopi_device_add_device(prep_arg->cjson_device, NULL);
         if (touch_device)
         {
             __prepare_touch_sensor_device_cloud_properties(touch_device, prep_arg->cjson_device);

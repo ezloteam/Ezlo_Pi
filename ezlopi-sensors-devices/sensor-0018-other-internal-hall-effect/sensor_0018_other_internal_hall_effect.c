@@ -121,7 +121,7 @@ static ezlopi_error_t __prepare(void *arg)
         if (user_data)
         {
             memset(user_data, 0, sizeof(s_hall_data_t));
-            l_ezlopi_device_t *hall_device = ezlopi_device_add_device(cj_device, NULL, 0);
+            l_ezlopi_device_t *hall_device = ezlopi_device_add_device(cj_device, NULL);
             if (hall_device)
             {
                 __setup_device_cloud_properties(hall_device, cj_device);

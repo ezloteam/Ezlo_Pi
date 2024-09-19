@@ -165,7 +165,7 @@ static ezlopi_error_t __prepare(void *arg)
         if (TSL2561_lux_data)
         {
             memset(TSL2561_lux_data, 0, sizeof(TSL256_lum_t));
-            l_ezlopi_device_t *tsl256_device = ezlopi_device_add_device(prep_arg->cjson_device, NULL, 0);
+            l_ezlopi_device_t *tsl256_device = ezlopi_device_add_device(prep_arg->cjson_device, NULL);
             if (tsl256_device)
             {
                 __prepare_device_cloud_properties(tsl256_device, prep_arg->cjson_device);

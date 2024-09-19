@@ -322,7 +322,7 @@ static ezlopi_error_t __prepare(void *arg, void *user_arg)
         if (hilink_data)
         {
             memset(hilink_data, 0, sizeof(ld2410_outputs_t));
-            l_ezlopi_device_t *parent_hilink_device_motion = ezlopi_device_add_device(prep_arg->cjson_device, "motion", 0);
+            l_ezlopi_device_t *parent_hilink_device_motion = ezlopi_device_add_device(prep_arg->cjson_device, "motion");
             if (parent_hilink_device_motion)
             {
                 ret = EZPI_SUCCESS;
@@ -335,7 +335,7 @@ static ezlopi_error_t __prepare(void *arg, void *user_arg)
                     __prepare_hilink_motion_item_cloud_properties(motion_item, prep_arg->cjson_device, (void *)hilink_data);
                 }
 
-                l_ezlopi_device_t *child_hilink_device_direction = ezlopi_device_add_device(prep_arg->cjson_device, "direction", parent_hilink_device_motion->cloud_properties.device_id);
+                l_ezlopi_device_t *child_hilink_device_direction = ezlopi_device_add_device(prep_arg->cjson_device, "direction");
                 if (child_hilink_device_direction)
                 {
                     TRACE_I("child_hilink_device_direction-[0x%x] ", child_hilink_device_direction->cloud_properties.device_id);
@@ -353,7 +353,7 @@ static ezlopi_error_t __prepare(void *arg, void *user_arg)
                     }
                 }
 
-                l_ezlopi_device_t *child_hilink_device_distance = ezlopi_device_add_device(prep_arg->cjson_device, "distance", parent_hilink_device_motion->cloud_properties.device_id);
+                l_ezlopi_device_t *child_hilink_device_distance = ezlopi_device_add_device(prep_arg->cjson_device, "distance");
                 if (child_hilink_device_distance)
                 {
                     TRACE_I("child_hilink_device_distance-[0x%x] ", child_hilink_device_distance->cloud_properties.device_id);

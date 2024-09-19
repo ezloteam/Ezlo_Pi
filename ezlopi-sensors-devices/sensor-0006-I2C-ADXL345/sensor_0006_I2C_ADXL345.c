@@ -118,7 +118,7 @@ static ezlopi_error_t __prepare(void *arg)
         if (NULL != user_data)
         {
             memset(user_data, 0, sizeof(s_adxl345_data_t));
-            l_ezlopi_device_t *adxl345_parent_x_device = ezlopi_device_add_device(cj_device, "acc_x", 0);
+            l_ezlopi_device_t *adxl345_parent_x_device = ezlopi_device_add_device(cj_device, "acc_x");
             if (adxl345_parent_x_device)
             {
                 TRACE_I("Parent_adxl345_acc-x-[0x%x] ", adxl345_parent_x_device->cloud_properties.device_id);
@@ -131,7 +131,7 @@ static ezlopi_error_t __prepare(void *arg)
                     __prepare_item_interface_properties(x_item, cj_device);
                 }
 
-                l_ezlopi_device_t *adxl345_child_y_device = ezlopi_device_add_device(cj_device, "acc_y", adxl345_parent_x_device->cloud_properties.device_id);
+                l_ezlopi_device_t *adxl345_child_y_device = ezlopi_device_add_device(cj_device, "acc_y");
                 if (adxl345_child_y_device)
                 {
                     TRACE_I("child_mpu6050_acc-y-[0x%x] ", adxl345_child_y_device->cloud_properties.device_id);
@@ -151,7 +151,7 @@ static ezlopi_error_t __prepare(void *arg)
                     }
                 }
 
-                l_ezlopi_device_t *adxl345_child_z_device = ezlopi_device_add_device(cj_device, "acc_z", adxl345_parent_x_device->cloud_properties.device_id);
+                l_ezlopi_device_t *adxl345_child_z_device = ezlopi_device_add_device(cj_device, "acc_z");
                 if (adxl345_child_z_device)
                 {
                     TRACE_I("child_mpu6050_acc-z-[0x%x] ", adxl345_child_z_device->cloud_properties.device_id);

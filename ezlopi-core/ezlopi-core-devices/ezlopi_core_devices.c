@@ -383,7 +383,7 @@ l_ezlopi_device_t *ezlopi_device_get_by_id(uint32_t device_id)
     return device_node;
 }
 
-l_ezlopi_device_t *ezlopi_device_add_device(cJSON *cj_device, const char *last_name, uint32_t parent_device_id)
+l_ezlopi_device_t *ezlopi_device_add_device(cJSON *cj_device, const char *last_name)
 {
     l_ezlopi_device_t *new_device = ezlopi_malloc(__FUNCTION__, sizeof(l_ezlopi_device_t));
     if (new_device)
@@ -395,6 +395,8 @@ l_ezlopi_device_t *ezlopi_device_add_device(cJSON *cj_device, const char *last_n
         // 1. generate and update device_ID for ll
         {
             CJSON_GET_ID(new_device->cloud_properties.device_id, cJSON_GetObjectItem(__FUNCTION__, cj_device, ezlopi_device_id_str));
+            CJSON_GET_ID(new_device->cloud_properties.parent_device_id, cJSON_GetObjectItem(__FUNCTION__, cj_device, "child_linked_parent_id"));
+
             TRACE_D("Device Id (before): %08x", new_device->cloud_properties.device_id);
             if (new_device->cloud_properties.device_id)
             {
@@ -417,6 +419,7 @@ l_ezlopi_device_t *ezlopi_device_add_device(cJSON *cj_device, const char *last_n
             {
                 new_device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
                 CJSON_ASSIGN_ID(cj_device, new_device->cloud_properties.device_id, ezlopi_device_id_str);
+                CJSON_ASSIGN_ID(cj_device, new_device->cloud_properties.device_id, "child_linked_parent_id");
                 g_store_dev_config_with_id = 1;
             }
             TRACE_D("Device Id (after): %08x", new_device->cloud_properties.device_id);
@@ -436,13 +439,12 @@ l_ezlopi_device_t *ezlopi_device_add_device(cJSON *cj_device, const char *last_n
             }
 
             // B. Populate 'room_id' & 'parent_room' flag
-            if (0 != parent_device_id)
-            {   // only for child devices
-                new_device->cloud_properties.parent_device_id = parent_device_id;
+            new_device->cloud_properties.room_id = 0;
+            if (new_device->cloud_properties.parent_device_id >= DEVICE_ID_START)
+            {
+                TRACE_S("child [%08x]----- linked to ----> parentId [%08x]", new_device->cloud_properties.device_id, new_device->cloud_properties.parent_device_id);
                 new_device->cloud_properties.parent_room = true;
             }
-            new_device->cloud_properties.room_id = 0;
-
 
             // C. Populate 'Security config link.'
             snprintf(new_device->cloud_properties.protect_config, sizeof(new_device->cloud_properties.protect_config), "%s", ezlopi_default_str);
@@ -957,7 +959,7 @@ static ezlopi_error_t ezlopi_device_parse_json_v3(cJSON *cjson_config)
                                 {
                                     if (id_item == v3_device_list[dev_idx].id)
                                     {
-                                        s_ezlopi_prep_arg_t device_prep_arg = { .device = &v3_device_list[dev_idx], .cjson_device = cjson_device };
+                                        s_ezlopi_prep_arg_t device_prep_arg = {.device = &v3_device_list[dev_idx], .cjson_device = cjson_device};
                                         v3_device_list[dev_idx].func(EZLOPI_ACTION_PREPARE, NULL, (void *)&device_prep_arg, NULL);
                                         error = EZPI_SUCCESS;
                                     }
