@@ -92,7 +92,7 @@ static void __prepare_item_properties(l_ezlopi_item_t *item)
 static int __prepare()
 {
     int ret = -1;
-    l_ezlopi_device_t *device = ezlopi_device_add_device(NULL, NULL, 0);
+    l_ezlopi_device_t *device = ezlopi_device_add_device(NULL, NULL);
     if (device)
     {
         __prepare_device_cloud_properties(device);
