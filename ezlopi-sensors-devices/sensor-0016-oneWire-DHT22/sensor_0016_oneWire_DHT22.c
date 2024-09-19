@@ -165,7 +165,7 @@ static ezlopi_error_t dht22_sensor_prepare_v3(void *arg)
             s_ezlopi_dht22_data_t *dht22_sensor_data = (s_ezlopi_dht22_data_t *)ezlopi_malloc(__FUNCTION__, sizeof(s_ezlopi_dht22_data_t));
             if (dht22_sensor_data)
             {
-                l_ezlopi_device_t *parent_device_temperature = ezlopi_device_add_device(prep_arg->cjson_device, "temp");
+                l_ezlopi_device_t *parent_device_temperature = ezlopi_device_add_device(prep_arg->cjson_device, "temp", 0);
                 if (parent_device_temperature)
                 {
                     TRACE_I("Parent_dht22_temp_device-[0x%x] ", parent_device_temperature->cloud_properties.device_id);
@@ -177,11 +177,10 @@ static ezlopi_error_t dht22_sensor_prepare_v3(void *arg)
                         dht22_sensor_setup_item_properties_temperature(item_temperature, cjson_device, dht22_sensor_data);
                     }
 
-                    l_ezlopi_device_t *child_device_humidity = ezlopi_device_add_device(prep_arg->cjson_device, "humi");
+                    l_ezlopi_device_t *child_device_humidity = ezlopi_device_add_device(prep_arg->cjson_device, "humi", parent_device_temperature->cloud_properties.device_id);
                     if (child_device_humidity)
                     {
                         TRACE_I("Child_dht22_humi_device-[0x%x] ", child_device_humidity->cloud_properties.device_id);
-                        child_device_humidity->cloud_properties.parent_device_id = parent_device_temperature->cloud_properties.device_id;
 
                         dht22_sensor_setup_device_cloud_properties_humidity(child_device_humidity, cjson_device);
 

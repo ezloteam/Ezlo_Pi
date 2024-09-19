@@ -15,15 +15,15 @@
 #include "EZLOPI_USER_CONFIG.h"
 
 //--------------------------------------------------------------------------------------------------------
-static ezlopi_error_t __0055_prepare(void* arg);
-static ezlopi_error_t __0055_init(l_ezlopi_item_t* item);
-static ezlopi_error_t __0055_get_cjson_value(l_ezlopi_item_t* item, void* arg);
-static ezlopi_error_t __0055_notify(l_ezlopi_item_t* item);
-static void __prepare_device_adc_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device);
-static void __prepare_item_adc_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device, void* user_data);
+static ezlopi_error_t __0055_prepare(void *arg);
+static ezlopi_error_t __0055_init(l_ezlopi_item_t *item);
+static ezlopi_error_t __0055_get_cjson_value(l_ezlopi_item_t *item, void *arg);
+static ezlopi_error_t __0055_notify(l_ezlopi_item_t *item);
+static void __prepare_device_adc_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
+static void __prepare_item_adc_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_data);
 //--------------------------------------------------------------------------------------------------------
 
-ezlopi_error_t sensor_0055_ADC_FlexResistor(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
+ezlopi_error_t sensor_0055_ADC_FlexResistor(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
     switch (action)
@@ -58,7 +58,7 @@ ezlopi_error_t sensor_0055_ADC_FlexResistor(e_ezlopi_actions_t action, l_ezlopi_
 }
 
 //------------------------------------------------------------------------------------------------------
-static void __prepare_device_adc_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
+static void __prepare_device_adc_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
@@ -66,7 +66,7 @@ static void __prepare_device_adc_cloud_properties(l_ezlopi_device_t* device, cJS
     device->cloud_properties.info = NULL;
     device->cloud_properties.device_type_id = NULL;
 }
-static void __prepare_item_adc_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device, void* user_data)
+static void __prepare_item_adc_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_data)
 {
 
     item->cloud_properties.has_getter = true;
@@ -88,21 +88,21 @@ static void __prepare_item_adc_cloud_properties(l_ezlopi_item_t* item, cJSON* cj
 
 //------------------------------------------------------------------------------------------------------
 
-static ezlopi_error_t __0055_prepare(void* arg)
+static ezlopi_error_t __0055_prepare(void *arg)
 {
     ezlopi_error_t ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
-    s_ezlopi_prep_arg_t* device_prep_arg = (s_ezlopi_prep_arg_t*)arg;
+    s_ezlopi_prep_arg_t *device_prep_arg = (s_ezlopi_prep_arg_t *)arg;
     if (device_prep_arg && (NULL != device_prep_arg->cjson_device))
     {
-        flex_t* flex_res_value = (flex_t*)ezlopi_malloc(__FUNCTION__, sizeof(flex_t));
+        flex_t *flex_res_value = (flex_t *)ezlopi_malloc(__FUNCTION__, sizeof(flex_t));
         if (flex_res_value)
         {
             memset(flex_res_value, 0, sizeof(flex_t));
-            l_ezlopi_device_t* device_adc = ezlopi_device_add_device(device_prep_arg->cjson_device, NULL);
+            l_ezlopi_device_t *device_adc = ezlopi_device_add_device(device_prep_arg->cjson_device, NULL, 0);
             if (device_adc)
             {
                 __prepare_device_adc_cloud_properties(device_adc, device_prep_arg->cjson_device);
-                l_ezlopi_item_t* item_adc = ezlopi_device_add_item_to_device(device_adc, sensor_0055_ADC_FlexResistor);
+                l_ezlopi_item_t *item_adc = ezlopi_device_add_item_to_device(device_adc, sensor_0055_ADC_FlexResistor);
                 if (item_adc)
                 {
                     __prepare_item_adc_cloud_properties(item_adc, device_prep_arg->cjson_device, flex_res_value);
@@ -123,12 +123,12 @@ static ezlopi_error_t __0055_prepare(void* arg)
     return ret;
 }
 
-static ezlopi_error_t __0055_init(l_ezlopi_item_t* item)
+static ezlopi_error_t __0055_init(l_ezlopi_item_t *item)
 {
     ezlopi_error_t ret = EZPI_FAILED;
     if (NULL != item)
     {
-        flex_t* flex_res_value = (flex_t*)ezlopi_malloc(__FUNCTION__, sizeof(flex_t));
+        flex_t *flex_res_value = (flex_t *)ezlopi_malloc(__FUNCTION__, sizeof(flex_t));
         if (flex_res_value)
         {
             if (GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
@@ -143,15 +143,15 @@ static ezlopi_error_t __0055_init(l_ezlopi_item_t* item)
     return ret;
 }
 
-static ezlopi_error_t __0055_get_cjson_value(l_ezlopi_item_t* item, void* arg)
+static ezlopi_error_t __0055_get_cjson_value(l_ezlopi_item_t *item, void *arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
     if (item && arg)
     {
-        cJSON* cj_result = (cJSON*)arg;
+        cJSON *cj_result = (cJSON *)arg;
         if (cj_result)
         {
-            flex_t* flex_res_value = (flex_t*)item->user_arg;
+            flex_t *flex_res_value = (flex_t *)item->user_arg;
             if (flex_res_value)
             {
                 ezlopi_valueformatter_int32_to_cjson(cj_result, flex_res_value->rs_0055, NULL);
@@ -161,12 +161,12 @@ static ezlopi_error_t __0055_get_cjson_value(l_ezlopi_item_t* item, void* arg)
     }
     return ret;
 }
-static ezlopi_error_t __0055_notify(l_ezlopi_item_t* item)
+static ezlopi_error_t __0055_notify(l_ezlopi_item_t *item)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
     if (item)
     {
-        flex_t* flex_res_value = (flex_t*)item->user_arg;
+        flex_t *flex_res_value = (flex_t *)item->user_arg;
         if (flex_res_value)
         {
             s_ezlopi_analog_data_t ezlopi_analog_data = { .value = 0,

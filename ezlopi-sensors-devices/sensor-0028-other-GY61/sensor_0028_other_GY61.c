@@ -31,14 +31,14 @@ typedef struct s_gy61_data
 #define esp32S3_convert_mV_to_G(temp_vol) (((6.0f / 3000.0f) * (temp_vol - 100)) - 3.0f)
 #endif
 
-static ezlopi_error_t __0028_prepare(void* arg);
-static ezlopi_error_t __0028_init(l_ezlopi_item_t* item);
-static ezlopi_error_t __0028_get_cjson_value(l_ezlopi_item_t* item, void* arg);
-static ezlopi_error_t __0028_notify(l_ezlopi_item_t* item);
+static ezlopi_error_t __0028_prepare(void *arg);
+static ezlopi_error_t __0028_init(l_ezlopi_item_t *item);
+static ezlopi_error_t __0028_get_cjson_value(l_ezlopi_item_t *item, void *arg);
+static ezlopi_error_t __0028_notify(l_ezlopi_item_t *item);
 
-static float __update_gy61_axis_value(l_ezlopi_item_t* item);
+static float __update_gy61_axis_value(l_ezlopi_item_t *item);
 //--------------------------------------------------------------------------------------------------------
-ezlopi_error_t sensor_0028_other_GY61(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
+ezlopi_error_t sensor_0028_other_GY61(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
     switch (action)
@@ -72,7 +72,7 @@ ezlopi_error_t sensor_0028_other_GY61(e_ezlopi_actions_t action, l_ezlopi_item_t
     return ret;
 }
 //-------------------------------------------------------------------------------------------------------------------------
-static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
+static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
@@ -81,7 +81,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* 
     device->cloud_properties.device_type = dev_type_sensor;
 }
 
-static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, void* user_data)
+static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, void *user_data)
 {
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
     item->cloud_properties.has_getter = true;
@@ -97,7 +97,7 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, void* user_da
     }
 }
 
-static void __prepare_item_interface_properties(l_ezlopi_item_t* item, cJSON* cj_device)
+static void __prepare_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj_device)
 {
     if (item && cj_device)
     {
@@ -122,24 +122,24 @@ static void __prepare_item_interface_properties(l_ezlopi_item_t* item, cJSON* cj
 }
 //-------------------------------------------------------------------------------------------------------------------------
 
-static ezlopi_error_t __0028_prepare(void* arg)
+static ezlopi_error_t __0028_prepare(void *arg)
 {
     ezlopi_error_t ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
-    s_ezlopi_prep_arg_t* device_prep_arg = (s_ezlopi_prep_arg_t*)arg;
+    s_ezlopi_prep_arg_t *device_prep_arg = (s_ezlopi_prep_arg_t *)arg;
     if (device_prep_arg && (NULL != device_prep_arg->cjson_device))
     {
-        cJSON* cj_device = device_prep_arg->cjson_device;
+        cJSON *cj_device = device_prep_arg->cjson_device;
 
-        s_gy61_data_t* gy61_value = (s_gy61_data_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_gy61_data_t));
+        s_gy61_data_t *gy61_value = (s_gy61_data_t *)ezlopi_malloc(__FUNCTION__, sizeof(s_gy61_data_t));
         if (NULL != gy61_value)
         {
             memset(gy61_value, 0, sizeof(s_gy61_data_t));
-            l_ezlopi_device_t* gy61_device_x_parent = ezlopi_device_add_device(cj_device, "acc_x");
+            l_ezlopi_device_t *gy61_device_x_parent = ezlopi_device_add_device(cj_device, "acc_x", 0);
             if (gy61_device_x_parent)
             {
                 TRACE_I("Parent_gy61_device_x-[0x%x] ", gy61_device_x_parent->cloud_properties.device_id);
                 __prepare_device_cloud_properties(gy61_device_x_parent, cj_device);
-                l_ezlopi_item_t* gy61_item_x = ezlopi_device_add_item_to_device(gy61_device_x_parent, sensor_0028_other_GY61);
+                l_ezlopi_item_t *gy61_item_x = ezlopi_device_add_item_to_device(gy61_device_x_parent, sensor_0028_other_GY61);
                 if (gy61_item_x)
                 {
                     gy61_item_x->cloud_properties.item_name = ezlopi_item_name_acceleration_x_axis;
@@ -148,14 +148,13 @@ static ezlopi_error_t __0028_prepare(void* arg)
                     ret = EZPI_SUCCESS;
                 }
 
-                l_ezlopi_device_t* gy61_device_y_child = ezlopi_device_add_device(device_prep_arg->cjson_device, "acc_y");
+                l_ezlopi_device_t *gy61_device_y_child = ezlopi_device_add_device(device_prep_arg->cjson_device, "acc_y", gy61_device_x_parent->cloud_properties.device_id);
                 if (gy61_device_y_child)
                 {
                     TRACE_I("Child_gy61_device_y-[0x%x] ", gy61_device_y_child->cloud_properties.device_id);
                     __prepare_device_cloud_properties(gy61_device_y_child, cj_device);
-                    gy61_device_y_child->cloud_properties.parent_device_id = gy61_device_x_parent->cloud_properties.device_id;
 
-                    l_ezlopi_item_t* gy61_item_y = ezlopi_device_add_item_to_device(gy61_device_y_child, sensor_0028_other_GY61);
+                    l_ezlopi_item_t *gy61_item_y = ezlopi_device_add_item_to_device(gy61_device_y_child, sensor_0028_other_GY61);
                     if (gy61_item_y)
                     {
                         gy61_item_y->cloud_properties.item_name = ezlopi_item_name_acceleration_y_axis;
@@ -169,14 +168,13 @@ static ezlopi_error_t __0028_prepare(void* arg)
                     }
                 }
 
-                l_ezlopi_device_t* gy61_device_z_child = ezlopi_device_add_device(device_prep_arg->cjson_device, "acc_z");
+                l_ezlopi_device_t *gy61_device_z_child = ezlopi_device_add_device(device_prep_arg->cjson_device, "acc_z", gy61_device_x_parent->cloud_properties.device_id);
                 if (gy61_device_z_child)
                 {
                     TRACE_I("Child_gy61_device_z-[0x%x] ", gy61_device_z_child->cloud_properties.device_id);
                     __prepare_device_cloud_properties(gy61_device_z_child, cj_device);
-                    gy61_device_z_child->cloud_properties.parent_device_id = gy61_device_x_parent->cloud_properties.device_id;
 
-                    l_ezlopi_item_t* gy61_item_z = ezlopi_device_add_item_to_device(gy61_device_z_child, sensor_0028_other_GY61);
+                    l_ezlopi_item_t *gy61_item_z = ezlopi_device_add_item_to_device(gy61_device_z_child, sensor_0028_other_GY61);
                     if (gy61_item_z)
                     {
                         gy61_item_z->cloud_properties.item_name = ezlopi_item_name_acceleration_z_axis;
@@ -206,12 +204,12 @@ static ezlopi_error_t __0028_prepare(void* arg)
     return ret;
 }
 
-static ezlopi_error_t __0028_init(l_ezlopi_item_t* item)
+static ezlopi_error_t __0028_init(l_ezlopi_item_t *item)
 {
     ezlopi_error_t ret = EZPI_FAILED;
     if (item)
     {
-        s_gy61_data_t* user_data = (s_gy61_data_t*)item->user_arg;
+        s_gy61_data_t *user_data = (s_gy61_data_t *)item->user_arg;
         if (user_data)
         {
             if (GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
@@ -226,15 +224,15 @@ static ezlopi_error_t __0028_init(l_ezlopi_item_t* item)
     return ret;
 }
 
-static ezlopi_error_t __0028_get_cjson_value(l_ezlopi_item_t* item, void* arg)
+static ezlopi_error_t __0028_get_cjson_value(l_ezlopi_item_t *item, void *arg)
 {
     ezlopi_error_t ret = EZPI_FAILED;
     if (item && arg)
     {
-        cJSON* cj_result = (cJSON*)arg;
+        cJSON *cj_result = (cJSON *)arg;
         if (cj_result)
         {
-            s_gy61_data_t* user_data = ((s_gy61_data_t*)item->user_arg);
+            s_gy61_data_t *user_data = ((s_gy61_data_t *)item->user_arg);
 
             if (ezlopi_item_name_acceleration_x_axis == item->cloud_properties.item_name)
             {
@@ -255,12 +253,12 @@ static ezlopi_error_t __0028_get_cjson_value(l_ezlopi_item_t* item, void* arg)
     return ret;
 }
 
-static ezlopi_error_t __0028_notify(l_ezlopi_item_t* item)
+static ezlopi_error_t __0028_notify(l_ezlopi_item_t *item)
 {
     ezlopi_error_t ret = EZPI_FAILED;
     if (item)
     {
-        s_gy61_data_t* user_data = (s_gy61_data_t*)item->user_arg;
+        s_gy61_data_t *user_data = (s_gy61_data_t *)item->user_arg;
         if (user_data)
         {
             float new_value = 0;
@@ -298,7 +296,7 @@ static ezlopi_error_t __0028_notify(l_ezlopi_item_t* item)
     return ret;
 }
 
-static float __update_gy61_axis_value(l_ezlopi_item_t* item)
+static float __update_gy61_axis_value(l_ezlopi_item_t *item)
 {
     float G_data = 0;
     if (item)

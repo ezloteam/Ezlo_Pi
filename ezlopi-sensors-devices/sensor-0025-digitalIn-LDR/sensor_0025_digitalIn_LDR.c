@@ -13,14 +13,14 @@
 
 #include "ezlopi_service_gpioisr.h"
 
-static ezlopi_error_t __prepare(void* arg);
-static ezlopi_error_t __init(l_ezlopi_item_t* item);
-static ezlopi_error_t __get_value_cjson(l_ezlopi_item_t* item, void* arg);
-static void __setup_item_properties(l_ezlopi_item_t* item, cJSON* cj_device);
-static void __setup_device_properties(l_ezlopi_device_t* device, cJSON* cj_device);
-static void __value_updated_from_interrupt(void* arg);
+static ezlopi_error_t __prepare(void *arg);
+static ezlopi_error_t __init(l_ezlopi_item_t *item);
+static ezlopi_error_t __get_value_cjson(l_ezlopi_item_t *item, void *arg);
+static void __setup_item_properties(l_ezlopi_item_t *item, cJSON *cj_device);
+static void __setup_device_properties(l_ezlopi_device_t *device, cJSON *cj_device);
+static void __value_updated_from_interrupt(void *arg);
 
-ezlopi_error_t sensor_0025_digitalIn_LDR(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
+ezlopi_error_t sensor_0025_digitalIn_LDR(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
 
@@ -52,10 +52,10 @@ ezlopi_error_t sensor_0025_digitalIn_LDR(e_ezlopi_actions_t action, l_ezlopi_ite
     return ret;
 }
 
-static ezlopi_error_t __get_value_cjson(l_ezlopi_item_t* item, void* arg)
+static ezlopi_error_t __get_value_cjson(l_ezlopi_item_t *item, void *arg)
 {
     ezlopi_error_t ret = EZPI_FAILED;
-    cJSON* cj_value_obj = (cJSON*)arg;
+    cJSON *cj_value_obj = (cJSON *)arg;
 
     if (item && cj_value_obj)
     {
@@ -69,7 +69,7 @@ static ezlopi_error_t __get_value_cjson(l_ezlopi_item_t* item, void* arg)
     return ret;
 }
 
-static ezlopi_error_t __init(l_ezlopi_item_t* item)
+static ezlopi_error_t __init(l_ezlopi_item_t *item)
 {
     ezlopi_error_t ret = EZPI_ERR_INIT_DEVICE_FAILED;
     if (item)
@@ -95,28 +95,28 @@ static ezlopi_error_t __init(l_ezlopi_item_t* item)
     return ret;
 }
 
-static void __value_updated_from_interrupt(void* arg)
+static void __value_updated_from_interrupt(void *arg)
 {
     if (arg)
     {
-        ezlopi_device_value_updated_from_device_broadcast((l_ezlopi_item_t*)arg);
+        ezlopi_device_value_updated_from_device_broadcast((l_ezlopi_item_t *)arg);
     }
 }
 
-static ezlopi_error_t __prepare(void* arg)
+static ezlopi_error_t __prepare(void *arg)
 {
     ezlopi_error_t ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
-    s_ezlopi_prep_arg_t* prep_arg = (s_ezlopi_prep_arg_t*)arg;
+    s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
     if (prep_arg)
     {
-        cJSON* cj_device = prep_arg->cjson_device;
+        cJSON *cj_device = prep_arg->cjson_device;
         if (cj_device)
         {
-            l_ezlopi_device_t* device = ezlopi_device_add_device(prep_arg->cjson_device, NULL);
+            l_ezlopi_device_t *device = ezlopi_device_add_device(prep_arg->cjson_device, NULL, 0);
             if (device)
             {
                 __setup_device_properties(device, cj_device);
-                l_ezlopi_item_t* item = ezlopi_device_add_item_to_device(device, sensor_0025_digitalIn_LDR);
+                l_ezlopi_item_t *item = ezlopi_device_add_item_to_device(device, sensor_0025_digitalIn_LDR);
                 if (item)
                 {
                     __setup_item_properties(item, cj_device);
@@ -133,7 +133,7 @@ static ezlopi_error_t __prepare(void* arg)
     return ret;
 }
 
-static void __setup_item_properties(l_ezlopi_item_t* item, cJSON* cj_device)
+static void __setup_item_properties(l_ezlopi_item_t *item, cJSON *cj_device)
 {
     item->cloud_properties.show = true;
     item->cloud_properties.has_getter = true;
@@ -152,7 +152,7 @@ static void __setup_item_properties(l_ezlopi_item_t* item, cJSON* cj_device)
     item->interface.gpio.gpio_in.pull = GPIO_PULLDOWN_ONLY;
 }
 
-static void __setup_device_properties(l_ezlopi_device_t* device, cJSON* cj_device)
+static void __setup_device_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     device->cloud_properties.category = category_switch;
     device->cloud_properties.subcategory = subcategory_in_wall;

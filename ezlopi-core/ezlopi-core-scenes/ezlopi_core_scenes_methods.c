@@ -7,15 +7,15 @@
 #include "ezlopi_core_scenes_v2.h"
 #include "ezlopi_core_scenes_methods.h"
 
-static const char* ezlopi_scenes_methods_name[] = {
+static const char *ezlopi_scenes_methods_name[] = {
 #define EZLOPI_SCENE(method_type, name, func) name,
 #include "ezlopi_core_scenes_method_types.h"
 #undef EZLOPI_SCENE
 };
 
-const char* ezlopi_scene_get_scene_method_name(e_scene_method_type_t method_type)
+const char *ezlopi_scene_get_scene_method_name(e_scene_method_type_t method_type)
 {
-    const char* ret = NULL;
+    const char *ret = NULL;
     if ((method_type > EZLOPI_SCENE_METHOD_TYPE_NONE) && (method_type < EZLOPI_SCENE_METHOD_TYPE_MAX))
     {
         ret = ezlopi_scenes_methods_name[method_type];
@@ -23,7 +23,7 @@ const char* ezlopi_scene_get_scene_method_name(e_scene_method_type_t method_type
     return ret;
 }
 
-e_scene_method_type_t ezlopi_scenes_method_get_type_enum(char* method_name)
+e_scene_method_type_t ezlopi_scenes_method_get_type_enum(char *method_name)
 {
     e_scene_method_type_t method_type = EZLOPI_SCENE_METHOD_TYPE_NONE;
     if (method_name)
@@ -35,6 +35,7 @@ e_scene_method_type_t ezlopi_scenes_method_get_type_enum(char* method_name)
             {
             // TRACE_D("max_len [%d]" , max_len);
                 method_type = i;
+                break;
             }
         }
 
