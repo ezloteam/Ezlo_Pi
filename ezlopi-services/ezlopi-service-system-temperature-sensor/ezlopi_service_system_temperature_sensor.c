@@ -138,6 +138,7 @@ static int __notify(l_ezlopi_item_t *item)
 {
     int ret = 0;
     float system_temperature_current_value = 0;
+    float _eplison = 1.0;
     esp_err_t error = temp_sensor_read_celsius(&system_temperature_current_value);
     if (ESP_OK == error)
     {
@@ -147,9 +148,10 @@ static int __notify(l_ezlopi_item_t *item)
         if (TEMPERATURE_SCALE_FAHRENHEIT == scale_to_use)
         {
             system_temperature_current_value = (system_temperature_current_value * (9.0f / 5.0f)) + 32.0f;
+            _eplison = 2.5;
         }
 
-        if (fabs(system_temperature - system_temperature_current_value) > 0.5)
+        if (fabs(system_temperature - system_temperature_current_value) > _eplison)
         {
             system_temperature = system_temperature_current_value;
             ezlopi_device_value_updated_from_device_broadcast(item);
