@@ -243,7 +243,7 @@ static ezlopi_error_t __prepare(void *arg)
         {
             memset(value_ptr, 0, sizeof(s_gxhtc3_value_t));
 
-            l_ezlopi_device_t *parent_device_temp = ezlopi_device_add_device(prep_arg->cjson_device, "temp", 0);
+            l_ezlopi_device_t *parent_device_temp = ezlopi_device_add_device(prep_arg->cjson_device, "temp");
             if (parent_device_temp)
             {
                 TRACE_I("Parent_temp_device-[0x%x] ", parent_device_temp->cloud_properties.device_id);
@@ -258,7 +258,7 @@ static ezlopi_error_t __prepare(void *arg)
                     ret = EZPI_SUCCESS;
                 }
 
-                l_ezlopi_device_t *child_device_hum = ezlopi_device_add_device(prep_arg->cjson_device, "humi", parent_device_temp->cloud_properties.device_id);
+                l_ezlopi_device_t *child_device_hum = ezlopi_device_add_device(prep_arg->cjson_device, "humi");
                 if (child_device_hum)
                 {
                     TRACE_I("Child_humidity_device-[0x%x] ", child_device_hum->cloud_properties.device_id);

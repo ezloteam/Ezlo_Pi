@@ -124,7 +124,7 @@ static ezlopi_error_t sensor_pir_prepare_v3(void *arg)
         cJSON *cj_device = prep_arg->cjson_device;
         if (cj_device)
         {
-            l_ezlopi_device_t *device = ezlopi_device_add_device(prep_arg->cjson_device, NULL, 0);
+            l_ezlopi_device_t *device = ezlopi_device_add_device(prep_arg->cjson_device, NULL);
             if (device)
             {
                 sensor_pir_setup_device_cloud_properties_v3(device, cj_device);

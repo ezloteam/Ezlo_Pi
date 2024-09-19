@@ -95,7 +95,7 @@ static ezlopi_error_t __prepare(void *arg)
     {
         cJSON *cj_device = dev_prep_arg->cjson_device;
 
-        l_ezlopi_device_t *servo_device = ezlopi_device_add_device(dev_prep_arg->cjson_device, NULL, 0);
+        l_ezlopi_device_t *servo_device = ezlopi_device_add_device(dev_prep_arg->cjson_device, NULL);
         if (servo_device)
         {
             __prepare_device_cloud_properties(servo_device, cj_device);

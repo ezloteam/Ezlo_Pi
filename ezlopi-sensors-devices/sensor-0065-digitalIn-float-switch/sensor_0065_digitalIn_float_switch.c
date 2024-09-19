@@ -103,7 +103,7 @@ static ezlopi_error_t __0065_prepare(void *arg)
         s_ezlopi_prep_arg_t *device_prep_arg = (s_ezlopi_prep_arg_t *)arg;
         if (device_prep_arg && (NULL != device_prep_arg->cjson_device))
         {
-            l_ezlopi_device_t *float_device = ezlopi_device_add_device(device_prep_arg->cjson_device, NULL, 0);
+            l_ezlopi_device_t *float_device = ezlopi_device_add_device(device_prep_arg->cjson_device, NULL);
             if (float_device)
             {
                 __prepare_device_cloud_properties(float_device, device_prep_arg->cjson_device);

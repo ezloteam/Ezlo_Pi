@@ -130,7 +130,7 @@ static ezlopi_error_t __0054_prepare(void *arg)
         if (NULL != yfs201_data)
         {
             memset(yfs201_data, 0, sizeof(yfs201_t));
-            l_ezlopi_device_t *flowmeter_device = ezlopi_device_add_device(device_prep_arg->cjson_device, NULL, 0);
+            l_ezlopi_device_t *flowmeter_device = ezlopi_device_add_device(device_prep_arg->cjson_device, NULL);
             if (flowmeter_device)
             {
                 __prepare_device_cloud_properties(flowmeter_device, device_prep_arg->cjson_device);

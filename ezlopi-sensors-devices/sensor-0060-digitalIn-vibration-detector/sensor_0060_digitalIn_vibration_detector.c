@@ -106,7 +106,7 @@ static ezlopi_error_t __0060_prepare(void *arg)
         s_ezlopi_prep_arg_t *dev_prep_arg = (s_ezlopi_prep_arg_t *)arg;
         if (dev_prep_arg && (NULL != dev_prep_arg->cjson_device))
         {
-            l_ezlopi_device_t *vibration_device = ezlopi_device_add_device(dev_prep_arg->cjson_device, NULL, 0);
+            l_ezlopi_device_t *vibration_device = ezlopi_device_add_device(dev_prep_arg->cjson_device, NULL);
             if (vibration_device)
             {
                 __prepare_device_cloud_properties(vibration_device, dev_prep_arg->cjson_device);

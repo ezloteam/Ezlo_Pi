@@ -203,7 +203,7 @@ static ezlopi_error_t __prepare(void *arg)
         if (bme280_sensor_params)
         {
             memset(bme280_sensor_params, 0, sizeof(s_ezlopi_bmp280_t));
-            l_ezlopi_device_t *parent_temp_humid_device = ezlopi_device_add_device(prep_arg->cjson_device, "temp_hum", 0);
+            l_ezlopi_device_t *parent_temp_humid_device = ezlopi_device_add_device(prep_arg->cjson_device, "temp_hum");
             if (parent_temp_humid_device)
             {
                 TRACE_I("Parent_temp_humid_device-[0x%x] ", parent_temp_humid_device->cloud_properties.device_id);
@@ -223,7 +223,7 @@ static ezlopi_error_t __prepare(void *arg)
                 }
                 //------------------------------------------------------------------------
 
-                l_ezlopi_device_t *child_pressure_device = ezlopi_device_add_device(prep_arg->cjson_device, "pressure", parent_temp_humid_device->cloud_properties.device_id);
+                l_ezlopi_device_t *child_pressure_device = ezlopi_device_add_device(prep_arg->cjson_device, "pressure");
                 if (child_pressure_device)
                 {
                     TRACE_I("Child_pressure_device-[0x%x] ", child_pressure_device->cloud_properties.device_id);

@@ -159,7 +159,7 @@ static ezlopi_error_t __prepare(void *arg)
                     user_data->sensor_0020_joystick_item_ids[i] = ezlopi_cloud_generate_item_id();
                 }
 
-                l_ezlopi_device_t *joystick_parent_x_device = ezlopi_device_add_device(cj_device, "x_axis", 0);
+                l_ezlopi_device_t *joystick_parent_x_device = ezlopi_device_add_device(cj_device, "x_axis");
                 if (joystick_parent_x_device)
                 {
                     ret = 1;
@@ -178,7 +178,7 @@ static ezlopi_error_t __prepare(void *arg)
                         __setup_item_interface_properties(joystick_x_item, cj_device);
                     }
 
-                    l_ezlopi_device_t *joystick_child_y_device = ezlopi_device_add_device(cj_device, "y-axis", joystick_parent_x_device->cloud_properties.device_id);
+                    l_ezlopi_device_t *joystick_child_y_device = ezlopi_device_add_device(cj_device, "y-axis");
                     if (joystick_child_y_device)
                     {
                         // assigning parent_device_id to child_device
@@ -203,7 +203,7 @@ static ezlopi_error_t __prepare(void *arg)
                         }
                     }
 
-                    l_ezlopi_device_t *joystick_child_sw_device = ezlopi_device_add_device(cj_device, "switch", joystick_parent_x_device->cloud_properties.device_id);
+                    l_ezlopi_device_t *joystick_child_sw_device = ezlopi_device_add_device(cj_device, "switch");
                     if (joystick_child_sw_device)
                     {
                         // assigning parent_device_id to child_device

@@ -94,7 +94,7 @@ static ezlopi_error_t proximity_sensor_prepare(void *args)
 
     if ((NULL != device_prep_arg) && (NULL != device_prep_arg->cjson_device))
     {
-        l_ezlopi_device_t *device = ezlopi_device_add_device(device_prep_arg->cjson_device, NULL, 0);
+        l_ezlopi_device_t *device = ezlopi_device_add_device(device_prep_arg->cjson_device, NULL);
         if (device)
         {
             proximity_sensor_setup_device_cloud_properties(device, device_prep_arg->cjson_device);

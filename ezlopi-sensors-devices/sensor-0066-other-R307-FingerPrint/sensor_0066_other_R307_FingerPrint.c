@@ -22,7 +22,6 @@
 #include "sensor_0066_other_R307_FingerPrint.h"
 #include "EZLOPI_USER_CONFIG.h"
 
-
 //---------------------------------------------------------------------------------------------------------------
 static void IRAM_ATTR gpio_notify_isr(void *param)
 {
@@ -221,7 +220,7 @@ static ezlopi_error_t __0066_prepare(void *arg)
         server_packet_t *user_data = (server_packet_t *)ezlopi_malloc(__FUNCTION__, sizeof(server_packet_t));
         if (user_data)
         {
-            l_ezlopi_device_t *parent_fingerprint_enroll_device = ezlopi_device_add_device(cj_device, "enroll", 0);
+            l_ezlopi_device_t *parent_fingerprint_enroll_device = ezlopi_device_add_device(cj_device, "enroll");
             if (parent_fingerprint_enroll_device)
             {
                 ret = EZPI_SUCCESS;
@@ -240,7 +239,7 @@ static ezlopi_error_t __0066_prepare(void *arg)
                     __prepare_item_interface_properties(fingerprint_item_enroll, cj_device);
                 }
 
-                l_ezlopi_device_t *child_fingerprint_action_device = ezlopi_device_add_device(cj_device, "action", parent_fingerprint_enroll_device->cloud_properties.device_id);
+                l_ezlopi_device_t *child_fingerprint_action_device = ezlopi_device_add_device(cj_device, "action");
                 if (child_fingerprint_action_device)
                 {
                     TRACE_I("Child_fingerprint_action_device-[0x%x] ", child_fingerprint_action_device->cloud_properties.device_id);
@@ -259,7 +258,7 @@ static ezlopi_error_t __0066_prepare(void *arg)
                     }
                 }
 
-                l_ezlopi_device_t *child_fingerprint_ids_device = ezlopi_device_add_device(cj_device, "ids", parent_fingerprint_enroll_device->cloud_properties.device_id);
+                l_ezlopi_device_t *child_fingerprint_ids_device = ezlopi_device_add_device(cj_device, "ids");
                 if (child_fingerprint_ids_device)
                 {
                     TRACE_I("Child_fingerprint_ids_device-[0x%x] ", child_fingerprint_ids_device->cloud_properties.device_id);
@@ -342,7 +341,7 @@ static ezlopi_error_t __0066_init(l_ezlopi_item_t *item)
                                 const esp_timer_create_args_t esp_timer_create_args = {
                                     .callback = __timer_callback,
                                     .arg = (void *)item,
-                                    .name = "Enrollment timer" };
+                                    .name = "Enrollment timer"};
                                 if (0 == esp_timer_create(&esp_timer_create_args, &(user_data->timerHandler)))
                                 {
                                     TRACE_I(" ---->>> Creating Enrollment Timer <<<----");
@@ -531,7 +530,7 @@ static void __uart_0066_fingerprint_upcall(uint8_t *buffer, uint32_t output_len,
             if (user_data)
             {
                 uint16_t package_len = 0;
-                uint8_t another_buffer[MAX_PACKET_LENGTH_VAL] = { 0 };
+                uint8_t another_buffer[MAX_PACKET_LENGTH_VAL] = {0};
                 memcpy(another_buffer, temp_buf, MAX_PACKET_LENGTH_VAL);
                 // Programmed only for ACK_operation [0x07h] with 256byte results.
                 if (another_buffer[6] == FINGERPRINT_PID_ACKPACKET)

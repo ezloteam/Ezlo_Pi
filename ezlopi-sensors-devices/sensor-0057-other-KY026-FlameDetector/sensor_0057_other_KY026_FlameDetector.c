@@ -82,7 +82,7 @@ static ezlopi_error_t __0057_prepare(void *arg)
     if (device_prep_arg && (NULL != device_prep_arg->cjson_device))
     {
         //---------------------------  DIGI - DEVICE 1 --------------------------------------------
-        l_ezlopi_device_t *flame_device_parent_digi = ezlopi_device_add_device(device_prep_arg->cjson_device, "digi", 0);
+        l_ezlopi_device_t *flame_device_parent_digi = ezlopi_device_add_device(device_prep_arg->cjson_device, "digi");
         if (flame_device_parent_digi)
         {
             TRACE_I("Parent_flame_device_digi-[0x%x] ", flame_device_parent_digi->cloud_properties.device_id);
@@ -100,7 +100,7 @@ static ezlopi_error_t __0057_prepare(void *arg)
             if (NULL != flame_struct)
             {
                 memset(flame_struct, 0, sizeof(flame_t));
-                l_ezlopi_device_t *flame_device_child_adc = ezlopi_device_add_device(device_prep_arg->cjson_device, "adc", flame_device_parent_digi->cloud_properties.device_id);
+                l_ezlopi_device_t *flame_device_child_adc = ezlopi_device_add_device(device_prep_arg->cjson_device, "adc");
                 if (flame_device_child_adc)
                 {
                     TRACE_I("Child_flame_device_adc-[0x%x] ", flame_device_child_adc->cloud_properties.device_id);

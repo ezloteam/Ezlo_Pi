@@ -98,7 +98,7 @@ static ezlopi_error_t __0055_prepare(void *arg)
         if (flex_res_value)
         {
             memset(flex_res_value, 0, sizeof(flex_t));
-            l_ezlopi_device_t *device_adc = ezlopi_device_add_device(device_prep_arg->cjson_device, NULL, 0);
+            l_ezlopi_device_t *device_adc = ezlopi_device_add_device(device_prep_arg->cjson_device, NULL);
             if (device_adc)
             {
                 __prepare_device_adc_cloud_properties(device_adc, device_prep_arg->cjson_device);

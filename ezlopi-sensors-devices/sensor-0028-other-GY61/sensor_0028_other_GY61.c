@@ -134,7 +134,7 @@ static ezlopi_error_t __0028_prepare(void *arg)
         if (NULL != gy61_value)
         {
             memset(gy61_value, 0, sizeof(s_gy61_data_t));
-            l_ezlopi_device_t *gy61_device_x_parent = ezlopi_device_add_device(cj_device, "acc_x", 0);
+            l_ezlopi_device_t *gy61_device_x_parent = ezlopi_device_add_device(cj_device, "acc_x");
             if (gy61_device_x_parent)
             {
                 TRACE_I("Parent_gy61_device_x-[0x%x] ", gy61_device_x_parent->cloud_properties.device_id);
@@ -148,7 +148,7 @@ static ezlopi_error_t __0028_prepare(void *arg)
                     ret = EZPI_SUCCESS;
                 }
 
-                l_ezlopi_device_t *gy61_device_y_child = ezlopi_device_add_device(device_prep_arg->cjson_device, "acc_y", gy61_device_x_parent->cloud_properties.device_id);
+                l_ezlopi_device_t *gy61_device_y_child = ezlopi_device_add_device(device_prep_arg->cjson_device, "acc_y");
                 if (gy61_device_y_child)
                 {
                     TRACE_I("Child_gy61_device_y-[0x%x] ", gy61_device_y_child->cloud_properties.device_id);
@@ -168,7 +168,7 @@ static ezlopi_error_t __0028_prepare(void *arg)
                     }
                 }
 
-                l_ezlopi_device_t *gy61_device_z_child = ezlopi_device_add_device(device_prep_arg->cjson_device, "acc_z", gy61_device_x_parent->cloud_properties.device_id);
+                l_ezlopi_device_t *gy61_device_z_child = ezlopi_device_add_device(device_prep_arg->cjson_device, "acc_z");
                 if (gy61_device_z_child)
                 {
                     TRACE_I("Child_gy61_device_z-[0x%x] ", gy61_device_z_child->cloud_properties.device_id);

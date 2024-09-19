@@ -181,7 +181,7 @@ static ezlopi_error_t __0053_prepare(void *arg)
             if (NULL != sensor_0053_UART_gps6mv2_data)
             {
                 memset(sensor_0053_UART_gps6mv2_data, 0, sizeof(GPS6MV2_t));
-                l_ezlopi_device_t *parent_gps_device_lat = ezlopi_device_add_device(cjson_device, "lat", 0);
+                l_ezlopi_device_t *parent_gps_device_lat = ezlopi_device_add_device(cjson_device, "lat");
                 if (parent_gps_device_lat)
                 {
                     TRACE_I("Parent_gygps6mv2_lat-[0x%x] ", parent_gps_device_lat->cloud_properties.device_id);
@@ -195,7 +195,7 @@ static ezlopi_error_t __0053_prepare(void *arg)
                         ret = EZPI_SUCCESS;
                     }
 
-                    l_ezlopi_device_t *child_gps_device_long = ezlopi_device_add_device(device_prep_arg->cjson_device, "long", parent_gps_device_lat->cloud_properties.device_id);
+                    l_ezlopi_device_t *child_gps_device_long = ezlopi_device_add_device(device_prep_arg->cjson_device, "long");
                     if (child_gps_device_long)
                     {
                         TRACE_I("Child_gps_device_long-[0x%x] ", child_gps_device_long->cloud_properties.device_id);
@@ -214,7 +214,7 @@ static ezlopi_error_t __0053_prepare(void *arg)
                         }
                     }
 
-                    l_ezlopi_device_t *child_gps_device_fix = ezlopi_device_add_device(device_prep_arg->cjson_device, "fix", parent_gps_device_lat->cloud_properties.device_id);
+                    l_ezlopi_device_t *child_gps_device_fix = ezlopi_device_add_device(device_prep_arg->cjson_device, "fix");
                     if (child_gps_device_fix)
                     {
                         TRACE_I("Child_gps_device_fix-[0x%x] ", child_gps_device_fix->cloud_properties.device_id);
@@ -233,7 +233,7 @@ static ezlopi_error_t __0053_prepare(void *arg)
                         }
                     }
 
-                    l_ezlopi_device_t *child_gps_device_sea_level = ezlopi_device_add_device(device_prep_arg->cjson_device, "sea_lvl", parent_gps_device_lat->cloud_properties.device_id);
+                    l_ezlopi_device_t *child_gps_device_sea_level = ezlopi_device_add_device(device_prep_arg->cjson_device, "sea_lvl");
                     if (child_gps_device_sea_level)
                     {
                         TRACE_I("Child_gps_device_sea_level-[0x%x] ", child_gps_device_sea_level->cloud_properties.device_id);
@@ -252,7 +252,7 @@ static ezlopi_error_t __0053_prepare(void *arg)
                         }
                     }
 
-                    l_ezlopi_device_t *child_gps_device_geoid = ezlopi_device_add_device(device_prep_arg->cjson_device, "geoid", parent_gps_device_lat->cloud_properties.device_id);
+                    l_ezlopi_device_t *child_gps_device_geoid = ezlopi_device_add_device(device_prep_arg->cjson_device, "geoid");
                     if (child_gps_device_geoid)
                     {
                         TRACE_I("Child_gps_device_geoid-[0x%x] ", child_gps_device_geoid->cloud_properties.device_id);

@@ -153,7 +153,7 @@ static ezlopi_error_t __prepare(void *arg, void *user_arg)
         if (ze08_ch2o_sensor)
         {
             memset(ze08_ch2o_sensor, 0, sizeof(ze08_ch2o_sensor_data_t));
-            l_ezlopi_device_t *ze08_ch2o_sensor_device = ezlopi_device_add_device(prep_arg->cjson_device, NULL, 0);
+            l_ezlopi_device_t *ze08_ch2o_sensor_device = ezlopi_device_add_device(prep_arg->cjson_device, NULL);
             if (ze08_ch2o_sensor_device)
             {
                 memset(ze08_ch2o_sensor_device, 0, sizeof(l_ezlopi_device_t));

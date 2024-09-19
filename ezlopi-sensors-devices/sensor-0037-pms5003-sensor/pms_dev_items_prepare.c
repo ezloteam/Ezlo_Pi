@@ -18,7 +18,7 @@ static int __prepare_particulate_matter_particles_0_dot_3_um_device_and_items(cJ
 {
     int ret = 0;
 
-    l_ezlopi_device_t *particles_0_dot_3_um_device = ezlopi_device_add_device(cj_properties, "Dust_Particles_0.3um", 0);
+    l_ezlopi_device_t *particles_0_dot_3_um_device = ezlopi_device_add_device(cj_properties, "Dust_Particles_0.3um");
     if (particles_0_dot_3_um_device)
     {
         ret = 1;
@@ -69,7 +69,7 @@ static int __prepare_particulate_matter_particles_0_dot_5_um_device_and_items(cJ
 {
     int ret = 0;
 
-    l_ezlopi_device_t *particles_0_dot_5_um_device = ezlopi_device_add_device(cj_properties, "Dust_Particles_0.5_um", parent_id);
+    l_ezlopi_device_t *particles_0_dot_5_um_device = ezlopi_device_add_device(cj_properties, "Dust_Particles_0.5_um");
     if (particles_0_dot_5_um_device)
     {
         ret = 1;
@@ -117,7 +117,7 @@ static int __prepare_particulate_matter_particles_1_um_device_and_items(cJSON *c
 {
     int ret = 0;
 
-    l_ezlopi_device_t *particles_1_um_device = ezlopi_device_add_device(cj_properties, "Dust_Particles_1_um", parent_id);
+    l_ezlopi_device_t *particles_1_um_device = ezlopi_device_add_device(cj_properties, "Dust_Particles_1_um");
     if (particles_1_um_device)
     {
         ret = 1;
@@ -165,7 +165,7 @@ static int __prepare_particulate_matter_particles_2_dot_5_um_device_and_items(cJ
 {
     int ret = 0;
 
-    l_ezlopi_device_t *particles_2_dot_5_um_device = ezlopi_device_add_device(cj_properties, "Dust_Particles_2.5_um", parent_id);
+    l_ezlopi_device_t *particles_2_dot_5_um_device = ezlopi_device_add_device(cj_properties, "Dust_Particles_2.5_um");
     if (particles_2_dot_5_um_device)
     {
         ret = 1;
@@ -213,7 +213,7 @@ static int __prepare_particulate_matter_particles_5_um_device_and_items(cJSON *c
 {
     int ret = 0;
 
-    l_ezlopi_device_t *particles_5_um_device = ezlopi_device_add_device(cj_properties, "Dust_Particles_5_um", parent_id);
+    l_ezlopi_device_t *particles_5_um_device = ezlopi_device_add_device(cj_properties, "Dust_Particles_5_um");
     if (particles_5_um_device)
     {
         ret = 1;
@@ -261,7 +261,7 @@ static int __prepare_particulate_matter_particles_10_um_device_and_items(cJSON *
 {
     int ret = 0;
 
-    l_ezlopi_device_t *particles_10_um_device = ezlopi_device_add_device(cj_properties, "Dust_Particles_10_um", parent_id);
+    l_ezlopi_device_t *particles_10_um_device = ezlopi_device_add_device(cj_properties, "Dust_Particles_10_um");
     if (particles_10_um_device)
     {
         ret = 1;
@@ -309,7 +309,7 @@ static int __prepare_particulate_matter_standard_particles_1_um_device_and_items
 {
     int ret = 0;
 
-    l_ezlopi_device_t *standard_particles_1_um_device = ezlopi_device_add_device(cj_properties, "Dust_Particles_PM_1_um", parent_id);
+    l_ezlopi_device_t *standard_particles_1_um_device = ezlopi_device_add_device(cj_properties, "Dust_Particles_PM_1_um");
     if (standard_particles_1_um_device)
     {
         ret = 1;
@@ -357,7 +357,7 @@ static int __prepare_particulate_matter_standard_particles_2_dot_5_um_device_and
 {
     int ret = 0;
 
-    l_ezlopi_device_t *standard_particles_2_dot_5_um_device = ezlopi_device_add_device(cj_properties, "Dust_Particles_PM_2.5_um", parent_id);
+    l_ezlopi_device_t *standard_particles_2_dot_5_um_device = ezlopi_device_add_device(cj_properties, "Dust_Particles_PM_2.5_um");
     if (standard_particles_2_dot_5_um_device)
     {
         ret = 1;
@@ -405,7 +405,7 @@ static int __prepare_particulate_matter_standard_particles_10_um_device_and_item
 {
     int ret = 0;
 
-    l_ezlopi_device_t *standard_particles_10_um_device = ezlopi_device_add_device(cj_properties, "Dust_Particles_PM_10_um", parent_id);
+    l_ezlopi_device_t *standard_particles_10_um_device = ezlopi_device_add_device(cj_properties, "Dust_Particles_PM_10_um");
     if (standard_particles_10_um_device)
     {
         ret = 1;
