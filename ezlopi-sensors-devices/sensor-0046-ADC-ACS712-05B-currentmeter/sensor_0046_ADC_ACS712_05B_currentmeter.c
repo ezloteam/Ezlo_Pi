@@ -20,13 +20,13 @@ typedef struct s_currentmeter
     float amp_value;
 } s_currentmeter_t;
 
-static ezlopi_error_t __0046_prepare(void* arg);
-static ezlopi_error_t __0046_init(l_ezlopi_item_t* item);
-static ezlopi_error_t __0046_get_cjson_value(l_ezlopi_item_t* item, void* arg);
-static ezlopi_error_t __0046_notify(l_ezlopi_item_t* item);
-static void __calculate_current_value(l_ezlopi_item_t* item);
+static ezlopi_error_t __0046_prepare(void *arg);
+static ezlopi_error_t __0046_init(l_ezlopi_item_t *item);
+static ezlopi_error_t __0046_get_cjson_value(l_ezlopi_item_t *item, void *arg);
+static ezlopi_error_t __0046_notify(l_ezlopi_item_t *item);
+static void __calculate_current_value(l_ezlopi_item_t *item);
 
-ezlopi_error_t sensor_0046_ADC_ACS712_05B_currentmeter(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
+ezlopi_error_t sensor_0046_ADC_ACS712_05B_currentmeter(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
     switch (action)
@@ -60,7 +60,7 @@ ezlopi_error_t sensor_0046_ADC_ACS712_05B_currentmeter(e_ezlopi_actions_t action
     return ret;
 }
 
-static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
+static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_electricity;
@@ -68,7 +68,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* 
     device->cloud_properties.info = NULL;
     device->cloud_properties.device_type = dev_type_sensor;
 }
-static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device, void* user_data)
+static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_data)
 {
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
     item->cloud_properties.has_getter = true;
@@ -88,21 +88,21 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_dev
 }
 
 //----------------------------------------------------
-static ezlopi_error_t __0046_prepare(void* arg)
+static ezlopi_error_t __0046_prepare(void *arg)
 {
     ezlopi_error_t ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
-    s_ezlopi_prep_arg_t* device_prep_arg = (s_ezlopi_prep_arg_t*)arg;
+    s_ezlopi_prep_arg_t *device_prep_arg = (s_ezlopi_prep_arg_t *)arg;
     if (device_prep_arg && (NULL != device_prep_arg->cjson_device))
     {
-        s_currentmeter_t* user_data = (s_currentmeter_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_currentmeter_t));
+        s_currentmeter_t *user_data = (s_currentmeter_t *)ezlopi_malloc(__FUNCTION__, sizeof(s_currentmeter_t));
         if (user_data)
         {
             memset(user_data, 0, sizeof(s_currentmeter_t));
-            l_ezlopi_device_t* currentmeter_device = ezlopi_device_add_device(device_prep_arg->cjson_device, NULL);
+            l_ezlopi_device_t *currentmeter_device = ezlopi_device_add_device(device_prep_arg->cjson_device, NULL);
             if (currentmeter_device)
             {
                 __prepare_device_cloud_properties(currentmeter_device, device_prep_arg->cjson_device);
-                l_ezlopi_item_t* currentmeter_item = ezlopi_device_add_item_to_device(currentmeter_device, sensor_0046_ADC_ACS712_05B_currentmeter);
+                l_ezlopi_item_t *currentmeter_item = ezlopi_device_add_item_to_device(currentmeter_device, sensor_0046_ADC_ACS712_05B_currentmeter);
                 if (currentmeter_item)
                 {
                     __prepare_item_cloud_properties(currentmeter_item, device_prep_arg->cjson_device, user_data);
@@ -123,12 +123,12 @@ static ezlopi_error_t __0046_prepare(void* arg)
     return ret;
 }
 
-static ezlopi_error_t __0046_init(l_ezlopi_item_t* item)
+static ezlopi_error_t __0046_init(l_ezlopi_item_t *item)
 {
     ezlopi_error_t ret = EZPI_ERR_INIT_DEVICE_FAILED;
     if (item)
     {
-        s_currentmeter_t* user_data = (s_currentmeter_t*)item->user_arg;
+        s_currentmeter_t *user_data = (s_currentmeter_t *)item->user_arg;
         if (user_data)
         {
             if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num))
@@ -143,13 +143,13 @@ static ezlopi_error_t __0046_init(l_ezlopi_item_t* item)
     return ret;
 }
 
-static ezlopi_error_t __0046_get_cjson_value(l_ezlopi_item_t* item, void* arg)
+static ezlopi_error_t __0046_get_cjson_value(l_ezlopi_item_t *item, void *arg)
 {
     ezlopi_error_t ret = EZPI_FAILED;
     if (item && arg)
     {
-        cJSON* cj_result = (cJSON*)arg;
-        s_currentmeter_t* user_data = (s_currentmeter_t*)item->user_arg;
+        cJSON *cj_result = (cJSON *)arg;
+        s_currentmeter_t *user_data = (s_currentmeter_t *)item->user_arg;
         if (user_data)
         {
             ezlopi_valueformatter_float_to_cjson(cj_result, user_data->amp_value, scales_ampere);
@@ -160,13 +160,13 @@ static ezlopi_error_t __0046_get_cjson_value(l_ezlopi_item_t* item, void* arg)
     return ret;
 }
 
-static ezlopi_error_t __0046_notify(l_ezlopi_item_t* item)
+static ezlopi_error_t __0046_notify(l_ezlopi_item_t *item)
 {
     // During this calculation the system is polled for 20mS
     ezlopi_error_t ret = EZPI_FAILED;
     if (item)
     {
-        s_currentmeter_t* user_data = (s_currentmeter_t*)item->user_arg;
+        s_currentmeter_t *user_data = (s_currentmeter_t *)item->user_arg;
         if (user_data)
         {
             float prev_amp = user_data->amp_value;
@@ -181,11 +181,11 @@ static ezlopi_error_t __0046_notify(l_ezlopi_item_t* item)
     return ret;
 }
 //--------------------------------------------------------------------------------------------------------------------------------------
-static void __calculate_current_value(l_ezlopi_item_t* item)
+static void __calculate_current_value(l_ezlopi_item_t *item)
 {
     if (NULL != item)
     {
-        s_currentmeter_t* user_data = (s_currentmeter_t*)item->user_arg;
+        s_currentmeter_t *user_data = (s_currentmeter_t *)item->user_arg;
         if (user_data)
         {
             s_ezlopi_analog_data_t ezlopi_analog_data = { .value = 0, .voltage = 0 };

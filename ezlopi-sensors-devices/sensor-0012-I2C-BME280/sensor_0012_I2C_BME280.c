@@ -229,8 +229,6 @@ static ezlopi_error_t __prepare(void *arg)
                     TRACE_I("Child_pressure_device-[0x%x] ", child_pressure_device->cloud_properties.device_id);
                     __prepare_device_cloud_properties_child_pressure(child_pressure_device, prep_arg->cjson_device);
 
-                    child_pressure_device->cloud_properties.parent_device_id = parent_temp_humid_device->cloud_properties.device_id;
-
                     l_ezlopi_item_t *pressure_item = ezlopi_device_add_item_to_device(child_pressure_device, sensor_0012_I2C_BME280);
                     if (pressure_item)
                     {

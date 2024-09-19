@@ -100,7 +100,6 @@ static ezlopi_error_t __0015_prepare(void *arg)
                         TRACE_I("Child_dht11_humi_device-[0x%x] ", child_device_humidity->cloud_properties.device_id);
                         __dht11_setup_device_cloud_properties_humidity(child_device_humidity, cjson_device);
 
-                        child_device_humidity->cloud_properties.parent_device_id = parent_device_temperature->cloud_properties.device_id;
                         l_ezlopi_item_t *item_humidity = ezlopi_device_add_item_to_device(child_device_humidity, sensor_0015_oneWire_DHT11);
                         if (item_humidity)
                         {
@@ -269,7 +268,7 @@ static ezlopi_error_t __0015_get_value(l_ezlopi_item_t *item, void *args)
 
 static ezlopi_error_t __0015_notify(l_ezlopi_item_t *item)
 {
-    ezlopi_error_t ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
     if (item)
     {
         s_ezlopi_dht11_data_t *dht11_data = (s_ezlopi_dht11_data_t *)item->user_arg;

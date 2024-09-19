@@ -31,6 +31,7 @@
 
 #include "ezlopi_hal_system_info.h"
 #include "ezlopi_service_loop.h"
+#include "ezlopi_service_system_temperature_sensor.h"
 
 static void __device_loop(void *arg);
 static void ezlopi_initialize_devices_v3(void);
@@ -65,6 +66,9 @@ void ezlopi_init(void)
     vTaskDelay(10);
     // Init devices
     ezlopi_device_prepare();
+#if defined(CONFIG_EZPI_ENABLE_SYSTEM_TEMPERATURE)
+    ezlopi_system_temperature_device(EZLOPI_ACTION_PREPARE, NULL, NULL, NULL);
+#endif // EZPI_ENABLE_SYSTEM_TEMPERATURE
     vTaskDelay(10);
     // Init device_groups
     ezlopi_device_group_init();

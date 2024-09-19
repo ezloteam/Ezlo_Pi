@@ -41,5 +41,6 @@ idf_component_register(SRCS "ezlopi_core_broadcast.c" "ezlopi_core_ezlopi.c" "${
     REQUIRES    freertos
                 ${EZLOPI_CORE_COMPONENTS}
                 ${EZLOPI_CLOUD_COMPONENTS}
+                ezlopi-service-system-temperature-sensor
 )
 

@@ -19,12 +19,12 @@
 #include "sensor_0008_I2C_LTR303ALS.h"
 #include "EZLOPI_USER_CONFIG.h"
 
-static ezlopi_error_t __prepare(void* arg);
-static ezlopi_error_t __init(l_ezlopi_item_t* item);
-static ezlopi_error_t __notify(l_ezlopi_item_t* item);
-static ezlopi_error_t __get_value_cjson(l_ezlopi_item_t* item, void* arg);
+static ezlopi_error_t __prepare(void *arg);
+static ezlopi_error_t __init(l_ezlopi_item_t *item);
+static ezlopi_error_t __notify(l_ezlopi_item_t *item);
+static ezlopi_error_t __get_value_cjson(l_ezlopi_item_t *item, void *arg);
 
-ezlopi_error_t sensor_0008_I2C_LTR303ALS(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
+ezlopi_error_t sensor_0008_I2C_LTR303ALS(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
     switch (action)
@@ -59,28 +59,28 @@ ezlopi_error_t sensor_0008_I2C_LTR303ALS(e_ezlopi_actions_t action, l_ezlopi_ite
     return ret;
 }
 
-static ezlopi_error_t __get_value_cjson(l_ezlopi_item_t* item, void* arg)
+static ezlopi_error_t __get_value_cjson(l_ezlopi_item_t *item, void *arg)
 {
     ezlopi_error_t ret = EZPI_FAILED;
     if (item)
     {
-        cJSON* cj_param = (cJSON*)arg;
-        ltr303_data_t* als_ltr303_data = (ltr303_data_t*)item->user_arg;
+        cJSON *cj_param = (cJSON *)arg;
+        ltr303_data_t *als_ltr303_data = (ltr303_data_t *)item->user_arg;
         if (cj_param && als_ltr303_data)
         {
-            ezlopi_valueformatter_double_to_cjson(item, als_ltr303_data->lux, scales_lux);
+            ezlopi_valueformatter_double_to_cjson(cj_param, als_ltr303_data->lux, scales_lux);
             ret = EZPI_SUCCESS;
         }
     }
     return ret;
 }
 
-static ezlopi_error_t __notify(l_ezlopi_item_t* item)
+static ezlopi_error_t __notify(l_ezlopi_item_t *item)
 {
     ezlopi_error_t ret = EZPI_FAILED;
     if (item)
     {
-        ltr303_data_t* als_ltr303_data = (ltr303_data_t*)item->user_arg;
+        ltr303_data_t *als_ltr303_data = (ltr303_data_t *)item->user_arg;
         if (als_ltr303_data)
         {
             ltr303_data_t temp_data;
@@ -98,12 +98,12 @@ static ezlopi_error_t __notify(l_ezlopi_item_t* item)
     return ret;
 }
 
-static ezlopi_error_t __init(l_ezlopi_item_t* item)
+static ezlopi_error_t __init(l_ezlopi_item_t *item)
 {
     ezlopi_error_t ret = EZPI_ERR_INIT_DEVICE_FAILED;
     if (item)
     {
-        ltr303_data_t* als_ltr303_data = (ltr303_data_t*)item->user_arg;
+        ltr303_data_t *als_ltr303_data = (ltr303_data_t *)item->user_arg;
         if (als_ltr303_data)
         {
             if (item->interface.i2c_master.enable)
@@ -119,7 +119,7 @@ static ezlopi_error_t __init(l_ezlopi_item_t* item)
     return ret;
 }
 
-static void __prepare_device_cloud_properties(l_ezlopi_device_t * device, cJSON * cj_params)
+static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_params)
 {
     device->cloud_properties.category = category_light_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
@@ -128,7 +128,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t * device, cJSON 
     device->cloud_properties.device_type_id = NULL;
 }
 
-static void __prepare_item_properties(l_ezlopi_item_t * item, cJSON * cj_param)
+static void __prepare_item_properties(l_ezlopi_item_t *item, cJSON *cj_param)
 {
     CJSON_GET_VALUE_DOUBLE(cj_param, ezlopi_dev_type_str, item->interface_type);
     item->cloud_properties.has_getter = true;
@@ -145,26 +145,26 @@ static void __prepare_item_properties(l_ezlopi_item_t * item, cJSON * cj_param)
     item->interface.i2c_master.enable = true;
     item->interface.i2c_master.clock_speed = 100000;
     item->interface.i2c_master.address = LTR303_ADDR;
-    ltr303_data_t* als_ltr303_data = (ltr303_data_t*)ezlopi_malloc(__FUNCTION__, sizeof(ltr303_data_t));
+    ltr303_data_t *als_ltr303_data = (ltr303_data_t *)ezlopi_malloc(__FUNCTION__, sizeof(ltr303_data_t));
     if (als_ltr303_data)
     {
         memset(als_ltr303_data, 0, sizeof(ltr303_data_t));
-        item->user_arg = (void*)als_ltr303_data;
+        item->user_arg = (void *)als_ltr303_data;
     }
 }
 
-static ezlopi_error_t __prepare(void* arg)
+static ezlopi_error_t __prepare(void *arg)
 {
     ezlopi_error_t ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
 
-    s_ezlopi_prep_arg_t* prep_arg = (s_ezlopi_prep_arg_t*)arg;
+    s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
     if (prep_arg && prep_arg->cjson_device)
     {
-        l_ezlopi_device_t* als_ltr303_device = ezlopi_device_add_device(prep_arg->cjson_device, NULL);
+        l_ezlopi_device_t *als_ltr303_device = ezlopi_device_add_device(prep_arg->cjson_device, NULL);
         if (als_ltr303_device)
         {
             __prepare_device_cloud_properties(als_ltr303_device, prep_arg->cjson_device);
-            l_ezlopi_item_t* als_ltr303_item = ezlopi_device_add_item_to_device(als_ltr303_device, sensor_0008_I2C_LTR303ALS);
+            l_ezlopi_item_t *als_ltr303_item = ezlopi_device_add_item_to_device(als_ltr303_device, sensor_0008_I2C_LTR303ALS);
             if (als_ltr303_item)
             {
                 __prepare_item_properties(als_ltr303_item, prep_arg->cjson_device);

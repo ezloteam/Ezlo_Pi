@@ -136,8 +136,6 @@ static ezlopi_error_t __prepare(void *arg)
                     child_pressure_device->cloud_properties.category = category_level_sensor;
                     __prepare_device_cloud_properties(child_pressure_device, cj_device);
 
-                    child_pressure_device->cloud_properties.parent_device_id = parent_temp_humid_device->cloud_properties.device_id;
-
                     l_ezlopi_item_t *pressure_item = ezlopi_device_add_item_to_device(child_pressure_device, sensor_0010_I2C_BME680);
                     if (pressure_item)
                     {
@@ -159,8 +157,6 @@ static ezlopi_error_t __prepare(void *arg)
                     TRACE_I("Child_aqi_device-[0x%x] ", child_aqi_device->cloud_properties.device_id);
                     child_aqi_device->cloud_properties.category = category_level_sensor;
                     __prepare_device_cloud_properties(child_aqi_device, cj_device);
-
-                    child_aqi_device->cloud_properties.parent_device_id = parent_temp_humid_device->cloud_properties.device_id;
 
                     l_ezlopi_item_t *aqi_item = ezlopi_device_add_item_to_device(child_aqi_device, sensor_0010_I2C_BME680);
                     if (aqi_item)
@@ -184,8 +180,6 @@ static ezlopi_error_t __prepare(void *arg)
                     child_altitude_device->cloud_properties.category = category_level_sensor;
                     __prepare_device_cloud_properties(child_altitude_device, cj_device);
 
-                    child_altitude_device->cloud_properties.parent_device_id = parent_temp_humid_device->cloud_properties.device_id;
-
                     l_ezlopi_item_t *altitude_item = ezlopi_device_add_item_to_device(child_altitude_device, sensor_0010_I2C_BME680);
                     if (altitude_item)
                     {
@@ -207,8 +201,6 @@ static ezlopi_error_t __prepare(void *arg)
                     TRACE_I("Child_co2_device-[0x%x] ", child_co2_device->cloud_properties.device_id);
                     child_co2_device->cloud_properties.category = category_level_sensor;
                     __prepare_device_cloud_properties(child_co2_device, cj_device);
-
-                    child_co2_device->cloud_properties.parent_device_id = parent_temp_humid_device->cloud_properties.device_id;
 
                     l_ezlopi_item_t *co2_item = ezlopi_device_add_item_to_device(child_co2_device, sensor_0010_I2C_BME680);
                     if (co2_item)
@@ -330,7 +322,7 @@ static ezlopi_error_t __notify(l_ezlopi_item_t *item)
             float altitude = user_data->altitude;
             float co2_eqv = user_data->co2_equivalent;
 
-            if(true == bme680_get_data(user_data))
+            if (true == bme680_get_data(user_data))
             {
                 if (ezlopi_item_name_temp == item->cloud_properties.item_name)
                 {

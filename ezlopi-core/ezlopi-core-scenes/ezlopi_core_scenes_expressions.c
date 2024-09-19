@@ -216,9 +216,9 @@ static int __edit_expression_ll(s_ezlopi_expressions_t *expn_node, cJSON *cj_new
     return ret;
 }
 
-int ezlopi_scenes_expressions_update_nvs(char *nvs_exp_id_key, cJSON *cj_updated_exp)
+ezlopi_error_t ezlopi_scenes_expressions_update_nvs(char *nvs_exp_id_key, cJSON *cj_updated_exp)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
     if (cj_updated_exp)
     {
         char *update_exp_str = cJSON_PrintBuffered(__FUNCTION__, cj_updated_exp, 1024, false);
@@ -227,7 +227,8 @@ int ezlopi_scenes_expressions_update_nvs(char *nvs_exp_id_key, cJSON *cj_updated
         if (update_exp_str)
         {
             ezlopi_nvs_delete_stored_data_by_name(nvs_exp_id_key);
-            if (1 == (ret = ezlopi_nvs_write_str(update_exp_str, strlen(update_exp_str), nvs_exp_id_key)))
+            ret = ezlopi_nvs_write_str(update_exp_str, strlen(update_exp_str), nvs_exp_id_key);
+            if (EZPI_SUCCESS == ret)
             {
                 TRACE_S("successfully saved/modified expression in nvs");
             }
@@ -766,9 +767,9 @@ s_ezlopi_expressions_t *ezlopi_scenes_expression_get_by_name(char *target_exp_na
     return curr_node;
 }
 
-int ezlopi_scenes_expression_update_expr(s_ezlopi_expressions_t *expression_node, cJSON *cj_new_expression)
+ezlopi_error_t ezlopi_scenes_expression_update_expr(s_ezlopi_expressions_t *expression_node, cJSON *cj_new_expression)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
     if (expression_node && cj_new_expression)
     {
         if (1 == __edit_expression_ll(expression_node, cj_new_expression)) // if successfully updated in ll
@@ -957,7 +958,7 @@ ezlopi_error_t ezlopi_scenes_expressions_init(void)
 {
     // __remove_residue_expn_ids_from_list(); // for furture
     ezlopi_error_t error = EZPI_ERR_JSON_PARSE_FAILED;
-    char* exp_id_list_str = ezlopi_nvs_read_scenes_expressions();
+    char *exp_id_list_str = ezlopi_nvs_read_scenes_expressions();
     if (exp_id_list_str)
     {
         TRACE_D("exp_id_list_str: %s", exp_id_list_str);

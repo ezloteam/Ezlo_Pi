@@ -26,18 +26,18 @@
 #include "ezlopi_cloud_constants.h"
 #include "EZLOPI_USER_CONFIG.h"
 
-int ezlopi_scene_then_set_item_value(l_scenes_list_v2_t* curr_scene, void* arg)
+int ezlopi_scene_then_set_item_value(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     // TRACE_W(" Set_item_value ");
     int ret = 0;
     uint32_t item_id = 0;
-    cJSON* cj_params = cJSON_CreateObject(__FUNCTION__);
+    cJSON *cj_params = cJSON_CreateObject(__FUNCTION__);
     if (cj_params)
     {
-        l_action_block_v2_t* curr_then = (l_action_block_v2_t*)arg;
+        l_action_block_v2_t *curr_then = (l_action_block_v2_t *)arg;
         if (curr_then)
         {
-            l_fields_v2_t* curr_field = curr_then->fields;
+            l_fields_v2_t *curr_field = curr_then->fields;
             while (curr_field)
             {
                 if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "item", strlen(curr_field->name), 5))
@@ -70,7 +70,7 @@ int ezlopi_scene_then_set_item_value(l_scenes_list_v2_t* curr_scene, void* arg)
 
             if (item_id)
             {
-                l_ezlopi_item_t* curr_item = ezlopi_device_get_item_by_id(item_id);
+                l_ezlopi_item_t *curr_item = ezlopi_device_get_item_by_id(item_id);
                 if (curr_item)
                 {
                     curr_item->func(EZLOPI_ACTION_SET_VALUE, curr_item, cj_params, curr_item->user_arg);
@@ -83,21 +83,21 @@ int ezlopi_scene_then_set_item_value(l_scenes_list_v2_t* curr_scene, void* arg)
     }
     return ret;
 }
-int ezlopi_scene_then_group_set_item_value(l_scenes_list_v2_t* curr_scene, void* arg)
+int ezlopi_scene_then_group_set_item_value(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     // TRACE_W("Warning: then-method not implemented!");
     int ret = 0;
     uint32_t device_group_id = 0;
     uint32_t item_group_id = 0;
-    char * item_id_str = NULL;
+    // char * item_id_str = NULL;
 
-    cJSON* cj_params = cJSON_CreateObject(__FUNCTION__);
+    cJSON *cj_params = cJSON_CreateObject(__FUNCTION__);
     if (cj_params)
     {
-        l_action_block_v2_t* curr_then = (l_action_block_v2_t*)arg;
+        l_action_block_v2_t *curr_then = (l_action_block_v2_t *)arg;
         if (curr_then)
         {
-            l_fields_v2_t* curr_field = curr_then->fields;
+            l_fields_v2_t *curr_field = curr_then->fields;
             while (curr_field)
             {
                 if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "deviceGroup", strlen(curr_field->name), 12))
@@ -112,7 +112,7 @@ int ezlopi_scene_then_group_set_item_value(l_scenes_list_v2_t* curr_scene, void*
                 }
                 else if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, ezlopi_value_str, strlen(curr_field->name), 6))
                 {
-                    #warning "need to add more item_value_types";
+#warning "need to add more item_value_types";
                     switch (curr_field->value_type)
                     {
                     case EZLOPI_VALUE_TYPE_INT:
@@ -138,7 +138,6 @@ int ezlopi_scene_then_group_set_item_value(l_scenes_list_v2_t* curr_scene, void*
                     default:
                         break;
                     }
-
                 }
 
                 curr_field = curr_field->next;
@@ -146,27 +145,27 @@ int ezlopi_scene_then_group_set_item_value(l_scenes_list_v2_t* curr_scene, void*
 
             if (device_group_id && item_group_id)
             {
-                l_ezlopi_device_grp_t * curr_devgrp = ezlopi_core_device_group_get_by_id(device_group_id);
+                l_ezlopi_device_grp_t *curr_devgrp = ezlopi_core_device_group_get_by_id(device_group_id);
                 if (curr_devgrp)
                 {
                     int idx = 0;
-                    cJSON * cj_get_devarr = NULL;
-                    while (NULL != (cj_get_devarr = cJSON_GetArrayItem(curr_devgrp->devices, idx)))   // ["102ec000" , "102ec001" ,..]
+                    cJSON *cj_get_devarr = NULL;
+                    while (NULL != (cj_get_devarr = cJSON_GetArrayItem(curr_devgrp->devices, idx))) // ["102ec000" , "102ec001" ,..]
                     {
                         uint32_t curr_device_id = strtoul(cj_get_devarr->valuestring, NULL, 16);
-                        l_ezlopi_device_t * curr_device = ezlopi_device_get_by_id(curr_device_id);   // immediately goto "102ec000" ...
+                        l_ezlopi_device_t *curr_device = ezlopi_device_get_by_id(curr_device_id); // immediately goto "102ec000" ...
                         if (curr_device)
                         {
-                            l_ezlopi_item_t* curr_item_node = curr_device->items;   // perform operation on items of above device --> "102ec000"
+                            l_ezlopi_item_t *curr_item_node = curr_device->items; // perform operation on items of above device --> "102ec000"
                             while (curr_item_node)
                             {
                                 // compare with items_list stored in item_group_id
-                                l_ezlopi_item_grp_t * curr_item_grp = ezlopi_core_item_group_get_by_id(item_group_id);  // get  "ll_itemgrp_node"
+                                l_ezlopi_item_grp_t *curr_item_grp = ezlopi_core_item_group_get_by_id(item_group_id); // get  "ll_itemgrp_node"
                                 if (curr_item_grp)
                                 {
                                     int count = 0;
-                                    cJSON * cj_item_names = NULL;
-                                    while (NULL != (cj_item_names = cJSON_GetArrayItem(curr_item_grp->item_names, count)))  // ["202ec000" , "202ec001" ,..]
+                                    cJSON *cj_item_names = NULL;
+                                    while (NULL != (cj_item_names = cJSON_GetArrayItem(curr_item_grp->item_names, count))) // ["202ec000" , "202ec001" ,..]
                                     {
                                         uint32_t req_item_id_from_itemgrp = strtoul(cj_item_names->valuestring, NULL, 16);
                                         if (req_item_id_from_itemgrp == curr_item_node->cloud_properties.item_id)
@@ -192,7 +191,7 @@ int ezlopi_scene_then_group_set_item_value(l_scenes_list_v2_t* curr_scene, void*
     return ret;
 }
 
-int ezlopi_scene_then_set_device_armed(l_scenes_list_v2_t* curr_scene, void* arg)
+int ezlopi_scene_then_set_device_armed(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     // TRACE_W("Warning: then-method not implemented!");
     int ret = 0;
@@ -200,10 +199,10 @@ int ezlopi_scene_then_set_device_armed(l_scenes_list_v2_t* curr_scene, void* arg
     {
         uint32_t device_id = 0;
         bool device_armed = false;
-        l_action_block_v2_t* curr_then = (l_action_block_v2_t*)arg;
+        l_action_block_v2_t *curr_then = (l_action_block_v2_t *)arg;
         if (curr_then)
         {
-            l_fields_v2_t* curr_field = curr_then->fields;
+            l_fields_v2_t *curr_field = curr_then->fields;
             while (curr_field)
             {
                 if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "device", strlen(curr_field->name), 7))
@@ -222,14 +221,14 @@ int ezlopi_scene_then_set_device_armed(l_scenes_list_v2_t* curr_scene, void* arg
 
             if (device_id)
             {
-                l_ezlopi_device_t* curr_device = ezlopi_device_get_by_id(device_id);
+                l_ezlopi_device_t *curr_device = ezlopi_device_get_by_id(device_id);
                 if (curr_device)
                 {
                     curr_device->cloud_properties.armed = (device_armed) ? true : false;
-                    s_ezlopi_cloud_controller_t* controller_info = ezlopi_device_get_controller_information();
+                    s_ezlopi_cloud_controller_t *controller_info = ezlopi_device_get_controller_information();
                     if (controller_info)
                     {
-                        #warning "we need to change from 'controller' to device-specific [krishna]";
+#warning "we need to change from 'controller' to device-specific [krishna]";
                         controller_info->armed = (device_armed) ? true : false;
                     }
                 }
@@ -239,7 +238,7 @@ int ezlopi_scene_then_set_device_armed(l_scenes_list_v2_t* curr_scene, void* arg
 
     return ret;
 }
-int ezlopi_scene_then_group_set_device_armed(l_scenes_list_v2_t* curr_scene, void* arg)
+int ezlopi_scene_then_group_set_device_armed(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     // TRACE_W("Warning: then-method not implemented!");
     int ret = 0;
@@ -247,10 +246,10 @@ int ezlopi_scene_then_group_set_device_armed(l_scenes_list_v2_t* curr_scene, voi
     {
         uint32_t device_group_id = 0;
         bool device_armed = false;
-        l_action_block_v2_t* curr_then = (l_action_block_v2_t*)arg;
+        l_action_block_v2_t *curr_then = (l_action_block_v2_t *)arg;
         if (curr_then)
         {
-            l_fields_v2_t* curr_field = curr_then->fields;
+            l_fields_v2_t *curr_field = curr_then->fields;
             while (curr_field)
             {
                 if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "deviceGroup", strlen(curr_field->name), 12))
@@ -269,22 +268,22 @@ int ezlopi_scene_then_group_set_device_armed(l_scenes_list_v2_t* curr_scene, voi
 
             if (device_group_id)
             {
-                l_ezlopi_device_grp_t * curr_devgrp = ezlopi_core_device_group_get_by_id(device_group_id);
+                l_ezlopi_device_grp_t *curr_devgrp = ezlopi_core_device_group_get_by_id(device_group_id);
                 if (curr_devgrp)
                 {
                     int idx = 0;
-                    cJSON * cj_get_devarr = NULL;
-                    while (NULL != (cj_get_devarr = cJSON_GetArrayItem(curr_devgrp->devices, idx)))   // ["102ec000" , "102ec001" ,..]
+                    cJSON *cj_get_devarr = NULL;
+                    while (NULL != (cj_get_devarr = cJSON_GetArrayItem(curr_devgrp->devices, idx))) // ["102ec000" , "102ec001" ,..]
                     {
                         uint32_t curr_device_id = strtoul(cj_get_devarr->valuestring, NULL, 16);
-                        l_ezlopi_device_t * curr_device = ezlopi_device_get_by_id(curr_device_id);   // immediately goto "102ec000" ...
+                        l_ezlopi_device_t *curr_device = ezlopi_device_get_by_id(curr_device_id); // immediately goto "102ec000" ...
                         if (curr_device)
                         {
                             curr_device->cloud_properties.armed = (device_armed) ? true : false;
-                            s_ezlopi_cloud_controller_t* controller_info = ezlopi_device_get_controller_information();
+                            s_ezlopi_cloud_controller_t *controller_info = ezlopi_device_get_controller_information();
                             if (controller_info)
                             {
-                                #warning "we need to change from 'controller' to device-specific [krishna]";
+#warning "we need to change from 'controller' to device-specific [krishna]";
                                 controller_info->armed = (device_armed) ? true : false;
                             }
                         }
@@ -298,22 +297,22 @@ int ezlopi_scene_then_group_set_device_armed(l_scenes_list_v2_t* curr_scene, voi
     return ret;
 }
 
-int ezlopi_scene_then_send_cloud_abstract_command(l_scenes_list_v2_t* curr_scene, void* arg)
+int ezlopi_scene_then_send_cloud_abstract_command(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     TRACE_W("Warning: then-method not implemented!");
     return 0;
 }
-int ezlopi_scene_then_switch_house_mode(l_scenes_list_v2_t* curr_scene, void* arg)
+int ezlopi_scene_then_switch_house_mode(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     // TRACE_W(" switch_house_mode ");
     int ret = 0;
     if (curr_scene)
     {
         uint32_t house_mode_id = 0;
-        l_action_block_v2_t* curr_then = (l_action_block_v2_t*)arg;
+        l_action_block_v2_t *curr_then = (l_action_block_v2_t *)arg;
         if (curr_then)
         {
-            l_fields_v2_t* curr_field = curr_then->fields;
+            l_fields_v2_t *curr_field = curr_then->fields;
             while (curr_field)
             {
                 if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "houseMode", strlen(curr_field->name), 10))
@@ -337,39 +336,38 @@ int ezlopi_scene_then_switch_house_mode(l_scenes_list_v2_t* curr_scene, void* ar
 #if defined(CONFIG_EZPI_SERV_ENABLE_MODES)
             if (house_mode_id > 0)
             {
-                // first get the current 
-                s_ezlopi_modes_t* curr_house_mode = ezlopi_core_modes_get_custom_modes();
+                // first get the current
+                s_ezlopi_modes_t *curr_house_mode = ezlopi_core_modes_get_custom_modes();
 
                 // find and match the 'house_mode' you want to switch with.
-                s_house_modes_t* req_mode = ezlopi_core_modes_get_house_mode_by_id(house_mode_id);
+                s_house_modes_t *req_mode = ezlopi_core_modes_get_house_mode_by_id(house_mode_id);
                 TRACE_E("req-house-mode-id [%d] : curr->switch_to_mode_id[%d]",
-                    req_mode->_id,
-                    curr_house_mode->switch_to_mode_id);
+                        req_mode->_id,
+                        curr_house_mode->switch_to_mode_id);
                 if ((req_mode->_id != curr_house_mode->switch_to_mode_id))
                 {
                     ezlopi_core_modes_api_switch_mode(req_mode);
                     ret = 1;
                 }
             }
-#endif //CONFIG_EZPI_SERV_ENABLE_MODES
+#endif // CONFIG_EZPI_SERV_ENABLE_MODES
         }
-
     }
 
     return ret;
 }
-int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t* curr_scene, void* arg)
+int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     // TRACE_W(" send_http ");
     int ret = 0;
-    l_action_block_v2_t* curr_then = (l_action_block_v2_t*)arg;
+    l_action_block_v2_t *curr_then = (l_action_block_v2_t *)arg;
     if (curr_then)
     {
-        s_ezlopi_core_http_mbedtls_t* tmp_http_data = (s_ezlopi_core_http_mbedtls_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_ezlopi_core_http_mbedtls_t));
+        s_ezlopi_core_http_mbedtls_t *tmp_http_data = (s_ezlopi_core_http_mbedtls_t *)ezlopi_malloc(__FUNCTION__, sizeof(s_ezlopi_core_http_mbedtls_t));
         if (tmp_http_data)
         {
             memset(tmp_http_data, 0, sizeof(s_ezlopi_core_http_mbedtls_t));
-            l_fields_v2_t* curr_field = curr_then->fields;
+            l_fields_v2_t *curr_field = curr_then->fields;
 
             const s_sendhttp_method_t __sendhttp_method[] = {
                 {.field_name = "request", .field_func = parse_http_request_type},
@@ -406,15 +404,15 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t* curr_scene, void* ar
 
     return ret;
 }
-int ezlopi_scene_then_run_custom_script(l_scenes_list_v2_t* curr_scene, void* arg)
+int ezlopi_scene_then_run_custom_script(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     // TRACE_W(" run_custom_script ");
     int ret = 0;
     uint32_t script_id = 0;
-    l_action_block_v2_t* curr_then = (l_action_block_v2_t*)arg;
+    l_action_block_v2_t *curr_then = (l_action_block_v2_t *)arg;
     if (curr_then)
     {
-        l_fields_v2_t* curr_field = curr_then->fields;
+        l_fields_v2_t *curr_field = curr_then->fields;
         while (curr_field)
         {
             if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "script", strlen(curr_field->name), 7))
@@ -434,21 +432,21 @@ int ezlopi_scene_then_run_custom_script(l_scenes_list_v2_t* curr_scene, void* ar
 
     return ret;
 }
-int ezlopi_scene_then_run_plugin_script(l_scenes_list_v2_t* curr_scene, void* arg)
+int ezlopi_scene_then_run_plugin_script(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     TRACE_W("Warning: then-method not implemented!");
     return 0;
 }
-int ezlopi_scene_then_run_scene(l_scenes_list_v2_t* curr_scene, void* arg)
+int ezlopi_scene_then_run_scene(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     // TRACE_W(" run_scene ");
     int ret = 0;
     uint32_t sceneId = 0;
     bool execute_else_condition = false;
-    l_action_block_v2_t* curr_then = (l_action_block_v2_t*)arg;
+    l_action_block_v2_t *curr_then = (l_action_block_v2_t *)arg;
     if (curr_then)
     {
-        l_fields_v2_t* curr_field = curr_then->fields;
+        l_fields_v2_t *curr_field = curr_then->fields;
         while (curr_field)
         {
             if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, ezlopi_sceneId_str, strlen(curr_field->name), 8))
@@ -503,17 +501,17 @@ int ezlopi_scene_then_run_scene(l_scenes_list_v2_t* curr_scene, void* arg)
     }
     return ret;
 }
-int ezlopi_scene_then_set_scene_state(l_scenes_list_v2_t* curr_scene, void* arg)
+int ezlopi_scene_then_set_scene_state(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     // TRACE_W(" set_scene_state ");
     int ret = 0;
     uint32_t sceneID = 0;
     bool set_scene_enable = false;
-    l_action_block_v2_t* curr_then = (l_action_block_v2_t*)arg;
+    l_action_block_v2_t *curr_then = (l_action_block_v2_t *)arg;
 
     if (curr_then)
     {
-        l_fields_v2_t* curr_field = curr_then->fields;
+        l_fields_v2_t *curr_field = curr_then->fields;
         while (curr_field)
         {
             if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, ezlopi_sceneId_str, strlen(curr_field->name), 8))
@@ -535,10 +533,10 @@ int ezlopi_scene_then_set_scene_state(l_scenes_list_v2_t* curr_scene, void* arg)
             }
             curr_field = curr_field->next;
         }
-        l_scenes_list_v2_t* scene_node = ezlopi_scenes_get_by_id_v2(sceneID);
+        l_scenes_list_v2_t *scene_node = ezlopi_scenes_get_by_id_v2(sceneID);
         if (scene_node)
         {
-            if (1 == ezlopi_scenes_enable_disable_scene_by_id_v2(sceneID, set_scene_enable))
+            if (EZPI_SUCCESS == ezlopi_scenes_enable_disable_scene_by_id_v2(sceneID, set_scene_enable))
             {
                 ezlopi_scenes_status_change_broadcast(scene_node, scene_status_finished_str);
                 ret = 1;
@@ -553,16 +551,16 @@ int ezlopi_scene_then_set_scene_state(l_scenes_list_v2_t* curr_scene, void* arg)
     }
     return ret;
 }
-int ezlopi_scene_then_reset_latch(l_scenes_list_v2_t* curr_scene, void* arg)
+int ezlopi_scene_then_reset_latch(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     int ret = 0;
 
-    l_action_block_v2_t* curr_block = (l_action_block_v2_t*)arg;
+    l_action_block_v2_t *curr_block = (l_action_block_v2_t *)arg;
     if (curr_block && curr_scene)
     {
-        char * sceneId_str = NULL;
-        char * blockId_str = NULL;
-        l_fields_v2_t* curr_field = curr_block->fields;
+        char *sceneId_str = NULL;
+        char *blockId_str = NULL;
+        l_fields_v2_t *curr_field = curr_block->fields;
         while (curr_field)
         {
             if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, ezlopi_sceneId_str, strlen(curr_field->name), 8))
@@ -591,14 +589,14 @@ int ezlopi_scene_then_reset_latch(l_scenes_list_v2_t* curr_scene, void* arg)
     }
     return ret;
 }
-int ezlopi_scene_then_reset_scene_latches(l_scenes_list_v2_t* curr_scene, void* arg)
+int ezlopi_scene_then_reset_scene_latches(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     int ret = 0;
-    char * sceneId_str = 0;
-    l_action_block_v2_t* curr_then = (l_action_block_v2_t*)arg;
+    char *sceneId_str = 0;
+    l_action_block_v2_t *curr_then = (l_action_block_v2_t *)arg;
     if (curr_then && curr_scene)
     {
-        l_fields_v2_t* curr_field = curr_then->fields;
+        l_fields_v2_t *curr_field = curr_then->fields;
         while (curr_field)
         {
             if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, ezlopi_sceneId_str, strlen(curr_field->name), 8))
@@ -619,31 +617,31 @@ int ezlopi_scene_then_reset_scene_latches(l_scenes_list_v2_t* curr_scene, void* 
     }
     return ret;
 }
-int ezlopi_scene_then_reboot_hub(l_scenes_list_v2_t* curr_scene, void* arg)
+int ezlopi_scene_then_reboot_hub(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     TRACE_E("Rebooting ESP......................... ");
     EZPI_CORE_reset_reboot();
     return 1;
 }
-int ezlopi_scene_then_reset_hub(l_scenes_list_v2_t* curr_scene, void* arg)
+int ezlopi_scene_then_reset_hub(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     TRACE_W(" reset_hub ");
     int ret = 0;
-    cJSON* cj_params = cJSON_CreateObject(__FUNCTION__);
+    cJSON *cj_params = cJSON_CreateObject(__FUNCTION__);
 
     if (cj_params)
     {
-        l_action_block_v2_t* curr_then = (l_action_block_v2_t*)arg;
+        l_action_block_v2_t *curr_then = (l_action_block_v2_t *)arg;
         if (curr_then)
         {
-            l_fields_v2_t* curr_field = curr_then->fields;
+            l_fields_v2_t *curr_field = curr_then->fields;
             while (curr_field)
             {
                 if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "type", strlen(curr_field->name), 5))
                 {
                     if ((EZLOPI_VALUE_TYPE_ENUM == curr_field->value_type) && (NULL != curr_field->field_value.u_value.value_string))
                     {
-                        char* tmp_str = curr_field->field_value.u_value.value_string;
+                        char *tmp_str = curr_field->field_value.u_value.value_string;
                         // TRACE_S("value: %s", tmp_str);
                         if (EZPI_STRNCMP_IF_EQUAL(tmp_str, "factory", strlen(tmp_str), 8))
                         {
@@ -667,7 +665,7 @@ int ezlopi_scene_then_reset_hub(l_scenes_list_v2_t* curr_scene, void* arg)
                         }
                         else if (EZPI_STRNCMP_IF_EQUAL(tmp_str, "hard", strlen(tmp_str), 5))
                         {
-                            #warning "hard reset not in documention.";
+#warning "hard reset not in documention.";
                             EZPI_CORE_reset_factory_restore();
                         }
                     }
@@ -681,26 +679,26 @@ int ezlopi_scene_then_reset_hub(l_scenes_list_v2_t* curr_scene, void* arg)
     }
     return ret;
 }
-int ezlopi_scene_then_cloud_api(l_scenes_list_v2_t* curr_scene, void* arg)
+int ezlopi_scene_then_cloud_api(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     TRACE_W("Warning: then-method not implemented!");
     return 0;
 }
-int ezlopi_scene_then_set_expression(l_scenes_list_v2_t* curr_scene, void* arg)
+int ezlopi_scene_then_set_expression(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     int ret = 0;
     if (curr_scene)
     {
-        char* expression_name = NULL;
-        char* code_str = NULL;
-        char* exp_value_type = NULL;
-        cJSON* cj_metadata = NULL;
-        cJSON* cj_params = NULL;
+        char *expression_name = NULL;
+        char *code_str = NULL;
+        char *exp_value_type = NULL;
+        cJSON *cj_metadata = NULL;
+        cJSON *cj_params = NULL;
 
-        l_action_block_v2_t* curr_then = (l_action_block_v2_t*)arg;
+        l_action_block_v2_t *curr_then = (l_action_block_v2_t *)arg;
         if (curr_then)
         {
-            l_fields_v2_t* curr_field = curr_then->fields;
+            l_fields_v2_t *curr_field = curr_then->fields;
             while (curr_field)
             {
                 if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, ezlopi_name_str, strlen(curr_field->name), 5))
@@ -746,25 +744,25 @@ int ezlopi_scene_then_set_expression(l_scenes_list_v2_t* curr_scene, void* arg)
 
         if (expression_name)
         {
-            ret = ezlopi_core_scene_then_helper_setexpression_setvariable(expression_name, code_str, exp_value_type, cj_metadata, cj_params, NULL);
+            ret = (int)(EZPI_SUCCESS == ezlopi_core_scene_then_helper_setexpression_setvariable(expression_name, code_str, exp_value_type, cj_metadata, cj_params, NULL));
         }
     }
     return ret;
 }
-int ezlopi_scene_then_set_variable(l_scenes_list_v2_t* curr_scene, void* arg)
+int ezlopi_scene_then_set_variable(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     int ret = 0;
     if (curr_scene)
     {
-        char* expression_name = NULL;
-        char* var_value_type = NULL;
-        l_fields_v2_t* field_var_value = NULL;
-        cJSON* cj_metadata = NULL;
+        char *expression_name = NULL;
+        char *var_value_type = NULL;
+        l_fields_v2_t *field_var_value = NULL;
+        cJSON *cj_metadata = NULL;
 
-        l_action_block_v2_t* curr_then = (l_action_block_v2_t*)arg;
+        l_action_block_v2_t *curr_then = (l_action_block_v2_t *)arg;
         if (curr_then)
         {
-            l_fields_v2_t* curr_field = curr_then->fields;
+            l_fields_v2_t *curr_field = curr_then->fields;
             while (curr_field)
             {
                 if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, ezlopi_name_str, strlen(curr_field->name), 5))
@@ -802,25 +800,25 @@ int ezlopi_scene_then_set_variable(l_scenes_list_v2_t* curr_scene, void* arg)
 
         if (expression_name)
         {
-            ret = ezlopi_core_scene_then_helper_setexpression_setvariable(expression_name, NULL, var_value_type, cj_metadata, NULL, field_var_value);
+            ret = (int)(EZPI_SUCCESS == ezlopi_core_scene_then_helper_setexpression_setvariable(expression_name, NULL, var_value_type, cj_metadata, NULL, field_var_value));
         }
     }
     return ret;
 }
-int ezlopi_scene_then_toggle_value(l_scenes_list_v2_t* curr_scene, void* arg)
+int ezlopi_scene_then_toggle_value(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     // TRACE_W(" toggle_value ");
     int ret = 0;
     if (curr_scene)
     {
-        uint32_t item_id = 0;       /* item */
-        char*  __id_string = NULL;
-        char* expression_name = NULL; /* expression */
+        uint32_t item_id = 0; /* item */
+        char *__id_string = NULL;
+        char *expression_name = NULL; /* expression */
 
-        l_action_block_v2_t* curr_then = (l_action_block_v2_t*)arg;
+        l_action_block_v2_t *curr_then = (l_action_block_v2_t *)arg;
         if (curr_then)
         {
-            l_fields_v2_t* curr_field = curr_then->fields;
+            l_fields_v2_t *curr_field = curr_then->fields;
             while (curr_field)
             {
                 if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, ezlopi_item_str, strlen(curr_field->name), 5))
@@ -848,7 +846,7 @@ int ezlopi_scene_then_toggle_value(l_scenes_list_v2_t* curr_scene, void* arg)
             }
             else if (NULL != expression_name)
             {
-                s_ezlopi_expressions_t* curr_exp = ezlopi_scenes_get_expression_node_by_name(expression_name);
+                s_ezlopi_expressions_t *curr_exp = ezlopi_scenes_get_expression_node_by_name(expression_name);
                 if (curr_exp)
                 {
                     if (EXPRESSION_VALUE_TYPE_NUMBER == curr_exp->exp_value.type)
@@ -862,25 +860,24 @@ int ezlopi_scene_then_toggle_value(l_scenes_list_v2_t* curr_scene, void* arg)
                         curr_exp->exp_value.u_value.boolean_value = (false == curr_exp->exp_value.u_value.boolean_value) ? true : false;
                     }
                 }
-
             }
         }
     }
     return ret;
 }
 
-int ezlopi_scene_then_group_toggle_value(l_scenes_list_v2_t* curr_scene, void* arg)
+int ezlopi_scene_then_group_toggle_value(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     int ret = 0;
     if (curr_scene)
     {
         uint32_t device_group_id = 0;
-        uint32_t  item_group_id = 0;
+        uint32_t item_group_id = 0;
 
-        l_action_block_v2_t* curr_then = (l_action_block_v2_t*)arg;
+        l_action_block_v2_t *curr_then = (l_action_block_v2_t *)arg;
         if (curr_then)
         {
-            l_fields_v2_t* curr_field = curr_then->fields;
+            l_fields_v2_t *curr_field = curr_then->fields;
             while (curr_field)
             {
                 if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "deviceGroup", strlen(curr_field->name), 12))
@@ -901,30 +898,29 @@ int ezlopi_scene_then_group_toggle_value(l_scenes_list_v2_t* curr_scene, void* a
                 curr_field = curr_field->next;
             }
 
-
             if (device_group_id && item_group_id)
             {
-                l_ezlopi_device_grp_t * curr_devgrp = ezlopi_core_device_group_get_by_id(device_group_id);
+                l_ezlopi_device_grp_t *curr_devgrp = ezlopi_core_device_group_get_by_id(device_group_id);
                 if (curr_devgrp)
                 {
                     int idx = 0;
-                    cJSON * cj_get_devarr = NULL;
-                    while (NULL != (cj_get_devarr = cJSON_GetArrayItem(curr_devgrp->devices, idx)))   // ["102ec000" , "102ec001" ,..]
+                    cJSON *cj_get_devarr = NULL;
+                    while (NULL != (cj_get_devarr = cJSON_GetArrayItem(curr_devgrp->devices, idx))) // ["102ec000" , "102ec001" ,..]
                     {
                         uint32_t curr_device_id = strtoul(cj_get_devarr->valuestring, NULL, 16);
-                        l_ezlopi_device_t * curr_device = ezlopi_device_get_by_id(curr_device_id);   // immediately goto "102ec000" ...
+                        l_ezlopi_device_t *curr_device = ezlopi_device_get_by_id(curr_device_id); // immediately goto "102ec000" ...
                         if (curr_device)
                         {
-                            l_ezlopi_item_t* curr_item_node = curr_device->items;   // perform operation on items of above device --> "102ec000"
+                            l_ezlopi_item_t *curr_item_node = curr_device->items; // perform operation on items of above device --> "102ec000"
                             while (curr_item_node)
                             {
                                 // compare with items_list stored in item_group_id
-                                l_ezlopi_item_grp_t * curr_item_grp = ezlopi_core_item_group_get_by_id(item_group_id);  // get  "ll_itemgrp_node"
+                                l_ezlopi_item_grp_t *curr_item_grp = ezlopi_core_item_group_get_by_id(item_group_id); // get  "ll_itemgrp_node"
                                 if (curr_item_grp)
                                 {
                                     int count = 0;
-                                    cJSON * cj_item_names = NULL;
-                                    while (NULL != (cj_item_names = cJSON_GetArrayItem(curr_item_grp->item_names, count)))  // ["202ec000" , "202ec001" ,..]
+                                    cJSON *cj_item_names = NULL;
+                                    while (NULL != (cj_item_names = cJSON_GetArrayItem(curr_item_grp->item_names, count))) // ["202ec000" , "202ec001" ,..]
                                     {
                                         uint32_t req_item_id_from_itemgrp = strtoul(cj_item_names->valuestring, NULL, 16);
                                         // if the item_ids match ; Then compare the "item_values" with that of the "scene's" requirement
@@ -947,5 +943,4 @@ int ezlopi_scene_then_group_toggle_value(l_scenes_list_v2_t* curr_scene, void* a
     return ret;
 }
 
-
-#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+#endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS

@@ -40,12 +40,12 @@ static uint32_t aqi_item_id = 0;
 static uint32_t voc_item_id = 0;
 static uint32_t co2_item_id = 0;
 
-static ezlopi_error_t __prepare(void* arg, void* user_arg);
-static ezlopi_error_t __init(l_ezlopi_item_t* item);
-static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t* item, void* arg);
-static ezlopi_error_t __notify(l_ezlopi_item_t* item);
+static ezlopi_error_t __prepare(void *arg, void *user_arg);
+static ezlopi_error_t __init(l_ezlopi_item_t *item);
+static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg);
+static ezlopi_error_t __notify(l_ezlopi_item_t *item);
 
-ezlopi_error_t sensor_0068_ENS160_gas_sensor(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
+ezlopi_error_t sensor_0068_ENS160_gas_sensor(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
   ezlopi_error_t ret = EZPI_SUCCESS;
   switch (action)
@@ -78,14 +78,14 @@ ezlopi_error_t sensor_0068_ENS160_gas_sensor(e_ezlopi_actions_t action, l_ezlopi
   return ret;
 }
 
-static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t* item, void* arg)
+static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 {
   ezlopi_error_t ret = EZPI_FAILED;
 
-  cJSON* cj_params = (cJSON*)arg;
+  cJSON *cj_params = (cJSON *)arg;
   if (cj_params)
   {
-    ens160_t* ens160_sensor = (ens160_t*)item->user_arg;
+    ens160_t *ens160_sensor = (ens160_t *)item->user_arg;
     if (ens160_sensor)
     {
       if (item->cloud_properties.item_id == aqi_item_id)
@@ -106,10 +106,10 @@ static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t* item, void* arg)
   return ret;
 }
 
-static ezlopi_error_t __notify(l_ezlopi_item_t* item)
+static ezlopi_error_t __notify(l_ezlopi_item_t *item)
 {
   ezlopi_error_t ret = EZPI_FAILED;
-  ens160_t* ens160_sensor = (ens160_t*)item->user_arg;
+  ens160_t *ens160_sensor = (ens160_t *)item->user_arg;
   if (ens160_sensor)
   {
     if (has_setting_changed())
@@ -150,11 +150,11 @@ static ezlopi_error_t __notify(l_ezlopi_item_t* item)
   return ret;
 }
 
-static ezlopi_error_t __init(l_ezlopi_item_t* item)
+static ezlopi_error_t __init(l_ezlopi_item_t *item)
 {
   ezlopi_error_t ret = EZPI_ERR_INIT_DEVICE_FAILED;
 
-  ens160_t* ens160_sensor = (ens160_t*)item->user_arg;
+  ens160_t *ens160_sensor = (ens160_t *)item->user_arg;
   if (ens160_sensor)
   {
     if (item->interface.i2c_master.enable)
@@ -180,7 +180,7 @@ static ezlopi_error_t __init(l_ezlopi_item_t* item)
   return ret;
 }
 
-static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
+static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
   device->cloud_properties.category = category_level_sensor;
   device->cloud_properties.subcategory = subcategory_not_defined;
@@ -189,7 +189,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* 
   device->cloud_properties.device_type_id = NULL;
 }
 
-static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device, void* user_arg)
+static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_arg)
 {
   CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type);
   item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
@@ -213,26 +213,26 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_dev
   }
 }
 
-static ezlopi_error_t __prepare(void* arg, void* user_arg)
+static ezlopi_error_t __prepare(void *arg, void *user_arg)
 {
   ezlopi_error_t ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
 
-  s_ezlopi_prep_arg_t* prep_arg = (s_ezlopi_prep_arg_t*)arg;
+  s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
   if (prep_arg)
   {
-    ens160_t* ens160_sensor = (ens160_t*)ezlopi_malloc(__FUNCTION__, sizeof(ens160_t));
+    ens160_t *ens160_sensor = (ens160_t *)ezlopi_malloc(__FUNCTION__, sizeof(ens160_t));
     if (ens160_sensor)
     {
       memset(ens160_sensor, 0, sizeof(ens160_t));
       /* Prepare AQI device. */
-      l_ezlopi_device_t* parent_ens160_aqi_device = ezlopi_device_add_device(prep_arg->cjson_device, "aqi");
+      l_ezlopi_device_t *parent_ens160_aqi_device = ezlopi_device_add_device(prep_arg->cjson_device, "aqi");
       if (parent_ens160_aqi_device)
       {
         ret = EZPI_SUCCESS;
         TRACE_I("Parent_ens160_aqi_device-[0x%x] ", parent_ens160_aqi_device->cloud_properties.device_id);
         __prepare_device_cloud_properties(parent_ens160_aqi_device, prep_arg->cjson_device);
 
-        l_ezlopi_item_t* aqi_item = ezlopi_device_add_item_to_device(parent_ens160_aqi_device, sensor_0068_ENS160_gas_sensor);
+        l_ezlopi_item_t *aqi_item = ezlopi_device_add_item_to_device(parent_ens160_aqi_device, sensor_0068_ENS160_gas_sensor);
         if (aqi_item)
         {
           aqi_item->cloud_properties.item_name = ezlopi_item_name_volatile_organic_compound_level;
@@ -244,14 +244,13 @@ static ezlopi_error_t __prepare(void* arg, void* user_arg)
         }
 
         /* Prepare VOC device. */
-        l_ezlopi_device_t* child_ens160_voc_device = ezlopi_device_add_device(prep_arg->cjson_device, "voc");
+        l_ezlopi_device_t *child_ens160_voc_device = ezlopi_device_add_device(prep_arg->cjson_device, "voc");
         if (child_ens160_voc_device)
         {
           TRACE_I("Child_ens160_aqi_device-[0x%x] ", child_ens160_voc_device->cloud_properties.device_id);
           __prepare_device_cloud_properties(child_ens160_voc_device, prep_arg->cjson_device);
 
-          child_ens160_voc_device->cloud_properties.parent_device_id = parent_ens160_aqi_device->cloud_properties.device_id;
-          l_ezlopi_item_t* voc_item = ezlopi_device_add_item_to_device(child_ens160_voc_device, sensor_0068_ENS160_gas_sensor);
+          l_ezlopi_item_t *voc_item = ezlopi_device_add_item_to_device(child_ens160_voc_device, sensor_0068_ENS160_gas_sensor);
           if (voc_item)
           {
             voc_item->cloud_properties.item_name = ezlopi_item_name_volatile_organic_compound_level;
@@ -267,14 +266,13 @@ static ezlopi_error_t __prepare(void* arg, void* user_arg)
         }
 
         /* Prepare CO2 device. */
-        l_ezlopi_device_t* child_ens160_co2_device = ezlopi_device_add_device(prep_arg->cjson_device, "co2");
+        l_ezlopi_device_t *child_ens160_co2_device = ezlopi_device_add_device(prep_arg->cjson_device, "co2");
         if (child_ens160_co2_device)
         {
           TRACE_I("Child_ens160_co2_device-[0x%x] ", child_ens160_co2_device->cloud_properties.device_id);
           __prepare_device_cloud_properties(child_ens160_co2_device, prep_arg->cjson_device);
 
-          child_ens160_co2_device->cloud_properties.parent_device_id = parent_ens160_aqi_device->cloud_properties.device_id;
-          l_ezlopi_item_t* co2_item = ezlopi_device_add_item_to_device(child_ens160_co2_device, sensor_0068_ENS160_gas_sensor);
+          l_ezlopi_item_t *co2_item = ezlopi_device_add_item_to_device(child_ens160_co2_device, sensor_0068_ENS160_gas_sensor);
           if (co2_item)
           {
             co2_item->cloud_properties.item_name = ezlopi_item_name_co2_level;
@@ -290,8 +288,8 @@ static ezlopi_error_t __prepare(void* arg, void* user_arg)
         }
 
         if ((NULL == aqi_item) &&
-          (NULL == child_ens160_voc_device) &&
-          (NULL == child_ens160_co2_device))
+            (NULL == child_ens160_voc_device) &&
+            (NULL == child_ens160_co2_device))
         {
           ezlopi_device_free_device(parent_ens160_aqi_device);
           ezlopi_free(__FUNCTION__, ens160_sensor);
@@ -299,7 +297,7 @@ static ezlopi_error_t __prepare(void* arg, void* user_arg)
         }
         else
         {
-          sensor_0068_gas_sensor_settings_initialize(parent_ens160_aqi_device, (void*)ens160_sensor);
+          sensor_0068_gas_sensor_settings_initialize(parent_ens160_aqi_device, (void *)ens160_sensor);
         }
       }
       else

@@ -181,7 +181,6 @@ static ezlopi_error_t dht22_sensor_prepare_v3(void *arg)
                     if (child_device_humidity)
                     {
                         TRACE_I("Child_dht22_humi_device-[0x%x] ", child_device_humidity->cloud_properties.device_id);
-                        child_device_humidity->cloud_properties.parent_device_id = parent_device_temperature->cloud_properties.device_id;
 
                         dht22_sensor_setup_device_cloud_properties_humidity(child_device_humidity, cjson_device);
 

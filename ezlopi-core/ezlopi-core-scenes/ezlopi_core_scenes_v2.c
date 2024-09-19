@@ -62,7 +62,7 @@ int ezlopi_scene_edit_by_id(uint32_t scene_id, cJSON *cj_scene)
 
     if (EZPI_SUCCESS == ezlopi_core_scene_edit_store_updated_to_nvs(cj_scene)) // first store in nvs // add the new-block-id
     {
-        if (1 == ezlopi_core_scene_edit_update_id(scene_id, cj_scene)) // then populate to nvs
+        if (EZPI_SUCCESS == ezlopi_core_scene_edit_update_id(scene_id, cj_scene)) // then populate to nvs
         {
             ret = 1;
         }
@@ -146,7 +146,7 @@ uint32_t ezlopi_store_new_scene_v2(cJSON *cj_new_scene)
                             if (updated_scenes_list)
                             {
                                 TRACE_D("updated_scenes_list: %s", updated_scenes_list);
-                                if (ezlopi_nvs_scene_set_v2(updated_scenes_list))
+                                if (EZPI_SUCCESS == ezlopi_nvs_scene_set_v2(updated_scenes_list))
                                 {
                                     TRACE_D("Scenes list updated.");
                                 }
@@ -294,9 +294,9 @@ void ezlopi_scenes_depopulate_by_id_v2(uint32_t _id)
     }
 }
 
-int ezlopi_scenes_enable_disable_scene_by_id_v2(uint32_t _id, bool enabled_flag)
+ezlopi_error_t ezlopi_scenes_enable_disable_scene_by_id_v2(uint32_t _id, bool enabled_flag)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
     if (_id)
     {
         char tmp_buffer[32]; // store the scene name here
@@ -335,7 +335,7 @@ int ezlopi_scenes_enable_disable_scene_by_id_v2(uint32_t _id, bool enabled_flag)
                             ezlopi_nvs_delete_stored_data_by_name(cj_scene_id->valuestring);
                             ret = ezlopi_nvs_write_str(update_scene_str, strlen(update_scene_str), cj_scene_id->valuestring);
 
-                            if (ret)
+                            if (EZPI_SUCCESS == ret)
                             {
                                 TRACE_W("nvs updated successfull");
                             }
@@ -897,6 +897,12 @@ static void __new_method_populate(s_method_v2_t *p_method, cJSON *cj_method)
 {
     CJSON_GET_VALUE_STRING_BY_COPY(cj_method, ezlopi_name_str, p_method->name);
     p_method->type = ezlopi_scenes_method_get_type_enum(p_method->name);
+
+    // cJSON *method_name = cJSON_GetObjectItem(__FUNCTION__, cj_method, ezlopi_name_str);
+    // if (method_name && method_name->valuestring)
+    // {
+    //     TRACE_S("p_method->name : [%s] -> ll_method_name:[%s] -> type:[%d]", method_name->valuestring, p_method->name, p_method->type);
+    // }
 }
 
 static void _____new_action_delay(s_action_delay_v2_t *action_delay, cJSON *cj_delay)
@@ -1462,9 +1468,10 @@ int ezlopi_core_scene_set_reset_latch_enable(const char* sceneId_str, const char
                         if (cj_scene_id && cj_scene_id->valuestring)
                         {
                             ezlopi_nvs_delete_stored_data_by_name(cj_scene_id->valuestring);
-                            ret = ezlopi_nvs_write_str(update_scene_str, strlen(update_scene_str), cj_scene_id->valuestring);
+                            
+                            ret = (EZPI_SUCCESS == ezlopi_nvs_write_str(update_scene_str, strlen(update_scene_str), cj_scene_id->valuestring))
 
-                            if (ret)
+                            if(ret)
                             {
                                 TRACE_W("nvs updated successfull");
                             }
@@ -1642,9 +1649,9 @@ static bool ___enable_disable_block_en_with_blockId(cJSON *cj_when_block, const 
 
     return block_en_changed;
 }
-int ezlopi_core_scene_block_enable_set_reset(const char *sceneId_str, const char *blockId_str, bool enable_status)
+ezlopi_error_t ezlopi_core_scene_block_enable_set_reset(const char *sceneId_str, const char *blockId_str, bool enable_status)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
     uint32_t sceneId = strtoul(sceneId_str, NULL, 16);
     l_scenes_list_v2_t *curr_scene = ezlopi_scenes_get_by_id_v2(sceneId);
     if (curr_scene)
@@ -1681,7 +1688,7 @@ int ezlopi_core_scene_block_enable_set_reset(const char *sceneId_str, const char
                                 ezlopi_nvs_delete_stored_data_by_name(cj_scene_id->valuestring);
                                 ret = ezlopi_nvs_write_str(update_scene_str, strlen(update_scene_str), cj_scene_id->valuestring);
 
-                                if (ret)
+                                if (EZPI_SUCCESS == ret)
                                 {
                                     TRACE_W("nvs updated successfull");
                                     /*secondly Change in ll */
@@ -1775,9 +1782,9 @@ static bool ___add_new_blockmeta_by_id(cJSON *cj_when_block, const char *blockId
     return block_meta_changed;
 }
 
-int ezlopi_core_scene_meta_by_id(const char *sceneId_str, const char *blockId_str, cJSON *cj_new_meta)
+ezlopi_error_t ezlopi_core_scene_meta_by_id(const char *sceneId_str, const char *blockId_str, cJSON *cj_new_meta)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
     uint32_t sceneId = strtoul(sceneId_str, NULL, 16);
     l_scenes_list_v2_t *curr_scene = ezlopi_scenes_get_by_id_v2(sceneId);
     if (curr_scene && cj_new_meta)
@@ -1823,7 +1830,7 @@ int ezlopi_core_scene_meta_by_id(const char *sceneId_str, const char *blockId_st
                             ezlopi_nvs_delete_stored_data_by_name(cj_scene_id->valuestring);
                             ret = ezlopi_nvs_write_str(update_scene_str, strlen(update_scene_str), cj_scene_id->valuestring);
 
-                            if (ret)
+                            if (EZPI_SUCCESS == ret)
                             {
                                 TRACE_W("nvs updated successfully");
                                 /*secondly Change in ll */

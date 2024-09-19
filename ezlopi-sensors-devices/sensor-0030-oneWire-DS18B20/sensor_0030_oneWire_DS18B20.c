@@ -16,10 +16,10 @@
 #include "sensor_0030_oneWire_DS18B20.h"
 #include "EZLOPI_USER_CONFIG.h"
 
-static ezlopi_error_t __prepare(void* arg);
-static ezlopi_error_t __init(l_ezlopi_item_t* item);
-static ezlopi_error_t __notify(l_ezlopi_item_t* item);
-static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t* item, void* arg);
+static ezlopi_error_t __prepare(void *arg);
+static ezlopi_error_t __init(l_ezlopi_item_t *item);
+static ezlopi_error_t __notify(l_ezlopi_item_t *item);
+static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg);
 
 static esp_err_t ds18b20_write_data(uint8_t *data, uint32_t gpio_pin);
 static esp_err_t ds18b20_read_data(uint8_t *data, uint32_t gpio_pin);
@@ -29,9 +29,9 @@ static bool ds18b20_recognize_device(uint32_t gpio_pin);
 static esp_err_t ds18b20_get_temperature_data(double *temperature_data, uint32_t gpio_pin);
 static uint8_t ds18b20_calculate_crc(const uint8_t *data, uint8_t len);
 
-ezlopi_error_t sensor_0030_oneWire_DS18B20(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
+ezlopi_error_t sensor_0030_oneWire_DS18B20(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
-    
+
     ezlopi_error_t ret = EZPI_SUCCESS;
     switch (action)
     {
@@ -64,10 +64,10 @@ ezlopi_error_t sensor_0030_oneWire_DS18B20(e_ezlopi_actions_t action, l_ezlopi_i
     return ret;
 }
 
-static ezlopi_error_t __notify(l_ezlopi_item_t* item)
+static ezlopi_error_t __notify(l_ezlopi_item_t *item)
 {
     ezlopi_error_t ret = EZPI_FAILED;
-    double* temperature_prev_value = (double*)item->user_arg;
+    double *temperature_prev_value = (double *)item->user_arg;
     double temperature_current_value = 0.00;
     esp_err_t error = ds18b20_get_temperature_data(&temperature_current_value, item->interface.onewire_master.onewire_pin);
     if (ESP_OK == error)
@@ -92,21 +92,21 @@ static ezlopi_error_t __notify(l_ezlopi_item_t* item)
     return ret;
 }
 
-static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t* item, void* arg)
+static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 {
     ezlopi_error_t ret = EZPI_FAILED;
 
     if (item && arg && item->user_arg)
     {
-        cJSON* cj_result = (cJSON*)arg;
-        double* temperatue_value = (double*)item->user_arg;
+        cJSON *cj_result = (cJSON *)arg;
+        double *temperatue_value = (double *)item->user_arg;
         ezlopi_valueformatter_double_to_cjson(cj_result, *temperatue_value, scales_celsius);
         ret = EZPI_SUCCESS;
     }
     return ret;
 }
 
-static ezlopi_error_t __init(l_ezlopi_item_t* item)
+static ezlopi_error_t __init(l_ezlopi_item_t *item)
 {
     printf("HERE0\n");
     ezlopi_error_t ret = EZPI_ERR_INIT_DEVICE_FAILED;
@@ -120,12 +120,12 @@ static ezlopi_error_t __init(l_ezlopi_item_t* item)
             if (ds18b20_recognize_device(item->interface.onewire_master.onewire_pin))
             {
                 printf("HERE3\n");
-                double* temperature_prev_value = (double*)item->user_arg;
+                double *temperature_prev_value = (double *)item->user_arg;
                 TRACE_D("Providing initial settings to DS18B20");
                 ds18b20_write_to_scratchpad(DS18B20_TH_HIGHER_THRESHOLD, DS18B20_TL_LOWER_THRESHOLD, 12, item->interface.onewire_master.onewire_pin);
                 ds18b20_get_temperature_data(temperature_prev_value, item->interface.onewire_master.onewire_pin);
                 ret = EZPI_SUCCESS;
-                
+
             }
         }
     }
@@ -160,10 +160,10 @@ static void __prepare_item_properties(l_ezlopi_item_t *item, cJSON *cj_device)
     CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_str, item->interface.onewire_master.onewire_pin);
 }
 
-static ezlopi_error_t __prepare(void* arg)
+static ezlopi_error_t __prepare(void *arg)
 {
     ezlopi_error_t ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
-    s_ezlopi_prep_arg_t* prep_arg = (s_ezlopi_prep_arg_t*)arg;
+    s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
 
     if (prep_arg && prep_arg->cjson_device)
     {
@@ -182,7 +182,7 @@ static ezlopi_error_t __prepare(void* arg)
                     memset(temperature_value, 0, sizeof(double));
                     *temperature_value = 65536.0f;
                     item_temperature->is_user_arg_unique = true;
-                    item_temperature->user_arg = (void*)temperature_value;
+                    item_temperature->user_arg = (void *)temperature_value;
                     ret = EZPI_SUCCESS;
                 }
             }
