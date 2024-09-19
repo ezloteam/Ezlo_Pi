@@ -4,6 +4,26 @@
 
 # RELEASE NOTES
 
+# Version 4.1.6 Build 196
+
+## New
+
+1. Add remaining 'device/item_group' - comparison features in 'when' & 'then' [EZPI-437](https://jira.mios.com/browse/EZPI-437)
+2. Implement isGroupItem_group : when-method [EZPI-464](https://jira.mios.com/browse/EZPI-464)
+3. add expression-update feature when using 'hub.scenes.expressions.set'. [EZPI-465](https://jira.mios.com/browse/EZPI-465)
+4. Implement Group_set_Item_value then-method [EZPI-456](https://jira.mios.com/browse/EZPI-456)
+5. Implement Group_set_Device_armed then-method [EZPI-457](https://jira.mios.com/browse/EZPI-457)
+6. Implement Group_toggle_value then-method [EZPI-458](https://jira.mios.com/browse/EZPI-458)
+
+## Fixes
+
+1. Avoid HTTP Requests if there is no valid HTTP/S URL [EZPI-474](https://jira.mios.com/browse/EZPI-474)
+2. Issues when distinguishing between 'expression' and 'variable'. [EZPI-476](https://jira.mios.com/browse/EZPI-476)
+3. Duplication of Expression/Variable with same name. [EZPI-475](https://jira.mios.com/browse/EZPI-475)
+4. BLE Onboarding, cJSON incorrect cert length [EZPI-491](https://jira.mios.com/browse/EZPI-491)
+5. Scenes with three or more triggers are not created - broadcasts about the successful creation of the scene are not received. [EZPI-320](https://jira.mios.com/browse/EZPI-320)
+6. Bug found when triggering 'hub.device.room.set' [EZPI-473](https://jira.mios.com/browse/EZPI-473)
+
 # Version 4.1.5 Build 195
 
 ## New

@@ -25,6 +25,8 @@ set(EZLOPI_CLOUD_COMPONENTS
         ezlopi-cloud-offline-login
         ezlopi-cloud-registration
         ezlopi-cloud-log
+        ezlopi-cloud-hub-data-list
+        ezlopi-cloud-setting-commands
 )
 
 set(EZLOPI_CORE_COMPONENTS 

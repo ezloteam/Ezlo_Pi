@@ -487,27 +487,19 @@ static char *__base64_decode_provisioning_info(uint32_t total_size)
 
         TRACE_D("base64_buffer: %s", base64_buffer);
 
-        uint32_t buffer_len = 0;
         decoded_config_json = ezlopi_malloc(__FUNCTION__, total_size);
-        decoded_config_json = ezlopi_core_buffer_acquire(__FUNCTION__, &buffer_len, 5000);
+        // decoded_config_json = ezlopi_core_buffer_acquire(__FUNCTION__, &buffer_len, 5000);
 
         if (decoded_config_json)
         {
-            if (buffer_len >= total_size)
-            {
-                size_t o_len = 0;
-                bzero(decoded_config_json, total_size);
-                mbedtls_base64_decode((uint8_t *)decoded_config_json, (size_t)total_size, &o_len, (uint8_t *)base64_buffer, strlen(base64_buffer));
-                TRACE_D("Decoded data: %s", decoded_config_json);
-            }
-            else
-            {
-                TRACE_E("decoding buffer underflow!");
-            }
+            size_t o_len = 0;
+            bzero(decoded_config_json, total_size);
+            mbedtls_base64_decode((uint8_t *)decoded_config_json, (size_t)total_size, &o_len, (uint8_t *)base64_buffer, strlen(base64_buffer));
+            TRACE_D("Decoded data: %s", decoded_config_json);
         }
         else
         {
-            TRACE_E("decoding bufffer acquire failed!");
+            TRACE_E("decoding bufffer allocation failed!");
         }
 
         ezlopi_free(__FUNCTION__, base64_buffer);

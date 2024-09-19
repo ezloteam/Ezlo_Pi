@@ -98,15 +98,17 @@ static void __loop(void* pv)
 
         while (__loop_node)
         {
-            if ((NULL != __loop_node->loop) && ((xTaskGetTickCount() - __loop_node->_timer_ms) >= __loop_node->period_ms))
-            {
-                uint32_t __loop_time = xTaskGetTickCount();
 
+            uint32_t conditions = ((xTaskGetTickCount() - __loop_node->_timer_ms) >= __loop_node->period_ms);
+            if ((NULL != __loop_node->loop) && conditions)
+            {
+                
+                uint32_t __loop_time = xTaskGetTickCount();
                 __loop_node->loop(__loop_node->arg);
                 __loop_node->_timer_ms = xTaskGetTickCount();
                 __loop_time = (xTaskGetTickCount() - __loop_time);
 
-                // TRACE_D("'%s': \t\t %u", __loop_node->name ? __loop_node->name : "", __loop_time);
+                // TRACE_D("'%s': \t\t %u(period: %d(cmp: %d))", __loop_node->name ? __loop_node->name : "", __loop_time);
 
                 vTaskDelay(1 / portTICK_RATE_MS);
             }

@@ -9,6 +9,7 @@
 #include "ezlopi_core_broadcast.h"
 #include "ezlopi_core_event_group.h"
 #include "ezlopi_core_factory_info.h"
+#include "ezlopi_core_errors.h"
 
 #include "ezlopi_service_loop.h"
 #include "ezlopi_service_webprov.h"
@@ -87,18 +88,18 @@ static void __create_reg_packet(void)
 
 static void __reg_loop(void *arg)
 {
-    // TRACE_D("reg-loop");
-    int reg_event = ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 0, false);
-    // TRACE_D("reg-event: %d", reg_event);
+    TRACE_D("reg-loop");
+    ezlopi_error_t reg_event = ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 0, false);
+    TRACE_D("reg-event: %d", reg_event);
 
-    if (reg_event <= 0)
+    if (reg_event != ESP_OK)
     {
         __create_reg_packet();
 
         cJSON* cj_register_dup = cJSON_CreateObjectReference(__FUNCTION__, cj_reg_data->child);
         if (cj_register_dup)
         {
-            if (!ezlopi_core_broadcast_add_to_queue(cj_register_dup))
+            if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(cj_register_dup))
             {
                 TRACE_E("Error adding to broadcast queue!");
                 cJSON_Delete(__FUNCTION__, cj_register_dup);

@@ -9,6 +9,7 @@
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
+#include "ezlopi_core_errors.h"
 
 #include "ezlopi_cloud_items.h"
 #include "ezlopi_cloud_constants.h"
@@ -17,26 +18,26 @@
 #include "hilink_presence_sensor_setting.h"
 #include "EZLOPI_USER_CONFIG.h"
 
-static const char* hilink_presence_sensor_motion_direction_enum[] = {
+static const char *hilink_presence_sensor_motion_direction_enum[] = {
     "unknown",
     "no_motion",
     "incoming",
     "outgoing",
 };
 
-static l_ezlopi_item_t* motion_item;
-static l_ezlopi_item_t* motion_direction_item;
-static l_ezlopi_item_t* distance_item;
+static l_ezlopi_item_t *motion_item;
+static l_ezlopi_item_t *motion_direction_item;
+static l_ezlopi_item_t *distance_item;
 
-static int __prepare(void* arg, void* user_arg);
-static int __init(l_ezlopi_item_t* item);
-static int __get_hub_item_value(l_ezlopi_item_t* item, void* args);
-static int __get_cjson_value(l_ezlopi_item_t* item, void* args);
-static int __notify(l_ezlopi_item_t* item);
+static ezlopi_error_t __prepare(void *arg, void *user_arg);
+static ezlopi_error_t __init(l_ezlopi_item_t *item);
+static ezlopi_error_t __get_hub_item_value(l_ezlopi_item_t *item, void *args);
+static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *args);
+static ezlopi_error_t __notify(l_ezlopi_item_t *item);
 
-int sensor_0067_hilink_presence_sensor_v3(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
+ezlopi_error_t sensor_0067_hilink_presence_sensor_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_SUCCESS;
     switch (action)
     {
     case EZLOPI_ACTION_PREPARE:
@@ -72,7 +73,7 @@ int sensor_0067_hilink_presence_sensor_v3(e_ezlopi_actions_t action, l_ezlopi_it
     return ret;
 }
 
-static void __notify_if_needed(ld2410_outputs_t* hilink_data, ld2410_outputs_t* present_hilink_data)
+static void __notify_if_needed(ld2410_outputs_t *hilink_data, ld2410_outputs_t *present_hilink_data)
 {
     // Update specific item to the cloud only when the target's value is changed, else continue.
     if (hilink_data->direction != present_hilink_data->direction)
@@ -92,11 +93,11 @@ static void __notify_if_needed(ld2410_outputs_t* hilink_data, ld2410_outputs_t* 
     }
 }
 
-static int __notify(l_ezlopi_item_t* item)
+static ezlopi_error_t __notify(l_ezlopi_item_t *item)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
     static int sec_count = 0;
-    ld2410_outputs_t* hilink_data = (ld2410_outputs_t*)item->user_arg;
+    ld2410_outputs_t *hilink_data = (ld2410_outputs_t *)item->user_arg;
     if (hilink_data)
     {
         ld2410_outputs_t present_hilink_data;
@@ -128,33 +129,27 @@ static int __notify(l_ezlopi_item_t* item)
             }
             sec_count++;
         }
-    }
-    else
-    {
-        ret = 1;
+        ret = EZPI_SUCCESS;
     }
     return ret;
 }
 
-static int __add_array_to_object(cJSON* cj_params, const char* const* arr, const int count)
+static ezlopi_error_t __add_array_to_object(cJSON *cj_params, const char *const *arr, const int count)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
     if (cj_params && arr)
     {
-        cJSON* enum_array = cJSON_CreateStringArray(__FUNCTION__, arr, count);
+        cJSON *enum_array = cJSON_CreateStringArray(__FUNCTION__, arr, count);
         cJSON_AddItemToObject(__FUNCTION__, cj_params, "enum", enum_array);
-    }
-    else
-    {
-        ret = 1;
+        ret = EZPI_SUCCESS;
     }
     return ret;
 }
 
-static int __add_value_to_cjson(l_ezlopi_item_t* item, cJSON* cj_params, bool is_hub_request)
+static ezlopi_error_t __add_value_to_cjson(l_ezlopi_item_t *item, cJSON *cj_params, bool is_hub_request)
 {
-    int ret = 0;
-    ld2410_outputs_t* hilink_data = (ld2410_outputs_t*)item->user_arg;
+    ezlopi_error_t ret = EZPI_FAILED;
+    ld2410_outputs_t *hilink_data = (ld2410_outputs_t *)item->user_arg;
 
     if (item && cj_params && hilink_data)
     {
@@ -182,55 +177,49 @@ static int __add_value_to_cjson(l_ezlopi_item_t* item, cJSON* cj_params, bool is
             cJSON_AddNumberToObject(__FUNCTION__, cj_params, ezlopi_valueFormatted_str, hilink_data->moving_target_distance);
             cJSON_AddNumberToObject(__FUNCTION__, cj_params, ezlopi_value_str, hilink_data->moving_target_distance);
         }
+        ret = EZPI_SUCCESS;
     }
 
     return ret;
 }
 
-static int __get_hub_item_value(l_ezlopi_item_t* item, void* args)
+static ezlopi_error_t __get_hub_item_value(l_ezlopi_item_t *item, void *args)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
 
-    cJSON* cj_params = (cJSON*)args;
+    cJSON *cj_params = (cJSON *)args;
     if (cj_params)
     {
         ESP_ERROR_CHECK(__add_value_to_cjson(item, cj_params, true));
-    }
-    else
-    {
-        ret = 1;
+        ret = EZPI_SUCCESS;
     }
 
     return ret;
 }
 
-static int __get_cjson_value(l_ezlopi_item_t* item, void* args)
+static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *args)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
 
-    cJSON* cj_params = (cJSON*)args;
+    cJSON *cj_params = (cJSON *)args;
 
     if (cj_params)
     {
         ESP_ERROR_CHECK(__add_value_to_cjson(item, cj_params, false));
-    }
-    else
-    {
-        ret = 1;
+        ret = EZPI_SUCCESS;
     }
 
     return ret;
 }
 
-static int __init(l_ezlopi_item_t* item)
+static ezlopi_error_t __init(l_ezlopi_item_t *item)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_ERR_INIT_DEVICE_FAILED;
     if ((item))
     {
-        ld2410_outputs_t* hilink_data = (ld2410_outputs_t*)item->user_arg;
+        ld2410_outputs_t *hilink_data = (ld2410_outputs_t *)item->user_arg;
         if (hilink_data)
         {
-            ret = 1;
             if (item->interface.uart.enable)
             {
                 s_ezlopi_uart_t uart_settings = {
@@ -242,22 +231,15 @@ static int __init(l_ezlopi_item_t* item)
                 {
                     ESP_ERROR_CHECK(hilink_presence_sensor_apply_settings());
                     ESP_ERROR_CHECK(ld2410_get_data(hilink_data));
-                }
-                else
-                {
-                    ret = -1;
+                    ret = EZPI_SUCCESS;
                 }
             }
-        }
-        else
-        {
-            ret = -1;
         }
     }
     return ret;
 }
 
-static void __perare_device_cloud_properties(l_ezlopi_device_t* device)
+static void __perare_device_cloud_properties(l_ezlopi_device_t *device)
 {
     device->cloud_properties.category = category_security_sensor;
     device->cloud_properties.subcategory = subcategory_motion;
@@ -266,7 +248,7 @@ static void __perare_device_cloud_properties(l_ezlopi_device_t* device)
     device->cloud_properties.device_type_id = NULL;
 }
 
-static void __prepare_hilink_motion_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_properties, void* user_args)
+static void __prepare_hilink_motion_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_properties, void *user_args)
 {
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
@@ -288,7 +270,7 @@ static void __prepare_hilink_motion_item_cloud_properties(l_ezlopi_item_t* item,
     item->user_arg = user_args;
 }
 
-static void __prepare_hilink_motion_direction_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_properties, void* user_arg)
+static void __prepare_hilink_motion_direction_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_properties, void *user_arg)
 {
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
@@ -309,7 +291,7 @@ static void __prepare_hilink_motion_direction_item_cloud_properties(l_ezlopi_ite
     item->user_arg = user_arg;
 }
 
-static void __prepare_hilink_distance_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_properties, void* user_arg)
+static void __prepare_hilink_distance_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_properties, void *user_arg)
 {
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
@@ -330,65 +312,61 @@ static void __prepare_hilink_distance_item_cloud_properties(l_ezlopi_item_t* ite
     item->user_arg = user_arg;
 }
 
-static int __prepare(void* arg, void* user_arg)
+static ezlopi_error_t __prepare(void *arg, void *user_arg)
 {
-    int ret = 0;
-    s_ezlopi_prep_arg_t* prep_arg = (s_ezlopi_prep_arg_t*)arg;
+    ezlopi_error_t ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
+    s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
     if (prep_arg)
     {
-        ld2410_outputs_t* hilink_data = (ld2410_outputs_t*)ezlopi_malloc(__FUNCTION__, sizeof(ld2410_outputs_t));
+        ld2410_outputs_t *hilink_data = (ld2410_outputs_t *)ezlopi_malloc(__FUNCTION__, sizeof(ld2410_outputs_t));
         if (hilink_data)
         {
             memset(hilink_data, 0, sizeof(ld2410_outputs_t));
-            l_ezlopi_device_t* parent_hilink_device_motion = ezlopi_device_add_device(prep_arg->cjson_device, "motion");
+            l_ezlopi_device_t *parent_hilink_device_motion = ezlopi_device_add_device(prep_arg->cjson_device, "motion");
             if (parent_hilink_device_motion)
             {
-                ret = 1;
+                ret = EZPI_SUCCESS;
                 TRACE_I("Parent_hilink_motion-[0x%x] ", parent_hilink_device_motion->cloud_properties.device_id);
                 __perare_device_cloud_properties(parent_hilink_device_motion);
 
                 motion_item = ezlopi_device_add_item_to_device(parent_hilink_device_motion, sensor_0067_hilink_presence_sensor_v3);
                 if (motion_item)
                 {
-                    __prepare_hilink_motion_item_cloud_properties(motion_item, prep_arg->cjson_device, (void*)hilink_data);
+                    __prepare_hilink_motion_item_cloud_properties(motion_item, prep_arg->cjson_device, (void *)hilink_data);
                 }
 
-                l_ezlopi_device_t* child_hilink_device_direction = ezlopi_device_add_device(prep_arg->cjson_device, "direction");
+                l_ezlopi_device_t *child_hilink_device_direction = ezlopi_device_add_device(prep_arg->cjson_device, "direction");
                 if (child_hilink_device_direction)
                 {
                     TRACE_I("child_hilink_device_direction-[0x%x] ", child_hilink_device_direction->cloud_properties.device_id);
                     __perare_device_cloud_properties(child_hilink_device_direction);
 
-                    child_hilink_device_direction->cloud_properties.parent_device_id = parent_hilink_device_motion->cloud_properties.device_id;
-
                     motion_direction_item = ezlopi_device_add_item_to_device(child_hilink_device_direction, sensor_0067_hilink_presence_sensor_v3);
                     if (motion_direction_item)
                     {
-                        __prepare_hilink_motion_direction_item_cloud_properties(motion_direction_item, prep_arg->cjson_device, (void*)hilink_data);
+                        __prepare_hilink_motion_direction_item_cloud_properties(motion_direction_item, prep_arg->cjson_device, (void *)hilink_data);
                     }
                     else
                     {
-                        ret = -1;
+                        ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                         ezlopi_device_free_device(child_hilink_device_direction);
                     }
                 }
 
-                l_ezlopi_device_t* child_hilink_device_distance = ezlopi_device_add_device(prep_arg->cjson_device, "distance");
+                l_ezlopi_device_t *child_hilink_device_distance = ezlopi_device_add_device(prep_arg->cjson_device, "distance");
                 if (child_hilink_device_distance)
                 {
                     TRACE_I("child_hilink_device_distance-[0x%x] ", child_hilink_device_distance->cloud_properties.device_id);
                     __perare_device_cloud_properties(child_hilink_device_distance);
 
-                    child_hilink_device_distance->cloud_properties.parent_device_id = parent_hilink_device_motion->cloud_properties.device_id;
-
                     distance_item = ezlopi_device_add_item_to_device(child_hilink_device_distance, sensor_0067_hilink_presence_sensor_v3);
                     if (distance_item)
                     {
-                        __prepare_hilink_distance_item_cloud_properties(distance_item, prep_arg->cjson_device, (void*)hilink_data);
+                        __prepare_hilink_distance_item_cloud_properties(distance_item, prep_arg->cjson_device, (void *)hilink_data);
                     }
                     else
                     {
-                        ret = -1;
+                        ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                         ezlopi_device_free_device(child_hilink_device_distance);
                     }
                 }
@@ -399,7 +377,7 @@ static int __prepare(void* arg, void* user_arg)
                 {
                     ezlopi_device_free_device(parent_hilink_device_motion);
                     ezlopi_free(__FUNCTION__, hilink_data);
-                    ret = -1;
+                    ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                 }
                 else
                 {
@@ -410,12 +388,12 @@ static int __prepare(void* arg, void* user_arg)
             {
                 ezlopi_device_free_device(parent_hilink_device_motion);
                 ezlopi_free(__FUNCTION__, hilink_data);
-                ret = -1;
+                ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
             }
         }
         else
         {
-            ret = -1;
+            ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
         }
     }
     return ret;

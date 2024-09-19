@@ -7,6 +7,7 @@
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
+#include "ezlopi_core_errors.h"
 
 #include "ezlopi_hal_pwm.h"
 
@@ -37,23 +38,23 @@ typedef struct yfs201_t
 
 static QueueHandle_t yfs201_queue = NULL;
 //------------------------------------------------------------------------------
-static void IRAM_ATTR gpio_isr_handler(void* arg) // argument => time_us
+static void IRAM_ATTR gpio_isr_handler(void *arg) // argument => time_us
 {
-    *((uint32_t*)arg) = *((uint32_t*)arg) + 1;
+    *((uint32_t *)arg) = *((uint32_t *)arg) + 1;
 }
 //------------------------------------------------------------------------------
-static int __0054_prepare(void* arg);
-static int __0054_init(l_ezlopi_item_t* item);
-static int __0054_get_cjson_value(l_ezlopi_item_t* item, void* arg);
-static int __0054_notify(l_ezlopi_item_t* item);
+static ezlopi_error_t __0054_prepare(void *arg);
+static ezlopi_error_t __0054_init(l_ezlopi_item_t *item);
+static ezlopi_error_t __0054_get_cjson_value(l_ezlopi_item_t *item, void *arg);
+static ezlopi_error_t __0054_notify(l_ezlopi_item_t *item);
 
-static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device);
-static void __prepare_item_properties(l_ezlopi_item_t* item, cJSON* cj_device, void* user_data);
-static void __extract_YFS201_Pulse_Count_func(l_ezlopi_item_t* item);
+static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
+static void __prepare_item_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_data);
+static void __extract_YFS201_Pulse_Count_func(l_ezlopi_item_t *item);
 //------------------------------------------------------------------------------
-int sensor_0054_PWM_YFS201_flowmeter(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
+ezlopi_error_t sensor_0054_PWM_YFS201_flowmeter(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_SUCCESS;
     switch (action)
     {
     case EZLOPI_ACTION_PREPARE:
@@ -91,7 +92,7 @@ int sensor_0054_PWM_YFS201_flowmeter(e_ezlopi_actions_t action, l_ezlopi_item_t*
 }
 
 //------------------------------------------------------------------------------------------------------
-static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
+static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     device->cloud_properties.category = category_flow_meter;
     device->cloud_properties.subcategory = subcategory_not_defined;
@@ -99,7 +100,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* 
     device->cloud_properties.info = NULL;
     device->cloud_properties.device_type_id = NULL;
 }
-static void __prepare_item_properties(l_ezlopi_item_t* item, cJSON* cj_device, void* user_data)
+static void __prepare_item_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_data)
 {
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
@@ -117,38 +118,36 @@ static void __prepare_item_properties(l_ezlopi_item_t* item, cJSON* cj_device, v
     item->user_arg = user_data;
 }
 //------------------------------------------------------------------------------------------------------
-static int __0054_prepare(void* arg)
+static ezlopi_error_t __0054_prepare(void *arg)
 {
-    int ret = 0;
-    s_ezlopi_prep_arg_t* device_prep_arg = (s_ezlopi_prep_arg_t*)arg;
+    ezlopi_error_t ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
+    s_ezlopi_prep_arg_t *device_prep_arg = (s_ezlopi_prep_arg_t *)arg;
     if (device_prep_arg && (NULL != device_prep_arg->cjson_device))
     {
         //---------------------------  DIGI - DEVICE 1 --------------------------------------------
 
-        yfs201_t* yfs201_data = (yfs201_t*)ezlopi_malloc(__FUNCTION__, sizeof(yfs201_t));
+        yfs201_t *yfs201_data = (yfs201_t *)ezlopi_malloc(__FUNCTION__, sizeof(yfs201_t));
         if (NULL != yfs201_data)
         {
             memset(yfs201_data, 0, sizeof(yfs201_t));
-            l_ezlopi_device_t* flowmeter_device = ezlopi_device_add_device(device_prep_arg->cjson_device, NULL);
+            l_ezlopi_device_t *flowmeter_device = ezlopi_device_add_device(device_prep_arg->cjson_device, NULL);
             if (flowmeter_device)
             {
-                ret = 1;
                 __prepare_device_cloud_properties(flowmeter_device, device_prep_arg->cjson_device);
-                l_ezlopi_item_t* flowmeter_item = ezlopi_device_add_item_to_device(flowmeter_device, sensor_0054_PWM_YFS201_flowmeter);
+                l_ezlopi_item_t *flowmeter_item = ezlopi_device_add_item_to_device(flowmeter_device, sensor_0054_PWM_YFS201_flowmeter);
                 if (flowmeter_item)
                 {
                     __prepare_item_properties(flowmeter_item, device_prep_arg->cjson_device, yfs201_data);
+                    ret = EZPI_SUCCESS;
                 }
                 else
                 {
-                    ret = -1;
                     ezlopi_device_free_device(flowmeter_device);
                     ezlopi_free(__FUNCTION__, yfs201_data);
                 }
             }
             else
             {
-                ret = -1;
                 ezlopi_free(__FUNCTION__, yfs201_data);
             }
         }
@@ -156,12 +155,12 @@ static int __0054_prepare(void* arg)
     return ret;
 }
 
-static int __0054_init(l_ezlopi_item_t* item)
+static ezlopi_error_t __0054_init(l_ezlopi_item_t *item)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_ERR_INIT_DEVICE_FAILED;
     if (NULL != item)
     {
-        yfs201_t* yfs201_data = (yfs201_t*)item->user_arg;
+        yfs201_t *yfs201_data = (yfs201_t *)item->user_arg;
         if (yfs201_data)
         {
             // intialize digital_pin
@@ -174,30 +173,22 @@ static int __0054_init(l_ezlopi_item_t* item)
                     .pull_down_en = GPIO_PULLDOWN_DISABLE,
                     .pull_up_en = GPIO_PULLUP_DISABLE,
                 };
-                ret = (0 == gpio_config(&input_conf)) ? 1 : -1;
+                ret = (0 == gpio_config(&input_conf)) ? EZPI_SUCCESS : ret;
             }
-            else
-            {
-                ret = -1;
-            }
-        }
-        else
-        {
-            ret = -1;
         }
     }
     return ret;
 }
 
-static int __0054_get_cjson_value(l_ezlopi_item_t* item, void* arg)
+static ezlopi_error_t __0054_get_cjson_value(l_ezlopi_item_t *item, void *arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
     if (item && arg)
     {
-        cJSON* cj_result = (cJSON*)arg;
+        cJSON *cj_result = (cJSON *)arg;
         if (cj_result)
         {
-            yfs201_t* yfs201_data = (yfs201_t*)item->user_arg;
+            yfs201_t *yfs201_data = (yfs201_t *)item->user_arg;
             if (yfs201_data)
             {
                 float freq = 0, Lt_per_hr = 0;
@@ -210,20 +201,20 @@ static int __0054_get_cjson_value(l_ezlopi_item_t* item, void* arg)
                 Lt_per_hr = (Lt_per_hr > 720) ? 720 : Lt_per_hr;
                 // TRACE_E(" Frequency : %.2f Hz --> FlowRate : %.2f [Lt_per_hr]", freq, Lt_per_hr);
 
-                ezlopi_valueformatter_float_to_cjson(cj_result, Lt_per_hr, item->cloud_properties.scale);
-                ret = 1;
+                ezlopi_valueformatter_float_to_cjson(cj_result, Lt_per_hr, scales_liter_per_hour);
+                ret = EZPI_SUCCESS;
             }
         }
     }
     return ret;
 }
 //------------------------------------------------------------------------------------------------------
-static int __0054_notify(l_ezlopi_item_t* item)
+static ezlopi_error_t __0054_notify(l_ezlopi_item_t *item)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
     if (item)
     {
-        yfs201_t* yfs201_data = (yfs201_t*)item->user_arg;
+        yfs201_t *yfs201_data = (yfs201_t *)item->user_arg;
         if (yfs201_data)
         {
             // extract new pulse count
@@ -233,7 +224,7 @@ static int __0054_notify(l_ezlopi_item_t* item)
             {
                 ezlopi_device_value_updated_from_device_broadcast(item);
             }
-            ret = 1;
+            ret = EZPI_SUCCESS;
         }
     }
     return ret;
@@ -241,11 +232,11 @@ static int __0054_notify(l_ezlopi_item_t* item)
 
 //------------------------------------------------------------------------------
 // This function is used to get the time_period of incoming pulses . [NOTE: call 'gpio_install_isr_service()' before using this function]
-static void __extract_YFS201_Pulse_Count_func(l_ezlopi_item_t* item)
+static void __extract_YFS201_Pulse_Count_func(l_ezlopi_item_t *item)
 {
     if (NULL != item)
     {
-        yfs201_t* yfs201_data = (yfs201_t*)item->user_arg;
+        yfs201_t *yfs201_data = (yfs201_t *)item->user_arg;
         if (yfs201_data)
         {
             gpio_num_t pulse_pin = item->interface.pwm.gpio_num;

@@ -3,6 +3,7 @@
 
 #include "ezlopi_core_actions.h"
 #include "ezlopi_core_devices.h"
+#include "ezlopi_core_errors.h"
 
 /**
  *  NOTE : Flame Sensor [KY-026 module] gives (0V - 5V) analog output .
@@ -51,6 +52,6 @@ typedef struct flame_t
     float absorbed_percent;
 } flame_t;
 //----------------------------------------------------
-int sensor_0057_other_KY026_FlameDetector(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
+ezlopi_error_t sensor_0057_other_KY026_FlameDetector(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
 #endif //_SENSOR_0057_OTHER_KY026_FLAMEDETECTOR_H_

@@ -8,6 +8,7 @@
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
+#include "ezlopi_core_errors.h"
 
 #include "ezlopi_hal_gpio.h"
 
@@ -31,17 +32,17 @@ typedef struct
     uint32_t distance;    // distance in cm
 } s_ultrasonic_sensor_t;
 
-static int __prepare(void* arg);
-static int __init(l_ezlopi_item_t* item);
-static int __notify(l_ezlopi_item_t* item);
-static int __get_value_cjson(l_ezlopi_item_t* item, void* arg);
-static bool ezlopi_sensor_0024_other_HCSR04_get_from_sensor(l_ezlopi_item_t* item);
-static esp_err_t ultrasonic_measure(const s_ultrasonic_sensor_t* dev, uint32_t max_distance, uint32_t* distance);
-static esp_err_t ultrasonic_measure_raw(const s_ultrasonic_sensor_t* dev, uint32_t max_time_us, uint32_t* time_us);
+static ezlopi_error_t __prepare(void *arg);
+static ezlopi_error_t __init(l_ezlopi_item_t *item);
+static ezlopi_error_t __notify(l_ezlopi_item_t *item);
+static ezlopi_error_t __get_value_cjson(l_ezlopi_item_t *item, void *arg);
+static bool ezlopi_sensor_0024_other_HCSR04_get_from_sensor(l_ezlopi_item_t *item);
+static esp_err_t ultrasonic_measure(const s_ultrasonic_sensor_t *dev, uint32_t max_distance, uint32_t *distance);
+static esp_err_t ultrasonic_measure_raw(const s_ultrasonic_sensor_t *dev, uint32_t max_time_us, uint32_t *time_us);
 
-int sensor_0024_other_HCSR04_v3(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
+ezlopi_error_t sensor_0024_other_HCSR04_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_SUCCESS;
 
     switch (action)
     {
@@ -75,41 +76,42 @@ int sensor_0024_other_HCSR04_v3(e_ezlopi_actions_t action, l_ezlopi_item_t* item
     return ret;
 }
 
-static int __get_value_cjson(l_ezlopi_item_t* item, void* arg)
+static ezlopi_error_t __get_value_cjson(l_ezlopi_item_t *item, void *arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
     if (item && arg)
     {
-        cJSON* cj_param = (cJSON*)arg;
-        s_ultrasonic_sensor_t* ultrasonic_sensor = (s_ultrasonic_sensor_t*)item->user_arg;
+        cJSON *cj_param = (cJSON *)arg;
+        s_ultrasonic_sensor_t *ultrasonic_sensor = (s_ultrasonic_sensor_t *)item->user_arg;
         if (cj_param && ultrasonic_sensor)
         {
-            ezlopi_valueformatter_float_to_cjson(cj_param, ultrasonic_sensor->distance, item->cloud_properties.scale);
-            ret = 1;
+            ezlopi_valueformatter_float_to_cjson(cj_param, ultrasonic_sensor->distance, scales_meter);
+            ret = EZPI_SUCCESS;
         }
     }
     return ret;
 }
 
-static int __notify(l_ezlopi_item_t* item)
+static ezlopi_error_t __notify(l_ezlopi_item_t *item)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_SUCCESS;
     static int count = 0;
     if (2 == ++count)
     {
         ezlopi_sensor_0024_other_HCSR04_get_from_sensor(item);
         ezlopi_device_value_updated_from_device_broadcast(item);
         count = 0;
+        ret = EZPI_SUCCESS;
     }
     return ret;
 }
 
-static int __init(l_ezlopi_item_t* item)
+static ezlopi_error_t __init(l_ezlopi_item_t *item)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_ERR_INIT_DEVICE_FAILED;
     if (item)
     {
-        s_ultrasonic_sensor_t* ultrasonic_HCSR04_sensor = (s_ultrasonic_sensor_t*)item->user_arg;
+        s_ultrasonic_sensor_t *ultrasonic_HCSR04_sensor = (s_ultrasonic_sensor_t *)item->user_arg;
         if (ultrasonic_HCSR04_sensor)
         {
             if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_out.gpio_num))
@@ -127,7 +129,7 @@ static int __init(l_ezlopi_item_t* item)
                                         : GPIO_PULLDOWN_DISABLE,
                     .intr_type = GPIO_INTR_DISABLE,
                 };
-                ret = (0 == gpio_config(&io_conf)) ? 1 : -1;
+                ret = (0 == gpio_config(&io_conf)) ? EZPI_SUCCESS : EZPI_ERR_INIT_DEVICE_FAILED;
             }
             else if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num))
             {
@@ -147,23 +149,15 @@ static int __init(l_ezlopi_item_t* item)
                                      : GPIO_INTR_NEGEDGE,
                 };
 
-                ret = (0 == gpio_config(&io_conf)) ? 1 : -1;
+                ret = (0 == gpio_config(&io_conf)) ? EZPI_SUCCESS : EZPI_ERR_INIT_DEVICE_FAILED;
             }
-            if (1 != ret)
-            {
-                ret = -1;
-            }
-        }
-        else
-        {
-            ret = -1;
         }
     }
 
     return ret;
 }
 
-static void __setup_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
+static void __setup_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
@@ -172,7 +166,7 @@ static void __setup_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj
     device->cloud_properties.device_type_id = NULL;
 }
 
-static void __setup_item_properties(l_ezlopi_item_t* item, cJSON* cj_device)
+static void __setup_item_properties(l_ezlopi_item_t *item, cJSON *cj_device)
 {
     item->cloud_properties.show = true;
     item->cloud_properties.has_getter = true;
@@ -200,25 +194,24 @@ static void __setup_item_properties(l_ezlopi_item_t* item, cJSON* cj_device)
     item->interface.gpio.gpio_in.value = 0;
 }
 
-static int __prepare(void* arg)
+static ezlopi_error_t __prepare(void *arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
     if (arg)
     {
-        s_ezlopi_prep_arg_t* prep_arg = (s_ezlopi_prep_arg_t*)arg;
-        cJSON* cj_device = prep_arg->cjson_device;
+        s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
+        cJSON *cj_device = prep_arg->cjson_device;
         if (cj_device)
         {
-            l_ezlopi_device_t* device = ezlopi_device_add_device(prep_arg->cjson_device, NULL);
+            l_ezlopi_device_t *device = ezlopi_device_add_device(prep_arg->cjson_device, NULL);
             if (device)
             {
-                ret = 1;
                 __setup_device_cloud_properties(device, cj_device);
-                l_ezlopi_item_t* item = ezlopi_device_add_item_to_device(device, sensor_0024_other_HCSR04_v3);
+                l_ezlopi_item_t *item = ezlopi_device_add_item_to_device(device, sensor_0024_other_HCSR04_v3);
                 if (item)
                 {
                     __setup_item_properties(item, cj_device);
-                    s_ultrasonic_sensor_t* ultrasonic_sensor = (s_ultrasonic_sensor_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_ultrasonic_sensor_t));
+                    s_ultrasonic_sensor_t *ultrasonic_sensor = (s_ultrasonic_sensor_t *)ezlopi_malloc(__FUNCTION__, sizeof(s_ultrasonic_sensor_t));
                     if (ultrasonic_sensor)
                     {
                         memset(ultrasonic_sensor, 0, sizeof(s_ultrasonic_sensor_t));
@@ -227,27 +220,23 @@ static int __prepare(void* arg)
                         ultrasonic_sensor->echo_pin = item->interface.gpio.gpio_in.gpio_num;
 
                         item->is_user_arg_unique = true;
-                        item->user_arg = (void*)ultrasonic_sensor;
+                        item->user_arg = (void *)ultrasonic_sensor;
+                        ret = EZPI_SUCCESS;
                     }
                 }
                 else
                 {
                     ezlopi_device_free_device(device);
-                    ret = -1;
                 }
-            }
-            else
-            {
-                ret = -1;
             }
         }
     }
     return ret;
 }
 
-static bool ezlopi_sensor_0024_other_HCSR04_get_from_sensor(l_ezlopi_item_t* item)
+static bool ezlopi_sensor_0024_other_HCSR04_get_from_sensor(l_ezlopi_item_t *item)
 {
-    s_ultrasonic_sensor_t* ultrasonic_HCSR04_sensor = (s_ultrasonic_sensor_t*)item->user_arg;
+    s_ultrasonic_sensor_t *ultrasonic_HCSR04_sensor = (s_ultrasonic_sensor_t *)item->user_arg;
     if (ultrasonic_HCSR04_sensor)
     {
         esp_err_t res = ultrasonic_measure(ultrasonic_HCSR04_sensor, MAX_DISTANCE_CM, &ultrasonic_HCSR04_sensor->distance);
@@ -281,7 +270,7 @@ static bool ezlopi_sensor_0024_other_HCSR04_get_from_sensor(l_ezlopi_item_t* ite
     return true;
 }
 
-static esp_err_t ultrasonic_measure(const s_ultrasonic_sensor_t* dev, uint32_t max_distance, uint32_t* distance)
+static esp_err_t ultrasonic_measure(const s_ultrasonic_sensor_t *dev, uint32_t max_distance, uint32_t *distance)
 {
     CHECK_ARG(dev && distance);
 
@@ -293,7 +282,7 @@ static esp_err_t ultrasonic_measure(const s_ultrasonic_sensor_t* dev, uint32_t m
     return ESP_OK;
 }
 
-static esp_err_t ultrasonic_measure_raw(const s_ultrasonic_sensor_t* dev, uint32_t max_time_us, uint32_t* time_us)
+static esp_err_t ultrasonic_measure_raw(const s_ultrasonic_sensor_t *dev, uint32_t max_time_us, uint32_t *time_us)
 {
     CHECK_ARG(dev && time_us);
 

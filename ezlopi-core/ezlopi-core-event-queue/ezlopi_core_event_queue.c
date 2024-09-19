@@ -5,19 +5,24 @@
 
 #include "EZLOPI_USER_CONFIG.h"
 
+#include "ezlopi_core_errors.h"
+
 static QueueHandle_t generic_queue = NULL;
 
-void ezlopi_event_queue_init(void)
+ezlopi_error_t ezlopi_event_queue_init(void)
 {
+    ezlopi_error_t error = EZPI_SUCCESS;
     if (NULL == generic_queue)
     {
         generic_queue = xQueueCreate(20, sizeof(s_ezlo_event_t *));
+        error = (NULL != generic_queue) ? error : EZPI_ERR_EVENT_QUEUE_INIT_FAILED;
     }
+    return error;
 }
 
-int ezlopi_event_queue_send(s_ezlo_event_t *event_data, int from_isr)
+ezlopi_error_t ezlopi_event_queue_send(s_ezlo_event_t *event_data, int from_isr)
 {
-    int ret = 0;
+    ezlopi_error_t error = EZPI_ERR_EVENT_QUEUE_UNINITIALIZED;
 
     if (NULL != generic_queue)
     {
@@ -44,27 +49,29 @@ int ezlopi_event_queue_send(s_ezlo_event_t *event_data, int from_isr)
             }
         }
 
+        BaseType_t send_error = pdTRUE;
         if (from_isr)
         {
             BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-            ret = xQueueSendFromISR(generic_queue, &event_data, &xHigherPriorityTaskWoken);
+            send_error = xQueueSendFromISR(generic_queue, &event_data, &xHigherPriorityTaskWoken);
         }
         else
         {
-            ret = xQueueSend(generic_queue, &event_data, 0);
+            send_error = xQueueSend(generic_queue, &event_data, 0);
         }
+        error = pdTRUE == send_error ? EZPI_SUCCESS : EZPI_ERR_EVENT_QUEUE_RECV_SEND_ERROR;
     }
 
-    return ret;
+    return error;
 }
 
-int ezlopi_event_queue_receive(s_ezlo_event_t **event_data, int time_out_ms)
+ezlopi_error_t ezlopi_event_queue_receive(s_ezlo_event_t **event_data, int time_out_ms)
 {
-    int ret = 0;
+    ezlopi_error_t error = EZPI_ERR_EVENT_QUEUE_UNINITIALIZED;
     if (generic_queue)
     {
-        ret = xQueueReceive(generic_queue, event_data, (time_out_ms / portTICK_RATE_MS));
+        error = (pdTRUE == xQueueReceive(generic_queue, event_data, (time_out_ms / portTICK_RATE_MS))) ? EZPI_SUCCESS : EZPI_ERR_EVENT_QUEUE_RECV_SEND_ERROR;
     }
-    return ret;
+    return error;
 }
 #endif

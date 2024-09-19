@@ -60,7 +60,7 @@ int ezlopi_scenes_status_change_broadcast(l_scenes_list_v2_t* scene_node, const 
 
             ret = ezlopi_core_broadcast_add_to_queue(cj_response);
 
-            if (0 == ret)
+            if (0 != ret)
             {
                 cJSON_Delete(__FUNCTION__, cj_response);
             }

@@ -6,6 +6,7 @@
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
+#include "ezlopi_core_errors.h"
 
 #include "ezlopi_hal_adc.h"
 
@@ -18,15 +19,15 @@ typedef struct s_dummy_potentiometer
     float pot_val; // 0-100%
 } s_dummy_potentiometer_t;
 
-static int __0070_prepare(void* arg);
-static int __0070_init(l_ezlopi_item_t* item);
-static int __0070_set_value(l_ezlopi_item_t* item, void* arg);
-static int __0070_get_cjson_value(l_ezlopi_item_t* item, void* arg);
-static int __0070_notify(l_ezlopi_item_t* item);
+static ezlopi_error_t __0070_prepare(void *arg);
+static ezlopi_error_t __0070_init(l_ezlopi_item_t *item);
+static ezlopi_error_t __0070_set_value(l_ezlopi_item_t *item, void *arg);
+static ezlopi_error_t __0070_get_cjson_value(l_ezlopi_item_t *item, void *arg);
+static ezlopi_error_t __0070_notify(l_ezlopi_item_t *item);
 //--------------------------------------------------------------------------------------------------------
-int sensor_0070_ADC_dummy_potentiometer(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
+ezlopi_error_t sensor_0070_ADC_dummy_potentiometer(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_SUCCESS;
     switch (action)
     {
     case EZLOPI_ACTION_PREPARE:
@@ -63,7 +64,7 @@ int sensor_0070_ADC_dummy_potentiometer(e_ezlopi_actions_t action, l_ezlopi_item
     return ret;
 }
 //-------------------------------------------------------------------------------------------------------------------------
-static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
+static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
@@ -71,7 +72,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* 
     device->cloud_properties.info = NULL;
     device->cloud_properties.device_type = dev_type_sensor;
 }
-static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device, void* user_data)
+static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_data)
 {
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
     item->cloud_properties.has_getter = true;
@@ -89,100 +90,79 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_dev
     item->interface.adc.resln_bit = 3;
 }
 //-------------------------------------------------------------------------------------------------------------------------
-static int __0070_prepare(void* arg)
+static ezlopi_error_t __0070_prepare(void *arg)
 {
-    int ret = 0;
-    s_ezlopi_prep_arg_t* device_prep_arg = (s_ezlopi_prep_arg_t*)arg;
+    ezlopi_error_t ret = EZPI_SUCCESS;
+    s_ezlopi_prep_arg_t *device_prep_arg = (s_ezlopi_prep_arg_t *)arg;
     if (device_prep_arg && (NULL != device_prep_arg->cjson_device))
     {
-        cJSON* cj_device = device_prep_arg->cjson_device;
-        s_dummy_potentiometer_t* user_data = (s_dummy_potentiometer_t*)malloc(sizeof(s_dummy_potentiometer_t));
+        cJSON *cj_device = device_prep_arg->cjson_device;
+        s_dummy_potentiometer_t *user_data = (s_dummy_potentiometer_t *)malloc(sizeof(s_dummy_potentiometer_t));
         if (NULL != user_data)
         {
             memset(user_data, 0, sizeof(s_dummy_potentiometer_t));
-            l_ezlopi_device_t* dummy_potentiometer_device = ezlopi_device_add_device(cj_device, NULL);
+            l_ezlopi_device_t *dummy_potentiometer_device = ezlopi_device_add_device(cj_device, NULL);
             if (dummy_potentiometer_device)
             {
-                ret = 1;
                 __prepare_device_cloud_properties(dummy_potentiometer_device, cj_device);
-                l_ezlopi_item_t* dummy_potentiometer_item = ezlopi_device_add_item_to_device(dummy_potentiometer_device, sensor_0070_ADC_dummy_potentiometer);
+                l_ezlopi_item_t *dummy_potentiometer_item = ezlopi_device_add_item_to_device(dummy_potentiometer_device, sensor_0070_ADC_dummy_potentiometer);
                 if (dummy_potentiometer_item)
                 {
                     __prepare_item_cloud_properties(dummy_potentiometer_item, cj_device, user_data);
+                    ret = EZPI_SUCCESS;
                 }
                 else
                 {
                     ezlopi_device_free_device(dummy_potentiometer_device);
                     free(user_data);
-                    ret = -1;
                 }
             }
             else
             {
                 free(user_data);
-                ret = -1;
             }
-        }
-        else
-        {
-            ret = -1;
         }
     }
     return ret;
 }
 
-static int __0070_init(l_ezlopi_item_t* item)
+static ezlopi_error_t __0070_init(l_ezlopi_item_t *item)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_ERR_INIT_DEVICE_FAILED;
     if (item)
     {
-        s_dummy_potentiometer_t* user_data = (s_dummy_potentiometer_t*)item->user_arg;
+        s_dummy_potentiometer_t *user_data = (s_dummy_potentiometer_t *)item->user_arg;
         if (user_data)
         {
             if (GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
             {
-                if (0 == ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
+                if (EZPI_SUCCESS == ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
                 {
-                    ret = 1;
-                }
-                else
-                {
-                    ret = -1;
+                    ret = EZPI_SUCCESS;
                 }
             }
-            else
-            {
-                ret = -1;
-            }
-        }
-        else
-        {
-            ret = -1;
         }
     }
     return ret;
 }
 
 
-static int __0070_set_value(l_ezlopi_item_t* item, void* arg)
+static ezlopi_error_t __0070_set_value(l_ezlopi_item_t *item, void *arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
     if (item && arg)
     {
-        TRACE_E("Here !!");
-        cJSON* cjson_params = (cJSON*)arg;
+        cJSON *cjson_params = (cJSON *)arg;
         if (cjson_params)
         {
-            TRACE_E("Here !!");
-            s_dummy_potentiometer_t* user_data = (s_dummy_potentiometer_t*)item->user_arg;
+            s_dummy_potentiometer_t *user_data = (s_dummy_potentiometer_t *)item->user_arg;
             if (user_data)
             {
-                TRACE_E("Here !!");
                 CJSON_TRACE("cjson_params  [dummy_potentiometer]:", cjson_params);
 
                 float value_double = 0;
                 bool update_flag = false;
-                cJSON* cj_value = cJSON_GetObjectItem(__FUNCTION__, cjson_params, ezlopi_value_str);
+                cJSON *cj_value = cJSON_GetObjectItem(__FUNCTION__, cjson_params, ezlopi_value_str);
                 if (cj_value)
                 {
                     switch (cj_value->type)
@@ -211,28 +191,24 @@ static int __0070_set_value(l_ezlopi_item_t* item, void* arg)
 
                         user_data->pot_val = value_double;
                         ezlopi_device_value_updated_from_device_broadcast(item);
-                        ret = 1;
+                        ret = EZPI_SUCCESS;
                     }
                 }
-            }
-            else
-            {
-                TRACE_E("Here !!");
             }
         }
     }
     return ret;
 }
 
-static int __0070_get_cjson_value(l_ezlopi_item_t* item, void* arg)
+static ezlopi_error_t __0070_get_cjson_value(l_ezlopi_item_t *item, void *arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
     if (item && arg)
     {
-        cJSON* cj_result = (cJSON*)arg;
+        cJSON *cj_result = (cJSON *)arg;
         if (cj_result)
         {
-            s_dummy_potentiometer_t* user_data = (s_dummy_potentiometer_t*)item->user_arg;
+            s_dummy_potentiometer_t *user_data = (s_dummy_potentiometer_t *)item->user_arg;
             if (user_data)
             {
                 if (user_data->pot_val > 70)
@@ -250,25 +226,21 @@ static int __0070_get_cjson_value(l_ezlopi_item_t* item, void* arg)
                     cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, "low_volume");
                     cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, "low_volume");
                 }
-                ret = 1;
-            }
-            else
-            {
-                TRACE_E("Here !!");
+                ret = EZPI_SUCCESS;
             }
         }
     }
     return ret;
 }
 
-static int __0070_notify(l_ezlopi_item_t* item)
+static ezlopi_error_t __0070_notify(l_ezlopi_item_t *item)
 {
     static uint8_t timing = 10;// 5sec
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
     if (item && (0 == timing--))
     {
         timing = 10;
-        s_dummy_potentiometer_t* user_data = (s_dummy_potentiometer_t*)item->user_arg;
+        s_dummy_potentiometer_t *user_data = (s_dummy_potentiometer_t *)item->user_arg;
         if (user_data)
         {
             s_ezlopi_analog_data_t adc_data = { .value = 0, .voltage = 0 };
@@ -280,11 +252,7 @@ static int __0070_notify(l_ezlopi_item_t* item)
                 user_data->pot_val = new_pot;
                 ezlopi_device_value_updated_from_device_broadcast(item);
             }
-            ret = 1;
-        }
-        else
-        {
-            TRACE_E("Here!!");
+            ret = EZPI_FAILED;
         }
     }
     return ret;

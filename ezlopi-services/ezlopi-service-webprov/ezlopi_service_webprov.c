@@ -283,9 +283,9 @@ static int __send_cjson_data_to_nma_websocket(cJSON *cj_data)
     return ret;
 }
 
-static int __send_str_data_to_nma_websocket(char *str_data)
+static ezlopi_error_t __send_str_data_to_nma_websocket(char *str_data)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
 
 #if (1 == EZPI_CORE_WSS_USE_WSC_LIB)
     if (str_data && ezlopi_core_wsc_is_connected(__wsc_ssl))
@@ -299,10 +299,10 @@ static int __send_str_data_to_nma_websocket(char *str_data)
 #if (1 == EZPI_CORE_WSS_USE_WSC_LIB)
             if (ezlopi_core_wsc_send(__wsc_ssl, str_data, strlen(str_data)) > 0)
 #else  // EZPI_CORE_WSS_USE_WSC_LIB
-            if (ezlopi_websocket_client_send(str_data, strlen(str_data)))
+            if (EZPI_SUCCESS == ezlopi_websocket_client_send(str_data, strlen(str_data)))
 #endif // EZPI_CORE_WSS_USE_WSC_LIB
             {
-                ret = 1;
+                ret = EZPI_SUCCESS;
                 message_counter++;
                 break;
             }
@@ -310,7 +310,7 @@ static int __send_str_data_to_nma_websocket(char *str_data)
             vTaskDelay(10 / portTICK_PERIOD_MS);
         }
 
-        if (ret)
+        if (EZPI_SUCCESS == ret)
         {
             TRACE_S("## WSC-SENDING done >>>>>>>>>>>>>>>>>>> \n %s", str_data);
         }

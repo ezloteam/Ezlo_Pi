@@ -4,6 +4,8 @@
 
 #include "ezlopi_util_trace.h"
 
+#include "ezlopi_core_errors.h"
+
 #include "ezlopi_hal_spi_master.h"
 
 typedef enum e_spi_state
@@ -23,9 +25,9 @@ typedef enum e_spi_state
 
 static e_spi_state_t spi_port_status[3] = { SPI_UNINITIALIZED, SPI_UNINITIALIZED, SPI_UNINITIALIZED };
 
-int ezlopi_spi_master_init(s_ezlopi_spi_master_t* spi_config)
+ezlopi_error_t ezlopi_spi_master_init(s_ezlopi_spi_master_t* spi_config)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_ERR_HAL_INIT_FAILED;
 
     if (NULL != spi_config)
     {
@@ -66,6 +68,7 @@ int ezlopi_spi_master_init(s_ezlopi_spi_master_t* spi_config)
 
                 spi_port_status[spi_config->channel] = SPI_INITIALIZED;
             } while (0);
+            ret = EZPI_SUCCESS;
         }
     }
 

@@ -3,6 +3,8 @@
 
 #include "ezlopi_core_actions.h"
 #include "ezlopi_core_devices.h"
+#include "ezlopi_core_errors.h"
+
 /**
  * SHUNT VOLTAGE -> measures DC voltage [0V - 25V]
  *
@@ -42,6 +44,6 @@
 
 //------------------------------------------
 
-int sensor_0042_ADC_shunt_voltmeter(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
+ezlopi_error_t sensor_0042_ADC_shunt_voltmeter(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
 #endif //_SENSOR_0042_ADC_SHUNT_VOLTMETER_H_

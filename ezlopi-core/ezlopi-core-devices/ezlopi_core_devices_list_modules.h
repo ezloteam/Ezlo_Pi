@@ -47,17 +47,18 @@ EZLOPI_DEVICE_LIST("sensor-bme680-i2c                   ", 10, sensor_0010_I2C_B
 EZLOPI_DEVICE_LIST("sensor-bme280-i2c-temp-humid        ", 12, sensor_0012_I2C_BME280)
 #endif // SENSOR_0012_I2C_BME280
 
-#if (CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32)
+#if (CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32S2)
 
 #if (1 == SENSOR_0015_ONEWIRE_DHT11)
 EZLOPI_DEVICE_LIST("sensor-DHT11-1-wire-temp-humid      ", 15, sensor_0015_oneWire_DHT11)
 #endif // SENSOR_0015_ONEWIRE_DHT11
 
+#endif // CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32
+
 #if (1 == SENSOR_0016_ONEWIRE_DHT22)
 EZLOPI_DEVICE_LIST("sensor-DHT22-1-wire-temp-humid      ", 16, sensor_0016_oneWire_DHT22)
 #endif // SENSOR_0016_ONEWIRE_DHT22
 
-#endif // CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32
 
 #if (1 == SENSOR_0017_ADC_POTENTIOMETER)
 EZLOPI_DEVICE_LIST("sensor-potentiometer-ADC            ", 17, sensor_0017_ADC_potentiometer)
@@ -144,7 +145,7 @@ EZLOPI_DEVICE_LIST("device-PWM-servo-MG996R             ", 36, device_0036_PWM_s
 #endif // DEVICE_0036_PWM_SERVO_MG996R
 
 #if (1 == SENSOR_0037_PMS5003_SENSOR)
-EZLOPI_DEVICE_LIST("sensor-PMS5003                      ", 37, sensor_0037_pms5003_v3)
+EZLOPI_DEVICE_LIST("sensor-PMS5003                      ", 37, sensor_pms5003_v3)
 #endif // SENSOR_0037_PMS5003_SENSOR
 
 #if (1 == DEVICE_0038_OTHER_RGB)

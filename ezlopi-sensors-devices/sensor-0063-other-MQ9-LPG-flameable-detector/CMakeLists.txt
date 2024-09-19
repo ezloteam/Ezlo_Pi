@@ -7,6 +7,8 @@ idf_component_register(SRCS "sensor_0063_other_MQ9_LPG_flameable_detector.c"
             ezlopi-core-actions 
             ezlopi-core-devices 
             ezlopi-core-processes
+            ezlopi-core-errors
+
             ezlopi-core-valueformatter
            
             ezlopi-hal-adc

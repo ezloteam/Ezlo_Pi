@@ -33,6 +33,7 @@
 #include "ezlopi_core_broadcast.h"
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_core_ping.h"
+#include "ezlopi_core_errors.h"
 
 #include "ezlopi_service_uart.h"
 #include "EZLOPI_USER_CONFIG.h"
@@ -334,10 +335,10 @@ esp_err_t ezlopi_wifi_connect(const char* ssid, const char* pass)
     return err;
 }
 
-int ezlopi_wait_for_wifi_to_connect(uint32_t wait_time_ms)
+ezlopi_error_t ezlopi_wait_for_wifi_to_connect(uint32_t wait_time_ms)
 {
-    uint32_t ret = 0;
-    while (-1 == ezlopi_event_group_wait_for_event(EZLOPI_EVENT_WIFI_CONNECTED, wait_time_ms, false))
+    ezlopi_error_t ret = EZPI_FAILED;
+    while (EZPI_SUCCESS != ezlopi_event_group_wait_for_event(EZLOPI_EVENT_WIFI_CONNECTED, wait_time_ms, false))
     {
         vTaskDelay(100 / portTICK_PERIOD_MS);
     }
@@ -464,7 +465,7 @@ static void ezlopi_core_device_broadcast_wifi_start_scan()
             cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_status_str, "started");
         }
 
-        if (!ezlopi_core_broadcast_add_to_queue(cj_scan_start))
+        if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(cj_scan_start))
         {
             cJSON_Delete(__FUNCTION__, cj_scan_start);
         }
@@ -486,7 +487,7 @@ static void ezlopi_core_device_broadcast_wifi_stop_scan()
             cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_status_str, "finished");
         }
 
-        if (!ezlopi_core_broadcast_add_to_queue(cj_scan_stop))
+        if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(cj_scan_stop))
         {
             cJSON_Delete(__FUNCTION__, cj_scan_stop);
         }

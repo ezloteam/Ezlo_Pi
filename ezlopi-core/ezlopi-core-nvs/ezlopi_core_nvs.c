@@ -37,10 +37,14 @@ static const char* ezlopi_serial_frame_size = "ezpi_frm_sz";
 static const char* ezlopi_serial_flow_control = "ezpi_fl_ctrl";
 static const char* ezlopi_cloud_log_severity = "cld_log_svrt";
 static const char* ezlopi_serial_log_severity = "srl_log_svrt";
+static const char* ezlopi_temp_scale = "tmp_scale";
+static const char* ezlopi_date_format = "date_fmt";
+static const char* ezlopi_time_format = "time_fmt";
+static const char* ezlopi_network_ping_timeout = "png_tm_out";
 
-int ezlopi_nvs_init(void)
+ezlopi_error_t ezlopi_nvs_init(void)
 {
-    int ret = 0;
+    ezlopi_error_t error = EZPI_SUCCESS;
     if (0 == ezlopi_nvs_handle)
     {
         esp_err_t err = nvs_flash_init();
@@ -56,26 +60,22 @@ int ezlopi_nvs_init(void)
         if (ESP_OK != err)
         {
             TRACE_E("```nvs_open``` Error!");
+            error = EZPI_ERR_NVS_INIT_FAILED;
+
             // vTaskDelay(2000 / portTICK_RATE_MS);
         }
         else
         {
-            ret = 1;
             TRACE_D("```nvs_open``` success");
         }
     }
-    else
-    {
-        ret = 1;
-    }
-
-    return ret;
+    return error;
 }
 
 uint32_t ezlopi_nvs_config_info_update_time_get(void)
 {
     uint32_t ret = 0;
-    if (ezlopi_nvs_init())
+    if (EZPI_SUCCESS == ezlopi_nvs_init())
     {
         esp_err_t err = nvs_get_u32(ezlopi_nvs_handle, config_info_update_time_name, &ret);
         TRACE_S("config-update-time-get: %d", ret);
@@ -92,7 +92,7 @@ uint32_t ezlopi_nvs_config_info_version_number_get(void)
 {
     uint32_t ret = 0;
 
-    if (ezlopi_nvs_init())
+    if (EZPI_SUCCESS == ezlopi_nvs_init())
     {
         esp_err_t err = nvs_get_u32(ezlopi_nvs_handle, config_info_version_number, &ret);
         TRACE_S("config-version-number-get: %d", ret);
@@ -107,133 +107,139 @@ uint32_t ezlopi_nvs_config_info_version_number_get(void)
     return ret;
 }
 
-void ezlopi_nvs_config_info_update_time_set(uint32_t value)
+ezlopi_error_t ezlopi_nvs_config_info_update_time_set(uint32_t value)
 {
-    if (ezlopi_nvs_init())
+    ezlopi_error_t error = EZPI_FAILED;
+    if (EZPI_SUCCESS == ezlopi_nvs_init())
     {
         nvs_erase_key(ezlopi_nvs_handle, config_info_update_time_name);
         esp_err_t err = nvs_set_u32(ezlopi_nvs_handle, config_info_update_time_name, value);
         TRACE_W("(nvs_set_u32)-%s:: error: %s", config_info_update_time_name, esp_err_to_name(err));
+        error = (ESP_OK == err) ? EZPI_SUCCESS : error;
     }
+    return error;
 }
 
-void ezlopi_nvs_config_info_version_number_set(uint32_t value)
+ezlopi_error_t ezlopi_nvs_config_info_version_number_set(uint32_t value)
 {
-    if (ezlopi_nvs_init())
+    ezlopi_error_t error = EZPI_FAILED;
+    if (EZPI_SUCCESS == ezlopi_nvs_init())
     {
         esp_err_t err = nvs_set_u32(ezlopi_nvs_handle, config_info_version_number, value);
         TRACE_W("(nvs_set_u32)-%s:: - error: %s", config_info_version_number, esp_err_to_name(err));
+        error = (ESP_OK == err) ? EZPI_SUCCESS : error;
     }
+    return error;
 }
 
-int ezlopi_nvs_scene_set_v2(char* scene)
+ezlopi_error_t ezlopi_nvs_scene_set_v2(char* scene)
 {
     return ezlopi_nvs_write_str(scene, strlen(scene) + 1, ezlopi_scenes_v2_nvs_name);
 }
 
-char* ezlopi_nvs_scene_get_v2(void)
+char *ezlopi_nvs_scene_get_v2(void)
 {
     return ezlopi_nvs_read_str(ezlopi_scenes_v2_nvs_name);
 }
 
-int ezlopi_nvs_scene_set(char* scene)
+ezlopi_error_t ezlopi_nvs_scene_set(char* scene)
 {
     return ezlopi_nvs_write_str(scene, strlen(scene) + 1, ezlopi_scenes_nvs_name);
 }
 
-char* ezlopi_nvs_scene_get(void)
+char *ezlopi_nvs_scene_get(void)
 {
     return ezlopi_nvs_read_str(ezlopi_scenes_nvs_name);
 }
 
-int ezlopi_nvs_factory_reset(void)
+ezlopi_error_t ezlopi_nvs_factory_reset(void)
 {
-    int ret = 0;
+    ezlopi_error_t error = EZPI_SUCCESS;
     if (ESP_OK == nvs_flash_erase())
     {
-        ret = 1;
+        error = EZPI_SUCCESS;
     }
 
-    return ret;
+    return error;
 }
 
-int ezlopi_nvs_write_scenes_scripts(char* data)
+ezlopi_error_t ezlopi_nvs_write_scenes_scripts(char* data)
 {
-    return ezlopi_nvs_write_str(data, strlen(data), (char*)ezlopi_scripts_nvs_ids);
+    return ezlopi_nvs_write_str(data, strlen(data), (char *)ezlopi_scripts_nvs_ids);
 }
 
-char* ezlopi_nvs_read_scenes_scripts(void)
+char *ezlopi_nvs_read_scenes_scripts(void)
 {
     return ezlopi_nvs_read_str(ezlopi_scripts_nvs_ids);
 }
 
-int ezlopi_nvs_write_scenes_expressions(char* data)
+ezlopi_error_t ezlopi_nvs_write_scenes_expressions(char* data)
 {
     return ezlopi_nvs_write_str(data, strlen(data), ezlopi_scenes_expression_ids);
 }
 
-char* ezlopi_nvs_read_scenes_expressions(void)
+char *ezlopi_nvs_read_scenes_expressions(void)
 {
     return ezlopi_nvs_read_str(ezlopi_scenes_expression_ids);
 }
 
-int ezlopi_nvs_write_device_groups(char* data)
+ezlopi_error_t ezlopi_nvs_write_device_groups(char *data)
 {
     return ezlopi_nvs_write_str(data, strlen(data) + 1, ezlopi_device_groups_ids);
 }
 
-char* ezlopi_nvs_read_device_groups(void)
+char *ezlopi_nvs_read_device_groups(void)
 {
     return ezlopi_nvs_read_str(ezlopi_device_groups_ids);
 }
 
-int ezlopi_nvs_write_item_groups(char* data)
+ezlopi_error_t ezlopi_nvs_write_item_groups(char *data)
 {
     return ezlopi_nvs_write_str(data, strlen(data) + 1, ezlopi_item_groups_ids);
 }
 
-char* ezlopi_nvs_read_item_groups(void)
+char *ezlopi_nvs_read_item_groups(void)
 {
     return ezlopi_nvs_read_str(ezlopi_item_groups_ids);
 }
 
-char* ezlopi_nvs_read_rooms(void)
+char *ezlopi_nvs_read_rooms(void)
 {
     return ezlopi_nvs_read_str(ezlopi_room_ids_nvs_name);
 }
 
-int ezlopi_nvs_write_rooms(char* data)
+ezlopi_error_t ezlopi_nvs_write_rooms(char* data)
 {
     return ezlopi_nvs_write_str(data, strlen(data), ezlopi_room_ids_nvs_name);
 }
 
-char* ezlopi_nvs_read_modes(void)
+char *ezlopi_nvs_read_modes(void)
 {
     return ezlopi_nvs_read_str(ezlopi_modes_nvs_name);
 }
 
-int ezlopi_nvs_write_modes(char* data)
+ezlopi_error_t ezlopi_nvs_write_modes(char* data)
 {
     return ezlopi_nvs_write_str(data, strlen(data), ezlopi_modes_nvs_name);
 }
 
-int ezlopi_nvs_write_config_data_str(char* data)
+ezlopi_error_t ezlopi_nvs_write_config_data_str(char* data)
 {
     return ezlopi_nvs_write_str(data, strlen(data), config_nvs_name);
 }
 
-char* ezlopi_nvs_read_config_data_str(void)
+char *ezlopi_nvs_read_config_data_str(void)
 {
     return ezlopi_nvs_read_str(config_nvs_name);
 }
 
-int ezlopi_nvs_read_ble_passkey(uint32_t* passkey)
+ezlopi_error_t ezlopi_nvs_read_ble_passkey(uint32_t* passkey)
 {
     const uint32_t default_passkey = 123456;
-    int ret = 0;
+    ezlopi_error_t error = EZPI_ERR_NVS_READ_FAILED;
     if (passkey)
     {
-        if (1 == ezlopi_nvs_init())
+        if (EZPI_SUCCESS == ezlopi_nvs_init())
         {
             esp_err_t err = ESP_OK;
             err = nvs_get_u32(ezlopi_nvs_handle, passkey_nvs_name, passkey);
@@ -241,7 +247,7 @@ int ezlopi_nvs_read_ble_passkey(uint32_t* passkey)
 
             if (ESP_OK == err)
             {
-                ret = 1;
+                error = EZPI_SUCCESS;
             }
             else
             {
@@ -252,14 +258,14 @@ int ezlopi_nvs_read_ble_passkey(uint32_t* passkey)
         *passkey = ((0 == *passkey) || (*passkey > 999999)) ? default_passkey : *passkey;
     }
 
-    return ret;
+    return error;
 }
 
-int ezlopi_nvs_write_ble_passkey(uint32_t passkey)
+ezlopi_error_t ezlopi_nvs_write_ble_passkey(uint32_t passkey)
 {
-    int ret = 0;
+    ezlopi_error_t error = EZPI_ERR_NVS_WRITE_FAILED;
 
-    if (1 == ezlopi_nvs_init())
+    if (EZPI_SUCCESS == ezlopi_nvs_init())
     {
         esp_err_t err = ESP_OK;
         err = nvs_set_u32(ezlopi_nvs_handle, passkey_nvs_name, passkey);
@@ -267,22 +273,22 @@ int ezlopi_nvs_write_ble_passkey(uint32_t passkey)
 
         if (ESP_OK == err)
         {
-            ret = 1;
+            error = EZPI_SUCCESS;
         }
     }
 
-    return ret;
+    return error;
 }
 
-int ezlopi_nvs_write_wifi(const char* wifi_info, uint32_t len)
+ezlopi_error_t ezlopi_nvs_write_wifi(const char* wifi_info, uint32_t len)
 {
     return ezlopi_nvs_write_str(wifi_info, len, wifi_info_nvs_name);
 }
 
-int ezlopi_nvs_read_wifi(char* wifi_info, uint32_t len)
+ezlopi_error_t ezlopi_nvs_read_wifi(char* wifi_info, uint32_t len)
 {
-    int ret = 0;
-    if (1 == ezlopi_nvs_init())
+    ezlopi_error_t error = EZPI_ERR_NVS_READ_FAILED;
+    if (EZPI_SUCCESS == ezlopi_nvs_init())
     {
         size_t required_size;
         esp_err_t err = nvs_get_blob(ezlopi_nvs_handle, wifi_info_nvs_name, NULL, &required_size);
@@ -293,7 +299,7 @@ int ezlopi_nvs_read_wifi(char* wifi_info, uint32_t len)
 
             if (ESP_OK == err)
             {
-                ret = 1;
+                error = EZPI_SUCCESS;
                 TRACE_D("Load wifi config:: ssid: %s, password: %s", wifi_info, &wifi_info[32]);
             }
         }
@@ -302,13 +308,13 @@ int ezlopi_nvs_read_wifi(char* wifi_info, uint32_t len)
             TRACE_E("'wifi config' read-lenght error!, Required: %d | %d, Error: %s", required_size, len, esp_err_to_name(err));
         }
     }
-    return ret;
+    return error;
 }
 
-int ezlopi_nvs_write_user_id_str(char* data)
+ezlopi_error_t ezlopi_nvs_write_user_id_str(char* data)
 {
-    int ret = 0;
-    if (1 == ezlopi_nvs_init())
+    ezlopi_error_t error = EZPI_ERR_NVS_WRITE_FAILED;
+    if (EZPI_SUCCESS == ezlopi_nvs_init())
     {
         esp_err_t err;
         err = nvs_set_str(ezlopi_nvs_handle, user_id_nvs_name, data);
@@ -320,7 +326,7 @@ int ezlopi_nvs_write_user_id_str(char* data)
 
             if (ESP_OK == err)
             {
-                ret = 1;
+                error = EZPI_SUCCESS;
             }
             else
             {
@@ -329,10 +335,10 @@ int ezlopi_nvs_write_user_id_str(char* data)
         }
     }
 
-    return ret;
+    return error;
 }
 
-char* ezlopi_nvs_read_user_id_str(void)
+char *ezlopi_nvs_read_user_id_str(void)
 {
     return ezlopi_nvs_read_str(user_id_nvs_name);
 }
@@ -343,19 +349,22 @@ void ezlopi_nvs_deinit(void)
     ezlopi_nvs_handle = 0;
 }
 
-void ezlopi_nvs_set_boot_count(uint32_t boot_count)
+ezlopi_error_t ezlopi_nvs_set_boot_count(uint32_t boot_count)
 {
-    if (ezlopi_nvs_init())
+    ezlopi_error_t error = EZPI_ERR_NVS_WRITE_FAILED;
+    if (EZPI_SUCCESS == ezlopi_nvs_init())
     {
         esp_err_t err = nvs_set_u32(ezlopi_nvs_handle, boot_count_nvs_name, boot_count);
         TRACE_W("nvs_set_u32 - error: %s", esp_err_to_name(err));
+        error = (ESP_OK == err) ? EZPI_SUCCESS : error;
     }
+    return error;
 }
 
 uint32_t ezlopi_nvs_get_boot_count(void)
 {
     uint32_t boot_count = 1;
-    if (ezlopi_nvs_init())
+    if (EZPI_SUCCESS == ezlopi_nvs_init())
     {
         esp_err_t err = nvs_get_u32(ezlopi_nvs_handle, boot_count_nvs_name, &boot_count);
         TRACE_S("Boot count: %d", boot_count);
@@ -370,23 +379,26 @@ uint32_t ezlopi_nvs_get_boot_count(void)
     return boot_count;
 }
 
-void ezlopi_nvs_scenes_soft_reset(void)
+ezlopi_error_t ezlopi_nvs_scenes_soft_reset(void)
 {
+    ezlopi_error_t error = EZPI_SUCCESS;
     esp_err_t err = ESP_OK;
-    if (1 == ezlopi_nvs_init())
+    if (EZPI_SUCCESS == ezlopi_nvs_init())
     {
         // only 'wifi' key is cleared during 'soft reset'
         if (ESP_OK != (err = nvs_erase_key(ezlopi_nvs_handle, wifi_info_nvs_name)))
         {
             TRACE_E("Erasing nvs-key '%s' failed!, error: %s", wifi_info_nvs_name, esp_err_to_name(err));
+            error = EZPI_FAILED;
         }
     }
+    return error;
 }
 
 void ezlopi_nvs_scenes_factory_info_reset(void)
 {
     esp_err_t err = ESP_OK;
-    if (1 == ezlopi_nvs_init())
+    if (EZPI_SUCCESS == ezlopi_nvs_init())
     {
         // list of nvs keys cleared during 'factory reset'
         if (ESP_OK != (err = nvs_erase_key(ezlopi_nvs_handle, user_id_nvs_name))) // ble
@@ -417,9 +429,9 @@ void ezlopi_nvs_scenes_factory_info_reset(void)
     ezlopi_nvs_scenes_soft_reset();
 }
 
-uint8_t ezlopi_nvs_write_int32(int32_t i, const char* key_name)
+ezlopi_error_t ezlopi_nvs_write_int32(int32_t i, const char* key_name)
 {
-    uint8_t ret = 0;
+    ezlopi_error_t error = EZPI_ERR_NVS_WRITE_FAILED;
     if (ezlopi_nvs_handle)
     {
         esp_err_t err = nvs_set_i32(ezlopi_nvs_handle, key_name, i);
@@ -433,40 +445,39 @@ uint8_t ezlopi_nvs_write_int32(int32_t i, const char* key_name)
             if (ESP_OK != err)
             {
                 TRACE_E("(nvs_commit)-%s:: error: %s", key_name, esp_err_to_name(err));
-                ret = 0;
             }
             else
             {
                 TRACE_D("(nvs_commit)-%s successful.", key_name);
-                ret = 1;
+                error = EZPI_SUCCESS;
             }
         }
     }
 
-    return ret;
+    return error;
 }
 
-uint8_t ezlopi_nvs_read_int32(int32_t* i, const char* key_name)
+ezlopi_error_t ezlopi_nvs_read_int32(int32_t* i, const char* key_name)
 {
-    uint8_t ret = 0;
+    ezlopi_error_t error = EZPI_ERR_NVS_READ_FAILED;
     if (ezlopi_nvs_handle)
     {
         esp_err_t err = nvs_get_i32(ezlopi_nvs_handle, key_name, i);
         if (ESP_OK == err)
         {
-            ret = 1;
+            error = EZPI_SUCCESS;
         }
         else
         {
             TRACE_W("(nvs_get_i32)-%s:: error: %s", key_name, esp_err_to_name(err));
         }
     }
-    return ret;
+    return error;
 }
 
-uint8_t ezlopi_nvs_write_uint32(uint32_t i, const char* key_name)
+ezlopi_error_t ezlopi_nvs_write_uint32(uint32_t i, const char* key_name)
 {
-    uint8_t ret = 0;
+    ezlopi_error_t error = EZPI_ERR_NVS_READ_FAILED;
     if (ezlopi_nvs_handle)
     {
         esp_err_t err = nvs_set_u32(ezlopi_nvs_handle, key_name, (uint32_t)i);
@@ -480,40 +491,39 @@ uint8_t ezlopi_nvs_write_uint32(uint32_t i, const char* key_name)
             if (ESP_OK != err)
             {
                 TRACE_W("(nvs_commit)-%s:: error: %s", key_name, esp_err_to_name(err));
-                ret = 0;
             }
             else
             {
                 TRACE_D("(nvs_commit)-%s:: Success.", key_name);
-                ret = 1;
+                error = EZPI_SUCCESS;
             }
         }
     }
-    return ret;
+    return error;
 }
 
-uint8_t ezlopi_nvs_read_uint32(uint32_t* i, const char* key_name)
+ezlopi_error_t ezlopi_nvs_read_uint32(uint32_t* i, const char* key_name)
 {
-    uint8_t ret = 0;
+    ezlopi_error_t error = EZPI_ERR_NVS_READ_FAILED;
     if (ezlopi_nvs_handle)
     {
         esp_err_t err = nvs_get_u32(ezlopi_nvs_handle, key_name, i);
         if (ESP_OK == err)
         {
             TRACE_D("(nvs_get_u32)-%s - NVS read success", key_name);
-            ret = 1;
+            error = EZPI_SUCCESS;
         }
         else
         {
             TRACE_E("(nvs_get_u32)-%s - error: %s", key_name, esp_err_to_name(err));
         }
     }
-    return ret;
+    return error;
 }
 
-uint8_t ezlopi_nvs_write_float32(float f, const char* key_name)
+ezlopi_error_t ezlopi_nvs_write_float32(float f, const char* key_name)
 {
-    uint8_t ret = 0;
+    ezlopi_error_t error = EZPI_ERR_NVS_WRITE_FAILED;
     if (ezlopi_nvs_handle)
     {
         uint32_t value;
@@ -530,21 +540,20 @@ uint8_t ezlopi_nvs_write_float32(float f, const char* key_name)
             if (ESP_OK != err)
             {
                 TRACE_W("(nvs_commit)-%s:: error: %s", key_name, esp_err_to_name(err));
-                ret = 0;
             }
             else
             {
                 TRACE_D("(nvs_commit)-%s:: Success", key_name);
-                ret = 1;
+                error = EZPI_SUCCESS;
             }
         }
     }
-    return ret;
+    return error;
 }
 
-uint8_t ezlopi_nvs_read_float32(float* f, const char* key_name)
+ezlopi_error_t ezlopi_nvs_read_float32(float* f, const char* key_name)
 {
-    uint8_t ret = 0;
+    ezlopi_error_t error = EZPI_ERR_NVS_READ_FAILED;
     if (ezlopi_nvs_handle)
     {
         uint32_t value;
@@ -553,19 +562,19 @@ uint8_t ezlopi_nvs_read_float32(float* f, const char* key_name)
         if (err == ESP_OK)
         {
             memcpy(f, &value, sizeof(float));
-            ret = 1;
+            error = EZPI_SUCCESS;
         }
         else
         {
             TRACE_W("(nvs_get_u32)-%s:: error: %s", key_name, esp_err_to_name(err));
         }
     }
-    return ret;
+    return error;
 }
 
-uint8_t ezlopi_nvs_write_bool(bool b, const char* key_name)
+ezlopi_error_t ezlopi_nvs_write_bool(bool b, const char* key_name)
 {
-    uint8_t ret = 0;
+    ezlopi_error_t error = EZPI_ERR_NVS_WRITE_FAILED;
     if (ezlopi_nvs_handle)
     {
         uint8_t bool_val;
@@ -591,21 +600,20 @@ uint8_t ezlopi_nvs_write_bool(bool b, const char* key_name)
             if (ESP_OK != err)
             {
                 TRACE_W("(nvs_commit)-%s:: error: %s", key_name, esp_err_to_name(err));
-                ret = 0;
             }
             else
             {
                 TRACE_W("(nvs_commit)-%s:: Success.", key_name);
-                ret = 1;
+                error = EZPI_SUCCESS;
             }
         }
     }
-    return ret;
+    return error;
 }
 
-uint8_t ezlopi_nvs_read_bool(bool* b, const char* key_name)
+ezlopi_error_t ezlopi_nvs_read_bool(bool* b, const char* key_name)
 {
-    uint8_t ret = 0;
+    ezlopi_error_t error = EZPI_ERR_NVS_READ_FAILED;
     if (ezlopi_nvs_handle)
     {
         uint8_t bool_val = 0;
@@ -620,23 +628,23 @@ uint8_t ezlopi_nvs_read_bool(bool* b, const char* key_name)
             {
                 *b = false;
             }
-            ret = 1;
+            error = EZPI_SUCCESS;
         }
         else
         {
             TRACE_W("(nvs_get_u8)-%s:: error: %s", key_name, esp_err_to_name(err));
         }
     }
-    return ret;
+    return error;
 }
 
-int ezlopi_nvs_write_str(const char* data, uint32_t len, const char* nvs_name)
+ezlopi_error_t ezlopi_nvs_write_str(const char* data, uint32_t len, const char* nvs_name)
 {
-    int ret = 0;
+    ezlopi_error_t error = EZPI_ERR_NVS_WRITE_FAILED;
 
     if (data && nvs_name && len)
     {
-        if (1 == ezlopi_nvs_init())
+        if (EZPI_SUCCESS == ezlopi_nvs_init())
         {
             esp_err_t err = nvs_set_str(ezlopi_nvs_handle, nvs_name, data);
             if (ESP_OK == err)
@@ -644,7 +652,7 @@ int ezlopi_nvs_write_str(const char* data, uint32_t len, const char* nvs_name)
                 err = nvs_commit(ezlopi_nvs_handle);
                 if (ESP_OK == err)
                 {
-                    ret = 1;
+                    error = EZPI_SUCCESS;
                     TRACE_D("(nvs_commit)-%s:: Success.", nvs_name);
                 }
                 else
@@ -659,16 +667,16 @@ int ezlopi_nvs_write_str(const char* data, uint32_t len, const char* nvs_name)
         }
     }
 
-    return ret;
+    return error;
 }
 
-char* ezlopi_nvs_read_str(const char* nvs_name)
+char *ezlopi_nvs_read_str(const char *nvs_name)
 {
-    char* return_str = NULL;
+    char *return_str = NULL;
 
     if (nvs_name)
     {
-        if (1 == ezlopi_nvs_init())
+        if (EZPI_SUCCESS == ezlopi_nvs_init())
         {
             esp_err_t err = ESP_OK;
             size_t buf_len_needed = 0;
@@ -717,184 +725,163 @@ void ezlopi_nvs_delete_stored_data_by_id(uint32_t script_id)
     ezlopi_nvs_delete_stored_data_by_name(script_id_str);
 }
 
-void ezlopi_nvs_delete_stored_data_by_name(char* nvs_name)
+void ezlopi_nvs_delete_stored_data_by_name(char *nvs_name)
 {
-    if (1 == ezlopi_nvs_init())
+    if (EZPI_SUCCESS == ezlopi_nvs_init())
     {
         esp_err_t err = ESP_OK;
         if (ESP_OK != (err = nvs_erase_key(ezlopi_nvs_handle, nvs_name)))
         {
-
             TRACE_E("(nvs_erase_key)-%s:: error: %s", nvs_name, esp_err_to_name(err));
         }
     }
 }
 
-int EZPI_CORE_nvs_write_time_location(const char* time_loc, uint32_t len)
+ezlopi_error_t EZPI_CORE_nvs_write_time_location(const char* time_loc, uint32_t len)
 {
     return ezlopi_nvs_write_str(time_loc, len, ezlopi_time_location_nvs_name);
 }
 
-char* EZPI_CORE_nvs_read_time_location(void)
+char *EZPI_CORE_nvs_read_time_location(void)
 {
     return ezlopi_nvs_read_str(ezlopi_time_location_nvs_name);
 }
 
-char* ezlopi_nvs_read_latidtude_longitude()
+char *ezlopi_nvs_read_latidtude_longitude()
 {
     return ezlopi_nvs_read_str(ezlopi_coordinates_nvs_name);
 }
 
-int ezlopi_nvs_write_latitude_longitude(char* data)
+ezlopi_error_t ezlopi_nvs_write_latitude_longitude(char* data)
 {
-    int ret = 0;
+    ezlopi_error_t error = EZPI_ERR_NVS_WRITE_FAILED;
     if (data)
     {
-        ret = ezlopi_nvs_write_str(data, strlen(data), ezlopi_coordinates_nvs_name);
-        if (0 == ret)
+        error = ezlopi_nvs_write_str(data, strlen(data), ezlopi_coordinates_nvs_name);
+        if (EZPI_SUCCESS == error)
         {
             TRACE_E("Error writing latitude an longitude in nvs.");
-            ret = 1;
-        }
-        else
-        {
-            ret = 0;
         }
     }
-    else
-    {
-        ret = 1;
-    }
-    return ret;
+    return error;
 }
 
-bool EZPI_CORE_nvs_write_baud(uint32_t baud)
+ezlopi_error_t EZPI_CORE_nvs_write_baud(uint32_t baud)
 {
     // Key ezlopi_serial_baud_name
-    return ezlopi_nvs_write_uint32(baud, ezlopi_serial_baud_name) == 1 ? true : false;
+    return ezlopi_nvs_write_uint32(baud, ezlopi_serial_baud_name);
 }
 
-uint8_t EZPI_CORE_nvs_read_baud(uint32_t* baud)
+ezlopi_error_t EZPI_CORE_nvs_read_baud(uint32_t* baud)
 {
-    uint8_t ret = 0;
-    uint8_t err = ezlopi_nvs_read_uint32(baud, ezlopi_serial_baud_name);
-    if (0 == err)
-    {
-        ret = 1;
-    }
-    return ret;
+    return ezlopi_nvs_read_uint32(baud, ezlopi_serial_baud_name);
 }
 
-bool EZPI_CORE_nvs_write_parity(uint32_t parity)
+ezlopi_error_t EZPI_CORE_nvs_write_parity(uint32_t parity)
 {
-    return ezlopi_nvs_write_uint32(parity, ezlopi_serial_parity) == 1 ? true : false;
+    return ezlopi_nvs_write_uint32(parity, ezlopi_serial_parity);
 }
 
-uint8_t EZPI_CORE_nvs_read_parity(uint32_t* parity)
+ezlopi_error_t EZPI_CORE_nvs_read_parity(uint32_t* parity)
 {
-    uint8_t ret = 0;
-    uint8_t err = ezlopi_nvs_read_uint32(parity, ezlopi_serial_parity);
-    if (0 == err)
-    {
-        ret = 1;
-    }
-    return ret;
+    return ezlopi_nvs_read_uint32(parity, ezlopi_serial_parity);
 }
 
-bool EZPI_CORE_nvs_write_start_bits(uint32_t start_bits)
+ezlopi_error_t EZPI_CORE_nvs_write_start_bits(uint32_t start_bits)
 {
-    return ezlopi_nvs_write_uint32(start_bits, ezlopi_serial_start_bits) == 1 ? true : false;
+    return ezlopi_nvs_write_uint32(start_bits, ezlopi_serial_start_bits);
 }
-uint8_t EZPI_CORE_nvs_read_start_bits(uint32_t* start_bits)
+ezlopi_error_t EZPI_CORE_nvs_read_start_bits(uint32_t* start_bits)
 {
-    uint8_t ret = 0;
-    uint8_t err = ezlopi_nvs_read_uint32(start_bits, ezlopi_serial_start_bits);
-    if (0 == err)
-    {
-        ret = 1;
-    }
-
-    return ret;
+    return ezlopi_nvs_read_uint32(start_bits, ezlopi_serial_start_bits);
 }
 
-bool EZPI_CORE_nvs_write_stop_bits(uint32_t stop_bits)
+ezlopi_error_t EZPI_CORE_nvs_write_stop_bits(uint32_t stop_bits)
 {
-    return ezlopi_nvs_write_uint32(stop_bits, ezlopi_serial_stop_bits) == 1 ? true : false;
+    return ezlopi_nvs_write_uint32(stop_bits, ezlopi_serial_stop_bits);
 }
 
-uint8_t EZPI_CORE_nvs_read_stop_bits(uint32_t* stop_bits)
+ezlopi_error_t EZPI_CORE_nvs_read_stop_bits(uint32_t* stop_bits)
 {
-    uint8_t ret = 0;
-    uint8_t err = ezlopi_nvs_read_uint32(stop_bits, ezlopi_serial_stop_bits);
-    if (0 == err)
-    {
-        ret = 1;
-    }
-    return ret;
+    return ezlopi_nvs_read_uint32(stop_bits, ezlopi_serial_stop_bits);
 }
 
-
-bool EZPI_CORE_nvs_write_frame_size(uint32_t frame_size)
+ezlopi_error_t EZPI_CORE_nvs_write_frame_size(uint32_t frame_size)
 {
-    return ezlopi_nvs_write_uint32(frame_size, ezlopi_serial_frame_size) == 1 ? true : false;
+    return ezlopi_nvs_write_uint32(frame_size, ezlopi_serial_frame_size);
 }
 
-uint8_t EZPI_CORE_nvs_read_frame_size(uint32_t* frame_size)
+ezlopi_error_t EZPI_CORE_nvs_read_frame_size(uint32_t* frame_size)
 {
-    uint32_t ret = 0;
-    uint8_t err = ezlopi_nvs_read_uint32(frame_size, ezlopi_serial_frame_size);
-    if (0 == err)
-    {
-        ret = 1;
-    }
-    return ret;
+    return ezlopi_nvs_read_uint32(frame_size, ezlopi_serial_frame_size);
 }
 
-bool EZPI_CORE_nvs_write_flow_control(uint32_t flow_control)
+ezlopi_error_t EZPI_CORE_nvs_write_flow_control(uint32_t flow_control)
 {
-    return ezlopi_nvs_write_uint32(flow_control, ezlopi_serial_flow_control) == 1 ? true : false;
+    return ezlopi_nvs_write_uint32(flow_control, ezlopi_serial_flow_control);
 }
 
-uint8_t EZPI_CORE_nvs_read_flow_control(uint32_t* flow_control)
+ezlopi_error_t EZPI_CORE_nvs_read_flow_control(uint32_t* flow_control)
 {
-    uint8_t ret = 0;
-    uint8_t err = ezlopi_nvs_read_uint32(flow_control, ezlopi_serial_flow_control);
-    if (0 == err)
-    {
-        ret = 1;
-    }
-    return ret;
+    return ezlopi_nvs_read_uint32(flow_control, ezlopi_serial_flow_control);
 }
 
-
-bool EZPI_CORE_nvs_write_cloud_log_severity(uint32_t severity)
+ezlopi_error_t EZPI_CORE_nvs_write_cloud_log_severity(uint32_t severity)
 {
-    return ezlopi_nvs_write_uint32(severity, ezlopi_cloud_log_severity) == 1 ? true : false;
+    return ezlopi_nvs_write_uint32(severity, ezlopi_cloud_log_severity);
 }
 
-uint8_t EZPI_CORE_nvs_read_cloud_log_severity(uint32_t* severity)
+ezlopi_error_t EZPI_CORE_nvs_read_cloud_log_severity(uint32_t* severity)
 {
-    uint8_t ret = 0;
-    uint8_t err = ezlopi_nvs_read_uint32(severity, ezlopi_cloud_log_severity);
-    if (0 == err)
-    {
-        ret = 1;
-    }
-    return ret;
+    return ezlopi_nvs_read_uint32(severity, ezlopi_cloud_log_severity);
 }
 
-bool EZPI_CORE_nvs_write_serial_log_severity(uint32_t severity)
+ezlopi_error_t EZPI_CORE_nvs_write_serial_log_severity(uint32_t severity)
 {
     return ezlopi_nvs_write_uint32(severity, ezlopi_serial_log_severity);
 }
-uint8_t EZPI_CORE_nvs_read_serial_log_severity(uint32_t* severity)
-{
-    uint8_t ret = 0;
-    uint8_t err = ezlopi_nvs_read_uint32(severity, ezlopi_serial_log_severity);
-    if (0 == err)
-    {
-        ret = 1;
-    }
 
-    return ret;
+ezlopi_error_t EZPI_CORE_nvs_read_serial_log_severity(uint32_t* severity)
+{
+    return ezlopi_nvs_read_uint32(severity, ezlopi_serial_log_severity);
+}
+
+ezlopi_error_t EZPI_CORE_nvs_write_temperature_scale(uint32_t scale)
+{
+    return ezlopi_nvs_write_uint32(scale, ezlopi_temp_scale);
+}
+
+ezlopi_error_t EZPI_CORE_nvs_read_temperature_scale(uint32_t *scale)
+{
+    return ezlopi_nvs_read_uint32(scale, ezlopi_temp_scale);
+}
+
+ezlopi_error_t EZPI_CORE_nvs_write_date_format(uint32_t format)
+{
+    return ezlopi_nvs_write_uint32(format, ezlopi_date_format);
+}
+
+ezlopi_error_t EZPI_CORE_nvs_read_date_format(uint32_t *format)
+{
+    return ezlopi_nvs_read_uint32(format, ezlopi_date_format);
+}
+
+ezlopi_error_t EZPI_CORE_nvs_write_time_format(uint32_t format)
+{
+    return ezlopi_nvs_write_uint32(format, ezlopi_time_format);
+}
+
+ezlopi_error_t EZPI_CORE_nvs_read_time_format(uint32_t *format)
+{
+    return ezlopi_nvs_read_uint32(format, ezlopi_time_format);
+}
+
+ezlopi_error_t EZPI_CORE_nvs_write_network_ping_timeout(uint32_t ping_timeout)
+{
+    return ezlopi_nvs_write_uint32(ping_timeout, ezlopi_network_ping_timeout);
+}
+
+ezlopi_error_t EZPI_CORE_nvs_read_network_ping_timeout(uint32_t *ping_timeout)
+{
+    return ezlopi_nvs_read_uint32(ping_timeout, ezlopi_network_ping_timeout);
 }

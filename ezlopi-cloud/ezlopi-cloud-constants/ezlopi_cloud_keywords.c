@@ -4,7 +4,7 @@
 #include "stdio.h"
 const char *ezlopi_ESP32_str = "ESP32";
 const char *ezlopi_ESP32S3_str = "ESP32S3";
-const char* ezlopi_ESP32S2_str = "ESP32S2";
+const char *ezlopi_ESP32S2_str = "ESP32S2";
 const char *ezlopi_ESP32C3_str = "ESP32C3";
 const char *ezlopi_ezlopi_str = "ezlopi";
 const char *ezlopi__str = "";
@@ -85,6 +85,7 @@ const char *ezlopi_not_ready_str = "not ready";
 const char *ezlopi_settings_str = "settings";
 const char *ezlopi_valueType_str = "valueType";
 const char *ezlopi_metadata_str = "metadata";
+const char *ezlopi_meta_str = "meta";
 const char *ezlopi_code_str = "code";
 const char *ezlopi_data_str = "data";
 const char *ezlopi_message_str = "message";
@@ -266,7 +267,8 @@ const char *ezlopi_switchToDelay_str = "switchToDelay";
 const char *ezlopi_alarmDelay_str = "alarmDelay";
 const char *ezlopi_entryDelay_str = "entryDelay";
 const char *ezlopi_normal_str = "normal";
-const char *ezlopi_short_str = "short";
+// const char *ezlopi_short_str = "short";
+const char *ezlopi_long_extended_str = "longExtended";
 const char *ezlopi_extended_str = "extended";
 const char *ezlopi_instant_str = "instant";
 const char *ezlopi_modes_str = "modes";

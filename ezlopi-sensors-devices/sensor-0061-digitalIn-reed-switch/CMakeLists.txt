@@ -8,6 +8,7 @@ idf_component_register(SRCS "sensor_0061_digitalIn_reed_switch.c"
                 ezlopi-core-actions 
                 ezlopi-core-devices 
                 ezlopi-core-valueformatter 
+                ezlopi-core-errors
                 
                 ezlopi-hal-gpio
                 
