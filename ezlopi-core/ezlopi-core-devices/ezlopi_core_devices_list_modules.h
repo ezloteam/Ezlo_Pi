@@ -15,7 +15,6 @@ EZLOPI_DEVICE_LIST("digital-out plug                    ", 3, device_0003_digita
 EZLOPI_DEVICE_LIST("digital-in generic                  ", 4, device_0004_digitalIn_generic)
 #endif // DEVICE_0001_DIGITALOUT_GENERIC
 
-
 #if (1 == SENSOR_0005_I2C_MPU6050)
 EZLOPI_DEVICE_LIST("sensor-MPU6050-I2C                  ", 5, sensor_0005_I2C_MPU6050)
 #endif // SENSOR_0005_I2C_MPU6050
@@ -36,11 +35,10 @@ EZLOPI_DEVICE_LIST("sensor-LTR303ALS-I2C                ", 8, sensor_0008_I2C_LT
 EZLOPI_DEVICE_LIST("device-rgp_strip-RMT_SK6812         ", 9, device_0009_other_RMT_SK6812)
 #endif // DEVICE_0009_OTHER_RMT_SK6812
 
-
 #if (1 == SENSOR_0010_I2C_BME680)
-#if (CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32)
+#if (CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32S2)
 EZLOPI_DEVICE_LIST("sensor-bme680-i2c                   ", 10, sensor_0010_I2C_BME680)
-#endif // CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32
+#endif // CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32S2
 #endif // SENSOR_0010_I2C_BME680
 
 #if (1 == SENSOR_0012_I2C_BME280)
@@ -53,12 +51,11 @@ EZLOPI_DEVICE_LIST("sensor-bme280-i2c-temp-humid        ", 12, sensor_0012_I2C_B
 EZLOPI_DEVICE_LIST("sensor-DHT11-1-wire-temp-humid      ", 15, sensor_0015_oneWire_DHT11)
 #endif // SENSOR_0015_ONEWIRE_DHT11
 
-#endif // CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32
-
 #if (1 == SENSOR_0016_ONEWIRE_DHT22)
 EZLOPI_DEVICE_LIST("sensor-DHT22-1-wire-temp-humid      ", 16, sensor_0016_oneWire_DHT22)
 #endif // SENSOR_0016_ONEWIRE_DHT22
 
+#endif // CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32S2
 
 #if (1 == SENSOR_0017_ADC_POTENTIOMETER)
 EZLOPI_DEVICE_LIST("sensor-potentiometer-ADC            ", 17, sensor_0017_ADC_potentiometer)
@@ -81,7 +78,6 @@ EZLOPI_DEVICE_LIST("sensor-2AXIS-JOYSTICK               ", 20, sensor_0020_other
 #if (1 == SENSOR_0021_UART_MB1013)
 EZLOPI_DEVICE_LIST("sensor-UART-MB1013                  ", 21, sensor_0021_UART_MB1013)
 #endif // SENSOR_0021_UART_MB1013
-
 
 #if (1 == DEVICE_0022_PWM_DIMMABLE_LAMP)
 EZLOPI_DEVICE_LIST("device-PWM-dimmable-lamp            ", 22, device_0022_PWM_dimmable_lamp)
@@ -110,7 +106,6 @@ EZLOPI_DEVICE_LIST("sensor-WATERLEAK-ADC                ", 27, sensor_0027_ADC_w
 #if (1 == SENSOR_0028_OTHER_GY61)
 EZLOPI_DEVICE_LIST("sensor-GY61-other-accelerometer     ", 28, sensor_0028_other_GY61)
 #endif // SENSOR_0028_OTHER_GY61
-
 
 #if (1 == SENSOR_0029_I2C_GXHTC3)
 EZLOPI_DEVICE_LIST("sensor-GXHTC3-I2C-temp-humidity     ", 29, sensor_0029_I2C_GXHTC3)
@@ -220,7 +215,6 @@ EZLOPI_DEVICE_LIST("sensor-Force-sensetive-resistor-ADC ", 56, sensor_0056_ADC_F
 EZLOPI_DEVICE_LIST("sensor-KY026-Flame-detector         ", 57, sensor_0057_other_KY026_FlameDetector)
 #endif // SENSOR_0057_OTHER_KY026_FLAMEDETECTOR
 
-
 #if (1 == SENSOR_0059_OTHER_MQ6_LPG_DETECTOR)
 EZLOPI_DEVICE_LIST("sensor-MQ6-LPG-detector             ", 59, sensor_0059_other_MQ6_LPG_detector)
 #endif // SENSOR_0059_OTHER_MQ6_LPG_DETECTOR
@@ -240,7 +234,6 @@ EZLOPI_DEVICE_LIST("sensor-MQ7-CO-detector              ", 62, sensor_0062_other
 #if (1 == SENSOR_0063_OTHER_MQ9_LPG_FLAMEABLE_DETECTOR)
 EZLOPI_DEVICE_LIST("sensor-MQ9-LPG-flameable-detector   ", 63, sensor_0063_other_MQ9_LPG_flameable_detector)
 #endif // SENSOR_0063_OTHER_MQ9_LPG_FLAMEABLE_DETECTOR
-
 
 #if (1 == SENSOR_0065_DIGITALIN_FLOAT_SWITCH)
 EZLOPI_DEVICE_LIST("sensor-float-switch-digital         ", 65, sensor_0065_digitalIn_float_switch)

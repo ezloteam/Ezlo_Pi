@@ -650,7 +650,7 @@ l_ezlopi_item_t *ezlopi_device_get_item_by_id(uint32_t item_id)
     return item_to_return;
 }
 
-l_ezlopi_item_t *ezlopi_device_add_item_to_device(l_ezlopi_device_t *device, int (*item_func)(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg))
+l_ezlopi_item_t *ezlopi_device_add_item_to_device(l_ezlopi_device_t *device, ezlopi_error_t (*item_func)(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg))
 {
     l_ezlopi_item_t *new_item = NULL;
     if (device)

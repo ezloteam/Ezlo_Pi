@@ -59,10 +59,10 @@ static void __wifi_connection_event(esp_event_base_t event, int32_t event_id, vo
 static void __ws_async_send(void *arg);
 static esp_err_t __trigger_async_send(httpd_req_t *req);
 static int __respond_cjson(httpd_req_t *req, cJSON *cj_response);
-static int __ws_server_send(l_ws_server_client_conn_t *client, char *data, uint32_t len);
+static ezlopi_error_t __ws_server_send(l_ws_server_client_conn_t *client, char *data, uint32_t len);
 
 static esp_err_t __msg_handler(httpd_req_t *req);
-static int __ws_server_broadcast(char *data);
+static ezlopi_error_t __ws_server_broadcast(char *data);
 
 e_ws_status_t ezlopi_service_ws_server_status(void)
 {
