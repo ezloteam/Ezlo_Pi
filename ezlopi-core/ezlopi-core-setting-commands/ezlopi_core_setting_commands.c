@@ -386,16 +386,16 @@ int ezlopi_core_setting_commands_read_settings()
     int ret = 0;
 
     EZPI_CORE_nvs_read_temperature_scale((uint32_t *)&temperature_scale_to_user);
-    printf("Temperature scale: %s\n", temperature_scale_enum[temperature_scale_to_user]);
+    TRACE_I("Temperature scale: %s", temperature_scale_enum[temperature_scale_to_user]);
 
     EZPI_CORE_nvs_read_date_format((uint32_t *)&date_format_to_user);
-    printf("Date format: %s\n", date_format_enum[date_format_to_user]);
+    TRACE_I("Date format: %s", date_format_enum[date_format_to_user]);
 
     EZPI_CORE_nvs_read_time_format((uint32_t *)&time_format_to_user);
-    printf("Time format: %s\n", time_format_enum[time_format_to_user]);
+    TRACE_I("Time format: %s", time_format_enum[time_format_to_user]);
 
     EZPI_CORE_nvs_read_network_ping_timeout((uint32_t *)&network_ping_timeout_to_user);
-    printf("Network Ping Timeout: %d\n", network_ping_timeout_to_user);
+    TRACE_I("Network Ping Timeout: %d", network_ping_timeout_to_user);
 
 #ifdef CONFIG_EZPI_UTIL_TRACE_EN
     ezlopi_core_read_set_log_severities();
