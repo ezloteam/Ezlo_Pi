@@ -1,3 +1,5 @@
+#if (CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32S2)
+
 #include <math.h>
 #include "cjext.h"
 #include "ezlopi_util_trace.h"
@@ -99,9 +101,9 @@ static ezlopi_error_t dht22_sensor_notify(l_ezlopi_item_t *item)
             if (ezlopi_item_name_temp == item->cloud_properties.item_name)
             {
                 float temperature = getTemperature_dht22();
-                e_enum_temperature_scale_t scale_to_use = ezlopi_core_setting_get_temperature_scale();
-                item->cloud_properties.scale = (TEMPERATURE_SCALE_FAHRENHEIT == scale_to_use) ? scales_fahrenheit : scales_celsius;
+                item->cloud_properties.scale = ezlopi_core_setting_get_temperature_scale_str();
 
+                e_enum_temperature_scale_t scale_to_use = ezlopi_core_setting_get_temperature_scale();
                 if (TEMPERATURE_SCALE_FAHRENHEIT == scale_to_use)
                 {
                     temperature = (temperature * (9.0f / 5.0f)) + 32.0f;
@@ -269,8 +271,7 @@ static ezlopi_error_t dht22_sensor_setup_item_properties_temperature(l_ezlopi_it
         item->cloud_properties.item_name = ezlopi_item_name_temp;
         item->cloud_properties.value_type = value_type_temperature;
 
-        e_enum_temperature_scale_t scale_to_use = ezlopi_core_setting_get_temperature_scale();
-        item->cloud_properties.scale = (scale_to_use == TEMPERATURE_SCALE_FAHRENHEIT) ? scales_fahrenheit : scales_celsius;
+        item->cloud_properties.scale = ezlopi_core_setting_get_temperature_scale_str();
 
         item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
@@ -315,3 +316,5 @@ static ezlopi_error_t dht22_sensor_setup_item_properties_humidity(l_ezlopi_item_
 
     return ret;
 }
+
+#endif // (CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32S2)

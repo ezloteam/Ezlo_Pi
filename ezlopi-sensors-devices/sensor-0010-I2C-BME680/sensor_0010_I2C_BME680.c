@@ -115,8 +115,7 @@ static ezlopi_error_t __prepare(void *arg)
                     temperature_item->cloud_properties.item_name = ezlopi_item_name_temp;
                     temperature_item->cloud_properties.value_type = value_type_temperature;
 
-                    e_enum_temperature_scale_t scale_to_use = ezlopi_core_setting_get_temperature_scale();
-                    temperature_item->cloud_properties.scale = (scale_to_use == TEMPERATURE_SCALE_CELSIUS) ? scales_celsius : scales_fahrenheit;
+                    temperature_item->cloud_properties.scale = ezlopi_core_setting_get_temperature_scale_str();
                     __prepare_cloud_properties(temperature_item, cj_device, user_data);
                 }
 
@@ -326,8 +325,8 @@ static ezlopi_error_t __notify(l_ezlopi_item_t *item)
             {
                 if (ezlopi_item_name_temp == item->cloud_properties.item_name)
                 {
+                    item->cloud_properties.scale = ezlopi_core_setting_get_temperature_scale_str();
                     e_enum_temperature_scale_t scale_to_use = ezlopi_core_setting_get_temperature_scale();
-                    item->cloud_properties.scale = (TEMPERATURE_SCALE_FAHRENHEIT == scale_to_use) ? scales_fahrenheit : scales_celsius;
                     if (TEMPERATURE_SCALE_FAHRENHEIT == scale_to_use)
                     {
                         user_data->temperature = (user_data->temperature * (9.0f / 5.0f)) + 32.0f;

@@ -45,4 +45,8 @@ e_enum_time_format_t ezlopi_core_setting_get_time_format();
 int ezlopi_core_setting_get_network_ping_timeout();
 int ezlopi_core_setting_updated_broadcast(cJSON *cj_params, cJSON *cj_result);
 
+const char *ezlopi_core_setting_get_temperature_scale_str();
+const char *ezlopi_core_setting_get_date_format_str();
+const char *ezlopi_core_setting_get_time_format_str();
+
 #endif /// __EZLOPI_CORE_SETTING_COMMANDS_H__

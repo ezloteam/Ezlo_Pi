@@ -74,9 +74,9 @@ static ezlopi_error_t __notify(l_ezlopi_item_t *item)
     {
         // TRACE_I("Current %f, prev %f", temperature_current_value, *temperature_prev_value);
         // TRACE_I("Diff is %f", fabs(*temperature_prev_value - temperature_current_value));
-        e_enum_temperature_scale_t scale_to_use = ezlopi_core_setting_get_temperature_scale();
-        item->cloud_properties.scale = (TEMPERATURE_SCALE_FAHRENHEIT == scale_to_use) ? scales_fahrenheit : scales_celsius;
+        item->cloud_properties.scale = ezlopi_core_setting_get_temperature_scale_str();
 
+        e_enum_temperature_scale_t scale_to_use = ezlopi_core_setting_get_temperature_scale();
         if (TEMPERATURE_SCALE_FAHRENHEIT == scale_to_use)
         {
             temperature_current_value = (temperature_current_value * (9.0f / 5.0f)) + 32.0f;
@@ -151,8 +151,7 @@ static void __prepare_item_properties(l_ezlopi_item_t *item, cJSON *cj_device)
     item->cloud_properties.value_type = value_type_temperature;
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
-    e_enum_temperature_scale_t scale_to_use = ezlopi_core_setting_get_temperature_scale();
-    item->cloud_properties.scale = (TEMPERATURE_SCALE_FAHRENHEIT == scale_to_use) ? scales_fahrenheit : scales_celsius;
+    item->cloud_properties.scale = ezlopi_core_setting_get_temperature_scale_str();
 
     item->interface_type = EZLOPI_DEVICE_INTERFACE_ONEWIRE_MASTER;
 

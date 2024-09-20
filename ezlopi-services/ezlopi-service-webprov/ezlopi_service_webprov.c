@@ -60,7 +60,7 @@ static void __connection_upcall(bool connected);
 static void __message_upcall(const char *payload, uint32_t len);
 static void __message_process(const char *payload, uint32_t len);
 
-static int __send_str_data_to_nma_websocket(char *str_data);
+static ezlopi_error_t __send_str_data_to_nma_websocket(char *str_data);
 static int __send_cjson_data_to_nma_websocket(cJSON *cj_data);
 
 uint32_t ezlopi_service_web_provisioning_get_message_count(void)
