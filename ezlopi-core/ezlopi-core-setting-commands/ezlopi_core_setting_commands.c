@@ -39,7 +39,7 @@ const char *log_indentation_level[4] = {
     "8",
 };
 
-static e_enum_temperature_scale_t temperature_scale_to_user = TEMPERATURE_SCALE_FAHRENHEIT;
+static e_enum_temperature_scale_t temperature_scale_to_user = TEMPERATURE_SCALE_CELSIUS;
 static e_enum_date_format_t date_format_to_user = DATE_FORMAT_MMDDYY;
 static e_enum_time_format_t time_format_to_user = TIME_FORMAT_12;
 static int network_ping_timeout_to_user = 10;
@@ -441,4 +441,17 @@ e_ezlopi_core_setting_command_names_t ezlopi_core_setting_command_get_command_en
         }
     }
     return ret;
+}
+
+const char *ezlopi_core_setting_get_temperature_scale_str()
+{
+    return temperature_scale_enum[temperature_scale_to_user];
+}
+const char *ezlopi_core_setting_get_date_format_str()
+{
+    return date_format_enum[date_format_to_user];
+}
+const char *ezlopi_core_setting_get_time_format_str()
+{
+    return time_format_enum[time_format_to_user];
 }
