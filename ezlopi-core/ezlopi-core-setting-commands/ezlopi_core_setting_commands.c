@@ -39,7 +39,7 @@ const char *log_indentation_level[4] = {
     "8",
 };
 
-static e_enum_temperature_scale_t temperature_scale_to_user = TEMPERATURE_SCALE_FAHRENHEIT;
+static e_enum_temperature_scale_t temperature_scale_to_user = TEMPERATURE_SCALE_CELSIUS;
 static e_enum_date_format_t date_format_to_user = DATE_FORMAT_MMDDYY;
 static e_enum_time_format_t time_format_to_user = TIME_FORMAT_12;
 static int network_ping_timeout_to_user = 10;
@@ -362,16 +362,16 @@ int ezlopi_core_setting_commands_read_settings()
     int ret = 0;
 
     EZPI_CORE_nvs_read_temperature_scale((uint32_t *)&temperature_scale_to_user);
-    // printf("Temperature scale: %s\n", temperature_scale_enum[temperature_scale_to_user]);
+    printf("Temperature scale: %s\n", temperature_scale_enum[temperature_scale_to_user]);
 
     EZPI_CORE_nvs_read_date_format((uint32_t *)&date_format_to_user);
-    // printf("Date format: %s\n", date_format_enum[date_format_to_user]);
+    printf("Date format: %s\n", date_format_enum[date_format_to_user]);
 
     EZPI_CORE_nvs_read_time_format((uint32_t *)&time_format_to_user);
-    // printf("Time format: %s\n", time_format_enum[time_format_to_user]);
+    printf("Time format: %s\n", time_format_enum[time_format_to_user]);
 
     EZPI_CORE_nvs_read_network_ping_timeout((uint32_t *)&network_ping_timeout_to_user);
-    // printf("Network Ping Timeout: %d\n", network_ping_timeout_to_user);
+    printf("Network Ping Timeout: %d\n", network_ping_timeout_to_user);
 
 #ifdef CONFIG_EZPI_UTIL_TRACE_EN
     ezlopi_core_read_set_log_severities();
@@ -417,4 +417,17 @@ e_ezlopi_core_setting_command_names_t ezlopi_core_setting_command_get_command_en
         }
     }
     return ret;
+}
+
+const char *ezlopi_core_setting_get_temperature_scale_str()
+{
+    return temperature_scale_enum[temperature_scale_to_user];
+}
+const char *ezlopi_core_setting_get_date_format_str()
+{
+    return date_format_enum[date_format_to_user];
+}
+const char *ezlopi_core_setting_get_time_format_str()
+{
+    return time_format_enum[time_format_to_user];
 }

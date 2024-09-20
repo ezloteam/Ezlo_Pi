@@ -108,9 +108,9 @@ static ezlopi_error_t __notify(l_ezlopi_item_t *item)
             {
                 if (ezlopi_item_name_temp == item->cloud_properties.item_name)
                 {
-                    e_enum_temperature_scale_t scale_to_use = ezlopi_core_setting_get_temperature_scale();
-                    item->cloud_properties.scale = (TEMPERATURE_SCALE_FAHRENHEIT == scale_to_use) ? scales_fahrenheit : scales_celsius;
+                    item->cloud_properties.scale = ezlopi_core_setting_get_temperature_scale_str();
 
+                    e_enum_temperature_scale_t scale_to_use = ezlopi_core_setting_get_temperature_scale();
                     if (TEMPERATURE_SCALE_FAHRENHEIT == scale_to_use)
                     {
                         temperature = (temperature * (9.0f / 5.0f)) + 32.0f;
@@ -295,8 +295,7 @@ static void __prepare_item_temperature_properties(l_ezlopi_item_t *item, cJSON *
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
 
-    e_enum_temperature_scale_t scale_to_use = ezlopi_core_setting_get_temperature_scale();
-    item->cloud_properties.scale = (scale_to_use == TEMPERATURE_SCALE_FAHRENHEIT) ? scales_fahrenheit : scales_celsius;
+    item->cloud_properties.scale = ezlopi_core_setting_get_temperature_scale_str();
 
     item->cloud_properties.item_name = ezlopi_item_name_temp;
     item->cloud_properties.value_type = value_type_temperature;
