@@ -199,17 +199,15 @@ uint32_t ezlopi_scenes_get_list_v2(cJSON *cj_scenes_array)
                 cJSON *cj_scene_id = cJSON_GetArrayItem(cj_scenes_ids, i);
                 if (cj_scene_id && cj_scene_id->valuedouble)
                 {
-                    char tmp_buffer[32];
+                    char scene_id_str[32];
                     uint32_t scene_id = (uint32_t)cj_scene_id->valuedouble;
-                    snprintf(tmp_buffer, sizeof(tmp_buffer), "%08x", scene_id);
-                    char *scene_str = ezlopi_nvs_read_str(tmp_buffer);
+                    snprintf(scene_id_str, sizeof(scene_id_str), "%08x", scene_id);
+                    char *scene_str = ezlopi_nvs_read_str(scene_id_str);
                     if (scene_str)
                     {
                         cJSON *cj_scene = cJSON_Parse(__FUNCTION__, scene_str);
                         if (cj_scene)
                         {
-                            char scene_id_str[32];
-                            snprintf(scene_id_str, sizeof(scene_id_str), "%08x", (uint32_t)cj_scene_id->valuedouble);
                             cJSON_AddStringToObject(__FUNCTION__, cj_scene, ezlopi__id_str, scene_id_str); // NVS already might have '_id'
                             if (!cJSON_AddItemToArray(cj_scenes_array, cj_scene))
                             {
@@ -1852,6 +1850,64 @@ ezlopi_error_t ezlopi_core_scene_meta_by_id(const char *sceneId_str, const char 
     }
     return ret;
 }
+
+int ezlopi_scenes_get_time_list(cJSON *cj_scenes_array)
+{
+    int ret = 0;
+    char *scenes_ids = ezlopi_nvs_scene_get_v2();
+    if (scenes_ids)
+    {
+        cJSON *cj_scenes_ids = cJSON_Parse(__FUNCTION__, scenes_ids);
+        if (cj_scenes_ids)
+        {
+            int idx = 0;
+            cJSON *cj_scene_id = NULL;
+            while (NULL != (cj_scene_id = cJSON_GetArrayItem(cj_scenes_ids, idx)))
+            {
+                if (cj_scene_id && cj_scene_id->valuedouble)
+                {
+                    char scene_id_str[32];
+                    uint32_t scene_id = (uint32_t)cj_scene_id->valuedouble;
+                    snprintf(scene_id_str, sizeof(scene_id_str), "%08x", scene_id);
+                    char *scene_str = ezlopi_nvs_read_str(scene_id_str);
+                    if (scene_str)
+                    {
+                        cJSON *cj_scene = cJSON_Parse(__FUNCTION__, scene_str);
+                        if (cj_scene)
+                        {
+                            cJSON *cj_curr_scene = cJSON_CreateObject(__FUNCTION__);
+                            if (cj_curr_scene)
+                            {
+                                cJSON_AddStringToObject(__FUNCTION__, cj_curr_scene, ezlopi_sceneId_str, scene_id_str); // NVS already might have '_id'
+                                cJSON_AddStringToObject(__FUNCTION__, cj_curr_scene, "sceneName", cJSON_GetStringValue(cJSON_GetObjectItem(__FUNCTION__, cj_scene, ezlopi_name_str)));
+                                cJSON_AddStringToObject(__FUNCTION__, cj_curr_scene, "sceneName", cJSON_GetStringValue(cJSON_GetObjectItem(__FUNCTION__, cj_scene, ezlopi_name_str)));
+
+                                if (!cJSON_AddItemToArray(cj_scenes_array, cj_scene))
+                                {
+                                    cJSON_Delete(__FUNCTION__, cj_scene);
+                                }
+                                else
+                                {
+                                    ret += 1;
+                                }
+                            }
+                        }
+
+                        ezlopi_free(__FUNCTION__, scene_str);
+                    }
+                }
+                idx++;
+            }
+
+            cJSON_Delete(__FUNCTION__, cj_scenes_ids);
+        }
+
+        ezlopi_free(__FUNCTION__, scenes_ids);
+    }
+
+    return ret;
+}
+
 //--------------------------------------------------------------------------------------------------
 /* Add for Group-Id in future*/
 //--------------------------------------------------------------------------------------------------
