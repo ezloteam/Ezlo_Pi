@@ -5,6 +5,7 @@
 #include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_nvs.h"
+#include "ezlopi_core_sntp.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_devices.h"
 #include "ezlopi_core_scenes_v2.h"
@@ -27,7 +28,7 @@
 static l_scenes_list_v2_t *scenes_list_head_v2 = NULL;
 
 static const f_scene_method_v2_t ezlopi_core_scenes_methods[] = {
-#define EZLOPI_SCENE(method_type, name, func) func,
+#define EZLOPI_SCENE(method_type, name, func, category) func,
 #include "ezlopi_core_scenes_method_types.h"
 #undef EZLOPI_SCENE
 };
@@ -1867,33 +1868,37 @@ int ezlopi_scenes_get_time_list(cJSON *cj_scenes_array)
                 if (cj_scene_id && cj_scene_id->valuedouble)
                 {
                     char scene_id_str[32];
-                    uint32_t scene_id = (uint32_t)cj_scene_id->valuedouble;
-                    snprintf(scene_id_str, sizeof(scene_id_str), "%08x", scene_id);
-                    char *scene_str = ezlopi_nvs_read_str(scene_id_str);
-                    if (scene_str)
-                    {
-                        cJSON *cj_scene = cJSON_Parse(__FUNCTION__, scene_str);
-                        if (cj_scene)
-                        {
-                            cJSON *cj_curr_scene = cJSON_CreateObject(__FUNCTION__);
-                            if (cj_curr_scene)
-                            {
-                                cJSON_AddStringToObject(__FUNCTION__, cj_curr_scene, ezlopi_sceneId_str, scene_id_str); // NVS already might have '_id'
-                                cJSON_AddStringToObject(__FUNCTION__, cj_curr_scene, "sceneName", cJSON_GetStringValue(cJSON_GetObjectItem(__FUNCTION__, cj_scene, ezlopi_name_str)));
-                                cJSON_AddStringToObject(__FUNCTION__, cj_curr_scene, "sceneName", cJSON_GetStringValue(cJSON_GetObjectItem(__FUNCTION__, cj_scene, ezlopi_name_str)));
+                    snprintf(scene_id_str, sizeof(scene_id_str), "%08x", (uint32_t)cj_scene_id->valuedouble);
 
-                                if (!cJSON_AddItemToArray(cj_scenes_array, cj_scene))
-                                {
-                                    cJSON_Delete(__FUNCTION__, cj_scene);
-                                }
-                                else
-                                {
-                                    ret += 1;
-                                }
+                    cJSON *cj_new_add = cJSON_CreateObject(__FUNCTION__);
+                    if (cj_new_add)
+                    {
+                        // get the corresponding scene for ll
+                        l_scenes_list_v2_t *curr_scene = ezlopi_scenes_get_by_id_v2((uint32_t)cj_scene_id->valuedouble);
+                        if (curr_scene)
+                        {
+                            // extract the method-name and enum from ll
+
+                            e_scene_category_type_t req = EZLOPI_SCENE_WHEN_CATEGORY_TIME;
+                            if(EZLOPI_SCENE_WHEN_CATEGORY_TIME)
+                            {
+                                cJSON_AddStringToObject(__FUNCTION__, cj_new_add, ezlopi_sceneId_str, scene_id_str);
+                                cJSON_AddStringToObject(__FUNCTION__, cj_new_add, "sceneName", curr_scene->name);
+
+                                char timestamp_str[64] = {0};
+                                EZPI_CORE_sntp_epoch_to_iso8601(timestamp_str, sizeof(timestamp_str), (time_t)(curr_scene->executed_date));
+                                cJSON_AddStringToObject(__FUNCTION__, cj_new_add, "executionDate", timestamp_str);
                             }
                         }
 
-                        ezlopi_free(__FUNCTION__, scene_str);
+                        if (!cJSON_AddItemToArray(cj_scenes_array, cj_new_add))
+                        {
+                            cJSON_Delete(__FUNCTION__, cj_new_add);
+                        }
+                        else
+                        {
+                            ret += 1;
+                        }
                     }
                 }
                 idx++;

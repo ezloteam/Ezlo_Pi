@@ -119,9 +119,9 @@ typedef struct l_action_block_v2
 
 typedef struct l_when_block_v2
 {
-    bool block_enable;  //  actual -> '_enable'     //  flag that allows blocks to return 1;
-    char blockId[40];   //  actual -> '_ID'         //  The ID of a normal when-condition scene-block;
-    char blockName[40]; //  actual -> 'groupName'   //  The Group-Name provided by UI ; to indicate a group // e.g. ["blockName" : "group-A"]
+    bool block_enable;      //  actual -> '_enable'     //  flag that allows blocks to return 1;
+    char blockId[40];       //  actual -> '_ID'         //  The ID of a normal when-condition scene-block;
+    char blockName[40];     //  actual -> 'groupName'   //  The Group-Name provided by UI ; to indicate a group // e.g. ["blockName" : "group-A"]
 #if 0  
     bool is_group;          // may be used in future    //  currently not-populated from nvs
     char * group_id;        // may be used in future    //  currently not-populated from nvs
@@ -168,6 +168,7 @@ typedef struct l_scenes_list_v2
     char name[32];
     cJSON *meta;
     char parent_id[32];
+    uint32_t executed_date;
 
     l_user_notification_v2_t *user_notifications;
     l_house_modes_v2_t *house_modes;
