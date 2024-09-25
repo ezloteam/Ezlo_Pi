@@ -34,9 +34,10 @@ e_scene_method_type_t ezlopi_scenes_method_get_type_enum(char *method_name)
     e_scene_method_type_t method_type = EZLOPI_SCENE_METHOD_TYPE_NONE;
     if (method_name)
     {
+        size_t method_len = strlen(method_name);
         for (e_scene_method_type_t i = EZLOPI_SCENE_WHEN_METHOD_IS_ITEM_STATE; i < EZLOPI_SCENE_METHOD_TYPE_MAX; i++)
         {
-            size_t max_len = (strlen(method_name) > strlen(ezlopi_scenes_methods_name[i])) ? strlen(method_name) : strlen(ezlopi_scenes_methods_name[i]);
+            size_t max_len = (method_len > strlen(ezlopi_scenes_methods_name[i])) ? method_len : strlen(ezlopi_scenes_methods_name[i]);
             if (0 == strncmp(method_name, ezlopi_scenes_methods_name[i], max_len))
             {
                 method_type = i;
@@ -261,13 +262,17 @@ e_scene_method_type_t ezlopi_scenes_method_get_type_enum(char *method_name)
 const char *ezlopi_scene_get_scene_method_category_name(char *method_name)
 {
     const char *ret = NULL;
-    for (e_scene_method_type_t i = EZLOPI_SCENE_WHEN_METHOD_IS_ITEM_STATE; i < EZLOPI_SCENE_METHOD_TYPE_MAX; i++)
+    if (method_name)
     {
-        size_t max_len = (strlen(method_name) > strlen(ezlopi_scenes_method_category_name[i])) ? strlen(method_name) : strlen(ezlopi_scenes_method_category_name[i]);
-        if (0 == strncmp(method_name, ezlopi_scenes_method_category_name[i], max_len))
+        size_t method_len = strlen(method_name);
+        for (e_scene_method_type_t i = EZLOPI_SCENE_WHEN_METHOD_IS_ITEM_STATE; i < EZLOPI_SCENE_METHOD_TYPE_MAX; i++)
         {
-            ret = ezlopi_scenes_method_category_name[i];
-            break;
+            size_t max_len = (method_len > strlen(ezlopi_scenes_method_category_name[i])) ? method_len : strlen(ezlopi_scenes_method_category_name[i]);
+            if (0 == strncmp(method_name, ezlopi_scenes_method_category_name[i], max_len))
+            {
+                ret = ezlopi_scenes_method_category_name[i];
+                break;
+            }
         }
     }
     return ret;

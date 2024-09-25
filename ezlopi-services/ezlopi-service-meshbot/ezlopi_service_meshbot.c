@@ -9,6 +9,7 @@
 
 #include "ezlopi_core_scenes_status_changed.h"
 #include "ezlopi_core_scenes_v2.h"
+#include "ezlopi_core_sntp.h"
 
 #include "ezlopi_cloud_constants.h"
 
@@ -224,7 +225,7 @@ PT_THREAD(__scene_proto_thread(l_scenes_list_v2_t *scene_node, uint32_t routine_
 
                         if (ctx->start_cond)
                         {
-                            scene_node->executed_date = EZPI_CORE_sntp_get_current_time_sec();  // executed date/time when scene was activated
+                            scene_node->executed_date = EZPI_CORE_sntp_get_current_time_sec(); // executed date/time when scene was activated
                             ezlopi_scenes_status_change_broadcast(scene_node, scene_status_started_str);
                         }
 
