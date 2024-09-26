@@ -287,7 +287,7 @@ l_scenes_list_v2_t *ezlopi_scenes_new_scene_populate(cJSON *cj_new_scene, uint32
 
 void ezlopi_scenes_depopulate_by_id_v2(uint32_t _id)
 {
-    if (1 == ezlopi_meshbot_service_stop_for_scene_id(_id))
+    if (EZPI_SUCCESS == ezlopi_meshbot_stop_without_broadcast(ezlopi_scenes_get_by_id_v2(_id)))
     {
         ezlopi_scenes_delete(ezlopi_scenes_pop_by_id_v2(_id));
     }
@@ -1882,17 +1882,52 @@ ezlopi_error_t ezlopi_core_scene_meta_by_id(const char *sceneId_str, const char 
 //--------------------------------------------------------------------------------------------------
 //                  Functions for : listing Time-related when-blocks
 //--------------------------------------------------------------------------------------------------
-static char *____iterate_through_when_block_fields(l_fields_v2_t *curr_field_block);
-static char *___get_time_category_method_name(l_when_block_v2_t *curr_when_block);
 
-static char *____iterate_through_when_block_fields(l_fields_v2_t *curr_field_block)
+static char *____iterate_through_when_block_fields(cJSON *cj_scenes_array, l_scenes_list_v2_t *curr_scene, l_fields_v2_t *curr_field_block);
+static char *___get_time_category_method_name(cJSON *cj_scenes_array, l_scenes_list_v2_t *curr_scene, l_when_block_v2_t *curr_when_block);
+
+static void _____add_the_scene_time_method_to_arr(cJSON *cj_scenes_array, l_scenes_list_v2_t *curr_scene, char *method_name)
 {
-    char *ret = NULL;
+    if (cj_scenes_array && curr_scene)
+    {
+        cJSON *cj_new_add = cJSON_CreateObject(__FUNCTION__);
+        if (cj_new_add)
+        {
+            char scene_id_str[32];
+            snprintf(scene_id_str, sizeof(scene_id_str), "%08x", curr_scene->_id);
+
+            cJSON_AddStringToObject(__FUNCTION__, cj_new_add, ezlopi_sceneId_str, scene_id_str);
+            cJSON_AddStringToObject(__FUNCTION__, cj_new_add, "sceneName", curr_scene->name);
+            cJSON_AddStringToObject(__FUNCTION__, cj_new_add, "methodName", method_name);
+
+            char timestamp_str[64] = {0};
+            EZPI_CORE_sntp_epoch_to_iso8601(timestamp_str, sizeof(timestamp_str), (time_t)(curr_scene->executed_date));
+            cJSON_AddStringToObject(__FUNCTION__, cj_new_add, "executionDate", timestamp_str);
+
+            if (!cJSON_AddItemToArray(cj_scenes_array, cj_new_add))
+            {
+                cJSON_Delete(__FUNCTION__, cj_new_add);
+            }
+            else
+            {
+                TRACE_D("ADDING [curr_scene->name : %s]", curr_scene->name);
+            }
+        }
+    }
+}
+
+static char *____iterate_through_when_block_fields(cJSON *cj_scenes_array, l_scenes_list_v2_t *curr_scene, l_fields_v2_t *curr_field_block)
+{
+    char *ret_str = NULL;
     while (curr_field_block->next)
     {
-        if (NULL != (ret = ____iterate_through_when_block_fields(curr_field_block->next)))
+        if (NULL != (ret_str = ____iterate_through_when_block_fields(cj_scenes_array, curr_scene, curr_field_block->next)))
         {
-            TRACE_D("\t\t\t---| Found : method_name: %s", ret);
+            TRACE_D("\t\t\t---| Found : Field_method_name: %s", ret_str);
+        }
+        else
+        {
+            TRACE_D("end_of_field");
         }
     }
 
@@ -1901,44 +1936,77 @@ static char *____iterate_through_when_block_fields(l_fields_v2_t *curr_field_blo
         (EZPI_STRNCMP_IF_EQUAL(curr_field_block->name, "block", sizeof(curr_field_block->name), 6) && (VALUE_TYPE_BLOCK == curr_field_block->field_value.e_type)))
     {
         // this function iterates through the when-block-field-values.
-        ret = ___get_time_category_method_name(curr_field_block->field_value.u_value.when_block);
-    }
-    return ret;
-}
-
-static char *___get_time_category_method_name(l_when_block_v2_t *curr_when_block)
-{
-    char *ret = NULL;
-    // iterates through the 'when_block_array' - if present
-    while (curr_when_block->next)
-    {
-        TRACE_D("--> here");
-        // time-related methods are generated from here
-        if (NULL != (ret = ___get_time_category_method_name(curr_when_block->next)))
+        switch (curr_field_block->field_value.e_type)
         {
-            TRACE_D("\t---| Found : method_name: %s", ret);
+        case VALUE_TYPE_CJSON:
+        {
+            CJSON_TRACE("field _ cjson:", curr_field_block->field_value.u_value.cj_value);
+            break;
+        }
+        case VALUE_TYPE_BLOCK:
+        {
+            ret_str = ___get_time_category_method_name(cj_scenes_array, curr_scene, (curr_field_block->field_value.u_value.when_block));
+            break;
+        }
+        default:
             break;
         }
     }
-    TRACE_D("HERE : %s", curr_when_block->block_options.method.name);
-    // now examine if block-name is of 'logical-category'
-    const char *curr_when_category_name = ezlopi_scene_get_scene_method_category_name(curr_when_block->block_options.method.name); // give corresponding 'category_name' for respective 'method_name'
-    if (curr_when_category_name)
+    else
     {
-        TRACE_D("\t\t---| method_name: %s  -->  category_name : %s", curr_when_block->block_options.method.name, curr_when_category_name);
+        TRACE_D("___NO-blocks-further");
+    }
+    return ret_str;
+}
 
-        if (EZPI_STRNCMP_IF_EQUAL(curr_when_category_name, "when_category_time", strlen(curr_when_category_name), 19))
+static char *___get_time_category_method_name(cJSON *cj_scenes_array, l_scenes_list_v2_t *curr_scene, l_when_block_v2_t *curr_when_block)
+{
+    char *ret_str = NULL;
+    // iterates through the 'when_block_array' - if present
+    while (curr_when_block->next)
+    {
+        TRACE_D("-->");
+        // time-related methods are generated from here
+        if (NULL != (ret_str = ___get_time_category_method_name(cj_scenes_array, curr_scene, curr_when_block->next)))
         {
-            ret = curr_when_block->block_options.method.name;
+            TRACE_D("\t---| Found : Main_array_method_name: %s", ret_str);
         }
-        else if ((EZPI_STRNCMP_IF_EQUAL(curr_when_category_name, "when_category_logic", strlen(curr_when_category_name), 20))        // and,or,xor
-                 || (EZPI_STRNCMP_IF_EQUAL(curr_when_category_name, "when_category_function", strlen(curr_when_category_name), 23))) // function -> for/repeat/follow....
+        else
         {
-            ret = ____iterate_through_when_block_fields(curr_when_block->fields);
+            TRACE_D("method_null");
         }
     }
 
-    return ret;
+    {
+        // now examine if block-name is of 'logical-category'
+        const char *curr_when_category_name = ezlopi_scene_get_scene_method_category_name(curr_when_block->block_options.method.name); // give corresponding 'category_name' for respective 'method_name'
+        if (curr_when_category_name)
+        {
+
+            if (EZPI_STRNCMP_IF_EQUAL(curr_when_category_name, "when_category_time", strlen(curr_when_category_name), 19))
+            {
+                ret_str = curr_when_block->block_options.method.name;
+            }
+            else if ((EZPI_STRNCMP_IF_EQUAL(curr_when_category_name, "when_category_logic", strlen(curr_when_category_name), 20))        // and,or,xor
+                     || (EZPI_STRNCMP_IF_EQUAL(curr_when_category_name, "when_category_function", strlen(curr_when_category_name), 23))) // function -> for/repeat/follow....
+            {
+                ret_str = ____iterate_through_when_block_fields(cj_scenes_array, curr_scene, curr_when_block->fields);
+            }
+
+            TRACE_D("METHOD : %s", curr_when_block->block_options.method.name);
+            if (ret_str)
+            {
+                TRACE_D("\t\t---| method_name: %s  -->  category_name : %s", ret_str, curr_when_category_name);
+            }
+        }
+    }
+
+    if (NULL != ret_str)
+    {
+        _____add_the_scene_time_method_to_arr(cj_scenes_array, curr_scene, ret_str);
+    }
+
+    return ret_str;
 }
 
 int ezlopi_scenes_get_time_list(cJSON *cj_scenes_array)
@@ -1956,41 +2024,21 @@ int ezlopi_scenes_get_time_list(cJSON *cj_scenes_array)
             {
                 if (cj_scene_id && cj_scene_id->valuedouble)
                 {
-                    char scene_id_str[32];
-                    snprintf(scene_id_str, sizeof(scene_id_str), "%08x", (uint32_t)cj_scene_id->valuedouble);
-
                     // get the corresponding scene for ll
                     l_scenes_list_v2_t *curr_scene = ezlopi_scenes_get_by_id_v2((uint32_t)cj_scene_id->valuedouble);
                     if (curr_scene)
                     {
                         // extract the method-name and enum from ll
-                        char *method_name = ___get_time_category_method_name(curr_scene->when_block); // return first found time-related method_name for now [need additions]
+                        char *method_name = ___get_time_category_method_name(cj_scenes_array, curr_scene, curr_scene->when_block); // return first found time-related method_name for now [need additions]
                         if (method_name)
                         {
-                            cJSON *cj_new_add = cJSON_CreateObject(__FUNCTION__);
-                            if (cj_new_add)
-                            {
-                                cJSON_AddStringToObject(__FUNCTION__, cj_new_add, ezlopi_sceneId_str, scene_id_str);
-                                cJSON_AddStringToObject(__FUNCTION__, cj_new_add, "sceneName", curr_scene->name);
-                                cJSON_AddStringToObject(__FUNCTION__, cj_new_add, "methodName", method_name);
-
-                                char timestamp_str[64] = {0};
-                                EZPI_CORE_sntp_epoch_to_iso8601(timestamp_str, sizeof(timestamp_str), (time_t)(curr_scene->executed_date));
-                                cJSON_AddStringToObject(__FUNCTION__, cj_new_add, "executionDate", timestamp_str);
-
-                                if (!cJSON_AddItemToArray(cj_scenes_array, cj_new_add))
-                                {
-                                    cJSON_Delete(__FUNCTION__, cj_new_add);
-                                }
-                                else
-                                {
-                                    ret += 1;
-                                }
-                            }
+                            TRACE_D("----- END -----");
+                            // _____add_the_scene_time_method_to_arr(cj_scenes_array, curr_scene, method_name);
                         }
                     }
                 }
                 idx++;
+                TRACE_D("--------------- [idx: %d]-------------------\n", idx);
             }
 
             cJSON_Delete(__FUNCTION__, cj_scenes_ids);

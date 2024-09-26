@@ -267,8 +267,8 @@ const char *ezlopi_scene_get_scene_method_category_name(char *method_name)
         size_t method_len = strlen(method_name);
         for (e_scene_method_type_t i = EZLOPI_SCENE_WHEN_METHOD_IS_ITEM_STATE; i < EZLOPI_SCENE_METHOD_TYPE_MAX; i++)
         {
-            size_t max_len = (method_len > strlen(ezlopi_scenes_method_category_name[i])) ? method_len : strlen(ezlopi_scenes_method_category_name[i]);
-            if (0 == strncmp(method_name, ezlopi_scenes_method_category_name[i], max_len))
+            size_t max_len = (method_len > strlen(ezlopi_scenes_methods_name[i])) ? method_len : strlen(ezlopi_scenes_methods_name[i]);
+            if (0 == strncmp(method_name, ezlopi_scenes_methods_name[i], max_len))  // since the name matches ; required method name
             {
                 ret = ezlopi_scenes_method_category_name[i];
                 break;

@@ -41,13 +41,10 @@ static int __execute_action_block(l_scenes_list_v2_t *scene_node, l_action_block
 uint32_t ezlopi_meshbot_service_stop_for_scene_id(uint32_t _id)
 {
     uint32_t ret = 0;
-    l_scenes_list_v2_t *scene_node = ezlopi_scenes_get_by_id_v2(_id);
-    if (scene_node)
+    if (ezlopi_meshobot_service_stop_scene(ezlopi_scenes_get_by_id_v2(_id)))
     {
-        ezlopi_meshobot_service_stop_scene(scene_node);
         ret = 1;
     }
-
     return ret;
 }
 
@@ -56,20 +53,26 @@ uint32_t ezlopi_meshobot_service_stop_scene(l_scenes_list_v2_t *scene_node)
     int ret = 0;
     if (scene_node)
     {
-        if (EZLOPI_SCENE_STATUS_RUNNING == scene_node->status)
+        if (EZPI_SUCCESS == ezlopi_meshbot_stop_without_broadcast(scene_node))
         {
-            scene_node->status = EZLOPI_SCENE_STATUS_STOP;
+            // triggering broadcast
+            ezlopi_scenes_status_change_broadcast(scene_node, scene_status_stopped_str);
+            ret = 1;
+        }
+    }
+    return ret;
+}
+
+ezlopi_error_t ezlopi_meshbot_stop_without_broadcast(l_scenes_list_v2_t *scene_node)
+{
+    ezlopi_error_t ret = EZPI_FAILED;
+    if (scene_node)
+    {
+        if (__execute_scene_stop(scene_node))
+        {
             TRACE_S("stop scene_id : %#x [%d] ", scene_node->_id, scene_node->status);
+            ret = EZPI_SUCCESS;
         }
-
-        while (EZLOPI_SCENE_STATUS_STOPPED != scene_node->status)
-        {
-            vTaskDelay(10 / portTICK_RATE_MS);
-        }
-
-        ezlopi_scenes_status_change_broadcast(scene_node, scene_status_stopped_str);
-
-        ret = 1;
     }
     return ret;
 }
@@ -79,12 +82,10 @@ uint32_t ezlopi_meshbot_service_start_scene(l_scenes_list_v2_t *scene_node)
     int ret = 0;
     if (scene_node)
     {
-        if ((EZLOPI_SCENE_STATUS_NONE == scene_node->status) ||
-            (EZLOPI_SCENE_STATUS_STOPPED == scene_node->status))
+        if (__execute_scene_start(scene_node))
         {
-            __execute_scene_start(scene_node);
-
             TRACE_S("start scene_id : %#x [%d] ", scene_node->_id, scene_node->status);
+            ezlopi_scenes_status_change_broadcast(scene_node, scene_status_started_str);
             ret = 1;
         }
     }
@@ -318,7 +319,10 @@ PT_THREAD(__scene_proto_thread(l_scenes_list_v2_t *scene_node, uint32_t routine_
                         else_block_node = else_block_node->next;
                     }
 
-                    ezlopi_scenes_status_change_broadcast(scene_node, scene_status_stopped_str);
+                    if (1 == ctx->stopped_cond)
+                    { // avoid broadcasting twice when the 'scene' is in 'stop' conditon
+                        ezlopi_scenes_status_change_broadcast(scene_node, scene_status_stopped_str);
+                    }
 
                     ctx->stopped_cond += 1;
                     ctx->start_cond = 0;
@@ -432,13 +436,17 @@ static int __execute_scene_start(l_scenes_list_v2_t *scene_node)
     int ret = 0;
     if (scene_node && (true == scene_node->enabled) && (NULL == scene_node->thread_ctx))
     {
-        scene_node->thread_ctx = (void *)ezlopi_malloc(__FUNCTION__, sizeof(s_thread_ctx_t));
-        if (scene_node->thread_ctx)
+        if ((EZLOPI_SCENE_STATUS_NONE == scene_node->status) ||
+            (EZLOPI_SCENE_STATUS_STOPPED == scene_node->status))
         {
-            memset(scene_node->thread_ctx, 0, sizeof(s_thread_ctx_t));
-            PT_INIT(&((s_thread_ctx_t *)scene_node->thread_ctx)->pt);
-            scene_node->status = EZLOPI_SCENE_STATUS_RUN;
-            ret = 1;
+            scene_node->thread_ctx = (void *)ezlopi_malloc(__FUNCTION__, sizeof(s_thread_ctx_t));
+            if (scene_node->thread_ctx)
+            {
+                memset(scene_node->thread_ctx, 0, sizeof(s_thread_ctx_t));
+                PT_INIT(&((s_thread_ctx_t *)scene_node->thread_ctx)->pt);
+                scene_node->status = EZLOPI_SCENE_STATUS_RUN;
+                ret = 1;
+            }
         }
     }
 
