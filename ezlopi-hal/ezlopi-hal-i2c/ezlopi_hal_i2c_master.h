@@ -24,10 +24,9 @@ typedef struct s_ezlopi_i2c_master
     uint32_t address;
 } s_ezlopi_i2c_master_t;
 
-#define EZLOPI_I2C_MASTER_DEFAULT_CONF                                      \
-    {                                                                       \
-        .sda = 9, .scl = 10, .clock_speed = 100000, .channel = EZLOPI_I2C_0 \
-    }
+#define EZLOPI_I2C_MASTER_DEFAULT_CONF \
+    {                                  \
+        .sda = 9, .scl = 10, .clock_speed = 100000, .channel = EZLOPI_I2C_0}
 
 ezlopi_error_t ezlopi_i2c_master_init(s_ezlopi_i2c_master_t *i2c_master_conf);
 void ezlopi_i2c_master_deinit(s_ezlopi_i2c_master_t *i2c_master_conf);

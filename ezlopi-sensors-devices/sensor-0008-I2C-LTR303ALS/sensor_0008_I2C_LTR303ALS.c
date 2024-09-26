@@ -92,7 +92,7 @@ static ezlopi_error_t __notify(l_ezlopi_item_t *item)
                     ezlopi_device_value_updated_from_device_broadcast(item);
                     ret = EZPI_SUCCESS;
                 }
-            }
+            }   
         }
     }
     return ret;
@@ -145,6 +145,7 @@ static void __prepare_item_properties(l_ezlopi_item_t *item, cJSON *cj_param)
     item->interface.i2c_master.enable = true;
     item->interface.i2c_master.clock_speed = 100000;
     item->interface.i2c_master.address = LTR303_ADDR;
+    item->interface.i2c_master.channel = I2C_NUM_0;
     ltr303_data_t *als_ltr303_data = (ltr303_data_t *)ezlopi_malloc(__FUNCTION__, sizeof(ltr303_data_t));
     if (als_ltr303_data)
     {
