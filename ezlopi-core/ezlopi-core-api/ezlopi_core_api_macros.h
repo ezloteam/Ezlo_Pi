@@ -96,6 +96,7 @@ CLOUD_METHOD("hub.scenes.notification.add", scenes_notification_add, scene_chang
 CLOUD_METHOD("hub.scenes.notification.remove", scenes_notification_remove, scene_changed)
 CLOUD_METHOD("hub.scenes.status.get", scenes_status_get, NULL) // Incomplete
 CLOUD_METHOD("hub.scenes.room.set", scenes_room_set, scene_changed)
+CLOUD_METHOD("hub.scenes.time.list", scenes_time_list, NULL)
 CLOUD_METHOD("hub.scenes.house_modes.set", scenes_house_modes_set, NULL)
 CLOUD_METHOD("hub.scenes.action.block.test", scenes_action_block_test, NULL)
 CLOUD_METHOD("hub.scenes.block.enabled.set", scenes_block_enabled_set, scene_added)

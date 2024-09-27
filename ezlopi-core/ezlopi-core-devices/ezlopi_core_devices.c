@@ -442,7 +442,7 @@ l_ezlopi_device_t *ezlopi_device_add_device(cJSON *cj_device, const char *last_n
             new_device->cloud_properties.room_id = 0;
             if (new_device->cloud_properties.parent_device_id >= DEVICE_ID_START)
             {
-                TRACE_S("child [%08x]----- linked to ----> parentId [%08x]", new_device->cloud_properties.device_id, new_device->cloud_properties.parent_device_id);
+                // TRACE_S("child [%08x]----- linked to ----> parentId [%08x]", new_device->cloud_properties.device_id, new_device->cloud_properties.parent_device_id);
                 new_device->cloud_properties.parent_room = true;
             }
 

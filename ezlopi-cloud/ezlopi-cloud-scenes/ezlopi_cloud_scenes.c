@@ -46,11 +46,7 @@ void scenes_create(cJSON *cj_request, cJSON *cj_response)
             ezlopi_scenes_new_scene_populate(cj_params, new_scene_id);
 
             // Trigger new-scene to 'start'
-            l_scenes_list_v2_t *new_scene_node = ezlopi_scenes_get_by_id_v2(new_scene_id);
-            if (new_scene_node)
-            {
-                ezlopi_meshbot_service_start_scene(new_scene_node);
-            }
+            ezlopi_meshbot_service_start_scene(ezlopi_scenes_get_by_id_v2(new_scene_id));
         }
     }
 }
@@ -379,6 +375,15 @@ void scenes_room_set(cJSON *cj_request, cJSON *cj_response)
     if (NULL == cJSON_GetObjectItem(__FUNCTION__, cj_response, ezlopi_result_str))
     {
         cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+    }
+}
+
+void scenes_time_list(cJSON *cj_request, cJSON *cj_response)
+{
+    cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+    if (cj_result)
+    {
+        ezlopi_scenes_get_time_list(cJSON_AddArrayToObject(__FUNCTION__, cj_result, "timeScenes"));
     }
 }
 
