@@ -27,6 +27,7 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_dev
 ezlopi_error_t sensor_0044_I2C_TSL256_luminosity(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
+    // printf("\n\nHERE : %s\n\n", ezlopi_actions_to_string(action));
     switch (action)
     {
     case EZLOPI_ACTION_PREPARE:
@@ -144,6 +145,7 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_dev
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_slave_addr_str, item->interface.i2c_master.address);
 
     item->interface.i2c_master.enable = true;
+    item->interface.i2c_master.channel = I2C_NUM_0;
     item->interface.i2c_master.clock_speed = 100000;
     if (0x00 == item->interface.i2c_master.address)
     {
