@@ -104,6 +104,7 @@ CLOUD_METHOD("hub.scenes.block.status.reset", scenes_block_status_reset, NULL)
 CLOUD_METHOD("hub.scenes.meta.set", scenes_meta_set, scene_changed)
 CLOUD_METHOD("hub.scenes.block.meta.set", scenes_blockmeta_set, scene_changed)
 CLOUD_METHOD("hub.scenes.stop", scenes_stop, NULL)
+CLOUD_METHOD("hub.scenes.clone", scenes_stop, NULL)
 
 #endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 

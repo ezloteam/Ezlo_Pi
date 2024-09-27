@@ -630,6 +630,44 @@ void scenes_stop(cJSON *cj_request, cJSON *cj_response)
     }
 }
 
+void scenes_clone(cJSON *cj_request, cJSON *cj_response)
+{
+    cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str); // For NULL Broadcast
+    if (cj_result)
+    {
+        cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
+        if (cj_params)
+        {
+            TRACE_D("Clone executed");
+            cJSON *cj_scene_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi__id_str);
+            if (cj_scene_id && cj_scene_id->valuestring)
+            {
+                uint32_t u32_scene_id = strtoul(cj_scene_id->valuestring, NULL, 16);
+
+                char *scene_str = ezlopi_nvs_read_str(cj_ids->valuestring);
+                if (scene_str)
+                {
+                    cJSON_AddRawToObject(__FUNCTION__, cj_response, ezlopi_result_str, scene_str);
+                    ezlopi_free(__FUNCTION__, scene_str);
+                }
+
+                uint32_t new_scene_id = ezlopi_store_new_scene_v2(cj_params);
+                TRACE_D("new-scene-id: %08x", new_scene_id);
+                if (new_scene_id)
+                {
+                    char tmp_buff[32];
+                    snprintf(tmp_buff, sizeof(tmp_buff), "%08x", new_scene_id);
+                    cJSON_AddStringToObject(__FUNCTION__, cj_request, ezlopi__id_str, tmp_buff); // this is for (reply_broadcast)
+                    ezlopi_scenes_new_scene_populate(cj_params, new_scene_id);
+
+                    // Trigger new-scene to 'start'
+                    ezlopi_meshbot_service_start_scene(ezlopi_scenes_get_by_id_v2(new_scene_id));
+                }
+            }
+        }
+    }
+}
+
 ////// updater for scene
 ////// useful for 'hub.scenes.enabled.set'
 void scene_changed(cJSON *cj_request, cJSON *cj_response)
