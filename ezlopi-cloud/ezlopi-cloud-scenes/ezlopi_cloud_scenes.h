@@ -32,6 +32,7 @@ extern "C"
     void scenes_meta_set(cJSON *cj_request, cJSON *cj_response);
     void scenes_blockmeta_set(cJSON *cj_request, cJSON *cj_response);
     void scenes_stop(cJSON *cj_request, cJSON *cj_response);
+    void scenes_clone(cJSON *cj_request, cJSON *cj_response);
 
     ///////////// updaters
     void scene_changed(cJSON *cj_request, cJSON *cj_response);

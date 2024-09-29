@@ -507,7 +507,7 @@ void scenes_action_block_test(cJSON *cj_request, cJSON *cj_response)
                         if (tmp_http_data->response)
                         {
                             int code = 400;
-                            char detail[100] = {0};
+                            char detail[100] = { 0 };
                             if (sscanf(tmp_http_data->response, "HTTP/1.1 %d %99s[^\n]", &code, detail) == 2)
                             {
                                 cJSON_AddNumberToObject(__FUNCTION__, cj_result, "httpAnswerCode", code);
@@ -603,7 +603,7 @@ void scenes_blockmeta_set(cJSON *cj_request, cJSON *cj_response)
             cJSON *cj_block_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_blockId_str);
             if ((cj_scene_id && cj_scene_id->valuestring) && (cj_block_id && cj_block_id->valuestring))
             {
-#warning "The 'block_id' facility is only for 'when-blocks' [ 'Action-blocks' is not added in UI ]";
+                #warning "The 'block_id' facility is only for 'when-blocks' [ 'Action-blocks' is not added in UI ]";
                 ezlopi_core_scene_meta_by_id(cj_scene_id->valuestring, cj_block_id->valuestring, cj_meta);
             }
         }
@@ -622,7 +622,7 @@ void scenes_stop(cJSON *cj_request, cJSON *cj_response)
             cJSON *cj_scene_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_sceneId_str);
             if (cj_scene_id && cj_scene_id->valuestring)
             {
-#warning "add support for thenGroup or elseGroups";
+                #warning "add support for thenGroup or elseGroups";
                 uint32_t u32_scene_id = strtoul(cj_scene_id->valuestring, NULL, 16);
                 ezlopi_meshbot_service_stop_for_scene_id(u32_scene_id);
             }
@@ -642,27 +642,49 @@ void scenes_clone(cJSON *cj_request, cJSON *cj_response)
             cJSON *cj_scene_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi__id_str);
             if (cj_scene_id && cj_scene_id->valuestring)
             {
-                uint32_t u32_scene_id = strtoul(cj_scene_id->valuestring, NULL, 16);
-
-                char *scene_str = ezlopi_nvs_read_str(cj_ids->valuestring);
+                char *scene_str = ezlopi_nvs_read_str(cj_scene_id->valuestring);
                 if (scene_str)
                 {
-                    cJSON_AddRawToObject(__FUNCTION__, cj_response, ezlopi_result_str, scene_str);
+                    cJSON *cj_org_scene = cJSON_Parse(__FUNCTION__, scene_str);
+                    if (cj_org_scene)
+                    {
+                        cJSON *cj_dup_scene = cJSON_Duplicate(__FUNCTION__, cj_org_scene, 1);
+                        if (cj_dup_scene)
+                        {
+                            CJSON_TRACE("duplicating :", cj_dup_scene);
+                            cJSON_DeleteItemFromObject(__FUNCTION__, cj_dup_scene, ezlopi__id_str);
+
+                            // generate "XX_cloned(N)" and add to the duplicate scene.
+                            char name_buf[32] = { 0 };
+                            cJSON *cj_new_name = cJSON_GetObjectItem(__FUNCTION__, cj_dup_scene, ezlopi_name_str);
+                            if (cj_new_name && cj_new_name->valuestring) {
+                                snprintf(name_buf, sizeof(name_buf), "%08x_cloned(N)", cj_new_name->valuestring);
+                                cJSON_DeleteItemFromObject(__FUNCTION__, cj_dup_scene, ezlopi_name_str);
+                            }
+                            cJSON_AddStringToObject(__FUNCTION__, cj_dup_scene, ezlopi_name_str, name_buf);
+
+                            // store the 'new_scene' in nvs
+                            uint32_t new_scene_id = ezlopi_store_new_scene_v2(cj_dup_scene);
+                            TRACE_D("new-scene-id: %08x", new_scene_id);
+                            if (new_scene_id)
+                            {
+                                char tmp_buff[32];
+                                snprintf(tmp_buff, sizeof(tmp_buff), "%08x", new_scene_id);
+                                cJSON_AddStringToObject(__FUNCTION__, cj_request, ezlopi__id_str, tmp_buff); // this is for (reply_broadcast)
+                                ezlopi_scenes_new_scene_populate(cj_org_scene, new_scene_id);
+
+                                // Trigger new-scene to 'start'
+                                // ezlopi_meshbot_service_start_scene(ezlopi_scenes_get_by_id_v2(new_scene_id));
+                            }
+
+                            cJSON_Delete(__FUNCTION__, cj_dup_scene);
+                        }
+                        cJSON_Delete(__FUNCTION__, cj_org_scene);
+                    }
+
                     ezlopi_free(__FUNCTION__, scene_str);
                 }
 
-                uint32_t new_scene_id = ezlopi_store_new_scene_v2(cj_params);
-                TRACE_D("new-scene-id: %08x", new_scene_id);
-                if (new_scene_id)
-                {
-                    char tmp_buff[32];
-                    snprintf(tmp_buff, sizeof(tmp_buff), "%08x", new_scene_id);
-                    cJSON_AddStringToObject(__FUNCTION__, cj_request, ezlopi__id_str, tmp_buff); // this is for (reply_broadcast)
-                    ezlopi_scenes_new_scene_populate(cj_params, new_scene_id);
-
-                    // Trigger new-scene to 'start'
-                    ezlopi_meshbot_service_start_scene(ezlopi_scenes_get_by_id_v2(new_scene_id));
-                }
             }
         }
     }
