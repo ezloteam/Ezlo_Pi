@@ -638,7 +638,6 @@ void scenes_clone(cJSON *cj_request, cJSON *cj_response)
         cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
         if (cj_params)
         {
-            TRACE_D("Clone executed");
             cJSON *cj_scene_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi__id_str);
             if (cj_scene_id && cj_scene_id->valuestring)
             {
@@ -653,14 +652,14 @@ void scenes_clone(cJSON *cj_request, cJSON *cj_response)
                         {
                             char name_buf[32] = {0};
                             cJSON *cj_custom_name = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_name_str);
-                            if (cj_custom_name && cj_custom_name->valuestring)
+                            if (cj_custom_name && cj_custom_name->valuestring && (0 < cj_custom_name->str_value_len))
                             {
                                 snprintf(name_buf, sizeof(name_buf), "%s", cj_custom_name->valuestring);
                             }
                             else
                             {
                                 cJSON *cj_get_name = cJSON_GetObjectItem(__FUNCTION__, cj_dup_scene, ezlopi_name_str);
-                                if (cj_get_name && cj_get_name->valuestring)
+                                if (cj_get_name && cj_get_name->valuestring && (0 < cj_get_name->str_value_len))
                                 {
                                     uint32_t idx = 0;
                                     bool dupli_flag = false;
@@ -669,7 +668,7 @@ void scenes_clone(cJSON *cj_request, cJSON *cj_response)
                                     do
                                     { // generate "XX_cloned(N)" and add to the duplicate scene.
                                         dupli_flag = false;
-                                        snprintf(name_buf, sizeof(name_buf), "%s_cloned(%d)", cj_get_name->valuestring, idx++);
+                                        snprintf(name_buf, sizeof(name_buf), "%s_cloned(%d)", cj_get_name->valuestring, ++idx);
 
                                         scene_node = ezlopi_scenes_get_scenes_head_v2();
                                         while (scene_node)
@@ -706,6 +705,7 @@ void scenes_clone(cJSON *cj_request, cJSON *cj_response)
                                 // Trigger new-scene to 'start'
                                 // ezlopi_meshbot_service_start_scene(ezlopi_scenes_get_by_id_v2(new_scene_id));
                             }
+
                             cJSON_Delete(__FUNCTION__, cj_dup_scene);
                         }
 
