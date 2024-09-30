@@ -147,10 +147,7 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_dev
     item->interface.i2c_master.enable = true;
     item->interface.i2c_master.channel = I2C_NUM_0;
     item->interface.i2c_master.clock_speed = 100000;
-    if (0x00 == item->interface.i2c_master.address)
-    {
-        item->interface.i2c_master.address = TSL2561_ADDRESS;
-    }
+    
     // passing the custom data_structure
     item->is_user_arg_unique = true;
     item->user_arg = user_data;
