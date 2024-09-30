@@ -1158,7 +1158,7 @@ static bool ____check_and_append_group_id(cJSON *cj_when_block)
                 }
                 else
                 {
-                    TRACE_D("No further ----> groups!!");
+                    // TRACE_D("No further ----> groups!!");
                     break;
                 }
             }
@@ -1256,7 +1256,7 @@ static int _____check_and_add_when_blockId(cJSON *cj_new_scene_when_block)
                 }
                 else
                 {
-                    TRACE_D("No further ----> Blocks!!");
+                    // TRACE_D("No further ----> Blocks!!");
                     break;
                 }
             }
@@ -1659,7 +1659,7 @@ static bool ___enable_disable_block_en_with_blockId(cJSON *cj_when_block, const 
                     }
                     else
                     {
-                        TRACE_D("No further ----> Blocks!!");
+                        // TRACE_D("No further ----> Blocks!!");
                         break;
                     }
                 }
@@ -1798,7 +1798,7 @@ static bool ___add_new_blockmeta_by_id(cJSON *cj_when_block, const char *blockId
                     }
                     else
                     {
-                        TRACE_D("No further ----> Blocks!!");
+                        // TRACE_D("No further ----> Blocks!!");
                         break;
                     }
                 }

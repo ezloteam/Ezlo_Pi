@@ -141,7 +141,7 @@ cJSON *ezlopi_scene_cjson_get_field(l_fields_v2_t *field_node)
                         curr_when_block = curr_when_block->next;
                     }
 
-                    CJSON_TRACE(ezlopi_value_str, vlaue_block_array);
+                    // CJSON_TRACE(ezlopi_value_str, vlaue_block_array);
                 }
                 break;
             }
@@ -467,7 +467,7 @@ static void __cjson_add_fields(cJSON *cj_block, l_fields_v2_t *fields)
                                 }
                                 curr_when_block = curr_when_block->next;
                             }
-                            CJSON_TRACE(ezlopi_value_str, vlaue_block_array);
+                            // CJSON_TRACE(ezlopi_value_str, vlaue_block_array);
                         }
                         break;
                     }
