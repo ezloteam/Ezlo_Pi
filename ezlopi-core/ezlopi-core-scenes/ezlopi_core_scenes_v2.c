@@ -837,10 +837,10 @@ static l_when_block_v2_t *____new_when_block_populate(cJSON *cj_when_block)
             TRACE_D("blockEnable: %d", new_when_block->block_enable);
         }
 
-        CJSON_GET_VALUE_STRING_BY_COPY(cj_when_block, ezlopi_blockName_str, new_when_block->blockName);
-        if ((NULL != new_when_block->blockName) && (0 < strlen(new_when_block->blockName)))
+        CJSON_GET_VALUE_STRING_BY_COPY(cj_when_block, ezlopi_blockName_str, new_when_block->group_blockName); // Here the UI provides us 'GROUP_NAME' as 'blockName'
+        if ((NULL != new_when_block->group_blockName) && (0 < strlen(new_when_block->group_blockName)))       // should be group_name
         {
-            TRACE_D("blockName : %s ", new_when_block->blockName);
+            TRACE_D("group_blockName : %s ", new_when_block->group_blockName);
         }
 
         CJSON_GET_VALUE_STRING_BY_COPY(cj_when_block, ezlopi_blockId_str, new_when_block->blockId);
@@ -1122,8 +1122,8 @@ static bool ____check_and_append_group_id(cJSON *cj_when_block)
     int value_block_idx = 0;
 
     // <1> Add group_id if 'block_name' exists
-    cJSON *cj_blockName = cJSON_GetObjectItem(__FUNCTION__, cj_when_block, ezlopi_blockName_str);
-    if (cj_blockName && (NULL != cj_blockName->valuestring))
+    cJSON *cj_group_blockName = cJSON_GetObjectItem(__FUNCTION__, cj_when_block, ezlopi_blockName_str);
+    if (cj_group_blockName && (NULL != cj_group_blockName->valuestring))
     {
         add_groupId_flag = true;
     }
@@ -1187,7 +1187,7 @@ int ezlopi_core_scene_add_group_id_if_reqd(cJSON *cj_new_scene)
             add_when_blockId_flag = ____check_and_append_group_id(cj_when_block);
         }
 
-        // checks for 'blockName' in main-case.
+        // checks for 'group_blockName' in main-case.
         if (add_when_blockId_flag)
         {
             ret = 1;

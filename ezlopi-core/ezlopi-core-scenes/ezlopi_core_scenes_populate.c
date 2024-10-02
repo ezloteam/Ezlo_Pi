@@ -297,14 +297,14 @@ void ezlopi_scenes_populate_assign_when_block(l_when_block_v2_t *new_when_block,
             TRACE_D("blockEnable (edit): %d", new_when_block->block_enable);
         }
 
-        CJSON_GET_VALUE_STRING_BY_COPY(cj_when_block, ezlopi_blockName_str, new_when_block->blockName);
-        if (NULL != new_when_block->blockName && (0 < strlen(new_when_block->blockName)))
+        CJSON_GET_VALUE_STRING_BY_COPY(cj_when_block, ezlopi_blockName_str, new_when_block->group_blockName); // Here the UI provides us 'GROUP_NAME' as 'blockName'
+        if (NULL != new_when_block->group_blockName && (0 < strlen(new_when_block->group_blockName)))         // should be group-name
         {
-            TRACE_D("blockName (edit): %s ", new_when_block->blockName);
+            TRACE_D("group_blockName (edit): %s ", new_when_block->group_blockName);
         }
 
         CJSON_GET_VALUE_STRING_BY_COPY(cj_when_block, ezlopi_blockId_str, new_when_block->blockId);
-        if (NULL != new_when_block->blockId && (0 < strlen(new_when_block->blockName)))
+        if (NULL != new_when_block->blockId && (0 < strlen(new_when_block->blockId)))
         {
             TRACE_D("blockId (edit): %s", new_when_block->blockId);
             ezlopi_cloud_update_when_blockId((uint32_t)strtoul(new_when_block->blockId, NULL, 16));

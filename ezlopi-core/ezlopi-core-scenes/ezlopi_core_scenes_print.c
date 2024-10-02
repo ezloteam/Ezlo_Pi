@@ -219,9 +219,9 @@ void ezlopi_print_when_blocks(l_when_block_v2_t *when_blocks)
             TRACE_D("\t\t|-- blockId: %s", when_blocks->blockId);
         }
 
-        if (when_blocks->blockName && (0 < strlen(when_blocks->blockName)))
+        if (when_blocks->group_blockName && (0 < strlen(when_blocks->group_blockName)))
         {
-            TRACE_D("\t\t|-- blockName: %s", when_blocks->blockName);
+            TRACE_D("\t\t|-- group_blockName: %s", when_blocks->group_blockName);
         }
 
         TRACE_D("\t\t|-- block_status_reset_once: %d", when_blocks->block_status_reset_once);
