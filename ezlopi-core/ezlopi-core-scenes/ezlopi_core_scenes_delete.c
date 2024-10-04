@@ -60,14 +60,20 @@ void ezlopi_scenes_delete_when_blocks(l_when_block_v2_t *when_blocks)
 {
     if (when_blocks)
     {
-        if(NULL != when_blocks->cj_block_meta)
+        if (NULL != when_blocks->cj_block_meta)
         {
-            cJSON_Delete(__FUNCTION__ , when_blocks->cj_block_meta);
+            cJSON_Delete(__FUNCTION__, when_blocks->cj_block_meta);
         }
 
         if (NULL != when_blocks->block_options.cj_function)
         {
             cJSON_Delete(__FUNCTION__, when_blocks->block_options.cj_function);
+        }
+
+        if (NULL != when_blocks->when_grp)
+        {
+            ezlopi_free(__FUNCTION__, when_blocks->when_grp);
+            when_blocks->when_grp = NULL;
         }
         ezlopi_scenes_delete_fields(when_blocks->fields);
         ezlopi_scenes_delete_when_blocks(when_blocks->next);

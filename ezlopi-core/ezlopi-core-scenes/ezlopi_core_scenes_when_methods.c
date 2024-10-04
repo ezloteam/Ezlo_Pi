@@ -877,14 +877,87 @@ int ezlopi_scene_when_is_scene_state(l_scenes_list_v2_t *scene_node, void *arg)
 int ezlopi_scene_when_is_group_state(l_scenes_list_v2_t *scene_node, void *arg)
 {
     // TRACE_W("Warning: when-method 'is_group_state' not implemented!");
-
-    if(scene_node)
+    int ret = 0;
+    l_when_block_v2_t *when_block = (l_when_block_v2_t *)arg;
+    if (when_block && scene_node)
     {
-            
+        if (false == when_block->block_enable)
+        {
+            TRACE_D("Block-disabled [%s]", when_block->block_options.method.name);
+            return 0;
+        }
+
+        if (true == when_block->block_status_reset_once)
+        {
+            when_block->block_status_reset_once = false;
+            return 0;
+        }
+
+        uint32_t scene_id = 0;
+        uint32_t group_id = 0;
+        char *state_str = NULL;
+
+        l_fields_v2_t *curr_field = when_block->fields;
+        while (curr_field)
+        {
+            if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "scene", strlen(curr_field->name), 6))
+            {
+                if (EZLOPI_VALUE_TYPE_SCENEID == curr_field->value_type && (NULL != curr_field->field_value.u_value.value_string))
+                {
+                    scene_id = (uint32_t)strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
+                    TRACE_D("scene_id : %08x", scene_id);
+                }
+            }
+            else if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "group", strlen(curr_field->name), 6))
+            {
+                if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != curr_field->field_value.u_value.value_string))
+                {
+                    group_id = (uint32_t)strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
+                    TRACE_D("group_id : %08x", group_id);
+                }
+            }
+            else if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "state", strlen(curr_field->name), 6))
+            {
+                if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != curr_field->field_value.u_value.value_string))
+                {
+                    state_str = curr_field->field_value.u_value.value_string;
+                    TRACE_D("state_str : %s", state_str);
+                }
+            }
+            curr_field = curr_field->next;
+        }
+
+        if (scene_id && group_id && state_str)
+        {
+            // 1. find the 'when-grp-block'
+            l_when_block_v2_t *curr_grp_block = NULL;
+           
+
+            // 2. check the state of the 'when-grp-block'
+            if (curr_grp_block)
+            {
+                if (EZPI_STRNCMP_IF_EQUAL(state_str, "true", strlen(state_str), 5))
+                {
+                    ret = (curr_grp_block->when_grp->grp_state == true);
+                }
+                else if (EZPI_STRNCMP_IF_EQUAL(state_str, "false", strlen(state_str), 6))
+                {
+                    ret = (curr_grp_block->when_grp->grp_state == false);
+                }
+                else if (EZPI_STRNCMP_IF_EQUAL(state_str, "changed", strlen(state_str), 8))
+                {
+                    if (NULL != scene_node->when_block->fields->user_arg)
+                    {
+                        ret = ((uint32_t)scene_node->when_block->fields->user_arg == (uint32_t)curr_grp_block->when_grp->grp_state);
+                    }
+                    scene_node->when_block->fields->user_arg = (void *)curr_grp_block->when_grp->grp_state; // new state
+                }
+                TRACE_D("isgroupState__ret :%d", ret);
+            }
+        }
     }
 
-
-    return 0;
+    return ret;
 }
 
 int ezlopi_scene_when_is_cloud_state(l_scenes_list_v2_t *scene_node, void *arg)

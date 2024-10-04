@@ -102,7 +102,7 @@ typedef struct l_fields_v2
     e_scene_value_type_v2_t value_type; // 0: double, 1: string
     s_field_value_t field_value;
     char *scale;
-    void *user_arg; // user by when-methods
+    void *user_arg; // used by when-methods
     struct l_fields_v2 *next;
 
 } l_fields_v2_t;
@@ -117,16 +117,20 @@ typedef struct l_action_block_v2
     struct l_action_block_v2 *next;
 } l_action_block_v2_t;
 
+typedef struct l_group_block_type
+{
+    uint32_t grp_id;        // may be used in future    //  currently not-populated from nvs
+    bool grp_state;         //  result of the group_block --> 1/0
+    char grp_blockName[32]; //  actual -> 'groupName'   //  The Group-Name provided by UI ; to indicate a group // e.g. ["blockName" : "group-A"]
+} l_group_block_type_t;
+
 typedef struct l_when_block_v2
 {
-    bool block_enable;  //  actual -> '_enable'     //  flag that allows blocks to return 1;
-    char blockId[40];   //  actual -> '_ID'         //  The ID of a normal when-condition scene-block;
-    char group_blockName[40]; //  actual -> 'groupName'   //  The Group-Name provided by UI ; to indicate a group // e.g. ["blockName" : "group-A"]
-#if 0  
-    char * group_id;        // may be used in future    //  currently not-populated from nvs
-#endif
-    bool block_status_reset_once; // 'NOT-NVS parameter' [don't populate ; since not needed] // just a dummy flag to trigger function reset.
-    cJSON *cj_block_meta;         // Block metadata information. Intended to save data needed for user interfaces
+    l_group_block_type_t *when_grp; //   if(!NULL) ------------> //  indicates the 'when-block' is 'group_type'.
+    bool block_enable;              //   actual -> '_enable'     //  flag that allows blocks to return 1;
+    uint32_t blockId;               //   actual -> '_ID'         //  The ID of a normal when-condition scene-block;
+    bool block_status_reset_once;   //   NOT-NVS parameter [don't populate ; since not needed] // just a dummy flag to trigger function reset.
+    cJSON *cj_block_meta;           //   Block metadata information. Intended to save data needed for user interfaces
     e_scenes_block_type_v2_t block_type;
     s_block_options_v2_t block_options;
     l_fields_v2_t *fields;
@@ -163,7 +167,7 @@ typedef struct l_scenes_list_v2
     uint32_t _id;
     bool enabled;
     bool is_group;
-    char group_id[32];
+    uint32_t group_id;
     char name[32];
     cJSON *meta;
     char parent_id[32];
@@ -225,16 +229,18 @@ void ezlopi_scenes_notifications_add(cJSON *cj_notifications);
 int ezlopi_core_scene_set_reset_latch_enable(const char* sceneId_str, const char* blockId_str, bool enable_status);
 #endif
 
+// ----- # below function are for APIs # ---------
 ezlopi_error_t ezlopi_core_scene_block_enable_set_reset(const char *sceneId_str, const char *blockId_str, bool enable_status);
 int ezlopi_core_scene_reset_latch_state(const char *sceneId_str, const char *blockId_str);
 int ezlopi_core_scene_reset_when_block(const char *sceneId_str, const char *blockId_str);
+// ----- # below function are for APIs # ---------
+ezlopi_error_t ezlopi_core_scene_meta_by_id(const char *sceneId_str, const char *blockId_str, cJSON *cj_meta);
+int ezlopi_core_scenes_get_time_list(cJSON *cj_scenes_array);
 
 // ----- # below function are called when 'creating' and 'editing' scene # ---------
 int ezlopi_core_scene_add_group_id_if_reqd(cJSON *cj_new_scene);
 int ezlopi_core_scene_add_when_blockId_if_reqd(cJSON *cj_new_scene);
 
-ezlopi_error_t ezlopi_core_scene_meta_by_id(const char *sceneId_str, const char *blockId_str, cJSON *cj_meta);
-int ezlopi_scenes_get_time_list(cJSON *cj_scenes_array);
 // ---------------------------------------------------------------------------------
 #endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
