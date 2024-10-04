@@ -2049,6 +2049,11 @@ int ezlopi_core_scenes_get_time_list(cJSON *cj_scenes_array)
     return ret;
 }
 
+static l_when_block_v2_t *___get_group_when_block_from_fields(l_when_block_v2_t *curr_when_block, l_fields_v2_t *curr_fields)
+{
+    return NULL;
+}
+
 l_when_block_v2_t *ezlopi_core_scene_get_group_block(uint32_t scene_id, uint32_t group_id)
 {
     l_when_block_v2_t *ret = NULL;
