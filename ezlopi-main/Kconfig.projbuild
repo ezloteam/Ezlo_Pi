@@ -19,6 +19,21 @@ menu "EzloPi User Config"
         help
             ezlopi-util-trace component is enabled to log the outputs to the serial monitor
 
+    config EZPI_OTEL_EN
+        bool  "Enable opentelemetry for trace/logs/matrix*"
+        default n
+        help 
+            Enable to this to post telemetry data to otel-server
+
+        config EZPI_OTEL_COLLECTOR_ADDRESS
+            depends on EZPI_OTEL_EN
+            string "Address of the hosted collector"
+            default "localhost"
+            help 
+                Address of the hosted collecter
+
+
+
     config EZPI_BLE_ENABLE        
         bool "Enable BLE"
         depends on IDF_TARGET_ESP32 || IDF_TARGET_ESP32C3 || IDF_TARGET_ESP32S3

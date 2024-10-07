@@ -48,8 +48,9 @@ static void __print_mac_address(void)
 
 void app_main(void)
 {
-
-#ifdef CONFIG_EZPI_UTIL_TRACE_EN
+#ifdef CONFIG_EZPI_OTEL_EN
+    ezlopi_core_set_otel_logs_upcalls();
+#elif CONFIG_EZPI_UTIL_TRACE_EN
     ezlopi_core_set_log_upcalls();
 #endif // CONFIG_EZPI_UTIL_TRACE_EN
 
