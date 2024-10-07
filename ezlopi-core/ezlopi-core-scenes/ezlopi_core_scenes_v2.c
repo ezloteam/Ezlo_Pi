@@ -2049,64 +2049,98 @@ int ezlopi_core_scenes_get_time_list(cJSON *cj_scenes_array)
     return ret;
 }
 
-static l_when_block_v2_t *___get_group_when_block_from_fields(l_when_block_v2_t *curr_when_block, l_fields_v2_t *curr_fields)
-{
-    return NULL;
-}
+//--------------------------------------------------------------------------------------------------------------------
+static l_when_block_v2_t *___get_group_when_blocks(l_when_block_v2_t *curr_when_block, uint32_t group_id);
 
-l_when_block_v2_t *ezlopi_core_scene_get_group_block(uint32_t scene_id, uint32_t group_id)
+static l_when_block_v2_t *__iterate_through_fields(l_fields_v2_t *fields, uint32_t group_id)
 {
     l_when_block_v2_t *ret = NULL;
-    l_scenes_list_v2_t *scenes_list = ezlopi_scenes_get_scenes_head_v2();
-    while (scenes_list)
+    if (fields)
     {
-        if (scene_id == scenes_list->_id)
+        if ((EZPI_STRNCMP_IF_EQUAL(fields->name, "blocks", strlen(fields->name), 7) && (EZLOPI_VALUE_TYPE_BLOCKS == fields->value_type)) ||
+            (EZPI_STRNCMP_IF_EQUAL(fields->name, "block", strlen(fields->name), 7) && (EZLOPI_VALUE_TYPE_BLOCK == fields->value_type)))
         {
-            l_when_block_v2_t *curr_when_block = scenes_list->when_block;
-            while (curr_when_block)
+            l_when_block_v2_t *curr_field_when_blocks = fields->field_value.u_value.when_block; // value : {when_block , ...}
+            while (curr_field_when_blocks)
             {
-                // check for group_name in main-array
-                if (curr_when_block->when_grp && (0 < strlen(curr_when_block->when_grp->grp_blockName)))
+                if (NULL != (ret = ___get_group_when_blocks(curr_field_when_blocks, group_id)))
+                {
+                    break;
+                }
+                curr_field_when_blocks = curr_field_when_blocks->next;
+            }
+        }
+    }
+
+    return ret;
+}
+static l_when_block_v2_t *___get_group_when_blocks(l_when_block_v2_t *curr_when_block, uint32_t group_id)
+{
+    l_when_block_v2_t *ret = NULL;
+    if (curr_when_block)
+    {
+        // now examine if block-name is of 'logical-category'
+        const char *curr_when_category_name = ezlopi_scene_get_scene_method_category_name(curr_when_block->block_options.method.name); // give corresponding 'category_name' for respective 'method_name'
+        if (curr_when_category_name)
+        {
+            if ((EZPI_STRNCMP_IF_EQUAL(curr_when_category_name, "when_category_logic", strlen(curr_when_category_name), 20))        // and/or/not
+                || (EZPI_STRNCMP_IF_EQUAL(curr_when_category_name, "when_category_function", strlen(curr_when_category_name), 23))) // function -> for/repeat/follow....
+            {
+                // check for --> the 'when-block' containing the 'group-id'
+                if ((NULL != curr_when_block->when_grp) && (0 < strlen(curr_when_block->when_grp->grp_blockName)) && (0 < curr_when_block->when_grp->grp_id))
                 {
                     TRACE_D("group_id : %08x vs [%08x]", curr_when_block->when_grp->grp_id, group_id);
-                    if ((NULL != curr_when_block->when_grp) && (curr_when_block->when_grp->grp_id == group_id))
+                    if (curr_when_block->when_grp->grp_id == group_id)
                     {
-                        ret = curr_when_block;
-                        break;
+                        ret = curr_when_block; // if this 'block-group-id' matches with 'group_id' ; Exit the loop.
                     }
                 }
-                else
+
+                if (NULL == ret) // examine further
                 {
-                    // get the 'when-block' containing the 'group-id' and execute that block.
-                    // now examine if block-name is of 'logical-category'
-                    const char *curr_when_category_name = ezlopi_scene_get_scene_method_category_name(curr_when_block->block_options.method.name); // give corresponding 'category_name' for respective 'method_name'
-                    if (curr_when_block->block_options.method.name)
+                    l_fields_v2_t *curr_field = curr_when_block->fields;
+                    while (curr_field) // check for nested fields
                     {
-                        if ((EZPI_STRNCMP_IF_EQUAL(curr_when_category_name, "when_category_logic", strlen(curr_when_category_name), 20))        // and,or,xor
-                            || (EZPI_STRNCMP_IF_EQUAL(curr_when_category_name, "when_category_function", strlen(curr_when_category_name), 23))) // function -> for/repeat/follow....
+                        if (NULL != (ret = __iterate_through_fields(curr_field, group_id)))
                         {
-                            ret = ___get_group_when_block_from_fields(curr_when_block, curr_when_block->fields);
-
-                            // this check for perticular group
-                            {
-                                TRACE_D("group_id : %08x vs [%08x]", curr_when_block->when_grp->grp_id, group_id);
-
-                                if ((NULL != curr_when_block->when_grp) && (curr_when_block->when_grp->grp_id == group_id))
-                                {
-                                    ret = curr_when_block;
-                                    TRACE_S("__here__");
-                                    break;
-                                }
-                            }
+                            break;
                         }
+                        curr_field = curr_field->next;
                     }
                 }
-
-                curr_when_block = curr_when_block->next;
             }
-            break;
+            else
+            {
+                TRACE_E(" Invalid !! , Empty  AND/OR/NOT operation.");
+            }
         }
-        scenes_list = scenes_list->next;
+    }
+
+    return ret;
+}
+l_when_block_v2_t *ezlopi_core_scene_get_group_block(uint32_t scene_id, uint32_t group_id)
+{
+    l_when_block_v2_t *ret = 0;
+    l_scenes_list_v2_t *scene_node = ezlopi_scenes_get_by_id_v2(scene_id);
+    if (scene_node)
+    {
+        l_when_block_v2_t *curr_when_block = scene_node->when_block;
+        while (curr_when_block)
+        {
+            l_when_block_v2_t *found_matched_block = ___get_group_when_blocks(curr_when_block, group_id);
+            if (found_matched_block) // found the when-block linked with 'group_id'
+            {
+                // execute the matched 'when-block'.
+                f_scene_method_v2_t scene_method = ezlopi_scene_get_method_v2(found_matched_block->block_options.method.type);
+                if (scene_method)
+                {
+                    found_matched_block->when_grp->grp_state = (bool)scene_method(scene_node, (void *)found_matched_block);
+                    ret = found_matched_block;
+                }
+                break;
+            }
+            curr_when_block = curr_when_block->next;
+        }
     }
     return ret;
 }

@@ -241,6 +241,7 @@ int ezlopi_core_scenes_get_time_list(cJSON *cj_scenes_array);
 int ezlopi_core_scene_add_group_id_if_reqd(cJSON *cj_new_scene);
 int ezlopi_core_scene_add_when_blockId_if_reqd(cJSON *cj_new_scene);
 
+l_when_block_v2_t *ezlopi_core_scene_get_group_block(uint32_t scene_id, uint32_t group_id);
 // ---------------------------------------------------------------------------------
 #endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 

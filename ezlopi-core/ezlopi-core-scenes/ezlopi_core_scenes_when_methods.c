@@ -931,11 +931,11 @@ int ezlopi_scene_when_is_group_state(l_scenes_list_v2_t *scene_node, void *arg)
         {
             // 1. find the 'when-grp-block'
             l_when_block_v2_t *curr_grp_block = NULL;
-           
 
             // 2. check the state of the 'when-grp-block'
             if (curr_grp_block)
             {
+                
                 if (EZPI_STRNCMP_IF_EQUAL(state_str, "true", strlen(state_str), 5))
                 {
                     ret = (curr_grp_block->when_grp->grp_state == true);

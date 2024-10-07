@@ -342,7 +342,7 @@ void ezlopi_scenes_print(l_scenes_list_v2_t *scene_link_list)
         TRACE_D("\t|-- id: 0x%08x", scene_link_list->_id);
         TRACE_D("\t|-- enabled: %d", scene_link_list->enabled);
         TRACE_D("\t|-- is_group: %d", scene_link_list->is_group);
-        TRACE_D("\t|-- group_id: 0x%08x", scene_link_list->group_id);
+        TRACE_D("\t|-- group_id: %08x", scene_link_list->group_id);
         TRACE_D("\t|-- name: %s", scene_link_list->name);
         CJSON_TRACE("\t|-- meta: ", scene_link_list->meta);
 
