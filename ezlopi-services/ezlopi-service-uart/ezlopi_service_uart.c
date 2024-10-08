@@ -32,6 +32,7 @@
 #include "ezlopi_core_processes.h"
 #include "ezlopi_core_ping.h"
 #include "ezlopi_core_log.h"
+#include "ezlopi_core_errors.h"
 
 #include "ezlopi_hal_uart.h"
 #include "ezlopi_hal_system_info.h"
@@ -268,6 +269,100 @@ static int ezlopi_service_uart_process_log_severity(const cJSON *root)
     return ret;
 }
 
+static ezlopi_error_t ezlopi_service_uart_process_provisioning_api(const cJSON *root)
+{
+    ezlopi_error_t ret = EZPI_FAILED;
+    int uart_response = 0;
+
+    // if (ezlopi_factory_info_v3_get_provisioning_status())
+    if (0)
+    {
+        uart_response = 0;
+    }
+    else
+    {
+        cJSON *cj_data = cJSON_GetObjectItem(__FUNCTION__, root, "data");
+        if (cj_data)
+        {
+            s_basic_factory_info_t *ezlopi_config_basic = ezlopi_malloc(__FUNCTION__, sizeof(s_basic_factory_info_t));
+            if (ezlopi_config_basic)
+            {
+                char device_name[EZLOPI_FINFO_LEN_DEVICE_NAME];
+                char manufacturer[EZLOPI_FINFO_LEN_MANUF_NAME];
+                char brand[EZLOPI_FINFO_LEN_BRAND_NAME];
+                char model_number[EZLOPI_FINFO_LEN_MODEL_NAME];
+                char device_uuid[EZLOPI_FINFO_LEN_DEVICE_UUID];
+                char prov_uuid[EZLOPI_FINFO_LEN_PROV_UUID];
+                char device_mac[EZLOPI_FINFO_LEN_DEVICE_MAC];
+                char provision_server[EZLOPI_FINFO_LEN_PROVISIONING_SERVER_URL];
+                char cloud_server[EZLOPI_FINFO_LEN_CLOUD_SERVER_URL];
+                char provision_token[EZLOPI_FINFO_LEN_PROVISIONING_TOKEN];
+
+                memset(device_name, 0, EZLOPI_FINFO_LEN_DEVICE_NAME);
+                memset(manufacturer, 0, EZLOPI_FINFO_LEN_MANUF_NAME);
+                memset(brand, 0, EZLOPI_FINFO_LEN_BRAND_NAME);
+                memset(model_number, 0, EZLOPI_FINFO_LEN_MODEL_NAME);
+                memset(device_uuid, 0, EZLOPI_FINFO_LEN_DEVICE_UUID);
+                memset(prov_uuid, 0, EZLOPI_FINFO_LEN_PROV_UUID);
+                memset(device_mac, 0, EZLOPI_FINFO_LEN_DEVICE_MAC);
+                memset(provision_server, 0, EZLOPI_FINFO_LEN_PROVISIONING_SERVER_URL);
+                memset(cloud_server, 0, EZLOPI_FINFO_LEN_CLOUD_SERVER_URL);
+                memset(provision_token, 0, EZLOPI_FINFO_LEN_PROVISIONING_TOKEN);
+
+                CJSON_GET_VALUE_DOUBLE(cj_data, ezlopi_serial_str, ezlopi_config_basic->id);
+                CJSON_GET_VALUE_DOUBLE(cj_data, ezlopi_version_str, ezlopi_config_basic->config_version);
+
+                CJSON_GET_VALUE_STRING_BY_COPY(cj_data, ezlopi_device_name_str, device_name);
+                CJSON_GET_VALUE_STRING_BY_COPY(cj_data, ezlopi_manufacturer_name_str, manufacturer);
+                CJSON_GET_VALUE_STRING_BY_COPY(cj_data, ezlopi_brand_str, brand);
+                CJSON_GET_VALUE_STRING_BY_COPY(cj_data, ezlopi_model_number_str, model_number);
+                CJSON_GET_VALUE_STRING_BY_COPY(cj_data, ezlopi_uuid_str, device_uuid);
+                CJSON_GET_VALUE_STRING_BY_COPY(cj_data, ezlopi_mac_str, device_mac);
+                CJSON_GET_VALUE_STRING_BY_COPY(cj_data, "provisioning_uuid", prov_uuid);   
+                CJSON_GET_VALUE_STRING_BY_COPY(cj_data, ezlopi_provision_server_str, provision_server);
+                CJSON_GET_VALUE_STRING_BY_COPY(cj_data, ezlopi_cloud_server_str, cloud_server);
+                CJSON_GET_VALUE_STRING_BY_COPY(cj_data, ezlopi_provision_token_str, provision_token);
+
+                ezlopi_config_basic->device_name = device_name;
+                ezlopi_config_basic->manufacturer = manufacturer;
+                ezlopi_config_basic->brand = brand;
+                ezlopi_config_basic->model_number = model_number;
+                ezlopi_config_basic->device_uuid = device_uuid;
+                ezlopi_config_basic->prov_uuid = prov_uuid;
+                ezlopi_config_basic->device_mac = device_mac;
+                ezlopi_config_basic->provision_server = provision_server;
+                ezlopi_config_basic->cloud_server = cloud_server;
+                ezlopi_config_basic->provision_token = provision_token;
+                ezlopi_config_basic->device_type = NULL;
+
+                ezlopi_factory_info_v3_set_basic(ezlopi_config_basic);
+                ezlopi_factory_info_v3_set_ca_cert(cJSON_GetObjectItem(__FUNCTION__, cj_data, ezlopi_signing_ca_certificate_str));
+                ezlopi_factory_info_v3_set_ssl_shared_key(cJSON_GetObjectItem(__FUNCTION__, cj_data, ezlopi_ssl_shared_key_str));
+                ezlopi_factory_info_v3_set_ssl_private_key(cJSON_GetObjectItem(__FUNCTION__, cj_data, ezlopi_ssl_private_key_str));
+
+                uart_response = 1;
+            }
+        }
+    }
+
+    cJSON *cj_response = cJSON_CreateObject(__FUNCTION__);
+    if (cj_response)
+    {
+        cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_cmd_str, 7);
+        cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_status_str, uart_response);
+        const char *str_response = cJSON_Print(__func__, cj_response);
+        if (str_response)
+        {
+            cJSON_Minify((char *)str_response);
+            EZPI_SERV_uart_tx_data(strlen(str_response), (uint8_t *)str_response);
+            free((char *)str_response);
+        }
+        cJSON_Delete(__func__, cj_response);
+    }
+
+    return ret;
+}
+
 static int ezlopi_service_uart_parser(const char *data)
 {
     cJSON *root = cJSON_ParseWithRef(__FUNCTION__, data);
@@ -314,6 +409,11 @@ static int ezlopi_service_uart_parser(const char *data)
             case 6:
             {
                 ezlopi_service_uart_process_log_severity(root);
+                break;
+            }
+            case 7:
+            {
+                ezlopi_service_uart_process_provisioning_api(root);
                 break;
             }
             default:
@@ -638,7 +738,6 @@ static void ezlopi_service_uart_get_info()
             ezlopi_service_uart_oem_info(cj_info);
             ezlopi_service_uart_newtwork_info(cj_info);
 
-
             cJSON_AddItemToObject(__FUNCTION__, cj_get_info, ezlopi_info_str, cj_info);
 
             char *serial_data_json_string = cJSON_Print(__FUNCTION__, cj_get_info);
@@ -692,7 +791,7 @@ static void ezlopi_service_uart_set_wifi(const char *data)
                         }
                         else
                         {
-                            #warning "DO NOT user printf on production !"
+#warning "DO NOT user printf on production !"
                             TRACE_E("WiFi Connection to AP: %s failed !", ssid);
                             // printf("WiFi Connection to AP: %s failed !\n", ssid);
                             status = 0;
