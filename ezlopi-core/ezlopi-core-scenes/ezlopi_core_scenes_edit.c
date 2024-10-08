@@ -92,11 +92,13 @@ static void _edit_scene(l_scenes_list_v2_t *scene_node, cJSON *cj_scene)
     CJSON_GET_VALUE_BOOL(cj_scene, ezlopi_is_group_str, scene_node->is_group);
 
     {
-        CJSON_GET_VALUE_STRING_BY_COPY(cj_scene, ezlopi_group_id_str, scene_node->group_id);
-        if ((NULL != scene_node->group_id) && (0 < strlen(scene_node->group_id)))
+        char tmp_grp_id[32] = {0};
+        CJSON_GET_VALUE_STRING_BY_COPY(cj_scene, ezlopi_group_id_str, tmp_grp_id);
+        if (0 < strlen(tmp_grp_id))
         {
-            TRACE_S("new_group_id (edit): %s", scene_node->group_id);
-            ezlopi_cloud_update_group_id((uint32_t)strtoul(scene_node->group_id, NULL, 16));
+            scene_node->group_id = (uint32_t)strtoul(tmp_grp_id, NULL, 16);
+            TRACE_S("new_group_id (edit): %08x", scene_node->group_id);
+            ezlopi_cloud_update_group_id(scene_node->group_id);
         }
     }
 
@@ -109,7 +111,6 @@ static void _edit_scene(l_scenes_list_v2_t *scene_node, cJSON *cj_scene)
         {
             if (scene_node->meta)
             {
-                TRACE_D("here");
                 cJSON_Delete(__FUNCTION__, scene_node->meta);
                 scene_node->meta = NULL;
             }

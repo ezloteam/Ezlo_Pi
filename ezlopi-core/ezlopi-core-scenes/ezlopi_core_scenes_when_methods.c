@@ -45,10 +45,10 @@ int ezlopi_scene_when_is_item_state(l_scenes_list_v2_t *scene_node, void *arg)
         uint32_t item_id = 0;
         uint32_t device_group_id = 0;
         uint32_t item_group_id = 0;
+        bool armed_check = false;
+        bool value_armed = false;
 
         l_fields_v2_t *value_field = NULL;
-#warning "Warning: armed check remains [Krishna]";
-
         l_fields_v2_t *curr_field = when_block->fields;
         while (curr_field)
         {
@@ -68,10 +68,18 @@ int ezlopi_scene_when_is_item_state(l_scenes_list_v2_t *scene_node, void *arg)
             {
                 item_group_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
             }
+            else if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "armed", strlen(curr_field->name), 6))
+            {
+                if (EZLOPI_VALUE_TYPE_BOOL == curr_field->value_type)
+                {
+                    armed_check = true;
+                    value_armed = curr_field->field_value.u_value.value_bool;
+                }
+            }
 
             curr_field = curr_field->next;
         }
-
+        // 1. check for item_value
         if (item_id && value_field)
         {
             ret = is_item_state_single_condition(item_id, value_field);
@@ -79,6 +87,37 @@ int ezlopi_scene_when_is_item_state(l_scenes_list_v2_t *scene_node, void *arg)
         else if (device_group_id && item_group_id && value_field) // since device_and_item group both need to exist
         {
             ret = is_item_state_with_grp_condition(device_group_id, item_group_id, value_field);
+        }
+        // 2. check for armed condition
+        if (ret && armed_check)
+        {
+            armed_check = false;
+            l_ezlopi_device_t *device_node = ezlopi_device_get_head();
+            while (device_node)
+            {
+                l_ezlopi_item_t *item_node = device_node->items;
+                while (item_node)
+                {
+                    if (item_id == item_node->cloud_properties.item_id)
+                    {
+                        ret = ((value_armed == device_node->cloud_properties.armed) ? 1 : 0);
+                        // s_ezlopi_cloud_controller_t *controller_info = ezlopi_device_get_controller_information();
+                        // if (controller_info)
+                        // {
+                        // #warning "we need to change from 'controller' to 'device_id' specific";
+                        //     ret = ((value_armed == controller_info->armed) ? 1 : 0);
+                        // }
+                        armed_check = true;
+                        break;
+                    }
+                    item_node = item_node->next;
+                }
+                if (armed_check)
+                {
+                    break;
+                }
+                device_node = device_node->next;
+            }
         }
     }
 
@@ -694,6 +733,7 @@ int ezlopi_scene_when_is_device_state(l_scenes_list_v2_t *scene_node, void *arg)
             l_ezlopi_device_t *curr_device = ezlopi_device_get_by_id(device_id);
             if (curr_device)
             {
+                // ret = ((value_armed == curr_device->cloud_properties.armed) ? 1 : 0);
                 s_ezlopi_cloud_controller_t *controller_info = ezlopi_device_get_controller_information();
                 if (controller_info)
                 {
@@ -715,6 +755,7 @@ int ezlopi_scene_when_is_device_state(l_scenes_list_v2_t *scene_node, void *arg)
                     l_ezlopi_device_t *curr_device = ezlopi_device_get_by_id(curr_devce_id); // immediately goto "102ec000" ...
                     if (curr_device)
                     {
+                        //  ret = ((value_armed == curr_device->cloud_properties.armed) ? 1 : 0);
                         s_ezlopi_cloud_controller_t *controller_info = ezlopi_device_get_controller_information();
                         if (controller_info)
                         {
@@ -835,8 +876,85 @@ int ezlopi_scene_when_is_scene_state(l_scenes_list_v2_t *scene_node, void *arg)
 
 int ezlopi_scene_when_is_group_state(l_scenes_list_v2_t *scene_node, void *arg)
 {
-    TRACE_W("Warning: when-method 'is_group_state' not implemented!");
-    return 0;
+    // TRACE_W("Warning: when-method 'is_group_state' not implemented!");
+    int ret = 0;
+    l_when_block_v2_t *when_block = (l_when_block_v2_t *)arg;
+    if (when_block && scene_node)
+    {
+        if (false == when_block->block_enable)
+        {
+            TRACE_D("Block-disabled [%s]", when_block->block_options.method.name);
+            return 0;
+        }
+
+        if (true == when_block->block_status_reset_once)
+        {
+            when_block->block_status_reset_once = false;
+            return 0;
+        }
+
+        uint32_t scene_id = 0;
+        uint32_t group_id = 0;
+        char *state_str = NULL;
+
+        l_fields_v2_t *curr_field = when_block->fields;
+        while (curr_field)
+        {
+            if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "scene", strlen(curr_field->name), 6))
+            {
+                if (EZLOPI_VALUE_TYPE_SCENEID == curr_field->value_type && (NULL != curr_field->field_value.u_value.value_string))
+                {
+                    scene_id = (uint32_t)strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
+                    // TRACE_D("scene_id : %08x", scene_id);
+                }
+            }
+            else if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "group", strlen(curr_field->name), 6))
+            {
+                if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != curr_field->field_value.u_value.value_string))
+                {
+                    group_id = (uint32_t)strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
+                    // TRACE_D("group_id : %08x", group_id);
+                }
+            }
+            else if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "state", strlen(curr_field->name), 6))
+            {
+                if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != curr_field->field_value.u_value.value_string))
+                {
+                    state_str = curr_field->field_value.u_value.value_string;
+                    // TRACE_D("state_str : %s", state_str);
+                }
+            }
+            curr_field = curr_field->next;
+        }
+
+        if ((0 < scene_id) && (0 < group_id) && (NULL != state_str))
+        {
+            // 1. find the 'when-grp-block'
+            l_when_block_v2_t *curr_grp_block = ezlopi_core_scene_get_group_block(scene_id, group_id);
+            if (curr_grp_block)
+            {
+                if (EZPI_STRNCMP_IF_EQUAL(state_str, "true", strlen(state_str), 5))
+                {
+                    ret = (curr_grp_block->when_grp->grp_state == true);
+                }
+                else if (EZPI_STRNCMP_IF_EQUAL(state_str, "false", strlen(state_str), 6))
+                {
+                    ret = (curr_grp_block->when_grp->grp_state == false);
+                }
+                else if (EZPI_STRNCMP_IF_EQUAL(state_str, "changed", strlen(state_str), 8))
+                {
+                    if (NULL != scene_node->when_block->fields->user_arg)
+                    {
+                        ret = ((uint32_t)scene_node->when_block->fields->user_arg == (uint32_t)curr_grp_block->when_grp->grp_state);
+                    }
+                    scene_node->when_block->fields->user_arg = (void *)curr_grp_block->when_grp->grp_state; // new state
+                }
+                // TRACE_S("isgroupState__ret :%d", ret);
+            }
+        }
+    }
+
+    return ret;
 }
 
 int ezlopi_scene_when_is_cloud_state(l_scenes_list_v2_t *scene_node, void *arg)
