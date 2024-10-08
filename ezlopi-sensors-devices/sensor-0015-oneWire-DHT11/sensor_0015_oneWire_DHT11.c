@@ -100,7 +100,6 @@ static ezlopi_error_t __0015_prepare(void *arg)
                         TRACE_I("Child_dht11_humi_device-[0x%x] ", child_device_humidity->cloud_properties.device_id);
                         __dht11_setup_device_cloud_properties_humidity(child_device_humidity, cjson_device);
 
-                        child_device_humidity->cloud_properties.parent_device_id = parent_device_temperature->cloud_properties.device_id;
                         l_ezlopi_item_t *item_humidity = ezlopi_device_add_item_to_device(child_device_humidity, sensor_0015_oneWire_DHT11);
                         if (item_humidity)
                         {
@@ -187,8 +186,7 @@ static ezlopi_error_t __dht11_setup_item_properties_temperature(l_ezlopi_item_t 
         item->cloud_properties.show = true;
         item->cloud_properties.value_type = value_type_temperature;
 
-        e_enum_temperature_scale_t scale_to_use = ezlopi_core_setting_get_temperature_scale();
-        item->cloud_properties.scale = (TEMPERATURE_SCALE_FAHRENHEIT == scale_to_use) ? scales_fahrenheit : scales_celsius;
+        item->cloud_properties.scale = ezlopi_core_setting_get_temperature_scale_str();
 
         item->is_user_arg_unique = true;
         item->user_arg = user_arg;
@@ -269,7 +267,7 @@ static ezlopi_error_t __0015_get_value(l_ezlopi_item_t *item, void *args)
 
 static ezlopi_error_t __0015_notify(l_ezlopi_item_t *item)
 {
-    ezlopi_error_t ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
     if (item)
     {
         s_ezlopi_dht11_data_t *dht11_data = (s_ezlopi_dht11_data_t *)item->user_arg;
@@ -280,9 +278,9 @@ static ezlopi_error_t __0015_notify(l_ezlopi_item_t *item)
                 float temperature = getTemperature_dht11();
                 if (temperature > 15)
                 {
-                    e_enum_temperature_scale_t scale_to_use = ezlopi_core_setting_get_temperature_scale();
-                    item->cloud_properties.scale = (TEMPERATURE_SCALE_FAHRENHEIT == scale_to_use) ? scales_fahrenheit : scales_celsius;
+                    item->cloud_properties.scale = ezlopi_core_setting_get_temperature_scale_str();
 
+                    e_enum_temperature_scale_t scale_to_use = ezlopi_core_setting_get_temperature_scale();
                     if (TEMPERATURE_SCALE_FAHRENHEIT == scale_to_use)
                     {
                         temperature = (temperature * (9.0f / 5.0f)) + 32.0f;

@@ -17,12 +17,12 @@
 #include "sensor_0032_ADC_soilMoisture.h"
 #include "EZLOPI_USER_CONFIG.h"
 
-static ezlopi_error_t __prepare(void* arg);
-static ezlopi_error_t __init(l_ezlopi_item_t* item);
-static ezlopi_error_t __notify(l_ezlopi_item_t* item);
-static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t* item, void* arg);
+static ezlopi_error_t __prepare(void *arg);
+static ezlopi_error_t __init(l_ezlopi_item_t *item);
+static ezlopi_error_t __notify(l_ezlopi_item_t *item);
+static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg);
 
-ezlopi_error_t sensor_0032_ADC_soilMoisture(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
+ezlopi_error_t sensor_0032_ADC_soilMoisture(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
     switch (action)
@@ -56,11 +56,11 @@ ezlopi_error_t sensor_0032_ADC_soilMoisture(e_ezlopi_actions_t action, l_ezlopi_
     return ret;
 }
 
-static ezlopi_error_t __notify(l_ezlopi_item_t* item)
+static ezlopi_error_t __notify(l_ezlopi_item_t *item)
 {
     ezlopi_error_t ret = EZPI_FAILED;
 
-    double* soil_moisture_data = (double*)item->user_arg;
+    double *soil_moisture_data = (double *)item->user_arg;
     if (soil_moisture_data)
     {
         s_ezlopi_analog_data_t tmp_data = { .value = 0, .voltage = 0 };
@@ -76,14 +76,14 @@ static ezlopi_error_t __notify(l_ezlopi_item_t* item)
     return ret;
 }
 
-static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t* item, void* arg)
+static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 {
     ezlopi_error_t ret = EZPI_FAILED;
     if (item && arg)
     {
-        cJSON* cj_result = (cJSON*)arg;
+        cJSON *cj_result = (cJSON *)arg;
 
-        double* soil_moisture_data = (double*)item->user_arg;
+        double *soil_moisture_data = (double *)item->user_arg;
         if (soil_moisture_data)
         {
             ezlopi_valueformatter_double_to_cjson(cj_result, *soil_moisture_data, scales_percent);
@@ -93,7 +93,7 @@ static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t* item, void* arg)
     return ret;
 }
 
-static ezlopi_error_t __init(l_ezlopi_item_t* item)
+static ezlopi_error_t __init(l_ezlopi_item_t *item)
 {
     ezlopi_error_t ret = EZPI_ERR_INIT_DEVICE_FAILED;
     if (item)
@@ -109,7 +109,7 @@ static ezlopi_error_t __init(l_ezlopi_item_t* item)
     return ret;
 }
 
-static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
+static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     // cJSON *cj_info = cJSON_CreateObject(__FUNCTION__);
     // cJSON_AddStringToObject(__FUNCTION__, cj_info, ezlopi_manufacturer_str, "EzloPi");
@@ -124,7 +124,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* 
     device->cloud_properties.device_type_id = NULL;
 }
 
-static void __prepare_item_properties(l_ezlopi_item_t* item, cJSON* cj_device, void* user_arg)
+static void __prepare_item_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_arg)
 {
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type);
     item->cloud_properties.has_getter = true;
@@ -143,25 +143,25 @@ static void __prepare_item_properties(l_ezlopi_item_t* item, cJSON* cj_device, v
     item->user_arg = user_arg;
 }
 
-static ezlopi_error_t __prepare(void* arg)
+static ezlopi_error_t __prepare(void *arg)
 {
     ezlopi_error_t ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
-    s_ezlopi_prep_arg_t* prep_arg = (s_ezlopi_prep_arg_t*)arg;
+    s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
 
     if (prep_arg && prep_arg->cjson_device)
     {
-        l_ezlopi_device_t* device = ezlopi_device_add_device(prep_arg->cjson_device, NULL);
+        l_ezlopi_device_t *device = ezlopi_device_add_device(prep_arg->cjson_device, NULL);
         if (device)
         {
             __prepare_device_cloud_properties(device, prep_arg->cjson_device);
-            l_ezlopi_item_t* item_temperature = ezlopi_device_add_item_to_device(device, sensor_0032_ADC_soilMoisture);
+            l_ezlopi_item_t *item_temperature = ezlopi_device_add_item_to_device(device, sensor_0032_ADC_soilMoisture);
             if (item_temperature)
             {
-                double* soil_moisture_data = (double*)ezlopi_malloc(__FUNCTION__, sizeof(double));
+                double *soil_moisture_data = (double *)ezlopi_malloc(__FUNCTION__, sizeof(double));
                 if (soil_moisture_data)
                 {
                     memset(soil_moisture_data, 0, sizeof(double));
-                    __prepare_item_properties(item_temperature, prep_arg->cjson_device, (void*)soil_moisture_data);
+                    __prepare_item_properties(item_temperature, prep_arg->cjson_device, (void *)soil_moisture_data);
                     ret = EZPI_SUCCESS;
                 }
             }

@@ -108,9 +108,9 @@ static ezlopi_error_t __notify(l_ezlopi_item_t *item)
             {
                 if (ezlopi_item_name_temp == item->cloud_properties.item_name)
                 {
-                    e_enum_temperature_scale_t scale_to_use = ezlopi_core_setting_get_temperature_scale();
-                    item->cloud_properties.scale = (TEMPERATURE_SCALE_FAHRENHEIT == scale_to_use) ? scales_fahrenheit : scales_celsius;
+                    item->cloud_properties.scale = ezlopi_core_setting_get_temperature_scale_str();
 
+                    e_enum_temperature_scale_t scale_to_use = ezlopi_core_setting_get_temperature_scale();
                     if (TEMPERATURE_SCALE_FAHRENHEIT == scale_to_use)
                     {
                         temperature = (temperature * (9.0f / 5.0f)) + 32.0f;
@@ -229,8 +229,6 @@ static ezlopi_error_t __prepare(void *arg)
                     TRACE_I("Child_pressure_device-[0x%x] ", child_pressure_device->cloud_properties.device_id);
                     __prepare_device_cloud_properties_child_pressure(child_pressure_device, prep_arg->cjson_device);
 
-                    child_pressure_device->cloud_properties.parent_device_id = parent_temp_humid_device->cloud_properties.device_id;
-
                     l_ezlopi_item_t *pressure_item = ezlopi_device_add_item_to_device(child_pressure_device, sensor_0012_I2C_BME280);
                     if (pressure_item)
                     {
@@ -295,14 +293,14 @@ static void __prepare_item_temperature_properties(l_ezlopi_item_t *item, cJSON *
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
 
-    e_enum_temperature_scale_t scale_to_use = ezlopi_core_setting_get_temperature_scale();
-    item->cloud_properties.scale = (scale_to_use == TEMPERATURE_SCALE_FAHRENHEIT) ? scales_fahrenheit : scales_celsius;
+    item->cloud_properties.scale = ezlopi_core_setting_get_temperature_scale_str();
 
     item->cloud_properties.item_name = ezlopi_item_name_temp;
     item->cloud_properties.value_type = value_type_temperature;
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
     item->interface.i2c_master.enable = true;
+    item->interface.i2c_master.channel = I2C_NUM_0;
     item->interface.i2c_master.clock_speed = 100000;
     CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_scl_str, item->interface.i2c_master.scl);
     CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_sda_str, item->interface.i2c_master.sda);

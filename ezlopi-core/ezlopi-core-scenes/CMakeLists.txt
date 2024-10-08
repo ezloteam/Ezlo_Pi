@@ -11,6 +11,7 @@ set(EZLOPI_CORE_COMPONENTS
         ezlopi-core-nvs
         ezlopi-core-modes
         ezlopi-core-errors
+        ezlopi-core-sntp
 )
 
 # # Define HAL components

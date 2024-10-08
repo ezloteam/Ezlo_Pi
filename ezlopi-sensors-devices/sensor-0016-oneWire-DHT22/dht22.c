@@ -22,7 +22,7 @@
 #define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
 
 #include "../../build/config/sdkconfig.h"
-// #if (CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32)
+#if (CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32S2)
 
 // #include "esp_log.h"
 #include "driver/gpio.h"
@@ -248,4 +248,4 @@ int readDHT22()
         return DHT_CHECKSUM_ERROR;
 }
 
-// #endif // CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32
+#endif // CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32S2

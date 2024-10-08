@@ -14,12 +14,12 @@
 
 #include "sensor_0034_digitalIn_proximity.h"
 
-static ezlopi_error_t proximity_sensor_prepare(void* args);
-static ezlopi_error_t proximity_sensor_init(l_ezlopi_item_t* item);
-static void proximity_sensor_value_updated_from_device(void* arg);
-static ezlopi_error_t proximity_sensor_get_value_cjson(l_ezlopi_item_t* item, void* args);
+static ezlopi_error_t proximity_sensor_prepare(void *args);
+static ezlopi_error_t proximity_sensor_init(l_ezlopi_item_t *item);
+static void proximity_sensor_value_updated_from_device(void *arg);
+static ezlopi_error_t proximity_sensor_get_value_cjson(l_ezlopi_item_t *item, void *args);
 
-ezlopi_error_t sensor_0034_digitalIn_proximity(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* args, void* user_arg)
+ezlopi_error_t sensor_0034_digitalIn_proximity(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *args, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
 
@@ -51,7 +51,7 @@ ezlopi_error_t sensor_0034_digitalIn_proximity(e_ezlopi_actions_t action, l_ezlo
     return ret;
 }
 
-static void proximity_sensor_setup_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
+static void proximity_sensor_setup_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     if (device && cj_device)
     {
@@ -63,7 +63,7 @@ static void proximity_sensor_setup_device_cloud_properties(l_ezlopi_device_t* de
     }
 }
 
-static void proximity_sensor_setup_item_properties(l_ezlopi_item_t* item, cJSON* cj_device)
+static void proximity_sensor_setup_item_properties(l_ezlopi_item_t *item, cJSON *cj_device)
 {
     if (item && cj_device)
     {
@@ -87,18 +87,18 @@ static void proximity_sensor_setup_item_properties(l_ezlopi_item_t* item, cJSON*
     }
 }
 
-static ezlopi_error_t proximity_sensor_prepare(void* args)
+static ezlopi_error_t proximity_sensor_prepare(void *args)
 {
     ezlopi_error_t ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
-    s_ezlopi_prep_arg_t* device_prep_arg = (s_ezlopi_prep_arg_t*)args;
+    s_ezlopi_prep_arg_t *device_prep_arg = (s_ezlopi_prep_arg_t *)args;
 
     if ((NULL != device_prep_arg) && (NULL != device_prep_arg->cjson_device))
     {
-        l_ezlopi_device_t* device = ezlopi_device_add_device(device_prep_arg->cjson_device, NULL);
+        l_ezlopi_device_t *device = ezlopi_device_add_device(device_prep_arg->cjson_device, NULL);
         if (device)
         {
             proximity_sensor_setup_device_cloud_properties(device, device_prep_arg->cjson_device);
-            l_ezlopi_item_t* item = ezlopi_device_add_item_to_device(device, sensor_0034_digitalIn_proximity);
+            l_ezlopi_item_t *item = ezlopi_device_add_item_to_device(device, sensor_0034_digitalIn_proximity);
             if (item)
             {
                 proximity_sensor_setup_item_properties(item, device_prep_arg->cjson_device);
@@ -113,7 +113,7 @@ static ezlopi_error_t proximity_sensor_prepare(void* args)
     return ret;
 }
 
-static ezlopi_error_t proximity_sensor_init(l_ezlopi_item_t* item)
+static ezlopi_error_t proximity_sensor_init(l_ezlopi_item_t *item)
 {
     ezlopi_error_t ret = EZPI_ERR_INIT_DEVICE_FAILED;
     if (item)
@@ -145,19 +145,19 @@ static ezlopi_error_t proximity_sensor_init(l_ezlopi_item_t* item)
     return ret;
 }
 
-static void proximity_sensor_value_updated_from_device(void* arg)
+static void proximity_sensor_value_updated_from_device(void *arg)
 {
-    l_ezlopi_item_t* item = (l_ezlopi_item_t*)arg;
+    l_ezlopi_item_t *item = (l_ezlopi_item_t *)arg;
     if (item)
     {
         ezlopi_device_value_updated_from_device_broadcast(item);
     }
 }
 
-static ezlopi_error_t proximity_sensor_get_value_cjson(l_ezlopi_item_t* item, void* args)
+static ezlopi_error_t proximity_sensor_get_value_cjson(l_ezlopi_item_t *item, void *args)
 {
     ezlopi_error_t ret = EZPI_FAILED;
-    cJSON* cj_result = (cJSON*)args;
+    cJSON *cj_result = (cJSON *)args;
     if (cj_result)
     {
         item->interface.gpio.gpio_in.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);

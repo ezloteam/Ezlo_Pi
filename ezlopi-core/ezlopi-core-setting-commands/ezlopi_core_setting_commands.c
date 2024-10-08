@@ -39,7 +39,7 @@ const char *log_indentation_level[4] = {
     "8",
 };
 
-static e_enum_temperature_scale_t temperature_scale_to_user = TEMPERATURE_SCALE_FAHRENHEIT;
+static e_enum_temperature_scale_t temperature_scale_to_user = TEMPERATURE_SCALE_CELSIUS;
 static e_enum_date_format_t date_format_to_user = DATE_FORMAT_MMDDYY;
 static e_enum_time_format_t time_format_to_user = TIME_FORMAT_12;
 static int network_ping_timeout_to_user = 10;
@@ -268,27 +268,52 @@ static int ezlopi_core_add_log_level_settings(cJSON *cj_settings)
     return ret;
 }
 
-static void ezlopi_core_setting_updated_broadcast(cJSON *cj_params)
+int ezlopi_core_setting_updated_broadcast(cJSON *cj_params, cJSON *cj_result)
 {
-    if (cj_params)
+    int ret = -1;
+    if (cj_params && cj_result)
     {
-        cJSON *cj_result = cJSON_Duplicate(__FUNCTION__, cj_params, true);
-        if (cj_result)
+        cJSON *cj_name = cJSON_GetObjectItem(__FUNCTION__, cj_params, "name");
+        if (cj_name && cJSON_IsString(cj_name))
         {
-            cJSON *cj_response = cJSON_CreateObject(__FUNCTION__);
-            if (cj_response)
+            cJSON_AddStringToObject(__FUNCTION__, cj_result, "name", cj_name->valuestring);
+            e_ezlopi_core_setting_command_names_t e_name = ezlopi_core_setting_command_get_command_enum_from_str(cj_name->valuestring);
+            switch (e_name)
             {
-                cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi__id_str, ezlopi_ui_broadcast_str);
-                cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, "hub.setting.updated");
-                cJSON_AddItemToObject(__FUNCTION__, cj_response, "result", cj_result);
-                ezlopi_error_t ret = ezlopi_core_broadcast_add_to_queue(cj_response);
-                if (EZPI_SUCCESS != ret)
-                {
-                    cJSON_Delete(__FUNCTION__, cj_response);
-                }
+            case SETTING_COMMAND_NAME_SCALE_TEMPERATURE:
+            {
+                cJSON_AddStringToObject(__FUNCTION__, cj_result, "value", temperature_scale_enum[temperature_scale_to_user]);
+                break;
             }
+            case SETTING_COMMAND_NAME_DATE_FORMAT:
+            {
+                cJSON_AddStringToObject(__FUNCTION__, cj_result, "value", date_format_enum[date_format_to_user]);
+                break;
+            }
+            case SETTING_COMMAND_NAME_TIME_FORMAT:
+            {
+                cJSON_AddStringToObject(__FUNCTION__, cj_result, "value", time_format_enum[time_format_to_user]);
+                break;
+            }
+            case SETTING_COMMAND_NAME_NETWORK_PING_TIMEOUT:
+            {
+                cJSON_AddNumberToObject(__FUNCTION__, cj_result, "value", network_ping_timeout_to_user);
+                break;
+            }
+            case SETTING_COMMAND_NAME_LOG_LEVEL:
+            {
+                cJSON_AddStringToObject(__FUNCTION__, cj_result, "value", ezlopi_core_cloud_log_get_current_severity_enum_str());
+                break;
+            }
+            default:
+            {
+                break;
+            }
+            }
+            ret = 0;
         }
     }
+    return ret;
 }
 
 int ezlopi_core_setting_commands_process(cJSON *cj_params)
@@ -332,7 +357,6 @@ int ezlopi_core_setting_commands_process(cJSON *cj_params)
                 break;
             }
             }
-            ezlopi_core_setting_updated_broadcast(cj_params);
         }
     }
 
@@ -362,16 +386,16 @@ int ezlopi_core_setting_commands_read_settings()
     int ret = 0;
 
     EZPI_CORE_nvs_read_temperature_scale((uint32_t *)&temperature_scale_to_user);
-    // printf("Temperature scale: %s\n", temperature_scale_enum[temperature_scale_to_user]);
+    TRACE_I("Temperature scale: %s", temperature_scale_enum[temperature_scale_to_user]);
 
     EZPI_CORE_nvs_read_date_format((uint32_t *)&date_format_to_user);
-    // printf("Date format: %s\n", date_format_enum[date_format_to_user]);
+    TRACE_I("Date format: %s", date_format_enum[date_format_to_user]);
 
     EZPI_CORE_nvs_read_time_format((uint32_t *)&time_format_to_user);
-    // printf("Time format: %s\n", time_format_enum[time_format_to_user]);
+    TRACE_I("Time format: %s", time_format_enum[time_format_to_user]);
 
     EZPI_CORE_nvs_read_network_ping_timeout((uint32_t *)&network_ping_timeout_to_user);
-    // printf("Network Ping Timeout: %d\n", network_ping_timeout_to_user);
+    TRACE_I("Network Ping Timeout: %d", network_ping_timeout_to_user);
 
 #ifdef CONFIG_EZPI_UTIL_TRACE_EN
     ezlopi_core_read_set_log_severities();
@@ -417,4 +441,17 @@ e_ezlopi_core_setting_command_names_t ezlopi_core_setting_command_get_command_en
         }
     }
     return ret;
+}
+
+const char *ezlopi_core_setting_get_temperature_scale_str()
+{
+    return temperature_scale_enum[temperature_scale_to_user];
+}
+const char *ezlopi_core_setting_get_date_format_str()
+{
+    return date_format_enum[date_format_to_user];
+}
+const char *ezlopi_core_setting_get_time_format_str()
+{
+    return time_format_enum[time_format_to_user];
 }

@@ -16,6 +16,8 @@
 #include "ezlopi_core_log.h"
 #include "ezlopi_core_reset.h"
 #include "ezlopi_core_setting_commands.h"
+#include "ezlopi_core_wifi.h"
+#include "ezlopi_core_factory_info.h"
 
 #include "ezlopi_service_ble.h"
 #include "ezlopi_service_uart.h"
@@ -27,6 +29,7 @@
 #include "ezlopi_service_ws_server.h"
 #include "ezlopi_service_broadcast.h"
 #include "ezlopi_service_led_indicator.h"
+#include "ezlopi_service_system_temperature_sensor.h"
 
 #include "pt.h"
 #include "ezlopi_core_processes.h"
@@ -62,7 +65,9 @@ void app_main(void)
     ezlopi_service_gpioisr_init(); // this is time critical, Do not add to loop
 
     ezlopi_init();
-   
+
+    ezlopi_core_setting_commands_read_settings();
+
 #ifdef CONFIG_EZPI_ENABLE_UART_PROVISIONING
     EZPI_SERV_uart_init();
 #endif
@@ -70,24 +75,6 @@ void app_main(void)
 #if defined(CONFIG_EZPI_BLE_ENABLE)
     ezlopi_ble_service_init();
 #endif
-
-#if defined(CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER) || defined(CONFIG_EZPI_WEBSOCKET_CLIENT)
-    ezlopi_service_broadcast_init();
-#endif
-
-#if defined(CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER)
-    ezlopi_service_ws_server_start();
-#else  // CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER
-    ezlpi_service_ws_server_dummy();
-#endif // CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER
-
-#if defined(CONFIG_EZPI_WEBSOCKET_CLIENT)
-    ezlopi_service_web_provisioning_init();
-#endif
-
-#ifdef CONFIG_EZPI_ENABLE_OTA
-    ezlopi_service_ota_init();
-#endif // CONFIG_EZPI_ENABLE_OTA
 
 #if defined(CONFIG_EZPI_SERV_ENABLE_MODES)
     ezlopi_service_modes_init();
@@ -106,6 +93,25 @@ void app_main(void)
     xTaskCreate(__blinky, "blinky", EZLOPI_MAIN_BLINKY_TASK_DEPTH, NULL, tskIDLE_PRIORITY + 2, &ezlopi_main_blinky_task_handle);
     ezlopi_core_process_set_process_info(ENUM_EZLOPI_MAIN_BLINKY_TASK, &ezlopi_main_blinky_task_handle, EZLOPI_MAIN_BLINKY_TASK_DEPTH);
 #endif
+
+    ezlopi_wait_for_wifi_to_connect(portMAX_DELAY);
+#if defined(CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER) || defined(CONFIG_EZPI_WEBSOCKET_CLIENT)
+    ezlopi_service_broadcast_init();
+#endif
+
+#if defined(CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER)
+    ezlopi_service_ws_server_start();
+#else  // CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER
+    ezlpi_service_ws_server_dummy();
+#endif // CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER
+
+#if defined(CONFIG_EZPI_WEBSOCKET_CLIENT)
+    ezlopi_service_web_provisioning_init();
+#endif
+
+#ifdef CONFIG_EZPI_ENABLE_OTA
+    ezlopi_service_ota_init();
+#endif // CONFIG_EZPI_ENABLE_OTA
 }
 
 static void __blinky(void *pv)
@@ -120,8 +126,27 @@ static void __blinky(void *pv)
         uint32_t watermark_heap = esp_get_minimum_free_heap_size();
         TRACE_W("Free Heap Size: %d B     %.4f KB", free_heap, free_heap / 1024.0);
         TRACE_W("Heap Watermark: %d B     %.4f KB", watermark_heap, watermark_heap / 1024.0);
-        TRACE_I("----------------------------------------------");        
-        
+        TRACE_I("----------------------------------------------");
+
+        ezlopi_wifi_status_t *wifi_stat = ezlopi_wifi_status();
+        if (wifi_stat)
+        {
+            if (wifi_stat->wifi_connection == false)
+            {
+                char *ssid = ezlopi_factory_info_v3_get_ssid();
+                if (ssid)
+                {
+                    TRACE_E("Failed to connect to AP : %s, retrying ...", ssid);
+                    ezlopi_free(__FUNCTION__, ssid);
+                }
+                else
+                {
+                    TRACE_E("ERROR : WiFi Details not set !");
+                }
+            }
+            ezlopi_free(__FUNCTION__, wifi_stat);
+        }
+
         char cmd99_str[100] = {0};
         snprintf(cmd99_str, 100, "{\"cmd\":99,\"free_heap\":%d,\"heap_watermark\":%d}", free_heap, watermark_heap);
         EZPI_SERV_uart_tx_data(strlen(cmd99_str), (uint8_t *)cmd99_str);

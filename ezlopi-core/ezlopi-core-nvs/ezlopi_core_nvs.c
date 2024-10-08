@@ -183,7 +183,7 @@ char *ezlopi_nvs_read_scenes_expressions(void)
     return ezlopi_nvs_read_str(ezlopi_scenes_expression_ids);
 }
 
-int ezlopi_nvs_write_device_groups(char *data)
+ezlopi_error_t ezlopi_nvs_write_device_groups(char *data)
 {
     return ezlopi_nvs_write_str(data, strlen(data) + 1, ezlopi_device_groups_ids);
 }
@@ -193,7 +193,7 @@ char *ezlopi_nvs_read_device_groups(void)
     return ezlopi_nvs_read_str(ezlopi_device_groups_ids);
 }
 
-int ezlopi_nvs_write_item_groups(char *data)
+ezlopi_error_t ezlopi_nvs_write_item_groups(char *data)
 {
     return ezlopi_nvs_write_str(data, strlen(data) + 1, ezlopi_item_groups_ids);
 }

@@ -89,9 +89,9 @@ cJSON *generate_expression_node_in_cjson(s_ezlopi_expressions_t *exp_node);
  *
  * @param nvs_exp_id_key This is string of actual 'exp_id' to replace [must be in nvs_exp_list]
  * @param cj_updated_exp This 'cjson' is 'new_exp_node' to be stored in nvs
- * @return int
+ * @return ezlopi_error_t
  */
-int ezlopi_scenes_expressions_update_nvs(char *nvs_exp_id_key, cJSON *cj_updated_exp);
+ezlopi_error_t ezlopi_scenes_expressions_update_nvs(char *nvs_exp_id_key, cJSON *cj_updated_exp);
 
 /**
  * @brief This function returns expression with "targe_exp_name"
@@ -190,9 +190,9 @@ s_ezlopi_expressions_t *ezlopi_scenes_get_expression_node_by_name(char *expressi
  *
  * @param expression_node   The  'll_expression_node' containing 'target_exp_id' that indicated 'nvs_exp_target_id' to
  * @param cj_new_expression     cjson of the 'new_expn' which replace 'older_nvs_exp'
- * @return int
+ * @return ezlopi_error_t
  */
-int ezlopi_scenes_expression_update_expr(s_ezlopi_expressions_t *expression_node, cJSON *cj_new_expression);
+ezlopi_error_t ezlopi_scenes_expression_update_expr(s_ezlopi_expressions_t *expression_node, cJSON *cj_new_expression);
 
 #endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 

@@ -37,6 +37,8 @@ int dht22_sensor_read_data(uint32_t gpio_pin, dht22_sensor_t* data);
     DHT22 temperature sensor driver
 */
 
+#if (CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32S2)
+
 #define DHT_OK 0
 #define DHT_CHECKSUM_ERROR -1
 #define DHT_TIMEOUT_ERROR -2
@@ -49,5 +51,7 @@ int readDHT22();
 float getHumidity_dht22();
 float getTemperature_dht22();
 int dht22_getSignalLevel(int usTimeOut, bool state);
+
+#endif  // (CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32S2)
 
 #endif //__DHT22_H__

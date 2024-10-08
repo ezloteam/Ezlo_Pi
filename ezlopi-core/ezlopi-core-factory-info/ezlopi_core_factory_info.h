@@ -13,7 +13,6 @@ extern "C"
 
 #include "ezlopi_core_errors.h"
 
-
 #define EZLOPI_DEVICE_TYPE_TEST_DEVICE -1
 #define EZLOPI_DEVICE_TYPE_GENERIC 0
 
@@ -159,7 +158,7 @@ extern "C"
     int ezlopi_factory_info_v3_set_ssl_public_key(cJSON *cj_data);
     int ezlopi_factory_info_v3_set_ssl_private_key(cJSON *cj_data);
 
-    void ezlopi_factory_info_v3_free(void* arg);
+    void ezlopi_factory_info_v3_free(void *arg);
     ezlopi_error_t ezlopi_factory_info_v3_factory_reset(void);
 
     int ezlopi_factory_info_v3_scenes_factory_soft_reset(void);
@@ -170,6 +169,11 @@ extern "C"
 
 #elif (EZLOPI_DEVICE_TYPE_TEST_DEVICE == EZLOPI_DEVICE_TYPE)
 #if defined(CONFIG_IDF_TARGET_ESP32)
+
+static const char *ezlopi_config_test =
+    "{\"cmd\":3,\"dev_detail\":[{\"dev_type\":8,\"dev_name\":\"BME 280\",\"id_room\":\"\",\"id_item\":12,\"gpio_sda\":21,\"gpio_scl\":22,\"pullup_scl\":true,\"pullup_sda\":true,\"slave_addr\":118},{\"dev_type\":8,\"dev_name\":\"TSL2561_luminosity\",\"id_room\":\"\",\"id_item\":44,\"gpio_sda\":21,\"gpio_scl\":22,\"slave_addr\":57}],\"config_id\":\"1234567\",\"config_time\":1696508363,\"config_name\":\"My moisture sensor\",\"chipset\":\"ESP32\"}";
+// static const char * ezlopi_config_test = "{\"config_id\":1260701997,\"config_time\":1722516114,\"config_name\":\"Washing Machine Leak \",\"cmd\":4,\"dev_total\":2,\"dev_detail\":[{\"dev_type\":3,\"dev_name\":\"Washing Machine Leak Detector\",\"id_item\":27,\"id_room\":\"\",\"resln_bit\":10,\"gpio\":32,\"id\":\"83cd1aae-0a76-bf7e-1475-863ea1464607\",\"devType\":\"Analog Input\",\"device_id\":\"10e52000\"},{\"dev_type\":1,\"id_item\":2,\"dev_name\":\"Washing Machine Leak Buzzer\",\"gpio_in\":\"\",\"gpio_out\":2,\"pullup_ip\":false,\"pullup_op\":true,\"is_ip\":false,\"ip_inv\":false,\"op_inv\":false,\"val_ip\":false,\"val_op\":false,\"id\":\"bc44fa36-f5a5-1f80-54aa-f564210faf55\",\"devType\":\"Digital Output\",\"device_id\":\"10e52001\"}],\"chipset\":\"ESP32\"}";
+#elif defined(CONFIG_IDF_TARGET_ESP32S3)
 static const char *ezlopi_config_test =
     "{\
     \"cmd\":3,\
@@ -225,15 +229,12 @@ static const char *ezlopi_config_test =
     \"config_id\":\"1234567\",\
     \"config_time\":1696508363,\
     \"config_name\":\"My moisture sensor\",\
-    \"chipset\":\"ESP32\"\
+    \"chipset\":\"ESP32S3\"\
 }";
-// static const char * ezlopi_config_test = "{\"config_id\":1260701997,\"config_time\":1722516114,\"config_name\":\"Washing Machine Leak \",\"cmd\":4,\"dev_total\":2,\"dev_detail\":[{\"dev_type\":3,\"dev_name\":\"Washing Machine Leak Detector\",\"id_item\":27,\"id_room\":\"\",\"resln_bit\":10,\"gpio\":32,\"id\":\"83cd1aae-0a76-bf7e-1475-863ea1464607\",\"devType\":\"Analog Input\",\"device_id\":\"10e52000\"},{\"dev_type\":1,\"id_item\":2,\"dev_name\":\"Washing Machine Leak Buzzer\",\"gpio_in\":\"\",\"gpio_out\":2,\"pullup_ip\":false,\"pullup_op\":true,\"is_ip\":false,\"ip_inv\":false,\"op_inv\":false,\"val_ip\":false,\"val_op\":false,\"id\":\"bc44fa36-f5a5-1f80-54aa-f564210faf55\",\"devType\":\"Digital Output\",\"device_id\":\"10e52001\"}],\"chipset\":\"ESP32\"}";
-#elif defined(CONFIG_IDF_TARGET_ESP32S3)
-static const char *ezlopi_config_test = "{\"cmd\":3,\"dev_detail\":[{\"dev_type\":1,\"dev_name\":\"switch_temp\",\"id_room\":\"\",\"id_item\":2,\"gpio_in\":0,\"gpio_out\":2,\"pullup_ip\":false,\"pullup_op\":false,\"is_ip\":false,\"ip_inv\":false,\"op_inv\":false,\"val_ip\":false,\"val_op\":false},{\"dev_type\":1,\"dev_name\":\"Bulb\",\"id_room\":\"\",\"id_item\":1,\"gpio_in\":0,\"gpio_out\":3,\"pullup_ip\":false,\"pullup_op\":false,\"is_ip\":false,\"ip_inv\":false,\"op_inv\":false,\"val_ip\":false,\"val_op\":false},{\"dev_type\":7,\"dev_name\":\"DHT22_temp_humi\",\"id_room\":\"\",\"id_item\":16,\"gpio\":14}],\"config_id\":\"1234567\",\"config_time\":1696508363,\"config_name\":\"My moisture sensor\",\"chipset\":\"ESP32S3\"}";
 #elif defined(CONFIG_IDF_TARGET_ESP32S2)
-static const char *ezlopi_config_test = "{\"cmd\":3,\"dev_detail\":[{\"dev_type\":1,\"dev_name\":\"switch_temp\",\"id_room\":\"\",\"id_item\":2,\"gpio_in\":0,\"gpio_out\":2,\"pullup_ip\":false,\"pullup_op\":false,\"is_ip\":false,\"ip_inv\":false,\"op_inv\":false,\"val_ip\":false,\"val_op\":false},{\"dev_type\":1,\"dev_name\":\"Bulb\",\"id_room\":\"\",\"id_item\":1,\"gpio_in\":0,\"gpio_out\":3,\"pullup_ip\":false,\"pullup_op\":false,\"is_ip\":false,\"ip_inv\":false,\"op_inv\":false,\"val_ip\":false,\"val_op\":false},{\"dev_type\":7,\"dev_name\":\"DHT22_temp_humi\",\"id_room\":\"\",\"id_item\":16,\"gpio\":14}],\"config_id\":\"1234567\",\"config_time\":1696508363,\"config_name\":\"My moisture sensor\",\"chipset\":\"ESP32S2\"}";
+static const char *ezlopi_config_test = "{\"cmd\":3,\"dev_detail\":[{\"dev_type\":1,\"dev_name\":\"switch_temp\",\"id_room\":\"\",\"id_item\":2,\"gpio_in\":0,\"gpio_out\":2,\"pullup_ip\":false,\"pullup_op\":false,\"is_ip\":false,\"ip_inv\":false,\"op_inv\":false,\"val_ip\":false,\"val_op\":false},{\"dev_type\":1,\"dev_name\":\"Bulb\",\"id_room\":\"\",\"id_item\":1,\"gpio_in\":0,\"gpio_out\":3,\"pullup_ip\":false,\"pullup_op\":false,\"is_ip\":false,\"ip_inv\":false,\"op_inv\":false,\"val_ip\":false,\"val_op\":false},{\"dev_type\":7,\"dev_name\":\"DHT22_temp_humi\",\"id_room\":\"\",\"id_item\":16,\"gpio\":1}],\"config_id\":\"1234567\",\"config_time\":1696508363,\"config_name\":\"My moisture sensor\",\"chipset\":\"ESP32S2\"}";
 #elif defined(CONFIG_IDF_TARGET_ESP32C3)
-static const char *ezlopi_config_test = "{\"cmd\":3,\"dev_detail\":[{\"dev_type\":1,\"dev_name\":\"switch_temp\",\"id_room\":\"\",\"id_item\":2,\"gpio_in\":0,\"gpio_out\":25,\"pullup_ip\":false,\"pullup_op\":false,\"is_ip\":false,\"ip_inv\":false,\"op_inv\":false,\"val_ip\":false,\"val_op\":false},{\"dev_type\":7,\"dev_name\":\"temp_humi\",\"id_room\":\"\",\"id_item\":16,\"gpio\":12}],\"config_id\":\"1234567\",\"config_time\":1696508363,\"config_name\":\"My moisture sensor\",\"chipset\":\"ESP32C3\"}";
+static const char *ezlopi_config_test = "{\"cmd\":3,\"dev_detail\":[],\"config_id\":\"1234567\",\"config_time\":1696508363,\"config_name\":\"My moisture sensor\",\"chipset\":\"ESP32C3\"}";
 #endif
 #endif
 

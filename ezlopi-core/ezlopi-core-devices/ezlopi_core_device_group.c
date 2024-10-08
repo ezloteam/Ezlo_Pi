@@ -337,11 +337,11 @@ static int __edit_and_update_ll_itemgrp_by_id(uint32_t itemgrp_id, cJSON *cj_ite
  *
  * @param cj_grp_new 'new_grp' in cjson format
  * @param _id Target nvs '_id'.
- * @return int
+ * @return ezlopi_error_t
  */
-static int __edit_group_and_store_updated_to_nvs(uint32_t _id, cJSON *cj_grp_new)
+static ezlopi_error_t __edit_group_and_store_updated_to_nvs(uint32_t _id, cJSON *cj_grp_new)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
     if (cj_grp_new && _id)
     {
         char grp_id_str[32];
@@ -849,7 +849,7 @@ int ezlopi_core_device_group_edit_by_id(uint32_t devgrp_id, cJSON *cj_devgrp_new
     {
         if (1 == __edit_and_update_ll_devgrp_by_id(devgrp_id, tmp_updated_cj)) // modifies the ll-node with, 'devgrp_id'
         {
-            if (1 == __edit_group_and_store_updated_to_nvs(devgrp_id, tmp_updated_cj))
+            if (EZPI_SUCCESS == __edit_group_and_store_updated_to_nvs(devgrp_id, tmp_updated_cj))
             {
                 ret = 1;
             }
@@ -869,7 +869,7 @@ int ezlopi_core_item_group_edit_by_id(uint32_t itemgrp_id, cJSON *cj_itemgrp_new
     {
         if (1 == __edit_and_update_ll_itemgrp_by_id(itemgrp_id, cj_itemgrp_new)) // modifies the ll-node with, 'itemgrp_id'
         {
-            if (1 == __edit_group_and_store_updated_to_nvs(itemgrp_id, tmp_updated_cj))
+            if (EZPI_SUCCESS == __edit_group_and_store_updated_to_nvs(itemgrp_id, tmp_updated_cj))
             {
                 ret = 1;
             }
@@ -1015,7 +1015,7 @@ static uint32_t __store_new_grp_in_nvs(cJSON *cj_new_grp, bool choice_of_trigger
 
         if (new_grp_str)
         {
-            if (ezlopi_nvs_write_str(new_grp_str, strlen(new_grp_str) + 1, grp_id_str)) // writes to nvs as --> '0xC002e....'
+            if (EZPI_SUCCESS == ezlopi_nvs_write_str(new_grp_str, strlen(new_grp_str) + 1, grp_id_str)) // writes to nvs as --> '0xC002e....'
             {
                 bool free_Grp_id_list_str = 1;
                 char *grp_id_list_str = (choice_of_trigger) ? ezlopi_nvs_read_item_groups() : ezlopi_nvs_read_device_groups();

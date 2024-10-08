@@ -60,7 +60,6 @@ static int __compare_item_values(l_ezlopi_item_t* curr_item, l_fields_v2_t* valu
                 }
                 break;
             }
-            #warning "";
             default:
             {
                 TRACE_E("Value type mis-matched!");

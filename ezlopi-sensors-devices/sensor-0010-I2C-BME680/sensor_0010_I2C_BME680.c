@@ -81,6 +81,7 @@ static void __prepare_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, 
     {
         item->is_user_arg_unique = true;
         item->interface.i2c_master.enable = true;
+        item->interface.i2c_master.channel = I2C_NUM_0;
         item->interface.i2c_master.clock_speed = 100000;
         CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_scl_str, item->interface.i2c_master.scl);
         CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_sda_str, item->interface.i2c_master.sda);
@@ -115,8 +116,7 @@ static ezlopi_error_t __prepare(void *arg)
                     temperature_item->cloud_properties.item_name = ezlopi_item_name_temp;
                     temperature_item->cloud_properties.value_type = value_type_temperature;
 
-                    e_enum_temperature_scale_t scale_to_use = ezlopi_core_setting_get_temperature_scale();
-                    temperature_item->cloud_properties.scale = (scale_to_use == TEMPERATURE_SCALE_CELSIUS) ? scales_celsius : scales_fahrenheit;
+                    temperature_item->cloud_properties.scale = ezlopi_core_setting_get_temperature_scale_str();
                     __prepare_cloud_properties(temperature_item, cj_device, user_data);
                 }
 
@@ -135,8 +135,6 @@ static ezlopi_error_t __prepare(void *arg)
                     TRACE_I("Child_pressure_device-[0x%x] ", child_pressure_device->cloud_properties.device_id);
                     child_pressure_device->cloud_properties.category = category_level_sensor;
                     __prepare_device_cloud_properties(child_pressure_device, cj_device);
-
-                    child_pressure_device->cloud_properties.parent_device_id = parent_temp_humid_device->cloud_properties.device_id;
 
                     l_ezlopi_item_t *pressure_item = ezlopi_device_add_item_to_device(child_pressure_device, sensor_0010_I2C_BME680);
                     if (pressure_item)
@@ -160,8 +158,6 @@ static ezlopi_error_t __prepare(void *arg)
                     child_aqi_device->cloud_properties.category = category_level_sensor;
                     __prepare_device_cloud_properties(child_aqi_device, cj_device);
 
-                    child_aqi_device->cloud_properties.parent_device_id = parent_temp_humid_device->cloud_properties.device_id;
-
                     l_ezlopi_item_t *aqi_item = ezlopi_device_add_item_to_device(child_aqi_device, sensor_0010_I2C_BME680);
                     if (aqi_item)
                     {
@@ -184,8 +180,6 @@ static ezlopi_error_t __prepare(void *arg)
                     child_altitude_device->cloud_properties.category = category_level_sensor;
                     __prepare_device_cloud_properties(child_altitude_device, cj_device);
 
-                    child_altitude_device->cloud_properties.parent_device_id = parent_temp_humid_device->cloud_properties.device_id;
-
                     l_ezlopi_item_t *altitude_item = ezlopi_device_add_item_to_device(child_altitude_device, sensor_0010_I2C_BME680);
                     if (altitude_item)
                     {
@@ -207,8 +201,6 @@ static ezlopi_error_t __prepare(void *arg)
                     TRACE_I("Child_co2_device-[0x%x] ", child_co2_device->cloud_properties.device_id);
                     child_co2_device->cloud_properties.category = category_level_sensor;
                     __prepare_device_cloud_properties(child_co2_device, cj_device);
-
-                    child_co2_device->cloud_properties.parent_device_id = parent_temp_humid_device->cloud_properties.device_id;
 
                     l_ezlopi_item_t *co2_item = ezlopi_device_add_item_to_device(child_co2_device, sensor_0010_I2C_BME680);
                     if (co2_item)
@@ -330,12 +322,12 @@ static ezlopi_error_t __notify(l_ezlopi_item_t *item)
             float altitude = user_data->altitude;
             float co2_eqv = user_data->co2_equivalent;
 
-            if(true == bme680_get_data(user_data))
+            if (true == bme680_get_data(user_data))
             {
                 if (ezlopi_item_name_temp == item->cloud_properties.item_name)
                 {
+                    item->cloud_properties.scale = ezlopi_core_setting_get_temperature_scale_str();
                     e_enum_temperature_scale_t scale_to_use = ezlopi_core_setting_get_temperature_scale();
-                    item->cloud_properties.scale = (TEMPERATURE_SCALE_FAHRENHEIT == scale_to_use) ? scales_fahrenheit : scales_celsius;
                     if (TEMPERATURE_SCALE_FAHRENHEIT == scale_to_use)
                     {
                         user_data->temperature = (user_data->temperature * (9.0f / 5.0f)) + 32.0f;
