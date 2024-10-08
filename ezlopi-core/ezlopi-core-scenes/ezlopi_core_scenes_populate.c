@@ -22,11 +22,13 @@ void ezlopi_scenes_populate_scene(l_scenes_list_v2_t *new_scene, cJSON *cj_scene
         CJSON_GET_VALUE_BOOL(cj_scene, ezlopi_is_group_str, new_scene->is_group);
 
         {
-            CJSON_GET_VALUE_STRING_BY_COPY(cj_scene, ezlopi_group_id_str, new_scene->group_id);
-            if ((NULL != new_scene->group_id) && (0 < strlen(new_scene->group_id)))
+            char tmp_grp_id[32] = {0};
+            CJSON_GET_VALUE_STRING_BY_COPY(cj_scene, ezlopi_group_id_str, tmp_grp_id);
+            if (0 < strlen(tmp_grp_id))
             {
-                TRACE_S("group_id: %s", new_scene->group_id);
-                ezlopi_cloud_update_group_id((uint32_t)strtoul(new_scene->group_id, NULL, 16));
+                new_scene->group_id = (uint32_t)strtoul(tmp_grp_id, NULL, 16);
+                TRACE_S("group_id: %08x", new_scene->group_id);
+                ezlopi_cloud_update_group_id(new_scene->group_id);
             }
         }
 
@@ -297,17 +299,39 @@ void ezlopi_scenes_populate_assign_when_block(l_when_block_v2_t *new_when_block,
             TRACE_D("blockEnable (edit): %d", new_when_block->block_enable);
         }
 
-        CJSON_GET_VALUE_STRING_BY_COPY(cj_when_block, ezlopi_blockName_str, new_when_block->blockName);
-        if (NULL != new_when_block->blockName && (0 < strlen(new_when_block->blockName)))
         {
-            TRACE_D("blockName (edit): %s ", new_when_block->blockName);
+            if (NULL == new_when_block->when_grp)
+            {
+                new_when_block->when_grp = ezlopi_malloc(__FUNCTION__, sizeof(l_group_block_type_t));
+            }
+            if (new_when_block->when_grp)
+            {
+                memset(new_when_block->when_grp, 0, sizeof(l_group_block_type_t));
+                CJSON_GET_VALUE_STRING_BY_COPY(cj_when_block, ezlopi_blockName_str, new_when_block->when_grp->grp_blockName);
+                if (0 < strlen(new_when_block->when_grp->grp_blockName))
+                {
+                    TRACE_D("group_blockName (edit): %s ", new_when_block->when_grp->grp_blockName);
+                }
+
+                char grp_id_str[32] = {0};
+                CJSON_GET_VALUE_STRING_BY_COPY(cj_when_block, ezlopi_group_id_str, grp_id_str);
+                if (0 < strlen(grp_id_str))
+                {
+                    new_when_block->when_grp->grp_id = (uint32_t)strtoul(grp_id_str, NULL, 16);
+                    TRACE_D("group_blockId (edit): %08x ", new_when_block->when_grp->grp_id);
+                }
+            }
         }
 
-        CJSON_GET_VALUE_STRING_BY_COPY(cj_when_block, ezlopi_blockId_str, new_when_block->blockId);
-        if (NULL != new_when_block->blockId && (0 < strlen(new_when_block->blockName)))
         {
-            TRACE_D("blockId (edit): %s", new_when_block->blockId);
-            ezlopi_cloud_update_when_blockId((uint32_t)strtoul(new_when_block->blockId, NULL, 16));
+            char tmp_block_id[32] = {0};
+            CJSON_GET_VALUE_STRING_BY_COPY(cj_when_block, ezlopi_blockId_str, tmp_block_id);
+            if (0 < strlen(tmp_block_id))
+            {
+                new_when_block->blockId = (uint32_t)strtoul(tmp_block_id, NULL, 16);
+                TRACE_D("blockId (edit): %08x", new_when_block->blockId);
+                ezlopi_cloud_update_when_blockId(new_when_block->blockId);
+            }
         }
 
         cJSON *cj_block_options = cJSON_GetObjectItem(__FUNCTION__, cj_when_block, ezlopi_blockOptions_str);
