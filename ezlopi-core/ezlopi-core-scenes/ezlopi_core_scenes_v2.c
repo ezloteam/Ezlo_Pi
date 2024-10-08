@@ -2008,34 +2008,6 @@ int ezlopi_core_scenes_get_time_list(cJSON *cj_scenes_array)
     int ret = 0;
     if (cj_scenes_array)
     {
-#if 0
-        // char *scenes_ids = ezlopi_nvs_scene_get_v2();
-        // if (scenes_ids)
-        // {
-        //     cJSON *cj_scenes_ids = cJSON_Parse(__FUNCTION__, scenes_ids);
-        //     if (cj_scenes_ids)
-        //     {
-        //         int idx = 0;
-        //         cJSON *cj_scene_id = NULL;
-        //         while (NULL != (cj_scene_id = cJSON_GetArrayItem(cj_scenes_ids, idx)))
-        //         {
-        //             if (cj_scene_id && cj_scene_id->valuedouble)
-        //             {
-        //                 // get the corresponding scene for ll
-        //                 l_scenes_list_v2_t *curr_scene = ezlopi_scenes_get_by_id_v2((uint32_t)cj_scene_id->valuedouble);
-        //                 if (curr_scene)
-        //                 {
-        //                     // extract the method-name and enum from ll
-        //                     __get_time_category_method_name(cj_scenes_array, curr_scene, curr_scene->when_block); // return first found time-related method_name for now [need additions]
-        //                 }
-        //             }
-        //             idx++;
-        //         }
-        //         cJSON_Delete(__FUNCTION__, cj_scenes_ids);
-        //     }
-        //     ezlopi_free(__FUNCTION__, scenes_ids);
-        // }
-#endif
         // get the corresponding scene for ll
         l_scenes_list_v2_t *curr_scene = scenes_list_head_v2;
         while (curr_scene)
@@ -2111,7 +2083,7 @@ static l_when_block_v2_t *___get_group_when_blocks(l_when_block_v2_t *curr_when_
             }
             else
             {
-                TRACE_E(" Invalid !! , Empty  AND/OR/NOT operation.");
+                // TRACE_E(" Invalid !! , Empty  AND/OR/NOT operation.");
             }
         }
     }
@@ -2120,7 +2092,8 @@ static l_when_block_v2_t *___get_group_when_blocks(l_when_block_v2_t *curr_when_
 }
 l_when_block_v2_t *ezlopi_core_scene_get_group_block(uint32_t scene_id, uint32_t group_id)
 {
-    l_when_block_v2_t *ret = 0;
+    l_when_block_v2_t *ret = NULL;
+
     l_scenes_list_v2_t *scene_node = ezlopi_scenes_get_by_id_v2(scene_id);
     if (scene_node)
     {
@@ -2134,7 +2107,7 @@ l_when_block_v2_t *ezlopi_core_scene_get_group_block(uint32_t scene_id, uint32_t
                 f_scene_method_v2_t scene_method = ezlopi_scene_get_method_v2(found_matched_block->block_options.method.type);
                 if (scene_method)
                 {
-                    found_matched_block->when_grp->grp_state = (bool)scene_method(scene_node, (void *)found_matched_block);
+                    found_matched_block->when_grp->grp_state = (bool)(scene_method(scene_node, (void *)found_matched_block));
                     ret = found_matched_block;
                 }
                 break;

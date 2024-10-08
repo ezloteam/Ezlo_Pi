@@ -496,7 +496,7 @@ static void __cjson_add_fields(cJSON *cj_block, l_fields_v2_t *fields)
                                 }
                                 curr_when_block = curr_when_block->next;
                             }
-                            CJSON_TRACE(ezlopi_value_str, value_block_array);
+                            // CJSON_TRACE(ezlopi_value_str, value_block_array);
                         }
                         break;
                     }

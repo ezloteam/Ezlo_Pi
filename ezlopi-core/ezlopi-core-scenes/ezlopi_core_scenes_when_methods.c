@@ -905,7 +905,7 @@ int ezlopi_scene_when_is_group_state(l_scenes_list_v2_t *scene_node, void *arg)
                 if (EZLOPI_VALUE_TYPE_SCENEID == curr_field->value_type && (NULL != curr_field->field_value.u_value.value_string))
                 {
                     scene_id = (uint32_t)strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
-                    TRACE_D("scene_id : %08x", scene_id);
+                    // TRACE_D("scene_id : %08x", scene_id);
                 }
             }
             else if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "group", strlen(curr_field->name), 6))
@@ -913,7 +913,7 @@ int ezlopi_scene_when_is_group_state(l_scenes_list_v2_t *scene_node, void *arg)
                 if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != curr_field->field_value.u_value.value_string))
                 {
                     group_id = (uint32_t)strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
-                    TRACE_D("group_id : %08x", group_id);
+                    // TRACE_D("group_id : %08x", group_id);
                 }
             }
             else if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "state", strlen(curr_field->name), 6))
@@ -921,21 +921,18 @@ int ezlopi_scene_when_is_group_state(l_scenes_list_v2_t *scene_node, void *arg)
                 if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != curr_field->field_value.u_value.value_string))
                 {
                     state_str = curr_field->field_value.u_value.value_string;
-                    TRACE_D("state_str : %s", state_str);
+                    // TRACE_D("state_str : %s", state_str);
                 }
             }
             curr_field = curr_field->next;
         }
 
-        if (scene_id && group_id && state_str)
+        if ((0 < scene_id) && (0 < group_id) && (NULL != state_str))
         {
             // 1. find the 'when-grp-block'
-            l_when_block_v2_t *curr_grp_block = NULL;
-
-            // 2. check the state of the 'when-grp-block'
+            l_when_block_v2_t *curr_grp_block = ezlopi_core_scene_get_group_block(scene_id, group_id);
             if (curr_grp_block)
             {
-                
                 if (EZPI_STRNCMP_IF_EQUAL(state_str, "true", strlen(state_str), 5))
                 {
                     ret = (curr_grp_block->when_grp->grp_state == true);
@@ -952,7 +949,7 @@ int ezlopi_scene_when_is_group_state(l_scenes_list_v2_t *scene_node, void *arg)
                     }
                     scene_node->when_block->fields->user_arg = (void *)curr_grp_block->when_grp->grp_state; // new state
                 }
-                TRACE_D("isgroupState__ret :%d", ret);
+                // TRACE_S("isgroupState__ret :%d", ret);
             }
         }
     }
