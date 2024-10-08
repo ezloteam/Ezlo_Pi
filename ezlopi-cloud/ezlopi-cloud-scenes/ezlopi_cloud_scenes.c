@@ -387,6 +387,8 @@ void scenes_time_list(cJSON *cj_request, cJSON *cj_response)
     }
 }
 
+
+
 void scenes_house_modes_set(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str); // For NULL Broadcast

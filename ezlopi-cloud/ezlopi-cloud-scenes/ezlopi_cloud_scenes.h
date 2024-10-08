@@ -25,6 +25,7 @@ extern "C"
     void scenes_notification_remove(cJSON *cj_request, cJSON *cj_response);
     void scenes_room_set(cJSON *cj_request, cJSON *cj_response);
     void scenes_time_list(cJSON *cj_request, cJSON *cj_response);
+    void scenes_trigger_device_list(cJSON *cj_request, cJSON *cj_response);
     void scenes_block_enabled_set(cJSON *cj_request, cJSON *cj_response);
     void scenes_house_modes_set(cJSON *cj_request, cJSON *cj_response);
     void scenes_action_block_test(cJSON *cj_request, cJSON *cj_response);
