@@ -90,6 +90,7 @@ esp_websocket_client_handle_t ezlopi_websocket_client_init(cJSON* uri, void (*ms
             .pingpong_timeout_sec = EZPI_CORE_WSS_PING_PONG_TIMEOUT_SEC,
             .keep_alive_enable = 1,
             .ping_interval_sec = EZPI_CORE_WSS_PING_INTERVAL_SEC,
+            .task_prio  = configMAX_PRIORITIES - 1,
         };
 
         TRACE_S("Connecting to %s...", websocket_cfg.uri);

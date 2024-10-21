@@ -85,7 +85,7 @@ void ezlopi_service_loop_init(void)
 {
     TaskHandle_t ezlopi_service_timer_task_handle = NULL;
     // xTaskCreate(event_process, "event_process", EZLOPI_SERVICE_TIMER_TASK_DEPTH, NULL, 4, &ezlopi_service_timer_task_handle);
-    xTaskCreate(__loop, "__loop", EZLOPI_SERVICE_LOOP_TASK_DEPTH, NULL, 4, &ezlopi_service_timer_task_handle);
+    xTaskCreate(__loop, "__loop", EZLOPI_SERVICE_LOOP_TASK_DEPTH, NULL, configMAX_PRIORITIES - 1, &ezlopi_service_timer_task_handle);
     ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_LOOP_TASK, &ezlopi_service_timer_task_handle, EZLOPI_SERVICE_LOOP_TASK_DEPTH);
 }
 

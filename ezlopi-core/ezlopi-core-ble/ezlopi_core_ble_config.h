@@ -59,7 +59,7 @@ typedef struct s_gatt_service
     struct s_gatt_char* characteristics;
     struct s_gatt_service* next;
 } s_gatt_service_t;
-
+    
 #endif  // CONFIG_EZPI_BLE_ENABLE
 
 #endif // _EZLOPI_CORE_BLE_CONFIG_H_
