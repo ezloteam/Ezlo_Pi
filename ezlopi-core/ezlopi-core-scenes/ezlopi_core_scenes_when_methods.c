@@ -206,6 +206,11 @@ int ezlopi_scene_when_is_item_state_changed(l_scenes_list_v2_t *scene_node, void
         l_fields_v2_t *finish_field = NULL;
 
         l_fields_v2_t *curr_field = when_block->fields;
+
+        uint8_t state_to_check = 0;
+        const uint8_t check_start_value_as = (1 << 0);
+        const uint8_t check_end_value_as = (1 << 1);
+
         while (curr_field)
         {
             if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "item", strlen(curr_field->name), 5))
@@ -222,52 +227,87 @@ int ezlopi_scene_when_is_item_state_changed(l_scenes_list_v2_t *scene_node, void
                     item_exp_field = curr_field;
                 }
             }
-            else if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "start", strlen(curr_field->name), 6))
+            else if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "start", strlen(curr_field->name), 6)) // this indicates the item/expression must have the "prev-val == start_field"
             {
                 if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != (curr_field->field_value.u_value.value_string)))
                 {
+                    state_to_check |= check_start_value_as;
                     start_field = curr_field;
                 }
             }
 
-            else if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "finish", strlen(curr_field->name), 7))
+            else if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "finish", strlen(curr_field->name), 7)) // this indicates the item/expression must have the "new-val == finish_field"
             {
                 if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != (curr_field->field_value.u_value.value_string)))
                 {
+                    state_to_check |= check_end_value_as;
                     finish_field = curr_field;
                 }
             }
             curr_field = curr_field->next;
         }
 
-        if (start_field && finish_field && item_exp_field) // only for item_value 'string comparisions'
+        if (item_exp_field)
         {
-            //  BIT0 --> for start condition / BIT1 --> for finish conditon
-            uint32_t last_update = (uint32_t)scene_node->when_block->fields->user_arg;
-
-            #warning "check for 'any' field-values"
+            if (EZLOPI_VALUE_TYPE_EXPRESSION == item_exp_field->value_type) // EXPRESSION
             {
-                uint32_t flag = ezlopi_scene_compare_is_item_state_changed(item_exp_field, start_field, finish_field, last_update);
+                s_ezlopi_expressions_t *curr_expr_left = ezlopi_scenes_get_expression_node_by_name(item_exp_field->field_value.u_value.value_string);
+                if (curr_expr_left)
                 {
-                    uint32_t final_result = (last_update | flag);
-                    if (final_result & ((1 << 0) | (1 << 1)))   // if both the condition are satisfied
-                    {
-                        if (!(final_result & (1 << 2))) // if BIT2 --> not activated ; then return 1.
-                        {
-                            scene_node->when_block->fields->user_arg = (uint32_t)(final_result | (1 << 2)); // set the activation flag
-                            ret = 1;
-                        }
-                    }
-                    else    // when one/both condition fail
-                    {
-                        if (final_result & (1 << 2)) // but, BIT2 --> is activated ; reset the bit
-                        {
-                            scene_node->when_block->fields->user_arg = (uint32_t)(final_result | (0 << 2)); // reset the activation flag
-                        }
-                    }
-
+                   
                 }
             }
+            else // ITEM
+            {
+                uint32_t item_id = strtoul(item_exp_field->field_value.u_value.value_string, NULL, 16);
+                l_ezlopi_item_t *item_left = ezlopi_device_get_item_by_id(item_id);
+                if (item_left)
+                {
+                    value_type_field->field_value.u_value.value_string = item_left->cloud_properties.value_type;
+                }
+            }
+
+            //
+            if (NULL == scene_node->when_block->fields->user_arg)
+            {
+                s_item_exp_data_t *new = ezlopi_malloc(__FUNCTION__, sizeof(s_item_exp_data_t));
+                if (new)
+                {
+                    memset(new, 0, sizeof(s_item_exp_data_t));
+
+                    // populate the new data
+                    scene_node->when_block->fields->user_arg = (void *);
+                }
+            }
+
+            switch (state_to_check)
+            {
+            case (1 << 0) | (1 << 1): // indicates the values are given
+            {
+
+                break;
+            }
+            case (1 << 0): // indicates the value for only start is given
+            {              /* code */
+                break;
+            }
+            case (1 << 1): // indicates the value for only end is given
+            {              /* code */
+                break;
+            }
+            default:
+            {
+                break;
+            }
+            }
+
+            // 1. get the item or expression node
+
+            // 2. store the new values into structure and shift the prev to old dataType
+
+            // 3. Compare the pattern with 'any' to 'value' (the value type is always same )
+
+            // 4.
         }
     }
     return ret;
@@ -330,7 +370,7 @@ int ezlopi_scene_when_is_sun_state(l_scenes_list_v2_t *scene_node, void *arg)
                 if (0 == strncmp(__issunstate_field[i].field_name, curr_field->name, strlen(__issunstate_field[i].field_name) + 1))
                 {
                     flag_check |= (__issunstate_field[i].field_func)(scene_node, curr_field, info, ((0 == i) ? 1 : (1 == i) ? 2
-                        : 0));
+                                                                                                                            : 0));
                     break;
                 }
             }
@@ -519,7 +559,7 @@ int ezlopi_scene_when_is_date_range(l_scenes_list_v2_t *scene_node, void *arg)
             }
 
             // Check for time,day,month and year validity
-            uint8_t(*isdate_range_check_flags[])(struct tm *start, struct tm *end, struct tm *info) = {
+            uint8_t (*isdate_range_check_flags[])(struct tm *start, struct tm *end, struct tm *info) = {
                 isdate_range_check_tm,
                 isdate_range_check_day,
                 isdate_range_check_month,
@@ -701,11 +741,11 @@ int ezlopi_scene_when_is_house_mode_alarm_phase_range(l_scenes_list_v2_t *scene_
                 {
                     s_ezlopi_modes_t *curr_mode = ezlopi_core_modes_get_custom_modes();
 
-                    phase_name = (EZLOPI_MODES_ALARM_PHASE_IDLE == curr_mode->alarmed.phase) ? "idle"
-                        : (EZLOPI_MODES_ALARM_PHASE_BYPASS == curr_mode->alarmed.phase) ? "bypass"
-                        : (EZLOPI_MODES_ALARM_PHASE_ENTRYDELAY == curr_mode->alarmed.phase) ? "entryDelay"
-                        : (EZLOPI_MODES_ALARM_PHASE_MAIN == curr_mode->alarmed.phase) ? "main"
-                        : "null";
+                    phase_name = (EZLOPI_MODES_ALARM_PHASE_IDLE == curr_mode->alarmed.phase)         ? "idle"
+                                 : (EZLOPI_MODES_ALARM_PHASE_BYPASS == curr_mode->alarmed.phase)     ? "bypass"
+                                 : (EZLOPI_MODES_ALARM_PHASE_ENTRYDELAY == curr_mode->alarmed.phase) ? "entryDelay"
+                                 : (EZLOPI_MODES_ALARM_PHASE_MAIN == curr_mode->alarmed.phase)       ? "main"
+                                                                                                     : "null";
 
                     // TRACE_D(" req_mode : %s vs mode : %s ", curr_field->field_value.u_value.value_string, phase_name);
                     if (EZPI_STRNCMP_IF_EQUAL(curr_field->field_value.u_value.value_string, phase_name, strlen(curr_field->field_value.u_value.value_string), strlen(phase_name)))
@@ -823,7 +863,7 @@ int ezlopi_scene_when_is_device_state(l_scenes_list_v2_t *scene_node, void *arg)
                 s_ezlopi_cloud_controller_t *controller_info = ezlopi_device_get_controller_information();
                 if (controller_info)
                 {
-                    #warning "we need to change from 'controller' to 'device_id' specific";
+#warning "we need to change from 'controller' to 'device_id' specific";
                     ret = ((value_armed == controller_info->armed) ? 1 : 0) && ((value_reachable == controller_info->service_notification) ? 1 : 0);
                 }
             }
@@ -845,7 +885,7 @@ int ezlopi_scene_when_is_device_state(l_scenes_list_v2_t *scene_node, void *arg)
                         s_ezlopi_cloud_controller_t *controller_info = ezlopi_device_get_controller_information();
                         if (controller_info)
                         {
-                            #warning "we need to change from 'controller' to 'device_id' specific";
+#warning "we need to change from 'controller' to 'device_id' specific";
                             ret = ((value_armed == controller_info->armed) ? 1 : 0) && ((value_reachable == controller_info->service_notification) ? 1 : 0);
                         }
                     }
@@ -944,7 +984,7 @@ int ezlopi_scene_when_is_scene_state(l_scenes_list_v2_t *scene_node, void *arg)
                     {
                         ret = (EZLOPI_SCENE_STATUS_STOPPED == curr_scene->status) ? 1 : 0;
                     }
-                    #warning "need to add 'FAILED' status for scene";
+#warning "need to add 'FAILED' status for scene";
                     // else if (EZPI_STRNCMP_IF_EQUAL("failed", tmp_str, 7,strlen(tmp_str)))
                     // {
                     //     ret = (false == curr_scene->enabled)? 1:0;

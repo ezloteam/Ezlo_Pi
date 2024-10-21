@@ -99,8 +99,8 @@ typedef struct s_field_value
 typedef struct l_fields_v2
 {
     char name[32];
-    e_scene_value_type_v2_t value_type; // 0: double, 1: string
     s_field_value_t field_value;
+    e_scene_value_type_v2_t value_type; // 0: double, 1: string
     char *scale;
     void *user_arg; // used by when-methods
     struct l_fields_v2 *next;
