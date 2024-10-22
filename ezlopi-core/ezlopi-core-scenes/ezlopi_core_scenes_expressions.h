@@ -188,11 +188,21 @@ s_ezlopi_expressions_t *ezlopi_scenes_get_expression_node_by_name(char *expressi
 /**
  * @brief This function replaces the 'old_nvs_exp' with 'new_nvs_exp'
  *
- * @param expression_node   The  'll_expression_node' containing 'target_exp_id' that indicated 'nvs_exp_target_id' to
+ * @param expression_node   The 'll_expression_node' containing 'target_exp_id' that indicated 'nvs_exp_target_id' to
  * @param cj_new_expression     cjson of the 'new_expn' which replace 'older_nvs_exp'
  * @return ezlopi_error_t
  */
 ezlopi_error_t ezlopi_scenes_expression_update_expr(s_ezlopi_expressions_t *expression_node, cJSON *cj_new_expression);
+
+/**
+ * @brief This function is only used to evaluate expression for 'isItemStateChange when-method'
+ * 
+ * @param cj_des  This contains result-values 
+ * @param exp_name Name of the expression
+ * @param exp_code Expression Code to execute
+ * @return int 
+ */
+int ezlopi_scenes_expression_simple(cJSON *cj_des, const char *exp_name, const char *exp_code);
 
 #endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 

@@ -235,7 +235,6 @@ int ezlopi_scene_when_is_item_state_changed(l_scenes_list_v2_t *scene_node, void
                     start_field = curr_field;
                 }
             }
-
             else if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "finish", strlen(curr_field->name), 7)) // this indicates the item/expression must have the "new-val == finish_field"
             {
                 if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != (curr_field->field_value.u_value.value_string)))
@@ -249,65 +248,72 @@ int ezlopi_scene_when_is_item_state_changed(l_scenes_list_v2_t *scene_node, void
 
         if (item_exp_field)
         {
-            if (EZLOPI_VALUE_TYPE_EXPRESSION == item_exp_field->value_type) // EXPRESSION
+            // storing the new structure into 'user_arg'
+            s_item_exp_data_t *  new_extract_data = ezlopi_malloc(__FUNCTION__, sizeof(s_item_exp_data_t));
+            if (new_extract_data)
             {
-                s_ezlopi_expressions_t *curr_expr_left = ezlopi_scenes_get_expression_node_by_name(item_exp_field->field_value.u_value.value_string);
-                if (curr_expr_left)
+                memset(new_extract_data, 0, sizeof(s_item_exp_data_t));
+
+
+
+                // extract the values from expression or item
+                if (EZLOPI_VALUE_TYPE_EXPRESSION == item_exp_field->value_type) // EXPRESSION
                 {
-                   
+                    new_extract_data->value_type = 
+                    s_ezlopi_expressions_t *curr_expr_left = ezlopi_scenes_get_expression_node_by_name(item_exp_field->field_value.u_value.value_string);
+                    if (curr_expr_left)
+                    {
+                        // evaluate expression
+                        if (curr_expr_left->variable)
+                        {
+                            switch (curr_expr_left->exp_value.type) // the main value type to consider when comparing
+                            {
+                            case EXPRESSION_VALUE_TYPE_STRING:
+                            {
+                                new_extract_data.
+                                    // cJSON_AddStringToObject(__FUNCTION__, cj_expr_des, ezlopi_value_str, curr_expr_left->exp_value.u_value.str_value);
+                                    break;
+                            }
+                            case EXPRESSION_VALUE_TYPE_BOOL:
+                            {
+                                // cJSON_AddBoolToObject(__FUNCTION__, cj_expr_des, ezlopi_value_str, curr_expr_left->exp_value.u_value.boolean_value);
+                                break;
+                            }
+                            case EXPRESSION_VALUE_TYPE_NUMBER:
+                            {
+                                // cJSON_AddNumberToObject(__FUNCTION__, cj_expr_des, ezlopi_value_str, curr_expr_left->exp_value.u_value.number_value);
+                                break;
+                            }
+                            default:
+                                break;
+                            }
+
+                        }
+                        else
+                        {
+
+                            cJSON *cj_expr_des = cJSON_CreateObject(__FUNCTION__);
+                            if (cj_expr_des)
+                            {
+
+                            }
+                        }
+
+
+                    }
+                }
+                else // ITEM
+                {
+                    uint32_t item_id = strtoul(item_exp_field->field_value.u_value.value_string, NULL, 16);
+                    l_ezlopi_item_t *item_left = ezlopi_device_get_item_by_id(item_id);
+                    if (item_left)
+                    {
+                        // value_type_field->field_value.u_value.value_string = item_left->cloud_properties.value_type;
+                    }
                 }
             }
-            else // ITEM
-            {
-                uint32_t item_id = strtoul(item_exp_field->field_value.u_value.value_string, NULL, 16);
-                l_ezlopi_item_t *item_left = ezlopi_device_get_item_by_id(item_id);
-                if (item_left)
-                {
-                    value_type_field->field_value.u_value.value_string = item_left->cloud_properties.value_type;
-                }
-            }
 
-            //
-            if (NULL == scene_node->when_block->fields->user_arg)
-            {
-                s_item_exp_data_t *new = ezlopi_malloc(__FUNCTION__, sizeof(s_item_exp_data_t));
-                if (new)
-                {
-                    memset(new, 0, sizeof(s_item_exp_data_t));
 
-                    // populate the new data
-                    scene_node->when_block->fields->user_arg = (void *);
-                }
-            }
-
-            switch (state_to_check)
-            {
-            case (1 << 0) | (1 << 1): // indicates the values are given
-            {
-
-                break;
-            }
-            case (1 << 0): // indicates the value for only start is given
-            {              /* code */
-                break;
-            }
-            case (1 << 1): // indicates the value for only end is given
-            {              /* code */
-                break;
-            }
-            default:
-            {
-                break;
-            }
-            }
-
-            // 1. get the item or expression node
-
-            // 2. store the new values into structure and shift the prev to old dataType
-
-            // 3. Compare the pattern with 'any' to 'value' (the value type is always same )
-
-            // 4.
         }
     }
     return ret;
@@ -370,7 +376,7 @@ int ezlopi_scene_when_is_sun_state(l_scenes_list_v2_t *scene_node, void *arg)
                 if (0 == strncmp(__issunstate_field[i].field_name, curr_field->name, strlen(__issunstate_field[i].field_name) + 1))
                 {
                     flag_check |= (__issunstate_field[i].field_func)(scene_node, curr_field, info, ((0 == i) ? 1 : (1 == i) ? 2
-                                                                                                                            : 0));
+                        : 0));
                     break;
                 }
             }
@@ -559,7 +565,7 @@ int ezlopi_scene_when_is_date_range(l_scenes_list_v2_t *scene_node, void *arg)
             }
 
             // Check for time,day,month and year validity
-            uint8_t (*isdate_range_check_flags[])(struct tm *start, struct tm *end, struct tm *info) = {
+            uint8_t(*isdate_range_check_flags[])(struct tm *start, struct tm *end, struct tm *info) = {
                 isdate_range_check_tm,
                 isdate_range_check_day,
                 isdate_range_check_month,
@@ -741,11 +747,11 @@ int ezlopi_scene_when_is_house_mode_alarm_phase_range(l_scenes_list_v2_t *scene_
                 {
                     s_ezlopi_modes_t *curr_mode = ezlopi_core_modes_get_custom_modes();
 
-                    phase_name = (EZLOPI_MODES_ALARM_PHASE_IDLE == curr_mode->alarmed.phase)         ? "idle"
-                                 : (EZLOPI_MODES_ALARM_PHASE_BYPASS == curr_mode->alarmed.phase)     ? "bypass"
-                                 : (EZLOPI_MODES_ALARM_PHASE_ENTRYDELAY == curr_mode->alarmed.phase) ? "entryDelay"
-                                 : (EZLOPI_MODES_ALARM_PHASE_MAIN == curr_mode->alarmed.phase)       ? "main"
-                                                                                                     : "null";
+                    phase_name = (EZLOPI_MODES_ALARM_PHASE_IDLE == curr_mode->alarmed.phase) ? "idle"
+                        : (EZLOPI_MODES_ALARM_PHASE_BYPASS == curr_mode->alarmed.phase) ? "bypass"
+                        : (EZLOPI_MODES_ALARM_PHASE_ENTRYDELAY == curr_mode->alarmed.phase) ? "entryDelay"
+                        : (EZLOPI_MODES_ALARM_PHASE_MAIN == curr_mode->alarmed.phase) ? "main"
+                        : "null";
 
                     // TRACE_D(" req_mode : %s vs mode : %s ", curr_field->field_value.u_value.value_string, phase_name);
                     if (EZPI_STRNCMP_IF_EQUAL(curr_field->field_value.u_value.value_string, phase_name, strlen(curr_field->field_value.u_value.value_string), strlen(phase_name)))
@@ -863,7 +869,7 @@ int ezlopi_scene_when_is_device_state(l_scenes_list_v2_t *scene_node, void *arg)
                 s_ezlopi_cloud_controller_t *controller_info = ezlopi_device_get_controller_information();
                 if (controller_info)
                 {
-#warning "we need to change from 'controller' to 'device_id' specific";
+                    #warning "we need to change from 'controller' to 'device_id' specific";
                     ret = ((value_armed == controller_info->armed) ? 1 : 0) && ((value_reachable == controller_info->service_notification) ? 1 : 0);
                 }
             }
@@ -885,7 +891,7 @@ int ezlopi_scene_when_is_device_state(l_scenes_list_v2_t *scene_node, void *arg)
                         s_ezlopi_cloud_controller_t *controller_info = ezlopi_device_get_controller_information();
                         if (controller_info)
                         {
-#warning "we need to change from 'controller' to 'device_id' specific";
+                            #warning "we need to change from 'controller' to 'device_id' specific";
                             ret = ((value_armed == controller_info->armed) ? 1 : 0) && ((value_reachable == controller_info->service_notification) ? 1 : 0);
                         }
                     }
@@ -984,7 +990,7 @@ int ezlopi_scene_when_is_scene_state(l_scenes_list_v2_t *scene_node, void *arg)
                     {
                         ret = (EZLOPI_SCENE_STATUS_STOPPED == curr_scene->status) ? 1 : 0;
                     }
-#warning "need to add 'FAILED' status for scene";
+                    #warning "need to add 'FAILED' status for scene";
                     // else if (EZPI_STRNCMP_IF_EQUAL("failed", tmp_str, 7,strlen(tmp_str)))
                     // {
                     //     ret = (false == curr_scene->enabled)? 1:0;

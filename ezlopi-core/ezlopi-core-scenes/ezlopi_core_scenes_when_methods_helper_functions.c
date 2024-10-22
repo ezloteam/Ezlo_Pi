@@ -292,7 +292,7 @@ uint8_t isdate_tm_check(e_isdate_modes_t *mode_type, struct tm *info, l_fields_v
     if (cj_time_arr && (cJSON_Array == cj_time_arr->type))
     {
         ret |= (1 << 4);
-        char field_hr_mm[10] = {0};
+        char field_hr_mm[10] = { 0 };
         strftime(field_hr_mm, 10, "%H:%M", info);
         field_hr_mm[9] = '\0';
         // TRACE_S("[field_hr_mm: %s]", field_hr_mm);
@@ -400,8 +400,8 @@ uint8_t isdate_year_weeks_check(e_isdate_modes_t *mode_type, struct tm *info, l_
                 }
                 else // for case :- 'n'
                 {
-                    char field_weeks[10] = {0}; // week_value extracted from ESP32.
-                    char week_val[10] = {0};    // week_value given to us from cloud.
+                    char field_weeks[10] = { 0 }; // week_value extracted from ESP32.
+                    char week_val[10] = { 0 };    // week_value given to us from cloud.
 
                     // reducing array values by -1, for easier comparison ::==>  [1_54]--->[0_53]      or      [1_6]-->[0_5]
                     snprintf(week_val, 10, "%d", (int)(array_item->valuedouble - 1));
@@ -456,7 +456,7 @@ int isdate_check_flag_result(e_isdate_modes_t mode_type, uint8_t flag_check)
     case ISDATE_WEEKLY_MODE:
     {
         if ((((flag_check & MASK_FOR_TIME_ARG) && (flag_check & TIME_FLAG)) &&
-             ((flag_check & MASK_FOR_WEEKDAYS_ARG) && (flag_check & WEEKDAYS_FLAG))))
+            ((flag_check & MASK_FOR_WEEKDAYS_ARG) && (flag_check & WEEKDAYS_FLAG))))
         {
             // TRACE_W("here! week_days and time");
             ret = 1;
@@ -466,7 +466,7 @@ int isdate_check_flag_result(e_isdate_modes_t mode_type, uint8_t flag_check)
     case ISDATE_MONTHLY_MODE:
     {
         if ((((flag_check & MASK_FOR_TIME_ARG) && (flag_check & TIME_FLAG)) &&
-             ((flag_check & MASK_FOR_DAYS_ARG) && (flag_check & DAYS_FLAG))))
+            ((flag_check & MASK_FOR_DAYS_ARG) && (flag_check & DAYS_FLAG))))
         {
             // TRACE_W("here! month_days and time");
             ret = 1;
@@ -498,7 +498,7 @@ uint8_t isonce_tm_check(l_fields_v2_t *curr_field, struct tm *info)
     uint8_t flag_check = 0;
     if ((EZLOPI_VALUE_TYPE_24_HOURS_TIME == curr_field->value_type) && (NULL != curr_field->field_value.u_value.value_string))
     {
-        char field_hr_mm[10] = {0};
+        char field_hr_mm[10] = { 0 };
         strftime(field_hr_mm, 10, "%H:%M", info);
         field_hr_mm[9] = '\0';
 
@@ -586,7 +586,7 @@ static void issunsate_update_sunstate_tm(int tm_mday, s_sunstate_data_t *user_da
 {
     if (tm_mday && user_data)
     {
-        char tmp_url[100] = {0};
+        char tmp_url[100] = { 0 };
         char tmp_headers[] = "Host: api.sunrisesunset.io\r\nAccept: */*\r\nConnection: keep-alive\r\n";
         char tmp_web_server[] = "api.sunrisesunset.io";
         char *lat_long_vals = ezlopi_nvs_read_latidtude_longitude();
@@ -638,7 +638,7 @@ static void issunstate_add_offs(e_issunstate_offset_t tmoffs_type, struct tm *ch
     if (choosen_suntime && defined_moment && tm_offs_val) // choosen_suntime => sunrise or sunset
     {
         // Default values to store start and end boundries
-        struct tm tmp_time = {0};
+        struct tm tmp_time = { 0 };
 
         // Nox, extract & add :'tm_offs_val'
         char time_diff[10];
@@ -744,10 +744,10 @@ uint8_t issunstate_get_suntime(l_scenes_list_v2_t *scene_node, l_fields_v2_t *cu
 
             user_data->sunstate_mode = curr_sunstate_mode;          // this sets target sunstate for curr meshbot
             issunsate_update_sunstate_tm(info->tm_mday, user_data); // assign 'curr_day' & 'suntime' only
-            user_data->tmoffs_type = (0 == strncmp(curr_field->field_value.u_value.value_string, "intime", 7))   ? ISSUNSTATE_INTIME_MODE
-                                     : (0 == strncmp(curr_field->field_value.u_value.value_string, "before", 7)) ? ISSUNSTATE_BEFORE_MODE
-                                     : (0 == strncmp(curr_field->field_value.u_value.value_string, "after", 6))  ? ISSUNSTATE_AFTER_MODE
-                                                                                                                 : ISSUNSTATE_UNDEFINED;
+            user_data->tmoffs_type = (0 == strncmp(curr_field->field_value.u_value.value_string, "intime", 7)) ? ISSUNSTATE_INTIME_MODE
+                : (0 == strncmp(curr_field->field_value.u_value.value_string, "before", 7)) ? ISSUNSTATE_BEFORE_MODE
+                : (0 == strncmp(curr_field->field_value.u_value.value_string, "after", 6)) ? ISSUNSTATE_AFTER_MODE
+                : ISSUNSTATE_UNDEFINED;
             // 3. check if, curr_tm_day has been updated successfully
             if ((0 == user_data->curr_tm_day) ||
                 (0 == user_data->sunstate_mode) ||
@@ -777,14 +777,14 @@ uint8_t issunstate_get_offs_tmval(l_scenes_list_v2_t *scene_node, l_fields_v2_t 
                 TRACE_D(".... Adding offset:  +/- (hh:mm:ss) ....");
                 issunstate_add_offs(user_data->tmoffs_type, &(user_data->choosen_suntime), &(user_data->defined_moment), curr_field->field_value.u_value.value_string);
                 TRACE_S("\r\nSunMode[%d]{sunrise=1,sunset=2,0=NULL},\r\nChoosen_suntime(hh:mm:ss = %d:%d:%d),\r\ndefined_moment(hh:mm:ss = %d:%d:%d),\r\nOffset(%s)\r\n",
-                        user_data->sunstate_mode,
-                        user_data->choosen_suntime.tm_hour,
-                        user_data->choosen_suntime.tm_min,
-                        user_data->choosen_suntime.tm_sec,
-                        user_data->defined_moment.tm_hour,
-                        user_data->defined_moment.tm_min,
-                        user_data->defined_moment.tm_sec,
-                        curr_field->field_value.u_value.value_string);
+                    user_data->sunstate_mode,
+                    user_data->choosen_suntime.tm_hour,
+                    user_data->choosen_suntime.tm_min,
+                    user_data->choosen_suntime.tm_sec,
+                    user_data->defined_moment.tm_hour,
+                    user_data->defined_moment.tm_min,
+                    user_data->defined_moment.tm_sec,
+                    curr_field->field_value.u_value.value_string);
             }
         }
     }
@@ -847,8 +847,8 @@ uint8_t issunstate_check_mdrn(uint8_t sunstate_mode, const char *range_type, str
                 ret = (1 << 3);
             }
             else if (((info->tm_hour < 24) && (info->tm_hour == defined_moment->tm_hour)) &&
-                     ((info->tm_min < 60) && (info->tm_min >= defined_moment->tm_min)) &&
-                     ((info->tm_sec < 60) && (info->tm_sec > defined_moment->tm_sec)))
+                ((info->tm_min < 60) && (info->tm_min >= defined_moment->tm_min)) &&
+                ((info->tm_sec < 60) && (info->tm_sec > defined_moment->tm_sec)))
             {
                 ret = (1 << 3);
             }
@@ -860,8 +860,8 @@ uint8_t issunstate_check_mdrn(uint8_t sunstate_mode, const char *range_type, str
                 ret = (1 << 3);
             }
             else if (((info->tm_hour >= 0) && (info->tm_hour == defined_moment->tm_hour)) &&
-                     ((info->tm_min >= 0) && (info->tm_min <= defined_moment->tm_min)) &&
-                     ((info->tm_sec >= 0) && (info->tm_sec <= defined_moment->tm_sec)))
+                ((info->tm_min >= 0) && (info->tm_min <= defined_moment->tm_min)) &&
+                ((info->tm_sec >= 0) && (info->tm_sec <= defined_moment->tm_sec)))
             {
                 ret = (1 << 3);
             }
@@ -1374,9 +1374,9 @@ int when_function_for_pulse(l_scenes_list_v2_t *scene_node, l_when_block_v2_t *w
             }
 
             TRACE_W("trigger_state= %s , {seq_count: %d}.-----> return =>> [pulse_state = %s]",
-                    (function_state_info->activate_pulse_seq) ? "true" : "false",
-                    function_state_info->transition_count,
-                    (function_state_info->current_state) ? "high" : "low");
+                (function_state_info->activate_pulse_seq) ? "true" : "false",
+                function_state_info->transition_count,
+                (function_state_info->current_state) ? "high" : "low");
             ret = function_state_info->current_state;
         }
     }
@@ -1586,6 +1586,98 @@ int isdeviceitem_group_value_check(l_scenes_list_v2_t *scene_node, uint32_t devi
     }
     return ret;
 }
+
+uint8_t isitemstate_changed(s_item_exp_data_t *new_extract_data, l_fields_v2_t *start_field, l_fields_v2_t *finish_field, uint32_t curr_state, void * user_arg)
+{
+    uint32_t flag = 0;
+    if (new_extract_data)
+    {
+        bool start_flag = false;
+        bool finish_flag = false;
+
+        // the start value comparison
+        if (NULL != start_field)
+        {
+            
+
+        }
+
+        // the end value comparison
+        if (NULL != finish_field)
+        {
+
+        }
+
+
+
+
+
+        // l_fields_v2_t *value_type_field = ezlopi_malloc(__FUNCTION__, sizeof(l_fields_v2_t));
+        // if (value_type_field)
+        // {
+        //     // 1. Create a dummy 'value-type' required for comparison
+        //     memset(value_type_field, 0, sizeof(l_fields_v2_t));
+        //     value_type_field->next = NULL;
+        //     value_type_field->scale = NULL;
+        //     value_type_field->user_arg = NULL;
+
+        //     if (EZLOPI_VALUE_TYPE_EXPRESSION == item_exp_field->value_type) // EXPRESSION
+        //     {
+        //         s_ezlopi_expressions_t *curr_expr_left = ezlopi_scenes_get_expression_node_by_name(item_exp_field->field_value.u_value.value_string);
+        //         if (curr_expr_left)
+        //         {
+        //             value_type_field->field_value.u_value.value_string = ezlopi_scene_get_scene_value_type_name(curr_expr_left->value_type);
+        //         }
+        //     }
+        //     else  // ITEM
+        //     {
+        //         uint32_t item_id = strtoul(item_exp_field->field_value.u_value.value_string, NULL, 16);
+        //         l_ezlopi_item_t *item_left = ezlopi_device_get_item_by_id(item_id);
+        //         if (item_left)
+        //         {
+        //             value_type_field->field_value.u_value.value_string = item_left->cloud_properties.value_type;
+        //         }
+        //     }
+
+        // 2. Compare the fields
+        // switch (curr_state & (1 << 0 | 1 << 1))
+        // {
+        //     #warning "check for finish condition";
+        // case 0:// for fresh start (both conditions are false)
+        // {
+        //     TRACE_D("checking start conditon");
+        //     start_flag = ezlopi_scenes_operators_value_comparevalues_with_less_operations(item_exp_field, start_field, value_type_field, NULL);
+        //     break;
+        // }
+        // case (1 << 0):  // if start condition is true
+        // { /* code */
+        //     TRACE_D("checking finish conditon");
+        //     start_flag = true;
+        //     finish_flag = ezlopi_scenes_operators_value_comparevalues_with_less_operations(item_exp_field, finish_field, value_type_field, NULL);
+        //     break;
+        // }
+        // default:
+        // {
+        //     TRACE_D("...default checking");
+        //     start_flag = ezlopi_scenes_operators_value_comparevalues_with_less_operations(item_exp_field, start_field, value_type_field, NULL);
+        //     finish_flag = ezlopi_scenes_operators_value_comparevalues_with_less_operations(item_exp_field, finish_field, value_type_field, NULL);
+        //     break;
+        // }
+        // }
+
+        // 3. Delete the dummy 'value-type'
+        //     ezlopi_scenes_delete_field_value(value_type_field);
+        //     ezlopi_free(__FUNCTION__, value_type_field);
+        // }
+
+        // assign the flag result
+        flag = (start_flag ? (1 << 0) : 0) | (finish_flag ? (1 << 1) : 0);
+
+
+    }
+    return flag;
+}
+
 
 #endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 //-----------------------------------------------------------------------------------------------------

@@ -406,6 +406,7 @@ static void ___create_lua_subtable(lua_State *lua_state, l_ezlopi_item_t *item_p
         lua_setfield(lua_state, -2, sub_table_name);
     }
 }
+
 static int __evaluate_expression(cJSON *cj_des, cJSON *lua_prop_params, const char *exp_name, const char *exp_code)
 {
     int ret = 0;
@@ -509,6 +510,7 @@ static int __evaluate_expression(cJSON *cj_des, cJSON *lua_prop_params, const ch
                         {
                             ____get_devitem_expn_result(cj_expr_val, lua_state, "value");
                             ____get_devitem_expn_result(cj_expr_val, lua_state, "scale");
+                            ret = 1;
                         }
                         lua_pop(lua_state, 1); // Remove result table (params)
                     }
@@ -540,6 +542,10 @@ static int __evaluate_expression(cJSON *cj_des, cJSON *lua_prop_params, const ch
         TRACE_E("Couldn't create lua state for -> %s", exp_name);
     }
     return ret;
+}
+int ezlopi_scenes_expression_simple(cJSON *cj_des, const char *exp_name, const char *exp_code)
+{
+    return  __evaluate_expression(cj_des, NULL, exp_name, exp_code); // this is only for simple 
 }
 void ezlopi_scenes_expressions_list_cjson(cJSON *cj_expresson_array, cJSON *cj_params)
 {

@@ -29,19 +29,19 @@ typedef enum e_isdate_range_method
 typedef struct s_isdate_method
 {
     const char *field_name;
-    uint8_t (*field_func)(e_isdate_modes_t *mode_type, struct tm *info, l_fields_v2_t *curr_field);
+    uint8_t(*field_func)(e_isdate_modes_t *mode_type, struct tm *info, l_fields_v2_t *curr_field);
 } s_isdate_method_t;
 
 typedef struct s_issunstate_method
 {
     const char *field_name;
-    uint8_t (*field_func)(l_scenes_list_v2_t *scene_node, l_fields_v2_t *curr_field, struct tm *info, uint8_t curr_sunstate_mode);
+    uint8_t(*field_func)(l_scenes_list_v2_t *scene_node, l_fields_v2_t *curr_field, struct tm *info, uint8_t curr_sunstate_mode);
 } s_issunstate_method_t;
 
 typedef struct s_isonce_method
 {
     const char *field_name;
-    uint8_t (*field_func)(l_fields_v2_t *curr_field, struct tm *info);
+    uint8_t(*field_func)(l_fields_v2_t *curr_field, struct tm *info);
 } s_isonce_method_t;
 
 typedef struct s_isdate_range_method
@@ -64,7 +64,7 @@ typedef union u_item_expn_data
 
 typedef struct s_item_exp_data
 {
-    u_item_expn_data_t user_data;
+    u_item_expn_data_t prev_data;
     e_scene_value_type_v2_t value_type; // all scenes_value_types
 } s_item_exp_data_t;
 
@@ -121,10 +121,8 @@ int when_function_for_latch(l_scenes_list_v2_t *scene_node, l_when_block_v2_t *w
 int isdeviceitem_group_value_check(l_scenes_list_v2_t *scene_node, uint32_t device_group_id, uint32_t item_group_id);
 
 //------------------------------- ezlopi_scene_when_isItemStateChanged_method -----------------------------------
-int isitemState_changed()
-{
+uint8_t isitemstate_changed(s_item_exp_data_t *new_user_data, l_fields_v2_t *start_field, l_fields_v2_t *finish_field, uint32_t curr_state, void * user_arg);
 
-}
 
 #endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
