@@ -17,15 +17,15 @@
 void network_get(cJSON *cj_request, cJSON *cj_response)
 {
     /* =========================== Modified started =========================== */
-    const char *dummy_info = "{\"interfaces\":[{\"_id\":\"wlan0\",\"enabled\":\"auto\",\"hwaddr\":\"c8:f0:9e:ac:a1:18\",\"internetAvailable\":true,\"ipv4\":{\"dns\":[\"192.168.1.254\"],\"ip\":\"192.168.1.101\",\"mask\":\"255.255.255.0\",\"gateway\":\"192.168.1.254\",\"mode\":\"dhcp\"},\"priority\":0,\"network\":\"wan\",\"status\":\"up\",\"type\":\"wifi\",\"wifi\":{\"mode\":\"sta\",\"network\":{\"bssid\":\"04:75:f9:1d:15:35\",\"encryption\":\"psk2\",\"key\":\"MdKX3yMx\",\"ssid\":\"NTFiber-a5f3\"},\"channel\":\"10\",\"region\":\"00\"}}]}";
+    // const char *dummy_info = "{\"interfaces\":[{\"_id\":\"wlan0\",\"enabled\":\"auto\",\"hwaddr\":\"c8:f0:9e:ac:a1:18\",\"internetAvailable\":true,\"ipv4\":{\"dns\":[\"192.168.1.254\"],\"ip\":\"192.168.1.101\",\"mask\":\"255.255.255.0\",\"gateway\":\"192.168.1.254\",\"mode\":\"dhcp\"},\"priority\":0,\"network\":\"wan\",\"status\":\"up\",\"type\":\"wifi\",\"wifi\":{\"mode\":\"sta\",\"network\":{\"bssid\":\"04:75:f9:1d:15:35\",\"encryption\":\"psk2\",\"key\":\"MdKX3yMx\",\"ssid\":\"NTFiber-a5f3\"},\"channel\":\"10\",\"region\":\"00\"}}]}";
 
-    cJSON *cj_result = cJSON_Parse(__func__, dummy_info);
-    if (cj_result)
-    {
-        cJSON_AddItemToObject(__func__, cj_response, ezlopi_result_str, cj_result);
-    }
+    // cJSON *cj_result = cJSON_Parse(__func__, dummy_info);
+    // if (cj_result)
+    // {
+    //     cJSON_AddItemToObject(__func__, cj_response, ezlopi_result_str, cj_result);
+    // }
 
-    return;
+    // return;
     /* =========================== Modified ended =========================== */
 
     cJSON *cjson_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);

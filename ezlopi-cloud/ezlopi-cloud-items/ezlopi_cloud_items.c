@@ -53,15 +53,15 @@ static cJSON *ezlopi_device_create_item_table_from_prop(l_ezlopi_device_t *devic
 void items_list_v3(cJSON *cj_request, cJSON *cj_response)
 {
     /* =========================== Modified started =========================== */
-    const char *dummy_info = "{\"items\":[{\"_id\":\"20676000\",\"deviceId\":\"10676000\",\"hasGetter\":true,\"hasSetter\":true,\"name\":\"switch\",\"show\":true,\"valueType\":\"bool\",\"value\":false,\"valueFormatted\":\"false\",\"status\":\"idle\"},{\"_id\":\"20676001\",\"deviceId\":\"10676001\",\"hasGetter\":true,\"hasSetter\":true,\"name\":\"dimmer\",\"show\":true,\"valueType\":\"int\",\"minValue\":0,\"maxValue\":100,\"value\":0,\"valueFormatted\":\"0\",\"status\":\"idle\"},{\"_id\":\"20676002\",\"deviceId\":\"10676001\",\"hasGetter\":true,\"hasSetter\":true,\"name\":\"dimmer_up\",\"show\":true,\"valueType\":\"int\",\"value\":0,\"valueFormatted\":\"0\",\"status\":\"idle\"}]}";
-    // const char *dummy_info = "{}";
-    cJSON *cjson_result = cJSON_Parse(__func__, dummy_info);
-    if (cjson_result)
-    {
-        cJSON_AddItemToObject(__func__, cj_response, ezlopi_result_str, cjson_result);
-    }
+    // const char *dummy_info = "{\"items\":[{\"_id\":\"20676000\",\"deviceId\":\"10676000\",\"hasGetter\":true,\"hasSetter\":true,\"name\":\"switch\",\"show\":true,\"valueType\":\"bool\",\"value\":false,\"valueFormatted\":\"false\",\"status\":\"idle\"},{\"_id\":\"20676001\",\"deviceId\":\"10676001\",\"hasGetter\":true,\"hasSetter\":true,\"name\":\"dimmer\",\"show\":true,\"valueType\":\"int\",\"minValue\":0,\"maxValue\":100,\"value\":0,\"valueFormatted\":\"0\",\"status\":\"idle\"},{\"_id\":\"20676002\",\"deviceId\":\"10676001\",\"hasGetter\":true,\"hasSetter\":true,\"name\":\"dimmer_up\",\"show\":true,\"valueType\":\"int\",\"value\":0,\"valueFormatted\":\"0\",\"status\":\"idle\"}]}";
+    // // const char *dummy_info = "{}";
+    // cJSON *cjson_result = cJSON_Parse(__func__, dummy_info);
+    // if (cjson_result)
+    // {
+    //     cJSON_AddItemToObject(__func__, cj_response, ezlopi_result_str, cjson_result);
+    // }
 
-    return;
+    // return;
     /* =========================== Modified ended =========================== */
 
     cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);

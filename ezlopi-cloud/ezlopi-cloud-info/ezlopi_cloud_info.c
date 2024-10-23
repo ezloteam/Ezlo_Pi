@@ -23,15 +23,15 @@ void info_get(cJSON *cj_request, cJSON *cj_response)
 {
 
     /* =========================== Modified started =========================== */
-    const char *dummy_info = "{\"model\":\"ezlopi_generic\",\"architecture\":\"xtensa-esp32s2\",\"chipId\":\"esp32\",\"serial\":105200113,\"uuid\":\"623d3d65-0795-47df-b954-6e5f3baf13fc\",\"offlineAnonymousAccess\":true,\"offlineInsecureAccess\":true,\"location\":{\"latitude\":0,\"longitude\":0,\"timezone\":\"GMT0\",\"state\":\"default\"},\"build\":{\"time\":\"2024-07-10T14:42:27+0000\",\"builder\":\"lomas.subedi@ezlo.com\",\"branch\":\"development\",\"commit\":\"c2fbb27a518900e391a060655358b9f06429b0c0\"},\"battery\":{\"stateOfCharge\":0,\"remainingTime\":0,\"health\":0,\"status\":\"\"},\"localtime\":\"2024-07-18T09:10:03+0000\",\"uptime\":\"0d 0h 0m 53s\"}";
+    // const char *dummy_info = "{\"model\":\"ezlopi_generic\",\"architecture\":\"xtensa-esp32s2\",\"chipId\":\"esp32\",\"serial\":105200113,\"uuid\":\"623d3d65-0795-47df-b954-6e5f3baf13fc\",\"offlineAnonymousAccess\":true,\"offlineInsecureAccess\":true,\"location\":{\"latitude\":0,\"longitude\":0,\"timezone\":\"GMT0\",\"state\":\"default\"},\"build\":{\"time\":\"2024-07-10T14:42:27+0000\",\"builder\":\"lomas.subedi@ezlo.com\",\"branch\":\"development\",\"commit\":\"c2fbb27a518900e391a060655358b9f06429b0c0\"},\"battery\":{\"stateOfCharge\":0,\"remainingTime\":0,\"health\":0,\"status\":\"\"},\"localtime\":\"2024-07-18T09:10:03+0000\",\"uptime\":\"0d 0h 0m 53s\"}";
 
-    cJSON *cj_result = cJSON_Parse(__func__, dummy_info);
-    if (cj_result)
-    {
-        cJSON_AddItemToObject(__func__, cj_response, ezlopi_result_str, cj_result);
-    }
+    // cJSON *cj_result = cJSON_Parse(__func__, dummy_info);
+    // if (cj_result)
+    // {
+    //     cJSON_AddItemToObject(__func__, cj_response, ezlopi_result_str, cj_result);
+    // }
 
-    return;
+    // return;
     /* =========================== Modified ended =========================== */
 
     cJSON *cjson_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
