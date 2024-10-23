@@ -7,7 +7,7 @@
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_cloud_hub_data_list.h"
 
-static void ezlopi_core_hub_data_list_populate_settings_json(cJSON *cj_result_name, const char* field_str, const char *name_str)
+static void ezlopi_core_hub_data_list_populate_settings_json(cJSON *cj_result_name, const char *field_str, const char *name_str)
 {
     e_ezlopi_core_setting_command_names_t settings_name_enum = ezlopi_core_setting_command_get_command_enum_from_str(name_str);
     switch (settings_name_enum)
@@ -59,6 +59,17 @@ static void ezlopi_core_hub_data_list_process_settings_data_list(cJSON *cj_names
 
 void hub_data_list(cJSON *cj_request, cJSON *cj_response)
 {
+    /* =========================== Modified started =========================== */
+    const char *dummy_info = "{\"settings\":{\"first_start\":{}}}";
+
+    cJSON *cjson_result = cJSON_Parse(__func__, dummy_info);
+    if (cjson_result)
+    {
+        cJSON_AddItemToObject(__func__, cj_response, ezlopi_result_str, cjson_result);
+    }
+
+    return;
+    /* =========================== Modified ended =========================== */
     cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     if (cj_result)
     {

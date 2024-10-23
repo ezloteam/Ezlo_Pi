@@ -42,9 +42,9 @@ static char *__generate_sha1_of_src(const char *src)
                                 size_t l = (len - (strlen(ret) + 1));
                                 if (l > 0)
                                 {
-                                    ((int)sha1[i] / 100 > 0) ? (snprintf(ret + strlen(ret), l, "%u", (uint8_t)sha1[i]))    // tripple digit
-                                        : ((int)sha1[i] / 10 > 0) ? (snprintf(ret + strlen(ret), l, "0%u", (uint8_t)sha1[i]))   // double digit
-                                        : (snprintf(ret + strlen(ret), l, "00%u", (uint8_t)sha1[i])); // single digit
+                                    ((int)sha1[i] / 100 > 0)  ? (snprintf(ret + strlen(ret), l, "%u", (uint8_t)sha1[i]))    // tripple digit
+                                    : ((int)sha1[i] / 10 > 0) ? (snprintf(ret + strlen(ret), l, "0%u", (uint8_t)sha1[i]))   // double digit
+                                                              : (snprintf(ret + strlen(ret), l, "00%u", (uint8_t)sha1[i])); // single digit
                                 }
                                 else
                                 {
@@ -64,6 +64,19 @@ static char *__generate_sha1_of_src(const char *src)
 //------------------------------------------------------------------------------------------------------------------
 void devices_list_v3(cJSON *cj_request, cJSON *cj_response)
 {
+    /* =========================== Modified started =========================== */
+    // const char *dummy_info = "{\"devices\":[{\"_id\":\"10676000\",\"deviceTypeId\":\"ezlopi\",\"parentDeviceId\":\"\",\"category\":\"switch\",\"subcategory\":\"relay\",\"gatewayId\":\"457a5069\",\"batteryPowered\":false,\"name\":\"switch_temp\",\"type\":\"switch.inwall\",\"reachable\":true,\"persistent\":true,\"serviceNotification\":false,\"armed\":false,\"roomId\":\"\",\"security\":\"no\",\"ready\":true,\"status\":\"idle\"},{\"_id\":\"10676001\",\"deviceTypeId\":\"ezlopi\",\"parentDeviceId\":\"\",\"category\":\"dimmable_light\",\"subcategory\":\"dimmable_bulb\",\"gatewayId\":\"457a5069\",\"batteryPowered\":false,\"name\":\"Dimmer NDJ\",\"type\":\"dimmer.outlet\",\"reachable\":true,\"persistent\":true,\"serviceNotification\":false,\"armed\":false,\"roomId\":\"\",\"security\":\"no\",\"ready\":true,\"status\":\"idle\"}]}";
+
+    // // const char *dummy_info = "{}";
+    // cJSON *cj_result = cJSON_Parse(__func__, dummy_info);
+    // if (cj_result)
+    // {
+    //     cJSON_AddItemToObject(__func__, cj_response, ezlopi_result_str, cj_result);
+    // }
+
+    // return;
+    /* =========================== Modified ended =========================== */
+
     cJSON *cjson_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     if (cjson_result)
     {

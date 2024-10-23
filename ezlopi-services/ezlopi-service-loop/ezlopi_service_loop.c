@@ -110,7 +110,7 @@ static void __loop(void* pv)
 
                 // TRACE_D("'%s': \t\t %u(period: %d(cmp: %d))", __loop_node->name ? __loop_node->name : "", __loop_time);
 
-                vTaskDelay(1 / portTICK_RATE_MS);
+                // vTaskDelay(1 / portTICK_RATE_MS);
             }
 
             __loop_node = __loop_node->next;
