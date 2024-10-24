@@ -3,6 +3,7 @@
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 #include <time.h>
+#include <string.h>
 #include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_modes.h"
@@ -254,34 +255,39 @@ int ezlopi_scene_when_is_item_state_changed(l_scenes_list_v2_t *scene_node, void
             {
                 memset(new_extract_data, 0, sizeof(s_item_exp_data_t));
 
-
-
                 // extract the values from expression or item
                 if (EZLOPI_VALUE_TYPE_EXPRESSION == item_exp_field->value_type) // EXPRESSION
                 {
-                    new_extract_data->value_type = 
+                    new_extract_data->value_type = EZLOPI_VALUE_TYPE_EXPRESSION;
                     s_ezlopi_expressions_t *curr_expr_left = ezlopi_scenes_get_expression_node_by_name(item_exp_field->field_value.u_value.value_string);
                     if (curr_expr_left)
                     {
-                        // evaluate expression
-                        if (curr_expr_left->variable)
+                        if (curr_expr_left->variable)  // the experssion is 'variable-type'
                         {
                             switch (curr_expr_left->exp_value.type) // the main value type to consider when comparing
                             {
                             case EXPRESSION_VALUE_TYPE_STRING:
                             {
-                                new_extract_data.
-                                    // cJSON_AddStringToObject(__FUNCTION__, cj_expr_des, ezlopi_value_str, curr_expr_left->exp_value.u_value.str_value);
-                                    break;
+                                new_extract_data->U_data.exp_value.type = EXPRESSION_VALUE_TYPE_STRING;
+                                size_t len = strlen(curr_expr_left->exp_value.u_value.str_value);
+
+                                new_extract_data->U_data.exp_value.u_value.str_value = strndup(curr_expr_left->exp_value.u_value.str_value, len);
+                                if (new_extract_data->U_data.exp_value.u_value.str_value)
+                                {
+                                    TRACE_D("copied : %s", new_extract_data->U_data.exp_value.u_value.str_value);
+                                }
+                                break;
                             }
                             case EXPRESSION_VALUE_TYPE_BOOL:
                             {
-                                // cJSON_AddBoolToObject(__FUNCTION__, cj_expr_des, ezlopi_value_str, curr_expr_left->exp_value.u_value.boolean_value);
+                                new_extract_data->U_data.exp_value.type = EXPRESSION_VALUE_TYPE_BOOL;
+                                new_extract_data->U_data.exp_value.u_value.boolean_value = curr_expr_left->exp_value.u_value.boolean_value;
                                 break;
                             }
                             case EXPRESSION_VALUE_TYPE_NUMBER:
                             {
-                                // cJSON_AddNumberToObject(__FUNCTION__, cj_expr_des, ezlopi_value_str, curr_expr_left->exp_value.u_value.number_value);
+                                new_extract_data->U_data.exp_value.type = EXPRESSION_VALUE_TYPE_NUMBER;
+                                new_extract_data->U_data.exp_value.u_value.boolean_value = curr_expr_left->exp_value.u_value.number_value;
                                 break;
                             }
                             default:
@@ -289,27 +295,104 @@ int ezlopi_scene_when_is_item_state_changed(l_scenes_list_v2_t *scene_node, void
                             }
 
                         }
-                        else
+                        else    // expression is 'expression-type'
                         {
-
                             cJSON *cj_expr_des = cJSON_CreateObject(__FUNCTION__);
                             if (cj_expr_des)
                             {
-
+                                ezlopi_scenes_expression_simple(cj_expr_des, curr_expr_left->name, curr_expr_left->code);
+                                cJSON * cj_value = cJSON_GetObjectItem(__FUNCTION__, cj_expr_des, "value");
+                                if (cj_value)
+                                {
+                                    switch (cj_value->type)
+                                    {
+                                    case cJSON_True:
+                                    case cJSON_False:
+                                    {
+                                        new_extract_data->U_data.exp_value.type = EXPRESSION_VALUE_TYPE_BOOL;
+                                        new_extract_data->U_data.exp_value.u_value.boolean_value = (cJSON_True == cj_value->type ? 1 : 0);
+                                        break;
+                                    }
+                                    case cJSON_Number:
+                                    {
+                                        new_extract_data->U_data.exp_value.type = EXPRESSION_VALUE_TYPE_NUMBER;
+                                        new_extract_data->U_data.exp_value.u_value.number_value = cJSON_GetNumberValue(cj_value);
+                                        break;
+                                    }
+                                    case cJSON_String:
+                                    {
+                                        new_extract_data->U_data.exp_value.type = EXPRESSION_VALUE_TYPE_STRING;
+                                        size_t len = (cj_value->str_value_len);
+                                        new_extract_data->U_data.exp_value.u_value.str_value = strndup(cj_value->valuestring, cj_value->str_value_len);
+                                        if (new_extract_data->U_data.exp_value.u_value.str_value)
+                                        {
+                                            TRACE_D("copied : %s", new_extract_data->U_data.exp_value.u_value.str_value);
+                                        }
+                                        break;
+                                    }
+                                    default:
+                                        break;
+                                    }
+                                }
+                                cJSON_Delete(__FUNCTION__, cj_expr_des);
                             }
                         }
-
-
                     }
                 }
                 else // ITEM
                 {
+                    new_extract_data->value_type = EZLOPI_VALUE_TYPE_ITEM;
                     uint32_t item_id = strtoul(item_exp_field->field_value.u_value.value_string, NULL, 16);
-                    l_ezlopi_item_t *item_left = ezlopi_device_get_item_by_id(item_id);
-                    if (item_left)
+                    l_ezlopi_item_t *curr_item = ezlopi_device_get_item_by_id(item_id);
+                    if (curr_item)
                     {
-                        // value_type_field->field_value.u_value.value_string = item_left->cloud_properties.value_type;
+                        cJSON *cj_item_value = cJSON_CreateObject(__FUNCTION__);
+                        if (cj_item_value)
+                        {
+                            curr_item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, curr_item, (void *)cj_item_value, NULL);
+                            cJSON *cj_value = cJSON_GetObjectItem(__FUNCTION__, cj_item_value, ezlopi_value_str);
+                            if (cj_value)
+                            {
+                                switch (cj_value->type)
+                                {
+                                case cJSON_True:
+                                case cJSON_False:
+                                {
+                                    new_extract_data->U_data.field_value.e_type = VALUE_TYPE_BOOL;
+                                    new_extract_data->U_data.field_value.u_value.value_bool = (cJSON_True == cj_value->type) ? 1 : 0;
+                                    break;
+                                }
+                                case cJSON_Number:
+                                {
+                                    new_extract_data->U_data.field_value.e_type = VALUE_TYPE_NUMBER;
+                                    new_extract_data->U_data.field_value.u_value.value_double = cj_value->valuedouble;
+                                    break;
+                                }
+                                case cJSON_String:
+                                {
+                                    new_extract_data->U_data.field_value.e_type = VALUE_TYPE_STRING;
+                                    new_extract_data->U_data.field_value.u_value.value_string = strndup(cj_value->valuestring);
+                                    if (new_extract_data->U_data.field_value.u_value.value_string)
+                                    {
+                                        TRACE_D("copied : %s", new_extract_data->U_data.field_value.u_value.value_string);
+                                    }
+
+                                    break;
+                                }
+                                default:
+                                    break;
+                                }
+                            }
+
+                            cJSON_Delete(__FUNCTION__, cj_item_value);
+                        }
+
                     }
+                }
+
+                // delete 'new_extract_data'
+                if (new_extract_data->value_type == EZLOPI_VALUE_TYPE_ITEM)
+                {// new_extract_data->U_data.exp_value.u_value.str_value
                 }
             }
 

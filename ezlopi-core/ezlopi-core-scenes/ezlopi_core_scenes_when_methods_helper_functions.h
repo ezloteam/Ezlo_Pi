@@ -64,7 +64,7 @@ typedef union u_item_expn_data
 
 typedef struct s_item_exp_data
 {
-    u_item_expn_data_t prev_data;
+    u_item_expn_data_t U_data;
     e_scene_value_type_v2_t value_type; // all scenes_value_types
 } s_item_exp_data_t;
 
