@@ -264,30 +264,30 @@ int ezlopi_scene_when_is_item_state_changed(l_scenes_list_v2_t *scene_node, void
                     {
                         if (curr_expr_left->variable)  // the experssion is 'variable-type'
                         {
-                            switch (curr_expr_left->exp_value.type) // the main value type to consider when comparing
+                            switch (curr_expr_left->value_type) // the main value type to consider when comparing
                             {
                             case EXPRESSION_VALUE_TYPE_STRING:
                             {
-                                new_extract_data->U_data.exp_value.type = EXPRESSION_VALUE_TYPE_STRING;
+                                new_extract_data->sample_data.e_type = VALUE_TYPE_STRING;
                                 size_t len = strlen(curr_expr_left->exp_value.u_value.str_value);
 
-                                new_extract_data->U_data.exp_value.u_value.str_value = strndup(curr_expr_left->exp_value.u_value.str_value, len);
-                                if (new_extract_data->U_data.exp_value.u_value.str_value)
+                                new_extract_data->sample_data.u_value.value_string = strndup(curr_expr_left->exp_value.u_value.str_value, len);
+                                if (new_extract_data->sample_data.u_value.value_string)
                                 {
-                                    TRACE_D("copied : %s", new_extract_data->U_data.exp_value.u_value.str_value);
+                                    TRACE_D("copied : %s", new_extract_data->sample_data.u_value.value_string);
                                 }
                                 break;
                             }
                             case EXPRESSION_VALUE_TYPE_BOOL:
                             {
-                                new_extract_data->U_data.exp_value.type = EXPRESSION_VALUE_TYPE_BOOL;
-                                new_extract_data->U_data.exp_value.u_value.boolean_value = curr_expr_left->exp_value.u_value.boolean_value;
+                                new_extract_data->sample_data.e_type = VALUE_TYPE_BOOL;
+                                new_extract_data->sample_data.u_value.value_bool = curr_expr_left->exp_value.u_value.boolean_value;
                                 break;
                             }
                             case EXPRESSION_VALUE_TYPE_NUMBER:
                             {
-                                new_extract_data->U_data.exp_value.type = EXPRESSION_VALUE_TYPE_NUMBER;
-                                new_extract_data->U_data.exp_value.u_value.boolean_value = curr_expr_left->exp_value.u_value.number_value;
+                                new_extract_data->sample_data.e_type = VALUE_TYPE_NUMBER;
+                                new_extract_data->sample_data.u_value.value_double = curr_expr_left->exp_value.u_value.number_value;
                                 break;
                             }
                             default:
@@ -298,9 +298,8 @@ int ezlopi_scene_when_is_item_state_changed(l_scenes_list_v2_t *scene_node, void
                         else    // expression is 'expression-type'
                         {
                             cJSON *cj_expr_des = cJSON_CreateObject(__FUNCTION__);
-                            if (cj_expr_des)
+                            if (cj_expr_des && (0 < ezlopi_scenes_expression_simple(cj_expr_des, curr_expr_left->name, curr_expr_left->code)))
                             {
-                                ezlopi_scenes_expression_simple(cj_expr_des, curr_expr_left->name, curr_expr_left->code);
                                 cJSON * cj_value = cJSON_GetObjectItem(__FUNCTION__, cj_expr_des, "value");
                                 if (cj_value)
                                 {
@@ -309,24 +308,24 @@ int ezlopi_scene_when_is_item_state_changed(l_scenes_list_v2_t *scene_node, void
                                     case cJSON_True:
                                     case cJSON_False:
                                     {
-                                        new_extract_data->U_data.exp_value.type = EXPRESSION_VALUE_TYPE_BOOL;
-                                        new_extract_data->U_data.exp_value.u_value.boolean_value = (cJSON_True == cj_value->type ? 1 : 0);
+                                        new_extract_data->sample_data.e_type = VALUE_TYPE_BOOL;
+                                        new_extract_data->sample_data.u_value.value_bool = (cJSON_True == cj_value->type ? 1 : 0);
                                         break;
                                     }
                                     case cJSON_Number:
                                     {
-                                        new_extract_data->U_data.exp_value.type = EXPRESSION_VALUE_TYPE_NUMBER;
-                                        new_extract_data->U_data.exp_value.u_value.number_value = cJSON_GetNumberValue(cj_value);
+                                        new_extract_data->sample_data.e_type = VALUE_TYPE_NUMBER;
+                                        new_extract_data->sample_data.u_value.value_double = cJSON_GetNumberValue(cj_value);
                                         break;
                                     }
                                     case cJSON_String:
                                     {
-                                        new_extract_data->U_data.exp_value.type = EXPRESSION_VALUE_TYPE_STRING;
+                                        new_extract_data->sample_data.e_type = VALUE_TYPE_STRING;
                                         size_t len = (cj_value->str_value_len);
-                                        new_extract_data->U_data.exp_value.u_value.str_value = strndup(cj_value->valuestring, cj_value->str_value_len);
-                                        if (new_extract_data->U_data.exp_value.u_value.str_value)
+                                        new_extract_data->sample_data.u_value.value_string = strndup(cj_value->valuestring, cj_value->str_value_len);
+                                        if (new_extract_data->sample_data.u_value.value_string)
                                         {
-                                            TRACE_D("copied : %s", new_extract_data->U_data.exp_value.u_value.str_value);
+                                            TRACE_D("copied : %s", new_extract_data->sample_data.u_value.value_string);
                                         }
                                         break;
                                     }
@@ -358,25 +357,24 @@ int ezlopi_scene_when_is_item_state_changed(l_scenes_list_v2_t *scene_node, void
                                 case cJSON_True:
                                 case cJSON_False:
                                 {
-                                    new_extract_data->U_data.field_value.e_type = VALUE_TYPE_BOOL;
-                                    new_extract_data->U_data.field_value.u_value.value_bool = (cJSON_True == cj_value->type) ? 1 : 0;
+                                    new_extract_data->sample_data.e_type = VALUE_TYPE_BOOL;
+                                    new_extract_data->sample_data.u_value.value_bool = (cJSON_True == cj_value->type) ? 1 : 0;
                                     break;
                                 }
                                 case cJSON_Number:
                                 {
-                                    new_extract_data->U_data.field_value.e_type = VALUE_TYPE_NUMBER;
-                                    new_extract_data->U_data.field_value.u_value.value_double = cj_value->valuedouble;
+                                    new_extract_data->sample_data.e_type = VALUE_TYPE_NUMBER;
+                                    new_extract_data->sample_data.u_value.value_double = cj_value->valuedouble;
                                     break;
                                 }
                                 case cJSON_String:
                                 {
-                                    new_extract_data->U_data.field_value.e_type = VALUE_TYPE_STRING;
-                                    new_extract_data->U_data.field_value.u_value.value_string = strndup(cj_value->valuestring);
-                                    if (new_extract_data->U_data.field_value.u_value.value_string)
+                                    new_extract_data->sample_data.e_type = VALUE_TYPE_STRING;
+                                    new_extract_data->sample_data.u_value.value_string = strndup(cj_value->valuestring);
+                                    if (new_extract_data->sample_data.u_value.value_string)
                                     {
-                                        TRACE_D("copied : %s", new_extract_data->U_data.field_value.u_value.value_string);
+                                        TRACE_D("copied : %s", new_extract_data->sample_data.u_value.value_string);
                                     }
-
                                     break;
                                 }
                                 default:
@@ -390,9 +388,14 @@ int ezlopi_scene_when_is_item_state_changed(l_scenes_list_v2_t *scene_node, void
                     }
                 }
 
+                uint8_t flag = isitemstate_changed(new_extract_data, start_field, finish_field, scene_node->when_block->fields->user_arg);
+
                 // delete 'new_extract_data'
                 if (new_extract_data->value_type == EZLOPI_VALUE_TYPE_ITEM)
-                {// new_extract_data->U_data.exp_value.u_value.str_value
+                {
+                    // new_extract_data->sample_data.exp_value.u_value.str_value
+
+
                 }
             }
 

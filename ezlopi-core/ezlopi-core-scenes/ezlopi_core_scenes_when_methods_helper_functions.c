@@ -1587,7 +1587,7 @@ int isdeviceitem_group_value_check(l_scenes_list_v2_t *scene_node, uint32_t devi
     return ret;
 }
 
-uint8_t isitemstate_changed(s_item_exp_data_t *new_extract_data, l_fields_v2_t *start_field, l_fields_v2_t *finish_field, uint32_t curr_state, void * user_arg)
+uint8_t isitemstate_changed(s_item_exp_data_t *new_extract_data, l_fields_v2_t *start_field, l_fields_v2_t *finish_field, void * user_arg)
 {
     uint32_t flag = 0;
     if (new_extract_data)
@@ -1598,7 +1598,22 @@ uint8_t isitemstate_changed(s_item_exp_data_t *new_extract_data, l_fields_v2_t *
         // the start value comparison
         if (NULL != start_field)
         {
-            
+
+
+            if (start_field->value_type == new_extract_data->value_type)
+            {
+                switch (start_field->value_type)
+                {
+                case EZLOPI_VALUE_TYPE_ITEM:
+                    /* code */
+                    break;
+
+                default:
+                    break;
+                }
+
+
+            }
 
         }
 

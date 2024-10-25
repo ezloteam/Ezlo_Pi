@@ -56,15 +56,15 @@ typedef struct s_function_opr
     int (*opr_method)(l_scenes_list_v2_t *scene_node, l_when_block_v2_t *when_block, cJSON *cj_func_opr);
 } s_function_opr_t;
 
-typedef union u_item_expn_data
+typedef union s_item_expn_data
 {
-    s_field_value_t field_value;
-    s_exp_value_t exp_value;
-} u_item_expn_data_t;
+    e_value_type_t e_type;  // the data's nature
+    u_field_value_v2_t u_value; // reutilizing the field structure to store extracted data
+} s_item_expn_data_t;
 
 typedef struct s_item_exp_data
 {
-    u_item_expn_data_t U_data;
+    s_item_expn_data_t sample_data;    // this contains value 
     e_scene_value_type_v2_t value_type; // all scenes_value_types
 } s_item_exp_data_t;
 
@@ -121,7 +121,7 @@ int when_function_for_latch(l_scenes_list_v2_t *scene_node, l_when_block_v2_t *w
 int isdeviceitem_group_value_check(l_scenes_list_v2_t *scene_node, uint32_t device_group_id, uint32_t item_group_id);
 
 //------------------------------- ezlopi_scene_when_isItemStateChanged_method -----------------------------------
-uint8_t isitemstate_changed(s_item_exp_data_t *new_user_data, l_fields_v2_t *start_field, l_fields_v2_t *finish_field, uint32_t curr_state, void * user_arg);
+uint8_t isitemstate_changed(s_item_exp_data_t *new_user_data, l_fields_v2_t *start_field, l_fields_v2_t *finish_field, void * user_arg);
 
 
 #endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS

@@ -120,8 +120,6 @@ int ezlopi_scenes_operators_value_comparevalues_with_less_operations_with_group(
 int ezlopi_scenes_operators_has_atleastone_dictionary_value_operations(uint32_t item_id, l_fields_v2_t *value_field);
 // IsDictornaryChanged
 int ezlopi_scenes_operators_is_dictionary_changed_operations(l_scenes_list_v2_t *scene_node, uint32_t item_id, l_fields_v2_t *key_field, l_fields_v2_t *operation_field);
-// IsItemStateChanged
-uint8_t ezlopi_scene_compare_is_item_state_changed(l_fields_v2_t *item_exp_field, l_fields_v2_t *start_field, l_fields_v2_t *finish_field, uint32_t curr_state);
 
 #endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
