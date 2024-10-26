@@ -22,7 +22,7 @@ enum e_devicGrp_vs_itemGrp_choice
 //--------------------------------------------------------------------------------
 static void __ezlopi_core_device_group_print(l_ezlopi_device_grp_t *device_grp_node)
 {
-#if (1 == ENABLE_TRACE)
+#if (1 == CONFIG_EZPI_UTIL_TRACE_EN)
     if (device_grp_node)
     {
         TRACE_D("\t-------------------- DEVICE-GROUP --------------------");
@@ -46,7 +46,7 @@ static void __ezlopi_core_device_group_print(l_ezlopi_device_grp_t *device_grp_n
 }
 static void __ezlopi_core_item_group_print(l_ezlopi_item_grp_t *item_grp_node)
 {
-#if (1 == ENABLE_TRACE)
+#if (1 == CONFIG_EZPI_UTIL_TRACE_EN)
     if (item_grp_node)
     {
         TRACE_D("\t|------------------- ITEM-GROUP --------------------");

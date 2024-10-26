@@ -16,9 +16,15 @@
 
 static time_t start_time = 0;
 
+// uint64_t ezlopi_core_sntp_get_time_now_ms(void)
+// {
+//     struct timeval tv;
+//     gettimeofday(&tv, NULL);
+//     return (tv.tv_sec * 1000ULL + (tv.tv_usec / 1000LLU));
+// }
+
 static void sntp_sync_time_call_back(struct timeval *tv)
 {
-
     char strftime_buf[64];
     struct tm timeinfo;
 
@@ -63,10 +69,11 @@ ezlopi_error_t EZPI_CORE_sntp_init(void)
         TRACE_I("Waiting for system time to be set... (%d/%d)", retry, retry_count);
         vTaskDelay(700 / portTICK_PERIOD_MS);
     }
+
     return (sync_status == SNTP_SYNC_STATUS_COMPLETED) ? EZPI_SUCCESS : EZPI_ERR_SNTP_INIT_FAILED;
 }
 
-ezlopi_error_t EZPI_CORE_sntp_set_location(const char* location)
+ezlopi_error_t EZPI_CORE_sntp_set_location(const char *location)
 {
     ezlopi_error_t error = EZPI_SUCCESS;
     if (location)

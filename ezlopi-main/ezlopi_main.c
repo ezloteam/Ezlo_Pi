@@ -30,6 +30,7 @@
 #include "ezlopi_service_broadcast.h"
 #include "ezlopi_service_led_indicator.h"
 #include "ezlopi_service_system_temperature_sensor.h"
+#include "ezlopi_service_otel.h"
 
 #include "pt.h"
 #include "ezlopi_core_processes.h"
@@ -42,14 +43,13 @@ static void __blinky(void *pv);
 static void __print_mac_address(void)
 {
     uint8_t __base_mac[6] = {0, 0, 0, 0, 0, 0};
-
     esp_read_mac(__base_mac, ESP_MAC_WIFI_STA);
 }
 
 void app_main(void)
 {
 #ifdef CONFIG_EZPI_OTEL_EN
-    ezlopi_core_set_otel_logs_upcalls();
+    ezlopi_service_otel_init();
 #elif CONFIG_EZPI_UTIL_TRACE_EN
     ezlopi_core_set_log_upcalls();
 #endif // CONFIG_EZPI_UTIL_TRACE_EN
@@ -66,7 +66,6 @@ void app_main(void)
     ezlopi_service_gpioisr_init(); // this is time critical, Do not add to loop
 
     ezlopi_init();
-
     ezlopi_core_setting_commands_read_settings();
 
 #ifdef CONFIG_EZPI_ENABLE_UART_PROVISIONING
@@ -148,9 +147,11 @@ static void __blinky(void *pv)
             ezlopi_free(__FUNCTION__, wifi_stat);
         }
 
+#ifdef CONFIG_EZPI_ENABLE_UART_PROVISIONING
         char cmd99_str[100] = {0};
         snprintf(cmd99_str, 100, "{\"cmd\":99,\"free_heap\":%d,\"heap_watermark\":%d}", free_heap, watermark_heap);
         EZPI_SERV_uart_tx_data(strlen(cmd99_str), (uint8_t *)cmd99_str);
+#endif
 
         if (free_heap <= (10 * 1024))
         {

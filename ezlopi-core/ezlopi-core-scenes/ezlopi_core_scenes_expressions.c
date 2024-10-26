@@ -672,7 +672,7 @@ void ezlopi_scenes_expressions_list_cjson(cJSON *cj_expresson_array, cJSON *cj_p
 //----------------------------------------------------------------------------------------------------------------------
 void ezlopi_scenes_expressions_print(s_ezlopi_expressions_t *exp_node)
 {
-#if (ENABLE_TRACE)
+#if (CONFIG_EZPI_UTIL_TRACE_EN)
     if (exp_node)
     {
         TRACE_D("----------------- Expression --------------------");

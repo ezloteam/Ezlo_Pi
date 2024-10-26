@@ -6,11 +6,14 @@
 #include "ezlopi_core_errors.h"
 
 ezlopi_error_t EZPI_CORE_sntp_init(void);
-ezlopi_error_t EZPI_CORE_sntp_set_location(const char* location);
-char* EZPI_CORE_sntp_get_location(void);
-void EZPI_CORE_sntp_get_up_time(char* up_time_buf, uint32_t buf_len);
-void EZPI_CORE_sntp_get_local_time(char* local_time_buf, uint32_t buf_len);
-void EZPI_CORE_sntp_epoch_to_iso8601(char* time_buf, uint32_t buf_len, time_t t);
+ezlopi_error_t EZPI_CORE_sntp_set_location(const char *location);
+
+char *EZPI_CORE_sntp_get_location(void);
+void EZPI_CORE_sntp_get_up_time(char *up_time_buf, uint32_t buf_len);
+void EZPI_CORE_sntp_get_local_time(char *local_time_buf, uint32_t buf_len);
+void EZPI_CORE_sntp_epoch_to_iso8601(char *time_buf, uint32_t buf_len, time_t t);
+
+uint64_t ezlopi_core_sntp_get_time_now_ms(void);
 uint64_t EZPI_CORE_sntp_get_current_time_ms(void);
 uint64_t EZPI_CORE_sntp_get_current_time_sec(void);
 

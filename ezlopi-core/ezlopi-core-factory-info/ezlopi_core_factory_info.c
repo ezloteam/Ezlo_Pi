@@ -176,7 +176,7 @@ void ezlopi_factory_info_v3_free(void *arg)
 
 void print_factory_info_v3(void)
 {
-#if (1 == ENABLE_TRACE)
+#if (1 == CONFIG_EZPI_UTIL_TRACE_EN)
     // uint16_t version = ezlopi_factory_info_v3_get_version();
     unsigned long long id = ezlopi_factory_info_v3_get_id();
 

@@ -6,6 +6,7 @@ idf_component_register(SRCS "ezlopi_util_trace.c" "${config_src}"
     INCLUDE_DIRS "."
     REQUIRES 
                 log
+                ezlopi-core-sntp
                 ezlopi-user-config
                 ezlopi-core-errors
                 )

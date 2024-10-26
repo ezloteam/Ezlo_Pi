@@ -45,6 +45,7 @@ set(EZLOPI_SERVICES
         ezlopi-service-ota
         ezlopi-service-uart
         ezlopi-service-loop
+        ezlopi-service-otel
         ezlopi-service-modes
         ezlopi-service-webprov
         ezlopi-service-gpioisr

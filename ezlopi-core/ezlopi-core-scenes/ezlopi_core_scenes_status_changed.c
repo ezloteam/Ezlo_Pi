@@ -10,7 +10,7 @@
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_scenes_status_changed.h"
 
-int ezlopi_scenes_status_change_broadcast(l_scenes_list_v2_t* scene_node, const char* status_str)
+int ezlopi_scenes_status_change_broadcast(l_scenes_list_v2_t *scene_node, const char *status_str)
 {
     int ret = 0;
     if (scene_node)
@@ -70,10 +70,10 @@ int ezlopi_scenes_status_change_broadcast(l_scenes_list_v2_t* scene_node, const 
     return ret;
 }
 
-const char* ezlopi_scenes_status_to_string(e_scene_status_v2_t scene_status)
+const char *ezlopi_scenes_status_to_string(e_scene_status_v2_t scene_status)
 {
-    const char* ret = "";
-#if (1 == ENABLE_TRACE)
+    const char *ret = "";
+#if (1 == CONFIG_EZPI_UTIL_TRACE_EN)
     switch (scene_status)
     {
     case EZLOPI_SCENE_STATUS_RUN:
@@ -96,7 +96,7 @@ const char* ezlopi_scenes_status_to_string(e_scene_status_v2_t scene_status)
         ret = "EZLOPI_SCENE_STATUS_STOPPED";
         break;
     }
-    #warning "need to add status_failed";
+#warning "need to add status_failed";
     default:
     {
         ret = "EZLOPI_SCENE_STATUS_NONE";
@@ -107,4 +107,4 @@ const char* ezlopi_scenes_status_to_string(e_scene_status_v2_t scene_status)
 
     return ret;
 }
-#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+#endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS

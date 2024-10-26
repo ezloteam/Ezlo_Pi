@@ -7,12 +7,12 @@
 #include "ezlopi_core_event_group.h"
 #include "ezlopi_core_cjson_macros.h"
 
-static int __check_for_no_error(cJSON* cj_request);
-static cJSON* __execute_method(cJSON* cj_request, f_method_func_t method_func);
+static int __check_for_no_error(cJSON *cj_request);
+static cJSON *__execute_method(cJSON *cj_request, f_method_func_t method_func);
 
-cJSON *ezlopi_core_api_consume(const char * who, const char *payload, uint32_t len)
+cJSON *ezlopi_core_api_consume(const char *who, const char *payload, uint32_t len)
 {
-    cJSON* cj_response = NULL;
+    cJSON *cj_response = NULL;
 
     if (payload && len)
     {
@@ -25,7 +25,7 @@ cJSON *ezlopi_core_api_consume(const char * who, const char *payload, uint32_t l
                 cJSON *cj_sender = cJSON_GetObjectItem(who, cj_request, ezlopi_sender_str);
                 cJSON *cj_method = cJSON_GetObjectItem(who, cj_request, ezlopi_method_str);
 
-#if (1 == ENABLE_TRACE)
+#if (1 == CONFIG_EZPI_UTIL_TRACE_EN)
                 TRACE_I("## WS Rx <<<<<<<<<< '%s' \n %.*s", (cj_method ? cj_method->valuestring : ezlopi__str), len, payload);
 #endif
                 uint32_t method_id = ezlopi_core_ezlopi_methods_search_in_list(cj_method);
@@ -51,7 +51,7 @@ cJSON *ezlopi_core_api_consume(const char * who, const char *payload, uint32_t l
                     {
                         TRACE_W("updater function: %p", updater);
 
-                        cJSON* cj_update_response = __execute_method(cj_request, updater);
+                        cJSON *cj_update_response = __execute_method(cj_request, updater);
 
                         if (cj_update_response)
                         {
@@ -78,7 +78,7 @@ cJSON *ezlopi_core_api_consume(const char * who, const char *payload, uint32_t l
                     // CJSON_TRACE("x-cj_response", cj_response);
                 }
             }
-#if (1 == ENABLE_TRACE)
+#if (1 == CONFIG_EZPI_UTIL_TRACE_EN)
             else
             {
                 cJSON *cj_method = cJSON_GetObjectItem(who, cj_request, ezlopi_method_str);
@@ -92,9 +92,9 @@ cJSON *ezlopi_core_api_consume(const char * who, const char *payload, uint32_t l
     return cj_response;
 }
 
-static cJSON* __execute_method(cJSON* cj_request, f_method_func_t method_func)
+static cJSON *__execute_method(cJSON *cj_request, f_method_func_t method_func)
 {
-    cJSON* cj_response = NULL;
+    cJSON *cj_response = NULL;
     if (method_func)
     {
         if (ezlopi_core_elzlopi_methods_check_method_register(method_func))
@@ -119,7 +119,7 @@ static cJSON* __execute_method(cJSON* cj_request, f_method_func_t method_func)
     return cj_response;
 }
 
-static int __check_for_no_error(cJSON* cj_request)
+static int __check_for_no_error(cJSON *cj_request)
 {
     int ret = 0;
 
@@ -131,7 +131,7 @@ static int __check_for_no_error(cJSON* cj_request)
         {
             ret = 1;
         }
-#if (1 == ENABLE_TRACE)
+#if (1 == CONFIG_EZPI_UTIL_TRACE_EN)
         else
         {
             TRACE_E("cj_error: %p, cj_error->type: %u, cj_error->value_string: %s", cj_error, cj_error->type, cj_error ? (cj_error->valuestring ? cj_error->valuestring : ezlopi_null_str) : ezlopi_null_str);

@@ -6,22 +6,22 @@
 #include "ezlopi_util_trace.h"
 
 // #include "ezlopi_core_timer.h"
-#include "ezlopi_core_devices_list.h"
-#include "ezlopi_core_device_value_updated.h"
 #include "ezlopi_core_cloud.h"
-#include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_errors.h"
+#include "ezlopi_core_devices_list.h"
+#include "ezlopi_core_valueformatter.h"
+#include "ezlopi_core_device_value_updated.h"
 
 #include "ezlopi_cloud_constants.h"
 #include "pms5003.h"
 #include "sensor_0037_pms5003_sensor.h"
 
-static ezlopi_error_t __prepare(void* arg, void* user_arg);
-static ezlopi_error_t __init(l_ezlopi_item_t* item);
-static ezlopi_error_t __cjson_get_value(l_ezlopi_item_t* item, void* arg);
-static ezlopi_error_t __notify(l_ezlopi_item_t* item);
+static ezlopi_error_t __prepare(void *arg, void *user_arg);
+static ezlopi_error_t __init(l_ezlopi_item_t *item);
+static ezlopi_error_t __cjson_get_value(l_ezlopi_item_t *item, void *arg);
+static ezlopi_error_t __notify(l_ezlopi_item_t *item);
 
-ezlopi_error_t sensor_pms5003_v3(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
+ezlopi_error_t sensor_pms5003_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
 
@@ -57,11 +57,11 @@ ezlopi_error_t sensor_pms5003_v3(e_ezlopi_actions_t action, l_ezlopi_item_t* ite
     return ret;
 }
 
-static ezlopi_error_t __notify(l_ezlopi_item_t* item)
+static ezlopi_error_t __notify(l_ezlopi_item_t *item)
 {
     ezlopi_error_t ret = EZPI_FAILED;
 
-    s_pms5003_sensor_object* pms_object = (s_pms5003_sensor_object*)item->user_arg;
+    s_pms5003_sensor_object *pms_object = (s_pms5003_sensor_object *)item->user_arg;
 
     if (pms_object)
     {
@@ -72,7 +72,7 @@ static ezlopi_error_t __notify(l_ezlopi_item_t* item)
         }
         if ((pms_object->counter != 0) && (pms_object->counter <= 9))
         {
-            s_pms5003_sensor_object* pms_object = (s_pms5003_sensor_object*)item->user_arg;
+            s_pms5003_sensor_object *pms_object = (s_pms5003_sensor_object *)item->user_arg;
             pms_print_data(&pms_object->pms_data);
             ezlopi_device_value_updated_from_device_broadcast(item);
             pms_object->counter++;
@@ -87,12 +87,12 @@ static ezlopi_error_t __notify(l_ezlopi_item_t* item)
     return ret;
 }
 
-static ezlopi_error_t __cjson_get_value(l_ezlopi_item_t* item, void* arg)
+static ezlopi_error_t __cjson_get_value(l_ezlopi_item_t *item, void *arg)
 {
     ezlopi_error_t ret = EZPI_FAILED;
 
-    cJSON* cj_param = (cJSON*)arg;
-    s_pms5003_sensor_object* pms_object = (s_pms5003_sensor_object*)item->user_arg;
+    cJSON *cj_param = (cJSON *)arg;
+    s_pms5003_sensor_object *pms_object = (s_pms5003_sensor_object *)item->user_arg;
     if (cj_param && pms_object)
     {
         if (ezlopi_item_name_particulate_matter_1 == item->cloud_properties.item_name)
@@ -137,12 +137,12 @@ static ezlopi_error_t __cjson_get_value(l_ezlopi_item_t* item, void* arg)
     return ret;
 }
 
-static ezlopi_error_t __init(l_ezlopi_item_t* item)
+static ezlopi_error_t __init(l_ezlopi_item_t *item)
 {
     ezlopi_error_t ret = EZPI_ERR_INIT_DEVICE_FAILED;
     if (item)
     {
-        s_pms5003_sensor_object* pms_object = (s_pms5003_sensor_object*)item->user_arg;
+        s_pms5003_sensor_object *pms_object = (s_pms5003_sensor_object *)item->user_arg;
         if (pms_object)
         {
             if (item->interface.uart.enable)
@@ -155,11 +155,11 @@ static ezlopi_error_t __init(l_ezlopi_item_t* item)
     return ret;
 }
 
-static ezlopi_error_t __prepare(void* arg, void* user_arg)
+static ezlopi_error_t __prepare(void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_FAILED;
 
-    s_ezlopi_prep_arg_t* prep_arg = (s_ezlopi_prep_arg_t*)arg;
+    s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
     if (prep_arg)
     {
         uint32_t parent_id = 0;

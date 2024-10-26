@@ -190,7 +190,7 @@ cJSON *ezlopi_scene_cjson_get_field(l_fields_v2_t *field_node)
             }
             default:
             {
-#if (1 == ENABLE_TRACE)
+#if (1 == CONFIG_EZPI_UTIL_TRACE_EN)
                 const char *value_type_name = ezlopi_scene_get_scene_value_type_name(field_node->value_type);
                 TRACE_E("Value type not matched!, curr-type[%d]: %s ", field_node->value_type, value_type_name ? value_type_name : ezlopi_null_str);
 #endif
@@ -535,7 +535,7 @@ static void __cjson_add_fields(cJSON *cj_block, l_fields_v2_t *fields)
                     }
                     default:
                     {
-#if (1 == ENABLE_TRACE)
+#if (1 == CONFIG_EZPI_UTIL_TRACE_EN)
                         const char *value_type_name = ezlopi_scene_get_scene_value_type_name(curr_field->value_type);
                         TRACE_E("Value type not matched!, curr-type[%d]: %s ", curr_field->value_type, value_type_name ? value_type_name : ezlopi_null_str);
 #endif

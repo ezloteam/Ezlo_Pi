@@ -14,7 +14,7 @@
 
 void ezlopi_print_block_options(s_block_options_v2_t *block_options, l_fields_v2_t *fields)
 {
-#if (1 == ENABLE_TRACE)
+#if (1 == CONFIG_EZPI_UTIL_TRACE_EN)
     TRACE_D("\t\t|-- blockOptions:");
     TRACE_D("\t\t\t|-- method");
     TRACE_D("\t\t\t\t|-- name: %s", block_options->method.name);
@@ -37,7 +37,7 @@ void ezlopi_print_block_options(s_block_options_v2_t *block_options, l_fields_v2
 
 void ezlopi_print_fields(l_fields_v2_t *fields)
 {
-#if (1 == ENABLE_TRACE)
+#if (1 == CONFIG_EZPI_UTIL_TRACE_EN)
     TRACE_D("\t\t|-- fields: ");
     int field_count = 0;
     while (fields)
@@ -185,7 +185,7 @@ void ezlopi_print_fields(l_fields_v2_t *fields)
 
 void ezlopi_print_house_modes(l_house_modes_v2_t *house_modes)
 {
-#if (1 == ENABLE_TRACE)
+#if (1 == CONFIG_EZPI_UTIL_TRACE_EN)
     TRACE_D("\t|-- house_modes: ");
     while (house_modes)
     {
@@ -197,7 +197,7 @@ void ezlopi_print_house_modes(l_house_modes_v2_t *house_modes)
 
 void ezlopi_print_user_notifications(l_user_notification_v2_t *user_notification)
 {
-#if (1 == ENABLE_TRACE)
+#if (1 == CONFIG_EZPI_UTIL_TRACE_EN)
     TRACE_D("\t|-- user_notifications: ");
     while (user_notification)
     {
@@ -209,7 +209,7 @@ void ezlopi_print_user_notifications(l_user_notification_v2_t *user_notification
 
 void ezlopi_print_when_blocks(l_when_block_v2_t *when_blocks)
 {
-#if (1 == ENABLE_TRACE)
+#if (1 == CONFIG_EZPI_UTIL_TRACE_EN)
     TRACE_D("\t|-- when: ");
     while (when_blocks)
     {
@@ -237,7 +237,7 @@ void ezlopi_print_when_blocks(l_when_block_v2_t *when_blocks)
 
 void ezlopi_print_action_blocks(l_action_block_v2_t *action_block)
 {
-#if (1 == ENABLE_TRACE)
+#if (1 == CONFIG_EZPI_UTIL_TRACE_EN)
     while (action_block)
     {
         TRACE_D("\t|-- %s: ", (SCENE_BLOCK_TYPE_THEN == action_block->block_type) ? "then" : "else");
@@ -260,7 +260,7 @@ void ezlopi_print_action_blocks(l_action_block_v2_t *action_block)
 
 void ezlopi_scenes_print(l_scenes_list_v2_t *scene_link_list)
 {
-#if (1 == ENABLE_TRACE)
+#if (1 == CONFIG_EZPI_UTIL_TRACE_EN)
     int scene_count = 0;
     while (scene_link_list)
     {

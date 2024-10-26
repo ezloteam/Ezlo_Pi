@@ -19,7 +19,7 @@ static s_ezlopi_cloud_controller_t s_controller_information;
 
 static ezlopi_error_t ezlopi_device_parse_json_v3(cJSON *cj_config);
 static void ezlopi_device_free_single(l_ezlopi_device_t *device);
-#if (1 == ENABLE_TRACE)
+#if (1 == CONFIG_EZPI_UTIL_TRACE_EN)
 #if 0 // Defined but not used
 static void ezlopi_device_print_controller_cloud_information_v3(void);
 #endif
@@ -751,7 +751,7 @@ void ezlopi_device_prepare(void)
 }
 
 ///////// Print functions start here ////////////
-#if (1 == ENABLE_TRACE)
+#if (1 == CONFIG_EZPI_UTIL_TRACE_EN)
 
 #if 0 // Defined but not used 
 static void ezlopi_device_print_controller_cloud_information_v3(void)

@@ -3,47 +3,72 @@
 #include <stdio.h>
 #include <string.h>
 #include "esp_system.h"
+#include "ezlopi_core_sntp.h"
 
-#if (1 == ENABLE_TRACE)
+#if (1 == CONFIG_EZPI_UTIL_TRACE_EN)
+
+static const char *trace_name_str[] = {
+    "NONE",
+    "ERROR",
+    "WARNING",
+    "INFO",
+    "DEBUG",
+    "TRACE",
+    "MAX",
+};
+
+typedef struct ll_trace_upcall
+{
+    f_trace_func_t upcall;
+    struct ll_trace_upcall *next;
+} ll_trace_upcall_t;
+
+static ll_trace_upcall_t *trace_upcall_head = NULL;
+
 static f_ezlopi_log_upcall_t cloud_log_upcall_func = NULL;
 static f_ezlopi_log_upcall_t serial_log_upcall_func = NULL;
 
-static void put_idump(uint8_t *buff, uint32_t ofs, uint32_t cnt)
+static void put_idump(uint8_t *buff, uint32_t ofs, uint32_t cnt);
+
+const char *ezlopi_util_trace_get_severity_name_str(e_ezpi_trace_severity_t severity)
 {
-    int n;
-
-    ets_printf("\n%08lX ", ofs);
-
-    for (n = 0; n < cnt; n++)
+    const char *ret = trace_name_str[0];
+    if (severity > E_TRACE_SEVERITY_NONE && severity < E_TRACE_SEVERITY_MAX)
     {
-        ets_printf(" %02X", buff[n]);
+        ret = trace_name_str[severity];
     }
+    return ret;
+}
 
-    if (cnt < 16)
+void ezlopi_util_trace_add_upcall(f_trace_func_t upcall)
+{
+    if (upcall)
     {
-        do
+        if (trace_upcall_head)
         {
-            ets_printf("   ");
+            ll_trace_upcall_t *node = trace_upcall_head;
+            while (node->next)
+            {
+                node = node->next;
+            }
 
-        } while (++n < 16);
-    }
-
-    char temp_buff[17] = {0};
-
-    memcpy(temp_buff, buff, cnt);
-    temp_buff[16] = 0;
-
-    ets_printf("%c%c", 0x09, 0x09);
-
-    for (n = 0; n < cnt; n++)
-    {
-        if ((buff[n] < 0x20) || (buff[n] > 0x80))
-        {
-            ets_printf(".");
+            ll_trace_upcall_t *new_node = ezlopi_malloc(__FUNCTION__, sizeof(ll_trace_upcall_t));
+            if (new_node)
+            {
+                new_node->next = NULL;
+                new_node->upcall = upcall;
+                node->next = new_node;
+            }
         }
         else
         {
-            ets_printf("%c", buff[n]);
+            trace_upcall_head = ezlopi_malloc(__FUNCTION__, sizeof(ll_trace_upcall_t));
+            // trace_upcall_head = malloc(sizeof(ll_trace_upcall_t));
+            if (trace_upcall_head)
+            {
+                trace_upcall_head->next = NULL;
+                trace_upcall_head->upcall = upcall;
+            }
         }
     }
 }
@@ -95,22 +120,8 @@ f_ezlopi_log_upcall_t ezlopi_util_get_serial_log_upcall()
 
 void trace_color_print(const char *txt_color, uint8_t severity, const char *file, int line, const char *format, ...)
 {
-
-    f_ezlopi_log_upcall_t log_upcall_func;
-
 #if 0
-    f_ezlopi_log_upcall_t log_upcall_func = ezlopi_util_get_cloud_log_upcall();
-
-    if (log_upcall_func != NULL) {
-        va_list args;
-        va_start(args, format);
-        char cloud_log_format[EZPI_CORE_LOG_BUFFER_SIZE];
-        snprintf(cloud_log_format, sizeof(cloud_log_format), "[File: %s Line: %d]: ", file, line);
-        vsnprintf(cloud_log_format + strlen(cloud_log_format), sizeof(cloud_log_format) - strlen(cloud_log_format), format, args);
-        log_upcall_func(severity, cloud_log_format);
-        va_end(args);
-    }
-#endif
+    f_ezlopi_log_upcall_t log_upcall_func;
 
     log_upcall_func = ezlopi_util_get_serial_log_upcall();
     if (log_upcall_func != NULL)
@@ -127,7 +138,66 @@ void trace_color_print(const char *txt_color, uint8_t severity, const char *file
         snprintf(serial_log_format + strlen(serial_log_format), sizeof(serial_log_format) - strlen(serial_log_format), "\x1B[0m");
         log_upcall_func(severity, serial_log_format);
         va_end(args);
+#else
+    va_list args;
+    static char serial_log_format[10240];
+    uint64_t time_now_ms = EZPI_CORE_sntp_get_current_time_ms();
+
+    va_start(args, format);
+    vsnprintf(serial_log_format, sizeof(serial_log_format), format, args);
+    va_end(args);
+
+    ll_trace_upcall_t *upcall_node = trace_upcall_head;
+    while (upcall_node)
+    {
+        if (upcall_node->upcall)
+        {
+            upcall_node->upcall(severity, file, line, time_now_ms, serial_log_format);
+        }
+
+        upcall_node = upcall_node->next;
+    }
+#endif
+}
+
+static void put_idump(uint8_t *buff, uint32_t ofs, uint32_t cnt)
+{
+    int n;
+
+    ets_printf("\n%08lX ", ofs);
+
+    for (n = 0; n < cnt; n++)
+    {
+        ets_printf(" %02X", buff[n]);
+    }
+
+    if (cnt < 16)
+    {
+        do
+        {
+            ets_printf("   ");
+
+        } while (++n < 16);
+    }
+
+    char temp_buff[17] = {0};
+
+    memcpy(temp_buff, buff, cnt);
+    temp_buff[16] = 0;
+
+    ets_printf("%c%c", 0x09, 0x09);
+
+    for (n = 0; n < cnt; n++)
+    {
+        if ((buff[n] < 0x20) || (buff[n] > 0x80))
+        {
+            ets_printf(".");
+        }
+        else
+        {
+            ets_printf("%c", buff[n]);
+        }
     }
 }
 
-#endif // ENABLE_TRACE
+#endif // CONFIG_EZPI_UTIL_TRACE_EN
