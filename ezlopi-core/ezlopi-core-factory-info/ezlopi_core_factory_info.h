@@ -52,6 +52,7 @@ extern "C"
         EZLOPI_FINFO_REL_OFFSET_CA_CERTIFICATE = 0x3000,
         EZLOPI_FINFO_REL_OFFSET_SSL_PRIVATE_KEY = 0x4000,
         EZLOPI_FINFO_REL_OFFSET_SSL_SHARED_KEY = 0x5000,
+        EZLOPI_FINFO_REL_OFFSET_LOCAL_KEY = 0x6000,
 
         // Offset Hub Data
         EZLOPI_FINFO_REL_OFFSET_SERIAL_NUMBER = 0,
@@ -90,7 +91,8 @@ extern "C"
         EZLOPI_FINFO_LEN_SSL_SHARED_KEY = 0x1000,
         EZLOPI_FINFO_LEN_EZLOPI_CONFIG_JSON = 0x1000,
         EZLOPI_FINFO_LEN_PROVISIONING_TOKEN = 0x200,
-        EZLOPI_FINFO_LEN_PROVISIONING_SERVER_URL = 0x100
+        EZLOPI_FINFO_LEN_PROVISIONING_SERVER_URL = 0x100,
+        EZLOPI_FINFO_LEN_LOCAL_KEY = 0x200
     } e_ezlopi_factory_info_v3_length_t;
 
     typedef struct s_basic_factory_info
@@ -111,6 +113,7 @@ extern "C"
         char *provision_server;
         char *provision_token;
         char *user_id;
+        char *local_key;
         uint16_t config_version;
     } s_basic_factory_info_t;
 
@@ -134,6 +137,7 @@ extern "C"
     char *ezlopi_factory_info_v3_get_ezlopi_mac(void);
     char *ezlopi_factory_info_v3_get_cloud_server(void);
     const char *ezlopi_factory_info_v3_get_device_type(void);
+    char *ezlopi_factory_info_v3_get_local_key(void);
 
     void ezlopi_factory_info_v3_free_ca_certificate(void);
     void ezlopi_factory_info_v3_free_ssl_private_key(void);

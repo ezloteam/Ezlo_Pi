@@ -297,6 +297,7 @@ static ezlopi_error_t ezlopi_service_uart_process_provisioning_api(const cJSON *
                 char provision_server[EZLOPI_FINFO_LEN_PROVISIONING_SERVER_URL];
                 char cloud_server[EZLOPI_FINFO_LEN_CLOUD_SERVER_URL];
                 char provision_token[EZLOPI_FINFO_LEN_PROVISIONING_TOKEN];
+                char local_key[EZLOPI_FINFO_LEN_LOCAL_KEY];
 
                 memset(device_name, 0, EZLOPI_FINFO_LEN_DEVICE_NAME);
                 memset(manufacturer, 0, EZLOPI_FINFO_LEN_MANUF_NAME);
@@ -308,20 +309,22 @@ static ezlopi_error_t ezlopi_service_uart_process_provisioning_api(const cJSON *
                 memset(provision_server, 0, EZLOPI_FINFO_LEN_PROVISIONING_SERVER_URL);
                 memset(cloud_server, 0, EZLOPI_FINFO_LEN_CLOUD_SERVER_URL);
                 memset(provision_token, 0, EZLOPI_FINFO_LEN_PROVISIONING_TOKEN);
+                memset(local_key, 0, EZLOPI_FINFO_LEN_LOCAL_KEY);
 
-                CJSON_GET_VALUE_DOUBLE(cj_data, ezlopi_serial_str, ezlopi_config_basic->id);
-                CJSON_GET_VALUE_DOUBLE(cj_data, ezlopi_version_str, ezlopi_config_basic->config_version);
+                CJSON_GET_VALUE_DOUBLE(cj_data, ezlopi_serial_str, ezlopi_config_basic->id); // id => OK
+                CJSON_GET_VALUE_DOUBLE(cj_data, ezlopi_version_str, ezlopi_config_basic->config_version); 
 
                 CJSON_GET_VALUE_STRING_BY_COPY(cj_data, ezlopi_device_name_str, device_name);
                 CJSON_GET_VALUE_STRING_BY_COPY(cj_data, ezlopi_manufacturer_name_str, manufacturer);
                 CJSON_GET_VALUE_STRING_BY_COPY(cj_data, ezlopi_brand_str, brand);
                 CJSON_GET_VALUE_STRING_BY_COPY(cj_data, ezlopi_model_number_str, model_number);
-                CJSON_GET_VALUE_STRING_BY_COPY(cj_data, ezlopi_uuid_str, device_uuid);
+                CJSON_GET_VALUE_STRING_BY_COPY(cj_data, ezlopi_uuid_str, device_uuid); 
                 CJSON_GET_VALUE_STRING_BY_COPY(cj_data, ezlopi_mac_str, device_mac);
                 CJSON_GET_VALUE_STRING_BY_COPY(cj_data, "provisioning_uuid", prov_uuid);
                 CJSON_GET_VALUE_STRING_BY_COPY(cj_data, ezlopi_provision_server_str, provision_server);
                 CJSON_GET_VALUE_STRING_BY_COPY(cj_data, ezlopi_cloud_server_str, cloud_server);
                 CJSON_GET_VALUE_STRING_BY_COPY(cj_data, ezlopi_provision_token_str, provision_token);
+                CJSON_GET_VALUE_STRING_BY_COPY(cj_data, "local_key", local_key);
 
                 ezlopi_config_basic->device_name = device_name;
                 ezlopi_config_basic->manufacturer = manufacturer;
@@ -334,6 +337,7 @@ static ezlopi_error_t ezlopi_service_uart_process_provisioning_api(const cJSON *
                 ezlopi_config_basic->cloud_server = cloud_server;
                 ezlopi_config_basic->provision_token = provision_token;
                 ezlopi_config_basic->device_type = NULL;
+                ezlopi_config_basic->local_key = local_key;
 
                 ezlopi_factory_info_v3_set_basic(ezlopi_config_basic);
                 ezlopi_factory_info_v3_set_ca_cert(cJSON_GetObjectItem(__FUNCTION__, cj_data, ezlopi_signing_ca_certificate_str));
