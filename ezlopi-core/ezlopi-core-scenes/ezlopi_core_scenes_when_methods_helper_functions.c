@@ -9,6 +9,7 @@
 #include "ezlopi_core_device_group.h"
 #include "ezlopi_core_scenes_v2.h"
 #include "ezlopi_core_scenes_edit.h"
+#include "ezlopi_core_scenes_expressions.h"
 #include "ezlopi_core_scenes_when_methods_helper_functions.h"
 
 #include "ezlopi_cloud_constants.h"
@@ -1587,72 +1588,255 @@ int isdeviceitem_group_value_check(l_scenes_list_v2_t *scene_node, uint32_t devi
     return ret;
 }
 
+static uint8_t __isitemState_start_field_compare(s_item_exp_data_t *new_extract_data, l_fields_v2_t *start_field)
+{
+    uint8_t flag = 0;
+    if (start_field)
+    {
+
+        switch (start_field->value_type)
+        {
+        case EZLOPI_VALUE_TYPE_ITEM:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_EXPRESSION:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_INT:
+        {
+            new_extract_data->sample_data.u_value
+                break;
+        }
+        case EZLOPI_VALUE_TYPE_BOOL:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_STRING:
+        {
+            break;
+        }
+        default:
+            break;
+        }
+
+
+    }
+    else
+    {
+        flag = (1 << 0);
+    }
+    return flag;
+}
+static uint8_t __isitemState_vs_field_compare(s_item_exp_data_t *new_extract_data, l_fields_v2_t *tmp_field, uint8_t bit_mode_position)  // 1--> finish_mode | 2 --> start_mode 
+{
+    uint8_t flag = 0;
+    if (tmp_field)
+    {
+        switch (tmp_field->value_type)
+        {
+        case EZLOPI_VALUE_TYPE_ITEM:
+        {
+            cJSON *cj_item_value = cJSON_CreateObject(__FUNCTION__);
+            if (cj_item_value)
+            {
+                l_ezlopi_item_t *tmp_item = ezlopi_device_get_item_by_id(tmp_field->field_value.u_value.value_double);
+                tmp_item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, tmp_field, (void *)cj_item_value, NULL);
+                cJSON *cj_val = cJSON_GetObjectItem(__FUNCTION__, cj_item_value, ezlopi_value_str);
+                if (cj_val)
+                {
+                    switch (cj_val->type)
+                    {
+                    case cJSON_String:
+                    {
+                        if (cj_val->valuestring && new_extract_data->sample_data.u_value.value_string)
+                        {
+                            if (EZPI_STRNCMP_IF_EQUAL(cj_val->valuestring, new_extract_data->sample_data.u_value.value_string, cj_val->str_value_len, strlen(new_extract_data->sample_data.u_value.value_string)))
+                            {
+                                flag |= (1 << bit_mode_position);
+                            }
+                        }
+                        break;
+                    }
+                    case cJSON_Number:
+                    {
+                        flag |= (cj_val->valuedouble == new_extract_data->sample_data.u_value.value_double) ? (1 << bit_mode_position) : (0 << bit_mode_position);
+                        break;
+                    }
+                    case cJSON_True:  // bool_values can be converted to 1/0s
+                    {
+                        flag |= (new_extract_data->sample_data.u_value.value_bool) ? (1 << bit_mode_position) : (0 << bit_mode_position);
+                        break;
+                    }
+                    case cJSON_False: // bool_values can be converted to 1/0s
+                    {
+                        flag |= (!new_extract_data->sample_data.u_value.value_bool) ? (1 << bit_mode_position) : (0 << bit_mode_position);
+                        break;
+                    }
+                    default:
+                        TRACE_E("Error!! can compare only :- string / bool / number ");
+                        break;
+                    }
+                }
+
+                cJSON_Delete(__FUNCTION__, cj_item_value);
+            }
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_EXPRESSION:
+        {
+            s_ezlopi_expressions_t *tmp_expr = ezlopi_scenes_get_expression_node_by_name(tmp_field->field_value.u_value.value_string);
+            if (tmp_expr)
+            {
+                switch (tmp_expr->exp_value.type)
+                {
+                case EXPRESSION_VALUE_TYPE_BOOL:
+                {
+                    flag |= (tmp_expr->exp_value.u_value.boolean_value == new_extract_data->sample_data.u_value.value_double) ? (1 << bit_mode_position) : (0 << bit_mode_position);
+                    break;
+                }
+                case EXPRESSION_VALUE_TYPE_NUMBER:
+                {
+                    flag |= (tmp_expr->exp_value.u_value.number_value == new_extract_data->sample_data.u_value.value_double) ? (1 << bit_mode_position) : (0 << bit_mode_position);
+                    break;
+                }
+                case EXPRESSION_VALUE_TYPE_STRING:
+                {
+                    if (tmp_expr->exp_value.u_value.str_value && new_extract_data->sample_data.u_value.value_string)
+                    {
+                        if (EZPI_STRNCMP_IF_EQUAL(tmp_expr->exp_value.u_value.str_value,
+                            new_extract_data->sample_data.u_value.value_string,
+                            strlen(tmp_expr->exp_value.u_value.str_value),
+                            strlen(new_extract_data->sample_data.u_value.value_string)))
+                        {
+                            flag |= (1 << bit_mode_position);
+                        }
+                    }
+                    break;
+                }
+                default:
+                    TRACE_E("Error!! can compare only :- string / bool / number ");
+                    break;
+                }
+            }
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_INT:
+        {
+            flag |= (tmp_field->field_value.u_value.value_double == new_extract_data->sample_data.u_value.value_double) ? (1 << bit_mode_position) : (0 << bit_mode_position);
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_BOOL:
+        {
+            flag |= (tmp_field->field_value.u_value.value_bool == new_extract_data->sample_data.u_value.value_bool) ? (1 << bit_mode_position) : (0 << bit_mode_position);
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_STRING:
+        {
+            if (tmp_field->field_value.u_value.value_string && new_extract_data->sample_data.u_value.value_string)
+            {
+                if (EZPI_STRNCMP_IF_EQUAL(tmp_field->field_value.u_value.value_string,
+                    new_extract_data->sample_data.u_value.value_string,
+                    strlen(tmp_field->field_value.u_value.value_string),
+                    strlen(new_extract_data->sample_data.u_value.value_string)))
+                {
+                    flag |= (1 << bit_mode_position);
+                }
+            }
+            break;
+        }
+        default:
+            TRACE_E("Error!! Field-type  only support :- Item / Expression / string / bool / number ");
+            break;
+        }
+
+    }
+    else
+    {
+        flag = (1 << bit_mode_position);
+    }
+    return flag;
+}
+
 uint8_t isitemstate_changed(s_item_exp_data_t *new_extract_data, l_fields_v2_t *start_field, l_fields_v2_t *finish_field, void * user_arg)
 {
     uint32_t flag = 0;
-    if (new_extract_data)
+    s_item_exp_data_t *prev_extract_data = (s_item_exp_data_t *)user_arg;
+    if (new_extract_data)  // new vs old data
     {
         bool start_flag = false;
         bool finish_flag = false;
 
-        // the start value comparison
-        if (NULL != start_field)
+        // ---> New flag= (000) : ---> 1. compare 'new_extract_data' with 'start_field  / ANY'  ---> if true ; start_flag =1 ; ---> store data
+                                // --> 1.a . if start_field = Any ; start_flag =1 & return 'true' |  Else compare
+
+        // -----> For flag= (001): ------> 2. compare 'new_extract_data' with 'finish_field / ANY'  -----> if true ; flag = (011) ; ----> store data ;  flag = (111) : ---->
+                                    // --> 2.a . if finish = Any ; start_flag =1 & return 'true' |  Else compare  
+
+        // --------> For flag = (111) : --------> 3. if(start_field & final_field == NULL or 'ANY') ? exit ; else, flag = (000).  
+
+
+            // find the state we are in .
+        switch (prev_extract_data->curr_state)  // this says what to do next
         {
-
-
-            if (start_field->value_type == new_extract_data->value_type)
+            case (1 << 2) | (1 << 1) | (1 << 0) :// for fresh start (both conditions are false)
             {
-                switch (start_field->value_type)
-                {
-                case EZLOPI_VALUE_TYPE_ITEM:
-                    /* code */
-                    break;
+                TRACE_D("checking start conditon");
+                start_flag = ezlopi_scenes_operators_value_comparevalues_with_less_operations(item_exp_field, start_field, value_type_field, NULL);
+                break;
+            }
+            case (1 << 0):
+            { /* code */
+                TRACE_D("checking finish conditon");
+                start_flag = true;
+                finish_flag = ezlopi_scenes_operators_value_comparevalues_with_less_operations(item_exp_field, finish_field, value_type_field, NULL);
+                break;
+            }
+            default:
+            {
+                TRACE_D("...default checking");
+                start_flag = ezlopi_scenes_operators_value_comparevalues_with_less_operations(item_exp_field, start_field, value_type_field, NULL);
+                finish_flag = ezlopi_scenes_operators_value_comparevalues_with_less_operations(item_exp_field, finish_field, value_type_field, NULL);
+                break;
+            }
+        }
 
-                default:
-                    break;
-                }
 
 
+        if (start_field->field_value.e_type == new_extract_data->sample_data.e_type)    // ITEM or EXPRESSION
+        {
+            // the start value comparison
+            if (NULL != start_field)
+            {
+
+            }
+            else
+            {
+                // case : start_value = 'ANY'
+                start_field = true;
+            }
+
+            // the end value comparison
+            if (NULL != finish_field)
+            {
+
+            }
+            else
+            {
+                // case : start_value = 'ANY'
+                finish_field = true;
             }
 
         }
 
-        // the end value comparison
-        if (NULL != finish_field)
-        {
 
-        }
-
+        // replace the old with new
+        memset(prev_extract_data, 0, sizeof(s_item_exp_data_t));
+        memcpy(prev_extract_data, new_extract_data, sizeof(s_item_exp_data_t));
 
 
 
-
-        // l_fields_v2_t *value_type_field = ezlopi_malloc(__FUNCTION__, sizeof(l_fields_v2_t));
-        // if (value_type_field)
-        // {
-        //     // 1. Create a dummy 'value-type' required for comparison
-        //     memset(value_type_field, 0, sizeof(l_fields_v2_t));
-        //     value_type_field->next = NULL;
-        //     value_type_field->scale = NULL;
-        //     value_type_field->user_arg = NULL;
-
-        //     if (EZLOPI_VALUE_TYPE_EXPRESSION == item_exp_field->value_type) // EXPRESSION
-        //     {
-        //         s_ezlopi_expressions_t *curr_expr_left = ezlopi_scenes_get_expression_node_by_name(item_exp_field->field_value.u_value.value_string);
-        //         if (curr_expr_left)
-        //         {
-        //             value_type_field->field_value.u_value.value_string = ezlopi_scene_get_scene_value_type_name(curr_expr_left->value_type);
-        //         }
-        //     }
-        //     else  // ITEM
-        //     {
-        //         uint32_t item_id = strtoul(item_exp_field->field_value.u_value.value_string, NULL, 16);
-        //         l_ezlopi_item_t *item_left = ezlopi_device_get_item_by_id(item_id);
-        //         if (item_left)
-        //         {
-        //             value_type_field->field_value.u_value.value_string = item_left->cloud_properties.value_type;
-        //         }
-        //     }
 
         // 2. Compare the fields
         // switch (curr_state & (1 << 0 | 1 << 1))
@@ -1680,10 +1864,6 @@ uint8_t isitemstate_changed(s_item_exp_data_t *new_extract_data, l_fields_v2_t *
         // }
         // }
 
-        // 3. Delete the dummy 'value-type'
-        //     ezlopi_scenes_delete_field_value(value_type_field);
-        //     ezlopi_free(__FUNCTION__, value_type_field);
-        // }
 
         // assign the flag result
         flag = (start_flag ? (1 << 0) : 0) | (finish_flag ? (1 << 1) : 0);
