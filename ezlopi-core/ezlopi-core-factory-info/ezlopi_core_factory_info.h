@@ -92,7 +92,7 @@ extern "C"
         EZLOPI_FINFO_LEN_EZLOPI_CONFIG_JSON = 0x1000,
         EZLOPI_FINFO_LEN_PROVISIONING_TOKEN = 0x200,
         EZLOPI_FINFO_LEN_PROVISIONING_SERVER_URL = 0x100,
-        EZLOPI_FINFO_LEN_LOCAL_KEY = 0x200
+        EZLOPI_FINFO_LEN_LOCAL_KEY = 0x0040
     } e_ezlopi_factory_info_v3_length_t;
 
     typedef struct s_basic_factory_info

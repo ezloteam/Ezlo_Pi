@@ -87,6 +87,10 @@ typedef int32_t ezlopi_error_t;
 
 #define EZPI_ERR_MODES_FAILED                                           0x00040000 // Any error occcured during modes related operations
 
+#define EZPI_ERR_JOSN_PARAMS_NOT_FOUND                                  0x00080000 // If any parameters ar not found in incoming JSON as expected.
+
+#define EZPI_ERR_INVALID_CREDENTIALS                                    0x00100000 // Credentials such as wifi, login, etc.
+
 
 // #warning("Create error code for invalid and empty params")
 
