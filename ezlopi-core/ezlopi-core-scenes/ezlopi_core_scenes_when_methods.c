@@ -268,11 +268,12 @@ int ezlopi_scene_when_is_item_state_changed(l_scenes_list_v2_t *scene_node, void
                             case EXPRESSION_VALUE_TYPE_STRING:
                             {
                                 new_extract_data->sample_data.e_type = VALUE_TYPE_STRING;
-                                size_t len = strlen(curr_expr_left->exp_value.u_value.str_value);
+                                size_t value_len = strlen(curr_expr_left->exp_value.u_value.str_value) + 1;
 
-                                new_extract_data->sample_data.u_value.value_string = strndup(curr_expr_left->exp_value.u_value.str_value, len);
+                                new_extract_data->sample_data.u_value.value_string = ezlopi_malloc(__FUNCTION__, value_len);
                                 if (new_extract_data->sample_data.u_value.value_string)
                                 {
+                                    snprintf(new_extract_data->sample_data.u_value.value_string, value_len, "%s", curr_expr_left->exp_value.u_value.str_value);
                                     TRACE_D("copied : %s", new_extract_data->sample_data.u_value.value_string);
                                 }
                                 break;
@@ -320,10 +321,12 @@ int ezlopi_scene_when_is_item_state_changed(l_scenes_list_v2_t *scene_node, void
                                     case cJSON_String:
                                     {
                                         new_extract_data->sample_data.e_type = VALUE_TYPE_STRING;
-                                        size_t len = (cj_value->str_value_len);
-                                        new_extract_data->sample_data.u_value.value_string = strndup(cj_value->valuestring, cj_value->str_value_len);
+                                        size_t value_len = strlen(cj_value->valuestring) + 1;
+
+                                        new_extract_data->sample_data.u_value.value_string = ezlopi_malloc(__FUNCTION__, value_len);
                                         if (new_extract_data->sample_data.u_value.value_string)
                                         {
+                                            snprintf(new_extract_data->sample_data.u_value.value_string, value_len, "%s", cj_value->valuestring);
                                             TRACE_D("copied : %s", new_extract_data->sample_data.u_value.value_string);
                                         }
                                         break;
@@ -369,9 +372,12 @@ int ezlopi_scene_when_is_item_state_changed(l_scenes_list_v2_t *scene_node, void
                                 case cJSON_String:
                                 {
                                     new_extract_data->sample_data.e_type = VALUE_TYPE_STRING;
-                                    new_extract_data->sample_data.u_value.value_string = strndup(cj_value->valuestring);
+                                    size_t value_len = strlen(cj_value->valuestring) + 1;
+
+                                    new_extract_data->sample_data.u_value.value_string = ezlopi_malloc(__FUNCTION__, value_len);
                                     if (new_extract_data->sample_data.u_value.value_string)
                                     {
+                                        snprintf(new_extract_data->sample_data.u_value.value_string, value_len, "%s", cj_value->valuestring);
                                         TRACE_D("copied : %s", new_extract_data->sample_data.u_value.value_string);
                                     }
                                     break;
@@ -389,36 +395,16 @@ int ezlopi_scene_when_is_item_state_changed(l_scenes_list_v2_t *scene_node, void
 
                 uint8_t flag = isitemstate_changed(new_extract_data, start_field, finish_field, scene_node->when_block->fields->user_arg);
 
-                // examine the flag
-
-
-                // delete 'new_extract_data'
+                // remove string 
+                if (VALUE_TYPE_STRING == new_extract_data->sample_data.e_type)
                 {
-                    // new_extract_data->sample_data.exp_value.u_value.str_value
-                    switch (new_extract_data->sample_data.e_type)
+                    if (new_extract_data->sample_data.u_value.value_string)
                     {
-                    case VALUE_TYPE_NUMBER:
-                    {
-                        new_extract_data->sample_data.u_value.value_double = 0;
-                        break;
-                    }
-                    case VALUE_TYPE_STRING:
-                    {
-                        if (new_extract_data->sample_data.u_value.value_string)
-                        {
-                            ezlopi_free(__FUNCTION__, new_extract_data->sample_data.u_value.value_string);
-                            new_extract_data->sample_data.u_value.value_string = NULL;
-                        }
-                        break;
-                    }
-                    case VALUE_TYPE_BOOL:
-                    {
-                        new_extract_data->sample_data.u_value.value_bool = false;
-                        break;
-                    }
+                        ezlopi_free(__FUNCTION__, new_extract_data->sample_data.u_value.value_string);
+                        new_extract_data->sample_data.u_value.value_string = NULL;
                     }
                 }
-
+                ezlopi_free(__FUNCTION__, new_extract_data);
 
             }
         }

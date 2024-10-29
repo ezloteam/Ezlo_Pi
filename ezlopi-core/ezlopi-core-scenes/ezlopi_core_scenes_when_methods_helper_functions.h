@@ -66,7 +66,7 @@ typedef struct s_item_exp_data
 {
     s_item_expn_data_t sample_data;     // this contains value 
     e_scene_value_type_v2_t value_type; // all scenes_value_types
-    uint8_t curr_state : 3;                 // This is used to identify what to do next. | [BIT2 =activation_flag , BIT1 =finish_flag , BIT2 =start_flag]
+    uint8_t status : 3;                 // This is used to identify what to do next. | [BIT2 =activation_flag , BIT1 =finish_flag , BIT2 =start_flag]
 } s_item_exp_data_t;
 
 //------------------------------- ezlopi_scene_when_is_itemState ------------------------------------------

@@ -1588,48 +1588,7 @@ int isdeviceitem_group_value_check(l_scenes_list_v2_t *scene_node, uint32_t devi
     return ret;
 }
 
-static uint8_t __isitemState_start_field_compare(s_item_exp_data_t *new_extract_data, l_fields_v2_t *start_field)
-{
-    uint8_t flag = 0;
-    if (start_field)
-    {
-
-        switch (start_field->value_type)
-        {
-        case EZLOPI_VALUE_TYPE_ITEM:
-        {
-            break;
-        }
-        case EZLOPI_VALUE_TYPE_EXPRESSION:
-        {
-            break;
-        }
-        case EZLOPI_VALUE_TYPE_INT:
-        {
-            new_extract_data->sample_data.u_value
-                break;
-        }
-        case EZLOPI_VALUE_TYPE_BOOL:
-        {
-            break;
-        }
-        case EZLOPI_VALUE_TYPE_STRING:
-        {
-            break;
-        }
-        default:
-            break;
-        }
-
-
-    }
-    else
-    {
-        flag = (1 << 0);
-    }
-    return flag;
-}
-static uint8_t __isitemState_vs_field_compare(s_item_exp_data_t *new_extract_data, l_fields_v2_t *tmp_field, uint8_t bit_mode_position)  // 1--> finish_mode | 2 --> start_mode 
+static uint8_t __isitemState_vs_field_compare(s_item_exp_data_t *new_extract_data, l_fields_v2_t *tmp_field, uint8_t bit_mode_position)  // 1--> finish_case | 2 --> start_case 
 {
     uint8_t flag = 0;
     if (tmp_field)
@@ -1642,7 +1601,7 @@ static uint8_t __isitemState_vs_field_compare(s_item_exp_data_t *new_extract_dat
             if (cj_item_value)
             {
                 l_ezlopi_item_t *tmp_item = ezlopi_device_get_item_by_id(tmp_field->field_value.u_value.value_double);
-                tmp_item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, tmp_field, (void *)cj_item_value, NULL);
+                tmp_item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, tmp_item, (void *)cj_item_value, NULL);
                 cJSON *cj_val = cJSON_GetObjectItem(__FUNCTION__, cj_item_value, ezlopi_value_str);
                 if (cj_val)
                 {
@@ -1661,21 +1620,21 @@ static uint8_t __isitemState_vs_field_compare(s_item_exp_data_t *new_extract_dat
                     }
                     case cJSON_Number:
                     {
-                        flag |= (cj_val->valuedouble == new_extract_data->sample_data.u_value.value_double) ? (1 << bit_mode_position) : (0 << bit_mode_position);
+                        flag |= (cj_val->valuedouble == new_extract_data->sample_data.u_value.value_double) ? (1 << bit_mode_position) : 0;
                         break;
                     }
                     case cJSON_True:  // bool_values can be converted to 1/0s
                     {
-                        flag |= (new_extract_data->sample_data.u_value.value_bool) ? (1 << bit_mode_position) : (0 << bit_mode_position);
+                        flag |= (new_extract_data->sample_data.u_value.value_bool) ? (1 << bit_mode_position) : 0;
                         break;
                     }
                     case cJSON_False: // bool_values can be converted to 1/0s
                     {
-                        flag |= (!new_extract_data->sample_data.u_value.value_bool) ? (1 << bit_mode_position) : (0 << bit_mode_position);
+                        flag |= (!new_extract_data->sample_data.u_value.value_bool) ? (1 << bit_mode_position) : 0;
                         break;
                     }
                     default:
-                        TRACE_E("Error!! can compare only :- string / bool / number ");
+                        TRACE_E("Error!! (ITEM_value) can compare only :- string / bool / number ");
                         break;
                     }
                 }
@@ -1693,12 +1652,12 @@ static uint8_t __isitemState_vs_field_compare(s_item_exp_data_t *new_extract_dat
                 {
                 case EXPRESSION_VALUE_TYPE_BOOL:
                 {
-                    flag |= (tmp_expr->exp_value.u_value.boolean_value == new_extract_data->sample_data.u_value.value_double) ? (1 << bit_mode_position) : (0 << bit_mode_position);
+                    flag |= (tmp_expr->exp_value.u_value.boolean_value == new_extract_data->sample_data.u_value.value_double) ? (1 << bit_mode_position) : 0;
                     break;
                 }
                 case EXPRESSION_VALUE_TYPE_NUMBER:
                 {
-                    flag |= (tmp_expr->exp_value.u_value.number_value == new_extract_data->sample_data.u_value.value_double) ? (1 << bit_mode_position) : (0 << bit_mode_position);
+                    flag |= (tmp_expr->exp_value.u_value.number_value == new_extract_data->sample_data.u_value.value_double) ? (1 << bit_mode_position) : 0;
                     break;
                 }
                 case EXPRESSION_VALUE_TYPE_STRING:
@@ -1716,7 +1675,7 @@ static uint8_t __isitemState_vs_field_compare(s_item_exp_data_t *new_extract_dat
                     break;
                 }
                 default:
-                    TRACE_E("Error!! can compare only :- string / bool / number ");
+                    TRACE_E("Error!! (Expression_value) can compare only :- string / bool / number ");
                     break;
                 }
             }
@@ -1724,12 +1683,12 @@ static uint8_t __isitemState_vs_field_compare(s_item_exp_data_t *new_extract_dat
         }
         case EZLOPI_VALUE_TYPE_INT:
         {
-            flag |= (tmp_field->field_value.u_value.value_double == new_extract_data->sample_data.u_value.value_double) ? (1 << bit_mode_position) : (0 << bit_mode_position);
+            flag |= (tmp_field->field_value.u_value.value_double == new_extract_data->sample_data.u_value.value_double) ? (1 << bit_mode_position) : 0;
             break;
         }
         case EZLOPI_VALUE_TYPE_BOOL:
         {
-            flag |= (tmp_field->field_value.u_value.value_bool == new_extract_data->sample_data.u_value.value_bool) ? (1 << bit_mode_position) : (0 << bit_mode_position);
+            flag |= (tmp_field->field_value.u_value.value_bool == new_extract_data->sample_data.u_value.value_bool) ? (1 << bit_mode_position) : 0;
             break;
         }
         case EZLOPI_VALUE_TYPE_STRING:
@@ -1750,13 +1709,62 @@ static uint8_t __isitemState_vs_field_compare(s_item_exp_data_t *new_extract_dat
             TRACE_E("Error!! Field-type  only support :- Item / Expression / string / bool / number ");
             break;
         }
-
     }
     else
     {
-        flag = (1 << bit_mode_position);
+        flag |= (1 << bit_mode_position);
     }
     return flag;
+}
+
+static void __replace_old_with_new_data_val(s_item_exp_data_t *new_extract_data, s_item_exp_data_t *prev_extract_data)
+{
+    if (new_extract_data && prev_extract_data)
+    {
+        prev_extract_data->status = new_extract_data->status;
+        prev_extract_data->value_type = new_extract_data->value_type;
+        prev_extract_data->sample_data.e_type = new_extract_data->sample_data.e_type;
+
+        switch (new_extract_data->sample_data.e_type)
+        {
+        case VALUE_TYPE_BOOL:
+        {
+            prev_extract_data->sample_data.u_value.value_bool = new_extract_data->sample_data.u_value.value_bool;
+            break;
+        }
+        case VALUE_TYPE_NUMBER:
+        {
+            prev_extract_data->sample_data.u_value.value_double = new_extract_data->sample_data.u_value.value_double;
+            break;
+        }
+        case VALUE_TYPE_STRING:
+        {
+            if (new_extract_data->sample_data.u_value.value_string)
+            {
+                uint32_t value_len = strlen(new_extract_data->sample_data.u_value.value_string) + 1;
+                {
+                    if (prev_extract_data->sample_data.u_value.value_string) // erasing prev-string
+                    {
+                        ezlopi_free(__FUNCTION__, prev_extract_data->sample_data.u_value.value_string);
+                    }
+                    prev_extract_data->sample_data.u_value.value_string = ezlopi_malloc(__FUNCTION__, value_len);
+                    if (prev_extract_data->sample_data.u_value.value_string)
+                    {
+                        snprintf(prev_extract_data->sample_data.u_value.value_string, value_len, "%s", new_extract_data->sample_data.u_value.value_string);
+                    }
+                }
+            }
+            break;
+        }
+        default:
+            break;
+        }
+    }
+    else
+    {
+        TRACE_E("Invalid operation.... null structure");
+    }
+
 }
 
 uint8_t isitemstate_changed(s_item_exp_data_t *new_extract_data, l_fields_v2_t *start_field, l_fields_v2_t *finish_field, void * user_arg)
@@ -1765,110 +1773,103 @@ uint8_t isitemstate_changed(s_item_exp_data_t *new_extract_data, l_fields_v2_t *
     s_item_exp_data_t *prev_extract_data = (s_item_exp_data_t *)user_arg;
     if (new_extract_data)  // new vs old data
     {
-        bool start_flag = false;
-        bool finish_flag = false;
-
         // ---> New flag= (000) : ---> 1. compare 'new_extract_data' with 'start_field  / ANY'  ---> if true ; start_flag =1 ; ---> store data
                                 // --> 1.a . if start_field = Any ; start_flag =1 & return 'true' |  Else compare
-
         // -----> For flag= (001): ------> 2. compare 'new_extract_data' with 'finish_field / ANY'  -----> if true ; flag = (011) ; ----> store data ;  flag = (111) : ---->
-                                    // --> 2.a . if finish = Any ; start_flag =1 & return 'true' |  Else compare  
+                                // ------> 2.a . if finish = Any ; start_flag =1 & return 'true' |  Else compare
+        // --------> For flag = (111) : --------> 3. if(start_field & final_field == NULL or 'ANY') ? exit ; else, flag = (000).
 
-        // --------> For flag = (111) : --------> 3. if(start_field & final_field == NULL or 'ANY') ? exit ; else, flag = (000).  
-
-
-            // find the state we are in .
-        switch (prev_extract_data->curr_state)  // this says what to do next
+        if (NULL == prev_extract_data)
         {
-            case (1 << 2) | (1 << 1) | (1 << 0) :// for fresh start (both conditions are false)
+            flag |= __isitemState_vs_field_compare(new_extract_data, start_field, 0);
+            TRACE_D("First-time check.... flag=%08x", flag);
+        }
+        else
+        {
+            switch (prev_extract_data->status)  // this says what to do next
+            {
+            case 0: // no condition match   ---> check the start condition only.
             {
                 TRACE_D("checking start conditon");
-                start_flag = ezlopi_scenes_operators_value_comparevalues_with_less_operations(item_exp_field, start_field, value_type_field, NULL);
+                flag |= __isitemState_vs_field_compare(prev_extract_data, start_field, 0);
                 break;
             }
-            case (1 << 0):
-            { /* code */
+            case (BIT2 | BIT1 | BIT0):   // all condition matched and activated  ---> check if state have changed --> if changed , reset activation flag
+            {
+                if (BIT0 & (flag |= __isitemState_vs_field_compare(prev_extract_data, start_field, 0))) // if BIT0 = 1
+                {
+                    TRACE_D("start condition is still satisfied.... cannot reset 'BIT2'");
+                }
+                else if (BIT1 & (flag |= __isitemState_vs_field_compare(new_extract_data, finish_field, 1)))  //if BIT1 = 1
+                {
+                    TRACE_D("finish condition is still satisfied..... cannot reset 'BIT2'");
+                }
+                else
+                {
+                    TRACE_D("after checking the start/finish conditon , [Flag : %08x] --> so reseting the 'BIT2' ", flag);
+                    flag &= (0 << 2);
+                    TRACE_D("after checking the start/finish conditon , [Flag : %08x] --> so reseting the 'BIT2' ", flag);
+
+                }
+                break;
+            }
+            case (BIT1 | BIT0):  // condition match but not activated [or reset] ---> need to active here
+            {
+                TRACE_D("pre-state : (011) --> activating");
+                flag |= BIT2;
+                break;
+            }
+            case (BIT0):  // Only start condition activated ; ----> so check for finish condition
+            {
                 TRACE_D("checking finish conditon");
-                start_flag = true;
-                finish_flag = ezlopi_scenes_operators_value_comparevalues_with_less_operations(item_exp_field, finish_field, value_type_field, NULL);
+                flag |= BIT0;
+                flag |= __isitemState_vs_field_compare(new_extract_data, finish_field, 1);
                 break;
             }
-            default:
+            default:    // all remaining conditon are invalid ; So 'Reset' all flags and start again in next iteration.
             {
-                TRACE_D("...default checking");
-                start_flag = ezlopi_scenes_operators_value_comparevalues_with_less_operations(item_exp_field, start_field, value_type_field, NULL);
-                finish_flag = ezlopi_scenes_operators_value_comparevalues_with_less_operations(item_exp_field, finish_field, value_type_field, NULL);
+                TRACE_D("Reseting conditon");
+                flag = 0;
                 break;
             }
+            }
+            TRACE_D("Latest check.... flag=%08x", flag);
         }
 
-
-
-        if (start_field->field_value.e_type == new_extract_data->sample_data.e_type)    // ITEM or EXPRESSION
+        // activate BIT2 in status ; if both start and finish condition are satisfied.
+        if (flag & (BIT1 | BIT0))
         {
-            // the start value comparison
-            if (NULL != start_field)
-            {
-
-            }
-            else
-            {
-                // case : start_value = 'ANY'
-                start_field = true;
-            }
-
-            // the end value comparison
-            if (NULL != finish_field)
-            {
-
-            }
-            else
-            {
-                // case : start_value = 'ANY'
-                finish_field = true;
-            }
-
+            flag |= BIT2;
         }
 
+        // assign latest flag
+        new_extract_data->status = flag;
 
-        // replace the old with new
-        memset(prev_extract_data, 0, sizeof(s_item_exp_data_t));
-        memcpy(prev_extract_data, new_extract_data, sizeof(s_item_exp_data_t));
+        // Store the 'new-extracted' data
+        if (NULL == prev_extract_data)
+        {
+            s_item_exp_data_t *tmp_struct = ezlopi_malloc(__FUNCTION__, sizeof(s_item_exp_data_t));
+            if (tmp_struct)
+            {
+                memset(tmp_struct, 0, sizeof(s_item_exp_data_t));
+                __replace_old_with_new_data_val(new_extract_data, tmp_struct);
+                user_arg = (void*)tmp_struct;
+            }
+            else
+            {
+                TRACE_E("Malloc failed!!");
+            }
+        }
+        else
+        {
+            __replace_old_with_new_data_val(new_extract_data, prev_extract_data);
+            user_arg = (void*)prev_extract_data;
+        }
 
-
-
-
-        // 2. Compare the fields
-        // switch (curr_state & (1 << 0 | 1 << 1))
-        // {
-        //     #warning "check for finish condition";
-        // case 0:// for fresh start (both conditions are false)
-        // {
-        //     TRACE_D("checking start conditon");
-        //     start_flag = ezlopi_scenes_operators_value_comparevalues_with_less_operations(item_exp_field, start_field, value_type_field, NULL);
-        //     break;
-        // }
-        // case (1 << 0):  // if start condition is true
-        // { /* code */
-        //     TRACE_D("checking finish conditon");
-        //     start_flag = true;
-        //     finish_flag = ezlopi_scenes_operators_value_comparevalues_with_less_operations(item_exp_field, finish_field, value_type_field, NULL);
-        //     break;
-        // }
-        // default:
-        // {
-        //     TRACE_D("...default checking");
-        //     start_flag = ezlopi_scenes_operators_value_comparevalues_with_less_operations(item_exp_field, start_field, value_type_field, NULL);
-        //     finish_flag = ezlopi_scenes_operators_value_comparevalues_with_less_operations(item_exp_field, finish_field, value_type_field, NULL);
-        //     break;
-        // }
-        // }
-
-
-        // assign the flag result
-        flag = (start_flag ? (1 << 0) : 0) | (finish_flag ? (1 << 1) : 0);
-
-
+    }
+    else
+    {
+        TRACE_E("new_extract_data == NULL");
     }
     return flag;
 }
