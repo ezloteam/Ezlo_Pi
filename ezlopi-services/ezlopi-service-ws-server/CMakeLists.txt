@@ -16,6 +16,7 @@ set(EZLOPI_CORE_COMPONENTS
         ezlopi-core-buffer
         ezlopi-core-ezlopi
         ezlopi-core-factory-info
+        ezlopi-core-offline-login
 )
 
 set(EZLOPI_CLOUD_COMPONENTS 

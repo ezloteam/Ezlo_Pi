@@ -7,6 +7,7 @@
 #include "ezlopi_core_errors.h"
 
 ezlopi_error_t ezlopi_core_offline_login_perform(cJSON *cj_params);
+ezlopi_error_t ezlopi_core_offline_logout_perform();
 
 #endif // __EZLOPI_CORE_OFFLINE_LOGIN_H_
 

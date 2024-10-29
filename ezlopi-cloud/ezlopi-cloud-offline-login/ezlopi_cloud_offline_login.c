@@ -27,17 +27,17 @@ void EZPI_CLOUD_offline_login(cJSON *cj_request, cJSON *cj_response)
         if (cj_params)
         {
             ezlopi_error_t error = ezlopi_core_offline_login_perform(cj_params);
-            if (EZPI_ERR_JOSN_PARAMS_NOT_FOUND == error)
+            if (EZPI_ERR_WRONG_PARAM == error)
             {
-                ezlopi_cloud_prepare_error(error, -32602, "Wrong params", "rpc.params.invalid");
+                ezlopi_cloud_prepare_error(cj_response, -32602, "Wrong params", "rpc.params.invalid");
             }
             else if (EZPI_FAILED == error)
             {
                 ezlopi_cloud_prepare_error(cj_response, -32500, "Already logged in", "user.login.alreadylogged");
             }
-            else if(EZPI_ERR_INVALID_CREDENTIALS == error)
+            else if (EZPI_ERR_INVALID_CREDENTIALS == error)
             {
-                ezlopi_cloud_prepare_error(cj_response, -32500, "Bad password", "user.login.alreadylogged");
+                ezlopi_cloud_prepare_error(cj_response, -32500, "Bad password", "user.login.badpassword");
             }
         }
         else

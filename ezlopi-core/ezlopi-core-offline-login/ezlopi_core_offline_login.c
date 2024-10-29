@@ -20,30 +20,43 @@ ezlopi_error_t ezlopi_core_offline_login_perform(cJSON *cj_params)
         cJSON *cj_token = cJSON_GetObjectItem(__FUNCTION__, cj_params, "token");
         if (cj_user && cj_token && (cJSON_IsString(cj_user)) && (cJSON_IsString(cj_token)))
         {
-            const char *stored_uesr_id = ezlopi_nvs_read_user_id_str();
+            char *stored_uesr_id = ezlopi_nvs_read_user_id_str();
             if (NULL != stored_uesr_id)
             {
-                printf("\n\n UserID: %s\nToken: %s \nStored id: %s\n\n", cj_user->valuestring, cj_token->valuestring, stored_uesr_id);
-                if(0 == strncmp(stored_uesr_id, cj_user->valuestring, strlen(stored_uesr_id)))
+                if (0 == strncmp(stored_uesr_id, cj_user->valuestring, strlen(stored_uesr_id)))
                 {
-                    // const char *password_saved = "Hs87Kns41106743NMS2";
                     const char *password_saved = ezlopi_factory_info_v3_get_local_key();
-                    if(0 == strncmp(password_saved, cj_token->valuestring, strlen(password_saved)))
+                    if (0 == strncmp(password_saved, cj_token->valuestring, strlen(password_saved)))
                     {
                         logged_in = true;
                     }
-                    else 
+                    else
                     {
                         error = EZPI_ERR_INVALID_CREDENTIALS;
                     }
+                }
+                else
+                {
+                    error = EZPI_ERR_WRONG_PARAM;
                 }
                 ezlopi_free(__FUNCTION__, stored_uesr_id);
             }
         }
         else
         {
-            error = EZPI_ERR_JOSN_PARAMS_NOT_FOUND;
+            error = EZPI_ERR_WRONG_PARAM;
         }
+    }
+    return error;
+}
+
+ezlopi_error_t ezlopi_core_offline_logout_perform()
+{
+    ezlopi_error_t error = EZPI_FAILED;
+    if (logged_in)
+    {
+        logged_in = false;
+        error = EZPI_SUCCESS;
     }
     return error;
 }
