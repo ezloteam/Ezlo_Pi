@@ -486,6 +486,21 @@ char *ezlopi_factory_info_v3_get_cloud_server(void)
     }
 }
 
+char *ezlopi_factory_info_v3_get_local_key(void)
+{
+    char *local_key = ezlopi_factory_info_v3_read_string(__FUNCTION__, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_LOCAL_KEY, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_LOCAL_KEY);
+
+    if (local_key)
+    {
+        if (!isprint(local_key[0]))
+        {
+            ezlopi_free(__FUNCTION__, local_key);
+            local_key = NULL;
+        }
+    }
+    return local_key;
+}
+
 char *ezlopi_factory_info_v3_get_provisioning_server(void)
 {
     char *provisioning_server = ezlopi_factory_info_v3_read_string(__FUNCTION__, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_PROVISIONING_SERVER_URL, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_PROVISIONING_SERVER_URL);
@@ -503,21 +518,6 @@ char *ezlopi_factory_info_v3_get_provisioning_server(void)
 const char *ezlopi_factory_info_v3_get_device_type(void)
 {
     return "ezlopi_generic";
-}
-
-char *ezlopi_factory_info_v3_get_local_key(void)
-{
-    uint32_t abs_address_local_key = ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_LOCAL_KEY, E_EZLOPI_FACTORY_INFO_CONN_DATA);
-    char *local_key = ezlopi_factory_info_v3_read_string(__FUNCTION__, abs_address_local_key, EZLOPI_FINFO_LEN_LOCAL_KEY);
-    if (local_key)
-    {
-        return local_key;
-    }
-    else
-    {
-        ezlopi_free(__FUNCTION__, local_key);
-        return NULL;
-    }
 }
 
 void ezlopi_factory_info_v3_free_ca_certificate(void)
@@ -674,6 +674,13 @@ int ezlopi_factory_info_v3_set_basic(s_basic_factory_info_t *ezlopi_config_basic
                         TRACE_S("Config Version: %d", ezlopi_config_basic->config_version);
                     }
 
+                    if (NULL != ezlopi_config_basic->local_key)
+                    {
+                        memset(tmp_buffer + EZLOPI_FINFO_REL_OFFSET_LOCAL_KEY, 0, EZLOPI_FINFO_LEN_LOCAL_KEY);
+                        memcpy(tmp_buffer + EZLOPI_FINFO_REL_OFFSET_LOCAL_KEY, ezlopi_config_basic->local_key, EZLOPI_FINFO_LEN_LOCAL_KEY);
+                        TRACE_S("local_key: %s", ezlopi_config_basic->local_key);
+                    }
+
                     if (NULL != ezlopi_config_basic->cloud_server)
                     {
                         memset(tmp_buffer + EZLOPI_FINFO_REL_OFFSET_CLOUD_SERVER_URL, 0, EZLOPI_FINFO_LEN_CLOUD_SERVER_URL);
@@ -704,13 +711,6 @@ int ezlopi_factory_info_v3_set_basic(s_basic_factory_info_t *ezlopi_config_basic
                         memset(tmp_buffer + EZLOPI_FINFO_REL_OFFSET_PROVISIONING_TOKEN, 0, EZLOPI_FINFO_LEN_PROVISIONING_TOKEN);
                         memcpy(tmp_buffer + EZLOPI_FINFO_REL_OFFSET_PROVISIONING_TOKEN, ezlopi_config_basic->provision_token, EZLOPI_FINFO_LEN_PROVISIONING_TOKEN);
                         TRACE_S("provision_token: %s", ezlopi_config_basic->provision_token);
-                    }
-
-                    if (NULL != ezlopi_config_basic->local_key)
-                    {
-                        memset(tmp_buffer + EZLOPI_FINFO_REL_OFFSET_LOCAL_KEY, 0, EZLOPI_FINFO_LEN_LOCAL_KEY);
-                        memcpy(tmp_buffer + EZLOPI_FINFO_REL_OFFSET_LOCAL_KEY, ezlopi_config_basic->provision_token, EZLOPI_FINFO_LEN_LOCAL_KEY);
-                        TRACE_S("local_key: %s", ezlopi_config_basic->local_key);
                     }
 
                     if (ESP_OK == esp_partition_erase_range(partition_ctx_v3, EZLOPI_FINFO_OFFSET_CONN_DATA, EZLOPI_FINFO_READ_LEN_4KB))
