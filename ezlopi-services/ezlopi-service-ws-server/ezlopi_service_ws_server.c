@@ -34,6 +34,7 @@
 #include "ezlopi_core_event_group.h"
 #include "ezlopi_core_api_methods.h"
 #include "ezlopi_core_cjson_macros.h"
+#include "ezlopi_core_offline_login.h"
 
 #include "ezlopi_service_ws_server.h"
 #include "ezlopi_service_ws_server_clients.h"
@@ -232,6 +233,7 @@ static esp_err_t __msg_handler(httpd_req_t *req)
                 {
                     TRACE_D("closing connection!");
                     ezlopi_service_ws_server_clients_remove_by_handle(req->handle);
+                    ezlopi_core_offline_logout_perform();
                 }
                 else if (0 < ws_pkt.len)
                 {
@@ -259,6 +261,7 @@ static esp_err_t __msg_handler(httpd_req_t *req)
                             {
                                 TRACE_D("closing connection!");
                                 ezlopi_service_ws_server_clients_remove_by_handle(req->handle);
+                                ezlopi_core_offline_logout_perform();
                             }
                             else
                             {
@@ -430,6 +433,7 @@ static ezlopi_error_t __ws_server_send(l_ws_server_client_conn_t *client, char *
             {
                 TRACE_E("fail count reached maximum!");
                 ezlopi_service_ws_server_clients_remove_by_handle(client->http_handle);
+                ezlopi_core_offline_logout_perform();
             }
         }
     }
