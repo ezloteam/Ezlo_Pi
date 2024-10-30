@@ -44,6 +44,7 @@ set(EZLOPI_SERVICES
         ezlopi-service-ble
         ezlopi-service-ota
         ezlopi-service-uart
+        ezlopi-service-otel
         ezlopi-service-loop
         ezlopi-service-modes
         ezlopi-service-webprov

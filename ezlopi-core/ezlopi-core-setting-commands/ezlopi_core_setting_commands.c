@@ -239,32 +239,31 @@ static int ezlopi_core_add_network_ping_timeout_settings(cJSON *cj_settings)
 static int ezlopi_core_add_log_level_settings(cJSON *cj_settings)
 {
     int ret = -1;
-    const char **log_level_enums = ezlopi_core_cloud_log_get_severity_enums();
-    if (log_level_enums)
-    {
-        cJSON *cj_log_level = cJSON_CreateObject(__FUNCTION__);
-        if (cj_log_level)
-        {
-            cJSON *cj_enum = cJSON_AddArrayToObject(__FUNCTION__, cj_log_level, "enum");
-            if (cj_enum)
-            {
-                for (e_ezlopi_log_severity_t i = 0; i < ENUM_EZLOPI_LOG_SEVERITY_MAX; i++)
-                {
-                    cJSON_AddItemToArray(cj_enum, cJSON_CreateString(__FUNCTION__, log_level_enums[i]));
-                }
-                cJSON_DeleteItemFromArray(__FUNCTION__, cj_enum, 0);
-            }
-            cJSON_AddStringToObject(__FUNCTION__, cj_log_level, "name", ezlopi_core_setting_command_names[SETTING_COMMAND_NAME_LOG_LEVEL]);
-            const char *current_log_level = ezlopi_core_cloud_log_get_current_severity_enum_str();
-            if (current_log_level)
-            {
-                cJSON_AddStringToObject(__FUNCTION__, cj_log_level, "value", current_log_level);
-            }
-            cJSON_AddStringToObject(__FUNCTION__, cj_log_level, "valueType", "token");
+    cJSON *cj_log_level = cJSON_CreateObject(__FUNCTION__);
 
-            cJSON_AddItemToArray(cj_settings, cj_log_level);
+    if (cj_log_level)
+    {
+        cJSON *cj_enum = cJSON_AddArrayToObject(__FUNCTION__, cj_log_level, "enum");
+        if (cj_enum)
+        {
+            for (e_ezpi_trace_severity_t i = 0; i < E_TRACE_SEVERITY_MAX; i++)
+            {
+                const char *severity_name_str = ezlopi_util_trace_get_severity_name_str(i);
+                cJSON_AddItemToArray(cj_enum, cJSON_CreateString(__FUNCTION__, severity_name_str));
+            }
+            cJSON_DeleteItemFromArray(__FUNCTION__, cj_enum, 0);
         }
+        cJSON_AddStringToObject(__FUNCTION__, cj_log_level, "name", ezlopi_core_setting_command_names[SETTING_COMMAND_NAME_LOG_LEVEL]);
+        const char *current_log_level = ezlopi_core_cloud_log_get_current_severity_enum_str();
+        if (current_log_level)
+        {
+            cJSON_AddStringToObject(__FUNCTION__, cj_log_level, "value", current_log_level);
+        }
+        cJSON_AddStringToObject(__FUNCTION__, cj_log_level, "valueType", "token");
+
+        cJSON_AddItemToArray(cj_settings, cj_log_level);
     }
+
     return ret;
 }
 
@@ -400,7 +399,7 @@ int ezlopi_core_setting_commands_read_settings()
 #ifdef CONFIG_EZPI_UTIL_TRACE_EN
     ezlopi_core_read_set_log_severities();
     // #warning "remove this in release"
-    ezlopi_core_read_set_log_severities_internal(ENUM_EZLOPI_LOG_SEVERITY_TRACE);
+    ezlopi_core_serial_log_severity_process_id(E_TRACE_SEVERITY_TRACE);
     // printf("Log severity/level set to: %s\n", ezlopi_core_cloud_log_get_current_severity_enum_str());
 #endif // CONFIG_EZPI_UTIL_TRACE_EN
 

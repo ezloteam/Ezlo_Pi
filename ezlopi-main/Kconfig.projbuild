@@ -19,6 +19,21 @@ menu "EzloPi User Config"
         help
             ezlopi-util-trace component is enabled to log the outputs to the serial monitor
 
+    config EZPI_OTEL_EN
+        bool  "Enable opentelemetry for trace/logs/matrix*"
+        default n
+        help 
+            Enable to this to post telemetry data to otel-server
+
+        config EZPI_OTEL_COLLECTOR_ADDRESS
+            depends on EZPI_OTEL_EN
+            string "Address of the hosted collector"
+            default "localhost"
+            help 
+                Address of the hosted collecter
+
+
+
     config EZPI_BLE_ENABLE        
         bool "Enable BLE"
         depends on IDF_TARGET_ESP32 || IDF_TARGET_ESP32C3 || IDF_TARGET_ESP32S3
@@ -98,7 +113,7 @@ menu "EzloPi User Config"
         int "Static buffer size:"
         default 10240
         help 
-            Static buffer is used to broadcast data. Data is broadcasted by local-websocket-server and websocket-client. Default value is 10KB"
+            Static buffer is used to broadcast data. Data is broadcasted by local-websocket-server and websocket-client. Default value is 10KB
 
     config EZPI_SERV_ENABLE_MESHBOTS 
         depends on (EZPI_WEBSOCKET_CLIENT || EZPI_LOCAL_WEBSOCKET_SERVER)

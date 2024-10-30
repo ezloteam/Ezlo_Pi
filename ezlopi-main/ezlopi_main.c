@@ -21,6 +21,7 @@
 
 #include "ezlopi_service_ble.h"
 #include "ezlopi_service_uart.h"
+#include "ezlopi_service_otel.h"
 #include "ezlopi_service_loop.h"
 #include "ezlopi_service_modes.h"
 #include "ezlopi_service_meshbot.h"
@@ -50,7 +51,9 @@ void app_main(void)
 {
 
 #ifdef CONFIG_EZPI_UTIL_TRACE_EN
-    ezlopi_core_set_log_upcalls();
+    // ezlopi_core_set_log_upcalls();
+    // ezlopi_core_log_init();
+    ezlopi_service_otel_init();
 #endif // CONFIG_EZPI_UTIL_TRACE_EN
 
     __print_mac_address();
