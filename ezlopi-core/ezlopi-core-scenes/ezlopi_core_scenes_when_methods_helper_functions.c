@@ -1588,7 +1588,7 @@ int isdeviceitem_group_value_check(l_scenes_list_v2_t *scene_node, uint32_t devi
     return ret;
 }
 
-static uint8_t __isitemState_vs_field_compare(s_item_exp_data_t *new_extract_data, l_fields_v2_t *tmp_field, uint8_t bit_mode_position)  // 1--> finish_case | 2 --> start_case 
+static uint8_t __isitemState_vs_field_compare(s_item_exp_data_t *new_extract_data, l_fields_v2_t *tmp_field, uint8_t bit_mode_position)
 {
     uint8_t flag = 0;
     if (tmp_field)
@@ -1766,13 +1766,55 @@ static void __replace_old_with_new_data_val(s_item_exp_data_t *new_extract_data,
     }
 
 }
-
-uint8_t isitemstate_changed(s_item_exp_data_t *new_extract_data, l_fields_v2_t *start_field, l_fields_v2_t *finish_field, void * user_arg)
+static int ____old_vs_new_extract_data(s_item_exp_data_t *new_extract_data, s_item_exp_data_t *prev_extract_data)
 {
-    uint32_t flag = 0;
-    s_item_exp_data_t *prev_extract_data = (s_item_exp_data_t *)user_arg;
+    int ret = 0;
+    switch (new_extract_data->sample_data.e_type)
+    {
+    case VALUE_TYPE_BOOL:
+    {
+        if (prev_extract_data->sample_data.u_value.value_bool == new_extract_data->sample_data.u_value.value_bool)
+        {
+            ret = 1;
+        }
+        break;
+    }
+    case VALUE_TYPE_NUMBER:
+    {
+        if (prev_extract_data->sample_data.u_value.value_double == new_extract_data->sample_data.u_value.value_double)
+        {
+            ret = 1;
+        }
+        break;
+    }
+    case VALUE_TYPE_STRING:
+    {
+        if (new_extract_data->sample_data.u_value.value_string && prev_extract_data->sample_data.u_value.value_string)
+        {
+            if (EZPI_STRNCMP_IF_EQUAL(
+                new_extract_data->sample_data.u_value.value_string,
+                prev_extract_data->sample_data.u_value.value_string,
+                strlen(new_extract_data->sample_data.u_value.value_string),
+                strlen(prev_extract_data->sample_data.u_value.value_string)))
+            {
+                ret = 1;
+            }
+        }
+        break;
+    }
+    default:
+        break;
+    }
+    return ret; // if matched --> return 1  
+}
+
+int isitemstate_changed(s_item_exp_data_t *new_extract_data, l_fields_v2_t *start_field, l_fields_v2_t *finish_field, l_scenes_list_v2_t *scene_node)
+{
+    int ret = 0;
+    s_item_exp_data_t *prev_extract_data = (s_item_exp_data_t *)(scene_node->when_block->fields->user_arg);
     if (new_extract_data)  // new vs old data
     {
+        uint32_t flag = 0;
         // ---> New flag= (000) : ---> 1. compare 'new_extract_data' with 'start_field  / ANY'  ---> if true ; start_flag =1 ; ---> store data
                                 // --> 1.a . if start_field = Any ; start_flag =1 & return 'true' |  Else compare
         // -----> For flag= (001): ------> 2. compare 'new_extract_data' with 'finish_field / ANY'  -----> if true ; flag = (011) ; ----> store data ;  flag = (111) : ---->
@@ -1782,78 +1824,118 @@ uint8_t isitemstate_changed(s_item_exp_data_t *new_extract_data, l_fields_v2_t *
         if (NULL == prev_extract_data)
         {
             flag |= __isitemState_vs_field_compare(new_extract_data, start_field, 0);
-            TRACE_D("First-time check.... flag=%08x", flag);
+            // TRACE_D("First-time check.... flag=%08x", flag);
         }
         else
         {
-            switch (prev_extract_data->status)  // this says what to do next
+            flag = prev_extract_data->status;
+            // TRACE_I("# Before comparision : status_flag=%08x", flag);
+            switch (flag)  // this says what to do next
             {
             case 0: // no condition match   ---> check the start condition only.
             {
-                TRACE_D("checking start conditon");
+                // TRACE_D("checking start conditon");
                 flag |= __isitemState_vs_field_compare(prev_extract_data, start_field, 0);
                 break;
             }
-            case (BIT2 | BIT1 | BIT0):   // all condition matched and activated  ---> check if state have changed --> if changed , reset activation flag
+            case (BIT0):  // Only start condition activated ; ----> so check for finish condition
             {
-                if (BIT0 & (flag |= __isitemState_vs_field_compare(prev_extract_data, start_field, 0))) // if BIT0 = 1
-                {
-                    TRACE_D("start condition is still satisfied.... cannot reset 'BIT2'");
-                }
-                else if (BIT1 & (flag |= __isitemState_vs_field_compare(new_extract_data, finish_field, 1)))  //if BIT1 = 1
-                {
-                    TRACE_D("finish condition is still satisfied..... cannot reset 'BIT2'");
-                }
-                else
-                {
-                    TRACE_D("after checking the start/finish conditon , [Flag : %08x] --> so reseting the 'BIT2' ", flag);
-                    flag &= (0 << 2);
-                    TRACE_D("after checking the start/finish conditon , [Flag : %08x] --> so reseting the 'BIT2' ", flag);
+                // TRACE_D("checking finish conditon");
+                flag |= __isitemState_vs_field_compare(new_extract_data, finish_field, 1);
 
+                if (flag == (BIT1 | BIT0))
+                {
+                    // activate BIT2 in status ; if both start and finish condition are satisfied.
+                    flag |= BIT2;
                 }
                 break;
             }
             case (BIT1 | BIT0):  // condition match but not activated [or reset] ---> need to active here
             {
-                TRACE_D("pre-state : (011) --> activating");
+                // TRACE_I("====>  pre-state : (011) --> activating");
                 flag |= BIT2;
                 break;
             }
-            case (BIT0):  // Only start condition activated ; ----> so check for finish condition
+            case (BIT2 | BIT1 | BIT0):   // all condition matched and activated  ---> check if state have changed --> if changed , reset activation flag
             {
-                TRACE_D("checking finish conditon");
-                flag |= BIT0;
-                flag |= __isitemState_vs_field_compare(new_extract_data, finish_field, 1);
+                #warning "need to optimize this case";s
+                    // comparing 'start'
+                    if (NULL != start_field)
+                    {
+                        if (!(BIT0 & __isitemState_vs_field_compare(prev_extract_data, start_field, 0))) // if BIT0 = 0;
+                        {
+                            flag &= (0 << 2);
+                            // TRACE_I(" HERE :- Reseting the 'BIT2' ");
+                        }
+                        else
+                        {
+                            // TRACE_D("start or finish condition is still satisfied.... cannot reset 'BIT2'");
+                        }
+                    }
+                    else    // 'ANY'
+                    {
+                        if (!____old_vs_new_extract_data(new_extract_data, prev_extract_data))
+                        {
+                            flag &= (0 << 2);
+                            // TRACE_I(" HERE :- Reseting the 'BIT2' ");
+                        }
+                        else
+                        {
+                            // TRACE_D(" new-data == old-data");
+                        }
+
+                    }
+
+                // comparing 'finish'
+                if (NULL != finish_field)
+                {
+                    if (!(BIT1 & __isitemState_vs_field_compare(new_extract_data, finish_field, 1))) // if BIT0 = 0;
+                    {
+                        flag &= (0 << 2);
+                        // TRACE_I(" HERE :- Reseting the 'BIT2' ");
+                    }
+                    else
+                    {
+                        // TRACE_D("start or finish condition is still satisfied.... cannot reset 'BIT2'");
+                    }
+                }
+                else// 'ANY'
+                {
+                    if (!____old_vs_new_extract_data(new_extract_data, prev_extract_data))
+                    {
+                        flag &= (0 << 2);
+                        // TRACE_I(" HERE :- Reseting the 'BIT2' ");
+                    }
+                    else
+                    {
+                        // TRACE_D(" new-data == old-data");
+                    }
+                }
                 break;
             }
             default:    // all remaining conditon are invalid ; So 'Reset' all flags and start again in next iteration.
             {
-                TRACE_D("Reseting conditon");
-                flag = 0;
+                // TRACE_D("Reseting.... to start fresh");
+                // flag = 0;
                 break;
             }
             }
-            TRACE_D("Latest check.... flag=%08x", flag);
+
         }
 
-        // activate BIT2 in status ; if both start and finish condition are satisfied.
-        if (flag & (BIT1 | BIT0))
-        {
-            flag |= BIT2;
-        }
-
-        // assign latest flag
+        // assign latest flag to new-structure.
         new_extract_data->status = flag;
 
         // Store the 'new-extracted' data
-        if (NULL == prev_extract_data)
+        if (NULL == scene_node->when_block->fields->user_arg)
         {
+            // TRACE_S("---> Creating new structure");
             s_item_exp_data_t *tmp_struct = ezlopi_malloc(__FUNCTION__, sizeof(s_item_exp_data_t));
             if (tmp_struct)
             {
                 memset(tmp_struct, 0, sizeof(s_item_exp_data_t));
                 __replace_old_with_new_data_val(new_extract_data, tmp_struct);
-                user_arg = (void*)tmp_struct;
+                scene_node->when_block->fields->user_arg = (void*)tmp_struct;
             }
             else
             {
@@ -1862,16 +1944,23 @@ uint8_t isitemstate_changed(s_item_exp_data_t *new_extract_data, l_fields_v2_t *
         }
         else
         {
-            __replace_old_with_new_data_val(new_extract_data, prev_extract_data);
-            user_arg = (void*)prev_extract_data;
+            // TRACE_W("---> Replacing old extract data");
+            __replace_old_with_new_data_val(new_extract_data, (scene_node->when_block->fields->user_arg));
         }
 
+        // TRACE_W("#### Final..... flag result=%08x  ####", flag);
+        if (flag & BIT2)
+        {
+            // Also return 1 for 'then-method'
+            // TRACE_I("====> Return 1");
+            ret = 1;
+        }
     }
     else
     {
         TRACE_E("new_extract_data == NULL");
     }
-    return flag;
+    return ret;
 }
 
 

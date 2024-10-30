@@ -186,7 +186,7 @@ int ezlopi_scene_when_is_item_state_changed(l_scenes_list_v2_t *scene_node, void
 {
     int ret = 0;
     // TRACE_W("Warning: when-method 'is_item_state_changed' not implemented!");
-    TRACE_D(" is_item_state_changed ");
+    // TRACE_D(" is_item_state_changed ");
     l_when_block_v2_t *when_block = (l_when_block_v2_t *)arg;
     if (when_block && scene_node)
     {
@@ -208,10 +208,6 @@ int ezlopi_scene_when_is_item_state_changed(l_scenes_list_v2_t *scene_node, void
 
         l_fields_v2_t *curr_field = when_block->fields;
 
-        uint8_t state_to_check = 0;
-        const uint8_t check_start_value_as = (1 << 0);
-        const uint8_t check_end_value_as = (1 << 1);
-
         while (curr_field)
         {
             if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "item", strlen(curr_field->name), 5))
@@ -230,17 +226,15 @@ int ezlopi_scene_when_is_item_state_changed(l_scenes_list_v2_t *scene_node, void
             }
             else if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "start", strlen(curr_field->name), 6)) // this indicates the item/expression must have the "prev-val == start_field"
             {
-                if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != (curr_field->field_value.u_value.value_string)))
+                if (EZLOPI_VALUE_TYPE_NONE < curr_field->value_type && curr_field->value_type < EZLOPI_VALUE_TYPE_MAX)
                 {
-                    state_to_check |= check_start_value_as;
                     start_field = curr_field;
                 }
             }
             else if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "finish", strlen(curr_field->name), 7)) // this indicates the item/expression must have the "new-val == finish_field"
             {
-                if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != (curr_field->field_value.u_value.value_string)))
+                if (EZLOPI_VALUE_TYPE_NONE < curr_field->value_type && curr_field->value_type < EZLOPI_VALUE_TYPE_MAX)
                 {
-                    state_to_check |= check_end_value_as;
                     finish_field = curr_field;
                 }
             }
@@ -293,7 +287,6 @@ int ezlopi_scene_when_is_item_state_changed(l_scenes_list_v2_t *scene_node, void
                             default:
                                 break;
                             }
-
                         }
                         else    // 2. expression is 'expression-type'
                         {
@@ -393,9 +386,13 @@ int ezlopi_scene_when_is_item_state_changed(l_scenes_list_v2_t *scene_node, void
                     }
                 }
 
-                uint8_t flag = isitemstate_changed(new_extract_data, start_field, finish_field, scene_node->when_block->fields->user_arg);
+                // Perform Operation
+                if (1 == (ret = isitemstate_changed(new_extract_data, start_field, finish_field, scene_node)))
+                {
+                    TRACE_S("Activating THEN-METHOD");
+                }
 
-                // remove string 
+                // remove malloc for 'extracted_data' 
                 if (VALUE_TYPE_STRING == new_extract_data->sample_data.e_type)
                 {
                     if (new_extract_data->sample_data.u_value.value_string)
@@ -405,7 +402,6 @@ int ezlopi_scene_when_is_item_state_changed(l_scenes_list_v2_t *scene_node, void
                     }
                 }
                 ezlopi_free(__FUNCTION__, new_extract_data);
-
             }
         }
     }

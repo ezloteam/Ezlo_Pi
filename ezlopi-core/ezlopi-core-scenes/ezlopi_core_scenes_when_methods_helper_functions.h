@@ -66,7 +66,7 @@ typedef struct s_item_exp_data
 {
     s_item_expn_data_t sample_data;     // this contains value 
     e_scene_value_type_v2_t value_type; // all scenes_value_types
-    uint8_t status : 3;                 // This is used to identify what to do next. | [BIT2 =activation_flag , BIT1 =finish_flag , BIT2 =start_flag]
+    uint8_t status;                 // This is used to identify what to do next. | [BIT2 =activation_flag , BIT1 =finish_flag , BIT2 =start_flag]
 } s_item_exp_data_t;
 
 //------------------------------- ezlopi_scene_when_is_itemState ------------------------------------------
@@ -122,7 +122,7 @@ int when_function_for_latch(l_scenes_list_v2_t *scene_node, l_when_block_v2_t *w
 int isdeviceitem_group_value_check(l_scenes_list_v2_t *scene_node, uint32_t device_group_id, uint32_t item_group_id);
 
 //------------------------------- ezlopi_scene_when_isItemStateChanged_method -----------------------------------
-uint8_t isitemstate_changed(s_item_exp_data_t *new_user_data, l_fields_v2_t *start_field, l_fields_v2_t *finish_field, void * user_arg);
+int isitemstate_changed(s_item_exp_data_t *new_user_data, l_fields_v2_t *start_field, l_fields_v2_t *finish_field, l_scenes_list_v2_t *scene_node);
 
 
 #endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
