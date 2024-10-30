@@ -180,7 +180,7 @@ static const char *ezlopi_config_test =
     \"dev_detail\":[\
         {\
         \"dev_type\":5,\
-        \"dev_name\":\"Dimmer\",\
+        \"dev_name\":\"Dimmer_riken\",\
         \"id_room\":\"\",\
         \"id_item\":22,\
         \"gpio\":18,\
@@ -190,7 +190,7 @@ static const char *ezlopi_config_test =
         },\
         {\
             \"dev_type\":1,\
-            \"dev_name\":\"switch_temp\",\
+            \"dev_name\":\"switch_temp_riken\",\
             \"id_room\":\"\",\
             \"id_item\":2,\
             \"gpio_in\":0,\
@@ -205,7 +205,7 @@ static const char *ezlopi_config_test =
         },\
         {\
             \"dev_type\":1,\
-            \"dev_name\":\"Bulb\",\
+            \"dev_name\":\"Bulb_riken\",\
             \"id_room\":\"\",\
             \"id_item\":1,\
             \"gpio_in\":\"\",\
@@ -220,7 +220,7 @@ static const char *ezlopi_config_test =
         },\
         {\
             \"dev_type\":7,\
-            \"dev_name\":\"DHT22_temp_humi\",\
+            \"dev_name\":\"DHT22_temp_humi_riken\",\
             \"id_room\":\"\",\
             \"id_item\":16,\
             \"gpio\":21\
