@@ -60,3 +60,8 @@ ezlopi_error_t ezlopi_core_offline_logout_perform()
     }
     return error;
 }
+
+bool is_user_logged_in()
+{
+    return logged_in;
+}
