@@ -23,7 +23,8 @@
 // } e_ezpi_trace_severity_t;
 
 void ezlopi_core_log_init(void);
-void ezlopi_core_log_add_upcall(f_trace_upcall_t upcall);
+void ezlopi_core_log_add_log_upcall(f_trace_upcall_t upcall);
+void ezlopi_core_log_add_trace_upcall(int (*upcall)(cJSON *cj_telemetry));
 
 void ezlopi_core_read_set_log_severities();
 void ezlopi_core_read_set_log_severities_internal(e_ezpi_trace_severity_t severity);

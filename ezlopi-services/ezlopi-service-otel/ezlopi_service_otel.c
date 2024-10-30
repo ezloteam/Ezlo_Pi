@@ -3,6 +3,8 @@
 #include "ezlopi_core_log.h"
 #include "ezlopi_core_sntp.h"
 #include "ezlopi_core_http.h"
+#include "ezlopi_core_wifi.h"
+#include "ezlopi_util_version.h"
 
 #include "ezlopi_util_trace.h"
 #include "bootloader_random.h"
@@ -28,13 +30,41 @@ static void __otel_task(void *pv);
 static void __post_telemetry_logs(char *telemetry_logs);
 static void __console_log(e_ezpi_trace_severity_t severity, const char *file, uint32_t line, uint64_t time, char *msg);
 static void __otel_log_upcall(e_ezpi_trace_severity_t severity, const char *file, uint32_t line, uint64_t time, char *msg);
-static int __add_log_to_telemetry_queue(e_otel_type_t telemetry_type, cJSON *cj_telemetry);
 
+int ezlopi_service_otel_add_log_to_telemetry_queue(e_otel_type_t telemetry_type, cJSON *cj_telemetry)
+{
+    int ret = 0;
+
+    if (cj_telemetry)
+    {
+        cJSON_AddNumberToObject(__FUNCTION__, cj_telemetry, "otel_type", telemetry_type);
+
+        if (pdTRUE == xQueueIsQueueFullFromISR(__telemetry_queue))
+        {
+            cJSON *tmp_cjson_obj = NULL;
+
+            xQueueReceive(__telemetry_queue, &tmp_cjson_obj, 0);
+
+            if (tmp_cjson_obj)
+            {
+                cJSON_Delete(__FUNCTION__, tmp_cjson_obj);
+            }
+        }
+
+        if (pdFALSE == xQueueSend(__telemetry_queue, &cj_telemetry, 5 / portTICK_PERIOD_MS))
+        {
+            ret = 1;
+        }
+    }
+
+    return ret;
+}
 
 void ezlopi_service_otel_init(void)
 {
     bootloader_random_enable();
-    ezlopi_core_log_add_upcall(__otel_log_upcall);
+    ezlopi_core_log_add_log_upcall(__otel_log_upcall);
+    ezlopi_core_log_add_trace_upcall(__otel_trace_upcall);
 
 #if (1 == OTEL_HTTP)
     __telemetry_queue = xQueueCreate(10, sizeof(cJSON *));
@@ -54,26 +84,34 @@ static void __otel_task(void *pv)
 
         if (pdTRUE == xQueueReceive(__telemetry_queue, &cj_telemetry, portMAX_DELAY))
         {
+            e_otel_type_t telemetry_type = E_OTEL_NONE; // need to define
+            cJSON *cj_telemetry_type = cJSON_GetObjectItem(__FUNCTION__, cj_telemetry, "otel_type");
+
+            if (cj_telemetry_type && cj_telemetry_type->valueint)
+            {
+                telemetry_type = (e_otel_type_t)cj_telemetry_type->valueint;
+            }
+
+            cJSON_DeleteItemFromObject(__FUNCTION__, cj_telemetry, "otel_type");
+
             char *telemetry_str = cJSON_PrintBuffered(__FUNCTION__, cj_telemetry, 4096, false);
             cJSON_Delete(__FUNCTION__, cj_telemetry);
 
             if (telemetry_str)
             {
-                int telemetry_type = 0; // need to define
-
                 switch (telemetry_type)
                 {
-                case 0:
+                case E_OTEL_LOGS:
                 {
                     __post_telemetry_logs(telemetry_str);
                     break;
                 }
-                case 1:
+                case E_OTEL_TRACES:
                 {
                     // __post_telemetry_traces(telemetry_str);
                     break;
                 }
-                case 2:
+                case E_OTEL_MATRICS:
                 {
                     // __post_telemetry_matrics(telemetry_str);
                     break;
@@ -95,20 +133,44 @@ static void __otel_task(void *pv)
     vTaskDelete(NULL);
 }
 
+static void __post_telemetry_traces(char *telemetry_traces)
+{
+    if (EZPI_SUCCESS == ezlopi_wait_for_wifi_to_connect(portMAX_DELAY))
+    {
+        static const char *default_log_path = "v1/logs";
+
+        // char tmp_url[64];
+        // snprintf(tmp_url, sizeof(tmp_url), "%s/%s", CONFIG_EZPI_OTEL_COLLECTOR_ADDRESS, default_log_path);
+
+        cJSON *cj_headers = cJSON_CreateObject(__FUNCTION__);
+        if (cj_headers)
+        {
+            cJSON_AddStringToObject(__FUNCTION__, cj_headers, "Content-Type", "application/json");
+        }
+
+        s_ezlopi_http_data_t *ret = ezlopi_http_post_request("https://ot.ezlo.com", 4318, "logs", cj_headers, NULL, NULL, NULL);
+        printf("response[%d]: %.*s\r\n", ret->status_code, ret->response_len, ret->response);
+    }
+}
+
 static void __post_telemetry_logs(char *telemetry_logs)
 {
-    static const char *default_log_path = "v1/logs";
-
-    // char tmp_url[64];
-    // snprintf(tmp_url, sizeof(tmp_url), "%s/%s", CONFIG_EZPI_OTEL_COLLECTOR_ADDRESS, default_log_path);
-
-    cJSON *cj_headers = cJSON_CreateObject(__FUNCTION__);
-    if (cj_headers)
+    if (EZPI_SUCCESS == ezlopi_wait_for_wifi_to_connect(portMAX_DELAY))
     {
-        cJSON_AddStringToObject(__FUNCTION__, cj_headers, "Content-Type", "application/json");
-    }
+        static const char *default_log_path = "v1/logs";
 
-    ezlopi_http_post_request(CONFIG_EZPI_OTEL_COLLECTOR_ADDRESS, 4318, default_log_path, cj_headers, NULL, NULL, NULL);
+        // char tmp_url[64];
+        // snprintf(tmp_url, sizeof(tmp_url), "%s/%s", CONFIG_EZPI_OTEL_COLLECTOR_ADDRESS, default_log_path);
+
+        cJSON *cj_headers = cJSON_CreateObject(__FUNCTION__);
+        if (cj_headers)
+        {
+            cJSON_AddStringToObject(__FUNCTION__, cj_headers, "Content-Type", "application/json");
+        }
+
+        s_ezlopi_http_data_t *ret = ezlopi_http_post_request("https://ot.ezlo.com", 4318, "logs", cj_headers, NULL, NULL, NULL);
+        printf("response[%d]: %.*s\r\n", ret->status_code, ret->response_len, ret->response);
+    }
 }
 
 #endif // OTEL_HTTP
@@ -187,10 +249,10 @@ static void __otel_log_upcall(e_ezpi_trace_severity_t severity, const char *file
                 ezlopi_free(__FUNCTION__, log_str);
             }
 
-            __add_log_to_telemetry_queue(E_OTEL_LOGS, cj_log);
+            ezlopi_service_otel_add_log_to_telemetry_queue(E_OTEL_LOGS, cj_log);
 
 #elif (1 == OTEL_HTTP)
-            __add_log_to_telemetry_queue(E_OTEL_LOGS, cj_log);
+            ezlopi_service_otel_add_log_to_telemetry_queue(E_OTEL_LOGS, cj_log);
 
 #elif (1 == CONSOLE_LOG)
             char *log_str = cJSON_Print(__FUNCTION__, cj_log);
@@ -206,37 +268,7 @@ static void __otel_log_upcall(e_ezpi_trace_severity_t severity, const char *file
     }
 }
 
-
-static int __add_log_to_telemetry_queue(e_otel_type_t telemetry_type, cJSON *cj_telemetry)
-{
-    int ret = 0;
-
-    if (cj_telemetry)
-    {
-        cJSON_AddNumberToObject(__FUNCTION__, cj_telemetry, "otel_type", telemetry_type);
-
-        if (pdTRUE == xQueueIsQueueFullFromISR(__telemetry_queue))
-        {
-            cJSON *tmp_cjson_obj = NULL;
-
-            xQueueReceive(__telemetry_queue, &tmp_cjson_obj, 0);
-
-            if (tmp_cjson_obj)
-            {
-                cJSON_Delete(__FUNCTION__, tmp_cjson_obj);
-            }
-        }
-
-        if (pdFALSE == xQueueSend(__telemetry_queue, &cj_telemetry, 5 / portTICK_PERIOD_MS))
-        {
-            ret = 1;
-        }
-    }
-
-    return ret;
-}
-
-static void ezlopi_service_otel_trace_create(const char * srv_name, const char * ver, const char * host, const char * provider)
+static void ezlopi_service_otel_trace_create(const char *srv_name, const char *ver, const char *host, const char *provider)
 {
     cJSON *cj_telemetry = cJSON_CreateObject(__FUNCTION__);
     if (cj_telemetry)
@@ -248,17 +280,25 @@ static void ezlopi_service_otel_trace_create(const char * srv_name, const char *
             if (cj_attributes)
             {
                 cJSON_AddStringToObject(__FUNCTION__, cj_attributes, "service.name", "ezlopi");
-                cJSON_AddStringToObject(__FUNCTION__, cj_attributes, "service.version", "1.0.0");
+                cJSON_AddStringToObject(__FUNCTION__, cj_attributes, "service.version", VERSION_STR);
                 cJSON_AddStringToObject(__FUNCTION__, cj_attributes, "host.name", "");
                 cJSON_AddStringToObject(__FUNCTION__, cj_attributes, "cloud.provider", "");
             }
         }
 
-        cJSON * cj_instrumentation_lib = cJSON_AddObjectToObject(__FUNCTION__, cj_telemetry);
+        cJSON *cj_instrumentation_lib = cJSON_AddObjectToObject(__FUNCTION__, cj_telemetry, "instrumentation_library");
         if (cj_instrumentation_lib)
         {
             cJSON_AddStringToObject(__FUNCTION__, cj_instrumentation_lib, "name", "ezlopi-otel-c");
-            cJSON_AddStringToObject(__FUNCTION__, cj_instrumentation_lib, "version", )
+            // cJSON_AddStringToObject(__FUNCTION__, cj_instrumentation_lib, "version", )
         }
+    }
+}
+
+static int __otel_trace_upcall(cJSON *cj_traces)
+{
+    if (cj_traces)
+    {
+        ezlopi_service_otel_add_log_to_telemetry_queue();
     }
 }

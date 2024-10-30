@@ -30,14 +30,37 @@ static ll_log_upcall_t *__log_upcall_head = NULL;
 static e_ezpi_trace_severity_t serial_log_severity = E_TRACE_SEVERITY_MAX;
 static e_ezpi_trace_severity_t cloud_log_severity = E_TRACE_SEVERITY_NONE;
 
+static int (*__trace_upcall)(cJSON *cj_telemetry) = NULL;
+
 static ezlopi_error_t ezlopi_hub_cloud_log_set_severity(const char *severity_str);
 static ezlopi_error_t ezlopi_hub_serial_log_set_severity(const char *severity_str);
 
 static void __cloud_log(e_ezpi_trace_severity_t severity, const char *file, int line, uint32_t time, char *msg);
 static void __console_log(e_ezpi_trace_severity_t severity, const char *file, uint32_t line, uint64_t time, char *msg);
-static void __trace_upcall(e_ezpi_trace_severity_t severity, const char *file, uint32_t line, uint64_t time, char *msg);
+static void __log_upcall(e_ezpi_trace_severity_t severity, const char *file, uint32_t line, uint64_t time, char *msg);
 
-void ezlopi_core_log_add_upcall(f_trace_upcall_t upcall)
+
+void ezlopi_core_log_add_trace_upcall(int (*upcall)(cJSON *cj_telemetry))
+{
+    if (upcall)
+    {
+        __trace_upcall = upcall;
+    }
+}
+
+int ezlopi_core_log_push_trace(cJSON *cj_trace)
+{
+    int ret = 0;
+
+    if (cj_trace && __trace_upcall)
+    {
+        ret = __trace_upcall(cj_trace);
+    }
+
+    return ret;
+}
+
+void ezlopi_core_log_add_log_upcall(f_trace_upcall_t upcall)
 {
     if (upcall)
     {
@@ -72,9 +95,9 @@ void ezlopi_core_log_add_upcall(f_trace_upcall_t upcall)
 
 void ezlopi_core_log_init(void)
 {
-    ezlopi_util_trace_init(__trace_upcall);
-    // ezlopi_core_log_add_upcall(__console_log);
-    // ezlopi_core_log_add_upcall(__cloud_log);
+    ezlopi_util_trace_init(__log_upcall);
+    // ezlopi_core_log_add_log_upcall(__console_log);
+    // ezlopi_core_log_add_log_upcall(__cloud_log);
 }
 
 //////// Setter
@@ -366,7 +389,7 @@ static void __cloud_log(e_ezpi_trace_severity_t severity, const char *file, int 
     }
 }
 
-static void __trace_upcall(e_ezpi_trace_severity_t severity, const char *file, uint32_t line, uint64_t log_time, char *msg)
+static void __log_upcall(e_ezpi_trace_severity_t severity, const char *file, uint32_t line, uint64_t log_time, char *msg)
 {
     ll_log_upcall_t *upcall_node = __log_upcall_head;
     while (upcall_node)
