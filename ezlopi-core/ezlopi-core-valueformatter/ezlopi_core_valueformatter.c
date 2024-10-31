@@ -10,11 +10,6 @@ void ezlopi_valueformatter_bool_to_cjson(cJSON* cj_root, bool value, const char 
 {
     cJSON_AddBoolToObject(__FUNCTION__, cj_root, ezlopi_value_str, value);
     cJSON_AddStringToObject(__FUNCTION__, cj_root, ezlopi_valueFormatted_str, value ? ezlopi_true_str : ezlopi_false_str);
-
-    if (scale)
-    {
-        cJSON_AddStringToObject(__FUNCTION__, cj_root, ezlopi_scale_str, scale);
-    }
 }
 
 void ezlopi_valueformatter_float_to_cjson(cJSON* cj_root, float value, const char * scale)
@@ -24,11 +19,6 @@ void ezlopi_valueformatter_float_to_cjson(cJSON* cj_root, float value, const cha
     char valueFormatted[16];
     snprintf(valueFormatted, sizeof(valueFormatted), "%.02f", value);
     cJSON_AddStringToObject(__FUNCTION__, cj_root, ezlopi_valueFormatted_str, valueFormatted);
-
-    if (scale)
-    {
-        cJSON_AddStringToObject(__FUNCTION__, cj_root, ezlopi_scale_str, scale);
-    }
 }
 
 void ezlopi_valueformatter_double_to_cjson(cJSON* cj_root, double value, const char * scale)
@@ -38,11 +28,6 @@ void ezlopi_valueformatter_double_to_cjson(cJSON* cj_root, double value, const c
     char valueFormatted[16];
     snprintf(valueFormatted, sizeof(valueFormatted), "%.2lf", value);
     cJSON_AddStringToObject(__FUNCTION__, cj_root, ezlopi_valueFormatted_str, valueFormatted);
-
-    if (scale)
-    {
-        cJSON_AddStringToObject(__FUNCTION__, cj_root, ezlopi_scale_str, scale);
-    }
 }
 
 void ezlopi_valueformatter_int32_to_cjson(cJSON* cj_root, int value, const char * scale)
@@ -52,11 +37,6 @@ void ezlopi_valueformatter_int32_to_cjson(cJSON* cj_root, int value, const char 
     char valueFormatted[16];
     snprintf(valueFormatted, sizeof(valueFormatted), "%d", value);
     cJSON_AddStringToObject(__FUNCTION__, cj_root, ezlopi_valueFormatted_str, valueFormatted);
-
-    if (scale)
-    {
-        cJSON_AddStringToObject(__FUNCTION__, cj_root, ezlopi_scale_str, scale);
-    }
 }
 
 void ezlopi_valueformatter_uint32_to_cjson(cJSON* cj_root, uint32_t value, const char * scale)
@@ -66,9 +46,4 @@ void ezlopi_valueformatter_uint32_to_cjson(cJSON* cj_root, uint32_t value, const
     char valueFormatted[16];
     snprintf(valueFormatted, sizeof(valueFormatted), "%u", value);
     cJSON_AddStringToObject(__FUNCTION__, cj_root, ezlopi_valueFormatted_str, valueFormatted);
-
-    if (scale)
-    {
-        cJSON_AddStringToObject(__FUNCTION__, cj_root, ezlopi_scale_str, scale);
-    }
 }

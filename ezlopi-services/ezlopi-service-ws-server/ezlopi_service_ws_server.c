@@ -34,6 +34,7 @@
 #include "ezlopi_core_event_group.h"
 #include "ezlopi_core_api_methods.h"
 #include "ezlopi_core_cjson_macros.h"
+#include "ezlopi_core_offline_login.h"
 
 #include "ezlopi_service_ws_server.h"
 #include "ezlopi_service_ws_server_clients.h"
@@ -147,12 +148,70 @@ static ezlopi_error_t __ws_server_broadcast(char *data)
 
 static void __message_upcall(httpd_req_t *req, const char *payload, uint32_t payload_len)
 {
-    cJSON *cj_response = ezlopi_core_api_consume(__FUNCTION__, payload, payload_len);
-    if (cj_response)
+    bool proceed_to_api_consume = false;
+    cJSON *cj_request = NULL;
+    cJSON *cj_id = NULL;
+    cJSON *cj_sender = NULL;
+    cJSON *cj_method = NULL;
+
+    if (!is_user_logged_in())
     {
-        cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_msg_id_str, __message_counter);
-        __respond_cjson(req, cj_response);
-        cJSON_Delete(__FUNCTION__, cj_response);
+        cj_request = cJSON_ParseWithLength(__FUNCTION__, payload, payload_len);
+        if (cj_request)
+        {
+            const char *login_method = "hub.offline.login.ui";
+            cJSON *cj_method = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_method_str);
+            if (cj_method && cJSON_IsString(cj_method))
+            {
+                if (0 == strncmp(login_method, cj_method->valuestring, strlen(login_method)))
+                {
+                    proceed_to_api_consume = true;
+                    cJSON_Delete(__FUNCTION__, cj_request);
+                }
+            }
+        }
+    }
+    else
+    {
+        proceed_to_api_consume = true;
+    }
+
+    if (proceed_to_api_consume)
+    {
+        cJSON *cj_response = ezlopi_core_api_consume(__FUNCTION__, payload, payload_len);
+        if (cj_response)
+        {
+            cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_msg_id_str, __message_counter);
+            __respond_cjson(req, cj_response);
+            cJSON_Delete(__FUNCTION__, cj_response);
+        }
+    }
+    else
+    {
+        if (cj_request)
+        {
+            cJSON *cj_response = cJSON_CreateObject(__FUNCTION__);
+            cj_id = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_id_str);
+            cj_sender = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_sender_str);
+            cj_method = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_method_str);
+            if (cj_response)
+            {
+                cJSON *cj_error = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_error_str);
+                cJSON_AddItemToObject(__FUNCTION__, cj_response, ezlopi_id_str, cJSON_Duplicate(__FUNCTION__, cj_id, cJSON_True));
+                cJSON_AddItemToObject(__FUNCTION__, cj_response, ezlopi_sender_str, cJSON_Duplicate(__FUNCTION__, cj_sender, cJSON_True));
+                cJSON_AddItemToObject(__FUNCTION__, cj_response, ezlopi_method_str, cJSON_Duplicate(__FUNCTION__, cj_method, cJSON_True));
+                if (cj_error)
+                {
+                    cJSON_AddNumberToObject(__FUNCTION__, cj_error, ezlopi_code_str, -32600);
+                    cJSON_AddStringToObject(__FUNCTION__, cj_error, ezlopi_message_str, "Bad request");
+                    cJSON_AddStringToObject(__FUNCTION__, cj_error, ezlopi_data_str, "rpc.params.notfound.");
+                }
+                cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_msg_id_str, __message_counter);
+                __respond_cjson(req, cj_response);
+                cJSON_Delete(__FUNCTION__, cj_response);
+                cJSON_Delete(__FUNCTION__, cj_request);
+            }
+        }
     }
 }
 
@@ -232,6 +291,7 @@ static esp_err_t __msg_handler(httpd_req_t *req)
                 {
                     TRACE_D("closing connection!");
                     ezlopi_service_ws_server_clients_remove_by_handle(req->handle);
+                    ezlopi_core_offline_logout_perform();
                 }
                 else if (0 < ws_pkt.len)
                 {
@@ -259,6 +319,7 @@ static esp_err_t __msg_handler(httpd_req_t *req)
                             {
                                 TRACE_D("closing connection!");
                                 ezlopi_service_ws_server_clients_remove_by_handle(req->handle);
+                                ezlopi_core_offline_logout_perform();
                             }
                             else
                             {
@@ -430,6 +491,7 @@ static ezlopi_error_t __ws_server_send(l_ws_server_client_conn_t *client, char *
             {
                 TRACE_E("fail count reached maximum!");
                 ezlopi_service_ws_server_clients_remove_by_handle(client->http_handle);
+                ezlopi_core_offline_logout_perform();
             }
         }
     }

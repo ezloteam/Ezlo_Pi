@@ -241,6 +241,7 @@ static ezlopi_error_t __prepare(void *arg, void *user_arg)
           __prepare_item_cloud_properties(aqi_item, prep_arg->cjson_device, ens160_sensor);
           aqi_item->is_user_arg_unique = true;
           aqi_item->interface.i2c_master.enable = true;
+          aqi_item->interface.i2c_master.channel = I2C_NUM_0;
         }
 
         /* Prepare VOC device. */

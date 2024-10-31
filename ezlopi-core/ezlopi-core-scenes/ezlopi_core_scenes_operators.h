@@ -53,36 +53,36 @@ typedef enum e_scene_value_without_less_cmp_operators
 
 //-------------------------------------------------------------------
 // Numeric Operators
-e_scene_num_cmp_operators_t ezlopi_scenes_numeric_comparator_operators_get_enum(char* operator_str);
-const char* ezlopi_scenes_numeric_comparator_operators_get_op(e_scene_num_cmp_operators_t operator);
-const char* ezlopi_scenes_numeric_comparator_operators_get_name(e_scene_num_cmp_operators_t operator);
-const char* ezlopi_scenes_numeric_comparator_operators_get_method(e_scene_num_cmp_operators_t operator);
+e_scene_num_cmp_operators_t ezlopi_scenes_numeric_comparator_operators_get_enum(char *operator_str);
+const char *ezlopi_scenes_numeric_comparator_operators_get_op(e_scene_num_cmp_operators_t operator);
+const char *ezlopi_scenes_numeric_comparator_operators_get_name(e_scene_num_cmp_operators_t operator);
+const char *ezlopi_scenes_numeric_comparator_operators_get_method(e_scene_num_cmp_operators_t operator);
 
-int ezlopi_scenes_operators_value_number_operations(l_fields_v2_t* item_exp_field, l_fields_v2_t* value_field, l_fields_v2_t* comparator_field, l_fields_v2_t* devgrp_field, l_fields_v2_t* itemgrp_field);
+int ezlopi_scenes_operators_value_number_operations(l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, l_fields_v2_t *comparator_field, l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field);
 
 //-------------------------------------------------------------------
 //Number-Range Operators
-int ezlopi_scenes_operators_value_number_range_operations(l_fields_v2_t * item_exp_field, l_fields_v2_t * start_value_field, l_fields_v2_t * end_value_field, bool comparator_choice);
-int ezlopi_scenes_operators_value_number_range_operations_with_group(l_fields_v2_t * start_value_field, l_fields_v2_t * end_value_field, bool comparator_choice, l_fields_v2_t* devgrp_field, l_fields_v2_t* itemgrp_field);
+int ezlopi_scenes_operators_value_number_range_operations(l_fields_v2_t *item_exp_field, l_fields_v2_t *start_value_field, l_fields_v2_t *end_value_field, bool comparator_choice);
+int ezlopi_scenes_operators_value_number_range_operations_with_group(l_fields_v2_t *start_value_field, l_fields_v2_t *end_value_field, bool comparator_choice, l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field);
 
 //-------------------------------------------------------------------
 // Strings Operators
-e_scene_str_cmp_operators_t ezlopi_scenes_strings_comparator_operators_get_enum(char* operator_str);
-const char* ezlopi_scenes_strings_comparator_operators_get_op(e_scene_str_cmp_operators_t operator);
-const char* ezlopi_scenes_strings_comparator_operators_get_name(e_scene_str_cmp_operators_t operator);
-const char* ezlopi_scenes_strings_comparator_operators_get_method(e_scene_str_cmp_operators_t operator);
+e_scene_str_cmp_operators_t ezlopi_scenes_strings_comparator_operators_get_enum(char *operator_str);
+const char *ezlopi_scenes_strings_comparator_operators_get_op(e_scene_str_cmp_operators_t operator);
+const char *ezlopi_scenes_strings_comparator_operators_get_name(e_scene_str_cmp_operators_t operator);
+const char *ezlopi_scenes_strings_comparator_operators_get_method(e_scene_str_cmp_operators_t operator);
 
-int ezlopi_scenes_operators_value_strings_operations(l_fields_v2_t* item_exp_field, l_fields_v2_t* value_field, l_fields_v2_t* comparator_field, l_fields_v2_t* devgrp_field, l_fields_v2_t* itemgrp_field);
+int ezlopi_scenes_operators_value_strings_operations(l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, l_fields_v2_t *comparator_field, l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field);
 
 //-------------------------------------------------------------------
 // String-Operation Operators
-e_scene_strops_cmp_operators_t ezlopi_scenes_strops_comparator_operators_get_enum(char* operator_str);
-const char* ezlopi_scenes_strops_comparator_operators_get_op(e_scene_strops_cmp_operators_t operator);
-const char* ezlopi_scenes_strops_comparator_operators_get_name(e_scene_strops_cmp_operators_t operator);
-const char* ezlopi_scenes_strops_comparator_operators_get_method(e_scene_strops_cmp_operators_t operator);
+e_scene_strops_cmp_operators_t ezlopi_scenes_strops_comparator_operators_get_enum(char *operator_str);
+const char *ezlopi_scenes_strops_comparator_operators_get_op(e_scene_strops_cmp_operators_t operator);
+const char *ezlopi_scenes_strops_comparator_operators_get_name(e_scene_strops_cmp_operators_t operator);
+const char *ezlopi_scenes_strops_comparator_operators_get_method(e_scene_strops_cmp_operators_t operator);
 
-int ezlopi_scenes_operators_value_strops_operations(l_fields_v2_t* item_exp_field, l_fields_v2_t* value_field, l_fields_v2_t* comparator_field);
-int ezlopi_scenes_operators_value_strops_operations_with_group(l_fields_v2_t * value_field, l_fields_v2_t * operation_field, l_fields_v2_t* devgrp_field, l_fields_v2_t* itemgrp_field);
+int ezlopi_scenes_operators_value_strops_operations(l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, l_fields_v2_t *comparator_field);
+int ezlopi_scenes_operators_value_strops_operations_with_group(l_fields_v2_t *value_field, l_fields_v2_t *operation_field, l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field);
 //-------------------------------------------------------------------
 // InArray Operators
 #if 0
@@ -92,34 +92,34 @@ int ezlopi_scenes_operators_value_strops_operations_with_group(l_fields_v2_t * v
 // const char* ezlopi_scenes_inarr_comparator_operators_get_method(e_scene_inarr_cmp_operators_t operator);
 #endif
 
-int ezlopi_scenes_operators_value_inarr_operations(l_fields_v2_t* item_exp_field, l_fields_v2_t* value_field, l_fields_v2_t* comparator_field);
-int ezlopi_scenes_operators_value_inarr_operations_with_group(l_fields_v2_t * value_field, l_fields_v2_t * operation_field, l_fields_v2_t* devgrp_field, l_fields_v2_t* itemgrp_field);
+int ezlopi_scenes_operators_value_inarr_operations(l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, l_fields_v2_t *comparator_field);
+int ezlopi_scenes_operators_value_inarr_operations_with_group(l_fields_v2_t *value_field, l_fields_v2_t *operation_field, l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field);
 
 // Value with less Operators
-e_scene_value_with_less_cmp_operators_t ezlopi_scenes_value_with_less_comparator_operators_get_enum(char* operator_str);
-const char* ezlopi_scenes_value_with_less_comparator_operators_get_op(e_scene_value_with_less_cmp_operators_t operator);
-const char* ezlopi_scenes_value_with_less_comparator_operators_get_name(e_scene_value_with_less_cmp_operators_t operator);
-const char* ezlopi_scenes_value_with_less_comparator_operators_get_method(e_scene_value_with_less_cmp_operators_t operator);
+e_scene_value_with_less_cmp_operators_t ezlopi_scenes_value_with_less_comparator_operators_get_enum(char *operator_str);
+const char *ezlopi_scenes_value_with_less_comparator_operators_get_op(e_scene_value_with_less_cmp_operators_t operator);
+const char *ezlopi_scenes_value_with_less_comparator_operators_get_name(e_scene_value_with_less_cmp_operators_t operator);
+const char *ezlopi_scenes_value_with_less_comparator_operators_get_method(e_scene_value_with_less_cmp_operators_t operator);
 
 // int ezlopi_scenes_operators_value_with_less_operations(uint32_t item_id, l_fields_v2_t* value_field, l_fields_v2_t* comparator_field);
 
 // Value without less Operators
-e_scene_value_without_less_cmp_operators_t ezlopi_scenes_value_without_less_comparator_operators_get_enum(char* operator_str);
-const char* ezlopi_scenes_value_without_less_comparator_operators_get_op(e_scene_value_without_less_cmp_operators_t operator);
-const char* ezlopi_scenes_value_without_less_comparator_operators_get_name(e_scene_value_without_less_cmp_operators_t operator);
-const char* ezlopi_scenes_value_without_less_comparator_operators_get_method(e_scene_value_without_less_cmp_operators_t operator);
+e_scene_value_without_less_cmp_operators_t ezlopi_scenes_value_without_less_comparator_operators_get_enum(char *operator_str);
+const char *ezlopi_scenes_value_without_less_comparator_operators_get_op(e_scene_value_without_less_cmp_operators_t operator);
+const char *ezlopi_scenes_value_without_less_comparator_operators_get_name(e_scene_value_without_less_cmp_operators_t operator);
+const char *ezlopi_scenes_value_without_less_comparator_operators_get_method(e_scene_value_without_less_cmp_operators_t operator);
 
 // int ezlopi_scenes_operators_value_without_less_operations(uint32_t item_id, l_fields_v2_t* value_field, l_fields_v2_t* comparator_field);
 
 // CompareValues Operators 'without-less' (default)
 // int ezlopi_scenes_operators_value_comparevalues_without_less_operations(uint32_t item_id, l_fields_v2_t* value_field, l_fields_v2_t* value_type_field, l_fields_v2_t* comparator_field);
-int ezlopi_scenes_operators_value_comparevalues_with_less_operations(l_fields_v2_t* item_exp_field, l_fields_v2_t* value_field, l_fields_v2_t* value_type_field, l_fields_v2_t* comparator_field);
-int ezlopi_scenes_operators_value_comparevalues_with_less_operations_with_group(l_fields_v2_t * value_field, l_fields_v2_t * value_type_field, l_fields_v2_t * comparator_field, l_fields_v2_t* devgrp_field, l_fields_v2_t* itemgrp_field);
+int ezlopi_scenes_operators_value_comparevalues_with_less_operations(l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, l_fields_v2_t *value_type_field, l_fields_v2_t *comparator_field);
+int ezlopi_scenes_operators_value_comparevalues_with_less_operations_with_group(l_fields_v2_t *value_field, l_fields_v2_t *value_type_field, l_fields_v2_t *comparator_field, l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field);
 
 // HasAtleastOneDictionaryValue
-int ezlopi_scenes_operators_has_atleastone_dictionary_value_operations(uint32_t item_id, l_fields_v2_t* value_field);
+int ezlopi_scenes_operators_has_atleastone_dictionary_value_operations(uint32_t item_id, l_fields_v2_t *value_field);
 // IsDictornaryChanged
-int ezlopi_scenes_operators_is_dictionary_changed_operations(l_scenes_list_v2_t* scene_node, uint32_t item_id, l_fields_v2_t* key_field, l_fields_v2_t* operation_field);
+int ezlopi_scenes_operators_is_dictionary_changed_operations(l_scenes_list_v2_t *scene_node, uint32_t item_id, l_fields_v2_t *key_field, l_fields_v2_t *operation_field);
 
 #endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 

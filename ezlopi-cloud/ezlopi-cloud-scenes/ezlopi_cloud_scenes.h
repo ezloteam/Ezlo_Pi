@@ -24,6 +24,8 @@ extern "C"
     void scenes_notification_add(cJSON *cj_request, cJSON *cj_response);
     void scenes_notification_remove(cJSON *cj_request, cJSON *cj_response);
     void scenes_room_set(cJSON *cj_request, cJSON *cj_response);
+    void scenes_time_list(cJSON *cj_request, cJSON *cj_response);
+    void scenes_trigger_device_list(cJSON *cj_request, cJSON *cj_response);
     void scenes_block_enabled_set(cJSON *cj_request, cJSON *cj_response);
     void scenes_house_modes_set(cJSON *cj_request, cJSON *cj_response);
     void scenes_action_block_test(cJSON *cj_request, cJSON *cj_response);
@@ -31,6 +33,7 @@ extern "C"
     void scenes_meta_set(cJSON *cj_request, cJSON *cj_response);
     void scenes_blockmeta_set(cJSON *cj_request, cJSON *cj_response);
     void scenes_stop(cJSON *cj_request, cJSON *cj_response);
+    void scenes_clone(cJSON *cj_request, cJSON *cj_response);
 
     ///////////// updaters
     void scene_changed(cJSON *cj_request, cJSON *cj_response);

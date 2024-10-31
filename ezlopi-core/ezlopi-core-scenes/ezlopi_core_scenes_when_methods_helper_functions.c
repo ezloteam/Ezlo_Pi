@@ -2,7 +2,6 @@
 
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
-
 #include "ezlopi_util_trace.h"
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_http.h"
@@ -10,20 +9,21 @@
 #include "ezlopi_core_device_group.h"
 #include "ezlopi_core_scenes_v2.h"
 #include "ezlopi_core_scenes_edit.h"
+#include "ezlopi_core_scenes_expressions.h"
 #include "ezlopi_core_scenes_when_methods_helper_functions.h"
 
 #include "ezlopi_cloud_constants.h"
 #include "EZLOPI_USER_CONFIG.h"
 
 //------------------------------- ezlopi_scene_when_is_itemState ------------------------------------------
-static int __compare_item_values(l_ezlopi_item_t* curr_item, l_fields_v2_t* value_field)
+static int __compare_item_values(l_ezlopi_item_t *curr_item, l_fields_v2_t *value_field)
 {
     int ret = 0;
-    cJSON* cj_tmp_value = cJSON_CreateObject(__FUNCTION__);
+    cJSON *cj_tmp_value = cJSON_CreateObject(__FUNCTION__);
     if (cj_tmp_value)
     {
-        curr_item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, curr_item, (void*)cj_tmp_value, NULL);
-        cJSON* cj_value = cJSON_GetObjectItem(__FUNCTION__, cj_tmp_value, ezlopi_value_str);
+        curr_item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, curr_item, (void *)cj_tmp_value, NULL);
+        cJSON *cj_value = cJSON_GetObjectItem(__FUNCTION__, cj_tmp_value, ezlopi_value_str);
         if (cj_value)
         {
             switch (cj_value->type)
@@ -73,53 +73,42 @@ static int __compare_item_values(l_ezlopi_item_t* curr_item, l_fields_v2_t* valu
     return ret;
 }
 
-int is_item_state_single_condition(uint32_t item_id, l_fields_v2_t* value_field)
+int is_item_state_single_condition(uint32_t item_id, l_fields_v2_t *value_field)
 {
     int ret = 0;
-    l_ezlopi_device_t* curr_device = ezlopi_device_get_head();
-    while (curr_device)
+    l_ezlopi_item_t *curr_item = ezlopi_device_get_item_by_id(item_id);
+    if (curr_item)
     {
-        l_ezlopi_item_t* curr_item = curr_device->items;
-        while (curr_item)
-        {
-            if (item_id == curr_item->cloud_properties.item_id)
-            {
-                ret = __compare_item_values(curr_item, value_field);
-                break;
-            }
-            curr_item = curr_item->next;
-        }
-        curr_device = curr_device->next;
+        ret = __compare_item_values(curr_item, value_field);
     }
-
     return ret;
 }
 
-int is_item_state_with_grp_condition(uint32_t device_group_id, uint32_t item_group_id, l_fields_v2_t* value_field)
+int is_item_state_with_grp_condition(uint32_t device_group_id, uint32_t item_group_id, l_fields_v2_t *value_field)
 {
     int ret = 0;
 
-    l_ezlopi_device_grp_t * curr_devgrp = ezlopi_core_device_group_get_by_id(device_group_id);
+    l_ezlopi_device_grp_t *curr_devgrp = ezlopi_core_device_group_get_by_id(device_group_id);
     if (curr_devgrp)
     {
         int idx = 0;
-        cJSON * cj_get_devarr = NULL;
-        while (NULL != (cj_get_devarr = cJSON_GetArrayItem(curr_devgrp->devices, idx)))   // ["102ec000" , "102ec001" ,..]
+        cJSON *cj_get_devarr = NULL;
+        while (NULL != (cj_get_devarr = cJSON_GetArrayItem(curr_devgrp->devices, idx))) // ["102ec000" , "102ec001" ,..]
         {
             uint32_t curr_devce_id = strtoul(cj_get_devarr->valuestring, NULL, 16);
-            l_ezlopi_device_t * curr_device = ezlopi_device_get_by_id(curr_devce_id);   // immediately goto "102ec000" ...
+            l_ezlopi_device_t *curr_device = ezlopi_device_get_by_id(curr_devce_id); // immediately goto "102ec000" ...
             if (curr_device)
             {
-                l_ezlopi_item_t* curr_item_node = curr_device->items;   // perform operation on items of above device --> "102ec000"
+                l_ezlopi_item_t *curr_item_node = curr_device->items; // perform operation on items of above device --> "102ec000"
                 while (curr_item_node)
                 {
                     // compare with items_list stored in item_group_id
-                    l_ezlopi_item_grp_t * curr_item_grp = ezlopi_core_item_group_get_by_id(item_group_id);  // get  "ll_itemgrp_node"
+                    l_ezlopi_item_grp_t *curr_item_grp = ezlopi_core_item_group_get_by_id(item_group_id); // get  "ll_itemgrp_node"
                     if (curr_item_grp)
                     {
                         int count = 0;
-                        cJSON * cj_item_names = NULL;
-                        while (NULL != (cj_item_names = cJSON_GetArrayItem(curr_item_grp->item_names, count)))  // ["202ec000" , "202ec001" ,..]
+                        cJSON *cj_item_names = NULL;
+                        while (NULL != (cj_item_names = cJSON_GetArrayItem(curr_item_grp->item_names, count))) // ["202ec000" , "202ec001" ,..]
                         {
                             uint32_t req_item_id_from_itemgrp = strtoul(cj_item_names->valuestring, NULL, 16);
                             // if the item_ids match ; Then compare the "item_values" with that of the "scene's" requirement
@@ -142,10 +131,9 @@ int is_item_state_with_grp_condition(uint32_t device_group_id, uint32_t item_gro
     return ret;
 }
 
-
 //------------------------------- ezlopi_scene_when_is_date ---------------------------------------------
 
-static uint8_t isdate_check_endweek_conditon(e_isdate_modes_t mode_type, struct tm* info)
+static uint8_t isdate_check_endweek_conditon(e_isdate_modes_t mode_type, struct tm *info)
 {
     uint8_t ret = 0;
     static uint8_t _last_day_of_curr_month = 0;
@@ -252,7 +240,7 @@ static uint8_t isdate_check_endweek_conditon(e_isdate_modes_t mode_type, struct 
     }
     return ret;
 }
-static uint8_t isdate_find_nth_week_curr_month(struct tm* info)
+static uint8_t isdate_find_nth_week_curr_month(struct tm *info)
 {
     // 2. find the fisrt day in this month
     uint8_t tmp_week_num = 1; // starts with 1 ; since are already in one of the week-count
@@ -275,9 +263,9 @@ static uint8_t isdate_find_nth_week_curr_month(struct tm* info)
     return tmp_week_num;
 }
 
-uint8_t isdate_type_check(e_isdate_modes_t* mode_type, struct tm* info, l_fields_v2_t* curr_field)
+uint8_t isdate_type_check(e_isdate_modes_t *mode_type, struct tm *info, l_fields_v2_t *curr_field)
 {
-    const char* field_type_name[] = {
+    const char *field_type_name[] = {
         "daily",
         "weekly",
         "monthly",
@@ -286,7 +274,7 @@ uint8_t isdate_type_check(e_isdate_modes_t* mode_type, struct tm* info, l_fields
     };
     if ((EZLOPI_VALUE_TYPE_STRING == curr_field->value_type) && (NULL != curr_field->field_value.u_value.value_string))
     {
-        const char* check_type_name = curr_field->field_value.u_value.value_string;
+        const char *check_type_name = curr_field->field_value.u_value.value_string;
         for (uint8_t t = 0; t < 5; t++)
         {
             if (0 == strncmp(field_type_name[t], check_type_name, strlen(check_type_name) + 1))
@@ -298,10 +286,10 @@ uint8_t isdate_type_check(e_isdate_modes_t* mode_type, struct tm* info, l_fields
     }
     return 0;
 }
-uint8_t isdate_tm_check(e_isdate_modes_t* mode_type, struct tm* info, l_fields_v2_t* curr_field)
+uint8_t isdate_tm_check(e_isdate_modes_t *mode_type, struct tm *info, l_fields_v2_t *curr_field)
 {
     uint8_t ret = 0;
-    cJSON* cj_time_arr = curr_field->field_value.u_value.cj_value;
+    cJSON *cj_time_arr = curr_field->field_value.u_value.cj_value;
     if (cj_time_arr && (cJSON_Array == cj_time_arr->type))
     {
         ret |= (1 << 4);
@@ -313,7 +301,7 @@ uint8_t isdate_tm_check(e_isdate_modes_t* mode_type, struct tm* info, l_fields_v
         int array_size = cJSON_GetArraySize(cj_time_arr);
         for (int i = 0; i < array_size; i++)
         {
-            cJSON* array_item = cJSON_GetArrayItem(cj_time_arr, i);
+            cJSON *array_item = cJSON_GetArrayItem(cj_time_arr, i);
             if (array_item && cJSON_IsString(array_item))
             {
                 // TRACE_S("Time activate_%d: %s,  [field_hr_mm: %s]", i, array_item->valuestring, field_hr_mm);
@@ -335,10 +323,10 @@ uint8_t isdate_tm_check(e_isdate_modes_t* mode_type, struct tm* info, l_fields_v
     }
     return ret;
 }
-uint8_t isdate_weekdays_check(e_isdate_modes_t* mode_type, struct tm* info, l_fields_v2_t* curr_field)
+uint8_t isdate_weekdays_check(e_isdate_modes_t *mode_type, struct tm *info, l_fields_v2_t *curr_field)
 {
     uint8_t ret = 0;
-    cJSON* cj_weekdays_arr = curr_field->field_value.u_value.cj_value;
+    cJSON *cj_weekdays_arr = curr_field->field_value.u_value.cj_value;
     if (cj_weekdays_arr && (cJSON_Array == cj_weekdays_arr->type))
     {
         ret |= (1 << 5);
@@ -348,7 +336,7 @@ uint8_t isdate_weekdays_check(e_isdate_modes_t* mode_type, struct tm* info, l_fi
         int array_size = cJSON_GetArraySize(cj_weekdays_arr);
         for (int i = 0; i < array_size; i++)
         {
-            cJSON* array_item = cJSON_GetArrayItem(cj_weekdays_arr, i);
+            cJSON *array_item = cJSON_GetArrayItem(cj_weekdays_arr, i);
             if (array_item && cJSON_IsNumber(array_item))
             {
                 // TRACE_S("Weekdays activate_[%d]: %d, [field_weekdays: %d]", i, (int)(array_item->valuedouble), field_weekdays);
@@ -362,10 +350,10 @@ uint8_t isdate_weekdays_check(e_isdate_modes_t* mode_type, struct tm* info, l_fi
     }
     return ret;
 }
-uint8_t isdate_mdays_check(e_isdate_modes_t* mode_type, struct tm* info, l_fields_v2_t* curr_field)
+uint8_t isdate_mdays_check(e_isdate_modes_t *mode_type, struct tm *info, l_fields_v2_t *curr_field)
 {
     uint8_t ret = 0;
-    cJSON* cj_days_arr = curr_field->field_value.u_value.cj_value;
+    cJSON *cj_days_arr = curr_field->field_value.u_value.cj_value;
     if (cj_days_arr && (cJSON_Array == cj_days_arr->type))
     {
         ret |= (1 << 6);
@@ -374,7 +362,7 @@ uint8_t isdate_mdays_check(e_isdate_modes_t* mode_type, struct tm* info, l_field
 
         for (int i = 0; i < array_size; i++)
         {
-            cJSON* array_item = cJSON_GetArrayItem(cj_days_arr, i);
+            cJSON *array_item = cJSON_GetArrayItem(cj_days_arr, i);
             if (array_item && cJSON_IsNumber(array_item))
             {
                 TRACE_S("Days activate_%d: %d, [field_days: %d]", i, (int)(array_item->valuedouble), field_days);
@@ -389,10 +377,10 @@ uint8_t isdate_mdays_check(e_isdate_modes_t* mode_type, struct tm* info, l_field
     return ret;
 }
 
-uint8_t isdate_year_weeks_check(e_isdate_modes_t* mode_type, struct tm* info, l_fields_v2_t* curr_field)
+uint8_t isdate_year_weeks_check(e_isdate_modes_t *mode_type, struct tm *info, l_fields_v2_t *curr_field)
 {
     uint8_t ret = 0;
-    cJSON* cj_weeks_arr = curr_field->field_value.u_value.cj_value;
+    cJSON *cj_weeks_arr = curr_field->field_value.u_value.cj_value;
     if (cj_weeks_arr && (cJSON_Array == cj_weeks_arr->type))
     {
         ret |= (1 << 7);
@@ -400,7 +388,7 @@ uint8_t isdate_year_weeks_check(e_isdate_modes_t* mode_type, struct tm* info, l_
         for (int i = 0; i < array_size; i++)
         {
             // extract ;- [1,4,5,23,6,9,...,-1]
-            cJSON* array_item = cJSON_GetArrayItem(cj_weeks_arr, i);
+            cJSON *array_item = cJSON_GetArrayItem(cj_weeks_arr, i);
             if (array_item && cJSON_IsNumber(array_item))
             {
                 if (-1 == (int)(array_item->valuedouble)) // for case :- '-1'
@@ -461,7 +449,7 @@ int isdate_check_flag_result(e_isdate_modes_t mode_type, uint8_t flag_check)
     {
         if (((flag_check & MASK_FOR_TIME_ARG) && (flag_check & TIME_FLAG)))
         {
-            TRACE_W("here! daily-time");
+            // TRACE_W("here! daily-time");
             ret = 1;
         }
         break;
@@ -471,7 +459,7 @@ int isdate_check_flag_result(e_isdate_modes_t mode_type, uint8_t flag_check)
         if ((((flag_check & MASK_FOR_TIME_ARG) && (flag_check & TIME_FLAG)) &&
             ((flag_check & MASK_FOR_WEEKDAYS_ARG) && (flag_check & WEEKDAYS_FLAG))))
         {
-            TRACE_W("here! week_days and time");
+            // TRACE_W("here! week_days and time");
             ret = 1;
         }
         break;
@@ -481,7 +469,7 @@ int isdate_check_flag_result(e_isdate_modes_t mode_type, uint8_t flag_check)
         if ((((flag_check & MASK_FOR_TIME_ARG) && (flag_check & TIME_FLAG)) &&
             ((flag_check & MASK_FOR_DAYS_ARG) && (flag_check & DAYS_FLAG))))
         {
-            TRACE_W("here! month_days and time");
+            // TRACE_W("here! month_days and time");
             ret = 1;
         }
         break;
@@ -492,7 +480,7 @@ int isdate_check_flag_result(e_isdate_modes_t mode_type, uint8_t flag_check)
         if (((flag_check & MASK_FOR_TIME_ARG) && (flag_check & TIME_FLAG)) &&
             ((flag_check & MASK_FOR_WEEKS_ARG) && (flag_check & WEEKS_FLAG)))
         {
-            TRACE_W("here! week and time");
+            // TRACE_W("here! week and time");
             ret = 1;
         }
         break;
@@ -506,7 +494,7 @@ int isdate_check_flag_result(e_isdate_modes_t mode_type, uint8_t flag_check)
 }
 
 //------------------------------- ezlopi_scene_when_is_once ------------------------------------------
-uint8_t isonce_tm_check(l_fields_v2_t* curr_field, struct tm* info)
+uint8_t isonce_tm_check(l_fields_v2_t *curr_field, struct tm *info)
 {
     uint8_t flag_check = 0;
     if ((EZLOPI_VALUE_TYPE_24_HOURS_TIME == curr_field->value_type) && (NULL != curr_field->field_value.u_value.value_string))
@@ -522,7 +510,7 @@ uint8_t isonce_tm_check(l_fields_v2_t* curr_field, struct tm* info)
     }
     return flag_check;
 }
-uint8_t isonce_day_check(l_fields_v2_t* curr_field, struct tm* info)
+uint8_t isonce_day_check(l_fields_v2_t *curr_field, struct tm *info)
 {
     uint8_t flag_check = 0;
     if (EZLOPI_VALUE_TYPE_INT == curr_field->value_type)
@@ -534,7 +522,7 @@ uint8_t isonce_day_check(l_fields_v2_t* curr_field, struct tm* info)
     }
     return flag_check;
 }
-uint8_t isonce_month_check(l_fields_v2_t* curr_field, struct tm* info)
+uint8_t isonce_month_check(l_fields_v2_t *curr_field, struct tm *info)
 {
     uint8_t flag_check = 0;
     if (EZLOPI_VALUE_TYPE_INT == curr_field->value_type)
@@ -546,7 +534,7 @@ uint8_t isonce_month_check(l_fields_v2_t* curr_field, struct tm* info)
     }
     return flag_check;
 }
-uint8_t isonce_year_check(l_fields_v2_t* curr_field, struct tm* info)
+uint8_t isonce_year_check(l_fields_v2_t *curr_field, struct tm *info)
 {
     uint8_t flag_check = 0;
     if (EZLOPI_VALUE_TYPE_INT == curr_field->value_type)
@@ -558,7 +546,7 @@ uint8_t isonce_year_check(l_fields_v2_t* curr_field, struct tm* info)
     }
     return flag_check;
 }
-int isonce_check_flag_result(l_scenes_list_v2_t* scene_node, uint8_t flag_check)
+int isonce_check_flag_result(l_scenes_list_v2_t *scene_node, uint8_t flag_check)
 {
     int ret = 0;
     const uint8_t TIME_FLAG = (1 << 0);
@@ -568,7 +556,7 @@ int isonce_check_flag_result(l_scenes_list_v2_t* scene_node, uint8_t flag_check)
 
     if ((flag_check & TIME_FLAG) && (flag_check & DAY_FLAG) && (flag_check & MONTH_FLAG) && (flag_check & YEAR_FLAG))
     {
-        TRACE_W("here! once and time");
+        // TRACE_W("here! once and time");
         // now to disable the scene and also store in ezlopi_nvs
         scene_node->enabled = false;
         ezlopi_scenes_enable_disable_scene_by_id_v2(scene_node->_id, false);
@@ -595,14 +583,14 @@ typedef struct s_sunstate_data
     struct tm defined_moment;          // offset+suntime
 } s_sunstate_data_t;
 
-static void issunsate_update_sunstate_tm(int tm_mday, s_sunstate_data_t* user_data)
+static void issunsate_update_sunstate_tm(int tm_mday, s_sunstate_data_t *user_data)
 {
     if (tm_mday && user_data)
     {
         char tmp_url[100] = { 0 };
         char tmp_headers[] = "Host: api.sunrisesunset.io\r\nAccept: */*\r\nConnection: keep-alive\r\n";
         char tmp_web_server[] = "api.sunrisesunset.io";
-        char* lat_long_vals = ezlopi_nvs_read_latidtude_longitude();
+        char *lat_long_vals = ezlopi_nvs_read_latidtude_longitude();
         if (lat_long_vals)
         {
             TRACE_S("long_lat_co-ordinate : %s", lat_long_vals);
@@ -631,7 +619,7 @@ static void issunsate_update_sunstate_tm(int tm_mday, s_sunstate_data_t* user_da
 
         ezlopi_core_http_mbedtls_req(&tmp_config);
         // e.g. after valid extraction
-        user_data->curr_tm_day = tm_mday;            // this stores day for which data is extracted
+        user_data->curr_tm_day = tm_mday;                                                    // this stores day for which data is extracted
         user_data->choosen_suntime.tm_hour = 5 + ((user_data->sunstate_mode == 2) ? 12 : 0); // sunrise = 1 ; sunset = 2
         user_data->choosen_suntime.tm_min = 48;
         user_data->choosen_suntime.tm_sec = 42;
@@ -646,7 +634,7 @@ static void issunsate_update_sunstate_tm(int tm_mday, s_sunstate_data_t* user_da
         }
     }
 }
-static void issunstate_add_offs(e_issunstate_offset_t tmoffs_type, struct tm* choosen_suntime, struct tm* defined_moment, const char* tm_offs_val)
+static void issunstate_add_offs(e_issunstate_offset_t tmoffs_type, struct tm *choosen_suntime, struct tm *defined_moment, const char *tm_offs_val)
 {
     if (choosen_suntime && defined_moment && tm_offs_val) // choosen_suntime => sunrise or sunset
     {
@@ -657,8 +645,8 @@ static void issunstate_add_offs(e_issunstate_offset_t tmoffs_type, struct tm* ch
         char time_diff[10];
         snprintf(time_diff, 10, "%s", tm_offs_val);
         time_diff[9] = '\0';
-        char* ptr1 = NULL;
-        char* ptr2 = NULL;
+        char *ptr1 = NULL;
+        char *ptr2 = NULL;
         if (0 != strlen(time_diff))
         {
             tmp_time.tm_hour = strtoul(time_diff, &ptr1, 10);
@@ -725,7 +713,7 @@ static void issunstate_add_offs(e_issunstate_offset_t tmoffs_type, struct tm* ch
     }
 }
 
-uint8_t issunstate_get_suntime(l_scenes_list_v2_t* scene_node, l_fields_v2_t* curr_field, struct tm* info, uint8_t curr_sunstate_mode)
+uint8_t issunstate_get_suntime(l_scenes_list_v2_t *scene_node, l_fields_v2_t *curr_field, struct tm *info, uint8_t curr_sunstate_mode)
 {
     uint8_t flag_check = 0;
     /*Extract today's suntime via API call*/
@@ -737,11 +725,11 @@ uint8_t issunstate_get_suntime(l_scenes_list_v2_t* scene_node, l_fields_v2_t* cu
 
         if (NULL == (scene_node->when_block->fields->user_arg))
         {
-            s_sunstate_data_t* data = (s_sunstate_data_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_sunstate_data_t));
+            s_sunstate_data_t *data = (s_sunstate_data_t *)ezlopi_malloc(__FUNCTION__, sizeof(s_sunstate_data_t));
             if (data)
             {
                 memset(data, 0, sizeof(s_sunstate_data_t));
-                scene_node->when_block->fields->user_arg = (void*)data;
+                scene_node->when_block->fields->user_arg = (void *)data;
             }
             else
             {
@@ -750,7 +738,7 @@ uint8_t issunstate_get_suntime(l_scenes_list_v2_t* scene_node, l_fields_v2_t* cu
             }
         }
         // 2. Recalculate suntime for new-day or null
-        s_sunstate_data_t* user_data = (s_sunstate_data_t*)(scene_node->when_block->fields->user_arg);
+        s_sunstate_data_t *user_data = (s_sunstate_data_t *)(scene_node->when_block->fields->user_arg);
         if (user_data && (info->tm_mday != user_data->curr_tm_day))
         {
             TRACE_S("curr_day = [%d] ; [%dth]", info->tm_mday, user_data->curr_tm_day);
@@ -775,12 +763,12 @@ uint8_t issunstate_get_suntime(l_scenes_list_v2_t* scene_node, l_fields_v2_t* cu
     }
     return flag_check;
 }
-uint8_t issunstate_get_offs_tmval(l_scenes_list_v2_t* scene_node, l_fields_v2_t* curr_field, struct tm* info, uint8_t curr_sunstate_mode)
+uint8_t issunstate_get_offs_tmval(l_scenes_list_v2_t *scene_node, l_fields_v2_t *curr_field, struct tm *info, uint8_t curr_sunstate_mode)
 {
     uint8_t flag_check = 0;
     if ((EZLOPI_VALUE_TYPE_HMS_INTERVAL == curr_field->value_type) && (NULL != curr_field->field_value.u_value.value_string))
     {
-        s_sunstate_data_t* user_data = (s_sunstate_data_t*)(scene_node->when_block->fields->user_arg);
+        s_sunstate_data_t *user_data = (s_sunstate_data_t *)(scene_node->when_block->fields->user_arg);
         if ((user_data) && (0 != user_data->sunstate_mode))
         {
             if ((0 == user_data->defined_moment.tm_hour) &&
@@ -803,7 +791,7 @@ uint8_t issunstate_get_offs_tmval(l_scenes_list_v2_t* scene_node, l_fields_v2_t*
     }
     return flag_check;
 }
-uint8_t issunstate_eval_weekdays(l_scenes_list_v2_t* scene_node, l_fields_v2_t* curr_field, struct tm* info, uint8_t curr_sunstate_mode)
+uint8_t issunstate_eval_weekdays(l_scenes_list_v2_t *scene_node, l_fields_v2_t *curr_field, struct tm *info, uint8_t curr_sunstate_mode)
 {
     uint8_t flag_check = 0;
     if ((EZLOPI_VALUE_TYPE_INT_ARRAY == curr_field->value_type) && (curr_field))
@@ -813,7 +801,7 @@ uint8_t issunstate_eval_weekdays(l_scenes_list_v2_t* scene_node, l_fields_v2_t* 
     }
     return flag_check;
 }
-uint8_t issunstate_eval_days(l_scenes_list_v2_t* scene_node, l_fields_v2_t* curr_field, struct tm* info, uint8_t curr_sunstate_mode)
+uint8_t issunstate_eval_days(l_scenes_list_v2_t *scene_node, l_fields_v2_t *curr_field, struct tm *info, uint8_t curr_sunstate_mode)
 {
     uint8_t flag_check = 0;
     if ((EZLOPI_VALUE_TYPE_INT_ARRAY == curr_field->value_type) && (curr_field))
@@ -823,12 +811,12 @@ uint8_t issunstate_eval_days(l_scenes_list_v2_t* scene_node, l_fields_v2_t* curr
     }
     return flag_check;
 }
-uint8_t issunstate_eval_range(l_scenes_list_v2_t* scene_node, l_fields_v2_t* curr_field, struct tm* info, uint8_t curr_sunstate_mode)
+uint8_t issunstate_eval_range(l_scenes_list_v2_t *scene_node, l_fields_v2_t *curr_field, struct tm *info, uint8_t curr_sunstate_mode)
 {
     uint8_t flag_check = 0;
     if ((EZLOPI_VALUE_TYPE_TOKEN == curr_field->value_type) && (NULL != curr_field->field_value.u_value.value_string))
     {
-        s_sunstate_data_t* user_data = (s_sunstate_data_t*)(scene_node->when_block->fields->user_arg);
+        s_sunstate_data_t *user_data = (s_sunstate_data_t *)(scene_node->when_block->fields->user_arg);
         if ((user_data) && (0 != user_data->sunstate_mode))
         {
             // TRACE_S("checking midnight range offset");
@@ -838,7 +826,7 @@ uint8_t issunstate_eval_range(l_scenes_list_v2_t* scene_node, l_fields_v2_t* cur
     }
     return flag_check;
 }
-uint8_t issunstate_check_mdrn(uint8_t sunstate_mode, const char* range_type, struct tm* info, struct tm* defined_moment)
+uint8_t issunstate_check_mdrn(uint8_t sunstate_mode, const char *range_type, struct tm *info, struct tm *defined_moment)
 {
     uint8_t ret = 0;
     if (sunstate_mode && range_type && info && defined_moment)
@@ -883,7 +871,7 @@ uint8_t issunstate_check_mdrn(uint8_t sunstate_mode, const char* range_type, str
     return ret;
 }
 
-int issunstate_check_flag_result(l_scenes_list_v2_t* scene_node, struct tm* info, uint8_t flag_check)
+int issunstate_check_flag_result(l_scenes_list_v2_t *scene_node, struct tm *info, uint8_t flag_check)
 {
     int ret = 0;
     const uint8_t TIME_FLAG = (1 << 0);
@@ -894,7 +882,7 @@ int issunstate_check_flag_result(l_scenes_list_v2_t* scene_node, struct tm* info
     const uint8_t MASK_WEEKDAYS_FLAG = (1 << 5);
     const uint8_t MASK_DAYS_FLAG = (1 << 6);
     const uint8_t MASK_MIDNIGHT_FLAG = (1 << 7);
-    s_sunstate_data_t* user_data = (s_sunstate_data_t*)(scene_node->when_block->fields->user_arg);
+    s_sunstate_data_t *user_data = (s_sunstate_data_t *)(scene_node->when_block->fields->user_arg);
     if (user_data)
     {
         if ((0 != user_data->curr_tm_day) && (0 != user_data->sunstate_mode) && (flag_check & MASK_TIME_FLAG)) // defined_moment should have the current day
@@ -953,14 +941,14 @@ int issunstate_check_flag_result(l_scenes_list_v2_t* scene_node, struct tm* info
     return ret;
 }
 //--------------------------- ezlopi_scene_when_is_date_range ----------------------------------------
-void isdate_range_get_tm(l_fields_v2_t* curr_field, struct tm* tmp_tm)
+void isdate_range_get_tm(l_fields_v2_t *curr_field, struct tm *tmp_tm)
 {
     if ((EZLOPI_VALUE_TYPE_24_HOURS_TIME == curr_field->value_type) && (NULL != curr_field->field_value.u_value.value_string))
     {
         char time[10];
         snprintf(time, 10, "%s", curr_field->field_value.u_value.value_string);
         time[9] = '\0';
-        char* ptr = NULL;
+        char *ptr = NULL;
         if (0 != strlen(time))
         {
             tmp_tm->tm_hour = strtoul(time, &ptr, 10);
@@ -968,42 +956,42 @@ void isdate_range_get_tm(l_fields_v2_t* curr_field, struct tm* tmp_tm)
         }
     }
 }
-void isdate_range_get_startday(l_fields_v2_t* curr_field, struct tm* tmp_tm)
+void isdate_range_get_startday(l_fields_v2_t *curr_field, struct tm *tmp_tm)
 {
     if (EZLOPI_VALUE_TYPE_INT == curr_field->value_type)
     {
         tmp_tm->tm_mday = (curr_field->field_value.u_value.value_double) ? (int)(curr_field->field_value.u_value.value_double) : 1;
     }
 }
-void isdate_range_get_endday(l_fields_v2_t* curr_field, struct tm* tmp_tm)
+void isdate_range_get_endday(l_fields_v2_t *curr_field, struct tm *tmp_tm)
 {
     if (EZLOPI_VALUE_TYPE_INT == curr_field->value_type)
     {
         tmp_tm->tm_mday = (curr_field->field_value.u_value.value_double) ? (int)(curr_field->field_value.u_value.value_double) : 31;
     }
 }
-void isdate_range_get_startmonth(l_fields_v2_t* curr_field, struct tm* tmp_tm)
+void isdate_range_get_startmonth(l_fields_v2_t *curr_field, struct tm *tmp_tm)
 {
     if (EZLOPI_VALUE_TYPE_INT == curr_field->value_type)
     {
         tmp_tm->tm_mon = (curr_field->field_value.u_value.value_double) ? (int)(curr_field->field_value.u_value.value_double) : 1;
     }
 }
-void isdate_range_get_endmonth(l_fields_v2_t* curr_field, struct tm* tmp_tm)
+void isdate_range_get_endmonth(l_fields_v2_t *curr_field, struct tm *tmp_tm)
 {
     if (EZLOPI_VALUE_TYPE_INT == curr_field->value_type)
     {
         tmp_tm->tm_mon = (curr_field->field_value.u_value.value_double) ? (int)(curr_field->field_value.u_value.value_double) : 12;
     }
 }
-void isdate_range_get_startyear(l_fields_v2_t* curr_field, struct tm* tmp_tm)
+void isdate_range_get_startyear(l_fields_v2_t *curr_field, struct tm *tmp_tm)
 {
     if (EZLOPI_VALUE_TYPE_INT == curr_field->value_type)
     {
         tmp_tm->tm_year = (curr_field->field_value.u_value.value_double) ? (int)(curr_field->field_value.u_value.value_double) : 1;
     }
 }
-void isdate_range_get_endyear(l_fields_v2_t* curr_field, struct tm* tmp_tm)
+void isdate_range_get_endyear(l_fields_v2_t *curr_field, struct tm *tmp_tm)
 {
     if (EZLOPI_VALUE_TYPE_INT == curr_field->value_type)
     {
@@ -1011,7 +999,7 @@ void isdate_range_get_endyear(l_fields_v2_t* curr_field, struct tm* tmp_tm)
     }
 }
 
-uint8_t isdate_range_check_tm(struct tm* start, struct tm* end, struct tm* info)
+uint8_t isdate_range_check_tm(struct tm *start, struct tm *end, struct tm *info)
 {
     uint8_t ret = 0;
     // first confirm if the time range has positive or negative difference (end - start)
@@ -1050,7 +1038,7 @@ uint8_t isdate_range_check_tm(struct tm* start, struct tm* end, struct tm* info)
 end:
     return ret;
 }
-uint8_t isdate_range_check_day(struct tm* start, struct tm* end, struct tm* info)
+uint8_t isdate_range_check_day(struct tm *start, struct tm *end, struct tm *info)
 {
     uint8_t ret = 0;
     if ((info->tm_mday >= start->tm_mday) && (info->tm_mday <= end->tm_mday))
@@ -1063,7 +1051,7 @@ uint8_t isdate_range_check_day(struct tm* start, struct tm* end, struct tm* info
     }
     return ret;
 }
-uint8_t isdate_range_check_month(struct tm* start, struct tm* end, struct tm* info)
+uint8_t isdate_range_check_month(struct tm *start, struct tm *end, struct tm *info)
 {
     uint8_t ret = 0;
     if (((info->tm_mon + 1) >= start->tm_mon) && ((info->tm_mon + 1) <= end->tm_mon))
@@ -1076,7 +1064,7 @@ uint8_t isdate_range_check_month(struct tm* start, struct tm* end, struct tm* in
     }
     return ret;
 }
-uint8_t isdate_range_check_year(struct tm* start, struct tm* end, struct tm* info)
+uint8_t isdate_range_check_year(struct tm *start, struct tm *end, struct tm *info)
 {
     uint8_t ret = 0;
     if (((info->tm_year + 1900) >= start->tm_year) && ((info->tm_year + 1900) <= end->tm_year))
@@ -1107,16 +1095,16 @@ int isdate_range_check_flag_result(uint8_t flag_check)
 //-----------------------------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------------------------
 /* This function to extract the result of 'AND' when_blocks */
-static bool __and_when_block_condition(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* when_block)
+static bool __and_when_block_condition(l_scenes_list_v2_t *scene_node, l_when_block_v2_t *when_block)
 {
     bool transition_state = 1; // to make valid judgements
-    l_when_block_v2_t* value_when_block = when_block->fields->field_value.u_value.when_block;
+    l_when_block_v2_t *value_when_block = when_block->fields->field_value.u_value.when_block;
     while (value_when_block)
     {
         f_scene_method_v2_t scene_method = ezlopi_scene_get_method_v2(value_when_block->block_options.method.type);
         if (scene_method)
         {
-            transition_state &= scene_method(scene_node, (void*)value_when_block);
+            transition_state &= scene_method(scene_node, (void *)value_when_block);
             if (!transition_state)
             {
                 break;
@@ -1128,27 +1116,26 @@ static bool __and_when_block_condition(l_scenes_list_v2_t* scene_node, l_when_bl
 }
 //-----------------------------------------------------------------------------------------------------
 
-
 //------------------------------- ezlopi_scene_when_function_method -----------------------------------
 
-int when_function_for_opr(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* when_block, cJSON* cj_func_opr)
+int when_function_for_opr(l_scenes_list_v2_t *scene_node, l_when_block_v2_t *when_block, cJSON *cj_func_opr)
 {
     // TRACE_W("for_least");
     int ret = 0;
     if (scene_node && when_block && cj_func_opr)
     {
-        cJSON* for_type = cJSON_GetObjectItem(__FUNCTION__, cj_func_opr, "method");
-        cJSON* for_interval = cJSON_GetObjectItem(__FUNCTION__, cj_func_opr, "seconds");
+        cJSON *for_type = cJSON_GetObjectItem(__FUNCTION__, cj_func_opr, "method");
+        cJSON *for_interval = cJSON_GetObjectItem(__FUNCTION__, cj_func_opr, "seconds");
         if (for_type && for_interval)
         {
-            const char* for_less_least = cJSON_GetStringValue(for_type); /*extract the type*/
+            const char *for_less_least = cJSON_GetStringValue(for_type); /*extract the type*/
             if (for_less_least)
             {
                 /* first get the product of all children states*/
                 bool transition_state = __and_when_block_condition(scene_node, when_block);
 
                 /*now compare the intervals between each transtion result*/
-                s_when_function_t* function_state_info = (s_when_function_t*)scene_node->when_block->fields->user_arg;
+                s_when_function_t *function_state_info = (s_when_function_t *)scene_node->when_block->fields->user_arg;
 
                 if ((transition_state == 1) && (0 == function_state_info->current_state))
                 {
@@ -1184,17 +1171,17 @@ int when_function_for_opr(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* whe
     }
     return ret;
 }
-int when_function_for_repeat(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* when_block, cJSON* cj_func_opr)
+int when_function_for_repeat(l_scenes_list_v2_t *scene_node, l_when_block_v2_t *when_block, cJSON *cj_func_opr)
 {
     int ret = 0;
     if (scene_node && when_block && cj_func_opr)
     {
-        cJSON* for_times = cJSON_GetObjectItem(__FUNCTION__, cj_func_opr, "times");
-        cJSON* for_interval = cJSON_GetObjectItem(__FUNCTION__, cj_func_opr, "seconds");
+        cJSON *for_times = cJSON_GetObjectItem(__FUNCTION__, cj_func_opr, "times");
+        cJSON *for_interval = cJSON_GetObjectItem(__FUNCTION__, cj_func_opr, "seconds");
         if (for_times && for_interval)
         {
             /* first get the product of all children states*/
-            s_when_function_t* function_state_info = (s_when_function_t*)scene_node->when_block->fields->user_arg;
+            s_when_function_t *function_state_info = (s_when_function_t *)scene_node->when_block->fields->user_arg;
             bool transition_state = __and_when_block_condition(scene_node, when_block);
             if ((transition_state) && (0 == function_state_info->current_state)) /*previous state?*/
             {
@@ -1216,7 +1203,7 @@ int when_function_for_repeat(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* 
                 {
                     uint32_t dur = (((uint32_t)xTaskGetTickCount() - function_state_info->transtion_instant) / 1000);
                     int threshold_time = cJSON_GetNumberValue(for_interval);
-                    if (dur <= threshold_time)// from 'start' till 'now'
+                    if (dur <= threshold_time) // from 'start' till 'now'
                     {
                         TRACE_W(" Successful activation sequence within [%dsec] ; threshold [%dsec]", dur, threshold_time);
                         ret = 1;
@@ -1235,15 +1222,15 @@ int when_function_for_repeat(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* 
 
     return ret;
 }
-int when_function_for_follow(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* when_block, cJSON* cj_func_opr)
+int when_function_for_follow(l_scenes_list_v2_t *scene_node, l_when_block_v2_t *when_block, cJSON *cj_func_opr)
 {
     int ret = 0;
     if (scene_node && when_block && cj_func_opr)
     {
-        cJSON* for_delay = cJSON_GetObjectItem(__FUNCTION__, cj_func_opr, "delayReset");
+        cJSON *for_delay = cJSON_GetObjectItem(__FUNCTION__, cj_func_opr, "delayReset");
         if (for_delay)
         {
-            s_when_function_t* function_state_info = (s_when_function_t*)scene_node->when_block->fields->user_arg;
+            s_when_function_t *function_state_info = (s_when_function_t *)scene_node->when_block->fields->user_arg;
             if ((0 == function_state_info->transtion_instant) && (0 == function_state_info->current_state))
             {
                 /* first get the product of all children states*/
@@ -1284,14 +1271,14 @@ int when_function_for_follow(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* 
 
     return ret;
 }
-int when_function_for_pulse(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* when_block, cJSON* cj_func_opr)
+int when_function_for_pulse(l_scenes_list_v2_t *scene_node, l_when_block_v2_t *when_block, cJSON *cj_func_opr)
 {
     int ret = 0;
     if (scene_node && when_block && cj_func_opr)
     {
-        cJSON* for_trueperiod = cJSON_GetObjectItem(__FUNCTION__, cj_func_opr, "truePeriod");
-        cJSON* for_falseperiod = cJSON_GetObjectItem(__FUNCTION__, cj_func_opr, "falsePeriod");
-        cJSON* for_times = cJSON_GetObjectItem(__FUNCTION__, cj_func_opr, "times");
+        cJSON *for_trueperiod = cJSON_GetObjectItem(__FUNCTION__, cj_func_opr, "truePeriod");
+        cJSON *for_falseperiod = cJSON_GetObjectItem(__FUNCTION__, cj_func_opr, "falsePeriod");
+        cJSON *for_times = cJSON_GetObjectItem(__FUNCTION__, cj_func_opr, "times");
         if (for_trueperiod && for_times && for_falseperiod)
         {
             int true_time_dur = cJSON_GetNumberValue(for_trueperiod);
@@ -1299,7 +1286,7 @@ int when_function_for_pulse(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* w
             int seq_count = cJSON_GetNumberValue(for_times);
 
             /*1. check for activation condition for 'pulse_flag' */
-            s_when_function_t* function_state_info = (s_when_function_t*)scene_node->when_block->fields->user_arg;
+            s_when_function_t *function_state_info = (s_when_function_t *)scene_node->when_block->fields->user_arg;
             if ((0 == function_state_info->transition_count) &&
                 (0 == function_state_info->current_state) &&
                 (0 == function_state_info->transtion_instant) &&
@@ -1318,7 +1305,7 @@ int when_function_for_pulse(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* w
             {
                 if (seq_count == 0)
                 {
-                    function_state_info->transition_count = seq_count;  /* If 'SEQ_COUNT' == 0 ; Then loop the sequence forever. */
+                    function_state_info->transition_count = seq_count; /* If 'SEQ_COUNT' == 0 ; Then loop the sequence forever. */
                 }
                 else
                 {
@@ -1336,7 +1323,7 @@ int when_function_for_pulse(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* w
                         }
                         else
                         {
-                            function_state_info->transtion_instant = (uint32_t)xTaskGetTickCount();     /*in sec*/
+                            function_state_info->transtion_instant = (uint32_t)xTaskGetTickCount(); /*in sec*/
                             if (function_state_info->transition_count < seq_count)
                             {
                                 function_state_info->transition_count++;
@@ -1352,7 +1339,7 @@ int when_function_for_pulse(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* w
                         }
                         else
                         {
-                            function_state_info->transtion_instant = (uint32_t)xTaskGetTickCount();  /*in sec*/
+                            function_state_info->transtion_instant = (uint32_t)xTaskGetTickCount(); /*in sec*/
                             if (function_state_info->transition_count < seq_count)
                             {
                                 function_state_info->current_state = 1;
@@ -1372,9 +1359,6 @@ int when_function_for_pulse(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* w
                     function_state_info->current_state = 0;
                     function_state_info->transition_count = 0;
                 }
-
-
-
             }
             else
             {
@@ -1400,19 +1384,19 @@ int when_function_for_pulse(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* w
 
     return ret;
 }
-int when_function_for_latch(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* when_block, cJSON* cj_func_opr)
+int when_function_for_latch(l_scenes_list_v2_t *scene_node, l_when_block_v2_t *when_block, cJSON *cj_func_opr)
 {
     int ret = 0;
     if (scene_node && when_block && cj_func_opr)
     {
-        cJSON* for_enabled = cJSON_GetObjectItem(__FUNCTION__, cj_func_opr, "enabled");
+        cJSON *for_enabled = cJSON_GetObjectItem(__FUNCTION__, cj_func_opr, "enabled");
         if (for_enabled)
         {
-            s_when_function_t* function_state_info = (s_when_function_t*)scene_node->when_block->fields->user_arg;
+            s_when_function_t *function_state_info = (s_when_function_t *)scene_node->when_block->fields->user_arg;
             if ((0 == function_state_info->current_state) && (cJSON_True == for_enabled->type) && (0 == function_state_info->transtion_instant)) /* if the trigger phase has not started */
             {
                 /* first get the product of all children states*/
-                if (__and_when_block_condition(scene_node, when_block))  /*if : previous state = 0*/
+                if (__and_when_block_condition(scene_node, when_block)) /*if : previous state = 0*/
                 {
                     function_state_info->current_state = 1;
                     function_state_info->transtion_instant = (uint32_t)xTaskGetTickCount();
@@ -1434,49 +1418,49 @@ int when_function_for_latch(l_scenes_list_v2_t* scene_node, l_when_block_v2_t* w
 }
 
 //------------------------------- ezlopi_scene_when_isDeviceItemGroup_method -----------------------------------
-int isdeviceitem_group_value_check(l_scenes_list_v2_t* scene_node, uint32_t device_group_id, uint32_t item_group_id)
+int isdeviceitem_group_value_check(l_scenes_list_v2_t *scene_node, uint32_t device_group_id, uint32_t item_group_id)
 {
     int ret = 0;
     if (scene_node && (0 < device_group_id) && (0 < item_group_id))
     {
-        cJSON * cj_device_items_data = NULL;
+        cJSON *cj_device_items_data = NULL;
         bool save_flag = false;
         if (NULL == scene_node->when_block->fields->user_arg)
         {
-            cJSON * cj_device_items_data = cJSON_CreateObject(__FUNCTION__);
+            cJSON *cj_device_items_data = cJSON_CreateObject(__FUNCTION__);
             if (cj_device_items_data)
             {
                 save_flag = true;
             }
         }
         else
-        {   // extract the previous cjson_data, if exists;
+        { // extract the previous cjson_data, if exists;
             save_flag = false;
-            cj_device_items_data = (cJSON*)scene_node->when_block->fields->user_arg;
+            cj_device_items_data = (cJSON *)scene_node->when_block->fields->user_arg;
         }
 
         // 1.
-        l_ezlopi_device_grp_t * curr_devgrp = ezlopi_core_device_group_get_by_id(device_group_id);
+        l_ezlopi_device_grp_t *curr_devgrp = ezlopi_core_device_group_get_by_id(device_group_id);
         if (curr_devgrp)
         {
             int idx = 0;
-            cJSON * cj_get_devarr = NULL;
-            while (NULL != (cj_get_devarr = cJSON_GetArrayItem(curr_devgrp->devices, idx)))   // ["102ec000" , "102ec001" ,..]
+            cJSON *cj_get_devarr = NULL;
+            while (NULL != (cj_get_devarr = cJSON_GetArrayItem(curr_devgrp->devices, idx))) // ["102ec000" , "102ec001" ,..]
             {
                 uint32_t curr_devce_id = strtoul(cj_get_devarr->valuestring, NULL, 16);
-                l_ezlopi_device_t * curr_device = ezlopi_device_get_by_id(curr_devce_id);   // immediately goto "102ec000" ...
+                l_ezlopi_device_t *curr_device = ezlopi_device_get_by_id(curr_devce_id); // immediately goto "102ec000" ...
                 if (curr_device)
                 {
-                    l_ezlopi_item_t* curr_item_node = curr_device->items;   // perform operation on items of above device --> "102ec000"
+                    l_ezlopi_item_t *curr_item_node = curr_device->items; // perform operation on items of above device --> "102ec000"
                     while (curr_item_node)
                     {
                         // 2.
-                        l_ezlopi_item_grp_t * curr_item_grp = ezlopi_core_item_group_get_by_id(item_group_id);  // get  "ll_itemgrp_node"
+                        l_ezlopi_item_grp_t *curr_item_grp = ezlopi_core_item_group_get_by_id(item_group_id); // get  "ll_itemgrp_node"
                         if (curr_item_grp)
                         {
                             int count = 0;
-                            cJSON * cj_item_names = NULL;
-                            while (NULL != (cj_item_names = cJSON_GetArrayItem(curr_item_grp->item_names, count)))  // ["202ec000" , "202ec001" ,..]
+                            cJSON *cj_item_names = NULL;
+                            while (NULL != (cj_item_names = cJSON_GetArrayItem(curr_item_grp->item_names, count))) // ["202ec000" , "202ec001" ,..]
                             {
                                 uint32_t req_item_id_from_itemgrp = strtoul(cj_item_names->valuestring, NULL, 16);
                                 // if the item_ids match ; Then compare the "item_values" with that of the "scene's" requirement
@@ -1484,15 +1468,15 @@ int isdeviceitem_group_value_check(l_scenes_list_v2_t* scene_node, uint32_t devi
                                 {
                                     if (cj_device_items_data) // if destination arr
                                     {
-                                        cJSON* cj_tmp_value = cJSON_CreateObject(__FUNCTION__);
+                                        cJSON *cj_tmp_value = cJSON_CreateObject(__FUNCTION__);
                                         if (cj_tmp_value)
                                         {
-                                            curr_item_node->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, curr_item_node, (void*)cj_tmp_value, NULL);
-                                            cJSON* cj_value_new = cJSON_GetObjectItem(__FUNCTION__, cj_tmp_value, ezlopi_value_str);    // this 'cj_value_new' contains latest 'item_value'.
+                                            curr_item_node->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, curr_item_node, (void *)cj_tmp_value, NULL);
+                                            cJSON *cj_value_new = cJSON_GetObjectItem(__FUNCTION__, cj_tmp_value, ezlopi_value_str); // this 'cj_value_new' contains latest 'item_value'.
                                             if (cj_value_new)
                                             {
                                                 // save or compare?
-                                                if (true == save_flag)  /*save*/
+                                                if (true == save_flag) /*save*/
                                                 {
                                                     // since 'save_flag' is true we will add the latest 'item_values' into user_arg.
                                                     switch (cj_value_new->type)
@@ -1504,12 +1488,12 @@ int isdeviceitem_group_value_check(l_scenes_list_v2_t* scene_node, uint32_t devi
                                                     }
                                                     case cJSON_False:
                                                     {
-                                                        cJSON_AddBoolToObject(__FUNCTION__, cj_device_items_data, cj_item_names->valuestring, false);// store as {"202ec000" : false , ...}
+                                                        cJSON_AddBoolToObject(__FUNCTION__, cj_device_items_data, cj_item_names->valuestring, false); // store as {"202ec000" : false , ...}
                                                         break;
                                                     }
                                                     case cJSON_Number:
                                                     {
-                                                        cJSON_AddNumberToObject(__FUNCTION__, cj_device_items_data, cj_item_names->valuestring, cj_value_new->valuedouble);// store as {"202ec000" : 20 , ...}
+                                                        cJSON_AddNumberToObject(__FUNCTION__, cj_device_items_data, cj_item_names->valuestring, cj_value_new->valuedouble); // store as {"202ec000" : 20 , ...}
                                                         break;
                                                     }
                                                     case cJSON_String:
@@ -1528,12 +1512,12 @@ int isdeviceitem_group_value_check(l_scenes_list_v2_t* scene_node, uint32_t devi
                                                         break;
                                                     }
                                                 }
-                                                else   /*compare*/
+                                                else /*compare*/
                                                 {
-                                                    cJSON * cj_prev_item_val = cJSON_GetObjectItem(__FUNCTION__, cj_device_items_data, cj_item_names->valuestring); // grab the specific {"202ec000" :"..."}
+                                                    cJSON *cj_prev_item_val = cJSON_GetObjectItem(__FUNCTION__, cj_device_items_data, cj_item_names->valuestring); // grab the specific {"202ec000" :"..."}
                                                     if (cj_prev_item_val)
                                                     {
-                                                        if (cj_prev_item_val->type == cj_value_new->type)    // making sure both prev & new values, are of same type.
+                                                        if (cj_prev_item_val->type == cj_value_new->type) // making sure both prev & new values, are of same type.
                                                         {
                                                             // since 'save_flag' is true we will add the latest 'item_values' into user_arg.
                                                             switch (cj_value_new->type)
@@ -1575,7 +1559,6 @@ int isdeviceitem_group_value_check(l_scenes_list_v2_t* scene_node, uint32_t devi
                                                         // CJSON_TRACE("cj_device_items_data", cj_device_items_data);
                                                         TRACE_E(" [%s] doesnot exist", cj_item_names->valuestring);
                                                     }
-
                                                 }
                                             }
                                             cJSON_Delete(__FUNCTION__, cj_tmp_value);
@@ -1598,13 +1581,388 @@ int isdeviceitem_group_value_check(l_scenes_list_v2_t* scene_node, uint32_t devi
         if ((NULL == scene_node->when_block->fields->user_arg) && cj_device_items_data && (true == save_flag))
         {
             CJSON_TRACE("first_device_item_data", cj_device_items_data);
-            scene_node->when_block->fields->user_arg = (void*)cj_device_items_data;
+            scene_node->when_block->fields->user_arg = (void *)cj_device_items_data;
             ret = 1;
         }
     }
     return ret;
 }
 
+static uint8_t __isitemState_vs_field_compare(s_item_exp_data_t *new_extract_data, l_fields_v2_t *tmp_field, uint8_t bit_mode_position)
+{
+    uint8_t flag = 0;
+    if (tmp_field)
+    {
+        switch (tmp_field->value_type)
+        {
+        case EZLOPI_VALUE_TYPE_ITEM:
+        {
+            cJSON *cj_item_value = cJSON_CreateObject(__FUNCTION__);
+            if (cj_item_value)
+            {
+                l_ezlopi_item_t *tmp_item = ezlopi_device_get_item_by_id(tmp_field->field_value.u_value.value_double);
+                tmp_item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, tmp_item, (void *)cj_item_value, NULL);
+                cJSON *cj_val = cJSON_GetObjectItem(__FUNCTION__, cj_item_value, ezlopi_value_str);
+                if (cj_val)
+                {
+                    switch (cj_val->type)
+                    {
+                    case cJSON_String:
+                    {
+                        if (cj_val->valuestring && new_extract_data->sample_data.u_value.value_string)
+                        {
+                            if (EZPI_STRNCMP_IF_EQUAL(cj_val->valuestring, new_extract_data->sample_data.u_value.value_string, cj_val->str_value_len, strlen(new_extract_data->sample_data.u_value.value_string)))
+                            {
+                                flag |= (1 << bit_mode_position);
+                            }
+                        }
+                        break;
+                    }
+                    case cJSON_Number:
+                    {
+                        flag |= (cj_val->valuedouble == new_extract_data->sample_data.u_value.value_double) ? (1 << bit_mode_position) : 0;
+                        break;
+                    }
+                    case cJSON_True:  // bool_values can be converted to 1/0s
+                    {
+                        flag |= (new_extract_data->sample_data.u_value.value_bool) ? (1 << bit_mode_position) : 0;
+                        break;
+                    }
+                    case cJSON_False: // bool_values can be converted to 1/0s
+                    {
+                        flag |= (!new_extract_data->sample_data.u_value.value_bool) ? (1 << bit_mode_position) : 0;
+                        break;
+                    }
+                    default:
+                        TRACE_E("Error!! (ITEM_value) can compare only :- string / bool / number ");
+                        break;
+                    }
+                }
 
-#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+                cJSON_Delete(__FUNCTION__, cj_item_value);
+            }
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_EXPRESSION:
+        {
+            s_ezlopi_expressions_t *tmp_expr = ezlopi_scenes_get_expression_node_by_name(tmp_field->field_value.u_value.value_string);
+            if (tmp_expr)
+            {
+                switch (tmp_expr->exp_value.type)
+                {
+                case EXPRESSION_VALUE_TYPE_BOOL:
+                {
+                    flag |= (tmp_expr->exp_value.u_value.boolean_value == new_extract_data->sample_data.u_value.value_double) ? (1 << bit_mode_position) : 0;
+                    break;
+                }
+                case EXPRESSION_VALUE_TYPE_NUMBER:
+                {
+                    flag |= (tmp_expr->exp_value.u_value.number_value == new_extract_data->sample_data.u_value.value_double) ? (1 << bit_mode_position) : 0;
+                    break;
+                }
+                case EXPRESSION_VALUE_TYPE_STRING:
+                {
+                    if (tmp_expr->exp_value.u_value.str_value && new_extract_data->sample_data.u_value.value_string)
+                    {
+                        if (EZPI_STRNCMP_IF_EQUAL(tmp_expr->exp_value.u_value.str_value,
+                            new_extract_data->sample_data.u_value.value_string,
+                            strlen(tmp_expr->exp_value.u_value.str_value),
+                            strlen(new_extract_data->sample_data.u_value.value_string)))
+                        {
+                            flag |= (1 << bit_mode_position);
+                        }
+                    }
+                    break;
+                }
+                default:
+                    TRACE_E("Error!! (Expression_value) can compare only :- string / bool / number ");
+                    break;
+                }
+            }
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_INT:
+        {
+            flag |= (tmp_field->field_value.u_value.value_double == new_extract_data->sample_data.u_value.value_double) ? (1 << bit_mode_position) : 0;
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_BOOL:
+        {
+            flag |= (tmp_field->field_value.u_value.value_bool == new_extract_data->sample_data.u_value.value_bool) ? (1 << bit_mode_position) : 0;
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_STRING:
+        {
+            if (tmp_field->field_value.u_value.value_string && new_extract_data->sample_data.u_value.value_string)
+            {
+                if (EZPI_STRNCMP_IF_EQUAL(tmp_field->field_value.u_value.value_string,
+                    new_extract_data->sample_data.u_value.value_string,
+                    strlen(tmp_field->field_value.u_value.value_string),
+                    strlen(new_extract_data->sample_data.u_value.value_string)))
+                {
+                    flag |= (1 << bit_mode_position);
+                }
+            }
+            break;
+        }
+        default:
+            TRACE_E("Error!! Field-type  only support :- Item / Expression / string / bool / number ");
+            break;
+        }
+    }
+    else
+    {
+        flag |= (1 << bit_mode_position);
+    }
+    return flag;
+}
+
+static void __replace_old_with_new_data_val(s_item_exp_data_t *new_extract_data, s_item_exp_data_t *prev_extract_data)
+{
+    if (new_extract_data && prev_extract_data)
+    {
+        prev_extract_data->status = new_extract_data->status;
+        prev_extract_data->value_type = new_extract_data->value_type;
+        prev_extract_data->sample_data.e_type = new_extract_data->sample_data.e_type;
+
+        switch (new_extract_data->sample_data.e_type)
+        {
+        case VALUE_TYPE_BOOL:
+        {
+            prev_extract_data->sample_data.u_value.value_bool = new_extract_data->sample_data.u_value.value_bool;
+            break;
+        }
+        case VALUE_TYPE_NUMBER:
+        {
+            prev_extract_data->sample_data.u_value.value_double = new_extract_data->sample_data.u_value.value_double;
+            break;
+        }
+        case VALUE_TYPE_STRING:
+        {
+            if (new_extract_data->sample_data.u_value.value_string)
+            {
+                uint32_t value_len = strlen(new_extract_data->sample_data.u_value.value_string) + 1;
+                {
+                    if (prev_extract_data->sample_data.u_value.value_string) // erasing prev-string
+                    {
+                        ezlopi_free(__FUNCTION__, prev_extract_data->sample_data.u_value.value_string);
+                    }
+                    prev_extract_data->sample_data.u_value.value_string = ezlopi_malloc(__FUNCTION__, value_len);
+                    if (prev_extract_data->sample_data.u_value.value_string)
+                    {
+                        snprintf(prev_extract_data->sample_data.u_value.value_string, value_len, "%s", new_extract_data->sample_data.u_value.value_string);
+                    }
+                }
+            }
+            break;
+        }
+        default:
+            break;
+        }
+    }
+    else
+    {
+        TRACE_E("Invalid operation.... null structure");
+    }
+
+}
+static int ____old_vs_new_extract_data(s_item_exp_data_t *new_extract_data, s_item_exp_data_t *prev_extract_data)
+{
+    int ret = 0;
+    switch (new_extract_data->sample_data.e_type)
+    {
+    case VALUE_TYPE_BOOL:
+    {
+        if (prev_extract_data->sample_data.u_value.value_bool == new_extract_data->sample_data.u_value.value_bool)
+        {
+            ret = 1;
+        }
+        break;
+    }
+    case VALUE_TYPE_NUMBER:
+    {
+        if (prev_extract_data->sample_data.u_value.value_double == new_extract_data->sample_data.u_value.value_double)
+        {
+            ret = 1;
+        }
+        break;
+    }
+    case VALUE_TYPE_STRING:
+    {
+        if (new_extract_data->sample_data.u_value.value_string && prev_extract_data->sample_data.u_value.value_string)
+        {
+            if (EZPI_STRNCMP_IF_EQUAL(
+                new_extract_data->sample_data.u_value.value_string,
+                prev_extract_data->sample_data.u_value.value_string,
+                strlen(new_extract_data->sample_data.u_value.value_string),
+                strlen(prev_extract_data->sample_data.u_value.value_string)))
+            {
+                ret = 1;
+            }
+        }
+        break;
+    }
+    default:
+        break;
+    }
+    return ret; // if matched --> return 1  
+}
+
+int isitemstate_changed(s_item_exp_data_t *new_extract_data, l_fields_v2_t *start_field, l_fields_v2_t *finish_field, l_scenes_list_v2_t *scene_node)
+{
+    int ret = 0;
+    s_item_exp_data_t *prev_extract_data = (s_item_exp_data_t *)(scene_node->when_block->fields->user_arg);
+    if (new_extract_data)  // new vs old data
+    {
+        uint32_t flag = 0;
+        // ---> New flag= (000) : ---> 1. compare 'new_extract_data' with 'start_field  / ANY'  ---> if true ; start_flag =1 ; ---> store data
+                                // --> 1.a . if start_field = Any ; start_flag =1 & return 'true' |  Else compare
+        // -----> For flag= (001): ------> 2. compare 'new_extract_data' with 'finish_field / ANY'  -----> if true ; flag = (011) ; ----> store data ;  flag = (111) : ---->
+                                // ------> 2.a . if finish = Any ; start_flag =1 & return 'true' |  Else compare
+        // --------> For flag = (111) : --------> 3. if(start_field & final_field == NULL or 'ANY') ? exit ; else, flag = (000).
+
+        if (NULL == prev_extract_data)
+        {
+            flag |= __isitemState_vs_field_compare(new_extract_data, start_field, 0);
+            // TRACE_D("First-time check.... flag=%08x", flag);
+        }
+        else
+        {
+            flag = prev_extract_data->status;
+            // TRACE_I("# Before comparision : status_flag=%08x", flag);
+            switch (flag)  // this says what to do next
+            {
+            case 0: // no condition match   ---> check the start condition only.
+            {
+                // TRACE_D("checking start conditon");
+                flag |= __isitemState_vs_field_compare(prev_extract_data, start_field, 0);
+                break;
+            }
+            case (BIT0):  // Only start condition activated ; ----> so check for finish condition
+            {
+                // TRACE_D("checking finish conditon");
+                flag |= __isitemState_vs_field_compare(new_extract_data, finish_field, 1);
+
+                if (flag == (BIT1 | BIT0))
+                {
+                    // activate BIT2 in status ; if both start and finish condition are satisfied.
+                    flag |= BIT2;
+                }
+                break;
+            }
+            case (BIT1 | BIT0):  // condition match but not activated [or reset] ---> need to active here
+            {
+                // TRACE_I("====>  pre-state : (011) --> activating");
+                flag |= BIT2;
+                break;
+            }
+            case (BIT2 | BIT1 | BIT0):   // all condition matched and activated  ---> check if state have changed --> if changed , reset activation flag
+            {
+                #warning "need to optimize this case";s
+                    // comparing 'start'
+                    if (NULL != start_field)
+                    {
+                        if (!(BIT0 & __isitemState_vs_field_compare(prev_extract_data, start_field, 0))) // if BIT0 = 0;
+                        {
+                            flag &= (0 << 2);
+                            // TRACE_I(" HERE :- Reseting the 'BIT2' ");
+                        }
+                        else
+                        {
+                            // TRACE_D("start or finish condition is still satisfied.... cannot reset 'BIT2'");
+                        }
+                    }
+                    else    // 'ANY'
+                    {
+                        if (!____old_vs_new_extract_data(new_extract_data, prev_extract_data))
+                        {
+                            flag &= (0 << 2);
+                            // TRACE_I(" HERE :- Reseting the 'BIT2' ");
+                        }
+                        else
+                        {
+                            // TRACE_D(" new-data == old-data");
+                        }
+
+                    }
+
+                // comparing 'finish'
+                if (NULL != finish_field)
+                {
+                    if (!(BIT1 & __isitemState_vs_field_compare(new_extract_data, finish_field, 1))) // if BIT0 = 0;
+                    {
+                        flag &= (0 << 2);
+                        // TRACE_I(" HERE :- Reseting the 'BIT2' ");
+                    }
+                    else
+                    {
+                        // TRACE_D("start or finish condition is still satisfied.... cannot reset 'BIT2'");
+                    }
+                }
+                else// 'ANY'
+                {
+                    if (!____old_vs_new_extract_data(new_extract_data, prev_extract_data))
+                    {
+                        flag &= (0 << 2);
+                        // TRACE_I(" HERE :- Reseting the 'BIT2' ");
+                    }
+                    else
+                    {
+                        // TRACE_D(" new-data == old-data");
+                    }
+                }
+                break;
+            }
+            default:    // all remaining conditon are invalid ; So 'Reset' all flags and start again in next iteration.
+            {
+                // TRACE_D("Reseting.... to start fresh");
+                // flag = 0;
+                break;
+            }
+            }
+
+        }
+
+        // assign latest flag to new-structure.
+        new_extract_data->status = flag;
+
+        // Store the 'new-extracted' data
+        if (NULL == scene_node->when_block->fields->user_arg)
+        {
+            // TRACE_S("---> Creating new structure");
+            s_item_exp_data_t *tmp_struct = ezlopi_malloc(__FUNCTION__, sizeof(s_item_exp_data_t));
+            if (tmp_struct)
+            {
+                memset(tmp_struct, 0, sizeof(s_item_exp_data_t));
+                __replace_old_with_new_data_val(new_extract_data, tmp_struct);
+                scene_node->when_block->fields->user_arg = (void*)tmp_struct;
+            }
+            else
+            {
+                TRACE_E("Malloc failed!!");
+            }
+        }
+        else
+        {
+            // TRACE_W("---> Replacing old extract data");
+            __replace_old_with_new_data_val(new_extract_data, (scene_node->when_block->fields->user_arg));
+        }
+
+        // TRACE_W("#### Final..... flag result=%08x  ####", flag);
+        if (flag & BIT2)
+        {
+            // Also return 1 for 'then-method'
+            // TRACE_I("====> Return 1");
+            ret = 1;
+        }
+    }
+    else
+    {
+        TRACE_E("new_extract_data == NULL");
+    }
+    return ret;
+}
+
+
+#endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 //-----------------------------------------------------------------------------------------------------

@@ -96,6 +96,8 @@ CLOUD_METHOD("hub.scenes.notification.add", scenes_notification_add, scene_chang
 CLOUD_METHOD("hub.scenes.notification.remove", scenes_notification_remove, scene_changed)
 CLOUD_METHOD("hub.scenes.status.get", scenes_status_get, NULL) // Incomplete
 CLOUD_METHOD("hub.scenes.room.set", scenes_room_set, scene_changed)
+CLOUD_METHOD("hub.scenes.time.list", scenes_time_list, NULL)
+CLOUD_METHOD("hub.scenes.trigger.devices.list", scenes_trigger_device_list, NULL)
 CLOUD_METHOD("hub.scenes.house_modes.set", scenes_house_modes_set, NULL)
 CLOUD_METHOD("hub.scenes.action.block.test", scenes_action_block_test, NULL)
 CLOUD_METHOD("hub.scenes.block.enabled.set", scenes_block_enabled_set, scene_added)
@@ -103,6 +105,7 @@ CLOUD_METHOD("hub.scenes.block.status.reset", scenes_block_status_reset, NULL)
 CLOUD_METHOD("hub.scenes.meta.set", scenes_meta_set, scene_changed)
 CLOUD_METHOD("hub.scenes.block.meta.set", scenes_blockmeta_set, scene_changed)
 CLOUD_METHOD("hub.scenes.stop", scenes_stop, NULL)
+CLOUD_METHOD("hub.scenes.clone", scenes_clone, scene_added)
 
 #endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 

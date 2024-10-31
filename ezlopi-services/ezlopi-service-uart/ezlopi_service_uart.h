@@ -1,8 +1,6 @@
 #ifndef _EZLOPI_SERVICE_UART_H_
 #define _EZLOPI_SERVICE_UART_H_
 
-
-
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_ENABLE_UART_PROVISIONING
@@ -13,14 +11,10 @@
 #include "freertos/task.h"
 #include "EZLOPI_USER_CONFIG.h"
 
-
-
-
 #ifdef __cplusplus
 extern "C"
 {
 #endif
-
 
     // typedef enum e_ezlopi_item_type
     // {
@@ -37,9 +31,28 @@ extern "C"
 #define EZLOPI_WIFI_CONN_RETRY_ATTEMPT 2
 #define EZLOPI_WIFI_CONN_ATTEMPT_INTERVAL 5000
 
-    void EZPI_SERV_uart_init(void);
-    int EZPI_SERV_uart_tx_data(int len, uint8_t* data);
+    typedef enum e_ezlopi_uart_cmd
+    {
+        EZPI_UART_CMD_RESET = 0,
+        EZPI_UART_CMD_INFO,
+        EZPI_UART_CMD_WIFI,
+        EZPI_UART_CMD_SET_CONFIG,
+        EZPI_UART_CMD_GET_CONFIG,
+        EZPI_UART_CMD_UART_CONFIG,
+        EZPI_UART_CMD_LOG_CONFIG,
+        EZPI_UART_CMD_SET_PROV,
+        EZPI_UART_CMD_MAX
+    } e_ezlopi_uart_cmd_t;
 
+    typedef enum e_ezlopi_uart_cmd_status
+    {
+        EZPI_UART_CMD_STATUS_FAIL = 0,
+        EZPI_UART_CMD_STATUS_SUCCESS,
+        EZPI_UART_CMD_STATUS_MAX
+    } e_ezlopi_uart_cmd_status_t;
+
+    void EZPI_SERV_uart_init(void);
+    int EZPI_SERV_uart_tx_data(int len, uint8_t *data);
 
 #ifdef __cplusplus
 }
