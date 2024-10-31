@@ -59,6 +59,33 @@ static void ezlopi_replace_newline_escape(char *str)
     str[j] = '\0';
 }
 
+bool ezlopi_check_uuid_validity(const char *uuid)
+{
+    if (strlen(uuid) != 36)
+    {
+        return false;
+    }
+
+    if (uuid[8] != '-' || uuid[13] != '-' || uuid[18] != '-' || uuid[23] != '-') // Check the positions of hyphens
+    {
+        return false;
+    }
+
+    for (int i = 0; i < 36; i++) // Check each character
+    {
+        if (i == 8 || i == 13 || i == 18 || i == 23)
+        {
+            continue; // Skip hyphen positions
+        }
+        if (!isxdigit(uuid[i])) // Check if it's a hexadecimal digit
+        {
+            return false;
+        }
+    }
+
+    return true; // UUID is valid
+}
+
 static int ezlopi_factory_info_v3_set_4kb(const char *data, uint32_t offset, uint32_t len)
 {
     int ret = 0;
@@ -403,7 +430,7 @@ char *ezlopi_factory_info_v3_get_device_uuid(void)
     char *read_data = ezlopi_factory_info_v3_read_string(__FUNCTION__, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_DEVICE_UUID, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_DEVICE_UUID);
     if (read_data)
     {
-        if (!isprint(read_data[0]))
+        if (!ezlopi_check_uuid_validity(read_data))
         {
             ezlopi_free(__FUNCTION__, read_data);
             read_data = NULL;
@@ -417,7 +444,7 @@ char *ezlopi_factory_info_v3_get_provisioning_uuid(void)
     char *read_data = ezlopi_factory_info_v3_read_string(__FUNCTION__, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_PROVISIONING_UUID, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_PROV_UUID);
     if (read_data)
     {
-        if (!isprint(read_data[0]))
+        if (!ezlopi_check_uuid_validity(read_data))
         {
             ezlopi_free(__FUNCTION__, read_data);
             read_data = NULL;
