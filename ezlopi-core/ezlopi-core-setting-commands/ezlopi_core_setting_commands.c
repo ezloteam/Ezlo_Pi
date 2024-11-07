@@ -246,13 +246,13 @@ static int ezlopi_core_add_log_level_settings(cJSON *cj_settings)
         cJSON *cj_enum = cJSON_AddArrayToObject(__FUNCTION__, cj_log_level, "enum");
         if (cj_enum)
         {
-            for (e_ezpi_trace_severity_t i = 0; i < E_TRACE_SEVERITY_MAX; i++)
-            {
-                const char *severity_name_str = ezlopi_util_trace_get_severity_name_str(i);
-                cJSON_AddItemToArray(cj_enum, cJSON_CreateString(__FUNCTION__, severity_name_str));
-            }
-            cJSON_DeleteItemFromArray(__FUNCTION__, cj_enum, 0);
+            cJSON_AddItemToArray(cj_enum, cJSON_CreateString(__FUNCTION__, ezlopi_util_trace_get_severity_name_str(E_TRACE_SEVERITY_TRACE)));
+            cJSON_AddItemToArray(cj_enum, cJSON_CreateString(__FUNCTION__, ezlopi_util_trace_get_severity_name_str(E_TRACE_SEVERITY_DEBUG)));
+            cJSON_AddItemToArray(cj_enum, cJSON_CreateString(__FUNCTION__, ezlopi_util_trace_get_severity_name_str(E_TRACE_SEVERITY_INFO)));
+            cJSON_AddItemToArray(cj_enum, cJSON_CreateString(__FUNCTION__, ezlopi_util_trace_get_severity_name_str(E_TRACE_SEVERITY_WARNING)));
+            cJSON_AddItemToArray(cj_enum, cJSON_CreateString(__FUNCTION__, ezlopi_util_trace_get_severity_name_str(E_TRACE_SEVERITY_ERROR)));
         }
+
         cJSON_AddStringToObject(__FUNCTION__, cj_log_level, "name", ezlopi_core_setting_command_names[SETTING_COMMAND_NAME_LOG_LEVEL]);
         const char *current_log_level = ezlopi_core_cloud_log_get_current_severity_enum_str();
         if (current_log_level)

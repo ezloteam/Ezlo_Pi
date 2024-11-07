@@ -6,23 +6,15 @@
 
 #ifdef CONFIG_EZPI_UTIL_TRACE_EN
 
+#include "cjext.h"
 #include "ezlopi_util_trace.h"
 #include "ezlopi_core_errors.h"
 
 #include <stdbool.h>
 
-// typedef enum
-// {
-//     ENUM_EZLOPI_LOG_SEVERITY_NONE = 0,
-//     ENUM_EZLOPI_LOG_SEVERITY_ERROR,
-//     ENUM_EZLOPI_LOG_SEVERITY_WARNING,
-//     ENUM_EZLOPI_LOG_SEVERITY_INFO,
-//     ENUM_EZLOPI_LOG_SEVERITY_DEBUG,
-//     ENUM_EZLOPI_LOG_SEVERITY_TRACE,
-//     ENUM_EZLOPI_LOG_SEVERITY_MAX,
-// } e_ezpi_trace_severity_t;
-
 void ezlopi_core_log_init(void);
+int ezlopi_core_log_push_trace(cJSON *cj_trace);
+
 void ezlopi_core_log_add_log_upcall(f_trace_upcall_t upcall);
 void ezlopi_core_log_add_trace_upcall(int (*upcall)(cJSON *cj_telemetry));
 

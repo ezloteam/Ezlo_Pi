@@ -27,11 +27,42 @@ void ezlopi_util_trace_init(f_trace_upcall_t upcall)
 
 const char *ezlopi_util_trace_get_severity_name_str(e_ezpi_trace_severity_t severity)
 {
-    const char *ret = trace_name_str[0];
-    if (severity > E_TRACE_SEVERITY_NONE && severity < E_TRACE_SEVERITY_MAX)
+    const char *ret = NULL;
+
+    switch (severity)
     {
-        ret = trace_name_str[severity];
+    case E_TRACE_SEVERITY_TRACE:
+    {
+        ret = "TRACE";
+        break;
     }
+    case E_TRACE_SEVERITY_DEBUG:
+    {
+        ret = "DEBUG";
+        break;
+    }
+    case E_TRACE_SEVERITY_INFO:
+    {
+        ret = "INFO";
+        break;
+    }
+    case E_TRACE_SEVERITY_WARNING:
+    {
+        ret = "WARNING";
+        break;
+    }
+    case E_TRACE_SEVERITY_ERROR:
+    {
+        ret = "ERROR";
+        break;
+    }
+    default:
+    {
+        ret = "NONE";
+        break;
+    }
+    }
+
     return ret;
 }
 
@@ -65,15 +96,13 @@ void trace_color_print(const char *txt_color, uint8_t severity, const char *file
     time(&now);
     static char serial_log_buffer[4096];
 
-    uint64_t time_now_ms = (now * 1000LL);
-
     va_start(args, format);
     vsnprintf(serial_log_buffer, sizeof(serial_log_buffer), format, args);
     va_end(args);
 
     if (__trace_upcall)
     {
-        __trace_upcall(severity, file, line, time_now_ms, serial_log_buffer);
+        __trace_upcall(severity, file, line, now, serial_log_buffer);
     }
 }
 

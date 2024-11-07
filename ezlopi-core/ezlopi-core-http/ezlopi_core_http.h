@@ -101,8 +101,8 @@ extern "C"
     void ezlopi_core_http_mbedtls_req(s_ezlopi_core_http_mbedtls_t *tmp_http_data);
 
     s_ezlopi_http_data_t *ezlopi_http_get_request(const char *cloud_url, const char *private_key, const char *shared_key, const char *ca_certificate);
-    s_ezlopi_http_data_t *ezlopi_http_post_request(const char *cloud_url, int port, const char *location, cJSON *headers, const char *private_key, const char *shared_key, const char *ca_certificate);
-    // s_ezlopi_http_data_t* ezlopi_http_post_request(const char* cloud_url, const char* location, cJSON* headers, const char* private_key, const char* shared_key, const char* ca_certificate);
+    s_ezlopi_http_data_t *ezlopi_http_post_request(const char *cloud_url, cJSON *headers, char *post_data, uint32_t data_len,
+                                                   const char *private_key, const char *shared_key, const char *ca_certificate);
 
 #ifdef __cplusplus
 }

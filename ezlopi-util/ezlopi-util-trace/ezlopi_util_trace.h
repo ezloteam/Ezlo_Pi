@@ -23,15 +23,14 @@ extern "C"
     typedef enum
     {
         E_TRACE_SEVERITY_NONE = 0,
-        E_TRACE_SEVERITY_ERROR,
-        E_TRACE_SEVERITY_WARNING,
-        E_TRACE_SEVERITY_INFO,
-        E_TRACE_SEVERITY_DEBUG,
-        E_TRACE_SEVERITY_TRACE,
-        E_TRACE_SEVERITY_MAX
+        E_TRACE_SEVERITY_TRACE = 1,
+        E_TRACE_SEVERITY_DEBUG = 5,
+        E_TRACE_SEVERITY_INFO = 9,
+        E_TRACE_SEVERITY_WARNING = 13,
+        E_TRACE_SEVERITY_ERROR = 17
     } e_ezpi_trace_severity_t;
 
-    typedef void (*f_trace_upcall_t)(e_ezpi_trace_severity_t severity, const char *file, uint32_t line, uint64_t time, char *msg);
+    typedef void (*f_trace_upcall_t)(e_ezpi_trace_severity_t severity, const char *file, uint32_t line, uint32_t time, char *msg);
 
     void ezlopi_util_trace_init(f_trace_upcall_t upcall);
     const char *ezlopi_util_trace_get_severity_name_str(e_ezpi_trace_severity_t severity);
@@ -75,11 +74,11 @@ extern "C"
         ets_printf("%s[%d]:" X "\n", __FILE__, __LINE__, ##reg); \
     }
 
-#define trace_log_sev_error(X, reg...) trace_color_print(COLOR_FONT_RED, 1, __FILE__, __LINE__, X, ##reg)
-#define trace_log_sev_warning(X, reg...) trace_color_print(COLOR_FONT_YELLOW, 2, __FILE__, __LINE__, X, ##reg)
-#define trace_log_sev_info(X, reg...) trace_color_print(COLOR_FONT_BLUE, 3, __FILE__, __LINE__, X, ##reg)
-#define trace_log_sev_debug(X, reg...) trace_color_print(COLOR_FONT_WHITE, 4, __FILE__, __LINE__, X, ##reg)
-#define trace_log_sev_trace(X, reg...) trace_color_print(COLOR_FONT_GREEN, 5, __FILE__, __LINE__, X, ##reg)
+#define trace_log_sev_error(X, reg...) trace_color_print(COLOR_FONT_RED, E_TRACE_SEVERITY_ERROR, __FILE__, __LINE__, X, ##reg)
+#define trace_log_sev_warning(X, reg...) trace_color_print(COLOR_FONT_YELLOW, E_TRACE_SEVERITY_WARNING, __FILE__, __LINE__, X, ##reg)
+#define trace_log_sev_info(X, reg...) trace_color_print(COLOR_FONT_BLUE, E_TRACE_SEVERITY_INFO, __FILE__, __LINE__, X, ##reg)
+#define trace_log_sev_debug(X, reg...) trace_color_print(COLOR_FONT_WHITE, E_TRACE_SEVERITY_DEBUG, __FILE__, __LINE__, X, ##reg)
+#define trace_log_sev_trace(X, reg...) trace_color_print(COLOR_FONT_GREEN, E_TRACE_SEVERITY_TRACE, __FILE__, __LINE__, X, ##reg)
 
 #define trace_debug(X, reg...) trace_color(COLOR_FONT_WHITE, X, ##reg)
 #define trace_information(X, reg...) trace_color(COLOR_FONT_BLUE, X, ##reg)
