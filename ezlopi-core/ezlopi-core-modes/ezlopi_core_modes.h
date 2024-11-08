@@ -62,6 +62,7 @@ typedef struct s_house_modes
     bool armed;
     bool protect;
     bool disarmed_default;
+    bool notify_all;
 
     cJSON *cj_notifications;
     cJSON *cj_bypass_devices;
