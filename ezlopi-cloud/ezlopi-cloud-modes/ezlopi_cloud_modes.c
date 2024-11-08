@@ -130,8 +130,18 @@ void ezlopi_cloud_modes_alarm_delay_set(cJSON *cj_request, cJSON *cj_response)
 void ezlopi_cloud_modes_notifications_set(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
-    if (cj_result)
+    cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
+    if (cj_result && cj_params)
     {
+        bool all = false;
+        CJSON_GET_VALUE_BOOL(cj_params, "all", all);
+        cJSON *cj_modeId = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_modeId_str);
+        cJSON *cj_userIds = cJSON_GetObjectItem(__FUNCTION__, cj_params, "userIds");
+        if (cj_userIds && cj_modeId)
+        {
+            uint8_t modeId = strtoul(cj_modeId->valuestring, NULL, 10);
+            ezlopi_core_modes_notification_set(modeId, all, cj_userIds);
+        }
     }
 }
 
