@@ -140,7 +140,7 @@ void ezlopi_cloud_modes_notifications_set(cJSON *cj_request, cJSON *cj_response)
         if (cj_userIds && cj_modeId)
         {
             uint8_t modeId = strtoul(cj_modeId->valuestring, NULL, 10);
-            ezlopi_core_modes_notification_set(modeId, all, cj_userIds);
+            ezlopi_core_modes_set_notifications(modeId, all, cj_userIds);
         }
     }
 }

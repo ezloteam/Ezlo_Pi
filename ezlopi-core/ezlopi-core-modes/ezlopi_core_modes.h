@@ -163,6 +163,7 @@ ezlopi_error_t ezlopi_core_modes_api_cancel_switch(void);
 ezlopi_error_t ezlopi_core_modes_api_cancel_entry_delay(void);
 ezlopi_error_t ezlopi_core_modes_set_switch_to_delay(uint32_t switch_to_delay);
 ezlopi_error_t ezlopi_core_modes_set_alarm_delay(uint32_t switch_to_delay);
+ezlopi_error_t ezlopi_core_modes_set_notifications(uint8_t modesId, bool all, cJSON *user_id_aray);
 ezlopi_error_t ezlopi_core_modes_set_protect(uint32_t mode_id, bool protect_state);
 
 ezlopi_error_t ezlopi_core_modes_add_alarm_off(uint8_t mode_id, cJSON *device_id);

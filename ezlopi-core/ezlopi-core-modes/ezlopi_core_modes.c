@@ -171,15 +171,44 @@ ezlopi_error_t ezlopi_core_modes_set_alarm_delay(uint32_t alarm_to_delay)
     return ret;
 }
 
-ezlopi_error_t ezlopi_core_modes_set_notifications(cJSON *cj_params)
+ezlopi_error_t ezlopi_core_modes_set_notifications(uint8_t modesId, bool all, cJSON *user_id_aray)
 {
     ezlopi_error_t ret = EZPI_ERR_MODES_FAILED;
-    if (cj_params)
+    if ((EZLOPI_HOUSE_MODE_REF_ID_NONE < modesId) && (EZLOPI_HOUSE_MODE_REF_ID_MAX > modesId) && user_id_aray && (cJSON_Array == user_id_aray->type))
     {
         ezlopi_service_modes_stop(5000);
+        s_house_modes_t *mode_to_upate = ezlopi_core_modes_get_house_mode_by_id(modesId);
+        if (mode_to_upate)
+        {
+            mode_to_upate->notify_all = all;
+            cJSON *element_to_add = NULL;
+            cJSON_ArrayForEach(element_to_add, user_id_aray)
+            {
+                cJSON *element_to_check = NULL;
+                bool add_to_array = true;
+                cJSON_ArrayForEach(element_to_check, mode_to_upate->cj_notifications)
+                {
+                    if (0 == strncmp(element_to_add->valuestring, element_to_check->valuestring, 32))
+                    {
+                        add_to_array = false;
+                        break;
+                    }
+                }
+                if (add_to_array)
+                {
+                    if (NULL == mode_to_upate->cj_notifications)
+                    {
+                        mode_to_upate->cj_notifications = cJSON_CreateArray(__FUNCTION__);
+                    }
+                    cJSON_AddItemToArray(mode_to_upate->cj_notifications, cJSON_CreateString(__FUNCTION__, element_to_add->valuestring));
+                }
+            }
+            mode_to_upate->disarmed_default = false;
+            ezlopi_core_modes_store_to_nvs();
 
+            ret = EZPI_SUCCESS;
+        }
         ezlopi_service_modes_start(5000);
-        ret = EZPI_SUCCESS;
     }
     return ret;
 }
