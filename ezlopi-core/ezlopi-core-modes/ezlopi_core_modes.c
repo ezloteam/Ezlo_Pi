@@ -5,7 +5,11 @@
 #include "ezlopi_core_modes_cjson.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_errors.h"
+#include "ezlopi_core_devices.h"
+#include "ezlopi_core_api_methods.h"
+#include "ezlopi_core_broadcast.h"
 
+#include "ezlopi_cloud_devices.h"
 #include "ezlopi_cloud_constants.h"
 
 #include "ezlopi_service_modes.h"
@@ -372,6 +376,166 @@ ezlopi_error_t ezlopi_core_modes_reset_entry_delay(void)
     return ret;
 }
 
+ezlopi_error_t ezlopi_core_modes_set_disarmed_default(uint8_t modesID, bool disarmedDefault)
+{
+    ezlopi_error_t ret = EZPI_ERR_MODES_FAILED;
+    if ((modesID > EZLOPI_HOUSE_MODE_REF_ID_NONE) && (modesID < EZLOPI_HOUSE_MODE_REF_ID_MAX))
+    {
+        ezlopi_service_modes_stop(5000);
+        s_ezlopi_modes_t *custom_modes = ezlopi_core_modes_get_custom_modes();
+        if (custom_modes)
+        {
+            if (modesID == EZLOPI_HOUSE_MODE_REF_ID_HOME)
+            {
+                custom_modes->mode_home.disarmed_default = disarmedDefault;
+            }
+            else if (modesID == EZLOPI_HOUSE_MODE_REF_ID_NIGHT)
+            {
+                custom_modes->mode_night.disarmed_default = disarmedDefault;
+            }
+            else if (modesID == EZLOPI_HOUSE_MODE_REF_ID_AWAY)
+            {
+                custom_modes->mode_away.disarmed_default = disarmedDefault;
+            }
+            else if (modesID == EZLOPI_HOUSE_MODE_REF_ID_VACATION)
+            {
+                custom_modes->mode_vacation.disarmed_default = disarmedDefault;
+            }
+            ezlopi_core_modes_store_to_nvs();
+            ret = EZPI_SUCCESS;
+        }
+        ezlopi_service_modes_start(5000);
+    }
+    return ret;
+}
+
+ezlopi_error_t ezlopi_core_modes_add_disarmed_device(uint8_t modeId, const char *device_id_str)
+{
+    ezlopi_error_t ret = EZPI_ERR_MODES_FAILED;
+    if ((EZLOPI_HOUSE_MODE_REF_ID_NONE < modeId) && (EZLOPI_HOUSE_MODE_REF_ID_MAX > modeId) && device_id_str)
+    {
+        ezlopi_service_modes_stop(5000);
+        s_house_modes_t *mode_to_update = ezlopi_core_modes_get_house_mode_by_id(modeId);
+        if (mode_to_update)
+        {
+            if (mode_to_update->cj_disarmed_devices && (cJSON_Array == mode_to_update->cj_disarmed_devices->type))
+            {
+                bool add_to_array = true;
+                cJSON *element = NULL;
+                cJSON_ArrayForEach(element, mode_to_update->cj_disarmed_devices)
+                {
+                    if (0 == strncmp(device_id_str, element->valuestring, 32))
+                    {
+                        add_to_array = false;
+                    }
+                }
+                if (add_to_array)
+                {
+                    cJSON_AddItemToArray(mode_to_update->cj_disarmed_devices, cJSON_CreateString(__func__, device_id_str));
+                    mode_to_update->disarmed_default = false;
+                    ezlopi_core_modes_store_to_nvs();
+                }
+                ret = EZPI_SUCCESS;
+            }
+        }
+        ezlopi_service_modes_start(5000);
+    }
+
+    return ret;
+}
+
+ezlopi_error_t ezlopi_core_modes_remove_disarmed_device(uint8_t modeId, const char *device_id_str)
+{
+    ezlopi_error_t ret = EZPI_ERR_MODES_FAILED;
+
+    if ((EZLOPI_HOUSE_MODE_REF_ID_NONE < modeId) && (EZLOPI_HOUSE_MODE_REF_ID_MAX > modeId) && device_id_str)
+    {
+        ezlopi_service_modes_stop(5000);
+        s_house_modes_t *mode_to_update = ezlopi_core_modes_get_house_mode_by_id(modeId);
+        if (mode_to_update)
+        {
+            if (mode_to_update->cj_disarmed_devices && (cJSON_Array == mode_to_update->cj_disarmed_devices->type))
+            {
+                cJSON *element = NULL;
+                int array_index = 0;
+                cJSON_ArrayForEach(element, mode_to_update->cj_disarmed_devices)
+                {
+                    if (0 == strncmp(device_id_str, element->valuestring, 32))
+                    {
+                        cJSON *cj_device_str = cJSON_DetachItemFromArray(__func__, mode_to_update->cj_disarmed_devices, array_index);
+                        cJSON_Delete(__func__, cj_device_str);
+                        mode_to_update->disarmed_default = false;
+                        ezlopi_core_modes_store_to_nvs();
+                        break;
+                    }
+                    array_index++;
+                }
+                ret = EZPI_SUCCESS;
+            }
+        }
+        ezlopi_service_modes_start(5000);
+    }
+
+    return ret;
+}
+
+ezlopi_error_t ezlopi_core_modes_set_unset_device_armed_status(cJSON *cj_device_array, const bool set)
+{
+    ezlopi_error_t ret = EZPI_ERR_MODES_FAILED;
+    if (cj_device_array && cj_device_array->type == cJSON_Array)
+    {
+        cJSON *curr_device = NULL;
+        cJSON_ArrayForEach(curr_device, cj_device_array)
+        {
+            uint32_t device_id = strtoul(curr_device->valuestring, NULL, 16);
+            l_ezlopi_device_t *device_to_change = ezlopi_device_get_by_id(device_id);
+            if (device_to_change)
+            {
+                if (device_to_change->cloud_properties.armed != set)
+                {
+                    device_to_change->cloud_properties.armed = set; // this logic might be opposite
+                    
+                    // 1. PREPARE  cj_request structure to trigger broadcast for  'armed.set'
+                    cJSON *cj_device_armed_broadcast = cJSON_CreateObject(__func__);
+                    if (cj_device_armed_broadcast)
+                    {
+                        cJSON_AddStringToObject(__func__, cj_device_armed_broadcast, ezlopi_method_str, "hub.device.armed.set");
+                        cJSON *cj_params = cJSON_AddObjectToObject(__func__, cj_device_armed_broadcast, ezlopi_params_str);
+                        if (cj_params)
+                        {
+                            char temp[32];
+                            memset(temp, 0, 32);
+                            snprintf(temp, 32, "%08x", device_to_change->cloud_properties.device_id);
+                            cJSON_AddStringToObject(__func__, cj_params, ezlopi__id_str, temp);
+                            cJSON_AddBoolToObject(__func__, cj_params, ezlopi_armed_str, set);
+                            // uint32_t id = ezlopi_core_ezlopi_methods_search_in_list(cJSON_GetObjectItem(__func__, cj_device_armed_broadcast, ezlopi_method_str));
+                            // f_method_func_t updater_method = ezlopi_core_ezlopi_methods_get_updater_by_id(id);
+                            // if (updater_method)
+                            // {
+                            cJSON *cj_response = cJSON_CreateObject(__func__);
+                            if (NULL != cj_response)
+                            {
+                                // 2. call "device_updated"
+                                device_updated(cj_device_armed_broadcast, cj_response);
+
+                                // updater_method(cj_device_armed_broadcast, cj_response);
+                                ret = EZPI_SUCCESS;
+                                if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(cj_response))
+                                {
+                                    cJSON_Delete(__func__, cj_response);
+                                    ret = EZPI_ERR_MODES_FAILED;
+                                }
+                            }
+                            // }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return ret;
+}
+
 ezlopi_error_t ezlopi_core_modes_store_to_nvs(void)
 {
     ezlopi_error_t ret = EZPI_ERR_MODES_FAILED;
@@ -424,4 +588,5 @@ void ezlopi_core_modes_init(void)
         }
     }
 }
+
 #endif // CONFIG_EZPI_SERV_ENABLE_MODES

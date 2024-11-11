@@ -38,7 +38,7 @@ CLOUD_METHOD("hub.modes.entry_delay.skip", ezlopi_cloud_modes_entry_delay_skip, 
 CLOUD_METHOD("hub.modes.switch_to_delay.set", ezlopi_cloud_modes_switch_to_delay_set, NULL)
 CLOUD_METHOD("hub.modes.alarm_delay.set", ezlopi_cloud_modes_alarm_delay_set, NULL)
 CLOUD_METHOD("hub.modes.notifications.set", ezlopi_cloud_modes_notifications_set, ezlopi_cloud_modes_changed)
-CLOUD_METHOD("hub.modes.disarmed_default.set", ezlopi_cloud_modes_disarmed_default_set, NULL)
+CLOUD_METHOD("hub.modes.disarmed_default.set", ezlopi_cloud_modes_disarmed_default_set, ezlopi_cloud_modes_changed)
 CLOUD_METHOD("hub.modes.disarmed_devices.add", ezlopi_cloud_modes_disarmed_devices_add, NULL)
 CLOUD_METHOD("hub.modes.disarmed_devices.remove", ezlopi_cloud_modes_disarmed_devices_remove, NULL)
 CLOUD_METHOD("hub.modes.alarms_off.add", ezlopi_cloud_modes_alarms_off_add, ezlopi_cloud_modes_alarms_off_added)

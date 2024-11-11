@@ -61,14 +61,14 @@ typedef struct s_house_modes
 
     bool armed;
     bool protect;
-    bool disarmed_default;
+    bool disarmed_default; // if true ; utilize
     bool notify_all;
 
     cJSON *cj_notifications;
     cJSON *cj_bypass_devices;
-    cJSON *cj_disarmed_devices;
-    cJSON *cj_alarms_off_devices;
-    cJSON *cj_cameras_off_devices;
+    cJSON *cj_disarmed_devices;    // this list by default contains all alarm and camera devices; So besides these, other devices have to be added mannually
+    cJSON *cj_alarms_off_devices;  // (auto add alarm-type devices) // these devices are auto added to 'cj_disarmed_devices'
+    cJSON *cj_cameras_off_devices; // (auto add camera-type devices) // these devices are auto added to 'cj_disarmed_devices'
 
 } s_house_modes_t;
 
@@ -165,6 +165,8 @@ ezlopi_error_t ezlopi_core_modes_api_cancel_entry_delay(void);
 ezlopi_error_t ezlopi_core_modes_set_switch_to_delay(uint32_t switch_to_delay);
 ezlopi_error_t ezlopi_core_modes_set_alarm_delay(uint32_t switch_to_delay);
 ezlopi_error_t ezlopi_core_modes_set_notifications(uint8_t modesId, bool all, cJSON *user_id_aray);
+ezlopi_error_t ezlopi_core_modes_set_disarmed_default(uint8_t modesID, bool disarmedDefault);
+ezlopi_error_t ezlopi_core_modes_set_unset_device_armed_status(cJSON* cj_device_array, const bool set);
 ezlopi_error_t ezlopi_core_modes_set_protect(uint32_t mode_id, bool protect_state);
 
 ezlopi_error_t ezlopi_core_modes_add_alarm_off(uint8_t mode_id, cJSON *device_id);

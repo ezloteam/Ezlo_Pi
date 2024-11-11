@@ -150,6 +150,27 @@ void ezlopi_cloud_modes_disarmed_default_set(cJSON *cj_request, cJSON *cj_respon
     cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     if (cj_result)
     {
+        cJSON *cj_params = cJSON_GetObjectItem(__func__, cj_request, ezlopi_params_str);
+        if (cj_params)
+        {
+            cJSON *cj_modeId = cJSON_GetObjectItem(__func__, cj_params, ezlopi_modeId_str);
+            cJSON *cj_disarmedDefault = cJSON_GetObjectItem(__func__, cj_params, ezlopi_disarmedDefault_str);
+            if (cj_modeId && cj_disarmedDefault)
+            {
+                uint8_t modeId = strtoul(cj_modeId->valuestring, NULL, 10);
+                bool disarmedDefault = cj_disarmedDefault->type == cJSON_True ? true : false;
+
+                // toggle the flag in - inactive and active mode
+                ezlopi_core_modes_set_disarmed_default(modeId, disarmedDefault);
+
+                // Trigger broadcast for only 'active' HouseMode [if active_id == 'modeId']
+                s_house_modes_t *current_house_mode = ezlopi_core_modes_get_current_house_modes();
+                if (current_house_mode && current_house_mode->_id == modeId)
+                { // To arm the disarmed devices [given in the list -> 'default-disarmed'].
+                    ezlopi_core_modes_set_unset_device_armed_status(current_house_mode->cj_disarmed_devices, current_house_mode->disarmed_default);
+                }
+            }
+        }
     }
 }
 
