@@ -48,6 +48,12 @@ static xTaskHandle _task_handle = NULL;
 static s_ssl_websocket_t *__wsc_ssl = NULL;
 #endif // EZPI_CORE_WSS_USE_WSC_LIB
 
+typedef struct
+{
+    uint32_t time;
+    char *payload;
+} s_rx_message_t;
+
 static QueueHandle_t _wss_message_queue = NULL;
 static TaskHandle_t __web_socket_initialize_handler = NULL;
 
@@ -58,7 +64,7 @@ static void __fetch_wss_endpoint(void *pv);
 
 static void __connection_upcall(bool connected);
 static void __message_upcall(const char *payload, uint32_t len);
-static void __message_process(const char *payload, uint32_t len);
+static void __message_process(const char *payload, uint32_t len, uint32_t now);
 
 static ezlopi_error_t __send_str_data_to_nma_websocket(char *str_data);
 static int __send_cjson_data_to_nma_websocket(cJSON *cj_data);
@@ -121,7 +127,6 @@ static void __connection_upcall(bool connected)
 
 static void __fetch_wss_endpoint(void *pv)
 {
-
     char *ca_certificate = ezlopi_factory_info_v3_get_ca_certificate();
     char *ssl_shared_key = ezlopi_factory_info_v3_get_ssl_shared_key();
     char *ssl_private_key = ezlopi_factory_info_v3_get_ssl_private_key();
@@ -180,13 +185,17 @@ static void __fetch_wss_endpoint(void *pv)
         {
             while (_wss_message_queue)
             {
-                char *payload = NULL;
-                xQueueReceive(_wss_message_queue, &payload, 100 / portTICK_RATE_MS);
+                s_rx_message_t *message = NULL;
+                xQueueReceive(_wss_message_queue, &message, 100 / portTICK_RATE_MS);
 
-                if (payload)
+                if (message)
                 {
-                    __message_process(payload, strlen(payload));
-                    ezlopi_free(__FUNCTION__, payload);
+                    if (message->payload)
+                    {
+                        __message_process(message->payload, strlen(message->payload), message->time);
+                        ezlopi_free(__FUNCTION__, message->payload);
+                    }
+                    ezlopi_free(__FUNCTION__, message);
                 }
             }
 
@@ -202,13 +211,16 @@ static void __fetch_wss_endpoint(void *pv)
     vTaskDelete(NULL);
 }
 
-static void __message_process(const char *payload, uint32_t len)
+static void __message_process(const char *payload, uint32_t len, uint32_t time_ms)
 {
     if (payload && len)
     {
         cJSON *cj_response = ezlopi_core_api_consume(__FUNCTION__, payload, len);
         if (cj_response)
         {
+#warning "WORKING -------------------------------- WORKING -------------------------------- WORKING"
+            cJSON *cj_method = cJSON_Duplicate(__FUNCTION__, cJSON_GetObjectItem(__FUNCTION__, cj_response, "method"), false);
+
             cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_msg_id_str, message_counter);
             __send_cjson_data_to_nma_websocket(cj_response);
 
@@ -223,33 +235,47 @@ static void __message_process(const char *payload, uint32_t len)
 
 static void __message_upcall(const char *payload, uint32_t len)
 {
+    time_t now;
+    time(&now);
+
     if (_wss_message_queue)
     {
-        char *payload_copy = ezlopi_malloc(__FUNCTION__, len + 1);
-        if (payload_copy)
+        s_rx_message_t *message = ezlopi_malloc(__FUNCTION__, sizeof(s_rx_message_t));
+        if (message)
         {
-            if (pdTRUE == xQueueIsQueueFullFromISR(_wss_message_queue))
+            message->time = now;
+            message->payload = ezlopi_malloc(__FUNCTION__, len + 1);
+            if (message->payload)
             {
-                char *stale_data = NULL;
-                int ret = xQueueReceive(_wss_message_queue, &stale_data, 5);
-                if (pdTRUE == ret && stale_data)
+                if (pdTRUE == xQueueIsQueueFullFromISR(_wss_message_queue))
                 {
-                    ezlopi_free(__FUNCTION__, stale_data);
+                    s_rx_message_t *stale_data = NULL;
+                    int ret = xQueueReceive(_wss_message_queue, &stale_data, 5);
+                    if (pdTRUE == ret && stale_data)
+                    {
+                        ezlopi_free(__FUNCTION__, stale_data->payload);
+                        ezlopi_free(__FUNCTION__, stale_data);
+                    }
+                }
+
+                memcpy(message->payload, payload, len);
+                message->payload[len] = '\0';
+
+                if (pdTRUE != xQueueSend(_wss_message_queue, &message, 5))
+                {
+                    ezlopi_free(__FUNCTION__, message->payload);
+                    ezlopi_free(__FUNCTION__, message);
                 }
             }
-
-            memcpy(payload_copy, payload, len);
-            payload_copy[len] = '\0';
-
-            if (pdTRUE != xQueueSend(_wss_message_queue, &payload_copy, 5))
+            else
             {
-                ezlopi_free(__FUNCTION__, payload_copy);
+                ezlopi_free(__FUNCTION__, message);
             }
         }
     }
     else
     {
-        __message_process(payload, len);
+        __message_process(payload, len, now);
     }
 }
 
