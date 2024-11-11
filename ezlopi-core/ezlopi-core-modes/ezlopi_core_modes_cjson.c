@@ -123,7 +123,7 @@ s_ezlopi_modes_t *ezlopi_core_modes_cjson_parse_modes(cJSON *cj_modes)
                 CJSON_TRACE("cj_house_mod", cj_house_mod);
                 uint32_t _mode_id = 0;
                 CJSON_GET_ID(_mode_id, cJSON_GetObjectItem(__FUNCTION__, cj_house_mod, ezlopi__id_str));
-                TRACE_D("Mode-id: %d", _mode_id);
+                // TRACE_D("Mode-id: %d", _mode_id);
 
                 s_house_modes_t *cur_house_mode = NULL;
 
@@ -212,7 +212,6 @@ s_ezlopi_modes_t *ezlopi_core_modes_cjson_parse_modes(cJSON *cj_modes)
 
                 CJSON_GET_VALUE_BOOL(cj_house_mod, ezlopi_protect_str, cur_house_mode->protect);
                 CJSON_GET_VALUE_BOOL(cj_house_mod, ezlopi_armed_str, cur_house_mode->armed);
-
                 // CJSON_TRACE("cur_house_mode->cj_notifications", cur_house_mode->cj_notifications);
                 // CJSON_TRACE("cur_house_mode->cj_disarmed_devices", cur_house_mode->cj_disarmed_devices);
                 // CJSON_TRACE("cur_house_mode->cj_alarms_off_devices", cur_house_mode->cj_alarms_off_devices);

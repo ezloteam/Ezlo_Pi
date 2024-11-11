@@ -404,7 +404,7 @@ void ezlopi_core_modes_init(void)
         cJSON *cj_custom_modes = cJSON_Parse(__FUNCTION__, custom_modes_str);
         ezlopi_free(__FUNCTION__, custom_modes_str);
 
-        CJSON_TRACE("cj_custom-modes", cj_custom_modes);
+        // CJSON_TRACE("cj_custom-modes", cj_custom_modes);
 
         if (cj_custom_modes)
         {
