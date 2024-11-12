@@ -3,8 +3,6 @@
 
 #include "../../build/config/sdkconfig.h"
 
-#ifdef CONFIG_EZPI_ENABLE_UART_PROVISIONING
-
 #include <string.h>
 
 #include "freertos/FreeRTOS.h"
@@ -51,13 +49,15 @@ extern "C"
         EZPI_UART_CMD_STATUS_MAX
     } e_ezlopi_uart_cmd_status_t;
 
+#ifdef CONFIG_EZPI_ENABLE_UART_PROVISIONING
     void EZPI_SERV_uart_init(void);
+#elif CONFIG_EZPI_ENABLE_CDC_PROVISIONING
+void EZPI_SERV_cdc_init();
+#endif
     int EZPI_SERV_uart_tx_data(int len, uint8_t *data);
 
 #ifdef __cplusplus
 }
 #endif
-
-#endif // CONFIG_EZPI_ENABLE_UART_PROVISIONING
 
 #endif // _EZLOPI_SERVICE_UART_H_
