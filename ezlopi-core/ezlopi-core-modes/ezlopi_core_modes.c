@@ -185,14 +185,17 @@ ezlopi_error_t ezlopi_core_modes_set_notifications(uint8_t modesId, bool all, cJ
         if (mode_to_upate)
         {
             mode_to_upate->notify_all = all;
-            cJSON *element_to_add = NULL;
-            cJSON_ArrayForEach(element_to_add, user_id_aray)
+            cJSON *add_element = NULL;
+            cJSON_ArrayForEach(add_element, user_id_aray)
             {
                 cJSON *element_to_check = NULL;
                 bool add_to_array = true;
                 cJSON_ArrayForEach(element_to_check, mode_to_upate->cj_notifications)
                 {
-                    if (0 == strncmp(element_to_add->valuestring, element_to_check->valuestring, 32))
+                    if (EZPI_STRNCMP_IF_EQUAL(add_element->valuestring,
+                                              element_to_check->valuestring,
+                                              add_element->str_value_len,
+                                              element_to_check->str_value_len))
                     {
                         add_to_array = false;
                         break;
@@ -204,7 +207,7 @@ ezlopi_error_t ezlopi_core_modes_set_notifications(uint8_t modesId, bool all, cJ
                     {
                         mode_to_upate->cj_notifications = cJSON_CreateArray(__FUNCTION__);
                     }
-                    cJSON_AddItemToArray(mode_to_upate->cj_notifications, cJSON_CreateString(__FUNCTION__, element_to_add->valuestring));
+                    cJSON_AddItemToArray(mode_to_upate->cj_notifications, cJSON_CreateString(__FUNCTION__, add_element->valuestring));
                 }
             }
             mode_to_upate->disarmed_default = false;
@@ -233,6 +236,7 @@ ezlopi_error_t ezlopi_core_modes_add_alarm_off(uint8_t mode_id, cJSON *device_id
                 if (EZPI_STRNCMP_IF_EQUAL(device_id->valuestring, element_to_check->valuestring, strlen(device_id->valuestring), strlen(element_to_check->valuestring)))
                 {
                     add_to_array = false;
+                    break;
                 }
             }
             if (add_to_array)
@@ -421,12 +425,13 @@ ezlopi_error_t ezlopi_core_modes_add_disarmed_device(uint8_t modeId, const char 
             if (mode_to_update->cj_disarmed_devices && (cJSON_Array == mode_to_update->cj_disarmed_devices->type))
             {
                 bool add_to_array = true;
-                cJSON *element = NULL;
-                cJSON_ArrayForEach(element, mode_to_update->cj_disarmed_devices)
+                cJSON *add_element = NULL;
+                cJSON_ArrayForEach(add_element, mode_to_update->cj_disarmed_devices)
                 {
-                    if (0 == strncmp(device_id_str, element->valuestring, 32))
+                    if (EZPI_STRNCMP_IF_EQUAL(device_id_str, add_element->valuestring, strlen(device_id_str), add_element->str_value_len))
                     {
                         add_to_array = false;
+                        break;
                     }
                 }
                 if (add_to_array)
@@ -456,14 +461,15 @@ ezlopi_error_t ezlopi_core_modes_remove_disarmed_device(uint8_t modeId, const ch
         {
             if (mode_to_update->cj_disarmed_devices && (cJSON_Array == mode_to_update->cj_disarmed_devices->type))
             {
-                cJSON *element = NULL;
+                cJSON *add_element = NULL;
                 int array_index = 0;
-                cJSON_ArrayForEach(element, mode_to_update->cj_disarmed_devices)
+                cJSON_ArrayForEach(add_element, mode_to_update->cj_disarmed_devices)
                 {
-                    if (0 == strncmp(device_id_str, element->valuestring, 32))
+                    if (EZPI_STRNCMP_IF_EQUAL(device_id_str, add_element->valuestring, strlen(device_id_str), add_element->str_value_len))
                     {
                         cJSON *cj_device_str = cJSON_DetachItemFromArray(__func__, mode_to_update->cj_disarmed_devices, array_index);
                         cJSON_Delete(__func__, cj_device_str);
+
                         mode_to_update->disarmed_default = false;
                         ezlopi_core_modes_store_to_nvs();
                         break;

@@ -179,6 +179,17 @@ void ezlopi_cloud_modes_disarmed_devices_add(cJSON *cj_request, cJSON *cj_respon
     cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     if (cj_result)
     {
+        cJSON* cj_params = cJSON_GetObjectItem(__func__, cj_request, ezlopi_params_str);
+        if (cj_params)
+        {
+            cJSON* cj_modeId = cJSON_GetObjectItem(__func__, cj_params, ezlopi_modeId_str);
+            cJSON* cj_deviceId = cJSON_GetObjectItem(__func__, cj_params, ezlopi_deviceId_str);
+            if (cj_modeId && cj_deviceId)
+            {
+                uint8_t modeId = strtoul(cj_modeId->valuestring, NULL, 10);
+                ezlopi_core_modes_add_disarmed_device(modeId, cj_deviceId->valuestring);
+            }
+        }
     }
 }
 
