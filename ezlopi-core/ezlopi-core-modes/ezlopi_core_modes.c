@@ -493,8 +493,8 @@ ezlopi_error_t ezlopi_core_modes_set_unset_device_armed_status(cJSON *cj_device_
             {
                 if (device_to_change->cloud_properties.armed != set)
                 {
-                    device_to_change->cloud_properties.armed = set; // this logic might be opposite
-                    
+                    device_to_change->cloud_properties.armed = set;
+
                     // 1. PREPARE  cj_request structure to trigger broadcast for  'armed.set'
                     cJSON *cj_device_armed_broadcast = cJSON_CreateObject(__func__);
                     if (cj_device_armed_broadcast)
@@ -503,31 +503,30 @@ ezlopi_error_t ezlopi_core_modes_set_unset_device_armed_status(cJSON *cj_device_
                         cJSON *cj_params = cJSON_AddObjectToObject(__func__, cj_device_armed_broadcast, ezlopi_params_str);
                         if (cj_params)
                         {
-                            char temp[32];
-                            memset(temp, 0, 32);
-                            snprintf(temp, 32, "%08x", device_to_change->cloud_properties.device_id);
-                            cJSON_AddStringToObject(__func__, cj_params, ezlopi__id_str, temp);
+                            char tmp_id[32];
+                            memset(tmp_id, 0, 32);
+                            snprintf(tmp_id, 32, "%08x", device_to_change->cloud_properties.device_id);
+                            cJSON_AddStringToObject(__func__, cj_params, ezlopi__id_str, tmp_id);
                             cJSON_AddBoolToObject(__func__, cj_params, ezlopi_armed_str, set);
-                            // uint32_t id = ezlopi_core_ezlopi_methods_search_in_list(cJSON_GetObjectItem(__func__, cj_device_armed_broadcast, ezlopi_method_str));
-                            // f_method_func_t updater_method = ezlopi_core_ezlopi_methods_get_updater_by_id(id);
-                            // if (updater_method)
-                            // {
+
                             cJSON *cj_response = cJSON_CreateObject(__func__);
                             if (NULL != cj_response)
                             {
-                                // 2. call "device_updated"
+                                // 2. CALL : "device_updated" broadcast for devices: switced from [ armed --> disarmed ]
                                 device_updated(cj_device_armed_broadcast, cj_response);
 
-                                // updater_method(cj_device_armed_broadcast, cj_response);
-                                ret = EZPI_SUCCESS;
                                 if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(cj_response))
                                 {
-                                    cJSON_Delete(__func__, cj_response);
                                     ret = EZPI_ERR_MODES_FAILED;
                                 }
+                                else
+                                {
+                                    ret = EZPI_SUCCESS;
+                                }
+                                cJSON_Delete(__func__, cj_response);
                             }
-                            // }
                         }
+                        cJSON_Delete(__func__, cj_device_armed_broadcast);
                     }
                 }
             }

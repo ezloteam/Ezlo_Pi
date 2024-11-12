@@ -239,15 +239,21 @@ void ezlopi_cloud_modes_changed(cJSON *cj_request, cJSON *cj_response)
     cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     if (cj_result)
     {
-        s_ezlopi_modes_t *curr_mode = ezlopi_core_modes_get_custom_modes(); // get the latest 'mode' we are servicing
-        if (curr_mode)
+        cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
+        if (cj_params)
         {
-            s_house_modes_t *curr_house_mode = ezlopi_core_modes_get_house_mode_by_id(curr_mode->current_mode_id); // get the 'running' house mode, indicated by outer struct 'ezlopi_mode_t'
-            if (curr_house_mode)
+            cJSON *cj_mode_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_modeId_str);
+            if (cj_mode_id && cj_mode_id->valuestring)
             {
-                CJSON_ASSIGN_ID(cj_result, curr_house_mode->_id, ezlopi_modeId_str);
-                cJSON_AddBoolToObject(__FUNCTION__, cj_result, ezlopi_disarmedDefault_str, curr_house_mode->disarmed_default);
-                cJSON_AddNumberToObject(__FUNCTION__, cj_result, ezlopi_timestamp_str, EZPI_CORE_sntp_get_current_time_ms());
+                uint32_t modeId = strtoul(cj_mode_id->valuestring, NULL, 16);
+
+                s_house_modes_t *curr_house_mode = ezlopi_core_modes_get_house_mode_by_id(modeId); // get the 'running' house mode, indicated by outer struct 'ezlopi_mode_t'
+                if (curr_house_mode)
+                {
+                    CJSON_ASSIGN_ID(cj_result, curr_house_mode->_id, ezlopi_modeId_str);
+                    cJSON_AddBoolToObject(__FUNCTION__, cj_result, ezlopi_disarmedDefault_str, curr_house_mode->disarmed_default);
+                    cJSON_AddNumberToObject(__FUNCTION__, cj_result, ezlopi_timestamp_str, EZPI_CORE_sntp_get_current_time_ms());
+                }
             }
         }
     }
