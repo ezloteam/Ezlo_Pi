@@ -64,6 +64,7 @@ static uint8_t __uart_data[EZPI_SERV_UART_RX_BUFFER_SIZE];
 static uint8_t usb_rx_buffer[CONFIG_TINYUSB_CDC_RX_BUFSIZE - 1];
 static size_t rx_buffer_pointer = 0;
 static int cdc_port = TINYUSB_CDC_ACM_0;
+static SemaphoreHandle_t usb_semaphore_handle = NULL;
 #endif //  CONFIG_EZPI_ENABLE_CDC_PROVISIONING
 
 static void ezlopi_service_uart_get_info();
@@ -377,6 +378,7 @@ static ezlopi_error_t ezlopi_service_uart_process_provisioning_api(const cJSON *
 static int ezlopi_service_uart_parser(const char *data)
 {
     cJSON *root = cJSON_ParseWithRef(__FUNCTION__, data);
+    // printf("HERE again\n");
 
     if (root)
     {
@@ -975,7 +977,7 @@ static void ezlopi_service_uart_get_config(void)
     if (root)
     {
         char *my_json_string = cJSON_Print(__FUNCTION__, root);
-        // TRACE_D("length of 'my_json_string': %d", strlen(my_json_string));
+        TRACE_D("length of 'my_json_string': %d", strlen(my_json_string));
 
         if (my_json_string)
         {
@@ -996,9 +998,13 @@ int EZPI_SERV_uart_tx_data(int len, uint8_t *data)
     ret = uart_write_bytes(EZPI_SERV_UART_NUM_DEFAULT, (void *)data, len);
     ret += uart_write_bytes(EZPI_SERV_UART_NUM_DEFAULT, "\r\n", 2);
 #elif CONFIG_EZPI_ENABLE_CDC_PROVISIONING
-    tinyusb_cdcacm_write_queue(cdc_port, (uint8_t *)data, len);
-    tinyusb_cdcacm_write_queue(cdc_port, (uint8_t*)"\r\n", 2);
-    ret = tinyusb_cdcacm_write_flush(cdc_port, 0);
+    if (pdTRUE == xSemaphoreTake(usb_semaphore_handle, portMAX_DELAY))
+    {
+        tinyusb_cdcacm_write_queue(cdc_port, (uint8_t *)data, len);
+        tinyusb_cdcacm_write_queue(cdc_port, (uint8_t *)"\r\n", 2);
+        ret = tinyusb_cdcacm_write_flush(cdc_port, 0);
+        xSemaphoreGive(usb_semaphore_handle);
+    }
 #endif // CONFIG_EZPI_ENABLE_UART_PROVISIONING
     return ret;
 }
@@ -1010,21 +1016,25 @@ static void tinyusb_cdc_rx_callback(int itf, cdcacm_event_t *event)
     {
         size_t rx_size = 0;
         uint8_t temporary_buffer[63];
-        esp_err_t error = tinyusb_cdcacm_read(itf, temporary_buffer, CONFIG_TINYUSB_CDC_RX_BUFSIZE, &rx_size);
-        if (ESP_OK != error)
+        if (pdTRUE == xSemaphoreTake(usb_semaphore_handle, portMAX_DELAY))
         {
-            TRACE_E("Error reading cdc data");
-        }
-        else
-        {
-            memcpy((void *)usb_rx_buffer + rx_buffer_pointer, temporary_buffer, rx_size);
-            rx_buffer_pointer += rx_size;
-            if (0x0d == temporary_buffer[rx_size - 2] && 0x0a == temporary_buffer[rx_size - 1])
+            esp_err_t error = tinyusb_cdcacm_read(itf, temporary_buffer, CONFIG_TINYUSB_CDC_RX_BUFSIZE, &rx_size);
+            xSemaphoreGive(usb_semaphore_handle);
+            if (ESP_OK != error)
             {
-                TRACE_I("%s", (char *)usb_rx_buffer);
-                ezlopi_service_uart_parser((const char *)usb_rx_buffer);
-                memset(usb_rx_buffer, 0, rx_buffer_pointer);
-                rx_buffer_pointer = 0;
+                TRACE_E("Error reading cdc data");
+            }
+            else if(rx_size > 9)
+            {
+                memcpy((void *)usb_rx_buffer + rx_buffer_pointer, temporary_buffer, rx_size);
+                rx_buffer_pointer += rx_size;
+                if (0x0d == temporary_buffer[rx_size - 2] && 0x0a == temporary_buffer[rx_size - 1])
+                {
+                    usb_rx_buffer[rx_buffer_pointer - 2] = '\0';
+                    ezlopi_service_uart_parser((const char *)usb_rx_buffer);
+                    memset(usb_rx_buffer, 0, rx_buffer_pointer);
+                    rx_buffer_pointer = 0;
+                }
             }
         }
     }
@@ -1042,25 +1052,30 @@ static void tinyusb_cdc_rx_callback(int itf, cdcacm_event_t *event)
 
 void EZPI_SERV_cdc_init()
 {
-    tinyusb_config_t ezlopi_usb_device_configuration = {
-        .descriptor = NULL,
-        .string_descriptor = NULL,
-        .external_phy = false,
-    };
+    usb_semaphore_handle = xSemaphoreCreateBinary();
+    if (usb_semaphore_handle)
+    {
+        xSemaphoreGive(usb_semaphore_handle);
+        tinyusb_config_t ezlopi_usb_device_configuration = {
+            .descriptor = NULL,
+            .string_descriptor = NULL,
+            .external_phy = false,
+        };
 
-    tinyusb_config_cdcacm_t ezlopi_usb_cdc_configuration = {
-        .usb_dev = TINYUSB_USBDEV_0,
-        .cdc_port = cdc_port,
-        .rx_unread_buf_sz = CONFIG_TINYUSB_CDC_RX_BUFSIZE,
-        .callback_rx = &tinyusb_cdc_rx_callback,
-        .callback_rx_wanted_char = NULL,
-        .callback_line_state_changed = &tinyusb_cdc_rx_callback,
-        .callback_line_coding_changed = NULL,
-    };
+        tinyusb_config_cdcacm_t ezlopi_usb_cdc_configuration = {
+            .usb_dev = TINYUSB_USBDEV_0,
+            .cdc_port = cdc_port,
+            .rx_unread_buf_sz = CONFIG_TINYUSB_CDC_RX_BUFSIZE,
+            .callback_rx = &tinyusb_cdc_rx_callback,
+            .callback_rx_wanted_char = NULL,
+            .callback_line_state_changed = &tinyusb_cdc_rx_callback,
+            .callback_line_coding_changed = NULL,
+        };
 
-    ESP_ERROR_CHECK(tinyusb_driver_install(&ezlopi_usb_device_configuration));
-    ESP_ERROR_CHECK(tusb_cdc_acm_init(&ezlopi_usb_cdc_configuration));
-    TRACE_I("USB CDC initialization completed successfully.");
+        ESP_ERROR_CHECK(tinyusb_driver_install(&ezlopi_usb_device_configuration));
+        ESP_ERROR_CHECK(tusb_cdc_acm_init(&ezlopi_usb_cdc_configuration));
+        TRACE_I("USB CDC initialization completed successfully.");
+    }
 }
 #endif // CONFIG_EZPI_ENABLE_CDC_PROVISIONING
 
