@@ -523,16 +523,20 @@ ezlopi_error_t ezlopi_core_modes_set_unset_device_armed_status(cJSON *cj_device_
 
                                 if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(cj_response))
                                 {
+                                    // TRACE_E("freeing cj_response");
+                                    cJSON_Delete(__func__, cj_response);
                                     ret = EZPI_ERR_MODES_FAILED;
                                 }
                                 else
                                 {
+                                    // TRACE_D("Sending--> broadcast for device armed toggle");
+                                    // The 'cj_response' is freed automatically after broadcast.
                                     ret = EZPI_SUCCESS;
                                 }
-                                cJSON_Delete(__func__, cj_response);
                             }
                         }
-                        cJSON_Delete(__func__, cj_device_armed_broadcast);
+
+                        cJSON_Delete(__func__, cj_device_armed_broadcast); // this cjson need to be freed manually
                     }
                 }
             }
