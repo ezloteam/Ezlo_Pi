@@ -143,6 +143,23 @@ ezlopi_error_t ezlopi_core_modes_api_cancel_entry_delay(void)
     return ret;
 }
 
+ezlopi_error_t ezlopi_core_modes_api_skip_entry_delay(void)
+{
+    ezlopi_error_t ret = EZPI_ERR_MODES_FAILED;
+    if (sg_custom_modes)
+    {
+        ret = EZPI_SUCCESS;
+        ezlopi_service_modes_stop(5000);
+
+        
+        
+        ezlopi_service_modes_start(5000);
+    }
+
+    return ret;
+}
+
+
 ezlopi_error_t ezlopi_core_modes_set_switch_to_delay(uint32_t switch_to_delay)
 {
     ezlopi_error_t ret = EZPI_ERR_MODES_FAILED;

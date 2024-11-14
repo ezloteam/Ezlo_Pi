@@ -88,6 +88,8 @@ void ezlopi_cloud_modes_entry_delay_cancel(cJSON *cj_request, cJSON *cj_response
     cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     if (cj_result)
     {
+
+        // 1. 
         ezlopi_core_modes_api_cancel_entry_delay();
     }
 }
@@ -97,7 +99,7 @@ void ezlopi_cloud_modes_entry_delay_skip(cJSON *cj_request, cJSON *cj_response)
     cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     if (cj_result)
     {
-#warning "Implementation required";
+        ezlopi_core_modes_api_skip_entry_delay();
     }
 }
 

@@ -133,10 +133,10 @@ typedef struct s_ezlopi_modes
     cJSON *cj_devices;
     s_protect_buttons_t *l_protect_buttons;
 
-    s_entry_delay_t entry_delay;
+    s_entry_delay_t entry_delay; // A dictionary for Entry Delays values
     s_abort_window_t abort_delay;
 
-    s_alarmed_t alarmed;
+    s_alarmed_t alarmed; // the alarmed phase contains 4-phases [idle / bypassed / entryDelay / main]
 
     s_house_modes_t mode_home;
     s_house_modes_t mode_away;
