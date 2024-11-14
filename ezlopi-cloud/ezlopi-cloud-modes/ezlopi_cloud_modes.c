@@ -198,6 +198,17 @@ void ezlopi_cloud_modes_disarmed_devices_remove(cJSON *cj_request, cJSON *cj_res
     cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     if (cj_result)
     {
+        cJSON *cj_params = cJSON_GetObjectItem(__func__, cj_request, ezlopi_params_str);
+        if (cj_params)
+        {
+            cJSON *cj_modeID = cJSON_GetObjectItem(__func__, cj_params, ezlopi_modeId_str);
+            cJSON *cj_deviceId = cJSON_GetObjectItem(__func__, cj_params, ezlopi_deviceId_str);
+            if (cj_modeID && cj_deviceId)
+            {
+                uint8_t modeId = strtoul(cj_modeID->valuestring, NULL, 10);
+                ezlopi_core_modes_remove_disarmed_device(modeId, cj_deviceId->valuestring);
+            }
+        }
     }
 }
 

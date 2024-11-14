@@ -41,8 +41,6 @@ void ezlopi_cloud_modes_switched(cJSON *cj_request, cJSON *cj_response)
 
 void ezlopi_cloud_modes_alarmed(cJSON *cj_request, cJSON *cj_response)
 {
-    cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
-
     cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_id_str);
     cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_method_str);
 
@@ -242,16 +240,14 @@ void ezlopi_cloud_modes_changed(cJSON *cj_request, cJSON *cj_response)
         cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
         if (cj_params)
         {
-            cJSON *cj_mode_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_modeId_str);
+            cJSON *cj_mode_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_modeId_str); // broadcast modes-info of 'updated_house_mode'
             if (cj_mode_id && cj_mode_id->valuestring)
             {
-                uint32_t modeId = strtoul(cj_mode_id->valuestring, NULL, 16);
-
-                s_house_modes_t *curr_house_mode = ezlopi_core_modes_get_house_mode_by_id(modeId); // get the 'running' house mode, indicated by outer struct 'ezlopi_mode_t'
-                if (curr_house_mode)
+                s_house_modes_t *update_house_mode = ezlopi_core_modes_get_house_mode_by_id(strtoul(cj_mode_id->valuestring, NULL, 16)); // get the 'running' house mode, indicated by outer struct 'ezlopi_mode_t'
+                if (update_house_mode)
                 {
-                    CJSON_ASSIGN_ID(cj_result, curr_house_mode->_id, ezlopi_modeId_str);
-                    cJSON_AddBoolToObject(__FUNCTION__, cj_result, ezlopi_disarmedDefault_str, curr_house_mode->disarmed_default);
+                    CJSON_ASSIGN_ID(cj_result, update_house_mode->_id, ezlopi_modeId_str);
+                    cJSON_AddBoolToObject(__FUNCTION__, cj_result, ezlopi_disarmedDefault_str, update_house_mode->disarmed_default);
                     cJSON_AddNumberToObject(__FUNCTION__, cj_result, ezlopi_timestamp_str, EZPI_CORE_sntp_get_current_time_ms());
                 }
             }

@@ -168,6 +168,7 @@ ezlopi_error_t ezlopi_core_modes_set_notifications(uint8_t modesId, bool all, cJ
 ezlopi_error_t ezlopi_core_modes_set_disarmed_default(uint8_t modesID, bool disarmedDefault);
 ezlopi_error_t ezlopi_core_modes_set_unset_device_armed_status(cJSON *cj_device_array, const bool set);
 ezlopi_error_t ezlopi_core_modes_add_disarmed_device(uint8_t modeId, const char *device_id_str);
+ezlopi_error_t ezlopi_core_modes_remove_disarmed_device(uint8_t modeId, const char *device_id_str);
 ezlopi_error_t ezlopi_core_modes_set_protect(uint32_t mode_id, bool protect_state);
 
 ezlopi_error_t ezlopi_core_modes_add_alarm_off(uint8_t mode_id, cJSON *device_id);

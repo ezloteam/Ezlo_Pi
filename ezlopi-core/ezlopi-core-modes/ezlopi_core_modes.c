@@ -437,7 +437,7 @@ ezlopi_error_t ezlopi_core_modes_add_disarmed_device(uint8_t modeId, const char 
                 if (add_to_array)
                 {
                     cJSON_AddItemToArray(mode_to_update->cj_disarmed_devices, cJSON_CreateString(__func__, device_id_str));
-                    mode_to_update->disarmed_default = false;
+                    mode_to_update->disarmed_default = false; // disarmedDefault state will change to **false**
                     ezlopi_core_modes_store_to_nvs();
                 }
                 ret = EZPI_SUCCESS;
@@ -461,16 +461,19 @@ ezlopi_error_t ezlopi_core_modes_remove_disarmed_device(uint8_t modeId, const ch
         {
             if (mode_to_update->cj_disarmed_devices && (cJSON_Array == mode_to_update->cj_disarmed_devices->type))
             {
-                cJSON *add_element = NULL;
+                cJSON *remove_element = NULL;
                 int array_index = 0;
-                cJSON_ArrayForEach(add_element, mode_to_update->cj_disarmed_devices)
+                cJSON_ArrayForEach(remove_element, mode_to_update->cj_disarmed_devices)
                 {
-                    if (EZPI_STRNCMP_IF_EQUAL(device_id_str, add_element->valuestring, strlen(device_id_str), add_element->str_value_len))
+                    if (EZPI_STRNCMP_IF_EQUAL(device_id_str, remove_element->valuestring, strlen(device_id_str), remove_element->str_value_len))
                     {
                         cJSON *cj_device_str = cJSON_DetachItemFromArray(__func__, mode_to_update->cj_disarmed_devices, array_index);
-                        cJSON_Delete(__func__, cj_device_str);
+                        if (cj_device_str)
+                        {
+                            cJSON_Delete(__func__, cj_device_str);
+                        }
 
-                        mode_to_update->disarmed_default = false;
+                        mode_to_update->disarmed_default = false; // disarmedDefault state will change to **false**
                         ezlopi_core_modes_store_to_nvs();
                         break;
                     }
