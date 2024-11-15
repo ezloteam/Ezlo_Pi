@@ -95,7 +95,7 @@ void ezlopi_core_log_add_log_upcall(f_trace_upcall_t upcall)
 void ezlopi_core_log_init(void)
 {
     ezlopi_util_trace_init(__log_upcall);
-    // ezlopi_core_log_add_log_upcall(__console_log);
+    ezlopi_core_log_add_log_upcall(__console_log);
     // ezlopi_core_log_add_log_upcall(__cloud_log);
 }
 

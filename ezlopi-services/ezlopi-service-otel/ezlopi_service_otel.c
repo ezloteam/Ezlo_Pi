@@ -24,7 +24,8 @@ typedef enum e_otel_type
 } e_otel_type_t;
 
 static QueueHandle_t __telemetry_queue = NULL;
-static e_ezpi_trace_severity_t __severity_level = E_TRACE_SEVERITY_WARNING;
+static e_ezpi_trace_severity_t __severity_level = E_TRACE_SEVERITY_NONE;
+// static e_ezpi_trace_severity_t __severity_level = E_TRACE_SEVERITY_WARNING;
 
 static void __otel_task(void *pv);
 static void __post_telemetry(const char *location, char *telemetry_data);
@@ -80,6 +81,7 @@ void ezlopi_service_otel_init(void)
 static void __otel_task(void *pv)
 {
     ezlopi_wait_for_wifi_to_connect(portMAX_DELAY);
+    vTaskDelay(30000 / portTICK_RATE_MS);
 
     while (1)
     {

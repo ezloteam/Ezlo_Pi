@@ -24,21 +24,21 @@ static esp_websocket_client_handle_t client = NULL;
 typedef struct s_ws_event_arg
 {
     esp_websocket_client_handle_t client;
-    void (*msg_upcall)(const char*, uint32_t);
+    void (*msg_upcall)(const char *, uint32_t, uint32_t time_ms);
     void (*connection_upcall)(bool connected);
 } s_ws_event_arg_t;
 
 typedef struct s_ws_data_buffer
 {
-    char* buffer;
+    char *buffer;
     uint32_t len;
     uint32_t tot_len;
-    struct s_ws_data_buffer* next;
+    struct s_ws_data_buffer *next;
 } s_ws_data_buffer_t;
 
-static void websocket_event_handler(void* handler_args, esp_event_base_t base, int32_t event_id, void* event_data);
+static void websocket_event_handler(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data);
 
-ezlopi_error_t ezlopi_websocket_client_send(char* data, uint32_t len)
+ezlopi_error_t ezlopi_websocket_client_send(char *data, uint32_t len)
 {
     ezlopi_error_t ret = EZPI_FAILED;
 
@@ -67,13 +67,13 @@ void ezlopi_websocket_client_kill(void)
     client = NULL;
 }
 
-esp_websocket_client_handle_t ezlopi_websocket_client_init(cJSON* uri, void (*msg_upcall)(const char*, uint32_t), void (*connection_upcall)(bool connected))
+esp_websocket_client_handle_t ezlopi_websocket_client_init(cJSON *uri, void (*msg_upcall)(const char *, uint32_t, uint32_t), void (*connection_upcall)(bool connected))
 {
     if ((NULL == client) && (NULL != uri) && (NULL != uri->valuestring) && (NULL != msg_upcall))
     {
-        char * ca_cert = ezlopi_factory_info_v3_get_ca_certificate();
-        char * ssl_priv = ezlopi_factory_info_v3_get_ssl_private_key();
-        char * ssl_shared = ezlopi_factory_info_v3_get_ssl_shared_key();
+        char *ca_cert = ezlopi_factory_info_v3_get_ca_certificate();
+        char *ssl_priv = ezlopi_factory_info_v3_get_ssl_private_key();
+        char *ssl_shared = ezlopi_factory_info_v3_get_ssl_shared_key();
 
         static s_ws_event_arg_t event_arg;
         event_arg.client = client;
@@ -97,8 +97,15 @@ esp_websocket_client_handle_t ezlopi_websocket_client_init(cJSON* uri, void (*ms
         client = esp_websocket_client_init(&websocket_cfg);
         if (client)
         {
-            esp_websocket_register_events(client, WEBSOCKET_EVENT_ANY, websocket_event_handler, (void*)&event_arg);
-            esp_websocket_client_start(client);
+            esp_err_t err = esp_websocket_register_events(client, WEBSOCKET_EVENT_ANY, websocket_event_handler, (void *)&event_arg);
+            TRACE_I("error: %d", err);
+
+            err = esp_websocket_client_start(client);
+            TRACE_I("error: %d", err);
+        }
+        else
+        {
+            TRACE_E("Failed to create wss-client!");
         }
     }
     else
@@ -109,10 +116,10 @@ esp_websocket_client_handle_t ezlopi_websocket_client_init(cJSON* uri, void (*ms
     return client;
 }
 
-static void websocket_event_handler(void* handler_args, esp_event_base_t base, int32_t event_id, void* event_data)
+static void websocket_event_handler(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data)
 {
-    s_ws_event_arg_t* event_arg = (s_ws_event_arg_t*)handler_args;
-    esp_websocket_event_data_t* data = (esp_websocket_event_data_t*)event_data;
+    s_ws_event_arg_t *event_arg = (s_ws_event_arg_t *)handler_args;
+    esp_websocket_event_data_t *data = (esp_websocket_event_data_t *)event_data;
     switch (event_id)
     {
     case WEBSOCKET_EVENT_CONNECTED:
@@ -139,7 +146,9 @@ static void websocket_event_handler(void* handler_args, esp_event_base_t base, i
     {
         if ((NULL != data->data_ptr) && (data->data_len > 0) && (NULL != event_arg) && (NULL != event_arg->msg_upcall))
         {
-            event_arg->msg_upcall(data->data_ptr, data->data_len);
+            time_t now;
+            time(&now);
+            event_arg->msg_upcall(data->data_ptr, data->data_len, now);
         }
         break;
     }

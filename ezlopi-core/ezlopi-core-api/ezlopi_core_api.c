@@ -8,12 +8,12 @@
 #include "ezlopi_core_cjson_macros.h"
 
 static int __check_for_no_error(cJSON *cj_request);
+static void __cjson_add_duplicate(cJSON *cj_haystack, const char *key_str, cJSON *cj_needle);
 static cJSON *__execute_method(cJSON *cj_request, f_method_func_t method_func);
 
-cJSON *ezlopi_core_api_consume(const char *who, const char *payload, uint32_t len)
+cJSON *ezlopi_core_api_consume(const char *who, const char *payload, uint32_t len, cJSON *cj_otel_trace)
 {
     cJSON *cj_response = NULL;
-    cJSON *cj_trace = cJSON_CreateObject(__FUNCTION__);
 
     if (payload && len)
     {
@@ -25,6 +25,11 @@ cJSON *ezlopi_core_api_consume(const char *who, const char *payload, uint32_t le
                 cJSON *cj_id = cJSON_GetObjectItem(who, cj_request, ezlopi_id_str);
                 cJSON *cj_sender = cJSON_GetObjectItem(who, cj_request, ezlopi_sender_str);
                 cJSON *cj_method = cJSON_GetObjectItem(who, cj_request, ezlopi_method_str);
+                cJSON *cj_params = cJSON_GetObjectItem(who, cj_request, ezlopi_params_str);
+
+                // __cjson_add_duplicate(cj_otel_trace, ezlopi_id_str, cj_id);
+                // __cjson_add_duplicate(cj_otel_trace, ezlopi_method_str, cj_method);
+                // __cjson_add_duplicate(cj_otel_trace, ezlopi_params_str, cj_params);
 
 #if (1 == ENABLE_TRACE)
                 TRACE_I("## WS Rx <<<<<<<<<< '%s' \n %.*s", (cj_method ? cj_method->valuestring : ezlopi__str), len, payload);
@@ -41,9 +46,16 @@ cJSON *ezlopi_core_api_consume(const char *who, const char *payload, uint32_t le
                         if (cj_response)
                         {
                             cJSON_AddNullToObject(who, cj_response, ezlopi_error_str);
+
+                            __cjson_add_duplicate(cj_response, ezlopi_id_str, cj_id);
+                            __cjson_add_duplicate(cj_response, ezlopi_sender_str, cj_sender);
+                            __cjson_add_duplicate(cj_response, ezlopi_method_str, cj_method);
+
+#if 0
                             cJSON_AddItemToObject(who, cj_response, ezlopi_id_str, cJSON_Duplicate(who, cj_id, cJSON_True));
                             cJSON_AddItemToObject(who, cj_response, ezlopi_sender_str, cJSON_Duplicate(who, cj_sender, cJSON_True));
                             cJSON_AddItemToObject(who, cj_response, ezlopi_method_str, cJSON_Duplicate(who, cj_method, cJSON_True));
+#endif
                         }
                     }
 
@@ -71,9 +83,15 @@ cJSON *ezlopi_core_api_consume(const char *who, const char *payload, uint32_t le
 
                     if (cj_response)
                     {
+                        __cjson_add_duplicate(cj_response, ezlopi_id_str, cj_id);
+                        __cjson_add_duplicate(cj_response, ezlopi_sender_str, cj_sender);
+                        __cjson_add_duplicate(cj_response, ezlopi_method_str, cj_method);
+
+#if 0
                         cJSON_AddItemToObject(who, cj_response, ezlopi_id_str, cJSON_Duplicate(who, cj_id, cJSON_True));
                         cJSON_AddItemToObject(who, cj_response, ezlopi_sender_str, cJSON_Duplicate(who, cj_sender, cJSON_True));
                         cJSON_AddItemToObject(who, cj_response, ezlopi_method_str, cJSON_Duplicate(who, cj_method, cJSON_True));
+#endif
                     }
 
                     // CJSON_TRACE("x-cj_response", cj_response);
@@ -141,4 +159,19 @@ static int __check_for_no_error(cJSON *cj_request)
     }
 
     return ret;
+}
+
+static void __cjson_add_duplicate(cJSON *cj_haystack, const char *key_str, cJSON *cj_needle)
+{
+    if (cj_haystack && cj_needle && key_str)
+    {
+        cJSON *cj_dup = cJSON_Duplicate(__FUNCTION__, cj_needle, true);
+        if (cj_dup)
+        {
+            if (false == cJSON_AddItemToObject(__FUNCTION__, cj_haystack, key_str, cj_needle))
+            {
+                cJSON_Delete(__FUNCTION__, cj_dup);
+            }
+        }
+    }
 }

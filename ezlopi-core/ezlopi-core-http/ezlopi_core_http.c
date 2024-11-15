@@ -540,10 +540,6 @@ s_ezlopi_http_data_t *ezlopi_http_get_request(const char *cloud_url, const char 
                 TRACE_E("Error perform http request %s", esp_err_to_name(err));
             }
         }
-        else
-        {
-            TRACE_D("get_status_code: %d", status_code);
-        }
 
         ezlopi_http_free_rx_data(my_data.rx_chunks);
         esp_http_client_cleanup(client);

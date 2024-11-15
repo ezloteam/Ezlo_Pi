@@ -147,7 +147,11 @@ static ezlopi_error_t __ws_server_broadcast(char *data)
 
 static void __message_upcall(httpd_req_t *req, const char *payload, uint32_t payload_len)
 {
-    cJSON *cj_response = ezlopi_core_api_consume(__FUNCTION__, payload, payload_len);
+    time_t now;
+    time(&now);
+
+    cJSON *cj_otel_trace = cJSON_CreateObject(__FUNCTION__);
+    cJSON *cj_response = ezlopi_core_api_consume(__FUNCTION__, payload, payload_len, cj_otel_trace);
     if (cj_response)
     {
         cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_msg_id_str, __message_counter);
