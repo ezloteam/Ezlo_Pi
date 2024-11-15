@@ -110,6 +110,7 @@ s_ezlopi_modes_t *ezlopi_core_modes_cjson_parse_modes(cJSON *cj_modes)
             CJSON_GET_VALUE_DOUBLE(cj_entry_delay, ezlopi_extended_str, parsed_mode->entry_delay.extended_delay_sec);
             CJSON_GET_VALUE_DOUBLE(cj_entry_delay, ezlopi_instant_str, parsed_mode->entry_delay.instant_delay_sec);
         }
+#warning "need to add abortWindow";
 
         cJSON *cj_house_modes = cJSON_GetObjectItem(__FUNCTION__, cj_modes, ezlopi_modes_str);
         if (cj_house_modes)
@@ -291,11 +292,12 @@ s_ezlopi_modes_t *ezlopi_core_modes_cjson_parse_modes(cJSON *cj_modes)
                 cJSON *cj_sources_arr = cJSON_GetObjectItem(__FUNCTION__, cj_alarmed, ezlopi_sources_str);
                 if (cj_sources_arr)
                 {
-                    uint32_t src_idx = 0;
+                    // uint32_t src_idx = 0;
                     cJSON *cj_source = NULL;
                     s_sources_t *curr_source = NULL;
 
-                    while (NULL != (cj_source = cJSON_GetArrayItem(cj_sources_arr, src_idx)))
+                    // while (NULL != (cj_source = cJSON_GetArrayItem(cj_sources_arr, src_idx)))
+                    cJSON_ArrayForEach(cj_source, cj_sources_arr)
                     {
                         if (parsed_mode->alarmed.sources)
                         {
@@ -317,7 +319,7 @@ s_ezlopi_modes_t *ezlopi_core_modes_cjson_parse_modes(cJSON *cj_modes)
                             CJSON_GET_VALUE_DOUBLE(cj_source, ezlopi_delay_str, curr_source->delay);
                         }
 
-                        src_idx++;
+                        // src_idx++;
                     }
                 }
             }

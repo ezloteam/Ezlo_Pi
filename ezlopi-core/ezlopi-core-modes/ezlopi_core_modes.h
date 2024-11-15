@@ -109,13 +109,13 @@ typedef struct s_sources
 
 typedef struct s_alarmed
 {
-    char type[32]; // default is 'global' ( Indicates that the alarmDelay value was taken from the house modes settings)
-    uint32_t entry_delay_sec;
-    uint32_t time_is_left_sec;
-    bool silent;                   // in --> hub.modes.get (v3.0)
-    e_modes_alarm_phase_t phase;   // alarm_phases_type : [idle / bypassed / entryDelay / main]
-    e_modes_alarm_status_t status; // House_mode status for 'alaram_phase'
-    s_sources_t *sources;
+    char type[32];                 // default is 'global' ( Indicates that the alarmDelay value was taken from the house modes settings)
+    uint32_t entry_delay_sec;      // If house modes alarmed, and HouseModes.alarmDelay > 0, entry delay period is started
+    uint32_t time_is_left_sec;     // Number of seconds left to the end of the Entry delay.
+    bool silent;                   // Default: false ... When : true ; websocket clients should treat the alarm as the silent alarm: no indication of alarm is allowed.
+    e_modes_alarm_phase_t phase;   // --> [Not in  documentation ; Added for broadcast purpose] === alarm_phases_type : [idle / bypassed / entryDelay / main]
+    e_modes_alarm_status_t status; // --> [Not in  documentation ; Added for broadcast purpose] === House_mode status for 'alaram_phase'
+    s_sources_t *sources;          // Contains an array of devices that waiting for the entry delay to finish. They are security devices which emitted security events
 
 } s_alarmed_t;
 
@@ -136,7 +136,7 @@ typedef struct s_ezlopi_modes
     s_entry_delay_t entry_delay; // A dictionary for Entry Delays values
     s_abort_window_t abort_delay;
 
-    s_alarmed_t alarmed; // the alarmed phase contains 4-phases [idle / bypassed / entryDelay / main]
+    s_alarmed_t alarmed; // Information about the alarmed state. Present only if the house modes enter the alarmed state.
 
     s_house_modes_t mode_home;
     s_house_modes_t mode_away;

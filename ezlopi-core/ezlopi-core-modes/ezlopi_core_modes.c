@@ -133,10 +133,7 @@ ezlopi_error_t ezlopi_core_modes_api_cancel_entry_delay(void)
     {
         ret = EZPI_SUCCESS;
         ezlopi_service_modes_stop(5000);
-        sg_custom_modes->entry_delay.normal_delay_sec = 0;
-        sg_custom_modes->entry_delay.extended_delay_sec = 0;
-        sg_custom_modes->entry_delay.long_extended_delay_sec = 0;
-        sg_custom_modes->entry_delay.instant_delay_sec = 0;
+        sg_custom_modes->alarmed.status = EZLOPI_MODES_ALARM_STATUS_CANCELED;
         ezlopi_service_modes_start(5000);
     }
 
@@ -150,15 +147,13 @@ ezlopi_error_t ezlopi_core_modes_api_skip_entry_delay(void)
     {
         ret = EZPI_SUCCESS;
         ezlopi_service_modes_stop(5000);
-
-        
-        
+        sg_custom_modes->alarmed.phase = EZLOPI_MODES_ALARM_PHASE_MAIN;
+        sg_custom_modes->alarmed.status = EZLOPI_MODES_ALARM_STATUS_BEGIN;
         ezlopi_service_modes_start(5000);
     }
 
     return ret;
 }
-
 
 ezlopi_error_t ezlopi_core_modes_set_switch_to_delay(uint32_t switch_to_delay)
 {
