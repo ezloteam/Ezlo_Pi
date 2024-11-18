@@ -99,6 +99,7 @@ s_ezlopi_modes_t *ezlopi_core_modes_cjson_parse_modes(cJSON *cj_modes)
         CJSON_GET_ID(parsed_mode->current_mode_id, cJSON_GetObjectItem(__FUNCTION__, cj_modes, ezlopi_current_str));
         CJSON_GET_ID(parsed_mode->switch_to_mode_id, cJSON_GetObjectItem(__FUNCTION__, cj_modes, ezlopi_switchTo_str));
         CJSON_GET_VALUE_DOUBLE(cj_modes, ezlopi_timeIsLeftToSwitch_str, parsed_mode->time_is_left_to_switch_sec);
+        CJSON_GET_VALUE_DOUBLE(cj_modes, ezlopi_timeIsLeftToAlarm_str, parsed_mode->time_is_left_to_alarm_sec);
         CJSON_GET_VALUE_DOUBLE(cj_modes, ezlopi_switchToDelay_str, parsed_mode->switch_to_delay_sec);
         CJSON_GET_VALUE_DOUBLE(cj_modes, ezlopi_alarmDelay_str, parsed_mode->alarm_delay_sec);
 
@@ -110,15 +111,16 @@ s_ezlopi_modes_t *ezlopi_core_modes_cjson_parse_modes(cJSON *cj_modes)
             CJSON_GET_VALUE_DOUBLE(cj_entry_delay, ezlopi_extended_str, parsed_mode->entry_delay.extended_delay_sec);
             CJSON_GET_VALUE_DOUBLE(cj_entry_delay, ezlopi_instant_str, parsed_mode->entry_delay.instant_delay_sec);
         }
-#warning "need to add abortWindow";
+        #warning "need to add abortWindow info";
 
         cJSON *cj_house_modes = cJSON_GetObjectItem(__FUNCTION__, cj_modes, ezlopi_modes_str);
         if (cj_house_modes)
         {
-            uint32_t mode_idx = 0;
+            // uint32_t mode_idx = 0;
             cJSON *cj_house_mod = NULL;
 
-            while (NULL != (cj_house_mod = cJSON_GetArrayItem(cj_house_modes, mode_idx)))
+            // while (NULL != (cj_house_mod = cJSON_GetArrayItem(cj_house_modes, mode_idx)))
+            cJSON_ArrayForEach(cj_house_mod, cj_house_modes)
             {
                 CJSON_TRACE("cj_house_mod", cj_house_mod);
                 uint32_t _mode_id = 0;
@@ -217,8 +219,7 @@ s_ezlopi_modes_t *ezlopi_core_modes_cjson_parse_modes(cJSON *cj_modes)
                 // CJSON_TRACE("cur_house_mode->cj_disarmed_devices", cur_house_mode->cj_disarmed_devices);
                 // CJSON_TRACE("cur_house_mode->cj_alarms_off_devices", cur_house_mode->cj_alarms_off_devices);
                 // CJSON_TRACE("cur_house_mode->cj_cameras_off_devices", cur_house_mode->cj_cameras_off_devices);
-
-                mode_idx++;
+                // mode_idx++;
             }
         }
 

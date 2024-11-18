@@ -12,6 +12,7 @@ static s_ezlopi_modes_t sg_default_mode = {
     .current_mode_id = 0,
     .switch_to_mode_id = 0,
 
+    .time_left_to_alarm_sec = 0,
     .alarm_delay_sec = 0,
     .switch_to_delay_sec = 0,
     .time_is_left_to_switch_sec = 0,

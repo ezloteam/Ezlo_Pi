@@ -67,7 +67,6 @@ static void __modes_loop(void *arg)
     if (pdTRUE == xSemaphoreTake(sg_modes_loop_smphr, 1000 / portTICK_PERIOD_MS))
     {
         s_ezlopi_modes_t *ez_mode = ezlopi_core_modes_get_custom_modes();
-
         if (ez_mode)
         {
             if (ez_mode->switch_to_mode_id)
@@ -75,36 +74,66 @@ static void __modes_loop(void *arg)
                 if (ez_mode->time_is_left_to_switch_sec)
                 {
                     ez_mode->time_is_left_to_switch_sec--;
-                    TRACE_D("time_is_left_to_switch_sec: %u", ez_mode->time_is_left_to_switch_sec);
+                    TRACE_D("time_is_left_to_SWITCH_sec: %u", ez_mode->time_is_left_to_switch_sec);
                 }
                 else
                 {
+                    // find the 'house-mode' to switch to using 'switch_to_mode_id'
                     s_house_modes_t *new_house_mode = ezlopi_core_modes_get_house_mode_by_id(ez_mode->switch_to_mode_id);
-
                     if (new_house_mode)
                     {
                         TRACE_I("switching-to-mode: %s (id: %u)", new_house_mode->name, new_house_mode->_id);
-
                         ez_mode->current_mode_id = ez_mode->switch_to_mode_id;
                         ez_mode->switch_to_mode_id = 0;
 
-                        ezlopi_core_modes_set_current_house_mode(new_house_mode);
-
-                        if (new_house_mode->cj_bypass_devices)
+                        // set the new 'house-mode' as the active 'custom-mode'
+                        if (EZPI_SUCCESS == ezlopi_core_modes_set_current_house_mode(new_house_mode))
                         {
-                            cJSON_Delete(__FUNCTION__, new_house_mode->cj_bypass_devices);
-                            new_house_mode->cj_bypass_devices = NULL;
+                            // assign 'delayToSwitch'
+                            ez_mode->time_is_left_to_switch_sec = ez_mode->switch_to_delay_sec = new_house_mode->switch_to_delay_sec;
+
+                            // assign 'alarm_delay' mode.
+                            ez_mode->time_left_to_alarm_sec = ez_mode->alarm_delay_sec = new_house_mode->alarm_delay_sec;
+
+                            if (new_house_mode->cj_bypass_devices)
+                            {
+                                cJSON_Delete(__FUNCTION__, new_house_mode->cj_bypass_devices);
+                                new_house_mode->cj_bypass_devices = NULL;
+                            }
+
+                            ezlopi_core_modes_store_to_nvs();
+
+                            cJSON *cj_update = ezlopi_core_modes_cjson_changed();
+                            CJSON_TRACE("----------------- broadcasting - cj_update", cj_update);
+
+                            if (0 != ezlopi_core_broadcast_add_to_queue(cj_update))
+                            {
+                                cJSON_Delete(__FUNCTION__, cj_update);
+                            }
                         }
+                    }
+                }
+            }
 
-                        ezlopi_core_modes_store_to_nvs();
+            if (ez_mode->alarmed && 0 < ez_mode->alarm_delay_sec)
+            {
+                if (ez_mode->time_left_to_alarm_sec)
+                {
+                    ez_mode->time_left_to_alarm_sec--;
+                    TRACE_D("time_is_left_to_ALARM_sec: %u", ez_mode->time_left_to_alarm_sec);
 
-                        cJSON *cj_update = ezlopi_core_modes_cjson_changed();
-                        CJSON_TRACE("----------------- broadcasting - cj_update", cj_update);
+                }
+                else    // broadcast --> 'alarmed state activation'
+                {
 
-                        if (0 != ezlopi_core_broadcast_add_to_queue(cj_update))
-                        {
-                            cJSON_Delete(__FUNCTION__, cj_update);
-                        }
+                    ezlopi_core_modes_store_to_nvs();
+
+                    cJSON *cj_update = ezlopi_core_modes_cjson_changed();
+                    CJSON_TRACE("----------------- broadcasting - cj_update", cj_update);
+
+                    if (0 != ezlopi_core_broadcast_add_to_queue(cj_update))
+                    {
+                        cJSON_Delete(__FUNCTION__, cj_update);
                     }
                 }
             }

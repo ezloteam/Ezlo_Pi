@@ -61,8 +61,12 @@ void ezlopi_cloud_modes_switch(cJSON *cj_request, cJSON *cj_response)
         if (house_mode)
         {
             ezlopi_core_modes_api_switch_mode(house_mode);
-            cJSON_AddNumberToObject(__FUNCTION__, cj_result, ezlopi_switchToDelay_str, house_mode->switch_to_delay_sec);
-            cJSON_AddNumberToObject(__FUNCTION__, cj_result, ezlopi_alarmDelay_str, house_mode->alarm_delay_sec);
+            s_ezlopi_modes_t *custom_mode = ezlopi_core_modes_get_custom_modes();
+            if (custom_mode)
+            {
+                cJSON_AddNumberToObject(__FUNCTION__, cj_result, ezlopi_switchToDelay_str, custom_mode->switch_to_delay_sec);
+                cJSON_AddNumberToObject(__FUNCTION__, cj_result, ezlopi_alarmDelay_str, custom_mode->alarm_delay_sec);
+            }
         }
     }
 }

@@ -266,6 +266,7 @@ extern const char *ezlopi_modeId_str;
 extern const char *ezlopi_current_str;
 extern const char *ezlopi_switchTo_str;
 extern const char *ezlopi_timeIsLeftToSwitch_str;
+extern const char *ezlopi_timeIsLeftToAlarm_str;
 extern const char *ezlopi_switchToDelay_str;
 extern const char *ezlopi_alarmDelay_str;
 extern const char *ezlopi_entryDelay_str;

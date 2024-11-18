@@ -50,16 +50,16 @@ typedef enum e_modes_alarm_status
     EZLOPI_MODES_ALARM_STATUS_CANCELED
 } e_modes_alarm_status_t;
 
-typedef struct s_house_modes
+typedef struct s_house_modes    // this resembles a category of 'mode'.
 {
     uint32_t _id;
-    uint32_t alarm_delay_sec;     // #warning "Removed in 'hub.modes.get(v3.0)'";
-    uint32_t switch_to_delay_sec; // #warning "Removed in 'hub.modes.get(v3.0)'";
+    uint32_t switch_to_delay_sec;    // represent a delay before switching to a perticular 'mode'.
+    uint32_t alarm_delay_sec;       // delay before activating 'alarm-state' .
 
     const char *name;
     char *description;
 
-    bool armed;
+    bool armed; // flag to indicate if the mode enters the alarmed mode.
     bool protect;
     bool disarmed_default;
 
@@ -124,19 +124,20 @@ typedef struct s_ezlopi_modes
     uint32_t current_mode_id;
     uint32_t switch_to_mode_id;
 
-    uint32_t alarm_delay_sec;     //"Removed in 'hub.modes.get(v3.0)'";
-    uint32_t switch_to_delay_sec; //"Removed in 'hub.modes.get(v3.0)'";
-    uint32_t time_is_left_to_switch_sec;
+    uint32_t time_is_left_to_switch_sec;  //  (switch_to_delay_sec - N_sec) //Time left (sec) after start to switch to the mode
+    uint32_t switch_to_delay_sec; // Delay (sec) before switch to the all modes // this holds a copy to actual 'SwitchDelay' of active 'houseMode'
+    uint32_t alarm_delay_sec;     // Delay (sec) before going to alarm state   // this holds a copy to actual 'alarm_delay' of active 'houseMode'
+    uint32_t time_is_left_to_alarm_sec; //  (alarm_delay_sec - N_sec) // Time left to alarm
 
-    cJSON *cj_alarms;
-    cJSON *cj_cameras;
-    cJSON *cj_devices;
+    cJSON *cj_alarms;               // Array of device id which make alarms after trips
+    cJSON *cj_cameras;              // Array of camera device identifiers with items named make_recording
+    cJSON *cj_devices;              // Array of device id with security sensors
     s_protect_buttons_t *l_protect_buttons;
 
     s_entry_delay_t entry_delay; // A dictionary for Entry Delays values
     s_abort_window_t abort_delay;
 
-    s_alarmed_t alarmed; // Information about the alarmed state. Present only if the house modes enter the alarmed state.
+    s_alarmed_t alarmed; //Present only if the house modes enter the alarmed state.
 
     s_house_modes_t mode_home;
     s_house_modes_t mode_away;
@@ -161,6 +162,7 @@ ezlopi_error_t ezlopi_core_modes_api_get_current_mode(cJSON *cj_result);
 ezlopi_error_t ezlopi_core_modes_api_switch_mode(s_house_modes_t *switch_to_house_mode);
 ezlopi_error_t ezlopi_core_modes_api_cancel_switch(void);
 ezlopi_error_t ezlopi_core_modes_api_cancel_entry_delay(void);
+ezlopi_error_t ezlopi_core_modes_api_skip_entry_delay(void);
 ezlopi_error_t ezlopi_core_modes_set_switch_to_delay(uint32_t switch_to_delay);
 ezlopi_error_t ezlopi_core_modes_set_alarm_delay(uint32_t switch_to_delay);
 ezlopi_error_t ezlopi_core_modes_set_protect(uint32_t mode_id, bool protect_state);

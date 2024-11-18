@@ -263,6 +263,7 @@ const char *ezlopi_modeId_str = "modeId";
 const char *ezlopi_current_str = "current";
 const char *ezlopi_switchTo_str = "switchTo";
 const char *ezlopi_timeIsLeftToSwitch_str = "timeIsLeftToSwitch";
+const char *ezlopi_timeIsLeftToAlarm_str = "timeIsLeftToAlarm";
 const char *ezlopi_switchToDelay_str = "switchToDelay";
 const char *ezlopi_alarmDelay_str = "alarmDelay";
 const char *ezlopi_entryDelay_str = "entryDelay";
