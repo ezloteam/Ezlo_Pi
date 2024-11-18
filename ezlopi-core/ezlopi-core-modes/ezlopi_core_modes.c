@@ -245,6 +245,7 @@ ezlopi_error_t ezlopi_core_modes_add_alarm_off(uint8_t mode_id, cJSON *device_id
                     ret = EZPI_SUCCESS;
                 }
             }
+            targe_house_mode->disarmed_default = false;
         }
         ezlopi_service_modes_start(5000);
     }
@@ -280,6 +281,7 @@ ezlopi_error_t ezlopi_core_modes_remove_alarm_off(uint32_t mode_id, cJSON *devic
             {
                 ret = EZPI_SUCCESS;
             }
+            targe_house_mode->disarmed_default = false;
         }
         ezlopi_service_modes_start(5000);
     }
