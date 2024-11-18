@@ -185,31 +185,20 @@ ezlopi_error_t ezlopi_core_modes_set_notifications(uint8_t modesId, bool all, cJ
         if (mode_to_upate)
         {
             mode_to_upate->notify_all = all;
-            cJSON *add_element = NULL;
-            cJSON_ArrayForEach(add_element, user_id_aray)
+
+            // Delete previous cj_notification
+            if (NULL != mode_to_upate->cj_notifications)
             {
-                cJSON *element_to_check = NULL;
-                bool add_to_array = true;
-                cJSON_ArrayForEach(element_to_check, mode_to_upate->cj_notifications)
-                {
-                    if (EZPI_STRNCMP_IF_EQUAL(add_element->valuestring,
-                                              element_to_check->valuestring,
-                                              add_element->str_value_len,
-                                              element_to_check->str_value_len))
-                    {
-                        add_to_array = false;
-                        break;
-                    }
-                }
-                if (add_to_array)
-                {
-                    if (NULL == mode_to_upate->cj_notifications)
-                    {
-                        mode_to_upate->cj_notifications = cJSON_CreateArray(__FUNCTION__);
-                    }
-                    cJSON_AddItemToArray(mode_to_upate->cj_notifications, cJSON_CreateString(__FUNCTION__, add_element->valuestring));
-                }
+                cJSON_Delete(__func__, mode_to_upate->cj_notifications);
             }
+
+            // Refreshing the notification list.
+            mode_to_upate->cj_notifications = cJSON_CreateArray(__FUNCTION__);
+            if (mode_to_upate->cj_notifications)
+            {
+                mode_to_upate->cj_notifications = cJSON_Duplicate(__FUNCTION__, user_id_aray, cJSON_True);
+            }
+
             mode_to_upate->disarmed_default = false;
             ezlopi_core_modes_store_to_nvs();
 
