@@ -210,12 +210,21 @@ s_ezlopi_modes_t *ezlopi_core_modes_cjson_parse_modes(cJSON *cj_modes)
                     }
                 }
 
+                {
+                    cJSON *cj_bypass_devices = cJSON_GetObjectItem(__FUNCTION__, cj_house_mod, ezlopi_bypassDevices_str);
+                    if (cj_bypass_devices)
+                    {
+                        cur_house_mode->cj_bypass_devices = cJSON_Duplicate(__FUNCTION__, cj_bypass_devices, cJSON_True);
+                    }
+                }
+
                 CJSON_GET_VALUE_BOOL(cj_house_mod, ezlopi_protect_str, cur_house_mode->protect);
                 CJSON_GET_VALUE_BOOL(cj_house_mod, ezlopi_armed_str, cur_house_mode->armed);
                 // CJSON_TRACE("cur_house_mode->cj_notifications", cur_house_mode->cj_notifications);
                 // CJSON_TRACE("cur_house_mode->cj_disarmed_devices", cur_house_mode->cj_disarmed_devices);
                 // CJSON_TRACE("cur_house_mode->cj_alarms_off_devices", cur_house_mode->cj_alarms_off_devices);
                 // CJSON_TRACE("cur_house_mode->cj_cameras_off_devices", cur_house_mode->cj_cameras_off_devices);
+                // CJSON_TRACE("cur_house_mode->cj_bypass_devices", cur_house_mode->cj_bypass_devices);
 
                 // mode_idx++;
             }
@@ -427,6 +436,7 @@ static void __cjson_add_mode_to_array(cJSON *cj_modes_arr, s_house_modes_t *hous
             __cjson_duplicate_add_reference(cj_house_mode, ezlopi_notifications_str, house_mode->cj_notifications);
             __cjson_duplicate_add_reference(cj_house_mode, ezlopi_alarmsOffDevices_str, house_mode->cj_alarms_off_devices);
             __cjson_duplicate_add_reference(cj_house_mode, ezlopi_camerasOffDevices_str, house_mode->cj_cameras_off_devices);
+            __cjson_duplicate_add_reference(cj_house_mode, ezlopi_bypassDevices_str, house_mode->cj_bypass_devices);
 
             if (!cJSON_AddItemToArray(cj_modes_arr, cj_house_mode))
             {

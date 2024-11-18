@@ -286,6 +286,77 @@ ezlopi_error_t ezlopi_core_modes_remove_alarm_off(uint32_t mode_id, cJSON *devic
     return ret;
 }
 
+ezlopi_error_t ezlopi_core_modes_bypass_device_add(uint8_t modeId, cJSON* cj_device_id_array)
+{
+    ezlopi_error_t ret = EZPI_ERR_MODES_FAILED;
+    if ((EZLOPI_HOUSE_MODE_REF_ID_NONE < modeId) && (EZLOPI_HOUSE_MODE_REF_ID_MAX > modeId) && cj_device_id_array && (cJSON_Array == cj_device_id_array->type))
+    {
+        ezlopi_service_modes_stop(5000);
+        s_house_modes_t* mode_to_update = ezlopi_core_modes_get_house_mode_by_id(modeId);
+        if (mode_to_update)
+        {
+            cJSON* bypass_dev_to_add = NULL;
+            cJSON_ArrayForEach(bypass_dev_to_add, cj_device_id_array)
+            {
+                cJSON* element_to_check = NULL;
+                bool add_to_array = true;
+                cJSON_ArrayForEach(element_to_check, mode_to_update->cj_bypass_devices)
+                {
+                    if (EZPI_STRNCMP_IF_EQUAL(bypass_dev_to_add->valuestring, element_to_check->valuestring, bypass_dev_to_add->str_value_len, element_to_check->str_value_len))
+                    {
+                        add_to_array = false;
+                        break;
+                    }
+                }
+                if (add_to_array)
+                {
+                    if (NULL == mode_to_update->cj_bypass_devices)
+                    {
+                        mode_to_update->cj_bypass_devices = cJSON_CreateArray(__func__);
+                    }
+                    cJSON_AddItemToArray(mode_to_update->cj_bypass_devices, cJSON_CreateString(__func__, bypass_dev_to_add->valuestring));
+                }
+            }
+            ezlopi_core_modes_store_to_nvs();
+            ret = EZPI_SUCCESS;
+        }
+        ezlopi_service_modes_start(5000);
+    }
+    return ret;
+}
+
+ezlopi_error_t ezlopi_core_modes_bypass_device_remove(uint8_t modeId, cJSON* cj_device_id_array)
+{
+    ezlopi_error_t ret = 0;
+    if ((EZLOPI_HOUSE_MODE_REF_ID_NONE < modeId) && (EZLOPI_HOUSE_MODE_REF_ID_MAX > modeId) && cj_device_id_array && (cJSON_Array == cj_device_id_array->type))
+    {
+        ezlopi_service_modes_stop(5000);
+        s_house_modes_t* mode_to_update = ezlopi_core_modes_get_house_mode_by_id(modeId);
+        if (mode_to_update)
+        {
+            cJSON* bypass_dev_to_remove = NULL;
+            cJSON_ArrayForEach(bypass_dev_to_remove, cj_device_id_array)
+            {
+                cJSON* element_to_check = NULL;
+                int array_index = 0;
+                cJSON_ArrayForEach(element_to_check, mode_to_update->cj_bypass_devices)
+                {
+                    if (EZPI_STRNCMP_IF_EQUAL(bypass_dev_to_remove->valuestring, element_to_check->valuestring, bypass_dev_to_remove->str_value_len, element_to_check->str_value_len))
+                    {
+                        cJSON_DeleteItemFromArray(__func__, mode_to_update->cj_bypass_devices, array_index);
+                        break;
+                    }
+                    array_index++;
+                }
+            }
+            ezlopi_core_modes_store_to_nvs();
+            ret = 1;
+        }
+        ezlopi_service_modes_start(5000);
+    }
+    return ret;
+}
+
 ezlopi_error_t ezlopi_core_modes_set_protect(uint32_t mode_id, bool protect_state)
 {
     ezlopi_error_t ret = EZPI_ERR_MODES_FAILED;

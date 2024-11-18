@@ -60,16 +60,16 @@ void ezlopi_cloud_modes_alarmed(cJSON *cj_request, cJSON *cj_response)
                 // CJSON_ASSIGN_ID(cj_result, "0000", ezlopi_deviceId_str);
                 CJSON_ASSIGN_ID(cj_result, curr_mode->time_is_left_to_switch_sec, "pendingDelay");
 
-                (EZLOPI_MODES_ALARM_PHASE_IDLE == curr_mode->alarmed.phase)         ? cJSON_AddStringToObject(__FUNCTION__, cj_result, "phase", "idle")
-                : (EZLOPI_MODES_ALARM_PHASE_BYPASS == curr_mode->alarmed.phase)     ? cJSON_AddStringToObject(__FUNCTION__, cj_result, "phase", "bypass")
-                : (EZLOPI_MODES_ALARM_PHASE_ENTRYDELAY == curr_mode->alarmed.phase) ? cJSON_AddStringToObject(__FUNCTION__, cj_result, "phase", "entryDelay")
-                : (EZLOPI_MODES_ALARM_PHASE_MAIN == curr_mode->alarmed.phase)       ? cJSON_AddStringToObject(__FUNCTION__, cj_result, "phase", "main")
-                                                                                    : cJSON_AddStringToObject(__FUNCTION__, cj_result, "phase", "");
+                (EZLOPI_MODES_ALARM_PHASE_IDLE == curr_mode->alarmed.phase) ? cJSON_AddStringToObject(__FUNCTION__, cj_result, "phase", "idle")
+                    : (EZLOPI_MODES_ALARM_PHASE_BYPASS == curr_mode->alarmed.phase) ? cJSON_AddStringToObject(__FUNCTION__, cj_result, "phase", "bypass")
+                    : (EZLOPI_MODES_ALARM_PHASE_ENTRYDELAY == curr_mode->alarmed.phase) ? cJSON_AddStringToObject(__FUNCTION__, cj_result, "phase", "entryDelay")
+                    : (EZLOPI_MODES_ALARM_PHASE_MAIN == curr_mode->alarmed.phase) ? cJSON_AddStringToObject(__FUNCTION__, cj_result, "phase", "main")
+                    : cJSON_AddStringToObject(__FUNCTION__, cj_result, "phase", "");
 
-                (EZLOPI_MODES_ALARM_STATUS_DONE == curr_mode->alarmed.status)       ? cJSON_AddStringToObject(__FUNCTION__, cj_result, "status", "done")
-                : (EZLOPI_MODES_ALARM_STATUS_BEGIN == curr_mode->alarmed.status)    ? cJSON_AddStringToObject(__FUNCTION__, cj_result, "status", "begin")
-                : (EZLOPI_MODES_ALARM_STATUS_CANCELED == curr_mode->alarmed.status) ? cJSON_AddStringToObject(__FUNCTION__, cj_result, "status", "canceled")
-                                                                                    : cJSON_AddStringToObject(__FUNCTION__, cj_result, "status", "");
+                (EZLOPI_MODES_ALARM_STATUS_DONE == curr_mode->alarmed.status) ? cJSON_AddStringToObject(__FUNCTION__, cj_result, "status", "done")
+                    : (EZLOPI_MODES_ALARM_STATUS_BEGIN == curr_mode->alarmed.status) ? cJSON_AddStringToObject(__FUNCTION__, cj_result, "status", "begin")
+                    : (EZLOPI_MODES_ALARM_STATUS_CANCELED == curr_mode->alarmed.status) ? cJSON_AddStringToObject(__FUNCTION__, cj_result, "status", "canceled")
+                    : cJSON_AddStringToObject(__FUNCTION__, cj_result, "status", "");
 
                 cJSON_AddNumberToObject(__FUNCTION__, cj_result, ezlopi_timestamp_str, EZPI_CORE_sntp_get_current_time_ms());
                 cJSON_AddBoolToObject(__FUNCTION__, cj_result, "silent", curr_mode->alarmed.silent);
@@ -218,12 +218,32 @@ void ezlopi_cloud_modes_cameras_off_removed(cJSON *cj_request, cJSON *cj_respons
 
 void ezlopi_cloud_modes_bypass_devices_added(cJSON *cj_request, cJSON *cj_response)
 {
-    cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+    cJSON_AddStringToObject(__func__, cj_response, ezlopi__id_str, ezlopi_ui_broadcast_str);
+    cJSON_AddStringToObject(__func__, cj_response, ezlopi_msg_subclass_str, "hub.modes.bypass_devices.added");
+    cJSON* cj_params = cJSON_GetObjectItem(__func__, cj_request, ezlopi_params_str);
+    if (cj_params)
+    {
+        cJSON* cj_result = cJSON_Duplicate(__func__, cj_params, true);
+        if (cj_result)
+        {
+            cJSON_AddItemToObject(__func__, cj_response, ezlopi_result_str, cj_result);
+        }
+    }
 }
 
 void ezlopi_cloud_modes_bypass_devices_removed(cJSON *cj_request, cJSON *cj_response)
 {
-    cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+    cJSON_AddStringToObject(__func__, cj_response, ezlopi__id_str, ezlopi_ui_broadcast_str);
+    cJSON_AddStringToObject(__func__, cj_response, ezlopi_msg_subclass_str, "hub.modes.bypass_devices.removed");
+    cJSON* cj_params = cJSON_GetObjectItem(__func__, cj_request, ezlopi_params_str);
+    if (cj_params)
+    {
+        cJSON* cj_result = cJSON_Duplicate(__func__, cj_params, true);
+        if (cj_result)
+        {
+            cJSON_AddItemToObject(__func__, cj_response, ezlopi_result_str, cj_result);
+        }
+    }
 }
 
 void ezlopi_cloud_modes_changed(cJSON *cj_request, cJSON *cj_response)
@@ -243,7 +263,7 @@ void ezlopi_cloud_modes_changed(cJSON *cj_request, cJSON *cj_response)
             cJSON *cj_mode_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_modeId_str); // broadcast modes-info of 'updated_house_mode'
             if (cj_mode_id && cj_mode_id->valuestring)
             {
-                s_house_modes_t *update_house_mode = ezlopi_core_modes_get_house_mode_by_id(strtoul(cj_mode_id->valuestring, NULL, 16)); // get the 'running' house mode, indicated by outer struct 'ezlopi_mode_t'
+                s_house_modes_t *update_house_mode = ezlopi_core_modes_get_house_mode_by_id(strtoul(cj_mode_id->valuestring, NULL, 16)); // get the 'running' house mode, indicated by 'ezlopi_mode_t'
                 if (update_house_mode)
                 {
                     CJSON_ASSIGN_ID(cj_result, update_house_mode->_id, ezlopi_modeId_str);
