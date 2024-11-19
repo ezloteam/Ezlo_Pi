@@ -11,8 +11,10 @@
 #include "esp_idf_version.h"
 #include "esp_netif_ip_addr.h"
 
+#ifndef CONFIG_IDF_TARGET_ESP32
 #include "tinyusb.h"
 #include "tusb_cdc_acm.h"
+#endif // NOT defined CONFIG_IDF_TARGET_ESP32
 
 #include "ezlopi_util_trace.h"
 #include "ezlopi_util_version.h"
@@ -58,14 +60,14 @@
 #define RXD_PIN (GPIO_NUM_44)
 #endif
 
-#ifdef CONFIG_EZPI_ENABLE_UART_PROVISIONING
 static uint8_t __uart_data[EZPI_SERV_UART_RX_BUFFER_SIZE];
-#elif CONFIG_EZPI_ENABLE_CDC_PROVISIONING
+
+#ifndef CONFIG_IDF_TARGET_ESP32
 static uint8_t usb_rx_buffer[CONFIG_TINYUSB_CDC_RX_BUFSIZE - 1];
 static size_t rx_buffer_pointer = 0;
 static int cdc_port = TINYUSB_CDC_ACM_0;
 static SemaphoreHandle_t usb_semaphore_handle = NULL;
-#endif //  CONFIG_EZPI_ENABLE_CDC_PROVISIONING
+#endif // NOT defined CONFIG_IDF_TARGET_ESP32
 
 static void ezlopi_service_uart_get_info();
 static void ezlopi_service_uart_set_wifi(const char *data);
@@ -451,7 +453,7 @@ static int ezlopi_service_uart_parser(const char *data)
     return 1;
 }
 
-#ifdef CONFIG_EZPI_ENABLE_UART_PROVISIONING
+// #ifdef CONFIG_EZPI_ENABLE_UART_PROVISIONING
 static void __uart_loop(void *arg)
 {
     uint32_t cur_len = 0;
@@ -473,7 +475,7 @@ static void __uart_loop(void *arg)
         }
     }
 }
-#endif // CONFIG_EZPI_ENABLE_UART_PROVISIONING
+// #endif // CONFIG_EZPI_ENABLE_UART_PROVISIONING
 
 #if 0
 static void ezlopi_service_uart_task(void* arg)
@@ -994,10 +996,9 @@ static void ezlopi_service_uart_get_config(void)
 int EZPI_SERV_uart_tx_data(int len, uint8_t *data)
 {
     int ret = 0;
-#ifdef CONFIG_EZPI_ENABLE_UART_PROVISIONING
     ret = uart_write_bytes(EZPI_SERV_UART_NUM_DEFAULT, (void *)data, len);
     ret += uart_write_bytes(EZPI_SERV_UART_NUM_DEFAULT, "\r\n", 2);
-#elif CONFIG_EZPI_ENABLE_CDC_PROVISIONING
+#ifndef CONFIG_IDF_TARGET_ESP32
     if (pdTRUE == xSemaphoreTake(usb_semaphore_handle, portMAX_DELAY))
     {
         tinyusb_cdcacm_write_queue(cdc_port, (uint8_t *)data, len);
@@ -1005,11 +1006,11 @@ int EZPI_SERV_uart_tx_data(int len, uint8_t *data)
         ret = tinyusb_cdcacm_write_flush(cdc_port, 0);
         xSemaphoreGive(usb_semaphore_handle);
     }
-#endif // CONFIG_EZPI_ENABLE_UART_PROVISIONING
+#endif // NOT defined CONFIG_IDF_TARGET_ESP32
     return ret;
 }
 
-#ifdef CONFIG_EZPI_ENABLE_CDC_PROVISIONING
+#ifndef CONFIG_IDF_TARGET_ESP32
 static void tinyusb_cdc_rx_callback(int itf, cdcacm_event_t *event)
 {
     if (CDC_EVENT_RX == event->type)
@@ -1024,7 +1025,7 @@ static void tinyusb_cdc_rx_callback(int itf, cdcacm_event_t *event)
             {
                 TRACE_E("Error reading cdc data");
             }
-            else if(rx_size > 9)
+            else if (rx_size > 9)
             {
                 memcpy((void *)usb_rx_buffer + rx_buffer_pointer, temporary_buffer, rx_size);
                 rx_buffer_pointer += rx_size;
@@ -1077,9 +1078,8 @@ void EZPI_SERV_cdc_init()
         TRACE_I("USB CDC initialization completed successfully.");
     }
 }
-#endif // CONFIG_EZPI_ENABLE_CDC_PROVISIONING
+#endif // NOT defined CONFIG_IDF_TARGET_ESP32
 
-#ifdef CONFIG_EZPI_ENABLE_UART_PROVISIONING
 void EZPI_SERV_uart_init(void)
 {
     ezlopi_service_loop_add("uart-loop", __uart_loop, 1, NULL);
@@ -1089,4 +1089,3 @@ void EZPI_SERV_uart_init(void)
     ezlopi_core_process_set_process_info(ENUM___uart_loop, &__uart_loop_handle, __uart_loop_DEPTH);
 #endif
 }
-#endif // CONFIG_EZPI_ENABLE_UART_PROVISIONING
