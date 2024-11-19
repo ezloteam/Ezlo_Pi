@@ -90,7 +90,7 @@ static void __modes_loop(void *arg)
 
                         ezlopi_core_modes_set_current_house_mode(new_house_mode);
 
-                        if (new_house_mode->cj_bypass_devices)
+                        if (new_house_mode->cj_bypass_devices)// After the transition, bypass devices list is cleared for the previous house mode.
                         {
                             cJSON_Delete(__FUNCTION__, new_house_mode->cj_bypass_devices);
                             new_house_mode->cj_bypass_devices = NULL;

@@ -339,13 +339,13 @@ static cJSON *__add_scenes_blocks_by_item_ids(e_scenes_block_type_v2_t block_typ
 
 static cJSON *__add_scenes_blocks_by_device_ids(e_scenes_block_type_v2_t block_type, cJSON *cj_devices_array)
 {
-    int device_id_idx = 0;
+    // int device_id_idx = 0;
     cJSON *cj_device_id = NULL;
     cJSON *cj_block_array = NULL;
 
     CJSON_TRACE("device array", cj_devices_array);
-
-    while (NULL != (cj_device_id = cJSON_GetArrayItem(cj_devices_array, device_id_idx++)))
+    // while (NULL != (cj_device_id = cJSON_GetArrayItem(cj_devices_array, device_id_idx++)))
+    cJSON_ArrayForEach(cj_device_id, cj_devices_array)
     {
         TRACE_D("device-id: %s", cj_device_id->valuestring ? cj_device_id->valuestring : ezlopi__str);
         if (cj_device_id->valuestring)

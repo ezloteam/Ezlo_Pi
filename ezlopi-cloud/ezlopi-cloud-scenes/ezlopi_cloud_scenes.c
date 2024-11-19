@@ -281,7 +281,8 @@ void scenes_notification_remove(cJSON *cj_request, cJSON *cj_response)
                     {
                         uint32_t idx = 0;
                         cJSON *cj_user_id = NULL;
-                        while (NULL != (cj_user_id = cJSON_GetArrayItem(cj_user_notifications, idx)))
+                        // while (NULL != (cj_user_id = cJSON_GetArrayItem(cj_user_notifications, idx)))
+                        cJSON_ArrayForEach(cj_user_id, cj_user_notifications)
                         {
                             if (0 == strcmp(cj_user_id->valuestring, cj_user_id_del->valuestring))
                             {
@@ -386,8 +387,6 @@ void scenes_time_list(cJSON *cj_request, cJSON *cj_response)
         ezlopi_core_scenes_get_time_list(cJSON_AddArrayToObject(__FUNCTION__, cj_result, "timeScenes"));
     }
 }
-
-
 
 void scenes_house_modes_set(cJSON *cj_request, cJSON *cj_response)
 {
