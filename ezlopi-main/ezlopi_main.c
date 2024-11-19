@@ -70,6 +70,8 @@ void app_main(void)
 
 #ifdef CONFIG_EZPI_ENABLE_UART_PROVISIONING
     EZPI_SERV_uart_init();
+#elif CONFIG_EZPI_ENABLE_CDC_PROVISIONING
+    EZPI_SERV_cdc_init();
 #endif
 
 #if defined(CONFIG_EZPI_BLE_ENABLE)
