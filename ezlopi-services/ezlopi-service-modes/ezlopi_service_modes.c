@@ -95,11 +95,11 @@ static void __modes_loop(void *arg)
                             // assign 'alarm_delay' mode.
                             ez_mode->time_left_to_alarm_sec = ez_mode->alarm_delay_sec = new_house_mode->alarm_delay_sec;
 
-                            if (new_house_mode->cj_bypass_devices)
-                            {
-                                cJSON_Delete(__FUNCTION__, new_house_mode->cj_bypass_devices);
-                                new_house_mode->cj_bypass_devices = NULL;
-                            }
+                        if (new_house_mode->cj_bypass_devices)// After the transition, bypass devices list is cleared for the previous house mode.
+                        {
+                            cJSON_Delete(__FUNCTION__, new_house_mode->cj_bypass_devices);
+                            new_house_mode->cj_bypass_devices = NULL;
+                        }
 
                             ezlopi_core_modes_store_to_nvs();
 

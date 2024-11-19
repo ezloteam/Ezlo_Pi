@@ -277,6 +277,7 @@ const char *ezlopi_disarmedDefault_str = "disarmedDefault";
 const char *ezlopi_disarmedDevices_str = "disarmedDevices";
 const char *ezlopi_alarmsOffDevices_str = "alarmsOffDevices";
 const char *ezlopi_camerasOffDevices_str = "camerasOffDevices";
+const char *ezlopi_bypassDevices_str = "bypassDevices";
 const char *ezlopi_protect_str = "protect";
 const char *ezlopi_devices_str = "devices";
 const char *ezlopi_alarms_str = "alarms";

@@ -280,6 +280,7 @@ extern const char *ezlopi_disarmedDefault_str;
 extern const char *ezlopi_disarmedDevices_str;
 extern const char *ezlopi_alarmsOffDevices_str;
 extern const char *ezlopi_camerasOffDevices_str;
+extern const char *ezlopi_bypassDevices_str;
 extern const char *ezlopi_protect_str;
 extern const char *ezlopi_devices_str;
 extern const char *ezlopi_alarms_str;

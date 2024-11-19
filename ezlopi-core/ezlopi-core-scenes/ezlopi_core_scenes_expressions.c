@@ -431,9 +431,10 @@ static int __evaluate_expression(cJSON *cj_des, cJSON *lua_prop_params, const ch
                 // 1. If 'device_item_names' is given
                 if (cj_device_item_names && cJSON_IsArray(cj_device_item_names))
                 {
-                    int idx = 0;
+                    // int idx = 0;
                     cJSON *cj_device_item = NULL;
-                    while (NULL != (cj_device_item = cJSON_GetArrayItem(cj_device_item_names, idx)))
+                    // while (NULL != (cj_device_item = cJSON_GetArrayItem(cj_device_item_names, idx)))
+                    cJSON_ArrayForEach(cj_device_item, cj_device_item_names)
                     {
                         // get the item id
                         cJSON *cj_target_name = cJSON_GetObjectItem(__FUNCTION__, cj_device_item, "name");
@@ -464,15 +465,16 @@ static int __evaluate_expression(cJSON *cj_des, cJSON *lua_prop_params, const ch
                                 curr_dev_node = curr_dev_node->next;
                             }
                         }
-                        idx++;
+                        // idx++;
                     }
                 }
                 // 2. If 'items' is given
                 if (cj_items && cJSON_IsArray(cj_items))
                 {
-                    int count = 0;
+                    // int count = 0;
                     cJSON *cj_item = NULL;
-                    while (NULL != (cj_item = cJSON_GetArrayItem(cj_items, count)))
+                    // while (NULL != (cj_item = cJSON_GetArrayItem(cj_items, count)))
+                    cJSON_ArrayForEach(cj_item, cj_items)
                     {
                         cJSON *cj_item_name = cJSON_GetObjectItem(__FUNCTION__, cj_item, ezlopi_name_str);
                         cJSON *cj_item_id = cJSON_GetObjectItem(__FUNCTION__, cj_item, ezlopi__id_str);
@@ -489,7 +491,7 @@ static int __evaluate_expression(cJSON *cj_des, cJSON *lua_prop_params, const ch
                                 // TRACE_D(" [items_%d] : adding '%s'.", total_key_count, cj_item_name->valuestring);
                             }
                         }
-                        count++;
+                        // count++;
                     }
                 }
                 // Set the 'params' table as a global variable
@@ -545,7 +547,7 @@ static int __evaluate_expression(cJSON *cj_des, cJSON *lua_prop_params, const ch
 }
 int ezlopi_scenes_expression_simple(cJSON *cj_des, const char *exp_name, const char *exp_code)
 {
-    return  __evaluate_expression(cj_des, NULL, exp_name, exp_code); // this is only for simple 
+    return __evaluate_expression(cj_des, NULL, exp_name, exp_code); // this is only for simple
 }
 void ezlopi_scenes_expressions_list_cjson(cJSON *cj_expresson_array, cJSON *cj_params)
 {
@@ -636,12 +638,13 @@ void ezlopi_scenes_expressions_list_cjson(cJSON *cj_expresson_array, cJSON *cj_p
                     //--------------------------- check for 'NAMES' condition --------------------------------
                     if (valid_append_flag)
                     {
-                        int idx = 0;
+                        // int idx = 0;
                         cJSON *cj_check_name = NULL;
                         cJSON *cj_names_list = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_names_str);
                         if (cj_names_list)
                         {
-                            while (NULL != (cj_check_name = cJSON_GetArrayItem(cj_names_list, idx)))
+                            // while (NULL != (cj_check_name = cJSON_GetArrayItem(cj_names_list, idx)))
+                            cJSON_ArrayForEach(cj_check_name, cj_names_list)
                             {
                                 if (EZPI_STRNCMP_IF_EQUAL(cj_check_name->valuestring, curr_exp->name, strlen(cj_check_name->valuestring), strlen(curr_exp->name)))
                                 {
@@ -652,7 +655,7 @@ void ezlopi_scenes_expressions_list_cjson(cJSON *cj_expresson_array, cJSON *cj_p
                                 {
                                     valid_append_flag = false;
                                 }
-                                idx++;
+                                // idx++;
                             }
                         }
                     }
@@ -972,10 +975,11 @@ ezlopi_error_t ezlopi_scenes_expressions_init(void)
         cJSON *cj_exp_id_list = cJSON_Parse(__FUNCTION__, exp_id_list_str);
         if (cj_exp_id_list)
         {
-            uint32_t exp_idx = 0;
+            // uint32_t exp_idx = 0;
             cJSON *cj_exp_id = NULL;
 
-            while (NULL != (cj_exp_id = cJSON_GetArrayItem(cj_exp_id_list, exp_idx++)))
+            // while (NULL != (cj_exp_id = cJSON_GetArrayItem(cj_exp_id_list, exp_idx++)))
+            cJSON_ArrayForEach(cj_exp_id, cj_exp_id_list)
             {
                 if (cj_exp_id->valuestring)
                 {
@@ -1031,12 +1035,13 @@ void __get_expressions_items(s_ezlopi_expressions_t *exp_node, cJSON *cj_items)
 {
     if (cj_items)
     {
-        uint32_t item_index = 0;
+        // uint32_t item_index = 0;
         cJSON *cj_item = NULL;
         s_exp_items_t *new_item_head = NULL;
         s_exp_items_t *curr_item_node = NULL;
 
-        while (NULL != (cj_item = cJSON_GetArrayItem(cj_items, item_index++)))
+        // while (NULL != (cj_item = cJSON_GetArrayItem(cj_items, item_index++)))
+        cJSON_ArrayForEach(cj_item, cj_items)
         {
             if (new_item_head)
             {
@@ -1090,12 +1095,13 @@ void __get_expressions_device_item_names(s_ezlopi_expressions_t *exp_node, cJSON
 {
     if (cj_device_item_names)
     {
-        uint32_t dev_item_name_index = 0;
+        // uint32_t dev_item_name_index = 0;
         cJSON *cj_dev_item_name = NULL;
         s_exp_device_item_names_t *new_device_item_names_head = NULL;
         s_exp_device_item_names_t *cur_device_item_names_head = NULL;
 
-        while (NULL != (cj_dev_item_name = cJSON_GetArrayItem(cj_device_item_names, dev_item_name_index++)))
+        // while (NULL != (cj_dev_item_name = cJSON_GetArrayItem(cj_device_item_names, dev_item_name_index++)))
+        cJSON_ArrayForEach(cj_dev_item_name, cj_device_item_names)
         {
             if (new_device_item_names_head)
             {
@@ -1354,7 +1360,8 @@ static e_scene_value_type_v2_t *__parse_expression_type_filter(cJSON *cj_params)
         {
             uint32_t idx = 0;
             cJSON *cj_type = NULL;
-            while (NULL != (cj_type = cJSON_GetArrayItem(cj_types_filter_array, idx)))
+            // while (NULL != (cj_type = cJSON_GetArrayItem(cj_types_filter_array, idx)))
+            cJSON_ArrayForEach(cj_type, cj_types_filter_array)
             {
                 type_filter_array[idx] = ezlopi_core_scenes_value_get_type(cj_type, NULL);
                 idx++;
@@ -1473,7 +1480,8 @@ static int __remove_exp_id_from_nvs_exp_list(uint32_t target_id)
 
             uint32_t idx = 0;
             cJSON *cj_exp_id = NULL;
-            while (NULL != (cj_exp_id = cJSON_GetArrayItem(cj_exp_ids, idx)))
+            // while (NULL != (cj_exp_id = cJSON_GetArrayItem(cj_exp_ids, idx)))
+            cJSON_ArrayForEach(cj_exp_id, cj_exp_ids)
             {
                 uint32_t _id = strtoul(cj_exp_id->valuestring, NULL, 16);
                 if (_id == target_id)

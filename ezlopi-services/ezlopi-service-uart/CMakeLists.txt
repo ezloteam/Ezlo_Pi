@@ -29,7 +29,7 @@ set(EZLOPI_SERVICE_COMPONENTS
 
 idf_component_register(SRCS "ezlopi_service_uart.c" "${src_files}"
     INCLUDE_DIRS "."
-    REQUIRES    ${EZLOPI_CORE_COMPONENTS} 
+    REQUIRES    tinyusb ${EZLOPI_CORE_COMPONENTS} 
                 ${EZLOPI_HAL_COMPONENTS}
                 ${EZLOPI_CLOUD_COMPONENTS} 
                 ${EZLOPI_SERVICE_COMPONENTS}

@@ -255,7 +255,7 @@ int ezlopi_scene_when_is_item_state_changed(l_scenes_list_v2_t *scene_node, void
                     s_ezlopi_expressions_t *curr_expr_left = ezlopi_scenes_get_expression_node_by_name(item_exp_field->field_value.u_value.value_string);
                     if (curr_expr_left)
                     {
-                        if (curr_expr_left->variable)  // 1. experssion is 'variable-type'
+                        if (curr_expr_left->variable) // 1. experssion is 'variable-type'
                         {
                             switch (curr_expr_left->value_type) // the main value type to consider when comparing
                             {
@@ -288,12 +288,12 @@ int ezlopi_scene_when_is_item_state_changed(l_scenes_list_v2_t *scene_node, void
                                 break;
                             }
                         }
-                        else    // 2. expression is 'expression-type'
+                        else // 2. expression is 'expression-type'
                         {
                             cJSON *cj_expr_des = cJSON_CreateObject(__FUNCTION__);
                             if (cj_expr_des && (0 < ezlopi_scenes_expression_simple(cj_expr_des, curr_expr_left->name, curr_expr_left->code)))
                             {
-                                cJSON * cj_value = cJSON_GetObjectItem(__FUNCTION__, cj_expr_des, "value");
+                                cJSON *cj_value = cJSON_GetObjectItem(__FUNCTION__, cj_expr_des, "value");
                                 if (cj_value)
                                 {
                                     switch (cj_value->type)
@@ -382,7 +382,6 @@ int ezlopi_scene_when_is_item_state_changed(l_scenes_list_v2_t *scene_node, void
 
                             cJSON_Delete(__FUNCTION__, cj_item_value);
                         }
-
                     }
                 }
 
@@ -392,7 +391,7 @@ int ezlopi_scene_when_is_item_state_changed(l_scenes_list_v2_t *scene_node, void
                     TRACE_S("Activating THEN-METHOD");
                 }
 
-                // remove malloc for 'extracted_data' 
+                // remove malloc for 'extracted_data'
                 if (VALUE_TYPE_STRING == new_extract_data->sample_data.e_type)
                 {
                     if (new_extract_data->sample_data.u_value.value_string)
@@ -408,13 +407,13 @@ int ezlopi_scene_when_is_item_state_changed(l_scenes_list_v2_t *scene_node, void
     return ret;
 }
 
-int ezlopi_scene_when_is_button_state(l_scenes_list_v2_t * scene_node, void *arg)
+int ezlopi_scene_when_is_button_state(l_scenes_list_v2_t *scene_node, void *arg)
 {
     TRACE_W("Warning: when-method 'is_button_state' not implemented!");
     return 0;
 }
 
-int ezlopi_scene_when_is_sun_state(l_scenes_list_v2_t * scene_node, void *arg)
+int ezlopi_scene_when_is_sun_state(l_scenes_list_v2_t *scene_node, void *arg)
 {
     // TRACE_W(" is_SunState ");
     int ret = 0;
@@ -465,7 +464,7 @@ int ezlopi_scene_when_is_sun_state(l_scenes_list_v2_t * scene_node, void *arg)
                 if (0 == strncmp(__issunstate_field[i].field_name, curr_field->name, strlen(__issunstate_field[i].field_name) + 1))
                 {
                     flag_check |= (__issunstate_field[i].field_func)(scene_node, curr_field, info, ((0 == i) ? 1 : (1 == i) ? 2
-                        : 0));
+                                                                                                                            : 0));
                     break;
                 }
             }
@@ -477,7 +476,7 @@ int ezlopi_scene_when_is_sun_state(l_scenes_list_v2_t * scene_node, void *arg)
     return ret;
 }
 
-int ezlopi_scene_when_is_date(l_scenes_list_v2_t * scene_node, void *arg)
+int ezlopi_scene_when_is_date(l_scenes_list_v2_t *scene_node, void *arg)
 {
     // TRACE_W(" isDate ");
     int ret = 0;
@@ -534,7 +533,7 @@ int ezlopi_scene_when_is_date(l_scenes_list_v2_t * scene_node, void *arg)
     return ret;
 }
 
-int ezlopi_scene_when_is_once(l_scenes_list_v2_t * scene_node, void *arg)
+int ezlopi_scene_when_is_once(l_scenes_list_v2_t *scene_node, void *arg)
 {
     // TRACE_W(" isOnce ");
     int ret = 0;
@@ -591,7 +590,7 @@ int ezlopi_scene_when_is_once(l_scenes_list_v2_t * scene_node, void *arg)
     return ret;
 }
 
-int ezlopi_scene_when_is_date_range(l_scenes_list_v2_t * scene_node, void *arg)
+int ezlopi_scene_when_is_date_range(l_scenes_list_v2_t *scene_node, void *arg)
 {
     // TRACE_W(" isDate_range ");
     int ret = 0;
@@ -654,7 +653,7 @@ int ezlopi_scene_when_is_date_range(l_scenes_list_v2_t * scene_node, void *arg)
             }
 
             // Check for time,day,month and year validity
-            uint8_t(*isdate_range_check_flags[])(struct tm *start, struct tm *end, struct tm *info) = {
+            uint8_t (*isdate_range_check_flags[])(struct tm *start, struct tm *end, struct tm *info) = {
                 isdate_range_check_tm,
                 isdate_range_check_day,
                 isdate_range_check_month,
@@ -673,14 +672,14 @@ int ezlopi_scene_when_is_date_range(l_scenes_list_v2_t * scene_node, void *arg)
     return ret;
 }
 
-int ezlopi_scene_when_is_user_lock_operation(l_scenes_list_v2_t * scene_node, void *arg)
+int ezlopi_scene_when_is_user_lock_operation(l_scenes_list_v2_t *scene_node, void *arg)
 {
     TRACE_W("Warning: when-method 'is_user_lock_operation' not implemented!");
     return 0;
 }
 
 #if defined(CONFIG_EZPI_SERV_ENABLE_MODES)
-int ezlopi_scene_when_is_house_mode_changed_to(l_scenes_list_v2_t * scene_node, void *arg)
+int ezlopi_scene_when_is_house_mode_changed_to(l_scenes_list_v2_t *scene_node, void *arg)
 {
     // TRACE_W(" isHouse_modechanged_to");
     int ret = 0;
@@ -716,10 +715,11 @@ int ezlopi_scene_when_is_house_mode_changed_to(l_scenes_list_v2_t * scene_node, 
             curr_field = curr_field->next;
         }
 
-        uint32_t idx = 0;
+        // uint32_t idx = 0;
         cJSON *cj_house_mdoe_id = NULL;
 
-        while (NULL != (cj_house_mdoe_id = cJSON_GetArrayItem(house_mode_id_array->field_value.u_value.cj_value, idx++)))
+        // while (NULL != (cj_house_mdoe_id = cJSON_GetArrayItem(house_mode_id_array->field_value.u_value.cj_value, idx++)))
+        cJSON_ArrayForEach(cj_house_mdoe_id, house_mode_id_array->field_value.u_value.cj_value)
         {
             if (cj_house_mdoe_id->valuestring)
             {
@@ -741,7 +741,7 @@ int ezlopi_scene_when_is_house_mode_changed_to(l_scenes_list_v2_t * scene_node, 
     return ret;
 }
 
-int ezlopi_scene_when_is_house_mode_changed_from(l_scenes_list_v2_t * scene_node, void *arg)
+int ezlopi_scene_when_is_house_mode_changed_from(l_scenes_list_v2_t *scene_node, void *arg)
 {
     // TRACE_W(" isHouse_mode_changed_from");
     int ret = 0;
@@ -776,10 +776,11 @@ int ezlopi_scene_when_is_house_mode_changed_from(l_scenes_list_v2_t * scene_node
             curr_field = curr_field->next;
         }
 
-        uint32_t idx = 0;
+        // uint32_t idx = 0;
         cJSON *cj_house_mode_id = NULL;
 
-        while (NULL != (cj_house_mode_id = cJSON_GetArrayItem(house_mode_id_array->field_value.u_value.cj_value, idx++)))
+        // while (NULL != (cj_house_mode_id = cJSON_GetArrayItem(house_mode_id_array->field_value.u_value.cj_value, idx++)))
+        cJSON_ArrayForEach(cj_house_mode_id, house_mode_id_array->field_value.u_value.cj_value)
         {
             if (cj_house_mode_id->valuestring)
             {
@@ -805,7 +806,7 @@ int ezlopi_scene_when_is_house_mode_changed_from(l_scenes_list_v2_t * scene_node
     return ret;
 }
 
-int ezlopi_scene_when_is_house_mode_alarm_phase_range(l_scenes_list_v2_t * scene_node, void *arg)
+int ezlopi_scene_when_is_house_mode_alarm_phase_range(l_scenes_list_v2_t *scene_node, void *arg)
 {
     // TRACE_W(" is_House_Mode_Alarm_Phase_Range ");
     int ret = 0;
@@ -836,11 +837,11 @@ int ezlopi_scene_when_is_house_mode_alarm_phase_range(l_scenes_list_v2_t * scene
                 {
                     s_ezlopi_modes_t *curr_mode = ezlopi_core_modes_get_custom_modes();
 
-                    phase_name = (EZLOPI_MODES_ALARM_PHASE_IDLE == curr_mode->alarmed.phase) ? "idle"
-                        : (EZLOPI_MODES_ALARM_PHASE_BYPASS == curr_mode->alarmed.phase) ? "bypass"
-                        : (EZLOPI_MODES_ALARM_PHASE_ENTRYDELAY == curr_mode->alarmed.phase) ? "entryDelay"
-                        : (EZLOPI_MODES_ALARM_PHASE_MAIN == curr_mode->alarmed.phase) ? "main"
-                        : "null";
+                    phase_name = (EZLOPI_MODES_ALARM_PHASE_IDLE == curr_mode->alarmed.phase)         ? "idle"
+                                 : (EZLOPI_MODES_ALARM_PHASE_BYPASS == curr_mode->alarmed.phase)     ? "bypass"
+                                 : (EZLOPI_MODES_ALARM_PHASE_ENTRYDELAY == curr_mode->alarmed.phase) ? "entryDelay"
+                                 : (EZLOPI_MODES_ALARM_PHASE_MAIN == curr_mode->alarmed.phase)       ? "main"
+                                                                                                     : "null";
 
                     // TRACE_D(" req_mode : %s vs mode : %s ", curr_field->field_value.u_value.value_string, phase_name);
                     if (EZPI_STRNCMP_IF_EQUAL(curr_field->field_value.u_value.value_string, phase_name, strlen(curr_field->field_value.u_value.value_string), strlen(phase_name)))
@@ -855,7 +856,7 @@ int ezlopi_scene_when_is_house_mode_alarm_phase_range(l_scenes_list_v2_t * scene
     return ret;
 }
 
-int ezlopi_scene_when_is_house_mode_switch_to_range(l_scenes_list_v2_t * scene_node, void *arg)
+int ezlopi_scene_when_is_house_mode_switch_to_range(l_scenes_list_v2_t *scene_node, void *arg)
 {
     TRACE_W(" is_House_Mode_Switch_to_Range ");
     int ret = 0;
@@ -892,7 +893,7 @@ int ezlopi_scene_when_is_house_mode_switch_to_range(l_scenes_list_v2_t * scene_n
 }
 #endif // CONFIG_EZPI_SERV_ENABLE_MODES
 
-int ezlopi_scene_when_is_device_state(l_scenes_list_v2_t * scene_node, void *arg)
+int ezlopi_scene_when_is_device_state(l_scenes_list_v2_t *scene_node, void *arg)
 {
     // TRACE_W(" isDevice_state. ");
     int ret = 0;
@@ -958,7 +959,7 @@ int ezlopi_scene_when_is_device_state(l_scenes_list_v2_t * scene_node, void *arg
                 s_ezlopi_cloud_controller_t *controller_info = ezlopi_device_get_controller_information();
                 if (controller_info)
                 {
-                    #warning "we need to change from 'controller' to 'device_id' specific";
+#warning "we need to change from 'controller' to 'device_id' specific";
                     ret = ((value_armed == controller_info->armed) ? 1 : 0) && ((value_reachable == controller_info->service_notification) ? 1 : 0);
                 }
             }
@@ -968,9 +969,10 @@ int ezlopi_scene_when_is_device_state(l_scenes_list_v2_t * scene_node, void *arg
             l_ezlopi_device_grp_t *curr_devgrp = ezlopi_core_device_group_get_by_id(device_group_id);
             if (curr_devgrp)
             {
-                int idx = 0;
+                // int idx = 0;
                 cJSON *cj_device = NULL;
-                while (NULL != (cj_device = cJSON_GetArrayItem(curr_devgrp->devices, idx))) // ["102ec000" , "102ec001" ,..]
+                // while (NULL != (cj_device = cJSON_GetArrayItem(curr_devgrp->devices, idx))) // ["102ec000" , "102ec001" ,..]
+                cJSON_ArrayForEach(cj_device, curr_devgrp->devices)
                 {
                     uint32_t curr_devce_id = strtoul(cj_device->valuestring, NULL, 16);
                     l_ezlopi_device_t *curr_device = ezlopi_device_get_by_id(curr_devce_id); // immediately goto "102ec000" ...
@@ -980,7 +982,7 @@ int ezlopi_scene_when_is_device_state(l_scenes_list_v2_t * scene_node, void *arg
                         s_ezlopi_cloud_controller_t *controller_info = ezlopi_device_get_controller_information();
                         if (controller_info)
                         {
-                            #warning "we need to change from 'controller' to 'device_id' specific";
+#warning "we need to change from 'controller' to 'device_id' specific";
                             ret = ((value_armed == controller_info->armed) ? 1 : 0) && ((value_reachable == controller_info->service_notification) ? 1 : 0);
                         }
                     }
@@ -989,7 +991,7 @@ int ezlopi_scene_when_is_device_state(l_scenes_list_v2_t * scene_node, void *arg
                     {
                         ret = 0;
                     }
-                    idx++;
+                    // idx++;
                 }
             }
         }
@@ -998,13 +1000,13 @@ int ezlopi_scene_when_is_device_state(l_scenes_list_v2_t * scene_node, void *arg
     return ret;
 }
 
-int ezlopi_scene_when_is_network_state(l_scenes_list_v2_t * scene_node, void *arg)
+int ezlopi_scene_when_is_network_state(l_scenes_list_v2_t *scene_node, void *arg)
 {
     TRACE_W("Warning: when-method 'is_network_state' not implemented!");
     return 0;
 }
 
-int ezlopi_scene_when_is_scene_state(l_scenes_list_v2_t * scene_node, void *arg)
+int ezlopi_scene_when_is_scene_state(l_scenes_list_v2_t *scene_node, void *arg)
 {
     // TRACE_W(" isScene_state ");
     int ret = 0;
@@ -1079,7 +1081,7 @@ int ezlopi_scene_when_is_scene_state(l_scenes_list_v2_t * scene_node, void *arg)
                     {
                         ret = (EZLOPI_SCENE_STATUS_STOPPED == curr_scene->status) ? 1 : 0;
                     }
-                    #warning "need to add 'FAILED' status for scene";
+#warning "need to add 'FAILED' status for scene";
                     // else if (EZPI_STRNCMP_IF_EQUAL("failed", tmp_str, 7,strlen(tmp_str)))
                     // {
                     //     ret = (false == curr_scene->enabled)? 1:0;
@@ -1095,7 +1097,7 @@ int ezlopi_scene_when_is_scene_state(l_scenes_list_v2_t * scene_node, void *arg)
     return ret;
 }
 
-int ezlopi_scene_when_is_group_state(l_scenes_list_v2_t * scene_node, void *arg)
+int ezlopi_scene_when_is_group_state(l_scenes_list_v2_t *scene_node, void *arg)
 {
     // TRACE_W("Warning: when-method 'is_group_state' not implemented!");
     int ret = 0;
@@ -1178,7 +1180,7 @@ int ezlopi_scene_when_is_group_state(l_scenes_list_v2_t * scene_node, void *arg)
     return ret;
 }
 
-int ezlopi_scene_when_is_cloud_state(l_scenes_list_v2_t * scene_node, void *arg)
+int ezlopi_scene_when_is_cloud_state(l_scenes_list_v2_t *scene_node, void *arg)
 {
     int ret = 0;
     l_when_block_v2_t *when_block = (l_when_block_v2_t *)arg;
@@ -1225,19 +1227,19 @@ int ezlopi_scene_when_is_cloud_state(l_scenes_list_v2_t * scene_node, void *arg)
     return ret;
 }
 
-int ezlopi_scene_when_is_battery_state(l_scenes_list_v2_t * scene_node, void *arg)
+int ezlopi_scene_when_is_battery_state(l_scenes_list_v2_t *scene_node, void *arg)
 {
     TRACE_W("Warning: when-method 'is_battery_state' not implemented!");
     return 0;
 }
 
-int ezlopi_scene_when_is_battery_level(l_scenes_list_v2_t * scene_node, void *arg)
+int ezlopi_scene_when_is_battery_level(l_scenes_list_v2_t *scene_node, void *arg)
 {
     TRACE_W("Warning: when-method 'is_battery_level' not implemented!");
     return 0;
 }
 
-int ezlopi_scene_when_compare_numbers(l_scenes_list_v2_t * scene_node, void *arg)
+int ezlopi_scene_when_compare_numbers(l_scenes_list_v2_t *scene_node, void *arg)
 {
     // TRACE_W(" Compare_num ");
     int ret = 0;
@@ -1311,7 +1313,7 @@ int ezlopi_scene_when_compare_numbers(l_scenes_list_v2_t * scene_node, void *arg
     return ret;
 }
 
-int ezlopi_scene_when_compare_number_range(l_scenes_list_v2_t * scene_node, void *arg)
+int ezlopi_scene_when_compare_number_range(l_scenes_list_v2_t *scene_node, void *arg)
 {
     // TRACE_W(" Compare_num_range");
     int ret = 0;
@@ -1394,7 +1396,7 @@ int ezlopi_scene_when_compare_number_range(l_scenes_list_v2_t * scene_node, void
     return ret;
 }
 
-int ezlopi_scene_when_compare_strings(l_scenes_list_v2_t * scene_node, void *arg)
+int ezlopi_scene_when_compare_strings(l_scenes_list_v2_t *scene_node, void *arg)
 {
     // TRACE_W(" Compare_strings ");
     int ret = 0;
@@ -1471,7 +1473,7 @@ int ezlopi_scene_when_compare_strings(l_scenes_list_v2_t * scene_node, void *arg
     return ret;
 }
 
-int ezlopi_scene_when_string_operation(l_scenes_list_v2_t * scene_node, void *arg)
+int ezlopi_scene_when_string_operation(l_scenes_list_v2_t *scene_node, void *arg)
 {
     // TRACE_W(" Compare_string_op ");
     int ret = 0;
@@ -1554,7 +1556,7 @@ int ezlopi_scene_when_string_operation(l_scenes_list_v2_t * scene_node, void *ar
     return ret;
 }
 
-int ezlopi_scene_when_in_array(l_scenes_list_v2_t * scene_node, void *arg)
+int ezlopi_scene_when_in_array(l_scenes_list_v2_t *scene_node, void *arg)
 {
     // TRACE_W(" Compare_inArray ");
     int ret = 0;
@@ -1634,7 +1636,7 @@ int ezlopi_scene_when_in_array(l_scenes_list_v2_t * scene_node, void *arg)
     return ret;
 }
 
-int ezlopi_scene_when_compare_values(l_scenes_list_v2_t * scene_node, void *arg)
+int ezlopi_scene_when_compare_values(l_scenes_list_v2_t *scene_node, void *arg)
 {
     // TRACE_W(" Compare_values ");
     int ret = 0;
@@ -1725,7 +1727,7 @@ int ezlopi_scene_when_compare_values(l_scenes_list_v2_t * scene_node, void *arg)
     return ret;
 }
 
-int ezlopi_scene_when_has_atleast_one_dictionary_value(l_scenes_list_v2_t * scene_node, void *arg)
+int ezlopi_scene_when_has_atleast_one_dictionary_value(l_scenes_list_v2_t *scene_node, void *arg)
 {
     // TRACE_W(" atleast_one_diction_val ");
     int ret = 0;
@@ -1776,7 +1778,7 @@ int ezlopi_scene_when_has_atleast_one_dictionary_value(l_scenes_list_v2_t * scen
     return ret;
 }
 
-int ezlopi_scene_when_is_firmware_update_state(l_scenes_list_v2_t * scene_node, void *arg)
+int ezlopi_scene_when_is_firmware_update_state(l_scenes_list_v2_t *scene_node, void *arg)
 {
     // TRACE_W(" firmware_update ");
     int ret = 0;
@@ -1833,7 +1835,7 @@ int ezlopi_scene_when_is_firmware_update_state(l_scenes_list_v2_t * scene_node, 
     return ret;
 }
 
-int ezlopi_scene_when_is_dictionary_changed(l_scenes_list_v2_t * scene_node, void *arg)
+int ezlopi_scene_when_is_dictionary_changed(l_scenes_list_v2_t *scene_node, void *arg)
 {
     // TRACE_W(" isDictionary_changed ");
     int ret = 0;
@@ -1891,13 +1893,13 @@ int ezlopi_scene_when_is_dictionary_changed(l_scenes_list_v2_t * scene_node, voi
     return ret;
 }
 
-int ezlopi_scene_when_is_detected_in_hot_zone(l_scenes_list_v2_t * scene_node, void *arg)
+int ezlopi_scene_when_is_detected_in_hot_zone(l_scenes_list_v2_t *scene_node, void *arg)
 {
     TRACE_W("Warning: when-method 'is_detected_in_hot_zone' not implemented!");
     return 0;
 }
 
-int ezlopi_scene_when_and(l_scenes_list_v2_t * scene_node, void *arg)
+int ezlopi_scene_when_and(l_scenes_list_v2_t *scene_node, void *arg)
 {
     int ret = 0;
     l_when_block_v2_t *when_block = (l_when_block_v2_t *)arg;
@@ -1923,7 +1925,7 @@ int ezlopi_scene_when_and(l_scenes_list_v2_t * scene_node, void *arg)
     return ret;
 }
 
-int ezlopi_scene_when_not(l_scenes_list_v2_t * scene_node, void *arg)
+int ezlopi_scene_when_not(l_scenes_list_v2_t *scene_node, void *arg)
 {
     int ret = 0;
     l_when_block_v2_t *when_block = (l_when_block_v2_t *)arg;
@@ -1943,7 +1945,7 @@ int ezlopi_scene_when_not(l_scenes_list_v2_t * scene_node, void *arg)
     return ret;
 }
 
-int ezlopi_scene_when_or(l_scenes_list_v2_t * scene_node, void *arg)
+int ezlopi_scene_when_or(l_scenes_list_v2_t *scene_node, void *arg)
 {
     int ret = 0;
     l_when_block_v2_t *when_block = (l_when_block_v2_t *)arg;
@@ -1968,7 +1970,7 @@ int ezlopi_scene_when_or(l_scenes_list_v2_t * scene_node, void *arg)
     return ret;
 }
 
-int ezlopi_scene_when_xor(l_scenes_list_v2_t * scene_node, void *arg)
+int ezlopi_scene_when_xor(l_scenes_list_v2_t *scene_node, void *arg)
 {
     int ret = 0;
     l_when_block_v2_t *when_block = (l_when_block_v2_t *)arg;
@@ -1991,7 +1993,7 @@ int ezlopi_scene_when_xor(l_scenes_list_v2_t * scene_node, void *arg)
     return ret;
 }
 
-int ezlopi_scene_when_function(l_scenes_list_v2_t * scene_node, void *arg)
+int ezlopi_scene_when_function(l_scenes_list_v2_t *scene_node, void *arg)
 {
     int ret = 0;
     l_when_block_v2_t *when_block = (l_when_block_v2_t *)arg;
@@ -2054,7 +2056,7 @@ int ezlopi_scene_when_function(l_scenes_list_v2_t * scene_node, void *arg)
     return ret;
 }
 
-int ezlopi_scene_when_is_device_item_group(l_scenes_list_v2_t * scene_node, void *arg)
+int ezlopi_scene_when_is_device_item_group(l_scenes_list_v2_t *scene_node, void *arg)
 {
     // TRACE_W(" is_item_state ");
     int ret = 0;
