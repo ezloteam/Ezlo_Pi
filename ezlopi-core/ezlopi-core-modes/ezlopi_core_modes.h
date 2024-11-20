@@ -50,21 +50,21 @@ typedef enum e_modes_alarm_status
     EZLOPI_MODES_ALARM_STATUS_CANCELED
 } e_modes_alarm_status_t;
 
-typedef struct s_house_modes    // this resembles a category of 'mode'.
+typedef struct s_house_modes // this resembles a category of 'mode'.
 {
-    uint32_t _id;
-    uint32_t switch_to_delay_sec;    // represent a delay before switching to a perticular 'mode'.
-    uint32_t alarm_delay_sec;       // delay before activating 'alarm-state' .
+    uint32_t _id;                 // Numeric representation of the 'House-Mode'
+    uint32_t switch_to_delay_sec; // represent a delay before switching to a perticular 'mode'.
+    uint32_t alarm_delay_sec;     // delay before activating 'alarm-state' .
 
     const char *name;
     char *description;
 
-    bool armed; // flag to indicate if the mode enters the alarmed mode.
-    bool protect;
-    bool disarmed_default; // if true ; utilize
-    bool notify_all;
+    bool armed;            // flag to indicate if the mode enters the alarmed mode. // Default values: [Home: false], [Away: true], [Night: true], [Vacation: true]
+    bool protect;          // Enables or disables Ezlo Protect for a particular house mode. // Default values: [Home: false], [Away: true], [Night: true], [Vacation: true]
+    bool disarmed_default; // if true ; utilize the disarmed devices.
+    bool notify_all;       // This Flag indicates, notifiations trigger to all user_IDs
 
-    cJSON *cj_notifications;
+    cJSON *cj_notifications; // Specific list of user_IDs to notify
     cJSON *cj_bypass_devices;
     cJSON *cj_disarmed_devices;    // NOTE: BY default contains -> 'alarm and camera devices' ; So besides these, other devices have to be added mannually
     cJSON *cj_alarms_off_devices;  // (auto add alarm-type devices) // these devices are auto added to 'cj_disarmed_devices'
@@ -125,20 +125,20 @@ typedef struct s_ezlopi_modes
     uint32_t current_mode_id;
     uint32_t switch_to_mode_id;
 
-    uint32_t time_is_left_to_switch_sec;  //  (switch_to_delay_sec - N_sec) //Time left (sec) after start to switch to the mode
-    uint32_t switch_to_delay_sec; // Delay (sec) before switch to the all modes // this holds a copy to actual 'SwitchDelay' of active 'houseMode'
-    uint32_t alarm_delay_sec;     // Delay (sec) before going to alarm state   // this holds a copy to actual 'alarm_delay' of active 'houseMode'
-    uint32_t time_is_left_to_alarm_sec; //  (alarm_delay_sec - N_sec) // Time left to alarm
+    uint32_t time_is_left_to_switch_sec; //  (switch_to_delay_sec - N_sec) //Time left (sec) after start to switch to the mode
+    uint32_t switch_to_delay_sec;        // Delay (sec) before switch to the all modes // this holds a copy to actual 'SwitchDelay' of active 'houseMode'
+    uint32_t alarm_delay_sec;            // Delay (sec) before going to alarm state    // this holds a copy to actual 'alarm_delay' of active 'houseMode'
+    uint32_t time_is_left_to_alarm_sec;  //  (alarm_delay_sec - N_sec) // Time left to alarm
 
-    cJSON *cj_alarms;               // Array of device id which make alarms after trips
-    cJSON *cj_cameras;              // Array of camera device identifiers with items named make_recording
-    cJSON *cj_devices;              // Array of device id with security sensors
+    cJSON *cj_alarms;  // Array of device id which make alarms after trips
+    cJSON *cj_cameras; // Array of camera device identifiers with items named make_recording
+    cJSON *cj_devices; // Array of device id with security sensors
     s_protect_buttons_t *l_protect_buttons;
 
     s_entry_delay_t entry_delay; // A dictionary for Entry Delays values
     s_abort_window_t abort_delay;
 
-    s_alarmed_t alarmed; //Present only if the house modes enter the alarmed state.
+    s_alarmed_t alarmed; // NOTE :: Present only if the house modes enter the alarmed state. [ie. must have 'alarm_delay_sec' value stored above.]
 
     s_house_modes_t mode_home;
     s_house_modes_t mode_away;
@@ -176,8 +176,8 @@ ezlopi_error_t ezlopi_core_modes_set_protect(uint32_t mode_id, bool protect_stat
 ezlopi_error_t ezlopi_core_modes_add_alarm_off(uint8_t mode_id, cJSON *device_id);
 ezlopi_error_t ezlopi_core_modes_remove_alarm_off(uint32_t mode_id, cJSON *device_id);
 
-ezlopi_error_t ezlopi_core_modes_bypass_device_add(uint8_t modeId, cJSON* cj_device_id_array);
-ezlopi_error_t ezlopi_core_modes_bypass_device_remove(uint8_t modeId, cJSON* cj_device_id_array);
+ezlopi_error_t ezlopi_core_modes_bypass_device_add(uint8_t modeId, cJSON *cj_device_id_array);
+ezlopi_error_t ezlopi_core_modes_bypass_device_remove(uint8_t modeId, cJSON *cj_device_id_array);
 
 ezlopi_error_t ezlopi_core_modes_cjson_get_current_mode(cJSON *cj_result);
 ezlopi_error_t ezlopi_core_modes_set_entry_delay(uint32_t normal_sec, uint32_t extended_sec, uint32_t long_extended_sec, uint32_t instant_sec);

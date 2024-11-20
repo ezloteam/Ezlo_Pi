@@ -62,6 +62,104 @@ void ezlopi_service_modes_init(void)
     ezlopi_service_modes_start(5000);
 }
 
+static ezlopi_error_t __check_mode_switch_condition(s_ezlopi_modes_t *ez_mode)
+{
+    ezlopi_error_t ret = EZPI_ERR_MODES_FAILED;
+
+    if (ez_mode->switch_to_mode_id)
+    {
+        if (ez_mode->time_is_left_to_switch_sec)
+        {
+            ez_mode->time_is_left_to_switch_sec--;
+            TRACE_D("time_is_left_to_SWITCH_sec: %u", ez_mode->time_is_left_to_switch_sec);
+        }
+        else
+        {
+            // find the 'house-mode', to switch to using 'switch_to_mode_id'.
+            s_house_modes_t *new_house_mode = ezlopi_core_modes_get_house_mode_by_id(ez_mode->switch_to_mode_id);
+            if (new_house_mode)
+            {
+                TRACE_I("switching-to-mode: %s (id: %u)", new_house_mode->name, new_house_mode->_id);
+                ez_mode->current_mode_id = ez_mode->switch_to_mode_id;
+                ez_mode->switch_to_mode_id = 0;
+
+                // set the new 'house-mode' as the active 'custom-mode'
+                if (EZPI_SUCCESS == ezlopi_core_modes_set_current_house_mode(new_house_mode))
+                {
+                    // 1. assign 'delayToSwitch'
+                    ez_mode->time_is_left_to_switch_sec = ez_mode->switch_to_delay_sec = new_house_mode->switch_to_delay_sec;
+
+                    // 2. assign 'alarm_delay' mode ; if {alarm_delay} exists.
+                    if (new_house_mode->armed)
+                    {
+                        ez_mode->time_is_left_to_alarm_sec = ez_mode->alarm_delay_sec = new_house_mode->alarm_delay_sec;
+                    }
+
+                    // After the transition, bypass devices list is cleared for the previous house mode.
+                    if (new_house_mode->cj_bypass_devices)
+                    {
+                        cJSON_Delete(__FUNCTION__, new_house_mode->cj_bypass_devices);
+                        new_house_mode->cj_bypass_devices = NULL;
+                    }
+
+                    ezlopi_core_modes_store_to_nvs();
+
+                    cJSON *cj_update = ezlopi_core_modes_cjson_changed();
+                    CJSON_TRACE("----------------- broadcasting - cj_update", cj_update);
+
+                    if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(cj_update))
+                    {
+                        cJSON_Delete(__FUNCTION__, cj_update);
+                    }
+
+                    ret = EZPI_SUCCESS;
+                }
+            }
+        }
+    }
+
+    return ret;
+}
+
+static ezlopi_error_t __check_mode_alarm_trigger(s_ezlopi_modes_t *ez_mode)
+{
+    ezlopi_error_t ret = EZPI_ERR_MODES_FAILED;
+
+    // 1. determine mode phase
+    if (0 < ez_mode->time_is_left_to_alarm_sec)
+    {
+        ez_mode->time_is_left_to_alarm_sec--;
+        TRACE_D("time_is_left_to_ALARM_sec: %u", ez_mode->time_is_left_to_alarm_sec);
+    }
+    else // broadcast --> 'alarmed state activation'
+    {
+        ezlopi_core_modes_store_to_nvs();
+
+        // cJSON *cj_update = ezlopi_core_modes_cjson_changed();
+        // CJSON_TRACE("----------------- broadcasting - cj_update", cj_update);
+
+        // if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(cj_update))
+        // {
+        //     cJSON_Delete(__FUNCTION__, cj_update);
+        // }
+
+        // refresh the 'alarmDelay_sec'
+        ez_mode->time_is_left_to_alarm_sec = ez_mode->alarm_delay_sec;
+
+        ret = EZPI_SUCCESS;
+    }
+
+    // broadcast according to phase and status
+    cJSON *cj_update = ezlopi_core_modes_cjson_changed();
+    CJSON_TRACE("----------------- broadcasting - cj_update", cj_update);
+
+    if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(cj_update))
+    {
+        cJSON_Delete(__FUNCTION__, cj_update);
+    }
+
+    return ret;
+}
 static void __modes_loop(void *arg)
 {
     if (pdTRUE == xSemaphoreTake(sg_modes_loop_smphr, 1000 / portTICK_PERIOD_MS))
@@ -69,73 +167,17 @@ static void __modes_loop(void *arg)
         s_ezlopi_modes_t *ez_mode = ezlopi_core_modes_get_custom_modes();
         if (ez_mode)
         {
-            if (ez_mode->switch_to_mode_id)
+            // 1. check if the mode is to be switched.
+            if (EZPI_SUCCESS == __check_mode_switch_condition(ez_mode))
             {
-                if (ez_mode->time_is_left_to_switch_sec)
-                {
-                    ez_mode->time_is_left_to_switch_sec--;
-                    TRACE_D("time_is_left_to_SWITCH_sec: %u", ez_mode->time_is_left_to_switch_sec);
-                }
-                else
-                {
-                    // find the 'house-mode' to switch to using 'switch_to_mode_id'
-                    s_house_modes_t *new_house_mode = ezlopi_core_modes_get_house_mode_by_id(ez_mode->switch_to_mode_id);
-                    if (new_house_mode)
-                    {
-                        TRACE_I("switching-to-mode: %s (id: %u)", new_house_mode->name, new_house_mode->_id);
-                        ez_mode->current_mode_id = ez_mode->switch_to_mode_id;
-                        ez_mode->switch_to_mode_id = 0;
-
-                        // set the new 'house-mode' as the active 'custom-mode'
-                        if (EZPI_SUCCESS == ezlopi_core_modes_set_current_house_mode(new_house_mode))
-                        {
-                            // assign 'delayToSwitch'
-                            ez_mode->time_is_left_to_switch_sec = ez_mode->switch_to_delay_sec = new_house_mode->switch_to_delay_sec;
-
-                            // assign 'alarm_delay' mode.
-                            ez_mode->time_left_to_alarm_sec = ez_mode->alarm_delay_sec = new_house_mode->alarm_delay_sec;
-
-                        if (new_house_mode->cj_bypass_devices)// After the transition, bypass devices list is cleared for the previous house mode.
-                        {
-                            cJSON_Delete(__FUNCTION__, new_house_mode->cj_bypass_devices);
-                            new_house_mode->cj_bypass_devices = NULL;
-                        }
-
-                            ezlopi_core_modes_store_to_nvs();
-
-                            cJSON *cj_update = ezlopi_core_modes_cjson_changed();
-                            CJSON_TRACE("----------------- broadcasting - cj_update", cj_update);
-
-                            if (0 != ezlopi_core_broadcast_add_to_queue(cj_update))
-                            {
-                                cJSON_Delete(__FUNCTION__, cj_update);
-                            }
-                        }
-                    }
-                }
+                TRACE_D("Mode - Switch completed to [%d]", ez_mode->current_mode_id);
             }
 
-            if (ez_mode->alarmed && 0 < ez_mode->alarm_delay_sec)
+            // 2. check if the [mode->house_id]; have 'alarm_flag == true'
+            s_house_modes_t *curr_house_mode = ezlopi_core_modes_get_current_house_modes();
+            if (curr_house_mode && curr_house_mode->armed)
             {
-                if (ez_mode->time_left_to_alarm_sec)
-                {
-                    ez_mode->time_left_to_alarm_sec--;
-                    TRACE_D("time_is_left_to_ALARM_sec: %u", ez_mode->time_left_to_alarm_sec);
-
-                }
-                else    // broadcast --> 'alarmed state activation'
-                {
-
-                    ezlopi_core_modes_store_to_nvs();
-
-                    cJSON *cj_update = ezlopi_core_modes_cjson_changed();
-                    CJSON_TRACE("----------------- broadcasting - cj_update", cj_update);
-
-                    if (0 != ezlopi_core_broadcast_add_to_queue(cj_update))
-                    {
-                        cJSON_Delete(__FUNCTION__, cj_update);
-                    }
-                }
+                __check_mode_alarm_trigger(ez_mode);
             }
         }
 

@@ -111,7 +111,7 @@ s_ezlopi_modes_t *ezlopi_core_modes_cjson_parse_modes(cJSON *cj_modes)
             CJSON_GET_VALUE_DOUBLE(cj_entry_delay, ezlopi_extended_str, parsed_mode->entry_delay.extended_delay_sec);
             CJSON_GET_VALUE_DOUBLE(cj_entry_delay, ezlopi_instant_str, parsed_mode->entry_delay.instant_delay_sec);
         }
-        #warning "need to add abortWindow info";
+#warning "need to add abortWindow info";
 
         cJSON *cj_house_modes = cJSON_GetObjectItem(__FUNCTION__, cj_modes, ezlopi_modes_str);
         if (cj_house_modes)
@@ -300,6 +300,25 @@ s_ezlopi_modes_t *ezlopi_core_modes_cjson_parse_modes(cJSON *cj_modes)
                 CJSON_GET_VALUE_STRING_BY_COPY(cj_alarmed, ezlopi_type_str, parsed_mode->alarmed.type);
                 CJSON_GET_VALUE_BOOL(cj_alarmed, "silent", parsed_mode->alarmed.silent);
 
+                char tmp_str[32];
+                CJSON_GET_VALUE_STRING_BY_COPY(cj_alarmed, "phase", tmp_str);
+                {
+
+                    (EZPI_STRNCMP_IF_EQUAL("idle", tmp_str, 5, strlen(tmp_str)))         ? (parsed_mode->alarmed.phase = EZLOPI_MODES_ALARM_PHASE_IDLE)
+                    : (EZPI_STRNCMP_IF_EQUAL("bypass", tmp_str, 5, strlen(tmp_str)))     ? (parsed_mode->alarmed.phase = EZLOPI_MODES_ALARM_PHASE_BYPASS)
+                    : (EZPI_STRNCMP_IF_EQUAL("entryDelay", tmp_str, 5, strlen(tmp_str))) ? (parsed_mode->alarmed.phase = EZLOPI_MODES_ALARM_PHASE_ENTRYDELAY)
+                    : (EZPI_STRNCMP_IF_EQUAL("main", tmp_str, 5, strlen(tmp_str)))       ? (parsed_mode->alarmed.phase = EZLOPI_MODES_ALARM_PHASE_MAIN)
+                                                                                         : (parsed_mode->alarmed.phase = EZLOPI_MODES_ALARM_PHASE_IDLE);
+                }
+
+                CJSON_GET_VALUE_STRING_BY_COPY(cj_alarmed, "status", tmp_str);
+                {
+                    (EZPI_STRNCMP_IF_EQUAL("done", tmp_str, 5, strlen(tmp_str)))       ? (parsed_mode->alarmed.status = EZLOPI_MODES_ALARM_STATUS_DONE)
+                    : (EZPI_STRNCMP_IF_EQUAL("begin", tmp_str, 5, strlen(tmp_str)))    ? (parsed_mode->alarmed.status = EZLOPI_MODES_ALARM_STATUS_BEGIN)
+                    : (EZPI_STRNCMP_IF_EQUAL("canceled", tmp_str, 5, strlen(tmp_str))) ? (parsed_mode->alarmed.status = EZLOPI_MODES_ALARM_STATUS_CANCELED)
+                                                                                       : (parsed_mode->alarmed.status = EZLOPI_MODES_ALARM_STATUS_DONE);
+                }
+
                 cJSON *cj_sources_arr = cJSON_GetObjectItem(__FUNCTION__, cj_alarmed, ezlopi_sources_str);
                 if (cj_sources_arr)
                 {
@@ -476,6 +495,17 @@ static void __cjson_add_alarmed(cJSON *cj_alarmed, s_alarmed_t *alarmed)
         cJSON_AddNumberToObject(__FUNCTION__, cj_alarmed, ezlopi_timeIsLeft_str, alarmed->time_is_left_sec);
         cJSON_AddStringToObject(__FUNCTION__, cj_alarmed, ezlopi_type_str, alarmed->type);
         cJSON_AddBoolToObject(__FUNCTION__, cj_alarmed, "silent", alarmed->silent);
+
+        (EZLOPI_MODES_ALARM_PHASE_IDLE == alarmed->phase)         ? cJSON_AddStringToObject(__FUNCTION__, cj_alarmed, "phase", "idle")
+        : (EZLOPI_MODES_ALARM_PHASE_BYPASS == alarmed->phase)     ? cJSON_AddStringToObject(__FUNCTION__, cj_alarmed, "phase", "bypass")
+        : (EZLOPI_MODES_ALARM_PHASE_ENTRYDELAY == alarmed->phase) ? cJSON_AddStringToObject(__FUNCTION__, cj_alarmed, "phase", "entryDelay")
+        : (EZLOPI_MODES_ALARM_PHASE_MAIN == alarmed->phase)       ? cJSON_AddStringToObject(__FUNCTION__, cj_alarmed, "phase", "main")
+                                                                  : cJSON_AddStringToObject(__FUNCTION__, cj_alarmed, "phase", "");
+
+        (EZLOPI_MODES_ALARM_STATUS_DONE == alarmed->status)       ? cJSON_AddStringToObject(__FUNCTION__, cj_alarmed, "status", "done")
+        : (EZLOPI_MODES_ALARM_STATUS_BEGIN == alarmed->status)    ? cJSON_AddStringToObject(__FUNCTION__, cj_alarmed, "status", "begin")
+        : (EZLOPI_MODES_ALARM_STATUS_CANCELED == alarmed->status) ? cJSON_AddStringToObject(__FUNCTION__, cj_alarmed, "status", "canceled")
+                                                                  : cJSON_AddStringToObject(__FUNCTION__, cj_alarmed, "status", "");
 
         cJSON *cj_sources_arr = cJSON_AddArrayToObject(__FUNCTION__, cj_alarmed, ezlopi_sources_str);
         if (cj_sources_arr)

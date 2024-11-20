@@ -53,7 +53,6 @@ void ezlopi_cloud_modes_alarmed(cJSON *cj_request, cJSON *cj_response)
         s_ezlopi_modes_t *curr_mode = ezlopi_core_modes_get_custom_modes();
         if (curr_mode)
         {
-
             CJSON_ASSIGN_ID(cj_result, curr_mode->current_mode_id, ezlopi_modeId_str);
             // CJSON_ASSIGN_ID(cj_result, "0000", ezlopi_deviceId_str);
             CJSON_ASSIGN_ID(cj_result, curr_mode->time_is_left_to_switch_sec, "pendingDelay");
@@ -217,10 +216,10 @@ void ezlopi_cloud_modes_bypass_devices_added(cJSON *cj_request, cJSON *cj_respon
 {
     cJSON_AddStringToObject(__func__, cj_response, ezlopi__id_str, ezlopi_ui_broadcast_str);
     cJSON_AddStringToObject(__func__, cj_response, ezlopi_msg_subclass_str, "hub.modes.bypass_devices.added");
-    cJSON* cj_params = cJSON_GetObjectItem(__func__, cj_request, ezlopi_params_str);
+    cJSON *cj_params = cJSON_GetObjectItem(__func__, cj_request, ezlopi_params_str);
     if (cj_params)
     {
-        cJSON* cj_result = cJSON_Duplicate(__func__, cj_params, true);
+        cJSON *cj_result = cJSON_Duplicate(__func__, cj_params, true);
         if (cj_result)
         {
             cJSON_AddItemToObject(__func__, cj_response, ezlopi_result_str, cj_result);
@@ -232,10 +231,10 @@ void ezlopi_cloud_modes_bypass_devices_removed(cJSON *cj_request, cJSON *cj_resp
 {
     cJSON_AddStringToObject(__func__, cj_response, ezlopi__id_str, ezlopi_ui_broadcast_str);
     cJSON_AddStringToObject(__func__, cj_response, ezlopi_msg_subclass_str, "hub.modes.bypass_devices.removed");
-    cJSON* cj_params = cJSON_GetObjectItem(__func__, cj_request, ezlopi_params_str);
+    cJSON *cj_params = cJSON_GetObjectItem(__func__, cj_request, ezlopi_params_str);
     if (cj_params)
     {
-        cJSON* cj_result = cJSON_Duplicate(__func__, cj_params, true);
+        cJSON *cj_result = cJSON_Duplicate(__func__, cj_params, true);
         if (cj_result)
         {
             cJSON_AddItemToObject(__func__, cj_response, ezlopi_result_str, cj_result);
