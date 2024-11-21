@@ -341,5 +341,5 @@ extern const char *ezlopi_flow_control_str;
 
 extern const char *ezlopi_chipset_str;
 extern const char *ezlopi_internet_str;
-
+extern const char *ezlopi_local_key_str;
 #endif // __EZLOPI_CLOUD_KEYWORDS_H__

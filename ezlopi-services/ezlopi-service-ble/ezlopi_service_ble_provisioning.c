@@ -222,6 +222,7 @@ static void __provisioning_info_write_func(esp_gatt_value_t *value, esp_ble_gatt
                                         char provision_server[EZLOPI_FINFO_LEN_PROVISIONING_SERVER_URL];
                                         char cloud_server[EZLOPI_FINFO_LEN_CLOUD_SERVER_URL];
                                         char provision_toke[EZLOPI_FINFO_LEN_PROVISIONING_TOKEN];
+                                        char local_key[EZLOPI_FINFO_LEN_LOCAL_KEY];
                                         // char device_type[32];
 
                                         memset(device_name, 0, EZLOPI_FINFO_LEN_DEVICE_NAME);
@@ -234,6 +235,7 @@ static void __provisioning_info_write_func(esp_gatt_value_t *value, esp_ble_gatt
                                         memset(provision_server, 0, EZLOPI_FINFO_LEN_PROVISIONING_SERVER_URL);
                                         memset(cloud_server, 0, EZLOPI_FINFO_LEN_CLOUD_SERVER_URL);
                                         memset(provision_toke, 0, EZLOPI_FINFO_LEN_PROVISIONING_TOKEN);
+                                        memset(local_key, 0, EZLOPI_FINFO_LEN_LOCAL_KEY);
                                         // memset(device_type, 0, sizeof(device_type));
 
                                         CJSON_GET_VALUE_DOUBLE(cj_config, ezlopi_serial_str, ezlopi_config_basic->id);
@@ -249,6 +251,7 @@ static void __provisioning_info_write_func(esp_gatt_value_t *value, esp_ble_gatt
                                         CJSON_GET_VALUE_STRING_BY_COPY(cj_config, ezlopi_provision_server_str, provision_server);
                                         CJSON_GET_VALUE_STRING_BY_COPY(cj_config, ezlopi_cloud_server_str, cloud_server);
                                         CJSON_GET_VALUE_STRING_BY_COPY(cj_config, ezlopi_provision_token_str, provision_toke);
+                                        CJSON_GET_VALUE_STRING_BY_COPY(cj_config, ezlopi_local_key_str, local_key);
                                         // CJSON_GET_VALUE_STRING_BY_COPY(cj_config, ezlopi_device_type_ezlopi_str, device_type);
 
                                         ezlopi_config_basic->device_name = device_name;
@@ -261,6 +264,7 @@ static void __provisioning_info_write_func(esp_gatt_value_t *value, esp_ble_gatt
                                         ezlopi_config_basic->provision_server = provision_server;
                                         ezlopi_config_basic->cloud_server = cloud_server;
                                         ezlopi_config_basic->provision_token = provision_toke;
+                                        ezlopi_config_basic->local_key = local_key;
                                         ezlopi_config_basic->device_type = NULL;
 
                                         ezlopi_factory_info_v3_set_basic(ezlopi_config_basic);

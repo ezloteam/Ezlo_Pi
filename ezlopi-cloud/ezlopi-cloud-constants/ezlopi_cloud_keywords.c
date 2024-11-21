@@ -337,5 +337,6 @@ const char *ezlopi_frame_size_str = "frame_size";
 const char *ezlopi_flow_control_str = "flow_control";
 const char *ezlopi_chipset_str = "chipset";
 const char *ezlopi_internet_str = "internet";
+const char *ezlopi_local_key_str = "local_key";
 
 #endif // __EZLOPI_CLOUD_KEYWORDS_H__
