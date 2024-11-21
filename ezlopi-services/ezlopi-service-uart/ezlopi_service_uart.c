@@ -453,7 +453,7 @@ static int ezlopi_service_uart_parser(const char *data)
     return 1;
 }
 
-// #ifdef CONFIG_EZPI_ENABLE_UART_PROVISIONING
+#if 0
 static void __uart_loop(void *arg)
 {
     uint32_t cur_len = 0;
@@ -475,15 +475,14 @@ static void __uart_loop(void *arg)
         }
     }
 }
-// #endif // CONFIG_EZPI_ENABLE_UART_PROVISIONING
+#endif
 
-#if 0
-static void ezlopi_service_uart_task(void* arg)
+static void ezlopi_service_uart_task(void *arg)
 {
-    static const char* RX_TASK_TAG = "RX_TASK";
+    static const char *RX_TASK_TAG = "RX_TASK";
     esp_log_level_set(RX_TASK_TAG, ESP_LOG_INFO);
 
-    uint8_t* data = (uint8_t*)ezlopi_malloc(__FUNCTION__, EZPI_SERV_UART_RX_BUFFER_SIZE);
+    uint8_t *data = (uint8_t *)ezlopi_malloc(__FUNCTION__, EZPI_SERV_UART_RX_BUFFER_SIZE);
     memset(data, 0, EZPI_SERV_UART_RX_BUFFER_SIZE);
 
     while (1)
@@ -494,7 +493,7 @@ static void ezlopi_service_uart_task(void* arg)
         {
             data[rxBytes] = 0;
             TRACE_I("%s", data);
-            ezlopi_service_uart_parser((const char*)data);
+            ezlopi_service_uart_parser((const char *)data);
         }
     }
 
@@ -502,7 +501,6 @@ static void ezlopi_service_uart_task(void* arg)
     ezlopi_core_process_set_is_deleted(ENUM___uart_loop);
     vTaskDelete(NULL);
 }
-#endif
 
 static int ezlopi_service_uart_firmware_info(cJSON *parent)
 {
@@ -1082,10 +1080,10 @@ void EZPI_SERV_cdc_init()
 
 void EZPI_SERV_uart_init(void)
 {
-    ezlopi_service_loop_add("uart-loop", __uart_loop, 1, NULL);
-#if 0
+    // ezlopi_service_loop_add("uart-loop", __uart_loop, 1, NULL);
+#if 1
     TaskHandle_t __uart_loop_handle = NULL;
-    xTaskCreate(__uart_loop, "serv_uart_task", __uart_loop_DEPTH, NULL, configMAX_PRIORITIES, &__uart_loop_handle);
-    ezlopi_core_process_set_process_info(ENUM___uart_loop, &__uart_loop_handle, __uart_loop_DEPTH);
+    xTaskCreate(ezlopi_service_uart_task, "serv_uart_task", EZLOPI_SERVICE_UART_TASK_DEPTH, NULL, configMAX_PRIORITIES - 4, &__uart_loop_handle);
+    ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_UART_TASK, &__uart_loop_handle, EZLOPI_SERVICE_UART_TASK_DEPTH);
 #endif
 }
