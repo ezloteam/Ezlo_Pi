@@ -59,7 +59,27 @@ static void ezlopi_replace_newline_escape(char *str)
     str[j] = '\0';
 }
 
-bool ezlopi_check_uuid_validity(const char *uuid)
+static ezlopi_error_t ezlopi_check_string_validity(const char *str)
+{
+    ezlopi_error_t ret = EZPI_SUCCESS;
+    if (str == NULL)
+    {
+        return EZPI_FAILED;
+    }
+
+    while (*str)
+    {
+        if (!isprint(*str))
+        {
+            ret = EZPI_FAILED;
+            break;
+        }
+        str++;
+    }
+    return ret;
+}
+
+static bool ezlopi_check_uuid_validity(const char *uuid)
 {
     if (strlen(uuid) != 36)
     {
@@ -84,6 +104,39 @@ bool ezlopi_check_uuid_validity(const char *uuid)
     }
 
     return true; // UUID is valid
+}
+
+static bool ezlopi_check_mac_validity(const char *mac)
+{
+    if (mac == NULL)
+    {
+        return false; // Invalid if the pointer is NULL
+    }
+
+    if (strlen(mac) != 17)
+    {
+        return false; // A valid MAC address is exactly 17 characters long
+    }
+
+    for (int i = 0; i < 17; i++)
+    {
+        if (i % 3 == 2)
+        {
+            if (mac[i] != ':')
+            {
+                return false; // Every 3rd character (2, 5, 8, 11, 14) must be a colon
+            }
+        }
+        else
+        {
+            if (!isxdigit(mac[i]))
+            {
+                return false; // The other characters must be hexadecimal digits
+            }
+        }
+    }
+
+    return true; // MAC address is valid
 }
 
 static int ezlopi_factory_info_v3_set_4kb(const char *data, uint32_t offset, uint32_t len)
@@ -315,7 +368,7 @@ char *ezlopi_factory_info_v3_get_name(void)
     char *read_data = ezlopi_factory_info_v3_read_string(__FUNCTION__, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_DEVICE_NAME, E_EZLOPI_FACTORY_INFO_HUB_DATA), EZLOPI_FINFO_LEN_DEVICE_NAME);
     if (read_data)
     {
-        if (!isprint(read_data[0]))
+        if (ezlopi_check_string_validity(read_data) == EZPI_FAILED)
         {
             ezlopi_free(__FUNCTION__, read_data);
             read_data = NULL;
@@ -330,7 +383,7 @@ char *ezlopi_factory_info_v3_get_manufacturer(void)
 
     if (read_data)
     {
-        if (!isprint(read_data[0]))
+        if (ezlopi_check_string_validity(read_data) == EZPI_FAILED)
         {
             ezlopi_free(__FUNCTION__, read_data);
             read_data = NULL;
@@ -345,7 +398,7 @@ char *ezlopi_factory_info_v3_get_brand(void)
 
     if (read_data)
     {
-        if (!isprint(read_data[0]))
+        if (ezlopi_check_string_validity(read_data) == EZPI_FAILED)
         {
             ezlopi_free(__FUNCTION__, read_data);
             read_data = NULL;
@@ -359,7 +412,7 @@ char *ezlopi_factory_info_v3_get_model(void)
     char *read_data = ezlopi_factory_info_v3_read_string(__FUNCTION__, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_MODEL_NAME, E_EZLOPI_FACTORY_INFO_HUB_DATA), EZLOPI_FINFO_LEN_MODEL_NAME);
     if (read_data)
     {
-        if (!isprint(read_data[0]))
+        if (ezlopi_check_string_validity(read_data) == EZPI_FAILED)
         {
             ezlopi_free(__FUNCTION__, read_data);
             read_data = NULL;
@@ -458,7 +511,7 @@ char *ezlopi_factory_info_v3_get_ssid(void)
     char *read_data = ezlopi_factory_info_v3_read_string(__FUNCTION__, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_WIFI_SSID, E_EZLOPI_FACTORY_INFO_HUB_DATA), EZLOPI_FINFO_LEN_WIFI_SSID);
     if (read_data)
     {
-        if (!isprint(read_data[0]))
+        if (ezlopi_check_string_validity(read_data) == EZPI_FAILED)
         {
             ezlopi_free(__FUNCTION__, read_data);
             read_data = NULL;
@@ -489,7 +542,7 @@ char *ezlopi_factory_info_v3_get_ezlopi_mac(void)
     char *read_data = ezlopi_factory_info_v3_read_string(__FUNCTION__, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_DEVICE_MAC, E_EZLOPI_FACTORY_INFO_HUB_DATA), EZLOPI_FINFO_LEN_DEVICE_MAC);
     if (read_data)
     {
-        if (!isprint(read_data[0]))
+        if (!ezlopi_check_mac_validity(read_data))
         {
             ezlopi_free(__FUNCTION__, read_data);
             read_data = NULL;
