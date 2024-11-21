@@ -54,7 +54,7 @@ typedef struct s_house_modes // this resembles a category of 'mode'.
 {
     uint32_t _id;                 // Numeric representation of the 'House-Mode'
     uint32_t switch_to_delay_sec; // represent a delay before switching to a perticular 'mode'.
-    uint32_t alarm_delay_sec;     // delay before activating 'alarm-state' .
+    uint32_t alarm_delay_sec;     // 'Entry_delay' before activating 'alarm' .
 
     const char *name;
     char *description;
@@ -64,8 +64,8 @@ typedef struct s_house_modes // this resembles a category of 'mode'.
     bool disarmed_default; // if true ; utilize the disarmed devices.
     bool notify_all;       // This Flag indicates, notifiations trigger to all user_IDs
 
-    cJSON *cj_notifications; // Specific list of user_IDs to notify
-    cJSON *cj_bypass_devices;
+    cJSON *cj_notifications;    // Specific list of user_IDs to notify
+    cJSON *cj_bypass_devices;   // a security event from a sensor from bypass list, no security consequences.
     cJSON *cj_disarmed_devices;    // NOTE: BY default contains -> 'alarm and camera devices' ; So besides these, other devices have to be added mannually
     cJSON *cj_alarms_off_devices;  // (auto add alarm-type devices) // these devices are auto added to 'cj_disarmed_devices'
     cJSON *cj_cameras_off_devices; // (auto add camera-type devices) // these devices are auto added to 'cj_disarmed_devices'
@@ -108,11 +108,12 @@ typedef struct s_sources
 
 } s_sources_t;
 
+
 typedef struct s_alarmed
 {
     char type[32];                 // default is 'global' ( Indicates that the alarmDelay value was taken from the house modes settings)
-    uint32_t entry_delay_sec;      // If house modes alarmed, and HouseModes.alarmDelay > 0, entry delay period is started
-    uint32_t time_is_left_sec;     // Number of seconds left to the end of the Entry delay.
+    uint32_t entry_delay_sec;      // If house modes alarmed, and HouseModes.alarmDelay > 0, entry delay period is started . [The default value is given from 'MODE->s_entry_delay_t' choice]
+    volatile uint32_t time_is_left_sec;     // Number of seconds left to the end of the Entry delay.
     bool silent;                   // Default: false ... When : true ; websocket clients should treat the alarm as the silent alarm: no indication of alarm is allowed.
     e_modes_alarm_phase_t phase;   // --> [Not in  documentation ; Added for broadcast purpose] === alarm_phases_type : [idle / bypassed / entryDelay / main]
     e_modes_alarm_status_t status; // --> [Not in  documentation ; Added for broadcast purpose] === House_mode status for 'alaram_phase'
@@ -127,8 +128,7 @@ typedef struct s_ezlopi_modes
 
     uint32_t time_is_left_to_switch_sec; //  (switch_to_delay_sec - N_sec) //Time left (sec) after start to switch to the mode
     uint32_t switch_to_delay_sec;        // Delay (sec) before switch to the all modes // this holds a copy to actual 'SwitchDelay' of active 'houseMode'
-    uint32_t alarm_delay_sec;            // Delay (sec) before going to alarm state    // this holds a copy to actual 'alarm_delay' of active 'houseMode'
-    uint32_t time_is_left_to_alarm_sec;  //  (alarm_delay_sec - N_sec) // Time left to alarm
+    uint32_t alarm_delay;            // [https://log.ezlo.com/new/hub/house_modes_manager/#hubmodesget-version-20] 	Delay (sec) before sending alert to the all modes   // NOTE : [(alarm_delay_sec > 0) === means 'mode->alarmed' member exists ]
 
     cJSON *cj_alarms;  // Array of device id which make alarms after trips
     cJSON *cj_cameras; // Array of camera device identifiers with items named make_recording
@@ -138,9 +138,9 @@ typedef struct s_ezlopi_modes
     s_entry_delay_t entry_delay; // A dictionary for Entry Delays values
     s_abort_window_t abort_delay;
 
-    s_alarmed_t alarmed; // NOTE :: Present only if the house modes enter the alarmed state. [ie. must have 'alarm_delay_sec' value stored above.]
+    s_alarmed_t alarmed; // NOTE :: Present only if the house modes enter the alarmed state. [ie. must have { armed = true ; for 'current_mode_id'}  ]
 
-    s_house_modes_t mode_home;
+    s_house_modes_t mode_home;  // this structure specifies configuration of 'home-MODE'
     s_house_modes_t mode_away;
     s_house_modes_t mode_night;
     s_house_modes_t mode_vacation;

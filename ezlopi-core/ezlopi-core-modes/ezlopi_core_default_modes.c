@@ -12,8 +12,8 @@ static s_ezlopi_modes_t sg_default_mode = {
     .current_mode_id = 0,
     .switch_to_mode_id = 0,
 
-    .time_left_to_alarm_sec = 0,
-    .alarm_delay_sec = 0,
+    // .time_is_left_to_alarm_sec = 0,
+    .alarm_delay = 0,
     .switch_to_delay_sec = 0,
     .time_is_left_to_switch_sec = 0,
 
@@ -37,10 +37,10 @@ static s_ezlopi_modes_t sg_default_mode = {
 
     .alarmed = {
         .type = "global",
-        .entry_delay_sec = 10,
+        .entry_delay_sec = 10, // this delay represent the alarm_delay for 'entry_delay_phase' only
         .time_is_left_sec = 8,
         .sources = NULL,
-        .phase = EZLOPI_MODES_ALARM_PHASE_IDLE,
+        .phase = EZLOPI_MODES_ALARM_PHASE_NONE,
         .status = EZLOPI_MODES_ALARM_STATUS_DONE,
         .silent = false,
     },

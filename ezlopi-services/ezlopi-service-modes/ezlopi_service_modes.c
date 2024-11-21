@@ -92,7 +92,7 @@ static ezlopi_error_t __check_mode_switch_condition(s_ezlopi_modes_t *ez_mode)
                     // 2. assign 'alarm_delay' mode ; if {alarm_delay} exists.
                     if (new_house_mode->armed)
                     {
-                        ez_mode->time_is_left_to_alarm_sec = ez_mode->alarm_delay_sec = new_house_mode->alarm_delay_sec;
+                        ez_mode->alarm_delay = new_house_mode->alarm_delay_sec; // update the new 'alarm_delay' value
                     }
 
                     // After the transition, bypass devices list is cleared for the previous house mode.
@@ -124,40 +124,71 @@ static ezlopi_error_t __check_mode_switch_condition(s_ezlopi_modes_t *ez_mode)
 static ezlopi_error_t __check_mode_alarm_trigger(s_ezlopi_modes_t *ez_mode)
 {
     ezlopi_error_t ret = EZPI_ERR_MODES_FAILED;
-
-    // 1. determine mode phase
-    if (0 < ez_mode->time_is_left_to_alarm_sec)
+    if (ez_mode)
     {
-        ez_mode->time_is_left_to_alarm_sec--;
-        TRACE_D("time_is_left_to_ALARM_sec: %u", ez_mode->time_is_left_to_alarm_sec);
+        e_modes_alarm_phase_t prev_phase = ez_mode->alarmed.phase;
+        e_modes_alarm_status_t prev_state = ez_mode->alarmed.status;
+
+        // 1. determine which alarm_phase is curr_mode in?
+
+        switch (prev_phase)
+        {
+        case EZLOPI_MODES_ALARM_PHASE_IDLE:
+            /* code */
+            break;
+        case EZLOPI_MODES_ALARM_PHASE_BYPASS:
+            /* code */
+            break;
+        case EZLOPI_MODES_ALARM_PHASE_ENTRYDELAY:
+            /* code */
+            break;
+        case EZLOPI_MODES_ALARM_PHASE_MAIN:
+            /* code */
+            break;
+
+        default:
+            break;
+        }
+
+
+
+        // 2. according to phases , Alarm-delay is assigned?
+        {
+            if (0 < ez_mode->alarmed.time_is_left_sec)
+            {
+                ez_mode->alarmed.time_is_left_sec--;
+                TRACE_D("time_is_left_to_ALARM_sec: %u", ez_mode->alarmed.time_is_left_sec);
+            }
+            else // broadcast --> 'alarmed state activation'
+            {
+                ezlopi_core_modes_store_to_nvs();
+
+                // cJSON *cj_update = ezlopi_core_modes_cjson_changed();
+                // CJSON_TRACE("----------------- broadcasting - cj_update", cj_update);
+
+                // if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(cj_update))
+                // {
+                //     cJSON_Delete(__FUNCTION__, cj_update);
+                // }
+
+                // refresh the 'alarmDelay_sec'
+                ez_mode->alarmed.time_is_left_sec = ez_mode->alarmed.entry_delay_sec;
+
+                ret = EZPI_SUCCESS;
+            }
+        }
+
+
+        // broadcast according to phase and status
+        cJSON *cj_update = ezlopi_core_modes_cjson_changed();
+        CJSON_TRACE("----------------- broadcasting - cj_update", cj_update);
+
+        if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(cj_update))
+        {
+            cJSON_Delete(__FUNCTION__, cj_update);
+        }
+
     }
-    else // broadcast --> 'alarmed state activation'
-    {
-        ezlopi_core_modes_store_to_nvs();
-
-        // cJSON *cj_update = ezlopi_core_modes_cjson_changed();
-        // CJSON_TRACE("----------------- broadcasting - cj_update", cj_update);
-
-        // if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(cj_update))
-        // {
-        //     cJSON_Delete(__FUNCTION__, cj_update);
-        // }
-
-        // refresh the 'alarmDelay_sec'
-        ez_mode->time_is_left_to_alarm_sec = ez_mode->alarm_delay_sec;
-
-        ret = EZPI_SUCCESS;
-    }
-
-    // broadcast according to phase and status
-    cJSON *cj_update = ezlopi_core_modes_cjson_changed();
-    CJSON_TRACE("----------------- broadcasting - cj_update", cj_update);
-
-    if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(cj_update))
-    {
-        cJSON_Delete(__FUNCTION__, cj_update);
-    }
-
     return ret;
 }
 static void __modes_loop(void *arg)

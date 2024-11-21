@@ -109,7 +109,7 @@ ezlopi_error_t ezlopi_core_modes_api_switch_mode(s_house_modes_t *switch_to_hous
 {
     ezlopi_service_modes_stop(5000);
     sg_custom_modes->switch_to_mode_id = switch_to_house_mode->_id;
-    sg_custom_modes->time_is_left_to_switch_sec = 0;// 
+    sg_custom_modes->time_is_left_to_switch_sec = 0;  // broadcast canceled / done?
     ezlopi_service_modes_start(5000);
 
     return 1;
@@ -122,7 +122,7 @@ ezlopi_error_t ezlopi_core_modes_api_cancel_switch(void)
     {
         ezlopi_service_modes_stop(5000);
         sg_custom_modes->switch_to_mode_id = 0;
-        sg_custom_modes->time_is_left_to_switch_sec = 0;
+        sg_custom_modes->time_is_left_to_switch_sec = 0;    // broad cast done ?
         ezlopi_service_modes_start(5000);
         ret = EZPI_SUCCESS;
     }
@@ -151,7 +151,6 @@ ezlopi_error_t ezlopi_core_modes_api_skip_entry_delay(void)
     {
         ret = EZPI_SUCCESS;
         ezlopi_service_modes_stop(5000);
-        sg_custom_modes->entry_delay.;
         sg_custom_modes->alarmed.phase = EZLOPI_MODES_ALARM_PHASE_MAIN;
         sg_custom_modes->alarmed.status = EZLOPI_MODES_ALARM_STATUS_BEGIN;
         ezlopi_service_modes_start(5000);
@@ -181,7 +180,11 @@ ezlopi_error_t ezlopi_core_modes_set_alarm_delay(uint32_t alarm_to_delay)
     {
         ret = EZPI_SUCCESS;
         ezlopi_service_modes_stop(5000);
-        sg_custom_modes->alarm_delay_sec = alarm_to_delay;
+        // 1. update in static 'mode-struct'
+        sg_custom_modes->alarm_delay = sg_custom_modes->alarmed.entry_delay_sec = alarm_to_delay; // "delay used" before switching to alarm assigned to this 'MODE'
+        // 2. update using 'curr-house_mode' pointer
+        sg_current_house_mode->alarm_delay_sec = alarm_to_delay;    // new value stored using pointer to ' house-mode alarm delay'
+
         ezlopi_core_modes_store_to_nvs();
         ezlopi_service_modes_start(5000);
     }
