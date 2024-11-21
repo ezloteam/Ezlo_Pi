@@ -70,9 +70,9 @@ void app_main(void)
 
     EZPI_SERV_uart_init();
 
-#ifndef CONFIG_IDF_TARGET_ESP32
+#if !defined(CONFIG_IDF_TARGET_ESP32) && !defined(CONFIG_IDF_TARGET_ESP32C3)
     EZPI_SERV_cdc_init();
-#endif // NOT defined CONFIG_IDF_TARGET_ESP32
+#endif // NOT defined CONFIG_IDF_TARGET_ESP32 or CONFIG_IDF_TARGET_ESP32C3
 
 #if defined(CONFIG_EZPI_BLE_ENABLE)
     ezlopi_ble_service_init();
