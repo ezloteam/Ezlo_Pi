@@ -276,6 +276,7 @@ const char *ezlopi_disarmedDefault_str = "disarmedDefault";
 const char *ezlopi_disarmedDevices_str = "disarmedDevices";
 const char *ezlopi_alarmsOffDevices_str = "alarmsOffDevices";
 const char *ezlopi_camerasOffDevices_str = "camerasOffDevices";
+const char *ezlopi_bypassDevices_str = "bypassDevices";
 const char *ezlopi_protect_str = "protect";
 const char *ezlopi_devices_str = "devices";
 const char *ezlopi_alarms_str = "alarms";
@@ -336,5 +337,6 @@ const char *ezlopi_frame_size_str = "frame_size";
 const char *ezlopi_flow_control_str = "flow_control";
 const char *ezlopi_chipset_str = "chipset";
 const char *ezlopi_internet_str = "internet";
+const char *ezlopi_local_key_str = "local_key";
 
 #endif // __EZLOPI_CLOUD_KEYWORDS_H__

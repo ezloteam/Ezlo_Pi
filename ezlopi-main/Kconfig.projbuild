@@ -72,12 +72,6 @@ menu "EzloPi User Config"
         default y
         help
             Enable Ping
-    
-    config EZPI_ENABLE_UART_PROVISIONING
-        bool "Enable UART provisioning"
-        default n
-        help
-            Enable provisioning and monitoring via UART    
 
     config EZPI_LOCAL_WEBSOCKET_SERVER
         depends on (HTTPD_WS_SUPPORT && (EZPI_CORE_ENABLE_ETH || EZPI_ENABLE_WIFI ))
@@ -132,6 +126,24 @@ menu "EzloPi User Config"
         default n
         help 
             Enable system temperature monitoring uisng inbuilt temperature sensor
+    
+    # choice 
+    #     prompt "Enable provisionsing method"
+    #     default EZPI_ENABLE_UART_PROVISIONING
+
+    #     config EZPI_ENABLE_UART_PROVISIONING
+    #         bool "Enable UART provisioning"
+    #         default y
+    #         help
+    #             Enable provisioning and monitoring via UART   
+
+    #     config EZPI_ENABLE_CDC_PROVISIONING
+    #         depends on (IDF_TARGET_ESP32S3 || IDF_TARGET_ESP32C3 || IDF_TARGET_ESP32S2) && TINYUSB
+    #         bool "Enable CDC provisioning"
+    #         default n
+    #         help 
+    #             Enable CDC provisioning
+    # endchoice 
 
     menu "EzloPi mDNS config"
         depends on EZPI_SERV_MDNS_EN

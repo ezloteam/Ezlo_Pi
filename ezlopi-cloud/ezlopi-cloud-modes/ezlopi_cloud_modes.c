@@ -97,7 +97,7 @@ void ezlopi_cloud_modes_entry_delay_skip(cJSON *cj_request, cJSON *cj_response)
     cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     if (cj_result)
     {
-#warning "Implementation required";
+        #warning "Implementation required";
     }
 }
 
@@ -130,8 +130,18 @@ void ezlopi_cloud_modes_alarm_delay_set(cJSON *cj_request, cJSON *cj_response)
 void ezlopi_cloud_modes_notifications_set(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
-    if (cj_result)
+    cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
+    if (cj_result && cj_params)
     {
+        bool all = false;
+        CJSON_GET_VALUE_BOOL(cj_params, "all", all);
+        cJSON *cj_modeId = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_modeId_str);
+        cJSON *cj_userIds = cJSON_GetObjectItem(__FUNCTION__, cj_params, "userIds");
+        if (cj_userIds && cj_modeId)
+        {
+            uint8_t modeId = strtoul(cj_modeId->valuestring, NULL, 10);
+            ezlopi_core_modes_set_notifications(modeId, all, cj_userIds);
+        }
     }
 }
 
@@ -140,6 +150,27 @@ void ezlopi_cloud_modes_disarmed_default_set(cJSON *cj_request, cJSON *cj_respon
     cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     if (cj_result)
     {
+        cJSON *cj_params = cJSON_GetObjectItem(__func__, cj_request, ezlopi_params_str);
+        if (cj_params)
+        {
+            cJSON *cj_modeId = cJSON_GetObjectItem(__func__, cj_params, ezlopi_modeId_str);
+            cJSON *cj_disarmedDefault = cJSON_GetObjectItem(__func__, cj_params, ezlopi_disarmedDefault_str);
+            if (cj_modeId && cj_disarmedDefault)
+            {
+                uint8_t modeId = strtoul(cj_modeId->valuestring, NULL, 10);
+                bool disarmedDefault = cj_disarmedDefault->type == cJSON_True ? true : false;
+
+                // toggle the flag in - inactive and active mode
+                ezlopi_core_modes_set_disarmed_default(modeId, disarmedDefault);
+
+                // Trigger broadcast if the devices in 'modeId' is 'disarmed'.
+                s_house_modes_t *target_house_mode = ezlopi_core_modes_get_house_mode_by_id(modeId);
+                if (target_house_mode)
+                { // To disarm devices [given in the list -> 'default-disarmed'].
+                    ezlopi_core_modes_set_unset_device_armed_status(target_house_mode->cj_disarmed_devices, !disarmedDefault);
+                }
+            }
+        }
     }
 }
 
@@ -148,6 +179,17 @@ void ezlopi_cloud_modes_disarmed_devices_add(cJSON *cj_request, cJSON *cj_respon
     cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     if (cj_result)
     {
+        cJSON *cj_params = cJSON_GetObjectItem(__func__, cj_request, ezlopi_params_str);
+        if (cj_params)
+        {
+            cJSON *cj_modeId = cJSON_GetObjectItem(__func__, cj_params, ezlopi_modeId_str);
+            cJSON *cj_deviceId = cJSON_GetObjectItem(__func__, cj_params, ezlopi_deviceId_str);
+            if (cj_modeId && cj_deviceId)
+            {
+                uint8_t modeId = strtoul(cj_modeId->valuestring, NULL, 10);
+                ezlopi_core_modes_add_disarmed_device(modeId, cj_deviceId->valuestring);
+            }
+        }
     }
 }
 
@@ -156,6 +198,17 @@ void ezlopi_cloud_modes_disarmed_devices_remove(cJSON *cj_request, cJSON *cj_res
     cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     if (cj_result)
     {
+        cJSON *cj_params = cJSON_GetObjectItem(__func__, cj_request, ezlopi_params_str);
+        if (cj_params)
+        {
+            cJSON *cj_modeID = cJSON_GetObjectItem(__func__, cj_params, ezlopi_modeId_str);
+            cJSON *cj_deviceId = cJSON_GetObjectItem(__func__, cj_params, ezlopi_deviceId_str);
+            if (cj_modeID && cj_deviceId)
+            {
+                uint8_t modeId = strtoul(cj_modeID->valuestring, NULL, 10);
+                ezlopi_core_modes_remove_disarmed_device(modeId, cj_deviceId->valuestring);
+            }
+        }
     }
 }
 
@@ -215,17 +268,39 @@ void ezlopi_cloud_modes_cameras_off_remove(cJSON *cj_request, cJSON *cj_response
 
 void ezlopi_cloud_modes_bypass_devices_add(cJSON *cj_request, cJSON *cj_response)
 {
-    cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+    cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     if (cj_result)
     {
+        cJSON* cj_params = cJSON_GetObjectItem(__func__, cj_request, ezlopi_params_str);
+        if (cj_params)
+        {
+            cJSON* cj_modelID = cJSON_GetObjectItem(__func__, cj_params, ezlopi_modeId_str);
+            cJSON* cj_deviceIds = cJSON_GetObjectItem(__func__, cj_params, ezlopi_device_ids_str);
+            if (cj_modelID && cj_deviceIds && (cj_deviceIds->type == cJSON_Array))
+            {
+                uint8_t modeId = strtoul(cj_modelID->valuestring, NULL, 10);
+                ezlopi_core_modes_bypass_device_add(modeId, cj_deviceIds);
+            }
+        }
     }
 }
 
 void ezlopi_cloud_modes_bypass_devices_remove(cJSON *cj_request, cJSON *cj_response)
 {
-    cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+    cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     if (cj_result)
     {
+        cJSON* cj_params = cJSON_GetObjectItem(__func__, cj_request, ezlopi_params_str);
+        if (cj_params)
+        {
+            cJSON* cj_modelID = cJSON_GetObjectItem(__func__, cj_params, ezlopi_modeId_str);
+            cJSON* cj_deviceIds = cJSON_GetObjectItem(__func__, cj_params, ezlopi_device_ids_str);
+            if (cj_modelID && cj_deviceIds && (cj_deviceIds->type == cJSON_Array))
+            {
+                uint8_t modeId = strtoul(cj_modelID->valuestring, NULL, 10);
+                ezlopi_core_modes_bypass_device_remove(modeId, cj_deviceIds);
+            }
+        }
     }
 }
 

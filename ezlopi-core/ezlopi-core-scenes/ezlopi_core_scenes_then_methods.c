@@ -148,9 +148,10 @@ int ezlopi_scene_then_group_set_item_value(l_scenes_list_v2_t *curr_scene, void 
                 l_ezlopi_device_grp_t *curr_devgrp = ezlopi_core_device_group_get_by_id(device_group_id);
                 if (curr_devgrp)
                 {
-                    int idx = 0;
+                    // int idx = 0;
                     cJSON *cj_get_devarr = NULL;
-                    while (NULL != (cj_get_devarr = cJSON_GetArrayItem(curr_devgrp->devices, idx))) // ["102ec000" , "102ec001" ,..]
+                    // while (NULL != (cj_get_devarr = cJSON_GetArrayItem(curr_devgrp->devices, idx))) // ["102ec000" , "102ec001" ,..]
+                    cJSON_ArrayForEach(cj_get_devarr, curr_devgrp->devices)
                     {
                         uint32_t curr_device_id = strtoul(cj_get_devarr->valuestring, NULL, 16);
                         l_ezlopi_device_t *curr_device = ezlopi_device_get_by_id(curr_device_id); // immediately goto "102ec000" ...
@@ -180,7 +181,7 @@ int ezlopi_scene_then_group_set_item_value(l_scenes_list_v2_t *curr_scene, void 
                                 curr_item_node = curr_item_node->next;
                             }
                         }
-                        idx++;
+                        // idx++;
                     }
                 }
             }
@@ -271,9 +272,10 @@ int ezlopi_scene_then_group_set_device_armed(l_scenes_list_v2_t *curr_scene, voi
                 l_ezlopi_device_grp_t *curr_devgrp = ezlopi_core_device_group_get_by_id(device_group_id);
                 if (curr_devgrp)
                 {
-                    int idx = 0;
+                    // int idx = 0;
                     cJSON *cj_get_devarr = NULL;
-                    while (NULL != (cj_get_devarr = cJSON_GetArrayItem(curr_devgrp->devices, idx))) // ["102ec000" , "102ec001" ,..]
+                    // while (NULL != (cj_get_devarr = cJSON_GetArrayItem(curr_devgrp->devices, idx))) // ["102ec000" , "102ec001" ,..]
+                    cJSON_ArrayForEach(cj_get_devarr, curr_devgrp->devices)
                     {
                         uint32_t curr_device_id = strtoul(cj_get_devarr->valuestring, NULL, 16);
                         l_ezlopi_device_t *curr_device = ezlopi_device_get_by_id(curr_device_id); // immediately goto "102ec000" ...
@@ -287,7 +289,7 @@ int ezlopi_scene_then_group_set_device_armed(l_scenes_list_v2_t *curr_scene, voi
                                 controller_info->armed = (device_armed) ? true : false;
                             }
                         }
-                        idx++;
+                        // idx++;
                     }
                 }
             }
@@ -903,9 +905,10 @@ int ezlopi_scene_then_group_toggle_value(l_scenes_list_v2_t *curr_scene, void *a
                 l_ezlopi_device_grp_t *curr_devgrp = ezlopi_core_device_group_get_by_id(device_group_id);
                 if (curr_devgrp)
                 {
-                    int idx = 0;
+                    // int idx = 0;
                     cJSON *cj_get_devarr = NULL;
-                    while (NULL != (cj_get_devarr = cJSON_GetArrayItem(curr_devgrp->devices, idx))) // ["102ec000" , "102ec001" ,..]
+                    // while (NULL != (cj_get_devarr = cJSON_GetArrayItem(curr_devgrp->devices, idx))) // ["102ec000" , "102ec001" ,..]
+                    cJSON_ArrayForEach(cj_get_devarr, curr_devgrp->devices)
                     {
                         uint32_t curr_device_id = strtoul(cj_get_devarr->valuestring, NULL, 16);
                         l_ezlopi_device_t *curr_device = ezlopi_device_get_by_id(curr_device_id); // immediately goto "102ec000" ...
@@ -918,9 +921,10 @@ int ezlopi_scene_then_group_toggle_value(l_scenes_list_v2_t *curr_scene, void *a
                                 l_ezlopi_item_grp_t *curr_item_grp = ezlopi_core_item_group_get_by_id(item_group_id); // get  "ll_itemgrp_node"
                                 if (curr_item_grp)
                                 {
-                                    int count = 0;
+                                    // int count = 0;
                                     cJSON *cj_item_names = NULL;
-                                    while (NULL != (cj_item_names = cJSON_GetArrayItem(curr_item_grp->item_names, count))) // ["202ec000" , "202ec001" ,..]
+                                    // while (NULL != (cj_item_names = cJSON_GetArrayItem(curr_item_grp->item_names, count))) // ["202ec000" , "202ec001" ,..]
+                                    cJSON_ArrayForEach(cj_item_names, curr_item_grp->item_names)
                                     {
                                         uint32_t req_item_id_from_itemgrp = strtoul(cj_item_names->valuestring, NULL, 16);
                                         // if the item_ids match ; Then compare the "item_values" with that of the "scene's" requirement
@@ -928,13 +932,13 @@ int ezlopi_scene_then_group_toggle_value(l_scenes_list_v2_t *curr_scene, void *a
                                         {
                                             ret = ezlopi_core_scene_then_helper_toggleValue(req_item_id_from_itemgrp, cj_item_names->valuestring);
                                         }
-                                        count++;
+                                        // count++;
                                     }
                                 }
                                 curr_item_node = curr_item_node->next;
                             }
                         }
-                        idx++;
+                        // idx++;
                     }
                 }
             }
