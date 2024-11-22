@@ -1,5 +1,12 @@
+/**
+ * @file    main.c
+ * @brief   perform some function on data
+ * @author  John Doe
+ * @version 0.1
+ * @date    1st January 2024
+ */
 /* ===========================================================================
-** Copyright (C) 2022 Ezlo Innovation Inc
+** Copyright (C) 2024 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -44,6 +51,7 @@
  * 8. EzloPi Sensors and Device Specific eg. ezlopi_device_0001_digitalout_generic
  */
 #include "header.h"
+
 /*******************************************************************************
  *                          Extern Data Declarations
  *******************************************************************************/
@@ -59,7 +67,7 @@
 /*******************************************************************************
  *                          Static Function Prototypes
  *******************************************************************************/
-static void ezpi_subcomponent_functiontitle(type_t arg);
+static void ezpi_subcomponent_functiontitle( type_t arg );
 
 /*******************************************************************************
  *                          Static Data Definitions
@@ -75,10 +83,10 @@ static void ezpi_subcomponent_functiontitle(type_t arg);
 
 /**
  * @brief Global/extern function template example
- * Convention : Use capital letter for initial word on extern function
+ * Convention : Use capital letters for initial word on extern functions
  * @param arg
  */
-void EZPI_maincomponent_subcomponent_functiontitle(type_t arg)
+void EZPI_maincomponent_subcomponent_functiontitle( type_t arg )
 {
     // func defintion here
 }
@@ -87,7 +95,12 @@ void EZPI_maincomponent_subcomponent_functiontitle(type_t arg)
  *                         Static Function Definitions
  *******************************************************************************/
 
-static void ezpi_subcomponent_functiontitle(type_t arg)
+/**
+ * @brief Local/static function template example
+ * Convention : Use lowercase letters for all words on static functions
+ * @param arg
+ */
+static void ezpi_subcomponent_functiontitle( type_t arg )
 {
 }
 
