@@ -81,6 +81,11 @@ static ezlopi_error_t __check_mode_switch_condition(s_ezlopi_modes_t *ez_mode)
             {
                 uint8_t bypass_clear_modeId = ez_mode->current_mode_id;
 
+                // switch to new 'MODE'
+                TRACE_I("switching-to-mode: %s (id: %u)", new_house_mode->name, new_house_mode->_id);
+                ez_mode->current_mode_id = ez_mode->switch_to_mode_id;
+                ez_mode->switch_to_mode_id = 0;
+
                 // After the transition, bypass devices list is cleared for the previous house mode.
                 s_house_modes_t *tmp_house_mode = ezlopi_core_modes_get_house_mode_by_id(bypass_clear_modeId);
                 if (tmp_house_mode && tmp_house_mode->cj_bypass_devices)
@@ -88,11 +93,6 @@ static ezlopi_error_t __check_mode_switch_condition(s_ezlopi_modes_t *ez_mode)
                     cJSON_Delete(__FUNCTION__, tmp_house_mode->cj_bypass_devices);
                     tmp_house_mode->cj_bypass_devices = NULL;
                 }
-
-                //
-                TRACE_I("switching-to-mode: %s (id: %u)", new_house_mode->name, new_house_mode->_id);
-                ez_mode->current_mode_id = ez_mode->switch_to_mode_id;
-                ez_mode->switch_to_mode_id = 0;
 
                 // set the new 'house-mode' as the active 'custom-mode'
                 if (EZPI_SUCCESS == ezlopi_core_modes_set_current_house_mode(new_house_mode))
@@ -103,9 +103,16 @@ static ezlopi_error_t __check_mode_switch_condition(s_ezlopi_modes_t *ez_mode)
                     // 2. assign 'alert/alarm_delay' mode.
                     if (new_house_mode->armed)
                     {
-                        ez_mode->alarm_delay = new_house_mode->alarm_delay_sec; // update the new 'alarm_delay' value
+                        ez_mode->alarm_delay = new_house_mode->alarm_delay_sec; // 'Delay_sec' before sending alert if armed sensors (door/window or motion sensor) tripped
                     }
 
+                    // 3. Refresh 'timeleftTo-exit-EntryDelay' second info for --->  non-zero 'entryDelay'
+                    if ((0 < ez_mode->alarmed.entry_delay_sec) && (0 == ez_mode->alarmed.time_is_left_sec))
+                    {
+                        ez_mode->alarmed.time_is_left_sec = ez_mode->alarmed.entry_delay_sec;
+                    }
+
+                    // 4. Store to nvs
                     ezlopi_core_modes_store_to_nvs();
 
                     cJSON *cj_update = ezlopi_core_modes_cjson_changed();
@@ -125,74 +132,72 @@ static ezlopi_error_t __check_mode_switch_condition(s_ezlopi_modes_t *ez_mode)
     return ret;
 }
 
-static ezlopi_error_t __check_mode_alarm_trigger(s_ezlopi_modes_t *ez_mode)
+static bool __check_if_device_in_bypass_condition(s_ezlopi_modes_t *ez_mode, s_house_modes_t *curr_house_mode, uint32_t device_id)
+{
+    bool ret = false;
+    if (ez_mode && curr_house_mode)
+    {
+    }
+    return ret;
+}
+
+static ezlopi_error_t __check_mode_entry_delay(s_ezlopi_modes_t *ez_mode, s_house_modes_t *curr_house_mode)
 {
     ezlopi_error_t ret = EZPI_ERR_MODES_FAILED;
-    if (ez_mode)
+    if (ez_mode && curr_house_mode)
     {
-        bool trigger_alarm = false;
-        // e_modes_alarm_phase_t prev_phase = ez_mode->alarmed.phase;
-        // e_modes_alarm_status_t prev_state = ez_mode->alarmed.status;
+        bool trigger_broadcast = false;
+        bool entryDelay_finish = false;
 
-        // 2. determine which alarm_phase is curr_mode in?
-        switch (ez_mode->alarmed.phase)
+        // 1. First activate --> 'entry-delay' phase immediately
+        if ((0 < ez_mode->alarmed.entry_delay_sec) && (0 < ez_mode->alarmed.time_is_left_sec)) // time-left to exit entry-delay
         {
-        case EZLOPI_MODES_ALARM_PHASE_NONE:
-        {
-            TRACE_D("Initial starting Phase of the 'HOUSE-MODE' phases");
-            break;
-        }
-        case EZLOPI_MODES_ALARM_PHASE_BYPASS:
-        {
-            ez_mode->alarmed.status = EZLOPI_MODES_ALARM_STATUS_DONE;
+            ez_mode->alarmed.phase = EZLOPI_MODES_ALARM_PHASE_ENTRYDELAY;
 
-            break;
-        }
-        case EZLOPI_MODES_ALARM_PHASE_ENTRYDELAY:
-        {
-            if ()
+            // First check if 'EntryDelay' is canceled.
+            if (EZLOPI_MODES_ALARM_STATUS_CANCELED != ez_mode->alarmed.status) // begin or done
             {
+                // a. Trigger entry-Delay 'begin' broadcast (at the start)
+                if (EZLOPI_MODES_ALARM_STATUS_BEGIN != ez_mode->alarmed.status) // done
+                {
+                    ez_mode->alarmed.status = EZLOPI_MODES_ALARM_STATUS_BEGIN;
+                    trigger_broadcast = true;
+                }
+
+                // b. Check if the mode is given
+                if (0 == ez_mode->alarmed.time_is_left_sec) // Number of seconds left to the end of the Entry delay.
+                {
+                    ez_mode->alarmed.status = EZLOPI_MODES_ALARM_STATUS_DONE;
+                    trigger_broadcast = true;
+                    entryDelay_finish = true;
+                    // ezlopi_core_modes_store_to_nvs();
+                }
+                else
+                {
+                    ez_mode->alarmed.time_is_left_sec--;
+                    TRACE_D("time_is_left_to_ALARM_sec: %u", ez_mode->alarmed.time_is_left_sec);
+                }
             }
-            break;
-        }
-        case EZLOPI_MODES_ALARM_PHASE_MAIN:
-        {
-            if ()
+            else // for canceled entry-delay
             {
-            }
-            break;
-        }
-        case EZLOPI_MODES_ALARM_PHASE_IDLE: // if you
-        {
-            if ()
-            {
-            }
-            break;
-        }
-        default:
-            break;
-        }
-
-        // 3. according to phases , Alarm-delay is assigned?
-        {
-            if (0 < ez_mode->alarmed.time_is_left_sec)
-            {
-                ez_mode->alarmed.time_is_left_sec--;
-                TRACE_D("time_is_left_to_ALARM_sec: %u", ez_mode->alarmed.time_is_left_sec);
-            }
-            else // broadcast --> 'alarmed state activation'
-            {
-                ezlopi_core_modes_store_to_nvs();
-
-                // refresh the 'alarmDelay_sec'
-                ez_mode->alarmed.time_is_left_sec = ez_mode->alarmed.entry_delay_sec;
-
-                ret = EZPI_SUCCESS;
+                TRACE_D("entryDelay_Status : 'Canceled' ");
+                entryDelay_finish = true;
             }
         }
+        else // Here if "entryDelay-time-left" is 0
+        {
+            entryDelay_finish = true;
+        }
 
-        // broadcast phase and status 
-        if (trigger_alarm)
+        //-------------------------------------------------------------------------------------
+        // 2. Second  Enter --> Bypass or Main Phase.
+        if (entryDelay_finish)
+        {
+        }
+
+        //-------------------------------------------------------------------------------------
+        // 3. Lastly Trigger a broadcast to provid --> phase and status info
+        if (trigger_broadcast)
         {
             cJSON *cj_update = ezlopi_core_modes_cjson_alarmed();
             CJSON_TRACE("----------------- broadcasting - cj_update", cj_update);
@@ -202,6 +207,7 @@ static ezlopi_error_t __check_mode_alarm_trigger(s_ezlopi_modes_t *ez_mode)
                 cJSON_Delete(__FUNCTION__, cj_update);
             }
         }
+        ret = EZPI_SUCCESS;
     }
     return ret;
 }
@@ -218,11 +224,11 @@ static void __modes_loop(void *arg)
                 TRACE_D("Mode - Switch completed to [%d]", ez_mode->current_mode_id);
             }
 
-            // 2. check if alarm_flag == true' for active 'HOUSE-MODE'
+            // 2. Now to enter alarming process; if 'house modes is alarmed, and HouseModes.alarmDelay > 0'
             s_house_modes_t *curr_house_mode = ezlopi_core_modes_get_current_house_modes();
-            if (curr_house_mode && (true == curr_house_mode->armed) && (0 < curr_house_mode->alarm_delay_sec))
+            if (curr_house_mode && (true == curr_house_mode->armed)) //&& (0 < curr_house_mode->alarm_delay_sec)
             {
-                __check_mode_alarm_trigger(ez_mode);
+                __check_mode_alarm_trigger(ez_mode, curr_house_mode);
             }
         }
 

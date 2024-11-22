@@ -37,8 +37,8 @@ static s_ezlopi_modes_t sg_default_mode = {
 
     .alarmed = {
         .type = "global",
-        .entry_delay_sec = 10, // this delay represent the alarm_delay for 'entry_delay_phase' only
-        .time_is_left_sec = 8,
+        .entry_delay_sec = 10, // Actual delay to be triggered immediately ; [if house-mode.alarm = true] .
+        .time_is_left_sec = 8, // Time remaining to exit delay
         .sources = NULL,
         .phase = EZLOPI_MODES_ALARM_PHASE_NONE,
         .status = EZLOPI_MODES_ALARM_STATUS_DONE,

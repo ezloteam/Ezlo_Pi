@@ -54,7 +54,7 @@ typedef struct s_house_modes // this resembles a category of 'mode'.
 {
     uint32_t _id;                 // Numeric representation of the 'House-Mode'
     uint32_t switch_to_delay_sec; // represent a delay before switching to a perticular 'mode'.
-    uint32_t alarm_delay_sec;     // 'Entry_delay' before activating 'alarm' .
+    uint32_t alarm_delay_sec;     // Delay before sending alert if armed sensors (door/window or motion sensor) tripped .
 
     const char *name;
     char *description;
@@ -126,7 +126,7 @@ typedef struct s_ezlopi_modes
 
     uint32_t time_is_left_to_switch_sec; //  (switch_to_delay_sec - N_sec) //Time left (sec) after start to switch to the mode
     uint32_t switch_to_delay_sec;        // Delay (sec) before switch to the all modes // this holds a copy to actual 'SwitchDelay' of active 'houseMode'
-    uint32_t alarm_delay;                // [https://log.ezlo.com/new/hub/house_modes_manager/#hubmodesget-version-20] 	Delay (sec) before sending alert to the all modes   // NOTE : [(alarm_delay_sec > 0) === means 'mode->alarmed' member exists ]
+    uint32_t alarm_delay;                // Delay (sec) before sending alert if armed sensors (door/window or motion sensor) tripped. // [https://log.ezlo.com/new/hub/house_modes_manager/#hubmodesget-version-20] 	Delay (sec) before sending alert to the all modes   // NOTE : [(alarm_delay_sec > 0) === means 'mode->alarmed' member exists ]
 
     cJSON *cj_alarms;  // Array of device id which make alarms after trips
     cJSON *cj_cameras; // Array of camera device identifiers with items named make_recording

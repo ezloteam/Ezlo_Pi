@@ -109,7 +109,7 @@ ezlopi_error_t ezlopi_core_modes_api_switch_mode(s_house_modes_t *switch_to_hous
 {
     ezlopi_service_modes_stop(5000);
     sg_custom_modes->switch_to_mode_id = switch_to_house_mode->_id;
-    sg_custom_modes->time_is_left_to_switch_sec = 0;  // broadcast canceled / done?
+    sg_custom_modes->time_is_left_to_switch_sec = 0; // broadcast canceled / done?
     ezlopi_service_modes_start(5000);
 
     return 1;
@@ -122,7 +122,7 @@ ezlopi_error_t ezlopi_core_modes_api_cancel_switch(void)
     {
         ezlopi_service_modes_stop(5000);
         sg_custom_modes->switch_to_mode_id = 0;
-        sg_custom_modes->time_is_left_to_switch_sec = 0;    // broad cast done ?
+        sg_custom_modes->time_is_left_to_switch_sec = 0; // broad cast done ?
         ezlopi_service_modes_start(5000);
         ret = EZPI_SUCCESS;
     }
@@ -181,9 +181,9 @@ ezlopi_error_t ezlopi_core_modes_set_alarm_delay(uint32_t alarm_to_delay)
         ret = EZPI_SUCCESS;
         ezlopi_service_modes_stop(5000);
         // 1. update in static 'mode-struct'
-        sg_custom_modes->alarm_delay = sg_custom_modes->alarmed.entry_delay_sec = alarm_to_delay; // "delay used" before switching to alarm assigned to this 'MODE'
+        sg_custom_modes->alarm_delay = alarm_to_delay; // Delay (sec) before sending alert if armed sensors (door/window or motion sensor) tripped
         // 2. update using 'curr-house_mode' pointer
-        sg_current_house_mode->alarm_delay_sec = alarm_to_delay;    // new value stored using pointer to ' house-mode alarm delay'
+        sg_current_house_mode->alarm_delay_sec = alarm_to_delay; // new value stored using pointer to ' house-mode alarm delay'
 
         ezlopi_core_modes_store_to_nvs();
         ezlopi_service_modes_start(5000);
@@ -304,19 +304,19 @@ ezlopi_error_t ezlopi_core_modes_remove_alarm_off(uint32_t mode_id, cJSON *devic
     return ret;
 }
 
-ezlopi_error_t ezlopi_core_modes_bypass_device_add(uint8_t modeId, cJSON* cj_device_id_array)
+ezlopi_error_t ezlopi_core_modes_bypass_device_add(uint8_t modeId, cJSON *cj_device_id_array)
 {
     ezlopi_error_t ret = EZPI_ERR_MODES_FAILED;
     if ((EZLOPI_HOUSE_MODE_REF_ID_NONE < modeId) && (EZLOPI_HOUSE_MODE_REF_ID_MAX > modeId) && cj_device_id_array && (cJSON_Array == cj_device_id_array->type))
     {
         ezlopi_service_modes_stop(5000);
-        s_house_modes_t* mode_to_update = ezlopi_core_modes_get_house_mode_by_id(modeId);
+        s_house_modes_t *mode_to_update = ezlopi_core_modes_get_house_mode_by_id(modeId);
         if (mode_to_update)
         {
-            cJSON* bypass_dev_to_add = NULL;
+            cJSON *bypass_dev_to_add = NULL;
             cJSON_ArrayForEach(bypass_dev_to_add, cj_device_id_array)
             {
-                cJSON* element_to_check = NULL;
+                cJSON *element_to_check = NULL;
                 bool add_to_array = true;
                 cJSON_ArrayForEach(element_to_check, mode_to_update->cj_bypass_devices)
                 {
@@ -343,19 +343,19 @@ ezlopi_error_t ezlopi_core_modes_bypass_device_add(uint8_t modeId, cJSON* cj_dev
     return ret;
 }
 
-ezlopi_error_t ezlopi_core_modes_bypass_device_remove(uint8_t modeId, cJSON* cj_device_id_array)
+ezlopi_error_t ezlopi_core_modes_bypass_device_remove(uint8_t modeId, cJSON *cj_device_id_array)
 {
     ezlopi_error_t ret = 0;
     if ((EZLOPI_HOUSE_MODE_REF_ID_NONE < modeId) && (EZLOPI_HOUSE_MODE_REF_ID_MAX > modeId) && cj_device_id_array && (cJSON_Array == cj_device_id_array->type))
     {
         ezlopi_service_modes_stop(5000);
-        s_house_modes_t* mode_to_update = ezlopi_core_modes_get_house_mode_by_id(modeId);
+        s_house_modes_t *mode_to_update = ezlopi_core_modes_get_house_mode_by_id(modeId);
         if (mode_to_update)
         {
-            cJSON* bypass_dev_to_remove = NULL;
+            cJSON *bypass_dev_to_remove = NULL;
             cJSON_ArrayForEach(bypass_dev_to_remove, cj_device_id_array)
             {
-                cJSON* element_to_check = NULL;
+                cJSON *element_to_check = NULL;
                 int array_index = 0;
                 cJSON_ArrayForEach(element_to_check, mode_to_update->cj_bypass_devices)
                 {
