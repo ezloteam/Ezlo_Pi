@@ -3,16 +3,16 @@ file(GLOB_RECURSE config_src "*.c")
 
 idf_component_register(SRCS "sensor_0030_oneWire_DS18B20.c" "ds18b20_onewire.c" "${config_src}"
     INCLUDE_DIRS "."
-    REQUIRES    ezlopi-util-trace  
+    REQUIRES    ezlopi-util-trace
                 driver
-                # ezlopi-core-timer 
-                ezlopi-core-cloud 
-                ezlopi-core-actions 
-                ezlopi-core-devices 
-                ezlopi-core-valueformatter 
+                # ezlopi-core-timer
+                ezlopi-core-cloud
+                ezlopi-core-actions
+                ezlopi-core-devices
+                ezlopi-core-valueformatter
                 ezlopi-core-errors
                 ezlopi-core-setting-commands
 
                 ezlopi-cloud-items
-                ezlopi-cloud-constants 
+                ezlopi-cloud-constants
                 )

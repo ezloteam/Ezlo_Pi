@@ -2,14 +2,14 @@
 
 file(GLOB_RECURSE config_src "./*.c*")
 
-set(ESP_IDF_COMPONENTS 
-        nvs_flash 
+set(ESP_IDF_COMPONENTS
+        nvs_flash
 )
 
-set(EZLOPI_COMPONENTS 
+set(EZLOPI_COMPONENTS
         ezlopi-util-trace
 )
-set(EZLOPI_CORE_COMPONENTS 
+set(EZLOPI_CORE_COMPONENTS
         ezlopi-core-settings
         ezlopi-core-errors
 )

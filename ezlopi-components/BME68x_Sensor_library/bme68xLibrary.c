@@ -195,7 +195,7 @@ void bme68xlib_soft_reset(void)
 
 /**
  * @brief Function to set the ambient temperature for better configuration
- */ 
+ */
 void bme68xlib_set_ambient_temp(int8_t temp)
 {
 	bme6.amb_temp = temp;
@@ -531,7 +531,7 @@ void bme68x_delay_us(uint32_t periodUs, void *intfPtr) {
  * @brief Function that implements the default I2C write transaction
  */
 int8_t bme68x_i2c_write(uint8_t reg_addr, const uint8_t *reg_data,
-        uint32_t length, void *intfPtr) 
+        uint32_t length, void *intfPtr)
 {
     (void)intfPtr; // Unused parameter
     esp_err_t _error;
@@ -541,7 +541,7 @@ int8_t bme68x_i2c_write(uint8_t reg_addr, const uint8_t *reg_data,
     {
         write_buf[i+1] = reg_data[i];
     }
-  
+
 	_error = ezlopi_i2c_master_write_to_device(&g_bme68x_i2c_master_conf, write_buf, length+1);
 
 	if (_error != ESP_OK)
@@ -553,7 +553,7 @@ int8_t bme68x_i2c_write(uint8_t reg_addr, const uint8_t *reg_data,
 
 /**
  * @brief Function that implements the default I2C read transaction
- */ 
+ */
 int8_t bme68x_i2c_read(uint8_t reg_addr, uint8_t *reg_data, uint32_t length,
         void *intfPtr) {
    	esp_err_t _error;

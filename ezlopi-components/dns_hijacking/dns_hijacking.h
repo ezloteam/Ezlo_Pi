@@ -1,4 +1,4 @@
-/* 
+/*
  * Esp32 DNS Hijacking Server.
  * Copyright Alija Bobija, 2019.
  */

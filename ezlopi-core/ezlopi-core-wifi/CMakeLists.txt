@@ -2,10 +2,10 @@
 
 file(GLOB_RECURSE wifi_src "./*.c*")
 
-set(EZLOPI_COMPONENTS 
+set(EZLOPI_COMPONENTS
         dns_hijacking
 )
-set(EZLOPI_SERVICE_COMPONENTS 
+set(EZLOPI_SERVICE_COMPONENTS
         ezlopi-service-uart
 )
 

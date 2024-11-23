@@ -1,6 +1,47 @@
+/**
+ * @file    main.c
+ * @brief   perform some function on data
+ * @author  John Doe
+ * @version 0.1
+ * @date    1st January 2024
+ */
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+
 #ifndef _EZLOPI_HAL_UART_H_
 #define _EZLOPI_HAL_UART_H_
 
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -10,41 +51,78 @@
 #include "esp_err.h"
 #include "EZLOPI_USER_CONFIG.h"
 
-typedef int ezlo_uart_channel_t;
-
-typedef enum e_ezlopi_uart_channel
+/*******************************************************************************
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
+#ifdef __cplusplus
+extern "C"
 {
-    EZLOPI_UART_CHANNEL_UNDEFINED = -1,
-    EZLOPI_UART_CHANNEL_0 = UART_NUM_0,
-    EZLOPI_UART_CHANNEL_1 = UART_NUM_1,
-#if UART_NUM_MAX > 2
-    EZLOPI_UART_CHANNEL_2 = UART_NUM_2,
 #endif
-#define EZLOPI_UART_CHANNEL_MAX UART_NUM_MAX
-} e_ezlopi_uart_channel_t;
 
-typedef struct s_ezlopi_uart_object* s_ezlopi_uart_object_handle_t;
-typedef void (*__uart_upcall)(uint8_t* buffer, uint32_t output_len, s_ezlopi_uart_object_handle_t uart_object_handle);
+    /*******************************************************************************
+     *                          Type & Macro Declarations
+     *******************************************************************************/
+    typedef int ezlo_uart_channel_t;
 
-typedef struct s_ezlopi_uart
-{
-    ezlo_uart_channel_t channel;
-    uint32_t baudrate;
-    int tx;
-    int rx;
-    bool enable;
-} s_ezlopi_uart_t;
+    typedef enum e_ezlopi_uart_channel
+    {
+        EZLOPI_UART_CHANNEL_UNDEFINED = -1,
+        EZLOPI_UART_CHANNEL_0 = UART_NUM_0,
+        EZLOPI_UART_CHANNEL_1 = UART_NUM_1,
+    #if UART_NUM_MAX > 2
+        EZLOPI_UART_CHANNEL_2 = UART_NUM_2,
+    #endif
+    #define EZLOPI_UART_CHANNEL_MAX UART_NUM_MAX
+    } e_ezlopi_uart_channel_t;
 
-struct s_ezlopi_uart_object
-{
-    void* arg;
-    s_ezlopi_uart_t ezlopi_uart;
-    __uart_upcall upcall;
-    QueueHandle_t ezlopi_uart_queue_handle;
-    TaskHandle_t taskHandle;
-};
+    typedef struct s_ezlopi_uart_object* s_ezlopi_uart_object_handle_t;
+    typedef void (*__uart_upcall)(uint8_t* buffer, uint32_t output_len, s_ezlopi_uart_object_handle_t uart_object_handle);
 
-s_ezlopi_uart_object_handle_t ezlopi_uart_init(uint32_t baudrate, uint32_t tx, uint32_t rx, __uart_upcall upcall, void* arg);
-ezlo_uart_channel_t ezlopi_uart_get_channel(s_ezlopi_uart_object_handle_t ezlopi_uart_object_handle);
-void EZPI_HAL_uart_init(void);
+    typedef struct s_ezlopi_uart
+    {
+        ezlo_uart_channel_t channel;
+        uint32_t baudrate;
+        int tx;
+        int rx;
+        bool enable;
+    } s_ezlopi_uart_t;
+
+    struct s_ezlopi_uart_object
+    {
+        void* arg;
+        s_ezlopi_uart_t ezlopi_uart;
+        __uart_upcall upcall;
+        QueueHandle_t ezlopi_uart_queue_handle;
+        TaskHandle_t taskHandle;
+    };
+
+    /*******************************************************************************
+     *                          Extern Data Declarations
+     *******************************************************************************/
+
+    /*******************************************************************************
+     *                          Extern Function Prototypes
+     *******************************************************************************/
+    /**
+     * @brief Global function template example
+     * Convention : Use capital letter for initial word on extern function
+     * maincomponent : Main component as hal, core, service etc.
+     * subcomponent : Sub component as i2c from hal, ble from service etc
+     * functiontitle : Title of the function
+     * eg : EZPI_hal_i2c_init()
+     * @param arg
+     *
+     */
+    s_ezlopi_uart_object_handle_t ezlopi_uart_init(uint32_t baudrate, uint32_t tx, uint32_t rx, __uart_upcall upcall, void* arg);
+    ezlo_uart_channel_t ezlopi_uart_get_channel(s_ezlopi_uart_object_handle_t ezlopi_uart_object_handle);
+    void EZPI_HAL_uart_init(void);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif // _EZLOPI_HAL_UART_H_
+
+/*******************************************************************************
+ *                          End of File
+ *******************************************************************************/

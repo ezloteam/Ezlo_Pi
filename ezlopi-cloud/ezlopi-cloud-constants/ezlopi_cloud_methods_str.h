@@ -165,26 +165,26 @@ extern "C"
     // extern const  char *method_hub_detection_devices_scans_top;
     extern const char *method_hub_scene_run_progress;
     extern const char *ezlopi_rpc_method_notfound_str;
-    
+
     extern const char *ezlopi_hub_expression_added_str;
     extern const char *ezlopi_hub_expression_changed_str;
     extern const char *ezlopi_hub_expression_deleted_str;
-    
+
     extern const char *ezlopi_hub_scene_changed_str;
     extern const char *ezlopi_hub_scene_added_str;
     extern const char *ezlopi_hub_scene_deleted_str;
-    
+
     extern const char *ezlopi_hub_room_created_str;
     extern const char *ezlopi_hub_room_edited_str;
     extern const char *ezlopi_hub_room_deleted_str;
     extern const char *ezlopi_hub_room_reordered_str;
-    
+
     extern const char *ezlopi_hub_modes_changed_str;
-    
+
     extern const char *ezlopi_hub_device_group_created;
     extern const char *ezlopi_hub_device_group_deleted;
     extern const char *ezlopi_hub_device_group_updated;
-    
+
     extern const char *ezlopi_hub_item_group_created;
     extern const char *ezlopi_hub_item_group_deleted;
     extern const char *ezlopi_hub_item_group_updated;

@@ -2,10 +2,10 @@
 
 file(GLOB_RECURSE config_src "*.c")
 
-set(EZLOPI_CORE_COMPONENTS 
-        ezlopi-core-actions 
+set(EZLOPI_CORE_COMPONENTS
+        ezlopi-core-actions
 )
-set(EZLOPI_HAL_COMPONENTS 
+set(EZLOPI_HAL_COMPONENTS
         ezlopi-hal-spi
 )
 

@@ -2,7 +2,7 @@
 
 file(GLOB_RECURSE config_src "*.c")
 
-set(EZLOPI_CLOUD_COMPONENTS 
+set(EZLOPI_CLOUD_COMPONENTS
         ezlopi-cloud-constants
 )
 

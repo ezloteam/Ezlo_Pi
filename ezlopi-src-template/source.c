@@ -92,7 +92,7 @@ void EZPI_maincomponent_subcomponent_functiontitle( type_t arg )
 }
 
 /*******************************************************************************
- *                         Static Function Definitions
+ *                          Static Function Definitions
  *******************************************************************************/
 
 /**

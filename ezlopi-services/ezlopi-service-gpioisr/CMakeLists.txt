@@ -1,7 +1,7 @@
 # file( GLOB_RECURSE provisioning_src "*.c*" "actions/*.c*" )
 file(GLOB_RECURSE src_files "./*.c*")
 
-set(EZLOPI_CORE_COMPONENTS 
+set(EZLOPI_CORE_COMPONENTS
         ezlopi-core-devices
         ezlopi-core-processes
 )
