@@ -16,28 +16,55 @@
 
 #include "ezlopi_service_loop.h"
 
-typedef struct s_loop_node {
+typedef struct s_loop_node
+{
     void *arg;
     f_loop_t loop;
-    const char * name;
+    const char *name;
     uint32_t period_ms;
     uint32_t _timer_ms;
 
-    struct s_loop_node * next;
+    struct s_loop_node *next;
 } s_loop_node_t;
 
-static s_loop_node_t * __loop_head = NULL;
+static s_loop_node_t *__loop_head = NULL;
 
-static void __loop(void* pv);
-static s_loop_node_t * __create_node(const char * name, f_loop_t loop, uint32_t period_ms, void *arg);
+static void __loop(void *pv);
+static s_loop_node_t *__create_node(const char *name, f_loop_t loop, uint32_t period_ms, void *arg);
 
-void ezlopi_service_loop_add(const char * name, f_loop_t loop, uint32_t period_ms, void *arg)
+bool ezlopi_service_is_mode_loop_acitve(f_loop_t loop)
 {
+    bool ret = false;
     if (loop)
+    {
+        if (__loop_head->loop == loop)
+        {
+            ret = true;
+        }
+        else
+        {
+            s_loop_node_t *curr_node = __loop_head;
+            while (curr_node->next)
+            {
+                if (curr_node->next->loop == loop)
+                {
+                    ret = true;
+                    break;
+                }
+                curr_node = curr_node->next;
+            }
+        }
+    }
+    return ret;
+}
+
+void ezlopi_service_loop_add(const char *name, f_loop_t loop, uint32_t period_ms, void *arg)
+{
+    if (loop && (false == ezlopi_service_is_mode_loop_acitve(loop))) // adding to guard [check if 'loop' is already present]
     {
         if (__loop_head)
         {
-            s_loop_node_t * __loop_node = __loop_head;
+            s_loop_node_t *__loop_node = __loop_head;
             while (__loop_node->next)
             {
                 __loop_node = __loop_node->next;
@@ -58,18 +85,18 @@ void ezlopi_service_loop_remove(f_loop_t loop)
     {
         if (__loop_head->loop == loop)
         {
-            s_loop_node_t * __del_node = __loop_head;
+            s_loop_node_t *__del_node = __loop_head;
             __loop_head = __loop_head->next;
             ezlopi_free(__FUNCTION__, __del_node);
         }
         else
         {
-            s_loop_node_t * __loop_node = __loop_head;
+            s_loop_node_t *__loop_node = __loop_head;
             while (__loop_node->next)
             {
                 if (__loop_node->next->loop == loop)
                 {
-                    s_loop_node_t * __del_node = __loop_node->next;
+                    s_loop_node_t *__del_node = __loop_node->next;
                     __loop_node->next = __loop_node->next->next;
                     ezlopi_free(__FUNCTION__, __del_node);
                     break;
@@ -89,12 +116,12 @@ void ezlopi_service_loop_init(void)
     ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_LOOP_TASK, &ezlopi_service_timer_task_handle, EZLOPI_SERVICE_LOOP_TASK_DEPTH);
 }
 
-static void __loop(void* pv)
+static void __loop(void *pv)
 {
     while (1)
     {
         uint32_t __run_time = xTaskGetTickCount();
-        s_loop_node_t * __loop_node = __loop_head;
+        s_loop_node_t *__loop_node = __loop_head;
 
         while (__loop_node)
         {
@@ -102,7 +129,7 @@ static void __loop(void* pv)
             uint32_t conditions = ((xTaskGetTickCount() - __loop_node->_timer_ms) >= __loop_node->period_ms);
             if ((NULL != __loop_node->loop) && conditions)
             {
-                
+
                 uint32_t __loop_time = xTaskGetTickCount();
                 __loop_node->loop(__loop_node->arg);
                 __loop_node->_timer_ms = xTaskGetTickCount();
@@ -123,9 +150,9 @@ static void __loop(void* pv)
     }
 }
 
-static s_loop_node_t * __create_node(const char * name, f_loop_t loop, uint32_t period_ms, void *arg)
+static s_loop_node_t *__create_node(const char *name, f_loop_t loop, uint32_t period_ms, void *arg)
 {
-    s_loop_node_t * __loop_node = ezlopi_malloc(__FUNCTION__, sizeof(s_loop_node_t));
+    s_loop_node_t *__loop_node = ezlopi_malloc(__FUNCTION__, sizeof(s_loop_node_t));
 
     if (__loop_node)
     {
@@ -140,5 +167,3 @@ static s_loop_node_t * __create_node(const char * name, f_loop_t loop, uint32_t 
 
     return __loop_node;
 }
-
-
