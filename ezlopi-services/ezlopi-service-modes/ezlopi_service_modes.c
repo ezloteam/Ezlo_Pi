@@ -37,9 +37,8 @@ void ezlopi_service_modes_init(void)
 static void ezlopi_service_mode_alert_init(void)
 {
     // initialize if the 'mode-loop' and 'semaphore' exists
-    if (NULL != sg_modes_loop_smphr &&
-        (true == ezlopi_service_is_mode_loop_acitve(__modes_loop)) &&      // must have mode-loop
-        (false == ezlopi_service_is_mode_loop_acitve(__modes_alert_loop))) // must not have mode-alert-loop
+    if ((true == ezlopi_service_is_mode_loop_acitve(__modes_loop, "modes-loop")) &&            // 'mode-loop' must be present
+        (false == ezlopi_service_is_mode_loop_acitve(__modes_alert_loop, "modes-ALERT-loop"))) // 'mode-alert-loop' must not exist
     {
         // check - the bypass list
         sg_device_alert_smphr = xSemaphoreCreateBinary();
@@ -60,8 +59,8 @@ bool ezlopi_service_modes_stop(uint32_t wait_ms)
         TRACE_W("removed modes-loop");
         ret = true;
 
-        // Stop the 'alert-loop' if possible.
-        if (NULL != sg_device_alert_smphr && (true == ezlopi_service_is_mode_loop_acitve(__modes_alert_loop))) // the 'alert_semaphore' should not be null // 'alert-loop' should exist
+        // Stop the 'alert-loop' if mode-loop stops.
+        if (NULL != sg_device_alert_smphr && (true == ezlopi_service_is_mode_loop_acitve(__modes_alert_loop, "modes-loop"))) // the 'alert_semaphore' should not be null // 'alert-loop' should exist
         {
             ezlopi_service_modes_device_alert_stop(5000);
         }
@@ -81,8 +80,8 @@ bool ezlopi_service_modes_start(uint32_t wait_ms)
         ezlopi_service_loop_add("modes-loop", __modes_loop, 1000, NULL);
         TRACE_I("added modes-loop");
 
-        // Start the 'alert-loop' if possible.
-        if (NULL != sg_device_alert_smphr && (false == ezlopi_service_is_mode_loop_acitve(__modes_alert_loop))) // the 'alert_semaphore' should not be null // 'alert-loop' should not exist
+        // Start the 'alert-loop' if mode-loop starts.
+        if (NULL != sg_device_alert_smphr && (false == ezlopi_service_is_mode_loop_acitve(__modes_alert_loop, ""))) // the 'alert_semaphore' should not be null // 'alert-loop' should not exist
         {
             ezlopi_service_modes_device_alert_start(5000);
         }
@@ -91,7 +90,7 @@ bool ezlopi_service_modes_start(uint32_t wait_ms)
     return ret;
 }
 
-static bool ezlopi_service_modes_device_alert_start(uint32_t wait_ms)
+bool ezlopi_service_modes_device_alert_start(uint32_t wait_ms)
 {
     bool ret = false;
 
@@ -99,14 +98,26 @@ static bool ezlopi_service_modes_device_alert_start(uint32_t wait_ms)
     {
         ret = true;
         xSemaphoreGive(sg_device_alert_smphr);
-        ezlopi_service_loop_add("modes-ALERT-loop", __modes_alert_loop, 1000, NULL);
-        TRACE_I("added modes-ALERT-loop");
+
+        // Check if 'mode-armed' --> true
+        s_house_modes_t *curr_house_mode = ezlopi_core_modes_get_current_house_modes();
+        if (curr_house_mode && (true == curr_house_mode->armed))
+        {
+
+#warning "need to create multiple run-once loops to address the 'non-bypass alerts' ";
+            ezlopi_service_loop_add("modes-ALERT-loop", __modes_alert_loop, 1000, NULL);
+            TRACE_I("added modes-ALERT-loop");
+        }
+        else
+        {
+            TRACE_E("Couldn't add, modes-ALERT-loop . [house_mode_armed=flase]");
+        }
     }
 
     return ret;
 }
 
-static bool ezlopi_service_modes_device_alert_stop(uint32_t wait_ms)
+bool ezlopi_service_modes_device_alert_stop(uint32_t wait_ms)
 {
     bool ret = false;
     // uint32_t start_tick = xTaskGetTickCount() / portTICK_PERIOD_MS;
@@ -192,15 +203,51 @@ static ezlopi_error_t __check_mode_switch_condition(s_ezlopi_modes_t *ez_mode)
     return ret;
 }
 
-static bool __check_if_device_is_bypassed(s_ezlopi_modes_t *ez_mode, s_house_modes_t *curr_house_mode, uint32_t device_id_str)
+static bool __check_if_device_is_bypassed(s_house_modes_t *curr_house_mode, const char *device_id_str)
 {
     bool ret = false;
-    if (ez_mode && curr_house_mode && device_id_str)
+    if (curr_house_mode && device_id_str)
     {
-        cJSON *cj_element = NULL;
-        cJSON_ArrayForEach(cj_element, curr_house_mode->cj_bypass_devices)
+        cJSON *cj_bypass = NULL;
+        cJSON_ArrayForEach(cj_bypass, curr_house_mode->cj_bypass_devices)
         {
-            if (EZPI_STRNCMP_IF_EQUAL(device_id_str, cj_element->valuestring, strlen(device_id_str), cj_element->str_value_len))
+            if (EZPI_STRNCMP_IF_EQUAL(device_id_str, cj_bypass->valuestring, strlen(device_id_str), cj_bypass->str_value_len))
+            {
+                ret = true;
+                break;
+            }
+        }
+
+        // If 'bypass' condition is trur ; trigger a bypass 'DONE' broadcast.
+        if (true == ret)
+        {
+            s_ezlopi_modes_t *curr_mode = ezlopi_core_modes_get_custom_modes();
+            if (curr_mode)
+            {
+                curr_mode->alarmed.phase = EZLOPI_MODES_ALARM_PHASE_BYPASS;
+                curr_mode->alarmed.status = EZLOPI_MODES_ALARM_STATUS_DONE;
+                cJSON *cj_update = ezlopi_core_modes_cjson_alarmed(device_id_str);
+                CJSON_TRACE("----------------- broadcasting - cj_update", cj_update);
+
+                if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(cj_update))
+                {
+                    cJSON_Delete(__FUNCTION__, cj_update);
+                }
+            }
+        }
+    }
+    return ret;
+}
+
+static bool __check_if_device_alarm_is_off(s_house_modes_t *curr_house_mode, const char *device_id_str)
+{
+    bool ret = false;
+    if (curr_house_mode && device_id_str)
+    {
+        cJSON *cj_alarm_off = NULL;
+        cJSON_ArrayForEach(cj_alarm_off, curr_house_mode->cj_alarms_off_devices) // 'alarm_devid' should not be here
+        {
+            if (EZPI_STRNCMP_IF_EQUAL(device_id_str, cj_alarm_off->valuestring, strlen(device_id_str), cj_alarm_off->str_value_len))
             {
                 ret = true;
                 break;
@@ -210,19 +257,17 @@ static bool __check_if_device_is_bypassed(s_ezlopi_modes_t *ez_mode, s_house_mod
     return ret;
 }
 
-static ezlopi_error_t __check_mode_entry_delay(s_ezlopi_modes_t *ez_mode, s_house_modes_t *curr_house_mode)
+static bool __check_if_entry_delay_finished(s_ezlopi_modes_t *ez_mode, s_house_modes_t *curr_house_mode, const char *device_id_str)
 {
-    ezlopi_error_t ret = EZPI_ERR_MODES_FAILED;
+    bool entryDelay_finish = false;
     if (ez_mode && curr_house_mode)
     {
         bool trigger_broadcast = false;
-        bool entryDelay_finish = false;
+        ez_mode->alarmed.phase = EZLOPI_MODES_ALARM_PHASE_ENTRYDELAY;
 
         // 1. First activate --> 'entry-delay' phase immediately
         if ((0 < ez_mode->alarmed.entry_delay_sec) && (0 < ez_mode->alarmed.time_is_left_sec)) // time-left to exit entry-delay
         {
-            ez_mode->alarmed.phase = EZLOPI_MODES_ALARM_PHASE_ENTRYDELAY;
-
             // First check if 'EntryDelay' is canceled.
             if (EZLOPI_MODES_ALARM_STATUS_CANCELED != ez_mode->alarmed.status) // begin or done
             {
@@ -250,25 +295,24 @@ static ezlopi_error_t __check_mode_entry_delay(s_ezlopi_modes_t *ez_mode, s_hous
             else // for canceled entry-delay
             {
                 TRACE_D("entryDelay_Status : 'Canceled' ");
+                ez_mode->alarmed.status = EZLOPI_MODES_ALARM_STATUS_CANCELED;
+                trigger_broadcast = true;
                 entryDelay_finish = true;
             }
         }
         else // Here if "entryDelay-time-left" is 0
         {
+            ez_mode->alarmed.status = EZLOPI_MODES_ALARM_STATUS_DONE;
             entryDelay_finish = true;
+            trigger_broadcast = true;
         }
 
-        //-------------------------------------------------------------------------------------
-        // 2. Second  Enter --> Bypass or Main Phase.
-        if (entryDelay_finish)
-        {
-        }
-
+        TRACE_W("alarm.phase = [%d] / alarm.status = [%d]", ez_mode->alarmed.phase, ez_mode->alarmed.status);
         //-------------------------------------------------------------------------------------
         // 3. Lastly Trigger a broadcast to provid --> phase and status info
-        if (trigger_broadcast)
+        if (true == trigger_broadcast)
         {
-            cJSON *cj_update = ezlopi_core_modes_cjson_alarmed();
+            cJSON *cj_update = ezlopi_core_modes_cjson_alarmed(device_id_str);
             CJSON_TRACE("----------------- broadcasting - cj_update", cj_update);
 
             if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(cj_update))
@@ -276,34 +320,41 @@ static ezlopi_error_t __check_mode_entry_delay(s_ezlopi_modes_t *ez_mode, s_hous
                 cJSON_Delete(__FUNCTION__, cj_update);
             }
         }
-        ret = EZPI_SUCCESS;
     }
-    return ret;
+    return entryDelay_finish;
 }
 
 static void __modes_alert_loop(void *arg)
 {
+#warning "need to create different tasks 'id-based' , that can count the entry delay and trigger ";
     if (pdTRUE == xSemaphoreTake(sg_device_alert_smphr, 1000 / portTICK_PERIOD_MS))
     {
         s_ezlopi_modes_t *ez_mode = ezlopi_core_modes_get_custom_modes();
         s_house_modes_t *curr_house_mode = ezlopi_core_modes_get_current_house_modes();
         if (ez_mode && curr_house_mode)
         {
-            // find the devices_ids with alarm/security ability
-            char device_id_str[32] = {0};
-            l_ezlopi_device_t *device_node = ezlopi_device_get_head();
-            while (device_node)
+            cJSON *cj_alarm = NULL;
+            cJSON_ArrayForEach(cj_alarm, ez_mode->cj_alarms) // 'alarm_device_id' to trigger alerts
             {
-                snprintf(device_id_str, 32, "%08x", device_node->cloud_properties.device_id);
-                if (__check_if_device_is_bypassed(ez_mode, curr_house_mode, device_id_str))
+                // 1.1.  Non-bypass
+                if (false == __check_if_device_is_bypassed(curr_house_mode, cj_alarm->valuestring)) // donot trigger alert if device is bypassed
                 {
-                    // 2. Now to enter alarming process; if 'house modes is alarmed, and HouseModes.alarmDelay > 0'
-                    if (true == curr_house_mode->armed) //&& (0 < curr_house_mode->alarm_delay_sec)
+                    // 1.2. Pre-alarming (ENTRY-DELAY) ; Operate on the 'cj_alarms' list to excluding 'cj_alarm_off_devices'
+
+                    if (true == __check_if_entry_delay_finished(ez_mode, curr_house_mode, cj_alarm->valuestring))
                     {
-                        __check_mode_alarm_trigger(ez_mode, curr_house_mode);
+                        // Exclude :- a list of devices that should not raise alarms in the house mode
+                        if (false == __check_if_device_alarm_is_off(curr_house_mode, cj_alarm->valuestring))
+                        {
+                            // Now to enter alarming process; if 'house modes is alarmed, and HouseModes.alarmDelay > 0'
+                            __check_mode_alarm_trigger(ez_mode, curr_house_mode);
+                        }
+                    }
+                    else
+                    {
+                        TRACE_D(" PRE-alarming [ ENTRYDELAY -- PHASE ] : alert_device_id [%s] , ", cj_alarm->valuestring);
                     }
                 }
-                device_node = device_node->next;
             }
         }
 
@@ -324,9 +375,14 @@ static void __modes_loop(void *arg)
                 TRACE_D("Mode - Switch completed to [%d]", ez_mode->current_mode_id);
             }
 
+#warning "Create multiple NON-BYPASSED ; alert-loops here "
             if (NULL == sg_device_alert_smphr)
             { //  Only once: start the alert loop
                 ezlopi_service_mode_alert_init();
+            }
+            else
+            {
+                TRACE_E("Failed to initialize MODE-ALERT-INIT. [ 'sg_device_alert_smphr' = NULL ]");
             }
         }
 

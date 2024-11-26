@@ -16,6 +16,7 @@
 
 #include "ezlopi_service_loop.h"
 
+#define MAX_LEN(str1_len, str2_len) ((str1_len > str2_len) ? str1_len : str2_len)
 typedef struct s_loop_node
 {
     void *arg;
@@ -32,12 +33,13 @@ static s_loop_node_t *__loop_head = NULL;
 static void __loop(void *pv);
 static s_loop_node_t *__create_node(const char *name, f_loop_t loop, uint32_t period_ms, void *arg);
 
-bool ezlopi_service_is_mode_loop_acitve(f_loop_t loop)
+bool ezlopi_service_is_mode_loop_acitve(f_loop_t loop, const char *loop_name)
 {
     bool ret = false;
-    if (loop)
+    if (loop && loop_name)
     {
-        if (__loop_head->loop == loop)
+        if (__loop_head->loop == loop &&
+            (0 == strncmp(__loop_head->name, loop_name, MAX_LEN(__loop_head->name, loop_name))))
         {
             ret = true;
         }
@@ -46,7 +48,8 @@ bool ezlopi_service_is_mode_loop_acitve(f_loop_t loop)
             s_loop_node_t *curr_node = __loop_head;
             while (curr_node->next)
             {
-                if (curr_node->next->loop == loop)
+                if (curr_node->next->loop == loop &&
+                    (0 == strncmp(curr_node->next->name, loop_name, MAX_LEN(curr_node->next->name, loop_name))))
                 {
                     ret = true;
                     break;
@@ -60,7 +63,7 @@ bool ezlopi_service_is_mode_loop_acitve(f_loop_t loop)
 
 void ezlopi_service_loop_add(const char *name, f_loop_t loop, uint32_t period_ms, void *arg)
 {
-    if (loop && (false == ezlopi_service_is_mode_loop_acitve(loop))) // adding to guard [check if 'loop' is already present]
+    if (loop && name && (false == ezlopi_service_is_mode_loop_acitve(loop, name))) // adding to guard [check if 'loop' is already present]
     {
         if (__loop_head)
         {

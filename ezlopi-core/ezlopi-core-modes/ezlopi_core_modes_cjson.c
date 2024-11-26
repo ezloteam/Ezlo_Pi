@@ -379,15 +379,9 @@ cJSON *ezlopi_core_modes_cjson_changed(void) //  (IN core-service-loop) // For b
             s_house_modes_t *_current_mode = ezlopi_core_modes_get_current_house_modes();
             if (_mode)
             {
-                // char tmp_str[32];
-                // snprintf(tmp_str, sizeof(tmp_str), "%u", _mode->current_mode_id);
-                // cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_modeId_str, tmp_str);
                 CJSON_ASSIGN_ID(cj_result, _mode->current_mode_id, ezlopi_modeId_str);
                 cJSON_AddBoolToObject(__FUNCTION__, cj_result, ezlopi_disarmedDefault_str, _current_mode->disarmed_default);
 
-                // time_t now;
-                // time(&now);
-                // uint64_t time_now_ms = now * 1000LL;
                 cJSON_AddNumberToObject(__FUNCTION__, cj_result, ezlopi_timestamp_str, EZPI_CORE_sntp_get_current_time_ms());
             }
         }
@@ -396,7 +390,7 @@ cJSON *ezlopi_core_modes_cjson_changed(void) //  (IN core-service-loop) // For b
     return cj_root;
 }
 
-cJSON *ezlopi_core_modes_cjson_alarmed(void) // (IN core-service-loop) // For broadcasting alarm-info on active 'MODE'
+cJSON *ezlopi_core_modes_cjson_alarmed(const char *dev_id_str) // (IN core-service-loop) // For broadcasting alarm-info on active 'MODE'
 {
     cJSON *cj_root = cJSON_CreateObject(__FUNCTION__);
     if (cj_root)
@@ -410,11 +404,12 @@ cJSON *ezlopi_core_modes_cjson_alarmed(void) // (IN core-service-loop) // For br
             s_ezlopi_modes_t *curr_mode = ezlopi_core_modes_get_custom_modes();
             if (curr_mode)
             {
-#warning "need to determince the device that triggered alarm"
-                // CJSON_ASSIGN_ID(cj_result, "0000", ezlopi_deviceId_str); // mode->cj_alarms // devices that makes the alarms trip
-
                 CJSON_ASSIGN_ID(cj_result, curr_mode->current_mode_id, ezlopi_modeId_str);
-                CJSON_ASSIGN_ID(cj_result, curr_mode->time_is_left_to_switch_sec, "pendingDelay");
+                CJSON_ASSIGN_ID(cj_result, dev_id_str, ezlopi_deviceId_str); // 'device_id' that triggers an alarm
+                if (EZLOPI_MODES_ALARM_PHASE_ENTRYDELAY == curr_mode->alarmed.phase)
+                {
+                    CJSON_ASSIGN_ID(cj_result, curr_mode->time_is_left_to_switch_sec, "pendingDelay"); // Only for 'entryDelay'
+                }
 
                 (EZLOPI_MODES_ALARM_PHASE_IDLE == curr_mode->alarmed.phase)         ? cJSON_AddStringToObject(__FUNCTION__, cj_result, "phase", "idle")
                 : (EZLOPI_MODES_ALARM_PHASE_BYPASS == curr_mode->alarmed.phase)     ? cJSON_AddStringToObject(__FUNCTION__, cj_result, "phase", "bypass")

@@ -180,10 +180,10 @@ ezlopi_error_t ezlopi_core_modes_set_alarm_delay(uint32_t alarm_to_delay)
     {
         ret = EZPI_SUCCESS;
         ezlopi_service_modes_stop(5000);
+
         // 1. update in static 'mode-struct'
-        sg_custom_modes->alarm_delay = alarm_to_delay; // Delay (sec) before sending alert if armed sensors (door/window or motion sensor) tripped
         // 2. update using 'curr-house_mode' pointer
-        sg_current_house_mode->alarm_delay_sec = alarm_to_delay; // new value stored using pointer to ' house-mode alarm delay'
+        sg_custom_modes->alarm_delay = sg_current_house_mode->alarm_delay_sec = alarm_to_delay; // Delay (sec) before sending alert if armed sensors (door/window or motion sensor) tripped
 
         ezlopi_core_modes_store_to_nvs();
         ezlopi_service_modes_start(5000);
