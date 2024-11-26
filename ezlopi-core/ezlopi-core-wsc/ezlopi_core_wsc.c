@@ -1,6 +1,7 @@
 // Created by krishna on July 29, 2024.
 
 #include "time.h"
+#include "lwip/dns.h"
 #include "lwip/apps/sntp.h"
 #include "mbedtls/net_sockets.h"
 
@@ -13,26 +14,25 @@
 #include "ezlopi_core_wsc.h"
 
 static const char *__request_format = "GET / HTTP/1.1\n"
-"Host: %s\n"
-"Connection: Upgrade\n"
-"Upgrade: websocket\n"
-"Origin: %s\n"
-"Sec-WebSocket-Version: 13\n"
-"User-Agent: EzloPi-%llu\n"
-"Sec-WebSocket-Key: JSUlJXYeLiJ2Hi4idh4uIg==\r\n\r\n";
+                                      "Host: %s\n"
+                                      "Connection: Upgrade\n"
+                                      "Upgrade: websocket\n"
+                                      "Origin: %s\n"
+                                      "Sec-WebSocket-Version: 13\n"
+                                      "User-Agent: EzloPi-%llu\n"
+                                      "Sec-WebSocket-Key: JSUlJXYeLiJ2Hi4idh4uIg==\r\n\r\n";
 
 static void __rx_task(void *arg);
 static int __init_mbedtls(s_ssl_websocket_t *ssl_wsc);
-static int __deinit_mbedtls(s_ssl_websocket_t * wsc_ssl);
+static int __deinit_mbedtls(s_ssl_websocket_t *wsc_ssl);
 static int __zap_aut(unsigned char *ttx, unsigned char *text);
-static void __setup_wsc_request(cJSON * cj_uri, s_ssl_websocket_t * ssl_ws);
-static int __send_internal(s_ssl_websocket_t * wsc_ssl, char *buf_s, size_t len, uint32_t timeout_ms);
+static void __setup_wsc_request(cJSON *cj_uri, s_ssl_websocket_t *ssl_ws);
+static int __send_internal(s_ssl_websocket_t *wsc_ssl, char *buf_s, size_t len, uint32_t timeout_ms);
 static void __timer_callback(TimerHandle_t timer);
-static int __upgrade_to_websocket(s_ssl_websocket_t * ssl_wsc);
-static int __rx_func(s_ssl_websocket_t * ssl_wsc);
+static int __upgrade_to_websocket(s_ssl_websocket_t *ssl_wsc);
+static int __rx_func(s_ssl_websocket_t *ssl_wsc);
 
-
-int ezlopi_core_wsc_is_connected(s_ssl_websocket_t * wsc_ssl)
+int ezlopi_core_wsc_is_connected(s_ssl_websocket_t *wsc_ssl)
 {
     int ret = 0;
 
@@ -44,7 +44,7 @@ int ezlopi_core_wsc_is_connected(s_ssl_websocket_t * wsc_ssl)
     return ret;
 }
 
-int ezlopi_core_wsc_kill(s_ssl_websocket_t * wsc_ssl)
+int ezlopi_core_wsc_kill(s_ssl_websocket_t *wsc_ssl)
 {
     int ret = 0;
 
@@ -56,7 +56,7 @@ int ezlopi_core_wsc_kill(s_ssl_websocket_t * wsc_ssl)
     return ret;
 }
 
-int ezlopi_core_wsc_stop(s_ssl_websocket_t * wsc_ssl)
+int ezlopi_core_wsc_stop(s_ssl_websocket_t *wsc_ssl)
 {
     int ret = 0;
 
@@ -68,7 +68,7 @@ int ezlopi_core_wsc_stop(s_ssl_websocket_t * wsc_ssl)
     return ret;
 }
 
-int ezlopi_core_wsc_send(s_ssl_websocket_t * ssl_wsc, char *buf, size_t len)
+int ezlopi_core_wsc_send(s_ssl_websocket_t *ssl_wsc, char *buf, size_t len)
 {
     int ret = 0;
 
@@ -80,9 +80,9 @@ int ezlopi_core_wsc_send(s_ssl_websocket_t * ssl_wsc, char *buf, size_t len)
     return ret;
 }
 
-s_ssl_websocket_t * ezlopi_core_wsc_init(cJSON * uri, f_wsc_msg_upcall_t __message_upcall, f_wsc_conn_upcall_t __connection_upcall)
+s_ssl_websocket_t *ezlopi_core_wsc_init(cJSON *uri, f_wsc_msg_upcall_t __message_upcall, f_wsc_conn_upcall_t __connection_upcall)
 {
-    s_ssl_websocket_t * ssl_ws = NULL;
+    s_ssl_websocket_t *ssl_ws = NULL;
 
     if (uri && uri->valuestring)
     {
@@ -111,7 +111,6 @@ s_ssl_websocket_t * ezlopi_core_wsc_init(cJSON * uri, f_wsc_msg_upcall_t __messa
 
             TRACE_D("__request_format: %s", __request);
 #endif
-
             ssl_ws->timer = xTimerCreate("wsc-timer", (1000 / portTICK_RATE_MS), pdTRUE, ssl_ws, __timer_callback);
             xTaskCreate(__rx_task, "wsc-rx_task", 6 * 1024, ssl_ws, 5, &ssl_ws->task_handle);
         }
@@ -120,31 +119,32 @@ s_ssl_websocket_t * ezlopi_core_wsc_init(cJSON * uri, f_wsc_msg_upcall_t __messa
     return ssl_ws;
 }
 
-static int __init_mbedtls(s_ssl_websocket_t * wsc_ssl)
+static int __init_mbedtls(s_ssl_websocket_t *wsc_ssl)
 {
     int ret = 0;
 
-    do {
+    do
+    {
         wsc_ssl->conf = ezlopi_malloc(__FUNCTION__, sizeof(mbedtls_ssl_config));
         wsc_ssl->ssl_ctx = ezlopi_malloc(__FUNCTION__, sizeof(mbedtls_ssl_context));
         wsc_ssl->server_fd = ezlopi_malloc(__FUNCTION__, sizeof(mbedtls_net_context));
         wsc_ssl->entropy = ezlopi_malloc(__FUNCTION__, sizeof(mbedtls_entropy_context));
         wsc_ssl->ctr_drbg = ezlopi_malloc(__FUNCTION__, sizeof(mbedtls_ctr_drbg_context));
 
-        wsc_ssl->cacert = ezlopi_malloc(__FUNCTION__, sizeof(mbedtls_x509_crt));
-        wsc_ssl->shared_cert = ezlopi_malloc(__FUNCTION__, sizeof(mbedtls_x509_crt));
-        wsc_ssl->private_key = ezlopi_malloc(__FUNCTION__, sizeof(mbedtls_pk_context));
+        // wsc_ssl->cacert = ezlopi_malloc(__FUNCTION__, sizeof(mbedtls_x509_crt));
+        // wsc_ssl->shared_cert = ezlopi_malloc(__FUNCTION__, sizeof(mbedtls_x509_crt));
+        // wsc_ssl->private_key = ezlopi_malloc(__FUNCTION__, sizeof(mbedtls_pk_context));
 
-        wsc_ssl->str_cacert = ezlopi_factory_info_v3_get_ca_certificate();
-        wsc_ssl->str_shared_cert = ezlopi_factory_info_v3_get_ssl_shared_key();
-        wsc_ssl->str_private_key = ezlopi_factory_info_v3_get_ssl_private_key();
+        // wsc_ssl->str_cacert = ezlopi_factory_info_v3_get_ca_certificate();
+        // wsc_ssl->str_shared_cert = ezlopi_factory_info_v3_get_ssl_shared_key();
+        // wsc_ssl->str_private_key = ezlopi_factory_info_v3_get_ssl_private_key();
 
         wsc_ssl->buffer_len = 4096;
         wsc_ssl->buffer = ezlopi_malloc(__FUNCTION__, wsc_ssl->buffer_len);
 
         if (wsc_ssl->conf && wsc_ssl->ssl_ctx && wsc_ssl->server_fd && wsc_ssl->entropy && wsc_ssl->ctr_drbg &&
-            wsc_ssl->cacert && wsc_ssl->shared_cert && wsc_ssl->private_key &&
-            wsc_ssl->str_cacert && wsc_ssl->str_shared_cert && wsc_ssl->str_private_key &&
+            // wsc_ssl->cacert && wsc_ssl->shared_cert && wsc_ssl->private_key &&
+            // wsc_ssl->str_cacert && wsc_ssl->str_shared_cert && wsc_ssl->str_private_key &&
             wsc_ssl->buffer)
         {
             mbedtls_ssl_init(wsc_ssl->ssl_ctx);
@@ -152,26 +152,25 @@ static int __init_mbedtls(s_ssl_websocket_t * wsc_ssl)
             mbedtls_entropy_init(wsc_ssl->entropy);
             mbedtls_ctr_drbg_init(wsc_ssl->ctr_drbg);
 
-            mbedtls_pk_init(wsc_ssl->private_key);
-            mbedtls_x509_crt_init(wsc_ssl->cacert);
-            mbedtls_x509_crt_init(wsc_ssl->shared_cert);
+            // mbedtls_pk_init(wsc_ssl->private_key);
+            // mbedtls_x509_crt_init(wsc_ssl->cacert);
+            // mbedtls_x509_crt_init(wsc_ssl->shared_cert);
 
-
-            if ((ret = mbedtls_ctr_drbg_seed(wsc_ssl->ctr_drbg, mbedtls_entropy_func, wsc_ssl->entropy, NULL, 0)) != 0)//
+            if ((ret = mbedtls_ctr_drbg_seed(wsc_ssl->ctr_drbg, mbedtls_entropy_func, wsc_ssl->entropy, NULL, 0)) != 0) //
             {
                 ret = -1;
                 TRACE_E("mbedtls_ctr_drbg_seed returned %d", ret);
                 break;
             }
 
-            ret = mbedtls_x509_crt_parse(wsc_ssl->cacert, (uint8_t *)wsc_ssl->str_cacert, strlen(wsc_ssl->str_cacert) + 1);
-            // TRACE_W("RET: -0x%04x [%d]", -ret, ret);
+            // ret = mbedtls_x509_crt_parse(wsc_ssl->cacert, (uint8_t *)wsc_ssl->str_cacert, strlen(wsc_ssl->str_cacert) + 1);
+            // // TRACE_W("RET: -0x%04x [%d]", -ret, ret);
 
-            ret |= mbedtls_x509_crt_parse(wsc_ssl->shared_cert, (uint8_t *)wsc_ssl->str_shared_cert, strlen(wsc_ssl->str_shared_cert) + 1);
-            // TRACE_W("RET: -0x%04x [%d]", -ret, ret);
+            // ret |= mbedtls_x509_crt_parse(wsc_ssl->shared_cert, (uint8_t *)wsc_ssl->str_shared_cert, strlen(wsc_ssl->str_shared_cert) + 1);
+            // // TRACE_W("RET: -0x%04x [%d]", -ret, ret);
 
-            ret |= mbedtls_pk_parse_key(wsc_ssl->private_key, (uint8_t *)wsc_ssl->str_private_key, strlen(wsc_ssl->str_private_key) + 1, NULL, 0);
-            // TRACE_W("RET: -0x%04x [%d]", -ret, ret);
+            // ret |= mbedtls_pk_parse_key(wsc_ssl->private_key, (uint8_t *)wsc_ssl->str_private_key, strlen(wsc_ssl->str_private_key) + 1, NULL, 0);
+            // // TRACE_W("RET: -0x%04x [%d]", -ret, ret);
 
             if (ret >= 0)
             {
@@ -222,7 +221,7 @@ static int __init_mbedtls(s_ssl_websocket_t * wsc_ssl)
     return ret;
 }
 
-static int __deinit_mbedtls(s_ssl_websocket_t * wsc_ssl)
+static int __deinit_mbedtls(s_ssl_websocket_t *wsc_ssl)
 {
     int ret = 0;
 
@@ -248,7 +247,6 @@ static int __deinit_mbedtls(s_ssl_websocket_t * wsc_ssl)
         ezlopi_free(__FUNCTION__, wsc_ssl->ctr_drbg);
         wsc_ssl->ctr_drbg = NULL;
 
-
         mbedtls_x509_crt_free(wsc_ssl->cacert);
         ezlopi_free(__FUNCTION__, wsc_ssl->cacert);
         wsc_ssl->cacert = NULL;
@@ -271,7 +269,7 @@ static int __deinit_mbedtls(s_ssl_websocket_t * wsc_ssl)
     return ret;
 }
 
-static void __setup_wsc_request(cJSON * cj_uri, s_ssl_websocket_t * ssl_wsc)
+static void __setup_wsc_request(cJSON *cj_uri, s_ssl_websocket_t *ssl_wsc)
 {
     if (cj_uri && cj_uri->valuestring && ssl_wsc && ssl_wsc->url)
     {
@@ -283,7 +281,8 @@ static void __setup_wsc_request(cJSON * cj_uri, s_ssl_websocket_t * ssl_wsc)
 
         if (port_start)
         {
-            snprintf(ssl_wsc->port, sizeof(ssl_wsc->port), "%d", atoi(port_start + 1));
+            ssl_wsc->u_port = strtoul(port_start + 1, NULL, 10);
+            snprintf(ssl_wsc->port, sizeof(ssl_wsc->port), "%d", ssl_wsc->u_port);
             url_len = port_start - tmp_buf;
         }
 
@@ -294,7 +293,7 @@ static void __setup_wsc_request(cJSON * cj_uri, s_ssl_websocket_t * ssl_wsc)
     }
 }
 
-static int __send_internal(s_ssl_websocket_t * wsc_ssl, char *buf_s, size_t len, uint32_t timeout)
+static int __send_internal(s_ssl_websocket_t *wsc_ssl, char *buf_s, size_t len, uint32_t timeout)
 {
     int ret = 0;
 
@@ -334,7 +333,8 @@ static int __send_internal(s_ssl_websocket_t * wsc_ssl, char *buf_s, size_t len,
             time_val.tv_sec = timeout / 1000;
             time_val.tv_usec = timeout ? ((timeout % 1000) * 1000) : 1;
 
-            do {
+            do
+            {
                 // TRACE_W("waiting for write-ready.......");
                 vTaskDelay(1 / portTICK_RATE_MS);
                 ret = select(fd + 1, NULL, &write_fds, NULL, &time_val);
@@ -378,7 +378,7 @@ static int __zap_aut(unsigned char *ttx, unsigned char *text)
 {
     int i;
     int len1 = 0;
-    const unsigned char mask[4] = { 0x10, 0x55, 0x21, 0x43 };
+    const unsigned char mask[4] = {0x10, 0x55, 0x21, 0x43};
 
     // TRACE_I("Sending dan to wss:: len: %d\r\n%s", strlen((char *)ttx), ttx);
 
@@ -411,12 +411,13 @@ static int __zap_aut(unsigned char *ttx, unsigned char *text)
 
 static void __rx_task(void *arg)
 {
-    s_ssl_websocket_t * __ssl_wsc = (s_ssl_websocket_t *)arg;
+    s_ssl_websocket_t *__ssl_wsc = (s_ssl_websocket_t *)arg;
     if (__ssl_wsc)
     {
         while (1)
         {
-            do {
+            do
+            {
                 int ret = 0;
 
                 if (__init_mbedtls(__ssl_wsc) > 0)
@@ -426,11 +427,19 @@ static void __rx_task(void *arg)
                     mbedtls_net_init(__ssl_wsc->server_fd);
                     mbedtls_net_set_nonblock(__ssl_wsc->server_fd);
 
-                    TRACE_I("Connecting to  '%s:%s'...", __ssl_wsc->url, __ssl_wsc->port);
+                    char tmp_port[8];
+                    snprintf(tmp_port, sizeof(tmp_port), "%u", __ssl_wsc->u_port ? __ssl_wsc->u_port : 443);
 
-                    if ((ret = mbedtls_net_connect(__ssl_wsc->server_fd, __ssl_wsc->url, __ssl_wsc->port, MBEDTLS_NET_PROTO_TCP)) != 0)
+                    TRACE_I("Connecting to  '%s:%s'...", __ssl_wsc->url, tmp_port);
+
+                    // ip_addr_t TargetIp;
+                    // err_t err = dns_gethostbyname("ot.review-staging-op-owkix8.ewr4.opentelemetry.ezlo.com", &TargetIp, NULL, NULL);
+                    // TRACE_S("%s: %s, err: %d", "ot.review-staging-op-owkix8.ewr4.opentelemetry.ezlo.com", ipaddr_ntoa((const ip_addr_t *)&TargetIp), err);
+
+                    if ((ret = mbedtls_net_connect(__ssl_wsc->server_fd, "ot.review-staging-op-owkix8.ewr4.opentelemetry.ezlo.com",
+                                                   tmp_port, MBEDTLS_NET_PROTO_TCP)) != 0)
                     {
-                        TRACE_E("mbedtls_net_connect returned -%x", -ret);
+                        TRACE_E("mbedtls_net_connect returned -0x%04x", -ret);
                         break;
                     }
 
@@ -486,13 +495,13 @@ static void __rx_task(void *arg)
                                 if (0 == retry--)
                                 {
                                     __ssl_wsc->is_connected = false;
-                                    if (__ssl_wsc->connection_upcall_func) {
+                                    if (__ssl_wsc->connection_upcall_func)
+                                    {
                                         __ssl_wsc->connection_upcall_func(false);
                                     }
 
                                     break;
                                 }
-
                             }
                             else
                             {
@@ -521,28 +530,40 @@ static void __rx_task(void *arg)
     vTaskDelete(NULL);
 }
 
-static int __upgrade_to_websocket(s_ssl_websocket_t * ssl_wsc)
+static int __upgrade_to_websocket(s_ssl_websocket_t *ssl_wsc)
 {
     int ret = 0;
 
     if (ssl_wsc)
     {
-        do {
+        do
+        {
             ssl_wsc->is_connected = false;
             // TRACE_I("Writing HTTP __request...");
 
-            snprintf(ssl_wsc->buffer, ssl_wsc->buffer_len, __request_format, ssl_wsc->url, ssl_wsc->url, ezlopi_factory_info_v3_get_id());
-            // TRACE_D("__request_format: \r\n%s", ssl_wsc->buffer ? ssl_wsc->buffer : "null");
+            char *tmp_request_format = "GET /logs HTTP/1.1\n"
+                                       "Host: ot.review-staging-op-owkix8.ewr4.opentelemetry.ezlo.com\n"
+                                       "Connection: Upgrade\n"
+                                       "Upgrade: websocket\n"
+                                       "Origin: wss://%s\n"
+                                       "Sec-WebSocket-Version: 13\n"
+                                       "User-Agent: EzloPi-%llu\n"
+                                       "Sec-WebSocket-Key: JSUlJXYeLiJ2Hi4idh4uIg==\r\n\r\n";
+
+            snprintf(ssl_wsc->buffer, ssl_wsc->buffer_len, tmp_request_format, ssl_wsc->url, ezlopi_factory_info_v3_get_id());
+            TRACE_D("tmp_request_format: \r\n%s", ssl_wsc->buffer ? ssl_wsc->buffer : "null");
 
             ret = __send_internal(ssl_wsc, ssl_wsc->buffer, strlen(ssl_wsc->buffer), 5000);
 
             if (ret > 0)
             {
-                // TRACE_S("WSC-upgrade request sent. ret: %d", ret);
+                TRACE_S("WSC-upgrade request sent. ret: %d", ret);
 
                 int read_len = 0;
                 memset(ssl_wsc->buffer, 0, ssl_wsc->buffer_len);
                 ret = mbedtls_ssl_read(ssl_wsc->ssl_ctx, (uint8_t *)ssl_wsc->buffer, ssl_wsc->buffer_len);
+
+                TRACE_I("wss-upgrade response: %.*s", ssl_wsc->buffer_len, ssl_wsc->buffer);
 
                 if ((ret == MBEDTLS_ERR_SSL_WANT_READ) || (ret == MBEDTLS_ERR_SSL_WANT_WRITE))
                 {
@@ -556,7 +577,8 @@ static int __upgrade_to_websocket(s_ssl_websocket_t * ssl_wsc)
 
                     ret = 0;
                     ssl_wsc->is_connected = false;
-                    if (ssl_wsc->connection_upcall_func) {
+                    if (ssl_wsc->connection_upcall_func)
+                    {
                         ssl_wsc->connection_upcall_func(false);
                     }
 
@@ -568,7 +590,8 @@ static int __upgrade_to_websocket(s_ssl_websocket_t * ssl_wsc)
                     TRACE_E("connection closed");
 
                     ssl_wsc->is_connected = false;
-                    if (ssl_wsc->connection_upcall_func) {
+                    if (ssl_wsc->connection_upcall_func)
+                    {
                         ssl_wsc->connection_upcall_func(false);
                     }
 
@@ -581,7 +604,8 @@ static int __upgrade_to_websocket(s_ssl_websocket_t * ssl_wsc)
                     TRACE_E("connection closed");
 
                     ssl_wsc->is_connected = false;
-                    if (ssl_wsc->connection_upcall_func) {
+                    if (ssl_wsc->connection_upcall_func)
+                    {
                         ssl_wsc->connection_upcall_func(false);
                     }
 
@@ -600,7 +624,8 @@ static int __upgrade_to_websocket(s_ssl_websocket_t * ssl_wsc)
                     ret = 1;
                     // TRACE_I("WSC Connected.");
                     ssl_wsc->is_connected = true;
-                    if (ssl_wsc->connection_upcall_func) {
+                    if (ssl_wsc->connection_upcall_func)
+                    {
                         ssl_wsc->connection_upcall_func(true);
                     }
                     break;
@@ -622,11 +647,11 @@ static int __upgrade_to_websocket(s_ssl_websocket_t * ssl_wsc)
 static void __timer_callback(TimerHandle_t timer)
 {
     TRACE_I("timer-callback");
-    s_ssl_websocket_t* wss_ssl = (s_ssl_websocket_t *)pvTimerGetTimerID(timer);
+    s_ssl_websocket_t *wss_ssl = (s_ssl_websocket_t *)pvTimerGetTimerID(timer);
     ezlopi_core_wsc_stop(wss_ssl);
 }
 
-static int __rx_func(s_ssl_websocket_t * ssl_wsc)
+static int __rx_func(s_ssl_websocket_t *ssl_wsc)
 {
     int ret = 0;
 
@@ -666,14 +691,15 @@ static int __rx_func(s_ssl_websocket_t * ssl_wsc)
                     return (-1);
                 }
 
-
+                // MBEDTLS_ERR_SSL_CRYPTO_IN_PROGRESS
                 ret = mbedtls_ssl_read(ssl_wsc->ssl_ctx, (uint8_t *)ssl_wsc->buffer, ssl_wsc->buffer_len);
 
                 if (ret < 0)
                 {
                     TRACE_I("mbedtls_ssl_read returned: -0x%04x [%d]", -ret, ret);
 
-                    if (retry == 0) {
+                    if (retry == 0)
+                    {
                         return (-1);
                     }
                 }
@@ -717,7 +743,6 @@ static int __rx_func(s_ssl_websocket_t * ssl_wsc)
 
                 ssl_wsc->e_state = STATE_HEADER;
             }
-
         }
     }
 
