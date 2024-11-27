@@ -82,6 +82,26 @@ void ezlopi_service_loop_add(const char *name, f_loop_t loop, uint32_t period_ms
     }
 }
 
+void ezlopi_service_loop_remove_by_name(const char *_name_) // 'loop-method-name'
+{
+    if (_name_ && __loop_head)
+    {
+        s_loop_node_t *curr_node = __loop_head;
+        while (curr_node)
+        { // compare and remove loop with '_name_'.
+            if (0 == strncmp(curr_node->name, _name_, MAX_LEN(curr_node->name, _name_)))
+            {
+                if (curr_node->loop)
+                {
+                    ezlopi_service_loop_remove(curr_node->loop);
+                }
+                break;
+            }
+            curr_node = curr_node->next;
+        }
+    }
+}
+
 void ezlopi_service_loop_remove(f_loop_t loop)
 {
     if (loop && __loop_head)
