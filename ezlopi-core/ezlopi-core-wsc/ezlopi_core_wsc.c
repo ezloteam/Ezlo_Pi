@@ -545,12 +545,12 @@ static int __upgrade_to_websocket(s_ssl_websocket_t *ssl_wsc)
                                        "Host: ot.review-staging-op-owkix8.ewr4.opentelemetry.ezlo.com\n"
                                        "Connection: Upgrade\n"
                                        "Upgrade: websocket\n"
-                                       "Origin: wss://%s\n"
+                                       "Origin: wss://ot.review-staging-op-owkix8.ewr4.opentelemetry.ezlo.com\n"
                                        "Sec-WebSocket-Version: 13\n"
                                        "User-Agent: EzloPi-%llu\n"
                                        "Sec-WebSocket-Key: JSUlJXYeLiJ2Hi4idh4uIg==\r\n\r\n";
 
-            snprintf(ssl_wsc->buffer, ssl_wsc->buffer_len, tmp_request_format, ssl_wsc->url, ezlopi_factory_info_v3_get_id());
+            snprintf(ssl_wsc->buffer, ssl_wsc->buffer_len, tmp_request_format, ezlopi_factory_info_v3_get_id());
             TRACE_D("tmp_request_format: \r\n%s", ssl_wsc->buffer ? ssl_wsc->buffer : "null");
 
             ret = __send_internal(ssl_wsc, ssl_wsc->buffer, strlen(ssl_wsc->buffer), 5000);
@@ -561,9 +561,12 @@ static int __upgrade_to_websocket(s_ssl_websocket_t *ssl_wsc)
 
                 int read_len = 0;
                 memset(ssl_wsc->buffer, 0, ssl_wsc->buffer_len);
-                ret = mbedtls_ssl_read(ssl_wsc->ssl_ctx, (uint8_t *)ssl_wsc->buffer, ssl_wsc->buffer_len);
 
-                TRACE_I("wss-upgrade response: %.*s", ssl_wsc->buffer_len, ssl_wsc->buffer);
+                // mbedtls_ssl_conf_read_timeout(ssl_wsc->ssl_ctx, 5000);
+                ret = mbedtls_ssl_read(ssl_wsc->ssl_ctx, (uint8_t *)ssl_wsc->buffer, ssl_wsc->buffer_len);
+                // ret = mbedtls_net_recv_timeout(ssl_wsc->ssl_ctx, (uint8_t *)ssl_wsc->buffer, ssl_wsc->buffer_len, 5000);
+
+                TRACE_S("wss-upgrade response: %.*s", ssl_wsc->buffer_len, ssl_wsc->buffer);
 
                 if ((ret == MBEDTLS_ERR_SSL_WANT_READ) || (ret == MBEDTLS_ERR_SSL_WANT_WRITE))
                 {
@@ -595,7 +598,9 @@ static int __upgrade_to_websocket(s_ssl_websocket_t *ssl_wsc)
                         ssl_wsc->connection_upcall_func(false);
                     }
 
-                    TRACE_E("mbedtls_ssl_read returned -0x%x", -ret);
+                    char error_str[200];
+                    mbedtls_strerror(ret, error_str, 200);
+                    TRACE_E("mbedtls_ssl_read returned -0x%x, %s", -ret, error_str);
                     break;
                 }
 
@@ -659,7 +664,6 @@ static int __rx_func(s_ssl_websocket_t *ssl_wsc)
     {
         while (1)
         {
-
             int retry = 5;
 
             do
@@ -692,7 +696,14 @@ static int __rx_func(s_ssl_websocket_t *ssl_wsc)
                 }
 
                 // MBEDTLS_ERR_SSL_CRYPTO_IN_PROGRESS
+
+                mbedtls_ssl_conf_read_timeout(ssl_wsc->ssl_ctx, 5000);
                 ret = mbedtls_ssl_read(ssl_wsc->ssl_ctx, (uint8_t *)ssl_wsc->buffer, ssl_wsc->buffer_len);
+                // ret = mbedtls_net_recv_timeout(ssl_wsc->ssl_ctx, (uint8_t *)ssl_wsc->buffer, ssl_wsc->buffer_len, 5000);
+
+                char error_str[200];
+                mbedtls_strerror(ret, error_str, 200);
+                TRACE_E("mbedtls_ssl_read returned -0x%x, %s", -ret, error_str);
 
                 if (ret < 0)
                 {

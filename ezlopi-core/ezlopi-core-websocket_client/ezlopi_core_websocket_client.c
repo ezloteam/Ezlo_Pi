@@ -82,14 +82,16 @@ esp_websocket_client_handle_t ezlopi_websocket_client_init(cJSON *uri, void (*ms
 
         esp_websocket_client_config_t websocket_cfg = {
             .uri = uri->valuestring,
-            .task_stack = EZPI_CORE_WSS_TASK_STACK_SIZE,
-            .buffer_size = EZPI_CORE_WSS_DATA_BUFFER_SIZE,
+            .buffer_size = 128,
+            .task_stack = 5 * 1024,
+            // .task_stack = EZPI_CORE_WSS_TASK_STACK_SIZE,
+            // .buffer_size = EZPI_CORE_WSS_DATA_BUFFER_SIZE,
             .cert_pem = ca_cert,
-            .client_cert = ssl_shared,
             .client_key = ssl_priv,
-            .pingpong_timeout_sec = EZPI_CORE_WSS_PING_PONG_TIMEOUT_SEC,
+            .client_cert = ssl_shared,
             .keep_alive_enable = 1,
             .ping_interval_sec = EZPI_CORE_WSS_PING_INTERVAL_SEC,
+            .pingpong_timeout_sec = EZPI_CORE_WSS_PING_PONG_TIMEOUT_SEC,
         };
 
         TRACE_S("Connecting to %s...", websocket_cfg.uri);

@@ -204,6 +204,7 @@ static void __fetch_wss_endpoint(void *pv)
 
 static void __message_process(const char *payload, uint32_t len)
 {
+    TRACE_D("PAYLOAD: %.*s", len, payload);
     if (payload && len)
     {
         cJSON *cj_response = ezlopi_core_api_consume(__FUNCTION__, payload, len);
