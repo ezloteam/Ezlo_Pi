@@ -59,6 +59,7 @@ static void __fetch_wss_endpoint(void *pv);
 static void __connection_upcall(bool connected);
 static void __message_upcall(const char *payload, uint32_t len);
 static void __message_process(const char *payload, uint32_t len);
+static void __message_process_cjson(cJSON *cj_request);
 
 static ezlopi_error_t __send_str_data_to_nma_websocket(char *str_data);
 static int __send_cjson_data_to_nma_websocket(cJSON *cj_data);
@@ -185,8 +186,16 @@ static void __fetch_wss_endpoint(void *pv)
 
                 if (payload)
                 {
-                    __message_process(payload, strlen(payload));
+                    // __message_process(payload, strlen(payload));
+
+                    cJSON *cj_request = cJSON_Parse(__FUNCTION__, payload);
                     ezlopi_free(__FUNCTION__, payload);
+
+                    if (cj_request)
+                    {
+                        __message_process_cjson(cj_request);
+                        cJSON_Delete(__FUNCTION__, cj_request);
+                    }
                 }
             }
 
@@ -202,12 +211,32 @@ static void __fetch_wss_endpoint(void *pv)
     vTaskDelete(NULL);
 }
 
+static void __message_process_cjson(cJSON *cj_request)
+{
+    if (cj_request)
+    {
+        cJSON *cj_response = ezlopi_core_api_consume_cjson(__FUNCTION__, cj_request);
+        if (cj_response)
+        {
+            cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_msg_id_str, message_counter);
+            __send_cjson_data_to_nma_websocket(cj_response);
+
+            cJSON_Delete(__FUNCTION__, cj_response);
+        }
+        else
+        {
+            TRACE_W("no response!");
+        }
+    }
+}
+
 static void __message_process(const char *payload, uint32_t len)
 {
     TRACE_D("PAYLOAD: %.*s", len, payload);
     if (payload && len)
     {
         cJSON *cj_response = ezlopi_core_api_consume(__FUNCTION__, payload, len);
+
         if (cj_response)
         {
             cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_msg_id_str, message_counter);
@@ -247,10 +276,6 @@ static void __message_upcall(const char *payload, uint32_t len)
                 ezlopi_free(__FUNCTION__, payload_copy);
             }
         }
-    }
-    else
-    {
-        __message_process(payload, len);
     }
 }
 
