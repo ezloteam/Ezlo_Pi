@@ -9,6 +9,7 @@
 #include "ezlopi_core_modes_cjson.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_errors.h"
+#include "ezlopi_core_sntp.h"
 
 #include "ezlopi_cloud_constants.h"
 #include "EZLOPI_USER_CONFIG.h"
@@ -412,7 +413,7 @@ cJSON *ezlopi_core_modes_cjson_alarmed(const char *dev_id_str) // (IN core-servi
             if (curr_mode)
             {
                 CJSON_ASSIGN_ID(cj_result, curr_mode->current_mode_id, ezlopi_modeId_str);
-                CJSON_ASSIGN_ID(cj_result, dev_id_str, ezlopi_deviceId_str); // 'device_id' that triggers an alarm
+                cJSON_AddStringToObject(__FUNCTION__, cj_result, dev_id_str, ezlopi_deviceId_str); // 'device_id' that triggers an alarm
                 if (EZLOPI_MODES_ALARM_PHASE_ENTRYDELAY == curr_mode->alarmed.phase)
                 {
                     CJSON_ASSIGN_ID(cj_result, curr_mode->time_is_left_to_switch_sec, "pendingDelay"); // Only for 'entryDelay'

@@ -20,15 +20,12 @@
 #if defined(CONFIG_EZPI_SERV_ENABLE_MODES)
 
 static SemaphoreHandle_t sg_modes_loop_smphr = NULL;
-static SemaphoreHandle_t sg_device_alert_smphr = NULL;
 
 static void __modes_loop(void *pv);
-static void __device_alert_event(void *pv);
-// static void __modes_service(void *pv);
 
 typedef struct l_modes_alert
 {
-    volatile bool alert_trig;      // default 'false' [guard to trigger alert]
+    bool alert_trig;               // default 'false' [guard to trigger alert]
     const char *u_id_str;          // unique arg for a
     uint32_t abort_window_ll;      // abort alarm-broadcast with this time   (Phase 1)
     uint32_t alarm_delay_ll;       // delay before triggering an alert       (Phase 2)
@@ -202,79 +199,6 @@ static void __broadcast_modes_alarmed_for_uid(const char *dev_id_str)
     {
         cJSON_Delete(__FUNCTION__, cj_update);
     }
-}
-
-static ezlopi_error_t __check_mode_switch_condition(s_ezlopi_modes_t *ez_mode)
-{
-    ezlopi_error_t ret = EZPI_ERR_MODES_FAILED;
-
-    if (ez_mode->switch_to_mode_id)
-    {
-        if (ez_mode->time_is_left_to_switch_sec)
-        {
-            ez_mode->time_is_left_to_switch_sec--;
-            TRACE_D("time_is_left_to_SWITCH_sec: %u", ez_mode->time_is_left_to_switch_sec);
-        }
-        else
-        {
-            // find the 'house-mode', to switch to using 'switch_to_mode_id'.
-            s_house_modes_t *new_house_mode = ezlopi_core_modes_get_house_mode_by_id(ez_mode->switch_to_mode_id);
-            if (new_house_mode)
-            {
-                uint8_t bypass_clear_modeId = ez_mode->current_mode_id;
-
-                // switch to new 'MODE'
-                TRACE_I("switching-to-mode: %s (id: %u)", new_house_mode->name, new_house_mode->_id);
-                ez_mode->current_mode_id = ez_mode->switch_to_mode_id;
-                ez_mode->switch_to_mode_id = 0;
-
-                // After the transition, bypass devices list is cleared for the previous house mode.
-                s_house_modes_t *prev_house_mode = ezlopi_core_modes_get_house_mode_by_id(bypass_clear_modeId);
-                if (prev_house_mode && prev_house_mode->cj_bypass_devices)
-                {
-                    // Also Remove all the 'alert-nodes'
-                    __ezlopi_service_remove_all_alerts(); // [false ; 0] == remove all
-
-                    cJSON_Delete(__FUNCTION__, prev_house_mode->cj_bypass_devices);
-                    prev_house_mode->cj_bypass_devices = NULL;
-                }
-
-                // set the new 'house-mode' as the active 'custom-mode'
-                if (EZPI_SUCCESS == ezlopi_core_modes_set_current_house_mode(new_house_mode))
-                {
-                    // 1. assign 'delayToSwitch'
-                    ez_mode->time_is_left_to_switch_sec = ez_mode->switch_to_delay_sec = new_house_mode->switch_to_delay_sec;
-
-                    // 2. assign 'alert/alarm_delay' mode.
-                    if (new_house_mode->armed)
-                    {
-                        ez_mode->alarm_delay = new_house_mode->alarm_delay_sec; // 'Delay_sec' before sending alert if armed sensors (door/window or motion sensor) tripped
-                    }
-
-                    // 3. Refresh 'timeleftTo-exit-EntryDelay' second info for --->  non-zero 'entryDelay'
-                    if ((0 < ez_mode->alarmed.entry_delay_sec) && (0 == ez_mode->alarmed.time_is_left_sec))
-                    {
-                        ez_mode->alarmed.time_is_left_sec = ez_mode->alarmed.entry_delay_sec;
-                    }
-
-                    // 4. Store to nvs
-                    ezlopi_core_modes_store_to_nvs();
-
-                    cJSON *cj_update = ezlopi_core_modes_cjson_changed();
-                    CJSON_TRACE("----------------- broadcasting - cj_update", cj_update);
-
-                    if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(cj_update))
-                    {
-                        cJSON_Delete(__FUNCTION__, cj_update);
-                    }
-
-                    ret = EZPI_SUCCESS;
-                }
-            }
-        }
-    }
-
-    return ret;
 }
 
 static bool __check_if_device_is_bypassed(cJSON *cj_bypass_devices, const char *device_id_str) // this only checks if 'device_id_str' is bypassed
@@ -481,6 +405,79 @@ static void __check_main_and_broadcast_status(s_ezlopi_modes_t *ez_mode)
     }
 }
 
+static ezlopi_error_t __check_mode_switch_condition(s_ezlopi_modes_t *ez_mode)
+{
+    ezlopi_error_t ret = EZPI_ERR_MODES_FAILED;
+
+    if (ez_mode->switch_to_mode_id)
+    {
+        if (ez_mode->time_is_left_to_switch_sec)
+        {
+            ez_mode->time_is_left_to_switch_sec--;
+            TRACE_D("time_is_left_to_SWITCH_sec: %u", ez_mode->time_is_left_to_switch_sec);
+        }
+        else
+        {
+            // find the 'house-mode', to switch to using 'switch_to_mode_id'.
+            s_house_modes_t *new_house_mode = ezlopi_core_modes_get_house_mode_by_id(ez_mode->switch_to_mode_id);
+            if (new_house_mode)
+            {
+                uint8_t bypass_clear_modeId = ez_mode->current_mode_id;
+
+                // switch to new 'MODE'
+                TRACE_I("switching-to-mode: %s (id: %u)", new_house_mode->name, new_house_mode->_id);
+                ez_mode->current_mode_id = ez_mode->switch_to_mode_id;
+                ez_mode->switch_to_mode_id = 0;
+
+                // After the transition, bypass devices list is cleared for the previous house mode.
+                s_house_modes_t *prev_house_mode = ezlopi_core_modes_get_house_mode_by_id(bypass_clear_modeId);
+                if (prev_house_mode && prev_house_mode->cj_bypass_devices)
+                {
+                    // Also Remove all the 'alert-nodes'
+                    __ezlopi_service_remove_all_alerts(); // [false ; 0] == remove all
+
+                    cJSON_Delete(__FUNCTION__, prev_house_mode->cj_bypass_devices);
+                    prev_house_mode->cj_bypass_devices = NULL;
+                }
+
+                // set the new 'house-mode' as the active 'custom-mode'
+                if (EZPI_SUCCESS == ezlopi_core_modes_set_current_house_mode(new_house_mode))
+                {
+                    // 1. assign 'delayToSwitch'
+                    ez_mode->time_is_left_to_switch_sec = ez_mode->switch_to_delay_sec = new_house_mode->switch_to_delay_sec;
+
+                    // 2. assign 'alert/alarm_delay' mode.
+                    if (new_house_mode->armed)
+                    {
+                        ez_mode->alarm_delay = new_house_mode->alarm_delay_sec; // 'Delay_sec' before sending alert if armed sensors (door/window or motion sensor) tripped
+                    }
+
+                    // 3. Refresh 'timeleftTo-exit-EntryDelay' second info for --->  non-zero 'entryDelay'
+                    if ((0 < ez_mode->alarmed.entry_delay_sec) && (0 == ez_mode->alarmed.time_is_left_sec))
+                    {
+                        ez_mode->alarmed.time_is_left_sec = ez_mode->alarmed.entry_delay_sec;
+                    }
+
+                    // 4. Store to nvs
+                    ezlopi_core_modes_store_to_nvs();
+
+                    cJSON *cj_update = ezlopi_core_modes_cjson_changed();
+                    CJSON_TRACE("----------------- broadcasting - cj_update", cj_update);
+
+                    if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(cj_update))
+                    {
+                        cJSON_Delete(__FUNCTION__, cj_update);
+                    }
+
+                    ret = EZPI_SUCCESS;
+                }
+            }
+        }
+    }
+
+    return ret;
+}
+
 static void __modes_loop(void *arg)
 {
     if (pdTRUE == xSemaphoreTake(sg_modes_loop_smphr, 1000 / portTICK_PERIOD_MS))
@@ -494,15 +491,13 @@ static void __modes_loop(void *arg)
             {
                 TRACE_D("Mode - Switch completed to [%d]", ez_mode->current_mode_id);
                 // after switching-modes ; Create unique trigger-event-loops for each devices in 'alarm-list'
-
                 if (true == curr_house_mode->armed) // if the new mode is armed ; create 'non_bypass_alert_ll'
                 {
                     __modes_create_non_bypass_alerts(ez_mode, curr_house_mode);
                 }
             }
             else
-            {
-                // After the switching is DONE.
+            { // After the switching is DONE.
                 // 2. Pre-alarming (ENTRY-DELAY) ; Operate on the 'cj_alarms' list to excluding 'cj_alarm_off_devices'
                 if ((true == curr_house_mode->armed) && (true == __check_if_entry_delay_finished(ez_mode)))
                 {
