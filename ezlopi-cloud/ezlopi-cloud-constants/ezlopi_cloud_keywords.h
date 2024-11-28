@@ -271,10 +271,13 @@ extern const char *ezlopi_switchToDelay_str;
 extern const char *ezlopi_alarmDelay_str;
 extern const char *ezlopi_entryDelay_str;
 extern const char *ezlopi_normal_str;
-// extern const char *ezlopi_short_str;
 extern const char *ezlopi_long_extended_str;
 extern const char *ezlopi_extended_str;
 extern const char *ezlopi_instant_str;
+extern const char *ezlopi_abortWindow_str;
+extern const char *ezlopi_minimum_str;
+extern const char *ezlopi_maximum_str;
+
 extern const char *ezlopi_modes_str;
 extern const char *ezlopi_disarmedDefault_str;
 extern const char *ezlopi_disarmedDevices_str;

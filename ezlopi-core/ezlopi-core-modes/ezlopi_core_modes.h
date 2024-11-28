@@ -133,8 +133,8 @@ typedef struct s_ezlopi_modes
     cJSON *cj_devices; // Array of device id with security sensors
     s_protect_buttons_t *l_protect_buttons;
 
-    s_entry_delay_t entry_delay; // A dictionary for Entry Delays values
-    s_abort_window_t abort_delay;
+    s_entry_delay_t entry_delay;  // A dictionary for Entry Delays values
+    s_abort_window_t abort_delay; // 'default / min / max' - delay values
 
     s_alarmed_t alarmed; // NOTE :: Present only if the house modes enter the alarmed state. [ie. must have { MODES->house_mode.armed = true}  ]
 
