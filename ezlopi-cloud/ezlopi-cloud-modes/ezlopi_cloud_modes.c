@@ -33,7 +33,6 @@ void ezlopi_cloud_modes_current_get(cJSON *cj_request, cJSON *cj_response)
 
 void ezlopi_cloud_modes_switch(cJSON *cj_request, cJSON *cj_response)
 {
-
     s_house_modes_t *house_mode = NULL;
 
     cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
@@ -64,8 +63,8 @@ void ezlopi_cloud_modes_switch(cJSON *cj_request, cJSON *cj_response)
             s_ezlopi_modes_t *custom_mode = ezlopi_core_modes_get_custom_modes();
             if (custom_mode)
             {
-                cJSON_AddNumberToObject(__FUNCTION__, cj_result, ezlopi_switchToDelay_str, custom_mode->switch_to_delay_sec);   // "delay used" before switching to new 'mode' ()
-                cJSON_AddNumberToObject(__FUNCTION__, cj_result, ezlopi_alarmDelay_str, custom_mode->alarm_delay);  // "delay used" before alarm activated ; assigned to curr 'MODE'
+                cJSON_AddNumberToObject(__FUNCTION__, cj_result, ezlopi_switchToDelay_str, custom_mode->switch_to_delay_sec); // "delay used" before switching to new 'mode' ()
+                cJSON_AddNumberToObject(__FUNCTION__, cj_result, ezlopi_alarmDelay_str, custom_mode->alarm_delay);            // "delay used" before alarm activated ; assigned to curr 'MODE'
             }
         }
     }
@@ -272,14 +271,14 @@ void ezlopi_cloud_modes_cameras_off_remove(cJSON *cj_request, cJSON *cj_response
 
 void ezlopi_cloud_modes_bypass_devices_add(cJSON *cj_request, cJSON *cj_response)
 {
-    cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+    cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     if (cj_result)
     {
-        cJSON* cj_params = cJSON_GetObjectItem(__func__, cj_request, ezlopi_params_str);
+        cJSON *cj_params = cJSON_GetObjectItem(__func__, cj_request, ezlopi_params_str);
         if (cj_params)
         {
-            cJSON* cj_modelID = cJSON_GetObjectItem(__func__, cj_params, ezlopi_modeId_str);
-            cJSON* cj_deviceIds = cJSON_GetObjectItem(__func__, cj_params, ezlopi_device_ids_str);
+            cJSON *cj_modelID = cJSON_GetObjectItem(__func__, cj_params, ezlopi_modeId_str);
+            cJSON *cj_deviceIds = cJSON_GetObjectItem(__func__, cj_params, ezlopi_device_ids_str);
             if (cj_modelID && cj_deviceIds && (cj_deviceIds->type == cJSON_Array))
             {
                 uint8_t modeId = strtoul(cj_modelID->valuestring, NULL, 10);
@@ -291,14 +290,14 @@ void ezlopi_cloud_modes_bypass_devices_add(cJSON *cj_request, cJSON *cj_response
 
 void ezlopi_cloud_modes_bypass_devices_remove(cJSON *cj_request, cJSON *cj_response)
 {
-    cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+    cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     if (cj_result)
     {
-        cJSON* cj_params = cJSON_GetObjectItem(__func__, cj_request, ezlopi_params_str);
+        cJSON *cj_params = cJSON_GetObjectItem(__func__, cj_request, ezlopi_params_str);
         if (cj_params)
         {
-            cJSON* cj_modelID = cJSON_GetObjectItem(__func__, cj_params, ezlopi_modeId_str);
-            cJSON* cj_deviceIds = cJSON_GetObjectItem(__func__, cj_params, ezlopi_device_ids_str);
+            cJSON *cj_modelID = cJSON_GetObjectItem(__func__, cj_params, ezlopi_modeId_str);
+            cJSON *cj_deviceIds = cJSON_GetObjectItem(__func__, cj_params, ezlopi_device_ids_str);
             if (cj_modelID && cj_deviceIds && (cj_deviceIds->type == cJSON_Array))
             {
                 uint8_t modeId = strtoul(cj_modelID->valuestring, NULL, 10);

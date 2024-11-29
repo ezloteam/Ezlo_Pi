@@ -33,37 +33,9 @@ static s_loop_node_t *__loop_head = NULL;
 static void __loop(void *pv);
 static s_loop_node_t *__create_node(const char *name, f_loop_t loop, uint32_t period_ms, void *arg);
 
-bool ezlopi_service_is_mode_loop_acitve(f_loop_t loop, const char *loop_name)
-{
-    bool ret = false;
-    if (loop && loop_name)
-    {
-        if (__loop_head->loop == loop &&
-            (0 == strncmp(__loop_head->name, loop_name, MAX_LEN(__loop_head->name, loop_name))))
-        {
-            ret = true;
-        }
-        else
-        {
-            s_loop_node_t *curr_node = __loop_head;
-            while (curr_node->next)
-            {
-                if (curr_node->next->loop == loop &&
-                    (0 == strncmp(curr_node->next->name, loop_name, MAX_LEN(curr_node->next->name, loop_name))))
-                {
-                    ret = true;
-                    break;
-                }
-                curr_node = curr_node->next;
-            }
-        }
-    }
-    return ret;
-}
-
 void ezlopi_service_loop_add(const char *name, f_loop_t loop, uint32_t period_ms, void *arg)
 {
-    if (loop && name && (false == ezlopi_service_is_mode_loop_acitve(loop, name))) // adding to guard [check if 'loop' is already present]
+    if (loop && name) // adding to guard [check if 'loop' is already present]
     {
         if (__loop_head)
         {
@@ -78,26 +50,6 @@ void ezlopi_service_loop_add(const char *name, f_loop_t loop, uint32_t period_ms
         else
         {
             __loop_head = __create_node(name, loop, (period_ms / portTICK_RATE_MS), arg);
-        }
-    }
-}
-
-void ezlopi_service_loop_remove_by_name(const char *_name_) // 'loop-method-name'
-{
-    if (_name_ && __loop_head)
-    {
-        s_loop_node_t *curr_node = __loop_head;
-        while (curr_node)
-        { // compare and remove loop with '_name_'.
-            if (0 == strncmp(curr_node->name, _name_, MAX_LEN(curr_node->name, _name_)))
-            {
-                if (curr_node->loop)
-                {
-                    ezlopi_service_loop_remove(curr_node->loop);
-                }
-                break;
-            }
-            curr_node = curr_node->next;
         }
     }
 }

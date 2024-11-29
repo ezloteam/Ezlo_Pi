@@ -70,19 +70,19 @@ s_house_modes_t *ezlopi_core_modes_get_house_mode_by_name(char *house_mode_name)
 
     if (house_mode_name)
     {
-        if (0 == strcmp(house_mode_name, sg_custom_modes->mode_home.name))
+        if (EZPI_STRNCMP_IF_EQUAL(house_mode_name, sg_custom_modes->mode_home.name, strlen(house_mode_name), strlen(sg_custom_modes->mode_home.name)))
         {
             _house_mode = &sg_custom_modes->mode_home;
         }
-        else if (0 == strcmp(house_mode_name, sg_custom_modes->mode_away.name))
+        else if (EZPI_STRNCMP_IF_EQUAL(house_mode_name, sg_custom_modes->mode_away.name, strlen(house_mode_name), strlen(sg_custom_modes->mode_away.name)))
         {
             _house_mode = &sg_custom_modes->mode_away;
         }
-        else if (0 == strcmp(house_mode_name, sg_custom_modes->mode_night.name))
+        else if (EZPI_STRNCMP_IF_EQUAL(house_mode_name, sg_custom_modes->mode_night.name, strlen(house_mode_name), strlen(sg_custom_modes->mode_night.name)))
         {
             _house_mode = &sg_custom_modes->mode_night;
         }
-        else if (0 == strcmp(house_mode_name, sg_custom_modes->mode_vacation.name))
+        else if (EZPI_STRNCMP_IF_EQUAL(house_mode_name, sg_custom_modes->mode_vacation.name, strlen(house_mode_name), strlen(sg_custom_modes->mode_vacation.name)))
         {
             _house_mode = &sg_custom_modes->mode_vacation;
         }
@@ -109,7 +109,20 @@ ezlopi_error_t ezlopi_core_modes_api_switch_mode(s_house_modes_t *switch_to_hous
 {
     ezlopi_service_modes_stop(5000);
     sg_custom_modes->switch_to_mode_id = switch_to_house_mode->_id;
-    sg_custom_modes->time_is_left_to_switch_sec = 0; // broadcast canceled / done?
+    sg_custom_modes->time_is_left_to_switch_sec = 0;
+
+    if (sg_current_house_mode && (true == sg_current_house_mode->armed))
+    {
+        TRACE_D("here");
+        // #. If the curr-house-mode already was in 'pre-alarming[EntryDelay]' MODE ; set 'canceled' broadcast status
+        if (EZLOPI_MODES_ALARM_PHASE_ENTRYDELAY == sg_custom_modes->alarmed.phase &&
+            EZLOPI_MODES_ALARM_STATUS_BEGIN == sg_custom_modes->alarmed.status)
+        {
+            TRACE_D("here");
+            sg_custom_modes->alarmed.status = EZLOPI_MODES_ALARM_STATUS_CANCELED;
+        }
+    }
+    // The broadcast is triggered when 'modes-loop' is started
     ezlopi_service_modes_start(5000);
 
     return 1;
@@ -122,7 +135,7 @@ ezlopi_error_t ezlopi_core_modes_api_cancel_switch(void)
     {
         ezlopi_service_modes_stop(5000);
         sg_custom_modes->switch_to_mode_id = 0;
-        sg_custom_modes->time_is_left_to_switch_sec = 0; // broad cast done ?
+        sg_custom_modes->time_is_left_to_switch_sec = 0;
         ezlopi_service_modes_start(5000);
         ret = EZPI_SUCCESS;
     }
@@ -151,8 +164,9 @@ ezlopi_error_t ezlopi_core_modes_api_skip_entry_delay(void)
     {
         ret = EZPI_SUCCESS;
         ezlopi_service_modes_stop(5000);
-        sg_custom_modes->alarmed.phase = EZLOPI_MODES_ALARM_PHASE_MAIN;
-        sg_custom_modes->alarmed.status = EZLOPI_MODES_ALARM_STATUS_BEGIN;
+        sg_custom_modes->alarmed.time_is_left_sec = 0;
+        sg_custom_modes->alarmed.phase = EZLOPI_MODES_ALARM_PHASE_ENTRYDELAY;
+        sg_custom_modes->alarmed.status = EZLOPI_MODES_ALARM_STATUS_DONE;
         ezlopi_service_modes_start(5000);
     }
 

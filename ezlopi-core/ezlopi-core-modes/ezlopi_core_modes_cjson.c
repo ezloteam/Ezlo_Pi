@@ -19,6 +19,7 @@
 static void __cjson_add_alarmed(cJSON *cj_alarmed, s_alarmed_t *alarmed);
 static void __cjson_add_mode_to_array(cJSON *cj_modes_arr, s_house_modes_t *mode);
 static void __cjson_add_entry_delay(cJSON *cj_result, s_entry_delay_t *entry_delay);
+static void __cjson_add_abort_window(cJSON *cj_result, s_abort_window_t *abort_delay);
 static void __cjson_add_number_as_hex_string(cJSON *cj_dest, const char *obj_name, uint32_t number);
 static void __cjson_duplicate_add_reference(cJSON *cj_dest, const char *item_name_str, cJSON *cj_item);
 static void __cjson_add_protect_buttons(cJSON *cj_protect_buttons_arr, s_protect_buttons_t *l_protect_buttons);
@@ -43,9 +44,12 @@ ezlopi_error_t ezlopi_core_modes_cjson_get_modes(cJSON *cj_dest)
 
         cJSON_AddNumberToObject(__FUNCTION__, cj_dest, ezlopi_timeIsLeftToSwitch_str, _modes->time_is_left_to_switch_sec);
         cJSON_AddNumberToObject(__FUNCTION__, cj_dest, ezlopi_switchToDelay_str, _modes->switch_to_delay_sec);
-        cJSON_AddNumberToObject(__FUNCTION__, cj_dest, ezlopi_alarmDelay_str, _modes->alarmed.time_is_left_sec); // utilizing the alarm-delay variables in 'alarmed-struct'
+        cJSON_AddNumberToObject(__FUNCTION__, cj_dest, ezlopi_alarmDelay_str, _modes->alarm_delay); // utilizing the alarm-delay variables in 'alarmed-struct'
 
         __cjson_add_entry_delay(cj_dest, &_modes->entry_delay);
+        __cjson_add_abort_window(cj_dest, &_modes->abort_delay);
+
+        cJSON_AddNumberToObject(__FUNCTION__, cj_dest, "switchToDelayRunsOut", _modes->switch_to_delay_runs_out);
 
         cJSON *cj_modes_array = cJSON_AddArrayToObject(__FUNCTION__, cj_dest, ezlopi_modes_str);
         if (cj_modes_array)
@@ -89,7 +93,7 @@ ezlopi_error_t ezlopi_core_modes_cjson_get_current_mode(cJSON *cj_dest)
     return ret;
 }
 
-s_ezlopi_modes_t *ezlopi_core_modes_cjson_parse_modes(cJSON *cj_modes)
+s_ezlopi_modes_t *ezlopi_core_modes_cjson_parse_modes(cJSON *cj_modes) // This function extracts 'mode_values' from cjson
 {
     int _parsing_status = 0;
     s_ezlopi_modes_t *parsed_mode = (s_ezlopi_modes_t *)ezlopi_malloc(__FUNCTION__, sizeof(s_ezlopi_modes_t));
@@ -100,7 +104,6 @@ s_ezlopi_modes_t *ezlopi_core_modes_cjson_parse_modes(cJSON *cj_modes)
         CJSON_GET_ID(parsed_mode->current_mode_id, cJSON_GetObjectItem(__FUNCTION__, cj_modes, ezlopi_current_str));
         CJSON_GET_ID(parsed_mode->switch_to_mode_id, cJSON_GetObjectItem(__FUNCTION__, cj_modes, ezlopi_switchTo_str));
         CJSON_GET_VALUE_DOUBLE(cj_modes, ezlopi_timeIsLeftToSwitch_str, parsed_mode->time_is_left_to_switch_sec);
-        CJSON_GET_VALUE_DOUBLE(cj_modes, ezlopi_timeIsLeftToAlarm_str, parsed_mode->alarmed.time_is_left_sec); // utlizing the 'time_left_var' within 'alarmed-struct'
         CJSON_GET_VALUE_DOUBLE(cj_modes, ezlopi_switchToDelay_str, parsed_mode->switch_to_delay_sec);
         CJSON_GET_VALUE_DOUBLE(cj_modes, ezlopi_alarmDelay_str, parsed_mode->alarm_delay); // "delay used" before switching to alarm assigned to this 'MODE'
 
@@ -464,6 +467,17 @@ static void __cjson_add_entry_delay(cJSON *cj_result, s_entry_delay_t *entry_del
     }
 }
 
+static void __cjson_add_abort_window(cJSON *cj_result, s_abort_window_t *abort_delay)
+{
+    cJSON *cj_abort_window = cJSON_AddObjectToObject(__FUNCTION__, cj_result, ezlopi_abortWindow_str);
+    if (cj_abort_window)
+    {
+        cJSON_AddNumberToObject(__FUNCTION__, cj_abort_window, ezlopi_default_str, abort_delay->default_delay_sec);
+        cJSON_AddNumberToObject(__FUNCTION__, cj_abort_window, ezlopi_minimum_str, abort_delay->minimum_delay_sec);
+        cJSON_AddNumberToObject(__FUNCTION__, cj_abort_window, ezlopi_maximum_str, abort_delay->maximum_delay_sec);
+    }
+}
+
 static void __cjson_duplicate_add_reference(cJSON *cj_dest, const char *item_name_str, cJSON *cj_item)
 {
     if (cj_dest)
@@ -538,17 +552,6 @@ static void __cjson_add_alarmed(cJSON *cj_alarmed, s_alarmed_t *alarmed)
         cJSON_AddStringToObject(__FUNCTION__, cj_alarmed, ezlopi_type_str, alarmed->type);
         cJSON_AddBoolToObject(__FUNCTION__, cj_alarmed, "silent", alarmed->silent);
 
-        (EZLOPI_MODES_ALARM_PHASE_IDLE == alarmed->phase)         ? cJSON_AddStringToObject(__FUNCTION__, cj_alarmed, "phase", "idle")
-        : (EZLOPI_MODES_ALARM_PHASE_BYPASS == alarmed->phase)     ? cJSON_AddStringToObject(__FUNCTION__, cj_alarmed, "phase", "bypass")
-        : (EZLOPI_MODES_ALARM_PHASE_ENTRYDELAY == alarmed->phase) ? cJSON_AddStringToObject(__FUNCTION__, cj_alarmed, "phase", "entryDelay")
-        : (EZLOPI_MODES_ALARM_PHASE_MAIN == alarmed->phase)       ? cJSON_AddStringToObject(__FUNCTION__, cj_alarmed, "phase", "main")
-                                                                  : cJSON_AddStringToObject(__FUNCTION__, cj_alarmed, "phase", "");
-
-        (EZLOPI_MODES_ALARM_STATUS_DONE == alarmed->status)       ? cJSON_AddStringToObject(__FUNCTION__, cj_alarmed, "status", "done")
-        : (EZLOPI_MODES_ALARM_STATUS_BEGIN == alarmed->status)    ? cJSON_AddStringToObject(__FUNCTION__, cj_alarmed, "status", "begin")
-        : (EZLOPI_MODES_ALARM_STATUS_CANCELED == alarmed->status) ? cJSON_AddStringToObject(__FUNCTION__, cj_alarmed, "status", "canceled")
-                                                                  : cJSON_AddStringToObject(__FUNCTION__, cj_alarmed, "status", "");
-
         cJSON *cj_sources_arr = cJSON_AddArrayToObject(__FUNCTION__, cj_alarmed, ezlopi_sources_str);
         if (cj_sources_arr)
         {
@@ -558,7 +561,6 @@ static void __cjson_add_alarmed(cJSON *cj_alarmed, s_alarmed_t *alarmed)
                 cJSON *cj_source = cJSON_CreateObject(__FUNCTION__);
                 if (cj_source)
                 {
-
                     CJSON_ASSIGN_NUMBER_AS_STRING(cj_source, source_node->device_id, ezlopi_deviceId_str);
                     cJSON_AddNumberToObject(__FUNCTION__, cj_source, ezlopi_delay_str, source_node->delay);
                     cJSON_AddNumberToObject(__FUNCTION__, cj_source, ezlopi_timestamp_str, source_node->time_stamp);

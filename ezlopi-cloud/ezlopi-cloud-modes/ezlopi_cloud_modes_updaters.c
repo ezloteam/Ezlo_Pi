@@ -54,6 +54,7 @@ void ezlopi_cloud_modes_alarmed(cJSON *cj_request, cJSON *cj_response)
         if (curr_mode)
         {
             CJSON_ASSIGN_ID(cj_result, curr_mode->current_mode_id, ezlopi_modeId_str);
+#warning "For Cloud interaction; [Cannot to determine which '_id' triggered the alert]"
             // CJSON_ASSIGN_ID(cj_result, "0000", ezlopi_deviceId_str);
             CJSON_ASSIGN_ID(cj_result, curr_mode->time_is_left_to_switch_sec, "pendingDelay");
 
@@ -89,6 +90,7 @@ void ezlopi_cloud_modes_changed_alarmed(cJSON *cj_request, cJSON *cj_response)
     }
 
     // 2. for 'modes.alarmed' - return  'cj_response'
+    TRACE_S("Triggering modes-alarm status");
     ezlopi_cloud_modes_alarmed(cj_request, cj_response);
 }
 
@@ -203,31 +205,24 @@ void ezlopi_cloud_modes_cameras_off_removed(cJSON *cj_request, cJSON *cj_respons
 
 void ezlopi_cloud_modes_bypass_devices_added(cJSON *cj_request, cJSON *cj_response)
 {
-    cJSON_AddStringToObject(__func__, cj_response, ezlopi__id_str, ezlopi_ui_broadcast_str);
+    cJSON_AddStringToObject(__func__, cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
     cJSON_AddStringToObject(__func__, cj_response, ezlopi_msg_subclass_str, "hub.modes.bypass_devices.added");
+
     cJSON *cj_params = cJSON_GetObjectItem(__func__, cj_request, ezlopi_params_str);
     if (cj_params)
     {
-        cJSON *cj_result = cJSON_Duplicate(__func__, cj_params, true);
-        if (cj_result)
-        {
-            cJSON_AddItemToObject(__func__, cj_response, ezlopi_result_str, cj_result);
-        }
+        cJSON_AddItemToObject(__func__, cj_response, ezlopi_result_str, cJSON_Duplicate(__func__, cj_params, true));
     }
 }
 
 void ezlopi_cloud_modes_bypass_devices_removed(cJSON *cj_request, cJSON *cj_response)
 {
-    cJSON_AddStringToObject(__func__, cj_response, ezlopi__id_str, ezlopi_ui_broadcast_str);
+    cJSON_AddStringToObject(__func__, cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
     cJSON_AddStringToObject(__func__, cj_response, ezlopi_msg_subclass_str, "hub.modes.bypass_devices.removed");
     cJSON *cj_params = cJSON_GetObjectItem(__func__, cj_request, ezlopi_params_str);
     if (cj_params)
     {
-        cJSON *cj_result = cJSON_Duplicate(__func__, cj_params, true);
-        if (cj_result)
-        {
-            cJSON_AddItemToObject(__func__, cj_response, ezlopi_result_str, cj_result);
-        }
+        cJSON_AddItemToObject(__func__, cj_response, ezlopi_result_str, cJSON_Duplicate(__func__, cj_params, true));
     }
 }
 

@@ -53,54 +53,6 @@ static l_modes_alert_t *__create_alert(const char *u_id, s_ezlopi_modes_t *ez_mo
     return new_node;
 }
 
-static void __ezlopi_service_add_alert(const char *u_id, s_ezlopi_modes_t *ez_mode)
-{
-    if (u_id && ez_mode)
-    {
-        if (_alert_head)
-        {
-            l_modes_alert_t *curr_node = _alert_head;
-            while (curr_node->next)
-            {
-                curr_node = curr_node->next;
-            }
-
-            curr_node->next = __create_alert(u_id, ez_mode);
-        }
-        else
-        {
-            _alert_head = __create_alert(u_id, ez_mode);
-        }
-    }
-}
-
-static void __remove_all_alerts(l_modes_alert_t *curr_node)
-{
-    if (curr_node->next)
-    {
-        __remove_all_alerts(curr_node->next);
-    }
-
-    if (curr_node->u_id_str)
-    {
-        ezlopi_free(__func__, curr_node->u_id_str);
-        curr_node->u_id_str = NULL;
-    }
-}
-
-static void __ezlopi_service_remove_all_alerts(void)
-{
-    if (_alert_head)
-    {
-        __remove_all_alerts(_alert_head);
-        _alert_head = NULL;
-    }
-    else
-    {
-        TRACE_E("Error!! [_alert_head] not found. ");
-    }
-}
-
 #if 0 /* These two function maybe used in future */
 static void __ezlopi_service_remove_alert_node(l_modes_alert_t *node)
 {
@@ -148,6 +100,60 @@ static void __ezlopi_service_remove_alert_node_by_name(const char *_name_)
     }
 }
 #endif
+
+static void __ezlopi_service_add_alert(const char *u_id, s_ezlopi_modes_t *ez_mode)
+{
+    if (u_id && ez_mode)
+    {
+        if (_alert_head)
+        {
+            l_modes_alert_t *curr_node = _alert_head;
+            while (curr_node->next)
+            {
+                curr_node = curr_node->next;
+            }
+
+            curr_node->next = __create_alert(u_id, ez_mode);
+        }
+        else
+        {
+            _alert_head = __create_alert(u_id, ez_mode);
+        }
+    }
+}
+
+static void __remove_all_alerts(l_modes_alert_t *curr_node)
+{
+    if (curr_node)
+    {
+        if (curr_node->next)
+        {
+            __remove_all_alerts(curr_node->next);
+            curr_node->next = NULL;
+        }
+
+        if (curr_node->u_id_str)
+        {
+            ezlopi_free(__func__, &(curr_node->u_id_str));
+            curr_node->u_id_str = NULL;
+        }
+
+        ezlopi_free(__func__, curr_node);
+    }
+}
+
+static void __ezlopi_service_remove_all_alerts(void)
+{
+    if (_alert_head)
+    {
+        __remove_all_alerts(_alert_head);
+        _alert_head = NULL;
+    }
+    else
+    {
+        TRACE_E("Error!! [_alert_head] not found. ");
+    }
+}
 
 //---------------------------------------------------------------------------------------------
 void ezlopi_service_modes_init(void)
@@ -201,6 +207,38 @@ static void __broadcast_modes_alarmed_for_uid(const char *dev_id_str)
     }
 }
 
+static bool __check_if_devid_in_alarm_off(s_house_modes_t *curr_house_mode, const char *device_id_str)
+{
+    bool ret = false;
+    if (curr_house_mode && device_id_str)
+    {
+        cJSON *cj_alarm_off = NULL;
+        cJSON_ArrayForEach(cj_alarm_off, curr_house_mode->cj_alarms_off_devices) // 'alarm_devid' should not be here
+        {
+            if (EZPI_STRNCMP_IF_EQUAL(device_id_str, cj_alarm_off->valuestring, strlen(device_id_str), cj_alarm_off->str_value_len))
+            {
+                ret = true;
+                break;
+            }
+        }
+    }
+    return ret;
+}
+
+static void __broadcast_alarmed_state_for_valid_ids(void)
+{
+    // iterate throught the 'alert_ll' and send broadcast to 'valid_ids'
+    l_modes_alert_t *curr_node = _alert_head;
+    while (curr_node)
+    {
+        if ((NULL != curr_node->u_id_str) && (false == __check_if_devid_in_alarm_off(ezlopi_core_modes_get_current_house_modes(), curr_node->u_id_str)))
+        {
+            __broadcast_modes_alarmed_for_uid(curr_node->u_id_str);
+        }
+        curr_node = curr_node->next;
+    }
+}
+
 static bool __check_if_device_is_bypassed(cJSON *cj_bypass_devices, const char *device_id_str) // this only checks if 'device_id_str' is bypassed
 {
     bool ret = false;
@@ -230,24 +268,6 @@ static bool __check_if_device_is_bypassed(cJSON *cj_bypass_devices, const char *
     return ret;
 }
 
-static bool __check_if_devid_in_alarm_off(s_house_modes_t *curr_house_mode, const char *device_id_str)
-{
-    bool ret = false;
-    if (curr_house_mode && device_id_str)
-    {
-        cJSON *cj_alarm_off = NULL;
-        cJSON_ArrayForEach(cj_alarm_off, curr_house_mode->cj_alarms_off_devices) // 'alarm_devid' should not be here
-        {
-            if (EZPI_STRNCMP_IF_EQUAL(device_id_str, cj_alarm_off->valuestring, strlen(device_id_str), cj_alarm_off->str_value_len))
-            {
-                ret = true;
-                break;
-            }
-        }
-    }
-    return ret;
-}
-
 static bool __check_if_entry_delay_finished(s_ezlopi_modes_t *ez_mode)
 {
     bool entryDelay_finish = false;
@@ -256,6 +276,10 @@ static bool __check_if_entry_delay_finished(s_ezlopi_modes_t *ez_mode)
         bool trigger_broadcast = false;
 
         // 1. First activate --> 'entry-delay' phase immediately
+        if (ez_mode->alarmed.phase != EZLOPI_MODES_ALARM_PHASE_ENTRYDELAY)
+        {
+            TRACE_S("alarm.phase = [%d]--> not entry_delay / / alarm.status = [%d] ", ez_mode->alarmed.phase, ez_mode->alarmed.status);
+        }
 
         //  USE :- [ time_is_left_sec = 0 ] ; To Exit from 'entry-delay' and move to "main"  immediately."
         if ((0 < ez_mode->alarmed.entry_delay_sec) && (0 < ez_mode->alarmed.time_is_left_sec)) // time-left to exit entry-delay
@@ -302,18 +326,10 @@ static bool __check_if_entry_delay_finished(s_ezlopi_modes_t *ez_mode)
         TRACE_W("alarm.phase = [%d] / alarm.status = [%d]", ez_mode->alarmed.phase, ez_mode->alarmed.status);
         //-------------------------------------------------------------------------------------
 
-        //// Exclude :- a list of devices that should not raise alarms in the house mode
         if (true == trigger_broadcast)
         {
-            cJSON *cj_alarm = NULL;
-            cJSON_ArrayForEach(cj_alarm, ez_mode->cj_alarms) // 'alarm_device_id' to trigger alerts
-            {
-                if (false == __check_if_devid_in_alarm_off(ezlopi_core_modes_get_current_house_modes(), cj_alarm->valuestring))
-                {
-                    // 3. Lastly Trigger a broadcast to provid --> phase and status info
-                    __broadcast_modes_alarmed_for_uid(cj_alarm->valuestring);
-                }
-            }
+            //// Exclude :- a list of devices that should not raise alarms in the house mode
+            __broadcast_alarmed_state_for_valid_ids();
         }
     }
     return entryDelay_finish;
@@ -335,30 +351,26 @@ static void __modes_create_non_bypass_alerts(s_ezlopi_modes_t *ez_mode, s_house_
     }
 }
 
-static void __modes_check_for_trigger(s_ezlopi_modes_t *ez_mode)
+static void __modes_check_main_for_trigger(s_ezlopi_modes_t *ez_mode)
 {
     if (_alert_head)
     {
         l_modes_alert_t *curr_node = _alert_head;
         while (curr_node)
-        {
-            // check if the alert has been triggered for any of node in 'alert_ll'.
+        { // check if the alert has been triggered for any of node in 'alert_ll'.
             if (true == curr_node->alert_trig)
             {
                 if (0 == curr_node->timeleft_to_abort_ll)
                 {
                     if (0 == curr_node->timeleft_to_alarm_ll)
-                    {
-                        // trigger a broadcast  --> from: 'MAIN-begin' to 'MAIN-done'
-                        if (false == __check_if_devid_in_alarm_off(ezlopi_core_modes_get_current_house_modes(), curr_node->u_id_str))
-                        {
-                            ez_mode->alarmed.status = EZLOPI_MODES_ALARM_STATUS_DONE;
-                            __broadcast_modes_alarmed_for_uid(curr_node->u_id_str);
+                    { // trigger a broadcast  --> from: 'MAIN-begin' to 'MAIN-done'
+                        ez_mode->alarmed.status = EZLOPI_MODES_ALARM_STATUS_DONE;
+                        __broadcast_alarmed_state_for_valid_ids();
 
-                            // Reset the 'abort-window' and 'alarm-delay' in this "ALERT-NODE"
-                            curr_node->timeleft_to_alarm_ll = curr_node->abort_window_ll;
-                            curr_node->timeleft_to_alarm_ll = curr_node->alarm_delay_ll;
-                        }
+                        // Reset the 'alert_trig' flag, 'abort-window' and 'alarm-delay' in this "ALERT-NODE"
+                        curr_node->timeleft_to_alarm_ll = curr_node->abort_window_ll;
+                        curr_node->timeleft_to_alarm_ll = curr_node->alarm_delay_ll;
+                        curr_node->alert_trig = false;
                     }
                     else
                     {
@@ -376,9 +388,9 @@ static void __modes_check_for_trigger(s_ezlopi_modes_t *ez_mode)
     }
 }
 
-static void __check_main_and_broadcast_status(s_ezlopi_modes_t *ez_mode)
+static void __modes_main_and_broadcast_status(s_ezlopi_modes_t *ez_mode)
 {
-    if (ez_mode && _alert_head)
+    if (ez_mode && _alert_head) // must have 'alert_ll'
     {
         // 1. broadcast 'MAIN-begin' status (Should happen only Once)
         if (EZLOPI_MODES_ALARM_PHASE_ENTRYDELAY == ez_mode->alarmed.phase &&
@@ -386,20 +398,16 @@ static void __check_main_and_broadcast_status(s_ezlopi_modes_t *ez_mode)
         {
             ez_mode->alarmed.phase = EZLOPI_MODES_ALARM_PHASE_MAIN;
             ez_mode->alarmed.status = EZLOPI_MODES_ALARM_STATUS_BEGIN;
-            l_modes_alert_t *curr_node = _alert_head;
-            while (curr_node)
-            {
-                __broadcast_modes_alarmed_for_uid(curr_node->u_id_str);
-                curr_node = curr_node->next;
-            }
+
+            __broadcast_alarmed_state_for_valid_ids(); // broadcast for 'valid' ids only
         }
         else
-        { // SET --> [PHASE :- MAIN]
+        { // 2. SET --> [PHASE :- MAIN]
             ez_mode->alarmed.phase = EZLOPI_MODES_ALARM_PHASE_MAIN;
         }
 
-        // 2. iterate through 'alert-ll' to trigger
-        __modes_check_for_trigger(ez_mode);
+        // 3. iterate through 'alert-ll' to trigger
+        __modes_check_main_for_trigger(ez_mode);
 
         TRACE_W("alarm.phase = [%d] / alarm.status = [%d]", ez_mode->alarmed.phase, ez_mode->alarmed.status);
     }
@@ -408,10 +416,10 @@ static void __check_main_and_broadcast_status(s_ezlopi_modes_t *ez_mode)
 static ezlopi_error_t __check_mode_switch_condition(s_ezlopi_modes_t *ez_mode)
 {
     ezlopi_error_t ret = EZPI_ERR_MODES_FAILED;
-
+    TRACE_D("here");
     if (ez_mode->switch_to_mode_id)
     {
-        if (ez_mode->time_is_left_to_switch_sec)
+        if (0 < ez_mode->time_is_left_to_switch_sec)
         {
             ez_mode->time_is_left_to_switch_sec--;
             TRACE_D("time_is_left_to_SWITCH_sec: %u", ez_mode->time_is_left_to_switch_sec);
@@ -433,6 +441,15 @@ static ezlopi_error_t __check_mode_switch_condition(s_ezlopi_modes_t *ez_mode)
                 s_house_modes_t *prev_house_mode = ezlopi_core_modes_get_house_mode_by_id(bypass_clear_modeId);
                 if (prev_house_mode && prev_house_mode->cj_bypass_devices)
                 {
+                    TRACE_D("here");
+#if 0
+                    // if switching has took place during 'entry-delay'phase---> send 'canceled' as alarmed-broadcast
+                    if (EZLOPI_MODES_ALARM_PHASE_ENTRYDELAY == ez_mode->alarmed.phase &&
+                        EZLOPI_MODES_ALARM_STATUS_CANCELED == ez_mode->alarmed.status)
+                    {
+                        __broadcast_alarmed_state_for_valid_ids();
+                    }
+#endif
                     // Also Remove all the 'alert-nodes'
                     __ezlopi_service_remove_all_alerts(); // [false ; 0] == remove all
 
@@ -453,14 +470,13 @@ static ezlopi_error_t __check_mode_switch_condition(s_ezlopi_modes_t *ez_mode)
                     }
 
                     // 3. Refresh 'timeleftTo-exit-EntryDelay' second info for --->  non-zero 'entryDelay'
-                    if ((0 < ez_mode->alarmed.entry_delay_sec) && (0 == ez_mode->alarmed.time_is_left_sec))
+                    if (0 < ez_mode->alarmed.entry_delay_sec)
                     {
                         ez_mode->alarmed.time_is_left_sec = ez_mode->alarmed.entry_delay_sec;
                     }
 
                     // 4. Store to nvs
                     ezlopi_core_modes_store_to_nvs();
-
                     cJSON *cj_update = ezlopi_core_modes_cjson_changed();
                     CJSON_TRACE("----------------- broadcasting - cj_update", cj_update);
 
@@ -499,10 +515,13 @@ static void __modes_loop(void *arg)
             else
             { // After the switching is DONE.
                 // 2. Pre-alarming (ENTRY-DELAY) ; Operate on the 'cj_alarms' list to excluding 'cj_alarm_off_devices'
-                if ((true == curr_house_mode->armed) && (true == __check_if_entry_delay_finished(ez_mode)))
+                if (true == curr_house_mode->armed)
                 {
-                    // 3. Perform --> 'MAIN' phase operations
-                    __check_main_and_broadcast_status(ez_mode);
+                    if (true == __check_if_entry_delay_finished(ez_mode))
+                    {
+                        // 3. Perform --> 'MAIN' phase operations
+                        __modes_main_and_broadcast_status(ez_mode);
+                    }
                 }
             }
         }

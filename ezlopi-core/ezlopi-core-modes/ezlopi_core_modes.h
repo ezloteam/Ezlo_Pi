@@ -125,8 +125,9 @@ typedef struct s_ezlopi_modes
     uint32_t switch_to_mode_id;
 
     uint32_t time_is_left_to_switch_sec; //  (switch_to_delay_sec - N_sec) //Time left (sec) after start to switch to the mode
-    uint32_t switch_to_delay_sec;        // Delay (sec) before switch to the all modes // this holds a copy to actual 'SwitchDelay' of active 'houseMode'
-    uint32_t alarm_delay;                // Delay (sec) before sending alert if armed sensors (door/window or motion sensor) tripped. // [https://log.ezlo.com/new/hub/house_modes_manager/#hubmodesget-version-20] 	Delay (sec) before sending alert to the all modes   // NOTE : [(alarm_delay_sec > 0) === means 'mode->alarmed' member exists ]
+    uint32_t switch_to_delay_sec;        //  Delay (sec) before switch to the all modes // this holds a copy to actual 'SwitchDelay' of active 'houseMode'
+    uint32_t alarm_delay;                //  Delay (sec) before sending alert if armed sensors (door/window or motion sensor) tripped. // [https://log.ezlo.com/new/hub/house_modes_manager/#hubmodesget-version-20] 	Delay (sec) before sending alert to the all modes   // NOTE : [(alarm_delay_sec > 0) === means 'mode->alarmed' member exists ]
+    uint32_t switch_to_delay_runs_out;   //  A period of 'exit-time-delay' ; switching to/from the armed mode.
 
     cJSON *cj_alarms;  // Array of device id which make alarms after trips (Main alert list)
     cJSON *cj_cameras; // Array of camera device identifiers with items named make_recording
