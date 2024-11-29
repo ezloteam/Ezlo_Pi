@@ -57,7 +57,8 @@ static void __provision_check(void *pv);
 static void __fetch_wss_endpoint(void *pv);
 
 static void __connection_upcall(bool connected);
-static void __message_upcall(const char *payload, uint32_t len);
+static int __message_upcall(const char *payload, uint32_t len);
+// static void __message_upcall(const char *payload, uint32_t len);
 static void __message_process(const char *payload, uint32_t len);
 static void __message_process_cjson(cJSON *cj_request);
 
@@ -122,7 +123,6 @@ static void __connection_upcall(bool connected)
 
 static void __fetch_wss_endpoint(void *pv)
 {
-
     char *ca_certificate = ezlopi_factory_info_v3_get_ca_certificate();
     char *ssl_shared_key = ezlopi_factory_info_v3_get_ssl_shared_key();
     char *ssl_private_key = ezlopi_factory_info_v3_get_ssl_private_key();
@@ -182,13 +182,17 @@ static void __fetch_wss_endpoint(void *pv)
             while (_wss_message_queue)
             {
                 char *payload = NULL;
-                xQueueReceive(_wss_message_queue, &payload, 100 / portTICK_RATE_MS);
+                BaseType_t ret = xQueueReceive(_wss_message_queue, &payload, 100 / portTICK_RATE_MS);
 
-                if (payload)
+                if (payload && (ret == pdTRUE))
                 {
-                    // __message_process(payload, strlen(payload));
-
+#if 0
+                    __message_process(payload, strlen(payload));
+                    ezlopi_free(__FUNCTION__, payload);
+#else
+                    TRACE_D("payload: %s", payload);
                     cJSON *cj_request = cJSON_Parse(__FUNCTION__, payload);
+                    TRACE_W("payload: %p -> freed!", payload);
                     ezlopi_free(__FUNCTION__, payload);
 
                     if (cj_request)
@@ -196,7 +200,10 @@ static void __fetch_wss_endpoint(void *pv)
                         __message_process_cjson(cj_request);
                         cJSON_Delete(__FUNCTION__, cj_request);
                     }
+#endif
                 }
+
+                vTaskDelay(1);
             }
 
             break;
@@ -251,6 +258,33 @@ static void __message_process(const char *payload, uint32_t len)
     }
 }
 
+static int __message_upcall(const char *payload, uint32_t len)
+{
+    int ret = 0;
+
+    if (_wss_message_queue)
+    {
+        if (pdTRUE == xQueueIsQueueFullFromISR(_wss_message_queue))
+        {
+            char *stale_data = NULL;
+            xQueueReceive(_wss_message_queue, &stale_data, 5);
+            if (stale_data)
+            {
+                ezlopi_free(__FUNCTION__, stale_data);
+            }
+        }
+
+        if (pdTRUE == xQueueSend(_wss_message_queue, &payload, 5))
+        {
+            TRACE_D("data-pushed-to-queue: %p", payload);
+            ret = 1;
+        }
+    }
+
+    return ret;
+}
+
+#if 0
 static void __message_upcall(const char *payload, uint32_t len)
 {
     if (_wss_message_queue)
@@ -278,6 +312,7 @@ static void __message_upcall(const char *payload, uint32_t len)
         }
     }
 }
+#endif
 
 static int __send_cjson_data_to_nma_websocket(cJSON *cj_data)
 {
@@ -336,6 +371,7 @@ static ezlopi_error_t __send_str_data_to_nma_websocket(char *str_data)
             vTaskDelay(10 / portTICK_PERIOD_MS);
         }
 
+#if 0
         if (EZPI_SUCCESS == ret)
         {
             TRACE_S("## WSC-SENDING done >>>>>>>>>>>>>>>>>>> \n %s", str_data);
@@ -344,6 +380,7 @@ static ezlopi_error_t __send_str_data_to_nma_websocket(char *str_data)
         {
             TRACE_W("## WSC-SENDING failed >>>>>>>>>>>>>>>>>>> \n %s", str_data);
         }
+#endif
     }
 
     return ret;

@@ -26,8 +26,8 @@ static esp_websocket_client_handle_t client = NULL;
 typedef struct s_ws_event_arg
 {
     esp_websocket_client_handle_t client;
-    void (*msg_upcall)(const char *, uint32_t);
-    // void (*msg_upcall)(cJSON *cj_request);
+    int (*msg_upcall)(const char *, uint32_t);
+    // void (*msg_upcall)(const char *, uint32_t);
     void (*connection_upcall)(bool connected);
 } s_ws_event_arg_t;
 
@@ -70,8 +70,8 @@ void ezlopi_websocket_client_kill(void)
     client = NULL;
 }
 
-esp_websocket_client_handle_t ezlopi_websocket_client_init(cJSON *uri, void (*msg_upcall)(const char *, uint32_t), void (*connection_upcall)(bool connected))
-// esp_websocket_client_handle_t ezlopi_websocket_client_init(cJSON *uri, void (*msg_upcall)(cJSON *cj_request), void (*connection_upcall)(bool connected))
+// esp_websocket_client_handle_t ezlopi_websocket_client_init(cJSON *uri, void (*msg_upcall)(const char *, uint32_t), void (*connection_upcall)(bool connected))
+esp_websocket_client_handle_t ezlopi_websocket_client_init(cJSON *uri, int (*msg_upcall)(const char *, uint32_t), void (*connection_upcall)(bool connected))
 {
     if ((NULL == client) && (NULL != uri) && (NULL != uri->valuestring) && (NULL != msg_upcall))
     {
@@ -95,7 +95,8 @@ esp_websocket_client_handle_t ezlopi_websocket_client_init(cJSON *uri, void (*ms
             .client_cert = ssl_shared,
             .keep_alive_enable = 1,
             .ping_interval_sec = EZPI_CORE_WSS_PING_INTERVAL_SEC,
-            .pingpong_timeout_sec = EZPI_CORE_WSS_PING_PONG_TIMEOUT_SEC,
+            // .pingpong_timeout_sec = EZPI_CORE_WSS_PING_PONG_TIMEOUT_SEC,
+            .pingpong_timeout_sec = 30,
         };
 
         TRACE_S("Connecting to %s...", websocket_cfg.uri);
@@ -117,50 +118,6 @@ esp_websocket_client_handle_t ezlopi_websocket_client_init(cJSON *uri, void (*ms
     return client;
 }
 
-typedef struct s_wss_data_chunk
-{
-    int chunk_len;
-    uint8_t chunk[WSS_RX_BUFFER_SIZE];
-    struct s_wss_data_chunk *next;
-} s_wss_data_chunk_t;
-
-typedef struct s_wss_data
-{
-    int payload_len;
-    int payload_offset;
-    s_wss_data_chunk_t chunks;
-} s_wss_data_t;
-
-static void __add_chunk_to_data(s_wss_data_t *wss_data, uint8_t *data, uint32_t len)
-{
-    if (wss_data && data && len)
-    {
-
-        s_wss_data_chunk_t *chunk_node = &wss_data->chunks;
-        while (chunk_node)
-        {
-            /* code */
-        }
-    }
-}
-
-static s_wss_data_t *__create_data_buffer(uint8_t *data, int len)
-{
-    s_wss_data_t *wss_data = NULL;
-
-    if (data && len && (len <= WSS_RX_BUFFER_SIZE))
-    {
-        wss_data = ezlopi_malloc(__FUNCTION__, sizeof(s_wss_data_t));
-        if (wss_data)
-        {
-            wss_data->chunks.chunk_len = len;
-            memcpy(wss_data->chunks.chunk, data, len);
-        }
-    }
-
-    return wss_data;
-}
-
 static void websocket_event_handler(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data)
 {
     s_ws_event_arg_t *event_arg = (s_ws_event_arg_t *)handler_args;
@@ -178,7 +135,9 @@ static void websocket_event_handler(void *handler_args, esp_event_base_t base, i
     }
     case WEBSOCKET_EVENT_DISCONNECTED:
     {
-        TRACE_W("free-heap: %.02f KB", esp_get_free_heap_size() / 1024.0);
+        TRACE_W("free-heap:     %.02f KB", esp_get_free_heap_size() / 1024.0);
+        TRACE_E("event-base:    %s", base);
+        TRACE_E("data->op_code: %d", data->op_code);
         TRACE_E("WEBSOCKET_EVENT_DISCONNECTED");
         if (event_arg && event_arg->connection_upcall)
         {
@@ -189,25 +148,24 @@ static void websocket_event_handler(void *handler_args, esp_event_base_t base, i
     }
     case WEBSOCKET_EVENT_DATA:
     {
-
         if (0x01 == data->op_code) // op_code = 0x01: text-data,
         {
-            TRACE_D("----------------------------------------------------------------------------------------------------------------");
-            TRACE_D("<<<<<<<<<<<< websocket-data:\r\n");
-            TRACE_D("data_len: %d", data->data_len);
-            TRACE_D("payload_len: %d", data->payload_len);
-            TRACE_D("payload_offset: %d", data->payload_offset);
-            TRACE_D("op_code: %u", data->op_code);
-            TRACE_D("data: %.*s", data->data_len, data->data_ptr);
+            // TRACE_D("----------------------------------------------------------------------------------------------------------------");
+            // TRACE_D("<<<<<<<<<<<< websocket-data:\r\n");
+            // TRACE_D("data_len: %d", data->data_len);
+            // TRACE_D("payload_len: %d", data->payload_len);
+            // TRACE_D("payload_offset: %d", data->payload_offset);
+            // TRACE_D("op_code: %u", data->op_code);
+            // TRACE_D("data: %.*s", data->data_len, data->data_ptr);
 
             if ((NULL != data->data_ptr) && (data->data_len > 0) &&
                 (NULL != event_arg) && (NULL != event_arg->msg_upcall))
             {
-                if (data->payload_len == data->data_len) // process the data if all data is received once
-                {
-                    event_arg->msg_upcall(data->data_ptr, data->data_len);
-                }
-                else
+                // if (data->payload_len == data->data_len) // process the data if all data is received once
+                // {
+                //     event_arg->msg_upcall(data->data_ptr, data->data_len);
+                // }
+                // else
                 {
                     static uint8_t *s_buffer = NULL;
                     static uint32_t chunk_count = 0;
@@ -218,14 +176,16 @@ static void websocket_event_handler(void *handler_args, esp_event_base_t base, i
                         {
                             chunk_count = 0;
                             ezlopi_free(__FUNCTION__, s_buffer);
+                            TRACE_W("s_buffer: %p, status: freed!", s_buffer);
                             s_buffer = NULL;
                         }
 
-                        s_buffer = ezlopi_malloc(__FUNCTION__, data->payload_len);
+                        s_buffer = ezlopi_malloc(__FUNCTION__, data->payload_len + 1);
                         if (s_buffer)
                         {
                             chunk_count = 1;
                             memcpy(s_buffer, data->data_ptr, data->data_len);
+                            s_buffer[data->payload_len] = '\0';
                         }
                     }
                     else if (s_buffer)
@@ -240,14 +200,22 @@ static void websocket_event_handler(void *handler_args, esp_event_base_t base, i
                     {
                         TRACE_D("complete-payload: %.*s", data->payload_len, s_buffer);
 
-                        event_arg->msg_upcall((const char *)s_buffer, data->payload_len);
-                        ezlopi_free(__FUNCTION__, s_buffer);
+                        if (0 == event_arg->msg_upcall((const char *)s_buffer, data->payload_len))
+                        {
+                            ezlopi_free(__FUNCTION__, s_buffer);
+                            TRACE_W("s_buffer: %p, status: freed!", s_buffer);
+                        }
+                        else
+                        {
+                            TRACE_W("s_buffer: %p, pushed to queue", s_buffer);
+                        }
+
                         s_buffer = NULL;
                         chunk_count = 0;
                     }
                 }
             }
-            TRACE_D("----------------------------------------------------------------------------------------------------------------");
+            // TRACE_D("----------------------------------------------------------------------------------------------------------------");
         }
         break;
     }

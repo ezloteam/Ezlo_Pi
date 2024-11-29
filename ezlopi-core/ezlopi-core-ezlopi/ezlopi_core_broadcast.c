@@ -11,23 +11,23 @@
 #include "ezlopi_util_trace.h"
 #include "ezlopi_core_buffer.h"
 #include "ezlopi_core_broadcast.h"
-#include "ezlopi_core_errors.h" 
+#include "ezlopi_core_errors.h"
 
 #include "EZLOPI_USER_CONFIG.h"
 
 // static uint32_t __message_count = 0;
-static l_broadcast_method_t* __method_head = NULL;
-static ezlopi_error_t (*__broadcast_queue_func)(cJSON* cj_data) = NULL;
+static l_broadcast_method_t *__method_head = NULL;
+static ezlopi_error_t (*__broadcast_queue_func)(cJSON *cj_data) = NULL;
 
-static ezlopi_error_t __call_broadcast_methods(char* data);
-static l_broadcast_method_t* __method_create(f_broadcast_method_t method, char* name, uint32_t retries);
+static ezlopi_error_t __call_broadcast_methods(char *data);
+static l_broadcast_method_t *__method_create(f_broadcast_method_t method, char *name, uint32_t retries);
 
-void ezlopi_core_broadcast_methods_set_queue(ezlopi_error_t (*func)(cJSON*))
+void ezlopi_core_broadcast_methods_set_queue(ezlopi_error_t (*func)(cJSON *))
 {
     __broadcast_queue_func = func;
 }
 
-ezlopi_error_t ezlopi_core_broadcast_add_to_queue(cJSON* cj_data)
+ezlopi_error_t ezlopi_core_broadcast_add_to_queue(cJSON *cj_data)
 {
     ezlopi_error_t ret = EZPI_ERR_BROADCAST_FAILED;
     if (cj_data && __broadcast_queue_func)
@@ -69,7 +69,7 @@ int ezlopi_core_broadcast_log_cjson(cJSON* cj_log_data)
 }
 #endif
 
-ezlopi_error_t ezlopi_core_broadcast_cjson(cJSON* cj_data)
+ezlopi_error_t ezlopi_core_broadcast_cjson(cJSON *cj_data)
 {
     ezlopi_error_t ret = EZPI_FAILED;
 
@@ -177,10 +177,10 @@ void ezlopi_core_broadcast_remove_method(f_broadcast_method_t broadcast_method)
     }
 }
 
-static ezlopi_error_t __call_broadcast_methods(char* data)
+static ezlopi_error_t __call_broadcast_methods(char *data)
 {
     ezlopi_error_t ret = EZPI_ERR_BROADCAST_FAILED;
-    l_broadcast_method_t* curr_method = __method_head;
+    l_broadcast_method_t *curr_method = __method_head;
 
     while (curr_method)
     {
@@ -191,6 +191,7 @@ static ezlopi_error_t __call_broadcast_methods(char* data)
 
             do
             {
+                TRACE_D("broadcast-retry: %u", retries);
                 int mret = curr_method->func(data);
                 if (EZPI_SUCCESS == mret)
                 {
@@ -199,7 +200,7 @@ static ezlopi_error_t __call_broadcast_methods(char* data)
                     break;
                 }
 
-                vTaskDelay(10 / portTICK_RATE_MS);
+                vTaskDelay(5 / portTICK_RATE_MS);
 
             } while (retries--);
         }

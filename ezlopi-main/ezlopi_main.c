@@ -125,18 +125,17 @@ static void __blinky(void *pv)
     while (1)
     {
 
-        TRACE_I("----------------------------------------------");
         uint32_t free_heap = esp_get_free_heap_size();
         uint32_t watermark_heap = esp_get_minimum_free_heap_size();
         uint32_t free_heap_internal = esp_get_free_internal_heap_size();
 
         uint32_t total_heap_size = heap_caps_get_total_size(MALLOC_CAP_DEFAULT);
 
-        TRACE_W("Total heap: %d     %.4f", total_heap_size, total_heap_size / 1024.0);
-
-        TRACE_W("Free Heap Size: %d B     %.4f KB", free_heap, free_heap / 1024.0);
-        TRACE_W("Free Heap internal Size: %d B     %.4f KB", free_heap_internal, free_heap_internal / 1024.0);
-        TRACE_W("Heap Watermark: %d B     %.4f KB", watermark_heap, watermark_heap / 1024.0);
+        TRACE_I("----------------------------------------------");
+        TRACE_W("Total heap:                %d B   %.4f KB", total_heap_size, total_heap_size / 1024.0);
+        TRACE_W("Free Heap Size:            %d B    %.4f KB", free_heap, free_heap / 1024.0);
+        TRACE_W("Free Heap internal Size:   %d B    %.4f KB", free_heap_internal, free_heap_internal / 1024.0);
+        TRACE_W("Heap Watermark:            %d B    %.4f KB", watermark_heap, watermark_heap / 1024.0);
         TRACE_I("----------------------------------------------");
 
         ezlopi_wifi_status_t *wifi_stat = ezlopi_wifi_status();
