@@ -171,9 +171,9 @@ ezlopi_error_t ezlopi_core_modes_set_unset_device_armed_status(cJSON *cj_device_
 ezlopi_error_t ezlopi_core_modes_add_disarmed_device(uint8_t modeId, const char *device_id_str);
 ezlopi_error_t ezlopi_core_modes_remove_disarmed_device(uint8_t modeId, const char *device_id_str);
 ezlopi_error_t ezlopi_core_modes_set_protect(uint32_t mode_id, bool protect_state);
-ezlopi_core_modes_protect_button_service_set()
-ezlopi_error_t ezlopi_core_modes_add_protect_devices(cJSON* user_id_aray);
-ezlopi_error_t ezlopi_core_modes_remove_protect_devices(cJSON* user_id_aray);
+ezlopi_error_t ezlopi_core_modes_protect_button_service_set(char *service_str, uint32_t deviceId, uint8_t *status);
+ezlopi_error_t ezlopi_core_modes_add_protect_devices(cJSON *user_id_aray);
+ezlopi_error_t ezlopi_core_modes_remove_protect_devices(cJSON *user_id_aray);
 
 ezlopi_error_t ezlopi_core_modes_add_alarm_off(uint8_t mode_id, cJSON *device_id);
 ezlopi_error_t ezlopi_core_modes_remove_alarm_off(uint32_t mode_id, cJSON *device_id);

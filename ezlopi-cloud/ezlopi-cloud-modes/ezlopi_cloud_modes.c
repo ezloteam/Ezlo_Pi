@@ -336,6 +336,21 @@ void ezlopi_cloud_modes_protect_buttons_set(cJSON *cj_request, cJSON *cj_respons
     cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     if (cj_result)
     {
+        cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
+        if (cj_params)
+        {
+            cJSON *cj_service = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_service_str);
+            cJSON *cj_deviceId = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_deviceId_str);
+            if (cj_service && (cj_service->type == cJSON_String) && cj_deviceId && (cj_deviceId->type == cJSON_String))
+            {
+                uint32_t deviceId = strtoul(cj_deviceId->valuestring, NULL, 16);
+
+                uint8_t status = 0;
+                ezlopi_core_modes_protect_button_service_set(cj_service->valuestring, deviceId, &status); // status => [ BIT0 = added ; BIT1 = Updated ; BIT2 = removed ]
+
+                cJSON_AddNumberToObject(__func__, cj_request, "button_state", (double)status); // just for broadcast purpose
+            }
+        }
     }
 }
 
@@ -344,13 +359,13 @@ void ezlopi_cloud_modes_protect_devices_add(cJSON *cj_request, cJSON *cj_respons
     cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     if (cj_result)
     {
-        cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
+        cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
         if (cj_params)
         {
-            cJSON* cj_deviceIds = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_device_ids_str);
+            cJSON *cj_deviceIds = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_device_ids_str);
             if (cj_deviceIds && (cJSON_Array == cj_deviceIds->type))
             {
-                ezlopi_core_modes_protect_devices_add(cj_deviceIds);
+                ezlopi_core_modes_add_protect_devices(cj_deviceIds);
             }
         }
     }
@@ -361,6 +376,15 @@ void ezlopi_cloud_modes_protect_devices_remove(cJSON *cj_request, cJSON *cj_resp
     cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     if (cj_result)
     {
+        cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
+        if (cj_params)
+        {
+            cJSON *cj_deviceIds = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_device_ids_str);
+            if (cj_deviceIds && (cJSON_Array == cj_deviceIds->type))
+            {
+                ezlopi_core_modes_remove_protect_devices(cj_deviceIds);
+            }
+        }
     }
 }
 

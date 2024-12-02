@@ -6,6 +6,7 @@
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_modes.h"
 #include "ezlopi_core_cloud.h"
+#include "ezlopi_core_devices.h"
 #include "ezlopi_core_modes_cjson.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_errors.h"
@@ -23,7 +24,7 @@ static void __cjson_add_abort_window(cJSON *cj_result, s_abort_window_t *abort_d
 static void __cjson_add_number_as_hex_string(cJSON *cj_dest, const char *obj_name, uint32_t number);
 static void __cjson_duplicate_add_reference(cJSON *cj_dest, const char *item_name_str, cJSON *cj_item);
 static void __cjson_add_protect_buttons(cJSON *cj_protect_buttons_arr, s_protect_buttons_t *l_protect_buttons);
-static void __cjson_add_security_device_to_array(cJSON* cj_device_array);
+static void __cjson_add_security_device_to_array(cJSON *cj_device_array);
 
 //////////////////////
 
@@ -61,18 +62,8 @@ ezlopi_error_t ezlopi_core_modes_cjson_get_modes(cJSON *cj_dest)
             __cjson_add_mode_to_array(cj_modes_array, &_modes->mode_vacation);
         }
 
-
-        if (NULL == _modes->cj_devices)
-        {
-            _modes->cj_devices = cJSON_CreateArray(__func__);
-            if (_modes->cj_devices)
-            {
-                __cjson_add_security_device_to_array(_modes->cj_devices);// adding 'security_device' from 'l_ezlopi_device_t'
-            }
-        }
-
-        __cjson_duplicate_add_reference(cj_dest, ezlopi_devices_str, _modes->cj_devices);// Adding list of security devices
-        __cjson_duplicate_add_reference(cj_dest, ezlopi_alarms_str, _modes->cj_alarms); // Array of device id which make alarms after trips
+        __cjson_duplicate_add_reference(cj_dest, ezlopi_devices_str, _modes->cj_devices); // Adding list of security devices
+        __cjson_duplicate_add_reference(cj_dest, ezlopi_alarms_str, _modes->cj_alarms);   // Array of device id which make alarms after trips
         __cjson_duplicate_add_reference(cj_dest, ezlopi_cameras_str, _modes->cj_cameras);
 
         cJSON *cj_protect_buttons_arr = cJSON_AddArrayToObject(__FUNCTION__, cj_dest, ezlopi_protectButtons_str);
@@ -91,7 +82,7 @@ ezlopi_error_t ezlopi_core_modes_cjson_get_modes(cJSON *cj_dest)
     return ret;
 }
 
-ezlopi_error_t ezlopi_core_modes_cjson_get_current_mode(cJSON * cj_dest)
+ezlopi_error_t ezlopi_core_modes_cjson_get_current_mode(cJSON *cj_dest)
 {
     ezlopi_error_t ret = EZPI_FAILED;
     s_ezlopi_modes_t *modes = ezlopi_core_modes_get_custom_modes();
@@ -104,7 +95,7 @@ ezlopi_error_t ezlopi_core_modes_cjson_get_current_mode(cJSON * cj_dest)
     return ret;
 }
 
-s_ezlopi_modes_t *ezlopi_core_modes_cjson_parse_modes(cJSON * cj_modes) // This function extracts 'mode_values' from cjson
+s_ezlopi_modes_t *ezlopi_core_modes_cjson_parse_modes(cJSON *cj_modes) // This function extracts 'mode_values' from cjson
 {
     int _parsing_status = 0;
     s_ezlopi_modes_t *parsed_mode = (s_ezlopi_modes_t *)ezlopi_malloc(__FUNCTION__, sizeof(s_ezlopi_modes_t));
@@ -138,10 +129,8 @@ s_ezlopi_modes_t *ezlopi_core_modes_cjson_parse_modes(cJSON * cj_modes) // This 
         cJSON *cj_house_modes = cJSON_GetObjectItem(__FUNCTION__, cj_modes, ezlopi_modes_str);
         if (cj_house_modes)
         {
-            // uint32_t mode_idx = 0;
             cJSON *cj_house_mod = NULL;
 
-            // while (NULL != (cj_house_mod = cJSON_GetArrayItem(cj_house_modes, mode_idx)))
             cJSON_ArrayForEach(cj_house_mod, cj_house_modes)
             {
                 CJSON_TRACE("cj_house_mod", cj_house_mod);
@@ -249,8 +238,6 @@ s_ezlopi_modes_t *ezlopi_core_modes_cjson_parse_modes(cJSON * cj_modes) // This 
                 // CJSON_TRACE("cur_house_mode->cj_alarms_off_devices", cur_house_mode->cj_alarms_off_devices);
                 // CJSON_TRACE("cur_house_mode->cj_cameras_off_devices", cur_house_mode->cj_cameras_off_devices);
                 // CJSON_TRACE("cur_house_mode->cj_bypass_devices", cur_house_mode->cj_bypass_devices);
-
-                // mode_idx++;
             }
         }
 
@@ -259,6 +246,15 @@ s_ezlopi_modes_t *ezlopi_core_modes_cjson_parse_modes(cJSON * cj_modes) // This 
             if (cj_devices)
             {
                 parsed_mode->cj_devices = cJSON_Duplicate(__FUNCTION__, cj_devices, cJSON_True);
+            }
+            else
+            {
+                TRACE_S("Here adding security device list");
+                parsed_mode->cj_devices = cJSON_CreateArray(__func__);
+                if (parsed_mode->cj_devices)
+                {
+                    __cjson_add_security_device_to_array(parsed_mode->cj_devices); // adding 'security_device' from 'l_ezlopi_device_t'
+                }
             }
         }
 
@@ -283,11 +279,11 @@ s_ezlopi_modes_t *ezlopi_core_modes_cjson_parse_modes(cJSON * cj_modes) // This 
             if (cj_protect_buttons)
             {
                 cJSON *cj_button = NULL;
-                s_protect_buttons_t *curr_button = NULL;
+                s_protect_buttons_t *curr_button = parsed_mode->l_protect_buttons;
 
                 cJSON_ArrayForEach(cj_button, cj_protect_buttons)
                 {
-                    if (parsed_mode->l_protect_buttons)
+                    if (curr_button)
                     {
                         curr_button->next = (s_protect_buttons_t *)ezlopi_malloc(__FUNCTION__, sizeof(s_protect_buttons_t));
                         curr_button = curr_button->next;
@@ -303,7 +299,7 @@ s_ezlopi_modes_t *ezlopi_core_modes_cjson_parse_modes(cJSON * cj_modes) // This 
                         memset(curr_button, 0, sizeof(s_protect_buttons_t));
                         CJSON_GET_ID(curr_button->device_id, cJSON_GetObjectItem(__FUNCTION__, cj_modes, ezlopi_id_str));
                         CJSON_GET_VALUE_STRING_BY_COPY(cj_modes, ezlopi_service_str, curr_button->service_name);
-                        curr_button->next = NULL;   // making sure, tail is null;
+                        curr_button->next = NULL; // making sure, tail is null;
                     }
                 }
             }
@@ -322,29 +318,27 @@ s_ezlopi_modes_t *ezlopi_core_modes_cjson_parse_modes(cJSON * cj_modes) // This 
                 char tmp_str[32];
                 CJSON_GET_VALUE_STRING_BY_COPY(cj_alarmed, "phase", tmp_str);
                 {
-                    (EZPI_STRNCMP_IF_EQUAL("idle", tmp_str, 5, strlen(tmp_str))) ? (parsed_mode->alarmed.phase = EZLOPI_MODES_ALARM_PHASE_IDLE)
-                        : (EZPI_STRNCMP_IF_EQUAL("bypass", tmp_str, 5, strlen(tmp_str))) ? (parsed_mode->alarmed.phase = EZLOPI_MODES_ALARM_PHASE_BYPASS)
-                        : (EZPI_STRNCMP_IF_EQUAL("entryDelay", tmp_str, 5, strlen(tmp_str))) ? (parsed_mode->alarmed.phase = EZLOPI_MODES_ALARM_PHASE_ENTRYDELAY)
-                        : (EZPI_STRNCMP_IF_EQUAL("main", tmp_str, 5, strlen(tmp_str))) ? (parsed_mode->alarmed.phase = EZLOPI_MODES_ALARM_PHASE_MAIN)
-                        : (parsed_mode->alarmed.phase = EZLOPI_MODES_ALARM_PHASE_NONE); // this "NONE"-phase exists only at the beginning .
+                    (EZPI_STRNCMP_IF_EQUAL("idle", tmp_str, 5, strlen(tmp_str)))         ? (parsed_mode->alarmed.phase = EZLOPI_MODES_ALARM_PHASE_IDLE)
+                    : (EZPI_STRNCMP_IF_EQUAL("bypass", tmp_str, 5, strlen(tmp_str)))     ? (parsed_mode->alarmed.phase = EZLOPI_MODES_ALARM_PHASE_BYPASS)
+                    : (EZPI_STRNCMP_IF_EQUAL("entryDelay", tmp_str, 5, strlen(tmp_str))) ? (parsed_mode->alarmed.phase = EZLOPI_MODES_ALARM_PHASE_ENTRYDELAY)
+                    : (EZPI_STRNCMP_IF_EQUAL("main", tmp_str, 5, strlen(tmp_str)))       ? (parsed_mode->alarmed.phase = EZLOPI_MODES_ALARM_PHASE_MAIN)
+                                                                                         : (parsed_mode->alarmed.phase = EZLOPI_MODES_ALARM_PHASE_NONE); // this "NONE"-phase exists only at the beginning .
                 }
 
                 CJSON_GET_VALUE_STRING_BY_COPY(cj_alarmed, "status", tmp_str);
                 {
-                    (EZPI_STRNCMP_IF_EQUAL("done", tmp_str, 5, strlen(tmp_str))) ? (parsed_mode->alarmed.status = EZLOPI_MODES_ALARM_STATUS_DONE)
-                        : (EZPI_STRNCMP_IF_EQUAL("begin", tmp_str, 5, strlen(tmp_str))) ? (parsed_mode->alarmed.status = EZLOPI_MODES_ALARM_STATUS_BEGIN)
-                        : (EZPI_STRNCMP_IF_EQUAL("canceled", tmp_str, 5, strlen(tmp_str))) ? (parsed_mode->alarmed.status = EZLOPI_MODES_ALARM_STATUS_CANCELED)
-                        : (parsed_mode->alarmed.status = EZLOPI_MODES_ALARM_STATUS_DONE); // default State
+                    (EZPI_STRNCMP_IF_EQUAL("done", tmp_str, 5, strlen(tmp_str)))       ? (parsed_mode->alarmed.status = EZLOPI_MODES_ALARM_STATUS_DONE)
+                    : (EZPI_STRNCMP_IF_EQUAL("begin", tmp_str, 5, strlen(tmp_str)))    ? (parsed_mode->alarmed.status = EZLOPI_MODES_ALARM_STATUS_BEGIN)
+                    : (EZPI_STRNCMP_IF_EQUAL("canceled", tmp_str, 5, strlen(tmp_str))) ? (parsed_mode->alarmed.status = EZLOPI_MODES_ALARM_STATUS_CANCELED)
+                                                                                       : (parsed_mode->alarmed.status = EZLOPI_MODES_ALARM_STATUS_DONE); // default State
                 }
 
                 cJSON *cj_sources_arr = cJSON_GetObjectItem(__FUNCTION__, cj_alarmed, ezlopi_sources_str);
                 if (cj_sources_arr)
                 {
-                    // uint32_t src_idx = 0;
                     cJSON *cj_source = NULL;
                     s_sources_t *curr_source = NULL;
 
-                    // while (NULL != (cj_source = cJSON_GetArrayItem(cj_sources_arr, src_idx)))
                     cJSON_ArrayForEach(cj_source, cj_sources_arr)
                     {
                         if (parsed_mode->alarmed.sources)
@@ -366,8 +360,6 @@ s_ezlopi_modes_t *ezlopi_core_modes_cjson_parse_modes(cJSON * cj_modes) // This 
                             CJSON_GET_VALUE_DOUBLE(cj_source, ezlopi_timestamp_str, curr_source->time_stamp);
                             CJSON_GET_VALUE_DOUBLE(cj_source, ezlopi_delay_str, curr_source->delay);
                         }
-
-                        // src_idx++;
                     }
                 }
             }
@@ -430,21 +422,21 @@ cJSON *ezlopi_core_modes_cjson_alarmed(const char *dev_id_str) // (IN core-servi
                     CJSON_ASSIGN_ID(cj_result, curr_mode->time_is_left_to_switch_sec, "pendingDelay"); // Only for 'entryDelay'
                 }
 
-                (EZLOPI_MODES_ALARM_PHASE_IDLE == curr_mode->alarmed.phase) ? cJSON_AddStringToObject(__FUNCTION__, cj_result, "phase", "idle")
-                    : (EZLOPI_MODES_ALARM_PHASE_BYPASS == curr_mode->alarmed.phase) ? cJSON_AddStringToObject(__FUNCTION__, cj_result, "phase", "bypass")
-                    : (EZLOPI_MODES_ALARM_PHASE_ENTRYDELAY == curr_mode->alarmed.phase) ? cJSON_AddStringToObject(__FUNCTION__, cj_result, "phase", "entryDelay")
-                    : (EZLOPI_MODES_ALARM_PHASE_MAIN == curr_mode->alarmed.phase) ? cJSON_AddStringToObject(__FUNCTION__, cj_result, "phase", "main")
-                    : cJSON_AddStringToObject(__FUNCTION__, cj_result, "phase", ""); // none
+                (EZLOPI_MODES_ALARM_PHASE_IDLE == curr_mode->alarmed.phase)         ? cJSON_AddStringToObject(__FUNCTION__, cj_result, "phase", "idle")
+                : (EZLOPI_MODES_ALARM_PHASE_BYPASS == curr_mode->alarmed.phase)     ? cJSON_AddStringToObject(__FUNCTION__, cj_result, "phase", "bypass")
+                : (EZLOPI_MODES_ALARM_PHASE_ENTRYDELAY == curr_mode->alarmed.phase) ? cJSON_AddStringToObject(__FUNCTION__, cj_result, "phase", "entryDelay")
+                : (EZLOPI_MODES_ALARM_PHASE_MAIN == curr_mode->alarmed.phase)       ? cJSON_AddStringToObject(__FUNCTION__, cj_result, "phase", "main")
+                                                                                    : cJSON_AddStringToObject(__FUNCTION__, cj_result, "phase", ""); // none
 
-                (EZLOPI_MODES_ALARM_STATUS_DONE == curr_mode->alarmed.status) ? cJSON_AddStringToObject(__FUNCTION__, cj_result, "status", "done")
-                    : (EZLOPI_MODES_ALARM_STATUS_BEGIN == curr_mode->alarmed.status) ? cJSON_AddStringToObject(__FUNCTION__, cj_result, "status", "begin")
-                    : (EZLOPI_MODES_ALARM_STATUS_CANCELED == curr_mode->alarmed.status) ? cJSON_AddStringToObject(__FUNCTION__, cj_result, "status", "canceled")
-                    : cJSON_AddStringToObject(__FUNCTION__, cj_result, "status", ""); // none
+                (EZLOPI_MODES_ALARM_STATUS_DONE == curr_mode->alarmed.status)       ? cJSON_AddStringToObject(__FUNCTION__, cj_result, "status", "done")
+                : (EZLOPI_MODES_ALARM_STATUS_BEGIN == curr_mode->alarmed.status)    ? cJSON_AddStringToObject(__FUNCTION__, cj_result, "status", "begin")
+                : (EZLOPI_MODES_ALARM_STATUS_CANCELED == curr_mode->alarmed.status) ? cJSON_AddStringToObject(__FUNCTION__, cj_result, "status", "canceled")
+                                                                                    : cJSON_AddStringToObject(__FUNCTION__, cj_result, "status", ""); // none
 
                 cJSON_AddNumberToObject(__FUNCTION__, cj_result, ezlopi_timestamp_str, EZPI_CORE_sntp_get_current_time_ms());
                 cJSON_AddBoolToObject(__FUNCTION__, cj_result, "silent", curr_mode->alarmed.silent);
 
-                #warning "need to add two-members [soundType & chime]"
+#warning "need to add two-members [soundType & chime]"
             }
         }
     }
@@ -453,7 +445,7 @@ cJSON *ezlopi_core_modes_cjson_alarmed(const char *dev_id_str) // (IN core-servi
 
 ////////////////////////////////
 
-static void __cjson_add_number_as_hex_string(cJSON * cj_dest, const char *obj_name, uint32_t number)
+static void __cjson_add_number_as_hex_string(cJSON *cj_dest, const char *obj_name, uint32_t number)
 {
     if (cj_dest && obj_name)
     {
@@ -463,7 +455,7 @@ static void __cjson_add_number_as_hex_string(cJSON * cj_dest, const char *obj_na
     }
 }
 
-static void __cjson_add_entry_delay(cJSON * cj_result, s_entry_delay_t * entry_delay)
+static void __cjson_add_entry_delay(cJSON *cj_result, s_entry_delay_t *entry_delay)
 {
     cJSON *cj_entry_delay = cJSON_AddObjectToObject(__FUNCTION__, cj_result, ezlopi_entryDelay_str);
     if (cj_entry_delay)
@@ -475,7 +467,7 @@ static void __cjson_add_entry_delay(cJSON * cj_result, s_entry_delay_t * entry_d
     }
 }
 
-static void __cjson_add_abort_window(cJSON * cj_result, s_abort_window_t * abort_delay)
+static void __cjson_add_abort_window(cJSON *cj_result, s_abort_window_t *abort_delay)
 {
     cJSON *cj_abort_window = cJSON_AddObjectToObject(__FUNCTION__, cj_result, ezlopi_abortWindow_str);
     if (cj_abort_window)
@@ -486,7 +478,7 @@ static void __cjson_add_abort_window(cJSON * cj_result, s_abort_window_t * abort
     }
 }
 
-static void __cjson_duplicate_add_reference(cJSON * cj_dest, const char *item_name_str, cJSON * cj_item)
+static void __cjson_duplicate_add_reference(cJSON *cj_dest, const char *item_name_str, cJSON *cj_item)
 {
     if (cj_dest)
     {
@@ -501,14 +493,14 @@ static void __cjson_duplicate_add_reference(cJSON * cj_dest, const char *item_na
     }
 }
 
-static void __cjson_add_security_device_to_array(cJSON * cj_device_array)
+static void __cjson_add_security_device_to_array(cJSON *cj_device_array)
 {
     if (cj_device_array && (cj_device_array->type == cJSON_Array))
     {
-        l_ezlopi_device_t* curr_device = ezlopi_device_get_head();
+        l_ezlopi_device_t *curr_device = ezlopi_device_get_head();
         while (curr_device)
         {
-            if (EZPI_STRNCMP_IF_EQUAL(category_security_sensor, curr_device->cloud_properties.category, 16, strlen(curr_device->cloud_properties.category)))
+            if (EZPI_STRNCMP_IF_EQUAL(category_security_sensor, curr_device->cloud_properties.category, strlen(category_security_sensor), strlen(curr_device->cloud_properties.category)))
             {
                 char temp[32];
                 memset(temp, 0, 32);
@@ -520,7 +512,7 @@ static void __cjson_add_security_device_to_array(cJSON * cj_device_array)
     }
 }
 
-static void __cjson_add_mode_to_array(cJSON * cj_modes_arr, s_house_modes_t * house_mode)
+static void __cjson_add_mode_to_array(cJSON *cj_modes_arr, s_house_modes_t *house_mode)
 {
     if (house_mode)
     {
@@ -550,7 +542,7 @@ static void __cjson_add_mode_to_array(cJSON * cj_modes_arr, s_house_modes_t * ho
     }
 }
 
-static void __cjson_add_protect_buttons(cJSON * cj_protect_buttons_arr, s_protect_buttons_t * l_protect_buttons)
+static void __cjson_add_protect_buttons(cJSON *cj_protect_buttons_arr, s_protect_buttons_t *l_protect_buttons)
 {
     while (l_protect_buttons)
     {
@@ -570,7 +562,7 @@ static void __cjson_add_protect_buttons(cJSON * cj_protect_buttons_arr, s_protec
     }
 }
 
-static void __cjson_add_alarmed(cJSON * cj_alarmed, s_alarmed_t * alarmed)
+static void __cjson_add_alarmed(cJSON *cj_alarmed, s_alarmed_t *alarmed)
 {
     if (alarmed)
     {
