@@ -344,6 +344,15 @@ void ezlopi_cloud_modes_protect_devices_add(cJSON *cj_request, cJSON *cj_respons
     cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     if (cj_result)
     {
+        cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
+        if (cj_params)
+        {
+            cJSON* cj_deviceIds = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_device_ids_str);
+            if (cj_deviceIds && (cJSON_Array == cj_deviceIds->type))
+            {
+                ezlopi_core_modes_protect_devices_add(cj_deviceIds);
+            }
+        }
     }
 }
 
@@ -364,16 +373,12 @@ void ezlopi_cloud_modes_entry_delay_set(cJSON *cj_request, cJSON *cj_response)
         if (cj_params)
         {
             double normal_sec = 30;
-            // double short_sec = 30;
             double extended_sec = 60;
             double long_extended_sec = 120;
             double instant_sec = 0;
 
             CJSON_GET_VALUE_DOUBLE(cj_params, ezlopi_normal_str, normal_sec);
             normal_sec = (normal_sec > 240) ? 240 : normal_sec;
-
-            // CJSON_GET_VALUE_DOUBLE(cj_params, ezlopi_short_str, short_sec);
-            // short_sec = (short_sec > 240) ? 240 : short_sec;
 
             CJSON_GET_VALUE_DOUBLE(cj_params, ezlopi_long_extended_str, long_extended_sec);
             long_extended_sec = (long_extended_sec > 240) ? 240 : long_extended_sec;

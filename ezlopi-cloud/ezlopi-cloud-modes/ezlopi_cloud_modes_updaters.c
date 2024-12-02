@@ -54,24 +54,24 @@ void ezlopi_cloud_modes_alarmed(cJSON *cj_request, cJSON *cj_response)
         if (curr_mode)
         {
             CJSON_ASSIGN_ID(cj_result, curr_mode->current_mode_id, ezlopi_modeId_str);
-#warning "For Cloud interaction; [Cannot to determine which '_id' triggered the alert]"
-            // CJSON_ASSIGN_ID(cj_result, "0000", ezlopi_deviceId_str);
-            CJSON_ASSIGN_ID(cj_result, curr_mode->time_is_left_to_switch_sec, "pendingDelay");
+            #warning "For Cloud interaction; [Cannot to determine which '_id' triggered the alert]"
+                // CJSON_ASSIGN_ID(cj_result, "0000", ezlopi_deviceId_str);
+                CJSON_ASSIGN_ID(cj_result, curr_mode->time_is_left_to_switch_sec, "pendingDelay");
 
-            (EZLOPI_MODES_ALARM_PHASE_IDLE == curr_mode->alarmed.phase)         ? cJSON_AddStringToObject(__FUNCTION__, cj_result, "phase", "idle")
-            : (EZLOPI_MODES_ALARM_PHASE_BYPASS == curr_mode->alarmed.phase)     ? cJSON_AddStringToObject(__FUNCTION__, cj_result, "phase", "bypass")
-            : (EZLOPI_MODES_ALARM_PHASE_ENTRYDELAY == curr_mode->alarmed.phase) ? cJSON_AddStringToObject(__FUNCTION__, cj_result, "phase", "entryDelay")
-            : (EZLOPI_MODES_ALARM_PHASE_MAIN == curr_mode->alarmed.phase)       ? cJSON_AddStringToObject(__FUNCTION__, cj_result, "phase", "main")
-                                                                                : cJSON_AddStringToObject(__FUNCTION__, cj_result, "phase", ""); // none
+            (EZLOPI_MODES_ALARM_PHASE_IDLE == curr_mode->alarmed.phase) ? cJSON_AddStringToObject(__FUNCTION__, cj_result, "phase", "idle")
+                : (EZLOPI_MODES_ALARM_PHASE_BYPASS == curr_mode->alarmed.phase) ? cJSON_AddStringToObject(__FUNCTION__, cj_result, "phase", "bypass")
+                : (EZLOPI_MODES_ALARM_PHASE_ENTRYDELAY == curr_mode->alarmed.phase) ? cJSON_AddStringToObject(__FUNCTION__, cj_result, "phase", "entryDelay")
+                : (EZLOPI_MODES_ALARM_PHASE_MAIN == curr_mode->alarmed.phase) ? cJSON_AddStringToObject(__FUNCTION__, cj_result, "phase", "main")
+                : cJSON_AddStringToObject(__FUNCTION__, cj_result, "phase", ""); // none
 
-            (EZLOPI_MODES_ALARM_STATUS_DONE == curr_mode->alarmed.status)       ? cJSON_AddStringToObject(__FUNCTION__, cj_result, "status", "done")
-            : (EZLOPI_MODES_ALARM_STATUS_BEGIN == curr_mode->alarmed.status)    ? cJSON_AddStringToObject(__FUNCTION__, cj_result, "status", "begin")
-            : (EZLOPI_MODES_ALARM_STATUS_CANCELED == curr_mode->alarmed.status) ? cJSON_AddStringToObject(__FUNCTION__, cj_result, "status", "canceled")
-                                                                                : cJSON_AddStringToObject(__FUNCTION__, cj_result, "status", ""); // none
+            (EZLOPI_MODES_ALARM_STATUS_DONE == curr_mode->alarmed.status) ? cJSON_AddStringToObject(__FUNCTION__, cj_result, "status", "done")
+                : (EZLOPI_MODES_ALARM_STATUS_BEGIN == curr_mode->alarmed.status) ? cJSON_AddStringToObject(__FUNCTION__, cj_result, "status", "begin")
+                : (EZLOPI_MODES_ALARM_STATUS_CANCELED == curr_mode->alarmed.status) ? cJSON_AddStringToObject(__FUNCTION__, cj_result, "status", "canceled")
+                : cJSON_AddStringToObject(__FUNCTION__, cj_result, "status", ""); // none
 
             cJSON_AddNumberToObject(__FUNCTION__, cj_result, ezlopi_timestamp_str, EZPI_CORE_sntp_get_current_time_ms());
             cJSON_AddBoolToObject(__FUNCTION__, cj_result, "silent", curr_mode->alarmed.silent);
-#warning "need to add two-members [soundType & chime]"
+            #warning "need to add two-members [soundType & chime]"
         }
     }
 }
@@ -257,27 +257,100 @@ void ezlopi_cloud_modes_changed(cJSON *cj_request, cJSON *cj_response)
 
 void ezlopi_cloud_modes_protect_buttons_added(cJSON *cj_request, cJSON *cj_response)
 {
-    cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+    cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_id_str);
+    cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_method_str);
+
+    cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
+    cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, "hub.modes.protect.button.added");
+    cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
+    if (cj_params)
+    {
+        cJSON_AddItemToObject(__FUNCTION__, cj_response, ezlopi_result_str, cJSON_Duplicate(__FUNCTION__, cj_params, true));
+    }
 }
 
 void ezlopi_cloud_modes_protect_buttons_updated(cJSON *cj_request, cJSON *cj_response)
 {
-    cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+    cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_id_str);
+    cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_method_str);
+
+    cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
+    cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, "hub.modes.protect.button.updated");
+    cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
+    if (cj_params)
+    {
+        cJSON_AddItemToObject(__FUNCTION__, cj_response, ezlopi_result_str, cJSON_Duplicate(__FUNCTION__, cj_params, true));
+    }
 }
 
 void ezlopi_cloud_modes_protect_buttons_removed(cJSON *cj_request, cJSON *cj_response)
 {
-    cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+    cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_id_str);
+    cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_method_str);
+
+    cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
+    cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, "hub.modes.protect.button.removed");
+    cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
+    if (cj_params)
+    {
+        cJSON_AddItemToObject(__FUNCTION__, cj_response, ezlopi_result_str, cJSON_Duplicate(__FUNCTION__, cj_params, true));
+    }
+}
+
+void ezlopi_cloud_modes_protect_button_set_broadcast(cJSON *cj_request, cJSON *cj_response)
+{
+    // 1. broadcast 'modes.protect.button.added'
+    cJSON *added_resp = cJSON_CreateObject(__FUNCTION__);
+    if (added_resp)
+    {
+        ezlopi_cloud_modes_protect_buttons_added(cj_request, added_resp);
+        if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(added_resp))
+        {
+            cJSON_Delete(__FUNCTION__, added_resp);
+        }
+    }
+
+    // 2. broadcast 'modes.protect.button.updated'
+    cJSON *updated_resp = cJSON_CreateObject(__FUNCTION__);
+    if (updated_resp)
+    {
+        ezlopi_cloud_modes_protect_buttons_updated(cj_request, updated_resp);
+        if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(updated_resp))
+        {
+            cJSON_Delete(__FUNCTION__, updated_resp);
+        }
+    }
+
+    // 3.broadcast 'modes.protect.button.removed'
+    ezlopi_cloud_modes_protect_buttons_removed(cj_request, cj_response);
 }
 
 void ezlopi_cloud_modes_protect_devices_added(cJSON *cj_request, cJSON *cj_response)
 {
-    cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+    cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_id_str);
+    cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_method_str);
+
+    cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
+    cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, "hub.modes.protect.devices.added");
+    cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
+    if (cj_params)
+    {
+        cJSON_AddItemToObject(__FUNCTION__, cj_response, ezlopi_result_str, cJSON_Duplicate(__FUNCTION__, cj_params, true));
+    }
 }
 
 void ezlopi_cloud_modes_protect_devices_removed(cJSON *cj_request, cJSON *cj_response)
 {
-    cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+    cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_id_str);
+    cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_method_str);
+
+    cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
+    cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, "hub.modes.protect.devices.removed");
+    cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
+    if (cj_params)
+    {
+        cJSON_AddItemToObject(__FUNCTION__, cj_response, ezlopi_result_str, cJSON_Duplicate(__FUNCTION__, cj_params, true));
+    }
 }
 
 void ezlopi_cloud_modes_entry_delay_changed(cJSON *cj_request, cJSON *cj_response)

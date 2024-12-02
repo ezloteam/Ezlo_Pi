@@ -414,6 +414,142 @@ ezlopi_error_t ezlopi_core_modes_set_protect(uint32_t mode_id, bool protect_stat
     return ret;
 }
 
+ezlopi_error_t ezlopi_core_modes_protect_button_service_set(char* service_str, uint32_t deviceId)
+{
+    ezlopi_error_t ret = EZPI_ERR_MODES_FAILED;
+    if (service_str && deviceId)
+    {
+        ezlopi_service_modes_stop();
+
+        if (sg_custom_modes)
+        {
+            if (NULL == sg_custom_modes->l_protect_buttons)
+            {
+                sg_custom_modes->l_protect_buttons = (s_protect_buttons_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_protect_buttons_t));
+                if (sg_custom_modes->l_protect_buttons)
+                {
+                    memset(sg_custom_modes->l_protect_buttons, 0, sizeof(s_protect_buttons_t));
+                    sg_custom_modes->l_protect_buttons->device_id = deviceId;
+                    snprintf(sg_custom_modes->l_protect_buttons->service_name, sizeof(sg_custom_modes->l_protect_buttons->service_name), "%s", service_str);
+                    sg_custom_modes->l_protect_buttons->func = NULL;
+                    sg_custom_modes->l_protect_buttons->next = NULL;
+                }
+            }
+            else
+            {
+                bool add_new_device = true;
+                s_protect_buttons_t* protect_head = sg_custom_modes->l_protect_buttons;
+                s_protect_buttons_t* previous_potect_button = sg_custom_modes->l_protect_buttons;
+                while (NULL != protect_head)
+                {
+                    if (deviceId == protect_head->device_id)
+                    {
+                        memset(protect_head->service_name, 0, sizeof(protect_head->service_name));
+                        snprintf(protect_head->service_name, sizeof(protect_head->service_name), "%s", service_str);
+                        protect_head->func = NULL;
+                        add_new_device = false;
+                        break;
+                    }
+                    previous_potect_button = protect_head;
+                    protect_head = protect_head->next;
+                }
+                if (add_new_device)
+                {
+                    s_protect_buttons_t* new_button = (s_protect_buttons_t*)ezlopi_malloc(__FUNCCTION__, sizeof(s_protect_buttons_t));
+                    if (new_button)
+                    {
+                        memset(new_button, 0, sizeof(s_protect_buttons_t));
+                        new_button->device_id = deviceId;
+                        snprintf(new_button->service_name, sizeof(new_button->service_name), "%s", service_str);
+                        new_button->func = NULL;
+                        new_button->next = NULL;
+                        previous_potect_button->next = new_button;
+                    }
+                }
+            }
+            ezlopi_core_modes_store_to_nvs();
+            ret = EZPI_SUCCESS;
+        }
+        ezlopi_service_modes_start();
+    }
+
+    return ret;
+}
+
+
+ezlopi_error_t ezlopi_core_modes_add_protect_devices(cJSON* user_id_aray)
+{
+    ezlopi_error_t ret = EZPI_ERR_MODES_FAILED;
+
+    if (user_id_aray && (cJSON_Array == user_id_aray->type))
+    {
+        ezlopi_service_modes_stop(5000);
+
+        if (sg_custom_modes)
+        {
+            cJSON* dev_to_add = NULL;
+            cJSON_ArrayForEach(dev_to_add, user_id_aray)
+            {
+                bool add_to_array = true;
+                cJSON* dev_to_check = NULL;
+                cJSON_ArrayForEach(dev_to_check, sg_custom_modes->cj_devices)
+                {
+                    if (EZPI_STRNCMP_IF_EQUAL(dev_to_add->valuestring, dev_to_check->valuestring, strlen(dev_to_add->valuestring), strlen(dev_to_check->valuestring)))
+                    {
+                        add_to_array = false;
+                        break;
+                    }
+                }
+                if (add_to_array)
+                {
+                    if (NULL == sg_custom_modes->cj_devices)
+                    {
+                        sg_custom_modes->cj_devices = cJSON_CreateArray(__FUNCTION__);
+                    }
+                    cJSON_AddItemToArray(sg_custom_modes->cj_devices, cJSON_CreateString(__FUNCTION__, dev_to_add->valuestring));
+                }
+            }
+            ezlopi_core_modes_store_to_nvs();
+            ret = EZPI_SUCCESS;
+        }
+
+        ezlopi_service_modes_start(5000);
+    }
+
+    return ret;
+}
+
+#warning "protect.button.updated - case needs to be included"
+
+ezlopi_error_t ezlopi_core_modes_remove_protect_devices(cJSON* user_id_aray)
+{
+    ezlopi_error_t ret = EZPI_ERR_MODES_FAILED;
+    if (user_id_aray && (cJSON_Array == user_id_aray->type) && sg_custom_modes)
+    {
+        ezlopi_service_modes_stop(5000);
+        cJSON* element_to_remove = NULL;
+        cJSON_ArrayForEach(element_to_remove, user_id_aray)
+        {
+            cJSON* element_to_check = NULL;
+            int element_index = 0;
+            cJSON_ArrayForEach(element_to_check, sg_custom_modes->cj_devices)
+            {
+                if (EZPI_STRNCMP_IF_EQUAL(element_to_remove->valuestring, element_to_check->valuestring, strlen(element_to_remove->valuestring), strlen(element_to_check->valuestring)))
+                {
+                    cJSON_DeleteItemFromArray(__FUNCTION__, sg_custom_modes->cj_devices, element_index);
+                    break;
+                }
+                element_index++;
+            }
+
+        }
+        ezlopi_core_modes_store_to_nvs();
+        ezlopi_service_modes_start(5000);
+        ret = EZPI_SUCCESS;
+    }
+    return ret;
+}
+
 ezlopi_error_t ezlopi_core_modes_set_entry_delay(uint32_t normal_sec, uint32_t extended_sec, uint32_t long_extended_sec, uint32_t instant_sec)
 {
     ezlopi_error_t ret = EZPI_ERR_MODES_FAILED;
