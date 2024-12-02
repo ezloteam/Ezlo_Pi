@@ -58,6 +58,7 @@ static void __fetch_wss_endpoint(void *pv);
 
 static void __connection_upcall(bool connected);
 static void __message_upcall(const char *payload, uint32_t len);
+static void ___message_upcall(const char *payload, uint32_t len);
 static void __message_process(const char *payload, uint32_t len);
 
 static ezlopi_error_t __send_str_data_to_nma_websocket(char *str_data);
@@ -119,6 +120,31 @@ static void __connection_upcall(bool connected)
     }
 }
 
+static void ___connection_upcall(bool connected)
+{
+    // static int prev_status; // 0: never connected, 1: Not-connected, 2: connected
+    if (connected)
+    {
+        // if (0 == prev_status)
+        // {
+        TRACE_S("alt Web-socket Connected.");
+        // }
+        // else
+        // {
+        // TRACE_S("alt Web-socket Re-connected.");
+        // }
+
+        // prev_status = 2;
+    }
+    // TRACE_I("Starting registration process....");
+    // ezlopi_core_ezlopi_methods_registration_init();
+    // }
+    // else
+    // {
+    //     prev_status = 1;
+    //     ezlopi_event_group_clear_event(EZLOPI_EVENT_NMA_REG);
+    // }
+}
 static void __fetch_wss_endpoint(void *pv)
 {
 
@@ -161,7 +187,14 @@ static void __fetch_wss_endpoint(void *pv)
 #if (1 == EZPI_CORE_WSS_USE_WSC_LIB)
                             __wsc_ssl = ezlopi_core_wsc_init(cjson_uri, __message_upcall, __connection_upcall);
 #else  // EZPI_CORE_WSS_USE_WSC_LIB
+       // char *alt_uri = "{\"uri\":\"wss://echo.websocket.org\"}";
+       // cJSON *alternate_uri = cJSON_Parse(__FUNCTION__, alt_uri);
+       // char *jsonPrint = NULL;
+       // jsonPrint = cJSON_Print(__FUNCTION__, alternate_uri);
+       // TRACE_E("HERE: %s", jsonPrint);
                             ezlopi_websocket_client_init(cjson_uri, __message_upcall, __connection_upcall);
+                            _ezlopi_websocket_client_init(NULL, ___message_upcall, ___connection_upcall);
+                            // free(jsonPrint);
 #endif // EZPI_CORE_WSS_USE_WSC_LIB
                             task_complete = 1;
                         }
@@ -251,6 +284,11 @@ static void __message_upcall(const char *payload, uint32_t len)
     {
         __message_process(payload, len);
     }
+}
+
+static void ___message_upcall(const char *payload, uint32_t len)
+{
+    _ezlopi_websocket_client_send(payload, len);
 }
 
 static int __send_cjson_data_to_nma_websocket(cJSON *cj_data)

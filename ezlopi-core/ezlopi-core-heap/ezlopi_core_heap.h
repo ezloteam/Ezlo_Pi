@@ -9,9 +9,13 @@
 void ezlopi_util_heap_flush(void);
 void ezlopi_util_heap_trace(bool print_freed);
 
-void ezlopi_util_heap_free(const char * who, void *ptr, const char * __file_name, uint32_t line_number);
-void* ezlopi_util_heap_malloc(const char * who, size_t size, const char * file_name, uint32_t line_no);
-void* ezlopi_util_heap_calloc(const char * who, size_t count, size_t size, const char * file_name, uint32_t line_no);
-void* ezlopi_util_heap_realloc(const char * who, void *ptr, size_t new_size, const char * file_name, uint32_t line_no);
+void ezlopi_util_heap_free(const char *who, void *ptr, const char *__file_name, uint32_t line_number);
+void *ezlopi_util_heap_malloc(const char *who, size_t size, const char *file_name, uint32_t line_no);
+void *ezlopi_util_heap_calloc(const char *who, size_t count, size_t size, const char *file_name, uint32_t line_no);
+void *ezlopi_util_heap_realloc(const char *who, void *ptr, size_t new_size, const char *file_name, uint32_t line_no);
+
+void print_heap_info();
+void print_all_heap_info();
+void dump_heap_caps();
 
 #endif // __EZLOPI_UTIL_HEAP_TRACE_H__

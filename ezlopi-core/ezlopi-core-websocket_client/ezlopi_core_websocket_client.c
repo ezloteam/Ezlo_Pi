@@ -20,25 +20,26 @@
 #include "EZLOPI_USER_CONFIG.h"
 
 static esp_websocket_client_handle_t client = NULL;
+static esp_websocket_client_handle_t client_ii = NULL;
 
 typedef struct s_ws_event_arg
 {
     esp_websocket_client_handle_t client;
-    void (*msg_upcall)(const char*, uint32_t);
+    void (*msg_upcall)(const char *, uint32_t);
     void (*connection_upcall)(bool connected);
 } s_ws_event_arg_t;
 
 typedef struct s_ws_data_buffer
 {
-    char* buffer;
+    char *buffer;
     uint32_t len;
     uint32_t tot_len;
-    struct s_ws_data_buffer* next;
+    struct s_ws_data_buffer *next;
 } s_ws_data_buffer_t;
 
-static void websocket_event_handler(void* handler_args, esp_event_base_t base, int32_t event_id, void* event_data);
+static void websocket_event_handler(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data);
 
-ezlopi_error_t ezlopi_websocket_client_send(char* data, uint32_t len)
+ezlopi_error_t ezlopi_websocket_client_send(char *data, uint32_t len)
 {
     ezlopi_error_t ret = EZPI_FAILED;
 
@@ -47,6 +48,22 @@ ezlopi_error_t ezlopi_websocket_client_send(char* data, uint32_t len)
         if (esp_websocket_client_is_connected(client) && (len > 0) && (NULL != data))
         {
             ret = esp_websocket_client_send_text(client, data, len, 10000 / portTICK_RATE_MS);
+            ret = (ret > 0) ? EZPI_SUCCESS : EZPI_FAILED;
+        }
+    }
+
+    return ret;
+}
+
+ezlopi_error_t _ezlopi_websocket_client_send(char *data, uint32_t len)
+{
+    ezlopi_error_t ret = EZPI_FAILED;
+
+    if ((NULL != data) && (len > 0) && (NULL != client_ii))
+    {
+        if (esp_websocket_client_is_connected(client_ii) && (len > 0) && (NULL != data))
+        {
+            ret = esp_websocket_client_send_text(client_ii, data, len, 10000 / portTICK_RATE_MS);
             ret = (ret > 0) ? EZPI_SUCCESS : EZPI_FAILED;
         }
     }
@@ -67,13 +84,13 @@ void ezlopi_websocket_client_kill(void)
     client = NULL;
 }
 
-esp_websocket_client_handle_t ezlopi_websocket_client_init(cJSON* uri, void (*msg_upcall)(const char*, uint32_t), void (*connection_upcall)(bool connected))
+esp_websocket_client_handle_t ezlopi_websocket_client_init(cJSON *uri, void (*msg_upcall)(const char *, uint32_t), void (*connection_upcall)(bool connected))
 {
     if ((NULL == client) && (NULL != uri) && (NULL != uri->valuestring) && (NULL != msg_upcall))
     {
-        char * ca_cert = ezlopi_factory_info_v3_get_ca_certificate();
-        char * ssl_priv = ezlopi_factory_info_v3_get_ssl_private_key();
-        char * ssl_shared = ezlopi_factory_info_v3_get_ssl_shared_key();
+        char *ca_cert = ezlopi_factory_info_v3_get_ca_certificate();
+        char *ssl_priv = ezlopi_factory_info_v3_get_ssl_private_key();
+        char *ssl_shared = ezlopi_factory_info_v3_get_ssl_shared_key();
 
         static s_ws_event_arg_t event_arg;
         event_arg.client = client;
@@ -97,7 +114,7 @@ esp_websocket_client_handle_t ezlopi_websocket_client_init(cJSON* uri, void (*ms
         client = esp_websocket_client_init(&websocket_cfg);
         if (client)
         {
-            esp_websocket_register_events(client, WEBSOCKET_EVENT_ANY, websocket_event_handler, (void*)&event_arg);
+            esp_websocket_register_events(client, WEBSOCKET_EVENT_ANY, websocket_event_handler, (void *)&event_arg);
             esp_websocket_client_start(client);
         }
     }
@@ -109,10 +126,86 @@ esp_websocket_client_handle_t ezlopi_websocket_client_init(cJSON* uri, void (*ms
     return client;
 }
 
-static void websocket_event_handler(void* handler_args, esp_event_base_t base, int32_t event_id, void* event_data)
+esp_websocket_client_handle_t _ezlopi_websocket_client_init(cJSON *uri, void (*msg_upcall)(const char *, uint32_t), void (*connection_upcall)(bool connected))
 {
-    s_ws_event_arg_t* event_arg = (s_ws_event_arg_t*)handler_args;
-    esp_websocket_event_data_t* data = (esp_websocket_event_data_t*)event_data;
+    if (NULL != client_ii)
+    {
+        TRACE_E("Client already active!");
+        return;
+    }
+
+    // if ((NULL == uri))
+    // {
+    //     TRACE_E("Empty URI ");
+    //     return;
+    // }
+
+    // if ((NULL == uri->valuestring))
+    // {
+    //     TRACE_E("Empty URI value string ");
+    //     return;
+    // }
+
+    if ((NULL == msg_upcall))
+    {
+        TRACE_E("Empty Message upcall ");
+        return;
+    }
+
+    // if ((NULL == client_ii) && (NULL != uri) && (NULL != uri->valuestring) && (NULL != msg_upcall))
+    {
+        char *ca_cert = ezlopi_factory_info_v3_get_ca_certificate();
+        char *ssl_priv = ezlopi_factory_info_v3_get_ssl_private_key();
+        char *ssl_shared = ezlopi_factory_info_v3_get_ssl_shared_key();
+        // const char *url__ = "wss://demo.piesocket.com/v3/channel_123?api_key=VCXCEuvhGcBDP7XhiJJUDvR1e1D3eiVjgZ9VRiaV&notify_self";
+        const char *url__ = "wss://nma-server6-cloud.ezlo.com:443";
+        static s_ws_event_arg_t event_arg;
+        event_arg.client = client_ii;
+        event_arg.msg_upcall = msg_upcall;
+        event_arg.connection_upcall = connection_upcall;
+
+        esp_websocket_client_config_t websocket_cfg = {
+            .uri = url__,
+            .task_stack = EZPI_CORE_WSS_TASK_STACK_SIZE,
+            .buffer_size = EZPI_CORE_WSS_DATA_BUFFER_SIZE,
+            .cert_pem = ca_cert,
+            .client_cert = ssl_shared,
+            .client_key = ssl_priv,
+            .pingpong_timeout_sec = EZPI_CORE_WSS_PING_PONG_TIMEOUT_SEC,
+            .keep_alive_enable = 1,
+            .ping_interval_sec = EZPI_CORE_WSS_PING_INTERVAL_SEC,
+            // .use_global_ca_store = true,
+        };
+
+        TRACE_S("Connecting to %s...", websocket_cfg.uri);
+
+        client_ii = esp_websocket_client_init(&websocket_cfg);
+        if (client_ii)
+        {
+            esp_websocket_register_events(client_ii, WEBSOCKET_EVENT_ANY, websocket_event_handler, (void *)&event_arg);
+            esp_err_t err = esp_websocket_client_start(client_ii);
+            if (err != ESP_OK)
+            {
+                TRACE_E("Could not start the WSS client !!");
+            }
+        }
+        else
+        {
+            TRACE_E("Failed client init ");
+        }
+    }
+    // else
+    // {
+    //     TRACE_I("Client already active!");
+    // }
+
+    return client_ii;
+}
+
+static void websocket_event_handler(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data)
+{
+    s_ws_event_arg_t *event_arg = (s_ws_event_arg_t *)handler_args;
+    esp_websocket_event_data_t *data = (esp_websocket_event_data_t *)event_data;
     switch (event_id)
     {
     case WEBSOCKET_EVENT_CONNECTED:

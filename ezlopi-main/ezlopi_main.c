@@ -124,9 +124,17 @@ static void __blinky(void *pv)
     {
 
         TRACE_I("----------------------------------------------");
+
+        // print_heap_info();
+        // print_all_heap_info();
+        // dump_heap_caps();
+
         uint32_t free_heap = esp_get_free_heap_size();
         uint32_t watermark_heap = esp_get_minimum_free_heap_size();
+        uint32_t internal_heap = esp_get_free_internal_heap_size();
+
         TRACE_W("Free Heap Size: %d B     %.4f KB", free_heap, free_heap / 1024.0);
+        TRACE_W("Free Heap internal Size: %d B     %.4f KB", internal_heap, internal_heap / 1024.0);
         TRACE_W("Heap Watermark: %d B     %.4f KB", watermark_heap, watermark_heap / 1024.0);
         TRACE_I("----------------------------------------------");
 
