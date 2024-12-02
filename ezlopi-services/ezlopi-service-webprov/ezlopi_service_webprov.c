@@ -41,6 +41,12 @@
 
 #if defined(CONFIG_EZPI_WEBSOCKET_CLIENT)
 
+typedef struct
+{
+    time_t time_ms;
+    char *payload;
+} s_rx_message_t;
+
 static uint32_t message_counter = 0;
 static xTaskHandle _task_handle = NULL;
 
@@ -57,10 +63,10 @@ static void __provision_check(void *pv);
 static void __fetch_wss_endpoint(void *pv);
 
 static void __connection_upcall(bool connected);
-static int __message_upcall(const char *payload, uint32_t len);
+static int __message_upcall(const char *payload, uint32_t len, time_t time_ms);
 // static void __message_upcall(const char *payload, uint32_t len);
 static void __message_process(const char *payload, uint32_t len);
-static void __message_process_cjson(cJSON *cj_request);
+static void __message_process_cjson(cJSON *cj_request, time_t time_ms);
 
 static ezlopi_error_t __send_str_data_to_nma_websocket(char *str_data);
 static int __send_cjson_data_to_nma_websocket(cJSON *cj_data);
@@ -76,7 +82,7 @@ void ezlopi_service_web_provisioning_init(void)
     xTaskCreate(__provision_check, "WebProvCfgChk", EZLOPI_SERVICE_WEB_PROV_CONFIG_CHECK_TASK_DEPTH, NULL, 4, &ezlopi_service_web_prov_config_check_task_handle);
     ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_WEB_PROV_CONFIG_CHECK_TASK, &ezlopi_service_web_prov_config_check_task_handle, EZLOPI_SERVICE_WEB_PROV_CONFIG_CHECK_TASK_DEPTH);
 
-    _wss_message_queue = xQueueCreate(10, sizeof(char *));
+    _wss_message_queue = xQueueCreate(10, sizeof(s_rx_message_t *));
 
     xTaskCreate(__fetch_wss_endpoint, "WebProvFetchWSS", EZLOPI_SERVICE_WEB_PROV_FETCH_WSS_TASK_DEPTH, NULL, 4, &__web_socket_initialize_handler);
     ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_WEB_PROV_FETCH_WSS_TASK, &__web_socket_initialize_handler, EZLOPI_SERVICE_WEB_PROV_FETCH_WSS_TASK_DEPTH);
@@ -181,27 +187,71 @@ static void __fetch_wss_endpoint(void *pv)
         {
             while (_wss_message_queue)
             {
+                s_rx_message_t *rx_message = NULL;
+                BaseType_t ret = xQueueReceive(_wss_message_queue, &rx_message, 100 / portTICK_RATE_MS);
+
+                if (rx_message && (ret == pdTRUE))
+                {
+                    char *payload = rx_message->payload;
+                    if (rx_message->payload)
+                    {
+                        cJSON *cj_request = cJSON_Parse(__FUNCTION__, rx_message->payload);
+                        if (cj_request)
+                        {
+                            cJSON *cj_method = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_method_str);
+
+                            if (cj_method)
+                            {
+                                TRACE_D("rx_message->payload [method: %.*s]\r\n%s", cj_method->str_value_len, cj_method->valuestring, rx_message->payload);
+                                ezlopi_free(__FUNCTION__, rx_message->payload);
+                                rx_message->payload = NULL;
+                            }
+                            else
+                            {
+                                TRACE_E("rx_message->payload [method: null]\r\n%s", rx_message->payload);
+                            }
+
+                            __message_process_cjson(cj_request, rx_message->time_ms);
+                            cJSON_Delete(__FUNCTION__, cj_request);
+                        }
+
+                        ezlopi_free(__FUNCTION__, rx_message->payload);
+                        rx_message->payload = NULL;
+                    }
+
+                    ezlopi_free(__FUNCTION__, rx_message);
+                }
+
+#if 0
                 char *payload = NULL;
                 BaseType_t ret = xQueueReceive(_wss_message_queue, &payload, 100 / portTICK_RATE_MS);
 
                 if (payload && (ret == pdTRUE))
                 {
-#if 0
-                    __message_process(payload, strlen(payload));
-                    ezlopi_free(__FUNCTION__, payload);
-#else
-                    TRACE_D("payload: %s", payload);
                     cJSON *cj_request = cJSON_Parse(__FUNCTION__, payload);
-                    TRACE_W("payload: %p -> freed!", payload);
-                    ezlopi_free(__FUNCTION__, payload);
-
                     if (cj_request)
                     {
+                        cJSON *cj_method = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_method_str);
+
+                        if (cj_method)
+                        {
+                            TRACE_D("Payload [method: %.*s]\r\n%s", cj_method->str_value_len, cj_method->valuestring, payload);
+                            ezlopi_free(__FUNCTION__, payload);
+                            payload = NULL;
+                        }
+                        else
+                        {
+                            TRACE_E("Payload [method: null]\r\n%s", payload);
+                        }
+
                         __message_process_cjson(cj_request);
                         cJSON_Delete(__FUNCTION__, cj_request);
                     }
-#endif
+
+                    ezlopi_free(__FUNCTION__, payload);
+                    payload = NULL;
                 }
+#endif
 
                 vTaskDelay(1);
             }
@@ -218,15 +268,23 @@ static void __fetch_wss_endpoint(void *pv)
     vTaskDelete(NULL);
 }
 
-static void __message_process_cjson(cJSON *cj_request)
+static void __message_process_cjson(cJSON *cj_request, time_t time_ms)
 {
     if (cj_request)
     {
+        time_t now;
         cJSON *cj_response = ezlopi_core_api_consume_cjson(__FUNCTION__, cj_request);
+
+        time(&now);
+        TRACE_D("time to process: %lu", now - time_ms);
+
         if (cj_response)
         {
             cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_msg_id_str, message_counter);
             __send_cjson_data_to_nma_websocket(cj_response);
+
+            time(&now);
+            TRACE_D("time to reply: %lu", now - time_ms);
 
             cJSON_Delete(__FUNCTION__, cj_response);
         }
@@ -258,61 +316,45 @@ static void __message_process(const char *payload, uint32_t len)
     }
 }
 
-static int __message_upcall(const char *payload, uint32_t len)
+static int __message_upcall(const char *payload, uint32_t len, time_t time_ms)
 {
     int ret = 0;
 
     if (_wss_message_queue)
     {
-        if (pdTRUE == xQueueIsQueueFullFromISR(_wss_message_queue))
-        {
-            char *stale_data = NULL;
-            xQueueReceive(_wss_message_queue, &stale_data, 5);
-            if (stale_data)
-            {
-                ezlopi_free(__FUNCTION__, stale_data);
-            }
-        }
-
-        if (pdTRUE == xQueueSend(_wss_message_queue, &payload, 5))
-        {
-            TRACE_D("data-pushed-to-queue: %p", payload);
-            ret = 1;
-        }
-    }
-
-    return ret;
-}
-
-#if 0
-static void __message_upcall(const char *payload, uint32_t len)
-{
-    if (_wss_message_queue)
-    {
-        char *payload_copy = ezlopi_malloc(__FUNCTION__, len + 1);
-        if (payload_copy)
+        s_rx_message_t *rx_message = ezlopi_malloc(__FUNCTION__, sizeof(s_rx_message_t));
+        if (rx_message)
         {
             if (pdTRUE == xQueueIsQueueFullFromISR(_wss_message_queue))
             {
                 char *stale_data = NULL;
-                int ret = xQueueReceive(_wss_message_queue, &stale_data, 5);
-                if (pdTRUE == ret && stale_data)
+                xQueueReceive(_wss_message_queue, &stale_data, 5);
+                if (stale_data)
                 {
                     ezlopi_free(__FUNCTION__, stale_data);
                 }
             }
 
-            memcpy(payload_copy, payload, len);
-            payload_copy[len] = '\0';
+            rx_message->payload = payload;
+            rx_message->time_ms = time_ms;
 
-            if (pdTRUE != xQueueSend(_wss_message_queue, &payload_copy, 5))
+            if (pdTRUE == xQueueSend(_wss_message_queue, &rx_message, 5))
             {
-                ezlopi_free(__FUNCTION__, payload_copy);
+                ret = 1;
+            }
+            else
+            {
+                ezlopi_free(__FUNCTION__, rx_message);
             }
         }
+
+        // time_t now;
+        // time(&now);
+        // TRACE_W("data-queued(time): %lu,       time-now: %lu, time_ms: %lu", now - time_ms, now, time_ms);
     }
+
+    return ret;
 }
-#endif
 
 static int __send_cjson_data_to_nma_websocket(cJSON *cj_data)
 {
@@ -331,6 +373,15 @@ static int __send_cjson_data_to_nma_websocket(cJSON *cj_data)
             {
                 // trace_warning("data-buffer: %s", data_buffer);
                 ret = __send_str_data_to_nma_websocket(data_buffer);
+
+                if (EZPI_SUCCESS == ret)
+                {
+                    TRACE_S("NMA-send:\r\n%s", data_buffer);
+                }
+                else
+                {
+                    TRACE_E("NMA-send:\r\n%s", data_buffer);
+                }
             }
             else
             {
