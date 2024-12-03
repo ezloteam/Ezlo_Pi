@@ -1,3 +1,10 @@
+/**
+ * @file    main.c
+ * @brief   perform some function on data
+ * @author  John Doe
+ * @version 0.1
+ * @date    1st January 2024
+ */
 /* ===========================================================================
 ** Copyright (C) 2022 Ezlo Innovation Inc
 **
@@ -35,6 +42,18 @@
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
+/**
+ * Include Sequence
+ * 1. C standard libraries eg. stdint, string etc.
+ * 2. Third party component eg. cJSON, freeRTOS etc etc
+ * 3. ESP-IDF specific eg. driver/gpio, esp_log etc.
+ * 4. EzloPi HAL specific eg ezlopi_hal_i2c
+ * 5. EzloPi core specific eg. ezlopi_core_ble
+ * 6. EzloPi cloud specific eg. ezlopi_cloud_items
+ * 7. EzloPi Service specific eg ezlopi_service_ble
+ * 8. EzloPi Sensors and Device Specific eg. ezlopi_device_0001_digitalout_generic
+ */
+#include "header.h"
 
 /*******************************************************************************
  *                          C++ Declaration Wrapper
@@ -61,11 +80,11 @@ extern "C"
      * maincomponent : Main component as hal, core, service etc.
      * subcomponent : Sub component as i2c from hal, ble from service etc
      * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init() 
+     * eg : EZPI_hal_i2c_init()
      * @param arg
-     * 
+     *
      */
-    void EZPI_maincomponent_subcomponent_functiontitle(type_t arg);
+    void EZPI_maincomponent_subcomponent_functiontitle( type_t arg );
 
 #ifdef __cplusplus
 }
