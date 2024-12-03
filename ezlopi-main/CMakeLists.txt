@@ -43,6 +43,7 @@ set(EZLOPI_SENSOR_DEVICE_COMPONENTS
 set(EZLOPI_SERVICES
         ezlopi-service-ble
         ezlopi-service-ota
+        ezlopi-service-otel
         ezlopi-service-uart
         ezlopi-service-loop
         ezlopi-service-modes
