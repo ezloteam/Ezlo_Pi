@@ -24,6 +24,7 @@ void ezlopi_cloud_modes_changed(cJSON *cj_request, cJSON *cj_response);
 void ezlopi_cloud_modes_protect_buttons_added(cJSON *cj_request, cJSON *cj_response);
 void ezlopi_cloud_modes_protect_buttons_updated(cJSON *cj_request, cJSON *cj_response);
 void ezlopi_cloud_modes_protect_buttons_removed(cJSON *cj_request, cJSON *cj_response);
+void ezlopi_cloud_modes_protect_button_set_broadcast(cJSON *cj_request, cJSON *cj_response);
 void ezlopi_cloud_modes_protect_devices_added(cJSON *cj_request, cJSON *cj_response);
 void ezlopi_cloud_modes_protect_devices_removed(cJSON *cj_request, cJSON *cj_response);
 void ezlopi_cloud_modes_entry_delay_changed(cJSON *cj_request, cJSON *cj_response);
