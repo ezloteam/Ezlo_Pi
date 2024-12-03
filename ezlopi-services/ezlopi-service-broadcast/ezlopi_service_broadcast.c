@@ -50,11 +50,12 @@ static void __broadcast_loop(void *arg)
     }
     else
     {
-        if (pdTRUE == xQueueReceive(__broadcast_queue, &cj_data, 0))
+        if (pdTRUE == xQueueReceive(__broadcast_queue, &cj_data, 10))
         {
             broadcast_wait_start = xTaskGetTickCount();
         }
     }
+
     vTaskDelay(1);
 }
 

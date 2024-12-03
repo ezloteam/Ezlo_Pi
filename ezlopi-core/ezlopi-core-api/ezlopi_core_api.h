@@ -77,6 +77,7 @@ extern "C"
      * @param arg
      *
      */
+    cJSON *ezlopi_core_api_consume_cjson(const char *who, cJSON *cj_request);
     cJSON* ezlopi_core_api_consume(const char * who, const char* payload, uint32_t len);
 
 #ifdef __cplusplus
