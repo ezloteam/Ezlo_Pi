@@ -41,8 +41,7 @@ static void __broadcast_loop(void *arg)
 
     if (cj_data)
     {
-        // if ((xTaskGetTickCount() - broadcast_wait_start) > 1000 / portTICK_RATE_MS)
-        if ((xTaskGetTickCount() - broadcast_wait_start) > 10 / portTICK_RATE_MS)
+        if ((xTaskGetTickCount() - broadcast_wait_start) > 1000 / portTICK_RATE_MS)
         {
             ezlopi_core_broadcast_cjson(cj_data);
             cJSON_Delete(__FUNCTION__, cj_data);
