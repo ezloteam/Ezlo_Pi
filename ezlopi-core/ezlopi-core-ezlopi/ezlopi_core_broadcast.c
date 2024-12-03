@@ -75,13 +75,6 @@ ezlopi_error_t ezlopi_core_broadcast_cjson(cJSON *cj_data)
 
     if (cj_data)
     {
-        // char * tmp = cJSON_PrintUnformatted(__FUNCTION__, cj_data);
-        // if (tmp)
-        // {
-        //     printf("\n ### %s[%d] ; cj_data : ### \n ### \n %s \n ### \n\n", __FILE__, __LINE__, tmp);
-        //     free(tmp);
-        // }
-
         uint32_t buffer_len = 0;
 
         TRACE_I("%d -> -----------------------------> waiting for static buffer!", xTaskGetTickCount());

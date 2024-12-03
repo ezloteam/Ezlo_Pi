@@ -102,7 +102,6 @@ esp_websocket_client_handle_t ezlopi_websocket_client_init(cJSON *uri, int (*msg
         TRACE_S("Connecting to %s...", websocket_cfg.uri);
 
         client = esp_websocket_client_init(&websocket_cfg);
-        // client = esp_websocket_client_init(&websocket_cfg);
 
         if (client)
         {

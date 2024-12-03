@@ -134,7 +134,6 @@ static void __blinky(void *pv)
         TRACE_I("----------------------------------------------");
         TRACE_W("Total heap:                %d B   %.4f KB", total_heap_size, total_heap_size / 1024.0);
         TRACE_W("Free Heap Size:            %d B    %.4f KB", free_heap, free_heap / 1024.0);
-        TRACE_W("Free Heap internal Size:   %d B    %.4f KB", free_heap_internal, free_heap_internal / 1024.0);
         TRACE_W("Heap Watermark:            %d B    %.4f KB", watermark_heap, watermark_heap / 1024.0);
         TRACE_I("----------------------------------------------");
 
