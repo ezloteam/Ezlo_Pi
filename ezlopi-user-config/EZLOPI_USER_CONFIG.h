@@ -37,8 +37,8 @@
  * @date    1st January 2024
  */
 
-#ifndef _EZLOPI_USER_CONFIG_H_
-#define _EZLOPI_USER_CONFIG_H_
+#ifndef __EZLOPI_USER_CONFIG_H__
+#define __EZLOPI_USER_CONFIG_H__
 
 /*******************************************************************************
  *                          Include Files
@@ -81,6 +81,7 @@ extern "C"
     #endif
 
     #if defined(CONFIG_EZPI_HEAP_ENABLE)
+
     #ifdef malloc
     #undef malloc
     #endif
@@ -112,6 +113,7 @@ extern "C"
 
 
     // #else
+
     /////////////////////////////////////////////////////////////
     /////////////// Do not change here //////////////////
     ////////////////////////////////////////////////////////////
@@ -196,7 +198,7 @@ extern "C"
     #undef EZPI_DEV_TYPE_GENERIC
     // #undef EZPI_SERV_ENABLE_MESHBOTS
     #undef EZPI_UTIL_ENABLE_TRACE
-    #endif
+    // #endif
 
     #undef EZPI_SERV_BLE_ENABLE_READ_PROV
     #undef EZPI_SERV_BLE_ENABLE_STAT_PROV
@@ -213,7 +215,7 @@ extern "C"
 }
 #endif
 
-#endif // _EZLOPI_USER_CONFIG_H_
+#endif // __EZLOPI_USER_CONFIG_H__
 
 /*******************************************************************************
  *                          End of File
