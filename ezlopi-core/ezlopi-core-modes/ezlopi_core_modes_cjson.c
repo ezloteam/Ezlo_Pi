@@ -24,7 +24,6 @@ static void __cjson_add_abort_window(cJSON *cj_result, s_abort_window_t *abort_d
 static void __cjson_add_number_as_hex_string(cJSON *cj_dest, const char *obj_name, uint32_t number);
 static void __cjson_duplicate_add_reference(cJSON *cj_dest, const char *item_name_str, cJSON *cj_item);
 static void __cjson_add_protect_buttons(cJSON *cj_protect_buttons_arr, s_protect_buttons_t *l_protect_buttons);
-static void __cjson_add_security_device_to_array(cJSON *cj_device_array);
 
 //////////////////////
 
@@ -247,15 +246,6 @@ s_ezlopi_modes_t *ezlopi_core_modes_cjson_parse_modes(cJSON *cj_modes) // This f
             {
                 parsed_mode->cj_devices = cJSON_Duplicate(__FUNCTION__, cj_devices, cJSON_True);
             }
-            else
-            {
-                TRACE_S("Here adding security device list");
-                parsed_mode->cj_devices = cJSON_CreateArray(__func__);
-                if (parsed_mode->cj_devices)
-                {
-                    __cjson_add_security_device_to_array(parsed_mode->cj_devices); // adding 'security_device' from 'l_ezlopi_device_t'
-                }
-            }
         }
 
         {
@@ -278,6 +268,7 @@ s_ezlopi_modes_t *ezlopi_core_modes_cjson_parse_modes(cJSON *cj_modes) // This f
             cJSON *cj_protect_buttons = cJSON_GetObjectItem(__FUNCTION__, cj_modes, ezlopi_protectButtons_str);
             if (cj_protect_buttons)
             {
+                // CJSON_TRACE("protect_ll", cj_protect_buttons);
                 cJSON *cj_button = NULL;
                 s_protect_buttons_t *curr_button = parsed_mode->l_protect_buttons;
 
@@ -297,8 +288,8 @@ s_ezlopi_modes_t *ezlopi_core_modes_cjson_parse_modes(cJSON *cj_modes) // This f
                     if (curr_button)
                     {
                         memset(curr_button, 0, sizeof(s_protect_buttons_t));
-                        CJSON_GET_ID(curr_button->device_id, cJSON_GetObjectItem(__FUNCTION__, cj_modes, ezlopi_id_str));
-                        CJSON_GET_VALUE_STRING_BY_COPY(cj_modes, ezlopi_service_str, curr_button->service_name);
+                        CJSON_GET_ID(curr_button->device_id, cJSON_GetObjectItem(__FUNCTION__, cj_button, ezlopi_id_str));
+                        CJSON_GET_VALUE_STRING_BY_COPY(cj_button, ezlopi_service_str, curr_button->service_name);
                         curr_button->next = NULL; // making sure, tail is null;
                     }
                 }
@@ -315,21 +306,21 @@ s_ezlopi_modes_t *ezlopi_core_modes_cjson_parse_modes(cJSON *cj_modes) // This f
                 CJSON_GET_VALUE_STRING_BY_COPY(cj_alarmed, ezlopi_type_str, parsed_mode->alarmed.type);
                 CJSON_GET_VALUE_BOOL(cj_alarmed, "silent", parsed_mode->alarmed.silent);
 
-                char tmp_str[32];
+                char tmp_str[32] = {0};
                 CJSON_GET_VALUE_STRING_BY_COPY(cj_alarmed, "phase", tmp_str);
                 {
-                    (EZPI_STRNCMP_IF_EQUAL("idle", tmp_str, 5, strlen(tmp_str)))         ? (parsed_mode->alarmed.phase = EZLOPI_MODES_ALARM_PHASE_IDLE)
-                    : (EZPI_STRNCMP_IF_EQUAL("bypass", tmp_str, 5, strlen(tmp_str)))     ? (parsed_mode->alarmed.phase = EZLOPI_MODES_ALARM_PHASE_BYPASS)
-                    : (EZPI_STRNCMP_IF_EQUAL("entryDelay", tmp_str, 5, strlen(tmp_str))) ? (parsed_mode->alarmed.phase = EZLOPI_MODES_ALARM_PHASE_ENTRYDELAY)
-                    : (EZPI_STRNCMP_IF_EQUAL("main", tmp_str, 5, strlen(tmp_str)))       ? (parsed_mode->alarmed.phase = EZLOPI_MODES_ALARM_PHASE_MAIN)
-                                                                                         : (parsed_mode->alarmed.phase = EZLOPI_MODES_ALARM_PHASE_NONE); // this "NONE"-phase exists only at the beginning .
+                    (EZPI_STRNCMP_IF_EQUAL("idle", tmp_str, 5, strlen(tmp_str)))          ? (parsed_mode->alarmed.phase = EZLOPI_MODES_ALARM_PHASE_IDLE)
+                    : (EZPI_STRNCMP_IF_EQUAL("bypass", tmp_str, 7, strlen(tmp_str)))      ? (parsed_mode->alarmed.phase = EZLOPI_MODES_ALARM_PHASE_BYPASS)
+                    : (EZPI_STRNCMP_IF_EQUAL("entryDelay", tmp_str, 11, strlen(tmp_str))) ? (parsed_mode->alarmed.phase = EZLOPI_MODES_ALARM_PHASE_ENTRYDELAY)
+                    : (EZPI_STRNCMP_IF_EQUAL("main", tmp_str, 5, strlen(tmp_str)))        ? (parsed_mode->alarmed.phase = EZLOPI_MODES_ALARM_PHASE_MAIN)
+                                                                                          : (parsed_mode->alarmed.phase = EZLOPI_MODES_ALARM_PHASE_NONE); // this "NONE"-phase exists only at the beginning .
                 }
 
                 CJSON_GET_VALUE_STRING_BY_COPY(cj_alarmed, "status", tmp_str);
                 {
                     (EZPI_STRNCMP_IF_EQUAL("done", tmp_str, 5, strlen(tmp_str)))       ? (parsed_mode->alarmed.status = EZLOPI_MODES_ALARM_STATUS_DONE)
-                    : (EZPI_STRNCMP_IF_EQUAL("begin", tmp_str, 5, strlen(tmp_str)))    ? (parsed_mode->alarmed.status = EZLOPI_MODES_ALARM_STATUS_BEGIN)
-                    : (EZPI_STRNCMP_IF_EQUAL("canceled", tmp_str, 5, strlen(tmp_str))) ? (parsed_mode->alarmed.status = EZLOPI_MODES_ALARM_STATUS_CANCELED)
+                    : (EZPI_STRNCMP_IF_EQUAL("begin", tmp_str, 6, strlen(tmp_str)))    ? (parsed_mode->alarmed.status = EZLOPI_MODES_ALARM_STATUS_BEGIN)
+                    : (EZPI_STRNCMP_IF_EQUAL("canceled", tmp_str, 9, strlen(tmp_str))) ? (parsed_mode->alarmed.status = EZLOPI_MODES_ALARM_STATUS_CANCELED)
                                                                                        : (parsed_mode->alarmed.status = EZLOPI_MODES_ALARM_STATUS_DONE); // default State
                 }
 
@@ -489,25 +480,6 @@ static void __cjson_duplicate_add_reference(cJSON *cj_dest, const char *item_nam
         else
         {
             cJSON_AddArrayToObject(__FUNCTION__, cj_dest, item_name_str);
-        }
-    }
-}
-
-static void __cjson_add_security_device_to_array(cJSON *cj_device_array)
-{
-    if (cj_device_array && (cj_device_array->type == cJSON_Array))
-    {
-        l_ezlopi_device_t *curr_device = ezlopi_device_get_head();
-        while (curr_device)
-        {
-            if (EZPI_STRNCMP_IF_EQUAL(category_security_sensor, curr_device->cloud_properties.category, strlen(category_security_sensor), strlen(curr_device->cloud_properties.category)))
-            {
-                char temp[32];
-                memset(temp, 0, 32);
-                snprintf(temp, 32, "%08X", curr_device->cloud_properties.device_id);
-                cJSON_AddItemToArray(cj_device_array, cJSON_CreateString(__func__, temp));
-            }
-            curr_device = curr_device->next;
         }
     }
 }

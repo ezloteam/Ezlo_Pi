@@ -347,7 +347,7 @@ void ezlopi_cloud_modes_protect_buttons_set(cJSON *cj_request, cJSON *cj_respons
 
                 uint8_t status = 0;
                 ezlopi_core_modes_protect_button_service_set(cj_service->valuestring, deviceId, &status); // status => [ BIT0 = added ; BIT1 = Updated ; BIT2 = removed ]
-
+                // TRACE_D("BUTTPON_STATE = %d", status);
                 cJSON_AddNumberToObject(__func__, cj_request, "button_state", (double)status); // just for broadcast purpose
             }
         }

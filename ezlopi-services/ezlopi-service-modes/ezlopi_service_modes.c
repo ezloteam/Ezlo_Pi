@@ -167,7 +167,7 @@ void ezlopi_service_modes_init(void)
 bool ezlopi_service_modes_stop(uint32_t wait_ms)
 {
     bool ret = false;
-    uint32_t start_tick = xTaskGetTickCount() / portTICK_PERIOD_MS;
+    // uint32_t start_tick = xTaskGetTickCount() / portTICK_PERIOD_MS;
 
     if (sg_modes_loop_smphr && (xSemaphoreTake(sg_modes_loop_smphr, wait_ms / portTICK_RATE_MS)))
     {
@@ -199,7 +199,7 @@ bool ezlopi_service_modes_start(uint32_t wait_ms)
 static void __broadcast_modes_alarmed_for_uid(const char *dev_id_str)
 {
     cJSON *cj_update = ezlopi_core_modes_cjson_alarmed(dev_id_str);
-    CJSON_TRACE("----------------- broadcasting - cj_update", cj_update);
+    // CJSON_TRACE("----------------- broadcasting - cj_update", cj_update);
 
     if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(cj_update))
     {
@@ -343,9 +343,12 @@ static void __modes_create_non_bypass_alerts(s_ezlopi_modes_t *ez_mode, s_house_
         cJSON_ArrayForEach(cj_alarm, ez_mode->cj_alarms) // 'alarm_device_id' to trigger alerts
         {
             // 1.1.  Non-bypass-loop creation for listed 'device_id'
+
+            TRACE_S("checking id: %s", cj_alarm->valuestring);
             if (false == __check_if_device_is_bypassed(curr_house_mode->cj_bypass_devices, cj_alarm->valuestring)) // donot trigger alert if device is bypassed
             {
                 __ezlopi_service_add_alert(cj_alarm->valuestring, ez_mode); // Append suitable nodes to 'alert_ll'.
+                TRACE_D("alert_ll --> Adding :%s", cj_alarm->valuestring);
             }
         }
     }
@@ -416,7 +419,6 @@ static void __modes_main_and_broadcast_status(s_ezlopi_modes_t *ez_mode)
 static ezlopi_error_t __check_mode_switch_condition(s_ezlopi_modes_t *ez_mode)
 {
     ezlopi_error_t ret = EZPI_ERR_MODES_FAILED;
-    TRACE_D("here");
     if (ez_mode->switch_to_mode_id)
     {
         if (0 < ez_mode->time_is_left_to_switch_sec)
@@ -441,7 +443,7 @@ static ezlopi_error_t __check_mode_switch_condition(s_ezlopi_modes_t *ez_mode)
                 s_house_modes_t *prev_house_mode = ezlopi_core_modes_get_house_mode_by_id(bypass_clear_modeId);
                 if (prev_house_mode && prev_house_mode->cj_bypass_devices)
                 {
-                    TRACE_D("here");
+                    // TRACE_D("clearing all alerts");
 #if 0
                     // if switching has took place during 'entry-delay'phase---> send 'canceled' as alarmed-broadcast
                     if (EZLOPI_MODES_ALARM_PHASE_ENTRYDELAY == ez_mode->alarmed.phase &&
@@ -451,7 +453,7 @@ static ezlopi_error_t __check_mode_switch_condition(s_ezlopi_modes_t *ez_mode)
                     }
 #endif
                     // Also Remove all the 'alert-nodes'
-                    __ezlopi_service_remove_all_alerts(); // [false ; 0] == remove all
+                    __ezlopi_service_remove_all_alerts();
 
                     cJSON_Delete(__FUNCTION__, prev_house_mode->cj_bypass_devices);
                     prev_house_mode->cj_bypass_devices = NULL;
@@ -478,7 +480,7 @@ static ezlopi_error_t __check_mode_switch_condition(s_ezlopi_modes_t *ez_mode)
                     // 4. Store to nvs
                     ezlopi_core_modes_store_to_nvs();
                     cJSON *cj_update = ezlopi_core_modes_cjson_changed();
-                    CJSON_TRACE("----------------- broadcasting - cj_update", cj_update);
+                    // CJSON_TRACE("----------------- broadcasting - cj_update", cj_update);
 
                     if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(cj_update))
                     {

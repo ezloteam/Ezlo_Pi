@@ -111,17 +111,14 @@ ezlopi_error_t ezlopi_core_modes_api_switch_mode(s_house_modes_t *switch_to_hous
     sg_custom_modes->switch_to_mode_id = switch_to_house_mode->_id;
     sg_custom_modes->time_is_left_to_switch_sec = 0;
 
-    if (sg_current_house_mode && (true == sg_current_house_mode->armed))
+    // #. If the curr-house-mode already was in 'pre-alarming[EntryDelay]' MODE ; set 'canceled' broadcast status
+    if (EZLOPI_MODES_ALARM_PHASE_ENTRYDELAY == sg_custom_modes->alarmed.phase &&
+        EZLOPI_MODES_ALARM_STATUS_BEGIN == sg_custom_modes->alarmed.status)
     {
-        TRACE_D("here");
-        // #. If the curr-house-mode already was in 'pre-alarming[EntryDelay]' MODE ; set 'canceled' broadcast status
-        if (EZLOPI_MODES_ALARM_PHASE_ENTRYDELAY == sg_custom_modes->alarmed.phase &&
-            EZLOPI_MODES_ALARM_STATUS_BEGIN == sg_custom_modes->alarmed.status)
-        {
-            TRACE_D("here");
-            sg_custom_modes->alarmed.status = EZLOPI_MODES_ALARM_STATUS_CANCELED;
-        }
+        TRACE_D("switching to MODE : %d", sg_custom_modes->switch_to_mode_id);
+        sg_custom_modes->alarmed.status = EZLOPI_MODES_ALARM_STATUS_CANCELED;
     }
+
     // The broadcast is triggered when 'modes-loop' is started
     ezlopi_service_modes_start(5000);
 
@@ -852,6 +849,7 @@ void ezlopi_core_modes_init(void)
         {
             _is_custom_mode_ok = 1;
             sg_custom_modes = ezlopi_core_modes_cjson_parse_modes(cj_custom_modes);
+            ezlopi_core_modes_set_current_house_mode(ezlopi_core_modes_get_house_mode_by_id(sg_custom_modes->current_mode_id));
             cJSON_Delete(__FUNCTION__, cj_custom_modes);
         }
     }

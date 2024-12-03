@@ -90,7 +90,6 @@ void ezlopi_cloud_modes_changed_alarmed(cJSON *cj_request, cJSON *cj_response)
     }
 
     // 2. for 'modes.alarmed' - return  'cj_response'
-    TRACE_S("Triggering modes-alarm status");
     ezlopi_cloud_modes_alarmed(cj_request, cj_response);
 }
 
