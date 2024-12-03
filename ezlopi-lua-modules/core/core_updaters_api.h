@@ -1,10 +1,3 @@
-/**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
- * @version 0.1
- * @date    1st January 2024
- */
 /* ===========================================================================
 ** Copyright (C) 2024 Ezlo Innovation Inc
 **
@@ -35,6 +28,14 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
+
+/**
+ * @file    main.c
+ * @brief   perform some function on data
+ * @author  John Doe
+ * @version 0.1
+ * @date    1st January 2024
+ */
 
 #ifndef __CORE_UPDATERS_API_H__
 #define __CORE_UPDATERS_API_H__

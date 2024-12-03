@@ -1,10 +1,41 @@
-#ifndef _SENSOR_0059_OTHER_MQ6_LPG_DETECTOR_H_
-#define _SENSOR_0059_OTHER_MQ6_LPG_DETECTOR_H_
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
 
-#include "ezlopi_core_actions.h"
-#include "ezlopi_core_devices.h"
-#include "ezlopi_core_errors.h"
 /**
+ * @file    main.c
+ * @brief   perform some function on data
+ * @author  John Doe
+ * @version 0.1
+ * @date    1st January 2024
+ * @note
  *  NOTE : MQ6_LPG_gas - module gives (0V - 4.2V) as analog output .
  *  But ESP32- only allows upto 2.4V max input.
  *
@@ -28,9 +59,6 @@
  *      [0V] ---------------+--> 0V--------+------------+ 0V
  *
  *
- **/
-
-/**
  *  From the graph, we can see that the resistance ratio in fresh air is a constant:
  *      (via black straight line of sensitivity graph in the Mq-4 datasheet)
  *
@@ -41,9 +69,7 @@
  *  Then we will use the 'RS' formula to find 'R0'.
  *
  *  i.e. ----------------------------> RS_calib = [(VC x RL) / VRL] - RL;
- */
-
-/**
+ *
  *   Calculation Process
  *   ~~~~~~~~~~~~~~~~~~~
  *                          : $. Linear      : y = mx + b
@@ -101,47 +127,85 @@
  *
  */
 
-//------------------------------------------
-/**
- * Please don't forget to uncomment ,
- * -> If you added a voltage divider at sensor's analog output. [Make sure voltage does not exceed 2.5V]
- *      |
- *      |
- *      V
- */
-#define VOLTAGE_DIVIDER_ADDED 1
-//------------------------------------------
+#ifndef _SENSOR_0059_OTHER_MQ6_LPG_DETECTOR_H_
+#define _SENSOR_0059_OTHER_MQ6_LPG_DETECTOR_H_
 
-/**
- * Before writing below  [mq6_eqv_RL], [m_slope_mq6], [b_coeff_mq6] shown values.
- * Please apply voltage-divider schematics as shown above.
- *
- * NOTE .1 : Mannually use multimeter and measure : eqv-resistance [mq6_eqv_RL], between [A0_pin vs GND] of 'MQ-4 sensor'
- *
- * NOTE .2 : For [m_slope_mq6] & [b_coeff_mq6] values:- follow [stage-1] above shown procedures.
- * */
-#define mq6_eqv_RL 500.0f      // review the upper diagram clearly to know why this value is assigned
-#define RatioMQ6CleanAir 10.0f // -> [RS / R0] = 10.0f
-#define MQ6_VOLT_RESOLUTION_Vc 5.0f
-#define m_slope_mq6 -0.424f
-#define b_coeff_mq6 1.272f
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
+#include "ezlopi_core_actions.h"
+#include "ezlopi_core_devices.h"
+#include "ezlopi_core_errors.h"
 
-typedef enum
+/*******************************************************************************
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
+#ifdef __cplusplus
+extern "C"
 {
-    MQ6_GAS_ALARM_NO_GAS,
-    MQ6_GAS_ALARM_COMBUSTIBLE_GAS_DETECTED,
-    MQ6_GAS_ALARM_TOXIC_GAS_DETECTED,
-    MQ6_GAS_ALARM_UNKNOWN,
-    MQ6_GAS_ALARM_MAX
-} e_mq6_gas_alarm_states_t;
+#endif
 
+    /*******************************************************************************
+     *                          Type & Macro Declarations
+     *******************************************************************************/
+    /**
+     * Please don't forget to uncomment ,
+     * -> If you added a voltage divider at sensor's analog output. [Make sure voltage does not exceed 2.5V]
+     *      |
+     *      |
+     *      V
+     */
+    #define VOLTAGE_DIVIDER_ADDED 1
+    //------------------------------------------
 
-//--------------------------------------------------------------------------------------------------------
-//      ACTION FUNCTION
-//--------------------------------------------------------------------------------------------------------
+    /**
+     * Before writing below  [mq6_eqv_RL], [m_slope_mq6], [b_coeff_mq6] shown values.
+     * Please apply voltage-divider schematics as shown above.
+     *
+     * NOTE .1 : Mannually use multimeter and measure : eqv-resistance [mq6_eqv_RL], between [A0_pin vs GND] of 'MQ-4 sensor'
+     *
+     * NOTE .2 : For [m_slope_mq6] & [b_coeff_mq6] values:- follow [stage-1] above shown procedures.
+     * */
+    #define mq6_eqv_RL 500.0f      // review the upper diagram clearly to know why this value is assigned
+    #define RatioMQ6CleanAir 10.0f // -> [RS / R0] = 10.0f
+    #define MQ6_VOLT_RESOLUTION_Vc 5.0f
+    #define m_slope_mq6 -0.424f
+    #define b_coeff_mq6 1.272f
 
-ezlopi_error_t sensor_0059_other_MQ6_LPG_detector(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
+    typedef enum
+    {
+        MQ6_GAS_ALARM_NO_GAS,
+        MQ6_GAS_ALARM_COMBUSTIBLE_GAS_DETECTED,
+        MQ6_GAS_ALARM_TOXIC_GAS_DETECTED,
+        MQ6_GAS_ALARM_UNKNOWN,
+        MQ6_GAS_ALARM_MAX
+    } e_mq6_gas_alarm_states_t;
 
-//--------------------------------------------------------------------------------------------------------
+    /*******************************************************************************
+     *                          Extern Data Declarations
+     *******************************************************************************/
+
+    /*******************************************************************************
+     *                          Extern Function Prototypes
+     *******************************************************************************/
+    /**
+     * @brief Global function template example
+     * Convention : Use capital letter for initial word on extern function
+     * maincomponent : Main component as hal, core, service etc.
+     * subcomponent : Sub component as i2c from hal, ble from service etc
+     * functiontitle : Title of the function
+     * eg : EZPI_hal_i2c_init()
+     * @param arg
+     *
+     */
+    ezlopi_error_t sensor_0059_other_MQ6_LPG_detector(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //_SENSOR_0059_OTHER_MQ6_LPG_DETECTOR_H_
+
+/*******************************************************************************
+ *                          End of File
+ *******************************************************************************/

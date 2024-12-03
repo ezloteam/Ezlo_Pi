@@ -1,7 +1,7 @@
 /*
 	LTR303 illumination sensor library for Arduino
 	Lovelesh, thingTronics
-	
+
 The MIT License (MIT)
 
 Copyright (c) 2015 thingTronics Limited
@@ -95,7 +95,7 @@ typedef enum {
   LTR3XX_MEASRATE_1000,
   LTR3XX_MEASRATE_2000,
 } ltr329_measurerate_t;
-			
+
 boolean ltr303_begin(s_ezlopi_i2c_master_t* bme68x_i2c_master_conf);
 	// Initialize LTR303 library with default address (0x29)
 	// Always returns true
@@ -127,7 +127,7 @@ boolean ltr303_set_control(byte gain, boolean reset, boolean mode);
 	//----------------------------------------
 	// If mode = false(0), stand-by mode (default)
 	// If mode = true(1), active mode
-	
+
 boolean ltr303_get_control(byte* gain, boolean* reset, boolean* mode);
 	// Gets the control register values
 	// Default value is 0x00
@@ -147,8 +147,8 @@ boolean ltr303_get_control(byte* gain, boolean* reset, boolean* mode);
 	// If mode = true(1), active mode
 	// Returns true (1) if successful, false (0) if there was an I2C error
 	// (Also see getError() below)
-	
-	
+
+
 boolean ltr303_set_measurement_rate(byte integration_time, byte measurement_rate);
 	// Sets the integration time and measurement rate of the sensor
 	// integrationTime is the measurement time for each ALs cycle
@@ -174,7 +174,7 @@ boolean ltr303_set_measurement_rate(byte integration_time, byte measurement_rate
 	// If measurementRate = 7, measurementRate will be 2000ms
 	// Returns true (1) if successful, false (0) if there was an I2C error
 	// (Also see getError() below)
-	
+
 boolean ltr303_get_measurement_rate(byte* integration_time, byte* measurement_rate);
 	// Gets the value of Measurement Rate register
 	// Default value is 0x03
@@ -240,7 +240,7 @@ boolean ltr303_get_status(boolean* valid, byte* gain, boolean* intr_status, bool
 	// If dataStatus = true(1), NEW data
 	// Returns true (1) if successful, false (0) if there was an I2C error
 	// (Also see getError() below)
-	
+
 boolean ltr303_set_interrupt_control(boolean intr_mode, boolean polarity);
 	// Sets up interrupt operations
 	// Default value is 0x08
@@ -252,7 +252,7 @@ boolean ltr303_set_interrupt_control(boolean intr_mode, boolean polarity);
 	//------------------------------------------------------
 	// Returns true (1) if successful, false (0) if there was an I2C error
 	// (Also see getError() below)
-	
+
 boolean ltr303_get_interrupt_control(boolean* polarity, boolean* intr_mode);
 	// Sets up interrupt operations
 	// Default value is 0x08
@@ -264,23 +264,23 @@ boolean ltr303_get_interrupt_control(boolean* polarity, boolean* intr_mode);
 	//------------------------------------------------------
 	// Returns true (1) if successful, false (0) if there was an I2C error
 	// (Also see getError() below)
-	
+
 boolean ltr303_set_threshold(unsigned int upper_limit, unsigned int lower_limit);
 	// Sets the upper limit and lower limit of the threshold
 	// Default value of upper threshold is 0xFF and lower threshold is 0x00
 	// Both the threshold are 16-bit integer values
 	// Returns true (1) if successful, false (0) if there was an I2C error
 	// (Also see getError() below)
-	
+
 boolean ltr303_get_threshold(unsigned int* upper_limit, unsigned int* lower_limit);
 	// Gets the upper limit and lower limit of the threshold
 	// Default value of upper threshold is 0xFF and lower threshold is 0x00
 	// Both the threshold are 16-bit integer values
 	// Returns true (1) if successful, false (0) if there was an I2C error
 	// (Also see getError() below)
-	
+
 boolean ltr303_set_intr_persist(byte persist);
-	// Sets the interrupt persistance i.e. controls the N number of times the 
+	// Sets the interrupt persistance i.e. controls the N number of times the
 	// measurement data is outside the range defined by upper and lower threshold
 	// Default value is 0x00
 	// If persist = 0, every sensor value out of threshold range (default)
@@ -301,7 +301,7 @@ boolean ltr303_set_intr_persist(byte persist);
 	// If persist = 15, every 16 consecutive value out of threshold range
 	// Returns true (1) if successful, false (0) if there was an I2C error
 	// (Also see getError() below)
-	
+
 boolean ltr303_get_intr_persist(byte* persist);
 	// Gets the interrupt persistance i.e. controls the N number of times the measurement data is outside the range defined by upper and lower threshold
 	// Default value is 0x00
@@ -335,13 +335,13 @@ boolean ltr303_get_lux(byte gain, byte integration_time, unsigned int ch0, unsig
 
 byte ltr303_get_error(void);
 	// If any library command fails, you can retrieve an extended
-	// error code using this command. Errors are from the wire library: 
+	// error code using this command. Errors are from the wire library:
 	// 0 = Success
 	// 1 = Data too long to fit in transmit buffer
 	// 2 = Received NACK on transmit of address
 	// 3 = Received NACK on transmit of data
 	// 4 = Other error
-	
+
 void ltr303_print_error(byte error);
 	// Print Errors
 

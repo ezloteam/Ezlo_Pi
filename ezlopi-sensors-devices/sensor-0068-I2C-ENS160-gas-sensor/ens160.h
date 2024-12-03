@@ -2,7 +2,7 @@
  * @file  DFRobot_ENS160.h
  * @brief  Define infrastructure of DFRobot_ENS160 class
  * @details  This is a Digital Metal-Oxide Multi-Gas Sensor. It can be controlled by I2C and SPI port.
- * @n        Detection of a variety of gases, such as volatile organic compounds (VOCs), as 
+ * @n        Detection of a variety of gases, such as volatile organic compounds (VOCs), as
  * @n        well as hydrogen and nitrogen dioxide, has superior selectivity and accuracy.
  * @copyright  Copyright (c) 2010 DFRobot Co.Ltd (http://www.dfrobot.com)
  * @license  The MIT License (MIT)
@@ -171,7 +171,7 @@ typedef struct ens160_data
     uint8_t aqi;
     uint16_t tvoc;
     uint16_t eco2;
-} ens160_data_t; 
+} ens160_data_t;
 
 typedef struct ens160
 {
@@ -219,9 +219,9 @@ void dfrobot_ens160_set_temp_and_hum(ens160_t* ens160, float ambient_temp, float
  * @fn getENS160Status
  * @brief This API is used to get the sensor operating status
  * @return Operating status:
- * @n        eNormalOperation: Normal operation; 
- * @n        eWarmUpPhase: Warm-Up phase; 
- * @n        eInitialStartUpPhase: Initial Start-Up phase; 
+ * @n        eNormalOperation: Normal operation;
+ * @n        eWarmUpPhase: Warm-Up phase;
+ * @n        eInitialStartUpPhase: Initial Start-Up phase;
  * @n        eInvalidOutput: Invalid output
  */
 uint8_t dfrobot_ens160_get_ens160_status(ens160_t* ens160);
@@ -244,7 +244,7 @@ uint16_t dfrobot_ens160_get_tvoc(ens160_t* ens160);
  * @fn getECO2
  * @brief Get CO2 equivalent concentration calculated according to the detected data of VOCs and hydrogen (eCO2 – Equivalent CO2)
  * @return Return value range: 400–65000, unit: ppm
- * @note Five levels: Excellent(400 - 600), Good(600 - 800), Moderate(800 - 1000), 
+ * @note Five levels: Excellent(400 - 600), Good(600 - 800), Moderate(800 - 1000),
  * @n                  Poor(1000 - 1500), Unhealthy(> 1500)
  */
 uint16_t dfrobot_ens160_get_eco2(ens160_t* ens160);

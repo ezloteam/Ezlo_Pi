@@ -1,10 +1,3 @@
-/**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
- * @version 0.1
- * @date    1st January 2024
- */
 /* ===========================================================================
 ** Copyright (C) 2024 Ezlo Innovation Inc
 **
@@ -35,6 +28,14 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
+
+/**
+ * @file    main.c
+ * @brief   perform some function on data
+ * @author  John Doe
+ * @version 0.1
+ * @date    1st January 2024
+ */
 
 #ifndef _EZLOPI_ADC_H_
 #define _EZLOPI_ADC_H_
@@ -104,7 +105,7 @@ extern "C"
         int gpio_num;
         uint8_t resln_bit;
     }s_ezlopi_adc_t;
-    
+
     /*******************************************************************************
      *                          Extern Data Declarations
      *******************************************************************************/

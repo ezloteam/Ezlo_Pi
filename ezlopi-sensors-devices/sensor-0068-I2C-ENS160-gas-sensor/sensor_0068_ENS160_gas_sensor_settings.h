@@ -1,5 +1,3 @@
-
-
 #ifndef _SENSOR_ENS160_GAS_SENSOR_SETTINGS_H_
 #define _SENSOR_ENS160_GAS_SENSOR_SETTINGS_H_
 
@@ -58,5 +56,3 @@ static inline cJSON* __setting_add_text_and_lang_tag(const char* const object_te
 
 
 #endif // _SENSOR_ENS160_GAS_SENSOR_SETTINGS_H_
-
-

@@ -139,7 +139,7 @@ bool bsec2_get_state(uint8_t *state);
  */
 bool bsec2_set_state(uint8_t *state);
 
-/** 
+/**
  * @brief Function to retrieve the current library configuration
  * @param config    : Pointer to a memory location, to hold the serialized config blob
  * @return	true for success, false otherwise
@@ -160,7 +160,7 @@ int64_t bsec2_get_time_ms(void);
 
 /**
  * @brief Function to assign the memory block to the bsec instance
- * 
+ *
  * @param[in] mem_block : reference to the memory block
  */
 void bsec2_allocate_memory(uint8_t *mem_block); // &mem_block)[BSEC_INSTANCE_SIZE]
