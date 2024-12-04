@@ -5,7 +5,7 @@
 #include "ezlopi_core_factory_info.h"
 #include "ezlopi_core_offline_login.h"
 
-#define BYPASS_LOGIN 0
+#define BYPASS_LOGIN 1
 
 static bool logged_in = false;
 

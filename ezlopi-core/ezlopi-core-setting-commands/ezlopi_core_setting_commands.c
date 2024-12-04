@@ -137,7 +137,9 @@ static int ezlopi_core_setting_command_process_log_level(const cJSON *cj_params)
         cJSON *cj_value = cJSON_GetObjectItem(__FUNCTION__, cj_params, "value");
         if (cj_value && cJSON_IsString(cj_value))
         {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
             ezlopi_core_cloud_log_severity_process_str(true, cj_value->valuestring);
+#endif
             ret = 0;
         }
     }
@@ -239,6 +241,7 @@ static int ezlopi_core_add_network_ping_timeout_settings(cJSON *cj_settings)
 static int ezlopi_core_add_log_level_settings(cJSON *cj_settings)
 {
     int ret = -1;
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
     const char **log_level_enums = ezlopi_core_cloud_log_get_severity_enums();
     if (log_level_enums)
     {
@@ -265,6 +268,7 @@ static int ezlopi_core_add_log_level_settings(cJSON *cj_settings)
             cJSON_AddItemToArray(cj_settings, cj_log_level);
         }
     }
+#endif
     return ret;
 }
 
@@ -300,11 +304,13 @@ int ezlopi_core_setting_updated_broadcast(cJSON *cj_params, cJSON *cj_result)
                 cJSON_AddNumberToObject(__FUNCTION__, cj_result, "value", network_ping_timeout_to_user);
                 break;
             }
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
             case SETTING_COMMAND_NAME_LOG_LEVEL:
             {
                 cJSON_AddStringToObject(__FUNCTION__, cj_result, "value", ezlopi_core_cloud_log_get_current_severity_enum_str());
                 break;
             }
+#endif
             default:
             {
                 break;

@@ -24,13 +24,6 @@ void ezlopi_service_broadcast_init(void)
     {
         ezlopi_core_broadcast_methods_set_queue(ezlopi_service_broadcast_send_to_queue);
         ezlopi_service_loop_add("broadcast-loop", __broadcast_loop, 1, NULL);
-
-#if 0
-        TaskHandle_t ezlopi_service_broadcast_task_handle = NULL;
-        ezlopi_core_broadcast_methods_set_queue(ezlopi_service_broadcast_send_to_queue);
-        xTaskCreate(__broadcast_process, "broadcast-service", EZLOPI_SERVICE_BROADCAST_TASK_DEPTH, NULL, 2, &ezlopi_service_broadcast_task_handle);
-        ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_BROADCAST_TASK, &ezlopi_service_broadcast_task_handle, EZLOPI_SERVICE_BROADCAST_TASK_DEPTH);
-#endif
     }
 }
 

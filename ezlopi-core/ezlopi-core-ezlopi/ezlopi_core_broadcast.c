@@ -1,3 +1,4 @@
+#include <time.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
@@ -177,6 +178,9 @@ static ezlopi_error_t __call_broadcast_methods(char *data)
 
     while (curr_method)
     {
+        time_t start_time;
+        time(&start_time);
+
         if (curr_method->func)
         {
             ret = EZPI_SUCCESS;
@@ -192,11 +196,21 @@ static ezlopi_error_t __call_broadcast_methods(char *data)
                     ret = EZPI_SUCCESS;
                     break;
                 }
+                else
+                {
+                    ret = EZPI_NOT_AVAILABLE;
+                    break;
+                }
 
                 vTaskDelay(5 / portTICK_RATE_MS);
 
             } while (retries--);
         }
+
+        time_t end_time;
+        time(&end_time);
+
+        TRACE_W("Broadcast method '%s' took %lu", curr_method->method_name ? curr_method->method_name : "--", end_time - start_time);
 
         curr_method = curr_method->next;
     }

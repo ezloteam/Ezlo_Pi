@@ -49,6 +49,7 @@ typedef struct
 
 static uint32_t message_counter = 0;
 static xTaskHandle _task_handle = NULL;
+static esp_websocket_client_handle_t wss_client = NULL;
 
 #if (1 == EZPI_CORE_WSS_USE_WSC_LIB)
 static s_ssl_websocket_t *__wsc_ssl = NULL;
@@ -63,13 +64,18 @@ static void __provision_check(void *pv);
 static void __fetch_wss_endpoint(void *pv);
 
 static void __connection_upcall(bool connected);
-static int __message_upcall(const char *payload, uint32_t len, time_t time_ms);
+static int __message_upcall(char *payload, uint32_t len, time_t time_ms);
 // static void __message_upcall(const char *payload, uint32_t len);
 static void __message_process(const char *payload, uint32_t len);
 static void __message_process_cjson(cJSON *cj_request, time_t time_ms);
 
 static ezlopi_error_t __send_str_data_to_nma_websocket(char *str_data);
 static int __send_cjson_data_to_nma_websocket(cJSON *cj_data);
+
+bool ezlopi_service_webprov_is_connected(void)
+{
+    return esp_websocket_client_is_connected(wss_client);
+}
 
 uint32_t ezlopi_service_web_provisioning_get_message_count(void)
 {
@@ -98,7 +104,7 @@ void ezlopi_service_web_provisioning_deinit(void)
 #if (1 == EZPI_CORE_WSS_USE_WSC_LIB)
     ezlopi_core_wsc_kill(__wsc_ssl);
 #else
-    ezlopi_websocket_client_kill();
+    ezlopi_websocket_client_kill(wss_client);
 #endif
 }
 
@@ -168,7 +174,8 @@ static void __fetch_wss_endpoint(void *pv)
 #if (1 == EZPI_CORE_WSS_USE_WSC_LIB)
                             __wsc_ssl = ezlopi_core_wsc_init(cjson_uri, __message_upcall, __connection_upcall);
 #else  // EZPI_CORE_WSS_USE_WSC_LIB
-                            ezlopi_websocket_client_init(cjson_uri, __message_upcall, __connection_upcall);
+                            wss_client = ezlopi_websocket_client_init(cjson_uri, __message_upcall, __connection_upcall,
+                                                                      ca_certificate, ssl_private_key, ssl_shared_key);
 #endif // EZPI_CORE_WSS_USE_WSC_LIB
                             task_complete = 1;
                         }
@@ -192,7 +199,6 @@ static void __fetch_wss_endpoint(void *pv)
 
                 if (rx_message && (ret == pdTRUE))
                 {
-                    char *payload = rx_message->payload;
                     if (rx_message->payload)
                     {
                         cJSON *cj_request = cJSON_Parse(__FUNCTION__, rx_message->payload);
@@ -316,7 +322,7 @@ static void __message_process(const char *payload, uint32_t len)
     }
 }
 
-static int __message_upcall(const char *payload, uint32_t len, time_t time_ms)
+static int __message_upcall(char *payload, uint32_t len, time_t time_ms)
 {
     int ret = 0;
 
@@ -347,10 +353,6 @@ static int __message_upcall(const char *payload, uint32_t len, time_t time_ms)
                 ezlopi_free(__FUNCTION__, rx_message);
             }
         }
-
-        // time_t now;
-        // time(&now);
-        // TRACE_W("data-queued(time): %lu,       time-now: %lu, time_ms: %lu", now - time_ms, now, time_ms);
     }
 
     return ret;
@@ -402,7 +404,7 @@ static ezlopi_error_t __send_str_data_to_nma_websocket(char *str_data)
 #if (1 == EZPI_CORE_WSS_USE_WSC_LIB)
     if (str_data && ezlopi_core_wsc_is_connected(__wsc_ssl))
 #else  // EZPI_CORE_WSS_USE_WSC_LIB
-    if (str_data && ezlopi_websocket_client_is_connected())
+    if (str_data && ezlopi_websocket_client_is_connected(wss_client))
 #endif // EZPI_CORE_WSS_USE_WSC_LIB
     {
         int retries = 3;
@@ -411,7 +413,7 @@ static ezlopi_error_t __send_str_data_to_nma_websocket(char *str_data)
 #if (1 == EZPI_CORE_WSS_USE_WSC_LIB)
             if (ezlopi_core_wsc_send(__wsc_ssl, str_data, strlen(str_data)) > 0)
 #else  // EZPI_CORE_WSS_USE_WSC_LIB
-            if (EZPI_SUCCESS == ezlopi_websocket_client_send(str_data, strlen(str_data)))
+            if (EZPI_SUCCESS == ezlopi_websocket_client_send(wss_client, str_data, strlen(str_data)))
 #endif // EZPI_CORE_WSS_USE_WSC_LIB
             {
                 ret = EZPI_SUCCESS;
@@ -552,7 +554,6 @@ static void __provision_check(void *pv)
 #endif
 
     ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SERVICE_WEB_PROV_CONFIG_CHECK_TASK);
-
     vTaskDelete(NULL);
 }
 
@@ -594,9 +595,8 @@ static int __provision_update(char *arg)
             config_check_factoryInfo.cloud_server = tmp_cloud_server;
             config_check_factoryInfo.provision_token = tmp_provision_token;
             config_check_factoryInfo.provision_server = NULL;
-
-#if 0
-            // TODO  Decide if needs parsing and storing to flash
+#if 0 // unused for now, but can be used in future
+      // TODO  Decide if needs parsing and storing to flash
             if (NULL != cJSON_zwave_region_aary)
             {
                 if (cJSON_IsArray(cJSON_zwave_region_aary))
@@ -612,7 +612,6 @@ static int __provision_update(char *arg)
             uint32_t provision_order = 0;
             CJSON_GET_VALUE_DOUBLE(cj_root_prov_data, "provision_order", provision_order);
 #endif
-
             config_check_factoryInfo.brand = NULL;
             config_check_factoryInfo.device_name = NULL;
             config_check_factoryInfo.device_type = NULL;

@@ -1050,10 +1050,12 @@ static uint32_t __store_new_grp_in_nvs(cJSON *cj_new_grp, bool choice_of_trigger
                                 {
                                     TRACE_S("Group list updated.");
                                 }
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                                 else
                                 {
                                     TRACE_E("Group list update failed!");
                                 }
+#endif
 
                                 ezlopi_free(__FUNCTION__, updated_grp_id_list_str);
                             }
@@ -1255,7 +1257,9 @@ static bool __check_devgroup_validity(cJSON *cj_curr_devgrp_node, cJSON *cj_para
     {
         if (!____check_for_category_in_devGrp(cj_curr_devgrp_node, cj_category_param->valuestring))
         {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
             trace_error(" error at --> [devGrp : category]");
+#endif
             return false;
         }
     }
@@ -1265,7 +1269,9 @@ static bool __check_devgroup_validity(cJSON *cj_curr_devgrp_node, cJSON *cj_para
     {
         if (!____check_for_subcategory_in_devGrp(cj_curr_devgrp_node, cj_subcategory_param->valuestring))
         {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
             trace_error(" error at --> [devGrp : sub-category]");
+#endif
             return false;
         }
     }
@@ -1275,7 +1281,9 @@ static bool __check_devgroup_validity(cJSON *cj_curr_devgrp_node, cJSON *cj_para
     {
         if (!____check_for_device_id_in_devGrp(cj_curr_devgrp_node, cj_deviceId_param->valuestring))
         {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
             trace_error(" error at --> [devGrp : deviceId]");
+#endif
             return false;
         }
     }
@@ -1285,7 +1293,9 @@ static bool __check_devgroup_validity(cJSON *cj_curr_devgrp_node, cJSON *cj_para
     {
         if (!____check_for_deviceGroupIds_list(cj_curr_devgrp_node, cj_deviceGroupIds_param))
         {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
             trace_error(" error at --> [devGrp : deviceGroupIds]");
+#endif
             return false;
         }
     }
@@ -1295,7 +1305,9 @@ static bool __check_devgroup_validity(cJSON *cj_curr_devgrp_node, cJSON *cj_para
     {
         if (!____check_for_deviceGroupId(cj_curr_devgrp_node, cj_deviceGroupId_param->valuestring))
         {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
             trace_error(" error at --> [devGrp : deviceGroupId]");
+#endif
             return false;
         }
     }
@@ -1496,7 +1508,9 @@ static void __generate_device_list_with_specific_itemgroup_id(cJSON *cj_destinat
                             cJSON *cj_showitems = cJSON_GetObjectItem(__FUNCTION__, cj_params, "showItems");
                             if (cj_showitems && (cj_showitems->type == cJSON_True))
                             {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                                 TRACE_E("Since, [showItems==TRUE] ; attaching items_list ");
+#endif
 
                                 // C2 . add "items" : [...]
                                 ______add_items_list_to_dest_array(cj_main_device_list, curr_dev_node);

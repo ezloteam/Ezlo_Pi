@@ -43,6 +43,8 @@
 #include "ezlopi_service_ble.h"
 #include "ezlopi_service_uart.h"
 #include "ezlopi_service_loop.h"
+#include "ezlopi_service_webprov.h"
+
 #include "EZLOPI_USER_CONFIG.h"
 
 #if defined(CONFIG_IDF_TARGET_ESP32)
@@ -312,13 +314,13 @@ static ezlopi_error_t ezlopi_service_uart_process_provisioning_api(const cJSON *
                 memset(local_key, 0, EZLOPI_FINFO_LEN_LOCAL_KEY);
 
                 CJSON_GET_VALUE_DOUBLE(cj_data, ezlopi_serial_str, ezlopi_config_basic->id); // id => OK
-                CJSON_GET_VALUE_DOUBLE(cj_data, ezlopi_version_str, ezlopi_config_basic->config_version); 
+                CJSON_GET_VALUE_DOUBLE(cj_data, ezlopi_version_str, ezlopi_config_basic->config_version);
 
                 CJSON_GET_VALUE_STRING_BY_COPY(cj_data, ezlopi_device_name_str, device_name);
                 CJSON_GET_VALUE_STRING_BY_COPY(cj_data, ezlopi_manufacturer_name_str, manufacturer);
                 CJSON_GET_VALUE_STRING_BY_COPY(cj_data, ezlopi_brand_str, brand);
                 CJSON_GET_VALUE_STRING_BY_COPY(cj_data, ezlopi_model_number_str, model_number);
-                CJSON_GET_VALUE_STRING_BY_COPY(cj_data, ezlopi_uuid_str, device_uuid); 
+                CJSON_GET_VALUE_STRING_BY_COPY(cj_data, ezlopi_uuid_str, device_uuid);
                 CJSON_GET_VALUE_STRING_BY_COPY(cj_data, ezlopi_mac_str, device_mac);
                 CJSON_GET_VALUE_STRING_BY_COPY(cj_data, "provisioning_uuid", prov_uuid);
                 CJSON_GET_VALUE_STRING_BY_COPY(cj_data, ezlopi_provision_server_str, provision_server);
@@ -788,6 +790,8 @@ static void ezlopi_service_uart_set_wifi(const char *data)
                     s_ezlopi_net_status_t *net_stat = ezlopi_get_net_status();
                     if (net_stat)
                     {
+                        net_stat->nma_cloud_connection_status = ezlopi_service_webprov_is_connected();
+
                         if (net_stat->wifi_status->wifi_connection)
                         {
                             status = 1;

@@ -343,13 +343,6 @@ esp_err_t ezlopi_ping_new_session(const ezlopi_ping_config_t *config, const ezlo
     /* create ping thread */
     ezlopi_service_loop_add("ping-loop", __ping_loop, 10000, ep);
 
-#if 0
-    BaseType_t xReturned = xTaskCreate(__ping_thread, "ping", config->task_stack_size, ep,
-        config->task_prio, &ep->ping_task_hdl);
-    PING_CHECK(xReturned == pdTRUE, "create ping task failed", err, ESP_ERR_NO_MEM);
-#endif
-
-
     /* callback functions */
     if (cbs) {
         ep->cb_args = cbs->cb_args;

@@ -343,18 +343,22 @@ static cJSON *__add_scenes_blocks_by_device_ids(e_scenes_block_type_v2_t block_t
     cJSON *cj_device_id = NULL;
     cJSON *cj_block_array = NULL;
 
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
     CJSON_TRACE("device array", cj_devices_array);
+#endif
 
     while (NULL != (cj_device_id = cJSON_GetArrayItem(cj_devices_array, device_id_idx++)))
     {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
         TRACE_D("device-id: %s", cj_device_id->valuestring ? cj_device_id->valuestring : ezlopi__str);
+#endif
+
         if (cj_device_id->valuestring)
         {
             uint32_t device_id = strtoul(cj_device_id->valuestring, NULL, 16);
             l_ezlopi_device_t *device_node = ezlopi_device_get_by_id(device_id);
             if (device_node)
             {
-                // TRACE_D("Here");
                 cJSON *cj_block = __add_scenes_blocks_by_item_ids(block_type, device_node->items);
                 if (cj_block)
                 {
@@ -372,10 +376,12 @@ static cJSON *__add_scenes_blocks_by_device_ids(e_scenes_block_type_v2_t block_t
                     }
                 }
             }
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
             else
             {
                 TRACE_E("Device-id not found in list");
             }
+#endif
         }
     }
 

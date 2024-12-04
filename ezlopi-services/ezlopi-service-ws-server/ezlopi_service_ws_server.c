@@ -127,16 +127,22 @@ static ezlopi_error_t __ws_server_broadcast(char *data)
             l_ws_server_client_conn_t *curr_client = ezlopi_service_ws_server_clients_get_head();
 #warning "DO NOT USE printf ON PRODUCTION"
             // printf("%s and curr-client: %p\n", __func__, curr_client);
-
-            while (curr_client)
+            if (curr_client)
             {
-                ret = __ws_server_send(curr_client, data, strlen(data));
-                if (NULL == (curr_client = curr_client->next))
+                while (curr_client)
                 {
-                    break;
-                }
+                    ret = __ws_server_send(curr_client, data, strlen(data));
+                    if (NULL == (curr_client = curr_client->next))
+                    {
+                        break;
+                    }
 
-                vTaskDelay(1 / portTICK_RATE_MS);
+                    vTaskDelay(1 / portTICK_RATE_MS);
+                }
+            }
+            else
+            {
+                ret = EZPI_NOT_AVAILABLE;
             }
         }
 

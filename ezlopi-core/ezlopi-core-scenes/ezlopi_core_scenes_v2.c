@@ -516,8 +516,9 @@ ezlopi_error_t ezlopi_scenes_init_v2(void)
 
         ezlopi_free(__FUNCTION__, scenes_id_list_str);
     }
-
+#if ENABLE_SCENES_PRINT
     ezlopi_scenes_print(scenes_list_head_v2);
+#endif
     return error;
 }
 

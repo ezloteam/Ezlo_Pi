@@ -62,10 +62,10 @@ void scenes_expressions_set(cJSON *cj_request, cJSON *cj_response)
         if (cj_params)
         {
             // CJSON_TRACE("expressions params", cj_params);
-            cJSON* cj_name = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_name_str);
+            cJSON *cj_name = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_name_str);
             if (cj_name && cj_name->valuestring)
             {
-                s_ezlopi_expressions_t* curr_expn_node = ezlopi_scenes_expression_get_by_name(cj_name->valuestring);
+                s_ezlopi_expressions_t *curr_expn_node = ezlopi_scenes_expression_get_by_name(cj_name->valuestring);
                 if (NULL != curr_expn_node)
                 {
                     ezlopi_scenes_expression_update_expr(curr_expn_node, cj_params);
@@ -83,9 +83,9 @@ void scenes_expressions_set(cJSON *cj_request, cJSON *cj_response)
 //                  EXPRESSION UPDATERS
 //-----------------------------------------------------------------------------------------------------------
 
-static void ____common_part_of_scenes_expressions_added_and_changed(cJSON* cj_request, cJSON* cj_response)
+static void ____common_part_of_scenes_expressions_added_and_changed(cJSON *cj_request, cJSON *cj_response)
 {
-    cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+    cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     if (cj_result)
     {
         cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
@@ -154,7 +154,9 @@ static void ____common_part_of_scenes_expressions_added_and_changed(cJSON* cj_re
                 }
                 default:
                 {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                     TRACE_E("Error: Undefined value type: %d", cj_value->type);
+#endif
                     break;
                 }
                 }
