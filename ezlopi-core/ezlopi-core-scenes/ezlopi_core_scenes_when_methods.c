@@ -464,7 +464,7 @@ int ezlopi_scene_when_is_sun_state(l_scenes_list_v2_t *scene_node, void *arg)
                 if (0 == strncmp(__issunstate_field[i].field_name, curr_field->name, strlen(__issunstate_field[i].field_name) + 1))
                 {
                     flag_check |= (__issunstate_field[i].field_func)(scene_node, curr_field, info, ((0 == i) ? 1 : (1 == i) ? 2
-                                                                                                                            : 0));
+                        : 0));
                     break;
                 }
             }
@@ -653,7 +653,7 @@ int ezlopi_scene_when_is_date_range(l_scenes_list_v2_t *scene_node, void *arg)
             }
 
             // Check for time,day,month and year validity
-            uint8_t (*isdate_range_check_flags[])(struct tm *start, struct tm *end, struct tm *info) = {
+            uint8_t(*isdate_range_check_flags[])(struct tm *start, struct tm *end, struct tm *info) = {
                 isdate_range_check_tm,
                 isdate_range_check_day,
                 isdate_range_check_month,
@@ -837,11 +837,11 @@ int ezlopi_scene_when_is_house_mode_alarm_phase_range(l_scenes_list_v2_t *scene_
                 {
                     s_ezlopi_modes_t *curr_mode = ezlopi_core_modes_get_custom_modes();
 
-                    phase_name = (EZLOPI_MODES_ALARM_PHASE_IDLE == curr_mode->alarmed.phase)         ? "idle"
-                                 : (EZLOPI_MODES_ALARM_PHASE_BYPASS == curr_mode->alarmed.phase)     ? "bypass"
-                                 : (EZLOPI_MODES_ALARM_PHASE_ENTRYDELAY == curr_mode->alarmed.phase) ? "entryDelay"
-                                 : (EZLOPI_MODES_ALARM_PHASE_MAIN == curr_mode->alarmed.phase)       ? "main"
-                                                                                                     : "null";
+                    phase_name = (EZLOPI_MODES_ALARM_PHASE_IDLE == curr_mode->alarmed.phase) ? "idle"
+                        : (EZLOPI_MODES_ALARM_PHASE_BYPASS == curr_mode->alarmed.phase) ? "bypass"
+                        : (EZLOPI_MODES_ALARM_PHASE_ENTRYDELAY == curr_mode->alarmed.phase) ? "entryDelay"
+                        : (EZLOPI_MODES_ALARM_PHASE_MAIN == curr_mode->alarmed.phase) ? "main"
+                        : "null";
 
                     // TRACE_D(" req_mode : %s vs mode : %s ", curr_field->field_value.u_value.value_string, phase_name);
                     if (EZPI_STRNCMP_IF_EQUAL(curr_field->field_value.u_value.value_string, phase_name, strlen(curr_field->field_value.u_value.value_string), strlen(phase_name)))
@@ -878,9 +878,9 @@ int ezlopi_scene_when_is_house_mode_switch_to_range(l_scenes_list_v2_t *scene_no
         }
 
         s_ezlopi_modes_t *curr_mode = ezlopi_core_modes_get_custom_modes();
-        if ((curr_mode->alarmed.time_is_left_sec > 0) && (EZLOPI_MODES_ALARM_PHASE_NONE < curr_mode->alarmed.phase && curr_mode->alarmed.phase < EZLOPI_MODES_ALARM_PHASE_MAX))
+        if ((curr_mode->time_is_left_to_switch_sec > 0) && (EZLOPI_MODES_ALARM_PHASE_NONE < curr_mode->alarmed.phase && curr_mode->alarmed.phase < EZLOPI_MODES_ALARM_PHASE_MAX))
         {
-            TRACE_S(" Current HouseMode_phase has [%d]sec time before switch.(Duration confirmed) ", curr_mode->alarmed.time_is_left_sec);
+            TRACE_S(" Current HouseMode_phase has [%d]sec time before switch.(Duration confirmed) ", curr_mode->time_is_left_to_switch_sec);
             ret = 1;
         }
         else
@@ -959,7 +959,7 @@ int ezlopi_scene_when_is_device_state(l_scenes_list_v2_t *scene_node, void *arg)
                 s_ezlopi_cloud_controller_t *controller_info = ezlopi_device_get_controller_information();
                 if (controller_info)
                 {
-#warning "we need to change from 'controller' to 'device_id' specific";
+                    #warning "we need to change from 'controller' to 'device_id' specific";
                     ret = ((value_armed == controller_info->armed) ? 1 : 0) && ((value_reachable == controller_info->service_notification) ? 1 : 0);
                 }
             }
@@ -982,7 +982,7 @@ int ezlopi_scene_when_is_device_state(l_scenes_list_v2_t *scene_node, void *arg)
                         s_ezlopi_cloud_controller_t *controller_info = ezlopi_device_get_controller_information();
                         if (controller_info)
                         {
-#warning "we need to change from 'controller' to 'device_id' specific";
+                            #warning "we need to change from 'controller' to 'device_id' specific";
                             ret = ((value_armed == controller_info->armed) ? 1 : 0) && ((value_reachable == controller_info->service_notification) ? 1 : 0);
                         }
                     }
@@ -1081,7 +1081,7 @@ int ezlopi_scene_when_is_scene_state(l_scenes_list_v2_t *scene_node, void *arg)
                     {
                         ret = (EZLOPI_SCENE_STATUS_STOPPED == curr_scene->status) ? 1 : 0;
                     }
-#warning "need to add 'FAILED' status for scene";
+                    #warning "need to add 'FAILED' status for scene";
                     // else if (EZPI_STRNCMP_IF_EQUAL("failed", tmp_str, 7,strlen(tmp_str)))
                     // {
                     //     ret = (false == curr_scene->enabled)? 1:0;

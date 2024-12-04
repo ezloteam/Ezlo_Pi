@@ -11,10 +11,10 @@
 #include "esp_idf_version.h"
 #include "esp_netif_ip_addr.h"
 
-#ifndef CONFIG_IDF_TARGET_ESP32
+#if !defined(CONFIG_IDF_TARGET_ESP32) && !defined(CONFIG_IDF_TARGET_ESP32C3)
 #include "tinyusb.h"
 #include "tusb_cdc_acm.h"
-#endif // NOT defined CONFIG_IDF_TARGET_ESP32
+#endif // NOT defined CONFIG_IDF_TARGET_ESP32 or CONFIG_IDF_TARGET_ESP32C3
 
 #include "ezlopi_util_trace.h"
 #include "ezlopi_util_version.h"
@@ -62,12 +62,12 @@
 
 static uint8_t __uart_data[EZPI_SERV_UART_RX_BUFFER_SIZE];
 
-#ifndef CONFIG_IDF_TARGET_ESP32
+#if !defined(CONFIG_IDF_TARGET_ESP32) && !defined(CONFIG_IDF_TARGET_ESP32C3)
 static uint8_t usb_rx_buffer[CONFIG_TINYUSB_CDC_RX_BUFSIZE - 1];
 static size_t rx_buffer_pointer = 0;
 static int cdc_port = TINYUSB_CDC_ACM_0;
 static SemaphoreHandle_t usb_semaphore_handle = NULL;
-#endif // NOT defined CONFIG_IDF_TARGET_ESP32
+#endif // NOT defined CONFIG_IDF_TARGET_ESP32 or CONFIG_IDF_TARGET_ESP32C3
 
 static void ezlopi_service_uart_get_info();
 static void ezlopi_service_uart_set_wifi(const char *data);
@@ -996,7 +996,8 @@ int EZPI_SERV_uart_tx_data(int len, uint8_t *data)
     int ret = 0;
     ret = uart_write_bytes(EZPI_SERV_UART_NUM_DEFAULT, (void *)data, len);
     ret += uart_write_bytes(EZPI_SERV_UART_NUM_DEFAULT, "\r\n", 2);
-#ifndef CONFIG_IDF_TARGET_ESP32
+
+#if !defined(CONFIG_IDF_TARGET_ESP32) && !defined(CONFIG_IDF_TARGET_ESP32C3)
     if (pdTRUE == xSemaphoreTake(usb_semaphore_handle, portMAX_DELAY))
     {
         tinyusb_cdcacm_write_queue(cdc_port, (uint8_t *)data, len);
@@ -1004,11 +1005,12 @@ int EZPI_SERV_uart_tx_data(int len, uint8_t *data)
         ret = tinyusb_cdcacm_write_flush(cdc_port, 0);
         xSemaphoreGive(usb_semaphore_handle);
     }
-#endif // NOT defined CONFIG_IDF_TARGET_ESP32
+#endif // NOT defined CONFIG_IDF_TARGET_ESP32 or CONFIG_IDF_TARGET_ESP32C3
+
     return ret;
 }
 
-#ifndef CONFIG_IDF_TARGET_ESP32
+#if !defined(CONFIG_IDF_TARGET_ESP32) && !defined(CONFIG_IDF_TARGET_ESP32C3)
 static void tinyusb_cdc_rx_callback(int itf, cdcacm_event_t *event)
 {
     if (CDC_EVENT_RX == event->type)
@@ -1076,7 +1078,7 @@ void EZPI_SERV_cdc_init()
         TRACE_I("USB CDC initialization completed successfully.");
     }
 }
-#endif // NOT defined CONFIG_IDF_TARGET_ESP32
+#endif // NOT defined CONFIG_IDF_TARGET_ESP32 or CONFIG_IDF_TARGET_ESP32C3
 
 void EZPI_SERV_uart_init(void)
 {

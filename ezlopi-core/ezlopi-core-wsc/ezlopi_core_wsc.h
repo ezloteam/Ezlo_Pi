@@ -44,7 +44,6 @@
 #include "cjext.h"
 #include "sdkconfig.h"
 
-
 #ifdef __cplusplus
 extern "C"
 {
@@ -59,28 +58,32 @@ extern "C"
         STATE_HEADER,
     } e_state_wss_t;
 
-    typedef struct s_ssl_websocket {
+    typedef struct s_ssl_websocket
+    {
         char url[64];
         char port[8];
-        char * buffer;
+        uint32_t u_port;
+        char path[64];
+
+        char *buffer;
         uint32_t buffer_len;
 
         bool is_connected;
         e_state_wss_t e_state;
 
-        mbedtls_ssl_config * conf;
-        mbedtls_ssl_context * ssl_ctx;
-        mbedtls_net_context * server_fd;
-        mbedtls_entropy_context * entropy;
-        mbedtls_ctr_drbg_context * ctr_drbg;
+        mbedtls_ssl_config *conf;
+        mbedtls_ssl_context *ssl_ctx;
+        mbedtls_net_context *server_fd;
+        mbedtls_entropy_context *entropy;
+        mbedtls_ctr_drbg_context *ctr_drbg;
 
-        mbedtls_x509_crt * cacert;
-        mbedtls_x509_crt * shared_cert;
-        mbedtls_pk_context * private_key;
+        mbedtls_x509_crt *cacert;
+        mbedtls_x509_crt *shared_cert;
+        mbedtls_pk_context *private_key;
 
-        char * str_cacert;
-        char * str_private_key;
-        char * str_shared_cert;
+        char *str_cacert;
+        char *str_private_key;
+        char *str_shared_cert;
 
         TimerHandle_t timer;
         TaskHandle_t task_handle;
@@ -89,11 +92,11 @@ extern "C"
 
     } s_ssl_websocket_t;
 
-    int ezlopi_core_wsc_kill(s_ssl_websocket_t * wsc_ssl);
-    s_ssl_websocket_t * ezlopi_core_wsc_init(cJSON *uri, f_wsc_msg_upcall_t __message_upcall, f_wsc_conn_upcall_t __connection_upcall);
+    int ezlopi_core_wsc_kill(s_ssl_websocket_t *wsc_ssl);
+    s_ssl_websocket_t *ezlopi_core_wsc_init(cJSON *uri, f_wsc_msg_upcall_t __message_upcall, f_wsc_conn_upcall_t __connection_upcall);
 
-    int ezlopi_core_wsc_send(s_ssl_websocket_t * wsc_ssl, char *buf_s, size_t len);
-    int ezlopi_core_wsc_is_connected(s_ssl_websocket_t * wsc_ssl);
+    int ezlopi_core_wsc_send(s_ssl_websocket_t *wsc_ssl, char *buf_s, size_t len);
+    int ezlopi_core_wsc_is_connected(s_ssl_websocket_t *wsc_ssl);
 
 #ifdef __cplusplus
 }
