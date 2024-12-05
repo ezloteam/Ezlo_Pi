@@ -413,7 +413,7 @@ static ezlopi_error_t __send_str_data_to_nma_websocket(char *str_data)
 #if (1 == EZPI_CORE_WSS_USE_WSC_LIB)
             if (ezlopi_core_wsc_send(__wsc_ssl, str_data, strlen(str_data)) > 0)
 #else  // EZPI_CORE_WSS_USE_WSC_LIB
-            if (EZPI_SUCCESS == ezlopi_websocket_client_send(wss_client, str_data, strlen(str_data)))
+            if (EZPI_SUCCESS == ezlopi_websocket_client_send(wss_client, str_data, strlen(str_data), 3000))
 #endif // EZPI_CORE_WSS_USE_WSC_LIB
             {
                 ret = EZPI_SUCCESS;

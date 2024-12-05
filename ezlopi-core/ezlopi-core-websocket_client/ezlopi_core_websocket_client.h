@@ -17,7 +17,9 @@
 
 #include "esp_websocket_client.h"
 
-ezlopi_error_t ezlopi_websocket_client_send(esp_websocket_client_handle_t client, char *data, uint32_t len);
+
+// ezlopi_error_t ezlopi_websocket_client_send(esp_websocket_client_handle_t client, char *data, uint32_t len);
+ezlopi_error_t ezlopi_websocket_client_send(esp_websocket_client_handle_t client, char *data, uint32_t len, uint32_t timeout_ms);
 // esp_websocket_client_handle_t ezlopi_websocket_client_init(cJSON *uri, void (*msg_upcall)(const char *, uint32_t), void (*connection_upcall)(bool connection));
 // esp_websocket_client_handle_t ezlopi_websocket_client_init(cJSON *uri, int (*msg_upcall)(char *, uint32_t, time_t time_ms), void (*connection_upcall)(bool connection));
 esp_websocket_client_handle_t ezlopi_websocket_client_init(cJSON *uri, int (*msg_upcall)(char *, uint32_t, time_t time_ms), void (*connection_upcall)(bool connected),

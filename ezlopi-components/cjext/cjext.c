@@ -1444,13 +1444,13 @@ char *cJSON_PrintBuffered(const char *who, const cJSON *item, int prebuffer, cJS
     return (char *)p.buffer;
 }
 
-cJSON_bool cJSON_PrintPreallocated(const char *who, cJSON *item, char *buffer, const int length, const cJSON_bool format)
+bool cJSON_PrintPreallocated(const char *who, cJSON *item, char *buffer, const int length, const cJSON_bool format)
 {
     printbuffer p = {0, 0, 0, 0, 0, 0};
 
     if ((length < 0) || (buffer == NULL))
     {
-        return cJSON_False;
+        return false;
     }
 
     p.buffer = (unsigned char *)buffer;

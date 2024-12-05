@@ -502,7 +502,7 @@ static int __respond_cjson(httpd_req_t *req, cJSON *cj_response)
         {
             memset(data_buffer, 0, buffer_len);
 
-            if (cJSON_PrintPreallocated(__FUNCTION__, cj_response, data_buffer, buffer_len, false))
+            if (true == cJSON_PrintPreallocated(__FUNCTION__, cj_response, data_buffer, buffer_len, false))
             {
                 httpd_ws_frame_t data_frame = {
                     .final = false,

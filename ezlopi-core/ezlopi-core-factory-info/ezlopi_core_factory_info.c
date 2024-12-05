@@ -874,7 +874,7 @@ int ezlopi_factory_info_v3_set_ezlopi_config(cJSON *cj_data)
         char *tmp_data = ezlopi_malloc(__FUNCTION__, 4 * 1024);
         if (tmp_data)
         {
-            if (cJSON_PrintPreallocated(__FUNCTION__, cj_data, tmp_data, 4 * 1024, false))
+            if (true == cJSON_PrintPreallocated(__FUNCTION__, cj_data, tmp_data, 4 * 1024, false))
             {
                 // TRACE_D("added-chipset: %.*s", tmp_data);
                 ret = ezlopi_factory_info_v3_set_4kb(tmp_data, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_EZLOPI_CONFIG_JSON, E_EZLOPI_FACTORY_INFO_CONN_DATA), strlen(tmp_data) + 1);

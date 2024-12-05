@@ -38,7 +38,7 @@ typedef struct s_ws_data_buffer
 
 static void websocket_event_handler(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data);
 
-ezlopi_error_t ezlopi_websocket_client_send(esp_websocket_client_handle_t client, char *data, uint32_t len)
+ezlopi_error_t ezlopi_websocket_client_send(esp_websocket_client_handle_t client, char *data, uint32_t len, uint32_t timeout_ms)
 {
     ezlopi_error_t ret = EZPI_FAILED;
 

@@ -1056,7 +1056,6 @@ static uint32_t __store_new_grp_in_nvs(cJSON *cj_new_grp, bool choice_of_trigger
                                     TRACE_E("Group list update failed!");
                                 }
 #endif
-
                                 ezlopi_free(__FUNCTION__, updated_grp_id_list_str);
                             }
                         }
