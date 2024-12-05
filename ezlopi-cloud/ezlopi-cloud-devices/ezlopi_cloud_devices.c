@@ -22,41 +22,55 @@ static char *__generate_sha1_of_src(const char *src)
     {
         if (!mbedtls_sha1_self_test(1))
         {
-            unsigned char sha1[20];
-            mbedtls_sha1_context sha1_ctx;
+            unsigned char sha1_hash[20];
 
-            mbedtls_sha1_init(&sha1_ctx);
-            if (0 == mbedtls_sha1_starts_ret(&sha1_ctx))
+            if (0 == mbedtls_sha1_ret((unsigned char *)src, strlen(src), sha1_hash))
             {
-                if (0 == mbedtls_sha1_update_ret(&sha1_ctx, (const unsigned char *)src, strlen(src)))
+                ret = (char *)ezlopi_malloc(__FUNCTION__, sizeof(unsigned char) * 20);
+                if (ret)
                 {
-                    if (0 == mbedtls_sha1_finish_ret(&sha1_ctx, sha1))
+                    for (size_t idx = 0; idx < sizeof(sha1_hash); idx++)
                     {
-                        size_t len = (4 * sizeof(sha1)) + 1;
-                        ret = (char *)ezlopi_malloc(__FUNCTION__, len);
-                        if (ret)
-                        {
-                            memset(ret, 0, len);
-                            for (int i = 0; i < sizeof(sha1); i++)
-                            {
-                                size_t l = (len - (strlen(ret) + 1));
-                                if (l > 0)
-                                {
-                                    ((int)sha1[i] / 100 > 0) ? (snprintf(ret + strlen(ret), l, "%u", (uint8_t)sha1[i]))    // tripple digit
-                                        : ((int)sha1[i] / 10 > 0) ? (snprintf(ret + strlen(ret), l, "0%u", (uint8_t)sha1[i]))   // double digit
-                                        : (snprintf(ret + strlen(ret), l, "00%u", (uint8_t)sha1[i])); // single digit
-                                }
-                                else
-                                {
-                                    break;
-                                }
-                            }
-                        }
+                        snprintf(ret + strlen(ret), (sizeof(ret) - (strlen(ret))), "%02x", sha1_hash[idx]);
                     }
+                    TRACE_D(" sha1_hash = %s ;  => ret = %s", sha1_hash, ret);
                 }
             }
 
-            mbedtls_sha1_free(&sha1_ctx);
+            // mbedtls_sha1_context sha1_ctx;
+
+            // mbedtls_sha1_init(&sha1_ctx);
+            // if (0 == mbedtls_sha1_starts_ret(&sha1_ctx))
+            // {
+            //     if (0 == mbedtls_sha1_update_ret(&sha1_ctx, (const unsigned char *)src, strlen(src)))
+            //     {
+            //         if (0 == mbedtls_sha1_finish_ret(&sha1_ctx, sha1))
+            //         {
+            //             size_t len = (4 * sizeof(sha1)) + 1;
+            //             ret = (char *)ezlopi_malloc(__FUNCTION__, len);
+            //             if (ret)
+            //             {
+            //                 memset(ret, 0, len);
+            //                 for (int i = 0; i < sizeof(sha1); i++)
+            //                 {
+            //                     size_t l = (len - (strlen(ret) + 1));
+            //                     if (l > 0)
+            //                     {
+            //                         ((int)sha1[i] / 100 > 0)  ? (snprintf(ret + strlen(ret), l, "%u", (uint8_t)sha1[i]))    // tripple digit
+            //                         : ((int)sha1[i] / 10 > 0) ? (snprintf(ret + strlen(ret), l, "0%u", (uint8_t)sha1[i]))   // double digit
+            //                                                   : (snprintf(ret + strlen(ret), l, "00%u", (uint8_t)sha1[i])); // single digit
+            //                     }
+            //                     else
+            //                     {
+            //                         break;
+            //                     }
+            //                 }
+            //             }
+            //         }
+            //     }
+            // }
+
+            // mbedtls_sha1_free(&sha1_ctx);
         }
     }
     return ret;
