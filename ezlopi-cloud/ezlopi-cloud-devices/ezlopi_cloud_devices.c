@@ -1,3 +1,45 @@
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+
+/**
+ * @file    main.c
+ * @brief   perform some function on data
+ * @author  John Doe
+ * @version 0.1
+ * @date    1st January 2024
+ */
+
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 #include <string.h>
 #include "mbedtls/sha1.h"
 
@@ -14,54 +56,41 @@
 #include "ezlopi_cloud_keywords.h"
 #include "ezlopi_cloud_methods_str.h"
 #include "ezlopi_cloud_constants.h"
-//------------------------------------------------------------------------------------------------------------------
-static char *__generate_sha1_of_src(const char *src)
-{
-    char *ret = NULL;
-    if (src)
-    {
-        if (!mbedtls_sha1_self_test(1))
-        {
-            unsigned char sha1[20];
-            mbedtls_sha1_context sha1_ctx;
 
-            mbedtls_sha1_init(&sha1_ctx);
-            if (0 == mbedtls_sha1_starts_ret(&sha1_ctx))
-            {
-                if (0 == mbedtls_sha1_update_ret(&sha1_ctx, (const unsigned char *)src, strlen(src)))
-                {
-                    if (0 == mbedtls_sha1_finish_ret(&sha1_ctx, sha1))
-                    {
-                        size_t len = (4 * sizeof(sha1)) + 1;
-                        ret = (char *)ezlopi_malloc(__FUNCTION__, len);
-                        if (ret)
-                        {
-                            memset(ret, 0, len);
-                            for (int i = 0; i < sizeof(sha1); i++)
-                            {
-                                size_t l = (len - (strlen(ret) + 1));
-                                if (l > 0)
-                                {
-                                    ((int)sha1[i] / 100 > 0) ? (snprintf(ret + strlen(ret), l, "%u", (uint8_t)sha1[i]))    // tripple digit
-                                        : ((int)sha1[i] / 10 > 0) ? (snprintf(ret + strlen(ret), l, "0%u", (uint8_t)sha1[i]))   // double digit
-                                        : (snprintf(ret + strlen(ret), l, "00%u", (uint8_t)sha1[i])); // single digit
-                                }
-                                else
-                                {
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+/*******************************************************************************
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
-            mbedtls_sha1_free(&sha1_ctx);
-        }
-    }
-    return ret;
-}
-//------------------------------------------------------------------------------------------------------------------
+/*******************************************************************************
+ *                          Extern Function Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Type & Macro Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Static Function Prototypes
+ *******************************************************************************/
+static char *__generate_sha1_of_src(const char *src);
+
+/*******************************************************************************
+ *                          Static Data Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Data Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Definitions
+ *******************************************************************************/
+
+/**
+ * @brief Global/extern function template example
+ * Convention : Use capital letter for initial word on extern function
+ * @param arg
+ */
 void devices_list_v3(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON *cjson_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
@@ -766,3 +795,57 @@ void item_group_updated(cJSON *cj_request, cJSON *cj_response)
         }
     }
 }
+
+/*******************************************************************************
+ *                          Static Function Definitions
+ *******************************************************************************/
+static char *__generate_sha1_of_src(const char *src)
+{
+    char *ret = NULL;
+    if (src)
+    {
+        if (!mbedtls_sha1_self_test(1))
+        {
+            unsigned char sha1[20];
+            mbedtls_sha1_context sha1_ctx;
+
+            mbedtls_sha1_init(&sha1_ctx);
+            if (0 == mbedtls_sha1_starts_ret(&sha1_ctx))
+            {
+                if (0 == mbedtls_sha1_update_ret(&sha1_ctx, (const unsigned char *)src, strlen(src)))
+                {
+                    if (0 == mbedtls_sha1_finish_ret(&sha1_ctx, sha1))
+                    {
+                        size_t len = (4 * sizeof(sha1)) + 1;
+                        ret = (char *)ezlopi_malloc(__FUNCTION__, len);
+                        if (ret)
+                        {
+                            memset(ret, 0, len);
+                            for (int i = 0; i < sizeof(sha1); i++)
+                            {
+                                size_t l = (len - (strlen(ret) + 1));
+                                if (l > 0)
+                                {
+                                    ((int)sha1[i] / 100 > 0) ? (snprintf(ret + strlen(ret), l, "%u", (uint8_t)sha1[i]))    // tripple digit
+                                        : ((int)sha1[i] / 10 > 0) ? (snprintf(ret + strlen(ret), l, "0%u", (uint8_t)sha1[i]))   // double digit
+                                        : (snprintf(ret + strlen(ret), l, "00%u", (uint8_t)sha1[i])); // single digit
+                                }
+                                else
+                                {
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            mbedtls_sha1_free(&sha1_ctx);
+        }
+    }
+    return ret;
+}
+
+/*******************************************************************************
+ *                          End of File
+ *******************************************************************************/
