@@ -106,9 +106,9 @@ extern "C"
     CLOUD_METHOD("hub.modes.bypass_devices.add", ezlopi_cloud_modes_bypass_devices_add, ezlopi_cloud_modes_bypass_devices_added)
     CLOUD_METHOD("hub.modes.bypass_devices.remove", ezlopi_cloud_modes_bypass_devices_remove, ezlopi_cloud_modes_bypass_devices_removed)
     CLOUD_METHOD("hub.modes.protect.set", ezlopi_cloud_modes_protect_set, NULL)
-    CLOUD_METHOD("hub.modes.protect.buttons.set", ezlopi_cloud_modes_protect_buttons_set, NULL)
-    CLOUD_METHOD("hub.modes.protect.devices.add", ezlopi_cloud_modes_protect_devices_add, NULL)
-    CLOUD_METHOD("hub.modes.protect.devices.remove", ezlopi_cloud_modes_protect_devices_remove, NULL)
+    CLOUD_METHOD("hub.modes.protect.buttons.set", ezlopi_cloud_modes_protect_buttons_set, ezlopi_cloud_modes_protect_button_set_broadcast)
+    CLOUD_METHOD("hub.modes.protect.devices.add", ezlopi_cloud_modes_protect_devices_add, ezlopi_cloud_modes_protect_devices_added)
+    CLOUD_METHOD("hub.modes.protect.devices.remove", ezlopi_cloud_modes_protect_devices_remove, ezlopi_cloud_modes_protect_devices_removed)
     CLOUD_METHOD("hub.modes.entry_delay.set", ezlopi_cloud_modes_entry_delay_set, ezlopi_cloud_modes_entry_delay_changed)
     CLOUD_METHOD("hub.modes.entry_delay.reset", ezlopi_cloud_modes_entry_delay_reset, ezlopi_cloud_modes_entry_delay_changed)
     #endif // CONFIG_EZPI_SERV_ENABLE_MODES

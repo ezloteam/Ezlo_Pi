@@ -180,6 +180,7 @@ extern "C"
     extern const char *ezlopi_hub_room_reordered_str;
 
     extern const char *ezlopi_hub_modes_changed_str;
+    extern const char *ezlopi_hub_modes_alarmed_str;
 
     extern const char *ezlopi_hub_device_group_created;
     extern const char *ezlopi_hub_device_group_deleted;

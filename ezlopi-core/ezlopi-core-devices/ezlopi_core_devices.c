@@ -370,7 +370,7 @@ l_ezlopi_device_t *ezlopi_device_get_head(void)
 
 l_ezlopi_device_t *ezlopi_device_get_by_id(uint32_t device_id)
 {
-    l_ezlopi_device_t *device_node = l_device_head;
+    l_ezlopi_device_t *device_node = ezlopi_device_get_head();
 
     while (device_node)
     {

@@ -78,7 +78,7 @@ extern "C"
      */
     void ezlopi_service_loop_init(void);
     void ezlopi_service_loop_remove(f_loop_t loop);
-    void ezlopi_service_loop_add(const char * name, f_loop_t loop, uint32_t period_ms, void *arg);
+    void ezlopi_service_loop_add(const char *name, f_loop_t loop, uint32_t period_ms, void *arg);
 
 #ifdef __cplusplus
 }
