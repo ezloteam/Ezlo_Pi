@@ -106,6 +106,7 @@ const char * test_ca_cert = "-----BEGIN CERTIFICATE-----\nMIICbDCCAhGgAwIBAgIJAO
 // const char * test_ssl_pub_key = NULL;
 // const char * test_ssl_shared_key = NULL;
 // const char * test_ca_cert = NULL;
+
 /*******************************************************************************
  *                          Extern Function Declarations
  *******************************************************************************/

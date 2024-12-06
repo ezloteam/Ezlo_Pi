@@ -1,3 +1,46 @@
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+
+/**
+ * @file    main.c
+ * @brief   perform some function on data
+ * @author  John Doe
+ * @version 0.1
+ * @date    1st January 2024
+ */
+
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
+
 
 #include "../../build/config/sdkconfig.h"
 #include "EZLOPI_USER_CONFIG.h"
@@ -41,22 +84,26 @@
 
 #if defined(CONFIG_EZPI_WEBSOCKET_CLIENT)
 
+/*******************************************************************************
+ *                          Extern Data Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 typedef struct
 {
     time_t time_ms;
     char *payload;
 } s_rx_message_t;
 
-static uint32_t message_counter = 0;
-static xTaskHandle _task_handle = NULL;
-
-#if (1 == EZPI_CORE_WSS_USE_WSC_LIB)
-static s_ssl_websocket_t *__wsc_ssl = NULL;
-#endif // EZPI_CORE_WSS_USE_WSC_LIB
-
-static QueueHandle_t _wss_message_queue = NULL;
-static TaskHandle_t __web_socket_initialize_handler = NULL;
-
+/*******************************************************************************
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static int __provision_update(char *arg);
 
 static void __provision_check(void *pv);
@@ -71,6 +118,32 @@ static void __message_process_cjson(cJSON *cj_request, time_t time_ms);
 static ezlopi_error_t __send_str_data_to_nma_websocket(char *str_data);
 static int __send_cjson_data_to_nma_websocket(cJSON *cj_data);
 
+/*******************************************************************************
+ *                          Static Data Definitions
+ *******************************************************************************/
+static uint32_t message_counter = 0;
+static xTaskHandle _task_handle = NULL;
+
+#if (1 == EZPI_CORE_WSS_USE_WSC_LIB)
+static s_ssl_websocket_t *__wsc_ssl = NULL;
+#endif // EZPI_CORE_WSS_USE_WSC_LIB
+
+static QueueHandle_t _wss_message_queue = NULL;
+static TaskHandle_t __web_socket_initialize_handler = NULL;
+
+/*******************************************************************************
+ *                          Extern Data Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Definitions
+ *******************************************************************************/
+
+/**
+ * @brief Global/extern function template example
+ * Convention : Use capital letter for initial word on extern function
+ * @param arg
+ */
 uint32_t ezlopi_service_web_provisioning_get_message_count(void)
 {
     return message_counter;
@@ -102,6 +175,9 @@ void ezlopi_service_web_provisioning_deinit(void)
 #endif
 }
 
+/*******************************************************************************
+ *                          Static Function Definitions
+ *******************************************************************************/
 static void __connection_upcall(bool connected)
 {
     static int prev_status; // 0: never connected, 1: Not-connected, 2: connected
@@ -674,4 +750,9 @@ static int __provision_update(char *arg)
 
     return ret;
 }
+
 #endif // CONFIG_EZPI_WEBSOCKET_CLIENT
+
+/*******************************************************************************
+ *                          End of File
+ *******************************************************************************/

@@ -1,3 +1,45 @@
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+
+/**
+ * @file    main.c
+ * @brief   perform some function on data
+ * @author  John Doe
+ * @version 0.1
+ * @date    1st January 2024
+ */
+
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 #include <string.h>
 
 #include "../../build/config/sdkconfig.h"
@@ -14,9 +56,17 @@
 #include "ezlopi_service_gpioisr.h"
 #include "EZLOPI_USER_CONFIG.h"
 
-static QueueHandle_t gpio_evt_queue = NULL;
-static const uint32_t default_debounce_time = 1000;
+/*******************************************************************************
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
+/*******************************************************************************
+ *                          Extern Function Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 typedef struct s_event_arg
 {
     TickType_t time;
@@ -26,9 +76,31 @@ typedef struct s_event_arg
     f_interrupt_upcall_t __upcall;
 } s_event_arg_t;
 
+/*******************************************************************************
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static void gpio_isr_process_v3(void* pv);
 static void IRAM_ATTR __gpio_isr_handler(void* arg);
 
+/*******************************************************************************
+ *                          Static Data Definitions
+ *******************************************************************************/
+static QueueHandle_t gpio_evt_queue = NULL;
+static const uint32_t default_debounce_time = 1000;
+
+/*******************************************************************************
+ *                          Extern Data Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Definitions
+ *******************************************************************************/
+
+/**
+ * @brief Global/extern function template example
+ * Convention : Use capital letter for initial word on extern function
+ * @param arg
+ */
 void ezlopi_service_gpioisr_init(void)
 {
     TRACE_S("Started gpio-isr service");
@@ -68,6 +140,35 @@ void ezlopi_service_gpioisr_register_v3(l_ezlopi_item_t* item, f_interrupt_upcal
     }
 }
 
+#if 0
+void gpio_isr_service_register(s_ezlopi_device_properties_t* properties, f_interrupt_upcall_t __upcall, TickType_t debounce_ms)
+{
+    s_event_arg_t* event_arg = ezlopi_malloc(__FUNCTION__, sizeof(s_event_arg_t));
+
+    if (event_arg)
+    {
+        event_arg->time = 0;
+        event_arg->properties = properties;
+        event_arg->__upcall = __upcall;
+        event_arg->debounce_ms = (0 == debounce_ms) ? default_debounce_time : debounce_ms;
+        gpio_intr_enable(properties->interface.gpio.gpio_in.gpio_num);
+
+        if (gpio_isr_handler_add(properties->interface.gpio.gpio_in.gpio_num, __gpio_isr_handler, (void*)event_arg))
+        {
+            TRACE_E("Error while adding GPIO ISR handler.");
+            gpio_reset_pin(properties->interface.gpio.gpio_in.gpio_num);
+        }
+        else
+        {
+            TRACE_S("Successfully added GPIO ISR handler.");
+        }
+    }
+}
+#endif
+
+/*******************************************************************************
+ *                          Static Function Definitions
+ *******************************************************************************/
 static void gpio_isr_process_v3(void* pv)
 {
     while (1)
@@ -100,30 +201,6 @@ static void IRAM_ATTR __gpio_isr_handler(void* arg)
 }
 
 #if 0
-void gpio_isr_service_register(s_ezlopi_device_properties_t* properties, f_interrupt_upcall_t __upcall, TickType_t debounce_ms)
-{
-    s_event_arg_t* event_arg = ezlopi_malloc(__FUNCTION__, sizeof(s_event_arg_t));
-
-    if (event_arg)
-    {
-        event_arg->time = 0;
-        event_arg->properties = properties;
-        event_arg->__upcall = __upcall;
-        event_arg->debounce_ms = (0 == debounce_ms) ? default_debounce_time : debounce_ms;
-        gpio_intr_enable(properties->interface.gpio.gpio_in.gpio_num);
-
-        if (gpio_isr_handler_add(properties->interface.gpio.gpio_in.gpio_num, __gpio_isr_handler, (void*)event_arg))
-        {
-            TRACE_E("Error while adding GPIO ISR handler.");
-            gpio_reset_pin(properties->interface.gpio.gpio_in.gpio_num);
-        }
-        else
-        {
-            TRACE_S("Successfully added GPIO ISR handler.");
-        }
-    }
-}
-
 static void gpio_isr_process(void* pv)
 {
     while (1)
@@ -146,3 +223,7 @@ static void gpio_isr_process(void* pv)
     }
 }
 #endif
+
+/*******************************************************************************
+ *                          End of File
+ *******************************************************************************/

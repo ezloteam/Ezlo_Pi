@@ -1,5 +1,45 @@
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
 
+/**
+ * @file    main.c
+ * @brief   perform some function on data
+ * @author  John Doe
+ * @version 0.1
+ * @date    1st January 2024
+ */
 
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_ENABLE_LED_INDICATOR
@@ -22,11 +62,19 @@
 #include "ezlopi_core_ping.h"
 #include "ezlopi_core_processes.h"
 
-static void __indicator_LED_loop(void *arg);
-
-static e_indicator_led_priority_t __indicator_priority = PRIORITY_CLOUD;
-
 #if defined(CONFIG_IDF_TARGET_ESP32S3) || defined(CONFIG_IDF_TARGET_ESP32C3)
+
+/*******************************************************************************
+ *                          Extern Data Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 
 #define COLOR_GET_RED(x) ( 0xFF & ( x >> 16 ))
 #define COLOR_GET_GREEN(x) ( 0xFF & ( x >> 8 ) )
@@ -43,8 +91,6 @@ static e_indicator_led_priority_t __indicator_priority = PRIORITY_CLOUD;
 #endif
 #define INDICATOR_RGB_RMT_TX_CHANNEL RMT_CHANNEL_1
 
-static led_strip_t indicator_led;
-
 #elif defined(CONFIG_IDF_TARGET_ESP32) // CONFIG_IDF_TARGET_ESP32S3 OR OR CONFIG_IDF_TARGET_ESP32C3 OR CONFIG_IDF_TARGET_ESP32
 
 #define INDICATOR_LED_PIN 2
@@ -56,8 +102,40 @@ static led_strip_t indicator_led;
 
 #endif // CONFIG_IDF_TARGET_ESP32S3 OR OR CONFIG_IDF_TARGET_ESP32C3 OR CONFIG_IDF_TARGET_ESP32
 
+/*******************************************************************************
+ *                          Static Function Prototypes
+ *******************************************************************************/
+static void __indicator_LED_loop(void *arg);
+
+/*******************************************************************************
+ *                          Static Data Definitions
+ *******************************************************************************/
+static e_indicator_led_priority_t __indicator_priority = PRIORITY_CLOUD;
+static led_strip_t indicator_led;
+
+/*******************************************************************************
+ *                          Extern Data Definitions
+ *******************************************************************************/
+
 #if defined(CONFIG_IDF_TARGET_ESP32S3) || defined(CONFIG_IDF_TARGET_ESP32C3)
 
+/*******************************************************************************
+ *                          Extern Function Definitions
+ *******************************************************************************/
+
+/**
+ * @brief Global/extern function template example
+ * Convention : Use capital letter for initial word on extern function
+ * @param arg
+ */
+int ezlopi_service_led_indicator_init()
+{
+    return __indicator_led_init();
+}
+
+/*******************************************************************************
+ *                          Static Function Definitions
+ *******************************************************************************/
 static int indicator_RGB_led_fade_out(uint16_t fade_time_ms)
 {
     static int _brightness = 255;
@@ -410,10 +488,8 @@ static void __indicator_LED_loop(void *arg)
     // vTaskDelay(1 / portTICK_PERIOD_MS);
 }
 
-int ezlopi_service_led_indicator_init()
-{
-    return __indicator_led_init();
-}
-
-
 #endif // CONFIG_EZPI_ENABLE_LED_INDICATOR
+
+/*******************************************************************************
+ *                          End of File
+ *******************************************************************************/

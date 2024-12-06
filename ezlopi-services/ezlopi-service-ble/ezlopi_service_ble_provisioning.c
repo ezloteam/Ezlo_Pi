@@ -1,4 +1,45 @@
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
 
+/**
+ * @file    main.c
+ * @brief   perform some function on data
+ * @author  John Doe
+ * @version 0.1
+ * @date    1st January 2024
+ */
+
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_BLE_ENABLE
@@ -31,11 +72,23 @@
 #include "EZLOPI_USER_CONFIG.h"
 #include "ezlopi_core_buffer.h"
 
+/*******************************************************************************
+ *                          Extern Data Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 #define CJ_GET_STRING(name) cJSON_GetStringValue(cJSON_GetObjectItem(__FUNCTION__, root, name))
 #define CJ_GET_NUMBER(name) cJSON_GetNumberValue(cJSON_GetObjectItem(__FUNCTION__, root, name))
-static s_gatt_service_t *g_provisioning_service;
-static s_linked_buffer_t *g_provisioning_linked_buffer = NULL;
 
+/*******************************************************************************
+ *                          Static Function Prototypes
+ *******************************************************************************/
 #ifdef EZPI_SERV_BLE_ENABLE_READ_PROV
 static char *__provisioning_info_jsonify(void);
 static char *__provisioning_info_base64(void);
@@ -49,6 +102,25 @@ static void __provisioning_status_read_func(esp_gatt_value_t *value, esp_ble_gat
 static void __provisioning_info_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
 static char *__base64_decode_provisioning_info(uint32_t total_size);
 
+/*******************************************************************************
+ *                          Static Data Definitions
+ *******************************************************************************/
+static s_gatt_service_t *g_provisioning_service;
+static s_linked_buffer_t *g_provisioning_linked_buffer = NULL;
+
+/*******************************************************************************
+ *                          Extern Data Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Definitions
+ *******************************************************************************/
+
+/**
+ * @brief Global/extern function template example
+ * Convention : Use capital letter for initial word on extern function
+ * @param arg
+ */
 void ezlopi_ble_service_provisioning_init(void)
 {
     esp_bt_uuid_t uuid;
@@ -81,7 +153,11 @@ void ezlopi_ble_service_provisioning_init(void)
 #endif // EZPI_SERV_BLE_ENABLE_STAT_PROV
 }
 
+/*******************************************************************************
+ *                          Static Function Definitions
+ *******************************************************************************/
 #ifdef EZPI_SERV_BLE_ENABLE_STAT_PROV
+
 static char *__provisioning_status_jsonify(void)
 {
     char *prov_status_jstr = NULL;
@@ -312,6 +388,7 @@ static void __provisioning_info_write_func(esp_gatt_value_t *value, esp_ble_gatt
 }
 
 #ifdef EZPI_SERV_BLE_ENABLE_READ_PROV
+
 static void __provisioning_info_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
 {
     // TRACE_D("Read function called!");
@@ -513,6 +590,7 @@ static char *__base64_decode_provisioning_info(uint32_t total_size)
 }
 
 #ifdef EZPI_SERV_BLE_ENABLE_READ_PROV
+
 static char *__provisioning_info_jsonify(void)
 {
     char *str_json_prov_info = NULL;
@@ -597,6 +675,10 @@ static char *__provisioning_info_base64(void)
     return base64_data;
 }
 
+#endif // EZPI_SERV_BLE_ENABLE_READ_PROV
+
 #endif // CONFIG_EZPI_BLE_ENABLE
 
-#endif // EZPI_SERV_BLE_ENABLE_READ_PROV
+/*******************************************************************************
+ *                          End of File
+ *******************************************************************************/
