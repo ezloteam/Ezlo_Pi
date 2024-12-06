@@ -8,6 +8,7 @@ extern const char *ezlopi_ESP32S3_str;
 extern const char *ezlopi_ESP32S2_str;
 extern const char *ezlopi_ESP32C3_str;
 extern const char *ezlopi_ezlopi_str;
+extern const char *ezlopi_EzloPI_str;
 extern const char *ezlopi__str;
 extern const char *ezlopi_id_str;
 extern const char *ezlopi_ids_str;
@@ -340,5 +341,13 @@ extern const char *ezlopi_flow_control_str;
 
 extern const char *ezlopi_chipset_str;
 extern const char *ezlopi_internet_str;
+
+//////////// otel keywords
+extern const char *ezlopi_stringValue_str;
+extern const char *ezlopi_key_str;
+extern const char *ezlopI_service___name;
+extern const char *ezlopi_attributes_str;
+extern const char *ezlopi_resource_str;
+extern const char *ezlopi_resourceSpans_str;
 
 #endif // __EZLOPI_CLOUD_KEYWORDS_H__

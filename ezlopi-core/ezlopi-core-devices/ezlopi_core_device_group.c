@@ -75,13 +75,21 @@ static void __ezlopi_core_item_group_print(l_ezlopi_item_grp_t *item_grp_node)
  */
 static void __edit_devgrp_from_ll(l_ezlopi_device_grp_t *req_devgrp_node, cJSON *cj_devgrp_new)
 {
-    (NULL != cJSON_GetObjectItem(__FUNCTION__, cj_devgrp_new, ezlopi_name_str)) ? (CJSON_GET_VALUE_STRING_BY_COPY(cj_devgrp_new, ezlopi_name_str, req_devgrp_node->name)) : ((req_devgrp_node->name) ? cJSON_AddStringToObject(__FUNCTION__, cj_devgrp_new, ezlopi_name_str, req_devgrp_node->name) : NULL);
+    (NULL != cJSON_GetObjectItem(__FUNCTION__, cj_devgrp_new, ezlopi_name_str))
+        ? (CJSON_GET_VALUE_STRING_BY_COPY(cj_devgrp_new, ezlopi_name_str, req_devgrp_node->name))
+        : ((req_devgrp_node->name) ? cJSON_AddStringToObject(__FUNCTION__, cj_devgrp_new, ezlopi_name_str, req_devgrp_node->name) : NULL);
 
-    (NULL != cJSON_GetObjectItem(__FUNCTION__, cj_devgrp_new, ezlopi_persistent_str)) ? (CJSON_GET_VALUE_BOOL(cj_devgrp_new, ezlopi_persistent_str, req_devgrp_node->persistent)) : cJSON_AddBoolToObject(__FUNCTION__, cj_devgrp_new, ezlopi_persistent_str, req_devgrp_node->persistent);
+    (NULL != cJSON_GetObjectItem(__FUNCTION__, cj_devgrp_new, ezlopi_persistent_str))
+        ? (CJSON_GET_VALUE_BOOL(cj_devgrp_new, ezlopi_persistent_str, req_devgrp_node->persistent))
+        : cJSON_AddBoolToObject(__FUNCTION__, cj_devgrp_new, ezlopi_persistent_str, req_devgrp_node->persistent);
 
-    (NULL != cJSON_GetObjectItem(__FUNCTION__, cj_devgrp_new, "followEntry")) ? (CJSON_GET_VALUE_BOOL(cj_devgrp_new, "followEntry", req_devgrp_node->follow_entry)) : cJSON_AddBoolToObject(__FUNCTION__, cj_devgrp_new, "followEntry", req_devgrp_node->follow_entry);
+    (NULL != cJSON_GetObjectItem(__FUNCTION__, cj_devgrp_new, "followEntry"))
+        ? (CJSON_GET_VALUE_BOOL(cj_devgrp_new, "followEntry", req_devgrp_node->follow_entry))
+        : cJSON_AddBoolToObject(__FUNCTION__, cj_devgrp_new, "followEntry", req_devgrp_node->follow_entry);
 
-    (NULL != cJSON_GetObjectItem(__FUNCTION__, cj_devgrp_new, "packageId")) ? (CJSON_GET_VALUE_STRING_BY_COPY(cj_devgrp_new, "packageId", req_devgrp_node->package_id)) : ((req_devgrp_node->package_id) ? cJSON_AddStringToObject(__FUNCTION__, cj_devgrp_new, "packageId", req_devgrp_node->package_id) : NULL);
+    (NULL != cJSON_GetObjectItem(__FUNCTION__, cj_devgrp_new, "packageId"))
+        ? (CJSON_GET_VALUE_STRING_BY_COPY(cj_devgrp_new, "packageId", req_devgrp_node->package_id))
+        : ((req_devgrp_node->package_id) ? cJSON_AddStringToObject(__FUNCTION__, cj_devgrp_new, "packageId", req_devgrp_node->package_id) : NULL);
 
     // ------------- categories -------------
     {
@@ -89,13 +97,13 @@ static void __edit_devgrp_from_ll(l_ezlopi_device_grp_t *req_devgrp_node, cJSON 
         if (cj_categories && cJSON_IsArray(cj_categories))
         {
             cJSON_Delete(__FUNCTION__, req_devgrp_node->categories);
-            req_devgrp_node->categories = cJSON_Duplicate(__FUNCTION__, cj_categories, cJSON_True);
+            req_devgrp_node->categories = cJSON_Duplicate(__FUNCTION__, cj_categories, true);
         }
         else
         {
             if (req_devgrp_node->categories)
             {
-                cJSON_AddItemToObject(__FUNCTION__, cj_devgrp_new, "categories", cJSON_Duplicate(__FUNCTION__, cj_categories, cJSON_True));
+                cJSON_AddItemToObject(__FUNCTION__, cj_devgrp_new, "categories", cJSON_Duplicate(__FUNCTION__, cj_categories, true));
             }
         }
     }
@@ -106,13 +114,13 @@ static void __edit_devgrp_from_ll(l_ezlopi_device_grp_t *req_devgrp_node, cJSON 
         if (cj_devices && cJSON_IsArray(cj_devices))
         {
             cJSON_Delete(__FUNCTION__, req_devgrp_node->devices);
-            req_devgrp_node->devices = cJSON_Duplicate(__FUNCTION__, cj_devices, cJSON_True);
+            req_devgrp_node->devices = cJSON_Duplicate(__FUNCTION__, cj_devices, true);
         }
         else
         {
             if (req_devgrp_node->devices)
             {
-                cJSON_AddItemToObject(__FUNCTION__, cj_devgrp_new, "devices", cJSON_Duplicate(__FUNCTION__, cj_devices, cJSON_True));
+                cJSON_AddItemToObject(__FUNCTION__, cj_devgrp_new, "devices", cJSON_Duplicate(__FUNCTION__, cj_devices, true));
             }
         }
     }
@@ -123,13 +131,13 @@ static void __edit_devgrp_from_ll(l_ezlopi_device_grp_t *req_devgrp_node, cJSON 
         if (cj_exceptions && cJSON_IsArray(cj_exceptions))
         {
             cJSON_Delete(__FUNCTION__, req_devgrp_node->exceptions);
-            req_devgrp_node->exceptions = cJSON_Duplicate(__FUNCTION__, cj_exceptions, cJSON_True);
+            req_devgrp_node->exceptions = cJSON_Duplicate(__FUNCTION__, cj_exceptions, true);
         }
         else
         {
             if (req_devgrp_node->exceptions)
             {
-                cJSON_AddItemToObject(__FUNCTION__, cj_devgrp_new, "exceptions", cJSON_Duplicate(__FUNCTION__, cj_exceptions, cJSON_True));
+                cJSON_AddItemToObject(__FUNCTION__, cj_devgrp_new, "exceptions", cJSON_Duplicate(__FUNCTION__, cj_exceptions, true));
             }
         }
     }
@@ -195,20 +203,31 @@ static void __edit_devgrp_from_ll(l_ezlopi_device_grp_t *req_devgrp_node, cJSON 
 }
 static void __edit_itemgrp_from_ll(l_ezlopi_item_grp_t *req_itemgrp_node, cJSON *cj_itemgrp_new)
 {
+    (NULL != cJSON_GetObjectItem(__FUNCTION__, cj_itemgrp_new, ezlopi_name_str))
+        ? (CJSON_GET_VALUE_STRING_BY_COPY(cj_itemgrp_new, ezlopi_name_str, req_itemgrp_node->name))
+        : ((req_itemgrp_node->name) ? cJSON_AddStringToObject(__FUNCTION__, cj_itemgrp_new, ezlopi_name_str, req_itemgrp_node->name) : NULL);
 
-    (NULL != cJSON_GetObjectItem(__FUNCTION__, cj_itemgrp_new, ezlopi_name_str)) ? (CJSON_GET_VALUE_STRING_BY_COPY(cj_itemgrp_new, ezlopi_name_str, req_itemgrp_node->name)) : ((req_itemgrp_node->name) ? cJSON_AddStringToObject(__FUNCTION__, cj_itemgrp_new, ezlopi_name_str, req_itemgrp_node->name) : NULL);
+    (NULL != cJSON_GetObjectItem(__FUNCTION__, cj_itemgrp_new, "hasGetter"))
+        ? (CJSON_GET_VALUE_BOOL(cj_itemgrp_new, "hasGetter", req_itemgrp_node->has_getter))
+        : cJSON_AddBoolToObject(__FUNCTION__, cj_itemgrp_new, "hasGetter", req_itemgrp_node->has_getter);
 
-    (NULL != cJSON_GetObjectItem(__FUNCTION__, cj_itemgrp_new, "hasGetter")) ? (CJSON_GET_VALUE_BOOL(cj_itemgrp_new, "hasGetter", req_itemgrp_node->has_getter)) : cJSON_AddBoolToObject(__FUNCTION__, cj_itemgrp_new, "hasGetter", req_itemgrp_node->has_getter);
+    (NULL != cJSON_GetObjectItem(__FUNCTION__, cj_itemgrp_new, "hasSetter"))
+        ? (CJSON_GET_VALUE_BOOL(cj_itemgrp_new, "hasSetter", req_itemgrp_node->has_setter))
+        : cJSON_AddBoolToObject(__FUNCTION__, cj_itemgrp_new, "hasSetter", req_itemgrp_node->has_setter);
 
-    (NULL != cJSON_GetObjectItem(__FUNCTION__, cj_itemgrp_new, "hasSetter")) ? (CJSON_GET_VALUE_BOOL(cj_itemgrp_new, "hasSetter", req_itemgrp_node->has_setter)) : cJSON_AddBoolToObject(__FUNCTION__, cj_itemgrp_new, "hasSetter", req_itemgrp_node->has_setter);
+    (NULL != cJSON_GetObjectItem(__FUNCTION__, cj_itemgrp_new, ezlopi_persistent_str))
+        ? (CJSON_GET_VALUE_BOOL(cj_itemgrp_new, ezlopi_persistent_str, req_itemgrp_node->persistent))
+        : cJSON_AddBoolToObject(__FUNCTION__, cj_itemgrp_new, ezlopi_persistent_str, req_itemgrp_node->persistent);
 
-    (NULL != cJSON_GetObjectItem(__FUNCTION__, cj_itemgrp_new, ezlopi_persistent_str)) ? (CJSON_GET_VALUE_BOOL(cj_itemgrp_new, ezlopi_persistent_str, req_itemgrp_node->persistent)) : cJSON_AddBoolToObject(__FUNCTION__, cj_itemgrp_new, ezlopi_persistent_str, req_itemgrp_node->persistent);
-
-    (NULL != cJSON_GetObjectItem(__FUNCTION__, cj_itemgrp_new, "valueType")) ? (CJSON_GET_VALUE_STRING_BY_COPY(cj_itemgrp_new, "valueType", req_itemgrp_node->value_type)) : ((req_itemgrp_node->value_type) ? cJSON_AddStringToObject(__FUNCTION__, cj_itemgrp_new, "valueType", req_itemgrp_node->value_type) : NULL);
+    (NULL != cJSON_GetObjectItem(__FUNCTION__, cj_itemgrp_new, "valueType"))
+        ? (CJSON_GET_VALUE_STRING_BY_COPY(cj_itemgrp_new, "valueType", req_itemgrp_node->value_type))
+        : ((req_itemgrp_node->value_type) ? cJSON_AddStringToObject(__FUNCTION__, cj_itemgrp_new, "valueType", req_itemgrp_node->value_type) : NULL);
 
     if (req_itemgrp_node->value_type && strlen(req_itemgrp_node->value_type))
     {
-        (NULL != cJSON_GetObjectItem(__FUNCTION__, cj_itemgrp_new, "valueTypeFamily")) ? (CJSON_GET_VALUE_STRING_BY_COPY(cj_itemgrp_new, "valueTypeFamily", req_itemgrp_node->value_type_family)) : ((req_itemgrp_node->value_type_family) ? cJSON_AddStringToObject(__FUNCTION__, cj_itemgrp_new, "valueTypeFamily", req_itemgrp_node->value_type_family) : NULL);
+        (NULL != cJSON_GetObjectItem(__FUNCTION__, cj_itemgrp_new, "valueTypeFamily"))
+            ? (CJSON_GET_VALUE_STRING_BY_COPY(cj_itemgrp_new, "valueTypeFamily", req_itemgrp_node->value_type_family))
+            : ((req_itemgrp_node->value_type_family) ? cJSON_AddStringToObject(__FUNCTION__, cj_itemgrp_new, "valueTypeFamily", req_itemgrp_node->value_type_family) : NULL);
     }
 
     // ------------- itemNames -------------
@@ -217,13 +236,13 @@ static void __edit_itemgrp_from_ll(l_ezlopi_item_grp_t *req_itemgrp_node, cJSON 
         if (cj_item_names && cJSON_IsArray(cj_item_names))
         {
             cJSON_Delete(__FUNCTION__, req_itemgrp_node->item_names);
-            req_itemgrp_node->item_names = cJSON_Duplicate(__FUNCTION__, cj_item_names, cJSON_True);
+            req_itemgrp_node->item_names = cJSON_Duplicate(__FUNCTION__, cj_item_names, true);
         }
         else
         {
             if (req_itemgrp_node->item_names)
             {
-                cJSON_AddItemToObject(__FUNCTION__, cj_itemgrp_new, "itemNames", cJSON_Duplicate(__FUNCTION__, req_itemgrp_node->item_names, cJSON_True));
+                cJSON_AddItemToObject(__FUNCTION__, cj_itemgrp_new, "itemNames", cJSON_Duplicate(__FUNCTION__, req_itemgrp_node->item_names, true));
             }
         }
     }
@@ -234,13 +253,13 @@ static void __edit_itemgrp_from_ll(l_ezlopi_item_grp_t *req_itemgrp_node, cJSON 
         if (cj_enums && cJSON_IsArray(cj_enums))
         {
             cJSON_Delete(__FUNCTION__, req_itemgrp_node->enum_values);
-            req_itemgrp_node->enum_values = cJSON_Duplicate(__FUNCTION__, cj_enums, cJSON_True);
+            req_itemgrp_node->enum_values = cJSON_Duplicate(__FUNCTION__, cj_enums, true);
         }
         else
         {
             if (req_itemgrp_node->enum_values)
             {
-                cJSON_AddItemToObject(__FUNCTION__, cj_itemgrp_new, ezlopi_enum_str, cJSON_Duplicate(__FUNCTION__, req_itemgrp_node->enum_values, cJSON_True));
+                cJSON_AddItemToObject(__FUNCTION__, cj_itemgrp_new, ezlopi_enum_str, cJSON_Duplicate(__FUNCTION__, req_itemgrp_node->enum_values, true));
             }
         }
     }
@@ -279,13 +298,13 @@ static void __edit_itemgrp_from_ll(l_ezlopi_item_grp_t *req_itemgrp_node, cJSON 
         if (cj_info && cJSON_IsArray(cj_info))
         {
             cJSON_Delete(__FUNCTION__, req_itemgrp_node->info);
-            req_itemgrp_node->info = cJSON_Duplicate(__FUNCTION__, cj_info, cJSON_True);
+            req_itemgrp_node->info = cJSON_Duplicate(__FUNCTION__, cj_info, true);
         }
         else
         {
             if (req_itemgrp_node->info)
             {
-                cJSON_AddItemToObject(__FUNCTION__, cj_itemgrp_new, ezlopi_info_str, cJSON_Duplicate(__FUNCTION__, req_itemgrp_node->info, cJSON_True));
+                cJSON_AddItemToObject(__FUNCTION__, cj_itemgrp_new, ezlopi_info_str, cJSON_Duplicate(__FUNCTION__, req_itemgrp_node->info, true));
             }
         }
     }
@@ -510,7 +529,7 @@ static l_ezlopi_device_grp_t *____device_grp_create_node(cJSON *cj_device_grp, u
                 cJSON *cj_categories = cJSON_GetObjectItem(__FUNCTION__, cj_device_grp, "categories");
                 if (cj_categories && cJSON_IsArray(cj_categories))
                 {
-                    new_device_grp_node->categories = cJSON_Duplicate(__FUNCTION__, cj_categories, cJSON_True);
+                    new_device_grp_node->categories = cJSON_Duplicate(__FUNCTION__, cj_categories, true);
                 }
             }
 
@@ -518,7 +537,7 @@ static l_ezlopi_device_grp_t *____device_grp_create_node(cJSON *cj_device_grp, u
                 cJSON *cj_devices = cJSON_GetObjectItem(__FUNCTION__, cj_device_grp, "devices");
                 if (cj_devices && cJSON_IsArray(cj_devices))
                 {
-                    new_device_grp_node->devices = cJSON_Duplicate(__FUNCTION__, cj_devices, cJSON_True);
+                    new_device_grp_node->devices = cJSON_Duplicate(__FUNCTION__, cj_devices, true);
                 }
             }
 
@@ -526,7 +545,7 @@ static l_ezlopi_device_grp_t *____device_grp_create_node(cJSON *cj_device_grp, u
                 cJSON *cj_exceptions = cJSON_GetObjectItem(__FUNCTION__, cj_device_grp, "exceptions");
                 if (cj_exceptions && cJSON_IsArray(cj_exceptions))
                 {
-                    new_device_grp_node->exceptions = cJSON_Duplicate(__FUNCTION__, cj_exceptions, cJSON_True);
+                    new_device_grp_node->exceptions = cJSON_Duplicate(__FUNCTION__, cj_exceptions, true);
                 }
             }
 
@@ -577,7 +596,7 @@ static l_ezlopi_item_grp_t *____item_grp_create_node(cJSON *cj_item_grp, uint32_
                 cJSON *cj_item_names = cJSON_GetObjectItem(__FUNCTION__, cj_item_grp, "itemNames");
                 if (cj_item_names && cJSON_IsArray(cj_item_names))
                 {
-                    new_item_grp_node->item_names = cJSON_Duplicate(__FUNCTION__, cj_item_names, cJSON_True);
+                    new_item_grp_node->item_names = cJSON_Duplicate(__FUNCTION__, cj_item_names, true);
                 }
             }
 
@@ -585,7 +604,7 @@ static l_ezlopi_item_grp_t *____item_grp_create_node(cJSON *cj_item_grp, uint32_
                 cJSON *cj_enum = cJSON_GetObjectItem(__FUNCTION__, cj_item_grp, ezlopi_enum_str);
                 if (cj_enum && cJSON_IsArray(cj_enum))
                 {
-                    new_item_grp_node->enum_values = cJSON_Duplicate(__FUNCTION__, cj_enum, cJSON_True);
+                    new_item_grp_node->enum_values = cJSON_Duplicate(__FUNCTION__, cj_enum, true);
                 }
             }
 
@@ -610,7 +629,7 @@ static l_ezlopi_item_grp_t *____item_grp_create_node(cJSON *cj_item_grp, uint32_
                 cJSON *cj_info = cJSON_GetObjectItem(__FUNCTION__, cj_item_grp, ezlopi_info_str);
                 if (cj_info && cJSON_IsObject(cj_info))
                 {
-                    new_item_grp_node->info = cJSON_Duplicate(__FUNCTION__, cj_info, cJSON_True);
+                    new_item_grp_node->info = cJSON_Duplicate(__FUNCTION__, cj_info, true);
                 }
             }
 
@@ -728,9 +747,9 @@ cJSON *ezlopi_core_device_group_create_cjson(l_ezlopi_device_grp_t *devgrp_node)
             cJSON_AddStringToObject(__FUNCTION__, cj_devgrp, ezlopi__id_str, tmp_str);
             cJSON_AddStringToObject(__FUNCTION__, cj_devgrp, ezlopi_name_str, devgrp_node->name);
 
-            cJSON_AddItemToObject(__FUNCTION__, cj_devgrp, "categories", cJSON_Duplicate(__FUNCTION__, devgrp_node->categories, cJSON_True));
-            cJSON_AddItemToObject(__FUNCTION__, cj_devgrp, "devices", cJSON_Duplicate(__FUNCTION__, devgrp_node->devices, cJSON_True));
-            cJSON_AddItemToObject(__FUNCTION__, cj_devgrp, "exceptions", cJSON_Duplicate(__FUNCTION__, devgrp_node->exceptions, cJSON_True));
+            cJSON_AddItemToObject(__FUNCTION__, cj_devgrp, "categories", cJSON_Duplicate(__FUNCTION__, devgrp_node->categories, true));
+            cJSON_AddItemToObject(__FUNCTION__, cj_devgrp, "devices", cJSON_Duplicate(__FUNCTION__, devgrp_node->devices, true));
+            cJSON_AddItemToObject(__FUNCTION__, cj_devgrp, "exceptions", cJSON_Duplicate(__FUNCTION__, devgrp_node->exceptions, true));
 
             { // add 'entryDelay'
                 switch (devgrp_node->entry_delay)
@@ -805,11 +824,11 @@ cJSON *ezlopi_core_item_group_create_cjson(l_ezlopi_item_grp_t *itemgrp_node)
             cJSON_AddBoolToObject(__FUNCTION__, cj_itemgrp, ezlopi_persistent_str, itemgrp_node->persistent);
             cJSON_AddStringToObject(__FUNCTION__, cj_itemgrp, ezlopi_valueType_str, itemgrp_node->value_type);
             cJSON_AddStringToObject(__FUNCTION__, cj_itemgrp, "valueTypeFamily", itemgrp_node->value_type_family);
-            // cJSON_AddItemToObject(__FUNCTION__, cj_itemgrp, "valueTypeFamily", cJSON_Duplicate(__FUNCTION__, itemgrp_node->value_type_family, cJSON_True));
+            // cJSON_AddItemToObject(__FUNCTION__, cj_itemgrp, "valueTypeFamily", cJSON_Duplicate(__FUNCTION__, itemgrp_node->value_type_family, true));
 
-            cJSON_AddItemToObject(__FUNCTION__, cj_itemgrp, "itemNames", cJSON_Duplicate(__FUNCTION__, itemgrp_node->item_names, cJSON_True));
-            cJSON_AddItemToObject(__FUNCTION__, cj_itemgrp, ezlopi_enum_str, cJSON_Duplicate(__FUNCTION__, itemgrp_node->enum_values, cJSON_True));
-            cJSON_AddItemToObject(__FUNCTION__, cj_itemgrp, ezlopi_info_str, cJSON_Duplicate(__FUNCTION__, itemgrp_node->info, cJSON_True));
+            cJSON_AddItemToObject(__FUNCTION__, cj_itemgrp, "itemNames", cJSON_Duplicate(__FUNCTION__, itemgrp_node->item_names, true));
+            cJSON_AddItemToObject(__FUNCTION__, cj_itemgrp, ezlopi_enum_str, cJSON_Duplicate(__FUNCTION__, itemgrp_node->enum_values, true));
+            cJSON_AddItemToObject(__FUNCTION__, cj_itemgrp, ezlopi_info_str, cJSON_Duplicate(__FUNCTION__, itemgrp_node->info, true));
 
             { // add 'role'
                 switch (itemgrp_node->role)
@@ -844,7 +863,7 @@ int ezlopi_core_device_group_edit_by_id(uint32_t devgrp_id, cJSON *cj_devgrp_new
 {
     int ret = 0;
 
-    cJSON *tmp_updated_cj = cJSON_Duplicate(__FUNCTION__, cj_devgrp_new, cJSON_True);
+    cJSON *tmp_updated_cj = cJSON_Duplicate(__FUNCTION__, cj_devgrp_new, true);
     if (tmp_updated_cj)
     {
         if (1 == __edit_and_update_ll_devgrp_by_id(devgrp_id, tmp_updated_cj)) // modifies the ll-node with, 'devgrp_id'
@@ -864,7 +883,7 @@ int ezlopi_core_item_group_edit_by_id(uint32_t itemgrp_id, cJSON *cj_itemgrp_new
 {
     int ret = 0;
 
-    cJSON *tmp_updated_cj = cJSON_Duplicate(__FUNCTION__, cj_itemgrp_new, cJSON_True);
+    cJSON *tmp_updated_cj = cJSON_Duplicate(__FUNCTION__, cj_itemgrp_new, true);
     if (tmp_updated_cj)
     {
         if (1 == __edit_and_update_ll_itemgrp_by_id(itemgrp_id, cj_itemgrp_new)) // modifies the ll-node with, 'itemgrp_id'

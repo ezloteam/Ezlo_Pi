@@ -90,7 +90,7 @@ int ezlopi_room_name_set(cJSON *cj_room)
                                 if (room_id == tmp_room_id)
                                 {
                                     cJSON_DeleteItemFromObject(__FUNCTION__, cj_room_tmp, ezlopi_name_str);
-                                    ret = cJSON_AddItemToObject(__FUNCTION__, cj_room_tmp, ezlopi_name_str, cJSON_Duplicate(__FUNCTION__, cj_room_name, cJSON_True));
+                                    ret = cJSON_AddItemToObject(__FUNCTION__, cj_room_tmp, ezlopi_name_str, cJSON_Duplicate(__FUNCTION__, cj_room_name, true));
 
                                     s_ezlopi_room_t *room_node = l_room_head;
                                     while (room_node)

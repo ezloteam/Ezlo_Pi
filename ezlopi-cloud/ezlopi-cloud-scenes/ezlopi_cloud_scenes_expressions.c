@@ -112,7 +112,7 @@ static void ____common_part_of_scenes_expressions_added_and_changed(cJSON *cj_re
             cJSON *cj_metadata = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_metadata_str);
             if (cj_metadata)
             {
-                cJSON_AddItemToObject(__FUNCTION__, cj_result, ezlopi_metadata_str, cJSON_Duplicate(__FUNCTION__, cj_metadata, cJSON_True));
+                cJSON_AddItemToObject(__FUNCTION__, cj_result, ezlopi_metadata_str, cJSON_Duplicate(__FUNCTION__, cj_metadata, true));
             }
 
             cJSON *cj_variable = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_variable_str);
@@ -138,18 +138,18 @@ static void ____common_part_of_scenes_expressions_added_and_changed(cJSON *cj_re
                 }
                 case cJSON_True:
                 {
-                    cJSON_AddBoolToObject(__FUNCTION__, cj_result, ezlopi_value_str, cJSON_True);
+                    cJSON_AddBoolToObject(__FUNCTION__, cj_result, ezlopi_value_str, true);
                     break;
                 }
                 case cJSON_False:
                 {
-                    cJSON_AddBoolToObject(__FUNCTION__, cj_result, ezlopi_value_str, cJSON_False);
+                    cJSON_AddBoolToObject(__FUNCTION__, cj_result, ezlopi_value_str, false);
                     break;
                 }
                 case cJSON_Array:
                 case cJSON_Object:
                 {
-                    cJSON_AddItemToObject(__FUNCTION__, cj_result, ezlopi_value_str, cJSON_Duplicate(__FUNCTION__, cj_value, cJSON_True));
+                    cJSON_AddItemToObject(__FUNCTION__, cj_result, ezlopi_value_str, cJSON_Duplicate(__FUNCTION__, cj_value, true));
                     break;
                 }
                 default:

@@ -3,6 +3,8 @@
 #include <freertos/task.h>
 #include <esp_websocket_client.h>
 
+#include "ezlopi_cloud_constants.h"
+
 #include "ezlopi_core_wsc.h"
 #include "ezlopi_core_wifi.h"
 #include "ezlopi_core_buffer.h"
@@ -72,6 +74,51 @@ void ezlopi_service_otel_init(void)
     __telemetry_queue = xQueueCreate(10, sizeof(s_otel_queue_data_t *));
     xTaskCreate(__otel_task, "otel-service-task", 2 * 2048, NULL, 4, NULL);
     // __otel_task(NULL);
+}
+
+static void __otel_trace_decorate(cJSON *cj_traces)
+{
+    cJSON *cj_traceRecord = cJSON_CreateObject(__FUNCTION__);
+    if (cj_traceRecord)
+    {
+        cJSON *cj_resourceSpans = cJSON_AddArrayToObject(__FUNCTION__, cj_traceRecord, ezlopi_resourceSpans_str);
+        if (cj_resourceSpans)
+        {
+            cJSON *cj_resourceSpan = cJSON_CreateObject(__FUNCTION__);
+            if (cj_resourceSpan)
+            {
+                cJSON *cj_resource = cJSON_AddObjectToObject(__FUNCTION__, cj_resourceSpan, ezlopi_resource_str);
+                if (cj_resource)
+                {
+                    cJSON *cj_attributes = cJSON_AddArrayToObject(__FUNCTION__, cj_resource, ezlopi_attributes_str);
+                    if (cj_attributes)
+                    {
+                        cJSON *cj_attribute = cJSON_CreateObject(__FUNCTION__);
+                        if (cj_attribute)
+                        {
+                            cJSON_AddStringToObject(__FUNCTION__, cj_attribute, ezlopi_key_str, ezlopI_service___name);
+                            cJSON *cj_value = cJSON_AddObjectToObject(__FUNCTION__, cj_attribute, ezlopi_value_str);
+                            if (cj_value)
+                            {
+                                cJSON_AddStringToObject(__FUNCTION__, cj_value, ezlopi_stringValue_str, ezlopi_EzloPI_str);
+                            }
+
+                            if (false == cJSON_AddItemToArray(cj_attributes, cj_attribute))
+                            {
+                                cJSON_Delete(__FUNCTION__, cj_attribute);
+                            }
+                        }
+                    }
+                }
+
+                // append resourceSpan into array (resourceSpans)
+                if (false == cJSON_AddItemToArray(cj_resourceSpans, cj_resourceSpan))
+                {
+                    cJSON_Delete(__FUNCTION__, cj_resourceSpan);
+                }
+            }
+        }
+    }
 }
 
 static void __otel_logs_decorate(cJSON *cj_logs)
@@ -164,6 +211,7 @@ static void __otel_loop(void *pv)
                 }
                 case E_OTEL_TRACES:
                 {
+                    __otel_trace_decorate(otel_data->cj_data);
                     break;
                 }
                 case E_OTEL_MATRICS:

@@ -7,6 +7,7 @@ const char *ezlopi_ESP32S3_str = "ESP32S3";
 const char *ezlopi_ESP32S2_str = "ESP32S2";
 const char *ezlopi_ESP32C3_str = "ESP32C3";
 const char *ezlopi_ezlopi_str = "ezlopi";
+const char *ezlopi_EzloPI_str = "EzloPI";
 const char *ezlopi__str = "";
 const char *ezlopi_id_str = "id";
 const char *ezlopi_ids_str = "ids";
@@ -337,4 +338,11 @@ const char *ezlopi_flow_control_str = "flow_control";
 const char *ezlopi_chipset_str = "chipset";
 const char *ezlopi_internet_str = "internet";
 
+////////////////// otel keywords
+const char *ezlopi_stringValue_str = "stringValue";
+const char *ezlopi_key_str = "key";
+const char *ezlopI_service___name = "service.name";
+const char *ezlopi_attributes_str = "attributes";
+const char *ezlopi_resource_str = "resource";
+const char *ezlopi_resourceSpans_str = "resourceSpans";
 #endif // __EZLOPI_CLOUD_KEYWORDS_H__

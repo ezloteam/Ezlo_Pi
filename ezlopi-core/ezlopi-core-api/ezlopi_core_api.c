@@ -52,9 +52,9 @@ cJSON *ezlopi_core_api_consume_cjson(const char *who, cJSON *cj_request)
                     if (cj_response)
                     {
                         cJSON_AddNullToObject(who, cj_response, ezlopi_error_str);
-                        cJSON_AddItemToObject(who, cj_response, ezlopi_id_str, cJSON_Duplicate(who, cj_id, cJSON_True));
-                        cJSON_AddItemToObject(who, cj_response, ezlopi_sender_str, cJSON_Duplicate(who, cj_sender, cJSON_True));
-                        cJSON_AddItemToObject(who, cj_response, ezlopi_method_str, cJSON_Duplicate(who, cj_method, cJSON_True));
+                        cJSON_AddItemToObject(who, cj_response, ezlopi_id_str, cJSON_Duplicate(who, cj_id, true));
+                        cJSON_AddItemToObject(who, cj_response, ezlopi_sender_str, cJSON_Duplicate(who, cj_sender, true));
+                        cJSON_AddItemToObject(who, cj_response, ezlopi_method_str, cJSON_Duplicate(who, cj_method, true));
                     }
                 }
 
@@ -84,9 +84,9 @@ cJSON *ezlopi_core_api_consume_cjson(const char *who, cJSON *cj_request)
 
                 if (cj_response)
                 {
-                    cJSON_AddItemToObject(who, cj_response, ezlopi_id_str, cJSON_Duplicate(who, cj_id, cJSON_True));
-                    cJSON_AddItemToObject(who, cj_response, ezlopi_sender_str, cJSON_Duplicate(who, cj_sender, cJSON_True));
-                    cJSON_AddItemToObject(who, cj_response, ezlopi_method_str, cJSON_Duplicate(who, cj_method, cJSON_True));
+                    cJSON_AddItemToObject(who, cj_response, ezlopi_id_str, cJSON_Duplicate(who, cj_id, true));
+                    cJSON_AddItemToObject(who, cj_response, ezlopi_sender_str, cJSON_Duplicate(who, cj_sender, true));
+                    cJSON_AddItemToObject(who, cj_response, ezlopi_method_str, cJSON_Duplicate(who, cj_method, true));
                 }
 
 #ifdef CONFIG_EZPI_UTIL_TRACE_EN

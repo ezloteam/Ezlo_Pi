@@ -732,7 +732,7 @@ void scene_changed(cJSON *cj_request, cJSON *cj_response)
     cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, ezlopi_hub_scene_changed_str);
 
     cJSON *cj_method = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_method_str);
-    cJSON_AddItemToObject(__FUNCTION__, cj_response, ezlopi_changed_by_str, cJSON_Duplicate(__FUNCTION__, cj_method, cJSON_True));
+    cJSON_AddItemToObject(__FUNCTION__, cj_response, ezlopi_changed_by_str, cJSON_Duplicate(__FUNCTION__, cj_method, true));
 
     cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
     if (cj_params)

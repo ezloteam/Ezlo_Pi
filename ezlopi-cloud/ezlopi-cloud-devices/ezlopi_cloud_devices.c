@@ -208,8 +208,8 @@ void device_updated(cJSON *cj_request, cJSON *cj_response)
 
                             if (controller_info)
                             {
-                                cJSON_AddBoolToObject(__FUNCTION__, cj_result, ezlopi_armed_str, controller_info->armed ? cJSON_True : cJSON_False);
-                                cJSON_AddBoolToObject(__FUNCTION__, cj_result, ezlopi_serviceNotification_str, controller_info->service_notification ? cJSON_True : cJSON_False);
+                                cJSON_AddBoolToObject(__FUNCTION__, cj_result, ezlopi_armed_str, controller_info->armed ? true : false);
+                                cJSON_AddBoolToObject(__FUNCTION__, cj_result, ezlopi_serviceNotification_str, controller_info->service_notification ? true : false);
                             }
 
                             uint64_t time = EZPI_CORE_sntp_get_current_time_ms();
