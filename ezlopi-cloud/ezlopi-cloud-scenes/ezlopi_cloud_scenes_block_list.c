@@ -86,7 +86,7 @@ void scenes_trigger_device_list(cJSON *cj_request, cJSON *cj_response)
     cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str); // For NULL broadcast
     if (cj_result)
     {
-        cJSON *cj_devices_array = cJSON_AddArrayToObject(__FUNCTION__, cj_result, "devices");
+        cJSON *cj_devices_array = cJSON_AddArrayToObject(__FUNCTION__, cj_result, ezlopi_devices_str);
         if (cj_devices_array)
         {
             if (0 < __scenes_block_trigger_device_list(cj_devices_array))
@@ -113,7 +113,7 @@ void scenes_blocks_list(cJSON *cj_request, cJSON *cj_response)
 
                 if (block_type)
                 {
-                    cJSON *cj_devices_array = cJSON_GetObjectItem(__FUNCTION__, cj_paramas, "devices");
+                    cJSON *cj_devices_array = cJSON_GetObjectItem(__FUNCTION__, cj_paramas, ezlopi_devices_str);
                     if (cj_devices_array && (cJSON_Array == cj_devices_array->type))
                     {
                         cJSON *cj_block_array = __add_scenes_blocks_by_device_ids(block_type, cj_devices_array);

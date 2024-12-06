@@ -183,7 +183,7 @@ ezlopi_error_t ezlopi_core_device_value_update_wifi_scan_broadcast(cJSON* networ
             if (result)
             {
                 cJSON_AddStringToObject(__FUNCTION__, result, "interfaceId", "wlan0");
-                cJSON_AddStringToObject(__FUNCTION__, result, "status", "process");
+                cJSON_AddStringToObject(__FUNCTION__, result, ezlopi_status_str, "process");
                 cJSON_AddItemToObject(__FUNCTION__, result, "networks", network_array);
             }
 

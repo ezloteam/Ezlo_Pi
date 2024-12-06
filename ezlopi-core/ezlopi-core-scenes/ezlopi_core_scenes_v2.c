@@ -1034,7 +1034,7 @@ static void _______fields_get_value(l_fields_v2_t *field, cJSON *cj_value)
             {
                 field->field_value.e_type = VALUE_TYPE_CJSON;
                 field->field_value.u_value.cj_value = cJSON_Duplicate(__FUNCTION__, cj_value, cJSON_True);
-                CJSON_TRACE("value", field->field_value.u_value.cj_value);
+                CJSON_TRACE(ezlopi_value_str, field->field_value.u_value.cj_value);
             }
             break;
         }
@@ -1424,15 +1424,15 @@ static bool ___enable_disable_latch_with_blockId(cJSON *cj_when_block, uint32_t 
             cJSON_ArrayForEach(cj_fields_block, cj_fields_blocks)
             {
 
-                cJSON *name = cJSON_GetObjectItem(__FUNCTION__, cj_fields_block, "name");
-                cJSON *type = cJSON_GetObjectItem(__FUNCTION__, cj_fields_block, "type");
+                cJSON *name = cJSON_GetObjectItem(__FUNCTION__, cj_fields_block, ezlopi_name_str);
+                cJSON *type = cJSON_GetObjectItem(__FUNCTION__, cj_fields_block, ezlopi_type_str);
                 if (name && type)
                 {
                     if ((EZPI_STRNCMP_IF_EQUAL(name->valuestring, "blocks", strlen(name->valuestring), 7) && EZPI_STRNCMP_IF_EQUAL(type->valuestring, "blocks", strlen(type->valuestring), 7)) ||
                         (EZPI_STRNCMP_IF_EQUAL(name->valuestring, "block", strlen(name->valuestring), 6) && EZPI_STRNCMP_IF_EQUAL(type->valuestring, "block", strlen(type->valuestring), 6)))
                     {
                         /* now scanning the value-section within 'fields-block'*/
-                        cJSON *cj_value_blocks = cJSON_GetObjectItem(__FUNCTION__, cj_fields_block, "value");
+                        cJSON *cj_value_blocks = cJSON_GetObjectItem(__FUNCTION__, cj_fields_block, ezlopi_value_str);
                         if (cj_value_blocks && (cJSON_Array == cj_value_blocks->type))
                         {
                             cJSON *cj_value_block = NULL;
@@ -1670,15 +1670,15 @@ static bool ___enable_disable_block_en_with_blockId(cJSON *cj_when_block, uint32
             // while (NULL != (cj_fields_block = cJSON_GetArrayItem(cj_fields_blocks, fields_block_idx++)))
             cJSON_ArrayForEach(cj_fields_block, cj_fields_blocks)
             {
-                cJSON *name = cJSON_GetObjectItem(__FUNCTION__, cj_fields_block, "name");
-                cJSON *type = cJSON_GetObjectItem(__FUNCTION__, cj_fields_block, "type");
+                cJSON *name = cJSON_GetObjectItem(__FUNCTION__, cj_fields_block, ezlopi_name_str);
+                cJSON *type = cJSON_GetObjectItem(__FUNCTION__, cj_fields_block, ezlopi_type_str);
                 if (name && type)
                 {
                     if ((EZPI_STRNCMP_IF_EQUAL(name->valuestring, "blocks", strlen(name->valuestring), 7) && EZPI_STRNCMP_IF_EQUAL(type->valuestring, "blocks", strlen(type->valuestring), 7)) ||
                         (EZPI_STRNCMP_IF_EQUAL(name->valuestring, "block", strlen(name->valuestring), 6) && EZPI_STRNCMP_IF_EQUAL(type->valuestring, "block", strlen(type->valuestring), 6)))
                     {
                         /* now scanning the value-section within 'fields-block'*/
-                        cJSON *cj_value_blocks = cJSON_GetObjectItem(__FUNCTION__, cj_fields_block, "value");
+                        cJSON *cj_value_blocks = cJSON_GetObjectItem(__FUNCTION__, cj_fields_block, ezlopi_value_str);
                         if (cj_value_blocks && (cJSON_Array == cj_value_blocks->type))
                         {
                             cJSON *cj_value_block = NULL;
@@ -1815,15 +1815,15 @@ static bool ___add_new_blockmeta_by_id(cJSON *cj_when_block, uint32_t blockId, c
             // while (NULL != (cj_fields_block = cJSON_GetArrayItem(cj_fields_blocks, fields_block_idx++)))
             cJSON_ArrayForEach(cj_fields_block, cj_fields_blocks)
             {
-                cJSON *name = cJSON_GetObjectItem(__FUNCTION__, cj_fields_block, "name");
-                cJSON *type = cJSON_GetObjectItem(__FUNCTION__, cj_fields_block, "type");
+                cJSON *name = cJSON_GetObjectItem(__FUNCTION__, cj_fields_block, ezlopi_name_str);
+                cJSON *type = cJSON_GetObjectItem(__FUNCTION__, cj_fields_block, ezlopi_type_str);
                 if (name && type)
                 {
                     if ((EZPI_STRNCMP_IF_EQUAL(name->valuestring, "blocks", strlen(name->valuestring), 7) && EZPI_STRNCMP_IF_EQUAL(type->valuestring, "blocks", strlen(type->valuestring), 7)) ||
                         (EZPI_STRNCMP_IF_EQUAL(name->valuestring, "block", strlen(name->valuestring), 6) && EZPI_STRNCMP_IF_EQUAL(type->valuestring, "block", strlen(type->valuestring), 6)))
                     {
                         /* now scanning the value-section within 'fields-block'*/
-                        cJSON *cj_value_blocks = cJSON_GetObjectItem(__FUNCTION__, cj_fields_block, "value");
+                        cJSON *cj_value_blocks = cJSON_GetObjectItem(__FUNCTION__, cj_fields_block, ezlopi_value_str);
                         if (cj_value_blocks && (cJSON_Array == cj_value_blocks->type)) // nested value-block
                         {
                             cJSON *cj_value_block = NULL;

@@ -40,7 +40,7 @@ int ezlopi_scene_then_set_item_value(l_scenes_list_v2_t *curr_scene, void *arg)
             l_fields_v2_t *curr_field = curr_then->fields;
             while (curr_field)
             {
-                if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "item", strlen(curr_field->name), 5))
+                if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, ezlopi_item_str, strlen(curr_field->name), 5))
                 {
                     cJSON_AddStringToObject(__FUNCTION__, cj_params, ezlopi__id_str, curr_field->field_value.u_value.value_string);
                     item_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
@@ -112,7 +112,7 @@ int ezlopi_scene_then_group_set_item_value(l_scenes_list_v2_t *curr_scene, void 
                 }
                 else if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, ezlopi_value_str, strlen(curr_field->name), 6))
                 {
-#warning "need to add more item_value_types";
+                    #warning "need to add more item_value_types";
                     switch (curr_field->value_type)
                     {
                     case EZLOPI_VALUE_TYPE_INT:
@@ -229,7 +229,7 @@ int ezlopi_scene_then_set_device_armed(l_scenes_list_v2_t *curr_scene, void *arg
                     s_ezlopi_cloud_controller_t *controller_info = ezlopi_device_get_controller_information();
                     if (controller_info)
                     {
-#warning "we need to change from 'controller' to device-specific [krishna]";
+                        #warning "we need to change from 'controller' to device-specific [krishna]";
                         controller_info->armed = (device_armed) ? true : false;
                     }
                 }
@@ -285,7 +285,7 @@ int ezlopi_scene_then_group_set_device_armed(l_scenes_list_v2_t *curr_scene, voi
                             s_ezlopi_cloud_controller_t *controller_info = ezlopi_device_get_controller_information();
                             if (controller_info)
                             {
-#warning "we need to change from 'controller' to device-specific [krishna]";
+                                #warning "we need to change from 'controller' to device-specific [krishna]";
                                 controller_info->armed = (device_armed) ? true : false;
                             }
                         }
@@ -317,7 +317,7 @@ int ezlopi_scene_then_switch_house_mode(l_scenes_list_v2_t *curr_scene, void *ar
             l_fields_v2_t *curr_field = curr_then->fields;
             while (curr_field)
             {
-                if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "houseMode", strlen(curr_field->name), 10))
+                if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, ezlopi_houseMode_str, strlen(curr_field->name), 10))
                 {
                     if (EZLOPI_VALUE_TYPE_HOUSE_MODE_ID == curr_field->value_type)
                     {
@@ -637,7 +637,7 @@ int ezlopi_scene_then_reset_hub(l_scenes_list_v2_t *curr_scene, void *arg)
             l_fields_v2_t *curr_field = curr_then->fields;
             while (curr_field)
             {
-                if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "type", strlen(curr_field->name), 5))
+                if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, ezlopi_type_str, strlen(curr_field->name), 5))
                 {
                     if ((EZLOPI_VALUE_TYPE_ENUM == curr_field->value_type) && (NULL != curr_field->field_value.u_value.value_string))
                     {
@@ -665,7 +665,7 @@ int ezlopi_scene_then_reset_hub(l_scenes_list_v2_t *curr_scene, void *arg)
                         }
                         else if (EZPI_STRNCMP_IF_EQUAL(tmp_str, "hard", strlen(tmp_str), 5))
                         {
-#warning "hard reset not in documention.";
+                            #warning "hard reset not in documention.";
                             EZPI_CORE_reset_factory_restore();
                         }
                     }

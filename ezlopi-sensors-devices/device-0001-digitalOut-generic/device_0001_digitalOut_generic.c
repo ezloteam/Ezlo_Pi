@@ -133,7 +133,7 @@ static ezlopi_error_t __settings_get(void *arg, l_ezlopi_device_settings_v3_t *s
             cJSON_AddStringToObject(__FUNCTION__, description, ezlopi_lang_tag_str, "ezlopi_presence_user_defined_mode_description");
 
             cJSON_AddItemToObject(__FUNCTION__, cjson_propertise, ezlopi_label_str, label);
-            cJSON_AddItemToObject(__FUNCTION__, cjson_propertise, "description", description);
+            cJSON_AddItemToObject(__FUNCTION__, cjson_propertise, ezlopi_description_str, description);
             cJSON_AddStringToObject(__FUNCTION__, cjson_propertise, ezlopi_valueType_str, "presence_operation_mode");
 
             cJSON_AddNumberToObject(__FUNCTION__, value, ezlopi_min_move_distance_str, 0.75);
@@ -148,7 +148,7 @@ static ezlopi_error_t __settings_get(void *arg, l_ezlopi_device_settings_v3_t *s
             cJSON_AddNumberToObject(__FUNCTION__, value_default, ezlopi_min_still_distance_str, 0.75);
             cJSON_AddNumberToObject(__FUNCTION__, value_default, ezlopi_max_still_distance_str, 6.0);
             cJSON_AddFalseToObject(__FUNCTION__, value_default, ezlopi_is_active_str);
-            cJSON_AddItemToObject(__FUNCTION__, cjson_propertise, "valueDefault", value_default);
+            cJSON_AddItemToObject(__FUNCTION__, cjson_propertise, ezlopi_valueDefault_str, value_default);
         }
         else if (setting->cloud_properties.setting_id == settings_ids[1])
         {
@@ -162,7 +162,7 @@ static ezlopi_error_t __settings_get(void *arg, l_ezlopi_device_settings_v3_t *s
             cJSON_AddStringToObject(__FUNCTION__, description, ezlopi_lang_tag_str, "ezlopi_digitalio_pwm_setting_description");
 
             cJSON_AddItemToObject(__FUNCTION__, cjson_propertise, ezlopi_label_str, label);
-            cJSON_AddItemToObject(__FUNCTION__, cjson_propertise, "description", description);
+            cJSON_AddItemToObject(__FUNCTION__, cjson_propertise, ezlopi_description_str, description);
             cJSON_AddStringToObject(__FUNCTION__, cjson_propertise, ezlopi_valueType_str, "int");
 
             s_digio_settings_t *settings_data = (s_digio_settings_t *)setting->user_arg;
@@ -170,7 +170,7 @@ static ezlopi_error_t __settings_get(void *arg, l_ezlopi_device_settings_v3_t *s
             cJSON_AddNumberToObject(__FUNCTION__, cjson_propertise, ezlopi_value_str, settings_data->settings_int_data);
             cJSON_AddNumberToObject(__FUNCTION__, cjson_propertise, "valueMin", 0);
             cJSON_AddNumberToObject(__FUNCTION__, cjson_propertise, ezlopi_valueMax_str, 100);
-            cJSON_AddNumberToObject(__FUNCTION__, cjson_propertise, "valueDefault", 50);
+            cJSON_AddNumberToObject(__FUNCTION__, cjson_propertise, ezlopi_valueDefault_str, 50);
         }
 
         error = EZPI_SUCCESS;

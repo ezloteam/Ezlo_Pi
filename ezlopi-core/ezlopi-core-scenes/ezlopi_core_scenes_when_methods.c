@@ -53,7 +53,7 @@ int ezlopi_scene_when_is_item_state(l_scenes_list_v2_t *scene_node, void *arg)
         l_fields_v2_t *curr_field = when_block->fields;
         while (curr_field)
         {
-            if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "item", strlen(curr_field->name), 5) && (NULL != curr_field->field_value.u_value.value_string))
+            if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, ezlopi_item_str, strlen(curr_field->name), 5) && (NULL != curr_field->field_value.u_value.value_string))
             {
                 item_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
             }
@@ -210,7 +210,7 @@ int ezlopi_scene_when_is_item_state_changed(l_scenes_list_v2_t *scene_node, void
 
         while (curr_field)
         {
-            if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "item", strlen(curr_field->name), 5))
+            if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, ezlopi_item_str, strlen(curr_field->name), 5))
             {
                 if (EZLOPI_VALUE_TYPE_ITEM == curr_field->value_type && (NULL != (curr_field->field_value.u_value.value_string)))
                 {
@@ -293,7 +293,7 @@ int ezlopi_scene_when_is_item_state_changed(l_scenes_list_v2_t *scene_node, void
                             cJSON *cj_expr_des = cJSON_CreateObject(__FUNCTION__);
                             if (cj_expr_des && (0 < ezlopi_scenes_expression_simple(cj_expr_des, curr_expr_left->name, curr_expr_left->code)))
                             {
-                                cJSON *cj_value = cJSON_GetObjectItem(__FUNCTION__, cj_expr_des, "value");
+                                cJSON *cj_value = cJSON_GetObjectItem(__FUNCTION__, cj_expr_des, ezlopi_value_str);
                                 if (cj_value)
                                 {
                                     switch (cj_value->type)
@@ -831,16 +831,16 @@ int ezlopi_scene_when_is_house_mode_alarm_phase_range(l_scenes_list_v2_t *scene_
 
         while (curr_field)
         {
-            if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "phase", strlen(curr_field->name), 10))
+            if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, ezlopi_phase_str, strlen(curr_field->name), 10))
             {
                 if ((EZLOPI_VALUE_TYPE_STRING == curr_field->value_type) && (NULL != curr_field->field_value.u_value.value_string))
                 {
                     s_ezlopi_modes_t *curr_mode = ezlopi_core_modes_get_custom_modes();
 
-                    phase_name = (EZLOPI_MODES_ALARM_PHASE_IDLE == curr_mode->alarmed.phase) ? "idle"
-                        : (EZLOPI_MODES_ALARM_PHASE_BYPASS == curr_mode->alarmed.phase) ? "bypass"
-                        : (EZLOPI_MODES_ALARM_PHASE_ENTRYDELAY == curr_mode->alarmed.phase) ? "entryDelay"
-                        : (EZLOPI_MODES_ALARM_PHASE_MAIN == curr_mode->alarmed.phase) ? "main"
+                    phase_name = (EZLOPI_MODES_ALARM_PHASE_IDLE == curr_mode->alarmed.phase) ? ezlopi_idle_str
+                        : (EZLOPI_MODES_ALARM_PHASE_BYPASS == curr_mode->alarmed.phase) ? ezlopi_bypass_str
+                        : (EZLOPI_MODES_ALARM_PHASE_ENTRYDELAY == curr_mode->alarmed.phase) ? ezlopi_entryDelay_str
+                        : (EZLOPI_MODES_ALARM_PHASE_MAIN == curr_mode->alarmed.phase) ? ezlopi_main_str
                         : "null";
 
                     // TRACE_D(" req_mode : %s vs mode : %s ", curr_field->field_value.u_value.value_string, phase_name);
@@ -1665,7 +1665,7 @@ int ezlopi_scene_when_compare_values(l_scenes_list_v2_t *scene_node, void *arg)
         l_fields_v2_t *curr_field = when_block->fields;
         while (curr_field)
         {
-            if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "item", strlen(curr_field->name), 5))
+            if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, ezlopi_item_str, strlen(curr_field->name), 5))
             {
                 if (EZLOPI_VALUE_TYPE_ITEM == curr_field->value_type && (NULL != (curr_field->field_value.u_value.value_string)))
                 {
@@ -1817,7 +1817,7 @@ int ezlopi_scene_when_is_firmware_update_state(l_scenes_list_v2_t *scene_node, v
         // now to extract the
         if (item_id && (NULL != state_value))
         {
-            if (0 == strncmp("done", state_value, 5) && (0 == __get_ota_state()))
+            if (0 == strncmp(ezlopi_done_str, state_value, 5) && (0 == __get_ota_state()))
             {
                 ret = 1;
             }
@@ -2048,7 +2048,7 @@ int ezlopi_scene_when_function(l_scenes_list_v2_t *scene_node, void *arg)
                 }
                 else
                 {
-                    TRACE_E("when-Function ['%s'] --> Disabled", cJSON_GetStringValue(cJSON_GetObjectItem(__FUNCTION__, cj_latch, "name")));
+                    TRACE_E("when-Function ['%s'] --> Disabled", cJSON_GetStringValue(cJSON_GetObjectItem(__FUNCTION__, cj_latch, ezlopi_name_str)));
                 }
             }
         }

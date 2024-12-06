@@ -437,7 +437,7 @@ static int __evaluate_expression(cJSON *cj_des, cJSON *lua_prop_params, const ch
                     cJSON_ArrayForEach(cj_device_item, cj_device_item_names)
                     {
                         // get the item id
-                        cJSON *cj_target_name = cJSON_GetObjectItem(__FUNCTION__, cj_device_item, "name");
+                        cJSON *cj_target_name = cJSON_GetObjectItem(__FUNCTION__, cj_device_item, ezlopi_name_str);
                         cJSON *cj_dev_name = cJSON_GetObjectItem(__FUNCTION__, cj_device_item, "deviceName");
                         cJSON *cj_item_name = cJSON_GetObjectItem(__FUNCTION__, cj_device_item, "itemName");
                         if ((cj_target_name && cj_target_name->valuestring) && (cj_dev_name && cj_dev_name->valuestring) && (cj_item_name && cj_item_name->valuestring))
@@ -510,8 +510,8 @@ static int __evaluate_expression(cJSON *cj_des, cJSON *lua_prop_params, const ch
                         cJSON *cj_expr_val = cJSON_AddObjectToObject(__FUNCTION__, cj_des, ezlopi_value_str);
                         if (cj_expr_val)
                         {
-                            ____get_devitem_expn_result(cj_expr_val, lua_state, "value");
-                            ____get_devitem_expn_result(cj_expr_val, lua_state, "scale");
+                            ____get_devitem_expn_result(cj_expr_val, lua_state, ezlopi_value_str);
+                            ____get_devitem_expn_result(cj_expr_val, lua_state, ezlopi_scale_str);
                             ret = 1;
                         }
                         lua_pop(lua_state, 1); // Remove result table (params)
