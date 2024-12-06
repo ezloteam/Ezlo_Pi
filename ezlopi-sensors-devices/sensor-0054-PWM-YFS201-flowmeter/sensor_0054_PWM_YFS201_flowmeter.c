@@ -1,3 +1,45 @@
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+
+/**
+ * @file    main.c
+ * @brief   perform some function on data
+ * @author  John Doe
+ * @version 0.1
+ * @date    1st January 2024
+ */
+
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 #include "ezlopi_util_trace.h"
 
 #include "driver/gpio.h"
@@ -17,11 +59,19 @@
 #include "sensor_0054_PWM_YFS201_flowmeter.h"
 #include "EZLOPI_USER_CONFIG.h"
 
+/*******************************************************************************
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
-//*************************************************************************
-//                          Declaration
-//*************************************************************************
+/*******************************************************************************
+ *                          Extern Function Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 #define YFS201_QUEUE_SIZE 5
+
 typedef enum YFS201_queue_enum
 {
     YFS201_QUEUE_RESET = 0,
@@ -36,13 +86,9 @@ typedef struct yfs201_t
     YFS201_queue_enum_t yfs201_QueueFlag;
 } yfs201_t;
 
-static QueueHandle_t yfs201_queue = NULL;
-//------------------------------------------------------------------------------
-static void IRAM_ATTR gpio_isr_handler(void *arg) // argument => time_us
-{
-    *((uint32_t *)arg) = *((uint32_t *)arg) + 1;
-}
-//------------------------------------------------------------------------------
+/*******************************************************************************
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static ezlopi_error_t __0054_prepare(void *arg);
 static ezlopi_error_t __0054_init(l_ezlopi_item_t *item);
 static ezlopi_error_t __0054_get_cjson_value(l_ezlopi_item_t *item, void *arg);
@@ -51,7 +97,25 @@ static ezlopi_error_t __0054_notify(l_ezlopi_item_t *item);
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
 static void __prepare_item_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_data);
 static void __extract_YFS201_Pulse_Count_func(l_ezlopi_item_t *item);
-//------------------------------------------------------------------------------
+
+/*******************************************************************************
+ *                          Static Data Definitions
+ *******************************************************************************/
+static QueueHandle_t yfs201_queue = NULL;
+
+/*******************************************************************************
+ *                          Extern Data Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Definitions
+ *******************************************************************************/
+
+/**
+ * @brief Global/extern function template example
+ * Convention : Use capital letter for initial word on extern function
+ * @param arg
+ */
 ezlopi_error_t sensor_0054_PWM_YFS201_flowmeter(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
@@ -91,7 +155,14 @@ ezlopi_error_t sensor_0054_PWM_YFS201_flowmeter(e_ezlopi_actions_t action, l_ezl
     return ret;
 }
 
-//------------------------------------------------------------------------------------------------------
+/*******************************************************************************
+ *                          Static Function Definitions
+ *******************************************************************************/
+static void IRAM_ATTR gpio_isr_handler(void *arg) // argument => time_us
+{
+    *((uint32_t *)arg) = *((uint32_t *)arg) + 1;
+}
+
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     device->cloud_properties.category = category_flow_meter;
@@ -100,6 +171,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
     device->cloud_properties.info = NULL;
     device->cloud_properties.device_type_id = NULL;
 }
+
 static void __prepare_item_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_data)
 {
     item->cloud_properties.has_getter = true;
@@ -117,7 +189,7 @@ static void __prepare_item_properties(l_ezlopi_item_t *item, cJSON *cj_device, v
     item->is_user_arg_unique = true;
     item->user_arg = user_data;
 }
-//------------------------------------------------------------------------------------------------------
+
 static ezlopi_error_t __0054_prepare(void *arg)
 {
     ezlopi_error_t ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
@@ -208,7 +280,7 @@ static ezlopi_error_t __0054_get_cjson_value(l_ezlopi_item_t *item, void *arg)
     }
     return ret;
 }
-//------------------------------------------------------------------------------------------------------
+
 static ezlopi_error_t __0054_notify(l_ezlopi_item_t *item)
 {
     ezlopi_error_t ret = EZPI_FAILED;
@@ -230,7 +302,6 @@ static ezlopi_error_t __0054_notify(l_ezlopi_item_t *item)
     return ret;
 }
 
-//------------------------------------------------------------------------------
 // This function is used to get the time_period of incoming pulses . [NOTE: call 'gpio_install_isr_service()' before using this function]
 static void __extract_YFS201_Pulse_Count_func(l_ezlopi_item_t *item)
 {
@@ -331,4 +402,6 @@ static void __extract_YFS201_Pulse_Count_func(l_ezlopi_item_t *item)
     }
 }
 
-//------------------------------------------------------------------------------
+/*******************************************************************************
+ *                          End of File
+ *******************************************************************************/
