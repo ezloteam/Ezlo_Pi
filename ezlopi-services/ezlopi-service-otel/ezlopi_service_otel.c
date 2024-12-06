@@ -111,7 +111,85 @@ static void __otel_trace_decorate(cJSON *cj_traces)
                     }
                 }
 
-                // append resourceSpan into array (resourceSpans)
+                cJSON *cj_scopeSpans = cJSON_AddArrayToObject(__FUNCTION__, cj_resourceSpan, "scopeSpans");
+                if (cj_scopeSpans)
+                {
+                    cJSON *cj_scopeSpan = cJSON_CreateObject(__FUNCTION__);
+                    if (cj_scopeSpan)
+                    {
+                        cJSON *cj_scope = cJSON_AddObjectToObject(__FUNCTION__, cj_scopeSpan, "scope");
+                        if (cj_scope)
+                        {
+                            cJSON_AddStringToObject(__FUNCTION__, cj_scope, "name", "my.library");
+                            cJSON_AddStringToObject(__FUNCTION__, cj_scope, "version", "1.0.0");
+                            cJSON *cj_attributes = cJSON_AddArrayToObject(__FUNCTION__, cj_scope, "attributes");
+                            if (cj_attributes)
+                            {
+                                cJSON *cj_attribute = cJSON_CreateObject(__FUNCTION__);
+                                if (cj_attribute)
+                                {
+                                    cJSON_AddStringToObject(__FUNCTION__, cj_attribute, "key", "my.scope.attribute");
+                                    cJSON *cj_value = cJSON_AddObjectToObject(__FUNCTION__, cj_attribute, "value");
+                                    if (cj_value)
+                                    {
+                                        cJSON_AddStringToObject(__FUNCTION__, cj_value, "stringValue", "some scope attribute");
+                                    }
+
+                                    if (false == cJSON_AddItemToArray(cj_attributes, cj_attribute))
+                                    {
+                                        cJSON_Delete(__FUNCTION__, cj_attribute);
+                                    }
+                                }
+                            }
+                        }
+
+                        cJSON *cj_spans = cJSON_AddArrayToObject(__FUNCTION__, cj_scopeSpan, "spans");
+                        if (cj_spans)
+                        {
+                            cJSON *cj_span = cJSON_CreateObject(__FUNCTION__);
+                            if (cj_span)
+                            {
+                                cJSON_AddStringToObject(__FUNCTION__, cj_span, "traceId", "");
+                                cJSON_AddStringToObject(__FUNCTION__, cj_span, "spanId", "");
+                                cJSON_AddStringToObject(__FUNCTION__, cj_span, "paperntSpanId", "");
+                                cJSON_AddStringToObject(__FUNCTION__, cj_span, "name", "I'm a server span");
+                                cJSON_AddStringToObject(__FUNCTION__, cj_span, "startTimeUnixNano", "");
+                                cJSON_AddStringToObject(__FUNCTION__, cj_span, "endTimeUnixNano", "");
+                                cJSON_AddNumberToObject(__FUNCTION__, cj_span, "kind", 2);
+                                cJSON *cj_attributes = cJSON_AddArrayToObject(__FUNCTION__, cj_span, "attributes");
+                                if (cj_attributes)
+                                {
+                                    cJSON *cj_attribute = cJSON_CreateObject(__FUNCTION__);
+                                    if (cj_attribute)
+                                    {
+                                        cJSON_AddStringToObject(__FUNCTION__, cj_attribute, "key", "my.span.attr");
+                                        cJSON *cj_value = cJSON_AddObjectToObject(__FUNCTION__, cj_attribute, "value");
+                                        if (cj_value)
+                                        {
+                                            cJSON_AddStringToObject(__FUNCTION__, cj_value, "stringValue", "some value");
+                                        }
+
+                                        if (false == cJSON_AddItemToArray(cj_attributes, cj_attribute))
+                                        {
+                                            cJSON_Delete(__FUNCTION__, cj_attribute);
+                                        }
+                                    }
+                                }
+
+                                if (false == cJSON_AddItemToArray(cj_spans, cj_span))
+                                {
+                                    cJSON_Delete(__FUNCTION__, cj_span);
+                                }
+                            }
+                        }
+
+                        if (false == cJSON_AddItemToArray(cj_scopeSpans, cj_scopeSpan))
+                        {
+                            cJSON_Delete(__FUNCTION__, cj_scopeSpan);
+                        }
+                    }
+                }
+
                 if (false == cJSON_AddItemToArray(cj_resourceSpans, cj_resourceSpan))
                 {
                     cJSON_Delete(__FUNCTION__, cj_resourceSpan);
