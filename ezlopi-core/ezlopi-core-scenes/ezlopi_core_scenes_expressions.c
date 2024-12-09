@@ -93,6 +93,10 @@ static void __add_expression_items(s_ezlopi_expressions_t *exp_node, cJSON *cj_p
 static void __add_expression_device_item_names(s_ezlopi_expressions_t *exp_node, cJSON *cj_params);
 static int __remove_exp_id_from_nvs_exp_list(uint32_t target_id);
 
+static int __evaluate_expression(cJSON *cj_des, cJSON *lua_prop_params, const char *exp_name, const char *exp_code);
+static int __edit_expression_ll(s_ezlopi_expressions_t *expn_node, cJSON *cj_new_expression);
+
+
 /*******************************************************************************
  *                          Static Data Definitions
  *******************************************************************************/

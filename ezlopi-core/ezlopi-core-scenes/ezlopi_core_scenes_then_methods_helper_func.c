@@ -89,6 +89,10 @@
 /*******************************************************************************
  *                          Static Function Prototypes
  *******************************************************************************/
+static int __ezlopi_core_scenes_then_sendhttp_relloc_header(s_ezlopi_core_http_mbedtls_t *tmp_http_data, int append_size, const char *append_str);
+static void __ezlopi_core_scenes_then_sendhttp_parse_host_name(s_ezlopi_core_http_mbedtls_t* tmp_http_data, const char* field_value_string);
+static int __ezlopi_core_scenes_then_create_fresh_header(s_ezlopi_core_http_mbedtls_t *tmp_http_data);
+static void __ezlopi_core_scenes_then_append_to_header(s_ezlopi_core_http_mbedtls_t *tmp_http_data, const char *str1, const char *str2);
 
 /*******************************************************************************
  *                          Static Data Definitions

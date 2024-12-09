@@ -96,8 +96,10 @@
 /*******************************************************************************
  *                          Static Function Prototypes
  *******************************************************************************/
-static void ezlopi_http_free_rx_data(s_rx_chunk_t *rx_chunks);
+static void ezlopi_core_http_request_via_mbedTLS(const char *host_web_server, int web_port_num, const char *url_req, char **resp_buf);
+static void ezlopi_core_http_generate_request(s_ezlopi_core_http_mbedtls_t *config, char **request, int request_len);
 static esp_err_t ezlopi_http_event_handler(esp_http_client_event_t *evt);
+static void ezlopi_http_free_rx_data(s_rx_chunk_t *rx_chunks);
 
 /*******************************************************************************
  *                          Static Data Definitions

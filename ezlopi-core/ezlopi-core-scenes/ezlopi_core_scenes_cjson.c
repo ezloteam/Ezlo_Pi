@@ -69,10 +69,15 @@
 /*******************************************************************************
  *                          Static Function Prototypes
  *******************************************************************************/
+static void ezlopi_scenes_cjson_add_user_notifications(cJSON *root, l_user_notification_v2_t *user_notifications);
+static void ezlopi_scenes_cjson_add_house_modes(cJSON *root, l_house_modes_v2_t *house_modes);
+static void ezlopi_scenes_cjson_add_when_block_options(cJSON *cj_when_block, l_when_block_v2_t *when_block);
+static void ezlopi_scenes_cjson_add_when_group_info(cJSON *cj_when_block, l_when_block_v2_t *when_block);
+static void ezlopi_scenes_cjson_add_when_block_info(cJSON *cj_when_block, l_when_block_v2_t *when_block);
+static void __cjson_add_action_block_options(cJSON *cj_block_array, l_action_block_v2_t *action_block);
+static void __cjson_add_action_delay(cJSON *cj_action_block, s_action_delay_v2_t *action_delay);
 static void __cjson_add_fields(cJSON *cj_block, l_fields_v2_t *fields);
 static void __cjson_add_string(cJSON *root, const char *key, const char *value);
-static void __cjson_add_action_delay(cJSON *cj_then_block, s_action_delay_v2_t *action_delay);
-static void __cjson_add_action_block_options(cJSON *cj_block_array, l_action_block_v2_t *then_block);
 
 /*******************************************************************************
  *                          Static Data Definitions

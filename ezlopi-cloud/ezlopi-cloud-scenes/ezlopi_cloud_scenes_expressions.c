@@ -69,6 +69,9 @@
 /*******************************************************************************
  *                          Static Function Prototypes
  *******************************************************************************/
+static void ____common_part_of_scenes_expressions_added_and_changed(cJSON* cj_request, cJSON* cj_response);
+static void scenes_expressions_added(cJSON *cj_request, cJSON *cj_response);
+static void scenes_expressions_changed(cJSON *cj_request, cJSON *cj_response);
 
 /*******************************************************************************
  *                          Static Data Definitions

@@ -74,11 +74,15 @@
 /*******************************************************************************
  *                          Static Function Prototypes
  *******************************************************************************/
+static int __scenes_block_trigger_device_list(cJSON *cj_devices_array);
+static void __add_block_options_and_fields_cjson(cJSON *cj_block, s_block_options_v2_t *block_options, l_fields_v2_t *fields_node);
 static cJSON *__create_when_block_cjson(l_when_block_v2_t *when_block);
-
+static cJSON *__create_then_block_cjson(l_action_block_v2_t *then_block);
+static cJSON *__create_else_block_cjson(l_action_block_v2_t *else_block);
+static bool ____iterate_field_block_to_find_item_id(l_when_block_v2_t *curr_when_block, uint32_t item_id);
 static bool __found_item_in_field(l_fields_v2_t *field_node, uint32_t item_id);
-static cJSON *__add_scenes_blocks_by_device_ids(e_scenes_block_type_v2_t block_type, cJSON *cj_devices_array);
 static cJSON *__add_scenes_blocks_by_item_ids(e_scenes_block_type_v2_t block_type, l_ezlopi_item_t *item_list);
+static cJSON *__add_scenes_blocks_by_device_ids(e_scenes_block_type_v2_t block_type, cJSON *cj_devices_array);
 static e_scenes_block_type_v2_t __get_block_type_and_create_block_array(cJSON *cj_result, char const **block_type_name, cJSON *cj_block_type);
 
 /*******************************************************************************

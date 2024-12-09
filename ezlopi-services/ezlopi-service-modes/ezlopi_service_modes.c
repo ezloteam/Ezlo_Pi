@@ -87,13 +87,33 @@ typedef struct l_modes_alert
 /*******************************************************************************
  *                          Static Function Prototypes
  *******************************************************************************/
-static void __modes_loop(void *pv);
+static void __modes_loop(void *arg);
+static void __broadcast_modes_alarmed_for_uid(const char *dev_id_str);
+static bool __check_if_devid_in_alarm_off(s_house_modes_t *curr_house_mode, const char *device_id_str);
+static void __broadcast_alarmed_state_for_valid_ids(void);
+static bool __check_if_device_is_bypassed(cJSON *cj_bypass_devices, const char *device_id_str);
+static bool __check_if_entry_delay_finished(s_ezlopi_modes_t *ez_mode);
+static void __modes_create_non_bypass_alerts(s_ezlopi_modes_t *ez_mode, s_house_modes_t *curr_house_mode);
+static void __modes_check_main_for_trigger(s_ezlopi_modes_t *ez_mode);
+static void __modes_main_and_broadcast_status(s_ezlopi_modes_t *ez_mode);
+static ezlopi_error_t __check_mode_switch_condition(s_ezlopi_modes_t *ez_mode);
+static l_modes_alert_t *__create_alert(const char *u_id, s_ezlopi_modes_t *ez_mode);
+static void __ezlopi_service_remove_alert_node(l_modes_alert_t *node);
+static void __ezlopi_service_remove_alert_node_by_name(const char *_name_);
+static void __ezlopi_service_add_alert(const char *u_id, s_ezlopi_modes_t *ez_mode);
+static void __remove_all_alerts(l_modes_alert_t *curr_node);
+static void __ezlopi_service_remove_all_alerts(void);
+static void __modes_service(void *pv);
 
 /*******************************************************************************
  *                          Static Data Definitions
  *******************************************************************************/
 static SemaphoreHandle_t sg_modes_loop_smphr = NULL;
 static l_modes_alert_t *_alert_head = NULL;
+
+#if 0
+static TaskHandle_t sg_process_handle = NULL;
+#endif
 
 /*******************************************************************************
  *                          Extern Data Definitions
@@ -145,6 +165,36 @@ void ezlopi_service_modes_init(void)
     xSemaphoreGive(sg_modes_loop_smphr);
     ezlopi_service_modes_start(5000);
 }
+
+#if 0
+int ezlopi_service_modes_stop(void)
+{
+    if (sg_process_handle)
+    {
+        ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SERVICE_MODES_TASK);
+        vTaskDelete(sg_process_handle);
+        sg_process_handle = NULL;
+        TRACE_W("Modes-service: Stopped!");
+    }
+
+    return 1;
+}
+
+int ezlopi_service_modes_start(5000void)
+{
+    int ret = 0;
+
+    if ((NULL == sg_process_handle) && ezlopi_core_modes_get_custom_modes())
+    {
+        ret = 1;
+        xTaskCreate(__modes_service, "modes-service", EZLOPI_SERVICE_MODES_TASK_DEPTH, NULL, 3, &sg_process_handle);
+        ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_MODES_TASK, &sg_process_handle, EZLOPI_SERVICE_MODES_TASK_DEPTH);
+        TRACE_I("Starting modes-service");
+    }
+
+    return ret;
+}
+#endif
 
 /*******************************************************************************
  *                          Static Function Definitions
@@ -605,36 +655,6 @@ static void __ezlopi_service_remove_all_alerts(void)
 }
 
 #if 0
-static TaskHandle_t sg_process_handle = NULL;
-
-int ezlopi_service_modes_stop(void)
-{
-    if (sg_process_handle)
-    {
-        ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SERVICE_MODES_TASK);
-        vTaskDelete(sg_process_handle);
-        sg_process_handle = NULL;
-        TRACE_W("Modes-service: Stopped!");
-    }
-
-    return 1;
-}
-
-int ezlopi_service_modes_start(5000void)
-{
-    int ret = 0;
-
-    if ((NULL == sg_process_handle) && ezlopi_core_modes_get_custom_modes())
-    {
-        ret = 1;
-        xTaskCreate(__modes_service, "modes-service", EZLOPI_SERVICE_MODES_TASK_DEPTH, NULL, 3, &sg_process_handle);
-        ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_MODES_TASK, &sg_process_handle, EZLOPI_SERVICE_MODES_TASK_DEPTH);
-        TRACE_I("Starting modes-service");
-    }
-
-    return ret;
-}
-
 static void __modes_service(void *pv)
 {
     while (1)

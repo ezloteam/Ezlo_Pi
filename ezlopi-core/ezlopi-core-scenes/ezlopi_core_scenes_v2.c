@@ -82,27 +82,41 @@
 /*******************************************************************************
  *                          Static Function Prototypes
  *******************************************************************************/
-static l_fields_v2_t *______new_field_populate(cJSON *cj_field);
-static l_fields_v2_t *_____fields_populate(cJSON *cj_fields);
-
-static void _____new_action_delay(s_action_delay_v2_t *action_delay, cJSON *cj_delay);
+static void __remove_residue_scenes_ids_from_list(void);
+static l_scenes_list_v2_t *_scenes_populate(cJSON *cj_scene, uint32_t scene_id);
+static l_scenes_list_v2_t *__new_scene_populate(cJSON *cj_scene, uint32_t scene_id);
+static l_user_notification_v2_t *___user_notifications_populate(cJSON *cj_user_notifications);
+static l_user_notification_v2_t *____new_user_notification_populate(cJSON *cj_user_notification);
+static l_house_modes_v2_t *___house_modes_populate(cJSON *cj_house_modes);
+static l_house_modes_v2_t *____new_house_mode_populate(cJSON *cj_house_mode);
+static l_action_block_v2_t *___action_blocks_populate(cJSON *cj_action_blocks, e_scenes_block_type_v2_t block_type);
+static l_action_block_v2_t *____new_action_block_populate(cJSON *cj_action_block, e_scenes_block_type_v2_t block_type);
+static l_when_block_v2_t *___when_blocks_populate(cJSON *cj_when_blocks);
+static l_when_block_v2_t *____new_when_block_populate(cJSON *cj_when_block);
 static void _____new_block_options_populate(s_block_options_v2_t *p_block_options, cJSON *cj_block_options);
 static void __new_method_populate(s_method_v2_t *p_method, cJSON *cj_method);
-
-static l_when_block_v2_t *____new_when_block_populate(cJSON *cj_when_block);
-static l_when_block_v2_t *___when_blocks_populate(cJSON *cj_when_blocks);
-
-static l_action_block_v2_t *____new_action_block_populate(cJSON *cj_then_block, e_scenes_block_type_v2_t block_type);
-static l_action_block_v2_t *___action_blocks_populate(cJSON *cj_then_blocks, e_scenes_block_type_v2_t block_type);
-
-static l_house_modes_v2_t *____new_house_mode_populate(cJSON *cj_house_mode);
-static l_house_modes_v2_t *___house_modes_populate(cJSON *cj_house_modes);
-
-static l_user_notification_v2_t *____new_user_notification_populate(cJSON *cj_user_notification);
-static l_user_notification_v2_t *___user_notifications_populate(cJSON *cj_user_notifications);
-
-static l_scenes_list_v2_t *__new_scene_populate(cJSON *cj_scene, uint32_t scene_id);
-static l_scenes_list_v2_t *_scenes_populate(cJSON *cj_scene, uint32_t scene_id);
+static void _____new_action_delay(s_action_delay_v2_t *action_delay, cJSON *cj_delay);
+static l_fields_v2_t *_____fields_populate(cJSON *cj_fields);
+static void _______fields_get_value(l_fields_v2_t *field, cJSON *cj_value);
+static l_fields_v2_t *______new_field_populate(cJSON *cj_field);
+static void ______add_groupID_and_flag(cJSON *cj_target);
+static bool ____check_and_append_group_id(cJSON *cj_when_block);
+static int _____check_and_add_when_blockId(cJSON *cj_new_scene_when_block);
+static void ____modify_function_in_blockmeta(cJSON *cj_when_block, bool enable_status);
+static bool ____change_latch_status_in_blockOptions(cJSON *cj_when_block, bool enable_status);
+static bool ___enable_disable_latch_with_blockId(cJSON *cj_when_block, uint32_t blockId, bool enable_status);
+static bool _____change_block_en_status(cJSON *cj_when_block, bool enable_status);
+static bool ___enable_disable_block_en_with_blockId(cJSON *cj_when_block, uint32_t blockId, bool enable_status);
+static bool _____put_new_block_meta(cJSON *cj_when_block, cJSON *cj_new_blockmeta);
+static bool ___add_new_blockmeta_by_id(cJSON *cj_when_block, uint32_t blockId, cJSON *cj_blockmeta);
+static char *___get_time_list_from_when_block_fields(cJSON *cj_scenes_array, l_scenes_list_v2_t *curr_scene, l_fields_v2_t *curr_field_block);
+static char *__get_time_category_method_name(cJSON *cj_scenes_array, l_scenes_list_v2_t *curr_scene, l_when_block_v2_t *curr_when_block);
+static void _____add_the_scene_time_method_to_arr(cJSON *cj_scenes_array, l_scenes_list_v2_t *curr_scene, char *method_name);
+static char *___get_time_list_from_when_block_fields(cJSON *cj_scenes_array, l_scenes_list_v2_t *curr_scene, l_fields_v2_t *curr_field_block);
+static char *__get_time_category_method_name(cJSON *cj_scenes_array, l_scenes_list_v2_t *curr_scene, l_when_block_v2_t *curr_when_block);
+static l_when_block_v2_t *___get_group_when_blocks(l_when_block_v2_t *curr_when_block, uint32_t group_id);;
+static l_when_block_v2_t *__iterate_through_fields(l_fields_v2_t *fields, uint32_t group_id);
+static l_when_block_v2_t *___get_group_when_blocks(l_when_block_v2_t *curr_when_block, uint32_t group_id);
 
 /*******************************************************************************
  *                          Static Data Definitions

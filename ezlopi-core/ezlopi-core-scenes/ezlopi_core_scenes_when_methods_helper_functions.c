@@ -87,6 +87,15 @@ typedef struct s_sunstate_data
 /*******************************************************************************
  *                          Static Function Prototypes
  *******************************************************************************/
+static int __compare_item_values(l_ezlopi_item_t *curr_item, l_fields_v2_t *value_field);
+static uint8_t isdate_check_endweek_conditon(e_isdate_modes_t mode_type, struct tm *info);
+static uint8_t isdate_find_nth_week_curr_month(struct tm *info);
+static void issunsate_update_sunstate_tm(int tm_mday, s_sunstate_data_t *user_data);
+static void issunstate_add_offs(e_issunstate_offset_t tmoffs_type, struct tm *choosen_suntime, struct tm *defined_moment, const char *tm_offs_val);
+static bool __and_when_block_condition(l_scenes_list_v2_t *scene_node, l_when_block_v2_t *when_block);
+static uint8_t __isitemState_vs_field_compare(s_item_exp_data_t *new_extract_data, l_fields_v2_t *tmp_field, uint8_t bit_mode_position);
+static void __replace_old_with_new_data_val(s_item_exp_data_t *new_extract_data, s_item_exp_data_t *prev_extract_data);
+static int ____old_vs_new_extract_data(s_item_exp_data_t *new_extract_data, s_item_exp_data_t *prev_extract_data);
 
 /*******************************************************************************
  *                          Static Data Definitions

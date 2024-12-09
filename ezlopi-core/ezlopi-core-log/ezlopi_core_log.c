@@ -77,6 +77,9 @@
 /*******************************************************************************
  *                          Static Function Prototypes
  *******************************************************************************/
+static ezlopi_error_t ezlopi_core_serial_log_upcall(int severity, const char* log_str);
+static ezlopi_error_t ezlopi_hub_cloud_log_set_severity(const char* severity_str);
+static ezlopi_error_t ezlopi_hub_serial_log_set_severity(const char* severity_str);
 
 /*******************************************************************************
  *                          Static Data Definitions

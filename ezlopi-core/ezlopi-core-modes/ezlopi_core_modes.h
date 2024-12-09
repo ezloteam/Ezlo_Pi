@@ -178,16 +178,6 @@ extern "C"
 
         uint32_t alarm_delay_sec;     //"Removed in 'hub.modes.get(v3.0)'";
 
-        cJSON *cj_alarms;
-        cJSON *cj_cameras;
-        cJSON *cj_devices;
-        s_protect_buttons_t *l_protect_buttons;
-
-        s_entry_delay_t entry_delay;
-        s_abort_window_t abort_delay;
-
-        s_alarmed_t alarmed;
-
         uint32_t time_is_left_to_switch_sec; //  (switch_to_delay_sec - N_sec) //Time left (sec) after start to switch to the mode
         uint32_t switch_to_delay_sec;        //  Delay (sec) before switch to the all modes // this holds a copy to actual 'SwitchDelay' of active 'houseMode'
         uint32_t alarm_delay;                //  Delay (sec) before sending alert if armed sensors (door/window or motion sensor) tripped. // [https://log.ezlo.com/new/hub/house_modes_manager/#hubmodesget-version-20] Delay (sec) before sending alert to the all modes   // NOTE : [(alarm_delay_sec > 0) === means 'mode->alarmed' member exists ]

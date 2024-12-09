@@ -65,6 +65,16 @@
 /*******************************************************************************
  *                          Static Function Prototypes
  *******************************************************************************/
+static int ezlopi_core_setting_command_process_scale_temperature(const cJSON *cj_params);
+static int ezlopi_core_setting_command_process_date_format(const cJSON *cj_params);
+static int ezlopi_core_setting_command_process_time_format(const cJSON *cj_params);
+static int ezlopi_core_setting_command_process_netork_ping_timeout(const cJSON *cj_params);
+static int ezlopi_core_setting_command_process_log_level(const cJSON *cj_params);
+static int ezlopi_core_add_temperature_scale_settings(cJSON *cj_settings);
+static int ezlopi_core_add_date_format_settings(cJSON *cj_settings);
+static int ezlopi_core_add_time_format_settings(cJSON *cj_settings);
+static int ezlopi_core_add_network_ping_timeout_settings(cJSON *cj_settings);
+static int ezlopi_core_add_log_level_settings(cJSON *cj_settings);
 
 /*******************************************************************************
  *                          Static Data Definitions

@@ -88,9 +88,30 @@ typedef enum e_with_grp
 /*******************************************************************************
  *                          Static Function Prototypes
  *******************************************************************************/
+static int ________compare_val_num(double item_exp_value, double value_to_compare_with, char *comparator_field_str);
+static int ________compare_val_str(const char *item_exp_value_str, const char *value_to_compare_with_str, char *comparator_field_str);
+static int ____compare_exp_vs_other(s_ezlopi_expressions_t *curr_expr_left, l_fields_v2_t *value_field, char *comparator_field_str);
+static int ____compare_exp_vs_exp(s_ezlopi_expressions_t *curr_expr_left, s_ezlopi_expressions_t *curr_expr_right, char *comparator_field_str);
+static int ____compare_exp_vs_item(s_ezlopi_expressions_t *curr_expr_left, l_ezlopi_item_t *item_right, char *comparator_field_str);
+static int ____compare_item_vs_other(l_ezlopi_item_t *item_left, l_fields_v2_t *value_field, char *comparator_field_str);
+static int ____compare_item_vs_exp(l_ezlopi_item_t *item_left, s_ezlopi_expressions_t *curr_expr_right, char *comparator_field_str);
+static int ____compare_item_vs_item(l_ezlopi_item_t *item_left, l_ezlopi_item_t *item_right, char *comparator_field_str);
+static int __trigger_grp_functions(e_with_grp_t choice, l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field, l_fields_v2_t *operation_field, l_fields_v2_t *comparator_field, l_fields_v2_t *value_field, l_fields_v2_t *start_value_field, l_fields_v2_t *end_value_field, l_fields_v2_t *value_type_field, char *comparator_str, bool comparator_choice);
+static int ________compare_numeric_range_num(double extract_data, double start_value_field_num, double end_value_field_num, bool comparator_choice);
+static int ________compare_numeric_range_str(const char *extract_data, const char *start_value_field_str, const char *end_value_field_str, bool comparator_choice);
+static int ____compare_range_exp_vs_other(s_ezlopi_expressions_t *curr_expr_left, l_fields_v2_t *start_value_field, l_fields_v2_t *end_value_field, bool comparator_choice);
+static int ____compare_range_exp_vs_exp(s_ezlopi_expressions_t *curr_expr_left, s_ezlopi_expressions_t *curr_expr_right_start, s_ezlopi_expressions_t *curr_expr_right_end, bool comparator_choice);
+static int ____compare_range_item_vs_other(l_ezlopi_item_t *item, l_fields_v2_t *start_value_field, l_fields_v2_t *end_value_field, bool comparator_choice);
+static int ____compare_range_item_vs_exp(l_ezlopi_item_t *item, s_ezlopi_expressions_t *curr_expr_right_start, s_ezlopi_expressions_t *curr_expr_right_end, bool comparator_choice);
 static int __evaluate_numrange(l_fields_v2_t *item_exp_field, l_fields_v2_t *start_value_field, l_fields_v2_t *end_value_field, bool comparator_choice);
+static char *__ezlopi_core_scenes_operator_get_item_string_value_current_by_id(uint32_t item_id);
+static char *ezlopi_scenes_laststr_comp(const char *haystack, const char *needle);
+static int __compare_inarry_str(char *item_exp_value_str, l_fields_v2_t *value_field, bool operation);
+static int __compare_inarry_num(double item_exp_value, l_fields_v2_t *value_field, bool operation);
+static int __compare_inarry_cj(cJSON *item_exp_value, l_fields_v2_t *value_field, bool operation);
 static int __evaluate_compareNumber_or_compareStrings(l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, char *comparator_str);
 static int __evaluate_compareNumbers_or_compareStrings_with_group(l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field, l_fields_v2_t *value_field, l_fields_v2_t *comparator_field);
+static bool __check_valuetypes(const char *lhs_type_str, const char *rhs_type_str, const char *required_type_str);
 
 /*******************************************************************************
  *                          Static Data Definitions
