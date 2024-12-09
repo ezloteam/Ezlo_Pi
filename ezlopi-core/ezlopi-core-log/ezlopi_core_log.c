@@ -1,3 +1,45 @@
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+
+/**
+ * @file    main.c
+ * @brief   perform some function on data
+ * @author  John Doe
+ * @version 0.1
+ * @date    1st January 2024
+ */
+
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_UTIL_TRACE_EN
@@ -20,6 +62,25 @@
 
 #include "ezlopi_core_log.h"
 
+/*******************************************************************************
+ *                          Extern Data Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Type & Macro Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Static Function Prototypes
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Static Data Definitions
+ *******************************************************************************/
 const char* ezlopi_log_severity_enum[ENUM_EZLOPI_LOG_SEVERITY_MAX] = {
     "NONE",
     "ERROR",
@@ -29,53 +90,22 @@ const char* ezlopi_log_severity_enum[ENUM_EZLOPI_LOG_SEVERITY_MAX] = {
     "TRACE"
 };
 
-
 static e_ezlopi_log_severity_t cloud_log_severity = ENUM_EZLOPI_LOG_SEVERITY_WARNING;
 static e_ezlopi_log_severity_t serial_log_severity = ENUM_EZLOPI_LOG_SEVERITY_MAX;
 
-static ezlopi_error_t ezlopi_hub_cloud_log_set_severity(const char* severity_str)
-{
-    ezlopi_error_t ret = EZPI_FAILED;
-    if (severity_str)
-    {
-        for (int i = 0; i < ENUM_EZLOPI_LOG_SEVERITY_MAX; i++)
-        {
-            if (0 == strncmp(ezlopi_log_severity_enum[i], severity_str, strlen(ezlopi_log_severity_enum[i])))
-            {
-                if (i <= ENUM_EZLOPI_LOG_SEVERITY_WARNING)
-                {
-                    cloud_log_severity = i;
-                }
-                else
-                {
-                    cloud_log_severity = ENUM_EZLOPI_LOG_SEVERITY_WARNING;
-                }
-                ret = EZPI_SUCCESS;
-                break;
-            }
-        }
-    }
-    return ret;
-}
+/*******************************************************************************
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
-static ezlopi_error_t ezlopi_hub_serial_log_set_severity(const char* severity_str)
-{
-    ezlopi_error_t ret = EZPI_FAILED;
-    if (severity_str)
-    {
-        for (int i = 0; i < ENUM_EZLOPI_LOG_SEVERITY_MAX; i++)
-        {
-            if (0 == strncmp(ezlopi_log_severity_enum[i], severity_str, strlen(ezlopi_log_severity_enum[i])))
-            {
-                serial_log_severity = i;
-                ret = EZPI_SUCCESS;
-                break;
-            }
-        }
-    }
-    return ret;
-}
+/*******************************************************************************
+ *                          Extern Function Definitions
+ *******************************************************************************/
 
+/**
+ * @brief Global/extern function template example
+ * Convention : Use capital letter for initial word on extern function
+ * @param arg
+ */
 void ezlopi_core_read_set_log_severities_internal(e_ezlopi_log_severity_t severity)
 {
     serial_log_severity = severity;
@@ -227,6 +257,14 @@ ezlopi_error_t ezlopi_core_send_cloud_log(int severity, const char* log_str)
     return ret;
 }
 
+void ezlopi_core_set_log_upcalls()
+{
+    ezlopi_util_set_log_upcalls(ezlopi_core_send_cloud_log, ezlopi_core_serial_log_upcall);
+}
+
+/*******************************************************************************
+ *                          Static Function Definitions
+ *******************************************************************************/
 static ezlopi_error_t ezlopi_core_serial_log_upcall(int severity, const char* log_str)
 {
     ezlopi_error_t ret = EZPI_FAILED;
@@ -238,9 +276,51 @@ static ezlopi_error_t ezlopi_core_serial_log_upcall(int severity, const char* lo
     return ret;
 }
 
-void ezlopi_core_set_log_upcalls()
+static ezlopi_error_t ezlopi_hub_cloud_log_set_severity(const char* severity_str)
 {
-    ezlopi_util_set_log_upcalls(ezlopi_core_send_cloud_log, ezlopi_core_serial_log_upcall);
+    ezlopi_error_t ret = EZPI_FAILED;
+    if (severity_str)
+    {
+        for (int i = 0; i < ENUM_EZLOPI_LOG_SEVERITY_MAX; i++)
+        {
+            if (0 == strncmp(ezlopi_log_severity_enum[i], severity_str, strlen(ezlopi_log_severity_enum[i])))
+            {
+                if (i <= ENUM_EZLOPI_LOG_SEVERITY_WARNING)
+                {
+                    cloud_log_severity = i;
+                }
+                else
+                {
+                    cloud_log_severity = ENUM_EZLOPI_LOG_SEVERITY_WARNING;
+                }
+                ret = EZPI_SUCCESS;
+                break;
+            }
+        }
+    }
+    return ret;
+}
+
+static ezlopi_error_t ezlopi_hub_serial_log_set_severity(const char* severity_str)
+{
+    ezlopi_error_t ret = EZPI_FAILED;
+    if (severity_str)
+    {
+        for (int i = 0; i < ENUM_EZLOPI_LOG_SEVERITY_MAX; i++)
+        {
+            if (0 == strncmp(ezlopi_log_severity_enum[i], severity_str, strlen(ezlopi_log_severity_enum[i])))
+            {
+                serial_log_severity = i;
+                ret = EZPI_SUCCESS;
+                break;
+            }
+        }
+    }
+    return ret;
 }
 
 #endif // CONFIG_EZPI_UTIL_TRACE_EN
+
+/*******************************************************************************
+ *                          End of File
+ *******************************************************************************/

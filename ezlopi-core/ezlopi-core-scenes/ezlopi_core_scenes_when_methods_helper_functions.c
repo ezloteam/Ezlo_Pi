@@ -1,3 +1,45 @@
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+
+/**
+ * @file    main.c
+ * @brief   perform some function on data
+ * @author  John Doe
+ * @version 0.1
+ * @date    1st January 2024
+ */
+
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
@@ -15,64 +57,54 @@
 #include "ezlopi_cloud_constants.h"
 #include "EZLOPI_USER_CONFIG.h"
 
-//------------------------------- ezlopi_scene_when_is_itemState ------------------------------------------
-static int __compare_item_values(l_ezlopi_item_t *curr_item, l_fields_v2_t *value_field)
+/*******************************************************************************
+ *                          Extern Data Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Type & Macro Definitions
+ *******************************************************************************/
+typedef enum e_issunstate_offset
 {
-    int ret = 0;
-    cJSON *cj_tmp_value = cJSON_CreateObject(__FUNCTION__);
-    if (cj_tmp_value)
-    {
-        curr_item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, curr_item, (void *)cj_tmp_value, NULL);
-        cJSON *cj_value = cJSON_GetObjectItem(__FUNCTION__, cj_tmp_value, ezlopi_value_str);
-        if (cj_value)
-        {
-            switch (cj_value->type)
-            {
-            case cJSON_True:
-            {
-                if (true == value_field->field_value.u_value.value_bool)
-                {
-                    ret = 1;
-                }
-                break;
-            }
-            case cJSON_False:
-            {
-                if (false == value_field->field_value.u_value.value_bool)
-                {
-                    ret = 1;
-                }
-                break;
-            }
-            case cJSON_Number:
-            {
-                if (cj_value->valuedouble == value_field->field_value.u_value.value_double)
-                {
-                    ret = 1;
-                }
-                break;
-            }
-            case cJSON_String:
-            {
-                if (EZPI_STRNCMP_IF_EQUAL(cj_value->valuestring, value_field->field_value.u_value.value_string, strlen(cj_value->valuestring), strlen(value_field->field_value.u_value.value_string)))
-                {
-                    ret = 1;
-                }
-                break;
-            }
-            default:
-            {
-                TRACE_E("Value type mis-matched!");
-            }
-            }
-        }
+    ISSUNSTATE_INTIME_MODE = 0,
+    ISSUNSTATE_BEFORE_MODE,
+    ISSUNSTATE_AFTER_MODE,
+    ISSUNSTATE_UNDEFINED,
+} e_issunstate_offset_t;
+typedef struct s_sunstate_data
+{
+    uint8_t sunstate_mode;             // [sunrise=1,sunset=2,0=NULL]
+    e_issunstate_offset_t tmoffs_type; // [intime=0,before=1,after=2]
+    int curr_tm_day;                   // today's day number
+    struct tm choosen_suntime;         // unique suntime
+    struct tm defined_moment;          // offset+suntime
+} s_sunstate_data_t;
 
-        cJSON_Delete(__FUNCTION__, cj_tmp_value);
-    }
+/*******************************************************************************
+ *                          Static Function Prototypes
+ *******************************************************************************/
 
-    return ret;
-}
+/*******************************************************************************
+ *                          Static Data Definitions
+ *******************************************************************************/
 
+/*******************************************************************************
+ *                          Extern Data Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Definitions
+ *******************************************************************************/
+
+/**
+ * @brief Global/extern function template example
+ * Convention : Use capital letter for initial word on extern function
+ * @param arg
+ */
 int is_item_state_single_condition(uint32_t item_id, l_fields_v2_t *value_field)
 {
     int ret = 0;
@@ -135,135 +167,6 @@ int is_item_state_with_grp_condition(uint32_t device_group_id, uint32_t item_gro
 
 //------------------------------- ezlopi_scene_when_is_date ---------------------------------------------
 
-static uint8_t isdate_check_endweek_conditon(e_isdate_modes_t mode_type, struct tm *info)
-{
-    uint8_t ret = 0;
-    static uint8_t _last_day_of_curr_month = 0;
-    static int _starting_date_of_last_week = -1;
-    // filter out the first 22 days ; which do-not lie in last week of the month
-    if (info->tm_mday > 22)
-    {
-        // 1. Find out the 'valid' starting date of last week ( return -1 , if invalid )
-        if (-1 == _starting_date_of_last_week)
-        {
-            //-------------------------------------------------------------------
-            // 1.1 find the nearest-prev sunday and assign it.
-            // for this calculation dont change default 'info->tm_wday' -> '0-6'
-            switch (info->tm_wday)
-            {
-            case 1: // monday
-                _starting_date_of_last_week = info->tm_mday - 1;
-                break;
-            case 2: // tuesday
-                _starting_date_of_last_week = info->tm_mday - 2;
-                break;
-            case 3: // wednasday
-                _starting_date_of_last_week = info->tm_mday - 3;
-                break;
-            case 4: // thursday
-                _starting_date_of_last_week = info->tm_mday - 4;
-                break;
-            case 5: // friday
-                _starting_date_of_last_week = info->tm_mday - 5;
-                break;
-            case 6: // saturday
-                _starting_date_of_last_week = info->tm_mday - 6;
-                break;
-            default:
-                _starting_date_of_last_week = info->tm_mday;
-                break;
-            }
-            TRACE_I("sunday :%dth_Day ", _starting_date_of_last_week);
-            //-------------------------------------------------------------------
-            // 1.2 validate the generated sunday number
-            switch (info->tm_mon)
-            {
-            case 1: // FEB
-            {
-                int year = info->tm_year + 1900;
-                if ((0 == (year % 4)) && ((0 == (year % 400)) || (0 != (year % 100))))
-                {
-                    _starting_date_of_last_week = ((29 - _starting_date_of_last_week) < 7) ? _starting_date_of_last_week : -1; // if this sunday's day_num lies within last 7-days of the month ; return this sunday's date
-                    _last_day_of_curr_month = 29;
-                }
-                else // non-leap years
-                {
-                    _starting_date_of_last_week = ((28 - _starting_date_of_last_week) < 7) ? _starting_date_of_last_week : -1; // if this sunday's day_num lies within last 7-days of the month ; return this sunday's date
-                    _last_day_of_curr_month = 28;
-                }
-
-                break;
-            }
-            case 3:  // APR
-            case 5:  // JUN
-            case 8:  // SEP
-            case 10: // NOV
-            {
-                _starting_date_of_last_week = ((30 - _starting_date_of_last_week) < 7) ? _starting_date_of_last_week : -1;
-                _last_day_of_curr_month = 30;
-                break;
-            }
-            default: // JAN , MAR , MAY , JULY , AUG , OCT , DEC
-            {
-                _starting_date_of_last_week = ((31 - _starting_date_of_last_week) < 7) ? _starting_date_of_last_week : -1;
-                _last_day_of_curr_month = 31;
-                break;
-            }
-            }
-        }
-
-        // 2. Now to compare today's date and produce result ( if not -1 )
-        if (-1 != _starting_date_of_last_week)
-        {
-            // TRACE_S(" Last week of [%d] starts from [%d] :", info->tm_mon, _starting_date_of_last_week);
-            if (ISDATE_YEAR_WEEKS_MODE == mode_type) // last week of the year
-            {
-                if ((11 == info->tm_mon) && (info->tm_mday >= _starting_date_of_last_week))
-                {
-                    if (info->tm_mday >= _last_day_of_curr_month)
-                    { // refresh the calculation flag '_starting_date_of_last_week'
-                        _starting_date_of_last_week = -1;
-                    }
-                    ret = (1 << 3);
-                }
-            }
-            else if (ISDATE_WEEKS_MODE == mode_type) // last week of the month
-            {
-                if (info->tm_mday >= _starting_date_of_last_week)
-                {
-                    if (info->tm_mday >= _last_day_of_curr_month)
-                    { // refresh the calculation flag '_starting_date_of_last_week'
-                        _starting_date_of_last_week = -1;
-                    }
-                    ret = (1 << 3);
-                }
-            }
-        }
-    }
-    return ret;
-}
-static uint8_t isdate_find_nth_week_curr_month(struct tm *info)
-{
-    // 2. find the fisrt day in this month
-    uint8_t tmp_week_num = 1; // starts with 1 ; since are already in one of the week-count
-    // for this calculation dont change default 'info->tm_wday' -> '0-6'
-    int tmp_weekday_of_curr_month = (info->tm_wday); // 0-6 ; sun = 0
-    for (uint8_t i = (info->tm_mday); i > 1; i--)    // total_days_in_curr_month - 1
-    {
-        if (1 == tmp_weekday_of_curr_month) // if 'monday' ; add count
-        {
-            tmp_week_num++;
-        }
-        tmp_weekday_of_curr_month--;
-        if (0 > tmp_weekday_of_curr_month)
-        {
-            tmp_weekday_of_curr_month = 6; // sunday -> saturday
-        }
-    }
-    // TRACE_S("First day in current month = %d", tmp_weekday_of_curr_month);
-    // TRACE_S("[1-7] : %dth_Day  lies in week[%dth] of the current month", (info->tm_wday), tmp_week_num);
-    return tmp_week_num;
-}
 
 uint8_t isdate_type_check(e_isdate_modes_t *mode_type, struct tm *info, l_fields_v2_t *curr_field)
 {
@@ -288,6 +191,7 @@ uint8_t isdate_type_check(e_isdate_modes_t *mode_type, struct tm *info, l_fields
     }
     return 0;
 }
+
 uint8_t isdate_tm_check(e_isdate_modes_t *mode_type, struct tm *info, l_fields_v2_t *curr_field)
 {
     uint8_t ret = 0;
@@ -325,6 +229,7 @@ uint8_t isdate_tm_check(e_isdate_modes_t *mode_type, struct tm *info, l_fields_v
     }
     return ret;
 }
+
 uint8_t isdate_weekdays_check(e_isdate_modes_t *mode_type, struct tm *info, l_fields_v2_t *curr_field)
 {
     uint8_t ret = 0;
@@ -352,6 +257,7 @@ uint8_t isdate_weekdays_check(e_isdate_modes_t *mode_type, struct tm *info, l_fi
     }
     return ret;
 }
+
 uint8_t isdate_mdays_check(e_isdate_modes_t *mode_type, struct tm *info, l_fields_v2_t *curr_field)
 {
     uint8_t ret = 0;
@@ -434,6 +340,7 @@ uint8_t isdate_year_weeks_check(e_isdate_modes_t *mode_type, struct tm *info, l_
     }
     return ret;
 }
+
 int isdate_check_flag_result(e_isdate_modes_t mode_type, uint8_t flag_check)
 {
     int ret = 0;
@@ -512,6 +419,7 @@ uint8_t isonce_tm_check(l_fields_v2_t *curr_field, struct tm *info)
     }
     return flag_check;
 }
+
 uint8_t isonce_day_check(l_fields_v2_t *curr_field, struct tm *info)
 {
     uint8_t flag_check = 0;
@@ -524,6 +432,7 @@ uint8_t isonce_day_check(l_fields_v2_t *curr_field, struct tm *info)
     }
     return flag_check;
 }
+
 uint8_t isonce_month_check(l_fields_v2_t *curr_field, struct tm *info)
 {
     uint8_t flag_check = 0;
@@ -536,6 +445,7 @@ uint8_t isonce_month_check(l_fields_v2_t *curr_field, struct tm *info)
     }
     return flag_check;
 }
+
 uint8_t isonce_year_check(l_fields_v2_t *curr_field, struct tm *info)
 {
     uint8_t flag_check = 0;
@@ -548,6 +458,7 @@ uint8_t isonce_year_check(l_fields_v2_t *curr_field, struct tm *info)
     }
     return flag_check;
 }
+
 int isonce_check_flag_result(l_scenes_list_v2_t *scene_node, uint8_t flag_check)
 {
     int ret = 0;
@@ -569,151 +480,6 @@ int isonce_check_flag_result(l_scenes_list_v2_t *scene_node, uint8_t flag_check)
 
 //------------------------------- ezlopi_scene_when_is_SunState ---------------------------------------
 
-typedef enum e_issunstate_offset
-{
-    ISSUNSTATE_INTIME_MODE = 0,
-    ISSUNSTATE_BEFORE_MODE,
-    ISSUNSTATE_AFTER_MODE,
-    ISSUNSTATE_UNDEFINED,
-} e_issunstate_offset_t;
-typedef struct s_sunstate_data
-{
-    uint8_t sunstate_mode;             // [sunrise=1,sunset=2,0=NULL]
-    e_issunstate_offset_t tmoffs_type; // [intime=0,before=1,after=2]
-    int curr_tm_day;                   // today's day number
-    struct tm choosen_suntime;         // unique suntime
-    struct tm defined_moment;          // offset+suntime
-} s_sunstate_data_t;
-
-static void issunsate_update_sunstate_tm(int tm_mday, s_sunstate_data_t *user_data)
-{
-    if (tm_mday && user_data)
-    {
-        char tmp_url[100] = {0};
-        char tmp_headers[] = "Host: api.sunrisesunset.io\r\nAccept: */*\r\nConnection: keep-alive\r\n";
-        char tmp_web_server[] = "api.sunrisesunset.io";
-        char *lat_long_vals = ezlopi_nvs_read_latidtude_longitude();
-        if (lat_long_vals)
-        {
-            TRACE_S("long_lat_co-ordinate : %s", lat_long_vals);
-            snprintf(tmp_url, 95, "%s", "https://api.sunrisesunset.io/json?lat=27.700769&lng=85.300140");
-            ezlopi_free(__FUNCTION__, lat_long_vals);
-        }
-        else
-        {
-            // send httprequest to 'sunrisesunset.io' // use the latitude and longitude from NVS
-            snprintf(tmp_url, 95, "%s", "https://api.sunrisesunset.io/json?lat=27.700769&lng=85.300140");
-        }
-
-        s_ezlopi_core_http_mbedtls_t tmp_config = {
-            .method = HTTP_METHOD_GET,
-            .url = tmp_url,
-            .url_maxlen = sizeof(tmp_url),
-            .web_port = 443,
-            .header = tmp_headers,
-            .header_maxlen = sizeof(tmp_headers),
-            .web_server = tmp_web_server,
-            .web_server_maxlen = sizeof(tmp_web_server),
-            .response = NULL,
-            .response_maxlen = 0,
-        };
-        /*Make API call here and extract the suntime[according to 'user_data->sunstate_mode']*/
-
-        ezlopi_core_http_mbedtls_req(&tmp_config);
-        // e.g. after valid extraction
-        user_data->curr_tm_day = tm_mday;                                                    // this stores day for which data is extracted
-        user_data->choosen_suntime.tm_hour = 5 + ((user_data->sunstate_mode == 2) ? 12 : 0); // sunrise = 1 ; sunset = 2
-        user_data->choosen_suntime.tm_min = 48;
-        user_data->choosen_suntime.tm_sec = 42;
-
-        // now check if sunset and sunrise time are not zero
-        if ((0 == user_data->choosen_suntime.tm_hour) &&
-            (0 == user_data->choosen_suntime.tm_min) &&
-            (0 == user_data->choosen_suntime.tm_sec))
-        {
-            TRACE_E(" Failed... clearing 'sunrise/sunset tm_mday'.. ");
-            user_data->curr_tm_day = 0;
-        }
-    }
-}
-static void issunstate_add_offs(e_issunstate_offset_t tmoffs_type, struct tm *choosen_suntime, struct tm *defined_moment, const char *tm_offs_val)
-{
-    if (choosen_suntime && defined_moment && tm_offs_val) // choosen_suntime => sunrise or sunset
-    {
-        // Default values to store start and end boundries
-        struct tm tmp_time = {0};
-
-        // Nox, extract & add :'tm_offs_val'
-        char time_diff[10];
-        snprintf(time_diff, 10, "%s", tm_offs_val);
-        time_diff[9] = '\0';
-        char *ptr1 = NULL;
-        char *ptr2 = NULL;
-        if (0 != strlen(time_diff))
-        {
-            tmp_time.tm_hour = strtoul(time_diff, &ptr1, 10);
-            if (NULL != ptr1)
-            {
-                tmp_time.tm_min = strtoul(ptr1 + 1, &ptr2, 10);
-                if (NULL != ptr2)
-                {
-                    tmp_time.tm_sec = strtoul(ptr2 + 1, NULL, 10);
-                }
-                else // only has minutes and seconds
-                {
-                    tmp_time.tm_sec = tmp_time.tm_min;
-                    tmp_time.tm_min = tmp_time.tm_hour;
-                    tmp_time.tm_hour = 0;
-                }
-            }
-            else // only has seconds
-            {
-                tmp_time.tm_sec = tmp_time.tm_hour;
-                tmp_time.tm_min = 0;
-                tmp_time.tm_hour = 0;
-            }
-        }
-        // Combined  'tm_offs_val' & 'curr_suntime'
-        switch (tmoffs_type)
-        {
-        case ISSUNSTATE_INTIME_MODE:
-        {
-            TRACE_S("offset : Intime");
-            defined_moment->tm_hour = choosen_suntime->tm_hour;
-            defined_moment->tm_min = choosen_suntime->tm_min;
-            defined_moment->tm_sec = choosen_suntime->tm_sec;
-            break;
-        }
-        case ISSUNSTATE_BEFORE_MODE:
-        {
-            TRACE_S("offset : Before");
-            defined_moment->tm_hour = (choosen_suntime->tm_hour - tmp_time.tm_hour);
-            defined_moment->tm_hour = (defined_moment->tm_hour < 0) ? (24 + defined_moment->tm_hour) : defined_moment->tm_hour; // check the hour-range
-            defined_moment->tm_min = (choosen_suntime->tm_min - tmp_time.tm_min);
-            defined_moment->tm_min = (defined_moment->tm_min < 0) ? (60 + defined_moment->tm_min) : defined_moment->tm_min; // check the min-range
-            defined_moment->tm_sec = (choosen_suntime->tm_sec - tmp_time.tm_sec);
-            defined_moment->tm_sec = (defined_moment->tm_sec < 0) ? (60 + defined_moment->tm_sec) : defined_moment->tm_sec; // check the sec-range
-            break;
-        }
-        case ISSUNSTATE_AFTER_MODE:
-        {
-            TRACE_S("offset : After");
-            defined_moment->tm_hour = (choosen_suntime->tm_hour + tmp_time.tm_hour);
-            defined_moment->tm_hour = (defined_moment->tm_hour > 23) ? (defined_moment->tm_hour - 24) : defined_moment->tm_hour; // check the hour-range
-            defined_moment->tm_min = (choosen_suntime->tm_min + tmp_time.tm_min);
-            defined_moment->tm_min = (defined_moment->tm_min > 59) ? (defined_moment->tm_min - 60) : defined_moment->tm_min; // check the min-range
-            defined_moment->tm_sec = (choosen_suntime->tm_sec + tmp_time.tm_sec);
-            defined_moment->tm_sec = (defined_moment->tm_sec > 59) ? (defined_moment->tm_sec - 60) : defined_moment->tm_sec; // check the sec-range
-            break;
-        }
-        case ISSUNSTATE_UNDEFINED:
-        {
-            TRACE_D(" INVALID isSunState_offset_type ... No time-offset added.");
-            break;
-        }
-        }
-    }
-}
 
 uint8_t issunstate_get_suntime(l_scenes_list_v2_t *scene_node, l_fields_v2_t *curr_field, struct tm *info, uint8_t curr_sunstate_mode)
 {
@@ -765,6 +531,7 @@ uint8_t issunstate_get_suntime(l_scenes_list_v2_t *scene_node, l_fields_v2_t *cu
     }
     return flag_check;
 }
+
 uint8_t issunstate_get_offs_tmval(l_scenes_list_v2_t *scene_node, l_fields_v2_t *curr_field, struct tm *info, uint8_t curr_sunstate_mode)
 {
     uint8_t flag_check = 0;
@@ -793,6 +560,7 @@ uint8_t issunstate_get_offs_tmval(l_scenes_list_v2_t *scene_node, l_fields_v2_t 
     }
     return flag_check;
 }
+
 uint8_t issunstate_eval_weekdays(l_scenes_list_v2_t *scene_node, l_fields_v2_t *curr_field, struct tm *info, uint8_t curr_sunstate_mode)
 {
     uint8_t flag_check = 0;
@@ -803,6 +571,7 @@ uint8_t issunstate_eval_weekdays(l_scenes_list_v2_t *scene_node, l_fields_v2_t *
     }
     return flag_check;
 }
+
 uint8_t issunstate_eval_days(l_scenes_list_v2_t *scene_node, l_fields_v2_t *curr_field, struct tm *info, uint8_t curr_sunstate_mode)
 {
     uint8_t flag_check = 0;
@@ -813,6 +582,7 @@ uint8_t issunstate_eval_days(l_scenes_list_v2_t *scene_node, l_fields_v2_t *curr
     }
     return flag_check;
 }
+
 uint8_t issunstate_eval_range(l_scenes_list_v2_t *scene_node, l_fields_v2_t *curr_field, struct tm *info, uint8_t curr_sunstate_mode)
 {
     uint8_t flag_check = 0;
@@ -828,6 +598,7 @@ uint8_t issunstate_eval_range(l_scenes_list_v2_t *scene_node, l_fields_v2_t *cur
     }
     return flag_check;
 }
+
 uint8_t issunstate_check_mdrn(uint8_t sunstate_mode, const char *range_type, struct tm *info, struct tm *defined_moment)
 {
     uint8_t ret = 0;
@@ -942,6 +713,7 @@ int issunstate_check_flag_result(l_scenes_list_v2_t *scene_node, struct tm *info
 
     return ret;
 }
+
 //--------------------------- ezlopi_scene_when_is_date_range ----------------------------------------
 void isdate_range_get_tm(l_fields_v2_t *curr_field, struct tm *tmp_tm)
 {
@@ -958,6 +730,7 @@ void isdate_range_get_tm(l_fields_v2_t *curr_field, struct tm *tmp_tm)
         }
     }
 }
+
 void isdate_range_get_startday(l_fields_v2_t *curr_field, struct tm *tmp_tm)
 {
     if (EZLOPI_VALUE_TYPE_INT == curr_field->value_type)
@@ -965,6 +738,7 @@ void isdate_range_get_startday(l_fields_v2_t *curr_field, struct tm *tmp_tm)
         tmp_tm->tm_mday = (curr_field->field_value.u_value.value_double) ? (int)(curr_field->field_value.u_value.value_double) : 1;
     }
 }
+
 void isdate_range_get_endday(l_fields_v2_t *curr_field, struct tm *tmp_tm)
 {
     if (EZLOPI_VALUE_TYPE_INT == curr_field->value_type)
@@ -972,6 +746,7 @@ void isdate_range_get_endday(l_fields_v2_t *curr_field, struct tm *tmp_tm)
         tmp_tm->tm_mday = (curr_field->field_value.u_value.value_double) ? (int)(curr_field->field_value.u_value.value_double) : 31;
     }
 }
+
 void isdate_range_get_startmonth(l_fields_v2_t *curr_field, struct tm *tmp_tm)
 {
     if (EZLOPI_VALUE_TYPE_INT == curr_field->value_type)
@@ -979,6 +754,7 @@ void isdate_range_get_startmonth(l_fields_v2_t *curr_field, struct tm *tmp_tm)
         tmp_tm->tm_mon = (curr_field->field_value.u_value.value_double) ? (int)(curr_field->field_value.u_value.value_double) : 1;
     }
 }
+
 void isdate_range_get_endmonth(l_fields_v2_t *curr_field, struct tm *tmp_tm)
 {
     if (EZLOPI_VALUE_TYPE_INT == curr_field->value_type)
@@ -986,6 +762,7 @@ void isdate_range_get_endmonth(l_fields_v2_t *curr_field, struct tm *tmp_tm)
         tmp_tm->tm_mon = (curr_field->field_value.u_value.value_double) ? (int)(curr_field->field_value.u_value.value_double) : 12;
     }
 }
+
 void isdate_range_get_startyear(l_fields_v2_t *curr_field, struct tm *tmp_tm)
 {
     if (EZLOPI_VALUE_TYPE_INT == curr_field->value_type)
@@ -993,6 +770,7 @@ void isdate_range_get_startyear(l_fields_v2_t *curr_field, struct tm *tmp_tm)
         tmp_tm->tm_year = (curr_field->field_value.u_value.value_double) ? (int)(curr_field->field_value.u_value.value_double) : 1;
     }
 }
+
 void isdate_range_get_endyear(l_fields_v2_t *curr_field, struct tm *tmp_tm)
 {
     if (EZLOPI_VALUE_TYPE_INT == curr_field->value_type)
@@ -1040,6 +818,7 @@ uint8_t isdate_range_check_tm(struct tm *start, struct tm *end, struct tm *info)
 end:
     return ret;
 }
+
 uint8_t isdate_range_check_day(struct tm *start, struct tm *end, struct tm *info)
 {
     uint8_t ret = 0;
@@ -1053,6 +832,7 @@ uint8_t isdate_range_check_day(struct tm *start, struct tm *end, struct tm *info
     }
     return ret;
 }
+
 uint8_t isdate_range_check_month(struct tm *start, struct tm *end, struct tm *info)
 {
     uint8_t ret = 0;
@@ -1066,6 +846,7 @@ uint8_t isdate_range_check_month(struct tm *start, struct tm *end, struct tm *in
     }
     return ret;
 }
+
 uint8_t isdate_range_check_year(struct tm *start, struct tm *end, struct tm *info)
 {
     uint8_t ret = 0;
@@ -1079,6 +860,7 @@ uint8_t isdate_range_check_year(struct tm *start, struct tm *end, struct tm *inf
     }
     return ret;
 }
+
 int isdate_range_check_flag_result(uint8_t flag_check)
 {
     const uint8_t TIME_FLAG = (1 << 0);
@@ -1094,32 +876,7 @@ int isdate_range_check_flag_result(uint8_t flag_check)
     return ret;
 }
 
-//-----------------------------------------------------------------------------------------------------
-//-----------------------------------------------------------------------------------------------------
-/* This function to extract the result of 'AND' when_blocks */
-static bool __and_when_block_condition(l_scenes_list_v2_t *scene_node, l_when_block_v2_t *when_block)
-{
-    bool transition_state = 1; // to make valid judgements
-    l_when_block_v2_t *value_when_block = when_block->fields->field_value.u_value.when_block;
-    while (value_when_block)
-    {
-        f_scene_method_v2_t scene_method = ezlopi_scene_get_method_v2(value_when_block->block_options.method.type);
-        if (scene_method)
-        {
-            transition_state &= scene_method(scene_node, (void *)value_when_block);
-            if (!transition_state)
-            {
-                break;
-            }
-        }
-        value_when_block = value_when_block->next;
-    }
-    return transition_state;
-}
-//-----------------------------------------------------------------------------------------------------
-
 //------------------------------- ezlopi_scene_when_function_method -----------------------------------
-
 int when_function_for_opr(l_scenes_list_v2_t *scene_node, l_when_block_v2_t *when_block, cJSON *cj_func_opr)
 {
     // TRACE_W("for_least");
@@ -1173,6 +930,7 @@ int when_function_for_opr(l_scenes_list_v2_t *scene_node, l_when_block_v2_t *whe
     }
     return ret;
 }
+
 int when_function_for_repeat(l_scenes_list_v2_t *scene_node, l_when_block_v2_t *when_block, cJSON *cj_func_opr)
 {
     int ret = 0;
@@ -1224,6 +982,7 @@ int when_function_for_repeat(l_scenes_list_v2_t *scene_node, l_when_block_v2_t *
 
     return ret;
 }
+
 int when_function_for_follow(l_scenes_list_v2_t *scene_node, l_when_block_v2_t *when_block, cJSON *cj_func_opr)
 {
     int ret = 0;
@@ -1273,6 +1032,7 @@ int when_function_for_follow(l_scenes_list_v2_t *scene_node, l_when_block_v2_t *
 
     return ret;
 }
+
 int when_function_for_pulse(l_scenes_list_v2_t *scene_node, l_when_block_v2_t *when_block, cJSON *cj_func_opr)
 {
     int ret = 0;
@@ -1386,6 +1146,7 @@ int when_function_for_pulse(l_scenes_list_v2_t *scene_node, l_when_block_v2_t *w
 
     return ret;
 }
+
 int when_function_for_latch(l_scenes_list_v2_t *scene_node, l_when_block_v2_t *when_block, cJSON *cj_func_opr)
 {
     int ret = 0;
@@ -1593,6 +1354,502 @@ int isdeviceitem_group_value_check(l_scenes_list_v2_t *scene_node, uint32_t devi
     return ret;
 }
 
+int isitemstate_changed(s_item_exp_data_t *new_extract_data, l_fields_v2_t *start_field, l_fields_v2_t *finish_field, l_scenes_list_v2_t *scene_node)
+{
+    int ret = 0;
+    s_item_exp_data_t *prev_extract_data = (s_item_exp_data_t *)(scene_node->when_block->fields->user_arg);
+    if (new_extract_data) // new vs old data
+    {
+        uint32_t flag = 0;
+        // ---> New flag= (000) : ---> 1. compare 'new_extract_data' with 'start_field  / ANY'  ---> if true ; start_flag =1 ; ---> store data
+        // --> 1.a . if start_field = Any ; start_flag =1 & return 'true' |  Else compare
+        // -----> For flag= (001): ------> 2. compare 'new_extract_data' with 'finish_field / ANY'  -----> if true ; flag = (011) ; ----> store data ;  flag = (111) : ---->
+        // ------> 2.a . if finish = Any ; start_flag =1 & return 'true' |  Else compare
+        // --------> For flag = (111) : --------> 3. if(start_field & final_field == NULL or 'ANY') ? exit ; else, flag = (000).
+
+        if (NULL == prev_extract_data)
+        {
+            flag |= __isitemState_vs_field_compare(new_extract_data, start_field, 0);
+            // TRACE_D("First-time check.... flag=%08x", flag);
+        }
+        else
+        {
+            flag = prev_extract_data->status;
+            // TRACE_I("# Before comparision : status_flag=%08x", flag);
+            switch (flag) // this says what to do next
+            {
+            case 0: // no condition match   ---> check the start condition only.
+            {
+                // TRACE_D("checking start conditon");
+                flag |= __isitemState_vs_field_compare(prev_extract_data, start_field, 0);
+                break;
+            }
+            case (BIT0): // Only start condition activated ; ----> so check for finish condition
+            {
+                // TRACE_D("checking finish conditon");
+                flag |= __isitemState_vs_field_compare(new_extract_data, finish_field, 1);
+
+                if (flag == (BIT1 | BIT0))
+                {
+                    // activate BIT2 in status ; if both start and finish condition are satisfied.
+                    flag |= BIT2;
+                }
+                break;
+            }
+            case (BIT1 | BIT0): // condition match but not activated [or reset] ---> need to active here
+            {
+                // TRACE_I("====>  pre-state : (011) --> activating");
+                flag |= BIT2;
+                break;
+            }
+            case (BIT2 | BIT1 | BIT0): // all condition matched and activated  ---> check if state have changed --> if changed , reset activation flag
+            {
+#warning "need to optimize this case";
+                // comparing 'start'
+                if (NULL != start_field)
+                {
+                    if (!(BIT0 & __isitemState_vs_field_compare(prev_extract_data, start_field, 0))) // if BIT0 = 0;
+                    {
+                        flag &= (0 << 2);
+                        // TRACE_I(" HERE :- Reseting the 'BIT2' ");
+                    }
+                    else
+                    {
+                        // TRACE_D("start or finish condition is still satisfied.... cannot reset 'BIT2'");
+                    }
+                }
+                else // 'ANY'
+                {
+                    if (!____old_vs_new_extract_data(new_extract_data, prev_extract_data))
+                    {
+                        flag &= (0 << 2);
+                        // TRACE_I(" HERE :- Reseting the 'BIT2' ");
+                    }
+                    else
+                    {
+                        // TRACE_D(" new-data == old-data");
+                    }
+                }
+
+                // comparing 'finish'
+                if (NULL != finish_field)
+                {
+                    if (!(BIT1 & __isitemState_vs_field_compare(new_extract_data, finish_field, 1))) // if BIT0 = 0;
+                    {
+                        flag &= (0 << 2);
+                        // TRACE_I(" HERE :- Reseting the 'BIT2' ");
+                    }
+                    else
+                    {
+                        // TRACE_D("start or finish condition is still satisfied.... cannot reset 'BIT2'");
+                    }
+                }
+                else // 'ANY'
+                {
+                    if (!____old_vs_new_extract_data(new_extract_data, prev_extract_data))
+                    {
+                        flag &= (0 << 2);
+                        // TRACE_I(" HERE :- Reseting the 'BIT2' ");
+                    }
+                    else
+                    {
+                        // TRACE_D(" new-data == old-data");
+                    }
+                }
+                break;
+            }
+            default: // all remaining conditon are invalid ; So 'Reset' all flags and start again in next iteration.
+            {
+                // TRACE_D("Reseting.... to start fresh");
+                // flag = 0;
+                break;
+            }
+            }
+        }
+
+        // assign latest flag to new-structure.
+        new_extract_data->status = flag;
+
+        // Store the 'new-extracted' data
+        if (NULL == scene_node->when_block->fields->user_arg)
+        {
+            // TRACE_S("---> Creating new structure");
+            s_item_exp_data_t *tmp_struct = ezlopi_malloc(__FUNCTION__, sizeof(s_item_exp_data_t));
+            if (tmp_struct)
+            {
+                memset(tmp_struct, 0, sizeof(s_item_exp_data_t));
+                __replace_old_with_new_data_val(new_extract_data, tmp_struct);
+                scene_node->when_block->fields->user_arg = (void *)tmp_struct;
+            }
+            else
+            {
+                TRACE_E("Malloc failed!!");
+            }
+        }
+        else
+        {
+            // TRACE_W("---> Replacing old extract data");
+            __replace_old_with_new_data_val(new_extract_data, (scene_node->when_block->fields->user_arg));
+        }
+
+        // TRACE_W("#### Final..... flag result=%08x  ####", flag);
+        if (flag & BIT2)
+        {
+            // Also return 1 for 'then-method'
+            // TRACE_I("====> Return 1");
+            ret = 1;
+        }
+    }
+    else
+    {
+        TRACE_E("new_extract_data == NULL");
+    }
+    return ret;
+}
+
+/*******************************************************************************
+ *                          Static Function Definitions
+ *******************************************************************************/
+static int __compare_item_values(l_ezlopi_item_t *curr_item, l_fields_v2_t *value_field)
+{
+    int ret = 0;
+    cJSON *cj_tmp_value = cJSON_CreateObject(__FUNCTION__);
+    if (cj_tmp_value)
+    {
+        curr_item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, curr_item, (void *)cj_tmp_value, NULL);
+        cJSON *cj_value = cJSON_GetObjectItem(__FUNCTION__, cj_tmp_value, ezlopi_value_str);
+        if (cj_value)
+        {
+            switch (cj_value->type)
+            {
+            case cJSON_True:
+            {
+                if (true == value_field->field_value.u_value.value_bool)
+                {
+                    ret = 1;
+                }
+                break;
+            }
+            case cJSON_False:
+            {
+                if (false == value_field->field_value.u_value.value_bool)
+                {
+                    ret = 1;
+                }
+                break;
+            }
+            case cJSON_Number:
+            {
+                if (cj_value->valuedouble == value_field->field_value.u_value.value_double)
+                {
+                    ret = 1;
+                }
+                break;
+            }
+            case cJSON_String:
+            {
+                if (EZPI_STRNCMP_IF_EQUAL(cj_value->valuestring, value_field->field_value.u_value.value_string, strlen(cj_value->valuestring), strlen(value_field->field_value.u_value.value_string)))
+                {
+                    ret = 1;
+                }
+                break;
+            }
+            default:
+            {
+                TRACE_E("Value type mis-matched!");
+            }
+            }
+        }
+
+        cJSON_Delete(__FUNCTION__, cj_tmp_value);
+    }
+
+    return ret;
+}
+
+static uint8_t isdate_check_endweek_conditon(e_isdate_modes_t mode_type, struct tm *info)
+{
+    uint8_t ret = 0;
+    static uint8_t _last_day_of_curr_month = 0;
+    static int _starting_date_of_last_week = -1;
+    // filter out the first 22 days ; which do-not lie in last week of the month
+    if (info->tm_mday > 22)
+    {
+        // 1. Find out the 'valid' starting date of last week ( return -1 , if invalid )
+        if (-1 == _starting_date_of_last_week)
+        {
+            //-------------------------------------------------------------------
+            // 1.1 find the nearest-prev sunday and assign it.
+            // for this calculation dont change default 'info->tm_wday' -> '0-6'
+            switch (info->tm_wday)
+            {
+            case 1: // monday
+                _starting_date_of_last_week = info->tm_mday - 1;
+                break;
+            case 2: // tuesday
+                _starting_date_of_last_week = info->tm_mday - 2;
+                break;
+            case 3: // wednasday
+                _starting_date_of_last_week = info->tm_mday - 3;
+                break;
+            case 4: // thursday
+                _starting_date_of_last_week = info->tm_mday - 4;
+                break;
+            case 5: // friday
+                _starting_date_of_last_week = info->tm_mday - 5;
+                break;
+            case 6: // saturday
+                _starting_date_of_last_week = info->tm_mday - 6;
+                break;
+            default:
+                _starting_date_of_last_week = info->tm_mday;
+                break;
+            }
+            TRACE_I("sunday :%dth_Day ", _starting_date_of_last_week);
+            //-------------------------------------------------------------------
+            // 1.2 validate the generated sunday number
+            switch (info->tm_mon)
+            {
+            case 1: // FEB
+            {
+                int year = info->tm_year + 1900;
+                if ((0 == (year % 4)) && ((0 == (year % 400)) || (0 != (year % 100))))
+                {
+                    _starting_date_of_last_week = ((29 - _starting_date_of_last_week) < 7) ? _starting_date_of_last_week : -1; // if this sunday's day_num lies within last 7-days of the month ; return this sunday's date
+                    _last_day_of_curr_month = 29;
+                }
+                else // non-leap years
+                {
+                    _starting_date_of_last_week = ((28 - _starting_date_of_last_week) < 7) ? _starting_date_of_last_week : -1; // if this sunday's day_num lies within last 7-days of the month ; return this sunday's date
+                    _last_day_of_curr_month = 28;
+                }
+
+                break;
+            }
+            case 3:  // APR
+            case 5:  // JUN
+            case 8:  // SEP
+            case 10: // NOV
+            {
+                _starting_date_of_last_week = ((30 - _starting_date_of_last_week) < 7) ? _starting_date_of_last_week : -1;
+                _last_day_of_curr_month = 30;
+                break;
+            }
+            default: // JAN , MAR , MAY , JULY , AUG , OCT , DEC
+            {
+                _starting_date_of_last_week = ((31 - _starting_date_of_last_week) < 7) ? _starting_date_of_last_week : -1;
+                _last_day_of_curr_month = 31;
+                break;
+            }
+            }
+        }
+
+        // 2. Now to compare today's date and produce result ( if not -1 )
+        if (-1 != _starting_date_of_last_week)
+        {
+            // TRACE_S(" Last week of [%d] starts from [%d] :", info->tm_mon, _starting_date_of_last_week);
+            if (ISDATE_YEAR_WEEKS_MODE == mode_type) // last week of the year
+            {
+                if ((11 == info->tm_mon) && (info->tm_mday >= _starting_date_of_last_week))
+                {
+                    if (info->tm_mday >= _last_day_of_curr_month)
+                    { // refresh the calculation flag '_starting_date_of_last_week'
+                        _starting_date_of_last_week = -1;
+                    }
+                    ret = (1 << 3);
+                }
+            }
+            else if (ISDATE_WEEKS_MODE == mode_type) // last week of the month
+            {
+                if (info->tm_mday >= _starting_date_of_last_week)
+                {
+                    if (info->tm_mday >= _last_day_of_curr_month)
+                    { // refresh the calculation flag '_starting_date_of_last_week'
+                        _starting_date_of_last_week = -1;
+                    }
+                    ret = (1 << 3);
+                }
+            }
+        }
+    }
+    return ret;
+}
+
+static uint8_t isdate_find_nth_week_curr_month(struct tm *info)
+{
+    // 2. find the fisrt day in this month
+    uint8_t tmp_week_num = 1; // starts with 1 ; since are already in one of the week-count
+    // for this calculation dont change default 'info->tm_wday' -> '0-6'
+    int tmp_weekday_of_curr_month = (info->tm_wday); // 0-6 ; sun = 0
+    for (uint8_t i = (info->tm_mday); i > 1; i--)    // total_days_in_curr_month - 1
+    {
+        if (1 == tmp_weekday_of_curr_month) // if 'monday' ; add count
+        {
+            tmp_week_num++;
+        }
+        tmp_weekday_of_curr_month--;
+        if (0 > tmp_weekday_of_curr_month)
+        {
+            tmp_weekday_of_curr_month = 6; // sunday -> saturday
+        }
+    }
+    // TRACE_S("First day in current month = %d", tmp_weekday_of_curr_month);
+    // TRACE_S("[1-7] : %dth_Day  lies in week[%dth] of the current month", (info->tm_wday), tmp_week_num);
+    return tmp_week_num;
+}
+
+static void issunsate_update_sunstate_tm(int tm_mday, s_sunstate_data_t *user_data)
+{
+    if (tm_mday && user_data)
+    {
+        char tmp_url[100] = {0};
+        char tmp_headers[] = "Host: api.sunrisesunset.io\r\nAccept: */*\r\nConnection: keep-alive\r\n";
+        char tmp_web_server[] = "api.sunrisesunset.io";
+        char *lat_long_vals = ezlopi_nvs_read_latidtude_longitude();
+        if (lat_long_vals)
+        {
+            TRACE_S("long_lat_co-ordinate : %s", lat_long_vals);
+            snprintf(tmp_url, 95, "%s", "https://api.sunrisesunset.io/json?lat=27.700769&lng=85.300140");
+            ezlopi_free(__FUNCTION__, lat_long_vals);
+        }
+        else
+        {
+            // send httprequest to 'sunrisesunset.io' // use the latitude and longitude from NVS
+            snprintf(tmp_url, 95, "%s", "https://api.sunrisesunset.io/json?lat=27.700769&lng=85.300140");
+        }
+
+        s_ezlopi_core_http_mbedtls_t tmp_config = {
+            .method = HTTP_METHOD_GET,
+            .url = tmp_url,
+            .url_maxlen = sizeof(tmp_url),
+            .web_port = 443,
+            .header = tmp_headers,
+            .header_maxlen = sizeof(tmp_headers),
+            .web_server = tmp_web_server,
+            .web_server_maxlen = sizeof(tmp_web_server),
+            .response = NULL,
+            .response_maxlen = 0,
+        };
+        /*Make API call here and extract the suntime[according to 'user_data->sunstate_mode']*/
+
+        ezlopi_core_http_mbedtls_req(&tmp_config);
+        // e.g. after valid extraction
+        user_data->curr_tm_day = tm_mday;                                                    // this stores day for which data is extracted
+        user_data->choosen_suntime.tm_hour = 5 + ((user_data->sunstate_mode == 2) ? 12 : 0); // sunrise = 1 ; sunset = 2
+        user_data->choosen_suntime.tm_min = 48;
+        user_data->choosen_suntime.tm_sec = 42;
+
+        // now check if sunset and sunrise time are not zero
+        if ((0 == user_data->choosen_suntime.tm_hour) &&
+            (0 == user_data->choosen_suntime.tm_min) &&
+            (0 == user_data->choosen_suntime.tm_sec))
+        {
+            TRACE_E(" Failed... clearing 'sunrise/sunset tm_mday'.. ");
+            user_data->curr_tm_day = 0;
+        }
+    }
+}
+
+static void issunstate_add_offs(e_issunstate_offset_t tmoffs_type, struct tm *choosen_suntime, struct tm *defined_moment, const char *tm_offs_val)
+{
+    if (choosen_suntime && defined_moment && tm_offs_val) // choosen_suntime => sunrise or sunset
+    {
+        // Default values to store start and end boundries
+        struct tm tmp_time = {0};
+
+        // Nox, extract & add :'tm_offs_val'
+        char time_diff[10];
+        snprintf(time_diff, 10, "%s", tm_offs_val);
+        time_diff[9] = '\0';
+        char *ptr1 = NULL;
+        char *ptr2 = NULL;
+        if (0 != strlen(time_diff))
+        {
+            tmp_time.tm_hour = strtoul(time_diff, &ptr1, 10);
+            if (NULL != ptr1)
+            {
+                tmp_time.tm_min = strtoul(ptr1 + 1, &ptr2, 10);
+                if (NULL != ptr2)
+                {
+                    tmp_time.tm_sec = strtoul(ptr2 + 1, NULL, 10);
+                }
+                else // only has minutes and seconds
+                {
+                    tmp_time.tm_sec = tmp_time.tm_min;
+                    tmp_time.tm_min = tmp_time.tm_hour;
+                    tmp_time.tm_hour = 0;
+                }
+            }
+            else // only has seconds
+            {
+                tmp_time.tm_sec = tmp_time.tm_hour;
+                tmp_time.tm_min = 0;
+                tmp_time.tm_hour = 0;
+            }
+        }
+        // Combined  'tm_offs_val' & 'curr_suntime'
+        switch (tmoffs_type)
+        {
+        case ISSUNSTATE_INTIME_MODE:
+        {
+            TRACE_S("offset : Intime");
+            defined_moment->tm_hour = choosen_suntime->tm_hour;
+            defined_moment->tm_min = choosen_suntime->tm_min;
+            defined_moment->tm_sec = choosen_suntime->tm_sec;
+            break;
+        }
+        case ISSUNSTATE_BEFORE_MODE:
+        {
+            TRACE_S("offset : Before");
+            defined_moment->tm_hour = (choosen_suntime->tm_hour - tmp_time.tm_hour);
+            defined_moment->tm_hour = (defined_moment->tm_hour < 0) ? (24 + defined_moment->tm_hour) : defined_moment->tm_hour; // check the hour-range
+            defined_moment->tm_min = (choosen_suntime->tm_min - tmp_time.tm_min);
+            defined_moment->tm_min = (defined_moment->tm_min < 0) ? (60 + defined_moment->tm_min) : defined_moment->tm_min; // check the min-range
+            defined_moment->tm_sec = (choosen_suntime->tm_sec - tmp_time.tm_sec);
+            defined_moment->tm_sec = (defined_moment->tm_sec < 0) ? (60 + defined_moment->tm_sec) : defined_moment->tm_sec; // check the sec-range
+            break;
+        }
+        case ISSUNSTATE_AFTER_MODE:
+        {
+            TRACE_S("offset : After");
+            defined_moment->tm_hour = (choosen_suntime->tm_hour + tmp_time.tm_hour);
+            defined_moment->tm_hour = (defined_moment->tm_hour > 23) ? (defined_moment->tm_hour - 24) : defined_moment->tm_hour; // check the hour-range
+            defined_moment->tm_min = (choosen_suntime->tm_min + tmp_time.tm_min);
+            defined_moment->tm_min = (defined_moment->tm_min > 59) ? (defined_moment->tm_min - 60) : defined_moment->tm_min; // check the min-range
+            defined_moment->tm_sec = (choosen_suntime->tm_sec + tmp_time.tm_sec);
+            defined_moment->tm_sec = (defined_moment->tm_sec > 59) ? (defined_moment->tm_sec - 60) : defined_moment->tm_sec; // check the sec-range
+            break;
+        }
+        case ISSUNSTATE_UNDEFINED:
+        {
+            TRACE_D(" INVALID isSunState_offset_type ... No time-offset added.");
+            break;
+        }
+        }
+    }
+}
+
+/* This function to extract the result of 'AND' when_blocks */
+static bool __and_when_block_condition(l_scenes_list_v2_t *scene_node, l_when_block_v2_t *when_block)
+{
+    bool transition_state = 1; // to make valid judgements
+    l_when_block_v2_t *value_when_block = when_block->fields->field_value.u_value.when_block;
+    while (value_when_block)
+    {
+        f_scene_method_v2_t scene_method = ezlopi_scene_get_method_v2(value_when_block->block_options.method.type);
+        if (scene_method)
+        {
+            transition_state &= scene_method(scene_node, (void *)value_when_block);
+            if (!transition_state)
+            {
+                break;
+            }
+        }
+        value_when_block = value_when_block->next;
+    }
+    return transition_state;
+}
+
 static uint8_t __isitemState_vs_field_compare(s_item_exp_data_t *new_extract_data, l_fields_v2_t *tmp_field, uint8_t bit_mode_position)
 {
     uint8_t flag = 0;
@@ -1770,6 +2027,7 @@ static void __replace_old_with_new_data_val(s_item_exp_data_t *new_extract_data,
         TRACE_E("Invalid operation.... null structure");
     }
 }
+
 static int ____old_vs_new_extract_data(s_item_exp_data_t *new_extract_data, s_item_exp_data_t *prev_extract_data)
 {
     int ret = 0;
@@ -1812,158 +2070,8 @@ static int ____old_vs_new_extract_data(s_item_exp_data_t *new_extract_data, s_it
     return ret; // if matched --> return 1
 }
 
-int isitemstate_changed(s_item_exp_data_t *new_extract_data, l_fields_v2_t *start_field, l_fields_v2_t *finish_field, l_scenes_list_v2_t *scene_node)
-{
-    int ret = 0;
-    s_item_exp_data_t *prev_extract_data = (s_item_exp_data_t *)(scene_node->when_block->fields->user_arg);
-    if (new_extract_data) // new vs old data
-    {
-        uint32_t flag = 0;
-        // ---> New flag= (000) : ---> 1. compare 'new_extract_data' with 'start_field  / ANY'  ---> if true ; start_flag =1 ; ---> store data
-        // --> 1.a . if start_field = Any ; start_flag =1 & return 'true' |  Else compare
-        // -----> For flag= (001): ------> 2. compare 'new_extract_data' with 'finish_field / ANY'  -----> if true ; flag = (011) ; ----> store data ;  flag = (111) : ---->
-        // ------> 2.a . if finish = Any ; start_flag =1 & return 'true' |  Else compare
-        // --------> For flag = (111) : --------> 3. if(start_field & final_field == NULL or 'ANY') ? exit ; else, flag = (000).
-
-        if (NULL == prev_extract_data)
-        {
-            flag |= __isitemState_vs_field_compare(new_extract_data, start_field, 0);
-            // TRACE_D("First-time check.... flag=%08x", flag);
-        }
-        else
-        {
-            flag = prev_extract_data->status;
-            // TRACE_I("# Before comparision : status_flag=%08x", flag);
-            switch (flag) // this says what to do next
-            {
-            case 0: // no condition match   ---> check the start condition only.
-            {
-                // TRACE_D("checking start conditon");
-                flag |= __isitemState_vs_field_compare(prev_extract_data, start_field, 0);
-                break;
-            }
-            case (BIT0): // Only start condition activated ; ----> so check for finish condition
-            {
-                // TRACE_D("checking finish conditon");
-                flag |= __isitemState_vs_field_compare(new_extract_data, finish_field, 1);
-
-                if (flag == (BIT1 | BIT0))
-                {
-                    // activate BIT2 in status ; if both start and finish condition are satisfied.
-                    flag |= BIT2;
-                }
-                break;
-            }
-            case (BIT1 | BIT0): // condition match but not activated [or reset] ---> need to active here
-            {
-                // TRACE_I("====>  pre-state : (011) --> activating");
-                flag |= BIT2;
-                break;
-            }
-            case (BIT2 | BIT1 | BIT0): // all condition matched and activated  ---> check if state have changed --> if changed , reset activation flag
-            {
-#warning "need to optimize this case";
-                // comparing 'start'
-                if (NULL != start_field)
-                {
-                    if (!(BIT0 & __isitemState_vs_field_compare(prev_extract_data, start_field, 0))) // if BIT0 = 0;
-                    {
-                        flag &= (0 << 2);
-                        // TRACE_I(" HERE :- Reseting the 'BIT2' ");
-                    }
-                    else
-                    {
-                        // TRACE_D("start or finish condition is still satisfied.... cannot reset 'BIT2'");
-                    }
-                }
-                else // 'ANY'
-                {
-                    if (!____old_vs_new_extract_data(new_extract_data, prev_extract_data))
-                    {
-                        flag &= (0 << 2);
-                        // TRACE_I(" HERE :- Reseting the 'BIT2' ");
-                    }
-                    else
-                    {
-                        // TRACE_D(" new-data == old-data");
-                    }
-                }
-
-                // comparing 'finish'
-                if (NULL != finish_field)
-                {
-                    if (!(BIT1 & __isitemState_vs_field_compare(new_extract_data, finish_field, 1))) // if BIT0 = 0;
-                    {
-                        flag &= (0 << 2);
-                        // TRACE_I(" HERE :- Reseting the 'BIT2' ");
-                    }
-                    else
-                    {
-                        // TRACE_D("start or finish condition is still satisfied.... cannot reset 'BIT2'");
-                    }
-                }
-                else // 'ANY'
-                {
-                    if (!____old_vs_new_extract_data(new_extract_data, prev_extract_data))
-                    {
-                        flag &= (0 << 2);
-                        // TRACE_I(" HERE :- Reseting the 'BIT2' ");
-                    }
-                    else
-                    {
-                        // TRACE_D(" new-data == old-data");
-                    }
-                }
-                break;
-            }
-            default: // all remaining conditon are invalid ; So 'Reset' all flags and start again in next iteration.
-            {
-                // TRACE_D("Reseting.... to start fresh");
-                // flag = 0;
-                break;
-            }
-            }
-        }
-
-        // assign latest flag to new-structure.
-        new_extract_data->status = flag;
-
-        // Store the 'new-extracted' data
-        if (NULL == scene_node->when_block->fields->user_arg)
-        {
-            // TRACE_S("---> Creating new structure");
-            s_item_exp_data_t *tmp_struct = ezlopi_malloc(__FUNCTION__, sizeof(s_item_exp_data_t));
-            if (tmp_struct)
-            {
-                memset(tmp_struct, 0, sizeof(s_item_exp_data_t));
-                __replace_old_with_new_data_val(new_extract_data, tmp_struct);
-                scene_node->when_block->fields->user_arg = (void *)tmp_struct;
-            }
-            else
-            {
-                TRACE_E("Malloc failed!!");
-            }
-        }
-        else
-        {
-            // TRACE_W("---> Replacing old extract data");
-            __replace_old_with_new_data_val(new_extract_data, (scene_node->when_block->fields->user_arg));
-        }
-
-        // TRACE_W("#### Final..... flag result=%08x  ####", flag);
-        if (flag & BIT2)
-        {
-            // Also return 1 for 'then-method'
-            // TRACE_I("====> Return 1");
-            ret = 1;
-        }
-    }
-    else
-    {
-        TRACE_E("new_extract_data == NULL");
-    }
-    return ret;
-}
-
 #endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
-//-----------------------------------------------------------------------------------------------------
+
+/*******************************************************************************
+ *                          End of File
+ *******************************************************************************/

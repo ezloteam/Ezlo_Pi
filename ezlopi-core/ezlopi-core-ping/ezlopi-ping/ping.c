@@ -307,3 +307,4 @@ void ping_deinit(void)
 }
 
 #endif /* LWIP_IPV4 && LWIP_RAW */
+

@@ -1,10 +1,62 @@
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+
+/**
+ * @file    main.c
+ * @brief   perform some function on data
+ * @author  John Doe
+ * @version 0.1
+ * @date    1st January 2024
+ */
+
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 #include <string.h>
 #include "ezlopi_util_trace.h"
 #include "ezlopi_hal_uart.h"
 #include "sensor_0066_other_R307_FingerPrint.h"
 #include "EZLOPI_USER_CONFIG.h"
 
-//----------------------------------------------------------------------------------------------------------------
+/*******************************************************************************
+ *                          Extern Data Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 // !< Custom tx-packet >
 typedef struct fingerprint_packet_t
 {
@@ -15,237 +67,28 @@ typedef struct fingerprint_packet_t
     uint8_t data[MAX_PACKET_LENGTH_VAL]; /* Inst_code + Data_content */
     uint8_t chk_sum[2];
 } fingerprint_packet_t;
-//---------------------------------------------------------------------------------------------------------------------------------
-// Function for Communication-Packet (Generation and Response).
-//---------------------------------------------------------------------------------------------------------------------------------
+
+/*******************************************************************************
+ *                          Static Function Prototypes
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Static Data Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Data Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Definitions
+ *******************************************************************************/
 
 /**
- * @brief This is a function generates/prepares appropriate transmission packets actions.
- *
- * @param txPacket(fingerprint_packet_t*): Address to a buffer, that stores the generated transmission packet
- * @param PID(uint8_t): Packet Identifier Type
- * @param length(uint16_t): Packet_length value (Combined_data only)
- * @param Combined_data(uint8_t*): Address to buffer containing, [instruction code + data values (if any)]
- *
- * @return Success=[>0] / Fail=[0].
+ * @brief Global/extern function template example
+ * Convention : Use capital letter for initial word on extern function
+ * @param arg
  */
-static void generate_packet(fingerprint_packet_t* txPacket, uint8_t PID, uint16_t length, uint8_t* Combined_data)
-{
-    //------------ PID ------------------------------------------------------------------------------------------------------
-    txPacket->PID = PID;
-    //------------ Packet length -------------------------------------------------------------------------------------------
-    length = length + 2;
-    txPacket->Packet_len[0] = (uint8_t)(length >> 8);   /*MSB [PID + P_LEN + (data_fields)] should not exceed 256bytes*/
-    txPacket->Packet_len[1] = (uint8_t)(length & 0xFF); /*LSB [PID + P_LEN + (data_fields)] should not exceed 256bytes*/
-    length = length - 2;
-    //------------ Inst_code + Data_content  --------------------------------------------------------------------------------
-    if (length < MAX_PACKET_LENGTH_VAL)
-    {
-        memcpy(&(txPacket->data), Combined_data, ((int)length)); // Copying only data section
-    }
-    else
-    {
-        memcpy(&(txPacket->data), Combined_data, (MAX_PACKET_LENGTH_VAL - 2));
-    }
-    //------------ Checksum -------------------------------------------------------------------------------------------------
-    // CHK_SUM calculation
-    uint16_t sum = (uint16_t)PID + ((uint16_t)(txPacket->Packet_len[0] << 8) + (uint16_t)(txPacket->Packet_len[1] & 0xFF)); // adding
-    for (uint8_t i = 0; i < (int)length; i++)
-    {
-        sum += (uint16_t)(txPacket->data[i]);
-    }
-    txPacket->chk_sum[0] = (uint8_t)(sum >> 8);   // MSB
-    txPacket->chk_sum[1] = (uint8_t)(sum & 0xFF); // LSB
-    //----------------------------------------------------------------------------------------------------------------------
-}
-/**
- * @brief This is a function to execute uart_packet transfer actions :- through UART_buffer
- *
- * @param uart_channel_num(int): uart_channel number
- * @param txPacket(fingerprint_packet_t*): Address to the buffer holding, Transmission packet
- *
- * @return Success=[>0] / Fail=[0].
- */
-static int send_uart_packets(int uart_channel_num, fingerprint_packet_t* txPacket)
-{
-    int ret = 0;
-    int len = ((int)((txPacket->Packet_len[0] << 8) + (txPacket->Packet_len[1] & 0xFF)) - 2);
-
-    // 1. Header seciton
-    ret = uart_write_bytes(uart_channel_num, txPacket->header_code, 2);
-    ret = uart_write_bytes(uart_channel_num, txPacket->device_address, 4);
-    ret = uart_write_bytes(uart_channel_num, &(txPacket->PID), 1);
-    ret = uart_write_bytes(uart_channel_num, txPacket->Packet_len, 2);
-    // 2. data_section (Inst_code + Data_content)
-    ret = uart_write_bytes(uart_channel_num, &(txPacket->data), len);
-    // 3. Checksum
-    ret = uart_write_bytes(uart_channel_num, txPacket->chk_sum, 2);
-
-    //----------------------------------------------------------------------------------------------------------------------
-    uart_wait_tx_done(uart_channel_num, 100); // wait timeout is 100 RTOS ticks (TickType_t)
-    return ret;
-}
-
-/**
- * @brief This is a function to execute sequential actions :- generate packet and send_packet them through UART_buffer
- *
- * @param uart_channel_num(int): uart_channel number
- * @param PID(uint8_t): Packet Identifier Type
- * @param length(uint16_t): Packet_length value (Combined_data + chk_sum)
- * @param Combined_data(uint8_t*): Address to buffer containing, [instruction code + data values (if any)]
- *
- * @return Success=[true] / Fail=[false].
- */
-static bool SEND_PACKET(int uart_channel_num, uint8_t PID, uint16_t length, uint8_t* Combined_data)
-{
-    bool ret = false;
-    fingerprint_packet_t* txPacket = (fingerprint_packet_t*)ezlopi_malloc(__FUNCTION__, sizeof(fingerprint_packet_t));
-    if (txPacket)
-    {
-        txPacket->header_code[0] = FINGERPRINT_HEADER_MSB;
-        txPacket->header_code[1] = FINGERPRINT_HEADER_LSB;
-        txPacket->device_address[0] = txPacket->device_address[1] = txPacket->device_address[2] = txPacket->device_address[3] = FINGERPRINT_DEVICE_ADDR_BIT;
-
-        generate_packet(txPacket, PID, length, Combined_data);
-
-        if (FINGERPRINT_FAIL != send_uart_packets(uart_channel_num, txPacket))
-        {
-            ret = true;
-        }
-        ezlopi_free(__FUNCTION__, txPacket);
-    }
-    return ret;
-}
-
-/**
- * @brief Additional function that waits  for recieve_buffer to fill up, (utill 'time-out')  and return appropriate responses.
- *
- * @param (uint8_t*)recieved_buffer: Holds the address to a uart_buffer with recieved and filtered message
- * @param (uint32_t)timeout: Timeout(N*1ms) for uart message polling
- *
- * @return [FINGERPRINT_OK : Successful] // [FINGERPRINT_FAIL : Error]
- */
-static fingerprint_status_t __Response_function(uint8_t* recieved_buffer, uint32_t timeout)
-{
-    fingerprint_status_t F_res = FINGERPRINT_FAIL;
-    uint32_t start_time = esp_timer_get_time() / 1000;
-    uint32_t dummy_timer = 0;
-    while (dummy_timer <= timeout)
-    {
-        //------------ check if the recieved PID is ack packet  --------------------------------------------------------------------------------
-        if (FINGERPRINT_PID_ACKPACKET == recieved_buffer[0])
-        {
-            // TRACE_W(" ----> Response : PID : %d", recieved_buffer[0]);
-            break; // break away from while() , if we have the correct buffer values
-        }
-        dummy_timer = (esp_timer_get_time() / 1000) - start_time;
-        vTaskDelay(50 / portTICK_PERIOD_MS); // 200ms
-    }
-    //------------ Check 'Confirmation code' of the ack packet: And give response --------------------------------------------------------------------------------
-    if (!(dummy_timer > timeout) && (FINGERPRINT_PID_ACKPACKET == recieved_buffer[0]))
-    {
-        /**
-         * recieved_buffer[0] => PID
-         * recieved_buffer[1] => Package_len [MSB]
-         * recieved_buffer[2] => Package_len [LSB]
-         * recieved_buffer[3] => Confirmation_code  (1byte)
-         * recieved_buffer[4+0 ; {0 to (p_len-4)}] => data1
-         * recieved_buffer[4+1 ; {0 to (p_len-4)}] => data2
-         * ...
-         * recieved_buffer[N] = Checksum  (2byte)
-         */
-         /*check confirmation code*/
-        switch ((uint8_t)recieved_buffer[3])
-        {
-        case ACK_OK:
-            // TRACE_S("[.....Commad execution SUCCESS.....] ");
-            F_res = FINGERPRINT_OK;
-            break;
-        case ACK_ERR_RECV:
-            TRACE_E(".... ERR in recieving Package ... ");
-            break;
-        case ACK_ERR_DETECT_FP:
-            TRACE_E(".... ERR: Can't detect finger ... ");
-            break;
-        case ACK_ERR_ENROLL_FP:
-            TRACE_E(".... ERR: Failed to Collect/Enroll finger ... ");
-            break;
-        case ACK_ERR_DIS_FP:
-            TRACE_E(".... ERR: Failed to generate character file (distorted fingerprint-img) ... ");
-            break;
-        case ACK_ERR_SMALL_FP:
-            TRACE_E(".... ERR: Failed to generate character file (lackness of character point or over-smallness of fingerprint) ... ");
-            break;
-        case ACK_ERR_MATCH:
-            TRACE_E(".... ERR: Templates from both Charbuffers(1 & 2) arenot matching ... ");
-            break;
-        case ACK_ERR_NO_LIB_MATCH:
-            // TRACE_E(".... ERR: Not matching with the library (both the PageID and matching score are 0) ... ");
-            break;
-        case ACK_ERR_CMB_CHRFILE:
-            TRACE_E(".... ERR: Failed to combine the character files (character files donot belong to same finger) ... ");
-            break;
-        case ACK_ERR_ID_BYND_LIB:
-            TRACE_E(".... ERR: Addressed PageID is beyond the finger library ... ");
-            break;
-        case ACK_ERR_LOAD_CHR:
-            // TRACE_E(".... ERR: Failed to load temp/chr_file from finger library ... ");
-            break;
-        case ACK_ERR_UP_CHR:
-            TRACE_E(".... ERR: Failed to upload character_file (uploading template to computer) ... ");
-            break;
-        case ACK_ERR_DWN_IMG_CHR:
-            TRACE_E(".... ERR: Failed to recieve data packet (downloading image or character) ... ");
-            break;
-        case ACK_ERR_UP_IMG:
-            TRACE_E(".... ERR: Failed to upload image (uploading image to computer) ... ");
-            break;
-        case ACK_ERR_DEL:
-            TRACE_E(".... ERR: Failed to Delete (N)Templates From PageID ... ");
-            break;
-        case ACK_ERR_CLR:
-            TRACE_E(".... ERR: Failed to Clear all Templates From finger library ... ");
-            break;
-        case ACK_ERR_WRONG_PASS:
-            TRACE_E(".... ERR in Password .. ");
-            break;
-        case ACK_ERR_PRIM_IMG:
-            TRACE_E(".... ERR: Failed to generate IMG (lack of valid primary image) ... ");
-            break;
-        case ACK_ERR_STORE:
-            TRACE_E(".... ERR: When writing/storing template into flash library ... ");
-            break;
-        case ACK_ERR_WRNG_REGS:
-            TRACE_E(".... ERR: wrong register number .. ");
-            break;
-        case ACK_ERR_CONFIG:
-            TRACE_E(".... ERR: incorrect configuration of register ... ");
-            break;
-        case ACK_ERR_PAGE:
-            TRACE_E(".... ERR: wrong notepad page number ... ");
-            break;
-        case ACK_ERR_OP_FAIL:
-            TRACE_E(".... ERR: Failed to operate communication ... ");
-            break;
-        case ACK_ERR_DUP_FP:
-            TRACE_E(".... ERR: Duplicate fingerprint ... ");
-            break;
-        default:
-            TRACE_E(".... ERR: Unknown ... ");
-            break;
-        }
-    }
-    else
-    {
-        TRACE_W("SEND_PACKET: ....Time-out");
-    }
-    return F_res;
-}
-
-//---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// Function for Fingerprint Library
-//---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
 bool VerifyPwd(int uart_channel_num, uint32_t the_password, uint8_t* recieved_buffer, uint32_t timeout)
 {
     // Reset the recieving buffer before new data is to be extracted.
@@ -1383,3 +1226,233 @@ fingerprint_status_t r307_as606_fingerprint_config(l_ezlopi_item_t* item)
     }
     return F_res;
 }
+
+/*******************************************************************************
+ *                          Static Function Definitions
+ *******************************************************************************/
+/**
+ * @brief This is a function generates/prepares appropriate transmission packets actions.
+ *
+ * @param txPacket(fingerprint_packet_t*): Address to a buffer, that stores the generated transmission packet
+ * @param PID(uint8_t): Packet Identifier Type
+ * @param length(uint16_t): Packet_length value (Combined_data only)
+ * @param Combined_data(uint8_t*): Address to buffer containing, [instruction code + data values (if any)]
+ *
+ * @return Success=[>0] / Fail=[0].
+ */
+static void generate_packet(fingerprint_packet_t* txPacket, uint8_t PID, uint16_t length, uint8_t* Combined_data)
+{
+    //------------ PID ------------------------------------------------------------------------------------------------------
+    txPacket->PID = PID;
+    //------------ Packet length -------------------------------------------------------------------------------------------
+    length = length + 2;
+    txPacket->Packet_len[0] = (uint8_t)(length >> 8);   /*MSB [PID + P_LEN + (data_fields)] should not exceed 256bytes*/
+    txPacket->Packet_len[1] = (uint8_t)(length & 0xFF); /*LSB [PID + P_LEN + (data_fields)] should not exceed 256bytes*/
+    length = length - 2;
+    //------------ Inst_code + Data_content  --------------------------------------------------------------------------------
+    if (length < MAX_PACKET_LENGTH_VAL)
+    {
+        memcpy(&(txPacket->data), Combined_data, ((int)length)); // Copying only data section
+    }
+    else
+    {
+        memcpy(&(txPacket->data), Combined_data, (MAX_PACKET_LENGTH_VAL - 2));
+    }
+    //------------ Checksum -------------------------------------------------------------------------------------------------
+    // CHK_SUM calculation
+    uint16_t sum = (uint16_t)PID + ((uint16_t)(txPacket->Packet_len[0] << 8) + (uint16_t)(txPacket->Packet_len[1] & 0xFF)); // adding
+    for (uint8_t i = 0; i < (int)length; i++)
+    {
+        sum += (uint16_t)(txPacket->data[i]);
+    }
+    txPacket->chk_sum[0] = (uint8_t)(sum >> 8);   // MSB
+    txPacket->chk_sum[1] = (uint8_t)(sum & 0xFF); // LSB
+    //----------------------------------------------------------------------------------------------------------------------
+}
+/**
+ * @brief This is a function to execute uart_packet transfer actions :- through UART_buffer
+ *
+ * @param uart_channel_num(int): uart_channel number
+ * @param txPacket(fingerprint_packet_t*): Address to the buffer holding, Transmission packet
+ *
+ * @return Success=[>0] / Fail=[0].
+ */
+static int send_uart_packets(int uart_channel_num, fingerprint_packet_t* txPacket)
+{
+    int ret = 0;
+    int len = ((int)((txPacket->Packet_len[0] << 8) + (txPacket->Packet_len[1] & 0xFF)) - 2);
+
+    // 1. Header seciton
+    ret = uart_write_bytes(uart_channel_num, txPacket->header_code, 2);
+    ret = uart_write_bytes(uart_channel_num, txPacket->device_address, 4);
+    ret = uart_write_bytes(uart_channel_num, &(txPacket->PID), 1);
+    ret = uart_write_bytes(uart_channel_num, txPacket->Packet_len, 2);
+    // 2. data_section (Inst_code + Data_content)
+    ret = uart_write_bytes(uart_channel_num, &(txPacket->data), len);
+    // 3. Checksum
+    ret = uart_write_bytes(uart_channel_num, txPacket->chk_sum, 2);
+
+    //----------------------------------------------------------------------------------------------------------------------
+    uart_wait_tx_done(uart_channel_num, 100); // wait timeout is 100 RTOS ticks (TickType_t)
+    return ret;
+}
+
+/**
+ * @brief This is a function to execute sequential actions :- generate packet and send_packet them through UART_buffer
+ *
+ * @param uart_channel_num(int): uart_channel number
+ * @param PID(uint8_t): Packet Identifier Type
+ * @param length(uint16_t): Packet_length value (Combined_data + chk_sum)
+ * @param Combined_data(uint8_t*): Address to buffer containing, [instruction code + data values (if any)]
+ *
+ * @return Success=[true] / Fail=[false].
+ */
+static bool SEND_PACKET(int uart_channel_num, uint8_t PID, uint16_t length, uint8_t* Combined_data)
+{
+    bool ret = false;
+    fingerprint_packet_t* txPacket = (fingerprint_packet_t*)ezlopi_malloc(__FUNCTION__, sizeof(fingerprint_packet_t));
+    if (txPacket)
+    {
+        txPacket->header_code[0] = FINGERPRINT_HEADER_MSB;
+        txPacket->header_code[1] = FINGERPRINT_HEADER_LSB;
+        txPacket->device_address[0] = txPacket->device_address[1] = txPacket->device_address[2] = txPacket->device_address[3] = FINGERPRINT_DEVICE_ADDR_BIT;
+
+        generate_packet(txPacket, PID, length, Combined_data);
+
+        if (FINGERPRINT_FAIL != send_uart_packets(uart_channel_num, txPacket))
+        {
+            ret = true;
+        }
+        ezlopi_free(__FUNCTION__, txPacket);
+    }
+    return ret;
+}
+
+/**
+ * @brief Additional function that waits  for recieve_buffer to fill up, (utill 'time-out')  and return appropriate responses.
+ *
+ * @param (uint8_t*)recieved_buffer: Holds the address to a uart_buffer with recieved and filtered message
+ * @param (uint32_t)timeout: Timeout(N*1ms) for uart message polling
+ *
+ * @return [FINGERPRINT_OK : Successful] // [FINGERPRINT_FAIL : Error]
+ */
+static fingerprint_status_t __Response_function(uint8_t* recieved_buffer, uint32_t timeout)
+{
+    fingerprint_status_t F_res = FINGERPRINT_FAIL;
+    uint32_t start_time = esp_timer_get_time() / 1000;
+    uint32_t dummy_timer = 0;
+    while (dummy_timer <= timeout)
+    {
+        //------------ check if the recieved PID is ack packet  --------------------------------------------------------------------------------
+        if (FINGERPRINT_PID_ACKPACKET == recieved_buffer[0])
+        {
+            // TRACE_W(" ----> Response : PID : %d", recieved_buffer[0]);
+            break; // break away from while() , if we have the correct buffer values
+        }
+        dummy_timer = (esp_timer_get_time() / 1000) - start_time;
+        vTaskDelay(50 / portTICK_PERIOD_MS); // 200ms
+    }
+    //------------ Check 'Confirmation code' of the ack packet: And give response --------------------------------------------------------------------------------
+    if (!(dummy_timer > timeout) && (FINGERPRINT_PID_ACKPACKET == recieved_buffer[0]))
+    {
+        /**
+         * recieved_buffer[0] => PID
+         * recieved_buffer[1] => Package_len [MSB]
+         * recieved_buffer[2] => Package_len [LSB]
+         * recieved_buffer[3] => Confirmation_code  (1byte)
+         * recieved_buffer[4+0 ; {0 to (p_len-4)}] => data1
+         * recieved_buffer[4+1 ; {0 to (p_len-4)}] => data2
+         * ...
+         * recieved_buffer[N] = Checksum  (2byte)
+         */
+         /*check confirmation code*/
+        switch ((uint8_t)recieved_buffer[3])
+        {
+        case ACK_OK:
+            // TRACE_S("[.....Commad execution SUCCESS.....] ");
+            F_res = FINGERPRINT_OK;
+            break;
+        case ACK_ERR_RECV:
+            TRACE_E(".... ERR in recieving Package ... ");
+            break;
+        case ACK_ERR_DETECT_FP:
+            TRACE_E(".... ERR: Can't detect finger ... ");
+            break;
+        case ACK_ERR_ENROLL_FP:
+            TRACE_E(".... ERR: Failed to Collect/Enroll finger ... ");
+            break;
+        case ACK_ERR_DIS_FP:
+            TRACE_E(".... ERR: Failed to generate character file (distorted fingerprint-img) ... ");
+            break;
+        case ACK_ERR_SMALL_FP:
+            TRACE_E(".... ERR: Failed to generate character file (lackness of character point or over-smallness of fingerprint) ... ");
+            break;
+        case ACK_ERR_MATCH:
+            TRACE_E(".... ERR: Templates from both Charbuffers(1 & 2) arenot matching ... ");
+            break;
+        case ACK_ERR_NO_LIB_MATCH:
+            // TRACE_E(".... ERR: Not matching with the library (both the PageID and matching score are 0) ... ");
+            break;
+        case ACK_ERR_CMB_CHRFILE:
+            TRACE_E(".... ERR: Failed to combine the character files (character files donot belong to same finger) ... ");
+            break;
+        case ACK_ERR_ID_BYND_LIB:
+            TRACE_E(".... ERR: Addressed PageID is beyond the finger library ... ");
+            break;
+        case ACK_ERR_LOAD_CHR:
+            // TRACE_E(".... ERR: Failed to load temp/chr_file from finger library ... ");
+            break;
+        case ACK_ERR_UP_CHR:
+            TRACE_E(".... ERR: Failed to upload character_file (uploading template to computer) ... ");
+            break;
+        case ACK_ERR_DWN_IMG_CHR:
+            TRACE_E(".... ERR: Failed to recieve data packet (downloading image or character) ... ");
+            break;
+        case ACK_ERR_UP_IMG:
+            TRACE_E(".... ERR: Failed to upload image (uploading image to computer) ... ");
+            break;
+        case ACK_ERR_DEL:
+            TRACE_E(".... ERR: Failed to Delete (N)Templates From PageID ... ");
+            break;
+        case ACK_ERR_CLR:
+            TRACE_E(".... ERR: Failed to Clear all Templates From finger library ... ");
+            break;
+        case ACK_ERR_WRONG_PASS:
+            TRACE_E(".... ERR in Password .. ");
+            break;
+        case ACK_ERR_PRIM_IMG:
+            TRACE_E(".... ERR: Failed to generate IMG (lack of valid primary image) ... ");
+            break;
+        case ACK_ERR_STORE:
+            TRACE_E(".... ERR: When writing/storing template into flash library ... ");
+            break;
+        case ACK_ERR_WRNG_REGS:
+            TRACE_E(".... ERR: wrong register number .. ");
+            break;
+        case ACK_ERR_CONFIG:
+            TRACE_E(".... ERR: incorrect configuration of register ... ");
+            break;
+        case ACK_ERR_PAGE:
+            TRACE_E(".... ERR: wrong notepad page number ... ");
+            break;
+        case ACK_ERR_OP_FAIL:
+            TRACE_E(".... ERR: Failed to operate communication ... ");
+            break;
+        case ACK_ERR_DUP_FP:
+            TRACE_E(".... ERR: Duplicate fingerprint ... ");
+            break;
+        default:
+            TRACE_E(".... ERR: Unknown ... ");
+            break;
+        }
+    }
+    else
+    {
+        TRACE_W("SEND_PACKET: ....Time-out");
+    }
+    return F_res;
+}
+
+/*******************************************************************************
+ *                          End of File
+ *******************************************************************************/

@@ -1,3 +1,45 @@
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+
+/**
+ * @file    main.c
+ * @brief   perform some function on data
+ * @author  John Doe
+ * @version 0.1
+ * @date    1st January 2024
+ */
+
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
@@ -25,14 +67,26 @@
 #include "ezlopi_cloud_constants.h"
 #include "EZLOPI_USER_CONFIG.h"
 
-static l_ezlopi_scenes_script_t *script_head = NULL;
+/*******************************************************************************
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
+/*******************************************************************************
+ *                          Extern Function Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 typedef struct s_lua_scripts_modules
 {
     char *name;
     lua_CFunction func;
 } s_lua_scripts_modules_t;
 
+/*******************************************************************************
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static ezlopi_error_t __scripts_nvs_parse(void);
 static void __script_process(void* arg);
 static void __scripts_process_runner(void);
@@ -43,6 +97,24 @@ static const char * __script_report(lua_State *lua_state, int status);
 static void __exit_script_hook(lua_State *lua_state, lua_Debug *ar);
 static l_ezlopi_scenes_script_t *__scripts_create_node(uint32_t script_id, cJSON *cj_script);
 
+/*******************************************************************************
+ *                          Static Data Definitions
+ *******************************************************************************/
+static l_ezlopi_scenes_script_t *script_head = NULL;
+
+/*******************************************************************************
+ *                          Extern Data Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Definitions
+ *******************************************************************************/
+
+/**
+ * @brief Global/extern function template example
+ * Convention : Use capital letter for initial word on extern function
+ * @param arg
+ */
 l_ezlopi_scenes_script_t *ezlopi_scenes_scripts_get_head(void)
 {
     return script_head;
@@ -232,6 +304,9 @@ void ezlopi_scenes_scripts_init(void)
     __scripts_process_runner();
 }
 
+/*******************************************************************************
+ *                          Static Function Definitions
+ *******************************************************************************/
 static void __run_script(l_ezlopi_scenes_script_t *script_node)
 {
     if (script_node->code)
@@ -523,3 +598,7 @@ static void __load_custom_libs(lua_State *lua_state)
 }
 
 #endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+
+/*******************************************************************************
+ *                          End of File
+ *******************************************************************************/

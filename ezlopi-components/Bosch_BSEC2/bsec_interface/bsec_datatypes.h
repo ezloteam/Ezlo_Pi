@@ -283,7 +283,7 @@ typedef enum
      */
     BSEC_OUTPUT_SENSOR_HEAT_COMPENSATED_HUMIDITY = 15,
 
-	BSEC_OUTPUT_GAS_PERCENTAGE = 21,                        /*!< Percentage of min and max filtered gas value [%] */
+    BSEC_OUTPUT_GAS_PERCENTAGE = 21,                        /*!< Percentage of min and max filtered gas value [%] */
 
     /**
      * @brief Gas estimate output channel 1 [0-1]
@@ -292,9 +292,9 @@ typedef enum
      * In standard scan mode, the probability of H2S and non-H2S is provided by the variables BSEC_OUTPUT_GAS_ESTIMATE_1 & BSEC_OUTPUT_GAS_ESTIMATE_2 respectively. A maximum of 4 classes can be used by configuring using BME AI-studio.
      */
     BSEC_OUTPUT_GAS_ESTIMATE_1 = 22,
-	BSEC_OUTPUT_GAS_ESTIMATE_2 = 23,                        /*!< Gas estimate output channel 2 [0-1] */
-	BSEC_OUTPUT_GAS_ESTIMATE_3 = 24,                        /*!< Gas estimate output channel 3 [0-1] */
-	BSEC_OUTPUT_GAS_ESTIMATE_4 = 25,                        /*!< Gas estimate output channel 4 [0-1] */
+    BSEC_OUTPUT_GAS_ESTIMATE_2 = 23,                        /*!< Gas estimate output channel 2 [0-1] */
+    BSEC_OUTPUT_GAS_ESTIMATE_3 = 24,                        /*!< Gas estimate output channel 3 [0-1] */
+    BSEC_OUTPUT_GAS_ESTIMATE_4 = 25,                        /*!< Gas estimate output channel 4 [0-1] */
 
     BSEC_OUTPUT_RAW_GAS_INDEX = 26      /*!< Gas index cyclically running from 0 to heater_profile_length-1, range of heater profile length is from 1 to 10, default being 10 */
 } bsec_virtual_sensor_t;

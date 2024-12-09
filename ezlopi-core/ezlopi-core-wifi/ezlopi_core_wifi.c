@@ -674,4 +674,3 @@ int ezlopi_wifi_get_wifi_mac(uint8_t mac[6])
     return ret;
 }
 
-

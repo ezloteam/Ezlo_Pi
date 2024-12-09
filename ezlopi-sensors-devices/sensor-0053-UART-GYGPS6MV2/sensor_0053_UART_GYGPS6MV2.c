@@ -1,3 +1,45 @@
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+
+/**
+ * @file    main.c
+ * @brief   perform some function on data
+ * @author  John Doe
+ * @version 0.1
+ * @date    1st January 2024
+ */
+
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 #include <string.h>
 #include "ezlopi_util_trace.h"
 
@@ -6,7 +48,7 @@
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
-#include "ezlopi_core_errors.h" 
+#include "ezlopi_core_errors.h"
 
 #include "ezlopi_hal_uart.h"
 
@@ -17,7 +59,21 @@
 #include "sensor_0053_UART_GYGPS6MV2.h"
 #include "EZLOPI_USER_CONFIG.h"
 
-//------------------------------------------------------------------------
+/*******************************************************************************
+ *                          Extern Data Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Type & Macro Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static ezlopi_error_t __0053_prepare(void *arg);
 static ezlopi_error_t __0053_init(l_ezlopi_item_t *item);
 static ezlopi_error_t __0053_get_value_cjson(l_ezlopi_item_t *item, void *arg);
@@ -35,7 +91,23 @@ static void __prepare_sea_level_item_cloud_properties(l_ezlopi_item_t *item, cJS
 static void __prepare_geiod_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, GPS6MV2_t *gps_arg);
 static void __prepare_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj_device);
 
-//------------------------------------------------------------------------
+/*******************************************************************************
+ *                          Static Data Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Data Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Definitions
+ *******************************************************************************/
+
+/**
+ * @brief Global/extern function template example
+ * Convention : Use capital letter for initial word on extern function
+ * @param arg
+ */
 ezlopi_error_t sensor_0053_UART_GYGPS6MV2(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
@@ -70,7 +142,10 @@ ezlopi_error_t sensor_0053_UART_GYGPS6MV2(e_ezlopi_actions_t action, l_ezlopi_it
 
     return ret;
 }
-//---------------------------------------------------------------------------------------------------------
+
+/*******************************************************************************
+ *                          Static Function Definitions
+ *******************************************************************************/
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     device->cloud_properties.category = category_generic_sensor;
@@ -79,6 +154,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
     device->cloud_properties.info = NULL;
     device->cloud_properties.device_type_id = NULL;
 }
+
 static void __prepare_lat_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, GPS6MV2_t *gps_arg)
 {
     item->cloud_properties.show = true;
@@ -93,6 +169,7 @@ static void __prepare_lat_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj
     item->is_user_arg_unique = true;
     item->user_arg = (void *)gps_arg;
 }
+
 static void __prepare_long_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, GPS6MV2_t *gps_arg)
 {
     item->cloud_properties.show = true;
@@ -106,6 +183,7 @@ static void __prepare_long_item_cloud_properties(l_ezlopi_item_t *item, cJSON *c
     //----- CUSTOM DATA STRUCTURE -----------------------------------------
     item->user_arg = (void *)gps_arg;
 }
+
 static void __prepare_fix_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, GPS6MV2_t *gps_arg)
 {
     item->cloud_properties.show = true;
@@ -119,6 +197,7 @@ static void __prepare_fix_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj
     //----- CUSTOM DATA STRUCTURE -----------------------------------------
     item->user_arg = (void *)gps_arg;
 }
+
 static void __prepare_sea_level_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, GPS6MV2_t *gps_arg)
 {
     item->cloud_properties.show = true;
@@ -132,6 +211,7 @@ static void __prepare_sea_level_item_cloud_properties(l_ezlopi_item_t *item, cJS
     //----- CUSTOM DATA STRUCTURE -----------------------------------------
     item->user_arg = (void *)gps_arg;
 }
+
 static void __prepare_geiod_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, GPS6MV2_t *gps_arg)
 {
     item->cloud_properties.show = true;
@@ -167,7 +247,7 @@ static void __prepare_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj
         }
     }
 }
-//---------------------------------------------------------------------------------------------------------
+
 static ezlopi_error_t __0053_prepare(void *arg)
 {
     ezlopi_error_t ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
@@ -296,7 +376,7 @@ static ezlopi_error_t __0053_prepare(void *arg)
     }
     return ret;
 }
-//----------------------------------------------------------------------------------------------------------------------
+
 static ezlopi_error_t __0053_init(l_ezlopi_item_t *item)
 {
     ezlopi_error_t ret = EZPI_ERR_INIT_DEVICE_FAILED;
@@ -319,7 +399,7 @@ static ezlopi_error_t __0053_init(l_ezlopi_item_t *item)
     }
     return ret;
 }
-//------------------------------------------------------------------------------
+
 static ezlopi_error_t __0053_get_value_cjson(l_ezlopi_item_t *item, void *arg)
 {
     ezlopi_error_t ret = EZPI_FAILED;
@@ -434,7 +514,7 @@ static ezlopi_error_t __0053_notify(l_ezlopi_item_t *item)
     }
     return EZPI_SUCCESS;
 }
-//------------------------------------------------------------------------------
+
 static int __sensor_uart_gps6mv2_update_values(l_ezlopi_item_t *item)
 {
     int ret = 0, len = 0;
@@ -468,7 +548,6 @@ static int __sensor_uart_gps6mv2_update_values(l_ezlopi_item_t *item)
     return ret;
 }
 
-//-------------------------------------------------------------------------
 static void __uart_gps6mv2_upcall(uint8_t *buffer, uint32_t output_len, s_ezlopi_uart_object_handle_t uart_object_handle)
 {
     // TRACE_E("UART_Buffer => \n%s\n", buffer);
@@ -558,4 +637,6 @@ static void __retrieve_GPGGA_sentence(l_ezlopi_item_t *item)
     }
 }
 
-//-------------------------------------------------------------------------
+/*******************************************************************************
+ *                          End of File
+ *******************************************************************************/

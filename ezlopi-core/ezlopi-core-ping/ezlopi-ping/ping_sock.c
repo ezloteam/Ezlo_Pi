@@ -540,3 +540,4 @@ esp_err_t ezlopi_ping_get_profile(esp_ping_handle_t hdl, esp_ping_profile_t prof
 err:
     return ret;
 }
+

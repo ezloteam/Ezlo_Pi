@@ -1,4 +1,45 @@
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
 
+/**
+ * @file    main.c
+ * @brief   perform some function on data
+ * @author  John Doe
+ * @version 0.1
+ * @date    1st January 2024
+ */
+
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
@@ -21,8 +62,21 @@
 #include "ezlopi_cloud_constants.h"
 #include "EZLOPI_USER_CONFIG.h"
 
-static s_ezlopi_expressions_t *l_expressions_head = NULL;
+/*******************************************************************************
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
+/*******************************************************************************
+ *                          Extern Function Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Type & Macro Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static uint32_t __expression_store_to_nvs(uint32_t exp_id, cJSON *cj_expression);
 static void __get_expressions_value(s_ezlopi_expressions_t *exp_node, cJSON *cj_value);
 static s_exp_items_t *__expressions_items_create(cJSON *cj_item);
@@ -39,6 +93,24 @@ static void __add_expression_items(s_ezlopi_expressions_t *exp_node, cJSON *cj_p
 static void __add_expression_device_item_names(s_ezlopi_expressions_t *exp_node, cJSON *cj_params);
 static int __remove_exp_id_from_nvs_exp_list(uint32_t target_id);
 
+/*******************************************************************************
+ *                          Static Data Definitions
+ *******************************************************************************/
+static s_ezlopi_expressions_t *l_expressions_head = NULL;
+
+/*******************************************************************************
+ *                          Extern Data Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Definitions
+ *******************************************************************************/
+
+/**
+ * @brief Global/extern function template example
+ * Convention : Use capital letter for initial word on extern function
+ * @param arg
+ */
 s_ezlopi_expressions_t *ezlopi_scenes_get_expression_node_by_name(char *expression_name)
 {
     s_ezlopi_expressions_t *curr_expr = l_expressions_head;
@@ -88,133 +160,6 @@ cJSON *generate_expression_node_in_cjson(s_ezlopi_expressions_t *exp_node)
     return ret_cj_exp;
 }
 
-static int __edit_expression_ll(s_ezlopi_expressions_t *expn_node, cJSON *cj_new_expression)
-{
-    int ret = 0;
-    // now update in ll
-    if (expn_node && cj_new_expression)
-    {
-        ret = 1;
-        // 1. code
-        {
-            if (expn_node->code)
-            {
-                ezlopi_free(__FUNCTION__, expn_node->code);
-                expn_node->code = NULL;
-            }
-
-            cJSON *cj_code = cJSON_GetObjectItem(__FUNCTION__, cj_new_expression, ezlopi_code_str);
-            if (cj_code && cj_code->valuestring && cj_code->str_value_len)
-            {
-                expn_node->code = (char *)ezlopi_malloc(__FUNCTION__, cj_code->str_value_len + 1);
-                if (expn_node->code)
-                {
-                    snprintf(expn_node->code, cj_code->str_value_len + 1, "%.*s", cj_code->str_value_len, cj_code->valuestring);
-                }
-            }
-        }
-
-        // 2. params
-        {
-            if (expn_node->items)
-            {
-                ezlopi_scenes_expressions_delete_exp_item(expn_node->items);
-                expn_node->items->next = NULL;
-                expn_node->items = NULL;
-            }
-            if (expn_node->device_item_names)
-            {
-                ezlopi_scenes_expressions_delete_exp_device_item_names(expn_node->device_item_names);
-                expn_node->device_item_names->next = NULL;
-                expn_node->device_item_names = NULL;
-            }
-
-            cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_new_expression, ezlopi_params_str);
-            if (cj_params)
-            {
-                // 1. items
-                cJSON *cj_items = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_items_str);
-                if (cj_items)
-                {
-                    __get_expressions_items(expn_node, cj_items);
-                }
-
-                // 2. device_items
-                cJSON *cj_device_item_names = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_device_item_names_str);
-                if (cj_device_item_names)
-                {
-                    __get_expressions_device_item_names(expn_node, cj_device_item_names);
-                }
-            }
-        }
-
-        // 3 .  is_variable
-        (NULL != cJSON_GetObjectItem(__FUNCTION__, cj_new_expression, ezlopi_variable_str)) ? (CJSON_GET_VALUE_BOOL(cj_new_expression, ezlopi_variable_str, expn_node->variable)) : NULL;
-
-        // 4. Metadata
-        {
-            if (expn_node->meta_data)
-            {
-                cJSON_Delete(__FUNCTION__, expn_node->meta_data);
-                expn_node->meta_data = NULL;
-            }
-            cJSON *cj_metaData = cJSON_GetObjectItem(__FUNCTION__, cj_new_expression, ezlopi_metadata_str);
-            if (cj_metaData)
-            {
-                expn_node->meta_data = cJSON_Duplicate(__FUNCTION__, cj_metaData, cJSON_True);
-            }
-        }
-
-        // 5. valueType
-        {
-            cJSON *cj_valueType = cJSON_GetObjectItem(__FUNCTION__, cj_new_expression, ezlopi_valueType_str);
-            if (cj_valueType && cj_valueType->valuestring && cj_valueType->str_value_len)
-            {
-                expn_node->value_type = ezlopi_core_scenes_value_get_type(cj_new_expression, ezlopi_valueType_str);
-            }
-        }
-
-        // 6. Value  [exp_value]
-        {
-            // First delete value if :- string or object
-            switch (expn_node->exp_value.type)
-            {
-            case EXPRESSION_VALUE_TYPE_STRING:
-            {
-                if (expn_node->exp_value.u_value.str_value)
-                {
-                    ezlopi_free(__FUNCTION__, expn_node->exp_value.u_value.str_value);
-                    expn_node->exp_value.u_value.str_value = NULL;
-                }
-                break;
-            }
-            case EXPRESSION_VALUE_TYPE_CJ:
-            {
-                if (expn_node->exp_value.u_value.cj_value)
-                {
-                    cJSON_Delete(__FUNCTION__, expn_node->exp_value.u_value.cj_value);
-                    expn_node->exp_value.u_value.cj_value = NULL;
-                }
-                break;
-            }
-            default:
-                // TRACE_D("expn_valueType [%d]", expn_node->exp_value.type);
-                break;
-            }
-
-            if (true == expn_node->variable) // only if variable--> store the 'constant' variable-value.
-            {
-                cJSON *cj_value = cJSON_GetObjectItem(__FUNCTION__, cj_new_expression, ezlopi_value_str);
-                if (cj_value)
-                {
-                    __get_expressions_value(expn_node, cj_value);
-                }
-            }
-        }
-    }
-
-    return ret;
-}
 
 ezlopi_error_t ezlopi_scenes_expressions_update_nvs(char *nvs_exp_id_key, cJSON *cj_updated_exp)
 {
@@ -290,265 +235,12 @@ int ezlopi_scenes_expressions_delete_by_name(char *expression_name)
 
     return ret;
 }
-//----------------------------------------------------------------------------------------------------------------------
-static int ____get_simple_expn_result(cJSON *cj_des, lua_State *lua_state, const char *name, int status)
-{
-    int ret = 1;
-    if (LUA_OK == status)
-    {
-        if (lua_isnumber(lua_state, -1))
-        {
-            float val_num = (float)lua_tonumber(lua_state, -1);
-            // TRACE_D(" [num]: %.2lf", val_num);
-            cJSON_AddNumberToObject(__FUNCTION__, cj_des, ezlopi_value_str, (float)((int)(val_num * 1000) / 1000.0f));
-        }
-        else if (lua_isstring(lua_state, -1))
-        {
-            const char *val_str = lua_tostring(lua_state, -1);
-            // TRACE_D(" [str]: %s", val_str);
-            cJSON_AddStringToObject(__FUNCTION__, cj_des, ezlopi_value_str, val_str);
-        }
-        else if (lua_isboolean(lua_state, -1))
-        {
-            bool value_bool = lua_toboolean(lua_state, -1);
-            // TRACE_D(" [bool]: %d", value_bool);
-            cJSON_AddBoolToObject(__FUNCTION__, cj_des, ezlopi_value_str, value_bool);
-        }
-    }
-    else if (LUA_ERRERR == status)
-    {
-        ret = 0;
-        const char *err = lua_tostring(lua_state, -1);
-        TRACE_D(" [error]: %s", err);
-        cJSON_AddStringToObject(__FUNCTION__, cj_des, ezlopi_error_str, err);
-    }
 
-    return ret;
-}
-static void ____get_devitem_expn_result(cJSON *cj_expr_val, lua_State *lua_state, const char *member_str)
-{
-    if (cj_expr_val && member_str)
-    {
-        lua_pushstring(lua_state, member_str);
-        lua_gettable(lua_state, -2);
-        if (!lua_isnil(lua_state, -1))
-        {
-            if (lua_isnumber(lua_state, -1))
-            {
-                float res = (float)lua_tonumber(lua_state, -1);
-                // TRACE_D(" %s: %.2lf", member_str, res);
-                cJSON_AddNumberToObject(__FUNCTION__, cj_expr_val, ezlopi_value_str, (float)((int)(res * 1000) / 1000.0f));
-            }
-            else if (lua_isstring(lua_state, -1))
-            {
-                const char *res = lua_tostring(lua_state, -1);
-                // TRACE_D(" %s: %s", member_str, res);
-                cJSON_AddStringToObject(__FUNCTION__, cj_expr_val, member_str, res);
-            }
-            else if (lua_isboolean(lua_state, -1))
-            {
-                bool res = lua_toboolean(lua_state, -1);
-                // TRACE_D(" %s: %d", member_str, res);
-                cJSON_AddBoolToObject(__FUNCTION__, cj_expr_val, member_str, res);
-            }
-            else
-            {
-                TRACE_E(" %s --> type:%d (need : LUA_TSTRING[4] / LUA_TNUMBER[3] / LUA_TBOOLEAN[1])", member_str, lua_type(lua_state, -1));
-            }
-            lua_pop(lua_state, 1);
-        }
-        else
-        {
-            TRACE_D("ERROR ! cannot find  {result.%s} in  result_table", member_str);
-        }
-    }
-}
-static void ___create_lua_subtable(lua_State *lua_state, l_ezlopi_item_t *item_prop, const char *sub_table_name)
-{
-    if (item_prop && sub_table_name)
-    {
-        lua_newtable(lua_state);
-        cJSON *cj_result = cJSON_CreateObject(__FUNCTION__);
-        if (cj_result)
-        {
-            item_prop->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item_prop, cj_result, item_prop->user_arg);
-            cJSON *cj_value = cJSON_GetObjectItem(__FUNCTION__, cj_result, ezlopi_value_str);
-            if (cj_value)
-            {
-                switch (cj_value->type)
-                {
-                case cJSON_True:
-                case cJSON_False:
-                {
-                    lua_create_table_bool_key_value(ezlopi_value_str, cj_value->valuedouble ? true : false);
-                    break;
-                }
-                case cJSON_Number:
-                {
-                    lua_create_table_number_key_value(ezlopi_value_str, cj_value->valuedouble);
-                    break;
-                }
-                case cJSON_String:
-                {
-                    if (cj_value->valuestring)
-                    {
-                        lua_create_table_string_key_value(ezlopi_value_str, cj_value->valuestring);
-                    }
-                    break;
-                }
-                default:
-                    break;
-                }
-            }
-            cJSON_Delete(__FUNCTION__, cj_result);
-        }
-        lua_create_table_string_key_value(ezlopi_scale_str, item_prop->cloud_properties.scale);
-        lua_setfield(lua_state, -2, sub_table_name);
-    }
-}
-
-static int __evaluate_expression(cJSON *cj_des, cJSON *lua_prop_params, const char *exp_name, const char *exp_code)
-{
-    int ret = 0;
-    lua_State *lua_state = luaL_newstate();
-    if (lua_state && exp_name && exp_code)
-    {
-        luaL_openlibs(lua_state);
-        {
-            if (lua_prop_params && (NULL != cJSON_GetObjectItem(__FUNCTION__, lua_prop_params, ezlopi_device_item_names_str) || NULL != cJSON_GetObjectItem(__FUNCTION__, lua_prop_params, ezlopi_items_str))) // if , params exits
-            {
-                // uint8_t total_key_count = 0;
-                // create 'params' tables.
-                lua_newtable(lua_state); // params
-
-                // if 'device_item_names' exists
-                cJSON *cj_device_item_names = NULL;
-                cJSON *cj_items = NULL;
-
-                cj_device_item_names = cJSON_GetObjectItem(__FUNCTION__, lua_prop_params, ezlopi_device_item_names_str);
-                cj_items = cJSON_GetObjectItem(__FUNCTION__, lua_prop_params, ezlopi_items_str);
-
-                // 1. If 'device_item_names' is given
-                if (cj_device_item_names && cJSON_IsArray(cj_device_item_names))
-                {
-                    // int idx = 0;
-                    cJSON *cj_device_item = NULL;
-                    // while (NULL != (cj_device_item = cJSON_GetArrayItem(cj_device_item_names, idx)))
-                    cJSON_ArrayForEach(cj_device_item, cj_device_item_names)
-                    {
-                        // get the item id
-                        cJSON *cj_target_name = cJSON_GetObjectItem(__FUNCTION__, cj_device_item, "name");
-                        cJSON *cj_dev_name = cJSON_GetObjectItem(__FUNCTION__, cj_device_item, "deviceName");
-                        cJSON *cj_item_name = cJSON_GetObjectItem(__FUNCTION__, cj_device_item, "itemName");
-                        if ((cj_target_name && cj_target_name->valuestring) && (cj_dev_name && cj_dev_name->valuestring) && (cj_item_name && cj_item_name->valuestring))
-                        {
-                            l_ezlopi_device_t *curr_dev_node = ezlopi_device_get_head();
-                            while (curr_dev_node)
-                            {
-                                if (EZPI_STRNCMP_IF_EQUAL(cj_dev_name->valuestring, curr_dev_node->cloud_properties.device_name, cj_dev_name->str_value_len, strlen(curr_dev_node->cloud_properties.device_name))) // "deviceName" == "siren"
-                                {
-                                    l_ezlopi_item_t *item_prop = curr_dev_node->items;
-                                    while (item_prop)
-                                    {
-                                        if (EZPI_STRNCMP_IF_EQUAL(cj_item_name->valuestring, item_prop->cloud_properties.item_name, cj_item_name->str_value_len, strlen(item_prop->cloud_properties.item_name))) // "itemName" == "sound_level"
-                                        {                                                                                                                                                                        // create the sub-table
-                                            ___create_lua_subtable(lua_state, item_prop, cj_target_name->valuestring);
-                                            // total_key_count++;
-                                            // TRACE_D(" [items_%d] : adding '%s'.", total_key_count, cj_target_name->valuestring);
-                                            break;
-                                        }
-
-                                        item_prop = item_prop->next;
-                                    }
-                                    break;
-                                }
-                                curr_dev_node = curr_dev_node->next;
-                            }
-                        }
-                        // idx++;
-                    }
-                }
-                // 2. If 'items' is given
-                if (cj_items && cJSON_IsArray(cj_items))
-                {
-                    // int count = 0;
-                    cJSON *cj_item = NULL;
-                    // while (NULL != (cj_item = cJSON_GetArrayItem(cj_items, count)))
-                    cJSON_ArrayForEach(cj_item, cj_items)
-                    {
-                        cJSON *cj_item_name = cJSON_GetObjectItem(__FUNCTION__, cj_item, ezlopi_name_str);
-                        cJSON *cj_item_id = cJSON_GetObjectItem(__FUNCTION__, cj_item, ezlopi__id_str);
-
-                        if ((cj_item_id && cj_item_id->valuestring) && (cj_item_name && cj_item_name->valuestring))
-                        {
-                            uint32_t _id = strtoul(cj_item_id->valuestring, NULL, 16);
-                            l_ezlopi_item_t *item_prop = ezlopi_device_get_item_by_id(_id);
-
-                            if (item_prop)
-                            {
-                                ___create_lua_subtable(lua_state, item_prop, cj_item_name->valuestring);
-                                // total_key_count++;
-                                // TRACE_D(" [items_%d] : adding '%s'.", total_key_count, cj_item_name->valuestring);
-                            }
-                        }
-                        // count++;
-                    }
-                }
-                // Set the 'params' table as a global variable
-                lua_setglobal(lua_state, "params");
-            }
-
-            // perform the lua-script executions
-            int tmp_ret = luaL_loadstring(lua_state, exp_code);
-            if (LUA_OK == tmp_ret)
-            {
-                tmp_ret = lua_pcall(lua_state, 0, 1, 0);
-                if (LUA_OK == tmp_ret)
-                {
-                    if (lua_istable(lua_state, -1)) // checks if 'params' is a table
-                    {
-                        cJSON *cj_expr_val = cJSON_AddObjectToObject(__FUNCTION__, cj_des, ezlopi_value_str);
-                        if (cj_expr_val)
-                        {
-                            ____get_devitem_expn_result(cj_expr_val, lua_state, "value");
-                            ____get_devitem_expn_result(cj_expr_val, lua_state, "scale");
-                            ret = 1;
-                        }
-                        lua_pop(lua_state, 1); // Remove result table (params)
-                    }
-                    else
-                    {
-                        ret = ____get_simple_expn_result(cj_des, lua_state, exp_name, tmp_ret);
-                    }
-                }
-                else
-                {
-                    const char *error_msg = lua_tostring(lua_state, -1);
-                    TRACE_D("LUA Runtime error [%d]: %s", tmp_ret, error_msg);
-                    cJSON_AddStringToObject(__FUNCTION__, cj_des, ezlopi_error_str, error_msg);
-                    lua_pop(lua_state, -1); // Remove the error message from the stack
-                }
-            }
-            else
-            {
-                const char *error_msg = lua_tostring(lua_state, -1);
-                TRACE_D("LUA Compile error [%d]: %s", tmp_ret, error_msg);
-                cJSON_AddStringToObject(__FUNCTION__, cj_des, ezlopi_error_str, error_msg);
-                lua_pop(lua_state, -1); // Remove the error message from the stack
-            }
-        }
-        lua_close(lua_state);
-    }
-    else
-    {
-        TRACE_E("Couldn't create lua state for -> %s", exp_name);
-    }
-    return ret;
-}
 int ezlopi_scenes_expression_simple(cJSON *cj_des, const char *exp_name, const char *exp_code)
 {
     return __evaluate_expression(cj_des, NULL, exp_name, exp_code); // this is only for simple
 }
+
 void ezlopi_scenes_expressions_list_cjson(cJSON *cj_expresson_array, cJSON *cj_params)
 {
     if (cj_expresson_array)
@@ -914,55 +606,6 @@ int ezlopi_scenes_expressions_delete_node(s_ezlopi_expressions_t *exp_node)
     return ret;
 }
 
-//-------------------------------------------------------------------------------------------
-#if 0 // may be used in future
-static void __remove_residue_expn_ids_from_list(void)
-{
-    TRACE_D("---------- # Removing [Expression] residue-Ids # ----------");
-    // check --> nvs_devgrp_list for unncessary "residue-IDs" & update the list
-    uint32_t residue_nvs_expn_id = 0;
-    bool expn_list_has_residue = false; // this indicates absence of residue-IDs // those IDs which are still in the "nvs-list" but doesnot not exists in "nvs-body"
-    char *list_ptr = NULL;
-
-    do
-    {
-        if (expn_list_has_residue)
-        {
-            if (0 != residue_nvs_expn_id)
-            {
-                __remove_exp_id_from_nvs_exp_list(residue_nvs_expn_id);
-            }
-            expn_list_has_residue = false;
-        }
-
-        list_ptr = ezlopi_nvs_read_scenes_expressions();
-        if (list_ptr)
-        {
-            cJSON *cj_id_list = cJSON_Parse(__FUNCTION__, list_ptr);
-            if (cj_id_list)
-            {
-                int array_size = cJSON_GetArraySize(cj_id_list);
-                for (int i = 0; i < array_size; i++)
-                {
-                    cJSON *cj_id = cJSON_GetArrayItem(cj_id_list, i);
-                    if (cj_id && cj_id->valuestring)
-                    {
-                        if (NULL == ezlopi_nvs_read_str(cj_id->valuestring))
-                        {
-                            residue_nvs_expn_id = (uint32_t)strtoul(cj_id->valuestring, NULL, 16); // A residue_id is found..
-                            expn_list_has_residue = true;                                          // this will trigger a removal of "invalid_nvs_devgrp_id" .
-                            break;                                                                 // get out of for
-                        }
-                    }
-                }
-            }
-        }
-    } while (expn_list_has_residue);
-    TRACE_D("---------- # --------------------------------- # ----------");
-}
-#endif
-//-------------------------------------------------------------------------------------------
-
 ezlopi_error_t ezlopi_scenes_expressions_init(void)
 {
     // __remove_residue_expn_ids_from_list(); // for furture
@@ -1009,28 +652,6 @@ ezlopi_error_t ezlopi_scenes_expressions_init(void)
     return error;
 }
 
-static s_exp_items_t *__expressions_items_create(cJSON *cj_item)
-{
-    s_exp_items_t *new_item_node = NULL;
-
-    if (cj_item)
-    {
-        new_item_node = ezlopi_malloc(__FUNCTION__, sizeof(s_exp_items_t));
-        if (new_item_node)
-        {
-            memset(new_item_node, 0, sizeof(s_exp_items_t));
-            CJSON_GET_VALUE_STRING_BY_COPY(cj_item, ezlopi_name_str, new_item_node->name);
-            CJSON_GET_ID(new_item_node->_id, cJSON_GetObjectItem(__FUNCTION__, cj_item, ezlopi__id_str));
-        }
-        else
-        {
-            TRACE_E("Error: malloc failed!");
-        }
-    }
-
-    return new_item_node;
-}
-
 void __get_expressions_items(s_ezlopi_expressions_t *exp_node, cJSON *cj_items)
 {
     if (cj_items)
@@ -1072,25 +693,6 @@ void __get_expressions_items(s_ezlopi_expressions_t *exp_node, cJSON *cj_items)
     }
 }
 
-static s_exp_device_item_names_t *__expressions_device_item_names_create(cJSON *cj_device_item_name)
-{
-    s_exp_device_item_names_t *new_device_item_name = NULL;
-
-    if (cj_device_item_name)
-    {
-        new_device_item_name = ezlopi_malloc(__FUNCTION__, sizeof(s_exp_device_item_names_t));
-        if (new_device_item_name)
-        {
-            memset(new_device_item_name, 0, sizeof(s_exp_device_item_names_t));
-            CJSON_GET_VALUE_STRING_BY_COPY(cj_device_item_name, ezlopi_name_str, new_device_item_name->name);
-            CJSON_GET_VALUE_STRING_BY_COPY(cj_device_item_name, ezlopi_deviceName_str, new_device_item_name->device_name);
-            CJSON_GET_VALUE_STRING_BY_COPY(cj_device_item_name, ezlopi_itemName_str, new_device_item_name->item_name);
-        }
-    }
-
-    return new_device_item_name;
-}
-
 void __get_expressions_device_item_names(s_ezlopi_expressions_t *exp_node, cJSON *cj_device_item_names)
 {
     if (cj_device_item_names)
@@ -1130,6 +732,482 @@ void __get_expressions_device_item_names(s_ezlopi_expressions_t *exp_node, cJSON
             exp_node->device_item_names = new_device_item_names_head;
         }
     }
+}
+
+/*******************************************************************************
+ *                          Static Function Definitions
+ *******************************************************************************/
+static int __edit_expression_ll(s_ezlopi_expressions_t *expn_node, cJSON *cj_new_expression)
+{
+    int ret = 0;
+    // now update in ll
+    if (expn_node && cj_new_expression)
+    {
+        ret = 1;
+        // 1. code
+        {
+            if (expn_node->code)
+            {
+                ezlopi_free(__FUNCTION__, expn_node->code);
+                expn_node->code = NULL;
+            }
+
+            cJSON *cj_code = cJSON_GetObjectItem(__FUNCTION__, cj_new_expression, ezlopi_code_str);
+            if (cj_code && cj_code->valuestring && cj_code->str_value_len)
+            {
+                expn_node->code = (char *)ezlopi_malloc(__FUNCTION__, cj_code->str_value_len + 1);
+                if (expn_node->code)
+                {
+                    snprintf(expn_node->code, cj_code->str_value_len + 1, "%.*s", cj_code->str_value_len, cj_code->valuestring);
+                }
+            }
+        }
+
+        // 2. params
+        {
+            if (expn_node->items)
+            {
+                ezlopi_scenes_expressions_delete_exp_item(expn_node->items);
+                expn_node->items->next = NULL;
+                expn_node->items = NULL;
+            }
+            if (expn_node->device_item_names)
+            {
+                ezlopi_scenes_expressions_delete_exp_device_item_names(expn_node->device_item_names);
+                expn_node->device_item_names->next = NULL;
+                expn_node->device_item_names = NULL;
+            }
+
+            cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_new_expression, ezlopi_params_str);
+            if (cj_params)
+            {
+                // 1. items
+                cJSON *cj_items = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_items_str);
+                if (cj_items)
+                {
+                    __get_expressions_items(expn_node, cj_items);
+                }
+
+                // 2. device_items
+                cJSON *cj_device_item_names = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_device_item_names_str);
+                if (cj_device_item_names)
+                {
+                    __get_expressions_device_item_names(expn_node, cj_device_item_names);
+                }
+            }
+        }
+
+        // 3 .  is_variable
+        (NULL != cJSON_GetObjectItem(__FUNCTION__, cj_new_expression, ezlopi_variable_str)) ? (CJSON_GET_VALUE_BOOL(cj_new_expression, ezlopi_variable_str, expn_node->variable)) : NULL;
+
+        // 4. Metadata
+        {
+            if (expn_node->meta_data)
+            {
+                cJSON_Delete(__FUNCTION__, expn_node->meta_data);
+                expn_node->meta_data = NULL;
+            }
+            cJSON *cj_metaData = cJSON_GetObjectItem(__FUNCTION__, cj_new_expression, ezlopi_metadata_str);
+            if (cj_metaData)
+            {
+                expn_node->meta_data = cJSON_Duplicate(__FUNCTION__, cj_metaData, cJSON_True);
+            }
+        }
+
+        // 5. valueType
+        {
+            cJSON *cj_valueType = cJSON_GetObjectItem(__FUNCTION__, cj_new_expression, ezlopi_valueType_str);
+            if (cj_valueType && cj_valueType->valuestring && cj_valueType->str_value_len)
+            {
+                expn_node->value_type = ezlopi_core_scenes_value_get_type(cj_new_expression, ezlopi_valueType_str);
+            }
+        }
+
+        // 6. Value  [exp_value]
+        {
+            // First delete value if :- string or object
+            switch (expn_node->exp_value.type)
+            {
+            case EXPRESSION_VALUE_TYPE_STRING:
+            {
+                if (expn_node->exp_value.u_value.str_value)
+                {
+                    ezlopi_free(__FUNCTION__, expn_node->exp_value.u_value.str_value);
+                    expn_node->exp_value.u_value.str_value = NULL;
+                }
+                break;
+            }
+            case EXPRESSION_VALUE_TYPE_CJ:
+            {
+                if (expn_node->exp_value.u_value.cj_value)
+                {
+                    cJSON_Delete(__FUNCTION__, expn_node->exp_value.u_value.cj_value);
+                    expn_node->exp_value.u_value.cj_value = NULL;
+                }
+                break;
+            }
+            default:
+                // TRACE_D("expn_valueType [%d]", expn_node->exp_value.type);
+                break;
+            }
+
+            if (true == expn_node->variable) // only if variable--> store the 'constant' variable-value.
+            {
+                cJSON *cj_value = cJSON_GetObjectItem(__FUNCTION__, cj_new_expression, ezlopi_value_str);
+                if (cj_value)
+                {
+                    __get_expressions_value(expn_node, cj_value);
+                }
+            }
+        }
+    }
+
+    return ret;
+}
+
+static int ____get_simple_expn_result(cJSON *cj_des, lua_State *lua_state, const char *name, int status)
+{
+    int ret = 1;
+    if (LUA_OK == status)
+    {
+        if (lua_isnumber(lua_state, -1))
+        {
+            float val_num = (float)lua_tonumber(lua_state, -1);
+            // TRACE_D(" [num]: %.2lf", val_num);
+            cJSON_AddNumberToObject(__FUNCTION__, cj_des, ezlopi_value_str, (float)((int)(val_num * 1000) / 1000.0f));
+        }
+        else if (lua_isstring(lua_state, -1))
+        {
+            const char *val_str = lua_tostring(lua_state, -1);
+            // TRACE_D(" [str]: %s", val_str);
+            cJSON_AddStringToObject(__FUNCTION__, cj_des, ezlopi_value_str, val_str);
+        }
+        else if (lua_isboolean(lua_state, -1))
+        {
+            bool value_bool = lua_toboolean(lua_state, -1);
+            // TRACE_D(" [bool]: %d", value_bool);
+            cJSON_AddBoolToObject(__FUNCTION__, cj_des, ezlopi_value_str, value_bool);
+        }
+    }
+    else if (LUA_ERRERR == status)
+    {
+        ret = 0;
+        const char *err = lua_tostring(lua_state, -1);
+        TRACE_D(" [error]: %s", err);
+        cJSON_AddStringToObject(__FUNCTION__, cj_des, ezlopi_error_str, err);
+    }
+
+    return ret;
+}
+
+static void ____get_devitem_expn_result(cJSON *cj_expr_val, lua_State *lua_state, const char *member_str)
+{
+    if (cj_expr_val && member_str)
+    {
+        lua_pushstring(lua_state, member_str);
+        lua_gettable(lua_state, -2);
+        if (!lua_isnil(lua_state, -1))
+        {
+            if (lua_isnumber(lua_state, -1))
+            {
+                float res = (float)lua_tonumber(lua_state, -1);
+                // TRACE_D(" %s: %.2lf", member_str, res);
+                cJSON_AddNumberToObject(__FUNCTION__, cj_expr_val, ezlopi_value_str, (float)((int)(res * 1000) / 1000.0f));
+            }
+            else if (lua_isstring(lua_state, -1))
+            {
+                const char *res = lua_tostring(lua_state, -1);
+                // TRACE_D(" %s: %s", member_str, res);
+                cJSON_AddStringToObject(__FUNCTION__, cj_expr_val, member_str, res);
+            }
+            else if (lua_isboolean(lua_state, -1))
+            {
+                bool res = lua_toboolean(lua_state, -1);
+                // TRACE_D(" %s: %d", member_str, res);
+                cJSON_AddBoolToObject(__FUNCTION__, cj_expr_val, member_str, res);
+            }
+            else
+            {
+                TRACE_E(" %s --> type:%d (need : LUA_TSTRING[4] / LUA_TNUMBER[3] / LUA_TBOOLEAN[1])", member_str, lua_type(lua_state, -1));
+            }
+            lua_pop(lua_state, 1);
+        }
+        else
+        {
+            TRACE_D("ERROR ! cannot find  {result.%s} in  result_table", member_str);
+        }
+    }
+}
+
+static void ___create_lua_subtable(lua_State *lua_state, l_ezlopi_item_t *item_prop, const char *sub_table_name)
+{
+    if (item_prop && sub_table_name)
+    {
+        lua_newtable(lua_state);
+        cJSON *cj_result = cJSON_CreateObject(__FUNCTION__);
+        if (cj_result)
+        {
+            item_prop->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item_prop, cj_result, item_prop->user_arg);
+            cJSON *cj_value = cJSON_GetObjectItem(__FUNCTION__, cj_result, ezlopi_value_str);
+            if (cj_value)
+            {
+                switch (cj_value->type)
+                {
+                case cJSON_True:
+                case cJSON_False:
+                {
+                    lua_create_table_bool_key_value(ezlopi_value_str, cj_value->valuedouble ? true : false);
+                    break;
+                }
+                case cJSON_Number:
+                {
+                    lua_create_table_number_key_value(ezlopi_value_str, cj_value->valuedouble);
+                    break;
+                }
+                case cJSON_String:
+                {
+                    if (cj_value->valuestring)
+                    {
+                        lua_create_table_string_key_value(ezlopi_value_str, cj_value->valuestring);
+                    }
+                    break;
+                }
+                default:
+                    break;
+                }
+            }
+            cJSON_Delete(__FUNCTION__, cj_result);
+        }
+        lua_create_table_string_key_value(ezlopi_scale_str, item_prop->cloud_properties.scale);
+        lua_setfield(lua_state, -2, sub_table_name);
+    }
+}
+
+static int __evaluate_expression(cJSON *cj_des, cJSON *lua_prop_params, const char *exp_name, const char *exp_code)
+{
+    int ret = 0;
+    lua_State *lua_state = luaL_newstate();
+    if (lua_state && exp_name && exp_code)
+    {
+        luaL_openlibs(lua_state);
+        {
+            if (lua_prop_params && (NULL != cJSON_GetObjectItem(__FUNCTION__, lua_prop_params, ezlopi_device_item_names_str) || NULL != cJSON_GetObjectItem(__FUNCTION__, lua_prop_params, ezlopi_items_str))) // if , params exits
+            {
+                // uint8_t total_key_count = 0;
+                // create 'params' tables.
+                lua_newtable(lua_state); // params
+
+                // if 'device_item_names' exists
+                cJSON *cj_device_item_names = NULL;
+                cJSON *cj_items = NULL;
+
+                cj_device_item_names = cJSON_GetObjectItem(__FUNCTION__, lua_prop_params, ezlopi_device_item_names_str);
+                cj_items = cJSON_GetObjectItem(__FUNCTION__, lua_prop_params, ezlopi_items_str);
+
+                // 1. If 'device_item_names' is given
+                if (cj_device_item_names && cJSON_IsArray(cj_device_item_names))
+                {
+                    // int idx = 0;
+                    cJSON *cj_device_item = NULL;
+                    // while (NULL != (cj_device_item = cJSON_GetArrayItem(cj_device_item_names, idx)))
+                    cJSON_ArrayForEach(cj_device_item, cj_device_item_names)
+                    {
+                        // get the item id
+                        cJSON *cj_target_name = cJSON_GetObjectItem(__FUNCTION__, cj_device_item, "name");
+                        cJSON *cj_dev_name = cJSON_GetObjectItem(__FUNCTION__, cj_device_item, "deviceName");
+                        cJSON *cj_item_name = cJSON_GetObjectItem(__FUNCTION__, cj_device_item, "itemName");
+                        if ((cj_target_name && cj_target_name->valuestring) && (cj_dev_name && cj_dev_name->valuestring) && (cj_item_name && cj_item_name->valuestring))
+                        {
+                            l_ezlopi_device_t *curr_dev_node = ezlopi_device_get_head();
+                            while (curr_dev_node)
+                            {
+                                if (EZPI_STRNCMP_IF_EQUAL(cj_dev_name->valuestring, curr_dev_node->cloud_properties.device_name, cj_dev_name->str_value_len, strlen(curr_dev_node->cloud_properties.device_name))) // "deviceName" == "siren"
+                                {
+                                    l_ezlopi_item_t *item_prop = curr_dev_node->items;
+                                    while (item_prop)
+                                    {
+                                        if (EZPI_STRNCMP_IF_EQUAL(cj_item_name->valuestring, item_prop->cloud_properties.item_name, cj_item_name->str_value_len, strlen(item_prop->cloud_properties.item_name))) // "itemName" == "sound_level"
+                                        {                                                                                                                                                                        // create the sub-table
+                                            ___create_lua_subtable(lua_state, item_prop, cj_target_name->valuestring);
+                                            // total_key_count++;
+                                            // TRACE_D(" [items_%d] : adding '%s'.", total_key_count, cj_target_name->valuestring);
+                                            break;
+                                        }
+
+                                        item_prop = item_prop->next;
+                                    }
+                                    break;
+                                }
+                                curr_dev_node = curr_dev_node->next;
+                            }
+                        }
+                        // idx++;
+                    }
+                }
+                // 2. If 'items' is given
+                if (cj_items && cJSON_IsArray(cj_items))
+                {
+                    // int count = 0;
+                    cJSON *cj_item = NULL;
+                    // while (NULL != (cj_item = cJSON_GetArrayItem(cj_items, count)))
+                    cJSON_ArrayForEach(cj_item, cj_items)
+                    {
+                        cJSON *cj_item_name = cJSON_GetObjectItem(__FUNCTION__, cj_item, ezlopi_name_str);
+                        cJSON *cj_item_id = cJSON_GetObjectItem(__FUNCTION__, cj_item, ezlopi__id_str);
+
+                        if ((cj_item_id && cj_item_id->valuestring) && (cj_item_name && cj_item_name->valuestring))
+                        {
+                            uint32_t _id = strtoul(cj_item_id->valuestring, NULL, 16);
+                            l_ezlopi_item_t *item_prop = ezlopi_device_get_item_by_id(_id);
+
+                            if (item_prop)
+                            {
+                                ___create_lua_subtable(lua_state, item_prop, cj_item_name->valuestring);
+                                // total_key_count++;
+                                // TRACE_D(" [items_%d] : adding '%s'.", total_key_count, cj_item_name->valuestring);
+                            }
+                        }
+                        // count++;
+                    }
+                }
+                // Set the 'params' table as a global variable
+                lua_setglobal(lua_state, "params");
+            }
+
+            // perform the lua-script executions
+            int tmp_ret = luaL_loadstring(lua_state, exp_code);
+            if (LUA_OK == tmp_ret)
+            {
+                tmp_ret = lua_pcall(lua_state, 0, 1, 0);
+                if (LUA_OK == tmp_ret)
+                {
+                    if (lua_istable(lua_state, -1)) // checks if 'params' is a table
+                    {
+                        cJSON *cj_expr_val = cJSON_AddObjectToObject(__FUNCTION__, cj_des, ezlopi_value_str);
+                        if (cj_expr_val)
+                        {
+                            ____get_devitem_expn_result(cj_expr_val, lua_state, "value");
+                            ____get_devitem_expn_result(cj_expr_val, lua_state, "scale");
+                            ret = 1;
+                        }
+                        lua_pop(lua_state, 1); // Remove result table (params)
+                    }
+                    else
+                    {
+                        ret = ____get_simple_expn_result(cj_des, lua_state, exp_name, tmp_ret);
+                    }
+                }
+                else
+                {
+                    const char *error_msg = lua_tostring(lua_state, -1);
+                    TRACE_D("LUA Runtime error [%d]: %s", tmp_ret, error_msg);
+                    cJSON_AddStringToObject(__FUNCTION__, cj_des, ezlopi_error_str, error_msg);
+                    lua_pop(lua_state, -1); // Remove the error message from the stack
+                }
+            }
+            else
+            {
+                const char *error_msg = lua_tostring(lua_state, -1);
+                TRACE_D("LUA Compile error [%d]: %s", tmp_ret, error_msg);
+                cJSON_AddStringToObject(__FUNCTION__, cj_des, ezlopi_error_str, error_msg);
+                lua_pop(lua_state, -1); // Remove the error message from the stack
+            }
+        }
+        lua_close(lua_state);
+    }
+    else
+    {
+        TRACE_E("Couldn't create lua state for -> %s", exp_name);
+    }
+    return ret;
+}
+
+#if 0 // may be used in future
+static void __remove_residue_expn_ids_from_list(void)
+{
+    TRACE_D("---------- # Removing [Expression] residue-Ids # ----------");
+    // check --> nvs_devgrp_list for unncessary "residue-IDs" & update the list
+    uint32_t residue_nvs_expn_id = 0;
+    bool expn_list_has_residue = false; // this indicates absence of residue-IDs // those IDs which are still in the "nvs-list" but doesnot not exists in "nvs-body"
+    char *list_ptr = NULL;
+
+    do
+    {
+        if (expn_list_has_residue)
+        {
+            if (0 != residue_nvs_expn_id)
+            {
+                __remove_exp_id_from_nvs_exp_list(residue_nvs_expn_id);
+            }
+            expn_list_has_residue = false;
+        }
+
+        list_ptr = ezlopi_nvs_read_scenes_expressions();
+        if (list_ptr)
+        {
+            cJSON *cj_id_list = cJSON_Parse(__FUNCTION__, list_ptr);
+            if (cj_id_list)
+            {
+                int array_size = cJSON_GetArraySize(cj_id_list);
+                for (int i = 0; i < array_size; i++)
+                {
+                    cJSON *cj_id = cJSON_GetArrayItem(cj_id_list, i);
+                    if (cj_id && cj_id->valuestring)
+                    {
+                        if (NULL == ezlopi_nvs_read_str(cj_id->valuestring))
+                        {
+                            residue_nvs_expn_id = (uint32_t)strtoul(cj_id->valuestring, NULL, 16); // A residue_id is found..
+                            expn_list_has_residue = true;                                          // this will trigger a removal of "invalid_nvs_devgrp_id" .
+                            break;                                                                 // get out of for
+                        }
+                    }
+                }
+            }
+        }
+    } while (expn_list_has_residue);
+    TRACE_D("---------- # --------------------------------- # ----------");
+}
+#endif
+
+static s_exp_items_t *__expressions_items_create(cJSON *cj_item)
+{
+    s_exp_items_t *new_item_node = NULL;
+
+    if (cj_item)
+    {
+        new_item_node = ezlopi_malloc(__FUNCTION__, sizeof(s_exp_items_t));
+        if (new_item_node)
+        {
+            memset(new_item_node, 0, sizeof(s_exp_items_t));
+            CJSON_GET_VALUE_STRING_BY_COPY(cj_item, ezlopi_name_str, new_item_node->name);
+            CJSON_GET_ID(new_item_node->_id, cJSON_GetObjectItem(__FUNCTION__, cj_item, ezlopi__id_str));
+        }
+        else
+        {
+            TRACE_E("Error: malloc failed!");
+        }
+    }
+
+    return new_item_node;
+}
+
+static s_exp_device_item_names_t *__expressions_device_item_names_create(cJSON *cj_device_item_name)
+{
+    s_exp_device_item_names_t *new_device_item_name = NULL;
+
+    if (cj_device_item_name)
+    {
+        new_device_item_name = ezlopi_malloc(__FUNCTION__, sizeof(s_exp_device_item_names_t));
+        if (new_device_item_name)
+        {
+            memset(new_device_item_name, 0, sizeof(s_exp_device_item_names_t));
+            CJSON_GET_VALUE_STRING_BY_COPY(cj_device_item_name, ezlopi_name_str, new_device_item_name->name);
+            CJSON_GET_VALUE_STRING_BY_COPY(cj_device_item_name, ezlopi_deviceName_str, new_device_item_name->device_name);
+            CJSON_GET_VALUE_STRING_BY_COPY(cj_device_item_name, ezlopi_itemName_str, new_device_item_name->item_name);
+        }
+    }
+
+    return new_device_item_name;
 }
 
 static void __get_expressions_value(s_ezlopi_expressions_t *exp_node, cJSON *cj_value)
@@ -1509,4 +1587,9 @@ static int __remove_exp_id_from_nvs_exp_list(uint32_t target_id)
     }
     return ret;
 }
+
 #endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+
+/*******************************************************************************
+ *                          End of File
+ *******************************************************************************/

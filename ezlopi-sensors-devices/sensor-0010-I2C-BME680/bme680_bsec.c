@@ -1,20 +1,85 @@
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+
+/**
+ * @file    main.c
+ * @brief   perform some function on data
+ * @author  John Doe
+ * @version 0.1
+ * @date    1st January 2024
+ */
+
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 #include "bme680_bsec.h"
 
 #warning "################### DO NOT USE printf ON PRODUCTION ###################"
 
-/**
- * @brief : This function is called by the BSEC library when a new output is available
- * @param[in] input     : BME68X sensor data before processing
- * @param[in] outputs   : Processed BSEC BSEC output data
- * @param[in] bsec      : Instance of BSEC2 calling the callback
- */
+/*******************************************************************************
+ *                          Extern Data Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Type & Macro Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static void bme680_data_callback(const bme68x_data data, const bsec_outputs outputs);
 
-
-
+/*******************************************************************************
+ *                          Static Data Definitions
+ *******************************************************************************/
 static bool callback_status = false;
 static bme680_data_t bme680_data;
 
+/*******************************************************************************
+ *                          Extern Data Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Definitions
+ *******************************************************************************/
+
+/**
+ * @brief Global/extern function template example
+ * Convention : Use capital letter for initial word on extern function
+ * @param arg
+ */
 /* Entry point for the example */
 void bme680_setup(uint32_t sda, uint32_t scl, bool initialize_i2c)
 {
@@ -73,18 +138,6 @@ void bme680_setup(uint32_t sda, uint32_t scl, bool initialize_i2c)
     // printf("BSEC library version %d.%d.%d.%d\n", bsec2_version.major, bsec2_version.minor, bsec2_version.major_bugfix, bsec2_version.minor_bugfix);
 }
 
-/* Function to copy sensor data */
-static bool bme680_copy_data(bme680_data_t *dest, bme680_data_t *src)
-{
-    if ((dest == NULL) && (src == NULL))
-    {
-        return false;
-    }
-
-    memcpy(dest, src, sizeof(bme680_data_t));
-    return true;
-}
-
 /* Function that is looped forever */
 bool bme680_get_data(bme680_data_t *data)
 {
@@ -109,6 +162,76 @@ bool bme680_get_data(bme680_data_t *data)
     return false;
 }
 
+float bme680_read_altitude(float pressure, float seaLevel)
+{
+    // Equation taken from BMP180 datasheet (page 16):
+    //  http://www.adafruit.com/datasheets/BST-BMP180-DS000-09.pdf
+
+    // Note that using the equation from wikipedia can give bad results
+    // at high altitude. See this thread for more information:
+    //  http://forums.adafruit.com/viewtopic.php?f=22&t=58064
+
+    float atmospheric = pressure / 100.0F;
+    return 44330.0 * (1.0 - pow(atmospheric / seaLevel, 0.1903));
+}
+
+void check_bsec_status()
+{
+    if (bsec2_get_status() < BSEC_OK)
+    {
+        // printf("BSEC error code : %d\n", bsec2_get_status());
+    }
+    else if (bsec2_get_status() > BSEC_OK)
+    {
+        // printf("BSEC warning code : %d\n", bsec2_get_status());
+    }
+
+    if (bsec2_get_sensor_status() < BME68X_OK)
+    {
+        // printf("BME68X error code : %d\n", bsec2_get_sensor_status());
+    }
+    else if (bsec2_get_sensor_status() > BME68X_OK)
+    {
+        // printf("BME68X warning code : 0x%X\n", bsec2_get_sensor_status());
+    }
+}
+
+bool bme680_print_data(bme680_data_t *data)
+{
+    if (data == NULL)
+    {
+        return false;
+    }
+
+    // printf("BSEC Outputs:\n");
+    // printf("\tiaq = %0.2f\n", data->iaq);
+    // printf("\tiaq accuracy = %d\n", (int)data->iaq_accuracy);
+    // printf("\ttemperature = %0.2f °C\n", data->temperature);
+    // printf("\tpressure = %0.2f hPa\n", data->pressure / 100.0f);
+    // printf("\thumidity = %0.2f %%\n", data->humidity);
+    // printf("\tgas resistance = %0.2f KΩ\n", data->gas_resistance / 1000.0);
+    // printf("\taltitude = %0.2f m\n", data->altitude);
+    // printf("\tCO2 Equivalent = %0.2f\n", data->co2_equivalent);
+    // printf("\tVOC Equivalent = %0.2f\n", data->voc_equivalent);
+    // printf("\tstabilization status = %d\n", data->stabilization_status);
+    // printf("\trun in status = %d\n", data->run_in_status);
+    return true;
+}
+
+bool get_data_status()
+{
+    return callback_status;
+}
+
+/*******************************************************************************
+ *                          Static Function Definitions
+ *******************************************************************************/
+/**
+ * @brief : This function is called by the BSEC library when a new output is available
+ * @param[in] input     : BME68X sensor data before processing
+ * @param[in] outputs   : Processed BSEC BSEC output data
+ * @param[in] bsec      : Instance of BSEC2 calling the callback
+ */
 static void bme680_data_callback(const bme68x_data data, const bsec_outputs outputs)
 {
     // printf("HERE!! %s\n", __func__);
@@ -199,63 +322,18 @@ static void bme680_data_callback(const bme68x_data data, const bsec_outputs outp
     }
 }
 
-float bme680_read_altitude(float pressure, float seaLevel)
+/* Function to copy sensor data */
+static bool bme680_copy_data(bme680_data_t *dest, bme680_data_t *src)
 {
-    // Equation taken from BMP180 datasheet (page 16):
-    //  http://www.adafruit.com/datasheets/BST-BMP180-DS000-09.pdf
-
-    // Note that using the equation from wikipedia can give bad results
-    // at high altitude. See this thread for more information:
-    //  http://forums.adafruit.com/viewtopic.php?f=22&t=58064
-
-    float atmospheric = pressure / 100.0F;
-    return 44330.0 * (1.0 - pow(atmospheric / seaLevel, 0.1903));
-}
-
-void check_bsec_status()
-{
-    if (bsec2_get_status() < BSEC_OK)
-    {
-        // printf("BSEC error code : %d\n", bsec2_get_status());
-    }
-    else if (bsec2_get_status() > BSEC_OK)
-    {
-        // printf("BSEC warning code : %d\n", bsec2_get_status());
-    }
-
-    if (bsec2_get_sensor_status() < BME68X_OK)
-    {
-        // printf("BME68X error code : %d\n", bsec2_get_sensor_status());
-    }
-    else if (bsec2_get_sensor_status() > BME68X_OK)
-    {
-        // printf("BME68X warning code : 0x%X\n", bsec2_get_sensor_status());
-    }
-}
-
-bool bme680_print_data(bme680_data_t *data)
-{
-    if (data == NULL)
+    if ((dest == NULL) && (src == NULL))
     {
         return false;
     }
 
-    // printf("BSEC Outputs:\n");
-    // printf("\tiaq = %0.2f\n", data->iaq);
-    // printf("\tiaq accuracy = %d\n", (int)data->iaq_accuracy);
-    // printf("\ttemperature = %0.2f °C\n", data->temperature);
-    // printf("\tpressure = %0.2f hPa\n", data->pressure / 100.0f);
-    // printf("\thumidity = %0.2f %%\n", data->humidity);
-    // printf("\tgas resistance = %0.2f KΩ\n", data->gas_resistance / 1000.0);
-    // printf("\taltitude = %0.2f m\n", data->altitude);
-    // printf("\tCO2 Equivalent = %0.2f\n", data->co2_equivalent);
-    // printf("\tVOC Equivalent = %0.2f\n", data->voc_equivalent);
-    // printf("\tstabilization status = %d\n", data->stabilization_status);
-    // printf("\trun in status = %d\n", data->run_in_status);
+    memcpy(dest, src, sizeof(bme680_data_t));
     return true;
 }
 
-bool get_data_status()
-{
-    return callback_status;
-}
+/*******************************************************************************
+ *                          End of File
+ *******************************************************************************/

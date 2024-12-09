@@ -1,3 +1,46 @@
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+
+/**
+ * @file    main.c
+ * @brief   perform some function on data
+ * @author  John Doe
+ * @version 0.1
+ * @date    1st January 2024
+ */
+
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
+
 #include <string.h>
 #include <ctype.h>
 
@@ -8,6 +51,17 @@
 #include "ezlopi_core_errors.h"
 #include "EZLOPI_USER_CONFIG.h"
 
+/*******************************************************************************
+ *                          Extern Data Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 #define UPDATE_STRING_VALUE(buffer, data, offset, length)  \
     {                                                      \
         if (data)                                          \
@@ -16,6 +70,13 @@
         }                                                  \
     }
 
+/*******************************************************************************
+ *                          Static Function Prototypes
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Static Data Definitions
+ *******************************************************************************/
 static uint32_t g_provisioning_status = 0;
 static const esp_partition_t *partition_ctx_v3 = NULL;
 
@@ -25,6 +86,19 @@ static char *__ca_cert = NULL;
 static char *__pvt_key = NULL;
 static char *__pub_key = NULL;
 
+/*******************************************************************************
+ *                          Extern Data Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Definitions
+ *******************************************************************************/
+
+/**
+ * @brief Global/extern function template example
+ * Convention : Use capital letter for initial word on extern function
+ * @param arg
+ */
 int ezlopi_calculate_certificate_length(const char *certificate_string, const char *end_marker)
 {
     char *end_pos = strstr(certificate_string, end_marker);
@@ -37,138 +111,6 @@ int ezlopi_calculate_certificate_length(const char *certificate_string, const ch
     {
         return 0;
     }
-}
-
-static void ezlopi_replace_newline_escape(char *str)
-{
-    int i = 0, j = 0;
-
-    while (str[i] != '\0')
-    {
-        if (str[i] == '\\' && str[i + 1] == 'n')
-        {
-            str[j++] = '\n'; // Replace "\\n" with '\n'
-            i += 2;          // Skip past the '\\' and 'n'
-        }
-        else
-        {
-            str[j++] = str[i++];
-        }
-    }
-
-    str[j] = '\0';
-}
-
-static ezlopi_error_t ezlopi_check_string_validity(const char *str)
-{
-    ezlopi_error_t ret = EZPI_SUCCESS;
-    if (str == NULL)
-    {
-        return EZPI_FAILED;
-    }
-
-    while (*str)
-    {
-        if (!isprint(*str))
-        {
-            ret = EZPI_FAILED;
-            break;
-        }
-        str++;
-    }
-    return ret;
-}
-
-static bool ezlopi_check_uuid_validity(const char *uuid)
-{
-    if (strlen(uuid) != 36)
-    {
-        return false;
-    }
-
-    if (uuid[8] != '-' || uuid[13] != '-' || uuid[18] != '-' || uuid[23] != '-') // Check the positions of hyphens
-    {
-        return false;
-    }
-
-    for (int i = 0; i < 36; i++) // Check each character
-    {
-        if (i == 8 || i == 13 || i == 18 || i == 23)
-        {
-            continue; // Skip hyphen positions
-        }
-        if (!isxdigit(uuid[i])) // Check if it's a hexadecimal digit
-        {
-            return false;
-        }
-    }
-
-    return true; // UUID is valid
-}
-
-static bool ezlopi_check_mac_validity(const char *mac)
-{
-    if (mac == NULL)
-    {
-        return false; // Invalid if the pointer is NULL
-    }
-
-    if (strlen(mac) != 17)
-    {
-        return false; // A valid MAC address is exactly 17 characters long
-    }
-
-    for (int i = 0; i < 17; i++)
-    {
-        if (i % 3 == 2)
-        {
-            if (mac[i] != ':')
-            {
-                return false; // Every 3rd character (2, 5, 8, 11, 14) must be a colon
-            }
-        }
-        else
-        {
-            if (!isxdigit(mac[i]))
-            {
-                return false; // The other characters must be hexadecimal digits
-            }
-        }
-    }
-
-    return true; // MAC address is valid
-}
-
-static int ezlopi_factory_info_v3_set_4kb(const char *data, uint32_t offset, uint32_t len)
-{
-    int ret = 0;
-    char *tmp_variable = ezlopi_malloc(__FUNCTION__, len + 1);
-
-    if (tmp_variable)
-    {
-        snprintf(tmp_variable, len + 1, "%.*s", len, data);
-
-        if (ESP_OK == esp_partition_erase_range(partition_ctx_v3, offset, EZLOPI_FINFO_READ_LEN_4KB))
-        {
-            if (ESP_OK == esp_partition_write(partition_ctx_v3, offset, tmp_variable, len + 1))
-            {
-                TRACE_S("Flash write successful");
-                ret = 1;
-            }
-            else
-            {
-                TRACE_E("esp-partition write failed!");
-            }
-        }
-        else
-        {
-            TRACE_E("esp-partition erase failed!");
-        }
-
-        ezlopi_free(__FUNCTION__, tmp_variable);
-    }
-
-    return ret;
 }
 
 uint32_t ezlopi_factory_info_v3_get_abs_address(uint32_t relative_offset, e_factory_info_v3_partition_type_t partition_type)
@@ -968,3 +910,142 @@ int ezlopi_factory_info_v3_scenes_factory_soft_reset(void)
     }
     return ret;
 }
+
+/*******************************************************************************
+ *                          Static Function Definitions
+ *******************************************************************************/
+static void ezlopi_replace_newline_escape(char *str)
+{
+    int i = 0, j = 0;
+
+    while (str[i] != '\0')
+    {
+        if (str[i] == '\\' && str[i + 1] == 'n')
+        {
+            str[j++] = '\n'; // Replace "\\n" with '\n'
+            i += 2;          // Skip past the '\\' and 'n'
+        }
+        else
+        {
+            str[j++] = str[i++];
+        }
+    }
+
+    str[j] = '\0';
+}
+
+static ezlopi_error_t ezlopi_check_string_validity(const char *str)
+{
+    ezlopi_error_t ret = EZPI_SUCCESS;
+    if (str == NULL)
+    {
+        return EZPI_FAILED;
+    }
+
+    while (*str)
+    {
+        if (!isprint(*str))
+        {
+            ret = EZPI_FAILED;
+            break;
+        }
+        str++;
+    }
+    return ret;
+}
+
+static bool ezlopi_check_uuid_validity(const char *uuid)
+{
+    if (strlen(uuid) != 36)
+    {
+        return false;
+    }
+
+    if (uuid[8] != '-' || uuid[13] != '-' || uuid[18] != '-' || uuid[23] != '-') // Check the positions of hyphens
+    {
+        return false;
+    }
+
+    for (int i = 0; i < 36; i++) // Check each character
+    {
+        if (i == 8 || i == 13 || i == 18 || i == 23)
+        {
+            continue; // Skip hyphen positions
+        }
+        if (!isxdigit(uuid[i])) // Check if it's a hexadecimal digit
+        {
+            return false;
+        }
+    }
+
+    return true; // UUID is valid
+}
+
+static bool ezlopi_check_mac_validity(const char *mac)
+{
+    if (mac == NULL)
+    {
+        return false; // Invalid if the pointer is NULL
+    }
+
+    if (strlen(mac) != 17)
+    {
+        return false; // A valid MAC address is exactly 17 characters long
+    }
+
+    for (int i = 0; i < 17; i++)
+    {
+        if (i % 3 == 2)
+        {
+            if (mac[i] != ':')
+            {
+                return false; // Every 3rd character (2, 5, 8, 11, 14) must be a colon
+            }
+        }
+        else
+        {
+            if (!isxdigit(mac[i]))
+            {
+                return false; // The other characters must be hexadecimal digits
+            }
+        }
+    }
+
+    return true; // MAC address is valid
+}
+
+static int ezlopi_factory_info_v3_set_4kb(const char *data, uint32_t offset, uint32_t len)
+{
+    int ret = 0;
+    char *tmp_variable = ezlopi_malloc(__FUNCTION__, len + 1);
+
+    if (tmp_variable)
+    {
+        snprintf(tmp_variable, len + 1, "%.*s", len, data);
+
+        if (ESP_OK == esp_partition_erase_range(partition_ctx_v3, offset, EZLOPI_FINFO_READ_LEN_4KB))
+        {
+            if (ESP_OK == esp_partition_write(partition_ctx_v3, offset, tmp_variable, len + 1))
+            {
+                TRACE_S("Flash write successful");
+                ret = 1;
+            }
+            else
+            {
+                TRACE_E("esp-partition write failed!");
+            }
+        }
+        else
+        {
+            TRACE_E("esp-partition erase failed!");
+        }
+
+        ezlopi_free(__FUNCTION__, tmp_variable);
+    }
+
+    return ret;
+}
+
+/*******************************************************************************
+ *                          End of File
+ *******************************************************************************/

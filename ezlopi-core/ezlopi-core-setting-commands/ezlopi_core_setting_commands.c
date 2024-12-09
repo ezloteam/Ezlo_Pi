@@ -1,4 +1,45 @@
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
 
+/**
+ * @file    main.c
+ * @brief   perform some function on data
+ * @author  John Doe
+ * @version 0.1
+ * @date    1st January 2024
+ */
+
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 #include "ezlopi_util_trace.h"
 #include "cjext.h"
 
@@ -9,6 +50,25 @@
 
 #include "ezlopi_cloud_constants.h"
 
+/*******************************************************************************
+ *                          Extern Data Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Type & Macro Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Static Function Prototypes
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Static Data Definitions
+ *******************************************************************************/
 const char *ezlopi_core_setting_command_names[SETTING_COMMAND_NAME_MAX] = {
     "scale.temperature",
     "date.format",
@@ -44,6 +104,210 @@ static e_enum_date_format_t date_format_to_user = DATE_FORMAT_MMDDYY;
 static e_enum_time_format_t time_format_to_user = TIME_FORMAT_12;
 static int network_ping_timeout_to_user = 10;
 
+/*******************************************************************************
+ *                          Extern Data Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Definitions
+ *******************************************************************************/
+
+/**
+ * @brief Global/extern function template example
+ * Convention : Use capital letter for initial word on extern function
+ * @param arg
+ */
+int ezlopi_core_setting_updated_broadcast(cJSON *cj_params, cJSON *cj_result)
+{
+    int ret = -1;
+    if (cj_params && cj_result)
+    {
+        cJSON *cj_name = cJSON_GetObjectItem(__FUNCTION__, cj_params, "name");
+        if (cj_name && cJSON_IsString(cj_name))
+        {
+            cJSON_AddStringToObject(__FUNCTION__, cj_result, "name", cj_name->valuestring);
+            e_ezlopi_core_setting_command_names_t e_name = ezlopi_core_setting_command_get_command_enum_from_str(cj_name->valuestring);
+            switch (e_name)
+            {
+            case SETTING_COMMAND_NAME_SCALE_TEMPERATURE:
+            {
+                cJSON_AddStringToObject(__FUNCTION__, cj_result, "value", temperature_scale_enum[temperature_scale_to_user]);
+                break;
+            }
+            case SETTING_COMMAND_NAME_DATE_FORMAT:
+            {
+                cJSON_AddStringToObject(__FUNCTION__, cj_result, "value", date_format_enum[date_format_to_user]);
+                break;
+            }
+            case SETTING_COMMAND_NAME_TIME_FORMAT:
+            {
+                cJSON_AddStringToObject(__FUNCTION__, cj_result, "value", time_format_enum[time_format_to_user]);
+                break;
+            }
+            case SETTING_COMMAND_NAME_NETWORK_PING_TIMEOUT:
+            {
+                cJSON_AddNumberToObject(__FUNCTION__, cj_result, "value", network_ping_timeout_to_user);
+                break;
+            }
+            case SETTING_COMMAND_NAME_LOG_LEVEL:
+            {
+                cJSON_AddStringToObject(__FUNCTION__, cj_result, "value", ezlopi_core_cloud_log_get_current_severity_enum_str());
+                break;
+            }
+            default:
+            {
+                break;
+            }
+            }
+            ret = 0;
+        }
+    }
+    return ret;
+}
+
+int ezlopi_core_setting_commands_process(cJSON *cj_params)
+{
+    int ret = -1;
+    if (cj_params)
+    {
+        cJSON *cj_name = cJSON_GetObjectItem(__FUNCTION__, cj_params, "name");
+        if (cj_name && cJSON_IsString(cj_name))
+        {
+            e_ezlopi_core_setting_command_names_t e_name = ezlopi_core_setting_command_get_command_enum_from_str(cj_name->valuestring);
+            switch (e_name)
+            {
+            case SETTING_COMMAND_NAME_SCALE_TEMPERATURE:
+            {
+                ret = ezlopi_core_setting_command_process_scale_temperature(cj_params);
+                break;
+            }
+            case SETTING_COMMAND_NAME_DATE_FORMAT:
+            {
+                ret = ezlopi_core_setting_command_process_date_format(cj_params);
+                break;
+            }
+            case SETTING_COMMAND_NAME_TIME_FORMAT:
+            {
+                ret = ezlopi_core_setting_command_process_time_format(cj_params);
+                break;
+            }
+            case SETTING_COMMAND_NAME_NETWORK_PING_TIMEOUT:
+            {
+                ret = ezlopi_core_setting_command_process_netork_ping_timeout(cj_params);
+                break;
+            }
+            case SETTING_COMMAND_NAME_LOG_LEVEL:
+            {
+                ret = ezlopi_core_setting_command_process_log_level(cj_params);
+                break;
+            }
+            default:
+            {
+                break;
+            }
+            }
+        }
+    }
+
+    return ret;
+}
+
+int ezlopi_core_setting_commands_populate_settings(cJSON *cj_result)
+{
+    int ret = -1;
+    if (cj_result)
+    {
+        cJSON *cj_settings = cJSON_AddArrayToObject(__FUNCTION__, cj_result, "settings");
+        if (cj_settings)
+        {
+            ezlopi_core_add_date_format_settings(cj_settings);
+            ezlopi_core_add_time_format_settings(cj_settings);
+            ezlopi_core_add_network_ping_timeout_settings(cj_settings);
+            ezlopi_core_add_temperature_scale_settings(cj_settings);
+            ezlopi_core_add_log_level_settings(cj_settings);
+        }
+    }
+    return ret;
+}
+
+int ezlopi_core_setting_commands_read_settings()
+{
+    int ret = 0;
+
+    EZPI_CORE_nvs_read_temperature_scale((uint32_t *)&temperature_scale_to_user);
+    TRACE_I("Temperature scale: %s", temperature_scale_enum[temperature_scale_to_user]);
+
+    EZPI_CORE_nvs_read_date_format((uint32_t *)&date_format_to_user);
+    TRACE_I("Date format: %s", date_format_enum[date_format_to_user]);
+
+    EZPI_CORE_nvs_read_time_format((uint32_t *)&time_format_to_user);
+    TRACE_I("Time format: %s", time_format_enum[time_format_to_user]);
+
+    EZPI_CORE_nvs_read_network_ping_timeout((uint32_t *)&network_ping_timeout_to_user);
+    TRACE_I("Network Ping Timeout: %d", network_ping_timeout_to_user);
+
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
+    ezlopi_core_read_set_log_severities();
+    // #warning "remove this in release"
+    ezlopi_core_read_set_log_severities_internal(ENUM_EZLOPI_LOG_SEVERITY_TRACE);
+    // printf("Log severity/level set to: %s\n", ezlopi_core_cloud_log_get_current_severity_enum_str());
+#endif // CONFIG_EZPI_UTIL_TRACE_EN
+
+    return ret;
+}
+
+e_enum_temperature_scale_t ezlopi_core_setting_get_temperature_scale()
+{
+    return temperature_scale_to_user;
+}
+
+e_enum_date_format_t ezlopi_core_setting_get_date_format()
+{
+    return date_format_to_user;
+}
+
+e_enum_time_format_t ezlopi_core_setting_get_time_format()
+{
+    return time_format_to_user;
+}
+
+int ezlopi_core_setting_get_network_ping_timeout()
+{
+    return network_ping_timeout_to_user;
+}
+
+e_ezlopi_core_setting_command_names_t ezlopi_core_setting_command_get_command_enum_from_str(const char *name)
+{
+    e_ezlopi_core_setting_command_names_t ret = SETTING_COMMAND_NAME_MAX;
+    if (name)
+    {
+        for (e_ezlopi_core_setting_command_names_t i = 0; i < SETTING_COMMAND_NAME_MAX; i++)
+        {
+            if (0 == strncmp(ezlopi_core_setting_command_names[i], name, strlen(ezlopi_core_setting_command_names[i])))
+            {
+                ret = i;
+            }
+        }
+    }
+    return ret;
+}
+
+const char *ezlopi_core_setting_get_temperature_scale_str()
+{
+    return temperature_scale_enum[temperature_scale_to_user];
+}
+const char *ezlopi_core_setting_get_date_format_str()
+{
+    return date_format_enum[date_format_to_user];
+}
+const char *ezlopi_core_setting_get_time_format_str()
+{
+    return time_format_enum[time_format_to_user];
+}
+
+/*******************************************************************************
+ *                          Static Function Definitions
+ *******************************************************************************/
 static int ezlopi_core_setting_command_process_scale_temperature(const cJSON *cj_params)
 {
     int ret = -1;
@@ -268,190 +532,6 @@ static int ezlopi_core_add_log_level_settings(cJSON *cj_settings)
     return ret;
 }
 
-int ezlopi_core_setting_updated_broadcast(cJSON *cj_params, cJSON *cj_result)
-{
-    int ret = -1;
-    if (cj_params && cj_result)
-    {
-        cJSON *cj_name = cJSON_GetObjectItem(__FUNCTION__, cj_params, "name");
-        if (cj_name && cJSON_IsString(cj_name))
-        {
-            cJSON_AddStringToObject(__FUNCTION__, cj_result, "name", cj_name->valuestring);
-            e_ezlopi_core_setting_command_names_t e_name = ezlopi_core_setting_command_get_command_enum_from_str(cj_name->valuestring);
-            switch (e_name)
-            {
-            case SETTING_COMMAND_NAME_SCALE_TEMPERATURE:
-            {
-                cJSON_AddStringToObject(__FUNCTION__, cj_result, "value", temperature_scale_enum[temperature_scale_to_user]);
-                break;
-            }
-            case SETTING_COMMAND_NAME_DATE_FORMAT:
-            {
-                cJSON_AddStringToObject(__FUNCTION__, cj_result, "value", date_format_enum[date_format_to_user]);
-                break;
-            }
-            case SETTING_COMMAND_NAME_TIME_FORMAT:
-            {
-                cJSON_AddStringToObject(__FUNCTION__, cj_result, "value", time_format_enum[time_format_to_user]);
-                break;
-            }
-            case SETTING_COMMAND_NAME_NETWORK_PING_TIMEOUT:
-            {
-                cJSON_AddNumberToObject(__FUNCTION__, cj_result, "value", network_ping_timeout_to_user);
-                break;
-            }
-            case SETTING_COMMAND_NAME_LOG_LEVEL:
-            {
-                cJSON_AddStringToObject(__FUNCTION__, cj_result, "value", ezlopi_core_cloud_log_get_current_severity_enum_str());
-                break;
-            }
-            default:
-            {
-                break;
-            }
-            }
-            ret = 0;
-        }
-    }
-    return ret;
-}
-
-int ezlopi_core_setting_commands_process(cJSON *cj_params)
-{
-    int ret = -1;
-    if (cj_params)
-    {
-        cJSON *cj_name = cJSON_GetObjectItem(__FUNCTION__, cj_params, "name");
-        if (cj_name && cJSON_IsString(cj_name))
-        {
-            e_ezlopi_core_setting_command_names_t e_name = ezlopi_core_setting_command_get_command_enum_from_str(cj_name->valuestring);
-            switch (e_name)
-            {
-            case SETTING_COMMAND_NAME_SCALE_TEMPERATURE:
-            {
-                ret = ezlopi_core_setting_command_process_scale_temperature(cj_params);
-                break;
-            }
-            case SETTING_COMMAND_NAME_DATE_FORMAT:
-            {
-                ret = ezlopi_core_setting_command_process_date_format(cj_params);
-                break;
-            }
-            case SETTING_COMMAND_NAME_TIME_FORMAT:
-            {
-                ret = ezlopi_core_setting_command_process_time_format(cj_params);
-                break;
-            }
-            case SETTING_COMMAND_NAME_NETWORK_PING_TIMEOUT:
-            {
-                ret = ezlopi_core_setting_command_process_netork_ping_timeout(cj_params);
-                break;
-            }
-            case SETTING_COMMAND_NAME_LOG_LEVEL:
-            {
-                ret = ezlopi_core_setting_command_process_log_level(cj_params);
-                break;
-            }
-            default:
-            {
-                break;
-            }
-            }
-        }
-    }
-
-    return ret;
-}
-
-int ezlopi_core_setting_commands_populate_settings(cJSON *cj_result)
-{
-    int ret = -1;
-    if (cj_result)
-    {
-        cJSON *cj_settings = cJSON_AddArrayToObject(__FUNCTION__, cj_result, "settings");
-        if (cj_settings)
-        {
-            ezlopi_core_add_date_format_settings(cj_settings);
-            ezlopi_core_add_time_format_settings(cj_settings);
-            ezlopi_core_add_network_ping_timeout_settings(cj_settings);
-            ezlopi_core_add_temperature_scale_settings(cj_settings);
-            ezlopi_core_add_log_level_settings(cj_settings);
-        }
-    }
-    return ret;
-}
-
-int ezlopi_core_setting_commands_read_settings()
-{
-    int ret = 0;
-
-    EZPI_CORE_nvs_read_temperature_scale((uint32_t *)&temperature_scale_to_user);
-    TRACE_I("Temperature scale: %s", temperature_scale_enum[temperature_scale_to_user]);
-
-    EZPI_CORE_nvs_read_date_format((uint32_t *)&date_format_to_user);
-    TRACE_I("Date format: %s", date_format_enum[date_format_to_user]);
-
-    EZPI_CORE_nvs_read_time_format((uint32_t *)&time_format_to_user);
-    TRACE_I("Time format: %s", time_format_enum[time_format_to_user]);
-
-    EZPI_CORE_nvs_read_network_ping_timeout((uint32_t *)&network_ping_timeout_to_user);
-    TRACE_I("Network Ping Timeout: %d", network_ping_timeout_to_user);
-
-#ifdef CONFIG_EZPI_UTIL_TRACE_EN
-    ezlopi_core_read_set_log_severities();
-    // #warning "remove this in release"
-    ezlopi_core_read_set_log_severities_internal(ENUM_EZLOPI_LOG_SEVERITY_TRACE);
-    // printf("Log severity/level set to: %s\n", ezlopi_core_cloud_log_get_current_severity_enum_str());
-#endif // CONFIG_EZPI_UTIL_TRACE_EN
-
-    return ret;
-}
-
-e_enum_temperature_scale_t ezlopi_core_setting_get_temperature_scale()
-{
-    return temperature_scale_to_user;
-}
-
-e_enum_date_format_t ezlopi_core_setting_get_date_format()
-{
-    return date_format_to_user;
-}
-
-e_enum_time_format_t ezlopi_core_setting_get_time_format()
-{
-    return time_format_to_user;
-}
-
-int ezlopi_core_setting_get_network_ping_timeout()
-{
-    return network_ping_timeout_to_user;
-}
-
-e_ezlopi_core_setting_command_names_t ezlopi_core_setting_command_get_command_enum_from_str(const char *name)
-{
-    e_ezlopi_core_setting_command_names_t ret = SETTING_COMMAND_NAME_MAX;
-    if (name)
-    {
-        for (e_ezlopi_core_setting_command_names_t i = 0; i < SETTING_COMMAND_NAME_MAX; i++)
-        {
-            if (0 == strncmp(ezlopi_core_setting_command_names[i], name, strlen(ezlopi_core_setting_command_names[i])))
-            {
-                ret = i;
-            }
-        }
-    }
-    return ret;
-}
-
-const char *ezlopi_core_setting_get_temperature_scale_str()
-{
-    return temperature_scale_enum[temperature_scale_to_user];
-}
-const char *ezlopi_core_setting_get_date_format_str()
-{
-    return date_format_enum[date_format_to_user];
-}
-const char *ezlopi_core_setting_get_time_format_str()
-{
-    return time_format_enum[time_format_to_user];
-}
+/*******************************************************************************
+ *                          End of File
+ *******************************************************************************/
