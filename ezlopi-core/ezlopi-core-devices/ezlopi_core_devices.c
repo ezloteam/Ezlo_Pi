@@ -225,9 +225,7 @@ static void __change_room_id_in_device_ll_and_nvs(l_ezlopi_device_t *curr_node, 
         if (cj_separate_child_devices)
         {
             bool change_to_new_room_id = true;
-            // int idx = 0;
             cJSON *cj_separate_child = NULL;
-            // while (NULL != (cj_separate_child = cJSON_GetArrayItem(cj_separate_child_devices, idx))) // ["102ea001" , "102ea002" ...]
             cJSON_ArrayForEach(cj_separate_child, cj_separate_child_devices)
             {
                 uint32_t _id_to_avoid = strtoul(cj_separate_child->valuestring, NULL, 16);
@@ -236,7 +234,6 @@ static void __change_room_id_in_device_ll_and_nvs(l_ezlopi_device_t *curr_node, 
                     change_to_new_room_id = false; // 'child_node_device_id' should not be listed in 'cj_separate_child_devices'
                     break;
                 }
-                // idx++;
             }
 
             if (change_to_new_room_id)
@@ -651,7 +648,7 @@ l_ezlopi_item_t *ezlopi_device_get_item_by_id(uint32_t item_id)
     return item_to_return;
 }
 
-l_ezlopi_item_t *ezlopi_device_add_item_to_device(l_ezlopi_device_t *device, ezlopi_error_t (*item_func)(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg))
+l_ezlopi_item_t *ezlopi_device_add_item_to_device(l_ezlopi_device_t *device, ezlopi_error_t(*item_func)(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg))
 {
     l_ezlopi_item_t *new_item = NULL;
     if (device)
@@ -938,7 +935,6 @@ static ezlopi_error_t ezlopi_device_parse_json_v3(cJSON *cjson_config)
                         cJSON *cjson_device = NULL;
 
                         TRACE_I("---------------------------------------------");
-                        // while (NULL != (cjson_device = cJSON_GetArrayItem(cjson_device_list, config_dev_idx)))
                         cJSON_ArrayForEach(cjson_device, cjson_device_list)
                         {
                             TRACE_I("Device-%d:", config_dev_idx);
@@ -961,7 +957,7 @@ static ezlopi_error_t ezlopi_device_parse_json_v3(cJSON *cjson_config)
                                 {
                                     if (id_item == v3_device_list[dev_idx].id)
                                     {
-                                        s_ezlopi_prep_arg_t device_prep_arg = {.device = &v3_device_list[dev_idx], .cjson_device = cjson_device};
+                                        s_ezlopi_prep_arg_t device_prep_arg = { .device = &v3_device_list[dev_idx], .cjson_device = cjson_device };
                                         v3_device_list[dev_idx].func(EZLOPI_ACTION_PREPARE, NULL, (void *)&device_prep_arg, NULL);
                                         error = EZPI_SUCCESS;
                                     }

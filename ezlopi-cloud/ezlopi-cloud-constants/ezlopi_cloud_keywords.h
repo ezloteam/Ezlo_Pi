@@ -1,5 +1,5 @@
-#ifndef __EZLOPI_CLOUD_KEYWORDS_H__
-#define __EZLOPI_CLOUD_KEYWORDS_H__
+#ifndef __EZLOPI_CLOUD_KEYWORDS_H__hfgdhdfg
+#define __EZLOPI_CLOUD_KEYWORDS_H__hfgdhdfg
 
 #include "stdio.h"
 
@@ -21,6 +21,7 @@ extern const char *ezlopi_user_str;
 extern const char *ezlopi_value_str;
 extern const char *ezlopi_method_str;
 extern const char *ezlopi_function_str;
+extern const char *ezlopi_ruleTrigger_str;
 extern const char *ezlopi_msg_id_str; // message counter, number of data transferred to ezlopi-cloud
 extern const char *ezlopi_msg_subclass_str;
 extern const char *ezlopi_ui_broadcast_str;
@@ -223,6 +224,7 @@ extern const char *ezlopi_ca_cert_str;
 extern const char *ezlopi_config_id_str;
 extern const char *ezlopi_config_time_str;
 extern const char *ezlopi_ssid_str;
+extern const char *ezlopi_key_str;
 extern const char *ezlopi_dev_type_ezlopi_str;
 extern const char *ezlopi_flash_size_str;
 extern const char *ezlopi_dev_free_flash_str;
@@ -414,8 +416,18 @@ extern const char *ezlopi_operation_str;
 extern const char *ezlopi_sunrise_str;
 extern const char *ezlopi_sunset_str;
 extern const char *ezlopi_weekdays_str;
+extern const char *ezlopi_weeks_str;
 extern const char *ezlopi_days_str;
 extern const char *ezlopi_range_str;
+
+extern const char *ezlopi_startTime_str;
+extern const char *ezlopi_startDay_str;
+extern const char *ezlopi_startMonth_str;
+extern const char *ezlopi_startYear_str;
+extern const char *ezlopi_endTime_str;
+extern const char *ezlopi_endDay_str;
+extern const char *ezlopi_endMonth_str;
+extern const char *ezlopi_endYear_str;
 
 extern const char *ezlopi_hours_str;
 extern const char *ezlopi_minutes_str;
@@ -437,6 +449,17 @@ extern const char *ezlopi_httpAnswerCode_str;
 extern const char *ezlopi_less_str;
 extern const char *ezlopi_least_str;
 
+extern const char *ezlopi_start_str;
+extern const char *ezlopi_finish_str;
 extern const char *ezlopi_blockMeta_str;
+
+extern const char *ezlopi_sceneName_str;
+extern const char *ezlopi_methodName_str;
+extern const char *ezlopi_executionDate_str;
+
+extern const char *ezlopi_when_category_time_str;
+extern const char *ezlopi_when_category_modes_str;
+extern const char *ezlopi_when_category_logic_str;
+extern const char *ezlopi_when_category_function_str;
 
 #endif // __EZLOPI_CLOUD_KEYWORDS_H__

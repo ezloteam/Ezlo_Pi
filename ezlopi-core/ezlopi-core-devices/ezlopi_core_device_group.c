@@ -76,15 +76,17 @@ static void __ezlopi_core_item_group_print(l_ezlopi_item_grp_t *item_grp_node)
 static void __edit_devgrp_from_ll(l_ezlopi_device_grp_t *req_devgrp_node, cJSON *cj_devgrp_new)
 {
 
-    (NULL != cJSON_GetObjectItem(__FUNCTION__, cj_devgrp_new, ezlopi_name_str)) ? (CJSON_GET_VALUE_STRING_BY_COPY_INTO_PTR(cj_devgrp_new, ezlopi_name_str, req_devgrp_node->name))
-        : ((NULL != req_devgrp_node->name) ? cJSON_AddStringToObject(__FUNCTION__, cj_devgrp_new, ezlopi_packageId_str, req_devgrp_node->name) : NULL);
+    (NULL != cJSON_GetObjectItem(__FUNCTION__, cj_devgrp_new, ezlopi_name_str))
+        ? (CJSON_GET_VALUE_STRING_BY_COPY_INTO_PTR(cj_devgrp_new, ezlopi_name_str, req_devgrp_node->name))
+        : cJSON_AddStringToObject(__FUNCTION__, cj_devgrp_new, ezlopi_packageId_str, req_devgrp_node->name);
 
     (NULL != cJSON_GetObjectItem(__FUNCTION__, cj_devgrp_new, ezlopi_persistent_str)) ? (CJSON_GET_VALUE_BOOL(cj_devgrp_new, ezlopi_persistent_str, req_devgrp_node->persistent)) : cJSON_AddBoolToObject(__FUNCTION__, cj_devgrp_new, ezlopi_persistent_str, req_devgrp_node->persistent);
 
     (NULL != cJSON_GetObjectItem(__FUNCTION__, cj_devgrp_new, ezlopi_followEntry_str)) ? (CJSON_GET_VALUE_BOOL(cj_devgrp_new, ezlopi_followEntry_str, req_devgrp_node->follow_entry)) : cJSON_AddBoolToObject(__FUNCTION__, cj_devgrp_new, ezlopi_followEntry_str, req_devgrp_node->follow_entry);
 
-    (NULL != cJSON_GetObjectItem(__FUNCTION__, cj_devgrp_new, ezlopi_packageId_str)) ? (CJSON_GET_VALUE_STRING_BY_COPY_INTO_PTR(cj_devgrp_new, ezlopi_packageId_str, req_devgrp_node->package_id))
-        : ((NULL != req_devgrp_node->package_id) ? cJSON_AddStringToObject(__FUNCTION__, cj_devgrp_new, ezlopi_packageId_str, req_devgrp_node->package_id) : NULL);
+    (NULL != cJSON_GetObjectItem(__FUNCTION__, cj_devgrp_new, ezlopi_packageId_str))
+        ? (CJSON_GET_VALUE_STRING_BY_COPY_INTO_PTR(cj_devgrp_new, ezlopi_packageId_str, req_devgrp_node->package_id))
+        : cJSON_AddStringToObject(__FUNCTION__, cj_devgrp_new, ezlopi_packageId_str, req_devgrp_node->package_id);
 
     // ------------- categories -------------
     {
@@ -142,10 +144,11 @@ static void __edit_devgrp_from_ll(l_ezlopi_device_grp_t *req_devgrp_node, cJSON 
         cJSON *cj_entry_delay = cJSON_GetObjectItem(__FUNCTION__, cj_devgrp_new, ezlopi_entryDelay_str);
         if (cj_entry_delay && cj_entry_delay->valuestring && cj_entry_delay->str_value_len)
         {
-            req_devgrp_node->entry_delay = ((0 == strncmp(cj_entry_delay->valuestring, ezlopi_normal_str, 7)) ? EZLOPI_DEVICE_GRP_ENTRYDELAY_NORMAL
-                : (0 == strncmp(cj_entry_delay->valuestring, ezlopi_long_extended_str, 14)) ? EZLOPI_DEVICE_GRP_ENTRYDELAY_LONG_EXTENDED
-                : (0 == strncmp(cj_entry_delay->valuestring, ezlopi_extended_str, 9)) ? EZLOPI_DEVICE_GRP_ENTRYDELAY_EXTENDED
-                : (0 == strncmp(cj_entry_delay->valuestring, ezlopi_instant_str, 8)) ? EZLOPI_DEVICE_GRP_ENTRYDELAY_INSTANT
+            req_devgrp_node->entry_delay = (
+                (EZPI_STRNCMP_IF_EQUAL(cj_entry_delay->valuestring, ezlopi_normal_str, cj_entry_delay->str_value_len, 7)) ? EZLOPI_DEVICE_GRP_ENTRYDELAY_NORMAL
+                : (EZPI_STRNCMP_IF_EQUAL(cj_entry_delay->valuestring, ezlopi_long_extended_str, cj_entry_delay->str_value_len, 13)) ? EZLOPI_DEVICE_GRP_ENTRYDELAY_LONG_EXTENDED
+                : (EZPI_STRNCMP_IF_EQUAL(cj_entry_delay->valuestring, ezlopi_extended_str, cj_entry_delay->str_value_len, 9)) ? EZLOPI_DEVICE_GRP_ENTRYDELAY_EXTENDED
+                : (EZPI_STRNCMP_IF_EQUAL(cj_entry_delay->valuestring, ezlopi_instant_str, cj_entry_delay->str_value_len, 8)) ? EZLOPI_DEVICE_GRP_ENTRYDELAY_INSTANT
                 : EZLOPI_DEVICE_GRP_ENTRYDELAY_NONE);
         }
         else
@@ -178,7 +181,7 @@ static void __edit_devgrp_from_ll(l_ezlopi_device_grp_t *req_devgrp_node, cJSON 
         cJSON *cj_role = cJSON_GetObjectItem(__FUNCTION__, cj_devgrp_new, ezlopi_role_str);
         if (cj_role && cj_role->valuestring && cj_role->str_value_len)
         {
-            req_devgrp_node->role = ((0 == strncmp(cj_role->valuestring, ezlopi_house_modes_str, 12)) ? EZLOPI_DEVICE_GRP_ROLE_HOUSE_MODES : EZLOPI_DEVICE_GRP_ROLE_USER);
+            req_devgrp_node->role = ((EZPI_STRNCMP_IF_EQUAL(cj_role->valuestring, ezlopi_house_modes_str, cj_role->str_value_len, 12)) ? EZLOPI_DEVICE_GRP_ROLE_HOUSE_MODES : EZLOPI_DEVICE_GRP_ROLE_USER);
         }
         else
         {
@@ -200,8 +203,7 @@ static void __edit_itemgrp_from_ll(l_ezlopi_item_grp_t *req_itemgrp_node, cJSON 
 {
 
     (NULL != cJSON_GetObjectItem(__FUNCTION__, cj_itemgrp_new, ezlopi_name_str)) ? (CJSON_GET_VALUE_STRING_BY_COPY_INTO_PTR(cj_itemgrp_new, ezlopi_name_str, req_itemgrp_node->name))
-        : ((NULL != req_itemgrp_node->name) ? cJSON_AddStringToObject(__FUNCTION__, cj_itemgrp_new, ezlopi_name_str, req_itemgrp_node->name)
-            : NULL);
+        : cJSON_AddStringToObject(__FUNCTION__, cj_itemgrp_new, ezlopi_name_str, req_itemgrp_node->name);
 
     (NULL != cJSON_GetObjectItem(__FUNCTION__, cj_itemgrp_new, ezlopi_hasGetter_str)) ? (CJSON_GET_VALUE_BOOL(cj_itemgrp_new, ezlopi_hasGetter_str, req_itemgrp_node->has_getter))
         : cJSON_AddBoolToObject(__FUNCTION__, cj_itemgrp_new, ezlopi_hasGetter_str, req_itemgrp_node->has_getter);
@@ -211,14 +213,12 @@ static void __edit_itemgrp_from_ll(l_ezlopi_item_grp_t *req_itemgrp_node, cJSON 
     (NULL != cJSON_GetObjectItem(__FUNCTION__, cj_itemgrp_new, ezlopi_persistent_str)) ? (CJSON_GET_VALUE_BOOL(cj_itemgrp_new, ezlopi_persistent_str, req_itemgrp_node->persistent)) : cJSON_AddBoolToObject(__FUNCTION__, cj_itemgrp_new, ezlopi_persistent_str, req_itemgrp_node->persistent);
 
     (NULL != cJSON_GetObjectItem(__FUNCTION__, cj_itemgrp_new, ezlopi_valueType_str)) ? (CJSON_GET_VALUE_STRING_BY_COPY_INTO_PTR(cj_itemgrp_new, ezlopi_valueType_str, req_itemgrp_node->value_type))
-        : ((NULL != req_itemgrp_node->value_type) ? cJSON_AddStringToObject(__FUNCTION__, cj_itemgrp_new, ezlopi_valueType_str, req_itemgrp_node->value_type)
-            : NULL);
+        : cJSON_AddStringToObject(__FUNCTION__, cj_itemgrp_new, ezlopi_valueType_str, req_itemgrp_node->value_type);
 
     if (req_itemgrp_node->value_type && strlen(req_itemgrp_node->value_type))
     {
         (NULL != cJSON_GetObjectItem(__FUNCTION__, cj_itemgrp_new, ezlopi_valueTypeFamily_str)) ? (CJSON_GET_VALUE_STRING_BY_COPY_INTO_PTR(cj_itemgrp_new, ezlopi_valueTypeFamily_str, req_itemgrp_node->value_type_family))
-            : ((NULL != req_itemgrp_node->value_type_family) ? cJSON_AddStringToObject(__FUNCTION__, cj_itemgrp_new, ezlopi_valueTypeFamily_str, req_itemgrp_node->value_type_family)
-                : NULL);
+            : cJSON_AddStringToObject(__FUNCTION__, cj_itemgrp_new, ezlopi_valueTypeFamily_str, req_itemgrp_node->value_type_family);
     }
 
     // ------------- itemNames -------------
@@ -261,8 +261,9 @@ static void __edit_itemgrp_from_ll(l_ezlopi_item_grp_t *req_itemgrp_node, cJSON 
         cJSON *cj_role = cJSON_GetObjectItem(__FUNCTION__, cj_itemgrp_new, ezlopi_role_str);
         if (cj_role && cj_role->valuestring && cj_role->str_value_len)
         {
-            req_itemgrp_node->role = ((0 == strncmp(cj_role->valuestring, ezlopi_house_modes_str, 12)) ? EZLOPI_ITEM_GRP_ROLE_HOUSE_MODES
-                : (0 == strncmp(cj_role->valuestring, ezlopi_lifeSafety_str, 12)) ? EZLOPI_ITEM_GRP_ROLE_LIFE_SAFETY
+            req_itemgrp_node->role = (
+                (EZPI_STRNCMP_IF_EQUAL(cj_role->valuestring, ezlopi_house_modes_str, cj_role->str_value_len, 12)) ? EZLOPI_ITEM_GRP_ROLE_HOUSE_MODES
+                : (EZPI_STRNCMP_IF_EQUAL(cj_role->valuestring, ezlopi_lifeSafety_str, cj_role->str_value_len, 11)) ? EZLOPI_ITEM_GRP_ROLE_LIFE_SAFETY
                 : EZLOPI_ITEM_GRP_ROLE_EMPTY);
         }
         else
@@ -568,10 +569,11 @@ static l_ezlopi_device_grp_t *____device_grp_create_node(cJSON *cj_device_grp, u
                 cJSON *cj_entry_delay = cJSON_GetObjectItem(__FUNCTION__, cj_device_grp, ezlopi_entryDelay_str);
                 if (cj_entry_delay && cj_entry_delay->valuestring && cj_entry_delay->str_value_len)
                 {
-                    new_device_grp_node->entry_delay = ((0 == strncmp(cj_entry_delay->valuestring, ezlopi_normal_str, 7)) ? EZLOPI_DEVICE_GRP_ENTRYDELAY_NORMAL
-                        : (0 == strncmp(cj_entry_delay->valuestring, ezlopi_long_extended_str, 14)) ? EZLOPI_DEVICE_GRP_ENTRYDELAY_LONG_EXTENDED
-                        : (0 == strncmp(cj_entry_delay->valuestring, ezlopi_extended_str, 9)) ? EZLOPI_DEVICE_GRP_ENTRYDELAY_EXTENDED
-                        : (0 == strncmp(cj_entry_delay->valuestring, ezlopi_instant_str, 8)) ? EZLOPI_DEVICE_GRP_ENTRYDELAY_INSTANT
+                    new_device_grp_node->entry_delay = (
+                        (EZPI_STRNCMP_IF_EQUAL(cj_entry_delay->valuestring, ezlopi_normal_str, cj_entry_delay->str_value_len, 7)) ? EZLOPI_DEVICE_GRP_ENTRYDELAY_NORMAL
+                        : (EZPI_STRNCMP_IF_EQUAL(cj_entry_delay->valuestring, ezlopi_long_extended_str, cj_entry_delay->str_value_len, 13)) ? EZLOPI_DEVICE_GRP_ENTRYDELAY_LONG_EXTENDED
+                        : (EZPI_STRNCMP_IF_EQUAL(cj_entry_delay->valuestring, ezlopi_extended_str, cj_entry_delay->str_value_len, 9)) ? EZLOPI_DEVICE_GRP_ENTRYDELAY_EXTENDED
+                        : (EZPI_STRNCMP_IF_EQUAL(cj_entry_delay->valuestring, ezlopi_instant_str, cj_entry_delay->str_value_len, 8)) ? EZLOPI_DEVICE_GRP_ENTRYDELAY_INSTANT
                         : EZLOPI_DEVICE_GRP_ENTRYDELAY_NONE);
                 }
             }
@@ -580,7 +582,7 @@ static l_ezlopi_device_grp_t *____device_grp_create_node(cJSON *cj_device_grp, u
                 cJSON *cj_role = cJSON_GetObjectItem(__FUNCTION__, cj_device_grp, ezlopi_role_str);
                 if (cj_role && cj_role->valuestring && cj_role->str_value_len)
                 {
-                    new_device_grp_node->role = ((0 == strncmp(cj_role->valuestring, ezlopi_house_modes_str, 12)) ? EZLOPI_DEVICE_GRP_ROLE_HOUSE_MODES : EZLOPI_DEVICE_GRP_ROLE_USER);
+                    new_device_grp_node->role = ((EZPI_STRNCMP_IF_EQUAL(cj_role->valuestring, ezlopi_house_modes_str, cj_role->str_value_len, 12)) ? EZLOPI_DEVICE_GRP_ROLE_HOUSE_MODES : EZLOPI_DEVICE_GRP_ROLE_USER);
                 }
             }
 
@@ -634,8 +636,9 @@ static l_ezlopi_item_grp_t *____item_grp_create_node(cJSON *cj_item_grp, uint32_
                 cJSON *cj_role = cJSON_GetObjectItem(__FUNCTION__, cj_item_grp, ezlopi_role_str);
                 if (cj_role && cj_role->valuestring && cj_role->str_value_len)
                 {
-                    new_item_grp_node->role = ((0 == strncmp(cj_role->valuestring, ezlopi_house_modes_str, 12)) ? EZLOPI_ITEM_GRP_ROLE_HOUSE_MODES
-                        : (0 == strncmp(cj_role->valuestring, ezlopi_lifeSafety_str, 12)) ? EZLOPI_ITEM_GRP_ROLE_LIFE_SAFETY
+                    new_item_grp_node->role = (
+                        (EZPI_STRNCMP_IF_EQUAL(cj_role->valuestring, ezlopi_house_modes_str, cj_role->str_value_len, 12)) ? EZLOPI_ITEM_GRP_ROLE_HOUSE_MODES
+                        : (EZPI_STRNCMP_IF_EQUAL(cj_role->valuestring, ezlopi_lifeSafety_str, cj_role->str_value_len, 11)) ? EZLOPI_ITEM_GRP_ROLE_LIFE_SAFETY
                         : EZLOPI_ITEM_GRP_ROLE_EMPTY);
                 }
             }
@@ -926,7 +929,6 @@ static void ____remove_id_from_group_list(uint32_t _id, bool choice_of_trigger) 
         {
             uint32_t idx = 0;
             cJSON *cj_id = NULL;
-            // while (NULL != (cj_id = cJSON_GetArrayItem(cj_grp_id_list, idx))) // since all the elements are all-ready in 'cJSON_Number'
             cJSON_ArrayForEach(cj_id, cj_grp_id_list)
             {
                 if (cj_id->valuedouble == _id)
@@ -1147,16 +1149,14 @@ static bool ____check_for_category_in_devGrp(cJSON *cj_curr_devGrp_node, const c
         cJSON *cj_categories_arr = cJSON_GetObjectItem(__FUNCTION__, cj_curr_devGrp_node, ezlopi_categories_str);
         if (cj_categories_arr && cJSON_IsArray(cj_categories_arr))
         {
-            // int idx = 0;
             cJSON *cj_cat_element = NULL;
-            // while (NULL != (cj_cat_element = cJSON_GetArrayItem(cj_categories_arr, idx))) // object
             cJSON_ArrayForEach(cj_cat_element, cj_categories_arr)
             {
                 // 1. compare category {string}
                 cJSON *cj_category = cJSON_GetObjectItem(__FUNCTION__, cj_cat_element, ezlopi_category_str); // string
                 if (cj_category && cj_category->valuestring)
                 {
-                    if (EZPI_STRNCMP_IF_EQUAL(cj_category->valuestring, req_category_name, strlen(cj_category->valuestring), strlen(req_category_name)))
+                    if (EZPI_STRNCMP_IF_EQUAL(cj_category->valuestring, req_category_name, cj_category->str_value_len, strlen(req_category_name) + 1))
                     {
                         ret = true;
                         // TRACE_S("found Category --> '%s'", req_category_name);
@@ -1164,7 +1164,6 @@ static bool ____check_for_category_in_devGrp(cJSON *cj_curr_devGrp_node, const c
                         break;
                     }
                 }
-                // idx++;
             }
         }
     }
@@ -1178,27 +1177,22 @@ static bool ____check_for_subcategory_in_devGrp(cJSON *cj_curr_devGrp_node, cons
         cJSON *cj_categories_arr = cJSON_GetObjectItem(__FUNCTION__, cj_curr_devGrp_node, ezlopi_categories_str);
         if (cj_categories_arr && cJSON_IsArray(cj_categories_arr))
         {
-            // int idx = 0;
             cJSON *cj_cat_element = NULL;
-            // while (NULL != (cj_cat_element = cJSON_GetArrayItem(cj_categories_arr, idx))) // object
             cJSON_ArrayForEach(cj_cat_element, cj_categories_arr)
             {
                 // 2 compare sub-category {array}
                 cJSON *cj_sub_category_arr = cJSON_GetObjectItem(__FUNCTION__, cj_cat_element, ezlopi_subcategory_str); // arr-object
                 if (cj_sub_category_arr && cJSON_IsArray(cj_sub_category_arr))
                 {
-                    // int count = 0;
                     cJSON *cj_subcat_element = NULL;
-                    // while (NULL != (cj_subcat_element = cJSON_GetArrayItem(cj_sub_category_arr, count))) // string
                     cJSON_ArrayForEach(cj_subcat_element, cj_sub_category_arr)
                     {
-                        if (EZPI_STRNCMP_IF_EQUAL(cj_subcat_element->valuestring, req_subcategory_name, strlen(cj_subcat_element->valuestring), strlen(req_subcategory_name)))
+                        if (EZPI_STRNCMP_IF_EQUAL(cj_subcat_element->valuestring, req_subcategory_name, cj_subcat_element->str_value_len, strlen(req_subcategory_name) + 1))
                         {
                             ret = true;
                             break;
                             // TRACE_S("found Sub-Category --> '%s'", req_subcategory_name);
                         }
-                        // count++;
                     }
                 }
 
@@ -1208,7 +1202,6 @@ static bool ____check_for_subcategory_in_devGrp(cJSON *cj_curr_devGrp_node, cons
                     // TRACE_S("Sub-Category criteria completed...  ");
                     break;
                 }
-                // idx++;
             }
         }
     }
@@ -1222,20 +1215,17 @@ static bool ____check_for_device_id_in_devGrp(cJSON *cj_curr_devGrp_node, const 
         cJSON *cj_devices_arr = cJSON_GetObjectItem(__FUNCTION__, cj_curr_devGrp_node, ezlopi_devices_str); // arr-obj
         if (cj_devices_arr && cJSON_IsArray(cj_devices_arr))
         {
-            // int idx = 0;
             cJSON *cj_device = NULL;
-            // while (NULL != (cj_device = cJSON_GetArrayItem(cj_devices_arr, idx))) // string
             cJSON_ArrayForEach(cj_device, cj_devices_arr)
             {
                 // 3. compare devices string-elements {string}
-                if (EZPI_STRNCMP_IF_EQUAL(cj_device->valuestring, req_device_id_str, strlen(cj_device->valuestring), strlen(req_device_id_str)))
+                if (EZPI_STRNCMP_IF_EQUAL(cj_device->valuestring, req_device_id_str, cj_device->str_value_len, strlen(req_device_id_str) + 1))
                 {
                     ret = true;
                     // TRACE_S("found Device-Id : %s", req_device_id_str);
                     // TRACE_S("DeviceGroupId criteria completed... ; ", ret);
                     break;
                 }
-                // idx++;
             }
         }
     }
@@ -1250,19 +1240,16 @@ static bool ____check_for_deviceGroupIds_list(cJSON *cj_curr_devGrp_node, cJSON 
         if (cj_curr_devGrp_id && cj_curr_devGrp_id->valuestring)
         {
             // 5. compare 'cj_curr_devGrp_id' match with the one in "deviceGroupIds_list".
-            // int idx = 0;
             cJSON *cj_devId_element = NULL;
-            // while (NULL != (cj_devId_element = cJSON_GetArrayItem(deviceGroupIds_list, idx))) // string [ "c02ea002" , "c02ea003" ...]
             cJSON_ArrayForEach(cj_devId_element, deviceGroupIds_list)
             {
-                if (EZPI_STRNCMP_IF_EQUAL(cj_curr_devGrp_id->valuestring, cj_devId_element->valuestring, strlen(cj_curr_devGrp_id->valuestring), strlen(cj_devId_element->valuestring)))
+                if (EZPI_STRNCMP_IF_EQUAL(cj_curr_devGrp_id->valuestring, cj_devId_element->valuestring, cj_curr_devGrp_id->str_value_len, strlen(cj_devId_element->valuestring) + 1))
                 {
                     ret = true;
                     // TRACE_S("found list Device-Id matched : %s", cj_curr_devGrp_id->valuestring);
                     // TRACE_S("DeviceGroupIds criteria completed... ; ", ret);
                     break;
                 }
-                // idx++;
             }
         }
     }
@@ -1277,7 +1264,7 @@ static bool ____check_for_deviceGroupId(cJSON *cj_curr_devGrp_node, const char *
         if (cj_curr_devGrp_id && cj_curr_devGrp_id->valuestring)
         {
             // 5. compare devices string-elements {string}
-            if (EZPI_STRNCMP_IF_EQUAL(cj_curr_devGrp_id->valuestring, req_deviceGroupId, strlen(cj_curr_devGrp_id->valuestring), strlen(req_deviceGroupId)))
+            if (EZPI_STRNCMP_IF_EQUAL(cj_curr_devGrp_id->valuestring, req_deviceGroupId, cj_curr_devGrp_id->str_value_len, strlen(req_deviceGroupId) + 1))
             {
                 ret = true;
                 // TRACE_S("DeviceGroupId criteria completed... ; ", ret);
@@ -1351,9 +1338,7 @@ uint32_t ezlopi_core_device_group_find(cJSON *cj_destination_array, cJSON *cj_pa
         cJSON *cj_devgrp_id_list = cJSON_Parse(__FUNCTION__, devgrp_id_list);
         if (cj_devgrp_id_list)
         {
-            // int idx = 0;
             cJSON *cj_devgrp_id = NULL;
-            // while (NULL != (cj_devgrp_id = cJSON_GetArrayItem(cj_devgrp_id_list, idx))) // the list elements are in 'cJSON_number'
             cJSON_ArrayForEach(cj_devgrp_id, cj_devgrp_id_list)
             {
                 char devgrp_id_str[32];
@@ -1406,7 +1391,6 @@ uint32_t ezlopi_core_device_group_find(cJSON *cj_destination_array, cJSON *cj_pa
 
                     ezlopi_free(__FUNCTION__, devgrp_str);
                 }
-                // idx++;
             }
 
             cJSON_Delete(__FUNCTION__, cj_devgrp_id_list);
@@ -1471,16 +1455,14 @@ static void ____compare_when_itemgrpid_is_given(cJSON *cj_main_device_list, l_ez
 
                 // B1 . Compare :-    devce_ll_[items]   -- with --    itemGrpId_[itemNames]
                 cJSON *cj_item_name_compare = NULL; // holds   "item_name" [i.e.list_member] <----- [itemGroupId]
-
-                // while (NULL != (cj_item_name_compare = cJSON_GetArrayItem(curr_itemgrp_ll->item_names, req_count))) //  [ "temp" , "humidity" , ...]
                 cJSON_ArrayForEach(cj_item_name_compare, curr_itemgrp_ll->item_names)
                 {
                     req_count++; // increase the count on items checked
 
                     if (EZPI_STRNCMP_IF_EQUAL(curr_items_ll_node->cloud_properties.item_name, // items_ll <---- device_ll
                         cj_item_name_compare->valuestring,              // cj_item_name_compare ("temp") <--- itemNames[] <--- ll_itemgrp
-                        strlen(curr_items_ll_node->cloud_properties.item_name),
-                        strlen(cj_item_name_compare->valuestring)))
+                        strlen(curr_items_ll_node->cloud_properties.item_name) + 1,
+                        cj_item_name_compare->str_value_len))
                     {
                         num_of_matched_items++;
                         break;
@@ -1506,10 +1488,8 @@ static void __generate_device_list_with_specific_itemgroup_id(cJSON *cj_destinat
 {
     if (cj_destination_array && cj_devices_arr && cj_params)
     {
-        // int idx = 0;
         cJSON *cj_device = NULL;
 
-        // while (NULL != (cj_device = cJSON_GetArrayItem(cj_devices_arr, idx))) // extract string device_id ---> "102ce001 .."
         cJSON_ArrayForEach(cj_device, cj_devices_arr)
         {
             if (cj_device->valuestring)
@@ -1555,7 +1535,6 @@ static void __generate_device_list_with_specific_itemgroup_id(cJSON *cj_destinat
                     }
                 }
             }
-            // idx++;
         }
     }
 }

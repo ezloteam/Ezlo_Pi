@@ -64,7 +64,7 @@
         }                                                                                               \
     }
 
-#define CJSON_GET_VALUE_STRING_BY_COPY_INTO_PTR(root, item_name, item_val_ptr)                                      \
+#define   CJSON_GET_VALUE_STRING_BY_COPY_INTO_PTR(root, item_name, item_val_ptr)                                      \
     {                                                                                                               \
         cJSON *o_item = cJSON_GetObjectItem(__FUNCTION__, root, item_name);                                         \
         if (o_item && o_item->valuestring && o_item->str_value_len)                                                 \

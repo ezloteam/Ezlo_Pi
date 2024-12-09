@@ -180,7 +180,7 @@ s_ezlopi_modes_t *ezlopi_core_modes_cjson_parse_modes(cJSON *cj_modes) // This f
                     cJSON *cj_description = cJSON_GetObjectItem(__FUNCTION__, cj_house_mod, ezlopi_description_str);
                     if (cj_description && cj_description->valuestring)
                     {
-                        uint32_t desc_len = strlen(cj_description->valuestring) + 1;
+                        uint32_t desc_len = (cj_description->str_value_len) + 1;
                         cur_house_mode->description = (char *)ezlopi_malloc(__FUNCTION__, desc_len);
                         if (cur_house_mode->description)
                         {
@@ -309,18 +309,20 @@ s_ezlopi_modes_t *ezlopi_core_modes_cjson_parse_modes(cJSON *cj_modes) // This f
                 char tmp_str[32] = { 0 };
                 CJSON_GET_VALUE_STRING_BY_COPY(cj_alarmed, ezlopi_phase_str, tmp_str);
                 {
-                    (EZPI_STRNCMP_IF_EQUAL(ezlopi_idle_str, tmp_str, 5, strlen(tmp_str))) ? (parsed_mode->alarmed.phase = EZLOPI_MODES_ALARM_PHASE_IDLE)
-                        : (EZPI_STRNCMP_IF_EQUAL(ezlopi_bypass_str, tmp_str, 7, strlen(tmp_str))) ? (parsed_mode->alarmed.phase = EZLOPI_MODES_ALARM_PHASE_BYPASS)
-                        : (EZPI_STRNCMP_IF_EQUAL(ezlopi_entryDelay_str, tmp_str, 11, strlen(tmp_str))) ? (parsed_mode->alarmed.phase = EZLOPI_MODES_ALARM_PHASE_ENTRYDELAY)
-                        : (EZPI_STRNCMP_IF_EQUAL(ezlopi_main_str, tmp_str, 5, strlen(tmp_str))) ? (parsed_mode->alarmed.phase = EZLOPI_MODES_ALARM_PHASE_MAIN)
+                    size_t tmp_len = strlen(tmp_str) + 1;
+                    (EZPI_STRNCMP_IF_EQUAL(ezlopi_idle_str, tmp_str, 5, tmp_len)) ? (parsed_mode->alarmed.phase = EZLOPI_MODES_ALARM_PHASE_IDLE)
+                        : (EZPI_STRNCMP_IF_EQUAL(ezlopi_bypass_str, tmp_str, 7, tmp_len)) ? (parsed_mode->alarmed.phase = EZLOPI_MODES_ALARM_PHASE_BYPASS)
+                        : (EZPI_STRNCMP_IF_EQUAL(ezlopi_entryDelay_str, tmp_str, 11, tmp_len)) ? (parsed_mode->alarmed.phase = EZLOPI_MODES_ALARM_PHASE_ENTRYDELAY)
+                        : (EZPI_STRNCMP_IF_EQUAL(ezlopi_main_str, tmp_str, 5, tmp_len)) ? (parsed_mode->alarmed.phase = EZLOPI_MODES_ALARM_PHASE_MAIN)
                         : (parsed_mode->alarmed.phase = EZLOPI_MODES_ALARM_PHASE_NONE); // this "NONE"-phase exists only at the beginning .
                 }
 
                 CJSON_GET_VALUE_STRING_BY_COPY(cj_alarmed, ezlopi_status_str, tmp_str);
                 {
-                    (EZPI_STRNCMP_IF_EQUAL(ezlopi_done_str, tmp_str, 5, strlen(tmp_str))) ? (parsed_mode->alarmed.status = EZLOPI_MODES_ALARM_STATUS_DONE)
-                        : (EZPI_STRNCMP_IF_EQUAL(ezlopi_begin_str, tmp_str, 6, strlen(tmp_str))) ? (parsed_mode->alarmed.status = EZLOPI_MODES_ALARM_STATUS_BEGIN)
-                        : (EZPI_STRNCMP_IF_EQUAL(ezlopi_canceled_str, tmp_str, 9, strlen(tmp_str))) ? (parsed_mode->alarmed.status = EZLOPI_MODES_ALARM_STATUS_CANCELED)
+                    size_t tmp_len = strlen(tmp_str) + 1;
+                    (EZPI_STRNCMP_IF_EQUAL(ezlopi_done_str, tmp_str, 5, tmp_len)) ? (parsed_mode->alarmed.status = EZLOPI_MODES_ALARM_STATUS_DONE)
+                        : (EZPI_STRNCMP_IF_EQUAL(ezlopi_begin_str, tmp_str, 6, tmp_len)) ? (parsed_mode->alarmed.status = EZLOPI_MODES_ALARM_STATUS_BEGIN)
+                        : (EZPI_STRNCMP_IF_EQUAL(ezlopi_canceled_str, tmp_str, 9, tmp_len)) ? (parsed_mode->alarmed.status = EZLOPI_MODES_ALARM_STATUS_CANCELED)
                         : (parsed_mode->alarmed.status = EZLOPI_MODES_ALARM_STATUS_DONE); // default State
                 }
 

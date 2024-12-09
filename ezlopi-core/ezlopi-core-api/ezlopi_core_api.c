@@ -137,7 +137,7 @@ static int __check_for_no_error(cJSON *cj_request)
     {
         cJSON *cj_error = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_error_str);
         if ((NULL == cj_error) || (cJSON_NULL == cj_error->type) ||
-            ((NULL != cj_error->valuestring) && (0 == strncmp(cj_error->valuestring, ezlopi_null_str, 4))))
+            ((NULL != cj_error->valuestring) && (EZPI_STRNCMP_IF_EQUAL(cj_error->valuestring, ezlopi_null_str, cj_error->str_value_len, 5))))
         {
             ret = 1;
         }

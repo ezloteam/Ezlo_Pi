@@ -14,13 +14,13 @@
 #include "ezlopi_core_scenes_v2.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_service_meshbot.h"
-#include "ezlopi_cloud_constants.h"
 #include "ezlopi_core_scenes_populate.h"
 #include "ezlopi_core_scenes_operators.h"
 #include "ezlopi_core_scenes_notifications.h"
 #include "ezlopi_core_scenes_then_methods_helper_func.h"
 #include "ezlopi_core_scenes_when_methods_helper_functions.h"
 
+#include "ezlopi_cloud_constants.h"
 void scenes_list(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str); // For NULL broadcast
@@ -281,7 +281,6 @@ void scenes_notification_remove(cJSON *cj_request, cJSON *cj_response)
                     {
                         uint32_t idx = 0;
                         cJSON *cj_user_id = NULL;
-                        // while (NULL != (cj_user_id = cJSON_GetArrayItem(cj_user_notifications, idx)))
                         cJSON_ArrayForEach(cj_user_id, cj_user_notifications)
                         {
                             if (0 == strcmp(cj_user_id->valuestring, cj_user_id_del->valuestring))
@@ -492,7 +491,7 @@ void scenes_action_block_test(cJSON *cj_request, cJSON *cj_response)
                         {
                             for (uint8_t i = 0; i < ((sizeof(__sendhttp_method) / sizeof(__sendhttp_method[i]))); i++)
                             {
-                                if (0 == strncmp(__sendhttp_method[i].field_name, curr_field->name, strlen(__sendhttp_method[i].field_name) + 1))
+                                if (EZPI_STRNCMP_IF_EQUAL(__sendhttp_method[i].field_name, curr_field->name, strlen(__sendhttp_method[i].field_name) + 1, strlen(curr_field->name) + 1))
                                 {
                                     (__sendhttp_method[i].field_func)(tmp_http_data, curr_field);
                                     break;
@@ -674,7 +673,7 @@ void scenes_clone(cJSON *cj_request, cJSON *cj_response)
                                         scene_node = ezlopi_scenes_get_scenes_head_v2();
                                         while (scene_node)
                                         { // check if the new-generated 'name' is redundant?
-                                            if (0 == strncmp(scene_node->name, name_buf, sizeof(scene_node->name)))
+                                            if (EZPI_STRNCMP_IF_EQUAL(scene_node->name, name_buf, sizeof(scene_node->name), sizeof(name_buf)))
                                             {
                                                 dupli_flag = true;
                                                 break;

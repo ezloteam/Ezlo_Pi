@@ -79,9 +79,7 @@ int ezlopi_room_name_set(cJSON *cj_room)
 
                     if (cj_rooms)
                     {
-                        // int idx = 0;
                         cJSON *cj_room_tmp = NULL;
-                        // while (NULL != (cj_room_tmp = cJSON_GetArrayItem(cj_rooms, idx++)))
                         cJSON_ArrayForEach(cj_room_tmp, cj_rooms)
                         {
                             cJSON *cj_room_tmp_id = cJSON_GetObjectItem(__FUNCTION__, cj_room_tmp, ezlopi__id_str);
@@ -240,7 +238,6 @@ int ezlopi_room_reorder(cJSON *cj_rooms_ids)
             {
                 cJSON *cj_room_id = NULL;
 
-                // while (NULL != (cj_room_id = cJSON_GetArrayItem(cj_rooms_ids, idx)))
                 cJSON_ArrayForEach(cj_room_id, cj_rooms_ids)
                 {
                     uint32_t room_id = strtoul(cj_room_id->valuestring, NULL, 16);
@@ -356,7 +353,6 @@ ezlopi_error_t ezlopi_room_init(void)
             cJSON *cj_room = NULL;
             s_ezlopi_room_t *curr_room_node = NULL;
 
-            // while (NULL != (cj_room = cJSON_GetArrayItem(cj_rooms, idx)))
             cJSON_ArrayForEach(cj_room, cj_rooms)
             {
                 s_ezlopi_room_t *new_room = ezlopi_room_add_to_list(cj_room);
@@ -536,7 +532,6 @@ static int __remove_room_from_nvs_by_id(uint32_t a_room_id)
             int idx = 0;
             cJSON *cj_room_tmp = NULL;
 
-            // while (NULL != (cj_room_tmp = cJSON_GetArrayItem(cj_rooms, idx)))
             cJSON_ArrayForEach(cj_room_tmp, cj_rooms)
             {
                 CJSON_TRACE("cj_room_tmp", cj_room_tmp);

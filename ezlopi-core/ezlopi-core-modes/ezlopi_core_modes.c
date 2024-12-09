@@ -70,19 +70,20 @@ s_house_modes_t *ezlopi_core_modes_get_house_mode_by_name(char *house_mode_name)
 
     if (house_mode_name)
     {
-        if (EZPI_STRNCMP_IF_EQUAL(house_mode_name, sg_custom_modes->mode_home.name, strlen(house_mode_name), strlen(sg_custom_modes->mode_home.name)))
+        size_t len = strlen(house_mode_name);
+        if (EZPI_STRNCMP_IF_EQUAL(house_mode_name, sg_custom_modes->mode_home.name, len, strlen(sg_custom_modes->mode_home.name) + 1))
         {
             _house_mode = &sg_custom_modes->mode_home;
         }
-        else if (EZPI_STRNCMP_IF_EQUAL(house_mode_name, sg_custom_modes->mode_away.name, strlen(house_mode_name), strlen(sg_custom_modes->mode_away.name)))
+        else if (EZPI_STRNCMP_IF_EQUAL(house_mode_name, sg_custom_modes->mode_away.name, len, strlen(sg_custom_modes->mode_away.name) + 1))
         {
             _house_mode = &sg_custom_modes->mode_away;
         }
-        else if (EZPI_STRNCMP_IF_EQUAL(house_mode_name, sg_custom_modes->mode_night.name, strlen(house_mode_name), strlen(sg_custom_modes->mode_night.name)))
+        else if (EZPI_STRNCMP_IF_EQUAL(house_mode_name, sg_custom_modes->mode_night.name, len, strlen(sg_custom_modes->mode_night.name) + 1))
         {
             _house_mode = &sg_custom_modes->mode_night;
         }
-        else if (EZPI_STRNCMP_IF_EQUAL(house_mode_name, sg_custom_modes->mode_vacation.name, strlen(house_mode_name), strlen(sg_custom_modes->mode_vacation.name)))
+        else if (EZPI_STRNCMP_IF_EQUAL(house_mode_name, sg_custom_modes->mode_vacation.name, len, strlen(sg_custom_modes->mode_vacation.name) + 1))
         {
             _house_mode = &sg_custom_modes->mode_vacation;
         }
@@ -249,7 +250,7 @@ ezlopi_error_t ezlopi_core_modes_api_add_alarm_off(uint8_t mode_id, const char *
             bool add_to_array = true;
             cJSON_ArrayForEach(element_to_check, targe_house_mode->cj_alarms_off_devices)
             {
-                if (EZPI_STRNCMP_IF_EQUAL(device_id_str, element_to_check->valuestring, strlen(device_id_str), strlen(element_to_check->valuestring)))
+                if (EZPI_STRNCMP_IF_EQUAL(device_id_str, element_to_check->valuestring, strlen(device_id_str) + 1, element_to_check->str_value_len))
                 {
                     add_to_array = false;
                     break;
@@ -292,7 +293,7 @@ ezlopi_error_t ezlopi_core_modes_api_remove_alarm_off(uint32_t mode_id, const ch
             int array_index = 0;
             cJSON_ArrayForEach(element_to_check, targe_house_mode->cj_alarms_off_devices)
             {
-                if (EZPI_STRNCMP_IF_EQUAL(device_id_str, element_to_check->valuestring, strlen(device_id_str), strlen(element_to_check->valuestring)))
+                if (EZPI_STRNCMP_IF_EQUAL(device_id_str, element_to_check->valuestring, strlen(device_id_str) + 1, element_to_check->str_value_len))
                 {
                     cJSON_DeleteItemFromArray(__func__, targe_house_mode->cj_alarms_off_devices, array_index);
                     break;
@@ -367,7 +368,7 @@ ezlopi_error_t ezlopi_core_modes_api_remove_cameras_off(uint8_t modeId, const ch
             int array_index = 0;
             cJSON_ArrayForEach(remove_element, mode_to_update->cj_cameras_off_devices)
             {
-                if (EZPI_STRNCMP_IF_EQUAL(device_id_str, remove_element->valuestring, strlen(device_id_str), remove_element->str_value_len))
+                if (EZPI_STRNCMP_IF_EQUAL(device_id_str, remove_element->valuestring, strlen(device_id_str) + 1, remove_element->str_value_len))
                 {
                     cJSON_DeleteItemFromArray(__FUNCTION__, mode_to_update->cj_cameras_off_devices, array_index);
 
@@ -492,12 +493,13 @@ ezlopi_error_t ezlopi_core_modes_api_set_protect_button(char *service_str, uint3
 
             if (NULL != sg_custom_modes->l_protect_buttons)
             {
+                size_t len = strlen(service_str) + 1;
                 s_protect_buttons_t *curr_button = sg_custom_modes->l_protect_buttons; // Start from the 'head'
                 while (curr_button)
                 {
                     if (deviceId == curr_button->device_id)
                     {
-                        if (EZPI_STRNCMP_IF_EQUAL(curr_button->service_name, service_str, strlen(curr_button->service_name), strlen(service_str)))
+                        if (EZPI_STRNCMP_IF_EQUAL(curr_button->service_name, service_str, strlen(curr_button->service_name) + 1, len))
                         {
                             // ### removing node
                             //---------------------------------------------------------------------------------------
@@ -764,7 +766,7 @@ ezlopi_error_t ezlopi_core_modes_api_add_disarmed_device(uint8_t modeId, const c
             cJSON *add_element = NULL;
             cJSON_ArrayForEach(add_element, mode_to_update->cj_disarmed_devices)
             {
-                if (EZPI_STRNCMP_IF_EQUAL(device_id_str, add_element->valuestring, strlen(device_id_str), add_element->str_value_len))
+                if (EZPI_STRNCMP_IF_EQUAL(device_id_str, add_element->valuestring, strlen(device_id_str) + 1, add_element->str_value_len))
                 {
                     add_to_array = false;
                     break;
@@ -803,7 +805,7 @@ ezlopi_error_t ezlopi_core_modes_api_remove_disarmed_device(uint8_t modeId, cons
             int array_index = 0;
             cJSON_ArrayForEach(remove_element, mode_to_update->cj_disarmed_devices)
             {
-                if (EZPI_STRNCMP_IF_EQUAL(device_id_str, remove_element->valuestring, strlen(device_id_str), remove_element->str_value_len))
+                if (EZPI_STRNCMP_IF_EQUAL(device_id_str, remove_element->valuestring, strlen(device_id_str) + 1, remove_element->str_value_len))
                 {
                     cJSON_DeleteItemFromArray(__FUNCTION__, mode_to_update->cj_disarmed_devices, array_index);
 

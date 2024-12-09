@@ -95,11 +95,9 @@ l_user_notification_v2_t *ezlopi_scenes_populate_user_notifications(cJSON *cj_us
 
     if (cj_user_notifications && (cJSON_Array == cj_user_notifications->type))
     {
-        // int user_notifications_idx = 0;
         cJSON *cj_user_notification = NULL;
         l_user_notification_v2_t *curr_user_notification = NULL;
 
-        // while (NULL != (cj_user_notification = cJSON_GetArrayItem(cj_user_notifications, user_notifications_idx++)))
         cJSON_ArrayForEach(cj_user_notification, cj_user_notifications)
         {
             if (tmp_user_notifications_head)
@@ -142,11 +140,9 @@ l_house_modes_v2_t *ezlopi_scenes_populate_house_modes(cJSON *cj_house_modes)
     l_house_modes_v2_t *tmp_house_mode_head = NULL;
     if (cj_house_modes)
     {
-        // int house_mode_idx = 0;
         cJSON *cj_house_mode = NULL;
         l_house_modes_v2_t *tmp_house_mode = NULL;
 
-        // while (NULL != (cj_house_mode = cJSON_GetArrayItem(cj_house_modes, house_mode_idx++)))
         cJSON_ArrayForEach(cj_house_mode, cj_house_modes)
         {
             if (tmp_house_mode_head)
@@ -190,11 +186,9 @@ l_action_block_v2_t *ezlopi_scenes_populate_action_blocks(cJSON *cj_action_block
     l_action_block_v2_t *tmp_action_block_head = NULL;
     if (cj_action_blocks)
     {
-        // int then_block_idx = 0;
-        cJSON *cj_action_block = NULL;
+         cJSON *cj_action_block = NULL;
         l_action_block_v2_t *tmp_then_block = NULL;
 
-        // while (NULL != (cj_action_block = cJSON_GetArrayItem(cj_action_blocks, then_block_idx++)))
         cJSON_ArrayForEach(cj_action_block, cj_action_blocks)
         {
             if (tmp_action_block_head)
@@ -259,11 +253,9 @@ l_when_block_v2_t *ezlopi_scenes_populate_when_blocks(cJSON *cj_when_blocks)
     l_when_block_v2_t *tmp_when_block_head = NULL;
     if (cj_when_blocks)
     {
-        // int when_block_idx = 0;
         cJSON *cj_when_block = NULL;
         l_when_block_v2_t *tmp_when_block = NULL;
 
-        // while (NULL != (cj_when_block = cJSON_GetArrayItem(cj_when_blocks, when_block_idx++)))
         cJSON_ArrayForEach(cj_when_block, cj_when_blocks)
         {
             if (tmp_when_block_head)
@@ -400,11 +392,9 @@ l_fields_v2_t *ezlopi_scenes_populate_fields(cJSON *cj_fields)
     l_fields_v2_t *tmp_fields_head = NULL;
     if (cj_fields)
     {
-        // int fields_idx = 0;
         cJSON *cj_field = NULL;
         l_fields_v2_t *tmp_field = NULL;
 
-        // while (NULL != (cj_field = cJSON_GetArrayItem(cj_fields, fields_idx++)))
         cJSON_ArrayForEach(cj_field, cj_fields)
         {
             if (tmp_fields_head)
@@ -525,7 +515,6 @@ void ezlopi_scenes_populate_fields_get_value(l_fields_v2_t *field, cJSON *cj_val
                 // CJSON_TRACE("blocks_value (edit)", cj_value);
                 l_when_block_v2_t *curr_when_block = NULL;
 
-                // while (NULL != (cj_block = cJSON_GetArrayItem(cj_value, block_idx++)))
                 cJSON_ArrayForEach(cj_block, cj_value)
                 {
                     if (field->field_value.u_value.when_block)

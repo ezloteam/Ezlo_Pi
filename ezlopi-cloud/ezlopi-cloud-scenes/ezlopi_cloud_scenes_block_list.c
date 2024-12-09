@@ -29,7 +29,7 @@ static int __scenes_block_trigger_device_list(cJSON *cj_devices_array)
     int ret = 0;
     if (cj_devices_array)
     {
-        char device_id_str[32] = {0};
+        char device_id_str[32] = { 0 };
         bool found_item = false;
         l_ezlopi_device_t *device_node = ezlopi_device_get_head();
         while (device_node)
@@ -339,12 +339,10 @@ static cJSON *__add_scenes_blocks_by_item_ids(e_scenes_block_type_v2_t block_typ
 
 static cJSON *__add_scenes_blocks_by_device_ids(e_scenes_block_type_v2_t block_type, cJSON *cj_devices_array)
 {
-    // int device_id_idx = 0;
     cJSON *cj_device_id = NULL;
     cJSON *cj_block_array = NULL;
 
     CJSON_TRACE("device array", cj_devices_array);
-    // while (NULL != (cj_device_id = cJSON_GetArrayItem(cj_devices_array, device_id_idx++)))
     cJSON_ArrayForEach(cj_device_id, cj_devices_array)
     {
         TRACE_D("device-id: %s", cj_device_id->valuestring ? cj_device_id->valuestring : ezlopi__str);
@@ -386,17 +384,17 @@ static e_scenes_block_type_v2_t __get_block_type_and_create_block_array(cJSON *c
 {
     e_scenes_block_type_v2_t block_type = SCENE_BLOCK_TYPE_NONE;
 
-    if (0 == strncmp(ezlopi_when_str, cj_block_type->valuestring, 5))
+    if (EZPI_STRNCMP_IF_EQUAL(ezlopi_when_str, cj_block_type->valuestring, cj_block_type->str_value_len, 5))
     {
         *block_type_name = ezlopi_when_str;
         block_type = SCENE_BLOCK_TYPE_WHEN;
     }
-    else if (0 == strncmp(ezlopi_then_str, cj_block_type->valuestring, 5))
+    else if (EZPI_STRNCMP_IF_EQUAL(ezlopi_then_str, cj_block_type->valuestring, cj_block_type->str_value_len, 5))
     {
         *block_type_name = ezlopi_then_str;
         block_type = SCENE_BLOCK_TYPE_THEN;
     }
-    else if (0 == strncmp(ezlopi_else_str, cj_block_type->valuestring, 5))
+    else if (EZPI_STRNCMP_IF_EQUAL(ezlopi_else_str, cj_block_type->valuestring, cj_block_type->str_value_len, 5))
     {
         *block_type_name = ezlopi_else_str;
         block_type = SCENE_BLOCK_TYPE_ELSE;

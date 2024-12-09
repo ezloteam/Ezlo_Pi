@@ -11,7 +11,6 @@
 #include "ezlopi_core_device_group.h"
 
 #include "ezlopi_cloud_devices.h"
-#include "ezlopi_cloud_keywords.h"
 #include "ezlopi_cloud_methods_str.h"
 #include "ezlopi_cloud_constants.h"
 //------------------------------------------------------------------------------------------------------------------
@@ -335,7 +334,7 @@ void device_groups_list(cJSON *cj_request, cJSON *cj_response)
                     if (cj_ver_str && cj_ver_str->valuestring && cj_ver_str->str_value_len)
                     {
                         // TRACE_D("'req_version': '%s'[%d]", cj_ver_str->valuestring, strlen(cj_ver_str->valuestring));
-                        if (EZPI_STRNCMP_IF_EQUAL(hash_str, cj_ver_str->valuestring, strlen(hash_str), strlen(cj_ver_str->valuestring)))
+                        if (EZPI_STRNCMP_IF_EQUAL(hash_str, cj_ver_str->valuestring, strlen(hash_str)+1, cj_ver_str->str_value_len))
                         {
                             cJSON_DeleteItemFromObject(__FUNCTION__, cj_result, ezlopi_deviceGroups_str);
                         }
@@ -467,7 +466,7 @@ void device_group_devitem_expand(cJSON *cj_request, cJSON *cj_response)
                         if (cj_ver_str && cj_ver_str->valuestring && cj_ver_str->str_value_len)
                         {
                             // TRACE_D("'version': %s [%d]", cj_ver_str->valuestring, cj_ver_str->str_value_len);
-                            if (EZPI_STRNCMP_IF_EQUAL(hash_str, cj_ver_str->valuestring, strlen(hash_str), strlen(cj_ver_str->valuestring)))
+                            if (EZPI_STRNCMP_IF_EQUAL(hash_str, cj_ver_str->valuestring, strlen(hash_str)+1, cj_ver_str->str_value_len))
                             {
                                 cJSON_DeleteItemFromObject(__FUNCTION__, cj_result, ezlopi_devices_str);
                             }
@@ -627,7 +626,7 @@ void item_groups_list(cJSON *cj_request, cJSON *cj_response)
                     if (cj_ver_str && cj_ver_str->valuestring && cj_ver_str->str_value_len)
                     {
                         // TRACE_D("'version': %s [%d]", cj_ver_str->valuestring, cj_ver_str->str_value_len);
-                        if (EZPI_STRNCMP_IF_EQUAL(hash_str, cj_ver_str->valuestring, strlen(hash_str), strlen(cj_ver_str->valuestring)))
+                        if (EZPI_STRNCMP_IF_EQUAL(hash_str, cj_ver_str->valuestring, strlen(hash_str)+1, cj_ver_str->str_value_len))
                         {
                             cJSON_DeleteItemFromObject(__FUNCTION__, cj_result, ezlopi_itemGroup_str);
                         }

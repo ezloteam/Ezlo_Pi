@@ -14,15 +14,15 @@
 
 #define MAC_ADDR_EXPANDED(mac) mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]
 
-void network_get(cJSON* cj_request, cJSON* cj_response)
+void network_get(cJSON *cj_request, cJSON *cj_response)
 {
-    cJSON* cjson_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+    cJSON *cjson_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     if (cjson_result)
     {
-        cJSON* interfaces_array = cJSON_AddArrayToObject(__FUNCTION__, cjson_result, ezlopi_interfaces_str);
+        cJSON *interfaces_array = cJSON_AddArrayToObject(__FUNCTION__, cjson_result, ezlopi_interfaces_str);
         if (interfaces_array)
         {
-            cJSON* wifi_properties = cJSON_CreateObject(__FUNCTION__);
+            cJSON *wifi_properties = cJSON_CreateObject(__FUNCTION__);
             if (wifi_properties)
             {
                 char tmp_string[54];
@@ -35,7 +35,7 @@ void network_get(cJSON* cj_request, cJSON* cj_response)
                 cJSON_AddStringToObject(__FUNCTION__, wifi_properties, ezlopi_hwaddr_str, tmp_string);
                 cJSON_AddBoolToObject(__FUNCTION__, wifi_properties, ezlopi_internetAvailable_str, true);
 
-                cJSON* wifi_ipv4 = cJSON_CreateObject(__FUNCTION__);
+                cJSON *wifi_ipv4 = cJSON_CreateObject(__FUNCTION__);
                 ezlopi_wifi_status_t *wifi_status = ezlopi_wifi_status();
                 if (wifi_ipv4)
                 {
@@ -94,14 +94,14 @@ void network_get(cJSON* cj_request, cJSON* cj_response)
                             get_auth_mode_str(tmp_string, ap_info.authmode);
                             cJSON_AddStringToObject(__FUNCTION__, cj_network, "encryption", tmp_string);
 
-                            char* wifi_ssid = ezlopi_factory_info_v3_get_ssid();
-                            char* wifi_password = ezlopi_factory_info_v3_get_password();
+                            char *wifi_ssid = ezlopi_factory_info_v3_get_ssid();
+                            char *wifi_password = ezlopi_factory_info_v3_get_password();
 
                             if ((NULL != wifi_ssid) && ('\0' != wifi_ssid[0]) &&
                                 (NULL != wifi_password) && ('\0' != wifi_password[0]))
                             {
-                                cJSON_AddStringToObject(__FUNCTION__, cj_network, "key", wifi_password);
-                                cJSON_AddStringToObject(__FUNCTION__, cj_network, "ssid", wifi_ssid);
+                                cJSON_AddStringToObject(__FUNCTION__, cj_network, ezlopi_key_str, wifi_password);
+                                cJSON_AddStringToObject(__FUNCTION__, cj_network, ezlopi_ssid_str, wifi_ssid);
                             }
 
                             if (wifi_ssid) ezlopi_free(__FUNCTION__, wifi_ssid);
@@ -123,30 +123,30 @@ void network_get(cJSON* cj_request, cJSON* cj_response)
     }
 }
 
-void network_wifi_scan_start(cJSON* cj_request, cJSON* cj_response)
+void network_wifi_scan_start(cJSON *cj_request, cJSON *cj_response)
 {
     ezlopi_wifi_scan_start();
     cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
 }
 
-void network_wifi_scan_stop(cJSON* cj_request, cJSON* cj_response)
+void network_wifi_scan_stop(cJSON *cj_request, cJSON *cj_response)
 {
     ezlopi_wifi_scan_stop();
     cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
 }
 
-void network_wifi_try_connect(cJSON* cj_request, cJSON* cj_response)
+void network_wifi_try_connect(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
 
-    cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
+    cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
     if (cj_params)
     {
         char interfaceId[16];
         CJSON_GET_VALUE_STRING_BY_COPY(cj_params, ezlopi_interfaceId_str, interfaceId);
         if (0 == strncmp(ezlopi_wlan0_str, interfaceId, 6))
         {
-            cJSON* cj_network = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_network_str);
+            cJSON *cj_network = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_network_str);
             if (cj_network)
             {
                 ezlopi_wifi_try_connect(cj_network);

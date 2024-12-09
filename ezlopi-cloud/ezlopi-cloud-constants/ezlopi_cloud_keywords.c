@@ -20,6 +20,7 @@ const char *ezlopi_user_str = "user";
 const char *ezlopi_value_str = "value";
 const char *ezlopi_method_str = "method";
 const char *ezlopi_function_str = "function";
+const char *ezlopi_ruleTrigger_str = "ruleTrigger";
 const char *ezlopi_msg_id_str = "msg_id"; // message counter, number of data transferred to ezlopi-cloud
 const char *ezlopi_msg_subclass_str = "msg_subclass";
 const char *ezlopi_ui_broadcast_str = "ui_broadcast";
@@ -58,6 +59,7 @@ const char *ezlopi_when_str = "when";
 const char *ezlopi_enabled_str = "enabled";
 const char *ezlopi_enable_str = "enable";
 const char *ezlopi_group_id_str = "group_id";
+const char *ezlopi_parent_id_str = "parent_id";
 const char *ezlopi_group_str = "group";
 const char *ezlopi_thenGroup_str = "thenGroup";
 const char *ezlopi_thenGroups_str = "thenGroups";
@@ -220,6 +222,7 @@ const char *ezlopi_ca_cert_str = "ca_cert";
 const char *ezlopi_config_id_str = "config_id";
 const char *ezlopi_config_time_str = "config_time";
 const char *ezlopi_ssid_str = "ssid";
+const char *ezlopi_key_str = "key";
 const char *ezlopi_dev_type_ezlopi_str = "dev_type_ezlopi";
 const char *ezlopi_flash_size_str = "flash_size";
 const char *ezlopi_dev_free_flash_str = "dev_free_flash";
@@ -410,7 +413,17 @@ const char *ezlopi_sunrise_str = "sunrise";
 const char *ezlopi_sunset_str = "sunset";
 const char *ezlopi_weekdays_str = "weekdays";
 const char *ezlopi_days_str = "days";
+const char *ezlopi_weeks_str = "weeks";
 const char *ezlopi_range_str = "range";
+
+const char *ezlopi_startTime_str = "startTime";
+const char *ezlopi_startDay_str = "startDay";
+const char *ezlopi_startMonth_str = "startMonth";
+const char *ezlopi_startYear_str = "startYear";
+const char *ezlopi_endTime_str = "endTime";
+const char *ezlopi_endDay_str = "endDay";
+const char *ezlopi_endMonth_str = "endMonth";
+const char *ezlopi_endYear_str = "endYear";
 
 const char *ezlopi_hours_str = "hours";
 const char *ezlopi_minutes_str = "minutes";
@@ -431,5 +444,16 @@ const char *ezlopi_httpAnswerCode_str = "httpAnswerCode";
 const char *ezlopi_less_str = "less";
 const char *ezlopi_least_str = "least";
 
+const char *ezlopi_start_str = "start";
+const char *ezlopi_finish_str = "finish";
 const char *ezlopi_blockMeta_str = "blockMeta";
+
+const char *ezlopi_sceneName_str = "sceneName";
+const char *ezlopi_methodName_str = "methodName";
+const char *ezlopi_executionDate_str = "executionDate";
+
+const char *ezlopi_when_category_time_str = "when_category_time";
+const char *ezlopi_when_category_modes_str = "when_category_modes";
+const char *ezlopi_when_category_logic_str = "when_category_logic";
+const char *ezlopi_when_category_function_str = "when_category_function";
 #endif // __EZLOPI_CLOUD_KEYWORDS_H__
