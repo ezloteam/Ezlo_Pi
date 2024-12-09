@@ -331,7 +331,7 @@ void device_groups_list(cJSON *cj_request, cJSON *cj_response)
                 if (NULL != (hash_str = __generate_sha1_of_src(res_str))) // returns malloc ; need to free
                 {
                     // TRACE_S("'hash': %s [%d]", hash_str, strlen(hash_str));
-                    cJSON *cj_ver_str = cJSON_GetObjectItem(__FUNCTION__, (cJSON_GetObjectItem(__FUNCTION__, cj_request, "params")), ezlopi_version_str);
+                    cJSON *cj_ver_str = cJSON_GetObjectItem(__FUNCTION__, (cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str)), ezlopi_version_str);
                     if (cj_ver_str && cj_ver_str->valuestring && cj_ver_str->str_value_len)
                     {
                         // TRACE_D("'req_version': '%s'[%d]", cj_ver_str->valuestring, strlen(cj_ver_str->valuestring));
@@ -372,7 +372,7 @@ void device_group_delete(cJSON *cj_request, cJSON *cj_response)
                     {
                         if (curr_devgrp->persistent)
                         { // if 'true'
-                            cJSON *cj_force = cJSON_GetObjectItem(__FUNCTION__, cj_params, "force");
+                            cJSON *cj_force = cJSON_GetObjectItem(__FUNCTION__, cj_params, value_type_force);
                             if (cj_force && cJSON_IsTrue(cj_force))
                             {
                                 ezlopi_nvs_delete_stored_data_by_id(dev_grp_id);          // from nvs
@@ -609,7 +609,7 @@ void item_groups_list(cJSON *cj_request, cJSON *cj_response)
         cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
         if (cj_result)
         {
-            cJSON *cj_item_groups = cJSON_AddArrayToObject(__FUNCTION__, cj_result, "itemGroups");
+            cJSON *cj_item_groups = cJSON_AddArrayToObject(__FUNCTION__, cj_result, ezlopi_itemGroup_str);
             if (cj_item_groups)
             {
                 ezlopi_core_item_group_get_list(cj_item_groups);
@@ -623,13 +623,13 @@ void item_groups_list(cJSON *cj_request, cJSON *cj_response)
                 if (NULL != (hash_str = __generate_sha1_of_src(res_str))) // returns malloc ; need to free
                 {
                     // TRACE_S("'hash': %s [%d]", hash_str, strlen(hash_str));
-                    cJSON *cj_ver_str = cJSON_GetObjectItem(__FUNCTION__, (cJSON_GetObjectItem(__FUNCTION__, cj_request, "params")), ezlopi_version_str);
+                    cJSON *cj_ver_str = cJSON_GetObjectItem(__FUNCTION__, (cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str)), ezlopi_version_str);
                     if (cj_ver_str && cj_ver_str->valuestring && cj_ver_str->str_value_len)
                     {
                         // TRACE_D("'version': %s [%d]", cj_ver_str->valuestring, cj_ver_str->str_value_len);
                         if (EZPI_STRNCMP_IF_EQUAL(hash_str, cj_ver_str->valuestring, strlen(hash_str), strlen(cj_ver_str->valuestring)))
                         {
-                            cJSON_DeleteItemFromObject(__FUNCTION__, cj_result, "itemGroups");
+                            cJSON_DeleteItemFromObject(__FUNCTION__, cj_result, ezlopi_itemGroup_str);
                         }
                     }
                     // now add the 'version_hash' into result.
@@ -664,7 +664,7 @@ void item_group_delete(cJSON *cj_request, cJSON *cj_response)
                     {
                         if (curr_itemgrp->persistent)
                         { // if 'true'
-                            cJSON *cj_force = cJSON_GetObjectItem(__FUNCTION__, cj_params, "force");
+                            cJSON *cj_force = cJSON_GetObjectItem(__FUNCTION__, cj_params, value_type_force);
                             if (cj_force && cJSON_IsTrue(cj_force))
                             {
                                 ezlopi_nvs_delete_stored_data_by_id(item_grp_id);        // from nvs

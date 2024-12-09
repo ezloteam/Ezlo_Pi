@@ -22,7 +22,7 @@ void ezlopi_scenes_populate_scene(l_scenes_list_v2_t *new_scene, cJSON *cj_scene
         CJSON_GET_VALUE_BOOL(cj_scene, ezlopi_is_group_str, new_scene->is_group);
 
         {
-            char tmp_grp_id[32] = {0};
+            char tmp_grp_id[32] = { 0 };
             CJSON_GET_VALUE_STRING_BY_COPY(cj_scene, ezlopi_group_id_str, tmp_grp_id);
             if (0 < strlen(tmp_grp_id))
             {
@@ -317,7 +317,7 @@ void ezlopi_scenes_populate_assign_when_block(l_when_block_v2_t *new_when_block,
                     TRACE_D("group_blockName (edit): %s ", new_when_block->when_grp->grp_blockName);
                 }
 
-                char grp_id_str[32] = {0};
+                char grp_id_str[32] = { 0 };
                 CJSON_GET_VALUE_STRING_BY_COPY(cj_when_block, ezlopi_group_id_str, grp_id_str);
                 if (0 < strlen(grp_id_str))
                 {
@@ -328,7 +328,7 @@ void ezlopi_scenes_populate_assign_when_block(l_when_block_v2_t *new_when_block,
         }
 
         {
-            char tmp_block_id[32] = {0};
+            char tmp_block_id[32] = { 0 };
             CJSON_GET_VALUE_STRING_BY_COPY(cj_when_block, ezlopi_blockId_str, tmp_block_id);
             if (0 < strlen(tmp_block_id))
             {
@@ -346,7 +346,7 @@ void ezlopi_scenes_populate_assign_when_block(l_when_block_v2_t *new_when_block,
 
         new_when_block->block_type = SCENE_BLOCK_TYPE_WHEN;
 
-        cJSON *cj_new_meta = cJSON_GetObjectItem(__FUNCTION__, cj_when_block, "blockMeta");
+        cJSON *cj_new_meta = cJSON_GetObjectItem(__FUNCTION__, cj_when_block, ezlopi_blockMeta_str);
         if (cj_new_meta && (cJSON_Object == cj_new_meta->type))
         {
             new_when_block->cj_block_meta = cJSON_Duplicate(__FUNCTION__, cj_new_meta, 1);
@@ -388,10 +388,10 @@ void ezlopi_scenes_populate_assign_action_delay(s_action_delay_v2_t *action_dela
 {
     if (action_delay && cj_delay)
     {
-        CJSON_GET_VALUE_DOUBLE(cj_delay, "days", action_delay->days);
-        CJSON_GET_VALUE_DOUBLE(cj_delay, "hours", action_delay->hours);
-        CJSON_GET_VALUE_DOUBLE(cj_delay, "minutes", action_delay->minutes);
-        CJSON_GET_VALUE_DOUBLE(cj_delay, "seconds", action_delay->seconds);
+        CJSON_GET_VALUE_DOUBLE(cj_delay, ezlopi_days_str, action_delay->days);
+        CJSON_GET_VALUE_DOUBLE(cj_delay, ezlopi_hours_str, action_delay->hours);
+        CJSON_GET_VALUE_DOUBLE(cj_delay, ezlopi_minutes_str, action_delay->minutes);
+        CJSON_GET_VALUE_DOUBLE(cj_delay, ezlopi_seconds_str, action_delay->seconds);
     }
 }
 

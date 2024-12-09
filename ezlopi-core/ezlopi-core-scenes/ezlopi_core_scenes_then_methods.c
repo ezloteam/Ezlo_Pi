@@ -100,12 +100,12 @@ int ezlopi_scene_then_group_set_item_value(l_scenes_list_v2_t *curr_scene, void 
             l_fields_v2_t *curr_field = curr_then->fields;
             while (curr_field)
             {
-                if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "deviceGroup", strlen(curr_field->name), 12))
+                if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, ezlopi_deviceGroup_str, strlen(curr_field->name), 12))
                 {
                     device_group_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
                     // TRACE_D("item_id: %s", curr_field->field_value.u_value.value_string);
                 }
-                else if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "itemGroup", strlen(curr_field->name), 10))
+                else if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, ezlopi_itemGroup_str, strlen(curr_field->name), 10))
                 {
                     item_group_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
                     // TRACE_D("item_id: %s", curr_field->field_value.u_value.value_string);
@@ -206,11 +206,11 @@ int ezlopi_scene_then_set_device_armed(l_scenes_list_v2_t *curr_scene, void *arg
             l_fields_v2_t *curr_field = curr_then->fields;
             while (curr_field)
             {
-                if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "device", strlen(curr_field->name), 7))
+                if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, dev_type_device, strlen(curr_field->name), 7))
                 {
                     device_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
                 }
-                else if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "deviceFlag", strlen(curr_field->name), 11))
+                else if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, ezlopi_deviceFlag_str, strlen(curr_field->name), 11))
                 {
                     if (EZLOPI_VALUE_TYPE_BOOL == curr_field->value_type)
                     {
@@ -253,11 +253,11 @@ int ezlopi_scene_then_group_set_device_armed(l_scenes_list_v2_t *curr_scene, voi
             l_fields_v2_t *curr_field = curr_then->fields;
             while (curr_field)
             {
-                if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "deviceGroup", strlen(curr_field->name), 12))
+                if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, ezlopi_deviceGroup_str, strlen(curr_field->name), 12))
                 {
                     device_group_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
                 }
-                else if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "deviceFlag", strlen(curr_field->name), 11))
+                else if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, ezlopi_deviceFlag_str, strlen(curr_field->name), 11))
                 {
                     if (EZLOPI_VALUE_TYPE_BOOL == curr_field->value_type)
                     {
@@ -456,15 +456,15 @@ int ezlopi_scene_then_run_scene(l_scenes_list_v2_t *curr_scene, void *arg)
                     sceneId = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
                 }
             }
-            else if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "block", strlen(curr_field->name), 6))
+            else if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, ezlopi_block_str, strlen(curr_field->name), 6))
             {
                 if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type)
                 {
-                    if (EZPI_STRNCMP_IF_EQUAL(curr_field->field_value.u_value.value_string, "else", strlen(curr_field->field_value.u_value.value_string), 5))
+                    if (EZPI_STRNCMP_IF_EQUAL(curr_field->field_value.u_value.value_string, ezlopi_else_str, strlen(curr_field->field_value.u_value.value_string), 5))
                     {
                         execute_else_condition = true;
                     }
-                    else if (EZPI_STRNCMP_IF_EQUAL(curr_field->field_value.u_value.value_string, "thenGroups", strlen(curr_field->field_value.u_value.value_string), 11))
+                    else if (EZPI_STRNCMP_IF_EQUAL(curr_field->field_value.u_value.value_string, ezlopi_thenGroups_str, strlen(curr_field->field_value.u_value.value_string), 11))
                     {
                         TRACE_D("Running scene group, yet to be implemented.");
                     }
@@ -474,7 +474,7 @@ int ezlopi_scene_then_run_scene(l_scenes_list_v2_t *curr_scene, void *arg)
                     ret = -1;
                 }
             }
-            else if ((EZPI_STRNCMP_IF_EQUAL(curr_field->name, "group", strlen(curr_field->name), 6)) && (curr_field->value_type == EZLOPI_VALUE_TYPE_STRING))
+            else if ((EZPI_STRNCMP_IF_EQUAL(curr_field->name, ezlopi_group_str, strlen(curr_field->name), 6)) && (curr_field->value_type == EZLOPI_VALUE_TYPE_STRING))
             {
                 ret = -1;
                 TRACE_D("Running scene group, yet to be implemented.");
@@ -524,7 +524,7 @@ int ezlopi_scene_then_set_scene_state(l_scenes_list_v2_t *curr_scene, void *arg)
             else if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, ezlopi_enabled_str, strlen(curr_field->name), 8))
             {
 
-                TRACE_W("%s", (curr_field->field_value.u_value.value_bool ? "true" : "false"));
+                TRACE_W("%s", (curr_field->field_value.u_value.value_bool ? ezlopi_true_str : ezlopi_false_str));
 
                 if (EZLOPI_VALUE_TYPE_BOOL == curr_field->value_type)
                 {
@@ -829,7 +829,7 @@ int ezlopi_scene_then_toggle_value(l_scenes_list_v2_t *curr_scene, void *arg)
                         item_id = strtoul(__id_string, NULL, 16);
                     }
                 }
-                else if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "expression", strlen(curr_field->name), 11)) /*need to add in str*/
+                else if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, ezlopi_expression_str, strlen(curr_field->name), 11)) /*need to add in str*/
                 {
                     if ((EZLOPI_VALUE_TYPE_EXPRESSION == curr_field->value_type) && (NULL != curr_field->field_value.u_value.value_string))
                     {
@@ -880,14 +880,14 @@ int ezlopi_scene_then_group_toggle_value(l_scenes_list_v2_t *curr_scene, void *a
             l_fields_v2_t *curr_field = curr_then->fields;
             while (curr_field)
             {
-                if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "deviceGroup", strlen(curr_field->name), 12))
+                if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, ezlopi_deviceGroup_str, strlen(curr_field->name), 12))
                 {
                     if ((EZLOPI_VALUE_TYPE_DEVICE_GROUP == curr_field->value_type) && (NULL != curr_field->field_value.u_value.value_string))
                     {
                         device_group_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
                     }
                 }
-                else if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, "itemGroup", strlen(curr_field->name), 10))
+                else if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, ezlopi_itemGroup_str, strlen(curr_field->name), 10))
                 {
                     if ((EZLOPI_VALUE_TYPE_ITEM_GROUP == curr_field->value_type) && (NULL != curr_field->field_value.u_value.value_string))
                     {

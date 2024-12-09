@@ -33,14 +33,14 @@
         }                                   \
     }
 
-/**
- * @brief This funtion is called, only to reallocate a '*header' of custom_structure 's_ezlopi_core_http_mbedtls_t'
- *
- * @param tmp_http_data     [ Pointer to (s_ezlopi_core_http_mbedtls_t*) block of memory. ]
- * @param append_size       [ Size of 'string' to be appended. ]
- * @param append_str        [ 'string_literal' to be appended. ]
- * @return int [ Fail ==> returns Old-size / Success ==> returns New-size ]
- */
+ /**
+  * @brief This funtion is called, only to reallocate a '*header' of custom_structure 's_ezlopi_core_http_mbedtls_t'
+  *
+  * @param tmp_http_data     [ Pointer to (s_ezlopi_core_http_mbedtls_t*) block of memory. ]
+  * @param append_size       [ Size of 'string' to be appended. ]
+  * @param append_str        [ 'string_literal' to be appended. ]
+  * @return int [ Fail ==> returns Old-size / Success ==> returns New-size ]
+  */
 static int __ezlopi_core_scenes_then_sendhttp_relloc_header(s_ezlopi_core_http_mbedtls_t *tmp_http_data, int append_size, const char *append_str)
 {
     int ret = (int)tmp_http_data->header_maxlen; // Assign Old-block size as default
@@ -219,8 +219,8 @@ void parse_http_url(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fields_v2_t *
             // tests[7] = "https://www.testhttp.com";
             int succ_parsing = 0; // Whether the parsing has been
             int port = 80;        // Port field of the HTTP uri if found
-            char host[100] = {0}; // IP field of the HTTP uri
-            char page[200] = {0}; // Page field of the uri if found
+            char host[100] = { 0 }; // IP field of the HTTP uri
+            char page[200] = { 0 }; // Page field of the uri if found
             if (sscanf(field_value_string, "http://%99[^:]:%i/%199[^\n]", host, &port, page) == 3)
             {
                 succ_parsing = 1;
@@ -392,7 +392,7 @@ void parse_http_skipsecurity(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fiel
         {
             // 5. adding 'skip_security' to header-buffer
             // TRACE_W("Appending!! skipsecurity -> header");
-            __ezlopi_core_scenes_then_append_to_header(tmp_http_data, "skipSecurity", ((curr_field->field_value.u_value.value_bool) ? "true" : "false"));
+            __ezlopi_core_scenes_then_append_to_header(tmp_http_data, "skipSecurity", ((curr_field->field_value.u_value.value_bool) ? ezlopi_true_str : ezlopi_false_str));
         }
         else
         {
@@ -622,7 +622,7 @@ int ezlopi_core_scene_then_helper_toggleValue(uint32_t item_id, const char *item
 
                             if ((EZPI_STRNCMP_IF_EQUAL(curr_item->cloud_properties.value_type, value_type_bool, strlen(curr_item->cloud_properties.value_type), 5)) && cJSON_IsBool(cj_val))
                             {
-                                // TRACE_S("1. getting 'item_id[%d]' ; bool_value = %s ", item_id, (cj_val->type == cJSON_True) ? "true" : "false"); // "false" or "true"
+                                // TRACE_S("1. getting 'item_id[%d]' ; bool_value = %s ", item_id, (cj_val->type == cJSON_True) ? ezlopi_true_str : ezlopi_false_str); // ezlopi_false_str or ezlopi_true_str
                                 if (cj_val->type == cJSON_True)
                                 {
                                     cJSON_AddBoolToObject(__FUNCTION__, cj_result_value, ezlopi_value_str, false);

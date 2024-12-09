@@ -139,7 +139,7 @@ void ezlopi_cloud_modes_notifications_set(cJSON *cj_request, cJSON *cj_response)
         bool all = false;
         CJSON_GET_VALUE_BOOL(cj_params, "all", all);
         cJSON *cj_modeId = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_modeId_str);
-        cJSON *cj_userIds = cJSON_GetObjectItem(__FUNCTION__, cj_params, "userIds");
+        cJSON *cj_userIds = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_userId_str);
         if (cj_userIds && cj_modeId)
         {
             uint8_t modeId = strtoul(cj_modeId->valuestring, NULL, 10);
@@ -370,7 +370,7 @@ void ezlopi_cloud_modes_protect_buttons_set(cJSON *cj_request, cJSON *cj_respons
                 uint8_t status = 0;
                 ezlopi_core_modes_api_set_protect_button(cj_service->valuestring, deviceId, &status); // status => [ BIT0 = added ; BIT1 = Updated ; BIT2 = removed ]
                 // TRACE_D("BUTTPON_STATE = %d", status);
-                cJSON_AddNumberToObject(__func__, cj_request, "button_state", (double)status); // just for broadcast purpose
+                cJSON_AddNumberToObject(__func__, cj_request, ezlopi_item_name_button_state, (double)status); // just for broadcast purpose
             }
         }
     }

@@ -461,8 +461,8 @@ static void ezlopi_core_device_broadcast_wifi_start_scan()
         cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_scan_start, ezlopi_result_str);
         if (cj_result)
         {
-            cJSON_AddStringToObject(__FUNCTION__, cj_result, "interfaceId", "wlan0");
-            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_status_str, "started");
+            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_interfaceId_str, ezlopi_wlan0_str);
+            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_status_str, scene_status_started_str);
         }
 
         if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(cj_scan_start))
@@ -483,8 +483,8 @@ static void ezlopi_core_device_broadcast_wifi_stop_scan()
         cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_scan_stop, ezlopi_result_str);
         if (cj_result)
         {
-            cJSON_AddStringToObject(__FUNCTION__, cj_result, "interfaceId", "wlan0");
-            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_status_str, "finished");
+            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_interfaceId_str, ezlopi_wlan0_str);
+            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_status_str, scene_status_finished_str);
         }
 
         if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(cj_scan_stop))

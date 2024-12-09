@@ -26,7 +26,7 @@ void network_get(cJSON* cj_request, cJSON* cj_response)
             if (wifi_properties)
             {
                 char tmp_string[54];
-                cJSON_AddStringToObject(__FUNCTION__, wifi_properties, ezlopi__id_str, "wlan0");
+                cJSON_AddStringToObject(__FUNCTION__, wifi_properties, ezlopi__id_str, ezlopi_wlan0_str);
                 cJSON_AddStringToObject(__FUNCTION__, wifi_properties, ezlopi_enabled_str, ezlopi_auto_str);
 
                 uint8_t mac_addr[6];
@@ -143,8 +143,8 @@ void network_wifi_try_connect(cJSON* cj_request, cJSON* cj_response)
     if (cj_params)
     {
         char interfaceId[16];
-        CJSON_GET_VALUE_STRING_BY_COPY(cj_params, "interfaceId", interfaceId);
-        if (0 == strncmp("wlan0", interfaceId, 6))
+        CJSON_GET_VALUE_STRING_BY_COPY(cj_params, ezlopi_interfaceId_str, interfaceId);
+        if (0 == strncmp(ezlopi_wlan0_str, interfaceId, 6))
         {
             cJSON* cj_network = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_network_str);
             if (cj_network)

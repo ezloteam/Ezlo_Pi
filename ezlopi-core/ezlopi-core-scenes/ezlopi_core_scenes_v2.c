@@ -309,7 +309,7 @@ ezlopi_error_t ezlopi_scenes_enable_disable_scene_by_id_v2(uint32_t _id, bool en
             if (cj_scene)
             {
                 cJSON *enable_item = cJSON_GetObjectItem(__FUNCTION__, cj_scene, ezlopi_enabled_str);
-                TRACE_S("prev_enable => [%s]", (enable_item->type == cJSON_True) ? "True" : "False");
+                TRACE_S("prev_enable => [%s]", (enable_item->type == cJSON_True) ? ezlopi_true_str : ezlopi_false_str);
                 if ((enable_item && cJSON_IsBool(enable_item)) && (enable_item->type != ((enabled_flag) ? cJSON_True : cJSON_False)))
                 {
                     enable_item->type = (enabled_flag) ? cJSON_True : cJSON_False;
@@ -349,7 +349,7 @@ ezlopi_error_t ezlopi_scenes_enable_disable_scene_by_id_v2(uint32_t _id, bool en
                 }
                 else
                 {
-                    TRACE_W("Scene-Already [%s] or, invalid option ", (true == enabled_flag) ? "enabled" : "disabled");
+                    TRACE_W("Scene-Already [%s] or, invalid option ", (true == enabled_flag) ? ezlopi_enabled_str : "disabled");
                 }
                 cJSON_Delete(__FUNCTION__, cj_scene);
             }
@@ -565,7 +565,7 @@ static l_scenes_list_v2_t *__new_scene_populate(cJSON *cj_scene, uint32_t scene_
             CJSON_GET_VALUE_BOOL(cj_scene, ezlopi_is_group_str, new_scene->is_group);
 
             {
-                char tmp_grp_id[32] = {0};
+                char tmp_grp_id[32] = { 0 };
                 CJSON_GET_VALUE_STRING_BY_COPY(cj_scene, ezlopi_group_id_str, tmp_grp_id);
                 if (0 < strlen(tmp_grp_id))
                 {
@@ -856,7 +856,7 @@ static l_when_block_v2_t *____new_when_block_populate(cJSON *cj_when_block)
                     TRACE_D("group_blockName : %s ", new_when_block->when_grp->grp_blockName);
                 }
 
-                char grp_id_str[32] = {0};
+                char grp_id_str[32] = { 0 };
                 CJSON_GET_VALUE_STRING_BY_COPY(cj_when_block, ezlopi_group_id_str, grp_id_str);
                 if (0 < strlen(grp_id_str))
                 {
@@ -867,7 +867,7 @@ static l_when_block_v2_t *____new_when_block_populate(cJSON *cj_when_block)
         }
 
         {
-            char tmp_block_id[32] = {0};
+            char tmp_block_id[32] = { 0 };
             CJSON_GET_VALUE_STRING_BY_COPY(cj_when_block, ezlopi_blockId_str, tmp_block_id);
             if (0 < strlen(tmp_block_id))
             {
@@ -885,7 +885,7 @@ static l_when_block_v2_t *____new_when_block_populate(cJSON *cj_when_block)
 
         new_when_block->block_type = SCENE_BLOCK_TYPE_WHEN;
 
-        cJSON *cj_new_blockmeta = cJSON_GetObjectItem(__FUNCTION__, cj_when_block, "blockMeta");
+        cJSON *cj_new_blockmeta = cJSON_GetObjectItem(__FUNCTION__, cj_when_block, ezlopi_blockMeta_str);
         if (cj_new_blockmeta && (cJSON_Object == cj_new_blockmeta->type))
         {
             new_when_block->cj_block_meta = cJSON_Duplicate(__FUNCTION__, cj_new_blockmeta, 1);
@@ -929,10 +929,10 @@ static void _____new_action_delay(s_action_delay_v2_t *action_delay, cJSON *cj_d
 {
     if (action_delay && cj_delay)
     {
-        CJSON_GET_VALUE_DOUBLE(cj_delay, "days", action_delay->days);
-        CJSON_GET_VALUE_DOUBLE(cj_delay, "hours", action_delay->hours);
-        CJSON_GET_VALUE_DOUBLE(cj_delay, "minutes", action_delay->minutes);
-        CJSON_GET_VALUE_DOUBLE(cj_delay, "seconds", action_delay->seconds);
+        CJSON_GET_VALUE_DOUBLE(cj_delay, ezlopi_days_str, action_delay->days);
+        CJSON_GET_VALUE_DOUBLE(cj_delay, ezlopi_hours_str, action_delay->hours);
+        CJSON_GET_VALUE_DOUBLE(cj_delay, ezlopi_minutes_str, action_delay->minutes);
+        CJSON_GET_VALUE_DOUBLE(cj_delay, ezlopi_seconds_str, action_delay->seconds);
     }
 }
 
@@ -1159,8 +1159,8 @@ static bool ____check_and_append_group_id(cJSON *cj_when_block)
             cJSON *type = cJSON_GetObjectItem(__FUNCTION__, cj_fields_block, ezlopi_type_str);
             if (name && type)
             {
-                if ((EZPI_STRNCMP_IF_EQUAL(name->valuestring, "blocks", strlen(name->valuestring), 7) && EZPI_STRNCMP_IF_EQUAL(type->valuestring, "blocks", strlen(type->valuestring), 7)) ||
-                    (EZPI_STRNCMP_IF_EQUAL(name->valuestring, "block", strlen(name->valuestring), 6) && EZPI_STRNCMP_IF_EQUAL(type->valuestring, "block", strlen(type->valuestring), 6)))
+                if ((EZPI_STRNCMP_IF_EQUAL(name->valuestring, ezlopi_blocks_str, strlen(name->valuestring), 7) && EZPI_STRNCMP_IF_EQUAL(type->valuestring, ezlopi_blocks_str, strlen(type->valuestring), 7)) ||
+                    (EZPI_STRNCMP_IF_EQUAL(name->valuestring, ezlopi_block_str, strlen(name->valuestring), 6) && EZPI_STRNCMP_IF_EQUAL(type->valuestring, ezlopi_block_str, strlen(type->valuestring), 6)))
                 {
                     cJSON *cj_value_blocks = cJSON_GetObjectItem(__FUNCTION__, cj_fields_block, ezlopi_value_str);
                     if (cj_value_blocks && (cJSON_Array == cj_value_blocks->type))
@@ -1240,8 +1240,8 @@ static int _____check_and_add_when_blockId(cJSON *cj_new_scene_when_block)
             cJSON *cj_args = cJSON_GetObjectItem(__FUNCTION__, cj_method, "args");
             if (cj_args)
             {
-                if ((NULL == cJSON_GetObjectItem(__FUNCTION__, cj_args, "blocks")) &&
-                    (NULL == cJSON_GetObjectItem(__FUNCTION__, cj_args, "block")))
+                if ((NULL == cJSON_GetObjectItem(__FUNCTION__, cj_args, ezlopi_blocks_str)) &&
+                    (NULL == cJSON_GetObjectItem(__FUNCTION__, cj_args, ezlopi_block_str)))
                 {
                     // TRACE_D("adding new-block-ID :");
                     add_when_blockId_flag = true;
@@ -1262,8 +1262,8 @@ static int _____check_and_add_when_blockId(cJSON *cj_new_scene_when_block)
             cJSON *type = cJSON_GetObjectItem(__FUNCTION__, cj_fields_block, ezlopi_type_str);
             if (name && type)
             {
-                if ((EZPI_STRNCMP_IF_EQUAL(name->valuestring, "blocks", strlen(name->valuestring), 7) && EZPI_STRNCMP_IF_EQUAL(type->valuestring, "blocks", strlen(type->valuestring), 7)) ||
-                    (EZPI_STRNCMP_IF_EQUAL(name->valuestring, "block", strlen(name->valuestring), 6) && EZPI_STRNCMP_IF_EQUAL(type->valuestring, "block", strlen(type->valuestring), 6)))
+                if ((EZPI_STRNCMP_IF_EQUAL(name->valuestring, ezlopi_blocks_str, strlen(name->valuestring), 7) && EZPI_STRNCMP_IF_EQUAL(type->valuestring, ezlopi_blocks_str, strlen(type->valuestring), 7)) ||
+                    (EZPI_STRNCMP_IF_EQUAL(name->valuestring, ezlopi_block_str, strlen(name->valuestring), 6) && EZPI_STRNCMP_IF_EQUAL(type->valuestring, ezlopi_block_str, strlen(type->valuestring), 6)))
                 {
                     cJSON *cj_value_blocks = cJSON_GetObjectItem(__FUNCTION__, cj_fields_block, ezlopi_value_str);
                     if (cj_value_blocks && (cJSON_Array == cj_value_blocks->type))
@@ -1338,7 +1338,7 @@ int ezlopi_core_scene_add_when_blockId_if_reqd(cJSON *cj_new_scene)
 //--------------------------------------------------------------------------------------------------
 static void ____modify_function_in_blockmeta(cJSON *cj_when_block, bool enable_status)
 {
-    cJSON *cj_blockMeta = cJSON_GetObjectItem(__FUNCTION__, cj_when_block, "blockMeta");
+    cJSON *cj_blockMeta = cJSON_GetObjectItem(__FUNCTION__, cj_when_block, ezlopi_blockMeta_str);
     if (cj_blockMeta)
     {
         cJSON *cj_ruleTrigger = cJSON_GetObjectItem(__FUNCTION__, cj_blockMeta, "ruleTrigger");
@@ -1350,12 +1350,12 @@ static void ____modify_function_in_blockmeta(cJSON *cj_when_block, bool enable_s
                 cJSON *cj_latch = cJSON_GetObjectItem(__FUNCTION__, cj_function, "latch");
                 if (cj_latch)
                 {
-                    cJSON *cj_enabled = cJSON_GetObjectItem(__FUNCTION__, cj_latch, "enabled");
+                    cJSON *cj_enabled = cJSON_GetObjectItem(__FUNCTION__, cj_latch, ezlopi_enabled_str);
                     if (cJSON_IsBool(cj_enabled) && cj_enabled)
                     {
                         // may need to include 'naming' filter
                         cj_enabled->type = (enable_status ? cJSON_True : cJSON_False); /* change latch-status in nvs*/
-                        CJSON_TRACE("blockMeta", cj_blockMeta);
+                        CJSON_TRACE(ezlopi_blockMeta_str, cj_blockMeta);
                     }
                 }
             }
@@ -1379,7 +1379,7 @@ static bool ____change_latch_status_in_blockOptions(cJSON *cj_when_block, bool e
             cJSON *cj_latch = cJSON_GetObjectItem(__FUNCTION__, cj_function, "latch");
             if (cj_latch)
             {
-                cJSON *cj_enabled = cJSON_GetObjectItem(__FUNCTION__, cj_latch, "enabled");
+                cJSON *cj_enabled = cJSON_GetObjectItem(__FUNCTION__, cj_latch, ezlopi_enabled_str);
                 if (cJSON_IsBool(cj_enabled) && cj_enabled)
                 {
                     // may need to include 'naming' filter
@@ -1403,7 +1403,7 @@ static bool ___enable_disable_latch_with_blockId(cJSON *cj_when_block, uint32_t 
     // int value_block_idx = 0;
 
     /* <1> single scene function */
-    cJSON *cj_blockId = cJSON_GetObjectItem(__FUNCTION__, cj_when_block, "blockId");
+    cJSON *cj_blockId = cJSON_GetObjectItem(__FUNCTION__, cj_when_block, ezlopi_blockId_str);
     if (cj_blockId && cj_blockId->valuestring)
     {
         uint32_t tmp_blockId = (uint32_t)strtoul(cj_blockId->valuestring, NULL, 16);
@@ -1416,7 +1416,7 @@ static bool ___enable_disable_latch_with_blockId(cJSON *cj_when_block, uint32_t 
     else
     {
         /* <2> nested scene with function combined by 'And/OR' */
-        cJSON *cj_fields_blocks = cJSON_GetObjectItem(__FUNCTION__, cj_when_block, "fields");
+        cJSON *cj_fields_blocks = cJSON_GetObjectItem(__FUNCTION__, cj_when_block, ezlopi_fields_str);
         if (cj_fields_blocks && (cJSON_Array == cj_fields_blocks->type))
         {
             cJSON *cj_fields_block = NULL;
@@ -1428,8 +1428,8 @@ static bool ___enable_disable_latch_with_blockId(cJSON *cj_when_block, uint32_t 
                 cJSON *type = cJSON_GetObjectItem(__FUNCTION__, cj_fields_block, ezlopi_type_str);
                 if (name && type)
                 {
-                    if ((EZPI_STRNCMP_IF_EQUAL(name->valuestring, "blocks", strlen(name->valuestring), 7) && EZPI_STRNCMP_IF_EQUAL(type->valuestring, "blocks", strlen(type->valuestring), 7)) ||
-                        (EZPI_STRNCMP_IF_EQUAL(name->valuestring, "block", strlen(name->valuestring), 6) && EZPI_STRNCMP_IF_EQUAL(type->valuestring, "block", strlen(type->valuestring), 6)))
+                    if ((EZPI_STRNCMP_IF_EQUAL(name->valuestring, ezlopi_blocks_str, strlen(name->valuestring), 7) && EZPI_STRNCMP_IF_EQUAL(type->valuestring, ezlopi_blocks_str, strlen(type->valuestring), 7)) ||
+                        (EZPI_STRNCMP_IF_EQUAL(name->valuestring, ezlopi_block_str, strlen(name->valuestring), 6) && EZPI_STRNCMP_IF_EQUAL(type->valuestring, ezlopi_block_str, strlen(type->valuestring), 6)))
                     {
                         /* now scanning the value-section within 'fields-block'*/
                         cJSON *cj_value_blocks = cJSON_GetObjectItem(__FUNCTION__, cj_fields_block, ezlopi_value_str);
@@ -1437,7 +1437,7 @@ static bool ___enable_disable_latch_with_blockId(cJSON *cj_when_block, uint32_t 
                         {
                             cJSON *cj_value_block = NULL;
                             // while (NULL != (cj_value_block = cJSON_GetArrayItem(cj_value_blocks, value_block_idx++)))
-                          cJSON_ArrayForEach(cj_value_block, cj_value_blocks)
+                            cJSON_ArrayForEach(cj_value_block, cj_value_blocks)
                             {
                                 latch_cleared = ___enable_disable_latch_with_blockId(cj_value_block, blockId, enable_status);
                             }
@@ -1495,7 +1495,7 @@ int ezlopi_core_scene_set_reset_latch_enable(const char *sceneId_str, const char
                     cJSON *cj_when_block = NULL;
                     cJSON *cj_when_blocks = cJSON_GetObjectItem(__FUNCTION__, cj_scene, "when");
                     // while (NULL != (cj_when_block = cJSON_GetArrayItem(cj_when_blocks, when_block_idx++)))
-                   cJSON_ArrayForEach(cj_when_block, cj_when_blocks)
+                    cJSON_ArrayForEach(cj_when_block, cj_when_blocks)
                     {
                         latch_cleared = ___enable_disable_latch_with_blockId(cj_when_block, blockId, enable_status);
                     }
@@ -1551,7 +1551,7 @@ int ezlopi_core_scene_reset_latch_state(const char *sceneId_str, const char *blo
         l_when_block_v2_t *curr_when_block = curr_scene->when_block;
         while (curr_when_block)
         {
-#warning "incomplete : need to iterate throught nested-when";
+            #warning "incomplete : need to iterate throught nested-when";
             s_when_function_t *function_state = (s_when_function_t *)curr_scene->when_block->fields->user_arg;
             if (function_state)
             {
@@ -1652,7 +1652,7 @@ static bool ___enable_disable_block_en_with_blockId(cJSON *cj_when_block, uint32
 
     /* <1> single scene function */
     // CJSON_TRACE("cj_when_block : ", cj_when_block);
-    cJSON *cj_blockId = cJSON_GetObjectItem(__FUNCTION__, cj_when_block, "blockId");
+    cJSON *cj_blockId = cJSON_GetObjectItem(__FUNCTION__, cj_when_block, ezlopi_blockId_str);
     if ((cj_blockId && cj_blockId->valuestring))
     {
         uint32_t curr_blockId = (uint32_t)strtoul(cj_blockId->valuestring, NULL, 16);
@@ -1663,7 +1663,7 @@ static bool ___enable_disable_block_en_with_blockId(cJSON *cj_when_block, uint32
     }
     else
     { /* <2> nested scene with function combined by 'And/OR' */
-        cJSON *cj_fields_blocks = cJSON_GetObjectItem(__FUNCTION__, cj_when_block, "fields");
+        cJSON *cj_fields_blocks = cJSON_GetObjectItem(__FUNCTION__, cj_when_block, ezlopi_fields_str);
         if (cj_fields_blocks && (cJSON_Array == cj_fields_blocks->type))
         {
             cJSON *cj_fields_block = NULL;
@@ -1674,8 +1674,8 @@ static bool ___enable_disable_block_en_with_blockId(cJSON *cj_when_block, uint32
                 cJSON *type = cJSON_GetObjectItem(__FUNCTION__, cj_fields_block, ezlopi_type_str);
                 if (name && type)
                 {
-                    if ((EZPI_STRNCMP_IF_EQUAL(name->valuestring, "blocks", strlen(name->valuestring), 7) && EZPI_STRNCMP_IF_EQUAL(type->valuestring, "blocks", strlen(type->valuestring), 7)) ||
-                        (EZPI_STRNCMP_IF_EQUAL(name->valuestring, "block", strlen(name->valuestring), 6) && EZPI_STRNCMP_IF_EQUAL(type->valuestring, "block", strlen(type->valuestring), 6)))
+                    if ((EZPI_STRNCMP_IF_EQUAL(name->valuestring, ezlopi_blocks_str, strlen(name->valuestring), 7) && EZPI_STRNCMP_IF_EQUAL(type->valuestring, ezlopi_blocks_str, strlen(type->valuestring), 7)) ||
+                        (EZPI_STRNCMP_IF_EQUAL(name->valuestring, ezlopi_block_str, strlen(name->valuestring), 6) && EZPI_STRNCMP_IF_EQUAL(type->valuestring, ezlopi_block_str, strlen(type->valuestring), 6)))
                     {
                         /* now scanning the value-section within 'fields-block'*/
                         cJSON *cj_value_blocks = cJSON_GetObjectItem(__FUNCTION__, cj_fields_block, ezlopi_value_str);
@@ -1784,8 +1784,8 @@ static bool _____put_new_block_meta(cJSON *cj_when_block, cJSON *cj_new_blockmet
     bool ret = false;
     if (cj_when_block && cj_new_blockmeta)
     {
-        cJSON_DeleteItemFromObject(__FUNCTION__, cj_when_block, "blockMeta");
-        ret = cJSON_AddItemToObject(__FUNCTION__, cj_when_block, "blockMeta", cJSON_Duplicate(__FUNCTION__, cj_new_blockmeta, 1));
+        cJSON_DeleteItemFromObject(__FUNCTION__, cj_when_block, ezlopi_blockMeta_str);
+        ret = cJSON_AddItemToObject(__FUNCTION__, cj_when_block, ezlopi_blockMeta_str, cJSON_Duplicate(__FUNCTION__, cj_new_blockmeta, 1));
     }
     return ret;
 }
@@ -1797,7 +1797,7 @@ static bool ___add_new_blockmeta_by_id(cJSON *cj_when_block, uint32_t blockId, c
 
     /* <1> single scene function */
     // CJSON_TRACE("cj_when_block : ", cj_when_block);
-    cJSON *cj_blockId = cJSON_GetObjectItem(__FUNCTION__, cj_when_block, "blockId");
+    cJSON *cj_blockId = cJSON_GetObjectItem(__FUNCTION__, cj_when_block, ezlopi_blockId_str);
     if (cj_blockId && cj_blockId->valuestring)
     {
         uint32_t tmp_blockId = (uint32_t)strtoul(cj_blockId->valuestring, NULL, 16);
@@ -1808,7 +1808,7 @@ static bool ___add_new_blockmeta_by_id(cJSON *cj_when_block, uint32_t blockId, c
     }
     else
     { /* <2> nested scene with function combined by 'And/OR/NOT' */
-        cJSON *cj_fields_blocks = cJSON_GetObjectItem(__FUNCTION__, cj_when_block, "fields");
+        cJSON *cj_fields_blocks = cJSON_GetObjectItem(__FUNCTION__, cj_when_block, ezlopi_fields_str);
         if (cj_fields_blocks && (cJSON_Array == cj_fields_blocks->type))
         {
             cJSON *cj_fields_block = NULL;
@@ -1819,8 +1819,8 @@ static bool ___add_new_blockmeta_by_id(cJSON *cj_when_block, uint32_t blockId, c
                 cJSON *type = cJSON_GetObjectItem(__FUNCTION__, cj_fields_block, ezlopi_type_str);
                 if (name && type)
                 {
-                    if ((EZPI_STRNCMP_IF_EQUAL(name->valuestring, "blocks", strlen(name->valuestring), 7) && EZPI_STRNCMP_IF_EQUAL(type->valuestring, "blocks", strlen(type->valuestring), 7)) ||
-                        (EZPI_STRNCMP_IF_EQUAL(name->valuestring, "block", strlen(name->valuestring), 6) && EZPI_STRNCMP_IF_EQUAL(type->valuestring, "block", strlen(type->valuestring), 6)))
+                    if ((EZPI_STRNCMP_IF_EQUAL(name->valuestring, ezlopi_blocks_str, strlen(name->valuestring), 7) && EZPI_STRNCMP_IF_EQUAL(type->valuestring, ezlopi_blocks_str, strlen(type->valuestring), 7)) ||
+                        (EZPI_STRNCMP_IF_EQUAL(name->valuestring, ezlopi_block_str, strlen(name->valuestring), 6) && EZPI_STRNCMP_IF_EQUAL(type->valuestring, ezlopi_block_str, strlen(type->valuestring), 6)))
                     {
                         /* now scanning the value-section within 'fields-block'*/
                         cJSON *cj_value_blocks = cJSON_GetObjectItem(__FUNCTION__, cj_fields_block, ezlopi_value_str);
@@ -1949,7 +1949,7 @@ static void _____add_the_scene_time_method_to_arr(cJSON *cj_scenes_array, l_scen
             cJSON_AddStringToObject(__FUNCTION__, cj_new_add, "sceneName", curr_scene->name);
             cJSON_AddStringToObject(__FUNCTION__, cj_new_add, "methodName", method_name);
 
-            char timestamp_str[64] = {0};
+            char timestamp_str[64] = { 0 };
             EZPI_CORE_sntp_epoch_to_iso8601(timestamp_str, sizeof(timestamp_str), (time_t)(curr_scene->executed_date));
             cJSON_AddStringToObject(__FUNCTION__, cj_new_add, "executionDate", timestamp_str);
 
@@ -1979,8 +1979,8 @@ static char *___get_time_list_from_when_block_fields(cJSON *cj_scenes_array, l_s
         }
 
         // iterate throught value array if field_name_type  is 'block'
-        if ((EZPI_STRNCMP_IF_EQUAL(curr_field_block->name, "blocks", sizeof(curr_field_block->name), 7) && (VALUE_TYPE_BLOCK == curr_field_block->field_value.e_type)) ||
-            (EZPI_STRNCMP_IF_EQUAL(curr_field_block->name, "block", sizeof(curr_field_block->name), 6) && (VALUE_TYPE_BLOCK == curr_field_block->field_value.e_type)))
+        if ((EZPI_STRNCMP_IF_EQUAL(curr_field_block->name, ezlopi_blocks_str, sizeof(curr_field_block->name), 7) && (VALUE_TYPE_BLOCK == curr_field_block->field_value.e_type)) ||
+            (EZPI_STRNCMP_IF_EQUAL(curr_field_block->name, ezlopi_block_str, sizeof(curr_field_block->name), 6) && (VALUE_TYPE_BLOCK == curr_field_block->field_value.e_type)))
         {
             // this function iterates through the when-block-field-values.
             if (VALUE_TYPE_BLOCK == curr_field_block->field_value.e_type)
@@ -2014,7 +2014,7 @@ static char *__get_time_category_method_name(cJSON *cj_scenes_array, l_scenes_li
                 _____add_the_scene_time_method_to_arr(cj_scenes_array, curr_scene, curr_when_block->block_options.method.name);
             }
             else if ((EZPI_STRNCMP_IF_EQUAL(curr_when_category_name, "when_category_logic", strlen(curr_when_category_name), 20))        // and,or,xor
-                     || (EZPI_STRNCMP_IF_EQUAL(curr_when_category_name, "when_category_function", strlen(curr_when_category_name), 23))) // function -> for/repeat/follow....
+                || (EZPI_STRNCMP_IF_EQUAL(curr_when_category_name, "when_category_function", strlen(curr_when_category_name), 23))) // function -> for/repeat/follow....
             {
                 ret_str = ___get_time_list_from_when_block_fields(cj_scenes_array, curr_scene, curr_when_block->fields);
             }
@@ -2049,8 +2049,8 @@ static l_when_block_v2_t *__iterate_through_fields(l_fields_v2_t *fields, uint32
     l_when_block_v2_t *ret = NULL;
     if (fields)
     {
-        if ((EZPI_STRNCMP_IF_EQUAL(fields->name, "blocks", strlen(fields->name), 7) && (EZLOPI_VALUE_TYPE_BLOCKS == fields->value_type)) ||
-            (EZPI_STRNCMP_IF_EQUAL(fields->name, "block", strlen(fields->name), 7) && (EZLOPI_VALUE_TYPE_BLOCK == fields->value_type)))
+        if ((EZPI_STRNCMP_IF_EQUAL(fields->name, ezlopi_blocks_str, strlen(fields->name), 7) && (EZLOPI_VALUE_TYPE_BLOCKS == fields->value_type)) ||
+            (EZPI_STRNCMP_IF_EQUAL(fields->name, ezlopi_block_str, strlen(fields->name), 7) && (EZLOPI_VALUE_TYPE_BLOCK == fields->value_type)))
         {
             l_when_block_v2_t *curr_field_when_blocks = fields->field_value.u_value.when_block; // value : {when_block , ...}
             while (curr_field_when_blocks)

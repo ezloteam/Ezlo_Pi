@@ -841,7 +841,7 @@ ezlopi_error_t ezlopi_core_modes_set_unset_device_armed_status(cJSON *cj_device_
                     cJSON *cj_device_armed_broadcast = cJSON_CreateObject(__func__);
                     if (cj_device_armed_broadcast)
                     {
-                        cJSON_AddStringToObject(__func__, cj_device_armed_broadcast, ezlopi_method_str, "hub.device.armed.set");
+                        cJSON_AddStringToObject(__func__, cj_device_armed_broadcast, ezlopi_method_str, method_hub_device_armed_set);
                         cJSON *cj_params = cJSON_AddObjectToObject(__func__, cj_device_armed_broadcast, ezlopi_params_str);
                         if (cj_params)
                         {

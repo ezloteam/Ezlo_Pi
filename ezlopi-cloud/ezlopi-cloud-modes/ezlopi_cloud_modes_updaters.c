@@ -204,7 +204,7 @@ void ezlopi_cloud_modes_alarms_off_added(cJSON *cj_request, cJSON *cj_response)
             if (cj_mode_id && cj_device_id)
             {
                 cJSON_AddItemToObject(__FUNCTION__, cj_result, ezlopi_modeId_str, cJSON_Duplicate(__FUNCTION__, cj_mode_id, true));
-                cJSON_AddItemToObject(__FUNCTION__, cj_result, "alarmsOffDevice", cJSON_Duplicate(__FUNCTION__, cj_device_id, true));
+                cJSON_AddItemToObject(__FUNCTION__, cj_result, ezlopi_alarmsOffDevice_str, cJSON_Duplicate(__FUNCTION__, cj_device_id, true));
             }
         }
     }
@@ -238,7 +238,7 @@ void ezlopi_cloud_modes_alarms_off_removed(cJSON *cj_request, cJSON *cj_response
             if (cj_mode_id && cj_device_id)
             {
                 cJSON_AddItemToObject(__FUNCTION__, cj_result, ezlopi_modeId_str, cJSON_Duplicate(__FUNCTION__, cj_mode_id, true));
-                cJSON_AddItemToObject(__FUNCTION__, cj_result, "alarmsOffDevice", cJSON_Duplicate(__FUNCTION__, cj_device_id, true));
+                cJSON_AddItemToObject(__FUNCTION__, cj_result, ezlopi_alarmsOffDevice_str, cJSON_Duplicate(__FUNCTION__, cj_device_id, true));
             }
         }
     }
@@ -272,7 +272,7 @@ void ezlopi_cloud_modes_cameras_off_added(cJSON *cj_request, cJSON *cj_response)
             if (cj_mode_id && cj_device_id)
             {
                 cJSON_AddItemToObject(__FUNCTION__, cj_result, ezlopi_modeId_str, cJSON_Duplicate(__FUNCTION__, cj_mode_id, true));
-                cJSON_AddItemToObject(__FUNCTION__, cj_result, "camerasOffDevice", cJSON_Duplicate(__FUNCTION__, cj_device_id, true));
+                cJSON_AddItemToObject(__FUNCTION__, cj_result, ezlopi_camerasOffDevices_str, cJSON_Duplicate(__FUNCTION__, cj_device_id, true));
             }
         }
     }
@@ -306,7 +306,7 @@ void ezlopi_cloud_modes_cameras_off_removed(cJSON *cj_request, cJSON *cj_respons
             if (cj_mode_id && cj_device_id)
             {
                 cJSON_AddItemToObject(__FUNCTION__, cj_result, ezlopi_modeId_str, cJSON_Duplicate(__FUNCTION__, cj_mode_id, true));
-                cJSON_AddItemToObject(__FUNCTION__, cj_result, "camerasOffDevice", cJSON_Duplicate(__FUNCTION__, cj_device_id, true));
+                cJSON_AddItemToObject(__FUNCTION__, cj_result, ezlopi_camerasOffDevices_str, cJSON_Duplicate(__FUNCTION__, cj_device_id, true));
             }
         }
     }
@@ -372,7 +372,7 @@ void ezlopi_cloud_modes_protect_buttons_added(cJSON *cj_request, cJSON *cj_respo
     cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
     cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, ezlopi_hub_modes_protect_button_added);
 
-    cJSON *cj_button_state = cJSON_GetObjectItem(__FUNCTION__, cj_request, "button_state");
+    cJSON *cj_button_state = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_item_name_button_state);
     if (cj_button_state && ((1 << 0) == cj_button_state->valuedouble))
     {
         cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
@@ -396,7 +396,7 @@ void ezlopi_cloud_modes_protect_buttons_updated(cJSON *cj_request, cJSON *cj_res
     cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
     cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, ezlopi_hub_modes_protect_button_updated);
 
-    cJSON *cj_button_state = cJSON_GetObjectItem(__FUNCTION__, cj_request, "button_state");
+    cJSON *cj_button_state = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_item_name_button_state);
     if (cj_button_state && ((1 << 1) == cj_button_state->valuedouble))
     {
         cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
@@ -420,7 +420,7 @@ void ezlopi_cloud_modes_protect_buttons_removed(cJSON *cj_request, cJSON *cj_res
     cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
     cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, ezlopi_hub_modes_protect_button_removed);
 
-    cJSON *cj_button_state = cJSON_GetObjectItem(__FUNCTION__, cj_request, "button_state");
+    cJSON *cj_button_state = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_item_name_button_state);
     if (cj_button_state && ((1 << 2) == cj_button_state->valuedouble))
     {
         cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);

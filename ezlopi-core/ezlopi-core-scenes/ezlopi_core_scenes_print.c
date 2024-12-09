@@ -314,7 +314,7 @@ void ezlopi_print_action_blocks(l_action_block_v2_t *action_block)
 #if (1 == ENABLE_TRACE)
     while (action_block)
     {
-        TRACE_D("\t|-- %s: ", (SCENE_BLOCK_TYPE_THEN == action_block->block_type) ? "then" : "else");
+        TRACE_D("\t|-- %s: ", (SCENE_BLOCK_TYPE_THEN == action_block->block_type) ? ezlopi_then_str : ezlopi_else_str);
         ezlopi_print_block_options(&action_block->block_options, action_block->fields, NULL);
         TRACE_D("\t\t|-- blockType: then");
         TRACE_D("\t\t|-- _tempId: %.*s", sizeof(action_block->_tempId), action_block->_tempId);

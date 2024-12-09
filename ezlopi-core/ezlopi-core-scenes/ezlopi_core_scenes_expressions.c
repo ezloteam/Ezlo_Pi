@@ -715,7 +715,7 @@ void ezlopi_scenes_expressions_print(s_ezlopi_expressions_t *exp_node)
         TRACE_D("\t-----------------------------------");
 
         CJSON_TRACE("meta-data", exp_node->meta_data);
-        TRACE_D("Is variable: %s", exp_node->variable ? "True" : "False");
+        TRACE_D("Is variable: %s", exp_node->variable ? ezlopi_true_str : ezlopi_false_str);
         TRACE_D("value-type: %s", ezlopi_scene_get_scene_value_type_name(exp_node->value_type));
 
         if (exp_node->exp_value.type > EXPRESSION_VALUE_TYPE_UNDEFINED && exp_node->exp_value.type < EXPRESSION_VALUE_TYPE_MAX)

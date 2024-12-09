@@ -295,7 +295,7 @@ uint8_t isdate_tm_check(e_isdate_modes_t *mode_type, struct tm *info, l_fields_v
     if (cj_time_arr && (cJSON_Array == cj_time_arr->type))
     {
         ret |= (1 << 4);
-        char field_hr_mm[10] = {0};
+        char field_hr_mm[10] = { 0 };
         strftime(field_hr_mm, 10, "%H:%M", info);
         field_hr_mm[9] = '\0';
         // TRACE_S("[field_hr_mm: %s]", field_hr_mm);
@@ -403,8 +403,8 @@ uint8_t isdate_year_weeks_check(e_isdate_modes_t *mode_type, struct tm *info, l_
                 }
                 else // for case :- 'n'
                 {
-                    char field_weeks[10] = {0}; // week_value extracted from ESP32.
-                    char week_val[10] = {0};    // week_value given to us from cloud.
+                    char field_weeks[10] = { 0 }; // week_value extracted from ESP32.
+                    char week_val[10] = { 0 };    // week_value given to us from cloud.
 
                     // reducing array values by -1, for easier comparison ::==>  [1_54]--->[0_53]      or      [1_6]-->[0_5]
                     snprintf(week_val, 10, "%d", (int)(array_item->valuedouble - 1));
@@ -459,7 +459,7 @@ int isdate_check_flag_result(e_isdate_modes_t mode_type, uint8_t flag_check)
     case ISDATE_WEEKLY_MODE:
     {
         if ((((flag_check & MASK_FOR_TIME_ARG) && (flag_check & TIME_FLAG)) &&
-             ((flag_check & MASK_FOR_WEEKDAYS_ARG) && (flag_check & WEEKDAYS_FLAG))))
+            ((flag_check & MASK_FOR_WEEKDAYS_ARG) && (flag_check & WEEKDAYS_FLAG))))
         {
             // TRACE_W("here! week_days and time");
             ret = 1;
@@ -469,7 +469,7 @@ int isdate_check_flag_result(e_isdate_modes_t mode_type, uint8_t flag_check)
     case ISDATE_MONTHLY_MODE:
     {
         if ((((flag_check & MASK_FOR_TIME_ARG) && (flag_check & TIME_FLAG)) &&
-             ((flag_check & MASK_FOR_DAYS_ARG) && (flag_check & DAYS_FLAG))))
+            ((flag_check & MASK_FOR_DAYS_ARG) && (flag_check & DAYS_FLAG))))
         {
             // TRACE_W("here! month_days and time");
             ret = 1;
@@ -501,7 +501,7 @@ uint8_t isonce_tm_check(l_fields_v2_t *curr_field, struct tm *info)
     uint8_t flag_check = 0;
     if ((EZLOPI_VALUE_TYPE_24_HOURS_TIME == curr_field->value_type) && (NULL != curr_field->field_value.u_value.value_string))
     {
-        char field_hr_mm[10] = {0};
+        char field_hr_mm[10] = { 0 };
         strftime(field_hr_mm, 10, "%H:%M", info);
         field_hr_mm[9] = '\0';
 
@@ -589,7 +589,7 @@ static void issunsate_update_sunstate_tm(int tm_mday, s_sunstate_data_t *user_da
 {
     if (tm_mday && user_data)
     {
-        char tmp_url[100] = {0};
+        char tmp_url[100] = { 0 };
         char tmp_headers[] = "Host: api.sunrisesunset.io\r\nAccept: */*\r\nConnection: keep-alive\r\n";
         char tmp_web_server[] = "api.sunrisesunset.io";
         char *lat_long_vals = ezlopi_nvs_read_latidtude_longitude();
@@ -641,7 +641,7 @@ static void issunstate_add_offs(e_issunstate_offset_t tmoffs_type, struct tm *ch
     if (choosen_suntime && defined_moment && tm_offs_val) // choosen_suntime => sunrise or sunset
     {
         // Default values to store start and end boundries
-        struct tm tmp_time = {0};
+        struct tm tmp_time = { 0 };
 
         // Nox, extract & add :'tm_offs_val'
         char time_diff[10];
@@ -747,10 +747,10 @@ uint8_t issunstate_get_suntime(l_scenes_list_v2_t *scene_node, l_fields_v2_t *cu
 
             user_data->sunstate_mode = curr_sunstate_mode;          // this sets target sunstate for curr meshbot
             issunsate_update_sunstate_tm(info->tm_mday, user_data); // assign 'curr_day' & 'suntime' only
-            user_data->tmoffs_type = (0 == strncmp(curr_field->field_value.u_value.value_string, "intime", 7))   ? ISSUNSTATE_INTIME_MODE
-                                     : (0 == strncmp(curr_field->field_value.u_value.value_string, "before", 7)) ? ISSUNSTATE_BEFORE_MODE
-                                     : (0 == strncmp(curr_field->field_value.u_value.value_string, "after", 6))  ? ISSUNSTATE_AFTER_MODE
-                                                                                                                 : ISSUNSTATE_UNDEFINED;
+            user_data->tmoffs_type = (0 == strncmp(curr_field->field_value.u_value.value_string, ezlopi_intime_str, 7)) ? ISSUNSTATE_INTIME_MODE
+                : (0 == strncmp(curr_field->field_value.u_value.value_string, ezlopi_before_str, 7)) ? ISSUNSTATE_BEFORE_MODE
+                : (0 == strncmp(curr_field->field_value.u_value.value_string, ezlopi_after_str, 6)) ? ISSUNSTATE_AFTER_MODE
+                : ISSUNSTATE_UNDEFINED;
             // 3. check if, curr_tm_day has been updated successfully
             if ((0 == user_data->curr_tm_day) ||
                 (0 == user_data->sunstate_mode) ||
@@ -780,14 +780,14 @@ uint8_t issunstate_get_offs_tmval(l_scenes_list_v2_t *scene_node, l_fields_v2_t 
                 TRACE_D(".... Adding offset:  +/- (hh:mm:ss) ....");
                 issunstate_add_offs(user_data->tmoffs_type, &(user_data->choosen_suntime), &(user_data->defined_moment), curr_field->field_value.u_value.value_string);
                 TRACE_S("\r\nSunMode[%d]{sunrise=1,sunset=2,0=NULL},\r\nChoosen_suntime(hh:mm:ss = %d:%d:%d),\r\ndefined_moment(hh:mm:ss = %d:%d:%d),\r\nOffset(%s)\r\n",
-                        user_data->sunstate_mode,
-                        user_data->choosen_suntime.tm_hour,
-                        user_data->choosen_suntime.tm_min,
-                        user_data->choosen_suntime.tm_sec,
-                        user_data->defined_moment.tm_hour,
-                        user_data->defined_moment.tm_min,
-                        user_data->defined_moment.tm_sec,
-                        curr_field->field_value.u_value.value_string);
+                    user_data->sunstate_mode,
+                    user_data->choosen_suntime.tm_hour,
+                    user_data->choosen_suntime.tm_min,
+                    user_data->choosen_suntime.tm_sec,
+                    user_data->defined_moment.tm_hour,
+                    user_data->defined_moment.tm_min,
+                    user_data->defined_moment.tm_sec,
+                    curr_field->field_value.u_value.value_string);
             }
         }
     }
@@ -833,7 +833,7 @@ uint8_t issunstate_check_mdrn(uint8_t sunstate_mode, const char *range_type, str
     uint8_t ret = 0;
     if (sunstate_mode && range_type && info && defined_moment)
     {
-        if (0 == strncmp(range_type, "at", 3)) // at desired moment
+        if (0 == strncmp(range_type, ezlopi_at_str, 3)) // at desired moment
         {
             if ((info->tm_hour == defined_moment->tm_hour) &&
                 (info->tm_min == defined_moment->tm_min) &&
@@ -842,7 +842,7 @@ uint8_t issunstate_check_mdrn(uint8_t sunstate_mode, const char *range_type, str
                 ret = (1 << 3);
             }
         }
-        else if (0 == strncmp(range_type, "after", 6)) // all time after defined moment till midnight of current day
+        else if (0 == strncmp(range_type, ezlopi_after_str, 6)) // all time after defined moment till midnight of current day
         {
 
             if ((info->tm_hour < 24) && (info->tm_hour > defined_moment->tm_hour))
@@ -850,21 +850,21 @@ uint8_t issunstate_check_mdrn(uint8_t sunstate_mode, const char *range_type, str
                 ret = (1 << 3);
             }
             else if (((info->tm_hour < 24) && (info->tm_hour == defined_moment->tm_hour)) &&
-                     ((info->tm_min < 60) && (info->tm_min >= defined_moment->tm_min)) &&
-                     ((info->tm_sec < 60) && (info->tm_sec > defined_moment->tm_sec)))
+                ((info->tm_min < 60) && (info->tm_min >= defined_moment->tm_min)) &&
+                ((info->tm_sec < 60) && (info->tm_sec > defined_moment->tm_sec)))
             {
                 ret = (1 << 3);
             }
         }
-        else if (0 == strncmp(range_type, "before", 7)) // all time after midnight till defined moment;
+        else if (0 == strncmp(range_type, ezlopi_before_str, 7)) // all time after midnight till defined moment;
         {
             if ((info->tm_hour >= 0) && (info->tm_hour < defined_moment->tm_hour))
             {
                 ret = (1 << 3);
             }
             else if (((info->tm_hour >= 0) && (info->tm_hour == defined_moment->tm_hour)) &&
-                     ((info->tm_min >= 0) && (info->tm_min <= defined_moment->tm_min)) &&
-                     ((info->tm_sec >= 0) && (info->tm_sec <= defined_moment->tm_sec)))
+                ((info->tm_min >= 0) && (info->tm_min <= defined_moment->tm_min)) &&
+                ((info->tm_sec >= 0) && (info->tm_sec <= defined_moment->tm_sec)))
             {
                 ret = (1 << 3);
             }
@@ -1126,8 +1126,8 @@ int when_function_for_opr(l_scenes_list_v2_t *scene_node, l_when_block_v2_t *whe
     int ret = 0;
     if (scene_node && when_block && cj_func_opr)
     {
-        cJSON *for_type = cJSON_GetObjectItem(__FUNCTION__, cj_func_opr, "method");
-        cJSON *for_interval = cJSON_GetObjectItem(__FUNCTION__, cj_func_opr, "seconds");
+        cJSON *for_type = cJSON_GetObjectItem(__FUNCTION__, cj_func_opr, ezlopi_method_str);
+        cJSON *for_interval = cJSON_GetObjectItem(__FUNCTION__, cj_func_opr, ezlopi_seconds_str);
         if (for_type && for_interval)
         {
             const char *for_less_least = cJSON_GetStringValue(for_type); /*extract the type*/
@@ -1148,7 +1148,7 @@ int when_function_for_opr(l_scenes_list_v2_t *scene_node, l_when_block_v2_t *whe
                     if (0 != function_state_info->transtion_instant)
                     {
                         int threshold_time = cJSON_GetNumberValue(for_interval);
-                        if (0 == strncmp(for_less_least, "less", 5))
+                        if (0 == strncmp(for_less_least, ezlopi_less_str, 5))
                         {
                             if ((((uint32_t)xTaskGetTickCount() - function_state_info->transtion_instant) / 1000) < threshold_time)
                             {
@@ -1156,7 +1156,7 @@ int when_function_for_opr(l_scenes_list_v2_t *scene_node, l_when_block_v2_t *whe
                                 ret = 1;
                             }
                         }
-                        else if (0 == strncmp(for_less_least, "least", 6))
+                        else if (0 == strncmp(for_less_least, ezlopi_least_str, 6))
                         {
                             if ((((uint32_t)xTaskGetTickCount() - function_state_info->transtion_instant) / 1000) >= threshold_time)
                             {
@@ -1178,8 +1178,8 @@ int when_function_for_repeat(l_scenes_list_v2_t *scene_node, l_when_block_v2_t *
     int ret = 0;
     if (scene_node && when_block && cj_func_opr)
     {
-        cJSON *for_times = cJSON_GetObjectItem(__FUNCTION__, cj_func_opr, "times");
-        cJSON *for_interval = cJSON_GetObjectItem(__FUNCTION__, cj_func_opr, "seconds");
+        cJSON *for_times = cJSON_GetObjectItem(__FUNCTION__, cj_func_opr, ezlopi_times_str);
+        cJSON *for_interval = cJSON_GetObjectItem(__FUNCTION__, cj_func_opr, ezlopi_seconds_str);
         if (for_times && for_interval)
         {
             /* first get the product of all children states*/
@@ -1280,7 +1280,7 @@ int when_function_for_pulse(l_scenes_list_v2_t *scene_node, l_when_block_v2_t *w
     {
         cJSON *for_trueperiod = cJSON_GetObjectItem(__FUNCTION__, cj_func_opr, "truePeriod");
         cJSON *for_falseperiod = cJSON_GetObjectItem(__FUNCTION__, cj_func_opr, "falsePeriod");
-        cJSON *for_times = cJSON_GetObjectItem(__FUNCTION__, cj_func_opr, "times");
+        cJSON *for_times = cJSON_GetObjectItem(__FUNCTION__, cj_func_opr, ezlopi_times_str);
         if (for_trueperiod && for_times && for_falseperiod)
         {
             int true_time_dur = cJSON_GetNumberValue(for_trueperiod);
@@ -1377,9 +1377,9 @@ int when_function_for_pulse(l_scenes_list_v2_t *scene_node, l_when_block_v2_t *w
             }
 
             TRACE_W("trigger_state= %s , {seq_count: %d}.-----> return =>> [pulse_state = %s]",
-                    (function_state_info->activate_pulse_seq) ? "true" : "false",
-                    function_state_info->transition_count,
-                    (function_state_info->current_state) ? "high" : "low");
+                (function_state_info->activate_pulse_seq) ? ezlopi_true_str : ezlopi_false_str,
+                function_state_info->transition_count,
+                (function_state_info->current_state) ? "high" : "low");
             ret = function_state_info->current_state;
         }
     }
@@ -1391,7 +1391,7 @@ int when_function_for_latch(l_scenes_list_v2_t *scene_node, l_when_block_v2_t *w
     int ret = 0;
     if (scene_node && when_block && cj_func_opr)
     {
-        cJSON *for_enabled = cJSON_GetObjectItem(__FUNCTION__, cj_func_opr, "enabled");
+        cJSON *for_enabled = cJSON_GetObjectItem(__FUNCTION__, cj_func_opr, ezlopi_enabled_str);
         if (for_enabled)
         {
             s_when_function_t *function_state_info = (s_when_function_t *)scene_node->when_block->fields->user_arg;
@@ -1670,9 +1670,9 @@ static uint8_t __isitemState_vs_field_compare(s_item_exp_data_t *new_extract_dat
                     if (tmp_expr->exp_value.u_value.str_value && new_extract_data->sample_data.u_value.value_string)
                     {
                         if (EZPI_STRNCMP_IF_EQUAL(tmp_expr->exp_value.u_value.str_value,
-                                                  new_extract_data->sample_data.u_value.value_string,
-                                                  strlen(tmp_expr->exp_value.u_value.str_value),
-                                                  strlen(new_extract_data->sample_data.u_value.value_string)))
+                            new_extract_data->sample_data.u_value.value_string,
+                            strlen(tmp_expr->exp_value.u_value.str_value),
+                            strlen(new_extract_data->sample_data.u_value.value_string)))
                         {
                             flag |= (1 << bit_mode_position);
                         }
@@ -1701,9 +1701,9 @@ static uint8_t __isitemState_vs_field_compare(s_item_exp_data_t *new_extract_dat
             if (tmp_field->field_value.u_value.value_string && new_extract_data->sample_data.u_value.value_string)
             {
                 if (EZPI_STRNCMP_IF_EQUAL(tmp_field->field_value.u_value.value_string,
-                                          new_extract_data->sample_data.u_value.value_string,
-                                          strlen(tmp_field->field_value.u_value.value_string),
-                                          strlen(new_extract_data->sample_data.u_value.value_string)))
+                    new_extract_data->sample_data.u_value.value_string,
+                    strlen(tmp_field->field_value.u_value.value_string),
+                    strlen(new_extract_data->sample_data.u_value.value_string)))
                 {
                     flag |= (1 << bit_mode_position);
                 }
@@ -1796,10 +1796,10 @@ static int ____old_vs_new_extract_data(s_item_exp_data_t *new_extract_data, s_it
         if (new_extract_data->sample_data.u_value.value_string && prev_extract_data->sample_data.u_value.value_string)
         {
             if (EZPI_STRNCMP_IF_EQUAL(
-                    new_extract_data->sample_data.u_value.value_string,
-                    prev_extract_data->sample_data.u_value.value_string,
-                    strlen(new_extract_data->sample_data.u_value.value_string),
-                    strlen(prev_extract_data->sample_data.u_value.value_string)))
+                new_extract_data->sample_data.u_value.value_string,
+                prev_extract_data->sample_data.u_value.value_string,
+                strlen(new_extract_data->sample_data.u_value.value_string),
+                strlen(prev_extract_data->sample_data.u_value.value_string)))
             {
                 ret = 1;
             }
@@ -1862,7 +1862,7 @@ int isitemstate_changed(s_item_exp_data_t *new_extract_data, l_fields_v2_t *star
             }
             case (BIT2 | BIT1 | BIT0): // all condition matched and activated  ---> check if state have changed --> if changed , reset activation flag
             {
-#warning "need to optimize this case";
+                #warning "need to optimize this case";
                 // comparing 'start'
                 if (NULL != start_field)
                 {
