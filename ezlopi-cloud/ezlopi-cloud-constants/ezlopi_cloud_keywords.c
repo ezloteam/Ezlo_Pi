@@ -345,4 +345,14 @@ const char *ezlopI_service___name = "service.name";
 const char *ezlopi_attributes_str = "attributes";
 const char *ezlopi_resource_str = "resource";
 const char *ezlopi_resourceSpans_str = "resourceSpans";
+const char *ezlopi_scopeSpans_str = "scopeSpans";
+const char *ezlopi_scope_str = "scope";
+const char *ezlopi_spans_str = "spans";
+const char *ezlopi_kind_str = "kind";
+const char *ezlopi_endTimeUnixNano_str = "endTimeUnixNano";
+const char *ezlopi_startTimeUnixNano_str = "startTimeUnixNano";
+const char *ezlopi_parentSpanId_str = "parentSpanId";
+const char *ezlopi_spanId_str = "spanId";
+const char *ezlopi_traceId_str = "traceId";
+
 #endif // __EZLOPI_CLOUD_KEYWORDS_H__

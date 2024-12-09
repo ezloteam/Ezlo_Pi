@@ -349,5 +349,14 @@ extern const char *ezlopI_service___name;
 extern const char *ezlopi_attributes_str;
 extern const char *ezlopi_resource_str;
 extern const char *ezlopi_resourceSpans_str;
+extern const char *ezlopi_scopeSpans_str;
+extern const char *ezlopi_scope_str;
+extern const char *ezlopi_spans_str;
+extern const char *ezlopi_kind_str;
+extern const char *ezlopi_endTimeUnixNano_str;
+extern const char *ezlopi_startTimeUnixNano_str;
+extern const char *ezlopi_parentSpanId_str;
+extern const char *ezlopi_spanId_str;
+extern const char *ezlopi_traceId_str;
 
 #endif // __EZLOPI_CLOUD_KEYWORDS_H__
