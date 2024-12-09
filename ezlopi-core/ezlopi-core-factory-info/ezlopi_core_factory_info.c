@@ -73,6 +73,11 @@
 /*******************************************************************************
  *                          Static Function Prototypes
  *******************************************************************************/
+static void ezlopi_replace_newline_escape(char *str);
+static ezlopi_error_t ezlopi_check_string_validity(const char *str);
+static bool ezlopi_check_uuid_validity(const char *uuid);
+static bool ezlopi_check_mac_validity(const char *mac);
+static int ezlopi_factory_info_v3_set_4kb(const char *data, uint32_t offset, uint32_t len);
 
 /*******************************************************************************
  *                          Static Data Definitions

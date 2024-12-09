@@ -116,11 +116,27 @@
 /*******************************************************************************
  *                          Static Function Prototypes
  *******************************************************************************/
+static int ezlopi_service_uart_reset(cJSON *root);
+static int ezlopi_service_uart_set_uart_config(const cJSON *root);
+static int ezlopi_service_uart_process_log_severity(const cJSON *root);
+static ezlopi_error_t ezlopi_service_uart_process_provisioning_api(const cJSON *root);
+static int ezlopi_service_uart_parser(const char *data);
+static void __uart_loop(void *arg);
+static void ezlopi_service_uart_task(void *arg);
+static int ezlopi_service_uart_firmware_info(cJSON *parent);
+static int ezlopi_service_uart_chip_info(cJSON *parent);
+static int ezlopi_service_uart_firmware_sdk_info(cJSON *parent);
+static int ezlopi_service_uart_device_status_info(cJSON *parent);
+static int ezlopi_service_uart_config_info(cJSON *parent);
+static int ezlopi_service_uart_ezlopi_info(cJSON *parent);
+static int ezlopi_service_uart_oem_info(cJSON *parent);
+static int ezlopi_service_uart_newtwork_info(cJSON *parent);
 static void ezlopi_service_uart_get_info();
 static void ezlopi_service_uart_set_wifi(const char *data);
 static void ezlopi_service_uart_response(uint8_t cmd, uint8_t status_write, uint8_t status_connect);
 static void ezlopi_service_uart_set_config(const char *data);
 static void ezlopi_service_uart_get_config(void);
+static void tinyusb_cdc_rx_callback(int itf, cdcacm_event_t *event);
 
 /*******************************************************************************
  *                          Static Data Definitions
@@ -174,6 +190,34 @@ void EZPI_SERV_uart_init(void)
     xTaskCreate(ezlopi_service_uart_task, "serv_uart_task", EZLOPI_SERVICE_UART_TASK_DEPTH, NULL, configMAX_PRIORITIES - 4, &__uart_loop_handle);
     ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_UART_TASK, &__uart_loop_handle, EZLOPI_SERVICE_UART_TASK_DEPTH);
 #endif
+}
+
+void EZPI_SERV_cdc_init()
+{
+    usb_semaphore_handle = xSemaphoreCreateBinary();
+    if (usb_semaphore_handle)
+    {
+        xSemaphoreGive(usb_semaphore_handle);
+        tinyusb_config_t ezlopi_usb_device_configuration = {
+            .descriptor = NULL,
+            .string_descriptor = NULL,
+            .external_phy = false,
+        };
+
+        tinyusb_config_cdcacm_t ezlopi_usb_cdc_configuration = {
+            .usb_dev = TINYUSB_USBDEV_0,
+            .cdc_port = cdc_port,
+            .rx_unread_buf_sz = CONFIG_TINYUSB_CDC_RX_BUFSIZE,
+            .callback_rx = &tinyusb_cdc_rx_callback,
+            .callback_rx_wanted_char = NULL,
+            .callback_line_state_changed = &tinyusb_cdc_rx_callback,
+            .callback_line_coding_changed = NULL,
+        };
+
+        ESP_ERROR_CHECK(tinyusb_driver_install(&ezlopi_usb_device_configuration));
+        ESP_ERROR_CHECK(tusb_cdc_acm_init(&ezlopi_usb_cdc_configuration));
+        TRACE_I("USB CDC initialization completed successfully.");
+    }
 }
 
 /*******************************************************************************
@@ -1133,34 +1177,6 @@ static void tinyusb_cdc_rx_callback(int itf, cdcacm_event_t *event)
     else
     {
         TRACE_E("Untracked CDC event(code: %d)", event->type);
-    }
-}
-
-void EZPI_SERV_cdc_init()
-{
-    usb_semaphore_handle = xSemaphoreCreateBinary();
-    if (usb_semaphore_handle)
-    {
-        xSemaphoreGive(usb_semaphore_handle);
-        tinyusb_config_t ezlopi_usb_device_configuration = {
-            .descriptor = NULL,
-            .string_descriptor = NULL,
-            .external_phy = false,
-        };
-
-        tinyusb_config_cdcacm_t ezlopi_usb_cdc_configuration = {
-            .usb_dev = TINYUSB_USBDEV_0,
-            .cdc_port = cdc_port,
-            .rx_unread_buf_sz = CONFIG_TINYUSB_CDC_RX_BUFSIZE,
-            .callback_rx = &tinyusb_cdc_rx_callback,
-            .callback_rx_wanted_char = NULL,
-            .callback_line_state_changed = &tinyusb_cdc_rx_callback,
-            .callback_line_coding_changed = NULL,
-        };
-
-        ESP_ERROR_CHECK(tinyusb_driver_install(&ezlopi_usb_device_configuration));
-        ESP_ERROR_CHECK(tusb_cdc_acm_init(&ezlopi_usb_cdc_configuration));
-        TRACE_I("USB CDC initialization completed successfully.");
     }
 }
 
