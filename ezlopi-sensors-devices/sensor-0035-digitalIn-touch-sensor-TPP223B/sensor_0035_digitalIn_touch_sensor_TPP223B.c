@@ -86,7 +86,7 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
             {
                 int gpio_level = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
                 item->interface.gpio.gpio_in.value = (false == item->interface.gpio.gpio_in.invert) ? gpio_level : !gpio_level;
-                ezlopi_service_gpioisr_register_v3(item, __touch_switch_callback, 200);
+                EZPI_service_gpioisr_register_v3(item, __touch_switch_callback, 200);
                 ret = EZPI_SUCCESS;
             }
         }

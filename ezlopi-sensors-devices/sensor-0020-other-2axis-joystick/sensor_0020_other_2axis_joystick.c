@@ -289,7 +289,7 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
                 }
             }
             else if (item->cloud_properties.item_id == user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_SWITCH] &&
-                (item->interface.gpio.gpio_in.enable))
+                     (item->interface.gpio.gpio_in.enable))
             {
                 if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num))
                 {
@@ -311,7 +311,7 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
                         TRACE_I("Joystick switch initialize successfully.");
                         item->interface.gpio.gpio_in.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
                         // TRACE_D("Value is %d", (int)item->interface.gpio.gpio_in.value);
-                        ezlopi_service_gpioisr_register_v3(item, __joystick_intr_callback, 200);
+                        EZPI_service_gpioisr_register_v3(item, __joystick_intr_callback, 200);
                     }
                     else
                     {
@@ -376,7 +376,7 @@ static ezlopi_error_t __notify(l_ezlopi_item_t *item)
             s_joystick_data_t *user_data = (s_joystick_data_t *)item->user_arg;
             if (user_data)
             {
-                s_ezlopi_analog_data_t ezlopi_analog_data = { .value = 0, .voltage = 0 };
+                s_ezlopi_analog_data_t ezlopi_analog_data = {.value = 0, .voltage = 0};
 
                 if (user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_X] == item->cloud_properties.item_id)
                 {

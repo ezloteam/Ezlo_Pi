@@ -148,7 +148,7 @@ static ezlopi_error_t __0065_init(l_ezlopi_item_t *item)
             if (0 == gpio_config(&input_conf))
             {
                 item->interface.gpio.gpio_in.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
-                ezlopi_service_gpioisr_register_v3(item, __0065_update_from_device, 200);
+                EZPI_service_gpioisr_register_v3(item, __0065_update_from_device, 200);
                 ret = EZPI_SUCCESS;
             }
         }
