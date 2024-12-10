@@ -1965,16 +1965,15 @@ static char *__get_time_category_method_name(cJSON *cj_scenes_array, l_scenes_li
         }
 
         // now examine if block-name is of 'logical-category'
-        const char *curr_when_category_name = ezlopi_scene_get_scene_method_category_name(curr_when_block->block_options.method.name); // give corresponding 'category_name' for respective 'method_name'
-        if (curr_when_category_name)
+        e_scenes_method_category_t curr_when_category_enum = ezlopi_scene_get_scene_method_category_enum(curr_when_block->block_options.method.name); // give corresponding 'category_name' for respective 'method_name'
+        if (METHOD_CATEGORY_NAN < curr_when_category_enum && curr_when_category_enum < METHOD_CATEGORY_MAX)
         {
-            size_t len = (curr_when_category_name) ? strlen(curr_when_category_name) + 1 : 0;
-            if (EZPI_STRNCMP_IF_EQUAL(curr_when_category_name, ezlopi_when_category_time_str, len, 19))
+            if (METHOD_CATEGORY_WHEN_TIME == curr_when_category_enum)
             {
                 _____add_the_scene_time_method_to_arr(cj_scenes_array, curr_scene, curr_when_block->block_options.method.name);
             }
-            else if ((EZPI_STRNCMP_IF_EQUAL(curr_when_category_name, ezlopi_when_category_logic_str, len, 20))        // and,or,xor
-                || (EZPI_STRNCMP_IF_EQUAL(curr_when_category_name, ezlopi_when_category_function_str, len, 23))) // function -> for/repeat/follow....
+            else if (METHOD_CATEGORY_WHEN_LOGIC == curr_when_category_enum        // and,or,xor
+                || METHOD_CATEGORY_WHEN_FUNCTION == curr_when_category_enum) // function -> for/repeat/follow....
             {
                 ret_str = ___get_time_list_from_when_block_fields(cj_scenes_array, curr_scene, curr_when_block->fields);
             }
@@ -2032,11 +2031,11 @@ static l_when_block_v2_t *___get_group_when_blocks(l_when_block_v2_t *curr_when_
     if (curr_when_block)
     {
         // now examine if block-name is of 'logical-category'
-        const char *curr_when_category_name = ezlopi_scene_get_scene_method_category_name(curr_when_block->block_options.method.name); // give corresponding 'category_name' for respective 'method_name'
-        if (curr_when_category_name)
+        e_scenes_method_category_t curr_when_category_enum = ezlopi_scene_get_scene_method_category_enum(curr_when_block->block_options.method.name); // give corresponding 'category_name' for respective 'method_name'
+        if (METHOD_CATEGORY_NAN < curr_when_category_enum && curr_when_category_enum < METHOD_CATEGORY_MAX)
         {
-            if ((EZPI_STRNCMP_IF_EQUAL(curr_when_category_name, ezlopi_when_category_logic_str, strlen(curr_when_category_name) + 1, 20))        // and/or/not
-                || (EZPI_STRNCMP_IF_EQUAL(curr_when_category_name, ezlopi_when_category_function_str, strlen(curr_when_category_name) + 1, 23))) // function -> for/repeat/follow....
+            if (METHOD_CATEGORY_WHEN_LOGIC == curr_when_category_enum      // and/or/not
+                || METHOD_CATEGORY_WHEN_FUNCTION == curr_when_category_enum) // function -> for/repeat/follow....
             {
                 // check for --> the 'when-block' containing the 'group-id'
                 if ((NULL != curr_when_block->when_grp) && (0 < strlen(curr_when_block->when_grp->grp_blockName)) && (0 < curr_when_block->when_grp->grp_id))
