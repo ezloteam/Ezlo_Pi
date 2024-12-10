@@ -27,6 +27,7 @@
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_websocket_client.h"
 
+#include "ezlopi_service_otel.h"
 #include "ezlopi_service_webprov.h"
 
 #if (1 == EZPI_CORE_WSS_USE_WSC_LIB)
@@ -208,16 +209,42 @@ static void __fetch_wss_endpoint(void *pv)
 
                             if (cj_method)
                             {
-                                TRACE_D("rx_message->payload [method: %.*s]\r\n%s", cj_method->str_value_len, cj_method->valuestring, rx_message->payload);
+                                printf("web-provisioning [method: %.*s]\r\n%s\r\n", cj_method->str_value_len, cj_method->valuestring, rx_message->payload);
+                                // TRACE_D("rx_message->payload [method: %.*s]\r\n%s", cj_method->str_value_len, cj_method->valuestring, rx_message->payload);
                                 ezlopi_free(__FUNCTION__, rx_message->payload);
                                 rx_message->payload = NULL;
                             }
                             else
                             {
-                                TRACE_E("rx_message->payload [method: null]\r\n%s", rx_message->payload);
+                                printf("web-provisioning [method: null]\r\n%s\r\n", rx_message->payload);
+                                // TRACE_E("rx_message->payload [method: null]\r\n%s", rx_message->payload);
                             }
 
                             __message_process_cjson(cj_request, rx_message->time_ms);
+
+                            cJSON *cj_trace_telemetry = cJSON_CreateObject(__FUNCTION__);
+                            if (cj_trace_telemetry)
+                            {
+                                time_t now = 0;
+
+                                cJSON *cj_method_dup = cJSON_Duplicate(__FUNCTION__, cj_method, true);
+                                if (false == cJSON_AddItemToObject(__FUNCTION__, cj_trace_telemetry, ezlopi_method_str, cj_method_dup))
+                                {
+                                    cJSON_Delete(__FUNCTION__, cj_method_dup);
+                                }
+
+                                cJSON_AddNumberToObject(__FUNCTION__, cj_trace_telemetry, ezlopi_kind_str, 1);
+                                cJSON_AddNumberToObject(__FUNCTION__, cj_trace_telemetry, ezlopi_startTime_str, rx_message->time_ms);
+
+                                time(&now);
+                                cJSON_AddNumberToObject(__FUNCTION__, cj_trace_telemetry, ezlopi_endTime_str, now);
+
+                                if (0 == ezlopi_service_otel_add_trace_to_telemetry_queue(cj_trace_telemetry))
+                                {
+                                    cJSON_Delete(__FUNCTION__, cj_trace_telemetry);
+                                }
+                            }
+
                             cJSON_Delete(__FUNCTION__, cj_request);
                         }
 

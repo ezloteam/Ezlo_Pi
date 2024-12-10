@@ -339,7 +339,11 @@ const char *ezlopi_chipset_str = "chipset";
 const char *ezlopi_internet_str = "internet";
 
 ////////////////// otel keywords
+const char *ezlopi_values_str = "values";
+const char *ezlopi_arrayValue_str = "arrayValue";
 const char *ezlopi_stringValue_str = "stringValue";
+const char *ezlopi_doubleValue_str = "doubleValue";
+const char *ezlopi_boolValue_str = "boolValue";
 const char *ezlopi_key_str = "key";
 const char *ezlopI_service___name = "service.name";
 const char *ezlopi_attributes_str = "attributes";
@@ -354,5 +358,8 @@ const char *ezlopi_startTimeUnixNano_str = "startTimeUnixNano";
 const char *ezlopi_parentSpanId_str = "parentSpanId";
 const char *ezlopi_spanId_str = "spanId";
 const char *ezlopi_traceId_str = "traceId";
+const char *ezlopi_startTime_str = "startTime";
+const char *ezlopi_endTime_str = "endTime";
+
 
 #endif // __EZLOPI_CLOUD_KEYWORDS_H__

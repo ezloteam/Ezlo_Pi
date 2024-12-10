@@ -20,11 +20,14 @@ set(EZLOPI_CORE_COMPONENTS
 set(EZLOPI_CLOUD_COMPONENTS 
 )
 
+set(EZLOPI_SERVICES
+        ezlopi-service-otel
+)
 
-
-idf_component_register(SRCS "ezlopi_test_prov.c" "ezlopi_service_webprov.c" "${provisioning_src}"
+idf_component_register(SRCS "${provisioning_src}"
     INCLUDE_DIRS "."
     REQUIRES    ${EZLOPI_UTIL_COMPONENTS}
                 ${EZLOPI_CORE_COMPONENTS} 
                 ${EZLOPI_CLOUD_COMPONENTS} 
+                ${EZLOPI_SERVICES}
     )

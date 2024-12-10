@@ -74,10 +74,13 @@ esp_websocket_client_handle_t ezlopi_websocket_client_init(cJSON *uri, int (*msg
 
     if ((NULL == client) && (NULL != uri) && (NULL != uri->valuestring) && (NULL != msg_upcall))
     {
-        static s_ws_event_arg_t event_arg;
-        event_arg.client = client;
-        event_arg.msg_upcall = msg_upcall;
-        event_arg.connection_upcall = connection_upcall;
+        s_ws_event_arg_t *event_arg = ezlopi_malloc(__FUNCTION__, sizeof(s_ws_event_arg_t));
+        if (event_arg)
+        {
+            event_arg->client = client;
+            event_arg->msg_upcall = msg_upcall;
+            event_arg->connection_upcall = connection_upcall;
+        }
 
         esp_websocket_client_config_t websocket_cfg = {
             .task_stack = 5120,
@@ -97,7 +100,7 @@ esp_websocket_client_handle_t ezlopi_websocket_client_init(cJSON *uri, int (*msg
 
         if (client)
         {
-            esp_websocket_register_events(client, WEBSOCKET_EVENT_ANY, websocket_event_handler, (void *)&event_arg);
+            esp_websocket_register_events(client, WEBSOCKET_EVENT_ANY, websocket_event_handler, (void *)event_arg);
             esp_websocket_client_start(client);
         }
     }

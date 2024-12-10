@@ -343,7 +343,11 @@ extern const char *ezlopi_chipset_str;
 extern const char *ezlopi_internet_str;
 
 //////////// otel keywords
+extern const char *ezlopi_values_str;
+extern const char *ezlopi_arrayValue_str;
 extern const char *ezlopi_stringValue_str;
+extern const char *ezlopi_doubleValue_str;
+extern const char *ezlopi_boolValue_str;
 extern const char *ezlopi_key_str;
 extern const char *ezlopI_service___name;
 extern const char *ezlopi_attributes_str;
@@ -358,5 +362,7 @@ extern const char *ezlopi_startTimeUnixNano_str;
 extern const char *ezlopi_parentSpanId_str;
 extern const char *ezlopi_spanId_str;
 extern const char *ezlopi_traceId_str;
+extern const char *ezlopi_startTime_str;
+extern const char *ezlopi_endTime_str;
 
 #endif // __EZLOPI_CLOUD_KEYWORDS_H__
