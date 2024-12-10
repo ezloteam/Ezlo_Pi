@@ -77,7 +77,7 @@ void app_main(void)
 #endif // NOT defined CONFIG_IDF_TARGET_ESP32 or CONFIG_IDF_TARGET_ESP32C3
 
 #if defined(CONFIG_EZPI_BLE_ENABLE)
-    ezlopi_ble_service_init();
+    EZPI_ble_service_init();
 #endif
 
 #if defined(CONFIG_EZPI_SERV_ENABLE_MODES)

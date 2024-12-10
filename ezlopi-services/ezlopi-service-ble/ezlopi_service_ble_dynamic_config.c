@@ -1,3 +1,42 @@
+
+/**
+ * @file    ezlopi_service_ble_dynamic_config.c
+ * @brief   Dynamic config service related functionalities
+ * @author
+ * @version
+ * @date
+ */
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_BLE_ENABLE
@@ -5,13 +44,15 @@
 #include <string.h>
 #include <time.h>
 
-#include "cjext.h"
 #include "lwip/ip_addr.h"
-#include "esp_event_base.h"
 #include "mbedtls/base64.h"
+
+#include "esp_event_base.h"
 #include "esp_gatt_common_api.h"
 
 #include "ezlopi_util_trace.h"
+#include "cjext.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_wifi.h"
@@ -27,21 +68,64 @@
 
 #include "ezlopi_service_ble_ble_auth.h"
 #include "ezlopi_service_ble.h"
-#include "EZLOPI_USER_CONFIG.h"
 
+/*******************************************************************************
+ *                          Type & Macro Definitions
+ *******************************************************************************/
+/**
+ * @brief Returns string from the the json `root` which contains name member
+ * @note root is the JOSN and should exist before being called
+ *
+ */
 #define CJ_GET_STRING(name) cJSON_GetStringValue(cJSON_GetObjectItem(__FUNCTION__, root, name))
+/**
+ * @brief Returns number from the the json `root` which contains name member
+ * @note root is the JOSN and should exist before being called
+ *
+ */
 #define CJ_GET_NUMBER(name) cJSON_GetNumberValue(cJSON_GetObjectItem(__FUNCTION__, root, name))
 
+/*******************************************************************************
+ *                          Static Function Prototypes
+ *******************************************************************************/
+
+/**
+ * @brief Function to encode dynamic config data to base64 string
+ *
+ * @return char* pointer to the base64 encoded string
+ * @retval Base64 encoded string or NULL on error
+ */
+static char *ezpi_dynamic_config_base64(void);
+/**
+ * @brief Function to decode base64 encoded dynamic config data
+ *
+ * @param total_size total size to decode
+ * @return char* Pointer to the decoded string
+ * @retval Decoded string or NULL on error
+ */
+static char *ezpi_base64_decode_dynamic_config(uint32_t total_size);
+/**
+ * @brief Function responds to ESP_GATTS_WRITE_EVT event for dynamic config write characteristics
+ *
+ * @param value Pointer to the command value
+ * @param param Pointer to the gatts callback parameter
+ */
+static void ezpi_dynamic_config_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
+/**
+ * @brief Function responds to ESP_GATTS_READ_EVT event for dynamic config read characteristics
+ *
+ * @param value Pointer to the command value
+ * @param param Pointer to the gatts callback parameter
+ */
+static void ezpi_dynamic_config_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
+
+/*******************************************************************************
+ *                          Static Data Definitions
+ *******************************************************************************/
 static s_gatt_service_t *g_dynamic_config_service = NULL;
 static s_linked_buffer_t *g_dynamic_config_linked_buffer = NULL;
 
-static char *__dynamic_config_base64(void);
-static char *__base64_decode_dynamic_config(uint32_t total_size);
-
-static void __dynamic_config_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
-static void __dynamic_config_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
-
-void ezlopi_ble_service_dynamic_config_init(void)
+void EZPI_ble_service_dynamic_config_init(void)
 {
     esp_bt_uuid_t uuid;
     esp_gatt_perm_t permission;
@@ -55,10 +139,10 @@ void ezlopi_ble_service_dynamic_config_init(void)
     uuid.len = ESP_UUID_LEN_16;
     permission = ESP_GATT_PERM_WRITE | ESP_GATT_PERM_READ;
     properties = ESP_GATT_CHAR_PROP_BIT_WRITE | ESP_GATT_CHAR_PROP_BIT_READ | ESP_GATT_CHAR_PROP_BIT_NOTIFY | ESP_GATT_CHAR_PROP_BIT_INDICATE;
-    ezlopi_ble_gatt_add_characteristic(g_dynamic_config_service, &uuid, permission, properties, __dynamic_config_read_func, __dynamic_config_write_func, NULL); // reliable-write is not implemented for now
+    ezlopi_ble_gatt_add_characteristic(g_dynamic_config_service, &uuid, permission, properties, ezpi_dynamic_config_read_func, ezpi_dynamic_config_write_func, NULL); // reliable-write is not implemented for now
 }
 
-static void __dynamic_config_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
+static void ezpi_dynamic_config_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
 {
     TRACE_D("Write function called!");
     TRACE_D("GATT_WRITE_EVT value: %.*s", param->write.len, param->write.value);
@@ -92,7 +176,7 @@ static void __dynamic_config_write_func(esp_gatt_value_t *value, esp_ble_gatts_c
                 {
                     if (((sequence - 1) * 400 + len) >= tot_len)
                     {
-                        char *decoded_data = __base64_decode_dynamic_config(tot_len); // uncommente f
+                        char *decoded_data = ezpi_base64_decode_dynamic_config(tot_len); // uncommente f
                         if (decoded_data)
                         {
                             cJSON *cjson_config = cJSON_Parse(__FUNCTION__, decoded_data);
@@ -122,7 +206,7 @@ static void __dynamic_config_write_func(esp_gatt_value_t *value, esp_ble_gatts_c
     }
 }
 
-static void __dynamic_config_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
+static void ezpi_dynamic_config_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
 {
     TRACE_D("Read function called!");
 
@@ -149,7 +233,7 @@ static void __dynamic_config_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb
     {
         if (NULL == g_dynamic_config_base64)
         {
-            g_dynamic_config_base64 = __dynamic_config_base64();
+            g_dynamic_config_base64 = ezpi_dynamic_config_base64();
 
             if (g_dynamic_config_base64)
             {
@@ -263,7 +347,7 @@ static void __dynamic_config_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb
     }
 }
 
-static char *__base64_decode_dynamic_config(uint32_t total_size)
+static char *ezpi_base64_decode_dynamic_config(uint32_t total_size)
 {
     char *decoded_config_json = NULL;
     char *base64_buffer = ezlopi_malloc(__FUNCTION__, total_size + 1);
@@ -323,7 +407,7 @@ static char *__base64_decode_dynamic_config(uint32_t total_size)
     return decoded_config_json;
 }
 
-static char *__dynamic_config_base64(void)
+static char *ezpi_dynamic_config_base64(void)
 {
     const uint32_t base64_data_len = 4096;
     char *base64_data = ezlopi_malloc(__FUNCTION__, base64_data_len);
@@ -357,3 +441,7 @@ static char *__dynamic_config_base64(void)
 }
 
 #endif // CONFIG_EZPI_BLE_ENABLE
+
+/*******************************************************************************
+ *                          End of File
+ *******************************************************************************/

@@ -1,4 +1,43 @@
 
+
+/**
+ * @file    ezlopi_service_ble_device_info.c
+ * @brief   Dynamic config service related functionalities
+ * @author
+ * @version
+ * @date
+ */
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_BLE_ENABLE
@@ -6,16 +45,21 @@
 #include <string.h>
 #include <ctype.h>
 
-#include "cjext.h"
 #include "lwip/ip_addr.h"
-#include "esp_event_base.h"
-#include "esp_chip_info.h"
 #include "mbedtls/base64.h"
 
+#include "esp_chip_info.h"
+#include "esp_event_base.h"
 #include "esp_netif.h"
 #include "esp_netif_ip_addr.h"
 #include "esp_system.h"
 #include "esp_idf_version.h"
+
+#include "cjext.h"
+#include "ezlopi_util_version.h"
+#include "ezlopi_util_trace.h"
+
+#include "ezlopi_hal_system_info.h"
 
 #include "ezlopi_core_wifi.h"
 #include "ezlopi_core_nvs.h"
@@ -30,38 +74,106 @@
 #include "ezlopi_core_info.h"
 #include "ezlopi_core_reset.h"
 
-#include "ezlopi_hal_system_info.h"
-
 #include "ezlopi_cloud_constants.h"
-
-#include "ezlopi_util_version.h"
-#include "ezlopi_util_trace.h"
 
 #include "ezlopi_service_ble.h"
 
+/**
+ * @brief Function to jsonify the device info in ransferable manner
+ *
+ * @return char* Stringified device info JSON
+ * @retval JSON string or NULL on error
+ */
+static char *ezpi_device_info_jsonify(void);
+/**
+ * @brief Function to add provided key value pairs to the root JSON
+ *
+ * @param[in] root Root JSON where infor has to be added
+ * @param[in] key JOSN key
+ * @param[in] value Value to the corresponding JSON key
+ */
+static void __add_factory_info_to_root(cJSON *root, char *key, char *value);
+/**
+ * @brief Function to read device information
+ *
+ * @param[in] value Pointer to the command value
+ * @param[in] param Pointer to the gatts callback parameter
+ */
+static void device_info_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
+/**
+ * @brief Function to read ezlopi API info
+ *
+ * @param[in] value Pointer to the command value
+ * @param[in] param Pointer to the gatts callback parameter
+ */
+static void ezpi_service_ble_ezlopi_api_info(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
+/**
+ * @brief Function to read ezlopi firmware info
+ *
+ * @param[in] value Pointer to the command value
+ * @param[in] param Pointer to the gatts callback parameter
+ */
+static void ezpi_service_ble_ezlopi_fmw_info(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
+/**
+ * @brief Function to read device chip info
+ *
+ * @param[in] value Pointer to the command value
+ * @param[in] param Pointer to the gatts callback parameter
+ */
+static void ezpi_service_ble_chip_info(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
+/**
+ * @brief Function to read SDK info over which firmware is built
+ *
+ * @param[in] value Pointer to the command value
+ * @param[in] param Pointer to the gatts callback parameter
+ */
+static void ezpi_service_ble_firmware_sdk_info(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
+/**
+ * @brief Function to read device state info
+ *
+ * @param[in] value Pointer to the command value
+ * @param[in] param Pointer to the gatts callback parameter
+ */
+static void ezpi_service_ble_device_state_info(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
+/**
+ * @brief Function to read device serial config info
+ *
+ * @param[in] value Pointer to the command value
+ * @param[in] param Pointer to the gatts callback parameter
+ */
+static void ezpi_service_ble_serial_config_info(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
+/**
+ * @brief Function to write device serial config info
+ *
+ * @param[in] value Pointer to the command value
+ * @param[in] param Pointer to the gatts callback parameter
+ */
+static void ezpi_service_ble_serial_config_write(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
+/**
+ * @brief Function to read ezlopi cloud info
+ *
+ * @param[in] value Pointer to the command value
+ * @param[in] param Pointer to the gatts callback parameter
+ */
+static void ezpi_service_ble_ezlo_cloud_info(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
+/**
+ * @brief Function to read device OEM info
+ *
+ * @param[in] value Pointer to the command value
+ * @param[in] param Pointer to the gatts callback parameter
+ */
+static void ezpi_service_ble_oem_info(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
+/**
+ * @brief Function to read device network info
+ *
+ * @param[in] value Pointer to the command value
+ * @param[in] param Pointer to the gatts callback parameter
+ */
+static void ezpi_service_ble_net_info(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
+
 static s_gatt_service_t *g_device_info_service = NULL;
 
-static char *device_info_jsonify(void);
-static void __add_factory_info_to_root(cJSON *root, char *key, char *value);
-
-static void device_info_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
-
-static void EZPI_SERVICE_BLE_ezlopi_api_info(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
-static void EZPI_SERVICE_BLE_ezlopi_fmw_info(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
-static void EZPI_SERVICE_BLE_chip_info(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
-static void EZPI_SERVICE_BLE_firmware_sdk_info(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
-static void EZPI_SERVICE_BLE_device_state_info(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
-static void EZPI_SERVICE_BLE_serial_config_info(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
-static void EZPI_SERVICE_BLE_serial_config_write(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
-static void EZPI_SERVICE_BLE_ezlo_cloud_info(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
-static void EZPI_SERVICE_BLE_oem_info(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
-static void EZPI_SERVICE_BLE_net_info(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
-
-#if 0 // Not used function
-static void device_mac_read_func(esp_gatt_value_t* value, esp_ble_gatts_cb_param_t* param);
-#endif
-
-void ezlopi_ble_service_device_info_init(void)
+void EZPI_ble_service_device_info_init(void)
 {
     esp_bt_uuid_t uuid;
     esp_gatt_perm_t permission;
@@ -83,55 +195,55 @@ void ezlopi_ble_service_device_info_init(void)
     uuid.len = ESP_UUID_LEN_16;
     permission = ESP_GATT_PERM_READ;
     properties = ESP_GATT_CHAR_PROP_BIT_READ;
-    ezlopi_ble_gatt_add_characteristic(g_device_info_service, &uuid, permission, properties, EZPI_SERVICE_BLE_ezlopi_api_info, NULL, NULL);
+    ezlopi_ble_gatt_add_characteristic(g_device_info_service, &uuid, permission, properties, ezpi_service_ble_ezlopi_api_info, NULL, NULL);
 
     uuid.uuid.uuid16 = EZPI_BLE_CHAR_FIRMWARE_INFO_UUID;
     uuid.len = ESP_UUID_LEN_16;
     permission = ESP_GATT_PERM_READ;
     properties = ESP_GATT_CHAR_PROP_BIT_READ;
-    ezlopi_ble_gatt_add_characteristic(g_device_info_service, &uuid, permission, properties, EZPI_SERVICE_BLE_ezlopi_fmw_info, NULL, NULL);
+    ezlopi_ble_gatt_add_characteristic(g_device_info_service, &uuid, permission, properties, ezpi_service_ble_ezlopi_fmw_info, NULL, NULL);
 
     uuid.uuid.uuid16 = EZPI_BLE_CHAR_CHIP_INFO_UUID;
     uuid.len = ESP_UUID_LEN_16;
     permission = ESP_GATT_PERM_READ;
     properties = ESP_GATT_CHAR_PROP_BIT_READ;
-    ezlopi_ble_gatt_add_characteristic(g_device_info_service, &uuid, permission, properties, EZPI_SERVICE_BLE_chip_info, NULL, NULL);
+    ezlopi_ble_gatt_add_characteristic(g_device_info_service, &uuid, permission, properties, ezpi_service_ble_chip_info, NULL, NULL);
 
     uuid.uuid.uuid16 = EZPI_BLE_CHAR_FIRMWARE_SDK_INFO_UUID;
     uuid.len = ESP_UUID_LEN_16;
     permission = ESP_GATT_PERM_READ;
     properties = ESP_GATT_CHAR_PROP_BIT_READ;
-    ezlopi_ble_gatt_add_characteristic(g_device_info_service, &uuid, permission, properties, EZPI_SERVICE_BLE_firmware_sdk_info, NULL, NULL);
+    ezlopi_ble_gatt_add_characteristic(g_device_info_service, &uuid, permission, properties, ezpi_service_ble_firmware_sdk_info, NULL, NULL);
 
     uuid.uuid.uuid16 = EZPI_BLE_CHAR_DEV_STATE_INFO_UUID;
     uuid.len = ESP_UUID_LEN_16;
     permission = ESP_GATT_PERM_READ;
     properties = ESP_GATT_CHAR_PROP_BIT_READ;
-    ezlopi_ble_gatt_add_characteristic(g_device_info_service, &uuid, permission, properties, EZPI_SERVICE_BLE_device_state_info, NULL, NULL);
+    ezlopi_ble_gatt_add_characteristic(g_device_info_service, &uuid, permission, properties, ezpi_service_ble_device_state_info, NULL, NULL);
 
     uuid.uuid.uuid16 = EZPI_BLE_CHAR_SER_CONFIG_INFO_UUID;
     uuid.len = ESP_UUID_LEN_16;
     permission = ESP_GATT_PERM_READ | ESP_GATT_PERM_WRITE;
     properties = ESP_GATT_CHAR_PROP_BIT_READ | ESP_GATT_CHAR_PROP_BIT_WRITE;
-    ezlopi_ble_gatt_add_characteristic(g_device_info_service, &uuid, permission, properties, EZPI_SERVICE_BLE_serial_config_info, EZPI_SERVICE_BLE_serial_config_write, NULL);
+    ezlopi_ble_gatt_add_characteristic(g_device_info_service, &uuid, permission, properties, ezpi_service_ble_serial_config_info, ezpi_service_ble_serial_config_write, NULL);
 
     uuid.uuid.uuid16 = EZPI_BLE_CHAR_EZPI_CLOUD_INFO_UUID;
     uuid.len = ESP_UUID_LEN_16;
     permission = ESP_GATT_PERM_READ;
     properties = ESP_GATT_CHAR_PROP_BIT_READ;
-    ezlopi_ble_gatt_add_characteristic(g_device_info_service, &uuid, permission, properties, EZPI_SERVICE_BLE_ezlo_cloud_info, NULL, NULL);
+    ezlopi_ble_gatt_add_characteristic(g_device_info_service, &uuid, permission, properties, ezpi_service_ble_ezlo_cloud_info, NULL, NULL);
 
     uuid.uuid.uuid16 = EZPI_BLE_CHAR_OEM_INFO_UUID;
     uuid.len = ESP_UUID_LEN_16;
     permission = ESP_GATT_PERM_READ;
     properties = ESP_GATT_CHAR_PROP_BIT_READ;
-    ezlopi_ble_gatt_add_characteristic(g_device_info_service, &uuid, permission, properties, EZPI_SERVICE_BLE_oem_info, NULL, NULL);
+    ezlopi_ble_gatt_add_characteristic(g_device_info_service, &uuid, permission, properties, ezpi_service_ble_oem_info, NULL, NULL);
 
     uuid.uuid.uuid16 = EZPI_BLE_CHAR_NETWORK_INFO_UUID;
     uuid.len = ESP_UUID_LEN_16;
     permission = ESP_GATT_PERM_READ;
     properties = ESP_GATT_CHAR_PROP_BIT_READ;
-    ezlopi_ble_gatt_add_characteristic(g_device_info_service, &uuid, permission, properties, EZPI_SERVICE_BLE_net_info, NULL, NULL);
+    ezlopi_ble_gatt_add_characteristic(g_device_info_service, &uuid, permission, properties, ezpi_service_ble_net_info, NULL, NULL);
 }
 
 static void ble_device_info_send_data(const cJSON *cj_response_data, esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
@@ -163,48 +275,8 @@ static void ble_device_info_send_data(const cJSON *cj_response_data, esp_gatt_va
         value->value[0] = 0; // Read 0 if the device not provisioned yet.
     }
 }
-#if 0 // Not used function
-static void device_mac_read_func(esp_gatt_value_t* value, esp_ble_gatts_cb_param_t* param)
-{
-    if (value)
-    {
-        cJSON* cj_device_mac = cJSON_CreateObject(__FUNCTION__);
-        if (cj_device_mac)
-        {
-            char* device_mac = ezlopi_factory_info_v3_get_ezlopi_mac();
-            cJSON_AddStringToObject(__FUNCTION__, cj_device_mac, "ezlopi_mac", device_mac ? device_mac : "unknown");
 
-            uint8_t mac[6];
-            ezlopi_wifi_get_wifi_mac(mac);
-            char mac_str[20];
-            memset(mac_str, 0, sizeof(mac_str));
-            snprintf(mac_str, 20, "%02X:%02X:%02X:%02X:%02X:%02X", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
-            cJSON_AddStringToObject(__FUNCTION__, cj_device_mac, "wifi_mac", mac_str);
-
-            memset(mac, 0, sizeof(mac));
-            ezlopi_ble_service_get_ble_mac(mac);
-            memset(mac_str, 0, sizeof(mac_str));
-            snprintf(mac_str, 20, "%02X:%02X:%02X:%02X:%02X:%02X", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
-            cJSON_AddStringToObject(__FUNCTION__, cj_device_mac, "ble_mac", mac_str);
-
-            ble_device_info_send_data(cj_device_mac, value, param);
-
-            cJSON_Delete(__FUNCTION__, cj_device_mac);
-            ezlopi_free(__FUNCTION__, device_mac);
-        }
-        else
-        {
-            TRACE_E("Couldn't allocate memory for device mac json");
-        }
-    }
-    else
-    {
-        TRACE_E("Value is empty");
-    }
-}
-#endif
-
-static void EZPI_SERVICE_BLE_ezlopi_api_info(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
+static void ezpi_service_ble_ezlopi_api_info(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
 {
     if (value)
     {
@@ -226,7 +298,7 @@ static void EZPI_SERVICE_BLE_ezlopi_api_info(esp_gatt_value_t *value, esp_ble_ga
     }
 }
 
-static void EZPI_SERVICE_BLE_ezlopi_fmw_info(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
+static void ezpi_service_ble_ezlopi_fmw_info(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
 {
     if (value)
     {
@@ -253,7 +325,7 @@ static void EZPI_SERVICE_BLE_ezlopi_fmw_info(esp_gatt_value_t *value, esp_ble_ga
     }
 }
 
-static void EZPI_SERVICE_BLE_chip_info(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
+static void ezpi_service_ble_chip_info(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
 {
     if (value)
     {
@@ -280,7 +352,7 @@ static void EZPI_SERVICE_BLE_chip_info(esp_gatt_value_t *value, esp_ble_gatts_cb
     }
 }
 
-static void EZPI_SERVICE_BLE_firmware_sdk_info(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
+static void ezpi_service_ble_firmware_sdk_info(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
 {
     if (value)
     {
@@ -303,7 +375,7 @@ static void EZPI_SERVICE_BLE_firmware_sdk_info(esp_gatt_value_t *value, esp_ble_
     }
 }
 
-static void EZPI_SERVICE_BLE_device_state_info(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
+static void ezpi_service_ble_device_state_info(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
 {
     if (value)
     {
@@ -329,7 +401,7 @@ static void EZPI_SERVICE_BLE_device_state_info(esp_gatt_value_t *value, esp_ble_
             cJSON_AddStringToObject(__FUNCTION__, cj_device_state, "wifi_mac", mac_str);
 
             memset(mac, 0, sizeof(mac));
-            ezlopi_ble_service_get_ble_mac(mac);
+            EZPI_ble_service_get_ble_mac(mac);
             memset(mac_str, 0, sizeof(mac_str));
             snprintf(mac_str, 20, "%02X:%02X:%02X:%02X:%02X:%02X", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
             cJSON_AddStringToObject(__FUNCTION__, cj_device_state, "ble_mac", mac_str);
@@ -349,7 +421,7 @@ static void EZPI_SERVICE_BLE_device_state_info(esp_gatt_value_t *value, esp_ble_
     }
 }
 
-static void EZPI_SERVICE_BLE_serial_config_info(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
+static void ezpi_service_ble_serial_config_info(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
 {
     if (value)
     {
@@ -403,7 +475,7 @@ static void EZPI_SERVICE_BLE_serial_config_info(esp_gatt_value_t *value, esp_ble
     }
 }
 
-static void EZPI_SERVICE_BLE_serial_config_write(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
+static void ezpi_service_ble_serial_config_write(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
 {
     if (value)
     {
@@ -507,7 +579,7 @@ static void EZPI_SERVICE_BLE_serial_config_write(esp_gatt_value_t *value, esp_bl
     }
 }
 
-static void EZPI_SERVICE_BLE_ezlo_cloud_info(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
+static void ezpi_service_ble_ezlo_cloud_info(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
 {
     if (value)
     {
@@ -553,7 +625,7 @@ static void EZPI_SERVICE_BLE_ezlo_cloud_info(esp_gatt_value_t *value, esp_ble_ga
     }
 }
 
-static void EZPI_SERVICE_BLE_oem_info(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
+static void ezpi_service_ble_oem_info(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
 {
     if (value)
     {
@@ -587,7 +659,7 @@ static void EZPI_SERVICE_BLE_oem_info(esp_gatt_value_t *value, esp_ble_gatts_cb_
     }
 }
 
-static void EZPI_SERVICE_BLE_net_info(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
+static void ezpi_service_ble_net_info(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
 {
     if (value)
     {
@@ -655,7 +727,7 @@ static void device_info_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb_para
 
     if (NULL == json_str_device_info)
     {
-        json_str_device_info = device_info_jsonify();
+        json_str_device_info = ezpi_device_info_jsonify();
     }
 
     if (value)
@@ -698,7 +770,7 @@ static void device_info_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb_para
     }
 }
 
-static char *device_info_jsonify(void)
+static char *ezpi_device_info_jsonify(void)
 {
 #warning "This info will be only available till Version 3.4.6 !"
 
@@ -769,3 +841,7 @@ void __add_factory_info_to_root(cJSON *root, char *key, char *value)
 }
 
 #endif // CONFIG_EZPI_BLE_ENABLE
+
+/*******************************************************************************
+ *                          End of File
+ *******************************************************************************/
