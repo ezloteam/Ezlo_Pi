@@ -77,6 +77,13 @@
 static ezlopi_error_t __prepare(void *arg);
 static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg);
 static ezlopi_error_t __get_cjson_update_value(l_ezlopi_item_t *item);
+static uint8_t compare_float_values(float a, float b);
+static ezlopi_error_t gxhtc3_sensor_init(l_ezlopi_item_t *item);
+static int gxhtc3_sensor_get_cjson_value_temp(l_ezlopi_item_t* item, void* arg);
+static void __prepare_device_cloud_properties_temp(l_ezlopi_device_t *device, cJSON *cj_device);
+static void __prepare_device_cloud_properties_hum(l_ezlopi_device_t *device, cJSON *cj_device);
+static void __prepare_temperature_item_properties(l_ezlopi_item_t *item, cJSON *cj_device);
+static void __prepare_humidity_item_properties(l_ezlopi_item_t *item, cJSON *cj_device);
 
 /*******************************************************************************
  *                          Static Data Definitions

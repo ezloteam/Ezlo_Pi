@@ -136,7 +136,10 @@ static void ezlopi_service_uart_set_wifi(const char *data);
 static void ezlopi_service_uart_response(uint8_t cmd, uint8_t status_write, uint8_t status_connect);
 static void ezlopi_service_uart_set_config(const char *data);
 static void ezlopi_service_uart_get_config(void);
+
+#if !defined(CONFIG_IDF_TARGET_ESP32) && !defined(CONFIG_IDF_TARGET_ESP32C3)
 static void tinyusb_cdc_rx_callback(int itf, cdcacm_event_t *event);
+#endif
 
 /*******************************************************************************
  *                          Static Data Definitions
@@ -192,6 +195,7 @@ void EZPI_SERV_uart_init(void)
 #endif
 }
 
+#if !defined(CONFIG_IDF_TARGET_ESP32) && !defined(CONFIG_IDF_TARGET_ESP32C3)
 void EZPI_SERV_cdc_init()
 {
     usb_semaphore_handle = xSemaphoreCreateBinary();
@@ -219,6 +223,7 @@ void EZPI_SERV_cdc_init()
         TRACE_I("USB CDC initialization completed successfully.");
     }
 }
+#endif
 
 /*******************************************************************************
  *                          Static Function Definitions

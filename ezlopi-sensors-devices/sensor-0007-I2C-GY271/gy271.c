@@ -65,6 +65,12 @@
 /*******************************************************************************
  *                          Static Function Prototypes
  *******************************************************************************/
+static esp_err_t activate_set_reset_period(l_ezlopi_item_t *item);
+static esp_err_t set_to_measure_mode(l_ezlopi_item_t *item);
+static esp_err_t enable_data_ready_interrupt(l_ezlopi_item_t *item);
+static int __gy271_Get_azimuth(float dx, float dy);
+static void __gy271_correct_data(s_gy271_raw_data_t *RAW_DATA, s_gy271_data_t *user_data);
+static esp_err_t __gy271_check_status(l_ezlopi_item_t *item, uint8_t *temp);
 
 /*******************************************************************************
  *                          Static Data Definitions

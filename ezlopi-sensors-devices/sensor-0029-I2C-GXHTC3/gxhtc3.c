@@ -60,6 +60,12 @@
 /*******************************************************************************
  *                          Static Function Prototypes
  *******************************************************************************/
+static uint8_t gxhtc3_get_crc8(uint8_t *data, int len);
+static bool gxhtc3_check_crc8(uint8_t calulated, uint8_t read);
+static bool gxhtc3_send_command(s_gxhtc3_sensor_handler_t *handler, uint16_t cmd);
+static bool gxhtc3_read_data(s_gxhtc3_sensor_handler_t *handler, uint8_t *read_buf, uint16_t len);
+static bool gxhtc3_reset(s_gxhtc3_sensor_handler_t *handler);
+static bool gxhtc3_read_id(s_gxhtc3_sensor_handler_t *handler);
 
 /*******************************************************************************
  *                          Static Data Definitions

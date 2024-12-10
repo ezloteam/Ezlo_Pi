@@ -76,6 +76,16 @@ static int __settings_get(void* arg, l_ezlopi_device_settings_v3_t* setting);
 static int __settings_set(void* arg, l_ezlopi_device_settings_v3_t* setting);
 static int __settings_reset(void* arg, l_ezlopi_device_settings_v3_t* setting);
 static int __settings_update(void* arg, l_ezlopi_device_settings_v3_t* setting);
+static int __settings_sensor_0068_gas_sensor_setting_initialize_ambient_temperature_setting(l_ezlopi_device_t* device, void* user_arg);
+static int __settings_sensor_0068_gas_sensor_setting_initialize_relative_humidity_setting(l_ezlopi_device_t* device, void* user_arg);
+static int __settings_get_ens160_gas_sensor_ambient_temperature_get(void* arg, l_ezlopi_device_settings_v3_t* setting);
+static int __settings_get_ens160_gas_sensor_relative_humidity_get(void* arg, l_ezlopi_device_settings_v3_t* setting);
+static int __settings_set_ens160_gas_sensor_ambient_temperature_get(void* arg, l_ezlopi_device_settings_v3_t* setting);
+static int __settings_set_ens160_gas_sensor_relative_humidity_get(void* arg, l_ezlopi_device_settings_v3_t* setting);
+static int __settings_update_ens160_gas_sensor_ambient_temperature_get(void* arg, l_ezlopi_device_settings_v3_t* setting);
+static int __settings_update_ens160_gas_sensor_relative_humidity_get(void* arg, l_ezlopi_device_settings_v3_t* setting);
+static int __settings_reset_ens160_gas_sensor_ambient_temperature_get(void* arg, l_ezlopi_device_settings_v3_t* setting);
+static int __settings_reset_ens160_gas_sensor_relative_humidity_get(void* arg, l_ezlopi_device_settings_v3_t* setting);
 
 /*******************************************************************************
  *                          Static Data Definitions

@@ -80,6 +80,23 @@ static void ezlopi_device_print_controller_cloud_information_v3(void);
 static void ezlopi_device_free_item(l_ezlopi_item_t *items);
 static void ezlopi_device_free_setting(l_ezlopi_device_settings_v3_t *settings);
 static void ezlopi_device_free_all_device_setting(l_ezlopi_device_t *curr_device);
+static void ____ezlopi_device_clear_bottom_children(l_ezlopi_device_t *curr_node, uint32_t compare_parent_id);
+static void __ezlopi_device_free_parent_tree(l_ezlopi_device_t *parent_device, uint32_t parent_dev_id);
+static void ezlopi_device_print_interface_digital_io(l_ezlopi_item_t *item);
+static void ezlopi_device_print_interface_analogue_input(l_ezlopi_item_t *item);
+static void ezlopi_device_print_interface_analogue_output(l_ezlopi_item_t *item);
+static void ezlopi_device_print_interface_pwm(l_ezlopi_item_t *item);
+static void ezlopi_device_print_interface_uart(l_ezlopi_item_t *item);
+static void ezlopi_device_print_interface_i2c_master(l_ezlopi_item_t *item);
+static void ezlopi_device_print_interface_spi_master(l_ezlopi_item_t *item);
+static void ezlopi_device_print_interface_onewire_master(l_ezlopi_item_t *item);
+static void ezlopi_device_print_interface_type(l_ezlopi_item_t *item);
+static int ____store_bool_in_nvs_dev_mod_info(uint32_t nvs_device_id, const char *string_key, bool bool_value);
+static int ____store_string_in_nvs_dev_mod_info(uint32_t nvs_device_id, const char *string_key, const char *string_value);
+static int ____store_dev_mod_room_id_in_nvs(uint32_t device_id, const char *new_room_id_str);
+static int ____store_dev_mod_parent_room_flag_in_nvs(uint32_t device_id, bool parent_room_flag);
+static void __change_room_id_in_device_ll_and_nvs(l_ezlopi_device_t *curr_node, uint32_t compare_parent_id, const char *room_id_str, cJSON *cj_separate_child_devices);
+static int __modify_dev_mod_name_in_nvs(uint32_t device_id, const char *new_dev_name);
 
 /*******************************************************************************
  *                          Static Data Definitions

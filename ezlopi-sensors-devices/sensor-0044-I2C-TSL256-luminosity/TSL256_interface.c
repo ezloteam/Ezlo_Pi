@@ -58,6 +58,10 @@
 /*******************************************************************************
  *                          Static Function Prototypes
  *******************************************************************************/
+static uint32_t TSL2561_CalculateLux(uint16_t ch0, uint16_t ch1, integration_t conv_time, gain_t gain);
+static void Power_Up_tsl2561(s_ezlopi_i2c_master_t *i2c_master);
+static void Power_Down_tsl2561(s_ezlopi_i2c_master_t *i2c_master);
+static uint8_t readRegister8(s_ezlopi_i2c_master_t *i2c_master, uint8_t target_address, size_t address_len, uint8_t *reg, size_t reg_len);
 
 /*******************************************************************************
  *                          Static Data Definitions

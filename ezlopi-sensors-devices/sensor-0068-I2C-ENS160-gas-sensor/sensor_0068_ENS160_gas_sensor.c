@@ -46,9 +46,6 @@
  *  }\
 */
 
-
- */
-
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
@@ -96,6 +93,8 @@ static ezlopi_error_t __prepare(void *arg, void *user_arg);
 static ezlopi_error_t __init(l_ezlopi_item_t *item);
 static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg);
 static ezlopi_error_t __notify(l_ezlopi_item_t *item);
+static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
+static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_arg);
 
 /*******************************************************************************
  *                          Static Data Definitions

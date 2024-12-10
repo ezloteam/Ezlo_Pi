@@ -61,6 +61,12 @@
 /*******************************************************************************
  *                          Static Function Prototypes
  *******************************************************************************/
+static esp_err_t get_device_id(l_ezlopi_item_t *item);
+static esp_err_t data_formatting(l_ezlopi_item_t *item);
+static esp_err_t set_to_measure_mode(l_ezlopi_item_t *item);
+static esp_err_t enable_data_ready_interrupt(l_ezlopi_item_t *item);
+static esp_err_t reset_measure_mode(l_ezlopi_item_t *item);
+static esp_err_t adxl345_check_data_ready_INTR(l_ezlopi_item_t *item, uint8_t *temp);
 
 /*******************************************************************************
  *                          Static Data Definitions

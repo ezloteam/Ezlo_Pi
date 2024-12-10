@@ -59,6 +59,16 @@
 /*******************************************************************************
  *                          Static Function Prototypes
  *******************************************************************************/
+static e_mpu6050_err_t __mpu6050_configure_power(l_ezlopi_item_t *item);
+static e_mpu6050_err_t __mpu6050_configure_accelerometer(l_ezlopi_item_t *item, uint8_t flags);
+static e_mpu6050_err_t __mpu6050_configure_gyroscope(l_ezlopi_item_t *item, uint8_t flags);
+static e_mpu6050_err_t __mpu6050_configure_dlfp(l_ezlopi_item_t *item);
+static e_mpu6050_err_t __mpu6050_enable_interrupt(l_ezlopi_item_t *item);
+static e_mpu6050_err_t mpu6050_check_data_ready_INTR(l_ezlopi_item_t *item, uint8_t *temp);
+
+#if 0
+static const char *mpu6050_err_to_str(e_mpu6050_err_t err);
+#endif
 
 /*******************************************************************************
  *                          Static Data Definitions

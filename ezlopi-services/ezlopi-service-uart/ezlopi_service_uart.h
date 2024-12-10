@@ -40,13 +40,11 @@
 #ifndef _EZLOPI_SERVICE_UART_H_
 #define _EZLOPI_SERVICE_UART_H_
 
-#include "../../build/config/sdkconfig.h"
-
-#ifdef CONFIG_EZPI_ENABLE_UART_PROVISIONING
-
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
+#include "../../build/config/sdkconfig.h"
+
 #include <string.h>
 
 #include "freertos/FreeRTOS.h"
@@ -127,8 +125,6 @@ extern "C"
 #ifdef __cplusplus
 }
 #endif
-
-#endif // CONFIG_EZPI_ENABLE_UART_PROVISIONING
 
 #endif // _EZLOPI_SERVICE_UART_H_
 

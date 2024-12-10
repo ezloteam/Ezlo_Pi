@@ -70,6 +70,16 @@
 /*******************************************************************************
  *                          Static Function Prototypes
  *******************************************************************************/
+static int __prepare_particulate_matter_particles_0_dot_3_um_device_and_items(cJSON *cj_properties, uint32_t *parent_id, void *user_arg);
+static int __prepare_particulate_matter_particles_0_dot_5_um_device_and_items(cJSON *cj_properties, uint32_t parent_id, void *user_arg);
+static int __prepare_particulate_matter_particles_1_um_device_and_items(cJSON *cj_properties, uint32_t parent_id, void *user_arg);
+static int __prepare_particulate_matter_particles_2_dot_5_um_device_and_items(cJSON *cj_properties, uint32_t parent_id, void *user_arg);
+static int __prepare_particulate_matter_particles_5_um_device_and_items(cJSON *cj_properties, uint32_t parent_id, void *user_arg);
+static int __prepare_particulate_matter_particles_10_um_device_and_items(cJSON *cj_properties, uint32_t parent_id, void *user_arg);
+static int __prepare_particulate_matter_standard_particles_1_um_device_and_items(cJSON *cj_properties, uint32_t parent_id, void *user_arg);
+static int __prepare_particulate_matter_standard_particles_2_dot_5_um_device_and_items(cJSON *cj_properties, uint32_t parent_id, void *user_arg);
+static int __prepare_particulate_matter_standard_particles_10_um_device_and_items(cJSON *cj_properties, uint32_t parent_id, void *user_arg);
+static int pms5003_set_pms_object_details(cJSON *cj_properties, s_pms5003_sensor_object *pms_object);
 
 /*******************************************************************************
  *                          Static Data Definitions

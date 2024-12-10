@@ -67,6 +67,34 @@ enum e_devicGrp_vs_itemGrp_choice
 /*******************************************************************************
  *                          Static Function Prototypes
  *******************************************************************************/
+static void __ezlopi_core_device_group_print(l_ezlopi_device_grp_t *device_grp_node);
+static void __ezlopi_core_item_group_print(l_ezlopi_item_grp_t *item_grp_node);
+static void __edit_devgrp_from_ll(l_ezlopi_device_grp_t *req_devgrp_node, cJSON *cj_devgrp_new);
+static void __edit_itemgrp_from_ll(l_ezlopi_item_grp_t *req_itemgrp_node, cJSON *cj_itemgrp_new);
+static int __edit_and_update_ll_devgrp_by_id(uint32_t devgrp_id, cJSON *cj_devgrp_new);
+static int __edit_and_update_ll_itemgrp_by_id(uint32_t itemgrp_id, cJSON *cj_itemgrp_new);
+static ezlopi_error_t __edit_group_and_store_updated_to_nvs(uint32_t _id, cJSON *cj_grp_new);
+static l_ezlopi_device_grp_t *__device_group_pop_by_id(uint32_t _id);
+static l_ezlopi_item_grp_t *__item_group_pop_by_id(uint32_t _id);
+static void __device_group_delete_node(l_ezlopi_device_grp_t *devgrp_node);
+static void __item_group_delete_node(l_ezlopi_item_grp_t *itemgrp_node);
+static l_ezlopi_device_grp_t *____device_grp_create_node(cJSON *cj_device_grp, uint32_t device_grp_id);
+static l_ezlopi_item_grp_t *____item_grp_create_node(cJSON *cj_item_grp, uint32_t item_grp_id);
+static l_ezlopi_device_grp_t *__device_group_populate(cJSON *cj_device_grp, uint32_t device_grp_id);
+static l_ezlopi_item_grp_t *__item_group_populate(cJSON *cj_item_grp, uint32_t item_grp_id);
+static void ____remove_id_from_group_list(uint32_t _id, bool choice_of_trigger);
+static uint32_t __grp_get_list(cJSON *cj_grp_array, bool choice_of_trigger);
+static uint32_t __store_new_grp_in_nvs(cJSON *cj_new_grp, bool choice_of_trigger);
+static bool ____check_for_category_in_devGrp(cJSON *cj_curr_devGrp_node, const char *req_category_name);
+static bool ____check_for_subcategory_in_devGrp(cJSON *cj_curr_devGrp_node, const char *req_subcategory_name);
+static bool ____check_for_device_id_in_devGrp(cJSON *cj_curr_devGrp_node, const char *req_device_id_str);
+static bool ____check_for_deviceGroupIds_list(cJSON *cj_curr_devGrp_node, cJSON *deviceGroupIds_list);
+static bool ____check_for_deviceGroupId(cJSON *cj_curr_devGrp_node, const char *req_deviceGroupId);
+static bool __check_devgroup_validity(cJSON *cj_curr_devgrp_node, cJSON *cj_params);
+static void ______add_items_list_to_dest_array(cJSON *cj_main_device_list, l_ezlopi_device_t *curr_dev_node);
+static void ____compare_when_itemgrpid_is_given(cJSON *cj_main_device_list, l_ezlopi_device_t *curr_dev_node, const char *device_id_str, const char *itemgrp_id_str);
+static void __generate_device_list_with_specific_itemgroup_id(cJSON *cj_destination_array, cJSON *cj_devices_arr, cJSON *cj_params);
+static void __remove_residue_ids_from_list(bool choice_of_trigger);
 
 /*******************************************************************************
  *                          Static Data Definitions

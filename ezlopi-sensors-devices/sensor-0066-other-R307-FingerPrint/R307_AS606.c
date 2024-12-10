@@ -71,6 +71,10 @@ typedef struct fingerprint_packet_t
 /*******************************************************************************
  *                          Static Function Prototypes
  *******************************************************************************/
+static void generate_packet(fingerprint_packet_t* txPacket, uint8_t PID, uint16_t length, uint8_t* Combined_data);
+static int send_uart_packets(int uart_channel_num, fingerprint_packet_t* txPacket);
+static bool SEND_PACKET(int uart_channel_num, uint8_t PID, uint16_t length, uint8_t* Combined_data);
+static fingerprint_status_t __Response_function(uint8_t* recieved_buffer, uint32_t timeout);
 
 /*******************************************************************************
  *                          Static Data Definitions
