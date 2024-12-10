@@ -2,10 +2,10 @@ file(GLOB_RECURSE websocket_src "*.c")
 
 set(ESP_IDF_COMPONENTS
         cjext
-        esp_websocket_client    
+        esp_websocket_client
 )
 set(EZLOPI_CORE_COMPONENTS
-        ezlopi-core-factory-info 
+        ezlopi-core-factory-info
         ezlopi-core-errors
 )
 

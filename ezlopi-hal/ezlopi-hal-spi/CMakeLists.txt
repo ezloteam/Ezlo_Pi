@@ -2,13 +2,13 @@
 file(GLOB_RECURSE SOURCES "./*.c*")
 
 
-set(EZLOPI_CORE_COMPONENTS 
-        ezlopi-core-nvs 
+set(EZLOPI_CORE_COMPONENTS
+        ezlopi-core-nvs
         ezlopi-core-errors
 )
 
 idf_component_register(SRCS ${SOURCES}
     INCLUDE_DIRS "."
-    REQUIRES    ${EZLOPI_CORE_COMPONENTS} 
+    REQUIRES    ${EZLOPI_CORE_COMPONENTS}
     )
 

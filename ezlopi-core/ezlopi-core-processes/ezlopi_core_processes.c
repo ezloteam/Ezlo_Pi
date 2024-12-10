@@ -1,4 +1,45 @@
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
 
+/**
+ * @file    main.c
+ * @brief   perform some function on data
+ * @author  John Doe
+ * @version 0.1
+ * @date    1st January 2024
+ */
+
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 #include "stdlib.h"
 #include "stdbool.h"
 #include "string.h"
@@ -11,6 +52,18 @@
 #include "ezlopi_core_processes.h"
 
 #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
+
+/*******************************************************************************
+ *                          Extern Data Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 typedef struct
 {
     TaskHandle_t task_handle;
@@ -18,8 +71,56 @@ typedef struct
     bool is_deleted;
 }s_ezlopi_task_info_t;
 
+/*******************************************************************************
+ *                          Static Function Prototypes
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Static Data Definitions
+ *******************************************************************************/
 static s_ezlopi_task_info_t ezlopi_task_info_array[ENUM_TASK_MAX];
 
+/*******************************************************************************
+ *                          Extern Data Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Definitions
+ *******************************************************************************/
+
+/**
+ * @brief Global/extern function template example
+ * Convention : Use capital letter for initial word on extern function
+ * @param arg
+ */
+int ezlopi_core_process_set_process_info(e_ezlopi_task_enum_t task_num, TaskHandle_t* task_handle, size_t task_depth)
+{
+    int ret = 0;
+    if (task_handle && *task_handle)
+    {
+        ezlopi_task_info_array[task_num].stack_depth = task_depth;
+        ezlopi_task_info_array[task_num].task_handle = *task_handle;
+        ezlopi_task_info_array[task_num].is_deleted = false;
+        ret = 1;
+    }
+    return ret;
+}
+
+int ezlopi_core_process_set_is_deleted(e_ezlopi_task_enum_t task_num)
+{
+    int ret = 0;
+    if (ezlopi_task_info_array[task_num].task_handle)
+    {
+        ezlopi_task_info_array[task_num].stack_depth = 0;
+        ezlopi_task_info_array[task_num].task_handle = NULL;
+        ezlopi_task_info_array[task_num].is_deleted = true;
+    }
+    return ret;
+}
+
+/*******************************************************************************
+ *                          Static Function Definitions
+ *******************************************************************************/
 static size_t set_default_task_memory_usage(const char* default_task_name)
 {
     size_t stack_size = 0;
@@ -146,28 +247,8 @@ int ezlopi_core_get_processes_details(cJSON* cj_processes_array)
     return ret;
 }
 
-int ezlopi_core_process_set_process_info(e_ezlopi_task_enum_t task_num, TaskHandle_t* task_handle, size_t task_depth)
-{
-    int ret = 0;
-    if (task_handle && *task_handle)
-    {
-        ezlopi_task_info_array[task_num].stack_depth = task_depth;
-        ezlopi_task_info_array[task_num].task_handle = *task_handle;
-        ezlopi_task_info_array[task_num].is_deleted = false;
-        ret = 1;
-    }
-    return ret;
-}
-
-int ezlopi_core_process_set_is_deleted(e_ezlopi_task_enum_t task_num)
-{
-    int ret = 0;
-    if (ezlopi_task_info_array[task_num].task_handle)
-    {
-        ezlopi_task_info_array[task_num].stack_depth = 0;
-        ezlopi_task_info_array[task_num].task_handle = NULL;
-        ezlopi_task_info_array[task_num].is_deleted = true;
-    }
-    return ret;
-}
 #endif // CONFIG_FREERTOS_USE_TRACE_FACILITY
+
+/*******************************************************************************
+ *                          End of File
+ *******************************************************************************/

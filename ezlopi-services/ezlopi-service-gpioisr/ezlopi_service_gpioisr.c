@@ -42,19 +42,19 @@
  *******************************************************************************/
 #include <string.h>
 
+#include "../../build/config/sdkconfig.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/portmacro.h"
+#include "freertos/task.h"
+#include "freertos/queue.h"
+
 #include "ezlopi_util_trace.h"
-#include "ezlopi_util_version.h"
 
-#include "ezlopi_cloud_constants.h"
-#include "ezlopi_cloud_registration.h"
+#include "ezlopi_core_device_value_updated.h"
+#include "ezlopi_core_processes.h"
 
-#include "ezlopi_core_broadcast.h"
-#include "ezlopi_core_event_group.h"
-#include "ezlopi_core_factory_info.h"
-#include "ezlopi_core_errors.h"
-
-#include "ezlopi_service_loop.h"
-#include "ezlopi_service_webprov.h"
+#include "ezlopi_service_gpioisr.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 /*******************************************************************************
  *                          Extern Data Declarations
@@ -67,17 +67,26 @@
 /*******************************************************************************
  *                          Type & Macro Definitions
  *******************************************************************************/
+typedef struct s_event_arg
+{
+    TickType_t time;
+    TickType_t debounce_ms;
+    // s_ezlopi_device_properties_t *properties;
+    l_ezlopi_item_t* item;
+    f_interrupt_upcall_t __upcall;
+} s_event_arg_t;
 
 /*******************************************************************************
  *                          Static Function Prototypes
  *******************************************************************************/
-static void __reg_loop(void *arg);
+static void gpio_isr_process_v3(void* pv);
+static void IRAM_ATTR __gpio_isr_handler(void* arg);
 
 /*******************************************************************************
  *                          Static Data Definitions
  *******************************************************************************/
-static cJSON * cj_reg_data = NULL;
-static const char * __reg_loop_str = "reg-loop";
+static QueueHandle_t gpio_evt_queue = NULL;
+static const uint32_t default_debounce_time = 1000;
 
 /*******************************************************************************
  *                          Extern Data Definitions
@@ -92,102 +101,128 @@ static const char * __reg_loop_str = "reg-loop";
  * Convention : Use capital letter for initial word on extern function
  * @param arg
  */
-void registration_init(void)
+void ezlopi_service_gpioisr_init(void)
 {
-    ezlopi_service_loop_add(__reg_loop_str, __reg_loop, 5000, NULL);
+    TRACE_S("Started gpio-isr service");
+    gpio_evt_queue = xQueueCreate(20, sizeof(s_event_arg_t*));
+    TaskHandle_t ezlopi_service_gpio_isr_task_handle = NULL;
+    xTaskCreate(gpio_isr_process_v3, "gpio_isr_process_v3", EZLOPI_SERVICE_GPIO_ISR_TASK_DEPTH, NULL, 3, &ezlopi_service_gpio_isr_task_handle);
+    ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_GPIO_ISR_TASK, &ezlopi_service_gpio_isr_task_handle, EZLOPI_SERVICE_GPIO_ISR_TASK_DEPTH);
+    // xTaskCreate(gpio_isr_process, "digital-io-isr-service", EZLOPI_SERVICE_GPIO_ISR_TASK_DEPTH, NULL, 3, &ezlopi_service_gpio_isr_task_handle);
 }
 
-void register_repeat(cJSON* cj_request, cJSON* cj_response)
+void ezlopi_service_gpioisr_register_v3(l_ezlopi_item_t* item, f_interrupt_upcall_t __upcall, TickType_t debounce_ms)
 {
-    ezlopi_service_loop_add(__reg_loop_str, __reg_loop, 5000, NULL);
-}
+    s_event_arg_t* event_arg = ezlopi_malloc(__FUNCTION__, sizeof(s_event_arg_t));
 
-void registered(cJSON* cj_request, cJSON* cj_response)
-{
-    if (cj_reg_data)
+    if (event_arg)
     {
-        cJSON_Delete(__FUNCTION__, cj_reg_data);
-        cj_reg_data = NULL;
+        event_arg->time = 0;
+        // event_arg->properties = properties;
+        event_arg->item = item;
+        event_arg->__upcall = __upcall;
+        event_arg->debounce_ms = (0 == debounce_ms) ? default_debounce_time : debounce_ms;
+        gpio_intr_enable(item->interface.gpio.gpio_in.gpio_num);
+
+        if (gpio_isr_handler_add(item->interface.gpio.gpio_in.gpio_num, __gpio_isr_handler, (void*)event_arg))
+        {
+            TRACE_E("Error while adding GPIO ISR handler.");
+            gpio_reset_pin(item->interface.gpio.gpio_in.gpio_num);
+        }
+        else
+        {
+            TRACE_S("Successfully added GPIO ISR handler for pin: %d.", item->interface.gpio.gpio_in.gpio_num);
+        }
     }
-    ezlopi_service_loop_remove(__reg_loop);
+    else
+    {
+        TRACE_E("Malloc failed!");
+    }
 }
 
-void ezpi_cloud_dummy()
+#if 0
+void gpio_isr_service_register(s_ezlopi_device_properties_t* properties, f_interrupt_upcall_t __upcall, TickType_t debounce_ms)
 {
-    TRACE_S("I am just a dummy");
+    s_event_arg_t* event_arg = ezlopi_malloc(__FUNCTION__, sizeof(s_event_arg_t));
+
+    if (event_arg)
+    {
+        event_arg->time = 0;
+        event_arg->properties = properties;
+        event_arg->__upcall = __upcall;
+        event_arg->debounce_ms = (0 == debounce_ms) ? default_debounce_time : debounce_ms;
+        gpio_intr_enable(properties->interface.gpio.gpio_in.gpio_num);
+
+        if (gpio_isr_handler_add(properties->interface.gpio.gpio_in.gpio_num, __gpio_isr_handler, (void*)event_arg))
+        {
+            TRACE_E("Error while adding GPIO ISR handler.");
+            gpio_reset_pin(properties->interface.gpio.gpio_in.gpio_num);
+        }
+        else
+        {
+            TRACE_S("Successfully added GPIO ISR handler.");
+        }
+    }
 }
+#endif
 
 /*******************************************************************************
  *                          Static Function Definitions
  *******************************************************************************/
-static void __create_reg_packet(void)
+static void gpio_isr_process_v3(void* pv)
 {
-    if (NULL == cj_reg_data)
+    while (1)
     {
-        cj_reg_data = cJSON_CreateObject(__FUNCTION__);
+        s_event_arg_t* event_arg = NULL;
+        xQueueReceive(gpio_evt_queue, &event_arg, portMAX_DELAY);
 
-        if (cj_reg_data)
+        if (NULL != event_arg)
         {
-            char mac_str[18];
-            uint8_t mac_addr[6];
+            TickType_t tick_now = xTaskGetTickCount();
 
-            esp_read_mac(mac_addr, ESP_MAC_WIFI_STA);
-            snprintf(mac_str, sizeof(mac_str), "%02X:%02X:%02X:%02X:%02X:%02X",
-                mac_addr[0], mac_addr[1], mac_addr[2], mac_addr[3], mac_addr[4], mac_addr[5]);
-
-            cJSON_AddStringToObject(__FUNCTION__, cj_reg_data, "id", "__ID__");
-            cJSON_AddStringToObject(__FUNCTION__, cj_reg_data, ezlopi_method_str, "register");
-
-            cJSON* cj_params = cJSON_AddObjectToObject(__FUNCTION__, cj_reg_data, ezlopi_params_str);
-
-            if (cj_params)
+            if ((tick_now - event_arg->time) > (event_arg->debounce_ms / portTICK_RATE_MS))
             {
-                char __id_str[32];
-
-                unsigned long long __id = ezlopi_factory_info_v3_get_id();
-                snprintf(__id_str, sizeof(__id_str), "%llu", __id);
-                cJSON_AddStringToObject(__FUNCTION__, cj_params, "serial", __id_str);
-
-                cJSON_AddStringToObject(__FUNCTION__, cj_params, ezlopi_firmware_str, VERSION_STR);
-                cJSON_AddNumberToObject(__FUNCTION__, cj_params, "timeOffset", 20700);
-                cJSON_AddStringToObject(__FUNCTION__, cj_params, "media", "radio");
-                cJSON_AddStringToObject(__FUNCTION__, cj_params, "hubType", "32.1");
-                // cJSON_AddStringToObject(__FUNCTION__, cj_params, "mac_address", "11:22:33:44:55:66");
-
-                char * __device_uuid = ezlopi_factory_info_v3_get_device_uuid();
-                if (__device_uuid) {
-                    cJSON_AddStringToObject(__FUNCTION__, cj_params, "controller_uuid", __device_uuid);
-                    ezlopi_free(__FUNCTION__, __device_uuid);
-                }
-
-                cJSON_AddStringToObject(__FUNCTION__, cj_params, "mac_address", mac_str);
-                cJSON_AddNumberToObject(__FUNCTION__, cj_params, "maxFrameSize", (20 * 1024));
+                event_arg->__upcall(event_arg->item);
+                event_arg->time = tick_now;
             }
         }
+
+        // vTaskDelay(1);
     }
 }
 
-static void __reg_loop(void *arg)
+static void IRAM_ATTR __gpio_isr_handler(void* arg)
 {
-    TRACE_D("reg-loop");
-    ezlopi_error_t reg_event = ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 0, false);
-    TRACE_D("reg-event: %d", reg_event);
-
-    if (reg_event != ESP_OK)
+    void* tmp_arg = arg;
+    if (gpio_evt_queue)
     {
-        __create_reg_packet();
-
-        cJSON* cj_register_dup = cJSON_CreateObjectReference(__FUNCTION__, cj_reg_data->child);
-        if (cj_register_dup)
-        {
-            if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(cj_register_dup))
-            {
-                TRACE_E("Error adding to broadcast queue!");
-                cJSON_Delete(__FUNCTION__, cj_register_dup);
-            }
-        }
+        xQueueSendFromISR(gpio_evt_queue, &tmp_arg, NULL);
     }
 }
+
+#if 0
+static void gpio_isr_process(void* pv)
+{
+    while (1)
+    {
+        s_event_arg_t* event_arg = NULL;
+        xQueueReceive(gpio_evt_queue, &event_arg, portMAX_DELAY);
+
+        if (NULL != event_arg)
+        {
+            TickType_t tick_now = xTaskGetTickCount();
+
+            if ((tick_now - event_arg->time) > (event_arg->debounce_ms / portTICK_RATE_MS))
+            {
+                event_arg->__upcall(event_arg->properties);
+                event_arg->time = tick_now;
+            }
+        }
+
+        vTaskDelay(1);
+    }
+}
+#endif
 
 /*******************************************************************************
  *                          End of File

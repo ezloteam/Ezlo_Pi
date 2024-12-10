@@ -30,9 +30,9 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @file	bsec2.cpp
- * @date	17 January 2023
- * @version	2.0.6
+ * @file    bsec2.cpp
+ * @date    17 January 2023
+ * @version 2.0.6
  *
  */
 
@@ -470,7 +470,7 @@ bsec_version_t bsec2_get_version(void)
 
 /**
  * @brief Callback from the user to read data from the BME68x using parallel/forced mode, process and store outputs
- * @return	true for success, false otherwise
+ * @return    true for success, false otherwise
  */
 void bsec2_attach_callback(bsec_callback callback)
 {
@@ -479,7 +479,7 @@ void bsec2_attach_callback(bsec_callback callback)
 
 /**
  * @brief Function to get the BSEC outputs
- * @return	pointer to BSEC outputs if available else nullptr
+ * @return    pointer to BSEC outputs if available else nullptr
  */
 const bsec_outputs* bsec2_get_outputs(void)
 {
@@ -490,7 +490,7 @@ const bsec_outputs* bsec2_get_outputs(void)
 
 /**
  * @brief Function to get the BSEC output by sensor id
- * @return	pointer to BSEC output, nullptr otherwise
+ * @return    pointer to BSEC output, nullptr otherwise
  */
 bsec_data bsec2_get_data(bsec_sensor id)
 {
@@ -504,7 +504,7 @@ bsec_data bsec2_get_data(bsec_sensor id)
 
 /**
  * @brief Function to set the temperature offset
- * @param temp_offset	: Temperature offset in degree Celsius
+ * @param temp_offset    : Temperature offset in degree Celsius
  */
 void bsec2_set_temperature_offset(float temp_offset)
 {

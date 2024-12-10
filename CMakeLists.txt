@@ -32,18 +32,18 @@ MACRO(SUBDIRLIST result curdir)
 ENDMACRO()
 
 # list of external components
-set(external_components_list 
-                                ezlopi-components 
-                                ezlopi-sensors-devices 
+set(external_components_list
+                                ezlopi-components
+                                ezlopi-sensors-devices
                                 ezlopi-lua-modules
-                                ezlopi-services 
-                                ezlopi-cloud 
-                                ezlopi-core 
+                                ezlopi-services
+                                ezlopi-cloud
+                                ezlopi-core
                                 ezlopi-hal
                                 ezlopi-util
-                                )  
+                                )
 
-                                # 
+                                #
 # set_target_properties(your_subdir2 PROPERTIES EXCLUDE_FROM_ALL TRUE)
 
 set(EXTRA_COMPONENT_DIRS "") # clearing variable 'EXTRA_COMPONENT_DIRS'

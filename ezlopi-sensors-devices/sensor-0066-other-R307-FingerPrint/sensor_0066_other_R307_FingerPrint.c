@@ -1,3 +1,45 @@
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+
+/**
+ * @file    main.c
+ * @brief   perform some function on data
+ * @author  John Doe
+ * @version 0.1
+ * @date    1st January 2024
+ */
+
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 #include <string.h>
 #include <time.h>
 
@@ -22,20 +64,21 @@
 #include "sensor_0066_other_R307_FingerPrint.h"
 #include "EZLOPI_USER_CONFIG.h"
 
-//---------------------------------------------------------------------------------------------------------------
-static void IRAM_ATTR gpio_notify_isr(void *param)
-{
-    l_ezlopi_item_t *item = (l_ezlopi_item_t *)param;
-    if (item)
-    {
-        server_packet_t *user_data = (server_packet_t *)item->user_arg;
-        if (false == (user_data->__busy_guard))
-        {
-            vTaskNotifyGiveFromISR(user_data->notifyHandler, NULL);
-        }
-    }
-}
+/*******************************************************************************
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
+/*******************************************************************************
+ *                          Extern Function Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Type & Macro Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static ezlopi_error_t __0066_prepare(void *arg);
 static ezlopi_error_t __0066_init(l_ezlopi_item_t *item);
 static ezlopi_error_t __0066_set_value(l_ezlopi_item_t *item, void *arg);
@@ -50,38 +93,23 @@ static void __prepare_item_action_cloud_properties(l_ezlopi_item_t *item, uint32
 static void __prepare_item_ids_cloud_properties(l_ezlopi_item_t *item, uint32_t item_id, cJSON *cj_device, server_packet_t *user_data);
 static void __prepare_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj_device);
 
-static void __timer_callback(void *param)
-{
-    l_ezlopi_item_t *item = (l_ezlopi_item_t *)param;
-    if (item)
-    {
-        server_packet_t *user_data = (server_packet_t *)item->user_arg;
-        if (user_data)
-        {
-            time_t now = 0;
-            time(&now);
-            if ((now - (user_data->timeout_start_time)) <= (time_t)30) // 30 sec
-            {
-                TRACE_W("...timer ON...");
-                if (user_data->opmode != FINGERPRINT_ENROLLMENT_MODE)
-                {
-                    TRACE_E("...timer OFF...");
-                    user_data->opmode = FINGERPRINT_MATCH_MODE;
-                    esp_timer_stop(user_data->timerHandler);
-                }
-            }
-            else
-            {
-                TRACE_S("...timer OFF...");
-                user_data->opmode = FINGERPRINT_MATCH_MODE;
-                ezlopi_device_value_updated_from_device_broadcast_by_item_id(user_data->sensor_fp_item_ids[SENSOR_FP_ITEM_ID_ENROLL]);
-                esp_timer_stop(user_data->timerHandler);
-            }
-        }
-    }
-}
+/*******************************************************************************
+ *                          Static Data Definitions
+ *******************************************************************************/
 
-//---------------------------------------------------------------------------------------------------------------
+/*******************************************************************************
+ *                          Extern Data Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Definitions
+ *******************************************************************************/
+
+/**
+ * @brief Global/extern function template example
+ * Convention : Use capital letter for initial word on extern function
+ * @param arg
+ */
 ezlopi_error_t sensor_0066_other_R307_FingerPrint(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
@@ -139,7 +167,53 @@ ezlopi_error_t sensor_0066_other_R307_FingerPrint(e_ezlopi_actions_t action, l_e
     return ret;
 }
 
-//-------------------------------------------------------------------------------------------------------------------------
+/*******************************************************************************
+ *                          Static Function Definitions
+ *******************************************************************************/
+static void IRAM_ATTR gpio_notify_isr(void *param)
+{
+    l_ezlopi_item_t *item = (l_ezlopi_item_t *)param;
+    if (item)
+    {
+        server_packet_t *user_data = (server_packet_t *)item->user_arg;
+        if (false == (user_data->__busy_guard))
+        {
+            vTaskNotifyGiveFromISR(user_data->notifyHandler, NULL);
+        }
+    }
+}
+
+static void __timer_callback(void *param)
+{
+    l_ezlopi_item_t *item = (l_ezlopi_item_t *)param;
+    if (item)
+    {
+        server_packet_t *user_data = (server_packet_t *)item->user_arg;
+        if (user_data)
+        {
+            time_t now = 0;
+            time(&now);
+            if ((now - (user_data->timeout_start_time)) <= (time_t)30) // 30 sec
+            {
+                TRACE_W("...timer ON...");
+                if (user_data->opmode != FINGERPRINT_ENROLLMENT_MODE)
+                {
+                    TRACE_E("...timer OFF...");
+                    user_data->opmode = FINGERPRINT_MATCH_MODE;
+                    esp_timer_stop(user_data->timerHandler);
+                }
+            }
+            else
+            {
+                TRACE_S("...timer OFF...");
+                user_data->opmode = FINGERPRINT_MATCH_MODE;
+                ezlopi_device_value_updated_from_device_broadcast_by_item_id(user_data->sensor_fp_item_ids[SENSOR_FP_ITEM_ID_ENROLL]);
+                esp_timer_stop(user_data->timerHandler);
+            }
+        }
+    }
+}
+
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     device->cloud_properties.category = category_generic_sensor;
@@ -773,3 +847,7 @@ static void __fingerprint_operation_task(void *params)
     ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SENSOR_R307_FINGER_PRINT_TASK);
     vTaskDelete(NULL);
 }
+
+/*******************************************************************************
+ *                          End of File
+ *******************************************************************************/

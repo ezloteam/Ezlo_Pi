@@ -1,3 +1,45 @@
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+
+/**
+ * @file    main.c
+ * @brief   perform some function on data
+ * @author  John Doe
+ * @version 0.1
+ * @date    1st January 2024
+ */
+
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 #include <string.h>
 #include <stdlib.h>
 #include "ezlopi_util_trace.h"
@@ -16,7 +58,53 @@
 #include "sensor_0067_hilink_presence_sensor.h"
 #include "EZLOPI_USER_CONFIG.h"
 
+/*******************************************************************************
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
+/*******************************************************************************
+ *                          Extern Function Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Type & Macro Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Static Function Prototypes
+ *******************************************************************************/
+static int __settings_callback(e_ezlopi_settings_action_t action, struct l_ezlopi_device_settings_v3* setting, void* arg, void* user_arg);
+static int __settings_get(void* arg, l_ezlopi_device_settings_v3_t* setting);
+static int __settings_set(void* arg, l_ezlopi_device_settings_v3_t* setting);
+static int __settings_reset(void* arg, l_ezlopi_device_settings_v3_t* setting);
+static int __settings_update(void* arg, l_ezlopi_device_settings_v3_t* setting);
+// Setting initialization declarations
+static int __setting_initialize_hilink_presence_sensor_predefined_settings(l_ezlopi_device_t* device);
+static int __setting_initialize_hilink_presence_sensor_userdefined_settings(l_ezlopi_device_t* device);
+static int __setting_initialize_hilink_presence_sensor_radar_distance_sensitivity(l_ezlopi_device_t* device);
+// Setting getters declarations
+static int __setting_get_sensor_enum(cJSON* cj_enum);
+static int __setting_get_pre_defined_setting(void* arg, l_ezlopi_device_settings_v3_t* setting);
+static int __setting_get_user_defined_setting(void* arg, l_ezlopi_device_settings_v3_t* setting);
+static int __setting_get_radar_distance_sensitivity_setting(void* arg, l_ezlopi_device_settings_v3_t* setting);
+// Setting setter declearations
+static int __setting_set_change_user_defined_template(bool set_active);
+static int __setting_set_change_setting_template(ld2410_template_t template, uint32_t setting_id);
+static int __setting_set_find_predefined_setting_template(s_hilink_predefined_setting_value_t* setting_value, ld2410_template_t* template);
+static int __setting_set_pre_defined_setting(void* arg, l_ezlopi_device_settings_v3_t* setting);
+static int __setting_set_user_defined_setting(void* arg, l_ezlopi_device_settings_v3_t* setting);
+// Setting reset declarations
+static int __setting_reset_pre_defined_setting(void* arg, l_ezlopi_device_settings_v3_t* setting);
+static int __setting_reset_user_defined_setting(void* arg, l_ezlopi_device_settings_v3_t* setting);
+static int __setting_reset_radar_distance_sensitivity_setting(void* arg, l_ezlopi_device_settings_v3_t* setting);
+// Setting update declarations
+static int __setting_update_pre_defined_setting(void* arg, l_ezlopi_device_settings_v3_t* setting);
+static int __setting_update_user_defined_setting(void* arg, l_ezlopi_device_settings_v3_t* setting);
+static int __setting_update_radar_distance_sensitivity_setting(void* arg, l_ezlopi_device_settings_v3_t* setting);
+
+/*******************************************************************************
+ *                          Static Data Definitions
+ *******************************************************************************/
 static const char* nvs_key_hilink_presence_sensor_predefined_setting = "predef";
 static const char* nvs_key_hilink_presence_sensor_userdefined_setting = "userdef";
 static const char* nvs_key_hilink_presence_sensor_radar_distance_sensitivity = "rdrsens";
@@ -48,35 +136,82 @@ static const s_hilink_userdefined_setting_value_t hilink_user_defined_setting_de
     .is_active = false,
 };
 
-static int __settings_callback(e_ezlopi_settings_action_t action, struct l_ezlopi_device_settings_v3* setting, void* arg, void* user_arg);
-static int __settings_get(void* arg, l_ezlopi_device_settings_v3_t* setting);
-static int __settings_set(void* arg, l_ezlopi_device_settings_v3_t* setting);
-static int __settings_reset(void* arg, l_ezlopi_device_settings_v3_t* setting);
-static int __settings_update(void* arg, l_ezlopi_device_settings_v3_t* setting);
-// Setting initialization declarations
-static int __setting_initialize_hilink_presence_sensor_predefined_settings(l_ezlopi_device_t* device);
-static int __setting_initialize_hilink_presence_sensor_userdefined_settings(l_ezlopi_device_t* device);
-static int __setting_initialize_hilink_presence_sensor_radar_distance_sensitivity(l_ezlopi_device_t* device);
-// Setting getters declarations
-static int __setting_get_sensor_enum(cJSON* cj_enum);
-static int __setting_get_pre_defined_setting(void* arg, l_ezlopi_device_settings_v3_t* setting);
-static int __setting_get_user_defined_setting(void* arg, l_ezlopi_device_settings_v3_t* setting);
-static int __setting_get_radar_distance_sensitivity_setting(void* arg, l_ezlopi_device_settings_v3_t* setting);
-// Setting setter declearations
-static int __setting_set_change_user_defined_template(bool set_active);
-static int __setting_set_change_setting_template(ld2410_template_t template, uint32_t setting_id);
-static int __setting_set_find_predefined_setting_template(s_hilink_predefined_setting_value_t* setting_value, ld2410_template_t* template);
-static int __setting_set_pre_defined_setting(void* arg, l_ezlopi_device_settings_v3_t* setting);
-static int __setting_set_user_defined_setting(void* arg, l_ezlopi_device_settings_v3_t* setting);
-// Setting reset declarations
-static int __setting_reset_pre_defined_setting(void* arg, l_ezlopi_device_settings_v3_t* setting);
-static int __setting_reset_user_defined_setting(void* arg, l_ezlopi_device_settings_v3_t* setting);
-static int __setting_reset_radar_distance_sensitivity_setting(void* arg, l_ezlopi_device_settings_v3_t* setting);
-// Setting update declarations
-static int __setting_update_pre_defined_setting(void* arg, l_ezlopi_device_settings_v3_t* setting);
-static int __setting_update_user_defined_setting(void* arg, l_ezlopi_device_settings_v3_t* setting);
-static int __setting_update_radar_distance_sensitivity_setting(void* arg, l_ezlopi_device_settings_v3_t* setting);
+/*******************************************************************************
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
+/*******************************************************************************
+ *                          Extern Function Definitions
+ *******************************************************************************/
+
+/**
+ * @brief Global/extern function template example
+ * Convention : Use capital letter for initial word on extern function
+ * @param arg
+ */
+int hilink_presence_sensor_apply_settings()
+{
+    int ret = 0;
+    if (hilink_presence_sensor_predefined_setting && hilink_presence_sensor_user_defined_setting)
+    {
+        // Only the predefined setting mode is required to be accessed, if it is set to user_defined_mode, the settings are changed according to the user defined setting automatically.
+        s_hilink_predefined_setting_value_t* predef_setting_value = (s_hilink_predefined_setting_value_t*)hilink_presence_sensor_predefined_setting->user_arg;
+        if (predef_setting_value)
+        {
+            ld2410_template_t template;
+            if (!__setting_set_find_predefined_setting_template(predef_setting_value, &template))
+            {
+                ret = __setting_set_change_setting_template(template, hilink_presence_sensor_predefined_setting->cloud_properties.setting_id);
+            }
+        }
+        else
+        {
+            ret = 1;
+        }
+    }
+    else
+    {
+        ret = 1;
+    }
+    return ret;
+}
+
+int hilink_presence_sensor_initialize_settings(l_ezlopi_device_t* device)
+{
+    int ret = 0;
+
+    ESP_ERROR_CHECK(__setting_initialize_hilink_presence_sensor_predefined_settings(device));
+    ESP_ERROR_CHECK(__setting_initialize_hilink_presence_sensor_userdefined_settings(device));
+    ESP_ERROR_CHECK(__setting_initialize_hilink_presence_sensor_radar_distance_sensitivity(device));
+
+    return ret;
+}
+
+bool hilink_presence_sensor_target_in_detectable_range(const uint16_t moving_target_distance)
+{
+    bool in_range = false;
+    s_hilink_radar_distance_sensitivity_value_t* setting_val = (s_hilink_radar_distance_sensitivity_value_t*)hilink_presence_sensor_radar_distance_sensitivity_setting->user_arg;
+    if (setting_val)
+    {
+        if (setting_val->distance_sensitivity_value <= moving_target_distance)
+        {
+            in_range = true;
+        }
+        else
+        {
+            in_range = false;
+        }
+    }
+    else
+    {
+        in_range = false;
+    }
+    return in_range;
+}
+
+/*******************************************************************************
+ *                          Static Function Definitions
+ *******************************************************************************/
 // ********************************************* Setting initialization related start ********************************************* //
 static int __setting_initialize_hilink_presence_sensor_predefined_settings(l_ezlopi_device_t* device)
 {
@@ -230,66 +365,6 @@ static int __setting_initialize_hilink_presence_sensor_radar_distance_sensitivit
         ret = 1;
     }
     return ret;
-}
-
-int hilink_presence_sensor_apply_settings()
-{
-    int ret = 0;
-    if (hilink_presence_sensor_predefined_setting && hilink_presence_sensor_user_defined_setting)
-    {
-        // Only the predefined setting mode is required to be accessed, if it is set to user_defined_mode, the settings are changed according to the user defined setting automatically.
-        s_hilink_predefined_setting_value_t* predef_setting_value = (s_hilink_predefined_setting_value_t*)hilink_presence_sensor_predefined_setting->user_arg;
-        if (predef_setting_value)
-        {
-            ld2410_template_t template;
-            if (!__setting_set_find_predefined_setting_template(predef_setting_value, &template))
-            {
-                ret = __setting_set_change_setting_template(template, hilink_presence_sensor_predefined_setting->cloud_properties.setting_id);
-            }
-        }
-        else
-        {
-            ret = 1;
-        }
-    }
-    else
-    {
-        ret = 1;
-    }
-    return ret;
-}
-
-int hilink_presence_sensor_initialize_settings(l_ezlopi_device_t* device)
-{
-    int ret = 0;
-
-    ESP_ERROR_CHECK(__setting_initialize_hilink_presence_sensor_predefined_settings(device));
-    ESP_ERROR_CHECK(__setting_initialize_hilink_presence_sensor_userdefined_settings(device));
-    ESP_ERROR_CHECK(__setting_initialize_hilink_presence_sensor_radar_distance_sensitivity(device));
-
-    return ret;
-}
-
-bool hilink_presence_sensor_target_in_detectable_range(const uint16_t moving_target_distance)
-{
-    bool in_range = false;
-    s_hilink_radar_distance_sensitivity_value_t* setting_val = (s_hilink_radar_distance_sensitivity_value_t*)hilink_presence_sensor_radar_distance_sensitivity_setting->user_arg;
-    if (setting_val)
-    {
-        if (setting_val->distance_sensitivity_value <= moving_target_distance)
-        {
-            in_range = true;
-        }
-        else
-        {
-            in_range = false;
-        }
-    }
-    else
-    {
-        in_range = false;
-    }
-    return in_range;
 }
 
 // ********************************************* Setting initialization related end ********************************************* //
@@ -966,4 +1041,7 @@ static int __settings_update(void* arg, l_ezlopi_device_settings_v3_t* setting)
 
     return ret;
 }
-// ********************************************* hub.device.setting.updated related end ********************************************* //
+
+/*******************************************************************************
+ *                          End of File
+ *******************************************************************************/

@@ -1,3 +1,45 @@
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+
+/**
+ * @file    main.c
+ * @brief   perform some function on data
+ * @author  John Doe
+ * @version 0.1
+ * @date    1st January 2024
+ */
+
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_BLE_ENABLE
@@ -12,10 +54,36 @@
 #include "ezlopi_cloud_constants.h"
 #include "EZLOPI_USER_CONFIG.h"
 
-static uint8_t adv_config_done = 0;
+/*******************************************************************************
+ *                          Extern Data Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 #define ADV_CONFIG_FLAG (1 << 0)
 #define SCAN_RSP_CONFIG_FLAG (1 << 1)
 
+/*******************************************************************************
+ *                          Static Function Prototypes
+ *******************************************************************************/
+static void ezlopi_ble_setup_service_uuid(void);
+#if (1 == ENABLE_TRACE)
+static void show_bonded_devices(void);
+static char* esp_key_type_to_str(esp_ble_key_type_t key_type);
+static char* esp_auth_req_to_str(esp_ble_auth_req_t auth_req);
+static char* ezlopi_ble_gap_event_to_str(esp_gap_ble_cb_event_t event);
+#endif
+// static void ezlopi_ble_setup_adv_config(void);
+
+/*******************************************************************************
+ *                          Static Data Definitions
+ *******************************************************************************/
+static uint8_t adv_config_done = 0;
 // static uint8_t manufacturer[] = {'e', 'z', 'l', 'o', 'p', 'i'};
 static uint8_t* all_service_uuid = NULL;
 static uint32_t all_service_uuid_len = 0;
@@ -67,16 +135,20 @@ static esp_ble_adv_params_t adv_params = {
     .adv_filter_policy = ADV_FILTER_ALLOW_SCAN_ANY_CON_ANY,
 };
 
-static void ezlopi_ble_setup_service_uuid(void);
-#if (1 == ENABLE_TRACE)
-static void show_bonded_devices(void);
-static char* esp_key_type_to_str(esp_ble_key_type_t key_type);
-static char* esp_auth_req_to_str(esp_ble_auth_req_t auth_req);
-static char* ezlopi_ble_gap_event_to_str(esp_gap_ble_cb_event_t event);
-#endif
-// static void ezlopi_ble_setup_adv_config(void);
+/*******************************************************************************
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
-#if (1 == CONFIG_EZPI_BLE_ENALBE_PASSKEY)
+/*******************************************************************************
+ *                          Extern Function Definitions
+ *******************************************************************************/
+
+/**
+ * @brief Global/extern function template example
+ * Convention : Use capital letter for initial word on extern function
+ * @param arg
+ */
+#if (1 == CONFIG_EZPI_BLE_ENABLE_PASSKEY)
 void ezlopi_ble_gap_set_passkey(uint32_t passkey)
 {
     esp_ble_gap_set_security_param(ESP_BLE_SM_SET_STATIC_PASSKEY, &passkey, sizeof(uint32_t));
@@ -225,7 +297,7 @@ void ezlopi_ble_gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_p
         break;
     }
 
-#if (1 == CONFIG_EZPI_BLE_ENALBE_PAIRING)
+#if (1 == CONFIG_EZPI_BLE_ENABLE_PAIRING)
     case ESP_GAP_BLE_PASSKEY_REQ_EVT: // 12
     {
         break;
@@ -313,7 +385,7 @@ void ezlopi_ble_gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_p
         ezlopi_ble_setup_adv_config();
         break;
     }
-#if (1 == CONFIG_EZPI_BLE_ENALBE_PAIRING)
+#if (1 == CONFIG_EZPI_BLE_ENABLE_PAIRING)
     case ESP_GAP_BLE_SET_LOCAL_PRIVACY_COMPLETE_EVT: // 22
     {
         ezlopi_ble_setup_adv_config();
@@ -365,6 +437,9 @@ void ezlopi_ble_gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_p
     }
 }
 
+/*******************************************************************************
+ *                          Static Function Definitions
+ *******************************************************************************/
 #if (1 == ENABLE_TRACE)
 static char* ezlopi_ble_gap_event_to_str(esp_gap_ble_cb_event_t event)
 {
@@ -853,4 +928,9 @@ static void ezlopi_ble_setup_service_uuid(void)
 
     // dump("complete-uuid", (all_service_uuid ? (void *)all_service_uuid : (void *)ezlopi__str), 0, all_service_uuid_len);
 }
+
 #endif // CONFIG_EZPI_BLE_ENABLE
+
+/*******************************************************************************
+ *                          End of File
+ *******************************************************************************/

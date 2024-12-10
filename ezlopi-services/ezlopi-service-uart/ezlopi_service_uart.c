@@ -1,3 +1,45 @@
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+
+/**
+ * @file    main.c
+ * @brief   perform some function on data
+ * @author  John Doe
+ * @version 0.1
+ * @date    1st January 2024
+ */
+
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 #include "../../build/config/sdkconfig.h"
 
 #include "freertos/FreeRTOSConfig.h"
@@ -48,6 +90,17 @@
 #include "ezlopi_service_loop.h"
 #include "EZLOPI_USER_CONFIG.h"
 
+/*******************************************************************************
+ *                          Extern Data Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 #if defined(CONFIG_IDF_TARGET_ESP32)
 #define TXD_PIN (GPIO_NUM_1)
 #define RXD_PIN (GPIO_NUM_3)
@@ -60,6 +113,37 @@
 #define RXD_PIN (GPIO_NUM_44)
 #endif
 
+/*******************************************************************************
+ *                          Static Function Prototypes
+ *******************************************************************************/
+static int ezlopi_service_uart_reset(cJSON *root);
+static int ezlopi_service_uart_set_uart_config(const cJSON *root);
+static int ezlopi_service_uart_process_log_severity(const cJSON *root);
+static ezlopi_error_t ezlopi_service_uart_process_provisioning_api(const cJSON *root);
+static int ezlopi_service_uart_parser(const char *data);
+static void __uart_loop(void *arg);
+static void ezlopi_service_uart_task(void *arg);
+static int ezlopi_service_uart_firmware_info(cJSON *parent);
+static int ezlopi_service_uart_chip_info(cJSON *parent);
+static int ezlopi_service_uart_firmware_sdk_info(cJSON *parent);
+static int ezlopi_service_uart_device_status_info(cJSON *parent);
+static int ezlopi_service_uart_config_info(cJSON *parent);
+static int ezlopi_service_uart_ezlopi_info(cJSON *parent);
+static int ezlopi_service_uart_oem_info(cJSON *parent);
+static int ezlopi_service_uart_newtwork_info(cJSON *parent);
+static void ezlopi_service_uart_get_info();
+static void ezlopi_service_uart_set_wifi(const char *data);
+static void ezlopi_service_uart_response(uint8_t cmd, uint8_t status_write, uint8_t status_connect);
+static void ezlopi_service_uart_set_config(const char *data);
+static void ezlopi_service_uart_get_config(void);
+
+#if !defined(CONFIG_IDF_TARGET_ESP32) && !defined(CONFIG_IDF_TARGET_ESP32C3)
+static void tinyusb_cdc_rx_callback(int itf, cdcacm_event_t *event);
+#endif
+
+/*******************************************************************************
+ *                          Static Data Definitions
+ *******************************************************************************/
 static uint8_t __uart_data[EZPI_SERV_UART_RX_BUFFER_SIZE];
 
 #if !defined(CONFIG_IDF_TARGET_ESP32) && !defined(CONFIG_IDF_TARGET_ESP32C3)
@@ -69,12 +153,81 @@ static int cdc_port = TINYUSB_CDC_ACM_0;
 static SemaphoreHandle_t usb_semaphore_handle = NULL;
 #endif // NOT defined CONFIG_IDF_TARGET_ESP32 or CONFIG_IDF_TARGET_ESP32C3
 
-static void ezlopi_service_uart_get_info();
-static void ezlopi_service_uart_set_wifi(const char *data);
-static void ezlopi_service_uart_response(uint8_t cmd, uint8_t status_write, uint8_t status_connect);
-static void ezlopi_service_uart_set_config(const char *data);
-static void ezlopi_service_uart_get_config(void);
+/*******************************************************************************
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
+/*******************************************************************************
+ *                          Extern Function Definitions
+ *******************************************************************************/
+
+/**
+ * @brief Global/extern function template example
+ * Convention : Use capital letter for initial word on extern function
+ * @param arg
+ */
+int EZPI_SERV_uart_tx_data(int len, uint8_t *data)
+{
+    int ret = 0;
+    ret = uart_write_bytes(EZPI_SERV_UART_NUM_DEFAULT, (void *)data, len);
+    ret += uart_write_bytes(EZPI_SERV_UART_NUM_DEFAULT, "\r\n", 2);
+
+#if !defined(CONFIG_IDF_TARGET_ESP32) && !defined(CONFIG_IDF_TARGET_ESP32C3)
+    if (pdTRUE == xSemaphoreTake(usb_semaphore_handle, portMAX_DELAY))
+    {
+        tinyusb_cdcacm_write_queue(cdc_port, (uint8_t *)data, len);
+        tinyusb_cdcacm_write_queue(cdc_port, (uint8_t *)"\r\n", 2);
+        ret = tinyusb_cdcacm_write_flush(cdc_port, 0);
+        xSemaphoreGive(usb_semaphore_handle);
+    }
+#endif // NOT defined CONFIG_IDF_TARGET_ESP32 or CONFIG_IDF_TARGET_ESP32C3
+
+    return ret;
+}
+
+void EZPI_SERV_uart_init(void)
+{
+    // ezlopi_service_loop_add("uart-loop", __uart_loop, 1, NULL);
+#if 1
+    TaskHandle_t __uart_loop_handle = NULL;
+    xTaskCreate(ezlopi_service_uart_task, "serv_uart_task", EZLOPI_SERVICE_UART_TASK_DEPTH, NULL, configMAX_PRIORITIES - 4, &__uart_loop_handle);
+    ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_UART_TASK, &__uart_loop_handle, EZLOPI_SERVICE_UART_TASK_DEPTH);
+#endif
+}
+
+#if !defined(CONFIG_IDF_TARGET_ESP32) && !defined(CONFIG_IDF_TARGET_ESP32C3)
+void EZPI_SERV_cdc_init()
+{
+    usb_semaphore_handle = xSemaphoreCreateBinary();
+    if (usb_semaphore_handle)
+    {
+        xSemaphoreGive(usb_semaphore_handle);
+        tinyusb_config_t ezlopi_usb_device_configuration = {
+            .descriptor = NULL,
+            .string_descriptor = NULL,
+            .external_phy = false,
+        };
+
+        tinyusb_config_cdcacm_t ezlopi_usb_cdc_configuration = {
+            .usb_dev = TINYUSB_USBDEV_0,
+            .cdc_port = cdc_port,
+            .rx_unread_buf_sz = CONFIG_TINYUSB_CDC_RX_BUFSIZE,
+            .callback_rx = &tinyusb_cdc_rx_callback,
+            .callback_rx_wanted_char = NULL,
+            .callback_line_state_changed = &tinyusb_cdc_rx_callback,
+            .callback_line_coding_changed = NULL,
+        };
+
+        ESP_ERROR_CHECK(tinyusb_driver_install(&ezlopi_usb_device_configuration));
+        ESP_ERROR_CHECK(tusb_cdc_acm_init(&ezlopi_usb_cdc_configuration));
+        TRACE_I("USB CDC initialization completed successfully.");
+    }
+}
+#endif
+
+/*******************************************************************************
+ *                          Static Function Definitions
+ *******************************************************************************/
 static int ezlopi_service_uart_reset(cJSON *root)
 {
     int ret = 0;
@@ -991,25 +1144,6 @@ static void ezlopi_service_uart_get_config(void)
     }
 }
 
-int EZPI_SERV_uart_tx_data(int len, uint8_t *data)
-{
-    int ret = 0;
-    ret = uart_write_bytes(EZPI_SERV_UART_NUM_DEFAULT, (void *)data, len);
-    ret += uart_write_bytes(EZPI_SERV_UART_NUM_DEFAULT, "\r\n", 2);
-
-#if !defined(CONFIG_IDF_TARGET_ESP32) && !defined(CONFIG_IDF_TARGET_ESP32C3)
-    if (pdTRUE == xSemaphoreTake(usb_semaphore_handle, portMAX_DELAY))
-    {
-        tinyusb_cdcacm_write_queue(cdc_port, (uint8_t *)data, len);
-        tinyusb_cdcacm_write_queue(cdc_port, (uint8_t *)"\r\n", 2);
-        ret = tinyusb_cdcacm_write_flush(cdc_port, 0);
-        xSemaphoreGive(usb_semaphore_handle);
-    }
-#endif // NOT defined CONFIG_IDF_TARGET_ESP32 or CONFIG_IDF_TARGET_ESP32C3
-
-    return ret;
-}
-
 #if !defined(CONFIG_IDF_TARGET_ESP32) && !defined(CONFIG_IDF_TARGET_ESP32C3)
 static void tinyusb_cdc_rx_callback(int itf, cdcacm_event_t *event)
 {
@@ -1051,41 +1185,8 @@ static void tinyusb_cdc_rx_callback(int itf, cdcacm_event_t *event)
     }
 }
 
-void EZPI_SERV_cdc_init()
-{
-    usb_semaphore_handle = xSemaphoreCreateBinary();
-    if (usb_semaphore_handle)
-    {
-        xSemaphoreGive(usb_semaphore_handle);
-        tinyusb_config_t ezlopi_usb_device_configuration = {
-            .descriptor = NULL,
-            .string_descriptor = NULL,
-            .external_phy = false,
-        };
-
-        tinyusb_config_cdcacm_t ezlopi_usb_cdc_configuration = {
-            .usb_dev = TINYUSB_USBDEV_0,
-            .cdc_port = cdc_port,
-            .rx_unread_buf_sz = CONFIG_TINYUSB_CDC_RX_BUFSIZE,
-            .callback_rx = &tinyusb_cdc_rx_callback,
-            .callback_rx_wanted_char = NULL,
-            .callback_line_state_changed = &tinyusb_cdc_rx_callback,
-            .callback_line_coding_changed = NULL,
-        };
-
-        ESP_ERROR_CHECK(tinyusb_driver_install(&ezlopi_usb_device_configuration));
-        ESP_ERROR_CHECK(tusb_cdc_acm_init(&ezlopi_usb_cdc_configuration));
-        TRACE_I("USB CDC initialization completed successfully.");
-    }
-}
 #endif // NOT defined CONFIG_IDF_TARGET_ESP32 or CONFIG_IDF_TARGET_ESP32C3
 
-void EZPI_SERV_uart_init(void)
-{
-    // ezlopi_service_loop_add("uart-loop", __uart_loop, 1, NULL);
-#if 1
-    TaskHandle_t __uart_loop_handle = NULL;
-    xTaskCreate(ezlopi_service_uart_task, "serv_uart_task", EZLOPI_SERVICE_UART_TASK_DEPTH, NULL, configMAX_PRIORITIES - 4, &__uart_loop_handle);
-    ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_UART_TASK, &__uart_loop_handle, EZLOPI_SERVICE_UART_TASK_DEPTH);
-#endif
-}
+/*******************************************************************************
+ *                          End of File
+ *******************************************************************************/

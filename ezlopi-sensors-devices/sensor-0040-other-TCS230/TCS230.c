@@ -1,133 +1,88 @@
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+
+/**
+ * @file    main.c
+ * @brief   perform some function on data
+ * @author  John Doe
+ * @version 0.1
+ * @date    1st January 2024
+ */
+
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 #include "ezlopi_util_trace.h"
 #include "freertos/queue.h"
 #include "sensor_0040_other_TCS230.h"
 
+/*******************************************************************************
+ *                          Extern Data Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 #define TCS230_QUEUE_SIZE 5
 
-static QueueHandle_t tcs230_queue = NULL;
-static e_TCS230_queue_t QueueFlag = TCS230_QUEUE_RESET;
-//------------------------------------------------------------------------------
-
-static void IRAM_ATTR gpio_isr_handler(void *args) // argument => time_us
-{
-    int32_t instant_uSec = (int32_t)esp_timer_get_time();
-    if (xQueueSendFromISR(tcs230_queue, &instant_uSec, NULL))
-    {
-        QueueFlag = TCS230_QUEUE_AVAILABLE;
-    }
-    else
-    {
-        QueueFlag = TCS230_QUEUE_FULL;
-    }
-}
-
+/*******************************************************************************
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static void Extract_TCS230_Pulse_Period_func(gpio_num_t gpio_pulse_output, int32_t *Time_period);
 static int MAP_color_value(int x, int fromLow, int fromHigh, int toLow, int toHigh);
 static void Get_mapped_color_value(uint32_t *color_value, gpio_num_t gpio_pulse_output, int32_t *period, int32_t min_time_limit, int32_t max_time_limit);
-//------------------------------------------------------------------------------
 
-// This function is used to get the time_period of incoming pulses in "freq_input pin". [So call 'gpio_install_isr_service()' before using this function]
-static void Extract_TCS230_Pulse_Period_func(gpio_num_t gpio_pulse_output, int32_t *Time_period)
-{
-    // creating queue here
-    tcs230_queue = xQueueCreate(TCS230_QUEUE_SIZE, sizeof(int32_t)); // takes max -> 1mSec
-    if (tcs230_queue)
-    {
-        // add -> gpio_isr_handle(pin_num)
-        // TRACE_I("Queue_Available..... Adding Gpio_interrupt");
-        gpio_isr_handler_add(gpio_pulse_output, gpio_isr_handler, NULL);
+/*******************************************************************************
+ *                          Static Data Definitions
+ *******************************************************************************/
+static QueueHandle_t tcs230_queue = NULL;
+static e_TCS230_queue_t QueueFlag = TCS230_QUEUE_RESET;
 
-        // check queue_full => 1
-        while (QueueFlag < TCS230_QUEUE_FULL)
-        {
-        }
-        // disable -> gpio_isr_handle_remove(pin_num)
-        // TRACE_I("Queue_full.....Removing Gpio_interrupt");
-        gpio_isr_handler_remove(gpio_pulse_output);
+/*******************************************************************************
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
-        if (QueueFlag == TCS230_QUEUE_FULL)
-        {
-            // loop through all the queue[0-5] values -> active low instants
-            int32_t prev_us_time = 0;
-            int32_t us_time = 0;
-            int32_t diff[TCS230_QUEUE_SIZE] = {0}; // correct data starts from 1-9, not zero
-            // extract the 10 queued values
-            for (uint8_t i = 0; i < TCS230_QUEUE_SIZE; i++)
-            {
-                if (xQueueReceive(tcs230_queue, &us_time, portMAX_DELAY))
-                {
-                    if ((us_time - prev_us_time) >= 0)
-                    {
-                        diff[i] = us_time - prev_us_time; // 0-9
-                        prev_us_time = us_time;
-                    }
-                }
-            }
+/*******************************************************************************
+ *                          Extern Function Definitions
+ *******************************************************************************/
 
-            // generate frequency of occurance for Time-period from "diff[]" array
-            uint8_t freq[TCS230_QUEUE_SIZE] = {0};
-            for (uint8_t x = 1; x < TCS230_QUEUE_SIZE; x++)
-            {
-                for (uint8_t i = 1; i < TCS230_QUEUE_SIZE; i++)
-                {
-                    float error = diff[x] - diff[i];
-                    error = ((error >= 0) ? error : error * -1); // finding difference between two readings
-                    if (error <= (diff[x] * 0.002))              // for Freq_scaling = 20% -> [error within => +-0.2%]
-                    {
-                        freq[x] += 1; // increment count
-                    }
-                }
-            }
-            // find the dominant period
-            uint8_t max_freq_index = 0;
-            int32_t dominant_val = 0;
-            for (uint8_t i = 0; i < TCS230_QUEUE_SIZE; i++)
-            {
-                if (freq[i] > dominant_val)
-                {
-                    dominant_val = freq[i];
-                    max_freq_index = i;
-                }
-            }
-            // TRACE_W("......................Dominant {%duS} => freq : %d", diff[max_freq_index], freq[max_freq_index]);
-
-            // reset Queue_flag
-            QueueFlag = TCS230_QUEUE_AVAILABLE;
-            *Time_period = diff[max_freq_index];
-        }
-        // Deleting queue after no use to avoid conflicts
-        vQueueDelete(tcs230_queue);
-    }
-    vTaskDelay(10 / portTICK_PERIOD_MS); // 10ms delay
-}
-
-// this is Map Function
-static int MAP_color_value(int x, int fromLow, int fromHigh, int toLow, int toHigh)
-{
-
-    return (int)(((float)(fromHigh - x) / (float)(fromHigh - fromLow)) * (float)toHigh);
-}
-
-// Generate the color value (0-255) from time_period_us
-static void Get_mapped_color_value(uint32_t *color_value, gpio_num_t gpio_pulse_output, int32_t *period, int32_t min_time_limit, int32_t max_time_limit)
-{
-    // first populate the variable pointed by 'period' ptr
-    Extract_TCS230_Pulse_Period_func(gpio_pulse_output, period); // stalls for 10 queue to be filled
-
-    // setting limits to avoid error during calculations
-    if (*period < min_time_limit) // if 'period' has smaller time_periods than min-limit [i.e. 'most_red_timeP']
-    {
-        *period = min_time_limit; // smaller time period
-    }
-    if (*period > max_time_limit) // if 'period' has larger time_periods than max-limit [i.e. 'least_red_timeP']
-    {
-        *period = max_time_limit; // larger time period
-    }
-    // mapping function (x ,smaller_time_period, larger_time_period, 0,255)
-    // assign the mapped value to structure
-    *(color_value) = MAP_color_value(*period, min_time_limit, max_time_limit, 0, 255);
-}
-
+/**
+ * @brief Global/extern function template example
+ * Convention : Use capital letter for initial word on extern function
+ * @param arg
+ */
 bool tcs230_set_filter_color(l_ezlopi_item_t *item, e_TCS230_color_t color_code)
 {
     bool ret = false;
@@ -295,3 +250,125 @@ bool get_tcs230_sensor_value(l_ezlopi_item_t *item)
     }
     return true;
 }
+
+/*******************************************************************************
+ *                          Static Function Definitions
+ *******************************************************************************/
+static void IRAM_ATTR gpio_isr_handler(void *args) // argument => time_us
+{
+    int32_t instant_uSec = (int32_t)esp_timer_get_time();
+    if (xQueueSendFromISR(tcs230_queue, &instant_uSec, NULL))
+    {
+        QueueFlag = TCS230_QUEUE_AVAILABLE;
+    }
+    else
+    {
+        QueueFlag = TCS230_QUEUE_FULL;
+    }
+}
+
+// This function is used to get the time_period of incoming pulses in "freq_input pin". [So call 'gpio_install_isr_service()' before using this function]
+static void Extract_TCS230_Pulse_Period_func(gpio_num_t gpio_pulse_output, int32_t *Time_period)
+{
+    // creating queue here
+    tcs230_queue = xQueueCreate(TCS230_QUEUE_SIZE, sizeof(int32_t)); // takes max -> 1mSec
+    if (tcs230_queue)
+    {
+        // add -> gpio_isr_handle(pin_num)
+        // TRACE_I("Queue_Available..... Adding Gpio_interrupt");
+        gpio_isr_handler_add(gpio_pulse_output, gpio_isr_handler, NULL);
+
+        // check queue_full => 1
+        while (QueueFlag < TCS230_QUEUE_FULL)
+        {
+        }
+        // disable -> gpio_isr_handle_remove(pin_num)
+        // TRACE_I("Queue_full.....Removing Gpio_interrupt");
+        gpio_isr_handler_remove(gpio_pulse_output);
+
+        if (QueueFlag == TCS230_QUEUE_FULL)
+        {
+            // loop through all the queue[0-5] values -> active low instants
+            int32_t prev_us_time = 0;
+            int32_t us_time = 0;
+            int32_t diff[TCS230_QUEUE_SIZE] = {0}; // correct data starts from 1-9, not zero
+            // extract the 10 queued values
+            for (uint8_t i = 0; i < TCS230_QUEUE_SIZE; i++)
+            {
+                if (xQueueReceive(tcs230_queue, &us_time, portMAX_DELAY))
+                {
+                    if ((us_time - prev_us_time) >= 0)
+                    {
+                        diff[i] = us_time - prev_us_time; // 0-9
+                        prev_us_time = us_time;
+                    }
+                }
+            }
+
+            // generate frequency of occurance for Time-period from "diff[]" array
+            uint8_t freq[TCS230_QUEUE_SIZE] = {0};
+            for (uint8_t x = 1; x < TCS230_QUEUE_SIZE; x++)
+            {
+                for (uint8_t i = 1; i < TCS230_QUEUE_SIZE; i++)
+                {
+                    float error = diff[x] - diff[i];
+                    error = ((error >= 0) ? error : error * -1); // finding difference between two readings
+                    if (error <= (diff[x] * 0.002))              // for Freq_scaling = 20% -> [error within => +-0.2%]
+                    {
+                        freq[x] += 1; // increment count
+                    }
+                }
+            }
+            // find the dominant period
+            uint8_t max_freq_index = 0;
+            int32_t dominant_val = 0;
+            for (uint8_t i = 0; i < TCS230_QUEUE_SIZE; i++)
+            {
+                if (freq[i] > dominant_val)
+                {
+                    dominant_val = freq[i];
+                    max_freq_index = i;
+                }
+            }
+            // TRACE_W("......................Dominant {%duS} => freq : %d", diff[max_freq_index], freq[max_freq_index]);
+
+            // reset Queue_flag
+            QueueFlag = TCS230_QUEUE_AVAILABLE;
+            *Time_period = diff[max_freq_index];
+        }
+        // Deleting queue after no use to avoid conflicts
+        vQueueDelete(tcs230_queue);
+    }
+    vTaskDelay(10 / portTICK_PERIOD_MS); // 10ms delay
+}
+
+// this is Map Function
+static int MAP_color_value(int x, int fromLow, int fromHigh, int toLow, int toHigh)
+{
+
+    return (int)(((float)(fromHigh - x) / (float)(fromHigh - fromLow)) * (float)toHigh);
+}
+
+// Generate the color value (0-255) from time_period_us
+static void Get_mapped_color_value(uint32_t *color_value, gpio_num_t gpio_pulse_output, int32_t *period, int32_t min_time_limit, int32_t max_time_limit)
+{
+    // first populate the variable pointed by 'period' ptr
+    Extract_TCS230_Pulse_Period_func(gpio_pulse_output, period); // stalls for 10 queue to be filled
+
+    // setting limits to avoid error during calculations
+    if (*period < min_time_limit) // if 'period' has smaller time_periods than min-limit [i.e. 'most_red_timeP']
+    {
+        *period = min_time_limit; // smaller time period
+    }
+    if (*period > max_time_limit) // if 'period' has larger time_periods than max-limit [i.e. 'least_red_timeP']
+    {
+        *period = max_time_limit; // larger time period
+    }
+    // mapping function (x ,smaller_time_period, larger_time_period, 0,255)
+    // assign the mapped value to structure
+    *(color_value) = MAP_color_value(*period, min_time_limit, max_time_limit, 0, 255);
+}
+
+/*******************************************************************************
+ *                          End of File
+ *******************************************************************************/

@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2022 Ezlo Innovation Inc
+** Copyright (C) 2024 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -29,13 +29,22 @@
 ** ===========================================================================
 */
 
-#ifndef __HEADER_H__
-#define __HEADER_H__
+/**
+ * @file    main.c
+ * @brief   perform some function on data
+ * @author  John Doe
+ * @version 0.1
+ * @date    1st January 2024
+ */
+
+#ifndef __EZLOPI_CORE_ERRORS_H__
+#define __EZLOPI_CORE_ERRORS_H__
 
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
 #include "stdint.h"
+
 /*******************************************************************************
  *                          C++ Declaration Wrapper
  *******************************************************************************/
@@ -47,55 +56,54 @@ extern "C"
     /*******************************************************************************
      *                          Type & Macro Declarations
      *******************************************************************************/
-    typedef int32_t ezlopi_error_t;
+    #define EZPI_SUCCESS 0
+    #define EZPI_FAILED -1
+        // NVS Related errors
+    #define EZPI_ERR_NVS_INIT_FAILED 0x00000001
+    // Not implemented
+    #define EZPI_ERR_NVS_READ_FAILED 0x00000002
+    // Not implemented
+    #define EZPI_ERR_NVS_WRITE_FAILED 0x00000004
 
-#define EZPI_SUCCESS 0
-#define EZPI_FAILED -1
-    // NVS Related errors
-#define EZPI_ERR_NVS_INIT_FAILED 0x00000001
-// Not implemented
-#define EZPI_ERR_NVS_READ_FAILED 0x00000002
-// Not implemented
-#define EZPI_ERR_NVS_WRITE_FAILED 0x00000004
+    // Factory info init related errors
+    // Not implemented
+    #define EZPI_ERR_FACTORY_INFO_READ_FAILED 0x00000008
+    // Event group related errors
+    #define EZPI_ERR_EVENT_GROUP_UNINITIALIZED 0x00000010   // It is returned if event group handle is uninitialized
+    #define EZPI_ERR_EVENT_GROUP_BIT_WAIT_FAILED 0x00000020 // It is returned if evvent group waits till timeout without event bit(s) being set
+    #define EZPI_ERR_EVENT_GROUP_BIT_UNDEFINED 0x00000040   // If bit set/clear/wait encounters undefined bit or bit value greater than BIT31
+    // Generic/Test device preperation errors
+    #define EZPI_ERR_JSON_PARSE_FAILED 0x00000080 // It is returned when device configuration parsing fails
+    // Device intitaliation errors
+    #define EZPI_ERR_PREP_DEVICE_PREP_FAILED 0x00000100 // It is returned when device preperation fails when PREPARE event is called on every devices
+    // Not implemented
+    #define EZPI_ERR_INIT_DEVICE_FAILED 0x00000200 // If any error occurs during initialization, this error is returned to abort futher initialization of the device in case it has to be deleted from the tree
+    // Room related errors
+    #define EZPI_ERR_ROOM_INIT_FAILED 0x00000400 // If any error occured duing the initialization of the core room module this error is returned
+    // Core event queue related errors
+    #define EZPI_ERR_EVENT_QUEUE_INIT_FAILED 0x00000800     // Failed to initialized event queue
+    #define EZPI_ERR_EVENT_QUEUE_UNINITIALIZED 0x00001000   // For uninitialized event queue
+    #define EZPI_ERR_EVENT_QUEUE_RECV_SEND_ERROR 0x00002000 // For queue if send or receive fails
+    // Core SNTP init sync related errors
+    #define EZPI_ERR_SNTP_INIT_FAILED 0x00004000         // For SNTP if failed to sync the status
+    #define EZPI_ERR_SNTP_LOCATION_SET_FAILED 0x00008000 // For SNTP if failed to set location
 
-// Factory info init related errors
-// Not implemented
-#define EZPI_ERR_FACTORY_INFO_READ_FAILED 0x00000008
-// Event group related errors
-#define EZPI_ERR_EVENT_GROUP_UNINITIALIZED 0x00000010   // It is returned if event group handle is uninitialized
-#define EZPI_ERR_EVENT_GROUP_BIT_WAIT_FAILED 0x00000020 // It is returned if evvent group waits till timeout without event bit(s) being set
-#define EZPI_ERR_EVENT_GROUP_BIT_UNDEFINED 0x00000040   // If bit set/clear/wait encounters undefined bit or bit value greater than BIT31
-// Generic/Test device preperation errors
-#define EZPI_ERR_JSON_PARSE_FAILED 0x00000080 // It is returned when device configuration parsing fails
-// Device intitaliation errors
-#define EZPI_ERR_PREP_DEVICE_PREP_FAILED 0x00000100 // It is returned when device preperation fails when PREPARE event is called on every devices
-// Not implemented
-#define EZPI_ERR_INIT_DEVICE_FAILED 0x00000200 // If any error occurs during initialization, this error is returned to abort futher initialization of the device in case it has to be deleted from the tree
-// Room related errors
-#define EZPI_ERR_ROOM_INIT_FAILED 0x00000400 // If any error occured duing the initialization of the core room module this error is returned
-// Core event queue related errors
-#define EZPI_ERR_EVENT_QUEUE_INIT_FAILED 0x00000800     // Failed to initialized event queue
-#define EZPI_ERR_EVENT_QUEUE_UNINITIALIZED 0x00001000   // For uninitialized event queue
-#define EZPI_ERR_EVENT_QUEUE_RECV_SEND_ERROR 0x00002000 // For queue if send or receive fails
-// Core SNTP init sync related errors
-#define EZPI_ERR_SNTP_INIT_FAILED 0x00004000         // For SNTP if failed to sync the status
-#define EZPI_ERR_SNTP_LOCATION_SET_FAILED 0x00008000 // For SNTP if failed to set location
+    #define EZPI_ERR_HAL_INIT_FAILED 0x00010000 // For HAL init failed
 
-#define EZPI_ERR_HAL_INIT_FAILED 0x00010000 // For HAL init failed
+    #define EZPI_ERR_BROADCAST_FAILED 0x00020000 // Any error occuring during broadcast throws this error
 
-#define EZPI_ERR_BROADCAST_FAILED 0x00020000 // Any error occuring during broadcast throws this error
+    #define EZPI_ERR_MODES_FAILED 0x00040000 // Any error occcured during modes related operations
 
-#define EZPI_ERR_MODES_FAILED 0x00040000 // Any error occcured during modes related operations
+    #define EZPI_ERR_WRONG_PARAM 0x00080000 // If any parameters ar not found in incoming JSON as expected.
 
-#define EZPI_ERR_WRONG_PARAM 0x00080000 // If any parameters ar not found in incoming JSON as expected.
-
-#define EZPI_ERR_INVALID_CREDENTIALS 0x00100000 // Credentials such as wifi, login, etc.
+    #define EZPI_ERR_INVALID_CREDENTIALS 0x00100000 // Credentials such as wifi, login, etc.
 
     // #warning("Create error code for invalid and empty params")
 
     /*******************************************************************************
      *                          Extern Data Declarations
      *******************************************************************************/
+    typedef int32_t ezlopi_error_t;
 
     /*******************************************************************************
      *                          Extern Function Prototypes
@@ -118,7 +126,7 @@ extern "C"
 }
 #endif
 
-#endif // __HEADER_H__
+#endif // __EZLOPI_CORE_ERRORS_H__
 
 /*******************************************************************************
  *                          End of File

@@ -1,10 +1,8 @@
-
-
 /*------------------------------------------------------------------------------
 
     DHT22 temperature_dht22 & humidity_dht22 sensor AM2302 (DHT22) driver for ESP32
 
-    Jun 2017:	Ricardo Timmermann, new for DHT22
+    Jun 2017:   Ricardo Timmermann, new for DHT22
 
     Code Based on Adafruit Industries and Sam Johnston and Coffe & Beer. Please help
     to improve this code.
@@ -79,10 +77,10 @@ float getTemperature_dht22() { return temperature_dht22; }
 
 /*-------------------------------------------------------------------------------
 ;
-;	get next state
+;   get next state
 ;
-;	I don't like this logic. It needs some interrupt blocking / priority
-;	to ensure it runs in realtime.
+;   I don't like this logic. It needs some interrupt blocking / priority
+;   to ensure it runs in realtime.
 ;
 ;--------------------------------------------------------------------------------*/
 
@@ -105,7 +103,7 @@ int dht22_getSignalLevel(int usTimeOut, bool state)
 
 /*----------------------------------------------------------------------------
 ;
-;	read DHT22 sensor
+;   read DHT22 sensor
 
 copy/paste from AM2302/DHT22 Docu:
 

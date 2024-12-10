@@ -12,7 +12,7 @@ config LUA_MAXSTACK
 config LUA_ROOT
     string "Lua libraries path"
     default "/lua"
-    help 
+    help
         The default path that Lua uses to look for Lua libraries.
 
 config LUA_COMPAT_5_3

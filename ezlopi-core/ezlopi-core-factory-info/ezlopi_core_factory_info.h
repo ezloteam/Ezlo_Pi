@@ -1,11 +1,48 @@
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+
+/**
+ * @file    main.c
+ * @brief   perform some function on data
+ * @author  John Doe
+ * @version 0.1
+ * @date    1st January 2024
+ */
+
 #ifndef _EZLOPI_CORE_FACTORY_INFO_H_
 #define _EZLOPI_CORE_FACTORY_INFO_H_
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 #include <esp_partition.h>
 
 #include "cjext.h"
@@ -13,24 +50,35 @@ extern "C"
 
 #include "ezlopi_core_errors.h"
 
-#define EZLOPI_DEVICE_TYPE_TEST_DEVICE -1
-#define EZLOPI_DEVICE_TYPE_GENERIC 0
-
-#if CONFIG_EZPI_DEV_TYPE_TEST == 1
-#define EZLOPI_DEVICE_TYPE EZLOPI_DEVICE_TYPE_TEST_DEVICE
-#else
-#define EZLOPI_DEVICE_TYPE EZLOPI_DEVICE_TYPE_GENERIC
+/*******************************************************************************
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
+#ifdef __cplusplus
+extern "C"
+{
 #endif
 
-#define EZLOPI_FACTORY_INFO_V3_PARTITION_NAME "prov_data"
-#define EZLOPI_FACTORY_INFO_V3_PARTITION_SIZE 0x8000 // 32KB
-#define EZLOPI_FACTORY_INFO_V3_PARTITION_TYPE 0x40
-#define EZLOPI_FACTORY_INFO_V3_SUBTYPE ESP_PARTITION_SUBTYPE_APP_FACTORY // ESP_PARTITION_SUBTYPE_ANY
+    /*******************************************************************************
+     *                          Type & Macro Declarations
+     *******************************************************************************/
+    #define EZLOPI_DEVICE_TYPE_TEST_DEVICE -1
+    #define EZLOPI_DEVICE_TYPE_GENERIC 0
 
-#define EZLOPI_FINFO_OFFSET_CONN_DATA 0x0000
-#define EZLOPI_FINFO_OFFSET_HUB_DATA 0x6000
+    #if CONFIG_EZPI_DEV_TYPE_TEST == 1
+    #define EZLOPI_DEVICE_TYPE EZLOPI_DEVICE_TYPE_TEST_DEVICE
+    #else
+    #define EZLOPI_DEVICE_TYPE EZLOPI_DEVICE_TYPE_GENERIC
+    #endif
 
-#define EZLOPI_FINFO_READ_LEN_4KB 4096
+    #define EZLOPI_FACTORY_INFO_V3_PARTITION_NAME "prov_data"
+    #define EZLOPI_FACTORY_INFO_V3_PARTITION_SIZE 0x8000 // 32KB
+    #define EZLOPI_FACTORY_INFO_V3_PARTITION_TYPE 0x40
+    #define EZLOPI_FACTORY_INFO_V3_SUBTYPE ESP_PARTITION_SUBTYPE_APP_FACTORY // ESP_PARTITION_SUBTYPE_ANY
+
+    #define EZLOPI_FINFO_OFFSET_CONN_DATA 0x0000
+    #define EZLOPI_FINFO_OFFSET_HUB_DATA 0x6000
+
+    #define EZLOPI_FINFO_READ_LEN_4KB 4096
 
     typedef enum e_factory_info_v3_partition_type
     {
@@ -117,6 +165,151 @@ extern "C"
         uint16_t config_version;
     } s_basic_factory_info_t;
 
+    /*******************************************************************************
+     *                          Extern Data Declarations
+     *******************************************************************************/
+    #if (EZLOPI_DEVICE_TYPE_GENERIC == EZLOPI_DEVICE_TYPE)
+
+    #elif (EZLOPI_DEVICE_TYPE_TEST_DEVICE == EZLOPI_DEVICE_TYPE)
+    #if defined(CONFIG_IDF_TARGET_ESP32)
+
+    static const char *ezlopi_config_test =
+        "{\
+        \"cmd\":3,\
+        \"dev_detail\":[\
+            {\
+            \"dev_type\":5,\
+            \"dev_name\":\"Dimmer_riken\",\
+            \"id_room\":\"\",\
+            \"id_item\":22,\
+            \"gpio\":18,\
+            \"pwm_resln\":3,\
+            \"freq_hz\":50,\
+            \"duty_cycle\":0\
+            },\
+            {\
+                \"dev_type\":1,\
+                \"dev_name\":\"switch_temp_riken\",\
+                \"id_room\":\"\",\
+                \"id_item\":2,\
+                \"gpio_in\":0,\
+                \"gpio_out\":25,\
+                \"pullup_ip\":false,\
+                \"pullup_op\":false,\
+                \"is_ip\":false,\
+                \"ip_inv\":false,\
+                \"op_inv\":false,\
+                \"val_ip\":false,\
+                \"val_op\":false\
+            },\
+            {\
+                \"dev_type\":1,\
+                \"dev_name\":\"Bulb_riken\",\
+                \"id_room\":\"\",\
+                \"id_item\":1,\
+                \"gpio_in\":\"\",\
+                \"gpio_out\":22,\
+                \"pullup_ip\":false,\
+                \"pullup_op\":false,\
+                \"is_ip\":false,\
+                \"ip_inv\":false,\
+                \"op_inv\":false,\
+                \"val_ip\":false,\
+                \"val_op\":false\
+            },\
+            {\
+                \"dev_type\":7,\
+                \"dev_name\":\"DHT22_temp_humi_riken\",\
+                \"id_room\":\"\",\
+                \"id_item\":16,\
+                \"gpio\":21\
+            }\
+        ],\
+        \"config_id\":\"1234567\",\
+        \"config_time\":1696508363,\
+        \"config_name\":\"My moisture sensor\",\
+        \"chipset\":\"ESP32\"\
+    }";
+    // "{\"cmd\":3,\"dev_detail\":[{\"dev_type\":8,\"dev_name\":\"BME 280\",\"id_room\":\"\",\"id_item\":12,\"gpio_sda\":21,\"gpio_scl\":22,\"pullup_scl\":true,\"pullup_sda\":true,\"slave_addr\":118},{\"dev_type\":8,\"dev_name\":\"TSL2561_luminosity\",\"id_room\":\"\",\"id_item\":44,\"gpio_sda\":21,\"gpio_scl\":22,\"slave_addr\":57}],\"config_id\":\"1234567\",\"config_time\":1696508363,\"config_name\":\"My moisture sensor\",\"chipset\":\"ESP32\"}";
+    // static const char * ezlopi_config_test = "{\"config_id\":1260701997,\"config_time\":1722516114,\"config_name\":\"Washing Machine Leak \",\"cmd\":4,\"dev_total\":2,\"dev_detail\":[{\"dev_type\":3,\"dev_name\":\"Washing Machine Leak Detector\",\"id_item\":27,\"id_room\":\"\",\"resln_bit\":10,\"gpio\":32,\"id\":\"83cd1aae-0a76-bf7e-1475-863ea1464607\",\"devType\":\"Analog Input\",\"device_id\":\"10e52000\"},{\"dev_type\":1,\"id_item\":2,\"dev_name\":\"Washing Machine Leak Buzzer\",\"gpio_in\":\"\",\"gpio_out\":2,\"pullup_ip\":false,\"pullup_op\":true,\"is_ip\":false,\"ip_inv\":false,\"op_inv\":false,\"val_ip\":false,\"val_op\":false,\"id\":\"bc44fa36-f5a5-1f80-54aa-f564210faf55\",\"devType\":\"Digital Output\",\"device_id\":\"10e52001\"}],\"chipset\":\"ESP32\"}";
+    #elif defined(CONFIG_IDF_TARGET_ESP32S3)
+    static const char *ezlopi_config_test =
+        "{\
+        \"cmd\":3,\
+        \"dev_detail\":[\
+            {\
+            \"dev_type\":5,\
+            \"dev_name\":\"Dimmer\",\
+            \"id_room\":\"\",\
+            \"id_item\":22,\
+            \"gpio\":18,\
+            \"pwm_resln\":3,\
+            \"freq_hz\":50,\
+            \"duty_cycle\":0\
+            },\
+            {\
+                \"dev_type\":1,\
+                \"dev_name\":\"switch_temp\",\
+                \"id_room\":\"\",\
+                \"id_item\":2,\
+                \"gpio_in\":0,\
+                \"gpio_out\":25,\
+                \"pullup_ip\":false,\
+                \"pullup_op\":false,\
+                \"is_ip\":false,\
+                \"ip_inv\":false,\
+                \"op_inv\":false,\
+                \"val_ip\":false,\
+                \"val_op\":false\
+            },\
+            {\
+                \"dev_type\":1,\
+                \"dev_name\":\"Bulb\",\
+                \"id_room\":\"\",\
+                \"id_item\":1,\
+                \"gpio_in\":\"\",\
+                \"gpio_out\":22,\
+                \"pullup_ip\":false,\
+                \"pullup_op\":false,\
+                \"is_ip\":false,\
+                \"ip_inv\":false,\
+                \"op_inv\":false,\
+                \"val_ip\":false,\
+                \"val_op\":false\
+            },\
+            {\
+                \"dev_type\":7,\
+                \"dev_name\":\"DHT22_temp_humi\",\
+                \"id_room\":\"\",\
+                \"id_item\":16,\
+                \"gpio\":21\
+            }\
+        ],\
+        \"config_id\":\"1234567\",\
+        \"config_time\":1696508363,\
+        \"config_name\":\"My moisture sensor\",\
+        \"chipset\":\"ESP32S3\"\
+    }";
+    #elif defined(CONFIG_IDF_TARGET_ESP32S2)
+    static const char *ezlopi_config_test = "{\"cmd\":3,\"dev_detail\":[{\"dev_type\":1,\"dev_name\":\"switch_temp\",\"id_room\":\"\",\"id_item\":2,\"gpio_in\":0,\"gpio_out\":2,\"pullup_ip\":false,\"pullup_op\":false,\"is_ip\":false,\"ip_inv\":false,\"op_inv\":false,\"val_ip\":false,\"val_op\":false},{\"dev_type\":1,\"dev_name\":\"Bulb\",\"id_room\":\"\",\"id_item\":1,\"gpio_in\":0,\"gpio_out\":3,\"pullup_ip\":false,\"pullup_op\":false,\"is_ip\":false,\"ip_inv\":false,\"op_inv\":false,\"val_ip\":false,\"val_op\":false},{\"dev_type\":7,\"dev_name\":\"DHT22_temp_humi\",\"id_room\":\"\",\"id_item\":16,\"gpio\":1}],\"config_id\":\"1234567\",\"config_time\":1696508363,\"config_name\":\"My moisture sensor\",\"chipset\":\"ESP32S2\"}";
+    #elif defined(CONFIG_IDF_TARGET_ESP32C3)
+    static const char *ezlopi_config_test = "{\"cmd\":3,\"dev_detail\":[],\"config_id\":\"1234567\",\"config_time\":1696508363,\"config_name\":\"My moisture sensor\",\"chipset\":\"ESP32C3\"}";
+    #endif
+    #endif
+
+    /*******************************************************************************
+     *                          Extern Function Prototypes
+     *******************************************************************************/
+    /**
+     * @brief Global function template example
+     * Convention : Use capital letter for initial word on extern function
+     * maincomponent : Main component as hal, core, service etc.
+     * subcomponent : Sub component as i2c from hal, ble from service etc
+     * functiontitle : Title of the function
+     * eg : EZPI_hal_i2c_init()
+     * @param arg
+     *
+     */
     uint32_t ezlopi_factory_info_v3_get_abs_address(uint32_t relative_offset, e_factory_info_v3_partition_type_t partition_type);
 
     void print_factory_info_v3(void);
@@ -169,137 +362,12 @@ extern "C"
 
     int EZPI_CORE_factory_info_prov_init(void);
 
-#if (EZLOPI_DEVICE_TYPE_GENERIC == EZLOPI_DEVICE_TYPE)
-
-#elif (EZLOPI_DEVICE_TYPE_TEST_DEVICE == EZLOPI_DEVICE_TYPE)
-#if defined(CONFIG_IDF_TARGET_ESP32)
-
-static const char *ezlopi_config_test =
-    "{\
-    \"cmd\":3,\
-    \"dev_detail\":[\
-        {\
-        \"dev_type\":5,\
-        \"dev_name\":\"Dimmer_riken\",\
-        \"id_room\":\"\",\
-        \"id_item\":22,\
-        \"gpio\":18,\
-        \"pwm_resln\":3,\
-        \"freq_hz\":50,\
-        \"duty_cycle\":0\
-        },\
-        {\
-            \"dev_type\":1,\
-            \"dev_name\":\"switch_temp_riken\",\
-            \"id_room\":\"\",\
-            \"id_item\":2,\
-            \"gpio_in\":0,\
-            \"gpio_out\":25,\
-            \"pullup_ip\":false,\
-            \"pullup_op\":false,\
-            \"is_ip\":false,\
-            \"ip_inv\":false,\
-            \"op_inv\":false,\
-            \"val_ip\":false,\
-            \"val_op\":false\
-        },\
-        {\
-            \"dev_type\":1,\
-            \"dev_name\":\"Bulb_riken\",\
-            \"id_room\":\"\",\
-            \"id_item\":1,\
-            \"gpio_in\":\"\",\
-            \"gpio_out\":22,\
-            \"pullup_ip\":false,\
-            \"pullup_op\":false,\
-            \"is_ip\":false,\
-            \"ip_inv\":false,\
-            \"op_inv\":false,\
-            \"val_ip\":false,\
-            \"val_op\":false\
-        },\
-        {\
-            \"dev_type\":7,\
-            \"dev_name\":\"DHT22_temp_humi_riken\",\
-            \"id_room\":\"\",\
-            \"id_item\":16,\
-            \"gpio\":21\
-        }\
-    ],\
-    \"config_id\":\"1234567\",\
-    \"config_time\":1696508363,\
-    \"config_name\":\"My moisture sensor\",\
-    \"chipset\":\"ESP32\"\
-}";
-// "{\"cmd\":3,\"dev_detail\":[{\"dev_type\":8,\"dev_name\":\"BME 280\",\"id_room\":\"\",\"id_item\":12,\"gpio_sda\":21,\"gpio_scl\":22,\"pullup_scl\":true,\"pullup_sda\":true,\"slave_addr\":118},{\"dev_type\":8,\"dev_name\":\"TSL2561_luminosity\",\"id_room\":\"\",\"id_item\":44,\"gpio_sda\":21,\"gpio_scl\":22,\"slave_addr\":57}],\"config_id\":\"1234567\",\"config_time\":1696508363,\"config_name\":\"My moisture sensor\",\"chipset\":\"ESP32\"}";
-// static const char * ezlopi_config_test = "{\"config_id\":1260701997,\"config_time\":1722516114,\"config_name\":\"Washing Machine Leak \",\"cmd\":4,\"dev_total\":2,\"dev_detail\":[{\"dev_type\":3,\"dev_name\":\"Washing Machine Leak Detector\",\"id_item\":27,\"id_room\":\"\",\"resln_bit\":10,\"gpio\":32,\"id\":\"83cd1aae-0a76-bf7e-1475-863ea1464607\",\"devType\":\"Analog Input\",\"device_id\":\"10e52000\"},{\"dev_type\":1,\"id_item\":2,\"dev_name\":\"Washing Machine Leak Buzzer\",\"gpio_in\":\"\",\"gpio_out\":2,\"pullup_ip\":false,\"pullup_op\":true,\"is_ip\":false,\"ip_inv\":false,\"op_inv\":false,\"val_ip\":false,\"val_op\":false,\"id\":\"bc44fa36-f5a5-1f80-54aa-f564210faf55\",\"devType\":\"Digital Output\",\"device_id\":\"10e52001\"}],\"chipset\":\"ESP32\"}";
-#elif defined(CONFIG_IDF_TARGET_ESP32S3)
-static const char *ezlopi_config_test =
-    "{\
-    \"cmd\":3,\
-    \"dev_detail\":[\
-        {\
-        \"dev_type\":5,\
-        \"dev_name\":\"Dimmer\",\
-        \"id_room\":\"\",\
-        \"id_item\":22,\
-        \"gpio\":18,\
-        \"pwm_resln\":3,\
-        \"freq_hz\":50,\
-        \"duty_cycle\":0\
-        },\
-        {\
-            \"dev_type\":1,\
-            \"dev_name\":\"switch_temp\",\
-            \"id_room\":\"\",\
-            \"id_item\":2,\
-            \"gpio_in\":0,\
-            \"gpio_out\":25,\
-            \"pullup_ip\":false,\
-            \"pullup_op\":false,\
-            \"is_ip\":false,\
-            \"ip_inv\":false,\
-            \"op_inv\":false,\
-            \"val_ip\":false,\
-            \"val_op\":false\
-        },\
-        {\
-            \"dev_type\":1,\
-            \"dev_name\":\"Bulb\",\
-            \"id_room\":\"\",\
-            \"id_item\":1,\
-            \"gpio_in\":\"\",\
-            \"gpio_out\":22,\
-            \"pullup_ip\":false,\
-            \"pullup_op\":false,\
-            \"is_ip\":false,\
-            \"ip_inv\":false,\
-            \"op_inv\":false,\
-            \"val_ip\":false,\
-            \"val_op\":false\
-        },\
-        {\
-            \"dev_type\":7,\
-            \"dev_name\":\"DHT22_temp_humi\",\
-            \"id_room\":\"\",\
-            \"id_item\":16,\
-            \"gpio\":21\
-        }\
-    ],\
-    \"config_id\":\"1234567\",\
-    \"config_time\":1696508363,\
-    \"config_name\":\"My moisture sensor\",\
-    \"chipset\":\"ESP32S3\"\
-}";
-#elif defined(CONFIG_IDF_TARGET_ESP32S2)
-static const char *ezlopi_config_test = "{\"cmd\":3,\"dev_detail\":[{\"dev_type\":1,\"dev_name\":\"switch_temp\",\"id_room\":\"\",\"id_item\":2,\"gpio_in\":0,\"gpio_out\":2,\"pullup_ip\":false,\"pullup_op\":false,\"is_ip\":false,\"ip_inv\":false,\"op_inv\":false,\"val_ip\":false,\"val_op\":false},{\"dev_type\":1,\"dev_name\":\"Bulb\",\"id_room\":\"\",\"id_item\":1,\"gpio_in\":0,\"gpio_out\":3,\"pullup_ip\":false,\"pullup_op\":false,\"is_ip\":false,\"ip_inv\":false,\"op_inv\":false,\"val_ip\":false,\"val_op\":false},{\"dev_type\":7,\"dev_name\":\"DHT22_temp_humi\",\"id_room\":\"\",\"id_item\":16,\"gpio\":1}],\"config_id\":\"1234567\",\"config_time\":1696508363,\"config_name\":\"My moisture sensor\",\"chipset\":\"ESP32S2\"}";
-#elif defined(CONFIG_IDF_TARGET_ESP32C3)
-static const char *ezlopi_config_test = "{\"cmd\":3,\"dev_detail\":[],\"config_id\":\"1234567\",\"config_time\":1696508363,\"config_name\":\"My moisture sensor\",\"chipset\":\"ESP32C3\"}";
-#endif
-#endif
-
 #ifdef __cplusplus
 }
 #endif
 
 #endif // _EZLOPI_CORE_FACTORY_INFO_H_
+
+/*******************************************************************************
+ *                          End of File
+ *******************************************************************************/

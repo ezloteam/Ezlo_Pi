@@ -2,8 +2,8 @@
 file(GLOB_RECURSE src_files "./*.c*")
 
 
-set(EZLOPI_CORE_COMPONENTS 
-        ezlopi-core-wifi 
+set(EZLOPI_CORE_COMPONENTS
+        ezlopi-core-wifi
         ezlopi-core-nvs
         ezlopi-core-factory-info
         ezlopi-core-net
@@ -16,21 +16,21 @@ set(EZLOPI_CORE_COMPONENTS
         ezlopi-core-log
         ezlopi-core-errors
 )
-set(EZLOPI_HAL_COMPONENTS 
+set(EZLOPI_HAL_COMPONENTS
         ezlopi-hal-sysinfo
 )
-set(EZLOPI_CLOUD_COMPONENTS 
+set(EZLOPI_CLOUD_COMPONENTS
         ezlopi-cloud-info
 )
 
-set(EZLOPI_SERVICE_COMPONENTS 
+set(EZLOPI_SERVICE_COMPONENTS
         ezlopi-service-ble
 )
 
 idf_component_register(SRCS "ezlopi_service_uart.c" "${src_files}"
     INCLUDE_DIRS "."
-    REQUIRES    tinyusb ${EZLOPI_CORE_COMPONENTS} 
+    REQUIRES    tinyusb ${EZLOPI_CORE_COMPONENTS}
                 ${EZLOPI_HAL_COMPONENTS}
-                ${EZLOPI_CLOUD_COMPONENTS} 
+                ${EZLOPI_CLOUD_COMPONENTS}
                 ${EZLOPI_SERVICE_COMPONENTS}
 )

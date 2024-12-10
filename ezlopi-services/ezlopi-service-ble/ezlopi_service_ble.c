@@ -1,4 +1,45 @@
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
 
+/**
+ * @file    main.c
+ * @brief   perform some function on data
+ * @author  John Doe
+ * @version 0.1
+ * @date    1st January 2024
+ */
+
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_BLE_ENABLE
@@ -32,22 +73,53 @@
 
 #include "ezlopi_service_ble.h"
 
+/*******************************************************************************
+ *                          Extern Data Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Declarations
+ *******************************************************************************/
 extern void ezlopi_ble_service_security_init(void);
 extern void ezlopi_ble_service_wifi_profile_init(void);
 extern void ezlopi_ble_service_provisioning_init(void);
 extern void ezlopi_ble_service_device_info_init(void);
 extern void ezlopi_ble_service_dynamic_config_init(void);
 
+/*******************************************************************************
+ *                          Type & Macro Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static void ezlopi_ble_basic_init(void);
 
-#if (1 == CONFIG_EZPI_BLE_ENALBE_PASSKEY)
+#if (1 == CONFIG_EZPI_BLE_ENABLE_PASSKEY)
 static void ezlopi_ble_start_secure_gatt_server(void);
 #endif
 
-#if (1 == CONFIG_EZPI_BLE_ENALBE_PAIRING)
+#if (1 == CONFIG_EZPI_BLE_ENABLE_PAIRING)
 static void ezlopi_ble_start_secure_gatt_server_open_pairing(void);
 #endif
 
+/*******************************************************************************
+ *                          Static Data Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Data Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Definitions
+ *******************************************************************************/
+
+/**
+ * @brief Global/extern function template example
+ * Convention : Use capital letter for initial word on extern function
+ * @param arg
+ */
 void ezlopi_ble_service_init(void)
 {
     ezlopi_ble_service_wifi_profile_init();
@@ -67,44 +139,29 @@ void ezlopi_ble_service_init(void)
 
     CHECK_PRINT_ERROR(esp_ble_gatt_set_local_mtu(517), "set local  MTU failed");
 
-#if (1 == CONFIG_EZPI_BLE_ENALBE_PAIRING)
-#if (1 == CONFIG_EZPI_BLE_ENALBE_PASSKEY)
+#if (1 == CONFIG_EZPI_BLE_ENABLE_PAIRING)
+#if (1 == CONFIG_EZPI_BLE_ENABLE_PASSKEY)
     ezlopi_ble_start_secure_gatt_server();
 #else
     ezlopi_ble_start_secure_gatt_server_open_pairing();
-#endif // 1 == CONFIG_EZPI_BLE_ENALBE_PASSKEY
-#endif // 1 == CONFIG_EZPI_BLE_ENALBE_PAIRING
+#endif // 1 == CONFIG_EZPI_BLE_ENABLE_PASSKEY
+#endif // 1 == CONFIG_EZPI_BLE_ENABLE_PAIRING
 }
 
-
-#if (1 == CONFIG_EZPI_BLE_ENALBE_PAIRING)
-static void ezlopi_ble_start_secure_gatt_server_open_pairing(void)
+int ezlopi_ble_service_get_ble_mac(uint8_t mac[6])
 {
-    const esp_ble_auth_req_t auth_req = ESP_LE_AUTH_REQ_SC_MITM_BOND;
-    // ESP_LE_AUTH_REQ_SC_MITM_BOND;
-    // ESP_LE_AUTH_REQ_BOND_MITM;
-    const esp_ble_io_cap_t iocap = ESP_IO_CAP_NONE; // ESP_IO_CAP_OUT;
-    const uint8_t auth_option = ESP_BLE_ONLY_ACCEPT_SPECIFIED_AUTH_DISABLE;
-    const uint8_t oob_support = ESP_BLE_OOB_DISABLE; // ESP_BLE_OOB_ENABLE; // ESP_BLE_OOB_DISABLE;
-    const uint8_t init_key = (ESP_BLE_ENC_KEY_MASK | ESP_BLE_ID_KEY_MASK);
-    const uint8_t rsp_key = (ESP_BLE_ENC_KEY_MASK | ESP_BLE_ID_KEY_MASK);
-
-    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_AUTHEN_REQ_MODE, (void*)&auth_req, sizeof(uint8_t)),
-        "failed -set - ESP_BLE_SM_AUTHEN_REQ_MODE");
-    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_IOCAP_MODE, (void*)&iocap, sizeof(uint8_t)),
-        "failed -set - ESP_BLE_SM_IOCAP_MODE");
-    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_ONLY_ACCEPT_SPECIFIED_SEC_AUTH, (void*)&auth_option, sizeof(uint8_t)),
-        "failed -set - ESP_BLE_SM_ONLY_ACCEPT_SPECIFIED_SEC_AUTH");
-    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_OOB_SUPPORT, (void*)&oob_support, sizeof(uint8_t)),
-        "failed -set - ESP_BLE_SM_OOB_SUPPORT");
-    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_SET_INIT_KEY, (void*)&init_key, sizeof(uint8_t)),
-        "failed -set - ESP_BLE_SM_SET_INIT_KEY");
-    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_SET_RSP_KEY, (void*)&rsp_key, sizeof(uint8_t)),
-        "failed -set - ESP_BLE_SM_SET_RSP_KEY");
+    int ret = 0;
+    if (ESP_OK == esp_read_mac(mac, ESP_MAC_BT))
+    {
+        ret = 1;
+    }
+    return ret;
 }
-#endif
 
-#if (1 == CONFIG_EZPI_BLE_ENALBE_PASSKEY)
+/*******************************************************************************
+ *                          Static Function Definitions
+ *******************************************************************************/
+#if (1 == CONFIG_EZPI_BLE_ENABLE_PASSKEY)
 static void ezlopi_ble_start_secure_gatt_server(void)
 {
     const uint32_t default_passkey = 123456;
@@ -176,13 +233,35 @@ static void ezlopi_ble_basic_init(void)
     CHECK_PRINT_ERROR(esp_ble_gap_set_device_name(ble_device_name), "Set device name failed!");
 }
 
-int ezlopi_ble_service_get_ble_mac(uint8_t mac[6])
+#if (1 == CONFIG_EZPI_BLE_ENABLE_PAIRING)
+static void ezlopi_ble_start_secure_gatt_server_open_pairing(void)
 {
-    int ret = 0;
-    if (ESP_OK == esp_read_mac(mac, ESP_MAC_BT))
-    {
-        ret = 1;
-    }
-    return ret;
+    const esp_ble_auth_req_t auth_req = ESP_LE_AUTH_REQ_SC_MITM_BOND;
+    // ESP_LE_AUTH_REQ_SC_MITM_BOND;
+    // ESP_LE_AUTH_REQ_BOND_MITM;
+    const esp_ble_io_cap_t iocap = ESP_IO_CAP_NONE; // ESP_IO_CAP_OUT;
+    const uint8_t auth_option = ESP_BLE_ONLY_ACCEPT_SPECIFIED_AUTH_DISABLE;
+    const uint8_t oob_support = ESP_BLE_OOB_DISABLE; // ESP_BLE_OOB_ENABLE; // ESP_BLE_OOB_DISABLE;
+    const uint8_t init_key = (ESP_BLE_ENC_KEY_MASK | ESP_BLE_ID_KEY_MASK);
+    const uint8_t rsp_key = (ESP_BLE_ENC_KEY_MASK | ESP_BLE_ID_KEY_MASK);
+
+    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_AUTHEN_REQ_MODE, (void*)&auth_req, sizeof(uint8_t)),
+        "failed -set - ESP_BLE_SM_AUTHEN_REQ_MODE");
+    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_IOCAP_MODE, (void*)&iocap, sizeof(uint8_t)),
+        "failed -set - ESP_BLE_SM_IOCAP_MODE");
+    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_ONLY_ACCEPT_SPECIFIED_SEC_AUTH, (void*)&auth_option, sizeof(uint8_t)),
+        "failed -set - ESP_BLE_SM_ONLY_ACCEPT_SPECIFIED_SEC_AUTH");
+    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_OOB_SUPPORT, (void*)&oob_support, sizeof(uint8_t)),
+        "failed -set - ESP_BLE_SM_OOB_SUPPORT");
+    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_SET_INIT_KEY, (void*)&init_key, sizeof(uint8_t)),
+        "failed -set - ESP_BLE_SM_SET_INIT_KEY");
+    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_SET_RSP_KEY, (void*)&rsp_key, sizeof(uint8_t)),
+        "failed -set - ESP_BLE_SM_SET_RSP_KEY");
 }
+#endif
+
 #endif // CONFIG_EZPI_BLE_ENABLE
+
+/*******************************************************************************
+ *                          End of File
+ *******************************************************************************/

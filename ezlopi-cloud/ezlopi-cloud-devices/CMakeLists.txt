@@ -1,10 +1,10 @@
 file(GLOB_RECURSE src_files "*.c")
 idf_component_register(SRCS  "${src_files}"
     INCLUDE_DIRS "."
-    REQUIRES    cjext 
-                mbedtls 
-                ezlopi-core-factory-info 
-                ezlopi-util-trace  
-                ezlopi-core-devices 
+    REQUIRES    cjext
+                mbedtls
+                ezlopi-core-factory-info
+                ezlopi-util-trace
+                ezlopi-core-devices
                 ezlopi-cloud-constants
 )

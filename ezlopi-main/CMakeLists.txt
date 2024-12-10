@@ -17,7 +17,7 @@ set(EZLOPI_COMPONENTS
 )
 
 # Define core components
-set(EZLOPI_CORE_COMPONENTS 
+set(EZLOPI_CORE_COMPONENTS
         ezlopi-core-ezlopi
         ezlopi-core-processes
         ezlopi-core-reset
@@ -25,17 +25,17 @@ set(EZLOPI_CORE_COMPONENTS
 )
 
 # Define HAL components
-set(EZLOPI_HAL_COMPONENTS 
+set(EZLOPI_HAL_COMPONENTS
 
 )
 
 # Define cloud components
-set(EZLOPI_CLOUD_COMPONENTS 
+set(EZLOPI_CLOUD_COMPONENTS
 
 )
 
 # Define sensor device components
-set(EZLOPI_SENSOR_DEVICE_COMPONENTS 
+set(EZLOPI_SENSOR_DEVICE_COMPONENTS
         # Add other sensor device components here
 )
 
@@ -62,6 +62,6 @@ idf_component_register(SRCS "ezlopi_main.c" "${config_src}"
                                         ${EZLOPI_CORE_COMPONENTS}
                                         ${EZLOPI_HAL_COMPONENTS}
                                         ${EZLOPI_CLOUD_COMPONENTS}
-                                        ${EZLOPI_SENSOR_DEVICE_COMPONENTS}               
-                                        ${EZLOPI_SERVICES} 
+                                        ${EZLOPI_SENSOR_DEVICE_COMPONENTS}
+                                        ${EZLOPI_SERVICES}
 )

@@ -1,9 +1,71 @@
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+
+/**
+ * @file    main.c
+ * @brief   perform some function on data
+ * @author  John Doe
+ * @version 0.1
+ * @date    1st January 2024
+ */
+
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 #include <esp_system.h>
 
 #include "ezlopi_core_cloud.h"
 
 #define CRC16_POLY 0x4460
 
+/*******************************************************************************
+ *                          Extern Data Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Type & Macro Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Static Function Prototypes
+ *******************************************************************************/
+static uint32_t ezlopi_get_mac_crc(void);
+
+/*******************************************************************************
+ *                          Static Data Definitions
+ *******************************************************************************/
 const uint32_t DEVICE_ID_START = 0x10000000;
 const uint32_t ITEM_ID_START = 0x20000000;
 const uint32_t ROOM_ID_START = 0x30000000;
@@ -16,7 +78,6 @@ const uint32_t SCENE_GROUP_ID_START = 0xA0000000;
 const uint32_t SCENE_WHEN_BLOCKID_START = 0xB0000000;
 const uint32_t DEVICE_GROUPID_START = 0xC0000000;
 const uint32_t ITEM_GROUPID_START = 0xD0000000;
-
 
 static uint32_t g_device_id = 0;
 static uint32_t g_item_id = 0;
@@ -31,33 +92,19 @@ static uint32_t g_scene_when_blockId = 0;
 static uint32_t g_device_group_id = 0;
 static uint32_t g_item_group_id = 0;
 
-static uint32_t ezlopi_get_mac_crc(void)
-{
-    uint32_t crc = 0;
-    uint8_t mac_base[6] = { 0 };
-    esp_efuse_mac_get_default((uint8_t*)mac_base);
+/*******************************************************************************
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
-    // Perform CRC calculation on each byte of the MAC address
-    for (int i = 0; i < 6; i++)
-    {
-        crc ^= ((uint16_t)mac_base[i]) << 8;
+/*******************************************************************************
+ *                          Extern Function Definitions
+ *******************************************************************************/
 
-        for (int j = 0; j < 8; j++)
-        {
-            if (crc & 0x8000)
-            {
-                crc = (crc << 1) ^ CRC16_POLY;
-            }
-            else
-            {
-                crc <<= 1;
-            }
-        }
-    }
-
-    return (crc << 8) & 0x00FFFF00;
-}
-
+/**
+ * @brief Global/extern function template example
+ * Convention : Use capital letter for initial word on extern function
+ * @param arg
+ */
 void ezlopi_cloud_update_device_id(uint32_t device_id)
 {
     g_device_id = (device_id > g_device_id) ? device_id : g_device_id;
@@ -203,3 +250,37 @@ void ezlopi_cloud_update_item_group_id(uint32_t a_item_group_id)
 {
     g_item_group_id = (a_item_group_id > g_item_group_id) ? a_item_group_id : g_item_group_id;
 }
+
+/*******************************************************************************
+ *                          Static Function Definitions
+ *******************************************************************************/
+static uint32_t ezlopi_get_mac_crc(void)
+{
+    uint32_t crc = 0;
+    uint8_t mac_base[6] = { 0 };
+    esp_efuse_mac_get_default((uint8_t*)mac_base);
+
+    // Perform CRC calculation on each byte of the MAC address
+    for (int i = 0; i < 6; i++)
+    {
+        crc ^= ((uint16_t)mac_base[i]) << 8;
+
+        for (int j = 0; j < 8; j++)
+        {
+            if (crc & 0x8000)
+            {
+                crc = (crc << 1) ^ CRC16_POLY;
+            }
+            else
+            {
+                crc <<= 1;
+            }
+        }
+    }
+
+    return (crc << 8) & 0x00FFFF00;
+}
+
+/*******************************************************************************
+ *                          End of File
+ *******************************************************************************/

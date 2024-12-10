@@ -70,7 +70,7 @@ typedef struct
 #define static_strlen(string_literal) (sizeof(string_literal) - 1)
 static error global_error = {NULL, 0};
 
-#if 0 // Not used function 
+#if 0 // Not used function
 static void __print_cj_object(cJSON * cj_obj)
 {
 #warning "DO NOT USE printf ON PRODUCTION"

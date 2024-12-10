@@ -6,7 +6,7 @@ idf_component_register(SRCS "ezlopi_cloud_setting_commands.c"
                                     cjext
 
                                     ezlopi-cloud-constants
-                                    
+
                                     ezlopi-core-setting-commands
 )
 

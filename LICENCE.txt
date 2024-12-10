@@ -5,8 +5,8 @@ BY DOWNLOADING, INSTALLING, ACCESSING OR USING THE SOFTWARE, YOU ACKNOWLEDGE   T
 THIS AGREEMENT CONTAINS A BINDING ARBITRATION PROVISION THAT REQUIRES THE RESOLUTION OF DISPUTES ON AN INDIVIDUAL BASIS, LIMITS YOUR ABILITY TO SEEK RELIEF IN A COURT OF LAW, AND WAIVES YOUR RIGHT TO PARTICIPATE IN CLASS ACTIONS, CLASS ARBITRATIONS, OR A JURY TRIAL FOR CERTAIN DISPUTES.
 
 If you are receiving the software on behalf of a legal entity, you represent and warrant that you have
-the actual authority to agree to the terms and conditions of this agreement on behalf of such entity. 
- 
+the actual authority to agree to the terms and conditions of this agreement on behalf of such entity.
+
 This Agreement is between you (“You”) and Ezlo Innovation, Inc., which has its principal place of business at 1255 Broad Street, Suite 100, Clifton, New Jersey 07013, and shall be referred to herein as “Ezlo” or “Licensor.”
 
 In exchange for your use of the Software, you agree as follows:
@@ -14,13 +14,13 @@ In exchange for your use of the Software, you agree as follows:
 
 1.1	Subject to the terms and conditions of this Section 1, Licensor hereby grants to You a non-exclusive, royalty-free, worldwide, non-transferable license during the term of this Agreement to:
 
-(a)	distribute or make available the Software or your modifications under the terms of this Agreement without charge, and only as part of your free application, so long as you include the following notice on any copy you distribute: “This software is subject to the terms of the "Ezlo Available Source License Agreement.”    
+(a)	distribute or make available the Software or your modifications under the terms of this Agreement without charge, and only as part of your free application, so long as you include the following notice on any copy you distribute: “This software is subject to the terms of the "Ezlo Available Source License Agreement.”
 
-(b)	use the Software or your modifications without charge and only as part of your free application, but not in connection with any product that is distributed or otherwise made available by any third party.  
+(b)	use the Software or your modifications without charge and only as part of your free application, but not in connection with any product that is distributed or otherwise made available by any third party.
 
 (c)	modify the Software, provided that all modifications remain subject to the terms of this License.
 
-(d)	reproduce the Software as necessary for the above. 
+(d)	reproduce the Software as necessary for the above.
 
 (e)	the above terms are conditional on You not charging any fees for the Software, modifications or any application which uses the Software or a modification thereof.  Any attempt at charging or collecting fees from the Software, modifications, or applications automatically terminates the License with all rights reverting back to Ezlo.
 
@@ -32,22 +32,22 @@ In exchange for your use of the Software, you agree as follows:
 
 # 2.	Ownership
 
-2.1	No Ownership Rights.  The Software is being licensed, not sold.  Ezlo retains all ownership rights in and to all Software, including any intellectual property rights therein.  
+2.1	No Ownership Rights.  The Software is being licensed, not sold.  Ezlo retains all ownership rights in and to all Software, including any intellectual property rights therein.
 
 2.2	Copyright.  The Software contains material that is protected by United States and foreign intellectual property laws, including copyright, trade secret, and patent law.  All rights not granted to you herein are expressly reserved by Ezlo. You may not remove any copyright or other proprietary notice from the Software.
 
-2.3	Updates.  Ezlo is under no obligation to provide update, support or patches for the Software.  
+2.3	Updates.  Ezlo is under no obligation to provide update, support or patches for the Software.
 
 # 3.	Termination
 
-3.1	Term.  This agreement is effective until terminated by you or by Ezlo. Any breach any of the terms, obligations, and conditions herein by You under this Agreement, terminates this Agreement automatically and the licenses granted herein will terminate automatically. 
+3.1	Term.  This agreement is effective until terminated by you or by Ezlo. Any breach any of the terms, obligations, and conditions herein by You under this Agreement, terminates this Agreement automatically and the licenses granted herein will terminate automatically.
 
-Termination by You.  You may terminate this agreement at any time by removing all copies of the software in your possession or under your control. 
+Termination by You.  You may terminate this agreement at any time by removing all copies of the software in your possession or under your control.
 
- 
+
 # 4.	Disclaimers and Limitation of Liability
- 
-4.1	Guarantee Disclaimer; Assumption of Risk.  EXCEPT AS SPECIFICALLY STATED OTHERWISE IN THIS AGREEMENT, EZLO INNOVATION EXPRESSLY DISCLAIMS ALL IMPLIED AND EXPRESS WARRANTIES IN THE SOFTWARE.  THIS DISCLAIMER INCLUDES ALL WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT AND IS EFFECTIVE TO THE MAXIMUM EXTENT ALLOWED BY LAW.  EZLO INNOVATION DOES NOT GUARANTEE THAT 1) THE SOFTWARE WILL MEET YOUR REQUIREMENTS OR EXPECTATIONS OR 2) THAT ACCESS TO THE SOFTWARE WILL BE UNINTERRUPTED, TIMELY, SECURE, OR ERROR-FREE.  The SOFTWARE IS PROVIDED “AS IS."  
+
+4.1	Guarantee Disclaimer; Assumption of Risk.  EXCEPT AS SPECIFICALLY STATED OTHERWISE IN THIS AGREEMENT, EZLO INNOVATION EXPRESSLY DISCLAIMS ALL IMPLIED AND EXPRESS WARRANTIES IN THE SOFTWARE.  THIS DISCLAIMER INCLUDES ALL WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT AND IS EFFECTIVE TO THE MAXIMUM EXTENT ALLOWED BY LAW.  EZLO INNOVATION DOES NOT GUARANTEE THAT 1) THE SOFTWARE WILL MEET YOUR REQUIREMENTS OR EXPECTATIONS OR 2) THAT ACCESS TO THE SOFTWARE WILL BE UNINTERRUPTED, TIMELY, SECURE, OR ERROR-FREE.  The SOFTWARE IS PROVIDED “AS IS."
 
 EZLO INNOVATION HAS NO LIABILITY OR RESPONSIBILITY FOR ANY PRE-EXISTING CONDITION ON YOUR COMPUTERS, DEVICES OR SYSTEMS, INCLUDING FAILURE TO CURE, DETECT OR REMEDY THE CONDITION AFTER INSTALLATION AND USE OF THE SOFTWARE.
 

@@ -2,7 +2,7 @@
 
 file(GLOB_RECURSE config_src "*.c")
 
-set(ESP_IDF_COMPONENTS 
+set(ESP_IDF_COMPONENTS
 )
 
 set(EZPI_COMPONENTS

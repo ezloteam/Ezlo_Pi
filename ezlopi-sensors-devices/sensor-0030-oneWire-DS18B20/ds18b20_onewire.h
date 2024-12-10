@@ -1,6 +1,3 @@
-
-
-
 // Reference for onewire: https://www.analog.com/en/technical-articles/1wire-communication-through-software.html
 
 
@@ -42,4 +39,3 @@ esp_err_t one_wire_read_byte_from_line(uint8_t* data, uint32_t gpio_pin);
 bool one_wire_reset_line(uint32_t gpio_pin);
 
 #endif // _DS18B20_ONEWIRE_H_
-
