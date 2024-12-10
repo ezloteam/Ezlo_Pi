@@ -100,7 +100,7 @@ void app_main(void)
 
     ezlopi_wait_for_wifi_to_connect(portMAX_DELAY);
 #if defined(CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER) || defined(CONFIG_EZPI_WEBSOCKET_CLIENT)
-    ezlopi_service_broadcast_init();
+    EZPI_service_broadcast_init();
 #endif
 
 #if defined(CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER)

@@ -51,7 +51,7 @@ extern "C"
      *  - Initializes the broadcast loop
      *
      */
-    void ezlopi_service_broadcast_init(void);
+    void EZPI_service_broadcast_init(void);
 
 #ifdef __cplusplus
 }

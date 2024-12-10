@@ -55,31 +55,31 @@
  *                          Static Function Prototypes
  *******************************************************************************/
 /**
- * @brief Broadcast loop that 
- * 
- * @param[in] arg Loop argument 
+ * @brief Broadcast loop that
+ *
+ * @param[in] arg Loop argument
  */
 static void __broadcast_loop(void *arg);
 /**
  * @brief Sends data to the broadcast queue which will be sent to the cloud
- * 
+ *
  * @param[in] cj_broadcast_data JSON object that contains data to broadcast
- * @return ezlopi_error_t 
+ * @return ezlopi_error_t
  * @retval EZPI_SUCCESS on success, or EZPI_FAILED on error
  */
-static ezlopi_error_t ezlopi_service_broadcast_send_to_queue(cJSON *cj_broadcast_data);
+static ezlopi_error_t ezpi_service_broadcast_send_to_queue(cJSON *cj_broadcast_data);
 
 /*******************************************************************************
  *                          Static Data Definitions
  *******************************************************************************/
 static QueueHandle_t __broadcast_queue = NULL;
 
-void ezlopi_service_broadcast_init(void)
+void EZPI_service_broadcast_init(void)
 {
     __broadcast_queue = xQueueCreate(10, sizeof(cJSON *));
     if (__broadcast_queue)
     {
-        ezlopi_core_broadcast_methods_set_queue(ezlopi_service_broadcast_send_to_queue);
+        ezlopi_core_broadcast_methods_set_queue(ezpi_service_broadcast_send_to_queue);
         ezlopi_service_loop_add("broadcast-loop", __broadcast_loop, 1, NULL);
     }
 }
@@ -109,7 +109,7 @@ static void __broadcast_loop(void *arg)
     vTaskDelay(1);
 }
 
-static ezlopi_error_t ezlopi_service_broadcast_send_to_queue(cJSON *cj_broadcast_data)
+static ezlopi_error_t ezpi_service_broadcast_send_to_queue(cJSON *cj_broadcast_data)
 {
     ezlopi_error_t ret = EZPI_FAILED;
 
