@@ -62,13 +62,13 @@ ezlopi_error_t ezlopi_core_scene_edit_update_id(uint32_t scene_id, cJSON *cj_upd
             if (scene_id == scene_node->_id)
             {
                 CJSON_TRACE("cj_updated_scene", cj_updated_scene);
-                ezlopi_meshobot_service_stop_scene(scene_node);
+                EZPI_meshobot_service_stop_scene(scene_node);
                 _edit_scene(scene_node, cj_updated_scene);
 
                 // TRACE_S("HERE : scene_node->enabled = [%s]", (scene_node->enabled) ? "true" : "false");
                 if (scene_node->enabled == true)
                 {
-                    ezlopi_meshbot_service_start_scene(scene_node);
+                    EZPI_meshbot_service_start_scene(scene_node);
                 }
                 ret = EZPI_SUCCESS;
 

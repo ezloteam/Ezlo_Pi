@@ -46,7 +46,7 @@ void scenes_create(cJSON *cj_request, cJSON *cj_response)
             ezlopi_scenes_new_scene_populate(cj_params, new_scene_id);
 
             // Trigger new-scene to 'start'
-            ezlopi_meshbot_service_start_scene(ezlopi_scenes_get_by_id_v2(new_scene_id));
+            EZPI_meshbot_service_start_scene(ezlopi_scenes_get_by_id_v2(new_scene_id));
         }
     }
 }
@@ -142,7 +142,7 @@ void scenes_run(cJSON *cj_request, cJSON *cj_response)
         if (cj_scene_id && cj_scene_id->valuestring)
         {
             uint32_t u32_scene_id = strtoul(cj_scene_id->valuestring, NULL, 16);
-            ezlopi_scenes_service_run_by_id(u32_scene_id);
+            EZPI_scenes_service_run_by_id(u32_scene_id);
         }
     }
 }
@@ -191,11 +191,11 @@ void scenes_enable_set(cJSON *cj_request, cJSON *cj_response)
                     scene_node->enabled = enabled_flag;
                     if (false == scene_node->enabled)
                     {
-                        ezlopi_meshobot_service_stop_scene(scene_node);
+                        EZPI_meshobot_service_stop_scene(scene_node);
                     }
                     else if (true == scene_node->enabled)
                     {
-                        ezlopi_meshbot_service_start_scene(scene_node);
+                        EZPI_meshbot_service_start_scene(scene_node);
                     }
                 }
             }
@@ -625,7 +625,7 @@ void scenes_stop(cJSON *cj_request, cJSON *cj_response)
             {
 #warning "add support for thenGroup or elseGroups";
                 uint32_t u32_scene_id = strtoul(cj_scene_id->valuestring, NULL, 16);
-                ezlopi_meshbot_service_stop_for_scene_id(u32_scene_id);
+                EZPI_meshbot_service_stop_for_scene_id(u32_scene_id);
             }
         }
     }
@@ -704,7 +704,7 @@ void scenes_clone(cJSON *cj_request, cJSON *cj_response)
                                 cJSON_AddStringToObject(__FUNCTION__, cj_request, ezlopi__id_str, tmp_buff); // this is for (reply_broadcast)
                                 ezlopi_scenes_new_scene_populate(cj_dup_scene, new_scene_id);
                                 // Trigger new-scene to 'start'
-                                // ezlopi_meshbot_service_start_scene(ezlopi_scenes_get_by_id_v2(new_scene_id));
+                                // EZPI_meshbot_service_start_scene(ezlopi_scenes_get_by_id_v2(new_scene_id));
                             }
 
                             cJSON_Delete(__FUNCTION__, cj_dup_scene);
