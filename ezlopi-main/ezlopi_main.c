@@ -58,7 +58,7 @@ void app_main(void)
     __print_mac_address();
 
 #ifdef CONFIG_EZPI_ENABLE_LED_INDICATOR
-    ezlopi_service_led_indicator_init();
+    EZPI_service_led_indicator_init();
 #endif // CONFIG_EZPI_ENABLE_LED_INDICATOR
 
     gpio_install_isr_service(0);
