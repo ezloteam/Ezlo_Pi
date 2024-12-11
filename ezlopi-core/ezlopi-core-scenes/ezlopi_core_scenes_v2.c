@@ -500,7 +500,7 @@ ezlopi_error_t ezlopi_scenes_init_v2(void)
 
                             if (new_scene)
                             {
-                                cJSON *cj_new_scene = ezlopi_scenes_create_cjson_scene(new_scene);
+                                cJSON *cj_new_scene = EZLOPI_scenes_create_cjson_scene(new_scene);
                                 // CJSON_TRACE("new_scene", cj_new_scene);
                                 cJSON_Delete(__FUNCTION__, cj_new_scene);
                             }

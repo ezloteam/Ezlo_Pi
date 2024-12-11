@@ -126,14 +126,14 @@ typedef struct l_group_block_type
 
 typedef struct l_when_block_v2
 {
-    l_group_block_type_t *when_grp; //   if(!NULL) ------------> //  indicates the 'when-block' is 'group_type'.
-    bool block_enable;              //   actual -> '_enable'     //  flag that allows blocks to return 1;
-    uint32_t blockId;               //   actual -> '_ID'         //  The ID of a normal when-condition scene-block;
-    bool block_status_reset_once;   //   NOT-NVS parameter [don't populate ; since not needed] // just a dummy flag to trigger function reset.
-    cJSON *cj_block_meta;           //   Block metadata information. Intended to save data needed for user interfaces
-    e_scenes_block_type_v2_t block_type;
     s_block_options_v2_t block_options;
-    l_fields_v2_t *fields;
+    l_group_block_type_t *when_grp;         //   if(!NULL) ------------> //  indicates the 'when-block' is 'group_type'.
+    l_fields_v2_t *fields;                  //
+    cJSON *cj_block_meta;                   //   Block metadata information. Intended to save data needed for user interfaces
+    e_scenes_block_type_v2_t block_type;    //  
+    uint32_t blockId;                       //   actual -> '_ID'         //  The ID of a normal when-condition scene-block;
+    bool block_enable;                      //   actual -> '_enable'     //  flag that allows blocks to return 1;
+    bool block_status_reset_once;           //   NOT-NVS parameter [don't populate ; since not needed] // just a dummy flag to trigger function reset.
     struct l_when_block_v2 *next;
 } l_when_block_v2_t;
 
@@ -164,22 +164,21 @@ typedef struct l_scenes_list_v2
     e_scene_status_v2_t status;
     TaskHandle_t task_handle;
 
+    char name[32];
+    char parent_id[32];
+    void *thread_ctx;
+    cJSON *meta;
     uint32_t _id;
+    uint32_t group_id;
+    uint32_t executed_date;
     bool enabled;
     bool is_group;
-    uint32_t group_id;
-    char name[32];
-    cJSON *meta;
-    char parent_id[32];
-    uint32_t executed_date;
 
     l_user_notification_v2_t *user_notifications;
     l_house_modes_v2_t *house_modes;
     l_action_block_v2_t *then_block;
     l_when_block_v2_t *when_block;
     l_action_block_v2_t *else_block;
-
-    void *thread_ctx;
 
     struct l_scenes_list_v2 *next;
 } l_scenes_list_v2_t;
@@ -226,7 +225,7 @@ void ezlopi_scenes_notifications_add(cJSON *cj_notifications);
  * @param enable_status enable [true or false] -> [1 or 0]
  * @return successful reset => 1 / else => 0.
  */
-int ezlopi_core_scene_set_reset_latch_enable(const char* sceneId_str, const char* blockId_str, bool enable_status);
+int ezlopi_core_scene_set_reset_latch_enable(const char *sceneId_str, const char *blockId_str, bool enable_status);
 #endif
 
 // ----- # below function are for APIs # ---------

@@ -32,35 +32,34 @@ typedef enum e_ezlopi_item_grp_role_type
 
 typedef struct l_ezlopi_device_grp
 {
-    uint32_t _id;               // perticular device_group_id
-    char *name;             // device_group_name
     cJSON *categories;         // array containing required categories/sub-categories
     cJSON *devices;            // array containing DeviceIds to be added
     cJSON *exceptions;         // array of DeviceIds to exclude from this group
-    bool persistent;
-    e_ezlopi_device_grp_entrydelay_type_t entry_delay;
-    bool follow_entry;
-    e_ezlopi_device_grp_role_type_t role;
+    char *name;             // device_group_name
     char *package_id;
+    e_ezlopi_device_grp_entrydelay_type_t entry_delay;
+    e_ezlopi_device_grp_role_type_t role;
+    uint32_t _id;               // perticular device_group_id
+    bool persistent;
+    bool follow_entry;
     struct l_ezlopi_device_grp *next;
 }l_ezlopi_device_grp_t;
 
 typedef struct l_ezlopi_item_grp
 {
-    uint32_t _id;
+    cJSON *item_names;                 // array containing 'Item_names' as filters
+    cJSON *enum_values;                // array of strings ; used to filter specifice 'tokens' [from valueType -> token]
+    cJSON *info;                       // Description of an item group.
     char *name;
+    char *value_type;                // 'valueType' -> https://api.ezlo.com/hub/items_api/index.html, // ezlopi-cloud/constants/values_str.h 
+    char *value_type_family;          // [yes, if there is no valueType field] 'valueType_family' :- one of ["numeric" / "string" / "valuesWithLess" / "valuesWithoutLess"]
+    e_ezlopi_item_grp_role_type_t role; // default : empty
+    uint32_t _id;
     bool has_getter;
     bool has_setter;
     bool persistent;
-    cJSON *item_names;                 // array containing 'Item_names' as filters
-    char *value_type;                // 'valueType' -> https://api.ezlo.com/hub/items_api/index.html, // ezlopi-cloud/constants/values_str.h 
-    char *value_type_family;          // [yes, if there is no valueType field] 'valueType_family' :- one of ["numeric" / "string" / "valuesWithLess" / "valuesWithoutLess"]
-    cJSON *enum_values;                // array of strings ; used to filter specifice 'tokens' [from valueType -> token]
-    e_ezlopi_item_grp_role_type_t role; // default : empty
-    cJSON *info;                       // Description of an item group.
     struct l_ezlopi_item_grp *next;
 }l_ezlopi_item_grp_t;
-
 
 // ----------------------------------------------------
 

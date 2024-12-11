@@ -54,18 +54,16 @@ typedef struct s_exp_value
 
 typedef struct s_ezlopi_expressions
 {
-    uint32_t exp_id;
     char name[32];
+    s_exp_value_t exp_value;
+    cJSON *meta_data; // not used for now
     char *code;
     s_exp_items_t *items;
     s_exp_device_item_names_t *device_item_names;
-    cJSON *meta_data; // not used for now
-    bool variable;
-
-    s_exp_value_t exp_value;
     e_scene_value_type_v2_t value_type; // value type returned by expression
+    uint32_t exp_id;
     // e_exp_value_type_t exp_value_type;
-
+    bool variable;
     struct s_ezlopi_expressions *next;
 
 } s_ezlopi_expressions_t;

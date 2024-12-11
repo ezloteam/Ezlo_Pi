@@ -148,7 +148,7 @@ static void __add_block_options_and_fields_cjson(cJSON *cj_block, s_block_option
                 {
                     cJSON_AddStringToObject(__FUNCTION__, cj_args, fields_node->name, fields_node->name);
 
-                    cJSON *cj_field_obj = ezlopi_scene_cjson_get_field(fields_node);
+                    cJSON *cj_field_obj = EZLOPI_scene_cjson_get_field(fields_node);
                     if (!cJSON_AddItemToArray(cj_fields, cj_field_obj))
                     {
                         cJSON_Delete(__FUNCTION__, cj_field_obj);

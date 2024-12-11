@@ -52,13 +52,11 @@ typedef enum e_modes_alarm_status
 
 typedef struct s_house_modes // this resembles a category of 'mode'.
 {
+    const char *name;
+    char *description;
     uint32_t _id;                 // Numeric representation of the 'House-Mode'
     uint32_t switch_to_delay_sec; // represent a delay before switching to a perticular 'mode'.
     uint32_t alarm_delay_sec;     // Delay before sending alert if armed sensors (door/window or motion sensor) tripped .
-
-    const char *name;
-    char *description;
-
     bool armed;            // flag to indicate if the mode enters the alarmed mode. // Default values: [Home: false], [Away: true], [Night: true], [Vacation: true]
     bool protect;          // Enables or disables Ezlo Protect for a particular house mode. // Default values: [Home: false], [Away: true], [Night: true], [Vacation: true]
     bool disarmed_default; // if true ; utilize the disarmed devices.
