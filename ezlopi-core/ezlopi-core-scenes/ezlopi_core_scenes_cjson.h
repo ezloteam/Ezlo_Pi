@@ -56,7 +56,7 @@
 * 7. EzloPi Service specific eg ezlopi_service_ble
 * 8. EzloPi Sensors and Device Specific eg. ezlopi_device_0001_digitalout_generic
 */
-#include "cjext.h"
+// #include "cjext.h"
 #include "ezlopi_core_scenes_v2.h"
 
 /*******************************************************************************
@@ -78,16 +78,15 @@ extern "C"
     /*******************************************************************************
     *                          Extern Function Prototypes
     *******************************************************************************/
-    /**
-    * @brief Global function template example
-    * Convention : Use capital letter for initial word on extern function
-    * maincomponent : Main component as hal, core, service etc.
-    * subcomponent : Sub component as i2c from hal, ble from service etc
-    * functiontitle : EZLOPI_scene_cjson_get_field()
-    * @param arg
-    *
-    */
+
     cJSON *EZLOPI_scene_cjson_get_field(l_fields_v2_t *field_node);
+    /**
+     * @brief
+     *
+     * @param action_block
+     * @param block_type_str
+     * @return cJSON*
+     */
     cJSON *EZLOPI_scenes_cjson_create_action_block(l_action_block_v2_t *action_block, char *block_type_str);
     cJSON *EZLOPI_scenes_cjson_create_when_block(l_when_block_v2_t *when_block);
     cJSON *EZLOPI_scenes_create_cjson_scene(l_scenes_list_v2_t *scene);
