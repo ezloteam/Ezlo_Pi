@@ -146,7 +146,7 @@ static ezlopi_error_t __0061_init(l_ezlopi_item_t *item)
             if (ESP_OK == gpio_config(&input_conf))
             {
                 item->interface.gpio.gpio_in.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
-                ezlopi_service_gpioisr_register_v3(item, _0061_update_from_device, 200);
+                EZPI_service_gpioisr_register_v3(item, _0061_update_from_device, 200);
                 ret = EZPI_SUCCESS;
             }
         }
@@ -211,8 +211,8 @@ static void _0061_update_from_device(void *arg)
         item->interface.gpio.gpio_in.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
 
         item->interface.gpio.gpio_in.value = (false == item->interface.gpio.gpio_in.invert)
-            ? (item->interface.gpio.gpio_in.value)
-            : (!item->interface.gpio.gpio_in.value);
+                                                 ? (item->interface.gpio.gpio_in.value)
+                                                 : (!item->interface.gpio.gpio_in.value);
 
         if (0 == (item->interface.gpio.gpio_in.value)) // when D0 -> 0V,
         {

@@ -284,7 +284,6 @@ static void __setup_item_properties(l_ezlopi_item_t *item, cJSON *cjson_device)
     //     item->interface.gpio.gpio_in.interrupt = GPIO_INTR_DISABLE;
     // }
 
-
     item->interface.gpio.gpio_out.enable = true;
     CJSON_GET_VALUE_GPIO(cjson_device, ezlopi_gpio_out_str, item->interface.gpio.gpio_out.gpio_num);
     CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_op_inv_str, item->interface.gpio.gpio_out.invert);
@@ -432,7 +431,7 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
         TRACE_D("enabling interrup for pin: %d", item->interface.gpio.gpio_in.gpio_num);
 
         gpio_config(&io_conf);
-        ezlopi_service_gpioisr_register_v3(item, __interrupt_upcall, 1000);
+        EZPI_service_gpioisr_register_v3(item, __interrupt_upcall, 1000);
         error = EZPI_SUCCESS;
     }
 
@@ -459,7 +458,7 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
 
             if (0 == gpio_config(&io_conf))
             {
-                ezlopi_service_gpioisr_register_v3(item, __interrupt_upcall, 1000);
+                EZPI_service_gpioisr_register_v3(item, __interrupt_upcall, 1000);
                 error = EZPI_SUCCESS;
             }
             else
@@ -514,19 +513,23 @@ static ezlopi_error_t __set_value(l_ezlopi_item_t *item, void *arg)
             {
                 switch (cj_value->type)
                 {
-                case cJSON_False: {
+                case cJSON_False:
+                {
                     value = 0;
                     break;
                 }
-                case cJSON_True: {
+                case cJSON_True:
+                {
                     value = 1;
                     break;
                 }
-                case cJSON_Number: {
+                case cJSON_Number:
+                {
                     value = cj_value->valuedouble;
                     break;
                 }
-                default: {
+                default:
+                {
                     break;
                 }
                 }

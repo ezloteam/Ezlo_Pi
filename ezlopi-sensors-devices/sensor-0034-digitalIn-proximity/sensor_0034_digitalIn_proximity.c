@@ -130,7 +130,7 @@ static ezlopi_error_t proximity_sensor_init(l_ezlopi_item_t *item)
 
             if (ESP_OK == gpio_config(&io_conf))
             {
-                ezlopi_service_gpioisr_register_v3(item, proximity_sensor_value_updated_from_device, 200);
+                EZPI_service_gpioisr_register_v3(item, proximity_sensor_value_updated_from_device, 200);
                 item->interface.gpio.gpio_in.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
                 TRACE_I("Proximity sensor initialize successfully.");
                 ret = EZPI_SUCCESS;

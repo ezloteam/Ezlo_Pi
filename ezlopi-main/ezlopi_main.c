@@ -64,7 +64,7 @@ void app_main(void)
     gpio_install_isr_service(0);
 
     ezlopi_service_loop_init();
-    ezlopi_service_gpioisr_init(); // this is time critical, Do not add to loop
+    EZPI_service_gpioisr_init(); // this is time critical, Do not add to loop
 
     ezlopi_init();
 

@@ -95,7 +95,7 @@ static ezlopi_error_t sensor_pir_init_v3(l_ezlopi_item_t *item)
             {
                 TRACE_I("PIR sensor initialize successfully.");
                 item->interface.gpio.gpio_in.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
-                ezlopi_service_gpioisr_register_v3(item, sensor_pir_value_updated_from_device_v3, 200);
+                EZPI_service_gpioisr_register_v3(item, sensor_pir_value_updated_from_device_v3, 200);
             }
             else
             {
