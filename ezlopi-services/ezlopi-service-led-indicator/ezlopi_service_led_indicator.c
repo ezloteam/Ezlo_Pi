@@ -531,7 +531,7 @@ static int ezpi_indicator_led_init(void)
         {
             if (ESP_OK == (err = led_strip_flush(&indicator_led)))
             {
-                ezlopi_service_loop_add("indicator-loop", ezpi_indicator_LED_loop, 10, NULL);
+                EZPI_service_loop_add("indicator-loop", ezpi_indicator_LED_loop, 10, NULL);
                 ret = 1;
             }
         }
@@ -608,7 +608,7 @@ static int ezpi_indicator_led_init(void)
         if (ESP_OK == ledc_channel_config(&indicator_pwm_channel_cfg))
         {
             ret = 1;
-            ezlopi_service_loop_add("indicator-loop", ezpi_indicator_LED_loop, 1, NULL);
+            EZPI_service_loop_add("indicator-loop", ezpi_indicator_LED_loop, 1, NULL);
         }
     }
 

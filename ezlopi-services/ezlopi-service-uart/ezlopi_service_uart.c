@@ -1082,7 +1082,7 @@ void EZPI_SERV_cdc_init()
 
 void EZPI_SERV_uart_init(void)
 {
-    // ezlopi_service_loop_add("uart-loop", __uart_loop, 1, NULL);
+    // EZPI_service_loop_add("uart-loop", __uart_loop, 1, NULL);
 #if 1
     TaskHandle_t __uart_loop_handle = NULL;
     xTaskCreate(ezlopi_service_uart_task, "serv_uart_task", EZLOPI_SERVICE_UART_TASK_DEPTH, NULL, configMAX_PRIORITIES - 4, &__uart_loop_handle);

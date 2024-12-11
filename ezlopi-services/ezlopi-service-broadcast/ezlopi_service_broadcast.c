@@ -80,7 +80,7 @@ void EZPI_service_broadcast_init(void)
     if (__broadcast_queue)
     {
         ezlopi_core_broadcast_methods_set_queue(ezpi_service_broadcast_send_to_queue);
-        ezlopi_service_loop_add("broadcast-loop", __broadcast_loop, 1, NULL);
+        EZPI_service_loop_add("broadcast-loop", __broadcast_loop, 1, NULL);
     }
 }
 
