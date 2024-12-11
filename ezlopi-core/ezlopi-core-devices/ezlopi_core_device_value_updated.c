@@ -179,11 +179,11 @@ ezlopi_error_t ezlopi_core_device_value_update_wifi_scan_broadcast(cJSON* networ
             cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, method_hub_network_wifi_scan_progress);
             // cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_msg_id_str, ezlopi_service_web_provisioning_get_message_count());
 
-            cJSON* result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, "result");
+            cJSON* result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
             if (result)
             {
-                cJSON_AddStringToObject(__FUNCTION__, result, "interfaceId", "wlan0");
-                cJSON_AddStringToObject(__FUNCTION__, result, "status", "process");
+                cJSON_AddStringToObject(__FUNCTION__, result, ezlopi_interfaceId_str, ezlopi_wlan0_str);
+                cJSON_AddStringToObject(__FUNCTION__, result, ezlopi_status_str, "process");
                 cJSON_AddItemToObject(__FUNCTION__, result, "networks", network_array);
             }
 

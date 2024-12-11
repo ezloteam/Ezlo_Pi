@@ -289,8 +289,8 @@ static ezlopi_error_t __prepare(void *arg, void *user_arg)
         }
 
         if ((NULL == aqi_item) &&
-            (NULL == child_ens160_voc_device) &&
-            (NULL == child_ens160_co2_device))
+          (NULL == child_ens160_voc_device) &&
+          (NULL == child_ens160_co2_device))
         {
           ezlopi_device_free_device(parent_ens160_aqi_device);
           ezlopi_free(__FUNCTION__, ens160_sensor);

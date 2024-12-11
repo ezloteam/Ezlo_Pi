@@ -35,7 +35,7 @@ static s_loop_node_t *__create_node(const char *name, f_loop_t loop, uint32_t pe
 
 void ezlopi_service_loop_add(const char *name, f_loop_t loop, uint32_t period_ms, void *arg)
 {
-    if (loop && name) // adding to guard [check if 'loop' is already present]
+    if (loop && name)
     {
         if (__loop_head)
         {

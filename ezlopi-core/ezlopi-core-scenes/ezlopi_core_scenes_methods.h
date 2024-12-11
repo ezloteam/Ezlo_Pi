@@ -5,6 +5,17 @@
 
 #include <string.h>
 
+typedef enum e_scenes_method_category   
+{
+    METHOD_CATEGORY_NAN = 0,
+    METHOD_CATEGORY_WHEN_TIME,
+    METHOD_CATEGORY_WHEN_MODES,
+    METHOD_CATEGORY_WHEN_LOGIC,
+    METHOD_CATEGORY_WHEN_FUNCTION,
+    METHOD_CATEGORY_UNDEFINED,
+    METHOD_CATEGORY_MAX
+}e_scenes_method_category_t;
+
 typedef enum e_scene_method_type
 {
 #define EZLOPI_SCENE(method, name, func, category) EZLOPI_SCENE_##method,
@@ -15,7 +26,7 @@ typedef enum e_scene_method_type
 e_scene_method_type_t ezlopi_scenes_method_get_type_enum(char *method_name);
 const char *ezlopi_scene_get_scene_method_name(e_scene_method_type_t method_type);
 
-const char *ezlopi_scene_get_scene_method_category_name(char *method_name);
+e_scenes_method_category_t ezlopi_scene_get_scene_method_category_enum(char *method_name);
 
 /* then methods */
 

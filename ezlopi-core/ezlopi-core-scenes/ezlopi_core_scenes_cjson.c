@@ -292,7 +292,7 @@ static void ezlopi_scenes_cjson_add_when_group_info(cJSON *cj_when_block, l_when
         if ((when_block->when_grp) && (0 < strlen(when_block->when_grp->grp_blockName)))
         {
             __cjson_add_string(cj_when_block, ezlopi_blockName_str, when_block->when_grp->grp_blockName); // group_blockName
-            char tmp_str[16] = {0};
+            char tmp_str[16] = { 0 };
             snprintf(tmp_str, sizeof(tmp_str), "%08x", when_block->when_grp->grp_id);
             cJSON_AddBoolToObject(__FUNCTION__, cj_when_block, ezlopi_is_group_str, true); // is_group flag
             __cjson_add_string(cj_when_block, ezlopi_group_id_str, tmp_str);               // group_id
@@ -307,7 +307,7 @@ static void ezlopi_scenes_cjson_add_when_block_info(cJSON *cj_when_block, l_when
         if (0 < when_block->blockId)
         {
             cJSON_AddBoolToObject(__FUNCTION__, cj_when_block, ezlopi_block_enable_str, when_block->block_enable);
-            char tmp_str[16] = {0};
+            char tmp_str[16] = { 0 };
             snprintf(tmp_str, sizeof(tmp_str), "%08x", when_block->blockId);
             __cjson_add_string(cj_when_block, ezlopi_blockId_str, tmp_str);
         }
@@ -361,10 +361,10 @@ static void __cjson_add_action_delay(cJSON *cj_action_block, s_action_delay_v2_t
             cJSON *cj_action_delay = cJSON_AddObjectToObject(__FUNCTION__, cj_action_block, ezlopi_delay_str);
             if (cj_action_delay)
             {
-                cJSON_AddNumberToObject(__FUNCTION__, cj_action_delay, "days", action_delay->days);
-                cJSON_AddNumberToObject(__FUNCTION__, cj_action_delay, "hours", action_delay->hours);
-                cJSON_AddNumberToObject(__FUNCTION__, cj_action_delay, "minutes", action_delay->minutes);
-                cJSON_AddNumberToObject(__FUNCTION__, cj_action_delay, "seconds", action_delay->seconds);
+                cJSON_AddNumberToObject(__FUNCTION__, cj_action_delay, ezlopi_days_str, action_delay->days);
+                cJSON_AddNumberToObject(__FUNCTION__, cj_action_delay, ezlopi_hours_str, action_delay->hours);
+                cJSON_AddNumberToObject(__FUNCTION__, cj_action_delay, ezlopi_minutes_str, action_delay->minutes);
+                cJSON_AddNumberToObject(__FUNCTION__, cj_action_delay, ezlopi_seconds_str, action_delay->seconds);
             }
         }
     }
@@ -678,7 +678,7 @@ cJSON *ezlopi_scenes_create_cjson_scene(l_scenes_list_v2_t *scene)
         cj_scene = cJSON_CreateObject(__FUNCTION__);
         if (cj_scene)
         {
-            char tmp_str[16] = {0};
+            char tmp_str[16] = { 0 };
             snprintf(tmp_str, sizeof(tmp_str), "%08x", scene->_id);
             cJSON_AddStringToObject(__FUNCTION__, cj_scene, ezlopi__id_str, tmp_str);
             cJSON_AddBoolToObject(__FUNCTION__, cj_scene, ezlopi_enabled_str, scene->enabled);

@@ -65,7 +65,7 @@ ezlopi_error_t ezlopi_core_scene_edit_update_id(uint32_t scene_id, cJSON *cj_upd
                 ezlopi_meshobot_service_stop_scene(scene_node);
                 _edit_scene(scene_node, cj_updated_scene);
 
-                // TRACE_S("HERE : scene_node->enabled = [%s]", (scene_node->enabled) ? "true" : "false");
+                // TRACE_S("HERE : scene_node->enabled = [%s]", (scene_node->enabled) ? ezlopi_true_str : ezlopi_false_str);
                 if (scene_node->enabled == true)
                 {
                     ezlopi_meshbot_service_start_scene(scene_node);
@@ -92,7 +92,7 @@ static void _edit_scene(l_scenes_list_v2_t *scene_node, cJSON *cj_scene)
     CJSON_GET_VALUE_BOOL(cj_scene, ezlopi_is_group_str, scene_node->is_group);
 
     {
-        char tmp_grp_id[32] = {0};
+        char tmp_grp_id[32] = { 0 };
         CJSON_GET_VALUE_STRING_BY_COPY(cj_scene, ezlopi_group_id_str, tmp_grp_id);
         if (0 < strlen(tmp_grp_id))
         {

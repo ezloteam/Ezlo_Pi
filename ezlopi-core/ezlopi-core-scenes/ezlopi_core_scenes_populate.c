@@ -22,7 +22,7 @@ void ezlopi_scenes_populate_scene(l_scenes_list_v2_t *new_scene, cJSON *cj_scene
         CJSON_GET_VALUE_BOOL(cj_scene, ezlopi_is_group_str, new_scene->is_group);
 
         {
-            char tmp_grp_id[32] = {0};
+            char tmp_grp_id[32] = { 0 };
             CJSON_GET_VALUE_STRING_BY_COPY(cj_scene, ezlopi_group_id_str, tmp_grp_id);
             if (0 < strlen(tmp_grp_id))
             {
@@ -95,11 +95,9 @@ l_user_notification_v2_t *ezlopi_scenes_populate_user_notifications(cJSON *cj_us
 
     if (cj_user_notifications && (cJSON_Array == cj_user_notifications->type))
     {
-        // int user_notifications_idx = 0;
         cJSON *cj_user_notification = NULL;
         l_user_notification_v2_t *curr_user_notification = NULL;
 
-        // while (NULL != (cj_user_notification = cJSON_GetArrayItem(cj_user_notifications, user_notifications_idx++)))
         cJSON_ArrayForEach(cj_user_notification, cj_user_notifications)
         {
             if (tmp_user_notifications_head)
@@ -142,11 +140,9 @@ l_house_modes_v2_t *ezlopi_scenes_populate_house_modes(cJSON *cj_house_modes)
     l_house_modes_v2_t *tmp_house_mode_head = NULL;
     if (cj_house_modes)
     {
-        // int house_mode_idx = 0;
         cJSON *cj_house_mode = NULL;
         l_house_modes_v2_t *tmp_house_mode = NULL;
 
-        // while (NULL != (cj_house_mode = cJSON_GetArrayItem(cj_house_modes, house_mode_idx++)))
         cJSON_ArrayForEach(cj_house_mode, cj_house_modes)
         {
             if (tmp_house_mode_head)
@@ -190,11 +186,9 @@ l_action_block_v2_t *ezlopi_scenes_populate_action_blocks(cJSON *cj_action_block
     l_action_block_v2_t *tmp_action_block_head = NULL;
     if (cj_action_blocks)
     {
-        // int then_block_idx = 0;
-        cJSON *cj_action_block = NULL;
+         cJSON *cj_action_block = NULL;
         l_action_block_v2_t *tmp_then_block = NULL;
 
-        // while (NULL != (cj_action_block = cJSON_GetArrayItem(cj_action_blocks, then_block_idx++)))
         cJSON_ArrayForEach(cj_action_block, cj_action_blocks)
         {
             if (tmp_action_block_head)
@@ -259,11 +253,9 @@ l_when_block_v2_t *ezlopi_scenes_populate_when_blocks(cJSON *cj_when_blocks)
     l_when_block_v2_t *tmp_when_block_head = NULL;
     if (cj_when_blocks)
     {
-        // int when_block_idx = 0;
         cJSON *cj_when_block = NULL;
         l_when_block_v2_t *tmp_when_block = NULL;
 
-        // while (NULL != (cj_when_block = cJSON_GetArrayItem(cj_when_blocks, when_block_idx++)))
         cJSON_ArrayForEach(cj_when_block, cj_when_blocks)
         {
             if (tmp_when_block_head)
@@ -317,7 +309,7 @@ void ezlopi_scenes_populate_assign_when_block(l_when_block_v2_t *new_when_block,
                     TRACE_D("group_blockName (edit): %s ", new_when_block->when_grp->grp_blockName);
                 }
 
-                char grp_id_str[32] = {0};
+                char grp_id_str[32] = { 0 };
                 CJSON_GET_VALUE_STRING_BY_COPY(cj_when_block, ezlopi_group_id_str, grp_id_str);
                 if (0 < strlen(grp_id_str))
                 {
@@ -328,7 +320,7 @@ void ezlopi_scenes_populate_assign_when_block(l_when_block_v2_t *new_when_block,
         }
 
         {
-            char tmp_block_id[32] = {0};
+            char tmp_block_id[32] = { 0 };
             CJSON_GET_VALUE_STRING_BY_COPY(cj_when_block, ezlopi_blockId_str, tmp_block_id);
             if (0 < strlen(tmp_block_id))
             {
@@ -346,7 +338,7 @@ void ezlopi_scenes_populate_assign_when_block(l_when_block_v2_t *new_when_block,
 
         new_when_block->block_type = SCENE_BLOCK_TYPE_WHEN;
 
-        cJSON *cj_new_meta = cJSON_GetObjectItem(__FUNCTION__, cj_when_block, "blockMeta");
+        cJSON *cj_new_meta = cJSON_GetObjectItem(__FUNCTION__, cj_when_block, ezlopi_blockMeta_str);
         if (cj_new_meta && (cJSON_Object == cj_new_meta->type))
         {
             new_when_block->cj_block_meta = cJSON_Duplicate(__FUNCTION__, cj_new_meta, 1);
@@ -388,10 +380,10 @@ void ezlopi_scenes_populate_assign_action_delay(s_action_delay_v2_t *action_dela
 {
     if (action_delay && cj_delay)
     {
-        CJSON_GET_VALUE_DOUBLE(cj_delay, "days", action_delay->days);
-        CJSON_GET_VALUE_DOUBLE(cj_delay, "hours", action_delay->hours);
-        CJSON_GET_VALUE_DOUBLE(cj_delay, "minutes", action_delay->minutes);
-        CJSON_GET_VALUE_DOUBLE(cj_delay, "seconds", action_delay->seconds);
+        CJSON_GET_VALUE_DOUBLE(cj_delay, ezlopi_days_str, action_delay->days);
+        CJSON_GET_VALUE_DOUBLE(cj_delay, ezlopi_hours_str, action_delay->hours);
+        CJSON_GET_VALUE_DOUBLE(cj_delay, ezlopi_minutes_str, action_delay->minutes);
+        CJSON_GET_VALUE_DOUBLE(cj_delay, ezlopi_seconds_str, action_delay->seconds);
     }
 }
 
@@ -400,11 +392,9 @@ l_fields_v2_t *ezlopi_scenes_populate_fields(cJSON *cj_fields)
     l_fields_v2_t *tmp_fields_head = NULL;
     if (cj_fields)
     {
-        // int fields_idx = 0;
         cJSON *cj_field = NULL;
         l_fields_v2_t *tmp_field = NULL;
 
-        // while (NULL != (cj_field = cJSON_GetArrayItem(cj_fields, fields_idx++)))
         cJSON_ArrayForEach(cj_field, cj_fields)
         {
             if (tmp_fields_head)
@@ -525,7 +515,6 @@ void ezlopi_scenes_populate_fields_get_value(l_fields_v2_t *field, cJSON *cj_val
                 // CJSON_TRACE("blocks_value (edit)", cj_value);
                 l_when_block_v2_t *curr_when_block = NULL;
 
-                // while (NULL != (cj_block = cJSON_GetArrayItem(cj_value, block_idx++)))
                 cJSON_ArrayForEach(cj_block, cj_value)
                 {
                     if (field->field_value.u_value.when_block)

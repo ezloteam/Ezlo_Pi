@@ -33,14 +33,14 @@
         }                                   \
     }
 
-/**
- * @brief This funtion is called, only to reallocate a '*header' of custom_structure 's_ezlopi_core_http_mbedtls_t'
- *
- * @param tmp_http_data     [ Pointer to (s_ezlopi_core_http_mbedtls_t*) block of memory. ]
- * @param append_size       [ Size of 'string' to be appended. ]
- * @param append_str        [ 'string_literal' to be appended. ]
- * @return int [ Fail ==> returns Old-size / Success ==> returns New-size ]
- */
+ /**
+  * @brief This funtion is called, only to reallocate a '*header' of custom_structure 's_ezlopi_core_http_mbedtls_t'
+  *
+  * @param tmp_http_data     [ Pointer to (s_ezlopi_core_http_mbedtls_t*) block of memory. ]
+  * @param append_size       [ Size of 'string' to be appended. ]
+  * @param append_str        [ 'string_literal' to be appended. ]
+  * @return int [ Fail ==> returns Old-size / Success ==> returns New-size ]
+  */
 static int __ezlopi_core_scenes_then_sendhttp_relloc_header(s_ezlopi_core_http_mbedtls_t *tmp_http_data, int append_size, const char *append_str)
 {
     int ret = (int)tmp_http_data->header_maxlen; // Assign Old-block size as default
@@ -69,24 +69,24 @@ static int __ezlopi_core_scenes_then_sendhttp_relloc_header(s_ezlopi_core_http_m
 /**
  * @brief Function to extract "web_host" from "field_value_string".
  */
-static void __ezlopi_core_scenes_then_sendhttp_parse_host_name(s_ezlopi_core_http_mbedtls_t* tmp_http_data, const char* field_value_string)
+static void __ezlopi_core_scenes_then_sendhttp_parse_host_name(s_ezlopi_core_http_mbedtls_t *tmp_http_data, const char *field_value_string)
 {
     if (NULL != field_value_string)
     {
-        const char* start = strstr(field_value_string, "://");
+        const char *start = strstr(field_value_string, "://");
         if (start != NULL)
         {
             // TRACE_W("Here! fresh webserver");
             start += 3;
             int length = 0;
-            char* end = strchr(start, '/');
+            char *end = strchr(start, '/');
             if (end != NULL)
             {
                 length = (end - start);
                 if (length > 0)
                 {
                     length++;                                         // include null character
-                    char* tmp_string = ezlopi_malloc(__FUNCTION__, length); // tmp_string != NULL
+                    char *tmp_string = ezlopi_malloc(__FUNCTION__, length); // tmp_string != NULL
                     if (tmp_string)
                     {
                         bzero(tmp_string, length);
@@ -99,12 +99,12 @@ static void __ezlopi_core_scenes_then_sendhttp_parse_host_name(s_ezlopi_core_htt
             }
             else
             {
-                const char* ptr = field_value_string;
+                const char *ptr = field_value_string;
                 length = (int)strlen(field_value_string) - (int)(start - ptr);
                 if (length > 0)
                 {
                     length++;                                         // include null character
-                    char* tmp_string = ezlopi_malloc(__FUNCTION__, length); // tmp_string != NULL
+                    char *tmp_string = ezlopi_malloc(__FUNCTION__, length); // tmp_string != NULL
                     if (tmp_string)
                     {
                         bzero(tmp_string, length);
@@ -219,8 +219,8 @@ void parse_http_url(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fields_v2_t *
             // tests[7] = "https://www.testhttp.com";
             int succ_parsing = 0; // Whether the parsing has been
             int port = 80;        // Port field of the HTTP uri if found
-            char host[100] = {0}; // IP field of the HTTP uri
-            char page[200] = {0}; // Page field of the uri if found
+            char host[100] = { 0 }; // IP field of the HTTP uri
+            char page[200] = { 0 }; // Page field of the uri if found
             if (sscanf(field_value_string, "http://%99[^:]:%i/%199[^\n]", host, &port, page) == 3)
             {
                 succ_parsing = 1;
@@ -392,7 +392,7 @@ void parse_http_skipsecurity(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fiel
         {
             // 5. adding 'skip_security' to header-buffer
             // TRACE_W("Appending!! skipsecurity -> header");
-            __ezlopi_core_scenes_then_append_to_header(tmp_http_data, "skipSecurity", ((curr_field->field_value.u_value.value_bool) ? "true" : "false"));
+            __ezlopi_core_scenes_then_append_to_header(tmp_http_data, "skipSecurity", ((curr_field->field_value.u_value.value_bool) ? ezlopi_true_str : ezlopi_false_str));
         }
         else
         {
@@ -571,9 +571,7 @@ ezlopi_error_t ezlopi_core_scene_then_helper_setexpression_setvariable(char *exp
             cJSON *cj_exp_id_list = cJSON_Parse(__FUNCTION__, exp_id_list_str);
             if (cj_exp_id_list)
             {
-                // uint32_t exp_idx = 0;
                 cJSON *cj_exp_id = NULL;
-                // while (NULL != (cj_exp_id = cJSON_GetArrayItem(cj_exp_id_list, exp_idx++)))
                 cJSON_ArrayForEach(cj_exp_id, cj_exp_id_list)
                 {
                     if (cj_exp_id && cj_exp_id->valuestring)
@@ -620,9 +618,9 @@ int ezlopi_core_scene_then_helper_toggleValue(uint32_t item_id, const char *item
                         {
                             cJSON_AddStringToObject(__FUNCTION__, cj_result_value, ezlopi__id_str, item_id_str);
 
-                            if ((EZPI_STRNCMP_IF_EQUAL(curr_item->cloud_properties.value_type, value_type_bool, strlen(curr_item->cloud_properties.value_type), 5)) && cJSON_IsBool(cj_val))
+                            if ((EZPI_STRNCMP_IF_EQUAL(curr_item->cloud_properties.value_type, value_type_bool, strlen(curr_item->cloud_properties.value_type) + 1, 5)) && cJSON_IsBool(cj_val))
                             {
-                                // TRACE_S("1. getting 'item_id[%d]' ; bool_value = %s ", item_id, (cj_val->type == cJSON_True) ? "true" : "false"); // "false" or "true"
+                                // TRACE_S("1. getting 'item_id[%d]' ; bool_value = %s ", item_id, (cj_val->type == cJSON_True) ? ezlopi_true_str : ezlopi_false_str); // ezlopi_false_str or ezlopi_true_str
                                 if (cj_val->type == cJSON_True)
                                 {
                                     cJSON_AddBoolToObject(__FUNCTION__, cj_result_value, ezlopi_value_str, false);
@@ -634,7 +632,7 @@ int ezlopi_core_scene_then_helper_toggleValue(uint32_t item_id, const char *item
                                 ret = 1;
                                 curr_item->func(EZLOPI_ACTION_SET_VALUE, curr_item, cj_result_value, curr_item->user_arg);
                             }
-                            else if ((EZPI_STRNCMP_IF_EQUAL(curr_item->cloud_properties.value_type, value_type_int, strlen(curr_item->cloud_properties.value_type), 4)) && cJSON_IsNumber(cj_val))
+                            else if ((EZPI_STRNCMP_IF_EQUAL(curr_item->cloud_properties.value_type, value_type_int, strlen(curr_item->cloud_properties.value_type) + 1, 4)) && cJSON_IsNumber(cj_val))
                             {
                                 // TRACE_S("2. getting 'item_id[%d]' ; int_value = %d ", item_id, (int)cj_val->valuedouble);
                                 if (cj_val->valuedouble == 0) // either  '0' or '1'.

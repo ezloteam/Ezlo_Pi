@@ -38,7 +38,7 @@ extern const  char *method_hub_device_room_set;
 // extern const  char *method_hub_detection_devices_list ;
 // extern const  char *method_hub_detection_device_remove ;
 // extern const  char *method_hub_detection_device_set ;
-// extern const  char *method_hub_setting_updated ;
+extern const  char *method_hub_setting_updated;
 // extern const  char *method_hub_device_setting_reset ;
 // extern const  char *method_hub_device_settings_list;
 // extern const  char *method_hub_setting_value_set_request;
@@ -143,4 +143,19 @@ extern const char *ezlopi_hub_item_group_created;
 extern const char *ezlopi_hub_item_group_deleted;
 extern const char *ezlopi_hub_item_group_updated;
 
+extern const char *ezlopi_hub_device_updated;
+extern const char *ezlopi_hub_modes_disarmed_devices_added;
+extern const char *ezlopi_hub_modes_disarmed_devices_removed;
+extern const char *ezlopi_hub_modes_alarms_off_added;
+extern const char *ezlopi_hub_modes_alarms_off_removed;
+extern const char *ezlopi_hub_modes_cameras_off_added;
+extern const char *ezlopi_hub_modes_cameras_off_removed;
+extern const char *ezlopi_hub_modes_bypass_devices_added;
+extern const char *ezlopi_hub_modes_bypass_devices_removed;
+extern const char *ezlopi_hub_modes_protect_button_added;
+extern const char *ezlopi_hub_modes_protect_button_updated;
+extern const char *ezlopi_hub_modes_protect_button_removed;
+extern const char *ezlopi_hub_modes_protect_devices_added;
+extern const char *ezlopi_hub_modes_protect_devices_removed;
+extern const char *ezlopi_hub_modes_entry_delay_changed;
 #endif // __EZLOPI_METHODS_STR_H__

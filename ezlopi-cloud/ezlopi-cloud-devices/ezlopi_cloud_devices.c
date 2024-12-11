@@ -11,7 +11,6 @@
 #include "ezlopi_core_device_group.h"
 
 #include "ezlopi_cloud_devices.h"
-#include "ezlopi_cloud_keywords.h"
 #include "ezlopi_cloud_methods_str.h"
 #include "ezlopi_cloud_constants.h"
 //------------------------------------------------------------------------------------------------------------------
@@ -22,41 +21,55 @@ static char *__generate_sha1_of_src(const char *src)
     {
         if (!mbedtls_sha1_self_test(1))
         {
-            unsigned char sha1[20];
-            mbedtls_sha1_context sha1_ctx;
+            unsigned char sha1_hash[20];
 
-            mbedtls_sha1_init(&sha1_ctx);
-            if (0 == mbedtls_sha1_starts_ret(&sha1_ctx))
+            if (0 == mbedtls_sha1_ret((unsigned char *)src, strlen(src), sha1_hash))
             {
-                if (0 == mbedtls_sha1_update_ret(&sha1_ctx, (const unsigned char *)src, strlen(src)))
+                ret = (char *)ezlopi_malloc(__FUNCTION__, sizeof(unsigned char) * 20);
+                if (ret)
                 {
-                    if (0 == mbedtls_sha1_finish_ret(&sha1_ctx, sha1))
+                    for (size_t idx = 0; idx < sizeof(sha1_hash); idx++)
                     {
-                        size_t len = (4 * sizeof(sha1)) + 1;
-                        ret = (char *)ezlopi_malloc(__FUNCTION__, len);
-                        if (ret)
-                        {
-                            memset(ret, 0, len);
-                            for (int i = 0; i < sizeof(sha1); i++)
-                            {
-                                size_t l = (len - (strlen(ret) + 1));
-                                if (l > 0)
-                                {
-                                    ((int)sha1[i] / 100 > 0) ? (snprintf(ret + strlen(ret), l, "%u", (uint8_t)sha1[i]))    // tripple digit
-                                        : ((int)sha1[i] / 10 > 0) ? (snprintf(ret + strlen(ret), l, "0%u", (uint8_t)sha1[i]))   // double digit
-                                        : (snprintf(ret + strlen(ret), l, "00%u", (uint8_t)sha1[i])); // single digit
-                                }
-                                else
-                                {
-                                    break;
-                                }
-                            }
-                        }
+                        snprintf(ret + strlen(ret), (sizeof(ret) - (strlen(ret))), "%02x", sha1_hash[idx]);
                     }
+                    TRACE_D(" sha1_hash = %s ;  => ret = %s", sha1_hash, ret);
                 }
             }
 
-            mbedtls_sha1_free(&sha1_ctx);
+            // mbedtls_sha1_context sha1_ctx;
+
+            // mbedtls_sha1_init(&sha1_ctx);
+            // if (0 == mbedtls_sha1_starts_ret(&sha1_ctx))
+            // {
+            //     if (0 == mbedtls_sha1_update_ret(&sha1_ctx, (const unsigned char *)src, strlen(src)))
+            //     {
+            //         if (0 == mbedtls_sha1_finish_ret(&sha1_ctx, sha1))
+            //         {
+            //             size_t len = (4 * sizeof(sha1)) + 1;
+            //             ret = (char *)ezlopi_malloc(__FUNCTION__, len);
+            //             if (ret)
+            //             {
+            //                 memset(ret, 0, len);
+            //                 for (int i = 0; i < sizeof(sha1); i++)
+            //                 {
+            //                     size_t l = (len - (strlen(ret) + 1));
+            //                     if (l > 0)
+            //                     {
+            //                         ((int)sha1[i] / 100 > 0)  ? (snprintf(ret + strlen(ret), l, "%u", (uint8_t)sha1[i]))    // tripple digit
+            //                         : ((int)sha1[i] / 10 > 0) ? (snprintf(ret + strlen(ret), l, "0%u", (uint8_t)sha1[i]))   // double digit
+            //                                                   : (snprintf(ret + strlen(ret), l, "00%u", (uint8_t)sha1[i])); // single digit
+            //                     }
+            //                     else
+            //                     {
+            //                         break;
+            //                     }
+            //                 }
+            //             }
+            //         }
+            //     }
+            // }
+
+            // mbedtls_sha1_free(&sha1_ctx);
         }
     }
     return ret;
@@ -67,7 +80,7 @@ void devices_list_v3(cJSON *cj_request, cJSON *cj_response)
     cJSON *cjson_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     if (cjson_result)
     {
-        cJSON *cjson_devices_array = cJSON_AddArrayToObject(__FUNCTION__, cjson_result, "devices");
+        cJSON *cjson_devices_array = cJSON_AddArrayToObject(__FUNCTION__, cjson_result, ezlopi_devices_str);
         if (cjson_devices_array)
         {
             l_ezlopi_device_t *curr_device = ezlopi_device_get_head();
@@ -171,7 +184,7 @@ void device_updated(cJSON *cj_request, cJSON *cj_response)
     if (cj_request)
     {
         cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
-        cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, "hub.device.updated");
+        cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, ezlopi_hub_device_updated);
 
         cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
         if (cj_result)
@@ -213,7 +226,7 @@ void device_updated(cJSON *cj_request, cJSON *cj_response)
                             }
 
                             uint64_t time = EZPI_CORE_sntp_get_current_time_ms();
-                            cJSON_AddNumberToObject(__FUNCTION__, cj_result, "fwTimestampMs", time);
+                            cJSON_AddNumberToObject(__FUNCTION__, cj_result, ezlopi_fwTimestampMs_str, time);
 
                             cJSON *cj_method = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_method_str);
                             if (cj_method)
@@ -303,7 +316,7 @@ void device_groups_list(cJSON *cj_request, cJSON *cj_response)
         cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
         if (cj_result)
         {
-            cJSON *cj_device_groups = cJSON_AddArrayToObject(__FUNCTION__, cj_result, "deviceGroups");
+            cJSON *cj_device_groups = cJSON_AddArrayToObject(__FUNCTION__, cj_result, ezlopi_deviceGroups_str);
             if (cj_device_groups)
             {
                 ezlopi_core_device_group_get_list(cj_device_groups);
@@ -317,17 +330,17 @@ void device_groups_list(cJSON *cj_request, cJSON *cj_response)
                 if (NULL != (hash_str = __generate_sha1_of_src(res_str))) // returns malloc ; need to free
                 {
                     // TRACE_S("'hash': %s [%d]", hash_str, strlen(hash_str));
-                    cJSON *cj_ver_str = cJSON_GetObjectItem(__FUNCTION__, (cJSON_GetObjectItem(__FUNCTION__, cj_request, "params")), "version");
+                    cJSON *cj_ver_str = cJSON_GetObjectItem(__FUNCTION__, (cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str)), ezlopi_version_str);
                     if (cj_ver_str && cj_ver_str->valuestring && cj_ver_str->str_value_len)
                     {
                         // TRACE_D("'req_version': '%s'[%d]", cj_ver_str->valuestring, strlen(cj_ver_str->valuestring));
-                        if (EZPI_STRNCMP_IF_EQUAL(hash_str, cj_ver_str->valuestring, strlen(hash_str), strlen(cj_ver_str->valuestring)))
+                        if (EZPI_STRNCMP_IF_EQUAL(hash_str, cj_ver_str->valuestring, strlen(hash_str)+1, cj_ver_str->str_value_len))
                         {
-                            cJSON_DeleteItemFromObject(__FUNCTION__, cj_result, "deviceGroups");
+                            cJSON_DeleteItemFromObject(__FUNCTION__, cj_result, ezlopi_deviceGroups_str);
                         }
                     }
                     // now add the 'version_hash' into result.
-                    cJSON_AddStringToObject(__FUNCTION__, cj_result, "version", hash_str);
+                    cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_version_str, hash_str);
 
                     ezlopi_free(__FUNCTION__, hash_str);
                 }
@@ -358,7 +371,7 @@ void device_group_delete(cJSON *cj_request, cJSON *cj_response)
                     {
                         if (curr_devgrp->persistent)
                         { // if 'true'
-                            cJSON *cj_force = cJSON_GetObjectItem(__FUNCTION__, cj_params, "force");
+                            cJSON *cj_force = cJSON_GetObjectItem(__FUNCTION__, cj_params, value_type_force);
                             if (cj_force && cJSON_IsTrue(cj_force))
                             {
                                 ezlopi_nvs_delete_stored_data_by_id(dev_grp_id);          // from nvs
@@ -419,7 +432,7 @@ void device_group_find(cJSON *cj_request, cJSON *cj_response)
             cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
             if (cj_params)
             {
-                ezlopi_core_device_group_find(cJSON_AddArrayToObject(__FUNCTION__, cj_result, "deviceGroups"), cj_params);
+                ezlopi_core_device_group_find(cJSON_AddArrayToObject(__FUNCTION__, cj_result, ezlopi_deviceGroups_str), cj_params);
             }
         }
     }
@@ -435,7 +448,7 @@ void device_group_devitem_expand(cJSON *cj_request, cJSON *cj_response)
             cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
             if (cj_params)
             {
-                cJSON *cj_devices = cJSON_AddArrayToObject(__FUNCTION__, cj_result, "devices");
+                cJSON *cj_devices = cJSON_AddArrayToObject(__FUNCTION__, cj_result, ezlopi_devices_str);
                 if (cj_devices)
                 {
                     ezlopi_core_device_group_devitem_expand(cj_devices, cj_params);
@@ -449,17 +462,17 @@ void device_group_devitem_expand(cJSON *cj_request, cJSON *cj_response)
                     if (NULL != (hash_str = __generate_sha1_of_src(res_str))) // returns malloc ; need to free
                     {
                         // TRACE_S("'hash': %s [%d]", hash_str, strlen(hash_str));
-                        cJSON *cj_ver_str = cJSON_GetObjectItem(__FUNCTION__, cj_params, "version");
+                        cJSON *cj_ver_str = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_version_str);
                         if (cj_ver_str && cj_ver_str->valuestring && cj_ver_str->str_value_len)
                         {
                             // TRACE_D("'version': %s [%d]", cj_ver_str->valuestring, cj_ver_str->str_value_len);
-                            if (EZPI_STRNCMP_IF_EQUAL(hash_str, cj_ver_str->valuestring, strlen(hash_str), strlen(cj_ver_str->valuestring)))
+                            if (EZPI_STRNCMP_IF_EQUAL(hash_str, cj_ver_str->valuestring, strlen(hash_str)+1, cj_ver_str->str_value_len))
                             {
-                                cJSON_DeleteItemFromObject(__FUNCTION__, cj_result, "devices");
+                                cJSON_DeleteItemFromObject(__FUNCTION__, cj_result, ezlopi_devices_str);
                             }
                         }
                         // now add the 'version_hash' into result.
-                        cJSON_AddStringToObject(__FUNCTION__, cj_result, "version", hash_str);
+                        cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_version_str, hash_str);
 
                         ezlopi_free(__FUNCTION__, hash_str);
                     }
@@ -595,7 +608,7 @@ void item_groups_list(cJSON *cj_request, cJSON *cj_response)
         cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
         if (cj_result)
         {
-            cJSON *cj_item_groups = cJSON_AddArrayToObject(__FUNCTION__, cj_result, "itemGroups");
+            cJSON *cj_item_groups = cJSON_AddArrayToObject(__FUNCTION__, cj_result, ezlopi_itemGroup_str);
             if (cj_item_groups)
             {
                 ezlopi_core_item_group_get_list(cj_item_groups);
@@ -609,17 +622,17 @@ void item_groups_list(cJSON *cj_request, cJSON *cj_response)
                 if (NULL != (hash_str = __generate_sha1_of_src(res_str))) // returns malloc ; need to free
                 {
                     // TRACE_S("'hash': %s [%d]", hash_str, strlen(hash_str));
-                    cJSON *cj_ver_str = cJSON_GetObjectItem(__FUNCTION__, (cJSON_GetObjectItem(__FUNCTION__, cj_request, "params")), "version");
+                    cJSON *cj_ver_str = cJSON_GetObjectItem(__FUNCTION__, (cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str)), ezlopi_version_str);
                     if (cj_ver_str && cj_ver_str->valuestring && cj_ver_str->str_value_len)
                     {
                         // TRACE_D("'version': %s [%d]", cj_ver_str->valuestring, cj_ver_str->str_value_len);
-                        if (EZPI_STRNCMP_IF_EQUAL(hash_str, cj_ver_str->valuestring, strlen(hash_str), strlen(cj_ver_str->valuestring)))
+                        if (EZPI_STRNCMP_IF_EQUAL(hash_str, cj_ver_str->valuestring, strlen(hash_str)+1, cj_ver_str->str_value_len))
                         {
-                            cJSON_DeleteItemFromObject(__FUNCTION__, cj_result, "itemGroups");
+                            cJSON_DeleteItemFromObject(__FUNCTION__, cj_result, ezlopi_itemGroup_str);
                         }
                     }
                     // now add the 'version_hash' into result.
-                    cJSON_AddStringToObject(__FUNCTION__, cj_result, "version", hash_str);
+                    cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_version_str, hash_str);
 
                     ezlopi_free(__FUNCTION__, hash_str);
                 }
@@ -650,7 +663,7 @@ void item_group_delete(cJSON *cj_request, cJSON *cj_response)
                     {
                         if (curr_itemgrp->persistent)
                         { // if 'true'
-                            cJSON *cj_force = cJSON_GetObjectItem(__FUNCTION__, cj_params, "force");
+                            cJSON *cj_force = cJSON_GetObjectItem(__FUNCTION__, cj_params, value_type_force);
                             if (cj_force && cJSON_IsTrue(cj_force))
                             {
                                 ezlopi_nvs_delete_stored_data_by_id(item_grp_id);        // from nvs

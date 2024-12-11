@@ -299,7 +299,7 @@ static int __create_lua_table_for_item(lua_State *lua_state, l_ezlopi_item_t *it
         lua_pushstring(lua_state, ezlopi_enum_str);
         lua_newtable(lua_state);
 
-        lua_create_table_string_value(1, ezlopi_None_str); // Remains for future
+        lua_create_table_string_value(1, ezlopi_none_str); // Remains for future
 
         lua_settable(lua_state, -3);
     }
