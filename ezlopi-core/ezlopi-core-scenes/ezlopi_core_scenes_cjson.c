@@ -30,7 +30,7 @@
 */
 /**
  * @file    ezlopi_core_scenes_cjson.c
- * @brief   file includes functions that operate on scene data 
+ * @brief   file includes functions that operate on scene data
  * @author  xx
  * @version 0.1
  * @date    12th DEC 2024
@@ -481,7 +481,7 @@ static void __ezlopi_scenes_cjson_add_when_block_options(cJSON *cj_when_block, l
                 if ((when_block->block_options.method.type > EZLOPI_SCENE_METHOD_TYPE_NONE) &&
                     (when_block->block_options.method.type < EZLOPI_SCENE_METHOD_TYPE_MAX))
                 {
-                    const char *method_type_name = ezlopi_scene_get_scene_method_name(when_block->block_options.method.type);
+                    const char *method_type_name = EZPI_scene_get_scene_method_name(when_block->block_options.method.type);
                     __cjson_add_string(cj_method, ezlopi_name_str, method_type_name ? method_type_name : ezlopi__str);
                 }
                 else
@@ -548,7 +548,7 @@ static void __cjson_add_action_block_options(cJSON *cj_block_array, l_action_blo
                 if ((action_block->block_options.method.type > EZLOPI_SCENE_METHOD_TYPE_NONE) &&
                     (action_block->block_options.method.type < EZLOPI_SCENE_METHOD_TYPE_MAX))
                 {
-                    const char *method_type_name = ezlopi_scene_get_scene_method_name(action_block->block_options.method.type);
+                    const char *method_type_name = EZPI_scene_get_scene_method_name(action_block->block_options.method.type);
                     __cjson_add_string(cj_method, ezlopi_name_str, method_type_name ? method_type_name : ezlopi__str);
                 }
                 else

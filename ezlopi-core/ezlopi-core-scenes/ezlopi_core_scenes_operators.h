@@ -29,14 +29,14 @@ typedef enum e_scene_strops_cmp_operators
 #undef SCENES_STROPS_COMP_OPERATORES
 } e_scene_strops_cmp_operators_t;
 
-
+#if 0  /* Currently not in use --> check 'in_array' when-condition before removing */
 typedef enum e_scene_inarr_cmp_operators
 {
 #define SCENES_IN_ARRAY_OPERATORS(OPERATOR, op, name, method) SCENES_IN_ARRAY_OPERATORS_##OPERATOR,
 #include "__operators_macros/__in_array_comparision_operators_macros.h"
 #undef SCENES_IN_ARRAY_OPERATORS
 } e_scene_inarr_cmp_operators_t;
-
+#endif
 typedef enum e_scene_value_with_less_cmp_operators
 {
 #define SCENES_VALUES_WITH_LESS_OPERATORS(OPERATOR, op, name, method) SCENES_VALUES_WITH_LESS_OPERATORS_##OPERATOR,

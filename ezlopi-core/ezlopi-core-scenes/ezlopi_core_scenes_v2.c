@@ -910,7 +910,7 @@ static void _____new_block_options_populate(s_block_options_v2_t *p_block_option
 static void __new_method_populate(s_method_v2_t *p_method, cJSON *cj_method)
 {
     CJSON_GET_VALUE_STRING_BY_COPY(cj_method, ezlopi_name_str, p_method->name);
-    p_method->type = ezlopi_scenes_method_get_type_enum(p_method->name);
+    p_method->type = EZPI_scenes_method_get_type_enum(p_method->name);
 }
 
 static void _____new_action_delay(s_action_delay_v2_t *action_delay, cJSON *cj_delay)
@@ -1965,7 +1965,7 @@ static char *__get_time_category_method_name(cJSON *cj_scenes_array, l_scenes_li
         }
 
         // now examine if block-name is of 'logical-category'
-        e_scenes_method_category_t curr_when_category_enum = ezlopi_scene_get_scene_method_category_enum(curr_when_block->block_options.method.name); // give corresponding 'category_name' for respective 'method_name'
+        e_scenes_method_category_t curr_when_category_enum = EZPI_scene_get_scene_method_category_enum(curr_when_block->block_options.method.name); // give corresponding 'category_name' for respective 'method_name'
         if (METHOD_CATEGORY_NAN < curr_when_category_enum && curr_when_category_enum < METHOD_CATEGORY_MAX)
         {
             if (METHOD_CATEGORY_WHEN_TIME == curr_when_category_enum)
@@ -2031,7 +2031,7 @@ static l_when_block_v2_t *___get_group_when_blocks(l_when_block_v2_t *curr_when_
     if (curr_when_block)
     {
         // now examine if block-name is of 'logical-category'
-        e_scenes_method_category_t curr_when_category_enum = ezlopi_scene_get_scene_method_category_enum(curr_when_block->block_options.method.name); // give corresponding 'category_name' for respective 'method_name'
+        e_scenes_method_category_t curr_when_category_enum = EZPI_scene_get_scene_method_category_enum(curr_when_block->block_options.method.name); // give corresponding 'category_name' for respective 'method_name'
         if (METHOD_CATEGORY_NAN < curr_when_category_enum && curr_when_category_enum < METHOD_CATEGORY_MAX)
         {
             if (METHOD_CATEGORY_WHEN_LOGIC == curr_when_category_enum      // and/or/not

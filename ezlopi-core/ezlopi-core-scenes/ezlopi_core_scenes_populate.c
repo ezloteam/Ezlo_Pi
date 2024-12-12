@@ -186,7 +186,7 @@ l_action_block_v2_t *ezlopi_scenes_populate_action_blocks(cJSON *cj_action_block
     l_action_block_v2_t *tmp_action_block_head = NULL;
     if (cj_action_blocks)
     {
-         cJSON *cj_action_block = NULL;
+        cJSON *cj_action_block = NULL;
         l_action_block_v2_t *tmp_then_block = NULL;
 
         cJSON_ArrayForEach(cj_action_block, cj_action_blocks)
@@ -373,7 +373,7 @@ void ezlopi_scenes_populate_assign_block_options(s_block_options_v2_t *p_block_o
 void ezlopi_scenes_populate_assign_method(s_method_v2_t *p_method, cJSON *cj_method)
 {
     CJSON_GET_VALUE_STRING_BY_COPY(cj_method, ezlopi_name_str, p_method->name);
-    p_method->type = ezlopi_scenes_method_get_type_enum(p_method->name);
+    p_method->type = EZPI_scenes_method_get_type_enum(p_method->name);
 }
 
 void ezlopi_scenes_populate_assign_action_delay(s_action_delay_v2_t *action_delay, cJSON *cj_delay)

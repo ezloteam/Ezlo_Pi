@@ -216,25 +216,25 @@ void EZPI_scenes_delete(l_scenes_list_v2_t *scenes_list);
 void EZPI_scenes_delete_field_value(l_fields_v2_t *field);
 /**
  * @brief This function deletes 'when_blocks' from the scene_node.
- * 
+ *
  * @param when_blocks Pointer to the 'when_blocks' of a scene-node.
  */
 void EZPI_scenes_delete_when_blocks(l_when_block_v2_t *when_blocks);
 /**
  * @brief This function deletes 'house_modes' from the scene_node.
- * 
+ *
  * @param house_modes Pointer to the 'house_modes' of a scene-node.
  */
 void EZPI_scenes_delete_house_modes(l_house_modes_v2_t *house_modes);
 /**
  * @brief This function deletes 'action_blocks' from the scene_node.
- * 
+ *
  * @param action_blocks Pointer to the 'action_blocks' of a scene-node.
  */
 void EZPI_scenes_delete_action_blocks(l_action_block_v2_t *action_blocks);
 /**
  * @brief This function deletes 'user_notifications' from the scene_node.
- * 
+ *
  * @param user_notifications Pointer to the 'user_notifications' of a scene-node.
  */
 void EZPI_scenes_delete_user_notifications(l_user_notification_v2_t *user_notifications);
@@ -244,7 +244,7 @@ ezlopi_error_t ezlopi_scenes_enable_disable_scene_by_id_v2(uint32_t _id, bool en
 void ezlopi_scenes_remove_id_from_list_v2(uint32_t _id);
 l_scenes_list_v2_t *ezlopi_scenes_pop_by_id_v2(uint32_t _id);
 
-void ezlopi_scenes_notifications_add(cJSON *cj_notifications);
+void EZPI_scenes_notifications_add(cJSON *cj_notifications);
 
 #if 0 // for future usage
 //-------------------------------- Only for latch operations  ----------------------------------------

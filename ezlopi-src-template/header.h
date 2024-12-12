@@ -29,7 +29,7 @@
 ** ===========================================================================
 */
 /**
- * @file    main.c
+ * @file    main.h
  * @brief   perform some function on data
  * @author  xx
  * @version 0.1
