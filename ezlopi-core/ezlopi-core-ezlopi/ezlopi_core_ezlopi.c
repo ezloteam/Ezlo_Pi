@@ -111,7 +111,7 @@ void ezlopi_init(void)
     EZPI_core_init_mdns();
 #endif // CONFIG_EZPI_SERV_MDNS_EN
 
-    ezlopi_service_loop_add("core-device-loop", __device_loop, 1000, NULL);
+    EZPI_service_loop_add("core-device-loop", __device_loop, 1000, NULL);
 }
 
 static l_ezlopi_device_t *__link_next_parent_id(uint32_t target_to_clear_parent_id)

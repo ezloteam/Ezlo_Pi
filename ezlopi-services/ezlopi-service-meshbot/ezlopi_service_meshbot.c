@@ -198,7 +198,7 @@ void ezlopi_scenes_meshbot_init(void)
         scene_node = scene_node->next;
     }
 
-    ezlopi_service_loop_add("meshbot-loop", __scenes_loop, 100, NULL);
+    EZPI_service_loop_add("meshbot-loop", __scenes_loop, 100, NULL);
 }
 
 PT_THREAD(__scene_proto_thread(l_scenes_list_v2_t *scene_node, uint32_t routine_delay_ms))

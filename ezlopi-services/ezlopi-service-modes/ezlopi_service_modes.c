@@ -171,7 +171,7 @@ bool ezlopi_service_modes_stop(uint32_t wait_ms)
 
     if (sg_modes_loop_smphr && (xSemaphoreTake(sg_modes_loop_smphr, wait_ms / portTICK_RATE_MS)))
     {
-        ezlopi_service_loop_remove(__modes_loop);
+        EZPI_service_loop_remove(__modes_loop);
         xSemaphoreGive(sg_modes_loop_smphr);
         TRACE_W("removed modes-loop");
         ret = true;
@@ -188,7 +188,7 @@ bool ezlopi_service_modes_start(uint32_t wait_ms)
     {
         ret = true;
         xSemaphoreGive(sg_modes_loop_smphr);
-        ezlopi_service_loop_add("modes-loop", __modes_loop, 1000, NULL);
+        EZPI_service_loop_add("modes-loop", __modes_loop, 1000, NULL);
         TRACE_I("added modes-loop");
     }
 

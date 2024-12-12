@@ -28,14 +28,12 @@
 #include "ezlopi_core_processes.h"
 #include "ezlopi_core_errors.h"
 
-
 static void __ota_loop(void *arg);
-
 
 void ezlopi_service_ota_init(void)
 {
     ezlopi_event_group_set_event(EZLOPI_EVENT_OTA);
-    ezlopi_service_loop_add("ota-loop", __ota_loop, 30000, NULL);
+    EZPI_service_loop_add("ota-loop", __ota_loop, 30000, NULL);
 
     // TaskHandle_t ezlopi_service_ota_process_task_handle = NULL;
     // xTaskCreate(ota_service_process, "ota-service-process", EZLOPI_SERVICE_OTA_PROCESS_TASK_DEPTH, NULL, 2, &ezlopi_service_ota_process_task_handle);
@@ -54,7 +52,7 @@ static void __ota_loop(void *arg)
 
             if ((ret_ota > 0) || ((xTaskGetTickCount() - __ota_time_stamp) > (86400 * 1000 / portTICK_RATE_MS))) // 86400 seconds in a day (24 hrs)
             {
-                cJSON* cj_firmware_info_request = firmware_send_firmware_query_to_nma_server(esp_random());
+                cJSON *cj_firmware_info_request = firmware_send_firmware_query_to_nma_server(esp_random());
 
                 if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(cj_firmware_info_request))
                 {
