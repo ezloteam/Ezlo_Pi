@@ -287,7 +287,7 @@ l_scenes_list_v2_t *ezlopi_scenes_new_scene_populate(cJSON *cj_new_scene, uint32
 
 void ezlopi_scenes_depopulate_by_id_v2(uint32_t _id)
 {
-    if (EZPI_SUCCESS == ezlopi_meshbot_stop_without_broadcast(ezlopi_scenes_get_by_id_v2(_id)))
+    if (EZPI_SUCCESS == EZPI_meshbot_stop_without_broadcast(ezlopi_scenes_get_by_id_v2(_id)))
     {
         ezlopi_scenes_delete(ezlopi_scenes_pop_by_id_v2(_id));
     }

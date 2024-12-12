@@ -485,13 +485,13 @@ int ezlopi_scene_then_run_scene(l_scenes_list_v2_t *curr_scene, void *arg)
         if (execute_else_condition)
         {
             TRACE_D("Executing else condition");
-            ezlopi_meshbot_execute_scene_else_action_group(sceneId);
+            EZPI_meshbot_execute_scene_else_action_group(sceneId);
             ret = 1;
         }
         else
         {
             TRACE_D("Executing scene, id: %d", sceneId);
-            ezlopi_scenes_service_run_by_id(sceneId);
+            EZPI_scenes_service_run_by_id(sceneId);
             ret = 1;
         }
     }

@@ -85,7 +85,7 @@ void app_main(void)
 #endif
 
 #if defined(CONFIG_EZPI_SERV_ENABLE_MESHBOTS)
-    ezlopi_scenes_meshbot_init();
+    EZPI_scenes_meshbot_init();
 #endif
 
     TaskHandle_t ezlopi_main_blinky_task_handle = NULL;
