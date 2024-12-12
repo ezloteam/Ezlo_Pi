@@ -110,7 +110,7 @@ void app_main(void)
 #endif // CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER
 
 #if defined(CONFIG_EZPI_WEBSOCKET_CLIENT)
-    ezlopi_service_web_provisioning_init();
+    EZPI_service_web_provisioning_init();
 #endif
 
 #ifdef CONFIG_EZPI_ENABLE_OTA

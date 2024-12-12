@@ -124,7 +124,7 @@ static void ota_service_process(void* pv)
         if ((EZPI_SUCCESS != ret_nma_reg) || (EZPI_SUCCESS != ret_ota))
         {
             TRACE_D("Sending firmware check request...");
-            // uint32_t message_counter = ezlopi_service_web_provisioning_get_message_count();
+            // uint32_t message_counter = EZPI_service_web_provisioning_get_message_count();
             cJSON* cj_firmware_info_request = firmware_send_firmware_query_to_nma_server(esp_random());
 
             // CJSON_TRACE("----------------- broadcasting - cj_firmware_info_request", cj_firmware_info_request);

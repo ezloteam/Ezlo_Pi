@@ -12,11 +12,10 @@
 
 #include "ezlopi_util_trace.h"
 
-
 void EZPI_CORE_reset_reboot(void)
 {
 #if defined(CONFIG_EZPI_WEBSOCKET_CLIENT)
-    ezlopi_service_web_provisioning_deinit();
+    EZPI_service_web_provisioning_deinit();
 #endif // CONFIG_EZPI_WEBSOCKET_CLIENT
 
 #ifdef CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER

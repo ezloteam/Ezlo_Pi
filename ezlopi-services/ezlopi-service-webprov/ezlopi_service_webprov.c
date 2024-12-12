@@ -1,20 +1,59 @@
 
+
+/**
+ * @file    ezlopi_service_webprov.c
+ * @brief
+ * @author
+ * @version
+ * @date
+ */
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+
 #include "../../build/config/sdkconfig.h"
+
+#include "freertos/FreeRTOS.h"
+#include "freertos/semphr.h"
+#include "freertos/task.h"
+#include "freertos/queue.h"
+
+#include "esp_mac.h"
+#include "esp_wifi_types.h"
+#include "esp_idf_version.h"
+
 #include "EZLOPI_USER_CONFIG.h"
-
-#include <esp_mac.h>
-#include <esp_wifi_types.h>
-#include <esp_idf_version.h>
-#include <freertos/FreeRTOS.h>
-#include <freertos/task.h>
-#include <freertos/semphr.h>
-#include <freertos/queue.h>
-
 #include "ezlopi_util_trace.h"
 #include "ezlopi_cloud_constants.h"
 
 #include "ezlopi_core_api.h"
-
 #include "ezlopi_core_http.h"
 #include "ezlopi_core_wifi.h"
 #include "ezlopi_core_reset.h"
@@ -26,12 +65,11 @@
 #include "ezlopi_core_factory_info.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_websocket_client.h"
-
-#include "ezlopi_service_webprov.h"
-
 #if (1 == EZPI_CORE_WSS_USE_WSC_LIB)
 #include "ezlopi_core_wsc.h"
 #endif // EZPI_CORE_WSS_USE_WSC_LIB
+
+#include "ezlopi_service_webprov.h"
 
 #define TEST_PROV 0
 
@@ -41,54 +79,105 @@
 
 #if defined(CONFIG_EZPI_WEBSOCKET_CLIENT)
 
+/**
+ * @brief Struct for tracking received messages
+ *
+ */
 typedef struct
 {
-    time_t time_ms;
-    char *payload;
+    time_t time_ms; /**< Time in ms */
+    char *payload;  /**< Received payload */
 } s_rx_message_t;
+
+/**
+ * @brief Function to update provision
+ *
+ * @param arg Provisiond data
+ * @return int
+ */
+static int ezpi_provision_update(char *arg);
+/**
+ * @brief Function to check if provisioned
+ *
+ * @param pv Function param
+ */
+static void ezpi_provision_check(void *pv);
+/**
+ * @brief Function task to fetch websocket server endpoint
+ *
+ * @param pv Task param
+ */
+static void ezpi_fetch_wss_endpoint(void *pv);
+/**
+ * @brief Function called for connection status
+ *
+ * @param connected Connected/disconnected status
+ */
+static void ezpi_connection_upcall(bool connected);
+/**
+ * @brief Function called at message received
+ *
+ * @param payload Incoming payload
+ * @param len Payload length
+ * @param time_ms Time in ms
+ * @return int
+ */
+static int ezpi_message_upcall(const char *payload, uint32_t len, time_t time_ms);
+/**
+ * @brief Function to process message
+ *
+ * @param payload Incoming payload
+ * @param len Payload length
+ */
+static void ezpi_message_process(const char *payload, uint32_t len);
+/**
+ * @brief Function to process JSON message
+ *
+ * @param cj_request Incoming request
+ * @param time_ms Time in ms
+ */
+static void ezpi_message_process_cjson(cJSON *cj_request, time_t time_ms);
+/**
+ * @brief Function to send payload string to NMA server
+ *
+ * @param str_data Payload to send
+ * @return ezlopi_error_t
+ */
+static ezlopi_error_t ezpi_send_str_data_to_nma_websocket(char *str_data);
+/**
+ * @brief Function to send JOSN data to the NMA server
+ *
+ * @param cj_data JSON data to send
+ * @return int
+ */
+static int ezpi_send_cjson_data_to_nma_websocket(cJSON *cj_data);
 
 static uint32_t message_counter = 0;
 static xTaskHandle _task_handle = NULL;
-
 #if (1 == EZPI_CORE_WSS_USE_WSC_LIB)
 static s_ssl_websocket_t *__wsc_ssl = NULL;
 #endif // EZPI_CORE_WSS_USE_WSC_LIB
-
 static QueueHandle_t _wss_message_queue = NULL;
 static TaskHandle_t __web_socket_initialize_handler = NULL;
 
-static int __provision_update(char *arg);
-
-static void __provision_check(void *pv);
-static void __fetch_wss_endpoint(void *pv);
-
-static void __connection_upcall(bool connected);
-static int __message_upcall(const char *payload, uint32_t len, time_t time_ms);
-// static void __message_upcall(const char *payload, uint32_t len);
-static void __message_process(const char *payload, uint32_t len);
-static void __message_process_cjson(cJSON *cj_request, time_t time_ms);
-
-static ezlopi_error_t __send_str_data_to_nma_websocket(char *str_data);
-static int __send_cjson_data_to_nma_websocket(cJSON *cj_data);
-
-uint32_t ezlopi_service_web_provisioning_get_message_count(void)
+uint32_t EZPI_service_web_provisioning_get_message_count(void)
 {
     return message_counter;
 }
 
-void ezlopi_service_web_provisioning_init(void)
+void EZPI_service_web_provisioning_init(void)
 {
     TaskHandle_t ezlopi_service_web_prov_config_check_task_handle = NULL;
-    xTaskCreate(__provision_check, "WebProvCfgChk", EZLOPI_SERVICE_WEB_PROV_CONFIG_CHECK_TASK_DEPTH, NULL, 4, &ezlopi_service_web_prov_config_check_task_handle);
+    xTaskCreate(ezpi_provision_check, "WebProvCfgChk", EZLOPI_SERVICE_WEB_PROV_CONFIG_CHECK_TASK_DEPTH, NULL, 4, &ezlopi_service_web_prov_config_check_task_handle);
     ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_WEB_PROV_CONFIG_CHECK_TASK, &ezlopi_service_web_prov_config_check_task_handle, EZLOPI_SERVICE_WEB_PROV_CONFIG_CHECK_TASK_DEPTH);
 
     _wss_message_queue = xQueueCreate(10, sizeof(s_rx_message_t *));
 
-    xTaskCreate(__fetch_wss_endpoint, "WebProvFetchWSS", EZLOPI_SERVICE_WEB_PROV_FETCH_WSS_TASK_DEPTH, NULL, 4, &__web_socket_initialize_handler);
+    xTaskCreate(ezpi_fetch_wss_endpoint, "WebProvFetchWSS", EZLOPI_SERVICE_WEB_PROV_FETCH_WSS_TASK_DEPTH, NULL, 4, &__web_socket_initialize_handler);
     ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_WEB_PROV_FETCH_WSS_TASK, &__web_socket_initialize_handler, EZLOPI_SERVICE_WEB_PROV_FETCH_WSS_TASK_DEPTH);
 }
 
-void ezlopi_service_web_provisioning_deinit(void)
+void EZPI_service_web_provisioning_deinit(void)
 {
     if (_task_handle)
     {
@@ -102,7 +191,7 @@ void ezlopi_service_web_provisioning_deinit(void)
 #endif
 }
 
-static void __connection_upcall(bool connected)
+static void ezpi_connection_upcall(bool connected)
 {
     static int prev_status; // 0: never connected, 1: Not-connected, 2: connected
     if (connected)
@@ -127,7 +216,7 @@ static void __connection_upcall(bool connected)
     }
 }
 
-static void __fetch_wss_endpoint(void *pv)
+static void ezpi_fetch_wss_endpoint(void *pv)
 {
     char *ca_certificate = ezlopi_factory_info_v3_get_ca_certificate();
     char *ssl_shared_key = ezlopi_factory_info_v3_get_ssl_shared_key();
@@ -164,11 +253,11 @@ static void __fetch_wss_endpoint(void *pv)
                         if (cjson_uri)
                         {
                             TRACE_D("uri: %s", cjson_uri->valuestring ? cjson_uri->valuestring : "NULL");
-                            ezlopi_core_broadcast_method_add(__send_str_data_to_nma_websocket, "nma-websocket", 4);
+                            ezlopi_core_broadcast_method_add(ezpi_send_str_data_to_nma_websocket, "nma-websocket", 4);
 #if (1 == EZPI_CORE_WSS_USE_WSC_LIB)
-                            __wsc_ssl = ezlopi_core_wsc_init(cjson_uri, __message_upcall, __connection_upcall);
+                            __wsc_ssl = ezlopi_core_wsc_init(cjson_uri, ezpi_message_upcall, ezpi_connection_upcall);
 #else  // EZPI_CORE_WSS_USE_WSC_LIB
-                            ezlopi_websocket_client_init(cjson_uri, __message_upcall, __connection_upcall);
+                            ezlopi_websocket_client_init(cjson_uri, ezpi_message_upcall, ezpi_connection_upcall);
 #endif // EZPI_CORE_WSS_USE_WSC_LIB
                             task_complete = 1;
                         }
@@ -211,7 +300,7 @@ static void __fetch_wss_endpoint(void *pv)
                                 TRACE_E("rx_message->payload [method: null]\r\n%s", rx_message->payload);
                             }
 
-                            __message_process_cjson(cj_request, rx_message->time_ms);
+                            ezpi_message_process_cjson(cj_request, rx_message->time_ms);
                             cJSON_Delete(__FUNCTION__, cj_request);
                         }
 
@@ -244,7 +333,7 @@ static void __fetch_wss_endpoint(void *pv)
                             TRACE_E("Payload [method: null]\r\n%s", payload);
                         }
 
-                        __message_process_cjson(cj_request);
+                        ezpi_message_process_cjson(cj_request);
                         cJSON_Delete(__FUNCTION__, cj_request);
                     }
 
@@ -268,7 +357,7 @@ static void __fetch_wss_endpoint(void *pv)
     vTaskDelete(NULL);
 }
 
-static void __message_process_cjson(cJSON *cj_request, time_t time_ms)
+static void ezpi_message_process_cjson(cJSON *cj_request, time_t time_ms)
 {
     if (cj_request)
     {
@@ -281,7 +370,7 @@ static void __message_process_cjson(cJSON *cj_request, time_t time_ms)
         if (cj_response)
         {
             cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_msg_id_str, message_counter);
-            __send_cjson_data_to_nma_websocket(cj_response);
+            ezpi_send_cjson_data_to_nma_websocket(cj_response);
 
             time(&now);
             TRACE_D("time to reply: %lu", now - time_ms);
@@ -295,7 +384,7 @@ static void __message_process_cjson(cJSON *cj_request, time_t time_ms)
     }
 }
 
-static void __message_process(const char *payload, uint32_t len)
+static void ezpi_message_process(const char *payload, uint32_t len)
 {
     TRACE_D("PAYLOAD: %.*s", len, payload);
     if (payload && len)
@@ -305,7 +394,7 @@ static void __message_process(const char *payload, uint32_t len)
         if (cj_response)
         {
             cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_msg_id_str, message_counter);
-            __send_cjson_data_to_nma_websocket(cj_response);
+            ezpi_send_cjson_data_to_nma_websocket(cj_response);
 
             cJSON_Delete(__FUNCTION__, cj_response);
         }
@@ -316,7 +405,7 @@ static void __message_process(const char *payload, uint32_t len)
     }
 }
 
-static int __message_upcall(const char *payload, uint32_t len, time_t time_ms)
+static int ezpi_message_upcall(const char *payload, uint32_t len, time_t time_ms)
 {
     int ret = 0;
 
@@ -356,7 +445,7 @@ static int __message_upcall(const char *payload, uint32_t len, time_t time_ms)
     return ret;
 }
 
-static int __send_cjson_data_to_nma_websocket(cJSON *cj_data)
+static int ezpi_send_cjson_data_to_nma_websocket(cJSON *cj_data)
 {
     int ret = 0;
 
@@ -372,7 +461,7 @@ static int __send_cjson_data_to_nma_websocket(cJSON *cj_data)
             if (true == cJSON_PrintPreallocated(__FUNCTION__, cj_data, data_buffer, buffer_len, false))
             {
                 // trace_warning("data-buffer: %s", data_buffer);
-                ret = __send_str_data_to_nma_websocket(data_buffer);
+                ret = ezpi_send_str_data_to_nma_websocket(data_buffer);
 
                 if (EZPI_SUCCESS == ret)
                 {
@@ -395,7 +484,7 @@ static int __send_cjson_data_to_nma_websocket(cJSON *cj_data)
     return ret;
 }
 
-static ezlopi_error_t __send_str_data_to_nma_websocket(char *str_data)
+static ezlopi_error_t ezpi_send_str_data_to_nma_websocket(char *str_data)
 {
     ezlopi_error_t ret = EZPI_FAILED;
 
@@ -437,7 +526,7 @@ static ezlopi_error_t __send_str_data_to_nma_websocket(char *str_data)
     return ret;
 }
 
-static void __provision_check(void *pv)
+static void ezpi_provision_check(void *pv)
 {
     uint8_t flag_break_loop = 0;
     static uint8_t retry_count = 0;
@@ -487,7 +576,7 @@ static void __provision_check(void *pv)
                 {
                     if (response->response)
                     {
-                        int _update_ret = __provision_update(response->response);
+                        int _update_ret = ezpi_provision_update(response->response);
 
                         if (_update_ret > 0)
                         {
@@ -556,7 +645,7 @@ static void __provision_check(void *pv)
     vTaskDelete(NULL);
 }
 
-static int __provision_update(char *arg)
+static int ezpi_provision_update(char *arg)
 {
     int ret = 0;
     cJSON *cj_root_prov_data = cJSON_Parse(__FUNCTION__, arg);
@@ -675,3 +764,7 @@ static int __provision_update(char *arg)
     return ret;
 }
 #endif // CONFIG_EZPI_WEBSOCKET_CLIENT
+
+/*******************************************************************************
+ *                          End of File
+ *******************************************************************************/
