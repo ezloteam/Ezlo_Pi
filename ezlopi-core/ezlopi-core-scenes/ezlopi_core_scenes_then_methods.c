@@ -852,7 +852,7 @@ int ezlopi_scene_then_toggle_value(l_scenes_list_v2_t *curr_scene, void *arg)
             }
             else if (NULL != expression_name)
             {
-                s_ezlopi_expressions_t *curr_exp = ezlopi_scenes_get_expression_node_by_name(expression_name);
+                s_ezlopi_expressions_t *curr_exp = EZPI_scenes_expressions_get_node_by_name(expression_name);
                 if (curr_exp)
                 {
                     if (EXPRESSION_VALUE_TYPE_NUMBER == curr_exp->exp_value.type)

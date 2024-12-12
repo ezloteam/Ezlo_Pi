@@ -314,7 +314,7 @@ void scenes_notification_remove(cJSON *cj_request, cJSON *cj_response)
                         l_user_notification_v2_t *user_id_del = scene_node->user_notifications;
                         scene_node->user_notifications = scene_node->user_notifications->next;
                         user_id_del->next = NULL;
-                        ezlopi_scenes_delete_user_notifications(user_id_del);
+                        EZPI_scenes_delete_user_notifications(user_id_del);
                     }
                     else
                     {
@@ -326,7 +326,7 @@ void scenes_notification_remove(cJSON *cj_request, cJSON *cj_response)
                                 l_user_notification_v2_t *user_id_del = user_node;
                                 user_node = user_node->next;
                                 user_id_del->next = NULL;
-                                ezlopi_scenes_delete_user_notifications(user_id_del);
+                                EZPI_scenes_delete_user_notifications(user_id_del);
                                 break;
                             }
 
@@ -433,7 +433,7 @@ void scenes_house_modes_set(cJSON *cj_request, cJSON *cj_response)
                 l_scenes_list_v2_t *scene_node = ezlopi_scenes_get_by_id_v2(scene_id);
                 if (scene_node && scene_node->house_modes)
                 {
-                    ezlopi_scenes_delete_house_modes(scene_node->house_modes);
+                    EZPI_scenes_delete_house_modes(scene_node->house_modes);
                     if (NULL != (scene_node->house_modes = ezlopi_scenes_populate_house_modes(cJSON_Duplicate(__FUNCTION__, cj_house_mode_arr, true))))
                     {
                         TRACE_S("Updating ... House_modes ; Success");
@@ -526,7 +526,7 @@ void scenes_action_block_test(cJSON *cj_request, cJSON *cj_response)
                         ezlopi_free(__FUNCTION__, tmp_http_data);
                     }
 
-                    ezlopi_scenes_delete_action_blocks(test_then_block);
+                    EZPI_scenes_delete_action_blocks(test_then_block);
                 }
             }
         }

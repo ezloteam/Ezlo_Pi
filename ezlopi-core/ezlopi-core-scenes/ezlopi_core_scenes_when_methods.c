@@ -255,7 +255,7 @@ int ezlopi_scene_when_is_item_state_changed(l_scenes_list_v2_t *scene_node, void
                 if (EZLOPI_VALUE_TYPE_EXPRESSION == item_exp_field->value_type) // EXPRESSION
                 {
                     new_extract_data->value_type = EZLOPI_VALUE_TYPE_EXPRESSION;
-                    s_ezlopi_expressions_t *curr_expr_left = ezlopi_scenes_get_expression_node_by_name(item_exp_field->field_value.u_value.value_string);
+                    s_ezlopi_expressions_t *curr_expr_left = EZPI_scenes_expressions_get_node_by_name(item_exp_field->field_value.u_value.value_string);
                     if (curr_expr_left)
                     {
                         if (curr_expr_left->variable) // 1. experssion is 'variable-type'
@@ -294,7 +294,7 @@ int ezlopi_scene_when_is_item_state_changed(l_scenes_list_v2_t *scene_node, void
                         else // 2. expression is 'expression-type'
                         {
                             cJSON *cj_expr_des = cJSON_CreateObject(__FUNCTION__);
-                            if (cj_expr_des && (0 < ezlopi_scenes_expression_simple(cj_expr_des, curr_expr_left->name, curr_expr_left->code)))
+                            if (cj_expr_des && (0 < EZPI_scenes_expressions_eval_simple(cj_expr_des, curr_expr_left->name, curr_expr_left->code)))
                             {
                                 cJSON *cj_value = cJSON_GetObjectItem(__FUNCTION__, cj_expr_des, ezlopi_value_str);
                                 if (cj_value)

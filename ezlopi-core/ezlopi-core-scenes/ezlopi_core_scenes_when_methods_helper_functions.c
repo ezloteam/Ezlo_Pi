@@ -1635,7 +1635,7 @@ static uint8_t __isitemState_vs_field_compare(s_item_exp_data_t *new_extract_dat
         }
         case EZLOPI_VALUE_TYPE_EXPRESSION:
         {
-            s_ezlopi_expressions_t *tmp_expr = ezlopi_scenes_get_expression_node_by_name(tmp_field->field_value.u_value.value_string);
+            s_ezlopi_expressions_t *tmp_expr = EZPI_scenes_expressions_get_node_by_name(tmp_field->field_value.u_value.value_string);
             if (tmp_expr)
             {
                 switch (tmp_expr->exp_value.type)

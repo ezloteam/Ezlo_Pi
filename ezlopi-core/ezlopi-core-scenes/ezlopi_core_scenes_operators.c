@@ -1029,7 +1029,7 @@ static int __evaluate_numrange(l_fields_v2_t *item_exp_field, l_fields_v2_t *sta
     // 1. LHS = expression
     if (EZLOPI_VALUE_TYPE_EXPRESSION == item_exp_field->value_type)
     {
-        s_ezlopi_expressions_t *curr_expr_left = ezlopi_scenes_get_expression_node_by_name(item_exp_field->field_value.u_value.value_string);
+        s_ezlopi_expressions_t *curr_expr_left = EZPI_scenes_expressions_get_node_by_name(item_exp_field->field_value.u_value.value_string);
         if (curr_expr_left)
         {
             if (EZLOPI_VALUE_TYPE_EXPRESSION != start_value_field->value_type &&
@@ -1042,8 +1042,8 @@ static int __evaluate_numrange(l_fields_v2_t *item_exp_field, l_fields_v2_t *sta
             else if (EZLOPI_VALUE_TYPE_EXPRESSION == start_value_field->value_type &&
                 EZLOPI_VALUE_TYPE_EXPRESSION == end_value_field->value_type)
             {
-                s_ezlopi_expressions_t *curr_expr_right_start = ezlopi_scenes_get_expression_node_by_name(start_value_field->field_value.u_value.value_string);
-                s_ezlopi_expressions_t *curr_expr_right_end = ezlopi_scenes_get_expression_node_by_name(end_value_field->field_value.u_value.value_string);
+                s_ezlopi_expressions_t *curr_expr_right_start = EZPI_scenes_expressions_get_node_by_name(start_value_field->field_value.u_value.value_string);
+                s_ezlopi_expressions_t *curr_expr_right_end = EZPI_scenes_expressions_get_node_by_name(end_value_field->field_value.u_value.value_string);
                 if (curr_expr_right_start && curr_expr_right_end)
                 { //---------------  expression_valueType  VS  expression_valueType  ---------------
                     ret = ____compare_range_exp_vs_exp(curr_expr_left, curr_expr_right_start, curr_expr_right_end, comparator_choice);
@@ -1069,8 +1069,8 @@ static int __evaluate_numrange(l_fields_v2_t *item_exp_field, l_fields_v2_t *sta
             else if (EZLOPI_VALUE_TYPE_EXPRESSION == start_value_field->value_type &&
                 EZLOPI_VALUE_TYPE_EXPRESSION == end_value_field->value_type)
             {
-                s_ezlopi_expressions_t *curr_expr_right_start = ezlopi_scenes_get_expression_node_by_name(start_value_field->field_value.u_value.value_string);
-                s_ezlopi_expressions_t *curr_expr_right_end = ezlopi_scenes_get_expression_node_by_name(end_value_field->field_value.u_value.value_string);
+                s_ezlopi_expressions_t *curr_expr_right_start = EZPI_scenes_expressions_get_node_by_name(start_value_field->field_value.u_value.value_string);
+                s_ezlopi_expressions_t *curr_expr_right_end = EZPI_scenes_expressions_get_node_by_name(end_value_field->field_value.u_value.value_string);
                 if (curr_expr_right_start && curr_expr_right_end)
                 { //---------------  item_valueType  VS  expression_valueType  --------------------
                     ret = ____compare_range_item_vs_exp(item, curr_expr_right_start, curr_expr_right_end, comparator_choice);
@@ -1280,7 +1280,7 @@ int ezlopi_scenes_operators_value_strops_operations(l_fields_v2_t *item_exp_fiel
         // 1 . LHS => expression (only string values )
         if (EZLOPI_VALUE_TYPE_EXPRESSION == item_exp_field->value_type)
         {
-            s_ezlopi_expressions_t *curr_expr_left = ezlopi_scenes_get_expression_node_by_name(item_exp_field->field_value.u_value.value_string);
+            s_ezlopi_expressions_t *curr_expr_left = EZPI_scenes_expressions_get_node_by_name(item_exp_field->field_value.u_value.value_string);
             if (curr_expr_left)
             {
                 if (EZLOPI_VALUE_TYPE_STRING == curr_expr_left->value_type)
@@ -1590,7 +1590,7 @@ int ezlopi_scenes_operators_value_inarr_operations(l_fields_v2_t *item_exp_field
         //------------------------------------------------
         if (EZLOPI_VALUE_TYPE_EXPRESSION == item_exp_field->value_type)
         {
-            s_ezlopi_expressions_t *curr_expr_left = ezlopi_scenes_get_expression_node_by_name(item_exp_field->field_value.u_value.value_string);
+            s_ezlopi_expressions_t *curr_expr_left = EZPI_scenes_expressions_get_node_by_name(item_exp_field->field_value.u_value.value_string);
             if (curr_expr_left)
             {
                 switch (curr_expr_left->exp_value.type)
@@ -2041,12 +2041,12 @@ int ezlopi_scenes_operators_value_comparevalues_with_less_operations(l_fields_v2
         // 1. LHS = expression
         if (EZLOPI_VALUE_TYPE_EXPRESSION == item_exp_field->value_type)
         {
-            s_ezlopi_expressions_t *curr_expr_left = ezlopi_scenes_get_expression_node_by_name(item_exp_field->field_value.u_value.value_string);
+            s_ezlopi_expressions_t *curr_expr_left = EZPI_scenes_expressions_get_node_by_name(item_exp_field->field_value.u_value.value_string);
             if (curr_expr_left)
             {
                 if (EZLOPI_VALUE_TYPE_EXPRESSION == value_field->value_type)
                 { // 2. exp vs exp
-                    s_ezlopi_expressions_t *curr_expr_right = ezlopi_scenes_get_expression_node_by_name(value_field->field_value.u_value.value_string);
+                    s_ezlopi_expressions_t *curr_expr_right = EZPI_scenes_expressions_get_node_by_name(value_field->field_value.u_value.value_string);
                     if (curr_expr_right)
                     { // check if all have same data-type
                         if (__check_valuetypes(ezlopi_scene_get_scene_value_type_name(curr_expr_left->value_type),
@@ -2090,7 +2090,7 @@ int ezlopi_scenes_operators_value_comparevalues_with_less_operations(l_fields_v2
             {
                 if (EZLOPI_VALUE_TYPE_EXPRESSION == value_field->value_type)
                 { // 2. RHS = expression
-                    s_ezlopi_expressions_t *curr_expr_right = ezlopi_scenes_get_expression_node_by_name(value_field->field_value.u_value.value_string);
+                    s_ezlopi_expressions_t *curr_expr_right = EZPI_scenes_expressions_get_node_by_name(value_field->field_value.u_value.value_string);
                     if (curr_expr_right)
                     {
                         if (__check_valuetypes(item_left->cloud_properties.value_type,
@@ -2264,7 +2264,7 @@ static int __evaluate_compareNumber_or_compareStrings(l_fields_v2_t *item_exp_fi
         // 1. LHS = expression
         if (EZLOPI_VALUE_TYPE_EXPRESSION == item_exp_field->value_type)
         {
-            s_ezlopi_expressions_t *curr_expr_left = ezlopi_scenes_get_expression_node_by_name(item_exp_field->field_value.u_value.value_string);
+            s_ezlopi_expressions_t *curr_expr_left = EZPI_scenes_expressions_get_node_by_name(item_exp_field->field_value.u_value.value_string);
             if (curr_expr_left)
             {
                 if (EZLOPI_VALUE_TYPE_EXPRESSION != value_field->value_type)
@@ -2275,7 +2275,7 @@ static int __evaluate_compareNumber_or_compareStrings(l_fields_v2_t *item_exp_fi
                 }
                 else if (EZLOPI_VALUE_TYPE_EXPRESSION == value_field->value_type)
                 {
-                    s_ezlopi_expressions_t *curr_expr_right = ezlopi_scenes_get_expression_node_by_name(value_field->field_value.u_value.value_string);
+                    s_ezlopi_expressions_t *curr_expr_right = EZPI_scenes_expressions_get_node_by_name(value_field->field_value.u_value.value_string);
                     if (curr_expr_right)
                     {
                         //---------------  expression_valueType  VS  expression_valueType  ---------------
@@ -2300,7 +2300,7 @@ static int __evaluate_compareNumber_or_compareStrings(l_fields_v2_t *item_exp_fi
                 }
                 else if (EZLOPI_VALUE_TYPE_EXPRESSION == value_field->value_type)
                 {
-                    s_ezlopi_expressions_t *curr_expr_right = ezlopi_scenes_get_expression_node_by_name(value_field->field_value.u_value.value_string);
+                    s_ezlopi_expressions_t *curr_expr_right = EZPI_scenes_expressions_get_node_by_name(value_field->field_value.u_value.value_string);
                     if (curr_expr_right)
                     { //---------------  item_valueType  VS  expression_valueType  --------------------
                         ret = ____compare_item_vs_exp(item, curr_expr_right, comparator_str);

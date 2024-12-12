@@ -35,10 +35,10 @@
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
-#include "stdint.h"
-/*******************************************************************************
- *                          C++ Declaration Wrapper
- *******************************************************************************/
+#include <stdint.h>
+ /*******************************************************************************
+  *                          C++ Declaration Wrapper
+  *******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
@@ -97,20 +97,20 @@ extern "C"
      *                          Extern Data Declarations
      *******************************************************************************/
 
-    /*******************************************************************************
-     *                          Extern Function Prototypes
-     *******************************************************************************/
-    /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
-     *
-     */
-    // void EZPI_core_errors_functiontitle(type_t arg);
+     /*******************************************************************************
+      *                          Extern Function Prototypes
+      *******************************************************************************/
+      /**
+       * @brief Global function template example
+       * Convention : Use capital letter for initial word on extern function
+       * maincomponent : Main component as hal, core, service etc.
+       * subcomponent : Sub component as i2c from hal, ble from service etc
+       * functiontitle : Title of the function
+       * eg : EZPI_hal_i2c_init()
+       * @param arg
+       *
+       */
+       // void EZPI_core_errors_functiontitle(type_t arg);
     void EZPI_core_error_assert_on_error(ezlopi_error_t error, uint32_t error_to_assert_on);
     const char *EZPI_core_error_code_to_str(ezlopi_error_t error_code);
 

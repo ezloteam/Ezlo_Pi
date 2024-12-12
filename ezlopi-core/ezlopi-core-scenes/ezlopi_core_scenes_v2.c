@@ -61,9 +61,9 @@ int ezlopi_scene_edit_by_id(uint32_t scene_id, cJSON *cj_scene)
 {
     int ret = 0;
 
-    if (EZPI_SUCCESS == ezlopi_core_scene_edit_store_updated_to_nvs(cj_scene)) // first store in nvs // add the new-block-id
+    if (EZPI_SUCCESS == EZPI_core_scene_edit_store_updated_to_nvs(cj_scene)) // first store in nvs // add the new-block-id
     {
-        if (EZPI_SUCCESS == ezlopi_core_scene_edit_update_id(scene_id, cj_scene)) // then populate to nvs
+        if (EZPI_SUCCESS == EZPI_core_scene_edit_update_id(scene_id, cj_scene)) // then populate to nvs
         {
             ret = 1;
         }
@@ -289,7 +289,7 @@ void ezlopi_scenes_depopulate_by_id_v2(uint32_t _id)
 {
     if (EZPI_SUCCESS == ezlopi_meshbot_stop_without_broadcast(ezlopi_scenes_get_by_id_v2(_id)))
     {
-        ezlopi_scenes_delete(ezlopi_scenes_pop_by_id_v2(_id));
+        EZPI_scenes_delete(ezlopi_scenes_pop_by_id_v2(_id));
     }
 }
 
@@ -322,7 +322,7 @@ ezlopi_error_t ezlopi_scenes_enable_disable_scene_by_id_v2(uint32_t _id, bool en
 
                     CJSON_TRACE("cj_scene----> 2. updated", cj_scene);
 
-                    /*  DONOT use : 'ezlopi_core_scene_edit_store_updated_to_nvs' .. Here */
+                    /*  DONOT use : 'EZPI_core_scene_edit_store_updated_to_nvs' .. Here */
                     char *update_scene_str = cJSON_PrintBuffered(__FUNCTION__, cj_scene, 4096, false);
                     TRACE_D("length of 'update_scene_str': %d", strlen(update_scene_str));
 
@@ -1473,7 +1473,7 @@ int ezlopi_core_scene_set_reset_latch_enable(const char *sceneId_str, const char
 
                     if (latch_cleared)
                     {
-                        /*  DONOT use : 'ezlopi_core_scene_edit_store_updated_to_nvs' .. Here */
+                        /*  DONOT use : 'EZPI_core_scene_edit_store_updated_to_nvs' .. Here */
                         char *update_scene_str = cJSON_PrintBuffered(__FUNCTION__, cj_scene, 4096, false);
                         TRACE_D("length of 'update_scene_str': %d", strlen(update_scene_str));
 
@@ -1703,7 +1703,7 @@ ezlopi_error_t ezlopi_core_scene_block_enable_set_reset(const char *sceneId_str,
 
                     if (block_enabled_changed)
                     {
-                        /*  DONOT use : 'ezlopi_core_scene_edit_store_updated_to_nvs' .. Here */
+                        /*  DONOT use : 'EZPI_core_scene_edit_store_updated_to_nvs' .. Here */
                         {
                             char *update_scene_str = cJSON_PrintBuffered(__FUNCTION__, cj_scene, 4096, false);
                             TRACE_D("length of 'update_scene_str': %d", strlen(update_scene_str));
@@ -1720,7 +1720,7 @@ ezlopi_error_t ezlopi_core_scene_block_enable_set_reset(const char *sceneId_str,
                                     {
                                         TRACE_W("nvs updated successfull");
                                         /*secondly Change in ll */
-                                        ezlopi_core_scene_edit_update_id(sceneId, cj_scene);
+                                        EZPI_core_scene_edit_update_id(sceneId, cj_scene);
                                     }
                                     else
                                     {
@@ -1853,7 +1853,7 @@ ezlopi_error_t ezlopi_core_scene_meta_by_id(const char *sceneId_str, const char 
                     if (meta_data_added)
                     {
                         // CJSON_TRACE("new_cj_scene", cj_scene);
-                        /*  DONOT use : 'ezlopi_core_scene_edit_store_updated_to_nvs' .. Here */
+                        /*  DONOT use : 'EZPI_core_scene_edit_store_updated_to_nvs' .. Here */
                         char *update_scene_str = cJSON_PrintBuffered(__FUNCTION__, cj_scene, 4096, false);
                         TRACE_D("length of 'update_scene_str': %d", strlen(update_scene_str));
 
@@ -1869,7 +1869,7 @@ ezlopi_error_t ezlopi_core_scene_meta_by_id(const char *sceneId_str, const char 
                                 {
                                     TRACE_W("nvs updated successfully");
                                     /*secondly Change in ll */
-                                    ezlopi_core_scene_edit_update_id(sceneId, cj_scene);
+                                    EZPI_core_scene_edit_update_id(sceneId, cj_scene);
                                 }
                                 else
                                 {

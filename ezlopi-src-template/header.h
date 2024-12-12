@@ -31,9 +31,9 @@
 /**
  * @file    main.c
  * @brief   perform some function on data
- * @author  John Doe
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    12th DEC 2024
 */
 
 #ifndef __HEADER_H__

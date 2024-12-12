@@ -434,7 +434,7 @@ void free_http_mbedtls_struct(s_ezlopi_core_http_mbedtls_t *config)
 ezlopi_error_t ezlopi_core_scene_then_helper_setexpression_setvariable(char *expression_name, const char *code_str, const char *value_type, cJSON *cj_metadata, cJSON *cj_params, l_fields_v2_t *var_value)
 {
     ezlopi_error_t ret = EZPI_FAILED;
-    s_ezlopi_expressions_t *curr_expr = ezlopi_scenes_get_expression_node_by_name(expression_name);
+    s_ezlopi_expressions_t *curr_expr = EZPI_scenes_expressions_get_node_by_name(expression_name);
     if (curr_expr)
     {
         // 1. set new code
@@ -478,23 +478,23 @@ ezlopi_error_t ezlopi_core_scene_then_helper_setexpression_setvariable(char *exp
             {
                 if (curr_expr->items)
                 {
-                    ezlopi_scenes_expressions_delete_exp_item(curr_expr->items);
+                    EZPI_scenes_expressions_delete_items(curr_expr->items);
                     curr_expr->items->next = NULL;
                     curr_expr->items = NULL;
                 }
 
-                __get_expressions_items(curr_expr, cj_new_items);
+                EZPI_scenes_expressions_populate_items(curr_expr, cj_new_items);
             }
             cJSON *cj_new_device_item_names = NULL;
             if ((NULL != curr_expr->device_item_names) && (NULL != (cj_new_device_item_names = cJSON_GetObjectItem(__FUNCTION__, cj_params, "device_item_names"))))
             {
                 if (curr_expr->device_item_names)
                 {
-                    ezlopi_scenes_expressions_delete_exp_device_item_names(curr_expr->device_item_names);
+                    EZPI_scenes_expressions_delete_devitem_names(curr_expr->device_item_names);
                     curr_expr->device_item_names->next = NULL;
                     curr_expr->device_item_names = NULL;
                 }
-                __get_expressions_device_item_names(curr_expr, cj_new_device_item_names);
+                EZPI_scenes_expressions_populate_devitem_names(curr_expr, cj_new_device_item_names);
             }
         }
 
@@ -559,7 +559,7 @@ ezlopi_error_t ezlopi_core_scene_then_helper_setexpression_setvariable(char *exp
         }
 
         // TRACE_S("-------------- Updated_exp_name : %s  ------------", expression_name);
-        // ezlopi_scenes_expressions_print(ezlopi_scenes_get_expression_node_by_name(expression_name));
+        // EZPI_scenes_expressions_print(EZPI_scenes_expressions_get_node_by_name(expression_name));
         // TRACE_S("----------------- ll --------------------");
 
         // 5. Now to edit in nvs
@@ -580,7 +580,7 @@ ezlopi_error_t ezlopi_core_scene_then_helper_setexpression_setvariable(char *exp
                         if (exp_id == curr_expr->exp_id)
                         {
                             TRACE_S("Found [%#x] in nvs ; req[%#x]", exp_id, curr_expr->exp_id);
-                            ret = ezlopi_scenes_expressions_update_nvs(cj_exp_id->valuestring, generate_expression_node_in_cjson(curr_expr));
+                            ret = EZPI_scenes_expressions_update_nvs(cj_exp_id->valuestring, EZPI_scenes_expressions_get_cjson(curr_expr));
                             break;
                         }
                     }

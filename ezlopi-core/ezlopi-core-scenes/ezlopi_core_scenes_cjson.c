@@ -30,7 +30,7 @@
 */
 /**
  * @file    ezlopi_core_scenes_cjson.c
- * @brief   perform some function on data
+ * @brief   file includes functions that operate on scene data 
  * @author  xx
  * @version 0.1
  * @date    12th DEC 2024
@@ -38,18 +38,6 @@
  //*******************************************************************************
  //*                          Include Files
  //*******************************************************************************
-
-/**
-* Include Sequence
-* 1. C standard libraries eg. stdint, string etc.
-* 2. Third party component eg. cJSON, freeRTOS etc etc
-* 3. ESP-IDF specific eg. driver/gpio, esp_log etc.
-* 4. EzloPi HAL specific eg ezlopi_hal_i2c
-* 5. EzloPi core specific eg. ezlopi_core_ble
-* 6. EzloPi cloud specific eg. ezlopi_cloud_items
-* 7. EzloPi Service specific eg ezlopi_service_ble
-* 8. EzloPi Sensors and Device Specific eg. ezlopi_device_0001_digitalout_generic
-*/
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
@@ -434,13 +422,6 @@ void EZPI_scenes_cjson_add_when_blocks(cJSON *root, l_when_block_v2_t *when_bloc
 /*******************************************************************************
 *                         Static Function Definitions
 *******************************************************************************/
-
-/**
-* @brief Local/static function template example
-* Convention : Use lowercase letters for all words on static functions
-* @param arg
-*/
-
 static void __ezlopi_scenes_cjson_add_user_notifications(cJSON *root, l_user_notification_v2_t *user_notifications)
 {
     if (root)
