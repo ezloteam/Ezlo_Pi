@@ -669,7 +669,7 @@ static int ezpi_service_uart_parser(const char *data)
     return 1;
 }
 
-static void ezlopi_service_uart_task(void *arg)
+static void ezpi_service_uart_task(void *arg)
 {
     static const char *RX_TASK_TAG = "RX_TASK";
     esp_log_level_set(RX_TASK_TAG, ESP_LOG_INFO);
