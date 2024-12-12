@@ -1,11 +1,3 @@
-/**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
- * @version 0.1
- * @date    1st January 2024
-*/
-
 /* ===========================================================================
 ** Copyright (C) 2024 Ezlo Innovation Inc
 **
@@ -37,6 +29,13 @@
 ** ===========================================================================
 */
 
+/**
+ * @file    ezlopi_core_scenes_cjson.h
+ * @brief   perform some function on data
+ * @author  John Doe
+ * @version 0.1
+ * @date    1st January 2024
+*/
 #ifndef _EZLOPI_CORE_SCENES_CJSON_H_
 #define _EZLOPI_CORE_SCENES_CJSON_H_
 
@@ -79,20 +78,59 @@ extern "C"
     *                          Extern Function Prototypes
     *******************************************************************************/
 
-    cJSON *EZLOPI_scene_cjson_get_field(l_fields_v2_t *field_node);
     /**
-     * @brief
+     * @brief This function returns a 'cjson-object' containing field info.
      *
-     * @param action_block
-     * @param block_type_str
+     * @param field_node[l_fields_v2_t] Node to generate obj from.
      * @return cJSON*
      */
-    cJSON *EZLOPI_scenes_cjson_create_action_block(l_action_block_v2_t *action_block, char *block_type_str);
-    cJSON *EZLOPI_scenes_cjson_create_when_block(l_when_block_v2_t *when_block);
-    cJSON *EZLOPI_scenes_create_cjson_scene(l_scenes_list_v2_t *scene);
-    cJSON *EZLOPI_scenes_create_cjson_scene_list(l_scenes_list_v2_t *scenes_list);
-    void EZLOPI_scenes_cjson_add_action_blocks(cJSON *root, l_action_block_v2_t *action_blocks, const char *block_type_str);
-    void EZLOPI_scenes_cjson_add_when_blocks(cJSON *root, l_when_block_v2_t *when_blocks);
+    cJSON *EZPI_scene_cjson_get_field(l_fields_v2_t *field_node);
+    /**
+     * @brief This function returns a 'cjson-object' containing 'action-block' info.
+     *
+     * @param action_block Node to generate the obj from.
+     * @param block_type_str info requied to generate the resulting 'cjson-obj'
+     * @return cJSON* ; 'NULL'=> if arg not valid.
+     */
+    cJSON *EZPI_scenes_cjson_create_action_block(l_action_block_v2_t *action_block, char *block_type_str);
+    /**
+     * @brief This function return a 'cjson-object' containing 'when-block' info.
+     *
+     * @param when_block Node to generate the obj from.
+     * @return cJSON* ; 'NULL'=> if arg  not valid.
+     */
+    cJSON *EZPI_scenes_cjson_create_when_block(l_when_block_v2_t *when_block);
+    /**
+     * @brief This function return a single 'cjson-object' containing 'l_scenes_list_v2_t' info.
+     *
+     * @param scene Node to generate the obj from.
+     * @return cJSON* ; 'NULL'=> if arg not valid.
+     */
+    cJSON *EZPI_scenes_create_cjson_scene(l_scenes_list_v2_t *scene);
+    /**
+     * @brief This function return a 'cjson-object' containing info on all the scene created till now.
+     *
+     * @param scenes_list List_Node to generate the 'obj-list' from.
+     * @return cJSON* ; 'NULL'=> if arg not valid.
+     */
+    cJSON *EZPI_scenes_create_cjson_scene_list(l_scenes_list_v2_t *scenes_list);
+    /**
+     * @brief This function appends 'then-cjson-objs' to 'root-obj' ; The objects are created using info from 'action_blocks' & 'block_type_str' args.
+     *
+     * @param root This CJSON holds the appended result.
+     * @param action_blocks Node to generate the obj from.
+     * @param block_type_str info requied to generate the resulting 'cjson-obj'
+     *
+     * @return NULL
+     */
+    void EZPI_scenes_cjson_add_action_blocks(cJSON *root, l_action_block_v2_t *action_blocks, const char *block_type_str);
+    /**
+     * @brief This function appends 'when-cjson-objs' to 'root-obj' ; The objects are created using info from 'when_blocks' arg.
+     *
+     * @param root This CJSON holds the appended result.
+     * @param when_blocks Node to generate the obj from.
+     */
+    void EZPI_scenes_cjson_add_when_blocks(cJSON *root, l_when_block_v2_t *when_blocks);
 
 
 #ifdef __cplusplus
