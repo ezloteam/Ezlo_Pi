@@ -364,5 +364,15 @@ extern const char *ezlopi_spanId_str;
 extern const char *ezlopi_traceId_str;
 extern const char *ezlopi_startTime_str;
 extern const char *ezlopi_endTime_str;
+extern const char *ezlopi_logTime_str;
+extern const char *ezlopi_severityNumber_str;
+extern const char *ezlopi_severityText_str;
+extern const char *ezlopi_TRACE_str;
+extern const char *ezlopi_DEBUG_str;
+extern const char *ezlopi_INFO_str;
+extern const char *ezlopi_WARN_str;
+extern const char *ezlopi_ERROR_str;
+extern const char *ezlopi_fileName_str;
+extern const char *ezlopi_lineNumber_str;
 
 #endif // __EZLOPI_CLOUD_KEYWORDS_H__

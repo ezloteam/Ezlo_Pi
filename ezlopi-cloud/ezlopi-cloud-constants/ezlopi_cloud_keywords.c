@@ -360,6 +360,15 @@ const char *ezlopi_spanId_str = "spanId";
 const char *ezlopi_traceId_str = "traceId";
 const char *ezlopi_startTime_str = "startTime";
 const char *ezlopi_endTime_str = "endTime";
-
+const char *ezlopi_logTime_str = "logTime";
+const char *ezlopi_severityNumber_str = "severityNumber";
+const char *ezlopi_severityText_str = "severityText";
+const char *ezlopi_TRACE_str = "TRACE";
+const char *ezlopi_DEBUG_str = "DEBUG";
+const char *ezlopi_INFO_str = "INFO";
+const char *ezlopi_WARN_str = "WARN";
+const char *ezlopi_ERROR_str = "ERROR";
+const char *ezlopi_fileName_str = "fileName";
+const char *ezlopi_lineNumber_str = "lineNumber";
 
 #endif // __EZLOPI_CLOUD_KEYWORDS_H__
