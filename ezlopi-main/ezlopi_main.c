@@ -104,9 +104,9 @@ void app_main(void)
 #endif
 
 #if defined(CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER)
-    ezlopi_service_ws_server_start();
+    EZPI_service_ws_server_start();
 #else  // CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER
-    ezlpi_service_ws_server_dummy();
+    EZPI_service_ws_server_dummy();
 #endif // CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER
 
 #if defined(CONFIG_EZPI_WEBSOCKET_CLIENT)

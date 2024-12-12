@@ -19,7 +19,7 @@ void EZPI_CORE_reset_reboot(void)
 #endif // CONFIG_EZPI_WEBSOCKET_CLIENT
 
 #ifdef CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER
-    ezlopi_service_ws_server_stop();
+    EZPI_service_ws_server_stop();
 #endif // CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER
 
     esp_restart();
