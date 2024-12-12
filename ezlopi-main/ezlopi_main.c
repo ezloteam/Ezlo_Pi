@@ -114,7 +114,7 @@ void app_main(void)
 #endif
 
 #ifdef CONFIG_EZPI_ENABLE_OTA
-    ezlopi_service_ota_init();
+    EZPI_service_ota_init();
 #endif // CONFIG_EZPI_ENABLE_OTA
 
     ezlopi_service_otel_init();
