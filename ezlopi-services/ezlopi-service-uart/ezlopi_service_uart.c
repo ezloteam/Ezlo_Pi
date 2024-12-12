@@ -1,8 +1,52 @@
+
+
+/**
+ * @file    ezlopi_service_uart.c
+ * @brief
+ * @author
+ * @version
+ * @date
+ */
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+
 #include "../../build/config/sdkconfig.h"
 
 #include "freertos/FreeRTOSConfig.h"
 
-#include "cjext.h"
+#if !defined(CONFIG_IDF_TARGET_ESP32) && !defined(CONFIG_IDF_TARGET_ESP32C3)
+#include "tinyusb.h"
+#include "tusb_cdc_acm.h"
+#endif // NOT defined CONFIG_IDF_TARGET_ESP32 or CONFIG_IDF_TARGET_ESP32C3
+
 #include "esp_log.h"
 #include "nvs_flash.h"
 #include "esp_netif.h"
@@ -11,13 +55,13 @@
 #include "esp_idf_version.h"
 #include "esp_netif_ip_addr.h"
 
-#if !defined(CONFIG_IDF_TARGET_ESP32) && !defined(CONFIG_IDF_TARGET_ESP32C3)
-#include "tinyusb.h"
-#include "tusb_cdc_acm.h"
-#endif // NOT defined CONFIG_IDF_TARGET_ESP32 or CONFIG_IDF_TARGET_ESP32C3
-
+#include "cjext.h"
 #include "ezlopi_util_trace.h"
 #include "ezlopi_util_version.h"
+#include "EZLOPI_USER_CONFIG.h"
+
+#include "ezlopi_hal_uart.h"
+#include "ezlopi_hal_system_info.h"
 
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_net.h"
@@ -28,7 +72,6 @@
 #include "ezlopi_core_event_group.h"
 #include "ezlopi_core_factory_info.h"
 #include "ezlopi_core_cjson_macros.h"
-
 #include "ezlopi_core_event_group.h"
 #include "ezlopi_core_sntp.h"
 #include "ezlopi_core_info.h"
@@ -37,30 +80,185 @@
 #include "ezlopi_core_log.h"
 #include "ezlopi_core_errors.h"
 
-#include "ezlopi_hal_uart.h"
-#include "ezlopi_hal_system_info.h"
-
 #include "ezlopi_cloud_info.h"
 #include "ezlopi_cloud_constants.h"
 
 #include "ezlopi_service_ble.h"
 #include "ezlopi_service_uart.h"
 #include "ezlopi_service_loop.h"
-#include "EZLOPI_USER_CONFIG.h"
 
 #if defined(CONFIG_IDF_TARGET_ESP32)
+/**
+ * @brief UART TX pin number
+ *
+ */
 #define TXD_PIN (GPIO_NUM_1)
+/**
+ * @brief UART RX pin number
+ *
+ */
 #define RXD_PIN (GPIO_NUM_3)
 #elif defined(CONFIG_IDF_TARGET_ESP32S2)
 #elif defined(CONFIG_IDF_TARGET_ESP32C3)
+/**
+ * @brief UART TX pin number
+ *
+ */
 #define TXD_PIN (GPIO_NUM_21)
+/**
+ * @brief UART RX pin number
+ *
+ */
 #define RXD_PIN (GPIO_NUM_20)
 #elif defined(CONFIG_IDF_TARGET_ESP32S3)
+/**
+ * @brief UART TX pin number
+ *
+ */
 #define TXD_PIN (GPIO_NUM_43)
+/**
+ * @brief UART RX pin number
+ *
+ */
 #define RXD_PIN (GPIO_NUM_44)
 #endif
 
-static uint8_t __uart_data[EZPI_SERV_UART_RX_BUFFER_SIZE];
+/**
+ * @brief Function to process reset command
+ *
+ * @param root Pointer to the root JSON coming from UART
+ * @return int
+ */
+static int ezpi_service_uart_reset(cJSON *root);
+/**
+ * @brief Function to process uart config command
+ *
+ * @param root Pointer to the root JSON coming from UART
+ * @return int
+ */
+static int ezpi_service_uart_set_uart_config(const cJSON *root);
+/**
+ * @brief Function to process log secerity command
+ *
+ * @param root Pointer to the root JSON coming from UART
+ * @return int
+ */
+static int ezpi_service_uart_process_log_severity(const cJSON *root);
+/**
+ * @brief Function to process provisioning command
+ *
+ * @param root Pointer to the root JSON coming from UART
+ * @return int
+ */
+static ezlopi_error_t ezpi_service_uart_process_provisioning_api(const cJSON *root);
+/**
+ * @brief Function to process UART JSON
+ *
+ * @param data Pointer to the data coming from UART
+ * @return int
+ */
+static int ezpi_service_uart_parser(const char *data);
+/**
+ * @brief Function to add firmware information to the parent JSON
+ *
+ * @param parent Pointer to the parent JSON
+ * @return int
+ */
+static int ezpi_service_uart_firmware_info(cJSON *parent);
+/**
+ * @brief Function to add chip information to the parent JSON
+ *
+ * @param parent Pointer to the parent JSON
+ * @return int
+ */
+static int ezpi_service_uart_chip_info(cJSON *parent);
+/**
+ * @brief Function to add firmware SDK information to the parent JSON
+ *
+ * @param parent Pointer to the parent JSON
+ * @return int
+ */
+static int ezpi_service_uart_firmware_sdk_info(cJSON *parent);
+/**
+ * @brief Function to add device status information to the parent JSON
+ *
+ * @param parent Pointer to the parent JSON
+ * @return int
+ */
+static int ezpi_service_uart_device_status_info(cJSON *parent);
+/**
+ * @brief Function to add UART config information to the parent JSON
+ *
+ * @param parent Pointer to the parent JSON
+ * @return int
+ */
+static int ezpi_service_uart_config_info(cJSON *parent);
+/**
+ * @brief Function to add ezlopi information to the parent JSON
+ *
+ * @param parent Pointer to the parent JSON
+ * @return int
+ */
+static int ezpi_service_uart_ezlopi_info(cJSON *parent);
+/**
+ * @brief Function to add OEM information to the parent JSON
+ *
+ * @param parent Pointer to the parent JSON
+ * @return int
+ */
+static int ezpi_service_uart_oem_info(cJSON *parent);
+/**
+ * @brief Function to add network information to the parent JSON
+ *
+ * @param parent Pointer to the parent JSON
+ * @return int
+ */
+static int ezpi_service_uart_newtwork_info(cJSON *parent);
+/**
+ * @brief Function to send device information through data
+ *
+ */
+static void ezpi_service_uart_get_info();
+/**
+ * @brief Function to set Wifi detials coming from UART
+ *
+ * @param data Pointer to the JSON data
+ */
+static void ezpi_service_uart_set_wifi(const char *data);
+/**
+ * @brief Function to send UART command response
+ *
+ * @param cmd Command triggering UART write
+ * @param status_write Status to send
+ * @param status_connect Optional param for WiFi command
+ */
+static void ezpi_service_uart_response(uint8_t cmd, uint8_t status_write, uint8_t status_connect);
+/**
+ * @brief Function to set configurations
+ *
+ * @param data Pointer to the JSON data
+ */
+static void ezpi_service_uart_set_config(const char *data);
+/**
+ * @brief Function to get configurations
+ *
+ */
+static void ezpi_service_uart_get_config(void);
+/**
+ * @brief Function task that handles UART communication
+ *
+ * @param arg Task arguments
+ */
+static void ezpi_service_uart_task(void *arg);
+#if !defined(CONFIG_IDF_TARGET_ESP32) && !defined(CONFIG_IDF_TARGET_ESP32C3)
+/**
+ * @brief Function that will be called on incoming data at CDC
+ *
+ * @param itf Interface
+ * @param event CDC event
+ */
+static void ezpi_tinyusb_cdc_rx_callback(int itf, cdcacm_event_t *event);
+#endif // NOT defined CONFIG_IDF_TARGET_ESP32 or CONFIG_IDF_TARGET_ESP32C3
 
 #if !defined(CONFIG_IDF_TARGET_ESP32) && !defined(CONFIG_IDF_TARGET_ESP32C3)
 static uint8_t usb_rx_buffer[CONFIG_TINYUSB_CDC_RX_BUFSIZE - 1];
@@ -69,13 +267,47 @@ static int cdc_port = TINYUSB_CDC_ACM_0;
 static SemaphoreHandle_t usb_semaphore_handle = NULL;
 #endif // NOT defined CONFIG_IDF_TARGET_ESP32 or CONFIG_IDF_TARGET_ESP32C3
 
-static void ezlopi_service_uart_get_info();
-static void ezlopi_service_uart_set_wifi(const char *data);
-static void ezlopi_service_uart_response(uint8_t cmd, uint8_t status_write, uint8_t status_connect);
-static void ezlopi_service_uart_set_config(const char *data);
-static void ezlopi_service_uart_get_config(void);
+#if !defined(CONFIG_IDF_TARGET_ESP32) && !defined(CONFIG_IDF_TARGET_ESP32C3)
+void EZPI_SERV_cdc_init()
+{
+    usb_semaphore_handle = xSemaphoreCreateBinary();
+    if (usb_semaphore_handle)
+    {
+        xSemaphoreGive(usb_semaphore_handle);
+        tinyusb_config_t ezlopi_usb_device_configuration = {
+            .descriptor = NULL,
+            .string_descriptor = NULL,
+            .external_phy = false,
+        };
 
-static int ezlopi_service_uart_reset(cJSON *root)
+        tinyusb_config_cdcacm_t ezlopi_usb_cdc_configuration = {
+            .usb_dev = TINYUSB_USBDEV_0,
+            .cdc_port = cdc_port,
+            .rx_unread_buf_sz = CONFIG_TINYUSB_CDC_RX_BUFSIZE,
+            .callback_rx = &ezpi_tinyusb_cdc_rx_callback,
+            .callback_rx_wanted_char = NULL,
+            .callback_line_state_changed = &ezpi_tinyusb_cdc_rx_callback,
+            .callback_line_coding_changed = NULL,
+        };
+
+        ESP_ERROR_CHECK(tinyusb_driver_install(&ezlopi_usb_device_configuration));
+        ESP_ERROR_CHECK(tusb_cdc_acm_init(&ezlopi_usb_cdc_configuration));
+        TRACE_I("USB CDC initialization completed successfully.");
+    }
+}
+#endif // NOT defined CONFIG_IDF_TARGET_ESP32 or CONFIG_IDF_TARGET_ESP32C3
+
+void EZPI_SERV_uart_init(void)
+{
+    // EZPI_service_loop_add("uart-loop", __uart_loop, 1, NULL);
+#if 1
+    TaskHandle_t __uart_loop_handle = NULL;
+    xTaskCreate(ezpi_service_uart_task, "serv_uart_task", EZLOPI_SERVICE_UART_TASK_DEPTH, NULL, configMAX_PRIORITIES - 4, &__uart_loop_handle);
+    ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_UART_TASK, &__uart_loop_handle, EZLOPI_SERVICE_UART_TASK_DEPTH);
+#endif
+}
+
+static int ezpi_service_uart_reset(cJSON *root)
 {
     int ret = 0;
     cJSON *cj_sub_cmd = cJSON_GetObjectItem(__FUNCTION__, root, ezlopi_sub_cmd_str);
@@ -111,7 +343,7 @@ static int ezlopi_service_uart_reset(cJSON *root)
     return ret;
 }
 
-static int ezlopi_service_uart_set_uart_config(const cJSON *root)
+static int ezpi_service_uart_set_uart_config(const cJSON *root)
 {
     int ret = 0;
 
@@ -147,22 +379,6 @@ static int ezlopi_service_uart_set_uart_config(const cJSON *root)
     EZPI_CORE_nvs_read_stop_bits(&stop_bits_current);
     EZPI_CORE_nvs_read_frame_size(&frame_size_current);
     EZPI_CORE_nvs_read_flow_control(&flow_control_current);
-
-#if 0
-    TRACE_D("Obtained baud: %d", baud);
-    TRACE_D("Obtained parity: %d", (uint32_t)EZPI_CORE_info_name_to_parity(parity));
-    TRACE_D("Obtained start bits: %d", start_bits);
-    TRACE_D("Obtained stop bits: %d", stop_bits);
-    TRACE_D("Obtained frame size: %d", frame_size);
-    TRACE_D("Obtained flow control: %d", (uint32_t)EZPI_CORE_info_get_flw_ctrl_from_name(flow_control));
-
-    TRACE_D("Current baud: %d", baud_current);
-    TRACE_D("Current parity: %d", parity_val_current);
-    TRACE_D("Current start bits: %d", start_bits_current);
-    TRACE_D("Current stop bits: %d", stop_bits_current);
-    TRACE_D("Current frame size: %d", frame_size_current);
-    TRACE_D("Current flow control: %d", flow_control_current);
-#endif
 
     if (
         (baud_current != baud) ||
@@ -230,7 +446,7 @@ static int ezlopi_service_uart_set_uart_config(const cJSON *root)
     return ret;
 }
 
-static int ezlopi_service_uart_process_log_severity(const cJSON *root)
+static int ezpi_service_uart_process_log_severity(const cJSON *root)
 {
     int ret = 0;
 
@@ -279,7 +495,7 @@ static int ezlopi_service_uart_process_log_severity(const cJSON *root)
     return ret;
 }
 
-static ezlopi_error_t ezlopi_service_uart_process_provisioning_api(const cJSON *root)
+static ezlopi_error_t ezpi_service_uart_process_provisioning_api(const cJSON *root)
 {
     ezlopi_error_t ret = EZPI_FAILED;
     int uart_response = 0;
@@ -377,7 +593,7 @@ static ezlopi_error_t ezlopi_service_uart_process_provisioning_api(const cJSON *
     return ret;
 }
 
-static int ezlopi_service_uart_parser(const char *data)
+static int ezpi_service_uart_parser(const char *data)
 {
     cJSON *root = cJSON_ParseWithRef(__FUNCTION__, data);
     // printf("HERE again\n");
@@ -393,42 +609,42 @@ static int ezlopi_service_uart_parser(const char *data)
             {
             case EZPI_UART_CMD_RESET:
             {
-                ezlopi_service_uart_reset(root);
+                ezpi_service_uart_reset(root);
                 break;
             }
             case EZPI_UART_CMD_INFO:
             {
-                ezlopi_service_uart_get_info();
+                ezpi_service_uart_get_info();
                 break;
             }
             case EZPI_UART_CMD_WIFI:
             {
-                ezlopi_service_uart_set_wifi(data);
+                ezpi_service_uart_set_wifi(data);
                 break;
             }
             case EZPI_UART_CMD_SET_CONFIG:
             {
-                ezlopi_service_uart_set_config(data);
+                ezpi_service_uart_set_config(data);
                 break;
             }
             case EZPI_UART_CMD_GET_CONFIG:
             {
-                ezlopi_service_uart_get_config();
+                ezpi_service_uart_get_config();
                 break;
             }
             case EZPI_UART_CMD_UART_CONFIG:
             {
-                ezlopi_service_uart_set_uart_config(root);
+                ezpi_service_uart_set_uart_config(root);
                 break;
             }
             case EZPI_UART_CMD_LOG_CONFIG:
             {
-                ezlopi_service_uart_process_log_severity(root);
+                ezpi_service_uart_process_log_severity(root);
                 break;
             }
             case EZPI_UART_CMD_SET_PROV:
             {
-                ezlopi_service_uart_process_provisioning_api(root);
+                ezpi_service_uart_process_provisioning_api(root);
                 break;
             }
             default:
@@ -453,30 +669,6 @@ static int ezlopi_service_uart_parser(const char *data)
     return 1;
 }
 
-#if 0
-static void __uart_loop(void *arg)
-{
-    uint32_t cur_len = 0;
-    static uint32_t __rx_len;
-
-    uart_get_buffered_data_len(EZPI_SERV_UART_NUM_DEFAULT, &cur_len);
-
-    if (cur_len && (cur_len > __rx_len))
-    {
-        memset(__uart_data, 0, EZPI_SERV_UART_RX_BUFFER_SIZE);
-
-        int rxBytes = uart_read_bytes(EZPI_SERV_UART_NUM_DEFAULT, __uart_data, (EZPI_SERV_UART_RX_BUFFER_SIZE - 1), 1000 / portTICK_RATE_MS);
-
-        if (rxBytes > (strlen(ezlopi_cmd_str) + 6))
-        {
-            __uart_data[rxBytes] = 0;
-            TRACE_I("%s", __uart_data);
-            ezlopi_service_uart_parser((const char *)__uart_data);
-        }
-    }
-}
-#endif
-
 static void ezlopi_service_uart_task(void *arg)
 {
     static const char *RX_TASK_TAG = "RX_TASK";
@@ -493,7 +685,7 @@ static void ezlopi_service_uart_task(void *arg)
         {
             data[rxBytes] = 0;
             TRACE_I("%s", data);
-            ezlopi_service_uart_parser((const char *)data);
+            ezpi_service_uart_parser((const char *)data);
         }
     }
 
@@ -502,7 +694,7 @@ static void ezlopi_service_uart_task(void *arg)
     vTaskDelete(NULL);
 }
 
-static int ezlopi_service_uart_firmware_info(cJSON *parent)
+static int ezpi_service_uart_firmware_info(cJSON *parent)
 {
     int ret = 0;
     static const char *_ezlopi_firmware_str = "ezlopi_firmware";
@@ -521,7 +713,7 @@ static int ezlopi_service_uart_firmware_info(cJSON *parent)
     return ret;
 }
 
-static int ezlopi_service_uart_chip_info(cJSON *parent)
+static int ezpi_service_uart_chip_info(cJSON *parent)
 {
     int ret = 0;
     cJSON *cj_chip = cJSON_AddObjectToObject(__FUNCTION__, parent, ezlopi_chip_str);
@@ -538,7 +730,7 @@ static int ezlopi_service_uart_chip_info(cJSON *parent)
     return ret;
 }
 
-static int ezlopi_service_uart_firmware_sdk_info(cJSON *parent)
+static int ezpi_service_uart_firmware_sdk_info(cJSON *parent)
 {
     int ret = 0;
     cJSON *cj_firmware_sdk = cJSON_AddObjectToObject(__FUNCTION__, parent, "firmware_sdk");
@@ -551,7 +743,7 @@ static int ezlopi_service_uart_firmware_sdk_info(cJSON *parent)
     return ret;
 }
 
-static int ezlopi_service_uart_device_status_info(cJSON *parent)
+static int ezpi_service_uart_device_status_info(cJSON *parent)
 {
     int ret = 0;
     cJSON *cj_device_state = cJSON_AddObjectToObject(__FUNCTION__, parent, "device_state");
@@ -585,7 +777,7 @@ static int ezlopi_service_uart_device_status_info(cJSON *parent)
     return ret;
 }
 
-static int ezlopi_service_uart_config_info(cJSON *parent)
+static int ezpi_service_uart_config_info(cJSON *parent)
 {
     int ret = 0;
     cJSON *cj_serial_config = cJSON_AddObjectToObject(__FUNCTION__, parent, "serial_config");
@@ -628,7 +820,7 @@ static int ezlopi_service_uart_config_info(cJSON *parent)
     return ret;
 }
 
-static int ezlopi_service_uart_ezlopi_info(cJSON *parent)
+static int ezpi_service_uart_ezlopi_info(cJSON *parent)
 {
     int ret = 0;
     cJSON *cj_ezlopi = cJSON_AddObjectToObject(__FUNCTION__, parent, "ezlopi_cloud");
@@ -655,7 +847,7 @@ static int ezlopi_service_uart_ezlopi_info(cJSON *parent)
     return ret;
 }
 
-static int ezlopi_service_uart_oem_info(cJSON *parent)
+static int ezpi_service_uart_oem_info(cJSON *parent)
 {
     int ret = 0;
     cJSON *cj_oem = cJSON_AddObjectToObject(__FUNCTION__, parent, "oem");
@@ -677,7 +869,7 @@ static int ezlopi_service_uart_oem_info(cJSON *parent)
     return ret;
 }
 
-static int ezlopi_service_uart_newtwork_info(cJSON *parent)
+static int ezpi_service_uart_newtwork_info(cJSON *parent)
 {
     int ret = 0;
     cJSON *cj_network = cJSON_AddObjectToObject(__FUNCTION__, parent, "network");
@@ -734,7 +926,7 @@ static int ezlopi_service_uart_newtwork_info(cJSON *parent)
     return ret;
 }
 
-static void ezlopi_service_uart_get_info()
+static void ezpi_service_uart_get_info()
 {
     cJSON *cj_get_info = cJSON_CreateObject(__FUNCTION__);
     if (cj_get_info)
@@ -744,14 +936,14 @@ static void ezlopi_service_uart_get_info()
         cJSON *cj_info = cJSON_CreateObject(__FUNCTION__);
         if (cj_info)
         {
-            ezlopi_service_uart_firmware_info(cj_info);
-            ezlopi_service_uart_chip_info(cj_info);
-            ezlopi_service_uart_firmware_sdk_info(cj_info);
-            ezlopi_service_uart_device_status_info(cj_info);
-            ezlopi_service_uart_config_info(cj_info);
-            ezlopi_service_uart_ezlopi_info(cj_info);
-            ezlopi_service_uart_oem_info(cj_info);
-            ezlopi_service_uart_newtwork_info(cj_info);
+            ezpi_service_uart_firmware_info(cj_info);
+            ezpi_service_uart_chip_info(cj_info);
+            ezpi_service_uart_firmware_sdk_info(cj_info);
+            ezpi_service_uart_device_status_info(cj_info);
+            ezpi_service_uart_config_info(cj_info);
+            ezpi_service_uart_ezlopi_info(cj_info);
+            ezpi_service_uart_oem_info(cj_info);
+            ezpi_service_uart_newtwork_info(cj_info);
 
             cJSON_AddItemToObject(__FUNCTION__, cj_get_info, ezlopi_info_str, cj_info);
 
@@ -768,7 +960,7 @@ static void ezlopi_service_uart_get_info()
     }
 }
 
-static void ezlopi_service_uart_set_wifi(const char *data)
+static void ezpi_service_uart_set_wifi(const char *data)
 {
     uint32_t status = 0;
     cJSON *root = cJSON_Parse(__FUNCTION__, data);
@@ -818,13 +1010,13 @@ static void ezlopi_service_uart_set_wifi(const char *data)
                     // vTaskDelay(EZLOPI_WIFI_CONNECT_ATTEMPT_INTERVAL / portTICK_PERIOD_MS);
                 }
 
-                ezlopi_service_uart_response(EZPI_UART_CMD_WIFI, status_write, status);
+                ezpi_service_uart_response(EZPI_UART_CMD_WIFI, status_write, status);
             }
             else
             {
                 TRACE_E("Invalid WiFi SSID or Password, aborting!");
                 // printf("Invalid WiFi SSID or Password, aborting! \n");
-                ezlopi_service_uart_response(EZPI_UART_CMD_WIFI, status_write, status);
+                ezpi_service_uart_response(EZPI_UART_CMD_WIFI, status_write, status);
             }
         }
 
@@ -832,7 +1024,7 @@ static void ezlopi_service_uart_set_wifi(const char *data)
     }
 }
 
-static void ezlopi_service_uart_response(uint8_t cmd, uint8_t status_write, uint8_t status_connect)
+static void ezpi_service_uart_response(uint8_t cmd, uint8_t status_write, uint8_t status_connect)
 {
     cJSON *response = NULL;
     response = cJSON_CreateObject(__FUNCTION__);
@@ -902,7 +1094,7 @@ static void ezlopi_service_uart_response(uint8_t cmd, uint8_t status_write, uint
     }
 }
 
-static void ezlopi_service_uart_set_config(const char *data)
+static void ezpi_service_uart_set_config(const char *data)
 {
 
     cJSON *cjson_config = cJSON_Parse(__FUNCTION__, data);
@@ -912,17 +1104,17 @@ static void ezlopi_service_uart_set_config(const char *data)
         if (ret)
         {
             TRACE_I("Successfully wrote config data..");
-            ezlopi_service_uart_response(EZPI_UART_CMD_SET_CONFIG, EZPI_UART_CMD_STATUS_SUCCESS, 0);
+            ezpi_service_uart_response(EZPI_UART_CMD_SET_CONFIG, EZPI_UART_CMD_STATUS_SUCCESS, 0);
         }
         else
         {
-            ezlopi_service_uart_response(EZPI_UART_CMD_SET_CONFIG, EZPI_UART_CMD_STATUS_FAIL, 0);
+            ezpi_service_uart_response(EZPI_UART_CMD_SET_CONFIG, EZPI_UART_CMD_STATUS_FAIL, 0);
         }
         cJSON_Delete(__FUNCTION__, cjson_config);
     }
 }
 
-static void ezlopi_service_uart_get_config(void)
+static void ezpi_service_uart_get_config(void)
 {
     cJSON *root = NULL;
     char *current_config = ezlopi_factory_info_v3_get_ezlopi_config();
@@ -1011,7 +1203,7 @@ int EZPI_SERV_uart_tx_data(int len, uint8_t *data)
 }
 
 #if !defined(CONFIG_IDF_TARGET_ESP32) && !defined(CONFIG_IDF_TARGET_ESP32C3)
-static void tinyusb_cdc_rx_callback(int itf, cdcacm_event_t *event)
+static void ezpi_tinyusb_cdc_rx_callback(int itf, cdcacm_event_t *event)
 {
     if (CDC_EVENT_RX == event->type)
     {
@@ -1032,7 +1224,7 @@ static void tinyusb_cdc_rx_callback(int itf, cdcacm_event_t *event)
                 if (0x0d == temporary_buffer[rx_size - 2] && 0x0a == temporary_buffer[rx_size - 1])
                 {
                     usb_rx_buffer[rx_buffer_pointer - 2] = '\0';
-                    ezlopi_service_uart_parser((const char *)usb_rx_buffer);
+                    ezpi_service_uart_parser((const char *)usb_rx_buffer);
                     memset(usb_rx_buffer, 0, rx_buffer_pointer);
                     rx_buffer_pointer = 0;
                 }
@@ -1050,42 +1242,8 @@ static void tinyusb_cdc_rx_callback(int itf, cdcacm_event_t *event)
         TRACE_E("Untracked CDC event(code: %d)", event->type);
     }
 }
-
-void EZPI_SERV_cdc_init()
-{
-    usb_semaphore_handle = xSemaphoreCreateBinary();
-    if (usb_semaphore_handle)
-    {
-        xSemaphoreGive(usb_semaphore_handle);
-        tinyusb_config_t ezlopi_usb_device_configuration = {
-            .descriptor = NULL,
-            .string_descriptor = NULL,
-            .external_phy = false,
-        };
-
-        tinyusb_config_cdcacm_t ezlopi_usb_cdc_configuration = {
-            .usb_dev = TINYUSB_USBDEV_0,
-            .cdc_port = cdc_port,
-            .rx_unread_buf_sz = CONFIG_TINYUSB_CDC_RX_BUFSIZE,
-            .callback_rx = &tinyusb_cdc_rx_callback,
-            .callback_rx_wanted_char = NULL,
-            .callback_line_state_changed = &tinyusb_cdc_rx_callback,
-            .callback_line_coding_changed = NULL,
-        };
-
-        ESP_ERROR_CHECK(tinyusb_driver_install(&ezlopi_usb_device_configuration));
-        ESP_ERROR_CHECK(tusb_cdc_acm_init(&ezlopi_usb_cdc_configuration));
-        TRACE_I("USB CDC initialization completed successfully.");
-    }
-}
 #endif // NOT defined CONFIG_IDF_TARGET_ESP32 or CONFIG_IDF_TARGET_ESP32C3
 
-void EZPI_SERV_uart_init(void)
-{
-    // EZPI_service_loop_add("uart-loop", __uart_loop, 1, NULL);
-#if 1
-    TaskHandle_t __uart_loop_handle = NULL;
-    xTaskCreate(ezlopi_service_uart_task, "serv_uart_task", EZLOPI_SERVICE_UART_TASK_DEPTH, NULL, configMAX_PRIORITIES - 4, &__uart_loop_handle);
-    ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_UART_TASK, &__uart_loop_handle, EZLOPI_SERVICE_UART_TASK_DEPTH);
-#endif
-}
+/*******************************************************************************
+ *                          End of File
+ *******************************************************************************/
