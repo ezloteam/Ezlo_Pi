@@ -29,7 +29,7 @@
 ** ===========================================================================
 */
 /**
- * @file    main.h
+ * @file    ezlopi_core_scenes_operators.h
  * @brief   These functions perform comparision operation for scenes
  * @author  xx
  * @version 0.1
@@ -109,105 +109,240 @@ extern "C"
     /*******************************************************************************
     *                          Extern Function Prototypes
     *******************************************************************************/
-    // Numeric Operators
+
     /**
     * @brief This function returns of operator symbols in string format.
     *
     * @param operator enum of corresponding operator symbol
     * @return const char *
     */
-    const char *ezlopi_scenes_numeric_comparator_operators_get_op(e_scene_num_cmp_operators_t operator);
+    const char *EZPI_scenes_numeric_comparator_operators_get_op(e_scene_num_cmp_operators_t operator);
     /**
     * @brief This function returns 'operator_name' of operator symbol
     *
     * @param operator enum of corresponding operator symbol
     * @return const char *
     */
-    const char *ezlopi_scenes_numeric_comparator_operators_get_name(e_scene_num_cmp_operators_t operator);
+    const char *EZPI_scenes_numeric_comparator_operators_get_name(e_scene_num_cmp_operators_t operator);
     /**
     * @brief This function returns 'method_name' of operator symbol
     *
     * @param operator enum of corresponding operator symbol
     * @return const char *
     */
-    const char *ezlopi_scenes_numeric_comparator_operators_get_method(e_scene_num_cmp_operators_t operator);
+    const char *EZPI_scenes_numeric_comparator_operators_get_method(e_scene_num_cmp_operators_t operator);
     /**
     * @brief This function compare 'number_value' from input args
     *
-    * @param item_exp_field item_exp-field block info
-    * @param value_field value-field block info
-    * @param comparator_field comparator-field block info
-    * @param devgrp_field device-group block info
-    * @param itemgrp_field item-group block info
-    *
+    * @param item_exp_field block with item_exp-field info
+    * @param value_field block with value-field info
+    * @param comparator_field block with comparator-field info
+    * @param devgrp_field block with device-group info
+    * @param itemgrp_field block with item-group info
     * @return int
     */
-    int ezlopi_scenes_operators_value_number_operations(l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, l_fields_v2_t *comparator_field, l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field);
-    // e_scene_num_cmp_operators_t ezlopi_scenes_numeric_comparator_operators_get_enum(char *operator_str);
+    int EZPI_scenes_operators_value_number_operations(l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, l_fields_v2_t *comparator_field, l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field);
 
-    //Number-Range Operators
     /**
-    * @brief This function compare 'number_value' from input args
+    * @brief This function compare 'number_range_value' using given args
     *
-    * @param start_value_field value-field block info
-    * @param end_value_field comparator-field block info
-    * @param item_exp_field item_exp-field block info
-    * @param comparator_choice device-group block info
-    *
+    * @param start_value_field block with 'start_value_field' info
+    * @param end_value_field block with 'end_value_field' info
+    * @param item_exp_field block with 'item_exp_field' info
+    * @param comparator_choice compare-type : [0='between'; 1='Not_between'] .
     * @return int
     */
-    int ezlopi_scenes_operators_value_number_range_operations(l_fields_v2_t *item_exp_field, l_fields_v2_t *start_value_field, l_fields_v2_t *end_value_field, bool comparator_choice);
-    int ezlopi_scenes_operators_value_number_range_operations_with_group(l_fields_v2_t *start_value_field, l_fields_v2_t *end_value_field, bool comparator_choice, l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field);
+    int EZPI_scenes_operators_value_number_range_operations(l_fields_v2_t *item_exp_field, l_fields_v2_t *start_value_field, l_fields_v2_t *end_value_field, bool comparator_choice);
+    /**
+     * @brief This function compare 'number_range_values' using given args
+     *
+     * @param devgrp_field block with device-group info
+     * @param itemgrp_field block with item-group info
+     * @param start_value_field block with 'start_value_field' info
+     * @param end_value_field block with 'start_value_field' info
+     * @param comparator_choice compare-type : [0='between'; 1='Not_between'] .
+     * @return int
+     */
+    int EZPI_scenes_operators_value_number_range_operations_with_group(l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field, l_fields_v2_t *start_value_field, l_fields_v2_t *end_value_field, bool comparator_choice);
 
-    // Strings Operators
-    const char *ezlopi_scenes_strings_comparator_operators_get_op(e_scene_str_cmp_operators_t operator);
-    const char *ezlopi_scenes_strings_comparator_operators_get_name(e_scene_str_cmp_operators_t operator);
-    const char *ezlopi_scenes_strings_comparator_operators_get_method(e_scene_str_cmp_operators_t operator);
-    int ezlopi_scenes_operators_value_strings_operations(l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, l_fields_v2_t *comparator_field, l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field);
-    // e_scene_str_cmp_operators_t ezlopi_scenes_strings_comparator_operators_get_enum(char *operator_str);
+    /**
+     * @brief This function returns of operator symbols in string format.
+     *
+     * @param operator enum of corresponding operator symbol
+     * @return const char*
+     */
+    const char *EZPI_scenes_strings_comparator_operators_get_op(e_scene_str_cmp_operators_t operator);
+    /**
+     * @brief This function returns 'operator_name' of operator symbol
+     *
+     * @param operator enum of corresponding operator symbol
+     * @return const char*
+     */
+    const char *EZPI_scenes_strings_comparator_operators_get_name(e_scene_str_cmp_operators_t operator);
+    /**
+     * @brief This function returns 'method_name' of operator symbol
+     *
+     * @param operator enum of corresponding operator symbol
+     * @return const char*
+     */
+    const char *EZPI_scenes_strings_comparator_operators_get_method(e_scene_str_cmp_operators_t operator);
+    /**
+     * @brief  This function compare 'string_values' using given args
+     *
+     * @param devgrp_field block with 'device_group_field' info
+     * @param itemgrp_field block with 'item_group_field' info
+     * @param item_exp_field block with 'item_exp_field' info
+     * @param value_field block with 'value_field' info
+     * @param comparator_field block with 'comparator_field' info
+     * @return int
+     */
+    int EZPI_scenes_operators_value_strings_operations(l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field, l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, l_fields_v2_t *comparator_field);
 
-    // String-Operation Operators
-    const char *ezlopi_scenes_strops_comparator_operators_get_op(e_scene_strops_cmp_operators_t operator);
-    const char *ezlopi_scenes_strops_comparator_operators_get_name(e_scene_strops_cmp_operators_t operator);
-    const char *ezlopi_scenes_strops_comparator_operators_get_method(e_scene_strops_cmp_operators_t operator);
-    int ezlopi_scenes_operators_value_strops_operations(l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, l_fields_v2_t *comparator_field);
-    int ezlopi_scenes_operators_value_strops_operations_with_group(l_fields_v2_t *value_field, l_fields_v2_t *operation_field, l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field);
-    // e_scene_strops_cmp_operators_t ezlopi_scenes_strops_comparator_operators_get_enum(char *operator_str);
+    /**
+     * @brief This function returns of 'operator' symbols in string format.
+     *
+     * @param operator enum of corresponding operator symbol
+     * @return const char*
+     */
+    const char *EZPI_scenes_strops_comparator_operators_get_op(e_scene_strops_cmp_operators_t operator);
+    /**
+     * @brief This function returns of 'string_operation' symbols .
+     *
+     * @param operator enum of corresponding operator symbol
+     * @return const char*
+     */
+    const char *EZPI_scenes_strops_comparator_operators_get_name(e_scene_strops_cmp_operators_t operator);
+    /**
+     * @brief This function returns 'method_name' of operator symbols .
+     *
+     * @param operator enum of corresponding operator symbol
+     * @return const char*
+     */
+    const char *EZPI_scenes_strops_comparator_operators_get_method(e_scene_strops_cmp_operators_t operator);
+    /**
+     * @brief  This function compare 'string_operation' symbols using given args
+     *
+     * @param item_exp_field block with 'item_exp_field' info
+     * @param value_field block with 'value_field' info
+     * @param comparator_field block with 'comparator_field' info
+     * @return int
+     */
+    int EZPI_scenes_operators_value_strops_operations(l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, l_fields_v2_t *comparator_field);
+    /**
+     * @brief This function compare 'string_operators' with device/item-groups using given args
+     *
+     * @param value_field block with 'value_field' info
+     * @param operation_field block with 'operation_field' info
+     * @param devgrp_field block with 'devgrp_field' info
+     * @param itemgrp_field block with 'itemgrp_field' info
+     * @return int
+     */
+    int EZPI_scenes_operators_value_strops_operations_with_group(l_fields_v2_t *value_field, l_fields_v2_t *operation_field, l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field);
 
-    // InArray Operators
-#if 0
-// e_scene_inarr_cmp_operators_t ezlopi_scenes_inarr_comparator_operators_get_enum(char* operator_inarr);
-// const char* ezlopi_scenes_inarr_comparator_operators_get_op(e_scene_inarr_cmp_operators_t operator);
-// const char* ezlopi_scenes_inarr_comparator_operators_get_name(e_scene_inarr_cmp_operators_t operator);
-// const char* ezlopi_scenes_inarr_comparator_operators_get_method(e_scene_inarr_cmp_operators_t operator);
-#endif
-    int ezlopi_scenes_operators_value_inarr_operations(l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, l_fields_v2_t *comparator_field);
-    int ezlopi_scenes_operators_value_inarr_operations_with_group(l_fields_v2_t *value_field, l_fields_v2_t *operation_field, l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field);
+    /**
+     * @brief This function perfroms 'in-array' operations using given args
+     *
+     * @param item_exp_field block with 'item_exp_field' info
+     * @param value_field block with 'value_field' info
+     * @param comparator_field block with 'comparator_field' info
+     * @return int
+     */
+    int EZPI_scenes_operators_value_inarr_operations(l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, l_fields_v2_t *comparator_field);
+    /**
+     * @brief This function perfroms 'in-array' operations with device/item-groups using given args
+     *
+     * @param value_field block with 'value_field' info
+     * @param operation_field block with 'operation_field' info
+     * @param devgrp_field block with 'devgrp_field' info
+     * @param itemgrp_field block with 'itemgrp_field' info
+     * @return int
+     */
+    int EZPI_scenes_operators_value_inarr_operations_with_group(l_fields_v2_t *value_field, l_fields_v2_t *operation_field, l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field);
 
-    // Value with less Operators
-    const char *ezlopi_scenes_value_with_less_comparator_operators_get_op(e_scene_value_with_less_cmp_operators_t operator);
-    const char *ezlopi_scenes_value_with_less_comparator_operators_get_name(e_scene_value_with_less_cmp_operators_t operator);
-    const char *ezlopi_scenes_value_with_less_comparator_operators_get_method(e_scene_value_with_less_cmp_operators_t operator);
-    // e_scene_value_with_less_cmp_operators_t ezlopi_scenes_value_with_less_comparator_operators_get_enum(char *operator_str);
-    // int ezlopi_scenes_operators_value_with_less_operations(uint32_t item_id, l_fields_v2_t* value_field, l_fields_v2_t* comparator_field);
+    /**
+     * @brief This function returns of 'operator' symbols in string format.
+     *
+     * @param operator  enum of corresponding operator symbol
+     * @return const char*
+     */
+    const char *EZPI_scenes_value_with_less_comparator_operators_get_op(e_scene_value_with_less_cmp_operators_t operator);
+    /**
+     * @brief This function returns of symbols 'compare_oprs_with_less-than'  .
+     *
+     * @param operator  enum of corresponding operator symbol
+     * @return const char*
+     */
+    const char *EZPI_scenes_value_with_less_comparator_operators_get_name(e_scene_value_with_less_cmp_operators_t operator);
+    /**
+     * @brief This function returns 'method_name' of 'compare_oprs_with_less-than' symbols .
+     *
+     * @param operator  enum of corresponding operator symbol
+     * @return const char*
+     */
+    const char *EZPI_scenes_value_with_less_comparator_operators_get_method(e_scene_value_with_less_cmp_operators_t operator);
 
-    // Value without less Operators
-    const char *ezlopi_scenes_value_without_less_comparator_operators_get_op(e_scene_value_without_less_cmp_operators_t operator);
-    const char *ezlopi_scenes_value_without_less_comparator_operators_get_name(e_scene_value_without_less_cmp_operators_t operator);
-    const char *ezlopi_scenes_value_without_less_comparator_operators_get_method(e_scene_value_without_less_cmp_operators_t operator);
-    // e_scene_value_without_less_cmp_operators_t ezlopi_scenes_value_without_less_comparator_operators_get_enum(char *operator_str);
-    // int ezlopi_scenes_operators_value_without_less_operations(uint32_t item_id, l_fields_v2_t* value_field, l_fields_v2_t* comparator_field);
+    /**
+     * @brief This function returns of 'operator' symbols in string format.
+     *
+     * @param operator  enum of corresponding operator symbol
+     * @return const char*
+     */
+    const char *EZPI_scenes_value_without_less_comparator_operators_get_op(e_scene_value_without_less_cmp_operators_t operator);
+    /**
+     * @brief This function returns of symbols 'compare_oprs_without_less-than'  .
+     *
+     * @param operator  enum of corresponding operator symbol
+     * @return const char*
+     */
+    const char *EZPI_scenes_value_without_less_comparator_operators_get_name(e_scene_value_without_less_cmp_operators_t operator);
+    /**
+     * @brief This function returns 'method_name' of 'compare_oprs_without_less-than' symbols .
+     *
+     * @param operator  enum of corresponding operator symbol
+     * @return const char*
+     */
+    const char *EZPI_scenes_value_without_less_comparator_operators_get_method(e_scene_value_without_less_cmp_operators_t operator);
 
-    // CompareValues Operators 'without-less' (default)
-    int ezlopi_scenes_operators_value_comparevalues_with_less_operations(l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, l_fields_v2_t *value_type_field, l_fields_v2_t *comparator_field);
-    int ezlopi_scenes_operators_value_comparevalues_with_less_operations_with_group(l_fields_v2_t *value_field, l_fields_v2_t *value_type_field, l_fields_v2_t *comparator_field, l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field);
-    // int ezlopi_scenes_operators_value_comparevalues_without_less_operations(uint32_t item_id, l_fields_v2_t* value_field, l_fields_v2_t* value_type_field, l_fields_v2_t* comparator_field);
+    /**
+     * @brief This function compare item_values using comparision operators with 'less-than' sign
+     *
+     * @param item_exp_field  block with 'item_exp_field' info
+     * @param value_field block with 'value_field' info
+     * @param value_type_field block with 'value_type_field' info
+     * @param comparator_field block with 'comparator_field' info
+     * @return int
+     */
+    int EZPI_scenes_operators_value_comparevalues_with_less_operations(l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, l_fields_v2_t *value_type_field, l_fields_v2_t *comparator_field);
+    /**
+     * @brief  This function compare item_values using comparision operators without 'less-than' sign
+     *
+     * @param value_field block with 'value_field' info
+     * @param value_type_field block with 'value_type_field' info
+     * @param comparator_field block with 'comparator_field' info
+     * @param devgrp_field block with 'devgrp_field' info
+     * @param itemgrp_field block with 'itemgrp_field' info
+     * @return int
+     */
+    int EZPI_scenes_operators_value_comparevalues_with_less_operations_with_group(l_fields_v2_t *value_field, l_fields_v2_t *value_type_field, l_fields_v2_t *comparator_field, l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field);
 
-    // HasAtleastOneDictionaryValue
-    int ezlopi_scenes_operators_has_atleastone_dictionary_value_operations(uint32_t item_id, l_fields_v2_t *value_field);
-
-    // IsDictornaryChanged
-    int ezlopi_scenes_operators_is_dictionary_changed_operations(l_scenes_list_v2_t *scene_node, uint32_t item_id, l_fields_v2_t *key_field, l_fields_v2_t *operation_field);
+    /**
+     * @brief This function determines if there is atleast one desired 'dictionary-type' value in perticular 'item_id'.
+     *
+     * @param item_id Compare with value from item with '_id'
+     * @param value_field block with 'value_field' info
+     * @return int
+     */
+    int EZPI_scenes_operators_has_atleastone_dictionary_value_operations(uint32_t item_id, l_fields_v2_t *value_field);
+    /**
+     * @brief This funciton compare previous and new dictionary values of perticular 'item_id'
+     *
+     * @param scene_node Pointer to scene_node
+     * @param item_id  Id of target item
+     * @param key_field Block containing 'Key' information
+     * @param operation_field Block containing type of operation we need to perform
+     * @return int
+     */
+    int EZPI_scenes_operators_is_dictionary_changed_operations(l_scenes_list_v2_t *scene_node, uint32_t item_id, l_fields_v2_t *key_field, l_fields_v2_t *operation_field);
 
 
 #ifdef __cplusplus

@@ -1,3 +1,44 @@
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+/**
+* @file    ezlopi_core_scenes_then_methods_helper_func.c
+* @brief   These are sub-functions utilized in file 'ezlopi_core_scenes_then_methods.c'
+* @author  xx
+* @version 0.1
+* @date    12th DEC 2024
+*/
+
+/*******************************************************************************
+*                          Include Files
+*******************************************************************************/
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
@@ -19,6 +60,17 @@
 #include "ezlopi_cloud_constants.h"
 #include "EZLOPI_USER_CONFIG.h"
 
+/*******************************************************************************
+*                          Extern Data Declarations
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Extern Function Declarations
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Type & Macro Definitions
+*******************************************************************************/
 #define STR_SIZE(str) ((NULL != str) ? (strlen(str)) : 0)
 
 /**
@@ -33,142 +85,25 @@
         }                                   \
     }
 
- /**
-  * @brief This funtion is called, only to reallocate a '*header' of custom_structure 's_ezlopi_core_http_mbedtls_t'
-  *
-  * @param tmp_http_data     [ Pointer to (s_ezlopi_core_http_mbedtls_t*) block of memory. ]
-  * @param append_size       [ Size of 'string' to be appended. ]
-  * @param append_str        [ 'string_literal' to be appended. ]
-  * @return int [ Fail ==> returns Old-size / Success ==> returns New-size ]
-  */
-static int __ezlopi_core_scenes_then_sendhttp_relloc_header(s_ezlopi_core_http_mbedtls_t *tmp_http_data, int append_size, const char *append_str)
-{
-    int ret = (int)tmp_http_data->header_maxlen; // Assign Old-block size as default
-    int new_size = append_size + (ret + 1);
+ /*******************************************************************************
+ *                          Static Function Prototypes
+ *******************************************************************************/
+static int __ezlopi_core_scenes_then_sendhttp_relloc_header(s_ezlopi_core_http_mbedtls_t *tmp_http_data, int append_size, const char *append_str);
+static int __ezlopi_core_scenes_then_create_fresh_header(s_ezlopi_core_http_mbedtls_t *tmp_http_data);
+static void __ezlopi_core_scenes_then_append_to_header(s_ezlopi_core_http_mbedtls_t *tmp_http_data, const char *str1, const char *str2);
+/*******************************************************************************
+*                          Static Data Definitions
+*******************************************************************************/
 
-    uint8_t retry = 5;
-    do
-    {
-        if (EZPI_SUCCESS == ezlopi_core_http_dyna_relloc(&(tmp_http_data->header), new_size)) // rellocate: 'tmp_http_data->header' with  'new_size'
-        {
-            snprintf((tmp_http_data->header) + strlen(tmp_http_data->header), append_size, "%s", append_str);
-            ret = new_size; // return new memory-block size
-            // TRACE_I("Append Successful: Header[size: %d , occupied: %d]", ret, STR_SIZE(tmp_http_data->header));
-            break;
-        }
-        else
-        {
-            TRACE_E("Append_Failed... ; returning original header_contents [RETRY:%d]", retry);
-            retry--;
-        }
-    } while (retry > 0);
-    return ret;
-}
+/*******************************************************************************
+*                          Extern Data Definitions
+*******************************************************************************/
 
-#if 0
-/**
- * @brief Function to extract "web_host" from "field_value_string".
- */
-static void __ezlopi_core_scenes_then_sendhttp_parse_host_name(s_ezlopi_core_http_mbedtls_t *tmp_http_data, const char *field_value_string)
-{
-    if (NULL != field_value_string)
-    {
-        const char *start = strstr(field_value_string, "://");
-        if (start != NULL)
-        {
-            // TRACE_W("Here! fresh webserver");
-            start += 3;
-            int length = 0;
-            char *end = strchr(start, '/');
-            if (end != NULL)
-            {
-                length = (end - start);
-                if (length > 0)
-                {
-                    length++;                                         // include null character
-                    char *tmp_string = ezlopi_malloc(__FUNCTION__, length); // tmp_string != NULL
-                    if (tmp_string)
-                    {
-                        bzero(tmp_string, length);
-                        snprintf(tmp_string, length, "%s", start);
-                        // TRACE_I("web_host_name : %s", tmp_string);
-                        tmp_http_data->web_server_maxlen = (uint16_t)ezlopi_core_http_mem_malloc(&(tmp_http_data->web_server), tmp_string);
-                        ezlopi_free(__FUNCTION__, tmp_string);
-                    }
-                }
-            }
-            else
-            {
-                const char *ptr = field_value_string;
-                length = (int)strlen(field_value_string) - (int)(start - ptr);
-                if (length > 0)
-                {
-                    length++;                                         // include null character
-                    char *tmp_string = ezlopi_malloc(__FUNCTION__, length); // tmp_string != NULL
-                    if (tmp_string)
-                    {
-                        bzero(tmp_string, length);
-                        snprintf(tmp_string, length, "%s", (ptr + ((int)(start - ptr))));
-                        // TRACE_I("web_host_name : %s", tmp_string);
-                        tmp_http_data->web_server_maxlen = (uint16_t)ezlopi_core_http_mem_malloc(&(tmp_http_data->web_server), tmp_string);
-                        ezlopi_free(__FUNCTION__, tmp_string);
-                    }
-                }
-            }
-        }
-    }
-}
-#endif
-
-/**
- * @brief Function to Clear and Malloc the header_member (within 's_ezlopi_core_http_mbedtls_t') only.
- * @return Size of content in 's_ezlopi_core_http_mbedtls_t'->header
- */
-static int __ezlopi_core_scenes_then_create_fresh_header(s_ezlopi_core_http_mbedtls_t *tmp_http_data)
-{
-    int ret = STR_SIZE(tmp_http_data->header);
-
-    if ((NULL == tmp_http_data->header) && (0 == ret))
-    {
-        // TRACE_W("Here! fresh header init");
-        tmp_http_data->header_maxlen = (uint16_t)ezlopi_core_http_mem_malloc(&(tmp_http_data->header), "\r\0");
-        ret = STR_SIZE(tmp_http_data->header);
-        // TRACE_W("Here!! Created fresh header-> [capacity: %d] , [occupied: %d]", tmp_http_data->header_maxlen, ret);
-    }
-    return ret;
-}
-/**
- * @brief Function to append values to header_member (within 's_ezlopi_core_http_mbedtls_t') only.
- */
-static void __ezlopi_core_scenes_then_append_to_header(s_ezlopi_core_http_mbedtls_t *tmp_http_data, const char *str1, const char *str2)
-{
-    int append_size = (STR_SIZE(str1) + 4 + STR_SIZE(str2)) + 6;
-    int max_allowed = ezlopi_core_http_calc_empty_bufsize(tmp_http_data->header, (tmp_http_data->header_maxlen), append_size);
-    if (max_allowed > 0)
-    {
-        snprintf(tmp_http_data->header + STR_SIZE(tmp_http_data->header), max_allowed, "%s: %s\r\n", str1, str2);
-    }
-    else // We reallocate:- 'tmp_http_data->header'
-    {
-        char *append_str = ezlopi_malloc(__FUNCTION__, append_size); // append_str != NULL
-        if (append_str)
-        {
-            bzero(append_str, append_size);
-            snprintf(append_str, append_size, "%s: %s\r\n", str1, str2);
-
-            //-----------------------------------------------------------------------------------
-            // TRACE_D("Append_str: %s[%d] ", append_str, append_size);
-            // TRACE_D("-> Before => Realloc_Header:-[capacity:%d (occupied:%d)]->[needed:%d]", tmp_http_data->header_maxlen, STR_SIZE(tmp_http_data->header), append_size);
-            tmp_http_data->header_maxlen = (uint16_t)__ezlopi_core_scenes_then_sendhttp_relloc_header(tmp_http_data, append_size, append_str);
-            // TRACE_D("-> After => Realloc_Header:-[capacity:%d (occupied:%d)]", tmp_http_data->header_maxlen, STR_SIZE(tmp_http_data->header));
-            //-----------------------------------------------------------------------------------
-            ezlopi_free(__FUNCTION__, append_str);
-        }
-    }
-}
-
-//------------------------------- ezlopi_scene_then_sendhttp_request -----------------------------------------------
-void parse_http_request_type(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fields_v2_t *curr_field)
+/*******************************************************************************
+*                          Extern Function Definitions
+*******************************************************************************/
+//------------------------------- EZPI_scene_then_sendhttp_request -----------------------------------------------
+void EZPI_parse_http_request_type(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fields_v2_t *curr_field)
 {
     const char *field_value_string = curr_field->field_value.u_value.value_string;
     if ((EZLOPI_VALUE_TYPE_STRING == curr_field->value_type) && (NULL != field_value_string))
@@ -195,7 +130,7 @@ void parse_http_request_type(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fiel
         }
     }
 }
-void parse_http_url(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fields_v2_t *curr_field)
+void EZPI_parse_http_url(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fields_v2_t *curr_field)
 {
     const char *field_value_string = curr_field->field_value.u_value.value_string;
     if ((EZLOPI_VALUE_TYPE_STRING == curr_field->value_type) && (NULL != field_value_string))
@@ -298,7 +233,7 @@ void parse_http_url(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fields_v2_t *
         }
     }
 }
-void parse_http_content_type(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fields_v2_t *curr_field)
+void EZPI_parse_http_content_type(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fields_v2_t *curr_field)
 {
     const char *field_value_string = curr_field->field_value.u_value.value_string;
     if ((EZLOPI_VALUE_TYPE_STRING == curr_field->value_type) && (NULL != field_value_string))
@@ -324,7 +259,7 @@ void parse_http_content_type(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fiel
         // }
     }
 }
-void parse_http_content(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fields_v2_t *curr_field)
+void EZPI_parse_http_content(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fields_v2_t *curr_field)
 {
     const char *field_value_string = curr_field->field_value.u_value.value_string;
     if ((EZLOPI_VALUE_TYPE_STRING == curr_field->value_type) && (NULL != field_value_string))
@@ -354,7 +289,7 @@ void parse_http_content(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fields_v2
         }
     }
 }
-void parse_http_headers(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fields_v2_t *curr_field)
+void EZPI_parse_http_headers(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fields_v2_t *curr_field)
 {
     const cJSON *cj_value = curr_field->field_value.u_value.cj_value;
     if ((EZLOPI_VALUE_TYPE_DICTIONARY == curr_field->value_type) && cJSON_IsObject(cj_value))
@@ -381,7 +316,7 @@ void parse_http_headers(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fields_v2
         }
     }
 }
-void parse_http_skipsecurity(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fields_v2_t *curr_field)
+void EZPI_parse_http_skipsecurity(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fields_v2_t *curr_field)
 {
     // TRACE_W("Here! skipsecurity");
     if (EZLOPI_VALUE_TYPE_BOOL == curr_field->value_type)
@@ -400,7 +335,7 @@ void parse_http_skipsecurity(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fiel
         }
     }
 }
-void parse_http_creds(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fields_v2_t *curr_field)
+void EZPI_parse_http_creds(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fields_v2_t *curr_field)
 {
     const cJSON *cj_value = curr_field->field_value.u_value.cj_value;
     if ((EZLOPI_VALUE_TYPE_CREDENTIAL == curr_field->value_type) && cJSON_IsObject(cj_value))
@@ -418,7 +353,7 @@ void parse_http_creds(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fields_v2_t
         }
     }
 }
-void free_http_mbedtls_struct(s_ezlopi_core_http_mbedtls_t *config)
+void EZPI_free_http_mbedtls_struct(s_ezlopi_core_http_mbedtls_t *config)
 {
     FREE_PTR_IF_NOT_NULL(config->url);
     FREE_PTR_IF_NOT_NULL(config->web_server);
@@ -429,9 +364,8 @@ void free_http_mbedtls_struct(s_ezlopi_core_http_mbedtls_t *config)
     FREE_PTR_IF_NOT_NULL(config->password);
     FREE_PTR_IF_NOT_NULL(config->response);
 }
-
 //------------------------------ SetExpression / SetVariable -------------------------------------------------------
-ezlopi_error_t ezlopi_core_scene_then_helper_setexpression_setvariable(char *expression_name, const char *code_str, const char *value_type, cJSON *cj_metadata, cJSON *cj_params, l_fields_v2_t *var_value)
+ezlopi_error_t EZPI_core_scenes_then_helper_set_expn_var(char *expression_name, const char *code_str, const char *value_type, cJSON *cj_metadata, cJSON *cj_params, l_fields_v2_t *var_value)
 {
     ezlopi_error_t ret = EZPI_FAILED;
     s_ezlopi_expressions_t *curr_expr = EZPI_scenes_expressions_get_node_by_name(expression_name);
@@ -592,10 +526,8 @@ ezlopi_error_t ezlopi_core_scene_then_helper_setexpression_setvariable(char *exp
     }
     return ret;
 }
-
 //------------------------------ toggleValue + grouptoggleValue -------------------------------------------------------
-
-int ezlopi_core_scene_then_helper_toggleValue(uint32_t item_id, const char *item_id_str)
+int EZPI_core_scenes_then_helper_toggleValue(uint32_t item_id, const char *item_id_str)
 {
     int ret = 0;
     if (item_id && item_id_str)
@@ -664,4 +596,151 @@ int ezlopi_core_scene_then_helper_toggleValue(uint32_t item_id, const char *item
     return ret;
 }
 
+/*******************************************************************************
+*                         Static Function Definitions
+*******************************************************************************/
+/**
+ * @brief This funtion is called, only to reallocate a '*header' of custom_structure 's_ezlopi_core_http_mbedtls_t'
+ *
+ * @param tmp_http_data     [ Pointer to (s_ezlopi_core_http_mbedtls_t*) block of memory. ]
+ * @param append_size       [ Size of 'string' to be appended. ]
+ * @param append_str        [ 'string_literal' to be appended. ]
+ * @return int [ Fail ==> returns Old-size / Success ==> returns New-size ]
+ */
+static int __ezlopi_core_scenes_then_sendhttp_relloc_header(s_ezlopi_core_http_mbedtls_t *tmp_http_data, int append_size, const char *append_str)
+{
+    int ret = (int)tmp_http_data->header_maxlen; // Assign Old-block size as default
+    int new_size = append_size + (ret + 1);
+
+    uint8_t retry = 5;
+    do
+    {
+        if (EZPI_SUCCESS == ezlopi_core_http_dyna_relloc(&(tmp_http_data->header), new_size)) // rellocate: 'tmp_http_data->header' with  'new_size'
+        {
+            snprintf((tmp_http_data->header) + strlen(tmp_http_data->header), append_size, "%s", append_str);
+            ret = new_size; // return new memory-block size
+            // TRACE_I("Append Successful: Header[size: %d , occupied: %d]", ret, STR_SIZE(tmp_http_data->header));
+            break;
+        }
+        else
+        {
+            TRACE_E("Append_Failed... ; returning original header_contents [RETRY:%d]", retry);
+            retry--;
+        }
+    } while (retry > 0);
+    return ret;
+}
+
+#if 0
+/**
+ * @brief Function to extract "web_host" from "field_value_string".
+ */
+static void __ezlopi_core_scenes_then_sendhttp_parse_host_name(s_ezlopi_core_http_mbedtls_t *tmp_http_data, const char *field_value_string)
+{
+    if (NULL != field_value_string)
+    {
+        const char *start = strstr(field_value_string, "://");
+        if (start != NULL)
+        {
+            // TRACE_W("Here! fresh webserver");
+            start += 3;
+            int length = 0;
+            char *end = strchr(start, '/');
+            if (end != NULL)
+            {
+                length = (end - start);
+                if (length > 0)
+                {
+                    length++;                                         // include null character
+                    char *tmp_string = ezlopi_malloc(__FUNCTION__, length); // tmp_string != NULL
+                    if (tmp_string)
+                    {
+                        bzero(tmp_string, length);
+                        snprintf(tmp_string, length, "%s", start);
+                        // TRACE_I("web_host_name : %s", tmp_string);
+                        tmp_http_data->web_server_maxlen = (uint16_t)ezlopi_core_http_mem_malloc(&(tmp_http_data->web_server), tmp_string);
+                        ezlopi_free(__FUNCTION__, tmp_string);
+                    }
+                }
+            }
+            else
+            {
+                const char *ptr = field_value_string;
+                length = (int)strlen(field_value_string) - (int)(start - ptr);
+                if (length > 0)
+                {
+                    length++;                                         // include null character
+                    char *tmp_string = ezlopi_malloc(__FUNCTION__, length); // tmp_string != NULL
+                    if (tmp_string)
+                    {
+                        bzero(tmp_string, length);
+                        snprintf(tmp_string, length, "%s", (ptr + ((int)(start - ptr))));
+                        // TRACE_I("web_host_name : %s", tmp_string);
+                        tmp_http_data->web_server_maxlen = (uint16_t)ezlopi_core_http_mem_malloc(&(tmp_http_data->web_server), tmp_string);
+                        ezlopi_free(__FUNCTION__, tmp_string);
+                    }
+                }
+            }
+        }
+    }
+}
+#endif
+
+/**
+ * @brief Function to Clear and Malloc the header_member (within 's_ezlopi_core_http_mbedtls_t') only.
+ * @return Size of content in 's_ezlopi_core_http_mbedtls_t'->header
+ */
+static int __ezlopi_core_scenes_then_create_fresh_header(s_ezlopi_core_http_mbedtls_t *tmp_http_data)
+{
+    int ret = STR_SIZE(tmp_http_data->header);
+
+    if ((NULL == tmp_http_data->header) && (0 == ret))
+    {
+        // TRACE_W("Here! fresh header init");
+        tmp_http_data->header_maxlen = (uint16_t)ezlopi_core_http_mem_malloc(&(tmp_http_data->header), "\r\0");
+        ret = STR_SIZE(tmp_http_data->header);
+        // TRACE_W("Here!! Created fresh header-> [capacity: %d] , [occupied: %d]", tmp_http_data->header_maxlen, ret);
+    }
+    return ret;
+}
+/**
+ * @brief Function to append values to header_member (within 's_ezlopi_core_http_mbedtls_t') only.
+ */
+static void __ezlopi_core_scenes_then_append_to_header(s_ezlopi_core_http_mbedtls_t *tmp_http_data, const char *str1, const char *str2)
+{
+    int append_size = (STR_SIZE(str1) + 4 + STR_SIZE(str2)) + 6;
+    int max_allowed = ezlopi_core_http_calc_empty_bufsize(tmp_http_data->header, (tmp_http_data->header_maxlen), append_size);
+    if (max_allowed > 0)
+    {
+        snprintf(tmp_http_data->header + STR_SIZE(tmp_http_data->header), max_allowed, "%s: %s\r\n", str1, str2);
+    }
+    else // We reallocate:- 'tmp_http_data->header'
+    {
+        char *append_str = ezlopi_malloc(__FUNCTION__, append_size); // append_str != NULL
+        if (append_str)
+        {
+            bzero(append_str, append_size);
+            snprintf(append_str, append_size, "%s: %s\r\n", str1, str2);
+
+            //-----------------------------------------------------------------------------------
+            // TRACE_D("Append_str: %s[%d] ", append_str, append_size);
+            // TRACE_D("-> Before => Realloc_Header:-[capacity:%d (occupied:%d)]->[needed:%d]", tmp_http_data->header_maxlen, STR_SIZE(tmp_http_data->header), append_size);
+            tmp_http_data->header_maxlen = (uint16_t)__ezlopi_core_scenes_then_sendhttp_relloc_header(tmp_http_data, append_size, append_str);
+            // TRACE_D("-> After => Realloc_Header:-[capacity:%d (occupied:%d)]", tmp_http_data->header_maxlen, STR_SIZE(tmp_http_data->header));
+            //-----------------------------------------------------------------------------------
+            ezlopi_free(__FUNCTION__, append_str);
+        }
+    }
+}
+
 #endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+
+/*******************************************************************************
+*                          End of File
+*******************************************************************************/
+
+
+
+
+
+

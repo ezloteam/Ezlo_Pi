@@ -1,17 +1,58 @@
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+/**
+* @file    ezlopi_core_scenes_then_methods.c
+* @brief   Funtions that performs scene-Action/Then method operations
+* @author  xx
+* @version 0.1
+* @date    12th DEC 2024
+*/
+
+/*******************************************************************************
+*                          Include Files
+*******************************************************************************/
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 #include "ezlopi_util_trace.h"
 
+// #include "ezlopi_core_devices.h"
+// #include "ezlopi_core_scenes_v2.h"
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_http.h"
 #include "ezlopi_core_modes.h"
 #include "ezlopi_core_reset.h"
-#include "ezlopi_core_devices.h"
-#include "ezlopi_core_device_group.h"
-#include "ezlopi_core_scenes_v2.h"
 #include "ezlopi_core_scenes_value.h"
+#include "ezlopi_core_device_group.h"
 #include "ezlopi_core_event_group.h"
 #include "ezlopi_core_factory_info.h"
 #include "ezlopi_core_scenes_edit.h"
@@ -25,8 +66,35 @@
 #include "ezlopi_service_meshbot.h"
 #include "ezlopi_cloud_constants.h"
 #include "EZLOPI_USER_CONFIG.h"
+/*******************************************************************************
+*                          Extern Data Declarations
+*******************************************************************************/
 
-int ezlopi_scene_then_set_item_value(l_scenes_list_v2_t *curr_scene, void *arg)
+/*******************************************************************************
+*                          Extern Function Declarations
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Type & Macro Definitions
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Static Function Prototypes
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Static Data Definitions
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Extern Data Definitions
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Extern Function Definitions
+*******************************************************************************/
+
+int EZPI_scene_then_set_item_value(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     // TRACE_W(" Set_item_value ");
     int ret = 0;
@@ -84,7 +152,7 @@ int ezlopi_scene_then_set_item_value(l_scenes_list_v2_t *curr_scene, void *arg)
     }
     return ret;
 }
-int ezlopi_scene_then_group_set_item_value(l_scenes_list_v2_t *curr_scene, void *arg)
+int EZPI_scene_then_group_set_item_value(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     // TRACE_W("Warning: then-method not implemented!");
     int ret = 0;
@@ -190,8 +258,7 @@ int ezlopi_scene_then_group_set_item_value(l_scenes_list_v2_t *curr_scene, void 
     }
     return ret;
 }
-
-int ezlopi_scene_then_set_device_armed(l_scenes_list_v2_t *curr_scene, void *arg)
+int EZPI_scene_then_set_device_armed(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     // TRACE_W("Warning: then-method not implemented!");
     int ret = 0;
@@ -239,7 +306,7 @@ int ezlopi_scene_then_set_device_armed(l_scenes_list_v2_t *curr_scene, void *arg
 
     return ret;
 }
-int ezlopi_scene_then_group_set_device_armed(l_scenes_list_v2_t *curr_scene, void *arg)
+int EZPI_scene_then_group_set_device_armed(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     // TRACE_W("Warning: then-method not implemented!");
     int ret = 0;
@@ -297,13 +364,12 @@ int ezlopi_scene_then_group_set_device_armed(l_scenes_list_v2_t *curr_scene, voi
 
     return ret;
 }
-
-int ezlopi_scene_then_send_cloud_abstract_command(l_scenes_list_v2_t *curr_scene, void *arg)
+int EZPI_scene_then_send_cloud_abstract_command(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     TRACE_W("Warning: then-method not implemented!");
     return 0;
 }
-int ezlopi_scene_then_switch_house_mode(l_scenes_list_v2_t *curr_scene, void *arg)
+int EZPI_scene_then_switch_house_mode(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     // TRACE_W(" switch_house_mode ");
     int ret = 0;
@@ -355,7 +421,7 @@ int ezlopi_scene_then_switch_house_mode(l_scenes_list_v2_t *curr_scene, void *ar
 
     return ret;
 }
-int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *arg)
+int EZPI_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     // TRACE_W(" send_http ");
     int ret = 0;
@@ -369,13 +435,13 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
             l_fields_v2_t *curr_field = curr_then->fields;
 
             const s_sendhttp_method_t __sendhttp_method[] = {
-                {.field_name = "request", .field_func = parse_http_request_type},
-                {.field_name = "url", .field_func = parse_http_url},
-                {.field_name = "credential", .field_func = parse_http_creds},
-                {.field_name = "contentType", .field_func = parse_http_content_type},
-                {.field_name = "content", .field_func = parse_http_content},
-                {.field_name = "headers", .field_func = parse_http_headers},
-                {.field_name = "skipSecurity", .field_func = parse_http_skipsecurity},
+                {.field_name = "request", .field_func = EZPI_parse_http_request_type},
+                {.field_name = "url", .field_func = EZPI_parse_http_url},
+                {.field_name = "credential", .field_func = EZPI_parse_http_creds},
+                {.field_name = "contentType", .field_func = EZPI_parse_http_content_type},
+                {.field_name = "content", .field_func = EZPI_parse_http_content},
+                {.field_name = "headers", .field_func = EZPI_parse_http_headers},
+                {.field_name = "skipSecurity", .field_func = EZPI_parse_http_skipsecurity},
                 {.field_name = NULL, .field_func = NULL},
             };
 
@@ -396,14 +462,14 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
             tmp_http_data->response_maxlen = 0;
             ezlopi_core_http_mbedtls_req(tmp_http_data); // Returns:- [response_buffer = &Memory_block]
 
-            free_http_mbedtls_struct(tmp_http_data);
+            EZPI_free_http_mbedtls_struct(tmp_http_data);
             ezlopi_free(__FUNCTION__, tmp_http_data);
         }
     }
 
     return ret;
 }
-int ezlopi_scene_then_run_custom_script(l_scenes_list_v2_t *curr_scene, void *arg)
+int EZPI_scene_then_run_custom_script(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     // TRACE_W(" run_custom_script ");
     int ret = 0;
@@ -426,17 +492,17 @@ int ezlopi_scene_then_run_custom_script(l_scenes_list_v2_t *curr_scene, void *ar
     if (script_id)
     {
         ret = 1;
-        ezlopi_scenes_scripts_run_by_id(script_id);
+        EZPI_scenes_scripts_run_by_id(script_id);
     }
 
     return ret;
 }
-int ezlopi_scene_then_run_plugin_script(l_scenes_list_v2_t *curr_scene, void *arg)
+int EZPI_scene_then_run_plugin_script(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     TRACE_W("Warning: then-method not implemented!");
     return 0;
 }
-int ezlopi_scene_then_run_scene(l_scenes_list_v2_t *curr_scene, void *arg)
+int EZPI_scene_then_run_scene(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     // TRACE_W(" run_scene ");
     int ret = 0;
@@ -505,7 +571,7 @@ int ezlopi_scene_then_run_scene(l_scenes_list_v2_t *curr_scene, void *arg)
     }
     return ret;
 }
-int ezlopi_scene_then_set_scene_state(l_scenes_list_v2_t *curr_scene, void *arg)
+int EZPI_scene_then_set_scene_state(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     // TRACE_W(" set_scene_state ");
     int ret = 0;
@@ -540,20 +606,20 @@ int ezlopi_scene_then_set_scene_state(l_scenes_list_v2_t *curr_scene, void *arg)
         {
             if (EZPI_SUCCESS == ezlopi_scenes_enable_disable_scene_by_id_v2(sceneID, set_scene_enable))
             {
-                ezlopi_scenes_status_change_broadcast(scene_node, scene_status_finished_str);
+                EZPI_scenes_status_change_broadcast(scene_node, scene_status_finished_str);
                 ret = 1;
             }
             else
             {
                 // TRACE_E("Failed : 'set_scene_state'");
-                ezlopi_scenes_status_change_broadcast(scene_node, scene_status_failed_str);
+                EZPI_scenes_status_change_broadcast(scene_node, scene_status_failed_str);
             }
         }
         TRACE_W("ret = %d", ret);
     }
     return ret;
 }
-int ezlopi_scene_then_reset_latch(l_scenes_list_v2_t *curr_scene, void *arg)
+int EZPI_scene_then_reset_latch(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     int ret = 0;
 
@@ -592,7 +658,7 @@ int ezlopi_scene_then_reset_latch(l_scenes_list_v2_t *curr_scene, void *arg)
     }
     return ret;
 }
-int ezlopi_scene_then_reset_scene_latches(l_scenes_list_v2_t *curr_scene, void *arg)
+int EZPI_scene_then_reset_scene_latches(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     int ret = 0;
     char *sceneId_str = 0;
@@ -620,13 +686,13 @@ int ezlopi_scene_then_reset_scene_latches(l_scenes_list_v2_t *curr_scene, void *
     }
     return ret;
 }
-int ezlopi_scene_then_reboot_hub(l_scenes_list_v2_t *curr_scene, void *arg)
+int EZPI_scene_then_reboot_hub(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     TRACE_E("Rebooting ESP......................... ");
     EZPI_CORE_reset_reboot();
     return 1;
 }
-int ezlopi_scene_then_reset_hub(l_scenes_list_v2_t *curr_scene, void *arg)
+int EZPI_scene_then_reset_hub(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     TRACE_W(" reset_hub ");
     int ret = 0;
@@ -650,7 +716,7 @@ int ezlopi_scene_then_reset_hub(l_scenes_list_v2_t *curr_scene, void *arg)
                         {
                             TRACE_E("Factory Reseting ESP......................... ");
                             // clear the settings realated to scenes, devices, items, rooms,etc
-                            ezlopi_scenes_scripts_factory_info_reset();
+                            EZPI_scenes_scripts_factory_info_reset();
                             ezlopi_device_factory_info_reset();
                             ezlopi_nvs_scenes_factory_info_reset(); // 'nvs' partitions
 
@@ -682,12 +748,12 @@ int ezlopi_scene_then_reset_hub(l_scenes_list_v2_t *curr_scene, void *arg)
     }
     return ret;
 }
-int ezlopi_scene_then_cloud_api(l_scenes_list_v2_t *curr_scene, void *arg)
+int EZPI_scene_then_cloud_api(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     TRACE_W("Warning: then-method not implemented!");
     return 0;
 }
-int ezlopi_scene_then_set_expression(l_scenes_list_v2_t *curr_scene, void *arg)
+int EZPI_scene_then_set_expression(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     int ret = 0;
     if (curr_scene)
@@ -748,12 +814,12 @@ int ezlopi_scene_then_set_expression(l_scenes_list_v2_t *curr_scene, void *arg)
 
         if (expression_name)
         {
-            ret = (int)(EZPI_SUCCESS == ezlopi_core_scene_then_helper_setexpression_setvariable(expression_name, code_str, exp_value_type, cj_metadata, cj_params, NULL));
+            ret = (int)(EZPI_SUCCESS == EZPI_core_scenes_then_helper_set_expn_var(expression_name, code_str, exp_value_type, cj_metadata, cj_params, NULL));
         }
     }
     return ret;
 }
-int ezlopi_scene_then_set_variable(l_scenes_list_v2_t *curr_scene, void *arg)
+int EZPI_scene_then_set_variable(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     int ret = 0;
     if (curr_scene)
@@ -805,12 +871,12 @@ int ezlopi_scene_then_set_variable(l_scenes_list_v2_t *curr_scene, void *arg)
 
         if (expression_name)
         {
-            ret = (int)(EZPI_SUCCESS == ezlopi_core_scene_then_helper_setexpression_setvariable(expression_name, NULL, var_value_type, cj_metadata, NULL, field_var_value));
+            ret = (int)(EZPI_SUCCESS == EZPI_core_scenes_then_helper_set_expn_var(expression_name, NULL, var_value_type, cj_metadata, NULL, field_var_value));
         }
     }
     return ret;
 }
-int ezlopi_scene_then_toggle_value(l_scenes_list_v2_t *curr_scene, void *arg)
+int EZPI_scene_then_toggle_value(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     // TRACE_W(" toggle_value ");
     int ret = 0;
@@ -848,7 +914,7 @@ int ezlopi_scene_then_toggle_value(l_scenes_list_v2_t *curr_scene, void *arg)
 
             if (item_id && __id_string)
             {
-                ret = ezlopi_core_scene_then_helper_toggleValue(item_id, __id_string);
+                ret = EZPI_core_scenes_then_helper_toggleValue(item_id, __id_string);
             }
             else if (NULL != expression_name)
             {
@@ -871,8 +937,7 @@ int ezlopi_scene_then_toggle_value(l_scenes_list_v2_t *curr_scene, void *arg)
     }
     return ret;
 }
-
-int ezlopi_scene_then_group_toggle_value(l_scenes_list_v2_t *curr_scene, void *arg)
+int EZPI_scene_then_group_toggle_value(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     int ret = 0;
     if (curr_scene)
@@ -931,7 +996,7 @@ int ezlopi_scene_then_group_toggle_value(l_scenes_list_v2_t *curr_scene, void *a
                                         // if the item_ids match ; Then compare the "item_values" with that of the "scene's" requirement
                                         if (req_item_id_from_itemgrp == curr_item_node->cloud_properties.item_id)
                                         {
-                                            ret = ezlopi_core_scene_then_helper_toggleValue(req_item_id_from_itemgrp, cj_item_names->valuestring);
+                                            ret = EZPI_core_scenes_then_helper_toggleValue(req_item_id_from_itemgrp, cj_item_names->valuestring);
                                         }
                                     }
                                 }
@@ -946,4 +1011,11 @@ int ezlopi_scene_then_group_toggle_value(l_scenes_list_v2_t *curr_scene, void *a
     return ret;
 }
 
+/*******************************************************************************
+*                         Static Function Definitions
+*******************************************************************************/
+
 #endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+/*******************************************************************************
+*                          End of File
+*******************************************************************************/

@@ -30,7 +30,7 @@
 */
 /**
 * @file    ezlopi_core_scenes_delete.c
-* @brief   This files include functions that delete scence-info or scene itself 
+* @brief   This files include functions that delete scence-info or scene itself
 * @author  xx
 * @version 0.1
 * @date    12th DEC 2024
@@ -46,6 +46,7 @@
 #include <string.h>
 
 #include "ezlopi_core_scenes_v2.h"
+#include "ezlopi_core_scenes_delete.h"
 
 /*******************************************************************************
 *                          Extern Data Declarations

@@ -1,3 +1,44 @@
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+/**
+* @file    ezlopi_core_scenes_scripts.c
+* @brief   Perform operations on Scene-scipts
+* @author  xx
+* @version 0.1
+* @date    12th DEC 2024
+*/
+
+/*******************************************************************************
+*                          Include Files
+*******************************************************************************/
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
@@ -9,46 +50,76 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-#include "ezlopi_util_trace.h"
 #include "lua/lua.h"
 #include "lua/lualib.h"
 #include "lua/lauxlib.h"
 
 #include "corelib.h"
+#include "ezlopi_util_trace.h"
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_scenes_scripts.h"
-#include "ezlopi_core_scenes_scripts_custom_libs_includes.h"
+// #include "ezlopi_core_errors.h"
+// #include "ezlopi_core_scenes_scripts_custom_libs_includes.h"
 #include "ezlopi_core_processes.h"
-#include "ezlopi_core_errors.h"
 
 #include "ezlopi_cloud_constants.h"
 #include "EZLOPI_USER_CONFIG.h"
 
-static l_ezlopi_scenes_script_t *script_head = NULL;
+/*******************************************************************************
+*                          Extern Data Declarations
+*******************************************************************************/
 
+/*******************************************************************************
+*                          Extern Function Declarations
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Type & Macro Definitions
+*******************************************************************************/
 typedef struct s_lua_scripts_modules
 {
     char *name;
     lua_CFunction func;
 } s_lua_scripts_modules_t;
-
+/*******************************************************************************
+*                          Static Function Prototypes
+*******************************************************************************/
 static ezlopi_error_t __scripts_nvs_parse(void);
-static void __script_process(void* arg);
+static void __script_process(void *arg);
 static void __scripts_process_runner(void);
+static void __scripts_add_script_id(uint32_t script_id);
 static void __load_custom_libs(lua_State *lua_state);
 static void __run_script(l_ezlopi_scenes_script_t *script_node);
 static void __scripts_remove_id_and_update_list(uint32_t script_id);
-static const char * __script_report(lua_State *lua_state, int status);
 static void __exit_script_hook(lua_State *lua_state, lua_Debug *ar);
+static const char *__script_report(lua_State *lua_state, int status);
 static l_ezlopi_scenes_script_t *__scripts_create_node(uint32_t script_id, cJSON *cj_script);
 
-l_ezlopi_scenes_script_t *ezlopi_scenes_scripts_get_head(void)
+/*******************************************************************************
+*                          Static Data Definitions
+*******************************************************************************/
+static l_ezlopi_scenes_script_t *script_head = NULL;
+
+static s_lua_scripts_modules_t lua_scripts_modules[] = {
+#define SCRIPTS_CUSTOM_LIB(module_name, module_func) {.name = module_name, .func = module_func},
+#include "ezlopi_core_scenes_scripts_custom_libs.h"
+#undef SCRIPTS_CUSTOM_LIB
+    {.name = NULL, .func = NULL},
+};
+/*******************************************************************************
+*                          Extern Data Definitions
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Extern Function Definitions
+*******************************************************************************/
+l_ezlopi_scenes_script_t *EZPI_scenes_scripts_get_head(void)
 {
     return script_head;
 }
 
-void ezlopi_scenes_scripts_stop(l_ezlopi_scenes_script_t *script_node)
+void EZPI_scenes_scripts_stop(l_ezlopi_scenes_script_t *script_node)
 {
     if (script_node && script_node->script_handle)
     {
@@ -56,21 +127,21 @@ void ezlopi_scenes_scripts_stop(l_ezlopi_scenes_script_t *script_node)
     }
 }
 
-void ezlopi_scenes_scripts_stop_by_id(uint32_t script_id)
+void EZPI_scenes_scripts_stop_by_id(uint32_t script_id)
 {
     l_ezlopi_scenes_script_t *script_node = script_head;
     while (script_node)
     {
         if (script_node->id == script_id)
         {
-            ezlopi_scenes_scripts_stop(script_node);
+            EZPI_scenes_scripts_stop(script_node);
             break;
         }
         script_node = script_node->next;
     }
 }
 
-void ezlopi_scenes_scripts_delete_by_id(uint32_t script_id)
+void EZPI_scenes_scripts_delete_by_id(uint32_t script_id)
 {
     l_ezlopi_scenes_script_t *script_to_delete = NULL;
     if (script_head->id == script_id)
@@ -95,7 +166,7 @@ void ezlopi_scenes_scripts_delete_by_id(uint32_t script_id)
 
     if (script_to_delete)
     {
-        ezlopi_scenes_scripts_stop(script_to_delete);
+        EZPI_scenes_scripts_stop(script_to_delete);
         ezlopi_nvs_delete_stored_data_by_id(script_to_delete->id); // deleting script from nvs
         __scripts_remove_id_and_update_list(script_to_delete->id);
 
@@ -108,18 +179,18 @@ void ezlopi_scenes_scripts_delete_by_id(uint32_t script_id)
     }
 }
 
-void ezlopi_scenes_scripts_factory_info_reset(void)
+void EZPI_scenes_scripts_factory_info_reset(void)
 {
-    l_ezlopi_scenes_script_t *curr_script = ezlopi_scenes_scripts_get_head();
+    l_ezlopi_scenes_script_t *curr_script = EZPI_scenes_scripts_get_head();
 
     while (curr_script)
     {
-        ezlopi_scenes_scripts_delete_by_id(curr_script->id); // auto-script_head shift
-        curr_script = ezlopi_scenes_scripts_get_head();
+        EZPI_scenes_scripts_delete_by_id(curr_script->id); // auto-script_head shift
+        curr_script = EZPI_scenes_scripts_get_head();
     }
 }
 
-uint32_t ezlopi_scenes_scripts_add_to_head(uint32_t script_id, cJSON *cj_script)
+uint32_t EZPI_scenes_scripts_add_to_head(uint32_t script_id, cJSON *cj_script)
 {
     uint32_t new_script_id = 0;
     if (script_head)
@@ -148,7 +219,7 @@ uint32_t ezlopi_scenes_scripts_add_to_head(uint32_t script_id, cJSON *cj_script)
     return new_script_id;
 }
 
-void ezlopi_scenes_scripts_run_by_id(uint32_t script_id)
+void EZPI_scenes_scripts_run_by_id(uint32_t script_id)
 {
     l_ezlopi_scenes_script_t *curr_script = script_head;
     while (curr_script)
@@ -165,7 +236,7 @@ void ezlopi_scenes_scripts_run_by_id(uint32_t script_id)
     }
 }
 
-void ezlopi_scenes_scripts_update(cJSON *cj_script)
+void EZPI_scenes_scripts_update(cJSON *cj_script)
 {
     cJSON *cj_script_id = cJSON_DetachItemFromObject(__FUNCTION__, cj_script, ezlopi__id_str);
 
@@ -226,11 +297,16 @@ void ezlopi_scenes_scripts_update(cJSON *cj_script)
     }
 }
 
-void ezlopi_scenes_scripts_init(void)
+void EZPI_scenes_scripts_init(void)
 {
     __scripts_nvs_parse();
     __scripts_process_runner();
 }
+
+
+/*******************************************************************************
+*                         Static Function Definitions
+*******************************************************************************/
 
 static void __run_script(l_ezlopi_scenes_script_t *script_node)
 {
@@ -266,7 +342,7 @@ static void __script_process(void *arg)
         int tmp_ret = luaL_loadstring(lua_state, script_node->code);
         if (tmp_ret)
         {
-            const char* script_report = __script_report(lua_state, tmp_ret);
+            const char *script_report = __script_report(lua_state, tmp_ret);
             if (script_report)
             {
                 TRACE_E("Error in '%s' -> %s", script_node->name, script_report);
@@ -276,7 +352,7 @@ static void __script_process(void *arg)
         tmp_ret = lua_pcall(lua_state, 0, 1, 0);
         if (tmp_ret)
         {
-            const char* script_report = __script_report(lua_state, tmp_ret);
+            const char *script_report = __script_report(lua_state, tmp_ret);
             if (script_report)
             {
                 TRACE_E("Error in '%s' -> %s", script_node->name, script_report);
@@ -383,7 +459,7 @@ static void __scripts_remove_id_and_update_list(uint32_t script_id)
 static ezlopi_error_t __scripts_nvs_parse(void)
 {
     ezlopi_error_t error = EZPI_ERR_JSON_PARSE_FAILED;
-    char* script_ids = ezlopi_nvs_read_scenes_scripts();
+    char *script_ids = ezlopi_nvs_read_scenes_scripts();
     if (script_ids)
     {
         cJSON *cj_script_ids = cJSON_Parse(__FUNCTION__, script_ids);
@@ -407,7 +483,7 @@ static ezlopi_error_t __scripts_nvs_parse(void)
                         cJSON *cj_script = cJSON_Parse(__FUNCTION__, script_str);
                         if (cj_script)
                         {
-                            ezlopi_scenes_scripts_add_to_head(script_id, cj_script);
+                            EZPI_scenes_scripts_add_to_head(script_id, cj_script);
                         }
 
                         ezlopi_free(__FUNCTION__, script_str);
@@ -491,24 +567,17 @@ static void __exit_script_hook(lua_State *lua_state, lua_Debug *ar)
     luaL_error(lua_state, "Exited from software call");
 }
 
-static const char * __script_report(lua_State *lua_state, int status)
+static const char *__script_report(lua_State *lua_state, int status)
 {
     if (status == LUA_OK)
     {
         return NULL;
     }
 
-    const char* msg = lua_tostring(lua_state, -1);
+    const char *msg = lua_tostring(lua_state, -1);
     lua_pop(lua_state, 1);
     return msg;
 }
-
-static s_lua_scripts_modules_t lua_scripts_modules[] = {
-#define SCRIPTS_CUSTOM_LIB(module_name, module_func) {.name = module_name, .func = module_func},
-#include "ezlopi_core_scenes_scripts_custom_libs.h"
-#undef SCRIPTS_CUSTOM_LIB
-    {.name = NULL, .func = NULL},
-};
 
 static void __load_custom_libs(lua_State *lua_state)
 {
@@ -523,3 +592,7 @@ static void __load_custom_libs(lua_State *lua_state)
 }
 
 #endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+
+/*******************************************************************************
+*                          End of File
+*******************************************************************************/

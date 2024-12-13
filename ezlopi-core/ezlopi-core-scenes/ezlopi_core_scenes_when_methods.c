@@ -1128,7 +1128,7 @@ int ezlopi_scene_when_is_scene_state(l_scenes_list_v2_t *scene_node, void *arg)
                     // {
                     //     ret = (false == curr_scene->enabled)? 1:0;
                     // }
-                    // TRACE_E("scene_state : %s , ret = %d", ezlopi_scenes_status_to_string(curr_scene->status), ret);
+                    // TRACE_E("scene_state : %s , ret = %d", EZPI_scenes_status_to_string(curr_scene->status), ret);
                     break;
                 }
                 curr_scene = curr_scene->next;
@@ -1354,7 +1354,7 @@ int ezlopi_scene_when_compare_numbers(l_scenes_list_v2_t *scene_node, void *arg)
             curr_field = curr_field->next;
         }
 
-        ret = ezlopi_scenes_operators_value_number_operations(item_exp_field, value_field, comparator_field, devgrp_field, itemgrp_field);
+        ret = EZPI_scenes_operators_value_number_operations(item_exp_field, value_field, comparator_field, devgrp_field, itemgrp_field);
     }
 
     return ret;
@@ -1431,13 +1431,13 @@ int ezlopi_scene_when_compare_number_range(l_scenes_list_v2_t *scene_node, void 
             curr_field = curr_field->next;
         }
 
-        if (devgrp_field && itemgrp_field && end_value_field && start_value_field)
+        if (devgrp_field && itemgrp_field && start_value_field && end_value_field)
         {
-            ret = ezlopi_scenes_operators_value_number_range_operations_with_group(start_value_field, end_value_field, comparator_choice, devgrp_field, itemgrp_field);
+            ret = EZPI_scenes_operators_value_number_range_operations_with_group(devgrp_field, itemgrp_field, start_value_field, end_value_field, comparator_choice);
         }
-        else
+        else if (item_exp_field && start_value_field && end_value_field)
         {
-            ret = ezlopi_scenes_operators_value_number_range_operations(item_exp_field, start_value_field, end_value_field, comparator_choice);
+            ret = EZPI_scenes_operators_value_number_range_operations(item_exp_field, start_value_field, end_value_field, comparator_choice);
         }
         //-----------------------------------------------------------------------------------------------------------------
     }
@@ -1518,7 +1518,10 @@ int ezlopi_scene_when_compare_strings(l_scenes_list_v2_t *scene_node, void *arg)
             curr_field = curr_field->next;
         }
 
-        ret = ezlopi_scenes_operators_value_strings_operations(item_exp_field, value_field, comparator_field, devgrp_field, itemgrp_field);
+        if (devgrp_field && itemgrp_field && item_exp_field && value_field && comparator_field)
+        {
+            ret = EZPI_scenes_operators_value_strings_operations(devgrp_field, itemgrp_field, item_exp_field, value_field, comparator_field);
+        }
     }
 
     return ret;
@@ -1599,11 +1602,11 @@ int ezlopi_scene_when_string_operation(l_scenes_list_v2_t *scene_node, void *arg
 
         if (devgrp_field && itemgrp_field && value_field && operation_field) // only for item_value 'string comparisions'
         {
-            ret = ezlopi_scenes_operators_value_strops_operations_with_group(value_field, operation_field, devgrp_field, itemgrp_field);
+            ret = EZPI_scenes_operators_value_strops_operations_with_group(value_field, operation_field, devgrp_field, itemgrp_field);
         }
         else
         {
-            ret = ezlopi_scenes_operators_value_strops_operations(item_exp_field, value_field, operation_field);
+            ret = EZPI_scenes_operators_value_strops_operations(item_exp_field, value_field, operation_field);
         }
     }
     return ret;
@@ -1680,11 +1683,11 @@ int ezlopi_scene_when_in_array(l_scenes_list_v2_t *scene_node, void *arg)
 
         if (devgrp_field && itemgrp_field && value_field && operation_field) // only for item_value 'string comparisions'
         {
-            ret = ezlopi_scenes_operators_value_inarr_operations_with_group(value_field, operation_field, devgrp_field, itemgrp_field);
+            ret = EZPI_scenes_operators_value_inarr_operations_with_group(value_field, operation_field, devgrp_field, itemgrp_field);
         }
-        else
+        else if (item_exp_field && value_field && operation_field)
         {
-            ret = ezlopi_scenes_operators_value_inarr_operations(item_exp_field, value_field, operation_field);
+            ret = EZPI_scenes_operators_value_inarr_operations(item_exp_field, value_field, operation_field);
         }
     }
 
@@ -1774,11 +1777,11 @@ int ezlopi_scene_when_compare_values(l_scenes_list_v2_t *scene_node, void *arg)
 
         if (devgrp_field && itemgrp_field && value_field && value_type_field && comparator_field) // only for item_value 'string comparisions'
         {
-            ret = ezlopi_scenes_operators_value_comparevalues_with_less_operations_with_group(value_field, value_type_field, comparator_field, devgrp_field, itemgrp_field);
+            ret = EZPI_scenes_operators_value_comparevalues_with_less_operations_with_group(value_field, value_type_field, comparator_field, devgrp_field, itemgrp_field);
         }
         else
         {
-            ret = ezlopi_scenes_operators_value_comparevalues_with_less_operations(item_exp_field, value_field, value_type_field, comparator_field);
+            ret = EZPI_scenes_operators_value_comparevalues_with_less_operations(item_exp_field, value_field, value_type_field, comparator_field);
         }
     }
     return ret;
@@ -1831,7 +1834,7 @@ int ezlopi_scene_when_has_atleast_one_dictionary_value(l_scenes_list_v2_t *scene
         // now to extract the
         if (item_id && value_field)
         {
-            ret = ezlopi_scenes_operators_has_atleastone_dictionary_value_operations(item_id, value_field);
+            ret = EZPI_scenes_operators_has_atleastone_dictionary_value_operations(item_id, value_field);
         }
     }
     return ret;
@@ -1949,7 +1952,7 @@ int ezlopi_scene_when_is_dictionary_changed(l_scenes_list_v2_t *scene_node, void
 
         if (item_id && key_field && operation_field)
         {
-            ret = ezlopi_scenes_operators_is_dictionary_changed_operations(scene_node, item_id, key_field, operation_field);
+            ret = EZPI_scenes_operators_is_dictionary_changed_operations(scene_node, item_id, key_field, operation_field);
         }
     }
     return ret;

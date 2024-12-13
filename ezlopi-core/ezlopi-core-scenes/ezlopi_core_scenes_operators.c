@@ -30,7 +30,7 @@
 */
 /**
 * @file    ezlopi_core_scenes_operators.c
-* @brief   perform some function on data
+* @brief   These functions perform comparision operation for scenes
 * @author  xx
 * @version 0.1
 * @date    12th DEC 2024
@@ -213,7 +213,7 @@ static const char *const ezlopi_scenes_value_without_less_cmp_operators_method[]
 *                          Extern Function Definitions
 *******************************************************************************/
 /* Numeric */
-e_scene_num_cmp_operators_t ezlopi_scenes_numeric_comparator_operators_get_enum(char *operator_str)
+e_scene_num_cmp_operators_t EZPI_scenes_numeric_comparator_operators_get_enum(char *operator_str)
 {
     e_scene_num_cmp_operators_t ret = SCENES_NUM_COMP_OPERATORS_NONE + 1;
     if (operator_str)
@@ -229,7 +229,7 @@ e_scene_num_cmp_operators_t ezlopi_scenes_numeric_comparator_operators_get_enum(
     }
     return ret;
 }
-const char *ezlopi_scenes_numeric_comparator_operators_get_op(e_scene_num_cmp_operators_t operator)
+const char *EZPI_scenes_numeric_comparator_operators_get_op(e_scene_num_cmp_operators_t operator)
 {
     const char *ret = NULL;
     if ((operator> SCENES_NUM_COMP_OPERATORS_NONE) && (operator<SCENES_NUM_COMP_OPERATORS_MAX))
@@ -238,7 +238,7 @@ const char *ezlopi_scenes_numeric_comparator_operators_get_op(e_scene_num_cmp_op
     }
     return ret;
 }
-const char *ezlopi_scenes_numeric_comparator_operators_get_name(e_scene_num_cmp_operators_t operator)
+const char *EZPI_scenes_numeric_comparator_operators_get_name(e_scene_num_cmp_operators_t operator)
 {
     const char *ret = NULL;
     if ((operator> SCENES_NUM_COMP_OPERATORS_NONE) && (operator<SCENES_NUM_COMP_OPERATORS_MAX))
@@ -248,7 +248,7 @@ const char *ezlopi_scenes_numeric_comparator_operators_get_name(e_scene_num_cmp_
     }
     return ret;
 }
-const char *ezlopi_scenes_numeric_comparator_operators_get_method(e_scene_num_cmp_operators_t operator)
+const char *EZPI_scenes_numeric_comparator_operators_get_method(e_scene_num_cmp_operators_t operator)
 {
     const char *ret = NULL;
     if ((operator> SCENES_NUM_COMP_OPERATORS_NONE) && (operator<SCENES_NUM_COMP_OPERATORS_MAX))
@@ -258,7 +258,7 @@ const char *ezlopi_scenes_numeric_comparator_operators_get_method(e_scene_num_cm
     }
     return ret;
 }
-int ezlopi_scenes_operators_value_number_operations(l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, l_fields_v2_t *comparator_field, l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field)
+int EZPI_scenes_operators_value_number_operations(l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, l_fields_v2_t *comparator_field, l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field)
 {
     int ret = 0;
     if (devgrp_field && itemgrp_field && value_field && comparator_field)
@@ -272,16 +272,16 @@ int ezlopi_scenes_operators_value_number_operations(l_fields_v2_t *item_exp_fiel
     return ret;
 }
 /* Numeric_Range */
-int ezlopi_scenes_operators_value_number_range_operations(l_fields_v2_t *item_exp_field, l_fields_v2_t *start_value_field, l_fields_v2_t *end_value_field, bool comparator_choice)
+int EZPI_scenes_operators_value_number_range_operations(l_fields_v2_t *item_exp_field, l_fields_v2_t *start_value_field, l_fields_v2_t *end_value_field, bool comparator_choice)
 {
     return __evaluate_numrange(item_exp_field, start_value_field, end_value_field, comparator_choice);
 }
-int ezlopi_scenes_operators_value_number_range_operations_with_group(l_fields_v2_t *start_value_field, l_fields_v2_t *end_value_field, bool comparator_choice, l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field)
+int EZPI_scenes_operators_value_number_range_operations_with_group(l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field, l_fields_v2_t *start_value_field, l_fields_v2_t *end_value_field, bool comparator_choice)
 {
     return __trigger_grp_functions(COMPARE_NUM_RANGE, devgrp_field, itemgrp_field, NULL, NULL, NULL, start_value_field, end_value_field, NULL, NULL, comparator_choice);
 }
 /* Strings */
-e_scene_str_cmp_operators_t ezlopi_scenes_strings_comparator_operators_get_enum(char *operator_str)
+e_scene_str_cmp_operators_t EZPI_scenes_strings_comparator_operators_get_enum(char *operator_str)
 {
     e_scene_str_cmp_operators_t ret = SCENES_STRINGS_OPERATORS_NONE + 1;
     if (operator_str)
@@ -299,7 +299,7 @@ e_scene_str_cmp_operators_t ezlopi_scenes_strings_comparator_operators_get_enum(
 
     return ret;
 }
-const char *ezlopi_scenes_strings_comparator_operators_get_op(e_scene_str_cmp_operators_t operator)
+const char *EZPI_scenes_strings_comparator_operators_get_op(e_scene_str_cmp_operators_t operator)
 {
     const char *ret = NULL;
     if ((operator>= SCENES_STRINGS_OPERATORS_NONE) && (operator<SCENES_STRINGS_OPERATORS_MAX))
@@ -308,7 +308,7 @@ const char *ezlopi_scenes_strings_comparator_operators_get_op(e_scene_str_cmp_op
     }
     return ret;
 }
-const char *ezlopi_scenes_strings_comparator_operators_get_name(e_scene_str_cmp_operators_t operator)
+const char *EZPI_scenes_strings_comparator_operators_get_name(e_scene_str_cmp_operators_t operator)
 {
     const char *ret = NULL;
     if ((operator> SCENES_STRINGS_OPERATORS_NONE) && (operator<SCENES_STRINGS_OPERATORS_MAX))
@@ -317,7 +317,7 @@ const char *ezlopi_scenes_strings_comparator_operators_get_name(e_scene_str_cmp_
     }
     return ret;
 }
-const char *ezlopi_scenes_strings_comparator_operators_get_method(e_scene_str_cmp_operators_t operator)
+const char *EZPI_scenes_strings_comparator_operators_get_method(e_scene_str_cmp_operators_t operator)
 {
     const char *ret = NULL;
     if ((operator> SCENES_STRINGS_OPERATORS_NONE) && (operator<SCENES_STRINGS_OPERATORS_MAX))
@@ -327,7 +327,7 @@ const char *ezlopi_scenes_strings_comparator_operators_get_method(e_scene_str_cm
     return ret;
 }
 /* Compare_string */
-int ezlopi_scenes_operators_value_strings_operations(l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, l_fields_v2_t *comparator_field, l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field)
+int EZPI_scenes_operators_value_strings_operations(l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field, l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, l_fields_v2_t *comparator_field)
 {
     int ret = 0;
     if (devgrp_field && itemgrp_field && value_field && comparator_field)
@@ -342,7 +342,7 @@ int ezlopi_scenes_operators_value_strings_operations(l_fields_v2_t *item_exp_fie
     return ret;
 }
 /* String_operations */
-e_scene_strops_cmp_operators_t ezlopi_scenes_strops_comparator_operators_get_enum(char *operator_str)
+e_scene_strops_cmp_operators_t EZPI_scenes_strops_comparator_operators_get_enum(char *operator_str)
 {
     e_scene_strops_cmp_operators_t ret = SCENES_STROPS_COMP_OPERATORES_NONE + 1;
     if (operator_str)
@@ -359,7 +359,7 @@ e_scene_strops_cmp_operators_t ezlopi_scenes_strops_comparator_operators_get_enu
     }
     return ret;
 }
-const char *ezlopi_scenes_strops_comparator_operators_get_op(e_scene_strops_cmp_operators_t operator)
+const char *EZPI_scenes_strops_comparator_operators_get_op(e_scene_strops_cmp_operators_t operator)
 {
     const char *ret = NULL;
     if ((operator>= SCENES_STROPS_COMP_OPERATORES_NONE) && (operator<SCENES_STROPS_COMP_OPERATORES_MAX))
@@ -368,7 +368,7 @@ const char *ezlopi_scenes_strops_comparator_operators_get_op(e_scene_strops_cmp_
     }
     return ret;
 }
-const char *ezlopi_scenes_strops_comparator_operators_get_name(e_scene_strops_cmp_operators_t operator)
+const char *EZPI_scenes_strops_comparator_operators_get_name(e_scene_strops_cmp_operators_t operator)
 {
     const char *ret = NULL;
     if ((operator> SCENES_STROPS_COMP_OPERATORES_NONE) && (operator<SCENES_STROPS_COMP_OPERATORES_MAX))
@@ -377,7 +377,7 @@ const char *ezlopi_scenes_strops_comparator_operators_get_name(e_scene_strops_cm
     }
     return ret;
 }
-const char *ezlopi_scenes_strops_comparator_operators_get_method(e_scene_strops_cmp_operators_t operator)
+const char *EZPI_scenes_strops_comparator_operators_get_method(e_scene_strops_cmp_operators_t operator)
 {
     const char *ret = NULL;
     if ((operator> SCENES_STROPS_COMP_OPERATORES_NONE) && (operator<SCENES_STROPS_COMP_OPERATORES_MAX))
@@ -386,7 +386,7 @@ const char *ezlopi_scenes_strops_comparator_operators_get_method(e_scene_strops_
     }
     return ret;
 }
-int ezlopi_scenes_operators_value_strops_operations(l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, l_fields_v2_t *operation_field)
+int EZPI_scenes_operators_value_strops_operations(l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, l_fields_v2_t *operation_field)
 {
     int ret = 0;
     if (item_exp_field && value_field && (operation_field->field_value.u_value.value_string))
@@ -434,7 +434,7 @@ int ezlopi_scenes_operators_value_strops_operations(l_fields_v2_t *item_exp_fiel
         //-------------- ITEM/EXPN must only have string as value ---------------------------
         if (item_exp_value_str && ((NULL != value_to_compare_with_str) || (value_to_compare_with_num > 0)))
         {
-            e_scene_strops_cmp_operators_t strops_operator = ezlopi_scenes_strops_comparator_operators_get_enum(tmp_str);
+            e_scene_strops_cmp_operators_t strops_operator = EZPI_scenes_strops_comparator_operators_get_enum(tmp_str);
             switch (strops_operator)
             {
             case SCENES_STROPS_COMP_OPERATORES_BEGINS_WITH:
@@ -515,7 +515,7 @@ int ezlopi_scenes_operators_value_strops_operations(l_fields_v2_t *item_exp_fiel
 
     return ret;
 }
-int ezlopi_scenes_operators_value_strops_operations_with_group(l_fields_v2_t *value_field, l_fields_v2_t *operation_field, l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field)
+int EZPI_scenes_operators_value_strops_operations_with_group(l_fields_v2_t *value_field, l_fields_v2_t *operation_field, l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field)
 {
     return __trigger_grp_functions(COMPARE_STROPS, devgrp_field, itemgrp_field, operation_field, NULL, value_field, NULL, NULL, NULL, NULL, 0);
 }
@@ -582,7 +582,7 @@ const char *ezlopi_scenes_inarr_comparator_operators_get_method(e_scene_inarr_cm
     return ret;
 }
 #endif
-int ezlopi_scenes_operators_value_inarr_operations(l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, l_fields_v2_t *operation_field)
+int EZPI_scenes_operators_value_inarr_operations(l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, l_fields_v2_t *operation_field)
 {
     int ret = 0;
     if (item_exp_field && value_field && (operation_field->field_value.u_value.value_string))
@@ -655,13 +655,12 @@ int ezlopi_scenes_operators_value_inarr_operations(l_fields_v2_t *item_exp_field
 
     return ret;
 }
-int ezlopi_scenes_operators_value_inarr_operations_with_group(l_fields_v2_t *value_field, l_fields_v2_t *operation_field, l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field)
+int EZPI_scenes_operators_value_inarr_operations_with_group(l_fields_v2_t *value_field, l_fields_v2_t *operation_field, l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field)
 {
     return __trigger_grp_functions(COMPARE_INARRAY, devgrp_field, itemgrp_field, operation_field, NULL, value_field, NULL, NULL, NULL, NULL, 0);
 }
 /* Values with Less */
-
-const char *ezlopi_scenes_value_with_less_comparator_operators_get_op(e_scene_value_with_less_cmp_operators_t operator)
+const char *EZPI_scenes_value_with_less_comparator_operators_get_op(e_scene_value_with_less_cmp_operators_t operator)
 {
     const char *ret = NULL;
     if ((operator>= SCENES_VALUES_WITH_LESS_OPERATORS_NONE) && (operator<SCENES_VALUES_WITH_LESS_OPERATORS_MAX))
@@ -670,7 +669,7 @@ const char *ezlopi_scenes_value_with_less_comparator_operators_get_op(e_scene_va
     }
     return ret;
 }
-const char *ezlopi_scenes_value_with_less_comparator_operators_get_name(e_scene_value_with_less_cmp_operators_t operator)
+const char *EZPI_scenes_value_with_less_comparator_operators_get_name(e_scene_value_with_less_cmp_operators_t operator)
 {
     const char *ret = NULL;
     if ((operator> SCENES_VALUES_WITH_LESS_OPERATORS_NONE) && (operator<SCENES_VALUES_WITH_LESS_OPERATORS_MAX))
@@ -679,7 +678,7 @@ const char *ezlopi_scenes_value_with_less_comparator_operators_get_name(e_scene_
     }
     return ret;
 }
-const char *ezlopi_scenes_value_with_less_comparator_operators_get_method(e_scene_value_with_less_cmp_operators_t operator)
+const char *EZPI_scenes_value_with_less_comparator_operators_get_method(e_scene_value_with_less_cmp_operators_t operator)
 {
     const char *ret = NULL;
     if ((operator> SCENES_VALUES_WITH_LESS_OPERATORS_NONE) && (operator<SCENES_VALUES_WITH_LESS_OPERATORS_MAX))
@@ -689,7 +688,7 @@ const char *ezlopi_scenes_value_with_less_comparator_operators_get_method(e_scen
     return ret;
 }
 #if 0
-e_scene_value_with_less_cmp_operators_t ezlopi_scenes_value_with_less_comparator_operators_get_enum(char *operator_str)
+e_scene_value_with_less_cmp_operators_t EZPI_scenes_value_with_less_comparator_operators_get_enum(char *operator_str)
 {
     e_scene_value_with_less_cmp_operators_t ret = SCENES_VALUES_WITH_LESS_OPERATORS_NONE + 1;
     if (operator_str)
@@ -741,7 +740,7 @@ int ezlopi_scenes_operators_value_with_less_operations(uint32_t item_id, l_field
             device = device->next;
         }
 
-        e_scene_value_with_less_cmp_operators_t value_with_less_operator = ezlopi_scenes_value_with_less_comparator_operators_get_enum(comparator_field->field_value.u_value.value_string);
+        e_scene_value_with_less_cmp_operators_t value_with_less_operator = EZPI_scenes_value_with_less_comparator_operators_get_enum(comparator_field->field_value.u_value.value_string);
 
         switch (value_with_less_operator)
         {
@@ -792,7 +791,7 @@ int ezlopi_scenes_operators_value_with_less_operations(uint32_t item_id, l_field
 }
 #endif
 /* Values without Less */
-const char *ezlopi_scenes_value_without_less_comparator_operators_get_op(e_scene_value_without_less_cmp_operators_t operator)
+const char *EZPI_scenes_value_without_less_comparator_operators_get_op(e_scene_value_without_less_cmp_operators_t operator)
 {
     const char *ret = NULL;
     if ((operator>= SCENES_VALUES_WITHOUT_LESS_OPERATORS_NONE) && (operator<SCENES_VALUES_WITHOUT_LESS_OPERATORS_MAX))
@@ -801,7 +800,7 @@ const char *ezlopi_scenes_value_without_less_comparator_operators_get_op(e_scene
     }
     return ret;
 }
-const char *ezlopi_scenes_value_without_less_comparator_operators_get_name(e_scene_value_without_less_cmp_operators_t operator)
+const char *EZPI_scenes_value_without_less_comparator_operators_get_name(e_scene_value_without_less_cmp_operators_t operator)
 {
     const char *ret = NULL;
     if ((operator> SCENES_VALUES_WITHOUT_LESS_OPERATORS_NONE) && (operator<SCENES_VALUES_WITHOUT_LESS_OPERATORS_MAX))
@@ -810,7 +809,7 @@ const char *ezlopi_scenes_value_without_less_comparator_operators_get_name(e_sce
     }
     return ret;
 }
-const char *ezlopi_scenes_value_without_less_comparator_operators_get_method(e_scene_value_without_less_cmp_operators_t operator)
+const char *EZPI_scenes_value_without_less_comparator_operators_get_method(e_scene_value_without_less_cmp_operators_t operator)
 {
     const char *ret = NULL;
     if ((operator> SCENES_VALUES_WITHOUT_LESS_OPERATORS_NONE) && (operator<SCENES_VALUES_WITHOUT_LESS_OPERATORS_MAX))
@@ -820,7 +819,7 @@ const char *ezlopi_scenes_value_without_less_comparator_operators_get_method(e_s
     return ret;
 }
 #if 0
-e_scene_value_without_less_cmp_operators_t ezlopi_scenes_value_without_less_comparator_operators_get_enum(char *operator_str)
+e_scene_value_without_less_cmp_operators_t EZPI_scenes_value_without_less_comparator_operators_get_enum(char *operator_str)
 {
     e_scene_value_without_less_cmp_operators_t ret = SCENES_VALUES_WITHOUT_LESS_OPERATORS_NONE + 1; // 1st element of enum after *_NONE
     if (operator_str)
@@ -875,7 +874,7 @@ int ezlopi_scenes_operators_value_without_less_operations(uint32_t item_id, l_fi
             device = device->next;
         }
 
-        e_scene_value_without_less_cmp_operators_t value_without_less_operator = ezlopi_scenes_value_without_less_comparator_operators_get_enum(comparator_field->field_value.u_value.value_string);
+        e_scene_value_without_less_cmp_operators_t value_without_less_operator = EZPI_scenes_value_without_less_comparator_operators_get_enum(comparator_field->field_value.u_value.value_string);
 
         switch (value_without_less_operator)
         {
@@ -907,7 +906,7 @@ int ezlopi_scenes_operators_value_without_less_operations(uint32_t item_id, l_fi
 
 /* compareValues */
 
-int ezlopi_scenes_operators_value_comparevalues_without_less_operations(uint32_t item_id, l_fields_v2_t *value_field, l_fields_v2_t *value_type_field, l_fields_v2_t *comparator_field)
+int EZPI_scenes_operators_value_comparevalues_without_less_operations(uint32_t item_id, l_fields_v2_t *value_field, l_fields_v2_t *value_type_field, l_fields_v2_t *comparator_field)
 {
     int ret = 0;
     if (item_id && value_field && value_type_field && comparator_field)
@@ -946,7 +945,7 @@ int ezlopi_scenes_operators_value_comparevalues_without_less_operations(uint32_t
         if (NULL != item_value)
         { // operating according to 'with-less or without-less' comparator
             char *op_str = (NULL == comparator_field) ? "==" : comparator_field->field_value.u_value.value_string;
-            e_scene_value_without_less_cmp_operators_t value_without_less_operator = ezlopi_scenes_value_without_less_comparator_operators_get_enum(op_str);
+            e_scene_value_without_less_cmp_operators_t value_without_less_operator = EZPI_scenes_value_without_less_comparator_operators_get_enum(op_str);
 
             switch (value_without_less_operator)
             {
@@ -987,7 +986,7 @@ int ezlopi_scenes_operators_value_comparevalues_without_less_operations(uint32_t
     return ret;
 }
 #endif
-int ezlopi_scenes_operators_value_comparevalues_with_less_operations(l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, l_fields_v2_t *value_type_field, l_fields_v2_t *comparator_field)
+int EZPI_scenes_operators_value_comparevalues_with_less_operations(l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, l_fields_v2_t *value_type_field, l_fields_v2_t *comparator_field)
 {
     int ret = 0;
     char *comparator_field_str = (NULL == comparator_field) ? "==" : comparator_field->field_value.u_value.value_string; // default '=='
@@ -1084,12 +1083,12 @@ int ezlopi_scenes_operators_value_comparevalues_with_less_operations(l_fields_v2
     }
     return ret;
 }
-int ezlopi_scenes_operators_value_comparevalues_with_less_operations_with_group(l_fields_v2_t *value_field, l_fields_v2_t *value_type_field, l_fields_v2_t *comparator_field, l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field)
+int EZPI_scenes_operators_value_comparevalues_with_less_operations_with_group(l_fields_v2_t *value_field, l_fields_v2_t *value_type_field, l_fields_v2_t *comparator_field, l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field)
 {
     return __trigger_grp_functions(COMPARE_VALUES, devgrp_field, itemgrp_field, NULL, comparator_field, value_field, NULL, NULL, value_type_field, NULL, 0);
 }
 /* Has atleast one dictornary Value */
-int ezlopi_scenes_operators_has_atleastone_dictionary_value_operations(uint32_t item_id, l_fields_v2_t *value_field)
+int EZPI_scenes_operators_has_atleastone_dictionary_value_operations(uint32_t item_id, l_fields_v2_t *value_field)
 {
     int ret = 0;
 
@@ -1133,7 +1132,7 @@ int ezlopi_scenes_operators_has_atleastone_dictionary_value_operations(uint32_t 
     return ret;
 }
 /* isDictornary Changed */
-int ezlopi_scenes_operators_is_dictionary_changed_operations(l_scenes_list_v2_t *scene_node, uint32_t item_id, l_fields_v2_t *key_field, l_fields_v2_t *operation_field)
+int EZPI_scenes_operators_is_dictionary_changed_operations(l_scenes_list_v2_t *scene_node, uint32_t item_id, l_fields_v2_t *key_field, l_fields_v2_t *operation_field)
 {
     int ret = 0;
     if (item_id && key_field && (operation_field->field_value.u_value.value_string))
@@ -1273,7 +1272,7 @@ static int __evaluate_compareNumbers_or_compareStrings_with_group(l_fields_v2_t 
 static int ________compare_val_num(double item_exp_value, double value_to_compare_with, char *comparator_field_str)
 {
     int ret = 0;
-    e_scene_num_cmp_operators_t numeric_operator = ezlopi_scenes_numeric_comparator_operators_get_enum(comparator_field_str);
+    e_scene_num_cmp_operators_t numeric_operator = EZPI_scenes_numeric_comparator_operators_get_enum(comparator_field_str);
     switch (numeric_operator)
     {
     case SCENES_NUM_COMP_OPERATORS_LESS:
@@ -1318,7 +1317,7 @@ static int ________compare_val_num(double item_exp_value, double value_to_compar
 static int ________compare_val_str(const char *item_exp_value_str, const char *value_to_compare_with_str, char *comparator_field_str)
 {
     int ret = 0;
-    e_scene_str_cmp_operators_t string_operator = ezlopi_scenes_strings_comparator_operators_get_enum(comparator_field_str);
+    e_scene_str_cmp_operators_t string_operator = EZPI_scenes_strings_comparator_operators_get_enum(comparator_field_str);
     switch (string_operator)
     {
     case SCENES_STRINGS_OPERATORS_LESS:
@@ -1811,17 +1810,17 @@ static int __trigger_grp_functions(e_with_grp_t choice, l_fields_v2_t *devgrp_fi
                                     }
                                     case COMPARE_VALUES:
                                     {
-                                        ret = ezlopi_scenes_operators_value_comparevalues_with_less_operations(dummy_item_field, value_field, value_type_field, comparator_field);
+                                        ret = EZPI_scenes_operators_value_comparevalues_with_less_operations(dummy_item_field, value_field, value_type_field, comparator_field);
                                         break;
                                     }
                                     case COMPARE_INARRAY:
                                     {
-                                        ret = ezlopi_scenes_operators_value_inarr_operations(dummy_item_field, value_field, operation_field);
+                                        ret = EZPI_scenes_operators_value_inarr_operations(dummy_item_field, value_field, operation_field);
                                         break;
                                     }
                                     case COMPARE_STROPS:
                                     {
-                                        ret = ezlopi_scenes_operators_value_strops_operations(dummy_item_field, value_field, operation_field);
+                                        ret = EZPI_scenes_operators_value_strops_operations(dummy_item_field, value_field, operation_field);
                                         break;
                                     }
 

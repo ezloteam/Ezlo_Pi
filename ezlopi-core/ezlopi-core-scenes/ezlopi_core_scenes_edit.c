@@ -49,6 +49,7 @@
 #include "ezlopi_core_scenes_edit.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_scenes_populate.h"
+#include "ezlopi_core_scenes_delete.h"
 #include "ezlopi_core_errors.h"
 #include "ezlopi_core_cloud.h"
 
@@ -193,7 +194,7 @@ static void __edit_scene(l_scenes_list_v2_t *scene_node, cJSON *cj_scene)
         if (cj_user_notifications && (cJSON_Array == cj_user_notifications->type))
         {
             EZPI_scenes_delete_user_notifications(scene_node->user_notifications);
-            scene_node->user_notifications = ezlopi_scenes_populate_user_notifications(cj_user_notifications);
+            scene_node->user_notifications = EZPI_scenes_populate_user_notifications(cj_user_notifications);
         }
     }
 
@@ -202,7 +203,7 @@ static void __edit_scene(l_scenes_list_v2_t *scene_node, cJSON *cj_scene)
         if (cj_house_modes && (cJSON_Array == cj_house_modes->type))
         {
             EZPI_scenes_delete_house_modes(scene_node->house_modes);
-            scene_node->house_modes = ezlopi_scenes_populate_house_modes(cj_house_modes);
+            scene_node->house_modes = EZPI_scenes_populate_house_modes(cj_house_modes);
         }
     }
 
@@ -211,7 +212,7 @@ static void __edit_scene(l_scenes_list_v2_t *scene_node, cJSON *cj_scene)
         if (cj_then_blocks && (cJSON_Array == cj_then_blocks->type))
         {
             EZPI_scenes_delete_action_blocks(scene_node->then_block);
-            scene_node->then_block = ezlopi_scenes_populate_action_blocks(cj_then_blocks, SCENE_BLOCK_TYPE_THEN);
+            scene_node->then_block = EZPI_scenes_populate_action_blocks(cj_then_blocks, SCENE_BLOCK_TYPE_THEN);
         }
     }
 
@@ -220,7 +221,7 @@ static void __edit_scene(l_scenes_list_v2_t *scene_node, cJSON *cj_scene)
         if (cj_when_blocks && (cJSON_Array == cj_when_blocks->type))
         {
             EZPI_scenes_delete_when_blocks(scene_node->when_block);
-            scene_node->when_block = ezlopi_scenes_populate_when_blocks(cj_when_blocks);
+            scene_node->when_block = EZPI_scenes_populate_when_blocks(cj_when_blocks);
         }
     }
 
@@ -229,7 +230,7 @@ static void __edit_scene(l_scenes_list_v2_t *scene_node, cJSON *cj_scene)
         if (cj_else_blocks && (cJSON_Array == cj_else_blocks->type))
         {
             EZPI_scenes_delete_action_blocks(scene_node->else_block);
-            scene_node->else_block = ezlopi_scenes_populate_action_blocks(cj_else_blocks, SCENE_BLOCK_TYPE_ELSE);
+            scene_node->else_block = EZPI_scenes_populate_action_blocks(cj_else_blocks, SCENE_BLOCK_TYPE_ELSE);
         }
     }
 }

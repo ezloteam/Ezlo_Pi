@@ -15,6 +15,7 @@
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_service_meshbot.h"
 #include "ezlopi_core_scenes_populate.h"
+#include "ezlopi_core_scenes_delete.h"
 #include "ezlopi_core_scenes_operators.h"
 #include "ezlopi_core_scenes_notifications.h"
 #include "ezlopi_core_scenes_then_methods_helper_func.h"
@@ -434,7 +435,7 @@ void scenes_house_modes_set(cJSON *cj_request, cJSON *cj_response)
                 if (scene_node && scene_node->house_modes)
                 {
                     EZPI_scenes_delete_house_modes(scene_node->house_modes);
-                    if (NULL != (scene_node->house_modes = ezlopi_scenes_populate_house_modes(cJSON_Duplicate(__FUNCTION__, cj_house_mode_arr, true))))
+                    if (NULL != (scene_node->house_modes = EZPI_scenes_populate_house_modes(cJSON_Duplicate(__FUNCTION__, cj_house_mode_arr, true))))
                     {
                         TRACE_S("Updating ... House_modes ; Success");
                     }
@@ -464,7 +465,7 @@ void scenes_action_block_test(cJSON *cj_request, cJSON *cj_response)
                     cJSON *dupli = cJSON_Duplicate(__FUNCTION__, cj_block, true);
                     if (dupli) // duplicate the 'cj_block' to avoid crashes
                     {
-                        ezlopi_scenes_populate_assign_action_block(test_then_block, dupli, SCENE_BLOCK_TYPE_THEN);
+                        EZPI_scenes_populate_assign_action_block(test_then_block, dupli, SCENE_BLOCK_TYPE_THEN);
                         // CJSON_TRACE("test_then:", dupli);
                         cJSON_Delete(__FUNCTION__, dupli);
                     }
@@ -477,13 +478,13 @@ void scenes_action_block_test(cJSON *cj_request, cJSON *cj_response)
                         l_fields_v2_t *curr_field = test_then_block->fields;
 
                         const s_sendhttp_method_t __sendhttp_method[] = {
-                            {.field_name = "request", .field_func = parse_http_request_type},
-                            {.field_name = "url", .field_func = parse_http_url},
-                            {.field_name = "credential", .field_func = parse_http_creds},
-                            {.field_name = "contentType", .field_func = parse_http_content_type},
-                            {.field_name = "content", .field_func = parse_http_content},
-                            {.field_name = "headers", .field_func = parse_http_headers},
-                            {.field_name = "skipSecurity", .field_func = parse_http_skipsecurity},
+                            {.field_name = "request", .field_func = EZPI_parse_http_request_type},
+                            {.field_name = "url", .field_func = EZPI_parse_http_url},
+                            {.field_name = "credential", .field_func = EZPI_parse_http_creds},
+                            {.field_name = "contentType", .field_func = EZPI_parse_http_content_type},
+                            {.field_name = "content", .field_func = EZPI_parse_http_content},
+                            {.field_name = "headers", .field_func = EZPI_parse_http_headers},
+                            {.field_name = "skipSecurity", .field_func = EZPI_parse_http_skipsecurity},
                             {.field_name = NULL, .field_func = NULL},
                         };
 
@@ -522,7 +523,7 @@ void scenes_action_block_test(cJSON *cj_request, cJSON *cj_response)
                             cJSON_AddNumberToObject(__FUNCTION__, cj_result, ezlopi_httpAnswerCode_str, 404);
                         }
 
-                        free_http_mbedtls_struct(tmp_http_data);
+                        EZPI_free_http_mbedtls_struct(tmp_http_data);
                         ezlopi_free(__FUNCTION__, tmp_http_data);
                     }
 

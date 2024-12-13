@@ -42,7 +42,7 @@
 /*******************************************************************************
 *                          Include Files
 *******************************************************************************/
-// #include "cjext.h"
+#include "cjext.h"
 
 /*******************************************************************************
 *                          C++ Declaration Wrapper
@@ -63,7 +63,7 @@ extern "C"
     /*******************************************************************************
     *                          Extern Function Prototypes
     *******************************************************************************/
-    // void EZPI_scenes_notifications_add(cJSON *cj_notifications);
+    void EZPI_scenes_notifications_add(cJSON *cj_notifications);
     // void EZPI_scenes_notifications_remove(cJSON *cj_notifications);
 
 #ifdef __cplusplus
