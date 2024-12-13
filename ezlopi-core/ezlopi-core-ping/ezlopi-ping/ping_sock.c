@@ -38,17 +38,15 @@
 #include "EZLOPI_USER_CONFIG.h"
 #include "ezlopi_service_loop.h"
 
-const static char *TAG = "ping_sock";
-
-#define PING_CHECK(a, str, goto_tag, ret_value, ...)                              \
-    do                                                                            \
-    {                                                                             \
-        if (!(a))                                                                 \
-        {                                                                         \
-            TRACE_E(TAG, "%s(%d): " str, __FUNCTION__, __LINE__, ##__VA_ARGS__); \
-            ret = ret_value;                                                      \
-            goto goto_tag;                                                        \
-        }                                                                         \
+#define PING_CHECK(a, str, goto_tag, ret_value, ...)                        \
+    do                                                                      \
+    {                                                                       \
+        if (!(a))                                                           \
+        {                                                                   \
+            TRACE_E("%s(%d): " str, __FUNCTION__, __LINE__, ##__VA_ARGS__); \
+            ret = ret_value;                                                \
+            goto goto_tag;                                                  \
+        }                                                                   \
     } while (0)
 
 #define PING_TIME_DIFF_MS(_end, _start) ((uint32_t)(((_end).tv_sec - (_start).tv_sec) * 1000 + \
@@ -59,7 +57,8 @@ const static char *TAG = "ping_sock";
 #define PING_FLAGS_INIT (1 << 0)
 #define PING_FLAGS_START (1 << 1)
 
-typedef struct {
+typedef struct
+{
     int sock;
     struct sockaddr_storage target_addr;
     TaskHandle_t ping_task_hdl;
@@ -88,20 +87,23 @@ static esp_err_t __ping_send(esp_ping_t *ep)
     ep->packet_hdr->seqno++;
     /* generate checksum since "seqno" has changed */
     ep->packet_hdr->chksum = 0;
-    if (ep->packet_hdr->type == ICMP_ECHO) {
+    if (ep->packet_hdr->type == ICMP_ECHO)
+    {
         ep->packet_hdr->chksum = inet_chksum(ep->packet_hdr, ep->icmp_pkt_size);
     }
 
     ssize_t sent = sendto(ep->sock, ep->packet_hdr, ep->icmp_pkt_size, 0,
-        (struct sockaddr *)&ep->target_addr, sizeof(ep->target_addr));
+                          (struct sockaddr *)&ep->target_addr, sizeof(ep->target_addr));
 
-    if (sent != (ssize_t)ep->icmp_pkt_size) {
+    if (sent != (ssize_t)ep->icmp_pkt_size)
+    {
         int opt_val;
         socklen_t opt_len = sizeof(opt_val);
         getsockopt(ep->sock, SOL_SOCKET, SO_ERROR, &opt_val, &opt_len);
         ret = ESP_FAIL;
     }
-    else {
+    else
+    {
         ep->transmitted++;
     }
     return ret;
@@ -120,8 +122,10 @@ static int __ping_receive(esp_ping_t *ep, uint32_t a_timeout)
     timeout.tv_usec = (a_timeout % 1000) * 1000;
     setsockopt(ep->sock, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
 
-    while ((len = recvfrom(ep->sock, buf, sizeof(buf), 0, (struct sockaddr *)&from, (socklen_t *)&fromlen)) > 0) {
-        if (from.ss_family == AF_INET) {
+    while ((len = recvfrom(ep->sock, buf, sizeof(buf), 0, (struct sockaddr *)&from, (socklen_t *)&fromlen)) > 0)
+    {
+        if (from.ss_family == AF_INET)
+        {
             // IPv4
             struct sockaddr_in *from4 = (struct sockaddr_in *)&from;
             inet_addr_to_ip4addr(ip_2_ip4(&ep->recv_addr), &from4->sin_addr);
@@ -129,7 +133,8 @@ static int __ping_receive(esp_ping_t *ep, uint32_t a_timeout)
             data_head = (uint16_t)(sizeof(struct ip_hdr) + sizeof(struct icmp_echo_hdr));
         }
 #if CONFIG_LWIP_IPV6
-        else {
+        else
+        {
             // IPv6
             struct sockaddr_in6 *from6 = (struct sockaddr_in6 *)&from;
             inet6_addr_to_ip6addr(ip_2_ip6(&ep->recv_addr), &from6->sin6_addr);
@@ -137,25 +142,30 @@ static int __ping_receive(esp_ping_t *ep, uint32_t a_timeout)
             data_head = (uint16_t)(sizeof(struct ip6_hdr) + sizeof(struct icmp6_echo_hdr));
         }
 #endif
-        if (len >= data_head) {
-            if (IP_IS_V4_VAL(ep->recv_addr)) {              // Currently we process IPv4
+        if (len >= data_head)
+        {
+            if (IP_IS_V4_VAL(ep->recv_addr))
+            { // Currently we process IPv4
                 struct ip_hdr *iphdr = (struct ip_hdr *)buf;
                 struct icmp_echo_hdr *iecho = (struct icmp_echo_hdr *)(buf + (IPH_HL(iphdr) * 4));
-                if ((iecho->id == ep->packet_hdr->id) && (iecho->seqno == ep->packet_hdr->seqno)) {
+                if ((iecho->id == ep->packet_hdr->id) && (iecho->seqno == ep->packet_hdr->seqno))
+                {
                     ep->received++;
                     ep->ttl = iphdr->_ttl;
                     ep->tos = iphdr->_tos;
-                    ep->recv_len = lwip_ntohs(IPH_LEN(iphdr)) - data_head;  // The data portion of ICMP
+                    ep->recv_len = lwip_ntohs(IPH_LEN(iphdr)) - data_head; // The data portion of ICMP
                     return len;
                 }
             }
 #if CONFIG_LWIP_IPV6
-            else if (IP_IS_V6_VAL(ep->recv_addr)) {      // Currently we process IPv6
+            else if (IP_IS_V6_VAL(ep->recv_addr))
+            { // Currently we process IPv6
                 struct ip6_hdr *iphdr = (struct ip6_hdr *)buf;
                 struct icmp6_echo_hdr *iecho6 = (struct icmp6_echo_hdr *)(buf + sizeof(struct ip6_hdr)); // IPv6 head length is 40
-                if ((iecho6->id == ep->packet_hdr->id) && (iecho6->seqno == ep->packet_hdr->seqno)) {
+                if ((iecho6->id == ep->packet_hdr->id) && (iecho6->seqno == ep->packet_hdr->seqno))
+                {
                     ep->received++;
-                    ep->recv_len = IP6H_PLEN(iphdr) - sizeof(struct icmp6_echo_hdr); //The data portion of ICMPv6
+                    ep->recv_len = IP6H_PLEN(iphdr) - sizeof(struct icmp6_echo_hdr); // The data portion of ICMPv6
                     return len;
                 }
             }
@@ -224,8 +234,7 @@ static void __ping_loop(void *arg)
                 _ping_event = 0;
             }
         }
-        else if ((ezlopi_event_group_wait_for_event(EZLOPI_EVENT_PING, 0, true) > 0)
-            || ((xTaskGetTickCount() - last_wake) >= ep->interval_ms / portTICK_RATE_MS))
+        else if ((ezlopi_event_group_wait_for_event(EZLOPI_EVENT_PING, 0, true) > 0) || ((xTaskGetTickCount() - last_wake) >= ep->interval_ms / portTICK_RATE_MS))
         {
             _ping_event = 1;
 
@@ -246,11 +255,13 @@ static void __ping_loop(void *arg)
 
             ezlopi_service_loop_remove(__ping_loop);
 
-            if (ep->packet_hdr) {
+            if (ep->packet_hdr)
+            {
                 free(ep->packet_hdr);
             }
 
-            if (ep->sock > 0) {
+            if (ep->sock > 0)
+            {
                 close(ep->sock);
             }
 
@@ -261,69 +272,6 @@ static void __ping_loop(void *arg)
     {
         ezlopi_service_loop_remove(__ping_loop);
     }
-}
-
-static void __ping_thread(void *args)
-{
-    esp_ping_t *ep = (esp_ping_t *)(args);
-    TickType_t last_wake;
-    struct timeval start_time, end_time;
-    int recv_ret;
-
-    while (1) {
-        /* wait for ping start signal */
-        if (ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(PING_CHECK_START_TIMEOUT_MS))) {
-            /* initialize runtime statistics */
-            ep->packet_hdr->seqno = 0;
-            ep->transmitted = 0;
-            ep->received = 0;
-            ep->total_time_ms = 0;
-
-            last_wake = xTaskGetTickCount();
-            while ((ep->flags & PING_FLAGS_START) && ((ep->count == 0) || (ep->packet_hdr->seqno < ep->count))) {
-                __ping_send(ep);
-                gettimeofday(&start_time, NULL);
-                recv_ret = __ping_receive(ep, 0);
-                gettimeofday(&end_time, NULL);
-                ep->elapsed_time_ms = PING_TIME_DIFF_MS(end_time, start_time);
-                ep->total_time_ms += ep->elapsed_time_ms;
-                if (recv_ret >= 0) {
-                    if (ep->on_ping_success) {
-                        ep->on_ping_success((esp_ping_handle_t)ep, ep->cb_args);
-                    }
-                }
-                else {
-                    if (ep->on_ping_timeout) {
-                        ep->on_ping_timeout((esp_ping_handle_t)ep, ep->cb_args);
-                    }
-                }
-
-                if (pdMS_TO_TICKS(ep->interval_ms)) {
-                    vTaskDelayUntil(&last_wake, pdMS_TO_TICKS(ep->interval_ms)); // to get a more accurate delay
-                }
-            }
-
-            /* batch of ping operations finished */
-            if (ep->on_ping_end) {
-                ep->on_ping_end((esp_ping_handle_t)ep, ep->cb_args);
-            }
-        }
-        else {
-            // check if ping has been de-initialized
-            if (!(ep->flags & PING_FLAGS_INIT)) {
-                break;
-            }
-        }
-    }
-    /* before exit task, free all resources */
-    if (ep->packet_hdr) {
-        free(ep->packet_hdr);
-    }
-    if (ep->sock > 0) {
-        close(ep->sock);
-    }
-    free(ep);
-    vTaskDelete(NULL);
 }
 
 esp_err_t ezlopi_ping_new_session(const ezlopi_ping_config_t *config, const ezlopi_ping_callbacks_t *cbs, esp_ping_handle_t *hdl_out)
@@ -344,7 +292,8 @@ esp_err_t ezlopi_ping_new_session(const ezlopi_ping_config_t *config, const ezlo
     ezlopi_service_loop_add("ping-loop", __ping_loop, 10000, ep);
 
     /* callback functions */
-    if (cbs) {
+    if (cbs)
+    {
         ep->cb_args = cbs->cb_args;
         ep->on_ping_end = cbs->on_ping_end;
         ep->on_ping_timeout = cbs->on_ping_timeout;
@@ -363,7 +312,8 @@ esp_err_t ezlopi_ping_new_session(const ezlopi_ping_config_t *config, const ezlo
     ep->packet_hdr->id = ((uint32_t)ep->ping_task_hdl) & 0xFFFF;
     /* fill the additional data buffer with some data */
     char *d = (char *)(ep->packet_hdr) + sizeof(struct icmp_echo_hdr);
-    for (uint32_t i = 0; i < config->data_size; i++) {
+    for (uint32_t i = 0; i < config->data_size; i++)
+    {
         d[i] = 'A' + i;
     }
 
@@ -372,24 +322,29 @@ esp_err_t ezlopi_ping_new_session(const ezlopi_ping_config_t *config, const ezlo
 #if CONFIG_LWIP_IPV6
         || ip6_addr_isipv4mappedipv6(ip_2_ip6(&config->target_addr))
 #endif
-        ) {
+    )
+    {
         ep->sock = socket(AF_INET, SOCK_RAW, IP_PROTO_ICMP);
     }
 #if CONFIG_LWIP_IPV6
-    else {
+    else
+    {
         ep->sock = socket(AF_INET6, SOCK_RAW, IP6_NEXTH_ICMP6);
     }
 #endif
     PING_CHECK(ep->sock > 0, "create socket failed: %d", err, ESP_FAIL, ep->sock);
     /* set if index */
-    if (config->interface) {
+    if (config->interface)
+    {
         struct ifreq iface;
-        if (netif_index_to_name(config->interface, iface.ifr_name) == NULL) {
-            TRACE_E(TAG, "fail to find interface name with netif index %d", config->interface);
+        if (netif_index_to_name(config->interface, iface.ifr_name) == NULL)
+        {
+            TRACE_E("fail to find interface name with netif index %d", config->interface);
             goto err;
         }
-        if (setsockopt(ep->sock, SOL_SOCKET, SO_BINDTODEVICE, &iface, sizeof(iface)) != 0) {
-            TRACE_E(TAG, "fail to setsockopt SO_BINDTODEVICE");
+        if (setsockopt(ep->sock, SOL_SOCKET, SO_BINDTODEVICE, &iface, sizeof(iface)) != 0)
+        {
+            TRACE_E("fail to setsockopt SO_BINDTODEVICE");
             goto err;
         }
     }
@@ -406,14 +361,16 @@ esp_err_t ezlopi_ping_new_session(const ezlopi_ping_config_t *config, const ezlo
     setsockopt(ep->sock, IPPROTO_IP, IP_TTL, &config->ttl, sizeof(config->ttl));
 
     /* set socket address */
-    if (IP_IS_V4(&config->target_addr)) {
+    if (IP_IS_V4(&config->target_addr))
+    {
         struct sockaddr_in *to4 = (struct sockaddr_in *)&ep->target_addr;
         to4->sin_family = AF_INET;
         inet_addr_from_ip4addr(&to4->sin_addr, ip_2_ip4(&config->target_addr));
         ep->packet_hdr->type = ICMP_ECHO;
     }
 #if CONFIG_LWIP_IPV6
-    if (IP_IS_V6(&config->target_addr)) {
+    if (IP_IS_V6(&config->target_addr))
+    {
         struct sockaddr_in6 *to6 = (struct sockaddr_in6 *)&ep->target_addr;
         to6->sin6_family = AF_INET6;
         inet6_addr_from_ip6addr(&to6->sin6_addr, ip_2_ip6(&config->target_addr));
@@ -424,14 +381,18 @@ esp_err_t ezlopi_ping_new_session(const ezlopi_ping_config_t *config, const ezlo
     *hdl_out = (esp_ping_handle_t)ep;
     return ESP_OK;
 err:
-    if (ep) {
-        if (ep->sock > 0) {
+    if (ep)
+    {
+        if (ep->sock > 0)
+        {
             close(ep->sock);
         }
-        if (ep->packet_hdr) {
+        if (ep->packet_hdr)
+        {
             free(ep->packet_hdr);
         }
-        if (ep->ping_task_hdl) {
+        if (ep->ping_task_hdl)
+        {
             vTaskDelete(ep->ping_task_hdl);
         }
         free(ep);
@@ -486,7 +447,8 @@ esp_err_t ezlopi_ping_get_profile(esp_ping_handle_t hdl, esp_ping_profile_t prof
     uint32_t copy_size = 0;
     PING_CHECK(ep, "ping handle can't be null", err, ESP_ERR_INVALID_ARG);
     PING_CHECK(data, "profile data can't be null", err, ESP_ERR_INVALID_ARG);
-    switch (profile) {
+    switch (profile)
+    {
     case ESP_PING_PROF_SEQNO:
         from = &ep->packet_hdr->seqno;
         copy_size = sizeof(ep->packet_hdr->seqno);

@@ -45,13 +45,12 @@ static cJSON *__otel_trace_decorate(cJSON *cj_traces_info);
 static cJSON *__otel_logs_decorate(cJSON *cj_logs_info);
 static int __push_to_telemetry_queue(s_otel_queue_data_t *otel_data);
 static void __otel_add_severity_number(cJSON *cj_root, e_ezlopi_log_severity_t severity);
+static int __otel_add_log_to_queue(uint8_t severity, const char *file, uint32_t line, char *log);
 
-int ezlopi_service_otel_add_log_to_telemetry_queue(e_ezlopi_log_severity_t severity, const char *file_name, uint32_t line_number, const char *format, ...)
+static int __otel_add_log_to_queue(uint8_t severity, const char *file, uint32_t line, char *log)
 {
     int ret = 0;
     time_t time_now;
-    const uint32_t buffer_len = 100;
-
     time(&time_now);
 
     s_otel_queue_data_t *otel_data = ezlopi_malloc(__FUNCTION__, sizeof(s_otel_queue_data_t));
@@ -63,20 +62,8 @@ int ezlopi_service_otel_add_log_to_telemetry_queue(e_ezlopi_log_severity_t sever
         if (otel_data->cj_data)
         {
             cJSON_AddNumberToObject(__FUNCTION__, otel_data->cj_data, ezlopi_logTime_str, time_now);
-            __otel_add_severity_number(otel_data->cj_data, severity);
-
-            char *buffer = ezlopi_malloc(__FUNCTION__, buffer_len);
-            if (buffer)
-            {
-                va_list args;
-                va_start(args, format);
-                vsnprintf(buffer, buffer_len, format, args);
-                va_end(args);
-
-                cJSON_AddStringToObject(__FUNCTION__, otel_data->cj_data, ezlopi_message_str, buffer);
-                ezlopi_free(__FUNCTION__, buffer);
-            }
-
+            __otel_add_severity_number(otel_data->cj_data, (e_ezlopi_log_severity_t)severity);
+            cJSON_AddStringToObject(__FUNCTION__, otel_data->cj_data, ezlopi_message_str, log);
             cJSON_AddStringToObject(__FUNCTION__, otel_data->cj_data, ezlopi_fileName_str, __FILENAME__);
             cJSON_AddNumberToObject(__FUNCTION__, otel_data->cj_data, ezlopi_lineNumber_str, __LINE__);
         }
@@ -116,6 +103,7 @@ int ezlopi_service_otel_add_trace_to_telemetry_queue(cJSON *cj_trace)
 void ezlopi_service_otel_init(void)
 {
     bootloader_random_enable();
+    ezlopi_util_set_otel_log_upcall(__otel_add_log_to_queue, 100);
     __telemetry_queue = xQueueCreate(10, sizeof(s_otel_queue_data_t *));
     xTaskCreate(__otel_task, "otel-service-task", 2 * 2048, NULL, 4, NULL);
 }
@@ -147,7 +135,7 @@ static void __otel_test_loop(void *pv)
     }
 #endif
 
-#if 1 // test otel-logs
+#if 0 // test otel-logs
     printf("otel-test-loop\r\n");
     s_otel_queue_data_t *otel_data = ezlopi_malloc(__FUNCTION__, sizeof(s_otel_queue_data_t));
     if (otel_data)
@@ -265,7 +253,7 @@ static void __otel_task(void *pv)
     }
 
     ezlopi_service_loop_add("otel-loop", __otel_loop, 50, NULL);
-    ezlopi_service_loop_add("otel-test-loop", __otel_test_loop, 5000, NULL);
+    // ezlopi_service_loop_add("otel-test-loop", __otel_test_loop, 5000, NULL);
     vTaskDelete(NULL);
 }
 

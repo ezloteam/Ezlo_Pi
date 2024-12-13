@@ -14,6 +14,5 @@ typedef enum e_otel_type
 
 void ezlopi_service_otel_init(void);
 int ezlopi_service_otel_add_trace_to_telemetry_queue(cJSON *cj_trace);
-int ezlopi_service_otel_add_log_to_telemetry_queue(e_ezlopi_log_severity_t severity, const char *file_name, uint32_t line_number, const char *format, ...);
 
 #endif // __EZLOPI_SERVICE_OTEL_H__

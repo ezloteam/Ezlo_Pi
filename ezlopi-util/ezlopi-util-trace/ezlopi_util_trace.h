@@ -19,12 +19,21 @@ extern "C"
 #endif // CONFIG_EZPI_UTIL_TRACE_EN
 
     // void trace_color_print(const char* txt_color, uint8_t severity, const char* format, ...);
+    void trace_otel(uint8_t severity, const char *file, int line, const char *format, ...);
     void trace_color_print(const char *txt_color, uint8_t severity, const char *file, int line, const char *format, ...);
     void __dump(const char *file_name, uint32_t line, char *buffer_name, void *_buff, uint32_t ofs, uint32_t cnt);
 
 #ifndef __FILENAME__
 #define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
 #endif
+
+    typedef ezlopi_error_t (*f_ezlopi_log_upcall_t)(int severity_level, const char *log_str);
+    typedef int (*f_otel_log_upcall_t)(uint8_t severity, const char *file, uint32_t line, char *log);
+
+    void ezlopi_util_set_otel_log_upcall(f_otel_log_upcall_t __log_upcall, uint32_t max_log_len);
+    void ezlopi_util_log_otel(uint8_t severity, const char *file, int line, const char *format, ...);
+
+#define TRACE_OTEL(severity, format, reg...) ezlopi_util_log_otel(severity, __FILENAME__, __LINE__, format, ##reg)
 
 #if (1 == ENABLE_TRACE)
 
