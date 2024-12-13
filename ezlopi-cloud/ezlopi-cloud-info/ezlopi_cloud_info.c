@@ -19,12 +19,12 @@
 #include "ezlopi_core_sntp.h"
 #include "ezlopi_core_info.h"
 
-void info_get(cJSON* cj_request, cJSON* cj_response)
+void info_get(cJSON *cj_request, cJSON *cj_response)
 {
-    cJSON* cjson_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+    cJSON *cjson_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     if (cjson_result)
     {
-        char* device_uuid = ezlopi_factory_info_v3_get_device_uuid();
+        char *device_uuid = ezlopi_factory_info_v3_get_device_uuid();
         // #include "esp_app_format.h"
         cJSON_AddStringToObject(__FUNCTION__, cjson_result, ezlopi_model_str, ezlopi_factory_info_v3_get_device_type());
         cJSON_AddStringToObject(__FUNCTION__, cjson_result, "architecture", CONFIG_SDK_TOOLPREFIX);
@@ -37,12 +37,12 @@ void info_get(cJSON* cj_request, cJSON* cj_response)
         cJSON_AddBoolToObject(__FUNCTION__, cjson_result, "offlineAnonymousAccess", true);
         cJSON_AddBoolToObject(__FUNCTION__, cjson_result, "offlineInsecureAccess", true);
 
-        cJSON* cjson_location = cJSON_AddObjectToObject(__FUNCTION__, cjson_result, "location");
+        cJSON *cjson_location = cJSON_AddObjectToObject(__FUNCTION__, cjson_result, "location");
         if (cjson_location)
         {
-            cJSON_AddNumberToObject(__FUNCTION__, cjson_location, "latitude", ezlopi_cloud_get_latitude());
-            cJSON_AddNumberToObject(__FUNCTION__, cjson_location, "longitude", ezlopi_cloud_get_longitude());
-            char* location = EZPI_CORE_sntp_get_location();
+            cJSON_AddNumberToObject(__FUNCTION__, cjson_location, "latitude", EZPI_cloud_get_latitude());
+            cJSON_AddNumberToObject(__FUNCTION__, cjson_location, "longitude", EZPI_cloud_get_longitude());
+            char *location = EZPI_CORE_sntp_get_location();
             if (location)
             {
                 cJSON_AddStringToObject(__FUNCTION__, cjson_location, "timezone", location);
@@ -56,7 +56,7 @@ void info_get(cJSON* cj_request, cJSON* cj_response)
             }
         }
 
-        cJSON* cjson_build = cJSON_AddObjectToObject(__FUNCTION__, cjson_result, "build");
+        cJSON *cjson_build = cJSON_AddObjectToObject(__FUNCTION__, cjson_result, "build");
         if (cjson_build)
         {
             {
@@ -70,7 +70,7 @@ void info_get(cJSON* cj_request, cJSON* cj_response)
             cJSON_AddStringToObject(__FUNCTION__, cjson_build, "commit", COMMIT_HASH);
         }
 
-        cJSON* cjson_battery = cJSON_AddObjectToObject(__FUNCTION__, cjson_result, "battery");
+        cJSON *cjson_battery = cJSON_AddObjectToObject(__FUNCTION__, cjson_result, "battery");
         if (cjson_battery)
         {
             cJSON_AddNumberToObject(__FUNCTION__, cjson_battery, "stateOfCharge", 0);

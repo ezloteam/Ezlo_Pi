@@ -67,8 +67,8 @@ extern "C"
     // extern const  char *method_hub_offline_credentials_updated;
     // extern const  char *method_hub_bridge_controller_connection_list ;
     // extern const  char *method_hub_bridge_controller_connection_set ;
-    // extern const  char *method_hub_coordinates_get ;
-    // extern const  char *method_hub_coordinates_set;
+    // extern const  char *method_EZPI_hub_coordinates_get ;
+    // extern const  char *method_EZPI_hub_coordinates_set;
     // extern const  char *method_hub_description_set;
     // extern const  char *method_hub_device_force_remove ;
     // extern const  char *method_hub_device_firmware_update ;

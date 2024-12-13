@@ -136,8 +136,8 @@ CLOUD_METHOD("hub.reboot", ezlopi_core_ezlopi_methods_reboot, NULL)
 
 CLOUD_METHOD("hub.status.get", EZPI_CLOUD_status_get, NULL)
 
-CLOUD_METHOD("hub.coordinates.set", hub_coordinates_set, NULL)
-CLOUD_METHOD("hub.coordinates.get", hub_coordinates_get, NULL)
+CLOUD_METHOD("hub.coordinates.set", EZPI_hub_coordinates_set, NULL)
+CLOUD_METHOD("hub.coordinates.get", EZPI_hub_coordinates_get, NULL)
 CLOUD_METHOD("hub.offline.login.ui", EZPI_CLOUD_offline_login, NULL)
 
 CLOUD_METHOD("registered", registered, NULL)
