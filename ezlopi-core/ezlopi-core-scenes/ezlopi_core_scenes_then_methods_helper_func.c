@@ -102,7 +102,7 @@ static void __ezlopi_core_scenes_then_append_to_header(s_ezlopi_core_http_mbedtl
 /*******************************************************************************
 *                          Extern Function Definitions
 *******************************************************************************/
-//------------------------------- EZPI_scene_then_sendhttp_request -----------------------------------------------
+//------------------------------- EZPI_core_scene_then_sendhttp_request -----------------------------------------------
 void EZPI_parse_http_request_type(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fields_v2_t *curr_field)
 {
     const char *field_value_string = curr_field->field_value.u_value.value_string;
@@ -389,7 +389,7 @@ ezlopi_error_t EZPI_core_scenes_then_helper_set_expn_var(char *expression_name, 
         // 2. set new valueType
         if (value_type)
         {
-            curr_expr->value_type = ezlopi_scene_get_scene_value_type_enum(value_type);
+            curr_expr->value_type = EZPI_core_scene_get_scene_value_type_enum(value_type);
         }
 
         // 3. replace metadata CJSON

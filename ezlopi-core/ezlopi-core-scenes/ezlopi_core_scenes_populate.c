@@ -496,7 +496,7 @@ void EZPI_scenes_populate_fields_get_value(l_fields_v2_t *field, cJSON *cj_value
     if (field && cj_value)
     {
         // CJSON_TRACE("cj_value (edit)", cj_value);
-        TRACE_I("type: %s", ezlopi_scene_get_scene_value_type_name(field->value_type));
+        TRACE_I("type: %s", EZPI_core_scenes_get_scene_value_type_name(field->value_type));
         switch (cj_value->type)
         {
         case cJSON_Number:
@@ -630,7 +630,7 @@ void EZPI_scenes_populate_assign_field(l_fields_v2_t *new_field, cJSON *cj_field
     if (cj_field && new_field)
     {
         CJSON_GET_VALUE_STRING_BY_COPY(cj_field, ezlopi_name_str, new_field->name);
-        new_field->value_type = ezlopi_core_scenes_value_get_type(cj_field, ezlopi_type_str);
+        new_field->value_type = EZPI_core_scenes_value_get_type(cj_field, ezlopi_type_str);
         EZPI_scenes_populate_fields_get_value(new_field, cJSON_GetObjectItem(__FUNCTION__, cj_field, ezlopi_value_str));
     }
 }

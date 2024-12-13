@@ -1003,8 +1003,8 @@ int EZPI_scenes_operators_value_comparevalues_with_less_operations(l_fields_v2_t
                     s_ezlopi_expressions_t *curr_expr_right = EZPI_scenes_expressions_get_node_by_name(value_field->field_value.u_value.value_string);
                     if (curr_expr_right)
                     { // check if all have same data-type
-                        if (__check_valuetypes(ezlopi_scene_get_scene_value_type_name(curr_expr_left->value_type),
-                            ezlopi_scene_get_scene_value_type_name(curr_expr_right->value_type),
+                        if (__check_valuetypes(EZPI_core_scenes_get_scene_value_type_name(curr_expr_left->value_type),
+                            EZPI_core_scenes_get_scene_value_type_name(curr_expr_right->value_type),
                             value_type_field->field_value.u_value.value_string))
                         {
                             ret = ____compare_exp_vs_exp(curr_expr_left, curr_expr_right, comparator_field_str);
@@ -1017,7 +1017,7 @@ int EZPI_scenes_operators_value_comparevalues_with_less_operations(l_fields_v2_t
                     l_ezlopi_item_t *item_right = ezlopi_device_get_item_by_id(item_id);
                     if (item_right)
                     {
-                        if (__check_valuetypes(ezlopi_scene_get_scene_value_type_name(curr_expr_left->value_type),
+                        if (__check_valuetypes(EZPI_core_scenes_get_scene_value_type_name(curr_expr_left->value_type),
                             item_right->cloud_properties.value_type,
                             value_type_field->field_value.u_value.value_string))
                         {
@@ -1027,8 +1027,8 @@ int EZPI_scenes_operators_value_comparevalues_with_less_operations(l_fields_v2_t
                 }
                 else
                 { // 2. exp vs other
-                    if (__check_valuetypes(ezlopi_scene_get_scene_value_type_name(curr_expr_left->value_type),
-                        ezlopi_scene_get_scene_value_type_name(value_field->value_type),
+                    if (__check_valuetypes(EZPI_core_scenes_get_scene_value_type_name(curr_expr_left->value_type),
+                        EZPI_core_scenes_get_scene_value_type_name(value_field->value_type),
                         value_type_field->field_value.u_value.value_string))
                     {
                         ret = ____compare_exp_vs_other(curr_expr_left, value_field, comparator_field_str);
@@ -1048,7 +1048,7 @@ int EZPI_scenes_operators_value_comparevalues_with_less_operations(l_fields_v2_t
                     if (curr_expr_right)
                     {
                         if (__check_valuetypes(item_left->cloud_properties.value_type,
-                            ezlopi_scene_get_scene_value_type_name(curr_expr_right->value_type),
+                            EZPI_core_scenes_get_scene_value_type_name(curr_expr_right->value_type),
                             value_type_field->field_value.u_value.value_string))
                         {
                             ret = ____compare_item_vs_exp(item_left, curr_expr_right, comparator_field_str);
@@ -1072,7 +1072,7 @@ int EZPI_scenes_operators_value_comparevalues_with_less_operations(l_fields_v2_t
                 else
                 { // 2. RHS = other
                     if (__check_valuetypes(item_left->cloud_properties.value_type,
-                        ezlopi_scene_get_scene_value_type_name(value_field->value_type),
+                        EZPI_core_scenes_get_scene_value_type_name(value_field->value_type),
                         value_type_field->field_value.u_value.value_string))
                     {
                         ret = ____compare_item_vs_other(item_left, value_field, comparator_field_str);
@@ -1409,7 +1409,7 @@ static int ____compare_exp_vs_other(s_ezlopi_expressions_t *curr_expr_left, l_fi
     }
     else
     {
-        TRACE_E(" LHS != RHS [ '%s' vs '%s' ]", ezlopi_scene_get_scene_value_type_name(curr_expr_left->value_type), ezlopi_scene_get_scene_value_type_name(value_field->value_type));
+        TRACE_E(" LHS != RHS [ '%s' vs '%s' ]", EZPI_core_scenes_get_scene_value_type_name(curr_expr_left->value_type), EZPI_core_scenes_get_scene_value_type_name(value_field->value_type));
     }
 
     return ret;
@@ -1464,7 +1464,7 @@ static int ____compare_exp_vs_exp(s_ezlopi_expressions_t *curr_expr_left, s_ezlo
     }
     else
     {
-        TRACE_E(" LHS != RHS [ '%s' vs '%s' ]", ezlopi_scene_get_scene_value_type_name(curr_expr_left->value_type), ezlopi_scene_get_scene_value_type_name(curr_expr_right->value_type));
+        TRACE_E(" LHS != RHS [ '%s' vs '%s' ]", EZPI_core_scenes_get_scene_value_type_name(curr_expr_left->value_type), EZPI_core_scenes_get_scene_value_type_name(curr_expr_right->value_type));
     }
 
     return ret;
@@ -1473,7 +1473,7 @@ static int ____compare_exp_vs_item(s_ezlopi_expressions_t *curr_expr_left, l_ezl
 {
     int ret = 0;
 
-    const char *lhs_str = ezlopi_scene_get_scene_value_type_name(curr_expr_left->value_type);
+    const char *lhs_str = EZPI_core_scenes_get_scene_value_type_name(curr_expr_left->value_type);
     const char *rhs_str = item_right->cloud_properties.value_type;
     if (EZPI_STRNCMP_IF_EQUAL(lhs_str, rhs_str, strlen(rhs_str) + 1, strlen(rhs_str) + 1)) // humidity == humidity
     {
@@ -1541,7 +1541,7 @@ static int ____compare_item_vs_other(l_ezlopi_item_t *item_left, l_fields_v2_t *
     int ret = 0;
 
     const char *lhs_str = item_left->cloud_properties.value_type;
-    const char *rhs_str = ezlopi_scene_get_scene_value_type_name(value_field->value_type);
+    const char *rhs_str = EZPI_core_scenes_get_scene_value_type_name(value_field->value_type);
     if (EZPI_STRNCMP_IF_EQUAL(lhs_str, rhs_str, strlen(lhs_str) + 1, strlen(rhs_str) + 1))
     { // making sure :- 'string' == 'string'
 
@@ -1610,7 +1610,7 @@ static int ____compare_item_vs_exp(l_ezlopi_item_t *item_left, s_ezlopi_expressi
     int ret = 0;
 
     const char *lhs_str = item_left->cloud_properties.value_type;
-    const char *rhs_str = ezlopi_scene_get_scene_value_type_name(curr_expr_right->value_type);
+    const char *rhs_str = EZPI_core_scenes_get_scene_value_type_name(curr_expr_right->value_type);
     if (EZPI_STRNCMP_IF_EQUAL(lhs_str, rhs_str, strlen(lhs_str) + 1, strlen(rhs_str) + 1))
     { // making sure :- 'temperature' == 'temperature'
 
@@ -1972,7 +1972,7 @@ static int ____compare_range_exp_vs_other(s_ezlopi_expressions_t *curr_expr_left
     }
     else
     {
-        TRACE_E(" LHS != RHS [ '%s' vs '%s' ]", ezlopi_scene_get_scene_value_type_name(start_value_field->value_type), ezlopi_scene_get_scene_value_type_name(end_value_field->value_type));
+        TRACE_E(" LHS != RHS [ '%s' vs '%s' ]", EZPI_core_scenes_get_scene_value_type_name(start_value_field->value_type), EZPI_core_scenes_get_scene_value_type_name(end_value_field->value_type));
     }
 
     return ret;
@@ -2035,7 +2035,7 @@ static int ____compare_range_exp_vs_exp(s_ezlopi_expressions_t *curr_expr_left, 
     }
     else
     {
-        TRACE_E(" LHS != RHS [ '%s' vs '%s' ]", ezlopi_scene_get_scene_value_type_name(curr_expr_right_start->value_type), ezlopi_scene_get_scene_value_type_name(curr_expr_right_end->value_type));
+        TRACE_E(" LHS != RHS [ '%s' vs '%s' ]", EZPI_core_scenes_get_scene_value_type_name(curr_expr_right_start->value_type), EZPI_core_scenes_get_scene_value_type_name(curr_expr_right_end->value_type));
     }
 
     return ret;
@@ -2045,7 +2045,7 @@ static int ____compare_range_item_vs_other(l_ezlopi_item_t *item, l_fields_v2_t 
     int ret = 0;
 
     const char *lhs_str = item->cloud_properties.value_type;
-    const char *rhs_str = ezlopi_scene_get_scene_value_type_name(start_value_field->value_type);
+    const char *rhs_str = EZPI_core_scenes_get_scene_value_type_name(start_value_field->value_type);
     if ((EZPI_STRNCMP_IF_EQUAL(lhs_str, rhs_str, strlen(lhs_str) + 1, strlen(rhs_str) + 1) &&
         (start_value_field->value_type == end_value_field->value_type))) // making sure :- 'temperature' == 'temperature'
     {
@@ -2121,7 +2121,7 @@ static int ____compare_range_item_vs_exp(l_ezlopi_item_t *item, s_ezlopi_express
     int ret = 0;
 
     const char *lhs_str = item->cloud_properties.value_type;
-    const char *rhs_str = ezlopi_scene_get_scene_value_type_name(curr_expr_right_start->value_type);
+    const char *rhs_str = EZPI_core_scenes_get_scene_value_type_name(curr_expr_right_start->value_type);
     if ((EZPI_STRNCMP_IF_EQUAL(lhs_str, rhs_str, strlen(lhs_str) + 1, strlen(rhs_str) + 1)) &&
         (curr_expr_right_start->value_type == curr_expr_right_end->value_type)) // making sure :- 'temperature' == 'temperature'
     {

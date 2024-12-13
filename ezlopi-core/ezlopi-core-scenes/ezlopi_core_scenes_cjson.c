@@ -97,7 +97,7 @@ cJSON *EZPI_scene_cjson_get_field(l_fields_v2_t *field_node)
     {
         cj_field = cJSON_CreateObject(__FUNCTION__);
         {
-            const char *value_type_str = ezlopi_scene_get_scene_value_type_name(field_node->value_type);
+            const char *value_type_str = EZPI_core_scenes_get_scene_value_type_name(field_node->value_type);
             if (value_type_str)
             {
                 cJSON_AddStringToObject(__FUNCTION__, cj_field, ezlopi_type_str, value_type_str);
@@ -264,7 +264,7 @@ cJSON *EZPI_scene_cjson_get_field(l_fields_v2_t *field_node)
             default:
             {
 #if (1 == ENABLE_TRACE)
-                const char *value_type_name = ezlopi_scene_get_scene_value_type_name(field_node->value_type);
+                const char *value_type_name = EZPI_core_scenes_get_scene_value_type_name(field_node->value_type);
                 TRACE_E("Value type not matched!, curr-type[%d]: %s ", field_node->value_type, value_type_name ? value_type_name : ezlopi_null_str);
 #endif
                 break;
@@ -603,7 +603,7 @@ static void __cjson_add_fields(cJSON *cj_block, l_fields_v2_t *fields)
                 if (cj_field)
                 {
                     __cjson_add_string(cj_field, ezlopi_name_str, curr_field->name);
-                    const char *value_type_name = ezlopi_scene_get_scene_value_type_name(curr_field->value_type);
+                    const char *value_type_name = EZPI_core_scenes_get_scene_value_type_name(curr_field->value_type);
                     __cjson_add_string(cj_field, ezlopi_type_str, value_type_name ? value_type_name : ezlopi__str);
 
                     switch (curr_field->value_type)
@@ -784,7 +784,7 @@ static void __cjson_add_fields(cJSON *cj_block, l_fields_v2_t *fields)
                     default:
                     {
 #if (1 == ENABLE_TRACE)
-                        const char *value_type_name = ezlopi_scene_get_scene_value_type_name(curr_field->value_type);
+                        const char *value_type_name = EZPI_core_scenes_get_scene_value_type_name(curr_field->value_type);
                         TRACE_E("Value type not matched!, curr-type[%d]: %s ", curr_field->value_type, value_type_name ? value_type_name : ezlopi_null_str);
 #endif
                         break;

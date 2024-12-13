@@ -72,7 +72,7 @@ extern "C"
     * @param arg User_arg
     * @return int
     */
-    int EZPI_scene_then_set_item_value(l_scenes_list_v2_t *scene_node, void *arg);
+    int EZPI_core_scene_then_set_item_value(l_scenes_list_v2_t *scene_node, void *arg);
     /**
     * @brief This funtion performs set-group-item-value operation of THEN-METHOD
     *
@@ -80,7 +80,7 @@ extern "C"
     * @param arg User_arg
     * @return int
     */
-    int EZPI_scene_then_group_set_item_value(l_scenes_list_v2_t *curr_scene, void *arg);
+    int EZPI_core_scene_then_group_set_item_value(l_scenes_list_v2_t *curr_scene, void *arg);
     /**
     * @brief This funtion performs set-device-armed operation of THEN-METHOD
     *
@@ -88,7 +88,7 @@ extern "C"
     * @param arg User_arg
     * @return int
     */
-    int EZPI_scene_then_set_device_armed(l_scenes_list_v2_t *scene_node, void *arg);
+    int EZPI_core_scene_then_set_device_armed(l_scenes_list_v2_t *scene_node, void *arg);
     /**
     * @brief This funtion performs set-group-device-armed operation of THEN-METHOD
     *
@@ -96,7 +96,7 @@ extern "C"
     * @param arg User_arg
     * @return int
     */
-    int EZPI_scene_then_group_set_device_armed(l_scenes_list_v2_t *curr_scene, void *arg);
+    int EZPI_core_scene_then_group_set_device_armed(l_scenes_list_v2_t *curr_scene, void *arg);
     /**
     * @brief This funtion performs send-cloud-abstract cmd operation of THEN-METHOD
     *
@@ -104,7 +104,7 @@ extern "C"
     * @param arg User_arg
     * @return int
     */
-    int EZPI_scene_then_send_cloud_abstract_command(l_scenes_list_v2_t *scene_node, void *arg);
+    int EZPI_core_scene_then_send_cloud_abstract_command(l_scenes_list_v2_t *scene_node, void *arg);
     /**
     * @brief This funtion performs swtich-house-mode operation of THEN-METHOD
     *
@@ -112,7 +112,7 @@ extern "C"
     * @param arg User_arg
     * @return int
     */
-    int EZPI_scene_then_switch_house_mode(l_scenes_list_v2_t *scene_node, void *arg);
+    int EZPI_core_scene_then_switch_house_mode(l_scenes_list_v2_t *scene_node, void *arg);
     /**
     * @brief This funtion performs send-http-request operation of THEN-METHOD
     *
@@ -120,7 +120,7 @@ extern "C"
     * @param arg User_arg
     * @return int
     */
-    int EZPI_scene_then_send_http_request(l_scenes_list_v2_t *scene_node, void *arg);
+    int EZPI_core_scene_then_send_http_request(l_scenes_list_v2_t *scene_node, void *arg);
     /**
     * @brief This funtion performs run-custom-script operation of THEN-METHOD
     *
@@ -128,7 +128,7 @@ extern "C"
     * @param arg User_arg
     * @return int
     */
-    int EZPI_scene_then_run_custom_script(l_scenes_list_v2_t *scene_node, void *arg);
+    int EZPI_core_scene_then_run_custom_script(l_scenes_list_v2_t *scene_node, void *arg);
     /**
     * @brief This funtion performs run-plugin-script operation of THEN-METHOD
     *
@@ -136,7 +136,7 @@ extern "C"
     * @param arg User_arg
     * @return int
     */
-    int EZPI_scene_then_run_plugin_script(l_scenes_list_v2_t *scene_node, void *arg);
+    int EZPI_core_scene_then_run_plugin_script(l_scenes_list_v2_t *scene_node, void *arg);
     /**
     * @brief This funtion performs run-scene operation of THEN-METHOD
     *
@@ -144,7 +144,7 @@ extern "C"
     * @param arg User_arg
     * @return int
     */
-    int EZPI_scene_then_run_scene(l_scenes_list_v2_t *scene_node, void *arg);
+    int EZPI_core_scene_then_run_scene(l_scenes_list_v2_t *scene_node, void *arg);
     /**
     * @brief This funtion performs set-scene-state operation of THEN-METHOD
     *
@@ -152,7 +152,7 @@ extern "C"
     * @param arg User_arg
     * @return int
     */
-    int EZPI_scene_then_set_scene_state(l_scenes_list_v2_t *scene_node, void *arg);
+    int EZPI_core_scene_then_set_scene_state(l_scenes_list_v2_t *scene_node, void *arg);
     /**
     * @brief This funtion performs reset-latch operation of THEN-METHOD
     *
@@ -160,7 +160,7 @@ extern "C"
     * @param arg User_arg
     * @return int
     */
-    int EZPI_scene_then_reset_latch(l_scenes_list_v2_t *scene_node, void *arg);
+    int EZPI_core_scene_then_reset_latch(l_scenes_list_v2_t *scene_node, void *arg);
     /**
     * @brief This funtion performs reset-latches operation of THEN-METHOD
     *
@@ -168,7 +168,7 @@ extern "C"
     * @param arg User_arg
     * @return int
     */
-    int EZPI_scene_then_reset_scene_latches(l_scenes_list_v2_t *scene_node, void *arg);
+    int EZPI_core_scene_then_reset_scene_latches(l_scenes_list_v2_t *scene_node, void *arg);
     /**
     * @brief This funtion performs reboot-hub operation of THEN-METHOD
     *
@@ -176,7 +176,7 @@ extern "C"
     * @param arg User_arg
     * @return int
     */
-    int EZPI_scene_then_reboot_hub(l_scenes_list_v2_t *scene_node, void *arg);
+    int EZPI_core_scene_then_reboot_hub(l_scenes_list_v2_t *scene_node, void *arg);
     /**
     * @brief This funtion performs reset-hub operation of THEN-METHOD
     *
@@ -184,7 +184,7 @@ extern "C"
     * @param arg User_arg
     * @return int
     */
-    int EZPI_scene_then_reset_hub(l_scenes_list_v2_t *scene_node, void *arg);
+    int EZPI_core_scene_then_reset_hub(l_scenes_list_v2_t *scene_node, void *arg);
     /**
     * @brief This funtion performs trigger-cloud-api operation of THEN-METHOD
     *
@@ -192,7 +192,7 @@ extern "C"
     * @param arg User_arg
     * @return int
     */
-    int EZPI_scene_then_cloud_api(l_scenes_list_v2_t *scene_node, void *arg);
+    int EZPI_core_scene_then_cloud_api(l_scenes_list_v2_t *scene_node, void *arg);
     /**
     * @brief This funtion performs set-expression operation of THEN-METHOD
     *
@@ -200,7 +200,7 @@ extern "C"
     * @param arg User_arg
     * @return int
     */
-    int EZPI_scene_then_set_expression(l_scenes_list_v2_t *scene_node, void *arg);
+    int EZPI_core_scene_then_set_expression(l_scenes_list_v2_t *scene_node, void *arg);
     /**
     * @brief This funtion performs set-variable operation of THEN-METHOD
     *
@@ -208,7 +208,7 @@ extern "C"
     * @param arg User_arg
     * @return int
     */
-    int EZPI_scene_then_set_variable(l_scenes_list_v2_t *scene_node, void *arg);
+    int EZPI_core_scene_then_set_variable(l_scenes_list_v2_t *scene_node, void *arg);
     /**
     * @brief This funtion performs set-toggle-value operation of THEN-METHOD
     *
@@ -216,7 +216,7 @@ extern "C"
     * @param arg User_arg
     * @return int
     */
-    int EZPI_scene_then_toggle_value(l_scenes_list_v2_t *scene_node, void *arg);
+    int EZPI_core_scene_then_toggle_value(l_scenes_list_v2_t *scene_node, void *arg);
     /**
     * @brief This funtion performs set-group-toggle-value operation of THEN-METHOD
     *
@@ -224,7 +224,7 @@ extern "C"
     * @param arg User_arg
     * @return int
     */
-    int EZPI_scene_then_group_toggle_value(l_scenes_list_v2_t *curr_scene, void *arg);
+    int EZPI_core_scene_then_group_toggle_value(l_scenes_list_v2_t *curr_scene, void *arg);
 
 
 

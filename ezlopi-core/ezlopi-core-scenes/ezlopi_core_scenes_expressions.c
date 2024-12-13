@@ -266,7 +266,7 @@ void EZPI_scenes_expressions_print(s_ezlopi_expressions_t *exp_node)
 
         CJSON_TRACE("meta-data", exp_node->meta_data);
         TRACE_D("Is variable: %s", exp_node->variable ? ezlopi_true_str : ezlopi_false_str);
-        TRACE_D("value-type: %s", ezlopi_scene_get_scene_value_type_name(exp_node->value_type));
+        TRACE_D("value-type: %s", EZPI_core_scenes_get_scene_value_type_name(exp_node->value_type));
 
         if (exp_node->exp_value.type > EXPRESSION_VALUE_TYPE_UNDEFINED && exp_node->exp_value.type < EXPRESSION_VALUE_TYPE_MAX)
         {
@@ -646,7 +646,7 @@ void EZPI_scenes_expressions_list_cjson(cJSON *cj_expresson_array, cJSON *cj_par
                         {
                             if ((EZLOPI_VALUE_TYPE_NONE < curr_exp->value_type) && (EZLOPI_VALUE_TYPE_MAX > curr_exp->value_type))
                             {
-                                cJSON_AddStringToObject(__FUNCTION__, cj_expr, ezlopi_valueType_str, ezlopi_scene_get_scene_value_type_name(curr_exp->value_type));
+                                cJSON_AddStringToObject(__FUNCTION__, cj_expr, ezlopi_valueType_str, EZPI_core_scenes_get_scene_value_type_name(curr_exp->value_type));
                             }
                             if (curr_exp->code)
                             {
@@ -849,7 +849,7 @@ static int __edit_expression_ll(s_ezlopi_expressions_t *expn_node, cJSON *cj_new
             cJSON *cj_valueType = cJSON_GetObjectItem(__FUNCTION__, cj_new_expression, ezlopi_valueType_str);
             if (cj_valueType && cj_valueType->valuestring && cj_valueType->str_value_len)
             {
-                expn_node->value_type = ezlopi_core_scenes_value_get_type(cj_new_expression, ezlopi_valueType_str);
+                expn_node->value_type = EZPI_core_scenes_value_get_type(cj_new_expression, ezlopi_valueType_str);
             }
         }
 
@@ -1309,7 +1309,7 @@ static s_ezlopi_expressions_t *__expressions_create_node(uint32_t exp_id, cJSON 
             new_exp_node->meta_data = cJSON_Duplicate(__FUNCTION__, cj_metaData, cJSON_True);
         }
 
-        new_exp_node->value_type = ezlopi_core_scenes_value_get_type(cj_expression, ezlopi_valueType_str);
+        new_exp_node->value_type = EZPI_core_scenes_value_get_type(cj_expression, ezlopi_valueType_str);
 
         if (new_exp_node->variable) // if true ; incoming 'Value' should be saved into nvs
         {
@@ -1417,7 +1417,7 @@ static e_scene_value_type_v2_t *__parse_expression_type_filter(cJSON *cj_params)
             cJSON *cj_type = NULL;
             cJSON_ArrayForEach(cj_type, cj_types_filter_array)
             {
-                type_filter_array[idx] = ezlopi_core_scenes_value_get_type(cj_type, NULL);
+                type_filter_array[idx] = EZPI_core_scenes_value_get_type(cj_type, NULL);
                 idx++;
             }
             type_filter_array[idx] = 0;
@@ -1431,7 +1431,7 @@ static void __add_expression_value(s_ezlopi_expressions_t *exp_node, cJSON *cj_e
 {
     if (EZLOPI_VALUE_TYPE_NONE < exp_node->value_type && EZLOPI_VALUE_TYPE_MAX > exp_node->value_type)
     {
-        cJSON_AddStringToObject(__FUNCTION__, cj_expr, ezlopi_valueType_str, ezlopi_scene_get_scene_value_type_name(exp_node->value_type));
+        cJSON_AddStringToObject(__FUNCTION__, cj_expr, ezlopi_valueType_str, EZPI_core_scenes_get_scene_value_type_name(exp_node->value_type));
         switch (exp_node->exp_value.type)
         {
         case EXPRESSION_VALUE_TYPE_STRING:

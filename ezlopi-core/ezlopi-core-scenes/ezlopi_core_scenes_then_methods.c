@@ -94,7 +94,7 @@
 *                          Extern Function Definitions
 *******************************************************************************/
 
-int EZPI_scene_then_set_item_value(l_scenes_list_v2_t *curr_scene, void *arg)
+int EZPI_core_scene_then_set_item_value(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     // TRACE_W(" Set_item_value ");
     int ret = 0;
@@ -152,7 +152,7 @@ int EZPI_scene_then_set_item_value(l_scenes_list_v2_t *curr_scene, void *arg)
     }
     return ret;
 }
-int EZPI_scene_then_group_set_item_value(l_scenes_list_v2_t *curr_scene, void *arg)
+int EZPI_core_scene_then_group_set_item_value(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     // TRACE_W("Warning: then-method not implemented!");
     int ret = 0;
@@ -182,7 +182,7 @@ int EZPI_scene_then_group_set_item_value(l_scenes_list_v2_t *curr_scene, void *a
                 }
                 else if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, ezlopi_value_str, len, 6))
                 {
-                    #warning "need to add more item_value_types";
+                    #warning "might need to add more item_value_types";
                     switch (curr_field->value_type)
                     {
                     case EZLOPI_VALUE_TYPE_INT:
@@ -258,7 +258,7 @@ int EZPI_scene_then_group_set_item_value(l_scenes_list_v2_t *curr_scene, void *a
     }
     return ret;
 }
-int EZPI_scene_then_set_device_armed(l_scenes_list_v2_t *curr_scene, void *arg)
+int EZPI_core_scene_then_set_device_armed(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     // TRACE_W("Warning: then-method not implemented!");
     int ret = 0;
@@ -306,7 +306,7 @@ int EZPI_scene_then_set_device_armed(l_scenes_list_v2_t *curr_scene, void *arg)
 
     return ret;
 }
-int EZPI_scene_then_group_set_device_armed(l_scenes_list_v2_t *curr_scene, void *arg)
+int EZPI_core_scene_then_group_set_device_armed(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     // TRACE_W("Warning: then-method not implemented!");
     int ret = 0;
@@ -364,12 +364,12 @@ int EZPI_scene_then_group_set_device_armed(l_scenes_list_v2_t *curr_scene, void 
 
     return ret;
 }
-int EZPI_scene_then_send_cloud_abstract_command(l_scenes_list_v2_t *curr_scene, void *arg)
+int EZPI_core_scene_then_send_cloud_abstract_command(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     TRACE_W("Warning: then-method not implemented!");
     return 0;
 }
-int EZPI_scene_then_switch_house_mode(l_scenes_list_v2_t *curr_scene, void *arg)
+int EZPI_core_scene_then_switch_house_mode(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     // TRACE_W(" switch_house_mode ");
     int ret = 0;
@@ -421,7 +421,7 @@ int EZPI_scene_then_switch_house_mode(l_scenes_list_v2_t *curr_scene, void *arg)
 
     return ret;
 }
-int EZPI_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *arg)
+int EZPI_core_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     // TRACE_W(" send_http ");
     int ret = 0;
@@ -469,7 +469,7 @@ int EZPI_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *arg)
 
     return ret;
 }
-int EZPI_scene_then_run_custom_script(l_scenes_list_v2_t *curr_scene, void *arg)
+int EZPI_core_scene_then_run_custom_script(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     // TRACE_W(" run_custom_script ");
     int ret = 0;
@@ -497,12 +497,12 @@ int EZPI_scene_then_run_custom_script(l_scenes_list_v2_t *curr_scene, void *arg)
 
     return ret;
 }
-int EZPI_scene_then_run_plugin_script(l_scenes_list_v2_t *curr_scene, void *arg)
+int EZPI_core_scene_then_run_plugin_script(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     TRACE_W("Warning: then-method not implemented!");
     return 0;
 }
-int EZPI_scene_then_run_scene(l_scenes_list_v2_t *curr_scene, void *arg)
+int EZPI_core_scene_then_run_scene(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     // TRACE_W(" run_scene ");
     int ret = 0;
@@ -571,7 +571,7 @@ int EZPI_scene_then_run_scene(l_scenes_list_v2_t *curr_scene, void *arg)
     }
     return ret;
 }
-int EZPI_scene_then_set_scene_state(l_scenes_list_v2_t *curr_scene, void *arg)
+int EZPI_core_scene_then_set_scene_state(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     // TRACE_W(" set_scene_state ");
     int ret = 0;
@@ -601,10 +601,10 @@ int EZPI_scene_then_set_scene_state(l_scenes_list_v2_t *curr_scene, void *arg)
             }
             curr_field = curr_field->next;
         }
-        l_scenes_list_v2_t *scene_node = ezlopi_scenes_get_by_id_v2(sceneID);
+        l_scenes_list_v2_t *scene_node = EZPI_core_scenes_get_by_id_v2(sceneID);
         if (scene_node)
         {
-            if (EZPI_SUCCESS == ezlopi_scenes_enable_disable_scene_by_id_v2(sceneID, set_scene_enable))
+            if (EZPI_SUCCESS == EZPI_core_scenes_enable_disable_scene_by_id_v2(sceneID, set_scene_enable))
             {
                 EZPI_scenes_status_change_broadcast(scene_node, scene_status_finished_str);
                 ret = 1;
@@ -619,7 +619,7 @@ int EZPI_scene_then_set_scene_state(l_scenes_list_v2_t *curr_scene, void *arg)
     }
     return ret;
 }
-int EZPI_scene_then_reset_latch(l_scenes_list_v2_t *curr_scene, void *arg)
+int EZPI_core_scene_then_reset_latch(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     int ret = 0;
 
@@ -653,12 +653,12 @@ int EZPI_scene_then_reset_latch(l_scenes_list_v2_t *curr_scene, void *arg)
 
         if (sceneId_str && blockId_str)
         {
-            ezlopi_core_scene_reset_latch_state(sceneId_str, blockId_str);
+            EZPI_core_scenes_reset_latch_state(sceneId_str, blockId_str);
         }
     }
     return ret;
 }
-int EZPI_scene_then_reset_scene_latches(l_scenes_list_v2_t *curr_scene, void *arg)
+int EZPI_core_scene_then_reset_scene_latches(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     int ret = 0;
     char *sceneId_str = 0;
@@ -681,18 +681,18 @@ int EZPI_scene_then_reset_scene_latches(l_scenes_list_v2_t *curr_scene, void *ar
 
         if (sceneId_str)
         {
-            ezlopi_core_scene_reset_latch_state(sceneId_str, NULL);
+            EZPI_core_scenes_reset_latch_state(sceneId_str, NULL);
         }
     }
     return ret;
 }
-int EZPI_scene_then_reboot_hub(l_scenes_list_v2_t *curr_scene, void *arg)
+int EZPI_core_scene_then_reboot_hub(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     TRACE_E("Rebooting ESP......................... ");
     EZPI_CORE_reset_reboot();
     return 1;
 }
-int EZPI_scene_then_reset_hub(l_scenes_list_v2_t *curr_scene, void *arg)
+int EZPI_core_scene_then_reset_hub(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     TRACE_W(" reset_hub ");
     int ret = 0;
@@ -748,12 +748,12 @@ int EZPI_scene_then_reset_hub(l_scenes_list_v2_t *curr_scene, void *arg)
     }
     return ret;
 }
-int EZPI_scene_then_cloud_api(l_scenes_list_v2_t *curr_scene, void *arg)
+int EZPI_core_scene_then_cloud_api(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     TRACE_W("Warning: then-method not implemented!");
     return 0;
 }
-int EZPI_scene_then_set_expression(l_scenes_list_v2_t *curr_scene, void *arg)
+int EZPI_core_scene_then_set_expression(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     int ret = 0;
     if (curr_scene)
@@ -819,7 +819,7 @@ int EZPI_scene_then_set_expression(l_scenes_list_v2_t *curr_scene, void *arg)
     }
     return ret;
 }
-int EZPI_scene_then_set_variable(l_scenes_list_v2_t *curr_scene, void *arg)
+int EZPI_core_scene_then_set_variable(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     int ret = 0;
     if (curr_scene)
@@ -876,7 +876,7 @@ int EZPI_scene_then_set_variable(l_scenes_list_v2_t *curr_scene, void *arg)
     }
     return ret;
 }
-int EZPI_scene_then_toggle_value(l_scenes_list_v2_t *curr_scene, void *arg)
+int EZPI_core_scene_then_toggle_value(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     // TRACE_W(" toggle_value ");
     int ret = 0;
@@ -937,7 +937,7 @@ int EZPI_scene_then_toggle_value(l_scenes_list_v2_t *curr_scene, void *arg)
     }
     return ret;
 }
-int EZPI_scene_then_group_toggle_value(l_scenes_list_v2_t *curr_scene, void *arg)
+int EZPI_core_scene_then_group_toggle_value(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     int ret = 0;
     if (curr_scene)

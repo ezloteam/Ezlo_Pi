@@ -218,7 +218,7 @@ static void __scenes_value_types_list(char *list_name, cJSON *cj_result)
                 uint32_t idx = EZLOPI_VALUE_TYPE_NONE + 1;
                 while (idx < EZLOPI_VALUE_TYPE_MAX)
                 {
-                    const char *type_name_str = ezlopi_scene_get_scene_value_type_name(idx);
+                    const char *type_name_str = EZPI_core_scenes_get_scene_value_type_name(idx);
                     if (type_name_str)
                     {
                         cJSON *cj_string_val = cJSON_CreateString(__FUNCTION__, type_name_str);

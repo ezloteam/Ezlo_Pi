@@ -122,12 +122,12 @@ void EZPI_scenes_notifications_add(cJSON *cj_notifications)
 
             if (scene_id)
             {
-                l_scenes_list_v2_t *scene_node = ezlopi_scenes_get_scenes_head_v2();
+                l_scenes_list_v2_t *scene_node = EZPI_core_scenes_get_scene_head_v2();
                 while (scene_node)
                 {
                     if (scene_id == scene_node->_id)
                     {
-                        ezlopi_scene_add_users_in_notifications(scene_node, cj_user_id);
+                        EZPI_core_scenes_add_users_in_notifications(scene_node, cj_user_id);
                         break;
                     }
                     scene_node = scene_node->next;

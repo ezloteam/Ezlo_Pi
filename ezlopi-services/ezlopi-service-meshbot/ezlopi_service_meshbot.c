@@ -41,7 +41,7 @@ static int __execute_action_block(l_scenes_list_v2_t *scene_node, l_action_block
 uint32_t ezlopi_meshbot_service_stop_for_scene_id(uint32_t _id)
 {
     uint32_t ret = 0;
-    if (ezlopi_meshobot_service_stop_scene(ezlopi_scenes_get_by_id_v2(_id)))
+    if (ezlopi_meshobot_service_stop_scene(EZPI_core_scenes_get_by_id_v2(_id)))
     {
         ret = 1;
     }
@@ -95,7 +95,7 @@ uint32_t ezlopi_meshbot_service_start_scene(l_scenes_list_v2_t *scene_node)
 uint32_t ezlopi_scenes_service_run_by_id(uint32_t _id) // Run once
 {
     uint32_t ret = 0;
-    l_scenes_list_v2_t *scene_node = ezlopi_scenes_get_by_id_v2(_id);
+    l_scenes_list_v2_t *scene_node = EZPI_core_scenes_get_by_id_v2(_id);
     TRACE_S("Scene-id:  %#x", _id);
 
     if (scene_node)
@@ -146,7 +146,7 @@ uint32_t ezlopi_scenes_service_run_by_id(uint32_t _id) // Run once
 uint32_t ezlopi_meshbot_execute_scene_else_action_group(uint32_t scene_id)
 {
     int ret = 0;
-    l_scenes_list_v2_t *scene_node = ezlopi_scenes_get_by_id_v2(scene_id);
+    l_scenes_list_v2_t *scene_node = EZPI_core_scenes_get_by_id_v2(scene_id);
     if (scene_node)
     {
         if (scene_node->else_block)
@@ -175,7 +175,7 @@ uint32_t ezlopi_meshbot_execute_scene_else_action_group(uint32_t scene_id)
 
 void ezlopi_scenes_meshbot_init(void)
 {
-    l_scenes_list_v2_t *scene_node = ezlopi_scenes_get_scenes_head_v2();
+    l_scenes_list_v2_t *scene_node = EZPI_core_scenes_get_scene_head_v2();
     while (scene_node)
     {
         scene_node->status = EZLOPI_SCENE_STATUS_STOPPED;
@@ -214,7 +214,7 @@ PT_THREAD(__scene_proto_thread(l_scenes_list_v2_t *scene_node, uint32_t routine_
 
         if (when_condition_node)
         {
-            f_scene_method_v2_t when_method = ezlopi_scene_get_method_v2(when_condition_node->block_options.method.type);
+            f_scene_method_v2_t when_method = EZPI_core_scenes_get_method_v2(when_condition_node->block_options.method.type);
             if (when_method)
             {
                 when_condition_returned = when_method(scene_node, (void *)when_condition_node);
@@ -246,7 +246,7 @@ PT_THREAD(__scene_proto_thread(l_scenes_list_v2_t *scene_node, uint32_t routine_
                                 then_block_node = ctx->action_node;
                             }
 
-                            f_scene_method_v2_t then_method = ezlopi_scene_get_method_v2(then_block_node->block_options.method.type);
+                            f_scene_method_v2_t then_method = EZPI_core_scenes_get_method_v2(then_block_node->block_options.method.type);
                             TRACE_D("then-method: %p", then_method);
                             if (then_method)
                             {
@@ -302,7 +302,7 @@ PT_THREAD(__scene_proto_thread(l_scenes_list_v2_t *scene_node, uint32_t routine_
                             else_block_node = ctx->action_node;
                         }
 
-                        f_scene_method_v2_t else_method = ezlopi_scene_get_method_v2(else_block_node->block_options.method.type);
+                        f_scene_method_v2_t else_method = EZPI_core_scenes_get_method_v2(else_block_node->block_options.method.type);
                         TRACE_D("else-method: %p", else_method);
                         if (else_method)
                         {
@@ -384,7 +384,7 @@ PT_THREAD(__scene_proto_thread(l_scenes_list_v2_t *scene_node, uint32_t routine_
 
 static void __scenes_loop(void *arg)
 {
-    l_scenes_list_v2_t *scene_node = ezlopi_scenes_get_scenes_head_v2();
+    l_scenes_list_v2_t *scene_node = EZPI_core_scenes_get_scene_head_v2();
 
     while (scene_node)
     {
@@ -466,7 +466,7 @@ static int __execute_action_block(l_scenes_list_v2_t *scene_node, l_action_block
             vTaskDelay(delay_ms / portTICK_RATE_MS);
         }
 
-        f_scene_method_v2_t action_method = ezlopi_scene_get_method_v2(action_block->block_options.method.type);
+        f_scene_method_v2_t action_method = EZPI_core_scenes_get_method_v2(action_block->block_options.method.type);
         TRACE_D("action-method: %p", action_method);
 
         if (action_method)

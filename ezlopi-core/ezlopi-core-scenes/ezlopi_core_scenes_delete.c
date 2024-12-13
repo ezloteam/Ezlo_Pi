@@ -240,7 +240,7 @@ void EZPI_scenes_delete_field_value(l_fields_v2_t *field)
 #if 0
 // void ezlopi_scenes_delete_by_id(uint32_t _id)
 // {
-//     EZPI_scenes_delete(ezlopi_scenes_pop_by_id_v2(_id)); /*THIS 'ezlopi_scenes_pop_by_id_v2' creates linking issue*/
+//     EZPI_scenes_delete(EZPI_core_scenes_pop_by_id_v2(_id)); /*THIS 'EZPI_core_scenes_pop_by_id_v2' creates linking issue*/
 // }
 #endif
 /*******************************************************************************

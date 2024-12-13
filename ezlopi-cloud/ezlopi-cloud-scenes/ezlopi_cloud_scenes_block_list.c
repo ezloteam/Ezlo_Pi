@@ -39,7 +39,7 @@ static int __scenes_block_trigger_device_list(cJSON *cj_devices_array)
             while (item_list)
             {
                 found_item = false;
-                l_scenes_list_v2_t *scene_node = ezlopi_scenes_get_scenes_head_v2();
+                l_scenes_list_v2_t *scene_node = EZPI_core_scenes_get_scene_head_v2();
                 while (scene_node)
                 {
                     if (scene_node->when_block)
@@ -275,7 +275,7 @@ static cJSON *__add_scenes_blocks_by_item_ids(e_scenes_block_type_v2_t block_typ
     cJSON *cj_block = NULL;
     while (item_list)
     {
-        l_scenes_list_v2_t *scene_node = ezlopi_scenes_get_scenes_head_v2();
+        l_scenes_list_v2_t *scene_node = EZPI_core_scenes_get_scene_head_v2();
         while (scene_node)
         {
             // TRACE_D("Here");

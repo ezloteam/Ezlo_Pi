@@ -46,10 +46,10 @@
 *******************************************************************************/
 #include <string.h>
 #include <inttypes.h>
-#include <stdbool.h>
+// #include <stdbool.h>
 
+// #include "ezlopi_core_errors.h"
 #include "ezlopi_core_scenes_v2.h"
-#include "ezlopi_core_errors.h"
 
 /*******************************************************************************
 *                          C++ Declaration Wrapper

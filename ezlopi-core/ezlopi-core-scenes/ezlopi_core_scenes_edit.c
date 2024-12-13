@@ -83,17 +83,17 @@ static void __edit_scene(l_scenes_list_v2_t *scene_node, cJSON *cj_scene);
 /*******************************************************************************
 *                          Extern Function Definitions
 *******************************************************************************/
-ezlopi_error_t EZPI_core_scene_edit_store_updated_to_nvs(cJSON *cj_updated_scene)
+ezlopi_error_t EZPI_core_scenes_edit_store_updated_to_nvs(cJSON *cj_updated_scene)
 {
     ezlopi_error_t error = EZPI_SUCCESS;
     if (cj_updated_scene)
     {
-        if (ezlopi_core_scene_add_when_blockId_if_reqd(cj_updated_scene))
+        if (EZPI_core_scenes_add_when_blockId_if_reqd(cj_updated_scene))
         {
             TRACE_S("==> Added new_blockIds (Edit) : SUCCESS");
         }
 
-        if (ezlopi_core_scene_add_group_id_if_reqd(cj_updated_scene))
+        if (EZPI_core_scenes_add_group_id_if_reqd(cj_updated_scene))
         {
             TRACE_S("==> Added new_group_id (Edit) : SUCCESS");
         }
@@ -117,13 +117,13 @@ ezlopi_error_t EZPI_core_scene_edit_store_updated_to_nvs(cJSON *cj_updated_scene
     return error;
 }
 
-ezlopi_error_t EZPI_core_scene_edit_update_id(uint32_t scene_id, cJSON *cj_updated_scene)
+ezlopi_error_t EZPI_core_scenes_edit_update_id(uint32_t scene_id, cJSON *cj_updated_scene)
 {
     ezlopi_error_t ret = EZPI_FAILED;
 
     if (scene_id && cj_updated_scene)
     {
-        l_scenes_list_v2_t *scene_node = ezlopi_scenes_get_scenes_head_v2();
+        l_scenes_list_v2_t *scene_node = EZPI_core_scenes_get_scene_head_v2();
         while (scene_node)
         {
             if (scene_id == scene_node->_id)

@@ -75,15 +75,15 @@ extern "C"
      * @param cj_updated_scene Node to generate obj from
      * @return cJSON*
      */
-    ezlopi_error_t EZPI_core_scene_edit_store_updated_to_nvs(cJSON *cj_updated_scene);
+    ezlopi_error_t EZPI_core_scenes_edit_store_updated_to_nvs(cJSON *cj_updated_scene);
     /**
      * @brief This function edits 'scene_id' using new info from 'cj_updated_scene'.
-     * 
+     *
      * @param scene_id The '_id' of scene to be updated
-     * @param cj_updated_scene Pointer to cjson containing new data 
-     * @return ezlopi_error_t 
+     * @param cj_updated_scene Pointer to cjson containing new data
+     * @return ezlopi_error_t
      */
-    ezlopi_error_t EZPI_core_scene_edit_update_id(uint32_t scene_id, cJSON *cj_updated_scene);
+    ezlopi_error_t EZPI_core_scenes_edit_update_id(uint32_t scene_id, cJSON *cj_updated_scene);
 
 
 #ifdef __cplusplus

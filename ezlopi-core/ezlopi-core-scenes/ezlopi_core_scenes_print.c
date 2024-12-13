@@ -127,7 +127,7 @@ void EZPI_print_fields(l_fields_v2_t *fields, const char *tab)
         TRACE_D("%s\t\t\t|---------- field_count: %d ----------", (NULL != tab ? tab : ""), ++field_count);
         TRACE_D("%s\t\t\t|-- name: %s", (NULL != tab ? tab : ""), fields->name);
 
-        const char *value_type_name = ezlopi_scene_get_scene_value_type_name(fields->value_type);
+        const char *value_type_name = EZPI_core_scenes_get_scene_value_type_name(fields->value_type);
         TRACE_D("%s\t\t\t|-- type: %s", (NULL != tab ? tab : ""), value_type_name ? value_type_name : ezlopi__str);
 
         switch (fields->value_type)
