@@ -1,4 +1,45 @@
+
+
+/**
+ * @file    ezlopi_cloud_devices.c
+ * @brief
+ * @author
+ * @version
+ * @date
+ */
+/* ===========================================================================
+** Copyright (C) 2022 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+
 #include <string.h>
+
 #include "mbedtls/sha1.h"
 
 #include "ezlopi_util_trace.h"
@@ -42,9 +83,9 @@ static char *__generate_sha1_of_src(const char *src)
                                 size_t l = (len - (strlen(ret) + 1));
                                 if (l > 0)
                                 {
-                                    ((int)sha1[i] / 100 > 0) ? (snprintf(ret + strlen(ret), l, "%u", (uint8_t)sha1[i]))    // tripple digit
-                                        : ((int)sha1[i] / 10 > 0) ? (snprintf(ret + strlen(ret), l, "0%u", (uint8_t)sha1[i]))   // double digit
-                                        : (snprintf(ret + strlen(ret), l, "00%u", (uint8_t)sha1[i])); // single digit
+                                    ((int)sha1[i] / 100 > 0)  ? (snprintf(ret + strlen(ret), l, "%u", (uint8_t)sha1[i]))    // tripple digit
+                                    : ((int)sha1[i] / 10 > 0) ? (snprintf(ret + strlen(ret), l, "0%u", (uint8_t)sha1[i]))   // double digit
+                                                              : (snprintf(ret + strlen(ret), l, "00%u", (uint8_t)sha1[i])); // single digit
                                 }
                                 else
                                 {
@@ -62,7 +103,7 @@ static char *__generate_sha1_of_src(const char *src)
     return ret;
 }
 //------------------------------------------------------------------------------------------------------------------
-void devices_list_v3(cJSON *cj_request, cJSON *cj_response)
+void EZPI_devices_list_v3(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON *cjson_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     if (cjson_result)
@@ -102,7 +143,7 @@ void devices_list_v3(cJSON *cj_request, cJSON *cj_response)
 #endif
 }
 
-void device_name_set(cJSON *cj_request, cJSON *cj_response)
+void EZPI_device_name_set(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     if (cj_result)
@@ -117,14 +158,14 @@ void device_name_set(cJSON *cj_request, cJSON *cj_response)
                 cJSON *cj_device_name_str = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_name_str);
                 if (device_id && cj_device_name_str->valuestring)
                 {
-                    ezlopi_device_name_set_by_device_id(device_id, cj_device_name_str->valuestring);
+                    ezlopi_EZPI_device_name_set_by_device_id(device_id, cj_device_name_str->valuestring);
                 }
             }
         }
     }
 }
 
-void device_armed_set(cJSON *cj_request, cJSON *cj_response)
+void EZPI_device_armed_set(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     if (cj_result)
@@ -145,7 +186,7 @@ void device_armed_set(cJSON *cj_request, cJSON *cj_response)
     return;
 }
 
-void device_room_set(cJSON *cj_request, cJSON *cj_response)
+void EZPI_device_room_set(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     if (cj_result)
@@ -166,7 +207,7 @@ void device_room_set(cJSON *cj_request, cJSON *cj_response)
     }
 }
 
-void device_updated(cJSON *cj_request, cJSON *cj_response)
+void EZPI_device_updated(cJSON *cj_request, cJSON *cj_response)
 {
     if (cj_request)
     {
@@ -246,7 +287,7 @@ void device_updated(cJSON *cj_request, cJSON *cj_response)
 
 //---- device_group_api ------
 
-void device_group_create(cJSON *cj_request, cJSON *cj_response)
+void EZPI_device_group_create(cJSON *cj_request, cJSON *cj_response)
 {
     if (cj_request && cj_response)
     {
@@ -271,7 +312,7 @@ void device_group_create(cJSON *cj_request, cJSON *cj_response)
     }
 }
 
-void device_group_get(cJSON *cj_request, cJSON *cj_response)
+void EZPI_device_group_get(cJSON *cj_request, cJSON *cj_response)
 {
     if (cj_request && cj_response)
     {
@@ -296,7 +337,7 @@ void device_group_get(cJSON *cj_request, cJSON *cj_response)
     }
 }
 
-void device_groups_list(cJSON *cj_request, cJSON *cj_response)
+void EZPI_device_groups_list(cJSON *cj_request, cJSON *cj_response)
 {
     if (cj_request && cj_response)
     {
@@ -337,7 +378,7 @@ void device_groups_list(cJSON *cj_request, cJSON *cj_response)
     }
 }
 
-void device_group_delete(cJSON *cj_request, cJSON *cj_response)
+void EZPI_device_group_delete(cJSON *cj_request, cJSON *cj_response)
 {
     if (cj_request && cj_response)
     {
@@ -385,7 +426,7 @@ void device_group_delete(cJSON *cj_request, cJSON *cj_response)
     }
 }
 
-void device_group_update(cJSON *cj_request, cJSON *cj_response)
+void EZPI_device_group_update(cJSON *cj_request, cJSON *cj_response)
 {
     if (cj_request && cj_response)
     {
@@ -409,7 +450,7 @@ void device_group_update(cJSON *cj_request, cJSON *cj_response)
     }
 }
 
-void device_group_find(cJSON *cj_request, cJSON *cj_response)
+void EZPI_device_group_find(cJSON *cj_request, cJSON *cj_response)
 {
     if (cj_request && cj_response)
     {
@@ -425,7 +466,7 @@ void device_group_find(cJSON *cj_request, cJSON *cj_response)
     }
 }
 
-void device_group_devitem_expand(cJSON *cj_request, cJSON *cj_response)
+void EZPI_device_group_devitem_expand(cJSON *cj_request, cJSON *cj_response)
 {
     if (cj_request && cj_response)
     {
@@ -473,7 +514,7 @@ void device_group_devitem_expand(cJSON *cj_request, cJSON *cj_response)
 ////// updater for device-grps
 ////// for 'hub.device.group.__'
 
-void device_group_created(cJSON *cj_request, cJSON *cj_response)
+void EZPI_device_group_created(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_sender_str);
     cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_error_str);
@@ -493,7 +534,7 @@ void device_group_created(cJSON *cj_request, cJSON *cj_response)
     }
 }
 
-void device_group_deleted(cJSON *cj_request, cJSON *cj_response)
+void EZPI_device_group_deleted(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_sender_str);
     cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_error_str);
@@ -512,7 +553,7 @@ void device_group_deleted(cJSON *cj_request, cJSON *cj_response)
     }
 }
 
-void device_group_updated(cJSON *cj_request, cJSON *cj_response)
+void EZPI_device_group_updated(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_sender_str);
     cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_error_str);
@@ -538,7 +579,7 @@ void device_group_updated(cJSON *cj_request, cJSON *cj_response)
 
 //---- item_group_api ------
 
-void item_group_create(cJSON *cj_request, cJSON *cj_response)
+void EZPI_item_group_create(cJSON *cj_request, cJSON *cj_response)
 {
     if (cj_request && cj_response)
     {
@@ -563,7 +604,7 @@ void item_group_create(cJSON *cj_request, cJSON *cj_response)
     }
 }
 
-void item_group_get(cJSON *cj_request, cJSON *cj_response)
+void EZPI_item_group_get(cJSON *cj_request, cJSON *cj_response)
 {
     if (cj_request && cj_response)
     {
@@ -588,7 +629,7 @@ void item_group_get(cJSON *cj_request, cJSON *cj_response)
     }
 }
 
-void item_groups_list(cJSON *cj_request, cJSON *cj_response)
+void EZPI_item_groups_list(cJSON *cj_request, cJSON *cj_response)
 {
     if (cj_request && cj_response)
     {
@@ -629,7 +670,7 @@ void item_groups_list(cJSON *cj_request, cJSON *cj_response)
     }
 }
 
-void item_group_delete(cJSON *cj_request, cJSON *cj_response)
+void EZPI_item_group_delete(cJSON *cj_request, cJSON *cj_response)
 {
     if (cj_request && cj_response)
     {
@@ -677,7 +718,7 @@ void item_group_delete(cJSON *cj_request, cJSON *cj_response)
     }
 }
 
-void item_group_update(cJSON *cj_request, cJSON *cj_response)
+void EZPI_item_group_update(cJSON *cj_request, cJSON *cj_response)
 {
     if (cj_request && cj_response)
     {
@@ -704,13 +745,13 @@ void item_group_update(cJSON *cj_request, cJSON *cj_response)
 ////// updater for item-grps
 ////// for 'hub.item.group.__'
 
-void item_group_created(cJSON *cj_request, cJSON *cj_response)
+void EZPI_item_group_created(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_sender_str);
     cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_error_str);
 
     cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
-    cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, ezlopi_hub_item_group_created);
+    cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, ezlopi_hub_EZPI_item_group_created);
 
     cJSON *new_itemgrp_id = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi__id_str);
     if (new_itemgrp_id && new_itemgrp_id->valuestring)
@@ -724,13 +765,13 @@ void item_group_created(cJSON *cj_request, cJSON *cj_response)
     }
 }
 
-void item_group_deleted(cJSON *cj_request, cJSON *cj_response)
+void EZPI_item_group_deleted(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_sender_str);
     cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_error_str);
 
     cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
-    cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, ezlopi_hub_item_group_deleted);
+    cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, ezlopi_hub_EZPI_item_group_deleted);
 
     cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     if (cj_result)
@@ -743,13 +784,13 @@ void item_group_deleted(cJSON *cj_request, cJSON *cj_response)
     }
 }
 
-void item_group_updated(cJSON *cj_request, cJSON *cj_response)
+void EZPI_EZPI_item_group_updated(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_sender_str);
     cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_error_str);
 
     cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
-    cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, ezlopi_hub_item_group_updated);
+    cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, ezlopi_hub_EZPI_EZPI_item_group_updated);
 
     cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
     if (cj_params)
@@ -766,3 +807,7 @@ void item_group_updated(cJSON *cj_request, cJSON *cj_response)
         }
     }
 }
+
+/*******************************************************************************
+ *                          End of File
+ *******************************************************************************/

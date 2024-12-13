@@ -64,9 +64,9 @@ const char *method_cloud_firmware_info_get = "cloud.firmware.info.get";
 // const  char *method_hub_device_force_remove = "hub.device.force_remove";
 // const  char *method_hub_device_firmware_update = "hub.device.firmware.update";
 const char *method_hub_devices_list = "hub.devices.list";
-const char *method_hub_device_armed_set = "hub.device.armed.set";
-// const  char *method_hub_device_name_set = "hub.device.name.set";
-const char *method_hub_device_room_set = "hub.device.room.set";
+const char *method_hub_EZPI_device_armed_set = "hub.device.armed.set";
+// const  char *method_hub_EZPI_device_name_set = "hub.device.name.set";
+const char *method_hub_EZPI_device_room_set = "hub.device.room.set";
 // const  char *method_hub_device_setting_dictionary_value_set = "hub.device.setting.dictionary.value.set";
 // const  char *method_hub_device_setting_value_set = "hub.device.setting.value.set";
 // const  char *method_hub_gateway_setting_value_set = "hub.gateway.setting.value.set";
@@ -175,9 +175,9 @@ const char *ezlopi_hub_device_group_created = "hub.device.group.created";
 const char *ezlopi_hub_device_group_deleted = "hub.device.group.deleted";
 const char *ezlopi_hub_device_group_updated = "hub.device.group.updated";
 
-const char *ezlopi_hub_item_group_created = "hub.item.group.created";
-const char *ezlopi_hub_item_group_deleted = "hub.item.group.deleted";
-const char *ezlopi_hub_item_group_updated = "hub.item.group.updated";
+const char *ezlopi_hub_EZPI_item_group_created = "hub.item.group.created";
+const char *ezlopi_hub_EZPI_item_group_deleted = "hub.item.group.deleted";
+const char *ezlopi_hub_EZPI_EZPI_item_group_updated = "hub.item.group.updated";
 
 /*******************************************************************************
  *                          End of File

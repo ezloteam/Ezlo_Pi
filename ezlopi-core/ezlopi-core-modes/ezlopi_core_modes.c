@@ -784,8 +784,8 @@ ezlopi_error_t ezlopi_core_modes_set_unset_device_armed_status(cJSON *cj_device_
                             cJSON *cj_response = cJSON_CreateObject(__func__);
                             if (NULL != cj_response)
                             {
-                                // 2. CALL : "device_updated" broadcast for devices: switced from [ armed --> disarmed ]
-                                device_updated(cj_device_armed_broadcast, cj_response);
+                                // 2. CALL : "EZPI_device_updated" broadcast for devices: switced from [ armed --> disarmed ]
+                                EZPI_device_updated(cj_device_armed_broadcast, cj_response);
 
                                 if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(cj_response))
                                 {

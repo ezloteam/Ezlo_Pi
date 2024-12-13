@@ -299,7 +299,7 @@ static int __modify_dev_mod_name_in_nvs(uint32_t device_id, const char *new_dev_
     }
     return ret;
 }
-void ezlopi_device_name_set_by_device_id(uint32_t a_device_id, const char *new_dev_name)
+void ezlopi_EZPI_device_name_set_by_device_id(uint32_t a_device_id, const char *new_dev_name)
 {
     if (a_device_id && new_dev_name)
     {

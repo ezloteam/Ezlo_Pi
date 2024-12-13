@@ -73,9 +73,9 @@ extern "C"
     // extern const  char *method_hub_device_force_remove ;
     // extern const  char *method_hub_device_firmware_update ;
     extern const char *method_hub_devices_list;
-    extern const char *method_hub_device_armed_set;
-    // extern const  char *method_hub_device_name_set;
-    extern const char *method_hub_device_room_set;
+    extern const char *method_hub_EZPI_device_armed_set;
+    // extern const  char *method_hub_EZPI_device_name_set;
+    extern const char *method_hub_EZPI_device_room_set;
     // extern const  char *method_hub_device_setting_dictionary_value_set ;
     // extern const  char *method_hub_device_setting_value_set ;
     // extern const  char *method_hub_gateway_setting_value_set ;
@@ -184,9 +184,9 @@ extern "C"
     extern const char *ezlopi_hub_device_group_deleted;
     extern const char *ezlopi_hub_device_group_updated;
 
-    extern const char *ezlopi_hub_item_group_created;
-    extern const char *ezlopi_hub_item_group_deleted;
-    extern const char *ezlopi_hub_item_group_updated;
+    extern const char *ezlopi_hub_EZPI_item_group_created;
+    extern const char *ezlopi_hub_EZPI_item_group_deleted;
+    extern const char *ezlopi_hub_EZPI_EZPI_item_group_updated;
 
 #ifdef __cplusplus
 }
