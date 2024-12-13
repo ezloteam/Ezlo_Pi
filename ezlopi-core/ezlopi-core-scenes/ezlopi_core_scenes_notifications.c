@@ -47,6 +47,7 @@
 
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_cjson_macros.h"
+#include "ezlopi_core_scenes_v2.h"
 // #include "ezlopi_core_scenes_notifications.h"
 
 #include "ezlopi_cloud_constants.h"

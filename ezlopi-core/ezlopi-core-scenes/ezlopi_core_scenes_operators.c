@@ -89,8 +89,7 @@ typedef enum e_with_grp
 *******************************************************************************/
 static int __evaluate_compareNumber_or_compareStrings(l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, char *comparator_str);
 static int __evaluate_compareNumbers_or_compareStrings_with_group(l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field, l_fields_v2_t *value_field, l_fields_v2_t *comparator_field);
-
-/************* Numeric & String ************/
+/* Numeric & String */
 static int ________compare_val_num(double item_exp_value, double value_to_compare_with, char *comparator_field_str);
 static int ________compare_val_str(const char *item_exp_value_str, const char *value_to_compare_with_str, char *comparator_field_str);
 static int ____compare_exp_vs_other(s_ezlopi_expressions_t *curr_expr_left, l_fields_v2_t *value_field, char *comparator_field_str);
@@ -103,8 +102,9 @@ static int __evaluate_numrange(l_fields_v2_t *item_exp_field, l_fields_v2_t *sta
 static int __evaluate_compareNumber_or_compareStrings(l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, char *comparator_str);;
 static int __evaluate_compareNumbers_or_compareStrings_with_group(l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field, l_fields_v2_t *value_field, l_fields_v2_t *comparator_field);;
 static int __trigger_grp_functions(e_with_grp_t choice, l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field, l_fields_v2_t *operation_field, l_fields_v2_t *comparator_field, l_fields_v2_t *value_field, l_fields_v2_t *start_value_field, l_fields_v2_t *end_value_field, l_fields_v2_t *value_type_field, char *comparator_str, bool comparator_choice);
-
-/************* Numeric_range ************/
+/* Strings */
+static char *__get_item_strvalue_by_id(uint32_t item_id);
+/* Numeric_range */
 static int ________compare_numeric_range_num(double extract_data, double start_value_field_num, double end_value_field_num, bool comparator_choice);
 static int ________compare_numeric_range_str(const char *extract_data, const char *start_value_field_str, const char *end_value_field_str, bool comparator_choice);
 static int ____compare_range_exp_vs_other(s_ezlopi_expressions_t *curr_expr_left, l_fields_v2_t *start_value_field, l_fields_v2_t *end_value_field, bool comparator_choice);
@@ -112,21 +112,19 @@ static int ____compare_range_exp_vs_exp(s_ezlopi_expressions_t *curr_expr_left, 
 static int ____compare_range_item_vs_other(l_ezlopi_item_t *item, l_fields_v2_t *start_value_field, l_fields_v2_t *end_value_field, bool comparator_choice);
 static int ____compare_range_item_vs_exp(l_ezlopi_item_t *item, s_ezlopi_expressions_t *curr_expr_right_start, s_ezlopi_expressions_t *curr_expr_right_end, bool comparator_choice);
 static int __evaluate_numrange(l_fields_v2_t *item_exp_field, l_fields_v2_t *start_value_field, l_fields_v2_t *end_value_field, bool comparator_choice);
-
-/************* String_operations ************/
+/* String_operations */
 static char *__ezlopi_stropr_laststr_comp(const char *haystack, const char *needle);
-
-/************* Values in_array ************/
+/* Values in_array */
 static int __compare_inarry_str(char *item_exp_value_str, l_fields_v2_t *value_field, bool operation);
 static int __compare_inarry_num(double item_exp_value, l_fields_v2_t *value_field, bool operation);
 static int __compare_inarry_cj(cJSON *item_exp_value, l_fields_v2_t *value_field, bool operation);
-
-/************* compareValues ************/
+/* compareValues */
 static bool __check_valuetypes(const char *lhs_type_str, const char *rhs_type_str, const char *required_type_str);
+
 /*******************************************************************************
 *                          Static Data Definitions
 *******************************************************************************/
-/************* Numeric ************/
+/* Numeric */
 static const char *const ezlopi_scenes_num_cmp_operators_op[] = {
 #define SCENES_NUM_COMP_OPERATORS(OPERATOR, op, name, method) op,
 #include "__operators_macros/__numeric_comparision_operators_macros.h"
@@ -142,7 +140,7 @@ static const char *const ezlopi_scenes_num_cmp_operators_method[] = {
 #include "__operators_macros/__numeric_comparision_operators_macros.h"
 #undef SCENES_NUM_COMP_OPERATORS
 };
-/************* Strings ************/
+/* Strings */
 static const char *const ezlopi_scenes_str_cmp_operators_op[] = {
 #define SCENES_STRINGS_OPERATORS(OPERATOR, op, name, method) op,
 #include "__operators_macros/__strings_comparision_operators_macros.h"
@@ -158,7 +156,7 @@ static const char *const ezlopi_scenes_str_cmp_operators_method[] = {
 #include "__operators_macros/__strings_comparision_operators_macros.h"
 #undef SCENES_STRINGS_OPERATORS
 };
-/************* String_operations ************/
+/* String_operations */
 static const char *const ezlopi_scenes_strops_cmp_operators_op[] = {
 #define SCENES_STROPS_COMP_OPERATORES(OPERATOR, op, name, method) op,
 #include "__operators_macros/__string_op_comparision_operators_macros.h"
@@ -174,7 +172,7 @@ static const char *const ezlopi_scenes_strops_cmp_operators_method[] = {
 #include "__operators_macros/__string_op_comparision_operators_macros.h"
 #undef SCENES_STROPS_COMP_OPERATORES
 };
-/************* Values with Less ************/
+/* Values with Less */
 static const char *const ezlopi_scenes_value_with_less_cmp_operators_op[] = {
 #define SCENES_VALUES_WITH_LESS_OPERATORS(OPERATOR, op, name, method) op,
 #include "__operators_macros/__value_with_less_comparision_operators_macros.h"
@@ -190,8 +188,7 @@ static const char *const ezlopi_scenes_value_with_less_cmp_operators_method[] = 
 #include "__operators_macros/__value_with_less_comparision_operators_macros.h"
 #undef SCENES_VALUES_WITH_LESS_OPERATORS
 };
-
-/************* Values without less ************/
+/* Values without less */
 static const char *const ezlopi_scenes_value_without_less_cmp_operators_op[] = {
 #define SCENES_VALUES_WITHOUT_LESS_OPERATORS(OPERATOR, op, name, method) op,
 #include "__operators_macros/__value_without_less_comparision_operators_macros.h"
@@ -215,8 +212,7 @@ static const char *const ezlopi_scenes_value_without_less_cmp_operators_method[]
 /*******************************************************************************
 *                          Extern Function Definitions
 *******************************************************************************/
-
-/************* Numeric ************/
+/* Numeric */
 e_scene_num_cmp_operators_t ezlopi_scenes_numeric_comparator_operators_get_enum(char *operator_str)
 {
     e_scene_num_cmp_operators_t ret = SCENES_NUM_COMP_OPERATORS_NONE + 1;
@@ -275,8 +271,7 @@ int ezlopi_scenes_operators_value_number_operations(l_fields_v2_t *item_exp_fiel
     }
     return ret;
 }
-
-/*********** Numeric_Range *********/
+/* Numeric_Range */
 int ezlopi_scenes_operators_value_number_range_operations(l_fields_v2_t *item_exp_field, l_fields_v2_t *start_value_field, l_fields_v2_t *end_value_field, bool comparator_choice)
 {
     return __evaluate_numrange(item_exp_field, start_value_field, end_value_field, comparator_choice);
@@ -285,8 +280,7 @@ int ezlopi_scenes_operators_value_number_range_operations_with_group(l_fields_v2
 {
     return __trigger_grp_functions(COMPARE_NUM_RANGE, devgrp_field, itemgrp_field, NULL, NULL, NULL, start_value_field, end_value_field, NULL, NULL, comparator_choice);
 }
-
-/************* Strings ************/
+/* Strings */
 e_scene_str_cmp_operators_t ezlopi_scenes_strings_comparator_operators_get_enum(char *operator_str)
 {
     e_scene_str_cmp_operators_t ret = SCENES_STRINGS_OPERATORS_NONE + 1;
@@ -332,8 +326,7 @@ const char *ezlopi_scenes_strings_comparator_operators_get_method(e_scene_str_cm
     }
     return ret;
 }
-
-/************* Compare_string **************/
+/* Compare_string */
 int ezlopi_scenes_operators_value_strings_operations(l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, l_fields_v2_t *comparator_field, l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field)
 {
     int ret = 0;
@@ -348,8 +341,7 @@ int ezlopi_scenes_operators_value_strings_operations(l_fields_v2_t *item_exp_fie
 
     return ret;
 }
-
-/************* String_operations ************/
+/* String_operations */
 e_scene_strops_cmp_operators_t ezlopi_scenes_strops_comparator_operators_get_enum(char *operator_str)
 {
     e_scene_strops_cmp_operators_t ret = SCENES_STROPS_COMP_OPERATORES_NONE + 1;
@@ -527,8 +519,7 @@ int ezlopi_scenes_operators_value_strops_operations_with_group(l_fields_v2_t *va
 {
     return __trigger_grp_functions(COMPARE_STROPS, devgrp_field, itemgrp_field, operation_field, NULL, value_field, NULL, NULL, NULL, NULL, 0);
 }
-
-/************* Values in_array ************/
+/* Values in_array */
 #if 0 /* Currently not in use --> check 'in_array' when-condition before removing */
 static const char *const ezlopi_scenes_inarr_cmp_operators_op[] = {
 #define SCENES_IN_ARRAY_OPERATORS(OPERATOR, op, name, method) op,
@@ -668,26 +659,8 @@ int ezlopi_scenes_operators_value_inarr_operations_with_group(l_fields_v2_t *val
 {
     return __trigger_grp_functions(COMPARE_INARRAY, devgrp_field, itemgrp_field, operation_field, NULL, value_field, NULL, NULL, NULL, NULL, 0);
 }
+/* Values with Less */
 
-/************* Values with Less ************/
-e_scene_value_with_less_cmp_operators_t ezlopi_scenes_value_with_less_comparator_operators_get_enum(char *operator_str)
-{
-    e_scene_value_with_less_cmp_operators_t ret = SCENES_VALUES_WITH_LESS_OPERATORS_NONE + 1;
-    if (operator_str)
-    {
-        while ((ret <= SCENES_VALUES_WITH_LESS_OPERATORS_MAX) && ezlopi_scenes_value_with_less_cmp_operators_op[ret])
-        {
-            if (0 == strcmp(ezlopi_scenes_value_with_less_cmp_operators_op[ret], operator_str))
-            {
-                break;
-            }
-
-            ret++;
-        }
-    }
-
-    return ret;
-}
 const char *ezlopi_scenes_value_with_less_comparator_operators_get_op(e_scene_value_with_less_cmp_operators_t operator)
 {
     const char *ret = NULL;
@@ -716,6 +689,24 @@ const char *ezlopi_scenes_value_with_less_comparator_operators_get_method(e_scen
     return ret;
 }
 #if 0
+e_scene_value_with_less_cmp_operators_t ezlopi_scenes_value_with_less_comparator_operators_get_enum(char *operator_str)
+{
+    e_scene_value_with_less_cmp_operators_t ret = SCENES_VALUES_WITH_LESS_OPERATORS_NONE + 1;
+    if (operator_str)
+    {
+        while ((ret <= SCENES_VALUES_WITH_LESS_OPERATORS_MAX) && ezlopi_scenes_value_with_less_cmp_operators_op[ret])
+        {
+            if (0 == strcmp(ezlopi_scenes_value_with_less_cmp_operators_op[ret], operator_str))
+            {
+                break;
+            }
+
+            ret++;
+        }
+    }
+
+    return ret;
+}
 int ezlopi_scenes_operators_value_with_less_operations(uint32_t item_id, l_fields_v2_t *value_field, l_fields_v2_t *comparator_field)
 {
     int ret = 0;
@@ -800,26 +791,7 @@ int ezlopi_scenes_operators_value_with_less_operations(uint32_t item_id, l_field
     return ret;
 }
 #endif
-
-/************* Values without Less ************/
-e_scene_value_without_less_cmp_operators_t ezlopi_scenes_value_without_less_comparator_operators_get_enum(char *operator_str)
-{
-    e_scene_value_without_less_cmp_operators_t ret = SCENES_VALUES_WITHOUT_LESS_OPERATORS_NONE + 1; // 1st element of enum after *_NONE
-    if (operator_str)
-    {
-        while ((ret <= SCENES_VALUES_WITHOUT_LESS_OPERATORS_MAX) && ezlopi_scenes_value_without_less_cmp_operators_op[ret])
-        {
-            if (0 == strcmp(ezlopi_scenes_value_without_less_cmp_operators_op[ret], operator_str))
-            {
-                break;
-            }
-
-            ret++;
-        }
-    }
-
-    return ret;
-}
+/* Values without Less */
 const char *ezlopi_scenes_value_without_less_comparator_operators_get_op(e_scene_value_without_less_cmp_operators_t operator)
 {
     const char *ret = NULL;
@@ -848,6 +820,25 @@ const char *ezlopi_scenes_value_without_less_comparator_operators_get_method(e_s
     return ret;
 }
 #if 0
+e_scene_value_without_less_cmp_operators_t ezlopi_scenes_value_without_less_comparator_operators_get_enum(char *operator_str)
+{
+    e_scene_value_without_less_cmp_operators_t ret = SCENES_VALUES_WITHOUT_LESS_OPERATORS_NONE + 1; // 1st element of enum after *_NONE
+    if (operator_str)
+    {
+        while ((ret <= SCENES_VALUES_WITHOUT_LESS_OPERATORS_MAX) && ezlopi_scenes_value_without_less_cmp_operators_op[ret])
+        {
+            if (0 == strcmp(ezlopi_scenes_value_without_less_cmp_operators_op[ret], operator_str))
+            {
+                break;
+            }
+
+            ret++;
+        }
+    }
+
+    return ret;
+}
+
 int ezlopi_scenes_operators_value_without_less_operations(uint32_t item_id, l_fields_v2_t *value_field, l_fields_v2_t *comparator_field)
 {
     int ret = 0;
@@ -913,10 +904,9 @@ int ezlopi_scenes_operators_value_without_less_operations(uint32_t item_id, l_fi
 
     return ret;
 }
-#endif
 
-/************* compareValues ************/
-#if 0
+/* compareValues */
+
 int ezlopi_scenes_operators_value_comparevalues_without_less_operations(uint32_t item_id, l_fields_v2_t *value_field, l_fields_v2_t *value_type_field, l_fields_v2_t *comparator_field)
 {
     int ret = 0;
@@ -1098,8 +1088,7 @@ int ezlopi_scenes_operators_value_comparevalues_with_less_operations_with_group(
 {
     return __trigger_grp_functions(COMPARE_VALUES, devgrp_field, itemgrp_field, NULL, comparator_field, value_field, NULL, NULL, value_type_field, NULL, 0);
 }
-
-/************* Has atleast one dictornary Value *************/
+/* Has atleast one dictornary Value */
 int ezlopi_scenes_operators_has_atleastone_dictionary_value_operations(uint32_t item_id, l_fields_v2_t *value_field)
 {
     int ret = 0;
@@ -1143,8 +1132,7 @@ int ezlopi_scenes_operators_has_atleastone_dictionary_value_operations(uint32_t 
 
     return ret;
 }
-
-/************* isDictornary Changed *************/
+/* isDictornary Changed */
 int ezlopi_scenes_operators_is_dictionary_changed_operations(l_scenes_list_v2_t *scene_node, uint32_t item_id, l_fields_v2_t *key_field, l_fields_v2_t *operation_field)
 {
     int ret = 0;
@@ -1281,8 +1269,7 @@ static int __evaluate_compareNumbers_or_compareStrings_with_group(l_fields_v2_t 
 {
     return __trigger_grp_functions(COMPARE_NUM_OR_STR, devgrp_field, itemgrp_field, NULL, comparator_field, value_field, NULL, NULL, NULL, NULL, 0);
 }
-
-/************* Numeric & String ************/
+/* Numeric & String */
 static int ________compare_val_num(double item_exp_value, double value_to_compare_with, char *comparator_field_str)
 {
     int ret = 0;
@@ -1373,7 +1360,6 @@ static int ________compare_val_str(const char *item_exp_value_str, const char *v
 
     return ret;
 }
-
 static int ____compare_exp_vs_other(s_ezlopi_expressions_t *curr_expr_left, l_fields_v2_t *value_field, char *comparator_field_str)
 {
     int ret = 0;
@@ -1551,7 +1537,6 @@ static int ____compare_exp_vs_item(s_ezlopi_expressions_t *curr_expr_left, l_ezl
 
     return ret;
 }
-
 static int ____compare_item_vs_other(l_ezlopi_item_t *item_left, l_fields_v2_t *value_field, char *comparator_field_str)
 {
     int ret = 0;
@@ -1770,11 +1755,9 @@ static int ____compare_item_vs_item(l_ezlopi_item_t *item_left, l_ezlopi_item_t 
 
     return ret;
 }
-
 static int __evaluate_numrange(l_fields_v2_t *item_exp_field, l_fields_v2_t *start_value_field, l_fields_v2_t *end_value_field, bool comparator_choice);
 static int __evaluate_compareNumber_or_compareStrings(l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, char *comparator_str);
 static int __evaluate_compareNumbers_or_compareStrings_with_group(l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field, l_fields_v2_t *value_field, l_fields_v2_t *comparator_field);
-
 static int __trigger_grp_functions(e_with_grp_t choice, l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field, l_fields_v2_t *operation_field, l_fields_v2_t *comparator_field, l_fields_v2_t *value_field, l_fields_v2_t *start_value_field, l_fields_v2_t *end_value_field, l_fields_v2_t *value_type_field, char *comparator_str, bool comparator_choice)
 {
     int ret = 0;
@@ -1861,8 +1844,7 @@ static int __trigger_grp_functions(e_with_grp_t choice, l_fields_v2_t *devgrp_fi
 
     return ret;
 }
-
-/************* Strings ************/
+/* Strings */
 static char *__get_item_strvalue_by_id(uint32_t item_id)
 {
     char *item_value_str = NULL;
@@ -1883,8 +1865,7 @@ static char *__get_item_strvalue_by_id(uint32_t item_id)
     }
     return item_value_str;
 }
-
-/*********** Numeric_Range *********/
+/* Numeric_Range */
 static int ________compare_numeric_range_num(double extract_data, double start_value_field_num, double end_value_field_num, bool comparator_choice)
 {
     int ret = 0;
@@ -1934,7 +1915,6 @@ static int ________compare_numeric_range_str(const char *extract_data, const cha
     }
     return ret;
 }
-
 static int ____compare_range_exp_vs_other(s_ezlopi_expressions_t *curr_expr_left, l_fields_v2_t *start_value_field, l_fields_v2_t *end_value_field, bool comparator_choice)
 {
     int ret = 0;
@@ -2061,7 +2041,6 @@ static int ____compare_range_exp_vs_exp(s_ezlopi_expressions_t *curr_expr_left, 
 
     return ret;
 }
-
 static int ____compare_range_item_vs_other(l_ezlopi_item_t *item, l_fields_v2_t *start_value_field, l_fields_v2_t *end_value_field, bool comparator_choice)
 {
     int ret = 0;
@@ -2215,7 +2194,6 @@ static int ____compare_range_item_vs_exp(l_ezlopi_item_t *item, s_ezlopi_express
 
     return ret;
 }
-
 static int __evaluate_numrange(l_fields_v2_t *item_exp_field, l_fields_v2_t *start_value_field, l_fields_v2_t *end_value_field, bool comparator_choice)
 {
     int ret = 0;
@@ -2274,8 +2252,7 @@ static int __evaluate_numrange(l_fields_v2_t *item_exp_field, l_fields_v2_t *sta
     }
     return ret;
 }
-
-/************* String_operations ************/
+/* String_operations */
 static char *__ezlopi_stropr_laststr_comp(const char *haystack, const char *needle)
 {
     char *loc = NULL;
@@ -2288,8 +2265,7 @@ static char *__ezlopi_stropr_laststr_comp(const char *haystack, const char *need
     }
     return loc;
 }
-
-/************* Values in_array ************/
+/* Values in_array */
 static int __compare_inarry_str(char *item_exp_value_str, l_fields_v2_t *value_field, bool operation)
 {
     int ret = 0;
@@ -2402,8 +2378,7 @@ static int __compare_inarry_cj(cJSON *item_exp_value, l_fields_v2_t *value_field
     }
     return ret;
 }
-
-/************* compareValues ************/
+/* compareValues */
 static bool __check_valuetypes(const char *lhs_type_str, const char *rhs_type_str, const char *required_type_str)
 {
     bool ret = false;
@@ -2414,7 +2389,6 @@ static bool __check_valuetypes(const char *lhs_type_str, const char *rhs_type_st
     }
     return ret;
 }
-
 
 #endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 /*******************************************************************************
