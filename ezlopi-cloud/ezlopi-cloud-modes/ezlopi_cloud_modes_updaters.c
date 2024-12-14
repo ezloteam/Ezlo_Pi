@@ -22,10 +22,10 @@ void ezlopi_cloud_modes_switched(cJSON *cj_request, cJSON *cj_response)
     if (cj_result)
     {
 #if 0
-        s_ezlopi_modes_t *curr_mode = ezlopi_core_modes_get_custom_modes();
+        s_ezlopi_modes_t *curr_mode = EZPI_core_modes_get_custom_modes();
         if (curr_mode)
         {
-            s_house_modes_t *curr_house_mode = ezlopi_core_modes_get_current_house_modes();
+            s_house_modes_t *curr_house_mode = EZPI_core_modes_get_current_house_modes();
             if (curr_house_mode)
             {
                 // CJSON_ASSIGN_ID(cj_result, curr_mode->current_mode_id, "from"); // this can be extracted from 'request'
@@ -50,7 +50,7 @@ void ezlopi_cloud_modes_alarmed(cJSON *cj_request, cJSON *cj_response)
     cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     if (cj_result)
     {
-        s_ezlopi_modes_t *curr_mode = ezlopi_core_modes_get_custom_modes();
+        s_ezlopi_modes_t *curr_mode = EZPI_core_modes_get_custom_modes();
         if (curr_mode)
         {
             CJSON_ASSIGN_ID(cj_result, curr_mode->current_mode_id, ezlopi_modeId_str);
@@ -352,7 +352,7 @@ void ezlopi_cloud_modes_changed(cJSON *cj_request, cJSON *cj_response)
             cJSON *cj_mode_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_modeId_str); // broadcast modes-info of 'updated_house_mode'
             if (cj_mode_id && cj_mode_id->valuestring)
             {
-                s_house_modes_t *update_house_mode = ezlopi_core_modes_get_house_mode_by_id(strtoul(cj_mode_id->valuestring, NULL, 16)); // get the 'running' house mode, indicated by 'ezlopi_mode_t'
+                s_house_modes_t *update_house_mode = EZPI_core_modes_get_house_mode_by_id(strtoul(cj_mode_id->valuestring, NULL, 16)); // get the 'running' house mode, indicated by 'ezlopi_mode_t'
                 if (update_house_mode)
                 {
                     CJSON_ASSIGN_ID(cj_result, update_house_mode->_id, ezlopi_modeId_str);
@@ -515,7 +515,7 @@ void ezlopi_cloud_modes_entry_delay_changed(cJSON *cj_request, cJSON *cj_respons
             cJSON *cj_entryDelay = cJSON_AddObjectToObject(__FUNCTION__, cj_result, ezlopi_entryDelay_str);
             if (cj_entryDelay)
             {
-                s_ezlopi_modes_t *curr_mode = ezlopi_core_modes_get_custom_modes();
+                s_ezlopi_modes_t *curr_mode = EZPI_core_modes_get_custom_modes();
                 if (curr_mode)
                 {
                     cJSON_AddNumberToObject(__FUNCTION__, cj_entryDelay, ezlopi_normal_str, curr_mode->entry_delay.normal_delay_sec);

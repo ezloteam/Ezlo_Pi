@@ -837,7 +837,7 @@ int EZPI_core_scenes_when_is_house_mode_changed_to(l_scenes_list_v2_t *scene_nod
             if (cj_house_mdoe_id->valuestring)
             {
                 uint32_t house_mode_id = strtoul(cj_house_mdoe_id->valuestring, NULL, 16);
-                s_ezlopi_modes_t *modes = ezlopi_core_modes_get_custom_modes();
+                s_ezlopi_modes_t *modes = EZPI_core_modes_get_custom_modes();
                 if ((uint32_t)house_mode_id_array->user_arg != modes->current_mode_id) /* first check if there is transition */
                 {
                     if (modes->current_mode_id == house_mode_id) /* if : new_state == desired */
@@ -895,7 +895,7 @@ int EZPI_core_scenes_when_is_house_mode_changed_from(l_scenes_list_v2_t *scene_n
             if (cj_house_mode_id->valuestring)
             {
                 uint32_t house_mode_id = strtoul(cj_house_mode_id->valuestring, NULL, 16); // "value": [ "1", "2"]
-                s_ezlopi_modes_t *modes = ezlopi_core_modes_get_custom_modes();
+                s_ezlopi_modes_t *modes = EZPI_core_modes_get_custom_modes();
                 if ((uint32_t)house_mode_id_array->user_arg != modes->current_mode_id) /* first check if there is transition */
                 {
                     if ((uint32_t)house_mode_id_array->user_arg == house_mode_id) /* if : old_state == desired */
@@ -945,7 +945,7 @@ int EZPI_core_scenes_when_is_house_mode_alarm_phase_range(l_scenes_list_v2_t *sc
             {
                 if ((EZLOPI_VALUE_TYPE_STRING == curr_field->value_type) && (NULL != curr_field->field_value.u_value.value_string))
                 {
-                    s_ezlopi_modes_t *curr_mode = ezlopi_core_modes_get_custom_modes();
+                    s_ezlopi_modes_t *curr_mode = EZPI_core_modes_get_custom_modes();
 
                     phase_name = ((EZLOPI_MODES_ALARM_PHASE_IDLE == curr_mode->alarmed.phase) ? (char *)ezlopi_idle_str
                         : (EZLOPI_MODES_ALARM_PHASE_BYPASS == curr_mode->alarmed.phase) ? (char *)ezlopi_bypass_str
@@ -987,7 +987,7 @@ int EZPI_core_scenes_when_is_house_mode_switch_to_range(l_scenes_list_v2_t *scen
             return 0;
         }
 
-        s_ezlopi_modes_t *curr_mode = ezlopi_core_modes_get_custom_modes();
+        s_ezlopi_modes_t *curr_mode = EZPI_core_modes_get_custom_modes();
         if ((curr_mode->time_is_left_to_switch_sec > 0) && (EZLOPI_MODES_ALARM_PHASE_NONE < curr_mode->alarmed.phase && curr_mode->alarmed.phase < EZLOPI_MODES_ALARM_PHASE_MAX))
         {
             TRACE_S(" Current HouseMode_phase has [%d]sec time before switch.(Duration confirmed) ", curr_mode->time_is_left_to_switch_sec);

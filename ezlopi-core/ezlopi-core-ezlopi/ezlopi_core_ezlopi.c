@@ -79,7 +79,7 @@ void ezlopi_init(void)
     vTaskDelay(10);
 
 #if defined(CONFIG_EZPI_SERV_ENABLE_MODES)
-    ezlopi_core_modes_init();
+    EZPI_core_modes_init();
 #endif
 
     ezlopi_room_init();

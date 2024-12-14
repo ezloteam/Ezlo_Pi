@@ -76,7 +76,7 @@ typedef struct s_thread_ctx
  *
  * @param arg Function loop argument
  */
-static void ezpi_scenes_loop(void *arg);
+static void __scenes_loop(void *arg);
 /**
  * @brief Proth-thread function for scene
  *
@@ -442,7 +442,7 @@ PT_THREAD(ezpi_scene_proto_thread(l_scenes_list_v2_t *scene_node, uint32_t routi
     PT_END(&ctx->pt);
 }
 
-static void ezpi_scenes_loop(void *arg)
+static void __scenes_loop(void *arg)
 {
     l_scenes_list_v2_t *scene_node = EZPI_core_scenes_get_scene_head_v2();
 
