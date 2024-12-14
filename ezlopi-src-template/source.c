@@ -1,10 +1,3 @@
-/**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
- * @version 0.1
- * @date    1st January 2024
- */
 /* ===========================================================================
 ** Copyright (C) 2024 Ezlo Innovation Inc
 **
@@ -35,75 +28,80 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
+/**
+* @file    main.c
+* @brief   perform some function on data
+* @author  xx
+* @version 0.1
+* @date    12th DEC 2024
+*/
 
 /*******************************************************************************
- *                          Include Files
- *******************************************************************************/
+*                          Include Files
+*******************************************************************************/
 /**
- * Include Sequence
- * 1. C standard libraries eg. stdint, string etc.
- * 2. Third party component eg. cJSON, freeRTOS etc etc
- * 3. ESP-IDF specific eg. driver/gpio, esp_log etc.
- * 4. EzloPi HAL specific eg ezlopi_hal_i2c
- * 5. EzloPi core specific eg. ezlopi_core_ble
- * 6. EzloPi cloud specific eg. ezlopi_cloud_items
- * 7. EzloPi Service specific eg ezlopi_service_ble
- * 8. EzloPi Sensors and Device Specific eg. ezlopi_device_0001_digitalout_generic
- */
+* Include Sequence
+* 1. C standard libraries eg. stdint, string etc.
+* 2. Third party component eg. cJSON, freeRTOS etc etc
+* 3. ESP-IDF specific eg. driver/gpio, esp_log etc.
+* 4. EzloPi HAL specific eg ezlopi_hal_i2c
+* 5. EzloPi core specific eg. ezlopi_core_ble
+* 6. EzloPi cloud specific eg. ezlopi_cloud_items
+* 7. EzloPi Service specific eg ezlopi_service_ble
+* 8. EzloPi Sensors and Device Specific eg. ezlopi_device_0001_digitalout_generic
+*/
 #include "header.h"
 
 /*******************************************************************************
- *                          Extern Data Declarations
- *******************************************************************************/
+*                          Extern Data Declarations
+*******************************************************************************/
 
 /*******************************************************************************
- *                          Extern Function Declarations
- *******************************************************************************/
+*                          Extern Function Declarations
+*******************************************************************************/
 
 /*******************************************************************************
- *                          Type & Macro Definitions
- *******************************************************************************/
+*                          Type & Macro Definitions
+*******************************************************************************/
 
 /*******************************************************************************
- *                          Static Function Prototypes
- *******************************************************************************/
-static void ezpi_subcomponent_functiontitle( type_t arg );
+*                          Static Function Prototypes
+*******************************************************************************/
+static void ezpi_subcomponent_functiontitle(type_t arg);
 
 /*******************************************************************************
- *                          Static Data Definitions
- *******************************************************************************/
+*                          Static Data Definitions
+*******************************************************************************/
 
 /*******************************************************************************
- *                          Extern Data Definitions
- *******************************************************************************/
+*                          Extern Data Definitions
+*******************************************************************************/
 
 /*******************************************************************************
- *                          Extern Function Definitions
- *******************************************************************************/
-
+*                          Extern Function Definitions
+*******************************************************************************/
 /**
- * @brief Global/extern function template example
- * Convention : Use capital letters for initial word on extern functions
- * @param arg
- */
-void EZPI_maincomponent_subcomponent_functiontitle( type_t arg )
+* @brief Global/extern function template example
+* Convention : Use capital letters for initial word on extern functions
+* @param arg
+*/
+void EZPI_maincomponent_subcomponent_functiontitle(type_t arg)
 {
     // func defintion here
 }
 
 /*******************************************************************************
- *                         Static Function Definitions
- *******************************************************************************/
-
+*                         Static Function Definitions
+*******************************************************************************/
 /**
- * @brief Local/static function template example
- * Convention : Use lowercase letters for all words on static functions
- * @param arg
- */
-static void ezpi_subcomponent_functiontitle( type_t arg )
+* @brief Local/static function template example
+* Convention : Use lowercase letters for all words on static functions
+* @param arg
+*/
+static void ezpi_subcomponent_functiontitle(type_t arg)
 {
 }
 
 /*******************************************************************************
- *                          End of File
- *******************************************************************************/
+*                          End of File
+*******************************************************************************/

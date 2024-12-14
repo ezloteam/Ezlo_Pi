@@ -64,6 +64,20 @@
         }                                                                                               \
     }
 
+#define   CJSON_GET_VALUE_STRING_BY_COPY_INTO_PTR(root, item_name, item_val_ptr)                                      \
+    {                                                                                                               \
+        cJSON *o_item = cJSON_GetObjectItem(__FUNCTION__, root, item_name);                                         \
+        if (o_item && o_item->valuestring && o_item->str_value_len)                                                 \
+        {                                                                                                           \
+            ezlopi_free(__func__,item_val_ptr);                                                                     \
+            item_val_ptr = ezlopi_malloc(__func__,(o_item->str_value_len + 1));                                     \
+            if(NULL != item_val_ptr)                                                                                \
+            {                                                                                                       \
+                snprintf(item_val_ptr, (o_item->str_value_len), "%.*s", o_item->str_value_len, o_item->valuestring);\
+            }                                                                                                       \
+        }                                                                                                           \
+    }
+
 #define ASSIGN_DEVICE_NAME_V2(device, dev_name)                          \
     {                                                                    \
         if ((NULL != dev_name) && ('\0' != dev_name[0]))                 \

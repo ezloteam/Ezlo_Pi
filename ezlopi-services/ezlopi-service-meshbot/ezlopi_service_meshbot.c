@@ -6,36 +6,36 @@
  * @version
  * @date
  */
-/* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
-**
-** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
-**
-** Redistribution and use in source and binary forms, with or without
-** modification, are permitted provided that the following conditions are met:
-**
-** 1. Redistributions of source code must retain the above copyright notice,
-**    this list of conditions and the following disclaimer.
-** 2. Redistributions in binary form must reproduce the above copyright
-**    notice, this list of conditions and the following disclaimer in the
-**    documentation and/or other materials provided with the distribution.
-** 3. Neither the name of the copyright holder nor the names of its
-**    contributors may be used to endorse or promote products derived from
-**    this software without specific prior written permission.
-**
-** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
-** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-** POSSIBILITY OF SUCH DAMAGE.
-** ===========================================================================
-*/
+ /* ===========================================================================
+ ** Copyright (C) 2024 Ezlo Innovation Inc
+ **
+ ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+ **
+ ** Redistribution and use in source and binary forms, with or without
+ ** modification, are permitted provided that the following conditions are met:
+ **
+ ** 1. Redistributions of source code must retain the above copyright notice,
+ **    this list of conditions and the following disclaimer.
+ ** 2. Redistributions in binary form must reproduce the above copyright
+ **    notice, this list of conditions and the following disclaimer in the
+ **    documentation and/or other materials provided with the distribution.
+ ** 3. Neither the name of the copyright holder nor the names of its
+ **    contributors may be used to endorse or promote products derived from
+ **    this software without specific prior written permission.
+ **
+ ** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ ** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ ** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ ** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ ** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ ** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ ** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ ** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ ** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ ** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ ** POSSIBILITY OF SUCH DAMAGE.
+ ** ===========================================================================
+ */
 
 #include "../../build/config/sdkconfig.h"
 
@@ -57,10 +57,10 @@
 #include "ezlopi_service_loop.h"
 #include "ezlopi_service_meshbot.h"
 
-/**
- * @brief Struct that holds the thread context
- *
- */
+ /**
+  * @brief Struct that holds the thread context
+  *
+  */
 typedef struct s_thread_ctx
 {
     struct pt pt;                     /**< P-thread structure */
@@ -112,7 +112,7 @@ static int ezpi_execute_action_block(l_scenes_list_v2_t *scene_node, l_action_bl
 uint32_t EZPI_meshbot_service_stop_for_scene_id(uint32_t _id)
 {
     uint32_t ret = 0;
-    if (EZPI_meshobot_service_stop_scene(ezlopi_scenes_get_by_id_v2(_id)))
+    if (EZPI_meshobot_service_stop_scene(EZPI_core_scenes_get_by_id_v2(_id)))
     {
         ret = 1;
     }
@@ -127,7 +127,7 @@ uint32_t EZPI_meshobot_service_stop_scene(l_scenes_list_v2_t *scene_node)
         if (EZPI_SUCCESS == EZPI_meshbot_stop_without_broadcast(scene_node))
         {
             // triggering broadcast
-            ezlopi_scenes_status_change_broadcast(scene_node, scene_status_stopped_str);
+            EZPI_core_scenes_status_change_broadcast(scene_node, scene_status_stopped_str);
             ret = 1;
         }
     }
@@ -156,7 +156,7 @@ uint32_t EZPI_meshbot_service_start_scene(l_scenes_list_v2_t *scene_node)
         if (ezpi_execute_scene_start(scene_node))
         {
             TRACE_S("start scene_id : %#x [%d] ", scene_node->_id, scene_node->status);
-            ezlopi_scenes_status_change_broadcast(scene_node, scene_status_started_str);
+            EZPI_core_scenes_status_change_broadcast(scene_node, scene_status_started_str);
             ret = 1;
         }
     }
@@ -166,7 +166,7 @@ uint32_t EZPI_meshbot_service_start_scene(l_scenes_list_v2_t *scene_node)
 uint32_t EZPI_scenes_service_run_by_id(uint32_t _id) // Run once
 {
     uint32_t ret = 0;
-    l_scenes_list_v2_t *scene_node = ezlopi_scenes_get_by_id_v2(_id);
+    l_scenes_list_v2_t *scene_node = EZPI_core_scenes_get_by_id_v2(_id);
     TRACE_S("Scene-id:  %#x", _id);
 
     if (scene_node)
@@ -175,31 +175,31 @@ uint32_t EZPI_scenes_service_run_by_id(uint32_t _id) // Run once
         {
             if (scene_node->then_block)
             {
-                ezlopi_scenes_status_change_broadcast(scene_node, scene_status_started_str);
+                EZPI_core_scenes_status_change_broadcast(scene_node, scene_status_started_str);
 
                 if (1 == ezpi_execute_action_block(scene_node, scene_node->then_block))
                 {
-                    ezlopi_scenes_status_change_broadcast(scene_node, scene_status_finished_str);
+                    EZPI_core_scenes_status_change_broadcast(scene_node, scene_status_finished_str);
                 }
                 else
                 {
-                    ezlopi_scenes_status_change_broadcast(scene_node, scene_status_failed_str);
+                    EZPI_core_scenes_status_change_broadcast(scene_node, scene_status_failed_str);
                 }
             }
             else if (scene_node->else_block)
             {
                 if (1 == ezpi_execute_action_block(scene_node, scene_node->else_block))
                 {
-                    ezlopi_scenes_status_change_broadcast(scene_node, scene_status_finished_str);
+                    EZPI_core_scenes_status_change_broadcast(scene_node, scene_status_finished_str);
                 }
                 else
                 {
-                    ezlopi_scenes_status_change_broadcast(scene_node, scene_status_failed_str);
+                    EZPI_core_scenes_status_change_broadcast(scene_node, scene_status_failed_str);
                 }
             }
             else
             {
-                ezlopi_scenes_status_change_broadcast(scene_node, scene_status_failed_str);
+                EZPI_core_scenes_status_change_broadcast(scene_node, scene_status_failed_str);
             }
 
             vTaskDelay(10 / portTICK_RATE_MS);
@@ -207,7 +207,7 @@ uint32_t EZPI_scenes_service_run_by_id(uint32_t _id) // Run once
         }
         else
         {
-            ezlopi_scenes_status_change_broadcast(scene_node, scene_status_failed_str);
+            EZPI_core_scenes_status_change_broadcast(scene_node, scene_status_failed_str);
         }
     }
 
@@ -217,27 +217,27 @@ uint32_t EZPI_scenes_service_run_by_id(uint32_t _id) // Run once
 uint32_t EZPI_meshbot_execute_scene_else_action_group(uint32_t scene_id)
 {
     int ret = 0;
-    l_scenes_list_v2_t *scene_node = ezlopi_scenes_get_by_id_v2(scene_id);
+    l_scenes_list_v2_t *scene_node = EZPI_core_scenes_get_by_id_v2(scene_id);
     if (scene_node)
     {
         if (scene_node->else_block)
         {
-            ezlopi_scenes_status_change_broadcast(scene_node, scene_status_started_str);
+            EZPI_core_scenes_status_change_broadcast(scene_node, scene_status_started_str);
 
             if (1 == ezpi_execute_action_block(scene_node, scene_node->else_block))
             {
-                ezlopi_scenes_status_change_broadcast(scene_node, scene_status_finished_str);
+                EZPI_core_scenes_status_change_broadcast(scene_node, scene_status_finished_str);
             }
             else
             {
-                ezlopi_scenes_status_change_broadcast(scene_node, scene_status_failed_str);
+                EZPI_core_scenes_status_change_broadcast(scene_node, scene_status_failed_str);
                 ret = 1;
             }
         }
     }
     else
     {
-        ezlopi_scenes_status_change_broadcast(scene_node, scene_status_failed_str);
+        EZPI_core_scenes_status_change_broadcast(scene_node, scene_status_failed_str);
         ret = 1;
     }
 
@@ -246,7 +246,7 @@ uint32_t EZPI_meshbot_execute_scene_else_action_group(uint32_t scene_id)
 
 void EZPI_scenes_meshbot_init(void)
 {
-    l_scenes_list_v2_t *scene_node = ezlopi_scenes_get_scenes_head_v2();
+    l_scenes_list_v2_t *scene_node = EZPI_core_scenes_get_scene_head_v2();
     while (scene_node)
     {
         scene_node->status = EZLOPI_SCENE_STATUS_STOPPED;
@@ -285,7 +285,7 @@ PT_THREAD(ezpi_scene_proto_thread(l_scenes_list_v2_t *scene_node, uint32_t routi
 
         if (when_condition_node)
         {
-            f_scene_method_v2_t when_method = ezlopi_scene_get_method_v2(when_condition_node->block_options.method.type);
+            f_scene_method_v2_t when_method = EZPI_core_scenes_get_method_v2(when_condition_node->block_options.method.type);
             if (when_method)
             {
                 when_condition_returned = when_method(scene_node, (void *)when_condition_node);
@@ -296,9 +296,9 @@ PT_THREAD(ezpi_scene_proto_thread(l_scenes_list_v2_t *scene_node, uint32_t routi
                         ctx->stopped_cond = 0;
 
                         if (ctx->start_cond)
-                       {
+                        {
                             scene_node->executed_date = EZPI_CORE_sntp_get_current_time_sec(); // executed date/time when scene was activated
-                            ezlopi_scenes_status_change_broadcast(scene_node, scene_status_started_str);
+                            EZPI_core_scenes_status_change_broadcast(scene_node, scene_status_started_str);
                         }
 
                         l_action_block_v2_t *then_block_node = scene_node->then_block;
@@ -317,7 +317,7 @@ PT_THREAD(ezpi_scene_proto_thread(l_scenes_list_v2_t *scene_node, uint32_t routi
                                 then_block_node = ctx->action_node;
                             }
 
-                            f_scene_method_v2_t then_method = ezlopi_scene_get_method_v2(then_block_node->block_options.method.type);
+                            f_scene_method_v2_t then_method = EZPI_core_scenes_get_method_v2(then_block_node->block_options.method.type);
                             TRACE_D("then-method: %p", then_method);
                             if (then_method)
                             {
@@ -325,18 +325,18 @@ PT_THREAD(ezpi_scene_proto_thread(l_scenes_list_v2_t *scene_node, uint32_t routi
 
                                 if (then_block_node->next)
                                 {
-                                    ezlopi_scenes_status_change_broadcast(scene_node, scene_status_partially_finished_str);
+                                    EZPI_core_scenes_status_change_broadcast(scene_node, scene_status_partially_finished_str);
                                 }
                                 else
                                 {
-                                    ezlopi_scenes_status_change_broadcast(scene_node, scene_status_finished_str);
+                                    EZPI_core_scenes_status_change_broadcast(scene_node, scene_status_finished_str);
                                 }
 
                                 ctx->start_cond += 1;
                             }
                             else
                             {
-                                ezlopi_scenes_status_change_broadcast(scene_node, scene_status_failed_str);
+                                EZPI_core_scenes_status_change_broadcast(scene_node, scene_status_failed_str);
                             }
 
                             ctx->delay_ms = 10;
@@ -356,48 +356,48 @@ PT_THREAD(ezpi_scene_proto_thread(l_scenes_list_v2_t *scene_node, uint32_t routi
                     }
                 }
                 else if (ctx->stopped_cond < 2)
+                {
+                    l_action_block_v2_t *else_block_node = scene_node->else_block;
+                    while (else_block_node)
                     {
-                        l_action_block_v2_t *else_block_node = scene_node->else_block;
-                        while (else_block_node) 
+                        uint32_t delay_ms = (else_block_node->delay.days * (24 * 60 * 60) + else_block_node->delay.hours * (60 * 60) + else_block_node->delay.minutes * 60 + else_block_node->delay.seconds) * 1000;
+
+                        if (delay_ms)
                         {
-                            uint32_t delay_ms = (else_block_node->delay.days * (24 * 60 * 60) + else_block_node->delay.hours * (60 * 60) + else_block_node->delay.minutes * 60 + else_block_node->delay.seconds) * 1000;
-
-                            if (delay_ms)
-                            {
-                                ctx->delay_ms = delay_ms;
-                                ctx->action_node = else_block_node;
-
-                                ctx->curr_ticks = xTaskGetTickCount();
-                                PT_WAIT_UNTIL(&ctx->pt, (xTaskGetTickCount() - ctx->curr_ticks) > ctx->delay_ms);
-
-                                else_block_node = ctx->action_node;
-                            }
-
-                            f_scene_method_v2_t else_method = ezlopi_scene_get_method_v2(else_block_node->block_options.method.type);
-                            TRACE_D("else-method: %p", else_method);
-                            if (else_method)
-                            {
-                                else_method(scene_node, (void *)else_block_node);
-                            }
-
-                            ctx->delay_ms = 10;
+                            ctx->delay_ms = delay_ms;
                             ctx->action_node = else_block_node;
 
                             ctx->curr_ticks = xTaskGetTickCount();
                             PT_WAIT_UNTIL(&ctx->pt, (xTaskGetTickCount() - ctx->curr_ticks) > ctx->delay_ms);
 
                             else_block_node = ctx->action_node;
-                            else_block_node = else_block_node->next;
                         }
 
-                        if (1 == ctx->stopped_cond)
-                            { // avoid broadcasting twice when the 'scene' is in 'stop' conditon
-                                ezlopi_scenes_status_change_broadcast(scene_node, scene_status_stopped_str);
-                            } 
+                        f_scene_method_v2_t else_method = EZPI_core_scenes_get_method_v2(else_block_node->block_options.method.type);
+                        TRACE_D("else-method: %p", else_method);
+                        if (else_method)
+                        {
+                            else_method(scene_node, (void *)else_block_node);
+                        }
 
-                        ctx->stopped_cond += 1;
-                        ctx->start_cond = 0;
+                        ctx->delay_ms = 10;
+                        ctx->action_node = else_block_node;
+
+                        ctx->curr_ticks = xTaskGetTickCount();
+                        PT_WAIT_UNTIL(&ctx->pt, (xTaskGetTickCount() - ctx->curr_ticks) > ctx->delay_ms);
+
+                        else_block_node = ctx->action_node;
+                        else_block_node = else_block_node->next;
                     }
+
+                    if (1 == ctx->stopped_cond)
+                    { // avoid broadcasting twice when the 'scene' is in 'stop' conditon
+                        EZPI_core_scenes_status_change_broadcast(scene_node, scene_status_stopped_str);
+                    }
+
+                    ctx->stopped_cond += 1;
+                    ctx->start_cond = 0;
+                }
                 else
                 {
                     TRACE_D("Meshobot '%s' is Idle.", scene_node->name);
@@ -409,13 +409,30 @@ PT_THREAD(ezpi_scene_proto_thread(l_scenes_list_v2_t *scene_node, uint32_t routi
             }
 
             when_condition_node = when_condition_node->next;
+            // EZPI 442 =======
+            //         }
+            //         else if (EZLOPI_SCENE_STATUS_STOP == scene_node->status)
+            //         {
+            //             scene_node->status = EZLOPI_SCENE_STATUS_STOPPED;
+            //             EZPI_core_scenes_status_change_broadcast(scene_node, scene_status_stopped_str);
+
+            //             TRACE_E("here");
+            //             ezlopi_free(__FUNCTION__, scene_node->thread_ctx);
+            //             scene_node->thread_ctx = NULL;
+            //             if (ctx)
+            //             {
+            //                 TRACE_S("stopped_cond => %d", ctx->stopped_cond);
+            //             }
+            //             TRACE_E("here");
+            //             break;
+            // >>>>>>> EZPI 442
         }
     }
 
     if (EZLOPI_SCENE_STATUS_STOP == scene_node->status)
     {
         scene_node->status = EZLOPI_SCENE_STATUS_STOPPED;
-        ezlopi_scenes_status_change_broadcast(scene_node, scene_status_stopped_str);
+        EZPI_core_scenes_status_change_broadcast(scene_node, scene_status_stopped_str);
         break;
     }
 
@@ -427,7 +444,7 @@ PT_THREAD(ezpi_scene_proto_thread(l_scenes_list_v2_t *scene_node, uint32_t routi
 
 static void ezpi_scenes_loop(void *arg)
 {
-    l_scenes_list_v2_t *scene_node = ezlopi_scenes_get_scenes_head_v2();
+    l_scenes_list_v2_t *scene_node = EZPI_core_scenes_get_scene_head_v2();
 
     while (scene_node)
     {
@@ -509,7 +526,7 @@ static int ezpi_execute_action_block(l_scenes_list_v2_t *scene_node, l_action_bl
             vTaskDelay(delay_ms / portTICK_RATE_MS);
         }
 
-        f_scene_method_v2_t action_method = ezlopi_scene_get_method_v2(action_block->block_options.method.type);
+        f_scene_method_v2_t action_method = EZPI_core_scenes_get_method_v2(action_block->block_options.method.type);
         TRACE_D("action-method: %p", action_method);
 
         if (action_method)
@@ -520,7 +537,7 @@ static int ezpi_execute_action_block(l_scenes_list_v2_t *scene_node, l_action_bl
 
         if (NULL != action_block->next) // ((SCENE_BLOCK_TYPE_THEN == action_block->block_type))
         {
-            ezlopi_scenes_status_change_broadcast(scene_node, scene_status_partially_finished_str);
+            EZPI_core_scenes_status_change_broadcast(scene_node, scene_status_partially_finished_str);
         }
 
         action_block = action_block->next;

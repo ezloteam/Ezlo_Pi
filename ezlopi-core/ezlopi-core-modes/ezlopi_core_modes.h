@@ -52,13 +52,11 @@ typedef enum e_modes_alarm_status
 
 typedef struct s_house_modes // this resembles a category of 'mode'.
 {
+    const char *name;
+    char *description;
     uint32_t _id;                 // Numeric representation of the 'House-Mode'
     uint32_t switch_to_delay_sec; // represent a delay before switching to a perticular 'mode'.
     uint32_t alarm_delay_sec;     // Delay before sending alert if armed sensors (door/window or motion sensor) tripped .
-
-    const char *name;
-    char *description;
-
     bool armed;            // flag to indicate if the mode enters the alarmed mode. // Default values: [Home: false], [Away: true], [Night: true], [Vacation: true]
     bool protect;          // Enables or disables Ezlo Protect for a particular house mode. // Default values: [Home: false], [Away: true], [Night: true], [Vacation: true]
     bool disarmed_default; // if true ; utilize the disarmed devices.
@@ -156,6 +154,7 @@ s_house_modes_t *ezlopi_core_modes_get_house_mode_by_name(char *house_mode_name)
 s_ezlopi_modes_t *ezlopi_core_modes_get_custom_modes(void);
 s_house_modes_t *ezlopi_core_modes_get_current_house_modes(void);
 ezlopi_error_t ezlopi_core_modes_set_current_house_mode(s_house_modes_t *new_house_mode);
+ezlopi_error_t ezlopi_core_modes_set_unset_device_armed_status(cJSON *cj_device_array, const bool set);
 
 ezlopi_error_t ezlopi_core_modes_api_get_modes(cJSON *cj_result);
 ezlopi_error_t ezlopi_core_modes_api_get_current_mode(cJSON *cj_result);
@@ -163,27 +162,28 @@ ezlopi_error_t ezlopi_core_modes_api_switch_mode(s_house_modes_t *switch_to_hous
 ezlopi_error_t ezlopi_core_modes_api_cancel_switch(void);
 ezlopi_error_t ezlopi_core_modes_api_cancel_entry_delay(void);
 ezlopi_error_t ezlopi_core_modes_api_skip_entry_delay(void);
-ezlopi_error_t ezlopi_core_modes_set_switch_to_delay(uint32_t switch_to_delay);
-ezlopi_error_t ezlopi_core_modes_set_alarm_delay(uint32_t switch_to_delay);
-ezlopi_error_t ezlopi_core_modes_set_notifications(uint8_t modesId, bool all, cJSON *user_id_aray);
-ezlopi_error_t ezlopi_core_modes_set_disarmed_default(uint8_t modesID, bool disarmedDefault);
-ezlopi_error_t ezlopi_core_modes_set_unset_device_armed_status(cJSON *cj_device_array, const bool set);
-ezlopi_error_t ezlopi_core_modes_add_disarmed_device(uint8_t modeId, const char *device_id_str);
-ezlopi_error_t ezlopi_core_modes_remove_disarmed_device(uint8_t modeId, const char *device_id_str);
-ezlopi_error_t ezlopi_core_modes_set_protect(uint32_t mode_id, bool protect_state);
-ezlopi_error_t ezlopi_core_modes_protect_button_service_set(char *service_str, uint32_t deviceId, uint8_t *status);
-ezlopi_error_t ezlopi_core_modes_add_protect_devices(cJSON *user_id_aray);
-ezlopi_error_t ezlopi_core_modes_remove_protect_devices(cJSON *user_id_aray);
+ezlopi_error_t ezlopi_core_modes_api_set_switch_to_delay(uint32_t switch_to_delay);
+ezlopi_error_t ezlopi_core_modes_api_set_alarm_delay(uint32_t switch_to_delay);
+ezlopi_error_t ezlopi_core_modes_api_set_notifications(uint8_t modesId, bool all, cJSON *user_id_aray);
+ezlopi_error_t ezlopi_core_modes_api_set_disarmed_default(uint8_t modesID, bool disarmedDefault);
+ezlopi_error_t ezlopi_core_modes_api_add_disarmed_device(uint8_t modeId, const char *device_id_str);
+ezlopi_error_t ezlopi_core_modes_api_remove_disarmed_device(uint8_t modeId, const char *device_id_str);
+ezlopi_error_t ezlopi_core_modes_api_set_protect(uint32_t mode_id, bool protect_state);
+ezlopi_error_t ezlopi_core_modes_api_set_protect_button(char *service_str, uint32_t deviceId, uint8_t *status);
+ezlopi_error_t ezlopi_core_modes_api_add_protect_devices(cJSON *user_id_aray);
+ezlopi_error_t ezlopi_core_modes_api_remove_protect_devices(cJSON *user_id_aray);
 
-ezlopi_error_t ezlopi_core_modes_add_alarm_off(uint8_t mode_id, cJSON *device_id);
-ezlopi_error_t ezlopi_core_modes_remove_alarm_off(uint32_t mode_id, cJSON *device_id);
+ezlopi_error_t ezlopi_core_modes_api_add_alarm_off(uint8_t mode_id, const char *device_id);
+ezlopi_error_t ezlopi_core_modes_api_remove_alarm_off(uint32_t mode_id, const char *device_id);
+ezlopi_error_t ezlopi_core_modes_api_add_cameras_off(uint8_t modeId, const char *device_id_str);
+ezlopi_error_t ezlopi_core_modes_api_remove_cameras_off(uint8_t modeId, const char *device_id_str);
 
-ezlopi_error_t ezlopi_core_modes_bypass_device_add(uint8_t modeId, cJSON *cj_device_id_array);
-ezlopi_error_t ezlopi_core_modes_bypass_device_remove(uint8_t modeId, cJSON *cj_device_id_array);
+ezlopi_error_t ezlopi_core_modes_api_bypass_device_add(uint8_t modeId, cJSON *cj_device_id_array);
+ezlopi_error_t ezlopi_core_modes_api_bypass_device_remove(uint8_t modeId, cJSON *cj_device_id_array);
 
 ezlopi_error_t ezlopi_core_modes_cjson_get_current_mode(cJSON *cj_result);
-ezlopi_error_t ezlopi_core_modes_set_entry_delay(uint32_t normal_sec, uint32_t extended_sec, uint32_t long_extended_sec, uint32_t instant_sec);
-ezlopi_error_t ezlopi_core_modes_reset_entry_delay(void);
+ezlopi_error_t ezlopi_core_modes_api_set_entry_delay(uint32_t normal_sec, uint32_t extended_sec, uint32_t long_extended_sec, uint32_t instant_sec);
+ezlopi_error_t ezlopi_core_modes_api_reset_entry_delay(void);
 
 ///
 cJSON *ezlopi_core_modes_cjson_changed(void);

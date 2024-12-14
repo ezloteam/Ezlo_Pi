@@ -1,5 +1,5 @@
-#ifndef __EZLOPI_CLOUD_KEYWORDS_H__
-#define __EZLOPI_CLOUD_KEYWORDS_H__
+#ifndef __EZLOPI_CLOUD_KEYWORDS_H__hfgdhdfg
+#define __EZLOPI_CLOUD_KEYWORDS_H__hfgdhdfg
 
 #include "stdio.h"
 
@@ -13,12 +13,15 @@ extern const char *ezlopi_id_str;
 extern const char *ezlopi_ids_str;
 extern const char *ezlopi__id_str;
 extern const char *ezlopi_deviceId_str;
+extern const char *ezlopi_itemId_str;
 extern const char *ezlopi_device_ids_str;
 extern const char *ezlopi_sender_str;
 extern const char *ezlopi_name_str;
+extern const char *ezlopi_user_str;
 extern const char *ezlopi_value_str;
 extern const char *ezlopi_method_str;
 extern const char *ezlopi_function_str;
+extern const char *ezlopi_ruleTrigger_str;
 extern const char *ezlopi_msg_id_str; // message counter, number of data transferred to ezlopi-cloud
 extern const char *ezlopi_msg_subclass_str;
 extern const char *ezlopi_ui_broadcast_str;
@@ -35,11 +38,14 @@ extern const char *ezlopi_syncNotification_str;
 extern const char *ezlopi_room_id_str;
 extern const char *ezlopi_room_name_str;
 extern const char *ezlopi_error_str;
+extern const char *ezlopi_expression_str;
 extern const char *ezlopi_expressions_str;
 extern const char *ezlopi_is_group_str;
 extern const char *ezlopi_user_notifications_str;
 extern const char *ezlopi_house_modes_str;
 extern const char *ezlopi_block_enable_str;
+extern const char *ezlopi_block_str;
+extern const char *ezlopi_blocks_str;
 extern const char *ezlopi_blockId_str;
 extern const char *ezlopi_blockOptions_str;
 extern const char *ezlopi_blockName_str;
@@ -53,7 +59,11 @@ extern const char *ezlopi_enabled_str;
 extern const char *ezlopi_enable_str;
 extern const char *ezlopi_group_id_str;
 extern const char *ezlopi_parent_id_str;
+extern const char *ezlopi_group_str;
+extern const char *ezlopi_scene_str;
 extern const char *ezlopi_then_str;
+extern const char *ezlopi_thenGroup_str;
+extern const char *ezlopi_thenGroups_str;
 extern const char *ezlopi_else_str;
 extern const char *ezlopi_hasGetter_str;
 extern const char *ezlopi_hasSetter_str;
@@ -83,6 +93,7 @@ extern const char *ezlopi_ready_str;
 extern const char *ezlopi_not_ready_str;
 extern const char *ezlopi_settings_str;
 extern const char *ezlopi_valueType_str;
+extern const char *ezlopi_valueTypeFamily_str;
 extern const char *ezlopi_metadata_str;
 extern const char *ezlopi_meta_str;
 extern const char *ezlopi_code_str;
@@ -101,6 +112,7 @@ extern const char *ezlopi_firmware_type_str;
 extern const char *ezlopi_deviceTypeId_str;
 extern const char *ezlopi_parentDeviceId_str;
 extern const char *ezlopi_category_str;
+extern const char *ezlopi_categories_str;
 extern const char *ezlopi_subcategory_str;
 extern const char *ezlopi_gatewayId_str;
 extern const char *ezlopi_batteryPowered_str;
@@ -126,7 +138,10 @@ extern const char *ezlopi_has_setter_str;
 extern const char *ezlopi_scale_str;
 extern const char *ezlopi_value_type_str;
 extern const char *ezlopi_device_id_str;
-extern const char *ezlopi_None_str;
+extern const char *ezlopi_none_str;
+extern const char *ezlopi_role_str;
+extern const char *ezlopi_lifeSafety_str;
+
 extern const char *ezlopi_device_type_id_str;
 extern const char *ezlopi_parent_device_id_str;
 extern const char *ezlopi_manufacturer_str;
@@ -159,6 +174,7 @@ extern const char *ezlopi_showValue_str;
 extern const char *ezlopi_deviceName_str;
 extern const char *ezlopi_items_str;
 extern const char *ezlopi_itemName_str;
+extern const char *ezlopi_itemNames_str;
 extern const char *ezlopi_device_item_names_str;
 extern const char *ezlopi_variable_str;
 extern const char *ezlopi_names_str;
@@ -180,10 +196,10 @@ extern const char *ezlopi_build_date_str;
 extern const char *ezlopi_unknown_str;
 extern const char *ezlopi_manufacturer_name_str;
 extern const char *ezlopi_build_str;
-const char *ezlopi_firmware_build_str;
+extern const char *ezlopi_firmware_build_str;
 extern const char *ezlopi_chip_str;
 extern const char *ezlopi_provisioned_status_str;
-const char *ezlopi_provisioned_str;
+extern const char *ezlopi_provisioned_str;
 extern const char *ezlopi_model_number_str;
 extern const char *ezlopi_serial_str;
 extern const char *ezlopi_uuid_provisioning_str;
@@ -201,12 +217,14 @@ extern const char *ezlopi_total_len_str;
 extern const char *ezlopi_sequence_str;
 extern const char *ezlopi_user_id_str;
 extern const char *ezlopi_userId_str;
+extern const char *ezlopi_userIds_str;
 extern const char *ezlopi_coinfig_time_str;
 extern const char *ezlopi_wifi_password_str;
 extern const char *ezlopi_ca_cert_str;
 extern const char *ezlopi_config_id_str;
 extern const char *ezlopi_config_time_str;
 extern const char *ezlopi_ssid_str;
+extern const char *ezlopi_key_str;
 extern const char *ezlopi_dev_type_ezlopi_str;
 extern const char *ezlopi_flash_size_str;
 extern const char *ezlopi_dev_free_flash_str;
@@ -257,6 +275,7 @@ extern const char *ezlopi_no_str;
 extern const char *ezlopi_idle_str;
 extern const char *ezlopi_is_active_str;
 
+extern const char *ezlopi_timezone_str;
 extern const char *ezlopi_location_str;
 extern const char *ezlopi_locations_str;
 extern const char *ezlopi_custom_timezone_str;
@@ -270,6 +289,14 @@ extern const char *ezlopi_timeIsLeftToAlarm_str;
 extern const char *ezlopi_switchToDelay_str;
 extern const char *ezlopi_alarmDelay_str;
 extern const char *ezlopi_entryDelay_str;
+extern const char *ezlopi_pendingDelay_str;
+extern const char *ezlopi_phase_str;
+extern const char *ezlopi_bypass_str;
+extern const char *ezlopi_main_str;
+extern const char *ezlopi_done_str;
+extern const char *ezlopi_begin_str;
+extern const char *ezlopi_canceled_str;
+extern const char *ezlopi_changed_str;
 extern const char *ezlopi_normal_str;
 extern const char *ezlopi_long_extended_str;
 extern const char *ezlopi_extended_str;
@@ -281,11 +308,21 @@ extern const char *ezlopi_maximum_str;
 extern const char *ezlopi_modes_str;
 extern const char *ezlopi_disarmedDefault_str;
 extern const char *ezlopi_disarmedDevices_str;
+extern const char *ezlopi_alarmsOffDevice_str;
 extern const char *ezlopi_alarmsOffDevices_str;
 extern const char *ezlopi_camerasOffDevices_str;
 extern const char *ezlopi_bypassDevices_str;
 extern const char *ezlopi_protect_str;
 extern const char *ezlopi_devices_str;
+extern const char *ezlopi_deviceGroup_str;
+extern const char *ezlopi_deviceGroups_str;
+extern const char *ezlopi_deviceGroupIds_str;
+extern const char *ezlopi_deviceGroupId_str;
+extern const char *ezlopi_itemGroup_str;
+extern const char *ezlopi_itemGroupId_str;
+extern const char *ezlopi_showItems_str;
+extern const char *ezlopi_deviceFlag_str;
+
 extern const char *ezlopi_alarms_str;
 extern const char *ezlopi_cameras_str;
 extern const char *ezlopi_protectButtons_str;
@@ -299,6 +336,7 @@ extern const char *ezlopi_Away_str;
 extern const char *ezlopi_Night_str;
 extern const char *ezlopi_Vacation_str;
 extern const char *ezlopi_houseMode_str;
+extern const char *ezlopi_disarmedDevice_str;
 
 extern const char *ezlopi_client_id_str;
 extern const char *ezlopi_source_str;
@@ -346,4 +384,82 @@ extern const char *ezlopi_flow_control_str;
 extern const char *ezlopi_chipset_str;
 extern const char *ezlopi_internet_str;
 extern const char *ezlopi_local_key_str;
+
+extern const char *ezlopi_fwTimestampMs_str;
+extern const char *ezlopi_followEntry_str;
+extern const char *ezlopi_packageId_str;
+extern const char *ezlopi_favorites_str;
+extern const char *ezlopi_exceptions_str;
+extern const char *ezlopi_silent_str;
+extern const char *ezlopi_empty_str;
+extern const char *ezlopi_switchToDelayRunsOut_str;
+extern const char *ezlopi_interfaceId_str;
+extern const char *ezlopi_wlan0_str;
+extern const char *ezlopi_process_str;
+extern const char *ezlopi_networks_str;
+
+extern const char *ezlopi_latch_str;
+extern const char *ezlopi_for_str;
+extern const char *ezlopi_repeat_str;
+extern const char *ezlopi_follow_str;
+extern const char *ezlopi_pulse_str;
+extern const char *ezlopi_state_str;
+
+extern const char *ezlopi_connected_str;
+extern const char *ezlopi_disconnected_str;
+extern const char *ezlopi_notbetween_str;
+extern const char *ezlopi_any_result_str;
+extern const char *ezlopi_scene_enabled_str;
+extern const char *ezlopi_scene_disabled_str;
+extern const char *ezlopi_operation_str;
+
+extern const char *ezlopi_sunrise_str;
+extern const char *ezlopi_sunset_str;
+extern const char *ezlopi_weekdays_str;
+extern const char *ezlopi_weeks_str;
+extern const char *ezlopi_days_str;
+extern const char *ezlopi_range_str;
+
+extern const char *ezlopi_startTime_str;
+extern const char *ezlopi_startDay_str;
+extern const char *ezlopi_startMonth_str;
+extern const char *ezlopi_startYear_str;
+extern const char *ezlopi_endTime_str;
+extern const char *ezlopi_endDay_str;
+extern const char *ezlopi_endMonth_str;
+extern const char *ezlopi_endYear_str;
+
+extern const char *ezlopi_hours_str;
+extern const char *ezlopi_minutes_str;
+extern const char *ezlopi_seconds_str;
+extern const char *ezlopi_at_str;
+extern const char *ezlopi_after_str;
+extern const char *ezlopi_before_str;
+
+extern const char *ezlopi_day_str;
+extern const char *ezlopi_month_str;
+extern const char *ezlopi_year_str;
+extern const char *ezlopi_intime_str;
+extern const char *ezlopi_time_str;
+extern const char *ezlopi_times_str;
+extern const char *ezlopi_timeScenes_str;
+extern const char *ezlopi_httpAnswerCode_str;
+
+
+extern const char *ezlopi_less_str;
+extern const char *ezlopi_least_str;
+
+extern const char *ezlopi_start_str;
+extern const char *ezlopi_finish_str;
+extern const char *ezlopi_blockMeta_str;
+
+extern const char *ezlopi_sceneName_str;
+extern const char *ezlopi_methodName_str;
+extern const char *ezlopi_executionDate_str;
+
+extern const char *ezlopi_when_category_time_str;
+extern const char *ezlopi_when_category_modes_str;
+extern const char *ezlopi_when_category_logic_str;
+extern const char *ezlopi_when_category_function_str;
+
 #endif // __EZLOPI_CLOUD_KEYWORDS_H__

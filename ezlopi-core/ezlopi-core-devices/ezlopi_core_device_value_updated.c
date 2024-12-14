@@ -138,15 +138,15 @@ int ezlopi_setting_value_updated_from_device_settings_id_v3(uint32_t setting_id)
 
     // if (setting)
     {
-        l_ezlopi_device_t* curr_device = ezlopi_device_get_head();
+        l_ezlopi_device_t *curr_device = ezlopi_device_get_head();
         while (curr_device)
         {
-            l_ezlopi_device_settings_v3_t* curr_setting = curr_device->settings;
+            l_ezlopi_device_settings_v3_t *curr_setting = curr_device->settings;
             while (curr_setting)
             {
                 if (setting_id == curr_setting->cloud_properties.setting_id)
                 {
-                    cJSON* cj_response = __broadcast_message_settings_updated_from_devices_v3(curr_device, curr_setting);
+                    cJSON *cj_response = __broadcast_message_settings_updated_from_devices_v3(curr_device, curr_setting);
                     CJSON_TRACE("----------------- broadcasting - cj_response", cj_response);
                     ret = ezlopi_core_broadcast_add_to_queue(cj_response);
 
@@ -178,11 +178,11 @@ ezlopi_error_t ezlopi_core_device_value_update_wifi_scan_broadcast(cJSON *networ
             cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, method_hub_network_wifi_scan_progress);
             // cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_msg_id_str, EZPI_service_web_provisioning_get_message_count());
 
-            cJSON *result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, "result");
+            cJSON *result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
             if (result)
             {
-                cJSON_AddStringToObject(__FUNCTION__, result, "interfaceId", "wlan0");
-                cJSON_AddStringToObject(__FUNCTION__, result, "status", "process");
+                cJSON_AddStringToObject(__FUNCTION__, result, ezlopi_interfaceId_str, ezlopi_wlan0_str);
+                cJSON_AddStringToObject(__FUNCTION__, result, ezlopi_status_str, "process");
                 cJSON_AddItemToObject(__FUNCTION__, result, "networks", network_array);
             }
 

@@ -90,7 +90,7 @@ static void __ezlopi_service_remove_alert_node_by_name(const char *_name_)
         l_modes_alert_t *curr_node = _alert_head;
         while (curr_node)
         {
-            if ((curr_node->u_id_str) && (EZPI_STRNCMP_IF_EQUAL(curr_node->u_id_str, _name_, strlen(curr_node->u_id_str), strlen(_name_))))
+            if ((curr_node->u_id_str) && (EZPI_STRNCMP_IF_EQUAL(curr_node->u_id_str, _name_, strlen(curr_node->u_id_str) + 1, strlen(_name_) + 1)))
             {
                 __ezlopi_service_remove_alert_node(curr_node);
                 break;
@@ -215,7 +215,7 @@ static bool __check_if_devid_in_alarm_off(s_house_modes_t *curr_house_mode, cons
         cJSON *cj_alarm_off = NULL;
         cJSON_ArrayForEach(cj_alarm_off, curr_house_mode->cj_alarms_off_devices) // 'alarm_devid' should not be here
         {
-            if (EZPI_STRNCMP_IF_EQUAL(device_id_str, cj_alarm_off->valuestring, strlen(device_id_str), cj_alarm_off->str_value_len))
+            if (EZPI_STRNCMP_IF_EQUAL(device_id_str, cj_alarm_off->valuestring, strlen(device_id_str) + 1, cj_alarm_off->str_value_len))
             {
                 ret = true;
                 break;
@@ -247,7 +247,7 @@ static bool __check_if_device_is_bypassed(cJSON *cj_bypass_devices, const char *
         cJSON *cj_bypass = NULL;
         cJSON_ArrayForEach(cj_bypass, cj_bypass_devices)
         {
-            if (EZPI_STRNCMP_IF_EQUAL(device_id_str, cj_bypass->valuestring, strlen(device_id_str), cj_bypass->str_value_len))
+            if (EZPI_STRNCMP_IF_EQUAL(device_id_str, cj_bypass->valuestring, strlen(device_id_str) + 1, cj_bypass->str_value_len))
             {
                 ret = true;
 

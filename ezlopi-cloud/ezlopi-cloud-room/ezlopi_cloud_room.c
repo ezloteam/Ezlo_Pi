@@ -31,9 +31,7 @@ void room_get(cJSON *cj_request, cJSON *cj_response)
         cJSON *cj_result = cJSON_AddArrayToObject(__FUNCTION__, cj_response, ezlopi_result_str);
         if (cj_result)
         {
-            // int idx = 0;
             cJSON *cj_room_id = NULL;
-            // while (NULL != (cj_room_id = cJSON_GetArrayItem(cj_params, idx++)))
             cJSON_ArrayForEach(cj_room_id, cj_params)
             {
                 uint32_t room_id = strtoul(cj_room_id->valuestring, NULL, 16);

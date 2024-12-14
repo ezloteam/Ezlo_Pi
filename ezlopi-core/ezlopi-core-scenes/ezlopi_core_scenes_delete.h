@@ -36,24 +36,13 @@
  * @date    12th DEC 2024
 */
 
-#ifndef __HEADER_H__
-#define __HEADER_H__
+#ifndef _EZLOPI_CORE_DELETE_H_
+#define _EZLOPI_CORE_DELETE_H_
 
 /*******************************************************************************
 *                          Include Files
 *******************************************************************************/
-/**
-* Include Sequence
-* 1. C standard libraries eg. stdint, string etc.
-* 2. Third party component eg. cJSON, freeRTOS etc etc
-* 3. ESP-IDF specific eg. driver/gpio, esp_log etc.
-* 4. EzloPi HAL specific eg ezlopi_hal_i2c
-* 5. EzloPi core specific eg. ezlopi_core_ble
-* 6. EzloPi cloud specific eg. ezlopi_cloud_items
-* 7. EzloPi Service specific eg ezlopi_service_ble
-* 8. EzloPi Sensors and Device Specific eg. ezlopi_device_0001_digitalout_generic
-*/
-#include "header.h"
+#include "ezlopi_core_scenes_v2_type_declaration.h"
 
 /*******************************************************************************
 *                          C++ Declaration Wrapper
@@ -74,23 +63,49 @@ extern "C"
     /*******************************************************************************
     *                          Extern Function Prototypes
     *******************************************************************************/
+       //--------------SCENE_DELETE--------------------------------------------------------
     /**
-    * @brief Global function template example
-    * Convention : Use capital letter for initial word on extern function
-    * maincomponent : Main component as hal, core, service etc.
-    * subcomponent : Sub component as i2c from hal, ble from service etc
-    * functiontitle : Title of the function
-    * eg : EZPI_hal_i2c_init()
-    * @param arg
-    *
-    */
-    void EZPI_maincomponent_subcomponent_functiontitle(type_t arg);
+     * @brief This function is used to delete a node from 'scene_linked_list'
+     *
+     * @param scenes_list Pointer to a scene-node.
+     */
+    void EZPI_scenes_delete(l_scenes_list_v2_t *scenes_list);
+    /**
+     * @brief This function deletes 'field_block' from the scene_node.
+     *
+     * @param field Pointer to the 'field_block' of a scene-node.
+     */
+    void EZPI_scenes_delete_field_value(l_fields_v2_t *field);
+    /**
+     * @brief This function deletes 'when_blocks' from the scene_node.
+     *
+     * @param when_blocks Pointer to the 'when_blocks' of a scene-node.
+     */
+    void EZPI_scenes_delete_when_blocks(l_when_block_v2_t *when_blocks);
+    /**
+     * @brief This function deletes 'house_modes' from the scene_node.
+     *
+     * @param house_modes Pointer to the 'house_modes' of a scene-node.
+     */
+    void EZPI_scenes_delete_house_modes(l_house_modes_v2_t *house_modes);
+    /**
+     * @brief This function deletes 'action_blocks' from the scene_node.
+     *
+     * @param action_blocks Pointer to the 'action_blocks' of a scene-node.
+     */
+    void EZPI_scenes_delete_action_blocks(l_action_block_v2_t *action_blocks);
+    /**
+     * @brief This function deletes 'user_notifications' from the scene_node.
+     *
+     * @param user_notifications Pointer to the 'user_notifications' of a scene-node.
+     */
+    void EZPI_scenes_delete_user_notifications(l_user_notification_v2_t *user_notifications);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // __HEADER_H__
+#endif // _EZLOPI_CORE_DELETE_H_
 
 /*******************************************************************************
 *                          End of File

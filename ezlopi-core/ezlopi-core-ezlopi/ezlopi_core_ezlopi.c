@@ -85,9 +85,9 @@ void ezlopi_init(void)
     ezlopi_room_init();
 
 #if defined(CONFIG_EZPI_SERV_ENABLE_MESHBOTS)
-    ezlopi_scenes_scripts_init();
-    ezlopi_scenes_expressions_init();
-    ezlopi_scenes_init_v2();
+    EZPI_scenes_scripts_init();
+    EZPI_scenes_expressions_init();
+    EZPI_scenes_init_v2();
 #endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 #if defined(CONFIG_EZPI_CORE_ENABLE_ETH)

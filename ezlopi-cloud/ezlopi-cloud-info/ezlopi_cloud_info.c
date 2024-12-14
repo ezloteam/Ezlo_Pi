@@ -37,32 +37,32 @@ void info_get(cJSON* cj_request, cJSON* cj_response)
         cJSON_AddBoolToObject(__FUNCTION__, cjson_result, "offlineAnonymousAccess", true);
         cJSON_AddBoolToObject(__FUNCTION__, cjson_result, "offlineInsecureAccess", true);
 
-        cJSON* cjson_location = cJSON_AddObjectToObject(__FUNCTION__, cjson_result, "location");
+        cJSON* cjson_location = cJSON_AddObjectToObject(__FUNCTION__, cjson_result, ezlopi_location_str);
         if (cjson_location)
         {
-            cJSON_AddNumberToObject(__FUNCTION__, cjson_location, "latitude", ezlopi_cloud_get_latitude());
-            cJSON_AddNumberToObject(__FUNCTION__, cjson_location, "longitude", ezlopi_cloud_get_longitude());
+            cJSON_AddNumberToObject(__FUNCTION__, cjson_location, ezlopi_latitude_str, ezlopi_cloud_get_latitude());
+            cJSON_AddNumberToObject(__FUNCTION__, cjson_location, ezlopi_longitude_str, ezlopi_cloud_get_longitude());
             char* location = EZPI_CORE_sntp_get_location();
             if (location)
             {
-                cJSON_AddStringToObject(__FUNCTION__, cjson_location, "timezone", location);
-                cJSON_AddStringToObject(__FUNCTION__, cjson_location, "state", ezlopi_custom_timezone_str);
+                cJSON_AddStringToObject(__FUNCTION__, cjson_location, ezlopi_timezone_str, location);
+                cJSON_AddStringToObject(__FUNCTION__, cjson_location, ezlopi_state_str, ezlopi_custom_timezone_str);
                 ezlopi_free(__FUNCTION__, location);
             }
             else
             {
-                cJSON_AddStringToObject(__FUNCTION__, cjson_location, "timezone", ezlopi_gmt0_str);
-                cJSON_AddStringToObject(__FUNCTION__, cjson_location, "state", ezlopi_default_str);
+                cJSON_AddStringToObject(__FUNCTION__, cjson_location, ezlopi_timezone_str, ezlopi_gmt0_str);
+                cJSON_AddStringToObject(__FUNCTION__, cjson_location, ezlopi_state_str, ezlopi_default_str);
             }
         }
 
-        cJSON* cjson_build = cJSON_AddObjectToObject(__FUNCTION__, cjson_result, "build");
+        cJSON* cjson_build = cJSON_AddObjectToObject(__FUNCTION__, cjson_result, ezlopi_build_str);
         if (cjson_build)
         {
             {
                 char build_time[64];
                 EZPI_CORE_sntp_epoch_to_iso8601(build_time, sizeof(build_time), (time_t)BUILD_DATE);
-                cJSON_AddStringToObject(__FUNCTION__, cjson_build, "time", build_time);
+                cJSON_AddStringToObject(__FUNCTION__, cjson_build, ezlopi_time_str, build_time);
             }
 
             cJSON_AddStringToObject(__FUNCTION__, cjson_build, "builder", DEVELOPER);

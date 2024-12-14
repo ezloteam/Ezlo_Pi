@@ -336,8 +336,8 @@ static void ezpi_service_ble_chip_info(esp_gatt_value_t *value, esp_ble_gatts_cb
             char chip_revision[10];
             esp_chip_info(&chip_info);
             sprintf(chip_revision, "%.2f", (float)(chip_info.full_revision / 100.0));
-            cJSON_AddStringToObject(__FUNCTION__, cj_chip, "type", EZPI_CORE_info_get_chip_type_to_name(chip_info.model));
-            cJSON_AddStringToObject(__FUNCTION__, cj_chip, "version", chip_revision);
+            cJSON_AddStringToObject(__FUNCTION__, cj_chip, ezlopi_type_str, EZPI_CORE_info_get_chip_type_to_name(chip_info.model));
+            cJSON_AddStringToObject(__FUNCTION__, cj_chip, ezlopi_version_str, chip_revision);
             ble_device_info_send_data(cj_chip, value, param);
             cJSON_Delete(__FUNCTION__, cj_chip);
         }
@@ -360,7 +360,7 @@ static void ezpi_service_ble_firmware_sdk_info(esp_gatt_value_t *value, esp_ble_
         if (cj_firmware_sdk)
         {
             cJSON_AddStringToObject(__FUNCTION__, cj_firmware_sdk, "name", "ESP-IDF");
-            cJSON_AddStringToObject(__FUNCTION__, cj_firmware_sdk, "version", esp_get_idf_version());
+            cJSON_AddStringToObject(__FUNCTION__, cj_firmware_sdk, ezlopi_version_str, esp_get_idf_version());
             ble_device_info_send_data(cj_firmware_sdk, value, param);
             cJSON_Delete(__FUNCTION__, cj_firmware_sdk);
         }

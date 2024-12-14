@@ -24,7 +24,7 @@ void scenes_expressions_delete(cJSON *cj_request, cJSON *cj_response)
             cJSON *cj_expression_name = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_name_str);
             if (cj_expression_name && cj_expression_name->valuestring)
             {
-                ezlopi_scenes_expressions_delete_by_name(cj_expression_name->valuestring);
+                EZPI_scenes_expressions_delete_by_name(cj_expression_name->valuestring);
             }
         }
     }
@@ -45,7 +45,7 @@ void scenes_expressions_list(cJSON *cj_request, cJSON *cj_response)
                 cJSON *cj_expressions_array = cJSON_AddArrayToObject(__FUNCTION__, cj_result, ezlopi_expressions_str);
                 if (cj_expressions_array)
                 {
-                    ezlopi_scenes_expressions_list_cjson(cj_expressions_array, cj_params);
+                    EZPI_scenes_expressions_list_cjson(cj_expressions_array, cj_params);
                 }
             }
         }
@@ -62,17 +62,17 @@ void scenes_expressions_set(cJSON *cj_request, cJSON *cj_response)
         if (cj_params)
         {
             // CJSON_TRACE("expressions params", cj_params);
-            cJSON* cj_name = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_name_str);
+            cJSON *cj_name = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_name_str);
             if (cj_name && cj_name->valuestring)
             {
-                s_ezlopi_expressions_t* curr_expn_node = ezlopi_scenes_expression_get_by_name(cj_name->valuestring);
+                s_ezlopi_expressions_t *curr_expn_node = EZPI_scenes_expression_get_by_name(cj_name->valuestring);
                 if (NULL != curr_expn_node)
                 {
-                    ezlopi_scenes_expression_update_expr(curr_expn_node, cj_params);
+                    EZPI_scenes_expressions_update_expr(curr_expn_node, cj_params);
                 }
                 else
                 {
-                    ezlopi_scenes_expressions_add_to_head(0, cj_params);
+                    EZPI_scenes_expressions_add_to_head(0, cj_params);
                 }
             }
         }
@@ -83,9 +83,9 @@ void scenes_expressions_set(cJSON *cj_request, cJSON *cj_response)
 //                  EXPRESSION UPDATERS
 //-----------------------------------------------------------------------------------------------------------
 
-static void ____common_part_of_scenes_expressions_added_and_changed(cJSON* cj_request, cJSON* cj_response)
+static void ____common_part_of_scenes_expressions_added_and_changed(cJSON *cj_request, cJSON *cj_response)
 {
-    cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+    cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     if (cj_result)
     {
         cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);

@@ -21,28 +21,28 @@
 
 typedef struct s_data_source_n_target_object
 {
-    char* types;
-    char* field;
+    char *types;
+    char *field;
 } s_data_source_n_target_object_t;
 
-static void __value_types_list(char* list_name, cJSON* cj_result);
-static void __scalable_value_types_list(char* list_name, cJSON* cj_result);
-static void __value_scales_list(char* list_name, cJSON* cj_result);
-static void __scenes_value_types_list(char* list_name, cJSON* cj_result);
-static void __value_types_families_list(char* list_name, cJSON* cj_result);
-static void __comparison_operators_list(char* list_name, cJSON* cj_result);
-static void __comparison_methods_list(char* list_name, cJSON* cj_result);
-static void __action_methods_list(char* list_name, cJSON* cj_result);
-static void __advanced_scenes_version_list(char* list_name, cJSON* cj_result);
+static void __value_types_list(char *list_name, cJSON *cj_result);
+static void __scalable_value_types_list(char *list_name, cJSON *cj_result);
+static void __value_scales_list(char *list_name, cJSON *cj_result);
+static void __scenes_value_types_list(char *list_name, cJSON *cj_result);
+static void __value_types_families_list(char *list_name, cJSON *cj_result);
+static void __comparison_operators_list(char *list_name, cJSON *cj_result);
+static void __comparison_methods_list(char *list_name, cJSON *cj_result);
+static void __action_methods_list(char *list_name, cJSON *cj_result);
+static void __advanced_scenes_version_list(char *list_name, cJSON *cj_result);
 
-static void __add_data_src_dest_array_to_object(cJSON* cj_method, char* array_name, const s_data_source_n_target_object_t* data_list);
+static void __add_data_src_dest_array_to_object(cJSON *cj_method, char *array_name, const s_data_source_n_target_object_t *data_list);
 
-void scenes_block_data_list(cJSON* cj_request, cJSON* cj_response)
+void scenes_block_data_list(cJSON *cj_request, cJSON *cj_response)
 {
     typedef struct s_block_data_list_collector
     {
-        char* key_string;
-        void (*func)(char* list_name, cJSON* result);
+        char *key_string;
+        void (*func)(char *list_name, cJSON *result);
     } s_block_data_list_collector_t;
 
     static const s_block_data_list_collector_t block_data_list_collector[] = {
@@ -60,16 +60,16 @@ void scenes_block_data_list(cJSON* cj_request, cJSON* cj_response)
 
     if (cj_request && cj_response)
     {
-        cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
+        cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
         if (cj_params)
         {
-            cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+            cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
             if (cj_result)
             {
                 uint32_t idx = 0;
                 while (block_data_list_collector[idx].func)
                 {
-                    cJSON* cj_value = cJSON_GetObjectItem(__FUNCTION__, cj_params, block_data_list_collector[idx].key_string);
+                    cJSON *cj_value = cJSON_GetObjectItem(__FUNCTION__, cj_params, block_data_list_collector[idx].key_string);
                     if (cj_value && (cj_value->type == cJSON_True))
                     {
                         block_data_list_collector[idx].func(block_data_list_collector[idx].key_string, cj_result);
@@ -82,25 +82,25 @@ void scenes_block_data_list(cJSON* cj_request, cJSON* cj_response)
     }
 }
 
-static void __value_types_list(char* list_name, cJSON* cj_result)
+static void __value_types_list(char *list_name, cJSON *cj_result)
 {
     if (cj_result && list_name)
     {
-        cJSON* cj_value_types = cJSON_AddObjectToObject(__FUNCTION__, cj_result, list_name);
+        cJSON *cj_value_types = cJSON_AddObjectToObject(__FUNCTION__, cj_result, list_name);
         if (cj_value_types)
         {
-            cJSON* cj_value_array = cJSON_AddArrayToObject(__FUNCTION__, cj_value_types, "list");
+            cJSON *cj_value_array = cJSON_AddArrayToObject(__FUNCTION__, cj_value_types, "list");
             if (cj_value_array)
             {
-                l_ezlopi_device_t* devices = ezlopi_device_get_head();
+                l_ezlopi_device_t *devices = ezlopi_device_get_head();
                 while (devices)
                 {
-                    l_ezlopi_item_t* items = devices->items;
+                    l_ezlopi_item_t *items = devices->items;
                     while (items)
                     {
                         if (NULL == items->cloud_properties.scale)
                         {
-                            cJSON* cj_item_value_type = cJSON_CreateString(__FUNCTION__, items->cloud_properties.value_type);
+                            cJSON *cj_item_value_type = cJSON_CreateString(__FUNCTION__, items->cloud_properties.value_type);
                             if (cj_item_value_type)
                             {
                                 if (!cJSON_AddItemToArray(cj_value_array, cj_item_value_type))
@@ -118,25 +118,25 @@ static void __value_types_list(char* list_name, cJSON* cj_result)
     }
 }
 
-static void __scalable_value_types_list(char* list_name, cJSON* cj_result)
+static void __scalable_value_types_list(char *list_name, cJSON *cj_result)
 {
     if (cj_result && list_name)
     {
-        cJSON* cj_value_types = cJSON_AddObjectToObject(__FUNCTION__, cj_result, list_name);
+        cJSON *cj_value_types = cJSON_AddObjectToObject(__FUNCTION__, cj_result, list_name);
         if (cj_value_types)
         {
-            cJSON* cj_value_array = cJSON_AddArrayToObject(__FUNCTION__, cj_value_types, "list");
+            cJSON *cj_value_array = cJSON_AddArrayToObject(__FUNCTION__, cj_value_types, "list");
             if (cj_value_array)
             {
-                l_ezlopi_device_t* devices = ezlopi_device_get_head();
+                l_ezlopi_device_t *devices = ezlopi_device_get_head();
                 while (devices)
                 {
-                    l_ezlopi_item_t* items = devices->items;
+                    l_ezlopi_item_t *items = devices->items;
                     while (items)
                     {
                         if (items->cloud_properties.scale)
                         {
-                            cJSON* cj_item_value_type = cJSON_CreateString(__FUNCTION__, items->cloud_properties.value_type);
+                            cJSON *cj_item_value_type = cJSON_CreateString(__FUNCTION__, items->cloud_properties.value_type);
                             if (cj_item_value_type)
                             {
                                 if (!cJSON_AddItemToArray(cj_value_array, cj_item_value_type))
@@ -154,23 +154,23 @@ static void __scalable_value_types_list(char* list_name, cJSON* cj_result)
     }
 }
 
-static void __value_scales_list(char* list_name, cJSON* cj_result)
+static void __value_scales_list(char *list_name, cJSON *cj_result)
 {
     if (cj_result && list_name)
     {
-        cJSON* cj_value_scales = cJSON_AddObjectToObject(__FUNCTION__, cj_result, list_name);
+        cJSON *cj_value_scales = cJSON_AddObjectToObject(__FUNCTION__, cj_result, list_name);
         if (cj_value_scales)
         {
-            l_ezlopi_device_t* devices = ezlopi_device_get_head();
+            l_ezlopi_device_t *devices = ezlopi_device_get_head();
             while (devices)
             {
-                l_ezlopi_item_t* items = devices->items;
+                l_ezlopi_item_t *items = devices->items;
                 while (items)
                 {
                     if (items->cloud_properties.scale)
                     {
-                        cJSON* cj_scale_array = NULL;
-                        cJSON* cj_value_type = cJSON_GetObjectItem(__FUNCTION__, cj_value_scales, items->cloud_properties.value_type);
+                        cJSON *cj_scale_array = NULL;
+                        cJSON *cj_value_type = cJSON_GetObjectItem(__FUNCTION__, cj_value_scales, items->cloud_properties.value_type);
                         if (NULL == cj_value_type)
                         {
                             cj_value_type = cJSON_AddObjectToObject(__FUNCTION__, cj_value_scales, items->cloud_properties.value_type);
@@ -187,7 +187,7 @@ static void __value_scales_list(char* list_name, cJSON* cj_result)
 
                         if (cj_scale_array)
                         {
-                            cJSON* cj_scale = cJSON_CreateString(__FUNCTION__, items->cloud_properties.scale);
+                            cJSON *cj_scale = cJSON_CreateString(__FUNCTION__, items->cloud_properties.scale);
                             if (cj_scale)
                             {
                                 if (!cJSON_AddItemToArray(cj_scale_array, cj_scale))
@@ -205,23 +205,23 @@ static void __value_scales_list(char* list_name, cJSON* cj_result)
     }
 }
 
-static void __scenes_value_types_list(char* list_name, cJSON* cj_result)
+static void __scenes_value_types_list(char *list_name, cJSON *cj_result)
 {
     if (cj_result && list_name)
     {
-        cJSON* cj_scenes_value_types = cJSON_AddObjectToObject(__FUNCTION__, cj_result, list_name);
+        cJSON *cj_scenes_value_types = cJSON_AddObjectToObject(__FUNCTION__, cj_result, list_name);
         if (cj_scenes_value_types)
         {
-            cJSON* cj_value_array = cJSON_AddArrayToObject(__FUNCTION__, cj_scenes_value_types, "list");
+            cJSON *cj_value_array = cJSON_AddArrayToObject(__FUNCTION__, cj_scenes_value_types, "list");
             if (cj_value_array)
             {
                 uint32_t idx = EZLOPI_VALUE_TYPE_NONE + 1;
                 while (idx < EZLOPI_VALUE_TYPE_MAX)
                 {
-                    const char* type_name_str = ezlopi_scene_get_scene_value_type_name(idx);
+                    const char *type_name_str = EZPI_core_scenes_get_scene_value_type_name(idx);
                     if (type_name_str)
                     {
-                        cJSON* cj_string_val = cJSON_CreateString(__FUNCTION__, type_name_str);
+                        cJSON *cj_string_val = cJSON_CreateString(__FUNCTION__, type_name_str);
                         if (cj_string_val)
                         {
                             if (!cJSON_AddItemToArray(cj_value_array, cj_string_val))
@@ -238,17 +238,17 @@ static void __scenes_value_types_list(char* list_name, cJSON* cj_result)
     }
 }
 
-static void __value_types_families_list(char* list_name, cJSON* cj_result)
+static void __value_types_families_list(char *list_name, cJSON *cj_result)
 {
     if (cj_result && list_name)
     {
-        cJSON* cj_value_type_famiies = cJSON_AddObjectToObject(__FUNCTION__, cj_result, list_name);
+        cJSON *cj_value_type_famiies = cJSON_AddObjectToObject(__FUNCTION__, cj_result, list_name);
         if (cj_value_type_famiies)
         {
-            const static char* numeric = "[\"int\",\"float\",\"scalableValueTypes\"]";
-            const static char* strings = "[\"string\",\"token\"]";
-            const static char* value_with_less = "[\"int\",\"float\",\"scalableValueTypes\",\"string\"]";
-            const static char* value_without_less = "[]"; // remained to fill
+            const static char *numeric = "[\"int\",\"float\",\"scalableValueTypes\"]";
+            const static char *strings = "[\"string\",\"token\"]";
+            const static char *value_with_less = "[\"int\",\"float\",\"scalableValueTypes\",\"string\"]";
+            const static char *value_without_less = "[]"; // remained to fill
 
             cJSON_AddRawToObject(__FUNCTION__, cj_value_type_famiies, "numeric", numeric);
             cJSON_AddRawToObject(__FUNCTION__, cj_value_type_famiies, "strings", strings);
@@ -258,24 +258,24 @@ static void __value_types_families_list(char* list_name, cJSON* cj_result)
     }
 }
 
-static cJSON* __comparision_operators_numeric(void)
+static cJSON *__comparision_operators_numeric(void)
 {
-    cJSON* cj_family = cJSON_CreateObject(__FUNCTION__);
+    cJSON *cj_family = cJSON_CreateObject(__FUNCTION__);
     if (cj_family)
     {
         cJSON_AddStringToObject(__FUNCTION__, cj_family, "family", "numeric");
-        cJSON* cj_methods_array = cJSON_AddArrayToObject(__FUNCTION__, cj_family, "methods");
+        cJSON *cj_methods_array = cJSON_AddArrayToObject(__FUNCTION__, cj_family, "methods");
         if (cj_methods_array)
         {
             e_scene_num_cmp_operators_t op_idx = SCENES_NUM_COMP_OPERATORS_NONE + 1;
-            while (ezlopi_scenes_numeric_comparator_operators_get_op(op_idx))
+            while (EZPI_scenes_numeric_comparator_operators_get_op(op_idx))
             {
-                cJSON* cj_method = cJSON_CreateObject(__FUNCTION__);
+                cJSON *cj_method = cJSON_CreateObject(__FUNCTION__);
                 if (cj_method)
                 {
-                    cJSON_AddStringToObject(__FUNCTION__, cj_method, "op", ezlopi_scenes_numeric_comparator_operators_get_op(op_idx));
-                    cJSON_AddStringToObject(__FUNCTION__, cj_method, ezlopi_name_str, ezlopi_scenes_numeric_comparator_operators_get_name(op_idx));
-                    cJSON_AddStringToObject(__FUNCTION__, cj_method, ezlopi_method_str, ezlopi_scenes_numeric_comparator_operators_get_method(op_idx));
+                    cJSON_AddStringToObject(__FUNCTION__, cj_method, "op", EZPI_scenes_numeric_comparator_operators_get_op(op_idx));
+                    cJSON_AddStringToObject(__FUNCTION__, cj_method, ezlopi_name_str, EZPI_scenes_numeric_comparator_operators_get_name(op_idx));
+                    cJSON_AddStringToObject(__FUNCTION__, cj_method, ezlopi_method_str, EZPI_scenes_numeric_comparator_operators_get_method(op_idx));
 
                     if (!cJSON_AddItemToArray(cj_methods_array, cj_method))
                     {
@@ -292,25 +292,25 @@ static cJSON* __comparision_operators_numeric(void)
     return cj_family;
 }
 
-static cJSON* __comparision_operators_strings(void)
+static cJSON *__comparision_operators_strings(void)
 {
-    cJSON* cj_family = cJSON_CreateObject(__FUNCTION__);
+    cJSON *cj_family = cJSON_CreateObject(__FUNCTION__);
     if (cj_family)
     {
         cJSON_AddStringToObject(__FUNCTION__, cj_family, "family", "strings");
-        cJSON* cj_methods_array = cJSON_AddArrayToObject(__FUNCTION__, cj_family, "methods");
+        cJSON *cj_methods_array = cJSON_AddArrayToObject(__FUNCTION__, cj_family, "methods");
         if (cj_methods_array)
         {
             /* <1> Adding for 'Strings' within 'family : strings' */
             e_scene_str_cmp_operators_t op_idx = SCENES_STRINGS_OPERATORS_NONE + 1;
-            while (ezlopi_scenes_strings_comparator_operators_get_op(op_idx))
+            while (EZPI_scenes_strings_comparator_operators_get_op(op_idx))
             {
-                cJSON* cj_method = cJSON_CreateObject(__FUNCTION__);
+                cJSON *cj_method = cJSON_CreateObject(__FUNCTION__);
                 if (cj_method)
                 {
-                    cJSON_AddStringToObject(__FUNCTION__, cj_method, "op", ezlopi_scenes_strings_comparator_operators_get_op(op_idx));
-                    cJSON_AddStringToObject(__FUNCTION__, cj_method, ezlopi_name_str, ezlopi_scenes_strings_comparator_operators_get_name(op_idx));
-                    cJSON_AddStringToObject(__FUNCTION__, cj_method, ezlopi_method_str, ezlopi_scenes_strings_comparator_operators_get_method(op_idx));
+                    cJSON_AddStringToObject(__FUNCTION__, cj_method, "op", EZPI_scenes_strings_comparator_operators_get_op(op_idx));
+                    cJSON_AddStringToObject(__FUNCTION__, cj_method, ezlopi_name_str, EZPI_scenes_strings_comparator_operators_get_name(op_idx));
+                    cJSON_AddStringToObject(__FUNCTION__, cj_method, ezlopi_method_str, EZPI_scenes_strings_comparator_operators_get_method(op_idx));
 
                     if (!cJSON_AddItemToArray(cj_methods_array, cj_method))
                     {
@@ -323,14 +323,14 @@ static cJSON* __comparision_operators_strings(void)
 
             /* <2> Adding for 'StringOperators' within 'family : strings' */
             op_idx = SCENES_STROPS_COMP_OPERATORES_NONE + 1;
-            while (ezlopi_scenes_strops_comparator_operators_get_op(op_idx))
+            while (EZPI_scenes_strops_comparator_operators_get_op(op_idx))
             {
-                cJSON* cj_method = cJSON_CreateObject(__FUNCTION__);
+                cJSON *cj_method = cJSON_CreateObject(__FUNCTION__);
                 if (cj_method)
                 {
-                    cJSON_AddStringToObject(__FUNCTION__, cj_method, "op", ezlopi_scenes_strops_comparator_operators_get_op(op_idx));
-                    cJSON_AddStringToObject(__FUNCTION__, cj_method, ezlopi_name_str, ezlopi_scenes_strops_comparator_operators_get_name(op_idx));
-                    cJSON_AddStringToObject(__FUNCTION__, cj_method, ezlopi_method_str, ezlopi_scenes_strops_comparator_operators_get_method(op_idx));
+                    cJSON_AddStringToObject(__FUNCTION__, cj_method, "op", EZPI_scenes_strops_comparator_operators_get_op(op_idx));
+                    cJSON_AddStringToObject(__FUNCTION__, cj_method, ezlopi_name_str, EZPI_scenes_strops_comparator_operators_get_name(op_idx));
+                    cJSON_AddStringToObject(__FUNCTION__, cj_method, ezlopi_method_str, EZPI_scenes_strops_comparator_operators_get_method(op_idx));
 
                     if (!cJSON_AddItemToArray(cj_methods_array, cj_method))
                     {
@@ -346,24 +346,24 @@ static cJSON* __comparision_operators_strings(void)
     return cj_family;
 }
 
-static cJSON* __comparision_operators_values_with_less(void)
+static cJSON *__comparision_operators_values_with_less(void)
 {
-    cJSON* cj_family = cJSON_CreateObject(__FUNCTION__);
+    cJSON *cj_family = cJSON_CreateObject(__FUNCTION__);
     if (cj_family)
     {
         cJSON_AddStringToObject(__FUNCTION__, cj_family, "family", "valuesWithLess");
-        cJSON* cj_methods_array = cJSON_AddArrayToObject(__FUNCTION__, cj_family, "methods");
+        cJSON *cj_methods_array = cJSON_AddArrayToObject(__FUNCTION__, cj_family, "methods");
         if (cj_methods_array)
         {
             e_scene_value_with_less_cmp_operators_t op_idx = SCENES_VALUES_WITH_LESS_OPERATORS_NONE + 1;
-            while (ezlopi_scenes_value_with_less_comparator_operators_get_op(op_idx))
+            while (EZPI_scenes_value_with_less_comparator_operators_get_op(op_idx))
             {
-                cJSON* cj_method = cJSON_CreateObject(__FUNCTION__);
+                cJSON *cj_method = cJSON_CreateObject(__FUNCTION__);
                 if (cj_method)
                 {
-                    cJSON_AddStringToObject(__FUNCTION__, cj_method, "op", ezlopi_scenes_value_with_less_comparator_operators_get_op(op_idx));
-                    cJSON_AddStringToObject(__FUNCTION__, cj_method, ezlopi_name_str, ezlopi_scenes_value_with_less_comparator_operators_get_name(op_idx));
-                    cJSON_AddStringToObject(__FUNCTION__, cj_method, ezlopi_method_str, ezlopi_scenes_value_with_less_comparator_operators_get_method(op_idx));
+                    cJSON_AddStringToObject(__FUNCTION__, cj_method, "op", EZPI_scenes_value_with_less_comparator_operators_get_op(op_idx));
+                    cJSON_AddStringToObject(__FUNCTION__, cj_method, ezlopi_name_str, EZPI_scenes_value_with_less_comparator_operators_get_name(op_idx));
+                    cJSON_AddStringToObject(__FUNCTION__, cj_method, ezlopi_method_str, EZPI_scenes_value_with_less_comparator_operators_get_method(op_idx));
 
                     if (!cJSON_AddItemToArray(cj_methods_array, cj_method))
                     {
@@ -380,24 +380,24 @@ static cJSON* __comparision_operators_values_with_less(void)
     return cj_family;
 }
 
-static cJSON* __comparision_operators_values_without_less(void)
+static cJSON *__comparision_operators_values_without_less(void)
 {
-    cJSON* cj_family = cJSON_CreateObject(__FUNCTION__);
+    cJSON *cj_family = cJSON_CreateObject(__FUNCTION__);
     if (cj_family)
     {
         cJSON_AddStringToObject(__FUNCTION__, cj_family, "family", "valuesWithoutLess");
-        cJSON* cj_methods_array = cJSON_AddArrayToObject(__FUNCTION__, cj_family, "methods");
+        cJSON *cj_methods_array = cJSON_AddArrayToObject(__FUNCTION__, cj_family, "methods");
         if (cj_methods_array)
         {
             e_scene_value_without_less_cmp_operators_t op_idx = SCENES_VALUES_WITHOUT_LESS_OPERATORS_NONE + 1;
-            while (ezlopi_scenes_value_without_less_comparator_operators_get_op(op_idx))
+            while (EZPI_scenes_value_without_less_comparator_operators_get_op(op_idx))
             {
-                cJSON* cj_method = cJSON_CreateObject(__FUNCTION__);
+                cJSON *cj_method = cJSON_CreateObject(__FUNCTION__);
                 if (cj_method)
                 {
-                    cJSON_AddStringToObject(__FUNCTION__, cj_method, "op", ezlopi_scenes_value_without_less_comparator_operators_get_op(op_idx));
-                    cJSON_AddStringToObject(__FUNCTION__, cj_method, ezlopi_name_str, ezlopi_scenes_value_without_less_comparator_operators_get_name(op_idx));
-                    cJSON_AddStringToObject(__FUNCTION__, cj_method, ezlopi_method_str, ezlopi_scenes_value_without_less_comparator_operators_get_method(op_idx));
+                    cJSON_AddStringToObject(__FUNCTION__, cj_method, "op", EZPI_scenes_value_without_less_comparator_operators_get_op(op_idx));
+                    cJSON_AddStringToObject(__FUNCTION__, cj_method, ezlopi_name_str, EZPI_scenes_value_without_less_comparator_operators_get_name(op_idx));
+                    cJSON_AddStringToObject(__FUNCTION__, cj_method, ezlopi_method_str, EZPI_scenes_value_without_less_comparator_operators_get_method(op_idx));
 
                     if (!cJSON_AddItemToArray(cj_methods_array, cj_method))
                     {
@@ -414,17 +414,17 @@ static cJSON* __comparision_operators_values_without_less(void)
     return cj_family;
 }
 
-static void __comparison_operators_list(char* list_name, cJSON* cj_result)
+static void __comparison_operators_list(char *list_name, cJSON *cj_result)
 {
     if (cj_result)
     {
-        cJSON* cj_value_types = cJSON_AddObjectToObject(__FUNCTION__, cj_result, list_name);
+        cJSON *cj_value_types = cJSON_AddObjectToObject(__FUNCTION__, cj_result, list_name);
         if (cj_value_types)
         {
-            cJSON* cj_families_array = cJSON_AddArrayToObject(__FUNCTION__, cj_value_types, "families");
+            cJSON *cj_families_array = cJSON_AddArrayToObject(__FUNCTION__, cj_value_types, "families");
             if (cj_families_array)
             {
-                static cJSON* (*com_operators_funcs[])(void) = {
+                static cJSON *(*com_operators_funcs[])(void) = {
                     __comparision_operators_numeric,
                     __comparision_operators_strings,
                     __comparision_operators_values_with_less,
@@ -435,7 +435,7 @@ static void __comparison_operators_list(char* list_name, cJSON* cj_result)
                 uint32_t family_idx = 0;
                 while (com_operators_funcs[family_idx])
                 {
-                    cJSON* cj_family = com_operators_funcs[family_idx]();
+                    cJSON *cj_family = com_operators_funcs[family_idx]();
                     if (cj_family)
                     {
                         if (!cJSON_AddItemToArray(cj_families_array, cj_family))
@@ -451,9 +451,9 @@ static void __comparison_operators_list(char* list_name, cJSON* cj_result)
     }
 }
 
-static cJSON* __comparision_method_info(void)
+static cJSON *__comparision_method_info(void)
 {
-    cJSON* cj_info = cJSON_CreateObject(__FUNCTION__);
+    cJSON *cj_info = cJSON_CreateObject(__FUNCTION__);
     if (cj_info)
     {
         cJSON_AddStringToObject(__FUNCTION__, cj_info, ezlopi_version_str, "1.0.0");
@@ -462,19 +462,19 @@ static cJSON* __comparision_method_info(void)
     return cj_info;
 }
 
-static cJSON* __comparision_method_compare_number_range(void)
+static cJSON *__comparision_method_compare_number_range(void)
 {
-    cJSON* cj_compare_number_range = cJSON_CreateObject(__FUNCTION__);
+    cJSON *cj_compare_number_range = cJSON_CreateObject(__FUNCTION__);
     if (cj_compare_number_range)
     {
-        cJSON* cj_comparator = cJSON_AddObjectToObject(__FUNCTION__, cj_compare_number_range, "comparator");
+        cJSON *cj_comparator = cJSON_AddObjectToObject(__FUNCTION__, cj_compare_number_range, "comparator");
         if (cj_comparator)
         {
             cJSON_AddStringToObject(__FUNCTION__, cj_comparator, "family", "numeric");
             cJSON_AddStringToObject(__FUNCTION__, cj_comparator, "field", "comparator");
             cJSON_AddStringToObject(__FUNCTION__, cj_comparator, ezlopi_type_str, ezlopi_enum_str);
 
-            const char* options_str = "[\"between\", \"not_between\"]";
+            const char *options_str = "[\"between\", \"not_between\"]";
             cJSON_AddRawToObject(__FUNCTION__, cj_comparator, "options", options_str);
         }
 
@@ -491,20 +491,20 @@ static cJSON* __comparision_method_compare_number_range(void)
     return cj_compare_number_range;
 }
 
-static cJSON* __comparision_method_compare_numbers(void)
+static cJSON *__comparision_method_compare_numbers(void)
 {
-    cJSON* cj_compare_numbers = cJSON_CreateObject(__FUNCTION__);
+    cJSON *cj_compare_numbers = cJSON_CreateObject(__FUNCTION__);
     if (cj_compare_numbers)
     {
 
-        cJSON* cj_comparator = cJSON_AddObjectToObject(__FUNCTION__, cj_compare_numbers, "comparator");
+        cJSON *cj_comparator = cJSON_AddObjectToObject(__FUNCTION__, cj_compare_numbers, "comparator");
         if (cj_comparator)
         {
             cJSON_AddStringToObject(__FUNCTION__, cj_comparator, "family", "numeric");
             cJSON_AddStringToObject(__FUNCTION__, cj_comparator, "field", "comparator");
             cJSON_AddStringToObject(__FUNCTION__, cj_comparator, ezlopi_type_str, ezlopi_enum_str);
 
-            const static char* options_str = "[\"<\",\">\",\"<=\",\">=\",\"==\",\"!=\"]";
+            const static char *options_str = "[\"<\",\">\",\"<=\",\">=\",\"==\",\"!=\"]";
             cJSON_AddRawToObject(__FUNCTION__, cj_comparator, "options", options_str);
         }
 
@@ -519,19 +519,19 @@ static cJSON* __comparision_method_compare_numbers(void)
     return cj_compare_numbers;
 }
 
-static cJSON* __comparision_method_compare_strings(void)
+static cJSON *__comparision_method_compare_strings(void)
 {
-    cJSON* cj_compare_strings = cJSON_CreateObject(__FUNCTION__);
+    cJSON *cj_compare_strings = cJSON_CreateObject(__FUNCTION__);
     if (cj_compare_strings)
     {
-        cJSON* cj_comparator = cJSON_AddObjectToObject(__FUNCTION__, cj_compare_strings, "comparator");
+        cJSON *cj_comparator = cJSON_AddObjectToObject(__FUNCTION__, cj_compare_strings, "comparator");
         if (cj_comparator)
         {
             cJSON_AddStringToObject(__FUNCTION__, cj_comparator, "family", "strings");
             cJSON_AddStringToObject(__FUNCTION__, cj_comparator, "field", "comparator");
             cJSON_AddStringToObject(__FUNCTION__, cj_comparator, ezlopi_type_str, ezlopi_enum_str);
 
-            const static char* options_str = "[\"<\",\">\",\"<=\",\">=\",\"==\",\"!=\"]";
+            const static char *options_str = "[\"<\",\">\",\"<=\",\">=\",\"==\",\"!=\"]";
             cJSON_AddRawToObject(__FUNCTION__, cj_comparator, "options", options_str);
         }
 
@@ -546,19 +546,19 @@ static cJSON* __comparision_method_compare_strings(void)
     return cj_compare_strings;
 }
 
-static cJSON* __comparision_method_compare_values(void)
+static cJSON *__comparision_method_compare_values(void)
 {
-    cJSON* cj_compare_values = cJSON_CreateObject(__FUNCTION__);
+    cJSON *cj_compare_values = cJSON_CreateObject(__FUNCTION__);
     if (cj_compare_values)
     {
-        cJSON* cj_comparator = cJSON_AddObjectToObject(__FUNCTION__, cj_compare_values, "comparator");
+        cJSON *cj_comparator = cJSON_AddObjectToObject(__FUNCTION__, cj_compare_values, "comparator");
         if (cj_comparator)
         {
             cJSON_AddStringToObject(__FUNCTION__, cj_comparator, "family", "valuesWithoutLess");
             cJSON_AddStringToObject(__FUNCTION__, cj_comparator, "field", "comparator");
             cJSON_AddStringToObject(__FUNCTION__, cj_comparator, ezlopi_type_str, ezlopi_enum_str);
 
-            const static char* options_str = "[\"==\",\"!=\"]";
+            const static char *options_str = "[\"==\",\"!=\"]";
             cJSON_AddRawToObject(__FUNCTION__, cj_comparator, "options", options_str);
         }
 
@@ -573,19 +573,19 @@ static cJSON* __comparision_method_compare_values(void)
     return cj_compare_values;
 }
 
-static cJSON* __comparision_method_in_array(void)
+static cJSON *__comparision_method_in_array(void)
 {
-    cJSON* cj_in_array = cJSON_CreateObject(__FUNCTION__);
+    cJSON *cj_in_array = cJSON_CreateObject(__FUNCTION__);
     if (cj_in_array)
     {
-        cJSON* cj_comparator = cJSON_AddObjectToObject(__FUNCTION__, cj_in_array, "comparator");
+        cJSON *cj_comparator = cJSON_AddObjectToObject(__FUNCTION__, cj_in_array, "comparator");
         if (cj_comparator)
         {
             cJSON_AddStringToObject(__FUNCTION__, cj_comparator, "family", "array");
             cJSON_AddStringToObject(__FUNCTION__, cj_comparator, "field", "comparator");
             cJSON_AddStringToObject(__FUNCTION__, cj_comparator, ezlopi_type_str, ezlopi_enum_str);
 
-            const static char* options_str = "[\"in\",\"not_in\"]";
+            const static char *options_str = "[\"in\",\"not_in\"]";
             cJSON_AddRawToObject(__FUNCTION__, cj_comparator, "options", options_str);
         }
 
@@ -600,9 +600,9 @@ static cJSON* __comparision_method_in_array(void)
     return cj_in_array;
 }
 
-static cJSON* __comparision_method_is_device_item_group(void)
+static cJSON *__comparision_method_is_device_item_group(void)
 {
-    cJSON* cj_is_device_item_grp = cJSON_CreateObject(__FUNCTION__);
+    cJSON *cj_is_device_item_grp = cJSON_CreateObject(__FUNCTION__);
     if (cj_is_device_item_grp)
     {
         static const s_data_source_n_target_object_t data_src_obj[] = {
@@ -617,9 +617,9 @@ static cJSON* __comparision_method_is_device_item_group(void)
     return cj_is_device_item_grp;
 }
 
-static cJSON* __comparision_method_is_device_state(void)
+static cJSON *__comparision_method_is_device_state(void)
 {
-    cJSON* cj_is_device_state = cJSON_CreateObject(__FUNCTION__);
+    cJSON *cj_is_device_state = cJSON_CreateObject(__FUNCTION__);
     if (cj_is_device_state)
     {
         static const s_data_source_n_target_object_t data_src_obj[] = {
@@ -634,9 +634,9 @@ static cJSON* __comparision_method_is_device_state(void)
     return cj_is_device_state;
 }
 
-static cJSON* __comparision_method_is_item_state(void)
+static cJSON *__comparision_method_is_item_state(void)
 {
-    cJSON* cj_is_item_state = cJSON_CreateObject(__FUNCTION__);
+    cJSON *cj_is_item_state = cJSON_CreateObject(__FUNCTION__);
     if (cj_is_item_state)
     {
         static const s_data_source_n_target_object_t data_src_obj[] = {
@@ -651,9 +651,9 @@ static cJSON* __comparision_method_is_item_state(void)
     return cj_is_item_state;
 }
 
-static cJSON* __comparision_method_is_item_state_changed(void)
+static cJSON *__comparision_method_is_item_state_changed(void)
 {
-    cJSON* cj_is_item_state_changed = cJSON_CreateObject(__FUNCTION__);
+    cJSON *cj_is_item_state_changed = cJSON_CreateObject(__FUNCTION__);
     if (cj_is_item_state_changed)
     {
         static const s_data_source_n_target_object_t data_src_obj[] = {
@@ -669,19 +669,19 @@ static cJSON* __comparision_method_is_item_state_changed(void)
     return cj_is_item_state_changed;
 }
 
-static cJSON* __comparision_method_string_operation(void)
+static cJSON *__comparision_method_string_operation(void)
 {
-    cJSON* cj_string_operation = cJSON_CreateObject(__FUNCTION__);
+    cJSON *cj_string_operation = cJSON_CreateObject(__FUNCTION__);
     if (cj_string_operation)
     {
-        cJSON* cj_comparator = cJSON_AddObjectToObject(__FUNCTION__, cj_string_operation, "comparator");
+        cJSON *cj_comparator = cJSON_AddObjectToObject(__FUNCTION__, cj_string_operation, "comparator");
         if (cj_comparator)
         {
             cJSON_AddStringToObject(__FUNCTION__, cj_comparator, "family", "strings");
             cJSON_AddStringToObject(__FUNCTION__, cj_comparator, "field", "comparator");
             cJSON_AddStringToObject(__FUNCTION__, cj_comparator, ezlopi_type_str, ezlopi_enum_str);
 
-            const static char* options_str = "[\"begin\",\"end\",\"contain\",\"length\",\"not_begin\",\"not_end\",\"not_contain\",\"not_length\"]";
+            const static char *options_str = "[\"begin\",\"end\",\"contain\",\"length\",\"not_begin\",\"not_end\",\"not_contain\",\"not_length\"]";
             cJSON_AddRawToObject(__FUNCTION__, cj_comparator, "options", options_str);
         }
 
@@ -697,11 +697,11 @@ static cJSON* __comparision_method_string_operation(void)
     return cj_string_operation;
 }
 
-static void __comparison_methods_list(char* list_name, cJSON* cj_result)
+static void __comparison_methods_list(char *list_name, cJSON *cj_result)
 {
     if (cj_result)
     {
-        cJSON* cj_comparision_methods = cJSON_AddObjectToObject(__FUNCTION__, cj_result, list_name);
+        cJSON *cj_comparision_methods = cJSON_AddObjectToObject(__FUNCTION__, cj_result, list_name);
         if (cj_comparision_methods)
         {
             cJSON_AddItemToObject(__FUNCTION__, cj_comparision_methods, ezlopi_info_str, __comparision_method_info());
@@ -719,18 +719,18 @@ static void __comparison_methods_list(char* list_name, cJSON* cj_result)
     }
 }
 
-static cJSON* __action_methods_info(void)
+static cJSON *__action_methods_info(void)
 {
-    cJSON* cj_method = cJSON_CreateObject(__FUNCTION__);
+    cJSON *cj_method = cJSON_CreateObject(__FUNCTION__);
     if (cj_method) // Info
     {
         cJSON_AddStringToObject(__FUNCTION__, cj_method, "schema_version", "0.0.1");
     }
     return cj_method;
 }
-static cJSON* __action_methods_set_item_value()
+static cJSON *__action_methods_set_item_value()
 {
-    cJSON* cj_method = cJSON_CreateObject(__FUNCTION__);
+    cJSON *cj_method = cJSON_CreateObject(__FUNCTION__);
     if (cj_method) // setItemValue
     {
         static const s_data_source_n_target_object_t data_src_obj[] = {
@@ -747,22 +747,22 @@ static cJSON* __action_methods_set_item_value()
         __add_data_src_dest_array_to_object(cj_method, "dataTarget", data_target_obj);
         //-------------------------------------------------------------------------
 
-        static const char* execution_raw_str = "[\"async\"]";
+        static const char *execution_raw_str = "[\"async\"]";
         cJSON_AddRawToObject(__FUNCTION__, cj_method, "execution", execution_raw_str);
         //-------------------------------------------------------------------------
 
         cJSON_AddStringToObject(__FUNCTION__, cj_method, "typeSystem", "itemValueTypes");
         //-------------------------------------------------------------------------
 
-        static const char* scope_raw_str = "[\"local\",\"global\"]";
+        static const char *scope_raw_str = "[\"local\",\"global\"]";
         cJSON_AddRawToObject(__FUNCTION__, cj_method, "scope", scope_raw_str);
         //-------------------------------------------------------------------------
     }
     return cj_method;
 }
-static cJSON* __action_methods_set_device_armed()
+static cJSON *__action_methods_set_device_armed()
 {
-    cJSON* cj_method = cJSON_CreateObject(__FUNCTION__);
+    cJSON *cj_method = cJSON_CreateObject(__FUNCTION__);
     if (cj_method) // setDeviceArmed
     {
         static const s_data_source_n_target_object_t data_src_obj[] = {
@@ -779,19 +779,19 @@ static cJSON* __action_methods_set_device_armed()
         __add_data_src_dest_array_to_object(cj_method, "dataTarget", data_target_obj);
         //-------------------------------------------------------------------------
 
-        static const char* execution_raw_str = "[\"async\"]";
+        static const char *execution_raw_str = "[\"async\"]";
         cJSON_AddRawToObject(__FUNCTION__, cj_method, "execution", execution_raw_str);
         //-------------------------------------------------------------------------
 
-        static const char* scope_raw_str = "[\"local\",\"global\"]";
+        static const char *scope_raw_str = "[\"local\",\"global\"]";
         cJSON_AddRawToObject(__FUNCTION__, cj_method, "scope", scope_raw_str);
         //-------------------------------------------------------------------------
     }
     return cj_method;
 }
-static cJSON* __action_methods_send_cloud_abstract_command()
+static cJSON *__action_methods_send_cloud_abstract_command()
 {
-    cJSON* cj_method = cJSON_CreateObject(__FUNCTION__);
+    cJSON *cj_method = cJSON_CreateObject(__FUNCTION__);
     if (cj_method) // sendCloudAbstractCommand
     {
         static const s_data_source_n_target_object_t data_src_obj[] = {
@@ -808,15 +808,15 @@ static cJSON* __action_methods_send_cloud_abstract_command()
         __add_data_src_dest_array_to_object(cj_method, "dataTarget", data_target_obj);
         //-------------------------------------------------------------------------
 
-        static const char* execution_raw_str = "[\"sync\"]";
+        static const char *execution_raw_str = "[\"sync\"]";
         cJSON_AddRawToObject(__FUNCTION__, cj_method, "execution", execution_raw_str);
         //-------------------------------------------------------------------------
     }
     return cj_method;
 }
-static cJSON* __action_methods_switch_house_mode()
+static cJSON *__action_methods_switch_house_mode()
 {
-    cJSON* cj_method = cJSON_CreateObject(__FUNCTION__);
+    cJSON *cj_method = cJSON_CreateObject(__FUNCTION__);
     if (cj_method) // switchHouseMode
     {
         static const s_data_source_n_target_object_t data_src_obj[] = {
@@ -833,15 +833,15 @@ static cJSON* __action_methods_switch_house_mode()
         __add_data_src_dest_array_to_object(cj_method, "dataTarget", data_target_obj);
         //-------------------------------------------------------------------------
 
-        static const char* execution_raw_str = "[\"async\"]";
+        static const char *execution_raw_str = "[\"async\"]";
         cJSON_AddRawToObject(__FUNCTION__, cj_method, "execution", execution_raw_str);
         //-------------------------------------------------------------------------
     }
     return cj_method;
 }
-static cJSON* __action_methods_send_http_request()
+static cJSON *__action_methods_send_http_request()
 {
-    cJSON* cj_method = cJSON_CreateObject(__FUNCTION__);
+    cJSON *cj_method = cJSON_CreateObject(__FUNCTION__);
     if (cj_method) // sendHttpRequest
     {
         static const s_data_source_n_target_object_t data_src_obj[] = {
@@ -854,7 +854,7 @@ static cJSON* __action_methods_send_http_request()
         cJSON_AddNullToObject(__FUNCTION__, cj_method, "dataTarget");
         //-------------------------------------------------------------------------
 
-        static const char* execution_raw_str = "[\"async\"]";
+        static const char *execution_raw_str = "[\"async\"]";
         cJSON_AddRawToObject(__FUNCTION__, cj_method, "execution", execution_raw_str);
         //-------------------------------------------------------------------------
 
@@ -862,10 +862,10 @@ static cJSON* __action_methods_send_http_request()
             {.types = "[\"expression\"]", .field = NULL},
             {.types = NULL, .field = NULL},
         };
-        cJSON* cj_side_effects = cJSON_AddArrayToObject(__FUNCTION__, cj_method, "sideEffects");
+        cJSON *cj_side_effects = cJSON_AddArrayToObject(__FUNCTION__, cj_method, "sideEffects");
         if (cj_side_effects)
         {
-            cJSON* cj_side_eff_elem = cJSON_CreateObject(__FUNCTION__);
+            cJSON *cj_side_eff_elem = cJSON_CreateObject(__FUNCTION__);
             if (cj_side_eff_elem)
             {
                 cJSON_AddStringToObject(__FUNCTION__, cj_side_eff_elem, "action", "saveResult");
@@ -881,9 +881,9 @@ static cJSON* __action_methods_send_http_request()
     }
     return cj_method;
 }
-static cJSON* __action_methods_run_custom_script()
+static cJSON *__action_methods_run_custom_script()
 {
-    cJSON* cj_method = cJSON_CreateObject(__FUNCTION__);
+    cJSON *cj_method = cJSON_CreateObject(__FUNCTION__);
     if (cj_method) // runCustomScript
     {
         static const s_data_source_n_target_object_t data_src_obj[] = {
@@ -900,15 +900,15 @@ static cJSON* __action_methods_run_custom_script()
         __add_data_src_dest_array_to_object(cj_method, "dataTarget", data_target_obj);
         //-------------------------------------------------------------------------
 
-        static const char* execution_raw_str = "[\"async\"]";
+        static const char *execution_raw_str = "[\"async\"]";
         cJSON_AddRawToObject(__FUNCTION__, cj_method, "execution", execution_raw_str);
         //-------------------------------------------------------------------------
     }
     return cj_method;
 }
-static cJSON* __action_methods_run_plugin_script()
+static cJSON *__action_methods_run_plugin_script()
 {
-    cJSON* cj_method = cJSON_CreateObject(__FUNCTION__);
+    cJSON *cj_method = cJSON_CreateObject(__FUNCTION__);
     if (cj_method) // runPluginScript
     {
         static const s_data_source_n_target_object_t data_src_obj[] = {
@@ -925,15 +925,15 @@ static cJSON* __action_methods_run_plugin_script()
         __add_data_src_dest_array_to_object(cj_method, "dataTarget", data_target_obj);
         //-------------------------------------------------------------------------
 
-        static const char* execution_raw_str = "[\"sync\"]";
+        static const char *execution_raw_str = "[\"sync\"]";
         cJSON_AddRawToObject(__FUNCTION__, cj_method, "execution", execution_raw_str);
         //-------------------------------------------------------------------------
     }
     return cj_method;
 }
-static cJSON* __action_methods_run_scene()
+static cJSON *__action_methods_run_scene()
 {
-    cJSON* cj_method = cJSON_CreateObject(__FUNCTION__);
+    cJSON *cj_method = cJSON_CreateObject(__FUNCTION__);
     if (cj_method) // runScene
     {
         static const s_data_source_n_target_object_t data_src_obj[] = {
@@ -950,15 +950,15 @@ static cJSON* __action_methods_run_scene()
         __add_data_src_dest_array_to_object(cj_method, "dataTarget", data_target_obj);
         //-------------------------------------------------------------------------
 
-        static const char* execution_raw_str = "[\"async\"]";
+        static const char *execution_raw_str = "[\"async\"]";
         cJSON_AddRawToObject(__FUNCTION__, cj_method, "execution", execution_raw_str);
         //-------------------------------------------------------------------------
     }
     return cj_method;
 }
-static cJSON* __action_methods_stop_scene()
+static cJSON *__action_methods_stop_scene()
 {
-    cJSON* cj_method = cJSON_CreateObject(__FUNCTION__);
+    cJSON *cj_method = cJSON_CreateObject(__FUNCTION__);
     if (cj_method) // stopScene
     {
         static const s_data_source_n_target_object_t data_src_obj[] = {
@@ -975,15 +975,15 @@ static cJSON* __action_methods_stop_scene()
         __add_data_src_dest_array_to_object(cj_method, "dataTarget", data_target_obj);
         //-------------------------------------------------------------------------
 
-        static const char* execution_raw_str = "[\"async\"]";
+        static const char *execution_raw_str = "[\"async\"]";
         cJSON_AddRawToObject(__FUNCTION__, cj_method, "execution", execution_raw_str);
         //-------------------------------------------------------------------------
     }
     return cj_method;
 }
-static cJSON* __action_methods_set_scene_state()
+static cJSON *__action_methods_set_scene_state()
 {
-    cJSON* cj_method = cJSON_CreateObject(__FUNCTION__);
+    cJSON *cj_method = cJSON_CreateObject(__FUNCTION__);
     if (cj_method) // setSceneState
     {
         static const s_data_source_n_target_object_t data_src_obj[] = {
@@ -1000,15 +1000,15 @@ static cJSON* __action_methods_set_scene_state()
         __add_data_src_dest_array_to_object(cj_method, "dataTarget", data_target_obj);
         //-------------------------------------------------------------------------
 
-        static const char* execution_raw_str = "[\"async\"]";
+        static const char *execution_raw_str = "[\"async\"]";
         cJSON_AddRawToObject(__FUNCTION__, cj_method, "execution", execution_raw_str);
         //-------------------------------------------------------------------------
     }
     return cj_method;
 }
-static cJSON* __action_methods_reboot_hub()
+static cJSON *__action_methods_reboot_hub()
 {
-    cJSON* cj_method = cJSON_CreateObject(__FUNCTION__);
+    cJSON *cj_method = cJSON_CreateObject(__FUNCTION__);
     if (cj_method) // rebootHub
     {
         cJSON_AddNullToObject(__FUNCTION__, cj_method, "dataSource");
@@ -1019,15 +1019,15 @@ static cJSON* __action_methods_reboot_hub()
         };
         __add_data_src_dest_array_to_object(cj_method, "dataTarget", data_target_obj);
         //-------------------------------------------------------------------------
-        static const char* execution_raw_str = "[\"async\"]";
+        static const char *execution_raw_str = "[\"async\"]";
         cJSON_AddRawToObject(__FUNCTION__, cj_method, "execution", execution_raw_str);
         //-------------------------------------------------------------------------
     }
     return cj_method;
 }
-static cJSON* __action_methods_cloud_api()
+static cJSON *__action_methods_cloud_api()
 {
-    cJSON* cj_method = cJSON_CreateObject(__FUNCTION__);
+    cJSON *cj_method = cJSON_CreateObject(__FUNCTION__);
     if (cj_method) // cloudAPI
     {
         static const s_data_source_n_target_object_t data_src_obj[] = {
@@ -1044,7 +1044,7 @@ static cJSON* __action_methods_cloud_api()
         __add_data_src_dest_array_to_object(cj_method, "dataTarget", data_target_obj);
         //-------------------------------------------------------------------------
 
-        static const char* execution_raw_str = "[\"async\"]";
+        static const char *execution_raw_str = "[\"async\"]";
         cJSON_AddRawToObject(__FUNCTION__, cj_method, "execution", execution_raw_str);
         //-------------------------------------------------------------------------
 
@@ -1052,10 +1052,10 @@ static cJSON* __action_methods_cloud_api()
             {.types = "[\"expression\"]", .field = NULL},
             {.types = NULL, .field = NULL},
         };
-        cJSON* cj_side_effects = cJSON_AddArrayToObject(__FUNCTION__, cj_method, "sideEffects");
+        cJSON *cj_side_effects = cJSON_AddArrayToObject(__FUNCTION__, cj_method, "sideEffects");
         if (cj_side_effects)
         {
-            cJSON* cj_side_eff_elem = cJSON_CreateObject(__FUNCTION__);
+            cJSON *cj_side_eff_elem = cJSON_CreateObject(__FUNCTION__);
             if (cj_side_eff_elem)
             {
                 cJSON_AddStringToObject(__FUNCTION__, cj_side_eff_elem, "action", "saveResult");
@@ -1071,9 +1071,9 @@ static cJSON* __action_methods_cloud_api()
     }
     return cj_method;
 }
-static cJSON* __action_methods_reset_hub()
+static cJSON *__action_methods_reset_hub()
 {
-    cJSON* cj_method = cJSON_CreateObject(__FUNCTION__);
+    cJSON *cj_method = cJSON_CreateObject(__FUNCTION__);
     if (cj_method) // resetHub
     {
         cJSON_AddNullToObject(__FUNCTION__, cj_method, "dataSource");
@@ -1084,15 +1084,15 @@ static cJSON* __action_methods_reset_hub()
         };
         __add_data_src_dest_array_to_object(cj_method, "dataTarget", data_target_obj);
         //-------------------------------------------------------------------------
-        static const char* execution_raw_str = "[\"async\"]";
+        static const char *execution_raw_str = "[\"async\"]";
         cJSON_AddRawToObject(__FUNCTION__, cj_method, "execution", execution_raw_str);
         //-------------------------------------------------------------------------
     }
     return cj_method;
 }
-static cJSON* __action_methods_reset_latch()
+static cJSON *__action_methods_reset_latch()
 {
-    cJSON* cj_method = cJSON_CreateObject(__FUNCTION__);
+    cJSON *cj_method = cJSON_CreateObject(__FUNCTION__);
     if (cj_method) // resetLatch
     {
         static const s_data_source_n_target_object_t data_src_obj[] = {
@@ -1109,15 +1109,15 @@ static cJSON* __action_methods_reset_latch()
         __add_data_src_dest_array_to_object(cj_method, "dataTarget", data_target_obj);
         //-------------------------------------------------------------------------
 
-        static const char* execution_raw_str = "[\"async\"]";
+        static const char *execution_raw_str = "[\"async\"]";
         cJSON_AddRawToObject(__FUNCTION__, cj_method, "execution", execution_raw_str);
         //-------------------------------------------------------------------------
     }
     return cj_method;
 }
-static cJSON* __action_methods_set_variable()
+static cJSON *__action_methods_set_variable()
 {
-    cJSON* cj_method = cJSON_CreateObject(__FUNCTION__);
+    cJSON *cj_method = cJSON_CreateObject(__FUNCTION__);
     if (cj_method) // setVariable
     {
         static const s_data_source_n_target_object_t data_src_obj[] = {
@@ -1134,18 +1134,18 @@ static cJSON* __action_methods_set_variable()
         __add_data_src_dest_array_to_object(cj_method, "dataTarget", data_target_obj);
         //-------------------------------------------------------------------------
 
-        static const char* execution_raw_str = "[\"sync\"]";
+        static const char *execution_raw_str = "[\"sync\"]";
         cJSON_AddRawToObject(__FUNCTION__, cj_method, "execution", execution_raw_str);
         //-------------------------------------------------------------------------
 
-        static const char* type_system_raw_str = "[\"itemValueTypes\",\"free\"]";
+        static const char *type_system_raw_str = "[\"itemValueTypes\",\"free\"]";
         cJSON_AddRawToObject(__FUNCTION__, cj_method, "typeSystem", type_system_raw_str);
         //-------------------------------------------------------------------------
 
-        cJSON* cj_side_effects = cJSON_AddArrayToObject(__FUNCTION__, cj_method, "sideEffects");
+        cJSON *cj_side_effects = cJSON_AddArrayToObject(__FUNCTION__, cj_method, "sideEffects");
         if (cj_side_effects)
         {
-            cJSON* cj_side_eff_elem = cJSON_CreateObject(__FUNCTION__);
+            cJSON *cj_side_eff_elem = cJSON_CreateObject(__FUNCTION__);
             if (cj_side_eff_elem)
             {
                 cJSON_AddStringToObject(__FUNCTION__, cj_side_eff_elem, "action", "saveResult");
@@ -1161,9 +1161,9 @@ static cJSON* __action_methods_set_variable()
     }
     return cj_method;
 }
-static cJSON* __action_methods_reset_scene_latches()
+static cJSON *__action_methods_reset_scene_latches()
 {
-    cJSON* cj_method = cJSON_CreateObject(__FUNCTION__);
+    cJSON *cj_method = cJSON_CreateObject(__FUNCTION__);
     if (cj_method) // resetSceneLatches
     {
         static const s_data_source_n_target_object_t data_src_obj[] = {
@@ -1180,15 +1180,15 @@ static cJSON* __action_methods_reset_scene_latches()
         __add_data_src_dest_array_to_object(cj_method, "dataTarget", data_target_obj);
         //-------------------------------------------------------------------------
 
-        static const char* execution_raw_str = "[\"async\"]";
+        static const char *execution_raw_str = "[\"async\"]";
         cJSON_AddRawToObject(__FUNCTION__, cj_method, "execution", execution_raw_str);
         //-------------------------------------------------------------------------
     }
     return cj_method;
 }
-static cJSON* __action_methods_set_expression()
+static cJSON *__action_methods_set_expression()
 {
-    cJSON* cj_method = cJSON_CreateObject(__FUNCTION__);
+    cJSON *cj_method = cJSON_CreateObject(__FUNCTION__);
     if (cj_method) // setExpression
     {
         static const s_data_source_n_target_object_t data_src_obj[] = {
@@ -1205,18 +1205,18 @@ static cJSON* __action_methods_set_expression()
         __add_data_src_dest_array_to_object(cj_method, "dataTarget", data_target_obj);
         //-------------------------------------------------------------------------
 
-        static const char* execution_raw_str = "[\"sync\"]";
+        static const char *execution_raw_str = "[\"sync\"]";
         cJSON_AddRawToObject(__FUNCTION__, cj_method, "execution", execution_raw_str);
         //-------------------------------------------------------------------------
 
-        static const char* type_system_raw_str = "[\"itemValueTypes\",\"free\"]";
+        static const char *type_system_raw_str = "[\"itemValueTypes\",\"free\"]";
         cJSON_AddRawToObject(__FUNCTION__, cj_method, "typeSystem", type_system_raw_str);
         //-------------------------------------------------------------------------
 
-        cJSON* cj_side_effects = cJSON_AddArrayToObject(__FUNCTION__, cj_method, "sideEffects");
+        cJSON *cj_side_effects = cJSON_AddArrayToObject(__FUNCTION__, cj_method, "sideEffects");
         if (cj_side_effects)
         {
-            cJSON* cj_side_eff_elem = cJSON_CreateObject(__FUNCTION__);
+            cJSON *cj_side_eff_elem = cJSON_CreateObject(__FUNCTION__);
             if (cj_side_eff_elem)
             {
                 cJSON_AddStringToObject(__FUNCTION__, cj_side_eff_elem, "action", "saveResult");
@@ -1232,9 +1232,9 @@ static cJSON* __action_methods_set_expression()
     }
     return cj_method;
 }
-static cJSON* __action_methods_toggle_value()
+static cJSON *__action_methods_toggle_value()
 {
-    cJSON* cj_method = cJSON_CreateObject(__FUNCTION__);
+    cJSON *cj_method = cJSON_CreateObject(__FUNCTION__);
     if (cj_method) // toggleValue
     {
         cJSON_AddNullToObject(__FUNCTION__, cj_method, "dataSource");
@@ -1247,7 +1247,7 @@ static cJSON* __action_methods_toggle_value()
         __add_data_src_dest_array_to_object(cj_method, "dataTarget", data_target_obj);
         //-------------------------------------------------------------------------
 
-        static const char* execution_raw_str = "[\"async\"]";
+        static const char *execution_raw_str = "[\"async\"]";
         cJSON_AddRawToObject(__FUNCTION__, cj_method, "execution", execution_raw_str);
         //-------------------------------------------------------------------------
 
@@ -1256,9 +1256,9 @@ static cJSON* __action_methods_toggle_value()
     }
     return cj_method;
 }
-static cJSON* __action_methods_group_set_item_value()
+static cJSON *__action_methods_group_set_item_value()
 {
-    cJSON* cj_method = cJSON_CreateObject(__FUNCTION__);
+    cJSON *cj_method = cJSON_CreateObject(__FUNCTION__);
     if (cj_method) // groupSetItemValue
     {
         static const s_data_source_n_target_object_t data_src_obj[] = {
@@ -1276,22 +1276,22 @@ static cJSON* __action_methods_group_set_item_value()
         __add_data_src_dest_array_to_object(cj_method, "dataTarget", data_target_obj);
         //-------------------------------------------------------------------------
 
-        static const char* execution_raw_str = "[\"async\"]";
+        static const char *execution_raw_str = "[\"async\"]";
         cJSON_AddRawToObject(__FUNCTION__, cj_method, "execution", execution_raw_str);
         //-------------------------------------------------------------------------
 
         cJSON_AddStringToObject(__FUNCTION__, cj_method, "typeSystem", "itemValueTypes");
         //-------------------------------------------------------------------------
 
-        static const char* scope_raw_str = "[\"local\"]";
+        static const char *scope_raw_str = "[\"local\"]";
         cJSON_AddRawToObject(__FUNCTION__, cj_method, "scope", scope_raw_str);
         //-------------------------------------------------------------------------
     }
     return cj_method;
 }
-static cJSON* __action_methods_group_toggle_value()
+static cJSON *__action_methods_group_toggle_value()
 {
-    cJSON* cj_method = cJSON_CreateObject(__FUNCTION__);
+    cJSON *cj_method = cJSON_CreateObject(__FUNCTION__);
     if (cj_method) // groupToggleValue
     {
         cJSON_AddNullToObject(__FUNCTION__, cj_method, "dataSource");
@@ -1305,22 +1305,22 @@ static cJSON* __action_methods_group_toggle_value()
         __add_data_src_dest_array_to_object(cj_method, "dataTarget", data_target_obj);
         //-------------------------------------------------------------------------
 
-        static const char* execution_raw_str = "[\"async\"]";
+        static const char *execution_raw_str = "[\"async\"]";
         cJSON_AddRawToObject(__FUNCTION__, cj_method, "execution", execution_raw_str);
         //-------------------------------------------------------------------------
 
         cJSON_AddStringToObject(__FUNCTION__, cj_method, "typeSystem", "itemValueTypes");
         //-------------------------------------------------------------------------
 
-        static const char* scope_raw_str = "[\"local\"]";
+        static const char *scope_raw_str = "[\"local\"]";
         cJSON_AddRawToObject(__FUNCTION__, cj_method, "scope", scope_raw_str);
         //-------------------------------------------------------------------------
     }
     return cj_method;
 }
-static cJSON* __action_methods_group_set_device_armed()
+static cJSON *__action_methods_group_set_device_armed()
 {
-    cJSON* cj_method = cJSON_CreateObject(__FUNCTION__);
+    cJSON *cj_method = cJSON_CreateObject(__FUNCTION__);
     if (cj_method) // groupSetDeviceArmed
     {
         static const s_data_source_n_target_object_t data_src_obj[] = {
@@ -1337,25 +1337,25 @@ static cJSON* __action_methods_group_set_device_armed()
         __add_data_src_dest_array_to_object(cj_method, "dataTarget", data_target_obj);
         //-------------------------------------------------------------------------
 
-        static const char* execution_raw_str = "[\"async\"]";
+        static const char *execution_raw_str = "[\"async\"]";
         cJSON_AddRawToObject(__FUNCTION__, cj_method, "execution", execution_raw_str);
         //-------------------------------------------------------------------------
 
         cJSON_AddStringToObject(__FUNCTION__, cj_method, "typeSystem", "itemValueTypes");
         //-------------------------------------------------------------------------
 
-        static const char* scope_raw_str = "[\"local\"]";
+        static const char *scope_raw_str = "[\"local\"]";
         cJSON_AddRawToObject(__FUNCTION__, cj_method, "scope", scope_raw_str);
         //-------------------------------------------------------------------------
     }
     return cj_method;
 }
 
-static void __action_methods_list(char* list_name, cJSON* cj_result)
+static void __action_methods_list(char *list_name, cJSON *cj_result)
 {
     if (cj_result)
     {
-        cJSON* cj_action_methods = cJSON_AddObjectToObject(__FUNCTION__, cj_result, list_name);
+        cJSON *cj_action_methods = cJSON_AddObjectToObject(__FUNCTION__, cj_result, list_name);
         if (cj_action_methods)
         {
             cJSON_AddItemToObject(__FUNCTION__, cj_action_methods, "Info", __action_methods_info());
@@ -1384,11 +1384,11 @@ static void __action_methods_list(char* list_name, cJSON* cj_result)
     }
 }
 
-static void __advanced_scenes_version_list(char* list_name, cJSON* cj_result)
+static void __advanced_scenes_version_list(char *list_name, cJSON *cj_result)
 {
     if (cj_result)
     {
-        cJSON* cj_avance_scenes_version = cJSON_AddObjectToObject(__FUNCTION__, cj_result, list_name);
+        cJSON *cj_avance_scenes_version = cJSON_AddObjectToObject(__FUNCTION__, cj_result, list_name);
         if (cj_avance_scenes_version)
         {
             cJSON_AddStringToObject(__FUNCTION__, cj_avance_scenes_version, ezlopi_version_str, "Major.Minor");
@@ -1398,15 +1398,15 @@ static void __advanced_scenes_version_list(char* list_name, cJSON* cj_result)
 
 // helper functions
 
-static void __add_data_src_dest_array_to_object(cJSON* cj_method, char* array_name, const s_data_source_n_target_object_t* data_list)
+static void __add_data_src_dest_array_to_object(cJSON *cj_method, char *array_name, const s_data_source_n_target_object_t *data_list)
 {
-    cJSON* cj_data_source_n_target_list = cJSON_AddArrayToObject(__FUNCTION__, cj_method, array_name);
+    cJSON *cj_data_source_n_target_list = cJSON_AddArrayToObject(__FUNCTION__, cj_method, array_name);
     if (cj_data_source_n_target_list)
     {
         uint32_t idx = 0;
         while (data_list[idx].types || data_list[idx].field)
         {
-            cJSON* cj_arr_object = cJSON_CreateObject(__FUNCTION__);
+            cJSON *cj_arr_object = cJSON_CreateObject(__FUNCTION__);
             if (cj_arr_object)
             {
                 cJSON_AddNumberToObject(__FUNCTION__, cj_arr_object, "index", idx);
