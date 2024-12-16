@@ -24,8 +24,8 @@ CLOUD_METHOD("hub.item.group.get", EZPI_item_group_get, NULL)
 CLOUD_METHOD("hub.item.groups.list", EZPI_item_groups_list, NULL)
 
 #ifdef CONFIG_EZPI_UTIL_TRACE_EN
-CLOUD_METHOD("hub.log.set", ezlopi_hub_cloud_log_set, NULL)
-CLOUD_METHOD("hub.log.local.set", ezlopi_hub_serial_log_set, ezlopi_hub_serial_log_set_updater)
+CLOUD_METHOD("hub.log.set", EZPI_hub_cloud_log_set, NULL)
+CLOUD_METHOD("hub.log.local.set", EZPI_hub_serial_log_set, ezlopi_hub_serial_log_set_updater)
 #endif // CONFIG_EZPI_UTIL_TRACE_EN
 
 #if defined(CONFIG_EZPI_SERV_ENABLE_MODES)
