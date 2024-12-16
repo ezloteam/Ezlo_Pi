@@ -28,9 +28,7 @@
 #include "ezlopi_core_processes.h"
 #include "ezlopi_core_errors.h"
 
-
 static void __ota_loop(void *arg);
-
 
 void ezlopi_service_ota_init(void)
 {
@@ -54,7 +52,7 @@ static void __ota_loop(void *arg)
 
             if ((ret_ota > 0) || ((xTaskGetTickCount() - __ota_time_stamp) > (86400 * 1000 / portTICK_RATE_MS))) // 86400 seconds in a day (24 hrs)
             {
-                cJSON* cj_firmware_info_request = firmware_send_firmware_query_to_nma_server(esp_random());
+                cJSON *cj_firmware_info_request = EZPI_firmware_send_firmware_query_to_nma_server(esp_random());
 
                 if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(cj_firmware_info_request))
                 {
@@ -84,7 +82,7 @@ static void ota_service_process(void* pv)
         {
             TRACE_D("Sending firmware check request...");
             // uint32_t message_counter = ezlopi_service_web_provisioning_get_message_count();
-            cJSON* cj_firmware_info_request = firmware_send_firmware_query_to_nma_server(esp_random());
+            cJSON* cj_firmware_info_request = EZPI_firmware_send_firmware_query_to_nma_server(esp_random());
 
             // CJSON_TRACE("----------------- broadcasting - cj_firmware_info_request", cj_firmware_info_request);
 
