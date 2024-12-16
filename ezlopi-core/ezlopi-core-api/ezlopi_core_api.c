@@ -36,9 +36,9 @@ cJSON *ezlopi_core_api_consume_cjson(const char *who, cJSON *cj_request)
     {
         if (__check_for_no_error(cj_request))
         {
-            cJSON *cj_id = cJSON_GetObjectItem(who, cj_request, ezlopi_id_str);
-            cJSON *cj_sender = cJSON_GetObjectItem(who, cj_request, ezlopi_sender_str);
-            cJSON *cj_method = cJSON_GetObjectItem(who, cj_request, ezlopi_method_str);
+            cJSON *cj_id = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_id_str);
+            cJSON *cj_sender = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_sender_str);
+            cJSON *cj_method = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_method_str);
 
             uint32_t method_id = ezlopi_core_ezlopi_methods_search_in_list(cj_method);
 
@@ -51,10 +51,10 @@ cJSON *ezlopi_core_api_consume_cjson(const char *who, cJSON *cj_request)
 
                     if (cj_response)
                     {
-                        cJSON_AddNullToObject(who, cj_response, ezlopi_error_str);
-                        cJSON_AddItemToObject(who, cj_response, ezlopi_id_str, cJSON_Duplicate(who, cj_id, true));
-                        cJSON_AddItemToObject(who, cj_response, ezlopi_sender_str, cJSON_Duplicate(who, cj_sender, true));
-                        cJSON_AddItemToObject(who, cj_response, ezlopi_method_str, cJSON_Duplicate(who, cj_method, true));
+                        cJSON_AddNullToObject(__FUNCTION__, cj_response, ezlopi_error_str);
+                        cJSON_AddItemToObject(__FUNCTION__, cj_response, ezlopi_id_str, cJSON_Duplicate(__FUNCTION__, cj_id, true));
+                        cJSON_AddItemToObject(__FUNCTION__, cj_response, ezlopi_sender_str, cJSON_Duplicate(__FUNCTION__, cj_sender, true));
+                        cJSON_AddItemToObject(__FUNCTION__, cj_response, ezlopi_method_str, cJSON_Duplicate(__FUNCTION__, cj_method, true));
                     }
                 }
 
@@ -69,11 +69,11 @@ cJSON *ezlopi_core_api_consume_cjson(const char *who, cJSON *cj_request)
 
                     if (cj_update_response)
                     {
-                        // cJSON_AddNullToObject(who, cj_update_response, ezlopi_error_str);
+                        // cJSON_AddNullToObject(__FUNCTION__, cj_update_response, ezlopi_error_str);
 
                         if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(cj_update_response))
                         {
-                            cJSON_Delete(who, cj_update_response);
+                            cJSON_Delete(__FUNCTION__, cj_update_response);
                         }
                     }
                 }
@@ -84,9 +84,9 @@ cJSON *ezlopi_core_api_consume_cjson(const char *who, cJSON *cj_request)
 
                 if (cj_response)
                 {
-                    cJSON_AddItemToObject(who, cj_response, ezlopi_id_str, cJSON_Duplicate(who, cj_id, true));
-                    cJSON_AddItemToObject(who, cj_response, ezlopi_sender_str, cJSON_Duplicate(who, cj_sender, true));
-                    cJSON_AddItemToObject(who, cj_response, ezlopi_method_str, cJSON_Duplicate(who, cj_method, true));
+                    cJSON_AddItemToObject(__FUNCTION__, cj_response, ezlopi_id_str, cJSON_Duplicate(__FUNCTION__, cj_id, true));
+                    cJSON_AddItemToObject(__FUNCTION__, cj_response, ezlopi_sender_str, cJSON_Duplicate(__FUNCTION__, cj_sender, true));
+                    cJSON_AddItemToObject(__FUNCTION__, cj_response, ezlopi_method_str, cJSON_Duplicate(__FUNCTION__, cj_method, true));
                 }
 
 #ifdef CONFIG_EZPI_UTIL_TRACE_EN
@@ -98,7 +98,7 @@ cJSON *ezlopi_core_api_consume_cjson(const char *who, cJSON *cj_request)
 #ifdef CONFIG_EZPI_UTIL_TRACE_EN
         else
         {
-            cJSON *cj_method = cJSON_GetObjectItem(who, cj_request, ezlopi_method_str);
+            cJSON *cj_method = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_method_str);
             // TRACE_E("## WS Rx <<<<<<<<<< '%s' \n %.*s", (NULL != cj_method) ? (cj_method->valuestring ? cj_method->valuestring : ezlopi__str) : ezlopi__str, len, payload);
         }
 #endif

@@ -1,4 +1,5 @@
 #include <esp_random.h>
+#include <esp_system.h>
 #include <bootloader_random.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
@@ -82,6 +83,7 @@ int ezlopi_service_otel_add_trace_to_telemetry_queue(cJSON *cj_trace)
 {
     int ret = 0;
 
+#if 0
     if (cj_trace)
     {
         s_otel_queue_data_t *otel_data = ezlopi_malloc(__FUNCTION__, sizeof(s_otel_queue_data_t));
@@ -96,6 +98,7 @@ int ezlopi_service_otel_add_trace_to_telemetry_queue(cJSON *cj_trace)
             }
         }
     }
+#endif
 
     return ret;
 }
@@ -103,7 +106,7 @@ int ezlopi_service_otel_add_trace_to_telemetry_queue(cJSON *cj_trace)
 void ezlopi_service_otel_init(void)
 {
     bootloader_random_enable();
-    ezlopi_util_set_otel_log_upcall(__otel_add_log_to_queue, 100);
+    // ezlopi_util_set_otel_log_upcall(__otel_add_log_to_queue, 100);
     __telemetry_queue = xQueueCreate(10, sizeof(s_otel_queue_data_t *));
     xTaskCreate(__otel_task, "otel-service-task", 2 * 2048, NULL, 4, NULL);
 }
@@ -183,7 +186,7 @@ static void __otel_loop(void *pv)
                     {
                     case E_OTEL_LOGS:
                     {
-                        cj_telemetry = __otel_logs_decorate(otel_data->cj_data);
+                        // cj_telemetry = __otel_logs_decorate(otel_data->cj_data);
                         break;
                     }
                     case E_OTEL_TRACES:
@@ -214,12 +217,14 @@ static void __otel_loop(void *pv)
 
 static void __otel_publish(cJSON *cj_telemetry)
 {
-    if (__wss_client && ezlopi_websocket_client_is_connected(__wss_client))
+    if (__wss_client && ezlopi_websocket_client_is_connected(__wss_client) && cj_telemetry)
     {
         uint32_t buffer_len = 0;
         char *buffer = ezlopi_core_buffer_acquire(__FUNCTION__, &buffer_len, 2000);
         if (buffer)
         {
+            uint32_t free_heap = esp_get_minimum_free_heap_size();
+            printf("Free Heap Size:            %d B    %.4f KB\r\n", free_heap, free_heap / 1024.0);
             cJSON_PrintPreallocated(__FUNCTION__, cj_telemetry, buffer, buffer_len, false);
             ezlopi_websocket_client_send(__wss_client, buffer, strlen(buffer), 1000);
             ezlopi_core_buffer_release(__FUNCTION__);
@@ -263,6 +268,8 @@ static int __message_upcall(char *payload, uint32_t len, time_t time_sec)
     if (payload && len)
     {
         printf("otel-response:: %lu -> wss-payload: %.*s\r\n", time_sec, len, payload);
+        ezlopi_free(__FUNCTION__, payload);
+        ret = 1;
     }
     return ret;
 }
@@ -677,20 +684,23 @@ static void __fill_random_hexstring(char *buffer, uint32_t bytelen)
 static int __push_to_telemetry_queue(s_otel_queue_data_t *otel_data)
 {
     int ret = 0;
-    if (pdTRUE == xQueueIsQueueFullFromISR(__telemetry_queue))
+    if (__telemetry_queue)
     {
-        s_otel_queue_data_t *dump_telemetry = NULL;
-        xQueueReceive(__telemetry_queue, &dump_telemetry, 0);
-        if (dump_telemetry)
+        if (pdTRUE == xQueueIsQueueFullFromISR(__telemetry_queue))
         {
-            cJSON_Delete(__FUNCTION__, dump_telemetry->cj_data);
-            ezlopi_free(__FUNCTION__, dump_telemetry);
+            s_otel_queue_data_t *dump_telemetry = NULL;
+            xQueueReceive(__telemetry_queue, &dump_telemetry, 0);
+            if (dump_telemetry)
+            {
+                cJSON_Delete(__FUNCTION__, dump_telemetry->cj_data);
+                ezlopi_free(__FUNCTION__, dump_telemetry);
+            }
         }
-    }
 
-    if (pdTRUE == xQueueSend(__telemetry_queue, &otel_data, 500 / portTICK_RATE_MS))
-    {
-        ret = 1;
+        if (pdTRUE == xQueueSend(__telemetry_queue, &otel_data, 500 / portTICK_RATE_MS))
+        {
+            ret = 1;
+        }
     }
     return ret;
 }

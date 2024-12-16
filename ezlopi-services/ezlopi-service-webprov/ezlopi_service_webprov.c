@@ -200,6 +200,7 @@ static void __fetch_wss_endpoint(void *pv)
 
                             __message_process_cjson(cj_request, rx_message->time_ms);
 
+#if 0
                             cJSON *cj_trace_telemetry = cJSON_CreateObject(__FUNCTION__);
                             if (cj_trace_telemetry)
                             {
@@ -222,6 +223,7 @@ static void __fetch_wss_endpoint(void *pv)
                                     cJSON_Delete(__FUNCTION__, cj_trace_telemetry);
                                 }
                             }
+#endif
 
                             cJSON_Delete(__FUNCTION__, cj_request);
                         }
