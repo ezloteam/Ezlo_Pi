@@ -24,7 +24,6 @@
 #include "ezlopi_cloud_setting_commands.h"
 #include "ezlopi_cloud_hub_data_list.h"
 
-
 #include "ezlopi_core_reset.h"
 #include "ezlopi_util_trace.h"
 
@@ -49,12 +48,12 @@ f_method_func_t ezlopi_core_ezlopi_methods_get_updater_by_id(uint32_t method_id)
     return method_list_v2[method_id].updater;
 }
 
-char* ezlopi_core_ezlopi_methods_get_name_by_id(uint32_t method_id)
+char *ezlopi_core_ezlopi_methods_get_name_by_id(uint32_t method_id)
 {
     return method_list_v2[method_id].method_name;
 }
 
-uint32_t ezlopi_core_ezlopi_methods_search_in_list(cJSON* cj_method)
+uint32_t ezlopi_core_ezlopi_methods_search_in_list(cJSON *cj_method)
 {
     uint32_t found_method = 0;
     uint32_t idx = 0;
@@ -76,9 +75,9 @@ uint32_t ezlopi_core_ezlopi_methods_search_in_list(cJSON* cj_method)
     return (found_method ? idx : UINT32_MAX);
 }
 
-void ezlopi_core_ezlopi_methods_rpc_method_notfound(cJSON* cj_request, cJSON* cj_response)
+void ezlopi_core_ezlopi_methods_rpc_method_notfound(cJSON *cj_request, cJSON *cj_response)
 {
-    cJSON* cjson_error = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_error_str);
+    cJSON *cjson_error = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_error_str);
     if (cjson_error)
     {
         cJSON_AddNumberToObject(__FUNCTION__, cjson_error, ezlopi_code_str, -32602);
@@ -91,14 +90,14 @@ void ezlopi_core_ezlopi_methods_rpc_method_notfound(cJSON* cj_request, cJSON* cj
 
 void ezlopi_core_ezlopi_methods_registration_init(void)
 {
-    registration_init();
+    EZPI_registration_init();
 }
 
 bool ezlopi_core_elzlopi_methods_check_method_register(f_method_func_t method)
 {
     bool ret = false;
 
-    if (registered == method)
+    if (EZPI_registered == method)
     {
         ret = true;
     }
@@ -106,7 +105,7 @@ bool ezlopi_core_elzlopi_methods_check_method_register(f_method_func_t method)
     return ret;
 }
 
-void ezlopi_core_ezlopi_methods_reboot(cJSON* cj_request, cJSON* cj_response)
+void ezlopi_core_ezlopi_methods_reboot(cJSON *cj_request, cJSON *cj_response)
 {
     EZPI_CORE_reset_reboot();
 }

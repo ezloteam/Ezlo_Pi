@@ -1,5 +1,4 @@
 
-
 /**
  * @file    ezlopi_cloud_ota.h
  * @brief

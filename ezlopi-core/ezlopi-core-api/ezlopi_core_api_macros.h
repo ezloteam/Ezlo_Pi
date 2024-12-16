@@ -130,7 +130,7 @@ CLOUD_METHOD("hub.scenes.expressions.delete", scenes_expressions_delete, scenes_
 
 #endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
-CLOUD_METHOD("hub.nma.register.repeat", register_repeat, NULL)
+CLOUD_METHOD("hub.nma.register.repeat", EZPI_register_repeat, NULL)
 
 CLOUD_METHOD("hub.reboot", ezlopi_core_ezlopi_methods_reboot, NULL)
 
@@ -140,7 +140,7 @@ CLOUD_METHOD("hub.coordinates.set", EZPI_hub_coordinates_set, NULL)
 CLOUD_METHOD("hub.coordinates.get", EZPI_hub_coordinates_get, NULL)
 CLOUD_METHOD("hub.offline.login.ui", EZPI_CLOUD_offline_login, NULL)
 
-CLOUD_METHOD("registered", registered, NULL)
+CLOUD_METHOD("registered", EZPI_registered, NULL)
 
 CLOUD_METHOD("hub.data.list", EZPI_hub_data_list, NULL)
 
