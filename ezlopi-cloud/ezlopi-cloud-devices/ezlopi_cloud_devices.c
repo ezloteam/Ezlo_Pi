@@ -55,53 +55,17 @@
 #include "ezlopi_cloud_keywords.h"
 #include "ezlopi_cloud_methods_str.h"
 #include "ezlopi_cloud_constants.h"
+
 //------------------------------------------------------------------------------------------------------------------
-static char *__generate_sha1_of_src(const char *src)
-{
-    char *ret = NULL;
-    if (src)
-    {
-        if (!mbedtls_sha1_self_test(1))
-        {
-            unsigned char sha1[20];
-            mbedtls_sha1_context sha1_ctx;
+/**
+ * @brief Function to generate sha1 for src
+ * 
+ * @param src Pointer to the source of which SHA1 has to be generated
+ * @return char* 
+ * @retval Generated SHA1 else NULL
+ */
+static char *ezpi_generate_sha1_of_src(const char *src);
 
-            mbedtls_sha1_init(&sha1_ctx);
-            if (0 == mbedtls_sha1_starts_ret(&sha1_ctx))
-            {
-                if (0 == mbedtls_sha1_update_ret(&sha1_ctx, (const unsigned char *)src, strlen(src)))
-                {
-                    if (0 == mbedtls_sha1_finish_ret(&sha1_ctx, sha1))
-                    {
-                        size_t len = (4 * sizeof(sha1)) + 1;
-                        ret = (char *)ezlopi_malloc(__FUNCTION__, len);
-                        if (ret)
-                        {
-                            memset(ret, 0, len);
-                            for (int i = 0; i < sizeof(sha1); i++)
-                            {
-                                size_t l = (len - (strlen(ret) + 1));
-                                if (l > 0)
-                                {
-                                    ((int)sha1[i] / 100 > 0)  ? (snprintf(ret + strlen(ret), l, "%u", (uint8_t)sha1[i]))    // tripple digit
-                                    : ((int)sha1[i] / 10 > 0) ? (snprintf(ret + strlen(ret), l, "0%u", (uint8_t)sha1[i]))   // double digit
-                                                              : (snprintf(ret + strlen(ret), l, "00%u", (uint8_t)sha1[i])); // single digit
-                                }
-                                else
-                                {
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            mbedtls_sha1_free(&sha1_ctx);
-        }
-    }
-    return ret;
-}
 //------------------------------------------------------------------------------------------------------------------
 void EZPI_devices_list_v3(cJSON *cj_request, cJSON *cj_response)
 {
@@ -355,7 +319,7 @@ void EZPI_device_groups_list(cJSON *cj_request, cJSON *cj_response)
             if (res_str)
             {
                 char *hash_str = NULL;
-                if (NULL != (hash_str = __generate_sha1_of_src(res_str))) // returns malloc ; need to free
+                if (NULL != (hash_str = ezpi_generate_sha1_of_src(res_str))) // returns malloc ; need to free
                 {
                     // TRACE_S("'hash': %s [%d]", hash_str, strlen(hash_str));
                     cJSON *cj_ver_str = cJSON_GetObjectItem(__FUNCTION__, (cJSON_GetObjectItem(__FUNCTION__, cj_request, "params")), "version");
@@ -487,7 +451,7 @@ void EZPI_device_group_devitem_expand(cJSON *cj_request, cJSON *cj_response)
                 if (res_str)
                 {
                     char *hash_str = NULL;
-                    if (NULL != (hash_str = __generate_sha1_of_src(res_str))) // returns malloc ; need to free
+                    if (NULL != (hash_str = ezpi_generate_sha1_of_src(res_str))) // returns malloc ; need to free
                     {
                         // TRACE_S("'hash': %s [%d]", hash_str, strlen(hash_str));
                         cJSON *cj_ver_str = cJSON_GetObjectItem(__FUNCTION__, cj_params, "version");
@@ -647,7 +611,7 @@ void EZPI_item_groups_list(cJSON *cj_request, cJSON *cj_response)
             if (res_str)
             {
                 char *hash_str = NULL;
-                if (NULL != (hash_str = __generate_sha1_of_src(res_str))) // returns malloc ; need to free
+                if (NULL != (hash_str = ezpi_generate_sha1_of_src(res_str))) // returns malloc ; need to free
                 {
                     // TRACE_S("'hash': %s [%d]", hash_str, strlen(hash_str));
                     cJSON *cj_ver_str = cJSON_GetObjectItem(__FUNCTION__, (cJSON_GetObjectItem(__FUNCTION__, cj_request, "params")), "version");
@@ -806,6 +770,53 @@ void EZPI_EZPI_item_group_updated(cJSON *cj_request, cJSON *cj_response)
             }
         }
     }
+}
+
+static char *ezpi_generate_sha1_of_src(const char *src)
+{
+    char *ret = NULL;
+    if (src)
+    {
+        if (!mbedtls_sha1_self_test(1))
+        {
+            unsigned char sha1[20];
+            mbedtls_sha1_context sha1_ctx;
+
+            mbedtls_sha1_init(&sha1_ctx);
+            if (0 == mbedtls_sha1_starts_ret(&sha1_ctx))
+            {
+                if (0 == mbedtls_sha1_update_ret(&sha1_ctx, (const unsigned char *)src, strlen(src)))
+                {
+                    if (0 == mbedtls_sha1_finish_ret(&sha1_ctx, sha1))
+                    {
+                        size_t len = (4 * sizeof(sha1)) + 1;
+                        ret = (char *)ezlopi_malloc(__FUNCTION__, len);
+                        if (ret)
+                        {
+                            memset(ret, 0, len);
+                            for (int i = 0; i < sizeof(sha1); i++)
+                            {
+                                size_t l = (len - (strlen(ret) + 1));
+                                if (l > 0)
+                                {
+                                    ((int)sha1[i] / 100 > 0)  ? (snprintf(ret + strlen(ret), l, "%u", (uint8_t)sha1[i]))    // tripple digit
+                                    : ((int)sha1[i] / 10 > 0) ? (snprintf(ret + strlen(ret), l, "0%u", (uint8_t)sha1[i]))   // double digit
+                                                              : (snprintf(ret + strlen(ret), l, "00%u", (uint8_t)sha1[i])); // single digit
+                                }
+                                else
+                                {
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            mbedtls_sha1_free(&sha1_ctx);
+        }
+    }
+    return ret;
 }
 
 /*******************************************************************************

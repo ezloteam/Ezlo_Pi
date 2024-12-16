@@ -48,38 +48,176 @@ extern "C"
 {
 #endif
 
+    /**
+     * @brief Function to respond to hub.devices.list method
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
     void EZPI_devices_list_v3(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function to respond to hub.device.name.set method
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
     void EZPI_device_name_set(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function to respond to hub.device.room.set method
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
     void EZPI_device_room_set(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function to respond to hub.devices.list method
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
     void EZPI_device_armed_set(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function to response device updated with method hub.device.updated
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
     void EZPI_device_updated(cJSON *cj_request, cJSON *cj_response);
 
     // char *devices_settings_list(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count);
     // char *devices_name_set(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count);
 
     //--------- device-groups-------
+    /**
+     * @brief Function to respond to hub.device.group.create method
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
     void EZPI_device_group_create(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function to respond to hub.device.group.get method
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
     void EZPI_device_group_get(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function to respond to hub.device.group.delete method
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
     void EZPI_device_group_delete(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function to respond to hub.device.group.update method
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
     void EZPI_device_group_update(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function to respond to hub.device.groups.list method
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
     void EZPI_device_groups_list(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function to respond to hub.device.group.find method
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
     void EZPI_device_group_find(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function to respond to hub.device.item.group.expand method
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
     void EZPI_device_group_devitem_expand(cJSON *cj_request, cJSON *cj_response);
 
     ///////////// device-grp updaters
+    /**
+     * @brief Function to send group created update with method hub.device.group.created
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
     void EZPI_device_group_created(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function to send group deleted update with method hub.device.group.deleted
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
     void EZPI_device_group_deleted(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function to send group updates with method hub.device.group.updated
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
     void EZPI_device_group_updated(cJSON *cj_request, cJSON *cj_response);
 
     //--------- item-groups-------
+    /**
+     * @brief Function to respond to hub.item.group.create method
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
     void EZPI_item_group_create(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function to respond to hub.item.group.get method
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
     void EZPI_item_group_get(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function to respond to hub.item.group.delete method
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
     void EZPI_item_group_delete(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function to respond to hub.item.group.update method
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
     void EZPI_item_group_update(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function to respond to hub.item.groups.list method
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
     void EZPI_item_groups_list(cJSON *cj_request, cJSON *cj_response);
     ///////////// item-grp updaters
+    /**
+     * @brief Function to send group created update with method hub.item.group.created
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
     void EZPI_item_group_created(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function to send group deleted update with method hub.item.group.deleted
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
     void EZPI_item_group_deleted(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function to send group updates with method hub.item.group.updated
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
     void EZPI_EZPI_item_group_updated(cJSON *cj_request, cJSON *cj_response);
 
 #ifdef __cplusplus
