@@ -59,7 +59,7 @@ CLOUD_METHOD("hub.favorite.list", EZPI_favorite_list_v3, NULL)
 
 CLOUD_METHOD("hub.gateways.list", EZPI_gateways_list, NULL)
 
-CLOUD_METHOD("hub.info.get", info_get, NULL)
+CLOUD_METHOD("hub.info.get", EZPI_info_get, NULL)
 
 CLOUD_METHOD("hub.network.get", network_get, NULL)
 CLOUD_METHOD("hub.network.wifi.scan.start", network_wifi_scan_start, NULL)
