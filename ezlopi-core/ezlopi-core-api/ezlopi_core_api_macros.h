@@ -55,9 +55,9 @@ CLOUD_METHOD("hub.modes.entry_delay.set", ezlopi_cloud_modes_entry_delay_set, ez
 CLOUD_METHOD("hub.modes.entry_delay.reset", ezlopi_cloud_modes_entry_delay_reset, ezlopi_cloud_modes_entry_delay_changed)
 #endif // CONFIG_EZPI_SERV_ENABLE_MODES
 
-CLOUD_METHOD("hub.favorite.list", favorite_list_v3, NULL)
+CLOUD_METHOD("hub.favorite.list", EZPI_favorite_list_v3, NULL)
 
-CLOUD_METHOD("hub.gateways.list", gateways_list, NULL)
+CLOUD_METHOD("hub.gateways.list", EZPI_gateways_list, NULL)
 
 CLOUD_METHOD("hub.info.get", info_get, NULL)
 

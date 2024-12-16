@@ -49,7 +49,7 @@
 #include "ezlopi_cloud_methods_str.h"
 #include "ezlopi_cloud_keywords.h"
 
-void favorite_list_v3(cJSON *cj_request, cJSON *cj_response)
+void EZPI_favorite_list_v3(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON *cj_devices_req = NULL;
     cJSON *cj_items_req = NULL;

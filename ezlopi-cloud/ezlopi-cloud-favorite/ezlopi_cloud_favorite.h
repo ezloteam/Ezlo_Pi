@@ -52,7 +52,7 @@ extern "C"
      * @param cj_request Incoming JSON request
      * @param cj_response Outgoing JSON response
      */
-    void favorite_list_v3(cJSON *cj_request, cJSON *cj_response);
+    void EZPI_favorite_list_v3(cJSON *cj_request, cJSON *cj_response);
 #if 0 // v2.x
     void favorite_list(cJSON* cj_request, cJSON* cj_response);
 #endif
