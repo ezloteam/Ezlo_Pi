@@ -109,13 +109,13 @@ CLOUD_METHOD("hub.scenes.clone", scenes_clone, scene_added)
 
 #endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
-CLOUD_METHOD("hub.room.list", room_list, NULL)
-CLOUD_METHOD("hub.room.create", room_create, room_created)
-CLOUD_METHOD("hub.room.name.set", room_name_set, room_edited)
-CLOUD_METHOD("hub.room.order.set", room_order_set, room_reordered)
-CLOUD_METHOD("hub.room.get", room_get, NULL)
-CLOUD_METHOD("hub.room.delete", room_delete, room_deleted)
-CLOUD_METHOD("hub.room.all.delete", room_all_delete, NULL)
+CLOUD_METHOD("hub.room.list", EZPI_room_list, NULL)
+CLOUD_METHOD("hub.room.create", EZPI_room_create, EZPI_room_created)
+CLOUD_METHOD("hub.room.name.set", EZPI_room_name_set, EZPI_room_edited)
+CLOUD_METHOD("hub.room.order.set", EZPI_room_order_set, EZPI_room_reordered)
+CLOUD_METHOD("hub.room.get", EZPI_room_get, NULL)
+CLOUD_METHOD("hub.room.delete", EZPI_room_delete, EZPI_room_deleted)
+CLOUD_METHOD("hub.room.all.delete", EZPI_room_all_delete, NULL)
 
 #if defined(CONFIG_EZPI_SERV_ENABLE_MESHBOTS)
 CLOUD_METHOD("hub.scenes.scripts.list", scenes_scripts_list, NULL)
