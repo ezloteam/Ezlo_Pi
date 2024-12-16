@@ -54,7 +54,7 @@ void favorite_list_v3(cJSON *cj_request, cJSON *cj_response)
             // cJSON *cj_items_list = cj_items_req ? cJSON_AddArrayToObject(__FUNCTION__, cj_favorites, ezlopi_items_str) : NULL;
             // cJSON *cj_rules_list = cj_rules_req ? cJSON_AddArrayToObject(__FUNCTION__, cj_favorites, "rules") : NULL;
 
-            l_ezlopi_device_t *curr_device = ezlopi_device_get_head();
+            l_ezlopi_device_t *curr_device = EZPI_core_device_get_head();
             while (curr_device)
             {
                 l_ezlopi_item_t *curr_item = curr_device->items;

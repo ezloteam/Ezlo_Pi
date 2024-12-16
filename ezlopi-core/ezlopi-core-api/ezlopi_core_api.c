@@ -1,5 +1,46 @@
-#include "ezlopi_util_trace.h"
-#include "ezlopi_cloud_constants.h"
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+/**
+* @file    ezlopi_core_api.c
+* @brief   These function perform operation on API-methods
+* @author  xx
+* @version 0.1
+* @date    12th DEC 2024
+*/
+
+/*******************************************************************************
+*                          Include Files
+*******************************************************************************/
+
+// #include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_api.h"
 #include "ezlopi_core_broadcast.h"
@@ -7,11 +48,36 @@
 #include "ezlopi_core_event_group.h"
 #include "ezlopi_core_cjson_macros.h"
 
+#include "ezlopi_cloud_constants.h"
+/*******************************************************************************
+*                          Extern Data Declarations
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Extern Function Declarations
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Type & Macro Definitions
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Static Function Prototypes
+*******************************************************************************/
 static int __check_for_no_error(cJSON *cj_request);
 static cJSON *__execute_method(cJSON *cj_request, f_method_func_t method_func);
+/*******************************************************************************
+*                          Static Data Definitions
+*******************************************************************************/
 
-///////////////////////////////////////////////////////////////////////////////////
-cJSON *ezlopi_core_api_consume(const char *who, const char *payload, uint32_t len)
+/*******************************************************************************
+*                          Extern Data Definitions
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Extern Function Definitions
+*******************************************************************************/
+cJSON *EZPI_core_api_consume(const char *who, const char *payload, uint32_t len)
 {
     cJSON *cj_response = NULL;
 
@@ -21,14 +87,14 @@ cJSON *ezlopi_core_api_consume(const char *who, const char *payload, uint32_t le
         // cJSON *cj_request = cJSON_ParseWithRefWithLength(who, payload, len);
         if (cj_request)
         {
-            cj_response = ezlopi_core_api_consume_cjson(who, cj_request);
+            cj_response = EZPI_core_api_consume_cjson(who, cj_request);
             cJSON_Delete(__FUNCTION__, cj_request);
         }
     }
     return cj_response;
 }
 
-cJSON *ezlopi_core_api_consume_cjson(const char *who, cJSON *cj_request)
+cJSON *EZPI_core_api_consume_cjson(const char *who, cJSON *cj_request)
 {
     cJSON *cj_response = NULL;
 
@@ -40,11 +106,11 @@ cJSON *ezlopi_core_api_consume_cjson(const char *who, cJSON *cj_request)
             cJSON *cj_sender = cJSON_GetObjectItem(who, cj_request, ezlopi_sender_str);
             cJSON *cj_method = cJSON_GetObjectItem(who, cj_request, ezlopi_method_str);
 
-            uint32_t method_id = ezlopi_core_ezlopi_methods_search_in_list(cj_method);
+            uint32_t method_id = EZPI_core_ezlopi_methods_search_in_list(cj_method);
 
             if (UINT32_MAX != method_id)
             {
-                f_method_func_t method = ezlopi_core_ezlopi_methods_get_by_id(method_id);
+                f_method_func_t method = EZPI_core_ezlopi_methods_get_by_id(method_id);
                 if (method)
                 {
                     cj_response = __execute_method(cj_request, method);
@@ -58,7 +124,7 @@ cJSON *ezlopi_core_api_consume_cjson(const char *who, cJSON *cj_request)
                     }
                 }
 
-                f_method_func_t updater = ezlopi_core_ezlopi_methods_get_updater_by_id(method_id);
+                f_method_func_t updater = EZPI_core_ezlopi_methods_get_updater_by_id(method_id);
                 if (updater)
                 {
                     TRACE_W("updater function: %p", updater);
@@ -78,7 +144,7 @@ cJSON *ezlopi_core_api_consume_cjson(const char *who, cJSON *cj_request)
             }
             else
             {
-                cj_response = __execute_method(cj_request, ezlopi_core_ezlopi_methods_rpc_method_notfound);
+                cj_response = __execute_method(cj_request, EZPI_core_ezlopi_methods_rpc_method_notfound);
 
                 if (cj_response)
                 {
@@ -102,12 +168,16 @@ cJSON *ezlopi_core_api_consume_cjson(const char *who, cJSON *cj_request)
     return cj_response;
 }
 
+
+/*******************************************************************************
+*                         Static Function Definitions
+*******************************************************************************/
 static cJSON *__execute_method(cJSON *cj_request, f_method_func_t method_func)
 {
     cJSON *cj_response = NULL;
     if (method_func)
     {
-        if (ezlopi_core_elzlopi_methods_check_method_register(method_func))
+        if (EZPI_core_ezlopi_methods_check_method_register(method_func))
         {
             method_func(cj_request, NULL);
             ezlopi_event_group_set_event(EZLOPI_EVENT_NMA_REG);
@@ -151,3 +221,7 @@ static int __check_for_no_error(cJSON *cj_request)
 
     return ret;
 }
+
+/*******************************************************************************
+*                          End of File
+*******************************************************************************/

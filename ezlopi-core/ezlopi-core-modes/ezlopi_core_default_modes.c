@@ -196,7 +196,7 @@ static void __cjson_add_security_device_to_array(cJSON *cj_device_array)
 {
     if (cj_device_array && (cj_device_array->type == cJSON_Array))
     {
-        l_ezlopi_device_t *curr_device = ezlopi_device_get_head();
+        l_ezlopi_device_t *curr_device = EZPI_core_device_get_head();
         while (curr_device)
         {
             if (EZPI_STRNCMP_IF_EQUAL(category_security_sensor, curr_device->cloud_properties.category, strlen(category_security_sensor) + 1, strlen(curr_device->cloud_properties.category) + 1))

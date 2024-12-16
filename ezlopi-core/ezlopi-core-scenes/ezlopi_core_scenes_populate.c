@@ -96,7 +96,7 @@ void EZPI_scenes_populate_scene(l_scenes_list_v2_t *new_scene, cJSON *cj_scene, 
             {
                 new_scene->group_id = (uint32_t)strtoul(tmp_grp_id, NULL, 16);
                 TRACE_S("group_id: %08x", new_scene->group_id);
-                ezlopi_cloud_update_group_id(new_scene->group_id);
+                EZPI_core_cloud_update_group_id(new_scene->group_id);
             }
         }
 
@@ -394,7 +394,7 @@ void EZPI_scenes_populate_assign_when_block(l_when_block_v2_t *new_when_block, c
             {
                 new_when_block->blockId = (uint32_t)strtoul(tmp_block_id, NULL, 16);
                 TRACE_D("blockId (edit): %08x", new_when_block->blockId);
-                ezlopi_cloud_update_when_blockId(new_when_block->blockId);
+                EZPI_core_cloud_update_when_blockId(new_when_block->blockId);
             }
         }
 

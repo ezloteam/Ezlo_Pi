@@ -31,7 +31,7 @@ static int __scenes_block_trigger_device_list(cJSON *cj_devices_array)
     {
         char device_id_str[32] = { 0 };
         bool found_item = false;
-        l_ezlopi_device_t *device_node = ezlopi_device_get_head();
+        l_ezlopi_device_t *device_node = EZPI_core_device_get_head();
         while (device_node)
         {
             found_item = false;
@@ -349,7 +349,7 @@ static cJSON *__add_scenes_blocks_by_device_ids(e_scenes_block_type_v2_t block_t
         if (cj_device_id->valuestring)
         {
             uint32_t device_id = strtoul(cj_device_id->valuestring, NULL, 16);
-            l_ezlopi_device_t *device_node = ezlopi_device_get_by_id(device_id);
+            l_ezlopi_device_t *device_node = EZPI_core_device_get_by_id(device_id);
             if (device_node)
             {
                 // TRACE_D("Here");

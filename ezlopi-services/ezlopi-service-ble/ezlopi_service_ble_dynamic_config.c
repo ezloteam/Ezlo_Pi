@@ -6,36 +6,36 @@
  * @version
  * @date
  */
-/* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
-**
-** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
-**
-** Redistribution and use in source and binary forms, with or without
-** modification, are permitted provided that the following conditions are met:
-**
-** 1. Redistributions of source code must retain the above copyright notice,
-**    this list of conditions and the following disclaimer.
-** 2. Redistributions in binary form must reproduce the above copyright
-**    notice, this list of conditions and the following disclaimer in the
-**    documentation and/or other materials provided with the distribution.
-** 3. Neither the name of the copyright holder nor the names of its
-**    contributors may be used to endorse or promote products derived from
-**    this software without specific prior written permission.
-**
-** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
-** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-** POSSIBILITY OF SUCH DAMAGE.
-** ===========================================================================
-*/
+ /* ===========================================================================
+ ** Copyright (C) 2024 Ezlo Innovation Inc
+ **
+ ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+ **
+ ** Redistribution and use in source and binary forms, with or without
+ ** modification, are permitted provided that the following conditions are met:
+ **
+ ** 1. Redistributions of source code must retain the above copyright notice,
+ **    this list of conditions and the following disclaimer.
+ ** 2. Redistributions in binary form must reproduce the above copyright
+ **    notice, this list of conditions and the following disclaimer in the
+ **    documentation and/or other materials provided with the distribution.
+ ** 3. Neither the name of the copyright holder nor the names of its
+ **    contributors may be used to endorse or promote products derived from
+ **    this software without specific prior written permission.
+ **
+ ** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ ** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ ** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ ** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ ** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ ** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ ** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ ** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ ** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ ** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ ** POSSIBILITY OF SUCH DAMAGE.
+ ** ===========================================================================
+ */
 
 #include "../../build/config/sdkconfig.h"
 
@@ -69,32 +69,32 @@
 #include "ezlopi_service_ble_ble_auth.h"
 #include "ezlopi_service_ble.h"
 
-/*******************************************************************************
- *                          Type & Macro Definitions
- *******************************************************************************/
-/**
- * @brief Returns string from the the json `root` which contains name member
- * @note root is the JOSN and should exist before being called
- *
- */
+ /*******************************************************************************
+  *                          Type & Macro Definitions
+  *******************************************************************************/
+  /**
+   * @brief Returns string from the the json `root` which contains name member
+   * @note root is the JOSN and should exist before being called
+   *
+   */
 #define CJ_GET_STRING(name) cJSON_GetStringValue(cJSON_GetObjectItem(__FUNCTION__, root, name))
-/**
- * @brief Returns number from the the json `root` which contains name member
- * @note root is the JOSN and should exist before being called
- *
- */
+   /**
+    * @brief Returns number from the the json `root` which contains name member
+    * @note root is the JOSN and should exist before being called
+    *
+    */
 #define CJ_GET_NUMBER(name) cJSON_GetNumberValue(cJSON_GetObjectItem(__FUNCTION__, root, name))
 
-/*******************************************************************************
- *                          Static Function Prototypes
- *******************************************************************************/
+    /*******************************************************************************
+     *                          Static Function Prototypes
+     *******************************************************************************/
 
-/**
- * @brief Function to encode dynamic config data to base64 string
- *
- * @return char* pointer to the base64 encoded string
- * @retval Base64 encoded string or NULL on error
- */
+     /**
+      * @brief Function to encode dynamic config data to base64 string
+      *
+      * @return char* pointer to the base64 encoded string
+      * @retval Base64 encoded string or NULL on error
+      */
 static char *ezpi_dynamic_config_base64(void);
 /**
  * @brief Function to decode base64 encoded dynamic config data
@@ -133,13 +133,13 @@ void EZPI_ble_service_dynamic_config_init(void)
 
     uuid.len = ESP_UUID_LEN_16;
     uuid.uuid.uuid16 = BLE_DYNAMIC_CONFIG_SERVICE_UUID;
-    g_dynamic_config_service = ezlopi_ble_gatt_create_service(BLE_DYNAMIC_CONFIG_HANDLE, &uuid);
+    g_dynamic_config_service = EZPI_core_ble_gatt_create_service(BLE_DYNAMIC_CONFIG_HANDLE, &uuid);
 
     uuid.uuid.uuid16 = BLE_DYNAMIC_CONFIG_CHAR_UUID;
     uuid.len = ESP_UUID_LEN_16;
     permission = ESP_GATT_PERM_WRITE | ESP_GATT_PERM_READ;
     properties = ESP_GATT_CHAR_PROP_BIT_WRITE | ESP_GATT_CHAR_PROP_BIT_READ | ESP_GATT_CHAR_PROP_BIT_NOTIFY | ESP_GATT_CHAR_PROP_BIT_INDICATE;
-    ezlopi_ble_gatt_add_characteristic(g_dynamic_config_service, &uuid, permission, properties, ezpi_dynamic_config_read_func, ezpi_dynamic_config_write_func, NULL); // reliable-write is not implemented for now
+    EZPI_core_ble_gatt_add_characteristic(g_dynamic_config_service, &uuid, permission, properties, ezpi_dynamic_config_read_func, ezpi_dynamic_config_write_func, NULL); // reliable-write is not implemented for now
 }
 
 static void ezpi_dynamic_config_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
@@ -149,11 +149,11 @@ static void ezpi_dynamic_config_write_func(esp_gatt_value_t *value, esp_ble_gatt
 
     if (NULL == g_dynamic_config_linked_buffer)
     {
-        g_dynamic_config_linked_buffer = ezlopi_ble_buffer_create(param);
+        g_dynamic_config_linked_buffer = EZPI_core_ble_buffer_create(param);
     }
     else
     {
-        ezlopi_ble_buffer_add_to_buffer(g_dynamic_config_linked_buffer, param);
+        EZPI_core_ble_buffer_add_to_buffer(g_dynamic_config_linked_buffer, param);
     }
 
     if (g_dynamic_config_linked_buffer)
@@ -197,7 +197,7 @@ static void ezpi_dynamic_config_write_func(esp_gatt_value_t *value, esp_ble_gatt
                             ezlopi_free(__FUNCTION__, decoded_data);
                         }
 
-                        ezlopi_ble_buffer_free_buffer(g_dynamic_config_linked_buffer);
+                        EZPI_core_ble_buffer_free_buffer(g_dynamic_config_linked_buffer);
                         g_dynamic_config_linked_buffer = NULL;
                     }
                 }
@@ -238,14 +238,14 @@ static void ezpi_dynamic_config_read_func(esp_gatt_value_t *value, esp_ble_gatts
             if (g_dynamic_config_base64)
             {
                 g_dynamic_config_sequence_no = 0;
-                g_dynamic_config_number_of_sequence = strlen(g_dynamic_config_base64) / ezlopi_ble_gatt_get_max_data_size();
-                g_dynamic_config_number_of_sequence = (strlen(g_dynamic_config_base64) % ezlopi_ble_gatt_get_max_data_size()) ? (g_dynamic_config_number_of_sequence + 1) : g_dynamic_config_number_of_sequence;
+                g_dynamic_config_number_of_sequence = strlen(g_dynamic_config_base64) / EZPI_core_ble_gatt_get_max_data_size();
+                g_dynamic_config_number_of_sequence = (strlen(g_dynamic_config_base64) % EZPI_core_ble_gatt_get_max_data_size()) ? (g_dynamic_config_number_of_sequence + 1) : g_dynamic_config_number_of_sequence;
             }
         }
 
         if (NULL != g_dynamic_config_base64)
         {
-            if (ezlopi_ble_gatt_get_max_data_size() >= g_required_ble_prov_buffer_size)
+            if (EZPI_core_ble_gatt_get_max_data_size() >= g_required_ble_prov_buffer_size)
             {
                 uint32_t total_data_len = strlen(g_dynamic_config_base64);
                 uint32_t copy_size = total_data_len - (g_dynamic_config_sequence_no * 400);
@@ -420,7 +420,7 @@ static char *ezpi_dynamic_config_base64(void)
             TRACE_D("device-config: [len: %d]\n%s", strlen(str_ezlopi_config), str_ezlopi_config);
 
             int ret = mbedtls_base64_encode((unsigned char *)base64_data, base64_data_len, &out_put_len,
-                                            (const unsigned char *)str_ezlopi_config, strlen(str_ezlopi_config));
+                (const unsigned char *)str_ezlopi_config, strlen(str_ezlopi_config));
 
             ezlopi_factory_info_v3_free(str_ezlopi_config);
 

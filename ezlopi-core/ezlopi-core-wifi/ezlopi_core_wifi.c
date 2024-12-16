@@ -634,7 +634,7 @@ static void __event_wifi_scan_done(void *event_data)
                     }
                 }
 
-                ezlopi_core_device_value_update_wifi_scan_broadcast(network_array);
+                EZPI_core_device_value_update_wifi_scan_broadcast(network_array);
             }
 
             ezlopi_free(__FUNCTION__, ap_record);

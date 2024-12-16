@@ -97,21 +97,23 @@ extern "C"
      *                          Extern Data Declarations
      *******************************************************************************/
 
-     /*******************************************************************************
-      *                          Extern Function Prototypes
-      *******************************************************************************/
-      /**
-       * @brief Global function template example
-       * Convention : Use capital letter for initial word on extern function
-       * maincomponent : Main component as hal, core, service etc.
-       * subcomponent : Sub component as i2c from hal, ble from service etc
-       * functiontitle : Title of the function
-       * eg : EZPI_hal_i2c_init()
-       * @param arg
-       *
-       */
-       // void EZPI_core_errors_functiontitle(type_t arg);
+    /*******************************************************************************
+     *                          Extern Function Prototypes
+     *******************************************************************************/
+
+    /**
+     * @brief Function to assert error
+     *
+     * @param error Target error-type
+     * @param error_to_assert_on Condition to assert
+     */
     void EZPI_core_error_assert_on_error(ezlopi_error_t error, uint32_t error_to_assert_on);
+    /**
+     * @brief Function to return string literal corresponding to error-code
+     *
+     * @param error_code src Error-code
+     * @return const char*
+     */
     const char *EZPI_core_error_code_to_str(ezlopi_error_t error_code);
 
 #ifdef __cplusplus

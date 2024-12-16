@@ -1,5 +1,3 @@
-# set(config_src "config.cpp")
-
 file(GLOB_RECURSE config_src "*.c")
 
 set(ESP_IDF_COMPONENTS 

@@ -73,7 +73,7 @@ static void proximity_sensor_setup_item_properties(l_ezlopi_item_t *item, cJSON 
         item->cloud_properties.value_type = value_type_bool;
         item->cloud_properties.show = true;
         item->cloud_properties.scale = NULL;
-        item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
+        item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
 
         CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type);
 
@@ -94,11 +94,11 @@ static ezlopi_error_t proximity_sensor_prepare(void *args)
 
     if ((NULL != device_prep_arg) && (NULL != device_prep_arg->cjson_device))
     {
-        l_ezlopi_device_t *device = ezlopi_device_add_device(device_prep_arg->cjson_device, NULL);
+        l_ezlopi_device_t *device = EZPI_core_device_add_device(device_prep_arg->cjson_device, NULL);
         if (device)
         {
             proximity_sensor_setup_device_cloud_properties(device, device_prep_arg->cjson_device);
-            l_ezlopi_item_t *item = ezlopi_device_add_item_to_device(device, sensor_0034_digitalIn_proximity);
+            l_ezlopi_item_t *item = EZPI_core_device_add_item_to_device(device, sensor_0034_digitalIn_proximity);
             if (item)
             {
                 proximity_sensor_setup_item_properties(item, device_prep_arg->cjson_device);
@@ -106,7 +106,7 @@ static ezlopi_error_t proximity_sensor_prepare(void *args)
             }
             else
             {
-                ezlopi_device_free_device(device);
+                EZPI_core_device_free_device(device);
             }
         }
     }
@@ -150,7 +150,7 @@ static void proximity_sensor_value_updated_from_device(void *arg)
     l_ezlopi_item_t *item = (l_ezlopi_item_t *)arg;
     if (item)
     {
-        ezlopi_device_value_updated_from_device_broadcast(item);
+        EZPI_core_device_value_updated_from_device_broadcast(item);
     }
 }
 

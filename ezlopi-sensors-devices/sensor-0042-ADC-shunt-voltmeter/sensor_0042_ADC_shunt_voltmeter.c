@@ -72,7 +72,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
 }
 static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_data)
 {
-    item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
+    item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
     item->cloud_properties.item_name = ezlopi_item_name_voltage;
@@ -101,11 +101,11 @@ static ezlopi_error_t __0042_prepare(void *arg)
         {
             memset(user_data, 0, sizeof(s_voltmeter_t));
 
-            l_ezlopi_device_t *voltmeter_device = ezlopi_device_add_device(device_prep_arg->cjson_device, NULL);
+            l_ezlopi_device_t *voltmeter_device = EZPI_core_device_add_device(device_prep_arg->cjson_device, NULL);
             if (voltmeter_device)
             {
                 __prepare_device_cloud_properties(voltmeter_device, device_prep_arg->cjson_device);
-                l_ezlopi_item_t *voltmeter_item = ezlopi_device_add_item_to_device(voltmeter_device, sensor_0042_ADC_shunt_voltmeter);
+                l_ezlopi_item_t *voltmeter_item = EZPI_core_device_add_item_to_device(voltmeter_device, sensor_0042_ADC_shunt_voltmeter);
                 if (voltmeter_item)
                 {
                     __prepare_item_cloud_properties(voltmeter_item, device_prep_arg->cjson_device, user_data);
@@ -113,7 +113,7 @@ static ezlopi_error_t __0042_prepare(void *arg)
                 }
                 else
                 {
-                    ezlopi_device_free_device(voltmeter_device);
+                    EZPI_core_device_free_device(voltmeter_device);
                     ezlopi_free(__FUNCTION__, user_data);
                 }
             }
@@ -185,7 +185,7 @@ static ezlopi_error_t __0042_notify(l_ezlopi_item_t *item)
             if (fabs(Vout - (user_data->volt)) > 0.5)
             {
                 user_data->volt = Vout;
-                ezlopi_device_value_updated_from_device_broadcast(item);
+                EZPI_core_device_value_updated_from_device_broadcast(item);
                 ret = EZPI_SUCCESS;
             }
         }

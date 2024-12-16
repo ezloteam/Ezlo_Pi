@@ -139,7 +139,7 @@ int EZPI_core_scene_then_set_item_value(l_scenes_list_v2_t *curr_scene, void *ar
 
             if (item_id)
             {
-                l_ezlopi_item_t *curr_item = ezlopi_device_get_item_by_id(item_id);
+                l_ezlopi_item_t *curr_item = EZPI_core_device_get_item_by_id(item_id);
                 if (curr_item)
                 {
                     curr_item->func(EZLOPI_ACTION_SET_VALUE, curr_item, cj_params, curr_item->user_arg);
@@ -215,21 +215,21 @@ int EZPI_core_scene_then_group_set_item_value(l_scenes_list_v2_t *curr_scene, vo
 
             if (device_group_id && item_group_id)
             {
-                l_ezlopi_device_grp_t *curr_devgrp = ezlopi_core_device_group_get_by_id(device_group_id);
+                l_ezlopi_device_grp_t *curr_devgrp = EZPI_core_device_group_get_by_id(device_group_id);
                 if (curr_devgrp)
                 {
                     cJSON *cj_get_devarr = NULL;
                     cJSON_ArrayForEach(cj_get_devarr, curr_devgrp->devices)
                     {
                         uint32_t curr_device_id = strtoul(cj_get_devarr->valuestring, NULL, 16);
-                        l_ezlopi_device_t *curr_device = ezlopi_device_get_by_id(curr_device_id); // immediately goto "102ec000" ...
+                        l_ezlopi_device_t *curr_device = EZPI_core_device_get_by_id(curr_device_id); // immediately goto "102ec000" ...
                         if (curr_device)
                         {
                             l_ezlopi_item_t *curr_item_node = curr_device->items; // perform operation on items of above device --> "102ec000"
                             while (curr_item_node)
                             {
                                 // compare with items_list stored in item_group_id
-                                l_ezlopi_item_grp_t *curr_item_grp = ezlopi_core_item_group_get_by_id(item_group_id); // get  "ll_itemgrp_node"
+                                l_ezlopi_item_grp_t *curr_item_grp = EZPI_core_item_group_get_by_id(item_group_id); // get  "ll_itemgrp_node"
                                 if (curr_item_grp)
                                 {
                                     int count = 0;
@@ -289,11 +289,11 @@ int EZPI_core_scene_then_set_device_armed(l_scenes_list_v2_t *curr_scene, void *
 
             if (device_id)
             {
-                l_ezlopi_device_t *curr_device = ezlopi_device_get_by_id(device_id);
+                l_ezlopi_device_t *curr_device = EZPI_core_device_get_by_id(device_id);
                 if (curr_device)
                 {
                     curr_device->cloud_properties.armed = (device_armed) ? true : false;
-                    s_ezlopi_cloud_controller_t *controller_info = ezlopi_device_get_controller_information();
+                    s_ezlopi_cloud_controller_t *controller_info = EZPI_core_device_get_controller_information();
                     if (controller_info)
                     {
                         #warning "we need to change from 'controller' to device-specific [krishna]";
@@ -338,18 +338,18 @@ int EZPI_core_scene_then_group_set_device_armed(l_scenes_list_v2_t *curr_scene, 
 
             if (device_group_id)
             {
-                l_ezlopi_device_grp_t *curr_devgrp = ezlopi_core_device_group_get_by_id(device_group_id);
+                l_ezlopi_device_grp_t *curr_devgrp = EZPI_core_device_group_get_by_id(device_group_id);
                 if (curr_devgrp)
                 {
                     cJSON *cj_get_devarr = NULL;
                     cJSON_ArrayForEach(cj_get_devarr, curr_devgrp->devices)
                     {
                         uint32_t curr_device_id = strtoul(cj_get_devarr->valuestring, NULL, 16);
-                        l_ezlopi_device_t *curr_device = ezlopi_device_get_by_id(curr_device_id); // immediately goto "102ec000" ...
+                        l_ezlopi_device_t *curr_device = EZPI_core_device_get_by_id(curr_device_id); // immediately goto "102ec000" ...
                         if (curr_device)
                         {
                             curr_device->cloud_properties.armed = (device_armed) ? true : false;
-                            s_ezlopi_cloud_controller_t *controller_info = ezlopi_device_get_controller_information();
+                            s_ezlopi_cloud_controller_t *controller_info = EZPI_core_device_get_controller_information();
                             if (controller_info)
                             {
                                 #warning "we need to change from 'controller' to device-specific [krishna]";
@@ -717,7 +717,7 @@ int EZPI_core_scene_then_reset_hub(l_scenes_list_v2_t *curr_scene, void *arg)
                             TRACE_E("Factory Reseting ESP......................... ");
                             // clear the settings realated to scenes, devices, items, rooms,etc
                             EZPI_scenes_scripts_factory_info_reset();
-                            ezlopi_device_factory_info_reset();
+                            EZPI_core_device_factory_info_reset();
                             ezlopi_nvs_scenes_factory_info_reset(); // 'nvs' partitions
 
                             ezlopi_factory_info_v3_scenes_factory_soft_reset(); // 'ID' partition :- 'wifi' sector
@@ -972,21 +972,21 @@ int EZPI_core_scene_then_group_toggle_value(l_scenes_list_v2_t *curr_scene, void
 
             if (device_group_id && item_group_id)
             {
-                l_ezlopi_device_grp_t *curr_devgrp = ezlopi_core_device_group_get_by_id(device_group_id);
+                l_ezlopi_device_grp_t *curr_devgrp = EZPI_core_device_group_get_by_id(device_group_id);
                 if (curr_devgrp)
                 {
                     cJSON *cj_get_devarr = NULL;
                     cJSON_ArrayForEach(cj_get_devarr, curr_devgrp->devices)
                     {
                         uint32_t curr_device_id = strtoul(cj_get_devarr->valuestring, NULL, 16);
-                        l_ezlopi_device_t *curr_device = ezlopi_device_get_by_id(curr_device_id); // immediately goto "102ec000" ...
+                        l_ezlopi_device_t *curr_device = EZPI_core_device_get_by_id(curr_device_id); // immediately goto "102ec000" ...
                         if (curr_device)
                         {
                             l_ezlopi_item_t *curr_item_node = curr_device->items; // perform operation on items of above device --> "102ec000"
                             while (curr_item_node)
                             {
                                 // compare with items_list stored in item_group_id
-                                l_ezlopi_item_grp_t *curr_item_grp = ezlopi_core_item_group_get_by_id(item_group_id); // get  "ll_itemgrp_node"
+                                l_ezlopi_item_grp_t *curr_item_grp = EZPI_core_item_group_get_by_id(item_group_id); // get  "ll_itemgrp_node"
                                 if (curr_item_grp)
                                 {
                                     cJSON *cj_item_names = NULL;

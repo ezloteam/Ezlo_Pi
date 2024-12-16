@@ -618,7 +618,7 @@ int EZPI_scenes_operators_value_inarr_operations(l_fields_v2_t *item_exp_field, 
         else
         {
             uint32_t item_id = strtoul(item_exp_field->field_value.u_value.value_string, NULL, 16);
-            l_ezlopi_item_t *item = ezlopi_device_get_item_by_id(item_id);
+            l_ezlopi_item_t *item = EZPI_core_device_get_item_by_id(item_id);
             if (item)
             {
                 cJSON *cj_item = cJSON_CreateObject(__FUNCTION__);
@@ -713,7 +713,7 @@ int ezlopi_scenes_operators_value_with_less_operations(uint32_t item_id, l_field
     {
         double item_value = 0.0;
         cJSON *cj_item_value = cJSON_CreateObject(__FUNCTION__);
-        l_ezlopi_device_t *device = ezlopi_device_get_head();
+        l_ezlopi_device_t *device = EZPI_core_device_get_head();
         while (device)
         {
             l_ezlopi_item_t *item = device->items;
@@ -845,7 +845,7 @@ int ezlopi_scenes_operators_value_without_less_operations(uint32_t item_id, l_fi
     {
         double item_value = 0.0;
         cJSON *cj_item_value = cJSON_CreateObject(__FUNCTION__);
-        l_ezlopi_device_t *device = ezlopi_device_get_head();
+        l_ezlopi_device_t *device = EZPI_core_device_get_head();
         while (device)
         {
             l_ezlopi_item_t *item = device->items;
@@ -913,7 +913,7 @@ int EZPI_scenes_operators_value_comparevalues_without_less_operations(uint32_t i
     {
         cJSON *item_value = NULL;
 
-        l_ezlopi_device_t *device = ezlopi_device_get_head();
+        l_ezlopi_device_t *device = EZPI_core_device_get_head();
         while (device)
         {
             l_ezlopi_item_t *item = device->items;
@@ -1014,7 +1014,7 @@ int EZPI_scenes_operators_value_comparevalues_with_less_operations(l_fields_v2_t
                 else if (EZLOPI_VALUE_TYPE_ITEM == value_field->value_type)
                 { // 2. exp vs item
                     uint32_t item_id = strtoul(value_field->field_value.u_value.value_string, NULL, 16);
-                    l_ezlopi_item_t *item_right = ezlopi_device_get_item_by_id(item_id);
+                    l_ezlopi_item_t *item_right = EZPI_core_device_get_item_by_id(item_id);
                     if (item_right)
                     {
                         if (__check_valuetypes(EZPI_core_scenes_get_scene_value_type_name(curr_expr_left->value_type),
@@ -1039,7 +1039,7 @@ int EZPI_scenes_operators_value_comparevalues_with_less_operations(l_fields_v2_t
         else
         { // 1. LHS = item
             uint32_t item_id = strtoul(item_exp_field->field_value.u_value.value_string, NULL, 16);
-            l_ezlopi_item_t *item_left = ezlopi_device_get_item_by_id(item_id);
+            l_ezlopi_item_t *item_left = EZPI_core_device_get_item_by_id(item_id);
             if (item_left)
             {
                 if (EZLOPI_VALUE_TYPE_EXPRESSION == value_field->value_type)
@@ -1058,7 +1058,7 @@ int EZPI_scenes_operators_value_comparevalues_with_less_operations(l_fields_v2_t
                 else if (EZLOPI_VALUE_TYPE_ITEM == value_field->value_type)
                 { // 2. RHS = item_right
                     uint32_t item_id = strtoul(value_field->field_value.u_value.value_string, NULL, 16);
-                    l_ezlopi_item_t *item_right = ezlopi_device_get_item_by_id(item_id);
+                    l_ezlopi_item_t *item_right = EZPI_core_device_get_item_by_id(item_id);
                     if (item_right)
                     {
                         if (__check_valuetypes(item_left->cloud_properties.value_type,
@@ -1094,7 +1094,7 @@ int EZPI_scenes_operators_has_atleastone_dictionary_value_operations(uint32_t it
 
     if (item_id && value_field)
     {
-        l_ezlopi_item_t *item = ezlopi_device_get_item_by_id(item_id);
+        l_ezlopi_item_t *item = EZPI_core_device_get_item_by_id(item_id);
         if (item)
         {
             cJSON *cj_item_value = cJSON_CreateObject(__FUNCTION__);
@@ -1138,7 +1138,7 @@ int EZPI_scenes_operators_is_dictionary_changed_operations(l_scenes_list_v2_t *s
     if (item_id && key_field && (operation_field->field_value.u_value.value_string))
     {
         cJSON *item_value = NULL;
-        l_ezlopi_item_t *item = ezlopi_device_get_item_by_id(item_id);
+        l_ezlopi_item_t *item = EZPI_core_device_get_item_by_id(item_id);
         if (item)
         {
             cJSON *cj_item_value = cJSON_CreateObject(__FUNCTION__);
@@ -1241,7 +1241,7 @@ static int __evaluate_compareNumber_or_compareStrings(l_fields_v2_t *item_exp_fi
         { // 2. LHS = item
             uint32_t item_id = strtoul(item_exp_field->field_value.u_value.value_string, NULL, 16);
 
-            l_ezlopi_item_t *item = ezlopi_device_get_item_by_id(item_id);
+            l_ezlopi_item_t *item = EZPI_core_device_get_item_by_id(item_id);
             if (item)
             {
                 if (EZLOPI_VALUE_TYPE_EXPRESSION != value_field->value_type)
@@ -1763,21 +1763,21 @@ static int __trigger_grp_functions(e_with_grp_t choice, l_fields_v2_t *devgrp_fi
     uint32_t device_group_id = strtoul(devgrp_field->field_value.u_value.value_string, NULL, 16);
     uint32_t item_group_id = strtoul(itemgrp_field->field_value.u_value.value_string, NULL, 16);
 
-    l_ezlopi_device_grp_t *curr_devgrp = ezlopi_core_device_group_get_by_id(device_group_id);
+    l_ezlopi_device_grp_t *curr_devgrp = EZPI_core_device_group_get_by_id(device_group_id);
     if (curr_devgrp)
     {
         cJSON *cj_get_devarr = NULL;
         cJSON_ArrayForEach(cj_get_devarr, curr_devgrp->devices)
         {
             uint32_t curr_devce_id = strtoul(cj_get_devarr->valuestring, NULL, 16);
-            l_ezlopi_device_t *curr_device = ezlopi_device_get_by_id(curr_devce_id); // immediately goto "102ec000" ...
+            l_ezlopi_device_t *curr_device = EZPI_core_device_get_by_id(curr_devce_id); // immediately goto "102ec000" ...
             if (curr_device)
             {
                 l_ezlopi_item_t *curr_item_node = curr_device->items; // perform operation on items of above device --> "102ec000"
                 while (curr_item_node)
                 {
                     // compare with items_list stored in item_group_id
-                    l_ezlopi_item_grp_t *curr_item_grp = ezlopi_core_item_group_get_by_id(item_group_id); // get  "ll_itemgrp_node"
+                    l_ezlopi_item_grp_t *curr_item_grp = EZPI_core_item_group_get_by_id(item_group_id); // get  "ll_itemgrp_node"
                     if (curr_item_grp)
                     {
                         cJSON *cj_item_names = NULL;
@@ -1847,7 +1847,7 @@ static int __trigger_grp_functions(e_with_grp_t choice, l_fields_v2_t *devgrp_fi
 static char *__get_item_strvalue_by_id(uint32_t item_id)
 {
     char *item_value_str = NULL;
-    l_ezlopi_item_t *item = ezlopi_device_get_item_by_id(item_id);
+    l_ezlopi_item_t *item = EZPI_core_device_get_item_by_id(item_id);
     if (item)
     {
         cJSON *cj_item_value = cJSON_CreateObject(__FUNCTION__);
@@ -2226,7 +2226,7 @@ static int __evaluate_numrange(l_fields_v2_t *item_exp_field, l_fields_v2_t *sta
     { // 2. LHS = item
         uint32_t item_id = strtoul(item_exp_field->field_value.u_value.value_string, NULL, 16);
 
-        l_ezlopi_item_t *item = ezlopi_device_get_item_by_id(item_id);
+        l_ezlopi_item_t *item = EZPI_core_device_get_item_by_id(item_id);
         if (item)
         {
             if (EZLOPI_VALUE_TYPE_EXPRESSION != start_value_field->value_type &&

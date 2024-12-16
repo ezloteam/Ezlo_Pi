@@ -94,12 +94,12 @@ static ezlopi_error_t __0049_prepare(void *arg)
     if (device_prep_arg && (NULL != device_prep_arg->cjson_device))
     {
         //---------------------------  DIGI - DEVICE 1 --------------------------------------------
-        l_ezlopi_device_t *MQ2_device_parent_digi = ezlopi_device_add_device(device_prep_arg->cjson_device, "adc");
+        l_ezlopi_device_t *MQ2_device_parent_digi = EZPI_core_device_add_device(device_prep_arg->cjson_device, "adc");
         if (MQ2_device_parent_digi)
         {
             TRACE_I("Parent_MQ2_device_digi-[0x%x] ", MQ2_device_parent_digi->cloud_properties.device_id);
             __prepare_device_digi_cloud_properties(MQ2_device_parent_digi, device_prep_arg->cjson_device);
-            l_ezlopi_item_t *MQ2_item_digi = ezlopi_device_add_item_to_device(MQ2_device_parent_digi, sensor_0049_other_MQ2_LPG_detector);
+            l_ezlopi_item_t *MQ2_item_digi = EZPI_core_device_add_item_to_device(MQ2_device_parent_digi, sensor_0049_other_MQ2_LPG_detector);
             if (MQ2_item_digi)
             {
                 __prepare_item_digi_cloud_properties(MQ2_item_digi, device_prep_arg->cjson_device);
@@ -111,13 +111,13 @@ static ezlopi_error_t __0049_prepare(void *arg)
             if (NULL != MQ2_value)
             {
                 memset(MQ2_value, 0, sizeof(s_mq2_value_t));
-                l_ezlopi_device_t *MQ2_device_child_adc = ezlopi_device_add_device(device_prep_arg->cjson_device, "digi");
+                l_ezlopi_device_t *MQ2_device_child_adc = EZPI_core_device_add_device(device_prep_arg->cjson_device, "digi");
                 if (MQ2_device_child_adc)
                 {
                     TRACE_I("Child_MQ2_device_adc-[0x%x] ", MQ2_device_child_adc->cloud_properties.device_id);
                     __prepare_device_adc_cloud_properties(MQ2_device_child_adc, device_prep_arg->cjson_device);
 
-                    l_ezlopi_item_t *MQ2_item_adc = ezlopi_device_add_item_to_device(MQ2_device_child_adc, sensor_0049_other_MQ2_LPG_detector);
+                    l_ezlopi_item_t *MQ2_item_adc = EZPI_core_device_add_item_to_device(MQ2_device_child_adc, sensor_0049_other_MQ2_LPG_detector);
                     if (MQ2_item_adc)
                     {
                         __prepare_item_adc_cloud_properties(MQ2_item_adc, device_prep_arg->cjson_device, MQ2_value);
@@ -126,7 +126,7 @@ static ezlopi_error_t __0049_prepare(void *arg)
                     else
                     {
                         ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
-                        ezlopi_device_free_device(MQ2_device_child_adc);
+                        EZPI_core_device_free_device(MQ2_device_child_adc);
                         ezlopi_free(__FUNCTION__, MQ2_value);
                     }
                 }
@@ -209,7 +209,7 @@ static void __prepare_item_digi_cloud_properties(l_ezlopi_item_t *item, cJSON *c
     item->cloud_properties.value_type = value_type_token;
     item->cloud_properties.show = true;
     item->cloud_properties.scale = NULL;
-    item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
+    item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
 
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
     CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio1_str, item->interface.gpio.gpio_in.gpio_num);
@@ -232,7 +232,7 @@ static void __prepare_item_adc_cloud_properties(l_ezlopi_item_t *item, cJSON *cj
     item->cloud_properties.value_type = value_type_substance_amount;
     item->cloud_properties.show = true;
     item->cloud_properties.scale = scales_parts_per_million;
-    item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
+    item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
 
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
     CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio2_str, item->interface.adc.gpio_num);
@@ -333,7 +333,7 @@ static ezlopi_error_t __0049_notify(l_ezlopi_item_t *item)
             if (curret_value != (char *)item->user_arg) // calls update only if there is change in state
             {
                 item->user_arg = (void *)curret_value;
-                ezlopi_device_value_updated_from_device_broadcast(item);
+                EZPI_core_device_value_updated_from_device_broadcast(item);
             }
         }
         else if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
@@ -346,7 +346,7 @@ static ezlopi_error_t __0049_notify(l_ezlopi_item_t *item)
                 if (fabs((double)(MQ2_value->_LPG_ppm) - new_value) > 0.0001)
                 {
                     MQ2_value->_LPG_ppm = (float)new_value;
-                    ezlopi_device_value_updated_from_device_broadcast(item);
+                    EZPI_core_device_value_updated_from_device_broadcast(item);
                 }
             }
         }

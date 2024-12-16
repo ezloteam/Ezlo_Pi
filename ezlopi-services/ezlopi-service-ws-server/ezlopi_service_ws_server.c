@@ -7,45 +7,45 @@
  * @version
  * @date
  */
-/* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
-**
-** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
-**
-** Redistribution and use in source and binary forms, with or without
-** modification, are permitted provided that the following conditions are met:
-**
-** 1. Redistributions of source code must retain the above copyright notice,
-**    this list of conditions and the following disclaimer.
-** 2. Redistributions in binary form must reproduce the above copyright
-**    notice, this list of conditions and the following disclaimer in the
-**    documentation and/or other materials provided with the distribution.
-** 3. Neither the name of the copyright holder nor the names of its
-**    contributors may be used to endorse or promote products derived from
-**    this software without specific prior written permission.
-**
-** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
-** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-** POSSIBILITY OF SUCH DAMAGE.
-** ===========================================================================
-*/
+ /* ===========================================================================
+ ** Copyright (C) 2024 Ezlo Innovation Inc
+ **
+ ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+ **
+ ** Redistribution and use in source and binary forms, with or without
+ ** modification, are permitted provided that the following conditions are met:
+ **
+ ** 1. Redistributions of source code must retain the above copyright notice,
+ **    this list of conditions and the following disclaimer.
+ ** 2. Redistributions in binary form must reproduce the above copyright
+ **    notice, this list of conditions and the following disclaimer in the
+ **    documentation and/or other materials provided with the distribution.
+ ** 3. Neither the name of the copyright holder nor the names of its
+ **    contributors may be used to endorse or promote products derived from
+ **    this software without specific prior written permission.
+ **
+ ** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ ** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ ** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ ** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ ** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ ** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ ** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ ** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ ** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ ** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ ** POSSIBILITY OF SUCH DAMAGE.
+ ** ===========================================================================
+ */
 
-/* WebSocket Echo Server Example
+ /* WebSocket Echo Server Example
 
-   This example code is in the Public Domain (or CC0 licensed, at your option.)
+    This example code is in the Public Domain (or CC0 licensed, at your option.)
 
-   Unless required by applicable law or agreed to in writing, this
-   software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-   CONDITIONS OF ANY KIND, either express or implied.
-*/
+    Unless required by applicable law or agreed to in writing, this
+    software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+    CONDITIONS OF ANY KIND, either express or implied.
+ */
 
 #include "../../build/config/sdkconfig.h"
 
@@ -80,10 +80,10 @@
 #include "ezlopi_service_ws_server.h"
 #include "ezlopi_service_ws_server_clients.h"
 
-/**
- * @brief Structure that wraps websocket response
- *
- */
+ /**
+  * @brief Structure that wraps websocket response
+  *
+  */
 typedef struct s_async_resp_arg
 {
     int fd;            /**< Connection file descriptors */
@@ -212,19 +212,19 @@ static ezlopi_error_t ezpi_ws_server_broadcast(char *data)
         {
             ret = EZPI_SUCCESS;
             l_ws_server_client_conn_t *curr_client = EZPI_service_ws_server_clients_get_head();
-#warning "DO NOT USE printf ON PRODUCTION"
-            // printf("%s and curr-client: %p\n", __func__, curr_client);
+            #warning "DO NOT USE printf ON PRODUCTION"
+                // printf("%s and curr-client: %p\n", __func__, curr_client);
 
-            while (curr_client)
-            {
-                ret = ezpi_ws_server_send(curr_client, data, strlen(data));
-                if (NULL == (curr_client = curr_client->next))
+                while (curr_client)
                 {
-                    break;
-                }
+                    ret = ezpi_ws_server_send(curr_client, data, strlen(data));
+                    if (NULL == (curr_client = curr_client->next))
+                    {
+                        break;
+                    }
 
-                vTaskDelay(1 / portTICK_RATE_MS);
-            }
+                    vTaskDelay(1 / portTICK_RATE_MS);
+                }
         }
 
         xSemaphoreGive(__send_lock);
@@ -265,7 +265,7 @@ static void __message_upcall(httpd_req_t *req, const char *payload, uint32_t pay
 
     if (proceed_to_api_consume)
     {
-        cJSON *cj_response = ezlopi_core_api_consume(__FUNCTION__, payload, payload_len);
+        cJSON *cj_response = EZPI_core_api_consume(__FUNCTION__, payload, payload_len);
         if (cj_response)
         {
             cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_msg_id_str, __message_counter);
@@ -334,7 +334,7 @@ static esp_err_t ezpi_trigger_async_send(httpd_req_t *req)
 
     if (resp_arg)
     {
-#warning "resp_arg needs to find out wether 'resp_arg' is freed or not";
+        #warning "resp_arg needs to find out wether 'resp_arg' is freed or not";
 
         resp_arg->hd = req->handle;
         resp_arg->fd = httpd_req_to_sockfd(req);
@@ -507,7 +507,7 @@ static int ezpi_respond_cjson(httpd_req_t *req, cJSON *cj_response)
     if (req && cj_response)
     {
         uint32_t buffer_len = 0;
-        char *data_buffer = ezlopi_core_buffer_acquire(__FUNCTION__, &buffer_len, 5000);
+        char *data_buffer = EZPI_core_buffer_acquire(__FUNCTION__, &buffer_len, 5000);
 
         if (data_buffer && buffer_len)
         {
@@ -536,7 +536,7 @@ static int ezpi_respond_cjson(httpd_req_t *req, cJSON *cj_response)
                 }
             }
 
-            ezlopi_core_buffer_release(__FUNCTION__);
+            EZPI_core_buffer_release(__FUNCTION__);
         }
     }
 #endif // CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER

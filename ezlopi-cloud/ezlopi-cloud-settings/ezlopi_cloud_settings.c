@@ -19,7 +19,7 @@ void ezlopi_device_settings_list_v3(cJSON *cj_request, cJSON *cj_response)
         cJSON *cj_settings_array = cJSON_AddArrayToObject(__FUNCTION__, cj_result, ezlopi_settings_str);
         if (cj_settings_array)
         {
-            l_ezlopi_device_t *curr_device = ezlopi_device_get_head();
+            l_ezlopi_device_t *curr_device = EZPI_core_device_get_head();
             while (curr_device)
             {
                 l_ezlopi_device_settings_v3_t *curr_setting = curr_device->settings;
@@ -58,7 +58,7 @@ void ezlopi_device_settings_value_set_v3(cJSON *cj_request, cJSON *cj_response)
         uint32_t setting_id = 0;
         CJSON_GET_ID(setting_id, cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi__id_str));
 
-        l_ezlopi_device_t *curr_device = ezlopi_device_get_head();
+        l_ezlopi_device_t *curr_device = EZPI_core_device_get_head();
         uint32_t found_setting = 0;
         while (curr_device)
         {
@@ -89,7 +89,7 @@ void ezlopi_device_settings_reset_v3(cJSON *cj_request, cJSON *cj_response)
     cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
     if (cj_params)
     {
-        l_ezlopi_device_t *curr_device = ezlopi_device_get_head();
+        l_ezlopi_device_t *curr_device = EZPI_core_device_get_head();
 
         while (curr_device)
         {
@@ -134,9 +134,9 @@ void ezlopi_device_settings_reset_v3(cJSON *cj_request, cJSON *cj_response)
 }
 
 #if 0
-cJSON* ezlopi_cloud_settings_updated_from_devices_v3(l_ezlopi_device_t* device, l_ezlopi_device_settings_v3_t* setting)
+cJSON *ezlopi_cloud_settings_updated_from_devices_v3(l_ezlopi_device_t *device, l_ezlopi_device_settings_v3_t *setting)
 {
-    cJSON* cjson_response = cJSON_CreateObject(__FUNCTION__);
+    cJSON *cjson_response = cJSON_CreateObject(__FUNCTION__);
     if (cjson_response)
     {
         if (NULL != setting)
@@ -145,7 +145,7 @@ cJSON* ezlopi_cloud_settings_updated_from_devices_v3(l_ezlopi_device_t* device, 
             cJSON_AddNumberToObject(__FUNCTION__, cjson_response, ezlopi_msg_id_str, EZPI_service_web_provisioning_get_message_count());
             cJSON_AddStringToObject(__FUNCTION__, cjson_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
 
-            cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cjson_response, ezlopi_result_str);
+            cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cjson_response, ezlopi_result_str);
             if (cj_result)
             {
                 char tmp_string[64];

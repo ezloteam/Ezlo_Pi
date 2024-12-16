@@ -7,36 +7,36 @@
  * @version
  * @date
  */
-/* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
-**
-** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
-**
-** Redistribution and use in source and binary forms, with or without
-** modification, are permitted provided that the following conditions are met:
-**
-** 1. Redistributions of source code must retain the above copyright notice,
-**    this list of conditions and the following disclaimer.
-** 2. Redistributions in binary form must reproduce the above copyright
-**    notice, this list of conditions and the following disclaimer in the
-**    documentation and/or other materials provided with the distribution.
-** 3. Neither the name of the copyright holder nor the names of its
-**    contributors may be used to endorse or promote products derived from
-**    this software without specific prior written permission.
-**
-** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
-** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-** POSSIBILITY OF SUCH DAMAGE.
-** ===========================================================================
-*/
+ /* ===========================================================================
+ ** Copyright (C) 2024 Ezlo Innovation Inc
+ **
+ ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+ **
+ ** Redistribution and use in source and binary forms, with or without
+ ** modification, are permitted provided that the following conditions are met:
+ **
+ ** 1. Redistributions of source code must retain the above copyright notice,
+ **    this list of conditions and the following disclaimer.
+ ** 2. Redistributions in binary form must reproduce the above copyright
+ **    notice, this list of conditions and the following disclaimer in the
+ **    documentation and/or other materials provided with the distribution.
+ ** 3. Neither the name of the copyright holder nor the names of its
+ **    contributors may be used to endorse or promote products derived from
+ **    this software without specific prior written permission.
+ **
+ ** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ ** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ ** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ ** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ ** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ ** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ ** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ ** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ ** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ ** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ ** POSSIBILITY OF SUCH DAMAGE.
+ ** ===========================================================================
+ */
 
 #include "../../build/config/sdkconfig.h"
 
@@ -79,10 +79,10 @@
 
 #if defined(CONFIG_EZPI_WEBSOCKET_CLIENT)
 
-/**
- * @brief Struct for tracking received messages
- *
- */
+ /**
+  * @brief Struct for tracking received messages
+  *
+  */
 typedef struct
 {
     time_t time_ms; /**< Time in ms */
@@ -207,7 +207,7 @@ static void ezpi_connection_upcall(bool connected)
 
         prev_status = 2;
         TRACE_I("Starting registration process....");
-        ezlopi_core_ezlopi_methods_registration_init();
+        EZPI_core_ezlopi_methods_registration_init();
     }
     else
     {
@@ -362,7 +362,7 @@ static void ezpi_message_process_cjson(cJSON *cj_request, time_t time_ms)
     if (cj_request)
     {
         time_t now;
-        cJSON *cj_response = ezlopi_core_api_consume_cjson(__FUNCTION__, cj_request);
+        cJSON *cj_response = EZPI_core_api_consume_cjson(__FUNCTION__, cj_request);
 
         time(&now);
         TRACE_D("time to process: %lu", now - time_ms);
@@ -389,7 +389,7 @@ static void ezpi_message_process(const char *payload, uint32_t len)
     TRACE_D("PAYLOAD: %.*s", len, payload);
     if (payload && len)
     {
-        cJSON *cj_response = ezlopi_core_api_consume(__FUNCTION__, payload, len);
+        cJSON *cj_response = EZPI_core_api_consume(__FUNCTION__, payload, len);
 
         if (cj_response)
         {
@@ -452,7 +452,7 @@ static int ezpi_send_cjson_data_to_nma_websocket(cJSON *cj_data)
     if (cj_data)
     {
         uint32_t buffer_len = 0;
-        char *data_buffer = ezlopi_core_buffer_acquire(__FUNCTION__, &buffer_len, 5000);
+        char *data_buffer = EZPI_core_buffer_acquire(__FUNCTION__, &buffer_len, 5000);
 
         if (data_buffer && buffer_len)
         {
@@ -477,7 +477,7 @@ static int ezpi_send_cjson_data_to_nma_websocket(cJSON *cj_data)
                 TRACE_E("FAILED!");
             }
 
-            ezlopi_core_buffer_release(__FUNCTION__);
+            EZPI_core_buffer_release(__FUNCTION__);
         }
     }
 

@@ -1108,7 +1108,7 @@ static int __evaluate_expression(cJSON *cj_des, cJSON *lua_prop_params, const ch
                         cJSON *cj_item_name = cJSON_GetObjectItem(__FUNCTION__, cj_device_item, ezlopi_itemName_str);
                         if ((cj_target_name && cj_target_name->valuestring) && (cj_dev_name && cj_dev_name->valuestring) && (cj_item_name && cj_item_name->valuestring))
                         {
-                            l_ezlopi_device_t *curr_dev_node = ezlopi_device_get_head();
+                            l_ezlopi_device_t *curr_dev_node = EZPI_core_device_get_head();
                             while (curr_dev_node)
                             {
                                 if (EZPI_STRNCMP_IF_EQUAL(cj_dev_name->valuestring, curr_dev_node->cloud_properties.device_name, cj_dev_name->str_value_len, strlen(curr_dev_node->cloud_properties.device_name) + 1)) // "deviceName" == "siren"
@@ -1145,7 +1145,7 @@ static int __evaluate_expression(cJSON *cj_des, cJSON *lua_prop_params, const ch
                         if ((cj_item_id && cj_item_id->valuestring) && (cj_item_name && cj_item_name->valuestring))
                         {
                             uint32_t _id = strtoul(cj_item_id->valuestring, NULL, 16);
-                            l_ezlopi_item_t *item_prop = ezlopi_device_get_item_by_id(_id);
+                            l_ezlopi_item_t *item_prop = EZPI_core_device_get_item_by_id(_id);
 
                             if (item_prop)
                             {
@@ -1332,7 +1332,7 @@ static uint32_t __expression_store_to_nvs(uint32_t exp_id, cJSON *cj_expression)
 
         if (exp_string)
         {
-            exp_id = ezlopi_cloud_generate_expression_id();
+            exp_id = EZPI_core_cloud_generate_expression_id();
             if (exp_id)
             {
                 char exp_id_str[32];
@@ -1398,7 +1398,7 @@ static uint32_t __expression_store_to_nvs(uint32_t exp_id, cJSON *cj_expression)
     }
     else
     {
-        ezlopi_cloud_update_expression_id(exp_id);
+        EZPI_core_cloud_update_expression_id(exp_id);
     }
 
     return exp_id;

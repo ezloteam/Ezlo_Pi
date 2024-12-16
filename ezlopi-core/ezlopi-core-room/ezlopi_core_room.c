@@ -305,12 +305,12 @@ s_ezlopi_room_t *ezlopi_room_add_to_list(cJSON *cj_room)
             if (cj_room_id && cj_room_id->valuestring)
             {
                 new_room->_id = strtoul(cj_room_id->valuestring, NULL, 16);
-                ezlopi_cloud_update_room_id(new_room->_id);
+                EZPI_core_cloud_update_room_id(new_room->_id);
             }
             else
             {
                 char tmp_str[32];
-                new_room->_id = ezlopi_cloud_generate_room_id();
+                new_room->_id = EZPI_core_cloud_generate_room_id();
                 snprintf(tmp_str, sizeof(tmp_str), "%08x", new_room->_id);
                 cJSON_AddStringToObject(__FUNCTION__, cj_room, ezlopi__id_str, tmp_str);
             }

@@ -49,7 +49,7 @@ void ezlopi_init(void)
 #endif // CONFIG_EZPI_UTIL_TRACE_EN
     EZPI_HAL_uart_init();
 #if defined(CONFIG_EZPI_WEBSOCKET_CLIENT) || defined(CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER)
-    ezlopi_core_buffer_init(CONFIG_EZPI_CORE_STATIC_BUFFER_SIZE); // allocate 10kB
+    EZPI_core_buffer_init(CONFIG_EZPI_CORE_STATIC_BUFFER_SIZE); // allocate 10kB
 #endif
 
     ESP_ERROR_CHECK(esp_netif_init());
@@ -65,15 +65,15 @@ void ezlopi_init(void)
 
     vTaskDelay(10);
     // Init devices
-    ezlopi_device_prepare();
+    EZPI_device_prepare();
 #if defined(CONFIG_EZPI_ENABLE_SYSTEM_TEMPERATURE)
     EZPI_system_temperature_device(EZLOPI_ACTION_PREPARE, NULL, NULL, NULL);
 #endif // EZPI_ENABLE_SYSTEM_TEMPERATURE
     vTaskDelay(10);
     // Init device_groups
-    ezlopi_device_group_init();
+    EZPI_device_group_init();
     // Init item_groups
-    ezlopi_item_group_init();
+    EZPI_item_group_init();
     vTaskDelay(10);
     ezlopi_initialize_devices_v3();
     vTaskDelay(10);
@@ -116,7 +116,7 @@ void ezlopi_init(void)
 
 static l_ezlopi_device_t *__link_next_parent_id(uint32_t target_to_clear_parent_id)
 {
-    l_ezlopi_device_t *pre_devs = ezlopi_device_get_head();
+    l_ezlopi_device_t *pre_devs = EZPI_core_device_get_head();
     while (pre_devs)
     {
         if ((NULL != pre_devs->next) &&
@@ -133,7 +133,7 @@ static l_ezlopi_device_t *__link_next_parent_id(uint32_t target_to_clear_parent_
 static void ezlopi_initialize_devices_v3(void)
 {
     int device_init_ret = 0;
-    l_ezlopi_device_t *curr_device = ezlopi_device_get_head();
+    l_ezlopi_device_t *curr_device = EZPI_core_device_get_head();
 
     while (curr_device)
     {
@@ -173,7 +173,7 @@ static void ezlopi_initialize_devices_v3(void)
                 curr_device = curr_device->next;
             }
 
-            ezlopi_device_free_device(device_to_free);
+            EZPI_core_device_free_device(device_to_free);
         }
         else
         {
@@ -187,7 +187,7 @@ static void __device_loop(void *arg)
     static l_ezlopi_device_t *device_node;
     if (NULL == device_node)
     {
-        device_node = ezlopi_device_get_head();
+        device_node = EZPI_core_device_get_head();
     }
     else
     {

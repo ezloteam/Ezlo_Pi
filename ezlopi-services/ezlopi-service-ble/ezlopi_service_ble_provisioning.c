@@ -7,36 +7,36 @@
  * @version
  * @date
  */
-/* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
-**
-** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
-**
-** Redistribution and use in source and binary forms, with or without
-** modification, are permitted provided that the following conditions are met:
-**
-** 1. Redistributions of source code must retain the above copyright notice,
-**    this list of conditions and the following disclaimer.
-** 2. Redistributions in binary form must reproduce the above copyright
-**    notice, this list of conditions and the following disclaimer in the
-**    documentation and/or other materials provided with the distribution.
-** 3. Neither the name of the copyright holder nor the names of its
-**    contributors may be used to endorse or promote products derived from
-**    this software without specific prior written permission.
-**
-** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
-** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-** POSSIBILITY OF SUCH DAMAGE.
-** ===========================================================================
-*/
+ /* ===========================================================================
+ ** Copyright (C) 2024 Ezlo Innovation Inc
+ **
+ ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+ **
+ ** Redistribution and use in source and binary forms, with or without
+ ** modification, are permitted provided that the following conditions are met:
+ **
+ ** 1. Redistributions of source code must retain the above copyright notice,
+ **    this list of conditions and the following disclaimer.
+ ** 2. Redistributions in binary form must reproduce the above copyright
+ **    notice, this list of conditions and the following disclaimer in the
+ **    documentation and/or other materials provided with the distribution.
+ ** 3. Neither the name of the copyright holder nor the names of its
+ **    contributors may be used to endorse or promote products derived from
+ **    this software without specific prior written permission.
+ **
+ ** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ ** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ ** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ ** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ ** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ ** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ ** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ ** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ ** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ ** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ ** POSSIBILITY OF SUCH DAMAGE.
+ ** ===========================================================================
+ */
 
 #include "../../build/config/sdkconfig.h"
 
@@ -71,32 +71,32 @@
 #include "ezlopi_service_ble_ble_auth.h"
 #include "ezlopi_service_ble.h"
 
-/*******************************************************************************
- *                          Type & Macro Definitions
- *******************************************************************************/
-/**
- * @brief Returns string from the the json `root` which contains name member
- * @note root is the JOSN and should exist before being called
- *
- */
+ /*******************************************************************************
+  *                          Type & Macro Definitions
+  *******************************************************************************/
+  /**
+   * @brief Returns string from the the json `root` which contains name member
+   * @note root is the JOSN and should exist before being called
+   *
+   */
 #define CJ_GET_STRING(name) cJSON_GetStringValue(cJSON_GetObjectItem(__FUNCTION__, root, name))
-/**
- * @brief Returns number from the the json `root` which contains name member
- * @note root is the JOSN and should exist before being called
- *
- */
+   /**
+    * @brief Returns number from the the json `root` which contains name member
+    * @note root is the JOSN and should exist before being called
+    *
+    */
 #define CJ_GET_NUMBER(name) cJSON_GetNumberValue(cJSON_GetObjectItem(__FUNCTION__, root, name))
 
-/*******************************************************************************
- *                          Static Function Prototypes
- *******************************************************************************/
+    /*******************************************************************************
+     *                          Static Function Prototypes
+     *******************************************************************************/
 #ifdef EZPI_SERV_BLE_ENABLE_READ_PROV
-/**
- * @brief Function converts provisoning data of the device into JOSN str
- *
- * @return char* Pointer to the JSON string
- * @retval JSON string pointer, or NULL on error
- */
+     /**
+      * @brief Function converts provisoning data of the device into JOSN str
+      *
+      * @return char* Pointer to the JSON string
+      * @retval JSON string pointer, or NULL on error
+      */
 static char *ezpi_provisioning_info_jsonify(void);
 /**
  * @brief Function returns base64 encoded value of device provisioning info
@@ -152,7 +152,7 @@ void EZPI_ble_service_provisioning_init(void)
 
     uuid.len = ESP_UUID_LEN_16;
     uuid.uuid.uuid16 = BLE_PROVISIONING_SERVICE_UUID;
-    g_provisioning_service = ezlopi_ble_gatt_create_service(BLE_PROVISIONING_ID_HANDLE, &uuid);
+    g_provisioning_service = EZPI_core_ble_gatt_create_service(BLE_PROVISIONING_ID_HANDLE, &uuid);
 
     uuid.uuid.uuid16 = BLE_PROVISIONING_CHAR_UUID;
     uuid.len = ESP_UUID_LEN_16;
@@ -160,11 +160,11 @@ void EZPI_ble_service_provisioning_init(void)
 #ifdef EZPI_SERV_BLE_ENABLE_READ_PROV
     permission = ESP_GATT_PERM_WRITE | ESP_GATT_PERM_READ;
     properties = ESP_GATT_CHAR_PROP_BIT_WRITE | ESP_GATT_CHAR_PROP_BIT_READ | ESP_GATT_CHAR_PROP_BIT_NOTIFY | ESP_GATT_CHAR_PROP_BIT_INDICATE;
-    ezlopi_ble_gatt_add_characteristic(g_provisioning_service, &uuid, permission, properties, ezpi_provisioning_info_read_func, ezpi_provisioning_info_write_func, NULL); // reliable-write is not implemented for now
+    EZPI_core_ble_gatt_add_characteristic(g_provisioning_service, &uuid, permission, properties, ezpi_provisioning_info_read_func, ezpi_provisioning_info_write_func, NULL); // reliable-write is not implemented for now
 #else                                                                                                                                                               // EZPI_SERV_BLE_ENABLE_READ_PROV
     permission = ESP_GATT_PERM_WRITE;
     properties = ESP_GATT_CHAR_PROP_BIT_WRITE;
-    ezlopi_ble_gatt_add_characteristic(g_provisioning_service, &uuid, permission, properties, NULL, ezpi_provisioning_info_write_func, NULL); // reliable-write is not implemented for now
+    EZPI_core_ble_gatt_add_characteristic(g_provisioning_service, &uuid, permission, properties, NULL, ezpi_provisioning_info_write_func, NULL); // reliable-write is not implemented for now
 #endif                                                                                                                                                              // EZPI_SERV_BLE_ENABLE_READ_PROV
 
 #ifdef EZPI_SERV_BLE_ENABLE_STAT_PROV
@@ -172,7 +172,7 @@ void EZPI_ble_service_provisioning_init(void)
     uuid.len = ESP_UUID_LEN_16;
     permission = ESP_GATT_PERM_READ;
     properties = ESP_GATT_CHAR_PROP_BIT_READ;
-    ezlopi_ble_gatt_add_characteristic(g_provisioning_service, &uuid, permission, properties, ezpi_provisioning_status_read_func, NULL, NULL);
+    EZPI_core_ble_gatt_add_characteristic(g_provisioning_service, &uuid, permission, properties, ezpi_provisioning_status_read_func, NULL, NULL);
 #endif // EZPI_SERV_BLE_ENABLE_STAT_PROV
 }
 
@@ -221,7 +221,7 @@ static void ezpi_provisioning_status_read_func(esp_gatt_value_t *value, esp_ble_
         if (NULL != prov_status_jstr)
         {
             uint32_t total_data_len = strlen(prov_status_jstr);
-            uint32_t max_data_buffer_size = ezlopi_ble_gatt_get_max_data_size();
+            uint32_t max_data_buffer_size = EZPI_core_ble_gatt_get_max_data_size();
             uint32_t copy_size = ((total_data_len - param->read.offset) < max_data_buffer_size) ? (total_data_len - param->read.offset) : max_data_buffer_size;
 
             if ((0 != total_data_len) && (total_data_len > param->read.offset))
@@ -264,11 +264,11 @@ static void ezpi_provisioning_info_write_func(esp_gatt_value_t *value, esp_ble_g
 
     if (NULL == g_provisioning_linked_buffer)
     {
-        g_provisioning_linked_buffer = ezlopi_ble_buffer_create(param);
+        g_provisioning_linked_buffer = EZPI_core_ble_buffer_create(param);
     }
     else
     {
-        ezlopi_ble_buffer_add_to_buffer(g_provisioning_linked_buffer, param);
+        EZPI_core_ble_buffer_add_to_buffer(g_provisioning_linked_buffer, param);
     }
 
     if (g_provisioning_linked_buffer)
@@ -397,7 +397,7 @@ static void ezpi_provisioning_info_write_func(esp_gatt_value_t *value, esp_ble_g
                             decoded_data = NULL;
                         }
 
-                        ezlopi_ble_buffer_free_buffer(g_provisioning_linked_buffer);
+                        EZPI_core_ble_buffer_free_buffer(g_provisioning_linked_buffer);
                         g_provisioning_linked_buffer = NULL;
                     }
                 }
@@ -438,13 +438,13 @@ static void ezpi_provisioning_info_read_func(esp_gatt_value_t *value, esp_ble_ga
             g_provisioning_info_base64 = ezpi_provisioning_info_base64();
 
             g_provisioning_sequence_no = 0;
-            g_provisioning_number_of_sequence = strlen(g_provisioning_info_base64) / ezlopi_ble_gatt_get_max_data_size();
-            g_provisioning_number_of_sequence = (strlen(g_provisioning_info_base64) % ezlopi_ble_gatt_get_max_data_size()) ? (g_provisioning_number_of_sequence + 1) : g_provisioning_number_of_sequence;
+            g_provisioning_number_of_sequence = strlen(g_provisioning_info_base64) / EZPI_core_ble_gatt_get_max_data_size();
+            g_provisioning_number_of_sequence = (strlen(g_provisioning_info_base64) % EZPI_core_ble_gatt_get_max_data_size()) ? (g_provisioning_number_of_sequence + 1) : g_provisioning_number_of_sequence;
         }
 
         if (NULL != g_provisioning_info_base64)
         {
-            if (ezlopi_ble_gatt_get_max_data_size() >= g_required_ble_prov_buffer_size)
+            if (EZPI_core_ble_gatt_get_max_data_size() >= g_required_ble_prov_buffer_size)
             {
                 uint32_t total_data_len = strlen(g_provisioning_info_base64);
                 uint32_t copy_size = total_data_len - (g_provisioning_sequence_no * _data_size);
@@ -587,7 +587,7 @@ static char *ezpi_base64_decode_provisioning_info(uint32_t total_size)
         TRACE_D("base64_buffer: %s", base64_buffer);
 
         decoded_config_json = ezlopi_malloc(__FUNCTION__, total_size);
-        // decoded_config_json = ezlopi_core_buffer_acquire(__FUNCTION__, &buffer_len, 5000);
+        // decoded_config_json = EZPI_core_buffer_acquire(__FUNCTION__, &buffer_len, 5000);
 
         if (decoded_config_json)
         {
@@ -677,7 +677,7 @@ static char *ezpi_provisioning_info_base64(void)
             TRACE_D("str_provisioning_data[len: %d]: %s", strlen(str_provisioning_data), str_provisioning_data);
 
             int ret = mbedtls_base64_encode((unsigned char *)base64_data, base64_data_len, &out_put_len,
-                                            (const unsigned char *)str_provisioning_data, strlen(str_provisioning_data));
+                (const unsigned char *)str_provisioning_data, strlen(str_provisioning_data));
 
             if (0 == out_put_len)
             {

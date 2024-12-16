@@ -169,7 +169,7 @@ static void __edit_scene(l_scenes_list_v2_t *scene_node, cJSON *cj_scene)
         {
             scene_node->group_id = (uint32_t)strtoul(tmp_grp_id, NULL, 16);
             TRACE_S("new_group_id (edit): %08x", scene_node->group_id);
-            ezlopi_cloud_update_group_id(scene_node->group_id);
+            EZPI_core_cloud_update_group_id(scene_node->group_id);
         }
     }
 

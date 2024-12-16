@@ -516,11 +516,11 @@ static l_ezlopi_scenes_script_t *__scripts_create_node(uint32_t script_id, cJSON
         {
             if (script_id)
             {
-                ezlopi_cloud_update_script_id(script_id);
+                EZPI_core_cloud_update_script_id(script_id);
             }
             else
             {
-                script_id = ezlopi_cloud_generate_script_id();
+                script_id = EZPI_core_cloud_generate_script_id();
                 char *script_str = cJSON_PrintBuffered(__FUNCTION__, cj_script, 4096, false);
                 TRACE_D("length of 'script_str': %d", strlen(script_str));
 

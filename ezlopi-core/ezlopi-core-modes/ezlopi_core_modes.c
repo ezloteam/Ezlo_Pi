@@ -555,7 +555,7 @@ ezlopi_error_t EZPI_core_modes_api_set_protect_button(char *service_str, uint32_
     ezlopi_error_t ret = EZPI_ERR_MODES_FAILED;
     if (service_str && deviceId)
     {
-        if ((NULL != ezlopi_device_get_by_id(deviceId)) && sg_custom_modes) // IF 'device_id' exists then add to 'protect_button_ll'
+        if ((NULL != EZPI_core_device_get_by_id(deviceId)) && sg_custom_modes) // IF 'device_id' exists then add to 'protect_button_ll'
         {
             ezlopi_service_modes_stop(5000);
 
@@ -900,7 +900,7 @@ ezlopi_error_t EZPI_core_modes_set_unset_device_armed_status(cJSON *cj_device_ar
         cJSON_ArrayForEach(curr_device, cj_device_array)
         {
             uint32_t device_id = strtoul(curr_device->valuestring, NULL, 16);
-            l_ezlopi_device_t *device_to_change = ezlopi_device_get_by_id(device_id);
+            l_ezlopi_device_t *device_to_change = EZPI_core_device_get_by_id(device_id);
             if (device_to_change)
             {
                 if (device_to_change->cloud_properties.armed != set)

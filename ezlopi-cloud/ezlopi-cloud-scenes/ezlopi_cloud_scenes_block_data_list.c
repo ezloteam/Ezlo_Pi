@@ -92,7 +92,7 @@ static void __value_types_list(char *list_name, cJSON *cj_result)
             cJSON *cj_value_array = cJSON_AddArrayToObject(__FUNCTION__, cj_value_types, "list");
             if (cj_value_array)
             {
-                l_ezlopi_device_t *devices = ezlopi_device_get_head();
+                l_ezlopi_device_t *devices = EZPI_core_device_get_head();
                 while (devices)
                 {
                     l_ezlopi_item_t *items = devices->items;
@@ -128,7 +128,7 @@ static void __scalable_value_types_list(char *list_name, cJSON *cj_result)
             cJSON *cj_value_array = cJSON_AddArrayToObject(__FUNCTION__, cj_value_types, "list");
             if (cj_value_array)
             {
-                l_ezlopi_device_t *devices = ezlopi_device_get_head();
+                l_ezlopi_device_t *devices = EZPI_core_device_get_head();
                 while (devices)
                 {
                     l_ezlopi_item_t *items = devices->items;
@@ -161,7 +161,7 @@ static void __value_scales_list(char *list_name, cJSON *cj_result)
         cJSON *cj_value_scales = cJSON_AddObjectToObject(__FUNCTION__, cj_result, list_name);
         if (cj_value_scales)
         {
-            l_ezlopi_device_t *devices = ezlopi_device_get_head();
+            l_ezlopi_device_t *devices = EZPI_core_device_get_head();
             while (devices)
             {
                 l_ezlopi_item_t *items = devices->items;

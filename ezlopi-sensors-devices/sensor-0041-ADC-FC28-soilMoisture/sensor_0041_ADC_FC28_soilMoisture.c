@@ -72,7 +72,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
 }
 static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, void *user_data)
 {
-    item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
+    item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
     item->cloud_properties.item_name = ezlopi_item_name_moisture;
@@ -106,12 +106,12 @@ static ezlopi_error_t __0041_prepare(void *arg)
         if (NULL != user_data)
         {
             memset(user_data, 0, sizeof(s_fc28_data_t));
-            l_ezlopi_device_t *fc28_device = ezlopi_device_add_device(cj_device, NULL);
+            l_ezlopi_device_t *fc28_device = EZPI_core_device_add_device(cj_device, NULL);
             if (fc28_device)
             {
                 __prepare_device_cloud_properties(fc28_device, cj_device);
 
-                l_ezlopi_item_t *fc28_item = ezlopi_device_add_item_to_device(fc28_device, sensor_0041_ADC_FC28_soilMoisture);
+                l_ezlopi_item_t *fc28_item = EZPI_core_device_add_item_to_device(fc28_device, sensor_0041_ADC_FC28_soilMoisture);
                 if (fc28_item)
                 {
                     __prepare_item_cloud_properties(fc28_item, user_data);
@@ -120,7 +120,7 @@ static ezlopi_error_t __0041_prepare(void *arg)
                 }
                 else
                 {
-                    ezlopi_device_free_device(fc28_device);
+                    EZPI_core_device_free_device(fc28_device);
                     ezlopi_free(__FUNCTION__, user_data);
                 }
             }
@@ -189,7 +189,7 @@ static ezlopi_error_t __0041_notify(l_ezlopi_item_t *item)
             if (fabs((user_data->hum_val) - new_hum) > 0.5) // percent
             {
                 user_data->hum_val = new_hum;
-                ezlopi_device_value_updated_from_device_broadcast(item);
+                EZPI_core_device_value_updated_from_device_broadcast(item);
                 ret = EZPI_SUCCESS;
             }
         }

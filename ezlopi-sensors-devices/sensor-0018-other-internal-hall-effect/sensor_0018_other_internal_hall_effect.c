@@ -95,7 +95,7 @@ static void __setup_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj
 
 static void __setup_item_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_data)
 {
-    item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
+    item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = true;
     item->cloud_properties.item_name = ezlopi_item_name_dw_state;
@@ -121,18 +121,18 @@ static ezlopi_error_t __prepare(void *arg)
         if (user_data)
         {
             memset(user_data, 0, sizeof(s_hall_data_t));
-            l_ezlopi_device_t *hall_device = ezlopi_device_add_device(cj_device, NULL);
+            l_ezlopi_device_t *hall_device = EZPI_core_device_add_device(cj_device, NULL);
             if (hall_device)
             {
                 __setup_device_cloud_properties(hall_device, cj_device);
-                l_ezlopi_item_t *hall_item = ezlopi_device_add_item_to_device(hall_device, sensor_0018_other_internal_hall_effect);
+                l_ezlopi_item_t *hall_item = EZPI_core_device_add_item_to_device(hall_device, sensor_0018_other_internal_hall_effect);
                 if (hall_item)
                 {
                     __setup_item_properties(hall_item, cj_device, user_data);
                 }
                 else
                 {
-                    ezlopi_device_free_device(hall_device);
+                    EZPI_core_device_free_device(hall_device);
                     ezlopi_free(__FUNCTION__, user_data);
                     ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                 }
@@ -273,7 +273,7 @@ static ezlopi_error_t __notify(l_ezlopi_item_t *item)
                 if (curret_value != user_data->hall_state) // calls update only if there is change in state
                 {
                     user_data->hall_state = curret_value;
-                    ezlopi_device_value_updated_from_device_broadcast(item);
+                    EZPI_core_device_value_updated_from_device_broadcast(item);
                 }
                 ret = EZPI_SUCCESS;
             }

@@ -82,32 +82,32 @@ static ezlopi_error_t __0015_prepare(void *arg)
             if (dht11_sensor_data)
             {
                 memset(dht11_sensor_data, 0, sizeof(s_ezlopi_dht11_data_t));
-                l_ezlopi_device_t *parent_device_temperature = ezlopi_device_add_device(cjson_device, "temp");
+                l_ezlopi_device_t *parent_device_temperature = EZPI_core_device_add_device(cjson_device, "temp");
                 if (parent_device_temperature)
                 {
                     ret = EZPI_SUCCESS;
                     TRACE_I("Parent_dht11_temp_device-[0x%x] ", parent_device_temperature->cloud_properties.device_id);
                     __dht11_setup_device_cloud_properties_temperature(parent_device_temperature, cjson_device);
-                    l_ezlopi_item_t *item_temperature = ezlopi_device_add_item_to_device(parent_device_temperature, sensor_0015_oneWire_DHT11);
+                    l_ezlopi_item_t *item_temperature = EZPI_core_device_add_item_to_device(parent_device_temperature, sensor_0015_oneWire_DHT11);
                     if (item_temperature)
                     {
                         __dht11_setup_item_properties_temperature(item_temperature, cjson_device, dht11_sensor_data);
                     }
 
-                    l_ezlopi_device_t *child_device_humidity = ezlopi_device_add_device(cjson_device, "humi");
+                    l_ezlopi_device_t *child_device_humidity = EZPI_core_device_add_device(cjson_device, "humi");
                     if (child_device_humidity)
                     {
                         TRACE_I("Child_dht11_humi_device-[0x%x] ", child_device_humidity->cloud_properties.device_id);
                         __dht11_setup_device_cloud_properties_humidity(child_device_humidity, cjson_device);
 
-                        l_ezlopi_item_t *item_humidity = ezlopi_device_add_item_to_device(child_device_humidity, sensor_0015_oneWire_DHT11);
+                        l_ezlopi_item_t *item_humidity = EZPI_core_device_add_item_to_device(child_device_humidity, sensor_0015_oneWire_DHT11);
                         if (item_humidity)
                         {
                             __dht11_setup_item_properties_humidity(item_humidity, cjson_device, dht11_sensor_data);
                         }
                         else
                         {
-                            ezlopi_device_free_device(child_device_humidity);
+                            EZPI_core_device_free_device(child_device_humidity);
                             ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                         }
                     }
@@ -116,7 +116,7 @@ static ezlopi_error_t __0015_prepare(void *arg)
                         (NULL == child_device_humidity))
                     {
                         ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
-                        ezlopi_device_free_device(parent_device_temperature);
+                        EZPI_core_device_free_device(parent_device_temperature);
                         ezlopi_free(__FUNCTION__, dht11_sensor_data);
                     }
                 }
@@ -179,7 +179,7 @@ static ezlopi_error_t __dht11_setup_item_properties_temperature(l_ezlopi_item_t 
     ezlopi_error_t ret = EZPI_FAILED;
     if (item && cj_device)
     {
-        item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
+        item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
         item->cloud_properties.has_getter = true;
         item->cloud_properties.has_setter = false;
         item->cloud_properties.item_name = ezlopi_item_name_temp;
@@ -206,7 +206,7 @@ static ezlopi_error_t __dht11_setup_item_properties_humidity(l_ezlopi_item_t *it
     ezlopi_error_t ret = EZPI_FAILED;
     if (item && cj_device)
     {
-        item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
+        item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
         item->cloud_properties.has_getter = true;
         item->cloud_properties.has_setter = false;
         item->cloud_properties.item_name = ezlopi_item_name_humidity;
@@ -289,7 +289,7 @@ static ezlopi_error_t __0015_notify(l_ezlopi_item_t *item)
                     if (fabs(dht11_data->temperature - temperature) > 1)
                     {
                         dht11_data->temperature = temperature;
-                        ezlopi_device_value_updated_from_device_broadcast(item);
+                        EZPI_core_device_value_updated_from_device_broadcast(item);
                     }
                 }
             }
@@ -301,7 +301,7 @@ static ezlopi_error_t __0015_notify(l_ezlopi_item_t *item)
                     if (fabs(dht11_data->humidity - humidity) > 1)
                     {
                         dht11_data->humidity = humidity;
-                        ezlopi_device_value_updated_from_device_broadcast(item);
+                        EZPI_core_device_value_updated_from_device_broadcast(item);
                     }
                 }
             }

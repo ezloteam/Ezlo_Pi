@@ -532,7 +532,7 @@ int EZPI_core_scenes_then_helper_toggleValue(uint32_t item_id, const char *item_
     int ret = 0;
     if (item_id && item_id_str)
     {
-        l_ezlopi_item_t *curr_item = ezlopi_device_get_item_by_id(item_id);
+        l_ezlopi_item_t *curr_item = EZPI_core_device_get_item_by_id(item_id);
         if ((curr_item) && (EZLOPI_DEVICE_INTERFACE_DIGITAL_OUTPUT == curr_item->interface_type))
         {
             cJSON *cj_tmp_value = cJSON_CreateObject(__FUNCTION__);

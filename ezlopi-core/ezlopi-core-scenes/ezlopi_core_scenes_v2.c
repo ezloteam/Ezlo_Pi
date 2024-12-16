@@ -172,7 +172,7 @@ uint32_t EZPI_core_scenes_store_new_scene_v2(cJSON *cj_new_scene)
     uint32_t new_scene_id = 0;
     if (cj_new_scene)
     {
-        new_scene_id = ezlopi_cloud_generate_scene_id();
+        new_scene_id = EZPI_core_cloud_generate_scene_id();
         char new_scene_id_str[32];
         snprintf(new_scene_id_str, sizeof(new_scene_id_str), "%08x", new_scene_id);
         cJSON_AddStringToObject(__FUNCTION__, cj_new_scene, ezlopi__id_str, new_scene_id_str);
@@ -805,7 +805,7 @@ ezlopi_error_t EZPI_scenes_init_v2(void)
                     uint32_t scene_id = (uint32_t)cj_scene_id->valuedouble;
 
                     snprintf(tmp_buffer, sizeof(tmp_buffer), "%08x", scene_id);
-                    ezlopi_cloud_update_scene_id((uint32_t)scene_id);
+                    EZPI_core_cloud_update_scene_id((uint32_t)scene_id);
                     char *scene_str = ezlopi_nvs_read_str(tmp_buffer);
                     if (scene_str)
                     {
@@ -891,7 +891,7 @@ static l_scenes_list_v2_t *__new_scene_populate(cJSON *cj_scene, uint32_t scene_
                 {
                     new_scene->group_id = (uint32_t)strtoul(tmp_grp_id, NULL, 16);
                     TRACE_S("group_id: %08x", new_scene->group_id);
-                    ezlopi_cloud_update_group_id(new_scene->group_id);
+                    EZPI_core_cloud_update_group_id(new_scene->group_id);
                 }
             }
 
@@ -1174,7 +1174,7 @@ static l_when_block_v2_t *____new_when_block_populate(cJSON *cj_when_block)
             {
                 new_when_block->blockId = (uint32_t)strtoul(tmp_block_id, NULL, 16);
                 TRACE_D("blockId (edit): %08x", new_when_block->blockId);
-                ezlopi_cloud_update_when_blockId(new_when_block->blockId);
+                EZPI_core_cloud_update_when_blockId(new_when_block->blockId);
             }
         }
 
@@ -1476,7 +1476,7 @@ static l_when_block_v2_t *___get_group_when_blocks(l_when_block_v2_t *curr_when_
 }
 static void ______add_groupID_and_flag(cJSON *cj_target)
 {
-    uint32_t group_id = ezlopi_cloud_generate_scene_group_id();
+    uint32_t group_id = EZPI_core_cloud_generate_scene_group_id();
     char group_id_str[32];
     snprintf(group_id_str, sizeof(group_id_str), "%08x", group_id);
     TRACE_S("new_Group_ID:  %s", group_id_str);
@@ -1612,7 +1612,7 @@ static int _____check_and_add_when_blockId(cJSON *cj_new_scene_when_block)
 
     if (add_when_blockId_flag)
     {
-        uint32_t new_blockId = ezlopi_cloud_generate_scene_when_blockId();
+        uint32_t new_blockId = EZPI_core_cloud_generate_scene_when_blockId();
         char new_blockId_str[32];
         snprintf(new_blockId_str, sizeof(new_blockId_str), "%08x", new_blockId);
         TRACE_S("---> new_when_blockId:  %s", new_blockId_str);

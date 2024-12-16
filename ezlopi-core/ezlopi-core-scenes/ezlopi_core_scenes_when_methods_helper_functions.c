@@ -110,7 +110,7 @@ static int ____old_vs_new_extract_data(s_item_exp_data_t *new_extract_data, s_it
 int ISITEM_state_single_condition(uint32_t item_id, l_fields_v2_t *value_field)
 {
     int ret = 0;
-    l_ezlopi_item_t *curr_item = ezlopi_device_get_item_by_id(item_id);
+    l_ezlopi_item_t *curr_item = EZPI_core_device_get_item_by_id(item_id);
     if (curr_item)
     {
         ret = __compare_item_values(curr_item, value_field);
@@ -121,21 +121,21 @@ int ISITEM_state_with_grp_condition(uint32_t device_group_id, uint32_t item_grou
 {
     int ret = 0;
 
-    l_ezlopi_device_grp_t *curr_devgrp = ezlopi_core_device_group_get_by_id(device_group_id);
+    l_ezlopi_device_grp_t *curr_devgrp = EZPI_core_device_group_get_by_id(device_group_id);
     if (curr_devgrp)
     {
         cJSON *cj_get_devarr = NULL;
         cJSON_ArrayForEach(cj_get_devarr, curr_devgrp->devices)
         {
             uint32_t curr_devce_id = strtoul(cj_get_devarr->valuestring, NULL, 16);
-            l_ezlopi_device_t *curr_device = ezlopi_device_get_by_id(curr_devce_id); // immediately goto "102ec000" ...
+            l_ezlopi_device_t *curr_device = EZPI_core_device_get_by_id(curr_devce_id); // immediately goto "102ec000" ...
             if (curr_device)
             {
                 l_ezlopi_item_t *curr_item_node = curr_device->items; // perform operation on items of above device --> "102ec000"
                 while (curr_item_node)
                 {
                     // compare with items_list stored in item_group_id
-                    l_ezlopi_item_grp_t *curr_item_grp = ezlopi_core_item_group_get_by_id(item_group_id); // get  "ll_itemgrp_node"
+                    l_ezlopi_item_grp_t *curr_item_grp = EZPI_core_item_group_get_by_id(item_group_id); // get  "ll_itemgrp_node"
                     if (curr_item_grp)
                     {
                         cJSON *cj_item_names = NULL;
@@ -1158,21 +1158,21 @@ int IS_deviceitem_group_value_check(l_scenes_list_v2_t *scene_node, uint32_t dev
         }
 
         // 1.
-        l_ezlopi_device_grp_t *curr_devgrp = ezlopi_core_device_group_get_by_id(device_group_id);
+        l_ezlopi_device_grp_t *curr_devgrp = EZPI_core_device_group_get_by_id(device_group_id);
         if (curr_devgrp)
         {
             cJSON *cj_get_devarr = NULL;
             cJSON_ArrayForEach(cj_get_devarr, curr_devgrp->devices)
             {
                 uint32_t curr_devce_id = strtoul(cj_get_devarr->valuestring, NULL, 16);
-                l_ezlopi_device_t *curr_device = ezlopi_device_get_by_id(curr_devce_id); // immediately goto "102ec000" ...
+                l_ezlopi_device_t *curr_device = EZPI_core_device_get_by_id(curr_devce_id); // immediately goto "102ec000" ...
                 if (curr_device)
                 {
                     l_ezlopi_item_t *curr_item_node = curr_device->items; // perform operation on items of above device --> "102ec000"
                     while (curr_item_node)
                     {
                         // 2.
-                        l_ezlopi_item_grp_t *curr_item_grp = ezlopi_core_item_group_get_by_id(item_group_id); // get  "ll_itemgrp_node"
+                        l_ezlopi_item_grp_t *curr_item_grp = EZPI_core_item_group_get_by_id(item_group_id); // get  "ll_itemgrp_node"
                         if (curr_item_grp)
                         {
                             cJSON *cj_item_names = NULL;
@@ -1802,7 +1802,7 @@ static uint8_t __isitemState_vs_field_compare(s_item_exp_data_t *new_extract_dat
             cJSON *cj_item_value = cJSON_CreateObject(__FUNCTION__);
             if (cj_item_value)
             {
-                l_ezlopi_item_t *tmp_item = ezlopi_device_get_item_by_id(tmp_field->field_value.u_value.value_double);
+                l_ezlopi_item_t *tmp_item = EZPI_core_device_get_item_by_id(tmp_field->field_value.u_value.value_double);
                 tmp_item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, tmp_item, (void *)cj_item_value, NULL);
                 cJSON *cj_val = cJSON_GetObjectItem(__FUNCTION__, cj_item_value, ezlopi_value_str);
                 if (cj_val)

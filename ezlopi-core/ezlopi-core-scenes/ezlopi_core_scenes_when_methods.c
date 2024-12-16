@@ -164,7 +164,7 @@ int EZPI_core_scenes_when_is_item_state(l_scenes_list_v2_t *scene_node, void *ar
         if (ret && armed_check)
         {
             armed_check = false;
-            l_ezlopi_device_t *device_node = ezlopi_device_get_head();
+            l_ezlopi_device_t *device_node = EZPI_core_device_get_head();
             while (device_node)
             {
                 l_ezlopi_item_t *item_node = device_node->items;
@@ -173,7 +173,7 @@ int EZPI_core_scenes_when_is_item_state(l_scenes_list_v2_t *scene_node, void *ar
                     if (item_id == item_node->cloud_properties.item_id)
                     {
                         ret = ((value_armed == device_node->cloud_properties.armed) ? 1 : 0);
-                        // s_ezlopi_cloud_controller_t *controller_info = ezlopi_device_get_controller_information();
+                        // s_ezlopi_cloud_controller_t *controller_info = EZPI_core_device_get_controller_information();
                         // if (controller_info)
                         // {
                         // #warning "we need to change from 'controller' to 'device_id' specific";
@@ -409,7 +409,7 @@ int EZPI_core_scenes_when_is_item_state_changed(l_scenes_list_v2_t *scene_node, 
                 {
                     new_extract_data->value_type = EZLOPI_VALUE_TYPE_ITEM;
                     uint32_t item_id = strtoul(item_exp_field->field_value.u_value.value_string, NULL, 16);
-                    l_ezlopi_item_t *curr_item = ezlopi_device_get_item_by_id(item_id);
+                    l_ezlopi_item_t *curr_item = EZPI_core_device_get_item_by_id(item_id);
                     if (curr_item)
                     {
                         cJSON *cj_item_value = cJSON_CreateObject(__FUNCTION__);
@@ -1064,11 +1064,11 @@ int EZPI_core_scenes_when_is_device_state(l_scenes_list_v2_t *scene_node, void *
 
         if (device_id)
         {
-            l_ezlopi_device_t *curr_device = ezlopi_device_get_by_id(device_id);
+            l_ezlopi_device_t *curr_device = EZPI_core_device_get_by_id(device_id);
             if (curr_device)
             {
                 // ret = ((value_armed == curr_device->cloud_properties.armed) ? 1 : 0);
-                s_ezlopi_cloud_controller_t *controller_info = ezlopi_device_get_controller_information();
+                s_ezlopi_cloud_controller_t *controller_info = EZPI_core_device_get_controller_information();
                 if (controller_info)
                 {
                     #warning "we need to change from 'controller' to 'device_id' specific";
@@ -1078,18 +1078,18 @@ int EZPI_core_scenes_when_is_device_state(l_scenes_list_v2_t *scene_node, void *
         }
         else if (device_group_id)
         {
-            l_ezlopi_device_grp_t *curr_devgrp = ezlopi_core_device_group_get_by_id(device_group_id);
+            l_ezlopi_device_grp_t *curr_devgrp = EZPI_core_device_group_get_by_id(device_group_id);
             if (curr_devgrp)
             {
                 cJSON *cj_device = NULL;
                 cJSON_ArrayForEach(cj_device, curr_devgrp->devices)
                 {
                     uint32_t curr_devce_id = strtoul(cj_device->valuestring, NULL, 16);
-                    l_ezlopi_device_t *curr_device = ezlopi_device_get_by_id(curr_devce_id); // immediately goto "102ec000" ...
+                    l_ezlopi_device_t *curr_device = EZPI_core_device_get_by_id(curr_devce_id); // immediately goto "102ec000" ...
                     if (curr_device)
                     {
                         //  ret = ((value_armed == curr_device->cloud_properties.armed) ? 1 : 0);
-                        s_ezlopi_cloud_controller_t *controller_info = ezlopi_device_get_controller_information();
+                        s_ezlopi_cloud_controller_t *controller_info = EZPI_core_device_get_controller_information();
                         if (controller_info)
                         {
                             #warning "we need to change from 'controller' to 'device_id' specific";

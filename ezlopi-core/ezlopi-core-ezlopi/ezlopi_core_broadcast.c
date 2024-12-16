@@ -17,12 +17,12 @@
 
 // static uint32_t __message_count = 0;
 static l_broadcast_method_t *__method_head = NULL;
-static ezlopi_error_t (*__broadcast_queue_func)(cJSON *cj_data) = NULL;
+static ezlopi_error_t(*__broadcast_queue_func)(cJSON *cj_data) = NULL;
 
 static ezlopi_error_t __call_broadcast_methods(char *data);
 static l_broadcast_method_t *__method_create(f_broadcast_method_t method, char *name, uint32_t retries);
 
-void ezlopi_core_broadcast_methods_set_queue(ezlopi_error_t (*func)(cJSON *))
+void ezlopi_core_broadcast_methods_set_queue(ezlopi_error_t(*func)(cJSON *))
 {
     __broadcast_queue_func = func;
 }
@@ -43,14 +43,14 @@ ezlopi_error_t ezlopi_core_broadcast_add_to_queue(cJSON *cj_data)
 }
 
 #if 0
-int ezlopi_core_broadcast_log_cjson(cJSON* cj_log_data)
+int ezlopi_core_broadcast_log_cjson(cJSON *cj_log_data)
 {
     int ret = 0;
 
     if (cj_log_data)
     {
         uint32_t buffer_len = 0;
-        char* data_buffer = ezlopi_core_buffer_acquire(&buffer_len, 5000);
+        char *data_buffer = EZPI_core_buffer_acquire(&buffer_len, 5000);
 
         if (data_buffer && buffer_len)
         {
@@ -61,7 +61,7 @@ int ezlopi_core_broadcast_log_cjson(cJSON* cj_log_data)
                 ret = __call_broadcast_methods(data_buffer);
             }
 
-            ezlopi_core_buffer_release();
+            EZPI_core_buffer_release();
         }
     }
 
@@ -85,7 +85,7 @@ ezlopi_error_t ezlopi_core_broadcast_cjson(cJSON *cj_data)
         uint32_t buffer_len = 0;
 
         TRACE_I("%d -> -----------------------------> waiting for static buffer!", xTaskGetTickCount());
-        char *data_buffer = ezlopi_core_buffer_acquire(__FUNCTION__, &buffer_len, 5000);
+        char *data_buffer = EZPI_core_buffer_acquire(__FUNCTION__, &buffer_len, 5000);
 
         if (data_buffer && buffer_len)
         {
@@ -99,7 +99,7 @@ ezlopi_error_t ezlopi_core_broadcast_cjson(cJSON *cj_data)
                 ret = __call_broadcast_methods(data_buffer);
             }
 
-            ezlopi_core_buffer_release(__FUNCTION__);
+            EZPI_core_buffer_release(__FUNCTION__);
         }
     }
 

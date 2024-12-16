@@ -7,36 +7,36 @@
  * @version
  * @date
  */
-/* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
-**
-** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
-**
-** Redistribution and use in source and binary forms, with or without
-** modification, are permitted provided that the following conditions are met:
-**
-** 1. Redistributions of source code must retain the above copyright notice,
-**    this list of conditions and the following disclaimer.
-** 2. Redistributions in binary form must reproduce the above copyright
-**    notice, this list of conditions and the following disclaimer in the
-**    documentation and/or other materials provided with the distribution.
-** 3. Neither the name of the copyright holder nor the names of its
-**    contributors may be used to endorse or promote products derived from
-**    this software without specific prior written permission.
-**
-** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
-** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-** POSSIBILITY OF SUCH DAMAGE.
-** ===========================================================================
-*/
+ /* ===========================================================================
+ ** Copyright (C) 2024 Ezlo Innovation Inc
+ **
+ ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+ **
+ ** Redistribution and use in source and binary forms, with or without
+ ** modification, are permitted provided that the following conditions are met:
+ **
+ ** 1. Redistributions of source code must retain the above copyright notice,
+ **    this list of conditions and the following disclaimer.
+ ** 2. Redistributions in binary form must reproduce the above copyright
+ **    notice, this list of conditions and the following disclaimer in the
+ **    documentation and/or other materials provided with the distribution.
+ ** 3. Neither the name of the copyright holder nor the names of its
+ **    contributors may be used to endorse or promote products derived from
+ **    this software without specific prior written permission.
+ **
+ ** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ ** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ ** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ ** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ ** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ ** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ ** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ ** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ ** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ ** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ ** POSSIBILITY OF SUCH DAMAGE.
+ ** ===========================================================================
+ */
 
 #include "../../build/config/sdkconfig.h"
 
@@ -78,12 +78,12 @@
 
 #include "ezlopi_service_ble.h"
 
-/**
- * @brief Function to jsonify the device info in ransferable manner
- *
- * @return char* Stringified device info JSON
- * @retval JSON string or NULL on error
- */
+ /**
+  * @brief Function to jsonify the device info in ransferable manner
+  *
+  * @return char* Stringified device info JSON
+  * @retval JSON string or NULL on error
+  */
 static char *ezpi_device_info_jsonify(void);
 /**
  * @brief Function to add provided key value pairs to the root JSON
@@ -181,69 +181,69 @@ void EZPI_ble_service_device_info_init(void)
 
     uuid.len = ESP_UUID_LEN_16;
     uuid.uuid.uuid16 = BLE_DEVICE_INFO_SERVICE_UUID;
-    g_device_info_service = ezlopi_ble_gatt_create_service(BLE_DEVICE_INFO_ID_HANDLE, &uuid);
+    g_device_info_service = EZPI_core_ble_gatt_create_service(BLE_DEVICE_INFO_ID_HANDLE, &uuid);
     // TRACE_W("'provisioning_service' service added to ezlopi-ble-stack");
 
     uuid.uuid.uuid16 = BLE_DEVICE_INFO_CHAR_UUID;
     uuid.len = ESP_UUID_LEN_16;
     permission = ESP_GATT_PERM_READ;
     properties = ESP_GATT_CHAR_PROP_BIT_READ;
-    ezlopi_ble_gatt_add_characteristic(g_device_info_service, &uuid, permission, properties, device_info_read_func, NULL, NULL);
+    EZPI_core_ble_gatt_add_characteristic(g_device_info_service, &uuid, permission, properties, device_info_read_func, NULL, NULL);
     // TRACE_W("'provisioning_service' character added to ezlopi-ble-stack");
 
     uuid.uuid.uuid16 = EZPI_BLE_CHAR_API_VERSION_INFO_UUID;
     uuid.len = ESP_UUID_LEN_16;
     permission = ESP_GATT_PERM_READ;
     properties = ESP_GATT_CHAR_PROP_BIT_READ;
-    ezlopi_ble_gatt_add_characteristic(g_device_info_service, &uuid, permission, properties, ezpi_service_ble_ezlopi_api_info, NULL, NULL);
+    EZPI_core_ble_gatt_add_characteristic(g_device_info_service, &uuid, permission, properties, ezpi_service_ble_ezlopi_api_info, NULL, NULL);
 
     uuid.uuid.uuid16 = EZPI_BLE_CHAR_FIRMWARE_INFO_UUID;
     uuid.len = ESP_UUID_LEN_16;
     permission = ESP_GATT_PERM_READ;
     properties = ESP_GATT_CHAR_PROP_BIT_READ;
-    ezlopi_ble_gatt_add_characteristic(g_device_info_service, &uuid, permission, properties, ezpi_service_ble_ezlopi_fmw_info, NULL, NULL);
+    EZPI_core_ble_gatt_add_characteristic(g_device_info_service, &uuid, permission, properties, ezpi_service_ble_ezlopi_fmw_info, NULL, NULL);
 
     uuid.uuid.uuid16 = EZPI_BLE_CHAR_CHIP_INFO_UUID;
     uuid.len = ESP_UUID_LEN_16;
     permission = ESP_GATT_PERM_READ;
     properties = ESP_GATT_CHAR_PROP_BIT_READ;
-    ezlopi_ble_gatt_add_characteristic(g_device_info_service, &uuid, permission, properties, ezpi_service_ble_chip_info, NULL, NULL);
+    EZPI_core_ble_gatt_add_characteristic(g_device_info_service, &uuid, permission, properties, ezpi_service_ble_chip_info, NULL, NULL);
 
     uuid.uuid.uuid16 = EZPI_BLE_CHAR_FIRMWARE_SDK_INFO_UUID;
     uuid.len = ESP_UUID_LEN_16;
     permission = ESP_GATT_PERM_READ;
     properties = ESP_GATT_CHAR_PROP_BIT_READ;
-    ezlopi_ble_gatt_add_characteristic(g_device_info_service, &uuid, permission, properties, ezpi_service_ble_firmware_sdk_info, NULL, NULL);
+    EZPI_core_ble_gatt_add_characteristic(g_device_info_service, &uuid, permission, properties, ezpi_service_ble_firmware_sdk_info, NULL, NULL);
 
     uuid.uuid.uuid16 = EZPI_BLE_CHAR_DEV_STATE_INFO_UUID;
     uuid.len = ESP_UUID_LEN_16;
     permission = ESP_GATT_PERM_READ;
     properties = ESP_GATT_CHAR_PROP_BIT_READ;
-    ezlopi_ble_gatt_add_characteristic(g_device_info_service, &uuid, permission, properties, ezpi_service_ble_device_state_info, NULL, NULL);
+    EZPI_core_ble_gatt_add_characteristic(g_device_info_service, &uuid, permission, properties, ezpi_service_ble_device_state_info, NULL, NULL);
 
     uuid.uuid.uuid16 = EZPI_BLE_CHAR_SER_CONFIG_INFO_UUID;
     uuid.len = ESP_UUID_LEN_16;
     permission = ESP_GATT_PERM_READ | ESP_GATT_PERM_WRITE;
     properties = ESP_GATT_CHAR_PROP_BIT_READ | ESP_GATT_CHAR_PROP_BIT_WRITE;
-    ezlopi_ble_gatt_add_characteristic(g_device_info_service, &uuid, permission, properties, ezpi_service_ble_serial_config_info, ezpi_service_ble_serial_config_write, NULL);
+    EZPI_core_ble_gatt_add_characteristic(g_device_info_service, &uuid, permission, properties, ezpi_service_ble_serial_config_info, ezpi_service_ble_serial_config_write, NULL);
 
     uuid.uuid.uuid16 = EZPI_BLE_CHAR_EZPI_CLOUD_INFO_UUID;
     uuid.len = ESP_UUID_LEN_16;
     permission = ESP_GATT_PERM_READ;
     properties = ESP_GATT_CHAR_PROP_BIT_READ;
-    ezlopi_ble_gatt_add_characteristic(g_device_info_service, &uuid, permission, properties, ezpi_service_ble_ezlo_cloud_info, NULL, NULL);
+    EZPI_core_ble_gatt_add_characteristic(g_device_info_service, &uuid, permission, properties, ezpi_service_ble_ezlo_cloud_info, NULL, NULL);
 
     uuid.uuid.uuid16 = EZPI_BLE_CHAR_OEM_INFO_UUID;
     uuid.len = ESP_UUID_LEN_16;
     permission = ESP_GATT_PERM_READ;
     properties = ESP_GATT_CHAR_PROP_BIT_READ;
-    ezlopi_ble_gatt_add_characteristic(g_device_info_service, &uuid, permission, properties, ezpi_service_ble_oem_info, NULL, NULL);
+    EZPI_core_ble_gatt_add_characteristic(g_device_info_service, &uuid, permission, properties, ezpi_service_ble_oem_info, NULL, NULL);
 
     uuid.uuid.uuid16 = EZPI_BLE_CHAR_NETWORK_INFO_UUID;
     uuid.len = ESP_UUID_LEN_16;
     permission = ESP_GATT_PERM_READ;
     properties = ESP_GATT_CHAR_PROP_BIT_READ;
-    ezlopi_ble_gatt_add_characteristic(g_device_info_service, &uuid, permission, properties, ezpi_service_ble_net_info, NULL, NULL);
+    EZPI_core_ble_gatt_add_characteristic(g_device_info_service, &uuid, permission, properties, ezpi_service_ble_net_info, NULL, NULL);
 }
 
 static void ble_device_info_send_data(const cJSON *cj_response_data, esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
@@ -254,7 +254,7 @@ static void ble_device_info_send_data(const cJSON *cj_response_data, esp_gatt_va
         cJSON_Minify(send_data);
 
         uint32_t total_data_len = strlen(send_data);
-        uint32_t max_data_buffer_size = ezlopi_ble_gatt_get_max_data_size();
+        uint32_t max_data_buffer_size = EZPI_core_ble_gatt_get_max_data_size();
         uint32_t copy_size = ((total_data_len - param->read.offset) < max_data_buffer_size) ? (total_data_len - param->read.offset) : max_data_buffer_size;
 
         if ((0 != total_data_len) && (total_data_len > param->read.offset))
@@ -722,8 +722,8 @@ static void ezpi_service_ble_net_info(esp_gatt_value_t *value, esp_ble_gatts_cb_
 
 static void device_info_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
 {
-#warning "This Characteristics is depricated, will be removed in future release later than 3.4.7"
-    static char *json_str_device_info;
+    #warning "This Characteristics is depricated, will be removed in future release later than 3.4.7"
+        static char *json_str_device_info;
 
     if (NULL == json_str_device_info)
     {
@@ -735,7 +735,7 @@ static void device_info_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb_para
         if (json_str_device_info)
         {
             uint32_t total_data_len = strlen(json_str_device_info);
-            uint32_t max_data_buffer_size = ezlopi_ble_gatt_get_max_data_size();
+            uint32_t max_data_buffer_size = EZPI_core_ble_gatt_get_max_data_size();
             uint32_t copy_size = ((total_data_len - param->read.offset) < max_data_buffer_size) ? (total_data_len - param->read.offset) : max_data_buffer_size;
             TRACE_D("ble - chunk size: %d", copy_size);
 
@@ -772,9 +772,9 @@ static void device_info_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb_para
 
 static char *ezpi_device_info_jsonify(void)
 {
-#warning "This info will be only available till Version 3.4.6 !"
+    #warning "This info will be only available till Version 3.4.6 !"
 
-    char *device_info = NULL;
+        char *device_info = NULL;
     cJSON *root = cJSON_CreateObject(__FUNCTION__);
     if (root)
     {

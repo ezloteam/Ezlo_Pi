@@ -58,7 +58,7 @@ int lcore_get_device(lua_State *lua_state)
     {
         TRACE_E("device-id: %s", device_id_str);
         uint32_t device_id = strtoul(device_id_str, NULL, 16);
-        l_ezlopi_device_t *device_node = ezlopi_device_get_head();
+        l_ezlopi_device_t *device_node = EZPI_core_device_get_head();
         while (device_node)
         {
             if (device_id == device_node->cloud_properties.device_id)
@@ -77,7 +77,7 @@ int lcore_get_device(lua_State *lua_state)
 int lcore_get_devices(lua_State *lua_state)
 {
     int ret = 0;
-    l_ezlopi_device_t *device_node = ezlopi_device_get_head();
+    l_ezlopi_device_t *device_node = EZPI_core_device_get_head();
     lua_newtable(lua_state);
     while (device_node)
     {
@@ -94,7 +94,7 @@ int lcore_get_devices(lua_State *lua_state)
 int lcore_get_devices_ids(lua_State *lua_state)
 {
     int ret = 0;
-    l_ezlopi_device_t *device_node = ezlopi_device_get_head();
+    l_ezlopi_device_t *device_node = EZPI_core_device_get_head();
     lua_newtable(lua_state);
     while (device_node)
     {
@@ -116,7 +116,7 @@ int lcore_get_item(lua_State *lua_state)
         TRACE_D("item-id: %s", item_id_str);
         uint32_t item_id = strtoul(item_id_str, NULL, 16);
 
-        l_ezlopi_device_t *device_node = ezlopi_device_get_head();
+        l_ezlopi_device_t *device_node = EZPI_core_device_get_head();
         lua_newtable(lua_state);
         while (device_node)
         {
@@ -141,7 +141,7 @@ int lcore_get_item(lua_State *lua_state)
 int lcore_get_items(lua_State *lua_state)
 {
     int ret = 0;
-    l_ezlopi_device_t *device_node = ezlopi_device_get_head();
+    l_ezlopi_device_t *device_node = EZPI_core_device_get_head();
     lua_newtable(lua_state);
     while (device_node)
     {
@@ -170,7 +170,7 @@ int lcore_get_items_by_device_id(lua_State *lua_state)
         TRACE_E("device-id: %s", device_id_str);
         uint32_t device_id = strtoul(device_id_str, NULL, 16);
 
-        l_ezlopi_device_t *device_node = ezlopi_device_get_head();
+        l_ezlopi_device_t *device_node = EZPI_core_device_get_head();
         lua_newtable(lua_state);
         while (device_node)
         {
@@ -207,7 +207,7 @@ int lcore_get_room(lua_State *lua_state) { return 0; }
 static int __create_lua_table_for_device(lua_State *lua_state, l_ezlopi_device_t *device_prop)
 {
     char tmp_str[32];
-    s_ezlopi_cloud_controller_t *controller_info = ezlopi_device_get_controller_information();
+    s_ezlopi_cloud_controller_t *controller_info = EZPI_core_device_get_controller_information();
 
     lua_newtable(lua_state);
 
@@ -277,7 +277,7 @@ static int __create_lua_table_for_device(lua_State *lua_state, l_ezlopi_device_t
 static int __create_lua_table_for_item(lua_State *lua_state, l_ezlopi_item_t *item_prop, uint32_t device_id)
 {
     char tmp_str[32];
-    // s_ezlopi_cloud_controller_t *controller_info = ezlopi_device_get_controller_information();
+    // s_ezlopi_cloud_controller_t *controller_info = EZPI_core_device_get_controller_information();
 
     lua_newtable(lua_state);
 

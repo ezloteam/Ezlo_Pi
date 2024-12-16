@@ -70,7 +70,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
 }
 static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_data)
 {
-    item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
+    item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
     item->cloud_properties.item_name = ezlopi_item_name_current;
@@ -98,11 +98,11 @@ static ezlopi_error_t __0046_prepare(void *arg)
         if (user_data)
         {
             memset(user_data, 0, sizeof(s_currentmeter_t));
-            l_ezlopi_device_t *currentmeter_device = ezlopi_device_add_device(device_prep_arg->cjson_device, NULL);
+            l_ezlopi_device_t *currentmeter_device = EZPI_core_device_add_device(device_prep_arg->cjson_device, NULL);
             if (currentmeter_device)
             {
                 __prepare_device_cloud_properties(currentmeter_device, device_prep_arg->cjson_device);
-                l_ezlopi_item_t *currentmeter_item = ezlopi_device_add_item_to_device(currentmeter_device, sensor_0046_ADC_ACS712_05B_currentmeter);
+                l_ezlopi_item_t *currentmeter_item = EZPI_core_device_add_item_to_device(currentmeter_device, sensor_0046_ADC_ACS712_05B_currentmeter);
                 if (currentmeter_item)
                 {
                     __prepare_item_cloud_properties(currentmeter_item, device_prep_arg->cjson_device, user_data);
@@ -110,7 +110,7 @@ static ezlopi_error_t __0046_prepare(void *arg)
                 }
                 else
                 {
-                    ezlopi_device_free_device(currentmeter_device);
+                    EZPI_core_device_free_device(currentmeter_device);
                     ezlopi_free(__FUNCTION__, user_data);
                 }
             }
@@ -173,7 +173,7 @@ static ezlopi_error_t __0046_notify(l_ezlopi_item_t *item)
             __calculate_current_value(item); // update amp
             if (fabs(user_data->amp_value - prev_amp) > 0.5)
             {
-                ezlopi_device_value_updated_from_device_broadcast(item);
+                EZPI_core_device_value_updated_from_device_broadcast(item);
                 ret = EZPI_SUCCESS;
             }
         }
