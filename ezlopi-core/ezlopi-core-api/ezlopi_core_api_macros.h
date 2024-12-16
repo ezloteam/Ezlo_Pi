@@ -1,8 +1,8 @@
 //          ("name",           func,          updater_func)
 #if (defined(CONFIG_EZPI_WEBSOCKET_CLIENT) || defined(CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER))
 
-CLOUD_METHOD("hub.items.list", items_list_v3, NULL)
-CLOUD_METHOD("hub.item.value.set", items_set_value_v3, NULL)
+CLOUD_METHOD("hub.items.list", EZPI_items_list_v3, NULL)
+CLOUD_METHOD("hub.item.value.set", EZPI_items_set_value_v3, NULL)
 
 CLOUD_METHOD("hub.devices.list", EZPI_devices_list_v3, NULL)
 CLOUD_METHOD("hub.device.name.set", EZPI_device_name_set, EZPI_device_updated)
