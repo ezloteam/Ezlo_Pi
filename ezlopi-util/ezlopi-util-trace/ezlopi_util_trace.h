@@ -12,6 +12,17 @@ extern "C"
 {
 #endif
 
+    typedef enum
+    {
+        ENUM_EZLOPI_LOG_SEVERITY_NONE = 0,
+        ENUM_EZLOPI_LOG_SEVERITY_ERROR,
+        ENUM_EZLOPI_LOG_SEVERITY_WARNING,
+        ENUM_EZLOPI_LOG_SEVERITY_INFO,
+        ENUM_EZLOPI_LOG_SEVERITY_DEBUG,
+        ENUM_EZLOPI_LOG_SEVERITY_TRACE,
+        ENUM_EZLOPI_LOG_SEVERITY_MAX,
+    } e_ezlopi_log_severity_t;
+
 #if defined(CONFIG_EZPI_UTIL_TRACE_EN) || defined(CONFIG_EZPI_LOG_CLOUD_EN)
 #define ENABLE_TRACE 1
 #else
@@ -30,7 +41,7 @@ extern "C"
     void ezlopi_util_set_otel_log_upcall(f_otel_log_upcall_t __log_upcall, uint32_t max_log_len);
     void ezlopi_util_log_otel(uint8_t severity, const char *file, int line, const char *format, ...);
 
-    // #define TRACE_OTEL(severity, format, reg...) ezlopi_util_log_otel(severity, __FILENAME__, __LINE__, format, ##reg)
+#define TRACE_OTEL(severity, format, reg...) ezlopi_util_log_otel(severity, __FILENAME__, __LINE__, format, ##reg)
 
 #if (1 == ENABLE_TRACE)
 

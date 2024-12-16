@@ -178,6 +178,8 @@ static void __fetch_wss_endpoint(void *pv)
 
                 if (rx_message && (ret == pdTRUE))
                 {
+                    cJSON *cj_method_dup = NULL;
+
                     if (rx_message->payload)
                     {
                         cJSON *cj_request = cJSON_Parse(__FUNCTION__, rx_message->payload);
@@ -187,6 +189,8 @@ static void __fetch_wss_endpoint(void *pv)
 
                             if (cj_method)
                             {
+                                cj_method_dup = cJSON_Duplicate(__FUNCTION__, cj_method, true);
+
                                 printf("web-provisioning [method: %.*s]\r\n%s\r\n", cj_method->str_value_len, cj_method->valuestring, rx_message->payload);
                                 // TRACE_D("rx_message->payload [method: %.*s]\r\n%s", cj_method->str_value_len, cj_method->valuestring, rx_message->payload);
                                 ezlopi_free(__FUNCTION__, rx_message->payload);
@@ -200,31 +204,6 @@ static void __fetch_wss_endpoint(void *pv)
 
                             __message_process_cjson(cj_request, rx_message->time_ms);
 
-#if 0
-                            cJSON *cj_trace_telemetry = cJSON_CreateObject(__FUNCTION__);
-                            if (cj_trace_telemetry)
-                            {
-                                time_t now = 0;
-
-                                cJSON *cj_method_dup = cJSON_Duplicate(__FUNCTION__, cj_method, true);
-                                if (false == cJSON_AddItemToObject(__FUNCTION__, cj_trace_telemetry, ezlopi_method_str, cj_method_dup))
-                                {
-                                    cJSON_Delete(__FUNCTION__, cj_method_dup);
-                                }
-
-                                cJSON_AddNumberToObject(__FUNCTION__, cj_trace_telemetry, ezlopi_kind_str, 1);
-                                cJSON_AddNumberToObject(__FUNCTION__, cj_trace_telemetry, ezlopi_startTime_str, rx_message->time_ms);
-
-                                time(&now);
-                                cJSON_AddNumberToObject(__FUNCTION__, cj_trace_telemetry, ezlopi_endTime_str, now);
-
-                                if (0 == ezlopi_service_otel_add_trace_to_telemetry_queue(cj_trace_telemetry))
-                                {
-                                    cJSON_Delete(__FUNCTION__, cj_trace_telemetry);
-                                }
-                            }
-#endif
-
                             cJSON_Delete(__FUNCTION__, cj_request);
                         }
 
@@ -233,6 +212,37 @@ static void __fetch_wss_endpoint(void *pv)
                     }
 
                     ezlopi_free(__FUNCTION__, rx_message);
+
+#if 1
+                    if (cj_method_dup)
+                    {
+                        cJSON *cj_trace_telemetry = cJSON_CreateObject(__FUNCTION__);
+                        if (cj_trace_telemetry)
+                        {
+                            time_t now = 0;
+
+                            if (false == cJSON_AddItemToObject(__FUNCTION__, cj_trace_telemetry, ezlopi_method_str, cj_method_dup))
+                            {
+                                cJSON_Delete(__FUNCTION__, cj_method_dup);
+                            }
+
+                            cJSON_AddNumberToObject(__FUNCTION__, cj_trace_telemetry, ezlopi_kind_str, 1);
+                            cJSON_AddNumberToObject(__FUNCTION__, cj_trace_telemetry, ezlopi_startTime_str, rx_message->time_ms);
+
+                            time(&now);
+                            cJSON_AddNumberToObject(__FUNCTION__, cj_trace_telemetry, ezlopi_endTime_str, now);
+
+                            if (0 == ezlopi_service_otel_add_trace_to_telemetry_queue(cj_trace_telemetry))
+                            {
+                                cJSON_Delete(__FUNCTION__, cj_trace_telemetry);
+                            }
+                        }
+                        else
+                        {
+                            cJSON_Delete(__FUNCTION__, cj_method_dup);
+                        }
+                    }
+#endif
                 }
 
                 vTaskDelay(1);

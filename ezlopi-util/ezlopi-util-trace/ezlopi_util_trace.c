@@ -130,29 +130,29 @@ void trace_color_print(const char *txt_color, uint8_t severity, const char *file
 
 #endif // ENABLE_TRACE
 
-// static uint32_t max_otel_log_length = 0;
-// static f_otel_log_upcall_t otel_log_upcall_func = NULL;
+static uint32_t max_otel_log_length = 0;
+static f_otel_log_upcall_t otel_log_upcall_func = NULL;
 
-// void ezlopi_util_set_otel_log_upcall(f_otel_log_upcall_t __log_upcall, uint32_t max_log_len)
-// {
-//     max_otel_log_length = max_log_len;
-//     otel_log_upcall_func = __log_upcall;
-// }
+void ezlopi_util_set_otel_log_upcall(f_otel_log_upcall_t __log_upcall, uint32_t max_log_len)
+{
+    max_otel_log_length = max_log_len;
+    otel_log_upcall_func = __log_upcall;
+}
 
-// void ezlopi_util_log_otel(uint8_t severity, const char *file, int line, const char *format, ...)
-// {
-//     if (otel_log_upcall_func && max_otel_log_length)
-//     {
-//         char *buffer = ezlopi_malloc(__FUNCTION__, max_otel_log_length);
-//         if (buffer)
-//         {
-//             va_list args;
-//             va_start(args, format);
-//             vsnprintf(buffer, max_otel_log_length, format, args);
-//             va_end(args);
+void ezlopi_util_log_otel(uint8_t severity, const char *file, int line, const char *format, ...)
+{
+    if (otel_log_upcall_func && max_otel_log_length)
+    {
+        char *buffer = ezlopi_malloc(__FUNCTION__, max_otel_log_length);
+        if (buffer)
+        {
+            va_list args;
+            va_start(args, format);
+            vsnprintf(buffer, max_otel_log_length, format, args);
+            va_end(args);
 
-//             otel_log_upcall_func(severity, file, line, buffer);
-//             ezlopi_free(__FUNCTION__, buffer);
-//         }
-//     }
-// }
+            otel_log_upcall_func(severity, file, line, buffer);
+            ezlopi_free(__FUNCTION__, buffer);
+        }
+    }
+}

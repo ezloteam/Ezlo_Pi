@@ -83,7 +83,7 @@ int ezlopi_service_otel_add_trace_to_telemetry_queue(cJSON *cj_trace)
 {
     int ret = 0;
 
-#if 0
+#if 1
     if (cj_trace)
     {
         s_otel_queue_data_t *otel_data = ezlopi_malloc(__FUNCTION__, sizeof(s_otel_queue_data_t));
@@ -106,7 +106,7 @@ int ezlopi_service_otel_add_trace_to_telemetry_queue(cJSON *cj_trace)
 void ezlopi_service_otel_init(void)
 {
     bootloader_random_enable();
-    // ezlopi_util_set_otel_log_upcall(__otel_add_log_to_queue, 100);
+    ezlopi_util_set_otel_log_upcall(__otel_add_log_to_queue, 100);
     __telemetry_queue = xQueueCreate(10, sizeof(s_otel_queue_data_t *));
     xTaskCreate(__otel_task, "otel-service-task", 2 * 2048, NULL, 4, NULL);
 }
@@ -129,6 +129,9 @@ static void __otel_test_loop(void *pv)
             cJSON_AddNumberToObject(__FUNCTION__, otel_data->cj_data, ezlopi_startTime_str, 1733828105);
             cJSON_AddNumberToObject(__FUNCTION__, otel_data->cj_data, ezlopi_endTime_str, 1733828106);
         }
+
+
+        01910017521830
 
         if (pdFALSE == xQueueSend(__telemetry_queue, &otel_data, 0))
         {
@@ -174,6 +177,7 @@ static void __otel_loop(void *pv)
     {
         s_otel_queue_data_t *otel_data = NULL;
         xQueueReceive(__telemetry_queue, &otel_data, 0);
+
         if (otel_data)
         {
             if (otel_data->cj_data)
@@ -186,7 +190,7 @@ static void __otel_loop(void *pv)
                     {
                     case E_OTEL_LOGS:
                     {
-                        // cj_telemetry = __otel_logs_decorate(otel_data->cj_data);
+                        cj_telemetry = __otel_logs_decorate(otel_data->cj_data);
                         break;
                     }
                     case E_OTEL_TRACES:
@@ -204,7 +208,11 @@ static void __otel_loop(void *pv)
                     }
                     }
 
-                    __otel_publish(cj_telemetry);
+                    if (cj_telemetry)
+                    {
+                        __otel_publish(cj_telemetry);
+                        cJSON_Delete(__FUNCTION__, cj_telemetry);
+                    }
                 }
 
                 cJSON_Delete(__FUNCTION__, otel_data->cj_data);
@@ -223,8 +231,12 @@ static void __otel_publish(cJSON *cj_telemetry)
         char *buffer = ezlopi_core_buffer_acquire(__FUNCTION__, &buffer_len, 2000);
         if (buffer)
         {
-            uint32_t free_heap = esp_get_minimum_free_heap_size();
+            uint32_t free_heap = esp_get_free_heap_size();
+            uint32_t heap_watermark = esp_get_minimum_free_heap_size();
+
             printf("Free Heap Size:            %d B    %.4f KB\r\n", free_heap, free_heap / 1024.0);
+            printf("Heap watermark:            %d B    %.4f KB\r\n", heap_watermark, heap_watermark / 1024.0);
+
             cJSON_PrintPreallocated(__FUNCTION__, cj_telemetry, buffer, buffer_len, false);
             ezlopi_websocket_client_send(__wss_client, buffer, strlen(buffer), 1000);
             ezlopi_core_buffer_release(__FUNCTION__);

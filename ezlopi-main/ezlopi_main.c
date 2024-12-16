@@ -115,7 +115,7 @@ void app_main(void)
     ezlopi_service_ota_init();
 #endif // CONFIG_EZPI_ENABLE_OTA
 
-    // ezlopi_service_otel_init();
+    ezlopi_service_otel_init();
 }
 
 static void __blinky(void *pv)
@@ -124,7 +124,6 @@ static void __blinky(void *pv)
 
     while (1)
     {
-
         uint32_t free_heap = esp_get_free_heap_size();
         uint32_t watermark_heap = esp_get_minimum_free_heap_size();
         uint32_t free_heap_internal = esp_get_free_internal_heap_size();
