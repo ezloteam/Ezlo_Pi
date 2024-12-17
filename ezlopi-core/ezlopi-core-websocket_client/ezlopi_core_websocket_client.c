@@ -75,9 +75,9 @@ esp_websocket_client_handle_t ezlopi_websocket_client_init(cJSON *uri, int (*msg
 {
     if ((NULL == client) && (NULL != uri) && (NULL != uri->valuestring) && (NULL != msg_upcall))
     {
-        char *ca_cert = ezlopi_factory_info_v3_get_ca_certificate();
-        char *ssl_priv = ezlopi_factory_info_v3_get_ssl_private_key();
-        char *ssl_shared = ezlopi_factory_info_v3_get_ssl_shared_key();
+        char *ca_cert = EZPI_core_factory_info_v3_get_ca_certificate();
+        char *ssl_priv = EZPI_core_factory_info_v3_get_ssl_private_key();
+        char *ssl_shared = EZPI_core_factory_info_v3_get_ssl_shared_key();
 
         static s_ws_event_arg_t event_arg;
         event_arg.client = client;

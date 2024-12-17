@@ -397,7 +397,7 @@ static void __update_cloud_room_deleted(uint32_t room_id)
 
         CJSON_TRACE("----------------- broadcasting - cj_response", cj_response);
 
-        if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(cj_response))
+        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_response))
         {
             cJSON_Delete(__FUNCTION__, cj_response);
         }

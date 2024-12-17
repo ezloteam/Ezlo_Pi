@@ -135,7 +135,7 @@ cJSON *EZPI_core_api_consume_cjson(const char *who, cJSON *cj_request)
                     {
                         // cJSON_AddNullToObject(who, cj_update_response, ezlopi_error_str);
 
-                        if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(cj_update_response))
+                        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_update_response))
                         {
                             cJSON_Delete(who, cj_update_response);
                         }
@@ -180,7 +180,7 @@ static cJSON *__execute_method(cJSON *cj_request, f_method_func_t method_func)
         if (EZPI_core_ezlopi_methods_check_method_register(method_func))
         {
             method_func(cj_request, NULL);
-            ezlopi_event_group_set_event(EZLOPI_EVENT_NMA_REG);
+            EZPI_core_event_group_set_event(EZLOPI_EVENT_NMA_REG);
         }
         else
         {

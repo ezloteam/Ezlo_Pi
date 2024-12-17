@@ -20,7 +20,7 @@ void gateways_list(cJSON *cj_request, cJSON *cj_response)
             cJSON *cjson_gateway = cJSON_CreateObject(__FUNCTION__);
             if (cjson_gateway)
             {
-                s_ezlopi_gateway_t *gateway_prop = ezlopi_gateway_get();
+                s_ezlopi_gateway_t *gateway_prop = EZPI_core_gateway_get();
                 if (gateway_prop)
                 {
                     char tmp_buffer[32];

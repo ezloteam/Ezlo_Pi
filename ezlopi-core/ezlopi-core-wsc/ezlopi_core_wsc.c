@@ -14,13 +14,13 @@
 #include "ezlopi_core_wsc.h"
 
 static const char *__request_format = "GET / HTTP/1.1\n"
-                                      "Host: %s\n"
-                                      "Connection: Upgrade\n"
-                                      "Upgrade: websocket\n"
-                                      "Origin: %s\n"
-                                      "Sec-WebSocket-Version: 13\n"
-                                      "User-Agent: EzloPi-%llu\n"
-                                      "Sec-WebSocket-Key: JSUlJXYeLiJ2Hi4idh4uIg==\r\n\r\n";
+"Host: %s\n"
+"Connection: Upgrade\n"
+"Upgrade: websocket\n"
+"Origin: %s\n"
+"Sec-WebSocket-Version: 13\n"
+"User-Agent: EzloPi-%llu\n"
+"Sec-WebSocket-Key: JSUlJXYeLiJ2Hi4idh4uIg==\r\n\r\n";
 
 static void __rx_task(void *arg);
 static int __init_mbedtls(s_ssl_websocket_t *ssl_wsc);
@@ -107,7 +107,7 @@ s_ssl_websocket_t *ezlopi_core_wsc_init(cJSON *uri, f_wsc_msg_upcall_t __message
             }
 
             snprintf(__wsc_url, sizeof(__wsc_url), "%.*s", (uri->str_value_len - 6), (uri->valuestring + 6));
-            snprintf(__request, sizeof(__request), __request_format, __wsc_url, __wsc_url, ezlopi_factory_info_v3_get_id());
+            snprintf(__request, sizeof(__request), __request_format, __wsc_url, __wsc_url, EZPI_core_factory_info_v3_get_id());
 
             TRACE_D("__request_format: %s", __request);
 #endif
@@ -135,9 +135,9 @@ static int __init_mbedtls(s_ssl_websocket_t *wsc_ssl)
         // wsc_ssl->shared_cert = ezlopi_malloc(__FUNCTION__, sizeof(mbedtls_x509_crt));
         // wsc_ssl->private_key = ezlopi_malloc(__FUNCTION__, sizeof(mbedtls_pk_context));
 
-        // wsc_ssl->str_cacert = ezlopi_factory_info_v3_get_ca_certificate();
-        // wsc_ssl->str_shared_cert = ezlopi_factory_info_v3_get_ssl_shared_key();
-        // wsc_ssl->str_private_key = ezlopi_factory_info_v3_get_ssl_private_key();
+        // wsc_ssl->str_cacert = EZPI_core_factory_info_v3_get_ca_certificate();
+        // wsc_ssl->str_shared_cert = EZPI_core_factory_info_v3_get_ssl_shared_key();
+        // wsc_ssl->str_private_key = EZPI_core_factory_info_v3_get_ssl_private_key();
 
         wsc_ssl->buffer_len = 4096;
         wsc_ssl->buffer = ezlopi_malloc(__FUNCTION__, wsc_ssl->buffer_len);
@@ -288,7 +288,7 @@ static void __setup_wsc_request(cJSON *cj_uri, s_ssl_websocket_t *ssl_wsc)
 
         snprintf(ssl_wsc->url, sizeof(ssl_wsc->url), "%.*s", url_len - 6, cj_uri->valuestring + 6);
 
-        // snprintf(__request, sizeof(__request), __request_format, __wsc_url, __wsc_url, ezlopi_factory_info_v3_get_id());
+        // snprintf(__request, sizeof(__request), __request_format, __wsc_url, __wsc_url, EZPI_core_factory_info_v3_get_id());
         // TRACE_D("__request_format: %s", __request);
     }
 }
@@ -378,7 +378,7 @@ static int __zap_aut(unsigned char *ttx, unsigned char *text)
 {
     int i;
     int len1 = 0;
-    const unsigned char mask[4] = {0x10, 0x55, 0x21, 0x43};
+    const unsigned char mask[4] = { 0x10, 0x55, 0x21, 0x43 };
 
     // TRACE_I("Sending dan to wss:: len: %d\r\n%s", strlen((char *)ttx), ttx);
 
@@ -437,7 +437,7 @@ static void __rx_task(void *arg)
                     // TRACE_S("%s: %s, err: %d", "ot.review-staging-op-owkix8.ewr4.opentelemetry.ezlo.com", ipaddr_ntoa((const ip_addr_t *)&TargetIp), err);
 
                     if ((ret = mbedtls_net_connect(__ssl_wsc->server_fd, "ot.review-staging-op-owkix8.ewr4.opentelemetry.ezlo.com",
-                                                   tmp_port, MBEDTLS_NET_PROTO_TCP)) != 0)
+                        tmp_port, MBEDTLS_NET_PROTO_TCP)) != 0)
                     {
                         TRACE_E("mbedtls_net_connect returned -0x%04x", -ret);
                         break;
@@ -542,15 +542,15 @@ static int __upgrade_to_websocket(s_ssl_websocket_t *ssl_wsc)
             // TRACE_I("Writing HTTP __request...");
 
             char *tmp_request_format = "GET /logs HTTP/1.1\n"
-                                       "Host: ot.review-staging-op-owkix8.ewr4.opentelemetry.ezlo.com\n"
-                                       "Connection: Upgrade\n"
-                                       "Upgrade: websocket\n"
-                                       "Origin: wss://ot.review-staging-op-owkix8.ewr4.opentelemetry.ezlo.com\n"
-                                       "Sec-WebSocket-Version: 13\n"
-                                       "User-Agent: EzloPi-%llu\n"
-                                       "Sec-WebSocket-Key: JSUlJXYeLiJ2Hi4idh4uIg==\r\n\r\n";
+                "Host: ot.review-staging-op-owkix8.ewr4.opentelemetry.ezlo.com\n"
+                "Connection: Upgrade\n"
+                "Upgrade: websocket\n"
+                "Origin: wss://ot.review-staging-op-owkix8.ewr4.opentelemetry.ezlo.com\n"
+                "Sec-WebSocket-Version: 13\n"
+                "User-Agent: EzloPi-%llu\n"
+                "Sec-WebSocket-Key: JSUlJXYeLiJ2Hi4idh4uIg==\r\n\r\n";
 
-            snprintf(ssl_wsc->buffer, ssl_wsc->buffer_len, tmp_request_format, ezlopi_factory_info_v3_get_id());
+            snprintf(ssl_wsc->buffer, ssl_wsc->buffer_len, tmp_request_format, EZPI_core_factory_info_v3_get_id());
             TRACE_D("tmp_request_format: \r\n%s", ssl_wsc->buffer ? ssl_wsc->buffer : "null");
 
             ret = __send_internal(ssl_wsc, ssl_wsc->buffer, strlen(ssl_wsc->buffer), 5000);

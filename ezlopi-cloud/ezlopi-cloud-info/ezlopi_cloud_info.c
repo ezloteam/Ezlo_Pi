@@ -19,30 +19,30 @@
 #include "ezlopi_core_sntp.h"
 #include "ezlopi_core_info.h"
 
-void info_get(cJSON* cj_request, cJSON* cj_response)
+void info_get(cJSON *cj_request, cJSON *cj_response)
 {
-    cJSON* cjson_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+    cJSON *cjson_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     if (cjson_result)
     {
-        char* device_uuid = ezlopi_factory_info_v3_get_device_uuid();
+        char *device_uuid = EZPI_core_factory_info_v3_get_device_uuid();
         // #include "esp_app_format.h"
-        cJSON_AddStringToObject(__FUNCTION__, cjson_result, ezlopi_model_str, ezlopi_factory_info_v3_get_device_type());
+        cJSON_AddStringToObject(__FUNCTION__, cjson_result, ezlopi_model_str, EZPI_core_factory_info_v3_get_device_type());
         cJSON_AddStringToObject(__FUNCTION__, cjson_result, "architecture", CONFIG_SDK_TOOLPREFIX);
         cJSON_AddStringToObject(__FUNCTION__, cjson_result, ezlopi_firmware_str, VERSION_STR);
         cJSON_AddStringToObject(__FUNCTION__, cjson_result, "kernel", "FreeRTOS");
         cJSON_AddStringToObject(__FUNCTION__, cjson_result, "hardware", CONFIG_IDF_TARGET);
-        cJSON_AddNumberToObject(__FUNCTION__, cjson_result, ezlopi_serial_str, ezlopi_factory_info_v3_get_id());
+        cJSON_AddNumberToObject(__FUNCTION__, cjson_result, ezlopi_serial_str, EZPI_core_factory_info_v3_get_id());
 
         cJSON_AddStringToObject(__FUNCTION__, cjson_result, ezlopi_uuid_str, device_uuid ? device_uuid : ezlopi__str);
         cJSON_AddBoolToObject(__FUNCTION__, cjson_result, "offlineAnonymousAccess", true);
         cJSON_AddBoolToObject(__FUNCTION__, cjson_result, "offlineInsecureAccess", true);
 
-        cJSON* cjson_location = cJSON_AddObjectToObject(__FUNCTION__, cjson_result, ezlopi_location_str);
+        cJSON *cjson_location = cJSON_AddObjectToObject(__FUNCTION__, cjson_result, ezlopi_location_str);
         if (cjson_location)
         {
             cJSON_AddNumberToObject(__FUNCTION__, cjson_location, ezlopi_latitude_str, ezlopi_cloud_get_latitude());
             cJSON_AddNumberToObject(__FUNCTION__, cjson_location, ezlopi_longitude_str, ezlopi_cloud_get_longitude());
-            char* location = EZPI_CORE_sntp_get_location();
+            char *location = EZPI_CORE_sntp_get_location();
             if (location)
             {
                 cJSON_AddStringToObject(__FUNCTION__, cjson_location, ezlopi_timezone_str, location);
@@ -56,7 +56,7 @@ void info_get(cJSON* cj_request, cJSON* cj_response)
             }
         }
 
-        cJSON* cjson_build = cJSON_AddObjectToObject(__FUNCTION__, cjson_result, ezlopi_build_str);
+        cJSON *cjson_build = cJSON_AddObjectToObject(__FUNCTION__, cjson_result, ezlopi_build_str);
         if (cjson_build)
         {
             {
@@ -70,7 +70,7 @@ void info_get(cJSON* cj_request, cJSON* cj_response)
             cJSON_AddStringToObject(__FUNCTION__, cjson_build, "commit", COMMIT_HASH);
         }
 
-        cJSON* cjson_battery = cJSON_AddObjectToObject(__FUNCTION__, cjson_result, "battery");
+        cJSON *cjson_battery = cJSON_AddObjectToObject(__FUNCTION__, cjson_result, "battery");
         if (cjson_battery)
         {
             cJSON_AddNumberToObject(__FUNCTION__, cjson_battery, "stateOfCharge", 0);
@@ -95,11 +95,11 @@ void info_get(cJSON* cj_request, cJSON* cj_response)
         {
             char time_string[50];
             uint32_t tick_count_ms = xTaskGetTickCount() / portTICK_PERIOD_MS;
-            EZPI_CORE_info_get_tick_to_time_name(time_string, sizeof(time_string), tick_count_ms);
+            EZPI_core_info_get_tick_to_time_name(time_string, sizeof(time_string), tick_count_ms);
             cJSON_AddStringToObject(__FUNCTION__, cjson_result, ezlopi_uptime_str, time_string);
         }
 
 #endif
-        ezlopi_factory_info_v3_free(device_uuid);
+        EZPI_core_factory_info_v3_free(device_uuid);
     }
 }

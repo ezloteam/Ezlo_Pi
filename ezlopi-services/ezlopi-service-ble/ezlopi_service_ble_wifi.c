@@ -164,12 +164,12 @@ static void ezpi_wifi_creds_parse_and_connect(uint8_t *value, uint32_t len)
                     if (BLE_AUTH_SUCCESS == l_ble_auth_status)
                     {
                         ezlopi_wifi_connect(ssid, password);
-                        ezlopi_factory_info_v3_set_wifi(ssid, password);
+                        EZPI_core_factory_info_v3_set_wifi(ssid, password);
                     }
                     else if (BLE_AUTH_USER_ID_NOT_FOUND == l_ble_auth_status)
                     {
                         ezlopi_wifi_connect(ssid, password);
-                        ezlopi_factory_info_v3_set_wifi(ssid, password);
+                        EZPI_core_factory_info_v3_set_wifi(ssid, password);
                         ezlopi_ble_auth_store_user_id(user_id_str);
                     }
                 }

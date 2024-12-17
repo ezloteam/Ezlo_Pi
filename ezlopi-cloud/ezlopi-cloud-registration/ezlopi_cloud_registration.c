@@ -52,7 +52,7 @@ static void __create_reg_packet(void)
 
             esp_read_mac(mac_addr, ESP_MAC_WIFI_STA);
             snprintf(mac_str, sizeof(mac_str), "%02X:%02X:%02X:%02X:%02X:%02X",
-                     mac_addr[0], mac_addr[1], mac_addr[2], mac_addr[3], mac_addr[4], mac_addr[5]);
+                mac_addr[0], mac_addr[1], mac_addr[2], mac_addr[3], mac_addr[4], mac_addr[5]);
 
             cJSON_AddStringToObject(__FUNCTION__, cj_reg_data, "id", "__ID__");
             cJSON_AddStringToObject(__FUNCTION__, cj_reg_data, ezlopi_method_str, "register");
@@ -63,7 +63,7 @@ static void __create_reg_packet(void)
             {
                 char __id_str[32];
 
-                unsigned long long __id = ezlopi_factory_info_v3_get_id();
+                unsigned long long __id = EZPI_core_factory_info_v3_get_id();
                 snprintf(__id_str, sizeof(__id_str), "%llu", __id);
                 cJSON_AddStringToObject(__FUNCTION__, cj_params, "serial", __id_str);
 
@@ -73,7 +73,7 @@ static void __create_reg_packet(void)
                 cJSON_AddStringToObject(__FUNCTION__, cj_params, "hubType", "32.1");
                 // cJSON_AddStringToObject(__FUNCTION__, cj_params, "mac_address", "11:22:33:44:55:66");
 
-                char *__device_uuid = ezlopi_factory_info_v3_get_device_uuid();
+                char *__device_uuid = EZPI_core_factory_info_v3_get_device_uuid();
                 if (__device_uuid)
                 {
                     cJSON_AddStringToObject(__FUNCTION__, cj_params, "controller_uuid", __device_uuid);
@@ -90,7 +90,7 @@ static void __create_reg_packet(void)
 static void __reg_loop(void *arg)
 {
     TRACE_D("reg-loop");
-    ezlopi_error_t reg_event = ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 0, false);
+    ezlopi_error_t reg_event = EZPI_core_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 0, false);
     TRACE_D("reg-event: %d", reg_event);
 
     if (reg_event != ESP_OK)
@@ -100,7 +100,7 @@ static void __reg_loop(void *arg)
         cJSON *cj_register_dup = cJSON_CreateObjectReference(__FUNCTION__, cj_reg_data->child);
         if (cj_register_dup)
         {
-            if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(cj_register_dup))
+            if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_register_dup))
             {
                 TRACE_E("Error adding to broadcast queue!");
                 cJSON_Delete(__FUNCTION__, cj_register_dup);

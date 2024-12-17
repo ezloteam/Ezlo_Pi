@@ -136,7 +136,7 @@ void EZPI_parse_http_url(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fields_v
     if ((EZLOPI_VALUE_TYPE_STRING == curr_field->value_type) && (NULL != field_value_string))
     {
         // TRACE_W("Here! fresh url");
-        tmp_http_data->url_maxlen = (uint16_t)ezlopi_core_http_mem_malloc(&(tmp_http_data->url), field_value_string);
+        tmp_http_data->url_maxlen = (uint16_t)EZPI_core_http_mem_malloc(&(tmp_http_data->url), field_value_string);
         if (tmp_http_data->url_maxlen > 0)
         {
             //--------------------------------------------
@@ -210,8 +210,8 @@ void EZPI_parse_http_url(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fields_v
                 TRACE_S("port = '%d'", port);
                 TRACE_S("page = '%s'", page);
 
-                tmp_http_data->web_server_maxlen = (uint16_t)ezlopi_core_http_mem_malloc(&(tmp_http_data->web_server), host);
-                tmp_http_data->targe_page_maxlen = (uint16_t)ezlopi_core_http_mem_malloc(&(tmp_http_data->target_page), page);
+                tmp_http_data->web_server_maxlen = (uint16_t)EZPI_core_http_mem_malloc(&(tmp_http_data->web_server), host);
+                tmp_http_data->targe_page_maxlen = (uint16_t)EZPI_core_http_mem_malloc(&(tmp_http_data->target_page), page);
                 tmp_http_data->web_port = port;
             }
             else
@@ -265,7 +265,7 @@ void EZPI_parse_http_content(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fiel
     if ((EZLOPI_VALUE_TYPE_STRING == curr_field->value_type) && (NULL != field_value_string))
     {
         // TRACE_W("Here! fresh content");
-        tmp_http_data->content_maxlen = (uint16_t)ezlopi_core_http_mem_malloc(&(tmp_http_data->content), field_value_string);
+        tmp_http_data->content_maxlen = (uint16_t)EZPI_core_http_mem_malloc(&(tmp_http_data->content), field_value_string);
         if (tmp_http_data->content_maxlen > 0)
         {
             int content_size = __ezlopi_core_scenes_then_create_fresh_header(tmp_http_data);
@@ -348,8 +348,8 @@ void EZPI_parse_http_creds(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fields
             const char *passValue = cJSON_GetStringValue(passwordItem);
 
             // TRACE_W("Here! credential");
-            tmp_http_data->username_maxlen = (uint16_t)ezlopi_core_http_mem_malloc(&(tmp_http_data->username), userValue);
-            tmp_http_data->password_maxlen = (uint16_t)ezlopi_core_http_mem_malloc(&(tmp_http_data->password), passValue);
+            tmp_http_data->username_maxlen = (uint16_t)EZPI_core_http_mem_malloc(&(tmp_http_data->username), userValue);
+            tmp_http_data->password_maxlen = (uint16_t)EZPI_core_http_mem_malloc(&(tmp_http_data->password), passValue);
         }
     }
 }
@@ -615,7 +615,7 @@ static int __ezlopi_core_scenes_then_sendhttp_relloc_header(s_ezlopi_core_http_m
     uint8_t retry = 5;
     do
     {
-        if (EZPI_SUCCESS == ezlopi_core_http_dyna_relloc(&(tmp_http_data->header), new_size)) // rellocate: 'tmp_http_data->header' with  'new_size'
+        if (EZPI_SUCCESS == EZPI_core_http_dyna_relloc(&(tmp_http_data->header), new_size)) // rellocate: 'tmp_http_data->header' with  'new_size'
         {
             snprintf((tmp_http_data->header) + strlen(tmp_http_data->header), append_size, "%s", append_str);
             ret = new_size; // return new memory-block size
@@ -658,7 +658,7 @@ static void __ezlopi_core_scenes_then_sendhttp_parse_host_name(s_ezlopi_core_htt
                         bzero(tmp_string, length);
                         snprintf(tmp_string, length, "%s", start);
                         // TRACE_I("web_host_name : %s", tmp_string);
-                        tmp_http_data->web_server_maxlen = (uint16_t)ezlopi_core_http_mem_malloc(&(tmp_http_data->web_server), tmp_string);
+                        tmp_http_data->web_server_maxlen = (uint16_t)EZPI_core_http_mem_malloc(&(tmp_http_data->web_server), tmp_string);
                         ezlopi_free(__FUNCTION__, tmp_string);
                     }
                 }
@@ -676,7 +676,7 @@ static void __ezlopi_core_scenes_then_sendhttp_parse_host_name(s_ezlopi_core_htt
                         bzero(tmp_string, length);
                         snprintf(tmp_string, length, "%s", (ptr + ((int)(start - ptr))));
                         // TRACE_I("web_host_name : %s", tmp_string);
-                        tmp_http_data->web_server_maxlen = (uint16_t)ezlopi_core_http_mem_malloc(&(tmp_http_data->web_server), tmp_string);
+                        tmp_http_data->web_server_maxlen = (uint16_t)EZPI_core_http_mem_malloc(&(tmp_http_data->web_server), tmp_string);
                         ezlopi_free(__FUNCTION__, tmp_string);
                     }
                 }
@@ -697,7 +697,7 @@ static int __ezlopi_core_scenes_then_create_fresh_header(s_ezlopi_core_http_mbed
     if ((NULL == tmp_http_data->header) && (0 == ret))
     {
         // TRACE_W("Here! fresh header init");
-        tmp_http_data->header_maxlen = (uint16_t)ezlopi_core_http_mem_malloc(&(tmp_http_data->header), "\r\0");
+        tmp_http_data->header_maxlen = (uint16_t)EZPI_core_http_mem_malloc(&(tmp_http_data->header), "\r\0");
         ret = STR_SIZE(tmp_http_data->header);
         // TRACE_W("Here!! Created fresh header-> [capacity: %d] , [occupied: %d]", tmp_http_data->header_maxlen, ret);
     }
@@ -709,7 +709,7 @@ static int __ezlopi_core_scenes_then_create_fresh_header(s_ezlopi_core_http_mbed
 static void __ezlopi_core_scenes_then_append_to_header(s_ezlopi_core_http_mbedtls_t *tmp_http_data, const char *str1, const char *str2)
 {
     int append_size = (STR_SIZE(str1) + 4 + STR_SIZE(str2)) + 6;
-    int max_allowed = ezlopi_core_http_calc_empty_bufsize(tmp_http_data->header, (tmp_http_data->header_maxlen), append_size);
+    int max_allowed = EZPI_core_http_calc_empty_bufsize(tmp_http_data->header, (tmp_http_data->header_maxlen), append_size);
     if (max_allowed > 0)
     {
         snprintf(tmp_http_data->header + STR_SIZE(tmp_http_data->header), max_allowed, "%s: %s\r\n", str1, str2);

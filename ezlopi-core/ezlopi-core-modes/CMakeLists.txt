@@ -20,7 +20,7 @@ set(EZLOPI_SERVICE_COMPONENTS
 )
 
 
-idf_component_register(SRCS "${config_src}"
+idf_component_register(SRCS  "${config_src}"
                         INCLUDE_DIRS "."
                         REQUIRES        ${EZLOPI_CORE_COMPONENTS}
                                         ${EZLOPI_HAL_COMPONENTS}

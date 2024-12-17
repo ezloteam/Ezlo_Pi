@@ -16,12 +16,12 @@
 #include "ezlopi_core_factory_info.h"
 #include "ezlopi_core_wifi_ap.h"
 
-static esp_netif_t* ezlopi_ap_netif = NULL;
+static esp_netif_t *ezlopi_ap_netif = NULL;
 
 void ezlopi_configure_wifi_ap()
 {
     char ezlopi_wifi_ap_ssid[32];
-    char* ezlopi_wifi_ap_pass = "123456789";
+    char *ezlopi_wifi_ap_pass = "123456789";
     // Check the return type, may be important.
     ezlopi_ap_netif = esp_netif_create_default_wifi_ap();
     wifi_init_config_t wifi_init_configurations = WIFI_INIT_CONFIG_DEFAULT();
@@ -35,10 +35,10 @@ void ezlopi_configure_wifi_ap()
         },
     };
 
-    const char* device_type = ezlopi_factory_info_v3_get_device_type();
+    const char *device_type = EZPI_core_factory_info_v3_get_device_type();
     if ((NULL != device_type) && (isprint(device_type[0])))
     {
-        snprintf(ezlopi_wifi_ap_ssid, sizeof(ezlopi_wifi_ap_ssid), "ezlopi_%s_%llu", device_type, ezlopi_factory_info_v3_get_id());
+        snprintf(ezlopi_wifi_ap_ssid, sizeof(ezlopi_wifi_ap_ssid), "ezlopi_%s_%llu", device_type, EZPI_core_factory_info_v3_get_id());
     }
     else
     {
@@ -50,8 +50,8 @@ void ezlopi_configure_wifi_ap()
         ezlopi_wifi_ap_ssid[19] = '\0';
     }
 
-    strncpy((char*)wifi_cred_configurations.ap.ssid, ezlopi_wifi_ap_ssid, sizeof(wifi_cred_configurations.ap.ssid));
-    strncpy((char*)wifi_cred_configurations.ap.password, ezlopi_wifi_ap_pass, sizeof(wifi_cred_configurations.ap.password));
+    strncpy((char *)wifi_cred_configurations.ap.ssid, ezlopi_wifi_ap_ssid, sizeof(wifi_cred_configurations.ap.ssid));
+    strncpy((char *)wifi_cred_configurations.ap.password, ezlopi_wifi_ap_pass, sizeof(wifi_cred_configurations.ap.password));
 
     TRACE_I("Setting wifi mode to AP.");
     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_AP));

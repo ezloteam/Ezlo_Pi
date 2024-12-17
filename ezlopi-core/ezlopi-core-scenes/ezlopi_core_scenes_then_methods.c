@@ -460,7 +460,7 @@ int EZPI_core_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void 
             // now to trigger http_request and extract the response.
             tmp_http_data->response = NULL;
             tmp_http_data->response_maxlen = 0;
-            ezlopi_core_http_mbedtls_req(tmp_http_data); // Returns:- [response_buffer = &Memory_block]
+            EZPI_core_http_mbedtls_req(tmp_http_data); // Returns:- [response_buffer = &Memory_block]
 
             EZPI_free_http_mbedtls_struct(tmp_http_data);
             ezlopi_free(__FUNCTION__, tmp_http_data);
@@ -720,7 +720,7 @@ int EZPI_core_scene_then_reset_hub(l_scenes_list_v2_t *curr_scene, void *arg)
                             EZPI_core_device_factory_info_reset();
                             ezlopi_nvs_scenes_factory_info_reset(); // 'nvs' partitions
 
-                            ezlopi_factory_info_v3_scenes_factory_soft_reset(); // 'ID' partition :- 'wifi' sector
+                            EZPI_core_factory_info_v3_scenes_factory_soft_reset(); // 'ID' partition :- 'wifi' sector
                             TRACE_E("Rebooting ESP......................... ");
                             EZPI_CORE_reset_reboot();
                         }
@@ -728,7 +728,7 @@ int EZPI_core_scene_then_reset_hub(l_scenes_list_v2_t *curr_scene, void *arg)
                         {
                             ezlopi_nvs_scenes_soft_reset();
 
-                            ezlopi_factory_info_v3_scenes_factory_soft_reset(); // 'ID' partition :- 'wifi' sector
+                            EZPI_core_factory_info_v3_scenes_factory_soft_reset(); // 'ID' partition :- 'wifi' sector
                             TRACE_E("Rebooting ESP......................... ");
                             EZPI_CORE_reset_reboot();
                         }

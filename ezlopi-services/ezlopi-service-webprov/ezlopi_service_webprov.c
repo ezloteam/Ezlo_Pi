@@ -212,16 +212,16 @@ static void ezpi_connection_upcall(bool connected)
     else
     {
         prev_status = 1;
-        ezlopi_event_group_clear_event(EZLOPI_EVENT_NMA_REG);
+        EZPI_core_event_group_clear_event(EZLOPI_EVENT_NMA_REG);
     }
 }
 
 static void ezpi_fetch_wss_endpoint(void *pv)
 {
-    char *ca_certificate = ezlopi_factory_info_v3_get_ca_certificate();
-    char *ssl_shared_key = ezlopi_factory_info_v3_get_ssl_shared_key();
-    char *ssl_private_key = ezlopi_factory_info_v3_get_ssl_private_key();
-    char *cloud_server = ezlopi_factory_info_v3_get_cloud_server();
+    char *ca_certificate = EZPI_core_factory_info_v3_get_ca_certificate();
+    char *ssl_shared_key = EZPI_core_factory_info_v3_get_ssl_shared_key();
+    char *ssl_private_key = EZPI_core_factory_info_v3_get_ssl_private_key();
+    char *cloud_server = EZPI_core_factory_info_v3_get_cloud_server();
 
     ezlopi_wait_for_wifi_to_connect(portMAX_DELAY);
     vTaskDelay(2);
@@ -238,8 +238,8 @@ static void ezpi_fetch_wss_endpoint(void *pv)
             snprintf(http_request, sizeof(http_request), "%s?json=true", cloud_server);
             TRACE_D("http_request: %s", http_request);
 
-            s_ezlopi_http_data_t *ws_endpoint = ezlopi_http_get_request(http_request, ssl_private_key, ssl_shared_key, ca_certificate);
-            // s_ezlopi_http_data_t * ws_endpoint = ezlopi_http_get_request(http_request, NULL, NULL, NULL);
+            s_ezlopi_http_data_t *ws_endpoint = EZPI_core_http_get_request(http_request, ssl_private_key, ssl_shared_key, ca_certificate);
+            // s_ezlopi_http_data_t * ws_endpoint = EZPI_core_http_get_request(http_request, NULL, NULL, NULL);
 
             if (ws_endpoint)
             {
@@ -253,7 +253,7 @@ static void ezpi_fetch_wss_endpoint(void *pv)
                         if (cjson_uri)
                         {
                             TRACE_D("uri: %s", cjson_uri->valuestring ? cjson_uri->valuestring : "NULL");
-                            ezlopi_core_broadcast_method_add(ezpi_send_str_data_to_nma_websocket, "nma-websocket", 4);
+                            EZPI_core_broadcast_method_add(ezpi_send_str_data_to_nma_websocket, "nma-websocket", 4);
 #if (1 == EZPI_CORE_WSS_USE_WSC_LIB)
                             __wsc_ssl = ezlopi_core_wsc_init(cjson_uri, ezpi_message_upcall, ezpi_connection_upcall);
 #else  // EZPI_CORE_WSS_USE_WSC_LIB
@@ -351,7 +351,7 @@ static void ezpi_fetch_wss_endpoint(void *pv)
         vTaskDelay(2000 / portTICK_RATE_MS);
     }
 
-    ezlopi_factory_info_v3_free(cloud_server);
+    EZPI_core_factory_info_v3_free(cloud_server);
 
     ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SERVICE_WEB_PROV_FETCH_WSS_TASK);
     vTaskDelete(NULL);
@@ -538,15 +538,15 @@ static void ezpi_provision_check(void *pv)
     char *ssl_shared_key = test_ssl_shared_key;
 
     char *provision_token = test_prov_token;
-    // char* provisioning_server = ezlopi_factory_info_v3_get_provisioning_server();
+    // char* provisioning_server = EZPI_core_factory_info_v3_get_provisioning_server();
     uint16_t config_version = test_version_num;
 #else
-    char *ssl_private_key = ezlopi_factory_info_v3_get_ssl_private_key();
-    char *ssl_shared_key = ezlopi_factory_info_v3_get_ssl_shared_key();
-    char *ca_certificate = ezlopi_factory_info_v3_get_ca_certificate();
-    char *provision_token = ezlopi_factory_info_get_v3_provision_token();
-    // char* provisioning_server = ezlopi_factory_info_v3_get_provisioning_server();
-    uint16_t config_version = ezlopi_factory_info_v3_get_config_version();
+    char *ssl_private_key = EZPI_core_factory_info_v3_get_ssl_private_key();
+    char *ssl_shared_key = EZPI_core_factory_info_v3_get_ssl_shared_key();
+    char *ca_certificate = EZPI_core_factory_info_v3_get_ca_certificate();
+    char *provision_token = EZPI_core_factory_info_v3_get_provision_token();
+    // char* provisioning_server = EZPI_core_factory_info_v3_get_provisioning_server();
+    uint16_t config_version = EZPI_core_factory_info_v3_get_config_version();
 #endif
 
     if (ssl_private_key && ssl_shared_key && ca_certificate && provision_token)
@@ -561,8 +561,8 @@ static void ezpi_provision_check(void *pv)
 #endif
 
             ezlopi_wait_for_wifi_to_connect(portMAX_DELAY);
-            s_ezlopi_http_data_t *response = ezlopi_http_get_request(http_request_location, NULL, NULL, NULL);
-            // s_ezlopi_http_data_t* response = ezlopi_http_get_request(http_request_location, ssl_private_key, ssl_shared_key, ca_certificate);
+            s_ezlopi_http_data_t *response = EZPI_core_http_get_request(http_request_location, NULL, NULL, NULL);
+            // s_ezlopi_http_data_t* response = EZPI_core_http_get_request(http_request_location, ssl_private_key, ssl_shared_key, ca_certificate);
 
             if (NULL != response)
             {
@@ -596,7 +596,7 @@ static void ezpi_provision_check(void *pv)
                             TRACE_W("Data not available on cloud!");
                         }
 
-                        ezlopi_factory_info_v3_free(response->response);
+                        EZPI_core_factory_info_v3_free(response->response);
                     }
 
                     break;
@@ -612,7 +612,7 @@ static void ezpi_provision_check(void *pv)
                 }
                 }
 
-                ezlopi_factory_info_v3_free(response);
+                EZPI_core_factory_info_v3_free(response);
             }
             else
             {
@@ -635,9 +635,9 @@ static void ezpi_provision_check(void *pv)
         vTaskDelay(5000 / portTICK_RATE_MS);
     }
 
-    // ezlopi_factory_info_v3_free(ca_certificate); // allocated once for all, do not free
+    // EZPI_core_factory_info_v3_free(ca_certificate); // allocated once for all, do not free
 #if (0 == TEST_PROV)
-    ezlopi_factory_info_v3_free(provision_token);
+    EZPI_core_factory_info_v3_free(provision_token);
 #endif
 
     ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SERVICE_WEB_PROV_CONFIG_CHECK_TASK);
@@ -709,7 +709,7 @@ static int ezpi_provision_update(char *arg)
             config_check_factoryInfo.model_number = NULL;
             // config_check_factoryInfo.prov_uuid = NULL; // NULL since it is not
 
-            if (ezlopi_factory_info_v3_set_basic(&config_check_factoryInfo))
+            if (EZPI_core_factory_info_v3_set_basic(&config_check_factoryInfo))
             {
                 TRACE_S("Updated basic config");
                 ret = 1;
@@ -722,25 +722,25 @@ static int ezpi_provision_update(char *arg)
             cJSON *cj_ssl_private_key = cJSON_GetObjectItem(__FUNCTION__, cj_root_data, ezlopi_ssl_private_key_str);
             if (cj_ssl_private_key && cj_ssl_private_key->valuestring && cj_ssl_private_key->str_value_len)
             {
-                ezlopi_factory_info_v3_set_ssl_private_key(cj_ssl_private_key);
+                EZPI_core_factory_info_v3_set_ssl_private_key(cj_ssl_private_key);
             }
 
             cJSON *cj_ssl_public_key = cJSON_GetObjectItem(__FUNCTION__, cj_root_data, ezlopi_ssl_public_key_str);
             if (cj_ssl_public_key && cj_ssl_public_key->valuestring && cj_ssl_public_key->str_value_len)
             {
-                ezlopi_factory_info_v3_set_ssl_public_key(cj_ssl_public_key);
+                EZPI_core_factory_info_v3_set_ssl_public_key(cj_ssl_public_key);
             }
 
             cJSON *cj_ssl_shared_key = cJSON_GetObjectItem(__FUNCTION__, cj_root_data, ezlopi_ssl_shared_key_str);
             if (cj_ssl_shared_key && cj_ssl_shared_key->valuestring && cj_ssl_shared_key->str_value_len)
             {
-                ezlopi_factory_info_v3_set_ssl_shared_key(cj_ssl_shared_key);
+                EZPI_core_factory_info_v3_set_ssl_shared_key(cj_ssl_shared_key);
             }
 
             cJSON *cj_ca_certificate = cJSON_GetObjectItem(__FUNCTION__, cj_root_data, ezlopi_signing_ca_certificate_str);
             if (cj_ca_certificate && cj_ca_certificate->valuestring && cj_ca_certificate->str_value_len)
             {
-                ezlopi_factory_info_v3_set_ca_cert(cj_ca_certificate);
+                EZPI_core_factory_info_v3_set_ca_cert(cj_ca_certificate);
             }
         }
         else if (cj_error_code && cj_error_code->string)

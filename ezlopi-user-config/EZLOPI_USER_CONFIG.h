@@ -32,22 +32,22 @@
 #ifdef malloc
 #undef malloc
 #endif
-#define ezlopi_malloc(who, x) ezlopi_util_heap_malloc(who, x, __FILENAME__, __LINE__)
+#define ezlopi_malloc(who, x) EZPI_core_util_heap_malloc(who, x, __FILENAME__, __LINE__)
 
 #ifdef calloc
 #undef calloc
 #endif
-#define ezlopi_calloc(who, x, y) ezlopi_util_heap_calloc(who, x, y, __FILENAME__, __LINE__)
+#define ezlopi_calloc(who, x, y) EZPI_core_util_heap_calloc(who, x, y, __FILENAME__, __LINE__)
 
 #ifdef free
 #undef free
 #endif
-#define ezlopi_free(who, x) ezlopi_util_heap_free(who, x, __FILENAME__, __LINE__)
+#define ezlopi_free(who, x) EZPI_core_util_heap_free(who, x, __FILENAME__, __LINE__)
 
 #ifdef realloc
 #undef realloc
 #endif
-#define ezlopi_realloc(who, x, y) ezlopi_util_heap_realloc(who, x, y, __FILENAME__, __LINE__)
+#define ezlopi_realloc(who, x, y) EZPI_core_util_heap_realloc(who, x, y, __FILENAME__, __LINE__)
 
 #else // CONFIG_EZPI_HEAP_ENABLE
 

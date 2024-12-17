@@ -1676,7 +1676,7 @@ static void __issunsate_update_sunstate_tm(int tm_mday, s_sunstate_data_t *user_
         };
         /*Make API call here and extract the suntime[according to 'user_data->sunstate_mode']*/
 
-        ezlopi_core_http_mbedtls_req(&tmp_config);
+        EZPI_core_http_mbedtls_req(&tmp_config);
         // e.g. after valid extraction
         user_data->curr_tm_day = tm_mday;                                                    // this stores day for which data is extracted
         user_data->choosen_suntime.tm_hour = 5 + ((user_data->sunstate_mode == 2) ? 12 : 0); // sunrise = 1 ; sunset = 2

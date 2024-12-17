@@ -182,7 +182,7 @@ static void ezpi_dynamic_config_write_func(esp_gatt_value_t *value, esp_ble_gatt
                             cJSON *cjson_config = cJSON_Parse(__FUNCTION__, decoded_data);
                             if (cjson_config)
                             {
-                                if (ezlopi_factory_info_v3_set_ezlopi_config(cjson_config))
+                                if (EZPI_core_factory_info_v3_set_ezlopi_config(cjson_config))
                                 {
                                     // TRACE_W("Restarting .....");
                                     // vTaskDelay(1000 / portTICK_PERIOD_MS);
@@ -414,7 +414,7 @@ static char *ezpi_dynamic_config_base64(void)
     if (base64_data)
     {
         uint32_t out_put_len = 0;
-        char *str_ezlopi_config = ezlopi_factory_info_v3_get_ezlopi_config(); // do not free 'str_provisioning_data', it is used by other modules
+        char *str_ezlopi_config = EZPI_core_factory_info_v3_get_ezlopi_config(); // do not free 'str_provisioning_data', it is used by other modules
         if (str_ezlopi_config)
         {
             TRACE_D("device-config: [len: %d]\n%s", strlen(str_ezlopi_config), str_ezlopi_config);
@@ -422,7 +422,7 @@ static char *ezpi_dynamic_config_base64(void)
             int ret = mbedtls_base64_encode((unsigned char *)base64_data, base64_data_len, &out_put_len,
                 (const unsigned char *)str_ezlopi_config, strlen(str_ezlopi_config));
 
-            ezlopi_factory_info_v3_free(str_ezlopi_config);
+            EZPI_core_factory_info_v3_free(str_ezlopi_config);
 
             TRACE_D("'mbedtls_base64_encode' returned: %04x", ret);
         }

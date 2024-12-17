@@ -43,7 +43,7 @@ static void __blinky(void *pv);
 
 static void __print_mac_address(void)
 {
-    uint8_t __base_mac[6] = {0, 0, 0, 0, 0, 0};
+    uint8_t __base_mac[6] = { 0, 0, 0, 0, 0, 0 };
 
     esp_read_mac(__base_mac, ESP_MAC_WIFI_STA);
 }
@@ -52,7 +52,7 @@ void app_main(void)
 {
 
 #ifdef CONFIG_EZPI_UTIL_TRACE_EN
-    ezlopi_core_set_log_upcalls();
+    EZPI_core_set_log_upcalls();
 #endif // CONFIG_EZPI_UTIL_TRACE_EN
 
     __print_mac_address();
@@ -66,7 +66,7 @@ void app_main(void)
     EZPI_service_loop_init();
     EZPI_service_gpioisr_init(); // this is time critical, Do not add to loop
 
-    ezlopi_init();
+    EZPI_init();
 
     ezlopi_core_setting_commands_read_settings();
 
@@ -145,7 +145,7 @@ static void __blinky(void *pv)
         {
             if (wifi_stat->wifi_connection == false)
             {
-                char *ssid = ezlopi_factory_info_v3_get_ssid();
+                char *ssid = EZPI_core_factory_info_v3_get_ssid();
                 if (ssid)
                 {
                     TRACE_E("Failed to connect to AP : %s, retrying ...", ssid);
@@ -159,7 +159,7 @@ static void __blinky(void *pv)
             ezlopi_free(__FUNCTION__, wifi_stat);
         }
 
-        char cmd99_str[100] = {0};
+        char cmd99_str[100] = { 0 };
         snprintf(cmd99_str, 100, "{\"cmd\":99,\"free_heap\":%d,\"heap_watermark\":%d}", free_heap, watermark_heap);
         EZPI_SERV_uart_tx_data(strlen(cmd99_str), (uint8_t *)cmd99_str);
 
@@ -182,8 +182,8 @@ static void __blinky(void *pv)
         }
 
 #ifdef CONFIG_EZPI_HEAP_ENABLE
-        ezlopi_util_heap_trace(false);
-        ezlopi_util_heap_flush();
+        EZPI_core_util_heap_trace(false);
+        EZPI_core_util_heap_flush();
 #endif // CONFIG_EZPI_HEAP_ENABLE
         vTaskDelay(10000 / portTICK_PERIOD_MS);
     }

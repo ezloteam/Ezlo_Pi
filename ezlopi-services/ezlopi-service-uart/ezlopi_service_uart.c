@@ -7,36 +7,36 @@
  * @version
  * @date
  */
-/* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
-**
-** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
-**
-** Redistribution and use in source and binary forms, with or without
-** modification, are permitted provided that the following conditions are met:
-**
-** 1. Redistributions of source code must retain the above copyright notice,
-**    this list of conditions and the following disclaimer.
-** 2. Redistributions in binary form must reproduce the above copyright
-**    notice, this list of conditions and the following disclaimer in the
-**    documentation and/or other materials provided with the distribution.
-** 3. Neither the name of the copyright holder nor the names of its
-**    contributors may be used to endorse or promote products derived from
-**    this software without specific prior written permission.
-**
-** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
-** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-** POSSIBILITY OF SUCH DAMAGE.
-** ===========================================================================
-*/
+ /* ===========================================================================
+ ** Copyright (C) 2024 Ezlo Innovation Inc
+ **
+ ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+ **
+ ** Redistribution and use in source and binary forms, with or without
+ ** modification, are permitted provided that the following conditions are met:
+ **
+ ** 1. Redistributions of source code must retain the above copyright notice,
+ **    this list of conditions and the following disclaimer.
+ ** 2. Redistributions in binary form must reproduce the above copyright
+ **    notice, this list of conditions and the following disclaimer in the
+ **    documentation and/or other materials provided with the distribution.
+ ** 3. Neither the name of the copyright holder nor the names of its
+ **    contributors may be used to endorse or promote products derived from
+ **    this software without specific prior written permission.
+ **
+ ** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ ** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ ** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ ** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ ** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ ** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ ** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ ** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ ** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ ** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ ** POSSIBILITY OF SUCH DAMAGE.
+ ** ===========================================================================
+ */
 
 #include "../../build/config/sdkconfig.h"
 
@@ -88,47 +88,47 @@
 #include "ezlopi_service_loop.h"
 
 #if defined(CONFIG_IDF_TARGET_ESP32)
-/**
- * @brief UART TX pin number
- *
- */
+ /**
+  * @brief UART TX pin number
+  *
+  */
 #define TXD_PIN (GPIO_NUM_1)
-/**
- * @brief UART RX pin number
- *
- */
+  /**
+   * @brief UART RX pin number
+   *
+   */
 #define RXD_PIN (GPIO_NUM_3)
 #elif defined(CONFIG_IDF_TARGET_ESP32S2)
 #elif defined(CONFIG_IDF_TARGET_ESP32C3)
-/**
- * @brief UART TX pin number
- *
- */
+ /**
+  * @brief UART TX pin number
+  *
+  */
 #define TXD_PIN (GPIO_NUM_21)
-/**
- * @brief UART RX pin number
- *
- */
+  /**
+   * @brief UART RX pin number
+   *
+   */
 #define RXD_PIN (GPIO_NUM_20)
 #elif defined(CONFIG_IDF_TARGET_ESP32S3)
-/**
- * @brief UART TX pin number
- *
- */
+ /**
+  * @brief UART TX pin number
+  *
+  */
 #define TXD_PIN (GPIO_NUM_43)
-/**
- * @brief UART RX pin number
- *
- */
+  /**
+   * @brief UART RX pin number
+   *
+   */
 #define RXD_PIN (GPIO_NUM_44)
 #endif
 
-/**
- * @brief Function to process reset command
- *
- * @param root Pointer to the root JSON coming from UART
- * @return int
- */
+   /**
+    * @brief Function to process reset command
+    *
+    * @param root Pointer to the root JSON coming from UART
+    * @return int
+    */
 static int ezpi_service_uart_reset(cJSON *root);
 /**
  * @brief Function to process uart config command
@@ -382,11 +382,11 @@ static int ezpi_service_uart_set_uart_config(const cJSON *root)
 
     if (
         (baud_current != baud) ||
-        (parity_val_current != (uint32_t)EZPI_CORE_info_name_to_parity(parity)) ||
+        (parity_val_current != (uint32_t)EZPI_core_info_name_to_parity(parity)) ||
         (start_bits_current != start_bits) ||
         (stop_bits != stop_bits_current) ||
         (frame_size != frame_size_current) ||
-        (flow_control_current != (uint32_t)EZPI_CORE_info_get_flw_ctrl_from_name(flow_control)))
+        (flow_control_current != (uint32_t)EZPI_core_info_get_flw_ctrl_from_name(flow_control)))
     {
         flag_new_config = true;
     }
@@ -395,7 +395,7 @@ static int ezpi_service_uart_set_uart_config(const cJSON *root)
     {
         if ('\0' != parity[0])
         {
-            parity_val = (uint32_t)EZPI_CORE_info_name_to_parity(parity);
+            parity_val = (uint32_t)EZPI_core_info_name_to_parity(parity);
         }
 
         EZPI_CORE_nvs_write_parity(parity_val);
@@ -421,7 +421,7 @@ static int ezpi_service_uart_set_uart_config(const cJSON *root)
 
         if ('\0' != flow_control[0])
         {
-            flow_control_val = (uint32_t)EZPI_CORE_info_get_flw_ctrl_from_name(flow_control);
+            flow_control_val = (uint32_t)EZPI_core_info_get_flw_ctrl_from_name(flow_control);
             TRACE_W("New Flow control: %d", flow_control_val);
         }
 
@@ -460,12 +460,12 @@ static int ezpi_service_uart_process_log_severity(const cJSON *root)
     if (0 == target)
     {
         // Call cloud log severity setter
-        ret = ezlopi_core_cloud_log_severity_process_id(severity);
+        ret = EZPI_core_cloud_log_severity_process_id(severity);
     }
     else if (1 == target)
     {
         // Call serial log severity setter
-        ret = ezlopi_core_serial_log_severity_process_id(severity);
+        ret = EZPI_core_serial_log_severity_process_id(severity);
     }
 #endif // CONFIG_EZPI_UTIL_TRACE_EN
 
@@ -500,7 +500,7 @@ static ezlopi_error_t ezpi_service_uart_process_provisioning_api(const cJSON *ro
     ezlopi_error_t ret = EZPI_FAILED;
     int uart_response = 0;
 
-    // if (ezlopi_factory_info_v3_get_provisioning_status())
+    // if (EZPI_core_factory_info_v3_get_provisioning_status())
     if (0)
     {
         uart_response = 0;
@@ -565,10 +565,10 @@ static ezlopi_error_t ezpi_service_uart_process_provisioning_api(const cJSON *ro
                 ezlopi_config_basic->device_type = NULL;
                 ezlopi_config_basic->local_key = local_key;
 
-                ezlopi_factory_info_v3_set_basic(ezlopi_config_basic);
-                ezlopi_factory_info_v3_set_ca_cert(cJSON_GetObjectItem(__FUNCTION__, cj_data, ezlopi_signing_ca_certificate_str));
-                ezlopi_factory_info_v3_set_ssl_shared_key(cJSON_GetObjectItem(__FUNCTION__, cj_data, ezlopi_ssl_shared_key_str));
-                ezlopi_factory_info_v3_set_ssl_private_key(cJSON_GetObjectItem(__FUNCTION__, cj_data, ezlopi_ssl_private_key_str));
+                EZPI_core_factory_info_v3_set_basic(ezlopi_config_basic);
+                EZPI_core_factory_info_v3_set_ca_cert(cJSON_GetObjectItem(__FUNCTION__, cj_data, ezlopi_signing_ca_certificate_str));
+                EZPI_core_factory_info_v3_set_ssl_shared_key(cJSON_GetObjectItem(__FUNCTION__, cj_data, ezlopi_ssl_shared_key_str));
+                EZPI_core_factory_info_v3_set_ssl_private_key(cJSON_GetObjectItem(__FUNCTION__, cj_data, ezlopi_ssl_private_key_str));
 
                 uart_response = 1;
             }
@@ -723,7 +723,7 @@ static int ezpi_service_uart_chip_info(cJSON *parent)
         char chip_revision[10];
         esp_chip_info(&chip_info);
         sprintf(chip_revision, "%.2f", (float)(chip_info.full_revision / 100.0));
-        cJSON_AddStringToObject(__FUNCTION__, cj_chip, ezlopi_type_str, EZPI_CORE_info_get_chip_type_to_name(chip_info.model));
+        cJSON_AddStringToObject(__FUNCTION__, cj_chip, ezlopi_type_str, EZPI_core_info_get_chip_type_to_name(chip_info.model));
         cJSON_AddStringToObject(__FUNCTION__, cj_chip, ezlopi_version_str, chip_revision);
         ret = 1;
     }
@@ -752,11 +752,11 @@ static int ezpi_service_uart_device_status_info(cJSON *parent)
 
         char time_string[50];
         uint32_t tick_count_ms = xTaskGetTickCount() / portTICK_PERIOD_MS;
-        EZPI_CORE_info_get_tick_to_time_name(time_string, sizeof(time_string), tick_count_ms);
+        EZPI_core_info_get_tick_to_time_name(time_string, sizeof(time_string), tick_count_ms);
 
         cJSON_AddStringToObject(__FUNCTION__, cj_device_state, ezlopi_uptime_str, time_string);
         cJSON_AddNumberToObject(__FUNCTION__, cj_device_state, "boot_count", ezlopi_system_info_get_boot_count());
-        cJSON_AddStringToObject(__FUNCTION__, cj_device_state, "boot_reason", EZPI_CORE_info_get_esp_reset_reason_to_name(esp_reset_reason()));
+        cJSON_AddStringToObject(__FUNCTION__, cj_device_state, "boot_reason", EZPI_core_info_get_esp_reset_reason_to_name(esp_reset_reason()));
 
         cJSON_AddStringToObject(__FUNCTION__, cj_device_state, ezlopi_flash_size_str, CONFIG_ESPTOOLPY_FLASHSIZE);
 
@@ -768,7 +768,7 @@ static int ezpi_service_uart_device_status_info(cJSON *parent)
         cJSON_AddStringToObject(__FUNCTION__, cj_device_state, "wifi_mac", mac_str);
 
         memset(mac, 0, sizeof(mac));
-        EZPI_CORE_info_get_ble_mac(mac);
+        EZPI_core_info_get_ble_mac(mac);
         memset(mac_str, 0, sizeof(mac_str));
         snprintf(mac_str, 20, "%02X:%02X:%02X:%02X:%02X:%02X", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
         cJSON_AddStringToObject(__FUNCTION__, cj_device_state, "ble_mac", mac_str);
@@ -798,7 +798,7 @@ static int ezpi_service_uart_config_info(cJSON *parent)
         cJSON_AddNumberToObject(__FUNCTION__, cj_serial_config, ezlopi_baud_str, baud);
 
         EZPI_CORE_nvs_read_parity((uint32_t *)&parity_val);
-        parity[0] = EZPI_CORE_info_parity_to_name(parity_val);
+        parity[0] = EZPI_core_info_parity_to_name(parity_val);
         parity[1] = 0;
         cJSON_AddStringToObject(__FUNCTION__, cj_serial_config, ezlopi_parity_str, parity);
 
@@ -812,7 +812,7 @@ static int ezpi_service_uart_config_info(cJSON *parent)
         cJSON_AddNumberToObject(__FUNCTION__, cj_serial_config, ezlopi_frame_size_str, frame_size);
 
         EZPI_CORE_nvs_read_flow_control(&flow_control);
-        EZPI_CORE_info_get_flow_ctrl_to_name(flow_control, flw_ctrl_bffr);
+        EZPI_core_info_get_flow_ctrl_to_name(flow_control, flw_ctrl_bffr);
         cJSON_AddStringToObject(__FUNCTION__, cj_serial_config, ezlopi_flow_control_str, flw_ctrl_bffr);
 
         ret = 1;
@@ -826,22 +826,22 @@ static int ezpi_service_uart_ezlopi_info(cJSON *parent)
     cJSON *cj_ezlopi = cJSON_AddObjectToObject(__FUNCTION__, parent, "ezlopi_cloud");
     if (cj_ezlopi)
     {
-        char *device_mac = ezlopi_factory_info_v3_get_ezlopi_mac();
-        char *controller_uuid = ezlopi_factory_info_v3_get_device_uuid();
-        char *provisioning_uuid = ezlopi_factory_info_v3_get_provisioning_uuid();
-        unsigned long long serial_id = ezlopi_factory_info_v3_get_id();
-        const char *device_type = ezlopi_factory_info_v3_get_device_type();
+        char *device_mac = EZPI_core_factory_info_v3_get_ezlopi_mac();
+        char *controller_uuid = EZPI_core_factory_info_v3_get_device_uuid();
+        char *provisioning_uuid = EZPI_core_factory_info_v3_get_provisioning_uuid();
+        unsigned long long serial_id = EZPI_core_factory_info_v3_get_id();
+        const char *device_type = EZPI_core_factory_info_v3_get_device_type();
 
-        cJSON_AddBoolToObject(__FUNCTION__, cj_ezlopi, ezlopi_provisioned_str, ezlopi_factory_info_v3_get_provisioning_status());
+        cJSON_AddBoolToObject(__FUNCTION__, cj_ezlopi, ezlopi_provisioned_str, EZPI_core_factory_info_v3_get_provisioning_status());
         cJSON_AddStringToObject(__FUNCTION__, cj_ezlopi, ezlopi_uuid_str, controller_uuid ? controller_uuid : "");
         cJSON_AddStringToObject(__FUNCTION__, cj_ezlopi, ezlopi_uuid_prov_str, provisioning_uuid ? provisioning_uuid : "");
         cJSON_AddStringToObject(__FUNCTION__, cj_ezlopi, ezlopi_type_str, device_type ? device_type : "");
         cJSON_AddNumberToObject(__FUNCTION__, cj_ezlopi, ezlopi_serial_str, serial_id);
         cJSON_AddStringToObject(__FUNCTION__, cj_ezlopi, ezlopi_mac_str, device_mac ? device_mac : "");
 
-        ezlopi_factory_info_v3_free(device_mac);
-        ezlopi_factory_info_v3_free(controller_uuid);
-        ezlopi_factory_info_v3_free(provisioning_uuid);
+        EZPI_core_factory_info_v3_free(device_mac);
+        EZPI_core_factory_info_v3_free(controller_uuid);
+        EZPI_core_factory_info_v3_free(provisioning_uuid);
         ret = 1;
     }
     return ret;
@@ -853,17 +853,17 @@ static int ezpi_service_uart_oem_info(cJSON *parent)
     cJSON *cj_oem = cJSON_AddObjectToObject(__FUNCTION__, parent, "oem");
     if (cj_oem)
     {
-        char *device_model = ezlopi_factory_info_v3_get_model();
-        char *device_brand = ezlopi_factory_info_v3_get_brand();
-        char *device_manufacturer = ezlopi_factory_info_v3_get_manufacturer();
+        char *device_model = EZPI_core_factory_info_v3_get_model();
+        char *device_brand = EZPI_core_factory_info_v3_get_brand();
+        char *device_manufacturer = EZPI_core_factory_info_v3_get_manufacturer();
 
         cJSON_AddStringToObject(__FUNCTION__, cj_oem, ezlopi_brand_str, device_brand ? device_brand : "");
         cJSON_AddStringToObject(__FUNCTION__, cj_oem, ezlopi_manufacturer_str, device_manufacturer ? device_manufacturer : "");
         cJSON_AddStringToObject(__FUNCTION__, cj_oem, ezlopi_model_str, device_model ? device_model : "");
 
-        ezlopi_factory_info_v3_free(device_model);
-        ezlopi_factory_info_v3_free(device_manufacturer);
-        ezlopi_factory_info_v3_free(device_brand);
+        EZPI_core_factory_info_v3_free(device_model);
+        EZPI_core_factory_info_v3_free(device_manufacturer);
+        EZPI_core_factory_info_v3_free(device_brand);
         ret = 0;
     }
     return ret;
@@ -875,14 +875,14 @@ static int ezpi_service_uart_newtwork_info(cJSON *parent)
     cJSON *cj_network = cJSON_AddObjectToObject(__FUNCTION__, parent, "network");
     if (cj_network)
     {
-        char *wifi_ssid = ezlopi_factory_info_v3_get_ssid();
+        char *wifi_ssid = EZPI_core_factory_info_v3_get_ssid();
         cJSON_AddStringToObject(__FUNCTION__, cj_network, ezlopi_ssid_str, wifi_ssid ? wifi_ssid : "");
-        ezlopi_factory_info_v3_free(wifi_ssid);
+        EZPI_core_factory_info_v3_free(wifi_ssid);
 
         ezlopi_wifi_status_t *wifi_status = ezlopi_wifi_status();
         if (wifi_status)
         {
-            char *wifi_mode = EZPI_CORE_info_get_wifi_mode_to_name(wifi_status->wifi_mode);
+            char *wifi_mode = EZPI_core_info_get_wifi_mode_to_name(wifi_status->wifi_mode);
             cJSON_AddStringToObject(__FUNCTION__, cj_network, "wifi_mode", wifi_mode ? wifi_mode : "");
 
             char ip_str[20];
@@ -900,7 +900,7 @@ static int ezpi_service_uart_newtwork_info(cJSON *parent)
 
             cJSON_AddBoolToObject(__FUNCTION__, cj_network, "wifi", wifi_status->wifi_connection);
 
-            e_ezlopi_event_t events = ezlopi_get_event_bit_status();
+            e_ezlopi_event_t events = ezlopi_core_event_group_get_eventbit_status();
             bool cloud_connection_status = (EZLOPI_EVENT_NMA_REG & events) == EZLOPI_EVENT_NMA_REG;
 
 #ifdef CONFIG_EZPI_ENABLE_PING
@@ -978,7 +978,7 @@ static void ezpi_service_uart_set_wifi(const char *data)
             if (strlen(pass) >= EZPI_CORE_WIFI_PASS_CHAR_MIN_LEN)
             {
                 // TRACE_S("SSID: %s\tPass : %s", ssid, pass);
-                if (ezlopi_factory_info_v3_set_wifi(ssid, pass))
+                if (EZPI_core_factory_info_v3_set_wifi(ssid, pass))
                 {
                     status_write = 1;
                 }
@@ -988,7 +988,7 @@ static void ezpi_service_uart_set_wifi(const char *data)
                 {
                     ezlopi_wifi_connect((const char *)ssid, (const char *)pass);
                     ezlopi_wait_for_wifi_to_connect((uint32_t)EZPI_CORE_WIFI_CONN_ATTEMPT_INTERVAL);
-                    s_ezlopi_net_status_t *net_stat = ezlopi_get_net_status();
+                    s_ezlopi_net_status_t *net_stat = EZPI_core_net_get_net_status();
                     if (net_stat)
                     {
                         if (net_stat->wifi_status->wifi_connection)
@@ -998,8 +998,8 @@ static void ezpi_service_uart_set_wifi(const char *data)
                         }
                         else
                         {
-#warning "DO NOT user printf on production !"
-                            TRACE_E("WiFi Connection to AP: %s failed !", ssid);
+                            #warning "DO NOT user printf on production !"
+                                TRACE_E("WiFi Connection to AP: %s failed !", ssid);
                             // printf("WiFi Connection to AP: %s failed !\n", ssid);
                             status = 0;
                         }
@@ -1100,7 +1100,7 @@ static void ezpi_service_uart_set_config(const char *data)
     cJSON *cjson_config = cJSON_Parse(__FUNCTION__, data);
     if (cjson_config)
     {
-        uint8_t ret = ezlopi_factory_info_v3_set_ezlopi_config(cjson_config);
+        uint8_t ret = EZPI_core_factory_info_v3_set_ezlopi_config(cjson_config);
         if (ret)
         {
             TRACE_I("Successfully wrote config data..");
@@ -1117,7 +1117,7 @@ static void ezpi_service_uart_set_config(const char *data)
 static void ezpi_service_uart_get_config(void)
 {
     cJSON *root = NULL;
-    char *current_config = ezlopi_factory_info_v3_get_ezlopi_config();
+    char *current_config = EZPI_core_factory_info_v3_get_ezlopi_config();
 
     if (current_config)
     {

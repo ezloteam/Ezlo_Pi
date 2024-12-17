@@ -83,7 +83,7 @@ void ezlopi_cloud_modes_changed_alarmed(cJSON *cj_request, cJSON *cj_response)
     if (changed_resp)
     {
         ezlopi_cloud_modes_changed(cj_request, changed_resp);
-        if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(changed_resp))
+        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(changed_resp))
         {
             cJSON_Delete(__FUNCTION__, changed_resp);
         }
@@ -115,7 +115,7 @@ void ezlopi_cloud_modes_disarmed_devices_added(cJSON *cj_request, cJSON *cj_resp
     if (changed_resp)
     {
         ezlopi_cloud_modes_changed(cj_request, changed_resp);
-        if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(changed_resp))
+        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(changed_resp))
         {
             cJSON_Delete(__FUNCTION__, changed_resp);
         }
@@ -149,7 +149,7 @@ void ezlopi_cloud_modes_disarmed_devices_removed(cJSON *cj_request, cJSON *cj_re
     if (changed_resp)
     {
         ezlopi_cloud_modes_changed(cj_request, changed_resp);
-        if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(changed_resp))
+        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(changed_resp))
         {
             cJSON_Delete(__FUNCTION__, changed_resp);
         }
@@ -183,7 +183,7 @@ void ezlopi_cloud_modes_alarms_off_added(cJSON *cj_request, cJSON *cj_response)
     if (changed_resp)
     {
         ezlopi_cloud_modes_changed(cj_request, changed_resp);
-        if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(changed_resp))
+        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(changed_resp))
         {
             cJSON_Delete(__FUNCTION__, changed_resp);
         }
@@ -217,7 +217,7 @@ void ezlopi_cloud_modes_alarms_off_removed(cJSON *cj_request, cJSON *cj_response
     if (changed_resp)
     {
         ezlopi_cloud_modes_changed(cj_request, changed_resp);
-        if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(changed_resp))
+        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(changed_resp))
         {
             cJSON_Delete(__FUNCTION__, changed_resp);
         }
@@ -251,7 +251,7 @@ void ezlopi_cloud_modes_cameras_off_added(cJSON *cj_request, cJSON *cj_response)
     if (changed_resp)
     {
         ezlopi_cloud_modes_changed(cj_request, changed_resp);
-        if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(changed_resp))
+        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(changed_resp))
         {
             cJSON_Delete(__FUNCTION__, changed_resp);
         }
@@ -285,7 +285,7 @@ void ezlopi_cloud_modes_cameras_off_removed(cJSON *cj_request, cJSON *cj_respons
     if (changed_resp)
     {
         ezlopi_cloud_modes_changed(cj_request, changed_resp);
-        if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(changed_resp))
+        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(changed_resp))
         {
             cJSON_Delete(__FUNCTION__, changed_resp);
         }
@@ -447,7 +447,7 @@ void ezlopi_cloud_modes_protect_button_set_broadcast(cJSON *cj_request, cJSON *c
     if (added_resp)
     {
         ezlopi_cloud_modes_protect_buttons_added(cj_request, added_resp);
-        if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(added_resp))
+        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(added_resp))
         {
             cJSON_Delete(__FUNCTION__, added_resp);
         }
@@ -458,7 +458,7 @@ void ezlopi_cloud_modes_protect_button_set_broadcast(cJSON *cj_request, cJSON *c
     if (updated_resp)
     {
         ezlopi_cloud_modes_protect_buttons_updated(cj_request, updated_resp);
-        if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(updated_resp))
+        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(updated_resp))
         {
             cJSON_Delete(__FUNCTION__, updated_resp);
         }

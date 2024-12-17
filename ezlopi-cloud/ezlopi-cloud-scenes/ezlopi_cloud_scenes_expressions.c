@@ -192,7 +192,7 @@ void scenes_expressions_added_changed(cJSON *cj_request, cJSON *cj_response)
     if (response1)
     {
         scenes_expressions_added(cj_request, response1);
-        if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(response1))
+        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(response1))
         {
             cJSON_Delete(__FUNCTION__, response1);
         }

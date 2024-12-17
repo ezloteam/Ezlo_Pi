@@ -548,7 +548,7 @@ int EZPI_core_scenes_when_is_sun_state(l_scenes_list_v2_t *scene_node, void *arg
             return 0;
         }
 
-        // if (0 < ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 100, false))
+        // if (0 < EZPI_core_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 100, false))
         // {
         //     TRACE_W("module not online");
         //     return 0;
@@ -1328,7 +1328,7 @@ int EZPI_core_scenes_when_is_cloud_state(l_scenes_list_v2_t *scene_node, void *a
 
         if (field_str_val)
         {
-            if (EZPI_SUCCESS == ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 100, false))
+            if (EZPI_SUCCESS == EZPI_core_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 100, false))
             {
                 ret = (EZPI_STRNCMP_IF_EQUAL(field_str_val, ezlopi_connected_str, strlen(field_str_val) + 1, 10));
             }

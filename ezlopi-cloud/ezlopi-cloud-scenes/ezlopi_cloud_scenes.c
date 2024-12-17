@@ -503,7 +503,7 @@ void scenes_action_block_test(cJSON *cj_request, cJSON *cj_response)
                         // now to trigger http_request and extract the response.
                         tmp_http_data->response = NULL;
                         tmp_http_data->response_maxlen = 0;
-                        ezlopi_core_http_mbedtls_req(tmp_http_data); // Returns:- [response_buffer = &Memory_block]
+                        EZPI_core_http_mbedtls_req(tmp_http_data); // Returns:- [response_buffer = &Memory_block]
 
                         if (tmp_http_data->response)
                         {

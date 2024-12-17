@@ -95,7 +95,7 @@ static esp_err_t __ping_send(esp_ping_t *ep)
     }
 
     ssize_t sent = sendto(ep->sock, ep->packet_hdr, ep->icmp_pkt_size, 0,
-                          (struct sockaddr *)&ep->target_addr, sizeof(ep->target_addr));
+        (struct sockaddr *)&ep->target_addr, sizeof(ep->target_addr));
 
     if (sent != (ssize_t)ep->icmp_pkt_size)
     {
@@ -236,7 +236,7 @@ static void __ping_loop(void *arg)
                 _ping_event = 0;
             }
         }
-        else if ((ezlopi_event_group_wait_for_event(EZLOPI_EVENT_PING, 0, true) > 0) || ((xTaskGetTickCount() - last_wake) >= ep->interval_ms / portTICK_RATE_MS))
+        else if ((EZPI_core_event_group_wait_for_event(EZLOPI_EVENT_PING, 0, true) > 0) || ((xTaskGetTickCount() - last_wake) >= ep->interval_ms / portTICK_RATE_MS))
         {
             _ping_event = 1;
 
@@ -406,7 +406,7 @@ esp_err_t ezlopi_ping_new_session(const ezlopi_ping_config_t *config, const ezlo
 #if CONFIG_LWIP_IPV6
         || ip6_addr_isipv4mappedipv6(ip_2_ip6(&config->target_addr))
 #endif
-    )
+        )
     {
         ep->sock = socket(AF_INET, SOCK_RAW, IP_PROTO_ICMP);
     }
@@ -506,7 +506,7 @@ esp_err_t ezlopi_ping_start_by_handle(esp_ping_handle_t hdl)
     PING_CHECK(ep, "ping handle can't be null", err, ESP_ERR_INVALID_ARG);
     ep->flags |= PING_FLAGS_START;
     // xTaskNotifyGive(ep->ping_task_hdl);
-    ezlopi_event_group_set_event(EZLOPI_EVENT_PING);
+    EZPI_core_event_group_set_event(EZLOPI_EVENT_PING);
     return ESP_OK;
 err:
     return ret;

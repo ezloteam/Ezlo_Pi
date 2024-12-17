@@ -183,10 +183,10 @@ static char *__provisioning_status_jsonify(void)
     cJSON *root = cJSON_CreateObject(__FUNCTION__);
     if (root)
     {
-        uint32_t prov_stat = ezlopi_factory_info_v3_get_provisioning_status();
+        uint32_t prov_stat = EZPI_core_factory_info_v3_get_provisioning_status();
         if (1 == prov_stat)
         {
-            cJSON_AddNumberToObject(__FUNCTION__, root, ezlopi_version_str, ezlopi_factory_info_v3_get_version());
+            cJSON_AddNumberToObject(__FUNCTION__, root, ezlopi_version_str, EZPI_core_factory_info_v3_get_version());
             cJSON_AddNumberToObject(__FUNCTION__, root, ezlopi_status_str, prov_stat);
         }
         else
@@ -362,7 +362,7 @@ static void ezpi_provisioning_info_write_func(esp_gatt_value_t *value, esp_ble_g
                                         ezlopi_config_basic->local_key = local_key;
                                         ezlopi_config_basic->device_type = NULL;
 
-                                        ezlopi_factory_info_v3_set_basic(ezlopi_config_basic);
+                                        EZPI_core_factory_info_v3_set_basic(ezlopi_config_basic);
                                         uint32_t version_no = ezlopi_nvs_config_info_version_number_get() + 1;
                                         ezlopi_nvs_config_info_version_number_set(version_no);
 
@@ -374,9 +374,9 @@ static void ezpi_provisioning_info_write_func(esp_gatt_value_t *value, esp_ble_g
                                         ezlopi_free(__FUNCTION__, ezlopi_config_basic);
                                     }
 
-                                    ezlopi_factory_info_v3_set_ca_cert(cJSON_GetObjectItem(__FUNCTION__, cj_config, ezlopi_signing_ca_certificate_str));
-                                    ezlopi_factory_info_v3_set_ssl_shared_key(cJSON_GetObjectItem(__FUNCTION__, cj_config, ezlopi_ssl_shared_key_str));
-                                    ezlopi_factory_info_v3_set_ssl_private_key(cJSON_GetObjectItem(__FUNCTION__, cj_config, ezlopi_ssl_private_key_str));
+                                    EZPI_core_factory_info_v3_set_ca_cert(cJSON_GetObjectItem(__FUNCTION__, cj_config, ezlopi_signing_ca_certificate_str));
+                                    EZPI_core_factory_info_v3_set_ssl_shared_key(cJSON_GetObjectItem(__FUNCTION__, cj_config, ezlopi_ssl_shared_key_str));
+                                    EZPI_core_factory_info_v3_set_ssl_private_key(cJSON_GetObjectItem(__FUNCTION__, cj_config, ezlopi_ssl_private_key_str));
                                 }
                                 else
                                 {
@@ -616,16 +616,16 @@ static char *ezpi_provisioning_info_jsonify(void)
     if (cj_prov_info)
     {
         char tmp_buffer[32];
-        char *device_name = ezlopi_factory_info_v3_get_name();
-        char *brand = ezlopi_factory_info_v3_get_brand();
-        char *manufacturer_name = ezlopi_factory_info_v3_get_manufacturer();
-        char *model_number = ezlopi_factory_info_v3_get_model();
-        char *uuid = ezlopi_factory_info_v3_get_device_uuid();
-        char *uuid_provisioning = ezlopi_factory_info_v3_get_provisioning_uuid();
-        char *cloud_server = ezlopi_factory_info_v3_get_cloud_server();
-        char *ssl_private_key = ezlopi_factory_info_v3_get_ssl_private_key();
-        char *ssl_shared_key = ezlopi_factory_info_v3_get_ssl_shared_key();
-        char *ca_cert = ezlopi_factory_info_v3_get_ca_certificate();
+        char *device_name = EZPI_core_factory_info_v3_get_name();
+        char *brand = EZPI_core_factory_info_v3_get_brand();
+        char *manufacturer_name = EZPI_core_factory_info_v3_get_manufacturer();
+        char *model_number = EZPI_core_factory_info_v3_get_model();
+        char *uuid = EZPI_core_factory_info_v3_get_device_uuid();
+        char *uuid_provisioning = EZPI_core_factory_info_v3_get_provisioning_uuid();
+        char *cloud_server = EZPI_core_factory_info_v3_get_cloud_server();
+        char *ssl_private_key = EZPI_core_factory_info_v3_get_ssl_private_key();
+        char *ssl_shared_key = EZPI_core_factory_info_v3_get_ssl_shared_key();
+        char *ca_cert = EZPI_core_factory_info_v3_get_ca_certificate();
 
         snprintf(tmp_buffer, sizeof(tmp_buffer), "%08x", ezlopi_nvs_config_info_version_number_get());
         cJSON_AddStringToObject(__FUNCTION__, cj_prov_info, ezlopi_config_id_str, tmp_buffer);
@@ -636,23 +636,23 @@ static char *ezpi_provisioning_info_jsonify(void)
         cJSON_AddStringToObject(__FUNCTION__, cj_prov_info, ezlopi_model_number_str, model_number);
         cJSON_AddStringToObject(__FUNCTION__, cj_prov_info, ezlopi_uuid_str, uuid);
         cJSON_AddStringToObject(__FUNCTION__, cj_prov_info, ezlopi_uuid_provisioning_str, uuid_provisioning);
-        cJSON_AddNumberToObject(__FUNCTION__, cj_prov_info, ezlopi_serial_str, ezlopi_factory_info_v3_get_id());
+        cJSON_AddNumberToObject(__FUNCTION__, cj_prov_info, ezlopi_serial_str, EZPI_core_factory_info_v3_get_id());
         cJSON_AddStringToObject(__FUNCTION__, cj_prov_info, ezlopi_cloud_server_str, cloud_server);
         cJSON_AddStringToObject(__FUNCTION__, cj_prov_info, ezlopi_ssl_private_key_str, ssl_private_key);
         cJSON_AddStringToObject(__FUNCTION__, cj_prov_info, ezlopi_ssl_shared_key_str, ssl_shared_key);
         cJSON_AddStringToObject(__FUNCTION__, cj_prov_info, ezlopi_ca_cert_str, ca_cert);
-        cJSON_AddStringToObject(__FUNCTION__, cj_prov_info, ezlopi_device_type_ezlopi_str, ezlopi_factory_info_v3_get_device_type());
+        cJSON_AddStringToObject(__FUNCTION__, cj_prov_info, ezlopi_device_type_ezlopi_str, EZPI_core_factory_info_v3_get_device_type());
 
-        ezlopi_factory_info_v3_free(device_name);
-        ezlopi_factory_info_v3_free(brand);
-        ezlopi_factory_info_v3_free(manufacturer_name);
-        ezlopi_factory_info_v3_free(model_number);
-        ezlopi_factory_info_v3_free(uuid);
-        ezlopi_factory_info_v3_free(uuid_provisioning);
-        ezlopi_factory_info_v3_free(cloud_server);
-        // ezlopi_factory_info_v3_free(ssl_private_key); // allocated once for all, do not free
-        // ezlopi_factory_info_v3_free(ssl_shared_key); // allocated once for all, do not free
-        // ezlopi_factory_info_v3_free(ca_cert); // allocated once for all, do not free
+        EZPI_core_factory_info_v3_free(device_name);
+        EZPI_core_factory_info_v3_free(brand);
+        EZPI_core_factory_info_v3_free(manufacturer_name);
+        EZPI_core_factory_info_v3_free(model_number);
+        EZPI_core_factory_info_v3_free(uuid);
+        EZPI_core_factory_info_v3_free(uuid_provisioning);
+        EZPI_core_factory_info_v3_free(cloud_server);
+        // EZPI_core_factory_info_v3_free(ssl_private_key); // allocated once for all, do not free
+        // EZPI_core_factory_info_v3_free(ssl_shared_key); // allocated once for all, do not free
+        // EZPI_core_factory_info_v3_free(ca_cert); // allocated once for all, do not free
 
         str_json_prov_info = cJSON_PrintBuffered(__FUNCTION__, cj_prov_info, 6 * 1024, false);
         cJSON_Delete(__FUNCTION__, cj_prov_info);

@@ -579,7 +579,7 @@ void EZPI_device_prepare(void)
 #if (EZLOPI_DEVICE_TYPE_TEST_DEVICE == EZLOPI_DEVICE_TYPE)
     char *config_string = ezlopi_config_test;
 #else
-    char *config_string = ezlopi_factory_info_v3_get_ezlopi_config();
+    char *config_string = EZPI_core_factory_info_v3_get_ezlopi_config();
 #endif
 
     if (config_string)
@@ -605,7 +605,7 @@ void EZPI_device_prepare(void)
                 char *tmp_str = cJSON_PrintUnformatted(__FUNCTION__, cj_config);
                 if (tmp_str)
                 {
-                    ezlopi_factory_info_v3_set_ezlopi_config(cj_config);
+                    EZPI_core_factory_info_v3_set_ezlopi_config(cj_config);
                     TRACE_D("added-chipset: %s", tmp_str);
                     vTaskDelay(1000);
                     free(tmp_str);
@@ -614,7 +614,7 @@ void EZPI_device_prepare(void)
             }
             else
             {
-                ezlopi_factory_info_v3_set_ezlopi_config(cj_config);
+                EZPI_core_factory_info_v3_set_ezlopi_config(cj_config);
             }
 
             cJSON_Delete(__FUNCTION__, cj_config);

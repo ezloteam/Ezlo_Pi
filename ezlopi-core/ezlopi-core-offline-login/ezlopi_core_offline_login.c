@@ -25,7 +25,7 @@ ezlopi_error_t ezlopi_core_offline_login_perform(cJSON *cj_params)
             {
                 // if (0 == strncmp(stored_uesr_id, cj_user->valuestring, strlen(stored_uesr_id)))
                 {
-                    const char *password_saved = ezlopi_factory_info_v3_get_local_key();
+                    const char *password_saved = EZPI_core_factory_info_v3_get_local_key();
                     if (NULL != password_saved)
                     {
                         if (0 == strncmp(password_saved, cj_token->valuestring, strlen(password_saved)))
@@ -36,7 +36,7 @@ ezlopi_error_t ezlopi_core_offline_login_perform(cJSON *cj_params)
                         {
                             error = EZPI_ERR_INVALID_CREDENTIALS;
                         }
-                        ezlopi_factory_info_v3_free(password_saved);
+                        EZPI_core_factory_info_v3_free(password_saved);
                     }
                     else
                     {

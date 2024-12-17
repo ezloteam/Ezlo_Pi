@@ -94,8 +94,8 @@ void network_get(cJSON *cj_request, cJSON *cj_response)
                             get_auth_mode_str(tmp_string, ap_info.authmode);
                             cJSON_AddStringToObject(__FUNCTION__, cj_network, "encryption", tmp_string);
 
-                            char *wifi_ssid = ezlopi_factory_info_v3_get_ssid();
-                            char *wifi_password = ezlopi_factory_info_v3_get_password();
+                            char *wifi_ssid = EZPI_core_factory_info_v3_get_ssid();
+                            char *wifi_password = EZPI_core_factory_info_v3_get_password();
 
                             if ((NULL != wifi_ssid) && ('\0' != wifi_ssid[0]) &&
                                 (NULL != wifi_password) && ('\0' != wifi_password[0]))

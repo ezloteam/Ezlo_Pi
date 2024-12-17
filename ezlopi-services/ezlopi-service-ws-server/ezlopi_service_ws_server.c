@@ -159,7 +159,7 @@ e_ws_status_t EZPI_service_ws_server_status(void)
 
 void EZPI_service_ws_server_start(void)
 {
-    ezlopi_core_broadcast_method_add(ezpi_ws_server_broadcast, "wss-method", 2);
+    EZPI_core_broadcast_method_add(ezpi_ws_server_broadcast, "wss-method", 2);
 
     if (ezlopi_wifi_got_ip())
     {

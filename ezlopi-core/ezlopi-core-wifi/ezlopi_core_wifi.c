@@ -120,7 +120,7 @@ ezlopi_wifi_status_t *ezlopi_wifi_status(void)
 static esp_err_t set_wifi_station_host_name(void)
 {
     static char station_host_name[32];
-    snprintf(station_host_name, sizeof(station_host_name), "EZLOPI-%llu", ezlopi_factory_info_v3_get_id());
+    snprintf(station_host_name, sizeof(station_host_name), "EZLOPI-%llu", EZPI_core_factory_info_v3_get_id());
     esp_err_t err = tcpip_adapter_set_hostname(TCPIP_ADAPTER_IF_STA, station_host_name);
     return err;
 }
@@ -277,8 +277,8 @@ void ezlopi_wifi_initialize(void)
 
 void ezlopi_wifi_connect_from_id_bin(void)
 {
-    char *wifi_ssid = ezlopi_factory_info_v3_get_ssid();
-    char *wifi_password = ezlopi_factory_info_v3_get_password();
+    char *wifi_ssid = EZPI_core_factory_info_v3_get_ssid();
+    char *wifi_password = EZPI_core_factory_info_v3_get_password();
 
     if ((NULL != wifi_ssid) && ('\0' != wifi_ssid[0]) &&
         (NULL != wifi_password) && ('\0' != wifi_password[0]))
@@ -338,12 +338,12 @@ esp_err_t ezlopi_wifi_connect(const char *ssid, const char *pass)
 ezlopi_error_t ezlopi_wait_for_wifi_to_connect(uint32_t wait_time_ms)
 {
     ezlopi_error_t ret = EZPI_FAILED;
-    while (EZPI_SUCCESS != ezlopi_event_group_wait_for_event(EZLOPI_EVENT_WIFI_CONNECTED, wait_time_ms, false))
+    while (EZPI_SUCCESS != EZPI_core_event_group_wait_for_event(EZLOPI_EVENT_WIFI_CONNECTED, wait_time_ms, false))
     {
         vTaskDelay(100 / portTICK_PERIOD_MS);
     }
 
-    ret = ezlopi_event_group_wait_for_event(EZLOPI_EVENT_WIFI_CONNECTED, wait_time_ms, false);
+    ret = EZPI_core_event_group_wait_for_event(EZLOPI_EVENT_WIFI_CONNECTED, wait_time_ms, false);
     return ret;
 }
 
@@ -363,7 +363,7 @@ static int ezlopi_wifi_wait_for_wifi_and_registration()
         {
             count++;
             TRACE_D("Waiting for device internet connection to complete...(%d)", count);
-            e_ezlopi_event_t event = ezlopi_get_event_bit_status();
+            e_ezlopi_event_t event = ezlopi_core_event_group_get_eventbit_status();
             if (EZLOPI_EVENT_NMA_REG == (event & EZLOPI_EVENT_NMA_REG))
             {
                 TRACE_Dw("Device registered successfully");
@@ -465,7 +465,7 @@ static void ezlopi_core_device_broadcast_wifi_start_scan()
             cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_status_str, scene_status_started_str);
         }
 
-        if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(cj_scan_start))
+        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_scan_start))
         {
             cJSON_Delete(__FUNCTION__, cj_scan_start);
         }
@@ -487,7 +487,7 @@ static void ezlopi_core_device_broadcast_wifi_stop_scan()
             cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_status_str, scene_status_finished_str);
         }
 
-        if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(cj_scan_stop))
+        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_scan_stop))
         {
             cJSON_Delete(__FUNCTION__, cj_scan_stop);
         }
@@ -572,7 +572,7 @@ void ezlopi_wifi_scan_start()
 
 static void __event_wifi_disconnected(void *event_data)
 {
-    ezlopi_event_group_clear_event(EZLOPI_EVENT_WIFI_CONNECTED);
+    EZPI_core_event_group_clear_event(EZLOPI_EVENT_WIFI_CONNECTED);
 
     if (event_data)
     {
@@ -591,7 +591,7 @@ static void __event_wifi_disconnected(void *event_data)
         }
         else
         {
-            ezlopi_event_group_set_event(EZLOPI_EVENT_WIFI_FAIL);
+            EZPI_core_event_group_set_event(EZLOPI_EVENT_WIFI_FAIL);
             sg_retry_num = 0;
         }
 
@@ -661,7 +661,7 @@ static void __event_ip_got_ip(void *event_data)
         memcpy(&sg_my_ip, &event->ip_info, sizeof(esp_netif_ip_info_t));
     }
     vTaskDelay(1);
-    ezlopi_event_group_set_event(EZLOPI_EVENT_WIFI_CONNECTED);
+    EZPI_core_event_group_set_event(EZLOPI_EVENT_WIFI_CONNECTED);
 }
 
 int ezlopi_wifi_get_wifi_mac(uint8_t mac[6])

@@ -228,7 +228,7 @@
 5. fixed an error in ` cjext : 'isCJSON_NULL'`--> always returns 'null'.
 6. Replaced `CJSON_GET_VALUE_DOUBLE` with `CJSON_GET_VALUE_GPIO` for all gpios
 7. Fixed DHT22 pin issue
-8. Fixed `ezlopi_factory_info_v3_set_ezlopi_config`
+8. Fixed `EZPI_core_factory_info_v3_set_ezlopi_config`
 9. Cleaned multiple occurrence of `\r\n`
 
 ## What's Changed

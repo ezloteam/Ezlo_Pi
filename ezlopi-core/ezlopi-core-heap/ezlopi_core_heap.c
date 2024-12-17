@@ -1,3 +1,44 @@
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+/**
+* @file    ezlopi_core_heap.c
+* @brief   Function to operate on heap
+* @author  xx
+* @version 0.1
+* @date    12th DEC 2024
+*/
+
+/*******************************************************************************
+*                          Include Files
+*******************************************************************************/
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
@@ -9,37 +50,59 @@
 #include "ezlopi_util_trace.h"
 #include "ezlopi_core_heap.h"
 
-#warning "################### DO NOT USE printf ON PRODUCTION ###################"
+/*******************************************************************************
+*                          Extern Data Declarations
+*******************************************************************************/
 
+/*******************************************************************************
+*                          Extern Function Declarations
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Type & Macro Definitions
+*******************************************************************************/
 typedef struct s_initiator {
-    const char * who;
-    const char * file_name;
+    const char *who;
+    const char *file_name;
     uint32_t line_number;
 } s_initiator_t;
 
 typedef struct s_heap_trace {
-    void* ptr;
+    void *ptr;
     bool freed;
     uint32_t size;
     uint32_t time_ms;
     s_initiator_t freer;
     s_initiator_t allocator;
 
-    struct s_heap_trace* next;
+    struct s_heap_trace *next;
 
 } s_heap_trace_t;
 
+/*******************************************************************************
+*                          Static Function Prototypes
+*******************************************************************************/
+static s_heap_trace_t *__internal_malloc(const char *who, size_t size, const char *file_name, uint32_t line_no);
+static s_heap_trace_t *__create_list(void);
+static void __remove_free_node(s_heap_trace_t *heap_node);
 
-static s_heap_trace_t* heap_head = NULL;
+/*******************************************************************************
+*                          Static Data Definitions
+*******************************************************************************/
+static s_heap_trace_t *heap_head = NULL;
 
-static s_heap_trace_t * __create_list(void);
-static void __remove_free_node(s_heap_trace_t * heap_node);
+/*******************************************************************************
+*                          Extern Data Definitions
+*******************************************************************************/
 
-void ezlopi_util_heap_free(const char * who, void *ptr, const char * __file_name, uint32_t line_number)
+/*******************************************************************************
+*                          Extern Function Definitions
+*******************************************************************************/
+void EZPI_core_util_heap_free(const char *who, void *ptr, const char *__file_name, uint32_t line_number)
 {
     if (ptr)
     {
-        s_heap_trace_t* curr_node = heap_head;
+        s_heap_trace_t *curr_node = heap_head;
         while (curr_node)
         {
             if ((curr_node->ptr == ptr) && (0 == curr_node->freed))
@@ -60,31 +123,13 @@ void ezlopi_util_heap_free(const char * who, void *ptr, const char * __file_name
     }
 }
 
-static s_heap_trace_t * __internal_malloc(const char * who, size_t size, const char * file_name, uint32_t line_no)
+void *EZPI_core_util_heap_malloc(const char *who, size_t size, const char *file_name, uint32_t line_no)
 {
-    s_heap_trace_t * new_heap = __create_list();
-
-    if (new_heap)
-    {
-        new_heap->allocator.who = who;
-        new_heap->time_ms = xTaskGetTickCount();
-        new_heap->allocator.file_name = file_name;
-        new_heap->allocator.line_number = line_no;
-        new_heap->ptr = (size > 0) ? malloc(size) : NULL;
-        new_heap->size = (NULL != new_heap->ptr) ? size : 0;
-
-    }
-
-    return new_heap;
-}
-
-void* ezlopi_util_heap_malloc(const char * who, size_t size, const char * file_name, uint32_t line_no)
-{
-    void* ret = NULL;
+    void *ret = NULL;
 
     if (size > 0)
     {
-        s_heap_trace_t * new_heap = __internal_malloc(who, size, file_name, line_no);
+        s_heap_trace_t *new_heap = __internal_malloc(who, size, file_name, line_no);
         if (NULL != new_heap->ptr)
         {
             ret = new_heap->ptr;
@@ -98,14 +143,14 @@ void* ezlopi_util_heap_malloc(const char * who, size_t size, const char * file_n
     return ret;
 }
 
-void* ezlopi_util_heap_calloc(const char * who, size_t count, size_t size, const char * file_name, uint32_t line_no)
+void *EZPI_core_util_heap_calloc(const char *who, size_t count, size_t size, const char *file_name, uint32_t line_no)
 {
-    return ezlopi_util_heap_malloc(who, (count * size), file_name, line_no);
+    return EZPI_core_util_heap_malloc(who, (count * size), file_name, line_no);
 }
 
-void* ezlopi_util_heap_realloc(const char * who, void *ptr, size_t new_size, const char * file_name, uint32_t line_no)
+void *EZPI_core_util_heap_realloc(const char *who, void *ptr, size_t new_size, const char *file_name, uint32_t line_no)
 {
-    s_heap_trace_t* curr_node = heap_head;
+    s_heap_trace_t *curr_node = heap_head;
     while (curr_node)
     {
         if (curr_node->ptr == ptr)
@@ -115,7 +160,7 @@ void* ezlopi_util_heap_realloc(const char * who, void *ptr, size_t new_size, con
         curr_node = curr_node->next;
     }
 
-    void * new_ptr = realloc(ptr, new_size);
+    void *new_ptr = realloc(ptr, new_size);
 
     if (curr_node)
     {
@@ -127,7 +172,7 @@ void* ezlopi_util_heap_realloc(const char * who, void *ptr, size_t new_size, con
     }
     else
     {
-        s_heap_trace_t * new_node = __internal_malloc(who, 0, file_name, line_no);
+        s_heap_trace_t *new_node = __internal_malloc(who, 0, file_name, line_no);
         if (new_node)
         {
             new_node->ptr = new_ptr;
@@ -139,21 +184,21 @@ void* ezlopi_util_heap_realloc(const char * who, void *ptr, size_t new_size, con
     return new_ptr;
 }
 
-void ezlopi_util_heap_flush(void)
+void EZPI_core_util_heap_flush(void)
 {
     __remove_free_node(heap_head);
 
     if (heap_head->freed)
     {
-        s_heap_trace_t * free_node = heap_head;
+        s_heap_trace_t *free_node = heap_head;
         heap_head = heap_head->next;
         free(free_node);
     }
 }
 
-void ezlopi_util_heap_trace(bool print_freed)
+void EZPI_core_util_heap_trace(bool print_freed)
 {
-    s_heap_trace_t * curr_node = heap_head;
+    s_heap_trace_t *curr_node = heap_head;
 
     printf("\r\n\r\n**************************************************************************\r\n");
     printf("****************************** CURRENT HEAP ******************************\r\n");
@@ -196,12 +241,29 @@ void ezlopi_util_heap_trace(bool print_freed)
     printf("**************************************************************************\r\n\r\n\r\n");
 }
 
-/// @brief ///////////////
-/// @param  
-/// @return 
-static s_heap_trace_t * __create_list(void)
+/*******************************************************************************
+*                         Static Function Definitions
+*******************************************************************************/
+static s_heap_trace_t *__internal_malloc(const char *who, size_t size, const char *file_name, uint32_t line_no)
 {
-    s_heap_trace_t* new_node = (s_heap_trace_t*)malloc(sizeof(s_heap_trace_t));
+    s_heap_trace_t *new_heap = __create_list();
+
+    if (new_heap)
+    {
+        new_heap->allocator.who = who;
+        new_heap->time_ms = xTaskGetTickCount();
+        new_heap->allocator.file_name = file_name;
+        new_heap->allocator.line_number = line_no;
+        new_heap->ptr = (size > 0) ? malloc(size) : NULL;
+        new_heap->size = (NULL != new_heap->ptr) ? size : 0;
+
+    }
+
+    return new_heap;
+}
+static s_heap_trace_t *__create_list(void)
+{
+    s_heap_trace_t *new_node = (s_heap_trace_t *)malloc(sizeof(s_heap_trace_t));
 
     if (new_node)
     {
@@ -209,7 +271,7 @@ static s_heap_trace_t * __create_list(void)
 
         if (heap_head)
         {
-            s_heap_trace_t* curr_node = heap_head;
+            s_heap_trace_t *curr_node = heap_head;
             while (curr_node->next)
             {
                 curr_node = curr_node->next;
@@ -225,9 +287,7 @@ static s_heap_trace_t * __create_list(void)
 
     return new_node;
 }
-
-
-static void __remove_free_node(s_heap_trace_t * heap_node)
+static void __remove_free_node(s_heap_trace_t *heap_node)
 {
     if (heap_node->next)
     {
@@ -235,9 +295,13 @@ static void __remove_free_node(s_heap_trace_t * heap_node)
 
         if (heap_node->next->freed)
         {
-            s_heap_trace_t * free_node = heap_node->next;
+            s_heap_trace_t *free_node = heap_node->next;
             heap_node->next = heap_node->next->next;
             free(free_node);
         }
     }
 }
+
+/*******************************************************************************
+*                          End of File
+*******************************************************************************/

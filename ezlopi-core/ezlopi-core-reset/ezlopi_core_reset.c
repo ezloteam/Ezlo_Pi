@@ -27,7 +27,7 @@ void EZPI_CORE_reset_reboot(void)
 
 void EZPI_CORE_reset_factory_restore(void)
 {
-    ezlopi_error_t ret = ezlopi_factory_info_v3_factory_reset();
+    ezlopi_error_t ret = EZPI_core_factory_info_v3_factory_reset();
     if (EZPI_SUCCESS == ret)
     {
         TRACE_I("FLASH RESET WAS DONE SUCCESSFULLY");
