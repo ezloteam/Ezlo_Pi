@@ -1,3 +1,5 @@
+#include <time.h>
+
 #include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_nvs.h"
@@ -31,13 +33,13 @@ static e_room_subtype_t __get_subtype_enum(char *subtype_str);
 
 // static const char *__get_subtype_name(e_room_subtype_t subtype);
 
-char * ezlopi_core_room_get_name_by_id(uint32_t room_id)
+char *ezlopi_core_room_get_name_by_id(uint32_t room_id)
 {
-    char * ret = NULL;
+    char *ret = NULL;
 
     if (room_id && l_room_head)
     {
-        s_ezlopi_room_t * cur_room = l_room_head;
+        s_ezlopi_room_t *cur_room = l_room_head;
         while (cur_room)
         {
             if (room_id == cur_room->_id)
@@ -384,6 +386,10 @@ static void __update_cloud_room_deleted(uint32_t room_id)
 {
     cJSON *cj_response = cJSON_CreateObject(__FUNCTION__);
     {
+        time_t now = 0;
+        time(&now);
+        cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_startTime_str, now);
+
         cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
         cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, ezlopi_hub_room_deleted_str);
         cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_method_str, method_hub_room_all_delete);

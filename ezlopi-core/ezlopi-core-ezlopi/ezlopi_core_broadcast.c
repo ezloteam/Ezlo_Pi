@@ -89,7 +89,7 @@ ezlopi_error_t ezlopi_core_broadcast_cjson(cJSON *cj_data)
 
             if (true == cJSON_PrintPreallocated(__FUNCTION__, cj_data, data_buffer, buffer_len, false))
             {
-                // TRACE_D("----------------- broadcasting: \n%s", data_buffer);
+                // printf("----------------- broadcasting: \n%s\r\n", data_buffer);
                 ret = __call_broadcast_methods(data_buffer);
             }
 

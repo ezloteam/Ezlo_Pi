@@ -79,6 +79,8 @@ static int ezlopi_service_uart_reset(cJSON *root)
         case 0:
         {
             TRACE_E("Factory restore command");
+            TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_INFO, "UART: Factory restore command");
+
             const static char *reboot_response = "{\"cmd\":0, \"sub_cmd\":0,\"status\":1}";
             EZPI_SERV_uart_tx_data(strlen(reboot_response), (uint8_t *)reboot_response);
             EZPI_CORE_reset_factory_restore();
@@ -87,6 +89,8 @@ static int ezlopi_service_uart_reset(cJSON *root)
         case 1:
         {
             TRACE_E("Reboot only command");
+            TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_INFO, "UART: Reboot only command");
+
             const static char *reboot_response = "{\"cmd\":0, \"sub_cmd\":1, \"status\":1}";
             EZPI_SERV_uart_tx_data(strlen(reboot_response), (uint8_t *)reboot_response);
             EZPI_CORE_reset_reboot();
@@ -206,8 +210,10 @@ static int ezlopi_service_uart_set_uart_config(const cJSON *root)
         const static char *reboot_response = "{\"cmd\":5, \"status\":1}";
         EZPI_SERV_uart_tx_data(strlen(reboot_response), (uint8_t *)reboot_response);
 
+        TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_INFO, "UART: New config applied.");
         TRACE_W("New config has been applied, device rebooting");
-        vTaskDelay(10);
+
+        vTaskDelay(100);
         EZPI_CORE_reset_reboot();
     }
     else
@@ -215,6 +221,7 @@ static int ezlopi_service_uart_set_uart_config(const cJSON *root)
         const static char *reboot_response = "{\"cmd\":5, \"status\":0}";
         EZPI_SERV_uart_tx_data(strlen(reboot_response), (uint8_t *)reboot_response);
 
+        TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_INFO, "UART: Configuration unchanged!");
         TRACE_W("Configuration unchanged !");
         vTaskDelay(10);
     }
@@ -431,7 +438,9 @@ static int ezlopi_service_uart_parser(const char *data)
         }
         else
         {
+
             TRACE_E("'cmd' not found!");
+            TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_ERROR, "UART: 'cmd' not found!");
         }
 
         cJSON_Delete(__FUNCTION__, root);
@@ -439,6 +448,7 @@ static int ezlopi_service_uart_parser(const char *data)
     else
     {
         TRACE_E("Failed to parse json!");
+        TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_ERROR, "UART: Failed to parse json!.");
     }
 
     return 1;
@@ -801,7 +811,6 @@ static void ezlopi_service_uart_set_wifi(const char *data)
                         {
 #warning "DO NOT user printf on production !"
                             TRACE_E("WiFi Connection to AP: %s failed !", ssid);
-                            // printf("WiFi Connection to AP: %s failed !\n", ssid);
                             status = 0;
                         }
                     }
@@ -878,6 +887,7 @@ static void ezlopi_service_uart_response(uint8_t cmd, uint8_t status_write, uint
         // }
         default:
         {
+            TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_ERROR, "UART: Invalid command!");
             TRACE_E("Invalid command!");
             break;
         }
@@ -918,6 +928,8 @@ static void ezlopi_service_uart_set_config(const char *data)
 static void ezlopi_service_uart_get_config(void)
 {
     cJSON *root = NULL;
+
+#warning "Lomas: didn't find feering 'current_config', if this is correct then please remove this warning"
     char *current_config = ezlopi_factory_info_v3_get_ezlopi_config();
 
     if (current_config)
@@ -942,14 +954,12 @@ static void ezlopi_service_uart_get_config(void)
             cJSON_AddNumberToObject(__FUNCTION__, root, ezlopi_cmd_str, EZPI_UART_CMD_GET_CONFIG);
             cJSON_AddNumberToObject(__FUNCTION__, root, ezlopi_status_str, EZPI_UART_CMD_STATUS_SUCCESS);
         }
-        else
-        {
-            TRACE_E("'root' is null!");
-        }
     }
     else
     {
+
         TRACE_E("'current_config' is null!");
+        TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_ERROR, "UART: 'current-config' is null!");
     }
 
     if (NULL == root)
@@ -964,6 +974,7 @@ static void ezlopi_service_uart_get_config(void)
         else
         {
             TRACE_E("Failed to create 'root'!");
+            TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_ERROR, "UART: config json parsing fialed!");
         }
     }
 

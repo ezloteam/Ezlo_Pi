@@ -1,7 +1,7 @@
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
-
+#include <time.h>
 #include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_broadcast.h"
@@ -166,6 +166,10 @@ static void ____common_part_of_scenes_expressions_added_and_changed(cJSON *cj_re
 }
 static void scenes_expressions_added(cJSON *cj_request, cJSON *cj_response)
 {
+    time_t now = 0;
+    time(&now);
+    cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_startTime_str, now);
+
     cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_sender_str);
     cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_error_str);
 
@@ -190,13 +194,13 @@ static void scenes_expressions_changed(cJSON *cj_request, cJSON *cj_response)
 void scenes_expressions_added_changed(cJSON *cj_request, cJSON *cj_response)
 {
     // 1. broadcast 'added'
-    cJSON *response1 = cJSON_CreateObject(__FUNCTION__);
-    if (response1)
+    cJSON *cj_response1 = cJSON_CreateObject(__FUNCTION__);
+    if (cj_response1)
     {
-        scenes_expressions_added(cj_request, response1);
-        if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(response1))
+        scenes_expressions_added(cj_request, cj_response1);
+        if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(cj_response1))
         {
-            cJSON_Delete(__FUNCTION__, response1);
+            cJSON_Delete(__FUNCTION__, cj_response1);
         }
     }
 

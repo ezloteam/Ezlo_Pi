@@ -246,8 +246,8 @@ PT_THREAD(__scene_proto_thread(l_scenes_list_v2_t *scene_node, uint32_t routine_
                                 then_block_node = ctx->action_node;
                             }
 
-                            f_scene_method_v2_t then_method = ezlopi_scene_get_method_v2(then_block_node->block_options.method.type);
                             // TRACE_D("then-method: %p", then_method);
+                            f_scene_method_v2_t then_method = ezlopi_scene_get_method_v2(then_block_node->block_options.method.type);
                             if (then_method)
                             {
                                 then_method(scene_node, (void *)then_block_node); // then method executed here
@@ -275,14 +275,9 @@ PT_THREAD(__scene_proto_thread(l_scenes_list_v2_t *scene_node, uint32_t routine_
                             PT_WAIT_UNTIL(&ctx->pt, (xTaskGetTickCount() - ctx->curr_ticks) > ctx->delay_ms);
 
                             then_block_node = ctx->action_node;
-
                             then_block_node = then_block_node->next;
                         }
                     }
-                    // else
-                    // {
-                    //     TRACE_D("Meshobot '%s' is Idle.", scene_node->name);
-                    // }
                 }
                 else if (ctx->stopped_cond < 2)
                 {
@@ -307,6 +302,7 @@ PT_THREAD(__scene_proto_thread(l_scenes_list_v2_t *scene_node, uint32_t routine_
                         if (else_method)
                         {
                             else_method(scene_node, (void *)else_block_node);
+                            TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_INFO, "meshbot[%.*s]: else condition.", sizeof(scene_node->name), scene_node->name);
                         }
 
                         ctx->delay_ms = 10;
@@ -327,15 +323,7 @@ PT_THREAD(__scene_proto_thread(l_scenes_list_v2_t *scene_node, uint32_t routine_
                     ctx->stopped_cond += 1;
                     ctx->start_cond = 0;
                 }
-                //     else
-                //     {
-                //         TRACE_D("Meshobot '%s' is Idle.", scene_node->name);
-                //     }
             }
-            // else
-            // {
-            //     TRACE_E("method not found");
-            // }
 
             when_condition_node = when_condition_node->next;
         }

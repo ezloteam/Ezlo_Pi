@@ -378,7 +378,7 @@ static cJSON *__add_scenes_blocks_by_device_ids(e_scenes_block_type_v2_t block_t
             }
             else
             {
-                TRACE_OTEL(ENUM_EZLOPI_LOG_SEVERITY_ERROR, "Device-ID: '%s' not found!", cj_device_id->valuestring);
+                TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_ERROR, "Device-ID: '%s' not found!", cj_device_id->valuestring);
 #ifdef CONFIG_EZPI_UTIL_TRACE_EN
                 TRACE_E("Device-id not found in list");
 #endif

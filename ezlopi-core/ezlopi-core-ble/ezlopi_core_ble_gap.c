@@ -273,6 +273,7 @@ void ezlopi_ble_gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_p
         memcpy(bd_addr, param->ble_security.auth_cmpl.bd_addr, sizeof(esp_bd_addr_t));
         // dump("remote BD_ADDR", bd_addr, 0, 6);
         // TRACE_I("address type = %d", param->ble_security.auth_cmpl.addr_type);
+        TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_INFO, "BLE: '%2X-%2X-%2X-%2X-%2X-%2X' connected!", bd_addr[0], bd_addr[1], bd_addr[2], bd_addr[3], bd_addr[4], bd_addr[5]);
         if (!param->ble_security.auth_cmpl.success)
         {
 #ifdef CONFIG_EZPI_UTIL_TRACE_EN
@@ -293,17 +294,19 @@ void ezlopi_ble_gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_p
 #endif // 1 == ENABLE_TRACE
         break;
     }
-#ifdef CONFIG_EZPI_UTIL_TRACE_EN
     case ESP_GAP_BLE_REMOVE_BOND_DEV_COMPLETE_EVT: // 23
     {
+        uint8_t *client_mac = param->remove_bond_dev_cmpl.bd_addr;
+        TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_INFO, "BLE: '%2X-%2X-%2X-%2X-%2X-%2X' dis-connected!", client_mac[0], client_mac[1], client_mac[2], client_mac[3], client_mac[4], client_mac[5]);
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
         TRACE_I("ESP_GAP_BLE_REMOVE_BOND_DEV_COMPLETE_EVT status = %d", param->remove_bond_dev_cmpl.status);
         TRACE_I("ESP_GAP_BLE_REMOVE_BOND_DEV");
         TRACE_I("-----ESP_GAP_BLE_REMOVE_BOND_DEV----");
         // dump("bd_adrr", param->remove_bond_dev_cmpl.bd_addr, 0, sizeof(esp_bd_addr_t));
         TRACE_I("------------------------------------");
+#endif
         break;
     }
-#endif
 #endif
 #ifdef CONFIG_EZPI_UTIL_TRACE_EN
     case ESP_GAP_BLE_ADV_STOP_COMPLETE_EVT: // 17

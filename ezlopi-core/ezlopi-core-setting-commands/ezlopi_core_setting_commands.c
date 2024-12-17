@@ -251,7 +251,7 @@ static int ezlopi_core_add_log_level_settings(cJSON *cj_settings)
             cJSON *cj_enum = cJSON_AddArrayToObject(__FUNCTION__, cj_log_level, "enum");
             if (cj_enum)
             {
-                for (e_ezlopi_log_severity_t i = 0; i < ENUM_EZLOPI_LOG_SEVERITY_MAX; i++)
+                for (e_trace_severity_t i = 0; i < ENUM_EZLOPI_TRACE_SEVERITY_MAX; i++)
                 {
                     cJSON_AddItemToArray(cj_enum, cJSON_CreateString(__FUNCTION__, log_level_enums[i]));
                 }
@@ -406,7 +406,7 @@ int ezlopi_core_setting_commands_read_settings()
 #ifdef CONFIG_EZPI_UTIL_TRACE_EN
     ezlopi_core_read_set_log_severities();
     // #warning "remove this in release"
-    ezlopi_core_read_set_log_severities_internal(ENUM_EZLOPI_LOG_SEVERITY_TRACE);
+    ezlopi_core_read_set_log_severities_internal(ENUM_EZLOPI_TRACE_SEVERITY_TRACE);
     // printf("Log severity/level set to: %s\n", ezlopi_core_cloud_log_get_current_severity_enum_str());
 #endif // CONFIG_EZPI_UTIL_TRACE_EN
 

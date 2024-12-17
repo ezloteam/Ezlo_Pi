@@ -84,6 +84,7 @@ static void __modes_loop(void *arg)
                     if (new_house_mode)
                     {
                         TRACE_I("switching-to-mode: %s (id: %u)", new_house_mode->name, new_house_mode->_id);
+                        TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_INFO, "mode: switching to: %s (id: %u).", new_house_mode->name, new_house_mode->_id);
 
                         ez_mode->current_mode_id = ez_mode->switch_to_mode_id;
                         ez_mode->switch_to_mode_id = 0;

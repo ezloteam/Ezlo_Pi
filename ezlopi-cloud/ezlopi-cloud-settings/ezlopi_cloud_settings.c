@@ -93,13 +93,12 @@ void ezlopi_device_settings_reset_v3(cJSON *cj_request, cJSON *cj_response)
 
         while (curr_device)
         {
+            // check for deviceId first
             if (cJSON_HasObjectItem(__FUNCTION__, cj_params, ezlopi_deviceId_str))
             {
                 uint32_t device_id = 0;
                 CJSON_GET_ID(device_id, cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_deviceId_str));
-#ifdef CONFIG_EZPI_UTIL_TRACE_EN
-                TRACE_E("device_id: %X", device_id);
-#endif
+
                 if (device_id == curr_device->cloud_properties.device_id)
                 {
                     l_ezlopi_device_settings_v3_t *curr_setting = curr_device->settings;
@@ -109,31 +108,35 @@ void ezlopi_device_settings_reset_v3(cJSON *cj_request, cJSON *cj_response)
                         curr_setting = curr_setting->next;
                     }
                 }
+                else
+                {
+                    TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_WARNING, "deviceId: %04X not found!", device_id);
+                }
             }
+            // checking for settingId
             else if (cJSON_HasObjectItem(__FUNCTION__, cj_params, ezlopi__id_str))
             {
+                bool found_id = false;
                 uint32_t setting_id = 0;
                 CJSON_GET_ID(setting_id, cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi__id_str));
 
-#ifdef CONFIG_EZPI_UTIL_TRACE_EN
-                TRACE_E("setting_id: %X", setting_id);
-#endif
                 l_ezlopi_device_settings_v3_t *curr_setting = curr_device->settings;
                 while (curr_setting)
                 {
                     if (setting_id == curr_setting->cloud_properties.setting_id)
                     {
+                        found_id = true;
                         curr_setting->func(EZLOPI_SETTINGS_ACTION_RESET_SETTING, curr_setting, cj_params, curr_setting->user_arg);
                     }
                     curr_setting = curr_setting->next;
                 }
+
+                if (false == found_id)
+                {
+                    TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_WARNING, "settingId: %04X not found!", setting_id);
+                }
             }
-#ifdef CONFIG_EZPI_UTIL_TRACE_EN
-            else
-            {
-                TRACE_E("ID not found !");
-            }
-#endif
+
             curr_device = curr_device->next;
         }
     }

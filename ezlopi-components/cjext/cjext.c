@@ -1920,10 +1920,6 @@ static bool parse_object(const char *who, cJSON *const item, parse_buffer *const
         current_item->is_key_ref = current_item->is_value_ref;
         current_item->str_key_len = current_item->str_value_len;
 
-        // #ifdef CONFIG_EZPI_UTIL_TRACE_EN
-        //         TRACE_E("current_item->string: %s", current_item->string);
-        // #endif
-
         current_item->is_value_ref = 0;
         current_item->str_value_len = 0;
         current_item->valuestring = NULL;
@@ -3709,9 +3705,6 @@ static int __estimateFromatedPrintLength(const char *who, cJSON *item, uint32_t 
         }
         default:
         {
-#ifdef CONFIG_EZPI_UTIL_TRACE_EN
-            TRACE_E("invalid type!");
-#endif
             break;
         }
         }

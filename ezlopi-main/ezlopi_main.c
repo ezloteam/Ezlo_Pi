@@ -96,6 +96,8 @@ void app_main(void)
     ezlopi_core_process_set_process_info(ENUM_EZLOPI_MAIN_BLINKY_TASK, &ezlopi_main_blinky_task_handle, EZLOPI_MAIN_BLINKY_TASK_DEPTH);
 #endif
 
+    ezlopi_service_otel_init();
+
     ezlopi_wait_for_wifi_to_connect(portMAX_DELAY);
 #if defined(CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER) || defined(CONFIG_EZPI_WEBSOCKET_CLIENT)
     ezlopi_service_broadcast_init();
@@ -114,8 +116,6 @@ void app_main(void)
 #ifdef CONFIG_EZPI_ENABLE_OTA
     ezlopi_service_ota_init();
 #endif // CONFIG_EZPI_ENABLE_OTA
-
-    ezlopi_service_otel_init();
 }
 
 static void __blinky(void *pv)
@@ -155,12 +155,14 @@ static void __blinky(void *pv)
             ezlopi_free(__FUNCTION__, wifi_stat);
         }
 
-        char cmd99_str[100] = {0};
-        snprintf(cmd99_str, 100, "{\"cmd\":99,\"free_heap\":%d,\"heap_watermark\":%d}", free_heap, watermark_heap);
-        printf("%s\r\n", cmd99_str);
-
+        // separating the scope
 #ifdef CONFIG_EZPI_ENABLE_UART_PROVISIONING
-        EZPI_SERV_uart_tx_data(strlen(cmd99_str), (uint8_t *)cmd99_str);
+        {
+            char cmd99_str[100] = {0};
+            snprintf(cmd99_str, 100, "{\"cmd\":99,\"free_heap\":%d,\"heap_watermark\":%d}", free_heap, watermark_heap);
+            EZPI_SERV_uart_tx_data(strlen(cmd99_str), (uint8_t *)cmd99_str);
+            TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_DEBUG, "%s", cmd99_str);
+        }
 #endif
 
         if (free_heap <= (10 * 1024))

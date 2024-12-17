@@ -1,7 +1,7 @@
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
-
+#include <time.h>
 #include "ezlopi_util_trace.h"
 
 #include "ezlopi_cloud_constants.h"
@@ -10,7 +10,7 @@
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_scenes_status_changed.h"
 
-int ezlopi_scenes_status_change_broadcast(l_scenes_list_v2_t* scene_node, const char* status_str)
+int ezlopi_scenes_status_change_broadcast(l_scenes_list_v2_t *scene_node, const char *status_str)
 {
     int ret = 0;
     if (scene_node)
@@ -18,6 +18,10 @@ int ezlopi_scenes_status_change_broadcast(l_scenes_list_v2_t* scene_node, const 
         cJSON *cj_response = cJSON_CreateObject(__FUNCTION__);
         if (cj_response)
         {
+            time_t now = 0;
+            time(&now);
+            cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_startTime_str, now);
+
             cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
             cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, method_hub_scene_run_progress);
             cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
@@ -70,9 +74,9 @@ int ezlopi_scenes_status_change_broadcast(l_scenes_list_v2_t* scene_node, const 
     return ret;
 }
 
-const char* ezlopi_scenes_status_to_string(e_scene_status_v2_t scene_status)
+const char *ezlopi_scenes_status_to_string(e_scene_status_v2_t scene_status)
 {
-    const char* ret = "";
+    const char *ret = "";
 #if (1 == ENABLE_TRACE)
     switch (scene_status)
     {
@@ -96,7 +100,7 @@ const char* ezlopi_scenes_status_to_string(e_scene_status_v2_t scene_status)
         ret = "EZLOPI_SCENE_STATUS_STOPPED";
         break;
     }
-    #warning "need to add status_failed";
+#warning "need to add status_failed";
     default:
     {
         ret = "EZLOPI_SCENE_STATUS_NONE";
@@ -107,4 +111,4 @@ const char* ezlopi_scenes_status_to_string(e_scene_status_v2_t scene_status)
 
     return ret;
 }
-#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+#endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS

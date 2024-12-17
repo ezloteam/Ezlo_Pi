@@ -46,20 +46,20 @@ typedef struct
 
 static uint32_t message_counter = 0;
 static xTaskHandle _task_handle = NULL;
-static esp_websocket_client_handle_t wss_client = NULL;
 static QueueHandle_t _wss_message_queue = NULL;
+static esp_websocket_client_handle_t wss_client = NULL;
 static TaskHandle_t __web_socket_initialize_handler = NULL;
 
-static int __provision_update(char *arg);
 static void __provision_check(void *pv);
+static int __provision_update(char *arg);
 static void __fetch_wss_endpoint(void *pv);
 
 static void __connection_upcall(bool connected);
-static int __message_upcall(char *payload, uint32_t len, time_t time_ms);
 static void __message_process_cjson(cJSON *cj_request, time_t time_ms);
+static int __message_upcall(char *payload, uint32_t len, time_t time_ms);
 
-static ezlopi_error_t __send_str_data_to_nma_websocket(char *str_data);
 static int __send_cjson_data_to_nma_websocket(cJSON *cj_data);
+static ezlopi_error_t __send_str_data_to_nma_websocket(char *str_data);
 
 bool ezlopi_service_webprov_is_connected(void)
 {
@@ -100,10 +100,12 @@ static void __connection_upcall(bool connected)
     {
         if (0 == prev_status)
         {
+            TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_INFO, "NMA-server connected.");
             TRACE_S("Web-socket Connected.");
         }
         else
         {
+            TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_INFO, "NMA-server re-connected.");
             TRACE_S("Web-socket Re-connected.");
         }
 
@@ -115,6 +117,7 @@ static void __connection_upcall(bool connected)
     {
         prev_status = 1;
         ezlopi_event_group_clear_event(EZLOPI_EVENT_NMA_REG);
+        TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_WARNING, "NMA-server dis-connected!");
     }
 }
 
@@ -147,12 +150,15 @@ static void __fetch_wss_endpoint(void *pv)
                 {
                     TRACE_D("ws_endpoint: %s", ws_endpoint->response); // {"uri": "wss://endpoint:port"}
                     cJSON *root = cJSON_Parse(__FUNCTION__, ws_endpoint->response);
+
                     if (root)
                     {
                         cJSON *cjson_uri = cJSON_GetObjectItem(__FUNCTION__, root, "uri");
                         if (cjson_uri)
                         {
-                            TRACE_D("uri: %s", cjson_uri->valuestring ? cjson_uri->valuestring : "NULL");
+                            // printf("----> URI: %s\r\n", cjson_uri->valuestring ? cjson_uri->valuestring : "NULL");
+                            TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_INFO, "NMA-server: %s.", cjson_uri->valuestring ? cjson_uri->valuestring : "NULL");
+
                             ezlopi_core_broadcast_method_add(__send_str_data_to_nma_websocket, "nma-websocket", 4);
                             wss_client = ezlopi_websocket_client_init(cjson_uri, __message_upcall, __connection_upcall,
                                                                       ca_certificate, ssl_private_key, ssl_shared_key);
@@ -191,19 +197,19 @@ static void __fetch_wss_endpoint(void *pv)
                             {
                                 cj_method_dup = cJSON_Duplicate(__FUNCTION__, cj_method, true);
 
-                                printf("web-provisioning [method: %.*s]\r\n%s\r\n", cj_method->str_value_len, cj_method->valuestring, rx_message->payload);
+                                // printf("web-provisioning [method: %.*s]\r\n%s\r\n", cj_method->str_value_len, cj_method->valuestring, rx_message->payload);
                                 // TRACE_D("rx_message->payload [method: %.*s]\r\n%s", cj_method->str_value_len, cj_method->valuestring, rx_message->payload);
                                 ezlopi_free(__FUNCTION__, rx_message->payload);
                                 rx_message->payload = NULL;
                             }
                             else
                             {
-                                printf("web-provisioning [method: null]\r\n%s\r\n", rx_message->payload);
+                                TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_ERROR, "web-provisioning [method: null], payload: %s", rx_message->payload);
+                                // printf("web-provisioning [method: null]\r\n%s\r\n", rx_message->payload);
                                 // TRACE_E("rx_message->payload [method: null]\r\n%s", rx_message->payload);
                             }
 
                             __message_process_cjson(cj_request, rx_message->time_ms);
-
                             cJSON_Delete(__FUNCTION__, cj_request);
                         }
 
@@ -343,6 +349,7 @@ static int __send_cjson_data_to_nma_websocket(cJSON *cj_data)
 
                 if (EZPI_SUCCESS == ret)
                 {
+                    // printf("NMA-send:\r\n%s\r\n", data_buffer);
                     TRACE_S("NMA-send:\r\n%s", data_buffer);
                 }
                 else
@@ -445,6 +452,7 @@ static void __provision_check(void *pv)
                         {
                             flag_break_loop = 1;
                             TRACE_W("Data not available on cloud!");
+                            TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_WARNING, "Config data not available!");
                         }
 
                         ezlopi_factory_info_v3_free(response->response);
@@ -457,6 +465,7 @@ static void __provision_check(void *pv)
                     if (304 == response->status_code) // HTTP Status not modified
                     {
                         TRACE_S("Config data not changed !");
+                        TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_INFO, "Config data not changed.");
                         flag_break_loop = 1;
                     }
                     break;
@@ -476,6 +485,7 @@ static void __provision_check(void *pv)
             if (flag_break_loop)
             {
                 TRACE_D("Terminating provison-check task!");
+                TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_INFO, "Terminating provison-check task!");
                 xTaskNotifyGive(__web_socket_initialize_handler);
                 break;
             }

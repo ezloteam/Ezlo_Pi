@@ -1,3 +1,5 @@
+#include <time.h>
+
 #include "ezlopi_util_trace.h"
 #include "ezlopi_cloud_constants.h"
 
@@ -69,6 +71,9 @@ cJSON *ezlopi_core_api_consume_cjson(const char *who, cJSON *cj_request)
 
                     if (cj_update_response)
                     {
+                        time_t now = 0;
+                        time(&now);
+                        cJSON_AddNumberToObject(__FUNCTION__, cj_update_response, ezlopi_startTime_str, now);
                         // cJSON_AddNullToObject(__FUNCTION__, cj_update_response, ezlopi_error_str);
 
                         if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(cj_update_response))

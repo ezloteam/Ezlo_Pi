@@ -6,7 +6,6 @@ set(EZLOPI_UTIL_COMPONENTS
 )
 set(EZLOPI_CORE_COMPONENTS  
         ezlopi-core-api
-        ezlopi-core-wsc
         ezlopi-core-wifi
         ezlopi-core-http
         ezlopi-core-buffer
