@@ -4,6 +4,7 @@
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 #include <inttypes.h>
+#include "cjext.h"
 
 typedef enum e_script_state
 {
