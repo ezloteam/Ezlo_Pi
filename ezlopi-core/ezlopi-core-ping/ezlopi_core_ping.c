@@ -1,3 +1,45 @@
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+/**
+* @file    ezlopi_core_ping.c
+* @brief   Function to perfrom operation on ezlopi-ping-service
+* @author  xx
+* @version 0.1
+* @date    12th DEC 2024
+*/
+
+/*******************************************************************************
+*                          Include Files
+*******************************************************************************/
+
 #include "../../build/config/sdkconfig.h"
 #ifdef CONFIG_EZPI_ENABLE_PING
 
@@ -19,26 +61,51 @@
 #include "ezlopi_core_setting_commands.h"
 #include "ezlopi_core_ping.h"
 
+/*******************************************************************************
+*                          Extern Data Declarations
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Extern Function Declarations
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Type & Macro Definitions
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Static Function Prototypes
+*******************************************************************************/
+static void __on_ping_end(esp_ping_handle_t hdl, void *args);
+static void __on_ping_success(esp_ping_handle_t hdl, void *args);
+static void __on_ping_timeout(esp_ping_handle_t hdl, void *args);
+
+/*******************************************************************************
+*                          Static Data Definitions
+*******************************************************************************/
+
 static uint32_t __ping_fail_count = 0;
 static esp_ping_handle_t __ping_handle = NULL;
 static e_ping_status_t __ping_status = EZLOPI_PING_STATUS_UNKNOWN;
+/*******************************************************************************
+*                          Extern Data Definitions
+*******************************************************************************/
 
-static void __on_ping_end(esp_ping_handle_t hdl, void* args);
-static void __on_ping_success(esp_ping_handle_t hdl, void* args);
-static void __on_ping_timeout(esp_ping_handle_t hdl, void* args);
-
-e_ping_status_t ezlopi_ping_get_internet_status(void)
+/*******************************************************************************
+*                          Extern Function Definitions
+*******************************************************************************/
+e_ping_status_t EZPI_core_ping_get_internet_status(void)
 {
     return __ping_status;
 }
 
-void ezlopi_ping_init(void)
+void EZPI_ping_init(void)
 {
     ezlopi_ping_config_t config = ESP_PING_DEFAULT_CONFIG();
 
     config.count = 0; // 0 : run forever
 
-    int timeout_sec = ezlopi_core_setting_get_network_ping_timeout();
+    int timeout_sec = EZPI_core_setting_get_network_ping_timeout();
 
     // config.timeout_ms = 2000;
     config.timeout_ms = timeout_sec * 1000;
@@ -47,7 +114,7 @@ void ezlopi_ping_init(void)
     // parse IP address
     ip_addr_t target_addr;
     struct addrinfo hint;
-    struct addrinfo* res = NULL;
+    struct addrinfo *res = NULL;
     memset(&hint, 0, sizeof(hint));
     memset(&target_addr, 0, sizeof(target_addr));
 
@@ -60,12 +127,12 @@ void ezlopi_ping_init(void)
 
     if (res->ai_family == AF_INET)
     {
-        struct in_addr addr4 = ((struct sockaddr_in*)(res->ai_addr))->sin_addr;
+        struct in_addr addr4 = ((struct sockaddr_in *)(res->ai_addr))->sin_addr;
         inet_addr_to_ip4addr(ip_2_ip4(&target_addr), &addr4);
     }
     else
     {
-        struct in6_addr addr6 = ((struct sockaddr_in6*)(res->ai_addr))->sin6_addr;
+        struct in6_addr addr6 = ((struct sockaddr_in6 *)(res->ai_addr))->sin6_addr;
         inet6_addr_to_ip6addr(ip_2_ip6(&target_addr), &addr6);
     }
 
@@ -92,12 +159,16 @@ void ezlopi_ping_stop(void)
 {
     if (__ping_handle)
     {
-        ezlopi_ping_stop_by_handle(__ping_handle);
+        EZPI_ping_stop_by_handle(__ping_handle);
         __ping_status = EZLOPI_PING_STATUS_UNKNOWN;
     }
 }
 
-static void __on_ping_success(esp_ping_handle_t hdl, void* args)
+/*******************************************************************************
+*                         Static Function Definitions
+*******************************************************************************/
+
+static void __on_ping_success(esp_ping_handle_t hdl, void *args)
 {
     uint8_t ttl;
     uint16_t seqno;
@@ -114,7 +185,7 @@ static void __on_ping_success(esp_ping_handle_t hdl, void* args)
     __ping_status = EZLOPI_PING_STATUS_LIVE;
 }
 
-static void __on_ping_timeout(esp_ping_handle_t hdl, void* args)
+static void __on_ping_timeout(esp_ping_handle_t hdl, void *args)
 {
     uint16_t seqno;
     ip_addr_t target_addr;
@@ -129,7 +200,7 @@ static void __on_ping_timeout(esp_ping_handle_t hdl, void* args)
     }
 }
 
-static void __on_ping_end(esp_ping_handle_t hdl, void* args)
+static void __on_ping_end(esp_ping_handle_t hdl, void *args)
 {
     ip_addr_t target_addr;
     uint32_t transmitted;
@@ -161,7 +232,11 @@ static void __on_ping_end(esp_ping_handle_t hdl, void* args)
     ezlopi_ping_start_by_handle(hdl);
     TRACE_D("Re-starting ping_handle...");
 
-    // ezlopi_ping_delete_session(hdl);
+    // EZPI_ping_delete_session(hdl);
 }
 
 #endif // CONFIG_EZPI_ENABLE_PING
+
+/*******************************************************************************
+*                          End of File
+*******************************************************************************/

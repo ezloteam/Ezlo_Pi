@@ -689,7 +689,7 @@ int EZPI_core_scene_then_reset_scene_latches(l_scenes_list_v2_t *curr_scene, voi
 int EZPI_core_scene_then_reboot_hub(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     TRACE_E("Rebooting ESP......................... ");
-    EZPI_CORE_reset_reboot();
+    EZPI_core_reset_reboot();
     return 1;
 }
 int EZPI_core_scene_then_reset_hub(l_scenes_list_v2_t *curr_scene, void *arg)
@@ -718,24 +718,24 @@ int EZPI_core_scene_then_reset_hub(l_scenes_list_v2_t *curr_scene, void *arg)
                             // clear the settings realated to scenes, devices, items, rooms,etc
                             EZPI_scenes_scripts_factory_info_reset();
                             EZPI_core_device_factory_info_reset();
-                            ezlopi_nvs_scenes_factory_info_reset(); // 'nvs' partitions
+                            EZPI_core_nvs_scenes_factory_info_reset(); // 'nvs' partitions
 
                             EZPI_core_factory_info_v3_scenes_factory_soft_reset(); // 'ID' partition :- 'wifi' sector
                             TRACE_E("Rebooting ESP......................... ");
-                            EZPI_CORE_reset_reboot();
+                            EZPI_core_reset_reboot();
                         }
                         else if (EZPI_STRNCMP_IF_EQUAL(tmp_str, "soft", strlen(tmp_str), 5))
                         {
-                            ezlopi_nvs_scenes_soft_reset();
+                            EZPI_core_nvs_scenes_soft_reset();
 
                             EZPI_core_factory_info_v3_scenes_factory_soft_reset(); // 'ID' partition :- 'wifi' sector
                             TRACE_E("Rebooting ESP......................... ");
-                            EZPI_CORE_reset_reboot();
+                            EZPI_core_reset_reboot();
                         }
                         else if (EZPI_STRNCMP_IF_EQUAL(tmp_str, "hard", strlen(tmp_str), 5))
                         {
                             #warning "hard reset not in documention.";
-                            EZPI_CORE_reset_factory_restore();
+                            EZPI_core_reset_factory_restore();
                         }
                     }
                 }

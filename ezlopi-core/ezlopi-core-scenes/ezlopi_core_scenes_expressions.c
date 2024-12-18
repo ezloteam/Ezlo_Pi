@@ -163,8 +163,8 @@ ezlopi_error_t EZPI_scenes_expressions_update_nvs(char *nvs_exp_id_key, cJSON *c
 
         if (update_exp_str)
         {
-            ezlopi_nvs_delete_stored_data_by_name(nvs_exp_id_key);
-            ret = ezlopi_nvs_write_str(update_exp_str, strlen(update_exp_str), nvs_exp_id_key);
+            EZPI_core_nvs_delete_stored_data_by_name(nvs_exp_id_key);
+            ret = EZPI_core_nvs_write_str(update_exp_str, strlen(update_exp_str), nvs_exp_id_key);
             if (EZPI_SUCCESS == ret)
             {
                 TRACE_S("successfully saved/modified expression in nvs");
@@ -455,7 +455,7 @@ int EZPI_scenes_expressions_delete_node(s_ezlopi_expressions_t *exp_node)
 
         // 2. clearing from NVS
         {
-            ezlopi_nvs_delete_stored_data_by_id(exp_node->exp_id); // remove 'target_exp_id' from nvs
+            EZPI_core_nvs_delete_stored_data_by_id(exp_node->exp_id); // remove 'target_exp_id' from nvs
             /*  Now to update 'expression_nvs_list' after removing 'exp_id' from nvs*/
             ret = __remove_exp_id_from_nvs_exp_list(exp_node->exp_id);
         }
@@ -468,7 +468,7 @@ ezlopi_error_t EZPI_scenes_expressions_init(void)
 {
     // __remove_residue_expn_ids_from_list(); // for furture
     ezlopi_error_t error = EZPI_ERR_JSON_PARSE_FAILED;
-    char *exp_id_list_str = ezlopi_nvs_read_scenes_expressions();
+    char *exp_id_list_str = EZPI_core_nvs_read_scenes_expressions();
     if (exp_id_list_str)
     {
         TRACE_D("exp_id_list_str: %s", exp_id_list_str);
@@ -484,7 +484,7 @@ ezlopi_error_t EZPI_scenes_expressions_init(void)
                     uint32_t exp_id = strtoul(cj_exp_id->valuestring, NULL, 16);
                     if (exp_id)
                     {
-                        char *exp_str = ezlopi_nvs_read_str(cj_exp_id->valuestring);
+                        char *exp_str = EZPI_core_nvs_read_str(cj_exp_id->valuestring);
                         if (exp_str)
                         {
                             cJSON *cj_exp = cJSON_Parse(__FUNCTION__, exp_str);
@@ -737,7 +737,7 @@ static void __remove_residue_expn_ids_from_list(void)
             expn_list_has_residue = false;
         }
 
-        list_ptr = ezlopi_nvs_read_scenes_expressions();
+        list_ptr = EZPI_core_nvs_read_scenes_expressions();
         if (list_ptr)
         {
             cJSON *cj_id_list = cJSON_Parse(__FUNCTION__, list_ptr);
@@ -749,7 +749,7 @@ static void __remove_residue_expn_ids_from_list(void)
                     cJSON *cj_id = cJSON_GetArrayItem(cj_id_list, i);
                     if (cj_id && cj_id->valuestring)
                     {
-                        if (NULL == ezlopi_nvs_read_str(cj_id->valuestring))
+                        if (NULL == EZPI_core_nvs_read_str(cj_id->valuestring))
                         {
                             residue_nvs_expn_id = (uint32_t)strtoul(cj_id->valuestring, NULL, 16); // A residue_id is found..
                             expn_list_has_residue = true;                                          // this will trigger a removal of "invalid_nvs_devgrp_id" .
@@ -1338,10 +1338,10 @@ static uint32_t __expression_store_to_nvs(uint32_t exp_id, cJSON *cj_expression)
                 char exp_id_str[32];
                 snprintf(exp_id_str, sizeof(exp_id_str), "%08x", exp_id);
 
-                if (EZPI_SUCCESS == ezlopi_nvs_write_str(exp_string, strlen(exp_string), exp_id_str))
+                if (EZPI_SUCCESS == EZPI_core_nvs_write_str(exp_string, strlen(exp_string), exp_id_str))
                 {
                     bool free_exp_id_list_str = 1;
-                    char *exp_id_list_str = ezlopi_nvs_read_scenes_expressions();
+                    char *exp_id_list_str = EZPI_core_nvs_read_scenes_expressions();
                     if (NULL == exp_id_list_str)
                     {
                         exp_id_list_str = "[]";
@@ -1374,7 +1374,7 @@ static uint32_t __expression_store_to_nvs(uint32_t exp_id, cJSON *cj_expression)
 
                                 if (exp_id_list_str)
                                 {
-                                    ezlopi_nvs_write_scenes_expressions(exp_id_list_str);
+                                    EZPI_core_nvs_write_scenes_expressions(exp_id_list_str);
                                     ezlopi_free(__FUNCTION__, exp_id_list_str);
                                 }
                             }
@@ -1522,7 +1522,7 @@ static int __remove_exp_id_from_nvs_exp_list(uint32_t target_id)
 {
     int ret = 0;
     /*  Now to update_list_in_nvs*/
-    char *exp_ids = ezlopi_nvs_read_scenes_expressions();
+    char *exp_ids = EZPI_core_nvs_read_scenes_expressions();
     if (exp_ids)
     {
         cJSON *cj_exp_ids = cJSON_Parse(__FUNCTION__, exp_ids);
@@ -1554,7 +1554,7 @@ static int __remove_exp_id_from_nvs_exp_list(uint32_t target_id)
             if (updated_ids_str)
             {
                 TRACE_D("updated-expression-ids: %s", updated_ids_str);
-                ezlopi_nvs_write_scenes_expressions(updated_ids_str);
+                EZPI_core_nvs_write_scenes_expressions(updated_ids_str);
                 ezlopi_free(__FUNCTION__, updated_ids_str);
                 ret = 1;
             }

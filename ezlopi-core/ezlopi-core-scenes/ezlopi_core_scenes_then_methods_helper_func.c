@@ -498,7 +498,7 @@ ezlopi_error_t EZPI_core_scenes_then_helper_set_expn_var(char *expression_name, 
 
         // 5. Now to edit in nvs
         // A. read from  nvs
-        char *exp_id_list_str = ezlopi_nvs_read_scenes_expressions();
+        char *exp_id_list_str = EZPI_core_nvs_read_scenes_expressions();
         if (exp_id_list_str)
         {
             TRACE_D("exp_id_list_str: %s", exp_id_list_str);

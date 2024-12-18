@@ -68,7 +68,7 @@ void app_main(void)
 
     EZPI_init();
 
-    ezlopi_core_setting_commands_read_settings();
+    EZPI_core_setting_commands_read_settings();
 
     EZPI_SERV_uart_init();
 
@@ -173,7 +173,7 @@ static void __blinky(void *pv)
                 TRACE_E("CRITICAL-ERROR: low heap time-out detected!");
                 TRACE_W("Rebooting.....");
                 vTaskDelay(1000 / portTICK_PERIOD_MS);
-                EZPI_CORE_reset_reboot();
+                EZPI_core_reset_reboot();
             }
         }
         else

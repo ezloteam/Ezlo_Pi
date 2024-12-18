@@ -26,7 +26,7 @@ void EZPI_CLOUD_offline_login(cJSON *cj_request, cJSON *cj_response)
         cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
         if (cj_params)
         {
-            ezlopi_error_t error = ezlopi_core_offline_login_perform(cj_params);
+            ezlopi_error_t error = EZPI_core_offline_login_perform(cj_params);
             if (EZPI_ERR_WRONG_PARAM == error)
             {
                 ezlopi_cloud_prepare_error(cj_response, -32602, "Wrong params", "rpc.params.invalid");

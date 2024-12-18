@@ -196,9 +196,9 @@ static char *__provisioning_status_jsonify(void)
         }
 
         char tmp_buffer[32];
-        snprintf(tmp_buffer, sizeof(tmp_buffer), "%08x", ezlopi_nvs_config_info_version_number_get());
+        snprintf(tmp_buffer, sizeof(tmp_buffer), "%08x", EZPI_core_nvs_config_info_version_number_get());
         cJSON_AddStringToObject(__FUNCTION__, root, ezlopi_config_id_str, tmp_buffer);
-        cJSON_AddNumberToObject(__FUNCTION__, root, ezlopi_config_time_str, ezlopi_nvs_config_info_update_time_get());
+        cJSON_AddNumberToObject(__FUNCTION__, root, ezlopi_config_time_str, EZPI_core_nvs_config_info_update_time_get());
 
         prov_status_jstr = cJSON_PrintBuffered(__FUNCTION__, root, 256, false);
 
@@ -363,13 +363,13 @@ static void ezpi_provisioning_info_write_func(esp_gatt_value_t *value, esp_ble_g
                                         ezlopi_config_basic->device_type = NULL;
 
                                         EZPI_core_factory_info_v3_set_basic(ezlopi_config_basic);
-                                        uint32_t version_no = ezlopi_nvs_config_info_version_number_get() + 1;
-                                        ezlopi_nvs_config_info_version_number_set(version_no);
+                                        uint32_t version_no = EZPI_core_nvs_config_info_version_number_get() + 1;
+                                        EZPI_core_nvs_config_info_version_number_set(version_no);
 
                                         time_t now;
                                         time(&now);
                                         TRACE_D("time now{size: %u}: %lu", sizeof(time_t), now);
-                                        ezlopi_nvs_config_info_update_time_set(now);
+                                        EZPI_core_nvs_config_info_update_time_set(now);
 
                                         ezlopi_free(__FUNCTION__, ezlopi_config_basic);
                                     }
@@ -382,7 +382,7 @@ static void ezpi_provisioning_info_write_func(esp_gatt_value_t *value, esp_ble_g
                                 {
                                     TRACE_E("User verification failed!");
 
-                                    char *curr_user_id = ezlopi_nvs_read_user_id_str();
+                                    char *curr_user_id = EZPI_core_nvs_read_user_id_str();
                                     if (curr_user_id)
                                     {
                                         TRACE_D("current user: %s", curr_user_id);
@@ -627,9 +627,9 @@ static char *ezpi_provisioning_info_jsonify(void)
         char *ssl_shared_key = EZPI_core_factory_info_v3_get_ssl_shared_key();
         char *ca_cert = EZPI_core_factory_info_v3_get_ca_certificate();
 
-        snprintf(tmp_buffer, sizeof(tmp_buffer), "%08x", ezlopi_nvs_config_info_version_number_get());
+        snprintf(tmp_buffer, sizeof(tmp_buffer), "%08x", EZPI_core_nvs_config_info_version_number_get());
         cJSON_AddStringToObject(__FUNCTION__, cj_prov_info, ezlopi_config_id_str, tmp_buffer);
-        cJSON_AddNumberToObject(__FUNCTION__, cj_prov_info, ezlopi_config_time_str, ezlopi_nvs_config_info_update_time_get());
+        cJSON_AddNumberToObject(__FUNCTION__, cj_prov_info, ezlopi_config_time_str, EZPI_core_nvs_config_info_update_time_get());
         cJSON_AddStringToObject(__FUNCTION__, cj_prov_info, ezlopi_device_name_str, device_name);
         cJSON_AddStringToObject(__FUNCTION__, cj_prov_info, ezlopi_brand_str, brand);
         cJSON_AddStringToObject(__FUNCTION__, cj_prov_info, ezlopi_manufacturer_name_str, manufacturer_name);

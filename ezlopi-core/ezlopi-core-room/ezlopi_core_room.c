@@ -1,3 +1,45 @@
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+/**
+* @file    ezlopi_core_room.c
+* @brief   perform some function on rooms
+* @author  xx
+* @version 0.1
+* @date    12th DEC 2024
+*/
+
+/*******************************************************************************
+*                          Include Files
+*******************************************************************************/
+
 #include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_nvs.h"
@@ -12,6 +54,33 @@
 #include "EZLOPI_USER_CONFIG.h"
 
 // #include "ezlopi_service_webprov.h"
+/*******************************************************************************
+*                          Extern Data Declarations
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Extern Function Declarations
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Type & Macro Definitions
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Static Function Prototypes
+*******************************************************************************/
+static void __sort_by_pos(void);
+static void __free_nodes(s_ezlopi_room_t *room);
+static int __free_room_from_list_by_id(uint32_t room_id);
+static void __update_cloud_room_deleted(uint32_t room_id);
+static int __remove_room_from_nvs_by_id(uint32_t a_room_id);
+static e_room_subtype_t __get_subtype_enum(char *subtype_str);
+// static const char *__get_subtype_name(e_room_subtype_t subtype);
+
+
+/*******************************************************************************
+*                          Static Data Definitions
+*******************************************************************************/
 
 static s_ezlopi_room_t *l_room_head = NULL;
 
@@ -22,16 +91,14 @@ static const char *sc_room_subtype_name[] = {
 #endif
 };
 
-static void __sort_by_pos(void);
-static void __free_nodes(s_ezlopi_room_t *room);
-static int __free_room_from_list_by_id(uint32_t room_id);
-static void __update_cloud_room_deleted(uint32_t room_id);
-static int __remove_room_from_nvs_by_id(uint32_t a_room_id);
-static e_room_subtype_t __get_subtype_enum(char *subtype_str);
+/*******************************************************************************
+*                          Extern Data Definitions
+*******************************************************************************/
 
-// static const char *__get_subtype_name(e_room_subtype_t subtype);
-
-char *ezlopi_core_room_get_name_by_id(uint32_t room_id)
+/*******************************************************************************
+*                          Extern Function Definitions
+*******************************************************************************/
+char *EZPI_core_room_get_name_by_id(uint32_t room_id)
 {
     char *ret = NULL;
 
@@ -53,12 +120,12 @@ char *ezlopi_core_room_get_name_by_id(uint32_t room_id)
     return ret;
 }
 
-s_ezlopi_room_t *ezlopi_room_get_room_head(void)
+s_ezlopi_room_t *EZPI_core_room_get_room_head(void)
 {
     return l_room_head;
 }
 
-int ezlopi_room_name_set(cJSON *cj_room)
+int EZPI_core_room_name_set(cJSON *cj_room)
 {
     int ret = 0;
     if (cj_room)
@@ -71,7 +138,7 @@ int ezlopi_room_name_set(cJSON *cj_room)
             uint32_t room_id = strtoul(cj_room_id->valuestring, NULL, 16);
             if (room_id)
             {
-                char *rooms_str = ezlopi_nvs_read_rooms();
+                char *rooms_str = EZPI_core_nvs_read_rooms();
                 if (rooms_str)
                 {
                     cJSON *cj_rooms = cJSON_Parse(__FUNCTION__, rooms_str);
@@ -113,7 +180,7 @@ int ezlopi_room_name_set(cJSON *cj_room)
 
                             if (updated_rooms)
                             {
-                                ezlopi_nvs_write_rooms(updated_rooms);
+                                EZPI_core_nvs_write_rooms(updated_rooms);
                                 ezlopi_free(__FUNCTION__, updated_rooms);
                             }
                         }
@@ -128,7 +195,7 @@ int ezlopi_room_name_set(cJSON *cj_room)
     return ret;
 }
 
-int ezlopi_room_delete(cJSON *cj_room)
+int EZPI_core_room_delete(cJSON *cj_room)
 {
     int ret = 0;
     if (cj_room)
@@ -156,19 +223,19 @@ int ezlopi_room_delete(cJSON *cj_room)
     return ret;
 }
 
-int ezlopi_room_delete_all(void)
+int EZPI_core_room_delete_all(void)
 {
     int ret = 1;
 
     __free_nodes(l_room_head);
     l_room_head = NULL;
 
-    ezlopi_nvs_write_rooms("[]");
+    EZPI_core_nvs_write_rooms("[]");
 
     return ret;
 }
 
-int ezlopi_room_add_to_nvs(cJSON *cj_room)
+int EZPI_core_room_add_to_nvs(cJSON *cj_room)
 {
     CJSON_TRACE("cj_room", cj_room);
 
@@ -176,7 +243,7 @@ int ezlopi_room_add_to_nvs(cJSON *cj_room)
     if (cj_room)
     {
         int room_free = 1;
-        char *rooms_str = ezlopi_nvs_read_rooms();
+        char *rooms_str = EZPI_core_nvs_read_rooms();
 
         if (NULL == rooms_str)
         {
@@ -203,7 +270,7 @@ int ezlopi_room_add_to_nvs(cJSON *cj_room)
 
                 if (updated_rooms_str)
                 {
-                    if (ezlopi_nvs_write_rooms(updated_rooms_str))
+                    if (EZPI_core_nvs_write_rooms(updated_rooms_str))
                     {
                         TRACE_I("room saved");
                         ret = 1;
@@ -220,7 +287,7 @@ int ezlopi_room_add_to_nvs(cJSON *cj_room)
     return ret;
 }
 
-int ezlopi_room_reorder(cJSON *cj_rooms_ids)
+int EZPI_core_room_reorder(cJSON *cj_rooms_ids)
 {
     int ret = 0;
 
@@ -279,7 +346,7 @@ int ezlopi_room_reorder(cJSON *cj_rooms_ids)
 
                     if (reordered_rooms_str)
                     {
-                        ezlopi_nvs_write_rooms(reordered_rooms_str);
+                        EZPI_core_nvs_write_rooms(reordered_rooms_str);
                         ezlopi_free(__FUNCTION__, reordered_rooms_str);
                     }
                 }
@@ -292,7 +359,7 @@ int ezlopi_room_reorder(cJSON *cj_rooms_ids)
     return ret;
 }
 
-s_ezlopi_room_t *ezlopi_room_add_to_list(cJSON *cj_room)
+s_ezlopi_room_t *EZPI_core_room_add_to_list(cJSON *cj_room)
 {
     s_ezlopi_room_t *new_room = ezlopi_malloc(__FUNCTION__, sizeof(s_ezlopi_room_t));
     if (new_room)
@@ -336,10 +403,10 @@ s_ezlopi_room_t *ezlopi_room_add_to_list(cJSON *cj_room)
     return new_room;
 }
 
-ezlopi_error_t ezlopi_room_init(void)
+ezlopi_error_t EZPI_room_init(void)
 {
     ezlopi_error_t error = EZPI_ERR_ROOM_INIT_FAILED;
-    char *rooms_str = ezlopi_nvs_read_rooms();
+    char *rooms_str = EZPI_core_nvs_read_rooms();
     if (rooms_str)
     {
         TRACE_D("rooms: %s", rooms_str);
@@ -355,7 +422,7 @@ ezlopi_error_t ezlopi_room_init(void)
 
             cJSON_ArrayForEach(cj_room, cj_rooms)
             {
-                s_ezlopi_room_t *new_room = ezlopi_room_add_to_list(cj_room);
+                s_ezlopi_room_t *new_room = EZPI_core_room_add_to_list(cj_room);
                 if (new_room)
                 {
                     new_room->_pos = idx;
@@ -378,6 +445,11 @@ ezlopi_error_t ezlopi_room_init(void)
     }
     return error;
 }
+
+
+/*******************************************************************************
+*                         Static Function Definitions
+*******************************************************************************/
 
 static void __update_cloud_room_deleted(uint32_t room_id)
 {
@@ -451,7 +523,6 @@ static void __sort_by_pos(void)
 //     {
 //         ret = sc_room_subtype_name[subtype];
 //     }
-
 //     return ret;
 // }
 
@@ -517,7 +588,7 @@ static int __free_room_from_list_by_id(uint32_t room_id)
 static int __remove_room_from_nvs_by_id(uint32_t a_room_id)
 {
     int ret = 0;
-    char *rooms_str = ezlopi_nvs_read_rooms();
+    char *rooms_str = EZPI_core_nvs_read_rooms();
 
     if (rooms_str)
     {
@@ -563,7 +634,7 @@ static int __remove_room_from_nvs_by_id(uint32_t a_room_id)
                 if (updated_rooms)
                 {
                     ret = 1;
-                    ezlopi_nvs_write_rooms(updated_rooms);
+                    EZPI_core_nvs_write_rooms(updated_rooms);
                     ezlopi_free(__FUNCTION__, updated_rooms);
                 }
             }
@@ -574,3 +645,7 @@ static int __remove_room_from_nvs_by_id(uint32_t a_room_id)
 
     return ret;
 }
+
+/*******************************************************************************
+*                          End of File
+*******************************************************************************/

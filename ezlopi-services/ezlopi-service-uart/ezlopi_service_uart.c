@@ -321,7 +321,7 @@ static int ezpi_service_uart_reset(cJSON *root)
             TRACE_E("Factory restore command");
             const static char *reboot_response = "{\"cmd\":0, \"sub_cmd\":0,\"status\":1}";
             EZPI_SERV_uart_tx_data(strlen(reboot_response), (uint8_t *)reboot_response);
-            EZPI_CORE_reset_factory_restore();
+            EZPI_core_reset_factory_restore();
             break;
         }
         case 1:
@@ -329,7 +329,7 @@ static int ezpi_service_uart_reset(cJSON *root)
             TRACE_E("Reboot only command");
             const static char *reboot_response = "{\"cmd\":0, \"sub_cmd\":1, \"status\":1}";
             EZPI_SERV_uart_tx_data(strlen(reboot_response), (uint8_t *)reboot_response);
-            EZPI_CORE_reset_reboot();
+            EZPI_core_reset_reboot();
             break;
         }
         default:
@@ -432,7 +432,7 @@ static int ezpi_service_uart_set_uart_config(const cJSON *root)
 
         TRACE_W("New config has been applied, device rebooting");
         vTaskDelay(10);
-        EZPI_CORE_reset_reboot();
+        EZPI_core_reset_reboot();
     }
     else
     {
@@ -705,7 +705,7 @@ static int ezpi_service_uart_firmware_info(cJSON *parent)
         char build_time[64];
         cJSON_AddStringToObjectWithRef(__FUNCTION__, cj_firmware_info, ezlopi_version_str, VERSION_STR);
         cJSON_AddNumberToObjectWithRef(__FUNCTION__, cj_firmware_info, ezlopi_build_str, BUILD);
-        EZPI_CORE_sntp_epoch_to_iso8601(build_time, sizeof(build_time), (time_t)BUILD_DATE);
+        EZPI_core_sntp_epoch_to_iso8601(build_time, sizeof(build_time), (time_t)BUILD_DATE);
         cJSON_AddStringToObject(__FUNCTION__, cj_firmware_info, ezlopi_build_date_str, build_time);
 
         ret = 1;
@@ -904,7 +904,7 @@ static int ezpi_service_uart_newtwork_info(cJSON *parent)
             bool cloud_connection_status = (EZLOPI_EVENT_NMA_REG & events) == EZLOPI_EVENT_NMA_REG;
 
 #ifdef CONFIG_EZPI_ENABLE_PING
-            e_ping_status_t ping_status = ezlopi_ping_get_internet_status();
+            e_ping_status_t ping_status = EZPI_core_ping_get_internet_status();
             if (ping_status == EZLOPI_PING_STATUS_LIVE)
             {
                 cJSON_AddTrueToObject(__FUNCTION__, cj_network, ezlopi_internet_str);

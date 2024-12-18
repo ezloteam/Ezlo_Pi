@@ -14,19 +14,19 @@ static void ezlopi_core_hub_data_list_populate_settings_json(cJSON *cj_result_na
     {
     case SETTING_COMMAND_NAME_SCALE_TEMPERATURE:
     {
-        char *scale_str = (ezlopi_core_setting_get_temperature_scale() == TEMPERATURE_SCALE_FAHRENHEIT) ? "fahrenheit" : "celsius";
+        char *scale_str = (EZPI_core_setting_get_temperature_scale() == TEMPERATURE_SCALE_FAHRENHEIT) ? "fahrenheit" : "celsius";
         cJSON_AddStringToObject(__FUNCTION__, cj_result_name, field_str, scale_str);
         break;
     }
     case SETTING_COMMAND_NAME_DATE_FORMAT:
     {
-        char *date_format = (ezlopi_core_setting_get_date_format() == DATE_FORMAT_MMDDYY) ? "mmddyy" : "ddmmyy";
+        char *date_format = (EZPI_core_setting_get_date_format() == DATE_FORMAT_MMDDYY) ? "mmddyy" : "ddmmyy";
         cJSON_AddStringToObject(__FUNCTION__, cj_result_name, field_str, date_format);
         break;
     }
     case SETTING_COMMAND_NAME_TIME_FORMAT:
     {
-        char *time_format = (ezlopi_core_setting_get_time_format() == TIME_FORMAT_12) ? "12" : "24";
+        char *time_format = (EZPI_core_setting_get_time_format() == TIME_FORMAT_12) ? "12" : "24";
         cJSON_AddStringToObject(__FUNCTION__, cj_result_name, field_str, time_format);
         break;
     }

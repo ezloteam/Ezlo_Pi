@@ -11,7 +11,7 @@
 
 void room_list(cJSON *cj_request, cJSON *cj_response)
 {
-    char *rooms_str = ezlopi_nvs_read_rooms();
+    char *rooms_str = EZPI_core_nvs_read_rooms();
     if (rooms_str)
     {
         cJSON_AddRawToObject(__FUNCTION__, cj_response, ezlopi_result_str, rooms_str);
@@ -35,7 +35,7 @@ void room_get(cJSON *cj_request, cJSON *cj_response)
             cJSON_ArrayForEach(cj_room_id, cj_params)
             {
                 uint32_t room_id = strtoul(cj_room_id->valuestring, NULL, 16);
-                s_ezlopi_room_t *l_room_node = ezlopi_room_get_room_head();
+                s_ezlopi_room_t *l_room_node = EZPI_core_room_get_room_head();
                 while (l_room_node)
                 {
                     if (l_room_node->_id == room_id)
@@ -67,8 +67,8 @@ void room_create(cJSON *cj_request, cJSON *cj_response)
     cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
     if (cj_params)
     {
-        ezlopi_room_add_to_list(cj_params);
-        ezlopi_room_add_to_nvs(cj_params);
+        EZPI_core_room_add_to_list(cj_params);
+        EZPI_core_room_add_to_nvs(cj_params);
 
         cJSON_AddItemToObject(__FUNCTION__, cj_response, ezlopi_result_str, cJSON_Duplicate(__FUNCTION__, cj_params, cJSON_True));
     }
@@ -81,7 +81,7 @@ void room_name_set(cJSON *cj_request, cJSON *cj_response)
     cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
     if (cj_params)
     {
-        ezlopi_room_name_set(cj_params);
+        EZPI_core_room_name_set(cj_params);
     }
 }
 
@@ -92,7 +92,7 @@ void room_delete(cJSON *cj_request, cJSON *cj_response)
     cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
     if (cj_params)
     {
-        ezlopi_room_delete(cj_params);
+        EZPI_core_room_delete(cj_params);
     }
 }
 
@@ -100,7 +100,7 @@ void room_all_delete(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
 
-    ezlopi_room_delete_all();
+    EZPI_core_room_delete_all();
 }
 
 void room_order_set(cJSON *cj_request, cJSON *cj_response)
@@ -111,7 +111,7 @@ void room_order_set(cJSON *cj_request, cJSON *cj_response)
         cJSON *cj_rooms_ids = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_roomsId_str);
         if (cj_rooms_ids)
         {
-            ezlopi_room_reorder(cj_rooms_ids);
+            EZPI_core_room_reorder(cj_rooms_ids);
         }
     }
 }

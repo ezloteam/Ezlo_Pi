@@ -1649,7 +1649,7 @@ static void __issunsate_update_sunstate_tm(int tm_mday, s_sunstate_data_t *user_
         char tmp_url[100] = { 0 };
         char tmp_headers[] = "Host: api.sunrisesunset.io\r\nAccept: */*\r\nConnection: keep-alive\r\n";
         char tmp_web_server[] = "api.sunrisesunset.io";
-        char *lat_long_vals = ezlopi_nvs_read_latidtude_longitude();
+        char *lat_long_vals = EZPI_core_nvs_read_latidtude_longitude();
         if (lat_long_vals)
         {
             TRACE_S("long_lat_co-ordinate : %s", lat_long_vals);

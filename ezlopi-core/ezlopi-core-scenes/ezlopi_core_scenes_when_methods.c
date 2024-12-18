@@ -1949,15 +1949,15 @@ int EZPI_core_scenes_when_is_firmware_update_state(l_scenes_list_v2_t *scene_nod
         if (item_id && (NULL != state_value))
         {
             size_t len = (state_value ? strlen(state_value) + 1 : 0);
-            if (EZPI_STRNCMP_IF_EQUAL(ezlopi_done_str, state_value, 5, len) && (0 == __get_ota_state()))
+            if (EZPI_STRNCMP_IF_EQUAL(ezlopi_done_str, state_value, 5, len) && (0 == EPZI_core_ota_get_state()))
             {
                 ret = 1;
             }
-            else if (EZPI_STRNCMP_IF_EQUAL(scene_status_started_str, state_value, 8, len) && (1 == __get_ota_state()))
+            else if (EZPI_STRNCMP_IF_EQUAL(scene_status_started_str, state_value, 8, len) && (1 == EPZI_core_ota_get_state()))
             {
                 ret = 1;
             }
-            else if (EZPI_STRNCMP_IF_EQUAL("updating", state_value, 9, len) && (2 == __get_ota_state()))
+            else if (EZPI_STRNCMP_IF_EQUAL("updating", state_value, 9, len) && (2 == EPZI_core_ota_get_state()))
             {
                 ret = 1;
             }

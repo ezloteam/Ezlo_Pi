@@ -167,7 +167,7 @@ void EZPI_scenes_scripts_delete_by_id(uint32_t script_id)
     if (script_to_delete)
     {
         EZPI_scenes_scripts_stop(script_to_delete);
-        ezlopi_nvs_delete_stored_data_by_id(script_to_delete->id); // deleting script from nvs
+        EZPI_core_nvs_delete_stored_data_by_id(script_to_delete->id); // deleting script from nvs
         __scripts_remove_id_and_update_list(script_to_delete->id);
 
         if (script_to_delete->code)
@@ -271,7 +271,8 @@ void EZPI_scenes_scripts_update(cJSON *cj_script)
                         {
                             uint32_t len = strlen(cj_code->valuestring) + 1;
                             script_node->code = ezlopi_malloc(__FUNCTION__, len);
-                            if (script_node->code) {
+                            if (script_node->code)
+                            {
                                 snprintf(script_node->code, len, "%s", cj_code->valuestring);
                             }
                         }
@@ -282,7 +283,7 @@ void EZPI_scenes_scripts_update(cJSON *cj_script)
 
                     if (script_to_update)
                     {
-                        ezlopi_nvs_write_str(script_to_update, strlen(script_to_update), cj_script_id->valuestring);
+                        EZPI_core_nvs_write_str(script_to_update, strlen(script_to_update), cj_script_id->valuestring);
                         ezlopi_free(__FUNCTION__, script_to_update);
                     }
 
@@ -376,7 +377,7 @@ static void __script_process(void *arg)
 static void __scripts_add_script_id(uint32_t script_id)
 {
     uint32_t script_ids_str_free = true;
-    char *script_ids_str = ezlopi_nvs_read_scenes_scripts();
+    char *script_ids_str = EZPI_core_nvs_read_scenes_scripts();
     if (NULL == script_ids_str)
     {
         script_ids_str = "[]"; // don't free in this case
@@ -396,7 +397,7 @@ static void __scripts_add_script_id(uint32_t script_id)
 
                 if (script_ids_str_updated)
                 {
-                    ezlopi_nvs_write_scenes_scripts(script_ids_str_updated);
+                    EZPI_core_nvs_write_scenes_scripts(script_ids_str_updated);
                     ezlopi_free(__FUNCTION__, script_ids_str_updated);
                 }
             }
@@ -417,7 +418,7 @@ static void __scripts_add_script_id(uint32_t script_id)
 
 static void __scripts_remove_id_and_update_list(uint32_t script_id)
 {
-    char *scripts_ids_str = ezlopi_nvs_read_scenes_scripts();
+    char *scripts_ids_str = EZPI_core_nvs_read_scenes_scripts();
     if (scripts_ids_str)
     {
         cJSON *cj_scripts_ids = cJSON_Parse(__FUNCTION__, scripts_ids_str);
@@ -439,7 +440,7 @@ static void __scripts_remove_id_and_update_list(uint32_t script_id)
 
                         if (scripts_ids_str_updated)
                         {
-                            ezlopi_nvs_write_scenes_scripts(scripts_ids_str_updated);
+                            EZPI_core_nvs_write_scenes_scripts(scripts_ids_str_updated);
 
                             ezlopi_free(__FUNCTION__, scripts_ids_str_updated);
                         }
@@ -459,7 +460,7 @@ static void __scripts_remove_id_and_update_list(uint32_t script_id)
 static ezlopi_error_t __scripts_nvs_parse(void)
 {
     ezlopi_error_t error = EZPI_ERR_JSON_PARSE_FAILED;
-    char *script_ids = ezlopi_nvs_read_scenes_scripts();
+    char *script_ids = EZPI_core_nvs_read_scenes_scripts();
     if (script_ids)
     {
         cJSON *cj_script_ids = cJSON_Parse(__FUNCTION__, script_ids);
@@ -477,7 +478,7 @@ static ezlopi_error_t __scripts_nvs_parse(void)
                     char script_id_str[32];
                     snprintf(script_id_str, sizeof(script_id_str), "%08x", script_id);
 
-                    char *script_str = ezlopi_nvs_read_str(script_id_str);
+                    char *script_str = EZPI_core_nvs_read_str(script_id_str);
                     if (script_str)
                     {
                         cJSON *cj_script = cJSON_Parse(__FUNCTION__, script_str);
@@ -528,7 +529,7 @@ static l_ezlopi_scenes_script_t *__scripts_create_node(uint32_t script_id, cJSON
                 {
                     char scrpt_id_str[32];
                     snprintf(scrpt_id_str, sizeof(scrpt_id_str), "%08x", script_id);
-                    ezlopi_nvs_write_str(script_str, strlen(script_str), scrpt_id_str);
+                    EZPI_core_nvs_write_str(script_str, strlen(script_str), scrpt_id_str);
                     ezlopi_free(__FUNCTION__, script_str);
                     __scripts_add_script_id(script_id);
                 }

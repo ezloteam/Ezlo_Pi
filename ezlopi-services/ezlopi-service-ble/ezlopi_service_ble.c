@@ -198,7 +198,7 @@ static void ezlopi_ble_start_secure_gatt_server(void)
 {
     const uint32_t default_passkey = 123456;
     uint32_t passkey;
-    ezlopi_nvs_read_ble_passkey(&passkey);
+    EZPI_core_nvs_read_ble_passkey(&passkey);
     passkey = (0 == passkey) ? default_passkey : passkey;
     passkey = (passkey > 999999) ? default_passkey : passkey;
     TRACE_D("Ble passkey: %d", passkey);

@@ -225,7 +225,7 @@ void device_updated(cJSON *cj_request, cJSON *cj_response)
                                 cJSON_AddBoolToObject(__FUNCTION__, cj_result, ezlopi_serviceNotification_str, controller_info->service_notification ? cJSON_True : cJSON_False);
                             }
 
-                            uint64_t time = EZPI_CORE_sntp_get_current_time_ms();
+                            uint64_t time = EZPI_core_sntp_get_current_time_ms();
                             cJSON_AddNumberToObject(__FUNCTION__, cj_result, ezlopi_fwTimestampMs_str, time);
 
                             cJSON *cj_method = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_method_str);
@@ -294,7 +294,7 @@ void device_group_get(cJSON *cj_request, cJSON *cj_response)
             cJSON *cj_devgrp_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_id_str);
             if (cj_devgrp_id && cj_devgrp_id->valuestring)
             {
-                char *devgrp_str = ezlopi_nvs_read_str(cj_devgrp_id->valuestring);
+                char *devgrp_str = EZPI_core_nvs_read_str(cj_devgrp_id->valuestring);
                 if (devgrp_str)
                 {
                     cJSON_AddRawToObject(__FUNCTION__, cj_response, ezlopi_result_str, devgrp_str);
@@ -374,7 +374,7 @@ void device_group_delete(cJSON *cj_request, cJSON *cj_response)
                             cJSON *cj_force = cJSON_GetObjectItem(__FUNCTION__, cj_params, value_type_force);
                             if (cj_force && cJSON_IsTrue(cj_force))
                             {
-                                ezlopi_nvs_delete_stored_data_by_id(dev_grp_id);          // from nvs
+                                EZPI_core_nvs_delete_stored_data_by_id(dev_grp_id);          // from nvs
                                 EZPI_core_device_group_depopulate_by_id_v2(dev_grp_id); // from ll
                                 EZPI_core_device_group_remove_id_from_list(dev_grp_id); // from nvs-list
 
@@ -387,7 +387,7 @@ void device_group_delete(cJSON *cj_request, cJSON *cj_response)
                         }
                         else
                         {
-                            ezlopi_nvs_delete_stored_data_by_id(dev_grp_id);
+                            EZPI_core_nvs_delete_stored_data_by_id(dev_grp_id);
                             EZPI_core_device_group_depopulate_by_id_v2(dev_grp_id);
                             EZPI_core_device_group_remove_id_from_list(dev_grp_id);
                         }
@@ -497,7 +497,7 @@ void device_group_created(cJSON *cj_request, cJSON *cj_response)
     cJSON *new_devgrp_id = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi__id_str);
     if (new_devgrp_id && new_devgrp_id->valuestring)
     {
-        char *new_devgrp = ezlopi_nvs_read_str(new_devgrp_id->valuestring);
+        char *new_devgrp = EZPI_core_nvs_read_str(new_devgrp_id->valuestring);
         if (new_devgrp)
         {
             cJSON_AddRawToObject(__FUNCTION__, cj_response, ezlopi_result_str, new_devgrp);
@@ -539,7 +539,7 @@ void device_group_updated(cJSON *cj_request, cJSON *cj_response)
         cJSON *cj_devgrp_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_id_str);
         if (cj_devgrp_id && cj_devgrp_id->valuestring)
         {
-            char *devgrp_str = ezlopi_nvs_read_str(cj_devgrp_id->valuestring);
+            char *devgrp_str = EZPI_core_nvs_read_str(cj_devgrp_id->valuestring);
             if (devgrp_str)
             {
                 cJSON_AddRawToObject(__FUNCTION__, cj_response, ezlopi_result_str, devgrp_str);
@@ -586,7 +586,7 @@ void item_group_get(cJSON *cj_request, cJSON *cj_response)
             cJSON *cj_itemgrp_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_id_str);
             if (cj_itemgrp_id && cj_itemgrp_id->valuestring)
             {
-                char *devgrp_str = ezlopi_nvs_read_str(cj_itemgrp_id->valuestring);
+                char *devgrp_str = EZPI_core_nvs_read_str(cj_itemgrp_id->valuestring);
                 if (devgrp_str)
                 {
                     cJSON_AddRawToObject(__FUNCTION__, cj_response, ezlopi_result_str, devgrp_str);
@@ -666,7 +666,7 @@ void item_group_delete(cJSON *cj_request, cJSON *cj_response)
                             cJSON *cj_force = cJSON_GetObjectItem(__FUNCTION__, cj_params, value_type_force);
                             if (cj_force && cJSON_IsTrue(cj_force))
                             {
-                                ezlopi_nvs_delete_stored_data_by_id(item_grp_id);        // from nvs
+                                EZPI_core_nvs_delete_stored_data_by_id(item_grp_id);        // from nvs
                                 EZPI_core_item_group_depopulate_by_id_v2(item_grp_id); // from ll
                                 EZPI_core_item_group_remove_id_from_list(item_grp_id); // from nvs-list
 
@@ -679,7 +679,7 @@ void item_group_delete(cJSON *cj_request, cJSON *cj_response)
                         }
                         else
                         {
-                            ezlopi_nvs_delete_stored_data_by_id(item_grp_id);
+                            EZPI_core_nvs_delete_stored_data_by_id(item_grp_id);
                             EZPI_core_item_group_depopulate_by_id_v2(item_grp_id);
                             EZPI_core_item_group_remove_id_from_list(item_grp_id);
                         }
@@ -728,7 +728,7 @@ void item_group_created(cJSON *cj_request, cJSON *cj_response)
     cJSON *new_itemgrp_id = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi__id_str);
     if (new_itemgrp_id && new_itemgrp_id->valuestring)
     {
-        char *new_itemgrp = ezlopi_nvs_read_str(new_itemgrp_id->valuestring);
+        char *new_itemgrp = EZPI_core_nvs_read_str(new_itemgrp_id->valuestring);
         if (new_itemgrp)
         {
             cJSON_AddRawToObject(__FUNCTION__, cj_response, ezlopi_result_str, new_itemgrp);
@@ -770,7 +770,7 @@ void item_group_updated(cJSON *cj_request, cJSON *cj_response)
         cJSON *cj_itemgrp_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_id_str);
         if (cj_itemgrp_id && cj_itemgrp_id->valuestring)
         {
-            char *devgrp_str = ezlopi_nvs_read_str(cj_itemgrp_id->valuestring);
+            char *devgrp_str = EZPI_core_nvs_read_str(cj_itemgrp_id->valuestring);
             if (devgrp_str)
             {
                 cJSON_AddRawToObject(__FUNCTION__, cj_response, ezlopi_result_str, devgrp_str);

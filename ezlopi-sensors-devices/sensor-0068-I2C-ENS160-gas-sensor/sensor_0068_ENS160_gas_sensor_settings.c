@@ -50,7 +50,7 @@ static int __settings_sensor_0068_gas_sensor_setting_initialize_ambient_temperat
             {
                 memset(ambient_temperature, 0, sizeof(s_sensor_ens160_gas_sensor_setting_ambient_temperature_t));
                 float read_value = 0;
-                ezlopi_error_t error = ezlopi_nvs_read_float32(&read_value, nvs_key_ens160_gas_sensor_ambient_temperature_setting);
+                ezlopi_error_t error = EZPI_core_nvs_read_float32(&read_value, nvs_key_ens160_gas_sensor_ambient_temperature_setting);
                 if (EZPI_SUCCESS == error)
                 {
                     TRACE_D("Setting already exist");
@@ -60,7 +60,7 @@ static int __settings_sensor_0068_gas_sensor_setting_initialize_ambient_temperat
                 {
                     TRACE_W("Not found saved setting for ambient temperature.");
                     ambient_temperature->ambient_temperature = 25;
-                    if (EZPI_SUCCESS != ezlopi_nvs_write_float32(ambient_temperature->ambient_temperature, nvs_key_ens160_gas_sensor_ambient_temperature_setting))
+                    if (EZPI_SUCCESS != EZPI_core_nvs_write_float32(ambient_temperature->ambient_temperature, nvs_key_ens160_gas_sensor_ambient_temperature_setting))
                     {
                         TRACE_E("Failed to write to NVS");
                         ret = 1;
@@ -104,7 +104,7 @@ static int __settings_sensor_0068_gas_sensor_setting_initialize_relative_humidit
             {
                 memset(relative_humidity, 0, sizeof(s_sensor_ens160_gas_sensor_setting_relative_humidity_t));
                 float read_value = 0;
-                ezlopi_error_t error = ezlopi_nvs_read_float32(&read_value, nvs_key_ens160_gas_sensor_relative_humidity_setting);
+                ezlopi_error_t error = EZPI_core_nvs_read_float32(&read_value, nvs_key_ens160_gas_sensor_relative_humidity_setting);
                 if (EZPI_SUCCESS == error)
                 {
                     TRACE_D("Setting already exist");
@@ -114,7 +114,7 @@ static int __settings_sensor_0068_gas_sensor_setting_initialize_relative_humidit
                 {
                     TRACE_W("Not found saved setting for ambient temperature.");
                     relative_humidity->relative_humidity = 50;
-                    if (EZPI_SUCCESS != ezlopi_nvs_write_float32(relative_humidity->relative_humidity, nvs_key_ens160_gas_sensor_relative_humidity_setting))
+                    if (EZPI_SUCCESS != EZPI_core_nvs_write_float32(relative_humidity->relative_humidity, nvs_key_ens160_gas_sensor_relative_humidity_setting))
                     {
                         TRACE_E("Failed to write to NVS");
                         ret = 1;
@@ -287,7 +287,7 @@ static int __settings_set_ens160_gas_sensor_ambient_temperature_get(void *arg, l
     if (cj_properties && ambient_temperature)
     {
         CJSON_GET_VALUE_DOUBLE(cj_properties, ezlopi_value_str, ambient_temperature->ambient_temperature);
-        if (EZPI_SUCCESS != ezlopi_nvs_write_float32(ambient_temperature->ambient_temperature, nvs_key_ens160_gas_sensor_ambient_temperature_setting))
+        if (EZPI_SUCCESS != EZPI_core_nvs_write_float32(ambient_temperature->ambient_temperature, nvs_key_ens160_gas_sensor_ambient_temperature_setting))
         {
             TRACE_E("Failed to write to NVS");
             ret = 1;
@@ -309,7 +309,7 @@ static int __settings_set_ens160_gas_sensor_relative_humidity_get(void *arg, l_e
     if (cj_properties && relative_humidity)
     {
         CJSON_GET_VALUE_DOUBLE(cj_properties, ezlopi_value_str, relative_humidity->relative_humidity);
-        if (EZPI_SUCCESS != ezlopi_nvs_write_float32(relative_humidity->relative_humidity, nvs_key_ens160_gas_sensor_relative_humidity_setting))
+        if (EZPI_SUCCESS != EZPI_core_nvs_write_float32(relative_humidity->relative_humidity, nvs_key_ens160_gas_sensor_relative_humidity_setting))
         {
             TRACE_E("Failed to write to NVS");
             ret = 1;
@@ -416,7 +416,7 @@ static int __settings_reset_ens160_gas_sensor_ambient_temperature_get(void *arg,
     if (cj_properties && ambient_temperature)
     {
         ambient_temperature->ambient_temperature = 25;
-        if (EZPI_SUCCESS != ezlopi_nvs_write_float32(ambient_temperature->ambient_temperature, nvs_key_ens160_gas_sensor_ambient_temperature_setting))
+        if (EZPI_SUCCESS != EZPI_core_nvs_write_float32(ambient_temperature->ambient_temperature, nvs_key_ens160_gas_sensor_ambient_temperature_setting))
         {
             TRACE_E("Failed to write to NVS");
             ret = 1;
@@ -438,7 +438,7 @@ static int __settings_reset_ens160_gas_sensor_relative_humidity_get(void *arg, l
     if (cj_properties && relative_humidity)
     {
         relative_humidity->relative_humidity = 50;
-        if (EZPI_SUCCESS != ezlopi_nvs_write_float32(relative_humidity->relative_humidity, nvs_key_ens160_gas_sensor_relative_humidity_setting))
+        if (EZPI_SUCCESS != EZPI_core_nvs_write_float32(relative_humidity->relative_humidity, nvs_key_ens160_gas_sensor_relative_humidity_setting))
         {
             TRACE_E("Failed to write to NVS");
             ret = 1;

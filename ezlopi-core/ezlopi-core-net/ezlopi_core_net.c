@@ -85,7 +85,7 @@ s_ezlopi_net_status_t *EZPI_core_net_get_net_status(void)
 
     net_stat.wifi_status = ezlopi_wifi_status();
 #ifdef CONFIG_EZPI_ENABLE_PING
-    net_stat.internet_status = ezlopi_ping_get_internet_status();
+    net_stat.internet_status = EZPI_core_ping_get_internet_status();
 #else // CONFIG_EZPI_ENABLE_PING
     net_stat.internet_status = EZLOPI_PING_STATUS_UNKNOWN;
 #endif // CONFIG_EZPI_ENABLE_PING

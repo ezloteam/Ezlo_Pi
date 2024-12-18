@@ -42,7 +42,7 @@ void info_get(cJSON *cj_request, cJSON *cj_response)
         {
             cJSON_AddNumberToObject(__FUNCTION__, cjson_location, ezlopi_latitude_str, ezlopi_cloud_get_latitude());
             cJSON_AddNumberToObject(__FUNCTION__, cjson_location, ezlopi_longitude_str, ezlopi_cloud_get_longitude());
-            char *location = EZPI_CORE_sntp_get_location();
+            char *location = EZPI_core_sntp_get_location();
             if (location)
             {
                 cJSON_AddStringToObject(__FUNCTION__, cjson_location, ezlopi_timezone_str, location);
@@ -61,7 +61,7 @@ void info_get(cJSON *cj_request, cJSON *cj_response)
         {
             {
                 char build_time[64];
-                EZPI_CORE_sntp_epoch_to_iso8601(build_time, sizeof(build_time), (time_t)BUILD_DATE);
+                EZPI_core_sntp_epoch_to_iso8601(build_time, sizeof(build_time), (time_t)BUILD_DATE);
                 cJSON_AddStringToObject(__FUNCTION__, cjson_build, ezlopi_time_str, build_time);
             }
 
@@ -81,14 +81,14 @@ void info_get(cJSON *cj_request, cJSON *cj_response)
 
         {
             char local_time[100];
-            EZPI_CORE_sntp_get_local_time(local_time, sizeof(local_time));
+            EZPI_core_sntp_get_local_time(local_time, sizeof(local_time));
             cJSON_AddStringToObject(__FUNCTION__, cjson_result, "localtime", local_time);
         }
 
 #if 0
         {
             char local_time[100];
-            EZPI_CORE_sntp_get_up_time(local_time, sizeof(local_time));
+            EZPI_core_sntp_get_up_time(local_time, sizeof(local_time));
             cJSON_AddStringToObject(__FUNCTION__, cjson_result, ezlopi_uptime_str, local_time);
         }
 #else

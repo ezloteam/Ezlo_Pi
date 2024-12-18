@@ -176,7 +176,7 @@ static void ezpi_passkey_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_pa
         {
             TRACE_D("New passkey: %d", passkey);
             EZPI_core_ble_gap_set_passkey(passkey);
-            ezlopi_nvs_write_ble_passkey(passkey);
+            EZPI_core_nvs_write_ble_passkey(passkey);
             EZPI_core_ble_gap_dissociate_bonded_devices();
         }
     }
@@ -199,7 +199,7 @@ static void ezpi_factory_reset_write_func(esp_gatt_value_t *value, esp_ble_gatts
             {
             case BLE_CMD_REBOOT:
             {
-                EZPI_CORE_reset_reboot();
+                EZPI_core_reset_reboot();
                 break;
             }
             case BLE_CMD_FACTORY_RESET: // factory reset command
@@ -241,13 +241,13 @@ static void ezpi_serv_ble_factory_reset_write_func(esp_gatt_value_t *value, esp_
                 case 0:
                 {
                     TRACE_E("Factory restore command");
-                    EZPI_CORE_reset_factory_restore();
+                    EZPI_core_reset_factory_restore();
                     break;
                 }
                 case 1:
                 {
                     TRACE_E("Reboot only command");
-                    EZPI_CORE_reset_reboot();
+                    EZPI_core_reset_reboot();
                     break;
                 }
                 default:
@@ -271,7 +271,7 @@ static void ezpi_process_hard_reset_command(void)
     if ((1 == authenticated_flag) && (current_tick - start_tick) < (30 * 1000 / portTICK_RATE_MS)) // once authenticated, valid for 30 seconds only
     {
 #endif
-        EZPI_CORE_reset_factory_restore();
+        EZPI_core_reset_factory_restore();
 #if (1 == CONFIG_EZPI_BLE_ENALBE_PASSKEY)
     }
     else
@@ -287,7 +287,7 @@ static void ezpi_process_auth_command(cJSON *root)
 #if (1 == CONFIG_EZPI_BLE_ENALBE_PASSKEY)
     uint32_t passkey = CJ_GET_NUMBER("passkey");
     uint32_t original_passkey = 0;
-    ezlopi_nvs_read_ble_passkey(&original_passkey);
+    EZPI_core_nvs_read_ble_passkey(&original_passkey);
 
     TRACE_D("Old passkey: %u, current_passkey: %u", original_passkey, passkey);
 

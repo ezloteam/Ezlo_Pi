@@ -297,7 +297,7 @@ PT_THREAD(ezpi_scene_proto_thread(l_scenes_list_v2_t *scene_node, uint32_t routi
 
                         if (ctx->start_cond)
                         {
-                            scene_node->executed_date = EZPI_CORE_sntp_get_current_time_sec(); // executed date/time when scene was activated
+                            scene_node->executed_date = EZPI_core_sntp_get_current_time_sec(); // executed date/time when scene was activated
                             EZPI_core_scenes_status_change_broadcast(scene_node, scene_status_started_str);
                         }
 

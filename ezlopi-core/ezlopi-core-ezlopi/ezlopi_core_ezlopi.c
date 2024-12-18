@@ -105,8 +105,8 @@ static void __EZPI_initialize_devices_v3(void);
 void EZPI_init(void)
 {
     // Init memories
-    ezlopi_nvs_init();
-    ezlopi_core_setting_commands_read_settings();
+    EZPI_nvs_init();
+    EZPI_core_setting_commands_read_settings();
 
 #ifdef CONFIG_EZPI_UTIL_TRACE_EN
     EZPI_core_read_set_log_severities();
@@ -148,7 +148,7 @@ void EZPI_init(void)
     EZPI_core_modes_init();
 #endif
 
-    ezlopi_room_init();
+    EZPI_room_init();
 
 #if defined(CONFIG_EZPI_SERV_ENABLE_MESHBOTS)
     EZPI_scenes_scripts_init();
@@ -160,16 +160,16 @@ void EZPI_init(void)
     EZPI_ethernet_init();
 #endif // CONFIG_EZPI_CORE_ETHERNET_EN
 
-    ezlopi_nvs_set_boot_count(ezlopi_system_info_get_boot_count() + 1);
+    EZPI_core_nvs_set_boot_count(ezlopi_system_info_get_boot_count() + 1);
 
 #if defined(CONFIG_EZPI_ENABLE_WIFI)
     ezlopi_wifi_connect_from_id_bin();
 #endif
 
 #if (defined(CONFIG_EZPI_ENABLE_WIFI) || defined(CONFIG_EZPI_CORE_ENABLE_ETH))
-    ezlopi_error_t sntp_error = EZPI_CORE_sntp_init();
+    ezlopi_error_t sntp_error = EZPI_core_sntp_init();
 #ifdef CONFIG_EZPI_ENABLE_PING
-    ezlopi_ping_init();
+    EZPI_ping_init();
 #endif // CONFIG_EZPI_ENABLE_PING
 #endif
 

@@ -106,8 +106,8 @@ ezlopi_error_t EZPI_core_scenes_edit_store_updated_to_nvs(cJSON *cj_updated_scen
             cJSON *cj_scene_id = cJSON_GetObjectItem(__FUNCTION__, cj_updated_scene, ezlopi__id_str);
             if (cj_scene_id && cj_scene_id->valuestring)
             {
-                ezlopi_nvs_delete_stored_data_by_name(cj_scene_id->valuestring);
-                error = ezlopi_nvs_write_str(update_scene_str, strlen(update_scene_str), cj_scene_id->valuestring);
+                EZPI_core_nvs_delete_stored_data_by_name(cj_scene_id->valuestring);
+                error = EZPI_core_nvs_write_str(update_scene_str, strlen(update_scene_str), cj_scene_id->valuestring);
             }
 
             ezlopi_free(__FUNCTION__, update_scene_str);

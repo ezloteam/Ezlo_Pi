@@ -1,4 +1,44 @@
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+/**
+* @file    ezlopi_core_sntp.c
+* @brief   perform some function on sntp
+* @author  xx
+* @version 0.1
+* @date    12th DEC 2024
+*/
 
+/*******************************************************************************
+*                          Include Files
+*******************************************************************************/
 #include <string.h>
 #include <time.h>
 #include <sys/time.h>
@@ -14,31 +54,36 @@
 #include "ezlopi_core_wifi.h"
 #include "ezlopi_core_errors.h"
 
+/*******************************************************************************
+*                          Extern Data Declarations
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Extern Function Declarations
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Type & Macro Definitions
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Static Function Prototypes
+*******************************************************************************/
+static void sntp_sync_time_call_back(struct timeval *tv);
+
+/*******************************************************************************
+*                          Static Data Definitions
+*******************************************************************************/
 static time_t start_time = 0;
 
-static void sntp_sync_time_call_back(struct timeval *tv)
-{
+/*******************************************************************************
+*                          Extern Data Definitions
+*******************************************************************************/
 
-    char strftime_buf[64];
-    struct tm timeinfo;
-
-    sntp_set_sync_interval(60 * 60 * 1000); // Sync every hour
-    TRACE_I("Notification of a time synchronization event");
-
-    time_t now;
-    time(&now);
-    if (0 == start_time)
-    {
-        start_time = now;
-    }
-
-    localtime_r(&now, &timeinfo);
-
-    strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
-    TRACE_I("Time now[%ld]: %s", now, strftime_buf);
-}
-
-ezlopi_error_t EZPI_CORE_sntp_init(void)
+/*******************************************************************************
+*                          Extern Function Definitions
+*******************************************************************************/
+ezlopi_error_t EZPI_core_sntp_init(void)
 {
     int retry = 0;
     const int retry_count = 10;
@@ -66,7 +111,7 @@ ezlopi_error_t EZPI_CORE_sntp_init(void)
     return (sync_status == SNTP_SYNC_STATUS_COMPLETED) ? EZPI_SUCCESS : EZPI_ERR_SNTP_INIT_FAILED;
 }
 
-ezlopi_error_t EZPI_CORE_sntp_set_location(const char* location)
+ezlopi_error_t EZPI_core_sntp_set_location(const char *location)
 {
     ezlopi_error_t error = EZPI_SUCCESS;
     if (location)
@@ -98,12 +143,12 @@ ezlopi_error_t EZPI_CORE_sntp_set_location(const char* location)
     return error;
 }
 
-char *EZPI_CORE_sntp_get_location(void)
+char *EZPI_core_sntp_get_location(void)
 {
     return EZPI_CORE_nvs_read_time_location();
 }
 
-void EZPI_CORE_sntp_get_local_time(char *time_buf, uint32_t buf_len)
+void EZPI_core_sntp_get_local_time(char *time_buf, uint32_t buf_len)
 {
     if (time_buf && buf_len)
     {
@@ -150,7 +195,7 @@ void EZPI_CORE_sntp_get_local_time(char *time_buf, uint32_t buf_len)
     }
 }
 
-void EZPI_CORE_sntp_get_up_time(char *up_time_buf, uint32_t buf_len)
+void EZPI_core_sntp_get_up_time(char *up_time_buf, uint32_t buf_len)
 {
     if (up_time_buf && buf_len)
     {
@@ -160,7 +205,7 @@ void EZPI_CORE_sntp_get_up_time(char *up_time_buf, uint32_t buf_len)
     }
 }
 
-void EZPI_CORE_sntp_epoch_to_iso8601(char *time_buf, uint32_t buf_len, time_t t)
+void EZPI_core_sntp_epoch_to_iso8601(char *time_buf, uint32_t buf_len, time_t t)
 {
     if (time_buf && buf_len)
     {
@@ -172,16 +217,47 @@ void EZPI_CORE_sntp_epoch_to_iso8601(char *time_buf, uint32_t buf_len, time_t t)
     }
 }
 
-uint64_t EZPI_CORE_sntp_get_current_time_ms(void)
+uint64_t EZPI_core_sntp_get_current_time_ms(void)
 {
     time_t now;
     time(&now);
     return (now * 1000LL);
 }
 
-uint64_t EZPI_CORE_sntp_get_current_time_sec(void)
+uint64_t EZPI_core_sntp_get_current_time_sec(void)
 {
     time_t now;
     time(&now);
     return now;
 }
+
+/*******************************************************************************
+*                         Static Function Definitions
+*******************************************************************************/
+
+static void sntp_sync_time_call_back(struct timeval *tv)
+{
+
+    char strftime_buf[64];
+    struct tm timeinfo;
+
+    sntp_set_sync_interval(60 * 60 * 1000); // Sync every hour
+    TRACE_I("Notification of a time synchronization event");
+
+    time_t now;
+    time(&now);
+    if (0 == start_time)
+    {
+        start_time = now;
+    }
+
+    localtime_r(&now, &timeinfo);
+
+    strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
+    TRACE_I("Time now[%ld]: %s", now, strftime_buf);
+}
+
+
+/*******************************************************************************
+*                          End of File
+*******************************************************************************/

@@ -91,7 +91,7 @@ static int __setting_initialize_hilink_presence_sensor_predefined_settings(l_ezl
         if (hilink_presence_sensor_setting_value)
         {
             memset(hilink_presence_sensor_setting_value, 0, sizeof(s_hilink_predefined_setting_value_t));
-            char *read_value = ezlopi_nvs_read_str(nvs_key_hilink_presence_sensor_predefined_setting);
+            char *read_value = EZPI_core_nvs_read_str(nvs_key_hilink_presence_sensor_predefined_setting);
             if (NULL != read_value)
             {
                 TRACE_I("Setting already exist");
@@ -101,7 +101,7 @@ static int __setting_initialize_hilink_presence_sensor_predefined_settings(l_ezl
             {
                 TRACE_W("Not found saved setting for predefined setting value!");
                 snprintf(hilink_presence_sensor_setting_value->setting_value, 50, "%s", hilink_presence_sensor_setting_enum[7]);
-                if (EZPI_SUCCESS == ezlopi_nvs_write_str(hilink_presence_sensor_setting_value->setting_value, strlen(hilink_presence_sensor_setting_value->setting_value), nvs_key_hilink_presence_sensor_predefined_setting))
+                if (EZPI_SUCCESS == EZPI_core_nvs_write_str(hilink_presence_sensor_setting_value->setting_value, strlen(hilink_presence_sensor_setting_value->setting_value), nvs_key_hilink_presence_sensor_predefined_setting))
                 {
                     TRACE_E("Failed to write to NVS");
                     ret = 1;
@@ -132,7 +132,7 @@ static int __setting_initialize_hilink_presence_sensor_userdefined_settings(l_ez
         if (hilink_presence_sensor_user_defined_setting_val)
         {
             memset(hilink_presence_sensor_user_defined_setting_val, 0, sizeof(s_hilink_userdefined_setting_value_t));
-            char *read_value = ezlopi_nvs_read_str(nvs_key_hilink_presence_sensor_userdefined_setting);
+            char *read_value = EZPI_core_nvs_read_str(nvs_key_hilink_presence_sensor_userdefined_setting);
             if (NULL != read_value)
             {
                 TRACE_I("Setting already exist.");
@@ -152,7 +152,7 @@ static int __setting_initialize_hilink_presence_sensor_userdefined_settings(l_ez
                 char *user_defined_value = __prepare_user_defined_setting_str(hilink_presence_sensor_user_defined_setting_val);
                 if (user_defined_value)
                 {
-                    if (EZPI_SUCCESS == ezlopi_nvs_write_str(user_defined_value, strlen(user_defined_value), nvs_key_hilink_presence_sensor_userdefined_setting))
+                    if (EZPI_SUCCESS == EZPI_core_nvs_write_str(user_defined_value, strlen(user_defined_value), nvs_key_hilink_presence_sensor_userdefined_setting))
                     {
                         TRACE_E("Failed to write to NVS");
                         ret = 1;
@@ -195,7 +195,7 @@ static int __setting_initialize_hilink_presence_sensor_radar_distance_sensitivit
             {
                 memset(distance_sensitivity_value, 0, sizeof(s_hilink_radar_distance_sensitivity_value_t));
                 int read_value = 0;
-                ezlopi_error_t error = ezlopi_nvs_read_int32(&read_value, nvs_key_hilink_presence_sensor_radar_distance_sensitivity);
+                ezlopi_error_t error = EZPI_core_nvs_read_int32(&read_value, nvs_key_hilink_presence_sensor_radar_distance_sensitivity);
                 if (EZPI_SUCCESS == error)
                 {
                     TRACE_I("Setting already exist.");
@@ -205,7 +205,7 @@ static int __setting_initialize_hilink_presence_sensor_radar_distance_sensitivit
                 {
                     TRACE_W("Not found saved setting for predefined setting value!");
                     distance_sensitivity_value->distance_sensitivity_value = 10;
-                    if (EZPI_SUCCESS != ezlopi_nvs_write_int32(distance_sensitivity_value->distance_sensitivity_value, nvs_key_hilink_presence_sensor_radar_distance_sensitivity))
+                    if (EZPI_SUCCESS != EZPI_core_nvs_write_int32(distance_sensitivity_value->distance_sensitivity_value, nvs_key_hilink_presence_sensor_radar_distance_sensitivity))
                     {
                         TRACE_E("Failed to write to NVS");
                         ret = 1;
@@ -503,7 +503,7 @@ static int __setting_set_change_user_defined_template(bool set_active)
             char *value_str = __prepare_user_defined_setting_str(setting_val);
             if (value_str)
             {
-                if (EZPI_SUCCESS == ezlopi_nvs_write_str(value_str, strlen(value_str), nvs_key_hilink_presence_sensor_userdefined_setting))
+                if (EZPI_SUCCESS == EZPI_core_nvs_write_str(value_str, strlen(value_str), nvs_key_hilink_presence_sensor_userdefined_setting))
                 {
                     ret = 1;
                 }
@@ -619,7 +619,7 @@ static int __setting_set_pre_defined_setting(void *arg, l_ezlopi_device_settings
         if (setting_value)
         {
             CJSON_GET_VALUE_STRING_BY_COPY(cj_properties, ezlopi_value_str, setting_value->setting_value);
-            if (EZPI_SUCCESS != ezlopi_nvs_write_str(setting_value->setting_value, strlen(setting_value->setting_value), nvs_key_hilink_presence_sensor_predefined_setting))
+            if (EZPI_SUCCESS != EZPI_core_nvs_write_str(setting_value->setting_value, strlen(setting_value->setting_value), nvs_key_hilink_presence_sensor_predefined_setting))
             {
                 TRACE_E("Failed to write to NVS");
                 ret = 1;
@@ -662,7 +662,7 @@ static int __setting_set_user_defined_setting(void *arg, l_ezlopi_device_setting
             char *value_str = __prepare_user_defined_setting_str(setting_val);
             if (value_str)
             {
-                if (EZPI_SUCCESS == ezlopi_nvs_write_str(value_str, strlen(value_str), nvs_key_hilink_presence_sensor_userdefined_setting))
+                if (EZPI_SUCCESS == EZPI_core_nvs_write_str(value_str, strlen(value_str), nvs_key_hilink_presence_sensor_userdefined_setting))
                 {
                     ret = 1;
                 }
@@ -698,7 +698,7 @@ static int __setting_set_radar_distance_sensitivity_setting(void *arg, l_ezlopi_
     if (cj_properties && setting && setting_val)
     {
         CJSON_GET_VALUE_DOUBLE(cj_properties, ezlopi_value_str, setting_val->distance_sensitivity_value);
-        if (EZPI_SUCCESS != ezlopi_nvs_write_int32(setting_val->distance_sensitivity_value, nvs_key_hilink_presence_sensor_radar_distance_sensitivity))
+        if (EZPI_SUCCESS != EZPI_core_nvs_write_int32(setting_val->distance_sensitivity_value, nvs_key_hilink_presence_sensor_radar_distance_sensitivity))
         {
             TRACE_E("Failed to write to NVS");
             ret = 1;
@@ -747,7 +747,7 @@ static int __setting_reset_pre_defined_setting(void *arg, l_ezlopi_device_settin
         if (setting_val)
         {
             snprintf(setting_val->setting_value, 50, "%s", hilink_presence_sensor_setting_enum[7]);
-            if (EZPI_SUCCESS == ezlopi_nvs_write_str(setting_val->setting_value, strlen(setting_val->setting_value), nvs_key_hilink_presence_sensor_predefined_setting))
+            if (EZPI_SUCCESS == EZPI_core_nvs_write_str(setting_val->setting_value, strlen(setting_val->setting_value), nvs_key_hilink_presence_sensor_predefined_setting))
             {
                 TRACE_E("Failed to write to NVS");
                 ret = 1;
@@ -785,7 +785,7 @@ static int __setting_reset_user_defined_setting(void *arg, l_ezlopi_device_setti
             char *setting_val_str = __prepare_user_defined_setting_str(setting_val);
             if (setting_val_str)
             {
-                if (EZPI_SUCCESS == ezlopi_nvs_write_str(setting_val_str, strlen(setting_val_str), nvs_key_hilink_presence_sensor_userdefined_setting))
+                if (EZPI_SUCCESS == EZPI_core_nvs_write_str(setting_val_str, strlen(setting_val_str), nvs_key_hilink_presence_sensor_userdefined_setting))
                 {
                     TRACE_I("Failed to write to nvs.");
                     ret = 1;
@@ -824,7 +824,7 @@ static int __setting_reset_radar_distance_sensitivity_setting(void *arg, l_ezlop
         if (setting_val)
         {
             setting_val->distance_sensitivity_value = 10;
-            if (EZPI_SUCCESS != ezlopi_nvs_write_int32(setting_val->distance_sensitivity_value, nvs_key_hilink_presence_sensor_radar_distance_sensitivity))
+            if (EZPI_SUCCESS != EZPI_core_nvs_write_int32(setting_val->distance_sensitivity_value, nvs_key_hilink_presence_sensor_radar_distance_sensitivity))
             {
                 TRACE_E("Failed to write to NVS");
                 ret = 1;

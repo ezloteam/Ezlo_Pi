@@ -32,7 +32,7 @@ void ezlopi_cloud_modes_switched(cJSON *cj_request, cJSON *cj_response)
                 // CJSON_ASSIGN_ID(cj_result, curr_mode->current_mode_id, "to");
 
                 // cJSON_AddNumberToObject(__FUNCTION__, cj_result, ezlopi_switchToDelay_str, curr_house_mode->switch_to_delay_sec);
-                // cJSON_AddNumberToObject(__FUNCTION__, cj_result, ezlopi_timestamp_str, EZPI_CORE_sntp_get_current_time_ms());
+                // cJSON_AddNumberToObject(__FUNCTION__, cj_result, ezlopi_timestamp_str, EZPI_core_sntp_get_current_time_ms());
             }
         }
 #endif
@@ -69,7 +69,7 @@ void ezlopi_cloud_modes_alarmed(cJSON *cj_request, cJSON *cj_response)
                 : (EZLOPI_MODES_ALARM_STATUS_CANCELED == curr_mode->alarmed.status) ? cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_status_str, ezlopi_canceled_str)
                 : cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_status_str, ezlopi__str); // none
 
-            cJSON_AddNumberToObject(__FUNCTION__, cj_result, ezlopi_timestamp_str, EZPI_CORE_sntp_get_current_time_ms());
+            cJSON_AddNumberToObject(__FUNCTION__, cj_result, ezlopi_timestamp_str, EZPI_core_sntp_get_current_time_ms());
             cJSON_AddBoolToObject(__FUNCTION__, cj_result, ezlopi_silent_str, curr_mode->alarmed.silent);
             #warning "need to add two-members [soundType & chime]"
         }
@@ -357,7 +357,7 @@ void ezlopi_cloud_modes_changed(cJSON *cj_request, cJSON *cj_response)
                 {
                     CJSON_ASSIGN_ID(cj_result, update_house_mode->_id, ezlopi_modeId_str);
                     cJSON_AddBoolToObject(__FUNCTION__, cj_result, ezlopi_disarmedDefault_str, update_house_mode->disarmed_default);
-                    cJSON_AddNumberToObject(__FUNCTION__, cj_result, ezlopi_timestamp_str, EZPI_CORE_sntp_get_current_time_ms());
+                    cJSON_AddNumberToObject(__FUNCTION__, cj_result, ezlopi_timestamp_str, EZPI_core_sntp_get_current_time_ms());
                 }
             }
         }
@@ -524,7 +524,7 @@ void ezlopi_cloud_modes_entry_delay_changed(cJSON *cj_request, cJSON *cj_respons
                     cJSON_AddNumberToObject(__FUNCTION__, cj_entryDelay, ezlopi_instant_str, curr_mode->entry_delay.instant_delay_sec);
                 }
             }
-            cJSON_AddItemToObject(__FUNCTION__, cj_result, ezlopi_timestamp_str, cJSON_CreateNumber(__FUNCTION__, (double)EZPI_CORE_sntp_get_current_time_ms()));
+            cJSON_AddItemToObject(__FUNCTION__, cj_result, ezlopi_timestamp_str, cJSON_CreateNumber(__FUNCTION__, (double)EZPI_core_sntp_get_current_time_ms()));
         }
     }
 }

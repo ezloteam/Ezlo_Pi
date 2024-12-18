@@ -157,7 +157,7 @@ static void ezpi_prepare_item_properties(l_ezlopi_item_t *item)
     item->cloud_properties.value_type = value_type_temperature;
     item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
 
-    e_enum_temperature_scale_t scale_to_use = ezlopi_core_setting_get_temperature_scale();
+    e_enum_temperature_scale_t scale_to_use = EZPI_core_setting_get_temperature_scale();
     item->cloud_properties.scale = (TEMPERATURE_SCALE_FAHRENHEIT == scale_to_use) ? scales_fahrenheit : scales_celsius;
 
     item->interface.adc.gpio_num = 0;
@@ -217,7 +217,7 @@ static int ezpi_notify(l_ezlopi_item_t *item)
     esp_err_t error = temp_sensor_read_celsius(&system_temperature_current_value);
     if (ESP_OK == error)
     {
-        e_enum_temperature_scale_t scale_to_use = ezlopi_core_setting_get_temperature_scale();
+        e_enum_temperature_scale_t scale_to_use = EZPI_core_setting_get_temperature_scale();
         item->cloud_properties.scale = (TEMPERATURE_SCALE_FAHRENHEIT == scale_to_use) ? scales_fahrenheit : scales_celsius;
 
         if (TEMPERATURE_SCALE_FAHRENHEIT == scale_to_use)

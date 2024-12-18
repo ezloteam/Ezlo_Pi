@@ -41,7 +41,7 @@ void firmware_update_start(cJSON *cj_request, cJSON *cj_response)
 
             if (firmware_url)
             {
-                ezlopi_ota_start(firmware_url);
+                EZPI_core_ota_start(firmware_url);
             }
 
             #warning "Checksum logic is not provided in document, needs to find it and implement it!"
@@ -80,7 +80,7 @@ void firmware_info_get(cJSON *cj_request, cJSON *cj_response)
 
                 if (firmware_url)
                 {
-                    ezlopi_ota_start(firmware_url);
+                    EZPI_core_ota_start(firmware_url);
                 }
 
                 #warning "Checksum logic is not provided in document, needs to find it and implement it!"

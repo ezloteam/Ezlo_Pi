@@ -298,7 +298,7 @@ static void ezpi_process_event(void)
     {
         __indicator_priority = PRIORITY_WIFI;
 #ifdef CONFIG_EZPI_ENABLE_PING
-        e_ping_status_t ping_status = ezlopi_ping_get_internet_status();
+        e_ping_status_t ping_status = EZPI_core_ping_get_internet_status();
 #else  // CONFIG_EZPI_ENABLE_PING
         e_ping_status_t ping_status = EZLOPI_PING_STATUS_UNKNOWN;
 #endif // CONFIG_EZPI_ENABLE_PING

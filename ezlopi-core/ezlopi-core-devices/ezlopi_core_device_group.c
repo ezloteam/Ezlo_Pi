@@ -359,7 +359,7 @@ l_ezlopi_item_grp_t *EZPI_core_item_group_new_itemgrp_populate(cJSON *cj_new_ite
 uint32_t EZPI_core_device_group_find(cJSON *cj_destination_array, cJSON *cj_params)
 {
     int ret = 0;
-    char *devgrp_id_list = ezlopi_nvs_read_device_groups();
+    char *devgrp_id_list = EZPI_core_nvs_read_device_groups();
     if (devgrp_id_list)
     {
         cJSON *cj_devgrp_id_list = cJSON_Parse(__FUNCTION__, devgrp_id_list);
@@ -371,7 +371,7 @@ uint32_t EZPI_core_device_group_find(cJSON *cj_destination_array, cJSON *cj_para
                 char devgrp_id_str[32];
                 snprintf(devgrp_id_str, sizeof(devgrp_id_str), "%08x", (uint32_t)cj_devgrp_id->valuedouble); // convert to "0xc02e00.."
 
-                char *devgrp_str = ezlopi_nvs_read_str(devgrp_id_str); // to exxtract the dev_grp from nvs ; if exists
+                char *devgrp_str = EZPI_core_nvs_read_str(devgrp_id_str); // to exxtract the dev_grp from nvs ; if exists
                 if (devgrp_str)
                 {
                     cJSON *cj_curr_devgrp_node = cJSON_Parse(__FUNCTION__, devgrp_str);
@@ -438,7 +438,7 @@ uint32_t EZPI_core_device_group_devitem_expand(cJSON *cj_destination_array, cJSO
         if (cj_deviceGroupId_param && cj_deviceGroupId_param->valuestring)
         {
             // Get the required device_group from NVS.
-            char *devgrp_str = ezlopi_nvs_read_str(cj_deviceGroupId_param->valuestring);
+            char *devgrp_str = EZPI_core_nvs_read_str(cj_deviceGroupId_param->valuestring);
             if (devgrp_str)
             {
                 cJSON *cj_curr_devgrp_node = cJSON_Parse(__FUNCTION__, devgrp_str);
@@ -467,7 +467,7 @@ uint32_t EZPI_core_device_group_devitem_expand(cJSON *cj_destination_array, cJSO
 void EZPI_device_group_init(void)
 {
     // __remove_residue_ids_from_list(DEVICE_GROUP_SELECTED);
-    char *devgrp_id_list_str = ezlopi_nvs_read_device_groups();
+    char *devgrp_id_list_str = EZPI_core_nvs_read_device_groups();
     if (devgrp_id_list_str)
     {
         TRACE_D("devGrp_id_list_str : %s", devgrp_id_list_str);
@@ -486,7 +486,7 @@ void EZPI_device_group_init(void)
                     snprintf(tmp_buffer, sizeof(tmp_buffer), "%08x", tmp_devgrp_id);
                     EZPI_core_cloud_update_device_group_id((uint32_t)tmp_devgrp_id);
 
-                    char *devgrp_str = ezlopi_nvs_read_str(tmp_buffer);
+                    char *devgrp_str = EZPI_core_nvs_read_str(tmp_buffer);
                     if (devgrp_str)
                     {
                         cJSON *cj_devgrp = cJSON_Parse(__FUNCTION__, devgrp_str);
@@ -515,7 +515,7 @@ void EZPI_device_group_init(void)
 void EZPI_item_group_init(void)
 {
     // __remove_residue_ids_from_list(ITEM_GROUP_SELECTED);
-    char *itemgrp_id_list_str = ezlopi_nvs_read_item_groups();
+    char *itemgrp_id_list_str = EZPI_core_nvs_read_item_groups();
     if (itemgrp_id_list_str)
     {
         TRACE_D("itemGrp_id_list_str : %s", itemgrp_id_list_str);
@@ -534,7 +534,7 @@ void EZPI_item_group_init(void)
                     snprintf(tmp_buffer, sizeof(tmp_buffer), "%08x", tmp_itemgrp_id);
                     EZPI_core_cloud_update_item_group_id((uint32_t)tmp_itemgrp_id);
 
-                    char *itemgrp_str = ezlopi_nvs_read_str(tmp_buffer);
+                    char *itemgrp_str = EZPI_core_nvs_read_str(tmp_buffer);
                     if (itemgrp_str)
                     {
                         cJSON *cj_itemgrp = cJSON_Parse(__FUNCTION__, itemgrp_str);
@@ -912,8 +912,8 @@ static ezlopi_error_t __edit_group_and_store_updated_to_nvs(uint32_t _id, cJSON 
 
         if (update_grp_str)
         {
-            ezlopi_nvs_delete_stored_data_by_name(grp_id_str);                              // delete --> '0x0..grp ' : '{}'
-            ret = ezlopi_nvs_write_str(update_grp_str, strlen(update_grp_str), grp_id_str); // write --> '0x0..grp ' : '{}'
+            EZPI_core_nvs_delete_stored_data_by_name(grp_id_str);                              // delete --> '0x0..grp ' : '{}'
+            ret = EZPI_core_nvs_write_str(update_grp_str, strlen(update_grp_str), grp_id_str); // write --> '0x0..grp ' : '{}'
 
             ezlopi_free(__FUNCTION__, update_grp_str);
         }
@@ -1251,7 +1251,7 @@ static l_ezlopi_item_grp_t *__item_group_populate(cJSON *cj_item_grp, uint32_t i
 //----------------------------------------------------------------------------------------------------------------------------------
 static void ____remove_id_from_group_list(uint32_t _id, bool choice_of_trigger)
 {
-    char *grp_id_list = (choice_of_trigger) ? ezlopi_nvs_read_item_groups() : ezlopi_nvs_read_device_groups();
+    char *grp_id_list = (choice_of_trigger) ? EZPI_core_nvs_read_item_groups() : EZPI_core_nvs_read_device_groups();
     if (grp_id_list)
     {
         cJSON *cj_grp_id_list = cJSON_Parse(__FUNCTION__, grp_id_list);
@@ -1275,7 +1275,7 @@ static void ____remove_id_from_group_list(uint32_t _id, bool choice_of_trigger)
 
             if (updated_grp_id_list_str)
             {
-                (choice_of_trigger) ? ezlopi_nvs_write_item_groups(updated_grp_id_list_str) : ezlopi_nvs_write_device_groups(updated_grp_id_list_str);
+                (choice_of_trigger) ? EZPI_core_nvs_write_item_groups(updated_grp_id_list_str) : EZPI_core_nvs_write_device_groups(updated_grp_id_list_str);
                 ezlopi_free(__FUNCTION__, updated_grp_id_list_str);
             }
 
@@ -1288,7 +1288,7 @@ static void ____remove_id_from_group_list(uint32_t _id, bool choice_of_trigger)
 static uint32_t __grp_get_list(cJSON *cj_grp_array, bool choice_of_trigger)
 {
     uint32_t ret = 0;
-    char *grp_id_list = (choice_of_trigger) ? ezlopi_nvs_read_item_groups() : ezlopi_nvs_read_device_groups();
+    char *grp_id_list = (choice_of_trigger) ? EZPI_core_nvs_read_item_groups() : EZPI_core_nvs_read_device_groups();
     if (grp_id_list)
     {
         cJSON *cj_grp_id_list = cJSON_Parse(__FUNCTION__, grp_id_list);
@@ -1303,7 +1303,7 @@ static uint32_t __grp_get_list(cJSON *cj_grp_array, bool choice_of_trigger)
                 {
                     char grp_id_str[32];
                     snprintf(grp_id_str, sizeof(grp_id_str), "%08x", (uint32_t)cj_grp_id->valuedouble);
-                    char *grp_str = ezlopi_nvs_read_str(grp_id_str);
+                    char *grp_str = EZPI_core_nvs_read_str(grp_id_str);
                     if (grp_str)
                     {
                         cJSON *cj_grp_node = cJSON_Parse(__FUNCTION__, grp_str);
@@ -1351,10 +1351,10 @@ static uint32_t __store_new_grp_in_nvs(cJSON *cj_new_grp, bool choice_of_trigger
 
         if (new_grp_str)
         {
-            if (EZPI_SUCCESS == ezlopi_nvs_write_str(new_grp_str, strlen(new_grp_str) + 1, grp_id_str)) // writes to nvs as --> '0xC002e....'
+            if (EZPI_SUCCESS == EZPI_core_nvs_write_str(new_grp_str, strlen(new_grp_str) + 1, grp_id_str)) // writes to nvs as --> '0xC002e....'
             {
                 bool free_Grp_id_list_str = 1;
-                char *grp_id_list_str = (choice_of_trigger) ? ezlopi_nvs_read_item_groups() : ezlopi_nvs_read_device_groups();
+                char *grp_id_list_str = (choice_of_trigger) ? EZPI_core_nvs_read_item_groups() : EZPI_core_nvs_read_device_groups();
                 if (NULL == grp_id_list_str)
                 {
                     grp_id_list_str = "[]";
@@ -1371,7 +1371,7 @@ static uint32_t __store_new_grp_in_nvs(cJSON *cj_new_grp, bool choice_of_trigger
                         if (!cJSON_AddItemToArray(cj_grp_id_list, cj_grp_id_str))
                         { // if 'new_grp_id' doesnot exist, then erase the falsly store 'new_grp_str' in nvs.
                             cJSON_Delete(__FUNCTION__, cj_grp_id_str);
-                            ezlopi_nvs_delete_stored_data_by_id(new_grp_id);
+                            EZPI_core_nvs_delete_stored_data_by_id(new_grp_id);
                             new_grp_id = 0;
                         }
                         else
@@ -1382,7 +1382,7 @@ static uint32_t __store_new_grp_in_nvs(cJSON *cj_new_grp, bool choice_of_trigger
                             if (updated_grp_id_list_str)
                             {
                                 TRACE_D("updated_grp_id_list_str: %s", updated_grp_id_list_str);
-                                if ((choice_of_trigger) ? ezlopi_nvs_write_item_groups(updated_grp_id_list_str) : ezlopi_nvs_write_device_groups(updated_grp_id_list_str))
+                                if ((choice_of_trigger) ? EZPI_core_nvs_write_item_groups(updated_grp_id_list_str) : EZPI_core_nvs_write_device_groups(updated_grp_id_list_str))
                                 {
                                     TRACE_S("Group list updated.");
                                 }
@@ -1767,7 +1767,7 @@ static void __remove_residue_ids_from_list(bool choice_of_trigger)
             grp_list_has_residue = false;
         }
 
-        list_ptr = (choice_of_trigger) ? ezlopi_nvs_read_item_groups() : ezlopi_nvs_read_device_groups();
+        list_ptr = (choice_of_trigger) ? EZPI_core_nvs_read_item_groups() : EZPI_core_nvs_read_device_groups();
         if (list_ptr)
         {
             cJSON *cj_id_list = cJSON_Parse(__FUNCTION__, list_ptr);
@@ -1782,7 +1782,7 @@ static void __remove_residue_ids_from_list(bool choice_of_trigger)
                         char tmp_buffer[32];
                         snprintf(tmp_buffer, sizeof(tmp_buffer), "%08x", (uint32_t)cj_id->valuedouble);
 
-                        if (NULL == ezlopi_nvs_read_str(tmp_buffer))
+                        if (NULL == EZPI_core_nvs_read_str(tmp_buffer))
                         {
                             residue_nvs_grp_id = (uint32_t)cj_id->valuedouble; // A residue_id is found..
                             grp_list_has_residue = true;                       // this will trigger a removal of "invalid_nvs_devgrp_id" .

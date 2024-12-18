@@ -308,7 +308,7 @@ static void ezpi_service_ble_ezlopi_fmw_info(esp_gatt_value_t *value, esp_ble_ga
             char build_time[64];
             cJSON_AddStringToObject(__FUNCTION__, cj_firmware_info, ezlopi_version_str, VERSION_STR);
             cJSON_AddNumberToObject(__FUNCTION__, cj_firmware_info, ezlopi_build_str, BUILD);
-            EZPI_CORE_sntp_epoch_to_iso8601(build_time, sizeof(build_time), (time_t)BUILD_DATE);
+            EZPI_core_sntp_epoch_to_iso8601(build_time, sizeof(build_time), (time_t)BUILD_DATE);
             cJSON_AddStringToObject(__FUNCTION__, cj_firmware_info, ezlopi_build_date_str, build_time);
 
             ble_device_info_send_data(cj_firmware_info, value, param);
@@ -564,7 +564,7 @@ static void ezpi_service_ble_serial_config_write(esp_gatt_value_t *value, esp_bl
 
                     TRACE_W("New config has been saved, reboot needed to apply changes.");
                     vTaskDelay(10);
-                    // EZPI_CORE_reset_reboot();
+                    // EZPI_core_reset_reboot();
                 }
                 else
                 {
@@ -695,7 +695,7 @@ static void ezpi_service_ble_net_info(esp_gatt_value_t *value, esp_ble_gatts_cb_
                 bool cloud_connection_status = (EZLOPI_EVENT_NMA_REG & events) == EZLOPI_EVENT_NMA_REG;
 
 #ifdef CONFIG_EZPI_ENABLE_PING
-                e_ping_status_t ping_status = ezlopi_ping_get_internet_status();
+                e_ping_status_t ping_status = EZPI_core_ping_get_internet_status();
                 cJSON_AddBoolToObject(__FUNCTION__, cj_network, ezlopi_internet_str, ping_status == EZLOPI_PING_STATUS_LIVE);
 #else  // CONFIG_EZPI_ENABLE_PING
                 cJSON_AddBoolToObject(__FUNCTION__, cj_network, ezlopi_internet_str, cloud_connection_status);
@@ -801,7 +801,7 @@ static char *ezpi_device_info_jsonify(void)
 
         cJSON_AddNumberToObject(__FUNCTION__, root, ezlopi_wifi_connection_status_str, ezlopi_wifi_got_ip());
 #ifdef CONFIG_EZPI_ENABLE_PING
-        uint8_t flag_internet_status = (EZLOPI_PING_STATUS_LIVE == ezlopi_ping_get_internet_status()) ? 1 : 0;
+        uint8_t flag_internet_status = (EZLOPI_PING_STATUS_LIVE == EZPI_core_ping_get_internet_status()) ? 1 : 0;
 #else  // CONFIG_EZPI_ENABLE_PING
         e_ezlopi_event_t events = ezlopi_core_event_group_get_eventbit_status();
         bool cloud_connection_status = (EZLOPI_EVENT_NMA_REG & events) == EZLOPI_EVENT_NMA_REG;

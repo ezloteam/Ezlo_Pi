@@ -1,6 +1,7 @@
+file(GLOB_RECURSE config_src "*.c")
 
 
-idf_component_register(SRCS "ezlopi_core_setting_commands.c"
+idf_component_register(SRCS "${config_src}"
                         INCLUDE_DIRS .
                         REQUIRES    ezlopi-util-trace 
                                     cjext

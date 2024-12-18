@@ -580,7 +580,7 @@ static void ezpi_provision_check(void *pv)
 
                         if (_update_ret > 0)
                         {
-                            EZPI_CORE_reset_reboot();
+                            EZPI_core_reset_reboot();
                         }
                         else if (_update_ret < 0)
                         {

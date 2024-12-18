@@ -223,11 +223,11 @@ ezlopi_error_t EZPI_core_send_cloud_log(int severity, const char *log_str)
                 cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_log_broadcast, ezlopi_result_str);
                 if (cj_result)
                 {
-                    uint64_t timestamp = EZPI_CORE_sntp_get_current_time_sec();
+                    uint64_t timestamp = EZPI_core_sntp_get_current_time_sec();
 
                     char timestamp_str[64];
 
-                    EZPI_CORE_sntp_epoch_to_iso8601(timestamp_str, sizeof(timestamp_str), (time_t)timestamp);
+                    EZPI_core_sntp_epoch_to_iso8601(timestamp_str, sizeof(timestamp_str), (time_t)timestamp);
 
                     size_t total_len = sizeof(timestamp_str) + strlen(log_str) + 2;
                     char message[total_len];

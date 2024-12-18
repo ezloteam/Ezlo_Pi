@@ -196,7 +196,7 @@ static ezlopi_error_t __settings_set(void *arg, l_ezlopi_device_settings_v3_t *s
             s_digio_settings_t *settings_data = (s_digio_settings_t *)setting->user_arg;
             settings_data->settings_int_data = value;
 
-            if (EZPI_SUCCESS != ezlopi_nvs_write_int32(value, nvs_key_backlight_brightness))
+            if (EZPI_SUCCESS != EZPI_core_nvs_write_int32(value, nvs_key_backlight_brightness))
             {
                 TRACE_E("Error Updating settings values to NVS");
             }
@@ -217,7 +217,7 @@ static ezlopi_error_t __settings_reset(void *arg, l_ezlopi_device_settings_v3_t 
         s_digio_settings_t *settings_data = (s_digio_settings_t *)setting->user_arg;
         settings_data->settings_int_data = 50; // 50 being default value
 
-        if (EZPI_SUCCESS != ezlopi_nvs_write_int32(settings_data->settings_int_data, nvs_key_backlight_brightness))
+        if (EZPI_SUCCESS != EZPI_core_nvs_write_int32(settings_data->settings_int_data, nvs_key_backlight_brightness))
         {
             TRACE_E("Error Updating settings values to NVS");
             error = EZPI_FAILED;
@@ -340,13 +340,13 @@ static ezlopi_error_t __prepare(void *arg)
                     s_digio_settings_t *settings_value = (s_digio_settings_t *)ezlopi_malloc(__FUNCTION__, sizeof(s_digio_settings_t));
                     memset(settings_value, 0, sizeof(s_digio_settings_t));
 
-                    if (EZPI_SUCCESS == ezlopi_nvs_read_int32(&settings_value->settings_int_data, nvs_key_backlight_brightness))
+                    if (EZPI_SUCCESS == EZPI_core_nvs_read_int32(&settings_value->settings_int_data, nvs_key_backlight_brightness))
                     {
                     }
                     else
                     {
                         settings_value->settings_int_data = 50;
-                        if (EZPI_SUCCESS != ezlopi_nvs_write_int32(settings_value->settings_int_data, nvs_key_backlight_brightness))
+                        if (EZPI_SUCCESS != EZPI_core_nvs_write_int32(settings_value->settings_int_data, nvs_key_backlight_brightness))
                         {
                             TRACE_E("Error Updating settings values to NVS");
                         }

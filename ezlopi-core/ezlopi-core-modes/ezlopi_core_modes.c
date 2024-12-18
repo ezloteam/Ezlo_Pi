@@ -965,7 +965,7 @@ ezlopi_error_t EZPI_core_modes_store_to_nvs(void)
 
         if (modes_str)
         {
-            ret = ezlopi_nvs_write_modes(modes_str);
+            ret = EZPI_core_nvs_write_modes(modes_str);
             ezlopi_free(__FUNCTION__, modes_str);
         }
     }
@@ -976,7 +976,7 @@ ezlopi_error_t EZPI_core_modes_store_to_nvs(void)
 void EZPI_core_modes_init(void)
 {
     uint32_t _is_custom_mode_ok = 0;
-    char *custom_modes_str = ezlopi_nvs_read_modes();
+    char *custom_modes_str = EZPI_core_nvs_read_modes();
 
     if (custom_modes_str)
     {

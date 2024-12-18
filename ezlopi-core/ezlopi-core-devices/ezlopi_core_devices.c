@@ -370,7 +370,7 @@ l_ezlopi_device_t *EZPI_core_device_add_device(cJSON *cj_device, const char *las
             char __device_id_str[32];
             snprintf(__device_id_str, sizeof(__device_id_str), "%08x", new_device->cloud_properties.device_id); // convert (uint32_t) to ('0x1002e001')
 
-            char *device_mod_str = ezlopi_nvs_read_str(__device_id_str); // use 'device_id' generated after parent/child-categorization.
+            char *device_mod_str = EZPI_core_nvs_read_str(__device_id_str); // use 'device_id' generated after parent/child-categorization.
             if (device_mod_str)
             {
                 cJSON *cj_target_dev_mod = cJSON_Parse(__FUNCTION__, device_mod_str);
@@ -609,7 +609,7 @@ void EZPI_device_prepare(void)
                     TRACE_D("added-chipset: %s", tmp_str);
                     vTaskDelay(1000);
                     free(tmp_str);
-                    EZPI_CORE_reset_reboot();
+                    EZPI_core_reset_reboot();
                 }
             }
             else
@@ -950,7 +950,7 @@ static int ____store_bool_in_nvs_dev_mod_info(uint32_t nvs_device_id, const char
     char __device_id_str[32];
     snprintf(__device_id_str, sizeof(__device_id_str), "%08x", nvs_device_id); // convert (uint32_t) to ('0x1002e001')
 
-    char *device_mod_str = ezlopi_nvs_read_str(__device_id_str);
+    char *device_mod_str = EZPI_core_nvs_read_str(__device_id_str);
     if (device_mod_str)
     {
         cJSON *cj_target_dev_mod = cJSON_Parse(__FUNCTION__, device_mod_str);
@@ -974,7 +974,7 @@ static int ____store_bool_in_nvs_dev_mod_info(uint32_t nvs_device_id, const char
 
             if (updated_target_dev_mod_str)
             {
-                if (EZPI_SUCCESS == ezlopi_nvs_write_str(updated_target_dev_mod_str, strlen(updated_target_dev_mod_str), (const char *)__device_id_str))
+                if (EZPI_SUCCESS == EZPI_core_nvs_write_str(updated_target_dev_mod_str, strlen(updated_target_dev_mod_str), (const char *)__device_id_str))
                 {
                     TRACE_S("Device_modification info updated.");
                     ret = 1;
@@ -1006,7 +1006,7 @@ static int ____store_bool_in_nvs_dev_mod_info(uint32_t nvs_device_id, const char
 
             if (new_dev_mod_str)
             {
-                if (EZPI_SUCCESS == ezlopi_nvs_write_str(new_dev_mod_str, strlen(new_dev_mod_str), (const char *)__device_id_str))
+                if (EZPI_SUCCESS == EZPI_core_nvs_write_str(new_dev_mod_str, strlen(new_dev_mod_str), (const char *)__device_id_str))
                 {
                     TRACE_S("New Device_modification info stored.");
                     ret = 1;
@@ -1030,7 +1030,7 @@ static int ____store_string_in_nvs_dev_mod_info(uint32_t nvs_device_id, const ch
     char __device_id_str[32];
     snprintf(__device_id_str, sizeof(__device_id_str), "%08x", nvs_device_id); // convert (uint32_t) to ('0x1002e001')
 
-    char *device_mod_str = ezlopi_nvs_read_str(__device_id_str);
+    char *device_mod_str = EZPI_core_nvs_read_str(__device_id_str);
     if (device_mod_str)
     {
         cJSON *cj_target_dev_mod = cJSON_Parse(__FUNCTION__, device_mod_str);
@@ -1054,7 +1054,7 @@ static int ____store_string_in_nvs_dev_mod_info(uint32_t nvs_device_id, const ch
 
             if (updated_target_dev_mod_str)
             {
-                if (EZPI_SUCCESS == ezlopi_nvs_write_str(updated_target_dev_mod_str, strlen(updated_target_dev_mod_str), (const char *)__device_id_str))
+                if (EZPI_SUCCESS == EZPI_core_nvs_write_str(updated_target_dev_mod_str, strlen(updated_target_dev_mod_str), (const char *)__device_id_str))
                 {
                     TRACE_S("Device_modification info updated.");
                     ret = 1;
@@ -1087,7 +1087,7 @@ static int ____store_string_in_nvs_dev_mod_info(uint32_t nvs_device_id, const ch
 
             if (new_dev_mod_str)
             {
-                if (EZPI_SUCCESS == ezlopi_nvs_write_str(new_dev_mod_str, strlen(new_dev_mod_str), (const char *)__device_id_str))
+                if (EZPI_SUCCESS == EZPI_core_nvs_write_str(new_dev_mod_str, strlen(new_dev_mod_str), (const char *)__device_id_str))
                 {
                     TRACE_S("New Device_modification info stored.");
                     ret = 1;

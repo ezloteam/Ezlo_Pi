@@ -207,7 +207,7 @@ void items_update_v3(cJSON *cj_request, cJSON *cj_response)
                         cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_deviceCategory_str, curr_device->cloud_properties.category);
                         cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_deviceSubcategory_str, curr_device->cloud_properties.subcategory);
 
-                        char *room_name = ezlopi_core_room_get_name_by_id(curr_device->cloud_properties.room_id);
+                        char *room_name = EZPI_core_room_get_name_by_id(curr_device->cloud_properties.room_id);
                         if (room_name)
                         {
                             cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_roomName_str, room_name);

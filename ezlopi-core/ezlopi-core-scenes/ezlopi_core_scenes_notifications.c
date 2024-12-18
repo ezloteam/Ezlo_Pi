@@ -90,7 +90,7 @@ void EZPI_scenes_notifications_add(cJSON *cj_notifications)
 
         if (cj_scene_id && cj_scene_id->valuestring && cj_user_id && cj_user_id->valuestring)
         {
-            char *scene_str = ezlopi_nvs_read_str(cj_scene_id->valuestring);
+            char *scene_str = EZPI_core_nvs_read_str(cj_scene_id->valuestring);
             if (scene_str)
             {
                 cJSON *cj_scene = cJSON_Parse(__FUNCTION__, scene_str);
@@ -112,7 +112,7 @@ void EZPI_scenes_notifications_add(cJSON *cj_notifications)
 
                     if (updated_scene_str)
                     {
-                        ezlopi_nvs_write_str(updated_scene_str, strlen(updated_scene_str), cj_scene_id->valuestring);
+                        EZPI_core_nvs_write_str(updated_scene_str, strlen(updated_scene_str), cj_scene_id->valuestring);
                         ezlopi_free(__FUNCTION__, updated_scene_str);
                     }
                 }

@@ -241,7 +241,7 @@ static void __message_upcall(httpd_req_t *req, const char *payload, uint32_t pay
     cJSON *cj_sender = NULL;
     cJSON *cj_method = NULL;
 
-    if (!is_user_logged_in())
+    if (!EZPI_core_offline_is_user_logged_in())
     {
         cj_request = cJSON_ParseWithLength(__FUNCTION__, payload, payload_len);
         if (cj_request)
@@ -378,7 +378,7 @@ static esp_err_t ezpi_msg_handler(httpd_req_t *req)
                 {
                     TRACE_D("closing connection!");
                     EZPI_service_ws_server_clients_remove_by_handle(req->handle);
-                    ezlopi_core_offline_logout_perform();
+                    EZPI_core_offline_logout_perform();
                 }
                 else if (0 < ws_pkt.len)
                 {
@@ -406,7 +406,7 @@ static esp_err_t ezpi_msg_handler(httpd_req_t *req)
                             {
                                 TRACE_D("closing connection!");
                                 EZPI_service_ws_server_clients_remove_by_handle(req->handle);
-                                ezlopi_core_offline_logout_perform();
+                                EZPI_core_offline_logout_perform();
                             }
                             else
                             {
@@ -578,7 +578,7 @@ static ezlopi_error_t ezpi_ws_server_send(l_ws_server_client_conn_t *client, cha
             {
                 TRACE_E("fail count reached maximum!");
                 EZPI_service_ws_server_clients_remove_by_handle(client->http_handle);
-                ezlopi_core_offline_logout_perform();
+                EZPI_core_offline_logout_perform();
             }
         }
     }

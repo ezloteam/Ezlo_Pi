@@ -186,7 +186,7 @@ static void ezpi_dynamic_config_write_func(esp_gatt_value_t *value, esp_ble_gatt
                                 {
                                     // TRACE_W("Restarting .....");
                                     // vTaskDelay(1000 / portTICK_PERIOD_MS);
-                                    // EZPI_CORE_reset_reboot();
+                                    // EZPI_core_reset_reboot();
                                 }
                                 cJSON_Delete(__FUNCTION__, cjson_config);
                             }
