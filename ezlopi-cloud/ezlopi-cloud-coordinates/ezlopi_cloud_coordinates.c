@@ -12,12 +12,12 @@
 static double sg_latitude;
 static double sg_longitude;
 
-void hub_coordinates_set(cJSON *cj_request, cJSON *cj_response)
+void hub_coordinates_set(cJSON* cj_request, cJSON* cj_response)
 {
     cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     if (cj_request)
     {
-        cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
+        cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
         if (cj_params)
         {
             CJSON_GET_VALUE_DOUBLE(cj_params, ezlopi_latitude_str, sg_latitude);
@@ -32,9 +32,9 @@ void hub_coordinates_set(cJSON *cj_request, cJSON *cj_response)
     }
 }
 
-void hub_coordinates_get(cJSON *cj_request, cJSON *cj_response)
+void hub_coordinates_get(cJSON* cj_request, cJSON* cj_response)
 {
-    char *lat_long_vals = ezlopi_nvs_read_latidtude_longitude();
+    char* lat_long_vals = ezlopi_nvs_read_latidtude_longitude();
     if (lat_long_vals)
     {
         cJSON_AddRawToObject(__FUNCTION__, cj_response, ezlopi_result_str, lat_long_vals);

@@ -22,42 +22,42 @@
 
 typedef struct s_otel_queue_data
 {
-    cJSON *cj_data;
+    cJSON* cj_data;
     e_otel_type_t type;
 } s_otel_queue_data_t;
 
 static QueueHandle_t __telemetry_queue = NULL;
 static esp_websocket_client_handle_t __wss_client = NULL;
 // static const char *__ot_logs_endpoint = "wss://ot.review-staging-op-owkix8.ewr4.opentelemetry.ezlo.com/traces";
-static const char *__ot_logs_endpoint = "wss://ot.review-staging-op-owkix8.ewr4.opentelemetry.ezlo.com/multi";
+static const char* __ot_logs_endpoint = "wss://ot.review-staging-op-owkix8.ewr4.opentelemetry.ezlo.com/multi";
 
-static void __otel_task(void *pv);
-static void __otel_publish(cJSON *cj_telemetry);
+static void __otel_task(void* pv);
+static void __otel_publish(cJSON* cj_telemetry);
 static void __connection_upcall(bool connected);
-static void __fill_random_hexstring(char *buffer, uint32_t bytelen);
-static int __message_upcall(char *payload, uint32_t len, time_t time_sec);
+static void __fill_random_hexstring(char* buffer, uint32_t bytelen);
+static int __message_upcall(char* payload, uint32_t len, time_t time_sec);
 
-static void __otel_add_scope(cJSON *cj_root);
-static cJSON *__otel_create_value(cJSON *cj_value_field);
-static cJSON *__otel_create_attribute(cJSON *cj_attr);
-static void __otel_add_time_stamp_nano(cJSON *cj_root, const char *add_key, const char *for_key, cJSON *cj_trace_info);
-static void __cjson_detach_and_add(cJSON *cj_destination, const char *add_key, const char *for_key_str, cJSON *cj_source);
-static cJSON *__otel_create_span(cJSON *cj_trace_info);
-static void __otel_add_resource(cJSON *cj_resourceLog);
-static cJSON *__otel_trace_decorate(cJSON *cj_traces_info);
-static cJSON *__otel_logs_decorate(cJSON *cj_logs_info);
-static int __push_to_telemetry_queue(s_otel_queue_data_t *otel_data);
-static void __otel_add_severity_number(cJSON *cj_root, e_trace_severity_t severity);
-static int __otel_add_log_to_queue(uint8_t severity, const char *file, uint32_t line, char *log);
+static void __otel_add_scope(cJSON* cj_root);
+static cJSON* __otel_create_value(cJSON* cj_value_field);
+static cJSON* __otel_create_attribute(cJSON* cj_attr);
+static void __otel_add_time_stamp_nano(cJSON* cj_root, const char* add_key, const char* for_key, cJSON* cj_trace_info);
+static void __cjson_detach_and_add(cJSON* cj_destination, const char* add_key, const char* for_key_str, cJSON* cj_source);
+static cJSON* __otel_create_span(cJSON* cj_trace_info);
+static void __otel_add_resource(cJSON* cj_resourceLog);
+static cJSON* __otel_trace_decorate(cJSON* cj_traces_info);
+static cJSON* __otel_logs_decorate(cJSON* cj_logs_info);
+static int __push_to_telemetry_queue(s_otel_queue_data_t* otel_data);
+static void __otel_add_severity_number(cJSON* cj_root, e_trace_severity_t severity);
+static int __otel_add_log_to_queue(uint8_t severity, const char* file, uint32_t line, char* log);
 
-int ezlopi_service_otel_add_trace_to_telemetry_queue(cJSON *cj_trace)
+int ezlopi_service_otel_add_trace_to_telemetry_queue(cJSON* cj_trace)
 {
     int ret = 0;
 
 #if 1
     if (cj_trace)
     {
-        s_otel_queue_data_t *otel_data = ezlopi_malloc(__FUNCTION__, sizeof(s_otel_queue_data_t));
+        s_otel_queue_data_t* otel_data = ezlopi_malloc(__FUNCTION__, sizeof(s_otel_queue_data_t));
         if (otel_data)
         {
             otel_data->cj_data = cj_trace;
@@ -78,16 +78,16 @@ void ezlopi_service_otel_init(void)
 {
     bootloader_random_enable();
     ezlopi_util_set_otel_log_upcall(__otel_add_log_to_queue, 100);
-    __telemetry_queue = xQueueCreate(10, sizeof(s_otel_queue_data_t *));
+    __telemetry_queue = xQueueCreate(10, sizeof(s_otel_queue_data_t*));
     xTaskCreate(__otel_task, "otel-service-task", 2 * 2048, NULL, 4, NULL);
 }
 
 #if 0
-static void __otel_test_loop(void *pv)
+static void __otel_test_loop(void* pv)
 {
 #if 0 // test otel-trace
     printf("otel-test-loop\r\n");
-    s_otel_queue_data_t *otel_data = ezlopi_malloc(__FUNCTION__, sizeof(s_otel_queue_data_t));
+    s_otel_queue_data_t* otel_data = ezlopi_malloc(__FUNCTION__, sizeof(s_otel_queue_data_t));
     if (otel_data)
     {
         otel_data->type = E_OTEL_TRACES;
@@ -104,17 +104,17 @@ static void __otel_test_loop(void *pv)
 
         01910017521830
 
-        if (pdFALSE == xQueueSend(__telemetry_queue, &otel_data, 0))
-        {
-            cJSON_Delete(__FUNCTION__, otel_data->cj_data);
-            ezlopi_free(__FUNCTION__, otel_data);
-        }
+            if (pdFALSE == xQueueSend(__telemetry_queue, &otel_data, 0))
+            {
+                cJSON_Delete(__FUNCTION__, otel_data->cj_data);
+                ezlopi_free(__FUNCTION__, otel_data);
+            }
     }
 #endif
 
 #if 0 // test otel-logs
     printf("otel-test-loop\r\n");
-    s_otel_queue_data_t *otel_data = ezlopi_malloc(__FUNCTION__, sizeof(s_otel_queue_data_t));
+    s_otel_queue_data_t* otel_data = ezlopi_malloc(__FUNCTION__, sizeof(s_otel_queue_data_t));
     if (otel_data)
     {
         otel_data->type = E_OTEL_LOGS;
@@ -142,13 +142,13 @@ static void __otel_test_loop(void *pv)
 }
 #endif
 
-static void __otel_loop(void *pv)
+static void __otel_loop(void* pv)
 {
     if (EZPI_SUCCESS == ezlopi_wait_for_wifi_to_connect(0))
     {
         if (true == ezlopi_websocket_client_is_connected(__wss_client))
         {
-            s_otel_queue_data_t *otel_data = NULL;
+            s_otel_queue_data_t* otel_data = NULL;
             xQueueReceive(__telemetry_queue, &otel_data, 0);
 
             if (otel_data)
@@ -157,7 +157,7 @@ static void __otel_loop(void *pv)
                 {
                     if (true == ezlopi_websocket_client_is_connected(__wss_client))
                     {
-                        cJSON *cj_telemetry = NULL;
+                        cJSON* cj_telemetry = NULL;
 
                         switch (otel_data->type)
                         {
@@ -197,12 +197,12 @@ static void __otel_loop(void *pv)
     }
 }
 
-static void __otel_publish(cJSON *cj_telemetry)
+static void __otel_publish(cJSON* cj_telemetry)
 {
     if (__wss_client && ezlopi_websocket_client_is_connected(__wss_client) && cj_telemetry)
     {
         uint32_t buffer_len = 0;
-        char *buffer = ezlopi_core_buffer_acquire(__FUNCTION__, &buffer_len, 2000);
+        char* buffer = ezlopi_core_buffer_acquire(__FUNCTION__, &buffer_len, 2000);
         if (buffer)
         {
             uint32_t rertries = 3;
@@ -223,13 +223,13 @@ static void __otel_publish(cJSON *cj_telemetry)
     }
 }
 
-static int __otel_add_log_to_queue(uint8_t severity, const char *file, uint32_t line, char *log)
+static int __otel_add_log_to_queue(uint8_t severity, const char* file, uint32_t line, char* log)
 {
     int ret = 0;
     time_t time_now;
     time(&time_now);
 
-    s_otel_queue_data_t *otel_data = ezlopi_malloc(__FUNCTION__, sizeof(s_otel_queue_data_t));
+    s_otel_queue_data_t* otel_data = ezlopi_malloc(__FUNCTION__, sizeof(s_otel_queue_data_t));
     if (otel_data)
     {
         otel_data->type = E_OTEL_LOGS;
@@ -254,12 +254,12 @@ static int __otel_add_log_to_queue(uint8_t severity, const char *file, uint32_t 
     return ret;
 }
 
-static void __otel_task(void *pv)
+static void __otel_task(void* pv)
 {
     ezlopi_wait_for_wifi_to_connect(portTICK_RATE_MS);
     TRACE_D("Starting otel-service");
 
-    cJSON *cjson_uri = cJSON_CreateString(__FUNCTION__, __ot_logs_endpoint);
+    cJSON* cjson_uri = cJSON_CreateString(__FUNCTION__, __ot_logs_endpoint);
     if (cjson_uri)
     {
         TRACE_D("uri: %.*s", cjson_uri->str_value_len, cjson_uri->valuestring);
@@ -267,7 +267,7 @@ static void __otel_task(void *pv)
         while (1)
         {
             __wss_client = ezlopi_websocket_client_init(cjson_uri, __message_upcall, __connection_upcall,
-                                                        NULL, NULL, NULL);
+                NULL, NULL, NULL);
             if (NULL != __wss_client)
             {
                 break;
@@ -284,7 +284,7 @@ static void __otel_task(void *pv)
     vTaskDelete(NULL);
 }
 
-static int __message_upcall(char *payload, uint32_t len, time_t time_sec)
+static int __message_upcall(char* payload, uint32_t len, time_t time_sec)
 {
     int ret = 0;
 #if 0
@@ -322,34 +322,34 @@ static void __connection_upcall(bool connected)
     }
 }
 
-static cJSON *__otel_trace_decorate(cJSON *cj_traces_info)
+static cJSON* __otel_trace_decorate(cJSON* cj_traces_info)
 {
-    cJSON *cj_traceRecord = cJSON_CreateObject(__FUNCTION__);
+    cJSON* cj_traceRecord = cJSON_CreateObject(__FUNCTION__);
     if (cj_traceRecord)
     {
         cJSON_AddStringToObject(__FUNCTION__, cj_traceRecord, "type", "trace");
-        cJSON *cj_request = cJSON_AddObjectToObject(__FUNCTION__, cj_traceRecord, "request");
+        cJSON* cj_request = cJSON_AddObjectToObject(__FUNCTION__, cj_traceRecord, "request");
         {
-            cJSON *cj_resourceSpans = cJSON_AddArrayToObject(__FUNCTION__, cj_request, ezlopi_resourceSpans_str);
+            cJSON* cj_resourceSpans = cJSON_AddArrayToObject(__FUNCTION__, cj_request, ezlopi_resourceSpans_str);
             if (cj_resourceSpans)
             {
-                cJSON *cj_resourceSpan = cJSON_CreateObject(__FUNCTION__);
+                cJSON* cj_resourceSpan = cJSON_CreateObject(__FUNCTION__);
                 if (cj_resourceSpan)
                 {
                     __otel_add_resource(cj_resourceSpan);
 
-                    cJSON *cj_scopeSpans = cJSON_AddArrayToObject(__FUNCTION__, cj_resourceSpan, ezlopi_scopeSpans_str);
+                    cJSON* cj_scopeSpans = cJSON_AddArrayToObject(__FUNCTION__, cj_resourceSpan, ezlopi_scopeSpans_str);
                     if (cj_scopeSpans)
                     {
-                        cJSON *cj_scopeSpan = cJSON_CreateObject(__FUNCTION__);
+                        cJSON* cj_scopeSpan = cJSON_CreateObject(__FUNCTION__);
                         if (cj_scopeSpan)
                         {
                             __otel_add_scope(cj_scopeSpan);
 
-                            cJSON *cj_spans = cJSON_AddArrayToObject(__FUNCTION__, cj_scopeSpan, ezlopi_spans_str);
+                            cJSON* cj_spans = cJSON_AddArrayToObject(__FUNCTION__, cj_scopeSpan, ezlopi_spans_str);
                             if (cj_spans)
                             {
-                                cJSON *cj_span = __otel_create_span(cj_traces_info);
+                                cJSON* cj_span = __otel_create_span(cj_traces_info);
                                 if (cj_span)
                                 {
                                     if (false == cJSON_AddItemToArray(cj_spans, cj_span))
@@ -374,7 +374,7 @@ static cJSON *__otel_trace_decorate(cJSON *cj_traces_info)
             }
         }
 #if 0
-        char *_data_str = cJSON_Print(__FUNCTION__, cj_traceRecord);
+        char* _data_str = cJSON_Print(__FUNCTION__, cj_traceRecord);
         // cJSON_Delete(__FUNCTION__, cj_traceRecord);
         // cj_traceRecord = NULL;
 
@@ -389,7 +389,7 @@ static cJSON *__otel_trace_decorate(cJSON *cj_traces_info)
     return cj_traceRecord;
 }
 
-static void __add_log_info(cJSON *cj_root, cJSON *cj_logs_info)
+static void __add_log_info(cJSON* cj_root, cJSON* cj_logs_info)
 {
     time_t now = 0;
     char tmp_buffer[33];
@@ -408,19 +408,19 @@ static void __add_log_info(cJSON *cj_root, cJSON *cj_logs_info)
     __fill_random_hexstring(tmp_buffer, OTEL_SPAN_ID_LEN + 1); // +1 for terminating byte
     cJSON_AddStringToObject(__FUNCTION__, cj_root, ezlopi_spanId_str, tmp_buffer);
 
-    cJSON *cj_body = cJSON_AddObjectToObject(__FUNCTION__, cj_root, "body");
+    cJSON* cj_body = cJSON_AddObjectToObject(__FUNCTION__, cj_root, "body");
     if (cj_body)
     {
         __cjson_detach_and_add(cj_body, "stringValue", "message", cj_logs_info);
     }
 
-    cJSON *cj_attributes = cJSON_AddArrayToObject(__FUNCTION__, cj_root, ezlopi_attributes_str);
+    cJSON* cj_attributes = cJSON_AddArrayToObject(__FUNCTION__, cj_root, ezlopi_attributes_str);
     if (cj_attributes)
     {
-        cJSON *cj_attr = cj_logs_info->child;
+        cJSON* cj_attr = cj_logs_info->child;
         while (cj_attr)
         {
-            cJSON *cj_attribute = __otel_create_attribute(cj_attr);
+            cJSON* cj_attribute = __otel_create_attribute(cj_attr);
             if (false == cJSON_AddItemToArray(cj_attributes, cj_attribute))
             {
                 cJSON_Delete(__FUNCTION__, cj_attribute);
@@ -430,39 +430,39 @@ static void __add_log_info(cJSON *cj_root, cJSON *cj_logs_info)
     }
 }
 
-static cJSON *__otel_logs_decorate(cJSON *cj_logs_info)
+static cJSON* __otel_logs_decorate(cJSON* cj_logs_info)
 {
-    cJSON *cj_logs_telemetry = cJSON_CreateObject(__FUNCTION__);
+    cJSON* cj_logs_telemetry = cJSON_CreateObject(__FUNCTION__);
     if (cj_logs_telemetry)
     {
         cJSON_AddStringToObject(__FUNCTION__, cj_logs_telemetry, "type", "log");
-        cJSON *cj_request = cJSON_AddObjectToObject(__FUNCTION__, cj_logs_telemetry, "request");
+        cJSON* cj_request = cJSON_AddObjectToObject(__FUNCTION__, cj_logs_telemetry, "request");
         if (cj_request)
         {
-            cJSON *cj_resourceLogs = cJSON_AddArrayToObject(__FUNCTION__, cj_request, "resourceLogs");
+            cJSON* cj_resourceLogs = cJSON_AddArrayToObject(__FUNCTION__, cj_request, "resourceLogs");
             if (cj_resourceLogs)
             {
-                cJSON *cj_resourceLog = cJSON_CreateObject(__FUNCTION__);
+                cJSON* cj_resourceLog = cJSON_CreateObject(__FUNCTION__);
                 if (cj_resourceLog)
                 {
                     // resource
                     __otel_add_resource(cj_resourceLog);
 
                     // scopeLogs
-                    cJSON *cj_scopeLogs = cJSON_AddArrayToObject(__FUNCTION__, cj_resourceLog, "scopeLogs");
+                    cJSON* cj_scopeLogs = cJSON_AddArrayToObject(__FUNCTION__, cj_resourceLog, "scopeLogs");
                     if (cj_scopeLogs)
                     {
-                        cJSON *cj_scopeLog = cJSON_CreateObject(__FUNCTION__);
+                        cJSON* cj_scopeLog = cJSON_CreateObject(__FUNCTION__);
                         if (cj_scopeLog)
                         {
                             // scope
                             __otel_add_scope(cj_scopeLog);
 
                             // logsRecords
-                            cJSON *cj_logRecords = cJSON_AddArrayToObject(__FUNCTION__, cj_scopeLog, "logRecords");
+                            cJSON* cj_logRecords = cJSON_AddArrayToObject(__FUNCTION__, cj_scopeLog, "logRecords");
                             if (cj_logRecords)
                             {
-                                cJSON *cj_logRecord = cJSON_CreateObject(__FUNCTION__);
+                                cJSON* cj_logRecord = cJSON_CreateObject(__FUNCTION__);
                                 if (cj_logRecord)
                                 {
                                     __add_log_info(cj_logRecord, cj_logs_info);
@@ -490,7 +490,7 @@ static cJSON *__otel_logs_decorate(cJSON *cj_logs_info)
         }
 
 #if 0
-        char *_data_str = cJSON_Print(__FUNCTION__, cj_logs_telemetry);
+        char* _data_str = cJSON_Print(__FUNCTION__, cj_logs_telemetry);
         // cJSON_Delete(__FUNCTION__, cj_logs_telemetry);
         // cj_logs_telemetry = NULL;
 
@@ -505,9 +505,9 @@ static cJSON *__otel_logs_decorate(cJSON *cj_logs_info)
     return cj_logs_telemetry;
 }
 
-static void __otel_add_scope(cJSON *cj_root)
+static void __otel_add_scope(cJSON* cj_root)
 {
-    cJSON *cj_scope = cJSON_AddObjectToObject(__FUNCTION__, cj_root, ezlopi_scope_str);
+    cJSON* cj_scope = cJSON_AddObjectToObject(__FUNCTION__, cj_root, ezlopi_scope_str);
     if (cj_scope)
     {
         cJSON_AddStringToObject(__FUNCTION__, cj_scope, "name", "otel-c");
@@ -515,9 +515,9 @@ static void __otel_add_scope(cJSON *cj_root)
     }
 }
 
-static cJSON *__otel_create_value(cJSON *cj_value_field)
+static cJSON* __otel_create_value(cJSON* cj_value_field)
 {
-    cJSON *cj_ret_value = cJSON_CreateObject(__FUNCTION__);
+    cJSON* cj_ret_value = cJSON_CreateObject(__FUNCTION__);
 
     if (cj_value_field)
     {
@@ -545,19 +545,19 @@ static cJSON *__otel_create_value(cJSON *cj_value_field)
         }
         case cJSON_Array:
         {
-            cJSON *cj_array_value_obj = cJSON_AddObjectToObject(__FUNCTION__, cj_ret_value, ezlopi_arrayValue_str);
+            cJSON* cj_array_value_obj = cJSON_AddObjectToObject(__FUNCTION__, cj_ret_value, ezlopi_arrayValue_str);
             if (cj_array_value_obj)
             {
-                cJSON *cj_values = cJSON_AddArrayToObject(__FUNCTION__, cj_array_value_obj, ezlopi_values_str);
+                cJSON* cj_values = cJSON_AddArrayToObject(__FUNCTION__, cj_array_value_obj, ezlopi_values_str);
                 if (cj_values)
                 {
                     int array_size = cJSON_GetArraySize(cj_value_field);
                     for (int i = 0; i < array_size; i++)
                     {
-                        cJSON *cj_element = cJSON_GetArrayItem(cj_value_field, i);
+                        cJSON* cj_element = cJSON_GetArrayItem(cj_value_field, i);
                         if (cj_element)
                         {
-                            cJSON *cj_element_value = __otel_create_value(cj_element);
+                            cJSON* cj_element_value = __otel_create_value(cj_element);
                             if (cj_element_value)
                             {
                                 if (false == cJSON_AddItemToArray(cj_values, cj_element_value))
@@ -582,15 +582,15 @@ static cJSON *__otel_create_value(cJSON *cj_value_field)
     return cj_ret_value;
 }
 
-static cJSON *__otel_create_attribute(cJSON *cj_attr)
+static cJSON* __otel_create_attribute(cJSON* cj_attr)
 {
-    cJSON *cj_attribute = NULL;
+    cJSON* cj_attribute = NULL;
     if (cj_attr)
     {
         cj_attribute = cJSON_CreateObject(__FUNCTION__);
         if (cj_attribute)
         {
-            cJSON *cj_attr_value = __otel_create_value(cj_attr);
+            cJSON* cj_attr_value = __otel_create_value(cj_attr);
             if (false == cJSON_AddItemToObject(__FUNCTION__, cj_attribute, ezlopi_value_str, cj_attr_value))
             {
                 cJSON_Delete(__FUNCTION__, cj_attr_value);
@@ -604,9 +604,9 @@ static cJSON *__otel_create_attribute(cJSON *cj_attr)
     return cj_attribute;
 }
 
-static void __otel_add_time_stamp_nano(cJSON *cj_root, const char *add_key, const char *for_key, cJSON *cj_trace_info)
+static void __otel_add_time_stamp_nano(cJSON* cj_root, const char* add_key, const char* for_key, cJSON* cj_trace_info)
 {
-    cJSON *cj_time_stamp = cJSON_DetachItemFromObject(__FUNCTION__, cj_trace_info, for_key);
+    cJSON* cj_time_stamp = cJSON_DetachItemFromObject(__FUNCTION__, cj_trace_info, for_key);
     if (cj_time_stamp)
     {
         char tmp_buffer[32];
@@ -616,11 +616,11 @@ static void __otel_add_time_stamp_nano(cJSON *cj_root, const char *add_key, cons
     }
 }
 
-static void __cjson_detach_and_add(cJSON *cj_destination, const char *add_key, const char *for_key_str, cJSON *cj_source)
+static void __cjson_detach_and_add(cJSON* cj_destination, const char* add_key, const char* for_key_str, cJSON* cj_source)
 {
     if (cj_destination && cj_source && for_key_str && add_key)
     {
-        cJSON *cj_message = cJSON_DetachItemFromObject(__FUNCTION__, cj_source, for_key_str);
+        cJSON* cj_message = cJSON_DetachItemFromObject(__FUNCTION__, cj_source, for_key_str);
         if (cj_message)
         {
             if (false == cJSON_AddItemToObject(__FUNCTION__, cj_destination, add_key, cj_message))
@@ -631,9 +631,9 @@ static void __cjson_detach_and_add(cJSON *cj_destination, const char *add_key, c
     }
 }
 
-static cJSON *__otel_create_span(cJSON *cj_trace_info)
+static cJSON* __otel_create_span(cJSON* cj_trace_info)
 {
-    cJSON *cj_span = cJSON_CreateObject(__FUNCTION__);
+    cJSON* cj_span = cJSON_CreateObject(__FUNCTION__);
     if (cj_span)
     {
         char unique_id[33];
@@ -651,16 +651,16 @@ static cJSON *__otel_create_span(cJSON *cj_trace_info)
         __otel_add_time_stamp_nano(cj_span, ezlopi_startTimeUnixNano_str, ezlopi_startTime_str, cj_trace_info);
         __otel_add_time_stamp_nano(cj_span, ezlopi_endTimeUnixNano_str, ezlopi_endTime_str, cj_trace_info);
 
-        cJSON *cj_attributes = cJSON_AddArrayToObject(__FUNCTION__, cj_span, ezlopi_attributes_str);
+        cJSON* cj_attributes = cJSON_AddArrayToObject(__FUNCTION__, cj_span, ezlopi_attributes_str);
         if (cj_attributes)
         {
             if (cj_trace_info)
             {
-                cJSON *cj_attr = cj_trace_info->child;
+                cJSON* cj_attr = cj_trace_info->child;
                 while (cj_attr)
                 {
                     // printf("%.*s: %.*s\r\n", cj_attr->str_key_len, cj_attr->string, cj_attr->str_value_len, cj_attr->valuestring);
-                    cJSON *cj_attribute = __otel_create_attribute(cj_attr);
+                    cJSON* cj_attribute = __otel_create_attribute(cj_attr);
                     if (false == cJSON_AddItemToArray(cj_attributes, cj_attribute))
                     {
                         cJSON_Delete(__FUNCTION__, cj_attribute);
@@ -674,15 +674,15 @@ static cJSON *__otel_create_span(cJSON *cj_trace_info)
     return cj_span;
 }
 
-static void __otel_add_resource_attr(cJSON *cj_root, const char *key, const char *value, bool is_const)
+static void __otel_add_resource_attr(cJSON* cj_root, const char* key, const char* value, bool is_const)
 {
     if (cj_root && key && value)
     {
-        cJSON *cj_attribute = cJSON_CreateObject(__FUNCTION__);
+        cJSON* cj_attribute = cJSON_CreateObject(__FUNCTION__);
         if (cj_attribute)
         {
             cJSON_AddStringToObject(__FUNCTION__, cj_attribute, ezlopi_key_str, key);
-            cJSON *cj_value = cJSON_AddObjectToObject(__FUNCTION__, cj_attribute, ezlopi_value_str);
+            cJSON* cj_value = cJSON_AddObjectToObject(__FUNCTION__, cj_attribute, ezlopi_value_str);
             if (cj_value)
             {
                 if (is_const)
@@ -703,12 +703,12 @@ static void __otel_add_resource_attr(cJSON *cj_root, const char *key, const char
     }
 }
 
-static void __otel_add_resource(cJSON *cj_resourceLog)
+static void __otel_add_resource(cJSON* cj_resourceLog)
 {
-    cJSON *cj_resource = cJSON_AddObjectToObject(__FUNCTION__, cj_resourceLog, ezlopi_resource_str);
+    cJSON* cj_resource = cJSON_AddObjectToObject(__FUNCTION__, cj_resourceLog, ezlopi_resource_str);
     if (cj_resource)
     {
-        cJSON *cj_attributes = cJSON_AddArrayToObject(__FUNCTION__, cj_resource, ezlopi_attributes_str);
+        cJSON* cj_attributes = cJSON_AddArrayToObject(__FUNCTION__, cj_resource, ezlopi_attributes_str);
         if (cj_attributes)
         {
             char tmp_buffer[24];
@@ -722,34 +722,16 @@ static void __otel_add_resource(cJSON *cj_resourceLog)
             }
 
             {
-                unsigned char mac_base[6] = {0};
+                unsigned char mac_base[6] = { 0 };
                 esp_efuse_mac_get_default(mac_base);
                 snprintf(tmp_buffer, sizeof(tmp_buffer), "%2X%2X%2X%2X%2X%2X", mac_base[0], mac_base[1], mac_base[2], mac_base[3], mac_base[4], mac_base[5]);
                 __otel_add_resource_attr(cj_attributes, ezlopi_base___mac_str, tmp_buffer, false);
             }
-
-#if 0
-            cJSON *cj_attribute = cJSON_CreateObject(__FUNCTION__);
-            if (cj_attribute)
-            {
-                cJSON_AddStringToObject(__FUNCTION__, cj_attribute, ezlopi_key_str, ezlopI_service___name_str);
-                cJSON *cj_value = cJSON_AddObjectToObject(__FUNCTION__, cj_attribute, ezlopi_value_str);
-                if (cj_value)
-                {
-                    cJSON_AddStringToObject(__FUNCTION__, cj_value, ezlopi_stringValue_str, ezlopi_EzloPI_str);
-                }
-
-                if (false == cJSON_AddItemToArray(cj_attributes, cj_attribute))
-                {
-                    cJSON_Delete(__FUNCTION__, cj_attribute);
-                }
-            }
-#endif
         }
     }
 }
 
-static void __fill_random_hexstring(char *buffer, uint32_t bytelen)
+static void __fill_random_hexstring(char* buffer, uint32_t bytelen)
 {
     if (buffer && bytelen)
     {
@@ -762,14 +744,14 @@ static void __fill_random_hexstring(char *buffer, uint32_t bytelen)
     }
 }
 
-static int __push_to_telemetry_queue(s_otel_queue_data_t *otel_data)
+static int __push_to_telemetry_queue(s_otel_queue_data_t* otel_data)
 {
     int ret = 0;
     if (__telemetry_queue)
     {
         if (pdTRUE == xQueueIsQueueFullFromISR(__telemetry_queue))
         {
-            s_otel_queue_data_t *dump_telemetry = NULL;
+            s_otel_queue_data_t* dump_telemetry = NULL;
             xQueueReceive(__telemetry_queue, &dump_telemetry, 0);
             if (dump_telemetry)
             {
@@ -786,10 +768,10 @@ static int __push_to_telemetry_queue(s_otel_queue_data_t *otel_data)
     return ret;
 }
 
-static void __otel_add_severity_number(cJSON *cj_root, e_trace_severity_t severity)
+static void __otel_add_severity_number(cJSON* cj_root, e_trace_severity_t severity)
 {
     double severity_number = 0;
-    const char *severity_text = ezlopi__str;
+    const char* severity_text = ezlopi__str;
 
     switch (severity)
     {

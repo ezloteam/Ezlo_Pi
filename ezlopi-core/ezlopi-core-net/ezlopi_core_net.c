@@ -12,7 +12,7 @@ void ezlopi_net_init(void)
 
 #endif // CONFIG_EZPI_CORE_ENABLE_ETH
 
-s_ezlopi_net_status_t *ezlopi_get_net_status(void)
+s_ezlopi_net_status_t* ezlopi_get_net_status(void)
 {
 
     net_stat.wifi_status = ezlopi_wifi_status();

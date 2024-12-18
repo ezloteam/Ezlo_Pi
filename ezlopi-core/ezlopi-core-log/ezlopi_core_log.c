@@ -20,18 +20,19 @@
 
 #include "ezlopi_core_log.h"
 
-const char *ezlopi_log_severity_enum[ENUM_EZLOPI_TRACE_SEVERITY_MAX] = {
+const char* ezlopi_log_severity_enum[ENUM_EZLOPI_TRACE_SEVERITY_MAX] = {
     "NONE",
     "ERROR",
     "WARNING",
     "INFO",
     "DEBUG",
-    "TRACE"};
+    "TRACE"
+};
 
 static e_trace_severity_t cloud_log_severity = ENUM_EZLOPI_TRACE_SEVERITY_WARNING;
 static e_trace_severity_t serial_log_severity = ENUM_EZLOPI_TRACE_SEVERITY_MAX;
 
-static ezlopi_error_t ezlopi_hub_cloud_log_set_severity(const char *severity_str)
+static ezlopi_error_t ezlopi_hub_cloud_log_set_severity(const char* severity_str)
 {
     ezlopi_error_t ret = EZPI_FAILED;
     if (severity_str)
@@ -56,7 +57,7 @@ static ezlopi_error_t ezlopi_hub_cloud_log_set_severity(const char *severity_str
     return ret;
 }
 
-static ezlopi_error_t ezlopi_hub_serial_log_set_severity(const char *severity_str)
+static ezlopi_error_t ezlopi_hub_serial_log_set_severity(const char* severity_str)
 {
     ezlopi_error_t ret = EZPI_FAILED;
     if (severity_str)
@@ -85,7 +86,7 @@ void ezlopi_core_read_set_log_severities()
     EZPI_CORE_nvs_read_serial_log_severity(&serial_log_severity);
 }
 
-ezlopi_error_t ezlopi_core_cloud_log_severity_process_str(bool severity_enable, const char *severity_str)
+ezlopi_error_t ezlopi_core_cloud_log_severity_process_str(bool severity_enable, const char* severity_str)
 {
     ezlopi_error_t ret = EZPI_FAILED;
     if (severity_enable)
@@ -123,12 +124,12 @@ ezlopi_error_t ezlopi_core_cloud_log_severity_process_id(const e_trace_severity_
     return ret;
 }
 
-const char **ezlopi_core_cloud_log_get_severity_enums()
+const char** ezlopi_core_cloud_log_get_severity_enums()
 {
     return ezlopi_log_severity_enum;
 }
 
-ezlopi_error_t ezlopi_core_serial_log_severity_process_str(const char *severity_str)
+ezlopi_error_t ezlopi_core_serial_log_severity_process_str(const char* severity_str)
 {
     ezlopi_error_t ret = EZPI_FAILED;
     if (severity_str)
@@ -159,12 +160,12 @@ ezlopi_error_t ezlopi_core_serial_log_severity_process_id(const e_trace_severity
     return ret;
 }
 
-const char *ezlopi_core_cloud_log_get_current_severity_enum_str()
+const char* ezlopi_core_cloud_log_get_current_severity_enum_str()
 {
     return ezlopi_log_severity_enum[cloud_log_severity];
 }
 
-const char *ezlopi_core_serial_log_get_current_severity_enum_str()
+const char* ezlopi_core_serial_log_get_current_severity_enum_str()
 {
     return ezlopi_log_severity_enum[serial_log_severity];
 }
@@ -179,7 +180,7 @@ e_trace_severity_t ezlopi_core_serial_log_get_current_severity_enum_val()
     return serial_log_severity;
 }
 
-ezlopi_error_t ezlopi_core_send_cloud_log(int severity, const char *log_str)
+ezlopi_error_t ezlopi_core_send_cloud_log(int severity, const char* log_str)
 {
     ezlopi_error_t ret = EZPI_FAILED;
 
@@ -188,12 +189,12 @@ ezlopi_error_t ezlopi_core_send_cloud_log(int severity, const char *log_str)
         e_ezlopi_event_t event = ezlopi_get_event_bit_status();
         if ((event & EZLOPI_EVENT_NMA_REG) == EZLOPI_EVENT_NMA_REG)
         {
-            cJSON *cj_log_broadcast = cJSON_CreateObject(__FUNCTION__);
+            cJSON* cj_log_broadcast = cJSON_CreateObject(__FUNCTION__);
             if (cj_log_broadcast)
             {
                 cJSON_AddStringToObject(__FUNCTION__, cj_log_broadcast, ezlopi_id_str, ezlopi_ui_broadcast_str);
                 cJSON_AddStringToObject(__FUNCTION__, cj_log_broadcast, ezlopi_msg_subclass_str, "hub.log");
-                cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_log_broadcast, ezlopi_result_str);
+                cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_log_broadcast, ezlopi_result_str);
                 if (cj_result)
                 {
                     uint64_t timestamp = EZPI_CORE_sntp_get_current_time_sec();
@@ -225,7 +226,7 @@ ezlopi_error_t ezlopi_core_send_cloud_log(int severity, const char *log_str)
     return ret;
 }
 
-static ezlopi_error_t ezlopi_core_serial_log_upcall(int severity, const char *log_str)
+static ezlopi_error_t ezlopi_core_serial_log_upcall(int severity, const char* log_str)
 {
     ezlopi_error_t ret = EZPI_FAILED;
     if ((severity > ENUM_EZLOPI_TRACE_SEVERITY_NONE) && (severity <= ezlopi_core_serial_log_get_current_severity_enum_val()))
