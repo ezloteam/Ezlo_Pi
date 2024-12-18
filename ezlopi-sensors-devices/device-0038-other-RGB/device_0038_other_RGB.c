@@ -117,14 +117,14 @@ static ezlopi_error_t RGB_LED_change_color_value(s_rgb_args_t *rgb_args)
 //             }
 //             else if (ezlopi_item_name_switch == item->cloud_properties.item_name)
 //             {
-//                 ezlopi_valueformatter_bool_to_cjson(cj_properties, rgb_args->brightness, item->cloud_properties.scale);
+//                 EZPI_core_valueformatter_bool_to_cjson(cj_properties, rgb_args->brightness, item->cloud_properties.scale);
 //             }
 //             else if (ezlopi_item_name_dimmer == item->cloud_properties.item_name)
 //             {
 //                 int dim_percentage = (int)(rgb_args->brightness * 100);
 //                 cJSON_AddNumberToObject(__FUNCTION__, cj_properties, ezlopi_minValue_str, 0);
 //                 cJSON_AddNumberToObject(__FUNCTION__, cj_properties, ezlopi_maxValue_str, 100);
-//                 ezlopi_valueformatter_int32_to_cjson(cj_properties, dim_percentage, item->cloud_properties.scale);
+//                 EZPI_core_valueformatter_int32_to_cjson(cj_properties, dim_percentage, item->cloud_properties.scale);
 //             }
 //         }
 //     }
@@ -158,13 +158,13 @@ static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg)
             }
             else if (ezlopi_item_name_switch == item->cloud_properties.item_name)
             {
-                ezlopi_valueformatter_bool_to_cjson(cj_properties, rgb_args->brightness, NULL);
+                EZPI_core_valueformatter_bool_to_cjson(cj_properties, rgb_args->brightness, NULL);
                 ret = EZPI_SUCCESS;
             }
             else if (ezlopi_item_name_dimmer == item->cloud_properties.item_name)
             {
                 int dim_percentage = (int)(rgb_args->brightness * 100);
-                ezlopi_valueformatter_int32_to_cjson(cj_properties, dim_percentage, item->cloud_properties.scale);
+                EZPI_core_valueformatter_int32_to_cjson(cj_properties, dim_percentage, item->cloud_properties.scale);
                 ret = EZPI_SUCCESS;
             }
         }

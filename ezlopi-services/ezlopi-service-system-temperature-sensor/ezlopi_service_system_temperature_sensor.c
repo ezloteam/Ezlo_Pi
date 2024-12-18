@@ -203,7 +203,7 @@ static int ezpi_get_cjson_value(l_ezlopi_item_t *item, void *arg)
     if (item && arg)
     {
         cJSON *cj_result = (cJSON *)arg;
-        ezlopi_valueformatter_float_to_cjson(cj_result, system_temperature, item->cloud_properties.scale);
+        EZPI_core_valueformatter_float_to_cjson(cj_result, system_temperature, item->cloud_properties.scale);
         ret = 0;
     }
     return ret;

@@ -201,7 +201,7 @@ static ezlopi_error_t __0054_get_cjson_value(l_ezlopi_item_t *item, void *arg)
                 Lt_per_hr = (Lt_per_hr > 720) ? 720 : Lt_per_hr;
                 // TRACE_E(" Frequency : %.2f Hz --> FlowRate : %.2f [Lt_per_hr]", freq, Lt_per_hr);
 
-                ezlopi_valueformatter_float_to_cjson(cj_result, Lt_per_hr, scales_liter_per_hour);
+                EZPI_core_valueformatter_float_to_cjson(cj_result, Lt_per_hr, scales_liter_per_hour);
                 ret = EZPI_SUCCESS;
             }
         }

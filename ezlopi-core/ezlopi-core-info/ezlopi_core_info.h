@@ -36,8 +36,8 @@
  * @date    12th DEC 2024
 */
 
-#ifndef EZLOPI_CORE_INFO_H
-#define EZLOPI_CORE_INFO_H
+#ifndef _EZLOPI_CORE_INFO_H_
+#define _EZLOPI_CORE_INFO_H_
 
 /*******************************************************************************
 *                          Include Files
@@ -148,7 +148,7 @@ extern "C"
 }
 #endif
 
-#endif // EZLOPI_CORE_INFO_H
+#endif // _EZLOPI_CORE_INFO_H_
 
 /*******************************************************************************
 *                          End of File

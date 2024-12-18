@@ -166,27 +166,40 @@ extern "C"
     /*******************************************************************************
     *                          Extern Function Prototypes
     *******************************************************************************/
-    /**
-    * @brief Global function template example
-    * Convention : Use capital letter for initial word on extern function
-    * maincomponent : Main component as hal, core, service etc.
-    * subcomponent : Sub component as i2c from hal, ble from service etc
-    * functiontitle : Title of the function
-    * eg : EZPI_hal_i2c_init()
-    * @param arg
-    *
-    */
-
 
 #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
+    /**
+     * @brief Function to get process_details
+     *
+     * @param cj_processes_array Target process-list to get details from
+     * @return int
+     */
     int ezlopi_core_get_processes_details(cJSON *cj_processes_array);
+    /**
+     * @brief Funtion to set process info mannually
+     *
+     * @param task_num Enum of task in the system
+     * @param task_handle Task-handle of corresponding task
+     * @param task_depth Task-depth
+     * @return int
+     */
     int ezlopi_core_process_set_process_info(e_ezlopi_task_enum_t task_num, TaskHandle_t *task_handle, size_t task_depth);
+    /**
+     * @brief Function to delete processes
+     *
+     * @param task_num ID of target-task
+     * @return int
+     */
     int ezlopi_core_process_set_is_deleted(e_ezlopi_task_enum_t task_num);
 #else // CONFIG_FREERTOS_USE_TRACE_FACILITY
-    #warning "need to clarify these macros, these are functions";
+
+    //---------- These are Not-required ---------------
+    #warning "need to add [CONFIG_FREERTOS_USE_TRACE_FACILITY] guard to these function declarations";
 #define ezlopi_core_get_processes_details(x)
 #define ezlopi_core_process_set_process_info(x, y, z)
 #define ezlopi_core_process_set_is_deleted(x)
+    //-------------------------------------------------
+
 #endif // CONFIG_FREERTOS_USE_TRACE_FACILITY
 
 #ifdef __cplusplus

@@ -126,7 +126,7 @@ void EZPI_init(void)
     EZPI_event_group_create();
 
 #if defined(CONFIG_EZPI_ENABLE_WIFI)
-    ezlopi_wifi_initialize();
+    EZPI_wifi_initialize();
 #endif
 
     vTaskDelay(10);
@@ -163,7 +163,7 @@ void EZPI_init(void)
     EZPI_core_nvs_set_boot_count(ezlopi_system_info_get_boot_count() + 1);
 
 #if defined(CONFIG_EZPI_ENABLE_WIFI)
-    ezlopi_wifi_connect_from_id_bin();
+    EZPI_core_wifi_connect_from_id_bin();
 #endif
 
 #if (defined(CONFIG_EZPI_ENABLE_WIFI) || defined(CONFIG_EZPI_CORE_ENABLE_ETH))

@@ -29,8 +29,8 @@
 ** ===========================================================================
 */
 /**
-* @file    main.c
-* @brief   perform some function on data
+* @file    ezlopi_core_net.c
+* @brief   perform some function on core-net
 * @author  xx
 * @version 0.1
 * @date    12th DEC 2024
@@ -83,14 +83,14 @@ void EZPI_net_init(void)
 s_ezlopi_net_status_t *EZPI_core_net_get_net_status(void)
 {
 
-    net_stat.wifi_status = ezlopi_wifi_status();
+    net_stat.wifi_status = EZPI_core_wifi_status();
 #ifdef CONFIG_EZPI_ENABLE_PING
     net_stat.internet_status = EZPI_core_ping_get_internet_status();
 #else // CONFIG_EZPI_ENABLE_PING
     net_stat.internet_status = EZLOPI_PING_STATUS_UNKNOWN;
 #endif // CONFIG_EZPI_ENABLE_PING
 
-    net_stat.nma_cloud_connection_status = ezlopi_websocket_client_is_connected();
+    net_stat.nma_cloud_connection_status = EZPI_core_websocket_client_is_connected();
 
     return &net_stat;
 }

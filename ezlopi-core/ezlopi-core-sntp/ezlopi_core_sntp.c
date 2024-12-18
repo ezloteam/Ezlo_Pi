@@ -116,7 +116,7 @@ ezlopi_error_t EZPI_core_sntp_set_location(const char *location)
     ezlopi_error_t error = EZPI_SUCCESS;
     if (location)
     {
-        if (EZPI_SUCCESS == EZPI_CORE_nvs_write_time_location(location, strlen(location)))
+        if (EZPI_SUCCESS == EZPI_core_nvs_write_time_location(location, strlen(location)))
         {
 
             const char *posix_str = micro_tz_db_get_posix_str(location);
@@ -145,14 +145,14 @@ ezlopi_error_t EZPI_core_sntp_set_location(const char *location)
 
 char *EZPI_core_sntp_get_location(void)
 {
-    return EZPI_CORE_nvs_read_time_location();
+    return EZPI_core_nvs_read_time_location();
 }
 
 void EZPI_core_sntp_get_local_time(char *time_buf, uint32_t buf_len)
 {
     if (time_buf && buf_len)
     {
-        char *location = EZPI_CORE_nvs_read_time_location();
+        char *location = EZPI_core_nvs_read_time_location();
         const char *posix_str = (location) ? micro_tz_db_get_posix_str(location) : NULL;
 
         if (!posix_str)

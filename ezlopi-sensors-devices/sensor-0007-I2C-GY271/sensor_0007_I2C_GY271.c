@@ -301,7 +301,9 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
                     // TRACE_D(" CONFIGURATION  Compplete _____ Calibration Started _____");
                     TaskHandle_t ezlopi_sensor_gy271_callibrationb_task_handle = NULL;
                     xTaskCreate(__gy271_calibration_task, "GY271_Calibration_Task", EZLOPI_SENSOR_GY271_CALLIBRATION_TASK_DEPTH, item, 1, &ezlopi_sensor_gy271_callibrationb_task_handle);
+#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
                     ezlopi_core_process_set_process_info(ENUM_EZLOPI_SENSOR_GY271_CALLIBRATION_TASK, &ezlopi_sensor_gy271_callibrationb_task_handle, EZLOPI_SENSOR_GY271_CALLIBRATION_TASK_DEPTH);
+#endif
                     ret = EZPI_SUCCESS;
                 }
             }
@@ -323,27 +325,27 @@ static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg)
             {
                 if (ezlopi_item_name_magnetic_strength_x_axis == item->cloud_properties.item_name)
                 {
-                    ezlopi_valueformatter_float_to_cjson(cj_result, user_data->X, item->cloud_properties.scale);
+                    EZPI_core_valueformatter_float_to_cjson(cj_result, user_data->X, item->cloud_properties.scale);
                 }
 
                 if (ezlopi_item_name_magnetic_strength_y_axis == item->cloud_properties.item_name)
                 {
-                    ezlopi_valueformatter_float_to_cjson(cj_result, user_data->Y, item->cloud_properties.scale);
+                    EZPI_core_valueformatter_float_to_cjson(cj_result, user_data->Y, item->cloud_properties.scale);
                 }
 
                 if (ezlopi_item_name_magnetic_strength_z_axis == item->cloud_properties.item_name)
                 {
-                    ezlopi_valueformatter_float_to_cjson(cj_result, user_data->Z, item->cloud_properties.scale);
+                    EZPI_core_valueformatter_float_to_cjson(cj_result, user_data->Z, item->cloud_properties.scale);
                 }
 
                 if (ezlopi_item_name_angle_position == item->cloud_properties.item_name)
                 {
-                    ezlopi_valueformatter_int32_to_cjson(cj_result, user_data->azimuth, item->cloud_properties.scale);
+                    EZPI_core_valueformatter_int32_to_cjson(cj_result, user_data->azimuth, item->cloud_properties.scale);
                 }
 
                 if (ezlopi_item_name_temp == item->cloud_properties.item_name)
                 {
-                    ezlopi_valueformatter_float_to_cjson(cj_result, user_data->T, item->cloud_properties.scale);
+                    EZPI_core_valueformatter_float_to_cjson(cj_result, user_data->T, item->cloud_properties.scale);
                 }
                 ret = EZPI_SUCCESS;
             }

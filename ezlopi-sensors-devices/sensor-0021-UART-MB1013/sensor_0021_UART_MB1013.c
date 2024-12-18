@@ -73,7 +73,7 @@ static ezlopi_error_t __get_value_cjson(l_ezlopi_item_t *item, void *arg)
         if (mb1013_args)
         {
             cJSON *cj_result = (cJSON *)arg;
-            ezlopi_valueformatter_float_to_cjson(cj_result, mb1013_args->current_value, scales_meter);
+            EZPI_core_valueformatter_float_to_cjson(cj_result, mb1013_args->current_value, scales_meter);
             ret = EZPI_SUCCESS;
         }
     }

@@ -42,21 +42,6 @@
 /*******************************************************************************
 *                          Include Files
 *******************************************************************************/
-
-// Copyright 2019 Espressif Systems (Shanghai) PTE LTD
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 #pragma once
 
 /*******************************************************************************
@@ -171,17 +156,7 @@ extern "C"
     /*******************************************************************************
     *                          Extern Function Prototypes
     *******************************************************************************/
-    /**
-    * @brief Global function template example
-    * Convention : Use capital letter for initial word on extern function
-    * maincomponent : Main component as hal, core, service etc.
-    * subcomponent : Sub component as i2c from hal, ble from service etc
-    * functiontitle : Title of the function
-    * eg : EZPI_hal_i2c_init()
-    * @param arg
-    *
-    */
-
+ 
     /**
      * @brief Create a ping session
      *

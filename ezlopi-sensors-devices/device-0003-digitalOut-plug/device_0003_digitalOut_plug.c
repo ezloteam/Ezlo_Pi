@@ -226,7 +226,7 @@ static ezlopi_error_t __get_value_cjson(l_ezlopi_item_t *item, void *arg)
         cJSON *cj_propertise = (cJSON *)arg;
         if (cj_propertise)
         {
-            ezlopi_valueformatter_bool_to_cjson(cj_propertise, item->interface.gpio.gpio_out.value, NULL);
+            EZPI_core_valueformatter_bool_to_cjson(cj_propertise, item->interface.gpio.gpio_out.value, NULL);
             error = EZPI_SUCCESS;
         }
     }

@@ -71,18 +71,19 @@ typedef enum e_ping_status
     /*******************************************************************************
     *                          Extern Function Prototypes
     *******************************************************************************/
+
+   
     /**
-    * @brief Global function template example
-    * Convention : Use capital letter for initial word on extern function
-    * maincomponent : Main component as hal, core, service etc.
-    * subcomponent : Sub component as i2c from hal, ble from service etc
-    * functiontitle : Title of the function
-    * eg : EZPI_hal_i2c_init()
-    * @param arg
-    *
-    */
-void EZPI_ping_init(void);
-e_ping_status_t EZPI_core_ping_get_internet_status(void);
+     * @brief Function to initialize ping service
+     * 
+     */
+    void EZPI_ping_init(void);
+    /**
+     * @brief Function to get internet status
+     * 
+     * @return e_ping_status_t 
+     */
+    e_ping_status_t EZPI_core_ping_get_internet_status(void);
 
 #ifdef __cplusplus
 }

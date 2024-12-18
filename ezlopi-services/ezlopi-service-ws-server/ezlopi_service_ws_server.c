@@ -161,7 +161,7 @@ void EZPI_service_ws_server_start(void)
 {
     EZPI_core_broadcast_method_add(ezpi_ws_server_broadcast, "wss-method", 2);
 
-    if (ezlopi_wifi_got_ip())
+    if (EZPI_core_wifi_got_ip())
     {
         if (WS_STATUS_STOPPED == __ws_status)
         {
@@ -178,8 +178,8 @@ void EZPI_service_ws_server_start(void)
         }
     }
 
-    ezlopi_wifi_event_add(ezpi_wifi_connection_event, NULL);
-    if (ezlopi_wifi_got_ip())
+    EZPI_core_wifi_event_add(ezpi_wifi_connection_event, NULL);
+    if (EZPI_core_wifi_got_ip())
     {
         if (WS_STATUS_STOPPED == __ws_status)
         {

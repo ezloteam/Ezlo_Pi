@@ -126,23 +126,23 @@ static ezlopi_error_t __list_cjson_value(l_ezlopi_item_t *item, void *arg)
             cJSON_AddNumberToObject(__FUNCTION__, cj_properties, ezlopi_maxValue_str, 100);
 
             int dimmable_value_percentage = (int)floor(((dimmable_bulb_arg->current_brightness_value * 100.0) / 4095.0));
-            ezlopi_valueformatter_int32_to_cjson(cj_properties, dimmable_value_percentage, item->cloud_properties.scale);
+            EZPI_core_valueformatter_int32_to_cjson(cj_properties, dimmable_value_percentage, item->cloud_properties.scale);
         }
         else if (ezlopi_item_name_dimmer_up == item->cloud_properties.item_name)
         {
-            ezlopi_valueformatter_int32_to_cjson(cj_properties, 0, item->cloud_properties.scale);
+            EZPI_core_valueformatter_int32_to_cjson(cj_properties, 0, item->cloud_properties.scale);
         }
         else if (ezlopi_item_name_dimmer_down == item->cloud_properties.item_name)
         {
-            ezlopi_valueformatter_int32_to_cjson(cj_properties, 0, item->cloud_properties.scale);
+            EZPI_core_valueformatter_int32_to_cjson(cj_properties, 0, item->cloud_properties.scale);
         }
         else if (ezlopi_item_name_dimmer_stop == item->cloud_properties.item_name)
         {
-            ezlopi_valueformatter_int32_to_cjson(cj_properties, 0, item->cloud_properties.scale);
+            EZPI_core_valueformatter_int32_to_cjson(cj_properties, 0, item->cloud_properties.scale);
         }
         else if (ezlopi_item_name_switch == item->cloud_properties.item_name)
         {
-            ezlopi_valueformatter_bool_to_cjson(cj_properties, dimmable_bulb_arg->current_brightness_value, item->cloud_properties.scale);
+            EZPI_core_valueformatter_bool_to_cjson(cj_properties, dimmable_bulb_arg->current_brightness_value, item->cloud_properties.scale);
         }
         ret = EZPI_SUCCESS;
     }
@@ -162,23 +162,23 @@ static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg)
         if (ezlopi_item_name_dimmer == item->cloud_properties.item_name)
         {
             int dimmable_value_percentage = (int)floor(((dimmable_bulb_arg->current_brightness_value * 100.0) / 4095.0));
-            ezlopi_valueformatter_int32_to_cjson(cj_properties, dimmable_value_percentage, item->cloud_properties.scale);
+            EZPI_core_valueformatter_int32_to_cjson(cj_properties, dimmable_value_percentage, item->cloud_properties.scale);
         }
         else if (ezlopi_item_name_dimmer_up == item->cloud_properties.item_name)
         {
-            ezlopi_valueformatter_int32_to_cjson(cj_properties, 0, item->cloud_properties.scale);
+            EZPI_core_valueformatter_int32_to_cjson(cj_properties, 0, item->cloud_properties.scale);
         }
         else if (ezlopi_item_name_dimmer_down == item->cloud_properties.item_name)
         {
-            ezlopi_valueformatter_int32_to_cjson(cj_properties, 0, item->cloud_properties.scale);
+            EZPI_core_valueformatter_int32_to_cjson(cj_properties, 0, item->cloud_properties.scale);
         }
         else if (ezlopi_item_name_dimmer_stop == item->cloud_properties.item_name)
         {
-            ezlopi_valueformatter_int32_to_cjson(cj_properties, 0, item->cloud_properties.scale);
+            EZPI_core_valueformatter_int32_to_cjson(cj_properties, 0, item->cloud_properties.scale);
         }
         else if (ezlopi_item_name_switch == item->cloud_properties.item_name)
         {
-            ezlopi_valueformatter_bool_to_cjson(cj_properties, dimmable_bulb_arg->current_brightness_value, item->cloud_properties.scale);
+            EZPI_core_valueformatter_bool_to_cjson(cj_properties, dimmable_bulb_arg->current_brightness_value, item->cloud_properties.scale);
         }
         ret = EZPI_SUCCESS;
     }

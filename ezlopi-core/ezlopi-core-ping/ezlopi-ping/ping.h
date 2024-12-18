@@ -53,7 +53,6 @@
 * 7. EzloPi Service specific eg ezlopi_service_ble
 * 8. EzloPi Sensors and Device Specific eg. ezlopi_device_0001_digitalout_generic
 */
-#include "header.h"
 
 /*******************************************************************************
 *                          C++ Declaration Wrapper
@@ -75,17 +74,7 @@ extern "C"
     /*******************************************************************************
     *                          Extern Function Prototypes
     *******************************************************************************/
-    /**
-    * @brief Global function template example
-    * Convention : Use capital letter for initial word on extern function
-    * maincomponent : Main component as hal, core, service etc.
-    * subcomponent : Sub component as i2c from hal, ble from service etc
-    * functiontitle : Title of the function
-    * eg : EZPI_hal_i2c_init()
-    * @param arg
-    *
-    */
-
+  
     /**
      * PING_USE_SOCKETS: Set to 1 to use sockets, otherwise the raw api is used
      */
@@ -93,14 +82,25 @@ extern "C"
 #define PING_USE_SOCKETS    LWIP_SOCKET
 #endif
 
-
+     /**
+      * @brief Function to initialize ping service
+      *
+      */
     int EZPI_ping_init(void) __attribute__((deprecated));
 
 #ifdef ESP_PING
+    /**
+     * @brief Function to de-initialize ping service
+     *
+     */
     void ping_deinit(void) __attribute__((deprecated));
 #endif
 
 #if !PING_USE_SOCKETS
+    /**
+     * @brief Function to send a ping
+     *
+     */
     void ping_send_now(void);
 #endif /* !PING_USE_SOCKETS */
 

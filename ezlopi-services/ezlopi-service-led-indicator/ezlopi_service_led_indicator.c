@@ -291,7 +291,7 @@ int EZPI_service_led_indicator_init()
 
 static void ezpi_process_event(void)
 {
-    e_ezlopi_event_t event = ezlopi_core_event_group_get_eventbit_status();
+    e_ezlopi_event_t event = EZPI_core_event_group_get_eventbit_status();
 
     __indicator_priority = PRIORITY_POWER;
     if ((event & EZLOPI_EVENT_WIFI_CONNECTED) == EZLOPI_EVENT_WIFI_CONNECTED)

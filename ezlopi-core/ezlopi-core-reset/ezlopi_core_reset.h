@@ -63,17 +63,14 @@ extern "C"
     *                          Extern Function Prototypes
     *******************************************************************************/
     /**
-    * @brief Global function template example
-    * Convention : Use capital letter for initial word on extern function
-    * maincomponent : Main component as hal, core, service etc.
-    * subcomponent : Sub component as i2c from hal, ble from service etc
-    * functiontitle : Title of the function
-    * eg : EZPI_hal_i2c_init()
-    * @param arg
-    *
-    */
-
+     * @brief Function to reset and reboot esp
+     *
+     */
     void EZPI_core_reset_reboot(void);
+    /**
+     * @brief Function to factory restore
+     *
+     */
     void EZPI_core_reset_factory_restore(void);
 
 #ifdef __cplusplus

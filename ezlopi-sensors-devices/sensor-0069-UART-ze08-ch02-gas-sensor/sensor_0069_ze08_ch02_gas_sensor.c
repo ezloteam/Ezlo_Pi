@@ -79,7 +79,7 @@ static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 
     if (ze08_ch2o_sensor && cj_params)
     {
-        ezlopi_valueformatter_float_to_cjson(cj_params, ze08_ch2o_sensor->ppm, scales_parts_per_million);
+        EZPI_core_valueformatter_float_to_cjson(cj_params, ze08_ch2o_sensor->ppm, scales_parts_per_million);
         ret = EZPI_SUCCESS;
     }
     return ret;

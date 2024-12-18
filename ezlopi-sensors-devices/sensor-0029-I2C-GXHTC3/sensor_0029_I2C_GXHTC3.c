@@ -68,7 +68,7 @@ static ezlopi_error_t gxhtc3_sensor_init(l_ezlopi_item_t *item)
 //         cJSON* cj_result = (cJSON*)arg;
 //         s_gxhtc3_value_t* value_ptr = (s_gxhtc3_value_t*)item->user_arg;
 
-//         ezlopi_valueformatter_float_to_cjson(cj_result, value_ptr->temperature, item->cloud_properties.scale);
+//         EZPI_core_valueformatter_float_to_cjson(cj_result, value_ptr->temperature, item->cloud_properties.scale);
 //     }
 
 //     return ret;
@@ -121,12 +121,12 @@ static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg)
         {
             if (value_type_temperature == item->cloud_properties.value_type)
             {
-                ezlopi_valueformatter_float_to_cjson(cj_result, value_ptr->temperature, scales_celsius);
+                EZPI_core_valueformatter_float_to_cjson(cj_result, value_ptr->temperature, scales_celsius);
                 ret = EZPI_SUCCESS;
             }
             else if (value_type_humidity == item->cloud_properties.value_type)
             {
-                ezlopi_valueformatter_float_to_cjson(cj_result, value_ptr->humidity, scales_percent);
+                EZPI_core_valueformatter_float_to_cjson(cj_result, value_ptr->humidity, scales_percent);
                 ret = EZPI_SUCCESS;
             }
         }

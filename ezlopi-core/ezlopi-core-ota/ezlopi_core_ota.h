@@ -66,19 +66,18 @@ extern "C"
     /*******************************************************************************
     *                          Extern Function Prototypes
     *******************************************************************************/
+
     /**
-    * @brief Global function template example
-    * Convention : Use capital letter for initial word on extern function
-    * maincomponent : Main component as hal, core, service etc.
-    * subcomponent : Sub component as i2c from hal, ble from service etc
-    * functiontitle : Title of the function
-    * eg : EZPI_hal_i2c_init()
-    * @param arg
-    *
-    */
-
-
+     * @brief Function to get OTA status
+     * 
+     * @return uint32_t 
+     */
     uint32_t EPZI_core_ota_get_state(void);
+    /**
+     * @brief Function to start firmware OTA process
+     * 
+     * @param cj_url URL to extract latest firmware from
+     */
     void EZPI_core_ota_start(cJSON *cj_url);
 
 #ifdef __cplusplus

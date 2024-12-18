@@ -303,7 +303,11 @@ void EZPI_SERV_uart_init(void)
 #if 1
     TaskHandle_t __uart_loop_handle = NULL;
     xTaskCreate(ezpi_service_uart_task, "serv_uart_task", EZLOPI_SERVICE_UART_TASK_DEPTH, NULL, configMAX_PRIORITIES - 4, &__uart_loop_handle);
+    
+#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
     ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_UART_TASK, &__uart_loop_handle, EZLOPI_SERVICE_UART_TASK_DEPTH);
+#endif //CONFIG_FREERTOS_USE_TRACE_FACILITY
+
 #endif
 }
 
@@ -373,12 +377,12 @@ static int ezpi_service_uart_set_uart_config(const cJSON *root)
     CJSON_GET_VALUE_DOUBLE(root, ezlopi_frame_size_str, frame_size);
     CJSON_GET_VALUE_STRING_BY_COPY(root, ezlopi_flow_control_str, flow_control);
 
-    EZPI_CORE_nvs_read_baud(&baud_current);
-    EZPI_CORE_nvs_read_parity(&parity_val_current);
-    EZPI_CORE_nvs_read_start_bits(&start_bits_current);
-    EZPI_CORE_nvs_read_stop_bits(&stop_bits_current);
-    EZPI_CORE_nvs_read_frame_size(&frame_size_current);
-    EZPI_CORE_nvs_read_flow_control(&flow_control_current);
+    EZPI_core_nvs_read_baud(&baud_current);
+    EZPI_core_nvs_read_parity(&parity_val_current);
+    EZPI_core_nvs_read_start_bits(&start_bits_current);
+    EZPI_core_nvs_read_stop_bits(&stop_bits_current);
+    EZPI_core_nvs_read_frame_size(&frame_size_current);
+    EZPI_core_nvs_read_flow_control(&flow_control_current);
 
     if (
         (baud_current != baud) ||
@@ -398,26 +402,26 @@ static int ezpi_service_uart_set_uart_config(const cJSON *root)
             parity_val = (uint32_t)EZPI_core_info_name_to_parity(parity);
         }
 
-        EZPI_CORE_nvs_write_parity(parity_val);
+        EZPI_core_nvs_write_parity(parity_val);
 
         if (baud)
         {
-            EZPI_CORE_nvs_write_baud(baud);
+            EZPI_core_nvs_write_baud(baud);
         }
         else
         {
             baud = EZPI_SERV_UART_BAUD_DEFAULT;
-            EZPI_CORE_nvs_write_baud(baud);
+            EZPI_core_nvs_write_baud(baud);
         }
 
-        EZPI_CORE_nvs_write_start_bits(start_bits);
-        EZPI_CORE_nvs_write_stop_bits(stop_bits);
+        EZPI_core_nvs_write_start_bits(start_bits);
+        EZPI_core_nvs_write_stop_bits(stop_bits);
 
         if (!frame_size)
         {
             frame_size = EZPI_SERV_UART_FRAME_SIZE_DEFAULT;
         }
-        EZPI_CORE_nvs_write_frame_size(frame_size);
+        EZPI_core_nvs_write_frame_size(frame_size);
 
         if ('\0' != flow_control[0])
         {
@@ -425,7 +429,7 @@ static int ezpi_service_uart_set_uart_config(const cJSON *root)
             TRACE_W("New Flow control: %d", flow_control_val);
         }
 
-        EZPI_CORE_nvs_write_flow_control(flow_control_val);
+        EZPI_core_nvs_write_flow_control(flow_control_val);
 
         const static char *reboot_response = "{\"cmd\":5, \"status\":1}";
         EZPI_SERV_uart_tx_data(strlen(reboot_response), (uint8_t *)reboot_response);
@@ -761,7 +765,7 @@ static int ezpi_service_uart_device_status_info(cJSON *parent)
         cJSON_AddStringToObject(__FUNCTION__, cj_device_state, ezlopi_flash_size_str, CONFIG_ESPTOOLPY_FLASHSIZE);
 
         uint8_t mac[6];
-        ezlopi_wifi_get_wifi_mac(mac);
+        EZPI_core_wifi_get_wifi_mac(mac);
         char mac_str[20];
         memset(mac_str, 0, sizeof(mac_str));
         snprintf(mac_str, 20, "%02X:%02X:%02X:%02X:%02X:%02X", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
@@ -794,24 +798,24 @@ static int ezpi_service_uart_config_info(cJSON *parent)
         char flw_ctrl_bffr[EZPI_UART_SERV_FLW_CTRL_STR_SIZE + 1];
         flw_ctrl_bffr[EZPI_UART_SERV_FLW_CTRL_STR_SIZE] = 0;
 
-        EZPI_CORE_nvs_read_baud(&baud);
+        EZPI_core_nvs_read_baud(&baud);
         cJSON_AddNumberToObject(__FUNCTION__, cj_serial_config, ezlopi_baud_str, baud);
 
-        EZPI_CORE_nvs_read_parity((uint32_t *)&parity_val);
+        EZPI_core_nvs_read_parity((uint32_t *)&parity_val);
         parity[0] = EZPI_core_info_parity_to_name(parity_val);
         parity[1] = 0;
         cJSON_AddStringToObject(__FUNCTION__, cj_serial_config, ezlopi_parity_str, parity);
 
-        EZPI_CORE_nvs_read_start_bits(&start_bits);
+        EZPI_core_nvs_read_start_bits(&start_bits);
         cJSON_AddNumberToObject(__FUNCTION__, cj_serial_config, ezlopi_start_bits_str, start_bits);
 
-        EZPI_CORE_nvs_read_stop_bits(&stop_bits);
+        EZPI_core_nvs_read_stop_bits(&stop_bits);
         cJSON_AddNumberToObject(__FUNCTION__, cj_serial_config, ezlopi_stop_bits_str, stop_bits);
 
-        EZPI_CORE_nvs_read_frame_size(&frame_size);
+        EZPI_core_nvs_read_frame_size(&frame_size);
         cJSON_AddNumberToObject(__FUNCTION__, cj_serial_config, ezlopi_frame_size_str, frame_size);
 
-        EZPI_CORE_nvs_read_flow_control(&flow_control);
+        EZPI_core_nvs_read_flow_control(&flow_control);
         EZPI_core_info_get_flow_ctrl_to_name(flow_control, flw_ctrl_bffr);
         cJSON_AddStringToObject(__FUNCTION__, cj_serial_config, ezlopi_flow_control_str, flw_ctrl_bffr);
 
@@ -879,7 +883,7 @@ static int ezpi_service_uart_newtwork_info(cJSON *parent)
         cJSON_AddStringToObject(__FUNCTION__, cj_network, ezlopi_ssid_str, wifi_ssid ? wifi_ssid : "");
         EZPI_core_factory_info_v3_free(wifi_ssid);
 
-        ezlopi_wifi_status_t *wifi_status = ezlopi_wifi_status();
+        ezlopi_wifi_status_t *wifi_status = EZPI_core_wifi_status();
         if (wifi_status)
         {
             char *wifi_mode = EZPI_core_info_get_wifi_mode_to_name(wifi_status->wifi_mode);
@@ -900,7 +904,7 @@ static int ezpi_service_uart_newtwork_info(cJSON *parent)
 
             cJSON_AddBoolToObject(__FUNCTION__, cj_network, "wifi", wifi_status->wifi_connection);
 
-            e_ezlopi_event_t events = ezlopi_core_event_group_get_eventbit_status();
+            e_ezlopi_event_t events = EZPI_core_event_group_get_eventbit_status();
             bool cloud_connection_status = (EZLOPI_EVENT_NMA_REG & events) == EZLOPI_EVENT_NMA_REG;
 
 #ifdef CONFIG_EZPI_ENABLE_PING
@@ -986,8 +990,8 @@ static void ezpi_service_uart_set_wifi(const char *data)
                 uint8_t attempt = 1;
                 while (attempt <= EZPI_CORE_WIFI_CONN_RETRY_ATTEMPT)
                 {
-                    ezlopi_wifi_connect((const char *)ssid, (const char *)pass);
-                    ezlopi_wait_for_wifi_to_connect((uint32_t)EZPI_CORE_WIFI_CONN_ATTEMPT_INTERVAL);
+                    EZPI_core_wifi_connect((const char *)ssid, (const char *)pass);
+                    EZPI_core_wait_for_wifi_to_connect((uint32_t)EZPI_CORE_WIFI_CONN_ATTEMPT_INTERVAL);
                     s_ezlopi_net_status_t *net_stat = EZPI_core_net_get_net_status();
                     if (net_stat)
                     {
@@ -998,8 +1002,8 @@ static void ezpi_service_uart_set_wifi(const char *data)
                         }
                         else
                         {
-                            #warning "DO NOT user printf on production !"
-                                TRACE_E("WiFi Connection to AP: %s failed !", ssid);
+                            #warning "DO NOT user printf on production !";
+                            TRACE_E("WiFi Connection to AP: %s failed !", ssid);
                             // printf("WiFi Connection to AP: %s failed !\n", ssid);
                             status = 0;
                         }

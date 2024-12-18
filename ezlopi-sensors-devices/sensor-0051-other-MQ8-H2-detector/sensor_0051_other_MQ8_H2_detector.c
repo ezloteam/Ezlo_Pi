@@ -181,7 +181,9 @@ static ezlopi_error_t __0051_init(l_ezlopi_item_t *item)
                         {
                             TaskHandle_t ezlopi_sensor_mq8_task_handle = NULL;
                             xTaskCreate(__calibrate_MQ8_R0_resistance, "Task_to_calculate_R0_air", EZLOPI_SENSOR_MQ8_TASK_DEPTH, item, 1, &ezlopi_sensor_mq8_task_handle);
+#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
                             ezlopi_core_process_set_process_info(ENUM_EZLOPI_SENSOR_MQ8_TASK, &ezlopi_sensor_mq8_task_handle, EZLOPI_SENSOR_MQ8_TASK_DEPTH);
+#endif
                         }
                     }
                     else
@@ -289,7 +291,7 @@ static ezlopi_error_t __0051_get_item(l_ezlopi_item_t *item, void *arg)
                 s_mq8_value_t *MQ8_value = ((s_mq8_value_t *)item->user_arg);
                 if (MQ8_value)
                 {
-                    ezlopi_valueformatter_float_to_cjson(cj_result, MQ8_value->_H2_ppm, item->cloud_properties.scale);
+                    EZPI_core_valueformatter_float_to_cjson(cj_result, MQ8_value->_H2_ppm, item->cloud_properties.scale);
                 }
             }
             ret = EZPI_SUCCESS;
@@ -316,7 +318,7 @@ static ezlopi_error_t __0051_get_cjson_value(l_ezlopi_item_t *item, void *arg)
                 s_mq8_value_t *MQ8_value = ((s_mq8_value_t *)item->user_arg);
                 if (MQ8_value)
                 {
-                    ezlopi_valueformatter_float_to_cjson(cj_result, MQ8_value->_H2_ppm, item->cloud_properties.scale);
+                    EZPI_core_valueformatter_float_to_cjson(cj_result, MQ8_value->_H2_ppm, item->cloud_properties.scale);
                 }
             }
             ret = EZPI_SUCCESS;

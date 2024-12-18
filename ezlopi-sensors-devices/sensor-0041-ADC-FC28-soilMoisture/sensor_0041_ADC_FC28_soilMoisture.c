@@ -164,7 +164,7 @@ static ezlopi_error_t __0041_get_cjson_value(l_ezlopi_item_t *item, void *arg)
             s_fc28_data_t *user_data = (s_fc28_data_t *)item->user_arg;
             if (user_data)
             {
-                ezlopi_valueformatter_uint32_to_cjson(cj_result, user_data->hum_val, scales_percent);
+                EZPI_core_valueformatter_uint32_to_cjson(cj_result, user_data->hum_val, scales_percent);
                 ret = EZPI_SUCCESS;
             }
         }

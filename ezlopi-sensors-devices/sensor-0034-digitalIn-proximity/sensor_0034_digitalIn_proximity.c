@@ -166,7 +166,7 @@ static ezlopi_error_t proximity_sensor_get_value_cjson(l_ezlopi_item_t *item, vo
             item->interface.gpio.gpio_in.value = item->interface.gpio.gpio_in.value ? false : true;
         }
 
-        ezlopi_valueformatter_bool_to_cjson(cj_result, item->interface.gpio.gpio_in.value, NULL);
+        EZPI_core_valueformatter_bool_to_cjson(cj_result, item->interface.gpio.gpio_in.value, NULL);
         ret = EZPI_SUCCESS;
         // TRACE_D("value: %d", item->interface.gpio.gpio_in.value);
     }

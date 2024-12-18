@@ -244,17 +244,17 @@ static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg)
                 if (ezlopi_item_name_acceleration_x_axis == item->cloud_properties.item_name)
                 {
                     acceleration_value = (user_data->acc_x * ADXL345_CONVERTER_FACTOR_MG_TO_G * ADXL345_STANDARD_G_TO_ACCEL_CONVERSION_VALUE);
-                    ezlopi_valueformatter_float_to_cjson(cj_result, acceleration_value, item->cloud_properties.scale);
+                    EZPI_core_valueformatter_float_to_cjson(cj_result, acceleration_value, item->cloud_properties.scale);
                 }
                 if (ezlopi_item_name_acceleration_y_axis == item->cloud_properties.item_name)
                 {
                     acceleration_value = (user_data->acc_y * ADXL345_CONVERTER_FACTOR_MG_TO_G * ADXL345_STANDARD_G_TO_ACCEL_CONVERSION_VALUE);
-                    ezlopi_valueformatter_float_to_cjson(cj_result, acceleration_value, item->cloud_properties.scale);
+                    EZPI_core_valueformatter_float_to_cjson(cj_result, acceleration_value, item->cloud_properties.scale);
                 }
                 if (ezlopi_item_name_acceleration_z_axis == item->cloud_properties.item_name)
                 {
                     acceleration_value = (user_data->acc_z * ADXL345_CONVERTER_FACTOR_MG_TO_G * ADXL345_STANDARD_G_TO_ACCEL_CONVERSION_VALUE);
-                    ezlopi_valueformatter_float_to_cjson(cj_result, acceleration_value, item->cloud_properties.scale);
+                    EZPI_core_valueformatter_float_to_cjson(cj_result, acceleration_value, item->cloud_properties.scale);
                 }
                 ret = EZPI_SUCCESS;
             }

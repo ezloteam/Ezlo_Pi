@@ -88,7 +88,7 @@ static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg)
         TSL256_lum_t *illuminance_value = ((TSL256_lum_t *)item->user_arg);
         if (illuminance_value)
         {
-            ezlopi_valueformatter_uint32_to_cjson(cj_result, illuminance_value->lux_val, scales_lux);
+            EZPI_core_valueformatter_uint32_to_cjson(cj_result, illuminance_value->lux_val, scales_lux);
             ret = EZPI_SUCCESS;
         }
     }

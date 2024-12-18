@@ -33,7 +33,7 @@
  * @brief   perform some function on data
  * @author  xx
  * @version 0.1
- * @date    12th DEC 2024
+ * @date    xx
 */
 
 #ifndef __HEADER_H__

@@ -198,7 +198,7 @@ static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg)
                 TRACE_W("new _ target duty value: %d", duty);
             }
 
-            ezlopi_valueformatter_int32_to_cjson(cj_result, target_duty, NULL);
+            EZPI_core_valueformatter_int32_to_cjson(cj_result, target_duty, NULL);
             ret = EZPI_SUCCESS;
         }
     }

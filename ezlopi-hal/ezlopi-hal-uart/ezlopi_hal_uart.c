@@ -66,7 +66,10 @@ s_ezlopi_uart_object_handle_t ezlopi_uart_init(uint32_t baudrate, uint32_t tx, u
         uart_object_handle->upcall = upcall;
 
         xTaskCreate(ezlopi_uart_channel_task, "EzpiUartChnTask", EZLOPI_HAL_UART_TASK_DEPTH, (void *)uart_object_handle, 13, &(uart_object_handle->taskHandle));
+
+#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
         ezlopi_core_process_set_process_info(ENUM_EZLOPI_HAL_UART_TASK, &uart_object_handle->taskHandle, EZLOPI_HAL_UART_TASK_DEPTH);
+#endif
     }
     else
     {
@@ -162,34 +165,34 @@ void EZPI_HAL_uart_init(void)
     uint32_t frame_size = EZPI_SERV_UART_FRAME_SIZE_DEFAULT;
     uint32_t flow_control = EZPI_SERV_UART_FLOW_CTRL_DEFAULT;
 
-    if (EZPI_SUCCESS != EZPI_CORE_nvs_read_baud(&baud))
+    if (EZPI_SUCCESS != EZPI_core_nvs_read_baud(&baud))
     {
-        EZPI_CORE_nvs_write_baud(EZPI_SERV_UART_BAUD_DEFAULT);
+        EZPI_core_nvs_write_baud(EZPI_SERV_UART_BAUD_DEFAULT);
     }
     vTaskDelay(1 / portTICK_RATE_MS);
-    if (EZPI_SUCCESS != EZPI_CORE_nvs_read_parity(&parity_val))
+    if (EZPI_SUCCESS != EZPI_core_nvs_read_parity(&parity_val))
     {
-        EZPI_CORE_nvs_write_parity(EZPI_SERV_UART_PARITY_DEFAULT);
+        EZPI_core_nvs_write_parity(EZPI_SERV_UART_PARITY_DEFAULT);
     }
     vTaskDelay(1 / portTICK_RATE_MS);
-    if (EZPI_SUCCESS != EZPI_CORE_nvs_read_start_bits(&start_bits))
+    if (EZPI_SUCCESS != EZPI_core_nvs_read_start_bits(&start_bits))
     {
-        EZPI_CORE_nvs_write_start_bits(EZPI_SERV_UART_START_BIT_DEFAULT);
+        EZPI_core_nvs_write_start_bits(EZPI_SERV_UART_START_BIT_DEFAULT);
     }
     vTaskDelay(1 / portTICK_RATE_MS);
-    if (EZPI_SUCCESS != EZPI_CORE_nvs_read_stop_bits(&stop_bits))
+    if (EZPI_SUCCESS != EZPI_core_nvs_read_stop_bits(&stop_bits))
     {
-        EZPI_CORE_nvs_write_stop_bits(EZPI_SERV_UART_STOP_BIT_DEFAULT);
+        EZPI_core_nvs_write_stop_bits(EZPI_SERV_UART_STOP_BIT_DEFAULT);
     }
     vTaskDelay(1 / portTICK_RATE_MS);
-    if (EZPI_SUCCESS != EZPI_CORE_nvs_read_frame_size(&frame_size))
+    if (EZPI_SUCCESS != EZPI_core_nvs_read_frame_size(&frame_size))
     {
-        EZPI_CORE_nvs_write_frame_size(EZPI_SERV_UART_FRAME_SIZE_DEFAULT);
+        EZPI_core_nvs_write_frame_size(EZPI_SERV_UART_FRAME_SIZE_DEFAULT);
     }
     vTaskDelay(1 / portTICK_RATE_MS);
-    if (EZPI_SUCCESS != EZPI_CORE_nvs_read_flow_control(&flow_control))
+    if (EZPI_SUCCESS != EZPI_core_nvs_read_flow_control(&flow_control))
     {
-        EZPI_CORE_nvs_write_flow_control(EZPI_SERV_UART_FLOW_CTRL_DEFAULT);
+        EZPI_core_nvs_write_flow_control(EZPI_SERV_UART_FLOW_CTRL_DEFAULT);
     }
     vTaskDelay(1 / portTICK_RATE_MS);
     uart_word_length_t frame_size_val = EZPI_core_info_get_frame_size(frame_size);

@@ -86,7 +86,7 @@ static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg)
         double *soil_moisture_data = (double *)item->user_arg;
         if (soil_moisture_data)
         {
-            ezlopi_valueformatter_double_to_cjson(cj_result, *soil_moisture_data, scales_percent);
+            EZPI_core_valueformatter_double_to_cjson(cj_result, *soil_moisture_data, scales_percent);
             ret = EZPI_SUCCESS;
         }
     }

@@ -556,7 +556,9 @@ int ezlopi_service_modes_start(5000void)
     {
         ret = 1;
         xTaskCreate(__modes_service, "modes-service", EZLOPI_SERVICE_MODES_TASK_DEPTH, NULL, 3, &sg_process_handle);
+#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
         ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_MODES_TASK, &sg_process_handle, EZLOPI_SERVICE_MODES_TASK_DEPTH);
+#endif
         TRACE_I("Starting modes-service");
     }
 

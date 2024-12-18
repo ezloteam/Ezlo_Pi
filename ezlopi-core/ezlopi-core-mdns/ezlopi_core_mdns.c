@@ -104,7 +104,9 @@ ezlopi_error_t EZPI_init_mdns(void)
 
     TaskHandle_t ezlopi_core_mdns_service_task_handle = NULL;
     xTaskCreate(__mdns_init, "mdns_svc", EZLOPI_CORE_MDNS_SERVICE_TASK_DEPTH, NULL, 4, &ezlopi_core_mdns_service_task_handle);
+#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
     ezlopi_core_process_set_process_info(ENUM_EZLOPI_CORE_MDNS_SERVICE_TASK, &ezlopi_core_mdns_service_task_handle, EZLOPI_CORE_MDNS_SERVICE_TASK_DEPTH);
+#endif
 
     return ret;
 }
@@ -314,7 +316,7 @@ static void __mdns_init(void *pv)
     __ezlopi_mdns_init_service_context();
     while (1)
     {
-        ezlopi_wait_for_wifi_to_connect(portMAX_DELAY);
+        EZPI_core_wait_for_wifi_to_connect(portMAX_DELAY);
 
         esp_err_t err = mdns_init();
         if (err == ESP_OK)

@@ -159,9 +159,9 @@ static ezlopi_error_t __0042_get_cjson_value(l_ezlopi_item_t *item, void *arg)
             if (user_data)
             {
 #if VOLTAGE_DIVIDER_EN
-                ezlopi_valueformatter_float_to_cjson(cj_result, (user_data->volt) * 9.52f, item->cloud_properties.scale);
+                EZPI_core_valueformatter_float_to_cjson(cj_result, (user_data->volt) * 9.52f, item->cloud_properties.scale);
 #else
-                ezlopi_valueformatter_float_to_cjson(cj_result, (user_data->volt) * 4.2f, item->cloud_properties.scale);
+                EZPI_core_valueformatter_float_to_cjson(cj_result, (user_data->volt) * 4.2f, item->cloud_properties.scale);
 #endif
                 ret = EZPI_SUCCESS;
             }

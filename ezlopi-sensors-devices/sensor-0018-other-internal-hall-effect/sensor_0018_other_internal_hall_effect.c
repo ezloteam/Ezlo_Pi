@@ -175,7 +175,9 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
                 user_data->hall_state = "dw_is_closed";
                 TaskHandle_t ezlopi_sensor_hall_callibration_task_handle = NULL;
                 xTaskCreate(__hall_calibration_task, "Hall_Calibration_Task", EZLOPI_SENSOR_HALL_CALLIBRATION_TASK_DEPTH, item, 1, &ezlopi_sensor_hall_callibration_task_handle);
+#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
                 ezlopi_core_process_set_process_info(ENUM_EZLOPI_SENSOR_HALL_CALLIBRATION_TASK, &ezlopi_sensor_hall_callibration_task_handle, EZLOPI_SENSOR_HALL_CALLIBRATION_TASK_DEPTH);
+#endif
             }
             else
             {

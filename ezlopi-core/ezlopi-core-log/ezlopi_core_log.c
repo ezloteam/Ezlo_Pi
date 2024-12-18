@@ -108,8 +108,8 @@ void EZPI_core_read_set_log_severities_internal(e_ezlopi_log_severity_t severity
 
 void EZPI_core_read_set_log_severities(void)
 {
-    EZPI_CORE_nvs_read_cloud_log_severity(&cloud_log_severity);
-    EZPI_CORE_nvs_read_serial_log_severity(&serial_log_severity);
+    EZPI_core_nvs_read_cloud_log_severity(&cloud_log_severity);
+    EZPI_core_nvs_read_serial_log_severity(&serial_log_severity);
 }
 
 ezlopi_error_t EZPI_core_cloud_log_severity_process_str(bool severity_enable, const char *severity_str)
@@ -125,7 +125,7 @@ ezlopi_error_t EZPI_core_cloud_log_severity_process_str(bool severity_enable, co
         cloud_log_severity = ENUM_EZLOPI_LOG_SEVERITY_NONE;
         ret = EZPI_SUCCESS;
     }
-    EZPI_CORE_nvs_write_cloud_log_severity(cloud_log_severity);
+    EZPI_core_nvs_write_cloud_log_severity(cloud_log_severity);
     return ret;
 }
 
@@ -143,7 +143,7 @@ ezlopi_error_t EZPI_core_cloud_log_severity_process_id(const e_ezlopi_log_severi
         {
             cloud_log_severity = ENUM_EZLOPI_LOG_SEVERITY_WARNING;
         }
-        EZPI_CORE_nvs_write_cloud_log_severity(cloud_log_severity);
+        EZPI_core_nvs_write_cloud_log_severity(cloud_log_severity);
         ret = EZPI_SUCCESS;
     }
 
@@ -168,7 +168,7 @@ ezlopi_error_t EZPI_core_serial_log_severity_process_str(const char *severity_st
         serial_log_severity = ENUM_EZLOPI_LOG_SEVERITY_NONE;
         ret = EZPI_SUCCESS;
     }
-    EZPI_CORE_nvs_write_serial_log_severity(serial_log_severity);
+    EZPI_core_nvs_write_serial_log_severity(serial_log_severity);
     return ret;
 }
 
@@ -179,7 +179,7 @@ ezlopi_error_t EZPI_core_serial_log_severity_process_id(const e_ezlopi_log_sever
     if ((ENUM_EZLOPI_LOG_SEVERITY_MAX > severity_level_id) && (ENUM_EZLOPI_LOG_SEVERITY_NONE <= severity_level_id))
     {
         serial_log_severity = severity_level_id;
-        EZPI_CORE_nvs_write_serial_log_severity(serial_log_severity);
+        EZPI_core_nvs_write_serial_log_severity(serial_log_severity);
         ret = EZPI_SUCCESS;
     }
 
@@ -212,7 +212,7 @@ ezlopi_error_t EZPI_core_send_cloud_log(int severity, const char *log_str)
 
     if (severity <= EZPI_core_cloud_log_get_current_severity_enum_val())
     {
-        e_ezlopi_event_t event = ezlopi_core_event_group_get_eventbit_status();
+        e_ezlopi_event_t event = EZPI_core_event_group_get_eventbit_status();
         if ((event & EZLOPI_EVENT_NMA_REG) == EZLOPI_EVENT_NMA_REG)
         {
             cJSON *cj_log_broadcast = cJSON_CreateObject(__FUNCTION__);

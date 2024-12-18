@@ -110,7 +110,7 @@ extern "C"
      *
      * @return e_ezlopi_event_t
      */
-    e_ezlopi_event_t ezlopi_core_event_group_get_eventbit_status();
+    e_ezlopi_event_t EZPI_core_event_group_get_eventbit_status();
 
 
 #ifdef __cplusplus

@@ -58,7 +58,6 @@
 #include "lwip/inet.h"
 #include "ping_sock.h"
 #endif /* PING_USE_SOCKETS */
-
 #ifdef ESP_PING
 #include "esp_ping.h"
 #include "lwip/ip_addr.h"
@@ -120,6 +119,17 @@
 *                          Static Function Prototypes
 *******************************************************************************/
 
+#if !PING_USE_SOCKETS
+static void ping_prepare_echo(struct icmp_echo_hdr *iecho, u16_t len);
+static u8_t ping_recv(void *arg, struct raw_pcb *pcb, struct pbuf *p, const ip_addr_t *addr);
+static void ping_send(struct raw_pcb *raw, ip_addr_t *addr);
+static void ping_timeout(void *arg);
+static void ping_raw_init(void);
+static void __on_ping_success(esp_ping_handle_t hdl, void *args);
+static void __on_ping_timeout(esp_ping_handle_t hdl, void *args);
+static void __on_ping_end(esp_ping_handle_t hdl, void *args);
+#endif /* !PING_USE_SOCKETS */
+
 /*******************************************************************************
 *                          Static Data Definitions
 *******************************************************************************/
@@ -127,6 +137,7 @@
 #if PING_USE_SOCKETS
 /* ping handle */
 static esp_ping_handle_t ping = NULL;
+
 #else
 static struct raw_pcb *ping_pcb;
 static u16_t ping_seq_num;
@@ -138,8 +149,7 @@ static struct timeval ping_time;
 /*******************************************************************************
 *                          Extern Function Definitions
 *******************************************************************************/
-void
-ping_send_now(void)
+void ping_send_now(void)
 {
   ip_addr_t ping_target;
   LWIP_ASSERT("ping_pcb != NULL", ping_pcb != NULL);
@@ -147,12 +157,58 @@ ping_send_now(void)
   ping_send(ping_pcb, &ping_target);
 }
 
+
+int EZPI_ping_init(void)
+{
+#if PING_USE_SOCKETS
+  uint32_t tos = 0;
+  uint32_t ping_timeout = PING_RCV_TIMEO;
+  uint32_t ping_delay = PING_DELAY;
+  uint32_t ping_count_max = 3;
+  uint32_t interface = 0;
+  ip_addr_t ipaddr;
+
+  esp_ping_get_target(PING_TARGET_IP_ADDRESS_COUNT, &ping_count_max, sizeof(ping_count_max));
+  esp_ping_get_target(PING_TARGET_RCV_TIMEO, &ping_timeout, sizeof(ping_timeout));
+  esp_ping_get_target(PING_TARGET_DELAY_TIME, &ping_delay, sizeof(ping_delay));
+  esp_ping_get_target(PING_TARGET_IP_ADDRESS, &ipaddr, sizeof(ip_addr_t));
+  esp_ping_get_target(PING_TARGET_IP_TOS, &tos, sizeof(tos));
+  esp_ping_get_target(PING_TARGET_IF_INDEX, &interface, sizeof(interface));
+
+  ezlopi_ping_config_t config = ESP_PING_DEFAULT_CONFIG();
+  config.count = ping_count_max;
+  config.timeout_ms = ping_timeout;
+  config.interval_ms = ping_delay;
+  config.target_addr = ipaddr;
+  config.tos = tos;
+  config.interface = interface;
+
+  ezlopi_ping_callbacks_t cbs = {
+    .on_ping_end = __on_ping_end,
+    .on_ping_success = __on_ping_success,
+    .on_ping_timeout = __on_ping_timeout,
+  };
+
+  ezlopi_ping_new_session(&config, &cbs, &ping);
+  ezlopi_ping_start_by_handle(ping);
+#else /* PING_USE_SOCKETS */
+  ping_raw_init();
+#endif /* PING_USE_SOCKETS */
+  return ERR_OK;
+}
+
+
+void ping_deinit(void)
+{
+  EZPI_ping_stop_by_handle(ping);
+  EZPI_ping_delete_session(ping);
+}
+
 /*******************************************************************************
 *                         Static Function Definitions
 *******************************************************************************/
 /** Prepare a echo ICMP request */
-static void
-ping_prepare_echo(struct icmp_echo_hdr *iecho, u16_t len)
+static void ping_prepare_echo(struct icmp_echo_hdr *iecho, u16_t len)
 {
   size_t i;
   size_t data_len = len - sizeof(struct icmp_echo_hdr);
@@ -173,8 +229,7 @@ ping_prepare_echo(struct icmp_echo_hdr *iecho, u16_t len)
 }
 
 /* Ping using the raw ip */
-static u8_t
-ping_recv(void *arg, struct raw_pcb *pcb, struct pbuf *p, const ip_addr_t *addr)
+static u8_t ping_recv(void *arg, struct raw_pcb *pcb, struct pbuf *p, const ip_addr_t *addr)
 {
   struct icmp_echo_hdr *iecho;
   struct timeval now;
@@ -208,8 +263,7 @@ ping_recv(void *arg, struct raw_pcb *pcb, struct pbuf *p, const ip_addr_t *addr)
   return 0; /* don't eat the packet */
 }
 
-static void
-ping_send(struct raw_pcb *raw, ip_addr_t *addr)
+static void ping_send(struct raw_pcb *raw, ip_addr_t *addr)
 {
   struct pbuf *p;
   struct icmp_echo_hdr *iecho;
@@ -237,8 +291,7 @@ ping_send(struct raw_pcb *raw, ip_addr_t *addr)
   pbuf_free(p);
 }
 
-static void
-ping_timeout(void *arg)
+static void ping_timeout(void *arg)
 {
   struct raw_pcb *pcb = (struct raw_pcb *)arg;
   ip_addr_t ping_target;
@@ -250,8 +303,7 @@ ping_timeout(void *arg)
   sys_timeout(PING_DELAY, ping_timeout, pcb);
 }
 
-static void
-ping_raw_init(void)
+static void ping_raw_init(void)
 {
   ping_pcb = raw_new(IP_PROTO_ICMP);
   LWIP_ASSERT("ping_pcb != NULL", ping_pcb != NULL);
@@ -261,8 +313,6 @@ ping_raw_init(void)
   sys_timeout(PING_DELAY, ping_timeout, ping_pcb);
 }
 
-#endif /* PING_USE_SOCKETS */
-
 /**
  *
  * Re-implement EZPI_ping_init and ping_deinit with the APIs from ping_sock.h for back-ward compatibility sake.
@@ -270,8 +320,7 @@ ping_raw_init(void)
  * ToDo: ping.h and esp_ping.h are deprecated now and should be removed in idf v5.x.
  *
  */
-static void
-on_ping_success(esp_ping_handle_t hdl, void *args)
+static void __on_ping_success(esp_ping_handle_t hdl, void *args)
 {
   uint32_t elapsed_time, recv_len;
   ezlopi_ping_get_profile(hdl, ESP_PING_PROF_SIZE, &recv_len, sizeof(recv_len));
@@ -279,8 +328,7 @@ on_ping_success(esp_ping_handle_t hdl, void *args)
   esp_ping_result(PING_RES_OK, recv_len, elapsed_time);
 }
 
-static void
-on_ping_timeout(esp_ping_handle_t hdl, void *args)
+static void __on_ping_timeout(esp_ping_handle_t hdl, void *args)
 {
   uint32_t elapsed_time, recv_len;
   ezlopi_ping_get_profile(hdl, ESP_PING_PROF_SIZE, &recv_len, sizeof(recv_len));
@@ -288,61 +336,15 @@ on_ping_timeout(esp_ping_handle_t hdl, void *args)
   esp_ping_result(PING_RES_TIMEOUT, recv_len, elapsed_time);
 }
 
-static void
-on_ping_end(esp_ping_handle_t hdl, void *args)
+static void __on_ping_end(esp_ping_handle_t hdl, void *args)
 {
   esp_ping_result(PING_RES_FINISH, 0, 0);
   EZPI_ping_delete_session(hdl);
 }
 
-
-int
-EZPI_ping_init(void)
-{
-#if PING_USE_SOCKETS
-  uint32_t tos = 0;
-  uint32_t ping_timeout = PING_RCV_TIMEO;
-  uint32_t ping_delay = PING_DELAY;
-  uint32_t ping_count_max = 3;
-  uint32_t interface = 0;
-  ip_addr_t ipaddr;
-
-  esp_ping_get_target(PING_TARGET_IP_ADDRESS_COUNT, &ping_count_max, sizeof(ping_count_max));
-  esp_ping_get_target(PING_TARGET_RCV_TIMEO, &ping_timeout, sizeof(ping_timeout));
-  esp_ping_get_target(PING_TARGET_DELAY_TIME, &ping_delay, sizeof(ping_delay));
-  esp_ping_get_target(PING_TARGET_IP_ADDRESS, &ipaddr, sizeof(ip_addr_t));
-  esp_ping_get_target(PING_TARGET_IP_TOS, &tos, sizeof(tos));
-  esp_ping_get_target(PING_TARGET_IF_INDEX, &interface, sizeof(interface));
-
-  ezlopi_ping_config_t config = ESP_PING_DEFAULT_CONFIG();
-  config.count = ping_count_max;
-  config.timeout_ms = ping_timeout;
-  config.interval_ms = ping_delay;
-  config.target_addr = ipaddr;
-  config.tos = tos;
-  config.interface = interface;
-
-  ezlopi_ping_callbacks_t cbs = {
-    .on_ping_end = on_ping_end,
-    .on_ping_success = on_ping_success,
-    .on_ping_timeout = on_ping_timeout,
-  };
-
-  ezlopi_ping_new_session(&config, &cbs, &ping);
-  ezlopi_ping_start_by_handle(ping);
-#else /* PING_USE_SOCKETS */
-  ping_raw_init();
 #endif /* PING_USE_SOCKETS */
-  return ERR_OK;
-}
 
-void ping_deinit(void)
-{
-  EZPI_ping_stop_by_handle(ping);
-  EZPI_ping_delete_session(ping);
-}
 #endif /* LWIP_IPV4 && LWIP_RAW */
-#warning "NEED to reorganize the functions in 'ping.c'";
 /*******************************************************************************
 *                          End of File
 *******************************************************************************/

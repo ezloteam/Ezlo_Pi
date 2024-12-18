@@ -36,7 +36,7 @@ void network_get(cJSON *cj_request, cJSON *cj_response)
                 cJSON_AddBoolToObject(__FUNCTION__, wifi_properties, ezlopi_internetAvailable_str, true);
 
                 cJSON *wifi_ipv4 = cJSON_CreateObject(__FUNCTION__);
-                ezlopi_wifi_status_t *wifi_status = ezlopi_wifi_status();
+                ezlopi_wifi_status_t *wifi_status = EZPI_core_wifi_status();
                 if (wifi_ipv4)
                 {
                     cJSON *cj_dns = cJSON_AddArrayToObject(__FUNCTION__, wifi_ipv4, "dns");
@@ -91,7 +91,7 @@ void network_get(cJSON *cj_request, cJSON *cj_response)
                             cJSON_AddStringToObject(__FUNCTION__, cj_network, "bssid", tmp_string);
 
                             memset(tmp_string, 0, sizeof(tmp_string));
-                            get_auth_mode_str(tmp_string, ap_info.authmode);
+                            EZPI_core_wifi_get_auth_mode_str(tmp_string, ap_info.authmode);
                             cJSON_AddStringToObject(__FUNCTION__, cj_network, "encryption", tmp_string);
 
                             char *wifi_ssid = EZPI_core_factory_info_v3_get_ssid();
@@ -125,13 +125,13 @@ void network_get(cJSON *cj_request, cJSON *cj_response)
 
 void network_wifi_scan_start(cJSON *cj_request, cJSON *cj_response)
 {
-    ezlopi_wifi_scan_start();
+    EZPI_core_wifi_scan_start();
     cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
 }
 
 void network_wifi_scan_stop(cJSON *cj_request, cJSON *cj_response)
 {
-    ezlopi_wifi_scan_stop();
+    EZPI_core_wifi_scan_stop();
     cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
 }
 
@@ -149,7 +149,7 @@ void network_wifi_try_connect(cJSON *cj_request, cJSON *cj_response)
             cJSON *cj_network = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_network_str);
             if (cj_network)
             {
-                ezlopi_wifi_try_connect(cj_network);
+                EZPI_core_wifi_try_new_connect(cj_network);
             }
         }
     }

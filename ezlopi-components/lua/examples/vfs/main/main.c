@@ -95,5 +95,7 @@ void app_main()
 {
     TaskHandle_t ezlopi_component_lua_vfs_test_task_handle = NULL;
     xTaskCreate(test, "test", EZLOPI_COMPONENT_LUA_VFS_TEST_TASK_DEPTH, NULL, 5, &ezlopi_component_lua_vfs_test_task_handle);
+#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
     ezlopi_core_process_set_process_info(ENUM_EZLOPI_COMPONENT_LUA_VFS_TEST_TASK, &ezlopi_component_lua_vfs_test_task_handle, EZLOPI_COMPONENT_LUA_VFS_TEST_TASK_DEPTH);
+#endif
 }

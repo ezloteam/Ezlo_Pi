@@ -185,7 +185,9 @@ static ezlopi_error_t __0047_init(l_ezlopi_item_t *item)
                         __hx711_power_reset(item);
                         TaskHandle_t ezlopi_sensor_hx711_task_handle = NULL;
                         xTaskCreate(__Calculate_hx711_tare_wt, "Calculate the Tare weight", EZLOPI_SENSOR_HX711_TASK_DEPTH, item, 1, &ezlopi_sensor_hx711_task_handle);
+#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
                         ezlopi_core_process_set_process_info(ENUM_EZLOPI_SENSOR_HX711_TASK, &ezlopi_sensor_hx711_task_handle, EZLOPI_SENSOR_HX711_TASK_DEPTH);
+#endif
                         ret = EZPI_SUCCESS;
                     }
                 }
@@ -207,7 +209,7 @@ static ezlopi_error_t __0047_get_cjson_value(l_ezlopi_item_t *item, void *arg)
             s_hx711_data_t *user_data = (s_hx711_data_t *)item->user_arg;
             if (user_data)
             {
-                ezlopi_valueformatter_float_to_cjson(cj_result, user_data->weight, scales_kilo_gram);
+                EZPI_core_valueformatter_float_to_cjson(cj_result, user_data->weight, scales_kilo_gram);
                 ret = EZPI_SUCCESS;
             }
         }

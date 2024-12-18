@@ -157,7 +157,7 @@ ezlopi_error_t EZPI_core_event_group_wait_for_event(e_ezlopi_event_t event, uint
     return error;
 }
 
-e_ezlopi_event_t ezlopi_core_event_group_get_eventbit_status()
+e_ezlopi_event_t EZPI_core_event_group_get_eventbit_status()
 {
     #warning("return statement always returns 0 i.e. OTA event at else")
         e_ezlopi_event_t ret = 0;

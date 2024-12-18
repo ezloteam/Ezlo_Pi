@@ -70,7 +70,7 @@
 *                          Static Function Prototypes
 *******************************************************************************/
 static void __sort_by_pos(void);
-static void __free_nodes(s_ezlopi_room_t *room);
+static void __free_all_room_nodes(s_ezlopi_room_t *room);
 static int __free_room_from_list_by_id(uint32_t room_id);
 static void __update_cloud_room_deleted(uint32_t room_id);
 static int __remove_room_from_nvs_by_id(uint32_t a_room_id);
@@ -227,7 +227,7 @@ int EZPI_core_room_delete_all(void)
 {
     int ret = 1;
 
-    __free_nodes(l_room_head);
+    __free_all_room_nodes(l_room_head);
     l_room_head = NULL;
 
     EZPI_core_nvs_write_rooms("[]");
@@ -476,11 +476,11 @@ static void __update_cloud_room_deleted(uint32_t room_id)
     }
 }
 
-static void __free_nodes(s_ezlopi_room_t *room)
+static void __free_all_room_nodes(s_ezlopi_room_t *room)
 {
     if (room)
     {
-        __free_nodes(room->next);
+        __free_all_room_nodes(room->next);
         __update_cloud_room_deleted(room->_id);
         ezlopi_free(__FUNCTION__, room);
     }

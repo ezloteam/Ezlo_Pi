@@ -238,16 +238,16 @@ int EZPI_core_setting_commands_read_settings()
 {
     int ret = 0;
 
-    EZPI_CORE_nvs_read_temperature_scale((uint32_t *)&temperature_scale_to_user);
+    EZPI_core_nvs_read_temperature_scale((uint32_t *)&temperature_scale_to_user);
     TRACE_I("Temperature scale: %s", temperature_scale_enum[temperature_scale_to_user]);
 
-    EZPI_CORE_nvs_read_date_format((uint32_t *)&date_format_to_user);
+    EZPI_core_nvs_read_date_format((uint32_t *)&date_format_to_user);
     TRACE_I("Date format: %s", date_format_enum[date_format_to_user]);
 
-    EZPI_CORE_nvs_read_time_format((uint32_t *)&time_format_to_user);
+    EZPI_core_nvs_read_time_format((uint32_t *)&time_format_to_user);
     TRACE_I("Time format: %s", time_format_enum[time_format_to_user]);
 
-    EZPI_CORE_nvs_read_network_ping_timeout((uint32_t *)&network_ping_timeout_to_user);
+    EZPI_core_nvs_read_network_ping_timeout((uint32_t *)&network_ping_timeout_to_user);
     TRACE_I("Network Ping Timeout: %d", network_ping_timeout_to_user);
 
 #ifdef CONFIG_EZPI_UTIL_TRACE_EN
@@ -325,7 +325,7 @@ static int ezlopi_core_setting_command_process_scale_temperature(const cJSON *cj
             {
                 if (0 == strncmp(temperature_scale_enum[i], cj_value->valuestring, strlen(temperature_scale_enum[i])))
                 {
-                    EZPI_CORE_nvs_write_temperature_scale((uint32_t)i);
+                    EZPI_core_nvs_write_temperature_scale((uint32_t)i);
                     temperature_scale_to_user = i;
                     ret = 0;
                     break;
@@ -348,7 +348,7 @@ static int ezlopi_core_setting_command_process_date_format(const cJSON *cj_param
             {
                 if (0 == strncmp(date_format_enum[i], cj_value->valuestring, strlen(date_format_enum[i])))
                 {
-                    EZPI_CORE_nvs_write_date_format((uint32_t)i);
+                    EZPI_core_nvs_write_date_format((uint32_t)i);
                     date_format_to_user = i;
                     ret = 0;
                     break;
@@ -371,7 +371,7 @@ static int ezlopi_core_setting_command_process_time_format(const cJSON *cj_param
             {
                 if (0 == strncmp(time_format_enum[i], cj_value->valuestring, strlen(time_format_enum[i])))
                 {
-                    EZPI_CORE_nvs_write_time_format((uint32_t)i);
+                    EZPI_core_nvs_write_time_format((uint32_t)i);
                     time_format_to_user = i;
                     ret = 0;
                     break;
@@ -390,7 +390,7 @@ static int ezlopi_core_setting_command_process_netork_ping_timeout(const cJSON *
         cJSON *cj_value = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_value_str);
         if (cj_value && cJSON_IsNumber(cj_value))
         {
-            EZPI_CORE_nvs_write_network_ping_timeout((uint32_t)cj_value->valuedouble);
+            EZPI_core_nvs_write_network_ping_timeout((uint32_t)cj_value->valuedouble);
             network_ping_timeout_to_user = (int)cj_value->valuedouble;
             ret = 0;
         }

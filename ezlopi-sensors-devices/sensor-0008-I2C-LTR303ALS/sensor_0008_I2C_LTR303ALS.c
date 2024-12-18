@@ -68,7 +68,7 @@ static ezlopi_error_t __get_value_cjson(l_ezlopi_item_t *item, void *arg)
         ltr303_data_t *als_ltr303_data = (ltr303_data_t *)item->user_arg;
         if (cj_param && als_ltr303_data)
         {
-            ezlopi_valueformatter_double_to_cjson(cj_param, als_ltr303_data->lux, scales_lux);
+            EZPI_core_valueformatter_double_to_cjson(cj_param, als_ltr303_data->lux, scales_lux);
             ret = EZPI_SUCCESS;
         }
     }

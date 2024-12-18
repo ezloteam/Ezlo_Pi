@@ -394,7 +394,7 @@ static void ezpi_service_ble_device_state_info(esp_gatt_value_t *value, esp_ble_
             cJSON_AddStringToObject(__FUNCTION__, cj_device_state, ezlopi_flash_size_str, CONFIG_ESPTOOLPY_FLASHSIZE);
 
             uint8_t mac[6];
-            ezlopi_wifi_get_wifi_mac(mac);
+            EZPI_core_wifi_get_wifi_mac(mac);
             char mac_str[20];
             memset(mac_str, 0, sizeof(mac_str));
             snprintf(mac_str, 20, "%02X:%02X:%02X:%02X:%02X:%02X", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
@@ -439,24 +439,24 @@ static void ezpi_service_ble_serial_config_info(esp_gatt_value_t *value, esp_ble
             char flw_ctrl_bffr[EZPI_UART_SERV_FLW_CTRL_STR_SIZE + 1];
             flw_ctrl_bffr[EZPI_UART_SERV_FLW_CTRL_STR_SIZE] = 0;
 
-            EZPI_CORE_nvs_read_baud(&baud);
+            EZPI_core_nvs_read_baud(&baud);
             cJSON_AddNumberToObject(__FUNCTION__, cj_serial_config, ezlopi_baud_str, baud);
 
-            EZPI_CORE_nvs_read_parity(&parity_val);
+            EZPI_core_nvs_read_parity(&parity_val);
             parity[0] = EZPI_core_info_parity_to_name(parity_val);
             parity[1] = 0;
             cJSON_AddStringToObject(__FUNCTION__, cj_serial_config, ezlopi_parity_str, parity);
 
-            EZPI_CORE_nvs_read_start_bits(&start_bits);
+            EZPI_core_nvs_read_start_bits(&start_bits);
             cJSON_AddNumberToObject(__FUNCTION__, cj_serial_config, ezlopi_start_bits_str, start_bits);
 
-            EZPI_CORE_nvs_read_stop_bits(&stop_bits);
+            EZPI_core_nvs_read_stop_bits(&stop_bits);
             cJSON_AddNumberToObject(__FUNCTION__, cj_serial_config, ezlopi_stop_bits_str, stop_bits);
 
-            EZPI_CORE_nvs_read_frame_size(&frame_size);
+            EZPI_core_nvs_read_frame_size(&frame_size);
             cJSON_AddNumberToObject(__FUNCTION__, cj_serial_config, ezlopi_frame_size_str, frame_size);
 
-            EZPI_CORE_nvs_read_flow_control(&flow_control);
+            EZPI_core_nvs_read_flow_control(&flow_control);
             EZPI_core_info_get_flow_ctrl_to_name(flow_control, flw_ctrl_bffr);
             cJSON_AddStringToObject(__FUNCTION__, cj_serial_config, ezlopi_flow_control_str, flw_ctrl_bffr);
 
@@ -509,12 +509,12 @@ static void ezpi_service_ble_serial_config_write(esp_gatt_value_t *value, esp_bl
                 CJSON_GET_VALUE_DOUBLE(root, ezlopi_frame_size_str, frame_size);
                 CJSON_GET_VALUE_STRING_BY_COPY(root, ezlopi_flow_control_str, str_flowcontrol);
 
-                EZPI_CORE_nvs_read_baud(&baud_current);
-                EZPI_CORE_nvs_read_parity(&parity_val_current);
-                EZPI_CORE_nvs_read_start_bits(&start_bits_current);
-                EZPI_CORE_nvs_read_stop_bits(&stop_bits_current);
-                EZPI_CORE_nvs_read_frame_size(&frame_size_current);
-                EZPI_CORE_nvs_read_flow_control(&flow_control_current);
+                EZPI_core_nvs_read_baud(&baud_current);
+                EZPI_core_nvs_read_parity(&parity_val_current);
+                EZPI_core_nvs_read_start_bits(&start_bits_current);
+                EZPI_core_nvs_read_stop_bits(&stop_bits_current);
+                EZPI_core_nvs_read_frame_size(&frame_size_current);
+                EZPI_core_nvs_read_flow_control(&flow_control_current);
 
                 if (
                     (baud_current != baud) ||
@@ -533,26 +533,26 @@ static void ezpi_service_ble_serial_config_write(esp_gatt_value_t *value, esp_bl
                     {
                         parity_val = (uint32_t)EZPI_core_info_name_to_parity(str_parity);
                     }
-                    EZPI_CORE_nvs_write_parity(parity_val);
+                    EZPI_core_nvs_write_parity(parity_val);
 
                     if (baud)
                     {
-                        EZPI_CORE_nvs_write_baud(baud);
+                        EZPI_core_nvs_write_baud(baud);
                     }
                     else
                     {
                         baud = EZPI_SERV_UART_BAUD_DEFAULT;
-                        EZPI_CORE_nvs_write_baud(baud);
+                        EZPI_core_nvs_write_baud(baud);
                     }
 
-                    EZPI_CORE_nvs_write_start_bits(start_bits);
-                    EZPI_CORE_nvs_write_stop_bits(stop_bits);
+                    EZPI_core_nvs_write_start_bits(start_bits);
+                    EZPI_core_nvs_write_stop_bits(stop_bits);
 
                     if (!frame_size)
                     {
                         frame_size = EZPI_SERV_UART_FRAME_SIZE_DEFAULT;
                     }
-                    EZPI_CORE_nvs_write_frame_size(frame_size);
+                    EZPI_core_nvs_write_frame_size(frame_size);
 
                     if ('\0' != str_flowcontrol[0])
                     {
@@ -560,7 +560,7 @@ static void ezpi_service_ble_serial_config_write(esp_gatt_value_t *value, esp_bl
                         TRACE_W("New Flow control: %d", flow_control_val);
                     }
 
-                    EZPI_CORE_nvs_write_flow_control(flow_control_val);
+                    EZPI_core_nvs_write_flow_control(flow_control_val);
 
                     TRACE_W("New config has been saved, reboot needed to apply changes.");
                     vTaskDelay(10);
@@ -670,7 +670,7 @@ static void ezpi_service_ble_net_info(esp_gatt_value_t *value, esp_ble_gatts_cb_
             cJSON_AddStringToObject(__FUNCTION__, cj_network, ezlopi_ssid_str, wifi_ssid ? wifi_ssid : "");
             EZPI_core_factory_info_v3_free(wifi_ssid);
 
-            ezlopi_wifi_status_t *wifi_status = ezlopi_wifi_status();
+            ezlopi_wifi_status_t *wifi_status = EZPI_core_wifi_status();
             // if (wifi_status)
             {
                 char *wifi_mode = EZPI_core_info_get_wifi_mode_to_name(wifi_status->wifi_mode);
@@ -691,7 +691,7 @@ static void ezpi_service_ble_net_info(esp_gatt_value_t *value, esp_ble_gatts_cb_
 
                 cJSON_AddBoolToObject(__FUNCTION__, cj_network, "wifi", wifi_status->wifi_connection);
 
-                e_ezlopi_event_t events = ezlopi_core_event_group_get_eventbit_status();
+                e_ezlopi_event_t events = EZPI_core_event_group_get_eventbit_status();
                 bool cloud_connection_status = (EZLOPI_EVENT_NMA_REG & events) == EZLOPI_EVENT_NMA_REG;
 
 #ifdef CONFIG_EZPI_ENABLE_PING
@@ -799,11 +799,11 @@ static char *ezpi_device_info_jsonify(void)
             ezlopi_free(__FUNCTION__, ssid);
         }
 
-        cJSON_AddNumberToObject(__FUNCTION__, root, ezlopi_wifi_connection_status_str, ezlopi_wifi_got_ip());
+        cJSON_AddNumberToObject(__FUNCTION__, root, ezlopi_wifi_connection_status_str, EZPI_core_wifi_got_ip());
 #ifdef CONFIG_EZPI_ENABLE_PING
         uint8_t flag_internet_status = (EZLOPI_PING_STATUS_LIVE == EZPI_core_ping_get_internet_status()) ? 1 : 0;
 #else  // CONFIG_EZPI_ENABLE_PING
-        e_ezlopi_event_t events = ezlopi_core_event_group_get_eventbit_status();
+        e_ezlopi_event_t events = EZPI_core_event_group_get_eventbit_status();
         bool cloud_connection_status = (EZLOPI_EVENT_NMA_REG & events) == EZLOPI_EVENT_NMA_REG;
         uint8_t flag_internet_status = cloud_connection_status ? 1 : 0;
 #endif // CONFIG_EZPI_ENABLE_PING

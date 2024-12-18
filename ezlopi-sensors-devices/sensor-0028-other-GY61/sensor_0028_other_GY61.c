@@ -236,15 +236,15 @@ static ezlopi_error_t __0028_get_cjson_value(l_ezlopi_item_t *item, void *arg)
 
             if (ezlopi_item_name_acceleration_x_axis == item->cloud_properties.item_name)
             {
-                ezlopi_valueformatter_float_to_cjson(cj_result, user_data->x_data, item->cloud_properties.scale);
+                EZPI_core_valueformatter_float_to_cjson(cj_result, user_data->x_data, item->cloud_properties.scale);
             }
             else if (ezlopi_item_name_acceleration_y_axis == item->cloud_properties.item_name)
             {
-                ezlopi_valueformatter_float_to_cjson(cj_result, user_data->y_data, item->cloud_properties.scale);
+                EZPI_core_valueformatter_float_to_cjson(cj_result, user_data->y_data, item->cloud_properties.scale);
             }
             else if (ezlopi_item_name_acceleration_z_axis == item->cloud_properties.item_name)
             {
-                ezlopi_valueformatter_float_to_cjson(cj_result, user_data->z_data, item->cloud_properties.scale);
+                EZPI_core_valueformatter_float_to_cjson(cj_result, user_data->z_data, item->cloud_properties.scale);
             }
 
             ret = EZPI_SUCCESS;

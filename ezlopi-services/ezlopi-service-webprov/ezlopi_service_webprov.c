@@ -169,12 +169,16 @@ void EZPI_service_web_provisioning_init(void)
 {
     TaskHandle_t ezlopi_service_web_prov_config_check_task_handle = NULL;
     xTaskCreate(ezpi_provision_check, "WebProvCfgChk", EZLOPI_SERVICE_WEB_PROV_CONFIG_CHECK_TASK_DEPTH, NULL, 4, &ezlopi_service_web_prov_config_check_task_handle);
+#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
     ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_WEB_PROV_CONFIG_CHECK_TASK, &ezlopi_service_web_prov_config_check_task_handle, EZLOPI_SERVICE_WEB_PROV_CONFIG_CHECK_TASK_DEPTH);
+#endif
 
     _wss_message_queue = xQueueCreate(10, sizeof(s_rx_message_t *));
 
     xTaskCreate(ezpi_fetch_wss_endpoint, "WebProvFetchWSS", EZLOPI_SERVICE_WEB_PROV_FETCH_WSS_TASK_DEPTH, NULL, 4, &__web_socket_initialize_handler);
+#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
     ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_WEB_PROV_FETCH_WSS_TASK, &__web_socket_initialize_handler, EZLOPI_SERVICE_WEB_PROV_FETCH_WSS_TASK_DEPTH);
+#endif
 }
 
 void EZPI_service_web_provisioning_deinit(void)
@@ -187,7 +191,7 @@ void EZPI_service_web_provisioning_deinit(void)
 #if (1 == EZPI_CORE_WSS_USE_WSC_LIB)
     ezlopi_core_wsc_kill(__wsc_ssl);
 #else
-    ezlopi_websocket_client_kill();
+    EZPI_core_websocket_client_kill();
 #endif
 }
 
@@ -223,7 +227,7 @@ static void ezpi_fetch_wss_endpoint(void *pv)
     char *ssl_private_key = EZPI_core_factory_info_v3_get_ssl_private_key();
     char *cloud_server = EZPI_core_factory_info_v3_get_cloud_server();
 
-    ezlopi_wait_for_wifi_to_connect(portMAX_DELAY);
+    EZPI_core_wait_for_wifi_to_connect(portMAX_DELAY);
     vTaskDelay(2);
 
     while (1)
@@ -257,7 +261,7 @@ static void ezpi_fetch_wss_endpoint(void *pv)
 #if (1 == EZPI_CORE_WSS_USE_WSC_LIB)
                             __wsc_ssl = ezlopi_core_wsc_init(cjson_uri, ezpi_message_upcall, ezpi_connection_upcall);
 #else  // EZPI_CORE_WSS_USE_WSC_LIB
-                            ezlopi_websocket_client_init(cjson_uri, ezpi_message_upcall, ezpi_connection_upcall);
+                            EZPI_core_websocket_client_init(cjson_uri, ezpi_message_upcall, ezpi_connection_upcall);
 #endif // EZPI_CORE_WSS_USE_WSC_LIB
                             task_complete = 1;
                         }
@@ -491,7 +495,7 @@ static ezlopi_error_t ezpi_send_str_data_to_nma_websocket(char *str_data)
 #if (1 == EZPI_CORE_WSS_USE_WSC_LIB)
     if (str_data && ezlopi_core_wsc_is_connected(__wsc_ssl))
 #else  // EZPI_CORE_WSS_USE_WSC_LIB
-    if (str_data && ezlopi_websocket_client_is_connected())
+    if (str_data && EZPI_core_websocket_client_is_connected())
 #endif // EZPI_CORE_WSS_USE_WSC_LIB
     {
         int retries = 3;
@@ -500,7 +504,7 @@ static ezlopi_error_t ezpi_send_str_data_to_nma_websocket(char *str_data)
 #if (1 == EZPI_CORE_WSS_USE_WSC_LIB)
             if (ezlopi_core_wsc_send(__wsc_ssl, str_data, strlen(str_data)) > 0)
 #else  // EZPI_CORE_WSS_USE_WSC_LIB
-            if (EZPI_SUCCESS == ezlopi_websocket_client_send(str_data, strlen(str_data)))
+            if (EZPI_SUCCESS == EZPI_core_websocket_client_send(str_data, strlen(str_data)))
 #endif // EZPI_CORE_WSS_USE_WSC_LIB
             {
                 ret = EZPI_SUCCESS;
@@ -560,7 +564,7 @@ static void ezpi_provision_check(void *pv)
             snprintf(http_request_location, sizeof(http_request_location), "https://ezlopiesp32.up.mios.com/provision-sync?token=%s&version=%d", provision_token, config_version ? config_version : 1);
 #endif
 
-            ezlopi_wait_for_wifi_to_connect(portMAX_DELAY);
+            EZPI_core_wait_for_wifi_to_connect(portMAX_DELAY);
             s_ezlopi_http_data_t *response = EZPI_core_http_get_request(http_request_location, NULL, NULL, NULL);
             // s_ezlopi_http_data_t* response = EZPI_core_http_get_request(http_request_location, ssl_private_key, ssl_shared_key, ca_certificate);
 

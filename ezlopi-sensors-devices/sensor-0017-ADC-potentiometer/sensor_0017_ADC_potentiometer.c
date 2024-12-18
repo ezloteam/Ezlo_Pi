@@ -163,7 +163,7 @@ static ezlopi_error_t __0017_get_cjson_value(l_ezlopi_item_t *item, void *arg)
             s_potentiometer_t *user_data = (s_potentiometer_t *)item->user_arg;
             if (user_data)
             {
-                ezlopi_valueformatter_float_to_cjson(cj_result, user_data->pot_val, scales_volt);
+                EZPI_core_valueformatter_float_to_cjson(cj_result, user_data->pot_val, scales_volt);
                 ret = EZPI_SUCCESS;
             }
         }

@@ -21,13 +21,13 @@
 
 #include "dns_hijacking.h"
 
-static const char* TAG = "dns_hijack_srv";
+static const char *TAG = "dns_hijack_srv";
 
 static dns_hijack_srv_handle_t dns_hijack_srv_handle;
 
 static esp_err_t dns_hijack_srv_cleanup();
 
-static void dns_hijack_srv_task(void* pvParameters) {
+static void dns_hijack_srv_task(void *pvParameters) {
     uint8_t rx_buffer[128];
 
     for (;;) {
@@ -46,7 +46,7 @@ static void dns_hijack_srv_task(void* pvParameters) {
 
         ESP_LOGI(TAG, "Socket created");
 
-        int err = bind(sock, (struct sockaddr*)&dest_addr, sizeof(dest_addr));
+        int err = bind(sock, (struct sockaddr *)&dest_addr, sizeof(dest_addr));
 
         if (err < 0) {
             ESP_LOGE(TAG, "Socket unable to bind");
@@ -60,7 +60,7 @@ static void dns_hijack_srv_task(void* pvParameters) {
             socklen_t socklen = sizeof(source_addr);
 
             memset(rx_buffer, 0x00, sizeof(rx_buffer));
-            int len = recvfrom(sock, rx_buffer, sizeof(rx_buffer), 0, (struct sockaddr*)&source_addr, &socklen);
+            int len = recvfrom(sock, rx_buffer, sizeof(rx_buffer), 0, (struct sockaddr *)&source_addr, &socklen);
 
             if (len < 0) {
                 ESP_LOGE(TAG, "revfrom failed");
@@ -75,7 +75,7 @@ static void dns_hijack_srv_task(void* pvParameters) {
             // Nul termination. To prevent pointer escape
             rx_buffer[sizeof(rx_buffer) - 1] = '\0';
 
-            dns_header_t* header = (dns_header_t*)rx_buffer;
+            dns_header_t *header = (dns_header_t *)rx_buffer;
 
             header->QR = 1;
             header->OPCODE = 0;
@@ -89,7 +89,7 @@ static void dns_hijack_srv_task(void* pvParameters) {
             header->ARCOUNT = 0;
 
             // ptr points to the beginning of the QUESTION
-            uint8_t* ptr = rx_buffer + sizeof(dns_header_t);
+            uint8_t *ptr = rx_buffer + sizeof(dns_header_t);
 
             // Jump over QNAME
             while (*ptr++);
@@ -100,7 +100,7 @@ static void dns_hijack_srv_task(void* pvParameters) {
             // Jump over QCLASS
             ptr += 2;
 
-            dns_hijack_answer_t* answer = (dns_hijack_answer_t*)ptr;
+            dns_hijack_answer_t *answer = (dns_hijack_answer_t *)ptr;
 
             answer->NAME = __bswap_16(0xC00C);
             answer->TYPE = __bswap_16(1);
@@ -112,7 +112,7 @@ static void dns_hijack_srv_task(void* pvParameters) {
             // Jump over ANSWER
             ptr += sizeof(dns_hijack_answer_t);
 
-            int err = sendto(sock, rx_buffer, ptr - rx_buffer, 0, (struct sockaddr*)&source_addr, sizeof(source_addr));
+            int err = sendto(sock, rx_buffer, ptr - rx_buffer, 0, (struct sockaddr *)&source_addr, sizeof(source_addr));
 
             if (err < 0) {
                 ESP_LOGE(TAG, "Error occurred during sending");
@@ -159,7 +159,10 @@ esp_err_t dns_hijack_srv_start(const ip4_addr_t resolve_ip_addr) {
         ip4_addr4(&resolve_ip_addr));
 
     xTaskCreate(dns_hijack_srv_task, "dns_hijack_srv", EZLOPI_COMPONENT_DNS_HIJACK_SRV_TASK_STACK_DEPTH, NULL, 5, &dns_hijack_srv_handle.task_handle);
+
+#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
     ezlopi_core_process_set_process_info(ENUM_EZLOPI_COMPONENT_DNS_HIJACK_SRV_TASK_STACK, &dns_hijack_srv_handle.task_handle, EZLOPI_COMPONENT_DNS_HIJACK_SRV_TASK_STACK_DEPTH);
+#endif
     return ESP_OK;
 }
 

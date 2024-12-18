@@ -333,23 +333,23 @@ static ezlopi_error_t __0053_get_value_cjson(l_ezlopi_item_t *item, void *arg)
             {
                 if ((sensor_0053_UART_gps6mv2_data->Latitude_item_id) == item->cloud_properties.item_id)
                 {
-                    ezlopi_valueformatter_float_to_cjson(cj_result, sensor_0053_UART_gps6mv2_data->prev_lat_angle_val, item->cloud_properties.scale);
+                    EZPI_core_valueformatter_float_to_cjson(cj_result, sensor_0053_UART_gps6mv2_data->prev_lat_angle_val, item->cloud_properties.scale);
                 }
                 else if ((sensor_0053_UART_gps6mv2_data->Longitude_item_id) == item->cloud_properties.item_id)
                 {
-                    ezlopi_valueformatter_float_to_cjson(cj_result, sensor_0053_UART_gps6mv2_data->prev_lat_angle_val, item->cloud_properties.scale);
+                    EZPI_core_valueformatter_float_to_cjson(cj_result, sensor_0053_UART_gps6mv2_data->prev_lat_angle_val, item->cloud_properties.scale);
                 }
                 else if ((sensor_0053_UART_gps6mv2_data->Fix_item_id) == item->cloud_properties.item_id)
                 {
-                    ezlopi_valueformatter_bool_to_cjson(cj_result, sensor_0053_UART_gps6mv2_data->prev_GPS_FIX, item->cloud_properties.scale);
+                    EZPI_core_valueformatter_bool_to_cjson(cj_result, sensor_0053_UART_gps6mv2_data->prev_GPS_FIX, item->cloud_properties.scale);
                 }
                 else if ((sensor_0053_UART_gps6mv2_data->Sea_level_item_id) == item->cloud_properties.item_id)
                 {
-                    ezlopi_valueformatter_float_to_cjson(cj_result, sensor_0053_UART_gps6mv2_data->prev_antenna_alti, item->cloud_properties.scale);
+                    EZPI_core_valueformatter_float_to_cjson(cj_result, sensor_0053_UART_gps6mv2_data->prev_antenna_alti, item->cloud_properties.scale);
                 }
                 else if ((sensor_0053_UART_gps6mv2_data->Geoid_item_id) == item->cloud_properties.item_id)
                 {
-                    ezlopi_valueformatter_float_to_cjson(cj_result, sensor_0053_UART_gps6mv2_data->prev_geoid, item->cloud_properties.scale);
+                    EZPI_core_valueformatter_float_to_cjson(cj_result, sensor_0053_UART_gps6mv2_data->prev_geoid, item->cloud_properties.scale);
                 }
 
                 ret = EZPI_SUCCESS;

@@ -805,12 +805,12 @@ void EZPI_core_nvs_delete_stored_data_by_name(char *nvs_name)
     }
 }
 
-ezlopi_error_t EZPI_CORE_nvs_write_time_location(const char *time_loc, uint32_t len)
+ezlopi_error_t EZPI_core_nvs_write_time_location(const char *time_loc, uint32_t len)
 {
     return EZPI_core_nvs_write_str(time_loc, len, ezlopi_time_location_nvs_name);
 }
 
-char *EZPI_CORE_nvs_read_time_location(void)
+char *EZPI_core_nvs_read_time_location(void)
 {
     return EZPI_core_nvs_read_str(ezlopi_time_location_nvs_name);
 }
@@ -834,122 +834,122 @@ ezlopi_error_t EZPI_core_nvs_write_latitude_longitude(char *data)
     return error;
 }
 
-ezlopi_error_t EZPI_CORE_nvs_write_baud(uint32_t baud)
+ezlopi_error_t EZPI_core_nvs_write_baud(uint32_t baud)
 {
     // Key ezlopi_serial_baud_name
     return EZPI_core_nvs_write_uint32(baud, ezlopi_serial_baud_name);
 }
 
-ezlopi_error_t EZPI_CORE_nvs_read_baud(uint32_t *baud)
+ezlopi_error_t EZPI_core_nvs_read_baud(uint32_t *baud)
 {
     return EZPI_core_nvs_read_uint32(baud, ezlopi_serial_baud_name);
 }
 
-ezlopi_error_t EZPI_CORE_nvs_write_parity(uint32_t parity)
+ezlopi_error_t EZPI_core_nvs_write_parity(uint32_t parity)
 {
     return EZPI_core_nvs_write_uint32(parity, ezlopi_serial_parity);
 }
 
-ezlopi_error_t EZPI_CORE_nvs_read_parity(uint32_t *parity)
+ezlopi_error_t EZPI_core_nvs_read_parity(uint32_t *parity)
 {
     return EZPI_core_nvs_read_uint32(parity, ezlopi_serial_parity);
 }
 
-ezlopi_error_t EZPI_CORE_nvs_write_start_bits(uint32_t start_bits)
+ezlopi_error_t EZPI_core_nvs_write_start_bits(uint32_t start_bits)
 {
     return EZPI_core_nvs_write_uint32(start_bits, ezlopi_serial_start_bits);
 }
-ezlopi_error_t EZPI_CORE_nvs_read_start_bits(uint32_t *start_bits)
+ezlopi_error_t EZPI_core_nvs_read_start_bits(uint32_t *start_bits)
 {
     return EZPI_core_nvs_read_uint32(start_bits, ezlopi_serial_start_bits);
 }
 
-ezlopi_error_t EZPI_CORE_nvs_write_stop_bits(uint32_t stop_bits)
+ezlopi_error_t EZPI_core_nvs_write_stop_bits(uint32_t stop_bits)
 {
     return EZPI_core_nvs_write_uint32(stop_bits, ezlopi_serial_stop_bits);
 }
 
-ezlopi_error_t EZPI_CORE_nvs_read_stop_bits(uint32_t *stop_bits)
+ezlopi_error_t EZPI_core_nvs_read_stop_bits(uint32_t *stop_bits)
 {
     return EZPI_core_nvs_read_uint32(stop_bits, ezlopi_serial_stop_bits);
 }
 
-ezlopi_error_t EZPI_CORE_nvs_write_frame_size(uint32_t frame_size)
+ezlopi_error_t EZPI_core_nvs_write_frame_size(uint32_t frame_size)
 {
     return EZPI_core_nvs_write_uint32(frame_size, ezlopi_serial_frame_size);
 }
 
-ezlopi_error_t EZPI_CORE_nvs_read_frame_size(uint32_t *frame_size)
+ezlopi_error_t EZPI_core_nvs_read_frame_size(uint32_t *frame_size)
 {
     return EZPI_core_nvs_read_uint32(frame_size, ezlopi_serial_frame_size);
 }
 
-ezlopi_error_t EZPI_CORE_nvs_write_flow_control(uint32_t flow_control)
+ezlopi_error_t EZPI_core_nvs_write_flow_control(uint32_t flow_control)
 {
     return EZPI_core_nvs_write_uint32(flow_control, ezlopi_serial_flow_control);
 }
 
-ezlopi_error_t EZPI_CORE_nvs_read_flow_control(uint32_t *flow_control)
+ezlopi_error_t EZPI_core_nvs_read_flow_control(uint32_t *flow_control)
 {
     return EZPI_core_nvs_read_uint32(flow_control, ezlopi_serial_flow_control);
 }
 
-ezlopi_error_t EZPI_CORE_nvs_write_cloud_log_severity(uint32_t severity)
+ezlopi_error_t EZPI_core_nvs_write_cloud_log_severity(uint32_t severity)
 {
     return EZPI_core_nvs_write_uint32(severity, ezlopi_cloud_log_severity);
 }
 
-ezlopi_error_t EZPI_CORE_nvs_read_cloud_log_severity(uint32_t *severity)
+ezlopi_error_t EZPI_core_nvs_read_cloud_log_severity(uint32_t *severity)
 {
     return EZPI_core_nvs_read_uint32(severity, ezlopi_cloud_log_severity);
 }
 
-ezlopi_error_t EZPI_CORE_nvs_write_serial_log_severity(uint32_t severity)
+ezlopi_error_t EZPI_core_nvs_write_serial_log_severity(uint32_t severity)
 {
     return EZPI_core_nvs_write_uint32(severity, ezlopi_serial_log_severity);
 }
 
-ezlopi_error_t EZPI_CORE_nvs_read_serial_log_severity(uint32_t *severity)
+ezlopi_error_t EZPI_core_nvs_read_serial_log_severity(uint32_t *severity)
 {
     return EZPI_core_nvs_read_uint32(severity, ezlopi_serial_log_severity);
 }
 
-ezlopi_error_t EZPI_CORE_nvs_write_temperature_scale(uint32_t scale)
+ezlopi_error_t EZPI_core_nvs_write_temperature_scale(uint32_t scale)
 {
     return EZPI_core_nvs_write_uint32(scale, ezlopi_temp_scale);
 }
 
-ezlopi_error_t EZPI_CORE_nvs_read_temperature_scale(uint32_t *scale)
+ezlopi_error_t EZPI_core_nvs_read_temperature_scale(uint32_t *scale)
 {
     return EZPI_core_nvs_read_uint32(scale, ezlopi_temp_scale);
 }
 
-ezlopi_error_t EZPI_CORE_nvs_write_date_format(uint32_t format)
+ezlopi_error_t EZPI_core_nvs_write_date_format(uint32_t format)
 {
     return EZPI_core_nvs_write_uint32(format, ezlopi_date_format);
 }
 
-ezlopi_error_t EZPI_CORE_nvs_read_date_format(uint32_t *format)
+ezlopi_error_t EZPI_core_nvs_read_date_format(uint32_t *format)
 {
     return EZPI_core_nvs_read_uint32(format, ezlopi_date_format);
 }
 
-ezlopi_error_t EZPI_CORE_nvs_write_time_format(uint32_t format)
+ezlopi_error_t EZPI_core_nvs_write_time_format(uint32_t format)
 {
     return EZPI_core_nvs_write_uint32(format, ezlopi_time_format);
 }
 
-ezlopi_error_t EZPI_CORE_nvs_read_time_format(uint32_t *format)
+ezlopi_error_t EZPI_core_nvs_read_time_format(uint32_t *format)
 {
     return EZPI_core_nvs_read_uint32(format, ezlopi_time_format);
 }
 
-ezlopi_error_t EZPI_CORE_nvs_write_network_ping_timeout(uint32_t ping_timeout)
+ezlopi_error_t EZPI_core_nvs_write_network_ping_timeout(uint32_t ping_timeout)
 {
     return EZPI_core_nvs_write_uint32(ping_timeout, ezlopi_network_ping_timeout);
 }
 
-ezlopi_error_t EZPI_CORE_nvs_read_network_ping_timeout(uint32_t *ping_timeout)
+ezlopi_error_t EZPI_core_nvs_read_network_ping_timeout(uint32_t *ping_timeout)
 {
     return EZPI_core_nvs_read_uint32(ping_timeout, ezlopi_network_ping_timeout);
 }

@@ -89,26 +89,66 @@ extern "C"
     /*******************************************************************************
     *                          Extern Function Prototypes
     *******************************************************************************/
+       
     /**
-    * @brief Global function template example
-    * Convention : Use capital letter for initial word on extern function
-    * maincomponent : Main component as hal, core, service etc.
-    * subcomponent : Sub component as i2c from hal, ble from service etc
-    * functiontitle : Title of the function
-    * eg : EZPI_hal_i2c_init()
-    * @param arg
-    *
-    */
-
+     * @brief Function to get room head
+     * 
+     * @return s_ezlopi_room_t* 
+     */
     s_ezlopi_room_t *EZPI_core_room_get_room_head(void);
+    /**
+     * @brief Function to get room_name by id
+     * 
+     * @param room_id 
+     * @return char* 
+     */
     char *EZPI_core_room_get_name_by_id(uint32_t room_id);
-
+    /**
+     * @brief Function to initialize room
+     * 
+     * @return ezlopi_error_t 
+     */
     ezlopi_error_t EZPI_room_init(void);
+    /**
+     * @brief Function to delete room
+     * 
+     * @param cj_room target room object 
+     * @return int 
+     */
     int EZPI_core_room_delete(cJSON *cj_room);
+    /**
+     * @brief Function to delete all rooms
+     * 
+     * @return int 
+     */
     int EZPI_core_room_delete_all(void);
+    /**
+     * @brief Function to set room name
+     * 
+     * @param cj_room object containing room name
+     * @return int 
+     */
     int EZPI_core_room_name_set(cJSON *cj_room);
+    /**
+     * @brief Function to add nvs
+     * 
+     * @param cj_room room-obj to add
+     * @return int 
+     */
     int EZPI_core_room_add_to_nvs(cJSON *cj_room);
+    /**
+     * @brief Function to reorder room
+     * 
+     * @param cj_rooms_ids cjson room ids
+     * @return int 
+     */
     int EZPI_core_room_reorder(cJSON *cj_rooms_ids);
+    /**
+     * @brief Function to add room to list
+     * 
+     * @param cj_room 
+     * @return s_ezlopi_room_t* 
+     */
     s_ezlopi_room_t *EZPI_core_room_add_to_list(cJSON *cj_room);
 
 #ifdef __cplusplus

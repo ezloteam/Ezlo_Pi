@@ -23,7 +23,7 @@ void ezlopi_service_otel_init(void)
 
 static void __otel_task(void *pv)
 {
-    ezlopi_wait_for_wifi_to_connect(portTICK_RATE_MS);
+    EZPI_core_wait_for_wifi_to_connect(portTICK_RATE_MS);
 
     TRACE_D("Starting otel-service");
 

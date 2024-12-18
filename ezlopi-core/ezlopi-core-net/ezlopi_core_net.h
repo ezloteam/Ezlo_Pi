@@ -29,8 +29,8 @@
 ** ===========================================================================
 */
 /**
- * @file    main.h
- * @brief   perform some function on data
+ * @file    ezlopi_core_net.h
+ * @brief   perform some function on core-net
  * @author  xx
  * @version 0.1
  * @date    12th DEC 2024
@@ -76,16 +76,7 @@ extern "C"
     /*******************************************************************************
     *                          Extern Function Prototypes
     *******************************************************************************/
-    /**
-    * @brief Global function template example
-    * Convention : Use capital letter for initial word on extern function
-    * maincomponent : Main component as hal, core, service etc.
-    * subcomponent : Sub component as i2c from hal, ble from service etc
-    * functiontitle : Title of the function
-    * eg : EZPI_hal_i2c_init()
-    * @param arg
-    *
-    */
+   
 
 #ifdef CONFIG_EZPI_CORE_ENABLE_ETH
     /**

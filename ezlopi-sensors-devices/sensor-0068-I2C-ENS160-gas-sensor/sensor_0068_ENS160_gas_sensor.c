@@ -90,15 +90,15 @@ static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg)
     {
       if (item->cloud_properties.item_id == aqi_item_id)
       {
-        ezlopi_valueformatter_uint32_to_cjson(cj_params, ens160_sensor->data.aqi, item->cloud_properties.scale);
+        EZPI_core_valueformatter_uint32_to_cjson(cj_params, ens160_sensor->data.aqi, item->cloud_properties.scale);
       }
       else if (item->cloud_properties.item_id == voc_item_id)
       {
-        ezlopi_valueformatter_uint32_to_cjson(cj_params, ens160_sensor->data.tvoc, item->cloud_properties.scale);
+        EZPI_core_valueformatter_uint32_to_cjson(cj_params, ens160_sensor->data.tvoc, item->cloud_properties.scale);
       }
       else if (item->cloud_properties.item_id == co2_item_id)
       {
-        ezlopi_valueformatter_uint32_to_cjson(cj_params, ens160_sensor->data.eco2, item->cloud_properties.scale);
+        EZPI_core_valueformatter_uint32_to_cjson(cj_params, ens160_sensor->data.eco2, item->cloud_properties.scale);
       }
       ret = EZPI_SUCCESS;
     }

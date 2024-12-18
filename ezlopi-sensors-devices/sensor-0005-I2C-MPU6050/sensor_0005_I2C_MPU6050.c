@@ -312,7 +312,9 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
                     TRACE_I("Configuration Complete.... ");
                     TaskHandle_t ezlopi_sensor_mpu6050_task_handle = NULL;
                     xTaskCreate(__mpu6050_calibration_task, "MPU6050_Calibration_Task", EZLOPI_SENSOR_MPU6050_TASK_DEPTH, item, 1, &ezlopi_sensor_mpu6050_task_handle);
+#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
                     ezlopi_core_process_set_process_info(ENUM_EZLOPI_SENSOR_MPU6050_TASK, &ezlopi_sensor_mpu6050_task_handle, EZLOPI_SENSOR_MPU6050_TASK_DEPTH);
+#endif
                 }
                 else
                 {
@@ -345,40 +347,40 @@ static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg)
             {
                 if (ezlopi_item_name_acceleration_x_axis == item->cloud_properties.item_name)
                 {
-                    ezlopi_valueformatter_float_to_cjson(cj_result, user_data->ax, scales_meter_per_square_second);
+                    EZPI_core_valueformatter_float_to_cjson(cj_result, user_data->ax, scales_meter_per_square_second);
                     ret = EZPI_SUCCESS;
                 }
                 else if (ezlopi_item_name_acceleration_y_axis == item->cloud_properties.item_name)
                 {
-                    ezlopi_valueformatter_float_to_cjson(cj_result, user_data->ay, scales_meter_per_square_second);
+                    EZPI_core_valueformatter_float_to_cjson(cj_result, user_data->ay, scales_meter_per_square_second);
                     ret = EZPI_SUCCESS;
                 }
                 else if (ezlopi_item_name_acceleration_z_axis == item->cloud_properties.item_name)
                 {
-                    ezlopi_valueformatter_float_to_cjson(cj_result, user_data->az, scales_meter_per_square_second);
+                    EZPI_core_valueformatter_float_to_cjson(cj_result, user_data->az, scales_meter_per_square_second);
                     ret = EZPI_SUCCESS;
                 }
                 else if (ezlopi_item_name_temp == item->cloud_properties.item_name)
                 {
-                    ezlopi_valueformatter_float_to_cjson(cj_result, user_data->tmp, scales_celsius);
+                    EZPI_core_valueformatter_float_to_cjson(cj_result, user_data->tmp, scales_celsius);
                     ret = EZPI_SUCCESS;
                 }
                 else if (ezlopi_item_name_gyroscope_x_axis == item->cloud_properties.item_name)
                 {
                     TRACE_I("Gyro-x : %d rpm", (int)user_data->gx);
-                    ezlopi_valueformatter_int32_to_cjson(cj_result, ((int)user_data->gx), "degrees_per_second");
+                    EZPI_core_valueformatter_int32_to_cjson(cj_result, ((int)user_data->gx), "degrees_per_second");
                     ret = EZPI_SUCCESS;
                 }
                 else if (ezlopi_item_name_gyroscope_y_axis == item->cloud_properties.item_name)
                 {
                     TRACE_I("Gyro-y : %d rpm", (int)user_data->gy);
-                    ezlopi_valueformatter_int32_to_cjson(cj_result, ((int)user_data->gy), "degrees_per_second");
+                    EZPI_core_valueformatter_int32_to_cjson(cj_result, ((int)user_data->gy), "degrees_per_second");
                     ret = EZPI_SUCCESS;
                 }
                 else if (ezlopi_item_name_gyroscope_z_axis == item->cloud_properties.item_name)
                 {
                     TRACE_I("Gyro-z : %d rpm", (int)user_data->gz);
-                    ezlopi_valueformatter_int32_to_cjson(cj_result, (int)user_data->gz, "degrees_per_second");
+                    EZPI_core_valueformatter_int32_to_cjson(cj_result, (int)user_data->gz, "degrees_per_second");
                     ret = EZPI_SUCCESS;
                 }
             }

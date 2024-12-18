@@ -92,13 +92,19 @@ void app_main(void)
 
 #if defined(CONFIG_EZPI_HEAP_ENABLE)
     xTaskCreate(__blinky, "blinky", 3 * EZLOPI_MAIN_BLINKY_TASK_DEPTH, NULL, 1, &ezlopi_main_blinky_task_handle);
+
+#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
     ezlopi_core_process_set_process_info(ENUM_EZLOPI_MAIN_BLINKY_TASK, &ezlopi_main_blinky_task_handle, 3 * EZLOPI_MAIN_BLINKY_TASK_DEPTH);
+#endif
 #else
     xTaskCreate(__blinky, "blinky", EZLOPI_MAIN_BLINKY_TASK_DEPTH, NULL, tskIDLE_PRIORITY + 2, &ezlopi_main_blinky_task_handle);
+
+#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
     ezlopi_core_process_set_process_info(ENUM_EZLOPI_MAIN_BLINKY_TASK, &ezlopi_main_blinky_task_handle, EZLOPI_MAIN_BLINKY_TASK_DEPTH);
 #endif
+#endif
 
-    ezlopi_wait_for_wifi_to_connect(portMAX_DELAY);
+    EZPI_core_wait_for_wifi_to_connect(portMAX_DELAY);
 #if defined(CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER) || defined(CONFIG_EZPI_WEBSOCKET_CLIENT)
     EZPI_service_broadcast_init();
 #endif
@@ -140,7 +146,7 @@ static void __blinky(void *pv)
         TRACE_W("Heap Watermark:            %d B    %.4f KB", watermark_heap, watermark_heap / 1024.0);
         TRACE_I("----------------------------------------------");
 
-        ezlopi_wifi_status_t *wifi_stat = ezlopi_wifi_status();
+        ezlopi_wifi_status_t *wifi_stat = EZPI_core_wifi_status();
         if (wifi_stat)
         {
             if (wifi_stat->wifi_connection == false)

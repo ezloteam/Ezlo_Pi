@@ -60,7 +60,7 @@ static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg)
     cJSON *cj_result = (cJSON *)arg;
     if (item && cj_result)
     {
-        ezlopi_valueformatter_bool_to_cjson(cj_result, item->interface.gpio.gpio_in.value, NULL);
+        EZPI_core_valueformatter_bool_to_cjson(cj_result, item->interface.gpio.gpio_in.value, NULL);
         ret = EZPI_SUCCESS;
     }
 

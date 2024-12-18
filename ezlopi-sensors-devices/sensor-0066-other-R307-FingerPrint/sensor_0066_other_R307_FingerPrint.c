@@ -335,7 +335,9 @@ static ezlopi_error_t __0066_init(l_ezlopi_item_t *item)
                                 {
                                     TRACE_I(" ---->>> Creating Fingerprint_activation Task <<<----");
                                     xTaskCreate(__fingerprint_operation_task, "Fingerprint_activation", EZLOPI_SENSOR_R307_FINGER_PRINT_TASK_DEPTH, item, 1, &(user_data->notifyHandler));
+#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
                                     ezlopi_core_process_set_process_info(ENUM_EZLOPI_SENSOR_R307_FINGER_PRINT_TASK, &user_data->notifyHandler, EZLOPI_SENSOR_R307_FINGER_PRINT_TASK_DEPTH);
+#endif
                                 }
 
                                 const esp_timer_create_args_t esp_timer_create_args = {

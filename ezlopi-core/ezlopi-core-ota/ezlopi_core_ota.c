@@ -100,7 +100,6 @@ typedef enum e_ezlopi_ota_state
 /*******************************************************************************
 *                          Static Function Prototypes
 *******************************************************************************/
-static void ezpi_subcomponent_functiontitle(type_t arg);
 
 /*******************************************************************************
 *                          Static Data Definitions
@@ -136,7 +135,9 @@ void EZPI_core_ota_start(cJSON *url)
             {
                 TaskHandle_t ezlopi_core_ota_process_task_handle = NULL;
                 xTaskCreate(ezlopi_ota_process, "EzpiOTAProcess", EZLOPI_CORE_OTA_PROCESS_TASK_DEPTH, ota_url, 3, &ezlopi_core_ota_process_task_handle);
+#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
                 ezlopi_core_process_set_process_info(ENUM_EZLOPI_CORE_OTA_PROCESS_TASK, &ezlopi_core_ota_process_task_handle, EZLOPI_CORE_OTA_PROCESS_TASK_DEPTH);
+#endif
             }
             else
             {
