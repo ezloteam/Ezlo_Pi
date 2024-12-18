@@ -11,21 +11,21 @@
 
 #include "ezlopi_service_webprov.h"
 
-void ezlopi_device_settings_list_v3(cJSON* cj_request, cJSON* cj_response)
+void EZPI_device_settings_list_v3(cJSON *cj_request, cJSON *cj_response)
 {
-    cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+    cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     if (cj_result)
     {
-        cJSON* cj_settings_array = cJSON_AddArrayToObject(__FUNCTION__, cj_result, ezlopi_settings_str);
+        cJSON *cj_settings_array = cJSON_AddArrayToObject(__FUNCTION__, cj_result, ezlopi_settings_str);
         if (cj_settings_array)
         {
-            l_ezlopi_device_t* curr_device = ezlopi_device_get_head();
+            l_ezlopi_device_t *curr_device = ezlopi_device_get_head();
             while (curr_device)
             {
-                l_ezlopi_device_settings_v3_t* curr_setting = curr_device->settings;
+                l_ezlopi_device_settings_v3_t *curr_setting = curr_device->settings;
                 while (curr_setting)
                 {
-                    cJSON* cj_properties = cJSON_CreateObject(__FUNCTION__);
+                    cJSON *cj_properties = cJSON_CreateObject(__FUNCTION__);
                     if (cj_properties)
                     {
                         char tmp_string[64];
@@ -48,21 +48,21 @@ void ezlopi_device_settings_list_v3(cJSON* cj_request, cJSON* cj_response)
     }
 }
 
-void ezlopi_device_settings_value_set_v3(cJSON* cj_request, cJSON* cj_response)
+void EZPI_device_settings_value_set_v3(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
 
-    cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
+    cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
     if (cj_params)
     {
         uint32_t setting_id = 0;
         CJSON_GET_ID(setting_id, cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi__id_str));
 
-        l_ezlopi_device_t* curr_device = ezlopi_device_get_head();
+        l_ezlopi_device_t *curr_device = ezlopi_device_get_head();
         uint32_t found_setting = 0;
         while (curr_device)
         {
-            l_ezlopi_device_settings_v3_t* curr_setting = curr_device->settings;
+            l_ezlopi_device_settings_v3_t *curr_setting = curr_device->settings;
             while (curr_setting)
             {
                 if (setting_id == curr_setting->cloud_properties.setting_id)
@@ -82,14 +82,14 @@ void ezlopi_device_settings_value_set_v3(cJSON* cj_request, cJSON* cj_response)
     }
 }
 
-void ezlopi_device_settings_reset_v3(cJSON* cj_request, cJSON* cj_response)
+void EZPI_device_settings_reset_v3(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
 
-    cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
+    cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
     if (cj_params)
     {
-        l_ezlopi_device_t* curr_device = ezlopi_device_get_head();
+        l_ezlopi_device_t *curr_device = ezlopi_device_get_head();
 
         while (curr_device)
         {
@@ -100,7 +100,7 @@ void ezlopi_device_settings_reset_v3(cJSON* cj_request, cJSON* cj_response)
                 TRACE_E("device_id: %X", device_id);
                 if (device_id == curr_device->cloud_properties.device_id)
                 {
-                    l_ezlopi_device_settings_v3_t* curr_setting = curr_device->settings;
+                    l_ezlopi_device_settings_v3_t *curr_setting = curr_device->settings;
                     while (curr_setting)
                     {
                         curr_setting->func(EZLOPI_SETTINGS_ACTION_RESET_SETTING, curr_setting, cj_params, curr_setting->user_arg);
@@ -114,7 +114,7 @@ void ezlopi_device_settings_reset_v3(cJSON* cj_request, cJSON* cj_response)
                 CJSON_GET_ID(setting_id, cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi__id_str));
 
                 TRACE_E("setting_id: %X", setting_id);
-                l_ezlopi_device_settings_v3_t* curr_setting = curr_device->settings;
+                l_ezlopi_device_settings_v3_t *curr_setting = curr_device->settings;
                 while (curr_setting)
                 {
                     if (setting_id == curr_setting->cloud_properties.setting_id)
@@ -134,7 +134,7 @@ void ezlopi_device_settings_reset_v3(cJSON* cj_request, cJSON* cj_response)
 }
 
 #if 0
-cJSON* ezlopi_cloud_settings_updated_from_devices_v3(l_ezlopi_device_t* device, l_ezlopi_device_settings_v3_t* setting)
+cJSON* EZPI_ezlopi_cloud_settings_updated_from_devices_v3(l_ezlopi_device_t* device, l_ezlopi_device_settings_v3_t* setting)
 {
     cJSON* cjson_response = cJSON_CreateObject(__FUNCTION__);
     if (cjson_response)

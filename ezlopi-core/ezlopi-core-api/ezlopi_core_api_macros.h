@@ -71,9 +71,9 @@ CLOUD_METHOD("cloud.firmware.info.get", EZPI_firmware_info_get, NULL)
 CLOUD_METHOD("hub.firmware.update.start", EZPI_firmware_update_start, NULL)
 #endif // CONFIG_EZPI_ENABLE_OTA
 
-CLOUD_METHOD("hub.device.settings.list", ezlopi_device_settings_list_v3, NULL)
-CLOUD_METHOD("hub.device.setting.value.set", ezlopi_device_settings_value_set_v3, NULL)
-CLOUD_METHOD("hub.device.setting.reset", ezlopi_device_settings_reset_v3, NULL)
+CLOUD_METHOD("hub.device.settings.list", EZPI_device_settings_list_v3, NULL)
+CLOUD_METHOD("hub.device.setting.value.set", EZPI_device_settings_value_set_v3, NULL)
+CLOUD_METHOD("hub.device.setting.reset", EZPI_device_settings_reset_v3, NULL)
 
 CLOUD_METHOD("hub.time.location.list", EZPI_CLOUD_location_list, NULL)
 CLOUD_METHOD("hub.time.location.set", EZPI_CLOUD_location_set, NULL)

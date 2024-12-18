@@ -15,26 +15,25 @@
 #include "sensor_0068_ENS160_gas_sensor_settings.h"
 #include "EZLOPI_USER_CONFIG.h"
 
-static const char* nvs_key_ens160_gas_sensor_ambient_temperature_setting = "enstemp";
-static const char* nvs_key_ens160_gas_sensor_relative_humidity_setting = "enshmd";
+static const char *nvs_key_ens160_gas_sensor_ambient_temperature_setting = "enstemp";
+static const char *nvs_key_ens160_gas_sensor_relative_humidity_setting = "enshmd";
 
-static uint32_t ens160_gas_sensor_settings_ids[2] = { 0, 0 };
+static uint32_t ens160_gas_sensor_settings_ids[2] = {0, 0};
 
 static bool setting_changed = false;
 
-l_ezlopi_device_settings_v3_t* ens160_gas_sensor_ambient_temperature_sensor_setting;
-l_ezlopi_device_settings_v3_t* ens160_gas_sensor_relative_humidity_sensor_setting;
+l_ezlopi_device_settings_v3_t *ens160_gas_sensor_ambient_temperature_sensor_setting;
+l_ezlopi_device_settings_v3_t *ens160_gas_sensor_relative_humidity_sensor_setting;
 
-static int __settings_callback(e_ezlopi_settings_action_t action, struct l_ezlopi_device_settings_v3* setting, void* arg, void* user_arg);
-static int __settings_get(void* arg, l_ezlopi_device_settings_v3_t* setting);
-static int __settings_set(void* arg, l_ezlopi_device_settings_v3_t* setting);
-static int __settings_reset(void* arg, l_ezlopi_device_settings_v3_t* setting);
-static int __settings_update(void* arg, l_ezlopi_device_settings_v3_t* setting);
-
+static int __settings_callback(e_ezlopi_settings_action_t action, struct l_ezlopi_device_settings_v3 *setting, void *arg, void *user_arg);
+static int __settings_get(void *arg, l_ezlopi_device_settings_v3_t *setting);
+static int __settings_set(void *arg, l_ezlopi_device_settings_v3_t *setting);
+static int __settings_reset(void *arg, l_ezlopi_device_settings_v3_t *setting);
+static int __settings_update(void *arg, l_ezlopi_device_settings_v3_t *setting);
 
 // ********************************************* Setting initialization related start ********************************************* //
 
-static int __settings_sensor_0068_gas_sensor_setting_initialize_ambient_temperature_setting(l_ezlopi_device_t* device, void* user_arg)
+static int __settings_sensor_0068_gas_sensor_setting_initialize_ambient_temperature_setting(l_ezlopi_device_t *device, void *user_arg)
 {
     int ret = 0;
 
@@ -45,7 +44,7 @@ static int __settings_sensor_0068_gas_sensor_setting_initialize_ambient_temperat
         if (ens160_gas_sensor_ambient_temperature_sensor_setting)
         {
             ens160_gas_sensor_ambient_temperature_sensor_setting->cloud_properties.setting_id = ens160_gas_sensor_settings_ids[0];
-            s_sensor_ens160_gas_sensor_setting_ambient_temperature_t* ambient_temperature = (s_sensor_ens160_gas_sensor_setting_ambient_temperature_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_sensor_ens160_gas_sensor_setting_ambient_temperature_t));
+            s_sensor_ens160_gas_sensor_setting_ambient_temperature_t *ambient_temperature = (s_sensor_ens160_gas_sensor_setting_ambient_temperature_t *)ezlopi_malloc(__FUNCTION__, sizeof(s_sensor_ens160_gas_sensor_setting_ambient_temperature_t));
             if (ambient_temperature)
             {
                 memset(ambient_temperature, 0, sizeof(s_sensor_ens160_gas_sensor_setting_ambient_temperature_t));
@@ -88,7 +87,7 @@ static int __settings_sensor_0068_gas_sensor_setting_initialize_ambient_temperat
     return ret;
 }
 
-static int __settings_sensor_0068_gas_sensor_setting_initialize_relative_humidity_setting(l_ezlopi_device_t* device, void* user_arg)
+static int __settings_sensor_0068_gas_sensor_setting_initialize_relative_humidity_setting(l_ezlopi_device_t *device, void *user_arg)
 {
     int ret = 0;
 
@@ -99,7 +98,7 @@ static int __settings_sensor_0068_gas_sensor_setting_initialize_relative_humidit
         if (ens160_gas_sensor_relative_humidity_sensor_setting)
         {
             ens160_gas_sensor_relative_humidity_sensor_setting->cloud_properties.setting_id = ens160_gas_sensor_settings_ids[1];
-            s_sensor_ens160_gas_sensor_setting_relative_humidity_t* relative_humidity = (s_sensor_ens160_gas_sensor_setting_relative_humidity_t*)ezlopi_malloc(__FUNCTION__, sizeof(s_sensor_ens160_gas_sensor_setting_relative_humidity_t));
+            s_sensor_ens160_gas_sensor_setting_relative_humidity_t *relative_humidity = (s_sensor_ens160_gas_sensor_setting_relative_humidity_t *)ezlopi_malloc(__FUNCTION__, sizeof(s_sensor_ens160_gas_sensor_setting_relative_humidity_t));
             if (relative_humidity)
             {
                 memset(relative_humidity, 0, sizeof(s_sensor_ens160_gas_sensor_setting_relative_humidity_t));
@@ -142,7 +141,7 @@ static int __settings_sensor_0068_gas_sensor_setting_initialize_relative_humidit
     return ret;
 }
 
-int sensor_0068_gas_sensor_settings_initialize(l_ezlopi_device_t* devices, void* user_arg)
+int sensor_0068_gas_sensor_settings_initialize(l_ezlopi_device_t *devices, void *user_arg)
 {
     int ret = 0;
 
@@ -152,7 +151,7 @@ int sensor_0068_gas_sensor_settings_initialize(l_ezlopi_device_t* devices, void*
     return ret;
 }
 
-static int __settings_callback(e_ezlopi_settings_action_t action, struct l_ezlopi_device_settings_v3* setting, void* arg, void* user_arg)
+static int __settings_callback(e_ezlopi_settings_action_t action, struct l_ezlopi_device_settings_v3 *setting, void *arg, void *user_arg)
 {
     int ret = 0;
 
@@ -187,7 +186,6 @@ static int __settings_callback(e_ezlopi_settings_action_t action, struct l_ezlop
     {
         break;
     }
-
     }
 
     return ret;
@@ -197,12 +195,12 @@ static int __settings_callback(e_ezlopi_settings_action_t action, struct l_ezlop
 
 // ********************************************* Setting getter related start ********************************************* //
 
-static int __settings_get_ens160_gas_sensor_ambient_temperature_get(void* arg, l_ezlopi_device_settings_v3_t* setting)
+static int __settings_get_ens160_gas_sensor_ambient_temperature_get(void *arg, l_ezlopi_device_settings_v3_t *setting)
 {
     int ret = 0;
 
-    cJSON* cj_properties = (cJSON*)arg;
-    s_sensor_ens160_gas_sensor_setting_ambient_temperature_t* ambient_temperature = (s_sensor_ens160_gas_sensor_setting_ambient_temperature_t*)setting->user_arg;
+    cJSON *cj_properties = (cJSON *)arg;
+    s_sensor_ens160_gas_sensor_setting_ambient_temperature_t *ambient_temperature = (s_sensor_ens160_gas_sensor_setting_ambient_temperature_t *)setting->user_arg;
     if (cj_properties && ambient_temperature)
     {
         cJSON_AddItemToObject(__FUNCTION__, cj_properties, "label", __setting_add_text_and_lang_tag(SENSOR_ENS160_GAS_SENSOR_SETTING_AMBIENT_TEMPERATURE_LABEL_TEXT, SENSOR_ENS160_GAS_SENSOR_SETTING_AMBIENT_TEMPERATURE_LABEL_LANG_TAG));
@@ -210,8 +208,8 @@ static int __settings_get_ens160_gas_sensor_ambient_temperature_get(void* arg, l
         cJSON_AddStringToObject(__FUNCTION__, cj_properties, "status", "synced");
         cJSON_AddStringToObject(__FUNCTION__, cj_properties, "valueType", value_type_temperature);
 
-        cJSON* value = cJSON_AddObjectToObject(__FUNCTION__, cj_properties, ezlopi_value_str);
-        cJSON* valueDefault = cJSON_AddObjectToObject(__FUNCTION__, cj_properties, "valueDefault");
+        cJSON *value = cJSON_AddObjectToObject(__FUNCTION__, cj_properties, ezlopi_value_str);
+        cJSON *valueDefault = cJSON_AddObjectToObject(__FUNCTION__, cj_properties, "valueDefault");
         if (value && valueDefault)
         {
             cJSON_AddNumberToObject(__FUNCTION__, value, ezlopi_value_str, ambient_temperature->ambient_temperature);
@@ -229,12 +227,12 @@ static int __settings_get_ens160_gas_sensor_ambient_temperature_get(void* arg, l
     return ret;
 }
 
-static int __settings_get_ens160_gas_sensor_relative_humidity_get(void* arg, l_ezlopi_device_settings_v3_t* setting)
+static int __settings_get_ens160_gas_sensor_relative_humidity_get(void *arg, l_ezlopi_device_settings_v3_t *setting)
 {
     int ret = 0;
 
-    cJSON* cj_properties = (cJSON*)arg;
-    s_sensor_ens160_gas_sensor_setting_relative_humidity_t* relative_humidity = (s_sensor_ens160_gas_sensor_setting_relative_humidity_t*)setting->user_arg;
+    cJSON *cj_properties = (cJSON *)arg;
+    s_sensor_ens160_gas_sensor_setting_relative_humidity_t *relative_humidity = (s_sensor_ens160_gas_sensor_setting_relative_humidity_t *)setting->user_arg;
     if (cj_properties && relative_humidity)
     {
         cJSON_AddItemToObject(__FUNCTION__, cj_properties, "label", __setting_add_text_and_lang_tag(SENSOR_ENS160_GAS_SENSOR_SETTING_RELATIVE_HUMIDITY_LABEL_TEXT, SENSOR_ENS160_GAS_SENSOR_SETTING_RELATIVE_HUMIDITY_LABEL_LANG_TAG));
@@ -242,8 +240,8 @@ static int __settings_get_ens160_gas_sensor_relative_humidity_get(void* arg, l_e
         cJSON_AddStringToObject(__FUNCTION__, cj_properties, "status", "synced");
         cJSON_AddStringToObject(__FUNCTION__, cj_properties, "valueType", value_type_humidity);
 
-        cJSON* value = cJSON_AddObjectToObject(__FUNCTION__, cj_properties, ezlopi_value_str);
-        cJSON* valueDefault = cJSON_AddObjectToObject(__FUNCTION__, cj_properties, "valueDefault");
+        cJSON *value = cJSON_AddObjectToObject(__FUNCTION__, cj_properties, ezlopi_value_str);
+        cJSON *valueDefault = cJSON_AddObjectToObject(__FUNCTION__, cj_properties, "valueDefault");
         if (value && valueDefault)
         {
             cJSON_AddNumberToObject(__FUNCTION__, value, ezlopi_value_str, relative_humidity->relative_humidity);
@@ -261,7 +259,7 @@ static int __settings_get_ens160_gas_sensor_relative_humidity_get(void* arg, l_e
     return ret;
 }
 
-static int __settings_get(void* arg, l_ezlopi_device_settings_v3_t* setting)
+static int __settings_get(void *arg, l_ezlopi_device_settings_v3_t *setting)
 {
     int ret = ret = 0;
     if (setting->cloud_properties.setting_id == ens160_gas_sensor_settings_ids[0])
@@ -278,12 +276,12 @@ static int __settings_get(void* arg, l_ezlopi_device_settings_v3_t* setting)
 
 // ********************************************* Setting setter related start ********************************************* //
 
-static int __settings_set_ens160_gas_sensor_ambient_temperature_get(void* arg, l_ezlopi_device_settings_v3_t* setting)
+static int __settings_set_ens160_gas_sensor_ambient_temperature_get(void *arg, l_ezlopi_device_settings_v3_t *setting)
 {
     int ret = 0;
 
-    cJSON* cj_properties = (cJSON*)arg;
-    s_sensor_ens160_gas_sensor_setting_ambient_temperature_t* ambient_temperature = (s_sensor_ens160_gas_sensor_setting_ambient_temperature_t*)setting->user_arg;
+    cJSON *cj_properties = (cJSON *)arg;
+    s_sensor_ens160_gas_sensor_setting_ambient_temperature_t *ambient_temperature = (s_sensor_ens160_gas_sensor_setting_ambient_temperature_t *)setting->user_arg;
     if (cj_properties && ambient_temperature)
     {
         CJSON_GET_VALUE_DOUBLE(cj_properties, ezlopi_value_str, ambient_temperature->ambient_temperature);
@@ -300,12 +298,12 @@ static int __settings_set_ens160_gas_sensor_ambient_temperature_get(void* arg, l
     return ret;
 }
 
-static int __settings_set_ens160_gas_sensor_relative_humidity_get(void* arg, l_ezlopi_device_settings_v3_t* setting)
+static int __settings_set_ens160_gas_sensor_relative_humidity_get(void *arg, l_ezlopi_device_settings_v3_t *setting)
 {
     int ret = 0;
 
-    cJSON* cj_properties = (cJSON*)arg;
-    s_sensor_ens160_gas_sensor_setting_relative_humidity_t* relative_humidity = (s_sensor_ens160_gas_sensor_setting_relative_humidity_t*)setting->user_arg;
+    cJSON *cj_properties = (cJSON *)arg;
+    s_sensor_ens160_gas_sensor_setting_relative_humidity_t *relative_humidity = (s_sensor_ens160_gas_sensor_setting_relative_humidity_t *)setting->user_arg;
     if (cj_properties && relative_humidity)
     {
         CJSON_GET_VALUE_DOUBLE(cj_properties, ezlopi_value_str, relative_humidity->relative_humidity);
@@ -323,7 +321,7 @@ static int __settings_set_ens160_gas_sensor_relative_humidity_get(void* arg, l_e
     return ret;
 }
 
-static int __settings_set(void* arg, l_ezlopi_device_settings_v3_t* setting)
+static int __settings_set(void *arg, l_ezlopi_device_settings_v3_t *setting)
 {
 
     int ret = ret = 0;
@@ -337,26 +335,21 @@ static int __settings_set(void* arg, l_ezlopi_device_settings_v3_t* setting)
     }
     setting_changed = true;
 
-
     ezlopi_core_device_value_updated_settings_broadcast(setting);
-    // ezlopi_cloud_settings_updated_from_devices_v3(NULL, setting);
+    // EZPI_ezlopi_cloud_settings_updated_from_devices_v3(NULL, setting);
     return ret;
-
 }
 
 // ********************************************* Setting setter related end ********************************************* //
 
-
-
 // ********************************************* Setting updater related start ********************************************* //
 
-
-static int __settings_update_ens160_gas_sensor_ambient_temperature_get(void* arg, l_ezlopi_device_settings_v3_t* setting)
+static int __settings_update_ens160_gas_sensor_ambient_temperature_get(void *arg, l_ezlopi_device_settings_v3_t *setting)
 {
     int ret = 0;
 
-    cJSON* cj_properties = (cJSON*)arg;
-    s_sensor_ens160_gas_sensor_setting_ambient_temperature_t* ambient_temperature = (s_sensor_ens160_gas_sensor_setting_ambient_temperature_t*)setting->user_arg;
+    cJSON *cj_properties = (cJSON *)arg;
+    s_sensor_ens160_gas_sensor_setting_ambient_temperature_t *ambient_temperature = (s_sensor_ens160_gas_sensor_setting_ambient_temperature_t *)setting->user_arg;
     if (cj_properties && ambient_temperature)
     {
         cJSON_AddNumberToObject(__FUNCTION__, cj_properties, ezlopi_value_str, ambient_temperature->ambient_temperature);
@@ -369,12 +362,12 @@ static int __settings_update_ens160_gas_sensor_ambient_temperature_get(void* arg
     return ret;
 }
 
-static int __settings_update_ens160_gas_sensor_relative_humidity_get(void* arg, l_ezlopi_device_settings_v3_t* setting)
+static int __settings_update_ens160_gas_sensor_relative_humidity_get(void *arg, l_ezlopi_device_settings_v3_t *setting)
 {
     int ret = 0;
 
-    cJSON* cj_properties = (cJSON*)arg;
-    s_sensor_ens160_gas_sensor_setting_relative_humidity_t* relative_humidity = (s_sensor_ens160_gas_sensor_setting_relative_humidity_t*)setting->user_arg;
+    cJSON *cj_properties = (cJSON *)arg;
+    s_sensor_ens160_gas_sensor_setting_relative_humidity_t *relative_humidity = (s_sensor_ens160_gas_sensor_setting_relative_humidity_t *)setting->user_arg;
     if (cj_properties && relative_humidity)
     {
         cJSON_AddNumberToObject(__FUNCTION__, cj_properties, ezlopi_value_str, relative_humidity->relative_humidity);
@@ -388,7 +381,7 @@ static int __settings_update_ens160_gas_sensor_relative_humidity_get(void* arg, 
     return ret;
 }
 
-static int __settings_update(void* arg, l_ezlopi_device_settings_v3_t* setting)
+static int __settings_update(void *arg, l_ezlopi_device_settings_v3_t *setting)
 {
     int ret = ret = 0;
     if (setting->cloud_properties.setting_id == ens160_gas_sensor_settings_ids[0])
@@ -404,15 +397,14 @@ static int __settings_update(void* arg, l_ezlopi_device_settings_v3_t* setting)
 
 // ********************************************* Setting updater related end ********************************************* //
 
-
 // ********************************************* Setting resetter related start ********************************************* //
 
-static int __settings_reset_ens160_gas_sensor_ambient_temperature_get(void* arg, l_ezlopi_device_settings_v3_t* setting)
+static int __settings_reset_ens160_gas_sensor_ambient_temperature_get(void *arg, l_ezlopi_device_settings_v3_t *setting)
 {
     int ret = 0;
 
-    cJSON* cj_properties = (cJSON*)arg;
-    s_sensor_ens160_gas_sensor_setting_ambient_temperature_t* ambient_temperature = (s_sensor_ens160_gas_sensor_setting_ambient_temperature_t*)setting->user_arg;
+    cJSON *cj_properties = (cJSON *)arg;
+    s_sensor_ens160_gas_sensor_setting_ambient_temperature_t *ambient_temperature = (s_sensor_ens160_gas_sensor_setting_ambient_temperature_t *)setting->user_arg;
     if (cj_properties && ambient_temperature)
     {
         ambient_temperature->ambient_temperature = 25;
@@ -429,12 +421,12 @@ static int __settings_reset_ens160_gas_sensor_ambient_temperature_get(void* arg,
     return ret;
 }
 
-static int __settings_reset_ens160_gas_sensor_relative_humidity_get(void* arg, l_ezlopi_device_settings_v3_t* setting)
+static int __settings_reset_ens160_gas_sensor_relative_humidity_get(void *arg, l_ezlopi_device_settings_v3_t *setting)
 {
     int ret = 0;
 
-    cJSON* cj_properties = (cJSON*)arg;
-    s_sensor_ens160_gas_sensor_setting_relative_humidity_t* relative_humidity = (s_sensor_ens160_gas_sensor_setting_relative_humidity_t*)setting->user_arg;
+    cJSON *cj_properties = (cJSON *)arg;
+    s_sensor_ens160_gas_sensor_setting_relative_humidity_t *relative_humidity = (s_sensor_ens160_gas_sensor_setting_relative_humidity_t *)setting->user_arg;
     if (cj_properties && relative_humidity)
     {
         relative_humidity->relative_humidity = 50;
@@ -452,7 +444,7 @@ static int __settings_reset_ens160_gas_sensor_relative_humidity_get(void* arg, l
     return ret;
 }
 
-static int __settings_reset(void* arg, l_ezlopi_device_settings_v3_t* setting)
+static int __settings_reset(void *arg, l_ezlopi_device_settings_v3_t *setting)
 {
 
     int ret = ret = 0;
@@ -467,18 +459,16 @@ static int __settings_reset(void* arg, l_ezlopi_device_settings_v3_t* setting)
     setting_changed = true;
 
     ezlopi_core_device_value_updated_settings_broadcast(setting);
-    // ezlopi_cloud_settings_updated_from_devices_v3(NULL, setting);
+    // EZPI_ezlopi_cloud_settings_updated_from_devices_v3(NULL, setting);
     return ret;
-
 }
 
 // ********************************************* Setting resetter related end ********************************************* //
 
-
 float get_ambient_temperature_setting()
 {
     float ret = 0.0f;
-    s_sensor_ens160_gas_sensor_setting_ambient_temperature_t* ambient_temperature = (s_sensor_ens160_gas_sensor_setting_ambient_temperature_t*)ens160_gas_sensor_ambient_temperature_sensor_setting;
+    s_sensor_ens160_gas_sensor_setting_ambient_temperature_t *ambient_temperature = (s_sensor_ens160_gas_sensor_setting_ambient_temperature_t *)ens160_gas_sensor_ambient_temperature_sensor_setting;
     if (ambient_temperature)
     {
         ret = ambient_temperature->ambient_temperature;
@@ -488,7 +478,7 @@ float get_ambient_temperature_setting()
 float get_relative_humidity_setting()
 {
     float ret = 0.0f;
-    s_sensor_ens160_gas_sensor_setting_relative_humidity_t* relative_humidity = (s_sensor_ens160_gas_sensor_setting_relative_humidity_t*)ens160_gas_sensor_relative_humidity_sensor_setting;
+    s_sensor_ens160_gas_sensor_setting_relative_humidity_t *relative_humidity = (s_sensor_ens160_gas_sensor_setting_relative_humidity_t *)ens160_gas_sensor_relative_humidity_sensor_setting;
     if (relative_humidity)
     {
         ret = relative_humidity->relative_humidity;
