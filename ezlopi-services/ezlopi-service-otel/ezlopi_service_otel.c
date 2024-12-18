@@ -1,3 +1,4 @@
+#include <esp_mac.h>
 #include <esp_random.h>
 #include <esp_system.h>
 #include <bootloader_random.h>
@@ -10,6 +11,7 @@
 #include "ezlopi_core_log.h"
 #include "ezlopi_core_wifi.h"
 #include "ezlopi_core_buffer.h"
+#include "ezlopi_core_factory_info.h"
 #include "ezlopi_core_websocket_client.h"
 
 #include "ezlopi_service_loop.h"
@@ -48,37 +50,6 @@ static int __push_to_telemetry_queue(s_otel_queue_data_t *otel_data);
 static void __otel_add_severity_number(cJSON *cj_root, e_trace_severity_t severity);
 static int __otel_add_log_to_queue(uint8_t severity, const char *file, uint32_t line, char *log);
 
-static int __otel_add_log_to_queue(uint8_t severity, const char *file, uint32_t line, char *log)
-{
-    int ret = 0;
-    time_t time_now;
-    time(&time_now);
-
-    s_otel_queue_data_t *otel_data = ezlopi_malloc(__FUNCTION__, sizeof(s_otel_queue_data_t));
-    if (otel_data)
-    {
-        otel_data->type = E_OTEL_LOGS;
-
-        otel_data->cj_data = cJSON_CreateObject(__FUNCTION__);
-        if (otel_data->cj_data)
-        {
-            cJSON_AddNumberToObject(__FUNCTION__, otel_data->cj_data, ezlopi_logTime_str, time_now);
-            __otel_add_severity_number(otel_data->cj_data, (e_trace_severity_t)severity);
-            cJSON_AddStringToObject(__FUNCTION__, otel_data->cj_data, ezlopi_message_str, log);
-            cJSON_AddStringToObject(__FUNCTION__, otel_data->cj_data, ezlopi_fileName_str, file);
-            cJSON_AddNumberToObject(__FUNCTION__, otel_data->cj_data, ezlopi_lineNumber_str, line);
-        }
-
-        ret = __push_to_telemetry_queue(otel_data);
-        if (0 == ret)
-        {
-            ezlopi_free(__FUNCTION__, otel_data);
-        }
-    }
-
-    return ret;
-}
-
 int ezlopi_service_otel_add_trace_to_telemetry_queue(cJSON *cj_trace)
 {
     int ret = 0;
@@ -111,7 +82,7 @@ void ezlopi_service_otel_init(void)
     xTaskCreate(__otel_task, "otel-service-task", 2 * 2048, NULL, 4, NULL);
 }
 
-#if 1
+#if 0
 static void __otel_test_loop(void *pv)
 {
 #if 0 // test otel-trace
@@ -175,50 +146,53 @@ static void __otel_loop(void *pv)
 {
     if (EZPI_SUCCESS == ezlopi_wait_for_wifi_to_connect(0))
     {
-        s_otel_queue_data_t *otel_data = NULL;
-        xQueueReceive(__telemetry_queue, &otel_data, 0);
-
-        if (otel_data)
+        if (true == ezlopi_websocket_client_is_connected(__wss_client))
         {
-            if (otel_data->cj_data)
+            s_otel_queue_data_t *otel_data = NULL;
+            xQueueReceive(__telemetry_queue, &otel_data, 0);
+
+            if (otel_data)
             {
-                if (true == ezlopi_websocket_client_is_connected(__wss_client))
+                if (otel_data->cj_data)
                 {
-                    cJSON *cj_telemetry = NULL;
+                    if (true == ezlopi_websocket_client_is_connected(__wss_client))
+                    {
+                        cJSON *cj_telemetry = NULL;
 
-                    switch (otel_data->type)
-                    {
-                    case E_OTEL_LOGS:
-                    {
-                        cj_telemetry = __otel_logs_decorate(otel_data->cj_data);
-                        break;
-                    }
-                    case E_OTEL_TRACES:
-                    {
-                        cj_telemetry = __otel_trace_decorate(otel_data->cj_data);
-                        break;
-                    }
-                    case E_OTEL_MATRICS:
-                    {
-                        break;
-                    }
-                    default:
-                    {
-                        break;
-                    }
+                        switch (otel_data->type)
+                        {
+                        case E_OTEL_LOGS:
+                        {
+                            cj_telemetry = __otel_logs_decorate(otel_data->cj_data);
+                            break;
+                        }
+                        case E_OTEL_TRACES:
+                        {
+                            cj_telemetry = __otel_trace_decorate(otel_data->cj_data);
+                            break;
+                        }
+                        case E_OTEL_MATRICS:
+                        {
+                            break;
+                        }
+                        default:
+                        {
+                            break;
+                        }
+                        }
+
+                        if (cj_telemetry)
+                        {
+                            __otel_publish(cj_telemetry);
+                            cJSON_Delete(__FUNCTION__, cj_telemetry);
+                        }
                     }
 
-                    if (cj_telemetry)
-                    {
-                        __otel_publish(cj_telemetry);
-                        cJSON_Delete(__FUNCTION__, cj_telemetry);
-                    }
+                    cJSON_Delete(__FUNCTION__, otel_data->cj_data);
                 }
 
-                cJSON_Delete(__FUNCTION__, otel_data->cj_data);
+                ezlopi_free(__FUNCTION__, otel_data);
             }
-
-            ezlopi_free(__FUNCTION__, otel_data);
         }
     }
 }
@@ -231,17 +205,53 @@ static void __otel_publish(cJSON *cj_telemetry)
         char *buffer = ezlopi_core_buffer_acquire(__FUNCTION__, &buffer_len, 2000);
         if (buffer)
         {
-            uint32_t free_heap = esp_get_free_heap_size();
-            uint32_t heap_watermark = esp_get_minimum_free_heap_size();
-
-            // printf("Free Heap Size:            %d B    %.4f KB\r\n", free_heap, free_heap / 1024.0);
-            // printf("Heap watermark:            %d B    %.4f KB\r\n", heap_watermark, heap_watermark / 1024.0);
-
+            uint32_t rertries = 3;
             cJSON_PrintPreallocated(__FUNCTION__, cj_telemetry, buffer, buffer_len, false);
-            ezlopi_websocket_client_send(__wss_client, buffer, strlen(buffer), 1000);
+
+            while (rertries--)
+            {
+                if (EZPI_SUCCESS == ezlopi_websocket_client_send(__wss_client, buffer, strlen(buffer), 1000))
+                {
+                    break;
+                }
+
+                vTaskDelay(10 / portTICK_RATE_MS);
+            }
+
             ezlopi_core_buffer_release(__FUNCTION__);
         }
     }
+}
+
+static int __otel_add_log_to_queue(uint8_t severity, const char *file, uint32_t line, char *log)
+{
+    int ret = 0;
+    time_t time_now;
+    time(&time_now);
+
+    s_otel_queue_data_t *otel_data = ezlopi_malloc(__FUNCTION__, sizeof(s_otel_queue_data_t));
+    if (otel_data)
+    {
+        otel_data->type = E_OTEL_LOGS;
+
+        otel_data->cj_data = cJSON_CreateObject(__FUNCTION__);
+        if (otel_data->cj_data)
+        {
+            cJSON_AddNumberToObject(__FUNCTION__, otel_data->cj_data, ezlopi_logTime_str, time_now);
+            __otel_add_severity_number(otel_data->cj_data, (e_trace_severity_t)severity);
+            cJSON_AddStringToObject(__FUNCTION__, otel_data->cj_data, ezlopi_message_str, log);
+            cJSON_AddStringToObject(__FUNCTION__, otel_data->cj_data, ezlopi_fileName_str, file);
+            cJSON_AddNumberToObject(__FUNCTION__, otel_data->cj_data, ezlopi_lineNumber_str, line);
+        }
+
+        ret = __push_to_telemetry_queue(otel_data);
+        if (0 == ret)
+        {
+            ezlopi_free(__FUNCTION__, otel_data);
+        }
+    }
+
+    return ret;
 }
 
 static void __otel_task(void *pv)
@@ -664,6 +674,35 @@ static cJSON *__otel_create_span(cJSON *cj_trace_info)
     return cj_span;
 }
 
+static void __otel_add_resource_attr(cJSON *cj_root, const char *key, const char *value, bool is_const)
+{
+    if (cj_root && key && value)
+    {
+        cJSON *cj_attribute = cJSON_CreateObject(__FUNCTION__);
+        if (cj_attribute)
+        {
+            cJSON_AddStringToObject(__FUNCTION__, cj_attribute, ezlopi_key_str, key);
+            cJSON *cj_value = cJSON_AddObjectToObject(__FUNCTION__, cj_attribute, ezlopi_value_str);
+            if (cj_value)
+            {
+                if (is_const)
+                {
+                    cJSON_AddStringToObjectWithRef(__FUNCTION__, cj_value, ezlopi_stringValue_str, value);
+                }
+                else
+                {
+                    cJSON_AddStringToObject(__FUNCTION__, cj_value, ezlopi_stringValue_str, value);
+                }
+            }
+
+            if (false == cJSON_AddItemToArray(cj_root, cj_attribute))
+            {
+                cJSON_Delete(__FUNCTION__, cj_attribute);
+            }
+        }
+    }
+}
+
 static void __otel_add_resource(cJSON *cj_resourceLog)
 {
     cJSON *cj_resource = cJSON_AddObjectToObject(__FUNCTION__, cj_resourceLog, ezlopi_resource_str);
@@ -672,10 +711,28 @@ static void __otel_add_resource(cJSON *cj_resourceLog)
         cJSON *cj_attributes = cJSON_AddArrayToObject(__FUNCTION__, cj_resource, ezlopi_attributes_str);
         if (cj_attributes)
         {
+            char tmp_buffer[24];
+
+            __otel_add_resource_attr(cj_attributes, ezlopI_service___name_str, ezlopi_EzloPI_str, true);
+
+            {
+                uint64_t serial = ezlopi_factory_info_v3_get_id();
+                snprintf(tmp_buffer, sizeof(tmp_buffer), "%llu", serial);
+                __otel_add_resource_attr(cj_attributes, ezlopi_serial_str, tmp_buffer, false);
+            }
+
+            {
+                unsigned char mac_base[6] = {0};
+                esp_efuse_mac_get_default(mac_base);
+                snprintf(tmp_buffer, sizeof(tmp_buffer), "%2X%2X%2X%2X%2X%2X", mac_base[0], mac_base[1], mac_base[2], mac_base[3], mac_base[4], mac_base[5]);
+                __otel_add_resource_attr(cj_attributes, ezlopi_base___mac_str, tmp_buffer, false);
+            }
+
+#if 0
             cJSON *cj_attribute = cJSON_CreateObject(__FUNCTION__);
             if (cj_attribute)
             {
-                cJSON_AddStringToObject(__FUNCTION__, cj_attribute, ezlopi_key_str, ezlopI_service___name);
+                cJSON_AddStringToObject(__FUNCTION__, cj_attribute, ezlopi_key_str, ezlopI_service___name_str);
                 cJSON *cj_value = cJSON_AddObjectToObject(__FUNCTION__, cj_attribute, ezlopi_value_str);
                 if (cj_value)
                 {
@@ -687,6 +744,7 @@ static void __otel_add_resource(cJSON *cj_resourceLog)
                     cJSON_Delete(__FUNCTION__, cj_attribute);
                 }
             }
+#endif
         }
     }
 }
