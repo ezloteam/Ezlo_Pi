@@ -539,7 +539,9 @@ int ezlopi_service_modes_stop(void)
 {
     if (sg_process_handle)
     {
+#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
         ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SERVICE_MODES_TASK);
+#endif
         vTaskDelete(sg_process_handle);
         sg_process_handle = NULL;
         TRACE_W("Modes-service: Stopped!");
@@ -614,7 +616,9 @@ static void __modes_service(void *pv)
 
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
+#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
     ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SERVICE_MODES_TASK);
+#endif
     vTaskDelete(NULL);
 }
 #endif

@@ -156,7 +156,8 @@ extern "C"
     /*******************************************************************************
     *                          Extern Function Prototypes
     *******************************************************************************/
- 
+
+#if PING_USE_SOCKETS
     /**
      * @brief Create a ping session
      *
@@ -172,16 +173,6 @@ extern "C"
     esp_err_t ezlopi_ping_new_session(const ezlopi_ping_config_t *config, const ezlopi_ping_callbacks_t *cbs, esp_ping_handle_t *hdl_out);
 
     /**
-     * @brief Delete a ping session
-     *
-     * @param hdl handle of ping session
-     * @return
-     *      - ESP_ERR_INVALID_ARG: invalid parameters (e.g. ping handle is null, etc)
-     *      - ESP_OK: delete ping session successfully
-     */
-    esp_err_t EZPI_ping_delete_session(esp_ping_handle_t hdl);
-
-    /**
      * @brief Start the ping session
      *
      * @param hdl handle of ping session
@@ -190,16 +181,6 @@ extern "C"
      *      - ESP_OK: start ping session successfully
      */
     esp_err_t ezlopi_ping_start_by_handle(esp_ping_handle_t hdl);
-
-    /**
-     * @brief Stop the ping session
-     *
-     * @param hdl handle of ping session
-     * @return
-     *      - ESP_ERR_INVALID_ARG: invalid parameters (e.g. ping handle is null, etc)
-     *      - ESP_OK: stop ping session successfully
-     */
-    esp_err_t EZPI_ping_stop_by_handle(esp_ping_handle_t hdl);
 
     /**
      * @brief Get runtime profile of ping session
@@ -214,6 +195,28 @@ extern "C"
      *      - ESP_OK: get profile successfully
      */
     esp_err_t ezlopi_ping_get_profile(esp_ping_handle_t hdl, esp_ping_profile_t profile, void *data, uint32_t size);
+
+#endif
+
+    /**
+    * @brief Delete a ping session
+    *
+    * @param hdl handle of ping session
+    * @return
+    *      - ESP_ERR_INVALID_ARG: invalid parameters (e.g. ping handle is null, etc)
+    *      - ESP_OK: delete ping session successfully
+    */
+    esp_err_t EZPI_ping_delete_session(esp_ping_handle_t hdl);
+
+    /**
+     * @brief Stop the ping session
+     *
+     * @param hdl handle of ping session
+     * @return
+     *      - ESP_ERR_INVALID_ARG: invalid parameters (e.g. ping handle is null, etc)
+     *      - ESP_OK: stop ping session successfully
+     */
+    esp_err_t EZPI_ping_stop_by_handle(esp_ping_handle_t hdl);
 
 
 #ifdef __cplusplus

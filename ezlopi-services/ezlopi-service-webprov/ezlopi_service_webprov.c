@@ -357,7 +357,9 @@ static void ezpi_fetch_wss_endpoint(void *pv)
 
     EZPI_core_factory_info_v3_free(cloud_server);
 
+#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
     ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SERVICE_WEB_PROV_FETCH_WSS_TASK);
+#endif
     vTaskDelete(NULL);
 }
 
@@ -644,7 +646,9 @@ static void ezpi_provision_check(void *pv)
     EZPI_core_factory_info_v3_free(provision_token);
 #endif
 
+#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
     ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SERVICE_WEB_PROV_CONFIG_CHECK_TASK);
+#endif
 
     vTaskDelete(NULL);
 }

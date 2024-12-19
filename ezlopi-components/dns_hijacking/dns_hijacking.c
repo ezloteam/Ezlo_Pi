@@ -167,7 +167,9 @@ esp_err_t dns_hijack_srv_start(const ip4_addr_t resolve_ip_addr) {
 }
 
 esp_err_t dns_hijack_srv_stop() {
+#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
     ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_COMPONENT_DNS_HIJACK_SRV_TASK_STACK);
+#endif
     vTaskDelete(dns_hijack_srv_handle.task_handle);
     dns_hijack_srv_handle.task_handle = NULL;
 

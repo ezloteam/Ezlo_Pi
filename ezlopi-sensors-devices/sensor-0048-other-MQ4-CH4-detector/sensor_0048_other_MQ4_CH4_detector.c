@@ -460,6 +460,8 @@ static void __calibrate_MQ4_R0_resistance(void *params)
             MQ4_value->Calibration_complete_CH4 = true;
         }
     }
+#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
     ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SENSOR_MQ4_TASK);
+#endif
     vTaskDelete(NULL);
 }

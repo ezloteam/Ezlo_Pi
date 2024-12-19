@@ -772,6 +772,8 @@ static void __fingerprint_operation_task(void *params)
             }
         }
     }
+#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
     ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SENSOR_R307_FINGER_PRINT_TASK);
+#endif
     vTaskDelete(NULL);
 }

@@ -474,6 +474,8 @@ static void __calibrate_MQ9_R0_resistance(void *params)
             MQ9_value->Calibration_complete_LPG_flameable = true;
         }
     }
+#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
     ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SENSOR_MQ9_TASK);
+#endif
     vTaskDelete(NULL);
 }

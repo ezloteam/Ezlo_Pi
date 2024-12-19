@@ -472,6 +472,8 @@ static void __calibrate_MQ135_R0_resistance(void *params)
             MQ135_value->Calibration_complete_NH3 = true;
         }
     }
+#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
     ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SENSOR_MQ135_TASK);
+#endif
     vTaskDelete(NULL);
 }

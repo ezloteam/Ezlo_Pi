@@ -18,7 +18,9 @@ void EZPI_CLOUD_status_get(cJSON *cj_request, cJSON *cj_response)
         cJSON *processes_array = cJSON_AddArrayToObject(__FUNCTION__, cjson_result, "processes");
         if (processes_array)
         {
+#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
             ezlopi_core_get_processes_details(processes_array);
+#endif
         }
         cJSON *cj_ram = cJSON_AddObjectToObject(__FUNCTION__, cjson_result, "ram");
         if (cj_ram)

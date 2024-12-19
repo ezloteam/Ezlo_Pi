@@ -473,6 +473,8 @@ static void __calibrate_MQ7_R0_resistance(void *params)
             MQ7_value->Calibration_complete_CO = true;
         }
     }
+#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
     ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SENSOR_MQ7_TASK);
+#endif
     vTaskDelete(NULL);
 }

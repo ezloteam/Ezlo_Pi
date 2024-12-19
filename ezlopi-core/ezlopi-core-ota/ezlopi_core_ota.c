@@ -218,7 +218,9 @@ static void ezlopi_ota_process(void *pv)
         TRACE_E("Firmware upgrade failed");
     }
 
+#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
     ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_CORE_OTA_PROCESS_TASK);
+#endif
     vTaskDelete(NULL);
 
     if (url)

@@ -342,7 +342,9 @@ static void __tcs230_calibration_task(void *params) // calibration task
             user_data->calibration_complete = true;
         }
     }
+#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
     ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SENSOR_TCS230_CALLIBRATION_TASK);
+#endif
     vTaskDelete(NULL);
 }
 //------------------------------------------------------------------------------

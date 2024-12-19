@@ -277,7 +277,9 @@ static void __Calculate_hx711_tare_wt(void *params)
             }
         }
     }
+#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
     ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SENSOR_HX711_TASK);
+#endif
     vTaskDelete(NULL);
 }
 

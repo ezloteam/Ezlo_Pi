@@ -368,7 +368,9 @@ void ezlopi_wifi_try_connect_task(void *params)
             break;
         }
     }
+#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
     ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_CORE_WIFI_TRY_CONNECT_TASK);
+#endif
     vTaskDelete(NULL);
 }
 
@@ -392,7 +394,9 @@ void EZPI_core_wifi_scan_stop()
     if (sg_scan_handle)
     {
         TRACE_E("Resetting WiFi scanner task.(handle: %p)", sg_scan_handle);
+#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
         ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_CORE_WIFI_SCANNER_TASK);
+#endif
         vTaskDelete(sg_scan_handle);
         sg_scan_handle = NULL;
     }
@@ -645,7 +649,9 @@ static void __ezlopi_wifi_scanner_task(void *params)
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
     __ezlopi_wifi_broadcast_stop_scan();
+#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
     ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_CORE_WIFI_SCANNER_TASK);
+#endif
     sg_scan_handle = NULL;
     vTaskDelete(NULL);
 }

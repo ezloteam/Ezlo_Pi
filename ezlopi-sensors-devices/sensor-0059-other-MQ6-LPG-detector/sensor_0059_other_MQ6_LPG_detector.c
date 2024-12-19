@@ -476,6 +476,8 @@ static void __calibrate_MQ6_R0_resistance(void *params)
             MQ6_value->Calibration_complete_LPG = true;
         }
     }
+#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
     ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SENSOR_MQ6_TASK);
+#endif
     vTaskDelete(NULL);
 }

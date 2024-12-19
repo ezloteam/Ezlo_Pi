@@ -359,7 +359,9 @@ static void __mdns_init(void *pv)
         }
         vTaskDelay(5000 / portTICK_PERIOD_MS);
     }
+#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
     ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_CORE_MDNS_SERVICE_TASK);
+#endif
     vTaskDelete(NULL);
 }
 

@@ -56,13 +56,13 @@
 #if PING_USE_SOCKETS
 #include "lwip/sockets.h"
 #include "lwip/inet.h"
-#include "ping_sock.h"
 #endif /* PING_USE_SOCKETS */
 #ifdef ESP_PING
 #include "esp_ping.h"
 #include "lwip/ip_addr.h"
 #endif
 
+#include "ping_sock.h"
 /*******************************************************************************
 *                          Extern Data Declarations
 *******************************************************************************/

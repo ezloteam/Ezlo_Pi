@@ -694,7 +694,9 @@ static void ezpi_service_uart_task(void *arg)
     }
 
     ezlopi_free(__FUNCTION__, data);
+#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
     ezlopi_core_process_set_is_deleted(ENUM___uart_loop);
+#endif
     vTaskDelete(NULL);
 }
 

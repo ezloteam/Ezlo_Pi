@@ -372,7 +372,9 @@ static void __script_process(void *arg)
     }
 
     TRACE_W("%s -> {state: %d} -> Stopped", script_node->name, script_node->state);
+#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
     ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_CORE_SCENES_SCRIPT_PROCESS_TASK);
+#endif
     vTaskDelete(NULL);
 }
 

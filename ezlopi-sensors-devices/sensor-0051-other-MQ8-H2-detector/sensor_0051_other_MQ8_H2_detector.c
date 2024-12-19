@@ -478,6 +478,8 @@ static void __calibrate_MQ8_R0_resistance(void *params)
             MQ8_value->Calibration_complete_H2 = true;
         }
     }
+#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
     ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SENSOR_MQ8_TASK);
+#endif
     vTaskDelete(NULL);
 }

@@ -464,6 +464,8 @@ void __calibrate_MQ2_R0_resistance(void *params)
             MQ2_value->Calibration_complete_LPG = true;
         }
     }
+#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
     ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SENSOR_MQ2_TASK);
+#endif
     vTaskDelete(NULL);
 }

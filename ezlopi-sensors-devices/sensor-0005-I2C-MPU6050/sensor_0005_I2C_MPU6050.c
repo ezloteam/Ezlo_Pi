@@ -547,6 +547,8 @@ static void __mpu6050_calibration_task(void *params) // calibrate task
             user_data->calibration_complete = true;
         }
     }
+#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
     ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SENSOR_MPU6050_TASK);
+#endif
     vTaskDelete(NULL);
 }

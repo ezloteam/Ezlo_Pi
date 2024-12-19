@@ -194,10 +194,9 @@ extern "C"
 #else // CONFIG_FREERTOS_USE_TRACE_FACILITY
 
     //---------- These are Not-required ---------------
-    #warning "need to add [CONFIG_FREERTOS_USE_TRACE_FACILITY] guard to these function declarations";
-#define ezlopi_core_get_processes_details(x)
-#define ezlopi_core_process_set_process_info(x, y, z)
-#define ezlopi_core_process_set_is_deleted(x)
+    // #define ezlopi_core_get_processes_details(x)
+    // #define ezlopi_core_process_set_is_deleted(x)    
+    // #define ezlopi_core_process_set_process_info(x, y, z)
     //-------------------------------------------------
 
 #endif // CONFIG_FREERTOS_USE_TRACE_FACILITY
