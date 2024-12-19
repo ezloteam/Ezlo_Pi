@@ -507,6 +507,7 @@ static void __modes_loop(void *arg)
             // 1. check if the mode is to be switched.
             if (EZPI_SUCCESS == __check_mode_switch_condition(ez_mode))
             {
+                curr_house_mode = EZPI_core_modes_get_current_house_modes();
                 TRACE_D("Mode - Switch completed to [%d]", ez_mode->current_mode_id);
                 // after switching-modes ; Create unique trigger-event-loops for each devices in 'alarm-list'
                 if (true == curr_house_mode->armed) // if the new mode is armed ; create 'non_bypass_alert_ll'
