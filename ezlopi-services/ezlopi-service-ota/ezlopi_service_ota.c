@@ -28,9 +28,7 @@
 #include "ezlopi_core_processes.h"
 #include "ezlopi_core_errors.h"
 
-
 static void __ota_loop(void *arg);
-
 
 void ezlopi_service_ota_init(void)
 {
@@ -44,17 +42,19 @@ void ezlopi_service_ota_init(void)
 
 static void __ota_loop(void *arg)
 {
-    if (1 == ezlopi_event_group_wait_for_event(EZLOPI_EVENT_WIFI_CONNECTED, 0, false))
+    if (EZPI_SUCCESS == ezlopi_event_group_wait_for_event(EZLOPI_EVENT_WIFI_CONNECTED, 0, false))
     {
-        if (1 == ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 0, false))
+        TRACE_E("OTA - Got WiFi Event. ");
+        if (EZPI_SUCCESS == ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 0, false))
         {
-            // TRACE_D("OTA - Got reg event.");
+            TRACE_D("OTA - Got reg event.");
             static uint32_t __ota_time_stamp = 0;
             int ret_ota = ezlopi_event_group_wait_for_event(EZLOPI_EVENT_OTA, 0, true);
 
-            if ((ret_ota > 0) || ((xTaskGetTickCount() - __ota_time_stamp) > (86400 * 1000 / portTICK_RATE_MS))) // 86400 seconds in a day (24 hrs)
+            if ((ret_ota > 0) || ((xTaskGetTickCount() - __ota_time_stamp) > (10000 / portTICK_RATE_MS))) // 86400 seconds in a day (24 hrs) // 86400 * 1000
             {
-                cJSON* cj_firmware_info_request = firmware_send_firmware_query_to_nma_server(esp_random());
+                __ota_time_stamp = xTaskGetTickCount();
+                cJSON *cj_firmware_info_request = firmware_send_firmware_query_to_nma_server(esp_random());
 
                 if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(cj_firmware_info_request))
                 {
