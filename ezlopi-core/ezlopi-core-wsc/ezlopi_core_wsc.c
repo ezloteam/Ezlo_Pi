@@ -631,7 +631,7 @@ static int __upgrade_to_websocket(s_ssl_websocket_t *ssl_wsc)
                 int read_len = 0;
                 memset(ssl_wsc->buffer, 0, ssl_wsc->buffer_len);
 
-                // mbedtls_ssl_conf_read_timeout(ssl_wsc->ssl_ctx, 5000);
+                // mbedtls_ssl_conf_read_timeout(ssl_wsc->conf, 5000);
                 ret = mbedtls_ssl_read(ssl_wsc->ssl_ctx, (uint8_t *)ssl_wsc->buffer, ssl_wsc->buffer_len);
                 // ret = mbedtls_net_recv_timeout(ssl_wsc->ssl_ctx, (uint8_t *)ssl_wsc->buffer, ssl_wsc->buffer_len, 5000);
 
@@ -766,7 +766,7 @@ static int __rx_func(s_ssl_websocket_t *ssl_wsc)
 
                 // MBEDTLS_ERR_SSL_CRYPTO_IN_PROGRESS
 
-                mbedtls_ssl_conf_read_timeout(ssl_wsc->ssl_ctx, 5000);
+                mbedtls_ssl_conf_read_timeout(ssl_wsc->conf, 5000); /* corrected the argment to 'mbedtls_ssl_config *' */
                 ret = mbedtls_ssl_read(ssl_wsc->ssl_ctx, (uint8_t *)ssl_wsc->buffer, ssl_wsc->buffer_len);
                 // ret = mbedtls_net_recv_timeout(ssl_wsc->ssl_ctx, (uint8_t *)ssl_wsc->buffer, ssl_wsc->buffer_len, 5000);
 
