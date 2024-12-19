@@ -11,7 +11,7 @@
 
 #include "ezlopi_service_webprov.h"
 
-void ezlopi_device_settings_list_v3(cJSON *cj_request, cJSON *cj_response)
+void EZPI_device_settings_list_v3(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     if (cj_result)
@@ -48,7 +48,7 @@ void ezlopi_device_settings_list_v3(cJSON *cj_request, cJSON *cj_response)
     }
 }
 
-void ezlopi_device_settings_value_set_v3(cJSON *cj_request, cJSON *cj_response)
+void EZPI_device_settings_value_set_v3(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
 
@@ -82,7 +82,7 @@ void ezlopi_device_settings_value_set_v3(cJSON *cj_request, cJSON *cj_response)
     }
 }
 
-void ezlopi_device_settings_reset_v3(cJSON *cj_request, cJSON *cj_response)
+void EZPI_device_settings_reset_v3(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
 
@@ -134,7 +134,7 @@ void ezlopi_device_settings_reset_v3(cJSON *cj_request, cJSON *cj_response)
 }
 
 #if 0
-cJSON *ezlopi_cloud_settings_updated_from_devices_v3(l_ezlopi_device_t *device, l_ezlopi_device_settings_v3_t *setting)
+cJSON *EZPI_cloud_settings_updated_from_devices_v3(l_ezlopi_device_t *device, l_ezlopi_device_settings_v3_t *setting)
 {
     cJSON *cjson_response = cJSON_CreateObject(__FUNCTION__);
     if (cjson_response)

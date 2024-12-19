@@ -157,7 +157,6 @@ extern "C"
     *                          Extern Function Prototypes
     *******************************************************************************/
 
-#if PING_USE_SOCKETS
     /**
      * @brief Create a ping session
      *
@@ -195,8 +194,6 @@ extern "C"
      *      - ESP_OK: get profile successfully
      */
     esp_err_t ezlopi_ping_get_profile(esp_ping_handle_t hdl, esp_ping_profile_t profile, void *data, uint32_t size);
-
-#endif
 
     /**
     * @brief Delete a ping session

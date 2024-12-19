@@ -75,21 +75,21 @@
 /*******************************************************************************
 *                          Extern Function Definitions
 *******************************************************************************/
-void EZPI_scenes_delete_user_notifications(l_user_notification_v2_t *user_notifications)
+void EZPI_core_scenes_delete_user_notifications(l_user_notification_v2_t *user_notifications)
 {
     if (user_notifications)
     {
-        EZPI_scenes_delete_user_notifications(user_notifications->next);
+        EZPI_core_scenes_delete_user_notifications(user_notifications->next);
         user_notifications->next = NULL;
         ezlopi_free(__FUNCTION__, user_notifications);
     }
 }
 
-void EZPI_scenes_delete_house_modes(l_house_modes_v2_t *house_modes)
+void EZPI_core_scenes_delete_house_modes(l_house_modes_v2_t *house_modes)
 {
     if (house_modes)
     {
-        EZPI_scenes_delete_house_modes(house_modes->next);
+        EZPI_core_scenes_delete_house_modes(house_modes->next);
         house_modes->next = NULL;
         ezlopi_free(__FUNCTION__, house_modes);
     }
@@ -105,12 +105,12 @@ void EZPI_scenes_delete_fields(l_fields_v2_t *fields)
             free(fields->user_arg);
         }
         fields->next = NULL;
-        EZPI_scenes_delete_field_value(fields);
+        EZPI_core_scenes_delete_field_value(fields);
         ezlopi_free(__FUNCTION__, fields);
     }
 }
 
-void EZPI_scenes_delete_action_blocks(l_action_block_v2_t *action_blocks)
+void EZPI_core_scenes_delete_action_blocks(l_action_block_v2_t *action_blocks)
 {
     if (action_blocks)
     {
@@ -119,13 +119,13 @@ void EZPI_scenes_delete_action_blocks(l_action_block_v2_t *action_blocks)
             cJSON_Delete(__FUNCTION__, action_blocks->block_options.cj_function);
         }
         EZPI_scenes_delete_fields(action_blocks->fields);
-        EZPI_scenes_delete_action_blocks(action_blocks->next);
+        EZPI_core_scenes_delete_action_blocks(action_blocks->next);
         action_blocks->next = NULL;
         ezlopi_free(__FUNCTION__, action_blocks);
     }
 }
 
-void EZPI_scenes_delete_when_blocks(l_when_block_v2_t *when_blocks)
+void EZPI_core_scenes_delete_when_blocks(l_when_block_v2_t *when_blocks)
 {
     if (when_blocks)
     {
@@ -145,21 +145,21 @@ void EZPI_scenes_delete_when_blocks(l_when_block_v2_t *when_blocks)
             when_blocks->when_grp = NULL;
         }
         EZPI_scenes_delete_fields(when_blocks->fields);
-        EZPI_scenes_delete_when_blocks(when_blocks->next);
+        EZPI_core_scenes_delete_when_blocks(when_blocks->next);
         when_blocks->next = NULL;
         ezlopi_free(__FUNCTION__, when_blocks);
     }
 }
 
-void EZPI_scenes_delete(l_scenes_list_v2_t *scenes_list)
+void EZPI_core_scenes_delete(l_scenes_list_v2_t *scenes_list)
 {
     if (scenes_list)
     {
-        EZPI_scenes_delete_user_notifications(scenes_list->user_notifications);
-        EZPI_scenes_delete_house_modes(scenes_list->house_modes);
-        EZPI_scenes_delete_action_blocks(scenes_list->then_block);
-        EZPI_scenes_delete_action_blocks(scenes_list->else_block);
-        EZPI_scenes_delete_when_blocks(scenes_list->when_block);
+        EZPI_core_scenes_delete_user_notifications(scenes_list->user_notifications);
+        EZPI_core_scenes_delete_house_modes(scenes_list->house_modes);
+        EZPI_core_scenes_delete_action_blocks(scenes_list->then_block);
+        EZPI_core_scenes_delete_action_blocks(scenes_list->else_block);
+        EZPI_core_scenes_delete_when_blocks(scenes_list->when_block);
 
         if (NULL != scenes_list->thread_ctx)
         {
@@ -173,13 +173,13 @@ void EZPI_scenes_delete(l_scenes_list_v2_t *scenes_list)
             scenes_list->meta = NULL;
         }
 
-        EZPI_scenes_delete(scenes_list->next);
+        EZPI_core_scenes_delete(scenes_list->next);
         scenes_list->next = NULL;
         ezlopi_free(__FUNCTION__, scenes_list);
     }
 }
 
-void EZPI_scenes_delete_field_value(l_fields_v2_t *field)
+void EZPI_core_scenes_delete_field_value(l_fields_v2_t *field)
 {
     switch (field->field_value.e_type)
     {
@@ -215,7 +215,7 @@ void EZPI_scenes_delete_field_value(l_fields_v2_t *field)
     {
         if (field->field_value.u_value.when_block)
         {
-            EZPI_scenes_delete_when_blocks(field->field_value.u_value.when_block);
+            EZPI_core_scenes_delete_when_blocks(field->field_value.u_value.when_block);
             field->field_value.u_value.when_block = NULL;
         }
         break;
@@ -225,7 +225,7 @@ void EZPI_scenes_delete_field_value(l_fields_v2_t *field)
         if (field->field_value.u_value.house_modes)
         {
             TRACE_S("here : free house_mode_arr");
-            EZPI_scenes_delete_house_modes(field->field_value.u_value.house_modes);
+            EZPI_core_scenes_delete_house_modes(field->field_value.u_value.house_modes);
             field->field_value.u_value.house_modes = NULL;
         }
         break;
@@ -240,7 +240,7 @@ void EZPI_scenes_delete_field_value(l_fields_v2_t *field)
 #if 0
 // void ezlopi_scenes_delete_by_id(uint32_t _id)
 // {
-//     EZPI_scenes_delete(EZPI_core_scenes_pop_by_id_v2(_id)); /*THIS 'EZPI_core_scenes_pop_by_id_v2' creates linking issue*/
+//     EZPI_core_scenes_delete(EZPI_core_scenes_pop_by_id_v2(_id)); /*THIS 'EZPI_core_scenes_pop_by_id_v2' creates linking issue*/
 // }
 #endif
 /*******************************************************************************

@@ -1,3 +1,42 @@
+
+/**
+ * @file    ezlopi_cloud_modes_updaters.c
+ * @brief
+ * @author
+ * @version
+ * @date
+ */
+/* ===========================================================================
+** Copyright (C) 2022 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+
 #include <time.h>
 
 #include "ezlopi_core_broadcast.h"
@@ -10,7 +49,7 @@
 #include "ezlopi_cloud_modes_updaters.h"
 
 #if defined(CONFIG_EZPI_SERV_ENABLE_MODES)
-void ezlopi_cloud_modes_switched(cJSON *cj_request, cJSON *cj_response)
+void EZPI_cloud_modes_switched(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_id_str);
     cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_method_str);
@@ -39,7 +78,7 @@ void ezlopi_cloud_modes_switched(cJSON *cj_request, cJSON *cj_response)
     }
 }
 
-void ezlopi_cloud_modes_alarmed(cJSON *cj_request, cJSON *cj_response)
+void EZPI_cloud_modes_alarmed(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_id_str);
     cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_method_str);
@@ -76,13 +115,13 @@ void ezlopi_cloud_modes_alarmed(cJSON *cj_request, cJSON *cj_response)
     }
 }
 
-void ezlopi_cloud_modes_changed_alarmed(cJSON *cj_request, cJSON *cj_response)
+void EZPI_cloud_modes_changed_alarmed(cJSON *cj_request, cJSON *cj_response)
 {
     // 1. broadcast 'modes.changed'
     cJSON *changed_resp = cJSON_CreateObject(__FUNCTION__);
     if (changed_resp)
     {
-        ezlopi_cloud_modes_changed(cj_request, changed_resp);
+        EZPI_cloud_modes_changed(cj_request, changed_resp);
         if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(changed_resp))
         {
             cJSON_Delete(__FUNCTION__, changed_resp);
@@ -90,31 +129,33 @@ void ezlopi_cloud_modes_changed_alarmed(cJSON *cj_request, cJSON *cj_response)
     }
 
     // 2. for 'modes.alarmed' - return  'cj_response'
-    ezlopi_cloud_modes_alarmed(cj_request, cj_response);
+    EZPI_cloud_modes_alarmed(cj_request, cj_response);
 }
 
-void ezlopi_cloud_modes_notifications_notify_all(cJSON *cj_request, cJSON *cj_response)
+void EZPI_cloud_modes_notifications_notify_all(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
 }
 #if 0
-void ezlopi_cloud_modes_notifications_added(cJSON *cj_request, cJSON *cj_response)
+
+void EZPI_cloud_modes_notifications_added(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
 }
 
-void ezlopi_cloud_modes_notifications_removed(cJSON *cj_request, cJSON *cj_response)
+void EZPI_cloud_modes_notifications_removed(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
 }
 #endif
-void ezlopi_cloud_modes_disarmed_devices_added(cJSON *cj_request, cJSON *cj_response)
+
+void EZPI_cloud_modes_disarmed_devices_added(cJSON *cj_request, cJSON *cj_response)
 {
     // 1. broadcast 'modes.changed'
     cJSON *changed_resp = cJSON_CreateObject(__FUNCTION__);
     if (changed_resp)
     {
-        ezlopi_cloud_modes_changed(cj_request, changed_resp);
+        EZPI_cloud_modes_changed(cj_request, changed_resp);
         if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(changed_resp))
         {
             cJSON_Delete(__FUNCTION__, changed_resp);
@@ -142,47 +183,13 @@ void ezlopi_cloud_modes_disarmed_devices_added(cJSON *cj_request, cJSON *cj_resp
     }
 }
 
-void ezlopi_cloud_modes_disarmed_devices_removed(cJSON *cj_request, cJSON *cj_response)
+void EZPI_cloud_modes_disarmed_devices_removed(cJSON *cj_request, cJSON *cj_response)
 {
     // 1. broadcast 'modes.changed'
     cJSON *changed_resp = cJSON_CreateObject(__FUNCTION__);
     if (changed_resp)
     {
-        ezlopi_cloud_modes_changed(cj_request, changed_resp);
-        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(changed_resp))
-        {
-            cJSON_Delete(__FUNCTION__, changed_resp);
-        }
-    }
-
-    // 2. broadcast disarmed_device.removed
-    cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
-    cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, ezlopi_hub_modes_disarmed_devices_removed);
-
-    cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
-    if (cj_result)
-    {
-        cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
-        if (cj_params)
-        {
-            cJSON *cj_mode_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_modeId_str);
-            cJSON *cj_device_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_deviceId_str);
-            if (cj_mode_id && cj_device_id)
-            {
-                cJSON_AddItemToObject(__FUNCTION__, cj_result, ezlopi_modeId_str, cJSON_Duplicate(__FUNCTION__, cj_mode_id, true));
-                cJSON_AddItemToObject(__FUNCTION__, cj_result, ezlopi_disarmedDevice_str, cJSON_Duplicate(__FUNCTION__, cj_device_id, true));
-            }
-        }
-    }
-}
-
-void ezlopi_cloud_modes_alarms_off_added(cJSON *cj_request, cJSON *cj_response)
-{
-    // 1. broadcast 'modes.changed'
-    cJSON *changed_resp = cJSON_CreateObject(__FUNCTION__);
-    if (changed_resp)
-    {
-        ezlopi_cloud_modes_changed(cj_request, changed_resp);
+        EZPI_cloud_modes_changed(cj_request, changed_resp);
         if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(changed_resp))
         {
             cJSON_Delete(__FUNCTION__, changed_resp);
@@ -210,13 +217,47 @@ void ezlopi_cloud_modes_alarms_off_added(cJSON *cj_request, cJSON *cj_response)
     }
 }
 
-void ezlopi_cloud_modes_alarms_off_removed(cJSON *cj_request, cJSON *cj_response)
+void EZPI_cloud_modes_alarms_off_added(cJSON *cj_request, cJSON *cj_response)
 {
     // 1. broadcast 'modes.changed'
     cJSON *changed_resp = cJSON_CreateObject(__FUNCTION__);
     if (changed_resp)
     {
-        ezlopi_cloud_modes_changed(cj_request, changed_resp);
+        EZPI_cloud_modes_changed(cj_request, changed_resp);
+        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(changed_resp))
+        {
+            cJSON_Delete(__FUNCTION__, changed_resp);
+        }
+    }
+
+    // 2. broadcast alarm_off.added
+    cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
+    cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, ezlopi_hub_modes_alarms_off_added);
+
+    cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+    if (cj_result)
+    {
+        cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
+        if (cj_params)
+        {
+            cJSON *cj_mode_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_modeId_str);
+            cJSON *cj_device_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_deviceId_str);
+            if (cj_mode_id && cj_device_id)
+            {
+                cJSON_AddItemToObject(__FUNCTION__, cj_result, ezlopi_modeId_str, cJSON_Duplicate(__FUNCTION__, cj_mode_id, true));
+                cJSON_AddItemToObject(__FUNCTION__, cj_result, ezlopi_alarmsOffDevice_str, cJSON_Duplicate(__FUNCTION__, cj_device_id, true));
+            }
+        }
+    }
+}
+
+void EZPI_cloud_modes_alarms_off_removed(cJSON *cj_request, cJSON *cj_response)
+{
+    // 1. broadcast 'modes.changed'
+    cJSON *changed_resp = cJSON_CreateObject(__FUNCTION__);
+    if (changed_resp)
+    {
+        EZPI_cloud_modes_changed(cj_request, changed_resp);
         if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(changed_resp))
         {
             cJSON_Delete(__FUNCTION__, changed_resp);
@@ -244,13 +285,13 @@ void ezlopi_cloud_modes_alarms_off_removed(cJSON *cj_request, cJSON *cj_response
     }
 }
 
-void ezlopi_cloud_modes_cameras_off_added(cJSON *cj_request, cJSON *cj_response)
+void EZPI_cloud_modes_cameras_off_added(cJSON *cj_request, cJSON *cj_response)
 {
     // 1. broadcast 'modes.changed'
     cJSON *changed_resp = cJSON_CreateObject(__FUNCTION__);
     if (changed_resp)
     {
-        ezlopi_cloud_modes_changed(cj_request, changed_resp);
+        EZPI_cloud_modes_changed(cj_request, changed_resp);
         if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(changed_resp))
         {
             cJSON_Delete(__FUNCTION__, changed_resp);
@@ -272,19 +313,19 @@ void ezlopi_cloud_modes_cameras_off_added(cJSON *cj_request, cJSON *cj_response)
             if (cj_mode_id && cj_device_id)
             {
                 cJSON_AddItemToObject(__FUNCTION__, cj_result, ezlopi_modeId_str, cJSON_Duplicate(__FUNCTION__, cj_mode_id, true));
-                cJSON_AddItemToObject(__FUNCTION__, cj_result, ezlopi_camerasOffDevices_str, cJSON_Duplicate(__FUNCTION__, cj_device_id, true));
+                cJSON_AddItemToObject(__FUNCTION__, cj_result, ezlopi_alarmsOffDevice_str, cJSON_Duplicate(__FUNCTION__, cj_device_id, true));
             }
         }
     }
 }
 
-void ezlopi_cloud_modes_cameras_off_removed(cJSON *cj_request, cJSON *cj_response)
+void EZPI_cloud_modes_cameras_off_removed(cJSON *cj_request, cJSON *cj_response)
 {
     // 1. broadcast 'modes.changed'
     cJSON *changed_resp = cJSON_CreateObject(__FUNCTION__);
     if (changed_resp)
     {
-        ezlopi_cloud_modes_changed(cj_request, changed_resp);
+        EZPI_cloud_modes_changed(cj_request, changed_resp);
         if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(changed_resp))
         {
             cJSON_Delete(__FUNCTION__, changed_resp);
@@ -312,7 +353,7 @@ void ezlopi_cloud_modes_cameras_off_removed(cJSON *cj_request, cJSON *cj_respons
     }
 }
 
-void ezlopi_cloud_modes_bypass_devices_added(cJSON *cj_request, cJSON *cj_response)
+void EZPI_cloud_modes_bypass_devices_added(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_AddStringToObject(__func__, cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
     cJSON_AddStringToObject(__func__, cj_response, ezlopi_msg_subclass_str, ezlopi_hub_modes_bypass_devices_added);
@@ -324,7 +365,7 @@ void ezlopi_cloud_modes_bypass_devices_added(cJSON *cj_request, cJSON *cj_respon
     }
 }
 
-void ezlopi_cloud_modes_bypass_devices_removed(cJSON *cj_request, cJSON *cj_response)
+void EZPI_cloud_modes_bypass_devices_removed(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_AddStringToObject(__func__, cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
     cJSON_AddStringToObject(__func__, cj_response, ezlopi_msg_subclass_str, ezlopi_hub_modes_bypass_devices_removed);
@@ -335,7 +376,7 @@ void ezlopi_cloud_modes_bypass_devices_removed(cJSON *cj_request, cJSON *cj_resp
     }
 }
 
-void ezlopi_cloud_modes_changed(cJSON *cj_request, cJSON *cj_response)
+void EZPI_cloud_modes_changed(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_id_str);
     cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_method_str);
@@ -364,7 +405,7 @@ void ezlopi_cloud_modes_changed(cJSON *cj_request, cJSON *cj_response)
     }
 }
 
-void ezlopi_cloud_modes_protect_buttons_added(cJSON *cj_request, cJSON *cj_response)
+void EZPI_cloud_modes_protect_buttons_added(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_id_str);
     cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_method_str);
@@ -388,7 +429,7 @@ void ezlopi_cloud_modes_protect_buttons_added(cJSON *cj_request, cJSON *cj_respo
     }
 }
 
-void ezlopi_cloud_modes_protect_buttons_updated(cJSON *cj_request, cJSON *cj_response)
+void EZPI_cloud_modes_protect_buttons_updated(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_id_str);
     cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_method_str);
@@ -412,7 +453,7 @@ void ezlopi_cloud_modes_protect_buttons_updated(cJSON *cj_request, cJSON *cj_res
     }
 }
 
-void ezlopi_cloud_modes_protect_buttons_removed(cJSON *cj_request, cJSON *cj_response)
+void EZPI_cloud_modes_protect_buttons_removed(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_id_str);
     cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_method_str);
@@ -440,13 +481,13 @@ void ezlopi_cloud_modes_protect_buttons_removed(cJSON *cj_request, cJSON *cj_res
     }
 }
 
-void ezlopi_cloud_modes_protect_button_set_broadcast(cJSON *cj_request, cJSON *cj_response)
+void EZPI_cloud_modes_protect_button_set_broadcast(cJSON *cj_request, cJSON *cj_response)
 {
     // 1. broadcast 'modes.protect.button.added'
     cJSON *added_resp = cJSON_CreateObject(__FUNCTION__);
     if (added_resp)
     {
-        ezlopi_cloud_modes_protect_buttons_added(cj_request, added_resp);
+        EZPI_cloud_modes_protect_buttons_added(cj_request, added_resp);
         if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(added_resp))
         {
             cJSON_Delete(__FUNCTION__, added_resp);
@@ -457,7 +498,7 @@ void ezlopi_cloud_modes_protect_button_set_broadcast(cJSON *cj_request, cJSON *c
     cJSON *updated_resp = cJSON_CreateObject(__FUNCTION__);
     if (updated_resp)
     {
-        ezlopi_cloud_modes_protect_buttons_updated(cj_request, updated_resp);
+        EZPI_cloud_modes_protect_buttons_updated(cj_request, updated_resp);
         if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(updated_resp))
         {
             cJSON_Delete(__FUNCTION__, updated_resp);
@@ -465,10 +506,10 @@ void ezlopi_cloud_modes_protect_button_set_broadcast(cJSON *cj_request, cJSON *c
     }
 
     // 3.broadcast 'modes.protect.button.removed'
-    ezlopi_cloud_modes_protect_buttons_removed(cj_request, cj_response);
+    EZPI_cloud_modes_protect_buttons_removed(cj_request, cj_response);
 }
 
-void ezlopi_cloud_modes_protect_devices_added(cJSON *cj_request, cJSON *cj_response)
+void EZPI_cloud_modes_protect_devices_added(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_id_str);
     cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_method_str);
@@ -482,7 +523,7 @@ void ezlopi_cloud_modes_protect_devices_added(cJSON *cj_request, cJSON *cj_respo
     }
 }
 
-void ezlopi_cloud_modes_protect_devices_removed(cJSON *cj_request, cJSON *cj_response)
+void EZPI_cloud_modes_protect_devices_removed(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_id_str);
     cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_method_str);
@@ -496,7 +537,7 @@ void ezlopi_cloud_modes_protect_devices_removed(cJSON *cj_request, cJSON *cj_res
     }
 }
 
-void ezlopi_cloud_modes_entry_delay_changed(cJSON *cj_request, cJSON *cj_response)
+void EZPI_cloud_modes_entry_delay_changed(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_id_str);
     cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_method_str);
@@ -530,3 +571,7 @@ void ezlopi_cloud_modes_entry_delay_changed(cJSON *cj_request, cJSON *cj_respons
 }
 
 #endif // CONFIG_EZPI_SERV_ENABLE_MODES
+
+/*******************************************************************************
+ *                          End of File
+ *******************************************************************************/

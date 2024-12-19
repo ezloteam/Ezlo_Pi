@@ -359,7 +359,7 @@ void EZPI_core_scenes_depopulate_by_id_v2(uint32_t _id)
 {
     if (EZPI_SUCCESS == EZPI_meshbot_stop_without_broadcast(EZPI_core_scenes_get_by_id_v2(_id)))
     {
-        EZPI_scenes_delete(EZPI_core_scenes_pop_by_id_v2(_id));
+        EZPI_core_scenes_delete(EZPI_core_scenes_pop_by_id_v2(_id));
     }
 }
 ezlopi_error_t EZPI_core_scenes_enable_disable_scene_by_id_v2(uint32_t _id, bool enabled_flag)

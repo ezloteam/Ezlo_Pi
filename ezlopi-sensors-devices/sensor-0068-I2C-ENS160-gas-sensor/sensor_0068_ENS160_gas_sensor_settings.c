@@ -187,7 +187,6 @@ static int __settings_callback(e_ezlopi_settings_action_t action, struct l_ezlop
     {
         break;
     }
-
     }
 
     return ret;
@@ -337,16 +336,12 @@ static int __settings_set(void *arg, l_ezlopi_device_settings_v3_t *setting)
     }
     setting_changed = true;
 
-
     EZPI_core_device_value_updated_settings_broadcast(setting);
-    // ezlopi_cloud_settings_updated_from_devices_v3(NULL, setting);
+    // EZPI_cloud_settings_updated_from_devices_v3(NULL, setting);
     return ret;
-
 }
 
 // ********************************************* Setting setter related end ********************************************* //
-
-
 
 // ********************************************* Setting updater related start ********************************************* //
 
@@ -403,7 +398,6 @@ static int __settings_update(void *arg, l_ezlopi_device_settings_v3_t *setting)
 }
 
 // ********************************************* Setting updater related end ********************************************* //
-
 
 // ********************************************* Setting resetter related start ********************************************* //
 
@@ -467,13 +461,11 @@ static int __settings_reset(void *arg, l_ezlopi_device_settings_v3_t *setting)
     setting_changed = true;
 
     EZPI_core_device_value_updated_settings_broadcast(setting);
-    // ezlopi_cloud_settings_updated_from_devices_v3(NULL, setting);
+    // EZPI_cloud_settings_updated_from_devices_v3(NULL, setting);
     return ret;
-
 }
 
 // ********************************************* Setting resetter related end ********************************************* //
-
 
 float get_ambient_temperature_setting()
 {

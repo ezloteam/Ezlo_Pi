@@ -205,7 +205,7 @@
 
 - Update README.md by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/140
 - Combined ezpi 381 400 401 402 403 404 by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/139
-- 1. bug_fixed in 'firmware_info_get' function by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/142
+- 1. bug_fixed in 'EZPI_firmware_info_get' function by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/142
 - Dev merge ezpi 371 411 413 415 417 419 420 by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/141
 - Development by @krishna-ezlo in https://github.com/ezloteam/Ezlo_Pi/pull/143
 - Ezpi wifi scanner issue by @NDJ-EZLO in https://github.com/ezloteam/Ezlo_Pi/pull/144

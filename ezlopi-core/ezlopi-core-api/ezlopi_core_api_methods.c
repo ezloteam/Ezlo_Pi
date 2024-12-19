@@ -69,7 +69,6 @@
 #include "ezlopi_cloud_log.h"
 #include "ezlopi_cloud_setting_commands.h"
 #include "ezlopi_cloud_hub_data_list.h"
-
 /*******************************************************************************
 *                          Extern Data Declarations
 *******************************************************************************/
@@ -155,14 +154,14 @@ void EZPI_core_ezlopi_methods_rpc_method_notfound(cJSON *cj_request, cJSON *cj_r
 
 void EZPI_core_ezlopi_methods_registration_init(void)
 {
-    registration_init();
+    EZPI_registration_init();
 }
 
 bool EZPI_core_ezlopi_methods_check_method_register(f_method_func_t method)
 {
     bool ret = false;
 
-    if (registered == method)
+    if (EZPI_registered == method)
     {
         ret = true;
     }

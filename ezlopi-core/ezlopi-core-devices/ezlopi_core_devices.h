@@ -29,15 +29,15 @@
 ** ===========================================================================
 */
 /**
- * @file    main.h
- * @brief   perform some function on data
+ * @file    ezlopi_core_devices.h
+ * @brief   perform some function on core-devices
  * @author  xx
  * @version 0.1
  * @date    12th DEC 2024
 */
 
-#ifndef EZLOPI_CORE_DEVICES_H
-#define EZLOPI_CORE_DEVICES_H
+#ifndef _EZLOPI_CORE_DEVICES_H_
+#define _EZLOPI_CORE_DEVICES_H_
 
 
 /*******************************************************************************
@@ -257,7 +257,7 @@ extern "C"
 }
 #endif
 
-#endif // EZLOPI_CORE_DEVICES_H
+#endif // _EZLOPI_CORE_DEVICES_H_
 
 
 /*******************************************************************************
