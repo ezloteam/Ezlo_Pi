@@ -32,7 +32,9 @@ void EZPI_CLOUD_location_list(cJSON* cj_request, cJSON* cj_response)
                 {
                     cJSON_AddItemToArray(json_array_tzs, json_location_name);
                 }
-                // TRACE_E("Here !!! Looping %d : %s", i+1, tz_list[i].name);
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
+                TRACE_E("Here !!! Looping %d : %s", i + 1, tz_list[i].name);
+#endif
                 vTaskDelay(1);
                 i++;
             }
@@ -67,7 +69,7 @@ void EZPI_CLOUD_location_set(cJSON* cj_request, cJSON* cj_response)
         char location_str[128];
         memset(location_str, 0, sizeof(location_str));
         CJSON_GET_VALUE_STRING_BY_COPY(cj_params, ezlopi_location_str, location_str);
-        
+
         if ('\0' != location_str[0])
         {
             TRACE_I("Location: %s", location_str);

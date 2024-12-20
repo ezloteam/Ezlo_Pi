@@ -48,10 +48,12 @@ void ezlopi_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t ga
             esp_ble_gatts_create_service(gatts_if, &service->service_id, service->num_handles);
             // TRACE_D("service->num_handles: %d", service->num_handles);
         }
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
         else
         {
             TRACE_E("service is null");
         }
+#endif
         break;
     }
     case ESP_GATTS_CREATE_EVT:
@@ -63,12 +65,13 @@ void ezlopi_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t ga
             service->status = GATT_STATUS_DONE;
             esp_ble_gatts_start_service(service->service_handle);
             // TRACE_D("service->service_handle: %d", service->service_handle);
-
         }
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
         else
         {
             TRACE_E("service is null");
         }
+#endif
         break;
     }
     case ESP_GATTS_START_EVT:
@@ -81,15 +84,19 @@ void ezlopi_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t ga
             char_to_add->status = GATT_STATUS_PROCESSING;
             esp_err_t err = esp_ble_gatts_add_char(service->service_handle, &char_to_add->uuid, char_to_add->permission, char_to_add->property, NULL, NULL);
             // ezlopi_ble_gatt_print_characteristic(char_to_add);
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
             if (err)
             {
                 TRACE_E("esp_ble_gatts_add_char: %s", esp_err_to_name(err));
             }
+#endif
         }
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
         else
         {
             TRACE_E("Characteristics or Service is null");
         }
+#endif
         break;
     }
     case ESP_GATTS_ADD_CHAR_EVT:
@@ -108,10 +115,12 @@ void ezlopi_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t ga
             {
                 desc_to_init->status = GATT_STATUS_PROCESSING;
                 esp_err_t add_descr_ret = esp_ble_gatts_add_char_descr(service->service_handle, &desc_to_init->uuid, desc_to_init->permission, NULL, NULL);
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                 if (add_descr_ret)
                 {
                     TRACE_E("add char descr failed, error code =%x", add_descr_ret);
                 }
+#endif
             }
             else
             {
@@ -122,10 +131,12 @@ void ezlopi_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t ga
                     char_to_add->status = GATT_STATUS_PROCESSING;
                     esp_err_t err = esp_ble_gatts_add_char(service->service_handle, &char_to_add->uuid, char_to_add->permission,
                         char_to_add->property, NULL, NULL);
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                     if (err)
                     {
                         TRACE_E("esp_ble_gatts_add_char: %s", esp_err_to_name(err));
                     }
+#endif
                 }
                 else
                 {
@@ -157,10 +168,12 @@ void ezlopi_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t ga
             esp_err_t add_descr_ret = esp_ble_gatts_add_char_descr(service->service_handle, &desc_to_init->uuid, desc_to_init->permission, NULL, NULL);
             // ezlopi_ble_gatt_print_descriptor(desc_to_init);
 
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
             if (add_descr_ret)
             {
                 TRACE_E("add char descr failed, error code =%x", add_descr_ret);
             }
+#endif
         }
         else
         {
@@ -173,10 +186,12 @@ void ezlopi_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t ga
                 esp_err_t err = esp_ble_gatts_add_char(service->service_handle, &char_to_add->uuid, char_to_add->permission,
                     char_to_add->property, NULL, NULL);
                 // ezlopi_ble_gatt_print_characteristic(char_to_add);
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                 if (err)
                 {
                     TRACE_E("esp_ble_gatts_add_char: %s", esp_err_to_name(err));
                 }
+#endif
             }
             else
             {
@@ -206,7 +221,9 @@ void ezlopi_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t ga
 #if (1 == CONFIG_EZPI_BLE_ENALBE_PAIRING)
     case ESP_GATTS_CONNECT_EVT:
     {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
         TRACE_S("ESP_GATTS_CONNECT_EVT");
+#endif
         /* start security connect with peer device when receive the connect event sent by the master */
         esp_ble_set_encryption(param->connect.remote_bda, ESP_BLE_SEC_ENCRYPT_MITM);
         break;
@@ -214,21 +231,27 @@ void ezlopi_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t ga
 #endif
     case ESP_GATTS_DISCONNECT_EVT:
     {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
         TRACE_S("ESP_GATTS_DISCONNECT_EVT, disconnect reason 0x%x", param->disconnect.reason);
+#endif
         ezlopi_ble_gap_start_advertising();
         break;
     }
     case ESP_GATTS_MTU_EVT: // 4
     {
         ezlopi_ble_setup_adv_config();
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
         TRACE_S("ESP_GATTS_MTU_EVT, MTU %d", param->mtu.mtu);
+#endif
         g_mtu_size = param->mtu.mtu;
         break;
     }
     case ESP_GATTS_RESPONSE_EVT:
     default:
     {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
         TRACE_W("BLE GATT Event: %s Not Implemented!", ezlopi_ble_gatt_event_to_string(event));
+#endif
         break;
     }
     }
@@ -253,22 +276,30 @@ static f_upcall_t ezlopi_ble_gatt_call_by_handle(esp_gatt_if_t gatts_if, uint16_
                 {
                 case ESP_GATTS_READ_EVT:
                 {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                     TRACE_S("Is a characteristic 'read'.");
+#endif
                     return characteristic->read_upcall;
                 }
                 case ESP_GATTS_WRITE_EVT:
                 {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                     TRACE_S("Is a characteristic 'write'.");
+#endif
                     return characteristic->write_upcall;
                 }
                 case ESP_GATTS_EXEC_WRITE_EVT:
                 {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                     TRACE_S("Is a characteristic 'write_exce'.");
+#endif
                     return characteristic->write_exce_upcall;
                 }
                 default:
                 {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                     TRACE_S("Characteristic upcall not found!");
+#endif
                     return NULL;
                 }
                 }
@@ -279,28 +310,38 @@ static f_upcall_t ezlopi_ble_gatt_call_by_handle(esp_gatt_if_t gatts_if, uint16_
             {
                 if (handle == descriptor->handle)
                 {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                     TRACE_S("Is a descriptor %s.", event ? "read" : "write");
+#endif
                     // ezlopi_ble_gatt_print_descriptor(descriptor);
                     switch (event)
                     {
                     case ESP_GATTS_READ_EVT:
                     {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                         TRACE_S("Is a descriptor 'read'.");
+#endif
                         return descriptor->read_upcall;
                     }
                     case ESP_GATTS_WRITE_EVT:
                     {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                         TRACE_S("Is a descriptor 'write'.");
+#endif
                         return descriptor->write_upcall;
                     }
                     case ESP_GATTS_EXEC_WRITE_EVT:
                     {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                         TRACE_S("Is a descriptor 'write_exce'.");
+#endif
                         return descriptor->write_exce_upcall;
                     }
                     default:
                     {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                         TRACE_S("Descriptor upcall not found!");
+#endif
                         return NULL;
                     }
                     }
@@ -311,10 +352,12 @@ static f_upcall_t ezlopi_ble_gatt_call_by_handle(esp_gatt_if_t gatts_if, uint16_
             characteristic = characteristic->next;
         }
     }
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
     else
     {
         TRACE_E("Service not found!");
     }
+#endif
 
     return NULL;
 }
@@ -357,10 +400,12 @@ static void ezlopi_ble_gatt_call_write_exec_by_handle(esp_gatt_if_t gatts_if, es
             write_exec_upcall(NULL, param);
         }
     }
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
     else
     {
         TRACE_E("'write_exec_upcall' not found!");
     }
+#endif
 }
 
 static void ezlopi_ble_gatt_call_read_by_handle(esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t* param)
@@ -517,5 +562,4 @@ static char* ezlopi_ble_gatt_event_to_string(esp_gatts_cb_event_t event)
 }
 
 #endif // CONFIG_EZPI_BLE_ENABLE
-
 #endif // 1 == ENABLE_TRACE

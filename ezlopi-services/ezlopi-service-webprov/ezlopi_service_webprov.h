@@ -12,6 +12,7 @@ extern "C"
 #endif
 
 #if defined(CONFIG_EZPI_WEBSOCKET_CLIENT)
+    bool ezlopi_service_webprov_is_connected(void);
     void ezlopi_service_web_provisioning_init(void);
     void ezlopi_service_web_provisioning_deinit(void);
     uint32_t ezlopi_service_web_provisioning_get_message_count(void);

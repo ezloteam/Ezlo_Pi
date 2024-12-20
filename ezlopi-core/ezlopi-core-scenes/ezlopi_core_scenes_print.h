@@ -5,6 +5,8 @@
 
 #include "ezlopi_core_scenes_v2.h"
 
+#define ENABLE_SCENES_PRINT 0
+
 void ezlopi_print_block_options(s_block_options_v2_t *block_options, l_fields_v2_t *fields, const char *tab);
 void ezlopi_print_fields(l_fields_v2_t *fields, const char *tab);
 void ezlopi_print_house_modes(l_house_modes_v2_t *house_modes);

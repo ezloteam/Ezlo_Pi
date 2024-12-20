@@ -53,18 +53,7 @@
 #include "cjext_utils.h"
 #include "EZLOPI_USER_CONFIG.h"
 
-/* define our own boolean type */
-#ifdef true
-#undef true
-#endif
-#define true ((cJSON_bool)1)
-
-#ifdef false
-#undef false
-#endif
-#define false ((cJSON_bool)0)
-
-static unsigned char *cJSONUtils_strdup(const char * who, const unsigned char *const string)
+static unsigned char *cJSONUtils_strdup(const char *who, const unsigned char *const string)
 {
     unsigned char *copy = NULL;
 
@@ -80,7 +69,7 @@ static unsigned char *cJSONUtils_strdup(const char * who, const unsigned char *c
 }
 
 /* string comparison which doesn't consider NULL pointers equal */
-static int compare_strings(const unsigned char *string1, const unsigned char *string2, const cJSON_bool case_sensitive)
+static int compare_strings(const unsigned char *string1, const unsigned char *string2, const bool case_sensitive)
 {
     if ((string1 == NULL) || (string2 == NULL))
     {
@@ -109,14 +98,14 @@ static int compare_strings(const unsigned char *string1, const unsigned char *st
 }
 
 /* securely comparison of floating-point variables */
-static cJSON_bool compare_double(double a, double b)
+static bool compare_double(double a, double b)
 {
     double maxVal = fabs(a) > fabs(b) ? fabs(a) : fabs(b);
     return (fabs(a - b) <= maxVal * DBL_EPSILON);
 }
 
 /* Compare the next path element of two JSON pointers, two NULL pointers are considered unequal: */
-static cJSON_bool compare_pointers(const unsigned char *name, const unsigned char *pointer, const cJSON_bool case_sensitive)
+static bool compare_pointers(const unsigned char *name, const unsigned char *pointer, const bool case_sensitive)
 {
     if ((name == NULL) || (pointer == NULL))
     {
@@ -195,7 +184,7 @@ static void encode_string_as_pointer(unsigned char *destination, const unsigned 
     destination[0] = '\0';
 }
 
-char * cJSONUtils_FindPointerFromObjectTo(const char * who, const cJSON *const object, const cJSON *const target)
+char *cJSONUtils_FindPointerFromObjectTo(const char *who, const cJSON *const object, const cJSON *const target)
 {
     size_t child_index = 0;
     cJSON *current_child = 0;
@@ -271,7 +260,7 @@ static cJSON *get_array_item(const cJSON *array, size_t item)
     return child;
 }
 
-static cJSON_bool decode_array_index_from_pointer(const unsigned char *const pointer, size_t *const index)
+static bool decode_array_index_from_pointer(const unsigned char *const pointer, size_t *const index)
 {
     size_t parsed_index = 0;
     size_t position = 0;
@@ -297,7 +286,7 @@ static cJSON_bool decode_array_index_from_pointer(const unsigned char *const poi
     return 1;
 }
 
-static cJSON *get_item_from_pointer(cJSON *const object, const char *pointer, const cJSON_bool case_sensitive)
+static cJSON *get_item_from_pointer(cJSON *const object, const char *pointer, const bool case_sensitive)
 {
     cJSON *current_element = object;
 
@@ -344,12 +333,12 @@ static cJSON *get_item_from_pointer(cJSON *const object, const char *pointer, co
     return current_element;
 }
 
-cJSON * cJSONUtils_GetPointer(cJSON *const object, const char *pointer)
+cJSON *cJSONUtils_GetPointer(cJSON *const object, const char *pointer)
 {
     return get_item_from_pointer(object, pointer, false);
 }
 
-cJSON * cJSONUtils_GetPointerCaseSensitive(cJSON *const object, const char *pointer)
+cJSON *cJSONUtils_GetPointerCaseSensitive(cJSON *const object, const char *pointer)
 {
     return get_item_from_pointer(object, pointer, true);
 }
@@ -427,7 +416,7 @@ static cJSON *detach_item_from_array(cJSON *array, size_t which)
 }
 
 /* detach an item at the given path */
-static cJSON *detach_path(const char * who, cJSON *object, const unsigned char *path, const cJSON_bool case_sensitive)
+static cJSON *detach_path(const char *who, cJSON *object, const unsigned char *path, const bool case_sensitive)
 {
     unsigned char *parent_pointer = NULL;
     unsigned char *child_pointer = NULL;
@@ -482,7 +471,7 @@ cleanup:
 }
 
 /* sort lists using mergesort */
-static cJSON *sort_list(cJSON *list, const cJSON_bool case_sensitive)
+static cJSON *sort_list(cJSON *list, const bool case_sensitive)
 {
     cJSON *first = list;
     cJSON *second = list;
@@ -593,7 +582,7 @@ static cJSON *sort_list(cJSON *list, const cJSON_bool case_sensitive)
     return result;
 }
 
-static void sort_object(cJSON *const object, const cJSON_bool case_sensitive)
+static void sort_object(cJSON *const object, const bool case_sensitive)
 {
     if (object == NULL)
     {
@@ -602,7 +591,7 @@ static void sort_object(cJSON *const object, const cJSON_bool case_sensitive)
     object->child = sort_list(object->child, case_sensitive);
 }
 
-static cJSON_bool compare_json(cJSON *a, cJSON *b, const cJSON_bool case_sensitive)
+static bool compare_json(cJSON *a, cJSON *b, const bool case_sensitive)
 {
     if ((a == NULL) || (b == NULL) || ((a->type & 0xFF) != (b->type & 0xFF)))
     {
@@ -636,7 +625,7 @@ static cJSON_bool compare_json(cJSON *a, cJSON *b, const cJSON_bool case_sensiti
     case cJSON_Array:
         for ((void)(a = a->child), b = b->child; (a != NULL) && (b != NULL); (void)(a = a->next), b = b->next)
         {
-            cJSON_bool identical = compare_json(a, b, case_sensitive);
+            bool identical = compare_json(a, b, case_sensitive);
             if (!identical)
             {
                 return false;
@@ -658,7 +647,7 @@ static cJSON_bool compare_json(cJSON *a, cJSON *b, const cJSON_bool case_sensiti
         sort_object(b, case_sensitive);
         for ((void)(a = a->child), b = b->child; (a != NULL) && (b != NULL); (void)(a = a->next), b = b->next)
         {
-            cJSON_bool identical = false;
+            bool identical = false;
             /* compare object keys */
             if (compare_strings((unsigned char *)a->string, (unsigned char *)b->string, case_sensitive))
             {
@@ -691,7 +680,7 @@ static cJSON_bool compare_json(cJSON *a, cJSON *b, const cJSON_bool case_sensiti
 }
 
 /* non broken version of cJSON_InsertItemInArray */
-static cJSON_bool insert_item_in_array(const char *who, cJSON *array, size_t which, cJSON *newitem)
+static bool insert_item_in_array(const char *who, cJSON *array, size_t which, cJSON *newitem)
 {
     cJSON *child = array->child;
     while (child && (which > 0))
@@ -702,12 +691,12 @@ static cJSON_bool insert_item_in_array(const char *who, cJSON *array, size_t whi
     if (which > 0)
     {
         /* item is after the end of the array */
-        return 0;
+        return false;
     }
     if (child == NULL)
     {
         cJSON_AddItemToArray(array, newitem);
-        return 1;
+        return true;
     }
 
     /* insert into the linked list */
@@ -725,10 +714,10 @@ static cJSON_bool insert_item_in_array(const char *who, cJSON *array, size_t whi
         newitem->prev->next = newitem;
     }
 
-    return 1;
+    return true;
 }
 
-static cJSON *get_object_item(const char * who, const cJSON *const object, const char *name, const cJSON_bool case_sensitive)
+static cJSON *get_object_item(const char *who, const cJSON *const object, const char *name, const bool case_sensitive)
 {
     if (case_sensitive)
     {
@@ -749,7 +738,7 @@ enum patch_operation
     TEST
 };
 
-static enum patch_operation decode_patch_operation(const char *who, const cJSON *const patch, const cJSON_bool case_sensitive)
+static enum patch_operation decode_patch_operation(const char *who, const cJSON *const patch, const bool case_sensitive)
 {
     cJSON *operation = get_object_item(who, patch, "op", case_sensitive);
     if (!cJSON_IsString(operation))
@@ -791,7 +780,7 @@ static enum patch_operation decode_patch_operation(const char *who, const cJSON 
 }
 
 /* overwrite and existing item with another one and free resources on the way */
-static void overwrite_item(const char * who, cJSON *const root, const cJSON replacement)
+static void overwrite_item(const char *who, cJSON *const root, const cJSON replacement)
 {
     if (root == NULL)
     {
@@ -814,7 +803,7 @@ static void overwrite_item(const char * who, cJSON *const root, const cJSON repl
     memcpy(root, &replacement, sizeof(cJSON));
 }
 
-static int apply_patch(const char * who, cJSON *object, const cJSON *patch, const cJSON_bool case_sensitive)
+static int apply_patch(const char *who, cJSON *object, const cJSON *patch, const bool case_sensitive)
 {
     cJSON *path = NULL;
     cJSON *value = NULL;
@@ -851,7 +840,7 @@ static int apply_patch(const char * who, cJSON *object, const cJSON *patch, cons
         if (opcode == REMOVE)
         {
             // static const cJSON invalid = {NULL, NULL, NULL, cJSON_Invalid, NULL, 0, 0, NULL};
-            static const cJSON invalid = { NULL, NULL, NULL, cJSON_Invalid, NULL, 0, 0, NULL, cJSON_False, cJSON_False, 0, 0 };
+            static const cJSON invalid = {NULL, NULL, NULL, cJSON_Invalid, NULL, 0, 0, NULL, cJSON_False, cJSON_False, 0, 0};
 
             overwrite_item(who, object, invalid);
 
@@ -1047,7 +1036,7 @@ cleanup:
     return status;
 }
 
-int cJSONUtils_ApplyPatches(const char * who, cJSON *const object, const cJSON *const patches)
+int cJSONUtils_ApplyPatches(const char *who, cJSON *const object, const cJSON *const patches)
 {
     const cJSON *current_patch = NULL;
     int status = 0;
@@ -1076,7 +1065,7 @@ int cJSONUtils_ApplyPatches(const char * who, cJSON *const object, const cJSON *
     return 0;
 }
 
-int cJSONUtils_ApplyPatchesCaseSensitive(const char * who, cJSON *const object, const cJSON *const patches)
+int cJSONUtils_ApplyPatchesCaseSensitive(const char *who, cJSON *const object, const cJSON *const patches)
 {
     const cJSON *current_patch = NULL;
     int status = 0;
@@ -1105,7 +1094,7 @@ int cJSONUtils_ApplyPatchesCaseSensitive(const char * who, cJSON *const object, 
     return 0;
 }
 
-static void compose_patch(const char * who, cJSON *const patches, const unsigned char *const operation, const unsigned char *const path, const unsigned char *suffix, const cJSON *const value)
+static void compose_patch(const char *who, cJSON *const patches, const unsigned char *const operation, const unsigned char *const path, const unsigned char *suffix, const cJSON *const value)
 {
     cJSON *patch = NULL;
 
@@ -1145,12 +1134,12 @@ static void compose_patch(const char * who, cJSON *const patches, const unsigned
     cJSON_AddItemToArray(patches, patch);
 }
 
-void cJSONUtils_AddPatchToArray(const char * who, cJSON *const array, const char *const operation, const char *const path, const cJSON *const value)
+void cJSONUtils_AddPatchToArray(const char *who, cJSON *const array, const char *const operation, const char *const path, const cJSON *const value)
 {
     compose_patch(who, array, (const unsigned char *)operation, (const unsigned char *)path, NULL, value);
 }
 
-static void create_patches(const char * who, cJSON *const patches, const unsigned char *const path, cJSON *const from, cJSON *const to, const cJSON_bool case_sensitive)
+static void create_patches(const char *who, cJSON *const patches, const unsigned char *const path, cJSON *const from, cJSON *const to, const bool case_sensitive)
 {
     if ((from == NULL) || (to == NULL))
     {
@@ -1290,7 +1279,7 @@ static void create_patches(const char * who, cJSON *const patches, const unsigne
     }
 }
 
-cJSON * cJSONUtils_GeneratePatches(const char * who, cJSON *const from, cJSON *const to)
+cJSON *cJSONUtils_GeneratePatches(const char *who, cJSON *const from, cJSON *const to)
 {
     cJSON *patches = NULL;
 
@@ -1305,7 +1294,7 @@ cJSON * cJSONUtils_GeneratePatches(const char * who, cJSON *const from, cJSON *c
     return patches;
 }
 
-cJSON * cJSONUtils_GeneratePatchesCaseSensitive(const char * who, cJSON *const from, cJSON *const to)
+cJSON *cJSONUtils_GeneratePatchesCaseSensitive(const char *who, cJSON *const from, cJSON *const to)
 {
     cJSON *patches = NULL;
 
@@ -1330,7 +1319,7 @@ void cJSONUtils_SortObjectCaseSensitive(cJSON *const object)
     sort_object(object, true);
 }
 
-static cJSON *merge_patch(const char * who, cJSON *target, const cJSON *const patch, const cJSON_bool case_sensitive)
+static cJSON *merge_patch(const char *who, cJSON *target, const cJSON *const patch, const bool case_sensitive)
 {
     cJSON *patch_child = NULL;
 
@@ -1390,17 +1379,17 @@ static cJSON *merge_patch(const char * who, cJSON *target, const cJSON *const pa
     return target;
 }
 
-cJSON * cJSONUtils_MergePatch(const char * who, cJSON *target, const cJSON *const patch)
+cJSON *cJSONUtils_MergePatch(const char *who, cJSON *target, const cJSON *const patch)
 {
     return merge_patch(who, target, patch, false);
 }
 
-cJSON * cJSONUtils_MergePatchCaseSensitive(const char * who, cJSON *target, const cJSON *const patch)
+cJSON *cJSONUtils_MergePatchCaseSensitive(const char *who, cJSON *target, const cJSON *const patch)
 {
     return merge_patch(who, target, patch, true);
 }
 
-static cJSON *generate_merge_patch(const char * who, cJSON *const from, cJSON *const to, const cJSON_bool case_sensitive)
+static cJSON *generate_merge_patch(const char *who, cJSON *const from, cJSON *const to, const bool case_sensitive)
 {
     cJSON *from_child = NULL;
     cJSON *to_child = NULL;
@@ -1482,12 +1471,12 @@ static cJSON *generate_merge_patch(const char * who, cJSON *const from, cJSON *c
     return patch;
 }
 
-cJSON * cJSONUtils_GenerateMergePatch(const char * who, cJSON *const from, cJSON *const to)
+cJSON *cJSONUtils_GenerateMergePatch(const char *who, cJSON *const from, cJSON *const to)
 {
     return generate_merge_patch(who, from, to, false);
 }
 
-cJSON * cJSONUtils_GenerateMergePatchCaseSensitive(const char * who, cJSON *const from, cJSON *const to)
+cJSON *cJSONUtils_GenerateMergePatchCaseSensitive(const char *who, cJSON *const from, cJSON *const to)
 {
     return generate_merge_patch(who, from, to, true);
 }

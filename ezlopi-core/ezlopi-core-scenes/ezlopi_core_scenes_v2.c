@@ -308,11 +308,11 @@ ezlopi_error_t ezlopi_scenes_enable_disable_scene_by_id_v2(uint32_t _id, bool en
             cJSON *cj_scene = cJSON_Parse(__FUNCTION__, scene_str);
             if (cj_scene)
             {
-                cJSON *enable_item = cJSON_GetObjectItem(__FUNCTION__, cj_scene, ezlopi_enabled_str);
-                TRACE_S("prev_enable => [%s]", (enable_item->type == cJSON_True) ? "True" : "False");
-                if ((enable_item && cJSON_IsBool(enable_item)) && (enable_item->type != ((enabled_flag) ? cJSON_True : cJSON_False)))
+                cJSON *cj_enable_item = cJSON_GetObjectItem(__FUNCTION__, cj_scene, ezlopi_enabled_str);
+                TRACE_S("prev_enable => [%s]", (cj_enable_item->type == cJSON_True) ? "True" : "False");
+                if ((cj_enable_item && cJSON_IsBool(cj_enable_item)) && (cj_enable_item->type != ((enabled_flag) ? cJSON_True : cJSON_False)))
                 {
-                    enable_item->type = (enabled_flag) ? cJSON_True : cJSON_False;
+                    cj_enable_item->type = (enabled_flag) ? cJSON_True : cJSON_False;
 
                     l_scenes_list_v2_t *curr_scene = ezlopi_scenes_get_by_id_v2(_id);
                     if (curr_scene)
@@ -516,8 +516,9 @@ ezlopi_error_t ezlopi_scenes_init_v2(void)
 
         ezlopi_free(__FUNCTION__, scenes_id_list_str);
     }
-
+#if ENABLE_SCENES_PRINT
     ezlopi_scenes_print(scenes_list_head_v2);
+#endif
     return error;
 }
 
@@ -914,7 +915,7 @@ static void _____new_block_options_populate(s_block_options_v2_t *p_block_option
         cJSON *cj_func = cJSON_GetObjectItem(__FUNCTION__, cj_block_options, ezlopi_function_str);
         if (cj_func)
         {
-            p_block_options->cj_function = cJSON_Duplicate(__FUNCTION__, cj_func, cJSON_True);
+            p_block_options->cj_function = cJSON_Duplicate(__FUNCTION__, cj_func, true);
         }
     }
 }
@@ -1033,7 +1034,7 @@ static void _______fields_get_value(l_fields_v2_t *field, cJSON *cj_value)
             else
             {
                 field->field_value.e_type = VALUE_TYPE_CJSON;
-                field->field_value.u_value.cj_value = cJSON_Duplicate(__FUNCTION__, cj_value, cJSON_True);
+                field->field_value.u_value.cj_value = cJSON_Duplicate(__FUNCTION__, cj_value, true);
                 CJSON_TRACE("value", field->field_value.u_value.cj_value);
             }
             break;
@@ -1053,7 +1054,7 @@ static void _______fields_get_value(l_fields_v2_t *field, cJSON *cj_value)
             case EZLOPI_VALUE_TYPE_HOUSE_MODE_ID_ARRAY:
             {
                 field->field_value.e_type = VALUE_TYPE_CJSON;
-                field->field_value.u_value.cj_value = cJSON_Duplicate(__FUNCTION__, cj_value, cJSON_True);
+                field->field_value.u_value.cj_value = cJSON_Duplicate(__FUNCTION__, cj_value, true);
                 break;
             }
             case EZLOPI_VALUE_TYPE_BLOCKS: // there are more than one-blocks [since 'cJSON_Array' ]
@@ -1134,7 +1135,7 @@ static void ______add_groupID_and_flag(cJSON *cj_target)
     }
     else
     {
-        cJSON_AddBoolToObject(__FUNCTION__, cj_target, ezlopi_is_group_str, cJSON_True);
+        cJSON_AddBoolToObject(__FUNCTION__, cj_target, ezlopi_is_group_str, true);
     }
 
     /* 2. Adding groupID */
@@ -1304,7 +1305,7 @@ static int _____check_and_add_when_blockId(cJSON *cj_new_scene_when_block)
         }
         else
         {
-            cJSON_AddBoolToObject(__FUNCTION__, cj_new_scene_when_block, ezlopi_block_enable_str, cJSON_True);
+            cJSON_AddBoolToObject(__FUNCTION__, cj_new_scene_when_block, ezlopi_block_enable_str, true);
         }
 
         /* 2. Adding block_id */

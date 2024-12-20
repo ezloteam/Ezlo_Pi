@@ -17,9 +17,8 @@ typedef struct s_ezlopi_net_status
 
 #ifdef CONFIG_EZPI_CORE_ENABLE_ETH
 void ezlopi_net_init(void);
-#endif  // CONFIG_EZPI_CORE_ENABLE_ETH
+#endif // CONFIG_EZPI_CORE_ENABLE_ETH
 
 s_ezlopi_net_status_t* ezlopi_get_net_status(void);
-
 
 #endif // _EZLOPI_CORE_NET_H_

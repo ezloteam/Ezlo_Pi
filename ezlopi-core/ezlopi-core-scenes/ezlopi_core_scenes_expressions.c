@@ -161,7 +161,7 @@ static int __edit_expression_ll(s_ezlopi_expressions_t *expn_node, cJSON *cj_new
             cJSON *cj_metaData = cJSON_GetObjectItem(__FUNCTION__, cj_new_expression, ezlopi_metadata_str);
             if (cj_metaData)
             {
-                expn_node->meta_data = cJSON_Duplicate(__FUNCTION__, cj_metaData, cJSON_True);
+                expn_node->meta_data = cJSON_Duplicate(__FUNCTION__, cj_metaData, true);
             }
         }
 
@@ -378,9 +378,13 @@ static void ___create_lua_subtable(lua_State *lua_state, l_ezlopi_item_t *item_p
                 switch (cj_value->type)
                 {
                 case cJSON_True:
+                {
+                    lua_create_table_bool_key_value(ezlopi_value_str, true);
+                    break;
+                }
                 case cJSON_False:
                 {
-                    lua_create_table_bool_key_value(ezlopi_value_str, cj_value->valuedouble ? true : false);
+                    lua_create_table_bool_key_value(ezlopi_value_str, false);
                     break;
                 }
                 case cJSON_Number:
@@ -1180,7 +1184,7 @@ static void __get_expressions_value(s_ezlopi_expressions_t *exp_node, cJSON *cj_
         {
             TRACE_E("cj_value type: %d", cj_value->type);
             exp_node->exp_value.type = EXPRESSION_VALUE_TYPE_CJ;
-            exp_node->exp_value.u_value.cj_value = cJSON_Duplicate(__FUNCTION__, cj_value, cJSON_True);
+            exp_node->exp_value.u_value.cj_value = cJSON_Duplicate(__FUNCTION__, cj_value, true);
             break;
         }
         default:
@@ -1230,7 +1234,7 @@ static s_ezlopi_expressions_t *__expressions_create_node(uint32_t exp_id, cJSON 
         cJSON *cj_metaData = cJSON_GetObjectItem(__FUNCTION__, cj_expression, ezlopi_metadata_str);
         if (cj_metaData)
         {
-            new_exp_node->meta_data = cJSON_Duplicate(__FUNCTION__, cj_metaData, cJSON_True);
+            new_exp_node->meta_data = cJSON_Duplicate(__FUNCTION__, cj_metaData, true);
         }
 
         new_exp_node->value_type = ezlopi_core_scenes_value_get_type(cj_expression, ezlopi_valueType_str);

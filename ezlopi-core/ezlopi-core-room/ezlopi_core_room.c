@@ -1,3 +1,5 @@
+#include <time.h>
+
 #include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_nvs.h"
@@ -91,7 +93,7 @@ int ezlopi_room_name_set(cJSON *cj_room)
                                 if (room_id == tmp_room_id)
                                 {
                                     cJSON_DeleteItemFromObject(__FUNCTION__, cj_room_tmp, ezlopi_name_str);
-                                    ret = cJSON_AddItemToObject(__FUNCTION__, cj_room_tmp, ezlopi_name_str, cJSON_Duplicate(__FUNCTION__, cj_room_name, cJSON_True));
+                                    ret = cJSON_AddItemToObject(__FUNCTION__, cj_room_tmp, ezlopi_name_str, cJSON_Duplicate(__FUNCTION__, cj_room_name, true));
 
                                     s_ezlopi_room_t *room_node = l_room_head;
                                     while (room_node)
@@ -387,6 +389,10 @@ static void __update_cloud_room_deleted(uint32_t room_id)
 {
     cJSON *cj_response = cJSON_CreateObject(__FUNCTION__);
     {
+        time_t now = 0;
+        time(&now);
+        cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_startTime_str, now);
+
         cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
         cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, ezlopi_hub_room_deleted_str);
         cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_method_str, method_hub_room_all_delete);

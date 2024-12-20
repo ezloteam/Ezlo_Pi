@@ -80,10 +80,6 @@ void ezlopi_ota_start(cJSON *url)
             }
         }
     }
-    else
-    {
-        TRACE_E("URL is null");
-    }
 }
 
 static void ezlopi_ota_process(void *pv)

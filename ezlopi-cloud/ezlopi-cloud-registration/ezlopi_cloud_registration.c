@@ -1,3 +1,4 @@
+#include <time.h>
 #include <string.h>
 
 #include "ezlopi_util_trace.h"
@@ -14,10 +15,10 @@
 #include "ezlopi_service_loop.h"
 #include "ezlopi_service_webprov.h"
 
-static void __reg_loop(void *arg);
+static cJSON* cj_reg_data = NULL;
+static const char* __reg_loop_str = "reg-loop";
 
-static cJSON * cj_reg_data = NULL;
-static const char * __reg_loop_str = "reg-loop";
+static void __reg_loop(void* arg);
 
 void registration_init(void)
 {
@@ -73,8 +74,9 @@ static void __create_reg_packet(void)
                 cJSON_AddStringToObject(__FUNCTION__, cj_params, "hubType", "32.1");
                 // cJSON_AddStringToObject(__FUNCTION__, cj_params, "mac_address", "11:22:33:44:55:66");
 
-                char * __device_uuid = ezlopi_factory_info_v3_get_device_uuid();
-                if (__device_uuid) {
+                char* __device_uuid = ezlopi_factory_info_v3_get_device_uuid();
+                if (__device_uuid)
+                {
                     cJSON_AddStringToObject(__FUNCTION__, cj_params, "controller_uuid", __device_uuid);
                     ezlopi_free(__FUNCTION__, __device_uuid);
                 }
@@ -86,11 +88,17 @@ static void __create_reg_packet(void)
     }
 }
 
-static void __reg_loop(void *arg)
+static void __reg_loop(void* arg)
 {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
     TRACE_D("reg-loop");
+#endif
+
     ezlopi_error_t reg_event = ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 0, false);
+
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
     TRACE_D("reg-event: %d", reg_event);
+#endif
 
     if (reg_event != ESP_OK)
     {
@@ -99,9 +107,15 @@ static void __reg_loop(void *arg)
         cJSON* cj_register_dup = cJSON_CreateObjectReference(__FUNCTION__, cj_reg_data->child);
         if (cj_register_dup)
         {
+            time_t now = 0;
+            time(&now);
+            cJSON_AddNumberToObject(__FUNCTION__, cj_register_dup, ezlopi_startTime_str, now);
+
             if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(cj_register_dup))
             {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                 TRACE_E("Error adding to broadcast queue!");
+#endif
                 cJSON_Delete(__FUNCTION__, cj_register_dup);
             }
         }

@@ -287,8 +287,10 @@ void ezlopi_wifi_connect_from_id_bin(void)
         TRACE_W("wifi_error: %u", wifi_error);
     }
 
-    if (wifi_ssid) ezlopi_free(__FUNCTION__, wifi_ssid);
-    if (wifi_password) ezlopi_free(__FUNCTION__, wifi_password);
+    if (wifi_ssid)
+        ezlopi_free(__FUNCTION__, wifi_ssid);
+    if (wifi_password)
+        ezlopi_free(__FUNCTION__, wifi_password);
 }
 
 esp_err_t ezlopi_wifi_connect(const char* ssid, const char* pass)
@@ -382,10 +384,9 @@ static int ezlopi_wifi_wait_for_wifi_and_registration()
     return ret;
 }
 
-
-void ezlopi_wifi_try_connect_task(void *params)
+void ezlopi_wifi_try_connect_task(void* params)
 {
-    cJSON *cj_network = (cJSON*)params;
+    cJSON* cj_network = (cJSON*)params;
     if (cj_network)
     {
         while (1)
@@ -423,7 +424,7 @@ void ezlopi_wifi_try_connect_task(void *params)
     vTaskDelete(NULL);
 }
 
-int ezlopi_wifi_try_connect(cJSON *cj_network)
+int ezlopi_wifi_try_connect(cJSON* cj_network)
 {
     int ret = 0;
     cJSON* cj_network_copy = cJSON_Duplicate(__FUNCTION__, cj_network, true);
@@ -450,49 +451,67 @@ static ll_ezlopi_wifi_event_upcall_t* ezlopi_wifi_event_upcall_create(f_ezlopi_w
     return _upcall;
 }
 
-static void ezlopi_core_device_broadcast_wifi_start_scan()
+// 0: start, 1: stop
+static void ezlopi_core_device_broadcast_wifi_scan_report(bool state)
 {
-    cJSON *cj_scan_start = cJSON_CreateObject(__FUNCTION__);
-    if (cj_scan_start)
+    cJSON* cj_scan_report = cJSON_CreateObject(__FUNCTION__);
+    if (cj_scan_report)
     {
-        cJSON_AddStringToObject(__FUNCTION__, cj_scan_start, ezlopi_id_str, ezlopi_ui_broadcast_str);
-        cJSON_AddStringToObject(__FUNCTION__, cj_scan_start, ezlopi_msg_subclass_str, method_hub_network_wifi_scan_progress);
+        time_t now = 0;
+        time(&now);
+        cJSON_AddNumberToObject(__FUNCTION__, cj_scan_report, ezlopi_startTime_str, now);
 
-        cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_scan_start, ezlopi_result_str);
+        cJSON_AddStringToObject(__FUNCTION__, cj_scan_report, ezlopi_id_str, ezlopi_ui_broadcast_str);
+        cJSON_AddStringToObject(__FUNCTION__, cj_scan_report, ezlopi_msg_subclass_str, method_hub_network_wifi_scan_progress);
+
+        cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_scan_report, ezlopi_result_str);
         if (cj_result)
         {
             cJSON_AddStringToObject(__FUNCTION__, cj_result, "interfaceId", "wlan0");
-            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_status_str, "started");
+            if (0 == state)
+            {
+                cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_status_str, "started");
+            }
+            else
+            {
+                cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_status_str, "finished");
+            }
         }
 
-        if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(cj_scan_start))
+        if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(cj_scan_report))
         {
-            cJSON_Delete(__FUNCTION__, cj_scan_start);
+            cJSON_Delete(__FUNCTION__, cj_scan_report);
         }
     }
 }
 
+#if 0
 static void ezlopi_core_device_broadcast_wifi_stop_scan()
 {
-    cJSON *cj_scan_stop = cJSON_CreateObject(__FUNCTION__);
-    if (cj_scan_stop)
+    cJSON* cj_scan_report = cJSON_CreateObject(__FUNCTION__);
+    if (cj_scan_report)
     {
-        cJSON_AddStringToObject(__FUNCTION__, cj_scan_stop, ezlopi_id_str, ezlopi_ui_broadcast_str);
-        cJSON_AddStringToObject(__FUNCTION__, cj_scan_stop, ezlopi_msg_subclass_str, method_hub_network_wifi_scan_progress);
+        time_t now = 0;
+        time(&now);
+        cJSON_AddNumberToObject(__FUNCTION__, cj_scan_report, ezlopi_startTime_str, now);
 
-        cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_scan_stop, ezlopi_result_str);
+        cJSON_AddStringToObject(__FUNCTION__, cj_scan_report, ezlopi_id_str, ezlopi_ui_broadcast_str);
+        cJSON_AddStringToObject(__FUNCTION__, cj_scan_report, ezlopi_msg_subclass_str, method_hub_network_wifi_scan_progress);
+
+        cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_scan_report, ezlopi_result_str);
         if (cj_result)
         {
             cJSON_AddStringToObject(__FUNCTION__, cj_result, "interfaceId", "wlan0");
             cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_status_str, "finished");
         }
 
-        if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(cj_scan_stop))
+        if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(cj_scan_report))
         {
-            cJSON_Delete(__FUNCTION__, cj_scan_stop);
+            cJSON_Delete(__FUNCTION__, cj_scan_report);
         }
     }
 }
+#endif
 
 static void ezlopi_wifi_scanner_task(void* params)
 {
@@ -509,7 +528,8 @@ static void ezlopi_wifi_scanner_task(void* params)
         .scan_time.active.max = 150,
     };
 
-    ezlopi_core_device_broadcast_wifi_start_scan();
+    ezlopi_core_device_broadcast_wifi_scan_report(0);
+
     while (1)
     {
         current_time = (xTaskGetTickCount() - start_time);
@@ -532,7 +552,7 @@ static void ezlopi_wifi_scanner_task(void* params)
         }
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
-    ezlopi_core_device_broadcast_wifi_stop_scan();
+    ezlopi_core_device_broadcast_wifi_scan_report(1);
     ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_CORE_WIFI_SCANNER_TASK);
     sg_scan_handle = NULL;
     vTaskDelete(NULL);
@@ -646,7 +666,6 @@ static void __event_wifi_scan_done(void* event_data)
 static void __event_ip_got_ip(void* event_data)
 {
 
-
     if (event_data)
     {
         sg_last_disconnect_reason = scg_wifi_no_error_str;
@@ -673,5 +692,3 @@ int ezlopi_wifi_get_wifi_mac(uint8_t mac[6])
     }
     return ret;
 }
-
-

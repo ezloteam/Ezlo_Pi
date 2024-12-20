@@ -343,41 +343,50 @@ static cJSON *__add_scenes_blocks_by_device_ids(e_scenes_block_type_v2_t block_t
     cJSON *cj_device_id = NULL;
     cJSON *cj_block_array = NULL;
 
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
     CJSON_TRACE("device array", cj_devices_array);
-    // while (NULL != (cj_device_id = cJSON_GetArrayItem(cj_devices_array, device_id_idx++)))
-    cJSON_ArrayForEach(cj_device_id, cj_devices_array)
-    {
-        TRACE_D("device-id: %s", cj_device_id->valuestring ? cj_device_id->valuestring : ezlopi__str);
-        if (cj_device_id->valuestring)
-        {
-            uint32_t device_id = strtoul(cj_device_id->valuestring, NULL, 16);
-            l_ezlopi_device_t *device_node = ezlopi_device_get_by_id(device_id);
-            if (device_node)
-            {
-                // TRACE_D("Here");
-                cJSON *cj_block = __add_scenes_blocks_by_item_ids(block_type, device_node->items);
-                if (cj_block)
-                {
-                    if (NULL == cj_block_array)
-                    {
-                        cj_block_array = cJSON_CreateArray(__FUNCTION__);
-                    }
+#endif
 
-                    if (cj_block_array)
+    while (NULL != (cj_device_id = cJSON_GetArrayItem(cj_devices_array, device_id_idx++)))
+        // while (NULL != (cj_device_id = cJSON_GetArrayItem(cj_devices_array, device_id_idx++)))
+        cJSON_ArrayForEach(cj_device_id, cj_devices_array)
+        {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
+            TRACE_D("device-id: %s", cj_device_id->valuestring ? cj_device_id->valuestring : ezlopi__str);
+#endif
+
+            if (cj_device_id->valuestring)
+            {
+                uint32_t device_id = strtoul(cj_device_id->valuestring, NULL, 16);
+                l_ezlopi_device_t *device_node = ezlopi_device_get_by_id(device_id);
+                if (device_node)
+                {
+                    cJSON *cj_block = __add_scenes_blocks_by_item_ids(block_type, device_node->items);
+                    if (cj_block)
                     {
-                        if (!cJSON_AddItemToArray(cj_block_array, cj_block))
+                        if (NULL == cj_block_array)
                         {
-                            cJSON_Delete(__FUNCTION__, cj_block);
+                            cj_block_array = cJSON_CreateArray(__FUNCTION__);
+                        }
+
+                        if (cj_block_array)
+                        {
+                            if (!cJSON_AddItemToArray(cj_block_array, cj_block))
+                            {
+                                cJSON_Delete(__FUNCTION__, cj_block);
+                            }
                         }
                     }
                 }
-            }
-            else
-            {
-                TRACE_E("Device-id not found in list");
+                else
+                {
+                    TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_ERROR, "Device-ID: '%s' not found!", cj_device_id->valuestring);
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
+                    TRACE_E("Device-id not found in list");
+#endif
+                }
             }
         }
-    }
 
     return cj_block_array;
 }

@@ -100,15 +100,19 @@ char *ezlopi_core_buffer_acquire(const char *who, uint32_t *len, uint32_t wait_t
             __buffer_lock_state = EZ_BUFFER_STATE_BUSY;
             TRACE_I("(%s): buffer acquired", who);
         }
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
         else
         {
             TRACE_E("(%s): buffer acquire failed!", who);
         }
+#endif
     }
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
     else
     {
         TRACE_E("(%s): __buffer_lock = NULL!", who);
     }
+#endif
 
     return ret;
 }
@@ -136,10 +140,12 @@ void ezlopi_core_buffer_release(const char *who)
         __buffer_lock_state = EZ_BUFFER_STATE_AVAILABLE;
         TRACE_I("(%s): buffer release success", who);
     }
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
     else
     {
         TRACE_E("__buffer_lock: %p", __buffer_lock);
         // TRACE_E("__buffer_lock_state: %d", __buffer_lock_state);
         TRACE_E("(%s): buffer release failed!", who);
     }
+#endif
 }

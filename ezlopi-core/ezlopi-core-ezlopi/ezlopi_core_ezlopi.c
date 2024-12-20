@@ -45,7 +45,7 @@ void ezlopi_init(void)
 #ifdef CONFIG_EZPI_UTIL_TRACE_EN
     ezlopi_core_read_set_log_severities();
     // #warning "remove this in release"
-    ezlopi_core_read_set_log_severities_internal(ENUM_EZLOPI_LOG_SEVERITY_TRACE);
+    ezlopi_core_read_set_log_severities_internal(ENUM_EZLOPI_TRACE_SEVERITY_TRACE);
 #endif // CONFIG_EZPI_UTIL_TRACE_EN
     EZPI_HAL_uart_init();
 #if defined(CONFIG_EZPI_WEBSOCKET_CLIENT) || defined(CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER)
@@ -101,7 +101,7 @@ void ezlopi_init(void)
 #endif
 
 #if (defined(CONFIG_EZPI_ENABLE_WIFI) || defined(CONFIG_EZPI_CORE_ENABLE_ETH))
-    ezlopi_error_t sntp_error = EZPI_CORE_sntp_init();
+    EZPI_CORE_sntp_init();
 #ifdef CONFIG_EZPI_ENABLE_PING
     ezlopi_ping_init();
 #endif // CONFIG_EZPI_ENABLE_PING

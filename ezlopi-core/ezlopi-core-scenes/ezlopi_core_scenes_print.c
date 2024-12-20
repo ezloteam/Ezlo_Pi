@@ -1,6 +1,9 @@
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+#include "ezlopi_core_scenes_print.h"
+
+#if ENABLE_SCENES_PRINT
 
 #include "ezlopi_util_trace.h"
 
@@ -9,8 +12,6 @@
 #include "ezlopi_core_cjson_macros.h"
 
 #include "ezlopi_cloud_constants.h"
-
-#include "ezlopi_core_scenes_print.h"
 
 void ezlopi_print_block_options(s_block_options_v2_t *block_options, l_fields_v2_t *fields, const char *tab)
 {
@@ -360,4 +361,5 @@ void ezlopi_scenes_print(l_scenes_list_v2_t *scene_link_list)
     }
 #endif
 }
+#endif // ENABLE_SCENES_PRINT
 #endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS

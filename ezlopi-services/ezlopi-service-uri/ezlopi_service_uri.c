@@ -106,6 +106,7 @@ static esp_err_t ezlopi_capture_base_uri_handler(httpd_req_t* req)
         else
         {
             TRACE_E("No memory available.");
+            TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_ERROR, "No memory available!");
         }
     }
     else
@@ -159,6 +160,7 @@ esp_err_t ezlopi_http_404_error_handler(httpd_req_t* req, httpd_err_code_t err)
 
 void ezlopi_end_ap_server_service()
 {
+    TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_INFO, "Stopping HTTP server (AP).");
     TRACE_I("Stopping HTTP server.");
     ESP_ERROR_CHECK(httpd_stop(httpd_server_handle));
 }
