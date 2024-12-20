@@ -347,6 +347,7 @@ extern const char *ezlopi_flow_control_str;
 
 extern const char *ezlopi_chipset_str;
 extern const char *ezlopi_internet_str;
+extern const char *ezlopi_local_key_str;
 
 //////////// otel keywords
 extern const char *ezlopi_values_str;
