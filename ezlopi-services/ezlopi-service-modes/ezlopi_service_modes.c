@@ -507,8 +507,9 @@ static void __modes_loop(void *arg)
             // 1. check if the mode is to be switched.
             if (EZPI_SUCCESS == __check_mode_switch_condition(ez_mode))
             {
-                curr_house_mode = EZPI_core_modes_get_current_house_modes();
                 TRACE_D("Mode - Switch completed to [%d]", ez_mode->current_mode_id);
+                curr_house_mode = EZPI_core_modes_get_current_house_modes();
+                TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_INFO, "mode: switching to: %s (id: %u).", curr_house_mode->name, curr_house_mode->_id);
                 // after switching-modes ; Create unique trigger-event-loops for each devices in 'alarm-list'
                 if (true == curr_house_mode->armed) // if the new mode is armed ; create 'non_bypass_alert_ll'
                 {
@@ -541,7 +542,7 @@ int ezlopi_service_modes_stop(void)
     if (sg_process_handle)
     {
 #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
-        ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SERVICE_MODES_TASK);
+        EZPI_core_process_set_is_deleted(ENUM_EZLOPI_SERVICE_MODES_TASK);
 #endif
         vTaskDelete(sg_process_handle);
         sg_process_handle = NULL;
@@ -560,7 +561,7 @@ int ezlopi_service_modes_start(5000void)
         ret = 1;
         xTaskCreate(__modes_service, "modes-service", EZLOPI_SERVICE_MODES_TASK_DEPTH, NULL, 3, &sg_process_handle);
 #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
-        ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_MODES_TASK, &sg_process_handle, EZLOPI_SERVICE_MODES_TASK_DEPTH);
+        EZPI_core_process_set_process_info(ENUM_EZLOPI_SERVICE_MODES_TASK, &sg_process_handle, EZLOPI_SERVICE_MODES_TASK_DEPTH);
 #endif
         TRACE_I("Starting modes-service");
     }
@@ -618,7 +619,7 @@ static void __modes_service(void *pv)
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
 #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
-    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SERVICE_MODES_TASK);
+    EZPI_core_process_set_is_deleted(ENUM_EZLOPI_SERVICE_MODES_TASK);
 #endif
     vTaskDelete(NULL);
 }

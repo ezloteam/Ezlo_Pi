@@ -377,11 +377,11 @@ ezlopi_error_t EZPI_core_scenes_enable_disable_scene_by_id_v2(uint32_t _id, bool
             cJSON *cj_scene = cJSON_Parse(__FUNCTION__, scene_str);
             if (cj_scene)
             {
-                cJSON *enable_item = cJSON_GetObjectItem(__FUNCTION__, cj_scene, ezlopi_enabled_str);
-                TRACE_S("prev_enable => [%s]", (enable_item->type == cJSON_True) ? ezlopi_true_str : ezlopi_false_str);
-                if ((enable_item && cJSON_IsBool(enable_item)) && (enable_item->type != ((enabled_flag) ? cJSON_True : cJSON_False)))
+                cJSON *cj_enable_item = cJSON_GetObjectItem(__FUNCTION__, cj_scene, ezlopi_enabled_str);
+                // TRACE_S("prev_enable => [%s]", (cj_enable_item->type == cJSON_True) ? ezlopi_true_str : ezlopi_false_str);
+                if ((cj_enable_item && cJSON_IsBool(cj_enable_item)) && (cj_enable_item->type != ((enabled_flag) ? cJSON_True : cJSON_False)))
                 {
-                    enable_item->type = (enabled_flag) ? cJSON_True : cJSON_False;
+                    cj_enable_item->type = (enabled_flag) ? cJSON_True : cJSON_False;
 
                     l_scenes_list_v2_t *curr_scene = EZPI_core_scenes_get_by_id_v2(_id);
                     if (curr_scene)
@@ -696,7 +696,7 @@ ezlopi_error_t EZPI_core_scenes_set_meta_by_id(const char *sceneId_str, const ch
                         {
                             cJSON_DeleteItemFromObject(__FUNCTION__, cj_scene, ezlopi_meta_str);
                         }
-                        meta_data_added = (bool)cJSON_AddItemToObject(__FUNCTION__, cj_scene, ezlopi_meta_str, cJSON_Duplicate(__FUNCTION__, cj_new_meta, 1));
+                        meta_data_added = (bool)cJSON_AddItemToObject(__FUNCTION__, cj_scene, ezlopi_meta_str, cJSON_Duplicate(__FUNCTION__, cj_new_meta, true));
                     }
 
                     if (meta_data_added)
@@ -833,8 +833,9 @@ ezlopi_error_t EZPI_scenes_init_v2(void)
 
         ezlopi_free(__FUNCTION__, scenes_id_list_str);
     }
-
+#if ENABLE_SCENES_PRINT
     EZPI_scenes_print(scenes_list_head_v2);
+#endif
     return error;
 }
 
@@ -902,7 +903,7 @@ static l_scenes_list_v2_t *__new_scene_populate(cJSON *cj_scene, uint32_t scene_
                 cJSON *cj_meta = cJSON_GetObjectItem(__FUNCTION__, cj_scene, ezlopi_meta_str);
                 if (cj_meta && (cJSON_Object == cj_meta->type))
                 {
-                    new_scene->meta = cJSON_Duplicate(__FUNCTION__, cj_meta, 1);
+                    new_scene->meta = cJSON_Duplicate(__FUNCTION__, cj_meta, true);
                 }
             }
 
@@ -1189,7 +1190,7 @@ static l_when_block_v2_t *____new_when_block_populate(cJSON *cj_when_block)
         cJSON *cj_new_blockmeta = cJSON_GetObjectItem(__FUNCTION__, cj_when_block, ezlopi_blockMeta_str);
         if (cj_new_blockmeta && (cJSON_Object == cj_new_blockmeta->type))
         {
-            new_when_block->cj_block_meta = cJSON_Duplicate(__FUNCTION__, cj_new_blockmeta, 1);
+            new_when_block->cj_block_meta = cJSON_Duplicate(__FUNCTION__, cj_new_blockmeta, true);
         }
 
         cJSON *cj_fields = cJSON_GetObjectItem(__FUNCTION__, cj_when_block, ezlopi_fields_str);
@@ -1214,7 +1215,7 @@ static void _____new_block_options_populate(s_block_options_v2_t *p_block_option
         cJSON *cj_func = cJSON_GetObjectItem(__FUNCTION__, cj_block_options, ezlopi_function_str);
         if (cj_func)
         {
-            p_block_options->cj_function = cJSON_Duplicate(__FUNCTION__, cj_func, cJSON_True);
+            p_block_options->cj_function = cJSON_Duplicate(__FUNCTION__, cj_func, true);
         }
     }
 }
@@ -1327,7 +1328,7 @@ static void _______fields_get_value(l_fields_v2_t *field, cJSON *cj_value)
             else
             {
                 field->field_value.e_type = VALUE_TYPE_CJSON;
-                field->field_value.u_value.cj_value = cJSON_Duplicate(__FUNCTION__, cj_value, cJSON_True);
+                field->field_value.u_value.cj_value = cJSON_Duplicate(__FUNCTION__, cj_value, true);
                 CJSON_TRACE(ezlopi_value_str, field->field_value.u_value.cj_value);
             }
             break;
@@ -1347,7 +1348,7 @@ static void _______fields_get_value(l_fields_v2_t *field, cJSON *cj_value)
             case EZLOPI_VALUE_TYPE_HOUSE_MODE_ID_ARRAY:
             {
                 field->field_value.e_type = VALUE_TYPE_CJSON;
-                field->field_value.u_value.cj_value = cJSON_Duplicate(__FUNCTION__, cj_value, cJSON_True);
+                field->field_value.u_value.cj_value = cJSON_Duplicate(__FUNCTION__, cj_value, true);
                 break;
             }
             case EZLOPI_VALUE_TYPE_BLOCKS: // there are more than one-blocks [since 'cJSON_Array' ]
@@ -1489,7 +1490,7 @@ static void ______add_groupID_and_flag(cJSON *cj_target)
     }
     else
     {
-        cJSON_AddBoolToObject(__FUNCTION__, cj_target, ezlopi_is_group_str, cJSON_True);
+        cJSON_AddBoolToObject(__FUNCTION__, cj_target, ezlopi_is_group_str, true);
     }
 
     /* 2. Adding groupID */
@@ -1625,7 +1626,7 @@ static int _____check_and_add_when_blockId(cJSON *cj_new_scene_when_block)
         }
         else
         {
-            cJSON_AddBoolToObject(__FUNCTION__, cj_new_scene_when_block, ezlopi_block_enable_str, cJSON_True);
+            cJSON_AddBoolToObject(__FUNCTION__, cj_new_scene_when_block, ezlopi_block_enable_str, true);
         }
 
         /* 2. Adding block_id */
@@ -1714,7 +1715,7 @@ static bool _____put_new_block_meta(cJSON *cj_when_block, cJSON *cj_new_blockmet
     if (cj_when_block && cj_new_blockmeta)
     {
         cJSON_DeleteItemFromObject(__FUNCTION__, cj_when_block, ezlopi_blockMeta_str);
-        ret = cJSON_AddItemToObject(__FUNCTION__, cj_when_block, ezlopi_blockMeta_str, cJSON_Duplicate(__FUNCTION__, cj_new_blockmeta, 1));
+        ret = cJSON_AddItemToObject(__FUNCTION__, cj_when_block, ezlopi_blockMeta_str, cJSON_Duplicate(__FUNCTION__, cj_new_blockmeta, true));
     }
     return ret;
 }

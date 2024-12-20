@@ -187,6 +187,7 @@ static esp_err_t ezpi_capture_base_uri_handler(httpd_req_t *req)
         else
         {
             TRACE_E("No memory available.");
+            TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_ERROR, "No memory available!");
         }
     }
     else

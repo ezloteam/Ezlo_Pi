@@ -183,20 +183,20 @@ extern "C"
      * @param task_depth Task-depth
      * @return int
      */
-    int ezlopi_core_process_set_process_info(e_ezlopi_task_enum_t task_num, TaskHandle_t *task_handle, size_t task_depth);
+    int EZPI_core_process_set_process_info(e_ezlopi_task_enum_t task_num, TaskHandle_t *task_handle, size_t task_depth);
     /**
      * @brief Function to delete processes
      *
      * @param task_num ID of target-task
      * @return int
      */
-    int ezlopi_core_process_set_is_deleted(e_ezlopi_task_enum_t task_num);
+    int EZPI_core_process_set_is_deleted(e_ezlopi_task_enum_t task_num);
 #else // CONFIG_FREERTOS_USE_TRACE_FACILITY
 
     //---------- These are Not-required ---------------
     // #define ezlopi_core_get_processes_details(x)
-    // #define ezlopi_core_process_set_is_deleted(x)    
-    // #define ezlopi_core_process_set_process_info(x, y, z)
+    // #define EZPI_core_process_set_is_deleted(x)    
+    // #define EZPI_core_process_set_process_info(x, y, z)
     //-------------------------------------------------
 
 #endif // CONFIG_FREERTOS_USE_TRACE_FACILITY

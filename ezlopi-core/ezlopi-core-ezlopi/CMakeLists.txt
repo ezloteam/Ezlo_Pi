@@ -34,7 +34,7 @@ set(EZLOPI_CLOUD_COMPONENTS
         ezlopi-core-setting-commands
 )
 
-idf_component_register(SRCS "ezlopi_core_ezlopi.c" "${config_src}"
+idf_component_register(SRCS  "${config_src}"
     INCLUDE_DIRS "."
     REQUIRES    freertos
                 ${EZLOPI_CORE_COMPONENTS}

@@ -97,7 +97,7 @@ void EZPI_service_gpioisr_init(void)
     TaskHandle_t ezlopi_service_gpio_isr_task_handle = NULL;
     xTaskCreate(ezpi_gpio_isr_process_v3, "gpio_isr_process_v3", EZLOPI_SERVICE_GPIO_ISR_TASK_DEPTH, NULL, 3, &ezlopi_service_gpio_isr_task_handle);
 #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
-    ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_GPIO_ISR_TASK, &ezlopi_service_gpio_isr_task_handle, EZLOPI_SERVICE_GPIO_ISR_TASK_DEPTH);
+    EZPI_core_process_set_process_info(ENUM_EZLOPI_SERVICE_GPIO_ISR_TASK, &ezlopi_service_gpio_isr_task_handle, EZLOPI_SERVICE_GPIO_ISR_TASK_DEPTH);
 #endif
 }
 

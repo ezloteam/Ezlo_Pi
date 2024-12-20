@@ -90,8 +90,7 @@
 *                          Static Function Prototypes
 *******************************************************************************/
 static void __event_handler(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data);
-static void __ezlopi_wifi_broadcast_start_scan();
-static void __ezlopi_wifi_broadcast_stop_scan();
+static void __ezlopi_wifi_broadcast_scan_report(bool state);
 static void __ezlopi_wifi_scanner_task(void *params);
 static void __event_ip_got_ip(void *event_data);
 static void __event_wifi_scan_done(void *event_data);
@@ -369,7 +368,7 @@ void ezlopi_wifi_try_connect_task(void *params)
         }
     }
 #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
-    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_CORE_WIFI_TRY_CONNECT_TASK);
+    EZPI_core_process_set_is_deleted(ENUM_EZLOPI_CORE_WIFI_TRY_CONNECT_TASK);
 #endif
     vTaskDelete(NULL);
 }
@@ -381,7 +380,7 @@ int EZPI_core_wifi_try_new_connect(cJSON *cj_network)
     static TaskHandle_t try_connect_task_handle = NULL;
     xTaskCreate(ezlopi_wifi_try_connect_task, wifi_try_connect_task_name, EZLOPI_CORE_WIFI_TRY_CONNECT_TASK_DEPTH, cj_network_copy, 3, &try_connect_task_handle);
 #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
-    ezlopi_core_process_set_process_info(ENUM_EZLOPI_CORE_WIFI_TRY_CONNECT_TASK, &try_connect_task_handle, EZLOPI_CORE_WIFI_TRY_CONNECT_TASK_DEPTH);
+    EZPI_core_process_set_process_info(ENUM_EZLOPI_CORE_WIFI_TRY_CONNECT_TASK, &try_connect_task_handle, EZLOPI_CORE_WIFI_TRY_CONNECT_TASK_DEPTH);
 #endif
     return ret;
 }
@@ -395,7 +394,7 @@ void EZPI_core_wifi_scan_stop()
     {
         TRACE_E("Resetting WiFi scanner task.(handle: %p)", sg_scan_handle);
 #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
-        ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_CORE_WIFI_SCANNER_TASK);
+        EZPI_core_process_set_is_deleted(ENUM_EZLOPI_CORE_WIFI_SCANNER_TASK);
 #endif
         vTaskDelete(sg_scan_handle);
         sg_scan_handle = NULL;
@@ -417,7 +416,7 @@ void EZPI_core_wifi_scan_start()
     {
         xTaskCreate(__ezlopi_wifi_scanner_task, wifi_scanner_task_name, EZLOPI_CORE_WIFI_SCANNER_TASK_DEPTH, NULL, 3, &sg_scan_handle);
 #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
-        ezlopi_core_process_set_process_info(ENUM_EZLOPI_CORE_WIFI_SCANNER_TASK, &sg_scan_handle, EZLOPI_CORE_WIFI_SCANNER_TASK_DEPTH);
+        EZPI_core_process_set_process_info(ENUM_EZLOPI_CORE_WIFI_SCANNER_TASK, &sg_scan_handle, EZLOPI_CORE_WIFI_SCANNER_TASK_DEPTH);
 #endif
     }
 }
@@ -566,46 +565,36 @@ static ll_ezlopi_wifi_event_upcall_t *ezlopi_wifi_event_upcall_create(f_ezlopi_w
     return _upcall;
 }
 
-static void __ezlopi_wifi_broadcast_start_scan()
+// 0: start, 1: stop
+static void __ezlopi_wifi_broadcast_scan_report(bool state)
 {
-    cJSON *cj_scan_start = cJSON_CreateObject(__FUNCTION__);
-    if (cj_scan_start)
+    cJSON *cj_scan_report = cJSON_CreateObject(__FUNCTION__);
+    if (cj_scan_report)
     {
-        cJSON_AddStringToObject(__FUNCTION__, cj_scan_start, ezlopi_id_str, ezlopi_ui_broadcast_str);
-        cJSON_AddStringToObject(__FUNCTION__, cj_scan_start, ezlopi_msg_subclass_str, method_hub_network_wifi_scan_progress);
+        time_t now = 0;
+        time(&now);
+        cJSON_AddNumberToObject(__FUNCTION__, cj_scan_report, ezlopi_startTime_str, now);
 
-        cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_scan_start, ezlopi_result_str);
+        cJSON_AddStringToObject(__FUNCTION__, cj_scan_report, ezlopi_id_str, ezlopi_ui_broadcast_str);
+        cJSON_AddStringToObject(__FUNCTION__, cj_scan_report, ezlopi_msg_subclass_str, method_hub_network_wifi_scan_progress);
+
+        cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_scan_report, ezlopi_result_str);
         if (cj_result)
         {
             cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_interfaceId_str, ezlopi_wlan0_str);
-            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_status_str, scene_status_started_str);
+            if (0 == state)
+            {
+                cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_status_str, scene_status_started_str);
+            }
+            else
+            {
+                cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_status_str, "finished");
+            }
         }
 
-        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_scan_start))
+        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_scan_report))
         {
-            cJSON_Delete(__FUNCTION__, cj_scan_start);
-        }
-    }
-}
-
-static void __ezlopi_wifi_broadcast_stop_scan()
-{
-    cJSON *cj_scan_stop = cJSON_CreateObject(__FUNCTION__);
-    if (cj_scan_stop)
-    {
-        cJSON_AddStringToObject(__FUNCTION__, cj_scan_stop, ezlopi_id_str, ezlopi_ui_broadcast_str);
-        cJSON_AddStringToObject(__FUNCTION__, cj_scan_stop, ezlopi_msg_subclass_str, method_hub_network_wifi_scan_progress);
-
-        cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_scan_stop, ezlopi_result_str);
-        if (cj_result)
-        {
-            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_interfaceId_str, ezlopi_wlan0_str);
-            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_status_str, scene_status_finished_str);
-        }
-
-        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_scan_stop))
-        {
-            cJSON_Delete(__FUNCTION__, cj_scan_stop);
+            cJSON_Delete(__FUNCTION__, cj_scan_report);
         }
     }
 }
@@ -625,7 +614,8 @@ static void __ezlopi_wifi_scanner_task(void *params)
         .scan_time.active.max = 150,
     };
 
-    __ezlopi_wifi_broadcast_start_scan();
+    __ezlopi_wifi_broadcast_scan_report(0);
+
     while (1)
     {
         current_time = (xTaskGetTickCount() - start_time);
@@ -648,9 +638,9 @@ static void __ezlopi_wifi_scanner_task(void *params)
         }
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
-    __ezlopi_wifi_broadcast_stop_scan();
+    __ezlopi_wifi_broadcast_scan_report(1);
 #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
-    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_CORE_WIFI_SCANNER_TASK);
+    EZPI_core_process_set_is_deleted(ENUM_EZLOPI_CORE_WIFI_SCANNER_TASK);
 #endif
     sg_scan_handle = NULL;
     vTaskDelete(NULL);
@@ -731,7 +721,6 @@ static void __event_wifi_scan_done(void *event_data)
 
 static void __event_ip_got_ip(void *event_data)
 {
-
 
     if (event_data)
     {

@@ -1108,11 +1108,11 @@ int WHEN_function_for_latch(l_scenes_list_v2_t *scene_node, l_when_block_v2_t *w
     int ret = 0;
     if (scene_node && when_block && cj_func_opr)
     {
-        cJSON *for_enabled = cJSON_GetObjectItem(__FUNCTION__, cj_func_opr, ezlopi_enabled_str);
-        if (for_enabled)
+        cJSON *cj_for_enabled = cJSON_GetObjectItem(__FUNCTION__, cj_func_opr, ezlopi_enabled_str);
+        if (cj_for_enabled)
         {
             s_when_function_t *function_state_info = (s_when_function_t *)scene_node->when_block->fields->user_arg;
-            if ((0 == function_state_info->current_state) && (cJSON_True == for_enabled->type) && (0 == function_state_info->transtion_instant)) /* if the trigger phase has not started */
+            if ((0 == function_state_info->current_state) && (cJSON_True == cj_for_enabled->type) && (0 == function_state_info->transtion_instant)) /* if the trigger phase has not started */
             {
                 /* first get the product of all children states*/
                 if (__and_when_block_condition(scene_node, when_block)) /*if : previous state = 0*/
@@ -1122,7 +1122,7 @@ int WHEN_function_for_latch(l_scenes_list_v2_t *scene_node, l_when_block_v2_t *w
                     TRACE_S("start_latched_time[%d]", (uint32_t)xTaskGetTickCount());
                 }
             }
-            else if (cJSON_False == for_enabled->type)
+            else if (cJSON_False == cj_for_enabled->type)
             {
                 function_state_info->current_state = 0;
                 function_state_info->transtion_instant = 0;
@@ -1220,7 +1220,7 @@ int IS_deviceitem_group_value_check(l_scenes_list_v2_t *scene_node, uint32_t dev
                                                     case cJSON_Array:
                                                     case cJSON_Object:
                                                     {
-                                                        cJSON_AddItemToObject(__FUNCTION__, cj_device_items_data, cj_item_names->valuestring, cJSON_Duplicate(__FUNCTION__, cj_value_new, cJSON_True)); // store as {"202ec000" : [{...},{...} ] , ...}
+                                                        cJSON_AddItemToObject(__FUNCTION__, cj_device_items_data, cj_item_names->valuestring, cJSON_Duplicate(__FUNCTION__, cj_value_new, true)); // store as {"202ec000" : [{...},{...} ] , ...}
                                                         break;
                                                     }
                                                     default:

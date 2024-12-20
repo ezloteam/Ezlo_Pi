@@ -105,7 +105,7 @@ ezlopi_error_t EZPI_init_mdns(void)
     TaskHandle_t ezlopi_core_mdns_service_task_handle = NULL;
     xTaskCreate(__mdns_init, "mdns_svc", EZLOPI_CORE_MDNS_SERVICE_TASK_DEPTH, NULL, 4, &ezlopi_core_mdns_service_task_handle);
 #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
-    ezlopi_core_process_set_process_info(ENUM_EZLOPI_CORE_MDNS_SERVICE_TASK, &ezlopi_core_mdns_service_task_handle, EZLOPI_CORE_MDNS_SERVICE_TASK_DEPTH);
+    EZPI_core_process_set_process_info(ENUM_EZLOPI_CORE_MDNS_SERVICE_TASK, &ezlopi_core_mdns_service_task_handle, EZLOPI_CORE_MDNS_SERVICE_TASK_DEPTH);
 #endif
 
     return ret;
@@ -340,7 +340,11 @@ static void __mdns_init(void *pv)
             if (mdns_context)
             {
                 TRACE_I("-------- Adding mDNS Service(count: %d) ------------ ", service_size);
-                TRACE_I("\tKEY\t\t\tValue");
+                if (service_size)
+                {
+                    TRACE_I("\tKEY\t\t\tValue");
+                }
+
                 for (int i = 0; i < service_size; i++)
                 {
                     TRACE_I("\t%s\t\t%s", mdns_context[i].key, mdns_context[i].value);
@@ -360,7 +364,8 @@ static void __mdns_init(void *pv)
         vTaskDelay(5000 / portTICK_PERIOD_MS);
     }
 #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
-    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_CORE_MDNS_SERVICE_TASK);
+
+    EZPI_core_process_set_is_deleted(ENUM_EZLOPI_CORE_MDNS_SERVICE_TASK);
 #endif
     vTaskDelete(NULL);
 }

@@ -146,7 +146,7 @@ void EZPI_service_loop_init(void)
     xTaskCreate(ezpi_loop, "ezpi_loop", EZLOPI_SERVICE_LOOP_TASK_DEPTH, NULL, 4, &ezlopi_service_timer_task_handle);
 
 #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
-    ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_LOOP_TASK, &ezlopi_service_timer_task_handle, EZLOPI_SERVICE_LOOP_TASK_DEPTH);
+    EZPI_core_process_set_process_info(ENUM_EZLOPI_SERVICE_LOOP_TASK, &ezlopi_service_timer_task_handle, EZLOPI_SERVICE_LOOP_TASK_DEPTH);
 #endif
 }
 

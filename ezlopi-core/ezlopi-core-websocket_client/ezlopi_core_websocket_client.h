@@ -80,35 +80,42 @@ extern "C"
     *******************************************************************************/
 
     /**
-     * @brief Function to send a websocket request
+     * @brief  Function to send websocket client request
      *
-     * @param data Target data to be sent
+     * @param client websocket client structure
+     * @param data  Target request-data
      * @param len Length of data
+     * @param timeout_ms Timeout in ms
      * @return ezlopi_error_t
      */
-    ezlopi_error_t EZPI_core_websocket_client_send(char *data, uint32_t len);
-    // esp_websocket_client_handle_t EZPI_core_websocket_client_init(cJSON *uri, void (*msg_upcall)(const char *, uint32_t), void (*connection_upcall)(bool connection));
+    ezlopi_error_t EZPI_core_websocket_client_send(esp_websocket_client_handle_t client, char *data, uint32_t len, uint32_t timeout_ms);
     /**
-     * @brief Function go initialize websocket client service
+     * @brief  Function go initialize websocket client service
      *
      * @param uri Pointer to request url
      * @param msg_upcall Function ptr to callback_msg_method
-     * @param connection_upcall Function ptr to callback_connection_method
+     * @param connection_upcall  Function ptr to callback_connection_method
+     * @param ca_cert Certificate creds
+     * @param ssl_private SSL-privatet key
+     * @param ssl_shared SSL-shared key
      * @return esp_websocket_client_handle_t
      */
-    esp_websocket_client_handle_t EZPI_core_websocket_client_init(cJSON *uri, int (*msg_upcall)(const char *, uint32_t, time_t time_ms), void (*connection_upcall)(bool connected));
+    esp_websocket_client_handle_t EZPI_core_websocket_client_init(cJSON *uri, int (*msg_upcall)(char *, uint32_t, time_t time_ms), void (*connection_upcall)(bool connected),
+        char *ca_cert, char *ssl_private, char *ssl_shared);
     /**
-     * @brief Function to get websocket client connection status
+     * @brief Function to get websocket connection status
      *
+     * @param client Target client
      * @return true
      * @return false
      */
-    bool EZPI_core_websocket_client_is_connected(void);
+    bool EZPI_core_websocket_client_is_connected(esp_websocket_client_handle_t client);
     /**
      * @brief Function to destroy websocket client
      *
+     * @param client  Target Client
      */
-    void EZPI_core_websocket_client_kill(void);
+    void EZPI_core_websocket_client_kill(esp_websocket_client_handle_t client);
 
 #if 0
     class websocket_client

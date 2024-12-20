@@ -70,8 +70,7 @@
 typedef struct s_ws_event_arg
 {
     esp_websocket_client_handle_t client;
-    int (*msg_upcall)(const char *, uint32_t, time_t time_ms);
-    // void (*msg_upcall)(const char *, uint32_t);
+    int (*msg_upcall)(char *, uint32_t, time_t time_ms);
     void (*connection_upcall)(bool connected);
 } s_ws_event_arg_t;
 
@@ -91,7 +90,6 @@ static void websocket_event_handler(void *handler_args, esp_event_base_t base, i
 /*******************************************************************************
 *                          Static Data Definitions
 *******************************************************************************/
-static esp_websocket_client_handle_t client = NULL;
 
 /*******************************************************************************
 *                          Extern Data Definitions
@@ -100,7 +98,7 @@ static esp_websocket_client_handle_t client = NULL;
 /*******************************************************************************
 *                          Extern Function Definitions
 *******************************************************************************/
-ezlopi_error_t EZPI_core_websocket_client_send(char *data, uint32_t len)
+ezlopi_error_t EZPI_core_websocket_client_send(esp_websocket_client_handle_t client, char *data, uint32_t len, uint32_t timeout_ms)
 {
     ezlopi_error_t ret = EZPI_FAILED;
 
@@ -116,12 +114,12 @@ ezlopi_error_t EZPI_core_websocket_client_send(char *data, uint32_t len)
     return ret;
 }
 
-bool EZPI_core_websocket_client_is_connected(void)
+bool EZPI_core_websocket_client_is_connected(esp_websocket_client_handle_t client)
 {
     return esp_websocket_client_is_connected(client);
 }
 
-void EZPI_core_websocket_client_kill(void)
+void EZPI_core_websocket_client_kill(esp_websocket_client_handle_t client)
 {
     esp_websocket_client_stop(client);
     TRACE_S("Websocket Stopped");
@@ -129,49 +127,42 @@ void EZPI_core_websocket_client_kill(void)
     client = NULL;
 }
 
-// esp_websocket_client_handle_t EZPI_core_websocket_client_init(cJSON *uri, void (*msg_upcall)(const char *, uint32_t), void (*connection_upcall)(bool connected))
-esp_websocket_client_handle_t EZPI_core_websocket_client_init(cJSON *uri, int (*msg_upcall)(const char *, uint32_t, time_t time_ms), void (*connection_upcall)(bool connected))
+esp_websocket_client_handle_t EZPI_core_websocket_client_init(cJSON *uri, int (*msg_upcall)(char *, uint32_t, time_t time_ms), void (*connection_upcall)(bool connected),
+    char *ca_certificate, char *ssl_private_key, char *ssl_shared_key)
 {
+    esp_websocket_client_handle_t client = NULL;
+
     if ((NULL == client) && (NULL != uri) && (NULL != uri->valuestring) && (NULL != msg_upcall))
     {
-        char *ca_cert = EZPI_core_factory_info_v3_get_ca_certificate();
-        char *ssl_priv = EZPI_core_factory_info_v3_get_ssl_private_key();
-        char *ssl_shared = EZPI_core_factory_info_v3_get_ssl_shared_key();
-
-        static s_ws_event_arg_t event_arg;
-        event_arg.client = client;
-        event_arg.msg_upcall = msg_upcall;
-        event_arg.connection_upcall = connection_upcall;
+        s_ws_event_arg_t *event_arg = ezlopi_malloc(__FUNCTION__, sizeof(s_ws_event_arg_t));
+        if (event_arg)
+        {
+            event_arg->client = client;
+            event_arg->msg_upcall = msg_upcall;
+            event_arg->connection_upcall = connection_upcall;
+        }
 
         esp_websocket_client_config_t websocket_cfg = {
-            .uri = uri->valuestring,
-            .task_stack = 5 * 1024,
-            .buffer_size = WSS_RX_BUFFER_SIZE,
-            // .task_stack = EZPI_CORE_WSS_TASK_STACK_SIZE,
-            // .buffer_size = EZPI_CORE_WSS_DATA_BUFFER_SIZE,
-            .cert_pem = ca_cert,
-            .client_key = ssl_priv,
-            .client_cert = ssl_shared,
+            .task_stack = 5120,
             .keep_alive_enable = 1,
-            .ping_interval_sec = EZPI_CORE_WSS_PING_INTERVAL_SEC,
-            // .pingpong_timeout_sec = EZPI_CORE_WSS_PING_PONG_TIMEOUT_SEC,
+            .uri = uri->valuestring,
             .pingpong_timeout_sec = 30,
+            .cert_pem = ca_certificate,
+            .client_key = ssl_private_key,
+            .client_cert = ssl_shared_key,
+            .buffer_size = WSS_RX_BUFFER_SIZE,
+            .ping_interval_sec = EZPI_CORE_WSS_PING_INTERVAL_SEC,
         };
 
         TRACE_S("Connecting to %s...", websocket_cfg.uri);
 
         client = esp_websocket_client_init(&websocket_cfg);
-        // client = esp_websocket_client_init(&websocket_cfg);
 
         if (client)
         {
-            esp_websocket_register_events(client, WEBSOCKET_EVENT_ANY, websocket_event_handler, (void *)&event_arg);
+            esp_websocket_register_events(client, WEBSOCKET_EVENT_ANY, websocket_event_handler, (void *)event_arg);
             esp_websocket_client_start(client);
         }
-    }
-    else
-    {
-        TRACE_I("Client already active!");
     }
 
     return client;
@@ -189,7 +180,6 @@ static void websocket_event_handler(void *handler_args, esp_event_base_t base, i
     {
     case WEBSOCKET_EVENT_CONNECTED:
     {
-        TRACE_W("free-heap:     %.02f KB", esp_get_free_heap_size() / 1024.0);
         TRACE_S("WEBSOCKET_EVENT_CONNECTED");
         if (event_arg && event_arg->connection_upcall)
         {
@@ -199,7 +189,6 @@ static void websocket_event_handler(void *handler_args, esp_event_base_t base, i
     }
     case WEBSOCKET_EVENT_DISCONNECTED:
     {
-        TRACE_W("free-heap:     %.02f KB", esp_get_free_heap_size() / 1024.0);
         TRACE_E("WEBSOCKET_EVENT_DISCONNECTED");
         if (event_arg && event_arg->connection_upcall)
         {
@@ -210,13 +199,14 @@ static void websocket_event_handler(void *handler_args, esp_event_base_t base, i
     }
     case WEBSOCKET_EVENT_DATA:
     {
-        if (0x01 == data->op_code) // op_code = 0x01: text-data,
+        // op_code = 0x01: text-data,
+        if (0x01 == data->op_code)
         {
-
             if ((NULL != data->data_ptr) && (data->data_len > 0) &&
                 (NULL != event_arg) && (NULL != event_arg->msg_upcall))
             {
-                if (data->payload_len == data->data_len) // process the data if all data is received once
+                // process the data if all data is received once
+                if (data->payload_len == data->data_len)
                 {
                     time_t now;
                     time(&now);
@@ -234,7 +224,6 @@ static void websocket_event_handler(void *handler_args, esp_event_base_t base, i
                 }
                 else
                 {
-
                     static time_t now = 0;
                     if (0 == now)
                     {
@@ -274,12 +263,12 @@ static void websocket_event_handler(void *handler_args, esp_event_base_t base, i
                             ezlopi_free(__FUNCTION__, s_buffer);
                         }
 
+                        now = 0;
                         s_buffer = NULL;
                         chunk_count = 0;
                     }
                 }
             }
-            // TRACE_D("----------------------------------------------------------------------------------------------------------------");
         }
         break;
     }

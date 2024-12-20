@@ -313,7 +313,7 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
                     TaskHandle_t ezlopi_sensor_mpu6050_task_handle = NULL;
                     xTaskCreate(__mpu6050_calibration_task, "MPU6050_Calibration_Task", EZLOPI_SENSOR_MPU6050_TASK_DEPTH, item, 1, &ezlopi_sensor_mpu6050_task_handle);
 #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
-                    ezlopi_core_process_set_process_info(ENUM_EZLOPI_SENSOR_MPU6050_TASK, &ezlopi_sensor_mpu6050_task_handle, EZLOPI_SENSOR_MPU6050_TASK_DEPTH);
+                    EZPI_core_process_set_process_info(ENUM_EZLOPI_SENSOR_MPU6050_TASK, &ezlopi_sensor_mpu6050_task_handle, EZLOPI_SENSOR_MPU6050_TASK_DEPTH);
 #endif
                 }
                 else
@@ -548,7 +548,7 @@ static void __mpu6050_calibration_task(void *params) // calibrate task
         }
     }
 #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
-    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SENSOR_MPU6050_TASK);
+    EZPI_core_process_set_is_deleted(ENUM_EZLOPI_SENSOR_MPU6050_TASK);
 #endif
     vTaskDelete(NULL);
 }

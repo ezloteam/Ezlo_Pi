@@ -76,8 +76,8 @@ static void __ezlopi_replace_newline_escape(char *str);
 static ezlopi_error_t __ezlopi_check_string_validity(const char *str);
 static bool __ezlopi_check_uuid_validity(const char *uuid);
 static bool __ezlopi_check_mac_validity(const char *mac);
-static int __ezlopi_factory_info_v3_set_4kb(const char *data, uint32_t offset, uint32_t len);
-static char *__ezlopi_factory_info_v3_read_string(const char *name, e_EZPI_core_factory_info_v3_offset_t offset, e_EZPI_core_factory_info_v3_length_t length);
+static int __EZPI_core_factory_info_v3_set_4kb(const char *data, uint32_t offset, uint32_t len);
+static char *__EZPI_core_factory_info_v3_read_string(const char *name, e_EZPI_core_factory_info_v3_offset_t offset, e_EZPI_core_factory_info_v3_length_t length);
 
 /*******************************************************************************
 *                          Static Data Definitions
@@ -217,7 +217,7 @@ uint32_t EZPI_core_factory_info_v3_get_provisioning_status(void)
 {
     if (EZPI_factory_info_v3_init())
     {
-        char *cloud_server = __ezlopi_factory_info_v3_read_string(__FUNCTION__, EZPI_core_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_CLOUD_SERVER_URL, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_CLOUD_SERVER_URL);
+        char *cloud_server = __EZPI_core_factory_info_v3_read_string(__FUNCTION__, EZPI_core_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_CLOUD_SERVER_URL, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_CLOUD_SERVER_URL);
         if (cloud_server && strstr(cloud_server, "https://"))
         {
             g_provisioning_status = 1;
@@ -257,7 +257,7 @@ uint16_t EZPI_core_factory_info_v3_get_version(void)
 
 char *EZPI_core_factory_info_v3_get_name(void)
 {
-    char *read_data = __ezlopi_factory_info_v3_read_string(__FUNCTION__, EZPI_core_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_DEVICE_NAME, E_EZLOPI_FACTORY_INFO_HUB_DATA), EZLOPI_FINFO_LEN_DEVICE_NAME);
+    char *read_data = __EZPI_core_factory_info_v3_read_string(__FUNCTION__, EZPI_core_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_DEVICE_NAME, E_EZLOPI_FACTORY_INFO_HUB_DATA), EZLOPI_FINFO_LEN_DEVICE_NAME);
     if (read_data)
     {
         if (__ezlopi_check_string_validity(read_data) == EZPI_FAILED)
@@ -271,7 +271,7 @@ char *EZPI_core_factory_info_v3_get_name(void)
 
 char *EZPI_core_factory_info_v3_get_manufacturer(void)
 {
-    char *read_data = __ezlopi_factory_info_v3_read_string(__FUNCTION__, EZPI_core_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_MANUF_NAME, E_EZLOPI_FACTORY_INFO_HUB_DATA), EZLOPI_FINFO_LEN_MANUF_NAME);
+    char *read_data = __EZPI_core_factory_info_v3_read_string(__FUNCTION__, EZPI_core_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_MANUF_NAME, E_EZLOPI_FACTORY_INFO_HUB_DATA), EZLOPI_FINFO_LEN_MANUF_NAME);
 
     if (read_data)
     {
@@ -286,7 +286,7 @@ char *EZPI_core_factory_info_v3_get_manufacturer(void)
 
 char *EZPI_core_factory_info_v3_get_brand(void)
 {
-    char *read_data = __ezlopi_factory_info_v3_read_string(__FUNCTION__, EZPI_core_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_BRAND_NAME, E_EZLOPI_FACTORY_INFO_HUB_DATA), EZLOPI_FINFO_LEN_BRAND_NAME);
+    char *read_data = __EZPI_core_factory_info_v3_read_string(__FUNCTION__, EZPI_core_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_BRAND_NAME, E_EZLOPI_FACTORY_INFO_HUB_DATA), EZLOPI_FINFO_LEN_BRAND_NAME);
 
     if (read_data)
     {
@@ -301,7 +301,7 @@ char *EZPI_core_factory_info_v3_get_brand(void)
 
 char *EZPI_core_factory_info_v3_get_model(void)
 {
-    char *read_data = __ezlopi_factory_info_v3_read_string(__FUNCTION__, EZPI_core_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_MODEL_NAME, E_EZLOPI_FACTORY_INFO_HUB_DATA), EZLOPI_FINFO_LEN_MODEL_NAME);
+    char *read_data = __EZPI_core_factory_info_v3_read_string(__FUNCTION__, EZPI_core_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_MODEL_NAME, E_EZLOPI_FACTORY_INFO_HUB_DATA), EZLOPI_FINFO_LEN_MODEL_NAME);
     if (read_data)
     {
         if (__ezlopi_check_string_validity(read_data) == EZPI_FAILED)
@@ -315,7 +315,7 @@ char *EZPI_core_factory_info_v3_get_model(void)
 
 char *EZPI_core_factory_info_v3_get_provision_token(void)
 {
-    char *read_data = __ezlopi_factory_info_v3_read_string(__FUNCTION__, EZPI_core_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_PROVISIONING_TOKEN, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_PROVISIONING_TOKEN);
+    char *read_data = __EZPI_core_factory_info_v3_read_string(__FUNCTION__, EZPI_core_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_PROVISIONING_TOKEN, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_PROVISIONING_TOKEN);
     if (read_data)
     {
         if (!isprint(read_data[0]))
@@ -372,7 +372,7 @@ unsigned long long EZPI_core_factory_info_v3_get_id(void)
 
 char *EZPI_core_factory_info_v3_get_device_uuid(void)
 {
-    char *read_data = __ezlopi_factory_info_v3_read_string(__FUNCTION__, EZPI_core_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_DEVICE_UUID, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_DEVICE_UUID);
+    char *read_data = __EZPI_core_factory_info_v3_read_string(__FUNCTION__, EZPI_core_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_DEVICE_UUID, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_DEVICE_UUID);
     if (read_data)
     {
         if (!__ezlopi_check_uuid_validity(read_data))
@@ -386,7 +386,7 @@ char *EZPI_core_factory_info_v3_get_device_uuid(void)
 
 char *EZPI_core_factory_info_v3_get_provisioning_uuid(void)
 {
-    char *read_data = __ezlopi_factory_info_v3_read_string(__FUNCTION__, EZPI_core_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_PROVISIONING_UUID, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_PROV_UUID);
+    char *read_data = __EZPI_core_factory_info_v3_read_string(__FUNCTION__, EZPI_core_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_PROVISIONING_UUID, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_PROV_UUID);
     if (read_data)
     {
         if (!__ezlopi_check_uuid_validity(read_data))
@@ -400,7 +400,7 @@ char *EZPI_core_factory_info_v3_get_provisioning_uuid(void)
 
 char *EZPI_core_factory_info_v3_get_ssid(void)
 {
-    char *read_data = __ezlopi_factory_info_v3_read_string(__FUNCTION__, EZPI_core_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_WIFI_SSID, E_EZLOPI_FACTORY_INFO_HUB_DATA), EZLOPI_FINFO_LEN_WIFI_SSID);
+    char *read_data = __EZPI_core_factory_info_v3_read_string(__FUNCTION__, EZPI_core_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_WIFI_SSID, E_EZLOPI_FACTORY_INFO_HUB_DATA), EZLOPI_FINFO_LEN_WIFI_SSID);
     if (read_data)
     {
         if (__ezlopi_check_string_validity(read_data) == EZPI_FAILED)
@@ -415,7 +415,7 @@ char *EZPI_core_factory_info_v3_get_ssid(void)
 char *EZPI_core_factory_info_v3_get_password(void)
 {
 
-    char *read_data = __ezlopi_factory_info_v3_read_string(__FUNCTION__, EZPI_core_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_WIFI_PASS, E_EZLOPI_FACTORY_INFO_HUB_DATA), EZLOPI_FINFO_LEN_WIFI_PASS);
+    char *read_data = __EZPI_core_factory_info_v3_read_string(__FUNCTION__, EZPI_core_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_WIFI_PASS, E_EZLOPI_FACTORY_INFO_HUB_DATA), EZLOPI_FINFO_LEN_WIFI_PASS);
     if (read_data)
     {
         if (!isprint(read_data[0]))
@@ -431,7 +431,7 @@ char *EZPI_core_factory_info_v3_get_password(void)
 char *EZPI_core_factory_info_v3_get_ezlopi_mac(void)
 {
 
-    char *read_data = __ezlopi_factory_info_v3_read_string(__FUNCTION__, EZPI_core_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_DEVICE_MAC, E_EZLOPI_FACTORY_INFO_HUB_DATA), EZLOPI_FINFO_LEN_DEVICE_MAC);
+    char *read_data = __EZPI_core_factory_info_v3_read_string(__FUNCTION__, EZPI_core_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_DEVICE_MAC, E_EZLOPI_FACTORY_INFO_HUB_DATA), EZLOPI_FINFO_LEN_DEVICE_MAC);
     if (read_data)
     {
         if (!__ezlopi_check_mac_validity(read_data))
@@ -445,7 +445,7 @@ char *EZPI_core_factory_info_v3_get_ezlopi_mac(void)
 
 char *EZPI_core_factory_info_v3_get_cloud_server(void)
 {
-    char *cloud_server = __ezlopi_factory_info_v3_read_string(__FUNCTION__, EZPI_core_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_CLOUD_SERVER_URL, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_CLOUD_SERVER_URL);
+    char *cloud_server = __EZPI_core_factory_info_v3_read_string(__FUNCTION__, EZPI_core_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_CLOUD_SERVER_URL, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_CLOUD_SERVER_URL);
     if (cloud_server && strstr(cloud_server, "https://"))
     {
         g_provisioning_status = 1;
@@ -460,7 +460,7 @@ char *EZPI_core_factory_info_v3_get_cloud_server(void)
 
 char *EZPI_core_factory_info_v3_get_local_key(void)
 {
-    char *local_key = __ezlopi_factory_info_v3_read_string(__FUNCTION__, EZPI_core_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_LOCAL_KEY, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_LOCAL_KEY);
+    char *local_key = __EZPI_core_factory_info_v3_read_string(__FUNCTION__, EZPI_core_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_LOCAL_KEY, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_LOCAL_KEY);
 
     // char *_local_key = (char *)malloc(128);
     // _local_key = "opAUdOPv04SyaVbBzm8VNUg7BrFfaGXC7pxEBAv6evZnmiijcCaUXNLqgYrQASDk";
@@ -479,7 +479,7 @@ char *EZPI_core_factory_info_v3_get_local_key(void)
 
 char *EZPI_core_factory_info_v3_get_provisioning_server(void)
 {
-    char *provisioning_server = __ezlopi_factory_info_v3_read_string(__FUNCTION__, EZPI_core_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_PROVISIONING_SERVER_URL, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_PROVISIONING_SERVER_URL);
+    char *provisioning_server = __EZPI_core_factory_info_v3_read_string(__FUNCTION__, EZPI_core_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_PROVISIONING_SERVER_URL, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_PROVISIONING_SERVER_URL);
     if (provisioning_server && strstr(provisioning_server, "https://"))
     {
         return provisioning_server;
@@ -508,7 +508,7 @@ char *EZPI_core_factory_info_v3_get_ca_certificate(void)
 {
     if (NULL == __ca_cert)
     {
-        __ca_cert = __ezlopi_factory_info_v3_read_string(__FUNCTION__, EZPI_core_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_CA_CERTIFICATE, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_CA_CERTIFICATE);
+        __ca_cert = __EZPI_core_factory_info_v3_read_string(__FUNCTION__, EZPI_core_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_CA_CERTIFICATE, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_CA_CERTIFICATE);
         __ezlopi_replace_newline_escape(__ca_cert); // Workaround : Escape Sequence "\n"
     }
     return __ca_cert;
@@ -526,7 +526,7 @@ char *EZPI_core_factory_info_v3_get_ssl_private_key(void)
 {
     if (NULL == __pvt_key)
     {
-        __pvt_key = __ezlopi_factory_info_v3_read_string(__FUNCTION__, EZPI_core_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_SSL_PRIVATE_KEY, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_SSL_PRIVATE_KEY);
+        __pvt_key = __EZPI_core_factory_info_v3_read_string(__FUNCTION__, EZPI_core_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_SSL_PRIVATE_KEY, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_SSL_PRIVATE_KEY);
         __ezlopi_replace_newline_escape(__pvt_key); // Workaround : Escape Sequence "\n"
     }
     return __pvt_key;
@@ -544,7 +544,7 @@ char *EZPI_core_factory_info_v3_get_ssl_shared_key(void)
 {
     if (NULL == __pub_key)
     {
-        __pub_key = __ezlopi_factory_info_v3_read_string(__FUNCTION__, EZPI_core_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_SSL_SHARED_KEY, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_SSL_SHARED_KEY);
+        __pub_key = __EZPI_core_factory_info_v3_read_string(__FUNCTION__, EZPI_core_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_SSL_SHARED_KEY, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_SSL_SHARED_KEY);
         __ezlopi_replace_newline_escape(__pub_key); // Workaround : Escape Sequence "\n"
     }
     return __pub_key;
@@ -553,7 +553,7 @@ char *EZPI_core_factory_info_v3_get_ssl_shared_key(void)
 char *EZPI_core_factory_info_v3_get_ezlopi_config(void)
 {
     // TRACE_E("ezlopi-config address: %d", EZPI_core_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_EZLOPI_CONFIG_JSON, E_EZLOPI_FACTORY_INFO_CONN_DATA));
-    char *ret = __ezlopi_factory_info_v3_read_string(__FUNCTION__, EZPI_core_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_EZLOPI_CONFIG_JSON, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_EZLOPI_CONFIG_JSON);
+    char *ret = __EZPI_core_factory_info_v3_read_string(__FUNCTION__, EZPI_core_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_EZLOPI_CONFIG_JSON, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_EZLOPI_CONFIG_JSON);
     if (false == isprint(ret[0]))
     {
         if (ret)
@@ -770,7 +770,7 @@ int EZPI_core_factory_info_v3_set_ssl_private_key(cJSON *cj_data)
     {
         cj_data->str_value_len = ezlopi_calculate_certificate_length(cj_data->valuestring, "-----END PRIVATE KEY-----"); // Workaround : cJSON is not giving correct length
         // TRACE_E("%.*s", cj_data->str_value_len, cj_data->valuestring);
-        ret = __ezlopi_factory_info_v3_set_4kb(cj_data->valuestring, EZPI_core_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_SSL_PRIVATE_KEY, E_EZLOPI_FACTORY_INFO_CONN_DATA), cj_data->str_value_len);
+        ret = __EZPI_core_factory_info_v3_set_4kb(cj_data->valuestring, EZPI_core_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_SSL_PRIVATE_KEY, E_EZLOPI_FACTORY_INFO_CONN_DATA), cj_data->str_value_len);
     }
     return ret;
 }
@@ -782,7 +782,7 @@ int EZPI_core_factory_info_v3_set_ssl_public_key(cJSON *cj_data)
     {
         cj_data->str_value_len = ezlopi_calculate_certificate_length(cj_data->valuestring, "-----END PUBLIC KEY-----"); // Workaround : cJSON is not giving correct length
         // TRACE_E("%.*s", cj_data->str_value_len, cj_data->valuestring);
-        ret = __ezlopi_factory_info_v3_set_4kb(cj_data->valuestring, EZPI_core_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_SSL_SHARED_KEY, E_EZLOPI_FACTORY_INFO_CONN_DATA), cj_data->str_value_len);
+        ret = __EZPI_core_factory_info_v3_set_4kb(cj_data->valuestring, EZPI_core_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_SSL_SHARED_KEY, E_EZLOPI_FACTORY_INFO_CONN_DATA), cj_data->str_value_len);
     }
     return ret;
 }
@@ -794,7 +794,7 @@ int EZPI_core_factory_info_v3_set_ssl_shared_key(cJSON *cj_data)
     {
         cj_data->str_value_len = ezlopi_calculate_certificate_length(cj_data->valuestring, "-----END CERTIFICATE-----"); // Workaround : cJSON is not giving correct length
         // TRACE_E("%.*s", cj_data->str_value_len, cj_data->valuestring);
-        ret = __ezlopi_factory_info_v3_set_4kb(cj_data->valuestring, EZPI_core_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_SSL_SHARED_KEY, E_EZLOPI_FACTORY_INFO_CONN_DATA), cj_data->str_value_len);
+        ret = __EZPI_core_factory_info_v3_set_4kb(cj_data->valuestring, EZPI_core_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_SSL_SHARED_KEY, E_EZLOPI_FACTORY_INFO_CONN_DATA), cj_data->str_value_len);
     }
     return ret;
 }
@@ -806,7 +806,7 @@ int EZPI_core_factory_info_v3_set_ca_cert(cJSON *cj_data)
     {
         cj_data->str_value_len = ezlopi_calculate_certificate_length(cj_data->valuestring, "-----END CERTIFICATE-----"); // Workaround : cJSON is not giving correct length
         // TRACE_E("%.*s", cj_data->str_value_len, cj_data->valuestring);
-        ret = __ezlopi_factory_info_v3_set_4kb(cj_data->valuestring, EZPI_core_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_CA_CERTIFICATE, E_EZLOPI_FACTORY_INFO_CONN_DATA), cj_data->str_value_len);
+        ret = __EZPI_core_factory_info_v3_set_4kb(cj_data->valuestring, EZPI_core_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_CA_CERTIFICATE, E_EZLOPI_FACTORY_INFO_CONN_DATA), cj_data->str_value_len);
     }
     return ret;
 }
@@ -819,10 +819,10 @@ int EZPI_core_factory_info_v3_set_ezlopi_config(cJSON *cj_data)
         char *tmp_data = ezlopi_malloc(__FUNCTION__, 4 * 1024);
         if (tmp_data)
         {
-            if (cJSON_PrintPreallocated(__FUNCTION__, cj_data, tmp_data, 4 * 1024, false))
+            if (true == cJSON_PrintPreallocated(__FUNCTION__, cj_data, tmp_data, 4 * 1024, false))
             {
                 // TRACE_D("added-chipset: %.*s", tmp_data);
-                ret = __ezlopi_factory_info_v3_set_4kb(tmp_data, EZPI_core_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_EZLOPI_CONFIG_JSON, E_EZLOPI_FACTORY_INFO_CONN_DATA), strlen(tmp_data) + 1);
+                ret = __EZPI_core_factory_info_v3_set_4kb(tmp_data, EZPI_core_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_EZLOPI_CONFIG_JSON, E_EZLOPI_FACTORY_INFO_CONN_DATA), strlen(tmp_data) + 1);
             }
 
             ezlopi_free(__FUNCTION__, tmp_data);
@@ -941,7 +941,7 @@ static bool __ezlopi_check_mac_validity(const char *mac)
 
     return true; // MAC address is valid
 }
-static int __ezlopi_factory_info_v3_set_4kb(const char *data, uint32_t offset, uint32_t len)
+static int __EZPI_core_factory_info_v3_set_4kb(const char *data, uint32_t offset, uint32_t len)
 {
     int ret = 0;
     char *tmp_variable = ezlopi_malloc(__FUNCTION__, len + 1);
@@ -972,7 +972,7 @@ static int __ezlopi_factory_info_v3_set_4kb(const char *data, uint32_t offset, u
 
     return ret;
 }
-static char *__ezlopi_factory_info_v3_read_string(const char *name, e_EZPI_core_factory_info_v3_offset_t offset, e_EZPI_core_factory_info_v3_length_t length)
+static char *__EZPI_core_factory_info_v3_read_string(const char *name, e_EZPI_core_factory_info_v3_offset_t offset, e_EZPI_core_factory_info_v3_length_t length)
 {
     char *read_string = NULL;
 

@@ -212,8 +212,8 @@ void EZPI_device_updated(cJSON *cj_request, cJSON *cj_response)
 
                             if (controller_info)
                             {
-                                cJSON_AddBoolToObject(__FUNCTION__, cj_result, ezlopi_armed_str, controller_info->armed ? cJSON_True : cJSON_False);
-                                cJSON_AddBoolToObject(__FUNCTION__, cj_result, ezlopi_serviceNotification_str, controller_info->service_notification ? cJSON_True : cJSON_False);
+                                cJSON_AddBoolToObject(__FUNCTION__, cj_result, ezlopi_armed_str, controller_info->armed ? true : false);
+                                cJSON_AddBoolToObject(__FUNCTION__, cj_result, ezlopi_serviceNotification_str, controller_info->service_notification ? true : false);
                             }
 
                             uint64_t time = EZPI_core_sntp_get_current_time_ms();
@@ -371,10 +371,13 @@ void EZPI_device_group_delete(cJSON *cj_request, cJSON *cj_response)
 
                                 cJSON_AddStringToObject(__FUNCTION__, cj_request, ezlopi__id_str, cj_id->valuestring); // for (reply_broadcast); if delete is successful
                             }
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                             else
                             {
+
                                 TRACE_E("Error!! , Unable to delete 'device_group_id' : [%d]", dev_grp_id);
                             }
+#endif
                         }
                         else
                         {
@@ -663,10 +666,12 @@ void EZPI_item_group_delete(cJSON *cj_request, cJSON *cj_response)
 
                                 cJSON_AddStringToObject(__FUNCTION__, cj_request, ezlopi__id_str, cj_id->valuestring); // for (reply_broadcast); if delete is successful
                             }
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                             else
                             {
                                 TRACE_E("Error!! , Unable to delete 'item_group_id' : [%d]", item_grp_id);
                             }
+#endif
                         }
                         else
                         {

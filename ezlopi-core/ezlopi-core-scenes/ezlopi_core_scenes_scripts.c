@@ -316,7 +316,7 @@ static void __run_script(l_ezlopi_scenes_script_t *script_node)
         TaskHandle_t ezlopi_core_scenes_script_process_task_handle = NULL;
         xTaskCreate(__script_process, script_node->name, EZLOPI_CORE_SCENES_SCRIPT_PROCESS_TASK_DEPTH, script_node, 3, &ezlopi_core_scenes_script_process_task_handle);
 #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
-        ezlopi_core_process_set_process_info(ENUM_EZLOPI_CORE_SCENES_SCRIPT_PROCESS_TASK, &ezlopi_core_scenes_script_process_task_handle, EZLOPI_CORE_SCENES_SCRIPT_PROCESS_TASK_DEPTH);
+        EZPI_core_process_set_process_info(ENUM_EZLOPI_CORE_SCENES_SCRIPT_PROCESS_TASK, &ezlopi_core_scenes_script_process_task_handle, EZLOPI_CORE_SCENES_SCRIPT_PROCESS_TASK_DEPTH);
 #endif
     }
 }
@@ -373,7 +373,7 @@ static void __script_process(void *arg)
 
     TRACE_W("%s -> {state: %d} -> Stopped", script_node->name, script_node->state);
 #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
-    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_CORE_SCENES_SCRIPT_PROCESS_TASK);
+    EZPI_core_process_set_is_deleted(ENUM_EZLOPI_CORE_SCENES_SCRIPT_PROCESS_TASK);
 #endif
     vTaskDelete(NULL);
 }

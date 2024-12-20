@@ -84,7 +84,7 @@ extern "C"
      *
      */
     void EZPI_net_init(void);
-#endif  // CONFIG_EZPI_CORE_ENABLE_ETH
+#endif // CONFIG_EZPI_CORE_ENABLE_ETH
 
     /**
      * @brief Function to get core-net status
@@ -92,7 +92,6 @@ extern "C"
      * @return s_ezlopi_net_status_t*
      */
     s_ezlopi_net_status_t *EZPI_core_net_get_net_status(void);
-
 #ifdef __cplusplus
 }
 #endif

@@ -169,7 +169,7 @@ extern "C"
      *      - ESP_FAIL: other internal error (e.g. socket error)
      *      - ESP_OK: create ping session successfully, user can take the ping handle to do follow-on jobs
      */
-    esp_err_t ezlopi_ping_new_session(const ezlopi_ping_config_t *config, const ezlopi_ping_callbacks_t *cbs, esp_ping_handle_t *hdl_out);
+    esp_err_t EZPI_ping_new_session(const ezlopi_ping_config_t *config, const ezlopi_ping_callbacks_t *cbs, esp_ping_handle_t *hdl_out);
 
     /**
      * @brief Start the ping session
@@ -179,7 +179,7 @@ extern "C"
      *      - ESP_ERR_INVALID_ARG: invalid parameters (e.g. ping handle is null, etc)
      *      - ESP_OK: start ping session successfully
      */
-    esp_err_t ezlopi_ping_start_by_handle(esp_ping_handle_t hdl);
+    esp_err_t EZPI_ping_start_by_handle(esp_ping_handle_t hdl);
 
     /**
      * @brief Get runtime profile of ping session
@@ -193,7 +193,7 @@ extern "C"
      *      - ESP_ERR_INVALID_SIZE: the actual profile data size doesn't match the "size" parameter
      *      - ESP_OK: get profile successfully
      */
-    esp_err_t ezlopi_ping_get_profile(esp_ping_handle_t hdl, esp_ping_profile_t profile, void *data, uint32_t size);
+    esp_err_t EZPI_ping_get_profile(esp_ping_handle_t hdl, esp_ping_profile_t profile, void *data, uint32_t size);
 
     /**
     * @brief Delete a ping session

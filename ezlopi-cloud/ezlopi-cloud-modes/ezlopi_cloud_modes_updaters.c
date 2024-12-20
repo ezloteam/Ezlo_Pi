@@ -118,13 +118,13 @@ void EZPI_cloud_modes_alarmed(cJSON *cj_request, cJSON *cj_response)
 void EZPI_cloud_modes_changed_alarmed(cJSON *cj_request, cJSON *cj_response)
 {
     // 1. broadcast 'modes.changed'
-    cJSON *changed_resp = cJSON_CreateObject(__FUNCTION__);
-    if (changed_resp)
+    cJSON *cj_changed_resp = cJSON_CreateObject(__FUNCTION__);
+    if (cj_changed_resp)
     {
-        EZPI_cloud_modes_changed(cj_request, changed_resp);
-        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(changed_resp))
+        EZPI_cloud_modes_changed(cj_request, cj_changed_resp);
+        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_changed_resp))
         {
-            cJSON_Delete(__FUNCTION__, changed_resp);
+            cJSON_Delete(__FUNCTION__, cj_changed_resp);
         }
     }
 
@@ -152,13 +152,13 @@ void EZPI_cloud_modes_notifications_removed(cJSON *cj_request, cJSON *cj_respons
 void EZPI_cloud_modes_disarmed_devices_added(cJSON *cj_request, cJSON *cj_response)
 {
     // 1. broadcast 'modes.changed'
-    cJSON *changed_resp = cJSON_CreateObject(__FUNCTION__);
-    if (changed_resp)
+    cJSON *cj_changed_resp = cJSON_CreateObject(__FUNCTION__);
+    if (cj_changed_resp)
     {
-        EZPI_cloud_modes_changed(cj_request, changed_resp);
-        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(changed_resp))
+        EZPI_cloud_modes_changed(cj_request, cj_changed_resp);
+        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_changed_resp))
         {
-            cJSON_Delete(__FUNCTION__, changed_resp);
+            cJSON_Delete(__FUNCTION__, cj_changed_resp);
         }
     }
 
@@ -186,13 +186,13 @@ void EZPI_cloud_modes_disarmed_devices_added(cJSON *cj_request, cJSON *cj_respon
 void EZPI_cloud_modes_disarmed_devices_removed(cJSON *cj_request, cJSON *cj_response)
 {
     // 1. broadcast 'modes.changed'
-    cJSON *changed_resp = cJSON_CreateObject(__FUNCTION__);
-    if (changed_resp)
+    cJSON *cj_changed_resp = cJSON_CreateObject(__FUNCTION__);
+    if (cj_changed_resp)
     {
-        EZPI_cloud_modes_changed(cj_request, changed_resp);
-        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(changed_resp))
+        EZPI_cloud_modes_changed(cj_request, cj_changed_resp);
+        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_changed_resp))
         {
-            cJSON_Delete(__FUNCTION__, changed_resp);
+            cJSON_Delete(__FUNCTION__, cj_changed_resp);
         }
     }
 
@@ -220,13 +220,13 @@ void EZPI_cloud_modes_disarmed_devices_removed(cJSON *cj_request, cJSON *cj_resp
 void EZPI_cloud_modes_alarms_off_added(cJSON *cj_request, cJSON *cj_response)
 {
     // 1. broadcast 'modes.changed'
-    cJSON *changed_resp = cJSON_CreateObject(__FUNCTION__);
-    if (changed_resp)
+    cJSON *cj_changed_resp = cJSON_CreateObject(__FUNCTION__);
+    if (cj_changed_resp)
     {
-        EZPI_cloud_modes_changed(cj_request, changed_resp);
-        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(changed_resp))
+        EZPI_cloud_modes_changed(cj_request, cj_changed_resp);
+        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_changed_resp))
         {
-            cJSON_Delete(__FUNCTION__, changed_resp);
+            cJSON_Delete(__FUNCTION__, cj_changed_resp);
         }
     }
 
@@ -254,13 +254,13 @@ void EZPI_cloud_modes_alarms_off_added(cJSON *cj_request, cJSON *cj_response)
 void EZPI_cloud_modes_alarms_off_removed(cJSON *cj_request, cJSON *cj_response)
 {
     // 1. broadcast 'modes.changed'
-    cJSON *changed_resp = cJSON_CreateObject(__FUNCTION__);
-    if (changed_resp)
+    cJSON *cj_changed_resp = cJSON_CreateObject(__FUNCTION__);
+    if (cj_changed_resp)
     {
-        EZPI_cloud_modes_changed(cj_request, changed_resp);
-        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(changed_resp))
+        EZPI_cloud_modes_changed(cj_request, cj_changed_resp);
+        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_changed_resp))
         {
-            cJSON_Delete(__FUNCTION__, changed_resp);
+            cJSON_Delete(__FUNCTION__, cj_changed_resp);
         }
     }
 
@@ -288,13 +288,13 @@ void EZPI_cloud_modes_alarms_off_removed(cJSON *cj_request, cJSON *cj_response)
 void EZPI_cloud_modes_cameras_off_added(cJSON *cj_request, cJSON *cj_response)
 {
     // 1. broadcast 'modes.changed'
-    cJSON *changed_resp = cJSON_CreateObject(__FUNCTION__);
-    if (changed_resp)
+    cJSON *cj_changed_resp = cJSON_CreateObject(__FUNCTION__);
+    if (cj_changed_resp)
     {
-        EZPI_cloud_modes_changed(cj_request, changed_resp);
-        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(changed_resp))
+        EZPI_cloud_modes_changed(cj_request, cj_changed_resp);
+        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_changed_resp))
         {
-            cJSON_Delete(__FUNCTION__, changed_resp);
+            cJSON_Delete(__FUNCTION__, cj_changed_resp);
         }
     }
 
@@ -322,13 +322,13 @@ void EZPI_cloud_modes_cameras_off_added(cJSON *cj_request, cJSON *cj_response)
 void EZPI_cloud_modes_cameras_off_removed(cJSON *cj_request, cJSON *cj_response)
 {
     // 1. broadcast 'modes.changed'
-    cJSON *changed_resp = cJSON_CreateObject(__FUNCTION__);
-    if (changed_resp)
+    cJSON *cj_changed_resp = cJSON_CreateObject(__FUNCTION__);
+    if (cj_changed_resp)
     {
-        EZPI_cloud_modes_changed(cj_request, changed_resp);
-        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(changed_resp))
+        EZPI_cloud_modes_changed(cj_request, cj_changed_resp);
+        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_changed_resp))
         {
-            cJSON_Delete(__FUNCTION__, changed_resp);
+            cJSON_Delete(__FUNCTION__, cj_changed_resp);
         }
     }
 
@@ -378,6 +378,10 @@ void EZPI_cloud_modes_bypass_devices_removed(cJSON *cj_request, cJSON *cj_respon
 
 void EZPI_cloud_modes_changed(cJSON *cj_request, cJSON *cj_response)
 {
+    time_t now = 0;
+    time(&now);
+    cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_startTime_str, now);
+
     cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_id_str);
     cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_method_str);
 
@@ -484,24 +488,24 @@ void EZPI_cloud_modes_protect_buttons_removed(cJSON *cj_request, cJSON *cj_respo
 void EZPI_cloud_modes_protect_button_set_broadcast(cJSON *cj_request, cJSON *cj_response)
 {
     // 1. broadcast 'modes.protect.button.added'
-    cJSON *added_resp = cJSON_CreateObject(__FUNCTION__);
-    if (added_resp)
+    cJSON *cj_added_resp = cJSON_CreateObject(__FUNCTION__);
+    if (cj_added_resp)
     {
-        EZPI_cloud_modes_protect_buttons_added(cj_request, added_resp);
-        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(added_resp))
+        EZPI_cloud_modes_protect_buttons_added(cj_request, cj_added_resp);
+        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_added_resp))
         {
-            cJSON_Delete(__FUNCTION__, added_resp);
+            cJSON_Delete(__FUNCTION__, cj_added_resp);
         }
     }
 
     // 2. broadcast 'modes.protect.button.updated'
-    cJSON *updated_resp = cJSON_CreateObject(__FUNCTION__);
-    if (updated_resp)
+    cJSON *cj_updated_resp = cJSON_CreateObject(__FUNCTION__);
+    if (cj_updated_resp)
     {
-        EZPI_cloud_modes_protect_buttons_updated(cj_request, updated_resp);
-        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(updated_resp))
+        EZPI_cloud_modes_protect_buttons_updated(cj_request, cj_updated_resp);
+        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_updated_resp))
         {
-            cJSON_Delete(__FUNCTION__, updated_resp);
+            cJSON_Delete(__FUNCTION__, cj_updated_resp);
         }
     }
 

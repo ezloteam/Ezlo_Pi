@@ -1061,7 +1061,7 @@ static void __get_expressions_value(s_ezlopi_expressions_t *exp_node, cJSON *cj_
         {
             TRACE_E("cj_value type: %d", cj_value->type);
             exp_node->exp_value.type = EXPRESSION_VALUE_TYPE_CJ;
-            exp_node->exp_value.u_value.cj_value = cJSON_Duplicate(__FUNCTION__, cj_value, cJSON_True);
+            exp_node->exp_value.u_value.cj_value = cJSON_Duplicate(__FUNCTION__, cj_value, true);
             break;
         }
         default:
@@ -1306,7 +1306,7 @@ static s_ezlopi_expressions_t *__expressions_create_node(uint32_t exp_id, cJSON 
         cJSON *cj_metaData = cJSON_GetObjectItem(__FUNCTION__, cj_expression, ezlopi_metadata_str);
         if (cj_metaData)
         {
-            new_exp_node->meta_data = cJSON_Duplicate(__FUNCTION__, cj_metaData, cJSON_True);
+            new_exp_node->meta_data = cJSON_Duplicate(__FUNCTION__, cj_metaData, true);
         }
 
         new_exp_node->value_type = EZPI_core_scenes_value_get_type(cj_expression, ezlopi_valueType_str);

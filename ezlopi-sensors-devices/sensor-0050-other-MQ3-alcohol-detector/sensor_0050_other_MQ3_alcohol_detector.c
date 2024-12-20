@@ -187,7 +187,7 @@ static ezlopi_error_t __0050_init(l_ezlopi_item_t *item)
                             TaskHandle_t ezlopi_sensor_mq3_task_handle = NULL;
                             xTaskCreate(__calibrate_MQ3_R0_resistance, "Task_to_calculate_R0_air", EZLOPI_SENSOR_MQ3_TASK_DEPTH, item, 1, &ezlopi_sensor_mq3_task_handle);
 #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
-                            ezlopi_core_process_set_process_info(ENUM_EZLOPI_SENSOR_MQ3_TASK, &ezlopi_sensor_mq3_task_handle, EZLOPI_SENSOR_MQ3_TASK_DEPTH);
+                            EZPI_core_process_set_process_info(ENUM_EZLOPI_SENSOR_MQ3_TASK, &ezlopi_sensor_mq3_task_handle, EZLOPI_SENSOR_MQ3_TASK_DEPTH);
 #endif
                         }
                     }
@@ -483,7 +483,7 @@ static void __calibrate_MQ3_R0_resistance(void *params)
         }
     }
 #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
-    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SENSOR_MQ3_TASK);
+    EZPI_core_process_set_is_deleted(ENUM_EZLOPI_SENSOR_MQ3_TASK);
 #endif
     vTaskDelete(NULL);
 }

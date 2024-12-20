@@ -206,7 +206,7 @@ void EZPI_service_ws_server_stop(void)
 static ezlopi_error_t ezpi_ws_server_broadcast(char *data)
 {
     ezlopi_error_t ret = EZPI_FAILED;
-    if (__send_lock && pdTRUE == xSemaphoreTake(__send_lock, 0))
+    if (__send_lock && pdTRUE == xSemaphoreTake(__send_lock, 2000))
     {
         if (data)
         {
@@ -214,16 +214,22 @@ static ezlopi_error_t ezpi_ws_server_broadcast(char *data)
             l_ws_server_client_conn_t *curr_client = EZPI_service_ws_server_clients_get_head();
             #warning "DO NOT USE printf ON PRODUCTION"
                 // printf("%s and curr-client: %p\n", __func__, curr_client);
-
-                while (curr_client)
+                if (curr_client)
                 {
-                    ret = ezpi_ws_server_send(curr_client, data, strlen(data));
-                    if (NULL == (curr_client = curr_client->next))
+                    while (curr_client)
                     {
-                        break;
-                    }
+                        ret = ezpi_ws_server_send(curr_client, data, strlen(data));
+                        if (NULL == (curr_client = curr_client->next))
+                        {
+                            break;
+                        }
 
-                    vTaskDelay(1 / portTICK_RATE_MS);
+                        vTaskDelay(1 / portTICK_RATE_MS);
+                    }
+                }
+                else
+                {
+                    ret = EZPI_NOT_AVAILABLE;
                 }
         }
 
@@ -235,11 +241,12 @@ static ezlopi_error_t ezpi_ws_server_broadcast(char *data)
 
 static void __message_upcall(httpd_req_t *req, const char *payload, uint32_t payload_len)
 {
-    bool proceed_to_api_consume = false;
-    cJSON *cj_request = NULL;
     cJSON *cj_id = NULL;
+    cJSON *cj_request = NULL;
     cJSON *cj_sender = NULL;
     cJSON *cj_method = NULL;
+    cJSON *cj_response = NULL;
+    bool proceed_to_api_consume = false;
 
     if (!EZPI_core_offline_is_user_logged_in())
     {
@@ -253,7 +260,6 @@ static void __message_upcall(httpd_req_t *req, const char *payload, uint32_t pay
                 if (0 == strncmp(login_method, cj_method->valuestring, strlen(login_method)))
                 {
                     proceed_to_api_consume = true;
-                    cJSON_Delete(__FUNCTION__, cj_request);
                 }
             }
         }
@@ -265,41 +271,39 @@ static void __message_upcall(httpd_req_t *req, const char *payload, uint32_t pay
 
     if (proceed_to_api_consume)
     {
-        cJSON *cj_response = EZPI_core_api_consume(__FUNCTION__, payload, payload_len);
+        cj_response = EZPI_core_api_consume(__FUNCTION__, payload, payload_len);
+    }
+    else if (cj_request)
+    {
+        cj_response = cJSON_CreateObject(__FUNCTION__);
+        cj_id = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_id_str);
+        cj_sender = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_sender_str);
+        cj_method = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_method_str);
+
         if (cj_response)
         {
-            cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_msg_id_str, __message_counter);
-            ezpi_respond_cjson(req, cj_response);
-            cJSON_Delete(__FUNCTION__, cj_response);
-        }
-    }
-    else
-    {
-        if (cj_request)
-        {
-            cJSON *cj_response = cJSON_CreateObject(__FUNCTION__);
-            cj_id = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_id_str);
-            cj_sender = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_sender_str);
-            cj_method = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_method_str);
-            if (cj_response)
+            cJSON *cj_error = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_error_str);
+            cJSON_AddItemToObject(__FUNCTION__, cj_response, ezlopi_id_str, cJSON_Duplicate(__FUNCTION__, cj_id, true));
+            cJSON_AddItemToObject(__FUNCTION__, cj_response, ezlopi_sender_str, cJSON_Duplicate(__FUNCTION__, cj_sender, true));
+            cJSON_AddItemToObject(__FUNCTION__, cj_response, ezlopi_method_str, cJSON_Duplicate(__FUNCTION__, cj_method, true));
+
+            if (cj_error)
             {
-                cJSON *cj_error = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_error_str);
-                cJSON_AddItemToObject(__FUNCTION__, cj_response, ezlopi_id_str, cJSON_Duplicate(__FUNCTION__, cj_id, cJSON_True));
-                cJSON_AddItemToObject(__FUNCTION__, cj_response, ezlopi_sender_str, cJSON_Duplicate(__FUNCTION__, cj_sender, cJSON_True));
-                cJSON_AddItemToObject(__FUNCTION__, cj_response, ezlopi_method_str, cJSON_Duplicate(__FUNCTION__, cj_method, cJSON_True));
-                if (cj_error)
-                {
-                    cJSON_AddNumberToObject(__FUNCTION__, cj_error, ezlopi_code_str, -32600);
-                    cJSON_AddStringToObject(__FUNCTION__, cj_error, ezlopi_message_str, "Bad request");
-                    cJSON_AddStringToObject(__FUNCTION__, cj_error, ezlopi_data_str, "rpc.params.notfound.");
-                }
-                cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_msg_id_str, __message_counter);
-                ezpi_respond_cjson(req, cj_response);
-                cJSON_Delete(__FUNCTION__, cj_response);
-                cJSON_Delete(__FUNCTION__, cj_request);
+                cJSON_AddNumberToObject(__FUNCTION__, cj_error, ezlopi_code_str, -32600);
+                cJSON_AddStringToObject(__FUNCTION__, cj_error, ezlopi_message_str, "Bad request");
+                cJSON_AddStringToObject(__FUNCTION__, cj_error, ezlopi_data_str, "rpc.params.notfound");
             }
         }
     }
+
+    if (cj_response)
+    {
+        cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_msg_id_str, __message_counter);
+        ezpi_respond_cjson(req, cj_response);
+        cJSON_Delete(__FUNCTION__, cj_response);
+    }
+
+    cJSON_Delete(__FUNCTION__, cj_request);
 }
 
 static void ezpi_ws_async_send(void *arg)
@@ -310,7 +314,7 @@ static void ezpi_ws_async_send(void *arg)
 
     if (resp_arg)
     {
-        if (__send_lock && pdTRUE == xSemaphoreTake(__send_lock, 5000 / portTICK_RATE_MS))
+        if (__send_lock && pdTRUE == xSemaphoreTake(__send_lock, 2000))
         {
             httpd_ws_frame_t ws_pkt;
             memset(&ws_pkt, 0, sizeof(httpd_ws_frame_t));
@@ -349,7 +353,7 @@ static esp_err_t ezpi_msg_handler(httpd_req_t *req)
     esp_err_t ret = ESP_FAIL;
 #if 1 // def CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER
 
-    if (__send_lock && (pdTRUE == xSemaphoreTake(__send_lock, 5000 / portTICK_RATE_MS)))
+    if (__send_lock && (pdTRUE == xSemaphoreTake(__send_lock, 5000)))
     {
         TRACE_S("WSL: -----------------------------> acquired send-lock");
 
@@ -400,6 +404,7 @@ static esp_err_t ezpi_msg_handler(httpd_req_t *req)
                             }
                             else if (HTTPD_WS_TYPE_TEXT == ws_pkt.type)
                             {
+                                TRACE_D("payload[len: %d]:\r\n%.*s", ws_pkt.len, ws_pkt.len, (char *)ws_pkt.payload);
                                 __message_upcall(req, (char *)ws_pkt.payload, (uint32_t)ws_pkt.len);
                             }
                             else if (HTTPD_WS_TYPE_CLOSE == ws_pkt.type)
@@ -513,7 +518,7 @@ static int ezpi_respond_cjson(httpd_req_t *req, cJSON *cj_response)
         {
             memset(data_buffer, 0, buffer_len);
 
-            if (cJSON_PrintPreallocated(__FUNCTION__, cj_response, data_buffer, buffer_len, false))
+            if (true == cJSON_PrintPreallocated(__FUNCTION__, cj_response, data_buffer, buffer_len, false))
             {
                 httpd_ws_frame_t data_frame = {
                     .final = false,

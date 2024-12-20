@@ -81,7 +81,7 @@ void ezlopi_service_ota_init(void)
     // TaskHandle_t ezlopi_service_ota_process_task_handle = NULL;
     // xTaskCreate(ota_service_process, "ota-service-process", EZLOPI_SERVICE_OTA_PROCESS_TASK_DEPTH, NULL, 2, &ezlopi_service_ota_process_task_handle);
 #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
-    // ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_OTA_PROCESS_TASK, &ezlopi_service_ota_process_task_handle, EZLOPI_SERVICE_OTA_PROCESS_TASK_DEPTH);
+    // EZPI_core_process_set_process_info(ENUM_EZLOPI_SERVICE_OTA_PROCESS_TASK, &ezlopi_service_ota_process_task_handle, EZLOPI_SERVICE_OTA_PROCESS_TASK_DEPTH);
 #endif
 }
 

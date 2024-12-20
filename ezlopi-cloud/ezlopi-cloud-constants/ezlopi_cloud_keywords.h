@@ -52,6 +52,7 @@ extern "C"
     extern const char *ezlopi_ESP32S2_str;
     extern const char *ezlopi_ESP32C3_str;
     extern const char *ezlopi_ezlopi_str;
+    extern const char *ezlopi_EzloPI_str;
     extern const char *ezlopi__str;
     extern const char *ezlopi_id_str;
     extern const char *ezlopi_ids_str;
@@ -149,6 +150,7 @@ extern "C"
     extern const char *ezlopi_firmware_version_str;
     extern const char *ezlopi_uptime_str;
     extern const char *ezlopi_mac_str;
+    extern const char *ezlopi_base___mac_str;
     extern const char *ezlopi_uuid_str;
     extern const char *ezlopi_cloud_uuid_str;
     extern const char *ezlopi_config_version_str;
@@ -240,10 +242,10 @@ extern "C"
     extern const char *ezlopi_unknown_str;
     extern const char *ezlopi_manufacturer_name_str;
     extern const char *ezlopi_build_str;
-    extern     const char *ezlopi_firmware_build_str;
+    extern const char *ezlopi_firmware_build_str;
     extern const char *ezlopi_chip_str;
     extern const char *ezlopi_provisioned_status_str;
-    extern     const char *ezlopi_provisioned_str;
+    extern const char *ezlopi_provisioned_str;
     extern const char *ezlopi_model_number_str;
     extern const char *ezlopi_serial_str;
     extern const char *ezlopi_uuid_provisioning_str;
@@ -268,7 +270,6 @@ extern "C"
     extern const char *ezlopi_config_id_str;
     extern const char *ezlopi_config_time_str;
     extern const char *ezlopi_ssid_str;
-    extern const char *ezlopi_key_str;
     extern const char *ezlopi_dev_type_ezlopi_str;
     extern const char *ezlopi_flash_size_str;
     extern const char *ezlopi_dev_free_flash_str;
@@ -464,11 +465,9 @@ extern "C"
     extern const char *ezlopi_days_str;
     extern const char *ezlopi_range_str;
 
-    extern const char *ezlopi_startTime_str;
     extern const char *ezlopi_startDay_str;
     extern const char *ezlopi_startMonth_str;
     extern const char *ezlopi_startYear_str;
-    extern const char *ezlopi_endTime_str;
     extern const char *ezlopi_endDay_str;
     extern const char *ezlopi_endMonth_str;
     extern const char *ezlopi_endYear_str;
@@ -506,6 +505,42 @@ extern "C"
     extern const char *ezlopi_when_category_logic_str;
     extern const char *ezlopi_when_category_function_str;
 
+
+
+
+
+    //////////// otel keywords
+    extern const char *ezlopi_values_str;
+    extern const char *ezlopi_arrayValue_str;
+    extern const char *ezlopi_stringValue_str;
+    extern const char *ezlopi_doubleValue_str;
+    extern const char *ezlopi_boolValue_str;
+    extern const char *ezlopi_key_str;
+    extern const char *ezlopI_service___name_str;
+    extern const char *ezlopi_attributes_str;
+    extern const char *ezlopi_resource_str;
+    extern const char *ezlopi_resourceSpans_str;
+    extern const char *ezlopi_scopeSpans_str;
+    extern const char *ezlopi_scope_str;
+    extern const char *ezlopi_spans_str;
+    extern const char *ezlopi_kind_str;
+    extern const char *ezlopi_endTimeUnixNano_str;
+    extern const char *ezlopi_startTimeUnixNano_str;
+    extern const char *ezlopi_parentSpanId_str;
+    extern const char *ezlopi_spanId_str;
+    extern const char *ezlopi_traceId_str;
+    extern const char *ezlopi_startTime_str;
+    extern const char *ezlopi_endTime_str;
+    extern const char *ezlopi_logTime_str;
+    extern const char *ezlopi_severityNumber_str;
+    extern const char *ezlopi_severityText_str;
+    extern const char *ezlopi_TRACE_str;
+    extern const char *ezlopi_DEBUG_str;
+    extern const char *ezlopi_INFO_str;
+    extern const char *ezlopi_WARN_str;
+    extern const char *ezlopi_ERROR_str;
+    extern const char *ezlopi_fileName_str;
+    extern const char *ezlopi_lineNumber_str;
 
 #ifdef __cplusplus
 }

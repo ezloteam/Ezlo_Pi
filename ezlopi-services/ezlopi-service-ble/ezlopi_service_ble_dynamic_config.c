@@ -265,7 +265,7 @@ static void ezpi_dynamic_config_read_func(esp_gatt_value_t *value, esp_ble_gatts
                     cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_sequence_str, g_dynamic_config_sequence_no);
                     cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_data_str, data_buffer);
 
-                    cJSON_bool ret = cJSON_PrintPreallocated(__FUNCTION__, cj_response, (char *)value->value, 512, false);
+                    bool ret = cJSON_PrintPreallocated(__FUNCTION__, cj_response, (char *)value->value, 512, false);
                     cJSON_Delete(__FUNCTION__, cj_response);
 
                     if (true == ret)

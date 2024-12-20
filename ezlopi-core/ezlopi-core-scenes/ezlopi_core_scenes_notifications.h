@@ -63,6 +63,9 @@ extern "C"
     /*******************************************************************************
     *                          Extern Function Prototypes
     *******************************************************************************/
+    /**
+    * @brief Function to add users to scene-notification
+    */
     void EZPI_scenes_notifications_add(cJSON *cj_notifications);
     // void EZPI_scenes_notifications_remove(cJSON *cj_notifications);
 

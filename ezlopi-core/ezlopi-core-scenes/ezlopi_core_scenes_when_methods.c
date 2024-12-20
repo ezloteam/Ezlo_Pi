@@ -936,7 +936,6 @@ int EZPI_core_scenes_when_is_house_mode_alarm_phase_range(l_scenes_list_v2_t *sc
             return 0;
         }
 
-        char *phase_name = NULL;
         l_fields_v2_t *curr_field = when_block->fields;
 
         while (curr_field)
@@ -947,10 +946,10 @@ int EZPI_core_scenes_when_is_house_mode_alarm_phase_range(l_scenes_list_v2_t *sc
                 {
                     s_ezlopi_modes_t *curr_mode = EZPI_core_modes_get_custom_modes();
 
-                    phase_name = ((EZLOPI_MODES_ALARM_PHASE_IDLE == curr_mode->alarmed.phase) ? (char *)ezlopi_idle_str
-                        : (EZLOPI_MODES_ALARM_PHASE_BYPASS == curr_mode->alarmed.phase) ? (char *)ezlopi_bypass_str
-                        : (EZLOPI_MODES_ALARM_PHASE_ENTRYDELAY == curr_mode->alarmed.phase) ? (char *)ezlopi_entryDelay_str
-                        : (EZLOPI_MODES_ALARM_PHASE_MAIN == curr_mode->alarmed.phase) ? (char *)ezlopi_main_str
+                    const char *phase_name = ((EZLOPI_MODES_ALARM_PHASE_IDLE == curr_mode->alarmed.phase) ? ezlopi_idle_str
+                        : (EZLOPI_MODES_ALARM_PHASE_BYPASS == curr_mode->alarmed.phase) ? ezlopi_bypass_str
+                        : (EZLOPI_MODES_ALARM_PHASE_ENTRYDELAY == curr_mode->alarmed.phase) ? ezlopi_entryDelay_str
+                        : (EZLOPI_MODES_ALARM_PHASE_MAIN == curr_mode->alarmed.phase) ? ezlopi_main_str
                         : ezlopi_null_str);
 
                     // TRACE_D(" req_mode : %s vs mode : %s ", curr_field->field_value.u_value.value_string, phase_name);

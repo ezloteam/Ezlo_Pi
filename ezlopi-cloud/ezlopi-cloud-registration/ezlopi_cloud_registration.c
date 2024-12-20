@@ -37,6 +37,7 @@
 ** ===========================================================================
 */
 
+#include <time.h>
 #include <string.h>
 
 #include "ezlopi_util_trace.h"
@@ -143,9 +144,15 @@ static void EZPI_create_reg_packet(void)
 
 static void EZPI_reg_loop(void *arg)
 {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
     TRACE_D("reg-loop");
+#endif
+
     ezlopi_error_t reg_event = EZPI_core_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 0, false);
+
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
     TRACE_D("reg-event: %d", reg_event);
+#endif
 
     if (reg_event != ESP_OK)
     {
@@ -154,9 +161,15 @@ static void EZPI_reg_loop(void *arg)
         cJSON *cj_register_dup = cJSON_CreateObjectReference(__FUNCTION__, cj_reg_data->child);
         if (cj_register_dup)
         {
+            time_t now = 0;
+            time(&now);
+            cJSON_AddNumberToObject(__FUNCTION__, cj_register_dup, ezlopi_startTime_str, now);
+
             if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_register_dup))
             {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                 TRACE_E("Error adding to broadcast queue!");
+#endif
                 cJSON_Delete(__FUNCTION__, cj_register_dup);
             }
         }

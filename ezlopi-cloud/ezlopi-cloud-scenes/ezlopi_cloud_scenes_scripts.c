@@ -104,7 +104,7 @@ void EZPI_scenes_scripts_get(cJSON *cj_request, cJSON *cj_response)
                 {
                     if (script_id_num == script_nodes->id)
                     {
-                        cJSON_AddItemToObject(__FUNCTION__, cj_result, ezlopi__id_str, cJSON_Duplicate(__FUNCTION__, cj_script_id, cJSON_True));
+                        cJSON_AddItemToObject(__FUNCTION__, cj_result, ezlopi__id_str, cJSON_Duplicate(__FUNCTION__, cj_script_id, true));
                         cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_name_str, script_nodes->name);
                         cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_code_str, script_nodes->code);
 

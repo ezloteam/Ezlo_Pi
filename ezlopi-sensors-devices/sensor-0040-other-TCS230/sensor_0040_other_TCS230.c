@@ -199,7 +199,7 @@ static ezlopi_error_t __0040_init(l_ezlopi_item_t *item)
                     // activate a task to calibrate data
                     xTaskCreate(__tcs230_calibration_task, "TCS230_Calibration_Task", EZLOPI_SENSOR_TCS230_CALLIBRATION_TASK_DEPTH, item, 1, &ezlopi_sensor_tcs230_callibration_task_handle);
 #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
-                    ezlopi_core_process_set_process_info(ENUM_EZLOPI_SENSOR_TCS230_CALLIBRATION_TASK, &ezlopi_sensor_tcs230_callibration_task_handle, EZLOPI_SENSOR_TCS230_CALLIBRATION_TASK_DEPTH);
+                    EZPI_core_process_set_process_info(ENUM_EZLOPI_SENSOR_TCS230_CALLIBRATION_TASK, &ezlopi_sensor_tcs230_callibration_task_handle, EZLOPI_SENSOR_TCS230_CALLIBRATION_TASK_DEPTH);
 #endif
                     ret = EZPI_SUCCESS;
                 }
@@ -343,7 +343,7 @@ static void __tcs230_calibration_task(void *params) // calibration task
         }
     }
 #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
-    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SENSOR_TCS230_CALLIBRATION_TASK);
+    EZPI_core_process_set_is_deleted(ENUM_EZLOPI_SENSOR_TCS230_CALLIBRATION_TASK);
 #endif
     vTaskDelete(NULL);
 }

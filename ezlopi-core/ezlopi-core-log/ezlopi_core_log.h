@@ -45,7 +45,7 @@
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_UTIL_TRACE_EN
-
+#include "ezlopi_util_trace.h"
 #include "ezlopi_core_errors.h"
 
 #include <stdbool.h>
@@ -60,17 +60,7 @@ extern "C"
 
     /*******************************************************************************
     *                          Type & Macro Declarations
-    *******************************************************************************/
-    typedef enum {
-        ENUM_EZLOPI_LOG_SEVERITY_NONE = 0,
-        ENUM_EZLOPI_LOG_SEVERITY_ERROR,
-        ENUM_EZLOPI_LOG_SEVERITY_WARNING,
-        ENUM_EZLOPI_LOG_SEVERITY_INFO,
-        ENUM_EZLOPI_LOG_SEVERITY_DEBUG,
-        ENUM_EZLOPI_LOG_SEVERITY_TRACE,
-        ENUM_EZLOPI_LOG_SEVERITY_MAX,
-    }e_ezlopi_log_severity_t;
-
+    *******************************************************************************/  
 
     /*******************************************************************************
     *                          Extern Data Declarations
@@ -89,7 +79,7 @@ extern "C"
      *
      * @param severity Target servertiy
      */
-    void EZPI_core_read_set_log_severities_internal(e_ezlopi_log_severity_t severity);
+    void EZPI_core_read_set_log_severities_internal(e_trace_severity_t severity);
     /**
      * @brief Function to  send logs everity
      *
@@ -104,7 +94,7 @@ extern "C"
      * @param severity_level_id Target severity lvl
      * @return ezlopi_error_t
      */
-    ezlopi_error_t EZPI_core_cloud_log_severity_process_id(const e_ezlopi_log_severity_t severity_level_id);
+    ezlopi_error_t EZPI_core_cloud_log_severity_process_id(const e_trace_severity_t severity_level_id);
     /**
      * @brief Function to get severity values
      *
@@ -120,9 +110,9 @@ extern "C"
     /**
      * @brief Function to get curr severity enum val
      *
-     * @return e_ezlopi_log_severity_t
+     * @return e_trace_severity_t
      */
-    e_ezlopi_log_severity_t EZPI_core_cloud_log_get_current_severity_enum_val();
+    e_trace_severity_t EZPI_core_cloud_log_get_current_severity_enum_val();
     /**
      * @brief Function to send-cloud log severity info
      *
@@ -149,7 +139,7 @@ extern "C"
      * @param severity_level_id src severity lvl
      * @return ezlopi_error_t
      */
-    ezlopi_error_t EZPI_core_serial_log_severity_process_id(const e_ezlopi_log_severity_t severity_level_id);
+    ezlopi_error_t EZPI_core_serial_log_severity_process_id(const e_trace_severity_t severity_level_id);
     /**
      * @brief Function to get current cloud log-severity str
      *
@@ -159,9 +149,9 @@ extern "C"
     /**
      * @brief Function to get current serial log-severity str
      *
-     * @return e_ezlopi_log_severity_t
+     * @return e_trace_severity_t
      */
-    e_ezlopi_log_severity_t EZPI_core_serial_log_get_current_severity_enum_val();
+    e_trace_severity_t EZPI_core_serial_log_get_current_severity_enum_val();
 
 
 #ifdef __cplusplus

@@ -42,6 +42,9 @@
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+#include "ezlopi_core_scenes_print.h"
+
+#if ENABLE_SCENES_PRINT
 
 // #include "ezlopi_util_trace.h"
 
@@ -50,8 +53,6 @@
 #include "ezlopi_core_cjson_macros.h"
 
 #include "ezlopi_cloud_constants.h"
-
-#include "ezlopi_core_scenes_print.h"
 
 /*******************************************************************************
 *                          Extern Data Declarations
@@ -433,6 +434,7 @@ void EZPI_scenes_print(l_scenes_list_v2_t *scene_link_list)
 *                         Static Function Definitions
 *******************************************************************************/
 
+#endif // ENABLE_SCENES_PRINT
 #endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 /*******************************************************************************
 *                          End of File

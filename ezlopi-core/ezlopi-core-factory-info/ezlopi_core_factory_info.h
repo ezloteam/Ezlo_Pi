@@ -518,24 +518,24 @@ extern "C"
     int EZPI_core_factory_info_v3_set_ssl_private_key(cJSON *cj_data);
     /**
      * @brief Function to free factory info
-     * 
-     * @param arg 
+     *
+     * @param arg
      */
     void EZPI_core_factory_info_v3_free(void *arg);
     /**
      * @brief Function to reset of factory info
-     * 
-     * @return ezlopi_error_t 
+     *
+     * @return ezlopi_error_t
      */
     ezlopi_error_t EZPI_core_factory_info_v3_factory_reset(void);
     /**
-     * @brief Function to softreset the sysytem 
-     * 
-     * @return int 
+     * @brief Function to softreset the sysytem
+     *
+     * @return int
      */
     int EZPI_core_factory_info_v3_scenes_factory_soft_reset(void);
 
-    // int EZPI_CORE_factory_info_prov_init(void);
+    // int EZPI_core_factory_info_prov_init(void);
 
 #ifdef __cplusplus
 }

@@ -36,12 +36,17 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
+#ifndef __EZLOPI_CLOUD_KEYWORDS_H__
+#define __EZLOPI_CLOUD_KEYWORDS_H__
+
+#include "stdio.h"
 
 const char *ezlopi_ESP32_str = "ESP32";
 const char *ezlopi_ESP32S3_str = "ESP32S3";
 const char *ezlopi_ESP32S2_str = "ESP32S2";
 const char *ezlopi_ESP32C3_str = "ESP32C3";
 const char *ezlopi_ezlopi_str = "ezlopi";
+const char *ezlopi_EzloPI_str = "EzloPI";
 const char *ezlopi__str = "";
 const char *ezlopi_id_str = "id";
 const char *ezlopi_ids_str = "ids";
@@ -141,6 +146,7 @@ const char *ezlopi_null_str = "null";
 const char *ezlopi_firmware_version_str = "firmware_version";
 const char *ezlopi_uptime_str = "uptime";
 const char *ezlopi_mac_str = "mac";
+const char *ezlopi_base___mac_str = "base.mac";
 const char *ezlopi_uuid_str = "uuid";
 const char *ezlopi_cloud_uuid_str = "cloud_uuid";
 const char *ezlopi_config_version_str = "config_version";
@@ -257,7 +263,6 @@ const char *ezlopi_ca_cert_str = "ca_cert";
 const char *ezlopi_config_id_str = "config_id";
 const char *ezlopi_config_time_str = "config_time";
 const char *ezlopi_ssid_str = "ssid";
-const char *ezlopi_key_str = "key";
 const char *ezlopi_dev_type_ezlopi_str = "dev_type_ezlopi";
 const char *ezlopi_flash_size_str = "flash_size";
 const char *ezlopi_dev_free_flash_str = "dev_free_flash";
@@ -415,6 +420,39 @@ const char *ezlopi_chipset_str = "chipset";
 const char *ezlopi_internet_str = "internet";
 const char *ezlopi_local_key_str = "local_key";
 
+////////////////// otel keywords
+const char *ezlopi_values_str = "values";
+const char *ezlopi_arrayValue_str = "arrayValue";
+const char *ezlopi_stringValue_str = "stringValue";
+const char *ezlopi_doubleValue_str = "doubleValue";
+const char *ezlopi_boolValue_str = "boolValue";
+const char *ezlopi_key_str = "key";
+const char *ezlopI_service___name_str = "service.name";
+const char *ezlopi_attributes_str = "attributes";
+const char *ezlopi_resource_str = "resource";
+const char *ezlopi_resourceSpans_str = "resourceSpans";
+const char *ezlopi_scopeSpans_str = "scopeSpans";
+const char *ezlopi_scope_str = "scope";
+const char *ezlopi_spans_str = "spans";
+const char *ezlopi_kind_str = "kind";
+const char *ezlopi_endTimeUnixNano_str = "endTimeUnixNano";
+const char *ezlopi_startTimeUnixNano_str = "startTimeUnixNano";
+const char *ezlopi_parentSpanId_str = "parentSpanId";
+const char *ezlopi_spanId_str = "spanId";
+const char *ezlopi_traceId_str = "traceId";
+const char *ezlopi_startTime_str = "startTime";
+const char *ezlopi_endTime_str = "endTime";
+const char *ezlopi_logTime_str = "logTime";
+const char *ezlopi_severityNumber_str = "severityNumber";
+const char *ezlopi_severityText_str = "severityText";
+const char *ezlopi_TRACE_str = "TRACE";
+const char *ezlopi_DEBUG_str = "DEBUG";
+const char *ezlopi_INFO_str = "INFO";
+const char *ezlopi_WARN_str = "WARN";
+const char *ezlopi_ERROR_str = "ERROR";
+const char *ezlopi_fileName_str = "fileName";
+const char *ezlopi_lineNumber_str = "lineNumber";
+
 const char *ezlopi_fwTimestampMs_str = "fwTimestampMs";
 const char *ezlopi_followEntry_str = "followEntry";
 const char *ezlopi_packageId_str = "packageId";
@@ -451,11 +489,9 @@ const char *ezlopi_days_str = "days";
 const char *ezlopi_weeks_str = "weeks";
 const char *ezlopi_range_str = "range";
 
-const char *ezlopi_startTime_str = "startTime";
 const char *ezlopi_startDay_str = "startDay";
 const char *ezlopi_startMonth_str = "startMonth";
 const char *ezlopi_startYear_str = "startYear";
-const char *ezlopi_endTime_str = "endTime";
 const char *ezlopi_endDay_str = "endDay";
 const char *ezlopi_endMonth_str = "endMonth";
 const char *ezlopi_endYear_str = "endYear";
@@ -492,7 +528,7 @@ const char *ezlopi_when_category_modes_str = "when_category_modes";
 const char *ezlopi_when_category_logic_str = "when_category_logic";
 const char *ezlopi_when_category_function_str = "when_category_function";
 
-
+#endif // __EZLOPI_CLOUD_KEYWORDS_H__
 /*******************************************************************************
  *                          End of File
  *******************************************************************************/

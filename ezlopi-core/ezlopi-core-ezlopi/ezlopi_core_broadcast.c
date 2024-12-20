@@ -39,6 +39,7 @@
 /*******************************************************************************
 *                          Include Files
 *******************************************************************************/
+#include <time.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
@@ -141,13 +142,6 @@ ezlopi_error_t EZPI_core_broadcast_cjson(cJSON *cj_data)
 
     if (cj_data)
     {
-        // char * tmp = cJSON_PrintUnformatted(__FUNCTION__, cj_data);
-        // if (tmp)
-        // {
-        //     printf("\n ### %s[%d] ; cj_data : ### \n ### \n %s \n ### \n\n", __FILE__, __LINE__, tmp);
-        //     free(tmp);
-        // }
-
         uint32_t buffer_len = 0;
 
         TRACE_I("%d -> -----------------------------> waiting for static buffer!", xTaskGetTickCount());
@@ -161,7 +155,7 @@ ezlopi_error_t EZPI_core_broadcast_cjson(cJSON *cj_data)
 
             if (true == cJSON_PrintPreallocated(__FUNCTION__, cj_data, data_buffer, buffer_len, false))
             {
-                // TRACE_D("----------------- broadcasting: \n%s", data_buffer);
+                // printf("----------------- broadcasting: \n%s\r\n", data_buffer);
                 ret = __call_broadcast_methods(data_buffer);
             }
 
@@ -254,6 +248,9 @@ static ezlopi_error_t __call_broadcast_methods(char *data)
 
     while (curr_method)
     {
+        time_t start_time;
+        time(&start_time);
+
         if (curr_method->func)
         {
             ret = EZPI_SUCCESS;
@@ -269,11 +266,21 @@ static ezlopi_error_t __call_broadcast_methods(char *data)
                     ret = EZPI_SUCCESS;
                     break;
                 }
+                else
+                {
+                    ret = EZPI_NOT_AVAILABLE;
+                    break;
+                }
 
                 vTaskDelay(5 / portTICK_RATE_MS);
 
             } while (retries--);
         }
+
+        time_t end_time;
+        time(&end_time);
+
+        TRACE_W("Broadcast method '%s' took %lu", curr_method->method_name ? curr_method->method_name : "--", end_time - start_time);
 
         curr_method = curr_method->next;
     }

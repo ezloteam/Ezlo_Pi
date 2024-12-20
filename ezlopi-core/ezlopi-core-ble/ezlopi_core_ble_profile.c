@@ -226,7 +226,8 @@ s_gatt_service_t *EZPI_core_ble_gatt_create_service(uint16_t app_id, esp_bt_uuid
         memcpy(&service_obj->service_id.id.uuid, service_uuid, sizeof(esp_bt_uuid_t));
         EZPI_core_ble_gatt_service_append_to_head(service_obj);
     }
-#if (1 == ENABLE_TRACE)
+
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
     else
     {
         TRACE_E("Failed to create gatt-service!");
@@ -256,7 +257,8 @@ s_gatt_char_t *EZPI_core_ble_gatt_add_characteristic(s_gatt_service_t *service_o
             EZPI_core_ble_gatt_append_characterstic_to_service(service_obj, character_object);
             service_obj->num_handles += 2;
         }
-#if (1 == ENABLE_TRACE)
+
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
         else
         {
             TRACE_E("Failed to create gatt-characteristic!");
@@ -302,7 +304,7 @@ s_gatt_descr_t *EZPI_core_ble_gatt_add_descriptor(s_gatt_char_t *charcteristic, 
             }
         }
 
-#if (1 == ENABLE_TRACE)
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
         else
         {
             TRACE_E("Failed to create gatt-descriptor!");

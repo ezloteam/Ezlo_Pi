@@ -51,6 +51,7 @@ extern "C"
 
 #define EZPI_SUCCESS 0
 #define EZPI_FAILED -1
+#define EZPI_NOT_AVAILABLE -2
     // NVS Related errors
 #define EZPI_ERR_NVS_INIT_FAILED 0x00000001
 // Not implemented

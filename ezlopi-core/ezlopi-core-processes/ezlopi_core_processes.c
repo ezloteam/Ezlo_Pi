@@ -131,7 +131,7 @@ int ezlopi_core_get_processes_details(cJSON *cj_processes_array)
     return ret;
 }
 
-int ezlopi_core_process_set_process_info(e_ezlopi_task_enum_t task_num, TaskHandle_t *task_handle, size_t task_depth)
+int EZPI_core_process_set_process_info(e_ezlopi_task_enum_t task_num, TaskHandle_t *task_handle, size_t task_depth)
 {
     int ret = 0;
     if (task_handle && *task_handle)
@@ -144,7 +144,7 @@ int ezlopi_core_process_set_process_info(e_ezlopi_task_enum_t task_num, TaskHand
     return ret;
 }
 
-int ezlopi_core_process_set_is_deleted(e_ezlopi_task_enum_t task_num)
+int EZPI_core_process_set_is_deleted(e_ezlopi_task_enum_t task_num)
 {
     int ret = 0;
     if (ezlopi_task_info_array[task_num].task_handle)

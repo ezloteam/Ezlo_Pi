@@ -108,18 +108,14 @@ static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 
 static ezlopi_error_t __init(l_ezlopi_item_t *item)
 {
-    printf("HERE0\n");
     ezlopi_error_t ret = EZPI_ERR_INIT_DEVICE_FAILED;
     if ((item) && (item->interface.onewire_master.enable))
     {
-        printf("HERE1\n");
         if (GPIO_IS_VALID_GPIO(item->interface.onewire_master.onewire_pin) &&
             ds18b20_reset_line(item->interface.onewire_master.onewire_pin))
         {
-            printf("HERE2\n");
             if (ds18b20_recognize_device(item->interface.onewire_master.onewire_pin))
             {
-                printf("HERE3\n");
                 double *temperature_prev_value = (double *)item->user_arg;
                 TRACE_D("Providing initial settings to DS18B20");
                 ds18b20_write_to_scratchpad(DS18B20_TH_HIGHER_THRESHOLD, DS18B20_TL_LOWER_THRESHOLD, 12, item->interface.onewire_master.onewire_pin);

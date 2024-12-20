@@ -161,6 +161,7 @@ void EZPI_core_ble_gap_config_adv_data(void)
     // adv_data.service_uuid_len = all_service_uuid_len;
 
     esp_err_t ret = esp_ble_gap_config_adv_data(&adv_data);
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
     if (ESP_OK == ret)
     {
         // TRACE_S("Adv-data set complete");
@@ -169,6 +170,7 @@ void EZPI_core_ble_gap_config_adv_data(void)
     {
         TRACE_E("config adv data failed, error code = %x", ret);
     }
+#endif
 
     adv_config_done |= ADV_CONFIG_FLAG;
 }
@@ -184,6 +186,7 @@ void EZPI_core_ble_gap_config_scan_rsp_data(void)
     // scan_rsp_data.service_uuid_len = all_service_uuid_len;
 
     esp_err_t ret = esp_ble_gap_config_adv_data(&scan_rsp_data);
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
     if (ret)
     {
         TRACE_E("config scan response data failed, error code = %x", ret);
@@ -192,6 +195,7 @@ void EZPI_core_ble_gap_config_scan_rsp_data(void)
     {
         TRACE_S("Scan response set complete");
     }
+#endif
     adv_config_done |= SCAN_RSP_CONFIG_FLAG;
 }
 
@@ -203,9 +207,10 @@ void EZPI_core_ble_gap_dissociate_bonded_devices(void)
     if (dev_list)
     {
         esp_ble_get_bond_device_list(&dev_num, dev_list);
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
         TRACE_S("Bonded devices number : %d", dev_num);
-
         TRACE_S("Bonded devices list : %d", dev_num);
+#endif
         for (int i = 0; i < dev_num; i++)
         {
             // dump("dev_list[i].bd_addr", dev_list[i].bd_addr, 0, sizeof(esp_bd_addr_t));
@@ -228,26 +233,30 @@ void EZPI_core_ble_setup_adv_config(void)
     adv_data.service_uuid_len = all_service_uuid_len;
 
     esp_err_t ret = esp_ble_gap_config_adv_data(&adv_data);
-    if (ret)
-    {
-        TRACE_E("config adv data failed, error code = %x", ret);
-    }
-    else
+    if (!ret)
     {
         adv_config_done |= ADV_CONFIG_FLAG;
     }
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
+    else
+    {
+        TRACE_E("config adv data failed, error code = %x", ret);
+    }
+#endif
 
     scan_rsp_data.p_service_uuid = all_service_uuid;
     scan_rsp_data.service_uuid_len = all_service_uuid_len;
     ret = esp_ble_gap_config_adv_data(&scan_rsp_data);
-    if (ret)
-    {
-        TRACE_E("config adv data failed, error code = %x", ret);
-    }
-    else
+    if (!ret)
     {
         adv_config_done |= SCAN_RSP_CONFIG_FLAG;
     }
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
+    else
+    {
+        TRACE_E("config adv data failed, error code = %x", ret);
+    }
+#endif
 }
 
 void EZPI_core_ble_gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t *param)
@@ -273,6 +282,7 @@ void EZPI_core_ble_gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_c
         }
         break;
     }
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
     case ESP_GAP_BLE_ADV_START_COMPLETE_EVT: // 6
     {
         // advertising start complete event to indicate advertising start successfully or failed
@@ -286,6 +296,7 @@ void EZPI_core_ble_gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_c
         }
         break;
     }
+#endif
 
 #if (1 == CONFIG_EZPI_BLE_ENALBE_PAIRING)
     case ESP_GAP_BLE_PASSKEY_REQ_EVT: // 12
@@ -301,7 +312,6 @@ void EZPI_core_ble_gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_c
     case ESP_GAP_BLE_NC_REQ_EVT: // 16
     {
         esp_ble_confirm_reply(param->ble_security.ble_req.bd_addr, true);
-        // TRACE_S("ESP_GAP_BLE_NC_REQ_EVT, the passkey Notify number: %d", param->ble_security.key_notif.passkey);
         break;
     }
     case ESP_GAP_BLE_SEC_REQ_EVT: // 10
@@ -309,33 +319,38 @@ void EZPI_core_ble_gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_c
         esp_ble_gap_security_rsp(param->ble_security.ble_req.bd_addr, true);
         break;
     }
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
     case ESP_GAP_BLE_PASSKEY_NOTIF_EVT: // 11
     {
-        // TRACE_S("The passkey Notify number:%06d", param->ble_security.key_notif.passkey);
         break;
     }
     case ESP_GAP_BLE_KEY_EVT: // 9
     {
-        // TRACE_S("key type = %s", esp_key_type_to_str(param->ble_security.ble_key.key_type));
         break;
     }
+#endif
     case ESP_GAP_BLE_AUTH_CMPL_EVT: // 8
     {
         esp_bd_addr_t bd_addr;
         memcpy(bd_addr, param->ble_security.auth_cmpl.bd_addr, sizeof(esp_bd_addr_t));
         // dump("remote BD_ADDR", bd_addr, 0, 6);
         // TRACE_I("address type = %d", param->ble_security.auth_cmpl.addr_type);
+        TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_INFO, "BLE: '%2X-%2X-%2X-%2X-%2X-%2X' connected!", bd_addr[0], bd_addr[1], bd_addr[2], bd_addr[3], bd_addr[4], bd_addr[5]);
         if (!param->ble_security.auth_cmpl.success)
         {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
             TRACE_W("pair status = fail");
             TRACE_W("fail reason = 0x%x", param->ble_security.auth_cmpl.fail_reason);
+#endif
             esp_ble_gap_disconnect(bd_addr);
         }
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
         else
         {
             TRACE_S("pair status = success");
             TRACE_S("auth mode =  %s", esp_auth_req_to_str(param->ble_security.auth_cmpl.auth_mode));
         }
+#endif
 #if (1 == ENABLE_TRACE)
         show_bonded_devices();
 #endif // 1 == ENABLE_TRACE
@@ -343,14 +358,19 @@ void EZPI_core_ble_gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_c
     }
     case ESP_GAP_BLE_REMOVE_BOND_DEV_COMPLETE_EVT: // 23
     {
+        uint8_t* client_mac = param->remove_bond_dev_cmpl.bd_addr;
+        TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_INFO, "BLE: '%2X-%2X-%2X-%2X-%2X-%2X' dis-connected!", client_mac[0], client_mac[1], client_mac[2], client_mac[3], client_mac[4], client_mac[5]);
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
         TRACE_I("ESP_GAP_BLE_REMOVE_BOND_DEV_COMPLETE_EVT status = %d", param->remove_bond_dev_cmpl.status);
         TRACE_I("ESP_GAP_BLE_REMOVE_BOND_DEV");
         TRACE_I("-----ESP_GAP_BLE_REMOVE_BOND_DEV----");
         // dump("bd_adrr", param->remove_bond_dev_cmpl.bd_addr, 0, sizeof(esp_bd_addr_t));
         TRACE_I("------------------------------------");
+#endif
         break;
     }
 #endif
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
     case ESP_GAP_BLE_ADV_STOP_COMPLETE_EVT: // 17
     {
         if (param->adv_stop_cmpl.status != ESP_BT_STATUS_SUCCESS)
@@ -363,8 +383,10 @@ void EZPI_core_ble_gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_c
         }
         break;
     }
+#endif
     case ESP_GAP_BLE_UPDATE_CONN_PARAMS_EVT: // 20
     {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
         TRACE_S("update connection params status = %d, min_int = %d, max_int = %d,conn_int = %d,latency = %d, timeout = %d",
             param->update_conn_params.status,
             param->update_conn_params.min_int,
@@ -373,6 +395,7 @@ void EZPI_core_ble_gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_c
             param->update_conn_params.latency,
             param->update_conn_params.timeout);
         EZPI_core_ble_setup_adv_config();
+#endif
         break;
     }
 #if (1 == CONFIG_EZPI_BLE_ENALBE_PAIRING)
@@ -421,7 +444,9 @@ void EZPI_core_ble_gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_c
 
     default:
     {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
         TRACE_W("BLE GAP Event: %s Not Implemented!", EZPI_core_ble_gap_event_to_str(event));
+#endif
         break;
     }
     }

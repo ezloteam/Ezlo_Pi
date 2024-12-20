@@ -37,6 +37,8 @@
  ** ===========================================================================
  */
 
+#include <time.h>
+
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/queue.h"
@@ -49,6 +51,7 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "ezlopi_service_loop.h"
+#include "ezlopi_service_otel.h"
 #include "ezlopi_service_broadcast.h"
 
  /*******************************************************************************
@@ -91,11 +94,54 @@ static void __broadcast_loop(void *arg)
 
     if (cj_data)
     {
-        if ((xTaskGetTickCount() - broadcast_wait_start) > 1000 / portTICK_RATE_MS)
+        if ((xTaskGetTickCount() - broadcast_wait_start) > 5 / portTICK_RATE_MS)
         {
+            cJSON *cj_startTime = cJSON_DetachItemFromObject(__FUNCTION__, cj_data, ezlopi_startTime_str);
+            cJSON *cj_method_dup = cJSON_Duplicate(__FUNCTION__, cJSON_GetObjectItem(__FUNCTION__, cj_data, ezlopi_method_str), true);
+            cJSON *cj_msg_subclass_dup = cJSON_Duplicate(__FUNCTION__, cJSON_GetObjectItem(__FUNCTION__, cj_data, ezlopi_msg_subclass_str), true);
+
             EZPI_core_broadcast_cjson(cj_data);
             cJSON_Delete(__FUNCTION__, cj_data);
             cj_data = NULL;
+
+#if 1
+            if (cj_method_dup || cj_msg_subclass_dup)
+            {
+                cJSON *cj_trace_telemetry = cJSON_CreateObject(__FUNCTION__);
+                if (cj_trace_telemetry)
+                {
+                    time_t now = 0;
+
+                    if (false == cJSON_AddItemToObject(__FUNCTION__, cj_trace_telemetry, ezlopi_method_str, cj_method_dup))
+                    {
+                        cJSON_Delete(__FUNCTION__, cj_method_dup);
+                    }
+
+                    if (false == cJSON_AddItemToObject(__FUNCTION__, cj_trace_telemetry, ezlopi_msg_subclass_str, cj_msg_subclass_dup))
+                    {
+                        cJSON_Delete(__FUNCTION__, cj_method_dup);
+                    }
+
+                    cJSON_AddNumberToObject(__FUNCTION__, cj_trace_telemetry, ezlopi_kind_str, 1);
+                    cJSON_AddNumberToObject(__FUNCTION__, cj_trace_telemetry, ezlopi_startTime_str, cj_startTime ? cj_startTime->valuedouble : 0);
+
+                    time(&now);
+                    cJSON_AddNumberToObject(__FUNCTION__, cj_trace_telemetry, ezlopi_endTime_str, now);
+
+                    if (0 == ezlopi_service_otel_add_trace_to_telemetry_queue(cj_trace_telemetry))
+                    {
+                        cJSON_Delete(__FUNCTION__, cj_trace_telemetry);
+                    }
+                }
+                else
+                {
+                    cJSON_Delete(__FUNCTION__, cj_method_dup);
+                    cJSON_Delete(__FUNCTION__, cj_msg_subclass_dup);
+                }
+            }
+
+            cJSON_Delete(__FUNCTION__, cj_startTime);
+#endif
         }
     }
     else

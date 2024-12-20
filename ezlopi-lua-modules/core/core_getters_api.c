@@ -315,9 +315,13 @@ static int __create_lua_table_for_item(lua_State *lua_state, l_ezlopi_item_t *it
                 switch (cj_value->type)
                 {
                 case cJSON_True:
+                {
+                    lua_create_table_bool_key_value(ezlopi_value_str, true);
+                    break;
+                }
                 case cJSON_False:
                 {
-                    lua_create_table_bool_key_value(ezlopi_value_str, cj_value->valuedouble ? true : false);
+                    lua_create_table_bool_key_value(ezlopi_value_str, false);
                     break;
                 }
                 case cJSON_Number:

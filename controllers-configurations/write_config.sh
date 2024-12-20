@@ -6,7 +6,7 @@ get_idf
 helpFunction()
 {
    echo ""
-   echo "Usage: $0 -p /dev/ttyUSBx -a 0x19000 -f $0/config.bin"
+   echo "Usage: $0 -p /dev/ttyUSBx -a 0x19000 -f ./controllers-configurations/config.json"
    echo -e "\t-p \t usb-port, eg. for most cases it is '/dev/ttyUSB0'"
    echo -e "\t-a \t address of flash from where the reading should start"
    echo -e "\t-f \t file name to store read binary data, Normally controller serial number (i.e. 105200657.bin)"

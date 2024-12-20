@@ -96,7 +96,6 @@
 #define PING_FLAGS_INIT (1 << 0)
 #define PING_FLAGS_START (1 << 1)
 
-
 typedef struct
 {
     int sock;
@@ -128,7 +127,7 @@ static esp_err_t __ping_send(esp_ping_t *ep);
 static int __ping_receive(esp_ping_t *ep, uint32_t a_timeout);
 static void __ping_loop(void *arg);
 static esp_err_t __ping_send(esp_ping_t *ep);
-static void __ping_thread(void *args);
+// static void __ping_thread(void *args);
 
 /*******************************************************************************
 *                          Static Data Definitions
@@ -142,8 +141,7 @@ const static char *TAG = "ping_sock";
 /*******************************************************************************
 *                          Extern Function Definitions
 *******************************************************************************/
-
-esp_err_t ezlopi_ping_new_session(const ezlopi_ping_config_t *config, const ezlopi_ping_callbacks_t *cbs, esp_ping_handle_t *hdl_out)
+esp_err_t EZPI_ping_new_session(const ezlopi_ping_config_t *config, const ezlopi_ping_callbacks_t *cbs, esp_ping_handle_t *hdl_out)
 {
     esp_ping_t *ep = NULL;
     esp_err_t ret = ESP_FAIL;
@@ -166,9 +164,9 @@ esp_err_t ezlopi_ping_new_session(const ezlopi_ping_config_t *config, const ezlo
     PING_CHECK(xReturned == pdTRUE, "create ping task failed", err, ESP_ERR_NO_MEM);
 #endif
 
+
     /* callback functions */
-    if (cbs)
-    {
+    if (cbs) {
         ep->cb_args = cbs->cb_args;
         ep->on_ping_end = cbs->on_ping_end;
         ep->on_ping_timeout = cbs->on_ping_timeout;
@@ -187,8 +185,7 @@ esp_err_t ezlopi_ping_new_session(const ezlopi_ping_config_t *config, const ezlo
     ep->packet_hdr->id = ((uint32_t)ep->ping_task_hdl) & 0xFFFF;
     /* fill the additional data buffer with some data */
     char *d = (char *)(ep->packet_hdr) + sizeof(struct icmp_echo_hdr);
-    for (uint32_t i = 0; i < config->data_size; i++)
-    {
+    for (uint32_t i = 0; i < config->data_size; i++) {
         d[i] = 'A' + i;
     }
 
@@ -197,28 +194,23 @@ esp_err_t ezlopi_ping_new_session(const ezlopi_ping_config_t *config, const ezlo
 #if CONFIG_LWIP_IPV6
         || ip6_addr_isipv4mappedipv6(ip_2_ip6(&config->target_addr))
 #endif
-        )
-    {
+        ) {
         ep->sock = socket(AF_INET, SOCK_RAW, IP_PROTO_ICMP);
     }
 #if CONFIG_LWIP_IPV6
-    else
-    {
+    else {
         ep->sock = socket(AF_INET6, SOCK_RAW, IP6_NEXTH_ICMP6);
     }
 #endif
     PING_CHECK(ep->sock > 0, "create socket failed: %d", err, ESP_FAIL, ep->sock);
     /* set if index */
-    if (config->interface)
-    {
+    if (config->interface) {
         struct ifreq iface;
-        if (netif_index_to_name(config->interface, iface.ifr_name) == NULL)
-        {
+        if (netif_index_to_name(config->interface, iface.ifr_name) == NULL) {
             TRACE_E(TAG, "fail to find interface name with netif index %d", config->interface);
             goto err;
         }
-        if (setsockopt(ep->sock, SOL_SOCKET, SO_BINDTODEVICE, &iface, sizeof(iface)) != 0)
-        {
+        if (setsockopt(ep->sock, SOL_SOCKET, SO_BINDTODEVICE, &iface, sizeof(iface)) != 0) {
             TRACE_E(TAG, "fail to setsockopt SO_BINDTODEVICE");
             goto err;
         }
@@ -236,16 +228,14 @@ esp_err_t ezlopi_ping_new_session(const ezlopi_ping_config_t *config, const ezlo
     setsockopt(ep->sock, IPPROTO_IP, IP_TTL, &config->ttl, sizeof(config->ttl));
 
     /* set socket address */
-    if (IP_IS_V4(&config->target_addr))
-    {
+    if (IP_IS_V4(&config->target_addr)) {
         struct sockaddr_in *to4 = (struct sockaddr_in *)&ep->target_addr;
         to4->sin_family = AF_INET;
         inet_addr_from_ip4addr(&to4->sin_addr, ip_2_ip4(&config->target_addr));
         ep->packet_hdr->type = ICMP_ECHO;
     }
 #if CONFIG_LWIP_IPV6
-    if (IP_IS_V6(&config->target_addr))
-    {
+    if (IP_IS_V6(&config->target_addr)) {
         struct sockaddr_in6 *to6 = (struct sockaddr_in6 *)&ep->target_addr;
         to6->sin6_family = AF_INET6;
         inet6_addr_from_ip6addr(&to6->sin6_addr, ip_2_ip6(&config->target_addr));
@@ -256,18 +246,14 @@ esp_err_t ezlopi_ping_new_session(const ezlopi_ping_config_t *config, const ezlo
     *hdl_out = (esp_ping_handle_t)ep;
     return ESP_OK;
 err:
-    if (ep)
-    {
-        if (ep->sock > 0)
-        {
+    if (ep) {
+        if (ep->sock > 0) {
             close(ep->sock);
         }
-        if (ep->packet_hdr)
-        {
+        if (ep->packet_hdr) {
             free(ep->packet_hdr);
         }
-        if (ep->ping_task_hdl)
-        {
+        if (ep->ping_task_hdl) {
             vTaskDelete(ep->ping_task_hdl);
         }
         free(ep);
@@ -290,7 +276,7 @@ err:
     return ret;
 }
 
-esp_err_t ezlopi_ping_start_by_handle(esp_ping_handle_t hdl)
+esp_err_t EZPI_ping_start_by_handle(esp_ping_handle_t hdl)
 {
     esp_err_t ret = ESP_OK;
     esp_ping_t *ep = (esp_ping_t *)hdl;
@@ -314,7 +300,7 @@ err:
     return ret;
 }
 
-esp_err_t ezlopi_ping_get_profile(esp_ping_handle_t hdl, esp_ping_profile_t profile, void *data, uint32_t size)
+esp_err_t EZPI_ping_get_profile(esp_ping_handle_t hdl, esp_ping_profile_t profile, void *data, uint32_t size)
 {
     esp_err_t ret = ESP_OK;
     esp_ping_t *ep = (esp_ping_t *)hdl;
@@ -462,12 +448,12 @@ static int __ping_receive(esp_ping_t *ep, uint32_t a_timeout)
                     ep->received++;
                     ep->recv_len = IP6H_PLEN(iphdr) - sizeof(struct icmp6_echo_hdr); // The data portion of ICMPv6
                     return len;
+                }
             }
-        }
 #endif
-    }
+        }
         fromlen = sizeof(from);
-}
+    }
     // if timeout, len will be -1
     return len;
 }
@@ -569,6 +555,9 @@ static void __ping_loop(void *arg)
     }
 }
 
+
+#if 0
+
 static void __ping_thread(void *args)
 {
     esp_ping_t *ep = (esp_ping_t *)(args);
@@ -644,8 +633,7 @@ static void __ping_thread(void *args)
     free(ep);
     vTaskDelete(NULL);
 }
-
-
+#endif
 /*******************************************************************************
 *                          End of File
 *******************************************************************************/

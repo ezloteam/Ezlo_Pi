@@ -61,13 +61,15 @@
 /*******************************************************************************
 *                          Type & Macro Definitions
 *******************************************************************************/
-typedef struct s_initiator {
-    const char *who;
-    const char *file_name;
+typedef struct s_initiator
+{
+    const char*who;
+    const char*file_name;
     uint32_t line_number;
 } s_initiator_t;
 
-typedef struct s_heap_trace {
+typedef struct s_heap_trace
+{
     void *ptr;
     bool freed;
     uint32_t size;
@@ -78,13 +80,12 @@ typedef struct s_heap_trace {
     struct s_heap_trace *next;
 
 } s_heap_trace_t;
-
 /*******************************************************************************
 *                          Static Function Prototypes
 *******************************************************************************/
 static s_heap_trace_t *__internal_malloc(const char *who, size_t size, const char *file_name, uint32_t line_no);
-static s_heap_trace_t *__create_list(void);
-static void __remove_free_node(s_heap_trace_t *heap_node);
+static s_heap_trace_t*__create_list(void);
+static void __remove_free_node(s_heap_trace_t*heap_node);
 
 /*******************************************************************************
 *                          Static Data Definitions
@@ -98,7 +99,7 @@ static s_heap_trace_t *heap_head = NULL;
 /*******************************************************************************
 *                          Extern Function Definitions
 *******************************************************************************/
-void EZPI_core_util_heap_free(const char *who, void *ptr, const char *__file_name, uint32_t line_number)
+void EZPI_core_util_heap_free(const char*who, void* ptr, const char*__file_name, uint32_t line_number)
 {
     if (ptr)
     {
@@ -129,7 +130,7 @@ void *EZPI_core_util_heap_malloc(const char *who, size_t size, const char *file_
 
     if (size > 0)
     {
-        s_heap_trace_t *new_heap = __internal_malloc(who, size, file_name, line_no);
+        s_heap_trace_t*new_heap = __internal_malloc(who, size, file_name, line_no);
         if (NULL != new_heap->ptr)
         {
             ret = new_heap->ptr;
@@ -143,12 +144,12 @@ void *EZPI_core_util_heap_malloc(const char *who, size_t size, const char *file_
     return ret;
 }
 
-void *EZPI_core_util_heap_calloc(const char *who, size_t count, size_t size, const char *file_name, uint32_t line_no)
+void *EZPI_core_util_heap_calloc(const char*who, size_t count, size_t size, const char*file_name, uint32_t line_no)
 {
     return EZPI_core_util_heap_malloc(who, (count * size), file_name, line_no);
 }
 
-void *EZPI_core_util_heap_realloc(const char *who, void *ptr, size_t new_size, const char *file_name, uint32_t line_no)
+void *EZPI_core_util_heap_realloc(const char*who, void* ptr, size_t new_size, const char*file_name, uint32_t line_no)
 {
     s_heap_trace_t *curr_node = heap_head;
     while (curr_node)
@@ -160,7 +161,7 @@ void *EZPI_core_util_heap_realloc(const char *who, void *ptr, size_t new_size, c
         curr_node = curr_node->next;
     }
 
-    void *new_ptr = realloc(ptr, new_size);
+    void*new_ptr = realloc(ptr, new_size);
 
     if (curr_node)
     {
@@ -172,14 +173,13 @@ void *EZPI_core_util_heap_realloc(const char *who, void *ptr, size_t new_size, c
     }
     else
     {
-        s_heap_trace_t *new_node = __internal_malloc(who, 0, file_name, line_no);
+        s_heap_trace_t*new_node = __internal_malloc(who, 0, file_name, line_no);
         if (new_node)
         {
             new_node->ptr = new_ptr;
             new_node->size = new_size;
         }
     }
-
 
     return new_ptr;
 }
@@ -190,7 +190,7 @@ void EZPI_core_util_heap_flush(void)
 
     if (heap_head->freed)
     {
-        s_heap_trace_t *free_node = heap_head;
+        s_heap_trace_t*free_node = heap_head;
         heap_head = heap_head->next;
         free(free_node);
     }
@@ -198,7 +198,7 @@ void EZPI_core_util_heap_flush(void)
 
 void EZPI_core_util_heap_trace(bool print_freed)
 {
-    s_heap_trace_t *curr_node = heap_head;
+    s_heap_trace_t*curr_node = heap_head;
 
     printf("\r\n\r\n**************************************************************************\r\n");
     printf("****************************** CURRENT HEAP ******************************\r\n");
@@ -237,7 +237,8 @@ void EZPI_core_util_heap_trace(bool print_freed)
         vTaskDelay(1 / portTICK_PERIOD_MS);
     }
 
-    printf("--------> total allocated ram: %u\r\n", total_allocated_memory);
+    printf("--------> total used-heap: %u\r\n", total_allocated_memory);
+    printf("--------> total free-heap: %u\r\n", esp_get_free_heap_size());
     printf("**************************************************************************\r\n\r\n\r\n");
 }
 
@@ -295,7 +296,7 @@ static void __remove_free_node(s_heap_trace_t *heap_node)
 
         if (heap_node->next->freed)
         {
-            s_heap_trace_t *free_node = heap_node->next;
+            s_heap_trace_t*free_node = heap_node->next;
             heap_node->next = heap_node->next->next;
             free(free_node);
         }

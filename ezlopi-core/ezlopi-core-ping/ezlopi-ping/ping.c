@@ -189,8 +189,8 @@ int EZPI_ping_init(void)
     .on_ping_timeout = __on_ping_timeout,
   };
 
-  ezlopi_ping_new_session(&config, &cbs, &ping);
-  ezlopi_ping_start_by_handle(ping);
+  EZPI_ping_new_session(&config, &cbs, &ping);
+  EZPI_ping_start_by_handle(ping);
 #else /* PING_USE_SOCKETS */
   ping_raw_init();
 #endif /* PING_USE_SOCKETS */
@@ -323,16 +323,16 @@ static void ping_raw_init(void)
 static void __on_ping_success(esp_ping_handle_t hdl, void *args)
 {
   uint32_t elapsed_time, recv_len;
-  ezlopi_ping_get_profile(hdl, ESP_PING_PROF_SIZE, &recv_len, sizeof(recv_len));
-  ezlopi_ping_get_profile(hdl, ESP_PING_PROF_TIMEGAP, &elapsed_time, sizeof(elapsed_time));
+  EZPI_ping_get_profile(hdl, ESP_PING_PROF_SIZE, &recv_len, sizeof(recv_len));
+  EZPI_ping_get_profile(hdl, ESP_PING_PROF_TIMEGAP, &elapsed_time, sizeof(elapsed_time));
   esp_ping_result(PING_RES_OK, recv_len, elapsed_time);
 }
 
 static void __on_ping_timeout(esp_ping_handle_t hdl, void *args)
 {
   uint32_t elapsed_time, recv_len;
-  ezlopi_ping_get_profile(hdl, ESP_PING_PROF_SIZE, &recv_len, sizeof(recv_len));
-  ezlopi_ping_get_profile(hdl, ESP_PING_PROF_TIMEGAP, &elapsed_time, sizeof(elapsed_time));
+  EZPI_ping_get_profile(hdl, ESP_PING_PROF_SIZE, &recv_len, sizeof(recv_len));
+  EZPI_ping_get_profile(hdl, ESP_PING_PROF_TIMEGAP, &elapsed_time, sizeof(elapsed_time));
   esp_ping_result(PING_RES_TIMEOUT, recv_len, elapsed_time);
 }
 
@@ -477,7 +477,7 @@ ping_prepare_echo(struct icmp_echo_hdr *iecho, u16_t len)
 
   /* fill the additional data buffer with some data */
   for (i = 0; i < data_len; i++) {
-    ((char*)iecho)[sizeof(struct icmp_echo_hdr) + i] = (char)i;
+    ((char *)iecho)[sizeof(struct icmp_echo_hdr) + i] = (char)i;
   }
 
   iecho->chksum = inet_chksum(iecho, len);
@@ -547,7 +547,7 @@ ping_send(struct raw_pcb *raw, ip_addr_t *addr)
 static void
 ping_timeout(void *arg)
 {
-  struct raw_pcb *pcb = (struct raw_pcb*)arg;
+  struct raw_pcb *pcb = (struct raw_pcb *)arg;
   ip_addr_t ping_target;
 
   LWIP_ASSERT("ping_timeout: no pcb given!", pcb != NULL);
@@ -591,8 +591,8 @@ static void
 on_ping_success(esp_ping_handle_t hdl, void *args)
 {
   uint32_t elapsed_time, recv_len;
-  ezlopi_ping_get_profile(hdl, ESP_PING_PROF_SIZE, &recv_len, sizeof(recv_len));
-  ezlopi_ping_get_profile(hdl, ESP_PING_PROF_TIMEGAP, &elapsed_time, sizeof(elapsed_time));
+  EZPI_ping_get_profile(hdl, ESP_PING_PROF_SIZE, &recv_len, sizeof(recv_len));
+  EZPI_ping_get_profile(hdl, ESP_PING_PROF_TIMEGAP, &elapsed_time, sizeof(elapsed_time));
   esp_ping_result(PING_RES_OK, recv_len, elapsed_time);
 }
 
@@ -600,8 +600,8 @@ static void
 on_ping_timeout(esp_ping_handle_t hdl, void *args)
 {
   uint32_t elapsed_time, recv_len;
-  ezlopi_ping_get_profile(hdl, ESP_PING_PROF_SIZE, &recv_len, sizeof(recv_len));
-  ezlopi_ping_get_profile(hdl, ESP_PING_PROF_TIMEGAP, &elapsed_time, sizeof(elapsed_time));
+  EZPI_ping_get_profile(hdl, ESP_PING_PROF_SIZE, &recv_len, sizeof(recv_len));
+  EZPI_ping_get_profile(hdl, ESP_PING_PROF_TIMEGAP, &elapsed_time, sizeof(elapsed_time));
   esp_ping_result(PING_RES_TIMEOUT, recv_len, elapsed_time);
 }
 
@@ -644,8 +644,8 @@ ping_init(void)
     .on_ping_timeout = on_ping_timeout,
   };
 
-  ezlopi_ping_new_session(&config, &cbs, &ping);
-  ezlopi_ping_start_by_handle(ping);
+  EZPI_ping_new_session(&config, &cbs, &ping);
+  EZPI_ping_start_by_handle(ping);
 #else /* PING_USE_SOCKETS */
   ping_raw_init();
 #endif /* PING_USE_SOCKETS */

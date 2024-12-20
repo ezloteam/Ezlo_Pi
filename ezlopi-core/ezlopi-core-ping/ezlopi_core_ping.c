@@ -130,11 +130,13 @@ void EZPI_ping_init(void)
         struct in_addr addr4 = ((struct sockaddr_in *)(res->ai_addr))->sin_addr;
         inet_addr_to_ip4addr(ip_2_ip4(&target_addr), &addr4);
     }
+#ifdef CONFIG_LWIP_IPV6
     else
     {
         struct in6_addr addr6 = ((struct sockaddr_in6 *)(res->ai_addr))->sin6_addr;
         inet6_addr_to_ip6addr(ip_2_ip6(&target_addr), &addr6);
     }
+#endif
 
     freeaddrinfo(res);
 
@@ -148,8 +150,8 @@ void EZPI_ping_init(void)
         .on_ping_end = __on_ping_end,
         .cb_args = NULL };
 
-    ezlopi_ping_new_session(&config, &cbs, &__ping_handle);
-    ezlopi_ping_start_by_handle(__ping_handle);
+    EZPI_ping_new_session(&config, &cbs, &__ping_handle);
+    EZPI_ping_start_by_handle(__ping_handle);
 
     TRACE_I("Ping initialized !!");
     return;
@@ -174,11 +176,11 @@ static void __on_ping_success(esp_ping_handle_t hdl, void *args)
     uint16_t seqno;
     uint32_t elapsed_time, recv_len;
     ip_addr_t target_addr;
-    ezlopi_ping_get_profile(hdl, ESP_PING_PROF_SEQNO, &seqno, sizeof(seqno));
-    ezlopi_ping_get_profile(hdl, ESP_PING_PROF_TTL, &ttl, sizeof(ttl));
-    ezlopi_ping_get_profile(hdl, ESP_PING_PROF_IPADDR, &target_addr, sizeof(target_addr));
-    ezlopi_ping_get_profile(hdl, ESP_PING_PROF_SIZE, &recv_len, sizeof(recv_len));
-    ezlopi_ping_get_profile(hdl, ESP_PING_PROF_TIMEGAP, &elapsed_time, sizeof(elapsed_time));
+    EZPI_ping_get_profile(hdl, ESP_PING_PROF_SEQNO, &seqno, sizeof(seqno));
+    EZPI_ping_get_profile(hdl, ESP_PING_PROF_TTL, &ttl, sizeof(ttl));
+    EZPI_ping_get_profile(hdl, ESP_PING_PROF_IPADDR, &target_addr, sizeof(target_addr));
+    EZPI_ping_get_profile(hdl, ESP_PING_PROF_SIZE, &recv_len, sizeof(recv_len));
+    EZPI_ping_get_profile(hdl, ESP_PING_PROF_TIMEGAP, &elapsed_time, sizeof(elapsed_time));
     TRACE_I("%d bytes from %s icmp_seq=%d ttl=%d time=%d ms\n",
         recv_len, inet_ntoa(target_addr.u_addr.ip4), seqno, ttl, elapsed_time);
     __ping_fail_count = 0;
@@ -189,8 +191,8 @@ static void __on_ping_timeout(esp_ping_handle_t hdl, void *args)
 {
     uint16_t seqno;
     ip_addr_t target_addr;
-    ezlopi_ping_get_profile(hdl, ESP_PING_PROF_SEQNO, &seqno, sizeof(seqno));
-    ezlopi_ping_get_profile(hdl, ESP_PING_PROF_IPADDR, &target_addr, sizeof(target_addr));
+    EZPI_ping_get_profile(hdl, ESP_PING_PROF_SEQNO, &seqno, sizeof(seqno));
+    EZPI_ping_get_profile(hdl, ESP_PING_PROF_IPADDR, &target_addr, sizeof(target_addr));
     TRACE_W("From %s icmp_seq=%d timeout\n", inet_ntoa(target_addr.u_addr.ip4), seqno);
 
     __ping_fail_count++;
@@ -207,12 +209,12 @@ static void __on_ping_end(esp_ping_handle_t hdl, void *args)
     uint32_t received;
     uint32_t total_time_ms;
 
-    ezlopi_ping_get_profile(hdl, ESP_PING_PROF_REQUEST, &transmitted, sizeof(transmitted));
-    ezlopi_ping_get_profile(hdl, ESP_PING_PROF_REPLY, &received, sizeof(received));
-    ezlopi_ping_get_profile(hdl, ESP_PING_PROF_IPADDR, &target_addr, sizeof(target_addr));
-    ezlopi_ping_get_profile(hdl, ESP_PING_PROF_DURATION, &total_time_ms, sizeof(total_time_ms));
+    EZPI_ping_get_profile(hdl, ESP_PING_PROF_REQUEST, &transmitted, sizeof(transmitted));
+    EZPI_ping_get_profile(hdl, ESP_PING_PROF_REPLY, &received, sizeof(received));
+    EZPI_ping_get_profile(hdl, ESP_PING_PROF_IPADDR, &target_addr, sizeof(target_addr));
+    EZPI_ping_get_profile(hdl, ESP_PING_PROF_DURATION, &total_time_ms, sizeof(total_time_ms));
 
-#if  (1 == ENABLE_TRACE)
+#if (1 == ENABLE_TRACE)
     uint32_t loss = (uint32_t)((1 - ((float)received) / transmitted) * 100);
 
     if (IP_IS_V4(&target_addr))
@@ -229,7 +231,7 @@ static void __on_ping_end(esp_ping_handle_t hdl, void *args)
 #endif
     // delete the ping_handle sessions, so that we clean up all resources and can create a new ping_handle session
     // we don't have to call delete function in the callback, instead we can call delete function from other tasks
-    ezlopi_ping_start_by_handle(hdl);
+    EZPI_ping_start_by_handle(hdl);
     TRACE_D("Re-starting ping_handle...");
 
     // EZPI_ping_delete_session(hdl);
