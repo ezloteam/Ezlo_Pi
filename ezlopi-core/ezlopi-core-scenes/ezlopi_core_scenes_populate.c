@@ -373,7 +373,7 @@ void ezlopi_scenes_populate_assign_block_options(s_block_options_v2_t *p_block_o
         cJSON *cj_func = cJSON_GetObjectItem(__FUNCTION__, cj_block_options, ezlopi_function_str);
         if (cj_func)
         {
-            p_block_options->cj_function = cJSON_Duplicate(__FUNCTION__, cj_func, cJSON_True);
+            p_block_options->cj_function = cJSON_Duplicate(__FUNCTION__, cj_func, true);
         }
     }
 }
@@ -496,7 +496,7 @@ void ezlopi_scenes_populate_fields_get_value(l_fields_v2_t *field, cJSON *cj_val
             else
             {
                 field->field_value.e_type = VALUE_TYPE_CJSON;
-                field->field_value.u_value.cj_value = cJSON_Duplicate(__FUNCTION__, cj_value, cJSON_True);
+                field->field_value.u_value.cj_value = cJSON_Duplicate(__FUNCTION__, cj_value, true);
                 CJSON_TRACE("value", field->field_value.u_value.cj_value);
             }
             break;
@@ -516,7 +516,7 @@ void ezlopi_scenes_populate_fields_get_value(l_fields_v2_t *field, cJSON *cj_val
             case EZLOPI_VALUE_TYPE_HOUSE_MODE_ID_ARRAY:
             {
                 field->field_value.e_type = VALUE_TYPE_CJSON;
-                field->field_value.u_value.cj_value = cJSON_Duplicate(__FUNCTION__, cj_value, cJSON_True);
+                field->field_value.u_value.cj_value = cJSON_Duplicate(__FUNCTION__, cj_value, true);
                 break;
             }
             case EZLOPI_VALUE_TYPE_BLOCKS: // there are more than one-blocks [since 'cJSON_Array' ]

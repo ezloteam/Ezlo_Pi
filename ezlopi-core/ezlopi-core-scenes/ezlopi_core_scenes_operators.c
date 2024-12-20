@@ -345,20 +345,26 @@ static int ____compare_item_vs_other(l_ezlopi_item_t *item_left, l_fields_v2_t *
                     break;
                 }
                 case cJSON_False: // bool_values can be converted to 1/0s
-                case cJSON_True:  // bool_values can be converted to 1/0s
                 {
                     if (value_field->field_value.e_type == VALUE_TYPE_BOOL)
                     {
-                        ret = ________compare_val_num(
-                            (cJSON_True == cj_item_value->type) ? 1 : 0,
-                            value_field->field_value.u_value.value_bool,
-                            comparator_field_str);
+                        ret = ________compare_val_num(0, value_field->field_value.u_value.value_bool, comparator_field_str);
+                    }
+                    break;
+                }
+                case cJSON_True: // bool_values can be converted to 1/0s
+                {
+                    if (value_field->field_value.e_type == VALUE_TYPE_BOOL)
+                    {
+                        ret = ________compare_val_num(1, value_field->field_value.u_value.value_bool, comparator_field_str);
                     }
                     break;
                 }
                 default:
+                {
                     TRACE_W("Error!! can compare only :- string / bool / number ");
                     break;
+                }
                 }
             }
             cJSON_Delete(__FUNCTION__, cj_item);
@@ -413,15 +419,19 @@ static int ____compare_item_vs_exp(l_ezlopi_item_t *item_left, s_ezlopi_expressi
                     }
                     break;
                 }
-                case cJSON_True:  // bool_values can be converted to 1/0s
+                case cJSON_True: // bool_values can be converted to 1/0s
+                {
+                    if (curr_expr_right->exp_value.type == EXPRESSION_VALUE_TYPE_BOOL)
+                    {
+                        ret = ________compare_val_num(1, curr_expr_right->exp_value.u_value.boolean_value, comparator_field_str);
+                    }
+                    break;
+                }
                 case cJSON_False: // bool_values can be converted to 1/0s
                 {
                     if (curr_expr_right->exp_value.type == EXPRESSION_VALUE_TYPE_BOOL)
                     {
-                        ret = ________compare_val_num(
-                            (cJSON_True == cj_item_value->type) ? 1 : 0,
-                            curr_expr_right->exp_value.u_value.boolean_value,
-                            comparator_field_str);
+                        ret = ________compare_val_num(0, curr_expr_right->exp_value.u_value.boolean_value, comparator_field_str);
                     }
                     break;
                 }
@@ -924,16 +934,20 @@ static int ____compare_range_item_vs_other(l_ezlopi_item_t *item, l_fields_v2_t 
                     break;
                 }
                 case cJSON_False: // bool_values can be converted to 1/0s
-                case cJSON_True:  // bool_values can be converted to 1/0s
                 {
                     if ((start_value_field->field_value.e_type == VALUE_TYPE_BOOL &&
                          end_value_field->field_value.e_type == VALUE_TYPE_BOOL))
                     {
-                        ret = ________compare_numeric_range_num(
-                            (cJSON_True == cj_item_value->type) ? 1 : 0,
-                            start_value_field->field_value.u_value.value_bool,
-                            end_value_field->field_value.u_value.value_bool,
-                            comparator_choice);
+                        ret = ________compare_numeric_range_num(0, start_value_field->field_value.u_value.value_bool, end_value_field->field_value.u_value.value_bool, comparator_choice);
+                    }
+                    break;
+                }
+                case cJSON_True: // bool_values can be converted to 1/0s
+                {
+                    if ((start_value_field->field_value.e_type == VALUE_TYPE_BOOL &&
+                         end_value_field->field_value.e_type == VALUE_TYPE_BOOL))
+                    {
+                        ret = ________compare_numeric_range_num(1, start_value_field->field_value.u_value.value_bool, end_value_field->field_value.u_value.value_bool, comparator_choice);
                     }
                     break;
                 }
@@ -1000,22 +1014,28 @@ static int ____compare_range_item_vs_exp(l_ezlopi_item_t *item, s_ezlopi_express
                     break;
                 }
                 case cJSON_False: // bool_values can be converted to 1/0s
-                case cJSON_True:  // bool_values can be converted to 1/0s
                 {
                     if ((curr_expr_right_start->exp_value.type == EXPRESSION_VALUE_TYPE_BOOL &&
                          curr_expr_right_end->exp_value.type == EXPRESSION_VALUE_TYPE_BOOL))
                     {
-                        ret = ________compare_numeric_range_num(
-                            (cJSON_True == cj_item_value->type) ? 1 : 0,
-                            curr_expr_right_start->exp_value.u_value.boolean_value,
-                            curr_expr_right_end->exp_value.u_value.boolean_value,
-                            comparator_choice);
+                        ret = ________compare_numeric_range_num(0, curr_expr_right_start->exp_value.u_value.boolean_value, curr_expr_right_end->exp_value.u_value.boolean_value, comparator_choice);
+                    }
+                    break;
+                }
+                case cJSON_True: // bool_values can be converted to 1/0s
+                {
+                    if ((curr_expr_right_start->exp_value.type == EXPRESSION_VALUE_TYPE_BOOL &&
+                         curr_expr_right_end->exp_value.type == EXPRESSION_VALUE_TYPE_BOOL))
+                    {
+                        ret = ________compare_numeric_range_num(1, curr_expr_right_start->exp_value.u_value.boolean_value, curr_expr_right_end->exp_value.u_value.boolean_value, comparator_choice);
                     }
                     break;
                 }
                 default:
+                {
                     TRACE_W("Error!! can compare only :- string / bool / number ");
                     break;
+                }
                 }
             }
             cJSON_Delete(__FUNCTION__, cj_item);
@@ -1557,7 +1577,7 @@ static int __compare_inarry_cj(cJSON *item_exp_value, l_fields_v2_t *value_field
         {
             cJSON_ArrayForEach(iterator, value_field->field_value.u_value.cj_value)
             {
-                if (cJSON_Compare(item_exp_value, iterator, cJSON_False)) // check for all array elements ; if exists then 'ret = 1' & break
+                if (cJSON_Compare(item_exp_value, iterator, false)) // check for all array elements ; if exists then 'ret = 1' & break
                 {
                     ret = 1;
                     break;
@@ -1570,7 +1590,7 @@ static int __compare_inarry_cj(cJSON *item_exp_value, l_fields_v2_t *value_field
             cJSON_ArrayForEach(iterator, value_field->field_value.u_value.cj_value)
             {
                 ret = 1;
-                if (cJSON_Compare(item_exp_value, iterator, cJSON_False)) // check for all array elements ; if exists then 'ret = 0' & break
+                if (cJSON_Compare(item_exp_value, iterator, false)) // check for all array elements ; if exists then 'ret = 0' & break
                 {
                     ret = 0;
                     break;

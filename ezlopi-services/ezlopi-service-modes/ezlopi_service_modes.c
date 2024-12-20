@@ -508,6 +508,8 @@ static void __modes_loop(void *arg)
             if (EZPI_SUCCESS == __check_mode_switch_condition(ez_mode))
             {
                 TRACE_D("Mode - Switch completed to [%d]", ez_mode->current_mode_id);
+                curr_house_mode = ezlopi_core_modes_get_current_house_modes();
+                TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_INFO, "mode: switching to: %s (id: %u).", curr_house_mode->name, curr_house_mode->_id);
                 // after switching-modes ; Create unique trigger-event-loops for each devices in 'alarm-list'
                 if (true == curr_house_mode->armed) // if the new mode is armed ; create 'non_bypass_alert_ll'
                 {

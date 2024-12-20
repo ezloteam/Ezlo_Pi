@@ -266,7 +266,11 @@ static void __mdns_init(void *pv)
             if (mdns_context)
             {
                 TRACE_I("-------- Adding mDNS Service(count: %d) ------------ ", service_size);
-                TRACE_I("\tKEY\t\t\tValue");
+                if (service_size)
+                {
+                    TRACE_I("\tKEY\t\t\tValue");
+                }
+
                 for (int i = 0; i < service_size; i++)
                 {
                     TRACE_I("\t%s\t\t%s", mdns_context[i].key, mdns_context[i].value);
@@ -285,6 +289,7 @@ static void __mdns_init(void *pv)
         }
         vTaskDelay(5000 / portTICK_PERIOD_MS);
     }
+
     ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_CORE_MDNS_SERVICE_TASK);
     vTaskDelete(NULL);
 }

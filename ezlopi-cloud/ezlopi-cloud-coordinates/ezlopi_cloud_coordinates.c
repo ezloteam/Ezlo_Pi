@@ -24,7 +24,7 @@ void hub_coordinates_set(cJSON* cj_request, cJSON* cj_response)
             CJSON_GET_VALUE_DOUBLE(cj_params, ezlopi_longitude_str, sg_longitude);
 
             char lat_long_str[256];
-            if (cJSON_PrintPreallocated(__FUNCTION__, cj_params, lat_long_str, sizeof(lat_long_str), false))
+            if (true == cJSON_PrintPreallocated(__FUNCTION__, cj_params, lat_long_str, sizeof(lat_long_str), false))
             {
                 ezlopi_nvs_write_latitude_longitude(lat_long_str);
             }
@@ -51,4 +51,3 @@ double ezlopi_cloud_get_longitude()
 {
     return sg_longitude;
 }
-

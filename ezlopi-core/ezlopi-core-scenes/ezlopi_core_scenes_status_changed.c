@@ -1,7 +1,7 @@
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
-
+#include <time.h>
 #include "ezlopi_util_trace.h"
 
 #include "ezlopi_cloud_constants.h"
@@ -15,12 +15,16 @@ int ezlopi_scenes_status_change_broadcast(l_scenes_list_v2_t* scene_node, const 
     int ret = 0;
     if (scene_node)
     {
-        cJSON *cj_response = cJSON_CreateObject(__FUNCTION__);
+        cJSON* cj_response = cJSON_CreateObject(__FUNCTION__);
         if (cj_response)
         {
+            time_t now = 0;
+            time(&now);
+            cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_startTime_str, now);
+
             cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
             cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, method_hub_scene_run_progress);
-            cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+            cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
             if (cj_result)
             {
                 char tmp_str[32];
@@ -28,17 +32,17 @@ int ezlopi_scenes_status_change_broadcast(l_scenes_list_v2_t* scene_node, const 
                 cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_scene_id_str, tmp_str);
                 cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_scene_name_str, scene_node->name);
                 cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_status_str, status_str ? status_str : scene_status_failed_str);
-                cJSON *cj_notifications = cJSON_AddArrayToObject(__FUNCTION__, cj_result, ezlopi_notifications_str);
+                cJSON* cj_notifications = cJSON_AddArrayToObject(__FUNCTION__, cj_result, ezlopi_notifications_str);
 
                 if (scene_node->user_notifications && cj_notifications)
                 {
                     cJSON_AddTrueToObject(__FUNCTION__, cj_result, ezlopi_userNotification_str);
-                    l_user_notification_v2_t *user_notification_node = scene_node->user_notifications;
+                    l_user_notification_v2_t* user_notification_node = scene_node->user_notifications;
                     while (user_notification_node)
                     {
                         if (NULL != user_notification_node->user_id)
                         {
-                            cJSON *cj_notf = cJSON_CreateString(__FUNCTION__, user_notification_node->user_id);
+                            cJSON* cj_notf = cJSON_CreateString(__FUNCTION__, user_notification_node->user_id);
                             if (!cJSON_AddItemToArray(cj_notifications, cj_notf))
                             {
                                 cJSON_Delete(__FUNCTION__, cj_notf);
@@ -107,4 +111,4 @@ const char* ezlopi_scenes_status_to_string(e_scene_status_v2_t scene_status)
 
     return ret;
 }
-#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+#endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS

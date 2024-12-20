@@ -42,9 +42,9 @@ static char *__generate_sha1_of_src(const char *src)
                                 size_t l = (len - (strlen(ret) + 1));
                                 if (l > 0)
                                 {
-                                    ((int)sha1[i] / 100 > 0) ? (snprintf(ret + strlen(ret), l, "%u", (uint8_t)sha1[i]))    // tripple digit
-                                        : ((int)sha1[i] / 10 > 0) ? (snprintf(ret + strlen(ret), l, "0%u", (uint8_t)sha1[i]))   // double digit
-                                        : (snprintf(ret + strlen(ret), l, "00%u", (uint8_t)sha1[i])); // single digit
+                                    ((int)sha1[i] / 100 > 0)  ? (snprintf(ret + strlen(ret), l, "%u", (uint8_t)sha1[i]))    // tripple digit
+                                    : ((int)sha1[i] / 10 > 0) ? (snprintf(ret + strlen(ret), l, "0%u", (uint8_t)sha1[i]))   // double digit
+                                                              : (snprintf(ret + strlen(ret), l, "00%u", (uint8_t)sha1[i])); // single digit
                                 }
                                 else
                                 {
@@ -208,8 +208,8 @@ void device_updated(cJSON *cj_request, cJSON *cj_response)
 
                             if (controller_info)
                             {
-                                cJSON_AddBoolToObject(__FUNCTION__, cj_result, ezlopi_armed_str, controller_info->armed ? cJSON_True : cJSON_False);
-                                cJSON_AddBoolToObject(__FUNCTION__, cj_result, ezlopi_serviceNotification_str, controller_info->service_notification ? cJSON_True : cJSON_False);
+                                cJSON_AddBoolToObject(__FUNCTION__, cj_result, ezlopi_armed_str, controller_info->armed ? true : false);
+                                cJSON_AddBoolToObject(__FUNCTION__, cj_result, ezlopi_serviceNotification_str, controller_info->service_notification ? true : false);
                             }
 
                             uint64_t time = EZPI_CORE_sntp_get_current_time_ms();
@@ -367,10 +367,13 @@ void device_group_delete(cJSON *cj_request, cJSON *cj_response)
 
                                 cJSON_AddStringToObject(__FUNCTION__, cj_request, ezlopi__id_str, cj_id->valuestring); // for (reply_broadcast); if delete is successful
                             }
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                             else
                             {
+
                                 TRACE_E("Error!! , Unable to delete 'device_group_id' : [%d]", dev_grp_id);
                             }
+#endif
                         }
                         else
                         {
@@ -659,10 +662,12 @@ void item_group_delete(cJSON *cj_request, cJSON *cj_response)
 
                                 cJSON_AddStringToObject(__FUNCTION__, cj_request, ezlopi__id_str, cj_id->valuestring); // for (reply_broadcast); if delete is successful
                             }
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                             else
                             {
                                 TRACE_E("Error!! , Unable to delete 'item_group_id' : [%d]", item_grp_id);
                             }
+#endif
                         }
                         else
                         {

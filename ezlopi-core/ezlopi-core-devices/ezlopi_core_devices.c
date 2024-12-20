@@ -52,7 +52,6 @@ static int ____store_bool_in_nvs_dev_mod_info(uint32_t nvs_device_id, const char
             }
 
             cJSON_AddBoolToObject(__FUNCTION__, cj_target_dev_mod, string_key, bool_value); // add the new info
-
             CJSON_TRACE("new_dev_mod:", cj_target_dev_mod);
 
             // Now update the 'nvs_dev_id'

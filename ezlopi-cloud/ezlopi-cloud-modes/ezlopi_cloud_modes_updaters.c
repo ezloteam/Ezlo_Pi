@@ -79,13 +79,13 @@ void ezlopi_cloud_modes_alarmed(cJSON *cj_request, cJSON *cj_response)
 void ezlopi_cloud_modes_changed_alarmed(cJSON *cj_request, cJSON *cj_response)
 {
     // 1. broadcast 'modes.changed'
-    cJSON *changed_resp = cJSON_CreateObject(__FUNCTION__);
-    if (changed_resp)
+    cJSON *cj_changed_resp = cJSON_CreateObject(__FUNCTION__);
+    if (cj_changed_resp)
     {
-        ezlopi_cloud_modes_changed(cj_request, changed_resp);
-        if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(changed_resp))
+        ezlopi_cloud_modes_changed(cj_request, cj_changed_resp);
+        if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(cj_changed_resp))
         {
-            cJSON_Delete(__FUNCTION__, changed_resp);
+            cJSON_Delete(__FUNCTION__, cj_changed_resp);
         }
     }
 
@@ -227,6 +227,10 @@ void ezlopi_cloud_modes_bypass_devices_removed(cJSON *cj_request, cJSON *cj_resp
 
 void ezlopi_cloud_modes_changed(cJSON *cj_request, cJSON *cj_response)
 {
+    time_t now = 0;
+    time(&now);
+    cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_startTime_str, now);
+
     cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_id_str);
     cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_method_str);
 

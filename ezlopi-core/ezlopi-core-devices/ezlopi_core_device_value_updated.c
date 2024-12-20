@@ -1,3 +1,5 @@
+#include <time.h>
+
 #include "ezlopi_core_broadcast.h"
 #include "ezlopi_core_devices_list.h"
 #include "ezlopi_core_errors.h"
@@ -11,7 +13,6 @@
 /// static declarations
 static cJSON* __broadcast_message_items_updated_from_device(l_ezlopi_device_t* device, l_ezlopi_item_t* item);
 static cJSON* __broadcast_message_settings_updated_from_devices_v3(l_ezlopi_device_t* device, l_ezlopi_device_settings_v3_t* setting);
-
 
 /// Global methods
 ezlopi_error_t ezlopi_device_value_updated_from_device_broadcast(l_ezlopi_item_t* item)
@@ -175,6 +176,10 @@ ezlopi_error_t ezlopi_core_device_value_update_wifi_scan_broadcast(cJSON* networ
         cJSON* cj_response = cJSON_CreateObject(__FUNCTION__);
         if (cj_response)
         {
+            time_t now = 0;
+            time(&now);
+            cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_startTime_str, now);
+
             cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
             cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, method_hub_network_wifi_scan_progress);
             // cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_msg_id_str, ezlopi_service_web_provisioning_get_message_count());
@@ -210,6 +215,10 @@ static cJSON* __broadcast_message_items_updated_from_device(l_ezlopi_device_t* d
         cjson_response = cJSON_CreateObject(__FUNCTION__);
         if (cjson_response)
         {
+            time_t now = 0;
+            time(&now);
+            cJSON_AddNumberToObject(__FUNCTION__, cjson_response, ezlopi_startTime_str, now);
+
             cJSON_AddStringToObject(__FUNCTION__, cjson_response, ezlopi_msg_subclass_str, method_hub_item_updated);
             // cJSON_AddNumberToObject(__FUNCTION__, cjson_response, ezlopi_msg_id_str, ezlopi_service_web_provisioning_get_message_count());
             cJSON_AddStringToObject(__FUNCTION__, cjson_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
@@ -257,6 +266,10 @@ static cJSON* __broadcast_message_settings_updated_from_devices_v3(l_ezlopi_devi
     cJSON* cjson_response = cJSON_CreateObject(__FUNCTION__);
     if (cjson_response)
     {
+        time_t now = 0;
+        time(&now);
+        cJSON_AddNumberToObject(__FUNCTION__, cjson_response, ezlopi_startTime_str, now);
+
         if (NULL != setting)
         {
             cJSON_AddStringToObject(__FUNCTION__, cjson_response, ezlopi_msg_subclass_str, method_hub_device_setting_updated);
@@ -281,5 +294,3 @@ static cJSON* __broadcast_message_settings_updated_from_devices_v3(l_ezlopi_devi
 
     return cjson_response;
 }
-
-

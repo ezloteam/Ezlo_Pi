@@ -6,7 +6,6 @@ set(EZLOPI_UTIL_COMPONENTS
 )
 set(EZLOPI_CORE_COMPONENTS  
         ezlopi-core-api
-        ezlopi-core-wsc
         ezlopi-core-wifi
         ezlopi-core-buffer
         ezlopi-core-ezlopi
@@ -21,7 +20,7 @@ set(EZLOPI_CLOUD_COMPONENTS
 
 
 
-idf_component_register(SRCS "${src}"
+idf_component_register(SRCS "ezlopi_service_otel.c" "${src}"
     INCLUDE_DIRS "."
     REQUIRES    ${EZLOPI_UTIL_COMPONENTS}
                 ${EZLOPI_CORE_COMPONENTS} 

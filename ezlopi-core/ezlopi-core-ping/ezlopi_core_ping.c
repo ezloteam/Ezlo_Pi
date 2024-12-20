@@ -63,11 +63,13 @@ void ezlopi_ping_init(void)
         struct in_addr addr4 = ((struct sockaddr_in*)(res->ai_addr))->sin_addr;
         inet_addr_to_ip4addr(ip_2_ip4(&target_addr), &addr4);
     }
+#ifdef CONFIG_LWIP_IPV6
     else
     {
         struct in6_addr addr6 = ((struct sockaddr_in6*)(res->ai_addr))->sin6_addr;
         inet6_addr_to_ip6addr(ip_2_ip6(&target_addr), &addr6);
     }
+#endif
 
     freeaddrinfo(res);
 
@@ -141,7 +143,7 @@ static void __on_ping_end(esp_ping_handle_t hdl, void* args)
     ezlopi_ping_get_profile(hdl, ESP_PING_PROF_IPADDR, &target_addr, sizeof(target_addr));
     ezlopi_ping_get_profile(hdl, ESP_PING_PROF_DURATION, &total_time_ms, sizeof(total_time_ms));
 
-#if  (1 == ENABLE_TRACE)
+#if (1 == ENABLE_TRACE)
     uint32_t loss = (uint32_t)((1 - ((float)received) / transmitted) * 100);
 
     if (IP_IS_V4(&target_addr))
