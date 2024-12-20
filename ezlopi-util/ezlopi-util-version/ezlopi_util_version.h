@@ -1,27 +1,24 @@
 #ifndef __VERSION_H__
 #define __VERSION_H__
 
-
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-
-#define BUILD_DATE 1730365637
+#define BUILD_DATE 1733304200
 #define MAJOR 4
 #define MINOR 2
-#define BATCH 8
-#define BUILD 198
-#define VERSION_STR "4.2.8"
+#define BATCH 10
+#define BUILD 200
+#define VERSION_STR "4.2.10"
 #define DEVELOPER "lomas.subedi@ezlo.com"
-#define COMPILE_TIME "Thu Oct 31 02:52:17 PM +0545 2024"
+#define COMPILE_TIME "Wed Dec 04 15:08:20 PM +0545 2024"
 #define CURRENT_BRANCH "development"
-#define COMMIT_HASH "27c74ea104654e19393bf69449e072cb544b982c"
-
+#define COMMIT_HASH "7b9332943693899f208e7f6168fb1b16b8ecfd69"
 
 #ifdef __cplusplus
 }
 #endif
-
 
 #endif // __VERSION_H__

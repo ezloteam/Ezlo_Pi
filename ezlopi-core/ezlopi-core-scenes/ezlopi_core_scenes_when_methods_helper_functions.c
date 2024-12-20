@@ -91,9 +91,10 @@ int is_item_state_with_grp_condition(uint32_t device_group_id, uint32_t item_gro
     l_ezlopi_device_grp_t *curr_devgrp = ezlopi_core_device_group_get_by_id(device_group_id);
     if (curr_devgrp)
     {
-        int idx = 0;
+        // int idx = 0;
         cJSON *cj_get_devarr = NULL;
-        while (NULL != (cj_get_devarr = cJSON_GetArrayItem(curr_devgrp->devices, idx))) // ["102ec000" , "102ec001" ,..]
+        // while (NULL != (cj_get_devarr = cJSON_GetArrayItem(curr_devgrp->devices, idx))) // ["102ec000" , "102ec001" ,..]
+        cJSON_ArrayForEach(cj_get_devarr, curr_devgrp->devices)
         {
             uint32_t curr_devce_id = strtoul(cj_get_devarr->valuestring, NULL, 16);
             l_ezlopi_device_t *curr_device = ezlopi_device_get_by_id(curr_devce_id); // immediately goto "102ec000" ...
@@ -106,9 +107,10 @@ int is_item_state_with_grp_condition(uint32_t device_group_id, uint32_t item_gro
                     l_ezlopi_item_grp_t *curr_item_grp = ezlopi_core_item_group_get_by_id(item_group_id); // get  "ll_itemgrp_node"
                     if (curr_item_grp)
                     {
-                        int count = 0;
+                        // int count = 0;
                         cJSON *cj_item_names = NULL;
-                        while (NULL != (cj_item_names = cJSON_GetArrayItem(curr_item_grp->item_names, count))) // ["202ec000" , "202ec001" ,..]
+                        // while (NULL != (cj_item_names = cJSON_GetArrayItem(curr_item_grp->item_names, count))) // ["202ec000" , "202ec001" ,..]
+                        cJSON_ArrayForEach(cj_item_names, curr_item_grp->item_names)
                         {
                             uint32_t req_item_id_from_itemgrp = strtoul(cj_item_names->valuestring, NULL, 16);
                             // if the item_ids match ; Then compare the "item_values" with that of the "scene's" requirement
@@ -118,13 +120,13 @@ int is_item_state_with_grp_condition(uint32_t device_group_id, uint32_t item_gro
                                 ret = __compare_item_values(curr_item_node, value_field);
                                 break;
                             }
-                            count++;
+                            // count++;
                         }
                     }
                     curr_item_node = curr_item_node->next;
                 }
             }
-            idx++;
+            // idx++;
         }
     }
 
@@ -293,7 +295,7 @@ uint8_t isdate_tm_check(e_isdate_modes_t *mode_type, struct tm *info, l_fields_v
     if (cj_time_arr && (cJSON_Array == cj_time_arr->type))
     {
         ret |= (1 << 4);
-        char field_hr_mm[10] = { 0 };
+        char field_hr_mm[10] = {0};
         strftime(field_hr_mm, 10, "%H:%M", info);
         field_hr_mm[9] = '\0';
         // TRACE_S("[field_hr_mm: %s]", field_hr_mm);
@@ -401,8 +403,8 @@ uint8_t isdate_year_weeks_check(e_isdate_modes_t *mode_type, struct tm *info, l_
                 }
                 else // for case :- 'n'
                 {
-                    char field_weeks[10] = { 0 }; // week_value extracted from ESP32.
-                    char week_val[10] = { 0 };    // week_value given to us from cloud.
+                    char field_weeks[10] = {0}; // week_value extracted from ESP32.
+                    char week_val[10] = {0};    // week_value given to us from cloud.
 
                     // reducing array values by -1, for easier comparison ::==>  [1_54]--->[0_53]      or      [1_6]-->[0_5]
                     snprintf(week_val, 10, "%d", (int)(array_item->valuedouble - 1));
@@ -457,7 +459,7 @@ int isdate_check_flag_result(e_isdate_modes_t mode_type, uint8_t flag_check)
     case ISDATE_WEEKLY_MODE:
     {
         if ((((flag_check & MASK_FOR_TIME_ARG) && (flag_check & TIME_FLAG)) &&
-            ((flag_check & MASK_FOR_WEEKDAYS_ARG) && (flag_check & WEEKDAYS_FLAG))))
+             ((flag_check & MASK_FOR_WEEKDAYS_ARG) && (flag_check & WEEKDAYS_FLAG))))
         {
             // TRACE_W("here! week_days and time");
             ret = 1;
@@ -467,7 +469,7 @@ int isdate_check_flag_result(e_isdate_modes_t mode_type, uint8_t flag_check)
     case ISDATE_MONTHLY_MODE:
     {
         if ((((flag_check & MASK_FOR_TIME_ARG) && (flag_check & TIME_FLAG)) &&
-            ((flag_check & MASK_FOR_DAYS_ARG) && (flag_check & DAYS_FLAG))))
+             ((flag_check & MASK_FOR_DAYS_ARG) && (flag_check & DAYS_FLAG))))
         {
             // TRACE_W("here! month_days and time");
             ret = 1;
@@ -499,7 +501,7 @@ uint8_t isonce_tm_check(l_fields_v2_t *curr_field, struct tm *info)
     uint8_t flag_check = 0;
     if ((EZLOPI_VALUE_TYPE_24_HOURS_TIME == curr_field->value_type) && (NULL != curr_field->field_value.u_value.value_string))
     {
-        char field_hr_mm[10] = { 0 };
+        char field_hr_mm[10] = {0};
         strftime(field_hr_mm, 10, "%H:%M", info);
         field_hr_mm[9] = '\0';
 
@@ -587,7 +589,7 @@ static void issunsate_update_sunstate_tm(int tm_mday, s_sunstate_data_t *user_da
 {
     if (tm_mday && user_data)
     {
-        char tmp_url[100] = { 0 };
+        char tmp_url[100] = {0};
         char tmp_headers[] = "Host: api.sunrisesunset.io\r\nAccept: */*\r\nConnection: keep-alive\r\n";
         char tmp_web_server[] = "api.sunrisesunset.io";
         char *lat_long_vals = ezlopi_nvs_read_latidtude_longitude();
@@ -639,7 +641,7 @@ static void issunstate_add_offs(e_issunstate_offset_t tmoffs_type, struct tm *ch
     if (choosen_suntime && defined_moment && tm_offs_val) // choosen_suntime => sunrise or sunset
     {
         // Default values to store start and end boundries
-        struct tm tmp_time = { 0 };
+        struct tm tmp_time = {0};
 
         // Nox, extract & add :'tm_offs_val'
         char time_diff[10];
@@ -745,10 +747,10 @@ uint8_t issunstate_get_suntime(l_scenes_list_v2_t *scene_node, l_fields_v2_t *cu
 
             user_data->sunstate_mode = curr_sunstate_mode;          // this sets target sunstate for curr meshbot
             issunsate_update_sunstate_tm(info->tm_mday, user_data); // assign 'curr_day' & 'suntime' only
-            user_data->tmoffs_type = (0 == strncmp(curr_field->field_value.u_value.value_string, "intime", 7)) ? ISSUNSTATE_INTIME_MODE
-                : (0 == strncmp(curr_field->field_value.u_value.value_string, "before", 7)) ? ISSUNSTATE_BEFORE_MODE
-                : (0 == strncmp(curr_field->field_value.u_value.value_string, "after", 6)) ? ISSUNSTATE_AFTER_MODE
-                : ISSUNSTATE_UNDEFINED;
+            user_data->tmoffs_type = (0 == strncmp(curr_field->field_value.u_value.value_string, "intime", 7))   ? ISSUNSTATE_INTIME_MODE
+                                     : (0 == strncmp(curr_field->field_value.u_value.value_string, "before", 7)) ? ISSUNSTATE_BEFORE_MODE
+                                     : (0 == strncmp(curr_field->field_value.u_value.value_string, "after", 6))  ? ISSUNSTATE_AFTER_MODE
+                                                                                                                 : ISSUNSTATE_UNDEFINED;
             // 3. check if, curr_tm_day has been updated successfully
             if ((0 == user_data->curr_tm_day) ||
                 (0 == user_data->sunstate_mode) ||
@@ -778,14 +780,14 @@ uint8_t issunstate_get_offs_tmval(l_scenes_list_v2_t *scene_node, l_fields_v2_t 
                 TRACE_D(".... Adding offset:  +/- (hh:mm:ss) ....");
                 issunstate_add_offs(user_data->tmoffs_type, &(user_data->choosen_suntime), &(user_data->defined_moment), curr_field->field_value.u_value.value_string);
                 TRACE_S("\r\nSunMode[%d]{sunrise=1,sunset=2,0=NULL},\r\nChoosen_suntime(hh:mm:ss = %d:%d:%d),\r\ndefined_moment(hh:mm:ss = %d:%d:%d),\r\nOffset(%s)\r\n",
-                    user_data->sunstate_mode,
-                    user_data->choosen_suntime.tm_hour,
-                    user_data->choosen_suntime.tm_min,
-                    user_data->choosen_suntime.tm_sec,
-                    user_data->defined_moment.tm_hour,
-                    user_data->defined_moment.tm_min,
-                    user_data->defined_moment.tm_sec,
-                    curr_field->field_value.u_value.value_string);
+                        user_data->sunstate_mode,
+                        user_data->choosen_suntime.tm_hour,
+                        user_data->choosen_suntime.tm_min,
+                        user_data->choosen_suntime.tm_sec,
+                        user_data->defined_moment.tm_hour,
+                        user_data->defined_moment.tm_min,
+                        user_data->defined_moment.tm_sec,
+                        curr_field->field_value.u_value.value_string);
             }
         }
     }
@@ -848,8 +850,8 @@ uint8_t issunstate_check_mdrn(uint8_t sunstate_mode, const char *range_type, str
                 ret = (1 << 3);
             }
             else if (((info->tm_hour < 24) && (info->tm_hour == defined_moment->tm_hour)) &&
-                ((info->tm_min < 60) && (info->tm_min >= defined_moment->tm_min)) &&
-                ((info->tm_sec < 60) && (info->tm_sec > defined_moment->tm_sec)))
+                     ((info->tm_min < 60) && (info->tm_min >= defined_moment->tm_min)) &&
+                     ((info->tm_sec < 60) && (info->tm_sec > defined_moment->tm_sec)))
             {
                 ret = (1 << 3);
             }
@@ -861,8 +863,8 @@ uint8_t issunstate_check_mdrn(uint8_t sunstate_mode, const char *range_type, str
                 ret = (1 << 3);
             }
             else if (((info->tm_hour >= 0) && (info->tm_hour == defined_moment->tm_hour)) &&
-                ((info->tm_min >= 0) && (info->tm_min <= defined_moment->tm_min)) &&
-                ((info->tm_sec >= 0) && (info->tm_sec <= defined_moment->tm_sec)))
+                     ((info->tm_min >= 0) && (info->tm_min <= defined_moment->tm_min)) &&
+                     ((info->tm_sec >= 0) && (info->tm_sec <= defined_moment->tm_sec)))
             {
                 ret = (1 << 3);
             }
@@ -1375,9 +1377,9 @@ int when_function_for_pulse(l_scenes_list_v2_t *scene_node, l_when_block_v2_t *w
             }
 
             TRACE_W("trigger_state= %s , {seq_count: %d}.-----> return =>> [pulse_state = %s]",
-                (function_state_info->activate_pulse_seq) ? "true" : "false",
-                function_state_info->transition_count,
-                (function_state_info->current_state) ? "high" : "low");
+                    (function_state_info->activate_pulse_seq) ? "true" : "false",
+                    function_state_info->transition_count,
+                    (function_state_info->current_state) ? "high" : "low");
             ret = function_state_info->current_state;
         }
     }
@@ -1443,9 +1445,10 @@ int isdeviceitem_group_value_check(l_scenes_list_v2_t *scene_node, uint32_t devi
         l_ezlopi_device_grp_t *curr_devgrp = ezlopi_core_device_group_get_by_id(device_group_id);
         if (curr_devgrp)
         {
-            int idx = 0;
+            // int idx = 0;
             cJSON *cj_get_devarr = NULL;
-            while (NULL != (cj_get_devarr = cJSON_GetArrayItem(curr_devgrp->devices, idx))) // ["102ec000" , "102ec001" ,..]
+            // while (NULL != (cj_get_devarr = cJSON_GetArrayItem(curr_devgrp->devices, idx))) // ["102ec000" , "102ec001" ,..]
+            cJSON_ArrayForEach(cj_get_devarr, curr_devgrp->devices)
             {
                 uint32_t curr_devce_id = strtoul(cj_get_devarr->valuestring, NULL, 16);
                 l_ezlopi_device_t *curr_device = ezlopi_device_get_by_id(curr_devce_id); // immediately goto "102ec000" ...
@@ -1458,9 +1461,11 @@ int isdeviceitem_group_value_check(l_scenes_list_v2_t *scene_node, uint32_t devi
                         l_ezlopi_item_grp_t *curr_item_grp = ezlopi_core_item_group_get_by_id(item_group_id); // get  "ll_itemgrp_node"
                         if (curr_item_grp)
                         {
-                            int count = 0;
+                            // int count = 0;
                             cJSON *cj_item_names = NULL;
-                            while (NULL != (cj_item_names = cJSON_GetArrayItem(curr_item_grp->item_names, count))) // ["202ec000" , "202ec001" ,..]
+                            // while (NULL != (cj_item_names = cJSON_GetArrayItem(curr_item_grp->item_names, count))) // ["202ec000" , "202ec001" ,..]
+
+                            cJSON_ArrayForEach(cj_item_names, curr_item_grp->item_names)
                             {
                                 uint32_t req_item_id_from_itemgrp = strtoul(cj_item_names->valuestring, NULL, 16);
                                 // if the item_ids match ; Then compare the "item_values" with that of the "scene's" requirement
@@ -1567,13 +1572,13 @@ int isdeviceitem_group_value_check(l_scenes_list_v2_t *scene_node, uint32_t devi
 
                                     break;
                                 }
-                                count++;
+                                // count++;
                             }
                         }
                         curr_item_node = curr_item_node->next;
                     }
                 }
-                idx++;
+                // idx++;
             }
         }
 
@@ -1623,7 +1628,7 @@ static uint8_t __isitemState_vs_field_compare(s_item_exp_data_t *new_extract_dat
                         flag |= (cj_val->valuedouble == new_extract_data->sample_data.u_value.value_double) ? (1 << bit_mode_position) : 0;
                         break;
                     }
-                    case cJSON_True:  // bool_values can be converted to 1/0s
+                    case cJSON_True: // bool_values can be converted to 1/0s
                     {
                         flag |= (new_extract_data->sample_data.u_value.value_bool) ? (1 << bit_mode_position) : 0;
                         break;
@@ -1665,9 +1670,9 @@ static uint8_t __isitemState_vs_field_compare(s_item_exp_data_t *new_extract_dat
                     if (tmp_expr->exp_value.u_value.str_value && new_extract_data->sample_data.u_value.value_string)
                     {
                         if (EZPI_STRNCMP_IF_EQUAL(tmp_expr->exp_value.u_value.str_value,
-                            new_extract_data->sample_data.u_value.value_string,
-                            strlen(tmp_expr->exp_value.u_value.str_value),
-                            strlen(new_extract_data->sample_data.u_value.value_string)))
+                                                  new_extract_data->sample_data.u_value.value_string,
+                                                  strlen(tmp_expr->exp_value.u_value.str_value),
+                                                  strlen(new_extract_data->sample_data.u_value.value_string)))
                         {
                             flag |= (1 << bit_mode_position);
                         }
@@ -1696,9 +1701,9 @@ static uint8_t __isitemState_vs_field_compare(s_item_exp_data_t *new_extract_dat
             if (tmp_field->field_value.u_value.value_string && new_extract_data->sample_data.u_value.value_string)
             {
                 if (EZPI_STRNCMP_IF_EQUAL(tmp_field->field_value.u_value.value_string,
-                    new_extract_data->sample_data.u_value.value_string,
-                    strlen(tmp_field->field_value.u_value.value_string),
-                    strlen(new_extract_data->sample_data.u_value.value_string)))
+                                          new_extract_data->sample_data.u_value.value_string,
+                                          strlen(tmp_field->field_value.u_value.value_string),
+                                          strlen(new_extract_data->sample_data.u_value.value_string)))
                 {
                     flag |= (1 << bit_mode_position);
                 }
@@ -1764,7 +1769,6 @@ static void __replace_old_with_new_data_val(s_item_exp_data_t *new_extract_data,
     {
         TRACE_E("Invalid operation.... null structure");
     }
-
 }
 static int ____old_vs_new_extract_data(s_item_exp_data_t *new_extract_data, s_item_exp_data_t *prev_extract_data)
 {
@@ -1792,10 +1796,10 @@ static int ____old_vs_new_extract_data(s_item_exp_data_t *new_extract_data, s_it
         if (new_extract_data->sample_data.u_value.value_string && prev_extract_data->sample_data.u_value.value_string)
         {
             if (EZPI_STRNCMP_IF_EQUAL(
-                new_extract_data->sample_data.u_value.value_string,
-                prev_extract_data->sample_data.u_value.value_string,
-                strlen(new_extract_data->sample_data.u_value.value_string),
-                strlen(prev_extract_data->sample_data.u_value.value_string)))
+                    new_extract_data->sample_data.u_value.value_string,
+                    prev_extract_data->sample_data.u_value.value_string,
+                    strlen(new_extract_data->sample_data.u_value.value_string),
+                    strlen(prev_extract_data->sample_data.u_value.value_string)))
             {
                 ret = 1;
             }
@@ -1805,20 +1809,20 @@ static int ____old_vs_new_extract_data(s_item_exp_data_t *new_extract_data, s_it
     default:
         break;
     }
-    return ret; // if matched --> return 1  
+    return ret; // if matched --> return 1
 }
 
 int isitemstate_changed(s_item_exp_data_t *new_extract_data, l_fields_v2_t *start_field, l_fields_v2_t *finish_field, l_scenes_list_v2_t *scene_node)
 {
     int ret = 0;
     s_item_exp_data_t *prev_extract_data = (s_item_exp_data_t *)(scene_node->when_block->fields->user_arg);
-    if (new_extract_data)  // new vs old data
+    if (new_extract_data) // new vs old data
     {
         uint32_t flag = 0;
         // ---> New flag= (000) : ---> 1. compare 'new_extract_data' with 'start_field  / ANY'  ---> if true ; start_flag =1 ; ---> store data
-                                // --> 1.a . if start_field = Any ; start_flag =1 & return 'true' |  Else compare
+        // --> 1.a . if start_field = Any ; start_flag =1 & return 'true' |  Else compare
         // -----> For flag= (001): ------> 2. compare 'new_extract_data' with 'finish_field / ANY'  -----> if true ; flag = (011) ; ----> store data ;  flag = (111) : ---->
-                                // ------> 2.a . if finish = Any ; start_flag =1 & return 'true' |  Else compare
+        // ------> 2.a . if finish = Any ; start_flag =1 & return 'true' |  Else compare
         // --------> For flag = (111) : --------> 3. if(start_field & final_field == NULL or 'ANY') ? exit ; else, flag = (000).
 
         if (NULL == prev_extract_data)
@@ -1830,7 +1834,7 @@ int isitemstate_changed(s_item_exp_data_t *new_extract_data, l_fields_v2_t *star
         {
             flag = prev_extract_data->status;
             // TRACE_I("# Before comparision : status_flag=%08x", flag);
-            switch (flag)  // this says what to do next
+            switch (flag) // this says what to do next
             {
             case 0: // no condition match   ---> check the start condition only.
             {
@@ -1838,7 +1842,7 @@ int isitemstate_changed(s_item_exp_data_t *new_extract_data, l_fields_v2_t *star
                 flag |= __isitemState_vs_field_compare(prev_extract_data, start_field, 0);
                 break;
             }
-            case (BIT0):  // Only start condition activated ; ----> so check for finish condition
+            case (BIT0): // Only start condition activated ; ----> so check for finish condition
             {
                 // TRACE_D("checking finish conditon");
                 flag |= __isitemState_vs_field_compare(new_extract_data, finish_field, 1);
@@ -1850,41 +1854,40 @@ int isitemstate_changed(s_item_exp_data_t *new_extract_data, l_fields_v2_t *star
                 }
                 break;
             }
-            case (BIT1 | BIT0):  // condition match but not activated [or reset] ---> need to active here
+            case (BIT1 | BIT0): // condition match but not activated [or reset] ---> need to active here
             {
                 // TRACE_I("====>  pre-state : (011) --> activating");
                 flag |= BIT2;
                 break;
             }
-            case (BIT2 | BIT1 | BIT0):   // all condition matched and activated  ---> check if state have changed --> if changed , reset activation flag
+            case (BIT2 | BIT1 | BIT0): // all condition matched and activated  ---> check if state have changed --> if changed , reset activation flag
             {
-                #warning "need to optimize this case";s
-                    // comparing 'start'
-                    if (NULL != start_field)
+#warning "need to optimize this case";
+                // comparing 'start'
+                if (NULL != start_field)
+                {
+                    if (!(BIT0 & __isitemState_vs_field_compare(prev_extract_data, start_field, 0))) // if BIT0 = 0;
                     {
-                        if (!(BIT0 & __isitemState_vs_field_compare(prev_extract_data, start_field, 0))) // if BIT0 = 0;
-                        {
-                            flag &= (0 << 2);
-                            // TRACE_I(" HERE :- Reseting the 'BIT2' ");
-                        }
-                        else
-                        {
-                            // TRACE_D("start or finish condition is still satisfied.... cannot reset 'BIT2'");
-                        }
+                        flag &= (0 << 2);
+                        // TRACE_I(" HERE :- Reseting the 'BIT2' ");
                     }
-                    else    // 'ANY'
+                    else
                     {
-                        if (!____old_vs_new_extract_data(new_extract_data, prev_extract_data))
-                        {
-                            flag &= (0 << 2);
-                            // TRACE_I(" HERE :- Reseting the 'BIT2' ");
-                        }
-                        else
-                        {
-                            // TRACE_D(" new-data == old-data");
-                        }
-
+                        // TRACE_D("start or finish condition is still satisfied.... cannot reset 'BIT2'");
                     }
+                }
+                else // 'ANY'
+                {
+                    if (!____old_vs_new_extract_data(new_extract_data, prev_extract_data))
+                    {
+                        flag &= (0 << 2);
+                        // TRACE_I(" HERE :- Reseting the 'BIT2' ");
+                    }
+                    else
+                    {
+                        // TRACE_D(" new-data == old-data");
+                    }
+                }
 
                 // comparing 'finish'
                 if (NULL != finish_field)
@@ -1899,7 +1902,7 @@ int isitemstate_changed(s_item_exp_data_t *new_extract_data, l_fields_v2_t *star
                         // TRACE_D("start or finish condition is still satisfied.... cannot reset 'BIT2'");
                     }
                 }
-                else// 'ANY'
+                else // 'ANY'
                 {
                     if (!____old_vs_new_extract_data(new_extract_data, prev_extract_data))
                     {
@@ -1913,14 +1916,13 @@ int isitemstate_changed(s_item_exp_data_t *new_extract_data, l_fields_v2_t *star
                 }
                 break;
             }
-            default:    // all remaining conditon are invalid ; So 'Reset' all flags and start again in next iteration.
+            default: // all remaining conditon are invalid ; So 'Reset' all flags and start again in next iteration.
             {
                 // TRACE_D("Reseting.... to start fresh");
                 // flag = 0;
                 break;
             }
             }
-
         }
 
         // assign latest flag to new-structure.
@@ -1935,7 +1937,7 @@ int isitemstate_changed(s_item_exp_data_t *new_extract_data, l_fields_v2_t *star
             {
                 memset(tmp_struct, 0, sizeof(s_item_exp_data_t));
                 __replace_old_with_new_data_val(new_extract_data, tmp_struct);
-                scene_node->when_block->fields->user_arg = (void*)tmp_struct;
+                scene_node->when_block->fields->user_arg = (void *)tmp_struct;
             }
             else
             {
@@ -1962,7 +1964,6 @@ int isitemstate_changed(s_item_exp_data_t *new_extract_data, l_fields_v2_t *star
     }
     return ret;
 }
-
 
 #endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 //-----------------------------------------------------------------------------------------------------

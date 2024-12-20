@@ -5,7 +5,11 @@
 #include "ezlopi_core_modes_cjson.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_errors.h"
+#include "ezlopi_core_devices.h"
+#include "ezlopi_core_api_methods.h"
+#include "ezlopi_core_broadcast.h"
 
+#include "ezlopi_cloud_devices.h"
 #include "ezlopi_cloud_constants.h"
 
 #include "ezlopi_service_modes.h"
@@ -66,19 +70,19 @@ s_house_modes_t *ezlopi_core_modes_get_house_mode_by_name(char *house_mode_name)
 
     if (house_mode_name)
     {
-        if (0 == strcmp(house_mode_name, sg_custom_modes->mode_home.name))
+        if (EZPI_STRNCMP_IF_EQUAL(house_mode_name, sg_custom_modes->mode_home.name, strlen(house_mode_name), strlen(sg_custom_modes->mode_home.name)))
         {
             _house_mode = &sg_custom_modes->mode_home;
         }
-        else if (0 == strcmp(house_mode_name, sg_custom_modes->mode_away.name))
+        else if (EZPI_STRNCMP_IF_EQUAL(house_mode_name, sg_custom_modes->mode_away.name, strlen(house_mode_name), strlen(sg_custom_modes->mode_away.name)))
         {
             _house_mode = &sg_custom_modes->mode_away;
         }
-        else if (0 == strcmp(house_mode_name, sg_custom_modes->mode_night.name))
+        else if (EZPI_STRNCMP_IF_EQUAL(house_mode_name, sg_custom_modes->mode_night.name, strlen(house_mode_name), strlen(sg_custom_modes->mode_night.name)))
         {
             _house_mode = &sg_custom_modes->mode_night;
         }
-        else if (0 == strcmp(house_mode_name, sg_custom_modes->mode_vacation.name))
+        else if (EZPI_STRNCMP_IF_EQUAL(house_mode_name, sg_custom_modes->mode_vacation.name, strlen(house_mode_name), strlen(sg_custom_modes->mode_vacation.name)))
         {
             _house_mode = &sg_custom_modes->mode_vacation;
         }
@@ -105,7 +109,17 @@ ezlopi_error_t ezlopi_core_modes_api_switch_mode(s_house_modes_t *switch_to_hous
 {
     ezlopi_service_modes_stop(5000);
     sg_custom_modes->switch_to_mode_id = switch_to_house_mode->_id;
-    sg_custom_modes->time_is_left_to_switch_sec = switch_to_house_mode->switch_to_delay_sec;
+    sg_custom_modes->time_is_left_to_switch_sec = 0;
+
+    // #. If the curr-house-mode already was in 'pre-alarming[EntryDelay]' MODE ; set 'canceled' broadcast status
+    if (EZLOPI_MODES_ALARM_PHASE_ENTRYDELAY == sg_custom_modes->alarmed.phase &&
+        EZLOPI_MODES_ALARM_STATUS_BEGIN == sg_custom_modes->alarmed.status)
+    {
+        TRACE_D("switching to MODE : %d", sg_custom_modes->switch_to_mode_id);
+        sg_custom_modes->alarmed.status = EZLOPI_MODES_ALARM_STATUS_CANCELED;
+    }
+
+    // The broadcast is triggered when 'modes-loop' is started
     ezlopi_service_modes_start(5000);
 
     return 1;
@@ -133,10 +147,23 @@ ezlopi_error_t ezlopi_core_modes_api_cancel_entry_delay(void)
     {
         ret = EZPI_SUCCESS;
         ezlopi_service_modes_stop(5000);
-        sg_custom_modes->entry_delay.normal_delay_sec = 0;
-        sg_custom_modes->entry_delay.extended_delay_sec = 0;
-        sg_custom_modes->entry_delay.long_extended_delay_sec = 0;
-        sg_custom_modes->entry_delay.instant_delay_sec = 0;
+        sg_custom_modes->alarmed.status = EZLOPI_MODES_ALARM_STATUS_CANCELED;
+        ezlopi_service_modes_start(5000);
+    }
+
+    return ret;
+}
+
+ezlopi_error_t ezlopi_core_modes_api_skip_entry_delay(void)
+{
+    ezlopi_error_t ret = EZPI_ERR_MODES_FAILED;
+    if (sg_custom_modes)
+    {
+        ret = EZPI_SUCCESS;
+        ezlopi_service_modes_stop(5000);
+        sg_custom_modes->alarmed.time_is_left_sec = 0;
+        sg_custom_modes->alarmed.phase = EZLOPI_MODES_ALARM_PHASE_ENTRYDELAY;
+        sg_custom_modes->alarmed.status = EZLOPI_MODES_ALARM_STATUS_DONE;
         ezlopi_service_modes_start(5000);
     }
 
@@ -150,7 +177,7 @@ ezlopi_error_t ezlopi_core_modes_set_switch_to_delay(uint32_t switch_to_delay)
     {
         ret = EZPI_SUCCESS;
         ezlopi_service_modes_stop(5000);
-        sg_current_house_mode->switch_to_delay_sec = switch_to_delay;
+        sg_custom_modes->switch_to_delay_sec = switch_to_delay;
         ezlopi_core_modes_store_to_nvs();
         ezlopi_service_modes_start(5000);
     }
@@ -164,22 +191,47 @@ ezlopi_error_t ezlopi_core_modes_set_alarm_delay(uint32_t alarm_to_delay)
     {
         ret = EZPI_SUCCESS;
         ezlopi_service_modes_stop(5000);
-        sg_current_house_mode->alarm_delay_sec = alarm_to_delay;
+
+        // 1. update in static 'mode-struct'
+        // 2. update using 'curr-house_mode' pointer
+        sg_custom_modes->alarm_delay = sg_current_house_mode->alarm_delay_sec = alarm_to_delay; // Delay (sec) before sending alert if armed sensors (door/window or motion sensor) tripped
+
         ezlopi_core_modes_store_to_nvs();
         ezlopi_service_modes_start(5000);
     }
     return ret;
 }
 
-ezlopi_error_t ezlopi_core_modes_set_notifications(cJSON *cj_params)
+ezlopi_error_t ezlopi_core_modes_set_notifications(uint8_t modesId, bool all, cJSON *user_id_aray)
 {
     ezlopi_error_t ret = EZPI_ERR_MODES_FAILED;
-    if (cj_params)
+    if ((EZLOPI_HOUSE_MODE_REF_ID_NONE < modesId) && (EZLOPI_HOUSE_MODE_REF_ID_MAX > modesId) && user_id_aray && (cJSON_Array == user_id_aray->type))
     {
         ezlopi_service_modes_stop(5000);
+        s_house_modes_t *mode_to_upate = ezlopi_core_modes_get_house_mode_by_id(modesId);
+        if (mode_to_upate)
+        {
+            mode_to_upate->notify_all = all;
 
+            // Delete previous cj_notification
+            if (NULL != mode_to_upate->cj_notifications)
+            {
+                cJSON_Delete(__func__, mode_to_upate->cj_notifications);
+            }
+
+            // Refreshing the notification list.
+            mode_to_upate->cj_notifications = cJSON_CreateArray(__FUNCTION__);
+            if (mode_to_upate->cj_notifications)
+            {
+                mode_to_upate->cj_notifications = cJSON_Duplicate(__FUNCTION__, user_id_aray, cJSON_True);
+            }
+
+            mode_to_upate->disarmed_default = false;
+            ezlopi_core_modes_store_to_nvs();
+
+            ret = EZPI_SUCCESS;
+        }
         ezlopi_service_modes_start(5000);
-        ret = EZPI_SUCCESS;
     }
     return ret;
 }
@@ -200,6 +252,7 @@ ezlopi_error_t ezlopi_core_modes_add_alarm_off(uint8_t mode_id, cJSON *device_id
                 if (EZPI_STRNCMP_IF_EQUAL(device_id->valuestring, element_to_check->valuestring, strlen(device_id->valuestring), strlen(element_to_check->valuestring)))
                 {
                     add_to_array = false;
+                    break;
                 }
             }
             if (add_to_array)
@@ -219,6 +272,7 @@ ezlopi_error_t ezlopi_core_modes_add_alarm_off(uint8_t mode_id, cJSON *device_id
                     ret = EZPI_SUCCESS;
                 }
             }
+            targe_house_mode->disarmed_default = false;
         }
         ezlopi_service_modes_start(5000);
     }
@@ -254,6 +308,78 @@ ezlopi_error_t ezlopi_core_modes_remove_alarm_off(uint32_t mode_id, cJSON *devic
             {
                 ret = EZPI_SUCCESS;
             }
+            targe_house_mode->disarmed_default = false;
+        }
+        ezlopi_service_modes_start(5000);
+    }
+    return ret;
+}
+
+ezlopi_error_t ezlopi_core_modes_bypass_device_add(uint8_t modeId, cJSON *cj_device_id_array)
+{
+    ezlopi_error_t ret = EZPI_ERR_MODES_FAILED;
+    if ((EZLOPI_HOUSE_MODE_REF_ID_NONE < modeId) && (EZLOPI_HOUSE_MODE_REF_ID_MAX > modeId) && cj_device_id_array && (cJSON_Array == cj_device_id_array->type))
+    {
+        ezlopi_service_modes_stop(5000);
+        s_house_modes_t *mode_to_update = ezlopi_core_modes_get_house_mode_by_id(modeId);
+        if (mode_to_update)
+        {
+            cJSON *bypass_dev_to_add = NULL;
+            cJSON_ArrayForEach(bypass_dev_to_add, cj_device_id_array)
+            {
+                cJSON *element_to_check = NULL;
+                bool add_to_array = true;
+                cJSON_ArrayForEach(element_to_check, mode_to_update->cj_bypass_devices)
+                {
+                    if (EZPI_STRNCMP_IF_EQUAL(bypass_dev_to_add->valuestring, element_to_check->valuestring, bypass_dev_to_add->str_value_len, element_to_check->str_value_len))
+                    {
+                        add_to_array = false;
+                        break;
+                    }
+                }
+                if (add_to_array)
+                {
+                    if (NULL == mode_to_update->cj_bypass_devices)
+                    {
+                        mode_to_update->cj_bypass_devices = cJSON_CreateArray(__func__);
+                    }
+                    cJSON_AddItemToArray(mode_to_update->cj_bypass_devices, cJSON_CreateString(__func__, bypass_dev_to_add->valuestring));
+                }
+            }
+            ezlopi_core_modes_store_to_nvs();
+            ret = EZPI_SUCCESS;
+        }
+        ezlopi_service_modes_start(5000);
+    }
+    return ret;
+}
+
+ezlopi_error_t ezlopi_core_modes_bypass_device_remove(uint8_t modeId, cJSON *cj_device_id_array)
+{
+    ezlopi_error_t ret = 0;
+    if ((EZLOPI_HOUSE_MODE_REF_ID_NONE < modeId) && (EZLOPI_HOUSE_MODE_REF_ID_MAX > modeId) && cj_device_id_array && (cJSON_Array == cj_device_id_array->type))
+    {
+        ezlopi_service_modes_stop(5000);
+        s_house_modes_t *mode_to_update = ezlopi_core_modes_get_house_mode_by_id(modeId);
+        if (mode_to_update)
+        {
+            cJSON *bypass_dev_to_remove = NULL;
+            cJSON_ArrayForEach(bypass_dev_to_remove, cj_device_id_array)
+            {
+                cJSON *element_to_check = NULL;
+                int array_index = 0;
+                cJSON_ArrayForEach(element_to_check, mode_to_update->cj_bypass_devices)
+                {
+                    if (EZPI_STRNCMP_IF_EQUAL(bypass_dev_to_remove->valuestring, element_to_check->valuestring, bypass_dev_to_remove->str_value_len, element_to_check->str_value_len))
+                    {
+                        cJSON_DeleteItemFromArray(__func__, mode_to_update->cj_bypass_devices, array_index);
+                        break;
+                    }
+                    array_index++;
+                }
+            }
+            ezlopi_core_modes_store_to_nvs();
+            ret = 1;
         }
         ezlopi_service_modes_start(5000);
     }
@@ -281,6 +407,185 @@ ezlopi_error_t ezlopi_core_modes_set_protect(uint32_t mode_id, bool protect_stat
             }
         }
         ezlopi_service_modes_start(5000);
+    }
+    return ret;
+}
+
+ezlopi_error_t ezlopi_core_modes_protect_button_service_set(char *service_str, uint32_t deviceId, uint8_t *status) // status => [ BIT0 = added ; BIT1 = Updated ; BIT2 = removed ]
+{
+    ezlopi_error_t ret = EZPI_ERR_MODES_FAILED;
+    if (service_str && deviceId)
+    {
+        if ((NULL != ezlopi_device_get_by_id(deviceId)) && sg_custom_modes) // IF 'device_id' exists then add to 'protect_button_ll'
+        {
+            ezlopi_service_modes_stop(5000);
+
+            if (NULL != sg_custom_modes->l_protect_buttons)
+            {
+                s_protect_buttons_t *curr_button = sg_custom_modes->l_protect_buttons; // Start from the 'head'
+                while (curr_button)
+                {
+                    if (deviceId == curr_button->device_id)
+                    {
+                        if (EZPI_STRNCMP_IF_EQUAL(curr_button->service_name, service_str, strlen(curr_button->service_name), strlen(service_str)))
+                        {
+                            // ### removing node
+                            //---------------------------------------------------------------------------------------
+                            *status = BIT2;                                        // 'removed-flag' is set
+                            if (sg_custom_modes->l_protect_buttons == curr_button) // first compare with head_node
+                            {
+                                s_protect_buttons_t *__del_node = sg_custom_modes->l_protect_buttons;
+                                sg_custom_modes->l_protect_buttons = sg_custom_modes->l_protect_buttons->next;
+
+                                // clearing all members of the target-node
+                                __del_node->func = NULL;
+                                __del_node->next = NULL;
+                                ezlopi_free(__func__, __del_node);
+                            }
+                            else
+                            {
+                                s_protect_buttons_t *_node = sg_custom_modes->l_protect_buttons;
+                                while (_node->next)
+                                {
+                                    if (_node->next == curr_button)
+                                    {
+                                        s_protect_buttons_t *__del_node = _node->next;
+                                        _node->next = _node->next->next;
+
+                                        // clearing all members of the target-node
+                                        __del_node->func = NULL;
+                                        __del_node->next = NULL;
+                                        ezlopi_free(__func__, __del_node);
+                                        break;
+                                    }
+
+                                    _node = _node->next;
+                                }
+                            }
+
+                            //---------------------------------------------------------------------------------------
+                        }
+                        else
+                        {
+                            *status = BIT1; // 'updated-flag' is set
+                            snprintf(curr_button->service_name, sizeof(curr_button->service_name), "%s", service_str);
+                        }
+
+                        break;
+                    }
+
+                    if (curr_button->next)
+                    {
+                        curr_button = curr_button->next;
+                    }
+                    else // ### Adding the 'new button', to last-node of ll
+                    {
+                        TRACE_D("[Tail->next==NULL] ; adding new 'protect_button' to the tail_node  ");
+                        curr_button->next = (s_protect_buttons_t *)ezlopi_malloc(__FUNCTION__, sizeof(s_protect_buttons_t));
+                        if (curr_button->next)
+                        {
+                            *status = BIT0; // 'added-flag' is set
+                            memset(curr_button->next, 0, sizeof(s_protect_buttons_t));
+                            snprintf(curr_button->next->service_name, sizeof(curr_button->next->service_name), "%s", service_str);
+                            curr_button->next->device_id = deviceId;
+                            curr_button->next->func = NULL;
+                            curr_button->next->next = NULL;
+                        }
+
+                        break;
+                    }
+                }
+            }
+            else // ### Adding to the head node :- 'sg_custom_modes->l_protect_buttons'
+            {
+                sg_custom_modes->l_protect_buttons = (s_protect_buttons_t *)ezlopi_malloc(__FUNCTION__, sizeof(s_protect_buttons_t));
+                if (sg_custom_modes->l_protect_buttons)
+                {
+                    *status = BIT0; // 'added-flag' is set
+                    memset(sg_custom_modes->l_protect_buttons, 0, sizeof(s_protect_buttons_t));
+                    snprintf(sg_custom_modes->l_protect_buttons->service_name, sizeof(sg_custom_modes->l_protect_buttons->service_name), "%s", service_str);
+                    sg_custom_modes->l_protect_buttons->device_id = deviceId;
+                    sg_custom_modes->l_protect_buttons->func = NULL;
+                    sg_custom_modes->l_protect_buttons->next = NULL;
+                }
+            }
+
+            ezlopi_core_modes_store_to_nvs();
+
+            ret = EZPI_SUCCESS;
+            ezlopi_service_modes_start(5000);
+        }
+    }
+
+    return ret;
+}
+
+ezlopi_error_t ezlopi_core_modes_add_protect_devices(cJSON *user_id_aray)
+{
+    ezlopi_error_t ret = EZPI_ERR_MODES_FAILED;
+
+    if (user_id_aray && (cJSON_Array == user_id_aray->type))
+    {
+        ezlopi_service_modes_stop(5000);
+
+        if (sg_custom_modes)
+        {
+            cJSON *dev_to_add = NULL;
+            cJSON_ArrayForEach(dev_to_add, user_id_aray)
+            {
+                bool add_to_array = true;
+                cJSON *dev_to_check = NULL;
+                cJSON_ArrayForEach(dev_to_check, sg_custom_modes->cj_devices)
+                {
+                    if (EZPI_STRNCMP_IF_EQUAL(dev_to_add->valuestring, dev_to_check->valuestring, (dev_to_add->str_value_len), (dev_to_check->str_value_len)))
+                    {
+                        add_to_array = false;
+                        break;
+                    }
+                }
+                if (add_to_array)
+                {
+                    if (NULL == sg_custom_modes->cj_devices)
+                    {
+                        sg_custom_modes->cj_devices = cJSON_CreateArray(__FUNCTION__);
+                    }
+                    cJSON_AddItemToArray(sg_custom_modes->cj_devices, cJSON_CreateString(__FUNCTION__, dev_to_add->valuestring));
+                }
+            }
+            ezlopi_core_modes_store_to_nvs();
+            ret = EZPI_SUCCESS;
+        }
+
+        ezlopi_service_modes_start(5000);
+    }
+
+    return ret;
+}
+
+ezlopi_error_t ezlopi_core_modes_remove_protect_devices(cJSON *user_id_aray)
+{
+    ezlopi_error_t ret = EZPI_ERR_MODES_FAILED;
+    if (user_id_aray && (cJSON_Array == user_id_aray->type) && sg_custom_modes)
+    {
+        ezlopi_service_modes_stop(5000);
+        cJSON *element_to_remove = NULL;
+        cJSON_ArrayForEach(element_to_remove, user_id_aray)
+        {
+            cJSON *element_to_check = NULL;
+            int element_index = 0;
+            cJSON_ArrayForEach(element_to_check, sg_custom_modes->cj_devices)
+            {
+                if (EZPI_STRNCMP_IF_EQUAL(element_to_remove->valuestring, element_to_check->valuestring, (element_to_remove->str_value_len), (element_to_check->str_value_len)))
+                {
+                    cJSON_DeleteItemFromArray(__FUNCTION__, sg_custom_modes->cj_devices, element_index);
+                    break;
+                }
+                element_index++;
+            }
+        }
+        ezlopi_core_modes_store_to_nvs();
+        ezlopi_service_modes_start(5000);
+        ret = EZPI_SUCCESS;
     }
     return ret;
 }
@@ -343,6 +648,169 @@ ezlopi_error_t ezlopi_core_modes_reset_entry_delay(void)
     return ret;
 }
 
+ezlopi_error_t ezlopi_core_modes_set_disarmed_default(uint8_t modesID, bool disarmedDefault)
+{
+    ezlopi_error_t ret = EZPI_ERR_MODES_FAILED;
+    if ((modesID > EZLOPI_HOUSE_MODE_REF_ID_NONE) && (modesID < EZLOPI_HOUSE_MODE_REF_ID_MAX))
+    {
+        ezlopi_service_modes_stop(5000);
+        s_ezlopi_modes_t *custom_modes = ezlopi_core_modes_get_custom_modes();
+        if (custom_modes)
+        {
+            if (modesID == EZLOPI_HOUSE_MODE_REF_ID_HOME)
+            {
+                custom_modes->mode_home.disarmed_default = disarmedDefault;
+            }
+            else if (modesID == EZLOPI_HOUSE_MODE_REF_ID_NIGHT)
+            {
+                custom_modes->mode_night.disarmed_default = disarmedDefault;
+            }
+            else if (modesID == EZLOPI_HOUSE_MODE_REF_ID_AWAY)
+            {
+                custom_modes->mode_away.disarmed_default = disarmedDefault;
+            }
+            else if (modesID == EZLOPI_HOUSE_MODE_REF_ID_VACATION)
+            {
+                custom_modes->mode_vacation.disarmed_default = disarmedDefault;
+            }
+            ezlopi_core_modes_store_to_nvs();
+            ret = EZPI_SUCCESS;
+        }
+        ezlopi_service_modes_start(5000);
+    }
+    return ret;
+}
+
+ezlopi_error_t ezlopi_core_modes_add_disarmed_device(uint8_t modeId, const char *device_id_str)
+{
+    ezlopi_error_t ret = EZPI_ERR_MODES_FAILED;
+    if ((EZLOPI_HOUSE_MODE_REF_ID_NONE < modeId) && (EZLOPI_HOUSE_MODE_REF_ID_MAX > modeId) && device_id_str)
+    {
+        ezlopi_service_modes_stop(5000);
+        s_house_modes_t *mode_to_update = ezlopi_core_modes_get_house_mode_by_id(modeId);
+        if (mode_to_update)
+        {
+            bool add_to_array = true;
+            cJSON *add_element = NULL;
+            cJSON_ArrayForEach(add_element, mode_to_update->cj_disarmed_devices)
+            {
+                if (EZPI_STRNCMP_IF_EQUAL(device_id_str, add_element->valuestring, strlen(device_id_str), add_element->str_value_len))
+                {
+                    add_to_array = false;
+                    break;
+                }
+            }
+            if (add_to_array)
+            {
+                if (NULL == mode_to_update->cj_disarmed_devices)
+                {
+                    mode_to_update->cj_disarmed_devices = cJSON_CreateArray(__FUNCTION__);
+                }
+                cJSON_AddItemToArray(mode_to_update->cj_disarmed_devices, cJSON_CreateString(__func__, device_id_str));
+
+                mode_to_update->disarmed_default = false; // disarmedDefault state will change to **false**
+                ezlopi_core_modes_store_to_nvs();
+            }
+            ret = EZPI_SUCCESS;
+        }
+        ezlopi_service_modes_start(5000);
+    }
+
+    return ret;
+}
+
+ezlopi_error_t ezlopi_core_modes_remove_disarmed_device(uint8_t modeId, const char *device_id_str)
+{
+    ezlopi_error_t ret = EZPI_ERR_MODES_FAILED;
+
+    if ((EZLOPI_HOUSE_MODE_REF_ID_NONE < modeId) && (EZLOPI_HOUSE_MODE_REF_ID_MAX > modeId) && device_id_str)
+    {
+        ezlopi_service_modes_stop(5000);
+        s_house_modes_t *mode_to_update = ezlopi_core_modes_get_house_mode_by_id(modeId);
+        if (mode_to_update)
+        {
+            cJSON *remove_element = NULL;
+            int array_index = 0;
+            cJSON_ArrayForEach(remove_element, mode_to_update->cj_disarmed_devices)
+            {
+                if (EZPI_STRNCMP_IF_EQUAL(device_id_str, remove_element->valuestring, strlen(device_id_str), remove_element->str_value_len))
+                {
+                    cJSON_DeleteItemFromArray(__FUNCTION__, mode_to_update->cj_disarmed_devices, array_index);
+
+                    mode_to_update->disarmed_default = false; // disarmedDefault state will change to **false**
+                    ezlopi_core_modes_store_to_nvs();
+                    break;
+                }
+                array_index++;
+            }
+            ret = EZPI_SUCCESS;
+        }
+        ezlopi_service_modes_start(5000);
+    }
+
+    return ret;
+}
+
+ezlopi_error_t ezlopi_core_modes_set_unset_device_armed_status(cJSON *cj_device_array, const bool set)
+{
+    ezlopi_error_t ret = EZPI_ERR_MODES_FAILED;
+    if (cj_device_array && cj_device_array->type == cJSON_Array)
+    {
+        cJSON *curr_device = NULL;
+        cJSON_ArrayForEach(curr_device, cj_device_array)
+        {
+            uint32_t device_id = strtoul(curr_device->valuestring, NULL, 16);
+            l_ezlopi_device_t *device_to_change = ezlopi_device_get_by_id(device_id);
+            if (device_to_change)
+            {
+                if (device_to_change->cloud_properties.armed != set)
+                {
+                    device_to_change->cloud_properties.armed = set;
+
+                    // 1. PREPARE  cj_request structure to trigger broadcast for  'armed.set'
+                    cJSON *cj_device_armed_broadcast = cJSON_CreateObject(__func__);
+                    if (cj_device_armed_broadcast)
+                    {
+                        cJSON_AddStringToObject(__func__, cj_device_armed_broadcast, ezlopi_method_str, "hub.device.armed.set");
+                        cJSON *cj_params = cJSON_AddObjectToObject(__func__, cj_device_armed_broadcast, ezlopi_params_str);
+                        if (cj_params)
+                        {
+                            char tmp_id[32];
+                            memset(tmp_id, 0, 32);
+                            snprintf(tmp_id, 32, "%08x", device_to_change->cloud_properties.device_id);
+                            cJSON_AddStringToObject(__func__, cj_params, ezlopi__id_str, tmp_id);
+                            cJSON_AddBoolToObject(__func__, cj_params, ezlopi_armed_str, set);
+
+                            cJSON *cj_response = cJSON_CreateObject(__func__);
+                            if (NULL != cj_response)
+                            {
+                                // 2. CALL : "device_updated" broadcast for devices: switced from [ armed --> disarmed ]
+                                device_updated(cj_device_armed_broadcast, cj_response);
+
+                                if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(cj_response))
+                                {
+                                    // TRACE_E("freeing cj_response");
+                                    cJSON_Delete(__func__, cj_response);
+                                    ret = EZPI_ERR_MODES_FAILED;
+                                }
+                                else
+                                {
+                                    // TRACE_D("Sending--> broadcast for device armed toggle");
+                                    // The 'cj_response' is freed automatically after broadcast.
+                                    ret = EZPI_SUCCESS;
+                                }
+                            }
+                        }
+
+                        cJSON_Delete(__func__, cj_device_armed_broadcast); // this cjson need to be freed manually
+                    }
+                }
+            }
+        }
+    }
+    return ret;
+}
+
 ezlopi_error_t ezlopi_core_modes_store_to_nvs(void)
 {
     ezlopi_error_t ret = EZPI_ERR_MODES_FAILED;
@@ -375,12 +843,13 @@ void ezlopi_core_modes_init(void)
         cJSON *cj_custom_modes = cJSON_Parse(__FUNCTION__, custom_modes_str);
         ezlopi_free(__FUNCTION__, custom_modes_str);
 
-        CJSON_TRACE("cj_custom-modes", cj_custom_modes);
+        // CJSON_TRACE("cj_custom-modes", cj_custom_modes);
 
         if (cj_custom_modes)
         {
             _is_custom_mode_ok = 1;
             sg_custom_modes = ezlopi_core_modes_cjson_parse_modes(cj_custom_modes);
+            ezlopi_core_modes_set_current_house_mode(ezlopi_core_modes_get_house_mode_by_id(sg_custom_modes->current_mode_id));
             cJSON_Delete(__FUNCTION__, cj_custom_modes);
         }
     }
@@ -395,4 +864,5 @@ void ezlopi_core_modes_init(void)
         }
     }
 }
+
 #endif // CONFIG_EZPI_SERV_ENABLE_MODES

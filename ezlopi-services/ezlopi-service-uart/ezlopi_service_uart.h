@@ -3,8 +3,6 @@
 
 #include "../../build/config/sdkconfig.h"
 
-#ifdef CONFIG_EZPI_ENABLE_UART_PROVISIONING
-
 #include <string.h>
 
 #include "freertos/FreeRTOS.h"
@@ -52,12 +50,14 @@ extern "C"
     } e_ezlopi_uart_cmd_status_t;
 
     void EZPI_SERV_uart_init(void);
+
+#ifndef CONFIG_IDF_TARGET_ESP32
+    void EZPI_SERV_cdc_init();
+#endif // NOT defined CONFIG_IDF_TARGET_ESP32
     int EZPI_SERV_uart_tx_data(int len, uint8_t *data);
 
 #ifdef __cplusplus
 }
 #endif
-
-#endif // CONFIG_EZPI_ENABLE_UART_PROVISIONING
 
 #endif // _EZLOPI_SERVICE_UART_H_

@@ -643,9 +643,10 @@ static l_user_notification_v2_t *___user_notifications_populate(cJSON *cj_user_n
     if (cj_user_notifications && (cJSON_Array == cj_user_notifications->type))
     {
         cJSON *cj_user_notification = NULL;
-        int user_notifications_idx = 0;
+        // int user_notifications_idx = 0;
 
-        while (NULL != (cj_user_notification = cJSON_GetArrayItem(cj_user_notifications, user_notifications_idx++)))
+        // while (NULL != (cj_user_notification = cJSON_GetArrayItem(cj_user_notifications, user_notifications_idx++)))
+        cJSON_ArrayForEach(cj_user_notification, cj_user_notifications)
         {
             if (tmp_user_notifications_head)
             {
@@ -689,10 +690,11 @@ static l_house_modes_v2_t *___house_modes_populate(cJSON *cj_house_modes)
     l_house_modes_v2_t *tmp_house_mode_head = NULL;
     if (cj_house_modes)
     {
-        int house_mode_idx = 0;
+        // int house_mode_idx = 0;
         cJSON *cj_house_mode = NULL;
 
-        while (NULL != (cj_house_mode = cJSON_GetArrayItem(cj_house_modes, house_mode_idx++)))
+        // while (NULL != (cj_house_mode = cJSON_GetArrayItem(cj_house_modes, house_mode_idx++)))
+        cJSON_ArrayForEach(cj_house_mode, cj_house_modes)
         {
             if (tmp_house_mode_head)
             {
@@ -737,10 +739,11 @@ static l_action_block_v2_t *___action_blocks_populate(cJSON *cj_action_blocks, e
     l_action_block_v2_t *tmp_action_block_head = NULL;
     if (cj_action_blocks)
     {
-        int then_block_idx = 0;
+        // int then_block_idx = 0;
         cJSON *cj_action_block = NULL;
 
-        while (NULL != (cj_action_block = cJSON_GetArrayItem(cj_action_blocks, then_block_idx++)))
+        // while (NULL != (cj_action_block = cJSON_GetArrayItem(cj_action_blocks, then_block_idx++)))
+        cJSON_ArrayForEach(cj_action_block, cj_action_blocks)
         {
             if (tmp_action_block_head)
             {
@@ -802,10 +805,11 @@ static l_when_block_v2_t *___when_blocks_populate(cJSON *cj_when_blocks)
     l_when_block_v2_t *tmp_when_block_head = NULL;
     if (cj_when_blocks)
     {
-        int when_block_idx = 0;
+        // int when_block_idx = 0;
         cJSON *cj_when_block = NULL;
 
-        while (NULL != (cj_when_block = cJSON_GetArrayItem(cj_when_blocks, when_block_idx++)))
+        // while (NULL != (cj_when_block = cJSON_GetArrayItem(cj_when_blocks, when_block_idx++)))
+        cJSON_ArrayForEach(cj_when_block, cj_when_blocks)
         {
             if (tmp_when_block_head)
             {
@@ -938,9 +942,10 @@ static l_fields_v2_t *_____fields_populate(cJSON *cj_fields)
     l_fields_v2_t *tmp_fields_head = NULL;
     if (cj_fields)
     {
-        int fields_idx = 0;
+        // int fields_idx = 0;
         cJSON *cj_field = NULL;
-        while (NULL != (cj_field = cJSON_GetArrayItem(cj_fields, fields_idx++)))
+        // while (NULL != (cj_field = cJSON_GetArrayItem(cj_fields, fields_idx++)))
+        cJSON_ArrayForEach(cj_field, cj_fields)
         {
             if (tmp_fields_head)
             {
@@ -1036,7 +1041,7 @@ static void _______fields_get_value(l_fields_v2_t *field, cJSON *cj_value)
         }
         case cJSON_Array:
         {
-            int block_idx = 0;
+            // int block_idx = 0;
             cJSON *cj_block = NULL;
 
             switch (field->value_type)
@@ -1055,7 +1060,8 @@ static void _______fields_get_value(l_fields_v2_t *field, cJSON *cj_value)
             case EZLOPI_VALUE_TYPE_BLOCKS: // there are more than one-blocks [since 'cJSON_Array' ]
             {
                 field->field_value.e_type = VALUE_TYPE_BLOCK;
-                while (NULL != (cj_block = cJSON_GetArrayItem(cj_value, block_idx++)))
+                // while (NULL != (cj_block = cJSON_GetArrayItem(cj_value, block_idx++)))
+                cJSON_ArrayForEach(cj_block, cj_value)
                 {
                     // CJSON_TRACE("cj_block", cj_block);
 
@@ -1139,7 +1145,7 @@ static void ______add_groupID_and_flag(cJSON *cj_target)
 static bool ____check_and_append_group_id(cJSON *cj_when_block)
 {
     bool add_groupId_flag = false; // this flag triggers new group_addition
-    int fields_block_idx = 0;
+    // int fields_block_idx = 0;
     int value_block_idx = 0;
 
     // <1> check for multiple/nested scene
@@ -1147,7 +1153,8 @@ static bool ____check_and_append_group_id(cJSON *cj_when_block)
     if (cj_fields_blocks && (cJSON_Array == cj_fields_blocks->type))
     {
         cJSON *cj_fields_block = NULL;
-        while (NULL != (cj_fields_block = cJSON_GetArrayItem(cj_fields_blocks, fields_block_idx++)))
+        // while (NULL != (cj_fields_block = cJSON_GetArrayItem(cj_fields_blocks, fields_block_idx++)))
+        cJSON_ArrayForEach(cj_fields_block, cj_fields_blocks)
         {
             cJSON *name = cJSON_GetObjectItem(__FUNCTION__, cj_fields_block, ezlopi_name_str);
             cJSON *type = cJSON_GetObjectItem(__FUNCTION__, cj_fields_block, ezlopi_type_str);
@@ -1197,9 +1204,10 @@ int ezlopi_core_scene_add_group_id_if_reqd(cJSON *cj_new_scene)
     if (cj_when_blocks && (cJSON_Array == cj_when_blocks->type))
     {
         bool add_when_blockId_flag = false; // this flag triggers new group_addition
-        int when_block_idx = 0;
+        // int when_block_idx = 0;
         cJSON *cj_when_block = NULL;
-        while (NULL != (cj_when_block = cJSON_GetArrayItem(cj_when_blocks, when_block_idx++)))
+        // while (NULL != (cj_when_block = cJSON_GetArrayItem(cj_when_blocks, when_block_idx++)))
+        cJSON_ArrayForEach(cj_when_block, cj_when_blocks)
         {
             add_when_blockId_flag |= ____check_and_append_group_id(cj_when_block);
         }
@@ -1220,8 +1228,8 @@ static int _____check_and_add_when_blockId(cJSON *cj_new_scene_when_block)
 {
     int ret = 0;
     bool add_when_blockId_flag = false; // this flag triggers new-blockId addition
-    int fields_block_idx = 0;
-    int value_block_idx = 0;
+    // int fields_block_idx = 0;
+    // int value_block_idx = 0;
 
     // <1> For single when-case
     cJSON *cj_blockOptions = cJSON_GetObjectItem(__FUNCTION__, cj_new_scene_when_block, ezlopi_blockOptions_str);
@@ -1248,7 +1256,8 @@ static int _____check_and_add_when_blockId(cJSON *cj_new_scene_when_block)
     if (cj_fields_blocks && (cJSON_Array == cj_fields_blocks->type))
     {
         cJSON *cj_fields_block = NULL;
-        while (NULL != (cj_fields_block = cJSON_GetArrayItem(cj_fields_blocks, fields_block_idx++)))
+        // while (NULL != (cj_fields_block = cJSON_GetArrayItem(cj_fields_blocks, fields_block_idx++)))
+        cJSON_ArrayForEach(cj_fields_block, cj_fields_blocks)
         {
             cJSON *name = cJSON_GetObjectItem(__FUNCTION__, cj_fields_block, ezlopi_name_str);
             cJSON *type = cJSON_GetObjectItem(__FUNCTION__, cj_fields_block, ezlopi_type_str);
@@ -1261,7 +1270,8 @@ static int _____check_and_add_when_blockId(cJSON *cj_new_scene_when_block)
                     if (cj_value_blocks && (cJSON_Array == cj_value_blocks->type))
                     {
                         cJSON *cj_value_block = NULL;
-                        while (NULL != (cj_value_block = cJSON_GetArrayItem(cj_value_blocks, value_block_idx++)))
+                        // while (NULL != (cj_value_block = cJSON_GetArrayItem(cj_value_blocks, value_block_idx++)))
+                        cJSON_ArrayForEach(cj_value_block, cj_value_blocks)
                         {
                             _____check_and_add_when_blockId(cj_value_block); /* RECURSIVE call*/
                         }
@@ -1312,8 +1322,9 @@ int ezlopi_core_scene_add_when_blockId_if_reqd(cJSON *cj_new_scene)
     if (cj_when_blocks && (cJSON_Array == cj_when_blocks->type))
     {
         cJSON *cj_when_block = NULL;
-        int when_block_idx = 0;
-        while (NULL != (cj_when_block = cJSON_GetArrayItem(cj_when_blocks, when_block_idx++)))
+        // int when_block_idx = 0;
+        // while (NULL != (cj_when_block = cJSON_GetArrayItem(cj_when_blocks, when_block_idx++)))
+        cJSON_ArrayForEach(cj_when_block, cj_when_blocks)
         { // [ In each-element form 'when-array' ] --> you can check for block_name and add group-id here
             ret = _____check_and_add_when_blockId(cj_when_block);
         }
@@ -1389,8 +1400,8 @@ static bool ____change_latch_status_in_blockOptions(cJSON *cj_when_block, bool e
 static bool ___enable_disable_latch_with_blockId(cJSON *cj_when_block, uint32_t blockId, bool enable_status)
 {
     bool latch_cleared = false;
-    int fields_block_idx = 0;
-    int value_block_idx = 0;
+    // int fields_block_idx = 0;
+    // int value_block_idx = 0;
 
     /* <1> single scene function */
     cJSON *cj_blockId = cJSON_GetObjectItem(__FUNCTION__, cj_when_block, "blockId");
@@ -1410,7 +1421,8 @@ static bool ___enable_disable_latch_with_blockId(cJSON *cj_when_block, uint32_t 
         if (cj_fields_blocks && (cJSON_Array == cj_fields_blocks->type))
         {
             cJSON *cj_fields_block = NULL;
-            while (NULL != (cj_fields_block = cJSON_GetArrayItem(cj_fields_blocks, fields_block_idx++)))
+            // while (NULL != (cj_fields_block = cJSON_GetArrayItem(cj_fields_blocks, fields_block_idx++)))
+            cJSON_ArrayForEach(cj_fields_block, cj_fields_blocks)
             {
 
                 cJSON *name = cJSON_GetObjectItem(__FUNCTION__, cj_fields_block, "name");
@@ -1425,7 +1437,8 @@ static bool ___enable_disable_latch_with_blockId(cJSON *cj_when_block, uint32_t 
                         if (cj_value_blocks && (cJSON_Array == cj_value_blocks->type))
                         {
                             cJSON *cj_value_block = NULL;
-                            while (NULL != (cj_value_block = cJSON_GetArrayItem(cj_value_blocks, value_block_idx++)))
+                            // while (NULL != (cj_value_block = cJSON_GetArrayItem(cj_value_blocks, value_block_idx++)))
+                          cJSON_ArrayForEach(cj_value_block, cj_value_blocks)
                             {
                                 latch_cleared = ___enable_disable_latch_with_blockId(cj_value_block, blockId, enable_status);
                             }
@@ -1479,10 +1492,11 @@ int ezlopi_core_scene_set_reset_latch_enable(const char *sceneId_str, const char
                 if (cj_scene)
                 {
                     bool latch_cleared = false;
-                    int when_block_idx = 0;
+                    // int when_block_idx = 0;
                     cJSON *cj_when_block = NULL;
                     cJSON *cj_when_blocks = cJSON_GetObjectItem(__FUNCTION__, cj_scene, "when");
-                    while (NULL != (cj_when_block = cJSON_GetArrayItem(cj_when_blocks, when_block_idx++)))
+                    // while (NULL != (cj_when_block = cJSON_GetArrayItem(cj_when_blocks, when_block_idx++)))
+                   cJSON_ArrayForEach(cj_when_block, cj_when_blocks)
                     {
                         latch_cleared = ___enable_disable_latch_with_blockId(cj_when_block, blockId, enable_status);
                     }
@@ -1634,8 +1648,8 @@ static bool _____change_block_en_status(cJSON *cj_when_block, bool enable_status
 static bool ___enable_disable_block_en_with_blockId(cJSON *cj_when_block, uint32_t blockId, bool enable_status)
 {
     bool block_en_changed = false;
-    int fields_block_idx = 0;
-    int value_block_idx = 0;
+    // int fields_block_idx = 0;
+    // int value_block_idx = 0;
 
     /* <1> single scene function */
     // CJSON_TRACE("cj_when_block : ", cj_when_block);
@@ -1654,7 +1668,8 @@ static bool ___enable_disable_block_en_with_blockId(cJSON *cj_when_block, uint32
         if (cj_fields_blocks && (cJSON_Array == cj_fields_blocks->type))
         {
             cJSON *cj_fields_block = NULL;
-            while (NULL != (cj_fields_block = cJSON_GetArrayItem(cj_fields_blocks, fields_block_idx++)))
+            // while (NULL != (cj_fields_block = cJSON_GetArrayItem(cj_fields_blocks, fields_block_idx++)))
+            cJSON_ArrayForEach(cj_fields_block, cj_fields_blocks)
             {
                 cJSON *name = cJSON_GetObjectItem(__FUNCTION__, cj_fields_block, "name");
                 cJSON *type = cJSON_GetObjectItem(__FUNCTION__, cj_fields_block, "type");
@@ -1668,7 +1683,8 @@ static bool ___enable_disable_block_en_with_blockId(cJSON *cj_when_block, uint32
                         if (cj_value_blocks && (cJSON_Array == cj_value_blocks->type))
                         {
                             cJSON *cj_value_block = NULL;
-                            while (NULL != (cj_value_block = cJSON_GetArrayItem(cj_value_blocks, value_block_idx++)))
+                            // while (NULL != (cj_value_block = cJSON_GetArrayItem(cj_value_blocks, value_block_idx++)))
+                            cJSON_ArrayForEach(cj_value_block, cj_value_blocks)
                             {
                                 if (true == (block_en_changed = ___enable_disable_block_en_with_blockId(cj_value_block, blockId, enable_status)))
                                 {
@@ -1712,10 +1728,11 @@ ezlopi_error_t ezlopi_core_scene_block_enable_set_reset(const char *sceneId_str,
                 if (cj_scene)
                 {
                     bool block_enabled_changed = false;
-                    int when_block_idx = 0;
+                    // int when_block_idx = 0;
                     cJSON *cj_when_block = NULL;
                     cJSON *cj_when_blocks = cJSON_GetObjectItem(__FUNCTION__, cj_scene, "when");
-                    while (NULL != (cj_when_block = cJSON_GetArrayItem(cj_when_blocks, when_block_idx++)))
+                    // while (NULL != (cj_when_block = cJSON_GetArrayItem(cj_when_blocks, when_block_idx++)))
+                    cJSON_ArrayForEach(cj_when_block, cj_when_blocks)
                     {
                         block_enabled_changed |= ___enable_disable_block_en_with_blockId(cj_when_block, blockId, enable_status);
                     }
@@ -1776,8 +1793,8 @@ static bool _____put_new_block_meta(cJSON *cj_when_block, cJSON *cj_new_blockmet
 static bool ___add_new_blockmeta_by_id(cJSON *cj_when_block, uint32_t blockId, cJSON *cj_blockmeta)
 {
     bool block_meta_changed = false;
-    int fields_block_idx = 0;
-    int value_block_idx = 0;
+    // int fields_block_idx = 0;
+    // int value_block_idx = 0;
 
     /* <1> single scene function */
     // CJSON_TRACE("cj_when_block : ", cj_when_block);
@@ -1796,7 +1813,8 @@ static bool ___add_new_blockmeta_by_id(cJSON *cj_when_block, uint32_t blockId, c
         if (cj_fields_blocks && (cJSON_Array == cj_fields_blocks->type))
         {
             cJSON *cj_fields_block = NULL;
-            while (NULL != (cj_fields_block = cJSON_GetArrayItem(cj_fields_blocks, fields_block_idx++)))
+            // while (NULL != (cj_fields_block = cJSON_GetArrayItem(cj_fields_blocks, fields_block_idx++)))
+            cJSON_ArrayForEach(cj_fields_block, cj_fields_blocks)
             {
                 cJSON *name = cJSON_GetObjectItem(__FUNCTION__, cj_fields_block, "name");
                 cJSON *type = cJSON_GetObjectItem(__FUNCTION__, cj_fields_block, "type");
@@ -1810,7 +1828,8 @@ static bool ___add_new_blockmeta_by_id(cJSON *cj_when_block, uint32_t blockId, c
                         if (cj_value_blocks && (cJSON_Array == cj_value_blocks->type)) // nested value-block
                         {
                             cJSON *cj_value_block = NULL;
-                            while (NULL != (cj_value_block = cJSON_GetArrayItem(cj_value_blocks, value_block_idx++)))
+                            // while (NULL != (cj_value_block = cJSON_GetArrayItem(cj_value_blocks, value_block_idx++)))
+                            cJSON_ArrayForEach(cj_value_block, cj_value_blocks)
                             {
                                 if (true == (block_meta_changed = ___add_new_blockmeta_by_id(cj_value_block, blockId, cj_blockmeta)))
                                 {
@@ -1855,10 +1874,11 @@ ezlopi_error_t ezlopi_core_scene_meta_by_id(const char *sceneId_str, const char 
                     bool meta_data_added = false;
                     if (NULL != blockId_str)
                     {
-                        int when_block_idx = 0;
+                        // int when_block_idx = 0;
                         cJSON *cj_when_block = NULL;
                         cJSON *cj_when_blocks = cJSON_GetObjectItem(__FUNCTION__, cj_scene, "when");
-                        while (NULL != (cj_when_block = cJSON_GetArrayItem(cj_when_blocks, when_block_idx++)))
+                        // while (NULL != (cj_when_block = cJSON_GetArrayItem(cj_when_blocks, when_block_idx++)))
+                        cJSON_ArrayForEach(cj_when_block, cj_when_blocks)
                         {
                             meta_data_added |= ___add_new_blockmeta_by_id(cj_when_block, blockId, cj_new_meta);
                         }

@@ -70,9 +70,11 @@ void app_main(void)
 
     ezlopi_core_setting_commands_read_settings();
 
-#ifdef CONFIG_EZPI_ENABLE_UART_PROVISIONING
     EZPI_SERV_uart_init();
-#endif
+
+#if !defined(CONFIG_IDF_TARGET_ESP32) && !defined(CONFIG_IDF_TARGET_ESP32C3)
+    EZPI_SERV_cdc_init();
+#endif // NOT defined CONFIG_IDF_TARGET_ESP32 or CONFIG_IDF_TARGET_ESP32C3
 
 #if defined(CONFIG_EZPI_BLE_ENABLE)
     ezlopi_ble_service_init();

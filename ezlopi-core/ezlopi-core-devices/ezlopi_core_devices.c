@@ -224,9 +224,10 @@ static void __change_room_id_in_device_ll_and_nvs(l_ezlopi_device_t *curr_node, 
         if (cj_separate_child_devices)
         {
             bool change_to_new_room_id = true;
-            int idx = 0;
+            // int idx = 0;
             cJSON *cj_separate_child = NULL;
-            while (NULL != (cj_separate_child = cJSON_GetArrayItem(cj_separate_child_devices, idx))) // ["102ea001" , "102ea002" ...]
+            // while (NULL != (cj_separate_child = cJSON_GetArrayItem(cj_separate_child_devices, idx))) // ["102ea001" , "102ea002" ...]
+            cJSON_ArrayForEach(cj_separate_child, cj_separate_child_devices)
             {
                 uint32_t _id_to_avoid = strtoul(cj_separate_child->valuestring, NULL, 16);
                 if (_id_to_avoid == curr_node->cloud_properties.device_id)
@@ -234,7 +235,7 @@ static void __change_room_id_in_device_ll_and_nvs(l_ezlopi_device_t *curr_node, 
                     change_to_new_room_id = false; // 'child_node_device_id' should not be listed in 'cj_separate_child_devices'
                     break;
                 }
-                idx++;
+                // idx++;
             }
 
             if (change_to_new_room_id)
@@ -368,7 +369,7 @@ l_ezlopi_device_t *ezlopi_device_get_head(void)
 
 l_ezlopi_device_t *ezlopi_device_get_by_id(uint32_t device_id)
 {
-    l_ezlopi_device_t *device_node = l_device_head;
+    l_ezlopi_device_t *device_node = ezlopi_device_get_head();
 
     while (device_node)
     {
@@ -936,7 +937,8 @@ static ezlopi_error_t ezlopi_device_parse_json_v3(cJSON *cjson_config)
                         cJSON *cjson_device = NULL;
 
                         TRACE_I("---------------------------------------------");
-                        while (NULL != (cjson_device = cJSON_GetArrayItem(cjson_device_list, config_dev_idx)))
+                        // while (NULL != (cjson_device = cJSON_GetArrayItem(cjson_device_list, config_dev_idx)))
+                        cJSON_ArrayForEach(cjson_device, cjson_device_list)
                         {
                             TRACE_I("Device-%d:", config_dev_idx);
 
