@@ -1,3 +1,4 @@
+#include <time.h>
 #include <stdio.h>
 #include <cjext.h>
 
@@ -12,15 +13,18 @@
 
 #include "ezlopi_util_trace.h"
 
-#include "ezlopi_core_ezlopi.h"
-#include "ezlopi_service_ota.h"
 #include "ezlopi_core_log.h"
-#include "ezlopi_core_reset.h"
-#include "ezlopi_core_setting_commands.h"
+#include "ezlopi_core_sntp.h"
 #include "ezlopi_core_wifi.h"
+#include "ezlopi_core_reset.h"
+#include "ezlopi_core_ezlopi.h"
+#include "ezlopi_core_processes.h"
+#include "ezlopi_core_ble_config.h"
 #include "ezlopi_core_factory_info.h"
+#include "ezlopi_core_setting_commands.h"
 
 #include "ezlopi_service_ble.h"
+#include "ezlopi_service_ota.h"
 #include "ezlopi_service_otel.h"
 #include "ezlopi_service_uart.h"
 #include "ezlopi_service_loop.h"
@@ -34,9 +38,6 @@
 #include "ezlopi_service_system_temperature_sensor.h"
 
 #include "pt.h"
-#include "ezlopi_core_processes.h"
-#include "ezlopi_core_ble_config.h"
-
 #include "EZLOPI_USER_CONFIG.h"
 
 static void __blinky(void *pv);
@@ -161,7 +162,9 @@ static void __blinky(void *pv)
 #ifdef CONFIG_EZPI_ENABLE_UART_PROVISIONING
         {
             char cmd99_str[100] = {0};
-            snprintf(cmd99_str, 100, "{\"cmd\":99,\"free_heap\":%d,\"heap_watermark\":%d}", free_heap, watermark_heap);
+            time_t now = EZPI_CORE_sntp_get_current_time_sec();
+
+            snprintf(cmd99_str, 100, "{\"time\":%lu,\"cmd\":99,\"free_heap\":%d,\"heap_watermark\":%d}", now, free_heap, watermark_heap);
             EZPI_SERV_uart_tx_data(strlen(cmd99_str), (uint8_t *)cmd99_str);
             TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_DEBUG, "%s", cmd99_str);
         }
@@ -170,6 +173,7 @@ static void __blinky(void *pv)
         if (free_heap <= (10 * 1024))
         {
             TRACE_W("CRITICAL-WARNING: low heap detected..");
+            TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_WARNING, "Critical-warning: low heap detected!, free-heap: %.02f KB", free_heap / 1024.0);
 
             if ((xTaskGetTickCount() - low_heap_start_time) > (15000 / portTICK_PERIOD_MS))
             {

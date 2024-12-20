@@ -15,6 +15,7 @@
 
 #include "ezlopi_util_trace.h"
 
+#include "ezlopi_core_sntp.h"
 #include "ezlopi_core_http.h"
 #include "ezlopi_core_event_group.h"
 #include "ezlopi_core_errors.h"
@@ -200,9 +201,8 @@ static void ezlopi_core_http_request_via_mbedTLS(const char *host_web_server, in
     mbedtls_ssl_set_bio(&ssl, &server_fd, mbedtls_net_send, mbedtls_net_recv, NULL);
 
     // TRACE_I("Performing the SSL/TLS handshake...");
-    time_t start_tm = 0, now = 0; // now keeping track of time
-    time(&start_tm);
-    time(&now);
+    uint64_t start_tm = EZPI_CORE_sntp_get_current_time_sec(); // now keeping track of time
+
     while (0 != (ret = mbedtls_ssl_handshake(&ssl)))
     {
         TRACE_W("ret => %x", -ret); // mbedtls_ssl_conf_async_private_cb()
@@ -211,7 +211,8 @@ static void ezlopi_core_http_request_via_mbedTLS(const char *host_web_server, in
             TRACE_E("mbedtls_ssl_handshake returned -0x%x", -ret);
             goto exit;
         }
-        time(&now);
+
+        uint64_t now = EZPI_CORE_sntp_get_current_time_sec();
         if ((now - start_tm) > (time_t)5) // 5sec
         {
             goto exit;

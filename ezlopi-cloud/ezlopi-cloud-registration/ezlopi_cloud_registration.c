@@ -7,6 +7,7 @@
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_cloud_registration.h"
 
+#include "ezlopi_core_sntp.h"
 #include "ezlopi_core_broadcast.h"
 #include "ezlopi_core_event_group.h"
 #include "ezlopi_core_factory_info.h"
@@ -15,22 +16,22 @@
 #include "ezlopi_service_loop.h"
 #include "ezlopi_service_webprov.h"
 
-static cJSON* cj_reg_data = NULL;
-static const char* __reg_loop_str = "reg-loop";
+static cJSON *cj_reg_data = NULL;
+static const char *__reg_loop_str = "reg-loop";
 
-static void __reg_loop(void* arg);
+static void __reg_loop(void *arg);
 
 void registration_init(void)
 {
     ezlopi_service_loop_add(__reg_loop_str, __reg_loop, 5000, NULL);
 }
 
-void register_repeat(cJSON* cj_request, cJSON* cj_response)
+void register_repeat(cJSON *cj_request, cJSON *cj_response)
 {
     ezlopi_service_loop_add(__reg_loop_str, __reg_loop, 5000, NULL);
 }
 
-void registered(cJSON* cj_request, cJSON* cj_response)
+void registered(cJSON *cj_request, cJSON *cj_response)
 {
     if (cj_reg_data)
     {
@@ -53,12 +54,12 @@ static void __create_reg_packet(void)
 
             esp_read_mac(mac_addr, ESP_MAC_WIFI_STA);
             snprintf(mac_str, sizeof(mac_str), "%02X:%02X:%02X:%02X:%02X:%02X",
-                mac_addr[0], mac_addr[1], mac_addr[2], mac_addr[3], mac_addr[4], mac_addr[5]);
+                     mac_addr[0], mac_addr[1], mac_addr[2], mac_addr[3], mac_addr[4], mac_addr[5]);
 
             cJSON_AddStringToObject(__FUNCTION__, cj_reg_data, "id", "__ID__");
             cJSON_AddStringToObject(__FUNCTION__, cj_reg_data, ezlopi_method_str, "register");
 
-            cJSON* cj_params = cJSON_AddObjectToObject(__FUNCTION__, cj_reg_data, ezlopi_params_str);
+            cJSON *cj_params = cJSON_AddObjectToObject(__FUNCTION__, cj_reg_data, ezlopi_params_str);
 
             if (cj_params)
             {
@@ -74,7 +75,7 @@ static void __create_reg_packet(void)
                 cJSON_AddStringToObject(__FUNCTION__, cj_params, "hubType", "32.1");
                 // cJSON_AddStringToObject(__FUNCTION__, cj_params, "mac_address", "11:22:33:44:55:66");
 
-                char* __device_uuid = ezlopi_factory_info_v3_get_device_uuid();
+                char *__device_uuid = ezlopi_factory_info_v3_get_device_uuid();
                 if (__device_uuid)
                 {
                     cJSON_AddStringToObject(__FUNCTION__, cj_params, "controller_uuid", __device_uuid);
@@ -88,7 +89,7 @@ static void __create_reg_packet(void)
     }
 }
 
-static void __reg_loop(void* arg)
+static void __reg_loop(void *arg)
 {
 #ifdef CONFIG_EZPI_UTIL_TRACE_EN
     TRACE_D("reg-loop");
@@ -104,12 +105,11 @@ static void __reg_loop(void* arg)
     {
         __create_reg_packet();
 
-        cJSON* cj_register_dup = cJSON_CreateObjectReference(__FUNCTION__, cj_reg_data->child);
+        cJSON *cj_register_dup = cJSON_CreateObjectReference(__FUNCTION__, cj_reg_data->child);
         if (cj_register_dup)
         {
-            time_t now = 0;
-            time(&now);
-            cJSON_AddNumberToObject(__FUNCTION__, cj_register_dup, ezlopi_startTime_str, now);
+            printf("%s[%u]\r\n", __FUNCTION__, __LINE__);
+            cJSON_AddNumberToObject(__FUNCTION__, cj_register_dup, ezlopi_startTime_str, EZPI_CORE_sntp_get_current_time_sec());
 
             if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(cj_register_dup))
             {

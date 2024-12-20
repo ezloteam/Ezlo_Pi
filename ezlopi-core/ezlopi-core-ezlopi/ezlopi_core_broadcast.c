@@ -9,6 +9,7 @@
 #include <freertos/task.h>
 #include <freertos/semphr.h>
 
+#include "ezlopi_core_sntp.h"
 #include "ezlopi_util_trace.h"
 #include "ezlopi_core_buffer.h"
 #include "ezlopi_core_broadcast.h"
@@ -178,8 +179,7 @@ static ezlopi_error_t __call_broadcast_methods(char *data)
 
     while (curr_method)
     {
-        time_t start_time;
-        time(&start_time);
+        uint64_t start_time = EZPI_CORE_sntp_get_current_time_sec();
 
         if (curr_method->func)
         {
@@ -207,9 +207,7 @@ static ezlopi_error_t __call_broadcast_methods(char *data)
             } while (retries--);
         }
 
-        time_t end_time;
-        time(&end_time);
-
+        uint64_t end_time = EZPI_CORE_sntp_get_current_time_sec();
         TRACE_W("Broadcast method '%s' took %lu", curr_method->method_name ? curr_method->method_name : "--", end_time - start_time);
 
         curr_method = curr_method->next;

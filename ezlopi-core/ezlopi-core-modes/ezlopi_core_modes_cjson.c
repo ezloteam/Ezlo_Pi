@@ -384,7 +384,7 @@ cJSON *ezlopi_core_modes_cjson_changed(void) //  (IN core-service-loop) // For b
                 CJSON_ASSIGN_ID(cj_result, _mode->current_mode_id, ezlopi_modeId_str);
                 cJSON_AddBoolToObject(__FUNCTION__, cj_result, ezlopi_disarmedDefault_str, _current_mode->disarmed_default);
 
-                cJSON_AddNumberToObject(__FUNCTION__, cj_result, ezlopi_timestamp_str, EZPI_CORE_sntp_get_current_time_ms());
+                cJSON_AddNumberToObject(__FUNCTION__, cj_result, ezlopi_timestamp_str, EZPI_CORE_sntp_get_current_time_sec());
             }
         }
     }
@@ -424,7 +424,7 @@ cJSON *ezlopi_core_modes_cjson_alarmed(const char *dev_id_str) // (IN core-servi
                 : (EZLOPI_MODES_ALARM_STATUS_CANCELED == curr_mode->alarmed.status) ? cJSON_AddStringToObject(__FUNCTION__, cj_result, "status", "canceled")
                                                                                     : cJSON_AddStringToObject(__FUNCTION__, cj_result, "status", ""); // none
 
-                cJSON_AddNumberToObject(__FUNCTION__, cj_result, ezlopi_timestamp_str, EZPI_CORE_sntp_get_current_time_ms());
+                cJSON_AddNumberToObject(__FUNCTION__, cj_result, ezlopi_timestamp_str, EZPI_CORE_sntp_get_current_time_sec());
                 cJSON_AddBoolToObject(__FUNCTION__, cj_result, "silent", curr_mode->alarmed.silent);
 
 #warning "need to add two-members [soundType & chime]"

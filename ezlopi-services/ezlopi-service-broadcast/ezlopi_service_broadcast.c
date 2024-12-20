@@ -6,10 +6,11 @@
 
 #include "ezlopi_cloud_constants.h"
 
+#include "ezlopi_core_sntp.h"
+#include "ezlopi_core_errors.h"
 #include "ezlopi_core_processes.h"
 #include "ezlopi_core_broadcast.h"
 #include "ezlopi_core_cjson_macros.h"
-#include "ezlopi_core_errors.h"
 
 #include "ezlopi_service_loop.h"
 #include "ezlopi_service_otel.h"
@@ -53,8 +54,6 @@ static void __broadcast_loop(void *arg)
                 cJSON *cj_trace_telemetry = cJSON_CreateObject(__FUNCTION__);
                 if (cj_trace_telemetry)
                 {
-                    time_t now = 0;
-
                     if (false == cJSON_AddItemToObject(__FUNCTION__, cj_trace_telemetry, ezlopi_method_str, cj_method_dup))
                     {
                         cJSON_Delete(__FUNCTION__, cj_method_dup);
@@ -67,9 +66,7 @@ static void __broadcast_loop(void *arg)
 
                     cJSON_AddNumberToObject(__FUNCTION__, cj_trace_telemetry, ezlopi_kind_str, 1);
                     cJSON_AddNumberToObject(__FUNCTION__, cj_trace_telemetry, ezlopi_startTime_str, cj_startTime ? cj_startTime->valuedouble : 0);
-
-                    time(&now);
-                    cJSON_AddNumberToObject(__FUNCTION__, cj_trace_telemetry, ezlopi_endTime_str, now);
+                    cJSON_AddNumberToObject(__FUNCTION__, cj_trace_telemetry, ezlopi_endTime_str, EZPI_CORE_sntp_get_current_time_sec());
 
                     if (0 == ezlopi_service_otel_add_trace_to_telemetry_queue(cj_trace_telemetry))
                     {

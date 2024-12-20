@@ -3,6 +3,7 @@
 #include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_nvs.h"
+#include "ezlopi_core_sntp.h"
 #include "ezlopi_core_room.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_broadcast.h"
@@ -389,9 +390,7 @@ static void __update_cloud_room_deleted(uint32_t room_id)
 {
     cJSON *cj_response = cJSON_CreateObject(__FUNCTION__);
     {
-        time_t now = 0;
-        time(&now);
-        cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_startTime_str, now);
+        cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_startTime_str, EZPI_CORE_sntp_get_current_time_sec());
 
         cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
         cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, ezlopi_hub_room_deleted_str);

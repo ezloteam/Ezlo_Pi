@@ -2,8 +2,8 @@
 
 #ifdef CONFIG_EZPI_BLE_ENABLE
 
-#include <string.h>
 #include <time.h>
+#include <string.h>
 
 #include "cjext.h"
 #include "lwip/ip_addr.h"
@@ -15,18 +15,20 @@
 
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_wifi.h"
+#include "ezlopi_core_sntp.h"
+#include "ezlopi_core_reset.h"
 #include "ezlopi_core_devices.h"
 #include "ezlopi_core_ble_gatt.h"
 #include "ezlopi_core_ble_buffer.h"
 #include "ezlopi_core_ble_profile.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_factory_info.h"
-#include "ezlopi_core_reset.h"
 
 #include "ezlopi_cloud_constants.h"
 
-#include "ezlopi_service_ble_ble_auth.h"
 #include "ezlopi_service_ble.h"
+#include "ezlopi_service_ble_ble_auth.h"
+
 #include "EZLOPI_USER_CONFIG.h"
 
 #define CJ_GET_STRING(name) cJSON_GetStringValue(cJSON_GetObjectItem(__FUNCTION__, root, name))
@@ -135,15 +137,14 @@ static void __dynamic_config_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb
 
     // timeout logic
     int status = -1; // success for non negative, failed for negative
-    time_t time_now = 0;
+    time_t time_now = EZPI_CORE_sntp_get_current_time_sec();
 
-    time(&time_now);
     if ((time_now - g_provisioning_last_read_time) >= gc_provisioning_read_timeout_s)
     {
         g_dynamic_config_sequence_no = 0;
     }
 
-    time(&g_provisioning_last_read_time);
+    g_provisioning_last_read_time = EZPI_CORE_sntp_get_current_time_sec();
 
     if (value)
     {

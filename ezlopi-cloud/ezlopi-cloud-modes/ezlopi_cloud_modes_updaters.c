@@ -227,9 +227,8 @@ void ezlopi_cloud_modes_bypass_devices_removed(cJSON *cj_request, cJSON *cj_resp
 
 void ezlopi_cloud_modes_changed(cJSON *cj_request, cJSON *cj_response)
 {
-    time_t now = 0;
-    time(&now);
-    cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_startTime_str, now);
+    printf("%s[%u]\r\n", __FUNCTION__, __LINE__);
+    cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_startTime_str, EZPI_CORE_sntp_get_current_time_sec());
 
     cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_id_str);
     cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_method_str);

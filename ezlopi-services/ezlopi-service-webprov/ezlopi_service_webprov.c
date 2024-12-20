@@ -15,6 +15,7 @@
 
 #include "ezlopi_core_api.h"
 
+#include "ezlopi_core_sntp.h"
 #include "ezlopi_core_http.h"
 #include "ezlopi_core_wifi.h"
 #include "ezlopi_core_reset.h"
@@ -225,8 +226,6 @@ static void __fetch_wss_endpoint(void *pv)
                         cJSON *cj_trace_telemetry = cJSON_CreateObject(__FUNCTION__);
                         if (cj_trace_telemetry)
                         {
-                            time_t now = 0;
-
                             if (false == cJSON_AddItemToObject(__FUNCTION__, cj_trace_telemetry, ezlopi_method_str, cj_method_dup))
                             {
                                 cJSON_Delete(__FUNCTION__, cj_method_dup);
@@ -234,9 +233,7 @@ static void __fetch_wss_endpoint(void *pv)
 
                             cJSON_AddNumberToObject(__FUNCTION__, cj_trace_telemetry, ezlopi_kind_str, 1);
                             cJSON_AddNumberToObject(__FUNCTION__, cj_trace_telemetry, ezlopi_startTime_str, rx_message->time_ms);
-
-                            time(&now);
-                            cJSON_AddNumberToObject(__FUNCTION__, cj_trace_telemetry, ezlopi_endTime_str, now);
+                            cJSON_AddNumberToObject(__FUNCTION__, cj_trace_telemetry, ezlopi_endTime_str, EZPI_CORE_sntp_get_current_time_sec());
 
                             if (0 == ezlopi_service_otel_add_trace_to_telemetry_queue(cj_trace_telemetry))
                             {
@@ -270,10 +267,9 @@ static void __message_process_cjson(cJSON *cj_request, time_t time_ms)
 {
     if (cj_request)
     {
-        time_t now;
+        time_t now = EZPI_CORE_sntp_get_current_time_sec();
         cJSON *cj_response = ezlopi_core_api_consume_cjson(__FUNCTION__, cj_request);
 
-        time(&now);
         TRACE_D("time to process: %lu", now - time_ms);
 
         if (cj_response)
@@ -281,7 +277,7 @@ static void __message_process_cjson(cJSON *cj_request, time_t time_ms)
             cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_msg_id_str, message_counter);
             __send_cjson_data_to_nma_websocket(cj_response);
 
-            time(&now);
+            now = EZPI_CORE_sntp_get_current_time_sec();
             TRACE_D("time to reply: %lu", now - time_ms);
 
             cJSON_Delete(__FUNCTION__, cj_response);

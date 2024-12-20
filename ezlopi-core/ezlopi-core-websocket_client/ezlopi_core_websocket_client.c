@@ -13,9 +13,10 @@
 
 #include "ezlopi_util_trace.h"
 
+#include "ezlopi_core_sntp.h"
+#include "ezlopi_core_errors.h"
 #include "ezlopi_core_factory_info.h"
 #include "ezlopi_core_websocket_client.h"
-#include "ezlopi_core_errors.h"
 
 #include "EZLOPI_USER_CONFIG.h"
 
@@ -144,9 +145,7 @@ static void websocket_event_handler(void *handler_args, esp_event_base_t base, i
                 // process the data if all data is received once
                 if (data->payload_len == data->data_len)
                 {
-                    time_t now;
-                    time(&now);
-
+                    time_t now = EZPI_CORE_sntp_get_current_time_sec();
                     char *tmp_buffer = ezlopi_malloc(__FUNCTION__, data->data_len + 1);
                     if (tmp_buffer)
                     {
@@ -163,7 +162,7 @@ static void websocket_event_handler(void *handler_args, esp_event_base_t base, i
                     static time_t now = 0;
                     if (0 == now)
                     {
-                        time(&now);
+                        now = EZPI_CORE_sntp_get_current_time_sec();
                     }
 
                     static char *s_buffer = NULL;

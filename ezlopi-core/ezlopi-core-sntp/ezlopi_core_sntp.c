@@ -5,14 +5,16 @@
 
 #include "../../build/config/sdkconfig.h"
 
-#include "esp_sntp.h"
 #include "zones.h"
+#include "esp_sntp.h"
 
-#include "ezlopi_util_trace.h"
-#include "ezlopi_core_sntp.h"
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_wifi.h"
+#include "ezlopi_core_sntp.h"
 #include "ezlopi_core_errors.h"
+
+#include "ezlopi_util_trace.h"
+#include "ezlopi_util_version.h"
 
 static time_t start_time = 0;
 
@@ -25,8 +27,7 @@ static void sntp_sync_time_call_back(struct timeval *tv)
     sntp_set_sync_interval(60 * 60 * 1000); // Sync every hour
     TRACE_I("Notification of a time synchronization event");
 
-    time_t now;
-    time(&now);
+    time_t now = EZPI_CORE_sntp_get_current_time_sec();
     if (0 == start_time)
     {
         start_time = now;
@@ -66,7 +67,7 @@ ezlopi_error_t EZPI_CORE_sntp_init(void)
     return (sync_status == SNTP_SYNC_STATUS_COMPLETED) ? EZPI_SUCCESS : EZPI_ERR_SNTP_INIT_FAILED;
 }
 
-ezlopi_error_t EZPI_CORE_sntp_set_location(const char* location)
+ezlopi_error_t EZPI_CORE_sntp_set_location(const char *location)
 {
     ezlopi_error_t error = EZPI_SUCCESS;
     if (location)
@@ -127,10 +128,8 @@ void EZPI_CORE_sntp_get_local_time(char *time_buf, uint32_t buf_len)
 
             TRACE_I("Timezone set: %s", posix_str);
 
-            time_t now;
             struct tm timeinfo;
-
-            time(&now);
+            time_t now = EZPI_CORE_sntp_get_current_time_sec();
             localtime_r(&now, &timeinfo);
 
             if (strftime(time_buf, buf_len, "%Y-%m-%dT%H:%M:%S%z", &timeinfo))
@@ -172,16 +171,31 @@ void EZPI_CORE_sntp_epoch_to_iso8601(char *time_buf, uint32_t buf_len, time_t t)
     }
 }
 
-uint64_t EZPI_CORE_sntp_get_current_time_ms(void)
+uint64_t EZPI_CORE_sntp_get_current_time_sec_abc(const char *function_name)
 {
-    time_t now;
-    time(&now);
-    return (now * 1000LL);
+    time_t now = 0;
+    int retries = 3;
+
+    while (retries--)
+    {
+        time(&now);
+        printf("%s - read time: %lu              [%u | %llu]\r\n", function_name, now, BUILD_DATE, BUILD_DATE + 1576800000llu);
+
+        if ((now > BUILD_DATE) && (now < (BUILD_DATE + 1576800000lu)))
+        {
+            printf("time: %lu\r\n", now);
+            break;
+        }
+        else
+        {
+            printf("time-error: %lu, retrying...\r\n", now);
+            vTaskDelay(20 / portTICK_RATE_MS);
+        }
+    }
+    return now;
 }
 
-uint64_t EZPI_CORE_sntp_get_current_time_sec(void)
+uint64_t EZPI_CORE_sntp_get_current_time_ms(void)
 {
-    time_t now;
-    time(&now);
-    return now;
+    return (EZPI_CORE_sntp_get_current_time_sec() * 1000LLU);
 }

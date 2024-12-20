@@ -15,14 +15,15 @@
 #include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_nvs.h"
+#include "ezlopi_core_sntp.h"
 #include "ezlopi_core_wifi.h"
 #include "ezlopi_core_devices.h"
 #include "ezlopi_core_ble_gatt.h"
 #include "ezlopi_core_ble_buffer.h"
 #include "ezlopi_core_ble_profile.h"
+#include "ezlopi_core_event_group.h"
 #include "ezlopi_core_factory_info.h"
 #include "ezlopi_core_cjson_macros.h"
-#include "ezlopi_core_event_group.h"
 
 #include "ezlopi_cloud_constants.h"
 
@@ -271,10 +272,8 @@ static void __provisioning_info_write_func(esp_gatt_value_t *value, esp_ble_gatt
                                         uint32_t version_no = ezlopi_nvs_config_info_version_number_get() + 1;
                                         ezlopi_nvs_config_info_version_number_set(version_no);
 
-                                        time_t now;
-                                        time(&now);
-                                        TRACE_D("time now{size: %u}: %lu", sizeof(time_t), now);
-                                        ezlopi_nvs_config_info_update_time_set(now);
+                                        TRACE_D("time now{size: %u}: %lu", sizeof(time_t), EZPI_CORE_sntp_get_current_time_sec());
+                                        ezlopi_nvs_config_info_update_time_set(EZPI_CORE_sntp_get_current_time_sec());
 
                                         ezlopi_free(__FUNCTION__, ezlopi_config_basic);
                                     }
@@ -327,14 +326,13 @@ static void __provisioning_info_read_func(esp_gatt_value_t *value, esp_ble_gatts
 
     // timeout logic
     int status = -1; // success for non negative, failed for negative
-    time_t time_now = 0;
-    time(&time_now);
-    if ((time_now - g_provisioning_last_read_time) >= gc_provisioning_read_timeout_s)
+
+    if ((EZPI_CORE_sntp_get_current_time_sec() - g_provisioning_last_read_time) >= gc_provisioning_read_timeout_s)
     {
         g_provisioning_sequence_no = 0;
     }
 
-    time(&g_provisioning_last_read_time);
+    g_provisioning_last_read_time = EZPI_CORE_sntp_get_current_time_sec();
 
     if (value)
     {

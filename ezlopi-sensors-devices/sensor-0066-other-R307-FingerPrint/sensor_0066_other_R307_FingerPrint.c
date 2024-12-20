@@ -5,12 +5,13 @@
 #include "esp_timer.h"
 
 // #include "ezlopi_core_timer.h"
+#include "ezlopi_core_sntp.h"
 #include "ezlopi_core_cloud.h"
+#include "ezlopi_core_errors.h"
+#include "ezlopi_core_processes.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
-#include "ezlopi_core_processes.h"
-#include "ezlopi_core_errors.h"
 
 #include "ezlopi_hal_uart.h"
 
@@ -58,8 +59,7 @@ static void __timer_callback(void *param)
         server_packet_t *user_data = (server_packet_t *)item->user_arg;
         if (user_data)
         {
-            time_t now = 0;
-            time(&now);
+            time_t now = EZPI_CORE_sntp_get_current_time_sec();
             if ((now - (user_data->timeout_start_time)) <= (time_t)30) // 30 sec
             {
                 TRACE_W("...timer ON...");
@@ -449,7 +449,7 @@ static ezlopi_error_t __0066_set_value(l_ezlopi_item_t *item, void *arg)
                     TRACE_E("HERE!! enroll");
                     if (cJSON_IsTrue(cj_value_cmd)) // true conditon
                     {
-                        time(&user_data->timeout_start_time); // !< reset the internal timer_start_time
+                        user_data->timeout_start_time = EZPI_CORE_sntp_get_current_time_sec(); // !< reset the internal timer_start_time
                         user_data->opmode = FINGERPRINT_ENROLLMENT_MODE;
 
                         /* Start the timers */
@@ -476,7 +476,7 @@ static ezlopi_error_t __0066_set_value(l_ezlopi_item_t *item, void *arg)
                 cJSON *cj_value_ids = cJSON_GetObjectItem(__FUNCTION__, cjson_params, ezlopi_value_str);
                 if ((cj_value_ids != NULL) && cJSON_IsArray(cj_value_ids))
                 {
-                    time(&user_data->timeout_start_time); // !< reset the internal timer_start_time
+                    user_data->timeout_start_time = EZPI_CORE_sntp_get_current_time_sec(); // !< reset the internal timer_start_time
                     uint16_t value_array_size = cJSON_GetArraySize(cj_value_ids);
                     if (value_array_size > 0)
                     {
@@ -623,8 +623,8 @@ static void __fingerprint_operation_task(void *params)
         server_packet_t *user_data = (server_packet_t *)item->user_arg;
         if (user_data)
         {
-            time(&user_data->timeout_start_time);   // !< reset the internal timer_start_time
-            r307_as606_update_id_status_list(item); // !< The best place to update ID_status_list
+            user_data->timeout_start_time = EZPI_CORE_sntp_get_current_time_sec(); // !< reset the internal timer_start_time
+            r307_as606_update_id_status_list(item);                                // !< The best place to update ID_status_list
             for (;;)
             {
                 ulTaskNotifyTake(pdTRUE, portMAX_DELAY);

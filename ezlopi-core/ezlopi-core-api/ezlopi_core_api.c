@@ -4,6 +4,7 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "ezlopi_core_api.h"
+#include "ezlopi_core_sntp.h"
 #include "ezlopi_core_broadcast.h"
 #include "ezlopi_core_api_methods.h"
 #include "ezlopi_core_event_group.h"
@@ -71,9 +72,8 @@ cJSON *ezlopi_core_api_consume_cjson(const char *who, cJSON *cj_request)
 
                     if (cj_update_response)
                     {
-                        time_t now = 0;
-                        time(&now);
-                        cJSON_AddNumberToObject(__FUNCTION__, cj_update_response, ezlopi_startTime_str, now);
+                        printf("%s[%u]\r\n", __FUNCTION__, __LINE__);
+                        cJSON_AddNumberToObject(__FUNCTION__, cj_update_response, ezlopi_startTime_str, EZPI_CORE_sntp_get_current_time_sec());
                         // cJSON_AddNullToObject(__FUNCTION__, cj_update_response, ezlopi_error_str);
 
                         if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(cj_update_response))

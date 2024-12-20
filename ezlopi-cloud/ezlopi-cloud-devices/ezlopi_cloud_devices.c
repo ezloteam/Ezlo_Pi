@@ -212,8 +212,7 @@ void device_updated(cJSON *cj_request, cJSON *cj_response)
                                 cJSON_AddBoolToObject(__FUNCTION__, cj_result, ezlopi_serviceNotification_str, controller_info->service_notification ? true : false);
                             }
 
-                            uint64_t time = EZPI_CORE_sntp_get_current_time_ms();
-                            cJSON_AddNumberToObject(__FUNCTION__, cj_result, "fwTimestampMs", time);
+                            cJSON_AddNumberToObject(__FUNCTION__, cj_result, "fwTimestampMs", EZPI_CORE_sntp_get_current_time_ms());
 
                             cJSON *cj_method = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_method_str);
                             if (cj_method)
