@@ -23,7 +23,6 @@ typedef enum e_otel_kind
     E_OTEL_KIND_CLIENT = 2,   // e.g.: web-provisioning, http requests, etc.
     E_OTEL_KIND_PRODUCER = 3,
     E_OTEL_KIND_CONSUMER = 4
-
 } e_otel_kind_t;
 
 typedef struct s_otel_trace

@@ -30,7 +30,7 @@ static void report(lua_State *L, int status)
 
 static int lua_mem_size = 0;
 
-static void* l_alloc(void *ud, void *ptr, size_t osize, size_t nsize)
+static void *l_alloc(void *ud, void *ptr, size_t osize, size_t nsize)
 {
     int new_size = lua_mem_size - osize + nsize;
     if (new_size > LUA_MAX_MEMSIZE)
@@ -89,5 +89,8 @@ void app_main()
 {
     TaskHandle_t ezlopi_component_lua_alloc_test_task_handle = NULL;
     xTaskCreate(test, "test", EZLOPI_COMPONENT_LUA_ALLOC_TEST_TASK_DEPTH, NULL, 5, &ezlopi_component_lua_alloc_test_task_handle);
-    ezlopi_core_process_set_process_info(ENUM_EZLOPI_COMPONENT_LUA_ALLOC_TEST_TASK, &ezlopi_component_lua_alloc_test_task_handle, EZLOPI_COMPONENT_LUA_ALLOC_TEST_TASK_DEPTH);
+
+#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
+    EZPI_core_process_set_process_info(ENUM_EZLOPI_COMPONENT_LUA_ALLOC_TEST_TASK, &ezlopi_component_lua_alloc_test_task_handle, EZLOPI_COMPONENT_LUA_ALLOC_TEST_TASK_DEPTH);
+#endif
 }

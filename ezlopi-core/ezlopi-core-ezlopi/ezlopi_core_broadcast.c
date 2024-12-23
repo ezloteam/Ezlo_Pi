@@ -1,3 +1,44 @@
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+/**
+* @file    ezlopi_core_broadcast.c
+* @brief   Function to perform broadcast operations
+* @author  xx
+* @version 0.1
+* @date    12th DEC 2024
+*/
+
+/*******************************************************************************
+*                          Include Files
+*******************************************************************************/
 #include <time.h>
 #include <stdio.h>
 #include <string.h>
@@ -17,19 +58,44 @@
 
 #include "EZLOPI_USER_CONFIG.h"
 
-// static uint32_t __message_count = 0;
-static l_broadcast_method_t *__method_head = NULL;
-static ezlopi_error_t (*__broadcast_queue_func)(cJSON *cj_data) = NULL;
+/*******************************************************************************
+*                          Extern Data Declarations
+*******************************************************************************/
 
+/*******************************************************************************
+*                          Extern Function Declarations
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Type & Macro Definitions
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Static Function Prototypes
+*******************************************************************************/
 static ezlopi_error_t __call_broadcast_methods(char *data);
 static l_broadcast_method_t *__method_create(f_broadcast_method_t method, char *name, uint32_t retries);
 
-void ezlopi_core_broadcast_methods_set_queue(ezlopi_error_t (*func)(cJSON *))
+/*******************************************************************************
+*                          Static Data Definitions
+*******************************************************************************/
+static l_broadcast_method_t *__method_head = NULL;
+static ezlopi_error_t(*__broadcast_queue_func)(cJSON *cj_data) = NULL;
+// static uint32_t __message_count = 0;
+
+/*******************************************************************************
+*                          Extern Data Definitions
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Extern Function Definitions
+*******************************************************************************/
+void EZPI_core_broadcast_methods_set_queue(ezlopi_error_t(*func)(cJSON *))
 {
     __broadcast_queue_func = func;
 }
 
-ezlopi_error_t ezlopi_core_broadcast_add_to_queue(cJSON *cj_data)
+ezlopi_error_t EZPI_core_broadcast_add_to_queue(cJSON *cj_data)
 {
     ezlopi_error_t ret = EZPI_ERR_BROADCAST_FAILED;
     if (cj_data && __broadcast_queue_func)
@@ -45,14 +111,14 @@ ezlopi_error_t ezlopi_core_broadcast_add_to_queue(cJSON *cj_data)
 }
 
 #if 0
-int ezlopi_core_broadcast_log_cjson(cJSON* cj_log_data)
+int EZPI_core_broadcast_log_cjson(cJSON *cj_log_data)
 {
     int ret = 0;
 
     if (cj_log_data)
     {
         uint32_t buffer_len = 0;
-        char* data_buffer = ezlopi_core_buffer_acquire(&buffer_len, 5000);
+        char *data_buffer = EZPI_core_buffer_acquire(&buffer_len, 5000);
 
         if (data_buffer && buffer_len)
         {
@@ -63,7 +129,7 @@ int ezlopi_core_broadcast_log_cjson(cJSON* cj_log_data)
                 ret = __call_broadcast_methods(data_buffer);
             }
 
-            ezlopi_core_buffer_release();
+            EZPI_core_buffer_release();
         }
     }
 
@@ -71,7 +137,7 @@ int ezlopi_core_broadcast_log_cjson(cJSON* cj_log_data)
 }
 #endif
 
-ezlopi_error_t ezlopi_core_broadcast_cjson(cJSON *cj_data)
+ezlopi_error_t EZPI_core_broadcast_cjson(cJSON *cj_data)
 {
     ezlopi_error_t ret = EZPI_FAILED;
 
@@ -80,7 +146,7 @@ ezlopi_error_t ezlopi_core_broadcast_cjson(cJSON *cj_data)
         uint32_t buffer_len = 0;
 
         TRACE_I("%d -> -----------------------------> waiting for static buffer!", xTaskGetTickCount());
-        char *data_buffer = ezlopi_core_buffer_acquire(__FUNCTION__, &buffer_len, 5000);
+        char *data_buffer = EZPI_core_buffer_acquire(__FUNCTION__, &buffer_len, 5000);
 
         if (data_buffer && buffer_len)
         {
@@ -94,14 +160,14 @@ ezlopi_error_t ezlopi_core_broadcast_cjson(cJSON *cj_data)
                 ret = __call_broadcast_methods(data_buffer);
             }
 
-            ezlopi_core_buffer_release(__FUNCTION__);
+            EZPI_core_buffer_release(__FUNCTION__);
         }
     }
 
     return ret;
 }
 
-l_broadcast_method_t *ezlopi_core_broadcast_method_add(f_broadcast_method_t broadcast_method, char *method_name, uint32_t retries)
+l_broadcast_method_t *EZPI_core_broadcast_method_add(f_broadcast_method_t broadcast_method, char *method_name, uint32_t retries)
 {
     int duplicate_method = 0;
     l_broadcast_method_t *ret = NULL;
@@ -142,7 +208,7 @@ l_broadcast_method_t *ezlopi_core_broadcast_method_add(f_broadcast_method_t broa
     return ret;
 }
 
-void ezlopi_core_broadcast_remove_method(f_broadcast_method_t broadcast_method)
+void EZPI_core_broadcast_remove_method(f_broadcast_method_t broadcast_method)
 {
     if (__method_head)
     {
@@ -172,6 +238,10 @@ void ezlopi_core_broadcast_remove_method(f_broadcast_method_t broadcast_method)
     }
 }
 
+
+/*******************************************************************************
+*                         Static Function Definitions
+*******************************************************************************/
 static ezlopi_error_t __call_broadcast_methods(char *data)
 {
     ezlopi_error_t ret = EZPI_ERR_BROADCAST_FAILED;
@@ -179,7 +249,7 @@ static ezlopi_error_t __call_broadcast_methods(char *data)
 
     while (curr_method)
     {
-        uint64_t start_time = EZPI_CORE_sntp_get_current_time_sec();
+        uint64_t start_time = EZPI_core_sntp_get_current_time_sec();
 
         if (curr_method->func)
         {
@@ -207,7 +277,7 @@ static ezlopi_error_t __call_broadcast_methods(char *data)
             } while (retries--);
         }
 
-        uint64_t end_time = EZPI_CORE_sntp_get_current_time_sec();
+        uint64_t end_time = EZPI_core_sntp_get_current_time_sec();
         TRACE_W("Broadcast method '%s' took %lu", curr_method->method_name ? curr_method->method_name : "--", end_time - start_time);
 
         curr_method = curr_method->next;
@@ -248,3 +318,7 @@ static l_broadcast_method_t *__method_create(f_broadcast_method_t method, char *
 
     return method_node;
 }
+
+/*******************************************************************************
+*                          End of File
+*******************************************************************************/

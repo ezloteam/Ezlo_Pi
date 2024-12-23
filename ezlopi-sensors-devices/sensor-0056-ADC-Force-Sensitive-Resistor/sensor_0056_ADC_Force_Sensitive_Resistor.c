@@ -75,7 +75,7 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_dev
     item->cloud_properties.value_type = value_type_force;
     item->cloud_properties.show = true;
     item->cloud_properties.scale = scales_newton;
-    item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
+    item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
 
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
     CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_str, item->interface.adc.gpio_num);
@@ -98,11 +98,11 @@ static ezlopi_error_t __0056_prepare(void *arg)
         {
             memset(fsr_struct, 0, sizeof(fsr_t));
 
-            l_ezlopi_device_t *FSR_device = ezlopi_device_add_device(device_prep_arg->cjson_device, NULL);
+            l_ezlopi_device_t *FSR_device = EZPI_core_device_add_device(device_prep_arg->cjson_device, NULL);
             if (FSR_device)
             {
                 __prepare_device_cloud_properties(FSR_device, device_prep_arg->cjson_device);
-                l_ezlopi_item_t *FSR_item = ezlopi_device_add_item_to_device(FSR_device, sensor_0056_ADC_Force_Sensitive_Resistor);
+                l_ezlopi_item_t *FSR_item = EZPI_core_device_add_item_to_device(FSR_device, sensor_0056_ADC_Force_Sensitive_Resistor);
                 if (FSR_item)
                 {
                     __prepare_item_cloud_properties(FSR_item, device_prep_arg->cjson_device, fsr_struct);
@@ -110,7 +110,7 @@ static ezlopi_error_t __0056_prepare(void *arg)
                 }
                 else
                 {
-                    ezlopi_device_free_device(FSR_device);
+                    EZPI_core_device_free_device(FSR_device);
                     ezlopi_free(__FUNCTION__, fsr_struct);
                 }
             }
@@ -154,7 +154,7 @@ static ezlopi_error_t __0056_get_cjson_value(l_ezlopi_item_t *item, void *arg)
         fsr_t *fsr_struct = (fsr_t *)item->user_arg;
         if (fsr_struct)
         {
-            ezlopi_valueformatter_float_to_cjson(cj_result, fsr_struct->fsr_value, scales_newton);
+            EZPI_core_valueformatter_float_to_cjson(cj_result, fsr_struct->fsr_value, scales_newton);
             ret = EZPI_SUCCESS;
         }
     }
@@ -180,7 +180,7 @@ static ezlopi_error_t __0056_notify(l_ezlopi_item_t *item)
             if (new_force != fsr_struct->fsr_value)
             {
                 fsr_struct->fsr_value = new_force;
-                ezlopi_device_value_updated_from_device_broadcast(item);
+                EZPI_core_device_value_updated_from_device_broadcast(item);
             }
             ret = EZPI_SUCCESS;
         }

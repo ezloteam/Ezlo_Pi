@@ -85,7 +85,7 @@ static ezlopi_error_t __get_value_cjson(l_ezlopi_item_t *item, void *arg)
         s_ultrasonic_sensor_t *ultrasonic_sensor = (s_ultrasonic_sensor_t *)item->user_arg;
         if (cj_param && ultrasonic_sensor)
         {
-            ezlopi_valueformatter_float_to_cjson(cj_param, ultrasonic_sensor->distance, scales_meter);
+            EZPI_core_valueformatter_float_to_cjson(cj_param, ultrasonic_sensor->distance, scales_meter);
             ret = EZPI_SUCCESS;
         }
     }
@@ -99,7 +99,7 @@ static ezlopi_error_t __notify(l_ezlopi_item_t *item)
     if (2 == ++count)
     {
         ezlopi_sensor_0024_other_HCSR04_get_from_sensor(item);
-        ezlopi_device_value_updated_from_device_broadcast(item);
+        EZPI_core_device_value_updated_from_device_broadcast(item);
         count = 0;
         ret = EZPI_SUCCESS;
     }
@@ -174,7 +174,7 @@ static void __setup_item_properties(l_ezlopi_item_t *item, cJSON *cj_device)
     item->cloud_properties.item_name = ezlopi_item_name_distance;
     item->cloud_properties.value_type = value_type_length;
     item->cloud_properties.scale = scales_centi_meter;
-    item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
+    item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
 
     CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio1_str, item->interface.gpio.gpio_out.gpio_num);
     CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio2_str, item->interface.gpio.gpio_in.gpio_num);
@@ -203,11 +203,11 @@ static ezlopi_error_t __prepare(void *arg)
         cJSON *cj_device = prep_arg->cjson_device;
         if (cj_device)
         {
-            l_ezlopi_device_t *device = ezlopi_device_add_device(prep_arg->cjson_device, NULL);
+            l_ezlopi_device_t *device = EZPI_core_device_add_device(prep_arg->cjson_device, NULL);
             if (device)
             {
                 __setup_device_cloud_properties(device, cj_device);
-                l_ezlopi_item_t *item = ezlopi_device_add_item_to_device(device, sensor_0024_other_HCSR04_v3);
+                l_ezlopi_item_t *item = EZPI_core_device_add_item_to_device(device, sensor_0024_other_HCSR04_v3);
                 if (item)
                 {
                     __setup_item_properties(item, cj_device);
@@ -226,7 +226,7 @@ static ezlopi_error_t __prepare(void *arg)
                 }
                 else
                 {
-                    ezlopi_device_free_device(device);
+                    EZPI_core_device_free_device(device);
                 }
             }
         }

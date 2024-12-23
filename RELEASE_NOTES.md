@@ -205,7 +205,7 @@
 
 - Update README.md by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/140
 - Combined ezpi 381 400 401 402 403 404 by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/139
-- 1. bug_fixed in 'firmware_info_get' function by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/142
+- 1. bug_fixed in 'EZPI_firmware_info_get' function by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/142
 - Dev merge ezpi 371 411 413 415 417 419 420 by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/141
 - Development by @krishna-ezlo in https://github.com/ezloteam/Ezlo_Pi/pull/143
 - Ezpi wifi scanner issue by @NDJ-EZLO in https://github.com/ezloteam/Ezlo_Pi/pull/144
@@ -228,7 +228,7 @@
 5. fixed an error in ` cjext : 'isCJSON_NULL'`--> always returns 'null'.
 6. Replaced `CJSON_GET_VALUE_DOUBLE` with `CJSON_GET_VALUE_GPIO` for all gpios
 7. Fixed DHT22 pin issue
-8. Fixed `ezlopi_factory_info_v3_set_ezlopi_config`
+8. Fixed `EZPI_core_factory_info_v3_set_ezlopi_config`
 9. Cleaned multiple occurrence of `\r\n`
 
 ## What's Changed

@@ -1,11 +1,46 @@
-/* ESP HTTP Client Example
 
-   This example code is in the Public Domain (or CC0 licensed, at your option.)
-
-   Unless required by applicable law or agreed to in writing, this
-   software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-   CONDITIONS OF ANY KIND, either express or implied.
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
 */
+/**
+* @file    ezlopi_core_websocket_client.c
+* @brief   perform some function on websocket_client
+* @author  xx
+* @version 0.1
+* @date    12th DEC 2024
+*/
+
+/*******************************************************************************
+*                          Include Files
+*******************************************************************************/
+
 #include <stdio.h>
 
 #include "freertos/FreeRTOS.h"
@@ -20,6 +55,17 @@
 
 #include "EZLOPI_USER_CONFIG.h"
 
+/*******************************************************************************
+*                          Extern Data Declarations
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Extern Function Declarations
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Type & Macro Definitions
+*******************************************************************************/
 #define WSS_RX_BUFFER_SIZE 1024
 
 typedef struct s_ws_event_arg
@@ -37,9 +83,23 @@ typedef struct s_ws_data_buffer
     struct s_ws_data_buffer *next;
 } s_ws_data_buffer_t;
 
+/*******************************************************************************
+*                          Static Function Prototypes
+*******************************************************************************/
 static void websocket_event_handler(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data);
 
-ezlopi_error_t ezlopi_websocket_client_send(esp_websocket_client_handle_t client, char *data, uint32_t len, uint32_t timeout_ms)
+/*******************************************************************************
+*                          Static Data Definitions
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Extern Data Definitions
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Extern Function Definitions
+*******************************************************************************/
+ezlopi_error_t EZPI_core_websocket_client_send(esp_websocket_client_handle_t client, char *data, uint32_t len, uint32_t timeout_ms)
 {
     ezlopi_error_t ret = EZPI_FAILED;
 
@@ -55,12 +115,12 @@ ezlopi_error_t ezlopi_websocket_client_send(esp_websocket_client_handle_t client
     return ret;
 }
 
-bool ezlopi_websocket_client_is_connected(esp_websocket_client_handle_t client)
+bool EZPI_core_websocket_client_is_connected(esp_websocket_client_handle_t client)
 {
     return esp_websocket_client_is_connected(client);
 }
 
-void ezlopi_websocket_client_kill(esp_websocket_client_handle_t client)
+void EZPI_core_websocket_client_kill(esp_websocket_client_handle_t client)
 {
     esp_websocket_client_stop(client);
     TRACE_S("Websocket Stopped");
@@ -68,8 +128,8 @@ void ezlopi_websocket_client_kill(esp_websocket_client_handle_t client)
     client = NULL;
 }
 
-esp_websocket_client_handle_t ezlopi_websocket_client_init(cJSON *uri, int (*msg_upcall)(char *, uint32_t, time_t time_ms), void (*connection_upcall)(bool connected),
-                                                           char *ca_certificate, char *ssl_private_key, char *ssl_shared_key)
+esp_websocket_client_handle_t EZPI_core_websocket_client_init(cJSON *uri, int (*msg_upcall)(char *, uint32_t, time_t time_ms), void (*connection_upcall)(bool connected),
+    char *ca_certificate, char *ssl_private_key, char *ssl_shared_key)
 {
     esp_websocket_client_handle_t client = NULL;
 
@@ -109,6 +169,10 @@ esp_websocket_client_handle_t ezlopi_websocket_client_init(cJSON *uri, int (*msg
     return client;
 }
 
+/*******************************************************************************
+*                         Static Function Definitions
+*******************************************************************************/
+
 static void websocket_event_handler(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data)
 {
     s_ws_event_arg_t *event_arg = (s_ws_event_arg_t *)handler_args;
@@ -145,7 +209,7 @@ static void websocket_event_handler(void *handler_args, esp_event_base_t base, i
                 // process the data if all data is received once
                 if (data->payload_len == data->data_len)
                 {
-                    time_t now = EZPI_CORE_sntp_get_current_time_sec();
+                    time_t now = EZPI_core_sntp_get_current_time_sec();
                     char *tmp_buffer = ezlopi_malloc(__FUNCTION__, data->data_len + 1);
                     if (tmp_buffer)
                     {
@@ -162,7 +226,7 @@ static void websocket_event_handler(void *handler_args, esp_event_base_t base, i
                     static time_t now = 0;
                     if (0 == now)
                     {
-                        now = EZPI_CORE_sntp_get_current_time_sec();
+                        now = EZPI_core_sntp_get_current_time_sec();
                     }
 
                     static char *s_buffer = NULL;
@@ -219,3 +283,8 @@ static void websocket_event_handler(void *handler_args, esp_event_base_t base, i
     }
     }
 }
+
+
+/*******************************************************************************
+*                          End of File
+*******************************************************************************/

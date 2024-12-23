@@ -156,10 +156,10 @@ static ezlopi_error_t __prepare(void *arg)
                 memset(user_data, 0, sizeof(s_joystick_data_t));
                 for (uint8_t i = 0; i < JOYSTICK_ITEM_ID_MAX; i++)
                 {
-                    user_data->sensor_0020_joystick_item_ids[i] = ezlopi_cloud_generate_item_id();
+                    user_data->sensor_0020_joystick_item_ids[i] = EZPI_core_cloud_generate_item_id();
                 }
 
-                l_ezlopi_device_t *joystick_parent_x_device = ezlopi_device_add_device(cj_device, "x_axis");
+                l_ezlopi_device_t *joystick_parent_x_device = EZPI_core_device_add_device(cj_device, "x_axis");
                 if (joystick_parent_x_device)
                 {
                     ret = 1;
@@ -168,7 +168,7 @@ static ezlopi_error_t __prepare(void *arg)
                     joystick_parent_x_device->cloud_properties.subcategory = subcategory_electricity;
                     __setup_device_cloud_properties(joystick_parent_x_device, cj_device);
 
-                    l_ezlopi_item_t *joystick_x_item = ezlopi_device_add_item_to_device(joystick_parent_x_device, sensor_0020_other_2axis_joystick);
+                    l_ezlopi_item_t *joystick_x_item = EZPI_core_device_add_item_to_device(joystick_parent_x_device, sensor_0020_other_2axis_joystick);
                     if (joystick_x_item)
                     {
                         joystick_x_item->cloud_properties.item_id = user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_X];
@@ -178,7 +178,7 @@ static ezlopi_error_t __prepare(void *arg)
                         __setup_item_interface_properties(joystick_x_item, cj_device);
                     }
 
-                    l_ezlopi_device_t *joystick_child_y_device = ezlopi_device_add_device(cj_device, "y-axis");
+                    l_ezlopi_device_t *joystick_child_y_device = EZPI_core_device_add_device(cj_device, "y-axis");
                     if (joystick_child_y_device)
                     {
                         // assigning parent_device_id to child_device
@@ -188,7 +188,7 @@ static ezlopi_error_t __prepare(void *arg)
                         joystick_child_y_device->cloud_properties.subcategory = subcategory_electricity;
                         __setup_device_cloud_properties(joystick_child_y_device, cj_device);
 
-                        l_ezlopi_item_t *joystick_y_item = ezlopi_device_add_item_to_device(joystick_child_y_device, sensor_0020_other_2axis_joystick);
+                        l_ezlopi_item_t *joystick_y_item = EZPI_core_device_add_item_to_device(joystick_child_y_device, sensor_0020_other_2axis_joystick);
                         if (joystick_y_item)
                         {
                             joystick_y_item->cloud_properties.item_id = user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_Y];
@@ -198,12 +198,12 @@ static ezlopi_error_t __prepare(void *arg)
                         }
                         else
                         {
-                            ezlopi_device_free_device(joystick_child_y_device);
+                            EZPI_core_device_free_device(joystick_child_y_device);
                             ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                         }
                     }
 
-                    l_ezlopi_device_t *joystick_child_sw_device = ezlopi_device_add_device(cj_device, "switch");
+                    l_ezlopi_device_t *joystick_child_sw_device = EZPI_core_device_add_device(cj_device, "switch");
                     if (joystick_child_sw_device)
                     {
                         // assigning parent_device_id to child_device
@@ -213,7 +213,7 @@ static ezlopi_error_t __prepare(void *arg)
                         joystick_child_sw_device->cloud_properties.subcategory = subcategory_in_wall;
                         __setup_device_cloud_properties(joystick_child_sw_device, cj_device);
 
-                        l_ezlopi_item_t *joystick_sw_item = ezlopi_device_add_item_to_device(joystick_child_sw_device, sensor_0020_other_2axis_joystick);
+                        l_ezlopi_item_t *joystick_sw_item = EZPI_core_device_add_item_to_device(joystick_child_sw_device, sensor_0020_other_2axis_joystick);
                         if (joystick_sw_item)
                         {
                             joystick_sw_item->cloud_properties.item_id = user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_SWITCH];
@@ -223,7 +223,7 @@ static ezlopi_error_t __prepare(void *arg)
                         }
                         else
                         {
-                            ezlopi_device_free_device(joystick_child_sw_device);
+                            EZPI_core_device_free_device(joystick_child_sw_device);
                             ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                         }
                     }
@@ -233,7 +233,7 @@ static ezlopi_error_t __prepare(void *arg)
                         (NULL == joystick_child_sw_device))
                     {
                         ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
-                        ezlopi_device_free_device(joystick_parent_x_device);
+                        EZPI_core_device_free_device(joystick_parent_x_device);
                     }
                 }
                 else
@@ -311,7 +311,7 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
                         TRACE_I("Joystick switch initialize successfully.");
                         item->interface.gpio.gpio_in.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
                         // TRACE_D("Value is %d", (int)item->interface.gpio.gpio_in.value);
-                        ezlopi_service_gpioisr_register_v3(item, __joystick_intr_callback, 200);
+                        EZPI_service_gpioisr_register_v3(item, __joystick_intr_callback, 200);
                     }
                     else
                     {
@@ -351,15 +351,15 @@ static ezlopi_error_t __get_value_cjson(l_ezlopi_item_t *item, void *arg)
         s_joystick_data_t *user_data = (s_joystick_data_t *)item->user_arg;
         if (user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_X] == item->cloud_properties.item_id)
         {
-            ezlopi_valueformatter_uint32_to_cjson(cj_result, user_data->adc_x, item->cloud_properties.scale);
+            EZPI_core_valueformatter_uint32_to_cjson(cj_result, user_data->adc_x, item->cloud_properties.scale);
         }
         else if (user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_Y] == item->cloud_properties.item_id)
         {
-            ezlopi_valueformatter_uint32_to_cjson(cj_result, user_data->adc_y, item->cloud_properties.scale);
+            EZPI_core_valueformatter_uint32_to_cjson(cj_result, user_data->adc_y, item->cloud_properties.scale);
         }
         else if (user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_SWITCH] == item->cloud_properties.item_id)
         {
-            ezlopi_valueformatter_bool_to_cjson(cj_result, (0 == item->interface.gpio.gpio_in.value) ? true : false, item->cloud_properties.scale);
+            EZPI_core_valueformatter_bool_to_cjson(cj_result, (0 == item->interface.gpio.gpio_in.value) ? true : false, item->cloud_properties.scale);
         }
         ret = EZPI_SUCCESS;
     }
@@ -385,7 +385,7 @@ static ezlopi_error_t __notify(l_ezlopi_item_t *item)
                     {
                         user_data->adc_x = ezlopi_analog_data.voltage;
                         // TRACE_S("X-axis value is %d and voltage is %d", ezlopi_analog_data.value, ezlopi_analog_data.voltage);
-                        ezlopi_device_value_updated_from_device_broadcast_by_item_id(user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_X]);
+                        EZPI_core_device_value_updated_from_device_broadcast_by_item_id(user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_X]);
                     }
                 }
                 else if (user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_Y] == item->cloud_properties.item_id)
@@ -395,7 +395,7 @@ static ezlopi_error_t __notify(l_ezlopi_item_t *item)
                     {
                         user_data->adc_y = ezlopi_analog_data.voltage;
                         // TRACE_S("Y-axis value is %d and voltage is %d", ezlopi_analog_data.value, ezlopi_analog_data.voltage);
-                        ezlopi_device_value_updated_from_device_broadcast_by_item_id(user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_Y]);
+                        EZPI_core_device_value_updated_from_device_broadcast_by_item_id(user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_Y]);
                     }
                 }
             }
@@ -415,7 +415,7 @@ static void __joystick_intr_callback(void *arg)
         {
             item->interface.gpio.gpio_in.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
             item->interface.gpio.gpio_in.value = (false == item->interface.gpio.gpio_in.invert) ? (item->interface.gpio.gpio_in.value) : (!item->interface.gpio.gpio_in.value);
-            ezlopi_device_value_updated_from_device_broadcast_by_item_id(user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_SWITCH]);
+            EZPI_core_device_value_updated_from_device_broadcast_by_item_id(user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_SWITCH]);
         }
     }
 }

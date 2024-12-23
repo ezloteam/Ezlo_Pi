@@ -74,9 +74,9 @@ static ezlopi_error_t __notify(l_ezlopi_item_t *item)
     {
         // TRACE_I("Current %f, prev %f", temperature_current_value, *temperature_prev_value);
         // TRACE_I("Diff is %f", fabs(*temperature_prev_value - temperature_current_value));
-        item->cloud_properties.scale = ezlopi_core_setting_get_temperature_scale_str();
+        item->cloud_properties.scale = EZPI_core_setting_get_temperature_scale_str();
 
-        e_enum_temperature_scale_t scale_to_use = ezlopi_core_setting_get_temperature_scale();
+        e_enum_temperature_scale_t scale_to_use = EZPI_core_setting_get_temperature_scale();
         if (TEMPERATURE_SCALE_FAHRENHEIT == scale_to_use)
         {
             temperature_current_value = (temperature_current_value * (9.0f / 5.0f)) + 32.0f;
@@ -85,7 +85,7 @@ static ezlopi_error_t __notify(l_ezlopi_item_t *item)
         if (fabs(*temperature_prev_value - temperature_current_value) > 0.2)
         {
             *temperature_prev_value = temperature_current_value;
-            ezlopi_device_value_updated_from_device_broadcast(item);
+            EZPI_core_device_value_updated_from_device_broadcast(item);
             ret = EZPI_SUCCESS;
         }
     }
@@ -100,7 +100,7 @@ static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg)
     {
         cJSON *cj_result = (cJSON *)arg;
         double *temperatue_value = (double *)item->user_arg;
-        ezlopi_valueformatter_double_to_cjson(cj_result, *temperatue_value, scales_celsius);
+        EZPI_core_valueformatter_double_to_cjson(cj_result, *temperatue_value, scales_celsius);
         ret = EZPI_SUCCESS;
     }
     return ret;
@@ -145,9 +145,9 @@ static void __prepare_item_properties(l_ezlopi_item_t *item, cJSON *cj_device)
     item->cloud_properties.has_setter = false;
     item->cloud_properties.item_name = ezlopi_item_name_temp;
     item->cloud_properties.value_type = value_type_temperature;
-    item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
+    item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
 
-    item->cloud_properties.scale = ezlopi_core_setting_get_temperature_scale_str();
+    item->cloud_properties.scale = EZPI_core_setting_get_temperature_scale_str();
 
     item->interface_type = EZLOPI_DEVICE_INTERFACE_ONEWIRE_MASTER;
 
@@ -162,11 +162,11 @@ static ezlopi_error_t __prepare(void *arg)
 
     if (prep_arg && prep_arg->cjson_device)
     {
-        l_ezlopi_device_t *device = ezlopi_device_add_device(prep_arg->cjson_device, NULL);
+        l_ezlopi_device_t *device = EZPI_core_device_add_device(prep_arg->cjson_device, NULL);
         if (device)
         {
             __prepare_device_cloud_properties(device, prep_arg->cjson_device);
-            l_ezlopi_item_t *item_temperature = ezlopi_device_add_item_to_device(device, sensor_0030_oneWire_DS18B20);
+            l_ezlopi_item_t *item_temperature = EZPI_core_device_add_item_to_device(device, sensor_0030_oneWire_DS18B20);
             if (item_temperature)
             {
                 __prepare_item_properties(item_temperature, prep_arg->cjson_device);
@@ -183,7 +183,7 @@ static ezlopi_error_t __prepare(void *arg)
             }
             else
             {
-                ezlopi_device_free_device(device);
+                EZPI_core_device_free_device(device);
             }
         }
     }
