@@ -1,10 +1,50 @@
-file(GLOB_RECURSE src_files "*.c*")
-idf_component_register(SRCS "ezlopi_cloud_ota.c" "${src_files}"
-    INCLUDE_DIRS "."
-    REQUIRES ezlopi-cloud-data
-             ezlopi-util-trace
-             ezlopi-util-version
-             ezlopi-core-factory-info
-             ezlopi-core-devices
-             ezlopi-core-event-group
-             ezlopi-core-ota )
+# Include all source files
+file(GLOB_RECURSE config_src "*.c")
+
+#Define SDK components
+set(ESP_IDF_COMPONENTS
+
+)
+
+# Define core components
+set(EZLOPI_CORE_COMPONENTS 
+        ezlopi-core-factory-info
+        ezlopi-core-devices
+        ezlopi-core-event-group
+        ezlopi-core-ota 
+)
+
+# Define HAL components
+set(EZLOPI_HAL_COMPONENTS 
+)
+
+# Define cloud components
+set(EZLOPI_CLOUD_COMPONENTS 
+        ezlopi-cloud-data
+)
+
+# Define service components
+set(EZLOPI_SERV_COMPONENTS
+)
+
+# Define sensor device components
+set(EZLOPI_SENSOR_DEVICE_COMPONENTS 
+)
+
+# Define ezlopi-utils components
+set(EZLOPI_UTIL_COMPONENTS
+        ezlopi-util-trace
+        ezlopi-util-version
+)
+
+# Register the components
+idf_component_register(SRCS  "${config_src}"
+                        INCLUDE_DIRS "."
+                        REQUIRES        ${ESP_IDF_COMPONENTS}
+                                        ${EZLOPI_CORE_COMPONENTS}
+                                        ${EZLOPI_HAL_COMPONENTS}
+                                        ${EZLOPI_CLOUD_COMPONENTS}
+                                        ${EZLOPI_SERV_COMPONENTS}
+                                        ${EZLOPI_SENSOR_DEVICE_COMPONENTS}  
+                                        ${EZLOPI_UTIL_COMPONENTS}              
+)

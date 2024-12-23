@@ -1,4 +1,3 @@
-
 file(GLOB_RECURSE provisioning_src "*.c*")
 
 set(EZLOPI_UTIL_COMPONENTS

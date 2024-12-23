@@ -82,12 +82,12 @@ static ezlopi_error_t __0057_prepare(void *arg)
     if (device_prep_arg && (NULL != device_prep_arg->cjson_device))
     {
         //---------------------------  DIGI - DEVICE 1 --------------------------------------------
-        l_ezlopi_device_t *flame_device_parent_digi = ezlopi_device_add_device(device_prep_arg->cjson_device, "digi");
+        l_ezlopi_device_t *flame_device_parent_digi = EZPI_core_device_add_device(device_prep_arg->cjson_device, "digi");
         if (flame_device_parent_digi)
         {
             TRACE_I("Parent_flame_device_digi-[0x%x] ", flame_device_parent_digi->cloud_properties.device_id);
             __prepare_device_digi_cloud_properties(flame_device_parent_digi, device_prep_arg->cjson_device);
-            l_ezlopi_item_t *flame_item_digi = ezlopi_device_add_item_to_device(flame_device_parent_digi, sensor_0057_other_KY026_FlameDetector);
+            l_ezlopi_item_t *flame_item_digi = EZPI_core_device_add_item_to_device(flame_device_parent_digi, sensor_0057_other_KY026_FlameDetector);
             if (flame_item_digi)
             {
                 flame_item_digi->cloud_properties.device_id = flame_device_parent_digi->cloud_properties.device_id;
@@ -100,13 +100,13 @@ static ezlopi_error_t __0057_prepare(void *arg)
             if (NULL != flame_struct)
             {
                 memset(flame_struct, 0, sizeof(flame_t));
-                l_ezlopi_device_t *flame_device_child_adc = ezlopi_device_add_device(device_prep_arg->cjson_device, "adc");
+                l_ezlopi_device_t *flame_device_child_adc = EZPI_core_device_add_device(device_prep_arg->cjson_device, "adc");
                 if (flame_device_child_adc)
                 {
                     TRACE_I("Child_flame_device_adc-[0x%x] ", flame_device_child_adc->cloud_properties.device_id);
                     __prepare_device_adc_cloud_properties(flame_device_child_adc, device_prep_arg->cjson_device);
 
-                    l_ezlopi_item_t *flame_item_adc = ezlopi_device_add_item_to_device(flame_device_child_adc, sensor_0057_other_KY026_FlameDetector);
+                    l_ezlopi_item_t *flame_item_adc = EZPI_core_device_add_item_to_device(flame_device_child_adc, sensor_0057_other_KY026_FlameDetector);
                     if (flame_item_adc)
                     {
                         flame_item_adc->cloud_properties.device_id = flame_device_child_adc->cloud_properties.device_id;
@@ -115,7 +115,7 @@ static ezlopi_error_t __0057_prepare(void *arg)
                     else
                     {
                         ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
-                        ezlopi_device_free_device(flame_device_child_adc);
+                        EZPI_core_device_free_device(flame_device_child_adc);
                         ezlopi_free(__FUNCTION__, flame_struct);
                     }
                 }
@@ -200,7 +200,7 @@ static void __prepare_item_digi_cloud_properties(l_ezlopi_item_t *item, cJSON *c
     item->cloud_properties.value_type = value_type_token;
     item->cloud_properties.show = true;
     item->cloud_properties.scale = NULL;
-    item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
+    item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
 
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
     CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio1_str, item->interface.gpio.gpio_in.gpio_num);
@@ -223,7 +223,7 @@ static void __prepare_item_adc_cloud_properties(l_ezlopi_item_t *item, cJSON *cj
     item->cloud_properties.value_type = value_type_general_purpose;
     item->cloud_properties.show = true;
     item->cloud_properties.scale = scales_percent;
-    item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
+    item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
 
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
     CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio2_str, item->interface.adc.gpio_num);
@@ -269,7 +269,7 @@ static ezlopi_error_t __0057_get_item(l_ezlopi_item_t *item, void *arg)
                 flame_t *flame_struct = (flame_t *)item->user_arg;
                 if (flame_struct)
                 {
-                    ezlopi_valueformatter_float_to_cjson(cj_result, flame_struct->absorbed_percent, item->cloud_properties.scale);
+                    EZPI_core_valueformatter_float_to_cjson(cj_result, flame_struct->absorbed_percent, item->cloud_properties.scale);
                 }
                 ret = EZPI_SUCCESS;
             }
@@ -296,7 +296,7 @@ static ezlopi_error_t __0057_get_cjson_value(l_ezlopi_item_t *item, void *arg)
                 flame_t *flame_struct = (flame_t *)item->user_arg;
                 if (flame_struct)
                 {
-                    ezlopi_valueformatter_float_to_cjson(cj_result, flame_struct->absorbed_percent, item->cloud_properties.scale);
+                    EZPI_core_valueformatter_float_to_cjson(cj_result, flame_struct->absorbed_percent, item->cloud_properties.scale);
                 }
             }
             ret = EZPI_SUCCESS;
@@ -324,7 +324,7 @@ static ezlopi_error_t __0057_notify(l_ezlopi_item_t *item)
             if (curret_value != (char *)item->user_arg) // calls update only if there is change in state
             {
                 item->user_arg = (void *)curret_value;
-                ezlopi_device_value_updated_from_device_broadcast(item);
+                EZPI_core_device_value_updated_from_device_broadcast(item);
             }
         }
         else if (ezlopi_item_name_temperature_changes == item->cloud_properties.item_name)
@@ -339,7 +339,7 @@ static ezlopi_error_t __0057_notify(l_ezlopi_item_t *item)
                 // TRACE_E("Heat-detected: %.2f percent", absorbed_percent);
                 if (new_percent != flame_struct->absorbed_percent)
                 {
-                    ezlopi_device_value_updated_from_device_broadcast(item);
+                    EZPI_core_device_value_updated_from_device_broadcast(item);
                     flame_struct->absorbed_percent = new_percent;
                 }
             }

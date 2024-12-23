@@ -86,5 +86,8 @@ void app_main()
 {
     TaskHandle_t ezlopi_component_lua_simple_test_task_handle = NULL;
     xTaskCreate(test, "test", EZLOPI_COMPONENT_LUA_SIMPLE_TEST_TASK_DEPTH, NULL, 5, &ezlopi_component_lua_simple_test_task_handle);
-    ezlopi_core_process_set_process_info(ENUM_EZLOPI_COMPONENT_LUA_SIMPLE_TEST_TASK, &ezlopi_component_lua_simple_test_task_handle, EZLOPI_COMPONENT_LUA_SIMPLE_TEST_TASK_DEPTH);
+
+#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
+    EZPI_core_process_set_process_info(ENUM_EZLOPI_COMPONENT_LUA_SIMPLE_TEST_TASK, &ezlopi_component_lua_simple_test_task_handle, EZLOPI_COMPONENT_LUA_SIMPLE_TEST_TASK_DEPTH);
+#endif
 }

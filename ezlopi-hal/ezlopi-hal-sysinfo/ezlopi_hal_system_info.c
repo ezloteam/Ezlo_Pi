@@ -9,7 +9,7 @@ uint32_t ezlopi_system_info_get_boot_count(void)
 {
     if (0 == boot_count)
     {
-        boot_count = ezlopi_nvs_get_boot_count();
+        boot_count = EZPI_core_nvs_get_boot_count();
     }
 
     return boot_count;
