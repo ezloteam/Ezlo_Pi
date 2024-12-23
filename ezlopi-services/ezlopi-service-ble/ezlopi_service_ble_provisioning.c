@@ -423,12 +423,12 @@ static void ezpi_provisioning_info_read_func(esp_gatt_value_t *value, esp_ble_ga
     // timeout logic
     int status = -1; // success for non negative, failed for negative
 
-    if ((EZPI_CORE_sntp_get_current_time_sec() - g_provisioning_last_read_time) >= gc_provisioning_read_timeout_s)
+    if ((EZPI_core_sntp_get_current_time_sec() - g_provisioning_last_read_time) >= gc_provisioning_read_timeout_s)
     {
         g_provisioning_sequence_no = 0;
     }
 
-    g_provisioning_last_read_time = EZPI_CORE_sntp_get_current_time_sec();
+    g_provisioning_last_read_time = EZPI_core_sntp_get_current_time_sec();
 
     if (value)
     {

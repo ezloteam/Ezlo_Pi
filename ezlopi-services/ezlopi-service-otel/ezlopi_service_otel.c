@@ -13,6 +13,7 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "ezlopi_core_log.h"
+#include "ezlopi_core_sntp.h"
 #include "ezlopi_core_wifi.h"
 #include "ezlopi_core_buffer.h"
 #include "ezlopi_core_factory_info.h"
@@ -375,7 +376,7 @@ static int __otel_add_log_to_queue(uint8_t severity, const char *file, uint32_t 
         otel_data->cj_data = cJSON_CreateObject(__FUNCTION__);
         if (otel_data->cj_data)
         {
-            cJSON_AddNumberToObject(__FUNCTION__, otel_data->cj_data, ezlopi_logTime_str, EZPI_CORE_sntp_get_current_time_sec());
+            cJSON_AddNumberToObject(__FUNCTION__, otel_data->cj_data, ezlopi_logTime_str, EZPI_core_sntp_get_current_time_sec());
             __otel_add_severity_number(otel_data->cj_data, (e_trace_severity_t)severity);
             cJSON_AddStringToObject(__FUNCTION__, otel_data->cj_data, ezlopi_message_str, log);
             cJSON_AddStringToObject(__FUNCTION__, otel_data->cj_data, ezlopi_fileName_str, file);
@@ -471,7 +472,7 @@ static void __add_log_info(cJSON *cj_root, cJSON *cj_logs_info)
 {
     char tmp_buffer[33];
 
-    snprintf(tmp_buffer, sizeof(tmp_buffer), "%llu", EZPI_CORE_sntp_get_current_time_sec() * 1000000000llu);
+    snprintf(tmp_buffer, sizeof(tmp_buffer), "%llu", EZPI_core_sntp_get_current_time_sec() * 1000000000llu);
     cJSON_AddStringToObject(__FUNCTION__, cj_root, "timeUnixNano", tmp_buffer);
 
     __otel_add_time_stamp_nano(cj_root, "observedTimeUnixNano", ezlopi_logTime_str, cj_logs_info);
