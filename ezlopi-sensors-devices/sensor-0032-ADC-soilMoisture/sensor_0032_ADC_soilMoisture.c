@@ -64,7 +64,7 @@ static ezlopi_error_t __notify(l_ezlopi_item_t *item)
     if (soil_moisture_data)
     {
         s_ezlopi_analog_data_t tmp_data = { .value = 0, .voltage = 0 };
-        ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &tmp_data);
+        EZPI_hal_adc_get_adc_data(item->interface.adc.gpio_num, &tmp_data);
         double percentage = ((4095 - tmp_data.value) / 4096.0) * 100;
         if (fabs(percentage - *soil_moisture_data) > 1.0)
         {
@@ -100,7 +100,7 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
     {
         if (GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
         {
-            if (EZPI_SUCCESS == ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
+            if (EZPI_SUCCESS == EZPI_hal_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
             {
                 ret = EZPI_SUCCESS;
             }

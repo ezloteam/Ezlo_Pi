@@ -38,7 +38,7 @@ static ezlopi_error_t gxhtc3_sensor_init(l_ezlopi_item_t *item)
             {
                 if (item->interface.i2c_master.enable)
                 {
-                    ezlopi_i2c_master_init(&item->interface.i2c_master);
+                    EZPI_hal_i2c_master_init(&item->interface.i2c_master);
                     gxhtce_val->gxhtc3 = GXHTC3_init(item->interface.i2c_master.channel, item->interface.i2c_master.address);
                     if (gxhtce_val->gxhtc3)
                     {

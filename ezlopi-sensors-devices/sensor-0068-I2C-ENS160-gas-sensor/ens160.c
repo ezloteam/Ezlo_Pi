@@ -17,7 +17,7 @@
 #include "ens160.h"
 #include "EZLOPI_USER_CONFIG.h"
 
-static const char* TAG = "ENS160";
+static const char *TAG = "ENS160";
 
 /**
  * @fn begin
@@ -27,9 +27,9 @@ static const char* TAG = "ENS160";
  * @retval -1 ERR_DATA_BUS
  * @retval -2 ERR_IC_VERSION
  */
-static int dfrobot_ens160_begin(ens160_t* ens160);
+static int dfrobot_ens160_begin(ens160_t *ens160);
 
-static int dfrobot_ens160_begin(ens160_t* ens160)
+static int dfrobot_ens160_begin(ens160_t *ens160)
 {
   ens160->misr = 0;
   uint8_t id_buf[2] = { 0 };
@@ -54,20 +54,20 @@ static int dfrobot_ens160_begin(ens160_t* ens160)
 
 /***************** Config function ******************************/
 
-void dfrobot_ens160_set_pwr_mode(ens160_t* ens160, uint8_t mode)
+void dfrobot_ens160_set_pwr_mode(ens160_t *ens160, uint8_t mode)
 {
   dfrobot_ens160_i2c_write_reg(ens160, ENS160_OPMODE_REG, &mode, sizeof(mode));
   vTaskDelay(20 / portTICK_PERIOD_MS);   // Give it some time to switch mode
 }
 
-void dfrobot_ens160_set_int_mode(ens160_t* ens160, uint8_t mode)
+void dfrobot_ens160_set_int_mode(ens160_t *ens160, uint8_t mode)
 {
   mode |= (eINTDataDrdyEN | eIntGprDrdyDIS);
   dfrobot_ens160_i2c_write_reg(ens160, ENS160_CONFIG_REG, &mode, sizeof(mode));
   vTaskDelay(20 / portTICK_PERIOD_MS);   // Give it some time to switch mode
 }
 
-void dfrobot_ens160_set_temp_and_hum(ens160_t* ens160, float ambient_temp, float relative_humidity)
+void dfrobot_ens160_set_temp_and_hum(ens160_t *ens160, float ambient_temp, float relative_humidity)
 {
   uint16_t temp = (ambient_temp + 273.15) * 64;
   uint16_t rh = relative_humidity * 512;
@@ -81,27 +81,27 @@ void dfrobot_ens160_set_temp_and_hum(ens160_t* ens160, float ambient_temp, float
 }
 
 /***************** Performance function ******************************/
-uint8_t dfrobot_ens160_get_ens160_status(ens160_t* ens160)
+uint8_t dfrobot_ens160_get_ens160_status(ens160_t *ens160)
 {
   dfrobot_ens160_i2c_read_reg(ens160, ENS160_DATA_STATUS_REG, &(ens160->status), sizeof(s_sensor_status_t));
   return ens160->status.validity_flag;
 }
 
-uint8_t dfrobot_ens160_get_aqi(ens160_t* ens160)
+uint8_t dfrobot_ens160_get_aqi(ens160_t *ens160)
 {
   uint8_t data = 0;
   dfrobot_ens160_i2c_read_reg(ens160, ENS160_DATA_AQI_REG, &data, sizeof(data));
   return data;
 }
 
-uint16_t dfrobot_ens160_get_tvoc(ens160_t* ens160)
+uint16_t dfrobot_ens160_get_tvoc(ens160_t *ens160)
 {
   uint8_t buf[2] = { 0 };
   dfrobot_ens160_i2c_read_reg(ens160, ENS160_DATA_TVOC_REG, buf, sizeof(buf));
   return ENS160_CONCAT_BYTES(buf[1], buf[0]);
 }
 
-uint16_t dfrobot_ens160_get_eco2(ens160_t* ens160)
+uint16_t dfrobot_ens160_get_eco2(ens160_t *ens160)
 {
   uint8_t buf[2] = { 0 };
   dfrobot_ens160_i2c_read_reg(ens160, ENS160_DATA_ECO2_REG, buf, sizeof(buf));
@@ -109,14 +109,14 @@ uint16_t dfrobot_ens160_get_eco2(ens160_t* ens160)
 }
 
 /************************** crc check calculation function ******************************/
-uint8_t dfrobot_ens160_get_misr(ens160_t* ens160)
+uint8_t dfrobot_ens160_get_misr(ens160_t *ens160)
 {
   uint8_t crc = 0;
   dfrobot_ens160_i2c_read_reg(ens160, ENS160_DATA_MISR_REG, &crc, sizeof(crc));
   return crc;
 }
 
-uint8_t dfrobot_ens160_calc_misr(ens160_t* ens160, uint8_t data)
+uint8_t dfrobot_ens160_calc_misr(ens160_t *ens160, uint8_t data)
 {
   uint8_t misr_xor = ((ens160->misr << 1) ^ data) & 0xFF;
   if ((ens160->misr & 0x80) == 0)
@@ -129,42 +129,42 @@ uint8_t dfrobot_ens160_calc_misr(ens160_t* ens160, uint8_t data)
 
 /***************** Init and read/write of I2C and SPI interfaces ******************************/
 
-int dfrobot_ens160_i2c_begin(ens160_t* ens160)
+int dfrobot_ens160_i2c_begin(ens160_t *ens160)
 {
-  ezlopi_i2c_master_init(ens160->ezlopi_i2c);
+  EZPI_hal_i2c_master_init(ens160->ezlopi_i2c);
 
   return dfrobot_ens160_begin(ens160);   // Use the initialization function of the parent class
 }
 
-void dfrobot_ens160_i2c_write_reg(ens160_t* ens160, uint8_t reg, const void* p_buf, size_t size)
+void dfrobot_ens160_i2c_write_reg(ens160_t *ens160, uint8_t reg, const void *p_buf, size_t size)
 {
   if (p_buf == NULL) {
     DBG("p_buf ERROR!! : null pointer");
   }
 
-  uint8_t* _p_buf = (uint8_t*)ezlopi_malloc(__FUNCTION__, size + sizeof(reg));
+  uint8_t *_p_buf = (uint8_t *)ezlopi_malloc(__FUNCTION__, size + sizeof(reg));
   memcpy(_p_buf, &reg, sizeof(reg));
   memcpy(_p_buf + 1, p_buf, size);
 
-  ezlopi_i2c_master_write_to_device(ens160->ezlopi_i2c, _p_buf, size + sizeof(reg));
+  EZPI_hal_i2c_master_write_to_device(ens160->ezlopi_i2c, _p_buf, size + sizeof(reg));
 
   ezlopi_free(__FUNCTION__, _p_buf);
 }
 
-size_t dfrobot_ens160_i2c_read_reg(ens160_t* ens160, uint8_t reg, void* p_buf, size_t size)
+size_t dfrobot_ens160_i2c_read_reg(ens160_t *ens160, uint8_t reg, void *p_buf, size_t size)
 {
   if (NULL == p_buf) {
     DBG("p_buf ERROR!! : null pointer");
   }
-  uint8_t * _p_buf = (uint8_t*)p_buf;
+  uint8_t *_p_buf = (uint8_t *)p_buf;
 
-  ezlopi_i2c_master_write_to_device(ens160->ezlopi_i2c, &reg, sizeof(reg));
-  ezlopi_i2c_master_read_from_device(ens160->ezlopi_i2c, _p_buf, size);
+  EZPI_hal_i2c_master_write_to_device(ens160->ezlopi_i2c, &reg, sizeof(reg));
+  EZPI_hal_i2c_master_read_from_device(ens160->ezlopi_i2c, _p_buf, size);
 
   return size;
 }
 
-void dfrobot_ens160_get_data(ens160_t* ens160)
+void dfrobot_ens160_get_data(ens160_t *ens160)
 {
   /**
    * Get the sensor operating status

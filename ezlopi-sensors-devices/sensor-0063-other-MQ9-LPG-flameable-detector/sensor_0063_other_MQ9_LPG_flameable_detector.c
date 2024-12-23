@@ -172,7 +172,7 @@ static ezlopi_error_t __0063_init(l_ezlopi_item_t *item)
             {
                 if (GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
                 { // initialize analog_pin
-                    if (EZPI_SUCCESS == ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
+                    if (EZPI_SUCCESS == EZPI_hal_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
                     {
                         // calibrate if not done
                         if (false == MQ9_value->Calibration_complete_LPG_flameable)
@@ -378,7 +378,7 @@ static float __extract_MQ9_sensor_ppm(l_ezlopi_item_t *item)
         float analog_sensor_volt = 0;
         for (uint8_t x = 10; x > 0; x--)
         {
-            ezlopi_adc_get_adc_data(mq9_adc_pin, &ezlopi_analog_data);
+            EZPI_hal_adc_get_adc_data(mq9_adc_pin, &ezlopi_analog_data);
 #ifdef VOLTAGE_DIVIDER_ADDED
             analog_sensor_volt += ((float)(ezlopi_analog_data.voltage) * 2.0f);
 #else
@@ -443,7 +443,7 @@ static void __calibrate_MQ9_R0_resistance(void *params)
                     TRACE_W("Please Wait..Collecting Ambient Air data ........... [Avoid Smokes/gases]");
                 }
                 // extract ADC values
-                ezlopi_adc_get_adc_data(mq9_adc_pin, &ezlopi_analog_data);
+                EZPI_hal_adc_get_adc_data(mq9_adc_pin, &ezlopi_analog_data);
 #ifdef VOLTAGE_DIVIDER_ADDED
                 _sensor_volt += (float)((ezlopi_analog_data.voltage) * 2.0f); // [0-2.4V] X2
 #else

@@ -22,18 +22,18 @@
  * SOFTWARE.
  */
 
-/**
- * @file bmp280.c
- *
- * ESP-IDF driver for BMP280/BME280 digital pressure sensor
- *
- * Ported from esp-open-rtos
- *
- * Copyright (c) 2016 sheinz <https://github.com/sheinz>\n
- * Copyright (c) 2018 Ruslan V. Uss <unclerus@gmail.com>
- *
- * MIT Licensed as described in the file LICENSE
- */
+ /**
+  * @file bmp280.c
+  *
+  * ESP-IDF driver for BMP280/BME280 digital pressure sensor
+  *
+  * Ported from esp-open-rtos
+  *
+  * Copyright (c) 2016 sheinz <https://github.com/sheinz>\n
+  * Copyright (c) 2018 Ruslan V. Uss <unclerus@gmail.com>
+  *
+  * MIT Licensed as described in the file LICENSE
+  */
 
 #include "sensor_bme280.h"
 #include <inttypes.h>
@@ -94,17 +94,17 @@ static const char *TAG = "bmp280";
 
 inline static esp_err_t read_register_8(s_ezlopi_i2c_master_t *i2c_master_conf, uint8_t reg, uint8_t *r)
 {
-    ESP_ERROR_CHECK(ezlopi_i2c_master_write_to_device(i2c_master_conf, &reg, 1));
-    ESP_ERROR_CHECK(ezlopi_i2c_master_read_from_device(i2c_master_conf, r, 1));
+    ESP_ERROR_CHECK(EZPI_hal_i2c_master_write_to_device(i2c_master_conf, &reg, 1));
+    ESP_ERROR_CHECK(EZPI_hal_i2c_master_read_from_device(i2c_master_conf, r, 1));
     return 0;
 }
 
 static esp_err_t read_register16(s_ezlopi_i2c_master_t *i2c_master_conf, uint8_t reg, uint16_t *r)
 {
-    uint8_t d[] = {0, 0};
+    uint8_t d[] = { 0, 0 };
 
-    ESP_ERROR_CHECK(ezlopi_i2c_master_write_to_device(i2c_master_conf, &reg, 1));
-    ESP_ERROR_CHECK(ezlopi_i2c_master_read_from_device(i2c_master_conf, d, 2));
+    ESP_ERROR_CHECK(EZPI_hal_i2c_master_write_to_device(i2c_master_conf, &reg, 1));
+    ESP_ERROR_CHECK(EZPI_hal_i2c_master_read_from_device(i2c_master_conf, d, 2));
     *r = d[0] | (d[1] << 8);
 
     return ESP_OK;
@@ -157,7 +157,7 @@ static esp_err_t read_hum_calibration_data(s_ezlopi_i2c_master_t *i2c_master_con
     CHECK(read_register16(i2c_master_conf, 0xe5, &h5));
 
     register_addr = 0xe7;
-    ESP_ERROR_CHECK(read_register_8(i2c_master_conf, register_addr, (uint8_t*)&dev->dig_H6));
+    ESP_ERROR_CHECK(read_register_8(i2c_master_conf, register_addr, (uint8_t *)&dev->dig_H6));
 
     dev->dig_H4 = (h4 & 0x00ff) << 4 | (h4 & 0x0f00) >> 8;
     dev->dig_H5 = h5 >> 4;
@@ -194,26 +194,26 @@ esp_err_t bmp280_init(bmp280_t *dev, bmp280_params_t *params, s_ezlopi_i2c_maste
 
     uint8_t write_buffer = BMP280_REG_ID;
 
-    ESP_ERROR_CHECK(ezlopi_i2c_master_write_to_device(i2c_master_conf, &write_buffer, 1));
-    ESP_ERROR_CHECK(ezlopi_i2c_master_read_from_device(i2c_master_conf, &dev->id, 1));
+    ESP_ERROR_CHECK(EZPI_hal_i2c_master_write_to_device(i2c_master_conf, &write_buffer, 1));
+    ESP_ERROR_CHECK(EZPI_hal_i2c_master_read_from_device(i2c_master_conf, &dev->id, 1));
 
     if (dev->id != BMP280_CHIP_ID && dev->id != BME280_CHIP_ID)
     {
         CHECK_LOGE(dev, ESP_ERR_INVALID_VERSION, "Invalid chip ID: expected: 0x%x (BME280) or 0x%x (BMP280) got: 0x%x",
-                   BME280_CHIP_ID, BMP280_CHIP_ID, dev->id);
+            BME280_CHIP_ID, BMP280_CHIP_ID, dev->id);
     }
 
     // Soft reset.
-    uint8_t reset_data[2] = {BMP280_REG_RESET, BMP280_RESET_VALUE};
-    ESP_ERROR_CHECK(ezlopi_i2c_master_write_to_device(i2c_master_conf, reset_data, 2));
+    uint8_t reset_data[2] = { BMP280_REG_RESET, BMP280_RESET_VALUE };
+    ESP_ERROR_CHECK(EZPI_hal_i2c_master_write_to_device(i2c_master_conf, reset_data, 2));
 
     // Wait until finished copying over the NVP data.
     uint8_t status;
     write_buffer = BMP280_REG_STATUS;
     while (1)
     {
-        ESP_ERROR_CHECK(ezlopi_i2c_master_write_to_device(i2c_master_conf, &write_buffer, 1));
-        ESP_ERROR_CHECK(ezlopi_i2c_master_read_from_device(i2c_master_conf, &status, 1));
+        ESP_ERROR_CHECK(EZPI_hal_i2c_master_write_to_device(i2c_master_conf, &write_buffer, 1));
+        ESP_ERROR_CHECK(EZPI_hal_i2c_master_read_from_device(i2c_master_conf, &status, 1));
         if ((status & 1) == 0)
         {
             break;
@@ -230,8 +230,8 @@ esp_err_t bmp280_init(bmp280_t *dev, bmp280_params_t *params, s_ezlopi_i2c_maste
     uint8_t config = (params->standby << 5) | (params->filter << 2);
     ESP_LOGD(TAG, "Writing config reg=%x", config);
 
-    uint8_t config_data[2] = {BMP280_REG_CONFIG, config};
-    ESP_ERROR_CHECK(ezlopi_i2c_master_write_to_device(i2c_master_conf, config_data, 2));
+    uint8_t config_data[2] = { BMP280_REG_CONFIG, config };
+    ESP_ERROR_CHECK(EZPI_hal_i2c_master_write_to_device(i2c_master_conf, config_data, 2));
 
     if (params->mode == BMP280_MODE_FORCED)
     {
@@ -243,14 +243,14 @@ esp_err_t bmp280_init(bmp280_t *dev, bmp280_params_t *params, s_ezlopi_i2c_maste
         // Write crtl hum reg first, only active after write to BMP280_REG_CTRL.
         uint8_t ctrl_hum = params->oversampling_humidity;
         ESP_LOGD(TAG, "Writing ctrl hum reg=%x", ctrl_hum);
-        uint8_t humid_crtl_data[2] = {BMP280_REG_CTRL_HUM, ctrl_hum};
-        ESP_ERROR_CHECK(ezlopi_i2c_master_write_to_device(i2c_master_conf, humid_crtl_data, 2));
+        uint8_t humid_crtl_data[2] = { BMP280_REG_CTRL_HUM, ctrl_hum };
+        ESP_ERROR_CHECK(EZPI_hal_i2c_master_write_to_device(i2c_master_conf, humid_crtl_data, 2));
     }
 
     uint8_t ctrl = (params->oversampling_temperature << 5) | (params->oversampling_pressure << 2) | (params->mode);
     ESP_LOGD(TAG, "Writing ctrl reg=%x", ctrl);
-    uint8_t crtl_data[2] = {BMP280_REG_CTRL, ctrl};
-    ESP_ERROR_CHECK(ezlopi_i2c_master_write_to_device(i2c_master_conf, crtl_data, 2));
+    uint8_t crtl_data[2] = { BMP280_REG_CTRL, ctrl };
+    ESP_ERROR_CHECK(EZPI_hal_i2c_master_write_to_device(i2c_master_conf, crtl_data, 2));
 
 
     return ESP_OK;
@@ -339,8 +339,8 @@ esp_err_t bmp280_read_fixed(s_ezlopi_i2c_master_t *i2c_master_conf, bmp280_t *de
     // Need to read in one sequence to ensure they match.
     size_t size = humidity ? 8 : 6;
     uint8_t register_addr = 0xf7;
-    ESP_ERROR_CHECK(ezlopi_i2c_master_write_to_device(i2c_master_conf, &register_addr, 1));
-    ESP_ERROR_CHECK(ezlopi_i2c_master_read_from_device(i2c_master_conf, data, size));
+    ESP_ERROR_CHECK(EZPI_hal_i2c_master_write_to_device(i2c_master_conf, &register_addr, 1));
+    ESP_ERROR_CHECK(EZPI_hal_i2c_master_read_from_device(i2c_master_conf, data, size));
 
     adc_pressure = data[0] << 12 | data[1] << 4 | data[2] >> 4;
     adc_temp = data[3] << 12 | data[4] << 4 | data[5] >> 4;

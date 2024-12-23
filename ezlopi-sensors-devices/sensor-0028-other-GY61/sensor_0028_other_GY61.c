@@ -214,7 +214,7 @@ static ezlopi_error_t __0028_init(l_ezlopi_item_t *item)
         {
             if (GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
             {
-                if (EZPI_SUCCESS == ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
+                if (EZPI_SUCCESS == EZPI_hal_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
                 {
                     ret = EZPI_SUCCESS;
                 }
@@ -302,7 +302,7 @@ static float __update_gy61_axis_value(l_ezlopi_item_t *item)
     if (item)
     {
         s_ezlopi_analog_data_t ezlopi_analog_data = { .value = 0, .voltage = 0 };
-        ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &ezlopi_analog_data);
+        EZPI_hal_adc_get_adc_data(item->interface.adc.gpio_num, &ezlopi_analog_data);
         int temp_vol = ezlopi_analog_data.voltage;
 #if (CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32C3)
         if (temp_vol <= 1300)

@@ -294,7 +294,7 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
         {
             if (item->interface.i2c_master.enable)
             {
-                ezlopi_i2c_master_init(&item->interface.i2c_master);
+                EZPI_hal_i2c_master_init(&item->interface.i2c_master);
                 TRACE_I("I2C initialized to channel %d", item->interface.i2c_master.channel);
                 if (0 == __gy271_configure(item)) // ESP_OK
                 {

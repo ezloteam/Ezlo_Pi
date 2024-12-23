@@ -39,8 +39,8 @@ static e_mpu6050_err_t __mpu6050_configure_power(l_ezlopi_item_t *item)
     if (item)
     {
         // uint8_t write_buffer[] = {0x6B, 0x03};
-        uint8_t write_buffer[] = {REG_PWR_MGMT_1, PWR_MGMT_1_PLL_Z_AXIS_INTERNAL_CLK_REF};
-        if (ESP_OK != ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, write_buffer, 2))
+        uint8_t write_buffer[] = { REG_PWR_MGMT_1, PWR_MGMT_1_PLL_Z_AXIS_INTERNAL_CLK_REF };
+        if (ESP_OK != EZPI_hal_i2c_master_write_to_device(&item->interface.i2c_master, write_buffer, 2))
         {
             err = MPU6050_ERR_DRIVER_INSTALL_FAIL;
         }
@@ -53,7 +53,7 @@ static e_mpu6050_err_t __mpu6050_configure_accelerometer(l_ezlopi_item_t *item, 
     if (item)
     {
         // uint8_t write_buffer[] = {0x1C, 0x00};
-        uint8_t write_buffer[] = {REG_A_CFG, A_CFG_2G};
+        uint8_t write_buffer[] = { REG_A_CFG, A_CFG_2G };
         switch (flags)
         {
         case A_CFG_2G:
@@ -71,7 +71,7 @@ static e_mpu6050_err_t __mpu6050_configure_accelerometer(l_ezlopi_item_t *item, 
         default:
             break;
         }
-        if (ESP_OK != ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, write_buffer, 2))
+        if (ESP_OK != EZPI_hal_i2c_master_write_to_device(&item->interface.i2c_master, write_buffer, 2))
         {
             err = MPU6050_ERR_DRIVER_INSTALL_FAIL;
         }
@@ -84,7 +84,7 @@ static e_mpu6050_err_t __mpu6050_configure_gyroscope(l_ezlopi_item_t *item, uint
     if (item)
     {
         // uint8_t write_buffer[] = {0x1B, 0x00};
-        uint8_t write_buffer[] = {REG_G_CFG, G_CFG_250};
+        uint8_t write_buffer[] = { REG_G_CFG, G_CFG_250 };
         switch (flags)
         {
         case G_CFG_250:
@@ -103,7 +103,7 @@ static e_mpu6050_err_t __mpu6050_configure_gyroscope(l_ezlopi_item_t *item, uint
             break;
         }
 
-        if (ESP_OK != ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, write_buffer, 2))
+        if (ESP_OK != EZPI_hal_i2c_master_write_to_device(&item->interface.i2c_master, write_buffer, 2))
         {
             err = MPU6050_ERR_DRIVER_INSTALL_FAIL;
         }
@@ -116,8 +116,8 @@ static e_mpu6050_err_t __mpu6050_configure_dlfp(l_ezlopi_item_t *item)
     if (item)
     {
         // uint8_t write_buffer[] = {0x1A, 0x00};
-        uint8_t write_buffer[] = {REG_DLFP_CFG, DLFP_CFG_FILTER_0};
-        if (ESP_OK != ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, write_buffer, 2))
+        uint8_t write_buffer[] = { REG_DLFP_CFG, DLFP_CFG_FILTER_0 };
+        if (ESP_OK != EZPI_hal_i2c_master_write_to_device(&item->interface.i2c_master, write_buffer, 2))
         {
             err = MPU6050_ERR_DRIVER_INSTALL_FAIL;
         }
@@ -130,8 +130,8 @@ static e_mpu6050_err_t __mpu6050_enable_interrupt(l_ezlopi_item_t *item)
     if (item)
     {
         // uint8_t write_buffer[] = {0x38, 0x00};
-        uint8_t write_buffer[] = {REG_INTR_EN, INTR_EN_DATA_RDY};
-        if (ESP_OK != ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, write_buffer, 2))
+        uint8_t write_buffer[] = { REG_INTR_EN, INTR_EN_DATA_RDY };
+        if (ESP_OK != EZPI_hal_i2c_master_write_to_device(&item->interface.i2c_master, write_buffer, 2))
         {
             err = MPU6050_ERR_DRIVER_INSTALL_FAIL;
         }
@@ -144,9 +144,9 @@ static e_mpu6050_err_t mpu6050_check_data_ready_INTR(l_ezlopi_item_t *item, uint
 {
     e_mpu6050_err_t err = MPU6050_ERR_OK;
     {
-        uint8_t write_buffer[] = {REG_INTR_STATUS}; // REG_INTR_STATUS;
-        ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, write_buffer, 1);
-        ezlopi_i2c_master_read_from_device(&item->interface.i2c_master, temp, 1);
+        uint8_t write_buffer[] = { REG_INTR_STATUS }; // REG_INTR_STATUS;
+        EZPI_hal_i2c_master_write_to_device(&item->interface.i2c_master, write_buffer, 1);
+        EZPI_hal_i2c_master_read_from_device(&item->interface.i2c_master, temp, 1);
         if (NULL != temp)
         {
             err = MPU6050_ERR_OK;
@@ -165,8 +165,8 @@ void __mpu6050_get_data(l_ezlopi_item_t *item)
     if (item)
     {
         e_mpu6050_err_t err = MPU6050_ERR_OK;
-        s_raw_mpu6050_data_t RAW_DATA = {0};
-        uint8_t tmp_buf[MPU6050_REG_COUNT_LEN] = {0}; // 0 - 13
+        s_raw_mpu6050_data_t RAW_DATA = { 0 };
+        uint8_t tmp_buf[MPU6050_REG_COUNT_LEN] = { 0 }; // 0 - 13
         uint8_t Check_Register = 0;
         uint8_t address_val = 0;
 
@@ -178,8 +178,8 @@ void __mpu6050_get_data(l_ezlopi_item_t *item)
                 if (Check_Register & DATA_RDY_INT_FLAG)
                 {
                     address_val = (ACCEL_X_H);
-                    ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, &address_val, 1);
-                    ezlopi_i2c_master_read_from_device(&item->interface.i2c_master, (tmp_buf), MPU6050_REG_COUNT_LEN); //(tmp_buf+i), 1);
+                    EZPI_hal_i2c_master_write_to_device(&item->interface.i2c_master, &address_val, 1);
+                    EZPI_hal_i2c_master_read_from_device(&item->interface.i2c_master, (tmp_buf), MPU6050_REG_COUNT_LEN); //(tmp_buf+i), 1);
                 }
                 // user_data->extract_counts++;
                 // TRACE_I("Total Extracted : [%d]", user_data->extract_counts);

@@ -306,7 +306,7 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
         {
             if (item->interface.i2c_master.enable)
             {
-                ezlopi_i2c_master_init(&item->interface.i2c_master);
+                EZPI_hal_i2c_master_init(&item->interface.i2c_master);
                 if (MPU6050_ERR_OK == __mpu6050_config_device(item))
                 {
                     TRACE_I("Configuration Complete.... ");
@@ -494,15 +494,15 @@ static void __mpu6050_calibration_task(void *params) // calibrate task
 
             for (uint8_t i = CALIBRATION_SAMPLES + 50; i > 0; i--)
             {
-                err = ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, write_buffer, 1);
-                err = ezlopi_i2c_master_read_from_device(&item->interface.i2c_master, &Check_Register, 1);
+                err = EZPI_hal_i2c_master_write_to_device(&item->interface.i2c_master, write_buffer, 1);
+                err = EZPI_hal_i2c_master_read_from_device(&item->interface.i2c_master, &Check_Register, 1);
 
                 if (ESP_OK == err)
                 {
                     if (Check_Register & DATA_RDY_INT_FLAG)
                     {
-                        err = ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, &address_val, 1);
-                        err = ezlopi_i2c_master_read_from_device(&item->interface.i2c_master, (buf), MPU6050_REG_COUNT_LEN);
+                        err = EZPI_hal_i2c_master_write_to_device(&item->interface.i2c_master, &address_val, 1);
+                        err = EZPI_hal_i2c_master_read_from_device(&item->interface.i2c_master, (buf), MPU6050_REG_COUNT_LEN);
                     }
                     if (i <= CALIBRATION_SAMPLES)
                     {

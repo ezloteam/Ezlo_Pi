@@ -133,7 +133,7 @@ static ezlopi_error_t __0055_init(l_ezlopi_item_t *item)
         {
             if (GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
             {
-                if (EZPI_SUCCESS == ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
+                if (EZPI_SUCCESS == EZPI_hal_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
                 {
                     ret = EZPI_SUCCESS;
                 }
@@ -172,7 +172,7 @@ static ezlopi_error_t __0055_notify(l_ezlopi_item_t *item)
             s_ezlopi_analog_data_t ezlopi_analog_data = { .value = 0,
                                                          .voltage = 0 };
             // extract the sensor_output_values
-            ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &ezlopi_analog_data);
+            EZPI_hal_adc_get_adc_data(item->interface.adc.gpio_num, &ezlopi_analog_data);
             float Vout = (ezlopi_analog_data.voltage) / 1000.0f; // millivolt -> voltage
 
             // calculate the 'rs_0055' resistance value using [voltage divider rule]

@@ -133,7 +133,7 @@ static ezlopi_error_t __0046_init(l_ezlopi_item_t *item)
         {
             if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num))
             {
-                if (EZPI_SUCCESS == ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
+                if (EZPI_SUCCESS == EZPI_hal_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
                 {
                     ret = EZPI_SUCCESS;
                 }
@@ -202,7 +202,7 @@ static void __calculate_current_value(l_ezlopi_item_t *item)
 
             while (((uint32_t)esp_timer_get_time() - t_start) < period_dur) // loops within 1-complete cycle
             {
-                ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &ezlopi_analog_data);
+                EZPI_hal_adc_get_adc_data(item->interface.adc.gpio_num, &ezlopi_analog_data);
                 Volt = 2 * (ezlopi_analog_data.voltage); // since the input is half the original value after voltage division
                 diff = ((ASC712TELC_05B_zero_point_mV - Volt) > 0 ? (ASC712TELC_05B_zero_point_mV - Volt) : (Volt - ASC712TELC_05B_zero_point_mV));
                 // getting the voltage value at this instant
