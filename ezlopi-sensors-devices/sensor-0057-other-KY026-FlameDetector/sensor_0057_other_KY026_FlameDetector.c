@@ -159,7 +159,7 @@ static ezlopi_error_t __0057_init(l_ezlopi_item_t *item)
             {
                 if (GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
                 { // initialize analog_pin
-                    if (EZPI_SUCCESS == ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
+                    if (EZPI_SUCCESS == EZPI_hal_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
                     {
                         ret = EZPI_SUCCESS;
                     }
@@ -358,7 +358,7 @@ static void __extract_KY026_sensor_value(uint32_t flame_adc_pin, float *analog_s
     // extract the mean_sensor_analog_output_voltage
     for (uint8_t x = 10; x > 0; x--)
     {
-        ezlopi_adc_get_adc_data(flame_adc_pin, &ezlopi_analog_data);
+        EZPI_hal_adc_get_adc_data(flame_adc_pin, &ezlopi_analog_data);
 #ifdef VOLTAGE_DIVIDER_ADDED
         *analog_sensor_volt += ((float)((ezlopi_analog_data.voltage) / 1000.0f) * 2.0f); // V
 #else

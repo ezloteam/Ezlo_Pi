@@ -82,9 +82,9 @@ static ezlopi_error_t RGB_LED_change_color_value(s_rgb_args_t *rgb_args)
         TRACE_D("Brightness value is %d, %d, %d", (uint8_t)(rgb_args->red_struct.value * rgb_args->brightness), (uint8_t)(rgb_args->green_struct.value * rgb_args->brightness),
             (uint8_t)(rgb_args->blue_struct.value * rgb_args->brightness));
 
-        ezlopi_pwm_change_duty(rgb_args->red_struct.channel, rgb_args->red_struct.speed_mode, (uint8_t)(rgb_args->red_struct.value * rgb_args->brightness));
-        ezlopi_pwm_change_duty(rgb_args->green_struct.channel, rgb_args->green_struct.speed_mode, (uint8_t)(rgb_args->green_struct.value * rgb_args->brightness));
-        ezlopi_pwm_change_duty(rgb_args->blue_struct.channel, rgb_args->blue_struct.speed_mode, (uint8_t)(rgb_args->blue_struct.value * rgb_args->brightness));
+        EZPI_hal_pwm_change_duty(rgb_args->red_struct.channel, rgb_args->red_struct.speed_mode, (uint8_t)(rgb_args->red_struct.value * rgb_args->brightness));
+        EZPI_hal_pwm_change_duty(rgb_args->green_struct.channel, rgb_args->green_struct.speed_mode, (uint8_t)(rgb_args->green_struct.value * rgb_args->brightness));
+        EZPI_hal_pwm_change_duty(rgb_args->blue_struct.channel, rgb_args->blue_struct.speed_mode, (uint8_t)(rgb_args->blue_struct.value * rgb_args->brightness));
         ret = EZPI_SUCCESS;
     }
     return ret;
@@ -239,7 +239,7 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
             {
                 if (false == rgb_args->RGB_LED_initialized)
                 {
-                    s_ezlopi_channel_speed_t *RGB_LED_red_channel_speed = ezlopi_pwm_init(rgb_args->red_struct.gpio_num, rgb_args->red_struct.pwm_resln, rgb_args->red_struct.freq_hz, rgb_args->red_struct.duty_cycle);
+                    s_ezlopi_channel_speed_t *RGB_LED_red_channel_speed = EZPI_hal_pwm_init(rgb_args->red_struct.gpio_num, rgb_args->red_struct.pwm_resln, rgb_args->red_struct.freq_hz, rgb_args->red_struct.duty_cycle);
                     if (RGB_LED_red_channel_speed)
                     {
                         rgb_args->red_struct.channel = RGB_LED_red_channel_speed->channel;
@@ -248,7 +248,7 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
                         ezlopi_free(__FUNCTION__, RGB_LED_red_channel_speed);
                     }
 
-                    s_ezlopi_channel_speed_t *RGB_LED_green_channel_speed = ezlopi_pwm_init(rgb_args->green_struct.gpio_num, rgb_args->green_struct.pwm_resln, rgb_args->green_struct.freq_hz, rgb_args->green_struct.duty_cycle);
+                    s_ezlopi_channel_speed_t *RGB_LED_green_channel_speed = EZPI_hal_pwm_init(rgb_args->green_struct.gpio_num, rgb_args->green_struct.pwm_resln, rgb_args->green_struct.freq_hz, rgb_args->green_struct.duty_cycle);
                     if (RGB_LED_green_channel_speed)
                     {
                         rgb_args->green_struct.channel = RGB_LED_green_channel_speed->channel;
@@ -257,7 +257,7 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
                         ezlopi_free(__FUNCTION__, RGB_LED_green_channel_speed);
                     }
 
-                    s_ezlopi_channel_speed_t *RGB_LED_blue_channel_speed = ezlopi_pwm_init(rgb_args->blue_struct.gpio_num, rgb_args->blue_struct.pwm_resln, rgb_args->blue_struct.freq_hz, rgb_args->blue_struct.duty_cycle);
+                    s_ezlopi_channel_speed_t *RGB_LED_blue_channel_speed = EZPI_hal_pwm_init(rgb_args->blue_struct.gpio_num, rgb_args->blue_struct.pwm_resln, rgb_args->blue_struct.freq_hz, rgb_args->blue_struct.duty_cycle);
                     if (RGB_LED_blue_channel_speed)
                     {
                         rgb_args->blue_struct.channel = RGB_LED_blue_channel_speed->channel;

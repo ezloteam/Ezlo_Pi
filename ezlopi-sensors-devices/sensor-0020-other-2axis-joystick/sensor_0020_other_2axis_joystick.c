@@ -274,7 +274,7 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
                 if (GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
                 {
                     TRACE_I("adc GPIO_NUM is %d", item->interface.adc.gpio_num);
-                    if (EZPI_SUCCESS == ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
+                    if (EZPI_SUCCESS == EZPI_hal_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
                     {
                         ret = EZPI_SUCCESS;
                     }
@@ -380,7 +380,7 @@ static ezlopi_error_t __notify(l_ezlopi_item_t *item)
 
                 if (user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_X] == item->cloud_properties.item_id)
                 {
-                    ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &ezlopi_analog_data);
+                    EZPI_hal_adc_get_adc_data(item->interface.adc.gpio_num, &ezlopi_analog_data);
                     if (fabs(user_data->adc_x - ezlopi_analog_data.voltage) > 100)
                     {
                         user_data->adc_x = ezlopi_analog_data.voltage;
@@ -390,7 +390,7 @@ static ezlopi_error_t __notify(l_ezlopi_item_t *item)
                 }
                 else if (user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_Y] == item->cloud_properties.item_id)
                 {
-                    ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &ezlopi_analog_data);
+                    EZPI_hal_adc_get_adc_data(item->interface.adc.gpio_num, &ezlopi_analog_data);
                     if (fabs(user_data->adc_y - ezlopi_analog_data.voltage) > 100)
                     {
                         user_data->adc_y = ezlopi_analog_data.voltage;

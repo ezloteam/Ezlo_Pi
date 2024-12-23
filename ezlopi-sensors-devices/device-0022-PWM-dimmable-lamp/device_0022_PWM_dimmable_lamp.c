@@ -88,7 +88,7 @@ static ezlopi_error_t __set_cjson_value(l_ezlopi_item_t *item, void *arg)
                 int value = 0;
                 CJSON_GET_VALUE_DOUBLE(device_details, ezlopi_value_str, value);
                 int target_value = (int)ceil(((value * 4095.0) / 100.0));
-                ezlopi_pwm_change_duty(item->interface.pwm.channel, item->interface.pwm.speed_mode, target_value);
+                EZPI_hal_pwm_change_duty(item->interface.pwm.channel, item->interface.pwm.speed_mode, target_value);
                 dimmable_bulb_arg->previous_brightness_value = dimmable_bulb_arg->current_brightness_value;
                 dimmable_bulb_arg->current_brightness_value = target_value;
                 EZPI_core_device_value_updated_from_device_broadcast(dimmable_bulb_arg->item_dimmer);
@@ -101,7 +101,7 @@ static ezlopi_error_t __set_cjson_value(l_ezlopi_item_t *item, void *arg)
                 CJSON_GET_VALUE_BOOL(device_details, ezlopi_value_str, switch_state);
                 dimmable_bulb_arg->previous_brightness_value = (false == switch_state) ? dimmable_bulb_arg->current_brightness_value : dimmable_bulb_arg->previous_brightness_value;
                 dimmable_bulb_arg->current_brightness_value = (false == switch_state) ? 0 : (0 == dimmable_bulb_arg->previous_brightness_value ? 4095 : dimmable_bulb_arg->previous_brightness_value);
-                ezlopi_pwm_change_duty(dimmable_bulb_arg->item_dimmer->interface.pwm.channel, dimmable_bulb_arg->item_dimmer->interface.pwm.speed_mode, dimmable_bulb_arg->current_brightness_value);
+                EZPI_hal_pwm_change_duty(dimmable_bulb_arg->item_dimmer->interface.pwm.channel, dimmable_bulb_arg->item_dimmer->interface.pwm.speed_mode, dimmable_bulb_arg->current_brightness_value);
                 EZPI_core_device_value_updated_from_device_broadcast(dimmable_bulb_arg->item_dimmer);
                 EZPI_core_device_value_updated_from_device_broadcast(dimmable_bulb_arg->item_dimmer_switch);
                 ret = EZPI_SUCCESS;
@@ -199,7 +199,7 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
             {
                 if (0 == dimmable_bulb_arg->dimmable_bulb_initialized)
                 {
-                    s_ezlopi_channel_speed_t *ezlopi_dimmable_channel_speed = ezlopi_pwm_init(item->interface.pwm.gpio_num, item->interface.pwm.pwm_resln,
+                    s_ezlopi_channel_speed_t *ezlopi_dimmable_channel_speed = EZPI_hal_pwm_init(item->interface.pwm.gpio_num, item->interface.pwm.pwm_resln,
                         item->interface.pwm.freq_hz, item->interface.pwm.duty_cycle);
                     if (ezlopi_dimmable_channel_speed)
                     {
@@ -209,7 +209,7 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
                         dimmable_bulb_arg->current_brightness_value = item->interface.pwm.duty_cycle;
                         dimmable_bulb_arg->previous_brightness_value = item->interface.pwm.duty_cycle;
                         dimmable_bulb_arg->dimmable_bulb_initialized = true;
-                        ezlopi_pwm_change_duty(item->interface.pwm.channel, item->interface.pwm.speed_mode, item->interface.pwm.duty_cycle);
+                        EZPI_hal_pwm_change_duty(item->interface.pwm.channel, item->interface.pwm.speed_mode, item->interface.pwm.duty_cycle);
                     }
                     else
                     {

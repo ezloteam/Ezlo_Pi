@@ -126,7 +126,7 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
         if (GPIO_IS_VALID_GPIO(item->interface.pwm.gpio_num))
         {
             static s_ezlopi_channel_speed_t *servo_item = NULL;
-            servo_item = ezlopi_pwm_init(item->interface.pwm.gpio_num, item->interface.pwm.pwm_resln,
+            servo_item = EZPI_hal_pwm_init(item->interface.pwm.gpio_num, item->interface.pwm.pwm_resln,
                 item->interface.pwm.freq_hz, item->interface.pwm.duty_cycle);
             if (servo_item)
             {
@@ -165,7 +165,7 @@ static ezlopi_error_t __set_cjson_value(l_ezlopi_item_t *item, void *arg)
             {
                 int target_value = (int)(((value * 17) / 100) + 13);
                 TRACE_I("target value: %d", target_value);
-                ezlopi_pwm_change_duty(item->interface.pwm.channel, item->interface.pwm.speed_mode, target_value);
+                EZPI_hal_pwm_change_duty(item->interface.pwm.channel, item->interface.pwm.speed_mode, target_value);
                 ret = EZPI_SUCCESS;
             }
         }
@@ -181,7 +181,7 @@ static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg)
         cJSON *cj_result = (cJSON *)arg;
         if (cj_result)
         {
-            uint32_t duty = ezlopi_pwm_get_duty(item->interface.pwm.channel, item->interface.pwm.speed_mode);
+            uint32_t duty = EZPI_hal_pwm_get_duty(item->interface.pwm.channel, item->interface.pwm.speed_mode);
             TRACE_I("raw duty value: %d", duty);
 
             if (duty < 13)

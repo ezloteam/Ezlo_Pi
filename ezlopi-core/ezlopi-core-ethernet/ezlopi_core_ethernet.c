@@ -255,7 +255,7 @@ static void __ethernet_setup_basic(void)
     eth_mac_config_t mac_config_spi = ETH_MAC_DEFAULT_CONFIG();
     eth_phy_config_t phy_config_spi = ETH_PHY_DEFAULT_CONFIG();
 
-    ezlopi_spi_master_init(&spi_config);
+    EZPI_hal_spi_master_init(&spi_config);
 
     eth_w5500_config_t w5500_config = ETH_W5500_DEFAULT_CONFIG(spi_config.handle);
 

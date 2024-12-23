@@ -132,7 +132,7 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
     {
         if (GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
         {
-            if (EZPI_SUCCESS == ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
+            if (EZPI_SUCCESS == EZPI_hal_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
             {
                 ret = EZPI_SUCCESS;
             }
@@ -187,7 +187,7 @@ static ezlopi_error_t __notify(l_ezlopi_item_t *item)
     if (item)
     {
         s_ezlopi_analog_data_t ezlopi_analog_data = { .value = 0, .voltage = 0 };
-        ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &ezlopi_analog_data);
+        EZPI_hal_adc_get_adc_data(item->interface.adc.gpio_num, &ezlopi_analog_data);
         TRACE_I("Value is: %d, voltage is: %d", ezlopi_analog_data.value, ezlopi_analog_data.voltage);
         const char *curr_ldr_state = NULL;
         if (((float)(4096 - ezlopi_analog_data.value) / 4096.0f) > 0.5f) // pot_val : [100% - 30%]

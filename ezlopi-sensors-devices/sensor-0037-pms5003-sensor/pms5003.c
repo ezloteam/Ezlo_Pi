@@ -31,7 +31,7 @@ void pms_init(s_pms5003_sensor_object *pms_object)
 */
 static void pms_uart_setup(s_pms5003_sensor_object *pms_object)
 {
-  ezlopi_uart_init(pms_object->pms_baud_rate, pms_object->pms_tx_pin, pms_object->pms_rx_pin, ezlopi_pms5003_upcall, &pms_object->pms_data);
+  EZPI_hal_uart_init(pms_object->pms_baud_rate, pms_object->pms_tx_pin, pms_object->pms_rx_pin, ezlopi_pms5003_upcall, &pms_object->pms_data);
 }
 
 /*!

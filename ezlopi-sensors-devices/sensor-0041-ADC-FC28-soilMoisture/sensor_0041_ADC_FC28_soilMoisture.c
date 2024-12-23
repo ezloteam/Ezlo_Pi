@@ -143,7 +143,7 @@ static ezlopi_error_t __0041_init(l_ezlopi_item_t *item)
         {
             if (GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
             {
-                if (EZPI_SUCCESS == ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
+                if (EZPI_SUCCESS == EZPI_hal_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
                 {
                     ret = EZPI_SUCCESS;
                 }
@@ -182,7 +182,7 @@ static ezlopi_error_t __0041_notify(l_ezlopi_item_t *item)
         if (user_data)
         {
             s_ezlopi_analog_data_t ezlopi_adc_data = { .value = 0, .voltage = 0 };
-            ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &ezlopi_adc_data);
+            EZPI_hal_adc_get_adc_data(item->interface.adc.gpio_num, &ezlopi_adc_data);
             uint32_t new_hum = ((4095.0f - (ezlopi_adc_data.value)) / 4095.0f) * 100;
             TRACE_S("[%dmv] soil moisture  : %d", ezlopi_adc_data.voltage, new_hum);
 

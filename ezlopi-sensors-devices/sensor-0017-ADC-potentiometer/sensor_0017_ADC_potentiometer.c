@@ -142,7 +142,7 @@ static ezlopi_error_t __0017_init(l_ezlopi_item_t *item)
         {
             if (GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
             {
-                if (EZPI_SUCCESS == ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
+                if (EZPI_SUCCESS == EZPI_hal_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
                 {
                     ret = EZPI_SUCCESS;
                 }
@@ -180,7 +180,7 @@ static ezlopi_error_t __0017_notify(l_ezlopi_item_t *item)
         if (user_data)
         {
             s_ezlopi_analog_data_t adc_data = { .value = 0, .voltage = 0 };
-            ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &adc_data);
+            EZPI_hal_adc_get_adc_data(item->interface.adc.gpio_num, &adc_data);
             float new_pot = (((float)(4095.0f - (adc_data.value)) / 4095.0f) * 100);
 
             if (fabs((user_data->pot_val) - new_pot) > 0.05)
