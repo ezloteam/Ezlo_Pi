@@ -104,7 +104,17 @@ static void __broadcast_loop(void *arg)
             cJSON_Delete(__FUNCTION__, cj_data);
             cj_data = NULL;
 
-#if 1
+            s_otel_trace_t *trace_obj = ezlopi_malloc(__FUNCTION__, sizeof(s_otel_trace_t));
+            if (trace_obj)
+            {
+
+                if (0 == ezlopi_service_otel_add_trace_to_telemetry_queue_struct(trace_obj))
+                {
+                    ezlopi_free(__FUNCTION__, trace_obj);
+                }
+            }
+
+#if 0
             if (cj_method_dup || cj_msg_subclass_dup)
             {
                 cJSON *cj_trace_telemetry = cJSON_CreateObject(__FUNCTION__);

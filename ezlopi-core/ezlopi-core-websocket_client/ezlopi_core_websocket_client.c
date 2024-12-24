@@ -155,6 +155,8 @@ esp_websocket_client_handle_t EZPI_core_websocket_client_init(cJSON *uri, int (*
             .ping_interval_sec = EZPI_CORE_WSS_PING_INTERVAL_SEC,
         };
 
+        
+
         TRACE_S("Connecting to %s...", websocket_cfg.uri);
 
         client = esp_websocket_client_init(&websocket_cfg);

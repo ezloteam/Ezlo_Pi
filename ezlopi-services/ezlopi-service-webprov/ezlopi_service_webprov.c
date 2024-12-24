@@ -147,11 +147,13 @@ static void __connection_upcall(bool connected)
         {
             TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_INFO, "NMA-server connected.");
             TRACE_S("Web-socket Connected.");
+            printf("web-prov - wss connected.\r\n");
         }
         else
         {
             TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_INFO, "NMA-server re-connected.");
             TRACE_S("Web-socket Re-connected.");
+            printf("web-prov - wss re-connected.\r\n");
         }
 
         prev_status = 2;
@@ -163,6 +165,7 @@ static void __connection_upcall(bool connected)
         prev_status = 1;
         EZPI_core_event_group_clear_event(EZLOPI_EVENT_NMA_REG);
         TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_WARNING, "NMA-server dis-connected!");
+        printf("web-prov - wss disconnected!\r\n");
     }
 }
 
@@ -194,15 +197,15 @@ static void __fetch_wss_endpoint(void *pv)
                 if (ws_endpoint->response)
                 {
                     TRACE_D("ws_endpoint: %s", ws_endpoint->response); // {"uri": "wss://endpoint:port"}
-                    cJSON *root = cJSON_Parse(__FUNCTION__, ws_endpoint->response);
 
-                    if (root)
+                    cJSON *cj_nma_uri = cJSON_Parse(__FUNCTION__, ws_endpoint->response);
+                    if (cj_nma_uri)
                     {
-                        cJSON *cjson_uri = cJSON_GetObjectItem(__FUNCTION__, root, "uri");
+                        cJSON *cjson_uri = cJSON_GetObjectItem(__FUNCTION__, cj_nma_uri, "uri");
                         if (cjson_uri)
                         {
                             // printf("----> URI: %s\r\n", cjson_uri->valuestring ? cjson_uri->valuestring : "NULL");
-                            TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_INFO, "NMA-server: %s.", cjson_uri->valuestring ? cjson_uri->valuestring : "NULL");
+                            TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_INFO, "NMA-server: %s.", cjson_uri->valuestring ? cjson_uri->valuestring : ezlopi_null_str);
 
                             EZPI_core_broadcast_method_add(__send_str_data_to_nma_websocket, "nma-websocket", 4);
                             wss_client = EZPI_core_websocket_client_init(cjson_uri, __message_upcall, __connection_upcall,
@@ -210,7 +213,7 @@ static void __fetch_wss_endpoint(void *pv)
                             task_complete = 1;
                         }
 
-                        cJSON_Delete(__FUNCTION__, root);
+                        cJSON_Delete(__FUNCTION__, cj_nma_uri);
                     }
 
                     ezlopi_free(__FUNCTION__, ws_endpoint->response);
@@ -496,8 +499,6 @@ static void __provision_check(void *pv)
                             TRACE_W("Data not available on cloud!");
                             TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_WARNING, "Config data not available!");
                         }
-
-                        EZPI_core_factory_info_v3_free(response->response);
                     }
 
                     break;
@@ -514,6 +515,7 @@ static void __provision_check(void *pv)
                 }
                 }
 
+                EZPI_core_factory_info_v3_free(response->response);
                 EZPI_core_factory_info_v3_free(response);
             }
             else

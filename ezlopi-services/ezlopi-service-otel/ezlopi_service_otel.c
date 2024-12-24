@@ -235,10 +235,12 @@ static void __connection_upcall(bool connected)
         if (0 == pre_status)
         {
             TRACE_S("WSS-connected!");
+            printf("otel - wss connected.\r\n");
         }
         else
         {
             TRACE_S("WSS-reconnected!");
+            printf("otel - wss re-connected.\r\n");
         }
 
         pre_status = 1;
@@ -246,6 +248,7 @@ static void __connection_upcall(bool connected)
     else
     {
         TRACE_E("WSS-disconnected!");
+        printf("otel - wss dis-connected!\r\n");
         pre_status = -1;
     }
 }
@@ -256,8 +259,8 @@ static cJSON *__otel_trace_decorate(cJSON *cj_traces_info)
     cJSON *cj_traceRecord = cJSON_CreateObject(__FUNCTION__);
     if (cj_traceRecord)
     {
-        cJSON_AddStringToObject(__FUNCTION__, cj_traceRecord, "type", "trace");
-        cJSON *cj_request = cJSON_AddObjectToObject(__FUNCTION__, cj_traceRecord, "request");
+        cJSON_AddStringToObjectWithRef(__FUNCTION__, cj_traceRecord, ezlopi_type_str, ezlopi_trace_str);
+        cJSON *cj_request = cJSON_AddObjectToObject(__FUNCTION__, cj_traceRecord, ezlopi_request_str);
         {
             cJSON *cj_resourceSpans = cJSON_AddArrayToObject(__FUNCTION__, cj_request, ezlopi_resourceSpans_str);
             if (cj_resourceSpans)
@@ -302,11 +305,8 @@ static cJSON *__otel_trace_decorate(cJSON *cj_traces_info)
                 }
             }
         }
-#if 0
+#if 1
         char *_data_str = cJSON_Print(__FUNCTION__, cj_traceRecord);
-        // cJSON_Delete(__FUNCTION__, cj_traceRecord);
-        // cj_traceRecord = NULL;
-
         if (_data_str)
         {
             printf("otel-trace:\r\n%s\r\n", _data_str);
@@ -331,7 +331,7 @@ static cJSON *__otel_create_span(cJSON *cj_trace_info)
         __fill_random_hexstring(unique_id, OTEL_SPAN_ID_LEN + 1); //  +1 for zero termination
         cJSON_AddStringToObject(__FUNCTION__, cj_span, ezlopi_spanId_str, unique_id);
 
-        cJSON_AddStringToObject(__FUNCTION__, cj_span, ezlopi_parentSpanId_str, "");
+        // cJSON_AddStringToObject(__FUNCTION__, cj_span, ezlopi_parentSpanId_str, "");
 
         __cjson_detach_and_add(cj_span, ezlopi_name_str, ezlopi_name_str, cj_trace_info);
         __cjson_detach_and_add(cj_span, ezlopi_kind_str, ezlopi_kind_str, cj_trace_info);
@@ -376,11 +376,11 @@ static int __otel_add_log_to_queue(uint8_t severity, const char *file, uint32_t 
         otel_data->cj_data = cJSON_CreateObject(__FUNCTION__);
         if (otel_data->cj_data)
         {
-            cJSON_AddNumberToObject(__FUNCTION__, otel_data->cj_data, ezlopi_logTime_str, EZPI_core_sntp_get_current_time_sec());
+            cJSON_AddNumberToObjectWithRef(__FUNCTION__, otel_data->cj_data, ezlopi_logTime_str, EZPI_core_sntp_get_current_time_sec());
             __otel_add_severity_number(otel_data->cj_data, (e_trace_severity_t)severity);
-            cJSON_AddStringToObject(__FUNCTION__, otel_data->cj_data, ezlopi_message_str, log);
-            cJSON_AddStringToObject(__FUNCTION__, otel_data->cj_data, ezlopi_fileName_str, file);
-            cJSON_AddNumberToObject(__FUNCTION__, otel_data->cj_data, ezlopi_lineNumber_str, line);
+            cJSON_AddStringToObjectWithRef(__FUNCTION__, otel_data->cj_data, ezlopi_message_str, log);
+            cJSON_AddStringToObjectWithRef(__FUNCTION__, otel_data->cj_data, ezlopi_fileName_str, file);
+            cJSON_AddNumberToObjectWithRef(__FUNCTION__, otel_data->cj_data, ezlopi_lineNumber_str, line);
         }
 
         ret = __push_to_telemetry_queue(otel_data);
@@ -398,11 +398,11 @@ static cJSON *__otel_logs_decorate(cJSON *cj_logs_info)
     cJSON *cj_logs_telemetry = cJSON_CreateObject(__FUNCTION__);
     if (cj_logs_telemetry)
     {
-        cJSON_AddStringToObject(__FUNCTION__, cj_logs_telemetry, "type", "log");
-        cJSON *cj_request = cJSON_AddObjectToObject(__FUNCTION__, cj_logs_telemetry, "request");
+        cJSON_AddStringToObjectWithRef(__FUNCTION__, cj_logs_telemetry, ezlopi_type_str, ezlopi_log_str);
+        cJSON *cj_request = cJSON_AddObjectToObjectWithRef(__FUNCTION__, cj_logs_telemetry, ezlopi_request_str);
         if (cj_request)
         {
-            cJSON *cj_resourceLogs = cJSON_AddArrayToObject(__FUNCTION__, cj_request, "resourceLogs");
+            cJSON *cj_resourceLogs = cJSON_AddArrayToObject(__FUNCTION__, cj_request, ezlopi_resourceLogs_str);
             if (cj_resourceLogs)
             {
                 cJSON *cj_resourceLog = cJSON_CreateObject(__FUNCTION__);
@@ -412,7 +412,7 @@ static cJSON *__otel_logs_decorate(cJSON *cj_logs_info)
                     __otel_add_resource(cj_resourceLog);
 
                     // scopeLogs
-                    cJSON *cj_scopeLogs = cJSON_AddArrayToObject(__FUNCTION__, cj_resourceLog, "scopeLogs");
+                    cJSON *cj_scopeLogs = cJSON_AddArrayToObject(__FUNCTION__, cj_resourceLog, ezlopi_scopeLogs_str);
                     if (cj_scopeLogs)
                     {
                         cJSON *cj_scopeLog = cJSON_CreateObject(__FUNCTION__);
@@ -422,7 +422,7 @@ static cJSON *__otel_logs_decorate(cJSON *cj_logs_info)
                             __otel_add_scope(cj_scopeLog);
 
                             // logsRecords
-                            cJSON *cj_logRecords = cJSON_AddArrayToObject(__FUNCTION__, cj_scopeLog, "logRecords");
+                            cJSON *cj_logRecords = cJSON_AddArrayToObject(__FUNCTION__, cj_scopeLog, ezlopi_logRecords_str);
                             if (cj_logRecords)
                             {
                                 cJSON *cj_logRecord = cJSON_CreateObject(__FUNCTION__);
@@ -451,12 +451,8 @@ static cJSON *__otel_logs_decorate(cJSON *cj_logs_info)
                 }
             }
         }
-
-#if 0
+#if 1
         char *_data_str = cJSON_Print(__FUNCTION__, cj_logs_telemetry);
-        // cJSON_Delete(__FUNCTION__, cj_logs_telemetry);
-        // cj_logs_telemetry = NULL;
-
         if (_data_str)
         {
             printf("otel-logs:\r\n%s\r\n", _data_str);
@@ -473,11 +469,11 @@ static void __add_log_info(cJSON *cj_root, cJSON *cj_logs_info)
     char tmp_buffer[33];
 
     snprintf(tmp_buffer, sizeof(tmp_buffer), "%llu", EZPI_core_sntp_get_current_time_sec() * 1000000000llu);
-    cJSON_AddStringToObject(__FUNCTION__, cj_root, "timeUnixNano", tmp_buffer);
+    cJSON_AddStringToObject(__FUNCTION__, cj_root, ezlopi_timeUnixNano_str, tmp_buffer);
 
-    __otel_add_time_stamp_nano(cj_root, "observedTimeUnixNano", ezlopi_logTime_str, cj_logs_info);
-    __cjson_detach_and_add(cj_root, "severityNumber", "severityNumber", cj_logs_info);
-    __cjson_detach_and_add(cj_root, "severityText", "severityText", cj_logs_info);
+    __otel_add_time_stamp_nano(cj_root, ezlopi_observedTimeUnixNano_str, ezlopi_logTime_str, cj_logs_info);
+    __cjson_detach_and_add(cj_root, ezlopi_severityNumber_str, ezlopi_severityNumber_str, cj_logs_info);
+    __cjson_detach_and_add(cj_root, ezlopi_severityText_str, ezlopi_severityText_str, cj_logs_info);
 
     __fill_random_hexstring(tmp_buffer, OTEL_TRACE_ID_LEN + 1); // +1 for terminating byte
     cJSON_AddStringToObject(__FUNCTION__, cj_root, ezlopi_traceId_str, tmp_buffer);
@@ -485,10 +481,10 @@ static void __add_log_info(cJSON *cj_root, cJSON *cj_logs_info)
     __fill_random_hexstring(tmp_buffer, OTEL_SPAN_ID_LEN + 1); // +1 for terminating byte
     cJSON_AddStringToObject(__FUNCTION__, cj_root, ezlopi_spanId_str, tmp_buffer);
 
-    cJSON *cj_body = cJSON_AddObjectToObject(__FUNCTION__, cj_root, "body");
+    cJSON *cj_body = cJSON_AddObjectToObject(__FUNCTION__, cj_root, ezlopi_body_str);
     if (cj_body)
     {
-        __cjson_detach_and_add(cj_body, "stringValue", "message", cj_logs_info);
+        __cjson_detach_and_add(cj_body, ezlopi_stringValue_str, ezlopi_message_str, cj_logs_info);
     }
 
     cJSON *cj_attributes = cJSON_AddArrayToObject(__FUNCTION__, cj_root, ezlopi_attributes_str);
@@ -557,8 +553,8 @@ static void __otel_add_scope(cJSON *cj_root)
     cJSON *cj_scope = cJSON_AddObjectToObject(__FUNCTION__, cj_root, ezlopi_scope_str);
     if (cj_scope)
     {
-        cJSON_AddStringToObject(__FUNCTION__, cj_scope, "name", "otel-c");
-        cJSON_AddStringToObject(__FUNCTION__, cj_scope, "version", "1.0.0");
+        cJSON_AddStringToObjectWithRef(__FUNCTION__, cj_scope, ezlopi_name_str, ezlopi_otel_c_str);
+        cJSON_AddStringToObjectWithRef(__FUNCTION__, cj_scope, ezlopi_version_str, ezlopi_otel_version_str);
     }
 }
 
@@ -582,7 +578,7 @@ static cJSON *__otel_create_value(cJSON *cj_value_field)
         }
         case cJSON_Number:
         {
-            cJSON_AddNumberToObject(__FUNCTION__, cj_ret_value, ezlopi_doubleValue_str, cj_value_field->valuedouble);
+            cJSON_AddNumberToObjectWithRef(__FUNCTION__, cj_ret_value, ezlopi_doubleValue_str, cj_value_field->valuedouble);
             break;
         }
         case cJSON_String:
@@ -656,11 +652,11 @@ static void __otel_add_time_stamp_nano(cJSON *cj_root, const char *add_key, cons
     cJSON *cj_time_stamp = cJSON_DetachItemFromObject(__FUNCTION__, cj_trace_info, for_key);
     if (cj_time_stamp)
     {
-        char *method = "null";
+        char *method = ezlopi_null_str;
         cJSON *cj_method = cJSON_GetObjectItem(__FUNCTION__, cj_trace_info, ezlopi_method_str);
         if (cj_method)
         {
-            method = cj_method->valuestring ? cj_method->valuestring : "null";
+            method = cj_method->valuestring ? cj_method->valuestring : ezlopi_null_str;
         }
 
         printf("-----> %s [%s]: %llu\r\n", method, for_key, (uint64_t)cj_time_stamp->valuedouble);

@@ -28,6 +28,7 @@ typedef enum e_otel_kind
 typedef struct s_otel_trace
 {
     char *method;
+    char *msg_subclass;
     uint32_t start_time;
     uint32_t end_time;
     uint32_t free_heap;
@@ -38,6 +39,7 @@ typedef struct s_otel_trace
 
 void ezlopi_service_otel_init(void);
 int ezlopi_service_otel_add_trace_to_telemetry_queue(cJSON *cj_trace);
+int ezlopi_service_otel_add_trace_to_telemetry_queue_struct(s_otel_trace_t * trace_obj);
 
 #endif // CONFIG_EZPI_ENABLE_OPENTELEMETRY
 
