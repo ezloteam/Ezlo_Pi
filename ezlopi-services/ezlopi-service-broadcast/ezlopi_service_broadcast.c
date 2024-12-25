@@ -96,9 +96,9 @@ static void __broadcast_loop(void *arg)
     {
         if ((xTaskGetTickCount() - broadcast_wait_start) > 5 / portTICK_RATE_MS)
         {
+            cJSON *cj_method = cJSON_GetObjectItem(__FUNCTION__, cj_data, ezlopi_method_str);
+            cJSON *cj_msg_subclass = cJSON_GetObjectItem(__FUNCTION__, cj_data, ezlopi_msg_subclass_str);
             cJSON *cj_startTime = cJSON_DetachItemFromObject(__FUNCTION__, cj_data, ezlopi_startTime_str);
-            cJSON *cj_method_dup = cJSON_Duplicate(__FUNCTION__, cJSON_GetObjectItem(__FUNCTION__, cj_data, ezlopi_method_str), true);
-            cJSON *cj_msg_subclass_dup = cJSON_Duplicate(__FUNCTION__, cJSON_GetObjectItem(__FUNCTION__, cj_data, ezlopi_msg_subclass_str), true);
 
             EZPI_core_broadcast_cjson(cj_data);
             cJSON_Delete(__FUNCTION__, cj_data);
@@ -107,6 +107,33 @@ static void __broadcast_loop(void *arg)
             s_otel_trace_t *trace_obj = ezlopi_malloc(__FUNCTION__, sizeof(s_otel_trace_t));
             if (trace_obj)
             {
+                memset(trace_obj, 0, sizeof(s_otel_trace_t));
+
+                trace_obj->kind = E_OTEL_KIND_SERVER;
+                trace_obj->start_time = cj_startTime ? cj_startTime->valuedouble : 0;
+                trace_obj->end_time = EZPI_core_sntp_get_current_time_sec();
+                trace_obj->free_heap = esp_get_free_heap_size();
+                trace_obj->heap_watermark = esp_get_minimum_free_heap_size();
+
+                if (cj_msg_subclass && (cj_msg_subclass->type == cJSON_String) && cj_msg_subclass->valuestring && cj_msg_subclass->str_value_len)
+                {
+                    trace_obj->msg_subclass = ezlopi_malloc(__FUNCTION__, cj_msg_subclass->str_value_len + 1);
+                    if (trace_obj->msg_subclass)
+                    {
+                        snprintf(trace_obj->msg_subclass, cj_msg_subclass->str_value_len + 1, "%.*s", cj_msg_subclass->str_value_len, cj_msg_subclass->valuestring);
+                    }
+                }
+
+                if (cj_method && (cj_method->type == cJSON_String) && cj_method->valuestring && cj_method->str_value_len)
+                {
+                    trace_obj->method = ezlopi_malloc(__FUNCTION__, cj_method->str_value_len + 1);
+                    if (trace_obj->method)
+                    {
+                        snprintf(trace_obj->method, cj_method->str_value_len + 1, "%.*s", cj_method->str_value_len, cj_method->valuestring);
+                    }
+                }
+
+                cJSON_Delete(__FUNCTION__, cj_startTime);
 
                 if (0 == ezlopi_service_otel_add_trace_to_telemetry_queue_struct(trace_obj))
                 {
