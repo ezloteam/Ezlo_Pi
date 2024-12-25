@@ -223,6 +223,14 @@ extern "C"
             \"id_room\":\"\",\
             \"id_item\":16,\
             \"gpio\":21\
+        },\
+        {\
+            \"dev_name\": \"MQ2_LPG\",\
+            \"dev_type\": 10,\
+            \"id_item\": 49,\
+            \"id_room\": \"\",\
+            \"gpio1\": 25,\
+            \"gpio2\": 33\
         }\
     ],\
     \"config_id\":\"1234567\",\
