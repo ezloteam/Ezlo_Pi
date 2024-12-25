@@ -23,11 +23,12 @@
 //*************************************************************************
 typedef struct s_mq2_value
 {
-    uint32_t heating_dur;
-    bool loop_stop_flag;
+    uint8_t status_flag : 3; // BIT2 = avg_volt_flag  ; BIT1 = loop_stop_flag  ; BIT0 = Calibration_complete_LPG
+    uint8_t heating_dur;
+    uint8_t avg_vol_count;  // counter for calculating avg_voltage. 
+    float calib_avg_volt;
     float _LPG_ppm;
     float MQ2_R0_constant;
-    bool Calibration_complete_LPG;
 } s_mq2_value_t;
 
 const char *mq2_sensor_gas_alarm_token[] = {
@@ -54,7 +55,6 @@ static void __prepare_item_adc_cloud_properties(l_ezlopi_item_t *item, cJSON *cj
 ezlopi_error_t sensor_0049_other_MQ2_LPG_detector(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
-    TRACE_D("ACTION : %s", EZPI_core_actions_to_string(action));
     switch (action)
     {
     case EZLOPI_ACTION_PREPARE:
@@ -98,7 +98,7 @@ static ezlopi_error_t __0049_prepare(void *arg)
     if (device_prep_arg && (NULL != device_prep_arg->cjson_device))
     {
         //---------------------------  DIGI - DEVICE 1 --------------------------------------------
-        l_ezlopi_device_t *MQ2_device_parent_digi = EZPI_core_device_add_device(device_prep_arg->cjson_device, "adc");
+        l_ezlopi_device_t *MQ2_device_parent_digi = EZPI_core_device_add_device(device_prep_arg->cjson_device, "digi");
         if (MQ2_device_parent_digi)
         {
             TRACE_I("Parent_MQ2_device_digi-[0x%x] ", MQ2_device_parent_digi->cloud_properties.device_id);
@@ -109,13 +109,17 @@ static ezlopi_error_t __0049_prepare(void *arg)
                 __prepare_item_digi_cloud_properties(MQ2_item_digi, device_prep_arg->cjson_device);
                 ret = EZPI_SUCCESS;
             }
+            else
+            {
+                ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
+            }
 
             //---------------------------- ADC - DEVICE 2 -------------------------------------------
             s_mq2_value_t *MQ2_value = (s_mq2_value_t *)ezlopi_malloc(__FUNCTION__, sizeof(s_mq2_value_t));
             if (NULL != MQ2_value)
             {
                 memset(MQ2_value, 0, sizeof(s_mq2_value_t));
-                l_ezlopi_device_t *MQ2_device_child_adc = EZPI_core_device_add_device(device_prep_arg->cjson_device, "digi");
+                l_ezlopi_device_t *MQ2_device_child_adc = EZPI_core_device_add_device(device_prep_arg->cjson_device, "adc");
                 if (MQ2_device_child_adc)
                 {
                     TRACE_I("Child_MQ2_device_adc-[0x%x] ", MQ2_device_child_adc->cloud_properties.device_id);
@@ -180,22 +184,30 @@ static ezlopi_error_t __0049_init(l_ezlopi_item_t *item)
                 { // initialize analog_pin
                     if (EZPI_SUCCESS == EZPI_hal_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
                     { // calibrate if not done
-                        if (false == MQ2_value->Calibration_complete_LPG)
+                        if (0 == (BIT0 & MQ2_value->status_flag)) // Calibration_complete_LPG == 0
                         {
-                            // TaskHandle_t ezlopi_sensor_mq2_task_handle = NULL;
-                            // xTaskCreate(__calibrate_MQ2_R0_resistance, "Task_to_calculate_R0_air", EZLOPI_SENSOR_MQ2_TASK_DEPTH, item, 1, &ezlopi_sensor_mq2_task_handle);
-
-                            // setting heating duration
-                            MQ2_value->heating_dur = 20;
-                            // MQ2_value->loop_stop_flag = true;
-                            EZPI_service_loop_add("mq2_loop", __calibrate_MQ2_R0_resistance, 1000, (void *)item);
-#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
-                            EZPI_core_process_set_process_info(ENUM_EZLOPI_SENSOR_MQ2_TASK, &ezlopi_sensor_mq2_task_handle, EZLOPI_SENSOR_MQ2_TASK_DEPTH);
-#endif
+                            MQ2_value->heating_dur = MQ2_HEATING_PERIOD * 10;   // [(20 * 100ms)* 10] = 20sec
+                            MQ2_value->avg_vol_count = MQ2_AVG_CAL_COUNT;
+                            EZPI_service_loop_add("mq2_loop", __calibrate_MQ2_R0_resistance, 100, (void *)item);
+                            // #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
+                            //                             // EZPI_core_process_set_process_info(ENUM_EZLOPI_SENSOR_MQ2_TASK, &ezlopi_sensor_mq2_task_handle, EZLOPI_SENSOR_MQ2_TASK_DEPTH);
+                            // #endif
                             ret = EZPI_SUCCESS;
                         }
                     }
+                    else
+                    {
+                        ret = EZPI_ERR_INIT_DEVICE_FAILED;
+                    }
                 }
+                else
+                {
+                    ret = EZPI_ERR_INIT_DEVICE_FAILED;
+                }
+            }
+            else
+            {
+                ret = EZPI_ERR_INIT_DEVICE_FAILED;
             }
         }
     }
@@ -348,15 +360,15 @@ static ezlopi_error_t __0049_notify(l_ezlopi_item_t *item)
         }
         else if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
         {
-            // extract the sensor_output_values
             s_mq2_value_t *MQ2_value = (s_mq2_value_t *)item->user_arg;
-            if ((MQ2_value) && (true == MQ2_value->Calibration_complete_LPG))
+            if ((MQ2_value) && (BIT0 == (BIT0 & MQ2_value->status_flag))) // calibration_complete == 1
             {
-                if (true == MQ2_value->loop_stop_flag) // only once
+                if (BIT1 == (BIT1 & MQ2_value->status_flag))// loop_stop_flag == 1
                 {
-                    MQ2_value->loop_stop_flag = false;
+                    MQ2_value->status_flag ^= BIT1; // toggle BIT1 // loop_stop_flag => 0
+                    // TRACE_D(" MQ2_value->status_flag : %03x", MQ2_value->status_flag);
                     EZPI_service_loop_remove(__calibrate_MQ2_R0_resistance);
-                    TRACE_S("removed mq2 calib-loop");
+                    TRACE_S("......Removed :- MQ2_calib_loop");
                 }
                 else
                 {
@@ -379,28 +391,28 @@ static float __extract_MQ2_sensor_ppm(l_ezlopi_item_t *item)
     s_mq2_value_t *MQ2_value = (s_mq2_value_t *)item->user_arg;
     if (MQ2_value)
     { // calculation process
-      //-------------------------------------------------
+        //-------------------------------------------------
         int mq2_adc_pin = item->interface.adc.gpio_num;
         s_ezlopi_analog_data_t ezlopi_analog_data = { .value = 0, .voltage = 0 };
         // extract the mean_sensor_analog_output_voltage
-        float analog_sensor_volt = 0;
+        MQ2_value->calib_avg_volt = 0;
         for (uint8_t x = 10; x > 0; x--)
         {
             EZPI_hal_adc_get_adc_data(mq2_adc_pin, &ezlopi_analog_data);
 #ifdef VOLTAGE_DIVIDER_ADDED
-            analog_sensor_volt += ((float)(ezlopi_analog_data.voltage) * 2.0f);
+            MQ2_value->calib_avg_volt += ((float)(ezlopi_analog_data.voltage) * 2.0f);
 #else
-            analog_sensor_volt += (float)(ezlopi_analog_data.voltage);
+            MQ2_value->calib_avg_volt += (float)(ezlopi_analog_data.voltage);
 #endif
             vTaskDelay(10 / portTICK_PERIOD_MS);
         }
-        analog_sensor_volt = analog_sensor_volt / 10.0f;
+        MQ2_value->calib_avg_volt = MQ2_value->calib_avg_volt / 10.0f;
 
         //-----------------------------------------------------------------------------------
         // Stage_2 : [from 'sensor_0049_ADC_MQ2_methane_gas_detector.h']
 
         // 1. Calculate 'Rs_gas' for the gas detected
-        float Rs_gas = (((MQ2_VOLT_RESOLUTION_Vc * mq2_eqv_RL) / (analog_sensor_volt / 1000.0f)) - mq2_eqv_RL);
+        float Rs_gas = (((MQ2_VOLT_RESOLUTION_Vc * mq2_eqv_RL) / (MQ2_value->calib_avg_volt / 1000.0f)) - mq2_eqv_RL);
 
         // 1.1 Calculate @ 'ratio' during LPG presence
         double _ratio = (Rs_gas / ((MQ2_value->MQ2_R0_constant <= 0) ? (1.0f) : (MQ2_value->MQ2_R0_constant))); // avoid dividing by zero??
@@ -416,83 +428,83 @@ static float __extract_MQ2_sensor_ppm(l_ezlopi_item_t *item)
         {
             _LPG_ppm = 0; // No negative values accepted or upper datasheet recomendation.
         }
-        TRACE_E("_LPG_ppm [LPG] : %.2f -> ratio[RS/R0] : %.2f -> Volts : %0.2fmv", _LPG_ppm, (float)_ratio, analog_sensor_volt);
-        return _LPG_ppm;
+        TRACE_E("_LPG_ppm [LPG] : %.2f -> ratio[RS/R0] : %.2f -> Volts : %0.2fmv", _LPG_ppm, (float)_ratio, MQ2_value->calib_avg_volt);
+
         //-------------------------------------------------
+        return _LPG_ppm;
     }
     return 0;
 }
 
-void __calibrate_MQ2_R0_resistance(void *params)
+static void __calibrate_MQ2_R0_resistance(void *params)
 {
     l_ezlopi_item_t *item = (l_ezlopi_item_t *)params;
     if (NULL != item)
     {
         s_mq2_value_t *MQ2_value = (s_mq2_value_t *)item->user_arg;
-        if (MQ2_value && false == MQ2_value->loop_stop_flag)
+        if (MQ2_value && (0 == (BIT1 & MQ2_value->status_flag)))// loop_stop_flag == 0
         {
             int mq2_adc_pin = item->interface.adc.gpio_num;
             //-------------------------------------------------
-            // let the sensor to heat for 20seconds
             if (MQ2_value->heating_dur > 0)
             {
-                TRACE_E("Heating sensor.........time left: %d sec", MQ2_value->heating_dur);
-                // vTaskDelay(1000 / portTICK_PERIOD_MS); // 1sec delay before calibration
+                if (0 == MQ2_value->heating_dur % 20)
+                {
+                    TRACE_E("Heating sensor.........time left: %d sec", MQ2_value->heating_dur / 10);
+                }
                 MQ2_value->heating_dur--;
             }
-            else
+            else    // after heating the sensor for 20 sec
             {
                 //-------------------------------------------------
                 // extract the mean_sensor_analog_output_voltage
-                float _sensor_volt = 0;
-                s_ezlopi_analog_data_t ezlopi_analog_data = { .value = 0, .voltage = 0 };
-                for (uint8_t i = 80; i > 0; i--)
+                if (MQ2_value->avg_vol_count != 0)
                 {
-                    if (i % 20 == 0)
-                    {
-                        TRACE_W("Please Wait..Collecting Ambient Air data ........... [Avoid Smokes/gases]");
-                    }
+                    s_ezlopi_analog_data_t ezlopi_analog_data = { .value = 0, .voltage = 0 };
                     // extract ADC values
                     EZPI_hal_adc_get_adc_data(mq2_adc_pin, &ezlopi_analog_data);
 #ifdef VOLTAGE_DIVIDER_ADDED
-                    _sensor_volt += (float)((ezlopi_analog_data.voltage) * 2.0f); // [0-2.4V] X2
+                    MQ2_value->calib_avg_volt += (float)((ezlopi_analog_data.voltage) * 2.0f); // [0-2.4V] X2
 #else
-                    _sensor_volt += (float)(ezlopi_analog_data.voltage);
+                    MQ2_value->calib_avg_volt += (float)(ezlopi_analog_data.voltage);
 #endif
-                    // vTaskDelay(5 / portTICK_PERIOD_MS); // 10ms
-                }
-                _sensor_volt = _sensor_volt / 80.0f;
+                    TRACE_D(" _count : %d", MQ2_value->avg_vol_count);
+                    MQ2_value->avg_vol_count--;
 
-                //-------------------------------------------------
-                // Calculate the 'Rs' of heater during clean air [calibration phase]
-                // Range -> [2Kohm - 20Kohm]
-                float RS_calib = 0;                                                                         // Define variable for sensor resistance
-                RS_calib = ((MQ2_VOLT_RESOLUTION_Vc * mq2_eqv_RL) / (_sensor_volt / 1000.0f)) - mq2_eqv_RL; // Calculate RS in fresh air
-                TRACE_E("CALIB_TASK -> 'RS_calib' = %.2f", RS_calib);
-                if (RS_calib < 0)
-                {
-                    RS_calib = 0; // No negative values accepted.
+                    if (0 == MQ2_value->avg_vol_count)
+                    {
+                        MQ2_value->status_flag |= BIT2;
+                    }
                 }
-                // Calculate the R0_air which is constant through-out
-                MQ2_value->MQ2_R0_constant = (RS_calib / RatioMQ2CleanAir); // Calculate MQ2_R0_constant
-                TRACE_E("CALIB_TASK -> 'MQ2_R0_constant' = %.2f", MQ2_value->MQ2_R0_constant);
-                if (MQ2_value->MQ2_R0_constant < 0)
+
+                if (BIT2 == (MQ2_value->status_flag & BIT2))
                 {
-                    MQ2_value->MQ2_R0_constant = 0; // No negative values accepted.
+                    MQ2_value->status_flag ^= BIT2;// avg_volt_flag => 0
+                    MQ2_value->calib_avg_volt /= MQ2_AVG_CAL_COUNT;
+                    //-------------------------------------------------
+                    // Calculate the 'Rs' of heater during clean air [calibration phase]
+                    // Range -> [2Kohm - 20Kohm]
+                    float RS_calib = 0;                                                                         // Define variable for sensor resistance
+                    RS_calib = ((MQ2_VOLT_RESOLUTION_Vc * mq2_eqv_RL) / (MQ2_value->calib_avg_volt / 1000.0f)) - mq2_eqv_RL; // Calculate RS in fresh air
+                    TRACE_E("CALIB_TASK -> 'RS_calib' = %.2f", RS_calib);
+                    if (RS_calib < 0)
+                    {
+                        RS_calib = 0; // No negative values accepted.
+                    }
+                    // Calculate the R0_air which is constant through-out
+                    MQ2_value->MQ2_R0_constant = (RS_calib / RatioMQ2CleanAir); // Calculate MQ2_R0_constant
+                    TRACE_E("CALIB_TASK -> 'MQ2_R0_constant' = %.2f", MQ2_value->MQ2_R0_constant);
+                    if (MQ2_value->MQ2_R0_constant < 0)
+                    {
+                        MQ2_value->MQ2_R0_constant = 0; // No negative values accepted.
+                    }
+                    // loop_stop_flag => 1 // Calibration_complete_LPG => 1;
+                    MQ2_value->status_flag |= (BIT0 | BIT1);
                 }
-                // Set calibration_complete_LPG flag
-                MQ2_value->Calibration_complete_LPG = true;
-                TRACE_D("STOP flag triggered");
-                MQ2_value->loop_stop_flag = true;
             }
         }
-        else
-        {
-            TRACE_D(".. Removing_mq2_loop");
-        }
     }
-#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
-    EZPI_core_process_set_is_deleted(ENUM_EZLOPI_SENSOR_MQ2_TASK);
-#endif
-    // vTaskDelete(NULL);
+    // #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
+    //     EZPI_core_process_set_is_deleted(ENUM_EZLOPI_SENSOR_MQ2_TASK);
+    // #endif
 }

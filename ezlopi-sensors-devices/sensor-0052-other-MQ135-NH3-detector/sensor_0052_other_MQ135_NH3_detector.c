@@ -22,9 +22,12 @@
 //*************************************************************************
 typedef struct s_mq135_value
 {
+    uint8_t status_flag : 3; // BIT2 = avg_volt_flag  ; BIT1 = loop_stop_flag  ; BIT0 = Calibration_complete_LPG
+    uint8_t heating_dur;
+    uint8_t avg_vol_count;  // counter for calculating avg_voltage. 
+    float calib_avg_volt;
     float _NH3_ppm;
     float MQ135_R0_constant;
-    bool Calibration_complete_NH3;
 } s_mq135_value_t;
 
 const char *mq135_sensor_gas_alarm_token[] = {
@@ -75,9 +78,7 @@ ezlopi_error_t sensor_0052_other_MQ135_NH3_detector(e_ezlopi_actions_t action, l
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
-
         ret = __0052_notify(item);
-
         break;
     }
     default:
@@ -106,6 +107,10 @@ static ezlopi_error_t __0052_prepare(void *arg)
             {
                 __prepare_item_digi_cloud_properties(MQ135_item_digi, device_prep_arg->cjson_device);
                 ret = EZPI_SUCCESS;
+            }
+            else
+            {
+                ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
             }
 
             //---------------------------- ADC - DEVICE 2 -------------------------------------------
@@ -173,13 +178,15 @@ static ezlopi_error_t __0052_init(l_ezlopi_item_t *item)
                 { // initialize analog_pin
                     if (EZPI_SUCCESS == EZPI_hal_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
                     { // calibrate if not done
-                        if (false == MQ135_value->Calibration_complete_NH3)
+                        if (0 == (BIT0 & MQ135_value->status_flag)) // Calibration_complete_LPG == 0
                         {
-                            TaskHandle_t ezlopi_sensor_mq135_task_handle = NULL;
-                            xTaskCreate(__calibrate_MQ135_R0_resistance, "Task_to_calculate_R0_air", EZLOPI_SENSOR_MQ135_TASK_DEPTH, item, 1, &ezlopi_sensor_mq135_task_handle);
-#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
-                            EZPI_core_process_set_process_info(ENUM_EZLOPI_SENSOR_MQ135_TASK, &ezlopi_sensor_mq135_task_handle, EZLOPI_SENSOR_MQ135_TASK_DEPTH);
-#endif
+                            MQ135_value->heating_dur = MQ135_HEATING_PERIOD * 10;   // [(20 * 100ms)* 10] = 20sec
+                            MQ135_value->avg_vol_count = MQ135_AVG_CAL_COUNT;
+                            EZPI_service_loop_add("mq135_loop", __calibrate_MQ135_R0_resistance, 100, (void *)item);
+                            // #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
+                            //                             // EZPI_core_process_set_process_info(ENUM_EZLOPI_SENSOR_MQ135_TASK, &ezlopi_sensor_mq135_task_handle, EZLOPI_SENSOR_MQ135_TASK_DEPTH);
+                            // #endif
+                            ret = EZPI_SUCCESS;
                         }
                     }
                     else
@@ -347,15 +354,24 @@ static ezlopi_error_t __0052_notify(l_ezlopi_item_t *item)
         }
         else if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
         {
-            // extract the sensor_output_values
             s_mq135_value_t *MQ135_value = (s_mq135_value_t *)item->user_arg;
-            if ((MQ135_value) && (true == MQ135_value->Calibration_complete_NH3))
+            if ((MQ135_value) && (BIT0 == (BIT0 & MQ135_value->status_flag))) // calibration_complete == 1
             {
-                double new_value = (double)__extract_MQ135_sensor_ppm(item);
-                if (fabs((double)(MQ135_value->_NH3_ppm) - new_value) > 0.0001)
+                if (BIT1 == (BIT1 & MQ135_value->status_flag))// loop_stop_flag == 1
                 {
-                    MQ135_value->_NH3_ppm = (float)new_value;
-                    EZPI_core_device_value_updated_from_device_broadcast(item);
+                    MQ135_value->status_flag ^= BIT1; // toggle BIT1 // loop_stop_flag => 0
+                    // TRACE_D(" MQ135_value->status_flag : %03x", MQ135_value->status_flag);
+                    EZPI_service_loop_remove(__calibrate_MQ135_R0_resistance);
+                    TRACE_S("......Removed :- MQ135_calib_loop");
+                }
+                else
+                {
+                    double new_value = (double)__extract_MQ135_sensor_ppm(item);
+                    if (fabs((double)(MQ135_value->_NH3_ppm) - new_value) > 0.0001)
+                    {
+                        MQ135_value->_NH3_ppm = (float)new_value;
+                        EZPI_core_device_value_updated_from_device_broadcast(item);
+                    }
                 }
             }
         }
@@ -373,24 +389,24 @@ static float __extract_MQ135_sensor_ppm(l_ezlopi_item_t *item)
         int mq135_adc_pin = item->interface.adc.gpio_num;
         s_ezlopi_analog_data_t ezlopi_analog_data = { .value = 0, .voltage = 0 };
         // extract the mean_sensor_analog_output_voltage
-        float analog_sensor_volt = 0;
+        MQ135_value->calib_avg_volt = 0;
         for (uint8_t x = 10; x > 0; x--)
         {
             EZPI_hal_adc_get_adc_data(mq135_adc_pin, &ezlopi_analog_data);
 #ifdef VOLTAGE_DIVIDER_ADDED
-            analog_sensor_volt += ((float)(ezlopi_analog_data.voltage) * 2.0f);
+            MQ135_value->calib_avg_volt += ((float)(ezlopi_analog_data.voltage) * 2.0f);
 #else
-            analog_sensor_volt += (float)(ezlopi_analog_data.voltage);
+            MQ135_value->calib_avg_volt += (float)(ezlopi_analog_data.voltage);
 #endif
             vTaskDelay(10 / portTICK_PERIOD_MS);
         }
-        analog_sensor_volt = analog_sensor_volt / 10.0f;
+        MQ135_value->calib_avg_volt = MQ135_value->calib_avg_volt / 10.0f;
 
         //-----------------------------------------------------------------------------------
         // Stage_2 : [from 'sensor_0052_ADC_MQ135_methane_gas_detector.h']
 
         // 1. Calculate 'Rs_gas' for the gas detected
-        float Rs_gas = (((MQ135_VOLT_RESOLUTION_Vc * mq135_eqv_RL) / (analog_sensor_volt / 1000.0f)) - mq135_eqv_RL);
+        float Rs_gas = (((MQ135_VOLT_RESOLUTION_Vc * mq135_eqv_RL) / (MQ135_value->calib_avg_volt / 1000.0f)) - mq135_eqv_RL);
 
         // 1.1 Calculate @ 'ratio' during NH3 presence
         double _ratio = (Rs_gas / ((MQ135_value->MQ135_R0_constant <= 0) ? (1.0f) : (MQ135_value->MQ135_R0_constant))); // avoid dividing by zero??
@@ -406,7 +422,7 @@ static float __extract_MQ135_sensor_ppm(l_ezlopi_item_t *item)
         {
             _NH3_ppm = 0; // No negative values accepted or upper datasheet recomendation.
         }
-        TRACE_E("_NH3_ppm [NH3] : %.2f -> ratio[RS/R0] : %.2f -> Volts : %0.2fmv", _NH3_ppm, (float)_ratio, analog_sensor_volt);
+        TRACE_E("_NH3_ppm [NH3] : %.2f -> ratio[RS/R0] : %.2f -> Volts : %0.2fmv", _NH3_ppm, (float)_ratio, MQ135_value->calib_avg_volt);
 
         //-------------------------------------------------
         return _NH3_ppm;
@@ -420,60 +436,68 @@ static void __calibrate_MQ135_R0_resistance(void *params)
     if (NULL != item)
     {
         s_mq135_value_t *MQ135_value = (s_mq135_value_t *)item->user_arg;
-        if (MQ135_value)
+        if (MQ135_value && (0 == (BIT1 & MQ135_value->status_flag)))// loop_stop_flag == 0
         {
             int mq135_adc_pin = item->interface.adc.gpio_num;
             //-------------------------------------------------
-            // let the sensor to heat for 20seconds
-            for (uint8_t j = 20; j > 0; j--)
+            if (MQ135_value->heating_dur > 0)
             {
-                TRACE_E("Heating sensor.........time left: %d sec", j);
-                vTaskDelay(1000 / portTICK_PERIOD_MS); // 1sec delay before calibration
-            }
-            //-------------------------------------------------
-            // extract the mean_sensor_analog_output_voltage
-            float _sensor_volt = 0;
-            s_ezlopi_analog_data_t ezlopi_analog_data = { .value = 0, .voltage = 0 };
-            for (uint8_t i = 100; i > 0; i--)
-            {
-                if (i % 20 == 0)
+                if (0 == MQ135_value->heating_dur % 20)
                 {
-                    TRACE_W("Please Wait..Collecting Ambient Air data ........... [Avoid Smokes/gases]");
+                    TRACE_E("Heating sensor.........time left: %d sec", MQ135_value->heating_dur / 10);
                 }
-                // extract ADC values
-                EZPI_hal_adc_get_adc_data(mq135_adc_pin, &ezlopi_analog_data);
+                MQ135_value->heating_dur--;
+            }
+            else    // after heating the sensor for 20 sec
+            { //-------------------------------------------------
+                // extract the mean_sensor_analog_output_voltage
+                if (MQ135_value->avg_vol_count != 0)
+                {
+                    s_ezlopi_analog_data_t ezlopi_analog_data = { .value = 0, .voltage = 0 };
+                    // extract ADC values
+                    EZPI_hal_adc_get_adc_data(mq135_adc_pin, &ezlopi_analog_data);
 #ifdef VOLTAGE_DIVIDER_ADDED
-                _sensor_volt += (float)((ezlopi_analog_data.voltage) * 2.0f); // [0-2.4V] X2
+                    MQ135_value->calib_avg_volt += (float)((ezlopi_analog_data.voltage) * 2.0f); // [0-2.4V] X2
 #else
-                _sensor_volt += (float)(ezlopi_analog_data->voltage);
+                    MQ135_value->calib_avg_volt += (float)(ezlopi_analog_data.voltage);
 #endif
-                vTaskDelay(10 / portTICK_PERIOD_MS);
-            }
-            _sensor_volt = _sensor_volt / 100.0f;
+                    TRACE_D(" _count : %d", MQ135_value->avg_vol_count);
+                    MQ135_value->avg_vol_count--;
 
-            //-------------------------------------------------
-            // Calculate the 'Rs' of heater during clean air [calibration phase]
-            // Range -> [2Kohm - 20Kohm]
-            float RS_calib = 0;                                                                               // Define variable for sensor resistance
-            RS_calib = ((MQ135_VOLT_RESOLUTION_Vc * mq135_eqv_RL) / (_sensor_volt / 1000.0f)) - mq135_eqv_RL; // Calculate RS in fresh air
-            TRACE_E("CALIB_TASK -> 'RS_calib' = %.2f", RS_calib);
-            if (RS_calib < 0)
-            {
-                RS_calib = 0; // No negative values accepted.
+                    if (0 == MQ135_value->avg_vol_count)
+                    {
+                        MQ135_value->status_flag |= BIT2;
+                    }
+                }
+
+                if (BIT2 == (MQ135_value->status_flag & BIT2))
+                {
+                    MQ135_value->status_flag ^= BIT2;// avg_volt_flag => 0
+                    MQ135_value->calib_avg_volt /= MQ135_AVG_CAL_COUNT;
+                    //-------------------------------------------------
+                     // Calculate the 'Rs' of heater during clean air [calibration phase]
+                     // Range -> [2Kohm - 20Kohm]
+                    float RS_calib = 0;                                                                               // Define variable for sensor resistance
+                    RS_calib = ((MQ135_VOLT_RESOLUTION_Vc * mq135_eqv_RL) / (MQ135_value->calib_avg_volt / 1000.0f)) - mq135_eqv_RL; // Calculate RS in fresh air
+                    TRACE_E("CALIB_TASK -> 'RS_calib' = %.2f", RS_calib);
+                    if (RS_calib < 0)
+                    {
+                        RS_calib = 0; // No negative values accepted.
+                    }
+                    // Calculate the R0_air which is constant through-out
+                    MQ135_value->MQ135_R0_constant = (RS_calib / RatioMQ135CleanAir); // Calculate MQ135_R0_constant
+                    TRACE_E("CALIB_TASK -> 'MQ135_R0_constant' = %.2f", MQ135_value->MQ135_R0_constant);
+                    if (MQ135_value->MQ135_R0_constant < 0)
+                    {
+                        MQ135_value->MQ135_R0_constant = 0; // No negative values accepted.
+                    }
+                    // loop_stop_flag => 1 // Calibration_complete_LPG => 1;
+                    MQ135_value->status_flag |= (BIT0 | BIT1);
+                }
             }
-            // Calculate the R0_air which is constant through-out
-            MQ135_value->MQ135_R0_constant = (RS_calib / RatioMQ135CleanAir); // Calculate MQ135_R0_constant
-            TRACE_E("CALIB_TASK -> 'MQ135_R0_constant' = %.2f", MQ135_value->MQ135_R0_constant);
-            if (MQ135_value->MQ135_R0_constant < 0)
-            {
-                MQ135_value->MQ135_R0_constant = 0; // No negative values accepted.
-            }
-            // Set calibration_complete_NH3 flag
-            MQ135_value->Calibration_complete_NH3 = true;
         }
     }
-#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
-    EZPI_core_process_set_is_deleted(ENUM_EZLOPI_SENSOR_MQ135_TASK);
-#endif
-    vTaskDelete(NULL);
+    // #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
+    //     EZPI_core_process_set_is_deleted(ENUM_EZLOPI_SENSOR_MQ135_TASK);
+    // #endif
 }
