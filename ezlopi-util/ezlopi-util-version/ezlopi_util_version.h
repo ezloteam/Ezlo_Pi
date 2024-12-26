@@ -9,9 +9,9 @@ extern "C"
 #define BUILD_DATE 1733304200
 #define MAJOR 4
 #define MINOR 2
-#define BATCH 10
+#define BATCH 9
 #define BUILD 200
-#define VERSION_STR "4.2.10"
+#define VERSION_STR "4.2.9"
 #define DEVELOPER "lomas.subedi@ezlo.com"
 #define COMPILE_TIME "Wed Dec 04 15:08:20 PM +0545 2024"
 #define CURRENT_BRANCH "development"
