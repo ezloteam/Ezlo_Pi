@@ -14,6 +14,8 @@ idf_component_register(SRCS "sensor_0050_other_MQ3_alcohol_detector.c"
 
                 ezlopi-cloud-items
                 ezlopi-cloud-constants 
+
+                ezlopi-service-loop
                 )
 
 

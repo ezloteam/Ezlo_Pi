@@ -14,6 +14,8 @@
 #include "ezlopi_cloud_items.h"
 #include "ezlopi_cloud_constants.h"
 
+#include "ezlopi_service_loop.h"
+
 #include "sensor_0048_other_MQ4_CH4_detector.h"
 #include "EZLOPI_USER_CONFIG.h"
 
@@ -38,7 +40,6 @@ static const char *mq4_sensor_gas_alarm_token[] = {
     "unknown",
 };
 //--------------------------------------------------------------------------------------------------------
-
 static ezlopi_error_t __0048_prepare(void *arg);
 static ezlopi_error_t __0048_init(l_ezlopi_item_t *item);
 static ezlopi_error_t __0048_get_item(l_ezlopi_item_t *item, void *arg);
@@ -102,7 +103,6 @@ static ezlopi_error_t __0048_prepare(void *arg)
         l_ezlopi_device_t *MQ4_device_parent_digi = EZPI_core_device_add_device(device_prep_arg->cjson_device, "digi");
         if (MQ4_device_parent_digi)
         {
-            ret = 1;
             TRACE_I("Parent_MQ4_device_digi-[0x%x] ", MQ4_device_parent_digi->cloud_properties.device_id);
             __prepare_device_digi_cloud_properties_parent_digi(MQ4_device_parent_digi, device_prep_arg->cjson_device);
             l_ezlopi_item_t *MQ4_item_digi = EZPI_core_device_add_item_to_device(MQ4_device_parent_digi, sensor_0048_other_MQ4_CH4_detector);
@@ -111,12 +111,8 @@ static ezlopi_error_t __0048_prepare(void *arg)
                 __prepare_item_digi_cloud_properties(MQ4_item_digi, device_prep_arg->cjson_device);
                 ret = EZPI_SUCCESS;
             }
-            else
-            {
-                ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
-            }
-            //---------------------------- ADC - DEVICE 2 -------------------------------------------
 
+            //---------------------------- ADC - DEVICE 2 -------------------------------------------
             s_mq4_value_t *MQ4_value = (s_mq4_value_t *)ezlopi_malloc(__FUNCTION__, sizeof(s_mq4_value_t));
             if (NULL != MQ4_value)
             {
@@ -135,25 +131,15 @@ static ezlopi_error_t __0048_prepare(void *arg)
                     }
                     else
                     {
-                        ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                         EZPI_core_device_free_device(MQ4_device_child_adc);
                         ezlopi_free(__FUNCTION__, MQ4_value);
                     }
                 }
                 else
                 {
-                    ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                     ezlopi_free(__FUNCTION__, MQ4_value);
                 }
             }
-            else
-            {
-                ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
-            }
-        }
-        else
-        {
-            ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
         }
     }
     return ret;
@@ -186,20 +172,16 @@ static ezlopi_error_t __0048_init(l_ezlopi_item_t *item)
                 { // initialize analog_pin
                     if (EZPI_SUCCESS == EZPI_hal_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
                     { // calibrate if not done
-                        if (0 == (BIT0 & MQ4_value->status_flag))
+                        if (0 == (BIT0 & MQ4_value->status_flag)) // Calibration_complete_CH4 == 0
                         {
-                            MQ4_value->heating_dur = MQ4_HEATING_PERIOD * 10;   // [(20 * 100ms)* 10] = 20sec
-                            MQ4_value->avg_vol_count = MQ4_AVG_CAL_COUNT;
+                            MQ4_value->heating_dur = MQ4_HEATING_PERIOD * 10;   //   [(20 * 100ms)* 10] = 20sec
+                            MQ4_value->avg_vol_count = MQ4_AVG_CAL_COUNT;       //            V
                             EZPI_service_loop_add("mq4_loop", __calibrate_MQ4_R0_resistance, 100, (void *)item);
                             // #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
                             //                             EZPI_core_process_set_process_info(ENUM_EZLOPI_SENSOR_MQ4_TASK, &ezlopi_sensor_mq4_task_handle, EZLOPI_SENSOR_MQ4_TASK_DEPTH);
                             // #endif
                             ret = EZPI_SUCCESS;
                         }
-                    }
-                    else
-                    {
-                        ret = EZPI_ERR_INIT_DEVICE_FAILED;
                     }
                 }
             }
@@ -384,9 +366,9 @@ static float __extract_MQ4_sensor_ppm(l_ezlopi_item_t *item)
 {
     s_mq4_value_t *MQ4_value = (s_mq4_value_t *)item->user_arg;
     if (MQ4_value)
-    { // calculation process
-        int mq4_adc_pin = item->interface.adc.gpio_num;
+    {   // calculation process
         //-------------------------------------------------
+        int mq4_adc_pin = item->interface.adc.gpio_num;
         s_ezlopi_analog_data_t ezlopi_analog_data = { .value = 0, .voltage = 0 };
         // extract the mean_sensor_analog_output_voltage
         MQ4_value->calib_avg_volt = 0;
@@ -422,9 +404,9 @@ static float __extract_MQ4_sensor_ppm(l_ezlopi_item_t *item)
         {
             _CH4_ppm = 0; // No negative values accepted or upper datasheet recomendation.
         }
+
         TRACE_E("_CH4_ppm [CH4] : %.2f -> ratio[RS/R0] : %.2f -> Volts : %0.2fmv", _CH4_ppm, (float)_ratio, MQ4_value->calib_avg_volt);
         return _CH4_ppm;
-
         //-------------------------------------------------
     }
     return 0;
@@ -436,7 +418,7 @@ static void __calibrate_MQ4_R0_resistance(void *params)
     if (NULL != item)
     {
         s_mq4_value_t *MQ4_value = (s_mq4_value_t *)item->user_arg;
-        if (MQ4_value)
+        if (MQ4_value && (0 == (BIT1 & MQ4_value->status_flag)))// loop_stop_flag == 0
         {
             int mq4_adc_pin = item->interface.adc.gpio_num;
             //-------------------------------------------------
@@ -463,7 +445,7 @@ static void __calibrate_MQ4_R0_resistance(void *params)
 #else
                     MQ4_value->calib_avg_volt += (float)(ezlopi_analog_data.voltage);
 #endif
-                    TRACE_D(" _count : %d", MQ4_value->avg_vol_count);
+                    // TRACE_D(" _count : %d", MQ4_value->avg_vol_count);
                     MQ4_value->avg_vol_count--;
 
                     if (0 == MQ4_value->avg_vol_count)
@@ -493,13 +475,13 @@ static void __calibrate_MQ4_R0_resistance(void *params)
                     {
                         (MQ4_value->MQ4_R0_constant) = 0; // No negative values accepted.
                     }
-                    // loop_stop_flag => 1 // Calibration_complete_LPG => 1;
+                    // loop_stop_flag => 1 // Calibration_complete_CH4 => 1;
                     MQ4_value->status_flag |= (BIT0 | BIT1);
                 }
             }
         }
     }
-#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
-    EZPI_core_process_set_is_deleted(ENUM_EZLOPI_SENSOR_MQ4_TASK);
-#endif
+    // #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
+    //     EZPI_core_process_set_is_deleted(ENUM_EZLOPI_SENSOR_MQ4_TASK);
+    // #endif
 }

@@ -14,6 +14,8 @@
 #include "ezlopi_cloud_items.h"
 #include "ezlopi_cloud_constants.h"
 
+#include "ezlopi_service_loop.h"
+
 #include "sensor_0052_other_MQ135_NH3_detector.h"
 #include "EZLOPI_USER_CONFIG.h"
 
@@ -22,7 +24,7 @@
 //*************************************************************************
 typedef struct s_mq135_value
 {
-    uint8_t status_flag : 3; // BIT2 = avg_volt_flag  ; BIT1 = loop_stop_flag  ; BIT0 = Calibration_complete_LPG
+    uint8_t status_flag : 3; // BIT2 = avg_volt_flag  ; BIT1 = loop_stop_flag  ; BIT0 = Calibration_complete_NH3
     uint8_t heating_dur;
     uint8_t avg_vol_count;  // counter for calculating avg_voltage. 
     float calib_avg_volt;
@@ -108,10 +110,6 @@ static ezlopi_error_t __0052_prepare(void *arg)
                 __prepare_item_digi_cloud_properties(MQ135_item_digi, device_prep_arg->cjson_device);
                 ret = EZPI_SUCCESS;
             }
-            else
-            {
-                ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
-            }
 
             //---------------------------- ADC - DEVICE 2 -------------------------------------------
             s_mq135_value_t *MQ135_value = (s_mq135_value_t *)ezlopi_malloc(__FUNCTION__, sizeof(s_mq135_value_t));
@@ -128,23 +126,18 @@ static ezlopi_error_t __0052_prepare(void *arg)
                     if (MQ135_item_adc)
                     {
                         __prepare_item_adc_cloud_properties(MQ135_item_adc, device_prep_arg->cjson_device, MQ135_value);
+                        ret = EZPI_SUCCESS;
                     }
                     else
                     {
-                        ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                         EZPI_core_device_free_device(MQ135_device_child_adc);
                         ezlopi_free(__FUNCTION__, MQ135_value);
                     }
                 }
                 else
                 {
-                    ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                     ezlopi_free(__FUNCTION__, MQ135_value);
                 }
-            }
-            else
-            {
-                ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
             }
         }
     }
@@ -166,7 +159,7 @@ static ezlopi_error_t __0052_init(l_ezlopi_item_t *item)
                 input_conf.mode = GPIO_MODE_INPUT;
                 input_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
                 input_conf.pull_up_en = GPIO_PULLUP_ENABLE;
-                ret = (0 == gpio_config(&input_conf)) ? EZPI_SUCCESS : ret;
+                ret = (0 == gpio_config(&input_conf)) ? EZPI_SUCCESS : EZPI_ERR_INIT_DEVICE_FAILED;
             }
         }
         else if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
@@ -178,10 +171,10 @@ static ezlopi_error_t __0052_init(l_ezlopi_item_t *item)
                 { // initialize analog_pin
                     if (EZPI_SUCCESS == EZPI_hal_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
                     { // calibrate if not done
-                        if (0 == (BIT0 & MQ135_value->status_flag)) // Calibration_complete_LPG == 0
+                        if (0 == (BIT0 & MQ135_value->status_flag)) // Calibration_complete_NH3 == 0
                         {
-                            MQ135_value->heating_dur = MQ135_HEATING_PERIOD * 10;   // [(20 * 100ms)* 10] = 20sec
-                            MQ135_value->avg_vol_count = MQ135_AVG_CAL_COUNT;
+                            MQ135_value->heating_dur = MQ135_HEATING_PERIOD * 10;   //   [(20 * 100ms)* 10] = 20sec
+                            MQ135_value->avg_vol_count = MQ135_AVG_CAL_COUNT;       //            V
                             EZPI_service_loop_add("mq135_loop", __calibrate_MQ135_R0_resistance, 100, (void *)item);
                             // #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
                             //                             // EZPI_core_process_set_process_info(ENUM_EZLOPI_SENSOR_MQ135_TASK, &ezlopi_sensor_mq135_task_handle, EZLOPI_SENSOR_MQ135_TASK_DEPTH);
@@ -189,19 +182,7 @@ static ezlopi_error_t __0052_init(l_ezlopi_item_t *item)
                             ret = EZPI_SUCCESS;
                         }
                     }
-                    else
-                    {
-                        ret = EZPI_ERR_INIT_DEVICE_FAILED;
-                    }
                 }
-                else
-                {
-                    ret = EZPI_ERR_INIT_DEVICE_FAILED;
-                }
-            }
-            else
-            {
-                ret = EZPI_ERR_INIT_DEVICE_FAILED;
             }
         }
     }
@@ -257,7 +238,7 @@ static void __prepare_item_adc_cloud_properties(l_ezlopi_item_t *item, cJSON *cj
 
     // passing the custom data_structure
     item->is_user_arg_unique = true;
-    item->user_arg = user_data;
+    item->user_arg = user_data; // since 'item->user_arg' exist in only one-child [item_adc]
 }
 
 //------------------------------------------------------------------------------------------------------
@@ -384,8 +365,8 @@ static float __extract_MQ135_sensor_ppm(l_ezlopi_item_t *item)
 {
     s_mq135_value_t *MQ135_value = (s_mq135_value_t *)item->user_arg;
     if (MQ135_value)
-    { // calculation process
-      //-------------------------------------------------
+    {   // calculation process
+        //-------------------------------------------------
         int mq135_adc_pin = item->interface.adc.gpio_num;
         s_ezlopi_analog_data_t ezlopi_analog_data = { .value = 0, .voltage = 0 };
         // extract the mean_sensor_analog_output_voltage
@@ -422,10 +403,10 @@ static float __extract_MQ135_sensor_ppm(l_ezlopi_item_t *item)
         {
             _NH3_ppm = 0; // No negative values accepted or upper datasheet recomendation.
         }
-        TRACE_E("_NH3_ppm [NH3] : %.2f -> ratio[RS/R0] : %.2f -> Volts : %0.2fmv", _NH3_ppm, (float)_ratio, MQ135_value->calib_avg_volt);
 
-        //-------------------------------------------------
+        TRACE_E("_NH3_ppm [NH3] : %.2f -> ratio[RS/R0] : %.2f -> Volts : %0.2fmv", _NH3_ppm, (float)_ratio, MQ135_value->calib_avg_volt);
         return _NH3_ppm;
+        //-------------------------------------------------
     }
     return 0;
 }
@@ -440,6 +421,7 @@ static void __calibrate_MQ135_R0_resistance(void *params)
         {
             int mq135_adc_pin = item->interface.adc.gpio_num;
             //-------------------------------------------------
+            // let the sensor to heat for 20secondss
             if (MQ135_value->heating_dur > 0)
             {
                 if (0 == MQ135_value->heating_dur % 20)
@@ -461,7 +443,7 @@ static void __calibrate_MQ135_R0_resistance(void *params)
 #else
                     MQ135_value->calib_avg_volt += (float)(ezlopi_analog_data.voltage);
 #endif
-                    TRACE_D(" _count : %d", MQ135_value->avg_vol_count);
+                    // TRACE_D(" _count : %d", MQ135_value->avg_vol_count);
                     MQ135_value->avg_vol_count--;
 
                     if (0 == MQ135_value->avg_vol_count)
@@ -491,7 +473,7 @@ static void __calibrate_MQ135_R0_resistance(void *params)
                     {
                         MQ135_value->MQ135_R0_constant = 0; // No negative values accepted.
                     }
-                    // loop_stop_flag => 1 // Calibration_complete_LPG => 1;
+                    // loop_stop_flag => 1 // Calibration_complete_NH3 => 1;
                     MQ135_value->status_flag |= (BIT0 | BIT1);
                 }
             }

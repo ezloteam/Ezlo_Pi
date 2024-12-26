@@ -114,20 +114,14 @@ static ezlopi_error_t __0057_prepare(void *arg)
                     }
                     else
                     {
-                        ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                         EZPI_core_device_free_device(flame_device_child_adc);
                         ezlopi_free(__FUNCTION__, flame_struct);
                     }
                 }
                 else
                 {
-                    ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                     ezlopi_free(__FUNCTION__, flame_struct);
                 }
-            }
-            else
-            {
-                ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
             }
         }
     }
@@ -149,7 +143,7 @@ static ezlopi_error_t __0057_init(l_ezlopi_item_t *item)
                 input_conf.mode = GPIO_MODE_INPUT;
                 input_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
                 input_conf.pull_up_en = GPIO_PULLUP_ENABLE;
-                ret = (0 == gpio_config(&input_conf)) ? EZPI_ERR_INIT_DEVICE_FAILED : ret;
+                ret = (0 == gpio_config(&input_conf)) ? EZPI_SUCCESS : EZPI_ERR_INIT_DEVICE_FAILED;
             }
         }
         else if (ezlopi_item_name_temperature_changes == item->cloud_properties.item_name)
@@ -163,19 +157,7 @@ static ezlopi_error_t __0057_init(l_ezlopi_item_t *item)
                     {
                         ret = EZPI_SUCCESS;
                     }
-                    else
-                    {
-                        ret = EZPI_ERR_INIT_DEVICE_FAILED;
-                    }
                 }
-                else
-                {
-                    ret = EZPI_ERR_INIT_DEVICE_FAILED;
-                }
-            }
-            else
-            {
-                ret = EZPI_ERR_INIT_DEVICE_FAILED;
             }
         }
     }

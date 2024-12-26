@@ -109,10 +109,6 @@ static ezlopi_error_t __0049_prepare(void *arg)
                 __prepare_item_digi_cloud_properties(MQ2_item_digi, device_prep_arg->cjson_device);
                 ret = EZPI_SUCCESS;
             }
-            else
-            {
-                ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
-            }
 
             //---------------------------- ADC - DEVICE 2 -------------------------------------------
             s_mq2_value_t *MQ2_value = (s_mq2_value_t *)ezlopi_malloc(__FUNCTION__, sizeof(s_mq2_value_t));
@@ -133,25 +129,15 @@ static ezlopi_error_t __0049_prepare(void *arg)
                     }
                     else
                     {
-                        ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                         EZPI_core_device_free_device(MQ2_device_child_adc);
                         ezlopi_free(__FUNCTION__, MQ2_value);
                     }
                 }
                 else
                 {
-                    ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                     ezlopi_free(__FUNCTION__, MQ2_value);
                 }
             }
-            else
-            {
-                ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
-            }
-        }
-        else
-        {
-            ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
         }
     }
     return ret;
@@ -172,7 +158,7 @@ static ezlopi_error_t __0049_init(l_ezlopi_item_t *item)
                 input_conf.mode = GPIO_MODE_INPUT;
                 input_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
                 input_conf.pull_up_en = GPIO_PULLUP_ENABLE;
-                ret = (0 == gpio_config(&input_conf)) ? EZPI_SUCCESS : ret;
+                ret = (0 == gpio_config(&input_conf)) ? EZPI_SUCCESS : EZPI_ERR_INIT_DEVICE_FAILED;
             }
         }
         else if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
@@ -186,8 +172,8 @@ static ezlopi_error_t __0049_init(l_ezlopi_item_t *item)
                     { // calibrate if not done
                         if (0 == (BIT0 & MQ2_value->status_flag)) // Calibration_complete_LPG == 0
                         {
-                            MQ2_value->heating_dur = MQ2_HEATING_PERIOD * 10;   // [(20 * 100ms)* 10] = 20sec
-                            MQ2_value->avg_vol_count = MQ2_AVG_CAL_COUNT;
+                            MQ2_value->heating_dur = MQ2_HEATING_PERIOD * 10;   //   [(20 * 100ms)* 10] = 20sec
+                            MQ2_value->avg_vol_count = MQ2_AVG_CAL_COUNT;       //            V
                             EZPI_service_loop_add("mq2_loop", __calibrate_MQ2_R0_resistance, 100, (void *)item);
                             // #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
                             //                             // EZPI_core_process_set_process_info(ENUM_EZLOPI_SENSOR_MQ2_TASK, &ezlopi_sensor_mq2_task_handle, EZLOPI_SENSOR_MQ2_TASK_DEPTH);
@@ -195,19 +181,7 @@ static ezlopi_error_t __0049_init(l_ezlopi_item_t *item)
                             ret = EZPI_SUCCESS;
                         }
                     }
-                    else
-                    {
-                        ret = EZPI_ERR_INIT_DEVICE_FAILED;
-                    }
                 }
-                else
-                {
-                    ret = EZPI_ERR_INIT_DEVICE_FAILED;
-                }
-            }
-            else
-            {
-                ret = EZPI_ERR_INIT_DEVICE_FAILED;
             }
         }
     }
@@ -428,10 +402,10 @@ static float __extract_MQ2_sensor_ppm(l_ezlopi_item_t *item)
         {
             _LPG_ppm = 0; // No negative values accepted or upper datasheet recomendation.
         }
-        TRACE_E("_LPG_ppm [LPG] : %.2f -> ratio[RS/R0] : %.2f -> Volts : %0.2fmv", _LPG_ppm, (float)_ratio, MQ2_value->calib_avg_volt);
 
-        //-------------------------------------------------
+        TRACE_E("_LPG_ppm [LPG] : %.2f -> ratio[RS/R0] : %.2f -> Volts : %0.2fmv", _LPG_ppm, (float)_ratio, MQ2_value->calib_avg_volt);
         return _LPG_ppm;
+        //-------------------------------------------------
     }
     return 0;
 }
@@ -468,7 +442,7 @@ static void __calibrate_MQ2_R0_resistance(void *params)
 #else
                     MQ2_value->calib_avg_volt += (float)(ezlopi_analog_data.voltage);
 #endif
-                    TRACE_D(" _count : %d", MQ2_value->avg_vol_count);
+                    // TRACE_D(" _count : %d", MQ2_value->avg_vol_count);
                     MQ2_value->avg_vol_count--;
 
                     if (0 == MQ2_value->avg_vol_count)

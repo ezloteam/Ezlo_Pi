@@ -14,5 +14,7 @@ idf_component_register(SRCS "sensor_0049_other_MQ2_LPG_detector.c"
 
                 ezlopi-cloud-items
                 ezlopi-cloud-constants 
+
+                ezlopi-service-loop
                 )
 

@@ -14,5 +14,7 @@ idf_component_register(SRCS "sensor_0051_other_MQ8_H2_detector.c"
 
                 ezlopi-cloud-items
                 ezlopi-cloud-constants 
+
+                ezlopi-service-loop
                 )
 

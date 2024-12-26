@@ -14,6 +14,8 @@
 #include "ezlopi_cloud_items.h"
 #include "ezlopi_cloud_constants.h"
 
+#include "ezlopi_service_loop.h"
+
 #include "sensor_0050_other_MQ3_alcohol_detector.h"
 #include "EZLOPI_USER_CONFIG.h"
 
@@ -23,7 +25,7 @@
 
 typedef struct s_mq3_value
 {
-    uint8_t status_flag : 3; // BIT2 = avg_volt_flag  ; BIT1 = loop_stop_flag  ; BIT0 = Calibration_complete_LPG
+    uint8_t status_flag : 3; // BIT2 = avg_volt_flag  ; BIT1 = loop_stop_flag  ; BIT0 = Calibration_complete_alcohol
     uint8_t heating_dur;
     uint8_t avg_vol_count;  // counter for calculating avg_voltage. 
     float calib_avg_volt;
@@ -109,10 +111,6 @@ static ezlopi_error_t __0050_prepare(void *arg)
                 __prepare_item_digi_cloud_properties(MQ3_item_digi, device_prep_arg->cjson_device);
                 ret = EZPI_SUCCESS;
             }
-            else
-            {
-                ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
-            }
 
             //---------------------------- ADC - DEVICE 2 -------------------------------------------
             s_mq3_value_t *MQ3_value = (s_mq3_value_t *)ezlopi_malloc(__FUNCTION__, sizeof(s_mq3_value_t));
@@ -133,25 +131,15 @@ static ezlopi_error_t __0050_prepare(void *arg)
                     }
                     else
                     {
-                        ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                         EZPI_core_device_free_device(MQ3_device_child_adc);
                         ezlopi_free(__FUNCTION__, MQ3_value);
                     }
                 }
                 else
                 {
-                    ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                     ezlopi_free(__FUNCTION__, MQ3_value);
                 }
             }
-            else
-            {
-                ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
-            }
-        }
-        else
-        {
-            ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
         }
     }
     return ret;
@@ -160,7 +148,7 @@ static ezlopi_error_t __0050_prepare(void *arg)
 static ezlopi_error_t __0050_init(l_ezlopi_item_t *item)
 {
     ezlopi_error_t ret = EZPI_ERR_INIT_DEVICE_FAILED;
-    if (item)
+    if (NULL != item)
     {
         if (ezlopi_item_name_gas_alarm == item->cloud_properties.item_name)
         {
@@ -172,8 +160,7 @@ static ezlopi_error_t __0050_init(l_ezlopi_item_t *item)
                 input_conf.mode = GPIO_MODE_INPUT;
                 input_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
                 input_conf.pull_up_en = GPIO_PULLUP_ENABLE;
-                gpio_config(&input_conf);
-                ret = EZPI_SUCCESS;
+                ret = (0 == gpio_config(&input_conf)) ? EZPI_SUCCESS : EZPI_ERR_INIT_DEVICE_FAILED;
             }
         }
         else if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
@@ -185,7 +172,7 @@ static ezlopi_error_t __0050_init(l_ezlopi_item_t *item)
                 { // initialize analog_pin
                     if (EZPI_SUCCESS == EZPI_hal_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
                     { // calibrate if not done
-                        if (0 == (BIT0 & MQ3_value->status_flag)) // Calibration_complete_LPG == 0
+                        if (0 == (BIT0 & MQ3_value->status_flag)) // Calibration_complete_alcohol == 0
                         {
                             MQ3_value->heating_dur = MQ3_HEATING_PERIOD * 10;   // [(20 * 100ms)* 10] = 20sec
                             MQ3_value->avg_vol_count = MQ3_AVG_CAL_COUNT;
@@ -196,23 +183,10 @@ static ezlopi_error_t __0050_init(l_ezlopi_item_t *item)
                             ret = EZPI_SUCCESS;
                         }
                     }
-                    else
-                    {
-                        ret = EZPI_ERR_INIT_DEVICE_FAILED;
-                    }
                 }
-                else
-                {
-                    ret = EZPI_ERR_INIT_DEVICE_FAILED;
-                }
-            }
-            else
-            {
-                ret = EZPI_ERR_INIT_DEVICE_FAILED;
             }
         }
     }
-
     return ret;
 }
 
@@ -430,10 +404,10 @@ static float __extract_MQ3_sensor_ppm(l_ezlopi_item_t *item)
         {
             _alcohol_ppm = 0; // No negative values accepted or upper datasheet recomendation.
         }
-        TRACE_E("_alcohol_ppm [alcohol] : %.2f -> ratio[RS/R0] : %.2f -> Volts : %0.2fmv", _alcohol_ppm, (float)_ratio, MQ3_value->calib_avg_volt);
 
-        //-------------------------------------------------
+        TRACE_E("_alcohol_ppm [alcohol] : %.2f -> ratio[RS/R0] : %.2f -> Volts : %0.2fmv", _alcohol_ppm, (float)_ratio, MQ3_value->calib_avg_volt);
         return _alcohol_ppm;
+        //-------------------------------------------------
     }
     return 0;
 }
@@ -448,6 +422,7 @@ static void __calibrate_MQ3_R0_resistance(void *params)
         {
             int mq3_adc_pin = item->interface.adc.gpio_num;
             //-------------------------------------------------
+            // let the sensor to heat for 20seconds
             if (MQ3_value->heating_dur > 0)
             {
                 if (0 == MQ3_value->heating_dur % 20)
@@ -456,7 +431,7 @@ static void __calibrate_MQ3_R0_resistance(void *params)
                 }
                 MQ3_value->heating_dur--;
             }
-            else    // after heating the sensor for 20 sec
+            else // after heating the sensor for 20 sec
             {
                 //-------------------------------------------------
                 // extract the mean_sensor_analog_output_voltage
@@ -470,7 +445,7 @@ static void __calibrate_MQ3_R0_resistance(void *params)
 #else
                     MQ3_value->calib_avg_volt += (float)(ezlopi_analog_data.voltage);
 #endif
-                    TRACE_D(" _count : %d", MQ3_value->avg_vol_count);
+                    // TRACE_D(" _count : %d", MQ3_value->avg_vol_count);
                     MQ3_value->avg_vol_count--;
 
                     if (0 == MQ3_value->avg_vol_count)
@@ -500,7 +475,7 @@ static void __calibrate_MQ3_R0_resistance(void *params)
                     {
                         MQ3_value->MQ3_R0_constant = 0; // No negative values accepted.
                     }
-                    // loop_stop_flag => 1 // Calibration_complete_LPG => 1;
+                    // loop_stop_flag => 1 // Calibration_complete_alcohol => 1;
                     MQ3_value->status_flag |= (BIT0 | BIT1);
                 }
             }

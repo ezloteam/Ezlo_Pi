@@ -14,5 +14,7 @@ idf_component_register(SRCS "sensor_0052_other_MQ135_NH3_detector.c"
 
                 ezlopi-cloud-items
                 ezlopi-cloud-constants 
+
+                ezlopi-service-loop
                 )
 

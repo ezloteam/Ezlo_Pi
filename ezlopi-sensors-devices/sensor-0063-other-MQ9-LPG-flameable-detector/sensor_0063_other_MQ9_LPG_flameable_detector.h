@@ -30,96 +30,96 @@
  *
  **/
 
-/**
- *  From the graph, we can see that the resistance ratio in fresh air is a constant:
- *      (via black straight line of sensitivity graph in the Mq-9 datasheet)
- *
- *  i.e. ---------------------------> [RS_calib / R0] =  9.6f
- *
- * To calculate R0 we will need to find the value of the RS in fresh air.
- *  This will be done by taking the analog average readings from the sensor and converting it to voltage.
- *  Then we will use the 'RS' formula to find 'R0'.
- *
- *  i.e. ----------------------------> RS_calib = [(VC x RL) / VRL] - RL;
- */
+ /**
+  *  From the graph, we can see that the resistance ratio in fresh air is a constant:
+  *      (via black straight line of sensitivity graph in the Mq-9 datasheet)
+  *
+  *  i.e. ---------------------------> [RS_calib / R0] =  9.6f
+  *
+  * To calculate R0 we will need to find the value of the RS in fresh air.
+  *  This will be done by taking the analog average readings from the sensor and converting it to voltage.
+  *  Then we will use the 'RS' formula to find 'R0'.
+  *
+  *  i.e. ----------------------------> RS_calib = [(VC x RL) / VRL] - RL;
+  */
 
-/**
- *   Calculation Process
- *   ~~~~~~~~~~~~~~~~~~~
- *                          : $. Linear      : y = mx + b
- *                          : $. Exponential : log(y) = m*log(x) + b
- *
- *   # On Solving, we get,
- *         => log(y) = m*log(x) + b ------------------------ (1)
- *         => log(x) = [log(y) - b] / m
- *         =>      x = 10 ^ { [log(y) - b] / m }------------ (2)
- *         where,
- *                -> m = [log(y) - log(y0)] / [log(x) - log(x0)]  => [ m = log(y/y0) / log(x/x0) ] ;
- *                -> b = [log(y) - m*log(x)] = ?
- *
- *    Case. 1: Calculation of slope 'm' Using MQ9's LPG_CH4-curve (LPG_CH4) in semi-log graph:
- *
- *                                      (x0 , y0) and (  x  , y  )
- *                                          |               |
- *                                          V               V
- *                 #A. chose the points (200,2.1) and (10000,0.34) from the 'LPG_CH4' graph-line
- *                 ->           m = log(0.34/2.1) / log(10000/200)
- *                 ->           m = -0.4654
- *
- *                 #B. We chose (1000,1)
- *                 ->           b = log(1) - ( -0.4654 )*log(1000)
- *                 ->           b = 1.3962
- *
- *    Case. 2: Calculation of _ppm. First change, {Y to [ratio = RS/R0]} in y-axis  and {X to [_PPM]} in x-axis
- *                  #C. From eq(2),
- *                  ->          x = 10 ^ { [log(y) - b] / m }
- *                  ->       _ppm = 10 ^ [ (log([ratio]) -   1.3962 ) / -0.4654   ] ----------------------------(3)
- *
- *
- *    _________ STAGE 1 : CALIBRATION ____________________________________________________
- *
- *    Case. 3: Here 'ratio' = [Rs/Ro] is still left to be calculated so,
- *                  #D. Using Rs formula :  Rs_calib = [(VC x RL) / VRL] - RL ; where Vc = 5V,
- *                                                                                  RL = 66O ohm ,
- *                                                                                  VRL = sensor_analog_output
- *                  NOTE : use multimeter and measure the Equivalent resistance (RL)
- *                  ->     Rs_calib = [(5 * 660) / VRL] - 660 ;
- *
- *                  #E. Now [Ro constant value] , we get :
- *                        ->   Ro = ratio/Rs_calib
- *                        ->   Ro =     / Rs_calib  --------------- (4)
- *
- *
- *    _________ STAGE 2 : PPM Calculation ____________________________________________________
- *
- *    Case. 4: Calculation of _ppm using eq(3), we get:
- *                  #F. Formula of _ppm is:-
- *                        -> _ppm = 10 ^ [ (log([Rs_gas / Ro]) - 1.019) / -0.3397 ]  ;
- *                                                  -> where ; Ro is taken from eq(4)
- *                                                           ; Rs_gas = [(5 * 660) / VRL] - 660 ;
- *    ________________________________________________________________________________________
- *
- */
+  /**
+   *   Calculation Process
+   *   ~~~~~~~~~~~~~~~~~~~
+   *                          : $. Linear      : y = mx + b
+   *                          : $. Exponential : log(y) = m*log(x) + b
+   *
+   *   # On Solving, we get,
+   *         => log(y) = m*log(x) + b ------------------------ (1)
+   *         => log(x) = [log(y) - b] / m
+   *         =>      x = 10 ^ { [log(y) - b] / m }------------ (2)
+   *         where,
+   *                -> m = [log(y) - log(y0)] / [log(x) - log(x0)]  => [ m = log(y/y0) / log(x/x0) ] ;
+   *                -> b = [log(y) - m*log(x)] = ?
+   *
+   *    Case. 1: Calculation of slope 'm' Using MQ9's LPG_CH4-curve (LPG_CH4) in semi-log graph:
+   *
+   *                                      (x0 , y0) and (  x  , y  )
+   *                                          |               |
+   *                                          V               V
+   *                 #A. chose the points (200,2.1) and (10000,0.34) from the 'LPG_CH4' graph-line
+   *                 ->           m = log(0.34/2.1) / log(10000/200)
+   *                 ->           m = -0.4654
+   *
+   *                 #B. We chose (1000,1)
+   *                 ->           b = log(1) - ( -0.4654 )*log(1000)
+   *                 ->           b = 1.3962
+   *
+   *    Case. 2: Calculation of _ppm. First change, {Y to [ratio = RS/R0]} in y-axis  and {X to [_PPM]} in x-axis
+   *                  #C. From eq(2),
+   *                  ->          x = 10 ^ { [log(y) - b] / m }
+   *                  ->       _ppm = 10 ^ [ (log([ratio]) -   1.3962 ) / -0.4654   ] ----------------------------(3)
+   *
+   *
+   *    _________ STAGE 1 : CALIBRATION ____________________________________________________
+   *
+   *    Case. 3: Here 'ratio' = [Rs/Ro] is still left to be calculated so,
+   *                  #D. Using Rs formula :  Rs_calib = [(VC x RL) / VRL] - RL ; where Vc = 5V,
+   *                                                                                  RL = 66O ohm ,
+   *                                                                                  VRL = sensor_analog_output
+   *                  NOTE : use multimeter and measure the Equivalent resistance (RL)
+   *                  ->     Rs_calib = [(5 * 660) / VRL] - 660 ;
+   *
+   *                  #E. Now [Ro constant value] , we get :
+   *                        ->   Ro = ratio/Rs_calib
+   *                        ->   Ro =     / Rs_calib  --------------- (4)
+   *
+   *
+   *    _________ STAGE 2 : PPM Calculation ____________________________________________________
+   *
+   *    Case. 4: Calculation of _ppm using eq(3), we get:
+   *                  #F. Formula of _ppm is:-
+   *                        -> _ppm = 10 ^ [ (log([Rs_gas / Ro]) - 1.019) / -0.3397 ]  ;
+   *                                                  -> where ; Ro is taken from eq(4)
+   *                                                           ; Rs_gas = [(5 * 660) / VRL] - 660 ;
+   *    ________________________________________________________________________________________
+   *
+   */
 
-//------------------------------------------
-/**
- * Please don't forget to uncomment ,
- * -> If you added a voltage divider at sensor's analog output. [Make sure voltage does not exceed 2.5V]
- *      |
- *      |
- *      V
- */
+   //------------------------------------------
+   /**
+	* Please don't forget to uncomment ,
+	* -> If you added a voltage divider at sensor's analog output. [Make sure voltage does not exceed 2.5V]
+	*      |
+	*      |
+	*      V
+	*/
 #define VOLTAGE_DIVIDER_ADDED 1
-//------------------------------------------
+	//------------------------------------------
 
-/**
- * Before writing below  [mq9_eqv_RL], [m_slope_mq9], [b_coeff_mq9] shown values.
- * Please apply voltage-divider schematics as shown above.
- *
- * NOTE .1 : Mannually use multimeter and measure : eqv-resistance [mq9_eqv_RL], between [A0_pin vs GND] of 'MQ-9 sensor'
- *
- * NOTE .2 : For [m_slope_mq9] & [b_coeff_mq9] values:- follow [stage-1] above shown procedures.
- * */
+	/**
+	 * Before writing below  [mq9_eqv_RL], [m_slope_mq9], [b_coeff_mq9] shown values.
+	 * Please apply voltage-divider schematics as shown above.
+	 *
+	 * NOTE .1 : Mannually use multimeter and measure : eqv-resistance [mq9_eqv_RL], between [A0_pin vs GND] of 'MQ-9 sensor'
+	 *
+	 * NOTE .2 : For [m_slope_mq9] & [b_coeff_mq9] values:- follow [stage-1] above shown procedures.
+	 * */
 
 #define mq9_eqv_RL 660.0f // review the upper diagram clearly to know why this value is assigned
 
@@ -127,6 +127,8 @@
 #define MQ9_VOLT_RESOLUTION_Vc 5.0f
 #define m_slope_mq9 -0.4654f
 #define b_coeff_mq9 1.3962f
+#define MQ9_HEATING_PERIOD 20   // in sec
+#define MQ9_AVG_CAL_COUNT 10
 
 typedef enum
 {

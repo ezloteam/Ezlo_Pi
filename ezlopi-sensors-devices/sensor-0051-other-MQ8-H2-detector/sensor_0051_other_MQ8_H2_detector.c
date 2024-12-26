@@ -14,6 +14,8 @@
 #include "ezlopi_cloud_items.h"
 #include "ezlopi_cloud_constants.h"
 
+#include "ezlopi_service_loop.h"
+
 #include "sensor_0051_other_MQ8_H2_detector.h"
 #include "EZLOPI_USER_CONFIG.h"
 
@@ -22,7 +24,7 @@
 //*************************************************************************
 typedef struct s_mq8_value
 {
-    uint8_t status_flag : 3; // BIT2 = avg_volt_flag  ; BIT1 = loop_stop_flag  ; BIT0 = Calibration_complete_LPG
+    uint8_t status_flag : 3; // BIT2 = avg_volt_flag  ; BIT1 = loop_stop_flag  ; BIT0 = Calibration_complete_H2
     uint8_t heating_dur;
     uint8_t avg_vol_count;  // counter for calculating avg_voltage. 
     float calib_avg_volt;
@@ -109,10 +111,6 @@ static ezlopi_error_t __0051_prepare(void *arg)
                 __prepare_item_digi_cloud_properties(MQ8_item_digi, device_prep_arg->cjson_device);
                 ret = EZPI_SUCCESS;
             }
-            else
-            {
-                ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
-            }
 
             //---------------------------- ADC - DEVICE 2 -------------------------------------------
             s_mq8_value_t *MQ8_value = (s_mq8_value_t *)ezlopi_malloc(__FUNCTION__, sizeof(s_mq8_value_t));
@@ -129,28 +127,19 @@ static ezlopi_error_t __0051_prepare(void *arg)
                     if (MQ8_item_adc)
                     {
                         __prepare_item_adc_cloud_properties(MQ8_item_adc, device_prep_arg->cjson_device, MQ8_value);
+                        ret = EZPI_SUCCESS;
                     }
                     else
                     {
-                        ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                         EZPI_core_device_free_device(MQ8_device_child_adc);
                         ezlopi_free(__FUNCTION__, MQ8_value);
                     }
                 }
                 else
                 {
-                    ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                     ezlopi_free(__FUNCTION__, MQ8_value);
                 }
             }
-            else
-            {
-                ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
-            }
-        }
-        else
-        {
-            ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
         }
     }
     return ret;
@@ -171,7 +160,7 @@ static ezlopi_error_t __0051_init(l_ezlopi_item_t *item)
                 input_conf.mode = GPIO_MODE_INPUT;
                 input_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
                 input_conf.pull_up_en = GPIO_PULLUP_ENABLE;
-                ret = (0 == gpio_config(&input_conf)) ? EZPI_SUCCESS : ret;
+                ret = (0 == gpio_config(&input_conf)) ? EZPI_SUCCESS : EZPI_ERR_INIT_DEVICE_FAILED;
             }
         }
         else if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
@@ -183,7 +172,7 @@ static ezlopi_error_t __0051_init(l_ezlopi_item_t *item)
                 { // initialize analog_pin
                     if (EZPI_SUCCESS == EZPI_hal_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
                     { // calibrate if not done
-                        if (0 == (BIT0 & MQ8_value->status_flag)) // Calibration_complete_LPG == 0
+                        if (0 == (BIT0 & MQ8_value->status_flag)) // Calibration_complete_H2 == 0
                         {
                             MQ8_value->heating_dur = MQ8_HEATING_PERIOD * 10;   // [(20 * 100ms)* 10] = 20sec
                             MQ8_value->avg_vol_count = MQ8_AVG_CAL_COUNT;
@@ -194,19 +183,7 @@ static ezlopi_error_t __0051_init(l_ezlopi_item_t *item)
                             ret = EZPI_SUCCESS;
                         }
                     }
-                    else
-                    {
-                        ret = EZPI_ERR_INIT_DEVICE_FAILED;
-                    }
                 }
-                else
-                {
-                    ret = EZPI_ERR_INIT_DEVICE_FAILED;
-                }
-            }
-            else
-            {
-                ret = EZPI_ERR_INIT_DEVICE_FAILED;
             }
         }
     }
@@ -262,7 +239,7 @@ static void __prepare_item_adc_cloud_properties(l_ezlopi_item_t *item, cJSON *cj
 
     // passing the custom data_structure
     item->is_user_arg_unique = true;
-    item->user_arg = user_data;
+    item->user_arg = user_data; // since 'item->user_arg' exist in only one-child [item_adc]
 }
 
 //------------------------------------------------------------------------------------------------------
@@ -337,7 +314,7 @@ static ezlopi_error_t __0051_get_cjson_value(l_ezlopi_item_t *item, void *arg)
 
 static ezlopi_error_t __0051_notify(l_ezlopi_item_t *item)
 {
-    ezlopi_error_t ret = EZPI_SUCCESS;
+    ezlopi_error_t ret = EZPI_FAILED;
     if (item)
     {
         if (ezlopi_item_name_gas_alarm == item->cloud_properties.item_name)
@@ -367,7 +344,7 @@ static ezlopi_error_t __0051_notify(l_ezlopi_item_t *item)
                     MQ8_value->status_flag ^= BIT1; // toggle BIT1 // loop_stop_flag => 0
                     // TRACE_D(" MQ8_value->status_flag : %03x", MQ8_value->status_flag);
                     EZPI_service_loop_remove(__calibrate_MQ8_R0_resistance);
-                    TRACE_S("......Removed :- MQ4_calib_loop");
+                    TRACE_S("......Removed :- MQ8_calib_loop");
                 }
                 else
                 {
@@ -389,7 +366,7 @@ static float __extract_MQ8_sensor_ppm(l_ezlopi_item_t *item)
 {
     s_mq8_value_t *MQ8_value = (s_mq8_value_t *)item->user_arg;
     if (MQ8_value)
-    { // calculation process
+    {   // calculation process
         //-------------------------------------------------
         int mq8_adc_pin = item->interface.adc.gpio_num;
         s_ezlopi_analog_data_t ezlopi_analog_data = { .value = 0, .voltage = 0 };
@@ -428,9 +405,8 @@ static float __extract_MQ8_sensor_ppm(l_ezlopi_item_t *item)
             _H2_ppm = 0; // No negative values accepted or upper datasheet recomendation.
         }
         TRACE_E("_H2_ppm [H2] : %.2f -> ratio[RS/R0] : %.2f -> Volts : %0.2fmv", _H2_ppm, (float)_ratio, MQ8_value->calib_avg_volt);
-
-        //-------------------------------------------------
         return _H2_ppm;
+        //-------------------------------------------------
     }
     return 0;
 }
@@ -467,7 +443,7 @@ static void __calibrate_MQ8_R0_resistance(void *params)
 #else
                     MQ8_value->calib_avg_volt += (float)(ezlopi_analog_data.voltage);
 #endif
-                    TRACE_D(" _count : %d", MQ8_value->avg_vol_count);
+                    // TRACE_D(" _count : %d", MQ8_value->avg_vol_count);
                     MQ8_value->avg_vol_count--;
 
                     if (0 == MQ8_value->avg_vol_count)
@@ -497,7 +473,7 @@ static void __calibrate_MQ8_R0_resistance(void *params)
                     {
                         MQ8_value->MQ8_R0_constant = 0; // No negative values accepted.
                     }
-                    // loop_stop_flag => 1 // Calibration_complete_LPG => 1;
+                    // loop_stop_flag => 1 // Calibration_complete_H2 => 1;
                     MQ8_value->status_flag |= (BIT0 | BIT1);
                 }
             }
