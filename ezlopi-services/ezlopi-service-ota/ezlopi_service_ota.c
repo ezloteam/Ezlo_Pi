@@ -51,7 +51,7 @@ static void __ota_loop(void *arg)
             static uint32_t __ota_time_stamp = 0;
             int ret_ota = ezlopi_event_group_wait_for_event(EZLOPI_EVENT_OTA, 0, true);
 
-            if ((ret_ota > 0) || ((xTaskGetTickCount() - __ota_time_stamp) > (10000 / portTICK_RATE_MS))) // 86400 seconds in a day (24 hrs) // 86400 * 1000
+            if ((ret_ota > 0) || ((xTaskGetTickCount() - __ota_time_stamp) > (86400 * 1000 / portTICK_RATE_MS))) // 86400 seconds in a day (24 hrs) // 86400 * 1000
             {
                 __ota_time_stamp = xTaskGetTickCount();
                 cJSON *cj_firmware_info_request = firmware_send_firmware_query_to_nma_server(esp_random());
