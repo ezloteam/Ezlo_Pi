@@ -126,9 +126,8 @@
 #define RatioMQ2CleanAir 9.83f // -> [RS / R0] = 9.83
 #define MQ2_VOLT_RESOLUTION_Vc 5.0f
 #define m_slope_mq2 -0.47f
-#define b_coeff_mq2 1.306f
-#define MQ2_HEATING_PERIOD 20   // in sec
-#define MQ2_AVG_CAL_COUNT 10
+#define b_coeff_mq2 1.306f         
+#define MQ2_AVG_CAL_COUNT 4
 
 typedef enum
 {

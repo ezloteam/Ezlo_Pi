@@ -126,8 +126,7 @@
 #define MQ135_VOLT_RESOLUTION_Vc 5.0f
 #define m_slope_mq135 -0.401f
 #define b_coeff_mq135 0.802f
-#define MQ135_HEATING_PERIOD 20   // in sec
-#define MQ135_AVG_CAL_COUNT 10
+#define MQ135_AVG_CAL_COUNT 4
 typedef enum
 {
     MQ135_GAS_ALARM_NO_GAS,

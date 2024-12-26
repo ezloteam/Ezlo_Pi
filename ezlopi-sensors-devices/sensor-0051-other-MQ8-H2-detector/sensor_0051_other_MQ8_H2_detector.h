@@ -126,8 +126,7 @@
 #define MQ8_VOLT_RESOLUTION_Vc 5.0f
 #define m_slope_mq8 -1.443f
 #define b_coeff_mq8 4.329f
-#define MQ8_HEATING_PERIOD 20   // in sec
-#define MQ8_AVG_CAL_COUNT 10
+#define MQ8_AVG_CAL_COUNT 4
 typedef enum
 {
     MQ8_GAS_ALARM_NO_GAS,

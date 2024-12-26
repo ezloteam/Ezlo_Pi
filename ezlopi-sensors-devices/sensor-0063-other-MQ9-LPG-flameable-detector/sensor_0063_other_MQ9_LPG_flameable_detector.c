@@ -25,7 +25,7 @@
 typedef struct s_mq9_value
 {
     uint8_t status_flag : 3; // BIT2 = avg_volt_flag  ; BIT1 = loop_stop_flag  ; BIT0 = Calibration_complete_LPG_flameable
-    uint8_t heating_dur;
+    uint8_t heating_count;
     uint8_t avg_vol_count;  // counter for calculating avg_voltage. 
     float calib_avg_volt;
     float _LPG_flameable_ppm;
@@ -176,9 +176,9 @@ static ezlopi_error_t __0063_init(l_ezlopi_item_t *item)
                     {// calibrate if not done
                         if (0 == (BIT0 & MQ9_value->status_flag)) // Calibration_complete_LPG_flameable == 0
                         {
-                            MQ9_value->heating_dur = MQ9_HEATING_PERIOD * 10;   //   [(20 * 100ms)* 10] = 20sec
-                            MQ9_value->avg_vol_count = MQ9_AVG_CAL_COUNT;       //            V
-                            EZPI_service_loop_add("mq9_loop", __calibrate_MQ9_R0_resistance, 100, (void *)item);
+                            MQ9_value->heating_count = 20;
+                            MQ9_value->avg_vol_count = MQ9_AVG_CAL_COUNT;
+                            EZPI_service_loop_add("mq9_loop", __calibrate_MQ9_R0_resistance, 1000, (void *)item);    
                             // #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
                             //                             EZPI_core_process_set_process_info(ENUM_EZLOPI_SENSOR_MQ9_TASK, &ezlopi_sensor_mq9_task_handle, EZLOPI_SENSOR_MQ9_TASK_DEPTH);
                             // #endif
@@ -426,13 +426,13 @@ static void __calibrate_MQ9_R0_resistance(void *params)
             int mq9_adc_pin = item->interface.adc.gpio_num;
             //-------------------------------------------------
             // let the sensor to heat for 20seconds
-            if (MQ9_value->heating_dur > 0)
+            if (MQ9_value->heating_count > 0)
             {
-                if (0 == MQ9_value->heating_dur % 20)
-                {
-                    TRACE_E("Heating sensor.........time left: %d sec", MQ9_value->heating_dur / 10);
-                }
-                MQ9_value->heating_dur--;
+                // if (0 == MQ9_value->heating_count % 20)
+                // {
+                //     TRACE_E("Heating sensor.........time left: %d sec", MQ9_value->heating_count / 10);
+                // }
+                MQ9_value->heating_count--;
             }
             else // after heating the sensor for 20 sec
             {

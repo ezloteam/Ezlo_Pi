@@ -125,8 +125,7 @@
 #define MQ6_VOLT_RESOLUTION_Vc 5.0f
 #define m_slope_mq6 -0.424f
 #define b_coeff_mq6 1.272f
-#define MQ6_HEATING_PERIOD 20   // in sec
-#define MQ6_AVG_CAL_COUNT 10
+#define MQ6_AVG_CAL_COUNT 4
 
 typedef enum
 {

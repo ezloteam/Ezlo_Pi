@@ -126,8 +126,7 @@
 #define MQ4_VOLT_RESOLUTION_Vc 5.0f
 #define m_slope_mq4 -0.3397f
 #define b_coeff_mq4 1.019f
-#define MQ4_HEATING_PERIOD 20   // in sec
-#define MQ4_AVG_CAL_COUNT 10
+#define MQ4_AVG_CAL_COUNT 4
 
 typedef enum
 {

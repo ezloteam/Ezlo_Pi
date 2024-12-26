@@ -190,7 +190,7 @@ extern "C"
 #endif // SENSOR_0035_DIGITALIN_TOUCH_SENSOR_TPP223B
 
 #if (1 == DEVICE_0036_PWM_SERVO_MG996R)
-                EZLOPI_DEVICE_LIST("device-PWM-servo-MG996R             ", 36, device_0036_PWM_servo_MG996R)
+                EZLOPI_DEVICE_LIST("device-PWM-servo-MG996R             ", 36, DEVICE_0036_PWM_servo_MG996R)
 #endif // DEVICE_0036_PWM_SERVO_MG996R
 
 #if (1 == SENSOR_0037_PMS5003_SENSOR)

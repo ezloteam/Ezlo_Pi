@@ -1,13 +1,65 @@
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+/**
+ * @file    sensor_0007_I2C_GY271.h
+ * @brief   perform some function on sensor_0007
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+*/
+
 #ifndef _SENSOR_0007_I2C_GY271_H_
 #define _SENSOR_0007_I2C_GY271_H_
 
+/*******************************************************************************
+*                          Include Files
+*******************************************************************************/
 #include <stdbool.h>
 
 #include "ezlopi_core_actions.h"
 #include "ezlopi_core_devices.h"
 #include "ezlopi_core_errors.h"
 
-// Calculation parameters
+/*******************************************************************************
+*                          C++ Declaration Wrapper
+*******************************************************************************/
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+    /*******************************************************************************
+    *                          Type & Macro Declarations
+    *******************************************************************************/
+    // Calculation parameters
 #define PI (3.1416f)
 #define GY271_REG_COUNT_LEN 6 // magnetometer data is to be read in one go .
 #define GY271_ADDR 0x0D // this chipset uses [QMC5883L chip]
@@ -89,38 +141,81 @@
 #define GY271_CONVERSION_TO_G 12000.0f
 
 // CUSTOM GY271 Data storage structure
-typedef struct s_gy271_calib
-{
-    long bias_axis[3];        // (max_ + min_)/2
-    long delta_axis[3];       // (max_ - min_)/2
-    float delta_avg;          // (Delta_axis[0] + Delta_axis[1] + Delta_axis[2])/3
-    float scale_axis[3];      // delta_avg / delta_axis
-    float calibrated_axis[3]; // scale_axis[0] * ( raw_axis - bias_axis[0] )
-} s_gy271_calib_t;
-typedef struct s_gy271_raw_data
-{
-    int16_t raw_x;
-    int16_t raw_y;
-    int16_t raw_z;
-    int16_t raw_temp;
-} s_gy271_raw_data_t;
-typedef struct s_gy271_data
-{
-    bool calibration_complete;
-    s_gy271_calib_t calib_factor;
-    float X;
-    float Y;
-    float Z;
-    float T;
-    int azimuth;
-} s_gy271_data_t;
+    typedef struct s_gy271_calib
+    {
+        long bias_axis[3];        // (max_ + min_)/2
+        long delta_axis[3];       // (max_ - min_)/2
+        float delta_avg;          // (Delta_axis[0] + Delta_axis[1] + Delta_axis[2])/3
+        float scale_axis[3];      // delta_avg / delta_axis
+        float calibrated_axis[3]; // scale_axis[0] * ( raw_axis - bias_axis[0] )
+    } s_gy271_calib_t;
+    typedef struct s_gy271_raw_data
+    {
+        int16_t raw_x;
+        int16_t raw_y;
+        int16_t raw_z;
+        int16_t raw_temp;
+    } s_gy271_raw_data_t;
+    typedef struct s_gy271_data
+    {
+        bool calibration_complete;
+        s_gy271_calib_t calib_factor;
+        float X;
+        float Y;
+        float Z;
+        float T;
+        int azimuth;
+    } s_gy271_data_t;
 
-ezlopi_error_t __gy271_configure(l_ezlopi_item_t *item);
-bool __gy271_update_value(l_ezlopi_item_t *item);
-void __gy271_get_raw_max_min_values(l_ezlopi_item_t *item, int (*calibrationData)[2]);
-//-----------------------------------------------------------------------------------------------
+    /*******************************************************************************
+    *                          Extern Data Declarations
+    *******************************************************************************/
 
-// Action
-ezlopi_error_t sensor_0007_I2C_GY271(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
+    /*******************************************************************************
+    *                          Extern Function Prototypes
+    *******************************************************************************/
+
+    /**
+    * @brief Function to operate on actions
+    *
+    * @param action Current Action to Operate on
+    * @param item Target-Item node
+    * @param arg Arg for action
+    * @param user_arg User-arg
+    * @return ezlopi_error_t
+    */
+    ezlopi_error_t SENSOR_0007_I2C_GY271(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
+
+    /**
+     * @brief Function to configure gy271
+     *
+     * @param item Target-Item node
+     * @return ezlopi_error_t
+     */
+    ezlopi_error_t __gy271_configure(l_ezlopi_item_t *item);
+    /**
+     * @brief Function to update gy271 value
+     *
+     * @param item Target-Item node
+     * @return true
+     * @return false
+     */
+    bool __gy271_update_value(l_ezlopi_item_t *item);
+    /**
+     * @brief Function to get raw values
+     *
+     * @param item Target-Item node
+     * @param calibrationData Pointer to Calibration Data
+     */
+    void __gy271_get_raw_max_min_values(l_ezlopi_item_t *item, int (*calibrationData)[2]);
+    //-----------------------------------------------------------------------------------------------
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // _SENSOR_0007_I2C_GY271_H_
+
+/*******************************************************************************
+*                          End of File
+*******************************************************************************/

@@ -103,23 +103,23 @@
 
    //------------------------------------------
    /**
-	* Please don't forget to uncomment ,
-	* -> If you added a voltage divider at sensor's analog output. [Make sure voltage does not exceed 2.5V]
-	*      |
-	*      |
-	*      V
-	*/
+   * Please don't forget to uncomment ,
+   * -> If you added a voltage divider at sensor's analog output. [Make sure voltage does not exceed 2.5V]
+   *      |
+   *      |
+   *      V
+   */
 #define VOLTAGE_DIVIDER_ADDED 1
-	//------------------------------------------
+   //------------------------------------------
 
-	/**
-	 * Before writing below  [mq9_eqv_RL], [m_slope_mq9], [b_coeff_mq9] shown values.
-	 * Please apply voltage-divider schematics as shown above.
-	 *
-	 * NOTE .1 : Mannually use multimeter and measure : eqv-resistance [mq9_eqv_RL], between [A0_pin vs GND] of 'MQ-9 sensor'
-	 *
-	 * NOTE .2 : For [m_slope_mq9] & [b_coeff_mq9] values:- follow [stage-1] above shown procedures.
-	 * */
+   /**
+    * Before writing below  [mq9_eqv_RL], [m_slope_mq9], [b_coeff_mq9] shown values.
+    * Please apply voltage-divider schematics as shown above.
+    *
+    * NOTE .1 : Mannually use multimeter and measure : eqv-resistance [mq9_eqv_RL], between [A0_pin vs GND] of 'MQ-9 sensor'
+    *
+    * NOTE .2 : For [m_slope_mq9] & [b_coeff_mq9] values:- follow [stage-1] above shown procedures.
+    * */
 
 #define mq9_eqv_RL 660.0f // review the upper diagram clearly to know why this value is assigned
 
@@ -127,16 +127,15 @@
 #define MQ9_VOLT_RESOLUTION_Vc 5.0f
 #define m_slope_mq9 -0.4654f
 #define b_coeff_mq9 1.3962f
-#define MQ9_HEATING_PERIOD 20   // in sec
-#define MQ9_AVG_CAL_COUNT 10
+#define MQ9_AVG_CAL_COUNT 4
 
 typedef enum
 {
-	MQ9_GAS_ALARM_NO_GAS,
-	MQ9_GAS_ALARM_COMBUSTIBLE_GAS_DETECTED,
-	MQ9_GAS_ALARM_TOXIC_GAS_DETECTED,
-	MQ9_GAS_ALARM_UNKNOWN,
-	MQ9_GAS_ALARM_MAX
+   MQ9_GAS_ALARM_NO_GAS,
+   MQ9_GAS_ALARM_COMBUSTIBLE_GAS_DETECTED,
+   MQ9_GAS_ALARM_TOXIC_GAS_DETECTED,
+   MQ9_GAS_ALARM_UNKNOWN,
+   MQ9_GAS_ALARM_MAX
 } e_mq9_gas_alarm_states_t;
 
 //--------------------------------------------------------------------------------------------------------

@@ -27,7 +27,7 @@
 typedef struct s_mq7_value
 {
     uint8_t status_flag : 3; // BIT2 = avg_volt_flag  ; BIT1 = loop_stop_flag  ; BIT0 = Calibration_complete_C0
-    uint8_t heating_dur;
+    uint8_t heating_count;
     uint8_t avg_vol_count;  // counter for calculating avg_voltage. 
     float calib_avg_volt;
     float _CO_ppm;
@@ -175,9 +175,9 @@ static ezlopi_error_t __0062_init(l_ezlopi_item_t *item)
                     { // calibrate if not done
                         if (0 == (BIT0 & MQ7_value->status_flag)) // Calibration_complete_CO == 0
                         {
-                            MQ7_value->heating_dur = MQ7_HEATING_PERIOD * 10;   //   [(20 * 100ms)* 10] = 20sec
-                            MQ7_value->avg_vol_count = MQ7_AVG_CAL_COUNT;       //            V
-                            EZPI_service_loop_add("mq7_loop", __calibrate_MQ7_R0_resistance, 100, (void *)item);
+                            MQ7_value->heating_count = 20;
+                            MQ7_value->avg_vol_count = MQ7_AVG_CAL_COUNT;
+                            EZPI_service_loop_add("mq7_loop", __calibrate_MQ7_R0_resistance, 1000, (void *)item);
                             // #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
                             //                             EZPI_core_process_set_process_info(ENUM_EZLOPI_SENSOR_MQ7_TASK, &ezlopi_sensor_mq7_task_handle, EZLOPI_SENSOR_MQ7_TASK_DEPTH);
                             // #endif
@@ -425,13 +425,13 @@ static void __calibrate_MQ7_R0_resistance(void *params)
             int mq7_adc_pin = item->interface.adc.gpio_num;
             //-------------------------------------------------
             // let the sensor to heat for 20seconds
-            if (MQ7_value->heating_dur > 0)
+            if (MQ7_value->heating_count > 0)
             {
-                if (0 == MQ7_value->heating_dur % 20)
-                {
-                    TRACE_E("Heating sensor.........time left: %d sec", MQ7_value->heating_dur / 10);
-                }
-                MQ7_value->heating_dur--;
+                // if (0 == MQ7_value->heating_count % 20)
+                // {
+                //     TRACE_E("Heating sensor.........time left: %d sec", MQ7_value->heating_count / 10);
+                // }
+                MQ7_value->heating_count--;
             }
             else // after heating the sensor for 20 sec
             {

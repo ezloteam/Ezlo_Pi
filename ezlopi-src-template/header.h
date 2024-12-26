@@ -84,6 +84,16 @@ extern "C"
     * @param arg
     *
     */
+
+    /**
+    * @brief Function to operate on actions
+    *
+    * @param action Current Action to Operate on
+    * @param item Target-Item node
+    * @param arg Arg for action
+    * @param user_arg User-arg
+    * @return ezlopi_error_t
+    */
     void EZPI_maincomponent_subcomponent_functiontitle(type_t arg);
 
 #ifdef __cplusplus

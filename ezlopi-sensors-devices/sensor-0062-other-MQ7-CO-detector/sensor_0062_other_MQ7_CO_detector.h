@@ -104,38 +104,37 @@
 
    //------------------------------------------
    /**
-	* Please don't forget to uncomment ,
-	* -> If you added a voltage divider at sensor's analog output. [Make sure voltage does not exceed 2.5V]
-	*      |
-	*      |
-	*      V
-	*/
+   * Please don't forget to uncomment ,
+   * -> If you added a voltage divider at sensor's analog output. [Make sure voltage does not exceed 2.5V]
+   *      |
+   *      |
+   *      V
+   */
 #define VOLTAGE_DIVIDER_ADDED 1
-	//------------------------------------------
+   //------------------------------------------
 
-	/**
-	 * Before writing below  [mq7_eqv_RL], [m_slope_mq7], [b_coeff_mq7] shown values.
-	 * Please apply voltage-divider schematics as shown above.
-	 *
-	 * NOTE .1 : Mannually use multimeter and measure : eqv-resistance [mq7_eqv_RL], between [A0_pin vs GND] of 'MQ7_sensor'
-	 *
-	 * NOTE .2 : For [m_slope_mq7] & [b_coeff_mq7] values:- follow [stage-1] above shown procedures.
-	 * */
+   /**
+    * Before writing below  [mq7_eqv_RL], [m_slope_mq7], [b_coeff_mq7] shown values.
+    * Please apply voltage-divider schematics as shown above.
+    *
+    * NOTE .1 : Mannually use multimeter and measure : eqv-resistance [mq7_eqv_RL], between [A0_pin vs GND] of 'MQ7_sensor'
+    *
+    * NOTE .2 : For [m_slope_mq7] & [b_coeff_mq7] values:- follow [stage-1] above shown procedures.
+    * */
 #define mq7_eqv_RL 1000.0f	   // review the upper diagram clearly to know why this value is assigned
 #define RatioMQ7CleanAir 27.5f // -> [RS / R0] = 27.5f
 #define MQ7_VOLT_RESOLUTION_Vc 5.0f
 #define m_slope_mq7 -0.6825f
 #define b_coeff_mq7 1.365f
-#define MQ7_HEATING_PERIOD 20   // in sec
-#define MQ7_AVG_CAL_COUNT 10
+#define MQ7_AVG_CAL_COUNT 4
 
 typedef enum
 {
-	MQ7_GAS_ALARM_NO_GAS,
-	MQ7_GAS_ALARM_COMBUSTIBLE_GAS_DETECTED,
-	MQ7_GAS_ALARM_TOXIC_GAS_DETECTED,
-	MQ7_GAS_ALARM_UNKNOWN,
-	MQ7_GAS_ALARM_MAX
+   MQ7_GAS_ALARM_NO_GAS,
+   MQ7_GAS_ALARM_COMBUSTIBLE_GAS_DETECTED,
+   MQ7_GAS_ALARM_TOXIC_GAS_DETECTED,
+   MQ7_GAS_ALARM_UNKNOWN,
+   MQ7_GAS_ALARM_MAX
 } e_mq7_gas_alarm_states_t;
 
 
