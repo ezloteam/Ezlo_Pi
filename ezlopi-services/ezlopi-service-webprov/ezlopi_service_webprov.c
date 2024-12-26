@@ -232,7 +232,7 @@ static void __fetch_wss_endpoint(void *pv)
 
                 if (rx_message && (ret == pdTRUE))
                 {
-                    cJSON *cj_method_dup = NULL;
+                    char *method_str = NULL;
 
                     if (rx_message->payload)
                     {
@@ -243,8 +243,13 @@ static void __fetch_wss_endpoint(void *pv)
 
                             if (cj_method)
                             {
-                                cj_method_dup = cJSON_Duplicate(__FUNCTION__, cj_method, true);
+                                method_str = ezlopi_malloc(__FUNCTION__, cj_method->str_value_len + 1);
+                                if (method_str)
+                                {
+                                    snprintf(method_str, cj_method->str_value_len + 1, "%.*s", cj_method->str_value_len, cj_method->valuestring);
+                                }
 
+                                // cj_method_dup = cJSON_Duplicate(__FUNCTION__, cj_method, true);
                                 // printf("web-provisioning [method: %.*s]\r\n%s\r\n", cj_method->str_value_len, cj_method->valuestring, rx_message->payload);
                                 // TRACE_D("rx_message->payload [method: %.*s]\r\n%s", cj_method->str_value_len, cj_method->valuestring, rx_message->payload);
                                 ezlopi_free(__FUNCTION__, rx_message->payload);
@@ -268,6 +273,31 @@ static void __fetch_wss_endpoint(void *pv)
                     ezlopi_free(__FUNCTION__, rx_message);
 
 #if 1
+                    s_otel_trace_t *trace_obj = ezlopi_malloc(__FUNCTION__, sizeof(s_otel_trace_t));
+                    if (trace_obj)
+                    {
+                        memset(trace_obj, 0, sizeof(s_otel_trace_t));
+
+                        trace_obj->kind = E_OTEL_KIND_SERVER;
+                        trace_obj->start_time = rx_message->time_ms;
+                        trace_obj->end_time = EZPI_core_sntp_get_current_time_sec();
+                        trace_obj->free_heap = esp_get_free_heap_size();
+                        trace_obj->heap_watermark = esp_get_minimum_free_heap_size();
+
+                        trace_obj->method = method_str;
+                        method_str = NULL;
+
+                        if (0 == ezlopi_service_otel_add_trace_to_telemetry_queue_struct(trace_obj))
+                        {
+                            ezlopi_free(__FUNCTION__, trace_obj->method);
+                            ezlopi_free(__FUNCTION__, trace_obj);
+                        }
+                    }
+
+                    ezlopi_free(__FUNCTION__, method_str);
+#endif
+
+#if 0
                     if (cj_method_dup)
                     {
                         cJSON *cj_trace_telemetry = cJSON_CreateObject(__FUNCTION__);

@@ -704,12 +704,6 @@ static void ezpi_service_uart_task(void *arg)
                 buffred_data_len = tmp_len;
                 vTaskDelay(10 / portTICK_RATE_MS);
                 uart_get_buffered_data_len(EZPI_SERV_UART_NUM_DEFAULT, &tmp_len);
-
-                if (tmp_len > EZPI_SERV_UART_RX_BUFFER_SIZE)
-                {
-                    buffred_data_len = tmp_len;
-                    break;
-                }
             }
 
             if (buffred_data_len)

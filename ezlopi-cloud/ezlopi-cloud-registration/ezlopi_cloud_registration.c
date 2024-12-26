@@ -110,8 +110,8 @@ static void EZPI_create_reg_packet(void)
             snprintf(mac_str, sizeof(mac_str), "%02X:%02X:%02X:%02X:%02X:%02X",
                      mac_addr[0], mac_addr[1], mac_addr[2], mac_addr[3], mac_addr[4], mac_addr[5]);
 
-            cJSON_AddStringToObject(__FUNCTION__, cj_reg_data, "id", "__ID__");
-            cJSON_AddStringToObject(__FUNCTION__, cj_reg_data, ezlopi_method_str, "register");
+            cJSON_AddStringToObject(__FUNCTION__, cj_reg_data, ezlopi_id_str, "__ID__");
+            cJSON_AddStringToObject(__FUNCTION__, cj_reg_data, ezlopi_method_str, ezlopi_register_str);
 
             cJSON *cj_params = cJSON_AddObjectToObject(__FUNCTION__, cj_reg_data, ezlopi_params_str);
 
@@ -121,23 +121,23 @@ static void EZPI_create_reg_packet(void)
 
                 unsigned long long __id = EZPI_core_factory_info_v3_get_id();
                 snprintf(__id_str, sizeof(__id_str), "%llu", __id);
-                cJSON_AddStringToObject(__FUNCTION__, cj_params, "serial", __id_str);
+                cJSON_AddStringToObject(__FUNCTION__, cj_params, ezlopi_serial_str, __id_str);
 
                 cJSON_AddStringToObject(__FUNCTION__, cj_params, ezlopi_firmware_str, VERSION_STR);
-                cJSON_AddNumberToObject(__FUNCTION__, cj_params, "timeOffset", 20700);
-                cJSON_AddStringToObject(__FUNCTION__, cj_params, "media", "radio");
-                cJSON_AddStringToObject(__FUNCTION__, cj_params, "hubType", "32.1");
+                cJSON_AddNumberToObject(__FUNCTION__, cj_params, ezlopi_timeOffset_str, 20700);
+                cJSON_AddStringToObject(__FUNCTION__, cj_params, ezlopi_media_str, ezlopi_radio_str);
+                cJSON_AddStringToObject(__FUNCTION__, cj_params, ezlopi_hubType_str, "32.1");
                 // cJSON_AddStringToObject(__FUNCTION__, cj_params, "mac_address", "11:22:33:44:55:66");
 
                 char *__device_uuid = EZPI_core_factory_info_v3_get_device_uuid();
                 if (__device_uuid)
                 {
-                    cJSON_AddStringToObject(__FUNCTION__, cj_params, "controller_uuid", __device_uuid);
+                    cJSON_AddStringToObject(__FUNCTION__, cj_params, ezlopi_controller_uuid_str, __device_uuid);
                     ezlopi_free(__FUNCTION__, __device_uuid);
                 }
 
-                cJSON_AddStringToObject(__FUNCTION__, cj_params, "mac_address", mac_str);
-                cJSON_AddNumberToObject(__FUNCTION__, cj_params, "maxFrameSize", (20 * 1024));
+                cJSON_AddStringToObject(__FUNCTION__, cj_params, ezlopi_mac_address_str, mac_str);
+                cJSON_AddNumberToObject(__FUNCTION__, cj_params, ezlopi_maxFrameSize_str, (20 * 1024));
             }
         }
     }

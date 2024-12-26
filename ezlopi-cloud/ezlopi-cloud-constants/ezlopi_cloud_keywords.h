@@ -547,6 +547,14 @@ extern "C"
     extern const char *ezlopi_otel_c_str;
     extern const char *ezlopi_trace_str;
     extern const char *ezlopi_otel_version_str;
+    extern const char *ezlopi_timeOffset_str;
+    extern const char *ezlopi_register_str;
+    extern const char *ezlopi_media_str;
+    extern const char *ezlopi_radio_str;
+    extern const char *ezlopi_hubType_str;
+    extern const char *ezlopi_controller_uuid_str;
+    extern const char *ezlopi_mac_address_str;
+    extern const char *ezlopi_maxFrameSize_str;
 
 #ifdef __cplusplus
 }

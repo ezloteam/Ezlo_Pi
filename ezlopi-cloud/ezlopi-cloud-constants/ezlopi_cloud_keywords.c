@@ -538,6 +538,14 @@ const char *ezlopi_body_str = "body";
 const char *ezlopi_otel_c_str = "otel-c";
 const char *ezlopi_trace_str = "trace";
 const char *ezlopi_otel_version_str = "1.0.0";
+const char *ezlopi_timeOffset_str = "timeOffset";
+const char *ezlopi_register_str = "register";
+const char *ezlopi_media_str = "media";
+const char *ezlopi_radio_str = "radio";
+const char *ezlopi_hubType_str = "hubType";
+const char *ezlopi_controller_uuid_str = "controller_uuid";
+const char *ezlopi_mac_address_str = "mac_address";
+const char *ezlopi_maxFrameSize_str = "maxFrameSize";
 
 #endif // __EZLOPI_CLOUD_KEYWORDS_H__
 /*******************************************************************************

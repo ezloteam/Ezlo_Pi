@@ -96,14 +96,42 @@ static void __broadcast_loop(void *arg)
     {
         if ((xTaskGetTickCount() - broadcast_wait_start) > 5 / portTICK_RATE_MS)
         {
-            cJSON *cj_method = cJSON_GetObjectItem(__FUNCTION__, cj_data, ezlopi_method_str);
+            double start_time = 0;
+            char *id_str = NULL;
+            char *msg_subclass_str = NULL;
+
+            cJSON *cj_id = cJSON_GetObjectItem(__FUNCTION__, cj_data, ezlopi_id_str);
+            if (cj_id && cj_id->valuestring && (cj_id->type == cJSON_String) && cj_id->str_value_len)
+            {
+                id_str = ezlopi_malloc(__FUNCTION__, cj_id->str_value_len + 1);
+                if (id_str)
+                {
+                    snprintf(id_str, cj_id->str_value_len + 1, "%.*s", cj_id->str_value_len, cj_id->valuestring);
+                }
+            }
+
             cJSON *cj_msg_subclass = cJSON_GetObjectItem(__FUNCTION__, cj_data, ezlopi_msg_subclass_str);
+            if (cj_msg_subclass && cj_msg_subclass->valuestring && (cj_msg_subclass->type == cJSON_String) && cj_msg_subclass->str_value_len)
+            {
+                msg_subclass_str = ezlopi_malloc(__FUNCTION__, cj_msg_subclass->str_value_len + 1);
+                if (msg_subclass_str)
+                {
+                    snprintf(msg_subclass_str, cj_msg_subclass->str_value_len + 1, "%.*s", cj_msg_subclass->str_value_len, cj_msg_subclass->valuestring);
+                }
+            }
+
             cJSON *cj_startTime = cJSON_DetachItemFromObject(__FUNCTION__, cj_data, ezlopi_startTime_str);
+            if (cj_startTime)
+            {
+                start_time = cj_startTime->valuedouble;
+                cJSON_Delete(__FUNCTION__, cj_startTime);
+            }
 
             EZPI_core_broadcast_cjson(cj_data);
             cJSON_Delete(__FUNCTION__, cj_data);
             cj_data = NULL;
 
+#if 1
             s_otel_trace_t *trace_obj = ezlopi_malloc(__FUNCTION__, sizeof(s_otel_trace_t));
             if (trace_obj)
             {
@@ -115,31 +143,25 @@ static void __broadcast_loop(void *arg)
                 trace_obj->free_heap = esp_get_free_heap_size();
                 trace_obj->heap_watermark = esp_get_minimum_free_heap_size();
 
-                if (cj_msg_subclass && (cj_msg_subclass->type == cJSON_String) && cj_msg_subclass->valuestring && cj_msg_subclass->str_value_len)
-                {
-                    trace_obj->msg_subclass = ezlopi_malloc(__FUNCTION__, cj_msg_subclass->str_value_len + 1);
-                    if (trace_obj->msg_subclass)
-                    {
-                        snprintf(trace_obj->msg_subclass, cj_msg_subclass->str_value_len + 1, "%.*s", cj_msg_subclass->str_value_len, cj_msg_subclass->valuestring);
-                    }
-                }
+                trace_obj->id = id_str;
+                trace_obj->msg_subclass = msg_subclass_str;
 
-                if (cj_method && (cj_method->type == cJSON_String) && cj_method->valuestring && cj_method->str_value_len)
-                {
-                    trace_obj->method = ezlopi_malloc(__FUNCTION__, cj_method->str_value_len + 1);
-                    if (trace_obj->method)
-                    {
-                        snprintf(trace_obj->method, cj_method->str_value_len + 1, "%.*s", cj_method->str_value_len, cj_method->valuestring);
-                    }
-                }
-
-                cJSON_Delete(__FUNCTION__, cj_startTime);
+                id_str = NULL;
+                msg_subclass_str = NULL;
 
                 if (0 == ezlopi_service_otel_add_trace_to_telemetry_queue_struct(trace_obj))
                 {
+
+                    id_str = trace_obj->id;                     // re-assigning to free in case adding to queue fails
+                    msg_subclass_str = trace_obj->msg_subclass; // re-assigning to free in case adding to queue fails
                     ezlopi_free(__FUNCTION__, trace_obj);
                 }
             }
+
+            ezlopi_free(__FUNCTION__, id_str);
+            ezlopi_free(__FUNCTION__, msg_subclass_str);
+
+#endif
 
 #if 0
             if (cj_method_dup || cj_msg_subclass_dup)
@@ -147,7 +169,7 @@ static void __broadcast_loop(void *arg)
                 cJSON *cj_trace_telemetry = cJSON_CreateObject(__FUNCTION__);
                 if (cj_trace_telemetry)
                 {
-                    if (false == cJSON_AddItemToObject(__FUNCTION__, cj_trace_telemetry, ezlopi_method_str, cj_method_dup))
+                    if (false == cJSON_AddItemToObject(__FUNCTION__, cj_trace_telemetry, ezlopi_id_str, cj_method_dup))
                     {
                         cJSON_Delete(__FUNCTION__, cj_method_dup);
                     }
