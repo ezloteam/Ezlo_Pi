@@ -39,14 +39,11 @@
 /*******************************************************************************
 *                          Include Files
 *******************************************************************************/
-#include "ezlopi_util_trace.h"
 
-// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
-#include "ezlopi_core_errors.h"
 
 #include "ezlopi_hal_pwm.h"
 
@@ -101,7 +98,7 @@ static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg);
 /*******************************************************************************
 *                          Extern Function Definitions
 *******************************************************************************/
-ezlopi_error_t DEVICE_0038_other_RGB(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+ezlopi_error_t DEVICE_0038_other_rgb(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
 
@@ -296,7 +293,7 @@ static ezlopi_error_t __set_cjson_value(l_ezlopi_item_t *item, void *arg)
 
 static ezlopi_error_t __init(l_ezlopi_item_t *item)
 {
-    ezlopi_error_t ret = EZPI_SUCCESS;
+    ezlopi_error_t ret = EZPI_ERR_INIT_DEVICE_FAILED;
 
     if (item)
     {
@@ -339,23 +336,11 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
                     RGB_LED_change_color_value(rgb_args);
 
                     rgb_args->RGB_LED_initialized = true;
+                    ret = EZPI_SUCCESS;
                 }
             }
-            else
-            {
-                ret = EZPI_ERR_INIT_DEVICE_FAILED;
-            }
-        }
-        else
-        {
-            ret = EZPI_ERR_INIT_DEVICE_FAILED;
         }
     }
-    else
-    {
-        ret = EZPI_ERR_INIT_DEVICE_FAILED;
-    }
-
     return ret;
 }
 
@@ -459,7 +444,7 @@ static void __prepare_RGB_LED_dimmer_item(l_ezlopi_item_t *item, cJSON *cj_devic
 
 static ezlopi_error_t __prepare(void *arg)
 {
-    ezlopi_error_t ret = EZPI_SUCCESS;
+    ezlopi_error_t ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
 
     s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
     if (prep_arg && prep_arg->cjson_device)
@@ -476,41 +461,39 @@ static ezlopi_error_t __prepare(void *arg)
                 __prepare_device_cloud_properties(RGB_device, prep_arg->cjson_device);
                 __prepare_RGB_LED_user_args(rgb_args, prep_arg->cjson_device);
 
-                rgb_args->RGB_LED_item = EZPI_core_device_add_item_to_device(RGB_device, device_0038_other_RGB);
+                rgb_args->RGB_LED_item = EZPI_core_device_add_item_to_device(RGB_device, DEVICE_0038_other_rgb);
                 if (rgb_args->RGB_LED_item)
                 {
                     __prepare_RGB_LED_item(rgb_args->RGB_LED_item, prep_arg->cjson_device, rgb_args);
                 }
 
-                rgb_args->RGB_LED_onoff_switch_item = EZPI_core_device_add_item_to_device(RGB_device, device_0038_other_RGB);
+                rgb_args->RGB_LED_onoff_switch_item = EZPI_core_device_add_item_to_device(RGB_device, DEVICE_0038_other_rgb);
                 if (rgb_args->RGB_LED_onoff_switch_item)
                 {
                     __prepare_RGB_LED_onoff_switch_item(rgb_args->RGB_LED_onoff_switch_item, prep_arg->cjson_device, rgb_args);
                 }
 
-                rgb_args->RGB_LED_dimmer_item = EZPI_core_device_add_item_to_device(RGB_device, device_0038_other_RGB);
+                rgb_args->RGB_LED_dimmer_item = EZPI_core_device_add_item_to_device(RGB_device, DEVICE_0038_other_rgb);
                 if (rgb_args->RGB_LED_dimmer_item)
                 {
                     __prepare_RGB_LED_dimmer_item(rgb_args->RGB_LED_dimmer_item, prep_arg->cjson_device, rgb_args);
                 }
-
+                //-----------------------------------------------------------------------------------------------------
                 if (!rgb_args->RGB_LED_item && !rgb_args->RGB_LED_onoff_switch_item && !rgb_args->RGB_LED_dimmer_item)
                 {
                     ezlopi_free(__FUNCTION__, rgb_args);
                     EZPI_core_device_free_device(RGB_device);
-                    ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
+                }
+                else
+                {
+                    ret = EZPI_SUCCESS;
                 }
             }
             else
             {
                 EZPI_core_device_free_device(RGB_device);
-                ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
             }
         }
-    }
-    else
-    {
-        ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
     }
 
     return ret;

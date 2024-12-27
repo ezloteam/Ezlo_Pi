@@ -42,14 +42,11 @@
 #include "soc/rtc.h"
 #include "driver/gpio.h"
 #include "driver/mcpwm.h"
-#include "ezlopi_util_trace.h"
 
-// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
-#include "ezlopi_core_errors.h"
 
 #include "ezlopi_hal_gpio.h"
 
@@ -98,7 +95,6 @@ static esp_err_t ultrasonic_measure_raw(const s_ultrasonic_sensor_t *dev, uint32
 *******************************************************************************/
 static portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
 
-
 /*******************************************************************************
 *                          Extern Data Definitions
 *******************************************************************************/
@@ -146,9 +142,6 @@ ezlopi_error_t SENSOR_0024_other_HCSR04_v3(e_ezlopi_actions_t action, l_ezlopi_i
 /*******************************************************************************
 *                         Static Function Definitions
 *******************************************************************************/
-
-
-
 static ezlopi_error_t __get_value_cjson(l_ezlopi_item_t *item, void *arg)
 {
     ezlopi_error_t ret = EZPI_FAILED;
@@ -280,7 +273,7 @@ static ezlopi_error_t __prepare(void *arg)
             if (device)
             {
                 __setup_device_cloud_properties(device, cj_device);
-                l_ezlopi_item_t *item = EZPI_core_device_add_item_to_device(device, sensor_0024_other_HCSR04_v3);
+                l_ezlopi_item_t *item = EZPI_core_device_add_item_to_device(device, SENSOR_0024_other_HCSR04_v3);
                 if (item)
                 {
                     __setup_item_properties(item, cj_device);

@@ -40,9 +40,7 @@
 *                          Include Files
 *******************************************************************************/
 #include <math.h>
-#include "ezlopi_util_trace.h"
 
-// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
@@ -90,7 +88,7 @@ static void __prepare_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj
 /*******************************************************************************
 *                          Extern Function Definitions
 *******************************************************************************/
-ezlopi_error_t SENSOR_0006_I2C_ADXL345(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+ezlopi_error_t SENSOR_0006_i2c_adxl345(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
     switch (action)
@@ -180,7 +178,7 @@ static void __prepare_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj
 
 static ezlopi_error_t __prepare(void *arg)
 {
-    ezlopi_error_t ret = EZPI_SUCCESS;
+    ezlopi_error_t ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
     s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
     if (prep_arg && prep_arg->cjson_device)
     {
@@ -194,7 +192,7 @@ static ezlopi_error_t __prepare(void *arg)
             {
                 TRACE_I("Parent_adxl345_acc-x-[0x%x] ", adxl345_parent_x_device->cloud_properties.device_id);
                 __prepare_device_cloud_properties(adxl345_parent_x_device, cj_device);
-                l_ezlopi_item_t *x_item = EZPI_core_device_add_item_to_device(adxl345_parent_x_device, sensor_0006_I2C_ADXL345);
+                l_ezlopi_item_t *x_item = EZPI_core_device_add_item_to_device(adxl345_parent_x_device, SENSOR_0006_i2c_adxl345);
                 if (x_item)
                 {
                     x_item->cloud_properties.item_name = ezlopi_item_name_acceleration_x_axis;
@@ -208,7 +206,7 @@ static ezlopi_error_t __prepare(void *arg)
                     TRACE_I("child_mpu6050_acc-y-[0x%x] ", adxl345_child_y_device->cloud_properties.device_id);
                     __prepare_device_cloud_properties(adxl345_child_y_device, cj_device);
 
-                    l_ezlopi_item_t *y_item = EZPI_core_device_add_item_to_device(adxl345_child_y_device, sensor_0006_I2C_ADXL345);
+                    l_ezlopi_item_t *y_item = EZPI_core_device_add_item_to_device(adxl345_child_y_device, SENSOR_0006_i2c_adxl345);
                     if (y_item)
                     {
                         y_item->cloud_properties.item_name = ezlopi_item_name_acceleration_y_axis;
@@ -217,7 +215,6 @@ static ezlopi_error_t __prepare(void *arg)
                     }
                     else
                     {
-                        ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                         EZPI_core_device_free_device(adxl345_child_y_device);
                     }
                 }
@@ -228,7 +225,7 @@ static ezlopi_error_t __prepare(void *arg)
                     TRACE_I("child_mpu6050_acc-z-[0x%x] ", adxl345_child_z_device->cloud_properties.device_id);
                     __prepare_device_cloud_properties(adxl345_child_z_device, cj_device);
 
-                    l_ezlopi_item_t *z_item = EZPI_core_device_add_item_to_device(adxl345_child_z_device, sensor_0006_I2C_ADXL345);
+                    l_ezlopi_item_t *z_item = EZPI_core_device_add_item_to_device(adxl345_child_z_device, SENSOR_0006_i2c_adxl345);
                     if (z_item)
                     {
                         z_item->cloud_properties.item_name = ezlopi_item_name_acceleration_z_axis;
@@ -237,7 +234,6 @@ static ezlopi_error_t __prepare(void *arg)
                     }
                     else
                     {
-                        ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                         EZPI_core_device_free_device(adxl345_child_z_device);
                     }
                 }
@@ -248,23 +244,17 @@ static ezlopi_error_t __prepare(void *arg)
                 {
                     EZPI_core_device_free_device(adxl345_parent_x_device);
                     ezlopi_free(__FUNCTION__, user_data);
-                    ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
+                }
+                else
+                {
+                    ret = EZPI_SUCCESS;
                 }
             }
             else
             {
                 ezlopi_free(__FUNCTION__, user_data);
-                ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
             }
         }
-        else
-        {
-            ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
-        }
-    }
-    else
-    {
-        ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
     }
 
     return ret;
@@ -272,7 +262,7 @@ static ezlopi_error_t __prepare(void *arg)
 
 static ezlopi_error_t __init(l_ezlopi_item_t *item)
 {
-    ezlopi_error_t ret = EZPI_SUCCESS;
+    ezlopi_error_t ret = EZPI_ERR_INIT_DEVICE_FAILED;
     if (item)
     {
         s_adxl345_data_t *user_data = (s_adxl345_data_t *)item->user_arg;
@@ -281,19 +271,12 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
             if (item->interface.i2c_master.enable)
             {
                 EZPI_hal_i2c_master_init(&item->interface.i2c_master);
-                if (0 == __adxl345_configure_device(item)) // ESP_OK
+                if (0 == ADXL345_configure_device(item)) // ESP_OK
                 {
                     TRACE_S("Configuration Complete...");
-                }
-                else
-                {
-                    ret = EZPI_ERR_INIT_DEVICE_FAILED;
+                    ret = EZPI_SUCCESS;
                 }
             }
-        }
-        else
-        {
-            ret = EZPI_ERR_INIT_DEVICE_FAILED;
         }
     }
     return ret;
@@ -345,7 +328,7 @@ static ezlopi_error_t __notify(l_ezlopi_item_t *item)
             if (ezlopi_item_name_acceleration_x_axis == item->cloud_properties.item_name)
             {
                 __prev[0] = user_data->acc_x;
-                __adxl345_get_axis_value(item);
+                ADXL345_get_axis_value(item);
                 if (fabs((__prev[0] - user_data->acc_x) > 0.5))
                 {
                     EZPI_core_device_value_updated_from_device_broadcast(item);
@@ -376,4 +359,4 @@ static ezlopi_error_t __notify(l_ezlopi_item_t *item)
 
 /*******************************************************************************
 *                          End of File
-*******************************************************************************
+*******************************************************************************/

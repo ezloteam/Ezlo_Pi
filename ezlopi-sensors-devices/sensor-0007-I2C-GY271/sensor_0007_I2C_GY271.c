@@ -40,15 +40,12 @@
 *                          Include Files
 *******************************************************************************/
 #include <math.h>
-#include "ezlopi_util_trace.h"
 
-// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
 #include "ezlopi_core_processes.h"
-#include "ezlopi_core_errors.h"
 
 #include "ezlopi_hal_i2c_master.h"
 
@@ -92,7 +89,7 @@ static void __gy271_calibration_task(void *params);
 /*******************************************************************************
 *                          Extern Function Definitions
 *******************************************************************************/
-ezlopi_error_t SENSOR_0007_I2C_GY271(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+ezlopi_error_t SENSOR_0007_i2c_gy271(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
     switch (action)
@@ -215,7 +212,7 @@ static void __prepare_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj
 
 static ezlopi_error_t __prepare(void *arg)
 {
-    ezlopi_error_t ret = EZPI_SUCCESS;
+    ezlopi_error_t ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
     s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
     if (prep_arg && prep_arg->cjson_device)
     {
@@ -230,7 +227,7 @@ static ezlopi_error_t __prepare(void *arg)
                 ret = 1;
                 TRACE_I("Parent_gy271-x-[0x%x] ", gy271_device_parent_x_device->cloud_properties.device_id);
                 __prepare_device_cloud_properties_parent_x(gy271_device_parent_x_device, cj_device);
-                l_ezlopi_item_t *gyro_x_item = EZPI_core_device_add_item_to_device(gy271_device_parent_x_device, sensor_0007_I2C_GY271);
+                l_ezlopi_item_t *gyro_x_item = EZPI_core_device_add_item_to_device(gy271_device_parent_x_device, SENSOR_0007_i2c_gy271);
                 if (gyro_x_item)
                 {
                     __prepare_item_cloud_properties(gyro_x_item, user_data);
@@ -246,7 +243,7 @@ static ezlopi_error_t __prepare(void *arg)
                     TRACE_I("Child_gy271-y-[0x%x] ", gy271_device_child_y_device->cloud_properties.device_id);
                     __prepare_device_cloud_properties_child_y(gy271_device_child_y_device, cj_device);
 
-                    l_ezlopi_item_t *gyro_y_item = EZPI_core_device_add_item_to_device(gy271_device_child_y_device, sensor_0007_I2C_GY271);
+                    l_ezlopi_item_t *gyro_y_item = EZPI_core_device_add_item_to_device(gy271_device_child_y_device, SENSOR_0007_i2c_gy271);
                     if (gyro_y_item)
                     {
                         __prepare_item_cloud_properties(gyro_y_item, user_data);
@@ -257,7 +254,6 @@ static ezlopi_error_t __prepare(void *arg)
                     }
                     else
                     {
-                        ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                         EZPI_core_device_free_device(gy271_device_child_y_device);
                     }
                 }
@@ -268,7 +264,7 @@ static ezlopi_error_t __prepare(void *arg)
                     TRACE_I("Child_gy271-z-[0x%x] ", gy271_device_child_z_device->cloud_properties.device_id);
                     __prepare_device_cloud_properties_child_z(gy271_device_child_z_device, cj_device);
 
-                    l_ezlopi_item_t *gyro_z_item = EZPI_core_device_add_item_to_device(gy271_device_child_z_device, sensor_0007_I2C_GY271);
+                    l_ezlopi_item_t *gyro_z_item = EZPI_core_device_add_item_to_device(gy271_device_child_z_device, SENSOR_0007_i2c_gy271);
                     if (gyro_z_item)
                     {
                         __prepare_item_cloud_properties(gyro_z_item, user_data);
@@ -279,7 +275,6 @@ static ezlopi_error_t __prepare(void *arg)
                     }
                     else
                     {
-                        ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                         EZPI_core_device_free_device(gy271_device_child_z_device);
                     }
                 }
@@ -289,7 +284,7 @@ static ezlopi_error_t __prepare(void *arg)
                     TRACE_I("Child_gy271-azi-[0x%x] ", gy271_device_child_azi_device->cloud_properties.device_id);
                     __prepare_device_cloud_properties_child_azi(gy271_device_child_azi_device, cj_device);
 
-                    l_ezlopi_item_t *gyro_azi_item = EZPI_core_device_add_item_to_device(gy271_device_child_azi_device, sensor_0007_I2C_GY271);
+                    l_ezlopi_item_t *gyro_azi_item = EZPI_core_device_add_item_to_device(gy271_device_child_azi_device, SENSOR_0007_i2c_gy271);
                     if (gyro_azi_item)
                     {
                         __prepare_item_cloud_properties(gyro_azi_item, user_data);
@@ -300,7 +295,6 @@ static ezlopi_error_t __prepare(void *arg)
                     }
                     else
                     {
-                        ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                         EZPI_core_device_free_device(gy271_device_child_azi_device);
                     }
                 }
@@ -310,7 +304,7 @@ static ezlopi_error_t __prepare(void *arg)
                     TRACE_I("Child_gy271-temp-[0x%x] ", gy271_device_child_temp_device->cloud_properties.device_id);
                     __prepare_device_cloud_properties_child_temp(gy271_device_child_temp_device, cj_device);
 
-                    l_ezlopi_item_t *gyro_temp_item = EZPI_core_device_add_item_to_device(gy271_device_child_temp_device, sensor_0007_I2C_GY271);
+                    l_ezlopi_item_t *gyro_temp_item = EZPI_core_device_add_item_to_device(gy271_device_child_temp_device, SENSOR_0007_i2c_gy271);
                     if (gyro_temp_item)
                     {
                         __prepare_item_cloud_properties(gyro_temp_item, user_data);
@@ -321,7 +315,6 @@ static ezlopi_error_t __prepare(void *arg)
                     }
                     else
                     {
-                        ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                         EZPI_core_device_free_device(gy271_device_child_temp_device);
                     }
                 }
@@ -332,24 +325,18 @@ static ezlopi_error_t __prepare(void *arg)
                     (NULL == gy271_device_child_azi_device) &&
                     (NULL == gy271_device_child_temp_device))
                 {
-                    ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                     EZPI_core_device_free_device(gy271_device_parent_x_device);
+                }
+                else
+                {
+                    ret = EZPI_SUCCESS;
                 }
             }
             else // if the parent_device dosenot exsist then dealloc the 'user_data'
             {
                 ezlopi_free(__FUNCTION__, user_data);
-                ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
             }
         }
-        else
-        {
-            ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
-        }
-    }
-    else
-    {
-        ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
     }
     return ret;
 }
@@ -366,7 +353,7 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
             {
                 EZPI_hal_i2c_master_init(&item->interface.i2c_master);
                 TRACE_I("I2C initialized to channel %d", item->interface.i2c_master.channel);
-                if (0 == __gy271_configure(item)) // ESP_OK
+                if (0 == GY271_configure_init(item)) // ESP_OK
                 {
                     // TRACE_D(" CONFIGURATION  Compplete _____ Calibration Started _____");
                     TaskHandle_t ezlopi_sensor_gy271_callibrationb_task_handle = NULL;
@@ -378,9 +365,9 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
                 }
             }
         }
-    }
+        }
     return ret;
-}
+    }
 
 static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 {
@@ -442,7 +429,7 @@ static ezlopi_error_t __notify(l_ezlopi_item_t *item)
                     __prev[2] = user_data->Z;
                     __prev[3] = user_data->T;
                     __prev[4] = user_data->azimuth;
-                    if (__gy271_update_value(item))
+                    if (GY271_update_value(item))
                     {
                         if (fabs(__prev[0] - user_data->X) > 0.1)
                         {
@@ -499,7 +486,7 @@ static void __gy271_calibration_task(void *params) // calibrate task
         {
             for (uint16_t i = 0; i <= 50; i++)
             {
-                __gy271_get_raw_max_min_values(item, calibrationData);
+                GY271_get_raw_max_min_values(item, calibrationData);
                 vTaskDelay(200 / portTICK_PERIOD_MS);
             }
 

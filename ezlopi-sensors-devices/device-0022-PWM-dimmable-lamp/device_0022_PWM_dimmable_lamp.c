@@ -40,14 +40,11 @@
 *                          Include Files
 *******************************************************************************/
 #include <math.h>
-#include "ezlopi_util_trace.h"
 
-// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
-#include "ezlopi_core_errors.h"
 
 #include "ezlopi_hal_pwm.h"
 
@@ -102,7 +99,7 @@ static ezlopi_error_t __set_cjson_value(l_ezlopi_item_t *item, void *arg);
 *                          Extern Function Definitions
 *******************************************************************************/
 
-ezlopi_error_t DEVICE_0022_PWM_dimmable_lamp(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+ezlopi_error_t DEVICE_0022_pwm_dimmable_lamp(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
 
@@ -260,7 +257,7 @@ static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 
 static ezlopi_error_t __init(l_ezlopi_item_t *item)
 {
-    ezlopi_error_t ret = EZPI_SUCCESS;
+    ezlopi_error_t ret = EZPI_ERR_INIT_DEVICE_FAILED;
     if (item)
     {
         if (GPIO_IS_VALID_GPIO(item->interface.pwm.gpio_num))
@@ -281,21 +278,15 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
                         dimmable_bulb_arg->previous_brightness_value = item->interface.pwm.duty_cycle;
                         dimmable_bulb_arg->dimmable_bulb_initialized = true;
                         EZPI_hal_pwm_change_duty(item->interface.pwm.channel, item->interface.pwm.speed_mode, item->interface.pwm.duty_cycle);
-                    }
-                    else
-                    {
-                        ret = EZPI_ERR_INIT_DEVICE_FAILED;
+
+                        ret = EZPI_SUCCESS;
                     }
                 }
+                else
+                {
+                    ret = EZPI_SUCCESS;
+                }
             }
-            else
-            {
-                ret = EZPI_ERR_INIT_DEVICE_FAILED;
-            }
-        }
-        else
-        {
-            ret = EZPI_ERR_INIT_DEVICE_FAILED;
         }
     }
     return ret;
@@ -402,7 +393,7 @@ static void __prepare_dimmer_switch_item_properties(l_ezlopi_item_t *item, cJSON
 
 static ezlopi_error_t __prepare(void *arg)
 {
-    ezlopi_error_t ret = EZPI_SUCCESS;
+    ezlopi_error_t ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
 
     s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
     if (prep_arg && prep_arg->cjson_device)
@@ -420,7 +411,7 @@ static ezlopi_error_t __prepare(void *arg)
                 dimmable_bulb_arg->previous_brightness_value = 4095;
                 dimmable_bulb_arg->dimmable_bulb_initialized = false;
 
-                dimmable_bulb_arg->item_dimmer = EZPI_core_device_add_item_to_device(device, device_0022_PWM_dimmable_lamp);
+                dimmable_bulb_arg->item_dimmer = EZPI_core_device_add_item_to_device(device, DEVICE_0022_pwm_dimmable_lamp);
                 if (dimmable_bulb_arg->item_dimmer)
                 {
                     dimmable_bulb_arg->item_dimmer->user_arg = dimmable_bulb_arg;
@@ -428,7 +419,7 @@ static ezlopi_error_t __prepare(void *arg)
                     __prepare_dimmer_item_properties(dimmable_bulb_arg->item_dimmer, prep_arg->cjson_device);
                 }
 
-                dimmable_bulb_arg->item_dimmer_up = EZPI_core_device_add_item_to_device(device, device_0022_PWM_dimmable_lamp);
+                dimmable_bulb_arg->item_dimmer_up = EZPI_core_device_add_item_to_device(device, DEVICE_0022_pwm_dimmable_lamp);
                 if (dimmable_bulb_arg->item_dimmer_up)
                 {
                     dimmable_bulb_arg->item_dimmer_up->user_arg = dimmable_bulb_arg;
@@ -436,7 +427,7 @@ static ezlopi_error_t __prepare(void *arg)
                     __prepare_dimmer_up_item_properties(dimmable_bulb_arg->item_dimmer_up, prep_arg->cjson_device);
                 }
 
-                dimmable_bulb_arg->item_dimmer_down = EZPI_core_device_add_item_to_device(device, device_0022_PWM_dimmable_lamp);
+                dimmable_bulb_arg->item_dimmer_down = EZPI_core_device_add_item_to_device(device, DEVICE_0022_pwm_dimmable_lamp);
                 if (dimmable_bulb_arg->item_dimmer_down)
                 {
                     dimmable_bulb_arg->item_dimmer_down->user_arg = dimmable_bulb_arg;
@@ -444,7 +435,7 @@ static ezlopi_error_t __prepare(void *arg)
                     __prepare_dimmer_down_item_properties(dimmable_bulb_arg->item_dimmer_down, prep_arg->cjson_device);
                 }
 
-                dimmable_bulb_arg->item_dimmer_stop = EZPI_core_device_add_item_to_device(device, device_0022_PWM_dimmable_lamp);
+                dimmable_bulb_arg->item_dimmer_stop = EZPI_core_device_add_item_to_device(device, DEVICE_0022_pwm_dimmable_lamp);
                 if (dimmable_bulb_arg->item_dimmer_stop)
                 {
                     dimmable_bulb_arg->item_dimmer_stop->user_arg = dimmable_bulb_arg;
@@ -452,7 +443,7 @@ static ezlopi_error_t __prepare(void *arg)
                     __prepare_dimmer_stop_item_properties(dimmable_bulb_arg->item_dimmer_stop, prep_arg->cjson_device);
                 }
 
-                dimmable_bulb_arg->item_dimmer_switch = EZPI_core_device_add_item_to_device(device, device_0022_PWM_dimmable_lamp);
+                dimmable_bulb_arg->item_dimmer_switch = EZPI_core_device_add_item_to_device(device, DEVICE_0022_pwm_dimmable_lamp);
                 if (dimmable_bulb_arg->item_dimmer_switch)
                 {
                     dimmable_bulb_arg->item_dimmer_switch->user_arg = dimmable_bulb_arg;
@@ -468,13 +459,15 @@ static ezlopi_error_t __prepare(void *arg)
                 {
                     EZPI_core_device_free_device(device);
                     ezlopi_free(__FUNCTION__, dimmable_bulb_arg);
-                    ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
+                }
+                else
+                {
+                    ret = EZPI_SUCCESS;
                 }
             }
             else
             {
                 EZPI_core_device_free_device(device);
-                ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
             }
         }
     }

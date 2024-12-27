@@ -61,8 +61,12 @@ float gyro_mpu6050_calib_val = 0;
 /*******************************************************************************
 *                          Static Function Prototypes
 *******************************************************************************/
-static void ezpi_subcomponent_functiontitle(type_t arg);
-
+static e_mpu6050_err_t __mpu6050_configure_power(l_ezlopi_item_t *item);
+static e_mpu6050_err_t __mpu6050_configure_accelerometer(l_ezlopi_item_t *item, uint8_t flags);
+static e_mpu6050_err_t __mpu6050_configure_gyroscope(l_ezlopi_item_t *item, uint8_t flags);
+static e_mpu6050_err_t __mpu6050_configure_dlfp(l_ezlopi_item_t *item);
+static e_mpu6050_err_t __mpu6050_enable_interrupt(l_ezlopi_item_t *item);
+static e_mpu6050_err_t mpu6050_check_data_ready_INTR(l_ezlopi_item_t *item, uint8_t *temp);
 /*******************************************************************************
 *                          Static Data Definitions
 *******************************************************************************/
@@ -74,7 +78,7 @@ static void ezpi_subcomponent_functiontitle(type_t arg);
 /*******************************************************************************
 *                          Extern Function Definitions
 *******************************************************************************/// function to initiate sensor data readings
-void __mpu6050_get_data(l_ezlopi_item_t *item)
+void MPU6050_get_data(l_ezlopi_item_t *item)
 {
     if (item)
     {
@@ -134,7 +138,7 @@ void __mpu6050_get_data(l_ezlopi_item_t *item)
     }
 }
 
-e_mpu6050_err_t __mpu6050_config_device(l_ezlopi_item_t *item)
+e_mpu6050_err_t MPU6050_config_device(l_ezlopi_item_t *item)
 {
     e_mpu6050_err_t err = MPU6050_ERR_OK;
     if (item)

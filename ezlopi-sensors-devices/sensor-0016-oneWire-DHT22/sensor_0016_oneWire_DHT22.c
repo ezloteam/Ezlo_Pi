@@ -43,16 +43,14 @@
 #if (CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32S2)
 
 #include <math.h>
-#include "cjext.h"
-#include "ezlopi_util_trace.h"
+// #include "cjext.h"
+// #include "ezlopi_util_trace.h"
 
-// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
 #include "ezlopi_core_setting_commands.h"
-#include "ezlopi_core_errors.h"
 
 #include "ezlopi_cloud_items.h"
 #include "ezlopi_cloud_constants.h"
@@ -81,6 +79,16 @@ typedef struct s_ezlopi_dht22_data
 /*******************************************************************************
 *                          Static Function Prototypes
 *******************************************************************************/
+static ezlopi_error_t dht22_sensor_prepare_v3(void *arg);
+static ezlopi_error_t dht22_sensor_init_v3(l_ezlopi_item_t *item);
+static ezlopi_error_t dht22_sensor_get_sensor_value_v3(l_ezlopi_item_t *item, void *args);
+static ezlopi_error_t dht22_sensor_setup_item_properties_temperature(l_ezlopi_item_t *item, cJSON *cj_device, void *user_arg);
+static ezlopi_error_t dht22_sensor_setup_item_properties_humidity(l_ezlopi_item_t *item, cJSON *cj_device, void *user_arg);
+
+static ezlopi_error_t dht22_sensor_setup_device_cloud_properties_temperature(l_ezlopi_device_t *device, cJSON *cj_device);
+static ezlopi_error_t dht22_sensor_setup_device_cloud_properties_humidity(l_ezlopi_device_t *device, cJSON *cj_device);
+
+static ezlopi_error_t dht22_sensor_notify(l_ezlopi_item_t *item);
 
 /*******************************************************************************
 *                          Static Data Definitions
@@ -93,7 +101,7 @@ typedef struct s_ezlopi_dht22_data
 /*******************************************************************************
 *                          Extern Function Definitions
 *******************************************************************************/
-ezlopi_error_t SENSOR_0016_oneWire_DHT22(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+ezlopi_error_t SENSOR_0016_oneWire_dht22(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
     switch (action)
@@ -130,18 +138,6 @@ ezlopi_error_t SENSOR_0016_oneWire_DHT22(e_ezlopi_actions_t action, l_ezlopi_ite
 /*******************************************************************************
 *                         Static Function Definitions
 *******************************************************************************/
-
-static ezlopi_error_t dht22_sensor_prepare_v3(void *arg);
-static ezlopi_error_t dht22_sensor_init_v3(l_ezlopi_item_t *item);
-static ezlopi_error_t dht22_sensor_get_sensor_value_v3(l_ezlopi_item_t *item, void *args);
-static ezlopi_error_t dht22_sensor_setup_item_properties_temperature(l_ezlopi_item_t *item, cJSON *cj_device, void *user_arg);
-static ezlopi_error_t dht22_sensor_setup_item_properties_humidity(l_ezlopi_item_t *item, cJSON *cj_device, void *user_arg);
-
-static ezlopi_error_t dht22_sensor_setup_device_cloud_properties_temperature(l_ezlopi_device_t *device, cJSON *cj_device);
-static ezlopi_error_t dht22_sensor_setup_device_cloud_properties_humidity(l_ezlopi_device_t *device, cJSON *cj_device);
-
-static ezlopi_error_t dht22_sensor_notify(l_ezlopi_item_t *item);
-
 static ezlopi_error_t dht22_sensor_init_v3(l_ezlopi_item_t *item)
 {
     ezlopi_error_t ret = EZPI_ERR_INIT_DEVICE_FAILED;
@@ -229,7 +225,7 @@ static ezlopi_error_t dht22_sensor_get_sensor_value_v3(l_ezlopi_item_t *item, vo
 
 static ezlopi_error_t dht22_sensor_prepare_v3(void *arg)
 {
-    ezlopi_error_t ret = EZPI_SUCCESS;
+    ezlopi_error_t ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
     s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
     if (prep_arg)
     {
@@ -245,7 +241,7 @@ static ezlopi_error_t dht22_sensor_prepare_v3(void *arg)
                     TRACE_I("Parent_dht22_temp_device-[0x%x] ", parent_device_temperature->cloud_properties.device_id);
                     dht22_sensor_setup_device_cloud_properties_temperature(parent_device_temperature, cjson_device);
 
-                    l_ezlopi_item_t *item_temperature = EZPI_core_device_add_item_to_device(parent_device_temperature, sensor_0016_oneWire_DHT22);
+                    l_ezlopi_item_t *item_temperature = EZPI_core_device_add_item_to_device(parent_device_temperature, SENSOR_0016_oneWire_dht22);
                     if (item_temperature)
                     {
                         dht22_sensor_setup_item_properties_temperature(item_temperature, cjson_device, dht22_sensor_data);
@@ -258,7 +254,7 @@ static ezlopi_error_t dht22_sensor_prepare_v3(void *arg)
 
                         dht22_sensor_setup_device_cloud_properties_humidity(child_device_humidity, cjson_device);
 
-                        l_ezlopi_item_t *item_humidity = EZPI_core_device_add_item_to_device(child_device_humidity, sensor_0016_oneWire_DHT22);
+                        l_ezlopi_item_t *item_humidity = EZPI_core_device_add_item_to_device(child_device_humidity, SENSOR_0016_oneWire_dht22);
                         if (item_humidity)
                         {
                             dht22_sensor_setup_item_properties_humidity(item_humidity, cjson_device, dht22_sensor_data);
@@ -266,36 +262,25 @@ static ezlopi_error_t dht22_sensor_prepare_v3(void *arg)
                         else
                         {
                             EZPI_core_device_free_device(child_device_humidity);
-                            ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                         }
                     }
 
                     if ((NULL == item_temperature) && (NULL == child_device_humidity))
                     {
-                        ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                         EZPI_core_device_free_device(parent_device_temperature);
                         ezlopi_free(__FUNCTION__, dht22_sensor_data);
+                    }
+                    else
+                    {
+                        ret = EZPI_SUCCESS;
                     }
                 }
                 else
                 {
                     ezlopi_free(__FUNCTION__, dht22_sensor_data);
-                    ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                 }
             }
-            else
-            {
-                ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
-            }
         }
-        else
-        {
-            ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
-        }
-    }
-    else
-    {
-        ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
     }
 
     return ret;

@@ -1,10 +1,7 @@
-#include "ezlopi_util_trace.h"
 
-// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
-#include "ezlopi_core_errors.h"
 
 #include "ezlopi_hal_gpio.h"
 
@@ -31,7 +28,7 @@ static ezlopi_error_t __0060_notify(l_ezlopi_item_t *item);
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
 static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device);
 //---------------------------------------------------------------------------------------------------------
-ezlopi_error_t sensor_0060_digitalIn_vibration_detector(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+ezlopi_error_t SENSOR_0060_digitalIn_vibration_detector(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
     switch (action)
@@ -110,7 +107,7 @@ static ezlopi_error_t __0060_prepare(void *arg)
             if (vibration_device)
             {
                 __prepare_device_cloud_properties(vibration_device, dev_prep_arg->cjson_device);
-                l_ezlopi_item_t *vibration_item = EZPI_core_device_add_item_to_device(vibration_device, sensor_0060_digitalIn_vibration_detector);
+                l_ezlopi_item_t *vibration_item = EZPI_core_device_add_item_to_device(vibration_device, SENSOR_0060_digitalIn_vibration_detector);
                 if (vibration_item)
                 {
                     __prepare_item_cloud_properties(vibration_item, dev_prep_arg->cjson_device);

@@ -29,8 +29,8 @@
 ** ===========================================================================
 */
 /**
- * @file    main.h
- * @brief   perform some function on data
+ * @file    sensor_0023_digitalIn_touch_switch_TTP223B.h
+ * @brief   perform some function on sensor_0023
  * @author  xx
  * @version 0.1
  * @date    xx

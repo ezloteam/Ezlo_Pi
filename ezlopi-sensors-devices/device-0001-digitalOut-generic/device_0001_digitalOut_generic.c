@@ -40,15 +40,12 @@
 *                          Include Files
 *******************************************************************************/
 #include "../../build/config/sdkconfig.h"
-#include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_nvs.h"
-// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
-#include "ezlopi_core_errors.h"
 
 #include "ezlopi_hal_gpio.h"
 
@@ -216,7 +213,7 @@ static ezlopi_error_t __prepare(void *arg)
             if (device)
             {
                 __setup_device_cloud_properties(device, cjson_device);
-                l_ezlopi_item_t *item = EZPI_core_device_add_item_to_device(device, device_0001_digitalOut_generic);
+                l_ezlopi_item_t *item = EZPI_core_device_add_item_to_device(device, DEVICE_0001_digitalOut_generic);
                 if (item)
                 {
                     // item->cloud_properties.device_id = device->cloud_properties.device_id;
@@ -263,7 +260,6 @@ static ezlopi_error_t __prepare(void *arg)
                 else
                 {
                     EZPI_core_device_free_device(device);
-                    error = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                 }
 #endif // DEV_TEST_SETTINGS_EN
             }
@@ -300,10 +296,6 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
                 // digital_io_write_gpio_value(item);
                 __write_gpio_value(item);
                 error = EZPI_SUCCESS;
-            }
-            else
-            {
-                error = EZPI_ERR_INIT_DEVICE_FAILED;
             }
         }
     }
@@ -361,14 +353,6 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
                 EZPI_service_gpioisr_register_v3(item, __interrupt_upcall, 1000);
                 error = EZPI_SUCCESS;
             }
-            else
-            {
-                error = EZPI_ERR_INIT_DEVICE_FAILED;
-            }
-        }
-        else
-        {
-            error = EZPI_ERR_INIT_DEVICE_FAILED;
         }
     }
 

@@ -126,16 +126,6 @@ extern "C"
     /*******************************************************************************
     *                          Extern Function Prototypes
     *******************************************************************************/
-    /**
-    * @brief Global function template example
-    * Convention : Use capital letter for initial word on extern function
-    * maincomponent : Main component as hal, core, service etc.
-    * subcomponent : Sub component as i2c from hal, ble from service etc
-    * functiontitle : Title of the function
-    * eg : EZPI_hal_i2c_init()
-    * @param arg
-    *
-    */
 
     /**
     * @brief Function to operate on actions
@@ -146,23 +136,21 @@ extern "C"
     * @param user_arg User-arg
     * @return ezlopi_error_t
     */
-
-    // Action function
-    ezlopi_error_t SENSOR_0006_I2C_ADXL345(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
+    ezlopi_error_t SENSOR_0006_i2c_adxl345(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
     /**
      * @brief Function to get 3-axis_value
      *
      * @param item Target Item
      */
-    void __adxl345_get_axis_value(l_ezlopi_item_t *item);
+    void ADXL345_get_axis_value(l_ezlopi_item_t *item);
     /**
      * @brief Function to configure adxl345 device
      *
      * @param item Target Item
      * @return ezlopi_error_t
      */
-    ezlopi_error_t __adxl345_configure_device(l_ezlopi_item_t *item);
+    ezlopi_error_t ADXL345_configure_device(l_ezlopi_item_t *item);
 
 
 

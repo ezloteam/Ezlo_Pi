@@ -1,6 +1,205 @@
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+/**
+* @file    TSL256_interface.c
+* @brief   perform some function on TSL256_interface
+* @author  xx
+* @version 0.1
+* @date    xx
+*/
 
+/*******************************************************************************
+*                          Include Files
+*******************************************************************************/
 #include "sensor_0044_I2C_TSL256_luminosity.h"
 #include "ezlopi_util_trace.h"
+
+/*******************************************************************************
+*                          Extern Data Declarations
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Extern Function Declarations
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Type & Macro Definitions
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Static Function Prototypes
+*******************************************************************************/
+static uint32_t TSL2561_CalculateLux(uint16_t ch0, uint16_t ch1, integration_t conv_time, gain_t gain);
+static void Power_Up_tsl2561(s_ezlopi_i2c_master_t *i2c_master);
+static void Power_Down_tsl2561(s_ezlopi_i2c_master_t *i2c_master);
+static uint8_t readRegister8(s_ezlopi_i2c_master_t *i2c_master, uint8_t target_address, size_t address_len, uint8_t *reg, size_t reg_len);
+/*******************************************************************************
+*                          Static Data Definitions
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Extern Data Definitions
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Extern Function Definitions
+*******************************************************************************/
+bool TSL2561_check_partid(s_ezlopi_i2c_master_t *i2c_master)
+{
+
+    Power_Up_tsl2561(i2c_master);
+
+    // Read -> PART_ID value
+    uint8_t read_buffer = 0;
+    uint8_t command_code = (SELECT_CMD_REGISTER | TSL2561_REGISTER_ID);
+    // uint8_t write_buffer1[] = {command_code};
+    // EZPI_hal_i2c_master_write_to_device(i2c_master, write_buffer1, 1);
+    // EZPI_hal_i2c_master_read_from_device(i2c_master, &read_buffer, 1);
+    if (readRegister8(i2c_master, command_code, 1, &read_buffer, 1))
+    {
+        TRACE_E(" PART_ID : {%x}", (read_buffer & (0xF0))); // required [0b0101xxxx]
+        TRACE_E(" REV_NO  : {%x}", (read_buffer & (0x0F)));
+    }
+    else
+    {
+        TRACE_E(" Unable to read the  PART_ID register [0x0A].....");
+    }
+
+    Power_Down_tsl2561(i2c_master);
+
+    return (((TSL2561_PART_NUMBER) == (read_buffer & 0xF0)) ? true : false);
+}
+
+void SENSOR_0044_tsl2561_configure_device(s_ezlopi_i2c_master_t *i2c_master)
+{
+    Power_Up_tsl2561(i2c_master);
+    // this controls both intergration time and gain of ADC
+    // Set the timing and gain
+
+    uint8_t command_code = (SELECT_CMD_REGISTER | TSL2561_REGISTER_TIMING);
+    uint8_t setup_code = (TSL2561_HIGH_GAIN_MODE_x16 | TSL2561_STOP_MANNUAL_INTEGRATION | TSL2561_INTEGRATION_TIME_101_MS);
+    uint8_t write_buffer_timing[] = { command_code, setup_code };
+    EZPI_hal_i2c_master_write_to_device(i2c_master, write_buffer_timing, 2);
+
+    // Power_Down_tsl2561(i2c_master);
+}
+
+uint32_t TSL2561_get_intensity_value(s_ezlopi_i2c_master_t *i2c_master)
+{
+    uint32_t illuminance_value = 0;
+    bool clear_to_read = false;
+    // first check if sensor is powered on    // Read -> PART_ID value
+    uint8_t read_buffer = 0;
+    uint8_t command_code = (SELECT_CMD_REGISTER | TSL2561_REGISTER_ID);
+    if (readRegister8(i2c_master, command_code, 1, &read_buffer, 1))
+    {
+        // TRACE_E(" Updating Data.... found PART_ID : {%x}", (read_buffer & (0xF0))); // required [0b0101xxxx]
+        // Powered ON ? [Part_No : 0b0101xxxx]
+        if ((TSL2561_PART_NUMBER) == (read_buffer & 0xF0))
+        {
+            read_buffer = 0;
+            command_code = (SELECT_CMD_REGISTER | TSL2561_REGISTER_TIMING);
+            // if powered ON, check the Gain & Integration time from 0x01H
+            if (readRegister8(i2c_master, command_code, 1, &read_buffer, 1))
+            {
+                // TRACE_E(" Timing Register Byte : ...............{%x}", (read_buffer));
+                if (read_buffer & (TSL2561_HIGH_GAIN_MODE_x16 | TSL2561_INTEGRATION_TIME_101_MS))
+                {
+                    // if the gain = x16 and integration_time = 101ms , set the "clear_to_read" flag
+                    clear_to_read = true;
+                }
+            }
+        }
+        else
+        {
+            TRACE_E(" Error : PART_ID register [0x0Ah] data mis-match.....");
+        }
+    }
+    else
+    {
+        TRACE_E(" Unable to read the  PART_ID register ....");
+    }
+
+    // If "clear_to_read" flag is set extract data from sensor and update the data structure
+    if (clear_to_read)
+    {
+        // Wait x ms for ADC to complete
+        switch (TSL2561_INTEGRATIONTIME_101MS)
+        {
+        case TSL2561_INTEGRATIONTIME_13MS:
+            vTaskDelay(14);
+            break;
+        case TSL2561_INTEGRATIONTIME_101MS:
+            vTaskDelay(102);
+            break;
+        default:
+            vTaskDelay(403);
+            break;
+        }
+
+        uint16_t IR = 0;
+        uint16_t Visible_Ir = 0;
+        uint8_t target_address = 0;
+        // extract the CH1-bits first
+        target_address = (SELECT_CMD_REGISTER | DO_WORD_TRANSACTION | TSL2561_REGISTER_CHAN1_LOW);
+        EZPI_hal_i2c_master_write_to_device(i2c_master, &target_address, 1);
+        EZPI_hal_i2c_master_read_from_device(i2c_master, (uint8_t *)&IR, 2); // extracts CH1-data
+        // readRegister8(i2c_master, &target_address, 1, &IR, 2);
+
+        // extract the CH0-bits first
+        target_address = (SELECT_CMD_REGISTER | DO_WORD_TRANSACTION | TSL2561_REGISTER_CHAN0_LOW);
+        EZPI_hal_i2c_master_write_to_device(i2c_master, &target_address, 1);
+        EZPI_hal_i2c_master_read_from_device(i2c_master, (uint8_t *)&Visible_Ir, 2); // extracts CH2-data
+        // readRegister8(i2c_master, &target_address, 1, &Visible_Ir, 2);
+
+        // Calculate the lux value
+        illuminance_value = TSL2561_CalculateLux(Visible_Ir,                    // CH0
+            IR,                            // CH1
+            TSL2561_INTEGRATIONTIME_101MS, // conv_time
+            TSL2561_GAIN_x1);              // adc_gain
+        // TRACE_I("IR : %d", IR);
+        // TRACE_I("Visible : %d", Visible_Ir - IR);
+        // TRACE_I("Lux : %d", Lux_intensity);
+        // TRACE_E(" Data update completed......");
+    }
+    else
+    {
+        TRACE_E(" Data update Failed ......");
+    }
+    return illuminance_value;
+}
+
+/*******************************************************************************
+*                         Static Function Definitions
+*******************************************************************************/
 
 static uint32_t TSL2561_CalculateLux(uint16_t ch0, uint16_t ch1, integration_t conv_time, gain_t gain)
 {
@@ -118,136 +317,12 @@ static void Power_Down_tsl2561(s_ezlopi_i2c_master_t *i2c_master)
     EZPI_hal_i2c_master_write_to_device(i2c_master, write_buffer_power_down, 2);
 }
 
-//------------------------------------------------------------
-
 static uint8_t readRegister8(s_ezlopi_i2c_master_t *i2c_master, uint8_t target_address, size_t address_len, uint8_t *reg, size_t reg_len)
 {
     EZPI_hal_i2c_master_write_to_device(i2c_master, &target_address, address_len);
     EZPI_hal_i2c_master_read_from_device(i2c_master, reg, reg_len); // extracts data into @reg
     return 1;
 }
-
-bool Check_PARTID(s_ezlopi_i2c_master_t *i2c_master)
-{
-
-    Power_Up_tsl2561(i2c_master);
-
-    // Read -> PART_ID value
-    uint8_t read_buffer = 0;
-    uint8_t command_code = (SELECT_CMD_REGISTER | TSL2561_REGISTER_ID);
-    // uint8_t write_buffer1[] = {command_code};
-    // EZPI_hal_i2c_master_write_to_device(i2c_master, write_buffer1, 1);
-    // EZPI_hal_i2c_master_read_from_device(i2c_master, &read_buffer, 1);
-    if (readRegister8(i2c_master, command_code, 1, &read_buffer, 1))
-    {
-        TRACE_E(" PART_ID : {%x}", (read_buffer & (0xF0))); // required [0b0101xxxx]
-        TRACE_E(" REV_NO  : {%x}", (read_buffer & (0x0F)));
-    }
-    else
-    {
-        TRACE_E(" Unable to read the  PART_ID register [0x0A].....");
-    }
-
-    Power_Down_tsl2561(i2c_master);
-
-    return (((TSL2561_PART_NUMBER) == (read_buffer & 0xF0)) ? true : false);
-}
-
-void sensor_0044_tsl2561_configure_device(s_ezlopi_i2c_master_t *i2c_master)
-{
-    Power_Up_tsl2561(i2c_master);
-    // this controls both intergration time and gain of ADC
-    // Set the timing and gain
-
-    uint8_t command_code = (SELECT_CMD_REGISTER | TSL2561_REGISTER_TIMING);
-    uint8_t setup_code = (TSL2561_HIGH_GAIN_MODE_x16 | TSL2561_STOP_MANNUAL_INTEGRATION | TSL2561_INTEGRATION_TIME_101_MS);
-    uint8_t write_buffer_timing[] = { command_code, setup_code };
-    EZPI_hal_i2c_master_write_to_device(i2c_master, write_buffer_timing, 2);
-
-    // Power_Down_tsl2561(i2c_master);
-}
-
-uint32_t tsl2561_get_intensity_value(s_ezlopi_i2c_master_t *i2c_master)
-{
-    uint32_t illuminance_value = 0;
-    bool clear_to_read = false;
-    // first check if sensor is powered on    // Read -> PART_ID value
-    uint8_t read_buffer = 0;
-    uint8_t command_code = (SELECT_CMD_REGISTER | TSL2561_REGISTER_ID);
-    if (readRegister8(i2c_master, command_code, 1, &read_buffer, 1))
-    {
-        // TRACE_E(" Updating Data.... found PART_ID : {%x}", (read_buffer & (0xF0))); // required [0b0101xxxx]
-        // Powered ON ? [Part_No : 0b0101xxxx]
-        if ((TSL2561_PART_NUMBER) == (read_buffer & 0xF0))
-        {
-            read_buffer = 0;
-            command_code = (SELECT_CMD_REGISTER | TSL2561_REGISTER_TIMING);
-            // if powered ON, check the Gain & Integration time from 0x01H
-            if (readRegister8(i2c_master, command_code, 1, &read_buffer, 1))
-            {
-                // TRACE_E(" Timing Register Byte : ...............{%x}", (read_buffer));
-                if (read_buffer & (TSL2561_HIGH_GAIN_MODE_x16 | TSL2561_INTEGRATION_TIME_101_MS))
-                {
-                    // if the gain = x16 and integration_time = 101ms , set the "clear_to_read" flag
-                    clear_to_read = true;
-                }
-            }
-        }
-        else
-        {
-            TRACE_E(" Error : PART_ID register [0x0Ah] data mis-match.....");
-        }
-    }
-    else
-    {
-        TRACE_E(" Unable to read the  PART_ID register ....");
-    }
-
-    // If "clear_to_read" flag is set extract data from sensor and update the data structure
-    if (clear_to_read)
-    {
-        // Wait x ms for ADC to complete
-        switch (TSL2561_INTEGRATIONTIME_101MS)
-        {
-        case TSL2561_INTEGRATIONTIME_13MS:
-            vTaskDelay(14);
-            break;
-        case TSL2561_INTEGRATIONTIME_101MS:
-            vTaskDelay(102);
-            break;
-        default:
-            vTaskDelay(403);
-            break;
-        }
-
-        uint16_t IR = 0;
-        uint16_t Visible_Ir = 0;
-        uint8_t target_address = 0;
-        // extract the CH1-bits first
-        target_address = (SELECT_CMD_REGISTER | DO_WORD_TRANSACTION | TSL2561_REGISTER_CHAN1_LOW);
-        EZPI_hal_i2c_master_write_to_device(i2c_master, &target_address, 1);
-        EZPI_hal_i2c_master_read_from_device(i2c_master, (uint8_t *)&IR, 2); // extracts CH1-data
-        // readRegister8(i2c_master, &target_address, 1, &IR, 2);
-
-        // extract the CH0-bits first
-        target_address = (SELECT_CMD_REGISTER | DO_WORD_TRANSACTION | TSL2561_REGISTER_CHAN0_LOW);
-        EZPI_hal_i2c_master_write_to_device(i2c_master, &target_address, 1);
-        EZPI_hal_i2c_master_read_from_device(i2c_master, (uint8_t *)&Visible_Ir, 2); // extracts CH2-data
-        // readRegister8(i2c_master, &target_address, 1, &Visible_Ir, 2);
-
-        // Calculate the lux value
-        illuminance_value = TSL2561_CalculateLux(Visible_Ir,                    // CH0
-            IR,                            // CH1
-            TSL2561_INTEGRATIONTIME_101MS, // conv_time
-            TSL2561_GAIN_x1);              // adc_gain
-        // TRACE_I("IR : %d", IR);
-        // TRACE_I("Visible : %d", Visible_Ir - IR);
-        // TRACE_I("Lux : %d", Lux_intensity);
-        // TRACE_E(" Data update completed......");
-    }
-    else
-    {
-        TRACE_E(" Data update Failed ......");
-    }
-    return illuminance_value;
-}
+/*******************************************************************************
+*                          End of File
+*******************************************************************************/

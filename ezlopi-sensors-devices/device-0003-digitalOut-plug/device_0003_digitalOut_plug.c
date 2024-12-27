@@ -40,14 +40,11 @@
 *                          Include Files
 *******************************************************************************/
 #include "../../build/config/sdkconfig.h"
-#include "ezlopi_util_trace.h"
 
-// // #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
-#include "ezlopi_core_errors.h"
 
 #include "ezlopi_hal_gpio.h"
 
@@ -195,7 +192,7 @@ static ezlopi_error_t __prepare(void *arg)
             if (device)
             {
                 __setup_device_cloud_properties(device, cjson_device);
-                l_ezlopi_item_t *item = EZPI_core_device_add_item_to_device(device, device_0003_digitalOut_plug);
+                l_ezlopi_item_t *item = EZPI_core_device_add_item_to_device(device, DEVICE_0003_digitalOut_plug);
                 if (item)
                 {
                     __setup_item_properties(item, cjson_device);
@@ -241,10 +238,6 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
                 __write_gpio_value(item);
                 error = EZPI_SUCCESS;
             }
-            else
-            {
-                error = EZPI_ERR_INIT_DEVICE_FAILED;
-            }
         }
         if (item->interface.gpio.gpio_in.enable)
         {
@@ -273,14 +266,6 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
                     EZPI_service_gpioisr_register_v3(item, __interrupt_upcall, 1000);
                     error = EZPI_SUCCESS;
                 }
-                else
-                {
-                    error = EZPI_ERR_INIT_DEVICE_FAILED;
-                }
-            }
-            else
-            {
-                error = EZPI_ERR_INIT_DEVICE_FAILED;
             }
         }
     }

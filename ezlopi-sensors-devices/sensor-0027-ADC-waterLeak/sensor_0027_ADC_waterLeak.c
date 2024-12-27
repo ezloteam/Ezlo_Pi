@@ -39,14 +39,11 @@
 /*******************************************************************************
 *                          Include Files
 *******************************************************************************/
-#include "ezlopi_util_trace.h"
 
-// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
-#include "ezlopi_core_errors.h"
 
 #include "ezlopi_hal_adc.h"
 
@@ -94,7 +91,7 @@ static ezlopi_error_t __get_item_list(l_ezlopi_item_t *item, void *arg);
 *                          Extern Function Definitions
 *******************************************************************************/
 
-ezlopi_error_t SENSOR_0027_ADC_waterLeak(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+ezlopi_error_t SENSOR_0027_adc_waterLeak(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
 
@@ -178,7 +175,7 @@ static ezlopi_error_t __prepare(void *arg)
             if (parent_device)
             {
                 prepare_device_cloud_properties(parent_device, cj_device);
-                l_ezlopi_item_t *item = EZPI_core_device_add_item_to_device(parent_device, sensor_0027_ADC_waterLeak);
+                l_ezlopi_item_t *item = EZPI_core_device_add_item_to_device(parent_device, SENSOR_0027_adc_waterLeak);
                 if (item)
                 {
                     prepare_item_cloud_properties(item, cj_device);

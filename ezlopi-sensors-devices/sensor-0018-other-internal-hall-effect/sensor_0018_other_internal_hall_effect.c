@@ -45,16 +45,12 @@
 #ifdef CONFIG_IDF_TARGET_ESP32
 
 #include <math.h>
-#include "ezlopi_util_trace.h"
-// #include "esp_err.h"
 
-// // #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
 #include "ezlopi_core_processes.h"
-#include "ezlopi_core_errors.h"
 
 #include "ezlopi_cloud_items.h"
 #include "ezlopi_cloud_constants.h"
@@ -181,7 +177,7 @@ static void __setup_item_properties(l_ezlopi_item_t *item, cJSON *cj_device, voi
 
 static ezlopi_error_t __prepare(void *arg)
 {
-    ezlopi_error_t ret = EZPI_SUCCESS;
+    ezlopi_error_t ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
     s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
     if (arg && prep_arg->cjson_device)
     {
@@ -194,39 +190,30 @@ static ezlopi_error_t __prepare(void *arg)
             if (hall_device)
             {
                 __setup_device_cloud_properties(hall_device, cj_device);
-                l_ezlopi_item_t *hall_item = EZPI_core_device_add_item_to_device(hall_device, sensor_0018_other_internal_hall_effect);
+                l_ezlopi_item_t *hall_item = EZPI_core_device_add_item_to_device(hall_device, SENSOR_0018_other_internal_hall_effect);
                 if (hall_item)
                 {
                     __setup_item_properties(hall_item, cj_device, user_data);
+                    ret = EZPI_SUCCESS;
                 }
                 else
                 {
                     EZPI_core_device_free_device(hall_device);
                     ezlopi_free(__FUNCTION__, user_data);
-                    ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                 }
             }
             else
             {
                 ezlopi_free(__FUNCTION__, user_data);
-                ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
             }
         }
-        else
-        {
-            ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
-        }
-    }
-    else
-    {
-        ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
     }
     return ret;
 }
 
 static ezlopi_error_t __init(l_ezlopi_item_t *item)
 {
-    ezlopi_error_t ret = EZPI_SUCCESS;
+    ezlopi_error_t ret = EZPI_ERR_INIT_DEVICE_FAILED;
     if (item)
     {
 #ifdef CONFIG_IDF_TARGET_ESP32
@@ -239,6 +226,7 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
         {
             if (ESP_OK == error)
             {
+                ret = EZPI_SUCCESS;
                 TRACE_I("Width configuration was successfully done!");
                 TRACE_W("Calibrating.....");
                 user_data->hall_state = "dw_is_closed";
@@ -251,17 +239,8 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
             else
             {
                 TRACE_E("Error 'sensor_door_init'. error: %s)", esp_err_to_name(error));
-                ret = EZPI_ERR_INIT_DEVICE_FAILED;
             }
         }
-        else
-        {
-            ret = EZPI_ERR_INIT_DEVICE_FAILED;
-        }
-    }
-    else
-    {
-        ret = EZPI_ERR_INIT_DEVICE_FAILED;
     }
     return ret;
 }

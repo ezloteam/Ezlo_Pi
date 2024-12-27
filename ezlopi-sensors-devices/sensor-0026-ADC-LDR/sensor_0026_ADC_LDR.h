@@ -99,7 +99,7 @@ extern "C"
     * @param user_arg User-arg
     * @return ezlopi_error_t
     */
-    ezlopi_error_t SENSOR_0026_ADC_LDR(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
+    ezlopi_error_t SENSOR_0026_adc_ldr(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
 #ifdef __cplusplus
 }

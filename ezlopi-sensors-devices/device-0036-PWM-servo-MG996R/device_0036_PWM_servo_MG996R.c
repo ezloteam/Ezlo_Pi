@@ -39,14 +39,11 @@
 /*******************************************************************************
 *                          Include Files
 *******************************************************************************/
-#include "ezlopi_util_trace.h"
 
-// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
-#include "ezlopi_core_errors.h"
 
 #include "ezlopi_hal_pwm.h"
 
@@ -89,7 +86,7 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_dev
 *                          Extern Function Definitions
 *******************************************************************************/
 
-ezlopi_error_t DEVICE_0036_PWM_servo_MG996R(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+ezlopi_error_t DEVICE_0036_pwm_servo_mg996r(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
 
@@ -158,7 +155,7 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_dev
 
 static ezlopi_error_t __prepare(void *arg)
 {
-    ezlopi_error_t ret = EZPI_SUCCESS;
+    ezlopi_error_t ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
 
     s_ezlopi_prep_arg_t *dev_prep_arg = (s_ezlopi_prep_arg_t *)arg;
     if (dev_prep_arg->cjson_device)
@@ -169,20 +166,16 @@ static ezlopi_error_t __prepare(void *arg)
         if (servo_device)
         {
             __prepare_device_cloud_properties(servo_device, cj_device);
-            l_ezlopi_item_t *servo_item = EZPI_core_device_add_item_to_device(servo_device, device_0036_PWM_servo_MG996R);
+            l_ezlopi_item_t *servo_item = EZPI_core_device_add_item_to_device(servo_device, DEVICE_0036_pwm_servo_mg996r);
             if (servo_item)
             {
                 __prepare_item_cloud_properties(servo_item, cj_device);
+                ret = EZPI_SUCCESS;
             }
             else
             {
                 EZPI_core_device_free_device(servo_device);
-                ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
             }
-        }
-        else
-        {
-            ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
         }
     }
     return ret;
@@ -190,7 +183,7 @@ static ezlopi_error_t __prepare(void *arg)
 
 static ezlopi_error_t __init(l_ezlopi_item_t *item)
 {
-    ezlopi_error_t ret = EZPI_SUCCESS;
+    ezlopi_error_t ret = EZPI_ERR_INIT_DEVICE_FAILED;
     if (item)
     {
         if (GPIO_IS_VALID_GPIO(item->interface.pwm.gpio_num))
@@ -202,15 +195,8 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
             {
                 item->interface.pwm.channel = servo_item->channel;
                 item->interface.pwm.speed_mode = servo_item->speed_mode;
+                ret = EZPI_SUCCESS;
             }
-            else
-            {
-                ret = EZPI_ERR_INIT_DEVICE_FAILED;
-            }
-        }
-        else
-        {
-            ret = EZPI_ERR_INIT_DEVICE_FAILED;
         }
     }
     return ret;

@@ -40,14 +40,11 @@
 *                          Include Files
 *******************************************************************************/
 #include "driver/gpio.h"
-#include "ezlopi_util_trace.h"
 
-// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
-#include "ezlopi_core_errors.h"
 
 #include "ezlopi_cloud_items.h"
 #include "ezlopi_cloud_constants.h"
@@ -194,7 +191,7 @@ static ezlopi_error_t __prepare(void *arg)
         if (touch_device)
         {
             __prepare_touch_switch_device_cloud_properties(touch_device, prep_arg->cjson_device);
-            l_ezlopi_item_t *touch_switch_item = EZPI_core_device_add_item_to_device(touch_device, sensor_0023_digitalIn_touch_switch_TTP223B);
+            l_ezlopi_item_t *touch_switch_item = EZPI_core_device_add_item_to_device(touch_device, SENSOR_0023_digitalIn_touch_switch_TTP223B);
             if (touch_switch_item)
             {
                 __prepare_touch_switch_properties(touch_switch_item, prep_arg->cjson_device);

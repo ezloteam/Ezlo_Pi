@@ -40,15 +40,12 @@
 *                          Include Files
 *******************************************************************************/
 #include <math.h>
-#include "ezlopi_util_trace.h"
 
-// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
 #include "ezlopi_core_setting_commands.h"
-#include "ezlopi_core_errors.h"
 
 #include "ezlopi_hal_i2c_master.h"
 
@@ -94,7 +91,7 @@ static void __prepare_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, 
 *                          Extern Function Definitions
 *******************************************************************************/
 
-ezlopi_error_t SENSOR_0010_I2C_BME680(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+ezlopi_error_t SENSOR_0010_i2c_bme680(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
     switch (action)
@@ -167,7 +164,7 @@ static void __prepare_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, 
 
 static ezlopi_error_t __prepare(void *arg)
 {
-    ezlopi_error_t ret = EZPI_SUCCESS;
+    ezlopi_error_t ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
     s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
     if (prep_arg && prep_arg->cjson_device)
     {
@@ -182,7 +179,7 @@ static ezlopi_error_t __prepare(void *arg)
                 TRACE_I("Parent_temp_humid_device-[0x%x] ", parent_temp_humid_device->cloud_properties.device_id);
                 parent_temp_humid_device->cloud_properties.category = category_temperature;
                 __prepare_device_cloud_properties(parent_temp_humid_device, cj_device);
-                l_ezlopi_item_t *temperature_item = EZPI_core_device_add_item_to_device(parent_temp_humid_device, sensor_0010_I2C_BME680);
+                l_ezlopi_item_t *temperature_item = EZPI_core_device_add_item_to_device(parent_temp_humid_device, SENSOR_0010_i2c_bme680);
                 if (temperature_item)
                 {
                     temperature_item->cloud_properties.item_name = ezlopi_item_name_temp;
@@ -192,7 +189,7 @@ static ezlopi_error_t __prepare(void *arg)
                     __prepare_cloud_properties(temperature_item, cj_device, user_data);
                 }
 
-                l_ezlopi_item_t *humidity_item = EZPI_core_device_add_item_to_device(parent_temp_humid_device, sensor_0010_I2C_BME680);
+                l_ezlopi_item_t *humidity_item = EZPI_core_device_add_item_to_device(parent_temp_humid_device, SENSOR_0010_i2c_bme680);
                 if (humidity_item)
                 {
                     humidity_item->cloud_properties.item_name = ezlopi_item_name_humidity;
@@ -208,7 +205,7 @@ static ezlopi_error_t __prepare(void *arg)
                     child_pressure_device->cloud_properties.category = category_level_sensor;
                     __prepare_device_cloud_properties(child_pressure_device, cj_device);
 
-                    l_ezlopi_item_t *pressure_item = EZPI_core_device_add_item_to_device(child_pressure_device, sensor_0010_I2C_BME680);
+                    l_ezlopi_item_t *pressure_item = EZPI_core_device_add_item_to_device(child_pressure_device, SENSOR_0010_i2c_bme680);
                     if (pressure_item)
                     {
                         pressure_item->cloud_properties.item_name = ezlopi_item_name_atmospheric_pressure;
@@ -219,7 +216,6 @@ static ezlopi_error_t __prepare(void *arg)
                     else
                     {
                         EZPI_core_device_free_device(child_pressure_device);
-                        ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                     }
                 }
 
@@ -230,7 +226,7 @@ static ezlopi_error_t __prepare(void *arg)
                     child_aqi_device->cloud_properties.category = category_level_sensor;
                     __prepare_device_cloud_properties(child_aqi_device, cj_device);
 
-                    l_ezlopi_item_t *aqi_item = EZPI_core_device_add_item_to_device(child_aqi_device, sensor_0010_I2C_BME680);
+                    l_ezlopi_item_t *aqi_item = EZPI_core_device_add_item_to_device(child_aqi_device, SENSOR_0010_i2c_bme680);
                     if (aqi_item)
                     {
                         aqi_item->cloud_properties.item_name = ezlopi_item_name_volatile_organic_compound_level;
@@ -241,7 +237,6 @@ static ezlopi_error_t __prepare(void *arg)
                     else
                     {
                         EZPI_core_device_free_device(child_aqi_device);
-                        ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                     }
                 }
 
@@ -252,7 +247,7 @@ static ezlopi_error_t __prepare(void *arg)
                     child_altitude_device->cloud_properties.category = category_level_sensor;
                     __prepare_device_cloud_properties(child_altitude_device, cj_device);
 
-                    l_ezlopi_item_t *altitude_item = EZPI_core_device_add_item_to_device(child_altitude_device, sensor_0010_I2C_BME680);
+                    l_ezlopi_item_t *altitude_item = EZPI_core_device_add_item_to_device(child_altitude_device, SENSOR_0010_i2c_bme680);
                     if (altitude_item)
                     {
                         altitude_item->cloud_properties.item_name = ezlopi_item_name_distance;
@@ -263,7 +258,6 @@ static ezlopi_error_t __prepare(void *arg)
                     else
                     {
                         EZPI_core_device_free_device(child_altitude_device);
-                        ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                     }
                 }
 
@@ -274,7 +268,7 @@ static ezlopi_error_t __prepare(void *arg)
                     child_co2_device->cloud_properties.category = category_level_sensor;
                     __prepare_device_cloud_properties(child_co2_device, cj_device);
 
-                    l_ezlopi_item_t *co2_item = EZPI_core_device_add_item_to_device(child_co2_device, sensor_0010_I2C_BME680);
+                    l_ezlopi_item_t *co2_item = EZPI_core_device_add_item_to_device(child_co2_device, SENSOR_0010_i2c_bme680);
                     if (co2_item)
                     {
                         co2_item->cloud_properties.item_name = ezlopi_item_name_co2_level;
@@ -285,7 +279,6 @@ static ezlopi_error_t __prepare(void *arg)
                     else
                     {
                         EZPI_core_device_free_device(child_co2_device);
-                        ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                     }
                 }
 
@@ -298,22 +291,13 @@ static ezlopi_error_t __prepare(void *arg)
                 {
                     EZPI_core_device_free_device(parent_temp_humid_device);
                     ezlopi_free(__FUNCTION__, user_data);
-                    ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
+                }
+                else
+                {
+                    ret = EZPI_SUCCESS;
                 }
             }
-            else
-            {
-                ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
-            }
         }
-        else
-        {
-            ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
-        }
-    }
-    else
-    {
-        ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
     }
     return ret;
 }
@@ -339,7 +323,7 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
 
 static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 {
-    ezlopi_error_t ret = EZPI_SUCCESS;
+    ezlopi_error_t ret = EZPI_FAILED;
     if (item && arg)
     {
         cJSON *cj_device = (cJSON *)arg;

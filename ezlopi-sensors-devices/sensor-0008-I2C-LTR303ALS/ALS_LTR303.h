@@ -36,8 +36,8 @@
  * @date    xx
 */
 
-#ifndef __HEADER_H__
-#define __HEADER_H__
+#ifndef _ALS_LTR303_H_
+#define _ALS_LTR303_H_
 
 /*******************************************************************************
 *                          Include Files
@@ -110,7 +110,7 @@ extern "C"
 }
 #endif
 
-#endif // __HEADER_H__
+#endif // _ALS_LTR303_H_
 
 /*******************************************************************************
 *                          End of File

@@ -40,14 +40,11 @@
 *                          Include Files
 *******************************************************************************/
 #include "driver/gpio.h"
-#include "ezlopi_util_trace.h"
 
-// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
-#include "ezlopi_core_errors.h"
 
 #include "ezlopi_cloud_items.h"
 #include "ezlopi_cloud_constants.h"
@@ -89,7 +86,7 @@ static void __value_updated_from_interrupt(void *arg);
 *                          Extern Function Definitions
 *******************************************************************************/
 
-ezlopi_error_t SENSOR_0025_digitalIn_LDR(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+ezlopi_error_t SENSOR_0025_digitalIn_ldr(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
 
@@ -189,7 +186,7 @@ static ezlopi_error_t __prepare(void *arg)
             if (device)
             {
                 __setup_device_properties(device, cj_device);
-                l_ezlopi_item_t *item = EZPI_core_device_add_item_to_device(device, sensor_0025_digitalIn_LDR);
+                l_ezlopi_item_t *item = EZPI_core_device_add_item_to_device(device, SENSOR_0025_digitalIn_ldr);
                 if (item)
                 {
                     __setup_item_properties(item, cj_device);

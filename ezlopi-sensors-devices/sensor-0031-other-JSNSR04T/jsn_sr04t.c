@@ -1,8 +1,62 @@
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+/**
+* @file    jsn_sr04t.c
+* @brief   perform some function on jsn_sr04t
+* @author  xx
+* @version 0.1
+* @date    xx
+*/
+
+/*******************************************************************************
+*                          Include Files
+*******************************************************************************/
+
 #include "jsn_sr04t.h"
 #include "ezlopi_util_trace.h"
 #include "ezlopi_cloud_value_type_str.h"
 #include "ezlopi_core_device_value_updated.h"
 
+/*******************************************************************************
+*                          Extern Data Declarations
+*******************************************************************************/
+
+
+/*******************************************************************************
+*                          Extern Function Declarations
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Type & Macro Definitions
+*******************************************************************************/
 /**
  * @brief Default configuration for RX channel
  *
@@ -22,6 +76,23 @@
         }                                           \
     }
 
+
+ /*******************************************************************************
+ *                          Static Function Prototypes
+ *******************************************************************************/
+
+ /*******************************************************************************
+ *                          Static Data Definitions
+ *******************************************************************************/
+static const char *TAG1 = "JSN_SR04T_V3";
+
+/*******************************************************************************
+*                          Extern Data Definitions
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Extern Function Definitions
+*******************************************************************************/
 void log_raw_data(jsn_sr04t_raw_data_t jsn_sr04t_raw_data)
 {
     TRACE_D("data_received = %u", jsn_sr04t_raw_data.data_received);
@@ -30,7 +101,7 @@ void log_raw_data(jsn_sr04t_raw_data_t jsn_sr04t_raw_data)
     TRACE_D("distance in cm = %f", jsn_sr04t_raw_data.distance_cm);
 }
 
-esp_err_t init_JSN_SR04T(jsn_sr04t_config_t *jsn_sr04t_config)
+esp_err_t JSN_sr04t_init(jsn_sr04t_config_t *jsn_sr04t_config)
 {
     esp_err_t ret = ESP_OK;
     ESP_LOGD(TAG1, "%s()", __FUNCTION__);
@@ -102,7 +173,7 @@ err:
     return ret;
 }
 
-esp_err_t raw_measeurement(jsn_sr04t_config_t *jsn_sr04t_config, jsn_sr04t_raw_data_t *jsn_sr04t_raw_data)
+esp_err_t JSN_sr04t_raw_calc(jsn_sr04t_config_t *jsn_sr04t_config, jsn_sr04t_raw_data_t *jsn_sr04t_raw_data)
 {
     esp_err_t ret = ESP_OK;
     // ESP_LOGD(TAG1, "%s()", __FUNCTION__);
@@ -140,9 +211,9 @@ esp_err_t raw_measeurement(jsn_sr04t_config_t *jsn_sr04t_config, jsn_sr04t_raw_d
         for (uint8_t i = 0; i < length; i++)
         {
             ESP_LOGD(TAG1, "  %2i :: [level 0]: %1d - %5d microsec, [level 1]: %3d - %5d microsec",
-                     i,
-                     temp_ptr->level0, temp_ptr->duration0,
-                     temp_ptr->level1, temp_ptr->duration1);
+                i,
+                temp_ptr->level0, temp_ptr->duration0,
+                temp_ptr->level1, temp_ptr->duration1);
             temp_ptr++;
         }
 
@@ -154,7 +225,7 @@ esp_err_t raw_measeurement(jsn_sr04t_config_t *jsn_sr04t_config, jsn_sr04t_raw_d
         {
             ret = ESP_ERR_INVALID_RESPONSE;
             ESP_LOGE(TAG1, "%s(). ABORT. Out Of Range: distance_cm < %d (%f) ", __FUNCTION__,
-                     minimum_detection_value_in_cm, jsn_sr04t_raw_data->distance_cm);
+                minimum_detection_value_in_cm, jsn_sr04t_raw_data->distance_cm);
 
             jsn_sr04t_raw_data->is_an_error = true;
             goto err;
@@ -164,7 +235,7 @@ esp_err_t raw_measeurement(jsn_sr04t_config_t *jsn_sr04t_config, jsn_sr04t_raw_d
         {
             ret = ESP_ERR_INVALID_RESPONSE;
             ESP_LOGE(TAG1, "%s(). ABORT. Out Of Range: distance_cm < %d (%f) ", __FUNCTION__,
-                     maximum_detection_value_in_cm, jsn_sr04t_raw_data->distance_cm);
+                maximum_detection_value_in_cm, jsn_sr04t_raw_data->distance_cm);
             jsn_sr04t_raw_data->is_an_error = true;
             goto err;
         }
@@ -177,9 +248,9 @@ esp_err_t raw_measeurement(jsn_sr04t_config_t *jsn_sr04t_config, jsn_sr04t_raw_d
             {
                 ret = ESP_ERR_INVALID_RESPONSE;
                 ESP_LOGE(TAG1,
-                         "%s(). ABORT. Invalid value: adjusted distance <= 0 (subtracted sensor_artifact_cm) (%f) | err %i (%s)",
-                         __FUNCTION__,
-                         jsn_sr04t_raw_data->distance_cm, ret, esp_err_to_name(ret));
+                    "%s(). ABORT. Invalid value: adjusted distance <= 0 (subtracted sensor_artifact_cm) (%f) | err %i (%s)",
+                    __FUNCTION__,
+                    jsn_sr04t_raw_data->distance_cm, ret, esp_err_to_name(ret));
                 jsn_sr04t_raw_data->is_an_error = true;
                 goto err;
             }
@@ -200,7 +271,7 @@ err:
     return ret;
 }
 
-esp_err_t measurement(jsn_sr04t_config_t *jsn_sr04t_config, jsn_sr04t_data_t *jsn_sr04t_data)
+esp_err_t JSN_sr04t_measurement(jsn_sr04t_config_t *jsn_sr04t_config, jsn_sr04t_data_t *jsn_sr04t_data)
 {
     esp_err_t ret = ESP_OK;
     uint32_t count_errors = 0;
@@ -215,7 +286,7 @@ esp_err_t measurement(jsn_sr04t_config_t *jsn_sr04t_config, jsn_sr04t_data_t *js
 
     for (int i = 0; i < jsn_sr04t_config->no_of_samples; i++)
     {
-        ret = raw_measeurement(jsn_sr04t_config, &sample[i]);
+        ret = JSN_sr04t_raw_calc(jsn_sr04t_config, &sample[i]);
         if (ESP_OK != ret)
         {
             ESP_LOGE(TAG1, "ERROR in reading");
@@ -230,29 +301,37 @@ esp_err_t measurement(jsn_sr04t_config_t *jsn_sr04t_config, jsn_sr04t_data_t *js
         vTaskDelay(500 / portTICK_PERIOD_MS);
     }
     #warning "DO NOT user printf"
-    // printf("[ ");
-    for (int i = 0; i < jsn_sr04t_config->no_of_samples; i++)
-    {
-        // printf("%.2f ", sample[i].distance_cm);
-        if (!sample[i].is_an_error)
+        // printf("[ ");
+        for (int i = 0; i < jsn_sr04t_config->no_of_samples; i++)
         {
-            distance += sample[i].distance_cm;
+            // printf("%.2f ", sample[i].distance_cm);
+            if (!sample[i].is_an_error)
+            {
+                distance += sample[i].distance_cm;
+            }
         }
-    }
     #warning "DO NOT user printf"
-    // printf("]\n");
+        // printf("]\n");
 
-    // if (count_errors > 0)
-    // {
-    //     jsn_sr04t_data->is_an_error = true;
-    //     ret = ESP_ERR_INVALID_RESPONSE;
-    //     ESP_LOGE(TAG1, "%s(). Abort At least one measurement is incorrect", __FUNCTION__);
-    //     goto err;
-    // }
+        // if (count_errors > 0)
+        // {
+        //     jsn_sr04t_data->is_an_error = true;
+        //     ret = ESP_ERR_INVALID_RESPONSE;
+        //     ESP_LOGE(TAG1, "%s(). Abort At least one measurement is incorrect", __FUNCTION__);
+        //     goto err;
+        // }
 
-    jsn_sr04t_data->data_received = true;
+        jsn_sr04t_data->data_received = true;
     jsn_sr04t_data->distance_cm = distance / (jsn_sr04t_config->no_of_samples - count_errors);
 
     // err:
     return jsn_sr04t_data->data_received;
 }
+
+/*******************************************************************************
+*                         Static Function Definitions
+*******************************************************************************/
+
+/*******************************************************************************
+*                          End of File
+*******************************************************************************/

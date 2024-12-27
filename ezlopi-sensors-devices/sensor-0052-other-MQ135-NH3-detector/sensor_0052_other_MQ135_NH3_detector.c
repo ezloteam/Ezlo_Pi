@@ -32,7 +32,7 @@ typedef struct s_mq135_value
     float MQ135_R0_constant;
 } s_mq135_value_t;
 
-const char *mq135_sensor_gas_alarm_token[] = {
+static const char *mq135_sensor_gas_alarm_token[] = {
     "no_gas",
     "combustible_gas_detected",
     "toxic_gas_detected",
@@ -53,7 +53,7 @@ static void __prepare_device_digi_cloud_properties(l_ezlopi_device_t *device, cJ
 static void __prepare_item_adc_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_data);
 //--------------------------------------------------------------------------------------------------------
 
-ezlopi_error_t sensor_0052_other_MQ135_NH3_detector(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+ezlopi_error_t SENSOR_0052_other_mq135_nh3_detector(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_FAILED;
     switch (action)
@@ -104,7 +104,7 @@ static ezlopi_error_t __0052_prepare(void *arg)
         {
             TRACE_I("Parent_MQ135_device_digi-[0x%x] ", MQ135_device_parent_digi->cloud_properties.device_id);
             __prepare_device_digi_cloud_properties(MQ135_device_parent_digi, device_prep_arg->cjson_device);
-            l_ezlopi_item_t *MQ135_item_digi = EZPI_core_device_add_item_to_device(MQ135_device_parent_digi, sensor_0052_other_MQ135_NH3_detector);
+            l_ezlopi_item_t *MQ135_item_digi = EZPI_core_device_add_item_to_device(MQ135_device_parent_digi, SENSOR_0052_other_mq135_nh3_detector);
             if (MQ135_item_digi)
             {
                 __prepare_item_digi_cloud_properties(MQ135_item_digi, device_prep_arg->cjson_device);
@@ -122,7 +122,7 @@ static ezlopi_error_t __0052_prepare(void *arg)
                     TRACE_I("Child_MQ135_device_adc-[0x%x] ", MQ135_device_child_adc->cloud_properties.device_id);
                     __prepare_device_adc_cloud_properties(MQ135_device_child_adc, device_prep_arg->cjson_device);
 
-                    l_ezlopi_item_t *MQ135_item_adc = EZPI_core_device_add_item_to_device(MQ135_device_child_adc, sensor_0052_other_MQ135_NH3_detector);
+                    l_ezlopi_item_t *MQ135_item_adc = EZPI_core_device_add_item_to_device(MQ135_device_child_adc, SENSOR_0052_other_mq135_nh3_detector);
                     if (MQ135_item_adc)
                     {
                         __prepare_item_adc_cloud_properties(MQ135_item_adc, device_prep_arg->cjson_device, MQ135_value);

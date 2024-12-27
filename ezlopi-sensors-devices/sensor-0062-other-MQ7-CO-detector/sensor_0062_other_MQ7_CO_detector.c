@@ -1,14 +1,50 @@
-// #include <string.h>
-#include <math.h>
-#include "ezlopi_util_trace.h"
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+/**
+* @file    sensor_0062_other_MQ7_CO_detector.c
+* @brief   perform some function on sensor_0062
+* @author  xx
+* @version 0.1
+* @date    xx
+*/
 
-// #include "ezlopi_core_timer.h"
-#include "ezlopi_core_actions.h"
+/*******************************************************************************
+*                          Include Files
+*******************************************************************************/
+#include <math.h>
+
 #include "ezlopi_core_processes.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
-#include "ezlopi_core_errors.h"
 
 #include "ezlopi_hal_adc.h"
 
@@ -20,10 +56,17 @@
 #include "sensor_0062_other_MQ7_CO_detector.h"
 #include "EZLOPI_USER_CONFIG.h"
 
-//*************************************************************************
-//                          Declaration
-//*************************************************************************
+/*******************************************************************************
+*                          Extern Data Declarations
+*******************************************************************************/
 
+/*******************************************************************************
+*                          Extern Function Declarations
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Type & Macro Definitions
+*******************************************************************************/
 typedef struct s_mq7_value
 {
     uint8_t status_flag : 3; // BIT2 = avg_volt_flag  ; BIT1 = loop_stop_flag  ; BIT0 = Calibration_complete_C0
@@ -34,13 +77,10 @@ typedef struct s_mq7_value
     float MQ7_R0_constant;
 } s_mq7_value_t;
 
-const char *mq7_sensor_gas_alarm_token[] = {
-    "no_gas",
-    "combustible_gas_detected",
-    "toxic_gas_detected",
-    "unknown",
-};
-//-------------------------------------------------------------------------
+/*******************************************************************************
+*                          Static Function Prototypes
+*******************************************************************************/
+
 static ezlopi_error_t __0062_prepare(void *arg);
 static ezlopi_error_t __0062_init(l_ezlopi_item_t *item);
 static ezlopi_error_t __0062_get_item(l_ezlopi_item_t *item, void *arg);
@@ -53,9 +93,25 @@ static void __prepare_device_digi_cloud_properties(l_ezlopi_device_t *device, cJ
 static void __prepare_item_digi_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device);
 static void __prepare_device_adc_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
 static void __prepare_item_adc_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_data);
-//--------------------------------------------------------------------------------------------------------
 
-ezlopi_error_t sensor_0062_other_MQ7_CO_detector(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+/*******************************************************************************
+*                          Static Data Definitions
+*******************************************************************************/
+
+static const char *mq7_sensor_gas_alarm_token[] = {
+    "no_gas",
+    "combustible_gas_detected",
+    "toxic_gas_detected",
+    "unknown",
+};
+/*******************************************************************************
+*                          Extern Data Definitions
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Extern Function Definitions
+*******************************************************************************/
+ezlopi_error_t SENSOR_0062_other_mq7_co_detector(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
     switch (action)
@@ -92,7 +148,11 @@ ezlopi_error_t sensor_0062_other_MQ7_CO_detector(e_ezlopi_actions_t action, l_ez
     }
     return ret;
 }
-//----------------------------------------------------
+
+/*******************************************************************************
+*                         Static Function Definitions
+*******************************************************************************/
+
 static ezlopi_error_t __0062_prepare(void *arg)
 {
     ezlopi_error_t ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
@@ -106,7 +166,7 @@ static ezlopi_error_t __0062_prepare(void *arg)
             TRACE_I("Parent_MQ7_device_digi-[0x%x] ", MQ7_device_parent_digi->cloud_properties.device_id);
             __prepare_device_digi_cloud_properties(MQ7_device_parent_digi, device_prep_arg->cjson_device);
 
-            l_ezlopi_item_t *MQ7_item_digi = EZPI_core_device_add_item_to_device(MQ7_device_parent_digi, sensor_0062_other_MQ7_CO_detector);
+            l_ezlopi_item_t *MQ7_item_digi = EZPI_core_device_add_item_to_device(MQ7_device_parent_digi, SENSOR_0062_other_mq7_co_detector);
             if (MQ7_item_digi)
             {
                 __prepare_item_digi_cloud_properties(MQ7_item_digi, device_prep_arg->cjson_device);
@@ -124,7 +184,7 @@ static ezlopi_error_t __0062_prepare(void *arg)
                     TRACE_I("Child_MQ135_device_adc-[0x%x] ", MQ7_device_child_adc->cloud_properties.device_id);
                     __prepare_device_adc_cloud_properties(MQ7_device_child_adc, device_prep_arg->cjson_device);
 
-                    l_ezlopi_item_t *MQ7_item_adc = EZPI_core_device_add_item_to_device(MQ7_device_child_adc, sensor_0062_other_MQ7_CO_detector);
+                    l_ezlopi_item_t *MQ7_item_adc = EZPI_core_device_add_item_to_device(MQ7_device_child_adc, SENSOR_0062_other_mq7_co_detector);
                     if (MQ7_item_adc)
                     {
                         __prepare_item_adc_cloud_properties(MQ7_item_adc, device_prep_arg->cjson_device, MQ7_value);
@@ -487,3 +547,7 @@ static void __calibrate_MQ7_R0_resistance(void *params)
     //     EZPI_core_process_set_is_deleted(ENUM_EZLOPI_SENSOR_MQ7_TASK);
     // #endif
 }
+
+/*******************************************************************************
+*                          End of File
+*******************************************************************************/

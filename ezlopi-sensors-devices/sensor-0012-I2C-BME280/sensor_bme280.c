@@ -108,8 +108,13 @@
  /*******************************************************************************
  *                          Static Function Prototypes
  *******************************************************************************/
-static void ezpi_subcomponent_functiontitle(type_t arg);
-
+inline static esp_err_t read_register_8(s_ezlopi_i2c_master_t *i2c_master_conf, uint8_t reg, uint8_t *r);
+static esp_err_t read_register16(s_ezlopi_i2c_master_t *i2c_master_conf, uint8_t reg, uint16_t *r);
+static esp_err_t read_calibration_data(s_ezlopi_i2c_master_t *i2c_master_conf, bmp280_t *dev);
+static esp_err_t read_hum_calibration_data(s_ezlopi_i2c_master_t *i2c_master_conf, bmp280_t *dev);
+static inline int32_t compensate_temperature(bmp280_t *dev, int32_t adc_temp, int32_t *fine_temp);
+static inline uint32_t compensate_pressure(bmp280_t *dev, int32_t adc_press, int32_t fine_temp);
+static inline uint32_t compensate_humidity(bmp280_t *dev, int32_t adc_hum, int32_t fine_temp);
 /*******************************************************************************
 *                          Static Data Definitions
 *******************************************************************************/

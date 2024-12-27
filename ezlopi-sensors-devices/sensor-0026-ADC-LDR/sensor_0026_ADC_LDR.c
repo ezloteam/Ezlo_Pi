@@ -39,14 +39,10 @@
 /*******************************************************************************
 *                          Include Files
 *******************************************************************************/
-#include "ezlopi_util_trace.h"
-
-// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
-#include "ezlopi_core_errors.h"
 
 #include "ezlopi_hal_adc.h"
 
@@ -96,7 +92,7 @@ static ezlopi_error_t _get_item_list(l_ezlopi_item_t *item, void *arg);
 *                          Extern Function Definitions
 *******************************************************************************/
 
-ezlopi_error_t SENSOR_0026_ADC_LDR(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+ezlopi_error_t SENSOR_0026_adc_ldr(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
 
@@ -180,7 +176,7 @@ static ezlopi_error_t __prepare(void *arg)
             if (device)
             {
                 __setup_device_cloud_params(device, cj_device);
-                l_ezlopi_item_t *item = EZPI_core_device_add_item_to_device(device, sensor_0026_ADC_LDR);
+                l_ezlopi_item_t *item = EZPI_core_device_add_item_to_device(device, SENSOR_0026_adc_ldr);
                 if (item)
                 {
                     __setup_item_cloud_properties(item, cj_device);

@@ -42,14 +42,11 @@
 
 #include "../../build/config/sdkconfig.h"
 #include <math.h>
-#include "ezlopi_util_trace.h"
 
-// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
-#include "ezlopi_core_errors.h"
 
 #include "ezlopi_hal_i2c_master.h"
 
@@ -92,7 +89,7 @@ static ezlopi_error_t __get_value_cjson(l_ezlopi_item_t *item, void *arg);
 *                          Extern Function Definitions
 *******************************************************************************/
 
-ezlopi_error_t SENSOR_0008_I2C_LTR303ALS(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+ezlopi_error_t SENSOR_0008_i2c_ltr303als(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
     switch (action)
@@ -237,7 +234,7 @@ static ezlopi_error_t __prepare(void *arg)
         if (als_ltr303_device)
         {
             __prepare_device_cloud_properties(als_ltr303_device, prep_arg->cjson_device);
-            l_ezlopi_item_t *als_ltr303_item = EZPI_core_device_add_item_to_device(als_ltr303_device, sensor_0008_I2C_LTR303ALS);
+            l_ezlopi_item_t *als_ltr303_item = EZPI_core_device_add_item_to_device(als_ltr303_device, SENSOR_0008_i2c_ltr303als);
             if (als_ltr303_item)
             {
                 __prepare_item_properties(als_ltr303_item, prep_arg->cjson_device);

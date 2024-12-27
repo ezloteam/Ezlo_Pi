@@ -60,8 +60,12 @@
 /*******************************************************************************
 *                          Static Function Prototypes
 *******************************************************************************/
-static void ezpi_subcomponent_functiontitle(type_t arg);
-
+static esp_err_t get_device_id(l_ezlopi_item_t *item);
+static esp_err_t data_formatting(l_ezlopi_item_t *item);
+static esp_err_t set_to_measure_mode(l_ezlopi_item_t *item);
+static esp_err_t enable_data_ready_interrupt(l_ezlopi_item_t *item);
+static esp_err_t reset_measure_mode(l_ezlopi_item_t *item);
+static esp_err_t adxl345_check_data_ready_INTR(l_ezlopi_item_t *item, uint8_t *temp);
 /*******************************************************************************
 *                          Static Data Definitions
 *******************************************************************************/
@@ -73,7 +77,7 @@ static void ezpi_subcomponent_functiontitle(type_t arg);
 /*******************************************************************************
 *                          Extern Function Definitions
 *******************************************************************************/
-ezlopi_error_t __adxl345_configure_device(l_ezlopi_item_t *item)
+ezlopi_error_t ADXL345_configure_device(l_ezlopi_item_t *item)
 {
     ezlopi_error_t ret = EZPI_FAILED;
     if (item)
@@ -88,7 +92,7 @@ ezlopi_error_t __adxl345_configure_device(l_ezlopi_item_t *item)
     return ret;
 }
 
-void __adxl345_get_axis_value(l_ezlopi_item_t *item)
+void ADXL345_get_axis_value(l_ezlopi_item_t *item)
 {
     if (item)
     {

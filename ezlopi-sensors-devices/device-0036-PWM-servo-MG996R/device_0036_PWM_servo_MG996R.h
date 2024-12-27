@@ -73,8 +73,7 @@ extern "C"
     * @param user_arg User-arg
     * @return ezlopi_error_t
     */
-
-    ezlopi_error_t DEVICE_0036_PWM_servo_MG996R(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
+    ezlopi_error_t DEVICE_0036_pwm_servo_mg996r(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
 
 #ifdef __cplusplus

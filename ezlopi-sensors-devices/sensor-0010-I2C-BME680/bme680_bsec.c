@@ -65,7 +65,7 @@
  * @param[in] bsec      : Instance of BSEC2 calling the callback
  */
     static void bme680_data_callback(const bme68x_data data, const bsec_outputs outputs);
-
+static bool bme680_copy_data(bme680_data_t *dest, bme680_data_t *src);
 /*******************************************************************************
 *                          Static Data Definitions
 *******************************************************************************/

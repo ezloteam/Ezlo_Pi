@@ -42,14 +42,11 @@
 #include <math.h>
 #include "../../build/config/sdkconfig.h"
 #include "driver/gpio.h"
-#include "ezlopi_util_trace.h"
 
-// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
-#include "ezlopi_core_errors.h"
 
 // #include "ezlopi_hal_i2c_master.h"
 // #include "ezlopi_hal_spi_master.h"
@@ -62,7 +59,6 @@
 
 #include "device_0009_other_RMT_SK6812.h"
 #include "EZLOPI_USER_CONFIG.h"
-
 
 /*******************************************************************************
 *                          Extern Data Declarations
@@ -109,7 +105,7 @@ static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg);
 *                          Extern Function Definitions
 *******************************************************************************/
 
-ezlopi_error_t DEVICE_0009_other_RMT_SK6812(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+ezlopi_error_t DEVICE_0009_other_rmt_sk6812(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
 
@@ -260,7 +256,7 @@ static ezlopi_error_t __set_cjson_value(l_ezlopi_item_t *item, void *arg)
 
 static ezlopi_error_t __init(l_ezlopi_item_t *item)
 {
-    ezlopi_error_t ret = EZPI_SUCCESS;
+    ezlopi_error_t ret = EZPI_ERR_INIT_DEVICE_FAILED;
     if (item)
     {
         if (GPIO_IS_VALID_GPIO(item->interface.pwm.gpio_num))
@@ -293,25 +289,21 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
                             if (ESP_OK == (err = led_strip_flush(&dimmer_args->sk6812_strip)))
                             {
                                 dimmer_args->sk6812_led_strip_initialized = true;
+                                ret = EZPI_SUCCESS;
                             }
                         }
-                    }
 
+                    }
                     if (ESP_OK != err)
                     {
                         TRACE_E("Couldn't initiate device!, error: %d", err);
-                        ret = EZPI_ERR_INIT_DEVICE_FAILED;
                     }
                 }
+                else
+                {
+                    ret = EZPI_SUCCESS;
+                }
             }
-            else
-            {
-                ret = EZPI_ERR_INIT_DEVICE_FAILED;
-            }
-        }
-        else
-        {
-            ret = EZPI_ERR_INIT_DEVICE_FAILED;
         }
     }
     return ret;
@@ -435,7 +427,7 @@ static void __prepare_SK6812_LED_onoff_switch_item(l_ezlopi_item_t *item, cJSON 
 
 static ezlopi_error_t __prepare(void *arg)
 {
-    ezlopi_error_t ret = EZPI_SUCCESS;
+    ezlopi_error_t ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
 
     s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
     if (prep_arg && prep_arg->cjson_device)
@@ -450,12 +442,12 @@ static ezlopi_error_t __prepare(void *arg)
             {
                 memset(dimmer_args, 0, sizeof(s_dimmer_args_t));
 
-                dimmer_args->rgb_color_item = EZPI_core_device_add_item_to_device(device, device_0009_other_RMT_SK6812);
-                dimmer_args->dimmer_item = EZPI_core_device_add_item_to_device(device, device_0009_other_RMT_SK6812);
-                dimmer_args->dimmer_up_item = EZPI_core_device_add_item_to_device(device, device_0009_other_RMT_SK6812);
-                dimmer_args->dimmer_down_item = EZPI_core_device_add_item_to_device(device, device_0009_other_RMT_SK6812);
-                dimmer_args->dimmer_stop_item = EZPI_core_device_add_item_to_device(device, device_0009_other_RMT_SK6812);
-                dimmer_args->switch_item = EZPI_core_device_add_item_to_device(device, device_0009_other_RMT_SK6812);
+                dimmer_args->rgb_color_item = EZPI_core_device_add_item_to_device(device, DEVICE_0009_other_rmt_sk6812);
+                dimmer_args->dimmer_item = EZPI_core_device_add_item_to_device(device, DEVICE_0009_other_rmt_sk6812);
+                dimmer_args->dimmer_up_item = EZPI_core_device_add_item_to_device(device, DEVICE_0009_other_rmt_sk6812);
+                dimmer_args->dimmer_down_item = EZPI_core_device_add_item_to_device(device, DEVICE_0009_other_rmt_sk6812);
+                dimmer_args->dimmer_stop_item = EZPI_core_device_add_item_to_device(device, DEVICE_0009_other_rmt_sk6812);
+                dimmer_args->switch_item = EZPI_core_device_add_item_to_device(device, DEVICE_0009_other_rmt_sk6812);
 
                 if (dimmer_args->switch_item && dimmer_args->dimmer_item && dimmer_args->dimmer_up_item && dimmer_args->dimmer_down_item && dimmer_args->dimmer_stop_item && dimmer_args->rgb_color_item)
                 {
@@ -479,18 +471,17 @@ static ezlopi_error_t __prepare(void *arg)
                     __prepare_SK6812_RGB_dimmer_down_item(dimmer_args->dimmer_down_item, prep_arg->cjson_device);
                     __prepare_SK6812_RGB_dimmer_stop_item(dimmer_args->dimmer_stop_item, prep_arg->cjson_device);
                     __prepare_SK6812_LED_onoff_switch_item(dimmer_args->switch_item, prep_arg->cjson_device);
+                    ret = EZPI_SUCCESS;
                 }
                 else
                 {
                     ezlopi_free(__FUNCTION__, dimmer_args);
                     EZPI_core_device_free_device(device);
-                    ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                 }
             }
             else
             {
                 EZPI_core_device_free_device(device);
-                ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
             }
         }
     }

@@ -184,7 +184,7 @@ extern "C"
     * @param user_arg User-arg
     * @return ezlopi_error_t
     */
-    ezlopi_error_t SENSOR_0007_I2C_GY271(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
+    ezlopi_error_t SENSOR_0007_i2c_gy271(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
     /**
      * @brief Function to configure gy271
@@ -192,7 +192,7 @@ extern "C"
      * @param item Target-Item node
      * @return ezlopi_error_t
      */
-    ezlopi_error_t __gy271_configure(l_ezlopi_item_t *item);
+    ezlopi_error_t GY271_configure_init(l_ezlopi_item_t *item);
     /**
      * @brief Function to update gy271 value
      *
@@ -200,14 +200,14 @@ extern "C"
      * @return true
      * @return false
      */
-    bool __gy271_update_value(l_ezlopi_item_t *item);
+    bool GY271_update_value(l_ezlopi_item_t *item);
     /**
      * @brief Function to get raw values
      *
      * @param item Target-Item node
      * @param calibrationData Pointer to Calibration Data
      */
-    void __gy271_get_raw_max_min_values(l_ezlopi_item_t *item, int (*calibrationData)[2]);
+    void GY271_get_raw_max_min_values(l_ezlopi_item_t *item, int (*calibrationData)[2]);
     //-----------------------------------------------------------------------------------------------
 
 #ifdef __cplusplus

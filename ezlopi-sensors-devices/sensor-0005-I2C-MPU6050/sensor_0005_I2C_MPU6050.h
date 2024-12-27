@@ -217,15 +217,14 @@ extern "C"
     * @param user_arg User-arg
     * @return ezlopi_error_t
     */
-    // Action function declaration
-    ezlopi_error_t SENSOR_0005_I2C_MPU6050(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
+    ezlopi_error_t SENSOR_0005_i2c_mpu6050(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
     /**
      * @brief Function to get mpu6050 data
      *
      * @param item Target Item
      */
-    void __mpu6050_get_data(l_ezlopi_item_t *item);
+    void MPU6050_get_data(l_ezlopi_item_t *item);
 
     /**
      * @brief Function to configure device
@@ -233,7 +232,7 @@ extern "C"
      * @param item Target Item
      * @return e_mpu6050_err_t
      */
-    e_mpu6050_err_t __mpu6050_config_device(l_ezlopi_item_t *item);
+    e_mpu6050_err_t MPU6050_config_device(l_ezlopi_item_t *item);
 
 
 
