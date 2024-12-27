@@ -456,7 +456,7 @@ static cJSON *__otel_create_span_struct(s_otel_trace_t *otel_data)
             cJSON_AddStringToObject(__FUNCTION__, cj_span, ezlopi_startTimeUnixNano_str, tmp_buffer);
 
             snprintf(tmp_buffer, sizeof(tmp_buffer), "%llu", otel_data->end_time * 1000000000LLU);
-            cJSON_AddStringToObject(__FUNCTION__, cj_span, ezlopi_endTime_str, tmp_buffer);
+            cJSON_AddStringToObject(__FUNCTION__, cj_span, ezlopi_endTimeUnixNano_str, tmp_buffer);
         }
 
         // __otel_add_time_stamp_nano(cj_span, ezlopi_startTimeUnixNano_str, ezlopi_startTime_str, cj_trace_info);

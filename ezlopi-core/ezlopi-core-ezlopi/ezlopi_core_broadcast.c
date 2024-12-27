@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    ezlopi_core_broadcast.c
-* @brief   Function to perform broadcast operations
-* @author  xx
-* @version 0.1
-* @date    12th DEC 2024
-*/
+ * @file    ezlopi_core_broadcast.c
+ * @brief   Function to perform broadcast operations
+ * @author  xx
+ * @version 0.1
+ * @date    12th DEC 2024
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include <time.h>
 #include <stdio.h>
 #include <string.h>
@@ -59,38 +59,38 @@
 #include "EZLOPI_USER_CONFIG.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static ezlopi_error_t __call_broadcast_methods(char *data);
 static l_broadcast_method_t *__method_create(f_broadcast_method_t method, char *name, uint32_t retries);
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 static l_broadcast_method_t *__method_head = NULL;
-static ezlopi_error_t(*__broadcast_queue_func)(cJSON *cj_data) = NULL;
+static ezlopi_error_t (*__broadcast_queue_func)(cJSON *cj_data) = NULL;
 // static uint32_t __message_count = 0;
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
-void EZPI_core_broadcast_methods_set_queue(ezlopi_error_t(*func)(cJSON *))
+ *                          Extern Function Definitions
+ *******************************************************************************/
+void EZPI_core_broadcast_methods_set_queue(ezlopi_error_t (*func)(cJSON *))
 {
     __broadcast_queue_func = func;
 }
@@ -238,10 +238,9 @@ void EZPI_core_broadcast_remove_method(f_broadcast_method_t broadcast_method)
     }
 }
 
-
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 static ezlopi_error_t __call_broadcast_methods(char *data)
 {
     ezlopi_error_t ret = EZPI_ERR_BROADCAST_FAILED;
@@ -250,6 +249,7 @@ static ezlopi_error_t __call_broadcast_methods(char *data)
     while (curr_method)
     {
         uint64_t start_time = EZPI_core_sntp_get_current_time_sec();
+        printf("%s[%u]: start-time: %llu\r\n", __FILENAME__, __LINE__, start_time);
 
         if (curr_method->func)
         {
@@ -320,5 +320,5 @@ static l_broadcast_method_t *__method_create(f_broadcast_method_t method, char *
 }
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

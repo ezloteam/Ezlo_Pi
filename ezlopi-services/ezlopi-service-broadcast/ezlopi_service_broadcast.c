@@ -138,7 +138,8 @@ static void __broadcast_loop(void *arg)
                 memset(trace_obj, 0, sizeof(s_otel_trace_t));
 
                 trace_obj->kind = E_OTEL_KIND_SERVER;
-                trace_obj->start_time = cj_startTime ? cj_startTime->valuedouble : 0;
+                printf("%s[%d]: startTime: %llu\r\n", __FILENAME__, __LINE__, (uint64_t)cj_startTime->valuedouble);
+                trace_obj->start_time = start_time;
                 trace_obj->end_time = EZPI_core_sntp_get_current_time_sec();
                 trace_obj->free_heap = esp_get_free_heap_size();
                 trace_obj->heap_watermark = esp_get_minimum_free_heap_size();
