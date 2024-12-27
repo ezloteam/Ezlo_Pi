@@ -35,13 +35,13 @@
  * @author  xx
  * @version 0.1
  * @date    12th DEC 2024
-*/
+ */
 
 #ifndef _EZLOPI_CORE_WEBSOCKET_CLIENT_H_
 #define _EZLOPI_CORE_WEBSOCKET_CLIENT_H_
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -60,24 +60,24 @@
 #include "esp_websocket_client.h"
 
 /*******************************************************************************
-*                          C++ Declaration Wrapper
-*******************************************************************************/
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
     /*******************************************************************************
-    *                          Type & Macro Declarations
-    *******************************************************************************/
+     *                          Type & Macro Declarations
+     *******************************************************************************/
 
     /*******************************************************************************
-    *                          Extern Data Declarations
-    *******************************************************************************/
+     *                          Extern Data Declarations
+     *******************************************************************************/
 
     /*******************************************************************************
-    *                          Extern Function Prototypes
-    *******************************************************************************/
+     *                          Extern Function Prototypes
+     *******************************************************************************/
 
     /**
      * @brief  Function to send websocket client request
@@ -100,8 +100,8 @@ extern "C"
      * @param ssl_shared SSL-shared key
      * @return esp_websocket_client_handle_t
      */
-    esp_websocket_client_handle_t EZPI_core_websocket_client_init(cJSON *uri, int (*msg_upcall)(char *, uint32_t, time_t time_ms), void (*connection_upcall)(bool connected),
-        char *ca_cert, char *ssl_private, char *ssl_shared);
+    esp_websocket_client_handle_t EZPI_core_websocket_client_init(cJSON *uri, int (*msg_upcall)(char *, uint32_t, time_t time_stamp), void (*connection_upcall)(bool connected),
+                                                                  char *ca_cert, char *ssl_private, char *ssl_shared);
     /**
      * @brief Function to get websocket connection status
      *
@@ -152,7 +152,6 @@ extern "C"
     };
 #endif
 
-
 #ifdef __cplusplus
 }
 #endif
@@ -160,7 +159,5 @@ extern "C"
 #endif // _EZLOPI_CORE_WEBSOCKET_CLIENT_H_
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
-
-
+ *                          End of File
+ *******************************************************************************/

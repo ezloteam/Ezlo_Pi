@@ -96,6 +96,7 @@ static void __broadcast_loop(void *arg)
     {
         if ((xTaskGetTickCount() - broadcast_wait_start) > 5 / portTICK_RATE_MS)
         {
+#ifdef CONFIG_EZPI_OPENTELEMETRY_ENABLE_TRACES
             double start_time = 0;
             char *id_str = NULL;
             char *msg_subclass_str = NULL;
@@ -123,23 +124,25 @@ static void __broadcast_loop(void *arg)
             cJSON *cj_startTime = cJSON_DetachItemFromObject(__FUNCTION__, cj_data, ezlopi_startTime_str);
             if (cj_startTime)
             {
+                printf("%s[%u]: startTime: %llu\r\n", __FILENAME__, __LINE__, (uint64_t)cj_startTime->valuedouble);
                 start_time = cj_startTime->valuedouble;
                 cJSON_Delete(__FUNCTION__, cj_startTime);
             }
+#endif
 
             EZPI_core_broadcast_cjson(cj_data);
             cJSON_Delete(__FUNCTION__, cj_data);
             cj_data = NULL;
 
-#if 1
+#ifdef CONFIG_EZPI_OPENTELEMETRY_ENABLE_TRACES
             s_otel_trace_t *trace_obj = ezlopi_malloc(__FUNCTION__, sizeof(s_otel_trace_t));
             if (trace_obj)
             {
                 memset(trace_obj, 0, sizeof(s_otel_trace_t));
 
-                trace_obj->kind = E_OTEL_KIND_SERVER;
-                printf("%s[%d]: startTime: %llu\r\n", __FILENAME__, __LINE__, (uint64_t)cj_startTime->valuedouble);
-                trace_obj->start_time = start_time;
+                trace_obj->kind = E_OTEL_KIND_CLIENT;
+                printf("%s[%d]: startTime: %lu\r\n", __FILENAME__, __LINE__, (time_t)start_time);
+                trace_obj->start_time = (time_t)start_time;
                 trace_obj->end_time = EZPI_core_sntp_get_current_time_sec();
                 trace_obj->free_heap = esp_get_free_heap_size();
                 trace_obj->heap_watermark = esp_get_minimum_free_heap_size();
@@ -152,7 +155,6 @@ static void __broadcast_loop(void *arg)
 
                 if (0 == ezlopi_service_otel_add_trace_to_telemetry_queue_struct(trace_obj))
                 {
-
                     id_str = trace_obj->id;                     // re-assigning to free in case adding to queue fails
                     msg_subclass_str = trace_obj->msg_subclass; // re-assigning to free in case adding to queue fails
                     ezlopi_free(__FUNCTION__, trace_obj);

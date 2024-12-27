@@ -50,15 +50,19 @@ typedef struct s_otel_attr
 
 typedef struct s_otel_trace
 {
-    const char *name;
     char *id;
+    char *error;
     char *method;
     char *msg_subclass;
+
+    const char *name;
+    e_otel_kind_t kind;
+
     time_t start_time;
     time_t end_time;
+    
     uint32_t free_heap;
     uint32_t heap_watermark;
-    e_otel_kind_t kind;
 
     s_otel_attr_t *attributes;
 

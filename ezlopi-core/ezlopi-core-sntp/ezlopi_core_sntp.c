@@ -216,12 +216,12 @@ void EZPI_core_sntp_epoch_to_iso8601(char *time_buf, uint32_t buf_len, time_t t)
     }
 }
 
-uint64_t EZPI_core_sntp_get_current_time_ms(void)
+time_t EZPI_core_sntp_get_current_time_ms(void)
 {
     return (EZPI_core_sntp_get_current_time_sec() * 1000LLU);
 }
 
-uint64_t EZPI_core_sntp_get_current_time_sec_abc(const char *function_name)
+time_t EZPI_core_sntp_get_current_time_sec_abc(const char *function_name)
 {
     time_t now = 0;
     int retries = 3;

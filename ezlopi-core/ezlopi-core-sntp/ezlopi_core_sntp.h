@@ -109,16 +109,16 @@ extern "C"
     /**
      * @brief Function to get current time in ms
      *
-     * @return uint64_t
+     * @return time_t
      */
-    uint64_t EZPI_core_sntp_get_current_time_ms(void);
+    time_t EZPI_core_sntp_get_current_time_ms(void);
     /**
      * @brief Function to get current time in sec
      *
-     * @return uint64_t
+     * @return time_t
      */
-    // uint64_t EZPI_core_sntp_get_current_time_sec(void);
-    uint64_t EZPI_core_sntp_get_current_time_sec_abc(const char *filename);
+    // time_t EZPI_core_sntp_get_current_time_sec(void);
+    time_t EZPI_core_sntp_get_current_time_sec_abc(const char *filename);
 #define EZPI_core_sntp_get_current_time_sec() EZPI_core_sntp_get_current_time_sec_abc(__FUNCTION__)
 
 #ifdef __cplusplus

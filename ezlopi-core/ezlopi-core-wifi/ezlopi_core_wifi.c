@@ -597,7 +597,7 @@ static void __ezlopi_wifi_broadcast_scan_report(bool state)
             }
         }
 
-        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_scan_report))
+        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_scan_report, EZPI_core_sntp_get_current_time_sec()))
         {
             cJSON_Delete(__FUNCTION__, cj_scan_report);
         }

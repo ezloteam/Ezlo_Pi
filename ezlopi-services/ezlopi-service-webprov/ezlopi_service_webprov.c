@@ -95,8 +95,8 @@ static int __provision_update(char *arg);
 static void __fetch_wss_endpoint(void *pv);
 
 static void __connection_upcall(bool connected);
-static void __message_process_cjson(cJSON *cj_request, time_t time_ms);
-static int __message_upcall(char *payload, uint32_t len, time_t time_ms);
+static void __message_process_cjson(cJSON *cj_request, time_t time_stamp);
+static int __message_upcall(char *payload, uint32_t len, time_t time_stamp);
 
 static int __send_cjson_data_to_nma_websocket(cJSON *cj_data);
 static ezlopi_error_t __send_str_data_to_nma_websocket(char *str_data);
@@ -232,6 +232,8 @@ static void __fetch_wss_endpoint(void *pv)
 
                 if (rx_message && (ret == pdTRUE))
                 {
+                    char *error = NULL;
+                    char *id_str = NULL;
                     char *method_str = NULL;
 
                     if (rx_message->payload)
@@ -239,8 +241,17 @@ static void __fetch_wss_endpoint(void *pv)
                         cJSON *cj_request = cJSON_Parse(__FUNCTION__, rx_message->payload);
                         if (cj_request)
                         {
-                            cJSON *cj_method = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_method_str);
+                            cJSON *cj_id = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_id_str);
+                            if (cj_id && cj_id->valuestring && (cj_id->type == cJSON_String) && cj_id->str_value_len)
+                            {
+                                id_str = ezlopi_malloc(__FUNCTION__, cj_id->str_value_len + 1);
+                                if (id_str)
+                                {
+                                    snprintf(id_str, cj_id->str_value_len + 1, "%.*s", cj_id->str_value_len, cj_id->valuestring);
+                                }
+                            }
 
+                            cJSON *cj_method = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_method_str);
                             if (cj_method)
                             {
                                 method_str = ezlopi_malloc(__FUNCTION__, cj_method->str_value_len + 1);
@@ -249,9 +260,6 @@ static void __fetch_wss_endpoint(void *pv)
                                     snprintf(method_str, cj_method->str_value_len + 1, "%.*s", cj_method->str_value_len, cj_method->valuestring);
                                 }
 
-                                // cj_method_dup = cJSON_Duplicate(__FUNCTION__, cj_method, true);
-                                // printf("web-provisioning [method: %.*s]\r\n%s\r\n", cj_method->str_value_len, cj_method->valuestring, rx_message->payload);
-                                // TRACE_D("rx_message->payload [method: %.*s]\r\n%s", cj_method->str_value_len, cj_method->valuestring, rx_message->payload);
                                 ezlopi_free(__FUNCTION__, rx_message->payload);
                                 rx_message->payload = NULL;
                             }
@@ -272,28 +280,33 @@ static void __fetch_wss_endpoint(void *pv)
 
                     ezlopi_free(__FUNCTION__, rx_message);
 
-#if 1
+#ifdef CONFIG_EZPI_OPENTELEMETRY_ENABLE_TRACES
                     s_otel_trace_t *trace_obj = ezlopi_malloc(__FUNCTION__, sizeof(s_otel_trace_t));
                     if (trace_obj)
                     {
                         memset(trace_obj, 0, sizeof(s_otel_trace_t));
 
-                        trace_obj->kind = E_OTEL_KIND_SERVER;
+                        trace_obj->kind = E_OTEL_KIND_CLIENT;
                         trace_obj->start_time = rx_message->time_ms;
                         trace_obj->end_time = EZPI_core_sntp_get_current_time_sec();
                         trace_obj->free_heap = esp_get_free_heap_size();
                         trace_obj->heap_watermark = esp_get_minimum_free_heap_size();
 
+                        trace_obj->id = id_str;
                         trace_obj->method = method_str;
+
+                        id_str = NULL;
                         method_str = NULL;
 
                         if (0 == ezlopi_service_otel_add_trace_to_telemetry_queue_struct(trace_obj))
                         {
-                            ezlopi_free(__FUNCTION__, trace_obj->method);
+                            id_str = trace_obj->id;
+                            method_str = trace_obj->method;
                             ezlopi_free(__FUNCTION__, trace_obj);
                         }
                     }
 
+                    ezlopi_free(__FUNCTION__, id_str);
                     ezlopi_free(__FUNCTION__, method_str);
 #endif
 
@@ -342,14 +355,14 @@ static void __fetch_wss_endpoint(void *pv)
     vTaskDelete(NULL);
 }
 
-static void __message_process_cjson(cJSON *cj_request, time_t time_ms)
+static void __message_process_cjson(cJSON *cj_request, time_t time_stamp)
 {
     if (cj_request)
     {
-        cJSON *cj_response = EZPI_core_api_consume_cjson(__FUNCTION__, cj_request);
+        cJSON *cj_response = EZPI_core_api_consume_cjson(__FUNCTION__, cj_request, time_stamp);
 
         time_t now = EZPI_core_sntp_get_current_time_sec();
-        TRACE_D("time to process: %lu", now - time_ms);
+        TRACE_D("time to process: %lu", (now - time_stamp));
 
         if (cj_response)
         {
@@ -357,7 +370,7 @@ static void __message_process_cjson(cJSON *cj_request, time_t time_ms)
             __send_cjson_data_to_nma_websocket(cj_response);
 
             now = EZPI_core_sntp_get_current_time_sec();
-            TRACE_D("time to reply: %lu", now - time_ms);
+            TRACE_D("time to reply: %lu", (now - time_stamp));
 
             cJSON_Delete(__FUNCTION__, cj_response);
         }
@@ -368,7 +381,7 @@ static void __message_process_cjson(cJSON *cj_request, time_t time_ms)
     }
 }
 
-static int __message_upcall(char *payload, uint32_t len, time_t time_ms)
+static int __message_upcall(char *payload, uint32_t len, time_t time_stamp)
 {
     int ret = 0;
 
@@ -388,7 +401,7 @@ static int __message_upcall(char *payload, uint32_t len, time_t time_ms)
             }
 
             rx_message->payload = payload;
-            rx_message->time_ms = time_ms;
+            rx_message->time_ms = time_stamp;
 
             if (pdTRUE == xQueueSend(_wss_message_queue, &rx_message, 5))
             {

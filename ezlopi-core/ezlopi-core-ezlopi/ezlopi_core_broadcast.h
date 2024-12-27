@@ -34,14 +34,14 @@
  * @author  xx
  * @version 0.1
  * @date    12th DEC 2024
-*/
+ */
 
 #ifndef __EZLOPI_CORE_EZLOPI_BROADCAST_H__
 #define __EZLOPI_CORE_EZLOPI_BROADCAST_H__
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 
 #include <stdio.h>
 #include <ctype.h>
@@ -52,17 +52,17 @@
 #include "ezlopi_core_errors.h"
 
 /*******************************************************************************
-*                          C++ Declaration Wrapper
-*******************************************************************************/
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
     /*******************************************************************************
-    *                          Type & Macro Declarations
-    *******************************************************************************/
-    typedef ezlopi_error_t(*f_broadcast_method_t)(char *data);
+     *                          Type & Macro Declarations
+     *******************************************************************************/
+    typedef ezlopi_error_t (*f_broadcast_method_t)(char *data);
 
     typedef struct l_broadcast_method
     {
@@ -73,20 +73,35 @@ extern "C"
 
     } l_broadcast_method_t;
 
-    /*******************************************************************************
-    *                          Extern Data Declarations
-    *******************************************************************************/
+    typedef enum e_broadcast_source {
+        E_BROADCAST_SOURCE_NONE = 0,
+        E_BROADCAST_SOURCE_UART,
+        E_BROADCAST_SOURCE_WSS_SERVER,
+        E_BROADCAST_SOURCE_WSS_CLIENT,
+        E_BROADCAST_SOURCE_BLE,
+        E_BROADCAST_SOURCE_MAX
+    } e_broadcast_source_t;
+
+    typedef struct s_broadcast_struct {
+        time_t time_stamp;
+        e_broadcast_source_t source;
+        cJSON * cj_broadcast_data;
+    }s_broadcast_struct_t;
 
     /*******************************************************************************
-    *                          Extern Function Prototypes
-    *******************************************************************************/
+     *                          Extern Data Declarations
+     *******************************************************************************/
+
+    /*******************************************************************************
+     *                          Extern Function Prototypes
+     *******************************************************************************/
     // int EZPI_core_broadcast_log_cjson(cJSON *cj_log_data);
     /**
-    * @brief Funtion to broadcast message from cjson
-    *
-    * @param cj_data Pointer to data to be added into queue
-    * @return ezlopi_error_t
-    */
+     * @brief Funtion to broadcast message from cjson
+     *
+     * @param cj_data Pointer to data to be added into queue
+     * @return ezlopi_error_t
+     */
     ezlopi_error_t EZPI_core_broadcast_cjson(cJSON *cj_data);
     /**
      * @brief Function to add broadcast message to queue
@@ -94,7 +109,7 @@ extern "C"
      * @param cj_data Pointer to data to be added into queue
      * @return ezlopi_error_t
      */
-    ezlopi_error_t EZPI_core_broadcast_add_to_queue(cJSON *cj_data);
+    ezlopi_error_t EZPI_core_broadcast_add_to_queue(cJSON *cj_data, time_t time_stamp);
     /**
      * @brief Funtion to remove broadcast method from ll
      *
@@ -106,7 +121,7 @@ extern "C"
      *
      * @param func Target method to add into queue
      */
-    void EZPI_core_broadcast_methods_set_queue(ezlopi_error_t(*func)(cJSON *));
+    void EZPI_core_broadcast_methods_set_queue(ezlopi_error_t (*func)(cJSON *));
     /**
      * @brief Function to add broadcast method
      *
@@ -117,7 +132,6 @@ extern "C"
      */
     l_broadcast_method_t *EZPI_core_broadcast_method_add(f_broadcast_method_t broadcast_method, char *method_name, uint32_t retries);
 
-
 #ifdef __cplusplus
 }
 #endif
@@ -125,5 +139,5 @@ extern "C"
 #endif // __EZLOPI_CORE_EZLOPI_BROADCAST_H__
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

@@ -95,7 +95,7 @@ void EZPI_core_broadcast_methods_set_queue(ezlopi_error_t (*func)(cJSON *))
     __broadcast_queue_func = func;
 }
 
-ezlopi_error_t EZPI_core_broadcast_add_to_queue(cJSON *cj_data)
+ezlopi_error_t EZPI_core_broadcast_add_to_queue(cJSON *cj_data, time_t time_stamp)
 {
     ezlopi_error_t ret = EZPI_ERR_BROADCAST_FAILED;
     if (cj_data && __broadcast_queue_func)
@@ -248,8 +248,8 @@ static ezlopi_error_t __call_broadcast_methods(char *data)
 
     while (curr_method)
     {
-        uint64_t start_time = EZPI_core_sntp_get_current_time_sec();
-        printf("%s[%u]: start-time: %llu\r\n", __FILENAME__, __LINE__, start_time);
+        time_t start_time = EZPI_core_sntp_get_current_time_sec();
+        printf("%s[%u]: start-time: %lu\r\n", __FILENAME__, __LINE__, start_time);
 
         if (curr_method->func)
         {
@@ -277,7 +277,7 @@ static ezlopi_error_t __call_broadcast_methods(char *data)
             } while (retries--);
         }
 
-        uint64_t end_time = EZPI_core_sntp_get_current_time_sec();
+        time_t end_time = EZPI_core_sntp_get_current_time_sec();
         TRACE_W("Broadcast method '%s' took %lu", curr_method->method_name ? curr_method->method_name : "--", end_time - start_time);
 
         curr_method = curr_method->next;

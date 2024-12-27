@@ -27,9 +27,9 @@
 
 typedef struct s_otel_queue_data
 {
-    void *otel_data;
     cJSON *cj_data;
     e_otel_type_t type;
+    s_otel_trace_t *trace_data;
 } s_otel_queue_data_t;
 
 static QueueHandle_t __telemetry_queue = NULL;
@@ -102,7 +102,7 @@ int ezlopi_service_otel_add_trace_to_telemetry_queue_struct(s_otel_trace_t *trac
         if (otel_data)
         {
             otel_data->cj_data = NULL;
-            otel_data->otel_data = trace_obj;
+            otel_data->trace_data = trace_obj;
             otel_data->type = E_OTEL_TRACES_STRUCT;
 
             ret = __push_to_telemetry_queue(otel_data);
@@ -137,7 +137,7 @@ static void __otel_loop(void *pv)
 
             if (otel_data)
             {
-                if (otel_data->cj_data || otel_data->otel_data)
+                if (otel_data->cj_data || otel_data->trace_data)
                 {
                     if (true == EZPI_core_websocket_client_is_connected(__wss_client))
                     {
@@ -161,9 +161,9 @@ static void __otel_loop(void *pv)
                         }
                         case E_OTEL_TRACES_STRUCT:
                         {
-                            if (otel_data->otel_data)
+                            if (otel_data->trace_data)
                             {
-                                cj_telemetry = __ote_trace_decorate_struct(otel_data->otel_data);
+                                cj_telemetry = __ote_trace_decorate_struct(otel_data->trace_data);
                             }
                             break;
                         }
@@ -183,12 +183,12 @@ static void __otel_loop(void *pv)
                         }
                     }
 
-                    s_otel_trace_t *otel_trace_data = (s_otel_trace_t *)otel_data->otel_data;
+                    s_otel_trace_t *otel_trace_data = (s_otel_trace_t *)otel_data->trace_data;
 
                     cJSON_Delete(__FUNCTION__, otel_data->cj_data);
                     ezlopi_free(__FUNCTION__, otel_trace_data->method);
                     ezlopi_free(__FUNCTION__, otel_trace_data->msg_subclass);
-                    ezlopi_free(__FUNCTION__, otel_data->otel_data);
+                    ezlopi_free(__FUNCTION__, otel_data->trace_data);
                 }
 
                 ezlopi_free(__FUNCTION__, otel_data);
@@ -447,9 +447,6 @@ static cJSON *__otel_create_span_struct(s_otel_trace_t *otel_data)
             cJSON_AddStringToObject(__FUNCTION__, cj_span, ezlopi_name_str, otel_data->name);
         }
 
-        // __cjson_detach_and_add(cj_span, ezlopi_name_str, ezlopi_name_str, otel_data);
-        // __cjson_detach_and_add(cj_span, ezlopi_kind_str, ezlopi_kind_str, otel_data);
-
         {
             char tmp_buffer[32];
             snprintf(tmp_buffer, sizeof(tmp_buffer), "%llu", otel_data->start_time * 1000000000LLU);
@@ -458,9 +455,6 @@ static cJSON *__otel_create_span_struct(s_otel_trace_t *otel_data)
             snprintf(tmp_buffer, sizeof(tmp_buffer), "%llu", otel_data->end_time * 1000000000LLU);
             cJSON_AddStringToObject(__FUNCTION__, cj_span, ezlopi_endTimeUnixNano_str, tmp_buffer);
         }
-
-        // __otel_add_time_stamp_nano(cj_span, ezlopi_startTimeUnixNano_str, ezlopi_startTime_str, cj_trace_info);
-        // __otel_add_time_stamp_nano(cj_span, ezlopi_endTimeUnixNano_str, ezlopi_endTime_str, cj_trace_info);
 
         cJSON *cj_attributes = cJSON_AddArrayToObject(__FUNCTION__, cj_span, ezlopi_attributes_str);
         if (cj_attributes)
@@ -919,14 +913,14 @@ static void __otel_add_time_stamp_nano(cJSON *cj_root, const char *add_key, cons
     cJSON *cj_time_stamp = cJSON_DetachItemFromObject(__FUNCTION__, cj_trace_info, for_key);
     if (cj_time_stamp)
     {
-        char *method = ezlopi_null_str;
+        const char *method = ezlopi__str;
         cJSON *cj_method = cJSON_GetObjectItem(__FUNCTION__, cj_trace_info, ezlopi_method_str);
         if (cj_method)
         {
             method = cj_method->valuestring ? cj_method->valuestring : ezlopi_null_str;
         }
 
-        printf("-----> %s [%s]: %llu\r\n", method, for_key, (uint64_t)cj_time_stamp->valuedouble);
+        printf("-----> %s [%s]: %lu\r\n", method, for_key, (time_t)cj_time_stamp->valuedouble);
 
         char tmp_buffer[32];
         snprintf(tmp_buffer, sizeof(tmp_buffer), "%llu", (uint64_t)(cj_time_stamp->valuedouble * 1000000000llu));
@@ -1032,14 +1026,14 @@ static int __push_to_telemetry_queue(s_otel_queue_data_t *otel_data)
 
             if (dump_telemetry)
             {
-                if (dump_telemetry->otel_data)
+                if (dump_telemetry->trace_data)
                 {
-                    s_otel_trace_t *dump_otel_data = dump_telemetry->otel_data;
+                    s_otel_trace_t *dump_otel_data = dump_telemetry->trace_data;
                     ezlopi_free(__FUNCTION__, dump_otel_data->method);
                     ezlopi_free(__FUNCTION__, dump_otel_data->msg_subclass);
                 }
 
-                ezlopi_free(__FUNCTION__, dump_telemetry->otel_data);
+                ezlopi_free(__FUNCTION__, dump_telemetry->trace_data);
                 cJSON_Delete(__FUNCTION__, dump_telemetry->cj_data);
                 ezlopi_free(__FUNCTION__, dump_telemetry);
             }

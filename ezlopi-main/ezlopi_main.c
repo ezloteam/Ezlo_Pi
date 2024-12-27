@@ -44,7 +44,7 @@ static void __blinky(void *pv);
 
 static void __print_mac_address(void)
 {
-    uint8_t __base_mac[6] = { 0, 0, 0, 0, 0, 0 };
+    uint8_t __base_mac[6] = {0, 0, 0, 0, 0, 0};
 
     esp_read_mac(__base_mac, ESP_MAC_WIFI_STA);
 }
@@ -104,8 +104,11 @@ void app_main(void)
     EZPI_core_process_set_process_info(ENUM_EZLOPI_MAIN_BLINKY_TASK, &ezlopi_main_blinky_task_handle, EZLOPI_MAIN_BLINKY_TASK_DEPTH);
 #endif
 
-    ezlopi_service_otel_init();
 #endif
+
+#ifdef CONFIG_EZPI_ENABLE_OPENTELEMETRY
+    ezlopi_service_otel_init();
+#endif // CONFIG_EZPI_ENABLE_OPENTELEMETRY
 
     EZPI_core_wait_for_wifi_to_connect(portMAX_DELAY);
 #if defined(CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER) || defined(CONFIG_EZPI_WEBSOCKET_CLIENT)
@@ -167,7 +170,7 @@ static void __blinky(void *pv)
         // separating the scope
 #ifdef CONFIG_EZPI_ENABLE_UART_PROVISIONING
         {
-            char cmd99_str[100] = { 0 };
+            char cmd99_str[100] = {0};
             snprintf(cmd99_str, 100, "{\"cmd\":99,\"free_heap\":%d,\"heap_watermark\":%d}", free_heap, watermark_heap);
             EZPI_SERV_uart_tx_data(strlen(cmd99_str), (uint8_t *)cmd99_str);
             TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_DEBUG, "%s", cmd99_str);

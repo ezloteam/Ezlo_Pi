@@ -162,10 +162,7 @@ static void EZPI_reg_loop(void *arg)
         cJSON *cj_register_dup = cJSON_CreateObjectReference(__FUNCTION__, cj_reg_data->child);
         if (cj_register_dup)
         {
-            printf("%s[%u]\r\n", __FUNCTION__, __LINE__);
-            cJSON_AddNumberToObject(__FUNCTION__, cj_register_dup, ezlopi_startTime_str, EZPI_core_sntp_get_current_time_sec());
-
-            if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_register_dup))
+            if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_register_dup, EZPI_core_sntp_get_current_time_sec()))
             {
 #ifdef CONFIG_EZPI_UTIL_TRACE_EN
                 TRACE_E("Error adding to broadcast queue!");
