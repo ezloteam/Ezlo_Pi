@@ -54,8 +54,6 @@
 
 #include "sensor_0005_I2C_MPU6050.h"
 #include "EZLOPI_USER_CONFIG.h"
-
-
 /*******************************************************************************
 *                          Extern Data Declarations
 *******************************************************************************/
@@ -354,7 +352,7 @@ static ezlopi_error_t __prepare(void *arg)
 }
 static ezlopi_error_t __init(l_ezlopi_item_t *item)
 {
-    ezlopi_error_t ret = EZPI_SUCCESS;
+    ezlopi_error_t ret = EZPI_ERR_INIT_DEVICE_FAILED;
     if (item)
     {
         s_mpu6050_data_t *user_data = (s_mpu6050_data_t *)item->user_arg;
@@ -365,27 +363,21 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
                 EZPI_hal_i2c_master_init(&item->interface.i2c_master);
                 if (MPU6050_ERR_OK == MPU6050_config_device(item))
                 {
-                    TRACE_I("Configuration Complete.... ");
-                    TaskHandle_t ezlopi_sensor_mpu6050_task_handle = NULL;
-                    xTaskCreate(__mpu6050_calibration_task, "MPU6050_Calibration_Task", EZLOPI_SENSOR_MPU6050_TASK_DEPTH, item, 1, &ezlopi_sensor_mpu6050_task_handle);
-#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
-                    EZPI_core_process_set_process_info(ENUM_EZLOPI_SENSOR_MPU6050_TASK, &ezlopi_sensor_mpu6050_task_handle, EZLOPI_SENSOR_MPU6050_TASK_DEPTH);
-#endif
-                }
-                else
-                {
-                    ret = EZPI_ERR_INIT_DEVICE_FAILED;
+                    // TRACE_I("Configuration Complete.... ");
+                    // TaskHandle_t ezlopi_sensor_mpu6050_task_handle = NULL;
+                    // xTaskCreate(__mpu6050_calibration_task, "MPU6050_Calibration_Task", EZLOPI_SENSOR_MPU6050_TASK_DEPTH, item, 1, &ezlopi_sensor_mpu6050_task_handle); 
+                    // EZPI_service_loop_add("mpu6050_calibration", __mpu6050_calibration_task, 1000, (void *)item);
+                    if (false == user_data->calibration_complete)
+                    {
+                        __mpu6050_calibration_task(item);
+                    }
+                    // #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
+                    //                     EZPI_core_process_set_process_info(ENUM_EZLOPI_SENSOR_MPU6050_TASK, &ezlopi_sensor_mpu6050_task_handle, EZLOPI_SENSOR_MPU6050_TASK_DEPTH);
+                    // #endif
+                    ret = EZPI_SUCCESS;
                 }
             }
         }
-        else
-        {
-            ret = EZPI_ERR_INIT_DEVICE_FAILED;
-        }
-    }
-    else
-    {
-        ret = EZPI_ERR_INIT_DEVICE_FAILED;
     }
     return ret;
 }
@@ -535,7 +527,7 @@ static void __mpu6050_calibration_task(void *params) // calibrate task
     if (item)
     {
         s_mpu6050_data_t *user_data = (s_mpu6050_data_t *)item->user_arg;
-        if (user_data)
+        if (user_data && (false == user_data->calibration_complete))
         {
             uint8_t buf[MPU6050_REG_COUNT_LEN] = { 0 }; // 0 - 13
             uint8_t dummy[MPU6050_REG_COUNT_LEN] = { 0 };
@@ -603,10 +595,9 @@ static void __mpu6050_calibration_task(void *params) // calibrate task
             user_data->calibration_complete = true;
         }
     }
-#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
-    EZPI_core_process_set_is_deleted(ENUM_EZLOPI_SENSOR_MPU6050_TASK);
-#endif
-    vTaskDelete(NULL);
+    // #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
+    //     EZPI_core_process_set_is_deleted(ENUM_EZLOPI_SENSOR_MPU6050_TASK);
+    // #endif
 }
 
 

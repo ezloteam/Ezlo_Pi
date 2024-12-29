@@ -230,11 +230,15 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
                 TRACE_I("Width configuration was successfully done!");
                 TRACE_W("Calibrating.....");
                 user_data->hall_state = "dw_is_closed";
-                TaskHandle_t ezlopi_sensor_hall_callibration_task_handle = NULL;
-                xTaskCreate(__hall_calibration_task, "Hall_Calibration_Task", EZLOPI_SENSOR_HALL_CALLIBRATION_TASK_DEPTH, item, 1, &ezlopi_sensor_hall_callibration_task_handle);
-#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
-                EZPI_core_process_set_process_info(ENUM_EZLOPI_SENSOR_HALL_CALLIBRATION_TASK, &ezlopi_sensor_hall_callibration_task_handle, EZLOPI_SENSOR_HALL_CALLIBRATION_TASK_DEPTH);
-#endif
+                // TaskHandle_t ezlopi_sensor_hall_callibration_task_handle = NULL;
+                // xTaskCreate(__hall_calibration_task, "Hall_Calibration_Task", EZLOPI_SENSOR_HALL_CALLIBRATION_TASK_DEPTH, item, 1, &ezlopi_sensor_hall_callibration_task_handle);
+                if (false == user_data->calibration_complete)
+                {
+                    __hall_calibration_task(item);
+                }
+                // #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
+                //                 EZPI_core_process_set_process_info(ENUM_EZLOPI_SENSOR_HALL_CALLIBRATION_TASK, &ezlopi_sensor_hall_callibration_task_handle, EZLOPI_SENSOR_HALL_CALLIBRATION_TASK_DEPTH);
+                // #endif
             }
             else
             {
@@ -338,7 +342,7 @@ static void __hall_calibration_task(void *params) // calibrate task
     if (item)
     {
         s_hall_data_t *user_data = (s_hall_data_t *)item->user_arg;
-        if (user_data)
+        if (user_data && (false == user_data->calibration_complete))
         {
 
             float sensor_data = (float)hall_sensor_read();
@@ -352,10 +356,10 @@ static void __hall_calibration_task(void *params) // calibrate task
             user_data->calibration_complete = true;
         }
     }
-#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
-    EZPI_core_process_set_is_deleted(ENUM_EZLOPI_SENSOR_HALL_CALLIBRATION_TASK);
-#endif
-    vTaskDelete(NULL);
+    // #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
+    //     EZPI_core_process_set_is_deleted(ENUM_EZLOPI_SENSOR_HALL_CALLIBRATION_TASK);
+    // #endif
+    //     vTaskDelete(NULL);
 }
 
 #endif // CONFIG_IDF_TARGET_ESP32

@@ -242,11 +242,12 @@ static ezlopi_error_t __0047_init(l_ezlopi_item_t *item)
                     if (false == (user_data->HX711_initialized))
                     {
                         __hx711_power_reset(item);
-                        TaskHandle_t ezlopi_sensor_hx711_task_handle = NULL;
-                        xTaskCreate(__Calculate_hx711_tare_wt, "Calculate the Tare weight", EZLOPI_SENSOR_HX711_TASK_DEPTH, item, 1, &ezlopi_sensor_hx711_task_handle);
-#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
-                        EZPI_core_process_set_process_info(ENUM_EZLOPI_SENSOR_HX711_TASK, &ezlopi_sensor_hx711_task_handle, EZLOPI_SENSOR_HX711_TASK_DEPTH);
-#endif
+                        // TaskHandle_t ezlopi_sensor_hx711_task_handle = NULL;
+                        // xTaskCreate(__Calculate_hx711_tare_wt, "Calculate the Tare weight", EZLOPI_SENSOR_HX711_TASK_DEPTH, item, 1, &ezlopi_sensor_hx711_task_handle);
+                        __Calculate_hx711_tare_wt(item);
+                        // #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
+                        //                         EZPI_core_process_set_process_info(ENUM_EZLOPI_SENSOR_HX711_TASK, &ezlopi_sensor_hx711_task_handle, EZLOPI_SENSOR_HX711_TASK_DEPTH);
+                        // #endif
                         ret = EZPI_SUCCESS;
                     }
                 }
@@ -307,7 +308,7 @@ static void __Calculate_hx711_tare_wt(void *params)
     if (item)
     {
         s_hx711_data_t *user_data = (s_hx711_data_t *)item->user_arg;
-        if (user_data)
+        if (user_data && (false == user_data->HX711_initialized))
         { // For Output settling time ; [10SPS] is 400ms
             // So, wait for 400ms after reset [as per datasheet]
             vTaskDelay(400 / portTICK_PERIOD_MS);
@@ -333,10 +334,10 @@ static void __Calculate_hx711_tare_wt(void *params)
             }
         }
     }
-#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
-    EZPI_core_process_set_is_deleted(ENUM_EZLOPI_SENSOR_HX711_TASK);
-#endif
-    vTaskDelete(NULL);
+    // #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
+    //     EZPI_core_process_set_is_deleted(ENUM_EZLOPI_SENSOR_HX711_TASK);
+    // #endif
+        // vTaskDelete(NULL);
 }
 static float __hx711_rawdata(l_ezlopi_item_t *item, hx711_gain_t _gain)
 {

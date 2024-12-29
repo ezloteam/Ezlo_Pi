@@ -356,18 +356,22 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
                 if (0 == GY271_configure_init(item)) // ESP_OK
                 {
                     // TRACE_D(" CONFIGURATION  Compplete _____ Calibration Started _____");
-                    TaskHandle_t ezlopi_sensor_gy271_callibrationb_task_handle = NULL;
-                    xTaskCreate(__gy271_calibration_task, "GY271_Calibration_Task", EZLOPI_SENSOR_GY271_CALLIBRATION_TASK_DEPTH, item, 1, &ezlopi_sensor_gy271_callibrationb_task_handle);
-#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
-                    EZPI_core_process_set_process_info(ENUM_EZLOPI_SENSOR_GY271_CALLIBRATION_TASK, &ezlopi_sensor_gy271_callibrationb_task_handle, EZLOPI_SENSOR_GY271_CALLIBRATION_TASK_DEPTH);
-#endif
+                    // TaskHandle_t ezlopi_sensor_gy271_callibrationb_task_handle = NULL;
+                    // xTaskCreate(__gy271_calibration_task, "GY271_Calibration_Task", EZLOPI_SENSOR_GY271_CALLIBRATION_TASK_DEPTH, item, 1, &ezlopi_sensor_gy271_callibrationb_task_handle);
+                    if (false == user_data->calibration_complete)
+                    {
+                        __gy271_calibration_task(item);
+                    }
+                    // #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
+                    //                     EZPI_core_process_set_process_info(ENUM_EZLOPI_SENSOR_GY271_CALLIBRATION_TASK, &ezlopi_sensor_gy271_callibrationb_task_handle, EZLOPI_SENSOR_GY271_CALLIBRATION_TASK_DEPTH);
+                    // #endif
                     ret = EZPI_SUCCESS;
                 }
             }
         }
-        }
-    return ret;
     }
+    return ret;
+}
 
 static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 {
@@ -418,55 +422,53 @@ static ezlopi_error_t __notify(l_ezlopi_item_t *item)
     if (item)
     {
         s_gy271_data_t *user_data = (s_gy271_data_t *)item->user_arg;
-        if (user_data)
+        if (user_data && user_data->calibration_complete)
         {
-            if (user_data->calibration_complete)
+            if (ezlopi_item_name_magnetic_strength_x_axis == item->cloud_properties.item_name)
             {
-                if (ezlopi_item_name_magnetic_strength_x_axis == item->cloud_properties.item_name)
+                __prev[0] = user_data->X;
+                __prev[1] = user_data->Y;
+                __prev[2] = user_data->Z;
+                __prev[3] = user_data->T;
+                __prev[4] = user_data->azimuth;
+                if (GY271_update_value(item))
                 {
-                    __prev[0] = user_data->X;
-                    __prev[1] = user_data->Y;
-                    __prev[2] = user_data->Z;
-                    __prev[3] = user_data->T;
-                    __prev[4] = user_data->azimuth;
-                    if (GY271_update_value(item))
-                    {
-                        if (fabs(__prev[0] - user_data->X) > 0.1)
-                        {
-                            EZPI_core_device_value_updated_from_device_broadcast(item);
-                        }
-                    }
-                }
-                if (ezlopi_item_name_magnetic_strength_y_axis == item->cloud_properties.item_name)
-                {
-                    if (fabs(__prev[1] - user_data->Y) > 0.1)
+                    if (fabs(__prev[0] - user_data->X) > 0.1)
                     {
                         EZPI_core_device_value_updated_from_device_broadcast(item);
                     }
                 }
-                if (ezlopi_item_name_magnetic_strength_z_axis == item->cloud_properties.item_name)
-                {
-                    if (fabs(__prev[2] - user_data->Z) > 0.1)
-                    {
-                        EZPI_core_device_value_updated_from_device_broadcast(item);
-                    }
-                }
-                if (ezlopi_item_name_temp == item->cloud_properties.item_name)
-                {
-                    if (fabs(__prev[3] - user_data->T) > 0.5)
-                    {
-                        EZPI_core_device_value_updated_from_device_broadcast(item);
-                    }
-                }
-                if (ezlopi_item_name_angle_position == item->cloud_properties.item_name)
-                {
-                    if (fabs(__prev[4] - user_data->azimuth) > 1)
-                    {
-                        EZPI_core_device_value_updated_from_device_broadcast(item);
-                    }
-                }
-                ret = EZPI_SUCCESS;
             }
+            if (ezlopi_item_name_magnetic_strength_y_axis == item->cloud_properties.item_name)
+            {
+                if (fabs(__prev[1] - user_data->Y) > 0.1)
+                {
+                    EZPI_core_device_value_updated_from_device_broadcast(item);
+                }
+            }
+            if (ezlopi_item_name_magnetic_strength_z_axis == item->cloud_properties.item_name)
+            {
+                if (fabs(__prev[2] - user_data->Z) > 0.1)
+                {
+                    EZPI_core_device_value_updated_from_device_broadcast(item);
+                }
+            }
+            if (ezlopi_item_name_temp == item->cloud_properties.item_name)
+            {
+                if (fabs(__prev[3] - user_data->T) > 0.5)
+                {
+                    EZPI_core_device_value_updated_from_device_broadcast(item);
+                }
+            }
+            if (ezlopi_item_name_angle_position == item->cloud_properties.item_name)
+            {
+                if (fabs(__prev[4] - user_data->azimuth) > 1)
+                {
+                    EZPI_core_device_value_updated_from_device_broadcast(item);
+                }
+            }
+            ret = EZPI_SUCCESS;
+
         }
     }
     return ret;
@@ -482,7 +484,7 @@ static void __gy271_calibration_task(void *params) // calibrate task
                                      {0, 0},  // ymin,ymax
                                      {0, 0} }; // zmin,zmax// Initialization added!
         s_gy271_data_t *user_data = (s_gy271_data_t *)item->user_arg;
-        if (user_data)
+        if (user_data && (false == user_data->calibration_complete))
         {
             for (uint16_t i = 0; i <= 50; i++)
             {
@@ -532,10 +534,10 @@ static void __gy271_calibration_task(void *params) // calibrate task
             user_data->calibration_complete = true;
         }
     }
-#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
-    EZPI_core_process_set_is_deleted(ENUM_EZLOPI_SENSOR_GY271_CALLIBRATION_TASK);
-#endif
-    vTaskDelete(NULL);
+    // #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
+    //     EZPI_core_process_set_is_deleted(ENUM_EZLOPI_SENSOR_GY271_CALLIBRATION_TASK);
+    // #endif
+    // vTaskDelete(NULL);
 }
 
 /*******************************************************************************

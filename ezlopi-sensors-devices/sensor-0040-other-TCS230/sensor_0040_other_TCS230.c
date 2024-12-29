@@ -249,7 +249,7 @@ static ezlopi_error_t __0040_init(l_ezlopi_item_t *item)
                     user_data->TCS230_pin.gpio_output_en,
                     user_data->TCS230_pin.gpio_pulse_output))
                 {
-                    TRACE_W("Entering Calibration Phase for 30 seconds.....");
+                    TRACE_W("Entering Calibration Phase .......");
 
                     // configure Freq_scale at 20%
                     TCS230_set_frequency_scaling(item, COLOR_SENSOR_FREQ_SCALING_20_PERCENT);
@@ -257,10 +257,14 @@ static ezlopi_error_t __0040_init(l_ezlopi_item_t *item)
                     TaskHandle_t ezlopi_sensor_tcs230_callibration_task_handle = NULL;
 
                     // activate a task to calibrate data
-                    xTaskCreate(__tcs230_calibration_task, "TCS230_Calibration_Task", EZLOPI_SENSOR_TCS230_CALLIBRATION_TASK_DEPTH, item, 1, &ezlopi_sensor_tcs230_callibration_task_handle);
-#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
-                    EZPI_core_process_set_process_info(ENUM_EZLOPI_SENSOR_TCS230_CALLIBRATION_TASK, &ezlopi_sensor_tcs230_callibration_task_handle, EZLOPI_SENSOR_TCS230_CALLIBRATION_TASK_DEPTH);
-#endif
+                    // xTaskCreate(__tcs230_calibration_task, "TCS230_Calibration_Task", EZLOPI_SENSOR_TCS230_CALLIBRATION_TASK_DEPTH, item, 1, &ezlopi_sensor_tcs230_callibration_task_handle);
+                    if (false == user_data->calibration_complete)
+                    {
+                        __tcs230_calibration_task(item);
+                    }
+                    // #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
+                    //                     EZPI_core_process_set_process_info(ENUM_EZLOPI_SENSOR_TCS230_CALLIBRATION_TASK, &ezlopi_sensor_tcs230_callibration_task_handle, EZLOPI_SENSOR_TCS230_CALLIBRATION_TASK_DEPTH);
+                    // #endif
                     ret = EZPI_SUCCESS;
                 }
             }
@@ -334,7 +338,7 @@ static void __tcs230_calibration_task(void *params) // calibration task
     if (item)
     { // extracting the 'user_args' from "item"
         s_TCS230_data_t *user_data = (s_TCS230_data_t *)item->user_arg;
-        if (user_data)
+        if (user_data && false == user_data->calibration_complete)
         {
 #if 0
             //--------------------------------------------------
@@ -401,10 +405,10 @@ static void __tcs230_calibration_task(void *params) // calibration task
             user_data->calibration_complete = true;
         }
     }
-#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
-    EZPI_core_process_set_is_deleted(ENUM_EZLOPI_SENSOR_TCS230_CALLIBRATION_TASK);
-#endif
-    vTaskDelete(NULL);
+    // #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
+    //     EZPI_core_process_set_is_deleted(ENUM_EZLOPI_SENSOR_TCS230_CALLIBRATION_TASK);
+    // #endif
+        // vTaskDelete(NULL);
 }
 
 /*******************************************************************************
