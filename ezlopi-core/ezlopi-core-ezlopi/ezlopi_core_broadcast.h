@@ -62,6 +62,7 @@ extern "C"
     /*******************************************************************************
      *                          Type & Macro Declarations
      *******************************************************************************/
+
     typedef ezlopi_error_t (*f_broadcast_method_t)(char *data);
 
     typedef struct l_broadcast_method
@@ -73,7 +74,8 @@ extern "C"
 
     } l_broadcast_method_t;
 
-    typedef enum e_broadcast_source {
+    typedef enum e_broadcast_source
+    {
         E_BROADCAST_SOURCE_NONE = 0,
         E_BROADCAST_SOURCE_UART,
         E_BROADCAST_SOURCE_WSS_SERVER,
@@ -82,11 +84,14 @@ extern "C"
         E_BROADCAST_SOURCE_MAX
     } e_broadcast_source_t;
 
-    typedef struct s_broadcast_struct {
+    typedef struct s_broadcast_struct
+    {
         time_t time_stamp;
+        cJSON *cj_broadcast_data;
         e_broadcast_source_t source;
-        cJSON * cj_broadcast_data;
-    }s_broadcast_struct_t;
+    } s_broadcast_struct_t;
+
+    typedef ezlopi_error_t (*f_broadcast_queue_func_t)(s_broadcast_struct_t *broadcast_data);
 
     /*******************************************************************************
      *                          Extern Data Declarations
@@ -121,7 +126,9 @@ extern "C"
      *
      * @param func Target method to add into queue
      */
-    void EZPI_core_broadcast_methods_set_queue(ezlopi_error_t (*func)(cJSON *));
+    // void EZPI_core_broadcast_methods_set_queue(ezlopi_error_t (*func)(cJSON *));
+
+    void EZPI_core_broadcast_methods_set_queue(f_broadcast_queue_func_t queue_func);
     /**
      * @brief Function to add broadcast method
      *
@@ -131,6 +138,8 @@ extern "C"
      * @return l_broadcast_method_t*
      */
     l_broadcast_method_t *EZPI_core_broadcast_method_add(f_broadcast_method_t broadcast_method, char *method_name, uint32_t retries);
+
+    const char *EZPI_core_brodcast_source_to_name(e_broadcast_source_t source);
 
 #ifdef __cplusplus
 }

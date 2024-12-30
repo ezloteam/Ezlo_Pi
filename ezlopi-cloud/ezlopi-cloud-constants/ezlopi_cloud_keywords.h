@@ -556,6 +556,11 @@ extern "C"
     extern const char *ezlopi_mac_address_str;
     extern const char *ezlopi_maxFrameSize_str;
 
+    extern const char *ezlopi_uart_str;
+    extern const char *ezlopi_bluetooth_str;
+    extern const char *ezlopi_websocket_server_str;
+    extern const char *ezlopi_websocket_client_str;
+
 #ifdef __cplusplus
 }
 #endif

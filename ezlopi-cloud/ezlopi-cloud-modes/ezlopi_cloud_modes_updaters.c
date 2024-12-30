@@ -93,24 +93,24 @@ void EZPI_cloud_modes_alarmed(cJSON *cj_request, cJSON *cj_response)
         if (curr_mode)
         {
             CJSON_ASSIGN_ID(cj_result, curr_mode->current_mode_id, ezlopi_modeId_str);
-            #warning "For Cloud interaction; [Cannot determine which '_id' triggered the alert]"
-                // CJSON_ASSIGN_ID(cj_result, "0000", ezlopi_deviceId_str);
-                CJSON_ASSIGN_ID(cj_result, curr_mode->time_is_left_to_switch_sec, ezlopi_entryDelay_str);
+#warning "For Cloud interaction; [Cannot determine which '_id' triggered the alert]"
+            // CJSON_ASSIGN_ID(cj_result, "0000", ezlopi_deviceId_str);
+            CJSON_ASSIGN_ID(cj_result, curr_mode->time_is_left_to_switch_sec, ezlopi_entryDelay_str);
 
-            (EZLOPI_MODES_ALARM_PHASE_IDLE == curr_mode->alarmed.phase) ? cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_phase_str, ezlopi_idle_str)
-                : (EZLOPI_MODES_ALARM_PHASE_BYPASS == curr_mode->alarmed.phase) ? cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_phase_str, ezlopi_bypass_str)
-                : (EZLOPI_MODES_ALARM_PHASE_ENTRYDELAY == curr_mode->alarmed.phase) ? cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_phase_str, ezlopi_entryDelay_str)
-                : (EZLOPI_MODES_ALARM_PHASE_MAIN == curr_mode->alarmed.phase) ? cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_phase_str, ezlopi_main_str)
-                : cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_phase_str, ezlopi__str); // none
+            (EZLOPI_MODES_ALARM_PHASE_IDLE == curr_mode->alarmed.phase)         ? cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_phase_str, ezlopi_idle_str)
+            : (EZLOPI_MODES_ALARM_PHASE_BYPASS == curr_mode->alarmed.phase)     ? cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_phase_str, ezlopi_bypass_str)
+            : (EZLOPI_MODES_ALARM_PHASE_ENTRYDELAY == curr_mode->alarmed.phase) ? cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_phase_str, ezlopi_entryDelay_str)
+            : (EZLOPI_MODES_ALARM_PHASE_MAIN == curr_mode->alarmed.phase)       ? cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_phase_str, ezlopi_main_str)
+                                                                                : cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_phase_str, ezlopi__str); // none
 
-            (EZLOPI_MODES_ALARM_STATUS_DONE == curr_mode->alarmed.status) ? cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_status_str, ezlopi_done_str)
-                : (EZLOPI_MODES_ALARM_STATUS_BEGIN == curr_mode->alarmed.status) ? cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_status_str, ezlopi_begin_str)
-                : (EZLOPI_MODES_ALARM_STATUS_CANCELED == curr_mode->alarmed.status) ? cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_status_str, ezlopi_canceled_str)
-                : cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_status_str, ezlopi__str); // none
+            (EZLOPI_MODES_ALARM_STATUS_DONE == curr_mode->alarmed.status)       ? cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_status_str, ezlopi_done_str)
+            : (EZLOPI_MODES_ALARM_STATUS_BEGIN == curr_mode->alarmed.status)    ? cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_status_str, ezlopi_begin_str)
+            : (EZLOPI_MODES_ALARM_STATUS_CANCELED == curr_mode->alarmed.status) ? cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_status_str, ezlopi_canceled_str)
+                                                                                : cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_status_str, ezlopi__str); // none
 
             cJSON_AddNumberToObject(__FUNCTION__, cj_result, ezlopi_timestamp_str, EZPI_core_sntp_get_current_time_ms());
             cJSON_AddBoolToObject(__FUNCTION__, cj_result, ezlopi_silent_str, curr_mode->alarmed.silent);
-            #warning "need to add two-members [soundType & chime]"
+#warning "need to add two-members [soundType & chime]"
         }
     }
 }
@@ -122,7 +122,7 @@ void EZPI_cloud_modes_changed_alarmed(cJSON *cj_request, cJSON *cj_response)
     if (cj_changed_resp)
     {
         EZPI_cloud_modes_changed(cj_request, cj_changed_resp);
-        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_changed_resp))
+        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_changed_resp, EZPI_core_sntp_get_current_time_sec()))
         {
             cJSON_Delete(__FUNCTION__, cj_changed_resp);
         }
@@ -156,7 +156,7 @@ void EZPI_cloud_modes_disarmed_devices_added(cJSON *cj_request, cJSON *cj_respon
     if (cj_changed_resp)
     {
         EZPI_cloud_modes_changed(cj_request, cj_changed_resp);
-        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_changed_resp))
+        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_changed_resp, EZPI_core_sntp_get_current_time_sec()))
         {
             cJSON_Delete(__FUNCTION__, cj_changed_resp);
         }
@@ -190,7 +190,7 @@ void EZPI_cloud_modes_disarmed_devices_removed(cJSON *cj_request, cJSON *cj_resp
     if (cj_changed_resp)
     {
         EZPI_cloud_modes_changed(cj_request, cj_changed_resp);
-        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_changed_resp))
+        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_changed_resp, EZPI_core_sntp_get_current_time_sec()))
         {
             cJSON_Delete(__FUNCTION__, cj_changed_resp);
         }
@@ -224,7 +224,7 @@ void EZPI_cloud_modes_alarms_off_added(cJSON *cj_request, cJSON *cj_response)
     if (cj_changed_resp)
     {
         EZPI_cloud_modes_changed(cj_request, cj_changed_resp);
-        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_changed_resp))
+        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_changed_resp, EZPI_core_sntp_get_current_time_sec()))
         {
             cJSON_Delete(__FUNCTION__, cj_changed_resp);
         }
@@ -258,7 +258,7 @@ void EZPI_cloud_modes_alarms_off_removed(cJSON *cj_request, cJSON *cj_response)
     if (cj_changed_resp)
     {
         EZPI_cloud_modes_changed(cj_request, cj_changed_resp);
-        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_changed_resp))
+        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_changed_resp, EZPI_core_sntp_get_current_time_sec()))
         {
             cJSON_Delete(__FUNCTION__, cj_changed_resp);
         }
@@ -292,7 +292,7 @@ void EZPI_cloud_modes_cameras_off_added(cJSON *cj_request, cJSON *cj_response)
     if (cj_changed_resp)
     {
         EZPI_cloud_modes_changed(cj_request, cj_changed_resp);
-        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_changed_resp))
+        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_changed_resp, EZPI_core_sntp_get_current_time_sec()))
         {
             cJSON_Delete(__FUNCTION__, cj_changed_resp);
         }
@@ -326,7 +326,7 @@ void EZPI_cloud_modes_cameras_off_removed(cJSON *cj_request, cJSON *cj_response)
     if (cj_changed_resp)
     {
         EZPI_cloud_modes_changed(cj_request, cj_changed_resp);
-        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_changed_resp))
+        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_changed_resp, EZPI_core_sntp_get_current_time_sec()))
         {
             cJSON_Delete(__FUNCTION__, cj_changed_resp);
         }
@@ -378,8 +378,8 @@ void EZPI_cloud_modes_bypass_devices_removed(cJSON *cj_request, cJSON *cj_respon
 
 void EZPI_cloud_modes_changed(cJSON *cj_request, cJSON *cj_response)
 {
-    printf("%s[%u]\r\n", __FUNCTION__, __LINE__);
-    cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_startTime_str, EZPI_core_sntp_get_current_time_sec());
+    // printf("%s[%u]\r\n", __FUNCTION__, __LINE__);
+    // cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_startTime_str, EZPI_core_sntp_get_current_time_sec());
 
     cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_id_str);
     cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_method_str);
@@ -491,7 +491,7 @@ void EZPI_cloud_modes_protect_button_set_broadcast(cJSON *cj_request, cJSON *cj_
     if (cj_added_resp)
     {
         EZPI_cloud_modes_protect_buttons_added(cj_request, cj_added_resp);
-        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_added_resp))
+        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_added_resp, EZPI_core_sntp_get_current_time_sec()))
         {
             cJSON_Delete(__FUNCTION__, cj_added_resp);
         }
@@ -502,7 +502,7 @@ void EZPI_cloud_modes_protect_button_set_broadcast(cJSON *cj_request, cJSON *cj_
     if (cj_updated_resp)
     {
         EZPI_cloud_modes_protect_buttons_updated(cj_request, cj_updated_resp);
-        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_updated_resp))
+        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_updated_resp, EZPI_core_sntp_get_current_time_sec()))
         {
             cJSON_Delete(__FUNCTION__, cj_updated_resp);
         }

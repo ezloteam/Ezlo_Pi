@@ -97,7 +97,6 @@ int ezlopi_service_otel_add_trace_to_telemetry_queue_struct(s_otel_trace_t *trac
 
     if (trace_obj)
     {
-
         s_otel_queue_data_t *otel_data = ezlopi_malloc(__FUNCTION__, sizeof(s_otel_queue_data_t));
         if (otel_data)
         {
@@ -156,7 +155,7 @@ static void __otel_loop(void *pv)
 #ifdef CONFIG_EZPI_OPENTELEMETRY_ENABLE_TRACES
                         case E_OTEL_TRACES:
                         {
-                            cj_telemetry = __otel_trace_decorate(otel_data->cj_data);
+                            // cj_telemetry = __otel_trace_decorate(otel_data->cj_data);
                             break;
                         }
                         case E_OTEL_TRACES_STRUCT:
@@ -186,6 +185,8 @@ static void __otel_loop(void *pv)
                     s_otel_trace_t *otel_trace_data = (s_otel_trace_t *)otel_data->trace_data;
 
                     cJSON_Delete(__FUNCTION__, otel_data->cj_data);
+                    ezlopi_free(__FUNCTION__, otel_trace_data->error);
+                    ezlopi_free(__FUNCTION__, otel_trace_data->id);
                     ezlopi_free(__FUNCTION__, otel_trace_data->method);
                     ezlopi_free(__FUNCTION__, otel_trace_data->msg_subclass);
                     ezlopi_free(__FUNCTION__, otel_data->trace_data);
@@ -448,6 +449,8 @@ static cJSON *__otel_create_span_struct(s_otel_trace_t *otel_data)
         }
 
         {
+            // printf("start-time: %lu\r\n", otel_data->start_time);
+
             char tmp_buffer[32];
             snprintf(tmp_buffer, sizeof(tmp_buffer), "%llu", otel_data->start_time * 1000000000LLU);
             cJSON_AddStringToObject(__FUNCTION__, cj_span, ezlopi_startTimeUnixNano_str, tmp_buffer);

@@ -92,7 +92,7 @@ void app_main(void)
     TaskHandle_t ezlopi_main_blinky_task_handle = NULL;
 
 #if defined(CONFIG_EZPI_HEAP_ENABLE)
-    xTaskCreate(__blinky, "blinky", 3 * EZLOPI_MAIN_BLINKY_TASK_DEPTH, NULL, 1, &ezlopi_main_blinky_task_handle);
+    xTaskCreate(__blinky, "blinky", 10 * EZLOPI_MAIN_BLINKY_TASK_DEPTH, NULL, 1, &ezlopi_main_blinky_task_handle);
 
 #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
     EZPI_core_process_set_process_info(ENUM_EZLOPI_MAIN_BLINKY_TASK, &ezlopi_main_blinky_task_handle, 3 * EZLOPI_MAIN_BLINKY_TASK_DEPTH);

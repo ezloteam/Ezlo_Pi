@@ -578,7 +578,7 @@ static void __ezlopi_wifi_broadcast_scan_report(bool state)
     cJSON *cj_scan_report = cJSON_CreateObject(__FUNCTION__);
     if (cj_scan_report)
     {
-        cJSON_AddNumberToObject(__FUNCTION__, cj_scan_report, ezlopi_startTime_str, EZPI_core_sntp_get_current_time_sec());
+        // cJSON_AddNumberToObject(__FUNCTION__, cj_scan_report, ezlopi_startTime_str, EZPI_core_sntp_get_current_time_sec());
 
         cJSON_AddStringToObject(__FUNCTION__, cj_scan_report, ezlopi_id_str, ezlopi_ui_broadcast_str);
         cJSON_AddStringToObject(__FUNCTION__, cj_scan_report, ezlopi_msg_subclass_str, method_hub_network_wifi_scan_progress);

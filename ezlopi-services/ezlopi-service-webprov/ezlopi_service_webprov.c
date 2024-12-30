@@ -80,8 +80,8 @@
 
 typedef struct
 {
-    time_t time_ms;
     char *payload;
+    time_t time_stamp;
 } s_rx_message_t;
 
 static uint32_t message_counter = 0;
@@ -230,11 +230,12 @@ static void __fetch_wss_endpoint(void *pv)
                 s_rx_message_t *rx_message = NULL;
                 BaseType_t ret = xQueueReceive(_wss_message_queue, &rx_message, 100 / portTICK_RATE_MS);
 
-                if (rx_message && (ret == pdTRUE))
+                if (rx_message)
                 {
                     char *error = NULL;
                     char *id_str = NULL;
                     char *method_str = NULL;
+                    time_t time_stamp = rx_message->time_stamp;
 
                     if (rx_message->payload)
                     {
@@ -270,7 +271,7 @@ static void __fetch_wss_endpoint(void *pv)
                                 // TRACE_E("rx_message->payload [method: null]\r\n%s", rx_message->payload);
                             }
 
-                            __message_process_cjson(cj_request, rx_message->time_ms);
+                            __message_process_cjson(cj_request, rx_message->time_stamp);
                             cJSON_Delete(__FUNCTION__, cj_request);
                         }
 
@@ -279,6 +280,7 @@ static void __fetch_wss_endpoint(void *pv)
                     }
 
                     ezlopi_free(__FUNCTION__, rx_message);
+                    rx_message = NULL;
 
 #ifdef CONFIG_EZPI_OPENTELEMETRY_ENABLE_TRACES
                     s_otel_trace_t *trace_obj = ezlopi_malloc(__FUNCTION__, sizeof(s_otel_trace_t));
@@ -287,7 +289,7 @@ static void __fetch_wss_endpoint(void *pv)
                         memset(trace_obj, 0, sizeof(s_otel_trace_t));
 
                         trace_obj->kind = E_OTEL_KIND_CLIENT;
-                        trace_obj->start_time = rx_message->time_ms;
+                        trace_obj->start_time = time_stamp;
                         trace_obj->end_time = EZPI_core_sntp_get_current_time_sec();
                         trace_obj->free_heap = esp_get_free_heap_size();
                         trace_obj->heap_watermark = esp_get_minimum_free_heap_size();
@@ -401,7 +403,7 @@ static int __message_upcall(char *payload, uint32_t len, time_t time_stamp)
             }
 
             rx_message->payload = payload;
-            rx_message->time_ms = time_stamp;
+            rx_message->time_stamp = time_stamp;
 
             if (pdTRUE == xQueueSend(_wss_message_queue, &rx_message, 5))
             {

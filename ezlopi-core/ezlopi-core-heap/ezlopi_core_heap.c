@@ -294,6 +294,7 @@ static void __remove_free_node(s_heap_trace_t *heap_node)
 {
     if (heap_node->next)
     {
+        vTaskDelay(1);
         __remove_free_node(heap_node->next);
 
         if (heap_node->next->freed)

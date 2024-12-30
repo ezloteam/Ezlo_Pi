@@ -65,7 +65,6 @@ typedef struct s_otel_trace
     uint32_t heap_watermark;
 
     s_otel_attr_t *attributes;
-
 } s_otel_trace_t;
 
 void ezlopi_service_otel_init(void);

@@ -547,6 +547,11 @@ const char *ezlopi_controller_uuid_str = "controller_uuid";
 const char *ezlopi_mac_address_str = "mac_address";
 const char *ezlopi_maxFrameSize_str = "maxFrameSize";
 
+const char *ezlopi_uart_str = "uart";
+const char *ezlopi_bluetooth_str = "bluetooth";
+const char *ezlopi_websocket_server_str = "websocket.server";
+const char *ezlopi_websocket_client_str = "websocket.client";
+
 #endif // __EZLOPI_CLOUD_KEYWORDS_H__
 /*******************************************************************************
  *                          End of File

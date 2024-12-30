@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    ezlopi_core_scenes_status_changed.c
-* @brief   These function operates on scene status info
-* @author  xx
-* @version 0.1
-* @date    12th DEC 2024
-*/
+ * @file    ezlopi_core_scenes_status_changed.c
+ * @brief   These function operates on scene status info
+ * @author  xx
+ * @version 0.1
+ * @date    12th DEC 2024
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
@@ -53,33 +53,33 @@
 #include "ezlopi_core_scenes_status_changed.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
-int EZPI_core_scenes_status_change_broadcast(l_scenes_list_v2_t *scene_node, const char *status_str)
+ *                          Extern Function Definitions
+ *******************************************************************************/
+int EZPI_core_scenes_status_change_broadcast(l_scenes_list_v2_t *scene_node, const char *status_str, time_t time_stamp)
 {
     int ret = 0;
     if (scene_node)
@@ -87,7 +87,7 @@ int EZPI_core_scenes_status_change_broadcast(l_scenes_list_v2_t *scene_node, con
         cJSON *cj_response = cJSON_CreateObject(__FUNCTION__);
         if (cj_response)
         {
-            cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_startTime_str, EZPI_core_sntp_get_current_time_sec());
+            // cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_startTime_str, EZPI_core_sntp_get_current_time_sec());
 
             cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
             cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, method_hub_scene_run_progress);
@@ -129,7 +129,7 @@ int EZPI_core_scenes_status_change_broadcast(l_scenes_list_v2_t *scene_node, con
 
             CJSON_TRACE("----------------- broadcasting - cj_response", cj_response);
 
-            ret = EZPI_core_broadcast_add_to_queue(cj_response);
+            ret = EZPI_core_broadcast_add_to_queue(cj_response, time_stamp);
 
             if (0 != ret)
             {
@@ -180,11 +180,11 @@ const char *EZPI_core_scenes_status_to_string(e_scene_status_v2_t scene_status)
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 
 #endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

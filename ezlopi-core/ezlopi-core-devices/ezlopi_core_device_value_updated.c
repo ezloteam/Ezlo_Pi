@@ -245,8 +245,8 @@ ezlopi_error_t EZPI_core_device_value_update_wifi_scan_broadcast(cJSON *network_
         cJSON *cj_response = cJSON_CreateObject(__FUNCTION__);
         if (cj_response)
         {
-            printf("%s[%u]\r\n", __FUNCTION__, __LINE__);
-            cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_startTime_str, EZPI_core_sntp_get_current_time_sec());
+            // printf("%s[%u]\r\n", __FUNCTION__, __LINE__);
+            // cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_startTime_str, EZPI_core_sntp_get_current_time_sec());
 
             cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
             cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, method_hub_network_wifi_scan_progress);
@@ -285,7 +285,7 @@ static cJSON *__broadcast_message_items_updated_from_device(l_ezlopi_device_t *d
         cjson_response = cJSON_CreateObject(__FUNCTION__);
         if (cjson_response)
         {
-            cJSON_AddNumberToObject(__FUNCTION__, cjson_response, ezlopi_startTime_str, EZPI_core_sntp_get_current_time_sec());
+            // cJSON_AddNumberToObject(__FUNCTION__, cjson_response, ezlopi_startTime_str, EZPI_core_sntp_get_current_time_sec());
 
             cJSON_AddStringToObject(__FUNCTION__, cjson_response, ezlopi_msg_subclass_str, method_hub_item_updated);
             // cJSON_AddNumberToObject(__FUNCTION__, cjson_response, ezlopi_msg_id_str, EZPI_service_web_provisioning_get_message_count());
@@ -336,7 +336,7 @@ static cJSON *__broadcast_message_settings_updated_from_devices_v3(l_ezlopi_devi
     cJSON *cjson_response = cJSON_CreateObject(__FUNCTION__);
     if (cjson_response)
     {
-        cJSON_AddNumberToObject(__FUNCTION__, cjson_response, ezlopi_startTime_str, EZPI_core_sntp_get_current_time_sec());
+        // cJSON_AddNumberToObject(__FUNCTION__, cjson_response, ezlopi_startTime_str, EZPI_core_sntp_get_current_time_sec());
 
         if (NULL != setting)
         {

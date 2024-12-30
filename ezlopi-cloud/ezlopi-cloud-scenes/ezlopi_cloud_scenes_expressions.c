@@ -154,7 +154,7 @@ void EZPI_scenes_expressions_added_changed(cJSON *cj_request, cJSON *cj_response
     if (response1)
     {
         ezpi_scenes_expressions_added(cj_request, response1);
-        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(response1))
+        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(response1, EZPI_core_sntp_get_current_time_sec()))
         {
             cJSON_Delete(__FUNCTION__, response1);
         }
@@ -189,8 +189,8 @@ void EZPI_scenes_expressions_deleted(cJSON *cj_request, cJSON *cj_response)
 
 static void ezpi_scenes_expressions_added(cJSON *cj_request, cJSON *cj_response)
 {
-    time_t now = EZPI_core_sntp_get_current_time_sec();
-    cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_startTime_str, now);
+    // time_t now = EZPI_core_sntp_get_current_time_sec();
+    // cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_startTime_str, now);
 
     cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_sender_str);
     cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_error_str);
