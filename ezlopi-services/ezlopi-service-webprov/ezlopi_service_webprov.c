@@ -82,6 +82,7 @@ typedef struct
 {
     char *payload;
     time_t time_stamp;
+    uint32_t tick_count;
 } s_rx_message_t;
 
 static uint32_t message_counter = 0;
@@ -300,7 +301,7 @@ static void __fetch_wss_endpoint(void *pv)
                         id_str = NULL;
                         method_str = NULL;
 
-                        if (0 == ezlopi_service_otel_add_trace_to_telemetry_queue_struct(trace_obj))
+                        if (0 == ezlopi_service_otel_add_trace_to_telemetry_queue(trace_obj))
                         {
                             id_str = trace_obj->id;
                             method_str = trace_obj->method;
@@ -310,33 +311,6 @@ static void __fetch_wss_endpoint(void *pv)
 
                     ezlopi_free(__FUNCTION__, id_str);
                     ezlopi_free(__FUNCTION__, method_str);
-#endif
-
-#if 0
-                    if (cj_method_dup)
-                    {
-                        cJSON *cj_trace_telemetry = cJSON_CreateObject(__FUNCTION__);
-                        if (cj_trace_telemetry)
-                        {
-                            if (false == cJSON_AddItemToObject(__FUNCTION__, cj_trace_telemetry, ezlopi_method_str, cj_method_dup))
-                            {
-                                cJSON_Delete(__FUNCTION__, cj_method_dup);
-                            }
-
-                            cJSON_AddNumberToObject(__FUNCTION__, cj_trace_telemetry, ezlopi_kind_str, 1);
-                            cJSON_AddNumberToObject(__FUNCTION__, cj_trace_telemetry, ezlopi_startTime_str, rx_message->time_ms);
-                            cJSON_AddNumberToObject(__FUNCTION__, cj_trace_telemetry, ezlopi_endTime_str, EZPI_core_sntp_get_current_time_sec());
-
-                            if (0 == ezlopi_service_otel_add_trace_to_telemetry_queue(cj_trace_telemetry))
-                            {
-                                cJSON_Delete(__FUNCTION__, cj_trace_telemetry);
-                            }
-                        }
-                        else
-                        {
-                            cJSON_Delete(__FUNCTION__, cj_method_dup);
-                        }
-                    }
 #endif
                 }
 

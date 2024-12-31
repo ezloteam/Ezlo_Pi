@@ -154,7 +154,6 @@ void ezlopi_util_log_otel(uint8_t severity, const char *file, int line, const ch
             va_end(args);
 
             otel_log_upcall_func(severity, file, line, buffer);
-            ezlopi_free(__FUNCTION__, buffer);
         }
     }
 }

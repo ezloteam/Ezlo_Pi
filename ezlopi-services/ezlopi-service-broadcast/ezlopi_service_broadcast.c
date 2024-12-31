@@ -88,7 +88,6 @@ void EZPI_service_broadcast_init(void)
     }
 }
 
-#if 1
 static void __broadcast_loop(void *arg)
 {
     static uint32_t broadcast_wait_start = 0;
@@ -98,9 +97,9 @@ static void __broadcast_loop(void *arg)
     {
         if ((xTaskGetTickCount() - broadcast_wait_start) > 5 / portTICK_RATE_MS)
         {
-#ifdef CONFIG_EZPI_OPENTELEMETRY_ENABLE_TRACES
             if (__broadcast_data->cj_broadcast_data)
             {
+#ifdef CONFIG_EZPI_OPENTELEMETRY_ENABLE_TRACES
                 char *id_str = NULL;
                 char *msg_subclass_str = NULL;
 
@@ -123,7 +122,6 @@ static void __broadcast_loop(void *arg)
                         snprintf(msg_subclass_str, cj_msg_subclass->str_value_len + 1, "%.*s", cj_msg_subclass->str_value_len, cj_msg_subclass->valuestring);
                     }
                 }
-
 #endif
                 EZPI_core_broadcast_cjson(__broadcast_data->cj_broadcast_data);
                 cJSON_Delete(__FUNCTION__, __broadcast_data->cj_broadcast_data);
@@ -142,6 +140,7 @@ static void __broadcast_loop(void *arg)
                     trace_obj->free_heap = esp_get_free_heap_size();
                     trace_obj->heap_watermark = esp_get_minimum_free_heap_size();
                     trace_obj->name = EZPI_core_brodcast_source_to_name(__broadcast_data->source);
+                    trace_obj->tick_count = xTaskGetTickCount();
 
                     trace_obj->id = id_str;
                     trace_obj->msg_subclass = msg_subclass_str;
@@ -149,7 +148,7 @@ static void __broadcast_loop(void *arg)
                     id_str = NULL;
                     msg_subclass_str = NULL;
 
-                    if (0 == ezlopi_service_otel_add_trace_to_telemetry_queue_struct(trace_obj))
+                    if (0 == ezlopi_service_otel_add_trace_to_telemetry_queue(trace_obj))
                     {
                         id_str = trace_obj->id;                     // re-assigning to free in case adding to queue fails
                         msg_subclass_str = trace_obj->msg_subclass; // re-assigning to free in case adding to queue fails
@@ -164,41 +163,6 @@ static void __broadcast_loop(void *arg)
 
             ezlopi_free(__FUNCTION__, __broadcast_data);
             __broadcast_data = NULL;
-
-#if 0
-            if (cj_method_dup || cj_msg_subclass_dup)
-            {
-                cJSON *cj_trace_telemetry = cJSON_CreateObject(__FUNCTION__);
-                if (cj_trace_telemetry)
-                {
-                    if (false == cJSON_AddItemToObject(__FUNCTION__, cj_trace_telemetry, ezlopi_id_str, cj_method_dup))
-                    {
-                        cJSON_Delete(__FUNCTION__, cj_method_dup);
-                    }
-
-                    if (false == cJSON_AddItemToObject(__FUNCTION__, cj_trace_telemetry, ezlopi_msg_subclass_str, cj_msg_subclass_dup))
-                    {
-                        cJSON_Delete(__FUNCTION__, cj_method_dup);
-                    }
-
-                    cJSON_AddNumberToObject(__FUNCTION__, cj_trace_telemetry, ezlopi_kind_str, 1);
-                    cJSON_AddNumberToObject(__FUNCTION__, cj_trace_telemetry, ezlopi_startTime_str, cj_startTime ? cj_startTime->valuedouble : 0);
-                    cJSON_AddNumberToObject(__FUNCTION__, cj_trace_telemetry, ezlopi_endTime_str, EZPI_core_sntp_get_current_time_sec());
-
-                    if (0 == ezlopi_service_otel_add_trace_to_telemetry_queue(cj_trace_telemetry))
-                    {
-                        cJSON_Delete(__FUNCTION__, cj_trace_telemetry);
-                    }
-                }
-                else
-                {
-                    cJSON_Delete(__FUNCTION__, cj_method_dup);
-                    cJSON_Delete(__FUNCTION__, cj_msg_subclass_dup);
-                }
-            }
-
-            cJSON_Delete(__FUNCTION__, cj_startTime);
-#endif
         }
     }
     else
@@ -211,136 +175,7 @@ static void __broadcast_loop(void *arg)
 
     vTaskDelay(1);
 }
-#else
-static void __broadcast_loop(void *arg)
-{
-    static cJSON *cj_data = NULL;
-    static uint32_t broadcast_wait_start = 0;
 
-    if (cj_data)
-    {
-        if ((xTaskGetTickCount() - broadcast_wait_start) > 5 / portTICK_RATE_MS)
-        {
-#ifdef CONFIG_EZPI_OPENTELEMETRY_ENABLE_TRACES
-            double start_time = 0;
-            char *id_str = NULL;
-            char *msg_subclass_str = NULL;
-
-            cJSON *cj_id = cJSON_GetObjectItem(__FUNCTION__, cj_data, ezlopi_id_str);
-            if (cj_id && cj_id->valuestring && (cj_id->type == cJSON_String) && cj_id->str_value_len)
-            {
-                id_str = ezlopi_malloc(__FUNCTION__, cj_id->str_value_len + 1);
-                if (id_str)
-                {
-                    snprintf(id_str, cj_id->str_value_len + 1, "%.*s", cj_id->str_value_len, cj_id->valuestring);
-                }
-            }
-
-            cJSON *cj_msg_subclass = cJSON_GetObjectItem(__FUNCTION__, cj_data, ezlopi_msg_subclass_str);
-            if (cj_msg_subclass && cj_msg_subclass->valuestring && (cj_msg_subclass->type == cJSON_String) && cj_msg_subclass->str_value_len)
-            {
-                msg_subclass_str = ezlopi_malloc(__FUNCTION__, cj_msg_subclass->str_value_len + 1);
-                if (msg_subclass_str)
-                {
-                    snprintf(msg_subclass_str, cj_msg_subclass->str_value_len + 1, "%.*s", cj_msg_subclass->str_value_len, cj_msg_subclass->valuestring);
-                }
-            }
-
-            cJSON *cj_startTime = cJSON_DetachItemFromObject(__FUNCTION__, cj_data, ezlopi_startTime_str);
-            if (cj_startTime)
-            {
-                printf("%s[%u]: startTime: %llu\r\n", __FILENAME__, __LINE__, (uint64_t)cj_startTime->valuedouble);
-                start_time = cj_startTime->valuedouble;
-                cJSON_Delete(__FUNCTION__, cj_startTime);
-            }
-#endif
-
-            EZPI_core_broadcast_cjson(cj_data);
-            cJSON_Delete(__FUNCTION__, cj_data);
-            cj_data = NULL;
-
-#ifdef CONFIG_EZPI_OPENTELEMETRY_ENABLE_TRACES
-            s_otel_trace_t *trace_obj = ezlopi_malloc(__FUNCTION__, sizeof(s_otel_trace_t));
-            if (trace_obj)
-            {
-                memset(trace_obj, 0, sizeof(s_otel_trace_t));
-
-                trace_obj->kind = E_OTEL_KIND_CLIENT;
-                printf("%s[%d]: startTime: %lu\r\n", __FILENAME__, __LINE__, (time_t)start_time);
-                trace_obj->start_time = (time_t)start_time;
-                trace_obj->end_time = EZPI_core_sntp_get_current_time_sec();
-                trace_obj->free_heap = esp_get_free_heap_size();
-                trace_obj->heap_watermark = esp_get_minimum_free_heap_size();
-
-                trace_obj->id = id_str;
-
-                trace_obj->msg_subclass = msg_subclass_str;
-
-                id_str = NULL;
-                msg_subclass_str = NULL;
-
-                if (0 == ezlopi_service_otel_add_trace_to_telemetry_queue_struct(trace_obj))
-                {
-                    id_str = trace_obj->id;                     // re-assigning to free in case adding to queue fails
-                    msg_subclass_str = trace_obj->msg_subclass; // re-assigning to free in case adding to queue fails
-                    ezlopi_free(__FUNCTION__, trace_obj);
-                }
-            }
-
-            ezlopi_free(__FUNCTION__, id_str);
-            ezlopi_free(__FUNCTION__, msg_subclass_str);
-
-#endif
-
-#if 0
-            if (cj_method_dup || cj_msg_subclass_dup)
-            {
-                cJSON *cj_trace_telemetry = cJSON_CreateObject(__FUNCTION__);
-                if (cj_trace_telemetry)
-                {
-                    if (false == cJSON_AddItemToObject(__FUNCTION__, cj_trace_telemetry, ezlopi_id_str, cj_method_dup))
-                    {
-                        cJSON_Delete(__FUNCTION__, cj_method_dup);
-                    }
-
-                    if (false == cJSON_AddItemToObject(__FUNCTION__, cj_trace_telemetry, ezlopi_msg_subclass_str, cj_msg_subclass_dup))
-                    {
-                        cJSON_Delete(__FUNCTION__, cj_method_dup);
-                    }
-
-                    cJSON_AddNumberToObject(__FUNCTION__, cj_trace_telemetry, ezlopi_kind_str, 1);
-                    cJSON_AddNumberToObject(__FUNCTION__, cj_trace_telemetry, ezlopi_startTime_str, cj_startTime ? cj_startTime->valuedouble : 0);
-                    cJSON_AddNumberToObject(__FUNCTION__, cj_trace_telemetry, ezlopi_endTime_str, EZPI_core_sntp_get_current_time_sec());
-
-                    if (0 == ezlopi_service_otel_add_trace_to_telemetry_queue(cj_trace_telemetry))
-                    {
-                        cJSON_Delete(__FUNCTION__, cj_trace_telemetry);
-                    }
-                }
-                else
-                {
-                    cJSON_Delete(__FUNCTION__, cj_method_dup);
-                    cJSON_Delete(__FUNCTION__, cj_msg_subclass_dup);
-                }
-            }
-
-            cJSON_Delete(__FUNCTION__, cj_startTime);
-#endif
-        }
-    }
-    else
-    {
-        if (pdTRUE == xQueueReceive(__broadcast_queue, &cj_data, 10))
-        {
-            broadcast_wait_start = xTaskGetTickCount();
-        }
-    }
-
-    vTaskDelay(1);
-}
-#endif
-
-#if 1
 static ezlopi_error_t ezpi_service_broadcast_send_to_queue(s_broadcast_struct_t *broadcast_data)
 {
     ezlopi_error_t ret = EZPI_FAILED;
@@ -359,60 +194,15 @@ static ezlopi_error_t ezpi_service_broadcast_send_to_queue(s_broadcast_struct_t 
                 }
             }
         }
-        // else
-        // {
-        //     // TRACE_S(" ----- Adding to broadcast queue -----");
-        // }
 
         if (pdTRUE == xQueueSend(__broadcast_queue, &broadcast_data, 500 / portTICK_PERIOD_MS))
         {
             ret = EZPI_SUCCESS;
         }
-        // else
-        // {
-        //     // TRACE_D(" ----- Failed adding to queue -----");
-        // }
     }
 
     return ret;
 }
-#else
-static ezlopi_error_t ezpi_service_broadcast_send_to_queue(cJSON *cj_broadcast_data)
-{
-    ezlopi_error_t ret = EZPI_FAILED;
-
-    if (__broadcast_queue && cj_broadcast_data)
-    {
-        if (xQueueIsQueueFullFromISR(__broadcast_queue))
-        {
-            cJSON *cj_tmp_data = NULL;
-            if (pdTRUE == xQueueReceive(__broadcast_queue, &cj_tmp_data, 5 / portTICK_PERIOD_MS))
-            {
-                if (cj_tmp_data)
-                {
-                    cJSON_Delete(__FUNCTION__, cj_tmp_data);
-                }
-            }
-        }
-        else
-        {
-            // TRACE_S(" ----- Adding to broadcast queue -----");
-        }
-
-        cJSON *cj_data = cj_broadcast_data;
-        if (pdTRUE == xQueueSend(__broadcast_queue, &cj_data, 500 / portTICK_PERIOD_MS))
-        {
-            ret = EZPI_SUCCESS;
-        }
-        else
-        {
-            // TRACE_D(" ----- Failed adding to queue -----");
-        }
-    }
-
-    return ret;
-}
-#endif
 
 /*******************************************************************************
  *                          End of File

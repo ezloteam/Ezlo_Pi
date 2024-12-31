@@ -12,7 +12,6 @@ typedef enum e_otel_type
     E_OTEL_NONE = 0,
     E_OTEL_LOGS,
     E_OTEL_TRACES,
-    E_OTEL_TRACES_STRUCT,
     E_OTEL_MATRICS,
     E_OTEL_MAX,
 } e_otel_type_t;
@@ -58,9 +57,10 @@ typedef struct s_otel_trace
     const char *name;
     e_otel_kind_t kind;
 
+    uint32_t tick_count;
     time_t start_time;
     time_t end_time;
-    
+
     uint32_t free_heap;
     uint32_t heap_watermark;
 
@@ -68,8 +68,9 @@ typedef struct s_otel_trace
 } s_otel_trace_t;
 
 void ezlopi_service_otel_init(void);
-// int ezlopi_service_otel_add_trace_to_telemetry_queue(cJSON *cj_trace);
-int ezlopi_service_otel_add_trace_to_telemetry_queue_struct(s_otel_trace_t *trace_obj);
+#ifdef CONFIG_EZPI_OPENTELEMETRY_ENABLE_TRACES
+int ezlopi_service_otel_add_trace_to_telemetry_queue(s_otel_trace_t *trace_obj);
+#endif // CONFIG_EZPI_OPENTELEMETRY_ENABLE_TRACES
 
 #endif // CONFIG_EZPI_ENABLE_OPENTELEMETRY
 

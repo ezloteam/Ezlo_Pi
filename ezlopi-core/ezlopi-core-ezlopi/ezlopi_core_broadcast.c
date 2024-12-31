@@ -150,16 +150,12 @@ ezlopi_error_t EZPI_core_broadcast_add_to_queue(cJSON *cj_data, time_t time_stam
 
             broadcast_data->time_stamp = time_stamp;
             broadcast_data->cj_broadcast_data = cj_data;
+            broadcast_data->tick_count = xTaskGetTickCount();
             broadcast_data->source = E_BROADCAST_SOURCE_NONE;
 
             ret = __broadcast_queue_func(broadcast_data);
         }
-        // TRACE_S("cj_data: %p, __broadcast_queue_func: %p", cj_data, __broadcast_queue_func);
     }
-    // else
-    // {
-    //     // TRACE_E("cj_data: %p, __broadcast_queue_func: %p", cj_data, __broadcast_queue_func);
-    // }
 
     return ret;
 }
