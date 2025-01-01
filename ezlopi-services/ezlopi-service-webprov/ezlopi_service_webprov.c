@@ -148,13 +148,11 @@ static void __connection_upcall(bool connected)
         {
             TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_INFO, "NMA-server connected.");
             TRACE_S("Web-socket Connected.");
-            printf("web-prov - wss connected.\r\n");
         }
         else
         {
             TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_INFO, "NMA-server re-connected.");
             TRACE_S("Web-socket Re-connected.");
-            printf("web-prov - wss re-connected.\r\n");
         }
 
         prev_status = 2;
@@ -166,7 +164,6 @@ static void __connection_upcall(bool connected)
         prev_status = 1;
         EZPI_core_event_group_clear_event(EZLOPI_EVENT_NMA_REG);
         TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_WARNING, "NMA-server dis-connected!");
-        printf("web-prov - wss disconnected!\r\n");
     }
 }
 
@@ -205,7 +202,6 @@ static void __fetch_wss_endpoint(void *pv)
                         cJSON *cjson_uri = cJSON_GetObjectItem(__FUNCTION__, cj_nma_uri, "uri");
                         if (cjson_uri)
                         {
-                            // printf("----> URI: %s\r\n", cjson_uri->valuestring ? cjson_uri->valuestring : "NULL");
                             TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_INFO, "NMA-server: %s.", cjson_uri->valuestring ? cjson_uri->valuestring : ezlopi_null_str);
 
                             EZPI_core_broadcast_method_add(__send_str_data_to_nma_websocket, "nma-websocket", 4);
@@ -229,20 +225,26 @@ static void __fetch_wss_endpoint(void *pv)
             while (_wss_message_queue)
             {
                 s_rx_message_t *rx_message = NULL;
-                BaseType_t ret = xQueueReceive(_wss_message_queue, &rx_message, 100 / portTICK_RATE_MS);
+                xQueueReceive(_wss_message_queue, &rx_message, 100 / portTICK_RATE_MS);
 
                 if (rx_message)
                 {
-                    char *error = NULL;
                     char *id_str = NULL;
+                    char *error_str = NULL;
                     char *method_str = NULL;
+
                     time_t time_stamp = rx_message->time_stamp;
+                    uint32_t tick_count = rx_message->tick_count;
 
                     if (rx_message->payload)
                     {
                         cJSON *cj_request = cJSON_Parse(__FUNCTION__, rx_message->payload);
                         if (cj_request)
                         {
+                            id_str = ezlopi_service_otel_fetch_string_value_from_cjson(cj_request, ezlopi_id_str);
+                            error_str = ezlopi_service_otel_fetch_string_value_from_cjson(cj_request, ezlopi_error_str);
+                            method_str = ezlopi_service_otel_fetch_string_value_from_cjson(cj_request, ezlopi_method_str);
+#if 0
                             cJSON *cj_id = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_id_str);
                             if (cj_id && cj_id->valuestring && (cj_id->type == cJSON_String) && cj_id->str_value_len)
                             {
@@ -250,6 +252,16 @@ static void __fetch_wss_endpoint(void *pv)
                                 if (id_str)
                                 {
                                     snprintf(id_str, cj_id->str_value_len + 1, "%.*s", cj_id->str_value_len, cj_id->valuestring);
+                                }
+                            }
+
+                            cJSON *cj_error = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_error_str);
+                            if (cj_error && cj_error->valuestring && (cj_error->type == cJSON_String) && cj_error->str_value_len)
+                            {
+                                error_str = ezlopi_malloc(__FUNCTION__, cj_error->str_value_len + 1);
+                                if (error_str)
+                                {
+                                    snprintf(error_str, cj_error->str_value_len + 1, "%.*s", cj_error->str_value_len, cj_error->valuestring);
                                 }
                             }
 
@@ -265,11 +277,10 @@ static void __fetch_wss_endpoint(void *pv)
                                 ezlopi_free(__FUNCTION__, rx_message->payload);
                                 rx_message->payload = NULL;
                             }
-                            else
+#endif
+                            if (NULL == method_str)
                             {
                                 TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_ERROR, "web-provisioning [method: null], payload: %s", rx_message->payload);
-                                // printf("web-provisioning [method: null]\r\n%s\r\n", rx_message->payload);
-                                // TRACE_E("rx_message->payload [method: null]\r\n%s", rx_message->payload);
                             }
 
                             __message_process_cjson(cj_request, rx_message->time_stamp);
@@ -291,25 +302,31 @@ static void __fetch_wss_endpoint(void *pv)
 
                         trace_obj->kind = E_OTEL_KIND_CLIENT;
                         trace_obj->start_time = time_stamp;
+                        trace_obj->tick_count = tick_count;
                         trace_obj->end_time = EZPI_core_sntp_get_current_time_sec();
+
                         trace_obj->free_heap = esp_get_free_heap_size();
                         trace_obj->heap_watermark = esp_get_minimum_free_heap_size();
 
                         trace_obj->id = id_str;
+                        trace_obj->error = error_str;
                         trace_obj->method = method_str;
 
                         id_str = NULL;
+                        error_str = NULL;
                         method_str = NULL;
 
                         if (0 == ezlopi_service_otel_add_trace_to_telemetry_queue(trace_obj))
                         {
                             id_str = trace_obj->id;
+                            error_str = trace_obj->error;
                             method_str = trace_obj->method;
                             ezlopi_free(__FUNCTION__, trace_obj);
                         }
                     }
 
                     ezlopi_free(__FUNCTION__, id_str);
+                    ezlopi_free(__FUNCTION__, error_str);
                     ezlopi_free(__FUNCTION__, method_str);
 #endif
                 }
@@ -337,22 +354,25 @@ static void __message_process_cjson(cJSON *cj_request, time_t time_stamp)
     {
         cJSON *cj_response = EZPI_core_api_consume_cjson(__FUNCTION__, cj_request, time_stamp);
 
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
         time_t now = EZPI_core_sntp_get_current_time_sec();
         TRACE_D("time to process: %lu", (now - time_stamp));
+#endif
 
         if (cj_response)
         {
             cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_msg_id_str, message_counter);
             __send_cjson_data_to_nma_websocket(cj_response);
+            cJSON_Delete(__FUNCTION__, cj_response);
 
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
             now = EZPI_core_sntp_get_current_time_sec();
             TRACE_D("time to reply: %lu", (now - time_stamp));
-
-            cJSON_Delete(__FUNCTION__, cj_response);
         }
         else
         {
             TRACE_W("no response!");
+#endif
         }
     }
 }
@@ -366,18 +386,21 @@ static int __message_upcall(char *payload, uint32_t len, time_t time_stamp)
         s_rx_message_t *rx_message = ezlopi_malloc(__FUNCTION__, sizeof(s_rx_message_t));
         if (rx_message)
         {
+
             if (pdTRUE == xQueueIsQueueFullFromISR(_wss_message_queue))
             {
-                char *stale_data = NULL;
+                s_rx_message_t *stale_data = NULL;
                 xQueueReceive(_wss_message_queue, &stale_data, 5);
                 if (stale_data)
                 {
+                    ezlopi_free(__FUNCTION__, stale_data->payload);
                     ezlopi_free(__FUNCTION__, stale_data);
                 }
             }
 
             rx_message->payload = payload;
             rx_message->time_stamp = time_stamp;
+            rx_message->tick_count = xTaskGetTickCount();
 
             if (pdTRUE == xQueueSend(_wss_message_queue, &rx_message, 5))
             {
@@ -413,7 +436,6 @@ static int __send_cjson_data_to_nma_websocket(cJSON *cj_data)
 
                 if (EZPI_SUCCESS == ret)
                 {
-                    // printf("NMA-send:\r\n%s\r\n", data_buffer);
                     TRACE_S("NMA-send:\r\n%s", data_buffer);
                 }
                 else

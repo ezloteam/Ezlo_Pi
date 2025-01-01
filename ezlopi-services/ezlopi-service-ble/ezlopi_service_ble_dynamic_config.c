@@ -421,12 +421,16 @@ static char *ezpi_dynamic_config_base64(void)
         {
             TRACE_D("device-config: [len: %d]\n%s", strlen(str_ezlopi_config), str_ezlopi_config);
 
+#ifndef CONFIG_EZPI_UTIL_TRACE_EN
+            mbedtls_base64_encode((unsigned char *)base64_data, base64_data_len, &out_put_len,
+                                  (const unsigned char *)str_ezlopi_config, strlen(str_ezlopi_config));
+#else
             int ret = mbedtls_base64_encode((unsigned char *)base64_data, base64_data_len, &out_put_len,
                                             (const unsigned char *)str_ezlopi_config, strlen(str_ezlopi_config));
+            TRACE_D("'mbedtls_base64_encode' returned: %04x", ret);
+#endif
 
             EZPI_core_factory_info_v3_free(str_ezlopi_config);
-
-            TRACE_D("'mbedtls_base64_encode' returned: %04x", ret);
         }
 
         TRACE_D("out-put-len: %d", out_put_len);

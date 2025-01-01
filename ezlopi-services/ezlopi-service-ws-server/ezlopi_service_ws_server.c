@@ -214,8 +214,6 @@ static ezlopi_error_t ezpi_ws_server_broadcast(char *data)
         {
             ret = EZPI_SUCCESS;
             l_ws_server_client_conn_t *curr_client = EZPI_service_ws_server_clients_get_head();
-#warning "DO NOT USE printf ON PRODUCTION"
-            // printf("%s and curr-client: %p\n", __func__, curr_client);
             if (curr_client)
             {
                 while (curr_client)

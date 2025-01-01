@@ -70,6 +70,7 @@ typedef struct s_otel_trace
 void ezlopi_service_otel_init(void);
 #ifdef CONFIG_EZPI_OPENTELEMETRY_ENABLE_TRACES
 int ezlopi_service_otel_add_trace_to_telemetry_queue(s_otel_trace_t *trace_obj);
+char *ezlopi_service_otel_fetch_string_value_from_cjson(cJSON *cj_root, const char *key);
 #endif // CONFIG_EZPI_OPENTELEMETRY_ENABLE_TRACES
 
 #endif // CONFIG_EZPI_ENABLE_OPENTELEMETRY

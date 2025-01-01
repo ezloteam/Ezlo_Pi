@@ -133,7 +133,7 @@ esp_websocket_client_handle_t EZPI_core_websocket_client_init(cJSON *uri, int (*
 {
     esp_websocket_client_handle_t client = NULL;
 
-    if ((NULL == client) && (NULL != uri) && (NULL != uri->valuestring) && (NULL != msg_upcall))
+    if ((NULL == client) && (NULL != uri) && (NULL != uri->valuestring))
     {
         s_ws_event_arg_t *event_arg = ezlopi_malloc(__FUNCTION__, sizeof(s_ws_event_arg_t));
         if (event_arg)

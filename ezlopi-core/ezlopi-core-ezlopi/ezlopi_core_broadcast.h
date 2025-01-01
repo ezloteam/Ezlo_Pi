@@ -86,8 +86,8 @@ extern "C"
 
     typedef struct s_broadcast_struct
     {
-        uint32_t tick_count;
         time_t time_stamp;
+        uint32_t tick_count;
         cJSON *cj_broadcast_data;
         e_broadcast_source_t source;
     } s_broadcast_struct_t;

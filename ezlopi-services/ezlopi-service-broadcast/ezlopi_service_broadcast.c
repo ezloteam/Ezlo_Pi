@@ -100,9 +100,13 @@ static void __broadcast_loop(void *arg)
             if (__broadcast_data->cj_broadcast_data)
             {
 #ifdef CONFIG_EZPI_OPENTELEMETRY_ENABLE_TRACES
-                char *id_str = NULL;
-                char *msg_subclass_str = NULL;
 
+                char *id_str = ezlopi_service_otel_fetch_string_value_from_cjson(__broadcast_data->cj_broadcast_data, ezlopi_id_str);
+                char *error_str = ezlopi_service_otel_fetch_string_value_from_cjson(__broadcast_data->cj_broadcast_data, ezlopi_error_str);
+                char *method_str = ezlopi_service_otel_fetch_string_value_from_cjson(__broadcast_data->cj_broadcast_data, ezlopi_method_str);
+                char *msg_subclass_str = ezlopi_service_otel_fetch_string_value_from_cjson(__broadcast_data->cj_broadcast_data, ezlopi_msg_subclass_str);
+
+#if 0
                 cJSON *cj_id = cJSON_GetObjectItem(__FUNCTION__, __broadcast_data->cj_broadcast_data, ezlopi_id_str);
                 if (cj_id && cj_id->valuestring && (cj_id->type == cJSON_String) && cj_id->str_value_len)
                 {
@@ -110,6 +114,16 @@ static void __broadcast_loop(void *arg)
                     if (id_str)
                     {
                         snprintf(id_str, cj_id->str_value_len + 1, "%.*s", cj_id->str_value_len, cj_id->valuestring);
+                    }
+                }
+
+                cJSON *cj_error = cJSON_GetObjectItem(__FUNCTION__, __broadcast_data->cj_broadcast_data, ezlopi_error_str);
+                if (cj_error && cj_error->valuestring && (cj_error->type == cJSON_String) && cj_id->str_value_len)
+                {
+                    error_str = ezlopi_malloc(__FUNCTION__, cj_error->str_value_len + 1);
+                    if (error_str)
+                    {
+                        snprintf(error_str, cj_error->str_value_len + 1, "%.*s", cj_error->str_value_len, cj_error->valuestring);
                     }
                 }
 
@@ -122,6 +136,18 @@ static void __broadcast_loop(void *arg)
                         snprintf(msg_subclass_str, cj_msg_subclass->str_value_len + 1, "%.*s", cj_msg_subclass->str_value_len, cj_msg_subclass->valuestring);
                     }
                 }
+
+                cJSON *cj_method = cJSON_GetObjectItem(__FUNCTION__, __broadcast_data->cj_broadcast_data, ezlopi_method_str);
+                if (cj_method)
+                {
+                    method_str = ezlopi_malloc(__FUNCTION__, cj_method->str_value_len + 1);
+                    if (method_str)
+                    {
+                        snprintf(method_str, cj_method->str_value_len + 1, "%.*s", cj_method->str_value_len, cj_method->valuestring);
+                    }
+                }
+#endif
+
 #endif
                 EZPI_core_broadcast_cjson(__broadcast_data->cj_broadcast_data);
                 cJSON_Delete(__FUNCTION__, __broadcast_data->cj_broadcast_data);
@@ -134,7 +160,6 @@ static void __broadcast_loop(void *arg)
                     memset(trace_obj, 0, sizeof(s_otel_trace_t));
 
                     trace_obj->kind = E_OTEL_KIND_CLIENT;
-                    // printf("%s[%d]: startTime: %lu\r\n", __FILENAME__, __LINE__, __broadcast_data->time_stamp);
                     trace_obj->start_time = __broadcast_data->time_stamp;
                     trace_obj->end_time = EZPI_core_sntp_get_current_time_sec();
                     trace_obj->free_heap = esp_get_free_heap_size();
@@ -143,20 +168,29 @@ static void __broadcast_loop(void *arg)
                     trace_obj->tick_count = xTaskGetTickCount();
 
                     trace_obj->id = id_str;
+                    trace_obj->error = error_str;
+                    trace_obj->method = method_str;
                     trace_obj->msg_subclass = msg_subclass_str;
 
                     id_str = NULL;
+                    error_str = NULL;
+                    method_str = NULL;
                     msg_subclass_str = NULL;
 
                     if (0 == ezlopi_service_otel_add_trace_to_telemetry_queue(trace_obj))
                     {
                         id_str = trace_obj->id;                     // re-assigning to free in case adding to queue fails
+                        error_str = trace_obj->error;               // re-assigning to free in case adding to queue fails
+                        method_str = trace_obj->method;             // re-assigning to free in case adding to queue fails
                         msg_subclass_str = trace_obj->msg_subclass; // re-assigning to free in case adding to queue fails
+
                         ezlopi_free(__FUNCTION__, trace_obj);
                     }
                 }
 
                 ezlopi_free(__FUNCTION__, id_str);
+                ezlopi_free(__FUNCTION__, error_str);
+                ezlopi_free(__FUNCTION__, method_str);
                 ezlopi_free(__FUNCTION__, msg_subclass_str);
 #endif
             }

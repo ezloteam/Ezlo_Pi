@@ -235,7 +235,7 @@ time_t EZPI_core_sntp_get_current_time_sec_abc(const char *function_name)
         }
         else
         {
-            printf("time-error: %lu, retrying...\r\n", now);
+            // printf("time-error: %lu, retrying...\r\n", now);
             vTaskDelay(5 / portTICK_RATE_MS);
         }
     }

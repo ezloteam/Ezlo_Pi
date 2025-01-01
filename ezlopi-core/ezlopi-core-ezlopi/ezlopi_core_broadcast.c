@@ -298,7 +298,7 @@ static ezlopi_error_t __call_broadcast_methods(char *data)
 
     while (curr_method)
     {
-        time_t start_time = EZPI_core_sntp_get_current_time_sec();
+        // time_t start_time = EZPI_core_sntp_get_current_time_sec();
         // printf("%s[%u]: start-time: %lu\r\n", __FILENAME__, __LINE__, start_time);
 
         if (curr_method->func)

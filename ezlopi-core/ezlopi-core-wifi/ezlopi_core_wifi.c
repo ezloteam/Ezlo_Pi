@@ -272,8 +272,12 @@ void EZPI_core_wifi_connect_from_id_bin(void)
     if ((NULL != wifi_ssid) && ('\0' != wifi_ssid[0]) &&
         (NULL != wifi_password) && ('\0' != wifi_password[0]))
     {
+#ifndef CONFIG_EZPI_UTIL_TRACE_EN
+        EZPI_core_wifi_connect(wifi_ssid, wifi_password);
+#else
         esp_err_t wifi_error = EZPI_core_wifi_connect(wifi_ssid, wifi_password);
         TRACE_W("wifi_error: %u", wifi_error);
+#endif
     }
 
     if (wifi_ssid)

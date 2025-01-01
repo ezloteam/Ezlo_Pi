@@ -1,7 +1,5 @@
 #include "bme680_bsec.h"
 
-#warning "################### DO NOT USE printf ON PRODUCTION ###################"
-
 /**
  * @brief : This function is called by the BSEC library when a new output is available
  * @param[in] input     : BME68X sensor data before processing
@@ -10,8 +8,7 @@
  */
 static void bme680_data_callback(const bme68x_data data, const bsec_outputs outputs);
 
-
-
+#warning "RIKEN: do not use global and/or static variable in devices! PLEASE!!"
 static bool callback_status = false;
 static bme680_data_t bme680_data;
 
@@ -69,7 +66,7 @@ void bme680_setup(uint32_t sda, uint32_t scl, bool initialize_i2c)
     /* Whenever new data is available call the data_callback function */
     bsec2_attach_callback(bme680_data_callback);
 
-    bsec_version_t bsec2_version = bsec2_get_version();
+    // bsec_version_t bsec2_version = bsec2_get_version();
     // printf("BSEC library version %d.%d.%d.%d\n", bsec2_version.major, bsec2_version.minor, bsec2_version.major_bugfix, bsec2_version.minor_bugfix);
 }
 
