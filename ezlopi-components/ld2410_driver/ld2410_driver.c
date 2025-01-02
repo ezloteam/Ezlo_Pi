@@ -59,61 +59,42 @@ static bool ld2410_leave_configuration_mode_(); // Will not read values without 
 #define DATA_BUF_LENGTH 23
 static void ld2410_callback(uint8_t *buffer, uint32_t output_len, s_ezlopi_uart_object_handle_t uart_object_handle)
 {
-	// printf("[ ");
 	for (size_t i = 0; i < output_len; i++)
 	{
-		// printf("0x%X ", buffer[i]);
 		ld2410_read_frame_(buffer[i]);
 	}
-	// printf("]\n");
 }
 
 /*	Function definition	*/
 bool ld2410_begin(bool wait_for_radar, s_ezlopi_uart_t uart_settings)
 {
+	bool ret = false;
 	ezlo_ld2410_uart_handle = ezlopi_uart_init(uart_settings.baudrate, uart_settings.tx, uart_settings.rx, ld2410_callback, NULL);
 
-#warning "DO NOT USE printf ON PRODUCTION"
-
-#ifdef LD2410_DEBUG_INITIALIZATION
-	// printf("ld2410 started");
-#endif
 	if (wait_for_radar)
 	{
-#ifdef LD2410_DEBUG_INITIALIZATION
-		// printf("\nLD2410 firmware: ");
-#endif
 		if (ld2410_request_firmware_version())
 		{
 #ifdef LD2410_DEBUG_INITIALIZATION
 			printf(" v%d.%d.%d\n", firmware_major_version, firmware_minor_version, firmware_bugfix_version);
 #endif
-			return true;
-		}
-		else
-		{
-#ifdef LD2410_DEBUG_INITIALIZATION
-			// printf("no response\n");
-#endif
+			ret = true;
 		}
 	}
 	else
 	{
-#ifdef LD2410_DEBUG_INITIALIZATION
-		// printf("\nLD2410 library configured");
-#endif
-		return true;
+		ret = true;
 	}
-	return false;
 }
 
 bool ld2410_is_connected()
 {
+	bool ret = false;
 	if (millis() - radar_uart_last_packet_ < radar_uart_timeout) // Use the last reading
 	{
-		return true;
+		ret = true;
 	}
-	return false;
+	return ret;
 }
 
 bool ld2410_presence_detected()
@@ -123,60 +104,48 @@ bool ld2410_presence_detected()
 
 bool ld2410_stationary_target_detected()
 {
+	bool ret = false;
 	if ((target_type_ & 0x02) && stationary_target_distance_ > 0 && stationary_target_energy_ > 0)
 	{
-		return true;
+		ret = true;
 	}
-	return false;
+	return ret;
 }
 
 uint16_t ld2410_stationary_target_distance()
 {
-	// if(stationary_target_energy_ > 0)
-	{
-		return stationary_target_distance_;
-	}
-	// return 0;
+	return stationary_target_distance_;
 }
 
 uint8_t ld2410_stationary_target_energy()
 {
-	// if(stationary_target_distance_ > 0)
-	{
-		return stationary_target_energy_;
-	}
-	// return 0;
+	return stationary_target_energy_;
 }
 
 bool ld2410_moving_target_detected()
 {
+	bool ret = false;
 	if ((target_type_ & 0x01) && moving_target_distance_ > 0 && moving_target_energy_ > 0)
 	{
-		return true;
+		ret = true;
 	}
-	return false;
+	return ret;
 }
 
 uint16_t ld2410_moving_target_distance()
 {
-	// if(moving_target_energy_ > 0)
-	{
-		return moving_target_distance_;
-	}
-	// return 0;
+	return moving_target_distance_;
 }
 
 uint8_t ld2410_moving_target_energy()
 {
-	// if(moving_target_distance_ > 0)
-	{
-		return moving_target_energy_;
-	}
-	// return 0;
+	return moving_target_energy_;
 }
 
 static bool ld2410_read_frame_(uint8_t l_byte)
 {
+	bool ret = false;
+
 	if (frame_started_ == false)
 	{
 		uint8_t byte_read_ = l_byte;
@@ -242,7 +211,7 @@ static bool ld2410_read_frame_(uint8_t l_byte)
 #endif
 						frame_started_ = false;
 						radar_data_frame_position_ = 0;
-						return true;
+						ret = true;
 					}
 					else
 					{
@@ -269,7 +238,7 @@ static bool ld2410_read_frame_(uint8_t l_byte)
 #endif
 						frame_started_ = false;
 						radar_data_frame_position_ = 0;
-						return true;
+						ret = true;
 					}
 					else
 					{
@@ -291,50 +260,30 @@ static bool ld2410_read_frame_(uint8_t l_byte)
 			radar_data_frame_position_ = 0;
 		}
 	}
-	return false;
-}
 
-#if 0
-static void ld2410_print_frame_()
-{
-	if (ack_frame_ == true)
-	{
-		// printf("\nCmnd : ");
-	}
-	else
-	{
-		// printf("\nData : ");
-	}
-	for (uint8_t i = 0; i < radar_data_frame_position_; i++)
-	{
-		if (radar_data_frame_[i] < 0x10)
-		{
-			// printf("0");
-		}
-		// printf("%x ", radar_data_frame_[i]);
-	}
+	return ret;
 }
-
-#endif
 
 static bool ld2410_parse_data_frame_()
 {
+	bool ret = false;
+
 	uint16_t intra_frame_data_length_ = radar_data_frame_[4] + (radar_data_frame_[5] << 8);
 	if (radar_data_frame_position_ == intra_frame_data_length_ + 10)
 	{
 #ifdef LD2410_DEBUG_DATA
-		// ld2410_print_frame_();
+		ld2410_print_frame_();
 #endif
 #ifdef LD2410_DEBUG_COMMANDS
 		if (ack_frame_ == true)
 		{
-			// ld2410_print_frame_();
+			ld2410_print_frame_();
 		}
 #endif
 		if (radar_data_frame_[6] == 0x01 && radar_data_frame_[7] == 0xAA) // Engineering mode data
 		{
 			target_type_ = radar_data_frame_[8];
-#if 0
+
 #ifdef LD2410_DEBUG_PARSE
 			printf("\nEngineering data - ");
 			if (target_type_ == 0x00)
@@ -354,7 +303,6 @@ static bool ld2410_parse_data_frame_()
 				printf("moving & stationary targets:");
 			}
 #endif
-#endif
 
 			/*
 			 *
@@ -371,7 +319,7 @@ static bool ld2410_parse_data_frame_()
 			moving_target_energy_ = radar_data_frame_[11];
 			// stationary_target_distance_ = radar_data_frame_[12] + (radar_data_frame_[13] << 8);
 			moving_target_distance_ = radar_data_frame_[15] + (radar_data_frame_[16] << 8);
-#if 0
+
 #ifdef LD2410_DEBUG_PARSE
 			printf("\nNormal data - ");
 			if (target_type_ == 0x00)
@@ -401,25 +349,13 @@ static bool ld2410_parse_data_frame_()
 				// printf(stationary_target_energy_);
 			}
 #endif
-#endif
+
 			radar_uart_last_packet_ = millis();
-			return true;
-		}
-		else
-		{
-			// #ifdef LD2410_DEBUG_DATA
-			// 			printf("\nUnknown frame type");
-			// ld2410_print_frame_();
-			// #endif
+			ret = true;
 		}
 	}
-	else
-	{
-		// #ifdef LD2410_DEBUG_DATA
-		// 		printf("\nFrame length unexpected: %d not %d", radar_data_frame_position_, intra_frame_data_length_ + 10);
-		// #endif
-	}
-	return false;
+
+	return ret;
 }
 
 static bool ld2410_parse_command_frame_()

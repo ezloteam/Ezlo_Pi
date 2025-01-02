@@ -503,6 +503,7 @@ int8_t bme68xlib_get_status(void)
 
 #define NOP() asm volatile ("nop")
 
+#warning "NABIN: Can we use timer for delay instead of NOP()"
 void IRAM_ATTR delay_microseconds(uint32_t us)
 {
   uint64_t m = (uint64_t)esp_timer_get_time();
