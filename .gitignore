@@ -79,3 +79,4 @@ dependencies.lock
 .editorconfig
 sdkconfig.old
 sdkconfig
+sdkconfig.ota.esp32.4mb 
