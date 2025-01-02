@@ -1,12 +1,12 @@
 #include "ALS_LTR303.h"
 
-#warning "NABIN: do not use global and/or static variable in devices! PLEASE!!"
+#warning "################### DO NOT USE printf ON PRODUCTION ###################"
 
-byte error;
 unsigned char gain = LTR3XX_GAIN_1;                    // Gain setting, values = 0-7
 unsigned char integration_time = LTR3XX_INTEGTIME_200; // Integration ("shutter") time in milliseconds
 unsigned char measurement_rate = LTR3XX_MEASRATE_200;  // Interval between DATA_REGISTERS update
 bool valid = 0, intr_status = 0, data_status = 0;
+byte error;
 
 bool ltr303_is_data_available(void)
 {

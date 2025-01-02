@@ -82,7 +82,7 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_dev
     item->cloud_properties.item_name = ezlopi_item_name_dw_state;
     item->cloud_properties.value_type = value_type_token;
     item->cloud_properties.scale = NULL;
-    item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
+    item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
     CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_str, item->interface.gpio.gpio_in.gpio_num);
@@ -102,11 +102,11 @@ static ezlopi_error_t __0061_prepare(void *arg)
         s_ezlopi_prep_arg_t *device_prep_arg = (s_ezlopi_prep_arg_t *)arg;
         if (device_prep_arg && (NULL != device_prep_arg->cjson_device))
         {
-            l_ezlopi_device_t *reed_device = EZPI_core_device_add_device(device_prep_arg->cjson_device, NULL);
+            l_ezlopi_device_t *reed_device = ezlopi_device_add_device(device_prep_arg->cjson_device, NULL);
             if (reed_device)
             {
                 __prepare_device_cloud_properties(reed_device, device_prep_arg->cjson_device);
-                l_ezlopi_item_t *reed_item = EZPI_core_device_add_item_to_device(reed_device, sensor_0061_digitalIn_reed_switch);
+                l_ezlopi_item_t *reed_item = ezlopi_device_add_item_to_device(reed_device, sensor_0061_digitalIn_reed_switch);
                 if (reed_item)
                 {
                     __prepare_item_cloud_properties(reed_item, device_prep_arg->cjson_device);
@@ -114,7 +114,7 @@ static ezlopi_error_t __0061_prepare(void *arg)
                 }
                 else
                 {
-                    EZPI_core_device_free_device(reed_device);
+                    ezlopi_device_free_device(reed_device);
                 }
             }
         }
@@ -146,7 +146,7 @@ static ezlopi_error_t __0061_init(l_ezlopi_item_t *item)
             if (ESP_OK == gpio_config(&input_conf))
             {
                 item->interface.gpio.gpio_in.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
-                EZPI_service_gpioisr_register_v3(item, _0061_update_from_device, 200);
+                ezlopi_service_gpioisr_register_v3(item, _0061_update_from_device, 200);
                 ret = EZPI_SUCCESS;
             }
         }
@@ -226,7 +226,7 @@ static void _0061_update_from_device(void *arg)
         if (curret_value != (char *)item->user_arg) // calls update only if there is change in state
         {
             item->user_arg = (void *)curret_value;
-            EZPI_core_device_value_updated_from_device_broadcast(item);
+            ezlopi_device_value_updated_from_device_broadcast(item);
         }
     }
 }

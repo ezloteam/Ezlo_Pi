@@ -73,7 +73,7 @@ static ezlopi_error_t __get_value_cjson(l_ezlopi_item_t *item, void *arg)
         if (mb1013_args)
         {
             cJSON *cj_result = (cJSON *)arg;
-            EZPI_core_valueformatter_float_to_cjson(cj_result, mb1013_args->current_value, scales_meter);
+            ezlopi_valueformatter_float_to_cjson(cj_result, mb1013_args->current_value, scales_meter);
             ret = EZPI_SUCCESS;
         }
     }
@@ -144,7 +144,7 @@ static void __setup_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_devic
     item->cloud_properties.item_name = ezlopi_item_name_distance;
     item->cloud_properties.value_type = value_type_length;
     item->cloud_properties.scale = scales_centi_meter;
-    item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
+    item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 }
 
 static void __setup_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj_device)
@@ -164,11 +164,11 @@ static ezlopi_error_t __prepare(void *arg)
         cJSON *cjson_device = prep_arg->cjson_device;
         if (cjson_device)
         {
-            l_ezlopi_device_t *device = EZPI_core_device_add_device(prep_arg->cjson_device, NULL);
+            l_ezlopi_device_t *device = ezlopi_device_add_device(prep_arg->cjson_device, NULL);
             if (device)
             {
                 __setup_device_cloud_properties(device, cjson_device);
-                l_ezlopi_item_t *item = EZPI_core_device_add_item_to_device(device, sensor_0021_UART_MB1013);
+                l_ezlopi_item_t *item = ezlopi_device_add_item_to_device(device, sensor_0021_UART_MB1013);
                 if (item)
                 {
                     __setup_item_cloud_properties(item, cjson_device);
@@ -186,7 +186,7 @@ static ezlopi_error_t __prepare(void *arg)
                 }
                 else
                 {
-                    EZPI_core_device_free_device(device);
+                    ezlopi_device_free_device(device);
                 }
             }
         }
@@ -205,7 +205,7 @@ static ezlopi_error_t __notify(l_ezlopi_item_t *item)
         {
             if (abs(mb1013_args->current_value - mb1013_args->previous_value) > 0.2) // accuracy of 0.5cm (i.e. 5mm)
             {
-                EZPI_core_device_value_updated_from_device_broadcast(item);
+                ezlopi_device_value_updated_from_device_broadcast(item);
                 mb1013_args->previous_value = mb1013_args->current_value;
                 ret = EZPI_SUCCESS;
             }

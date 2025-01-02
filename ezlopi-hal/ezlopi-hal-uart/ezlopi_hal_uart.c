@@ -17,13 +17,13 @@
 #include "ezlopi_hal_uart.h"
 #include "EZLOPI_USER_CONFIG.h"
 
-static void ezlopi_uart_channel_task(void *args);
+static void ezlopi_uart_channel_task(void* args);
 static ezlo_uart_channel_t get_available_channel();
 
-s_ezlopi_uart_object_handle_t ezlopi_uart_init(uint32_t baudrate, uint32_t tx, uint32_t rx, __uart_upcall upcall, void *arg)
+s_ezlopi_uart_object_handle_t ezlopi_uart_init(uint32_t baudrate, uint32_t tx, uint32_t rx, __uart_upcall upcall, void* arg)
 {
     static QueueHandle_t ezlo_uart_channel_queue;
-    s_ezlopi_uart_object_handle_t uart_object_handle = (struct s_ezlopi_uart_object *)ezlopi_malloc(__FUNCTION__, sizeof(struct s_ezlopi_uart_object));
+    s_ezlopi_uart_object_handle_t uart_object_handle = (struct s_ezlopi_uart_object*)ezlopi_malloc(__FUNCTION__, sizeof(struct s_ezlopi_uart_object));
     memset(uart_object_handle, 0, sizeof(struct s_ezlopi_uart_object));
     uart_object_handle->arg = arg;
     ezlo_uart_channel_t channel = get_available_channel();
@@ -65,11 +65,8 @@ s_ezlopi_uart_object_handle_t ezlopi_uart_init(uint32_t baudrate, uint32_t tx, u
         uart_object_handle->ezlopi_uart.enable = true;
         uart_object_handle->upcall = upcall;
 
-        xTaskCreate(ezlopi_uart_channel_task, "EzpiUartChnTask", EZLOPI_HAL_UART_TASK_DEPTH, (void *)uart_object_handle, 13, &(uart_object_handle->taskHandle));
-
-#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
-        EZPI_core_process_set_process_info(ENUM_EZLOPI_HAL_UART_TASK, &uart_object_handle->taskHandle, EZLOPI_HAL_UART_TASK_DEPTH);
-#endif
+        xTaskCreate(ezlopi_uart_channel_task, "EzpiUartChnTask", EZLOPI_HAL_UART_TASK_DEPTH, (void*)uart_object_handle, 13, &(uart_object_handle->taskHandle));
+        ezlopi_core_process_set_process_info(ENUM_EZLOPI_HAL_UART_TASK, &uart_object_handle->taskHandle, EZLOPI_HAL_UART_TASK_DEPTH);
     }
     else
     {
@@ -92,10 +89,10 @@ static ezlo_uart_channel_t get_available_channel()
     return -1;
 }
 
-static void ezlopi_uart_channel_task(void *args)
+static void ezlopi_uart_channel_task(void* args)
 {
     uart_event_t event;
-    uint8_t *buffer = NULL;
+    uint8_t* buffer = NULL;
 
     // s_ezlopi_uart_object_t *ezlopi_uart_object = (s_ezlopi_uart_object_t*)args;
     s_ezlopi_uart_object_handle_t ezlopi_uart_object = (s_ezlopi_uart_object_handle_t)args;
@@ -104,7 +101,7 @@ static void ezlopi_uart_channel_task(void *args)
     {
         int data_len = 0;
         // Start reveceiving UART events for first channel.
-        if (xQueueReceive(ezlopi_uart_object->ezlopi_uart_queue_handle, (void *)&event, portMAX_DELAY))
+        if (xQueueReceive(ezlopi_uart_object->ezlopi_uart_queue_handle, (void*)&event, portMAX_DELAY))
         {
             switch (event.type)
             {
@@ -165,40 +162,40 @@ void EZPI_HAL_uart_init(void)
     uint32_t frame_size = EZPI_SERV_UART_FRAME_SIZE_DEFAULT;
     uint32_t flow_control = EZPI_SERV_UART_FLOW_CTRL_DEFAULT;
 
-    if (EZPI_SUCCESS != EZPI_core_nvs_read_baud(&baud))
+    if (EZPI_SUCCESS != EZPI_CORE_nvs_read_baud(&baud))
     {
-        EZPI_core_nvs_write_baud(EZPI_SERV_UART_BAUD_DEFAULT);
+        EZPI_CORE_nvs_write_baud(EZPI_SERV_UART_BAUD_DEFAULT);
     }
     vTaskDelay(1 / portTICK_RATE_MS);
-    if (EZPI_SUCCESS != EZPI_core_nvs_read_parity(&parity_val))
+    if (EZPI_SUCCESS != EZPI_CORE_nvs_read_parity(&parity_val))
     {
-        EZPI_core_nvs_write_parity(EZPI_SERV_UART_PARITY_DEFAULT);
+        EZPI_CORE_nvs_write_parity(EZPI_SERV_UART_PARITY_DEFAULT);
     }
     vTaskDelay(1 / portTICK_RATE_MS);
-    if (EZPI_SUCCESS != EZPI_core_nvs_read_start_bits(&start_bits))
+    if (EZPI_SUCCESS != EZPI_CORE_nvs_read_start_bits(&start_bits))
     {
-        EZPI_core_nvs_write_start_bits(EZPI_SERV_UART_START_BIT_DEFAULT);
+        EZPI_CORE_nvs_write_start_bits(EZPI_SERV_UART_START_BIT_DEFAULT);
     }
     vTaskDelay(1 / portTICK_RATE_MS);
-    if (EZPI_SUCCESS != EZPI_core_nvs_read_stop_bits(&stop_bits))
+    if (EZPI_SUCCESS != EZPI_CORE_nvs_read_stop_bits(&stop_bits))
     {
-        EZPI_core_nvs_write_stop_bits(EZPI_SERV_UART_STOP_BIT_DEFAULT);
+        EZPI_CORE_nvs_write_stop_bits(EZPI_SERV_UART_STOP_BIT_DEFAULT);
     }
     vTaskDelay(1 / portTICK_RATE_MS);
-    if (EZPI_SUCCESS != EZPI_core_nvs_read_frame_size(&frame_size))
+    if (EZPI_SUCCESS != EZPI_CORE_nvs_read_frame_size(&frame_size))
     {
-        EZPI_core_nvs_write_frame_size(EZPI_SERV_UART_FRAME_SIZE_DEFAULT);
+        EZPI_CORE_nvs_write_frame_size(EZPI_SERV_UART_FRAME_SIZE_DEFAULT);
     }
     vTaskDelay(1 / portTICK_RATE_MS);
-    if (EZPI_SUCCESS != EZPI_core_nvs_read_flow_control(&flow_control))
+    if (EZPI_SUCCESS != EZPI_CORE_nvs_read_flow_control(&flow_control))
     {
-        EZPI_core_nvs_write_flow_control(EZPI_SERV_UART_FLOW_CTRL_DEFAULT);
+        EZPI_CORE_nvs_write_flow_control(EZPI_SERV_UART_FLOW_CTRL_DEFAULT);
     }
     vTaskDelay(1 / portTICK_RATE_MS);
-    uart_word_length_t frame_size_val = EZPI_core_info_get_frame_size(frame_size);
+    uart_word_length_t frame_size_val = EZPI_CORE_info_get_frame_size(frame_size);
 
     char flw_ctrl_bffr[EZPI_UART_SERV_FLW_CTRL_STR_SIZE + 1];
-    EZPI_core_info_get_flow_ctrl_to_name(flow_control, flw_ctrl_bffr);
+    EZPI_CORE_info_get_flow_ctrl_to_name(flow_control, flw_ctrl_bffr);
 
     TRACE_I("Serial Configuration:");
     TRACE_I("  Baud Rate: %d", baud);

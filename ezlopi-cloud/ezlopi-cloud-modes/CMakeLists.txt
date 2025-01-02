@@ -22,10 +22,6 @@ set(EZLOPI_HAL_COMPONENTS
 set(EZLOPI_CLOUD_COMPONENTS 
 )
 
-# Define service components
-set(EZLOPI_SERV_COMPONENTS
-)
-
 # Define sensor device components
 set(EZLOPI_SENSOR_DEVICE_COMPONENTS 
 )
@@ -36,13 +32,12 @@ set(EZLOPI_UTIL_COMPONENTS
 )
 
 # Register the components
-idf_component_register(SRCS  "${config_src}"
+idf_component_register(SRCS "ezlopi_cloud_modes_updaters.c" "ezlopi_cloud_modes.c" "${config_src}"
                         INCLUDE_DIRS "."
                         REQUIRES        ${ESP_IDF_COMPONENTS}
                                         ${EZLOPI_CORE_COMPONENTS}
                                         ${EZLOPI_HAL_COMPONENTS}
                                         ${EZLOPI_CLOUD_COMPONENTS}
-                                        ${EZLOPI_SERV_COMPONENTS}
                                         ${EZLOPI_SENSOR_DEVICE_COMPONENTS}  
                                         ${EZLOPI_UTIL_COMPONENTS}              
 )

@@ -108,7 +108,7 @@ static void __prepare_item_properties(l_ezlopi_item_t *item, cJSON *cj_device, v
     item->cloud_properties.value_type = value_type_volume_flow;
     item->cloud_properties.show = true;
     item->cloud_properties.scale = scales_liter_per_hour;
-    item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
+    item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
     CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_str, item->interface.pwm.gpio_num);
@@ -130,11 +130,11 @@ static ezlopi_error_t __0054_prepare(void *arg)
         if (NULL != yfs201_data)
         {
             memset(yfs201_data, 0, sizeof(yfs201_t));
-            l_ezlopi_device_t *flowmeter_device = EZPI_core_device_add_device(device_prep_arg->cjson_device, NULL);
+            l_ezlopi_device_t *flowmeter_device = ezlopi_device_add_device(device_prep_arg->cjson_device, NULL);
             if (flowmeter_device)
             {
                 __prepare_device_cloud_properties(flowmeter_device, device_prep_arg->cjson_device);
-                l_ezlopi_item_t *flowmeter_item = EZPI_core_device_add_item_to_device(flowmeter_device, sensor_0054_PWM_YFS201_flowmeter);
+                l_ezlopi_item_t *flowmeter_item = ezlopi_device_add_item_to_device(flowmeter_device, sensor_0054_PWM_YFS201_flowmeter);
                 if (flowmeter_item)
                 {
                     __prepare_item_properties(flowmeter_item, device_prep_arg->cjson_device, yfs201_data);
@@ -142,7 +142,7 @@ static ezlopi_error_t __0054_prepare(void *arg)
                 }
                 else
                 {
-                    EZPI_core_device_free_device(flowmeter_device);
+                    ezlopi_device_free_device(flowmeter_device);
                     ezlopi_free(__FUNCTION__, yfs201_data);
                 }
             }
@@ -201,7 +201,7 @@ static ezlopi_error_t __0054_get_cjson_value(l_ezlopi_item_t *item, void *arg)
                 Lt_per_hr = (Lt_per_hr > 720) ? 720 : Lt_per_hr;
                 // TRACE_E(" Frequency : %.2f Hz --> FlowRate : %.2f [Lt_per_hr]", freq, Lt_per_hr);
 
-                EZPI_core_valueformatter_float_to_cjson(cj_result, Lt_per_hr, scales_liter_per_hour);
+                ezlopi_valueformatter_float_to_cjson(cj_result, Lt_per_hr, scales_liter_per_hour);
                 ret = EZPI_SUCCESS;
             }
         }
@@ -222,7 +222,7 @@ static ezlopi_error_t __0054_notify(l_ezlopi_item_t *item)
             __extract_YFS201_Pulse_Count_func(item);
             if (prev_yfs201_dominant_pulse_count != yfs201_data->yfs201_dominant_pulse_count)
             {
-                EZPI_core_device_value_updated_from_device_broadcast(item);
+                ezlopi_device_value_updated_from_device_broadcast(item);
             }
             ret = EZPI_SUCCESS;
         }

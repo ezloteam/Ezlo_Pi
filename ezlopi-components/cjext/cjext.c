@@ -59,6 +59,30 @@ typedef struct
 #define static_strlen(string_literal) (sizeof(string_literal) - 1)
 static error global_error = {NULL, 0};
 
+#if 0 // Not used function 
+static void __print_cj_object(cJSON * cj_obj)
+{
+#warning "DO NOT USE printf ON PRODUCTION"
+    printf("\r\n");
+    TRACE_D("item: %u", (uint32_t)cj_obj);
+    if (cj_obj)
+    {
+        TRACE_D("-- next:           %u", (uint32_t)cj_obj->next);
+        TRACE_D("-- prev:           %u", (uint32_t)cj_obj->prev);
+        TRACE_D("-- child:          %u", (uint32_t)cj_obj->child);
+        TRACE_D("-- type:           %d", cj_obj->type);
+        TRACE_D("-- value-string:   %u", (uint32_t)cj_obj->valuestring);
+        TRACE_D("-- value-int:      %d", cj_obj->valueint);
+        TRACE_D("-- value-double:   %f", cj_obj->valuedouble);
+        TRACE_D("-- string:         %u", (uint32_t)cj_obj->string);
+        TRACE_D("-- is-key-ref:     %d", cj_obj->is_key_ref);
+        TRACE_D("-- is-value-ref:   %d", cj_obj->is_value_ref);
+        TRACE_D("-- str-key-len:    %u", (uint32_t)cj_obj->str_key_len);
+        TRACE_D("-- str-value-len:  %u", (uint32_t)cj_obj->str_value_len);
+    }
+}
+#endif
+
 const char *cJSON_GetErrorPtr(void)
 {
     return (const char *)(global_error.json + global_error.position);

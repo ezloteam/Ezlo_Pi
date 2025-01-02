@@ -74,7 +74,7 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_dev
     item->cloud_properties.show = true;
     item->cloud_properties.scale = NULL;
     item->cloud_properties.value_type = value_type_int;
-    item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
+    item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
     CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_str, item->interface.pwm.gpio_num);
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_duty_cycle_str, item->interface.pwm.duty_cycle);
@@ -95,18 +95,18 @@ static ezlopi_error_t __prepare(void *arg)
     {
         cJSON *cj_device = dev_prep_arg->cjson_device;
 
-        l_ezlopi_device_t *servo_device = EZPI_core_device_add_device(dev_prep_arg->cjson_device, NULL);
+        l_ezlopi_device_t *servo_device = ezlopi_device_add_device(dev_prep_arg->cjson_device, NULL);
         if (servo_device)
         {
             __prepare_device_cloud_properties(servo_device, cj_device);
-            l_ezlopi_item_t *servo_item = EZPI_core_device_add_item_to_device(servo_device, device_0036_PWM_servo_MG996R);
+            l_ezlopi_item_t *servo_item = ezlopi_device_add_item_to_device(servo_device, device_0036_PWM_servo_MG996R);
             if (servo_item)
             {
                 __prepare_item_cloud_properties(servo_item, cj_device);
             }
             else
             {
-                EZPI_core_device_free_device(servo_device);
+                ezlopi_device_free_device(servo_device);
                 ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
             }
         }
@@ -198,7 +198,7 @@ static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg)
                 TRACE_W("new _ target duty value: %d", duty);
             }
 
-            EZPI_core_valueformatter_int32_to_cjson(cj_result, target_duty, NULL);
+            ezlopi_valueformatter_int32_to_cjson(cj_result, target_duty, NULL);
             ret = EZPI_SUCCESS;
         }
     }

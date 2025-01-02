@@ -1,44 +1,3 @@
-/* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
-**
-** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
-**
-** Redistribution and use in source and binary forms, with or without
-** modification, are permitted provided that the following conditions are met:
-**
-** 1. Redistributions of source code must retain the above copyright notice,
-**    this list of conditions and the following disclaimer.
-** 2. Redistributions in binary form must reproduce the above copyright
-**    notice, this list of conditions and the following disclaimer in the
-**    documentation and/or other materials provided with the distribution.
-** 3. Neither the name of the copyright holder nor the names of its
-**    contributors may be used to endorse or promote products derived from
-**    this software without specific prior written permission.
-**
-** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
-** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-** POSSIBILITY OF SUCH DAMAGE.
-** ===========================================================================
-*/
-/**
-* @file    ezlopi_core_ethernet.c
-* @brief   Function to perform operation on ethernet module
-* @author  xx
-* @version 0.1
-* @date    12th DEC 2024
-*/
-
-/*******************************************************************************
-*                          Include Files
-*******************************************************************************/
 #ifdef CONFIG_EZPI_CORE_ENABLE_ETH
 
 #include <string.h>
@@ -52,34 +11,10 @@
 
 #include "ezlopi_hal_spi_master.h"
 
-/*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
-
-/*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
-
-/*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
-
-/*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
-static void __ethernet_reset(void);
-static void __ethernet_gpio_setup(void);
-static void __ethernet_setup_basic(void);
-static void __eth_event_handler(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data);
-static void __ip_event_handler(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data);
-
-/*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
-static const char *eth_key_desc_str = "ezlopi_eth";
-static esp_netif_t *eth_netif_spi = NULL;
-static esp_eth_mac_t *eth_mac_spi = NULL;
-static esp_eth_phy_t *eth_phy_spi = NULL;
+static const char* eth_key_desc_str = "ezlopi_eth";
+static esp_netif_t* eth_netif_spi = NULL;
+static esp_eth_mac_t* eth_mac_spi = NULL;
+static esp_eth_phy_t* eth_phy_spi = NULL;
 static esp_eth_handle_t eth_handle_spi = NULL;
 static esp_eth_netif_glue_handle_t eth_glue = NULL;
 static e_ethernet_status_t eth_last_status = ETHERNET_STATUS_UNKNOWN;
@@ -101,19 +36,18 @@ static s_ezlopi_spi_master_t spi_config = {
     .channel = EZLOPI_ETHERNET_W5500_SPI_HOST,
 };
 
-/*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+static void ezlopi_ethernet_reset(void);
+static void ezlopi_ethernet_gpio_setup(void);
+static void ezlopi_ethernet_setup_basic(void);
+static void eth_event_handler(void* arg, esp_event_base_t event_base, int32_t event_id, void* event_data);
+static void __ip_event_handler(void* arg, esp_event_base_t event_base, int32_t event_id, void* event_data);
 
-/*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
-e_ethernet_status_t EZPI_core_ethernet_get_status(void)
+e_ethernet_status_t ezlopi_ethernet_get_status(void)
 {
     return eth_last_status;
 }
 
-esp_netif_ip_info_t *EZPI_core_ethernet_get_ip_info(void)
+esp_netif_ip_info_t* ezlopi_ethernet_get_ip_info(void)
 {
     memset(&eth_ip_info, 0, sizeof(esp_netif_ip_info_t));
 
@@ -125,13 +59,13 @@ esp_netif_ip_info_t *EZPI_core_ethernet_get_ip_info(void)
     return &eth_ip_info;
 }
 
-void EZPI_ethernet_deinit(void)
+void ezlopi_ethernet_deinit(void)
 {
     if (eth_netif_spi)
     {
         esp_event_handler_unregister(IP_EVENT, IP_EVENT_ETH_GOT_IP, &__ip_event_handler);
         esp_event_handler_unregister(IP_EVENT, IP_EVENT_ETH_LOST_IP, &__ip_event_handler);
-        esp_event_handler_unregister(ETH_EVENT, ESP_EVENT_ANY_ID, &__eth_event_handler);
+        esp_event_handler_unregister(ETH_EVENT, ESP_EVENT_ANY_ID, &eth_event_handler);
 
         esp_eth_stop(eth_handle_spi);
         esp_eth_del_netif_glue(eth_glue);
@@ -150,28 +84,18 @@ void EZPI_ethernet_deinit(void)
     }
 }
 
-void EZPI_ethernet_init(void)
+void ezlopi_ethernet_init(void)
 {
-    __ethernet_gpio_setup();
-    __ethernet_reset();
-    __ethernet_setup_basic();
+    ezlopi_ethernet_gpio_setup();
+    ezlopi_ethernet_reset();
+    ezlopi_ethernet_setup_basic();
 }
 
-/*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
-/**
-* @brief Local/static function template example
-* Convention : Use lowercase letters for all words on static functions
-* @param arg
-*/
-
-
-static void __eth_event_handler(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
+static void eth_event_handler(void* arg, esp_event_base_t event_base, int32_t event_id, void* event_data)
 {
     uint8_t mac_addr[6] = { 0 };
     /* we can get the ethernet driver handle from event data */
-    esp_eth_handle_t eth_handle = *(esp_eth_handle_t *)event_data;
+    esp_eth_handle_t eth_handle = *(esp_eth_handle_t*)event_data;
 
     switch (event_id)
     {
@@ -210,9 +134,9 @@ static void __eth_event_handler(void *arg, esp_event_base_t event_base, int32_t 
     }
 }
 
-static void __ip_event_handler(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
+static void __ip_event_handler(void* arg, esp_event_base_t event_base, int32_t event_id, void* event_data)
 {
-    ip_event_got_ip_t *event = (ip_event_got_ip_t *)event_data;
+    ip_event_got_ip_t* event = (ip_event_got_ip_t*)event_data;
 
     switch (event_id)
     {
@@ -238,7 +162,7 @@ static void __ip_event_handler(void *arg, esp_event_base_t event_base, int32_t e
     }
 }
 
-static void __ethernet_setup_basic(void)
+static void ezlopi_ethernet_setup_basic(void)
 {
     esp_netif_inherent_config_t esp_netif_config = ESP_NETIF_INHERENT_DEFAULT_ETH();
 
@@ -275,7 +199,7 @@ static void __ethernet_setup_basic(void)
     esp_eth_start(eth_handle_spi);
 }
 
-static void __ethernet_gpio_setup(void)
+static void ezlopi_ethernet_gpio_setup(void)
 {
     gpio_config_t gpio_conf = {
         .pin_bit_mask = (1UL << EZLOPI_ETHERNET_W5500_EN_PIN) | (1UL << EZLOPI_ETHERNET_W5500_RST_PIN),
@@ -288,7 +212,7 @@ static void __ethernet_gpio_setup(void)
     gpio_config(&gpio_conf);
 }
 
-static void __ethernet_reset(void)
+static void ezlopi_ethernet_reset(void)
 {
     /* 1.Enable PWR to W5500 via mosfet */
     gpio_set_level(EZLOPI_ETHERNET_W5500_EN_PIN, 1);
@@ -301,9 +225,4 @@ static void __ethernet_reset(void)
     gpio_set_level(EZLOPI_ETHERNET_W5500_RST_PIN, 1);
     vTaskDelay(10 / portTICK_RATE_MS);
 }
-
 #endif // CONFIG_EZPI_CORE_ENABLE_ETH
-
-/*******************************************************************************
-*                          End of File
-*******************************************************************************/

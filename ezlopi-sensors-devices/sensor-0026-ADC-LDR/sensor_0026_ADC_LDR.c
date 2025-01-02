@@ -88,7 +88,7 @@ static void __setup_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_devic
         item->cloud_properties.item_name = ezlopi_item_name_light_alarm;
         item->cloud_properties.value_type = value_type_token;
         item->cloud_properties.scale = NULL;
-        item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
+        item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
         item->interface_type = EZLOPI_DEVICE_INTERFACE_ANALOG_INPUT;
         item->interface.adc.resln_bit = 3;
@@ -105,11 +105,11 @@ static ezlopi_error_t __prepare(void *arg)
         cJSON *cj_device = prep_arg->cjson_device;
         if (cj_device)
         {
-            l_ezlopi_device_t *device = EZPI_core_device_add_device(cj_device, NULL);
+            l_ezlopi_device_t *device = ezlopi_device_add_device(cj_device, NULL);
             if (device)
             {
                 __setup_device_cloud_params(device, cj_device);
-                l_ezlopi_item_t *item = EZPI_core_device_add_item_to_device(device, sensor_0026_ADC_LDR);
+                l_ezlopi_item_t *item = ezlopi_device_add_item_to_device(device, sensor_0026_ADC_LDR);
                 if (item)
                 {
                     __setup_item_cloud_properties(item, cj_device);
@@ -117,7 +117,7 @@ static ezlopi_error_t __prepare(void *arg)
                 }
                 else
                 {
-                    EZPI_core_device_free_device(device);
+                    ezlopi_device_free_device(device);
                 }
             }
         }
@@ -201,7 +201,7 @@ static ezlopi_error_t __notify(l_ezlopi_item_t *item)
         if (curr_ldr_state != (char *)item->user_arg)
         {
             item->user_arg = (void *)curr_ldr_state;
-            EZPI_core_device_value_updated_from_device_broadcast(item);
+            ezlopi_device_value_updated_from_device_broadcast(item);
             ret = EZPI_SUCCESS;
         }
     }

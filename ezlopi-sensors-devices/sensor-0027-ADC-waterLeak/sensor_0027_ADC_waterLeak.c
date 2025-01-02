@@ -83,7 +83,7 @@ static void prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_devic
     item->cloud_properties.item_name = ezlopi_item_name_water_leak_alarm;
     item->cloud_properties.value_type = value_type_token;
     item->cloud_properties.scale = NULL;
-    item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
+    item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 }
 
 static void prepare_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj_device)
@@ -103,11 +103,11 @@ static ezlopi_error_t __prepare(void *arg)
         cJSON *cj_device = prep_arg->cjson_device;
         if (cj_device)
         {
-            l_ezlopi_device_t *parent_device = EZPI_core_device_add_device(prep_arg->cjson_device, NULL);
+            l_ezlopi_device_t *parent_device = ezlopi_device_add_device(prep_arg->cjson_device, NULL);
             if (parent_device)
             {
                 prepare_device_cloud_properties(parent_device, cj_device);
-                l_ezlopi_item_t *item = EZPI_core_device_add_item_to_device(parent_device, sensor_0027_ADC_waterLeak);
+                l_ezlopi_item_t *item = ezlopi_device_add_item_to_device(parent_device, sensor_0027_ADC_waterLeak);
                 if (item)
                 {
                     prepare_item_cloud_properties(item, cj_device);
@@ -116,7 +116,7 @@ static ezlopi_error_t __prepare(void *arg)
                 }
                 else
                 {
-                    EZPI_core_device_free_device(parent_device);
+                    ezlopi_device_free_device(parent_device);
                 }
             }
         }
@@ -193,7 +193,7 @@ static ezlopi_error_t __notify(l_ezlopi_item_t *item)
         if (curret_value != (char *)item->user_arg)
         {
             item->user_arg = (void *)curret_value;
-            EZPI_core_device_value_updated_from_device_broadcast(item);
+            ezlopi_device_value_updated_from_device_broadcast(item);
             ret = EZPI_FAILED;
         }
     }

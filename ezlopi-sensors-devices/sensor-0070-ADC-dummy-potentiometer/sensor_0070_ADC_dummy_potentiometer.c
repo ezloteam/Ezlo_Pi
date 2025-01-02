@@ -74,7 +74,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
 }
 static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_data)
 {
-    item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
+    item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = true;
     item->cloud_properties.item_name = ezlopi_item_name_sound_volume;
@@ -101,11 +101,11 @@ static ezlopi_error_t __0070_prepare(void *arg)
         if (NULL != user_data)
         {
             memset(user_data, 0, sizeof(s_dummy_potentiometer_t));
-            l_ezlopi_device_t *dummy_potentiometer_device = EZPI_core_device_add_device(cj_device, NULL);
+            l_ezlopi_device_t *dummy_potentiometer_device = ezlopi_device_add_device(cj_device, NULL);
             if (dummy_potentiometer_device)
             {
                 __prepare_device_cloud_properties(dummy_potentiometer_device, cj_device);
-                l_ezlopi_item_t *dummy_potentiometer_item = EZPI_core_device_add_item_to_device(dummy_potentiometer_device, sensor_0070_ADC_dummy_potentiometer);
+                l_ezlopi_item_t *dummy_potentiometer_item = ezlopi_device_add_item_to_device(dummy_potentiometer_device, sensor_0070_ADC_dummy_potentiometer);
                 if (dummy_potentiometer_item)
                 {
                     __prepare_item_cloud_properties(dummy_potentiometer_item, cj_device, user_data);
@@ -113,7 +113,7 @@ static ezlopi_error_t __0070_prepare(void *arg)
                 }
                 else
                 {
-                    EZPI_core_device_free_device(dummy_potentiometer_device);
+                    ezlopi_device_free_device(dummy_potentiometer_device);
                     free(user_data);
                 }
             }
@@ -190,7 +190,7 @@ static ezlopi_error_t __0070_set_value(l_ezlopi_item_t *item, void *arg)
                         TRACE_S("curr_pot_state: [%.2f]", value_double);
 
                         user_data->pot_val = value_double;
-                        EZPI_core_device_value_updated_from_device_broadcast(item);
+                        ezlopi_device_value_updated_from_device_broadcast(item);
                         ret = EZPI_SUCCESS;
                     }
                 }
@@ -250,7 +250,7 @@ static ezlopi_error_t __0070_notify(l_ezlopi_item_t *item)
             if (fabs((user_data->pot_val) - new_pot) > 0.05)
             {
                 user_data->pot_val = new_pot;
-                EZPI_core_device_value_updated_from_device_broadcast(item);
+                ezlopi_device_value_updated_from_device_broadcast(item);
             }
             ret = EZPI_FAILED;
         }

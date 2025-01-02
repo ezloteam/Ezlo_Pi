@@ -75,7 +75,7 @@ static void __prepare_item_adc_cloud_properties(l_ezlopi_item_t *item, cJSON *cj
     item->cloud_properties.value_type = value_type_electrical_resistance;
     item->cloud_properties.show = true;
     item->cloud_properties.scale = scales_ohm_meter;
-    item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
+    item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
     CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_str, item->interface.adc.gpio_num);
@@ -98,11 +98,11 @@ static ezlopi_error_t __0055_prepare(void *arg)
         if (flex_res_value)
         {
             memset(flex_res_value, 0, sizeof(flex_t));
-            l_ezlopi_device_t *device_adc = EZPI_core_device_add_device(device_prep_arg->cjson_device, NULL);
+            l_ezlopi_device_t *device_adc = ezlopi_device_add_device(device_prep_arg->cjson_device, NULL);
             if (device_adc)
             {
                 __prepare_device_adc_cloud_properties(device_adc, device_prep_arg->cjson_device);
-                l_ezlopi_item_t *item_adc = EZPI_core_device_add_item_to_device(device_adc, sensor_0055_ADC_FlexResistor);
+                l_ezlopi_item_t *item_adc = ezlopi_device_add_item_to_device(device_adc, sensor_0055_ADC_FlexResistor);
                 if (item_adc)
                 {
                     __prepare_item_adc_cloud_properties(item_adc, device_prep_arg->cjson_device, flex_res_value);
@@ -110,7 +110,7 @@ static ezlopi_error_t __0055_prepare(void *arg)
                 }
                 else
                 {
-                    EZPI_core_device_free_device(device_adc);
+                    ezlopi_device_free_device(device_adc);
                     ezlopi_free(__FUNCTION__, flex_res_value);
                 }
             }
@@ -154,7 +154,7 @@ static ezlopi_error_t __0055_get_cjson_value(l_ezlopi_item_t *item, void *arg)
             flex_t *flex_res_value = (flex_t *)item->user_arg;
             if (flex_res_value)
             {
-                EZPI_core_valueformatter_int32_to_cjson(cj_result, flex_res_value->rs_0055, NULL);
+                ezlopi_valueformatter_int32_to_cjson(cj_result, flex_res_value->rs_0055, NULL);
                 ret = EZPI_SUCCESS;
             }
         }
@@ -179,7 +179,7 @@ static ezlopi_error_t __0055_notify(l_ezlopi_item_t *item)
             int new_rs_0055 = (int)(((flex_Vin / Vout) - 1) * flex_Rout);
             if (new_rs_0055 != flex_res_value->rs_0055)
             {
-                EZPI_core_device_value_updated_from_device_broadcast(item);
+                ezlopi_device_value_updated_from_device_broadcast(item);
                 flex_res_value->rs_0055 = new_rs_0055;
             }
             ret = EZPI_SUCCESS;
