@@ -1162,7 +1162,6 @@ static void ezpi_service_uart_get_config(void)
 {
     cJSON *cj_root = NULL;
 
-#warning "Lomas: didn't find freering 'current_config', if this is correct then please remove this warning"
     char *current_config = EZPI_core_factory_info_v3_get_ezlopi_config();
 
     if (current_config)
@@ -1187,6 +1186,7 @@ static void ezpi_service_uart_get_config(void)
             cJSON_AddNumberToObject(__FUNCTION__, cj_root, ezlopi_cmd_str, EZPI_UART_CMD_GET_CONFIG);
             cJSON_AddNumberToObject(__FUNCTION__, cj_root, ezlopi_status_str, EZPI_UART_CMD_STATUS_SUCCESS);
         }
+        ezlopi_free(__FUNCTION__, current_config);
     }
     else
     {
