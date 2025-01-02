@@ -11,8 +11,6 @@
  *
  */
 
-#warning "################### DO NOT USE printf ON PRODUCTION ###################"
-
 #include "ld2410_driver.h"
 #include "ezlopi_hal_uart.h"
 
@@ -72,8 +70,6 @@ static void ld2410_callback(uint8_t *buffer, uint32_t output_len, s_ezlopi_uart_
 bool ld2410_begin(bool wait_for_radar, s_ezlopi_uart_t uart_settings)
 {
 	ezlo_ld2410_uart_handle = ezlopi_uart_init(uart_settings.baudrate, uart_settings.tx, uart_settings.rx, ld2410_callback, NULL);
-
-#warning "DO NOT USE printf ON PRODUCTION"
 
 #ifdef LD2410_DEBUG_INITIALIZATION
 	// printf("ld2410 started");

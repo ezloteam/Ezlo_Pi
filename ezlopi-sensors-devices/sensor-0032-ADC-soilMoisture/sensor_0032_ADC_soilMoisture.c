@@ -69,7 +69,7 @@ static ezlopi_error_t __notify(l_ezlopi_item_t *item)
         if (fabs(percentage - *soil_moisture_data) > 1.0)
         {
             *soil_moisture_data = percentage;
-            ezlopi_device_value_updated_from_device_broadcast(item);
+            EZPI_core_device_value_updated_from_device_broadcast(item);
             ret = EZPI_SUCCESS;
         }
     }
@@ -86,7 +86,7 @@ static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg)
         double *soil_moisture_data = (double *)item->user_arg;
         if (soil_moisture_data)
         {
-            ezlopi_valueformatter_double_to_cjson(cj_result, *soil_moisture_data, scales_percent);
+            EZPI_core_valueformatter_double_to_cjson(cj_result, *soil_moisture_data, scales_percent);
             ret = EZPI_SUCCESS;
         }
     }
@@ -133,7 +133,7 @@ static void __prepare_item_properties(l_ezlopi_item_t *item, cJSON *cj_device, v
     item->cloud_properties.value_type = value_type_humidity;
     item->cloud_properties.scale = scales_percent;
     item->cloud_properties.show = true;
-    item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
+    item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
 
     item->interface_type = EZLOPI_DEVICE_INTERFACE_ANALOG_INPUT;
     item->interface.adc.resln_bit = 3;
@@ -150,11 +150,11 @@ static ezlopi_error_t __prepare(void *arg)
 
     if (prep_arg && prep_arg->cjson_device)
     {
-        l_ezlopi_device_t *device = ezlopi_device_add_device(prep_arg->cjson_device, NULL);
+        l_ezlopi_device_t *device = EZPI_core_device_add_device(prep_arg->cjson_device, NULL);
         if (device)
         {
             __prepare_device_cloud_properties(device, prep_arg->cjson_device);
-            l_ezlopi_item_t *item_temperature = ezlopi_device_add_item_to_device(device, sensor_0032_ADC_soilMoisture);
+            l_ezlopi_item_t *item_temperature = EZPI_core_device_add_item_to_device(device, sensor_0032_ADC_soilMoisture);
             if (item_temperature)
             {
                 double *soil_moisture_data = (double *)ezlopi_malloc(__FUNCTION__, sizeof(double));
@@ -167,7 +167,7 @@ static ezlopi_error_t __prepare(void *arg)
             }
             else
             {
-                ezlopi_device_free_device(device);
+                EZPI_core_device_free_device(device);
             }
         }
     }

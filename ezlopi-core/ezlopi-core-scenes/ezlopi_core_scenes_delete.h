@@ -29,21 +29,20 @@
 ** ===========================================================================
 */
 /**
- * @file    ezlopi_core_offline_login.h
- * @brief   Function to perform offine login operation
+ * @file    main.h
+ * @brief   perform some function on data
  * @author  xx
  * @version 0.1
  * @date    12th DEC 2024
 */
 
-#ifndef _EZLOPI_CORE_OFFLINE_LOGIN_H_
-#define _EZLOPI_CORE_OFFLINE_LOGIN_H_
+#ifndef _EZLOPI_CORE_DELETE_H_
+#define _EZLOPI_CORE_DELETE_H_
+
 /*******************************************************************************
 *                          Include Files
 *******************************************************************************/
-
-#include "cjext.h"
-#include "ezlopi_core_errors.h"
+#include "ezlopi_core_scenes_v2_type_declaration.h"
 
 /*******************************************************************************
 *                          C++ Declaration Wrapper
@@ -64,34 +63,49 @@ extern "C"
     /*******************************************************************************
     *                          Extern Function Prototypes
     *******************************************************************************/
-
+    //--------------SCENE_DELETE--------------------------------------------------------
+ /**
+  * @brief This function is used to delete a node from 'scene_linked_list'
+  *
+  * @param scenes_list Pointer to a scene-node.
+  */
+    void EZPI_core_scenes_delete(l_scenes_list_v2_t *scenes_list);
     /**
-     * @brief Function to trigger login check operation
+     * @brief This function deletes 'field_block' from the scene_node.
      *
-     * @param cj_params cjson obj login info
-     * @return ezlopi_error_t
+     * @param field Pointer to the 'field_block' of a scene-node.
      */
-    ezlopi_error_t EZPI_core_offline_login_perform(cJSON *cj_params);
+    void EZPI_core_scenes_delete_field_value(l_fields_v2_t *field);
     /**
-     * @brief Function to perform logout operation
+     * @brief This function deletes 'when_blocks' from the scene_node.
      *
-     * @return ezlopi_error_t
+     * @param when_blocks Pointer to the 'when_blocks' of a scene-node.
      */
-    ezlopi_error_t EZPI_core_offline_logout_perform();
+    void EZPI_core_scenes_delete_when_blocks(l_when_block_v2_t *when_blocks);
     /**
-     * @brief Function to check if user is logged in
+     * @brief This function deletes 'house_modes' from the scene_node.
      *
-     * @return true
-     * @return false
+     * @param house_modes Pointer to the 'house_modes' of a scene-node.
      */
-    bool EZPI_core_offline_is_user_logged_in();
+    void EZPI_core_scenes_delete_house_modes(l_house_modes_v2_t *house_modes);
+    /**
+     * @brief This function deletes 'action_blocks' from the scene_node.
+     *
+     * @param action_blocks Pointer to the 'action_blocks' of a scene-node.
+     */
+    void EZPI_core_scenes_delete_action_blocks(l_action_block_v2_t *action_blocks);
+    /**
+     * @brief This function deletes 'user_notifications' from the scene_node.
+     *
+     * @param user_notifications Pointer to the 'user_notifications' of a scene-node.
+     */
+    void EZPI_core_scenes_delete_user_notifications(l_user_notification_v2_t *user_notifications);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // _EZLOPI_CORE_OFFLINE_LOGIN_H_
-
+#endif // _EZLOPI_CORE_DELETE_H_
 
 /*******************************************************************************
 *                          End of File

@@ -60,7 +60,7 @@ static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg)
     cJSON *cj_result = (cJSON *)arg;
     if (item && cj_result)
     {
-        ezlopi_valueformatter_bool_to_cjson(cj_result, item->interface.gpio.gpio_in.value, NULL);
+        EZPI_core_valueformatter_bool_to_cjson(cj_result, item->interface.gpio.gpio_in.value, NULL);
         ret = EZPI_SUCCESS;
     }
 
@@ -86,7 +86,7 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
             {
                 int gpio_level = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
                 item->interface.gpio.gpio_in.value = (false == item->interface.gpio.gpio_in.invert) ? gpio_level : !gpio_level;
-                ezlopi_service_gpioisr_register_v3(item, __touch_switch_callback, 200);
+                EZPI_service_gpioisr_register_v3(item, __touch_switch_callback, 200);
                 ret = EZPI_SUCCESS;
             }
         }
@@ -100,7 +100,7 @@ static void __touch_switch_callback(void *arg)
     l_ezlopi_item_t *item = (l_ezlopi_item_t *)arg;
     int gpio_level = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
     item->interface.gpio.gpio_in.value = (false == item->interface.gpio.gpio_in.invert) ? gpio_level : !gpio_level;
-    ezlopi_device_value_updated_from_device_broadcast(item);
+    EZPI_core_device_value_updated_from_device_broadcast(item);
 }
 
 static ezlopi_error_t __prepare(void *arg)
@@ -110,11 +110,11 @@ static ezlopi_error_t __prepare(void *arg)
     s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
     if (prep_arg && prep_arg->cjson_device)
     {
-        l_ezlopi_device_t *touch_device = ezlopi_device_add_device(prep_arg->cjson_device, NULL);
+        l_ezlopi_device_t *touch_device = EZPI_core_device_add_device(prep_arg->cjson_device, NULL);
         if (touch_device)
         {
             __prepare_touch_sensor_device_cloud_properties(touch_device, prep_arg->cjson_device);
-            l_ezlopi_item_t *touch_switch_item = ezlopi_device_add_item_to_device(touch_device, sensor_0035_digitalIn_touch_sensor_TPP223B);
+            l_ezlopi_item_t *touch_switch_item = EZPI_core_device_add_item_to_device(touch_device, sensor_0035_digitalIn_touch_sensor_TPP223B);
             if (touch_switch_item)
             {
                 __prepare_touch_sensor_properties(touch_switch_item, prep_arg->cjson_device);
@@ -122,7 +122,7 @@ static ezlopi_error_t __prepare(void *arg)
             }
             else
             {
-                ezlopi_device_free_device(touch_device);
+                EZPI_core_device_free_device(touch_device);
             }
         }
     }
@@ -147,7 +147,7 @@ static void __prepare_touch_sensor_properties(l_ezlopi_item_t *item, cJSON *cj_d
     item->cloud_properties.scale = NULL;
     item->cloud_properties.item_name = ezlopi_item_name_switch;
     item->cloud_properties.value_type = value_type_bool;
-    item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
+    item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
     item->cloud_properties.scale = NULL;
 
     CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_str, item->interface.gpio.gpio_in.gpio_num);

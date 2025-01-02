@@ -68,7 +68,7 @@ static ezlopi_error_t __get_value_cjson(l_ezlopi_item_t *item, void *arg)
         ltr303_data_t *als_ltr303_data = (ltr303_data_t *)item->user_arg;
         if (cj_param && als_ltr303_data)
         {
-            ezlopi_valueformatter_double_to_cjson(cj_param, als_ltr303_data->lux, scales_lux);
+            EZPI_core_valueformatter_double_to_cjson(cj_param, als_ltr303_data->lux, scales_lux);
             ret = EZPI_SUCCESS;
         }
     }
@@ -89,10 +89,10 @@ static ezlopi_error_t __notify(l_ezlopi_item_t *item)
                 if (fabs(als_ltr303_data->lux - temp_data.lux) > 0.2)
                 {
                     als_ltr303_data->lux = temp_data.lux;
-                    ezlopi_device_value_updated_from_device_broadcast(item);
+                    EZPI_core_device_value_updated_from_device_broadcast(item);
                     ret = EZPI_SUCCESS;
                 }
-            }   
+            }
         }
     }
     return ret;
@@ -133,7 +133,7 @@ static void __prepare_item_properties(l_ezlopi_item_t *item, cJSON *cj_param)
     CJSON_GET_VALUE_DOUBLE(cj_param, ezlopi_dev_type_str, item->interface_type);
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
-    item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
+    item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
     item->cloud_properties.item_name = ezlopi_item_name_lux;
     item->cloud_properties.value_type = value_type_illuminance;
     item->cloud_properties.show = true;
@@ -161,11 +161,11 @@ static ezlopi_error_t __prepare(void *arg)
     s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
     if (prep_arg && prep_arg->cjson_device)
     {
-        l_ezlopi_device_t *als_ltr303_device = ezlopi_device_add_device(prep_arg->cjson_device, NULL);
+        l_ezlopi_device_t *als_ltr303_device = EZPI_core_device_add_device(prep_arg->cjson_device, NULL);
         if (als_ltr303_device)
         {
             __prepare_device_cloud_properties(als_ltr303_device, prep_arg->cjson_device);
-            l_ezlopi_item_t *als_ltr303_item = ezlopi_device_add_item_to_device(als_ltr303_device, sensor_0008_I2C_LTR303ALS);
+            l_ezlopi_item_t *als_ltr303_item = EZPI_core_device_add_item_to_device(als_ltr303_device, sensor_0008_I2C_LTR303ALS);
             if (als_ltr303_item)
             {
                 __prepare_item_properties(als_ltr303_item, prep_arg->cjson_device);
@@ -173,7 +173,7 @@ static ezlopi_error_t __prepare(void *arg)
             }
             else
             {
-                ezlopi_device_free_device(als_ltr303_device);
+                EZPI_core_device_free_device(als_ltr303_device);
             }
         }
     }
