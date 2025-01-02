@@ -81,7 +81,7 @@ static void __setup_item_properties(l_ezlopi_item_t *item, cJSON *cjson_device)
     item->cloud_properties.value_type = value_type_bool;
     item->cloud_properties.show = true;
     item->cloud_properties.scale = NULL;
-    item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
+    item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
     CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_dev_type_str, item->interface_type);
 
@@ -120,11 +120,11 @@ static ezlopi_error_t __prepare(void *arg)
         cJSON *cjson_device = prep_arg->cjson_device;
         if (cjson_device)
         {
-            l_ezlopi_device_t *device = EZPI_core_device_add_device(cjson_device, NULL);
+            l_ezlopi_device_t *device = ezlopi_device_add_device(cjson_device, NULL);
             if (device)
             {
                 __setup_device_cloud_properties(device, cjson_device);
-                l_ezlopi_item_t *item = EZPI_core_device_add_item_to_device(device, device_0002_digitalOut_relay);
+                l_ezlopi_item_t *item = ezlopi_device_add_item_to_device(device, device_0002_digitalOut_relay);
                 if (item)
                 {
                     __setup_item_properties(item, cjson_device);
@@ -132,7 +132,7 @@ static ezlopi_error_t __prepare(void *arg)
                 }
                 else
                 {
-                    EZPI_core_device_free_device(device);
+                    ezlopi_device_free_device(device);
                 }
             }
         }
@@ -197,7 +197,7 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
                 };
                 if (0 == gpio_config(&io_conf))
                 {
-                    EZPI_service_gpioisr_register_v3(item, __interrupt_upcall, 1000);
+                    ezlopi_service_gpioisr_register_v3(item, __interrupt_upcall, 1000);
                     error = EZPI_ERR_INIT_DEVICE_FAILED;
                 }
                 else
@@ -227,7 +227,7 @@ static ezlopi_error_t __get_value_cjson(l_ezlopi_item_t *item, void *arg)
         cJSON *cj_propertise = (cJSON *)arg;
         if (cj_propertise)
         {
-            EZPI_core_valueformatter_bool_to_cjson(cj_propertise, item->interface.gpio.gpio_out.value, NULL);
+            ezlopi_valueformatter_bool_to_cjson(cj_propertise, item->interface.gpio.gpio_out.value, NULL);
             error = EZPI_SUCCESS;
         }
     }
@@ -281,14 +281,14 @@ static ezlopi_error_t __set_value(l_ezlopi_item_t *item, void *arg)
                 if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_out.gpio_num))
                 {
                     __set_gpio_value(item, value);
-                    EZPI_core_device_value_updated_from_device_broadcast(item);
+                    ezlopi_device_value_updated_from_device_broadcast(item);
                     error = EZPI_SUCCESS;
                 }
             }
             else
             {
                 // in case of master switch
-                l_ezlopi_device_t *curr_device = EZPI_core_device_get_head();
+                l_ezlopi_device_t *curr_device = ezlopi_device_get_head();
                 while (curr_device)
                 {
                     l_ezlopi_item_t *curr_item = curr_device->items;
@@ -299,7 +299,7 @@ static ezlopi_error_t __set_value(l_ezlopi_item_t *item, void *arg)
                             TRACE_D("GPIO-pin: %d", curr_item->interface.gpio.gpio_out.gpio_num);
                             TRACE_D("value: %d", value);
                             __set_gpio_value(curr_item, value);
-                            EZPI_core_device_value_updated_from_device_broadcast(curr_item);
+                            ezlopi_device_value_updated_from_device_broadcast(curr_item);
                             error = EZPI_SUCCESS;
                         }
                         curr_item = curr_item->next;
@@ -308,7 +308,7 @@ static ezlopi_error_t __set_value(l_ezlopi_item_t *item, void *arg)
                 }
 
                 item->interface.gpio.gpio_out.value = value;
-                EZPI_core_device_value_updated_from_device_broadcast(item);
+                ezlopi_device_value_updated_from_device_broadcast(item);
             }
         }
     }
@@ -328,7 +328,7 @@ static void __interrupt_upcall(void *arg)
     {
         TRACE_D("%d -> Got interrupt!", xTaskGetTickCount());
         __toggle_gpio(item);
-        EZPI_core_device_value_updated_from_device_broadcast(item);
+        ezlopi_device_value_updated_from_device_broadcast(item);
     }
 }
 

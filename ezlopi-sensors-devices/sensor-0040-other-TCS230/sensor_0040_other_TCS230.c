@@ -103,7 +103,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
 }
 static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, void *user_data)
 {
-    item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
+    item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
     item->cloud_properties.item_name = ezlopi_item_name_rgbcolor;
@@ -141,11 +141,11 @@ static ezlopi_error_t __0040_prepare(void *arg)
         s_TCS230_data_t *user_data = (s_TCS230_data_t *)ezlopi_malloc(__FUNCTION__, sizeof(s_TCS230_data_t));
         if (user_data)
         {
-            l_ezlopi_device_t *tcs230_device = EZPI_core_device_add_device(cj_device, NULL);
+            l_ezlopi_device_t *tcs230_device = ezlopi_device_add_device(cj_device, NULL);
             if (tcs230_device)
             {
                 __prepare_device_cloud_properties(tcs230_device, cj_device);
-                l_ezlopi_item_t *tcs230_item = EZPI_core_device_add_item_to_device(tcs230_device, sensor_0040_other_TCS230);
+                l_ezlopi_item_t *tcs230_item = ezlopi_device_add_item_to_device(tcs230_device, sensor_0040_other_TCS230);
                 if (tcs230_item)
                 {
                     __prepare_item_cloud_properties(tcs230_item, user_data);
@@ -154,7 +154,7 @@ static ezlopi_error_t __0040_prepare(void *arg)
                 }
                 else
                 {
-                    EZPI_core_device_free_device(tcs230_device);
+                    ezlopi_device_free_device(tcs230_device);
                     ezlopi_free(__FUNCTION__, user_data);
                 }
             }
@@ -198,9 +198,7 @@ static ezlopi_error_t __0040_init(l_ezlopi_item_t *item)
 
                     // activate a task to calibrate data
                     xTaskCreate(__tcs230_calibration_task, "TCS230_Calibration_Task", EZLOPI_SENSOR_TCS230_CALLIBRATION_TASK_DEPTH, item, 1, &ezlopi_sensor_tcs230_callibration_task_handle);
-#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
-                    EZPI_core_process_set_process_info(ENUM_EZLOPI_SENSOR_TCS230_CALLIBRATION_TASK, &ezlopi_sensor_tcs230_callibration_task_handle, EZLOPI_SENSOR_TCS230_CALLIBRATION_TASK_DEPTH);
-#endif
+                    ezlopi_core_process_set_process_info(ENUM_EZLOPI_SENSOR_TCS230_CALLIBRATION_TASK, &ezlopi_sensor_tcs230_callibration_task_handle, EZLOPI_SENSOR_TCS230_CALLIBRATION_TASK_DEPTH);
                     ret = EZPI_SUCCESS;
                 }
             }
@@ -258,7 +256,7 @@ static ezlopi_error_t __0040_notify(l_ezlopi_item_t *item)
                     TRACE_S("Green :%d", user_data->green_mapped);
                     TRACE_S("Blue : %d", user_data->blue_mapped);
                     TRACE_S("---------------------------------------");
-                    EZPI_core_device_value_updated_from_device_broadcast(item);
+                    ezlopi_device_value_updated_from_device_broadcast(item);
                     ret = EZPI_SUCCESS;
                 }
             }
@@ -342,9 +340,7 @@ static void __tcs230_calibration_task(void *params) // calibration task
             user_data->calibration_complete = true;
         }
     }
-#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
-    EZPI_core_process_set_is_deleted(ENUM_EZLOPI_SENSOR_TCS230_CALLIBRATION_TASK);
-#endif
+    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SENSOR_TCS230_CALLIBRATION_TASK);
     vTaskDelete(NULL);
 }
 //------------------------------------------------------------------------------

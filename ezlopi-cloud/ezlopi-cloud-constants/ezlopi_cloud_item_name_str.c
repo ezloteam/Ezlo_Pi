@@ -1,42 +1,5 @@
-
-
-/**
- * @file    ezlopi_cloud_item_name_str.c
- * @brief
- * @author
- * @version
- * @date
- */
-/* ===========================================================================
-** Copyright (C) 2022 Ezlo Innovation Inc
-**
-** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
-**
-** Redistribution and use in source and binary forms, with or without
-** modification, are permitted provided that the following conditions are met:
-**
-** 1. Redistributions of source code must retain the above copyright notice,
-**    this list of conditions and the following disclaimer.
-** 2. Redistributions in binary form must reproduce the above copyright
-**    notice, this list of conditions and the following disclaimer in the
-**    documentation and/or other materials provided with the distribution.
-** 3. Neither the name of the copyright holder nor the names of its
-**    contributors may be used to endorse or promote products derived from
-**    this software without specific prior written permission.
-**
-** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
-** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-** POSSIBILITY OF SUCH DAMAGE.
-** ===========================================================================
-*/
+#ifndef __EZLOPI_ITEM_NAME_STR_H__
+#define __EZLOPI_ITEM_NAME_STR_H__
 
 /// @brief https://api.ezlo.com/devices/items/index.html
 const char *ezlopi_item_name_undefined = "";
@@ -58,7 +21,7 @@ const char *ezlopi_item_name_dw_state = "dw_state";
 // const  char *ezlopi_item_name_barrier_problem_sensors = "barrier_problem_sensors";
 // const  char *ezlopi_item_name_barrier_short_circuit = "barrier_short_circuit";
 // const  char *ezlopi_item_name_barrier_fail_events = "barrier_fail_events";
-const  char *ezlopi_item_name_button_state = "button_state";
+// const  char *ezlopi_item_name_button_state = "button_state";
 // const  char *ezlopi_item_name_test_state = "test_state";
 // const  char *ezlopi_item_name_co_alarm = "co_alarm";
 // const  char *ezlopi_item_name_maintenance_state = "maintenance_state";
@@ -215,8 +178,8 @@ const char *ezlopi_item_name_water_flow = "water_flow";
 // const  char *ezlopi_item_name_outside_temperature = "outside_temperature";
 // // const  char *ezlopi_item_name_water_chlorine_level = "water_chlorine_level";
 // const  char *ezlopi_item_name_water_acidity = "water_acidity";
-const char *ezlopi_item_name_particulate_matter_10 = "particulate_matter_10";
-const char *ezlopi_item_name_particulate_matter_2_dot_5 = "particulate_matter_2_dot_5";
+const  char *ezlopi_item_name_particulate_matter_10 = "particulate_matter_10";
+const  char *ezlopi_item_name_particulate_matter_2_dot_5 = "particulate_matter_2_dot_5";
 // const  char *ezlopi_item_name_program_status = "program_status";
 // const  char *ezlopi_item_name_program_failures = "program_failures";
 // const  char *ezlopi_item_name_position = "position";
@@ -257,10 +220,10 @@ const char *ezlopi_item_name_applied_force_on_sensor = "applied_force_on_sensor"
 // const  char *ezlopi_item_name_evaporator_coil_temperature = "evaporator_coil_temperature";
 // const  char *ezlopi_item_name_lead = "lead";
 // const  char *ezlopi_item_name_liquid_line_temperature = "liquid_line_temperature";
-const char *ezlopi_item_name_motion_direction = "motion_direction";
+const  char *ezlopi_item_name_motion_direction = "motion_direction";
 // const  char *ezlopi_item_name_nitrogen_dioxide = "nitrogen_dioxide";
 // const  char *ezlopi_item_name_ozone = "ozone";
-const char *ezlopi_item_name_particulate_matter_1 = "particulate_matter_1";
+const  char *ezlopi_item_name_particulate_matter_1 = "particulate_matter_1";
 // const  char *ezlopi_item_name_return_air_temperature = "return_air_temperature";
 // const  char *ezlopi_item_name_suction_pressure = "suction_pressure";
 // const  char *ezlopi_item_name_sulfur_dioxide = "sulfur_dioxide";
@@ -288,6 +251,4 @@ const char *ezlopi_item_name_particles_2_dot_5_um = "particles_2_dot_5_um";
 const char *ezlopi_item_name_particles_5_um = "particles_5_um";
 const char *ezlopi_item_name_particles_10_um = "particles_10_um";
 
-/*******************************************************************************
- *                          End of File
- *******************************************************************************/
+#endif // __EZLOPI_ITEM_NAME_STR_H__

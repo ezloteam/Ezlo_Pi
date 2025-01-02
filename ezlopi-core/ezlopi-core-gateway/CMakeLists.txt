@@ -1,3 +1,4 @@
+# set(config_src "config.cpp")
 
 file(GLOB_RECURSE config_src "*.c")
 

@@ -22,7 +22,7 @@ typedef unsigned char byte;
 #define millis() esp_timer_get_time() / 1000
 
 #define LD2410_MAX_FRAME_LENGTH 40
-// #define LD2410_DEBUG_INITIALIZATION
+#define LD2410_DEBUG_INITIALIZATION
 // #define LD2410_DEBUG_DATA
 // #define LD2410_DEBUG_COMMANDS
 // #define LD2410_DEBUG_PARSE

@@ -1,3 +1,4 @@
+# set(config_src "config.cpp")
 
 file(GLOB_RECURSE config_src "./*.c*")
 
@@ -13,7 +14,7 @@ set(EZLOPI_CORE_COMPONENTS
         ezlopi-core-errors
 )
 
-idf_component_register(SRCS "${config_src}"
+idf_component_register(SRCS "ezlopi_core_nvs.c" "${config_src}"
     INCLUDE_DIRS "."
     REQUIRES    ${ESP_IDF_COMPONENTS}
                 ${EZLOPI_COMPONENTS}

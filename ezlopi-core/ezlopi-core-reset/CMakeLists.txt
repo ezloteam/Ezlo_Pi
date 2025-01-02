@@ -9,6 +9,6 @@ set(EZLOPI_SERVICE_COMPONENTS
         ezlopi-core-errors
 )
 
-idf_component_register(SRCS  "${files_src}"
+idf_component_register(SRCS "ezlopi_core_reset.c" "${files_src}"
     INCLUDE_DIRS "."
     REQUIRES   ${EZLOPI_SERVICE_COMPONENTS})

@@ -13,7 +13,6 @@ idf_component_register(SRCS "sensor_0066_other_R307_FingerPrint.c" "R307_AS606.c
                 ezlopi-core-valueformatter 
                 ezlopi-core-processes
                 ezlopi-core-errors
-                ezlopi-core-sntp
 
                 ezlopi-hal-uart
 

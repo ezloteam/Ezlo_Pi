@@ -18,7 +18,7 @@ static int __prepare_particulate_matter_particles_0_dot_3_um_device_and_items(cJ
 {
     int ret = 0;
 
-    l_ezlopi_device_t *particles_0_dot_3_um_device = EZPI_core_device_add_device(cj_properties, "Dust_Particles_0.3um");
+    l_ezlopi_device_t *particles_0_dot_3_um_device = ezlopi_device_add_device(cj_properties, "Dust_Particles_0.3um");
     if (particles_0_dot_3_um_device)
     {
         ret = 1;
@@ -30,12 +30,12 @@ static int __prepare_particulate_matter_particles_0_dot_3_um_device_and_items(cJ
         particles_0_dot_3_um_device->cloud_properties.parent_device_id = particles_0_dot_3_um_device->cloud_properties.device_id;
         *parent_id = particles_0_dot_3_um_device->cloud_properties.parent_device_id;
 
-        l_ezlopi_item_t *particles_0_dot_3_um_item = EZPI_core_device_add_item_to_device(particles_0_dot_3_um_device, sensor_pms5003_v3);
+        l_ezlopi_item_t *particles_0_dot_3_um_item = ezlopi_device_add_item_to_device(particles_0_dot_3_um_device, sensor_pms5003_v3);
         if (particles_0_dot_3_um_item)
         {
             particles_0_dot_3_um_item->cloud_properties.has_getter = true;
             particles_0_dot_3_um_item->cloud_properties.has_setter = false;
-            particles_0_dot_3_um_item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
+            particles_0_dot_3_um_item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
             particles_0_dot_3_um_item->cloud_properties.item_name = ezlopi_item_name_particles_0_dot_3_um;
             particles_0_dot_3_um_item->cloud_properties.show = true;
             particles_0_dot_3_um_item->cloud_properties.value_type = value_type_substance_amount;
@@ -52,7 +52,7 @@ static int __prepare_particulate_matter_particles_0_dot_3_um_device_and_items(cJ
         }
         else
         {
-            EZPI_core_device_free_device(particles_0_dot_3_um_device);
+            ezlopi_device_free_device(particles_0_dot_3_um_device);
             ret = -1;
         }
     }
@@ -69,7 +69,7 @@ static int __prepare_particulate_matter_particles_0_dot_5_um_device_and_items(cJ
 {
     int ret = 0;
 
-    l_ezlopi_device_t *particles_0_dot_5_um_device = EZPI_core_device_add_device(cj_properties, "Dust_Particles_0.5_um");
+    l_ezlopi_device_t *particles_0_dot_5_um_device = ezlopi_device_add_device(cj_properties, "Dust_Particles_0.5_um");
     if (particles_0_dot_5_um_device)
     {
         ret = 1;
@@ -79,12 +79,12 @@ static int __prepare_particulate_matter_particles_0_dot_5_um_device_and_items(cJ
         particles_0_dot_5_um_device->cloud_properties.subcategory = subcategory_particulate_matter;
         particles_0_dot_5_um_device->cloud_properties.device_type = dev_type_sensor;
 
-        l_ezlopi_item_t *particles_0_dot_5_um_item = EZPI_core_device_add_item_to_device(particles_0_dot_5_um_device, sensor_pms5003_v3);
+        l_ezlopi_item_t *particles_0_dot_5_um_item = ezlopi_device_add_item_to_device(particles_0_dot_5_um_device, sensor_pms5003_v3);
         if (particles_0_dot_5_um_item)
         {
             particles_0_dot_5_um_item->cloud_properties.has_getter = true;
             particles_0_dot_5_um_item->cloud_properties.has_setter = false;
-            particles_0_dot_5_um_item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
+            particles_0_dot_5_um_item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
             particles_0_dot_5_um_item->cloud_properties.item_name = ezlopi_item_name_particles_0_dot_5_um;
             particles_0_dot_5_um_item->cloud_properties.show = true;
             particles_0_dot_5_um_item->cloud_properties.value_type = value_type_substance_amount;
@@ -101,7 +101,7 @@ static int __prepare_particulate_matter_particles_0_dot_5_um_device_and_items(cJ
         else
         {
             ret = -1;
-            EZPI_core_device_free_device(particles_0_dot_5_um_device);
+            ezlopi_device_free_device(particles_0_dot_5_um_device);
         }
     }
     else
@@ -117,7 +117,7 @@ static int __prepare_particulate_matter_particles_1_um_device_and_items(cJSON *c
 {
     int ret = 0;
 
-    l_ezlopi_device_t *particles_1_um_device = EZPI_core_device_add_device(cj_properties, "Dust_Particles_1_um");
+    l_ezlopi_device_t *particles_1_um_device = ezlopi_device_add_device(cj_properties, "Dust_Particles_1_um");
     if (particles_1_um_device)
     {
         ret = 1;
@@ -127,12 +127,12 @@ static int __prepare_particulate_matter_particles_1_um_device_and_items(cJSON *c
         particles_1_um_device->cloud_properties.subcategory = subcategory_particulate_matter;
         particles_1_um_device->cloud_properties.device_type = dev_type_sensor;
 
-        l_ezlopi_item_t *particles_1_um_item = EZPI_core_device_add_item_to_device(particles_1_um_device, sensor_pms5003_v3);
+        l_ezlopi_item_t *particles_1_um_item = ezlopi_device_add_item_to_device(particles_1_um_device, sensor_pms5003_v3);
         if (particles_1_um_item)
         {
             particles_1_um_item->cloud_properties.has_getter = true;
             particles_1_um_item->cloud_properties.has_setter = false;
-            particles_1_um_item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
+            particles_1_um_item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
             particles_1_um_item->cloud_properties.item_name = ezlopi_item_name_particles_1_um;
             particles_1_um_item->cloud_properties.show = true;
             particles_1_um_item->cloud_properties.value_type = value_type_substance_amount;
@@ -149,7 +149,7 @@ static int __prepare_particulate_matter_particles_1_um_device_and_items(cJSON *c
         else
         {
             ret = -1;
-            EZPI_core_device_free_device(particles_1_um_device);
+            ezlopi_device_free_device(particles_1_um_device);
         }
     }
     else
@@ -165,7 +165,7 @@ static int __prepare_particulate_matter_particles_2_dot_5_um_device_and_items(cJ
 {
     int ret = 0;
 
-    l_ezlopi_device_t *particles_2_dot_5_um_device = EZPI_core_device_add_device(cj_properties, "Dust_Particles_2.5_um");
+    l_ezlopi_device_t *particles_2_dot_5_um_device = ezlopi_device_add_device(cj_properties, "Dust_Particles_2.5_um");
     if (particles_2_dot_5_um_device)
     {
         ret = 1;
@@ -175,12 +175,12 @@ static int __prepare_particulate_matter_particles_2_dot_5_um_device_and_items(cJ
         particles_2_dot_5_um_device->cloud_properties.subcategory = subcategory_particulate_matter;
         particles_2_dot_5_um_device->cloud_properties.device_type = dev_type_sensor;
 
-        l_ezlopi_item_t *particles_2_dot_5_um_item = EZPI_core_device_add_item_to_device(particles_2_dot_5_um_device, sensor_pms5003_v3);
+        l_ezlopi_item_t *particles_2_dot_5_um_item = ezlopi_device_add_item_to_device(particles_2_dot_5_um_device, sensor_pms5003_v3);
         if (particles_2_dot_5_um_item)
         {
             particles_2_dot_5_um_item->cloud_properties.has_getter = true;
             particles_2_dot_5_um_item->cloud_properties.has_setter = false;
-            particles_2_dot_5_um_item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
+            particles_2_dot_5_um_item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
             particles_2_dot_5_um_item->cloud_properties.item_name = ezlopi_item_name_particles_2_dot_5_um;
             particles_2_dot_5_um_item->cloud_properties.show = true;
             particles_2_dot_5_um_item->cloud_properties.value_type = value_type_substance_amount;
@@ -197,7 +197,7 @@ static int __prepare_particulate_matter_particles_2_dot_5_um_device_and_items(cJ
         else
         {
             ret = -1;
-            EZPI_core_device_free_device(particles_2_dot_5_um_device);
+            ezlopi_device_free_device(particles_2_dot_5_um_device);
         }
     }
     else
@@ -213,7 +213,7 @@ static int __prepare_particulate_matter_particles_5_um_device_and_items(cJSON *c
 {
     int ret = 0;
 
-    l_ezlopi_device_t *particles_5_um_device = EZPI_core_device_add_device(cj_properties, "Dust_Particles_5_um");
+    l_ezlopi_device_t *particles_5_um_device = ezlopi_device_add_device(cj_properties, "Dust_Particles_5_um");
     if (particles_5_um_device)
     {
         ret = 1;
@@ -223,12 +223,12 @@ static int __prepare_particulate_matter_particles_5_um_device_and_items(cJSON *c
         particles_5_um_device->cloud_properties.subcategory = subcategory_particulate_matter;
         particles_5_um_device->cloud_properties.device_type = dev_type_sensor;
 
-        l_ezlopi_item_t *particles_5_um_item = EZPI_core_device_add_item_to_device(particles_5_um_device, sensor_pms5003_v3);
+        l_ezlopi_item_t *particles_5_um_item = ezlopi_device_add_item_to_device(particles_5_um_device, sensor_pms5003_v3);
         if (particles_5_um_item)
         {
             particles_5_um_item->cloud_properties.has_getter = true;
             particles_5_um_item->cloud_properties.has_setter = false;
-            particles_5_um_item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
+            particles_5_um_item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
             particles_5_um_item->cloud_properties.item_name = ezlopi_item_name_particles_5_um;
             particles_5_um_item->cloud_properties.show = true;
             particles_5_um_item->cloud_properties.value_type = value_type_substance_amount;
@@ -245,7 +245,7 @@ static int __prepare_particulate_matter_particles_5_um_device_and_items(cJSON *c
         else
         {
             ret = -1;
-            EZPI_core_device_free_device(particles_5_um_device);
+            ezlopi_device_free_device(particles_5_um_device);
         }
     }
     else
@@ -261,7 +261,7 @@ static int __prepare_particulate_matter_particles_10_um_device_and_items(cJSON *
 {
     int ret = 0;
 
-    l_ezlopi_device_t *particles_10_um_device = EZPI_core_device_add_device(cj_properties, "Dust_Particles_10_um");
+    l_ezlopi_device_t *particles_10_um_device = ezlopi_device_add_device(cj_properties, "Dust_Particles_10_um");
     if (particles_10_um_device)
     {
         ret = 1;
@@ -271,12 +271,12 @@ static int __prepare_particulate_matter_particles_10_um_device_and_items(cJSON *
         particles_10_um_device->cloud_properties.subcategory = subcategory_particulate_matter;
         particles_10_um_device->cloud_properties.device_type = dev_type_sensor;
 
-        l_ezlopi_item_t *particles_10_um_item = EZPI_core_device_add_item_to_device(particles_10_um_device, sensor_pms5003_v3);
+        l_ezlopi_item_t *particles_10_um_item = ezlopi_device_add_item_to_device(particles_10_um_device, sensor_pms5003_v3);
         if (particles_10_um_item)
         {
             particles_10_um_item->cloud_properties.has_getter = true;
             particles_10_um_item->cloud_properties.has_setter = false;
-            particles_10_um_item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
+            particles_10_um_item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
             particles_10_um_item->cloud_properties.item_name = ezlopi_item_name_particles_10_um;
             particles_10_um_item->cloud_properties.show = true;
             particles_10_um_item->cloud_properties.value_type = value_type_substance_amount;
@@ -293,7 +293,7 @@ static int __prepare_particulate_matter_particles_10_um_device_and_items(cJSON *
         else
         {
             ret = -1;
-            EZPI_core_device_free_device(particles_10_um_device);
+            ezlopi_device_free_device(particles_10_um_device);
         }
     }
     else
@@ -309,7 +309,7 @@ static int __prepare_particulate_matter_standard_particles_1_um_device_and_items
 {
     int ret = 0;
 
-    l_ezlopi_device_t *standard_particles_1_um_device = EZPI_core_device_add_device(cj_properties, "Dust_Particles_PM_1_um");
+    l_ezlopi_device_t *standard_particles_1_um_device = ezlopi_device_add_device(cj_properties, "Dust_Particles_PM_1_um");
     if (standard_particles_1_um_device)
     {
         ret = 1;
@@ -319,12 +319,12 @@ static int __prepare_particulate_matter_standard_particles_1_um_device_and_items
         standard_particles_1_um_device->cloud_properties.subcategory = subcategory_particulate_matter;
         standard_particles_1_um_device->cloud_properties.device_type = dev_type_sensor;
 
-        l_ezlopi_item_t *standard_particles_1_um_item = EZPI_core_device_add_item_to_device(standard_particles_1_um_device, sensor_pms5003_v3);
+        l_ezlopi_item_t *standard_particles_1_um_item = ezlopi_device_add_item_to_device(standard_particles_1_um_device, sensor_pms5003_v3);
         if (standard_particles_1_um_item)
         {
             standard_particles_1_um_item->cloud_properties.has_getter = true;
             standard_particles_1_um_item->cloud_properties.has_setter = false;
-            standard_particles_1_um_item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
+            standard_particles_1_um_item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
             standard_particles_1_um_item->cloud_properties.item_name = ezlopi_item_name_particulate_matter_1;
             standard_particles_1_um_item->cloud_properties.show = true;
             standard_particles_1_um_item->cloud_properties.value_type = value_type_substance_amount;
@@ -341,7 +341,7 @@ static int __prepare_particulate_matter_standard_particles_1_um_device_and_items
         else
         {
             ret = -1;
-            EZPI_core_device_free_device(standard_particles_1_um_device);
+            ezlopi_device_free_device(standard_particles_1_um_device);
         }
     }
     else
@@ -357,7 +357,7 @@ static int __prepare_particulate_matter_standard_particles_2_dot_5_um_device_and
 {
     int ret = 0;
 
-    l_ezlopi_device_t *standard_particles_2_dot_5_um_device = EZPI_core_device_add_device(cj_properties, "Dust_Particles_PM_2.5_um");
+    l_ezlopi_device_t *standard_particles_2_dot_5_um_device = ezlopi_device_add_device(cj_properties, "Dust_Particles_PM_2.5_um");
     if (standard_particles_2_dot_5_um_device)
     {
         ret = 1;
@@ -367,12 +367,12 @@ static int __prepare_particulate_matter_standard_particles_2_dot_5_um_device_and
         standard_particles_2_dot_5_um_device->cloud_properties.subcategory = subcategory_particulate_matter;
         standard_particles_2_dot_5_um_device->cloud_properties.device_type = dev_type_sensor;
 
-        l_ezlopi_item_t *standard_particles_2_dot_5_um_item = EZPI_core_device_add_item_to_device(standard_particles_2_dot_5_um_device, sensor_pms5003_v3);
+        l_ezlopi_item_t *standard_particles_2_dot_5_um_item = ezlopi_device_add_item_to_device(standard_particles_2_dot_5_um_device, sensor_pms5003_v3);
         if (standard_particles_2_dot_5_um_item)
         {
             standard_particles_2_dot_5_um_item->cloud_properties.has_getter = true;
             standard_particles_2_dot_5_um_item->cloud_properties.has_setter = false;
-            standard_particles_2_dot_5_um_item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
+            standard_particles_2_dot_5_um_item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
             standard_particles_2_dot_5_um_item->cloud_properties.item_name = ezlopi_item_name_particulate_matter_2_dot_5;
             standard_particles_2_dot_5_um_item->cloud_properties.show = true;
             standard_particles_2_dot_5_um_item->cloud_properties.value_type = value_type_substance_amount;
@@ -389,7 +389,7 @@ static int __prepare_particulate_matter_standard_particles_2_dot_5_um_device_and
         else
         {
             ret = -1;
-            EZPI_core_device_free_device(standard_particles_2_dot_5_um_device);
+            ezlopi_device_free_device(standard_particles_2_dot_5_um_device);
         }
     }
     else
@@ -405,7 +405,7 @@ static int __prepare_particulate_matter_standard_particles_10_um_device_and_item
 {
     int ret = 0;
 
-    l_ezlopi_device_t *standard_particles_10_um_device = EZPI_core_device_add_device(cj_properties, "Dust_Particles_PM_10_um");
+    l_ezlopi_device_t *standard_particles_10_um_device = ezlopi_device_add_device(cj_properties, "Dust_Particles_PM_10_um");
     if (standard_particles_10_um_device)
     {
         ret = 1;
@@ -415,12 +415,12 @@ static int __prepare_particulate_matter_standard_particles_10_um_device_and_item
         standard_particles_10_um_device->cloud_properties.subcategory = subcategory_particulate_matter;
         standard_particles_10_um_device->cloud_properties.device_type = dev_type_sensor;
 
-        l_ezlopi_item_t *standard_particles_10_um_item = EZPI_core_device_add_item_to_device(standard_particles_10_um_device, sensor_pms5003_v3);
+        l_ezlopi_item_t *standard_particles_10_um_item = ezlopi_device_add_item_to_device(standard_particles_10_um_device, sensor_pms5003_v3);
         if (standard_particles_10_um_item)
         {
             standard_particles_10_um_item->cloud_properties.has_getter = true;
             standard_particles_10_um_item->cloud_properties.has_setter = false;
-            standard_particles_10_um_item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
+            standard_particles_10_um_item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
             standard_particles_10_um_item->cloud_properties.item_name = ezlopi_item_name_particulate_matter_10;
             standard_particles_10_um_item->cloud_properties.show = true;
             standard_particles_10_um_item->cloud_properties.value_type = value_type_substance_amount;
@@ -437,7 +437,7 @@ static int __prepare_particulate_matter_standard_particles_10_um_device_and_item
         else
         {
             ret = -1;
-            EZPI_core_device_free_device(standard_particles_10_um_device);
+            ezlopi_device_free_device(standard_particles_10_um_device);
         }
     }
     else

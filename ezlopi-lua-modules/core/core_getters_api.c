@@ -18,7 +18,7 @@ static int __create_lua_table_for_item(lua_State *lua_state, l_ezlopi_item_t *it
 int lcore_get_product_name(lua_State *lua_state)
 {
     int ret = 0;
-    char *product_name = EZPI_core_factory_info_v3_get_name();
+    char *product_name = ezlopi_factory_info_v3_get_name();
     if (product_name)
     {
         lua_pushstring(lua_state, product_name);
@@ -36,7 +36,7 @@ int lcore_get_gateways(lua_State *lua_state)
 {
     lua_newtable(lua_state);
     lua_pushnumber(lua_state, 1);                                    // table index
-    __create_lua_table_for_gateway(lua_state, EZPI_core_gateway_get()); // individual device table
+    __create_lua_table_for_gateway(lua_state, ezlopi_gateway_get()); // individual device table
     lua_settable(lua_state, -3);
 
     return 1;
@@ -44,7 +44,7 @@ int lcore_get_gateways(lua_State *lua_state)
 
 int lcore_get_gateway(lua_State *lua_state)
 {
-    s_ezlopi_gateway_t *gateway = EZPI_core_gateway_get();
+    s_ezlopi_gateway_t *gateway = ezlopi_gateway_get();
     __create_lua_table_for_gateway(lua_state, gateway);
 
     return 1;
@@ -58,7 +58,7 @@ int lcore_get_device(lua_State *lua_state)
     {
         TRACE_E("device-id: %s", device_id_str);
         uint32_t device_id = strtoul(device_id_str, NULL, 16);
-        l_ezlopi_device_t *device_node = EZPI_core_device_get_head();
+        l_ezlopi_device_t *device_node = ezlopi_device_get_head();
         while (device_node)
         {
             if (device_id == device_node->cloud_properties.device_id)
@@ -77,7 +77,7 @@ int lcore_get_device(lua_State *lua_state)
 int lcore_get_devices(lua_State *lua_state)
 {
     int ret = 0;
-    l_ezlopi_device_t *device_node = EZPI_core_device_get_head();
+    l_ezlopi_device_t *device_node = ezlopi_device_get_head();
     lua_newtable(lua_state);
     while (device_node)
     {
@@ -94,7 +94,7 @@ int lcore_get_devices(lua_State *lua_state)
 int lcore_get_devices_ids(lua_State *lua_state)
 {
     int ret = 0;
-    l_ezlopi_device_t *device_node = EZPI_core_device_get_head();
+    l_ezlopi_device_t *device_node = ezlopi_device_get_head();
     lua_newtable(lua_state);
     while (device_node)
     {
@@ -116,7 +116,7 @@ int lcore_get_item(lua_State *lua_state)
         TRACE_D("item-id: %s", item_id_str);
         uint32_t item_id = strtoul(item_id_str, NULL, 16);
 
-        l_ezlopi_device_t *device_node = EZPI_core_device_get_head();
+        l_ezlopi_device_t *device_node = ezlopi_device_get_head();
         lua_newtable(lua_state);
         while (device_node)
         {
@@ -141,7 +141,7 @@ int lcore_get_item(lua_State *lua_state)
 int lcore_get_items(lua_State *lua_state)
 {
     int ret = 0;
-    l_ezlopi_device_t *device_node = EZPI_core_device_get_head();
+    l_ezlopi_device_t *device_node = ezlopi_device_get_head();
     lua_newtable(lua_state);
     while (device_node)
     {
@@ -170,7 +170,7 @@ int lcore_get_items_by_device_id(lua_State *lua_state)
         TRACE_E("device-id: %s", device_id_str);
         uint32_t device_id = strtoul(device_id_str, NULL, 16);
 
-        l_ezlopi_device_t *device_node = EZPI_core_device_get_head();
+        l_ezlopi_device_t *device_node = ezlopi_device_get_head();
         lua_newtable(lua_state);
         while (device_node)
         {
@@ -207,14 +207,14 @@ int lcore_get_room(lua_State *lua_state) { return 0; }
 static int __create_lua_table_for_device(lua_State *lua_state, l_ezlopi_device_t *device_prop)
 {
     char tmp_str[32];
-    s_ezlopi_cloud_controller_t *controller_info = EZPI_core_device_get_controller_information();
+    s_ezlopi_cloud_controller_t *controller_info = ezlopi_device_get_controller_information();
 
     lua_newtable(lua_state);
 
     snprintf(tmp_str, sizeof(tmp_str), "%08x", device_prop->cloud_properties.device_id);
     lua_create_table_string_key_value(ezlopi_id_str, &tmp_str[0]);
 
-    snprintf(tmp_str, sizeof(tmp_str), "%08x", EZPI_core_gateway_get()->_id);
+    snprintf(tmp_str, sizeof(tmp_str), "%08x", ezlopi_gateway_get()->_id);
     lua_create_table_string_key_value(ezlopi_gateway_id_str, &tmp_str[0]);
 
     lua_create_table_string_key_value(ezlopi_name_str, device_prop->cloud_properties.device_name);
@@ -239,15 +239,15 @@ static int __create_lua_table_for_device(lua_State *lua_state, l_ezlopi_device_t
     lua_pushstring(lua_state, ezlopi_info_str);
     lua_newtable(lua_state);
 
-    char *manufacturer = EZPI_core_factory_info_v3_get_manufacturer();
+    char *manufacturer = ezlopi_factory_info_v3_get_manufacturer();
     lua_create_table_string_key_value(ezlopi_manufacturer_str, manufacturer);
     ezlopi_free(__FUNCTION__, manufacturer);
 
-    char *model = EZPI_core_factory_info_v3_get_model();
+    char *model = ezlopi_factory_info_v3_get_model();
     lua_create_table_string_key_value(ezlopi_model_str, model);
     ezlopi_free(__FUNCTION__, model);
 
-    char *brand = EZPI_core_factory_info_v3_get_brand();
+    char *brand = ezlopi_factory_info_v3_get_brand();
     lua_create_table_string_key_value(ezlopi_brand_str, brand);
     ezlopi_free(__FUNCTION__, brand);
     lua_settable(lua_state, -3);
@@ -277,7 +277,7 @@ static int __create_lua_table_for_device(lua_State *lua_state, l_ezlopi_device_t
 static int __create_lua_table_for_item(lua_State *lua_state, l_ezlopi_item_t *item_prop, uint32_t device_id)
 {
     char tmp_str[32];
-    // s_ezlopi_cloud_controller_t *controller_info = EZPI_core_device_get_controller_information();
+    // s_ezlopi_cloud_controller_t *controller_info = ezlopi_device_get_controller_information();
 
     lua_newtable(lua_state);
 
@@ -299,7 +299,7 @@ static int __create_lua_table_for_item(lua_State *lua_state, l_ezlopi_item_t *it
         lua_pushstring(lua_state, ezlopi_enum_str);
         lua_newtable(lua_state);
 
-        lua_create_table_string_value(1, ezlopi_none_str); // Remains for future
+        lua_create_table_string_value(1, ezlopi_None_str); // Remains for future
 
         lua_settable(lua_state, -3);
     }

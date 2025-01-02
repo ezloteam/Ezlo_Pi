@@ -1,71 +1,22 @@
-
-
-/**
- * @file    ezlopi_service_ws_server_clients.c
- * @brief
- * @author
- * @version
- * @date
- */
-/* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
-**
-** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
-**
-** Redistribution and use in source and binary forms, with or without
-** modification, are permitted provided that the following conditions are met:
-**
-** 1. Redistributions of source code must retain the above copyright notice,
-**    this list of conditions and the following disclaimer.
-** 2. Redistributions in binary form must reproduce the above copyright
-**    notice, this list of conditions and the following disclaimer in the
-**    documentation and/or other materials provided with the distribution.
-** 3. Neither the name of the copyright holder nor the names of its
-**    contributors may be used to endorse or promote products derived from
-**    this software without specific prior written permission.
-**
-** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
-** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-** POSSIBILITY OF SUCH DAMAGE.
-** ===========================================================================
-*/
-
 #include <stdio.h>
 #include <string.h>
 
 #include "ezlopi_util_trace.h"
-#include "EZLOPI_USER_CONFIG.h"
-
 #include "ezlopi_service_ws_server.h"
 #include "ezlopi_service_ws_server_clients.h"
+#include "EZLOPI_USER_CONFIG.h"
 
-/**
- * @brief Function to create new clinet
- *
- * @param[in] http_handle Pointer to the client http handle
- * @param[in] http_descriptor HTTP descriptro for the clinent
- * @return l_ws_server_client_conn_t*
- * @retval Pointer to the newly created client
- */
-static l_ws_server_client_conn_t *ezpi_create_new_client(void *http_handle, int http_descriptor);
-
-static l_ws_server_client_conn_t *l_client_conn_head = NULL;
 static uint32_t __number_of_clients = 0;
+static l_ws_server_client_conn_t *l_client_conn_head = NULL;
 
-l_ws_server_client_conn_t *EZPI_service_ws_server_clients_get_head(void)
+l_ws_server_client_conn_t *__create_new_client(void *http_handle, int http_descriptor);
+
+l_ws_server_client_conn_t *ezlopi_service_ws_server_clients_get_head(void)
 {
     return l_client_conn_head;
 }
 
-l_ws_server_client_conn_t *EZPI_service_ws_server_clients_get_by_handle(void *http_handle)
+l_ws_server_client_conn_t *ezlopi_service_ws_server_clients_get_by_handle(void *http_handle)
 {
     l_ws_server_client_conn_t *curr_client = l_client_conn_head;
     while (curr_client)
@@ -80,7 +31,7 @@ l_ws_server_client_conn_t *EZPI_service_ws_server_clients_get_by_handle(void *ht
     return curr_client;
 }
 
-l_ws_server_client_conn_t *EZPI_service_ws_server_clients_add(void *http_handle, int http_descriptor)
+l_ws_server_client_conn_t *ezlopi_service_ws_server_clients_add(void *http_handle, int http_descriptor)
 {
     l_ws_server_client_conn_t *ws_client_conn = NULL;
     if (l_client_conn_head)
@@ -101,7 +52,7 @@ l_ws_server_client_conn_t *EZPI_service_ws_server_clients_add(void *http_handle,
 
             if (0 == dup_flag)
             {
-                curr_conn->next = ezpi_create_new_client(http_handle, http_descriptor);
+                curr_conn->next = __create_new_client(http_handle, http_descriptor);
                 if (curr_conn->next)
                 {
                     __number_of_clients++;
@@ -111,7 +62,7 @@ l_ws_server_client_conn_t *EZPI_service_ws_server_clients_add(void *http_handle,
     }
     else
     {
-        ws_client_conn = ezpi_create_new_client(http_handle, http_descriptor);
+        ws_client_conn = __create_new_client(http_handle, http_descriptor);
         if (ws_client_conn)
         {
             __number_of_clients++;
@@ -124,13 +75,13 @@ l_ws_server_client_conn_t *EZPI_service_ws_server_clients_add(void *http_handle,
     return ws_client_conn;
 }
 
-int EZPI_service_ws_server_clients_remove_by_handle(void *http_handle)
+int ezlopi_service_ws_server_clients_remove_by_handle(void *http_handle)
 {
     int ret = 0;
 
     if (http_handle)
     {
-        l_ws_server_client_conn_t *ws_popped_con = EZPI_service_ws_server_clients_pop(http_handle);
+        l_ws_server_client_conn_t *ws_popped_con = ezlopi_service_ws_server_clients_pop(http_handle);
         if (ws_popped_con)
         {
             __number_of_clients--;
@@ -143,7 +94,7 @@ int EZPI_service_ws_server_clients_remove_by_handle(void *http_handle)
     return ret;
 }
 
-l_ws_server_client_conn_t *EZPI_service_ws_server_clients_pop(void *http_handle)
+l_ws_server_client_conn_t *ezlopi_service_ws_server_clients_pop(void *http_handle)
 {
     l_ws_server_client_conn_t *pop_con = NULL;
 
@@ -176,7 +127,7 @@ l_ws_server_client_conn_t *EZPI_service_ws_server_clients_pop(void *http_handle)
     return pop_con;
 }
 
-static l_ws_server_client_conn_t *ezpi_create_new_client(void *http_handle, int http_descriptor)
+l_ws_server_client_conn_t *__create_new_client(void *http_handle, int http_descriptor)
 {
     l_ws_server_client_conn_t *ws_client_conn = ezlopi_malloc(__FUNCTION__, sizeof(l_ws_server_client_conn_t));
     if (ws_client_conn)
@@ -189,7 +140,3 @@ static l_ws_server_client_conn_t *ezpi_create_new_client(void *http_handle, int 
 
     return ws_client_conn;
 }
-
-/*******************************************************************************
- *                          End of File
- *******************************************************************************/

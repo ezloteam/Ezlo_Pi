@@ -5,13 +5,12 @@
 #include "esp_timer.h"
 
 // #include "ezlopi_core_timer.h"
-#include "ezlopi_core_sntp.h"
 #include "ezlopi_core_cloud.h"
-#include "ezlopi_core_errors.h"
-#include "ezlopi_core_processes.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
+#include "ezlopi_core_processes.h"
+#include "ezlopi_core_errors.h"
 
 #include "ezlopi_hal_uart.h"
 
@@ -59,7 +58,8 @@ static void __timer_callback(void *param)
         server_packet_t *user_data = (server_packet_t *)item->user_arg;
         if (user_data)
         {
-            time_t now = EZPI_core_sntp_get_current_time_sec();
+            time_t now = 0;
+            time(&now);
             if ((now - (user_data->timeout_start_time)) <= (time_t)30) // 30 sec
             {
                 TRACE_W("...timer ON...");
@@ -74,7 +74,7 @@ static void __timer_callback(void *param)
             {
                 TRACE_S("...timer OFF...");
                 user_data->opmode = FINGERPRINT_MATCH_MODE;
-                EZPI_core_device_value_updated_from_device_broadcast_by_item_id(user_data->sensor_fp_item_ids[SENSOR_FP_ITEM_ID_ENROLL]);
+                ezlopi_device_value_updated_from_device_broadcast_by_item_id(user_data->sensor_fp_item_ids[SENSOR_FP_ITEM_ID_ENROLL]);
                 esp_timer_stop(user_data->timerHandler);
             }
         }
@@ -85,7 +85,7 @@ static void __timer_callback(void *param)
 ezlopi_error_t sensor_0066_other_R307_FingerPrint(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
-    // TRACE_E("%s", EZPI_core_actions_to_string(action));
+    // TRACE_E("%s", ezlopi_actions_to_string(action));
     switch (action)
     {
     case EZLOPI_ACTION_PREPARE:
@@ -220,32 +220,32 @@ static ezlopi_error_t __0066_prepare(void *arg)
         server_packet_t *user_data = (server_packet_t *)ezlopi_malloc(__FUNCTION__, sizeof(server_packet_t));
         if (user_data)
         {
-            l_ezlopi_device_t *parent_fingerprint_enroll_device = EZPI_core_device_add_device(cj_device, "enroll");
+            l_ezlopi_device_t *parent_fingerprint_enroll_device = ezlopi_device_add_device(cj_device, "enroll");
             if (parent_fingerprint_enroll_device)
             {
                 ret = EZPI_SUCCESS;
                 memset(user_data, 0, sizeof(server_packet_t));
                 for (uint8_t i = 0; i < SENSOR_FP_ITEM_ID_MAX; i++)
                 {
-                    user_data->sensor_fp_item_ids[i] = EZPI_core_cloud_generate_item_id();
+                    user_data->sensor_fp_item_ids[i] = ezlopi_cloud_generate_item_id();
                 }
                 TRACE_I("Parent_fingerprint_action_device-[0x%x] ", parent_fingerprint_enroll_device->cloud_properties.device_id);
                 __prepare_device_cloud_properties(parent_fingerprint_enroll_device, cj_device);
 
-                l_ezlopi_item_t *fingerprint_item_enroll = EZPI_core_device_add_item_to_device(parent_fingerprint_enroll_device, sensor_0066_other_R307_FingerPrint);
+                l_ezlopi_item_t *fingerprint_item_enroll = ezlopi_device_add_item_to_device(parent_fingerprint_enroll_device, sensor_0066_other_R307_FingerPrint);
                 if (fingerprint_item_enroll)
                 {
                     __prepare_item_enroll_cloud_properties(fingerprint_item_enroll, user_data->sensor_fp_item_ids[SENSOR_FP_ITEM_ID_ENROLL], cj_device, user_data);
                     __prepare_item_interface_properties(fingerprint_item_enroll, cj_device);
                 }
 
-                l_ezlopi_device_t *child_fingerprint_action_device = EZPI_core_device_add_device(cj_device, "action");
+                l_ezlopi_device_t *child_fingerprint_action_device = ezlopi_device_add_device(cj_device, "action");
                 if (child_fingerprint_action_device)
                 {
                     TRACE_I("Child_fingerprint_action_device-[0x%x] ", child_fingerprint_action_device->cloud_properties.device_id);
                     __prepare_device_cloud_properties(child_fingerprint_action_device, cj_device);
 
-                    l_ezlopi_item_t *fingerprint_item_action = EZPI_core_device_add_item_to_device(child_fingerprint_action_device, sensor_0066_other_R307_FingerPrint);
+                    l_ezlopi_item_t *fingerprint_item_action = ezlopi_device_add_item_to_device(child_fingerprint_action_device, sensor_0066_other_R307_FingerPrint);
                     if (fingerprint_item_action)
                     {
                         __prepare_item_action_cloud_properties(fingerprint_item_action, user_data->sensor_fp_item_ids[SENSOR_FP_ITEM_ID_ACTION], cj_device, user_data);
@@ -253,18 +253,18 @@ static ezlopi_error_t __0066_prepare(void *arg)
                     }
                     else
                     {
-                        EZPI_core_device_free_device(child_fingerprint_action_device);
+                        ezlopi_device_free_device(child_fingerprint_action_device);
                         ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                     }
                 }
 
-                l_ezlopi_device_t *child_fingerprint_ids_device = EZPI_core_device_add_device(cj_device, "ids");
+                l_ezlopi_device_t *child_fingerprint_ids_device = ezlopi_device_add_device(cj_device, "ids");
                 if (child_fingerprint_ids_device)
                 {
                     TRACE_I("Child_fingerprint_ids_device-[0x%x] ", child_fingerprint_ids_device->cloud_properties.device_id);
                     __prepare_device_cloud_properties(child_fingerprint_ids_device, cj_device);
 
-                    l_ezlopi_item_t *fingerprint_item_ids = EZPI_core_device_add_item_to_device(child_fingerprint_ids_device, sensor_0066_other_R307_FingerPrint);
+                    l_ezlopi_item_t *fingerprint_item_ids = ezlopi_device_add_item_to_device(child_fingerprint_ids_device, sensor_0066_other_R307_FingerPrint);
                     if (fingerprint_item_ids)
                     {
                         __prepare_item_ids_cloud_properties(fingerprint_item_ids, user_data->sensor_fp_item_ids[SENSOR_FP_ITEM_ID_FP_IDS], cj_device, user_data);
@@ -272,7 +272,7 @@ static ezlopi_error_t __0066_prepare(void *arg)
                     }
                     else
                     {
-                        EZPI_core_device_free_device(child_fingerprint_ids_device);
+                        ezlopi_device_free_device(child_fingerprint_ids_device);
                         ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                     }
                 }
@@ -282,7 +282,7 @@ static ezlopi_error_t __0066_prepare(void *arg)
                     (NULL == child_fingerprint_ids_device))
                 {
                     ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
-                    EZPI_core_device_free_device(parent_fingerprint_enroll_device);
+                    ezlopi_device_free_device(parent_fingerprint_enroll_device);
                     ezlopi_free(__FUNCTION__, user_data);
                 }
             }
@@ -335,15 +335,13 @@ static ezlopi_error_t __0066_init(l_ezlopi_item_t *item)
                                 {
                                     TRACE_I(" ---->>> Creating Fingerprint_activation Task <<<----");
                                     xTaskCreate(__fingerprint_operation_task, "Fingerprint_activation", EZLOPI_SENSOR_R307_FINGER_PRINT_TASK_DEPTH, item, 1, &(user_data->notifyHandler));
-#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
-                                    EZPI_core_process_set_process_info(ENUM_EZLOPI_SENSOR_R307_FINGER_PRINT_TASK, &user_data->notifyHandler, EZLOPI_SENSOR_R307_FINGER_PRINT_TASK_DEPTH);
-#endif
+                                    ezlopi_core_process_set_process_info(ENUM_EZLOPI_SENSOR_R307_FINGER_PRINT_TASK, &user_data->notifyHandler, EZLOPI_SENSOR_R307_FINGER_PRINT_TASK_DEPTH);
                                 }
 
                                 const esp_timer_create_args_t esp_timer_create_args = {
                                     .callback = __timer_callback,
                                     .arg = (void *)item,
-                                    .name = "Enrollment timer" };
+                                    .name = "Enrollment timer"};
                                 if (0 == esp_timer_create(&esp_timer_create_args, &(user_data->timerHandler)))
                                 {
                                     TRACE_I(" ---->>> Creating Enrollment Timer <<<----");
@@ -451,7 +449,7 @@ static ezlopi_error_t __0066_set_value(l_ezlopi_item_t *item, void *arg)
                     TRACE_E("HERE!! enroll");
                     if (cJSON_IsTrue(cj_value_cmd)) // true conditon
                     {
-                        user_data->timeout_start_time = EZPI_core_sntp_get_current_time_sec(); // !< reset the internal timer_start_time
+                        time(&user_data->timeout_start_time); // !< reset the internal timer_start_time
                         user_data->opmode = FINGERPRINT_ENROLLMENT_MODE;
 
                         /* Start the timers */
@@ -478,7 +476,7 @@ static ezlopi_error_t __0066_set_value(l_ezlopi_item_t *item, void *arg)
                 cJSON *cj_value_ids = cJSON_GetObjectItem(__FUNCTION__, cjson_params, ezlopi_value_str);
                 if ((cj_value_ids != NULL) && cJSON_IsArray(cj_value_ids))
                 {
-                    user_data->timeout_start_time = EZPI_core_sntp_get_current_time_sec(); // !< reset the internal timer_start_time
+                    time(&user_data->timeout_start_time); // !< reset the internal timer_start_time
                     uint16_t value_array_size = cJSON_GetArraySize(cj_value_ids);
                     if (value_array_size > 0)
                     {
@@ -532,7 +530,7 @@ static void __uart_0066_fingerprint_upcall(uint8_t *buffer, uint32_t output_len,
             if (user_data)
             {
                 uint16_t package_len = 0;
-                uint8_t another_buffer[MAX_PACKET_LENGTH_VAL] = { 0 };
+                uint8_t another_buffer[MAX_PACKET_LENGTH_VAL] = {0};
                 memcpy(another_buffer, temp_buf, MAX_PACKET_LENGTH_VAL);
                 // Programmed only for ACK_operation [0x07h] with 256byte results.
                 if (another_buffer[6] == FINGERPRINT_PID_ACKPACKET)
@@ -625,8 +623,8 @@ static void __fingerprint_operation_task(void *params)
         server_packet_t *user_data = (server_packet_t *)item->user_arg;
         if (user_data)
         {
-            user_data->timeout_start_time = EZPI_core_sntp_get_current_time_sec(); // !< reset the internal timer_start_time
-            r307_as606_update_id_status_list(item);                                // !< The best place to update ID_status_list
+            time(&user_data->timeout_start_time);   // !< reset the internal timer_start_time
+            r307_as606_update_id_status_list(item); // !< The best place to update ID_status_list
             for (;;)
             {
                 ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
@@ -670,7 +668,7 @@ static void __fingerprint_operation_task(void *params)
                     }
                     TRACE_W("____ MATCH_IDS: SENDING _____");
                     user_data->notify_flag = true;
-                    EZPI_core_device_value_updated_from_device_broadcast_by_item_id(user_data->sensor_fp_item_ids[SENSOR_FP_ITEM_ID_ACTION]);
+                    ezlopi_device_value_updated_from_device_broadcast_by_item_id(user_data->sensor_fp_item_ids[SENSOR_FP_ITEM_ID_ACTION]);
 
                     user_data->user_id = temp_id;
                     break;
@@ -690,9 +688,9 @@ static void __fingerprint_operation_task(void *params)
                                 user_data->opmode = FINGERPRINT_MATCH_MODE;
                                 TRACE_W("____ ENROLL_IDS: SENDING _____");
                                 user_data->notify_flag = true;
-                                EZPI_core_device_value_updated_from_device_broadcast_by_item_id(user_data->sensor_fp_item_ids[SENSOR_FP_ITEM_ID_FP_IDS]);
+                                ezlopi_device_value_updated_from_device_broadcast_by_item_id(user_data->sensor_fp_item_ids[SENSOR_FP_ITEM_ID_FP_IDS]);
                                 user_data->notify_flag = true;
-                                EZPI_core_device_value_updated_from_device_broadcast_by_item_id(user_data->sensor_fp_item_ids[SENSOR_FP_ITEM_ID_ENROLL]);
+                                ezlopi_device_value_updated_from_device_broadcast_by_item_id(user_data->sensor_fp_item_ids[SENSOR_FP_ITEM_ID_ENROLL]);
                             }
                             else
                             {
@@ -739,7 +737,7 @@ static void __fingerprint_operation_task(void *params)
                     user_data->user_id = temp_id;
                     TRACE_W("____ ERASE_SPECIFIC_IDS: SENDING _____");
                     user_data->notify_flag = true;
-                    EZPI_core_device_value_updated_from_device_broadcast_by_item_id(user_data->sensor_fp_item_ids[SENSOR_FP_ITEM_ID_FP_IDS]);
+                    ezlopi_device_value_updated_from_device_broadcast_by_item_id(user_data->sensor_fp_item_ids[SENSOR_FP_ITEM_ID_FP_IDS]);
                     user_data->opmode = FINGERPRINT_MATCH_MODE;
                     break;
                 }
@@ -753,7 +751,7 @@ static void __fingerprint_operation_task(void *params)
                         }
                         TRACE_W("____ ERASE_ALL: SENDING _____");
                         user_data->notify_flag = true;
-                        EZPI_core_device_value_updated_from_device_broadcast_by_item_id(user_data->sensor_fp_item_ids[SENSOR_FP_ITEM_ID_FP_IDS]);
+                        ezlopi_device_value_updated_from_device_broadcast_by_item_id(user_data->sensor_fp_item_ids[SENSOR_FP_ITEM_ID_FP_IDS]);
                     }
                     user_data->opmode = FINGERPRINT_MATCH_MODE;
                     break;
@@ -772,8 +770,6 @@ static void __fingerprint_operation_task(void *params)
             }
         }
     }
-#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
-    EZPI_core_process_set_is_deleted(ENUM_EZLOPI_SENSOR_R307_FINGER_PRINT_TASK);
-#endif
+    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SENSOR_R307_FINGER_PRINT_TASK);
     vTaskDelete(NULL);
 }

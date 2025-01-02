@@ -60,7 +60,7 @@ static ezlopi_error_t sensor_pir_get_value_cjson_v3(l_ezlopi_item_t *item, void 
     if (cj_result)
     {
         item->interface.gpio.gpio_out.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
-        EZPI_core_valueformatter_bool_to_cjson(cj_result, item->interface.gpio.gpio_out.value, NULL);
+        ezlopi_valueformatter_bool_to_cjson(cj_result, item->interface.gpio.gpio_out.value, NULL);
         ret = EZPI_SUCCESS;
     }
 
@@ -72,7 +72,7 @@ static void sensor_pir_value_updated_from_device_v3(void *arg)
     l_ezlopi_item_t *item = (l_ezlopi_item_t *)arg;
     if (item)
     {
-        EZPI_core_device_value_updated_from_device_broadcast(item);
+        ezlopi_device_value_updated_from_device_broadcast(item);
     }
 }
 
@@ -95,7 +95,7 @@ static ezlopi_error_t sensor_pir_init_v3(l_ezlopi_item_t *item)
             {
                 TRACE_I("PIR sensor initialize successfully.");
                 item->interface.gpio.gpio_in.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
-                EZPI_service_gpioisr_register_v3(item, sensor_pir_value_updated_from_device_v3, 200);
+                ezlopi_service_gpioisr_register_v3(item, sensor_pir_value_updated_from_device_v3, 200);
             }
             else
             {
@@ -124,18 +124,18 @@ static ezlopi_error_t sensor_pir_prepare_v3(void *arg)
         cJSON *cj_device = prep_arg->cjson_device;
         if (cj_device)
         {
-            l_ezlopi_device_t *device = EZPI_core_device_add_device(prep_arg->cjson_device, NULL);
+            l_ezlopi_device_t *device = ezlopi_device_add_device(prep_arg->cjson_device, NULL);
             if (device)
             {
                 sensor_pir_setup_device_cloud_properties_v3(device, cj_device);
-                l_ezlopi_item_t *item = EZPI_core_device_add_item_to_device(device, sensor_0019_digitalIn_PIR);
+                l_ezlopi_item_t *item = ezlopi_device_add_item_to_device(device, sensor_0019_digitalIn_PIR);
                 if (item)
                 {
                     sensor_pir_setup_item_properties_v3(item, cj_device);
                 }
                 else
                 {
-                    EZPI_core_device_free_device(device);
+                    ezlopi_device_free_device(device);
                     ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                 }
             }
@@ -177,7 +177,7 @@ static void sensor_pir_setup_item_properties_v3(l_ezlopi_item_t *item, cJSON *cj
     item->cloud_properties.item_name = ezlopi_item_name_motion;
     item->cloud_properties.value_type = value_type_bool;
     item->cloud_properties.show = true;
-    item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
+    item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type);
 

@@ -135,7 +135,7 @@ static ezlopi_error_t __notify(l_ezlopi_item_t *item)
         if (strcmp(turbidity_sensor_state, tmp_sensor_state) != 0)
         {
             memcpy(turbidity_sensor_state, tmp_sensor_state, (40 * sizeof(char)));
-            EZPI_core_device_value_updated_from_device_broadcast(item);
+            ezlopi_device_value_updated_from_device_broadcast(item);
             ret = EZPI_SUCCESS;
         }
     }
@@ -193,7 +193,7 @@ static void __prepare_item_properties(l_ezlopi_item_t *item, cJSON *cj_device, v
     item->cloud_properties.value_type = value_type_token;
     item->cloud_properties.scale = NULL;
     item->cloud_properties.show = true;
-    item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
+    item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
     item->interface_type = EZLOPI_DEVICE_INTERFACE_ANALOG_INPUT;
     item->interface.adc.resln_bit = 3;
@@ -210,11 +210,11 @@ static ezlopi_error_t __prepare(void *arg)
 
     if (prep_arg && prep_arg->cjson_device)
     {
-        l_ezlopi_device_t *device = EZPI_core_device_add_device(prep_arg->cjson_device, NULL);
+        l_ezlopi_device_t *device = ezlopi_device_add_device(prep_arg->cjson_device, NULL);
         if (device)
         {
             __prepare_device_cloud_properties(device, prep_arg->cjson_device);
-            l_ezlopi_item_t *item_turbidity = EZPI_core_device_add_item_to_device(device, sensor_0033_ADC_turbidity);
+            l_ezlopi_item_t *item_turbidity = ezlopi_device_add_item_to_device(device, sensor_0033_ADC_turbidity);
             if (item_turbidity)
             {
                 char *turbidity_sensor_states = (char *)ezlopi_malloc(__FUNCTION__, 40 * sizeof(char));
@@ -227,7 +227,7 @@ static ezlopi_error_t __prepare(void *arg)
             }
             else
             {
-                EZPI_core_device_free_device(device);
+                ezlopi_device_free_device(device);
             }
         }
     }

@@ -27,9 +27,9 @@ esp_err_t ld2410_setup(s_ezlopi_uart_t uart_settings)
     return ESP_FAIL;
 }
 
-esp_err_t ld2410_set_template(ld2410_template_t template, ld2410_settings_t *p_settings)
+esp_err_t ld2410_set_template(ld2410_template_t template, ld2410_settings_t* p_settings)
 {
-    // esp_err_t ret = ESP_OK;
+    esp_err_t ret = ESP_OK;
 
     ld2410_settings_t settings = {
         .max_still_distance = DISTANCE_600CM,
@@ -188,7 +188,7 @@ esp_err_t ld2410_set_template(ld2410_template_t template, ld2410_settings_t *p_s
     return ESP_OK;
 }
 
-esp_err_t ld2410_get_data(ld2410_outputs_t *output)
+esp_err_t ld2410_get_data(ld2410_outputs_t* output)
 {
     if (NULL == output)
     {

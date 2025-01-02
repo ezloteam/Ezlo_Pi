@@ -35,23 +35,19 @@ extern "C"
 #define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
 #endif
 
-#ifdef CONFIG_EZPI_OPENTELEMETRY_ENABLE_LOGS
-    typedef ezlopi_error_t (*f_ezlopi_log_upcall_t)(int severity_level, const char *log_str);
-    typedef int (*f_otel_log_upcall_t)(uint8_t severity, const char *file, uint32_t line, char *log);
+    typedef ezlopi_error_t(*f_ezlopi_log_upcall_t)(int severity_level, const char* log_str);
+    typedef int (*f_otel_log_upcall_t)(uint8_t severity, const char* file, uint32_t line, char* log);
 
     void ezlopi_util_set_otel_log_upcall(f_otel_log_upcall_t __log_upcall, uint32_t max_log_len);
-    void ezlopi_util_log_otel(uint8_t severity, const char *file, int line, const char *format, ...);
+    void ezlopi_util_log_otel(uint8_t severity, const char* file, int line, const char* format, ...);
 
 #define TRACE_OTEL(severity, format, reg...) ezlopi_util_log_otel(severity, __FILENAME__, __LINE__, format, ##reg)
-#else // CONFIG_EZPI_OPENTELEMETRY_ENABLE_LOGS
-#define TRACE_OTEL(severity, format, reg...)
-#endif
 
 #if (1 == ENABLE_TRACE)
 
-    void trace_otel(uint8_t severity, const char *file, int line, const char *format, ...);
-    void trace_color_print(const char *txt_color, uint8_t severity, const char *file, int line, const char *format, ...);
-    void __dump(const char *file_name, uint32_t line, char *buffer_name, void *_buff, uint32_t ofs, uint32_t cnt);
+    void trace_otel(uint8_t severity, const char* file, int line, const char* format, ...);
+    void trace_color_print(const char* txt_color, uint8_t severity, const char* file, int line, const char* format, ...);
+    void __dump(const char* file_name, uint32_t line, char* buffer_name, void* _buff, uint32_t ofs, uint32_t cnt);
 
 #define COLOR_FONT_BLACK "30"
 #define COLOR_FONT_RED "31"
@@ -71,7 +67,7 @@ extern "C"
 #define COLOR_BG_CYAN "46"
 #define COLOR_BG_WHITE "47"
 
-    typedef ezlopi_error_t (*f_ezlopi_log_upcall_t)(int severity_level, const char *log_str);
+    typedef ezlopi_error_t(*f_ezlopi_log_upcall_t)(int severity_level, const char* log_str);
 
 #define trace_color(txt_color, X, reg...)                                                   \
     {                                                                                       \

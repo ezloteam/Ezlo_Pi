@@ -1,64 +1,26 @@
-/* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
-**
-** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
-**
-** Redistribution and use in source and binary forms, with or without
-** modification, are permitted provided that the following conditions are met:
-**
-** 1. Redistributions of source code must retain the above copyright notice,
-**    this list of conditions and the following disclaimer.
-** 2. Redistributions in binary form must reproduce the above copyright
-**    notice, this list of conditions and the following disclaimer in the
-**    documentation and/or other materials provided with the distribution.
-** 3. Neither the name of the copyright holder nor the names of its
-**    contributors may be used to endorse or promote products derived from
-**    this software without specific prior written permission.
-**
-** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
-** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-** POSSIBILITY OF SUCH DAMAGE.
-** ===========================================================================
-*/
-/**
- * @file    ping_sock.h
- * @brief   Function to perfrom operations on ping-socket
- * @author  xx
- * @version 0.1
- * @date    12th DEC 2024
-*/
+// Copyright 2019 Espressif Systems (Shanghai) PTE LTD
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
-#ifndef _PING_SOCK_H_
-#define _PING_SOCK_H_
-
-/*******************************************************************************
-*                          Include Files
-*******************************************************************************/
 #pragma once
 
-/*******************************************************************************
-*                          C++ Declaration Wrapper
-*******************************************************************************/
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
-
 
 #include <stdint.h>
 #include "esp_err.h"
 #include "lwip/ip_addr.h"
-    /*******************************************************************************
-    *                          Type & Macro Declarations
-    *******************************************************************************/
 
     /**
     * @brief Type of "ping" session handle
@@ -149,14 +111,6 @@ extern "C"
         ESP_PING_PROF_DURATION /*!< Elapsed time of the whole ping session */
     } esp_ping_profile_t;
 
-    /*******************************************************************************
-    *                          Extern Data Declarations
-    *******************************************************************************/
-
-    /*******************************************************************************
-    *                          Extern Function Prototypes
-    *******************************************************************************/
-
     /**
      * @brief Create a ping session
      *
@@ -169,7 +123,17 @@ extern "C"
      *      - ESP_FAIL: other internal error (e.g. socket error)
      *      - ESP_OK: create ping session successfully, user can take the ping handle to do follow-on jobs
      */
-    esp_err_t EZPI_ping_new_session(const ezlopi_ping_config_t *config, const ezlopi_ping_callbacks_t *cbs, esp_ping_handle_t *hdl_out);
+    esp_err_t ezlopi_ping_new_session(const ezlopi_ping_config_t *config, const ezlopi_ping_callbacks_t *cbs, esp_ping_handle_t *hdl_out);
+
+    /**
+     * @brief Delete a ping session
+     *
+     * @param hdl handle of ping session
+     * @return
+     *      - ESP_ERR_INVALID_ARG: invalid parameters (e.g. ping handle is null, etc)
+     *      - ESP_OK: delete ping session successfully
+     */
+    esp_err_t ezlopi_ping_delete_session(esp_ping_handle_t hdl);
 
     /**
      * @brief Start the ping session
@@ -179,7 +143,17 @@ extern "C"
      *      - ESP_ERR_INVALID_ARG: invalid parameters (e.g. ping handle is null, etc)
      *      - ESP_OK: start ping session successfully
      */
-    esp_err_t EZPI_ping_start_by_handle(esp_ping_handle_t hdl);
+    esp_err_t ezlopi_ping_start_by_handle(esp_ping_handle_t hdl);
+
+    /**
+     * @brief Stop the ping session
+     *
+     * @param hdl handle of ping session
+     * @return
+     *      - ESP_ERR_INVALID_ARG: invalid parameters (e.g. ping handle is null, etc)
+     *      - ESP_OK: stop ping session successfully
+     */
+    esp_err_t ezlopi_ping_stop_by_handle(esp_ping_handle_t hdl);
 
     /**
      * @brief Get runtime profile of ping session
@@ -193,35 +167,8 @@ extern "C"
      *      - ESP_ERR_INVALID_SIZE: the actual profile data size doesn't match the "size" parameter
      *      - ESP_OK: get profile successfully
      */
-    esp_err_t EZPI_ping_get_profile(esp_ping_handle_t hdl, esp_ping_profile_t profile, void *data, uint32_t size);
-
-    /**
-    * @brief Delete a ping session
-    *
-    * @param hdl handle of ping session
-    * @return
-    *      - ESP_ERR_INVALID_ARG: invalid parameters (e.g. ping handle is null, etc)
-    *      - ESP_OK: delete ping session successfully
-    */
-    esp_err_t EZPI_ping_delete_session(esp_ping_handle_t hdl);
-
-    /**
-     * @brief Stop the ping session
-     *
-     * @param hdl handle of ping session
-     * @return
-     *      - ESP_ERR_INVALID_ARG: invalid parameters (e.g. ping handle is null, etc)
-     *      - ESP_OK: stop ping session successfully
-     */
-    esp_err_t EZPI_ping_stop_by_handle(esp_ping_handle_t hdl);
-
+    esp_err_t ezlopi_ping_get_profile(esp_ping_handle_t hdl, esp_ping_profile_t profile, void *data, uint32_t size);
 
 #ifdef __cplusplus
 }
 #endif
-
-#endif // _PING_SOCK_H_
-
-/*******************************************************************************
-*                          End of File
-*******************************************************************************/
