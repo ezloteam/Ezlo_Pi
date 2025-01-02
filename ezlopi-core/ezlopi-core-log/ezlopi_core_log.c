@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    ezlopi_core_log.c
-* @brief   Function operaters on system-logs
-* @author  xx
-* @version 0.1
-* @date    12th DEC 2024
-*/
+ * @file    ezlopi_core_log.c
+ * @brief   Function operaters on system-logs
+ * @author  xx
+ * @version 0.1
+ * @date    12th DEC 2024
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_UTIL_TRACE_EN
@@ -62,45 +62,44 @@
 #include "ezlopi_core_log.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static ezlopi_error_t ezlopi_hub_cloud_log_set_severity(const char *severity_str);
 static ezlopi_error_t ezlopi_hub_serial_log_set_severity(const char *severity_str);
 static ezlopi_error_t EZPI_core_serial_log_upcall(int severity, const char *log_str);
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 static e_trace_severity_t cloud_log_severity = ENUM_EZLOPI_TRACE_SEVERITY_WARNING;
 static e_trace_severity_t serial_log_severity = ENUM_EZLOPI_TRACE_SEVERITY_MAX;
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 const char *ezlopi_log_severity_enum[ENUM_EZLOPI_TRACE_SEVERITY_MAX] = {
     "NONE",
     "ERROR",
     "WARNING",
     "INFO",
     "DEBUG",
-    "TRACE"
-};
+    "TRACE"};
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 void EZPI_core_read_set_log_severities_internal(e_trace_severity_t severity)
 {
     serial_log_severity = severity;
@@ -223,7 +222,7 @@ ezlopi_error_t EZPI_core_send_cloud_log(int severity, const char *log_str)
                 cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_log_broadcast, ezlopi_result_str);
                 if (cj_result)
                 {
-                    uint64_t timestamp = EZPI_core_sntp_get_current_time_sec();
+                    time_t timestamp = EZPI_core_sntp_get_current_time_sec();
 
                     char timestamp_str[64];
 
@@ -240,7 +239,7 @@ ezlopi_error_t EZPI_core_send_cloud_log(int severity, const char *log_str)
                     memset(severity_str, 0, 10);
                     snprintf(severity_str, 10, "%s", ezlopi_log_severity_enum[severity]);
                     cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_severity_str, severity_str);
-                    if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_log_broadcast))
+                    if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_log_broadcast, timestamp))
                     {
                         cJSON_Delete(__FUNCTION__, cj_log_broadcast);
                     }
@@ -258,8 +257,8 @@ void EZPI_core_set_log_upcalls()
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 static ezlopi_error_t ezlopi_hub_cloud_log_set_severity(const char *severity_str)
 {
     ezlopi_error_t ret = EZPI_FAILED;
@@ -317,5 +316,5 @@ static ezlopi_error_t EZPI_core_serial_log_upcall(int severity, const char *log_
 #endif // CONFIG_EZPI_UTIL_TRACE_EN
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

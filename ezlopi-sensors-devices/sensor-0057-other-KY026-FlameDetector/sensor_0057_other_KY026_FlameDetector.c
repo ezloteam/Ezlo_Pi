@@ -1,11 +1,48 @@
-#include "ezlopi_util_trace.h"
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+/**
+ * @file    sensor_0057_other_KY026_FlameDetector.c
+ * @brief   perform some function on sensor_0057
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+ */
 
-// #include "ezlopi_core_timer.h"
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
-#include "ezlopi_core_errors.h"
 
 #include "ezlopi_hal_adc.h"
 
@@ -15,14 +52,21 @@
 #include "sensor_0057_other_KY026_FlameDetector.h"
 #include "EZLOPI_USER_CONFIG.h"
 
-//------------------------------------------------------------------------------
-const char *ky206_sensor_heat_alarm_token[] = {
-    "heat_ok",
-    "overheat_detected",
-    "under_heat_detected",
-    "unknown",
-};
-//------------------------------------------------------------------------------
+/*******************************************************************************
+ *                          Extern Data Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Type & Macro Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static ezlopi_error_t __0057_prepare(void *arg);
 static ezlopi_error_t __0057_init(l_ezlopi_item_t *item);
 static ezlopi_error_t __0057_get_item(l_ezlopi_item_t *item, void *arg);
@@ -34,9 +78,19 @@ static void __prepare_item_digi_cloud_properties(l_ezlopi_item_t *item, cJSON *c
 static void __prepare_device_adc_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
 static void __prepare_item_adc_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_data);
 static void __extract_KY026_sensor_value(uint32_t flame_adc_pin, float *analog_sensor_volt, float *max_reading);
-//----------------------------------------------------------------------------------------------------------------
 
-ezlopi_error_t sensor_0057_other_KY026_FlameDetector(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+/*******************************************************************************
+ *                          Static Data Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Data Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Definitions
+ *******************************************************************************/
+ezlopi_error_t SENSOR_0057_other_ky026_flamedetector(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
     switch (action)
@@ -74,7 +128,10 @@ ezlopi_error_t sensor_0057_other_KY026_FlameDetector(e_ezlopi_actions_t action, 
     return ret;
 }
 
-//----------------------------------------------------
+/*******************************************************************************
+ *                         Static Function Definitions
+ *******************************************************************************/
+
 static ezlopi_error_t __0057_prepare(void *arg)
 {
     ezlopi_error_t ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
@@ -87,7 +144,7 @@ static ezlopi_error_t __0057_prepare(void *arg)
         {
             TRACE_I("Parent_flame_device_digi-[0x%x] ", flame_device_parent_digi->cloud_properties.device_id);
             __prepare_device_digi_cloud_properties(flame_device_parent_digi, device_prep_arg->cjson_device);
-            l_ezlopi_item_t *flame_item_digi = EZPI_core_device_add_item_to_device(flame_device_parent_digi, sensor_0057_other_KY026_FlameDetector);
+            l_ezlopi_item_t *flame_item_digi = EZPI_core_device_add_item_to_device(flame_device_parent_digi, SENSOR_0057_other_ky026_flamedetector);
             if (flame_item_digi)
             {
                 flame_item_digi->cloud_properties.device_id = flame_device_parent_digi->cloud_properties.device_id;
@@ -106,28 +163,23 @@ static ezlopi_error_t __0057_prepare(void *arg)
                     TRACE_I("Child_flame_device_adc-[0x%x] ", flame_device_child_adc->cloud_properties.device_id);
                     __prepare_device_adc_cloud_properties(flame_device_child_adc, device_prep_arg->cjson_device);
 
-                    l_ezlopi_item_t *flame_item_adc = EZPI_core_device_add_item_to_device(flame_device_child_adc, sensor_0057_other_KY026_FlameDetector);
+                    l_ezlopi_item_t *flame_item_adc = EZPI_core_device_add_item_to_device(flame_device_child_adc, SENSOR_0057_other_ky026_flamedetector);
                     if (flame_item_adc)
                     {
                         flame_item_adc->cloud_properties.device_id = flame_device_child_adc->cloud_properties.device_id;
                         __prepare_item_adc_cloud_properties(flame_item_adc, device_prep_arg->cjson_device, flame_struct);
+                        ret = EZPI_SUCCESS;
                     }
                     else
                     {
-                        ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                         EZPI_core_device_free_device(flame_device_child_adc);
                         ezlopi_free(__FUNCTION__, flame_struct);
                     }
                 }
                 else
                 {
-                    ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                     ezlopi_free(__FUNCTION__, flame_struct);
                 }
-            }
-            else
-            {
-                ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
             }
         }
     }
@@ -149,7 +201,7 @@ static ezlopi_error_t __0057_init(l_ezlopi_item_t *item)
                 input_conf.mode = GPIO_MODE_INPUT;
                 input_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
                 input_conf.pull_up_en = GPIO_PULLUP_ENABLE;
-                ret = (0 == gpio_config(&input_conf)) ? EZPI_ERR_INIT_DEVICE_FAILED : ret;
+                ret = (0 == gpio_config(&input_conf)) ? EZPI_SUCCESS : EZPI_ERR_INIT_DEVICE_FAILED;
             }
         }
         else if (ezlopi_item_name_temperature_changes == item->cloud_properties.item_name)
@@ -159,23 +211,11 @@ static ezlopi_error_t __0057_init(l_ezlopi_item_t *item)
             {
                 if (GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
                 { // initialize analog_pin
-                    if (EZPI_SUCCESS == ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
+                    if (EZPI_SUCCESS == EZPI_hal_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
                     {
                         ret = EZPI_SUCCESS;
                     }
-                    else
-                    {
-                        ret = EZPI_ERR_INIT_DEVICE_FAILED;
-                    }
                 }
-                else
-                {
-                    ret = EZPI_ERR_INIT_DEVICE_FAILED;
-                }
-            }
-            else
-            {
-                ret = EZPI_ERR_INIT_DEVICE_FAILED;
             }
         }
     }
@@ -250,6 +290,12 @@ static ezlopi_error_t __0057_get_item(l_ezlopi_item_t *item, void *arg)
                 cJSON *json_array_enum = cJSON_CreateArray(__FUNCTION__);
                 if (NULL != json_array_enum)
                 {
+                    char *ky206_sensor_heat_alarm_token[] = {
+                        "heat_ok",
+                        "overheat_detected",
+                        "under_heat_detected",
+                        "unknown",
+                    };
                     for (uint8_t i = 0; i < KY206_HEAT_ALARM_MAX; i++)
                     {
                         cJSON *json_value = cJSON_CreateString(__FUNCTION__, ky206_sensor_heat_alarm_token[i]);
@@ -261,8 +307,8 @@ static ezlopi_error_t __0057_get_item(l_ezlopi_item_t *item, void *arg)
                     cJSON_AddItemToObject(__FUNCTION__, cj_result, ezlopi_enum_str, json_array_enum);
                 }
                 //--------------------------------------------------------------------------------------
-                cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, (char *)item->user_arg ? item->user_arg : ky206_sensor_heat_alarm_token[0]);
-                cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, (char *)item->user_arg ? item->user_arg : ky206_sensor_heat_alarm_token[0]);
+                cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, (char *)item->user_arg ? item->user_arg : "heat_ok");
+                cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, (char *)item->user_arg ? item->user_arg : "heat_ok");
             }
             else if (ezlopi_item_name_temperature_changes == item->cloud_properties.item_name)
             {
@@ -288,8 +334,8 @@ static ezlopi_error_t __0057_get_cjson_value(l_ezlopi_item_t *item, void *arg)
         {
             if (ezlopi_item_name_heat_alarm == item->cloud_properties.item_name)
             {
-                cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, (char *)item->user_arg ? item->user_arg : ky206_sensor_heat_alarm_token[0]);
-                cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, (char *)item->user_arg ? item->user_arg : ky206_sensor_heat_alarm_token[0]);
+                cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, (char *)item->user_arg ? item->user_arg : "heat_ok");
+                cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, (char *)item->user_arg ? item->user_arg : "heat_ok");
             }
             else if (ezlopi_item_name_temperature_changes == item->cloud_properties.item_name)
             {
@@ -312,10 +358,10 @@ static ezlopi_error_t __0057_notify(l_ezlopi_item_t *item)
     {
         if (ezlopi_item_name_heat_alarm == item->cloud_properties.item_name)
         {
-            const char *curret_value = NULL;
+            char *curret_value = NULL;
             if (0 == gpio_get_level(item->interface.gpio.gpio_in.gpio_num)) // when D0 -> 0V,
             {
-                curret_value = ky206_sensor_heat_alarm_token[0];
+                curret_value = "heat_ok";
             }
             else
             {
@@ -353,12 +399,12 @@ static void __extract_KY026_sensor_value(uint32_t flame_adc_pin, float *analog_s
 {
     static float max = 0;
     // calculation process
-    s_ezlopi_analog_data_t ezlopi_analog_data = { .value = 0, .voltage = 0 };
+    s_ezlopi_analog_data_t ezlopi_analog_data = {.value = 0, .voltage = 0};
     //-------------------------------------------------
     // extract the mean_sensor_analog_output_voltage
     for (uint8_t x = 10; x > 0; x--)
     {
-        ezlopi_adc_get_adc_data(flame_adc_pin, &ezlopi_analog_data);
+        EZPI_hal_adc_get_adc_data(flame_adc_pin, &ezlopi_analog_data);
 #ifdef VOLTAGE_DIVIDER_ADDED
         *analog_sensor_volt += ((float)((ezlopi_analog_data.voltage) / 1000.0f) * 2.0f); // V
 #else
@@ -376,4 +422,6 @@ static void __extract_KY026_sensor_value(uint32_t flame_adc_pin, float *analog_s
     *max_reading = max;
 }
 
-//--------------------------------------------------------------------------------------------------------------------------------------
+/*******************************************************************************
+ *                          End of File
+ *******************************************************************************/

@@ -1,13 +1,51 @@
-#include <math.h>
-#include "ezlopi_util_trace.h"
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+/**
+* @file    sensor_0012_I2C_BME280.c
+* @brief   perform some function on sensor_0012
+* @author  xx
+* @version 0.1
+* @date    xx
+*/
 
-// #include "ezlopi_core_timer.h"
+/*******************************************************************************
+*                          Include Files
+*******************************************************************************/
+#include <math.h>
+
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
 #include "ezlopi_core_setting_commands.h"
-#include "ezlopi_core_errors.h"
 
 #include "ezlopi_hal_i2c_master.h"
 
@@ -17,6 +55,17 @@
 #include "sensor_0012_I2C_BME280.h"
 #include "EZLOPI_USER_CONFIG.h"
 
+/*******************************************************************************
+*                          Extern Data Declarations
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Extern Function Declarations
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Type & Macro Definitions
+*******************************************************************************/
 typedef struct s_ezlopi_bmp280
 {
     float pressure;
@@ -27,6 +76,9 @@ typedef struct s_ezlopi_bmp280
 
 } s_ezlopi_bmp280_t;
 
+/*******************************************************************************
+*                          Static Function Prototypes
+*******************************************************************************/
 static void __prepare_item_humidity_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_arg);
 static void __prepare_item_pressure_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_arg);
 static void __prepare_item_temperature_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_arg);
@@ -38,14 +90,19 @@ static ezlopi_error_t __notify(l_ezlopi_item_t *item);
 static ezlopi_error_t __prepare(void *arg);
 static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg);
 
-/**
- * @brief Public function to interface bme280. This is used to handles all the action on the bme280 sensor and is the entry point to interface the sensor.
- *
- * @param action e_ezlopi_actions_t
- * @param arg Other arguments if needed
- * @return ezlopi_error_t
- */
-ezlopi_error_t sensor_0012_I2C_BME280(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+/*******************************************************************************
+*                          Static Data Definitions
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Extern Data Definitions
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Extern Function Definitions
+*******************************************************************************/
+
+ezlopi_error_t SENSOR_0012_i2c_bme280(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
     switch (action)
@@ -79,6 +136,10 @@ ezlopi_error_t sensor_0012_I2C_BME280(e_ezlopi_actions_t action, l_ezlopi_item_t
     return ret;
 }
 
+/*******************************************************************************
+*                         Static Function Definitions
+*******************************************************************************/
+
 static bool check_double_val_equal(double first, double second)
 {
     bool ret = true;
@@ -94,6 +155,7 @@ static bool check_double_val_equal(double first, double second)
     }
     return ret;
 }
+
 static ezlopi_error_t __notify(l_ezlopi_item_t *item)
 {
     ezlopi_error_t ret = EZPI_FAILED;
@@ -180,7 +242,7 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
         {
             if (item->interface.i2c_master.enable)
             {
-                ezlopi_i2c_master_init(&item->interface.i2c_master);
+                EZPI_hal_i2c_master_init(&item->interface.i2c_master);
                 bmp280_init_default_params(&bmp280_sensor_params->bmp280_params);
                 bmp280_init(&bmp280_sensor_params->bmp280_dev, &bmp280_sensor_params->bmp280_params, &item->interface.i2c_master);
                 bmp280_read_float(&item->interface.i2c_master, &bmp280_sensor_params->bmp280_dev, &bmp280_sensor_params->temperature, &bmp280_sensor_params->pressure, &bmp280_sensor_params->humidity);
@@ -194,7 +256,7 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
 
 static ezlopi_error_t __prepare(void *arg)
 {
-    ezlopi_error_t ret = EZPI_SUCCESS;
+    ezlopi_error_t ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
 
     s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
     if (prep_arg && prep_arg->cjson_device)
@@ -210,13 +272,13 @@ static ezlopi_error_t __prepare(void *arg)
                 __prepare_device_cloud_properties_parent_temp_humid(parent_temp_humid_device, prep_arg->cjson_device);
 
                 //------------------------------------------------------------------------
-                l_ezlopi_item_t *temperature_item = EZPI_core_device_add_item_to_device(parent_temp_humid_device, sensor_0012_I2C_BME280);
+                l_ezlopi_item_t *temperature_item = EZPI_core_device_add_item_to_device(parent_temp_humid_device, SENSOR_0012_i2c_bme280);
                 if (temperature_item)
                 {
                     __prepare_item_temperature_properties(temperature_item, prep_arg->cjson_device, (void *)bme280_sensor_params);
                 }
 
-                l_ezlopi_item_t *humidity_item = EZPI_core_device_add_item_to_device(parent_temp_humid_device, sensor_0012_I2C_BME280);
+                l_ezlopi_item_t *humidity_item = EZPI_core_device_add_item_to_device(parent_temp_humid_device, SENSOR_0012_i2c_bme280);
                 if (humidity_item)
                 {
                     __prepare_item_humidity_properties(humidity_item, prep_arg->cjson_device, (void *)bme280_sensor_params);
@@ -229,7 +291,7 @@ static ezlopi_error_t __prepare(void *arg)
                     TRACE_I("Child_pressure_device-[0x%x] ", child_pressure_device->cloud_properties.device_id);
                     __prepare_device_cloud_properties_child_pressure(child_pressure_device, prep_arg->cjson_device);
 
-                    l_ezlopi_item_t *pressure_item = EZPI_core_device_add_item_to_device(child_pressure_device, sensor_0012_I2C_BME280);
+                    l_ezlopi_item_t *pressure_item = EZPI_core_device_add_item_to_device(child_pressure_device, SENSOR_0012_i2c_bme280);
                     if (pressure_item)
                     {
                         __prepare_item_pressure_properties(pressure_item, prep_arg->cjson_device, (void *)bme280_sensor_params);
@@ -237,7 +299,6 @@ static ezlopi_error_t __prepare(void *arg)
                     else
                     {
                         EZPI_core_device_free_device(child_pressure_device);
-                        ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                     }
                 }
 
@@ -245,25 +306,19 @@ static ezlopi_error_t __prepare(void *arg)
                     (NULL == humidity_item) &&
                     (NULL == child_pressure_device))
                 {
-                    ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                     ezlopi_free(__FUNCTION__, bme280_sensor_params);
                     EZPI_core_device_free_device(parent_temp_humid_device);
+                }
+                else
+                {
+                    ret = EZPI_SUCCESS;
                 }
             }
             else
             {
-                ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                 ezlopi_free(__FUNCTION__, bme280_sensor_params);
             }
         }
-        else
-        {
-            ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
-        }
-    }
-    else
-    {
-        ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
     }
 
     return ret;
@@ -349,3 +404,7 @@ static void __prepare_item_pressure_properties(l_ezlopi_item_t *item, cJSON *cj_
     item->is_user_arg_unique = false;
     item->user_arg = user_arg;
 }
+
+/*******************************************************************************
+*                          End of File
+*******************************************************************************/

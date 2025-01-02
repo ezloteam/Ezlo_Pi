@@ -464,13 +464,13 @@ static int ezpi_service_uart_process_log_severity(const cJSON *root)
 {
     int ret = 0;
 
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
     int target = 0;
     int severity = 0;
 
     CJSON_GET_VALUE_DOUBLE(root, "target", target);
     CJSON_GET_VALUE_DOUBLE(root, ezlopi_severity_str, severity);
 
-#ifdef CONFIG_EZPI_UTIL_TRACE_EN
     if (0 == target)
     {
         // Call cloud log severity setter
@@ -610,7 +610,6 @@ static ezlopi_error_t ezpi_service_uart_process_provisioning_api(const cJSON *ro
 static int ezpi_service_uart_parser(const char *data)
 {
     cJSON *root = cJSON_ParseWithRef(__FUNCTION__, data);
-    // printf("HERE again\n");
 
     if (root)
     {
@@ -691,22 +690,50 @@ static void ezpi_service_uart_task(void *arg)
     static const char *RX_TASK_TAG = "RX_TASK";
     esp_log_level_set(RX_TASK_TAG, ESP_LOG_INFO);
 
-    uint8_t *data = (uint8_t *)ezlopi_malloc(__FUNCTION__, EZPI_SERV_UART_RX_BUFFER_SIZE);
-    memset(data, 0, EZPI_SERV_UART_RX_BUFFER_SIZE);
-
     while (1)
     {
-        int rxBytes = uart_read_bytes(EZPI_SERV_UART_NUM_DEFAULT, data, (EZPI_SERV_UART_RX_BUFFER_SIZE - 1), 1000 / portTICK_RATE_MS);
+        uint32_t tmp_len = 0;
+        uint32_t buffred_data_len = 0;
+        uart_get_buffered_data_len(EZPI_SERV_UART_NUM_DEFAULT, &tmp_len);
 
-        if (rxBytes > 0)
+        if (tmp_len > 0)
         {
-            data[rxBytes] = 0;
-            TRACE_I("%s", data);
-            ezpi_service_uart_parser((const char *)data);
+            while (tmp_len != buffred_data_len)
+            {
+                buffred_data_len = tmp_len;
+                vTaskDelay(10 / portTICK_RATE_MS);
+                uart_get_buffered_data_len(EZPI_SERV_UART_NUM_DEFAULT, &tmp_len);
+            }
+
+            if (buffred_data_len)
+            {
+                uint8_t *uart_rx_data = (uint8_t *)ezlopi_malloc(__FUNCTION__, buffred_data_len + 1);
+
+                if (uart_rx_data)
+                {
+                    memset(uart_rx_data, 0, buffred_data_len);
+
+                    int rxBytes = uart_read_bytes(EZPI_SERV_UART_NUM_DEFAULT, uart_rx_data, buffred_data_len, 1000 / portTICK_RATE_MS);
+
+                    if (rxBytes > 0)
+                    {
+                        uart_rx_data[rxBytes] = 0;
+                        TRACE_I("%s", uart_rx_data);
+                        ezpi_service_uart_parser((const char *)uart_rx_data);
+                    }
+
+                    ezlopi_free(__FUNCTION__, uart_rx_data);
+                }
+                else
+                {
+                    uart_flush_input(EZPI_SERV_UART_NUM_DEFAULT);
+                }
+            }
         }
+
+        vTaskDelay(100 / portTICK_RATE_MS);
     }
 
-    ezlopi_free(__FUNCTION__, data);
 #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
     EZPI_core_process_set_is_deleted(ENUM___uart_loop);
 #endif
@@ -774,7 +801,7 @@ static int ezpi_service_uart_device_status_info(cJSON *parent)
         EZPI_core_info_get_tick_to_time_name(time_string, sizeof(time_string), tick_count_ms);
 
         cJSON_AddStringToObject(__FUNCTION__, cj_device_state, ezlopi_uptime_str, time_string);
-        cJSON_AddNumberToObject(__FUNCTION__, cj_device_state, "boot_count", ezlopi_system_info_get_boot_count());
+        cJSON_AddNumberToObject(__FUNCTION__, cj_device_state, "boot_count", EZPI_hal_system_info_get_boot_count());
         cJSON_AddStringToObject(__FUNCTION__, cj_device_state, "boot_reason", EZPI_core_info_get_esp_reset_reason_to_name(esp_reset_reason()));
 
         cJSON_AddStringToObject(__FUNCTION__, cj_device_state, ezlopi_flash_size_str, CONFIG_ESPTOOLPY_FLASHSIZE);
@@ -1019,15 +1046,12 @@ static void ezpi_service_uart_set_wifi(const char *data)
                         }
                         else
                         {
-#warning "DO NOT user printf on production !";
                             TRACE_E("WiFi Connection to AP: %s failed !", ssid);
                             status = 0;
                         }
                     }
                     TRACE_W("Trying to connect to AP : %s, attempt %d ....", ssid, attempt);
-                    // printf("Trying to connect to AP : %s, attempt %d ....\n", ssid, attempt);
                     attempt++;
-                    // vTaskDelay(EZLOPI_WIFI_CONNECT_ATTEMPT_INTERVAL / portTICK_PERIOD_MS);
                 }
 
                 ezpi_service_uart_response(EZPI_UART_CMD_WIFI, status_write, status);
@@ -1035,7 +1059,6 @@ static void ezpi_service_uart_set_wifi(const char *data)
             else
             {
                 TRACE_E("Invalid WiFi SSID or Password, aborting!");
-                // printf("Invalid WiFi SSID or Password, aborting! \n");
                 ezpi_service_uart_response(EZPI_UART_CMD_WIFI, status_write, status);
             }
         }
@@ -1137,31 +1160,31 @@ static void ezpi_service_uart_set_config(const char *data)
 
 static void ezpi_service_uart_get_config(void)
 {
-    cJSON *root = NULL;
+    cJSON *cj_root = NULL;
 
     char *current_config = EZPI_core_factory_info_v3_get_ezlopi_config();
 
     if (current_config)
     {
         // TRACE_D("current_config[len: %d]: %s", strlen(current_config), current_config);
-        root = cJSON_Parse(__FUNCTION__, current_config);
+        cj_root = cJSON_Parse(__FUNCTION__, current_config);
 
-        if (root)
+        if (cj_root)
         {
-            cJSON_DeleteItemFromObject(__FUNCTION__, root, ezlopi_cmd_str);
+            cJSON_DeleteItemFromObject(__FUNCTION__, cj_root, ezlopi_cmd_str);
 
-            // cJSON* device_total = cJSON_GetObjectItem(__FUNCTION__, root, "dev_total");
+            // cJSON* device_total = cJSON_GetObjectItem(__FUNCTION__, cj_root, "dev_total");
             // if (device_total)
             // {
             //     if (cJSON_IsNumber(device_total))
             //     {
-            //         cJSON_DeleteItemFromObject(__FUNCTION__, root, "dev_total");
+            //         cJSON_DeleteItemFromObject(__FUNCTION__, cj_root, "dev_total");
             //     }
             //     cJSON_Delete(__FUNCTION__, device_total);
             // }
 
-            cJSON_AddNumberToObject(__FUNCTION__, root, ezlopi_cmd_str, EZPI_UART_CMD_GET_CONFIG);
-            cJSON_AddNumberToObject(__FUNCTION__, root, ezlopi_status_str, EZPI_UART_CMD_STATUS_SUCCESS);
+            cJSON_AddNumberToObject(__FUNCTION__, cj_root, ezlopi_cmd_str, EZPI_UART_CMD_GET_CONFIG);
+            cJSON_AddNumberToObject(__FUNCTION__, cj_root, ezlopi_status_str, EZPI_UART_CMD_STATUS_SUCCESS);
         }
         ezlopi_free(__FUNCTION__, current_config);
     }
@@ -1172,31 +1195,32 @@ static void ezpi_service_uart_get_config(void)
         TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_ERROR, "UART: 'current-config' is null!");
     }
 
-    if (NULL == root)
+    if (NULL == cj_root)
     {
         TRACE_E("Reading config failed!");
-        root = cJSON_CreateObject(__FUNCTION__);
-        if (root)
+        cj_root = cJSON_CreateObject(__FUNCTION__);
+        if (cj_root)
         {
-            cJSON_AddNumberToObject(__FUNCTION__, root, ezlopi_cmd_str, EZPI_UART_CMD_GET_CONFIG);
-            cJSON_AddNumberToObject(__FUNCTION__, root, ezlopi_status_str, EZPI_UART_CMD_STATUS_FAIL);
+            cJSON_AddNumberToObject(__FUNCTION__, cj_root, ezlopi_cmd_str, EZPI_UART_CMD_GET_CONFIG);
+            cJSON_AddNumberToObject(__FUNCTION__, cj_root, ezlopi_status_str, EZPI_UART_CMD_STATUS_FAIL);
         }
         else
         {
-            TRACE_E("Failed to create 'root'!");
+            TRACE_E("Failed to create 'cj_root'!");
             TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_ERROR, "UART: config json parsing fialed!");
         }
     }
 
-    if (root)
+    if (cj_root)
     {
-        char *my_json_string = cJSON_Print(__FUNCTION__, root);
+        char *my_json_string = cJSON_Print(__FUNCTION__, cj_root);
+        cJSON_Delete(__FUNCTION__, cj_root); // free Json string
+
         TRACE_D("length of 'my_json_string': %d", strlen(my_json_string));
 
         if (my_json_string)
         {
             cJSON_Minify(my_json_string);
-            cJSON_Delete(__FUNCTION__, root); // free Json string
             const int len = strlen(my_json_string);
             EZPI_SERV_uart_tx_data(len, (uint8_t *)my_json_string); // Send the data over uart
             // TRACE_D("Sending: %s", my_json_string);

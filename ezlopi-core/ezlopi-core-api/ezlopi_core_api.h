@@ -34,44 +34,44 @@
  * @author  xx
  * @version 0.1
  * @date    12th DEC 2024
-*/
+ */
 #ifndef __EZLOPI_CORE_API_H__
 #define __EZLOPI_CORE_API_H__
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include <string.h>
 #include <stdio.h>
 #include <stdint.h>
 #include "cjext.h"
 
 /*******************************************************************************
-*                          C++ Declaration Wrapper
-*******************************************************************************/
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
     /*******************************************************************************
-    *                          Type & Macro Declarations
-    *******************************************************************************/
+     *                          Type & Macro Declarations
+     *******************************************************************************/
 
     /*******************************************************************************
-    *                          Extern Data Declarations
-    *******************************************************************************/
+     *                          Extern Data Declarations
+     *******************************************************************************/
 
     /*******************************************************************************
-    *                          Extern Function Prototypes
-    *******************************************************************************/
+     *                          Extern Function Prototypes
+     *******************************************************************************/
     /**
      * @brief Function to parse and process the incoming API-request
      *
      * @param cj_request Pointer to request cjson
      * @return CJSON *
      */
-    cJSON *EZPI_core_api_consume_cjson(const char *who, cJSON *cj_request);
+    cJSON *EZPI_core_api_consume_cjson(const char *who, cJSON *cj_request, time_t time_stamp);
     /**
      * @brief This function parses incoming payload message
      *
@@ -80,7 +80,7 @@ extern "C"
      * @param len Length of the payload
      * @return cJSON*
      */
-    cJSON *EZPI_core_api_consume(const char *who, const char *payload, uint32_t len);
+    cJSON *EZPI_core_api_consume(const char *who, const char *payload, uint32_t len, time_t time_stamp);
 
 #ifdef __cplusplus
 }
@@ -89,5 +89,5 @@ extern "C"
 #endif // __EZLOPI_CORE_API_H__
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

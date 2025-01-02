@@ -1,15 +1,53 @@
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+/**
+ * @file    sensor_0067_hilink_presence_sensor.c
+ * @brief   perform some function on sensor_0067
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+ */
+
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 #include <string.h>
 #include "../../build/config/sdkconfig.h"
-#include "ezlopi_util_trace.h"
-
 #include "ld2410.h"
-
 // #include "ezlopi_core_timer.h"
+// #include "ezlopi_core_errors.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
-#include "ezlopi_core_errors.h"
 
 #include "ezlopi_cloud_items.h"
 #include "ezlopi_cloud_constants.h"
@@ -18,6 +56,32 @@
 #include "hilink_presence_sensor_setting.h"
 #include "EZLOPI_USER_CONFIG.h"
 
+/*******************************************************************************
+ *                          Extern Data Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Type & Macro Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Static Function Prototypes
+ *******************************************************************************/
+
+static ezlopi_error_t __prepare(void *arg, void *user_arg);
+static ezlopi_error_t __init(l_ezlopi_item_t *item);
+static ezlopi_error_t __get_hub_item_value(l_ezlopi_item_t *item, void *args);
+static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *args);
+static ezlopi_error_t __notify(l_ezlopi_item_t *item);
+
+/*******************************************************************************
+ *                          Static Data Definitions
+ *******************************************************************************/
+#warning "NABIN ; Need to remove this global var";
 static const char *hilink_presence_sensor_motion_direction_enum[] = {
     "unknown",
     "no_motion",
@@ -29,13 +93,19 @@ static l_ezlopi_item_t *motion_item;
 static l_ezlopi_item_t *motion_direction_item;
 static l_ezlopi_item_t *distance_item;
 
-static ezlopi_error_t __prepare(void *arg, void *user_arg);
-static ezlopi_error_t __init(l_ezlopi_item_t *item);
-static ezlopi_error_t __get_hub_item_value(l_ezlopi_item_t *item, void *args);
-static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *args);
-static ezlopi_error_t __notify(l_ezlopi_item_t *item);
+/*******************************************************************************
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
-ezlopi_error_t sensor_0067_hilink_presence_sensor_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+/*******************************************************************************
+ *                          Extern Function Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                         Static Function Definitions
+ *******************************************************************************/
+
+ezlopi_error_t SENSOR_0067_hilink_presence_sensor_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
     switch (action)
@@ -109,7 +179,7 @@ static ezlopi_error_t __notify(l_ezlopi_item_t *item)
             present_hilink_data.moving_target_distance = 0;
         }
         // Check if the moving target is outside the minumum detectable range, if so, update to the cloud immediately.
-        if (hilink_presence_sensor_target_in_detectable_range(present_hilink_data.moving_target_distance))
+        if (HILINK_presence_sensor_target_in_detectable_range(present_hilink_data.moving_target_distance))
         {
             __notify_if_needed(hilink_data, &present_hilink_data);
             sec_count = 0;
@@ -229,7 +299,7 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
                 };
                 if (ESP_OK == ld2410_setup(uart_settings))
                 {
-                    ESP_ERROR_CHECK(hilink_presence_sensor_apply_settings());
+                    ESP_ERROR_CHECK(HILINK_presence_sensor_apply_settings());
                     ESP_ERROR_CHECK(ld2410_get_data(hilink_data));
                     ret = EZPI_SUCCESS;
                 }
@@ -325,11 +395,10 @@ static ezlopi_error_t __prepare(void *arg, void *user_arg)
             l_ezlopi_device_t *parent_hilink_device_motion = EZPI_core_device_add_device(prep_arg->cjson_device, "motion");
             if (parent_hilink_device_motion)
             {
-                ret = EZPI_SUCCESS;
                 TRACE_I("Parent_hilink_motion-[0x%x] ", parent_hilink_device_motion->cloud_properties.device_id);
                 __perare_device_cloud_properties(parent_hilink_device_motion);
 
-                motion_item = EZPI_core_device_add_item_to_device(parent_hilink_device_motion, sensor_0067_hilink_presence_sensor_v3);
+                motion_item = EZPI_core_device_add_item_to_device(parent_hilink_device_motion, SENSOR_0067_hilink_presence_sensor_v3);
                 if (motion_item)
                 {
                     __prepare_hilink_motion_item_cloud_properties(motion_item, prep_arg->cjson_device, (void *)hilink_data);
@@ -341,14 +410,13 @@ static ezlopi_error_t __prepare(void *arg, void *user_arg)
                     TRACE_I("child_hilink_device_direction-[0x%x] ", child_hilink_device_direction->cloud_properties.device_id);
                     __perare_device_cloud_properties(child_hilink_device_direction);
 
-                    motion_direction_item = EZPI_core_device_add_item_to_device(child_hilink_device_direction, sensor_0067_hilink_presence_sensor_v3);
+                    motion_direction_item = EZPI_core_device_add_item_to_device(child_hilink_device_direction, SENSOR_0067_hilink_presence_sensor_v3);
                     if (motion_direction_item)
                     {
                         __prepare_hilink_motion_direction_item_cloud_properties(motion_direction_item, prep_arg->cjson_device, (void *)hilink_data);
                     }
                     else
                     {
-                        ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                         EZPI_core_device_free_device(child_hilink_device_direction);
                     }
                 }
@@ -359,14 +427,13 @@ static ezlopi_error_t __prepare(void *arg, void *user_arg)
                     TRACE_I("child_hilink_device_distance-[0x%x] ", child_hilink_device_distance->cloud_properties.device_id);
                     __perare_device_cloud_properties(child_hilink_device_distance);
 
-                    distance_item = EZPI_core_device_add_item_to_device(child_hilink_device_distance, sensor_0067_hilink_presence_sensor_v3);
+                    distance_item = EZPI_core_device_add_item_to_device(child_hilink_device_distance, SENSOR_0067_hilink_presence_sensor_v3);
                     if (distance_item)
                     {
                         __prepare_hilink_distance_item_cloud_properties(distance_item, prep_arg->cjson_device, (void *)hilink_data);
                     }
                     else
                     {
-                        ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                         EZPI_core_device_free_device(child_hilink_device_distance);
                     }
                 }
@@ -377,24 +444,23 @@ static ezlopi_error_t __prepare(void *arg, void *user_arg)
                 {
                     EZPI_core_device_free_device(parent_hilink_device_motion);
                     ezlopi_free(__FUNCTION__, hilink_data);
-                    ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                 }
                 else
                 {
-                    ret = hilink_presence_sensor_initialize_settings(parent_hilink_device_motion);
+                    ret = EZPI_SUCCESS;
+                    ret = HILINK_presence_sensor_initialize_settings(parent_hilink_device_motion);
                 }
             }
             else
             {
                 EZPI_core_device_free_device(parent_hilink_device_motion);
                 ezlopi_free(__FUNCTION__, hilink_data);
-                ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
             }
-        }
-        else
-        {
-            ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
         }
     }
     return ret;
 }
+
+/*******************************************************************************
+ *                          End of File
+ *******************************************************************************/

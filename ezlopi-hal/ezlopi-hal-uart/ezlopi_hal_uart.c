@@ -1,4 +1,44 @@
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+/**
+* @file    ezlopi_hal_uart.c
+* @brief   perform some function on UART
+* @author  xx
+* @version 0.1
+* @date    xx
+*/
 
+/*******************************************************************************
+*                          Include Files
+*******************************************************************************/
 #include <string.h>
 
 #include "freertos/FreeRTOS.h"
@@ -17,10 +57,37 @@
 #include "ezlopi_hal_uart.h"
 #include "EZLOPI_USER_CONFIG.h"
 
+/*******************************************************************************
+*                          Extern Data Declarations
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Extern Function Declarations
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Type & Macro Definitions
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Static Function Prototypes
+*******************************************************************************/
 static void ezlopi_uart_channel_task(void *args);
 static ezlo_uart_channel_t get_available_channel();
 
-s_ezlopi_uart_object_handle_t ezlopi_uart_init(uint32_t baudrate, uint32_t tx, uint32_t rx, __uart_upcall upcall, void *arg)
+/*******************************************************************************
+*                          Static Data Definitions
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Extern Data Definitions
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Extern Function Definitions
+*******************************************************************************/
+
+s_ezlopi_uart_object_handle_t EZPI_hal_uart_init(uint32_t baudrate, uint32_t tx, uint32_t rx, __uart_upcall upcall, void *arg)
 {
     static QueueHandle_t ezlo_uart_channel_queue;
     s_ezlopi_uart_object_handle_t uart_object_handle = (struct s_ezlopi_uart_object *)ezlopi_malloc(__FUNCTION__, sizeof(struct s_ezlopi_uart_object));
@@ -78,6 +145,88 @@ s_ezlopi_uart_object_handle_t ezlopi_uart_init(uint32_t baudrate, uint32_t tx, u
 
     return uart_object_handle;
 }
+
+ezlo_uart_channel_t EZPI_hal_uart_get_channel(s_ezlopi_uart_object_handle_t ezlopi_uart_object_handle)
+{
+    return ezlopi_uart_object_handle->ezlopi_uart.channel;
+}
+
+void EZPI_uart_main_init(void)
+{
+    uint32_t baud = EZPI_SERV_UART_BAUD_DEFAULT;
+    uint32_t parity_val = EZPI_SERV_UART_PARITY_DEFAULT;
+    uint32_t start_bits = EZPI_SERV_UART_START_BIT_DEFAULT;
+    uint32_t stop_bits = EZPI_SERV_UART_STOP_BIT_DEFAULT;
+    uint32_t frame_size = EZPI_SERV_UART_FRAME_SIZE_DEFAULT;
+    uint32_t flow_control = EZPI_SERV_UART_FLOW_CTRL_DEFAULT;
+
+    if (EZPI_SUCCESS != EZPI_core_nvs_read_baud(&baud))
+    {
+        EZPI_core_nvs_write_baud(EZPI_SERV_UART_BAUD_DEFAULT);
+    }
+    vTaskDelay(1 / portTICK_RATE_MS);
+    if (EZPI_SUCCESS != EZPI_core_nvs_read_parity(&parity_val))
+    {
+        EZPI_core_nvs_write_parity(EZPI_SERV_UART_PARITY_DEFAULT);
+    }
+    vTaskDelay(1 / portTICK_RATE_MS);
+    if (EZPI_SUCCESS != EZPI_core_nvs_read_start_bits(&start_bits))
+    {
+        EZPI_core_nvs_write_start_bits(EZPI_SERV_UART_START_BIT_DEFAULT);
+    }
+    vTaskDelay(1 / portTICK_RATE_MS);
+    if (EZPI_SUCCESS != EZPI_core_nvs_read_stop_bits(&stop_bits))
+    {
+        EZPI_core_nvs_write_stop_bits(EZPI_SERV_UART_STOP_BIT_DEFAULT);
+    }
+    vTaskDelay(1 / portTICK_RATE_MS);
+    if (EZPI_SUCCESS != EZPI_core_nvs_read_frame_size(&frame_size))
+    {
+        EZPI_core_nvs_write_frame_size(EZPI_SERV_UART_FRAME_SIZE_DEFAULT);
+    }
+    vTaskDelay(1 / portTICK_RATE_MS);
+    if (EZPI_SUCCESS != EZPI_core_nvs_read_flow_control(&flow_control))
+    {
+        EZPI_core_nvs_write_flow_control(EZPI_SERV_UART_FLOW_CTRL_DEFAULT);
+    }
+    vTaskDelay(1 / portTICK_RATE_MS);
+    uart_word_length_t frame_size_val = EZPI_core_info_get_frame_size(frame_size);
+
+    char flw_ctrl_bffr[EZPI_UART_SERV_FLW_CTRL_STR_SIZE + 1];
+    EZPI_core_info_get_flow_ctrl_to_name(flow_control, flw_ctrl_bffr);
+
+    TRACE_I("Serial Configuration:");
+    TRACE_I("  Baud Rate: %d", baud);
+    TRACE_I("  Parity: %d", parity_val);
+    TRACE_I("  Start Bits: %d", start_bits);
+    TRACE_I("  Stop Bits: %d", stop_bits);
+    TRACE_I("  Frame Size: %d", frame_size);
+    TRACE_I("  Flow Control: %s", flw_ctrl_bffr);
+
+    vTaskDelay(10 / portTICK_RATE_MS);
+
+    const uart_config_t uart_config = {
+        .baud_rate = baud,
+        .data_bits = frame_size_val,
+        .parity = (uart_parity_t)parity_val,
+        .stop_bits = (uart_stop_bits_t)stop_bits,
+        .flow_ctrl = (uart_hw_flowcontrol_t)flow_control,
+        .source_clk = UART_SCLK_APB,
+    };
+
+    // Uninstall previous initialized drivers 
+    // uart_driver_delete(EZPI_SERV_UART_NUM_DEFAULT);
+    // vTaskDelay(10);
+    // We won't use a buffer for sending data.
+    uart_driver_install(EZPI_SERV_UART_NUM_DEFAULT, EZPI_SERV_UART_RX_BUFFER_SIZE, EZPI_SERV_UART_RX_BUFFER_SIZE, 0, NULL, 0);
+    vTaskDelay(10);
+    uart_param_config(EZPI_SERV_UART_NUM_DEFAULT, &uart_config);
+    uart_set_pin(EZPI_SERV_UART_NUM_DEFAULT, EZPI_SERV_UART_TXD_PIN, EZPI_SERV_UART_RXD_PIN, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
+}
+
+/*******************************************************************************
+*                         Static Function Definitions
+*******************************************************************************/
 
 static ezlo_uart_channel_t get_available_channel()
 {
@@ -151,80 +300,7 @@ static void ezlopi_uart_channel_task(void *args)
     }
 }
 
-ezlo_uart_channel_t ezlopi_uart_get_channel(s_ezlopi_uart_object_handle_t ezlopi_uart_object_handle)
-{
-    return ezlopi_uart_object_handle->ezlopi_uart.channel;
-}
 
-void EZPI_HAL_uart_init(void)
-{
-    uint32_t baud = EZPI_SERV_UART_BAUD_DEFAULT;
-    uint32_t parity_val = EZPI_SERV_UART_PARITY_DEFAULT;
-    uint32_t start_bits = EZPI_SERV_UART_START_BIT_DEFAULT;
-    uint32_t stop_bits = EZPI_SERV_UART_STOP_BIT_DEFAULT;
-    uint32_t frame_size = EZPI_SERV_UART_FRAME_SIZE_DEFAULT;
-    uint32_t flow_control = EZPI_SERV_UART_FLOW_CTRL_DEFAULT;
-
-    if (EZPI_SUCCESS != EZPI_core_nvs_read_baud(&baud))
-    {
-        EZPI_core_nvs_write_baud(EZPI_SERV_UART_BAUD_DEFAULT);
-    }
-    vTaskDelay(1 / portTICK_RATE_MS);
-    if (EZPI_SUCCESS != EZPI_core_nvs_read_parity(&parity_val))
-    {
-        EZPI_core_nvs_write_parity(EZPI_SERV_UART_PARITY_DEFAULT);
-    }
-    vTaskDelay(1 / portTICK_RATE_MS);
-    if (EZPI_SUCCESS != EZPI_core_nvs_read_start_bits(&start_bits))
-    {
-        EZPI_core_nvs_write_start_bits(EZPI_SERV_UART_START_BIT_DEFAULT);
-    }
-    vTaskDelay(1 / portTICK_RATE_MS);
-    if (EZPI_SUCCESS != EZPI_core_nvs_read_stop_bits(&stop_bits))
-    {
-        EZPI_core_nvs_write_stop_bits(EZPI_SERV_UART_STOP_BIT_DEFAULT);
-    }
-    vTaskDelay(1 / portTICK_RATE_MS);
-    if (EZPI_SUCCESS != EZPI_core_nvs_read_frame_size(&frame_size))
-    {
-        EZPI_core_nvs_write_frame_size(EZPI_SERV_UART_FRAME_SIZE_DEFAULT);
-    }
-    vTaskDelay(1 / portTICK_RATE_MS);
-    if (EZPI_SUCCESS != EZPI_core_nvs_read_flow_control(&flow_control))
-    {
-        EZPI_core_nvs_write_flow_control(EZPI_SERV_UART_FLOW_CTRL_DEFAULT);
-    }
-    vTaskDelay(1 / portTICK_RATE_MS);
-    uart_word_length_t frame_size_val = EZPI_core_info_get_frame_size(frame_size);
-
-    char flw_ctrl_bffr[EZPI_UART_SERV_FLW_CTRL_STR_SIZE + 1];
-    EZPI_core_info_get_flow_ctrl_to_name(flow_control, flw_ctrl_bffr);
-
-    TRACE_I("Serial Configuration:");
-    TRACE_I("  Baud Rate: %d", baud);
-    TRACE_I("  Parity: %d", parity_val);
-    TRACE_I("  Start Bits: %d", start_bits);
-    TRACE_I("  Stop Bits: %d", stop_bits);
-    TRACE_I("  Frame Size: %d", frame_size);
-    TRACE_I("  Flow Control: %s", flw_ctrl_bffr);
-
-    vTaskDelay(10 / portTICK_RATE_MS);
-
-    const uart_config_t uart_config = {
-        .baud_rate = baud,
-        .data_bits = frame_size_val,
-        .parity = (uart_parity_t)parity_val,
-        .stop_bits = (uart_stop_bits_t)stop_bits,
-        .flow_ctrl = (uart_hw_flowcontrol_t)flow_control,
-        .source_clk = UART_SCLK_APB,
-    };
-
-    // Uninstall previous initialized drivers 
-    // uart_driver_delete(EZPI_SERV_UART_NUM_DEFAULT);
-    // vTaskDelay(10);
-    // We won't use a buffer for sending data.
-    uart_driver_install(EZPI_SERV_UART_NUM_DEFAULT, EZPI_SERV_UART_RX_BUFFER_SIZE, EZPI_SERV_UART_RX_BUFFER_SIZE, 0, NULL, 0);
-    vTaskDelay(10);
-    uart_param_config(EZPI_SERV_UART_NUM_DEFAULT, &uart_config);
-    uart_set_pin(EZPI_SERV_UART_NUM_DEFAULT, EZPI_SERV_UART_TXD_PIN, EZPI_SERV_UART_RXD_PIN, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
-}
+/*******************************************************************************
+*                          End of File
+*******************************************************************************/

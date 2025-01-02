@@ -41,7 +41,7 @@
 #define __HUB_SETTINGS_H__
 
 #include <string.h>
-#include "cjext.h"
+// #include "cjext.h"
 
 #include "ezlopi_core_settings.h"
 #include "ezlopi_core_devices.h"

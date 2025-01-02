@@ -29,26 +29,27 @@
 ** ===========================================================================
 */
 /**
-* @file    ezlopi_core_modes.c
-* @brief   These function perform opertation on HouseModes
-* @author  xx
-* @version 0.1
-* @date    12th DEC 2024
-*/
+ * @file    ezlopi_core_modes.c
+ * @brief   These function perform opertation on HouseModes
+ * @author  xx
+ * @version 0.1
+ * @date    12th DEC 2024
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 // #include "ezlopi_util_trace.h"
 
 // #include "ezlopi_core_modes.h"
 // #include "ezlopi_core_errors.h"
 #include "ezlopi_core_nvs.h"
+#include "ezlopi_core_sntp.h"
+#include "ezlopi_core_devices.h"
+#include "ezlopi_core_broadcast.h"
+#include "ezlopi_core_api_methods.h"
 #include "ezlopi_core_modes_cjson.h"
 #include "ezlopi_core_cjson_macros.h"
-#include "ezlopi_core_devices.h"
-#include "ezlopi_core_api_methods.h"
-#include "ezlopi_core_broadcast.h"
 
 #include "ezlopi_cloud_devices.h"
 #include "ezlopi_cloud_constants.h"
@@ -59,34 +60,34 @@
 #if defined(CONFIG_EZPI_SERV_ENABLE_MODES)
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 static s_ezlopi_modes_t *sg_custom_modes = NULL;
 static s_house_modes_t *sg_current_house_mode = NULL;
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 
 s_ezlopi_modes_t *EZPI_core_modes_get_custom_modes(void)
 {
@@ -927,7 +928,7 @@ ezlopi_error_t EZPI_core_modes_set_unset_device_armed_status(cJSON *cj_device_ar
                                 // 2. CALL : "EZPI_device_updated" broadcast for devices: switced from [ armed --> disarmed ]
                                 EZPI_device_updated(cj_device_armed_broadcast, cj_response);
 
-                                if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_response))
+                                if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_response, EZPI_core_sntp_get_current_time_sec()))
                                 {
                                     // TRACE_E("freeing cj_response");
                                     cJSON_Delete(__func__, cj_response);
@@ -1006,10 +1007,10 @@ void EZPI_core_modes_init(void)
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 
 #endif // CONFIG_EZPI_SERV_ENABLE_MODES
-/*******************************************************************************
-*                          End of File
-*******************************************************************************/
+       /*******************************************************************************
+        *                          End of File
+        *******************************************************************************/

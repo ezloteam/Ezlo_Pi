@@ -34,38 +34,37 @@
  * @author  xx
  * @version 0.1
  * @date    12th DEC 2024
-*/
+ */
 
 #ifndef _EZLOPI_CORE_SCENES_STATUS_CHANGED_H_
 #define _EZLOPI_CORE_SCENES_STATUS_CHANGED_H_
 
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
-
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include "ezlopi_core_scenes_v2.h"
 
 /*******************************************************************************
-*                          C++ Declaration Wrapper
-*******************************************************************************/
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
     /*******************************************************************************
-    *                          Type & Macro Declarations
-    *******************************************************************************/
+     *                          Type & Macro Declarations
+     *******************************************************************************/
 
     /*******************************************************************************
-    *                          Extern Data Declarations
-    *******************************************************************************/
+     *                          Extern Data Declarations
+     *******************************************************************************/
 
     /*******************************************************************************
-    *                          Extern Function Prototypes
-    *******************************************************************************/
+     *                          Extern Function Prototypes
+     *******************************************************************************/
     /**
      * @brief This function returns 'scene_status' in string literal
      *
@@ -80,18 +79,16 @@ extern "C"
      * @param status_str The status to broadcast
      * @return int
      */
-    int EZPI_core_scenes_status_change_broadcast(l_scenes_list_v2_t *scene_node, const char *status_str);
+    int EZPI_core_scenes_status_change_broadcast(l_scenes_list_v2_t *scene_node, const char *status_str, time_t time_stamp);
 
 #ifdef __cplusplus
 }
 #endif
 
-
-#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+#endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 #endif // _EZLOPI_CORE_SCENES_STATUS_CHANGED_H_
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
-
+ *                          End of File
+ *******************************************************************************/

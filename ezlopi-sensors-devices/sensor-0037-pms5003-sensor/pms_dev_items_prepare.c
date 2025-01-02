@@ -1,17 +1,117 @@
-#include "esp_err.h"
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+/**
+* @file    pms_dev_items_prepare.c
+* @brief   perform some function to prepare 'pms_dev_items'
+* @author  xx
+* @version 0.1
+* @date    xx
+*/
 
-#include "ezlopi_util_trace.h"
+/*******************************************************************************
+*                          Include Files
+*******************************************************************************/
 
 #include "ezlopi_core_devices_list.h"
 #include "ezlopi_core_devices.h"
 #include "ezlopi_core_cjson_macros.h"
-#include "ezlopi_core_errors.h"
 
 #include "ezlopi_cloud_constants.h"
 
 #include "pms5003.h"
 #include "sensor_0037_pms5003_sensor.h"
 #include "EZLOPI_USER_CONFIG.h"
+
+/*******************************************************************************
+*                          Extern Data Declarations
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Extern Function Declarations
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Type & Macro Definitions
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Static Function Prototypes
+*******************************************************************************/
+static int __prepare_particulate_matter_particles_0_dot_3_um_device_and_items(cJSON *cj_properties, uint32_t *parent_id, void *user_arg);
+static int __prepare_particulate_matter_particles_0_dot_5_um_device_and_items(cJSON *cj_properties, uint32_t parent_id, void *user_arg);
+static int __prepare_particulate_matter_particles_1_um_device_and_items(cJSON *cj_properties, uint32_t parent_id, void *user_arg);
+static int __prepare_particulate_matter_particles_2_dot_5_um_device_and_items(cJSON *cj_properties, uint32_t parent_id, void *user_arg);
+static int __prepare_particulate_matter_particles_5_um_device_and_items(cJSON *cj_properties, uint32_t parent_id, void *user_arg);
+static int __prepare_particulate_matter_particles_10_um_device_and_items(cJSON *cj_properties, uint32_t parent_id, void *user_arg);
+static int __prepare_particulate_matter_standard_particles_1_um_device_and_items(cJSON *cj_properties, uint32_t parent_id, void *user_arg);
+static int __prepare_particulate_matter_standard_particles_2_dot_5_um_device_and_items(cJSON *cj_properties, uint32_t parent_id, void *user_arg);
+static int __prepare_particulate_matter_standard_particles_10_um_device_and_items(cJSON *cj_properties, uint32_t parent_id, void *user_arg);
+static int pms5003_set_pms_object_details(cJSON *cj_properties, s_pms5003_sensor_object *pms_object);
+/*******************************************************************************
+*                          Static Data Definitions
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Extern Data Definitions
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Extern Function Definitions
+*******************************************************************************/
+ezlopi_error_t PMS5003_sensor_prepare_devices_and_items(cJSON *cj_properties, uint32_t *parent_id)
+{
+    ezlopi_error_t ret = EZPI_FAILED;
+
+    s_pms5003_sensor_object *pms_object = (s_pms5003_sensor_object *)ezlopi_malloc(__FUNCTION__, sizeof(s_pms5003_sensor_object));
+    if (pms_object)
+    {
+        pms5003_set_pms_object_details(cj_properties, pms_object);
+        ESP_ERROR_CHECK(__prepare_particulate_matter_particles_0_dot_3_um_device_and_items(cj_properties, parent_id, (void *)pms_object));
+        ESP_ERROR_CHECK(__prepare_particulate_matter_particles_0_dot_5_um_device_and_items(cj_properties, *parent_id, (void *)pms_object));
+        ESP_ERROR_CHECK(__prepare_particulate_matter_particles_1_um_device_and_items(cj_properties, *parent_id, (void *)pms_object));
+        ESP_ERROR_CHECK(__prepare_particulate_matter_particles_2_dot_5_um_device_and_items(cj_properties, *parent_id, (void *)pms_object));
+        ESP_ERROR_CHECK(__prepare_particulate_matter_particles_5_um_device_and_items(cj_properties, *parent_id, (void *)pms_object));
+        ESP_ERROR_CHECK(__prepare_particulate_matter_particles_10_um_device_and_items(cj_properties, *parent_id, (void *)pms_object));
+        ESP_ERROR_CHECK(__prepare_particulate_matter_standard_particles_1_um_device_and_items(cj_properties, *parent_id, (void *)pms_object));
+        ESP_ERROR_CHECK(__prepare_particulate_matter_standard_particles_2_dot_5_um_device_and_items(cj_properties, *parent_id, (void *)pms_object));
+        ESP_ERROR_CHECK(__prepare_particulate_matter_standard_particles_10_um_device_and_items(cj_properties, *parent_id, (void *)pms_object));
+        ret = EZPI_SUCCESS;
+    }
+
+    return ret;
+}
+
+/*******************************************************************************
+*                         Static Function Definitions
+*******************************************************************************/
 
 // Device 0
 static int __prepare_particulate_matter_particles_0_dot_3_um_device_and_items(cJSON *cj_properties, uint32_t *parent_id, void *user_arg)
@@ -30,7 +130,7 @@ static int __prepare_particulate_matter_particles_0_dot_3_um_device_and_items(cJ
         particles_0_dot_3_um_device->cloud_properties.parent_device_id = particles_0_dot_3_um_device->cloud_properties.device_id;
         *parent_id = particles_0_dot_3_um_device->cloud_properties.parent_device_id;
 
-        l_ezlopi_item_t *particles_0_dot_3_um_item = EZPI_core_device_add_item_to_device(particles_0_dot_3_um_device, sensor_pms5003_v3);
+        l_ezlopi_item_t *particles_0_dot_3_um_item = EZPI_core_device_add_item_to_device(particles_0_dot_3_um_device, SENSOR_pms5003_v3);
         if (particles_0_dot_3_um_item)
         {
             particles_0_dot_3_um_item->cloud_properties.has_getter = true;
@@ -79,7 +179,7 @@ static int __prepare_particulate_matter_particles_0_dot_5_um_device_and_items(cJ
         particles_0_dot_5_um_device->cloud_properties.subcategory = subcategory_particulate_matter;
         particles_0_dot_5_um_device->cloud_properties.device_type = dev_type_sensor;
 
-        l_ezlopi_item_t *particles_0_dot_5_um_item = EZPI_core_device_add_item_to_device(particles_0_dot_5_um_device, sensor_pms5003_v3);
+        l_ezlopi_item_t *particles_0_dot_5_um_item = EZPI_core_device_add_item_to_device(particles_0_dot_5_um_device, SENSOR_pms5003_v3);
         if (particles_0_dot_5_um_item)
         {
             particles_0_dot_5_um_item->cloud_properties.has_getter = true;
@@ -127,7 +227,7 @@ static int __prepare_particulate_matter_particles_1_um_device_and_items(cJSON *c
         particles_1_um_device->cloud_properties.subcategory = subcategory_particulate_matter;
         particles_1_um_device->cloud_properties.device_type = dev_type_sensor;
 
-        l_ezlopi_item_t *particles_1_um_item = EZPI_core_device_add_item_to_device(particles_1_um_device, sensor_pms5003_v3);
+        l_ezlopi_item_t *particles_1_um_item = EZPI_core_device_add_item_to_device(particles_1_um_device, SENSOR_pms5003_v3);
         if (particles_1_um_item)
         {
             particles_1_um_item->cloud_properties.has_getter = true;
@@ -175,7 +275,7 @@ static int __prepare_particulate_matter_particles_2_dot_5_um_device_and_items(cJ
         particles_2_dot_5_um_device->cloud_properties.subcategory = subcategory_particulate_matter;
         particles_2_dot_5_um_device->cloud_properties.device_type = dev_type_sensor;
 
-        l_ezlopi_item_t *particles_2_dot_5_um_item = EZPI_core_device_add_item_to_device(particles_2_dot_5_um_device, sensor_pms5003_v3);
+        l_ezlopi_item_t *particles_2_dot_5_um_item = EZPI_core_device_add_item_to_device(particles_2_dot_5_um_device, SENSOR_pms5003_v3);
         if (particles_2_dot_5_um_item)
         {
             particles_2_dot_5_um_item->cloud_properties.has_getter = true;
@@ -223,7 +323,7 @@ static int __prepare_particulate_matter_particles_5_um_device_and_items(cJSON *c
         particles_5_um_device->cloud_properties.subcategory = subcategory_particulate_matter;
         particles_5_um_device->cloud_properties.device_type = dev_type_sensor;
 
-        l_ezlopi_item_t *particles_5_um_item = EZPI_core_device_add_item_to_device(particles_5_um_device, sensor_pms5003_v3);
+        l_ezlopi_item_t *particles_5_um_item = EZPI_core_device_add_item_to_device(particles_5_um_device, SENSOR_pms5003_v3);
         if (particles_5_um_item)
         {
             particles_5_um_item->cloud_properties.has_getter = true;
@@ -271,7 +371,7 @@ static int __prepare_particulate_matter_particles_10_um_device_and_items(cJSON *
         particles_10_um_device->cloud_properties.subcategory = subcategory_particulate_matter;
         particles_10_um_device->cloud_properties.device_type = dev_type_sensor;
 
-        l_ezlopi_item_t *particles_10_um_item = EZPI_core_device_add_item_to_device(particles_10_um_device, sensor_pms5003_v3);
+        l_ezlopi_item_t *particles_10_um_item = EZPI_core_device_add_item_to_device(particles_10_um_device, SENSOR_pms5003_v3);
         if (particles_10_um_item)
         {
             particles_10_um_item->cloud_properties.has_getter = true;
@@ -319,7 +419,7 @@ static int __prepare_particulate_matter_standard_particles_1_um_device_and_items
         standard_particles_1_um_device->cloud_properties.subcategory = subcategory_particulate_matter;
         standard_particles_1_um_device->cloud_properties.device_type = dev_type_sensor;
 
-        l_ezlopi_item_t *standard_particles_1_um_item = EZPI_core_device_add_item_to_device(standard_particles_1_um_device, sensor_pms5003_v3);
+        l_ezlopi_item_t *standard_particles_1_um_item = EZPI_core_device_add_item_to_device(standard_particles_1_um_device, SENSOR_pms5003_v3);
         if (standard_particles_1_um_item)
         {
             standard_particles_1_um_item->cloud_properties.has_getter = true;
@@ -367,7 +467,7 @@ static int __prepare_particulate_matter_standard_particles_2_dot_5_um_device_and
         standard_particles_2_dot_5_um_device->cloud_properties.subcategory = subcategory_particulate_matter;
         standard_particles_2_dot_5_um_device->cloud_properties.device_type = dev_type_sensor;
 
-        l_ezlopi_item_t *standard_particles_2_dot_5_um_item = EZPI_core_device_add_item_to_device(standard_particles_2_dot_5_um_device, sensor_pms5003_v3);
+        l_ezlopi_item_t *standard_particles_2_dot_5_um_item = EZPI_core_device_add_item_to_device(standard_particles_2_dot_5_um_device, SENSOR_pms5003_v3);
         if (standard_particles_2_dot_5_um_item)
         {
             standard_particles_2_dot_5_um_item->cloud_properties.has_getter = true;
@@ -415,7 +515,7 @@ static int __prepare_particulate_matter_standard_particles_10_um_device_and_item
         standard_particles_10_um_device->cloud_properties.subcategory = subcategory_particulate_matter;
         standard_particles_10_um_device->cloud_properties.device_type = dev_type_sensor;
 
-        l_ezlopi_item_t *standard_particles_10_um_item = EZPI_core_device_add_item_to_device(standard_particles_10_um_device, sensor_pms5003_v3);
+        l_ezlopi_item_t *standard_particles_10_um_item = EZPI_core_device_add_item_to_device(standard_particles_10_um_device, SENSOR_pms5003_v3);
         if (standard_particles_10_um_item)
         {
             standard_particles_10_um_item->cloud_properties.has_getter = true;
@@ -472,25 +572,7 @@ static int pms5003_set_pms_object_details(cJSON *cj_properties, s_pms5003_sensor
     return ret;
 }
 
-ezlopi_error_t pms5003_sensor_preapre_devices_and_items(cJSON *cj_properties, uint32_t *parent_id)
-{
-    ezlopi_error_t ret = EZPI_FAILED;
 
-    s_pms5003_sensor_object *pms_object = (s_pms5003_sensor_object *)ezlopi_malloc(__FUNCTION__, sizeof(s_pms5003_sensor_object));
-    if (pms_object)
-    {
-        pms5003_set_pms_object_details(cj_properties, pms_object);
-        ESP_ERROR_CHECK(__prepare_particulate_matter_particles_0_dot_3_um_device_and_items(cj_properties, parent_id, (void *)pms_object));
-        ESP_ERROR_CHECK(__prepare_particulate_matter_particles_0_dot_5_um_device_and_items(cj_properties, *parent_id, (void *)pms_object));
-        ESP_ERROR_CHECK(__prepare_particulate_matter_particles_1_um_device_and_items(cj_properties, *parent_id, (void *)pms_object));
-        ESP_ERROR_CHECK(__prepare_particulate_matter_particles_2_dot_5_um_device_and_items(cj_properties, *parent_id, (void *)pms_object));
-        ESP_ERROR_CHECK(__prepare_particulate_matter_particles_5_um_device_and_items(cj_properties, *parent_id, (void *)pms_object));
-        ESP_ERROR_CHECK(__prepare_particulate_matter_particles_10_um_device_and_items(cj_properties, *parent_id, (void *)pms_object));
-        ESP_ERROR_CHECK(__prepare_particulate_matter_standard_particles_1_um_device_and_items(cj_properties, *parent_id, (void *)pms_object));
-        ESP_ERROR_CHECK(__prepare_particulate_matter_standard_particles_2_dot_5_um_device_and_items(cj_properties, *parent_id, (void *)pms_object));
-        ESP_ERROR_CHECK(__prepare_particulate_matter_standard_particles_10_um_device_and_items(cj_properties, *parent_id, (void *)pms_object));
-        ret = EZPI_SUCCESS;
-    }
-
-    return ret;
-}
+/*******************************************************************************
+*                          End of File
+*******************************************************************************/

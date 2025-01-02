@@ -6,36 +6,36 @@
  * @version
  * @date
  */
- /* ===========================================================================
- ** Copyright (C) 2022 Ezlo Innovation Inc
- **
- ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
- **
- ** Redistribution and use in source and binary forms, with or without
- ** modification, are permitted provided that the following conditions are met:
- **
- ** 1. Redistributions of source code must retain the above copyright notice,
- **    this list of conditions and the following disclaimer.
- ** 2. Redistributions in binary form must reproduce the above copyright
- **    notice, this list of conditions and the following disclaimer in the
- **    documentation and/or other materials provided with the distribution.
- ** 3. Neither the name of the copyright holder nor the names of its
- **    contributors may be used to endorse or promote products derived from
- **    this software without specific prior written permission.
- **
- ** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- ** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- ** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- ** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- ** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- ** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- ** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- ** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- ** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- ** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- ** POSSIBILITY OF SUCH DAMAGE.
- ** ===========================================================================
- */
+/* ===========================================================================
+** Copyright (C) 2022 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
 
 #ifndef __EZLOPI_CLOUD_KEYWORDS_H__
 #define __EZLOPI_CLOUD_KEYWORDS_H__
@@ -488,7 +488,6 @@ extern "C"
     extern const char *ezlopi_timeScenes_str;
     extern const char *ezlopi_httpAnswerCode_str;
 
-
     extern const char *ezlopi_less_str;
     extern const char *ezlopi_least_str;
 
@@ -504,10 +503,6 @@ extern "C"
     extern const char *ezlopi_when_category_modes_str;
     extern const char *ezlopi_when_category_logic_str;
     extern const char *ezlopi_when_category_function_str;
-
-
-
-
 
     //////////// otel keywords
     extern const char *ezlopi_values_str;
@@ -541,6 +536,30 @@ extern "C"
     extern const char *ezlopi_ERROR_str;
     extern const char *ezlopi_fileName_str;
     extern const char *ezlopi_lineNumber_str;
+    extern const char *ezlopi_log_str;
+    extern const char *ezlopi_request_str;
+    extern const char *ezlopi_resourceLogs_str;
+    extern const char *ezlopi_scopeLogs_str;
+    extern const char *ezlopi_logRecords_str;
+    extern const char *ezlopi_timeUnixNano_str;
+    extern const char *ezlopi_observedTimeUnixNano_str;
+    extern const char *ezlopi_body_str;
+    extern const char *ezlopi_otel_c_str;
+    extern const char *ezlopi_trace_str;
+    extern const char *ezlopi_otel_version_str;
+    extern const char *ezlopi_timeOffset_str;
+    extern const char *ezlopi_register_str;
+    extern const char *ezlopi_media_str;
+    extern const char *ezlopi_radio_str;
+    extern const char *ezlopi_hubType_str;
+    extern const char *ezlopi_controller_uuid_str;
+    extern const char *ezlopi_mac_address_str;
+    extern const char *ezlopi_maxFrameSize_str;
+
+    extern const char *ezlopi_uart_str;
+    extern const char *ezlopi_bluetooth_str;
+    extern const char *ezlopi_websocket_server_str;
+    extern const char *ezlopi_websocket_client_str;
 
 #ifdef __cplusplus
 }

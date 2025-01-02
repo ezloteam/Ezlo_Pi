@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    ezlopi_core_scenes_then_methods.c
-* @brief   Funtions that performs scene-Action/Then method operations
-* @author  xx
-* @version 0.1
-* @date    12th DEC 2024
-*/
+ * @file    ezlopi_core_scenes_then_methods.c
+ * @brief   Funtions that performs scene-Action/Then method operations
+ * @author  xx
+ * @version 0.1
+ * @date    12th DEC 2024
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
@@ -49,6 +49,7 @@
 // #include "ezlopi_core_scenes_v2.h"
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_http.h"
+#include "ezlopi_core_sntp.h"
 #include "ezlopi_core_modes.h"
 #include "ezlopi_core_reset.h"
 #include "ezlopi_core_scenes_value.h"
@@ -67,32 +68,32 @@
 #include "ezlopi_cloud_constants.h"
 #include "EZLOPI_USER_CONFIG.h"
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 
 int EZPI_core_scene_then_set_item_value(l_scenes_list_v2_t *curr_scene, void *arg)
 {
@@ -182,7 +183,7 @@ int EZPI_core_scene_then_group_set_item_value(l_scenes_list_v2_t *curr_scene, vo
                 }
                 else if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, ezlopi_value_str, len, 6))
                 {
-                    #warning "might need to add more item_value_types";
+#warning "might need to add more item_value_types";
                     switch (curr_field->value_type)
                     {
                     case EZLOPI_VALUE_TYPE_INT:
@@ -296,7 +297,7 @@ int EZPI_core_scene_then_set_device_armed(l_scenes_list_v2_t *curr_scene, void *
                     s_ezlopi_cloud_controller_t *controller_info = EZPI_core_device_get_controller_information();
                     if (controller_info)
                     {
-                        #warning "we need to change from 'controller' to device-specific";
+#warning "we need to change from 'controller' to device-specific";
                         controller_info->armed = (device_armed) ? true : false;
                     }
                 }
@@ -352,7 +353,7 @@ int EZPI_core_scene_then_group_set_device_armed(l_scenes_list_v2_t *curr_scene, 
                             s_ezlopi_cloud_controller_t *controller_info = EZPI_core_device_get_controller_information();
                             if (controller_info)
                             {
-                                #warning "we need to change from 'controller' to device-specific [krishna]";
+#warning "we need to change from 'controller' to device-specific [krishna]";
                                 controller_info->armed = (device_armed) ? true : false;
                             }
                         }
@@ -606,13 +607,13 @@ int EZPI_core_scene_then_set_scene_state(l_scenes_list_v2_t *curr_scene, void *a
         {
             if (EZPI_SUCCESS == EZPI_core_scenes_enable_disable_scene_by_id_v2(sceneID, set_scene_enable))
             {
-                EZPI_core_scenes_status_change_broadcast(scene_node, scene_status_finished_str);
+                EZPI_core_scenes_status_change_broadcast(scene_node, scene_status_finished_str, EZPI_core_sntp_get_current_time_sec());
                 ret = 1;
             }
             else
             {
                 // TRACE_E("Failed : 'set_scene_state'");
-                EZPI_core_scenes_status_change_broadcast(scene_node, scene_status_failed_str);
+                EZPI_core_scenes_status_change_broadcast(scene_node, scene_status_failed_str, EZPI_core_sntp_get_current_time_sec());
             }
         }
         TRACE_W("ret = %d", ret);
@@ -734,7 +735,7 @@ int EZPI_core_scene_then_reset_hub(l_scenes_list_v2_t *curr_scene, void *arg)
                         }
                         else if (EZPI_STRNCMP_IF_EQUAL(tmp_str, "hard", strlen(tmp_str), 5))
                         {
-                            #warning "hard reset not in documention.";
+#warning "hard reset not in documention.";
                             EZPI_core_reset_factory_restore();
                         }
                     }
@@ -1012,10 +1013,10 @@ int EZPI_core_scene_then_group_toggle_value(l_scenes_list_v2_t *curr_scene, void
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 
 #endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
-/*******************************************************************************
-*                          End of File
-*******************************************************************************/
+       /*******************************************************************************
+        *                          End of File
+        *******************************************************************************/

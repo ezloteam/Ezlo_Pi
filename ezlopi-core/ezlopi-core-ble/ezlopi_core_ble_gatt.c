@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    ezlopi_core_ble_gatt.c
-* @brief   perform some function on ble-gatt operations
-* @author  xx
-* @version 0.1
-* @date    12th DEC 2024
-*/
+ * @file    ezlopi_core_ble_gatt.c
+ * @brief   perform some function on ble-gatt operations
+ * @author  xx
+ * @version 0.1
+ * @date    12th DEC 2024
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_BLE_ENABLE
@@ -53,38 +53,42 @@
 #include "ezlopi_core_ble_profile.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
-static f_upcall_t EZPI_core_ble_gatt_call_by_handle(esp_gatt_if_t gatts_if, uint16_t handle, esp_gatts_cb_event_t event);
+ *                          Static Function Prototypes
+ *******************************************************************************/
+
+#if (1 == ENABLE_TRACE)
 static char *EZPI_core_ble_gatt_event_to_string(esp_gatts_cb_event_t event);
+#endif
+
+static f_upcall_t EZPI_core_ble_gatt_call_by_handle(esp_gatt_if_t gatts_if, uint16_t handle, esp_gatts_cb_event_t event);
 static void EZPI_core_ble_gatt_call_read_by_handle(esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t *param);
 static void EZPI_core_ble_gatt_call_write_by_handle(esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t *param);
 static void EZPI_core_ble_gatt_call_write_exec_by_handle(esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t *param);
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 static uint16_t g_mtu_size = ESP_GATT_DEF_BLE_MTU_SIZE;
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 uint16_t EZPI_core_ble_gatt_get_max_data_size(void)
 {
     return g_mtu_size;
@@ -149,9 +153,11 @@ void EZPI_core_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t
         if (char_to_add && service)
         {
             char_to_add->status = GATT_STATUS_PROCESSING;
+#ifndef CONFIG_EZPI_UTIL_TRACE_EN
+            esp_ble_gatts_add_char(service->service_handle, &char_to_add->uuid, char_to_add->permission, char_to_add->property, NULL, NULL);
+#else
             esp_err_t err = esp_ble_gatts_add_char(service->service_handle, &char_to_add->uuid, char_to_add->permission, char_to_add->property, NULL, NULL);
             // EZPI_core_ble_gatt_print_characteristic(char_to_add);
-#ifdef CONFIG_EZPI_UTIL_TRACE_EN
             if (err)
             {
                 TRACE_E("esp_ble_gatts_add_char: %s", esp_err_to_name(err));
@@ -181,8 +187,10 @@ void EZPI_core_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t
             if (desc_to_init)
             {
                 desc_to_init->status = GATT_STATUS_PROCESSING;
+#ifndef CONFIG_EZPI_UTIL_TRACE_EN
+                esp_ble_gatts_add_char_descr(service->service_handle, &desc_to_init->uuid, desc_to_init->permission, NULL, NULL);
+#else
                 esp_err_t add_descr_ret = esp_ble_gatts_add_char_descr(service->service_handle, &desc_to_init->uuid, desc_to_init->permission, NULL, NULL);
-#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                 if (add_descr_ret)
                 {
                     TRACE_E("add char descr failed, error code =%x", add_descr_ret);
@@ -196,9 +204,10 @@ void EZPI_core_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t
                 if (char_to_add)
                 {
                     char_to_add->status = GATT_STATUS_PROCESSING;
-                    esp_err_t err = esp_ble_gatts_add_char(service->service_handle, &char_to_add->uuid, char_to_add->permission,
-                        char_to_add->property, NULL, NULL);
-#ifdef CONFIG_EZPI_UTIL_TRACE_EN
+#ifndef CONFIG_EZPI_UTIL_TRACE_EN
+                    esp_ble_gatts_add_char(service->service_handle, &char_to_add->uuid, char_to_add->permission, char_to_add->property, NULL, NULL);
+#else
+                    esp_err_t err = esp_ble_gatts_add_char(service->service_handle, &char_to_add->uuid, char_to_add->permission, char_to_add->property, NULL, NULL);
                     if (err)
                     {
                         TRACE_E("esp_ble_gatts_add_char: %s", esp_err_to_name(err));
@@ -232,10 +241,12 @@ void EZPI_core_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t
         if (desc_to_init)
         {
             desc_to_init->status = GATT_STATUS_PROCESSING;
-            esp_err_t add_descr_ret = esp_ble_gatts_add_char_descr(service->service_handle, &desc_to_init->uuid, desc_to_init->permission, NULL, NULL);
             // EZPI_core_ble_gatt_print_descriptor(desc_to_init);
 
-#ifdef CONFIG_EZPI_UTIL_TRACE_EN
+#ifndef CONFIG_EZPI_UTIL_TRACE_EN
+            esp_ble_gatts_add_char_descr(service->service_handle, &desc_to_init->uuid, desc_to_init->permission, NULL, NULL);
+#else
+            esp_err_t add_descr_ret = esp_ble_gatts_add_char_descr(service->service_handle, &desc_to_init->uuid, desc_to_init->permission, NULL, NULL);
             if (add_descr_ret)
             {
                 TRACE_E("add char descr failed, error code =%x", add_descr_ret);
@@ -250,10 +261,11 @@ void EZPI_core_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t
             if (char_to_add)
             {
                 char_to_add->status = GATT_STATUS_PROCESSING;
-                esp_err_t err = esp_ble_gatts_add_char(service->service_handle, &char_to_add->uuid, char_to_add->permission,
-                    char_to_add->property, NULL, NULL);
                 // EZPI_core_ble_gatt_print_characteristic(char_to_add);
-#ifdef CONFIG_EZPI_UTIL_TRACE_EN
+#ifndef CONFIG_EZPI_UTIL_TRACE_EN
+                esp_ble_gatts_add_char(service->service_handle, &char_to_add->uuid, char_to_add->permission, char_to_add->property, NULL, NULL);
+#else
+                esp_err_t err = esp_ble_gatts_add_char(service->service_handle, &char_to_add->uuid, char_to_add->permission, char_to_add->property, NULL, NULL);
                 if (err)
                 {
                     TRACE_E("esp_ble_gatts_add_char: %s", esp_err_to_name(err));
@@ -325,8 +337,8 @@ void EZPI_core_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 static f_upcall_t EZPI_core_ble_gatt_call_by_handle(esp_gatt_if_t gatts_if, uint16_t handle, esp_gatts_cb_event_t event)
 {
     s_gatt_service_t *service = EZPI_core_ble_profile_get_service_by_gatts_if(gatts_if);
@@ -634,6 +646,6 @@ static char *EZPI_core_ble_gatt_event_to_string(esp_gatts_cb_event_t event)
 #endif // 1 == ENABLE_TRACE
 
 #endif // CONFIG_EZPI_BLE_ENABLE
-/*******************************************************************************
-*                          End of File
-*******************************************************************************/
+       /*******************************************************************************
+        *                          End of File
+        *******************************************************************************/

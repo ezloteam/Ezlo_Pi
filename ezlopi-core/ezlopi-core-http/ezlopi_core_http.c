@@ -55,6 +55,7 @@
 
 #include "ezlopi_util_trace.h"
 
+#include "ezlopi_core_sntp.h"
 #include "ezlopi_core_http.h"
 #include "ezlopi_core_event_group.h"
 // #include "ezlopi_core_errors.h"

@@ -1,11 +1,51 @@
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+/**
+ * @file    hilink_presence_sensor_setting.c
+ * @brief   perform some function on hilink_presence_sensor_setting
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+ */
+
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 #include <string.h>
 #include <stdlib.h>
-#include "ezlopi_util_trace.h"
 
 #include "ld2410.h"
 
 #include "ezlopi_core_nvs.h"
-#include "ezlopi_core_cloud.h"
+// #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_device_value_updated.h"
 #include "ezlopi_core_errors.h"
 
@@ -16,38 +56,21 @@
 #include "sensor_0067_hilink_presence_sensor.h"
 #include "EZLOPI_USER_CONFIG.h"
 
+/*******************************************************************************
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
-static const char *nvs_key_hilink_presence_sensor_predefined_setting = "predef";
-static const char *nvs_key_hilink_presence_sensor_userdefined_setting = "userdef";
-static const char *nvs_key_hilink_presence_sensor_radar_distance_sensitivity = "rdrsens";
-static uint32_t hilink_presence_sensor_setting_ids[3] = { 0, 0, 0 };
+/*******************************************************************************
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
-static l_ezlopi_device_settings_v3_t *hilink_presence_sensor_radar_distance_sensitivity_setting;
-static l_ezlopi_device_settings_v3_t *hilink_presence_sensor_user_defined_setting;
-static l_ezlopi_device_settings_v3_t *hilink_presence_sensor_predefined_setting;
+/*******************************************************************************
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 
-static const char *hilink_presence_sensor_setting_enum[] = {
-    "sleep_mode_close",
-    "sleep_mode_mid",
-    "sleep_mode_long",
-    "movement_mode_close",
-    "movement_mode_mid",
-    "movement_mode_long",
-    "basic_routine_mode_close",
-    "basic_routine_mode_mid",
-    "basic_routine_mode_long",
-    "user_defined_mode",
-};
-
-static const s_hilink_userdefined_setting_value_t hilink_user_defined_setting_default_value = {
-    .min_move_distance = 0.75,
-    .max_move_distance = 6.0,
-    .min_still_distance = 0.75,
-    .max_still_distance = 6.0,
-    .timeout = 50,
-    .is_active = false,
-};
-
+/*******************************************************************************
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static int __settings_callback(e_ezlopi_settings_action_t action, struct l_ezlopi_device_settings_v3 *setting, void *arg, void *user_arg);
 static int __settings_get(void *arg, l_ezlopi_device_settings_v3_t *setting);
 static int __settings_set(void *arg, l_ezlopi_device_settings_v3_t *setting);
@@ -77,6 +100,118 @@ static int __setting_update_pre_defined_setting(void *arg, l_ezlopi_device_setti
 static int __setting_update_user_defined_setting(void *arg, l_ezlopi_device_settings_v3_t *setting);
 static int __setting_update_radar_distance_sensitivity_setting(void *arg, l_ezlopi_device_settings_v3_t *setting);
 
+// common static function
+static inline cJSON *__setting_add_text_and_lang_tag(const char *const object_text, const char *const object_lang_tag);
+static inline void __setting_extract_user_defined_setting(cJSON *cj_value, s_hilink_userdefined_setting_value_t *user_defined_setting_val);
+static inline int __prepare_user_defined_setting_cjson(cJSON *cj_value, s_hilink_userdefined_setting_value_t *setting_val);
+static inline char *__prepare_user_defined_setting_str(s_hilink_userdefined_setting_value_t *setting_val);
+static inline distance_t __setting_user_defined_setting_get_enum(float val);
+
+/*******************************************************************************
+ *                          Static Data Definitions
+ *******************************************************************************/
+
+// static const char *nvs_key_hilink_presence_sensor_predefined_setting = "predef";
+// static const char *nvs_key_hilink_presence_sensor_userdefined_setting = "userdef";
+// static const char *nvs_key_hilink_presence_sensor_radar_distance_sensitivity = "rdrsens";
+#warning "NABIN ; Need to remove these global variables";
+static uint32_t hilink_presence_sensor_setting_ids[3] = {0, 0, 0};
+
+static l_ezlopi_device_settings_v3_t *hilink_presence_sensor_radar_distance_sensitivity_setting;
+static l_ezlopi_device_settings_v3_t *hilink_presence_sensor_user_defined_setting;
+static l_ezlopi_device_settings_v3_t *hilink_presence_sensor_predefined_setting;
+
+// static const char *hilink_presence_sensor_setting_enum[] = {
+//     "sleep_mode_close",
+//     "sleep_mode_mid",
+//     "sleep_mode_long",
+//     "movement_mode_close",
+//     "movement_mode_mid",
+//     "movement_mode_long",
+//     "basic_routine_mode_close",
+//     "basic_routine_mode_mid",
+//     "basic_routine_mode_long",
+//     "user_defined_mode",
+// };
+
+static const s_hilink_userdefined_setting_value_t hilink_user_defined_setting_default_value = {
+    .min_move_distance = 0.75,
+    .max_move_distance = 6.0,
+    .min_still_distance = 0.75,
+    .max_still_distance = 6.0,
+    .timeout = 50,
+    .is_active = false,
+};
+
+/*******************************************************************************
+ *                          Extern Data Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Definitions
+ *******************************************************************************/
+int HILINK_presence_sensor_apply_settings(void)
+{
+    int ret = 0;
+    if (hilink_presence_sensor_predefined_setting && hilink_presence_sensor_user_defined_setting)
+    {
+        // Only the predefined setting mode is required to be accessed, if it is set to user_defined_mode, the settings are changed according to the user defined setting automatically.
+        s_hilink_predefined_setting_value_t *predef_setting_value = (s_hilink_predefined_setting_value_t *)hilink_presence_sensor_predefined_setting->user_arg;
+        if (predef_setting_value)
+        {
+            ld2410_template_t template;
+            if (!__setting_set_find_predefined_setting_template(predef_setting_value, &template))
+            {
+                ret = __setting_set_change_setting_template(template, hilink_presence_sensor_predefined_setting->cloud_properties.setting_id);
+            }
+        }
+        else
+        {
+            ret = 1;
+        }
+    }
+    else
+    {
+        ret = 1;
+    }
+    return ret;
+}
+int HILINK_presence_sensor_initialize_settings(l_ezlopi_device_t *device)
+{
+    int ret = 0;
+
+    ESP_ERROR_CHECK(__setting_initialize_hilink_presence_sensor_predefined_settings(device));
+    ESP_ERROR_CHECK(__setting_initialize_hilink_presence_sensor_userdefined_settings(device));
+    ESP_ERROR_CHECK(__setting_initialize_hilink_presence_sensor_radar_distance_sensitivity(device));
+
+    return ret;
+}
+bool HILINK_presence_sensor_target_in_detectable_range(const uint16_t moving_target_distance)
+{
+    bool in_range = false;
+    s_hilink_radar_distance_sensitivity_value_t *setting_val = (s_hilink_radar_distance_sensitivity_value_t *)hilink_presence_sensor_radar_distance_sensitivity_setting->user_arg;
+    if (setting_val)
+    {
+        if (setting_val->distance_sensitivity_value <= moving_target_distance)
+        {
+            in_range = true;
+        }
+        else
+        {
+            in_range = false;
+        }
+    }
+    else
+    {
+        in_range = false;
+    }
+    return in_range;
+}
+
+/*******************************************************************************
+ *                         Static Function Definitions
+ *******************************************************************************/
+
 // ********************************************* Setting initialization related start ********************************************* //
 static int __setting_initialize_hilink_presence_sensor_predefined_settings(l_ezlopi_device_t *device)
 {
@@ -91,7 +226,7 @@ static int __setting_initialize_hilink_presence_sensor_predefined_settings(l_ezl
         if (hilink_presence_sensor_setting_value)
         {
             memset(hilink_presence_sensor_setting_value, 0, sizeof(s_hilink_predefined_setting_value_t));
-            char *read_value = EZPI_core_nvs_read_str(nvs_key_hilink_presence_sensor_predefined_setting);
+            char *read_value = EZPI_core_nvs_read_str("predef");
             if (NULL != read_value)
             {
                 TRACE_I("Setting already exist");
@@ -100,8 +235,8 @@ static int __setting_initialize_hilink_presence_sensor_predefined_settings(l_ezl
             else
             {
                 TRACE_W("Not found saved setting for predefined setting value!");
-                snprintf(hilink_presence_sensor_setting_value->setting_value, 50, "%s", hilink_presence_sensor_setting_enum[7]);
-                if (EZPI_SUCCESS == EZPI_core_nvs_write_str(hilink_presence_sensor_setting_value->setting_value, strlen(hilink_presence_sensor_setting_value->setting_value), nvs_key_hilink_presence_sensor_predefined_setting))
+                snprintf(hilink_presence_sensor_setting_value->setting_value, 50, "%s", "basic_routine_mode_mid");
+                if (EZPI_SUCCESS == EZPI_core_nvs_write_str(hilink_presence_sensor_setting_value->setting_value, strlen(hilink_presence_sensor_setting_value->setting_value), "predef"))
                 {
                     TRACE_E("Failed to write to NVS");
                     ret = 1;
@@ -118,7 +253,6 @@ static int __setting_initialize_hilink_presence_sensor_predefined_settings(l_ezl
 
     return ret;
 }
-
 static int __setting_initialize_hilink_presence_sensor_userdefined_settings(l_ezlopi_device_t *device)
 {
     int ret = 0;
@@ -132,7 +266,7 @@ static int __setting_initialize_hilink_presence_sensor_userdefined_settings(l_ez
         if (hilink_presence_sensor_user_defined_setting_val)
         {
             memset(hilink_presence_sensor_user_defined_setting_val, 0, sizeof(s_hilink_userdefined_setting_value_t));
-            char *read_value = EZPI_core_nvs_read_str(nvs_key_hilink_presence_sensor_userdefined_setting);
+            char *read_value = EZPI_core_nvs_read_str("userdef");
             if (NULL != read_value)
             {
                 TRACE_I("Setting already exist.");
@@ -152,7 +286,7 @@ static int __setting_initialize_hilink_presence_sensor_userdefined_settings(l_ez
                 char *user_defined_value = __prepare_user_defined_setting_str(hilink_presence_sensor_user_defined_setting_val);
                 if (user_defined_value)
                 {
-                    if (EZPI_SUCCESS == EZPI_core_nvs_write_str(user_defined_value, strlen(user_defined_value), nvs_key_hilink_presence_sensor_userdefined_setting))
+                    if (EZPI_SUCCESS == EZPI_core_nvs_write_str(user_defined_value, strlen(user_defined_value), "userdef"))
                     {
                         TRACE_E("Failed to write to NVS");
                         ret = 1;
@@ -179,7 +313,6 @@ static int __setting_initialize_hilink_presence_sensor_userdefined_settings(l_ez
 
     return ret;
 }
-
 static int __setting_initialize_hilink_presence_sensor_radar_distance_sensitivity(l_ezlopi_device_t *device)
 {
     int ret = 0;
@@ -195,7 +328,7 @@ static int __setting_initialize_hilink_presence_sensor_radar_distance_sensitivit
             {
                 memset(distance_sensitivity_value, 0, sizeof(s_hilink_radar_distance_sensitivity_value_t));
                 int read_value = 0;
-                ezlopi_error_t error = EZPI_core_nvs_read_int32(&read_value, nvs_key_hilink_presence_sensor_radar_distance_sensitivity);
+                ezlopi_error_t error = EZPI_core_nvs_read_int32(&read_value, "rdrsens");
                 if (EZPI_SUCCESS == error)
                 {
                     TRACE_I("Setting already exist.");
@@ -205,7 +338,7 @@ static int __setting_initialize_hilink_presence_sensor_radar_distance_sensitivit
                 {
                     TRACE_W("Not found saved setting for predefined setting value!");
                     distance_sensitivity_value->distance_sensitivity_value = 10;
-                    if (EZPI_SUCCESS != EZPI_core_nvs_write_int32(distance_sensitivity_value->distance_sensitivity_value, nvs_key_hilink_presence_sensor_radar_distance_sensitivity))
+                    if (EZPI_SUCCESS != EZPI_core_nvs_write_int32(distance_sensitivity_value->distance_sensitivity_value, "rdrsens"))
                     {
                         TRACE_E("Failed to write to NVS");
                         ret = 1;
@@ -232,68 +365,7 @@ static int __setting_initialize_hilink_presence_sensor_radar_distance_sensitivit
     return ret;
 }
 
-int hilink_presence_sensor_apply_settings()
-{
-    int ret = 0;
-    if (hilink_presence_sensor_predefined_setting && hilink_presence_sensor_user_defined_setting)
-    {
-        // Only the predefined setting mode is required to be accessed, if it is set to user_defined_mode, the settings are changed according to the user defined setting automatically.
-        s_hilink_predefined_setting_value_t *predef_setting_value = (s_hilink_predefined_setting_value_t *)hilink_presence_sensor_predefined_setting->user_arg;
-        if (predef_setting_value)
-        {
-            ld2410_template_t template;
-            if (!__setting_set_find_predefined_setting_template(predef_setting_value, &template))
-            {
-                ret = __setting_set_change_setting_template(template, hilink_presence_sensor_predefined_setting->cloud_properties.setting_id);
-            }
-        }
-        else
-        {
-            ret = 1;
-        }
-    }
-    else
-    {
-        ret = 1;
-    }
-    return ret;
-}
-
-int hilink_presence_sensor_initialize_settings(l_ezlopi_device_t *device)
-{
-    int ret = 0;
-
-    ESP_ERROR_CHECK(__setting_initialize_hilink_presence_sensor_predefined_settings(device));
-    ESP_ERROR_CHECK(__setting_initialize_hilink_presence_sensor_userdefined_settings(device));
-    ESP_ERROR_CHECK(__setting_initialize_hilink_presence_sensor_radar_distance_sensitivity(device));
-
-    return ret;
-}
-
-bool hilink_presence_sensor_target_in_detectable_range(const uint16_t moving_target_distance)
-{
-    bool in_range = false;
-    s_hilink_radar_distance_sensitivity_value_t *setting_val = (s_hilink_radar_distance_sensitivity_value_t *)hilink_presence_sensor_radar_distance_sensitivity_setting->user_arg;
-    if (setting_val)
-    {
-        if (setting_val->distance_sensitivity_value <= moving_target_distance)
-        {
-            in_range = true;
-        }
-        else
-        {
-            in_range = false;
-        }
-    }
-    else
-    {
-        in_range = false;
-    }
-    return in_range;
-}
-
 // ********************************************* Setting initialization related end ********************************************* //
-
 static int __settings_callback(e_ezlopi_settings_action_t action, struct l_ezlopi_device_settings_v3 *setting, void *arg, void *user_arg)
 {
     int ret = 0;
@@ -332,7 +404,6 @@ static int __settings_callback(e_ezlopi_settings_action_t action, struct l_ezlop
 
     return ret;
 }
-
 // ********************************************* hub.device.settings.list related start ********************************************* //
 static int __setting_get_sensor_enum(cJSON *cj_enum)
 {
@@ -340,16 +411,16 @@ static int __setting_get_sensor_enum(cJSON *cj_enum)
 
     if (cj_enum)
     {
-        cJSON_AddItemToObject(__FUNCTION__, cj_enum, hilink_presence_sensor_setting_enum[0], __setting_add_text_and_lang_tag(SLEEP_MODE_CLOSE_TEXT, SLEEP_MODE_CLOSE_LANG_TAG));
-        cJSON_AddItemToObject(__FUNCTION__, cj_enum, hilink_presence_sensor_setting_enum[1], __setting_add_text_and_lang_tag(SLEEP_MODE_MID_TEXT, SLEEP_MODE_MID_LANG_TAG));
-        cJSON_AddItemToObject(__FUNCTION__, cj_enum, hilink_presence_sensor_setting_enum[2], __setting_add_text_and_lang_tag(SLEEP_MODE_LONG_TEXT, SLEEP_MODE_LONG_LANG_TAG));
-        cJSON_AddItemToObject(__FUNCTION__, cj_enum, hilink_presence_sensor_setting_enum[3], __setting_add_text_and_lang_tag(MOVEMENT_MODE_CLOSE_TEXT, MOVEMENT_MODE_CLOSE_LANG_TAG));
-        cJSON_AddItemToObject(__FUNCTION__, cj_enum, hilink_presence_sensor_setting_enum[4], __setting_add_text_and_lang_tag(MOVEMENT_MODE_MID_TEXT, MOVEMENT_MODE_MID_LANG_TAG));
-        cJSON_AddItemToObject(__FUNCTION__, cj_enum, hilink_presence_sensor_setting_enum[5], __setting_add_text_and_lang_tag(MOVEMENT_MODE_LONG_TEXT, MOVEMENT_MODE_LONG_LANG_TAG));
-        cJSON_AddItemToObject(__FUNCTION__, cj_enum, hilink_presence_sensor_setting_enum[6], __setting_add_text_and_lang_tag(BASIC_ROUTINE_MODE_CLOSE_TEXT, BASIC_ROUTINE_MODE_CLOSE_LANG_TAG));
-        cJSON_AddItemToObject(__FUNCTION__, cj_enum, hilink_presence_sensor_setting_enum[7], __setting_add_text_and_lang_tag(BASIC_ROUTINE_MODE_MID_TEXT, BASIC_ROUTINE_MODE_MID_LANG_TAG));
-        cJSON_AddItemToObject(__FUNCTION__, cj_enum, hilink_presence_sensor_setting_enum[8], __setting_add_text_and_lang_tag(BASIC_ROUTINE_MODE_LONG_TEXT, BASIC_ROUTINE_MODE_LONG_LANG_TAG));
-        cJSON_AddItemToObject(__FUNCTION__, cj_enum, hilink_presence_sensor_setting_enum[9], __setting_add_text_and_lang_tag(USER_DEFINED_MODE_TEXT, USER_DEFINED_MODE_LANG_TAG));
+        cJSON_AddItemToObject(__FUNCTION__, cj_enum, "sleep_mode_close", __setting_add_text_and_lang_tag(SLEEP_MODE_CLOSE_TEXT, SLEEP_MODE_CLOSE_LANG_TAG));
+        cJSON_AddItemToObject(__FUNCTION__, cj_enum, "sleep_mode_mid", __setting_add_text_and_lang_tag(SLEEP_MODE_MID_TEXT, SLEEP_MODE_MID_LANG_TAG));
+        cJSON_AddItemToObject(__FUNCTION__, cj_enum, "sleep_mode_long", __setting_add_text_and_lang_tag(SLEEP_MODE_LONG_TEXT, SLEEP_MODE_LONG_LANG_TAG));
+        cJSON_AddItemToObject(__FUNCTION__, cj_enum, "movement_mode_close", __setting_add_text_and_lang_tag(MOVEMENT_MODE_CLOSE_TEXT, MOVEMENT_MODE_CLOSE_LANG_TAG));
+        cJSON_AddItemToObject(__FUNCTION__, cj_enum, "movement_mode_mid", __setting_add_text_and_lang_tag(MOVEMENT_MODE_MID_TEXT, MOVEMENT_MODE_MID_LANG_TAG));
+        cJSON_AddItemToObject(__FUNCTION__, cj_enum, "movement_mode_long", __setting_add_text_and_lang_tag(MOVEMENT_MODE_LONG_TEXT, MOVEMENT_MODE_LONG_LANG_TAG));
+        cJSON_AddItemToObject(__FUNCTION__, cj_enum, "basic_routine_mode_close", __setting_add_text_and_lang_tag(BASIC_ROUTINE_MODE_CLOSE_TEXT, BASIC_ROUTINE_MODE_CLOSE_LANG_TAG));
+        cJSON_AddItemToObject(__FUNCTION__, cj_enum, "basic_routine_mode_mid", __setting_add_text_and_lang_tag(BASIC_ROUTINE_MODE_MID_TEXT, BASIC_ROUTINE_MODE_MID_LANG_TAG));
+        cJSON_AddItemToObject(__FUNCTION__, cj_enum, "basic_routine_mode_long", __setting_add_text_and_lang_tag(BASIC_ROUTINE_MODE_LONG_TEXT, BASIC_ROUTINE_MODE_LONG_LANG_TAG));
+        cJSON_AddItemToObject(__FUNCTION__, cj_enum, "user_defined_mode", __setting_add_text_and_lang_tag(USER_DEFINED_MODE_TEXT, USER_DEFINED_MODE_LANG_TAG));
     }
     else
     {
@@ -357,7 +428,6 @@ static int __setting_get_sensor_enum(cJSON *cj_enum)
     }
     return ret;
 }
-
 static int __setting_get_pre_defined_setting(void *arg, l_ezlopi_device_settings_v3_t *setting)
 {
     int ret = 0;
@@ -390,7 +460,7 @@ static int __setting_get_pre_defined_setting(void *arg, l_ezlopi_device_settings
             ret = 1;
         }
         cJSON_AddStringToObject(__FUNCTION__, cj_properties, ezlopi_value_str, setting_value->setting_value);
-        cJSON_AddStringToObject(__FUNCTION__, cj_properties, ezlopi_valueDefault_str, hilink_presence_sensor_setting_enum[7]);
+        cJSON_AddStringToObject(__FUNCTION__, cj_properties, ezlopi_valueDefault_str, "basic_routine_mode_mid");
     }
     else
     {
@@ -398,7 +468,6 @@ static int __setting_get_pre_defined_setting(void *arg, l_ezlopi_device_settings
     }
     return ret;
 }
-
 static int __setting_get_user_defined_setting(void *arg, l_ezlopi_device_settings_v3_t *setting)
 {
     int ret = 0;
@@ -431,7 +500,6 @@ static int __setting_get_user_defined_setting(void *arg, l_ezlopi_device_setting
 
     return ret;
 }
-
 static int __setting_get_radar_distance_sensitivity_setting(void *arg, l_ezlopi_device_settings_v3_t *setting)
 {
     int ret = 0;
@@ -457,7 +525,6 @@ static int __setting_get_radar_distance_sensitivity_setting(void *arg, l_ezlopi_
 
     return ret;
 }
-
 static int __settings_get(void *arg, l_ezlopi_device_settings_v3_t *setting)
 {
     int ret = 0;
@@ -476,11 +543,9 @@ static int __settings_get(void *arg, l_ezlopi_device_settings_v3_t *setting)
     }
     return ret;
 }
-
 // ********************************************* hub.device.settings.list related end ********************************************* //
 
 // ********************************************* hub.device.setting.value.set related start ********************************************* //
-
 // If set_active is true, is_active member is set to true and sent to the cloud accordingly.
 static int __setting_set_change_user_defined_template(bool set_active)
 {
@@ -503,7 +568,7 @@ static int __setting_set_change_user_defined_template(bool set_active)
             char *value_str = __prepare_user_defined_setting_str(setting_val);
             if (value_str)
             {
-                if (EZPI_SUCCESS == EZPI_core_nvs_write_str(value_str, strlen(value_str), nvs_key_hilink_presence_sensor_userdefined_setting))
+                if (EZPI_SUCCESS == EZPI_core_nvs_write_str(value_str, strlen(value_str), "userdef"))
                 {
                     ret = 1;
                 }
@@ -513,7 +578,6 @@ static int __setting_set_change_user_defined_template(bool set_active)
 
     return ret;
 }
-
 static int __setting_set_change_setting_template(ld2410_template_t template, uint32_t setting_id)
 {
     int ret = 0;
@@ -540,7 +604,7 @@ static int __setting_set_change_setting_template(ld2410_template_t template, uin
         {
             s_hilink_predefined_setting_value_t *predef_value = (s_hilink_predefined_setting_value_t *)hilink_presence_sensor_predefined_setting->user_arg;
             // If setting change request comes from user defined setting, check if predefined setting mode is set to user defined mode; in this case 9th index in enum str array.
-            if (predef_value && (0 == strcmp(predef_value->setting_value, hilink_presence_sensor_setting_enum[9])))
+            if (predef_value && (0 == strcmp(predef_value->setting_value, "user_defined_mode")))
             {
                 __setting_set_change_user_defined_template(true);
                 EZPI_core_device_value_updated_settings_broadcast(hilink_presence_sensor_predefined_setting);
@@ -554,47 +618,46 @@ static int __setting_set_change_setting_template(ld2410_template_t template, uin
     }
     return ret;
 }
-
 static int __setting_set_find_predefined_setting_template(s_hilink_predefined_setting_value_t *setting_value, ld2410_template_t *template)
 {
     int ret = 0;
-    if (0 == strcmp(setting_value->setting_value, hilink_presence_sensor_setting_enum[0])) // sleep_mode_close
+    if (0 == strcmp(setting_value->setting_value, "sleep_mode_close")) // sleep_mode_close
     {
         *template = SLEEP_TEMPLATE_CLOSE_RANGE;
     }
-    else if (0 == strcmp(setting_value->setting_value, hilink_presence_sensor_setting_enum[1])) // sleep_mode_mid
+    else if (0 == strcmp(setting_value->setting_value, "sleep_mode_mid")) // sleep_mode_mid
     {
         *template = SLEEP_TEMPLATE_MID_RANGE;
     }
-    else if (0 == strcmp(setting_value->setting_value, hilink_presence_sensor_setting_enum[2])) // sleep_mode_long
+    else if (0 == strcmp(setting_value->setting_value, "sleep_mode_long")) // sleep_mode_long
     {
         *template = SLEEP_TEMPLATE_LONG_RANGE;
     }
-    else if (0 == strcmp(setting_value->setting_value, hilink_presence_sensor_setting_enum[3])) // movement_mode_close
+    else if (0 == strcmp(setting_value->setting_value, "movement_mode_close")) // movement_mode_close
     {
         *template = MOVEMENT_TEMPLATE_CLOSE_RANGE;
     }
-    else if (0 == strcmp(setting_value->setting_value, hilink_presence_sensor_setting_enum[4])) // movement_mode_mid
+    else if (0 == strcmp(setting_value->setting_value, "movement_mode_mid")) // movement_mode_mid
     {
         *template = MOVEMENT_TEMPLATE_MID_RANGE;
     }
-    else if (0 == strcmp(setting_value->setting_value, hilink_presence_sensor_setting_enum[5])) // movement_mode_long
+    else if (0 == strcmp(setting_value->setting_value, "movement_mode_long")) // movement_mode_long
     {
         *template = MOVEMENT_TEMPLATE_LONG_RANGE;
     }
-    else if (0 == strcmp(setting_value->setting_value, hilink_presence_sensor_setting_enum[6])) // basic_routine_mode_close
+    else if (0 == strcmp(setting_value->setting_value, "basic_routine_mode_close")) // basic_routine_mode_close
     {
         *template = BASIC_TEMPLATE_CLOSE_RANGE;
     }
-    else if (0 == strcmp(setting_value->setting_value, hilink_presence_sensor_setting_enum[7])) // basic_routine_mode_mid
+    else if (0 == strcmp(setting_value->setting_value, "basic_routine_mode_mid")) // basic_routine_mode_mid
     {
         *template = BASIC_TEMPLATE_MID_RANGE;
     }
-    else if (0 == strcmp(setting_value->setting_value, hilink_presence_sensor_setting_enum[8])) // basic_routine_mode_long
+    else if (0 == strcmp(setting_value->setting_value, "basic_routine_mode_long")) // basic_routine_mode_long
     {
         *template = BASIC_TEMPLATE_LONG_RANGE;
     }
-    else if (0 == strcmp(setting_value->setting_value, hilink_presence_sensor_setting_enum[9])) // user_defined_mode
+    else if (0 == strcmp(setting_value->setting_value, "user_defined_mode")) // user_defined_mode
     {
         *template = CUSTOM_TEMPLATE;
     }
@@ -606,7 +669,6 @@ static int __setting_set_find_predefined_setting_template(s_hilink_predefined_se
 
     return ret;
 }
-
 static int __setting_set_pre_defined_setting(void *arg, l_ezlopi_device_settings_v3_t *setting)
 {
     int ret = 0;
@@ -619,7 +681,7 @@ static int __setting_set_pre_defined_setting(void *arg, l_ezlopi_device_settings
         if (setting_value)
         {
             CJSON_GET_VALUE_STRING_BY_COPY(cj_properties, ezlopi_value_str, setting_value->setting_value);
-            if (EZPI_SUCCESS != EZPI_core_nvs_write_str(setting_value->setting_value, strlen(setting_value->setting_value), nvs_key_hilink_presence_sensor_predefined_setting))
+            if (EZPI_SUCCESS != EZPI_core_nvs_write_str(setting_value->setting_value, strlen(setting_value->setting_value), "predef"))
             {
                 TRACE_E("Failed to write to NVS");
                 ret = 1;
@@ -645,7 +707,6 @@ static int __setting_set_pre_defined_setting(void *arg, l_ezlopi_device_settings
 
     return ret;
 }
-
 static int __setting_set_user_defined_setting(void *arg, l_ezlopi_device_settings_v3_t *setting)
 {
     int ret = 0;
@@ -662,7 +723,7 @@ static int __setting_set_user_defined_setting(void *arg, l_ezlopi_device_setting
             char *value_str = __prepare_user_defined_setting_str(setting_val);
             if (value_str)
             {
-                if (EZPI_SUCCESS == EZPI_core_nvs_write_str(value_str, strlen(value_str), nvs_key_hilink_presence_sensor_userdefined_setting))
+                if (EZPI_SUCCESS == EZPI_core_nvs_write_str(value_str, strlen(value_str), "userdef"))
                 {
                     ret = 1;
                 }
@@ -688,7 +749,6 @@ static int __setting_set_user_defined_setting(void *arg, l_ezlopi_device_setting
 
     return ret;
 }
-
 static int __setting_set_radar_distance_sensitivity_setting(void *arg, l_ezlopi_device_settings_v3_t *setting)
 {
     int ret = 0;
@@ -698,7 +758,7 @@ static int __setting_set_radar_distance_sensitivity_setting(void *arg, l_ezlopi_
     if (cj_properties && setting && setting_val)
     {
         CJSON_GET_VALUE_DOUBLE(cj_properties, ezlopi_value_str, setting_val->distance_sensitivity_value);
-        if (EZPI_SUCCESS != EZPI_core_nvs_write_int32(setting_val->distance_sensitivity_value, nvs_key_hilink_presence_sensor_radar_distance_sensitivity))
+        if (EZPI_SUCCESS != EZPI_core_nvs_write_int32(setting_val->distance_sensitivity_value, "rdrsens"))
         {
             TRACE_E("Failed to write to NVS");
             ret = 1;
@@ -711,7 +771,6 @@ static int __setting_set_radar_distance_sensitivity_setting(void *arg, l_ezlopi_
 
     return ret;
 }
-
 static int __settings_set(void *arg, l_ezlopi_device_settings_v3_t *setting)
 {
     int ret = 0;
@@ -746,8 +805,8 @@ static int __setting_reset_pre_defined_setting(void *arg, l_ezlopi_device_settin
         s_hilink_predefined_setting_value_t *setting_val = (s_hilink_predefined_setting_value_t *)setting->user_arg;
         if (setting_val)
         {
-            snprintf(setting_val->setting_value, 50, "%s", hilink_presence_sensor_setting_enum[7]);
-            if (EZPI_SUCCESS == EZPI_core_nvs_write_str(setting_val->setting_value, strlen(setting_val->setting_value), nvs_key_hilink_presence_sensor_predefined_setting))
+            snprintf(setting_val->setting_value, 50, "%s", "basic_routine_mode_mid");
+            if (EZPI_SUCCESS == EZPI_core_nvs_write_str(setting_val->setting_value, strlen(setting_val->setting_value), "predef"))
             {
                 TRACE_E("Failed to write to NVS");
                 ret = 1;
@@ -785,7 +844,7 @@ static int __setting_reset_user_defined_setting(void *arg, l_ezlopi_device_setti
             char *setting_val_str = __prepare_user_defined_setting_str(setting_val);
             if (setting_val_str)
             {
-                if (EZPI_SUCCESS == EZPI_core_nvs_write_str(setting_val_str, strlen(setting_val_str), nvs_key_hilink_presence_sensor_userdefined_setting))
+                if (EZPI_SUCCESS == EZPI_core_nvs_write_str(setting_val_str, strlen(setting_val_str), "userdef"))
                 {
                     TRACE_I("Failed to write to nvs.");
                     ret = 1;
@@ -824,7 +883,7 @@ static int __setting_reset_radar_distance_sensitivity_setting(void *arg, l_ezlop
         if (setting_val)
         {
             setting_val->distance_sensitivity_value = 10;
-            if (EZPI_SUCCESS != EZPI_core_nvs_write_int32(setting_val->distance_sensitivity_value, nvs_key_hilink_presence_sensor_radar_distance_sensitivity))
+            if (EZPI_SUCCESS != EZPI_core_nvs_write_int32(setting_val->distance_sensitivity_value, "rdrsens"))
             {
                 TRACE_E("Failed to write to NVS");
                 ret = 1;
@@ -967,3 +1026,109 @@ static int __settings_update(void *arg, l_ezlopi_device_settings_v3_t *setting)
     return ret;
 }
 // ********************************************* hub.device.setting.updated related end ********************************************* //
+
+static inline cJSON *__setting_add_text_and_lang_tag(const char *const object_text, const char *const object_lang_tag)
+{
+
+    cJSON *cj_object = cJSON_CreateObject(__FUNCTION__);
+    if (cj_object)
+    {
+        cJSON_AddStringToObject(__FUNCTION__, cj_object, ezlopi_text_str, object_text);
+        cJSON_AddStringToObject(__FUNCTION__, cj_object, ezlopi_lang_tag_str, object_lang_tag);
+    }
+    else
+    {
+        ezlopi_free(__FUNCTION__, cj_object);
+        cj_object = NULL;
+    }
+
+    return cj_object;
+}
+static inline void __setting_extract_user_defined_setting(cJSON *cj_value, s_hilink_userdefined_setting_value_t *user_defined_setting_val)
+{
+    CJSON_GET_VALUE_DOUBLE(cj_value, ezlopi_min_move_distance_str, user_defined_setting_val->min_move_distance);
+    CJSON_GET_VALUE_DOUBLE(cj_value, ezlopi_max_move_distance_str, user_defined_setting_val->max_move_distance);
+    CJSON_GET_VALUE_DOUBLE(cj_value, ezlopi_min_still_distance_str, user_defined_setting_val->min_still_distance);
+    CJSON_GET_VALUE_DOUBLE(cj_value, ezlopi_max_still_distance_str, user_defined_setting_val->max_still_distance);
+    CJSON_GET_VALUE_DOUBLE(cj_value, ezlopi_timeout_str, user_defined_setting_val->timeout);
+    CJSON_GET_VALUE_DOUBLE(cj_value, ezlopi_is_active_str, user_defined_setting_val->is_active);
+}
+static inline int __prepare_user_defined_setting_cjson(cJSON *cj_value, s_hilink_userdefined_setting_value_t *setting_val)
+{
+    int ret = 0;
+    if (cj_value && setting_val)
+    {
+        cJSON_AddNumberToObject(__FUNCTION__, cj_value, ezlopi_min_move_distance_str, setting_val->min_move_distance);
+        cJSON_AddNumberToObject(__FUNCTION__, cj_value, ezlopi_max_move_distance_str, setting_val->max_move_distance);
+        cJSON_AddNumberToObject(__FUNCTION__, cj_value, ezlopi_min_still_distance_str, setting_val->min_still_distance);
+        cJSON_AddNumberToObject(__FUNCTION__, cj_value, ezlopi_max_still_distance_str, setting_val->max_still_distance);
+        cJSON_AddNumberToObject(__FUNCTION__, cj_value, ezlopi_timeout_str, setting_val->timeout);
+        cJSON_AddBoolToObject(__FUNCTION__, cj_value, ezlopi_is_active_str, setting_val->is_active);
+    }
+    else
+    {
+        ret = 1;
+    }
+    return ret;
+}
+static inline char *__prepare_user_defined_setting_str(s_hilink_userdefined_setting_value_t *setting_val)
+{
+    char *ret = NULL;
+
+    cJSON *cj_setting = cJSON_CreateObject(__FUNCTION__);
+    if (cj_setting && setting_val)
+    {
+        ESP_ERROR_CHECK(__prepare_user_defined_setting_cjson(cj_setting, setting_val));
+        ret = cJSON_PrintBuffered(__FUNCTION__, cj_setting, 1024, false);
+        TRACE_D("length of 'ret': %d", strlen(ret));
+    }
+
+    return ret;
+}
+// Sensor's distance parameters are in the multiple of 0.75 which are encoded as enum in the driver.
+// Starting from 0.75cm ranges goes up to 6.0cm, there are total of 8 different distance ranges.
+static inline distance_t __setting_user_defined_setting_get_enum(float val)
+{
+    distance_t dist = DISTANCE_0CM;
+    if (val == 0.75)
+    {
+        dist = DISTANCE_75CM;
+    }
+    else if (val == 1.5)
+    {
+        dist = DISTANCE_150CM;
+    }
+    else if (val == 2.25)
+    {
+        dist = DISTANCE_225CM;
+    }
+    else if (val == 3.0)
+    {
+        dist = DISTANCE_300CM;
+    }
+    else if (val == 3.75)
+    {
+        dist = DISTANCE_375CM;
+    }
+    else if (val == 4.5)
+    {
+        dist = DISTANCE_450CM;
+    }
+    else if (val == 5.25)
+    {
+        dist = DISTANCE_525CM;
+    }
+    else if (val == 6.0)
+    {
+        dist = DISTANCE_600CM;
+    }
+    else
+    {
+        dist = DISTANCE_0CM;
+    }
+    return dist;
+}
+
+/*******************************************************************************
+ *                          End of File
+ *******************************************************************************/

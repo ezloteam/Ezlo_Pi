@@ -113,7 +113,7 @@ void EZPI_init(void)
     // #warning "remove this in release"
     EZPI_core_read_set_log_severities_internal(ENUM_EZLOPI_TRACE_SEVERITY_TRACE);
 #endif // CONFIG_EZPI_UTIL_TRACE_EN
-    EZPI_HAL_uart_init();
+    EZPI_uart_main_init();
 #if defined(CONFIG_EZPI_WEBSOCKET_CLIENT) || defined(CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER)
     EZPI_core_buffer_init(CONFIG_EZPI_CORE_STATIC_BUFFER_SIZE); // allocate 10kB
 #endif
@@ -160,7 +160,7 @@ void EZPI_init(void)
     EZPI_ethernet_init();
 #endif // CONFIG_EZPI_CORE_ETHERNET_EN
 
-    EZPI_core_nvs_set_boot_count(ezlopi_system_info_get_boot_count() + 1);
+    EZPI_core_nvs_set_boot_count(EZPI_hal_system_info_get_boot_count() + 1);
 
 #if defined(CONFIG_EZPI_ENABLE_WIFI)
     EZPI_core_wifi_connect_from_id_bin();

@@ -1,36 +1,155 @@
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+/**
+ * @file    main.c
+ * @brief   perform some function on data
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+ */
 
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 #include <stdlib.h>
-
-#include "esp_err.h"
+// #include "esp_err.h"
 
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_nvs.h"
-#include "ezlopi_core_devices.h"
-#include "ezlopi_cloud_settings.h"
-
-#include "ezlopi_cloud_constants.h"
+// #include "ezlopi_core_devices.h"
 #include "ezlopi_core_device_value_updated.h"
+
+#include "ezlopi_cloud_settings.h"
+#include "ezlopi_cloud_constants.h"
 
 #include "ens160.h"
 #include "sensor_0068_ENS160_gas_sensor_settings.h"
 #include "EZLOPI_USER_CONFIG.h"
 
-static const char *nvs_key_ens160_gas_sensor_ambient_temperature_setting = "enstemp";
-static const char *nvs_key_ens160_gas_sensor_relative_humidity_setting = "enshmd";
+/*******************************************************************************
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
-static uint32_t ens160_gas_sensor_settings_ids[2] = { 0, 0 };
+/*******************************************************************************
+ *                          Extern Function Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Type & Macro Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Static Function Prototypes
+ *******************************************************************************/
+static int __settings_sensor_0068_gas_sensor_setting_initialize_ambient_temperature_setting(l_ezlopi_device_t *device, void *user_arg);
+static int __settings_sensor_0068_gas_sensor_setting_initialize_relative_humidity_setting(l_ezlopi_device_t *device, void *user_arg);
+static int __settings_callback(e_ezlopi_settings_action_t action, struct l_ezlopi_device_settings_v3 *setting, void *arg, void *user_arg);
+static int __settings_get_ens160_gas_sensor_ambient_temperature_get(void *arg, l_ezlopi_device_settings_v3_t *setting);
+static int __settings_get_ens160_gas_sensor_relative_humidity_get(void *arg, l_ezlopi_device_settings_v3_t *setting);
+static int __settings_get(void *arg, l_ezlopi_device_settings_v3_t *setting);
+static int __settings_set_ens160_gas_sensor_ambient_temperature_get(void *arg, l_ezlopi_device_settings_v3_t *setting);
+static int __settings_set_ens160_gas_sensor_relative_humidity_get(void *arg, l_ezlopi_device_settings_v3_t *setting);
+static int __settings_set(void *arg, l_ezlopi_device_settings_v3_t *setting);
+static int __settings_update_ens160_gas_sensor_ambient_temperature_get(void *arg, l_ezlopi_device_settings_v3_t *setting);
+static int __settings_update_ens160_gas_sensor_relative_humidity_get(void *arg, l_ezlopi_device_settings_v3_t *setting);
+static int __settings_update(void *arg, l_ezlopi_device_settings_v3_t *setting);
+static int __settings_reset_ens160_gas_sensor_ambient_temperature_get(void *arg, l_ezlopi_device_settings_v3_t *setting);
+static int __settings_reset_ens160_gas_sensor_relative_humidity_get(void *arg, l_ezlopi_device_settings_v3_t *setting);
+static int __settings_reset(void *arg, l_ezlopi_device_settings_v3_t *setting);
+static inline cJSON *__setting_add_text_and_lang_tag_ens160(const char *const object_text, const char *const object_lang_tag);
+
+/*******************************************************************************
+ *                          Static Data Definitions
+ *******************************************************************************/
+
+// static const char *nvs_key_ens160_gas_sensor_ambient_temperature_setting = "enstemp";
+// static const char *nvs_key_ens160_gas_sensor_relative_humidity_setting = "enshmd";
+
+static uint32_t ens160_gas_sensor_settings_ids[2] = {0, 0};
 
 static bool setting_changed = false;
 
+/*******************************************************************************
+ *                          Extern Data Definitions
+ *******************************************************************************/
+
 l_ezlopi_device_settings_v3_t *ens160_gas_sensor_ambient_temperature_sensor_setting;
 l_ezlopi_device_settings_v3_t *ens160_gas_sensor_relative_humidity_sensor_setting;
+/*******************************************************************************
+ *                          Extern Function Definitions
+ *******************************************************************************/
+int ENS160_gas_sensor_settings_init(l_ezlopi_device_t *devices, void *user_arg)
+{
+    int ret = 0;
 
-static int __settings_callback(e_ezlopi_settings_action_t action, struct l_ezlopi_device_settings_v3 *setting, void *arg, void *user_arg);
-static int __settings_get(void *arg, l_ezlopi_device_settings_v3_t *setting);
-static int __settings_set(void *arg, l_ezlopi_device_settings_v3_t *setting);
-static int __settings_reset(void *arg, l_ezlopi_device_settings_v3_t *setting);
-static int __settings_update(void *arg, l_ezlopi_device_settings_v3_t *setting);
+    ESP_ERROR_CHECK(__settings_sensor_0068_gas_sensor_setting_initialize_ambient_temperature_setting(devices, user_arg));
+    ESP_ERROR_CHECK(__settings_sensor_0068_gas_sensor_setting_initialize_relative_humidity_setting(devices, user_arg));
 
+    return ret;
+}
+
+float ENS160_get_ambient_temp_setting()
+{
+    float ret = 0.0f;
+    s_sensor_ens160_gas_sensor_setting_ambient_temperature_t *ambient_temperature = (s_sensor_ens160_gas_sensor_setting_ambient_temperature_t *)ens160_gas_sensor_ambient_temperature_sensor_setting;
+    if (ambient_temperature)
+    {
+        ret = ambient_temperature->ambient_temperature;
+    }
+    return ret;
+}
+float ENS160_get_relative_humidity_setting()
+{
+    float ret = 0.0f;
+    s_sensor_ens160_gas_sensor_setting_relative_humidity_t *relative_humidity = (s_sensor_ens160_gas_sensor_setting_relative_humidity_t *)ens160_gas_sensor_relative_humidity_sensor_setting;
+    if (relative_humidity)
+    {
+        ret = relative_humidity->relative_humidity;
+    }
+    return ret;
+}
+
+bool ENS160_has_setting_changed()
+{
+    return setting_changed;
+}
+
+void ENS160_set_setting_changed_to_false()
+{
+    setting_changed = false;
+}
+
+/*******************************************************************************
+ *                         Static Function Definitions
+ *******************************************************************************/
 
 // ********************************************* Setting initialization related start ********************************************* //
 
@@ -50,7 +169,7 @@ static int __settings_sensor_0068_gas_sensor_setting_initialize_ambient_temperat
             {
                 memset(ambient_temperature, 0, sizeof(s_sensor_ens160_gas_sensor_setting_ambient_temperature_t));
                 float read_value = 0;
-                ezlopi_error_t error = EZPI_core_nvs_read_float32(&read_value, nvs_key_ens160_gas_sensor_ambient_temperature_setting);
+                ezlopi_error_t error = EZPI_core_nvs_read_float32(&read_value, "enstemp");
                 if (EZPI_SUCCESS == error)
                 {
                     TRACE_D("Setting already exist");
@@ -60,7 +179,7 @@ static int __settings_sensor_0068_gas_sensor_setting_initialize_ambient_temperat
                 {
                     TRACE_W("Not found saved setting for ambient temperature.");
                     ambient_temperature->ambient_temperature = 25;
-                    if (EZPI_SUCCESS != EZPI_core_nvs_write_float32(ambient_temperature->ambient_temperature, nvs_key_ens160_gas_sensor_ambient_temperature_setting))
+                    if (EZPI_SUCCESS != EZPI_core_nvs_write_float32(ambient_temperature->ambient_temperature, "enstemp"))
                     {
                         TRACE_E("Failed to write to NVS");
                         ret = 1;
@@ -104,7 +223,7 @@ static int __settings_sensor_0068_gas_sensor_setting_initialize_relative_humidit
             {
                 memset(relative_humidity, 0, sizeof(s_sensor_ens160_gas_sensor_setting_relative_humidity_t));
                 float read_value = 0;
-                ezlopi_error_t error = EZPI_core_nvs_read_float32(&read_value, nvs_key_ens160_gas_sensor_relative_humidity_setting);
+                ezlopi_error_t error = EZPI_core_nvs_read_float32(&read_value, "enshmd");
                 if (EZPI_SUCCESS == error)
                 {
                     TRACE_D("Setting already exist");
@@ -114,7 +233,7 @@ static int __settings_sensor_0068_gas_sensor_setting_initialize_relative_humidit
                 {
                     TRACE_W("Not found saved setting for ambient temperature.");
                     relative_humidity->relative_humidity = 50;
-                    if (EZPI_SUCCESS != EZPI_core_nvs_write_float32(relative_humidity->relative_humidity, nvs_key_ens160_gas_sensor_relative_humidity_setting))
+                    if (EZPI_SUCCESS != EZPI_core_nvs_write_float32(relative_humidity->relative_humidity, "enshmd"))
                     {
                         TRACE_E("Failed to write to NVS");
                         ret = 1;
@@ -138,16 +257,6 @@ static int __settings_sensor_0068_gas_sensor_setting_initialize_relative_humidit
     {
         ret = 1;
     }
-
-    return ret;
-}
-
-int sensor_0068_gas_sensor_settings_initialize(l_ezlopi_device_t *devices, void *user_arg)
-{
-    int ret = 0;
-
-    ESP_ERROR_CHECK(__settings_sensor_0068_gas_sensor_setting_initialize_ambient_temperature_setting(devices, user_arg));
-    ESP_ERROR_CHECK(__settings_sensor_0068_gas_sensor_setting_initialize_relative_humidity_setting(devices, user_arg));
 
     return ret;
 }
@@ -204,8 +313,8 @@ static int __settings_get_ens160_gas_sensor_ambient_temperature_get(void *arg, l
     s_sensor_ens160_gas_sensor_setting_ambient_temperature_t *ambient_temperature = (s_sensor_ens160_gas_sensor_setting_ambient_temperature_t *)setting->user_arg;
     if (cj_properties && ambient_temperature)
     {
-        cJSON_AddItemToObject(__FUNCTION__, cj_properties, ezlopi_label_str, __setting_add_text_and_lang_tag(SENSOR_ENS160_GAS_SENSOR_SETTING_AMBIENT_TEMPERATURE_LABEL_TEXT, SENSOR_ENS160_GAS_SENSOR_SETTING_AMBIENT_TEMPERATURE_LABEL_LANG_TAG));
-        cJSON_AddItemToObject(__FUNCTION__, cj_properties, ezlopi_description_str, __setting_add_text_and_lang_tag(SENSOR_ENS160_GAS_SENSOR_SETTING_AMBIENT_TEMPERATURE_DESCRIPTION_TEXT, SENSOR_ENS160_GAS_SENSOR_SETTING_AMBIENT_TEMPERATURE_DESCRIPTION_LANG_TAG));
+        cJSON_AddItemToObject(__FUNCTION__, cj_properties, ezlopi_label_str, __setting_add_text_and_lang_tag_ens160(SENSOR_ENS160_GAS_SENSOR_SETTING_AMBIENT_TEMPERATURE_LABEL_TEXT, SENSOR_ENS160_GAS_SENSOR_SETTING_AMBIENT_TEMPERATURE_LABEL_LANG_TAG));
+        cJSON_AddItemToObject(__FUNCTION__, cj_properties, ezlopi_description_str, __setting_add_text_and_lang_tag_ens160(SENSOR_ENS160_GAS_SENSOR_SETTING_AMBIENT_TEMPERATURE_DESCRIPTION_TEXT, SENSOR_ENS160_GAS_SENSOR_SETTING_AMBIENT_TEMPERATURE_DESCRIPTION_LANG_TAG));
         cJSON_AddStringToObject(__FUNCTION__, cj_properties, ezlopi_status_str, ezlopi_synced_str);
         cJSON_AddStringToObject(__FUNCTION__, cj_properties, ezlopi_valueType_str, value_type_temperature);
 
@@ -236,8 +345,8 @@ static int __settings_get_ens160_gas_sensor_relative_humidity_get(void *arg, l_e
     s_sensor_ens160_gas_sensor_setting_relative_humidity_t *relative_humidity = (s_sensor_ens160_gas_sensor_setting_relative_humidity_t *)setting->user_arg;
     if (cj_properties && relative_humidity)
     {
-        cJSON_AddItemToObject(__FUNCTION__, cj_properties, ezlopi_label_str, __setting_add_text_and_lang_tag(SENSOR_ENS160_GAS_SENSOR_SETTING_RELATIVE_HUMIDITY_LABEL_TEXT, SENSOR_ENS160_GAS_SENSOR_SETTING_RELATIVE_HUMIDITY_LABEL_LANG_TAG));
-        cJSON_AddItemToObject(__FUNCTION__, cj_properties, ezlopi_description_str, __setting_add_text_and_lang_tag(SENSOR_ENS160_GAS_SENSOR_SETTING_RELATIVE_HUMIDITY_DESCRIPTION_TEXT, SENSOR_ENS160_GAS_SENSOR_SETTING_RELATIVE_HUMIDITY_DESCRIPTION_LANG_TAG));
+        cJSON_AddItemToObject(__FUNCTION__, cj_properties, ezlopi_label_str, __setting_add_text_and_lang_tag_ens160(SENSOR_ENS160_GAS_SENSOR_SETTING_RELATIVE_HUMIDITY_LABEL_TEXT, SENSOR_ENS160_GAS_SENSOR_SETTING_RELATIVE_HUMIDITY_LABEL_LANG_TAG));
+        cJSON_AddItemToObject(__FUNCTION__, cj_properties, ezlopi_description_str, __setting_add_text_and_lang_tag_ens160(SENSOR_ENS160_GAS_SENSOR_SETTING_RELATIVE_HUMIDITY_DESCRIPTION_TEXT, SENSOR_ENS160_GAS_SENSOR_SETTING_RELATIVE_HUMIDITY_DESCRIPTION_LANG_TAG));
         cJSON_AddStringToObject(__FUNCTION__, cj_properties, ezlopi_status_str, ezlopi_synced_str);
         cJSON_AddStringToObject(__FUNCTION__, cj_properties, ezlopi_valueType_str, value_type_humidity);
 
@@ -286,7 +395,7 @@ static int __settings_set_ens160_gas_sensor_ambient_temperature_get(void *arg, l
     if (cj_properties && ambient_temperature)
     {
         CJSON_GET_VALUE_DOUBLE(cj_properties, ezlopi_value_str, ambient_temperature->ambient_temperature);
-        if (EZPI_SUCCESS != EZPI_core_nvs_write_float32(ambient_temperature->ambient_temperature, nvs_key_ens160_gas_sensor_ambient_temperature_setting))
+        if (EZPI_SUCCESS != EZPI_core_nvs_write_float32(ambient_temperature->ambient_temperature, "enstemp"))
         {
             TRACE_E("Failed to write to NVS");
             ret = 1;
@@ -308,7 +417,7 @@ static int __settings_set_ens160_gas_sensor_relative_humidity_get(void *arg, l_e
     if (cj_properties && relative_humidity)
     {
         CJSON_GET_VALUE_DOUBLE(cj_properties, ezlopi_value_str, relative_humidity->relative_humidity);
-        if (EZPI_SUCCESS != EZPI_core_nvs_write_float32(relative_humidity->relative_humidity, nvs_key_ens160_gas_sensor_relative_humidity_setting))
+        if (EZPI_SUCCESS != EZPI_core_nvs_write_float32(relative_humidity->relative_humidity, "enshmd"))
         {
             TRACE_E("Failed to write to NVS");
             ret = 1;
@@ -344,7 +453,6 @@ static int __settings_set(void *arg, l_ezlopi_device_settings_v3_t *setting)
 // ********************************************* Setting setter related end ********************************************* //
 
 // ********************************************* Setting updater related start ********************************************* //
-
 
 static int __settings_update_ens160_gas_sensor_ambient_temperature_get(void *arg, l_ezlopi_device_settings_v3_t *setting)
 {
@@ -410,7 +518,7 @@ static int __settings_reset_ens160_gas_sensor_ambient_temperature_get(void *arg,
     if (cj_properties && ambient_temperature)
     {
         ambient_temperature->ambient_temperature = 25;
-        if (EZPI_SUCCESS != EZPI_core_nvs_write_float32(ambient_temperature->ambient_temperature, nvs_key_ens160_gas_sensor_ambient_temperature_setting))
+        if (EZPI_SUCCESS != EZPI_core_nvs_write_float32(ambient_temperature->ambient_temperature, "enstemp"))
         {
             TRACE_E("Failed to write to NVS");
             ret = 1;
@@ -432,7 +540,7 @@ static int __settings_reset_ens160_gas_sensor_relative_humidity_get(void *arg, l
     if (cj_properties && relative_humidity)
     {
         relative_humidity->relative_humidity = 50;
-        if (EZPI_SUCCESS != EZPI_core_nvs_write_float32(relative_humidity->relative_humidity, nvs_key_ens160_gas_sensor_relative_humidity_setting))
+        if (EZPI_SUCCESS != EZPI_core_nvs_write_float32(relative_humidity->relative_humidity, "enshmd"))
         {
             TRACE_E("Failed to write to NVS");
             ret = 1;
@@ -467,33 +575,24 @@ static int __settings_reset(void *arg, l_ezlopi_device_settings_v3_t *setting)
 
 // ********************************************* Setting resetter related end ********************************************* //
 
-float get_ambient_temperature_setting()
+static inline cJSON *__setting_add_text_and_lang_tag_ens160(const char *const object_text, const char *const object_lang_tag)
 {
-    float ret = 0.0f;
-    s_sensor_ens160_gas_sensor_setting_ambient_temperature_t *ambient_temperature = (s_sensor_ens160_gas_sensor_setting_ambient_temperature_t *)ens160_gas_sensor_ambient_temperature_sensor_setting;
-    if (ambient_temperature)
+
+    cJSON *cj_object = cJSON_CreateObject(__FUNCTION__);
+    if (cj_object)
     {
-        ret = ambient_temperature->ambient_temperature;
+        cJSON_AddStringToObject(__FUNCTION__, cj_object, ezlopi_text_str, object_text);
+        cJSON_AddStringToObject(__FUNCTION__, cj_object, ezlopi_lang_tag_str, object_lang_tag);
     }
-    return ret;
-}
-float get_relative_humidity_setting()
-{
-    float ret = 0.0f;
-    s_sensor_ens160_gas_sensor_setting_relative_humidity_t *relative_humidity = (s_sensor_ens160_gas_sensor_setting_relative_humidity_t *)ens160_gas_sensor_relative_humidity_sensor_setting;
-    if (relative_humidity)
+    else
     {
-        ret = relative_humidity->relative_humidity;
+        ezlopi_free(__FUNCTION__, cj_object);
+        cj_object = NULL;
     }
-    return ret;
+
+    return cj_object;
 }
 
-bool has_setting_changed()
-{
-    return setting_changed;
-}
-
-void set_setting_changed_to_false()
-{
-    setting_changed = false;
-}
+/*******************************************************************************
+ *                          End of File
+ *******************************************************************************/

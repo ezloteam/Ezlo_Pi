@@ -7,36 +7,36 @@
  * @version
  * @date
  */
- /* ===========================================================================
- ** Copyright (C) 2024 Ezlo Innovation Inc
- **
- ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
- **
- ** Redistribution and use in source and binary forms, with or without
- ** modification, are permitted provided that the following conditions are met:
- **
- ** 1. Redistributions of source code must retain the above copyright notice,
- **    this list of conditions and the following disclaimer.
- ** 2. Redistributions in binary form must reproduce the above copyright
- **    notice, this list of conditions and the following disclaimer in the
- **    documentation and/or other materials provided with the distribution.
- ** 3. Neither the name of the copyright holder nor the names of its
- **    contributors may be used to endorse or promote products derived from
- **    this software without specific prior written permission.
- **
- ** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- ** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- ** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- ** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- ** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- ** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- ** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- ** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- ** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- ** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- ** POSSIBILITY OF SUCH DAMAGE.
- ** ===========================================================================
- */
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
 
 #include "../../build/config/sdkconfig.h"
 
@@ -56,11 +56,13 @@
 #include "EZLOPI_USER_CONFIG.h"
 
 #include "ezlopi_core_nvs.h"
+#include "ezlopi_core_sntp.h"
 #include "ezlopi_core_wifi.h"
 #include "ezlopi_core_devices.h"
 #include "ezlopi_core_ble_gatt.h"
 #include "ezlopi_core_ble_buffer.h"
 #include "ezlopi_core_ble_profile.h"
+#include "ezlopi_core_event_group.h"
 #include "ezlopi_core_factory_info.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_event_group.h"
@@ -71,32 +73,32 @@
 #include "ezlopi_service_ble_ble_auth.h"
 #include "ezlopi_service_ble.h"
 
- /*******************************************************************************
-  *                          Type & Macro Definitions
-  *******************************************************************************/
-  /**
-   * @brief Returns string from the the json `root` which contains name member
-   * @note root is the JOSN and should exist before being called
-   *
-   */
+/*******************************************************************************
+ *                          Type & Macro Definitions
+ *******************************************************************************/
+/**
+ * @brief Returns string from the the json `root` which contains name member
+ * @note root is the JOSN and should exist before being called
+ *
+ */
 #define CJ_GET_STRING(name) cJSON_GetStringValue(cJSON_GetObjectItem(__FUNCTION__, root, name))
-   /**
-    * @brief Returns number from the the json `root` which contains name member
-    * @note root is the JOSN and should exist before being called
-    *
-    */
+/**
+ * @brief Returns number from the the json `root` which contains name member
+ * @note root is the JOSN and should exist before being called
+ *
+ */
 #define CJ_GET_NUMBER(name) cJSON_GetNumberValue(cJSON_GetObjectItem(__FUNCTION__, root, name))
 
-    /*******************************************************************************
-     *                          Static Function Prototypes
-     *******************************************************************************/
+/*******************************************************************************
+ *                          Static Function Prototypes
+ *******************************************************************************/
 #ifdef EZPI_SERV_BLE_ENABLE_READ_PROV
-     /**
-      * @brief Function converts provisoning data of the device into JOSN str
-      *
-      * @return char* Pointer to the JSON string
-      * @retval JSON string pointer, or NULL on error
-      */
+/**
+ * @brief Function converts provisoning data of the device into JOSN str
+ *
+ * @return char* Pointer to the JSON string
+ * @retval JSON string pointer, or NULL on error
+ */
 static char *ezpi_provisioning_info_jsonify(void);
 /**
  * @brief Function returns base64 encoded value of device provisioning info
@@ -161,11 +163,11 @@ void EZPI_ble_service_provisioning_init(void)
     permission = ESP_GATT_PERM_WRITE | ESP_GATT_PERM_READ;
     properties = ESP_GATT_CHAR_PROP_BIT_WRITE | ESP_GATT_CHAR_PROP_BIT_READ | ESP_GATT_CHAR_PROP_BIT_NOTIFY | ESP_GATT_CHAR_PROP_BIT_INDICATE;
     EZPI_core_ble_gatt_add_characteristic(g_provisioning_service, &uuid, permission, properties, ezpi_provisioning_info_read_func, ezpi_provisioning_info_write_func, NULL); // reliable-write is not implemented for now
-#else                                                                                                                                                               // EZPI_SERV_BLE_ENABLE_READ_PROV
+#else                                                                                                                                                                        // EZPI_SERV_BLE_ENABLE_READ_PROV
     permission = ESP_GATT_PERM_WRITE;
     properties = ESP_GATT_CHAR_PROP_BIT_WRITE;
     EZPI_core_ble_gatt_add_characteristic(g_provisioning_service, &uuid, permission, properties, NULL, ezpi_provisioning_info_write_func, NULL); // reliable-write is not implemented for now
-#endif                                                                                                                                                              // EZPI_SERV_BLE_ENABLE_READ_PROV
+#endif                                                                                                                                                                       // EZPI_SERV_BLE_ENABLE_READ_PROV
 
 #ifdef EZPI_SERV_BLE_ENABLE_STAT_PROV
     uuid.uuid.uuid16 = BLE_PROVISIONING_STATUS_CHAR_UUID;
@@ -366,10 +368,8 @@ static void ezpi_provisioning_info_write_func(esp_gatt_value_t *value, esp_ble_g
                                         uint32_t version_no = EZPI_core_nvs_config_info_version_number_get() + 1;
                                         EZPI_core_nvs_config_info_version_number_set(version_no);
 
-                                        time_t now;
-                                        time(&now);
-                                        TRACE_D("time now{size: %u}: %lu", sizeof(time_t), now);
-                                        EZPI_core_nvs_config_info_update_time_set(now);
+                                        TRACE_D("time now{size: %u}: %lu", sizeof(time_t), EZPI_core_sntp_get_current_time_sec());
+                                        EZPI_core_nvs_config_info_update_time_set(EZPI_core_sntp_get_current_time_sec());
 
                                         ezlopi_free(__FUNCTION__, ezlopi_config_basic);
                                     }
@@ -422,14 +422,13 @@ static void ezpi_provisioning_info_read_func(esp_gatt_value_t *value, esp_ble_ga
 
     // timeout logic
     int status = -1; // success for non negative, failed for negative
-    time_t time_now = 0;
-    time(&time_now);
-    if ((time_now - g_provisioning_last_read_time) >= gc_provisioning_read_timeout_s)
+
+    if ((EZPI_core_sntp_get_current_time_sec() - g_provisioning_last_read_time) >= gc_provisioning_read_timeout_s)
     {
         g_provisioning_sequence_no = 0;
     }
 
-    time(&g_provisioning_last_read_time);
+    g_provisioning_last_read_time = EZPI_core_sntp_get_current_time_sec();
 
     if (value)
     {
@@ -677,7 +676,7 @@ static char *ezpi_provisioning_info_base64(void)
             TRACE_D("str_provisioning_data[len: %d]: %s", strlen(str_provisioning_data), str_provisioning_data);
 
             int ret = mbedtls_base64_encode((unsigned char *)base64_data, base64_data_len, &out_put_len,
-                (const unsigned char *)str_provisioning_data, strlen(str_provisioning_data));
+                                            (const unsigned char *)str_provisioning_data, strlen(str_provisioning_data));
 
             if (0 == out_put_len)
             {

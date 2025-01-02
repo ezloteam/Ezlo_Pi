@@ -481,7 +481,6 @@ const char *ezlopi_scene_enabled_str = "scene_enabled";
 const char *ezlopi_scene_disabled_str = "scene_disabled";
 const char *ezlopi_operation_str = "operation";
 
-
 const char *ezlopi_sunrise_str = "sunrise";
 const char *ezlopi_sunset_str = "sunset";
 const char *ezlopi_weekdays_str = "weekdays";
@@ -528,8 +527,32 @@ const char *ezlopi_when_category_modes_str = "when_category_modes";
 const char *ezlopi_when_category_logic_str = "when_category_logic";
 const char *ezlopi_when_category_function_str = "when_category_function";
 
+const char *ezlopi_log_str = "log";
+const char *ezlopi_request_str = "request";
+const char *ezlopi_resourceLogs_str = "resourceLogs";
+const char *ezlopi_scopeLogs_str = "scopeLogs";
+const char *ezlopi_logRecords_str = "logRecords";
+const char *ezlopi_timeUnixNano_str = "timeUnixNano";
+const char *ezlopi_observedTimeUnixNano_str = "observedTimeUnixNano";
+const char *ezlopi_body_str = "body";
+const char *ezlopi_otel_c_str = "otel-c";
+const char *ezlopi_trace_str = "trace";
+const char *ezlopi_otel_version_str = "1.0.0";
+const char *ezlopi_timeOffset_str = "timeOffset";
+const char *ezlopi_register_str = "register";
+const char *ezlopi_media_str = "media";
+const char *ezlopi_radio_str = "radio";
+const char *ezlopi_hubType_str = "hubType";
+const char *ezlopi_controller_uuid_str = "controller_uuid";
+const char *ezlopi_mac_address_str = "mac_address";
+const char *ezlopi_maxFrameSize_str = "maxFrameSize";
+
+const char *ezlopi_uart_str = "uart";
+const char *ezlopi_bluetooth_str = "bluetooth";
+const char *ezlopi_websocket_server_str = "websocket.server";
+const char *ezlopi_websocket_client_str = "websocket.client";
+
 #endif // __EZLOPI_CLOUD_KEYWORDS_H__
 /*******************************************************************************
  *                          End of File
  *******************************************************************************/
-
