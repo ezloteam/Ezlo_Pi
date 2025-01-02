@@ -136,6 +136,7 @@ void EZPI_firmware_info_get(cJSON *cj_request, cJSON *cj_response)
     }
 }
 
+
 cJSON *EZPI_firmware_send_firmware_query_to_nma_server(uint32_t message_count)
 {
     cJSON *cj_request = cJSON_CreateObject(__FUNCTION__);

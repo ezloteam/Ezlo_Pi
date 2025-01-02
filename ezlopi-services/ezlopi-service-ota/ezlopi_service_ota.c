@@ -83,15 +83,15 @@ void EZPI_service_ota_init(void)
 
 static void __ota_loop(void *arg)
 {
-    if (1 == EZPI_core_event_group_wait_for_event(EZLOPI_EVENT_WIFI_CONNECTED, 0, false))
+    if (EZPI_SUCCESS == EZPI_core_event_group_wait_for_event(EZLOPI_EVENT_WIFI_CONNECTED, 0, false))
     {
-        if (1 == EZPI_core_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 0, false))
+        if (EZPI_SUCCESS == EZPI_core_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 0, false))
         {
-            // TRACE_D("OTA - Got reg event.");
+            TRACE_D("OTA - Got reg event.");
             static uint32_t __ota_time_stamp = 0;
             int ret_ota = EZPI_core_event_group_wait_for_event(EZLOPI_EVENT_OTA, 0, true);
 
-            if ((ret_ota > 0) || ((xTaskGetTickCount() - __ota_time_stamp) > (86400 * 1000 / portTICK_RATE_MS))) // 86400 seconds in a day (24 hrs)
+            if ((ret_ota > 0) || ((xTaskGetTickCount() - __ota_time_stamp) > (86400 * 1000 / portTICK_RATE_MS))) // 86400 seconds in a day (24 hrs) // 86400 * 1000
             {
                 cJSON *cj_firmware_info_request = EZPI_firmware_send_firmware_query_to_nma_server(esp_random());
 

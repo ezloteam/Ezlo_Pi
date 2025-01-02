@@ -167,15 +167,15 @@ static void ezlopi_ota_process(void *pv)
     TRACE_S("Bind interface name is %s", ifr.ifr_name);
 #endif
 
+#include "ca_mios.h"
     esp_http_client_config_t config = {
         .url = url,
         .event_handler = _http_event_handler,
-        .keep_alive_enable = true,
-        .transport_type = HTTP_TRANSPORT_OVER_SSL,
-        // .cert_pem = ezlopi_factory_info_v2_get_ca_certificate(),
-        // .client_cert_pem = ezlopi_factory_info_v2_get_ssl_shared_key(),
-        // .client_key_pem = ezlopi_factory_info_v2_get_ssl_private_key(),
-        .crt_bundle_attach = esp_crt_bundle_attach,
+        .cert_pem = ca_mios, // ezlopi_factory_info_v3_get_ssl_shared_key(),
+                             // .buffer_size = 1024,
+                             // .buffer_size_tx = 1024,
+    // .client_cert_pem = ezlopi_factory_info_v3_get_ssl_shared_key(),
+    // .client_key_pem = ezlopi_factory_info_v3_get_ssl_private_key(),
 
 #ifdef CONFIG_FIRMWARE_UPGRADE_BIND_IF
         .if_name = &ifr,
@@ -231,7 +231,8 @@ static esp_err_t _http_event_handler(esp_http_client_event_t *evt)
     {
     case HTTP_EVENT_ERROR:
     {
-        TRACE_D("HTTP_EVENT_ERROR");
+        TRACE_E("HTTP_EVENT_ERROR");
+        TRACE_E("HTTP_EVENT_ERROR, error code: %d", esp_http_client_get_errno(evt));
         break;
     }
     case HTTP_EVENT_ON_CONNECTED:

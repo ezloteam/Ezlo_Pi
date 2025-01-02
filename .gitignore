@@ -60,7 +60,8 @@ compile_commands.json
 CTestTestfile.cmake
 _deps
 
-
+#specefic files 
+/ezlopi-core/ezlopi-core-ota/ca_mios.h
 # Python Tools for Visual Studio (PTVS)
 **/__pycache__/
 **/*.pyc
