@@ -39,7 +39,7 @@
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
-
+#include "cjext.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_errors.h"
 #include "ezlopi_core_processes.h"
@@ -47,6 +47,7 @@
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
 #include "ezlopi_core_processes.h"
+#include "ezlopi_core_sntp.h"
 
 #include "ezlopi_hal_uart.h"
 

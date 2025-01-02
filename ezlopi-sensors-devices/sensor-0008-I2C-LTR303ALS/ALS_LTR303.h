@@ -106,3 +106,13 @@ extern "C"
     esp_err_t ltr303_loop(void);
     esp_err_t ltr303_get_val(ltr303_data_t *ltr303_data);
     bool ltr303_is_data_available(void);
+
+    #ifdef __cplusplus
+}
+#endif
+
+#endif // _ALS_LTR303_H_
+
+/*******************************************************************************
+*                          End of File
+*******************************************************************************/

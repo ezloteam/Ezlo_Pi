@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    sensor_0033_ADC_turbidity.c
-* @brief   perform some function on sensor_0033
-* @author  xx
-* @version 0.1
-* @date    xx
-*/
+ * @file    sensor_0033_ADC_turbidity.c
+ * @brief   perform some function on sensor_0033
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
@@ -53,20 +53,20 @@
 #include "EZLOPI_USER_CONFIG.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static ezlopi_error_t __prepare(void *arg);
 static ezlopi_error_t __init(l_ezlopi_item_t *item);
 static ezlopi_error_t __notify(l_ezlopi_item_t *item);
@@ -74,16 +74,16 @@ static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg);
 static ezlopi_error_t __get_item_list(l_ezlopi_item_t *item, void *arg);
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 ezlopi_error_t SENSOR_0033_adc_turbidity(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
@@ -123,15 +123,8 @@ ezlopi_error_t SENSOR_0033_adc_turbidity(e_ezlopi_actions_t action, l_ezlopi_ite
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
-
-static const char *water_filter_replacement_alarm_states[] = {
-    "water_filter_ok",
-    "replace_water_filter",
-    "unknown",
-};
-
+ *                         Static Function Definitions
+ *******************************************************************************/
 static ezlopi_error_t __get_item_list(l_ezlopi_item_t *item, void *arg)
 {
     ezlopi_error_t ret = EZPI_FAILED;
@@ -141,7 +134,12 @@ static ezlopi_error_t __get_item_list(l_ezlopi_item_t *item, void *arg)
         cJSON *json_array_enum = cJSON_CreateArray(__FUNCTION__);
         if (NULL != json_array_enum)
         {
-            for (uint8_t i = 0; i < TURBIDITY__MAX; i++)
+            char *water_filter_replacement_alarm_states[] = {
+                "water_filter_ok",
+                "replace_water_filter",
+                "unknown",
+            };
+            for (uint8_t i = 0; i < TURBIDITY_MAX; i++)
             {
                 cJSON *json_value = cJSON_CreateString(__FUNCTION__, water_filter_replacement_alarm_states[i]);
                 if (NULL != json_value)
@@ -152,29 +150,29 @@ static ezlopi_error_t __get_item_list(l_ezlopi_item_t *item, void *arg)
             cJSON_AddItemToObject(__FUNCTION__, cjson_propertise, ezlopi_enum_str, json_array_enum);
         }
 
-        s_ezlopi_analog_data_t ezlopi_analog_data = { .value = 0, .voltage = 0 };
+        s_ezlopi_analog_data_t ezlopi_analog_data = {.value = 0, .voltage = 0};
 
         EZPI_hal_adc_get_adc_data(item->interface.adc.gpio_num, &ezlopi_analog_data);
         TRACE_I("Value is: %d, voltage is: %d", ezlopi_analog_data.value, ezlopi_analog_data.voltage);
-        const char *ezlopi_water_present_turbidity_state = NULL;
+        char *curr_turbidity_state = NULL;
         if (1000 > ezlopi_analog_data.voltage)
         {
-            ezlopi_water_present_turbidity_state = "replace_water_filter";
+            curr_turbidity_state = "replace_water_filter";
         }
         else
         {
-            ezlopi_water_present_turbidity_state = "water_filter_ok";
+            curr_turbidity_state = "water_filter_ok";
         }
 
-        if (ezlopi_water_present_turbidity_state)
+        if (curr_turbidity_state)
         {
-            cJSON_AddStringToObject(__FUNCTION__, cjson_propertise, ezlopi_value_str, ezlopi_water_present_turbidity_state);
-            cJSON_AddStringToObject(__FUNCTION__, cjson_propertise, ezlopi_valueFormatted_str, ezlopi_water_present_turbidity_state);
+            cJSON_AddStringToObject(__FUNCTION__, cjson_propertise, ezlopi_value_str, curr_turbidity_state);
+            cJSON_AddStringToObject(__FUNCTION__, cjson_propertise, ezlopi_valueFormatted_str, curr_turbidity_state);
         }
         else
         {
-            cJSON_AddStringToObject(__FUNCTION__, cjson_propertise, ezlopi_value_str, water_filter_replacement_alarm_states[TURBIDITY__UNKNOWN]);
-            cJSON_AddStringToObject(__FUNCTION__, cjson_propertise, ezlopi_valueFormatted_str, water_filter_replacement_alarm_states[TURBIDITY__UNKNOWN]);
+            cJSON_AddStringToObject(__FUNCTION__, cjson_propertise, ezlopi_value_str, "unknown");
+            cJSON_AddStringToObject(__FUNCTION__, cjson_propertise, ezlopi_valueFormatted_str, "unknown");
         }
         ret = EZPI_SUCCESS;
     }
@@ -189,7 +187,7 @@ static ezlopi_error_t __notify(l_ezlopi_item_t *item)
 
     if (turbidity_sensor_state)
     {
-        s_ezlopi_analog_data_t tmp_analog_data = { .value = 0, .voltage = 0 };
+        s_ezlopi_analog_data_t tmp_analog_data = {.value = 0, .voltage = 0};
         EZPI_hal_adc_get_adc_data(item->interface.adc.gpio_num, &tmp_analog_data);
         if (1000 > tmp_analog_data.voltage)
         {
@@ -302,5 +300,5 @@ static ezlopi_error_t __prepare(void *arg)
 }
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

@@ -2,6 +2,7 @@
 file(GLOB_RECURSE SOURCES "./*.c*")
 
 set(ESP_COMPONENTS
+        driver
         esp_adc_cal
 )
 set(EZLOPI_CORE_COMPONENTS

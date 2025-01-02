@@ -65,10 +65,19 @@
  * @param[in] bsec      : Instance of BSEC2 calling the callback
  */
 static void bme680_data_callback(const bme68x_data data, const bsec_outputs outputs);
+/**
+ * @brief This function is called to copy bme280 sensor data
+ *
+ * @param dest Pointer to destination structure
+ * @param src Pointer to source structure
+ * @return true
+ * @return false
+ */
+static bool bme680_copy_data(bme680_data_t *dest, bme680_data_t *src);
 /*******************************************************************************
  *                          Static Data Definitions
  *******************************************************************************/
-#warning "RIKEN: do not use global and/or static variable in devices! PLEASE!!"
+#warning "NABIN: do not use global & static variable"
 static bool callback_status = false;
 static bme680_data_t bme680_data;
 

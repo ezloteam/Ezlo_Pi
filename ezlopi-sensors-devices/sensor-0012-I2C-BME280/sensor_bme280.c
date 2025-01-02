@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    sensor_bme280.c
-* @brief   perform some function on bme280
-* @author  xx
-* @version 0.1
-* @date    xx
-*/
+ * @file    sensor_bme280.c
+ * @brief   perform some function on bme280
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 
 #include "sensor_bme280.h"
 #include <inttypes.h>
@@ -47,16 +47,16 @@
 #include "ezlopi_hal_i2c_master.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 #define I2C_FREQ_HZ 1000000 // Max 1MHz for esp-idf
 /**
  * BMP280 registers
@@ -93,19 +93,18 @@
         if (!(VAL))                     \
             return ESP_ERR_INVALID_ARG; \
     } while (0)
-#define CHECK_LOGE(dev, x, msg, ...)           \
-    do                                         \
-    {                                          \
-        esp_err_t __;                          \
-        if ((__ = x) != ESP_OK)                \
-        {                                      \
-            ESP_LOGE(TAG, msg, ##__VA_ARGS__); \
-            return __;                         \
-        }                                      \
+#define CHECK_LOGE(dev, x, msg, ...)                \
+    do                                              \
+    {                                               \
+        esp_err_t __;                               \
+        if ((__ = x) != ESP_OK)                     \
+        {                                           \
+            ESP_LOGE("bmp280", msg, ##__VA_ARGS__); \
+            return __;                              \
+        }                                           \
     } while (0)
 
-
- /*******************************************************************************
+/*******************************************************************************
  *                          Static Function Prototypes
  *******************************************************************************/
 inline static esp_err_t read_register_8(s_ezlopi_i2c_master_t *i2c_master_conf, uint8_t reg, uint8_t *r);
@@ -116,17 +115,17 @@ static inline int32_t compensate_temperature(bmp280_t *dev, int32_t adc_temp, in
 static inline uint32_t compensate_pressure(bmp280_t *dev, int32_t adc_press, int32_t fine_temp);
 static inline uint32_t compensate_humidity(bmp280_t *dev, int32_t adc_hum, int32_t fine_temp);
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
-static const char *TAG = "bmp280";
+ *                          Static Data Definitions
+ *******************************************************************************/
+// static const char *TAG = "bmp280";
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 esp_err_t bmp280_init_default_params(bmp280_params_t *params)
 {
     CHECK_ARG(params);
@@ -153,11 +152,11 @@ esp_err_t bmp280_init(bmp280_t *dev, bmp280_params_t *params, s_ezlopi_i2c_maste
     if (dev->id != BMP280_CHIP_ID && dev->id != BME280_CHIP_ID)
     {
         CHECK_LOGE(dev, ESP_ERR_INVALID_VERSION, "Invalid chip ID: expected: 0x%x (BME280) or 0x%x (BMP280) got: 0x%x",
-            BME280_CHIP_ID, BMP280_CHIP_ID, dev->id);
+                   BME280_CHIP_ID, BMP280_CHIP_ID, dev->id);
     }
 
     // Soft reset.
-    uint8_t reset_data[2] = { BMP280_REG_RESET, BMP280_RESET_VALUE };
+    uint8_t reset_data[2] = {BMP280_REG_RESET, BMP280_RESET_VALUE};
     ESP_ERROR_CHECK(EZPI_hal_i2c_master_write_to_device(i2c_master_conf, reset_data, 2));
 
     // Wait until finished copying over the NVP data.
@@ -181,9 +180,9 @@ esp_err_t bmp280_init(bmp280_t *dev, bmp280_params_t *params, s_ezlopi_i2c_maste
     }
 
     uint8_t config = (params->standby << 5) | (params->filter << 2);
-    ESP_LOGD(TAG, "Writing config reg=%x", config);
+    ESP_LOGD("bmp280", "Writing config reg=%x", config);
 
-    uint8_t config_data[2] = { BMP280_REG_CONFIG, config };
+    uint8_t config_data[2] = {BMP280_REG_CONFIG, config};
     ESP_ERROR_CHECK(EZPI_hal_i2c_master_write_to_device(i2c_master_conf, config_data, 2));
 
     if (params->mode == BMP280_MODE_FORCED)
@@ -195,16 +194,15 @@ esp_err_t bmp280_init(bmp280_t *dev, bmp280_params_t *params, s_ezlopi_i2c_maste
     {
         // Write crtl hum reg first, only active after write to BMP280_REG_CTRL.
         uint8_t ctrl_hum = params->oversampling_humidity;
-        ESP_LOGD(TAG, "Writing ctrl hum reg=%x", ctrl_hum);
-        uint8_t humid_crtl_data[2] = { BMP280_REG_CTRL_HUM, ctrl_hum };
+        ESP_LOGD("bmp280", "Writing ctrl hum reg=%x", ctrl_hum);
+        uint8_t humid_crtl_data[2] = {BMP280_REG_CTRL_HUM, ctrl_hum};
         ESP_ERROR_CHECK(EZPI_hal_i2c_master_write_to_device(i2c_master_conf, humid_crtl_data, 2));
     }
 
     uint8_t ctrl = (params->oversampling_temperature << 5) | (params->oversampling_pressure << 2) | (params->mode);
-    ESP_LOGD(TAG, "Writing ctrl reg=%x", ctrl);
-    uint8_t crtl_data[2] = { BMP280_REG_CTRL, ctrl };
+    ESP_LOGD("bmp280", "Writing ctrl reg=%x", ctrl);
+    uint8_t crtl_data[2] = {BMP280_REG_CTRL, ctrl};
     ESP_ERROR_CHECK(EZPI_hal_i2c_master_write_to_device(i2c_master_conf, crtl_data, 2));
-
 
     return ESP_OK;
 }
@@ -225,7 +223,6 @@ esp_err_t bmp280_read_fixed(s_ezlopi_i2c_master_t *i2c_master_conf, bmp280_t *de
         humidity = NULL;
     }
 
-
     // Need to read in one sequence to ensure they match.
     size_t size = humidity ? 8 : 6;
     uint8_t register_addr = 0xf7;
@@ -234,8 +231,8 @@ esp_err_t bmp280_read_fixed(s_ezlopi_i2c_master_t *i2c_master_conf, bmp280_t *de
 
     adc_pressure = data[0] << 12 | data[1] << 4 | data[2] >> 4;
     adc_temp = data[3] << 12 | data[4] << 4 | data[5] >> 4;
-    ESP_LOGD(TAG, "ADC temperature: %" PRIi32, adc_temp);
-    ESP_LOGD(TAG, "ADC pressure: %" PRIi32, adc_pressure);
+    ESP_LOGD("bmp280", "ADC temperature: %" PRIi32, adc_temp);
+    ESP_LOGD("bmp280", "ADC pressure: %" PRIi32, adc_pressure);
 
     int32_t fine_temp;
     *temperature = compensate_temperature(dev, adc_temp, &fine_temp);
@@ -244,7 +241,7 @@ esp_err_t bmp280_read_fixed(s_ezlopi_i2c_master_t *i2c_master_conf, bmp280_t *de
     if (humidity)
     {
         int32_t adc_humidity = data[6] << 8 | data[7];
-        ESP_LOGD(TAG, "ADC humidity: %" PRIi32, adc_humidity);
+        ESP_LOGD("bmp280", "ADC humidity: %" PRIi32, adc_humidity);
         *humidity = compensate_humidity(dev, adc_humidity, fine_temp);
     }
 
@@ -266,8 +263,8 @@ esp_err_t bmp280_read_float(s_ezlopi_i2c_master_t *i2c_master_conf, bmp280_t *de
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 inline static esp_err_t read_register_8(s_ezlopi_i2c_master_t *i2c_master_conf, uint8_t reg, uint8_t *r)
 {
     ESP_ERROR_CHECK(EZPI_hal_i2c_master_write_to_device(i2c_master_conf, &reg, 1));
@@ -277,7 +274,7 @@ inline static esp_err_t read_register_8(s_ezlopi_i2c_master_t *i2c_master_conf, 
 
 static esp_err_t read_register16(s_ezlopi_i2c_master_t *i2c_master_conf, uint8_t reg, uint16_t *r)
 {
-    uint8_t d[] = { 0, 0 };
+    uint8_t d[] = {0, 0};
 
     ESP_ERROR_CHECK(EZPI_hal_i2c_master_write_to_device(i2c_master_conf, &reg, 1));
     ESP_ERROR_CHECK(EZPI_hal_i2c_master_read_from_device(i2c_master_conf, d, 2));
@@ -301,19 +298,19 @@ static esp_err_t read_calibration_data(s_ezlopi_i2c_master_t *i2c_master_conf, b
     CHECK(read_register16(i2c_master_conf, 0x9c, (uint16_t *)&dev->dig_P8));
     CHECK(read_register16(i2c_master_conf, 0x9e, (uint16_t *)&dev->dig_P9));
 
-    ESP_LOGD(TAG, "Calibration data received:");
-    ESP_LOGD(TAG, "dig_T1=%d", dev->dig_T1);
-    ESP_LOGD(TAG, "dig_T2=%d", dev->dig_T2);
-    ESP_LOGD(TAG, "dig_T3=%d", dev->dig_T3);
-    ESP_LOGD(TAG, "dig_P1=%d", dev->dig_P1);
-    ESP_LOGD(TAG, "dig_P2=%d", dev->dig_P2);
-    ESP_LOGD(TAG, "dig_P3=%d", dev->dig_P3);
-    ESP_LOGD(TAG, "dig_P4=%d", dev->dig_P4);
-    ESP_LOGD(TAG, "dig_P5=%d", dev->dig_P5);
-    ESP_LOGD(TAG, "dig_P6=%d", dev->dig_P6);
-    ESP_LOGD(TAG, "dig_P7=%d", dev->dig_P7);
-    ESP_LOGD(TAG, "dig_P8=%d", dev->dig_P8);
-    ESP_LOGD(TAG, "dig_P9=%d", dev->dig_P9);
+    ESP_LOGD("bmp280", "Calibration data received:");
+    ESP_LOGD("bmp280", "dig_T1=%d", dev->dig_T1);
+    ESP_LOGD("bmp280", "dig_T2=%d", dev->dig_T2);
+    ESP_LOGD("bmp280", "dig_T3=%d", dev->dig_T3);
+    ESP_LOGD("bmp280", "dig_P1=%d", dev->dig_P1);
+    ESP_LOGD("bmp280", "dig_P2=%d", dev->dig_P2);
+    ESP_LOGD("bmp280", "dig_P3=%d", dev->dig_P3);
+    ESP_LOGD("bmp280", "dig_P4=%d", dev->dig_P4);
+    ESP_LOGD("bmp280", "dig_P5=%d", dev->dig_P5);
+    ESP_LOGD("bmp280", "dig_P6=%d", dev->dig_P6);
+    ESP_LOGD("bmp280", "dig_P7=%d", dev->dig_P7);
+    ESP_LOGD("bmp280", "dig_P8=%d", dev->dig_P8);
+    ESP_LOGD("bmp280", "dig_P9=%d", dev->dig_P9);
 
     return ESP_OK;
 }
@@ -321,7 +318,6 @@ static esp_err_t read_calibration_data(s_ezlopi_i2c_master_t *i2c_master_conf, b
 static esp_err_t read_hum_calibration_data(s_ezlopi_i2c_master_t *i2c_master_conf, bmp280_t *dev)
 {
     uint16_t h4, h5;
-
 
     uint8_t register_addr = 0xa1;
     ESP_ERROR_CHECK(read_register_8(i2c_master_conf, register_addr, &dev->dig_H1));
@@ -337,13 +333,13 @@ static esp_err_t read_hum_calibration_data(s_ezlopi_i2c_master_t *i2c_master_con
 
     dev->dig_H4 = (h4 & 0x00ff) << 4 | (h4 & 0x0f00) >> 8;
     dev->dig_H5 = h5 >> 4;
-    ESP_LOGD(TAG, "Calibration data received:");
-    ESP_LOGD(TAG, "dig_H1=%d", dev->dig_H1);
-    ESP_LOGD(TAG, "dig_H2=%d", dev->dig_H2);
-    ESP_LOGD(TAG, "dig_H3=%d", dev->dig_H3);
-    ESP_LOGD(TAG, "dig_H4=%d", dev->dig_H4);
-    ESP_LOGD(TAG, "dig_H5=%d", dev->dig_H5);
-    ESP_LOGD(TAG, "dig_H6=%d", dev->dig_H6);
+    ESP_LOGD("bmp280", "Calibration data received:");
+    ESP_LOGD("bmp280", "dig_H1=%d", dev->dig_H1);
+    ESP_LOGD("bmp280", "dig_H2=%d", dev->dig_H2);
+    ESP_LOGD("bmp280", "dig_H3=%d", dev->dig_H3);
+    ESP_LOGD("bmp280", "dig_H4=%d", dev->dig_H4);
+    ESP_LOGD("bmp280", "dig_H5=%d", dev->dig_H5);
+    ESP_LOGD("bmp280", "dig_H6=%d", dev->dig_H6);
 
     return ESP_OK;
 }
@@ -412,5 +408,5 @@ static inline uint32_t compensate_humidity(bmp280_t *dev, int32_t adc_hum, int32
 }
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

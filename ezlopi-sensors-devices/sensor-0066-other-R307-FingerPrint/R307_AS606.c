@@ -90,7 +90,7 @@ static fingerprint_status_t __Response_function(uint8_t *recieved_buffer, uint32
 // Function for Fingerprint Library
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-bool VerifyPwd(int uart_channel_num, uint32_t the_password, uint8_t *recieved_buffer, uint32_t timeout) bool VerifyPwd(int uart_channel_num, uint32_t the_password, uint8_t *recieved_buffer, uint32_t timeout)
+bool VerifyPwd(int uart_channel_num, uint32_t the_password, uint8_t *recieved_buffer, uint32_t timeout)
 {
     // Reset the recieving buffer before new data is to be extracted.
     memset(recieved_buffer, 0, MAX_PACKET_LENGTH_VAL);
@@ -130,7 +130,7 @@ bool VerifyPwd(int uart_channel_num, uint32_t the_password, uint8_t *recieved_bu
     return (bool)F_res;
 }
 
-bool SetAdder(int uart_channel_num, uint32_t new_address, uint8_t *recieved_buffer, uint32_t timeout) bool SetAdder(int uart_channel_num, uint32_t new_address, uint8_t *recieved_buffer, uint32_t timeout)
+bool SetAdder(int uart_channel_num, uint32_t new_address, uint8_t *recieved_buffer, uint32_t timeout) 
 {
     // Reset the recieving buffer before new data is to be extracted.
     memset(recieved_buffer, 0, MAX_PACKET_LENGTH_VAL);
@@ -171,7 +171,7 @@ bool SetAdder(int uart_channel_num, uint32_t new_address, uint8_t *recieved_buff
     return (bool)F_res;
 }
 
-bool SetSysPara(int uart_channel_num, uint8_t Parameter_Number, uint8_t Parameter_content, uint8_t *recieved_buffer, uint32_t timeout) bool SetSysPara(int uart_channel_num, uint8_t Parameter_Number, uint8_t Parameter_content, uint8_t *recieved_buffer, uint32_t timeout)
+bool SetSysPara(int uart_channel_num, uint8_t Parameter_Number, uint8_t Parameter_content, uint8_t *recieved_buffer, uint32_t timeout)
 {
     // Reset the recieving buffer before new data is to be extracted.
     memset(recieved_buffer, 0, MAX_PACKET_LENGTH_VAL);
@@ -210,7 +210,7 @@ bool SetSysPara(int uart_channel_num, uint8_t Parameter_Number, uint8_t Paramete
     return (bool)F_res;
 }
 
-bool PortControl(int uart_channel_num, uint8_t Control_code, uint8_t *recieved_buffer, uint32_t timeout) bool PortControl(int uart_channel_num, uint8_t Control_code, uint8_t *recieved_buffer, uint32_t timeout)
+bool PortControl(int uart_channel_num, uint8_t Control_code, uint8_t *recieved_buffer, uint32_t timeout)
 {
     // Reset the recieving buffer before new data is to be extracted.
     memset(recieved_buffer, 0, MAX_PACKET_LENGTH_VAL);
@@ -248,7 +248,7 @@ bool PortControl(int uart_channel_num, uint8_t Control_code, uint8_t *recieved_b
     return (bool)F_res;
 }
 
-bool ReadSysPara(int uart_channel_num, uint16_t *Status_bits, uint8_t *recieved_buffer, uint32_t timeout) bool ReadSysPara(int uart_channel_num, uint16_t *Status_bits, uint8_t *recieved_buffer, uint32_t timeout)
+bool ReadSysPara(int uart_channel_num, uint16_t *Status_bits, uint8_t *recieved_buffer, uint32_t timeout)
 {
     uint16_t Status_register = *Status_bits;
     // Reset the recieving buffer before new data is to be extracted.
@@ -301,7 +301,7 @@ bool ReadSysPara(int uart_channel_num, uint16_t *Status_bits, uint8_t *recieved_
     return (bool)F_res;
 }
 
-bool ReadTempNum(int uart_channel_num, uint16_t *TempNum, uint8_t *recieved_buffer, uint32_t timeout) bool ReadTempNum(int uart_channel_num, uint16_t *TempNum, uint8_t *recieved_buffer, uint32_t timeout)
+bool ReadTempNum(int uart_channel_num, uint16_t *TempNum, uint8_t *recieved_buffer, uint32_t timeout)
 {
     uint16_t TempleteNum = 0;
     // Reset the recieving buffer before new data is to be extracted.
@@ -343,7 +343,7 @@ bool ReadTempNum(int uart_channel_num, uint16_t *TempNum, uint8_t *recieved_buff
     return (bool)F_res;
 }
 
-bool GR_Identify(int uart_channel_num, uint16_t *PageID_ptr, uint16_t *MatchScore_ptr, uint8_t *recieved_buffer, uint32_t timeout) bool GR_Identify(int uart_channel_num, uint16_t *PageID_ptr, uint16_t *MatchScore_ptr, uint8_t *recieved_buffer, uint32_t timeout)
+bool GR_Identify(int uart_channel_num, uint16_t *PageID_ptr, uint16_t *MatchScore_ptr, uint8_t *recieved_buffer, uint32_t timeout)
 {
     uint16_t Page_num = 0;
     uint16_t Match_score = 0;
@@ -389,7 +389,7 @@ bool GR_Identify(int uart_channel_num, uint16_t *PageID_ptr, uint16_t *MatchScor
     return (bool)F_res;
 }
 
-bool GenImg(int uart_channel_num, uint8_t *recieved_buffer, uint32_t timeout) bool GenImg(int uart_channel_num, uint8_t *recieved_buffer, uint32_t timeout)
+bool GenImg(int uart_channel_num, uint8_t *recieved_buffer, uint32_t timeout) 
 {
     // Reset the recieving buffer before new data is to be extracted.
     memset(recieved_buffer, 0, MAX_PACKET_LENGTH_VAL);
@@ -423,7 +423,7 @@ bool GenImg(int uart_channel_num, uint8_t *recieved_buffer, uint32_t timeout) bo
     return (bool)F_res;
 }
 
-bool Img2Tz(int uart_channel_num, uint8_t CharBufferID, uint8_t *recieved_buffer, uint32_t timeout) bool Img2Tz(int uart_channel_num, uint8_t CharBufferID, uint8_t *recieved_buffer, uint32_t timeout)
+bool Img2Tz(int uart_channel_num, uint8_t CharBufferID, uint8_t *recieved_buffer, uint32_t timeout) 
 {
     // Reset the recieving buffer before new data is to be extracted.
     memset(recieved_buffer, 0, MAX_PACKET_LENGTH_VAL);
@@ -461,7 +461,7 @@ bool Img2Tz(int uart_channel_num, uint8_t CharBufferID, uint8_t *recieved_buffer
     return (bool)F_res;
 }
 
-bool RegModel(int uart_channel_num, uint8_t *recieved_buffer, uint32_t timeout) bool RegModel(int uart_channel_num, uint8_t *recieved_buffer, uint32_t timeout)
+bool RegModel(int uart_channel_num, uint8_t *recieved_buffer, uint32_t timeout) 
 {
     // Reset the recieving buffer before new data is to be extracted.
     memset(recieved_buffer, 0, MAX_PACKET_LENGTH_VAL);
@@ -498,7 +498,7 @@ bool RegModel(int uart_channel_num, uint8_t *recieved_buffer, uint32_t timeout) 
     return (bool)F_res;
 }
 
-bool Store(int uart_channel_num, uint8_t CharBufferID, uint16_t PageID, uint8_t *recieved_buffer, uint32_t timeout) bool Store(int uart_channel_num, uint8_t CharBufferID, uint16_t PageID, uint8_t *recieved_buffer, uint32_t timeout)
+bool Store(int uart_channel_num, uint8_t CharBufferID, uint16_t PageID, uint8_t *recieved_buffer, uint32_t timeout)
 {
     // Reset the recieving buffer before new data is to be extracted.
     memset(recieved_buffer, 0, MAX_PACKET_LENGTH_VAL);
@@ -538,7 +538,7 @@ bool Store(int uart_channel_num, uint8_t CharBufferID, uint16_t PageID, uint8_t 
     return (bool)F_res;
 }
 
-bool Load(int uart_channel_num, uint8_t CharBufferID, uint16_t PageID, uint8_t *recieved_buffer, uint32_t timeout) bool Load(int uart_channel_num, uint8_t CharBufferID, uint16_t PageID, uint8_t *recieved_buffer, uint32_t timeout)
+bool Load(int uart_channel_num, uint8_t CharBufferID, uint16_t PageID, uint8_t *recieved_buffer, uint32_t timeout)
 {
     // Reset the recieving buffer before new data is to be extracted.
     memset(recieved_buffer, 0, MAX_PACKET_LENGTH_VAL);
@@ -576,7 +576,7 @@ bool Load(int uart_channel_num, uint8_t CharBufferID, uint16_t PageID, uint8_t *
     return (bool)F_res;
 }
 
-bool Delete(int uart_channel_num, uint16_t PageID, uint16_t TempCount, uint8_t *recieved_buffer, uint32_t timeout) bool Delete(int uart_channel_num, uint16_t PageID, uint16_t TempCount, uint8_t *recieved_buffer, uint32_t timeout)
+bool Delete(int uart_channel_num, uint16_t PageID, uint16_t TempCount, uint8_t *recieved_buffer, uint32_t timeout)
 {
     // Reset the recieving buffer before new data is to be extracted.
     memset(recieved_buffer, 0, MAX_PACKET_LENGTH_VAL);
@@ -618,7 +618,7 @@ bool Delete(int uart_channel_num, uint16_t PageID, uint16_t TempCount, uint8_t *
     return (bool)F_res;
 }
 
-bool Empty(int uart_channel_num, uint8_t *recieved_buffer, uint32_t timeout) bool Empty(int uart_channel_num, uint8_t *recieved_buffer, uint32_t timeout)
+bool Empty(int uart_channel_num, uint8_t *recieved_buffer, uint32_t timeout) 
 {
     // Reset the recieving buffer before new data is to be extracted.
     memset(recieved_buffer, 0, MAX_PACKET_LENGTH_VAL);
@@ -655,7 +655,7 @@ bool Empty(int uart_channel_num, uint8_t *recieved_buffer, uint32_t timeout) boo
     return (bool)F_res;
 }
 
-bool LedControl(int uart_channel_num, bool LED_state, uint8_t *recieved_buffer, uint32_t timeout) bool LedControl(int uart_channel_num, bool LED_state, uint8_t *recieved_buffer, uint32_t timeout)
+bool LedControl(int uart_channel_num, bool LED_state, uint8_t *recieved_buffer, uint32_t timeout)
 {
     // Reset the recieving buffer before new data is to be extracted.
     memset(recieved_buffer, 0, MAX_PACKET_LENGTH_VAL);
@@ -694,7 +694,7 @@ bool LedControl(int uart_channel_num, bool LED_state, uint8_t *recieved_buffer, 
     return (bool)F_res;
 }
 
-bool Match(int uart_channel_num, uint16_t *InspectionScore, uint8_t *recieved_buffer, uint32_t timeout) bool Match(int uart_channel_num, uint16_t *InspectionScore, uint8_t *recieved_buffer, uint32_t timeout)
+bool Match(int uart_channel_num, uint16_t *InspectionScore, uint8_t *recieved_buffer, uint32_t timeout) 
 {
     uint16_t Score = 0;
     // Reset the recieving buffer before new data is to be extracted.
@@ -736,7 +736,7 @@ bool Match(int uart_channel_num, uint16_t *InspectionScore, uint8_t *recieved_bu
     return (bool)F_res;
 }
 
-bool Search(int uart_channel_num, uint8_t CharBufferID, uint16_t StartPage, uint16_t PageNum, uint16_t *PageID_ptr, uint16_t *MatchScore_ptr, uint8_t *recieved_buffer, uint32_t timeout) bool Search(int uart_channel_num, uint8_t CharBufferID, uint16_t StartPage, uint16_t PageNum, uint16_t *PageID_ptr, uint16_t *MatchScore_ptr, uint8_t *recieved_buffer, uint32_t timeout)
+bool Search(int uart_channel_num, uint8_t CharBufferID, uint16_t StartPage, uint16_t PageNum, uint16_t *PageID_ptr, uint16_t *MatchScore_ptr, uint8_t *recieved_buffer, uint32_t timeout) 
 {
     // use dummy variables
     uint16_t Page_num = *PageID_ptr;
@@ -802,7 +802,6 @@ bool r307_as606_wait_till_system_free(l_ezlopi_item_t *item, uint32_t timeout_ms
     if (NULL != item)
     {
         server_packet_t *user_data = (server_packet_t *)item->user_arg;
-        server_packet_t *user_data = (server_packet_t *)item->user_arg;
         static uint16_t __FPreg_status;
         //<! us time
         // TRACE_I("  > ENTER - system_status");
@@ -827,7 +826,6 @@ bool r307_as606_check_pageid_empty(l_ezlopi_item_t *item)
     if (NULL != item)
     {
         // TRACE_D("                  <<< Check_PAGEID_Empty >>> ");
-        server_packet_t *user_data = (server_packet_t *)item->user_arg;
         server_packet_t *user_data = (server_packet_t *)item->user_arg;
         fingerprint_status_t p = FINGERPRINT_FAIL; // status checker
         uint32_t start_time = 0, dummy_timer = 0;
@@ -858,7 +856,6 @@ uint16_t r307_as606_find_immediate_vaccant_id(l_ezlopi_item_t *item)
     if (NULL != item)
     {
         server_packet_t *user_data = (server_packet_t *)item->user_arg;
-        server_packet_t *user_data = (server_packet_t *)item->user_arg;
         for (uint16_t ids = 1; ids <= FINGERPRINT_MAX_CAPACITY_LIMIT; ids++)
         {
             user_data->user_id = ids;
@@ -876,7 +873,6 @@ bool r307_as606_update_id_status_list(l_ezlopi_item_t *item)
     if (NULL != item)
     {
         // TRACE_D("---------------------- ENTER: .[MODE:-2]. Update_ID_list ------------------------");
-        server_packet_t *user_data = (server_packet_t *)item->user_arg;
         server_packet_t *user_data = (server_packet_t *)item->user_arg;
         uint16_t Temp_ID = user_data->user_id;
         for (uint16_t ids = 1; ids <= FINGERPRINT_MAX_CAPACITY_LIMIT; ids++)
@@ -905,7 +901,6 @@ bool r307_as606_match_id(l_ezlopi_item_t *item)
     {
         // TRACE_D("---------------------- ENTER: .[MODE:-0]. Match_ID ------------------------");
         uint32_t start_time = 0, dummy_timer = 0;
-        server_packet_t *user_data = (server_packet_t *)item->user_arg;
         server_packet_t *user_data = (server_packet_t *)item->user_arg;
         uint16_t custom_USER_ID = user_data->user_id;
         //-------------------- 4. Search for all the library and store only if no duplicates found -----------------------
@@ -943,7 +938,6 @@ bool r307_as606_erase_specified_id(l_ezlopi_item_t *item)
         TRACE_D("----------------------  ENTER: .[MODE:-3]. Erase_Specified_ID ------------------------");
         uint32_t start_time = 0, dummy_timer = 0;
         server_packet_t *user_data = (server_packet_t *)item->user_arg;
-        server_packet_t *user_data = (server_packet_t *)item->user_arg;
         //-------------------- 4. Search for all the library and store only if no duplicates found ------------------------------------------------
         fingerprint_status_t p = FINGERPRINT_FAIL;
         start_time = esp_timer_get_time() / 1000; //  !< ms
@@ -976,7 +970,6 @@ bool r307_as606_erase_all_id(l_ezlopi_item_t *item)
         TRACE_D("----------------------  ENTER: .[MODE:-4]. Erase_all_ID ------------------------");
         uint32_t start_time = 0, dummy_timer = 0;
         server_packet_t *user_data = (server_packet_t *)item->user_arg;
-        server_packet_t *user_data = (server_packet_t *)item->user_arg;
         //-------------------- 4. Search for all the library and store only if no duplicates found ------------------------------------------------
         fingerprint_status_t p = FINGERPRINT_FAIL;
         start_time = esp_timer_get_time() / 1000; //  !< ms
@@ -1005,7 +998,6 @@ uint16_t r307_as606_enroll_fingerprint(l_ezlopi_item_t *item)
     {
         TRACE_D("----------------------  ENTER: .[MODE:-1]. Enroll_Fingerprint ------------------------");
         int uart_channel_num = item->interface.uart.channel;
-        server_packet_t *user_data = (server_packet_t *)item->user_arg;
         server_packet_t *user_data = (server_packet_t *)item->user_arg;
         uint16_t custom_USER_ID = user_data->user_id;
         user_data->confidence_level = 0;
@@ -1186,7 +1178,6 @@ fingerprint_status_t r307_as606_fingerprint_config(l_ezlopi_item_t *item)
     fingerprint_status_t F_res = FINGERPRINT_FAIL;
     if (NULL != item)
     {
-        server_packet_t *user_data = (server_packet_t *)item->user_arg;
         server_packet_t *user_data = (server_packet_t *)item->user_arg;
         int uart_channel_num = item->interface.uart.channel;
         vTaskDelay(200 / portTICK_PERIOD_MS); // waiting for necessary sensor boot-up delay 200ms

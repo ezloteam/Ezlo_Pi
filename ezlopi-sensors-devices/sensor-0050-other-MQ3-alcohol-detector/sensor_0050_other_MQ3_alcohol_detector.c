@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    sensor_0050_other_MQ3_alcohol_detector.c
-* @brief   perform some function on sensor_0050
-* @author  xx
-* @version 0.1
-* @date    xx
-*/
+ * @file    sensor_0050_other_MQ3_alcohol_detector.c
+ * @brief   perform some function on sensor_0050
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include <math.h>
 
 #include "ezlopi_core_cloud.h"
@@ -58,30 +58,29 @@
 #include "EZLOPI_USER_CONFIG.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 typedef struct s_mq3_value
 {
     uint8_t status_flag : 3; // BIT2 = avg_volt_flag  ; BIT1 = loop_stop_flag  ; BIT0 = Calibration_complete_alcohol
     uint8_t heating_count;
-    uint8_t avg_vol_count;  // counter for calculating avg_voltage. 
+    uint8_t avg_vol_count; // counter for calculating avg_voltage.
     float calib_avg_volt;
     float _alcohol_ppm;
     float MQ3_R0_constant;
 } s_mq3_value_t;
 
-
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static ezlopi_error_t __0050_prepare(void *arg);
 static ezlopi_error_t __0050_init(l_ezlopi_item_t *item);
 static ezlopi_error_t __0050_get_item(l_ezlopi_item_t *item, void *arg);
@@ -96,22 +95,16 @@ static void __prepare_device_digi_cloud_properties(l_ezlopi_device_t *device, cJ
 static void __prepare_item_adc_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_data);
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
-static const char *mq3_sensor_gas_alarm_token[] = {
-    "no_gas",
-    "combustible_gas_detected",
-    "toxic_gas_detected",
-    "unknown",
-};
+ *                          Static Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 ezlopi_error_t SENSOR_0050_other_mq3_alcohol_detector(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
@@ -151,9 +144,8 @@ ezlopi_error_t SENSOR_0050_other_mq3_alcohol_detector(e_ezlopi_actions_t action,
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
-
+ *                         Static Function Definitions
+ *******************************************************************************/
 
 static ezlopi_error_t __0050_prepare(void *arg)
 {
@@ -233,7 +225,7 @@ static ezlopi_error_t __0050_init(l_ezlopi_item_t *item)
                 if (GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
                 { // initialize analog_pin
                     if (EZPI_SUCCESS == EZPI_hal_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
-                    { // calibrate if not done
+                    {                                             // calibrate if not done
                         if (0 == (BIT0 & MQ3_value->status_flag)) // Calibration_complete_alcohol == 0
                         {
                             MQ3_value->heating_count = 20;
@@ -319,6 +311,12 @@ static ezlopi_error_t __0050_get_item(l_ezlopi_item_t *item, void *arg)
                 cJSON *json_array_enum = cJSON_CreateArray(__FUNCTION__);
                 if (NULL != json_array_enum)
                 {
+                    char *mq3_sensor_gas_alarm_token[] = {
+                        "no_gas",
+                        "combustible_gas_detected",
+                        "toxic_gas_detected",
+                        "unknown",
+                    };
                     for (uint8_t i = 0; i < MQ3_GAS_ALARM_MAX; i++)
                     {
                         cJSON *json_value = cJSON_CreateString(__FUNCTION__, mq3_sensor_gas_alarm_token[i]);
@@ -384,11 +382,11 @@ static ezlopi_error_t __0050_notify(l_ezlopi_item_t *item)
             const char *curret_value = NULL;
             if (0 == gpio_get_level(item->interface.gpio.gpio_in.gpio_num)) // when D0 -> 0V,
             {
-                curret_value = mq3_sensor_gas_alarm_token[1];
+                curret_value = "combustible_gas_detected";
             }
             else
             {
-                curret_value = mq3_sensor_gas_alarm_token[0];
+                curret_value = "no_gas";
             }
             if (curret_value != (char *)item->user_arg) // calls update only if there is change in state
             {
@@ -401,7 +399,7 @@ static ezlopi_error_t __0050_notify(l_ezlopi_item_t *item)
             s_mq3_value_t *MQ3_value = (s_mq3_value_t *)item->user_arg;
             if ((MQ3_value) && (BIT0 == (BIT0 & MQ3_value->status_flag))) // calibration_complete == 1
             {
-                if (BIT1 == (BIT1 & MQ3_value->status_flag))// loop_stop_flag == 1
+                if (BIT1 == (BIT1 & MQ3_value->status_flag)) // loop_stop_flag == 1
                 {
                     MQ3_value->status_flag ^= BIT1; // toggle BIT1 // loop_stop_flag => 0
                     // TRACE_D(" MQ3_value->status_flag : %03x", MQ3_value->status_flag);
@@ -431,7 +429,7 @@ static float __extract_MQ3_sensor_ppm(l_ezlopi_item_t *item)
     { // calculation process
         int32_t mq3_adc_pin = item->interface.adc.gpio_num;
         //-------------------------------------------------
-        s_ezlopi_analog_data_t ezlopi_analog_data = { .value = 0, .voltage = 0 };
+        s_ezlopi_analog_data_t ezlopi_analog_data = {.value = 0, .voltage = 0};
         // extract the mean_sensor_analog_output_voltage
         MQ3_value->calib_avg_volt = 0;
         for (uint8_t x = 10; x > 0; x--)
@@ -480,7 +478,7 @@ static void __calibrate_MQ3_R0_resistance(void *params)
     if (NULL != item)
     {
         s_mq3_value_t *MQ3_value = (s_mq3_value_t *)item->user_arg;
-        if (MQ3_value && (0 == (BIT1 & MQ3_value->status_flag)))// loop_stop_flag == 0
+        if (MQ3_value && (0 == (BIT1 & MQ3_value->status_flag))) // loop_stop_flag == 0
         {
             int mq3_adc_pin = item->interface.adc.gpio_num;
             //-------------------------------------------------
@@ -499,7 +497,7 @@ static void __calibrate_MQ3_R0_resistance(void *params)
                 // extract the mean_sensor_analog_output_voltage
                 if (MQ3_value->avg_vol_count != 0)
                 {
-                    s_ezlopi_analog_data_t ezlopi_analog_data = { .value = 0, .voltage = 0 };
+                    s_ezlopi_analog_data_t ezlopi_analog_data = {.value = 0, .voltage = 0};
                     // extract ADC values
                     EZPI_hal_adc_get_adc_data(mq3_adc_pin, &ezlopi_analog_data);
 #ifdef VOLTAGE_DIVIDER_ADDED
@@ -518,12 +516,12 @@ static void __calibrate_MQ3_R0_resistance(void *params)
 
                 if (BIT2 == (MQ3_value->status_flag & BIT2))
                 {
-                    MQ3_value->status_flag ^= BIT2;// avg_volt_flag => 0
+                    MQ3_value->status_flag ^= BIT2; // avg_volt_flag => 0
                     MQ3_value->calib_avg_volt /= MQ3_AVG_CAL_COUNT;
                     //-------------------------------------------------
                     // Calculate the 'Rs' of heater during clean air [calibration phase]
                     // Range -> [2Kohm - 20Kohm]
-                    float RS_calib = 0;                                                                         // Define variable for sensor resistance
+                    float RS_calib = 0;                                                                                     // Define variable for sensor resistance
                     RS_calib = ((MQ3_VOLT_RESOLUTION_Vc * mq3_eqv_RL) / (MQ3_value->avg_vol_count / 1000.0f)) - mq3_eqv_RL; // Calculate RS in fresh air
                     TRACE_E("CALIB_TASK -> 'RS_calib' = %.2f", RS_calib);
                     if (RS_calib < 0)
@@ -548,7 +546,6 @@ static void __calibrate_MQ3_R0_resistance(void *params)
     // #endif
 }
 
-
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

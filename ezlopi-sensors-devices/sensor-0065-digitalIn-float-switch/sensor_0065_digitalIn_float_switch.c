@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    sensor_0065_digitalIn_float_switch.c
-* @brief   perform some function on sensor_0065
-* @author  xx
-* @version 0.1
-* @date    xx
-*/
+ * @file    sensor_0065_digitalIn_float_switch.c
+ * @brief   perform some function on sensor_0065
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
@@ -55,20 +55,20 @@
 #include "sensor_0065_digitalIn_float_switch.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static ezlopi_error_t __0065_prepare(void *arg);
 static ezlopi_error_t __0065_init(l_ezlopi_item_t *item);
 static ezlopi_error_t __0065_get_item(l_ezlopi_item_t *item, void *arg);
@@ -78,21 +78,16 @@ static void __0065_update_from_device(void *arg);
 static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device);
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
-static const char *water_level_alarm_token[] = {
-    "water_level_ok",
-    "water_level_below_low_threshold",
-    "water_level_above_high_threshold",
-    "unknown",
-};
-/*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Definitions
+ *******************************************************************************/
 ezlopi_error_t SENSOR_0065_digitalIn_float_switch(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
@@ -127,8 +122,8 @@ ezlopi_error_t SENSOR_0065_digitalIn_float_switch(e_ezlopi_actions_t action, l_e
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
@@ -230,6 +225,12 @@ static ezlopi_error_t __0065_get_item(l_ezlopi_item_t *item, void *arg)
             cJSON *json_array_enum = cJSON_CreateArray(__FUNCTION__);
             if (NULL != json_array_enum)
             {
+                char *water_level_alarm_token[] = {
+                    "water_level_ok",
+                    "water_level_below_low_threshold",
+                    "water_level_above_high_threshold",
+                    "unknown",
+                };
                 for (uint8_t i = 0; i < WATER_LEVEL_ALARM_MAX; i++)
                 {
                     cJSON *json_value = cJSON_CreateString(__FUNCTION__, water_level_alarm_token[i]);
@@ -242,8 +243,8 @@ static ezlopi_error_t __0065_get_item(l_ezlopi_item_t *item, void *arg)
             }
             //--------------------------------------------------------------------------------------
 
-            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, (char *)item->user_arg ? item->user_arg : water_level_alarm_token[0]);
-            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, (char *)item->user_arg ? item->user_arg : water_level_alarm_token[0]);
+            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, (char *)item->user_arg ? item->user_arg :  "water_level_ok");
+            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, (char *)item->user_arg ? item->user_arg :  "water_level_ok");
             ret = EZPI_SUCCESS;
         }
     }
@@ -258,8 +259,8 @@ static ezlopi_error_t __0065_get_cjson_value(l_ezlopi_item_t *item, void *arg)
         cJSON *cj_result = (cJSON *)arg;
         if (cj_result)
         {
-            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, (char *)item->user_arg ? item->user_arg : water_level_alarm_token[0]);
-            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, (char *)item->user_arg ? item->user_arg : water_level_alarm_token[0]);
+            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, (char *)item->user_arg ? item->user_arg :  "water_level_ok");
+            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, (char *)item->user_arg ? item->user_arg :  "water_level_ok");
             ret = EZPI_SUCCESS;
         }
     }
@@ -277,11 +278,11 @@ static void __0065_update_from_device(void *arg)
         item->interface.gpio.gpio_in.value = (false == item->interface.gpio.gpio_in.invert) ? (item->interface.gpio.gpio_in.value) : (!item->interface.gpio.gpio_in.value);
         if (0 == (item->interface.gpio.gpio_in.value)) // when D0 -> 0V,
         {
-            curret_value = water_level_alarm_token[0];
+            curret_value =  "water_level_ok";
         }
         else
         {
-            curret_value = water_level_alarm_token[2];
+            curret_value = "water_level_above_high_threshold";
         }
         if (curret_value != (char *)item->user_arg) // calls update only if there is change in state
         {
@@ -291,5 +292,5 @@ static void __0065_update_from_device(void *arg)
     }
 }
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    sensor_0016_oneWire_DHT22.c
-* @brief   perform some function on sensor_0016
-* @author  xx
-* @version 0.1
-* @date    xx
-*/
+ * @file    sensor_0016_oneWire_DHT22.c
+ * @brief   perform some function on sensor_0016
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include "../../build/config/sdkconfig.h"
 #if (CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32S2)
 
@@ -60,16 +60,16 @@
 #include "EZLOPI_USER_CONFIG.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 typedef struct s_ezlopi_dht22_data
 {
     float temperature;
@@ -77,8 +77,8 @@ typedef struct s_ezlopi_dht22_data
 } s_ezlopi_dht22_data_t;
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static ezlopi_error_t dht22_sensor_prepare_v3(void *arg);
 static ezlopi_error_t dht22_sensor_init_v3(l_ezlopi_item_t *item);
 static ezlopi_error_t dht22_sensor_get_sensor_value_v3(l_ezlopi_item_t *item, void *args);
@@ -91,16 +91,16 @@ static ezlopi_error_t dht22_sensor_setup_device_cloud_properties_humidity(l_ezlo
 static ezlopi_error_t dht22_sensor_notify(l_ezlopi_item_t *item);
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 ezlopi_error_t SENSOR_0016_oneWire_dht22(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
@@ -136,8 +136,8 @@ ezlopi_error_t SENSOR_0016_oneWire_dht22(e_ezlopi_actions_t action, l_ezlopi_ite
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 static ezlopi_error_t dht22_sensor_init_v3(l_ezlopi_item_t *item)
 {
     ezlopi_error_t ret = EZPI_ERR_INIT_DEVICE_FAILED;
@@ -148,7 +148,7 @@ static ezlopi_error_t dht22_sensor_init_v3(l_ezlopi_item_t *item)
         {
             if (GPIO_IS_VALID_GPIO((gpio_num_t)item->interface.onewire_master.onewire_pin))
             {
-                setDHT22gpio(item->interface.onewire_master.onewire_pin);
+                // setDHT22gpio(item->interface.onewire_master.onewire_pin);
                 ret = EZPI_SUCCESS;
             }
         }
@@ -159,15 +159,15 @@ static ezlopi_error_t dht22_sensor_init_v3(l_ezlopi_item_t *item)
 static ezlopi_error_t dht22_sensor_notify(l_ezlopi_item_t *item)
 {
     ezlopi_error_t ret = EZPI_FAILED;
-    
+
     if (item)
     {
+        float temperature, humidity = 0;
         s_ezlopi_dht22_data_t *dht22_data = (s_ezlopi_dht22_data_t *)item->user_arg;
-        if (dht22_data && (DHT_OK == readDHT22()))
+        if (dht22_data && (DHT22_OK == readDHT22(&temperature, &humidity, item->interface.onewire_master.onewire_pin)))
         {
             if (ezlopi_item_name_temp == item->cloud_properties.item_name)
             {
-                float temperature = getTemperature_dht22();
                 item->cloud_properties.scale = EZPI_core_setting_get_temperature_scale_str();
 
                 e_enum_temperature_scale_t scale_to_use = EZPI_core_setting_get_temperature_scale();
@@ -185,7 +185,6 @@ static ezlopi_error_t dht22_sensor_notify(l_ezlopi_item_t *item)
             }
             else if (ezlopi_item_name_humidity == item->cloud_properties.item_name)
             {
-                float humidity = getHumidity_dht22();
                 if (fabs(dht22_data->humidity - humidity) > 0.5)
                 {
                     dht22_data->humidity = humidity;
@@ -375,7 +374,6 @@ static ezlopi_error_t dht22_sensor_setup_item_properties_humidity(l_ezlopi_item_
 
 #endif // (CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32S2)
 
-
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

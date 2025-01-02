@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    sensor_0027_ADC_waterLeak.c
-* @brief   perform some function on sensor_0027
-* @author  xx
-* @version 0.1
-* @date    xx
-*/
+ * @file    sensor_0027_ADC_waterLeak.c
+ * @brief   perform some function on sensor_0027
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
@@ -52,27 +52,21 @@
 
 #include "sensor_0027_ADC_waterLeak.h"
 
+/*******************************************************************************
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
-static const char *water_leak_alarm_states[] = {
-    "no_water_leak",
-    "water_leak_detected",
-    "unknown",
-};
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
-
-/*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static ezlopi_error_t __prepare(void *arg);
 static ezlopi_error_t __init(l_ezlopi_item_t *item);
 static ezlopi_error_t __get_ezlopi_value(l_ezlopi_item_t *item, void *arg);
@@ -80,16 +74,16 @@ static ezlopi_error_t __notify(l_ezlopi_item_t *item);
 static ezlopi_error_t __get_item_list(l_ezlopi_item_t *item, void *arg);
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 
 ezlopi_error_t SENSOR_0027_adc_waterLeak(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
@@ -132,8 +126,8 @@ ezlopi_error_t SENSOR_0027_adc_waterLeak(e_ezlopi_actions_t action, l_ezlopi_ite
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 static void prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     device->cloud_properties.category = category_security_sensor;
@@ -202,6 +196,11 @@ static ezlopi_error_t __get_item_list(l_ezlopi_item_t *item, void *arg)
         cJSON *json_array_enum = cJSON_CreateArray(__FUNCTION__);
         if (NULL != json_array_enum)
         {
+            char *water_leak_alarm_states[] = {
+                "no_water_leak",
+                "water_leak_detected",
+                "unknown",
+            };
             for (uint8_t i = 0; i < WATERLEAK_MAX; i++)
             {
                 cJSON *json_value = cJSON_CreateString(__FUNCTION__, water_leak_alarm_states[i]);
@@ -243,8 +242,8 @@ static ezlopi_error_t __notify(l_ezlopi_item_t *item)
 
     if (item)
     {
-        const char *curret_value = NULL;
-        s_ezlopi_analog_data_t ezlopi_analog_data = { .value = 0, .voltage = 0 };
+        char *curret_value = NULL;
+        s_ezlopi_analog_data_t ezlopi_analog_data = {.value = 0, .voltage = 0};
 
         EZPI_hal_adc_get_adc_data(item->interface.adc.gpio_num, &ezlopi_analog_data);
         TRACE_I("Value is: %d, voltage is: %d", ezlopi_analog_data.value, ezlopi_analog_data.voltage);
@@ -286,7 +285,6 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
     return ret;
 }
 
-
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

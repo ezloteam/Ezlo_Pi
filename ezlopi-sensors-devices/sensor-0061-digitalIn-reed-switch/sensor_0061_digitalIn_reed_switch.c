@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    sensor_0061_digitalIn_reed_switch.c
-* @brief   perform some function on sensor_0061
-* @author  xx
-* @version 0.1
-* @date    xx
-*/
+ * @file    sensor_0061_digitalIn_reed_switch.c
+ * @brief   perform some function on sensor_0061
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
@@ -54,20 +54,20 @@
 #include "sensor_0061_digitalIn_reed_switch.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static ezlopi_error_t __0061_prepare(void *arg);
 static ezlopi_error_t __0061_init(l_ezlopi_item_t *item);
 static ezlopi_error_t __0061_get_item(l_ezlopi_item_t *item, void *arg);
@@ -76,20 +76,16 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
 static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device);
 static void _0061_update_from_device(void *arg);
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
-static const char *reed_door_window_states[] = {
-    "dw_is_opened",
-    "dw_is_closed",
-    "unknown",
-};
-/*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Definitions
+ *******************************************************************************/
 ezlopi_error_t SENSOR_0061_digitalIn_reed_switch(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
@@ -124,8 +120,8 @@ ezlopi_error_t SENSOR_0061_digitalIn_reed_switch(e_ezlopi_actions_t action, l_ez
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
@@ -227,6 +223,11 @@ static ezlopi_error_t __0061_get_item(l_ezlopi_item_t *item, void *arg)
             cJSON *json_array_enum = cJSON_CreateArray(__FUNCTION__);
             if (NULL != json_array_enum)
             {
+                char *reed_door_window_states[] = {
+                    "dw_is_opened",
+                    "dw_is_closed",
+                    "unknown",
+                };
                 for (uint8_t i = 0; i < REED_DOOR_WINDOW_MAX; i++)
                 {
                     cJSON *json_value = cJSON_CreateString(__FUNCTION__, reed_door_window_states[i]);
@@ -239,8 +240,8 @@ static ezlopi_error_t __0061_get_item(l_ezlopi_item_t *item, void *arg)
             }
             //--------------------------------------------------------------------------------------
 
-            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, (char *)item->user_arg ? item->user_arg : reed_door_window_states[1]);
-            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, (char *)item->user_arg ? item->user_arg : reed_door_window_states[1]);
+            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, (char *)item->user_arg ? item->user_arg :"dw_is_closed");
+            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, (char *)item->user_arg ? item->user_arg :"dw_is_closed");
             ret = EZPI_SUCCESS;
         }
     }
@@ -254,8 +255,8 @@ static ezlopi_error_t __0061_get_cjson_value(l_ezlopi_item_t *item, void *arg)
         cJSON *cj_result = (cJSON *)arg;
         if (cj_result)
         {
-            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, (char *)item->user_arg ? item->user_arg : reed_door_window_states[1]);
-            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, (char *)item->user_arg ? item->user_arg : reed_door_window_states[1]);
+            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, (char *)item->user_arg ? item->user_arg :"dw_is_closed");
+            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, (char *)item->user_arg ? item->user_arg :"dw_is_closed");
             ret = EZPI_SUCCESS;
         }
     }
@@ -268,20 +269,20 @@ static void _0061_update_from_device(void *arg)
     l_ezlopi_item_t *item = (l_ezlopi_item_t *)arg;
     if (item)
     {
-        const char *curret_value = NULL;
+         char *curret_value = NULL;
         item->interface.gpio.gpio_in.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
 
         item->interface.gpio.gpio_in.value = (false == item->interface.gpio.gpio_in.invert)
-            ? (item->interface.gpio.gpio_in.value)
-            : (!item->interface.gpio.gpio_in.value);
+                                                 ? (item->interface.gpio.gpio_in.value)
+                                                 : (!item->interface.gpio.gpio_in.value);
 
         if (0 == (item->interface.gpio.gpio_in.value)) // when D0 -> 0V,
         {
-            curret_value = reed_door_window_states[0];
+            curret_value = "dw_is_opened";
         }
         else
         {
-            curret_value = reed_door_window_states[1];
+            curret_value ="dw_is_closed";
         }
 
         if (curret_value != (char *)item->user_arg) // calls update only if there is change in state
@@ -292,5 +293,5 @@ static void _0061_update_from_device(void *arg)
     }
 }
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

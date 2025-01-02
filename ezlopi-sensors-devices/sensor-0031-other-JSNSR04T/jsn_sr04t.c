@@ -82,7 +82,7 @@
 /*******************************************************************************
  *                          Static Data Definitions
  *******************************************************************************/
-static const char *TAG1 = "JSN_SR04T_V3";
+// static const char *TAG1 = "JSN_SR04T_V3";
 
 /*******************************************************************************
  *                          Extern Data Definitions
@@ -102,7 +102,7 @@ void log_raw_data(jsn_sr04t_raw_data_t jsn_sr04t_raw_data)
 esp_err_t JSN_sr04t_init(jsn_sr04t_config_t *jsn_sr04t_config)
 {
     esp_err_t ret = ESP_OK;
-    ESP_LOGD(TAG1, "%s()", __FUNCTION__);
+    ESP_LOGD("JSN_SR04T_V3", "%s()", __FUNCTION__);
 
     // GPIO's configurations
     gpio_config_t pin_config;
@@ -116,7 +116,7 @@ esp_err_t JSN_sr04t_init(jsn_sr04t_config_t *jsn_sr04t_config)
     if (ESP_OK != ret)
     {
         ret = ESP_ERR_INVALID_RESPONSE;
-        ESP_LOGE(TAG1, "%s(). ABORT. error configuring the trigger gpio pin", __FUNCTION__);
+        ESP_LOGE("JSN_SR04T_V3", "%s(). ABORT. error configuring the trigger gpio pin", __FUNCTION__);
         goto err;
     }
 
@@ -129,20 +129,20 @@ esp_err_t JSN_sr04t_init(jsn_sr04t_config_t *jsn_sr04t_config)
     if (ESP_OK != ret)
     {
         ret = ESP_ERR_INVALID_RESPONSE;
-        ESP_LOGE(TAG1, "%s(). ABORT. error configuring the echo gpio pin", __FUNCTION__);
+        ESP_LOGE("JSN_SR04T_V3", "%s(). ABORT. error configuring the echo gpio pin", __FUNCTION__);
         goto err;
     }
 
     if (jsn_sr04t_config->no_of_samples == 0)
     {
         ret = ESP_ERR_INVALID_ARG;
-        ESP_LOGE(TAG1, "%s(). ABORT. jsn_sr04t_config->nbr_of_samples cannot be 0", __FUNCTION__);
+        ESP_LOGE("JSN_SR04T_V3", "%s(). ABORT. jsn_sr04t_config->nbr_of_samples cannot be 0", __FUNCTION__);
     }
 
     if (jsn_sr04t_config->is_init == true)
     {
         ret = ESP_ERR_INVALID_ARG;
-        ESP_LOGE(TAG1, "%s(). ABORT. already init'd", __FUNCTION__);
+        ESP_LOGE("JSN_SR04T_V3", "%s(). ABORT. already init'd", __FUNCTION__);
     }
 
     /*
@@ -153,7 +153,7 @@ esp_err_t JSN_sr04t_init(jsn_sr04t_config_t *jsn_sr04t_config)
     if (ESP_OK != ret)
     {
         ret = ESP_ERR_INVALID_RESPONSE;
-        ESP_LOGE(TAG1, "%s(). ABORT. error configuring the RMT configuration", __FUNCTION__);
+        ESP_LOGE("JSN_SR04T_V3", "%s(). ABORT. error configuring the RMT configuration", __FUNCTION__);
         goto err;
     }
 
@@ -161,7 +161,7 @@ esp_err_t JSN_sr04t_init(jsn_sr04t_config_t *jsn_sr04t_config)
     if (ESP_OK != ret)
     {
         ret = ESP_ERR_INVALID_RESPONSE;
-        ESP_LOGE(TAG1, "%s(). ABORT. error installing the RMT Driver", __FUNCTION__);
+        ESP_LOGE("JSN_SR04T_V3", "%s(). ABORT. error installing the RMT Driver", __FUNCTION__);
         goto err;
     }
 
@@ -174,7 +174,7 @@ err:
 esp_err_t JSN_sr04t_raw_calc(jsn_sr04t_config_t *jsn_sr04t_config, jsn_sr04t_raw_data_t *jsn_sr04t_raw_data)
 {
     esp_err_t ret = ESP_OK;
-    // ESP_LOGD(TAG1, "%s()", __FUNCTION__);
+    // ESP_LOGD("JSN_SR04T_V3", "%s()", __FUNCTION__);
 
     // Reset receive values
     jsn_sr04t_raw_data->data_received = false;
@@ -208,7 +208,7 @@ esp_err_t JSN_sr04t_raw_calc(jsn_sr04t_config_t *jsn_sr04t_config, jsn_sr04t_raw
         rmt_item32_t *temp_ptr = items; // Use a temporary pointer (=pointing to the beginning of the item array)
         for (uint8_t i = 0; i < length; i++)
         {
-            ESP_LOGD(TAG1, "  %2i :: [level 0]: %1d - %5d microsec, [level 1]: %3d - %5d microsec",
+            ESP_LOGD("JSN_SR04T_V3", "  %2i :: [level 0]: %1d - %5d microsec, [level 1]: %3d - %5d microsec",
                      i,
                      temp_ptr->level0, temp_ptr->duration0,
                      temp_ptr->level1, temp_ptr->duration1);
@@ -222,7 +222,7 @@ esp_err_t JSN_sr04t_raw_calc(jsn_sr04t_config_t *jsn_sr04t_config, jsn_sr04t_raw
         if (jsn_sr04t_raw_data->distance_cm < minimum_detection_value_in_cm)
         {
             ret = ESP_ERR_INVALID_RESPONSE;
-            ESP_LOGE(TAG1, "%s(). ABORT. Out Of Range: distance_cm < %d (%f) ", __FUNCTION__,
+            ESP_LOGE("JSN_SR04T_V3", "%s(). ABORT. Out Of Range: distance_cm < %d (%f) ", __FUNCTION__,
                      minimum_detection_value_in_cm, jsn_sr04t_raw_data->distance_cm);
 
             jsn_sr04t_raw_data->is_an_error = true;
@@ -232,7 +232,7 @@ esp_err_t JSN_sr04t_raw_calc(jsn_sr04t_config_t *jsn_sr04t_config, jsn_sr04t_raw
         if (jsn_sr04t_raw_data->distance_cm > maximum_detection_value_in_cm)
         {
             ret = ESP_ERR_INVALID_RESPONSE;
-            ESP_LOGE(TAG1, "%s(). ABORT. Out Of Range: distance_cm < %d (%f) ", __FUNCTION__,
+            ESP_LOGE("JSN_SR04T_V3", "%s(). ABORT. Out Of Range: distance_cm < %d (%f) ", __FUNCTION__,
                      maximum_detection_value_in_cm, jsn_sr04t_raw_data->distance_cm);
             jsn_sr04t_raw_data->is_an_error = true;
             goto err;
@@ -245,7 +245,7 @@ esp_err_t JSN_sr04t_raw_calc(jsn_sr04t_config_t *jsn_sr04t_config, jsn_sr04t_raw
             if (jsn_sr04t_raw_data->distance_cm <= 0.0)
             {
                 ret = ESP_ERR_INVALID_RESPONSE;
-                ESP_LOGE(TAG1,
+                ESP_LOGE("JSN_SR04T_V3",
                          "%s(). ABORT. Invalid value: adjusted distance <= 0 (subtracted sensor_artifact_cm) (%f) | err %i (%s)",
                          __FUNCTION__,
                          jsn_sr04t_raw_data->distance_cm, ret, esp_err_to_name(ret));
@@ -274,7 +274,7 @@ esp_err_t JSN_sr04t_measurement(jsn_sr04t_config_t *jsn_sr04t_config, jsn_sr04t_
     esp_err_t ret = ESP_OK;
     uint32_t count_errors = 0;
     double distance = 0;
-    ESP_LOGD(TAG1, "%s()", __FUNCTION__);
+    ESP_LOGD("JSN_SR04T_V3", "%s()", __FUNCTION__);
 
     jsn_sr04t_data->data_received = false;
     jsn_sr04t_data->is_an_error = false;
@@ -287,12 +287,12 @@ esp_err_t JSN_sr04t_measurement(jsn_sr04t_config_t *jsn_sr04t_config, jsn_sr04t_
         ret = JSN_sr04t_raw_calc(jsn_sr04t_config, &sample[i]);
         if (ESP_OK != ret)
         {
-            ESP_LOGE(TAG1, "ERROR in reading");
+            ESP_LOGE("JSN_SR04T_V3", "ERROR in reading");
         }
         log_raw_data(sample[i]);
         if (sample[i].is_an_error == true)
         {
-            ESP_LOGE(TAG1, "ERROR");
+            ESP_LOGE("JSN_SR04T_V3", "ERROR");
             count_errors += 1;
         }
         // distance += sample[i].distance_cm;
@@ -315,7 +315,7 @@ esp_err_t JSN_sr04t_measurement(jsn_sr04t_config_t *jsn_sr04t_config, jsn_sr04t_
     // {
     //     jsn_sr04t_data->is_an_error = true;
     //     ret = ESP_ERR_INVALID_RESPONSE;
-    //     ESP_LOGE(TAG1, "%s(). Abort At least one measurement is incorrect", __FUNCTION__);
+    //     ESP_LOGE("JSN_SR04T_V3", "%s(). Abort At least one measurement is incorrect", __FUNCTION__);
     //     goto err;
     // }
 

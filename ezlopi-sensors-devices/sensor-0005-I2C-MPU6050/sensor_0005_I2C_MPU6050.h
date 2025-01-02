@@ -160,6 +160,8 @@ extern "C"
         float ax, ay, az; // m/s2
         float gx, gy, gz; // rpm
         float gyro_x_offset, gyro_y_offset, gyro_z_offset; // raw
+        float acc_mpu6050_calib_val;
+        float gyro_mpu6050_calib_val;
     } s_mpu6050_data_t;
 
     // #### Custom structure to store raw data

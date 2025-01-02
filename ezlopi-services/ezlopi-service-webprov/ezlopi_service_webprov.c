@@ -241,9 +241,11 @@ static void __fetch_wss_endpoint(void *pv)
                         cJSON *cj_request = cJSON_Parse(__FUNCTION__, rx_message->payload);
                         if (cj_request)
                         {
+#ifdef CONFIG_EZPI_OPENTELEMETRY_ENABLE_TRACES
                             id_str = ezlopi_service_otel_fetch_string_value_from_cjson(cj_request, ezlopi_id_str);
                             error_str = ezlopi_service_otel_fetch_string_value_from_cjson(cj_request, ezlopi_error_str);
                             method_str = ezlopi_service_otel_fetch_string_value_from_cjson(cj_request, ezlopi_method_str);
+#endif
 #if 0
                             cJSON *cj_id = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_id_str);
                             if (cj_id && cj_id->valuestring && (cj_id->type == cJSON_String) && cj_id->str_value_len)

@@ -34,73 +34,60 @@
  * @author  xx
  * @version 0.1
  * @date    xx
-*/
+ */
 
 #ifndef __DHT11_H__
 #define __DHT11_H__
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          C++ Declaration Wrapper
-*******************************************************************************/
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
     /*******************************************************************************
-    *                          Type & Macro Declarations
-    *******************************************************************************/
+     *                          Type & Macro Declarations
+     *******************************************************************************/
     /*
         DHT11 temperature sensor driver
     */
 
-#define DHT_OK 0
-#define DHT_CHECKSUM_ERROR -1
-#define DHT_TIMEOUT_ERROR -2
+#define DHT11_OK 0
+#define DHT11_CHECKSUM_ERROR -1
+#define DHT11_TIMEOUT_ERROR -2
+#define DHT11_INVALID_REQ -3
 
     /*******************************************************************************
-    *                          Extern Data Declarations
-    *******************************************************************************/
+     *                          Extern Data Declarations
+     *******************************************************************************/
 
     /*******************************************************************************
-    *                          Extern Function Prototypes
-    *******************************************************************************/
-    /**
-     * @brief Function to set DHT11 gpio pin
-     *
-     * @param gpio
-     */
-    void setDHT11gpio(int gpio);
+     *                          Extern Function Prototypes
+     *******************************************************************************/
     /**
      * @brief Function to read DHT11 data
      *
+     * @param temperature_dht11
+     * @param humidity_dht11
+     * @param DHT11gpio
      * @return int
      */
-    int readDHT11(void);
-    /**
-     * @brief Get the Temperature dht11 object
-     *
-     * @return float
-     */
-    float getTemperature_dht11();
-    /**
-     * @brief Get the Humidity dht11 object
-     *
-     * @return float
-     */
-    float getHumidity_dht11();
+    int readDHT11(float *temperature_dht11, float *humidity_dht11, int DHT11gpio);
     /**
      * @brief Function to get current signal level of dht11
      *
+     * @param DHT11gpio
      * @param usTimeOut
      * @param state
      * @return int
      */
-    int dht11_getSignalLevel(int usTimeOut, bool state);
+    int dht11_getSignalLevel(int DHT11gpio, int usTimeOut, bool state);
     // void errorHandler(int response);
 
 #ifdef __cplusplus
@@ -110,5 +97,5 @@ extern "C"
 #endif //__DHT11_H__
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

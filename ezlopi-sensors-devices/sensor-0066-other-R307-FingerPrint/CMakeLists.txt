@@ -3,7 +3,7 @@ file(GLOB_RECURSE config_src "*.c")
 
 #Define SDK components
 set(ESP_IDF_COMPONENTS
-        #cjext
+        cjext
         driver
         freertos
         esp_timer
@@ -18,6 +18,7 @@ set(EZLOPI_CORE_COMPONENTS
         ezlopi-core-valueformatter
         ezlopi-core-processes
         ezlopi-core-errors
+        ezlopi-core-sntp
 )
 
 # Define HAL components

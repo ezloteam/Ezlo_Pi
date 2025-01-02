@@ -81,7 +81,7 @@ extern "C"
 #define ENABLE_DBG   //!< Open this macro and you can see the details of the program
 #ifdef ENABLE_DBG
   // #define DBG(...) {Serial.print("[");Serial.print(__FUNCTION__); Serial.print("(): "); Serial.print(__LINE__); Serial.print(" ] "); Serial.println(__VA_ARGS__);}
-#define DBG(fmt, ...) ESP_LOGI(TAG, "[%s():%d] " fmt, __FUNCTION__, __LINE__, ##__VA_ARGS__)
+#define DBG(fmt, ...) ESP_LOGI("ENS160", "[%s():%d] " fmt, __FUNCTION__, __LINE__, ##__VA_ARGS__)
 #else
 #define DBG(...)
 #endif

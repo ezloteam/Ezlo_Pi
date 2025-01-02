@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    sensor_0057_other_KY026_FlameDetector.c
-* @brief   perform some function on sensor_0057
-* @author  xx
-* @version 0.1
-* @date    xx
-*/
+ * @file    sensor_0057_other_KY026_FlameDetector.c
+ * @brief   perform some function on sensor_0057
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
@@ -53,20 +53,20 @@
 #include "EZLOPI_USER_CONFIG.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static ezlopi_error_t __0057_prepare(void *arg);
 static ezlopi_error_t __0057_init(l_ezlopi_item_t *item);
 static ezlopi_error_t __0057_get_item(l_ezlopi_item_t *item, void *arg);
@@ -80,21 +80,16 @@ static void __prepare_item_adc_cloud_properties(l_ezlopi_item_t *item, cJSON *cj
 static void __extract_KY026_sensor_value(uint32_t flame_adc_pin, float *analog_sensor_volt, float *max_reading);
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
-static const char *ky206_sensor_heat_alarm_token[] = {
-    "heat_ok",
-    "overheat_detected",
-    "under_heat_detected",
-    "unknown",
-};
-/*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Definitions
+ *******************************************************************************/
 ezlopi_error_t SENSOR_0057_other_ky026_flamedetector(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
@@ -134,8 +129,8 @@ ezlopi_error_t SENSOR_0057_other_ky026_flamedetector(e_ezlopi_actions_t action, 
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 
 static ezlopi_error_t __0057_prepare(void *arg)
 {
@@ -295,6 +290,12 @@ static ezlopi_error_t __0057_get_item(l_ezlopi_item_t *item, void *arg)
                 cJSON *json_array_enum = cJSON_CreateArray(__FUNCTION__);
                 if (NULL != json_array_enum)
                 {
+                    char *ky206_sensor_heat_alarm_token[] = {
+                        "heat_ok",
+                        "overheat_detected",
+                        "under_heat_detected",
+                        "unknown",
+                    };
                     for (uint8_t i = 0; i < KY206_HEAT_ALARM_MAX; i++)
                     {
                         cJSON *json_value = cJSON_CreateString(__FUNCTION__, ky206_sensor_heat_alarm_token[i]);
@@ -306,8 +307,8 @@ static ezlopi_error_t __0057_get_item(l_ezlopi_item_t *item, void *arg)
                     cJSON_AddItemToObject(__FUNCTION__, cj_result, ezlopi_enum_str, json_array_enum);
                 }
                 //--------------------------------------------------------------------------------------
-                cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, (char *)item->user_arg ? item->user_arg : ky206_sensor_heat_alarm_token[0]);
-                cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, (char *)item->user_arg ? item->user_arg : ky206_sensor_heat_alarm_token[0]);
+                cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, (char *)item->user_arg ? item->user_arg : "heat_ok");
+                cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, (char *)item->user_arg ? item->user_arg : "heat_ok");
             }
             else if (ezlopi_item_name_temperature_changes == item->cloud_properties.item_name)
             {
@@ -333,8 +334,8 @@ static ezlopi_error_t __0057_get_cjson_value(l_ezlopi_item_t *item, void *arg)
         {
             if (ezlopi_item_name_heat_alarm == item->cloud_properties.item_name)
             {
-                cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, (char *)item->user_arg ? item->user_arg : ky206_sensor_heat_alarm_token[0]);
-                cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, (char *)item->user_arg ? item->user_arg : ky206_sensor_heat_alarm_token[0]);
+                cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, (char *)item->user_arg ? item->user_arg : "heat_ok");
+                cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, (char *)item->user_arg ? item->user_arg : "heat_ok");
             }
             else if (ezlopi_item_name_temperature_changes == item->cloud_properties.item_name)
             {
@@ -357,10 +358,10 @@ static ezlopi_error_t __0057_notify(l_ezlopi_item_t *item)
     {
         if (ezlopi_item_name_heat_alarm == item->cloud_properties.item_name)
         {
-            const char *curret_value = NULL;
+            char *curret_value = NULL;
             if (0 == gpio_get_level(item->interface.gpio.gpio_in.gpio_num)) // when D0 -> 0V,
             {
-                curret_value = ky206_sensor_heat_alarm_token[0];
+                curret_value = "heat_ok";
             }
             else
             {
@@ -398,7 +399,7 @@ static void __extract_KY026_sensor_value(uint32_t flame_adc_pin, float *analog_s
 {
     static float max = 0;
     // calculation process
-    s_ezlopi_analog_data_t ezlopi_analog_data = { .value = 0, .voltage = 0 };
+    s_ezlopi_analog_data_t ezlopi_analog_data = {.value = 0, .voltage = 0};
     //-------------------------------------------------
     // extract the mean_sensor_analog_output_voltage
     for (uint8_t x = 10; x > 0; x--)
@@ -422,5 +423,5 @@ static void __extract_KY026_sensor_value(uint32_t flame_adc_pin, float *analog_s
 }
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    device_0001_digitalOut_generic.c
-* @brief   perform some function on device_0001
-* @author  xx
-* @version 0.1
-* @date    xx
-*/
+ * @file    device_0001_digitalOut_generic.c
+ * @brief   perform some function on device_0001
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include "../../build/config/sdkconfig.h"
 
 #include "ezlopi_core_nvs.h"
@@ -57,16 +57,16 @@
 #include "EZLOPI_USER_CONFIG.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 static ezlopi_error_t __prepare(void *arg);
 static ezlopi_error_t __init(l_ezlopi_item_t *item);
 static ezlopi_error_t __set_value(l_ezlopi_item_t *item, void *arg);
@@ -78,8 +78,8 @@ static void __write_gpio_value(l_ezlopi_item_t *item);
 static void __set_gpio_value(l_ezlopi_item_t *item, int value);
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 // #define DEV_TEST_SETTINGS_EN
 #ifdef DEV_TEST_SETTINGS_EN
 static ezlopi_error_t __settings_callback(e_ezlopi_settings_action_t action, struct l_ezlopi_device_settings_v3 *setting, void *arg, void *user_arg);
@@ -88,22 +88,22 @@ static ezlopi_error_t __settings_set(void *arg, l_ezlopi_device_settings_v3_t *s
 static ezlopi_error_t __settings_reset(void *arg, l_ezlopi_device_settings_v3_t *setting);
 static ezlopi_error_t __settings_update(void *arg, l_ezlopi_device_settings_v3_t *setting);
 
-static const char *nvs_key_backlight_brightness = "bklt";
+// static const char *nvs_key_backlight_brightness = "bklt";
 
 uint32_t settings_ids[2];
 #endif // DEV_TEST_SETTINGS_EN
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 ezlopi_error_t DEVICE_0001_digitalOut_generic(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t error = 0;
@@ -141,8 +141,8 @@ ezlopi_error_t DEVICE_0001_digitalOut_generic(e_ezlopi_actions_t action, l_ezlop
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 static void __setup_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cjson_device)
 {
     device->cloud_properties.category = category_switch;
@@ -237,13 +237,13 @@ static ezlopi_error_t __prepare(void *arg)
                     s_digio_settings_t *settings_value = (s_digio_settings_t *)ezlopi_malloc(__FUNCTION__, sizeof(s_digio_settings_t));
                     memset(settings_value, 0, sizeof(s_digio_settings_t));
 
-                    if (EZPI_SUCCESS == EZPI_core_nvs_read_int32(&settings_value->settings_int_data, nvs_key_backlight_brightness))
+                    if (EZPI_SUCCESS == EZPI_core_nvs_read_int32(&settings_value->settings_int_data, "bklt"))
                     {
                     }
                     else
                     {
                         settings_value->settings_int_data = 50;
-                        if (EZPI_SUCCESS != EZPI_core_nvs_write_int32(settings_value->settings_int_data, nvs_key_backlight_brightness))
+                        if (EZPI_SUCCESS != EZPI_core_nvs_write_int32(settings_value->settings_int_data, "bklt"))
                         {
                             TRACE_E("Error Updating settings values to NVS");
                         }
@@ -598,7 +598,7 @@ static ezlopi_error_t __settings_set(void *arg, l_ezlopi_device_settings_v3_t *s
             s_digio_settings_t *settings_data = (s_digio_settings_t *)setting->user_arg;
             settings_data->settings_int_data = value;
 
-            if (EZPI_SUCCESS != EZPI_core_nvs_write_int32(value, nvs_key_backlight_brightness))
+            if (EZPI_SUCCESS != EZPI_core_nvs_write_int32(value, "bklt"))
             {
                 TRACE_E("Error Updating settings values to NVS");
             }
@@ -619,7 +619,7 @@ static ezlopi_error_t __settings_reset(void *arg, l_ezlopi_device_settings_v3_t 
         s_digio_settings_t *settings_data = (s_digio_settings_t *)setting->user_arg;
         settings_data->settings_int_data = 50; // 50 being default value
 
-        if (EZPI_SUCCESS != EZPI_core_nvs_write_int32(settings_data->settings_int_data, nvs_key_backlight_brightness))
+        if (EZPI_SUCCESS != EZPI_core_nvs_write_int32(settings_data->settings_int_data, "bklt"))
         {
             TRACE_E("Error Updating settings values to NVS");
             error = EZPI_FAILED;
@@ -649,5 +649,5 @@ static ezlopi_error_t __settings_update(void *arg, l_ezlopi_device_settings_v3_t
 #endif // DEV_TEST_SETTINGS_EN
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

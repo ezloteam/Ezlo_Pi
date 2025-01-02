@@ -68,16 +68,15 @@ static void EZPI_reg_loop(void *arg);
 static void EZPI_create_reg_packet(void);
 
 static cJSON *cj_reg_data = NULL;
-static const char *__reg_loop_str = "reg-loop";
 
 void EZPI_registration_init(void)
 {
-    EZPI_service_loop_add(__reg_loop_str, EZPI_reg_loop, 5000, NULL);
+    EZPI_service_loop_add("reg-loop", EZPI_reg_loop, 5000, NULL);
 }
 
 void EZPI_register_repeat(cJSON *cj_request, cJSON *cj_response)
 {
-    EZPI_service_loop_add(__reg_loop_str, EZPI_reg_loop, 5000, NULL);
+    EZPI_service_loop_add("reg-loop", EZPI_reg_loop, 5000, NULL);
 }
 
 void EZPI_registered(cJSON *cj_request, cJSON *cj_response)

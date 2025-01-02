@@ -34,27 +34,26 @@
  * @author  xx
  * @version 0.1
  * @date    xx
-*/
+ */
 
 #ifndef __DHT22_H__
 #define __DHT22_H__
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          C++ Declaration Wrapper
-*******************************************************************************/
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
     /*******************************************************************************
-    *                          Type & Macro Declarations
-    *******************************************************************************/
-
+     *                          Type & Macro Declarations
+     *******************************************************************************/
 
 #if 0
 #include "stdint.h"
@@ -90,52 +89,39 @@ extern "C"
 
 #if (CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32S2)
 
-#define DHT_OK 0
-#define DHT_CHECKSUM_ERROR -1
-#define DHT_TIMEOUT_ERROR -2
+#define DHT22_OK 0
+#define DHT22_CHECKSUM_ERROR -1
+#define DHT22_TIMEOUT_ERROR -2
+#define DHT22_INVALID_REQ -3
 
     /*******************************************************************************
-    *                          Extern Data Declarations
-    *******************************************************************************/
+     *                          Extern Data Declarations
+     *******************************************************************************/
 
     /*******************************************************************************
-    *                          Extern Function Prototypes
-    *******************************************************************************/
-    /**
-     * @brief Function to set dht22gpio
-     *
-     * @param gpio
-     */
-    void setDHT22gpio(int gpio);
+     *                          Extern Function Prototypes
+     *******************************************************************************/
     /**
      * @brief Function to read dht22 data
-     *
-     * @return int
+     * 
+     * @param temperature_dht22 
+     * @param humidity_dht22 
+     * @param DHT22gpio 
+     * @return int 
      */
-    int readDHT22();
-    /**
-     * @brief Get the Humidity dht22 object
-     *
-     * @return float
-     */
-    float getHumidity_dht22();
-    /**
-     * @brief Get the Temperature dht22 object
-     *
-     * @return float
-     */
-    float getTemperature_dht22();
+    int readDHT22(float *temperature_dht22, float *humidity_dht22, int DHT22gpio);
     /**
      * @brief Get current dht22 signal level
-     *
-     * @param usTimeOut
-     * @param state
-     * @return int
+     * 
+     * @param DHT22gpio 
+     * @param usTimeOut 
+     * @param state 
+     * @return int 
      */
-    int dht22_getSignalLevel(int usTimeOut, bool state);
+    int dht22_getSignalLevel(int DHT22gpio, int usTimeOut, bool state);
     // void errorHandler(int response);
 
-#endif  // (CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32S2)
+#endif // (CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32S2)
 
 #ifdef __cplusplus
 }
@@ -144,5 +130,5 @@ extern "C"
 #endif //__DHT22_H__
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

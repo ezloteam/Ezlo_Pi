@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    ens160.c
-* @brief   perform some function on ens160
-* @author  xx
-* @version 0.1
-* @date    xx
-*/
+ * @file    ens160.c
+ * @brief   perform some function on ens160
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 
 /*!
  * @file dfrobot_ens160.cpp
@@ -59,56 +59,56 @@
 #include "ens160.h"
 #include "EZLOPI_USER_CONFIG.h"
 
- /*******************************************************************************
+/*******************************************************************************
  *                          Extern Data Declarations
  *******************************************************************************/
 
- /*******************************************************************************
+/*******************************************************************************
  *                          Extern Function Declarations
  *******************************************************************************/
 
- /*******************************************************************************
+/*******************************************************************************
  *                          Type & Macro Definitions
  *******************************************************************************/
 
- /*******************************************************************************
+/*******************************************************************************
  *                          Static Function Prototypes
  *******************************************************************************/
 
- /**
-  * @brief  Init function for ens160
-  *
-  * @param ens160 Pointer to ens160-config struct
-  * @return int [0 = NO_ERROR ; -1 = ERR_DATA_BUS ;  -2 = ERR_IC_VERSION]
-  */
+/**
+ * @brief  Init function for ens160
+ *
+ * @param ens160 Pointer to ens160-config struct
+ * @return int [0 = NO_ERROR ; -1 = ERR_DATA_BUS ;  -2 = ERR_IC_VERSION]
+ */
 static int DFROBOT_ens160_begin(ens160_t *ens160);
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
-static const char *TAG = "ENS160";
+ *                          Static Data Definitions
+ *******************************************************************************/
+// static const char *TAG = "ENS160";
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 
 /***************** Config function ******************************/
 
 void DFROBOT_ens160_set_pwr_mode(ens160_t *ens160, uint8_t mode)
 {
   DFROBOT_ens160_i2c_write_reg(ens160, ENS160_OPMODE_REG, &mode, sizeof(mode));
-  vTaskDelay(20 / portTICK_PERIOD_MS);   // Give it some time to switch mode
+  vTaskDelay(20 / portTICK_PERIOD_MS); // Give it some time to switch mode
 }
 
 void DFROBOT_ens160_set_int_mode(ens160_t *ens160, uint8_t mode)
 {
   mode |= (eINTDataDrdyEN | eIntGprDrdyDIS);
   DFROBOT_ens160_i2c_write_reg(ens160, ENS160_CONFIG_REG, &mode, sizeof(mode));
-  vTaskDelay(20 / portTICK_PERIOD_MS);   // Give it some time to switch mode
+  vTaskDelay(20 / portTICK_PERIOD_MS); // Give it some time to switch mode
 }
 
 void DFROBOT_ens160_set_temp_and_hum(ens160_t *ens160, float ambient_temp, float relative_humidity)
@@ -140,14 +140,14 @@ uint8_t DFROBOT_ens160_get_aqi(ens160_t *ens160)
 
 uint16_t DFROBOT_ens160_get_tvoc(ens160_t *ens160)
 {
-  uint8_t buf[2] = { 0 };
+  uint8_t buf[2] = {0};
   DFROBOT_ens160_i2c_read_reg(ens160, ENS160_DATA_TVOC_REG, buf, sizeof(buf));
   return ENS160_CONCAT_BYTES(buf[1], buf[0]);
 }
 
 uint16_t DFROBOT_ens160_get_eco2(ens160_t *ens160)
 {
-  uint8_t buf[2] = { 0 };
+  uint8_t buf[2] = {0};
   DFROBOT_ens160_i2c_read_reg(ens160, ENS160_DATA_ECO2_REG, buf, sizeof(buf));
   return ENS160_CONCAT_BYTES(buf[1], buf[0]);
 }
@@ -177,12 +177,13 @@ int DFROBOT_ens160_i2c_begin(ens160_t *ens160)
 {
   EZPI_hal_i2c_master_init(ens160->ezlopi_i2c);
 
-  return DFROBOT_ens160_begin(ens160);   // Use the initialization function of the parent class
+  return DFROBOT_ens160_begin(ens160); // Use the initialization function of the parent class
 }
 
 void DFROBOT_ens160_i2c_write_reg(ens160_t *ens160, uint8_t reg, const void *p_buf, size_t size)
 {
-  if (p_buf == NULL) {
+  if (p_buf == NULL)
+  {
     DBG("p_buf ERROR!! : null pointer");
   }
 
@@ -197,7 +198,8 @@ void DFROBOT_ens160_i2c_write_reg(ens160_t *ens160, uint8_t reg, const void *p_b
 
 size_t DFROBOT_ens160_i2c_read_reg(ens160_t *ens160, uint8_t reg, void *p_buf, size_t size)
 {
-  if (NULL == p_buf) {
+  if (NULL == p_buf)
+  {
     DBG("p_buf ERROR!! : null pointer");
   }
   uint8_t *_p_buf = (uint8_t *)p_buf;
@@ -220,21 +222,21 @@ void DFROBOT_ens160_get_data(ens160_t *ens160)
    *       after re-powering.
    */
   uint8_t status = DFROBOT_ens160_get_ens160_status(ens160);
-  ESP_LOGI(TAG, "Sensor operating status : %d", status);
+  ESP_LOGI("ENS160", "Sensor operating status : %d", status);
 
   /**
    * Get the air quality index
    * Return value: 1-Excellent, 2-Good, 3-Moderate, 4-Poor, 5-Unhealthy
    */
   uint8_t aqi = DFROBOT_ens160_get_aqi(ens160);
-  ESP_LOGI(TAG, "Air quality index : %d", aqi);
+  ESP_LOGI("ENS160", "Air quality index : %d", aqi);
 
   /**
    * Get TVOC concentration
    * Return value range: 0–65000, unit: ppb
    */
   uint16_t tvoc = DFROBOT_ens160_get_tvoc(ens160);
-  ESP_LOGI(TAG, "Concentration of total volatile organic compounds : %d ppb", tvoc);
+  ESP_LOGI("ENS160", "Concentration of total volatile organic compounds : %d ppb", tvoc);
 
   /**
    * Get CO2 equivalent concentration calculated according to the detected data of VOCs and hydrogen (eCO2 – Equivalent CO2)
@@ -243,7 +245,7 @@ void DFROBOT_ens160_get_data(ens160_t *ens160)
    *               Poor(1000 - 1500), Unhealthy(> 1500)
    */
   uint16_t eco2 = DFROBOT_ens160_get_eco2(ens160);
-  ESP_LOGI(TAG, "Carbon dioxide equivalent concentration : %d ppm", eco2);
+  ESP_LOGI("ENS160", "Carbon dioxide equivalent concentration : %d ppm", eco2);
 
   ens160->data.status = status;
   ens160->data.aqi = aqi;
@@ -252,20 +254,20 @@ void DFROBOT_ens160_get_data(ens160_t *ens160)
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 static int DFROBOT_ens160_begin(ens160_t *ens160)
 {
   ens160->misr = 0;
-  uint8_t id_buf[2] = { 0 };
-  if (0 == DFROBOT_ens160_i2c_read_reg(ens160, ENS160_PART_ID_REG, id_buf, sizeof(id_buf)))   // Judge whether the data bus is successful
+  uint8_t id_buf[2] = {0};
+  if (0 == DFROBOT_ens160_i2c_read_reg(ens160, ENS160_PART_ID_REG, id_buf, sizeof(id_buf))) // Judge whether the data bus is successful
   {
     DBG("ERR_DATA_BUS");
     return ERR_DATA_BUS;
   }
 
   DBG("real sensor id= 0x%X", ENS160_CONCAT_BYTES(id_buf[1], id_buf[0]));
-  if (ENS160_PART_ID != ENS160_CONCAT_BYTES(id_buf[1], id_buf[0]))   // Judge whether the chip version matches
+  if (ENS160_PART_ID != ENS160_CONCAT_BYTES(id_buf[1], id_buf[0])) // Judge whether the chip version matches
   {
     DBG("ERR_IC_VERSION");
     return ERR_IC_VERSION;
@@ -278,5 +280,5 @@ static int DFROBOT_ens160_begin(ens160_t *ens160)
 }
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

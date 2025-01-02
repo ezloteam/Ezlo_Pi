@@ -29,33 +29,33 @@
 ** ===========================================================================
 */
 /**
-* @file    pms5003.c
-* @brief   perform some function on pms5003
-* @author  xx
-* @version 0.1
-* @date    xx
-*/
+ * @file    pms5003.c
+ * @brief   perform some function on pms5003
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include "pms5003.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 
 static void pms_uart_setup(s_pms5003_sensor_object *pms_object);
 static esp_err_t pms_setup_control_gpio(gpio_num_t set_pin, gpio_num_t reset_pin);
@@ -70,17 +70,17 @@ static void ezlopi_pms5003_upcall(uint8_t *buffer, uint32_t output_len, s_ezlopi
 static void pms_timer_callback(void *arg);
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
-static const char *TAG = "PMS";
+ *                          Static Data Definitions
+ *******************************************************************************/
+// static const char *TAG = "PMS";
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 /*!
      @brief  Setups the hardware and detects a valid UART PM2.5
 */
@@ -99,30 +99,30 @@ void pms_init(s_pms5003_sensor_object *pms_object)
  */
 void pms_print_data(PM25_AQI_Data *data)
 {
-  ESP_LOGI(TAG, "AQI reading success");
+  ESP_LOGI("PMS", "AQI reading success");
 
-  ESP_LOGI(TAG, "---------------------------------------");
-  ESP_LOGI(TAG, "Concentration Units (standard)");
-  ESP_LOGI(TAG, "---------------------------------------");
-  ESP_LOGI(TAG, "PM 1.0: %d", data->pm10_standard);
-  ESP_LOGI(TAG, "PM 2.5: %d", data->pm25_standard);
-  ESP_LOGI(TAG, "PM 10:  %d", data->pm100_standard);
+  ESP_LOGI("PMS", "---------------------------------------");
+  ESP_LOGI("PMS", "Concentration Units (standard)");
+  ESP_LOGI("PMS", "---------------------------------------");
+  ESP_LOGI("PMS", "PM 1.0: %d", data->pm10_standard);
+  ESP_LOGI("PMS", "PM 2.5: %d", data->pm25_standard);
+  ESP_LOGI("PMS", "PM 10:  %d", data->pm100_standard);
 
-  ESP_LOGI(TAG, "---------------------------------------");
-  ESP_LOGI(TAG, "Concentration Units (environmental)");
-  ESP_LOGI(TAG, "---------------------------------------");
-  ESP_LOGI(TAG, "PM 1.0: %d", data->pm10_env);
-  ESP_LOGI(TAG, "PM 2.5: %d", data->pm25_env);
-  ESP_LOGI(TAG, "PM 10:  %d", data->pm100_env);
+  ESP_LOGI("PMS", "---------------------------------------");
+  ESP_LOGI("PMS", "Concentration Units (environmental)");
+  ESP_LOGI("PMS", "---------------------------------------");
+  ESP_LOGI("PMS", "PM 1.0: %d", data->pm10_env);
+  ESP_LOGI("PMS", "PM 2.5: %d", data->pm25_env);
+  ESP_LOGI("PMS", "PM 10:  %d", data->pm100_env);
 
-  ESP_LOGI(TAG, "---------------------------------------");
-  ESP_LOGI(TAG, "Particles > 0.3um / 0.1L air: %d", data->particles_03um);
-  ESP_LOGI(TAG, "Particles > 0.5um / 0.1L air: %d", data->particles_05um);
-  ESP_LOGI(TAG, "Particles > 1.0um / 0.1L air: %d", data->particles_10um);
-  ESP_LOGI(TAG, "Particles > 2.5um / 0.1L air: %d", data->particles_25um);
-  ESP_LOGI(TAG, "Particles > 5.0um / 0.1L air: %d", data->particles_50um);
-  ESP_LOGI(TAG, "Particles > 10 um / 0.1L air: %d", data->particles_100um);
-  ESP_LOGI(TAG, "---------------------------------------");
+  ESP_LOGI("PMS", "---------------------------------------");
+  ESP_LOGI("PMS", "Particles > 0.3um / 0.1L air: %d", data->particles_03um);
+  ESP_LOGI("PMS", "Particles > 0.5um / 0.1L air: %d", data->particles_05um);
+  ESP_LOGI("PMS", "Particles > 1.0um / 0.1L air: %d", data->particles_10um);
+  ESP_LOGI("PMS", "Particles > 2.5um / 0.1L air: %d", data->particles_25um);
+  ESP_LOGI("PMS", "Particles > 5.0um / 0.1L air: %d", data->particles_50um);
+  ESP_LOGI("PMS", "Particles > 10 um / 0.1L air: %d", data->particles_100um);
+  ESP_LOGI("PMS", "---------------------------------------");
 }
 
 esp_err_t pms_read_upcall(uint8_t *buffer, PM25_AQI_Data *data)
@@ -182,8 +182,8 @@ void pms_set_data_available_to_false(PM25_AQI_Data *data)
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 /*!
     @brief Install UART Driver for PMS5003.
 */
@@ -313,5 +313,5 @@ static void ezlopi_pms5003_upcall(uint8_t *buffer, uint32_t output_len, s_ezlopi
 }
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    sensor_0018_other_internal_hall_effect.c
-* @brief   perform some function on sensor_0018
-* @author  xx
-* @version 0.1
-* @date    xx
-*/
+ * @file    sensor_0018_other_internal_hall_effect.c
+ * @brief   perform some function on sensor_0018
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 
 #include "../../build/config/sdkconfig.h"
 
@@ -59,21 +59,16 @@
 #include "EZLOPI_USER_CONFIG.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
-static const char *hall_door_window_states[] = {
-    "dw_is_opened",
-    "dw_is_closed",
-    "unknown",
-};
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 typedef struct s_hall_data
 {
     bool calibration_complete;
@@ -82,8 +77,8 @@ typedef struct s_hall_data
 } s_hall_data_t;
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static ezlopi_error_t __prepare(void *arg);
 static ezlopi_error_t __init(l_ezlopi_item_t *item);
 static ezlopi_error_t __get_item_cjson(l_ezlopi_item_t *item, void *arg);
@@ -94,16 +89,16 @@ static void __setup_item_properties(l_ezlopi_item_t *item, cJSON *cj_device, voi
 static void __hall_calibration_task(void *params);
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 
 ezlopi_error_t SENSOR_0018_other_internal_hall_effect(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
@@ -147,8 +142,8 @@ ezlopi_error_t SENSOR_0018_other_internal_hall_effect(e_ezlopi_actions_t action,
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 static void __setup_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     device->cloud_properties.category = category_security_sensor;
@@ -264,6 +259,11 @@ static ezlopi_error_t __get_item_cjson(l_ezlopi_item_t *item, void *arg)
                 cJSON *json_array_enum = cJSON_CreateArray(__FUNCTION__);
                 if (NULL != json_array_enum)
                 {
+                    char *hall_door_window_states[] = {
+                        "dw_is_opened",
+                        "dw_is_closed",
+                        "unknown",
+                    };
                     for (uint8_t i = 0; i < HALL_DOOR_WINDOW_MAX; i++)
                     {
                         cJSON *json_value = cJSON_CreateString(__FUNCTION__, hall_door_window_states[i]);
@@ -365,5 +365,5 @@ static void __hall_calibration_task(void *params) // calibrate task
 #endif // CONFIG_IDF_TARGET_ESP32
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/
