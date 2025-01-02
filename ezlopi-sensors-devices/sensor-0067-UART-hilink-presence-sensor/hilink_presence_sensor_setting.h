@@ -1,11 +1,62 @@
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+/**
+ * @file    hilink_presence_sensor_setting.h
+ * @brief   perform some function on hilink_presence_sensor_setting
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+*/
 
 #ifndef _HILINK_PRESENCE_SENSOR_SETTINGS_H_
 #define _HILINK_PRESENCE_SENSOR_SETTINGS_H_
 
+/*******************************************************************************
+*                          Include Files
+*******************************************************************************/
 #include "ezlopi_util_trace.h"
-#include "cjext.h"
+// #include "cjext.h"
 #include "ezlopi_core_devices.h"
 
+/*******************************************************************************
+*                          C++ Declaration Wrapper
+*******************************************************************************/
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+    /*******************************************************************************
+    *                          Type & Macro Declarations
+    *******************************************************************************/
 #define HILINK_PRESENCE_SENSOR_SETTING_PREDEFINED_LABEL_TEXT "Pre-defined operation mode"
 #define HILINK_PRESENCE_SENSOR_SETTING_PREDEFINED_DESCRIPTION_TEXT "Pre-Defined Operation mode, there will be different operation mode for different use cases"
 #define HILINK_PRESENCE_SENSOR_SETTING_USER_DEFINED_LABEL_TEXT "User defined mode"
@@ -42,134 +93,66 @@
 #define BASIC_ROUTINE_MODE_LONG_LANG_TAG "ezlopi_presence_basic_long"
 #define USER_DEFINED_MODE_LANG_TAG "ezlopi_presence_user_defined_mode"
 
-typedef struct s_hilink_predefined_setting_value
-{
-    char setting_value[50];
-} s_hilink_predefined_setting_value_t;
-
-typedef struct s_hilink_userdefined_setting_value
-{
-    float min_move_distance;
-    float max_move_distance;
-    float min_still_distance;
-    float max_still_distance;
-    uint8_t timeout;
-    bool is_active;
-} s_hilink_userdefined_setting_value_t;
-
-typedef struct s_hilink_radar_distance_sensitivity_value
-{
-    int distance_sensitivity_value;
-} s_hilink_radar_distance_sensitivity_value_t;
-
-int hilink_presence_sensor_initialize_settings(l_ezlopi_device_t* device);
-int hilink_presence_sensor_apply_settings();
-bool hilink_presence_sensor_target_in_detectable_range(const uint16_t moving_target_distance);
-
-static inline cJSON* __setting_add_text_and_lang_tag(const char* const object_text, const char* const object_lang_tag)
-{
-
-    cJSON* cj_object = cJSON_CreateObject(__FUNCTION__);
-    if (cj_object)
+    typedef struct s_hilink_predefined_setting_value
     {
-        cJSON_AddStringToObject(__FUNCTION__, cj_object, ezlopi_text_str, object_text);
-        cJSON_AddStringToObject(__FUNCTION__, cj_object, ezlopi_lang_tag_str, object_lang_tag);
-    }
-    else
-    {
-        ezlopi_free(__FUNCTION__, cj_object);
-        cj_object = NULL;
-    }
+        char setting_value[50];
+    } s_hilink_predefined_setting_value_t;
 
-    return cj_object;
+    typedef struct s_hilink_userdefined_setting_value
+    {
+        float min_move_distance;
+        float max_move_distance;
+        float min_still_distance;
+        float max_still_distance;
+        uint8_t timeout;
+        bool is_active;
+    } s_hilink_userdefined_setting_value_t;
+
+    typedef struct s_hilink_radar_distance_sensitivity_value
+    {
+        int distance_sensitivity_value;
+    } s_hilink_radar_distance_sensitivity_value_t;
+
+
+
+    /*******************************************************************************
+    *                          Extern Data Declarations
+    *******************************************************************************/
+
+    /*******************************************************************************
+    *                          Extern Function Prototypes
+    *******************************************************************************/
+    /**
+    * @brief Function to operate on actions
+    *
+    * @param action Current Action to Operate on
+    * @param item Target-Item node
+    * @param arg Arg for action
+    * @param user_arg User-arg
+    * @return ezlopi_error_t
+    */
+    int HILINK_presence_sensor_initialize_settings(l_ezlopi_device_t *device);
+    /**
+     * @brief Function to apply HILINK_presence_sensor setting
+     *
+     * @return int
+     */
+    int HILINK_presence_sensor_apply_settings(void);
+    /**
+     * @brief Functio to set moving target range
+     *
+     * @param moving_target_distance target distance
+     * @return true
+     * @return false
+     */
+    bool HILINK_presence_sensor_target_in_detectable_range(const uint16_t moving_target_distance);
+
+#ifdef __cplusplus
 }
-
-static inline void __setting_extract_user_defined_setting(cJSON* cj_value, s_hilink_userdefined_setting_value_t* user_defined_setting_val)
-{
-    CJSON_GET_VALUE_DOUBLE(cj_value, ezlopi_min_move_distance_str, user_defined_setting_val->min_move_distance);
-    CJSON_GET_VALUE_DOUBLE(cj_value, ezlopi_max_move_distance_str, user_defined_setting_val->max_move_distance);
-    CJSON_GET_VALUE_DOUBLE(cj_value, ezlopi_min_still_distance_str, user_defined_setting_val->min_still_distance);
-    CJSON_GET_VALUE_DOUBLE(cj_value, ezlopi_max_still_distance_str, user_defined_setting_val->max_still_distance);
-    CJSON_GET_VALUE_DOUBLE(cj_value, ezlopi_timeout_str, user_defined_setting_val->timeout);
-    CJSON_GET_VALUE_DOUBLE(cj_value, ezlopi_is_active_str, user_defined_setting_val->is_active);
-}
-
-static inline int __prepare_user_defined_setting_cjson(cJSON* cj_value, s_hilink_userdefined_setting_value_t* setting_val)
-{
-    int ret = 0;
-    if (cj_value && setting_val)
-    {
-        cJSON_AddNumberToObject(__FUNCTION__, cj_value, ezlopi_min_move_distance_str, setting_val->min_move_distance);
-        cJSON_AddNumberToObject(__FUNCTION__, cj_value, ezlopi_max_move_distance_str, setting_val->max_move_distance);
-        cJSON_AddNumberToObject(__FUNCTION__, cj_value, ezlopi_min_still_distance_str, setting_val->min_still_distance);
-        cJSON_AddNumberToObject(__FUNCTION__, cj_value, ezlopi_max_still_distance_str, setting_val->max_still_distance);
-        cJSON_AddNumberToObject(__FUNCTION__, cj_value, ezlopi_timeout_str, setting_val->timeout);
-        cJSON_AddBoolToObject(__FUNCTION__, cj_value, ezlopi_is_active_str, setting_val->is_active);
-    }
-    else
-    {
-        ret = 1;
-    }
-    return ret;
-}
-
-static inline char* __prepare_user_defined_setting_str(s_hilink_userdefined_setting_value_t* setting_val)
-{
-    char* ret = NULL;
-
-    cJSON* cj_setting = cJSON_CreateObject(__FUNCTION__);
-    if (cj_setting && setting_val)
-    {
-        ESP_ERROR_CHECK(__prepare_user_defined_setting_cjson(cj_setting, setting_val));
-        ret = cJSON_PrintBuffered(__FUNCTION__, cj_setting, 1024, false);
-        TRACE_D("length of 'ret': %d", strlen(ret));
-    }
-
-    return ret;
-}
-
-// Sensor's distance parameters are in the multiple of 0.75 which are encoded as enum in the driver.
-// Starting from 0.75cm ranges goes up to 6.0cm, there are total of 8 different distance ranges.
-static inline distance_t __setting_user_defined_setting_get_enum(float val)
-{
-    distance_t dist = DISTANCE_0CM;
-    if (val == 0.75)
-    {
-        dist = DISTANCE_75CM;
-    }
-    else if (val == 1.5)
-    {
-        dist = DISTANCE_150CM;
-    }
-    else if (val == 2.25)
-    {
-        dist = DISTANCE_225CM;
-    }
-    else if (val == 3.0)
-    {
-        dist = DISTANCE_300CM;
-    }
-    else if (val == 3.75)
-    {
-        dist = DISTANCE_375CM;
-    }
-    else if (val == 4.5)
-    {
-        dist = DISTANCE_450CM;
-    }
-    else if (val == 5.25)
-    {
-        dist = DISTANCE_525CM;
-    }
-    else if (val == 6.0)
-    {
-        dist = DISTANCE_600CM;
-    }
-    else
-    {
-        dist = DISTANCE_0CM;
-    }
-    return dist;
-}
+#endif
 
 #endif // _HILINK_PRESENCE_SENSOR_SETTINGS_H_
+
+/*******************************************************************************
+*                          End of File
+*******************************************************************************/

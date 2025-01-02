@@ -1,12 +1,50 @@
-#include "driver/gpio.h"
-#include "ezlopi_util_trace.h"
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+/**
+* @file    sensor_0023_digitalIn_touch_switch_TTP223B.c
+* @brief   perform some function on sensor_0023
+* @author  xx
+* @version 0.1
+* @date    xx
+*/
 
-// #include "ezlopi_core_timer.h"
+/*******************************************************************************
+*                          Include Files
+*******************************************************************************/
+#include "driver/gpio.h"
+
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
-#include "ezlopi_core_errors.h"
 
 #include "ezlopi_cloud_items.h"
 #include "ezlopi_cloud_constants.h"
@@ -15,6 +53,21 @@
 
 #include "sensor_0023_digitalIn_touch_switch_TTP223B.h"
 
+/*******************************************************************************
+*                          Extern Data Declarations
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Extern Function Declarations
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Type & Macro Definitions
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Static Function Prototypes
+*******************************************************************************/
 static ezlopi_error_t __prepare(void *arg);
 static void __prepare_touch_switch_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
 static void __prepare_touch_switch_properties(l_ezlopi_item_t *item, cJSON *cj_device);
@@ -22,6 +75,17 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item);
 static void touch_switch_callback(void *arg);
 static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg);
 
+/*******************************************************************************
+*                          Static Data Definitions
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Extern Data Definitions
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Extern Function Definitions
+*******************************************************************************/
 /**
  * @brief Public function to interface bme280. This is used to handles all the action on the bme280 sensor and is the entry point to interface the sensor.
  *
@@ -29,7 +93,7 @@ static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg);
  * @param arg Other arguments if needed
  * @return ezlopi_error_t
  */
-ezlopi_error_t sensor_0023_digitalIn_touch_switch_TTP223B(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+ezlopi_error_t SENSOR_0023_digitalIn_touch_switch_TTP223B(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
     switch (action)
@@ -57,6 +121,10 @@ ezlopi_error_t sensor_0023_digitalIn_touch_switch_TTP223B(e_ezlopi_actions_t act
     }
     return ret;
 }
+
+/*******************************************************************************
+*                         Static Function Definitions
+*******************************************************************************/
 
 static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 {
@@ -123,7 +191,7 @@ static ezlopi_error_t __prepare(void *arg)
         if (touch_device)
         {
             __prepare_touch_switch_device_cloud_properties(touch_device, prep_arg->cjson_device);
-            l_ezlopi_item_t *touch_switch_item = EZPI_core_device_add_item_to_device(touch_device, sensor_0023_digitalIn_touch_switch_TTP223B);
+            l_ezlopi_item_t *touch_switch_item = EZPI_core_device_add_item_to_device(touch_device, SENSOR_0023_digitalIn_touch_switch_TTP223B);
             if (touch_switch_item)
             {
                 __prepare_touch_switch_properties(touch_switch_item, prep_arg->cjson_device);
@@ -168,3 +236,7 @@ static void __prepare_touch_switch_properties(l_ezlopi_item_t *item, cJSON *cj_d
     item->interface.gpio.gpio_in.interrupt = GPIO_INTR_POSEDGE;
     item->interface.gpio.gpio_in.pull = GPIO_PULLDOWN_ONLY;
 }
+
+/*******************************************************************************
+*                          End of File
+*******************************************************************************/

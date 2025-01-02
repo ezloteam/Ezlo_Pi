@@ -25,8 +25,8 @@ uint8_t max_gate = 0;
 uint8_t max_moving_gate = 0;
 uint8_t max_stationary_gate = 0;
 uint16_t sensor_idle_time = 0;
-uint8_t motion_sensitivity[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
-uint8_t stationary_sensitivity[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
+uint8_t motion_sensitivity[9] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+uint8_t stationary_sensitivity[9] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 /*	private	*/
 static uint32_t radar_uart_timeout = 100;		   // How long to give up on receiving some useful data from the LD2410
@@ -71,39 +71,39 @@ static void ld2410_callback(uint8_t *buffer, uint32_t output_len, s_ezlopi_uart_
 /*	Function definition	*/
 bool ld2410_begin(bool wait_for_radar, s_ezlopi_uart_t uart_settings)
 {
-	ezlo_ld2410_uart_handle = ezlopi_uart_init(uart_settings.baudrate, uart_settings.tx, uart_settings.rx, ld2410_callback, NULL);
+	ezlo_ld2410_uart_handle = EZPI_hal_uart_init(uart_settings.baudrate, uart_settings.tx, uart_settings.rx, ld2410_callback, NULL);
 
-#warning "DO NOT USE printf ON PRODUCTION"
+	#warning "DO NOT USE printf ON PRODUCTION"
 
 #ifdef LD2410_DEBUG_INITIALIZATION
-	// printf("ld2410 started");
+		// printf("ld2410 started");
 #endif
-	if (wait_for_radar)
-	{
-#ifdef LD2410_DEBUG_INITIALIZATION
-		// printf("\nLD2410 firmware: ");
-#endif
-		if (ld2410_request_firmware_version())
+		if (wait_for_radar)
 		{
 #ifdef LD2410_DEBUG_INITIALIZATION
-			printf(" v%d.%d.%d\n", firmware_major_version, firmware_minor_version, firmware_bugfix_version);
+			// printf("\nLD2410 firmware: ");
 #endif
-			return true;
+			if (ld2410_request_firmware_version())
+			{
+#ifdef LD2410_DEBUG_INITIALIZATION
+				printf(" v%d.%d.%d\n", firmware_major_version, firmware_minor_version, firmware_bugfix_version);
+#endif
+				return true;
+			}
+			else
+			{
+#ifdef LD2410_DEBUG_INITIALIZATION
+				// printf("no response\n");
+#endif
+			}
 		}
 		else
 		{
 #ifdef LD2410_DEBUG_INITIALIZATION
-			// printf("no response\n");
+			// printf("\nLD2410 library configured");
 #endif
+			return true;
 		}
-	}
-	else
-	{
-#ifdef LD2410_DEBUG_INITIALIZATION
-		// printf("\nLD2410 library configured");
-#endif
-		return true;
-	}
 	return false;
 }
 
@@ -254,13 +254,13 @@ static bool ld2410_read_frame_(uint8_t l_byte)
 					}
 				}
 				else if (radar_data_frame_[0] == 0xFD && // Command frame end state
-						 radar_data_frame_[1] == 0xFC &&
-						 radar_data_frame_[2] == 0xFB &&
-						 radar_data_frame_[3] == 0xFA &&
-						 radar_data_frame_[radar_data_frame_position_ - 4] == 0x04 &&
-						 radar_data_frame_[radar_data_frame_position_ - 3] == 0x03 &&
-						 radar_data_frame_[radar_data_frame_position_ - 2] == 0x02 &&
-						 radar_data_frame_[radar_data_frame_position_ - 1] == 0x01)
+					radar_data_frame_[1] == 0xFC &&
+					radar_data_frame_[2] == 0xFB &&
+					radar_data_frame_[3] == 0xFA &&
+					radar_data_frame_[radar_data_frame_position_ - 4] == 0x04 &&
+					radar_data_frame_[radar_data_frame_position_ - 3] == 0x03 &&
+					radar_data_frame_[radar_data_frame_position_ - 2] == 0x02 &&
+					radar_data_frame_[radar_data_frame_position_ - 1] == 0x01)
 				{
 					if (ld2410_parse_command_frame_())
 					{

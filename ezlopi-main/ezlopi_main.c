@@ -134,7 +134,7 @@ static void __blinky(void *pv)
     {
         uint32_t free_heap = esp_get_free_heap_size();
         uint32_t watermark_heap = esp_get_minimum_free_heap_size();
-        uint32_t free_heap_internal = esp_get_free_internal_heap_size();
+        // uint32_t free_heap_internal = esp_get_free_internal_heap_size();
 
         uint32_t total_heap_size = heap_caps_get_total_size(MALLOC_CAP_DEFAULT);
 

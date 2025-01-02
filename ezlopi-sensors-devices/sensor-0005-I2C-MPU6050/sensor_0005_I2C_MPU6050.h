@@ -1,13 +1,67 @@
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+/**
+ * @file    sensor_0005_I2C_MPU6050.h
+ * @brief   perform some function on sensor_0005
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+*/
+
 #ifndef _SENSOR_0005_I2C_MPU6050_H_
 #define _SENSOR_0005_I2C_MPU6050_H_
 
+
+/*******************************************************************************
+*                          Include Files
+*******************************************************************************/
 #include "ezlopi_core_actions.h"
 #include "ezlopi_core_devices.h"
 #include "ezlopi_core_errors.h"
 
+/*******************************************************************************
+*                          C++ Declaration Wrapper
+*******************************************************************************/
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+    /*******************************************************************************
+    *                          Type & Macro Declarations
+    *******************************************************************************/
+
 #define MPU6050_REG_COUNT_LEN 14 // the accelerometer , temperature and gyrodata is to be in one go .
 
-// #define RECALIBRATE_ITERAION_COUNT 1000
+    // #define RECALIBRATE_ITERAION_COUNT 1000
 #define CALIBRATION_SAMPLES 200
 
 #define MPU6050_STANDARD_G_TO_ACCEL_CONVERSION_VALUE (9.80665f) // Offsets and conversion values : 1g = 9.80665 m/s^2
@@ -92,63 +146,102 @@
 #define PWR_MGMT_1_PLL_Y_AXIS_INTERNAL_CLK_REF (BIT_1)         // When set, choose PLL with Y axis gyroscope reference
 #define PWR_MGMT_1_PLL_Z_AXIS_INTERNAL_CLK_REF (BIT_1 | BIT_0) // When set, choose PLL with Z axis gyroscope reference
 
+
 //-----------------------------
 // #CUSTOM DATA STORAGE STRUCTS
 //-----------------------------
 
 // #### Custom structure to store processed data
-typedef struct s_mpu6050_data
-{
-    bool calibration_complete;
-    // uint16_t extract_counts;
-    float tmp;
-    float ax, ay, az; // m/s2
-    float gx, gy, gz; // rpm
-    float gyro_x_offset, gyro_y_offset, gyro_z_offset; // raw
-} s_mpu6050_data_t;
+    typedef struct s_mpu6050_data
+    {
+        bool calibration_complete;
+        // uint16_t extract_counts;
+        float tmp;
+        float ax, ay, az; // m/s2
+        float gx, gy, gz; // rpm
+        float gyro_x_offset, gyro_y_offset, gyro_z_offset; // raw
+    } s_mpu6050_data_t;
 
-// #### Custom structure to store raw data
-typedef struct s_raw_mpu6050_data
-{
-    int16_t raw_t;
-    int16_t raw_ax, raw_ay, raw_az;
-    int16_t raw_gx, raw_gy, raw_gz;
-} s_raw_mpu6050_data_t;
+    // #### Custom structure to store raw data
+    typedef struct s_raw_mpu6050_data
+    {
+        int16_t raw_t;
+        int16_t raw_ax, raw_ay, raw_az;
+        int16_t raw_gx, raw_gy, raw_gz;
+    } s_raw_mpu6050_data_t;
 
-//-----------------------------------------
-// #### Enumeration of MPU6050 error types
-//-----------------------------------------
-typedef enum e_mpu6050_err
-{
-    MPU6050_ERR_OK = 0,              // No error
-    MPU6050_ERR_PARAM_CFG_FAIL,      // i2c_param_config() error
-    MPU6050_ERR_DRIVER_INSTALL_FAIL, // i2c_driver_install() error
-    MPU6050_ERR_INVALID_ARGUMENT,    // invalid parameter to function
-    MPU6050_ERR_NO_SLAVE_ACK,        // No acknowledgment from slave
-    MPU6050_ERR_INVALID_STATE,       // Driver not installed / not i2c master
-    MPU6050_ERR_OPERATION_TIMEOUT,   // Bus busy,
-    MPU6050_ERR_UNKNOWN,             // Unknown error
-    MPU6050_ERR_MAX
-} e_mpu6050_err_t;
+    //-----------------------------------------
+    // #### Enumeration of MPU6050 error types
+    //-----------------------------------------
+    typedef enum e_mpu6050_err
+    {
+        MPU6050_ERR_OK = 0,              // No error
+        MPU6050_ERR_PARAM_CFG_FAIL,      // i2c_param_config() error
+        MPU6050_ERR_DRIVER_INSTALL_FAIL, // i2c_driver_install() error
+        MPU6050_ERR_INVALID_ARGUMENT,    // invalid parameter to function
+        MPU6050_ERR_NO_SLAVE_ACK,        // No acknowledgment from slave
+        MPU6050_ERR_INVALID_STATE,       // Driver not installed / not i2c master
+        MPU6050_ERR_OPERATION_TIMEOUT,   // Bus busy,
+        MPU6050_ERR_UNKNOWN,             // Unknown error
+        MPU6050_ERR_MAX
+    } e_mpu6050_err_t;
 
 #if 0
-// typedef enum e_sensor_i2c_mpu6050_item_ids
-// {
-//     SENSOR_I2C_MPU6050_ITEM_ACCELERATION_X,
-//     SENSOR_I2C_MPU6050_ITEM_ACCELERATION_Y,
-//     SENSOR_I2C_MPU6050_ITEM_ACCELERATION_Z,
-//     SENSOR_I2C_MPU6050_ITEM_TEMPERATURE,
-//     SENSOR_I2C_MPU6050_ITEM_GYRO_X,
-//     SENSOR_I2C_MPU6050_ITEM_GYRO_Y,
-//     SENSOR_I2C_MPU6050_ITEM_GYRO_Z,
-//     SENSOR_I2C_MPU6050_ITEM_MAX
-// } e_sensor_i2c_mpu6050_item_ids_t;
+    // typedef enum e_sensor_i2c_mpu6050_item_ids
+    // {
+    //     SENSOR_I2C_MPU6050_ITEM_ACCELERATION_X,
+    //     SENSOR_I2C_MPU6050_ITEM_ACCELERATION_Y,
+    //     SENSOR_I2C_MPU6050_ITEM_ACCELERATION_Z,
+    //     SENSOR_I2C_MPU6050_ITEM_TEMPERATURE,
+    //     SENSOR_I2C_MPU6050_ITEM_GYRO_X,
+    //     SENSOR_I2C_MPU6050_ITEM_GYRO_Y,
+    //     SENSOR_I2C_MPU6050_ITEM_GYRO_Z,
+    //     SENSOR_I2C_MPU6050_ITEM_MAX
+    // } e_sensor_i2c_mpu6050_item_ids_t;
 #endif
 
-void __mpu6050_get_data(l_ezlopi_item_t *item);
-e_mpu6050_err_t __mpu6050_config_device(l_ezlopi_item_t *item);
+    /*******************************************************************************
+    *                          Extern Data Declarations
+    *******************************************************************************/
 
-// Action function declaration
-ezlopi_error_t sensor_0005_I2C_MPU6050(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
+    /*******************************************************************************
+    *                          Extern Function Prototypes
+    *******************************************************************************/
+
+    /**
+    * @brief Function to operate on actions
+    *
+    * @param action Current Action to Operate on
+    * @param item Target-Item node
+    * @param arg Arg for action
+    * @param user_arg User-arg
+    * @return ezlopi_error_t
+    */
+    ezlopi_error_t SENSOR_0005_i2c_mpu6050(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
+
+    /**
+     * @brief Function to get mpu6050 data
+     *
+     * @param item Target Item
+     */
+    void MPU6050_get_data(l_ezlopi_item_t *item);
+
+    /**
+     * @brief Function to configure device
+     *
+     * @param item Target Item
+     * @return e_mpu6050_err_t
+     */
+    e_mpu6050_err_t MPU6050_config_device(l_ezlopi_item_t *item);
+
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //_SENSOR_0005_I2C_MPU6050_H_
+
+/*******************************************************************************
+*                          End of File
+*******************************************************************************/

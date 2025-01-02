@@ -1,14 +1,67 @@
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+/**
+ * @file    sensor_0044_I2C_TSL256_luminosity.h
+ * @brief   perform some function on sensor_0044
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+*/
+
 #ifndef _SENSOR_0044_I2C_TSL256_LUMINOSITY_H_
 #define _SENSOR_0044_I2C_TSL256_LUMINOSITY_H_
 
+/*******************************************************************************
+*                          Include Files
+*******************************************************************************/
+#include "ezlopi_hal_i2c_master.h"
+
 #include "ezlopi_core_actions.h"
 #include "ezlopi_core_devices.h"
-#include "ezlopi_hal_i2c_master.h"
 #include "ezlopi_core_errors.h"
 
-//-----------------------------------------------------------------
-// Definations
-//-----------------------------------------------------------------
+/*******************************************************************************
+*                          C++ Declaration Wrapper
+*******************************************************************************/
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+    /*******************************************************************************
+    *                          Type & Macro Declarations
+    *******************************************************************************/
+    //-----------------------------------------------------------------
+    // Definations
+    //-----------------------------------------------------------------
 #define TSL2561_ADDRESS (0x39) // floating address
 
 /* CMD_access = "COMMAND CODEs" + "REGISTER ADDRESS" > */
@@ -104,29 +157,74 @@
 #define TSL2561_LUX_B8T (0x0000) // 0.000 * 2^LUX_SCALE
 #define TSL2561_LUX_M8T (0x0000) // 0.000 * 2^LUX_SCALE
 
-typedef enum
-{
-    TSL2561_INTEGRATIONTIME_13MS = 0,
-    TSL2561_INTEGRATIONTIME_101MS,
-    TSL2561_INTEGRATIONTIME_402MS,
-} integration_t;
+    typedef enum
+    {
+        TSL2561_INTEGRATIONTIME_13MS = 0,
+        TSL2561_INTEGRATIONTIME_101MS,
+        TSL2561_INTEGRATIONTIME_402MS,
+    } integration_t;
 
-typedef enum
-{
-    TSL2561_GAIN_x1 = 0,
-    TSL2561_GAIN_x16,
-} gain_t;
+    typedef enum
+    {
+        TSL2561_GAIN_x1 = 0,
+        TSL2561_GAIN_x16,
+    } gain_t;
 
-typedef struct TSL256_lum_t
-{
-    uint32_t lux_val;
-}TSL256_lum_t;
-//------------------------------------------------------------------------------
-bool Check_PARTID(s_ezlopi_i2c_master_t *i2c_master);
-void sensor_0044_tsl2561_configure_device(s_ezlopi_i2c_master_t *i2c_master);
-uint32_t tsl2561_get_intensity_value(s_ezlopi_i2c_master_t *i2c_master);
-//------------------------------------------------------------------------------
+    typedef struct TSL256_lum_t
+    {
+        uint32_t lux_val;
+    }TSL256_lum_t;
 
-ezlopi_error_t sensor_0044_I2C_TSL256_luminosity(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
+    /*******************************************************************************
+    *                          Extern Data Declarations
+    *******************************************************************************/
 
+    /*******************************************************************************
+    *                          Extern Function Prototypes
+    *******************************************************************************/
+    /**
+    * @brief Function to operate on actions
+    *
+    * @param action Current Action to Operate on
+    * @param item Target-Item node
+    * @param arg Arg for action
+    * @param user_arg User-arg
+    * @return ezlopi_error_t
+    */
+    ezlopi_error_t SENSOR_0044_i2c_tsl256_luminosity(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
+
+    /**
+     * @brief Function to check PART_ID
+     *
+     * @param i2c_master Pointer to i2c
+     * @return true
+     * @return false
+     */
+    bool TSL2561_check_partid(s_ezlopi_i2c_master_t *i2c_master);
+    /**
+     * @brief Function to configure tsl2561
+     *
+     * @param i2c_master  Pointer to i2c
+     */
+    void SENSOR_0044_tsl2561_configure_device(s_ezlopi_i2c_master_t *i2c_master);
+    /**
+     * @brief Function to get tsl2561 intensity value
+     *
+     * @param i2c_master
+     * @return uint32_t
+     */
+    uint32_t TSL2561_get_intensity_value(s_ezlopi_i2c_master_t *i2c_master);
+
+
+#ifdef __cplusplus
+}
 #endif
+
+#endif // _SENSOR_0044_I2C_TSL256_LUMINOSITY_H_
+
+/*******************************************************************************
+*                          End of File
+*******************************************************************************/
+
+
+

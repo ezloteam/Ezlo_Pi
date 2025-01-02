@@ -1,28 +1,68 @@
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+/**
+* @file    sensor_0069_ze08_ch02_gas_sensor.c
+* @brief   perform some function on sensor_0069
+* @author  xx
+* @version 0.1
+* @date    xx
+*/
 
+/*******************************************************************************
+*                          Include Files
+*******************************************************************************/
 #include <stdlib.h>
 #include <string.h>
 
-#include "ezlopi_util_trace.h"
-
-#include "ezlopi_core_actions.h"
-#include "ezlopi_core_devices_list.h"
 #include "ezlopi_core_cjson_macros.h"
-#include "ezlopi_core_devices.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
-#include "ezlopi_core_errors.h"
 
 #include "ezlopi_cloud_constants.h"
 
-#include "sensor_0069_ze08_ch02_gas_sensor.h"
-
 #include "ze08_ch2o.h"
+#include "sensor_0069_ze08_ch02_gas_sensor.h"
 #include "EZLOPI_USER_CONFIG.h"
 
-static ezlopi_error_t __prepare(void *arg, void *user_arg);
-static ezlopi_error_t __init(l_ezlopi_item_t *item);
-static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg);
-static ezlopi_error_t __notify(l_ezlopi_item_t *item);
+/*******************************************************************************
+*                          Extern Data Declarations
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Extern Function Declarations
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Type & Macro Definitions
+*******************************************************************************/
 
 /*
 {\
@@ -35,8 +75,29 @@ static ezlopi_error_t __notify(l_ezlopi_item_t *item);
     \"baud\": 9600\
 }\
 */
+/*******************************************************************************
+*                          Static Function Prototypes
+*******************************************************************************/
 
-ezlopi_error_t sensor_0069_ze08_ch02_gas_sensor(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+static ezlopi_error_t __prepare(void *arg, void *user_arg);
+static ezlopi_error_t __init(l_ezlopi_item_t *item);
+static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg);
+static ezlopi_error_t __notify(l_ezlopi_item_t *item);
+
+
+/*******************************************************************************
+*                          Static Data Definitions
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Extern Data Definitions
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Extern Function Definitions
+*******************************************************************************/
+
+ezlopi_error_t SENSOR_0069_ze08_ch02_gas_sensor(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
     // TRACE_D("%s", EZPI_core_actions_to_string(action));
@@ -70,6 +131,9 @@ ezlopi_error_t sensor_0069_ze08_ch02_gas_sensor(e_ezlopi_actions_t action, l_ezl
     return ret;
 }
 
+/*******************************************************************************
+*                         Static Function Definitions
+*******************************************************************************/
 static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 {
     ezlopi_error_t ret = EZPI_FAILED;
@@ -107,7 +171,7 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
     {
         if (item->interface.uart.enable)
         {
-            if (false != ze08_ch2o_sensor_init(&item->interface.uart, ze08_ch2o_sensor))
+            if (false != ZE08_ch2o_sensor_init(&item->interface.uart, ze08_ch2o_sensor))
             {
                 ret = EZPI_SUCCESS;
             }
@@ -158,7 +222,7 @@ static ezlopi_error_t __prepare(void *arg, void *user_arg)
             {
                 memset(ze08_ch2o_sensor_device, 0, sizeof(l_ezlopi_device_t));
                 __prepare_ze08_ch2o_sensor_device_cloud_properties(ze08_ch2o_sensor_device);
-                l_ezlopi_item_t *ze08_ch02_ppm_item = EZPI_core_device_add_item_to_device(ze08_ch2o_sensor_device, sensor_0069_ze08_ch02_gas_sensor);
+                l_ezlopi_item_t *ze08_ch02_ppm_item = EZPI_core_device_add_item_to_device(ze08_ch2o_sensor_device, SENSOR_0069_ze08_ch02_gas_sensor);
                 if (ze08_ch02_ppm_item)
                 {
                     __prepare_ze08_ch2o_sensor_ppm_item_cloud_properties(ze08_ch02_ppm_item, prep_arg->cjson_device, ze08_ch2o_sensor);
@@ -179,3 +243,7 @@ static ezlopi_error_t __prepare(void *arg, void *user_arg)
 
     return ret;
 }
+
+/*******************************************************************************
+*                          End of File
+*******************************************************************************/

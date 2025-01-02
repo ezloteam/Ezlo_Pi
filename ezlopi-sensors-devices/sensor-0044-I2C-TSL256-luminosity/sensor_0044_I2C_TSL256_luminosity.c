@@ -1,12 +1,50 @@
-#include <math.h>
-#include "ezlopi_util_trace.h"
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+/**
+* @file    sensor_0044_I2C_TSL256_luminosity.c
+* @brief   perform some function on sensor_0044
+* @author  xx
+* @version 0.1
+* @date    xx
+*/
 
-// #include "ezlopi_core_timer.h"
+/*******************************************************************************
+*                          Include Files
+*******************************************************************************/
+#include <math.h>
+
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
-#include "ezlopi_core_errors.h"
 
 #include "ezlopi_hal_i2c_master.h"
 
@@ -15,8 +53,22 @@
 
 #include "sensor_0044_I2C_TSL256_luminosity.h"
 #include "EZLOPI_USER_CONFIG.h"
-//-----------------------------------------------------------------------
 
+/*******************************************************************************
+*                          Extern Data Declarations
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Extern Function Declarations
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Type & Macro Definitions
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Static Function Prototypes
+*******************************************************************************/
 static ezlopi_error_t __prepare(void *arg);
 static ezlopi_error_t __init(l_ezlopi_item_t *item);
 static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg);
@@ -24,7 +76,18 @@ static ezlopi_error_t __notify(l_ezlopi_item_t *item);
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
 static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_data);
 
-ezlopi_error_t sensor_0044_I2C_TSL256_luminosity(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+/*******************************************************************************
+*                          Static Data Definitions
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Extern Data Definitions
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Extern Function Definitions
+*******************************************************************************/
+ezlopi_error_t SENSOR_0044_i2c_tsl256_luminosity(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
     // printf("\n\nHERE : %s\n\n", EZPI_core_actions_to_string(action));
@@ -59,12 +122,16 @@ ezlopi_error_t sensor_0044_I2C_TSL256_luminosity(e_ezlopi_actions_t action, l_ez
     return ret;
 }
 
+
+/*******************************************************************************
+*                         Static Function Definitions
+*******************************************************************************/
 static ezlopi_error_t __notify(l_ezlopi_item_t *item)
 {
     ezlopi_error_t ret = EZPI_FAILED;
 
     // Allow only significant changes in values to be posted
-    double new_value = (double)tsl2561_get_intensity_value(&item->interface.i2c_master);
+    double new_value = (double)TSL2561_get_intensity_value(&item->interface.i2c_master);
     TSL256_lum_t *TSL2561_lux_data = (TSL256_lum_t *)item->user_arg;
     if (TSL2561_lux_data)
     {
@@ -78,7 +145,6 @@ static ezlopi_error_t __notify(l_ezlopi_item_t *item)
 
     return ret;
 }
-
 static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 {
     ezlopi_error_t ret = EZPI_FAILED;
@@ -94,7 +160,6 @@ static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg)
     }
     return ret;
 }
-
 static ezlopi_error_t __init(l_ezlopi_item_t *item)
 {
     ezlopi_error_t ret = EZPI_ERR_INIT_DEVICE_FAILED;
@@ -106,12 +171,12 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
         {
             if (item->interface.i2c_master.enable)
             {
-                ezlopi_i2c_master_init(&item->interface.i2c_master);
+                EZPI_hal_i2c_master_init(&item->interface.i2c_master);
                 TRACE_I("I2C channel is %d", item->interface.i2c_master.channel);
-                if (Check_PARTID(&item->interface.i2c_master))
+                if (TSL2561_check_partid(&item->interface.i2c_master))
                 {
                     TRACE_I("TSL561 initialization finished.........");
-                    sensor_0044_tsl2561_configure_device(&item->interface.i2c_master);
+                    SENSOR_0044_tsl2561_configure_device(&item->interface.i2c_master);
                     ret = EZPI_SUCCESS;
                 }
             }
@@ -119,7 +184,6 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
     }
     return ret;
 }
-
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     device->cloud_properties.category = category_light_sensor;
@@ -128,7 +192,6 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
     device->cloud_properties.info = NULL;
     device->cloud_properties.device_type_id = NULL;
 }
-
 static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_data)
 {
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type);
@@ -155,7 +218,6 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_dev
     item->is_user_arg_unique = true;
     item->user_arg = user_data;
 }
-
 static ezlopi_error_t __prepare(void *arg)
 {
     ezlopi_error_t ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
@@ -172,7 +234,7 @@ static ezlopi_error_t __prepare(void *arg)
             {
                 __prepare_device_cloud_properties(tsl256_device, prep_arg->cjson_device);
 
-                l_ezlopi_item_t *tsl256_item = EZPI_core_device_add_item_to_device(tsl256_device, sensor_0044_I2C_TSL256_luminosity);
+                l_ezlopi_item_t *tsl256_item = EZPI_core_device_add_item_to_device(tsl256_device, SENSOR_0044_i2c_tsl256_luminosity);
                 if (tsl256_item)
                 {
                     __prepare_item_cloud_properties(tsl256_item, prep_arg->cjson_device, TSL2561_lux_data);
@@ -193,3 +255,7 @@ static ezlopi_error_t __prepare(void *arg)
 
     return ret;
 }
+
+/*******************************************************************************
+*                          End of File
+*******************************************************************************/

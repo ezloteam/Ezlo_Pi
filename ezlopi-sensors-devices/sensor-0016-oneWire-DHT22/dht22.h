@@ -1,5 +1,60 @@
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+/**
+ * @file    dht22.h
+ * @brief   perform some function on dht22
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+*/
+
 #ifndef __DHT22_H__
 #define __DHT22_H__
+
+/*******************************************************************************
+*                          Include Files
+*******************************************************************************/
+
+/*******************************************************************************
+*                          C++ Declaration Wrapper
+*******************************************************************************/
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+    /*******************************************************************************
+    *                          Type & Macro Declarations
+    *******************************************************************************/
+
 
 #if 0
 #include "stdint.h"
@@ -23,19 +78,15 @@
     taskENTER_CRITICAL(&mux)
 #define onewireEXIT_CRITICAL_REGION() taskEXIT_CRITICAL(&mux)
 
-typedef struct dht22_sensor{
-    double temperature;
-    double humidity;
-    uint32_t gpio_pin;
-}dht22_sensor_t;
+    typedef struct dht22_sensor {
+        double temperature;
+        double humidity;
+        uint32_t gpio_pin;
+    }dht22_sensor_t;
 
-void dht22_sensor_init(uint32_t gpio_pin);
-int dht22_sensor_read_data(uint32_t gpio_pin, dht22_sensor_t* data);
+    void dht22_sensor_init(uint32_t gpio_pin);
+    int dht22_sensor_read_data(uint32_t gpio_pin, dht22_sensor_t *data);
 #endif
-
-/*
-    DHT22 temperature sensor driver
-*/
 
 #if (CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32S2)
 
@@ -43,15 +94,55 @@ int dht22_sensor_read_data(uint32_t gpio_pin, dht22_sensor_t* data);
 #define DHT_CHECKSUM_ERROR -1
 #define DHT_TIMEOUT_ERROR -2
 
-// == function prototypes =======================================
+    /*******************************************************************************
+    *                          Extern Data Declarations
+    *******************************************************************************/
 
-void setDHT22gpio(int gpio);
-// void errorHandler(int response);
-int readDHT22();
-float getHumidity_dht22();
-float getTemperature_dht22();
-int dht22_getSignalLevel(int usTimeOut, bool state);
+    /*******************************************************************************
+    *                          Extern Function Prototypes
+    *******************************************************************************/
+    /**
+     * @brief Function to set dht22gpio
+     *
+     * @param gpio
+     */
+    void setDHT22gpio(int gpio);
+    /**
+     * @brief Function to read dht22 data
+     *
+     * @return int
+     */
+    int readDHT22();
+    /**
+     * @brief Get the Humidity dht22 object
+     *
+     * @return float
+     */
+    float getHumidity_dht22();
+    /**
+     * @brief Get the Temperature dht22 object
+     *
+     * @return float
+     */
+    float getTemperature_dht22();
+    /**
+     * @brief Get current dht22 signal level
+     *
+     * @param usTimeOut
+     * @param state
+     * @return int
+     */
+    int dht22_getSignalLevel(int usTimeOut, bool state);
+    // void errorHandler(int response);
 
 #endif  // (CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32S2)
 
+#ifdef __cplusplus
+}
+#endif
+
 #endif //__DHT22_H__
+
+/*******************************************************************************
+*                          End of File
+*******************************************************************************/
