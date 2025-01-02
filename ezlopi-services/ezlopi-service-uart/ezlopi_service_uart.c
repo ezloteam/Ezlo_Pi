@@ -7,36 +7,36 @@
  * @version
  * @date
  */
- /* ===========================================================================
- ** Copyright (C) 2024 Ezlo Innovation Inc
- **
- ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
- **
- ** Redistribution and use in source and binary forms, with or without
- ** modification, are permitted provided that the following conditions are met:
- **
- ** 1. Redistributions of source code must retain the above copyright notice,
- **    this list of conditions and the following disclaimer.
- ** 2. Redistributions in binary form must reproduce the above copyright
- **    notice, this list of conditions and the following disclaimer in the
- **    documentation and/or other materials provided with the distribution.
- ** 3. Neither the name of the copyright holder nor the names of its
- **    contributors may be used to endorse or promote products derived from
- **    this software without specific prior written permission.
- **
- ** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- ** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- ** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- ** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- ** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- ** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- ** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- ** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- ** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- ** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- ** POSSIBILITY OF SUCH DAMAGE.
- ** ===========================================================================
- */
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
 
 #include "../../build/config/sdkconfig.h"
 
@@ -91,47 +91,47 @@
 #include "EZLOPI_USER_CONFIG.h"
 
 #if defined(CONFIG_IDF_TARGET_ESP32)
- /**
-  * @brief UART TX pin number
-  *
-  */
+/**
+ * @brief UART TX pin number
+ *
+ */
 #define TXD_PIN (GPIO_NUM_1)
-  /**
-   * @brief UART RX pin number
-   *
-   */
+/**
+ * @brief UART RX pin number
+ *
+ */
 #define RXD_PIN (GPIO_NUM_3)
 #elif defined(CONFIG_IDF_TARGET_ESP32S2)
 #elif defined(CONFIG_IDF_TARGET_ESP32C3)
- /**
-  * @brief UART TX pin number
-  *
-  */
+/**
+ * @brief UART TX pin number
+ *
+ */
 #define TXD_PIN (GPIO_NUM_21)
-  /**
-   * @brief UART RX pin number
-   *
-   */
+/**
+ * @brief UART RX pin number
+ *
+ */
 #define RXD_PIN (GPIO_NUM_20)
 #elif defined(CONFIG_IDF_TARGET_ESP32S3)
- /**
-  * @brief UART TX pin number
-  *
-  */
+/**
+ * @brief UART TX pin number
+ *
+ */
 #define TXD_PIN (GPIO_NUM_43)
-  /**
-   * @brief UART RX pin number
-   *
-   */
+/**
+ * @brief UART RX pin number
+ *
+ */
 #define RXD_PIN (GPIO_NUM_44)
 #endif
 
-   /**
-    * @brief Function to process reset command
-    *
-    * @param root Pointer to the root JSON coming from UART
-    * @return int
-    */
+/**
+ * @brief Function to process reset command
+ *
+ * @param root Pointer to the root JSON coming from UART
+ * @return int
+ */
 static int ezpi_service_uart_reset(cJSON *root);
 /**
  * @brief Function to process uart config command
@@ -309,7 +309,7 @@ void EZPI_SERV_uart_init(void)
 
 #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
     EZPI_core_process_set_process_info(ENUM_EZLOPI_SERVICE_UART_TASK, &__uart_loop_handle, EZLOPI_SERVICE_UART_TASK_DEPTH);
-#endif //CONFIG_FREERTOS_USE_TRACE_FACILITY
+#endif // CONFIG_FREERTOS_USE_TRACE_FACILITY
 
 #endif
 }
@@ -464,13 +464,13 @@ static int ezpi_service_uart_process_log_severity(const cJSON *root)
 {
     int ret = 0;
 
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
     int target = 0;
     int severity = 0;
 
     CJSON_GET_VALUE_DOUBLE(root, "target", target);
     CJSON_GET_VALUE_DOUBLE(root, ezlopi_severity_str, severity);
 
-#ifdef CONFIG_EZPI_UTIL_TRACE_EN
     if (0 == target)
     {
         // Call cloud log severity setter
@@ -610,7 +610,6 @@ static ezlopi_error_t ezpi_service_uart_process_provisioning_api(const cJSON *ro
 static int ezpi_service_uart_parser(const char *data)
 {
     cJSON *root = cJSON_ParseWithRef(__FUNCTION__, data);
-    // printf("HERE again\n");
 
     if (root)
     {
@@ -691,22 +690,50 @@ static void ezpi_service_uart_task(void *arg)
     static const char *RX_TASK_TAG = "RX_TASK";
     esp_log_level_set(RX_TASK_TAG, ESP_LOG_INFO);
 
-    uint8_t *data = (uint8_t *)ezlopi_malloc(__FUNCTION__, EZPI_SERV_UART_RX_BUFFER_SIZE);
-    memset(data, 0, EZPI_SERV_UART_RX_BUFFER_SIZE);
-
     while (1)
     {
-        int rxBytes = uart_read_bytes(EZPI_SERV_UART_NUM_DEFAULT, data, (EZPI_SERV_UART_RX_BUFFER_SIZE - 1), 1000 / portTICK_RATE_MS);
+        uint32_t tmp_len = 0;
+        uint32_t buffred_data_len = 0;
+        uart_get_buffered_data_len(EZPI_SERV_UART_NUM_DEFAULT, &tmp_len);
 
-        if (rxBytes > 0)
+        if (tmp_len > 0)
         {
-            data[rxBytes] = 0;
-            TRACE_I("%s", data);
-            ezpi_service_uart_parser((const char *)data);
+            while (tmp_len != buffred_data_len)
+            {
+                buffred_data_len = tmp_len;
+                vTaskDelay(10 / portTICK_RATE_MS);
+                uart_get_buffered_data_len(EZPI_SERV_UART_NUM_DEFAULT, &tmp_len);
+            }
+
+            if (buffred_data_len)
+            {
+                uint8_t *uart_rx_data = (uint8_t *)ezlopi_malloc(__FUNCTION__, buffred_data_len + 1);
+
+                if (uart_rx_data)
+                {
+                    memset(uart_rx_data, 0, buffred_data_len);
+
+                    int rxBytes = uart_read_bytes(EZPI_SERV_UART_NUM_DEFAULT, uart_rx_data, buffred_data_len, 1000 / portTICK_RATE_MS);
+
+                    if (rxBytes > 0)
+                    {
+                        uart_rx_data[rxBytes] = 0;
+                        TRACE_I("%s", uart_rx_data);
+                        ezpi_service_uart_parser((const char *)uart_rx_data);
+                    }
+
+                    ezlopi_free(__FUNCTION__, uart_rx_data);
+                }
+                else
+                {
+                    uart_flush_input(EZPI_SERV_UART_NUM_DEFAULT);
+                }
+            }
         }
+
+        vTaskDelay(100 / portTICK_RATE_MS);
     }
 
-    ezlopi_free(__FUNCTION__, data);
 #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
     EZPI_core_process_set_is_deleted(ENUM___uart_loop);
 #endif
@@ -1019,15 +1046,12 @@ static void ezpi_service_uart_set_wifi(const char *data)
                         }
                         else
                         {
-                            #warning "DO NOT user printf on production !";
                             TRACE_E("WiFi Connection to AP: %s failed !", ssid);
                             status = 0;
                         }
                     }
                     TRACE_W("Trying to connect to AP : %s, attempt %d ....", ssid, attempt);
-                    // printf("Trying to connect to AP : %s, attempt %d ....\n", ssid, attempt);
                     attempt++;
-                    // vTaskDelay(EZLOPI_WIFI_CONNECT_ATTEMPT_INTERVAL / portTICK_PERIOD_MS);
                 }
 
                 ezpi_service_uart_response(EZPI_UART_CMD_WIFI, status_write, status);
@@ -1035,7 +1059,6 @@ static void ezpi_service_uart_set_wifi(const char *data)
             else
             {
                 TRACE_E("Invalid WiFi SSID or Password, aborting!");
-                // printf("Invalid WiFi SSID or Password, aborting! \n");
                 ezpi_service_uart_response(EZPI_UART_CMD_WIFI, status_write, status);
             }
         }
@@ -1137,32 +1160,32 @@ static void ezpi_service_uart_set_config(const char *data)
 
 static void ezpi_service_uart_get_config(void)
 {
-    cJSON *root = NULL;
+    cJSON *cj_root = NULL;
 
-    #warning "Lomas: didn't find feering 'current_config', if this is correct then please remove this warning"
-        char *current_config = EZPI_core_factory_info_v3_get_ezlopi_config();
+#warning "Lomas: didn't find freering 'current_config', if this is correct then please remove this warning"
+    char *current_config = EZPI_core_factory_info_v3_get_ezlopi_config();
 
     if (current_config)
     {
         // TRACE_D("current_config[len: %d]: %s", strlen(current_config), current_config);
-        root = cJSON_Parse(__FUNCTION__, current_config);
+        cj_root = cJSON_Parse(__FUNCTION__, current_config);
 
-        if (root)
+        if (cj_root)
         {
-            cJSON_DeleteItemFromObject(__FUNCTION__, root, ezlopi_cmd_str);
+            cJSON_DeleteItemFromObject(__FUNCTION__, cj_root, ezlopi_cmd_str);
 
-            // cJSON* device_total = cJSON_GetObjectItem(__FUNCTION__, root, "dev_total");
+            // cJSON* device_total = cJSON_GetObjectItem(__FUNCTION__, cj_root, "dev_total");
             // if (device_total)
             // {
             //     if (cJSON_IsNumber(device_total))
             //     {
-            //         cJSON_DeleteItemFromObject(__FUNCTION__, root, "dev_total");
+            //         cJSON_DeleteItemFromObject(__FUNCTION__, cj_root, "dev_total");
             //     }
             //     cJSON_Delete(__FUNCTION__, device_total);
             // }
 
-            cJSON_AddNumberToObject(__FUNCTION__, root, ezlopi_cmd_str, EZPI_UART_CMD_GET_CONFIG);
-            cJSON_AddNumberToObject(__FUNCTION__, root, ezlopi_status_str, EZPI_UART_CMD_STATUS_SUCCESS);
+            cJSON_AddNumberToObject(__FUNCTION__, cj_root, ezlopi_cmd_str, EZPI_UART_CMD_GET_CONFIG);
+            cJSON_AddNumberToObject(__FUNCTION__, cj_root, ezlopi_status_str, EZPI_UART_CMD_STATUS_SUCCESS);
         }
     }
     else
@@ -1172,31 +1195,32 @@ static void ezpi_service_uart_get_config(void)
         TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_ERROR, "UART: 'current-config' is null!");
     }
 
-    if (NULL == root)
+    if (NULL == cj_root)
     {
         TRACE_E("Reading config failed!");
-        root = cJSON_CreateObject(__FUNCTION__);
-        if (root)
+        cj_root = cJSON_CreateObject(__FUNCTION__);
+        if (cj_root)
         {
-            cJSON_AddNumberToObject(__FUNCTION__, root, ezlopi_cmd_str, EZPI_UART_CMD_GET_CONFIG);
-            cJSON_AddNumberToObject(__FUNCTION__, root, ezlopi_status_str, EZPI_UART_CMD_STATUS_FAIL);
+            cJSON_AddNumberToObject(__FUNCTION__, cj_root, ezlopi_cmd_str, EZPI_UART_CMD_GET_CONFIG);
+            cJSON_AddNumberToObject(__FUNCTION__, cj_root, ezlopi_status_str, EZPI_UART_CMD_STATUS_FAIL);
         }
         else
         {
-            TRACE_E("Failed to create 'root'!");
+            TRACE_E("Failed to create 'cj_root'!");
             TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_ERROR, "UART: config json parsing fialed!");
         }
     }
 
-    if (root)
+    if (cj_root)
     {
-        char *my_json_string = cJSON_Print(__FUNCTION__, root);
+        char *my_json_string = cJSON_Print(__FUNCTION__, cj_root);
+        cJSON_Delete(__FUNCTION__, cj_root); // free Json string
+
         TRACE_D("length of 'my_json_string': %d", strlen(my_json_string));
 
         if (my_json_string)
         {
             cJSON_Minify(my_json_string);
-            cJSON_Delete(__FUNCTION__, root); // free Json string
             const int len = strlen(my_json_string);
             EZPI_SERV_uart_tx_data(len, (uint8_t *)my_json_string); // Send the data over uart
             // TRACE_D("Sending: %s", my_json_string);

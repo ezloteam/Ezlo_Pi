@@ -34,39 +34,38 @@
  * @author  xx
  * @version 0.1
  * @date    xx
-*/
-
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include <math.h>
 #include "bme68xLibrary.h"
 #include "bsec2.h"
 
 /*******************************************************************************
-*                          C++ Declaration Wrapper
-*******************************************************************************/
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
     /*******************************************************************************
-    *                          Type & Macro Declarations
-    *******************************************************************************/
+     *                          Type & Macro Declarations
+     *******************************************************************************/
 #pragma once
 
 #define BME680_SDA GPIO_NUM_18
 #define BME680_SCL GPIO_NUM_17
 
-    #warning "################### DO NOT USE printf ON PRODUCTION ###################"
+#warning "################### DO NOT USE printf ON PRODUCTION ###################"
 
 #define ACTIVE_I2C I2C_NUM_0
 #define BME680_TEST 0
 #define SEALEVELPRESSURE_HPA (1013.25)
 
-        typedef struct
+    typedef struct
     {
         float iaq;
         bool iaq_accuracy;
@@ -82,21 +81,21 @@ extern "C"
     } bme680_data_t;
 
     /*******************************************************************************
-    *                          Extern Data Declarations
-    *******************************************************************************/
+     *                          Extern Data Declarations
+     *******************************************************************************/
 
     /*******************************************************************************
-    *                          Extern Function Prototypes
-    *******************************************************************************/
+     *                          Extern Function Prototypes
+     *******************************************************************************/
     /**
-    * @brief Function to operate on actions
-    *
-    * @param action Current Action to Operate on
-    * @param item Target-Item node
-    * @param arg Arg for action
-    * @param user_arg User-arg
-    * @return ezlopi_error_t
-    */
+     * @brief Function to operate on actions
+     *
+     * @param action Current Action to Operate on
+     * @param item Target-Item node
+     * @param arg Arg for action
+     * @param user_arg User-arg
+     * @return ezlopi_error_t
+     */
 
     /**
      * @brief : This function checks the BSEC status, prints the respective error code. Halts in case of error
@@ -122,27 +121,27 @@ extern "C"
 
     /**
      * @brief Function to print data
-     * 
+     *
      * @param data Pointer to target data
-     * @return true 
-     * @return false 
+     * @return true
+     * @return false
      */
     bool bme680_print_data(bme680_data_t *data);
 
     /**
      * @brief Function to read altitude
-     * 
+     *
      * @param pressure Input pressure value
      * @param seaLevel Input seaLevel
-     * @return float 
+     * @return float
      */
     float bme680_read_altitude(float pressure, float seaLevel);
 
     /**
      * @brief Get the data status object
-     * 
-     * @return true 
-     * @return false 
+     *
+     * @return true
+     * @return false
      */
     bool get_data_status();
 
@@ -150,10 +149,6 @@ extern "C"
 }
 #endif
 
-
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
-
-
-
+ *                          End of File
+ *******************************************************************************/

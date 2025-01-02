@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    jsn_sr04t.c
-* @brief   perform some function on jsn_sr04t
-* @author  xx
-* @version 0.1
-* @date    xx
-*/
+ * @file    jsn_sr04t.c
+ * @brief   perform some function on jsn_sr04t
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 
 #include "jsn_sr04t.h"
 #include "ezlopi_util_trace.h"
@@ -46,17 +46,16 @@
 #include "ezlopi_core_device_value_updated.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
-
-
-/*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 /**
  * @brief Default configuration for RX channel
  *
@@ -76,23 +75,22 @@
         }                                           \
     }
 
-
- /*******************************************************************************
+/*******************************************************************************
  *                          Static Function Prototypes
  *******************************************************************************/
 
- /*******************************************************************************
+/*******************************************************************************
  *                          Static Data Definitions
  *******************************************************************************/
 static const char *TAG1 = "JSN_SR04T_V3";
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 void log_raw_data(jsn_sr04t_raw_data_t jsn_sr04t_raw_data)
 {
     TRACE_D("data_received = %u", jsn_sr04t_raw_data.data_received);
@@ -211,9 +209,9 @@ esp_err_t JSN_sr04t_raw_calc(jsn_sr04t_config_t *jsn_sr04t_config, jsn_sr04t_raw
         for (uint8_t i = 0; i < length; i++)
         {
             ESP_LOGD(TAG1, "  %2i :: [level 0]: %1d - %5d microsec, [level 1]: %3d - %5d microsec",
-                i,
-                temp_ptr->level0, temp_ptr->duration0,
-                temp_ptr->level1, temp_ptr->duration1);
+                     i,
+                     temp_ptr->level0, temp_ptr->duration0,
+                     temp_ptr->level1, temp_ptr->duration1);
             temp_ptr++;
         }
 
@@ -225,7 +223,7 @@ esp_err_t JSN_sr04t_raw_calc(jsn_sr04t_config_t *jsn_sr04t_config, jsn_sr04t_raw
         {
             ret = ESP_ERR_INVALID_RESPONSE;
             ESP_LOGE(TAG1, "%s(). ABORT. Out Of Range: distance_cm < %d (%f) ", __FUNCTION__,
-                minimum_detection_value_in_cm, jsn_sr04t_raw_data->distance_cm);
+                     minimum_detection_value_in_cm, jsn_sr04t_raw_data->distance_cm);
 
             jsn_sr04t_raw_data->is_an_error = true;
             goto err;
@@ -235,7 +233,7 @@ esp_err_t JSN_sr04t_raw_calc(jsn_sr04t_config_t *jsn_sr04t_config, jsn_sr04t_raw
         {
             ret = ESP_ERR_INVALID_RESPONSE;
             ESP_LOGE(TAG1, "%s(). ABORT. Out Of Range: distance_cm < %d (%f) ", __FUNCTION__,
-                maximum_detection_value_in_cm, jsn_sr04t_raw_data->distance_cm);
+                     maximum_detection_value_in_cm, jsn_sr04t_raw_data->distance_cm);
             jsn_sr04t_raw_data->is_an_error = true;
             goto err;
         }
@@ -248,9 +246,9 @@ esp_err_t JSN_sr04t_raw_calc(jsn_sr04t_config_t *jsn_sr04t_config, jsn_sr04t_raw
             {
                 ret = ESP_ERR_INVALID_RESPONSE;
                 ESP_LOGE(TAG1,
-                    "%s(). ABORT. Invalid value: adjusted distance <= 0 (subtracted sensor_artifact_cm) (%f) | err %i (%s)",
-                    __FUNCTION__,
-                    jsn_sr04t_raw_data->distance_cm, ret, esp_err_to_name(ret));
+                         "%s(). ABORT. Invalid value: adjusted distance <= 0 (subtracted sensor_artifact_cm) (%f) | err %i (%s)",
+                         __FUNCTION__,
+                         jsn_sr04t_raw_data->distance_cm, ret, esp_err_to_name(ret));
                 jsn_sr04t_raw_data->is_an_error = true;
                 goto err;
             }
@@ -300,28 +298,28 @@ esp_err_t JSN_sr04t_measurement(jsn_sr04t_config_t *jsn_sr04t_config, jsn_sr04t_
         // distance += sample[i].distance_cm;
         vTaskDelay(500 / portTICK_PERIOD_MS);
     }
-    #warning "DO NOT user printf"
-        // printf("[ ");
-        for (int i = 0; i < jsn_sr04t_config->no_of_samples; i++)
+#warning "DO NOT user printf"
+    // printf("[ ");
+    for (int i = 0; i < jsn_sr04t_config->no_of_samples; i++)
+    {
+        // printf("%.2f ", sample[i].distance_cm);
+        if (!sample[i].is_an_error)
         {
-            // printf("%.2f ", sample[i].distance_cm);
-            if (!sample[i].is_an_error)
-            {
-                distance += sample[i].distance_cm;
-            }
+            distance += sample[i].distance_cm;
         }
-    #warning "DO NOT user printf"
-        // printf("]\n");
+    }
+#warning "DO NOT user printf"
+    // printf("]\n");
 
-        // if (count_errors > 0)
-        // {
-        //     jsn_sr04t_data->is_an_error = true;
-        //     ret = ESP_ERR_INVALID_RESPONSE;
-        //     ESP_LOGE(TAG1, "%s(). Abort At least one measurement is incorrect", __FUNCTION__);
-        //     goto err;
-        // }
+    // if (count_errors > 0)
+    // {
+    //     jsn_sr04t_data->is_an_error = true;
+    //     ret = ESP_ERR_INVALID_RESPONSE;
+    //     ESP_LOGE(TAG1, "%s(). Abort At least one measurement is incorrect", __FUNCTION__);
+    //     goto err;
+    // }
 
-        jsn_sr04t_data->data_received = true;
+    jsn_sr04t_data->data_received = true;
     jsn_sr04t_data->distance_cm = distance / (jsn_sr04t_config->no_of_samples - count_errors);
 
     // err:
@@ -329,9 +327,9 @@ esp_err_t JSN_sr04t_measurement(jsn_sr04t_config_t *jsn_sr04t_config, jsn_sr04t_
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

@@ -159,8 +159,7 @@ static ezlopi_error_t dht22_sensor_init_v3(l_ezlopi_item_t *item)
 static ezlopi_error_t dht22_sensor_notify(l_ezlopi_item_t *item)
 {
     ezlopi_error_t ret = EZPI_FAILED;
-    float temperature = 0;
-    float humidity = 0;
+    
     if (item)
     {
         s_ezlopi_dht22_data_t *dht22_data = (s_ezlopi_dht22_data_t *)item->user_arg;
@@ -186,7 +185,7 @@ static ezlopi_error_t dht22_sensor_notify(l_ezlopi_item_t *item)
             }
             else if (ezlopi_item_name_humidity == item->cloud_properties.item_name)
             {
-                humidity = getHumidity_dht22();
+                float humidity = getHumidity_dht22();
                 if (fabs(dht22_data->humidity - humidity) > 0.5)
                 {
                     dht22_data->humidity = humidity;

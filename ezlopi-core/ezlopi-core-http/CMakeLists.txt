@@ -13,6 +13,7 @@ set(EZLOPI_COMPONENTS
 )
 
 set(EZLOPI_CORE_COMPONENTS 
+        ezlopi-core-sntp
         ezlopi-core-event-group
         ezlopi-core-errors
 )

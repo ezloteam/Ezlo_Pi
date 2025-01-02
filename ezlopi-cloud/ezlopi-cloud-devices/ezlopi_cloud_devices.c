@@ -7,36 +7,36 @@
  * @version
  * @date
  */
- /* ===========================================================================
- ** Copyright (C) 2022 Ezlo Innovation Inc
- **
- ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
- **
- ** Redistribution and use in source and binary forms, with or without
- ** modification, are permitted provided that the following conditions are met:
- **
- ** 1. Redistributions of source code must retain the above copyright notice,
- **    this list of conditions and the following disclaimer.
- ** 2. Redistributions in binary form must reproduce the above copyright
- **    notice, this list of conditions and the following disclaimer in the
- **    documentation and/or other materials provided with the distribution.
- ** 3. Neither the name of the copyright holder nor the names of its
- **    contributors may be used to endorse or promote products derived from
- **    this software without specific prior written permission.
- **
- ** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- ** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- ** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- ** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- ** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- ** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- ** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- ** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- ** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- ** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- ** POSSIBILITY OF SUCH DAMAGE.
- ** ===========================================================================
- */
+/* ===========================================================================
+** Copyright (C) 2022 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
 
 #include <string.h>
 
@@ -55,14 +55,14 @@
 #include "ezlopi_cloud_methods_str.h"
 #include "ezlopi_cloud_constants.h"
 
- //------------------------------------------------------------------------------------------------------------------
- /**
-  * @brief Function to generate sha1 for src
-  *
-  * @param src Pointer to the source of which SHA1 has to be generated
-  * @return char*
-  * @retval Generated SHA1 else NULL
-  */
+//------------------------------------------------------------------------------------------------------------------
+/**
+ * @brief Function to generate sha1 for src
+ *
+ * @param src Pointer to the source of which SHA1 has to be generated
+ * @return char*
+ * @retval Generated SHA1 else NULL
+ */
 static char *ezpi_generate_sha1_of_src(const char *src);
 
 //------------------------------------------------------------------------------------------------------------------
@@ -216,8 +216,7 @@ void EZPI_device_updated(cJSON *cj_request, cJSON *cj_response)
                                 cJSON_AddBoolToObject(__FUNCTION__, cj_result, ezlopi_serviceNotification_str, controller_info->service_notification ? true : false);
                             }
 
-                            uint64_t time = EZPI_core_sntp_get_current_time_ms();
-                            cJSON_AddNumberToObject(__FUNCTION__, cj_result, ezlopi_fwTimestampMs_str, time);
+                            cJSON_AddNumberToObject(__FUNCTION__, cj_result, ezlopi_fwTimestampMs_str, EZPI_core_sntp_get_current_time_sec());
 
                             cJSON *cj_method = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_method_str);
                             if (cj_method)
@@ -365,7 +364,7 @@ void EZPI_device_group_delete(cJSON *cj_request, cJSON *cj_response)
                             cJSON *cj_force = cJSON_GetObjectItem(__FUNCTION__, cj_params, value_type_force);
                             if (cj_force && cJSON_IsTrue(cj_force))
                             {
-                                EZPI_core_nvs_delete_stored_data_by_id(dev_grp_id);          // from nvs
+                                EZPI_core_nvs_delete_stored_data_by_id(dev_grp_id);     // from nvs
                                 EZPI_core_device_group_depopulate_by_id_v2(dev_grp_id); // from ll
                                 EZPI_core_device_group_remove_id_from_list(dev_grp_id); // from nvs-list
 
@@ -660,7 +659,7 @@ void EZPI_item_group_delete(cJSON *cj_request, cJSON *cj_response)
                             cJSON *cj_force = cJSON_GetObjectItem(__FUNCTION__, cj_params, value_type_force);
                             if (cj_force && cJSON_IsTrue(cj_force))
                             {
-                                EZPI_core_nvs_delete_stored_data_by_id(item_grp_id);        // from nvs
+                                EZPI_core_nvs_delete_stored_data_by_id(item_grp_id);   // from nvs
                                 EZPI_core_item_group_depopulate_by_id_v2(item_grp_id); // from ll
                                 EZPI_core_item_group_remove_id_from_list(item_grp_id); // from nvs-list
 

@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    ezlopi_core_factory_info.c
-* @brief   perform function on factory-data
-* @author  xx
-* @version 0.1
-* @date    12th DEC 2024
-*/
+ * @file    ezlopi_core_factory_info.c
+ * @brief   perform function on factory-data
+ * @author  xx
+ * @version 0.1
+ * @date    12th DEC 2024
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include <string.h>
 #include <ctype.h>
 
@@ -50,16 +50,16 @@
 #include "EZLOPI_USER_CONFIG.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 
 #define UPDATE_STRING_VALUE(buffer, data, offset, length)  \
     {                                                      \
@@ -70,8 +70,8 @@
     }
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static void __ezlopi_replace_newline_escape(char *str);
 static ezlopi_error_t __ezlopi_check_string_validity(const char *str);
 static bool __ezlopi_check_uuid_validity(const char *uuid);
@@ -80,8 +80,8 @@ static int __EZPI_core_factory_info_v3_set_4kb(const char *data, uint32_t offset
 static char *__EZPI_core_factory_info_v3_read_string(const char *name, e_EZPI_core_factory_info_v3_offset_t offset, e_EZPI_core_factory_info_v3_length_t length);
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 static uint32_t g_provisioning_status = 0;
 static const esp_partition_t *partition_ctx_v3 = NULL;
 
@@ -92,12 +92,12 @@ static char *__pvt_key = NULL;
 static char *__pub_key = NULL;
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 int ezlopi_calculate_certificate_length(const char *certificate_string, const char *end_marker)
 {
     char *end_pos = strstr(certificate_string, end_marker);
@@ -642,7 +642,7 @@ int EZPI_core_factory_info_v3_set_basic(s_basic_factory_info_t *ezlopi_config_ba
                 {
                     if (0 != ezlopi_config_basic->config_version)
                     {
-                        uint8_t config_version_arry[2] = { 0 };
+                        uint8_t config_version_arry[2] = {0};
                         config_version_arry[0] = (uint8_t)((ezlopi_config_basic->config_version & 0xFF00) >> 8);
                         config_version_arry[1] = (uint8_t)(ezlopi_config_basic->config_version & 0x00FF);
                         memset(tmp_buffer + EZLOPI_FINFO_REL_OFFSET_CONFIG_VERSION, 0, EZLOPI_FINFO_LEN_CONFIG_VERSION);
@@ -862,8 +862,8 @@ int EZPI_core_factory_info_v3_scenes_factory_soft_reset(void)
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 static void __ezlopi_replace_newline_escape(char *str)
 {
     int i = 0, j = 0;
@@ -989,15 +989,7 @@ static char *__EZPI_core_factory_info_v3_read_string(const char *name, e_EZPI_co
 
                 if (NULL != read_string)
                 {
-                    if (1) // (isprint(tmp_buffer[0]))
-                    {
-                        snprintf(read_string, s_length + 1, "%s", tmp_buffer);
-                    }
-                    else
-                    {
-                        ezlopi_free(__FUNCTION__, read_string);
-                        read_string = NULL;
-                    }
+                    snprintf(read_string, s_length + 1, "%s", tmp_buffer);
                 }
                 else
                 {
@@ -1041,6 +1033,5 @@ static ezlopi_error_t __ezlopi_check_string_validity(const char *str)
 }
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
-
+ *                          End of File
+ *******************************************************************************/

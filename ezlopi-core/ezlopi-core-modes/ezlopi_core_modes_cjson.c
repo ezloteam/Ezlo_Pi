@@ -451,7 +451,6 @@ cJSON *EZPI_core_modes_cjson_changed(void) //  (IN core-service-loop) // For bro
             {
                 CJSON_ASSIGN_ID(cj_result, _mode->current_mode_id, ezlopi_modeId_str);
                 cJSON_AddBoolToObject(__FUNCTION__, cj_result, ezlopi_disarmedDefault_str, _current_mode->disarmed_default);
-
                 cJSON_AddNumberToObject(__FUNCTION__, cj_result, ezlopi_timestamp_str, EZPI_core_sntp_get_current_time_ms());
             }
         }

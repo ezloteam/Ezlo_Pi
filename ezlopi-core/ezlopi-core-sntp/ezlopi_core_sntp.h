@@ -34,37 +34,37 @@
  * @author  xx
  * @version 0.1
  * @date    12th DEC 2024
-*/
+ */
 
 #ifndef _EZLOPI_CORE_SNTP_H_
 #define _EZLOPI_CORE_SNTP_H_
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 
 #include <time.h>
 #include "ezlopi_core_errors.h"
 
 /*******************************************************************************
-*                          C++ Declaration Wrapper
-*******************************************************************************/
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
     /*******************************************************************************
-    *                          Type & Macro Declarations
-    *******************************************************************************/
+     *                          Type & Macro Declarations
+     *******************************************************************************/
 
     /*******************************************************************************
-    *                          Extern Data Declarations
-    *******************************************************************************/
+     *                          Extern Data Declarations
+     *******************************************************************************/
 
     /*******************************************************************************
-    *                          Extern Function Prototypes
-    *******************************************************************************/
+     *                          Extern Function Prototypes
+     *******************************************************************************/
     /**
      * @brief Function to initialize sntp service
      *
@@ -109,15 +109,17 @@ extern "C"
     /**
      * @brief Function to get current time in ms
      *
-     * @return uint64_t
+     * @return time_t
      */
-    uint64_t EZPI_core_sntp_get_current_time_ms(void);
+    time_t EZPI_core_sntp_get_current_time_ms(void);
     /**
      * @brief Function to get current time in sec
      *
-     * @return uint64_t
+     * @return time_t
      */
-    uint64_t EZPI_core_sntp_get_current_time_sec(void);
+    // time_t EZPI_core_sntp_get_current_time_sec(void);
+    time_t EZPI_core_sntp_get_current_time_sec_abc(const char *filename);
+#define EZPI_core_sntp_get_current_time_sec() EZPI_core_sntp_get_current_time_sec_abc(__FUNCTION__)
 
 #ifdef __cplusplus
 }
@@ -126,5 +128,5 @@ extern "C"
 #endif // _EZLOPI_CORE_SNTP_H_
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

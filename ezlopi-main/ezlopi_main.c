@@ -1,3 +1,4 @@
+#include <time.h>
 #include <stdio.h>
 #include <cjext.h>
 
@@ -12,15 +13,18 @@
 
 #include "ezlopi_util_trace.h"
 
-#include "ezlopi_core_ezlopi.h"
-#include "ezlopi_service_ota.h"
 #include "ezlopi_core_log.h"
-#include "ezlopi_core_reset.h"
-#include "ezlopi_core_setting_commands.h"
+#include "ezlopi_core_sntp.h"
 #include "ezlopi_core_wifi.h"
+#include "ezlopi_core_reset.h"
+#include "ezlopi_core_ezlopi.h"
+#include "ezlopi_core_processes.h"
+#include "ezlopi_core_ble_config.h"
 #include "ezlopi_core_factory_info.h"
+#include "ezlopi_core_setting_commands.h"
 
 #include "ezlopi_service_ble.h"
+#include "ezlopi_service_ota.h"
 #include "ezlopi_service_otel.h"
 #include "ezlopi_service_uart.h"
 #include "ezlopi_service_loop.h"
@@ -34,16 +38,13 @@
 #include "ezlopi_service_system_temperature_sensor.h"
 
 #include "pt.h"
-#include "ezlopi_core_processes.h"
-#include "ezlopi_core_ble_config.h"
-
 #include "EZLOPI_USER_CONFIG.h"
 
 static void __blinky(void *pv);
 
 static void __print_mac_address(void)
 {
-    uint8_t __base_mac[6] = { 0, 0, 0, 0, 0, 0 };
+    uint8_t __base_mac[6] = {0, 0, 0, 0, 0, 0};
 
     esp_read_mac(__base_mac, ESP_MAC_WIFI_STA);
 }
@@ -91,7 +92,7 @@ void app_main(void)
     TaskHandle_t ezlopi_main_blinky_task_handle = NULL;
 
 #if defined(CONFIG_EZPI_HEAP_ENABLE)
-    xTaskCreate(__blinky, "blinky", 3 * EZLOPI_MAIN_BLINKY_TASK_DEPTH, NULL, 1, &ezlopi_main_blinky_task_handle);
+    xTaskCreate(__blinky, "blinky", 10 * EZLOPI_MAIN_BLINKY_TASK_DEPTH, NULL, 1, &ezlopi_main_blinky_task_handle);
 
 #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
     EZPI_core_process_set_process_info(ENUM_EZLOPI_MAIN_BLINKY_TASK, &ezlopi_main_blinky_task_handle, 3 * EZLOPI_MAIN_BLINKY_TASK_DEPTH);
@@ -103,8 +104,11 @@ void app_main(void)
     EZPI_core_process_set_process_info(ENUM_EZLOPI_MAIN_BLINKY_TASK, &ezlopi_main_blinky_task_handle, EZLOPI_MAIN_BLINKY_TASK_DEPTH);
 #endif
 
-    ezlopi_service_otel_init();
 #endif
+
+#ifdef CONFIG_EZPI_ENABLE_OPENTELEMETRY
+    ezlopi_service_otel_init();
+#endif // CONFIG_EZPI_ENABLE_OPENTELEMETRY
 
     EZPI_core_wait_for_wifi_to_connect(portMAX_DELAY);
 #if defined(CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER) || defined(CONFIG_EZPI_WEBSOCKET_CLIENT)
@@ -134,8 +138,8 @@ static void __blinky(void *pv)
     {
         uint32_t free_heap = esp_get_free_heap_size();
         uint32_t watermark_heap = esp_get_minimum_free_heap_size();
-        // uint32_t free_heap_internal = esp_get_free_internal_heap_size();
 
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
         uint32_t total_heap_size = heap_caps_get_total_size(MALLOC_CAP_DEFAULT);
 
         TRACE_I("----------------------------------------------");
@@ -143,6 +147,7 @@ static void __blinky(void *pv)
         TRACE_W("Free Heap Size:            %d B    %.4f KB", free_heap, free_heap / 1024.0);
         TRACE_W("Heap Watermark:            %d B    %.4f KB", watermark_heap, watermark_heap / 1024.0);
         TRACE_I("----------------------------------------------");
+#endif
 
         ezlopi_wifi_status_t *wifi_stat = EZPI_core_wifi_status();
         if (wifi_stat)
@@ -166,16 +171,17 @@ static void __blinky(void *pv)
         // separating the scope
 #ifdef CONFIG_EZPI_ENABLE_UART_PROVISIONING
         {
-            char cmd99_str[100] = { 0 };
+            char cmd99_str[100] = {0};
             snprintf(cmd99_str, 100, "{\"cmd\":99,\"free_heap\":%d,\"heap_watermark\":%d}", free_heap, watermark_heap);
             EZPI_SERV_uart_tx_data(strlen(cmd99_str), (uint8_t *)cmd99_str);
-            TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_DEBUG, "%s", cmd99_str);
+            TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_DEBUG, cmd99_str);
         }
 #endif
 
         if (free_heap <= (10 * 1024))
         {
             TRACE_W("CRITICAL-WARNING: low heap detected..");
+            TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_WARNING, "Critical-warning: low heap detected!, free-heap: %.02f KB", free_heap / 1024.0);
 
             if ((xTaskGetTickCount() - low_heap_start_time) > (15000 / portTICK_PERIOD_MS))
             {

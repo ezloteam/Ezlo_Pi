@@ -29,22 +29,23 @@
 ** ===========================================================================
 */
 /**
-* @file    ezlopi_core_room.c
-* @brief   perform some function on rooms
-* @author  xx
-* @version 0.1
-* @date    12th DEC 2024
-*/
+ * @file    ezlopi_core_room.c
+ * @brief   perform some function on rooms
+ * @author  xx
+ * @version 0.1
+ * @date    12th DEC 2024
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 
 #include <time.h>
 
 #include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_nvs.h"
+#include "ezlopi_core_sntp.h"
 #include "ezlopi_core_room.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_broadcast.h"
@@ -57,20 +58,20 @@
 
 // #include "ezlopi_service_webprov.h"
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static void __sort_by_pos(void);
 static void __free_all_room_nodes(s_ezlopi_room_t *room);
 static int __free_room_from_list_by_id(uint32_t room_id);
@@ -79,10 +80,9 @@ static int __remove_room_from_nvs_by_id(uint32_t a_room_id);
 static e_room_subtype_t __get_subtype_enum(char *subtype_str);
 // static const char *__get_subtype_name(e_room_subtype_t subtype);
 
-
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 
 static s_ezlopi_room_t *l_room_head = NULL;
 
@@ -94,12 +94,12 @@ static const char *sc_room_subtype_name[] = {
 };
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 char *EZPI_core_room_get_name_by_id(uint32_t room_id)
 {
     char *ret = NULL;
@@ -448,18 +448,15 @@ ezlopi_error_t EZPI_room_init(void)
     return error;
 }
 
-
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 
 static void __update_cloud_room_deleted(uint32_t room_id)
 {
     cJSON *cj_response = cJSON_CreateObject(__FUNCTION__);
     {
-        time_t now = 0;
-        time(&now);
-        cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_startTime_str, now);
+        // cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_startTime_str, EZPI_core_sntp_get_current_time_sec());
 
         cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
         cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, ezlopi_hub_room_deleted_str);
@@ -475,7 +472,7 @@ static void __update_cloud_room_deleted(uint32_t room_id)
 
         CJSON_TRACE("----------------- broadcasting - cj_response", cj_response);
 
-        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_response))
+        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_response, EZPI_core_sntp_get_current_time_sec()))
         {
             cJSON_Delete(__FUNCTION__, cj_response);
         }
@@ -653,5 +650,5 @@ static int __remove_room_from_nvs_by_id(uint32_t a_room_id)
 }
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

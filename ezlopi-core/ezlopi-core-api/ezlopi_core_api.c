@@ -30,21 +30,22 @@
 ** ===========================================================================
 */
 /**
-* @file    ezlopi_core_api.c
-* @brief   These function perform operation on API-methods
-* @author  xx
-* @version 0.1
-* @date    12th DEC 2024
-*/
+ * @file    ezlopi_core_api.c
+ * @brief   These function perform operation on API-methods
+ * @author  xx
+ * @version 0.1
+ * @date    12th DEC 2024
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include <time.h>
 
 // #include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_api.h"
+#include "ezlopi_core_sntp.h"
 #include "ezlopi_core_broadcast.h"
 #include "ezlopi_core_api_methods.h"
 #include "ezlopi_core_event_group.h"
@@ -52,34 +53,34 @@
 
 #include "ezlopi_cloud_constants.h"
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static int __check_for_no_error(cJSON *cj_request);
 static cJSON *__execute_method(cJSON *cj_request, f_method_func_t method_func);
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
-cJSON *EZPI_core_api_consume(const char *who, const char *payload, uint32_t len)
+ *                          Extern Function Definitions
+ *******************************************************************************/
+cJSON *EZPI_core_api_consume(const char *who, const char *payload, uint32_t len, time_t time_stamp)
 {
     cJSON *cj_response = NULL;
 
@@ -89,14 +90,14 @@ cJSON *EZPI_core_api_consume(const char *who, const char *payload, uint32_t len)
         // cJSON *cj_request = cJSON_ParseWithRefWithLength(who, payload, len);
         if (cj_request)
         {
-            cj_response = EZPI_core_api_consume_cjson(who, cj_request);
+            cj_response = EZPI_core_api_consume_cjson(who, cj_request, time_stamp);
             cJSON_Delete(__FUNCTION__, cj_request);
         }
     }
     return cj_response;
 }
 
-cJSON *EZPI_core_api_consume_cjson(const char *who, cJSON *cj_request)
+cJSON *EZPI_core_api_consume_cjson(const char *who, cJSON *cj_request, time_t time_stamp)
 {
     cJSON *cj_response = NULL;
 
@@ -137,12 +138,11 @@ cJSON *EZPI_core_api_consume_cjson(const char *who, cJSON *cj_request)
 
                     if (cj_update_response)
                     {
-                        time_t now = 0;
-                        time(&now);
-                        cJSON_AddNumberToObject(__FUNCTION__, cj_update_response, ezlopi_startTime_str, now);
+                        // printf("%s[%u]\r\n", __FUNCTION__, __LINE__);
+                        // cJSON_AddNumberToObject(__FUNCTION__, cj_update_response, ezlopi_startTime_str, EZPI_core_sntp_get_current_time_sec());
                         // cJSON_AddNullToObject(__FUNCTION__, cj_update_response, ezlopi_error_str);
 
-                        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_update_response))
+                        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_update_response, time_stamp))
                         {
                             cJSON_Delete(__FUNCTION__, cj_update_response);
                         }
@@ -178,10 +178,9 @@ cJSON *EZPI_core_api_consume_cjson(const char *who, cJSON *cj_request)
     return cj_response;
 }
 
-
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 static cJSON *__execute_method(cJSON *cj_request, f_method_func_t method_func)
 {
     cJSON *cj_response = NULL;
@@ -252,5 +251,5 @@ static int __check_for_no_error(cJSON *cj_request)
 }
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

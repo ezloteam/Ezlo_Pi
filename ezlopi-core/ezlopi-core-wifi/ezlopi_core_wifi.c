@@ -29,66 +29,71 @@
 ** ===========================================================================
 */
 /**
-* @file    ezlopi_core_wifi.c
-* @brief   perform some function on wifi-operations
-* @author  xx
-* @version 0.1
-* @date    12th DEC 2024
-*/
+ * @file    ezlopi_core_wifi.c
+ * @brief   perform some function on wifi-operations
+ * @author  xx
+ * @version 0.1
+ * @date    12th DEC 2024
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 
 #include <string.h>
+
+#include "esp_log.h"
+#include "esp_wifi.h"
+#include "esp_event.h"
+#include "esp_system.h"
+#include "esp_event_base.h"
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/event_groups.h"
-#include "esp_system.h"
-#include "esp_wifi.h"
-#include "esp_event.h"
-#include "esp_event_base.h"
-#include "esp_log.h"
-#include "cjext.h"
 
 #include "lwip/err.h"
 #include "lwip/sys.h"
 
+#include "cjext.h"
 #include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_nvs.h"
+#include "ezlopi_core_ping.h"
+#include "ezlopi_core_sntp.h"
 #include "ezlopi_core_wifi.h"
-#include "ezlopi_core_factory_info.h"
-#include "ezlopi_core_wifi_err_reason.h"
-#include "ezlopi_core_event_group.h"
-#include "ezlopi_core_device_value_updated.h"
+#include "ezlopi_core_ping.h"
+#include "ezlopi_core_errors.h"
 #include "ezlopi_core_processes.h"
 #include "ezlopi_core_broadcast.h"
-#include "ezlopi_cloud_constants.h"
-#include "ezlopi_core_ping.h"
+#include "ezlopi_core_event_group.h"
+#include "ezlopi_core_factory_info.h"
+#include "ezlopi_core_cjson_macros.h"
+#include "ezlopi_core_wifi_err_reason.h"
+#include "ezlopi_core_device_value_updated.h"
 // #include "ezlopi_core_errors.h"
+
+#include "ezlopi_cloud_constants.h"
 
 #include "ezlopi_service_uart.h"
 #include "EZLOPI_USER_CONFIG.h"
 
+/*******************************************************************************
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
-
-/*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 #define EXAMPLE_ESP_MAXIMUM_RETRY 5
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static void __event_handler(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data);
 static void __ezlopi_wifi_broadcast_scan_report(bool state);
 static void __ezlopi_wifi_scanner_task(void *params);
@@ -100,8 +105,8 @@ static esp_err_t set_wifi_station_host_name(void);
 static int __ezlopi_wifi_wait_for_wifi_and_registration();
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 static esp_netif_ip_info_t sg_my_ip;
 static esp_netif_t *sg_wifi_sta_netif = NULL;
 
@@ -119,12 +124,12 @@ static wifi_ap_record_t *ap_record = NULL;
 static uint16_t total_wifi_APs_available = 0;
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 void EZPI_core_wifi_event_add(f_ezlopi_wifi_event_upcall upcall, void *arg)
 {
     if (__event_upcall_head)
@@ -267,12 +272,18 @@ void EZPI_core_wifi_connect_from_id_bin(void)
     if ((NULL != wifi_ssid) && ('\0' != wifi_ssid[0]) &&
         (NULL != wifi_password) && ('\0' != wifi_password[0]))
     {
+#ifndef CONFIG_EZPI_UTIL_TRACE_EN
+        EZPI_core_wifi_connect(wifi_ssid, wifi_password);
+#else
         esp_err_t wifi_error = EZPI_core_wifi_connect(wifi_ssid, wifi_password);
         TRACE_W("wifi_error: %u", wifi_error);
+#endif
     }
 
-    if (wifi_ssid) ezlopi_free(__FUNCTION__, wifi_ssid);
-    if (wifi_password) ezlopi_free(__FUNCTION__, wifi_password);
+    if (wifi_ssid)
+        ezlopi_free(__FUNCTION__, wifi_ssid);
+    if (wifi_password)
+        ezlopi_free(__FUNCTION__, wifi_password);
 }
 
 esp_err_t EZPI_core_wifi_connect(const char *ssid, const char *pass)
@@ -432,8 +443,8 @@ int EZPI_core_wifi_get_wifi_mac(uint8_t mac[6])
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 
 static esp_err_t set_wifi_station_host_name(void)
 {
@@ -571,9 +582,7 @@ static void __ezlopi_wifi_broadcast_scan_report(bool state)
     cJSON *cj_scan_report = cJSON_CreateObject(__FUNCTION__);
     if (cj_scan_report)
     {
-        time_t now = 0;
-        time(&now);
-        cJSON_AddNumberToObject(__FUNCTION__, cj_scan_report, ezlopi_startTime_str, now);
+        // cJSON_AddNumberToObject(__FUNCTION__, cj_scan_report, ezlopi_startTime_str, EZPI_core_sntp_get_current_time_sec());
 
         cJSON_AddStringToObject(__FUNCTION__, cj_scan_report, ezlopi_id_str, ezlopi_ui_broadcast_str);
         cJSON_AddStringToObject(__FUNCTION__, cj_scan_report, ezlopi_msg_subclass_str, method_hub_network_wifi_scan_progress);
@@ -592,7 +601,7 @@ static void __ezlopi_wifi_broadcast_scan_report(bool state)
             }
         }
 
-        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_scan_report))
+        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_scan_report, EZPI_core_sntp_get_current_time_sec()))
         {
             cJSON_Delete(__FUNCTION__, cj_scan_report);
         }
@@ -701,7 +710,7 @@ static void __event_wifi_scan_done(void *event_data)
                         cJSON_AddStringToObject(__FUNCTION__, network_data, "ssid", temporary);
                         memset(temporary, 0, 50);
                         snprintf(temporary, 50, "%02x:%02x:%02x:%02x:%02x:%02x", ap_record[i].bssid[0], ap_record[i].bssid[1], ap_record[i].bssid[2],
-                            ap_record[i].bssid[3], ap_record[i].bssid[0], ap_record[i].bssid[5]);
+                                 ap_record[i].bssid[3], ap_record[i].bssid[0], ap_record[i].bssid[5]);
                         cJSON_AddStringToObject(__FUNCTION__, network_data, "bssid", temporary);
                         cJSON_AddNumberToObject(__FUNCTION__, network_data, "rssi", ap_record[i].rssi);
                         EZPI_core_wifi_get_auth_mode_str(temporary, ap_record[i].authmode);
@@ -740,5 +749,5 @@ static void __event_ip_got_ip(void *event_data)
 }
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

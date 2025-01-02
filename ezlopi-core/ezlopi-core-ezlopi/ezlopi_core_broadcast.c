@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    ezlopi_core_broadcast.c
-* @brief   Function to perform broadcast operations
-* @author  xx
-* @version 0.1
-* @date    12th DEC 2024
-*/
+ * @file    ezlopi_core_broadcast.c
+ * @brief   Function to perform broadcast operations
+ * @author  xx
+ * @version 0.1
+ * @date    12th DEC 2024
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include <time.h>
 #include <stdio.h>
 #include <string.h>
@@ -50,62 +50,113 @@
 #include <freertos/task.h>
 #include <freertos/semphr.h>
 
-#include "ezlopi_util_trace.h"
+#include "ezlopi_cloud_constants.h"
+
+#include "ezlopi_core_sntp.h"
+#include "ezlopi_core_errors.h"
 #include "ezlopi_core_buffer.h"
 #include "ezlopi_core_broadcast.h"
-#include "ezlopi_core_errors.h"
 
+#include "ezlopi_util_trace.h"
 #include "EZLOPI_USER_CONFIG.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static ezlopi_error_t __call_broadcast_methods(char *data);
 static l_broadcast_method_t *__method_create(f_broadcast_method_t method, char *name, uint32_t retries);
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 static l_broadcast_method_t *__method_head = NULL;
-static ezlopi_error_t(*__broadcast_queue_func)(cJSON *cj_data) = NULL;
-// static uint32_t __message_count = 0;
+static f_broadcast_queue_func_t __broadcast_queue_func = NULL;
+// static ezlopi_error_t (*__broadcast_queue_func)(cJSON *cj_data) = NULL;
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
-void EZPI_core_broadcast_methods_set_queue(ezlopi_error_t(*func)(cJSON *))
+ *                          Extern Function Definitions
+ *******************************************************************************/
+#if 1
+void EZPI_core_broadcast_methods_set_queue(f_broadcast_queue_func_t queue_func)
+{
+    __broadcast_queue_func = queue_func;
+}
+#else
+void EZPI_core_broadcast_methods_set_queue(ezlopi_error_t (*func)(cJSON *))
 {
     __broadcast_queue_func = func;
 }
+#endif
 
-ezlopi_error_t EZPI_core_broadcast_add_to_queue(cJSON *cj_data)
+const char *EZPI_core_brodcast_source_to_name(e_broadcast_source_t source)
+{
+    const char *ret = ezlopi__str;
+    switch (source)
+    {
+    case E_BROADCAST_SOURCE_UART:
+    {
+        ret = ezlopi_uart_str;
+        break;
+    }
+    case E_BROADCAST_SOURCE_WSS_SERVER:
+    {
+        ret = ezlopi_websocket_server_str;
+        break;
+    }
+    case E_BROADCAST_SOURCE_WSS_CLIENT:
+    {
+        ret = ezlopi_websocket_client_str;
+        break;
+    }
+    case E_BROADCAST_SOURCE_BLE:
+    {
+        ret = ezlopi_bluetooth_str;
+        break;
+    }
+    default:
+    {
+        break;
+    }
+    }
+    return ret;
+}
+
+ezlopi_error_t EZPI_core_broadcast_add_to_queue(cJSON *cj_data, time_t time_stamp)
 {
     ezlopi_error_t ret = EZPI_ERR_BROADCAST_FAILED;
+
     if (cj_data && __broadcast_queue_func)
     {
-        // TRACE_S("cj_data: %p, __broadcast_queue_func: %p", cj_data, __broadcast_queue_func);
-        ret = __broadcast_queue_func(cj_data);
+        s_broadcast_struct_t *broadcast_data = ezlopi_malloc(__FUNCTION__, sizeof(s_broadcast_struct_t));
+        if (broadcast_data)
+        {
+            memset(broadcast_data, 0, sizeof(s_broadcast_struct_t));
+
+            broadcast_data->time_stamp = time_stamp;
+            broadcast_data->cj_broadcast_data = cj_data;
+            broadcast_data->tick_count = xTaskGetTickCount();
+            broadcast_data->source = E_BROADCAST_SOURCE_NONE;
+
+            ret = __broadcast_queue_func(broadcast_data);
+        }
     }
-    else
-    {
-        // TRACE_E("cj_data: %p, __broadcast_queue_func: %p", cj_data, __broadcast_queue_func);
-    }
+
     return ret;
 }
 
@@ -237,10 +288,9 @@ void EZPI_core_broadcast_remove_method(f_broadcast_method_t broadcast_method)
     }
 }
 
-
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 static ezlopi_error_t __call_broadcast_methods(char *data)
 {
     ezlopi_error_t ret = EZPI_ERR_BROADCAST_FAILED;
@@ -248,8 +298,8 @@ static ezlopi_error_t __call_broadcast_methods(char *data)
 
     while (curr_method)
     {
-        time_t start_time;
-        time(&start_time);
+        // time_t start_time = EZPI_core_sntp_get_current_time_sec();
+        // printf("%s[%u]: start-time: %lu\r\n", __FILENAME__, __LINE__, start_time);
 
         if (curr_method->func)
         {
@@ -277,10 +327,8 @@ static ezlopi_error_t __call_broadcast_methods(char *data)
             } while (retries--);
         }
 
-        time_t end_time;
-        time(&end_time);
-
-        TRACE_W("Broadcast method '%s' took %lu", curr_method->method_name ? curr_method->method_name : "--", end_time - start_time);
+        // time_t end_time = EZPI_core_sntp_get_current_time_sec();
+        // TRACE_W("Broadcast method '%s' took %lu", curr_method->method_name ? curr_method->method_name : "--", end_time - start_time);
 
         curr_method = curr_method->next;
     }
@@ -322,5 +370,5 @@ static l_broadcast_method_t *__method_create(f_broadcast_method_t method, char *
 }
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

@@ -29,56 +29,56 @@
 ** ===========================================================================
 */
 /**
-* @file    bme680_bsec.c
-* @brief   perform some function on bme680
-* @author  xx
-* @version 0.1
-* @date    xx
-*/
+ * @file    bme680_bsec.c
+ * @brief   perform some function on bme680
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include "bme680_bsec.h"
 
 #warning "################### DO NOT USE printf ON PRODUCTION ###################"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 /**
  * @brief : This function is called by the BSEC library when a new output is available
  * @param[in] input     : BME68X sensor data before processing
  * @param[in] outputs   : Processed BSEC BSEC output data
  * @param[in] bsec      : Instance of BSEC2 calling the callback
  */
-    static void bme680_data_callback(const bme68x_data data, const bsec_outputs outputs);
-static bool bme680_copy_data(bme680_data_t *dest, bme680_data_t *src);
+static void bme680_data_callback(const bme68x_data data, const bsec_outputs outputs);
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
+#warning "RIKEN: do not use global and/or static variable in devices! PLEASE!!"
 static bool callback_status = false;
 static bme680_data_t bme680_data;
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 float bme680_read_altitude(float pressure, float seaLevel)
 {
     // Equation taken from BMP180 datasheet (page 16):
@@ -177,7 +177,7 @@ void bme680_setup(uint32_t sda, uint32_t scl, bool initialize_i2c)
         BSEC_OUTPUT_CO2_EQUIVALENT,
         BSEC_OUTPUT_BREATH_VOC_EQUIVALENT,
         BSEC_OUTPUT_STABILIZATION_STATUS,
-        BSEC_OUTPUT_RUN_IN_STATUS };
+        BSEC_OUTPUT_RUN_IN_STATUS};
 
     s_ezlopi_i2c_master_t bme68x_i2c_master_conf = {
         .enable = true,
@@ -218,13 +218,13 @@ void bme680_setup(uint32_t sda, uint32_t scl, bool initialize_i2c)
     /* Whenever new data is available call the data_callback function */
     bsec2_attach_callback(bme680_data_callback);
 
-    bsec_version_t bsec2_version = bsec2_get_version();
+    // bsec_version_t bsec2_version = bsec2_get_version();
     // printf("BSEC library version %d.%d.%d.%d\n", bsec2_version.major, bsec2_version.minor, bsec2_version.major_bugfix, bsec2_version.minor_bugfix);
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 /* Function to copy sensor data */
 static bool bme680_copy_data(bme680_data_t *dest, bme680_data_t *src)
 {
@@ -328,5 +328,5 @@ static void bme680_data_callback(const bme68x_data data, const bsec_outputs outp
 }
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

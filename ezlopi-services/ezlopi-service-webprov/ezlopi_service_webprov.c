@@ -7,36 +7,36 @@
  * @version
  * @date
  */
- /* ===========================================================================
- ** Copyright (C) 2024 Ezlo Innovation Inc
- **
- ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
- **
- ** Redistribution and use in source and binary forms, with or without
- ** modification, are permitted provided that the following conditions are met:
- **
- ** 1. Redistributions of source code must retain the above copyright notice,
- **    this list of conditions and the following disclaimer.
- ** 2. Redistributions in binary form must reproduce the above copyright
- **    notice, this list of conditions and the following disclaimer in the
- **    documentation and/or other materials provided with the distribution.
- ** 3. Neither the name of the copyright holder nor the names of its
- **    contributors may be used to endorse or promote products derived from
- **    this software without specific prior written permission.
- **
- ** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- ** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- ** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- ** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- ** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- ** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- ** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- ** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- ** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- ** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- ** POSSIBILITY OF SUCH DAMAGE.
- ** ===========================================================================
- */
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
 
 #include "../../build/config/sdkconfig.h"
 #include "EZLOPI_USER_CONFIG.h"
@@ -54,6 +54,7 @@
 
 #include "ezlopi_core_api.h"
 
+#include "ezlopi_core_sntp.h"
 #include "ezlopi_core_http.h"
 #include "ezlopi_core_wifi.h"
 #include "ezlopi_core_reset.h"
@@ -79,8 +80,9 @@
 
 typedef struct
 {
-    time_t time_ms;
     char *payload;
+    time_t time_stamp;
+    uint32_t tick_count;
 } s_rx_message_t;
 
 static uint32_t message_counter = 0;
@@ -94,8 +96,8 @@ static int __provision_update(char *arg);
 static void __fetch_wss_endpoint(void *pv);
 
 static void __connection_upcall(bool connected);
-static void __message_process_cjson(cJSON *cj_request, time_t time_ms);
-static int __message_upcall(char *payload, uint32_t len, time_t time_ms);
+static void __message_process_cjson(cJSON *cj_request, time_t time_stamp);
+static int __message_upcall(char *payload, uint32_t len, time_t time_stamp);
 
 static int __send_cjson_data_to_nma_websocket(cJSON *cj_data);
 static ezlopi_error_t __send_str_data_to_nma_websocket(char *str_data);
@@ -193,23 +195,22 @@ static void __fetch_wss_endpoint(void *pv)
                 if (ws_endpoint->response)
                 {
                     TRACE_D("ws_endpoint: %s", ws_endpoint->response); // {"uri": "wss://endpoint:port"}
-                    cJSON *root = cJSON_Parse(__FUNCTION__, ws_endpoint->response);
 
-                    if (root)
+                    cJSON *cj_nma_uri = cJSON_Parse(__FUNCTION__, ws_endpoint->response);
+                    if (cj_nma_uri)
                     {
-                        cJSON *cjson_uri = cJSON_GetObjectItem(__FUNCTION__, root, "uri");
+                        cJSON *cjson_uri = cJSON_GetObjectItem(__FUNCTION__, cj_nma_uri, "uri");
                         if (cjson_uri)
                         {
-                            // printf("----> URI: %s\r\n", cjson_uri->valuestring ? cjson_uri->valuestring : "NULL");
-                            TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_INFO, "NMA-server: %s.", cjson_uri->valuestring ? cjson_uri->valuestring : "NULL");
+                            TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_INFO, "NMA-server: %s.", cjson_uri->valuestring ? cjson_uri->valuestring : ezlopi_null_str);
 
                             EZPI_core_broadcast_method_add(__send_str_data_to_nma_websocket, "nma-websocket", 4);
                             wss_client = EZPI_core_websocket_client_init(cjson_uri, __message_upcall, __connection_upcall,
-                                ca_certificate, ssl_private_key, ssl_shared_key);
+                                                                         ca_certificate, ssl_private_key, ssl_shared_key);
                             task_complete = 1;
                         }
 
-                        cJSON_Delete(__FUNCTION__, root);
+                        cJSON_Delete(__FUNCTION__, cj_nma_uri);
                     }
 
                     ezlopi_free(__FUNCTION__, ws_endpoint->response);
@@ -224,36 +225,65 @@ static void __fetch_wss_endpoint(void *pv)
             while (_wss_message_queue)
             {
                 s_rx_message_t *rx_message = NULL;
-                BaseType_t ret = xQueueReceive(_wss_message_queue, &rx_message, 100 / portTICK_RATE_MS);
+                xQueueReceive(_wss_message_queue, &rx_message, 100 / portTICK_RATE_MS);
 
-                if (rx_message && (ret == pdTRUE))
+                if (rx_message)
                 {
-                    cJSON *cj_method_dup = NULL;
+                    char *id_str = NULL;
+                    char *error_str = NULL;
+                    char *method_str = NULL;
+
+                    time_t time_stamp = rx_message->time_stamp;
+                    uint32_t tick_count = rx_message->tick_count;
 
                     if (rx_message->payload)
                     {
                         cJSON *cj_request = cJSON_Parse(__FUNCTION__, rx_message->payload);
                         if (cj_request)
                         {
-                            cJSON *cj_method = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_method_str);
+                            id_str = ezlopi_service_otel_fetch_string_value_from_cjson(cj_request, ezlopi_id_str);
+                            error_str = ezlopi_service_otel_fetch_string_value_from_cjson(cj_request, ezlopi_error_str);
+                            method_str = ezlopi_service_otel_fetch_string_value_from_cjson(cj_request, ezlopi_method_str);
+#if 0
+                            cJSON *cj_id = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_id_str);
+                            if (cj_id && cj_id->valuestring && (cj_id->type == cJSON_String) && cj_id->str_value_len)
+                            {
+                                id_str = ezlopi_malloc(__FUNCTION__, cj_id->str_value_len + 1);
+                                if (id_str)
+                                {
+                                    snprintf(id_str, cj_id->str_value_len + 1, "%.*s", cj_id->str_value_len, cj_id->valuestring);
+                                }
+                            }
 
+                            cJSON *cj_error = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_error_str);
+                            if (cj_error && cj_error->valuestring && (cj_error->type == cJSON_String) && cj_error->str_value_len)
+                            {
+                                error_str = ezlopi_malloc(__FUNCTION__, cj_error->str_value_len + 1);
+                                if (error_str)
+                                {
+                                    snprintf(error_str, cj_error->str_value_len + 1, "%.*s", cj_error->str_value_len, cj_error->valuestring);
+                                }
+                            }
+
+                            cJSON *cj_method = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_method_str);
                             if (cj_method)
                             {
-                                cj_method_dup = cJSON_Duplicate(__FUNCTION__, cj_method, true);
+                                method_str = ezlopi_malloc(__FUNCTION__, cj_method->str_value_len + 1);
+                                if (method_str)
+                                {
+                                    snprintf(method_str, cj_method->str_value_len + 1, "%.*s", cj_method->str_value_len, cj_method->valuestring);
+                                }
 
-                                // printf("web-provisioning [method: %.*s]\r\n%s\r\n", cj_method->str_value_len, cj_method->valuestring, rx_message->payload);
-                                // TRACE_D("rx_message->payload [method: %.*s]\r\n%s", cj_method->str_value_len, cj_method->valuestring, rx_message->payload);
                                 ezlopi_free(__FUNCTION__, rx_message->payload);
                                 rx_message->payload = NULL;
                             }
-                            else
+#endif
+                            if (NULL == method_str)
                             {
                                 TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_ERROR, "web-provisioning [method: null], payload: %s", rx_message->payload);
-                                // printf("web-provisioning [method: null]\r\n%s\r\n", rx_message->payload);
-                                // TRACE_E("rx_message->payload [method: null]\r\n%s", rx_message->payload);
                             }
 
-                            __message_process_cjson(cj_request, rx_message->time_ms);
+                            __message_process_cjson(cj_request, rx_message->time_stamp);
                             cJSON_Delete(__FUNCTION__, cj_request);
                         }
 
@@ -262,36 +292,42 @@ static void __fetch_wss_endpoint(void *pv)
                     }
 
                     ezlopi_free(__FUNCTION__, rx_message);
+                    rx_message = NULL;
 
-#if 1
-                    if (cj_method_dup)
+#ifdef CONFIG_EZPI_OPENTELEMETRY_ENABLE_TRACES
+                    s_otel_trace_t *trace_obj = ezlopi_malloc(__FUNCTION__, sizeof(s_otel_trace_t));
+                    if (trace_obj)
                     {
-                        cJSON *cj_trace_telemetry = cJSON_CreateObject(__FUNCTION__);
-                        if (cj_trace_telemetry)
+                        memset(trace_obj, 0, sizeof(s_otel_trace_t));
+
+                        trace_obj->kind = E_OTEL_KIND_CLIENT;
+                        trace_obj->start_time = time_stamp;
+                        trace_obj->tick_count = tick_count;
+                        trace_obj->end_time = EZPI_core_sntp_get_current_time_sec();
+
+                        trace_obj->free_heap = esp_get_free_heap_size();
+                        trace_obj->heap_watermark = esp_get_minimum_free_heap_size();
+
+                        trace_obj->id = id_str;
+                        trace_obj->error = error_str;
+                        trace_obj->method = method_str;
+
+                        id_str = NULL;
+                        error_str = NULL;
+                        method_str = NULL;
+
+                        if (0 == ezlopi_service_otel_add_trace_to_telemetry_queue(trace_obj))
                         {
-                            time_t now = 0;
-
-                            if (false == cJSON_AddItemToObject(__FUNCTION__, cj_trace_telemetry, ezlopi_method_str, cj_method_dup))
-                            {
-                                cJSON_Delete(__FUNCTION__, cj_method_dup);
-                            }
-
-                            cJSON_AddNumberToObject(__FUNCTION__, cj_trace_telemetry, ezlopi_kind_str, 1);
-                            cJSON_AddNumberToObject(__FUNCTION__, cj_trace_telemetry, ezlopi_startTime_str, rx_message->time_ms);
-
-                            time(&now);
-                            cJSON_AddNumberToObject(__FUNCTION__, cj_trace_telemetry, ezlopi_endTime_str, now);
-
-                            if (0 == ezlopi_service_otel_add_trace_to_telemetry_queue(cj_trace_telemetry))
-                            {
-                                cJSON_Delete(__FUNCTION__, cj_trace_telemetry);
-                            }
-                        }
-                        else
-                        {
-                            cJSON_Delete(__FUNCTION__, cj_method_dup);
+                            id_str = trace_obj->id;
+                            error_str = trace_obj->error;
+                            method_str = trace_obj->method;
+                            ezlopi_free(__FUNCTION__, trace_obj);
                         }
                     }
+
+                    ezlopi_free(__FUNCTION__, id_str);
+                    ezlopi_free(__FUNCTION__, error_str);
+                    ezlopi_free(__FUNCTION__, method_str);
 #endif
                 }
 
@@ -312,34 +348,36 @@ static void __fetch_wss_endpoint(void *pv)
     vTaskDelete(NULL);
 }
 
-static void __message_process_cjson(cJSON *cj_request, time_t time_ms)
+static void __message_process_cjson(cJSON *cj_request, time_t time_stamp)
 {
     if (cj_request)
     {
-        time_t now;
-        cJSON *cj_response = EZPI_core_api_consume_cjson(__FUNCTION__, cj_request);
+        cJSON *cj_response = EZPI_core_api_consume_cjson(__FUNCTION__, cj_request, time_stamp);
 
-        time(&now);
-        TRACE_D("time to process: %lu", now - time_ms);
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
+        time_t now = EZPI_core_sntp_get_current_time_sec();
+        TRACE_D("time to process: %lu", (now - time_stamp));
+#endif
 
         if (cj_response)
         {
             cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_msg_id_str, message_counter);
             __send_cjson_data_to_nma_websocket(cj_response);
-
-            time(&now);
-            TRACE_D("time to reply: %lu", now - time_ms);
-
             cJSON_Delete(__FUNCTION__, cj_response);
+
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
+            now = EZPI_core_sntp_get_current_time_sec();
+            TRACE_D("time to reply: %lu", (now - time_stamp));
         }
         else
         {
             TRACE_W("no response!");
+#endif
         }
     }
 }
 
-static int __message_upcall(char *payload, uint32_t len, time_t time_ms)
+static int __message_upcall(char *payload, uint32_t len, time_t time_stamp)
 {
     int ret = 0;
 
@@ -348,18 +386,21 @@ static int __message_upcall(char *payload, uint32_t len, time_t time_ms)
         s_rx_message_t *rx_message = ezlopi_malloc(__FUNCTION__, sizeof(s_rx_message_t));
         if (rx_message)
         {
+
             if (pdTRUE == xQueueIsQueueFullFromISR(_wss_message_queue))
             {
-                char *stale_data = NULL;
+                s_rx_message_t *stale_data = NULL;
                 xQueueReceive(_wss_message_queue, &stale_data, 5);
                 if (stale_data)
                 {
+                    ezlopi_free(__FUNCTION__, stale_data->payload);
                     ezlopi_free(__FUNCTION__, stale_data);
                 }
             }
 
             rx_message->payload = payload;
-            rx_message->time_ms = time_ms;
+            rx_message->time_stamp = time_stamp;
+            rx_message->tick_count = xTaskGetTickCount();
 
             if (pdTRUE == xQueueSend(_wss_message_queue, &rx_message, 5))
             {
@@ -395,7 +436,6 @@ static int __send_cjson_data_to_nma_websocket(cJSON *cj_data)
 
                 if (EZPI_SUCCESS == ret)
                 {
-                    // printf("NMA-send:\r\n%s\r\n", data_buffer);
                     TRACE_S("NMA-send:\r\n%s", data_buffer);
                 }
                 else
@@ -500,8 +540,6 @@ static void __provision_check(void *pv)
                             TRACE_W("Data not available on cloud!");
                             TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_WARNING, "Config data not available!");
                         }
-
-                        EZPI_core_factory_info_v3_free(response->response);
                     }
 
                     break;
@@ -518,6 +556,7 @@ static void __provision_check(void *pv)
                 }
                 }
 
+                EZPI_core_factory_info_v3_free(response->response);
                 EZPI_core_factory_info_v3_free(response);
             }
             else
@@ -589,7 +628,7 @@ static int __provision_update(char *arg)
             config_check_factoryInfo.provision_server = NULL;
 
 #if 0 // unused for now, but can be used in future
-            // TODO  Decide if needs parsing and storing to flash
+      // TODO  Decide if needs parsing and storing to flash
             if (NULL != cJSON_zwave_region_aary)
             {
                 if (cJSON_IsArray(cJSON_zwave_region_aary))

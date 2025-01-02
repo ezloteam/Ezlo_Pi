@@ -29,18 +29,20 @@
 ** ===========================================================================
 */
 /**
-* @file    sensor_0066_other_R307_FingerPrint.c
-* @brief   perform some function on sensor_0066
-* @author  xx
-* @version 0.1
-* @date    xx
-*/
+ * @file    sensor_0066_other_R307_FingerPrint.c
+ * @brief   perform some function on sensor_0066
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 
 #include "ezlopi_core_cloud.h"
+#include "ezlopi_core_errors.h"
+#include "ezlopi_core_processes.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
@@ -57,20 +59,20 @@
 #include "EZLOPI_USER_CONFIG.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static void IRAM_ATTR gpio_notify_isr(void *param);
 static void __timer_callback(void *param);
 static ezlopi_error_t __0066_prepare(void *arg);
@@ -88,16 +90,16 @@ static void __prepare_item_ids_cloud_properties(l_ezlopi_item_t *item, uint32_t 
 static void __prepare_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj_device);
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 ezlopi_error_t SENSOR_0066_other_r307_fingerprint(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
@@ -156,8 +158,8 @@ ezlopi_error_t SENSOR_0066_other_r307_fingerprint(e_ezlopi_actions_t action, l_e
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 static void IRAM_ATTR gpio_notify_isr(void *param)
 {
     l_ezlopi_item_t *item = (l_ezlopi_item_t *)param;
@@ -399,7 +401,7 @@ static ezlopi_error_t __0066_init(l_ezlopi_item_t *item)
                                 const esp_timer_create_args_t esp_timer_create_args = {
                                     .callback = __timer_callback,
                                     .arg = (void *)item,
-                                    .name = "Enrollment timer" };
+                                    .name = "Enrollment timer"};
                                 if (ESP_OK == esp_timer_create(&esp_timer_create_args, &(user_data->timerHandler)))
                                 {
                                     ret = EZPI_SUCCESS;
@@ -495,7 +497,7 @@ static ezlopi_error_t __0066_set_value(l_ezlopi_item_t *item, void *arg)
                     TRACE_E("HERE!! enroll");
                     if (cJSON_IsTrue(cj_value_cmd)) // true conditon
                     {
-                        time(&user_data->timeout_start_time); // !< reset the internal timer_start_time
+                        user_data->timeout_start_time = EZPI_core_sntp_get_current_time_sec(); // !< reset the internal timer_start_time
                         user_data->opmode = FINGERPRINT_ENROLLMENT_MODE;
 
                         /* Start the timers */
@@ -522,7 +524,7 @@ static ezlopi_error_t __0066_set_value(l_ezlopi_item_t *item, void *arg)
                 cJSON *cj_value_ids = cJSON_GetObjectItem(__FUNCTION__, cjson_params, ezlopi_value_str);
                 if ((cj_value_ids != NULL) && cJSON_IsArray(cj_value_ids))
                 {
-                    time(&user_data->timeout_start_time); // !< reset the internal timer_start_time
+                    user_data->timeout_start_time = EZPI_core_sntp_get_current_time_sec(); // !< reset the internal timer_start_time
                     uint16_t value_array_size = cJSON_GetArraySize(cj_value_ids);
                     if (value_array_size > 0)
                     {
@@ -575,7 +577,7 @@ static void __uart_0066_fingerprint_upcall(uint8_t *buffer, uint32_t output_len,
             if (user_data)
             {
                 uint16_t package_len = 0;
-                uint8_t another_buffer[MAX_PACKET_LENGTH_VAL] = { 0 };
+                uint8_t another_buffer[MAX_PACKET_LENGTH_VAL] = {0};
                 memcpy(another_buffer, temp_buf, MAX_PACKET_LENGTH_VAL);
                 // Programmed only for ACK_operation [0x07h] with 256byte results.
                 if (another_buffer[6] == FINGERPRINT_PID_ACKPACKET)
@@ -667,8 +669,8 @@ static void __fingerprint_operation_task(void *params)
         server_packet_t *user_data = (server_packet_t *)item->user_arg;
         if (user_data)
         {
-            time(&user_data->timeout_start_time);   // !< reset the internal timer_start_time
-            r307_as606_update_id_status_list(item); // !< The best place to update ID_status_list
+            user_data->timeout_start_time = EZPI_core_sntp_get_current_time_sec(); // !< reset the internal timer_start_time
+            r307_as606_update_id_status_list(item);                                // !< The best place to update ID_status_list
             for (;;)
             {
                 ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
@@ -821,5 +823,5 @@ static void __fingerprint_operation_task(void *params)
 }
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

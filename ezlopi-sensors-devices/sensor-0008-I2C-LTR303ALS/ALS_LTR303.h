@@ -34,47 +34,47 @@
  * @author  xx
  * @version 0.1
  * @date    xx
-*/
+ */
 
 #ifndef _ALS_LTR303_H_
 #define _ALS_LTR303_H_
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #pragma once
 
 #include "LTR303.h"
 
 /*******************************************************************************
-*                          C++ Declaration Wrapper
-*******************************************************************************/
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
     /*******************************************************************************
-    *                          Type & Macro Declarations
-    *******************************************************************************/
-#define LTR303_SDA          GPIO_NUM_18
-#define LTR303_SCL          GPIO_NUM_17
-#define LTR303_INT_ALS_PIN  GPIO_NUM_16
-#define ACTIVE_I2C          I2C_NUM_0
+     *                          Type & Macro Declarations
+     *******************************************************************************/
+#define LTR303_SDA GPIO_NUM_18
+#define LTR303_SCL GPIO_NUM_17
+#define LTR303_INT_ALS_PIN GPIO_NUM_16
+#define ACTIVE_I2C I2C_NUM_0
 
 #define DEBUG 0
     typedef struct
     {
         double lux;
-    }   ltr303_data_t;
+    } ltr303_data_t;
 
     /*******************************************************************************
-    *                          Extern Data Declarations
-    *******************************************************************************/
+     *                          Extern Data Declarations
+     *******************************************************************************/
 
     /*******************************************************************************
-    *                          Extern Function Prototypes
-    *******************************************************************************/
+     *                          Extern Function Prototypes
+     *******************************************************************************/
     /**
      * @brief Loop
      *
@@ -96,7 +96,6 @@ extern "C"
      */
     bool ltr303_is_data_available(void);
 
-
     /**
      * @brief : This function initializes the LTR303 Sensor
      * @param[in] initialize_i2c  :  true : initialize i2c,
@@ -104,16 +103,6 @@ extern "C"
     */
     esp_err_t ltr303_setup(uint32_t sda, uint32_t scl, bool initialize_i2c);
 
-
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif // _ALS_LTR303_H_
-
-/*******************************************************************************
-*                          End of File
-*******************************************************************************/
-
-
+    esp_err_t ltr303_loop(void);
+    esp_err_t ltr303_get_val(ltr303_data_t *ltr303_data);
+    bool ltr303_is_data_available(void);

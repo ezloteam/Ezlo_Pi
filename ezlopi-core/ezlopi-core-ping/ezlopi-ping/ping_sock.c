@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    ping_sock.c
-* @brief   Function to perfrom ping-socket
-* @author  xx
-* @version 0.1
-* @date    12th DEC 2024
-*/
+ * @file    ping_sock.c
+ * @brief   Function to perfrom ping-socket
+ * @author  xx
+ * @version 0.1
+ * @date    12th DEC 2024
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 
 #include <stdlib.h>
 #include <stdbool.h>
@@ -67,25 +67,25 @@
 #include "ezlopi_service_loop.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
-#define PING_CHECK(a, str, goto_tag, ret_value, ...)                             \
-    do                                                                           \
-    {                                                                            \
-        if (!(a))                                                                \
-        {                                                                        \
-            TRACE_E(TAG, "%s(%d): " str, __FUNCTION__, __LINE__, ##__VA_ARGS__); \
-            ret = ret_value;                                                     \
-            goto goto_tag;                                                       \
-        }                                                                        \
+ *                          Type & Macro Definitions
+ *******************************************************************************/
+#define PING_CHECK(a, str, goto_tag, ret_value, ...)                        \
+    do                                                                      \
+    {                                                                       \
+        if (!(a))                                                           \
+        {                                                                   \
+            TRACE_E("%s(%d): " str, __FILENAME__, __LINE__, ##__VA_ARGS__); \
+            ret = ret_value;                                                \
+            goto goto_tag;                                                  \
+        }                                                                   \
     } while (0)
 
 #define PING_TIME_DIFF_MS(_end, _start) ((uint32_t)(((_end).tv_sec - (_start).tv_sec) * 1000 + \
@@ -121,8 +121,8 @@ typedef struct
 } esp_ping_t;
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static esp_err_t __ping_send(esp_ping_t *ep);
 static int __ping_receive(esp_ping_t *ep, uint32_t a_timeout);
 static void __ping_loop(void *arg);
@@ -130,17 +130,16 @@ static esp_err_t __ping_send(esp_ping_t *ep);
 // static void __ping_thread(void *args);
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
-const static char *TAG = "ping_sock";
+ *                          Static Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 esp_err_t EZPI_ping_new_session(const ezlopi_ping_config_t *config, const ezlopi_ping_callbacks_t *cbs, esp_ping_handle_t *hdl_out)
 {
     esp_ping_t *ep = NULL;
@@ -163,7 +162,6 @@ esp_err_t EZPI_ping_new_session(const ezlopi_ping_config_t *config, const ezlopi
         config->task_prio, &ep->ping_task_hdl);
     PING_CHECK(xReturned == pdTRUE, "create ping task failed", err, ESP_ERR_NO_MEM);
 #endif
-
 
     /* callback functions */
     if (cbs)
@@ -370,10 +368,9 @@ err:
     return ret;
 }
 
-
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 
 static esp_err_t __ping_send(esp_ping_t *ep)
 {
@@ -387,7 +384,7 @@ static esp_err_t __ping_send(esp_ping_t *ep)
     }
 
     ssize_t sent = sendto(ep->sock, ep->packet_hdr, ep->icmp_pkt_size, 0,
-        (struct sockaddr *)&ep->target_addr, sizeof(ep->target_addr));
+                          (struct sockaddr *)&ep->target_addr, sizeof(ep->target_addr));
 
     if (sent != (ssize_t)ep->icmp_pkt_size)
     {
@@ -568,7 +565,6 @@ static void __ping_loop(void *arg)
     }
 }
 
-
 #if 0
 
 static void __ping_thread(void *args)
@@ -648,5 +644,5 @@ static void __ping_thread(void *args)
 }
 #endif
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/
