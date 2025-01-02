@@ -1,4 +1,44 @@
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+/**
+* @file    ezlopi_core_wifi_ap.c
+* @brief   perform some function on wifi-AP (captive portal)
+* @author  xx
+* @version 0.1
+* @date    12th DEC 2024
+*/
 
+/*******************************************************************************
+*                          Include Files
+*******************************************************************************/
 #include "sdkconfig.h"
 
 #ifdef CONFIG_EZPI_ENABLE_CAPTIVE_PORTAL
@@ -16,12 +56,39 @@
 #include "ezlopi_core_factory_info.h"
 #include "ezlopi_core_wifi_ap.h"
 
-static esp_netif_t* ezlopi_ap_netif = NULL;
+/*******************************************************************************
+*                          Extern Data Declarations
+*******************************************************************************/
 
-void ezlopi_configure_wifi_ap()
+/*******************************************************************************
+*                          Extern Function Declarations
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Type & Macro Definitions
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Static Function Prototypes
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Static Data Definitions
+*******************************************************************************/
+static esp_netif_t *ezlopi_ap_netif = NULL;
+
+/*******************************************************************************
+*                          Extern Data Definitions
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Extern Function Definitions
+*******************************************************************************/
+
+void EZPI_core_configure_wifi_ap()
 {
     char ezlopi_wifi_ap_ssid[32];
-    char* ezlopi_wifi_ap_pass = "123456789";
+    char *ezlopi_wifi_ap_pass = "123456789";
     // Check the return type, may be important.
     ezlopi_ap_netif = esp_netif_create_default_wifi_ap();
     wifi_init_config_t wifi_init_configurations = WIFI_INIT_CONFIG_DEFAULT();
@@ -35,10 +102,10 @@ void ezlopi_configure_wifi_ap()
         },
     };
 
-    const char* device_type = ezlopi_factory_info_v3_get_device_type();
+    const char *device_type = EZPI_core_factory_info_v3_get_device_type();
     if ((NULL != device_type) && (isprint(device_type[0])))
     {
-        snprintf(ezlopi_wifi_ap_ssid, sizeof(ezlopi_wifi_ap_ssid), "ezlopi_%s_%llu", device_type, ezlopi_factory_info_v3_get_id());
+        snprintf(ezlopi_wifi_ap_ssid, sizeof(ezlopi_wifi_ap_ssid), "ezlopi_%s_%llu", device_type, EZPI_core_factory_info_v3_get_id());
     }
     else
     {
@@ -50,8 +117,8 @@ void ezlopi_configure_wifi_ap()
         ezlopi_wifi_ap_ssid[19] = '\0';
     }
 
-    strncpy((char*)wifi_cred_configurations.ap.ssid, ezlopi_wifi_ap_ssid, sizeof(wifi_cred_configurations.ap.ssid));
-    strncpy((char*)wifi_cred_configurations.ap.password, ezlopi_wifi_ap_pass, sizeof(wifi_cred_configurations.ap.password));
+    strncpy((char *)wifi_cred_configurations.ap.ssid, ezlopi_wifi_ap_ssid, sizeof(wifi_cred_configurations.ap.ssid));
+    strncpy((char *)wifi_cred_configurations.ap.password, ezlopi_wifi_ap_pass, sizeof(wifi_cred_configurations.ap.password));
 
     TRACE_I("Setting wifi mode to AP.");
     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_AP));
@@ -65,7 +132,7 @@ void ezlopi_configure_wifi_ap()
     TRACE_I("Wifi AP started!!");
 }
 
-void ezlopi_deconfigure_wifi_ap()
+void EZPI_core_deconfigure_wifi_ap()
 {
     esp_netif_destroy_default_wifi(ezlopi_ap_netif);
     ESP_ERROR_CHECK(esp_wifi_stop());
@@ -74,7 +141,7 @@ void ezlopi_deconfigure_wifi_ap()
     // TRACE_E("Wifi resources deinitialized.");
 }
 
-void ezlopi_start_dns_server()
+void EZPI_start_dns_server()
 {
     ip4_addr_t resolve_ip;
     inet_pton(AF_INET, "192.168.4.1", &resolve_ip);
@@ -89,4 +156,15 @@ void ezlopi_start_dns_server()
     }
 }
 
+
+
+/*******************************************************************************
+*                         Static Function Definitions
+*******************************************************************************/
+
+
 #endif // CONFIG_EZPI_ENABLE_CAPTIVE_PORTAL
+
+/*******************************************************************************
+*                          End of File
+*******************************************************************************/
