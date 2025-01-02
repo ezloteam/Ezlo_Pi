@@ -1,12 +1,80 @@
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+/**
+ * @file    ALS_LTR303.c
+ * @brief   perform some function on ALS_LTR303
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+ */
+
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 #include "ALS_LTR303.h"
 
-#warning "################### DO NOT USE printf ON PRODUCTION ###################"
+#warning "NABIN: do not use global and/or static variable in devices! PLEASE!!"
 
+/*******************************************************************************
+ *                          Extern Data Declarations
+ *******************************************************************************/
 unsigned char gain = LTR3XX_GAIN_1;                    // Gain setting, values = 0-7
 unsigned char integration_time = LTR3XX_INTEGTIME_200; // Integration ("shutter") time in milliseconds
 unsigned char measurement_rate = LTR3XX_MEASRATE_200;  // Interval between DATA_REGISTERS update
 bool valid = 0, intr_status = 0, data_status = 0;
 byte error;
+
+/*******************************************************************************
+ *                          Extern Function Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Type & Macro Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Static Function Prototypes
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Static Data Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Data Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Definitions
+ *******************************************************************************/
 
 bool ltr303_is_data_available(void)
 {
@@ -88,3 +156,11 @@ esp_err_t ltr303_get_val(ltr303_data_t *ltr303_data)
     }
     return ESP_FAIL;
 }
+
+/*******************************************************************************
+ *                         Static Function Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          End of File
+ *******************************************************************************/

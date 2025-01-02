@@ -1,12 +1,50 @@
-#include <string.h>
-#include "ezlopi_util_trace.h"
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+/**
+* @file    sensor_0053_UART_GYGPS6MV2.c
+* @brief   perform some function on sensor_0053
+* @author  xx
+* @version 0.1
+* @date    xx
+*/
 
-// #include "ezlopi_core_timer.h"
+/*******************************************************************************
+*                          Include Files
+*******************************************************************************/
+#include <string.h>
+
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
-#include "ezlopi_core_errors.h" 
 
 #include "ezlopi_hal_uart.h"
 
@@ -17,7 +55,21 @@
 #include "sensor_0053_UART_GYGPS6MV2.h"
 #include "EZLOPI_USER_CONFIG.h"
 
-//------------------------------------------------------------------------
+/*******************************************************************************
+*                          Extern Data Declarations
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Extern Function Declarations
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Type & Macro Definitions
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Static Function Prototypes
+*******************************************************************************/
 static ezlopi_error_t __0053_prepare(void *arg);
 static ezlopi_error_t __0053_init(l_ezlopi_item_t *item);
 static ezlopi_error_t __0053_get_value_cjson(l_ezlopi_item_t *item, void *arg);
@@ -35,8 +87,19 @@ static void __prepare_sea_level_item_cloud_properties(l_ezlopi_item_t *item, cJS
 static void __prepare_geiod_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, GPS6MV2_t *gps_arg);
 static void __prepare_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj_device);
 
-//------------------------------------------------------------------------
-ezlopi_error_t sensor_0053_UART_GYGPS6MV2(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+
+/*******************************************************************************
+*                          Static Data Definitions
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Extern Data Definitions
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Extern Function Definitions
+*******************************************************************************/
+ezlopi_error_t SENSOR_0053_uart_gygps6mv2(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
     switch (action)
@@ -70,7 +133,11 @@ ezlopi_error_t sensor_0053_UART_GYGPS6MV2(e_ezlopi_actions_t action, l_ezlopi_it
 
     return ret;
 }
-//---------------------------------------------------------------------------------------------------------
+
+/*******************************************************************************
+*                         Static Function Definitions
+*******************************************************************************/
+
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     device->cloud_properties.category = category_generic_sensor;
@@ -87,7 +154,7 @@ static void __prepare_lat_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj
     item->cloud_properties.item_name = ezlopi_item_name_angle_position;
     item->cloud_properties.value_type = value_type_angle;
     item->cloud_properties.scale = scales_north_pole_degress;
-    gps_arg->Latitude_item_id = ezlopi_cloud_generate_item_id();
+    gps_arg->Latitude_item_id = EZPI_core_cloud_generate_item_id();
     item->cloud_properties.item_id = gps_arg->Latitude_item_id;
     //----- CUSTOM DATA STRUCTURE -----------------------------------------
     item->is_user_arg_unique = true;
@@ -101,7 +168,7 @@ static void __prepare_long_item_cloud_properties(l_ezlopi_item_t *item, cJSON *c
     item->cloud_properties.item_name = ezlopi_item_name_angle_position;
     item->cloud_properties.value_type = value_type_angle;
     item->cloud_properties.scale = scales_north_pole_degress;
-    gps_arg->Longitude_item_id = ezlopi_cloud_generate_item_id();
+    gps_arg->Longitude_item_id = EZPI_core_cloud_generate_item_id();
     item->cloud_properties.item_id = gps_arg->Longitude_item_id;
     //----- CUSTOM DATA STRUCTURE -----------------------------------------
     item->user_arg = (void *)gps_arg;
@@ -114,7 +181,7 @@ static void __prepare_fix_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj
     item->cloud_properties.item_name = ezlopi_item_name_basic;
     item->cloud_properties.value_type = value_type_bool;
     item->cloud_properties.scale = NULL;
-    gps_arg->Fix_item_id = ezlopi_cloud_generate_item_id();
+    gps_arg->Fix_item_id = EZPI_core_cloud_generate_item_id();
     item->cloud_properties.item_id = gps_arg->Fix_item_id;
     //----- CUSTOM DATA STRUCTURE -----------------------------------------
     item->user_arg = (void *)gps_arg;
@@ -127,7 +194,7 @@ static void __prepare_sea_level_item_cloud_properties(l_ezlopi_item_t *item, cJS
     item->cloud_properties.item_name = ezlopi_item_name_distance;
     item->cloud_properties.value_type = value_type_length;
     item->cloud_properties.scale = scales_meter;
-    gps_arg->Sea_level_item_id = ezlopi_cloud_generate_item_id();
+    gps_arg->Sea_level_item_id = EZPI_core_cloud_generate_item_id();
     item->cloud_properties.item_id = gps_arg->Sea_level_item_id;
     //----- CUSTOM DATA STRUCTURE -----------------------------------------
     item->user_arg = (void *)gps_arg;
@@ -140,7 +207,7 @@ static void __prepare_geiod_item_cloud_properties(l_ezlopi_item_t *item, cJSON *
     item->cloud_properties.item_name = ezlopi_item_name_distance;
     item->cloud_properties.value_type = value_type_length;
     item->cloud_properties.scale = scales_meter;
-    gps_arg->Geoid_item_id = ezlopi_cloud_generate_item_id();
+    gps_arg->Geoid_item_id = EZPI_core_cloud_generate_item_id();
     item->cloud_properties.item_id = gps_arg->Geoid_item_id;
     //----- CUSTOM DATA STRUCTURE -----------------------------------------
     item->user_arg = (void *)gps_arg;
@@ -181,27 +248,26 @@ static ezlopi_error_t __0053_prepare(void *arg)
             if (NULL != sensor_0053_UART_gps6mv2_data)
             {
                 memset(sensor_0053_UART_gps6mv2_data, 0, sizeof(GPS6MV2_t));
-                l_ezlopi_device_t *parent_gps_device_lat = ezlopi_device_add_device(cjson_device, "lat");
+                l_ezlopi_device_t *parent_gps_device_lat = EZPI_core_device_add_device(cjson_device, "lat");
                 if (parent_gps_device_lat)
                 {
                     TRACE_I("Parent_gygps6mv2_lat-[0x%x] ", parent_gps_device_lat->cloud_properties.device_id);
                     __prepare_device_cloud_properties(parent_gps_device_lat, device_prep_arg->cjson_device);
 
-                    l_ezlopi_item_t *lat_item = ezlopi_device_add_item_to_device(parent_gps_device_lat, sensor_0053_UART_GYGPS6MV2);
+                    l_ezlopi_item_t *lat_item = EZPI_core_device_add_item_to_device(parent_gps_device_lat, SENSOR_0053_uart_gygps6mv2);
                     if (lat_item)
                     {
                         __prepare_lat_item_cloud_properties(lat_item, cjson_device, sensor_0053_UART_gps6mv2_data);
                         __prepare_item_interface_properties(lat_item, cjson_device);
-                        ret = EZPI_SUCCESS;
                     }
 
-                    l_ezlopi_device_t *child_gps_device_long = ezlopi_device_add_device(device_prep_arg->cjson_device, "long");
+                    l_ezlopi_device_t *child_gps_device_long = EZPI_core_device_add_device(device_prep_arg->cjson_device, "long");
                     if (child_gps_device_long)
                     {
                         TRACE_I("Child_gps_device_long-[0x%x] ", child_gps_device_long->cloud_properties.device_id);
                         __prepare_device_cloud_properties(child_gps_device_long, device_prep_arg->cjson_device);
 
-                        l_ezlopi_item_t *long_item = ezlopi_device_add_item_to_device(child_gps_device_long, sensor_0053_UART_GYGPS6MV2);
+                        l_ezlopi_item_t *long_item = EZPI_core_device_add_item_to_device(child_gps_device_long, SENSOR_0053_uart_gygps6mv2);
                         if (long_item)
                         {
                             __prepare_long_item_cloud_properties(long_item, cjson_device, sensor_0053_UART_gps6mv2_data);
@@ -209,18 +275,17 @@ static ezlopi_error_t __0053_prepare(void *arg)
                         }
                         else
                         {
-                            ezlopi_device_free_device(child_gps_device_long);
-                            ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
+                            EZPI_core_device_free_device(child_gps_device_long);
                         }
                     }
 
-                    l_ezlopi_device_t *child_gps_device_fix = ezlopi_device_add_device(device_prep_arg->cjson_device, "fix");
+                    l_ezlopi_device_t *child_gps_device_fix = EZPI_core_device_add_device(device_prep_arg->cjson_device, "fix");
                     if (child_gps_device_fix)
                     {
                         TRACE_I("Child_gps_device_fix-[0x%x] ", child_gps_device_fix->cloud_properties.device_id);
                         __prepare_device_cloud_properties(child_gps_device_fix, device_prep_arg->cjson_device);
 
-                        l_ezlopi_item_t *fix_item = ezlopi_device_add_item_to_device(child_gps_device_fix, sensor_0053_UART_GYGPS6MV2);
+                        l_ezlopi_item_t *fix_item = EZPI_core_device_add_item_to_device(child_gps_device_fix, SENSOR_0053_uart_gygps6mv2);
                         if (fix_item)
                         {
                             __prepare_fix_item_cloud_properties(fix_item, cjson_device, sensor_0053_UART_gps6mv2_data);
@@ -228,18 +293,17 @@ static ezlopi_error_t __0053_prepare(void *arg)
                         }
                         else
                         {
-                            ezlopi_device_free_device(child_gps_device_fix);
-                            ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
+                            EZPI_core_device_free_device(child_gps_device_fix);
                         }
                     }
 
-                    l_ezlopi_device_t *child_gps_device_sea_level = ezlopi_device_add_device(device_prep_arg->cjson_device, "sea_lvl");
+                    l_ezlopi_device_t *child_gps_device_sea_level = EZPI_core_device_add_device(device_prep_arg->cjson_device, "sea_lvl");
                     if (child_gps_device_sea_level)
                     {
                         TRACE_I("Child_gps_device_sea_level-[0x%x] ", child_gps_device_sea_level->cloud_properties.device_id);
                         __prepare_device_cloud_properties(child_gps_device_sea_level, device_prep_arg->cjson_device);
 
-                        l_ezlopi_item_t *sea_level_item = ezlopi_device_add_item_to_device(child_gps_device_sea_level, sensor_0053_UART_GYGPS6MV2);
+                        l_ezlopi_item_t *sea_level_item = EZPI_core_device_add_item_to_device(child_gps_device_sea_level, SENSOR_0053_uart_gygps6mv2);
                         if (sea_level_item)
                         {
                             __prepare_sea_level_item_cloud_properties(sea_level_item, cjson_device, sensor_0053_UART_gps6mv2_data);
@@ -247,18 +311,17 @@ static ezlopi_error_t __0053_prepare(void *arg)
                         }
                         else
                         {
-                            ezlopi_device_free_device(child_gps_device_sea_level);
-                            ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
+                            EZPI_core_device_free_device(child_gps_device_sea_level);
                         }
                     }
 
-                    l_ezlopi_device_t *child_gps_device_geoid = ezlopi_device_add_device(device_prep_arg->cjson_device, "geoid");
+                    l_ezlopi_device_t *child_gps_device_geoid = EZPI_core_device_add_device(device_prep_arg->cjson_device, "geoid");
                     if (child_gps_device_geoid)
                     {
                         TRACE_I("Child_gps_device_geoid-[0x%x] ", child_gps_device_geoid->cloud_properties.device_id);
                         __prepare_device_cloud_properties(child_gps_device_geoid, device_prep_arg->cjson_device);
 
-                        l_ezlopi_item_t *geiod_item = ezlopi_device_add_item_to_device(child_gps_device_geoid, sensor_0053_UART_GYGPS6MV2);
+                        l_ezlopi_item_t *geiod_item = EZPI_core_device_add_item_to_device(child_gps_device_geoid, SENSOR_0053_uart_gygps6mv2);
                         if (geiod_item)
                         {
                             __prepare_geiod_item_cloud_properties(geiod_item, cjson_device, sensor_0053_UART_gps6mv2_data);
@@ -266,8 +329,7 @@ static ezlopi_error_t __0053_prepare(void *arg)
                         }
                         else
                         {
-                            ezlopi_device_free_device(child_gps_device_geoid);
-                            ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
+                            EZPI_core_device_free_device(child_gps_device_geoid);
                         }
                     }
 
@@ -277,20 +339,18 @@ static ezlopi_error_t __0053_prepare(void *arg)
                         (NULL == child_gps_device_sea_level) &&
                         (NULL == child_gps_device_geoid))
                     {
-                        ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
-                        ezlopi_device_free_device(parent_gps_device_lat);
+                        EZPI_core_device_free_device(parent_gps_device_lat);
                         ezlopi_free(__FUNCTION__, sensor_0053_UART_gps6mv2_data);
+                    }
+                    else
+                    {
+                        ret = EZPI_SUCCESS;
                     }
                 }
                 else
                 {
-                    ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
                     ezlopi_free(__FUNCTION__, sensor_0053_UART_gps6mv2_data);
                 }
-            }
-            else
-            {
-                ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
             }
         }
     }
@@ -309,8 +369,8 @@ static ezlopi_error_t __0053_init(l_ezlopi_item_t *item)
             {
                 if (true == item->interface.uart.enable)
                 {
-                    s_ezlopi_uart_object_handle_t ezlopi_uart_object_handle = ezlopi_uart_init(item->interface.uart.baudrate, item->interface.uart.tx, item->interface.uart.rx, __uart_gps6mv2_upcall, item);
-                    item->interface.uart.channel = ezlopi_uart_get_channel(ezlopi_uart_object_handle);
+                    s_ezlopi_uart_object_handle_t ezlopi_uart_object_handle = EZPI_hal_uart_init(item->interface.uart.baudrate, item->interface.uart.tx, item->interface.uart.rx, __uart_gps6mv2_upcall, item);
+                    item->interface.uart.channel = EZPI_hal_uart_get_channel(ezlopi_uart_object_handle);
                     TRACE_S("GPS6MV2 Init complete......");
                     ret = EZPI_SUCCESS;
                 }
@@ -333,23 +393,23 @@ static ezlopi_error_t __0053_get_value_cjson(l_ezlopi_item_t *item, void *arg)
             {
                 if ((sensor_0053_UART_gps6mv2_data->Latitude_item_id) == item->cloud_properties.item_id)
                 {
-                    ezlopi_valueformatter_float_to_cjson(cj_result, sensor_0053_UART_gps6mv2_data->prev_lat_angle_val, item->cloud_properties.scale);
+                    EZPI_core_valueformatter_float_to_cjson(cj_result, sensor_0053_UART_gps6mv2_data->prev_lat_angle_val, item->cloud_properties.scale);
                 }
                 else if ((sensor_0053_UART_gps6mv2_data->Longitude_item_id) == item->cloud_properties.item_id)
                 {
-                    ezlopi_valueformatter_float_to_cjson(cj_result, sensor_0053_UART_gps6mv2_data->prev_lat_angle_val, item->cloud_properties.scale);
+                    EZPI_core_valueformatter_float_to_cjson(cj_result, sensor_0053_UART_gps6mv2_data->prev_lat_angle_val, item->cloud_properties.scale);
                 }
                 else if ((sensor_0053_UART_gps6mv2_data->Fix_item_id) == item->cloud_properties.item_id)
                 {
-                    ezlopi_valueformatter_bool_to_cjson(cj_result, sensor_0053_UART_gps6mv2_data->prev_GPS_FIX, item->cloud_properties.scale);
+                    EZPI_core_valueformatter_bool_to_cjson(cj_result, sensor_0053_UART_gps6mv2_data->prev_GPS_FIX, item->cloud_properties.scale);
                 }
                 else if ((sensor_0053_UART_gps6mv2_data->Sea_level_item_id) == item->cloud_properties.item_id)
                 {
-                    ezlopi_valueformatter_float_to_cjson(cj_result, sensor_0053_UART_gps6mv2_data->prev_antenna_alti, item->cloud_properties.scale);
+                    EZPI_core_valueformatter_float_to_cjson(cj_result, sensor_0053_UART_gps6mv2_data->prev_antenna_alti, item->cloud_properties.scale);
                 }
                 else if ((sensor_0053_UART_gps6mv2_data->Geoid_item_id) == item->cloud_properties.item_id)
                 {
-                    ezlopi_valueformatter_float_to_cjson(cj_result, sensor_0053_UART_gps6mv2_data->prev_geoid, item->cloud_properties.scale);
+                    EZPI_core_valueformatter_float_to_cjson(cj_result, sensor_0053_UART_gps6mv2_data->prev_geoid, item->cloud_properties.scale);
                 }
 
                 ret = EZPI_SUCCESS;
@@ -378,7 +438,7 @@ static ezlopi_error_t __0053_notify(l_ezlopi_item_t *item)
                 {
                     (sensor_0053_UART_gps6mv2_data->prev_lat_angle_val) = lat_angle_val;
                     (sensor_0053_UART_gps6mv2_data->gps_message_guard) = false;
-                    ezlopi_device_value_updated_from_device_broadcast(item);
+                    EZPI_core_device_value_updated_from_device_broadcast(item);
                 }
             }
             else if ((sensor_0053_UART_gps6mv2_data->Longitude_item_id) == item->cloud_properties.item_id)
@@ -389,7 +449,7 @@ static ezlopi_error_t __0053_notify(l_ezlopi_item_t *item)
                 {
                     (sensor_0053_UART_gps6mv2_data->prev_long_angle_val) = long_angle_val;
                     (sensor_0053_UART_gps6mv2_data->gps_message_guard) = false;
-                    ezlopi_device_value_updated_from_device_broadcast(item);
+                    EZPI_core_device_value_updated_from_device_broadcast(item);
                 }
             }
             else if ((sensor_0053_UART_gps6mv2_data->Fix_item_id) == item->cloud_properties.item_id)
@@ -404,7 +464,7 @@ static ezlopi_error_t __0053_notify(l_ezlopi_item_t *item)
                 {
                     (sensor_0053_UART_gps6mv2_data->prev_GPS_FIX) = GPS_FIX;
                     (sensor_0053_UART_gps6mv2_data->gps_message_guard) = false;
-                    ezlopi_device_value_updated_from_device_broadcast(item);
+                    EZPI_core_device_value_updated_from_device_broadcast(item);
                 }
             }
             else if ((sensor_0053_UART_gps6mv2_data->Sea_level_item_id) == item->cloud_properties.item_id)
@@ -415,7 +475,7 @@ static ezlopi_error_t __0053_notify(l_ezlopi_item_t *item)
                 {
                     (sensor_0053_UART_gps6mv2_data->prev_antenna_alti) = antenna_alti;
                     (sensor_0053_UART_gps6mv2_data->gps_message_guard) = false;
-                    ezlopi_device_value_updated_from_device_broadcast(item);
+                    EZPI_core_device_value_updated_from_device_broadcast(item);
                 }
             }
 
@@ -427,7 +487,7 @@ static ezlopi_error_t __0053_notify(l_ezlopi_item_t *item)
                 {
                     (sensor_0053_UART_gps6mv2_data->prev_geoid) = geoid;
                     (sensor_0053_UART_gps6mv2_data->gps_message_guard) = false;
-                    ezlopi_device_value_updated_from_device_broadcast(item);
+                    EZPI_core_device_value_updated_from_device_broadcast(item);
                 }
             }
         }
@@ -460,7 +520,7 @@ static int __sensor_uart_gps6mv2_update_values(l_ezlopi_item_t *item)
                 //-------------------------------------------------------------------------
                 // GPGGA MESSAGE PARSING FUNCTION
                 //-------------------------------------------------------------------------
-                parse_and_assign_GPGGA_message(sensor_0053_UART_gps6mv2_data);
+                GYGPS6MV2_parse_gpgga_mesg(sensor_0053_UART_gps6mv2_data);
             }
             (sensor_0053_UART_gps6mv2_data->gps_message_guard) = false;
         }
@@ -558,4 +618,6 @@ static void __retrieve_GPGGA_sentence(l_ezlopi_item_t *item)
     }
 }
 
-//-------------------------------------------------------------------------
+/*******************************************************************************
+*                          End of File
+*******************************************************************************/

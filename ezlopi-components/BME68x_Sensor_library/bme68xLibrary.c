@@ -38,7 +38,7 @@
 
 #include "bme68xLibrary.h"
 
-/* Maximum transaction size. Field size 17 x 3 */
+ /* Maximum transaction size. Field size 17 x 3 */
 #define BME68X_MAX_READ_LENGTH 51
 
 #ifdef ARDUINO_ARCH_ESP32
@@ -86,7 +86,7 @@
 #define BME68X_BURST_SPI_TRANSFER
 #endif
 
-/* Optimistically assume support for at least 64 byte reads */
+ /* Optimistically assume support for at least 64 byte reads */
 #ifndef BME68X_I2C_BUFFER_SIZE
 #define BME68X_I2C_BUFFER_SIZE 64
 #endif
@@ -104,7 +104,7 @@ static uint8_t n_fields, i_fields;
 static uint8_t last_op_mode;
 s_ezlopi_i2c_master_t g_bme68x_i2c_master_conf;
 
-void bme68xlib_setup(s_ezlopi_i2c_master_t* bme68x_i2c_master_conf)
+void bme68xlib_setup(s_ezlopi_i2c_master_t *bme68x_i2c_master_conf)
 {
 	status = BME68X_OK;
 	memset(&bme6, 0, sizeof(bme6));
@@ -117,14 +117,14 @@ void bme68xlib_setup(s_ezlopi_i2c_master_t* bme68x_i2c_master_conf)
 	last_op_mode = BME68X_SLEEP_MODE;
 
 	memcpy(&g_bme68x_i2c_master_conf, bme68x_i2c_master_conf, sizeof(s_ezlopi_i2c_master_t));
-	ezlopi_i2c_master_init(&g_bme68x_i2c_master_conf);
+	EZPI_hal_i2c_master_init(&g_bme68x_i2c_master_conf);
 }
 
 /**
  * @brief Function to initialize the sensor based on custom callbacks
 */
 void bme68xlib_begin_custom(bme68x_intf intf, bme68x_read_fptr_t read, bme68x_write_fptr_t write,
-		bme68x_delay_us_fptr_t idle_task, void *intf_ptr)
+	bme68x_delay_us_fptr_t idle_task, void *intf_ptr)
 {
 
 	bme6.intf = intf;
@@ -195,7 +195,7 @@ void bme68xlib_soft_reset(void)
 
 /**
  * @brief Function to set the ambient temperature for better configuration
- */ 
+ */
 void bme68xlib_set_ambient_temp(int8_t temp)
 {
 	bme6.amb_temp = temp;
@@ -235,7 +235,7 @@ uint8_t bme68xlib_get_op_mode(void)
 /**
  * @brief Function to get the Temperature, Pressure and Humidity over-sampling
  */
-void bme68xlib_get_tph(uint8_t* os_hum, uint8_t* os_temp, uint8_t* os_pres)
+void bme68xlib_get_tph(uint8_t *os_hum, uint8_t *os_temp, uint8_t *os_pres)
 {
 	status = bme68x_get_conf(&conf, &bme6);
 
@@ -369,12 +369,13 @@ uint8_t bme68xlib_fetch_data(void)
 /**
  * @brief Function to get a single data field
  */
-uint8_t bme68xlib_get_data(bme68x_data* data)
+uint8_t bme68xlib_get_data(bme68x_data *data)
 {
 	if (last_op_mode == BME68X_FORCED_MODE)
 	{
 		*data = sensorData[0];
-	} else
+	}
+	else
 	{
 		if (n_fields)
 		{
@@ -402,7 +403,7 @@ uint8_t bme68xlib_get_data(bme68x_data* data)
 /**
  * @brief Function to get whole sensor data
  */
-bme68x_data* bme68xlib_get_all_data(void)
+bme68x_data *bme68xlib_get_all_data(void)
 {
 	return sensorData;
 }
@@ -410,7 +411,7 @@ bme68x_data* bme68xlib_get_all_data(void)
 /**
  * @brief Function to get the BME68x heater configuration
  */
-const bme68x_heatr_conf* bme68xlib_get_heater_configuration(void)
+const bme68x_heatr_conf *bme68xlib_get_heater_configuration(void)
 {
 	return &heatrConf;
 }
@@ -420,14 +421,14 @@ const bme68x_heatr_conf* bme68xlib_get_heater_configuration(void)
  */
 uint32_t bme68xlib_get_unique_id(void)
 {
-    uint8_t id_regs[4];
-    uint32_t uid;
-    bme68xlib_read_reg(BME68X_REG_UNIQUE_ID, id_regs, 4);
+	uint8_t id_regs[4];
+	uint32_t uid;
+	bme68xlib_read_reg(BME68X_REG_UNIQUE_ID, id_regs, 4);
 
-    uint32_t id1 = ((uint32_t) id_regs[3] + ((uint32_t) id_regs[2] << 8)) & 0x7fff;
-    uid = (id1 << 16) + (((uint32_t) id_regs[1]) << 8) + (uint32_t) id_regs[0];
+	uint32_t id1 = ((uint32_t)id_regs[3] + ((uint32_t)id_regs[2] << 8)) & 0x7fff;
+	uid = (id1 << 16) + (((uint32_t)id_regs[1]) << 8) + (uint32_t)id_regs[0];
 
-    return uid;
+	return uid;
 }
 
 /**
@@ -447,7 +448,7 @@ int8_t bme68xlib_check_status(void)
 	{
 		return BME68X_ERROR;
 	}
-	else if(status > BME68X_OK)
+	else if (status > BME68X_OK)
 	{
 		return BME68X_WARNING;
 	}
@@ -460,9 +461,9 @@ int8_t bme68xlib_check_status(void)
 /**
  * @brief Function to get a brief text description of the error
  */
-const char* bme68xlib_status_string(void)
+const char *bme68xlib_status_string(void)
 {
-	const char* ret = "";
+	const char *ret = "";
 	switch (status)
 	{
 	case BME68X_OK:
@@ -505,66 +506,66 @@ int8_t bme68xlib_get_status(void)
 
 void IRAM_ATTR delay_microseconds(uint32_t us)
 {
-  uint64_t m = (uint64_t)esp_timer_get_time();
-  if(us){
-      uint64_t e = (m + us);
-      if(m > e){ //overflow
-          while((uint64_t)esp_timer_get_time() > e){
-              NOP();
-          }
-      }
-      while((uint64_t)esp_timer_get_time() < e){
-          NOP();
-      }
-  }
+	uint64_t m = (uint64_t)esp_timer_get_time();
+	if (us) {
+		uint64_t e = (m + us);
+		if (m > e) { //overflow
+			while ((uint64_t)esp_timer_get_time() > e) {
+				NOP();
+			}
+		}
+		while ((uint64_t)esp_timer_get_time() < e) {
+			NOP();
+		}
+	}
 }
 
 /**
  * @brief Function that implements the default microsecond delay callback
  */
 void bme68x_delay_us(uint32_t periodUs, void *intfPtr) {
-    (void) intfPtr;
-    delay_microseconds(periodUs);
+	(void)intfPtr;
+	delay_microseconds(periodUs);
 }
 
 /**
  * @brief Function that implements the default I2C write transaction
  */
 int8_t bme68x_i2c_write(uint8_t reg_addr, const uint8_t *reg_data,
-        uint32_t length, void *intfPtr) 
+	uint32_t length, void *intfPtr)
 {
-    (void)intfPtr; // Unused parameter
-    esp_err_t _error;
-    uint8_t write_buf[length+1];
-    write_buf[0] = reg_addr;
-    for (uint16_t i = 0; i < length; i++)
-    {
-        write_buf[i+1] = reg_data[i];
-    }
-  
-	_error = ezlopi_i2c_master_write_to_device(&g_bme68x_i2c_master_conf, write_buf, length+1);
+	(void)intfPtr; // Unused parameter
+	esp_err_t _error;
+	uint8_t write_buf[length + 1];
+	write_buf[0] = reg_addr;
+	for (uint16_t i = 0; i < length; i++)
+	{
+		write_buf[i + 1] = reg_data[i];
+	}
+
+	_error = EZPI_hal_i2c_master_write_to_device(&g_bme68x_i2c_master_conf, write_buf, length + 1);
 
 	if (_error != ESP_OK)
 	{
 		return -1;
 	}
-    return (int8_t)_error;
+	return (int8_t)_error;
 }
 
 /**
  * @brief Function that implements the default I2C read transaction
- */ 
+ */
 int8_t bme68x_i2c_read(uint8_t reg_addr, uint8_t *reg_data, uint32_t length,
-        void *intfPtr) {
-   	esp_err_t _error;
+	void *intfPtr) {
+	esp_err_t _error;
 
-	_error = ezlopi_i2c_master_write_to_device(&g_bme68x_i2c_master_conf, &reg_addr, 1);
-	_error = ezlopi_i2c_master_read_from_device(&g_bme68x_i2c_master_conf, reg_data, length);
+	_error = EZPI_hal_i2c_master_write_to_device(&g_bme68x_i2c_master_conf, &reg_addr, 1);
+	_error = EZPI_hal_i2c_master_read_from_device(&g_bme68x_i2c_master_conf, reg_data, length);
 
 	if (_error != ESP_OK)
 	{
 		return -1;
 	}
 
-    return _error;
+	return _error;
 }

@@ -95,7 +95,6 @@ f_ezlopi_log_upcall_t ezlopi_util_get_serial_log_upcall()
 
 void trace_color_print(const char *txt_color, uint8_t severity, const char *file, int line, const char *format, ...)
 {
-
     f_ezlopi_log_upcall_t log_upcall_func;
 
 #if 0
@@ -119,9 +118,8 @@ void trace_color_print(const char *txt_color, uint8_t severity, const char *file
         va_start(args, format);
 
 #warning "No remedies for buffer over 'EZPI_CORE_LOG_BUFFER_SIZE'";
-
-        static char serial_log_format[10240];
-        // char serial_log_format[EZPI_CORE_LOG_BUFFER_SIZE];
+        // static char serial_log_format[10240];
+        char serial_log_format[EZPI_CORE_LOG_BUFFER_SIZE];
         snprintf(serial_log_format, sizeof(serial_log_format), "\x1B[%sm %s[%d]: ", txt_color, file, line);
         vsnprintf(serial_log_format + strlen(serial_log_format), sizeof(serial_log_format) - strlen(serial_log_format), format, args);
         snprintf(serial_log_format + strlen(serial_log_format), sizeof(serial_log_format) - strlen(serial_log_format), "\x1B[0m");
@@ -131,3 +129,32 @@ void trace_color_print(const char *txt_color, uint8_t severity, const char *file
 }
 
 #endif // ENABLE_TRACE
+
+#ifdef CONFIG_EZPI_OPENTELEMETRY_ENABLE_LOGS
+
+static uint32_t max_otel_log_length = 0;
+static f_otel_log_upcall_t otel_log_upcall_func = NULL;
+
+void ezlopi_util_set_otel_log_upcall(f_otel_log_upcall_t __log_upcall, uint32_t max_log_len)
+{
+    max_otel_log_length = max_log_len;
+    otel_log_upcall_func = __log_upcall;
+}
+
+void ezlopi_util_log_otel(uint8_t severity, const char *file, int line, const char *format, ...)
+{
+    if (otel_log_upcall_func && max_otel_log_length)
+    {
+        char *buffer = ezlopi_malloc(__FUNCTION__, max_otel_log_length);
+        if (buffer)
+        {
+            va_list args;
+            va_start(args, format);
+            vsnprintf(buffer, max_otel_log_length, format, args);
+            va_end(args);
+
+            otel_log_upcall_func(severity, file, line, buffer);
+        }
+    }
+}
+#endif // CONFIG_EZPI_OPENTELEMETRY_ENABLE_LOGS

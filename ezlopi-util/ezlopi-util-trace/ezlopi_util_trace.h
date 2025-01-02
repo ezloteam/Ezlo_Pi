@@ -12,6 +12,17 @@ extern "C"
 {
 #endif
 
+    typedef enum
+    {
+        ENUM_EZLOPI_TRACE_SEVERITY_NONE = 0,
+        ENUM_EZLOPI_TRACE_SEVERITY_ERROR,
+        ENUM_EZLOPI_TRACE_SEVERITY_WARNING,
+        ENUM_EZLOPI_TRACE_SEVERITY_INFO,
+        ENUM_EZLOPI_TRACE_SEVERITY_DEBUG,
+        ENUM_EZLOPI_TRACE_SEVERITY_TRACE,
+        ENUM_EZLOPI_TRACE_SEVERITY_MAX,
+    } e_trace_severity_t;
+
 #if defined(CONFIG_EZPI_UTIL_TRACE_EN) || defined(CONFIG_EZPI_LOG_CLOUD_EN)
 #define ENABLE_TRACE 1
 #else
@@ -19,14 +30,28 @@ extern "C"
 #endif // CONFIG_EZPI_UTIL_TRACE_EN
 
     // void trace_color_print(const char* txt_color, uint8_t severity, const char* format, ...);
-    void trace_color_print(const char* txt_color, uint8_t severity, const char* file, int line, const char* format, ...);
-    void __dump(const char* file_name, uint32_t line, char* buffer_name, void* _buff, uint32_t ofs, uint32_t cnt);
 
 #ifndef __FILENAME__
 #define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
 #endif
 
+#ifdef CONFIG_EZPI_OPENTELEMETRY_ENABLE_LOGS
+    typedef ezlopi_error_t (*f_ezlopi_log_upcall_t)(int severity_level, const char *log_str);
+    typedef int (*f_otel_log_upcall_t)(uint8_t severity, const char *file, uint32_t line, char *log);
+
+    void ezlopi_util_set_otel_log_upcall(f_otel_log_upcall_t __log_upcall, uint32_t max_log_len);
+    void ezlopi_util_log_otel(uint8_t severity, const char *file, int line, const char *format, ...);
+
+#define TRACE_OTEL(severity, format, reg...) ezlopi_util_log_otel(severity, __FILENAME__, __LINE__, format, ##reg)
+#else // CONFIG_EZPI_OPENTELEMETRY_ENABLE_LOGS
+#define TRACE_OTEL(severity, format, reg...)
+#endif
+
 #if (1 == ENABLE_TRACE)
+
+    void trace_otel(uint8_t severity, const char *file, int line, const char *format, ...);
+    void trace_color_print(const char *txt_color, uint8_t severity, const char *file, int line, const char *format, ...);
+    void __dump(const char *file_name, uint32_t line, char *buffer_name, void *_buff, uint32_t ofs, uint32_t cnt);
 
 #define COLOR_FONT_BLACK "30"
 #define COLOR_FONT_RED "31"
@@ -46,36 +71,36 @@ extern "C"
 #define COLOR_BG_CYAN "46"
 #define COLOR_BG_WHITE "47"
 
-    typedef ezlopi_error_t (*f_ezlopi_log_upcall_t)(int severity_level, const char* log_str);
+    typedef ezlopi_error_t (*f_ezlopi_log_upcall_t)(int severity_level, const char *log_str);
 
-#define trace_color(txt_color, X, reg...)                                                 \
-    {                                                                                     \
+#define trace_color(txt_color, X, reg...)                                                   \
+    {                                                                                       \
         ets_printf("\x1B[%sm %s[%d]:" X "\x1B[0m\n", txt_color, __FILE__, __LINE__, ##reg); \
     }
 
 #if 0
 
-#define trace_color_print(txt_color, severity, X, reg...)                                                                               \
-    {                                                                                                                                   \
-        f_ezlopi_log_upcall_t log_upcall_func = ezlopi_util_get_cloud_log_upcall();                                                     \
-        if (NULL != log_upcall_func)                                                                                                    \
-        {                                                                                                                               \
-            log_upcall_func(severity, "%s[%d]:" X "", __FILE__, __LINE__, ##reg);                                                       \
-        }                                                                                                                               \
-        log_upcall_func = ezlopi_util_get_serial_log_upcall();                                                                          \
-        if (NULL != log_upcall_func)                                                                                                    \
-        {                                                                                                                               \
-            log_upcall_func(severity, "\x1B[%sm %s[%d]:" X "\x1B[0m\r\n", txt_color, __FILE__, __LINE__, ##reg);                        \
-        }                                                                                                                               \
+#define trace_color_print(txt_color, severity, X, reg...)                                                        \
+    {                                                                                                            \
+        f_ezlopi_log_upcall_t log_upcall_func = ezlopi_util_get_cloud_log_upcall();                              \
+        if (NULL != log_upcall_func)                                                                             \
+        {                                                                                                        \
+            log_upcall_func(severity, "%s[%d]:" X "", __FILE__, __LINE__, ##reg);                                \
+        }                                                                                                        \
+        log_upcall_func = ezlopi_util_get_serial_log_upcall();                                                   \
+        if (NULL != log_upcall_func)                                                                             \
+        {                                                                                                        \
+            log_upcall_func(severity, "\x1B[%sm %s[%d]:" X "\x1B[0m\r\n", txt_color, __FILE__, __LINE__, ##reg); \
+        }                                                                                                        \
     }
-#endif 
+#endif
 
-#define trace(X, reg...)                                       \
-    {                                                          \
+#define trace(X, reg...)                                         \
+    {                                                            \
         ets_printf("%s[%d]:" X "\n", __FILE__, __LINE__, ##reg); \
     }
 
-#define trace_log_sev_error(X, reg...)  trace_color_print(COLOR_FONT_RED, 1, __FILE__, __LINE__, X, ##reg)
+#define trace_log_sev_error(X, reg...) trace_color_print(COLOR_FONT_RED, 1, __FILE__, __LINE__, X, ##reg)
 #define trace_log_sev_warning(X, reg...) trace_color_print(COLOR_FONT_YELLOW, 2, __FILE__, __LINE__, X, ##reg)
 #define trace_log_sev_info(X, reg...) trace_color_print(COLOR_FONT_BLUE, 3, __FILE__, __LINE__, X, ##reg)
 #define trace_log_sev_debug(X, reg...) trace_color_print(COLOR_FONT_WHITE, 4, __FILE__, __LINE__, X, ##reg)
@@ -87,7 +112,6 @@ extern "C"
 #define trace_warning(X, reg...) trace_color(COLOR_FONT_YELLOW, X, ##reg)
 #define trace_error(X, reg...) trace_color(COLOR_FONT_RED, X, ##reg)
 
-
     // #define trace_debug(X, ...) ESP_LOGD(__FILE__, "[%d]: " X, __LINE__, ##__VA_ARGS__)
     // #define trace_imp(X, ...) ESP_LOGI(__FILE__, "[%d]: " X, __LINE__, ##__VA_ARGS__)
     // #define trace_error(X, ...) ESP_LOGE(__FILE__, "[%d]: " X, __LINE__, ##__VA_ARGS__)
@@ -97,8 +121,8 @@ extern "C"
     //         printf("\x1B[34m %s[%d]:" X "\x1B[0m\r\n", __FILE__, __LINE__, ##__VA_ARGS__);
     //     }
 
-#define TRACE_Dg(bg, txt, X, reg...)                                                       \
-    {                                                                                      \
+#define TRACE_Dg(bg, txt, X, reg...)                                                         \
+    {                                                                                        \
         ets_printf("\x1B[%s;%sm %s[%d]:" X "\x1B[0m\n", txt, bg, __FILE__, __LINE__, ##reg); \
     }
 
@@ -108,18 +132,17 @@ extern "C"
 
 #define F(X) (flash_attr) X
 
-// #define TRACE_D trace_debug
-// #define TRACE_I trace_information
-// #define TRACE_S trace_success
-// #define TRACE_W trace_warning
-// #define TRACE_E trace_error
+    // #define TRACE_D trace_debug
+    // #define TRACE_I trace_information
+    // #define TRACE_S trace_success
+    // #define TRACE_W trace_warning
+    // #define TRACE_E trace_error
 
 #define TRACE_E trace_log_sev_error
 #define TRACE_W trace_log_sev_warning
 #define TRACE_I trace_log_sev_info
 #define TRACE_D trace_log_sev_debug
 #define TRACE_S trace_log_sev_trace
-
 
 #define dump(buffer_name, buffer, offset, count) __dump(__FILE__, __LINE__, buffer_name, buffer, offset, count)
 
@@ -135,7 +158,6 @@ extern "C"
 #define TRACE_D(X, ...)
 #define TRACE_I(x, ...)
 #define dump(name, X, Y, Z)
-
 
 #define TRACE_Dw(X, reg...)
 #define trace_yw(X, reg...)

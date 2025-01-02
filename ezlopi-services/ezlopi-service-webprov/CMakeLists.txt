@@ -1,4 +1,3 @@
-
 file(GLOB_RECURSE provisioning_src "*.c*")
 
 set(EZLOPI_UTIL_COMPONENTS
@@ -6,7 +5,6 @@ set(EZLOPI_UTIL_COMPONENTS
 )
 set(EZLOPI_CORE_COMPONENTS  
         ezlopi-core-api
-        ezlopi-core-wsc
         ezlopi-core-wifi
         ezlopi-core-http
         ezlopi-core-buffer
@@ -20,11 +18,14 @@ set(EZLOPI_CORE_COMPONENTS
 set(EZLOPI_CLOUD_COMPONENTS 
 )
 
+set(EZLOPI_SERVICES
+        ezlopi-service-otel
+)
 
-
-idf_component_register(SRCS "ezlopi_test_prov.c" "ezlopi_service_webprov.c" "${provisioning_src}"
+idf_component_register(SRCS "ezlopi_service_webprov.c" "${provisioning_src}"
     INCLUDE_DIRS "."
     REQUIRES    ${EZLOPI_UTIL_COMPONENTS}
                 ${EZLOPI_CORE_COMPONENTS} 
                 ${EZLOPI_CLOUD_COMPONENTS} 
+                ${EZLOPI_SERVICES}
     )
