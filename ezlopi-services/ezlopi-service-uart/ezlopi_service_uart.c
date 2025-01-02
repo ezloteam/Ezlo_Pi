@@ -7,36 +7,36 @@
  * @version
  * @date
  */
- /* ===========================================================================
- ** Copyright (C) 2024 Ezlo Innovation Inc
- **
- ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
- **
- ** Redistribution and use in source and binary forms, with or without
- ** modification, are permitted provided that the following conditions are met:
- **
- ** 1. Redistributions of source code must retain the above copyright notice,
- **    this list of conditions and the following disclaimer.
- ** 2. Redistributions in binary form must reproduce the above copyright
- **    notice, this list of conditions and the following disclaimer in the
- **    documentation and/or other materials provided with the distribution.
- ** 3. Neither the name of the copyright holder nor the names of its
- **    contributors may be used to endorse or promote products derived from
- **    this software without specific prior written permission.
- **
- ** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- ** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- ** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- ** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- ** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- ** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- ** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- ** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- ** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- ** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- ** POSSIBILITY OF SUCH DAMAGE.
- ** ===========================================================================
- */
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
 
 #include "../../build/config/sdkconfig.h"
 
@@ -91,47 +91,47 @@
 #include "EZLOPI_USER_CONFIG.h"
 
 #if defined(CONFIG_IDF_TARGET_ESP32)
- /**
-  * @brief UART TX pin number
-  *
-  */
+/**
+ * @brief UART TX pin number
+ *
+ */
 #define TXD_PIN (GPIO_NUM_1)
-  /**
-   * @brief UART RX pin number
-   *
-   */
+/**
+ * @brief UART RX pin number
+ *
+ */
 #define RXD_PIN (GPIO_NUM_3)
 #elif defined(CONFIG_IDF_TARGET_ESP32S2)
 #elif defined(CONFIG_IDF_TARGET_ESP32C3)
- /**
-  * @brief UART TX pin number
-  *
-  */
+/**
+ * @brief UART TX pin number
+ *
+ */
 #define TXD_PIN (GPIO_NUM_21)
-  /**
-   * @brief UART RX pin number
-   *
-   */
+/**
+ * @brief UART RX pin number
+ *
+ */
 #define RXD_PIN (GPIO_NUM_20)
 #elif defined(CONFIG_IDF_TARGET_ESP32S3)
- /**
-  * @brief UART TX pin number
-  *
-  */
+/**
+ * @brief UART TX pin number
+ *
+ */
 #define TXD_PIN (GPIO_NUM_43)
-  /**
-   * @brief UART RX pin number
-   *
-   */
+/**
+ * @brief UART RX pin number
+ *
+ */
 #define RXD_PIN (GPIO_NUM_44)
 #endif
 
-   /**
-    * @brief Function to process reset command
-    *
-    * @param root Pointer to the root JSON coming from UART
-    * @return int
-    */
+/**
+ * @brief Function to process reset command
+ *
+ * @param root Pointer to the root JSON coming from UART
+ * @return int
+ */
 static int ezpi_service_uart_reset(cJSON *root);
 /**
  * @brief Function to process uart config command
@@ -309,7 +309,7 @@ void EZPI_SERV_uart_init(void)
 
 #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
     EZPI_core_process_set_process_info(ENUM_EZLOPI_SERVICE_UART_TASK, &__uart_loop_handle, EZLOPI_SERVICE_UART_TASK_DEPTH);
-#endif //CONFIG_FREERTOS_USE_TRACE_FACILITY
+#endif // CONFIG_FREERTOS_USE_TRACE_FACILITY
 
 #endif
 }
@@ -1019,7 +1019,7 @@ static void ezpi_service_uart_set_wifi(const char *data)
                         }
                         else
                         {
-                            #warning "DO NOT user printf on production !";
+#warning "DO NOT user printf on production !";
                             TRACE_E("WiFi Connection to AP: %s failed !", ssid);
                             status = 0;
                         }
@@ -1139,8 +1139,7 @@ static void ezpi_service_uart_get_config(void)
 {
     cJSON *root = NULL;
 
-    #warning "Lomas: didn't find feering 'current_config', if this is correct then please remove this warning"
-        char *current_config = EZPI_core_factory_info_v3_get_ezlopi_config();
+    char *current_config = EZPI_core_factory_info_v3_get_ezlopi_config();
 
     if (current_config)
     {
@@ -1164,6 +1163,7 @@ static void ezpi_service_uart_get_config(void)
             cJSON_AddNumberToObject(__FUNCTION__, root, ezlopi_cmd_str, EZPI_UART_CMD_GET_CONFIG);
             cJSON_AddNumberToObject(__FUNCTION__, root, ezlopi_status_str, EZPI_UART_CMD_STATUS_SUCCESS);
         }
+        ezlopi_free(__FUNCTION__, current_config);
     }
     else
     {
