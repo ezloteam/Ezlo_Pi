@@ -59,6 +59,11 @@ install_manifest.txt
 compile_commands.json
 CTestTestfile.cmake
 _deps
+config.env
+kconfigs_projbuild.in
+bootloader-prefix/**
+config/**
+kconfigs.in
 
 #specefic files 
 /ezlopi-core/ezlopi-core-ota/ca_mios.h
