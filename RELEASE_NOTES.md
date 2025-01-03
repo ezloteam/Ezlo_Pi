@@ -4,6 +4,44 @@
 
 # RELEASE NOTES
 
+# Version 4.3.11 Build 201
+
+## New
+
+1. Implement Feature Open Telemetry [EZPI-477](https://jira.mios.com/browse/EZPI-477)
+
+## What's Changed
+
+- Feature otel trace by @krishna-ezlo in https://github.com/ezloteam/Ezlo_Pi/pull/211
+- Development by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/212
+
+# Version 4.2.10 Build 200
+
+## New
+
+1. Implement API: `hub.mode.entry_delay.skip` - House Modes [EZPI-529](https://jira.mios.com/browse/EZPI-529)
+2. Added house-mode alarm functionality in `house_modes_loop` [EZPI-548](https://jira.mios.com/browse/EZPI-548)
+3. Implement API: `hub.modes.protect.buttons.set` [EZPI-549](https://jira.mios.com/browse/EZPI-549)
+4. Implement API: `hub.modes.protect.devices.add` [EZPI-550](https://jira.mios.com/browse/EZPI-550)
+5. Implement API: `hub.modes.protect.devices.remove` [EZPI-551](https://jira.mios.com/browse/EZPI-551)
+
+## Fixes
+
+1.  Digital LDR causing device to reboot [EZPI-546](https://jira.mios.com/browse/EZPI-546)
+2.  Memory assessment on WSS and optimization [EZPI-543](https://jira.mios.com/browse/EZPI-543)
+3.  Update source and header templates[EZPI-536](https://jira.mios.com/browse/EZPI-536)
+
+## What's Changed
+
+- Inspecting otel by @krishna-ezlo in https://github.com/ezloteam/Ezlo_Pi/pull/205
+- EZPI-536 Update template files by @ezlo-gary in https://github.com/ezloteam/Ezlo_Pi/pull/204
+- Combined ezpi 529 548 549 550 551 by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/206
+- Development by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/207
+
+## New Contributors
+
+- @ezlo-gary made their first contribution in https://github.com/ezloteam/Ezlo_Pi/pull/204
+
 # Version 4.2.9 Build 199
 
 ## New
