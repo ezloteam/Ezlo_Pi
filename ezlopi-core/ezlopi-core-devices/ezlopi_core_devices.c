@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    ezlopi_core_devices.c
-* @brief   Function
-* @author  xx
-* @version 0.1
-* @date    12th DEC 2024
-*/
+ * @file    ezlopi_core_devices.c
+ * @brief   Function
+ * @author  xx
+ * @version 0.1
+ * @date    12th DEC 2024
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 
 #include <ctype.h>
 
@@ -54,20 +54,20 @@
 #include "EZLOPI_USER_CONFIG.h"
 #include "../../build/config/sdkconfig.h"
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static int ____store_bool_in_nvs_dev_mod_info(uint32_t nvs_device_id, const char *string_key, bool bool_value);
 static int ____store_string_in_nvs_dev_mod_info(uint32_t nvs_device_id, const char *string_key, const char *string_value);
 static int ____store_dev_mod_room_id_in_nvs(uint32_t device_id, const char *new_room_id_str);
@@ -90,18 +90,18 @@ static void ezlopi_device_free_setting(l_ezlopi_device_settings_v3_t *settings);
 static void ezlopi_device_free_all_device_setting(l_ezlopi_device_t *curr_device);
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 static l_ezlopi_device_t *l_device_head = NULL;
 static volatile uint32_t g_store_dev_config_with_id = 0;
 static s_ezlopi_cloud_controller_t s_controller_information;
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 void EZPI_core_device_factory_info_reset(void)
 {
     // clear all 'devices', along with their 'items & settings'
@@ -433,7 +433,6 @@ l_ezlopi_device_t *EZPI_core_device_add_device(cJSON *cj_device, const char *las
     return new_device;
 }
 
-
 void EZPI_core_device_free_device(l_ezlopi_device_t *device)
 {
     if (device && l_device_head)
@@ -530,7 +529,7 @@ l_ezlopi_item_t *EZPI_core_device_get_item_by_id(uint32_t item_id)
     return item_to_return;
 }
 
-l_ezlopi_item_t *EZPI_core_device_add_item_to_device(l_ezlopi_device_t *device, ezlopi_error_t(*item_func)(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg))
+l_ezlopi_item_t *EZPI_core_device_add_item_to_device(l_ezlopi_device_t *device, ezlopi_error_t (*item_func)(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg))
 {
     l_ezlopi_item_t *new_item = NULL;
     if (device)
@@ -780,8 +779,8 @@ static void ezlopi_device_print_interface_type(l_ezlopi_item_t *item)
 #endif
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 static ezlopi_error_t ezlopi_device_parse_json_v3(cJSON *cjson_config)
 {
     ezlopi_error_t error = EZPI_SUCCESS;
@@ -804,6 +803,9 @@ static ezlopi_error_t ezlopi_device_parse_json_v3(cJSON *cjson_config)
 #elif defined(CONFIG_IDF_TARGET_ESP32S3)
                 uint32_t compare_len = strlen(ezlopi_ESP32S3_str) > cjson_chipset->str_value_len ? strlen(ezlopi_ESP32S3_str) : cjson_chipset->str_value_len;
                 if (strncmp(chipset_name, ezlopi_ESP32S3_str, compare_len) == 0)
+#elif defined(CONFIG_IDF_TARGET_ESP32S2)
+                uint32_t compare_len = strlen(ezlopi_ESP32S2_str) > cjson_chipset->str_value_len ? strlen(ezlopi_ESP32S2_str) : cjson_chipset->str_value_len;
+                if (strncmp(chipset_name, ezlopi_ESP32S2_str, compare_len) == 0)
 #elif defined(CONFIG_IDF_TARGET_ESP32C3)
                 uint32_t compare_len = strlen(ezlopi_ESP32C3_str) > cjson_chipset->str_value_len ? strlen(ezlopi_ESP32C3_str) : cjson_chipset->str_value_len;
                 if (strncmp(chipset_name, ezlopi_ESP32C3_str, compare_len) == 0)
@@ -839,7 +841,7 @@ static ezlopi_error_t ezlopi_device_parse_json_v3(cJSON *cjson_config)
                                 {
                                     if (id_item == v3_device_list[dev_idx].id)
                                     {
-                                        s_ezlopi_prep_arg_t device_prep_arg = { .device = &v3_device_list[dev_idx], .cjson_device = cjson_device };
+                                        s_ezlopi_prep_arg_t device_prep_arg = {.device = &v3_device_list[dev_idx], .cjson_device = cjson_device};
                                         v3_device_list[dev_idx].func(EZLOPI_ACTION_PREPARE, NULL, (void *)&device_prep_arg, NULL);
                                         error = EZPI_SUCCESS;
                                     }
@@ -853,13 +855,13 @@ static ezlopi_error_t ezlopi_device_parse_json_v3(cJSON *cjson_config)
                     }
                 }
 
-#if (defined(CONFIG_IDF_TARGET_ESP32) || defined(CONFIG_IDF_TARGET_ESP32S3) || defined(CONFIG_IDF_TARGET_ESP32C3))
+#if (defined(CONFIG_IDF_TARGET_ESP32) || defined(CONFIG_IDF_TARGET_ESP32S3) || defined(CONFIG_IDF_TARGET_ESP32S2) || defined(CONFIG_IDF_TARGET_ESP32C3))
                 else
                 {
                     error = EZPI_ERR_JSON_PARSE_FAILED;
                     TRACE_E("Device configuration and chipset mismatch ! Device and Item assignment aborted !");
                 }
-#endif // CONFIG_IDF_TARGET_ESP32 OR CONFIG_IDF_TARGET_ESP32S3 OR CONFIG_IDF_TARGET_ESP32C3
+#endif // CONFIG_IDF_TARGET_ESP32 OR CONFIG_IDF_TARGET_ESP32S3 OR CONFIG_IDF_TARGET_ESP32S2 OR CONFIG_IDF_TARGET_ESP32C3
             }
             else
             {
@@ -1241,5 +1243,5 @@ static void __ezlopi_device_free_parent_tree(l_ezlopi_device_t *parent_device, u
 }
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/
