@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    device_0038_other_RGB.c
-* @brief   perform some function on device_0038
-* @author  xx
-* @version 0.1
-* @date    xx
-*/
+ * @file    device_0038_other_RGB.c
+ * @brief   perform some function on device_0038
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
@@ -54,16 +54,16 @@
 #include "EZLOPI_USER_CONFIG.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 
 typedef struct s_rgb_args
 {
@@ -80,24 +80,24 @@ typedef struct s_rgb_args
 } s_rgb_args_t;
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static ezlopi_error_t __prepare(void *arg);
 static ezlopi_error_t __init(l_ezlopi_item_t *item);
 static ezlopi_error_t __set_cjson_value(l_ezlopi_item_t *item, void *arg);
 static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg);
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 ezlopi_error_t DEVICE_0038_other_rgb(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
@@ -138,10 +138,9 @@ ezlopi_error_t DEVICE_0038_other_rgb(e_ezlopi_actions_t action, l_ezlopi_item_t 
     return ret;
 }
 
-
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 
 static ezlopi_error_t RGB_LED_change_color_value(s_rgb_args_t *rgb_args)
 {
@@ -149,7 +148,7 @@ static ezlopi_error_t RGB_LED_change_color_value(s_rgb_args_t *rgb_args)
     if (rgb_args)
     {
         TRACE_D("Brightness value is %d, %d, %d", (uint8_t)(rgb_args->red_struct.value * rgb_args->brightness), (uint8_t)(rgb_args->green_struct.value * rgb_args->brightness),
-            (uint8_t)(rgb_args->blue_struct.value * rgb_args->brightness));
+                (uint8_t)(rgb_args->blue_struct.value * rgb_args->brightness));
 
         EZPI_hal_pwm_change_duty(rgb_args->red_struct.channel, rgb_args->red_struct.speed_mode, (uint8_t)(rgb_args->red_struct.value * rgb_args->brightness));
         EZPI_hal_pwm_change_duty(rgb_args->green_struct.channel, rgb_args->green_struct.speed_mode, (uint8_t)(rgb_args->green_struct.value * rgb_args->brightness));
@@ -251,7 +250,10 @@ static ezlopi_error_t __set_cjson_value(l_ezlopi_item_t *item, void *arg)
             if (ezlopi_item_name_rgbcolor == item->cloud_properties.item_name)
             {
                 cJSON *cjson_params_rgb_values = cJSON_GetObjectItem(__FUNCTION__, cjson_params, ezlopi_value_str);
+
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                 CJSON_TRACE("cjson_params_rgb_values", cjson_params_rgb_values);
+#endif
 
                 if (cjson_params_rgb_values)
                 {
@@ -270,7 +272,7 @@ static ezlopi_error_t __set_cjson_value(l_ezlopi_item_t *item, void *arg)
                 rgb_args->previous_dim_factor = ((0 == led_state) ? rgb_args->brightness : rgb_args->previous_dim_factor);
                 rgb_args->brightness = ((0 == led_state) ? 0.0 : ((0 == rgb_args->previous_dim_factor) ? 1.0 : rgb_args->previous_dim_factor));
                 TRACE_D("Brightness value is %d, %d, %d", (uint8_t)(rgb_args->red_struct.value * rgb_args->brightness), (uint8_t)(rgb_args->green_struct.value * rgb_args->brightness),
-                    (uint8_t)(rgb_args->blue_struct.value * rgb_args->brightness));
+                        (uint8_t)(rgb_args->blue_struct.value * rgb_args->brightness));
                 RGB_LED_change_color_value(rgb_args);
                 EZPI_core_device_value_updated_from_device_broadcast(rgb_args->RGB_LED_dimmer_item);
                 ret = EZPI_SUCCESS;
@@ -383,7 +385,7 @@ static void __prepare_RGB_LED_item(l_ezlopi_item_t *item, cJSON *cj_device, void
     item->cloud_properties.has_setter = true;
     item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
     item->cloud_properties.item_name = ezlopi_item_name_rgbcolor,
-        item->cloud_properties.show = true;
+    item->cloud_properties.show = true;
     item->cloud_properties.scale = NULL;
     item->cloud_properties.value_type = value_type_rgb;
     item->interface_type = EZLOPI_DEVICE_INTERFACE_PWM;
@@ -404,7 +406,7 @@ static void __prepare_RGB_LED_onoff_switch_item(l_ezlopi_item_t *item, cJSON *cj
     item->cloud_properties.has_setter = true;
     item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
     item->cloud_properties.item_name = ezlopi_item_name_switch,
-        item->cloud_properties.show = true;
+    item->cloud_properties.show = true;
     item->cloud_properties.scale = NULL;
     item->cloud_properties.value_type = value_type_bool;
     item->interface_type = EZLOPI_DEVICE_INTERFACE_DIGITAL_OUTPUT;
@@ -427,7 +429,7 @@ static void __prepare_RGB_LED_dimmer_item(l_ezlopi_item_t *item, cJSON *cj_devic
     item->cloud_properties.has_setter = true;
     item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
     item->cloud_properties.item_name = ezlopi_item_name_dimmer,
-        item->cloud_properties.show = true;
+    item->cloud_properties.show = true;
     item->cloud_properties.scale = NULL;
     item->cloud_properties.value_type = value_type_int;
     item->interface_type = EZLOPI_DEVICE_INTERFACE_PWM;
@@ -500,5 +502,5 @@ static ezlopi_error_t __prepare(void *arg)
 }
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

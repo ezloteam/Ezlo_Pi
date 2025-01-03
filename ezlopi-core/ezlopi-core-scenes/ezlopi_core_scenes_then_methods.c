@@ -798,7 +798,9 @@ int EZPI_core_scene_then_set_expression(l_scenes_list_v2_t *curr_scene, void *ar
                     if ((EZLOPI_VALUE_TYPE_OBJECT == curr_field->value_type) && (NULL != curr_field->field_value.u_value.cj_value))
                     {
                         cj_metadata = curr_field->field_value.u_value.cj_value;
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                         CJSON_TRACE("params", cj_metadata);
+#endif
                     }
                 }
                 else if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, ezlopi_params_str, len, 7))
@@ -806,7 +808,9 @@ int EZPI_core_scene_then_set_expression(l_scenes_list_v2_t *curr_scene, void *ar
                     if ((EZLOPI_VALUE_TYPE_EXPRESSION == curr_field->value_type) && (NULL != curr_field->field_value.u_value.cj_value))
                     {
                         cj_params = curr_field->field_value.u_value.cj_value;
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                         CJSON_TRACE("params", cj_params);
+#endif
                     }
                 }
                 curr_field = curr_field->next;
@@ -863,7 +867,6 @@ int EZPI_core_scene_then_set_variable(l_scenes_list_v2_t *curr_scene, void *arg)
                     if ((EZLOPI_VALUE_TYPE_OBJECT == curr_field->value_type) && (NULL != curr_field->field_value.u_value.cj_value))
                     {
                         cj_metadata = curr_field->field_value.u_value.cj_value;
-                        // CJSON_TRACE("metadata", cj_metadata);
                     }
                 }
                 curr_field = curr_field->next;

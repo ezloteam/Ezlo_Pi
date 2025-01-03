@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    ezlopi_core_devices.c
-* @brief   Function
-* @author  xx
-* @version 0.1
-* @date    12th DEC 2024
-*/
+ * @file    ezlopi_core_devices.c
+ * @brief   Function
+ * @author  xx
+ * @version 0.1
+ * @date    12th DEC 2024
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 
 #include <ctype.h>
 
@@ -54,20 +54,20 @@
 #include "EZLOPI_USER_CONFIG.h"
 #include "../../build/config/sdkconfig.h"
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static int ____store_bool_in_nvs_dev_mod_info(uint32_t nvs_device_id, const char *string_key, bool bool_value);
 static int ____store_string_in_nvs_dev_mod_info(uint32_t nvs_device_id, const char *string_key, const char *string_value);
 static int ____store_dev_mod_room_id_in_nvs(uint32_t device_id, const char *new_room_id_str);
@@ -90,18 +90,18 @@ static void ezlopi_device_free_setting(l_ezlopi_device_settings_v3_t *settings);
 static void ezlopi_device_free_all_device_setting(l_ezlopi_device_t *curr_device);
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 static l_ezlopi_device_t *l_device_head = NULL;
 static volatile uint32_t g_store_dev_config_with_id = 0;
 static s_ezlopi_cloud_controller_t s_controller_information;
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 void EZPI_core_device_factory_info_reset(void)
 {
     // clear all 'devices', along with their 'items & settings'
@@ -433,7 +433,6 @@ l_ezlopi_device_t *EZPI_core_device_add_device(cJSON *cj_device, const char *las
     return new_device;
 }
 
-
 void EZPI_core_device_free_device(l_ezlopi_device_t *device)
 {
     if (device && l_device_head)
@@ -530,7 +529,7 @@ l_ezlopi_item_t *EZPI_core_device_get_item_by_id(uint32_t item_id)
     return item_to_return;
 }
 
-l_ezlopi_item_t *EZPI_core_device_add_item_to_device(l_ezlopi_device_t *device, ezlopi_error_t(*item_func)(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg))
+l_ezlopi_item_t *EZPI_core_device_add_item_to_device(l_ezlopi_device_t *device, ezlopi_error_t (*item_func)(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg))
 {
     l_ezlopi_item_t *new_item = NULL;
     if (device)
@@ -780,15 +779,18 @@ static void ezlopi_device_print_interface_type(l_ezlopi_item_t *item)
 #endif
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 static ezlopi_error_t ezlopi_device_parse_json_v3(cJSON *cjson_config)
 {
     ezlopi_error_t error = EZPI_SUCCESS;
 
     if (cjson_config)
     {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
         CJSON_TRACE("cjson-config", cjson_config);
+#endif
+
         cJSON *cjson_chipset = cJSON_GetObjectItem(__FUNCTION__, cjson_config, ezlopi_chipset_str);
 
         if (cjson_chipset)
@@ -839,7 +841,7 @@ static ezlopi_error_t ezlopi_device_parse_json_v3(cJSON *cjson_config)
                                 {
                                     if (id_item == v3_device_list[dev_idx].id)
                                     {
-                                        s_ezlopi_prep_arg_t device_prep_arg = { .device = &v3_device_list[dev_idx], .cjson_device = cjson_device };
+                                        s_ezlopi_prep_arg_t device_prep_arg = {.device = &v3_device_list[dev_idx], .cjson_device = cjson_device};
                                         v3_device_list[dev_idx].func(EZLOPI_ACTION_PREPARE, NULL, (void *)&device_prep_arg, NULL);
                                         error = EZPI_SUCCESS;
                                     }
@@ -956,7 +958,9 @@ static int ____store_bool_in_nvs_dev_mod_info(uint32_t nvs_device_id, const char
         cJSON *cj_target_dev_mod = cJSON_Parse(__FUNCTION__, device_mod_str);
         if (cj_target_dev_mod)
         {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
             // CJSON_TRACE("Prev_dev_mod:", cj_target_dev_mod);
+#endif
 
             cJSON *cj_get_dev_name = cJSON_GetObjectItem(__FUNCTION__, cj_target_dev_mod, string_key);
             if (cj_get_dev_name)
@@ -966,7 +970,9 @@ static int ____store_bool_in_nvs_dev_mod_info(uint32_t nvs_device_id, const char
 
             cJSON_AddBoolToObject(__FUNCTION__, cj_target_dev_mod, string_key, bool_value); // add the new info
 
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
             CJSON_TRACE("new_dev_mod:", cj_target_dev_mod);
+#endif
 
             // Now update the 'nvs_dev_id'
             char *updated_target_dev_mod_str = cJSON_PrintBuffered(__FUNCTION__, cj_target_dev_mod, 1024, false);
@@ -999,7 +1005,10 @@ static int ____store_bool_in_nvs_dev_mod_info(uint32_t nvs_device_id, const char
         if (cj_new_dev_mod)
         {
             cJSON_AddBoolToObject(__FUNCTION__, cj_new_dev_mod, string_key, bool_value); // add the new info
+
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
             CJSON_TRACE("new_dev_mod:", cj_new_dev_mod);
+#endif
 
             char *new_dev_mod_str = cJSON_PrintBuffered(__FUNCTION__, cj_new_dev_mod, 1024, false);
             TRACE_D("length of 'new_dev_mod_str': %d", strlen(new_dev_mod_str));
@@ -1036,7 +1045,9 @@ static int ____store_string_in_nvs_dev_mod_info(uint32_t nvs_device_id, const ch
         cJSON *cj_target_dev_mod = cJSON_Parse(__FUNCTION__, device_mod_str);
         if (cj_target_dev_mod)
         {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
             // CJSON_TRACE("Prev_dev_mod:", cj_target_dev_mod);
+#endif
 
             cJSON *cj_get_dev_name = cJSON_GetObjectItem(__FUNCTION__, cj_target_dev_mod, string_key);
             if (cj_get_dev_name)
@@ -1046,7 +1057,9 @@ static int ____store_string_in_nvs_dev_mod_info(uint32_t nvs_device_id, const ch
 
             cJSON_AddStringToObject(__FUNCTION__, cj_target_dev_mod, string_key, string_value); // add the new info
 
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
             CJSON_TRACE("new_dev_mod:", cj_target_dev_mod);
+#endif
 
             // Now update the 'nvs_dev_id'
             char *updated_target_dev_mod_str = cJSON_PrintBuffered(__FUNCTION__, cj_target_dev_mod, 1024, false);
@@ -1080,7 +1093,9 @@ static int ____store_string_in_nvs_dev_mod_info(uint32_t nvs_device_id, const ch
         {
             cJSON_AddStringToObject(__FUNCTION__, cj_new_dev_mod, string_key, string_value);
 
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
             CJSON_TRACE("new_dev_mod:", cj_new_dev_mod);
+#endif
 
             char *new_dev_mod_str = cJSON_PrintBuffered(__FUNCTION__, cj_new_dev_mod, 1024, false);
             TRACE_D("length of 'new_dev_mod_str': %d", strlen(new_dev_mod_str));
@@ -1241,5 +1256,5 @@ static void __ezlopi_device_free_parent_tree(l_ezlopi_device_t *parent_device, u
 }
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

@@ -6,36 +6,36 @@
  * @version
  * @date
  */
- /* ===========================================================================
- ** Copyright (C) 2022 Ezlo Innovation Inc
- **
- ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
- **
- ** Redistribution and use in source and binary forms, with or without
- ** modification, are permitted provided that the following conditions are met:
- **
- ** 1. Redistributions of source code must retain the above copyright notice,
- **    this list of conditions and the following disclaimer.
- ** 2. Redistributions in binary form must reproduce the above copyright
- **    notice, this list of conditions and the following disclaimer in the
- **    documentation and/or other materials provided with the distribution.
- ** 3. Neither the name of the copyright holder nor the names of its
- **    contributors may be used to endorse or promote products derived from
- **    this software without specific prior written permission.
- **
- ** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- ** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- ** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- ** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- ** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- ** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- ** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- ** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- ** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- ** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- ** POSSIBILITY OF SUCH DAMAGE.
- ** ===========================================================================
- */
+/* ===========================================================================
+** Copyright (C) 2022 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
 
 #include "../../build/config/sdkconfig.h"
 
@@ -123,7 +123,11 @@ void EZPI_scenes_edit(cJSON *cj_request, cJSON *cj_response)
     {
         cJSON *cj_eo = cJSON_GetObjectItem(__FUNCTION__, cj_params, "eo");
         cJSON *cj_id = cJSON_GetObjectItem(__FUNCTION__, cj_eo, ezlopi__id_str);
+
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
         // CJSON_TRACE("scene-edit eo", cj_eo);
+#endif
+
         if (cj_eo && (cj_id && cj_id->valuestring))
         {
             uint32_t u_id = strtoul(cj_id->valuestring, NULL, 16);
@@ -268,7 +272,10 @@ void EZPI_scenes_notification_add(cJSON *cj_request, cJSON *cj_response)
                         cJSON_AddItemReferenceToArray(__FUNCTION__, cj_user_notifications, cj_user_id);
                     }
 
-                    CJSON_TRACE("updated-scene", cj_scene);
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
+                    // CJSON_TRACE("updated-scene", cj_scene);
+#endif
+
                     char *updated_scene_str = cJSON_PrintBuffered(__FUNCTION__, cj_scene, 4096, false);
                     cJSON_Delete(__FUNCTION__, cj_scene);
 
@@ -332,7 +339,10 @@ void EZPI_scenes_notification_remove(cJSON *cj_request, cJSON *cj_response)
                         }
                     }
 
-                    CJSON_TRACE("updated-scene", cj_scene);
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
+                    // CJSON_TRACE("updated-scene", cj_scene);
+#endif
+
                     char *updated_scene_str = cJSON_PrintBuffered(__FUNCTION__, cj_scene, 4096, false);
                     cJSON_Delete(__FUNCTION__, cj_scene);
 
@@ -451,11 +461,13 @@ void EZPI_scenes_house_modes_set(cJSON *cj_request, cJSON *cj_response)
 
                     cJSON_AddItemToObject(__FUNCTION__, cj_scene, ezlopi_house_modes_str, cJSON_Duplicate(__FUNCTION__, cj_house_mode_arr, true));
 
-                    cJSON *cj_test = cJSON_GetObjectItem(__FUNCTION__, cj_scene, ezlopi_house_modes_str);
-                    if (cj_test)
-                    {
-                        CJSON_TRACE("new-house_mode:", cj_test);
-                    }
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
+                    // cJSON *cj_test = cJSON_GetObjectItem(__FUNCTION__, cj_scene, ezlopi_house_modes_str);
+                    // if (cj_test)
+                    // {
+                    //     CJSON_TRACE("new-house_mode:", cj_test);
+                    // }
+#endif
 
                     char *updated_scene_str = cJSON_PrintBuffered(__FUNCTION__, cj_scene, 4096, false);
                     cJSON_Delete(__FUNCTION__, cj_scene);
@@ -506,7 +518,11 @@ void EZPI_scenes_action_block_test(cJSON *cj_request, cJSON *cj_response)
                     if (dupli) // duplicate the 'cj_block' to avoid crashes
                     {
                         EZPI_scenes_populate_assign_action_block(test_then_block, dupli, SCENE_BLOCK_TYPE_THEN);
+
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                         // CJSON_TRACE("test_then:", dupli);
+#endif
+
                         cJSON_Delete(__FUNCTION__, dupli);
                     }
 
@@ -548,7 +564,7 @@ void EZPI_scenes_action_block_test(cJSON *cj_request, cJSON *cj_response)
                         if (tmp_http_data->response)
                         {
                             int code = 400;
-                            char detail[100] = { 0 };
+                            char detail[100] = {0};
                             if (sscanf(tmp_http_data->response, "HTTP/1.1 %d %99s[^\n]", &code, detail) == 2)
                             {
                                 cJSON_AddNumberToObject(__FUNCTION__, cj_result, ezlopi_httpAnswerCode_str, code);
@@ -644,7 +660,7 @@ void EZPI_scenes_blockmeta_set(cJSON *cj_request, cJSON *cj_response)
             cJSON *cj_block_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_blockId_str);
             if ((cj_scene_id && cj_scene_id->valuestring) && (cj_block_id && cj_block_id->valuestring))
             {
-                #warning "The 'block_id' facility is only for 'when-blocks' [ 'Action-blocks' is not added in UI ]";
+#warning "The 'block_id' facility is only for 'when-blocks' [ 'Action-blocks' is not added in UI ]";
                 EZPI_core_scenes_set_meta_by_id(cj_scene_id->valuestring, cj_block_id->valuestring, cj_meta);
             }
         }
@@ -663,7 +679,7 @@ void EZPI_scenes_stop(cJSON *cj_request, cJSON *cj_response)
             cJSON *cj_scene_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_sceneId_str);
             if (cj_scene_id && cj_scene_id->valuestring)
             {
-                #warning "add support for thenGroup or elseGroups";
+#warning "add support for thenGroup or elseGroups";
                 uint32_t u32_scene_id = strtoul(cj_scene_id->valuestring, NULL, 16);
                 EZPI_meshbot_service_stop_for_scene_id(u32_scene_id);
             }
@@ -691,7 +707,7 @@ void EZPI_scenes_clone(cJSON *cj_request, cJSON *cj_response)
                         cJSON *cj_dup_scene = cJSON_Duplicate(__FUNCTION__, cj_org_scene, 1);
                         if (cj_dup_scene)
                         {
-                            char name_buf[32] = { 0 };
+                            char name_buf[32] = {0};
                             cJSON *cj_custom_name = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_name_str);
                             if (cj_custom_name && cj_custom_name->valuestring && (0 < cj_custom_name->str_value_len))
                             {
@@ -732,7 +748,10 @@ void EZPI_scenes_clone(cJSON *cj_request, cJSON *cj_response)
                             cJSON_DeleteItemFromObject(__FUNCTION__, cj_dup_scene, ezlopi__id_str);
                             cJSON_DeleteItemFromObject(__FUNCTION__, cj_dup_scene, ezlopi_name_str);
                             cJSON_AddStringToObject(__FUNCTION__, cj_dup_scene, ezlopi_name_str, name_buf);
+
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                             CJSON_TRACE("__duplicated :", cj_dup_scene);
+#endif
 
                             // store the 'new_scene' in nvs
                             uint32_t new_scene_id = EZPI_core_scenes_store_new_scene_v2(cj_dup_scene);

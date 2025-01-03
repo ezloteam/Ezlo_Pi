@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    ezlopi_core_scenes_populate.c
-* @brief   These function perfrom scenes populate operations
-* @author  xx
-* @version 0.1
-* @date    12th DEC 2024
-*/
+ * @file    ezlopi_core_scenes_populate.c
+ * @brief   These function perfrom scenes populate operations
+ * @author  xx
+ * @version 0.1
+ * @date    12th DEC 2024
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
@@ -52,32 +52,32 @@
 #include "EZLOPI_USER_CONFIG.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 void EZPI_scenes_populate_scene(l_scenes_list_v2_t *new_scene, cJSON *cj_scene, uint32_t scene_id)
 {
     if (new_scene && cj_scene)
@@ -90,7 +90,7 @@ void EZPI_scenes_populate_scene(l_scenes_list_v2_t *new_scene, cJSON *cj_scene, 
         CJSON_GET_VALUE_BOOL(cj_scene, ezlopi_is_group_str, new_scene->is_group);
 
         {
-            char tmp_grp_id[32] = { 0 };
+            char tmp_grp_id[32] = {0};
             CJSON_GET_VALUE_STRING_BY_COPY(cj_scene, ezlopi_group_id_str, tmp_grp_id);
             if (0 < strlen(tmp_grp_id))
             {
@@ -377,7 +377,7 @@ void EZPI_scenes_populate_assign_when_block(l_when_block_v2_t *new_when_block, c
                     TRACE_D("group_blockName (edit): %s ", new_when_block->when_grp->grp_blockName);
                 }
 
-                char grp_id_str[32] = { 0 };
+                char grp_id_str[32] = {0};
                 CJSON_GET_VALUE_STRING_BY_COPY(cj_when_block, ezlopi_group_id_str, grp_id_str);
                 if (0 < strlen(grp_id_str))
                 {
@@ -388,7 +388,7 @@ void EZPI_scenes_populate_assign_when_block(l_when_block_v2_t *new_when_block, c
         }
 
         {
-            char tmp_block_id[32] = { 0 };
+            char tmp_block_id[32] = {0};
             CJSON_GET_VALUE_STRING_BY_COPY(cj_when_block, ezlopi_blockId_str, tmp_block_id);
             if (0 < strlen(tmp_block_id))
             {
@@ -495,7 +495,6 @@ void EZPI_scenes_populate_fields_get_value(l_fields_v2_t *field, cJSON *cj_value
 {
     if (field && cj_value)
     {
-        // CJSON_TRACE("cj_value (edit)", cj_value);
         TRACE_I("type: %s", EZPI_core_scenes_get_scene_value_type_name(field->value_type));
         switch (cj_value->type)
         {
@@ -542,7 +541,10 @@ void EZPI_scenes_populate_fields_get_value(l_fields_v2_t *field, cJSON *cj_value
             if (EZLOPI_VALUE_TYPE_BLOCK == field->value_type)
             {
                 field->field_value.e_type = VALUE_TYPE_BLOCK;
+
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                 CJSON_TRACE("single_obj_value", cj_value);
+#endif
 
                 field->field_value.u_value.when_block = (l_when_block_v2_t *)ezlopi_malloc(__FUNCTION__, sizeof(l_when_block_v2_t));
                 if (field->field_value.u_value.when_block)
@@ -555,7 +557,10 @@ void EZPI_scenes_populate_fields_get_value(l_fields_v2_t *field, cJSON *cj_value
             {
                 field->field_value.e_type = VALUE_TYPE_CJSON;
                 field->field_value.u_value.cj_value = cJSON_Duplicate(__FUNCTION__, cj_value, true);
+
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                 CJSON_TRACE("value", field->field_value.u_value.cj_value);
+#endif
             }
             break;
         }
@@ -580,7 +585,6 @@ void EZPI_scenes_populate_fields_get_value(l_fields_v2_t *field, cJSON *cj_value
             case EZLOPI_VALUE_TYPE_BLOCKS: // there are more than one-blocks [since 'cJSON_Array' ]
             {
                 field->field_value.e_type = VALUE_TYPE_BLOCK;
-                // CJSON_TRACE("blocks_value (edit)", cj_value);
                 l_when_block_v2_t *curr_when_block = NULL;
 
                 cJSON_ArrayForEach(cj_block, cj_value)
@@ -635,15 +639,12 @@ void EZPI_scenes_populate_assign_field(l_fields_v2_t *new_field, cJSON *cj_field
     }
 }
 
-
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 
 #endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
-
-
+ *                          End of File
+ *******************************************************************************/

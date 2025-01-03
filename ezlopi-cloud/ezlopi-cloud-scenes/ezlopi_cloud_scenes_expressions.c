@@ -99,7 +99,9 @@ void EZPI_scenes_expressions_list(cJSON *cj_request, cJSON *cj_response)
         cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
         if (cj_params)
         {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
             // CJSON_TRACE("exp-params", cj_params);
+#endif
 
             cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
             if (cj_result)
@@ -123,7 +125,9 @@ void EZPI_scenes_expressions_set(cJSON *cj_request, cJSON *cj_response)
         cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
         if (cj_params)
         {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
             // CJSON_TRACE("expressions params", cj_params);
+#endif
             cJSON *cj_name = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_name_str);
             if (cj_name && cj_name->valuestring)
             {

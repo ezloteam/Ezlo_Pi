@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    device_0003_digitalOut_plug.c
-* @brief   perform some function on device_0003
-* @author  xx
-* @version 0.1
-* @date    xx
-*/
+ * @file    device_0003_digitalOut_plug.c
+ * @brief   perform some function on device_0003
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include "../../build/config/sdkconfig.h"
 
 #include "ezlopi_core_cloud.h"
@@ -56,20 +56,20 @@
 #include "device_0003_digitalOut_plug.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static ezlopi_error_t __prepare(void *arg);
 static ezlopi_error_t __init(l_ezlopi_item_t *item);
 static ezlopi_error_t __set_value(l_ezlopi_item_t *item, void *arg);
@@ -81,16 +81,16 @@ static void __write_gpio_value(l_ezlopi_item_t *item);
 static void __set_gpio_value(l_ezlopi_item_t *item, int value);
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 ezlopi_error_t DEVICE_0003_digitalOut_plug(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t error = 0;
@@ -129,8 +129,8 @@ ezlopi_error_t DEVICE_0003_digitalOut_plug(e_ezlopi_actions_t action, l_ezlopi_i
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 
 static void __setup_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cjson_device)
 {
@@ -303,7 +303,9 @@ static ezlopi_error_t __set_value(l_ezlopi_item_t *item, void *arg)
 
         if (NULL != cjson_params)
         {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
             CJSON_TRACE("cjson_params", cjson_params);
+#endif
 
             int value = 0;
             cJSON *cj_value = cJSON_GetObjectItem(__FUNCTION__, cjson_params, ezlopi_value_str);
@@ -393,7 +395,6 @@ static void __toggle_gpio(l_ezlopi_item_t *item)
     item->interface.gpio.gpio_out.value = write_value;
 }
 
-
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

@@ -167,7 +167,7 @@ void EZPI_print_factory_info_v3(void)
     const char *device_type = EZPI_core_factory_info_v3_get_device_type();
     char *ca_certificate = EZPI_core_factory_info_v3_get_ca_certificate();
     char *ssl_private_key = EZPI_core_factory_info_v3_get_ssl_private_key();
-    char *ssl_shared_key = EZPI_core_factory_info_v3_get_ssl_shared_key();
+    char *ssl_shared_key = EZPI_core_factory_info_v3_get_ssl_shared_key(); 
     // char *local_key = EZPI_core_factory_info_v3_get_local_key();
     // char* ezlopi_config = EZPI_core_factory_info_v3_get_ezlopi_config();
 

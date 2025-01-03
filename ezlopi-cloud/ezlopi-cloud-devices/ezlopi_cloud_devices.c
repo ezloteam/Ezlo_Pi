@@ -404,7 +404,9 @@ void EZPI_device_group_update(cJSON *cj_request, cJSON *cj_response)
                 cJSON *cj_devgrp_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_id_str); // "id"
                 if (cj_devgrp_id && cj_devgrp_id->valuestring)
                 {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                     // CJSON_TRACE("dev-grp [new] : ", cj_devgrp_id);
+#endif
                     uint32_t req_devgrp_id = strtoul(cj_devgrp_id->valuestring, NULL, 16);
 
                     // edit in nvs and populate again
@@ -698,7 +700,9 @@ void EZPI_item_group_update(cJSON *cj_request, cJSON *cj_response)
                 cJSON *cj_itemgrp_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_id_str);
                 if (cj_itemgrp_id && cj_itemgrp_id->valuestring)
                 {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                     // CJSON_TRACE("dev-grp [new] : ", cj_itemgrp_id);
+#endif
                     uint32_t req_devgrp_id = strtoul(cj_itemgrp_id->valuestring, NULL, 16);
 
                     // edit in nvs and populate again

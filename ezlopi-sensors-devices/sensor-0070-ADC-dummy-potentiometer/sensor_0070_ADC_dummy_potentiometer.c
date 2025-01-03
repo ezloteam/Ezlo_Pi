@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    sensor_0070_ADC_dummy_potentiometer.c
-* @brief   perform some function on sensor_0070
-* @author  xx
-* @version 0.1
-* @date    xx
-*/
+ * @file    sensor_0070_ADC_dummy_potentiometer.c
+ * @brief   perform some function on sensor_0070
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 
 #include <math.h>
 
@@ -55,24 +55,24 @@
 #include "sensor_0070_ADC_dummy_potentiometer.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 typedef struct s_dummy_potentiometer
 {
     float pot_val; // 0-100%
 } s_dummy_potentiometer_t;
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static ezlopi_error_t __0070_prepare(void *arg);
 static ezlopi_error_t __0070_init(l_ezlopi_item_t *item);
 static ezlopi_error_t __0070_set_value(l_ezlopi_item_t *item, void *arg);
@@ -81,16 +81,16 @@ static ezlopi_error_t __0070_notify(l_ezlopi_item_t *item);
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
 static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_data);
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 ezlopi_error_t SENSOR_0070_adc_dummy_potentiometer(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
@@ -131,8 +131,8 @@ ezlopi_error_t SENSOR_0070_adc_dummy_potentiometer(e_ezlopi_actions_t action, l_
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     device->cloud_properties.category = category_level_sensor;
@@ -224,7 +224,9 @@ static ezlopi_error_t __0070_set_value(l_ezlopi_item_t *item, void *arg)
             s_dummy_potentiometer_t *user_data = (s_dummy_potentiometer_t *)item->user_arg;
             if (user_data)
             {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                 CJSON_TRACE("cjson_params  [dummy_potentiometer]:", cjson_params);
+#endif
 
                 float value_double = 0;
                 bool update_flag = false;
@@ -299,7 +301,7 @@ static ezlopi_error_t __0070_get_cjson_value(l_ezlopi_item_t *item, void *arg)
 }
 static ezlopi_error_t __0070_notify(l_ezlopi_item_t *item)
 {
-    static uint8_t timing = 10;// 5sec
+    static uint8_t timing = 10; // 5sec
     ezlopi_error_t ret = EZPI_FAILED;
     if (item && (0 == timing--))
     {
@@ -307,7 +309,7 @@ static ezlopi_error_t __0070_notify(l_ezlopi_item_t *item)
         s_dummy_potentiometer_t *user_data = (s_dummy_potentiometer_t *)item->user_arg;
         if (user_data)
         {
-            s_ezlopi_analog_data_t adc_data = { .value = 0, .voltage = 0 };
+            s_ezlopi_analog_data_t adc_data = {.value = 0, .voltage = 0};
             EZPI_hal_adc_get_adc_data(item->interface.adc.gpio_num, &adc_data);
             float new_pot = (((float)(4095.0f - (adc_data.value)) / 4095.0f) * 100);
 
@@ -323,5 +325,5 @@ static ezlopi_error_t __0070_notify(l_ezlopi_item_t *item)
 }
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

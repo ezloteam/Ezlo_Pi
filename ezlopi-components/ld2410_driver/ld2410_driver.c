@@ -14,6 +14,8 @@
 #include "ld2410_driver.h"
 #include "ezlopi_hal_uart.h"
 
+#warning "NABIN: Clean up required in this file!"
+
 s_ezlopi_uart_object_handle_t ezlo_ld2410_uart_handle = NULL;
 
 uint8_t firmware_major_version = 0;	  // Reported major version

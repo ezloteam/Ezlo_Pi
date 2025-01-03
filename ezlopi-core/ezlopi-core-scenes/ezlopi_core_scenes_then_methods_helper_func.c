@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    ezlopi_core_scenes_then_methods_helper_func.c
-* @brief   These are sub-functions utilized in file 'ezlopi_core_scenes_then_methods.c'
-* @author  xx
-* @version 0.1
-* @date    12th DEC 2024
-*/
+ * @file    ezlopi_core_scenes_then_methods_helper_func.c
+ * @brief   These are sub-functions utilized in file 'ezlopi_core_scenes_then_methods.c'
+ * @author  xx
+ * @version 0.1
+ * @date    12th DEC 2024
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
@@ -61,16 +61,16 @@
 #include "EZLOPI_USER_CONFIG.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 #define STR_SIZE(str) ((NULL != str) ? (strlen(str)) : 0)
 
 /**
@@ -85,23 +85,23 @@
         }                                   \
     }
 
- /*******************************************************************************
+/*******************************************************************************
  *                          Static Function Prototypes
  *******************************************************************************/
 static int __ezlopi_core_scenes_then_sendhttp_relloc_header(s_ezlopi_core_http_mbedtls_t *tmp_http_data, int append_size, const char *append_str);
 static int __ezlopi_core_scenes_then_create_fresh_header(s_ezlopi_core_http_mbedtls_t *tmp_http_data);
 static void __ezlopi_core_scenes_then_append_to_header(s_ezlopi_core_http_mbedtls_t *tmp_http_data, const char *str1, const char *str2);
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 //------------------------------- EZPI_core_scene_then_sendhttp_request -----------------------------------------------
 void EZPI_parse_http_request_type(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fields_v2_t *curr_field)
 {
@@ -154,8 +154,8 @@ void EZPI_parse_http_url(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fields_v
             // tests[7] = "https://www.testhttp.com";
             int succ_parsing = 0; // Whether the parsing has been
             int port = 80;        // Port field of the HTTP uri if found
-            char host[100] = { 0 }; // IP field of the HTTP uri
-            char page[200] = { 0 }; // Page field of the uri if found
+            char host[100] = {0}; // IP field of the HTTP uri
+            char page[200] = {0}; // Page field of the uri if found
             if (sscanf(field_value_string, "http://%99[^:]:%i/%199[^\n]", host, &port, page) == 3)
             {
                 succ_parsing = 1;
@@ -540,7 +540,9 @@ int EZPI_core_scenes_then_helper_toggleValue(uint32_t item_id, const char *item_
             {
                 if (curr_item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, curr_item, (void *)cj_tmp_value, NULL))
                 {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                     CJSON_TRACE("present_bool_gpio_value", cj_tmp_value); /*value formatted & value only*/
+#endif
 
                     cJSON *cj_val = cJSON_GetObjectItem(__FUNCTION__, cj_tmp_value, ezlopi_value_str);
                     if (cj_val)
@@ -597,8 +599,8 @@ int EZPI_core_scenes_then_helper_toggleValue(uint32_t item_id, const char *item_
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 /**
  * @brief This funtion is called, only to reallocate a '*header' of custom_structure 's_ezlopi_core_http_mbedtls_t'
  *
@@ -736,11 +738,5 @@ static void __ezlopi_core_scenes_then_append_to_header(s_ezlopi_core_http_mbedtl
 #endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
-
-
-
-
-
-
+ *                          End of File
+ *******************************************************************************/

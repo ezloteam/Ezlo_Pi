@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    ezlopi_core_scenes_when_methods_helper_functions.c
-* @brief   Functions that operates on scene-when-methods
-* @author  xx
-* @version 0.1
-* @date    12th DEC 2024
-*/
+ * @file    ezlopi_core_scenes_when_methods_helper_functions.c
+ * @brief   Functions that operates on scene-when-methods
+ * @author  xx
+ * @version 0.1
+ * @date    12th DEC 2024
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
@@ -57,16 +57,16 @@
 #include "EZLOPI_USER_CONFIG.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 typedef enum e_issunstate_offset
 {
     ISSUNSTATE_INTIME_MODE = 0,
@@ -84,8 +84,8 @@ typedef struct s_sunstate_data
 } s_sunstate_data_t;
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static int __compare_item_values(l_ezlopi_item_t *curr_item, l_fields_v2_t *value_field);
 static uint8_t __isdate_check_endweek_conditon(e_isdate_modes_t mode_type, struct tm *info);
 static uint8_t __isdate_find_nth_week_curr_month(struct tm *info);
@@ -97,16 +97,16 @@ static void __replace_old_with_new_data_val(s_item_exp_data_t *new_extract_data,
 static int ____old_vs_new_extract_data(s_item_exp_data_t *new_extract_data, s_item_exp_data_t *prev_extract_data);
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 int ISITEM_state_single_condition(uint32_t item_id, l_fields_v2_t *value_field)
 {
     int ret = 0;
@@ -190,7 +190,7 @@ uint8_t ISDATE_tm_check(e_isdate_modes_t *mode_type, struct tm *info, l_fields_v
     if (cj_time_arr && (cJSON_Array == cj_time_arr->type))
     {
         ret |= (1 << 4);
-        char field_hr_mm[10] = { 0 };
+        char field_hr_mm[10] = {0};
         strftime(field_hr_mm, 10, "%H:%M", info);
         field_hr_mm[9] = '\0';
         // TRACE_S("[field_hr_mm: %s]", field_hr_mm);
@@ -298,8 +298,8 @@ uint8_t ISDATE_year_weeks_check(e_isdate_modes_t *mode_type, struct tm *info, l_
                 }
                 else // for case :- 'n'
                 {
-                    char field_weeks[10] = { 0 }; // week_value extracted from ESP32.
-                    char week_val[10] = { 0 };    // week_value given to us from cloud.
+                    char field_weeks[10] = {0}; // week_value extracted from ESP32.
+                    char week_val[10] = {0};    // week_value given to us from cloud.
 
                     // reducing array values by -1, for easier comparison ::==>  [1_54]--->[0_53]      or      [1_6]-->[0_5]
                     snprintf(week_val, 10, "%d", (int)(array_item->valuedouble - 1));
@@ -354,7 +354,7 @@ int ISDATE_check_flag_result(e_isdate_modes_t mode_type, uint8_t flag_check)
     case ISDATE_WEEKLY_MODE:
     {
         if ((((flag_check & MASK_FOR_TIME_ARG) && (flag_check & TIME_FLAG)) &&
-            ((flag_check & MASK_FOR_WEEKDAYS_ARG) && (flag_check & WEEKDAYS_FLAG))))
+             ((flag_check & MASK_FOR_WEEKDAYS_ARG) && (flag_check & WEEKDAYS_FLAG))))
         {
             // TRACE_W("here! week_days and time");
             ret = 1;
@@ -364,7 +364,7 @@ int ISDATE_check_flag_result(e_isdate_modes_t mode_type, uint8_t flag_check)
     case ISDATE_MONTHLY_MODE:
     {
         if ((((flag_check & MASK_FOR_TIME_ARG) && (flag_check & TIME_FLAG)) &&
-            ((flag_check & MASK_FOR_DAYS_ARG) && (flag_check & DAYS_FLAG))))
+             ((flag_check & MASK_FOR_DAYS_ARG) && (flag_check & DAYS_FLAG))))
         {
             // TRACE_W("here! month_days and time");
             ret = 1;
@@ -395,7 +395,7 @@ uint8_t ISONCE_tm_check(l_fields_v2_t *curr_field, struct tm *info)
     uint8_t flag_check = 0;
     if ((EZLOPI_VALUE_TYPE_24_HOURS_TIME == curr_field->value_type) && (NULL != curr_field->field_value.u_value.value_string))
     {
-        char field_hr_mm[10] = { 0 };
+        char field_hr_mm[10] = {0};
         strftime(field_hr_mm, 10, "%H:%M", info);
         field_hr_mm[9] = '\0';
 
@@ -492,12 +492,12 @@ uint8_t ISSUNSTATE_get_suntime(l_scenes_list_v2_t *scene_node, l_fields_v2_t *cu
             TRACE_S("curr_day = [%d] ; [%dth]", info->tm_mday, user_data->curr_tm_day);
             char *tmp_str = curr_field->field_value.u_value.value_string;
             size_t tmp_str_len = strlen(tmp_str);
-            user_data->sunstate_mode = curr_sunstate_mode;          // this sets target sunstate for curr meshbot
+            user_data->sunstate_mode = curr_sunstate_mode;            // this sets target sunstate for curr meshbot
             __issunsate_update_sunstate_tm(info->tm_mday, user_data); // assign 'curr_day' & 'suntime' only
-            user_data->tmoffs_type = (EZPI_STRNCMP_IF_EQUAL(tmp_str, ezlopi_intime_str, tmp_str_len, 7)) ? ISSUNSTATE_INTIME_MODE
-                : (EZPI_STRNCMP_IF_EQUAL(tmp_str, ezlopi_before_str, tmp_str_len, 7)) ? ISSUNSTATE_BEFORE_MODE
-                : (EZPI_STRNCMP_IF_EQUAL(tmp_str, ezlopi_after_str, tmp_str_len, 6)) ? ISSUNSTATE_AFTER_MODE
-                : ISSUNSTATE_UNDEFINED;
+            user_data->tmoffs_type = (EZPI_STRNCMP_IF_EQUAL(tmp_str, ezlopi_intime_str, tmp_str_len, 7))   ? ISSUNSTATE_INTIME_MODE
+                                     : (EZPI_STRNCMP_IF_EQUAL(tmp_str, ezlopi_before_str, tmp_str_len, 7)) ? ISSUNSTATE_BEFORE_MODE
+                                     : (EZPI_STRNCMP_IF_EQUAL(tmp_str, ezlopi_after_str, tmp_str_len, 6))  ? ISSUNSTATE_AFTER_MODE
+                                                                                                           : ISSUNSTATE_UNDEFINED;
             // 3. check if, curr_tm_day has been updated successfully
             if ((0 == user_data->curr_tm_day) ||
                 (0 == user_data->sunstate_mode) ||
@@ -527,14 +527,14 @@ uint8_t ISSUNSTATE_get_offs_tmval(l_scenes_list_v2_t *scene_node, l_fields_v2_t 
                 TRACE_D(".... Adding offset:  +/- (hh:mm:ss) ....");
                 __issunstate_add_offs(user_data->tmoffs_type, &(user_data->choosen_suntime), &(user_data->defined_moment), curr_field->field_value.u_value.value_string);
                 TRACE_S("\r\nSunMode[%d]{sunrise=1,sunset=2,0=NULL},\r\nChoosen_suntime(hh:mm:ss = %d:%d:%d),\r\ndefined_moment(hh:mm:ss = %d:%d:%d),\r\nOffset(%s)\r\n",
-                    user_data->sunstate_mode,
-                    user_data->choosen_suntime.tm_hour,
-                    user_data->choosen_suntime.tm_min,
-                    user_data->choosen_suntime.tm_sec,
-                    user_data->defined_moment.tm_hour,
-                    user_data->defined_moment.tm_min,
-                    user_data->defined_moment.tm_sec,
-                    curr_field->field_value.u_value.value_string);
+                        user_data->sunstate_mode,
+                        user_data->choosen_suntime.tm_hour,
+                        user_data->choosen_suntime.tm_min,
+                        user_data->choosen_suntime.tm_sec,
+                        user_data->defined_moment.tm_hour,
+                        user_data->defined_moment.tm_min,
+                        user_data->defined_moment.tm_sec,
+                        curr_field->field_value.u_value.value_string);
             }
         }
     }
@@ -598,8 +598,8 @@ uint8_t ISSUNSTATE_check_mdrn(uint8_t sunstate_mode, const char *range_type, str
                 ret = (1 << 3);
             }
             else if (((info->tm_hour < 24) && (info->tm_hour == defined_moment->tm_hour)) &&
-                ((info->tm_min < 60) && (info->tm_min >= defined_moment->tm_min)) &&
-                ((info->tm_sec < 60) && (info->tm_sec > defined_moment->tm_sec)))
+                     ((info->tm_min < 60) && (info->tm_min >= defined_moment->tm_min)) &&
+                     ((info->tm_sec < 60) && (info->tm_sec > defined_moment->tm_sec)))
             {
                 ret = (1 << 3);
             }
@@ -611,8 +611,8 @@ uint8_t ISSUNSTATE_check_mdrn(uint8_t sunstate_mode, const char *range_type, str
                 ret = (1 << 3);
             }
             else if (((info->tm_hour >= 0) && (info->tm_hour == defined_moment->tm_hour)) &&
-                ((info->tm_min >= 0) && (info->tm_min <= defined_moment->tm_min)) &&
-                ((info->tm_sec >= 0) && (info->tm_sec <= defined_moment->tm_sec)))
+                     ((info->tm_min >= 0) && (info->tm_min <= defined_moment->tm_min)) &&
+                     ((info->tm_sec >= 0) && (info->tm_sec <= defined_moment->tm_sec)))
             {
                 ret = (1 << 3);
             }
@@ -1094,9 +1094,9 @@ int WHEN_function_for_pulse(l_scenes_list_v2_t *scene_node, l_when_block_v2_t *w
             }
 
             TRACE_W("trigger_state= %s , {seq_count: %d}.-----> return =>> [pulse_state = %s]",
-                (function_state_info->activate_pulse_seq) ? ezlopi_true_str : ezlopi_false_str,
-                function_state_info->transition_count,
-                (function_state_info->current_state) ? "high" : "low");
+                    (function_state_info->activate_pulse_seq) ? ezlopi_true_str : ezlopi_false_str,
+                    function_state_info->transition_count,
+                    (function_state_info->current_state) ? "high" : "low");
             ret = function_state_info->current_state;
         }
     }
@@ -1265,16 +1265,20 @@ int IS_deviceitem_group_value_check(l_scenes_list_v2_t *scene_node, uint32_t dev
                                                                 break;
                                                             }
                                                         }
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                                                         else
                                                         {
                                                             TRACE_E("The old-value-type and new-value-type doesnot match");
                                                         }
+#endif
                                                     }
+
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                                                     else
                                                     {
-                                                        // CJSON_TRACE("cj_device_items_data", cj_device_items_data);
                                                         TRACE_E(" [%s] doesnot exist", cj_item_names->valuestring);
                                                     }
+#endif
                                                 }
                                             }
                                             cJSON_Delete(__FUNCTION__, cj_tmp_value);
@@ -1294,7 +1298,9 @@ int IS_deviceitem_group_value_check(l_scenes_list_v2_t *scene_node, uint32_t dev
         // store into user_arg 'save_flag == 1'
         if ((NULL == scene_node->when_block->fields->user_arg) && cj_device_items_data && (true == save_flag))
         {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
             CJSON_TRACE("first_device_item_data", cj_device_items_data);
+#endif
             scene_node->when_block->fields->user_arg = (void *)cj_device_items_data;
             ret = 1;
         }
@@ -1351,7 +1357,7 @@ int IS_itemstate_changed(s_item_exp_data_t *new_extract_data, l_fields_v2_t *sta
             }
             case (BIT2 | BIT1 | BIT0): // all condition matched and activated  ---> check if state have changed --> if changed , reset activation flag
             {
-                #warning "need to optimize these switch-case";
+#warning "need to optimize these switch-case";
                 // comparing 'start'
                 if (NULL != start_field)
                 {
@@ -1455,8 +1461,8 @@ int IS_itemstate_changed(s_item_exp_data_t *new_extract_data, l_fields_v2_t *sta
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 static int __compare_item_values(l_ezlopi_item_t *curr_item, l_fields_v2_t *value_field)
 {
     int ret = 0;
@@ -1646,7 +1652,7 @@ static void __issunsate_update_sunstate_tm(int tm_mday, s_sunstate_data_t *user_
 {
     if (tm_mday && user_data)
     {
-        char tmp_url[100] = { 0 };
+        char tmp_url[100] = {0};
         char tmp_headers[] = "Host: api.sunrisesunset.io\r\nAccept: */*\r\nConnection: keep-alive\r\n";
         char tmp_web_server[] = "api.sunrisesunset.io";
         char *lat_long_vals = EZPI_core_nvs_read_latidtude_longitude();
@@ -1698,7 +1704,7 @@ static void __issunstate_add_offs(e_issunstate_offset_t tmoffs_type, struct tm *
     if (choosen_suntime && defined_moment && tm_offs_val) // choosen_suntime => sunrise or sunset
     {
         // Default values to store start and end boundries
-        struct tm tmp_time = { 0 };
+        struct tm tmp_time = {0};
 
         // Nox, extract & add :'tm_offs_val'
         char time_diff[10];
@@ -1867,9 +1873,9 @@ static uint8_t __isitemState_vs_field_compare(s_item_exp_data_t *new_extract_dat
                     if (tmp_expr->exp_value.u_value.str_value && new_extract_data->sample_data.u_value.value_string)
                     {
                         if (EZPI_STRNCMP_IF_EQUAL(tmp_expr->exp_value.u_value.str_value,
-                            new_extract_data->sample_data.u_value.value_string,
-                            strlen(tmp_expr->exp_value.u_value.str_value),
-                            strlen(new_extract_data->sample_data.u_value.value_string)))
+                                                  new_extract_data->sample_data.u_value.value_string,
+                                                  strlen(tmp_expr->exp_value.u_value.str_value),
+                                                  strlen(new_extract_data->sample_data.u_value.value_string)))
                         {
                             flag |= (1 << bit_mode_position);
                         }
@@ -1898,9 +1904,9 @@ static uint8_t __isitemState_vs_field_compare(s_item_exp_data_t *new_extract_dat
             if (tmp_field->field_value.u_value.value_string && new_extract_data->sample_data.u_value.value_string)
             {
                 if (EZPI_STRNCMP_IF_EQUAL(tmp_field->field_value.u_value.value_string,
-                    new_extract_data->sample_data.u_value.value_string,
-                    strlen(tmp_field->field_value.u_value.value_string),
-                    strlen(new_extract_data->sample_data.u_value.value_string)))
+                                          new_extract_data->sample_data.u_value.value_string,
+                                          strlen(tmp_field->field_value.u_value.value_string),
+                                          strlen(new_extract_data->sample_data.u_value.value_string)))
                 {
                     flag |= (1 << bit_mode_position);
                 }
@@ -1992,10 +1998,10 @@ static int ____old_vs_new_extract_data(s_item_exp_data_t *new_extract_data, s_it
         if (new_extract_data->sample_data.u_value.value_string && prev_extract_data->sample_data.u_value.value_string)
         {
             if (EZPI_STRNCMP_IF_EQUAL(
-                new_extract_data->sample_data.u_value.value_string,
-                prev_extract_data->sample_data.u_value.value_string,
-                strlen(new_extract_data->sample_data.u_value.value_string),
-                strlen(prev_extract_data->sample_data.u_value.value_string)))
+                    new_extract_data->sample_data.u_value.value_string,
+                    prev_extract_data->sample_data.u_value.value_string,
+                    strlen(new_extract_data->sample_data.u_value.value_string),
+                    strlen(prev_extract_data->sample_data.u_value.value_string)))
             {
                 ret = 1;
             }
@@ -2012,6 +2018,5 @@ static int ____old_vs_new_extract_data(s_item_exp_data_t *new_extract_data, s_it
 //-----------------------------------------------------------------------------------------------------
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
-
+ *                          End of File
+ *******************************************************************************/

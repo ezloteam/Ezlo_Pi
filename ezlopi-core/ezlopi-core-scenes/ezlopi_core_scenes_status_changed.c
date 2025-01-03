@@ -127,7 +127,9 @@ int EZPI_core_scenes_status_change_broadcast(l_scenes_list_v2_t *scene_node, con
                 cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_room_name_str, ezlopi__str);
             }
 
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
             CJSON_TRACE("----------------- broadcasting - cj_response", cj_response);
+#endif
 
             ret = EZPI_core_broadcast_add_to_queue(cj_response, time_stamp);
 

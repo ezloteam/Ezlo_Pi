@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    ezlopi_core_scenes_print.c
-* @brief   These function print scene information
-* @author  xx
-* @version 0.1
-* @date    12th DEC 2024
-*/
+ * @file    ezlopi_core_scenes_print.c
+ * @brief   These function print scene information
+ * @author  xx
+ * @version 0.1
+ * @date    12th DEC 2024
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
@@ -55,32 +55,32 @@
 #include "ezlopi_cloud_constants.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 void EZPI_print_block_options(s_block_options_v2_t *block_options, l_fields_v2_t *fields, const char *tab)
 {
 #if (1 == ENABLE_TRACE)
@@ -97,20 +97,17 @@ void EZPI_print_block_options(s_block_options_v2_t *block_options, l_fields_v2_t
 
     if (0 == strncmp(ezlopi_function_str, block_options->method.name, 9) && (NULL != block_options->cj_function))
     {
+        TRACE_D("%s\t\t\t|-- function", (NULL != tab ? tab : ""));
+        const char *name = "\t\t\t\t|--";
+        char *obj_str = cJSON_Print(__FUNCTION__, block_options->cj_function);
+        if (obj_str)
         {
-            // CJSON_TRACE("\t\t\t\t|-- ", block_options->cj_funct ion);
-            TRACE_D("%s\t\t\t|-- function", (NULL != tab ? tab : ""));
-            const char *name = "\t\t\t\t|--";
-            char *obj_str = cJSON_Print(__FUNCTION__, block_options->cj_function);
-            if (obj_str)
-            {
-                TRACE_D("%s%s[%d]: %s", (NULL != tab ? tab : ""), (name ? name : ezlopi__str), strlen(obj_str), obj_str);
-                ezlopi_free(__FUNCTION__, obj_str);
-            }
-            else
-            {
-                TRACE_E("%s\t\t|--%s: Null", (NULL != tab ? tab : ""), (name ? name : ""));
-            }
+            TRACE_D("%s%s[%d]: %s", (NULL != tab ? tab : ""), (name ? name : ezlopi__str), strlen(obj_str), obj_str);
+            ezlopi_free(__FUNCTION__, obj_str);
+        }
+        else
+        {
+            TRACE_E("%s\t\t|--%s: Null", (NULL != tab ? tab : ""), (name ? name : ""));
         }
     }
 
@@ -238,20 +235,18 @@ void EZPI_print_fields(l_fields_v2_t *fields, const char *tab)
         case EZLOPI_VALUE_TYPE_RGB:
         case EZLOPI_VALUE_TYPE_OBJECT:
         {
+            const char *name = "\t\t\t|-- value";
+            char *obj_str = cJSON_Print(__FUNCTION__, fields->field_value.u_value.cj_value);
+            if (obj_str)
             {
-                // CJSON_TRACE("\t\t\t|-- value", fields->field_value.u_value.cj_value);
-                const char *name = "\t\t\t|-- value";
-                char *obj_str = cJSON_Print(__FUNCTION__, fields->field_value.u_value.cj_value);
-                if (obj_str)
-                {
-                    TRACE_D("%s%s[%d]: %s", (NULL != tab ? tab : ""), (name ? name : ezlopi__str), strlen(obj_str), obj_str);
-                    ezlopi_free(__FUNCTION__, obj_str);
-                }
-                else
-                {
-                    TRACE_E("%s\t\t|--%s: Null", (NULL != tab ? tab : ""), (name ? name : ""));
-                }
+                TRACE_D("%s%s[%d]: %s", (NULL != tab ? tab : ""), (name ? name : ezlopi__str), strlen(obj_str), obj_str);
+                ezlopi_free(__FUNCTION__, obj_str);
             }
+            else
+            {
+                TRACE_E("%s\t\t|--%s: Null", (NULL != tab ? tab : ""), (name ? name : ""));
+            }
+
             break;
         }
         case EZLOPI_VALUE_TYPE_ENUM:
@@ -263,19 +258,16 @@ void EZPI_print_fields(l_fields_v2_t *fields, const char *tab)
             }
             else if (VALUE_TYPE_CJSON == fields->field_value.e_type)
             {
+                const char *name = "\t\t\t|-- value";
+                char *obj_str = cJSON_Print(__FUNCTION__, fields->field_value.u_value.cj_value);
+                if (obj_str)
                 {
-                    // CJSON_TRACE("\t\t\t|-- value", fields->field_value.u_value.cj_value);
-                    const char *name = "\t\t\t|-- value";
-                    char *obj_str = cJSON_Print(__FUNCTION__, fields->field_value.u_value.cj_value);
-                    if (obj_str)
-                    {
-                        TRACE_D("%s%s[%d]: %s", (NULL != tab ? tab : ""), (name ? name : ezlopi__str), strlen(obj_str), obj_str);
-                        ezlopi_free(__FUNCTION__, obj_str);
-                    }
-                    else
-                    {
-                        TRACE_E("%s\t\t|--%s: Null", (NULL != tab ? tab : ""), (name ? name : ""));
-                    }
+                    TRACE_D("%s%s[%d]: %s", (NULL != tab ? tab : ""), (name ? name : ezlopi__str), strlen(obj_str), obj_str);
+                    ezlopi_free(__FUNCTION__, obj_str);
+                }
+                else
+                {
+                    TRACE_E("%s\t\t|--%s: Null", (NULL != tab ? tab : ""), (name ? name : ""));
                 }
             }
             else
@@ -431,14 +423,11 @@ void EZPI_scenes_print(l_scenes_list_v2_t *scene_link_list)
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 
 #endif // ENABLE_SCENES_PRINT
 #endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
-
-
-
+ *                          End of File
+ *******************************************************************************/

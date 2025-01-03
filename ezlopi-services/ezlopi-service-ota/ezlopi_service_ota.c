@@ -125,7 +125,6 @@ static void ota_service_process(void *pv)
             // uint32_t message_counter = EZPI_service_web_provisioning_get_message_count();
             cJSON *cj_firmware_info_request = EZPI_firmware_send_firmware_query_to_nma_server(esp_random());
 
-            // CJSON_TRACE("----------------- broadcasting - cj_firmware_info_request", cj_firmware_info_request);
 
             if (0 == EZPI_core_broadcast_add_to_queue(cj_firmware_info_request))
             {

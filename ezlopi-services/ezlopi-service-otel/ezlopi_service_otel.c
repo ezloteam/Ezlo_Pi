@@ -855,11 +855,6 @@ static void __free_telemetry_queue_data(s_otel_queue_data_t *otel_data)
         {
             if (otel_data->otel.trace_data)
             {
-                printf("%s(%u): id = %s\r\n", __FILENAME__, __LINE__, otel_data->otel.trace_data->id ? otel_data->otel.trace_data->id : "NULL");
-                printf("%s(%u): error = %s\r\n", __FILENAME__, __LINE__, otel_data->otel.trace_data->error ? otel_data->otel.trace_data->error : "NULL");
-                printf("%s(%u): method = %s\r\n", __FILENAME__, __LINE__, otel_data->otel.trace_data->method ? otel_data->otel.trace_data->method : "NULL");
-                printf("%s(%u): msg-subclass = %s\r\n", __FILENAME__, __LINE__, otel_data->otel.trace_data->msg_subclass ? otel_data->otel.trace_data->msg_subclass : "NULL");
-
                 ezlopi_free(__FUNCTION__, otel_data->otel.trace_data->id);
                 ezlopi_free(__FUNCTION__, otel_data->otel.trace_data->error);
                 ezlopi_free(__FUNCTION__, otel_data->otel.trace_data->method);

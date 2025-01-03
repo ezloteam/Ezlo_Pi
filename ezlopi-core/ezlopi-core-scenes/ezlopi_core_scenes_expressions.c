@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    ezlopi_core_scenes_expressions.c
-* @brief   These function performs operation on scene-expression data
-* @author  xx
-* @version 0.1
-* @date    12th DEC 2024
-*/
+ * @file    ezlopi_core_scenes_expressions.c
+ * @brief   These function performs operation on scene-expression data
+ * @author  xx
+ * @version 0.1
+ * @date    12th DEC 2024
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
@@ -60,21 +60,21 @@
 #include "ezlopi_cloud_constants.h"
 #include "EZLOPI_USER_CONFIG.h"
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 void EZPI_scenes_expressions_populate_items(s_ezlopi_expressions_t *exp_node, cJSON *cj_items);
 void EZPI_scenes_expressions_populate_devitem_names(s_ezlopi_expressions_t *exp_node, cJSON *cj_device_item_names);
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static s_exp_device_item_names_t *__expressions_device_item_names_create(cJSON *cj_device_item_name);
 static s_ezlopi_expressions_t *__expressions_create_node(uint32_t exp_id, cJSON *cj_expression);
 static e_scene_value_type_v2_t *__parse_expression_type_filter(cJSON *cj_params);
@@ -92,17 +92,17 @@ static int __remove_exp_id_from_nvs_exp_list(uint32_t target_id);
 static int __evaluate_expression(cJSON *cj_des, cJSON *lua_prop_params, const char *exp_name, const char *exp_code);
 static int __edit_expression_ll(s_ezlopi_expressions_t *expn_node, cJSON *cj_new_expression);
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 static s_ezlopi_expressions_t *l_expressions_head = NULL;
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 s_ezlopi_expressions_t *EZPI_scenes_expressions_get_node_by_name(char *expression_name)
 {
     s_ezlopi_expressions_t *curr_expr = l_expressions_head;
@@ -146,8 +146,10 @@ cJSON *EZPI_scenes_expressions_get_cjson(s_ezlopi_expressions_t *exp_node)
                 cJSON_AddItemToObject(__FUNCTION__, ret_cj_exp, ezlopi_metadata_str, cJSON_Duplicate(__FUNCTION__, exp_node->meta_data, 1));
             }
 
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
             // TRACE_S("New_modified ; %s[%#x]", exp_node->name, exp_node->exp_id);
             // CJSON_TRACE("cj_exp_after_changes_in_ll", ret_cj_exp);
+#endif
         }
     }
     return ret_cj_exp;
@@ -337,7 +339,9 @@ ezlopi_error_t EZPI_scenes_expressions_update_expr(s_ezlopi_expressions_t *expre
             char id_str[32];
             snprintf(id_str, sizeof(id_str), "%08x", expression_node->exp_id);
 
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
             CJSON_TRACE("NEW_EXPN_stored", cj_new_expression);
+#endif
             ret = EZPI_scenes_expressions_update_nvs(id_str, cj_new_expression); // update in nvs
         }
     }
@@ -765,8 +769,8 @@ static void __remove_residue_expn_ids_from_list(void)
 #endif
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 static int __edit_expression_ll(s_ezlopi_expressions_t *expn_node, cJSON *cj_new_expression)
 {
     int ret = 0;
@@ -1117,7 +1121,7 @@ static int __evaluate_expression(cJSON *cj_des, cJSON *lua_prop_params, const ch
                                     while (item_prop)
                                     {
                                         if (EZPI_STRNCMP_IF_EQUAL(cj_item_name->valuestring, item_prop->cloud_properties.item_name, cj_item_name->str_value_len, strlen(item_prop->cloud_properties.item_name) + 1)) // "itemName" == "sound_level"
-                                        {                                                                                                                                                                        // create the sub-table
+                                        {                                                                                                                                                                            // create the sub-table
                                             ___create_lua_subtable(lua_state, item_prop, cj_target_name->valuestring);
                                             // total_key_count++;
                                             // TRACE_D(" [items_%d] : adding '%s'.", total_key_count, cj_target_name->valuestring);
@@ -1358,7 +1362,9 @@ static uint32_t __expression_store_to_nvs(uint32_t exp_id, cJSON *cj_expression)
                         exp_id_list_str = NULL;
                     }
 
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                     CJSON_TRACE("cj_esp-ids", cj_exp_id_list);
+#endif
 
                     if (cj_exp_id_list)
                     {
@@ -1530,7 +1536,9 @@ static int __remove_exp_id_from_nvs_exp_list(uint32_t target_id)
 
         if (cj_exp_ids)
         {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
             CJSON_TRACE("expression-ids", cj_exp_ids);
+#endif
 
             uint32_t idx = 0;
             cJSON *cj_exp_id = NULL;
@@ -1564,7 +1572,7 @@ static int __remove_exp_id_from_nvs_exp_list(uint32_t target_id)
 }
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/
 
 #endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
