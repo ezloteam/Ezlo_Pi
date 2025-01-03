@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    ezlopi_hal_adc.c
-* @brief   Function to operate on ADC
-* @author  xx
-* @version 0.1
-* @date    xx
-*/
+ * @file    ezlopi_hal_adc.c
+ * @brief   Function to operate on ADC
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include <string.h>
 #include <stdlib.h>
 
@@ -53,16 +53,16 @@
 #include "EZLOPI_USER_CONFIG.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 typedef struct s_ezlopi_analog_object
 {
     uint32_t vRef;
@@ -75,88 +75,92 @@ typedef struct s_ezlopi_analog_object
 } ezlopi_analog_object_handle_t;
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static void __check_eFuse_support(void);
 static int __get_adc_channel(uint8_t gpio_num);
 static void __fill_adc_characteristics(esp_adc_cal_characteristics_t *chars, adc_unit_t unit, adc_atten_t attenuation, adc_bits_width_t width, uint32_t vRef);
 
-
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 // object handle array to check if a channel is already configured.
-static ezlopi_analog_object_handle_t *ezlopi_analog_object_array[ADC1_CHANNEL_MAX] = { NULL };
+static ezlopi_analog_object_handle_t *ezlopi_analog_object_array[ADC1_CHANNEL_MAX] = {NULL};
 
 #if CONFIG_IDF_TARGET_ESP32
 static e_ezlopi_gpio_channel_t ezlopi_channel_to_gpio_map[ADC1_CHANNEL_MAX] = {
     EZLOPI_GPIO_CHANNEL_0, EZLOPI_GPIO_CHANNEL_1, EZLOPI_GPIO_CHANNEL_2, EZLOPI_GPIO_CHANNEL_3,
-    EZLOPI_GPIO_CHANNEL_4, EZLOPI_GPIO_CHANNEL_5, EZLOPI_GPIO_CHANNEL_6, EZLOPI_GPIO_CHANNEL_7
-};
+    EZLOPI_GPIO_CHANNEL_4, EZLOPI_GPIO_CHANNEL_5, EZLOPI_GPIO_CHANNEL_6, EZLOPI_GPIO_CHANNEL_7};
 #elif CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32S2
 static e_ezlopi_gpio_channel_t ezlopi_channel_to_gpio_map[ADC1_CHANNEL_MAX] = {
     EZLOPI_GPIO_CHANNEL_0, EZLOPI_GPIO_CHANNEL_1, EZLOPI_GPIO_CHANNEL_2, EZLOPI_GPIO_CHANNEL_3,
     EZLOPI_GPIO_CHANNEL_4, EZLOPI_GPIO_CHANNEL_5, EZLOPI_GPIO_CHANNEL_6, EZLOPI_GPIO_CHANNEL_7,
-    EZLOPI_GPIO_CHANNEL_8, EZLOPI_GPIO_CHANNEL_9
-};
+    EZLOPI_GPIO_CHANNEL_8, EZLOPI_GPIO_CHANNEL_9};
 #elif CONFIG_IDF_TARGET_ESP32C3
 static e_ezlopi_gpio_channel_t ezlopi_channel_to_gpio_map[ADC1_CHANNEL_MAX] = {
     EZLOPI_GPIO_CHANNEL_0, EZLOPI_GPIO_CHANNEL_1, EZLOPI_GPIO_CHANNEL_2, EZLOPI_GPIO_CHANNEL_3,
-    EZLOPI_GPIO_CHANNEL_4
-};
+    EZLOPI_GPIO_CHANNEL_4};
 #endif
 
+/*******************************************************************************
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
-
-/*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 
 ezlopi_error_t EZPI_hal_adc_init(uint8_t gpio_num, uint8_t width)
 {
-    ezlopi_analog_object_handle_t *ezlopi_analog_object_handle = (struct s_ezlopi_analog_object *)ezlopi_malloc(__FUNCTION__, sizeof(struct s_ezlopi_analog_object));
-    memset(ezlopi_analog_object_handle, 0, sizeof(struct s_ezlopi_analog_object));
     ezlopi_error_t ret = EZPI_ERR_HAL_INIT_FAILED;
-    int channel = EZPI_hal_adc_get_channel_number(gpio_num);
-    if (-1 == channel)
+
+    ezlopi_analog_object_handle_t *ezlopi_analog_object_handle = (struct s_ezlopi_analog_object *)ezlopi_malloc(__FUNCTION__, sizeof(struct s_ezlopi_analog_object));
+    if (NULL != ezlopi_analog_object_handle)
     {
-        TRACE_E("gpio_num %d is invalid for ADC.", gpio_num);
-    }
-    else if (ADC_WIDTH_MAX <= width)
-    {
-        TRACE_E("Invalid width(%d) for ADC; must be less than %d", width, ADC_WIDTH_MAX);
-    }
-    else if (NULL != ezlopi_analog_object_array[channel])
-    {
-        TRACE_E("Invalid gpio_num(%d) for ADC; it is already in use.", gpio_num);
-    }
-    else
-    {
-        ezlopi_analog_object_handle->adc_channel = channel;
-        ezlopi_analog_object_handle->unit = ADC_UNIT_1;
-        ezlopi_analog_object_handle->attenuation = ADC_ATTEN_11db;
+        memset(ezlopi_analog_object_handle, 0, sizeof(struct s_ezlopi_analog_object));
+
+        int channel = EZPI_hal_adc_get_channel_number(gpio_num);
+
+        if (-1 == channel)
+        {
+            TRACE_E("gpio_num %d is invalid for ADC.", gpio_num);
+            ezlopi_free(__FUNCTION__, ezlopi_analog_object_handle);
+        }
+        else if (ADC_WIDTH_MAX <= width)
+        {
+            TRACE_E("Invalid width(%d) for ADC; must be less than %d", width, ADC_WIDTH_MAX);
+            ezlopi_free(__FUNCTION__, ezlopi_analog_object_handle);
+        }
+        else if (NULL != ezlopi_analog_object_array[channel])
+        {
+            TRACE_E("Invalid gpio_num(%d) for ADC; it is already in use.", gpio_num);
+            ezlopi_free(__FUNCTION__, ezlopi_analog_object_handle);
+        }
+        else
+        {
+            ezlopi_analog_object_handle->adc_channel = channel;
+            ezlopi_analog_object_handle->unit = ADC_UNIT_1;
+            ezlopi_analog_object_handle->attenuation = ADC_ATTEN_11db;
 #if CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32S2
-        ezlopi_analog_object_handle->width = width;
+            ezlopi_analog_object_handle->width = width;
 #elif CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32C3
-        ezlopi_analog_object_handle->width = ADC_WIDTH_BIT_12;
+            ezlopi_analog_object_handle->width = ADC_WIDTH_BIT_12;
 #endif
-        ezlopi_analog_object_handle->vRef = 1100;
-        __fill_adc_characteristics(&ezlopi_analog_object_handle->adc_characteristics, ezlopi_analog_object_handle->unit,
-            ezlopi_analog_object_handle->attenuation, ezlopi_analog_object_handle->width, ezlopi_analog_object_handle->vRef);
-        TRACE_D("Checking for eFuse support.");
-        __check_eFuse_support();
+            ezlopi_analog_object_handle->vRef = 1100;
+            __fill_adc_characteristics(&ezlopi_analog_object_handle->adc_characteristics, ezlopi_analog_object_handle->unit,
+                                       ezlopi_analog_object_handle->attenuation, ezlopi_analog_object_handle->width, ezlopi_analog_object_handle->vRef);
+            TRACE_D("Checking for eFuse support.");
+            __check_eFuse_support();
 
-        TRACE_D("Configuring ADC.");
-        adc1_config_width(ezlopi_analog_object_handle->width);
-        adc1_config_channel_atten((adc1_channel_t)ezlopi_analog_object_handle->adc_channel, ezlopi_analog_object_handle->attenuation);
-        TRACE_D("ADC was configured successfully.");
+            TRACE_D("Configuring ADC.");
+            adc1_config_width(ezlopi_analog_object_handle->width);
+            adc1_config_channel_atten((adc1_channel_t)ezlopi_analog_object_handle->adc_channel, ezlopi_analog_object_handle->attenuation);
+            TRACE_D("ADC was configured successfully.");
 
-        ezlopi_analog_object_array[ezlopi_analog_object_handle->adc_channel] = ezlopi_analog_object_handle;
+            ezlopi_analog_object_array[ezlopi_analog_object_handle->adc_channel] = ezlopi_analog_object_handle;
 
-        ret = EZPI_SUCCESS;
+            ret = EZPI_SUCCESS;
+        }
     }
 
     return ret;
@@ -191,10 +195,9 @@ int EZPI_hal_adc_get_adc_data(uint8_t gpio_num, s_ezlopi_analog_data_t *ezlopi_a
     return channel;
 }
 
-
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 static int __get_adc_channel(uint8_t gpio_num)
 {
     int ret = -1;
@@ -263,5 +266,5 @@ static void __fill_adc_characteristics(esp_adc_cal_characteristics_t *chars, adc
 }
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/
