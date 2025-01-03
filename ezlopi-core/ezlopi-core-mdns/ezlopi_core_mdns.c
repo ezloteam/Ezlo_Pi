@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    ezlopi_core_mdns.c
-* @brief   Function to operate on mdns
-* @author  xx
-* @version 0.1
-* @date    12th DEC 2024
-*/
+ * @file    ezlopi_core_mdns.c
+ * @brief   Function to operate on mdns
+ * @author  xx
+ * @version 0.1
+ * @date    12th DEC 2024
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_SERV_MDNS_EN
@@ -66,20 +66,20 @@
 #include "EZLOPI_USER_CONFIG.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static void __ezlopi_mdns_add_service_context(l_ezlopi_mdns_context_t *new_context);
 static l_ezlopi_mdns_context_t *__ezlopi_mdns_get_service_context();
 static void __ezlopi_mdns_init_service_context();
@@ -87,17 +87,17 @@ static mdns_txt_item_t *__prepare_mdns_item_service_context(int *service_size);
 static void __mdns_init(void *pv);
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 static l_ezlopi_mdns_context_t *ezlopi_mdns_service_cntx = NULL;
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 ezlopi_error_t EZPI_init_mdns(void)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
@@ -112,8 +112,8 @@ ezlopi_error_t EZPI_init_mdns(void)
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 static void __ezlopi_mdns_add_service_context(l_ezlopi_mdns_context_t *new_context)
 {
     if (new_context)
@@ -186,7 +186,24 @@ static void __ezlopi_mdns_init_service_context()
                     ezlopi_mdns_service_cntx_device_id->mdns_context = service_cntx_device_id;
                     __ezlopi_mdns_add_service_context(ezlopi_mdns_service_cntx_device_id);
                 }
+                else
+                {
+                    ezlopi_free(__FUNCTION__, service_cntx_device_id);
+                    ezlopi_free(__FUNCTION__, ezlopi_mdns_service_cntx_device_id);
+                    return;
+                }
             }
+            else
+            {
+                ezlopi_free(__FUNCTION__, service_cntx_device_id);
+                ezlopi_free(__FUNCTION__, ezlopi_mdns_service_cntx_device_id);
+                return;
+            }
+        }
+        else
+        {
+            ezlopi_free(__FUNCTION__, ezlopi_mdns_service_cntx_device_id);
+            return;
         }
     }
 
@@ -370,9 +387,8 @@ static void __mdns_init(void *pv)
     vTaskDelete(NULL);
 }
 
-
 #endif // CONFIG_EZPI_SERV_MDNS_EN
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/
