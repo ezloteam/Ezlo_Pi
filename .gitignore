@@ -43,7 +43,7 @@ burn_id.sh
 erase_flash.sh
 flash.sh
 test.sh
-
+build_ezlopi.sh
 
 
 

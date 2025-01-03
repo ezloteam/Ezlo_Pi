@@ -531,17 +531,20 @@ static void __sort_by_pos(void)
 
 static e_room_subtype_t __get_subtype_enum(char *subtype_str)
 {
-    e_room_subtype_t ret = ROOM_SUBTYPE_NONE;
+    e_room_subtype_t ret = ROOM_SUBTYPE_NONE + 1;
 
     if (subtype_str)
     {
-        for (int idx = ROOM_SUBTYPE_NONE; idx < ROOM_SUBTYPE_MAX; idx++)
+        // for (int idx = ROOM_SUBTYPE_NONE; idx < ROOM_SUBTYPE_MAX; idx++)
+        while ((ret <= ROOM_SUBTYPE_MAX) && sc_room_subtype_name[ret])
         {
-            if (0 == strcmp(sc_room_subtype_name[idx], subtype_str))
+            // if (0 == strcmp(sc_room_subtype_name[idx], subtype_str))
+            if (EZPI_STRNCMP_IF_EQUAL(sc_room_subtype_name[ret], subtype_str, strlen(sc_room_subtype_name[ret]) + 1, strlen(subtype_str) + 1))
             {
-                ret = idx;
+                // ret = idx;
                 break;
             }
+            ret++;
         }
     }
 
