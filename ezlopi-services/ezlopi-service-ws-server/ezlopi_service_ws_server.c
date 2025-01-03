@@ -397,7 +397,7 @@ static esp_err_t ezpi_msg_handler(httpd_req_t *req)
                         {
                             TRACE_D("Packet type: %d", ws_pkt.type);
 
-                            if ((HTTPD_WS_TYPE_TEXT == ws_pkt.type) && (0 == strcmp((char *)ws_pkt.payload, "Trigger async")))
+                            if ((HTTPD_WS_TYPE_TEXT == ws_pkt.type) && (0 == strncmp((char *)ws_pkt.payload, "Trigger async", ((strlen((char *)ws_pkt.payload) + 1) > 14 ? (strlen((char *)ws_pkt.payload) + 1) : 14))))
                             {
                                 TRACE_E("ASYNC");
                                 ret = ezpi_trigger_async_send(req);

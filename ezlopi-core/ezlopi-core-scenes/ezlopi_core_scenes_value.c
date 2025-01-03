@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    ezlopi_core_scenes_value.c
-* @brief   Function to operate on scene-value-types
-* @author  xx
-* @version 0.1
-* @date    12th DEC 2024
-*/
+ * @file    ezlopi_core_scenes_value.c
+ * @brief   Function to operate on scene-value-types
+ * @author  xx
+ * @version 0.1
+ * @date    12th DEC 2024
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
@@ -49,24 +49,24 @@
 #include "ezlopi_core_scenes_value.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 static const char *sg_scenes_value_type_name[] = {
 #define EZLOPI_VALUE_TYPE(type, name) name,
 #include "ezlopi_core_scenes_value_types.h"
@@ -74,12 +74,12 @@ static const char *sg_scenes_value_type_name[] = {
 };
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 
 const char *EZPI_core_scenes_get_scene_value_type_name(e_scene_value_type_v2_t value_type)
 {
@@ -99,7 +99,7 @@ e_scene_value_type_v2_t EZPI_core_scene_get_scene_value_type_enum(const char *va
     {
         for (int i = EZLOPI_VALUE_TYPE_NONE; i < EZLOPI_VALUE_TYPE_MAX; i++)
         {
-            if (0 == strcmp(sg_scenes_value_type_name[i], value_type_str))
+            if (EZPI_STRNCMP_IF_EQUAL(sg_scenes_value_type_name[i], value_type_str, strlen(sg_scenes_value_type_name[i]) + 1, strlen(value_type_str) + 1))
             {
                 ret = i;
                 break;
@@ -133,11 +133,11 @@ e_scene_value_type_v2_t EZPI_core_scenes_value_get_type(cJSON *cj_root, const ch
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 
-#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+#endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/
