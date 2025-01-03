@@ -201,7 +201,7 @@ int EZPI_hal_adc_get_adc_data(uint8_t gpio_num, s_ezlopi_analog_data_t *ezlopi_a
 static int __get_adc_channel(uint8_t gpio_num)
 {
     int ret = -1;
-    for (uint8_t channel = 0; channel < EZLOPI_GPIO_CHANNEL_MAX; channel++)
+    for (uint8_t channel = 0; channel < ADC1_CHANNEL_MAX; channel++)
     {
         if (gpio_num == ezlopi_channel_to_gpio_map[channel])
         {
