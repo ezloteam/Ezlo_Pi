@@ -56,7 +56,7 @@
 #define COMPARE_IF_EQUAL(STR1, STR2, STR1_LEN, STR2_LEN) (strncmp(STR1, STR2, BIGGER_LEN(STR1_LEN, STR2_LEN)) == 0)
 /**
  * @brief Macro to compre two strings if they are equal
- *
+ * @note - Add '+1' to the input_str_length for both : STR1_LEN & STR1_LEN . (consider the '\0' char also)
  *
  */
 #define EZPI_STRNCMP_IF_EQUAL(STR1, STR2, STR1_LEN, STR2_LEN) \
