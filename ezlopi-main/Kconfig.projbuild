@@ -53,6 +53,35 @@ menu "EzloPi User Config"
         help 
             ezlopi-core-wifi component is enabled
     
+    config EZPI_ENABLE_OPENTELEMETRY
+        depends on EZPI_ENABLE_WIFI
+        bool "Enable Open-telemetry"
+        default n
+        help
+            Enable this for Open-telemetry feature.
+
+        config EZPI_OPENTELEMETRY_CLOUD_ENDPOINT
+            depends on EZPI_ENABLE_OPENTELEMETRY
+            string "Cloud URL"
+            default "wss://ot.review-staging-op-owkix8.ewr4.opentelemetry.ezlo.com/multi"
+            help
+                Enter the websocket cloud url. Both logs and trace are sent on same ulr.
+        
+
+        config EZPI_OPENTELEMETRY_ENABLE_LOGS
+            depends on EZPI_ENABLE_OPENTELEMETRY
+            bool "Enable capturing logs"
+            default n
+            help
+                Enable this feature to send the Open-telemetry logs to cloud
+
+        config EZPI_OPENTELEMETRY_ENABLE_TRACES
+            depends on EZPI_ENABLE_OPENTELEMETRY
+            bool "Enable capturing traces"
+            default n
+            help
+                Enable this feature to captive and send traces to cloud
+
     config EZPI_ENABLE_OTA 
         depends on EZPI_ENABLE_WIFI || EZPI_CORE_ENABLE_ETH
         bool "Enable OTA"
@@ -138,7 +167,7 @@ menu "EzloPi User Config"
                 Enable provisioning and monitoring via UART   
 
         config EZPI_ENABLE_CDC_PROVISIONING
-            depends on (IDF_TARGET_ESP32S3 || IDF_TARGET_ESP32C3 || IDF_TARGET_ESP32S2) && TINYUSB
+            depends on (IDF_TARGET_ESP32S3 || IDF_TARGET_ESP32S2) && TINYUSB
             bool "Enable CDC provisioning"
             default n
             help 

@@ -1,15 +1,64 @@
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+/**
+ * @file    sensor_0006_I2C_ADXL345.h
+ * @brief   perform some function on sensor_0006
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+*/
+
 #ifndef _SENSOR_0006_I2C_ADXL345_H_
 #define _SENSOR_0006_I2C_ADXL345_H_
-
+/*******************************************************************************
+*                          Include Files
+*******************************************************************************/
 #include "ezlopi_core_actions.h"
 #include "ezlopi_core_devices.h"
 #include "ezlopi_core_errors.h"
+/*******************************************************************************
+*                          C++ Declaration Wrapper
+*******************************************************************************/
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
-// Datasheet can be found at:
-// https://www.sparkfun.com/datasheets/Sensors/Accelerometer/ADXL345.pdf
+    /*******************************************************************************
+    *                          Type & Macro Declarations
+    *******************************************************************************/// Datasheet can be found at:
+    // https://www.sparkfun.com/datasheets/Sensors/Accelerometer/ADXL345.pdf
 
-// For reference following github repository can be consulted.
-// https://github.com/Embetronicx/incubator-nuttx-apps/tree/master/examples/etx_i2c
+    // For reference following github repository can be consulted.
+    // https://github.com/Embetronicx/incubator-nuttx-apps/tree/master/examples/etx_i2c
 
 #define ADXL345_ADDR (0x53) // if (AD0->Vcc) then; [i2c_address->0x1D]
 #define ADXL345_ODR_CNT 6
@@ -63,17 +112,59 @@
 // 1g = 9.80665 m/s^2
 #define ADXL345_STANDARD_G_TO_ACCEL_CONVERSION_VALUE 9.80665
 
-typedef struct s_adxl345_data
-{
-    float acc_x;
-    float acc_y;
-    float acc_z;
-} s_adxl345_data_t;
+    typedef struct s_adxl345_data
+    {
+        float acc_x;
+        float acc_y;
+        float acc_z;
+    } s_adxl345_data_t;
 
-void __adxl345_get_axis_value(l_ezlopi_item_t *item);
-ezlopi_error_t __adxl345_configure_device(l_ezlopi_item_t *item);
+    /*******************************************************************************
+    *                          Extern Data Declarations
+    *******************************************************************************/
 
-// Action function
-ezlopi_error_t sensor_0006_I2C_ADXL345(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
+    /*******************************************************************************
+    *                          Extern Function Prototypes
+    *******************************************************************************/
+
+    /**
+    * @brief Function to operate on actions
+    *
+    * @param action Current Action to Operate on
+    * @param item Target-Item node
+    * @param arg Arg for action
+    * @param user_arg User-arg
+    * @return ezlopi_error_t
+    */
+    ezlopi_error_t SENSOR_0006_i2c_adxl345(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
+
+    /**
+     * @brief Function to get 3-axis_value
+     *
+     * @param item Target Item
+     */
+    void ADXL345_get_axis_value(l_ezlopi_item_t *item);
+    /**
+     * @brief Function to configure adxl345 device
+     *
+     * @param item Target Item
+     * @return ezlopi_error_t
+     */
+    ezlopi_error_t ADXL345_configure_device(l_ezlopi_item_t *item);
+
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // _SENSOR_0006_I2C_ADXL345_H_
+
+/*******************************************************************************
+*                          End of File
+*******************************************************************************/
+
+
+
+
+
