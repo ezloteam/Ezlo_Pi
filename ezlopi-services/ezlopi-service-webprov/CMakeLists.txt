@@ -3,7 +3,7 @@ file(GLOB_RECURSE provisioning_src "*.c*")
 set(EZLOPI_UTIL_COMPONENTS
         ezlopi-util-trace
 )
-set(EZLOPI_CORE_COMPONENTS  
+set(EZLOPI_CORE_COMPONENTS
         ezlopi-core-api
         ezlopi-core-wifi
         ezlopi-core-http
@@ -11,11 +11,11 @@ set(EZLOPI_CORE_COMPONENTS
         ezlopi-core-ezlopi
         ezlopi-core-processes
         ezlopi-core-event-group
-        ezlopi-core-factory-info 
-        ezlopi-core-websocket_client 
+        ezlopi-core-factory-info
+        ezlopi-core-websocket_client
 )
 
-set(EZLOPI_CLOUD_COMPONENTS 
+set(EZLOPI_CLOUD_COMPONENTS
 )
 
 set(EZLOPI_SERVICES

@@ -1,13 +1,5 @@
-
-/**
- * @file    ezlopi_cloud_coordinates.h
- * @brief
- * @author
- * @version
- * @date
- */
 /* ===========================================================================
-** Copyright (C) 2022 Ezlo Innovation Inc
+** Copyright (C) 2024 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -37,22 +29,51 @@
 ** ===========================================================================
 */
 
+/**
+ * @file     ezlopi_cloud_coordinates.h
+ * @brief   perform some function on data
+ * @author  John Doe
+ * @version 0.1
+ * @date    1st January 2024
+ */
+
 #ifndef _EZLOPI_CLOUD_COORDINSTES_H_
 #define _EZLOPI_CLOUD_COORDINSTES_H_
 
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 #include "cjext.h"
-
+/*******************************************************************************
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
+    /*******************************************************************************
+     *                          Type & Macro Declarations
+     *******************************************************************************/
+
+    /*******************************************************************************
+     *                          Extern Data Declarations
+     *******************************************************************************/
+
+    /*******************************************************************************
+     *                          Extern Function Prototypes
+     *******************************************************************************/
     /**
-     * @brief Function to handle hub.coordinate.set method
+     * @brief Global function template example
+     * Convention : Use capital letter for initial word on extern function
+     * maincomponent : Main component as hal, core, service etc.
+     * subcomponent : Sub component as i2c from hal, ble from service etc
+     * functiontitle : Title of the function
+     * eg : EZPI_hal_i2c_init()
+     * @param arg
      *
-     * @param cjson_request Pointer to incoming JONS
-     * @param cjson_response Pointer to outgoing JONS
      */
+
     void EZPI_hub_coordinates_set(cJSON *cjson_request, cJSON *cjson_response);
     /**
      * @brief Function to handle hub.coordinate.get method
@@ -81,6 +102,7 @@ extern "C"
 #endif
 
 #endif // _EZLOPI_CLOUD_COORDINSTES_H_
+
 /*******************************************************************************
  *                          End of File
  *******************************************************************************/

@@ -34,14 +34,14 @@
  * @author  xx
  * @version 0.1
  * @date    xx
-*/
+ */
 
 #ifndef _SENSOR_0044_I2C_TSL256_LUMINOSITY_H_
 #define _SENSOR_0044_I2C_TSL256_LUMINOSITY_H_
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include "ezlopi_hal_i2c_master.h"
 
 #include "ezlopi_core_actions.h"
@@ -49,16 +49,16 @@
 #include "ezlopi_core_errors.h"
 
 /*******************************************************************************
-*                          C++ Declaration Wrapper
-*******************************************************************************/
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
     /*******************************************************************************
-    *                          Type & Macro Declarations
-    *******************************************************************************/
+     *                          Type & Macro Declarations
+     *******************************************************************************/
     //-----------------------------------------------------------------
     // Definations
     //-----------------------------------------------------------------
@@ -173,24 +173,24 @@ extern "C"
     typedef struct TSL256_lum_t
     {
         uint32_t lux_val;
-    }TSL256_lum_t;
+    } TSL256_lum_t;
 
     /*******************************************************************************
-    *                          Extern Data Declarations
-    *******************************************************************************/
+     *                          Extern Data Declarations
+     *******************************************************************************/
 
     /*******************************************************************************
-    *                          Extern Function Prototypes
-    *******************************************************************************/
+     *                          Extern Function Prototypes
+     *******************************************************************************/
     /**
-    * @brief Function to operate on actions
-    *
-    * @param action Current Action to Operate on
-    * @param item Target-Item node
-    * @param arg Arg for action
-    * @param user_arg User-arg
-    * @return ezlopi_error_t
-    */
+     * @brief Function to operate on actions
+     *
+     * @param action Current Action to Operate on
+     * @param item Target-Item node
+     * @param arg Arg for action
+     * @param user_arg User-arg
+     * @return ezlopi_error_t
+     */
     ezlopi_error_t SENSOR_0044_i2c_tsl256_luminosity(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
     /**
@@ -215,7 +215,6 @@ extern "C"
      */
     uint32_t TSL2561_get_intensity_value(s_ezlopi_i2c_master_t *i2c_master);
 
-
 #ifdef __cplusplus
 }
 #endif
@@ -223,8 +222,5 @@ extern "C"
 #endif // _SENSOR_0044_I2C_TSL256_LUMINOSITY_H_
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
-
-
-
+ *                          End of File
+ *******************************************************************************/

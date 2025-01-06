@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    ezlopi_core_setting_commands.c
-* @brief   perform some function on setting cmds
-* @author  xx
-* @version 0.1
-* @date    12th DEC 2024
-*/
+ * @file    ezlopi_core_setting_commands.c
+ * @brief   perform some function on setting cmds
+ * @author  xx
+ * @version 0.1
+ * @date    12th DEC 2024
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 
 #include "ezlopi_util_trace.h"
 #include "cjext.h"
@@ -51,20 +51,20 @@
 #include "ezlopi_cloud_constants.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static int __setting_cmd_process_scale_temperature(const cJSON *cj_params);
 static int __setting_cmd_process_date_format(const cJSON *cj_params);
 static int __setting_cmd_process_time_format(const cJSON *cj_params);
@@ -77,16 +77,16 @@ static int __add_network_ping_timeout_settings(cJSON *cj_settings);
 static int __add_log_level_settings(cJSON *cj_settings);
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 static e_enum_temperature_scale_t temperature_scale_to_user = TEMPERATURE_SCALE_CELSIUS;
 static e_enum_date_format_t date_format_to_user = DATE_FORMAT_MMDDYY;
 static e_enum_time_format_t time_format_to_user = TIME_FORMAT_12;
 static int network_ping_timeout_to_user = 10;
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 const char *ezlopi_core_setting_command_names[SETTING_COMMAND_NAME_MAX] = {
     "scale.temperature",
     "date.format",
@@ -118,8 +118,8 @@ const char *log_indentation_level[4] = {
 };
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 
 int EZPI_core_setting_updated_broadcast(cJSON *cj_params, cJSON *cj_result)
 {
@@ -312,8 +312,8 @@ const char *EZPI_core_setting_get_time_format_str()
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 
 static int __setting_cmd_process_scale_temperature(const cJSON *cj_params)
 {
@@ -544,5 +544,5 @@ static int __add_log_level_settings(cJSON *cj_settings)
 }
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

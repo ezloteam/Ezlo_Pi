@@ -171,7 +171,7 @@ esp_err_t led_strip_fill(led_strip_t *strip, size_t start, size_t len, rgb_t col
  *
  *
  * @param strip Descriptor of LED strip
- * @param brightness Brightness Level 
+ * @param brightness Brightness Level
  * @return `ESP_OK` on success
  */
 esp_err_t led_strip_set_brightness(led_strip_t *strip, uint8_t brightness);

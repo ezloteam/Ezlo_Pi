@@ -34,30 +34,30 @@
  * @author  xx
  * @version 0.1
  * @date    xx
-*/
+ */
 
 #ifndef _SENSOR_0053_UART_GYGPS6MV2_H_
 #define _SENSOR_0053_UART_GYGPS6MV2_H_
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 
 #include "ezlopi_core_actions.h"
 #include "ezlopi_core_devices.h"
 #include "ezlopi_core_errors.h"
 
 /*******************************************************************************
-*                          C++ Declaration Wrapper
-*******************************************************************************/
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
     /*******************************************************************************
-    *                          Type & Macro Declarations
-    *******************************************************************************/
+     *                          Type & Macro Declarations
+     *******************************************************************************/
 
     /* 3.3V operating voltage */
     //-----------------------------------------------------------------------------------------
@@ -73,11 +73,11 @@ extern "C"
 // #define GLL_MESSAGE_ENABLE
 //-----------------------------------------------------------------------------------------
 #define MAX_GPGGA_SENTENCE_SIZE 85 // (:'$GPGGA') + (:',') + (:'message')
-// #define MAX_GPRMC_SENTENCE_SIZE 70 // (:'$GPRMC') + (:',') + (:'message')
-// #define MAX_GPVTG_SENTENCE_SIZE 70 // (:'$GPGGA') + (:',') + (:'message')
-// #define MAX_GPGSA_SENTENCE_SIZE 70 // (:'$GPGGA') + (:',') + (:'message')
-// #define MAX_GPGSV_SENTENCE_SIZE 40 // (:'$GPGGA') + (:',') + (:'message')
-// #define MAX_GPGLL_SENTENCE_SIZE 40 // (:'$GPGGA') + (:',') + (:'message')
+                                   // #define MAX_GPRMC_SENTENCE_SIZE 70 // (:'$GPRMC') + (:',') + (:'message')
+                                   // #define MAX_GPVTG_SENTENCE_SIZE 70 // (:'$GPGGA') + (:',') + (:'message')
+                                   // #define MAX_GPGSA_SENTENCE_SIZE 70 // (:'$GPGGA') + (:',') + (:'message')
+                                   // #define MAX_GPGSV_SENTENCE_SIZE 40 // (:'$GPGGA') + (:',') + (:'message')
+                                   // #define MAX_GPGLL_SENTENCE_SIZE 40 // (:'$GPGGA') + (:',') + (:'message')
 
 //-----------------------------------------------------------------------------------------
 /**
@@ -85,21 +85,21 @@ extern "C"
  */
 #define CIR_BUFSIZE 768 // choose ( buf_size >= 768) to avoid faulty message
 
- /**
-  * link: https://www.rfwireless-world.com/Terminology/GPS-sentences-or-NMEA-sentences.html
-  *
-  * GPS standard language : default :- NMEA
-  *
-  * Output parameter list:-
-  *
-  * $GPRMC,,V,,,,,,,,,,N*53                          // Time, date, position, course and speed data
-  * $GPVTG,,,,,,,,,N*30                              // Course and speed information relative to the ground
-  * $GPGGA,,,,,,0,00,99.99,,,,,,*48                  // Global positioning system fix data (time, position, fix type data)
-  * $GPGSA,A,1,,,,,,,,,,,,,99.99,99.99,99.99*30      // GPS receiver operating mode, satellites used in the position solution, and DOP values.
-  * $GPGSV,1,1,03,18,,,21,20,,,20,28,,,20*78         // The number of GPS satellites in view satellite ID numbers, elevation, azimuth and SNR values
-  * $GPGLL,,,,,,V,N*64                               // Geographic position, latitude, longitude
-  *
-  * */
+    /**
+     * link: https://www.rfwireless-world.com/Terminology/GPS-sentences-or-NMEA-sentences.html
+     *
+     * GPS standard language : default :- NMEA
+     *
+     * Output parameter list:-
+     *
+     * $GPRMC,,V,,,,,,,,,,N*53                          // Time, date, position, course and speed data
+     * $GPVTG,,,,,,,,,N*30                              // Course and speed information relative to the ground
+     * $GPGGA,,,,,,0,00,99.99,,,,,,*48                  // Global positioning system fix data (time, position, fix type data)
+     * $GPGSA,A,1,,,,,,,,,,,,,99.99,99.99,99.99*30      // GPS receiver operating mode, satellites used in the position solution, and DOP values.
+     * $GPGSV,1,1,03,18,,,21,20,,,20,28,,,20*78         // The number of GPS satellites in view satellite ID numbers, elevation, azimuth and SNR values
+     * $GPGLL,,,,,,V,N*64                               // Geographic position, latitude, longitude
+     *
+     * */
 
     typedef struct hms_t
     {
@@ -299,22 +299,22 @@ extern "C"
 
     } GPS6MV2_t;
     /*******************************************************************************
-    *                          Extern Data Declarations
-    *******************************************************************************/
+     *                          Extern Data Declarations
+     *******************************************************************************/
 
     /*******************************************************************************
-    *                          Extern Function Prototypes
-    *******************************************************************************/
+     *                          Extern Function Prototypes
+     *******************************************************************************/
 
     /**
-    * @brief Function to operate on actions
-    *
-    * @param action Current Action to Operate on
-    * @param item Target-Item node
-    * @param arg Arg for action
-    * @param user_arg User-arg
-    * @return ezlopi_error_t
-    */
+     * @brief Function to operate on actions
+     *
+     * @param action Current Action to Operate on
+     * @param item Target-Item node
+     * @param arg Arg for action
+     * @param user_arg User-arg
+     * @return ezlopi_error_t
+     */
     ezlopi_error_t SENSOR_0053_uart_gygps6mv2(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
 #ifdef __cplusplus
@@ -323,5 +323,5 @@ extern "C"
 
 #endif //_SENSOR_0053_UART_GYGPS6MV2_H_
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

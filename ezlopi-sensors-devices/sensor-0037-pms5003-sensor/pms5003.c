@@ -291,6 +291,7 @@ static void pms_timer_callback(void *arg)
     pms_object->pmsStatusReg = 0;
   }
 }
+
 /*!
  *  @brief  Set PMS5003 in Sleep-mode and stop the fan.
  */
@@ -298,6 +299,7 @@ static void pms_sleep_mode(gpio_num_t set_pin)
 {
   gpio_set_level(set_pin, 0);
 }
+
 /*!
  *  @brief  Set PMS5003 in Active-mode and start the fan.
  */

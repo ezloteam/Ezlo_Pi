@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    sensor_0034_digitalIn_proximity.c
-* @brief   perform some function on sensor_0034
-* @author  xx
-* @version 0.1
-* @date    xx
-*/
+ * @file    sensor_0034_digitalIn_proximity.c
+ * @brief   perform some function on sensor_0034
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include "driver/gpio.h"
 
 #include "ezlopi_core_cloud.h"
@@ -54,36 +54,36 @@
 #include "sensor_0034_digitalIn_proximity.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static ezlopi_error_t proximity_sensor_prepare(void *args);
 static ezlopi_error_t proximity_sensor_init(l_ezlopi_item_t *item);
 static void proximity_sensor_value_updated_from_device(void *arg);
 static ezlopi_error_t proximity_sensor_get_value_cjson(l_ezlopi_item_t *item, void *args);
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 ezlopi_error_t SENSOR_0034_digitalIn_proximity(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *args, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
@@ -117,8 +117,8 @@ ezlopi_error_t SENSOR_0034_digitalIn_proximity(e_ezlopi_actions_t action, l_ezlo
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 static void proximity_sensor_setup_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     if (device && cj_device)
@@ -243,5 +243,5 @@ static ezlopi_error_t proximity_sensor_get_value_cjson(l_ezlopi_item_t *item, vo
 }
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

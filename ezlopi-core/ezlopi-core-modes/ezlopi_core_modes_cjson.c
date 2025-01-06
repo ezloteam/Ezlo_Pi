@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    ezlopi_core_modes_cjson.c
-* @brief   These functions perform operations related to house-mode cjsons
-* @author  xx
-* @version 0.1
-* @date    12th DEC 2024
-*/
+ * @file    ezlopi_core_modes_cjson.c
+ * @brief   These functions perform operations related to house-mode cjsons
+ * @author  xx
+ * @version 0.1
+ * @date    12th DEC 2024
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 
 // #include <time.h>
 // #include "cjext.h"
@@ -60,20 +60,20 @@
 #if defined(CONFIG_EZPI_SERV_ENABLE_MODES)
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static void __cjson_add_alarmed(cJSON *cj_alarmed, s_alarmed_t *alarmed);
 static void __cjson_add_mode_to_array(cJSON *cj_modes_arr, s_house_modes_t *mode);
 static void __cjson_add_entry_delay(cJSON *cj_result, s_entry_delay_t *entry_delay);
@@ -83,16 +83,16 @@ static void __cjson_duplicate_add_reference(cJSON *cj_dest, const char *item_nam
 static void __cjson_add_protect_buttons(cJSON *cj_protect_buttons_arr, s_protect_buttons_t *l_protect_buttons);
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 ezlopi_error_t EZPI_core_modes_cjson_get_modes(cJSON *cj_dest)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
@@ -372,24 +372,24 @@ s_ezlopi_modes_t *EZPI_core_modes_cjson_parse_modes(cJSON *cj_modes) // This fun
                 CJSON_GET_VALUE_STRING_BY_COPY(cj_alarmed, ezlopi_type_str, parsed_mode->alarmed.type);
                 CJSON_GET_VALUE_BOOL(cj_alarmed, ezlopi_silent_str, parsed_mode->alarmed.silent);
 
-                char tmp_str[32] = { 0 };
+                char tmp_str[32] = {0};
                 CJSON_GET_VALUE_STRING_BY_COPY(cj_alarmed, ezlopi_phase_str, tmp_str);
                 {
                     size_t tmp_len = strlen(tmp_str) + 1;
-                    (EZPI_STRNCMP_IF_EQUAL(ezlopi_idle_str, tmp_str, 5, tmp_len)) ? (parsed_mode->alarmed.phase = EZLOPI_MODES_ALARM_PHASE_IDLE)
-                        : (EZPI_STRNCMP_IF_EQUAL(ezlopi_bypass_str, tmp_str, 7, tmp_len)) ? (parsed_mode->alarmed.phase = EZLOPI_MODES_ALARM_PHASE_BYPASS)
-                        : (EZPI_STRNCMP_IF_EQUAL(ezlopi_entryDelay_str, tmp_str, 11, tmp_len)) ? (parsed_mode->alarmed.phase = EZLOPI_MODES_ALARM_PHASE_ENTRYDELAY)
-                        : (EZPI_STRNCMP_IF_EQUAL(ezlopi_main_str, tmp_str, 5, tmp_len)) ? (parsed_mode->alarmed.phase = EZLOPI_MODES_ALARM_PHASE_MAIN)
-                        : (parsed_mode->alarmed.phase = EZLOPI_MODES_ALARM_PHASE_NONE); // this "NONE"-phase exists only at the beginning .
+                    (EZPI_STRNCMP_IF_EQUAL(ezlopi_idle_str, tmp_str, 5, tmp_len))          ? (parsed_mode->alarmed.phase = EZLOPI_MODES_ALARM_PHASE_IDLE)
+                    : (EZPI_STRNCMP_IF_EQUAL(ezlopi_bypass_str, tmp_str, 7, tmp_len))      ? (parsed_mode->alarmed.phase = EZLOPI_MODES_ALARM_PHASE_BYPASS)
+                    : (EZPI_STRNCMP_IF_EQUAL(ezlopi_entryDelay_str, tmp_str, 11, tmp_len)) ? (parsed_mode->alarmed.phase = EZLOPI_MODES_ALARM_PHASE_ENTRYDELAY)
+                    : (EZPI_STRNCMP_IF_EQUAL(ezlopi_main_str, tmp_str, 5, tmp_len))        ? (parsed_mode->alarmed.phase = EZLOPI_MODES_ALARM_PHASE_MAIN)
+                                                                                           : (parsed_mode->alarmed.phase = EZLOPI_MODES_ALARM_PHASE_NONE); // this "NONE"-phase exists only at the beginning .
                 }
 
                 CJSON_GET_VALUE_STRING_BY_COPY(cj_alarmed, ezlopi_status_str, tmp_str);
                 {
                     size_t tmp_len = strlen(tmp_str) + 1;
-                    (EZPI_STRNCMP_IF_EQUAL(ezlopi_done_str, tmp_str, 5, tmp_len)) ? (parsed_mode->alarmed.status = EZLOPI_MODES_ALARM_STATUS_DONE)
-                        : (EZPI_STRNCMP_IF_EQUAL(ezlopi_begin_str, tmp_str, 6, tmp_len)) ? (parsed_mode->alarmed.status = EZLOPI_MODES_ALARM_STATUS_BEGIN)
-                        : (EZPI_STRNCMP_IF_EQUAL(ezlopi_canceled_str, tmp_str, 9, tmp_len)) ? (parsed_mode->alarmed.status = EZLOPI_MODES_ALARM_STATUS_CANCELED)
-                        : (parsed_mode->alarmed.status = EZLOPI_MODES_ALARM_STATUS_DONE); // default State
+                    (EZPI_STRNCMP_IF_EQUAL(ezlopi_done_str, tmp_str, 5, tmp_len))       ? (parsed_mode->alarmed.status = EZLOPI_MODES_ALARM_STATUS_DONE)
+                    : (EZPI_STRNCMP_IF_EQUAL(ezlopi_begin_str, tmp_str, 6, tmp_len))    ? (parsed_mode->alarmed.status = EZLOPI_MODES_ALARM_STATUS_BEGIN)
+                    : (EZPI_STRNCMP_IF_EQUAL(ezlopi_canceled_str, tmp_str, 9, tmp_len)) ? (parsed_mode->alarmed.status = EZLOPI_MODES_ALARM_STATUS_CANCELED)
+                                                                                        : (parsed_mode->alarmed.status = EZLOPI_MODES_ALARM_STATUS_DONE); // default State
                 }
 
                 cJSON *cj_sources_arr = cJSON_GetObjectItem(__FUNCTION__, cj_alarmed, ezlopi_sources_str);
@@ -480,21 +480,21 @@ cJSON *EZPI_core_modes_cjson_alarmed(const char *dev_id_str) // (IN core-service
                     CJSON_ASSIGN_ID(cj_result, curr_mode->time_is_left_to_switch_sec, ezlopi_pendingDelay_str); // Only for 'entryDelay'
                 }
 
-                (EZLOPI_MODES_ALARM_PHASE_IDLE == curr_mode->alarmed.phase) ? cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_phase_str, ezlopi_idle_str)
-                    : (EZLOPI_MODES_ALARM_PHASE_BYPASS == curr_mode->alarmed.phase) ? cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_phase_str, ezlopi_bypass_str)
-                    : (EZLOPI_MODES_ALARM_PHASE_ENTRYDELAY == curr_mode->alarmed.phase) ? cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_phase_str, ezlopi_entryDelay_str)
-                    : (EZLOPI_MODES_ALARM_PHASE_MAIN == curr_mode->alarmed.phase) ? cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_phase_str, ezlopi_main_str)
-                    : cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_phase_str, ezlopi__str); // none
+                (EZLOPI_MODES_ALARM_PHASE_IDLE == curr_mode->alarmed.phase)         ? cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_phase_str, ezlopi_idle_str)
+                : (EZLOPI_MODES_ALARM_PHASE_BYPASS == curr_mode->alarmed.phase)     ? cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_phase_str, ezlopi_bypass_str)
+                : (EZLOPI_MODES_ALARM_PHASE_ENTRYDELAY == curr_mode->alarmed.phase) ? cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_phase_str, ezlopi_entryDelay_str)
+                : (EZLOPI_MODES_ALARM_PHASE_MAIN == curr_mode->alarmed.phase)       ? cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_phase_str, ezlopi_main_str)
+                                                                                    : cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_phase_str, ezlopi__str); // none
 
-                (EZLOPI_MODES_ALARM_STATUS_DONE == curr_mode->alarmed.status) ? cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_status_str, ezlopi_done_str)
-                    : (EZLOPI_MODES_ALARM_STATUS_BEGIN == curr_mode->alarmed.status) ? cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_status_str, ezlopi_begin_str)
-                    : (EZLOPI_MODES_ALARM_STATUS_CANCELED == curr_mode->alarmed.status) ? cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_status_str, ezlopi_canceled_str)
-                    : cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_status_str, ezlopi__str); // none
+                (EZLOPI_MODES_ALARM_STATUS_DONE == curr_mode->alarmed.status)       ? cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_status_str, ezlopi_done_str)
+                : (EZLOPI_MODES_ALARM_STATUS_BEGIN == curr_mode->alarmed.status)    ? cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_status_str, ezlopi_begin_str)
+                : (EZLOPI_MODES_ALARM_STATUS_CANCELED == curr_mode->alarmed.status) ? cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_status_str, ezlopi_canceled_str)
+                                                                                    : cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_status_str, ezlopi__str); // none
 
                 cJSON_AddNumberToObject(__FUNCTION__, cj_result, ezlopi_timestamp_str, EZPI_core_sntp_get_current_time_ms());
                 cJSON_AddBoolToObject(__FUNCTION__, cj_result, ezlopi_silent_str, curr_mode->alarmed.silent);
 
-                #warning "need to add two-members [soundType & chime]"
+#warning "need to add two-members [soundType & chime]"
             }
         }
     }
@@ -502,8 +502,8 @@ cJSON *EZPI_core_modes_cjson_alarmed(const char *dev_id_str) // (IN core-service
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 
 static void __cjson_add_number_as_hex_string(cJSON *cj_dest, const char *obj_name, uint32_t number)
 {
@@ -635,5 +635,5 @@ static void __cjson_add_alarmed(cJSON *cj_alarmed, s_alarmed_t *alarmed)
 #endif // CONFIG_EZPI_SERV_ENABLE_MODES
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

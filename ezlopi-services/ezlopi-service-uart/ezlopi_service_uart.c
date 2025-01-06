@@ -1,12 +1,3 @@
-
-
-/**
- * @file    ezlopi_service_uart.c
- * @brief
- * @author
- * @version
- * @date
- */
 /* ===========================================================================
 ** Copyright (C) 2024 Ezlo Innovation Inc
 **
@@ -38,6 +29,17 @@
 ** ===========================================================================
 */
 
+/**
+ * @file    ezlopi_service_uart.c
+ * @brief
+ * @author
+ * @version
+ * @date
+ */
+
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 #include "../../build/config/sdkconfig.h"
 
 #include "freertos/FreeRTOSConfig.h"
@@ -90,6 +92,17 @@
 
 #include "EZLOPI_USER_CONFIG.h"
 
+/*******************************************************************************
+ *                          Extern Data Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 #if defined(CONFIG_IDF_TARGET_ESP32)
 /**
  * @brief UART TX pin number
@@ -126,6 +139,9 @@
 #define RXD_PIN (GPIO_NUM_44)
 #endif
 
+/*******************************************************************************
+ *                          Static Function Prototypes
+ *******************************************************************************/
 /**
  * @brief Function to process reset command
  *
@@ -262,7 +278,9 @@ static void ezpi_service_uart_task(void *arg);
  */
 static void ezpi_tinyusb_cdc_rx_callback(int itf, cdcacm_event_t *event);
 #endif // NOT defined CONFIG_IDF_TARGET_ESP32 or CONFIG_IDF_TARGET_ESP32C3
-
+/*******************************************************************************
+ *                          Static Data Definitions
+ *******************************************************************************/
 #if !defined(CONFIG_IDF_TARGET_ESP32) && !defined(CONFIG_IDF_TARGET_ESP32C3)
 static uint8_t usb_rx_buffer[CONFIG_TINYUSB_CDC_RX_BUFSIZE - 1];
 static size_t rx_buffer_pointer = 0;
@@ -270,6 +288,13 @@ static int cdc_port = TINYUSB_CDC_ACM_0;
 static SemaphoreHandle_t usb_semaphore_handle = NULL;
 #endif // NOT defined CONFIG_IDF_TARGET_ESP32 or CONFIG_IDF_TARGET_ESP32C3
 
+/*******************************************************************************
+ *                          Extern Data Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Definitions
+ *******************************************************************************/
 #if !defined(CONFIG_IDF_TARGET_ESP32) && !defined(CONFIG_IDF_TARGET_ESP32C3)
 void EZPI_SERV_cdc_init()
 {
@@ -314,6 +339,9 @@ void EZPI_SERV_uart_init(void)
 #endif
 }
 
+/*******************************************************************************
+ *                          Static Function Definitions
+ *******************************************************************************/
 static int ezpi_service_uart_reset(cJSON *root)
 {
     int ret = 0;

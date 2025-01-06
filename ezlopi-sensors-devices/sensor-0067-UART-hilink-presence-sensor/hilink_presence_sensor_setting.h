@@ -34,29 +34,29 @@
  * @author  xx
  * @version 0.1
  * @date    xx
-*/
+ */
 
 #ifndef _HILINK_PRESENCE_SENSOR_SETTINGS_H_
 #define _HILINK_PRESENCE_SENSOR_SETTINGS_H_
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include "ezlopi_util_trace.h"
 // #include "cjext.h"
 #include "ezlopi_core_devices.h"
 
 /*******************************************************************************
-*                          C++ Declaration Wrapper
-*******************************************************************************/
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
     /*******************************************************************************
-    *                          Type & Macro Declarations
-    *******************************************************************************/
+     *                          Type & Macro Declarations
+     *******************************************************************************/
 #define HILINK_PRESENCE_SENSOR_SETTING_PREDEFINED_LABEL_TEXT "Pre-defined operation mode"
 #define HILINK_PRESENCE_SENSOR_SETTING_PREDEFINED_DESCRIPTION_TEXT "Pre-Defined Operation mode, there will be different operation mode for different use cases"
 #define HILINK_PRESENCE_SENSOR_SETTING_USER_DEFINED_LABEL_TEXT "User defined mode"
@@ -113,24 +113,22 @@ extern "C"
         int distance_sensitivity_value;
     } s_hilink_radar_distance_sensitivity_value_t;
 
-
+    /*******************************************************************************
+     *                          Extern Data Declarations
+     *******************************************************************************/
 
     /*******************************************************************************
-    *                          Extern Data Declarations
-    *******************************************************************************/
-
-    /*******************************************************************************
-    *                          Extern Function Prototypes
-    *******************************************************************************/
+     *                          Extern Function Prototypes
+     *******************************************************************************/
     /**
-    * @brief Function to operate on actions
-    *
-    * @param action Current Action to Operate on
-    * @param item Target-Item node
-    * @param arg Arg for action
-    * @param user_arg User-arg
-    * @return ezlopi_error_t
-    */
+     * @brief Function to operate on actions
+     *
+     * @param action Current Action to Operate on
+     * @param item Target-Item node
+     * @param arg Arg for action
+     * @param user_arg User-arg
+     * @return ezlopi_error_t
+     */
     int HILINK_presence_sensor_initialize_settings(l_ezlopi_device_t *device);
     /**
      * @brief Function to apply HILINK_presence_sensor setting
@@ -154,5 +152,5 @@ extern "C"
 #endif // _HILINK_PRESENCE_SENSOR_SETTINGS_H_
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

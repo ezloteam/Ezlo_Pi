@@ -1,13 +1,5 @@
-
-/**
- * @file    ezlopi_cloud_constants.h
- * @brief
- * @author
- * @version
- * @date
- */
 /* ===========================================================================
-** Copyright (C) 2022 Ezlo Innovation Inc
+** Copyright (C) 2024 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -37,9 +29,27 @@
 ** ===========================================================================
 */
 
+/**
+ * @file    main.c
+ * @brief   perform some function on data
+ * @author  John Doe
+ * @version 0.1
+ * @date    1st January 2024
+ */
+
 #ifndef __EZLOPI_CLOUD_CONSTANTS_H__
 #define __EZLOPI_CLOUD_CONSTANTS_H__
+/*******************************************************************************
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
+/*******************************************************************************
+ *                          Type & Macro Declarations
+ *******************************************************************************/
 //------------------- MACRO FOR COMPARING EQUAL STR ------------------------------------------------------------
 
 /**
@@ -77,6 +87,19 @@
 #include "ezlopi_cloud_value_type_str.h"
 #include "ezlopi_cloud_subcategory_str.h"
 #include "ezlopi_cloud_device_types_str.h"
+
+
+    /*******************************************************************************
+     *                          Extern Data Declarations
+     *******************************************************************************/
+
+    /*******************************************************************************
+     *                          Extern Function Prototypes
+     *******************************************************************************/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // __EZLOPI_CLOUD_CONSTANTS_H__
 

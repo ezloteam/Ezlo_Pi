@@ -1,11 +1,3 @@
-
-/**
- * @file    ezlopi_cloud_room_types_str.h
- * @brief
- * @author
- * @version
- * @date
- */
 /* ===========================================================================
 ** Copyright (C) 2022 Ezlo Innovation Inc
 **
@@ -37,13 +29,35 @@
 ** ===========================================================================
 */
 
+/**
+ * @file    ezlopi_cloud_room_types_str.h
+ * @brief
+ * @author
+ * @version
+ * @date
+ */
 #ifndef __EZLOPI_ROOMTYPES_STR_H__
 #define __EZLOPI_ROOMTYPES_STR_H__
 
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
+
+    /*******************************************************************************
+     *                          Type & Macro Declarations
+     *******************************************************************************/
+
+    /*******************************************************************************
+     *                          Extern Data Declarations
+     *******************************************************************************/
 
     extern const char *hub_room_type_livingroom_title;
     extern const char *hub_room_type_kitchen_title;
@@ -58,6 +72,10 @@ extern "C"
     extern const char *hub_room_type_attic_title;
     extern const char *hub_room_type_hobbyroom_title;
     extern const char *hub_room_type_bathroom_title;
+
+    /*******************************************************************************
+     *                          Extern Function Prototypes
+     *******************************************************************************/
 
 #ifdef __cplusplus
 }

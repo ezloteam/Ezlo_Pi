@@ -29,17 +29,18 @@
 ** ===========================================================================
 */
 /**
-* @file    ezlopi_core_event_queue.c
-* @brief   perform function for event queue
-* @author  xx
-* @version 0.1
-* @date    12th DEC 2024
-*/
+ * @file    ezlopi_core_event_queue.c
+ * @brief   perform function for event queue
+ * @author  xx
+ * @version 0.1
+ * @date    12th DEC 2024
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #if 0
+
 #include "ezlopi_core_event_queue.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/queue.h"
@@ -145,8 +146,7 @@ ezlopi_error_t EZPI_core_event_queue_receive(s_ezlo_event_t **event_data, int ti
 *                         Static Function Definitions
 *******************************************************************************/
 
-
 #endif
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

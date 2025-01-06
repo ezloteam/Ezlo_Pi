@@ -1,11 +1,3 @@
-
-/**
- * @file    ezlopi_service_system_temperature_sensor.h
- * @brief
- * @author
- * @version
- * @date
- */
 /* ===========================================================================
 ** Copyright (C) 2024 Ezlo Innovation Inc
 **
@@ -37,16 +29,43 @@
 ** ===========================================================================
 */
 
+/**
+ * @file    ezlopi_service_system_temperature_sensor.h
+ * @brief
+ * @author
+ * @version
+ * @date
+ */
 #include "sdkconfig.h"
 #if defined(CONFIG_EZPI_ENABLE_SYSTEM_TEMPERATURE)
 
 #ifndef _EZLOPI_SERVICE_SYSTEM_TEMPERATURE_SENSOR_H_
 #define _EZLOPI_SERVICE_SYSTEM_TEMPERATURE_SENSOR_H_
 
+
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
+
+    /*******************************************************************************
+     *                          Type & Macro Declarations
+     *******************************************************************************/
+
+    /*******************************************************************************
+     *                          Extern Data Declarations
+     *******************************************************************************/
+
+    /*******************************************************************************
+     *                          Extern Function Prototypes
+     *******************************************************************************/
 
     /**
      * @brief Function that handles different actions related to temperatore sensor

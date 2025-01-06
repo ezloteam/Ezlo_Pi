@@ -1,14 +1,5 @@
-
-
-/**
- * @file    ezlopi_cloud_devices.c
- * @brief
- * @author
- * @version
- * @date
- */
 /* ===========================================================================
-** Copyright (C) 2022 Ezlo Innovation Inc
+** Copyright (C) 2024 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -38,6 +29,17 @@
 ** ===========================================================================
 */
 
+/**
+ * @file     ezlopi_cloud_devices.c
+ * @brief   perform some function on data
+ * @author  John Doe
+ * @version 0.1
+ * @date    1st January 2024
+ */
+
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 #include <string.h>
 
 #include "mbedtls/sha1.h"
@@ -55,6 +57,21 @@
 #include "ezlopi_cloud_methods_str.h"
 #include "ezlopi_cloud_constants.h"
 
+/*******************************************************************************
+ *                          Extern Data Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Type & Macro Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Static Function Prototypes
+ *******************************************************************************/
 //------------------------------------------------------------------------------------------------------------------
 /**
  * @brief Function to generate sha1 for src
@@ -65,6 +82,17 @@
  */
 static char *ezpi_generate_sha1_of_src(const char *src);
 
+/*******************************************************************************
+ *                          Static Data Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Data Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Definitions
+ *******************************************************************************/
 //------------------------------------------------------------------------------------------------------------------
 void EZPI_devices_list_v3(cJSON *cj_request, cJSON *cj_response)
 {
@@ -775,6 +803,9 @@ void EZPI_item_group_updated(cJSON *cj_request, cJSON *cj_response)
     }
 }
 
+/*******************************************************************************
+ *                          Static Function Definitions
+ *******************************************************************************/
 static char *ezpi_generate_sha1_of_src(const char *src)
 {
     char *ret = NULL;
@@ -796,40 +827,6 @@ static char *ezpi_generate_sha1_of_src(const char *src)
                     TRACE_D(" sha1_hash = %s ;  => ret = %s", sha1_hash, ret);
                 }
             }
-
-            // mbedtls_sha1_context sha1_ctx;
-            // mbedtls_sha1_init(&sha1_ctx);
-            // if (0 == mbedtls_sha1_starts_ret(&sha1_ctx))
-            // {
-            //     if (0 == mbedtls_sha1_update_ret(&sha1_ctx, (const unsigned char *)src, strlen(src)))
-            //     {
-            //         if (0 == mbedtls_sha1_finish_ret(&sha1_ctx, sha1))
-            //         {
-            //             size_t len = (4 * sizeof(sha1)) + 1;
-            //             ret = (char *)ezlopi_malloc(__FUNCTION__, len);
-            //             if (ret)
-            //             {
-            //                 memset(ret, 0, len);
-            //                 for (int i = 0; i < sizeof(sha1); i++)
-            //                 {
-            //                     size_t l = (len - (strlen(ret) + 1));
-            //                     if (l > 0)
-            //                     {
-            //                         ((int)sha1[i] / 100 > 0)  ? (snprintf(ret + strlen(ret), l, "%u", (uint8_t)sha1[i]))    // tripple digit
-            //                         : ((int)sha1[i] / 10 > 0) ? (snprintf(ret + strlen(ret), l, "0%u", (uint8_t)sha1[i]))   // double digit
-            //                                                   : (snprintf(ret + strlen(ret), l, "00%u", (uint8_t)sha1[i])); // single digit
-            //                     }
-            //                     else
-            //                     {
-            //                         break;
-            //                     }
-            //                 }
-            //             }
-            //         }
-            //     }
-            // }
-
-            // mbedtls_sha1_free(&sha1_ctx);
         }
     }
     return ret;

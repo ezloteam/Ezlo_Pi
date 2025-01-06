@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    device_0036_PWM_servo_MG996R.c
-* @brief   perform some function on device_0036
-* @author  xx
-* @version 0.1
-* @date    xx
-*/
+ * @file    device_0036_PWM_servo_MG996R.c
+ * @brief   perform some function on device_0036
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
@@ -54,20 +54,20 @@
 #include "EZLOPI_USER_CONFIG.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static ezlopi_error_t __prepare(void *arg);
 static ezlopi_error_t __init(l_ezlopi_item_t *item);
 static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg);
@@ -75,16 +75,16 @@ static ezlopi_error_t __set_cjson_value(l_ezlopi_item_t *item, void *arg);
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
 static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device);
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 
 ezlopi_error_t DEVICE_0036_pwm_servo_mg996r(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
@@ -120,8 +120,8 @@ ezlopi_error_t DEVICE_0036_pwm_servo_mg996r(e_ezlopi_actions_t action, l_ezlopi_
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
@@ -190,7 +190,7 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
         {
             static s_ezlopi_channel_speed_t *servo_item = NULL;
             servo_item = EZPI_hal_pwm_init(item->interface.pwm.gpio_num, item->interface.pwm.pwm_resln,
-                item->interface.pwm.freq_hz, item->interface.pwm.duty_cycle);
+                                           item->interface.pwm.freq_hz, item->interface.pwm.duty_cycle);
             if (servo_item)
             {
                 item->interface.pwm.channel = servo_item->channel;
@@ -263,5 +263,5 @@ static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 }
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

@@ -34,29 +34,29 @@
  * @author  xx
  * @version 0.1
  * @date    xx
-*/
+ */
 
 #ifndef _SENSOR_0055_ADC_FLEXRESISTOR_H_
 #define _SENSOR_0055_ADC_FLEXRESISTOR_H_
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include "ezlopi_core_actions.h"
 #include "ezlopi_core_devices.h"
 #include "ezlopi_core_errors.h"
 
 /*******************************************************************************
-*                          C++ Declaration Wrapper
-*******************************************************************************/
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
     /*******************************************************************************
-    *                          Type & Macro Declarations
-    *******************************************************************************/
+     *                          Type & Macro Declarations
+     *******************************************************************************/
     /**
      *  NOTE : FlexResistor module gives (0V - 5V) as analog output .
      *  But ESP32- only allows upto 2.4V max input.
@@ -96,7 +96,7 @@ extern "C"
      *      So using equation(3) and 'Vo' voltage value we get the required resistance value 'Rs'
      **/
 
-     // measure the resistor value using multimeter
+    // measure the resistor value using multimeter
 #define flex_Rout 10000.0f // minimum Rout = 10KOhm
 #define flex_Vin 5.0f      // Vin = 5V  (default) // if [3.3V] is used instead of [5.0V], Change [flex_Vin=> 5.0f to 3.3f]
 
@@ -106,22 +106,22 @@ extern "C"
     } flex_t;
 
     /*******************************************************************************
-    *                          Extern Data Declarations
-    *******************************************************************************/
+     *                          Extern Data Declarations
+     *******************************************************************************/
 
     /*******************************************************************************
-    *                          Extern Function Prototypes
-    *******************************************************************************/
+     *                          Extern Function Prototypes
+     *******************************************************************************/
 
     /**
-    * @brief Function to operate on actions
-    *
-    * @param action Current Action to Operate on
-    * @param item Target-Item node
-    * @param arg Arg for action
-    * @param user_arg User-arg
-    * @return ezlopi_error_t
-    */
+     * @brief Function to operate on actions
+     *
+     * @param action Current Action to Operate on
+     * @param item Target-Item node
+     * @param arg Arg for action
+     * @param user_arg User-arg
+     * @return ezlopi_error_t
+     */
     ezlopi_error_t SENSOR_0055_adc_flexresistor(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
 #ifdef __cplusplus
@@ -131,5 +131,5 @@ extern "C"
 #endif //_SENSOR_0055_ADC_FLEXRESISTOR_H_
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

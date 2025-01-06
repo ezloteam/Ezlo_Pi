@@ -143,6 +143,9 @@ ezlopi_error_t SENSOR_0067_hilink_presence_sensor_v3(e_ezlopi_actions_t action, 
     return ret;
 }
 
+/*******************************************************************************
+ *                          Static Function Definitions
+ *******************************************************************************/
 static void __notify_if_needed(ld2410_outputs_t *hilink_data, ld2410_outputs_t *present_hilink_data)
 {
     // Update specific item to the cloud only when the target's value is changed, else continue.

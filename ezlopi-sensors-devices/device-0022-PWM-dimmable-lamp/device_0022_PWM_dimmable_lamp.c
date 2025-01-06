@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    device_0022_PWM_dimmable_lamp.c
-* @brief   perform some function on device_0022
-* @author  xx
-* @version 0.1
-* @date    xx
-*/
+ * @file    device_0022_PWM_dimmable_lamp.c
+ * @brief   perform some function on device_0022
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include <math.h>
 
 #include "ezlopi_core_cloud.h"
@@ -55,16 +55,16 @@
 #include "EZLOPI_USER_CONFIG.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 typedef struct s_dimmable_bulb_properties
 {
     bool dimmable_bulb_initialized;
@@ -79,8 +79,8 @@ typedef struct s_dimmable_bulb_properties
 } s_dimmable_bulb_properties_t;
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static ezlopi_error_t __prepare(void *arg);
 static ezlopi_error_t __init(l_ezlopi_item_t *item);
 static ezlopi_error_t __list_cjson_value(l_ezlopi_item_t *item, void *arg);
@@ -88,16 +88,16 @@ static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg);
 static ezlopi_error_t __set_cjson_value(l_ezlopi_item_t *item, void *arg);
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 
 ezlopi_error_t DEVICE_0022_pwm_dimmable_lamp(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
@@ -138,8 +138,8 @@ ezlopi_error_t DEVICE_0022_pwm_dimmable_lamp(e_ezlopi_actions_t action, l_ezlopi
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 
 static ezlopi_error_t __set_cjson_value(l_ezlopi_item_t *item, void *arg)
 {
@@ -218,7 +218,6 @@ static ezlopi_error_t __list_cjson_value(l_ezlopi_item_t *item, void *arg)
     return ret;
 }
 
-
 static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 {
     ezlopi_error_t ret = EZPI_FAILED;
@@ -254,7 +253,6 @@ static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg)
     return ret;
 }
 
-
 static ezlopi_error_t __init(l_ezlopi_item_t *item)
 {
     ezlopi_error_t ret = EZPI_ERR_INIT_DEVICE_FAILED;
@@ -268,7 +266,7 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
                 if (0 == dimmable_bulb_arg->dimmable_bulb_initialized)
                 {
                     s_ezlopi_channel_speed_t *ezlopi_dimmable_channel_speed = EZPI_hal_pwm_init(item->interface.pwm.gpio_num, item->interface.pwm.pwm_resln,
-                        item->interface.pwm.freq_hz, item->interface.pwm.duty_cycle);
+                                                                                                item->interface.pwm.freq_hz, item->interface.pwm.duty_cycle);
                     if (ezlopi_dimmable_channel_speed)
                     {
                         item->interface.pwm.channel = ezlopi_dimmable_channel_speed->channel;
@@ -475,5 +473,5 @@ static ezlopi_error_t __prepare(void *arg)
     return ret;
 }
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

@@ -1,6 +1,6 @@
 file(GLOB_RECURSE files_src "./*.c*")
 
-set(EZLOPI_SERVICE_COMPONENTS 
+set(EZLOPI_SERVICE_COMPONENTS
         ezlopi-core-nvs
         ezlopi-util-trace
         ezlopi-service-webprov

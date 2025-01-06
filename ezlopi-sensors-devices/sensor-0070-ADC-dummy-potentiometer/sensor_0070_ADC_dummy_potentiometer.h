@@ -35,68 +35,66 @@
  * @author  xx
  * @version 0.1
  * @date    xx
-*/
+ */
 #ifndef _SENSOR_0070_ADC_DUMMY_POTENTIOMETER_H_
 #define _SENSOR_0070_ADC_DUMMY_POTENTIOMETER_H_
 
-
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include "ezlopi_core_actions.h"
 #include "ezlopi_core_devices.h"
 #include "ezlopi_core_errors.h"
 
 /*******************************************************************************
-*                          C++ Declaration Wrapper
-*******************************************************************************/
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
     /*******************************************************************************
-    *                          Type & Macro Declarations
-    *******************************************************************************/
+     *                          Type & Macro Declarations
+     *******************************************************************************/
 
     /*******************************************************************************
-    *                          Extern Data Declarations
-    *******************************************************************************/
+     *                          Extern Data Declarations
+     *******************************************************************************/
 
     /*******************************************************************************
-    *                          Extern Function Prototypes
-    *******************************************************************************/
+     *                          Extern Function Prototypes
+     *******************************************************************************/
     /**
-    *  NOTE : FC28 - module gives (0V - 4.2V) as analog output .
-    *  But ESP32- only allows upto 2.4V max input.
-    *
-    *  Remedy:  introduce a voltage divider of ratio [1:2 , i.e. 50%]  on the Sensor analog output , so that esp32 adc pin recieves half voltage only.
-    *             ( Half of 4.2) -> 2.1V
-    *
-    *            > 3.3V----+
-    *                      |
-    *              {potentiometer_half1}
-    *                      |
-    *                      +------------+ ~2.4V
-    *                      |                ^
-    *              {potentiometer_half2}    |  esp32 analog input
-    *                      |                v
-    *            > 0V------+------------+ 0V
-    *
-    *
-    **/
+     *  NOTE : FC28 - module gives (0V - 4.2V) as analog output .
+     *  But ESP32- only allows upto 2.4V max input.
+     *
+     *  Remedy:  introduce a voltage divider of ratio [1:2 , i.e. 50%]  on the Sensor analog output , so that esp32 adc pin recieves half voltage only.
+     *             ( Half of 4.2) -> 2.1V
+     *
+     *            > 3.3V----+
+     *                      |
+     *              {potentiometer_half1}
+     *                      |
+     *                      +------------+ ~2.4V
+     *                      |                ^
+     *              {potentiometer_half2}    |  esp32 analog input
+     *                      |                v
+     *            > 0V------+------------+ 0V
+     *
+     *
+     **/
 
     /**
-    * @brief Function to operate on actions
-    *
-    * @param action Current Action to Operate on
-    * @param item Target-Item node
-    * @param arg Arg for action
-    * @param user_arg User-arg
-    * @return ezlopi_error_t
-    */
+     * @brief Function to operate on actions
+     *
+     * @param action Current Action to Operate on
+     * @param item Target-Item node
+     * @param arg Arg for action
+     * @param user_arg User-arg
+     * @return ezlopi_error_t
+     */
     ezlopi_error_t SENSOR_0070_adc_dummy_potentiometer(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
-
 
 #ifdef __cplusplus
 }
@@ -105,5 +103,5 @@ extern "C"
 #endif //_SENSOR_0070_ADC_DUMMY_POTENTIOMETER_H_
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    sensor_0032_ADC_soilMoisture.c
-* @brief   perform some function on sensor_0032
-* @author  xx
-* @version 0.1
-* @date    xx
-*/
+ * @file    sensor_0032_ADC_soilMoisture.c
+ * @brief   perform some function on sensor_0032
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include <math.h>
 
 #include "ezlopi_core_cloud.h"
@@ -55,35 +55,35 @@
 #include "EZLOPI_USER_CONFIG.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static ezlopi_error_t __prepare(void *arg);
 static ezlopi_error_t __init(l_ezlopi_item_t *item);
 static ezlopi_error_t __notify(l_ezlopi_item_t *item);
 static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg);
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 
 ezlopi_error_t SENSOR_0032_adc_soilMoisture(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
@@ -120,8 +120,8 @@ ezlopi_error_t SENSOR_0032_adc_soilMoisture(e_ezlopi_actions_t action, l_ezlopi_
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 
 static ezlopi_error_t __notify(l_ezlopi_item_t *item)
 {
@@ -130,7 +130,7 @@ static ezlopi_error_t __notify(l_ezlopi_item_t *item)
     double *soil_moisture_data = (double *)item->user_arg;
     if (soil_moisture_data)
     {
-        s_ezlopi_analog_data_t tmp_data = { .value = 0, .voltage = 0 };
+        s_ezlopi_analog_data_t tmp_data = {.value = 0, .voltage = 0};
         EZPI_hal_adc_get_adc_data(item->interface.adc.gpio_num, &tmp_data);
         double percentage = ((4095 - tmp_data.value) / 4096.0) * 100;
         if (fabs(percentage - *soil_moisture_data) > 1.0)
@@ -242,5 +242,5 @@ static ezlopi_error_t __prepare(void *arg)
 }
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

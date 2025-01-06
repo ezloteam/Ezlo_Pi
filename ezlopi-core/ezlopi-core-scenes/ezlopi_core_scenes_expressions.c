@@ -1013,6 +1013,9 @@ static void ___create_lua_subtable(lua_State *lua_state, l_ezlopi_item_t *item_p
     }
 }
 
+/*******************************************************************************
+ *                          Static Function Definitions
+ *******************************************************************************/
 static void __get_expressions_value(s_ezlopi_expressions_t *exp_node, cJSON *cj_value)
 {
     if (exp_node && cj_value)
@@ -1117,7 +1120,7 @@ static int __evaluate_expression(cJSON *cj_des, cJSON *lua_prop_params, const ch
                                     while (item_prop)
                                     {
                                         if (EZPI_STRNCMP_IF_EQUAL(cj_item_name->valuestring, item_prop->cloud_properties.item_name, cj_item_name->str_value_len, strlen(item_prop->cloud_properties.item_name) + 1)) // "itemName" == "sound_level"
-                                        {                                                                                                                                                                        // create the sub-table
+                                        {                                                                                                                                                                            // create the sub-table
                                             ___create_lua_subtable(lua_state, item_prop, cj_target_name->valuestring);
                                             // total_key_count++;
                                             // TRACE_D(" [items_%d] : adding '%s'.", total_key_count, cj_target_name->valuestring);

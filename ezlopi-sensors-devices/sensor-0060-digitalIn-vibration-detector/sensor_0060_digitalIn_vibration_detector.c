@@ -11,14 +11,26 @@
 #include "ezlopi_service_gpioisr.h"
 #include "sensor_0060_digitalIn_vibration_detector.h"
 
-//---------------------------------------------------------------------------------------------------------
+/*******************************************************************************
+ *                          Extern Data Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 const char *Sw420_vibration_activity_state_token[] = {
     "no_activity",
     "shake",
     "tilt",
     "drop",
 };
-
+/*******************************************************************************
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static ezlopi_error_t __0060_prepare(void *arg);
 static ezlopi_error_t __0060_init(l_ezlopi_item_t *item);
 static ezlopi_error_t __0060_get_item(l_ezlopi_item_t *item, void *arg);
@@ -65,8 +77,10 @@ ezlopi_error_t SENSOR_0060_digitalIn_vibration_detector(e_ezlopi_actions_t actio
     }
     return ret;
 }
-//---------------------------------------------------------------------------------------------------------
 
+/*******************************************************************************
+ *                          Static Function Definitions
+ *******************************************************************************/
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     device->cloud_properties.category = category_security_sensor;
@@ -75,6 +89,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
     device->cloud_properties.info = NULL;
     device->cloud_properties.device_type_id = NULL;
 }
+
 static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device)
 {
     item->cloud_properties.show = true;
@@ -95,6 +110,7 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_dev
     item->interface.gpio.gpio_in.pull = GPIO_PULLDOWN_ONLY;
     item->interface.gpio.gpio_in.interrupt = GPIO_INTR_ANYEDGE;
 }
+
 static ezlopi_error_t __0060_prepare(void *arg)
 {
     ezlopi_error_t ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
@@ -152,6 +168,7 @@ static ezlopi_error_t __0060_init(l_ezlopi_item_t *item)
     }
     return ret;
 }
+
 static ezlopi_error_t __0060_get_item(l_ezlopi_item_t *item, void *arg)
 {
     ezlopi_error_t ret = EZPI_FAILED;
@@ -183,6 +200,7 @@ static ezlopi_error_t __0060_get_item(l_ezlopi_item_t *item, void *arg)
     }
     return ret;
 }
+
 static ezlopi_error_t __0060_get_cjson_value(l_ezlopi_item_t *item, void *arg)
 {
     ezlopi_error_t ret = EZPI_FAILED;
@@ -198,7 +216,7 @@ static ezlopi_error_t __0060_get_cjson_value(l_ezlopi_item_t *item, void *arg)
     }
     return ret;
 }
-//------------------------------------------------------------------------------------------------------------
+
 static ezlopi_error_t __0060_notify(l_ezlopi_item_t *item)
 {
     ezlopi_error_t ret = EZPI_FAILED;
@@ -224,3 +242,7 @@ static ezlopi_error_t __0060_notify(l_ezlopi_item_t *item)
 
     return ret;
 }
+
+/*******************************************************************************
+ *                          End of File
+ *******************************************************************************/

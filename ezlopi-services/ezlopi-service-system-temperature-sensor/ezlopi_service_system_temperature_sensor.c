@@ -1,4 +1,33 @@
-
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
 
 /**
  * @file    ezlopi_service_system_temperature_sensor.c
@@ -7,37 +36,10 @@
  * @version
  * @date
  */
- /* ===========================================================================
- ** Copyright (C) 2024 Ezlo Innovation Inc
- **
- ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
- **
- ** Redistribution and use in source and binary forms, with or without
- ** modification, are permitted provided that the following conditions are met:
- **
- ** 1. Redistributions of source code must retain the above copyright notice,
- **    this list of conditions and the following disclaimer.
- ** 2. Redistributions in binary form must reproduce the above copyright
- **    notice, this list of conditions and the following disclaimer in the
- **    documentation and/or other materials provided with the distribution.
- ** 3. Neither the name of the copyright holder nor the names of its
- **    contributors may be used to endorse or promote products derived from
- **    this software without specific prior written permission.
- **
- ** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- ** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- ** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- ** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- ** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- ** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- ** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- ** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- ** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- ** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- ** POSSIBILITY OF SUCH DAMAGE.
- ** ===========================================================================
- */
 
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 #include "sdkconfig.h"
 #if defined(CONFIG_EZPI_ENABLE_SYSTEM_TEMPERATURE)
 
@@ -57,12 +59,26 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "ezlopi_service_system_temperature_sensor.h"
+/*******************************************************************************
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
- /**
-  * @brief Function to prepare temperature sensor related cloud parameters and items
-  *
-  * @return int
-  */
+/*******************************************************************************
+ *                          Extern Function Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Type & Macro Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Static Function Prototypes
+ *******************************************************************************/
+/**
+ * @brief Function to prepare temperature sensor related cloud parameters and items
+ *
+ * @return int
+ */
 static int ezpi_prepare();
 /**
  * @brief Function to initialize and start temperature data
@@ -98,11 +114,20 @@ static void ezpi_prepare_device_cloud_properties(l_ezlopi_device_t *device);
  * @param item pointer to item
  */
 static void ezpi_prepare_item_properties(l_ezlopi_item_t *item);
-
+/*******************************************************************************
+ *                          Static Data Definitions
+ *******************************************************************************/
 static temp_sensor_config_t device_tempeature_sensor_configuration = TSENS_CONFIG_DEFAULT();
 static bool system_temperature_initialized = false;
 static float system_temperature = 0.0f;
 
+/*******************************************************************************
+ *                          Extern Data Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Definitions
+ *******************************************************************************/
 int EZPI_system_temperature_device(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     int ret = 0;
@@ -136,7 +161,9 @@ int EZPI_system_temperature_device(e_ezlopi_actions_t action, l_ezlopi_item_t *i
     }
     return ret;
 }
-
+/*******************************************************************************
+ *                          Static Function Definitions
+ *******************************************************************************/
 static void ezpi_prepare_device_cloud_properties(l_ezlopi_device_t *device)
 {
     device->cloud_properties.category = category_temperature;

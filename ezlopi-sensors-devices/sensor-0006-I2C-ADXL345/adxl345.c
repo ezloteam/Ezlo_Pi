@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    adxl345.c
-* @brief   perform some function on adxl345
-* @author  xx
-* @version 0.1
-* @date    xx
-*/
+ * @file    adxl345.c
+ * @brief   perform some function on adxl345
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include "ezlopi_util_trace.h"
 #include "esp_err.h"
 #include "ezlopi_cloud_item_name_str.h"
@@ -46,20 +46,20 @@
 #include "ezlopi_core_errors.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static esp_err_t get_device_id(l_ezlopi_item_t *item);
 static esp_err_t data_formatting(l_ezlopi_item_t *item);
 static esp_err_t set_to_measure_mode(l_ezlopi_item_t *item);
@@ -67,16 +67,16 @@ static esp_err_t enable_data_ready_interrupt(l_ezlopi_item_t *item);
 static esp_err_t reset_measure_mode(l_ezlopi_item_t *item);
 static esp_err_t adxl345_check_data_ready_INTR(l_ezlopi_item_t *item, uint8_t *temp);
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 ezlopi_error_t ADXL345_configure_device(l_ezlopi_item_t *item)
 {
     ezlopi_error_t ret = EZPI_FAILED;
@@ -98,7 +98,7 @@ void ADXL345_get_axis_value(l_ezlopi_item_t *item)
     {
         s_adxl345_data_t *user_data = (s_adxl345_data_t *)item->user_arg;
         bool valid_data = false;
-        static uint8_t buffer[ADXL345_ODR_CNT] = { 0 };
+        static uint8_t buffer[ADXL345_ODR_CNT] = {0};
         uint8_t Check_Register = 0;
         uint8_t address_val;
         esp_err_t err = ESP_OK;
@@ -140,8 +140,8 @@ void ADXL345_get_axis_value(l_ezlopi_item_t *item)
     }
 }
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 
 static esp_err_t get_device_id(l_ezlopi_item_t *item)
 {
@@ -149,7 +149,7 @@ static esp_err_t get_device_id(l_ezlopi_item_t *item)
     if (item)
     {
         uint8_t dev_id = 0;
-        uint8_t write_buffer[] = { ADXL345_DEVICE_ID_REGISTER }; // REG_INTR_STATUS;
+        uint8_t write_buffer[] = {ADXL345_DEVICE_ID_REGISTER}; // REG_INTR_STATUS;
         err = EZPI_hal_i2c_master_write_to_device(&item->interface.i2c_master, write_buffer, 1);
         err = EZPI_hal_i2c_master_read_from_device(&item->interface.i2c_master, &dev_id, 1);
         TRACE_E("The device id is {%#x}", dev_id);
@@ -161,7 +161,7 @@ static esp_err_t data_formatting(l_ezlopi_item_t *item)
     esp_err_t err = ESP_OK;
     if (item)
     {
-        uint8_t write_byte[] = { ADXL345_DATA_FORMAT_REGISTER, ADXL345_FORMAT_REGISTER_DATA };
+        uint8_t write_byte[] = {ADXL345_DATA_FORMAT_REGISTER, ADXL345_FORMAT_REGISTER_DATA};
         err = EZPI_hal_i2c_master_write_to_device(&item->interface.i2c_master, write_byte, 2);
     }
     return err;
@@ -171,7 +171,7 @@ static esp_err_t set_to_measure_mode(l_ezlopi_item_t *item)
     esp_err_t err = ESP_OK;
     if (item)
     {
-        uint8_t write_byte[] = { ADXL345_DEVICE_POWER_CTRL, ADXL345_POWER_CTRL_SET_TO_MEASUTEMENT };
+        uint8_t write_byte[] = {ADXL345_DEVICE_POWER_CTRL, ADXL345_POWER_CTRL_SET_TO_MEASUTEMENT};
         err = EZPI_hal_i2c_master_write_to_device(&item->interface.i2c_master, write_byte, 2);
     }
     return err;
@@ -181,7 +181,7 @@ static esp_err_t enable_data_ready_interrupt(l_ezlopi_item_t *item)
     esp_err_t err = ESP_OK;
     if (item)
     {
-        uint8_t write_byte[] = { ADXL345_INT_ENABLE_REGISTER, ADXL345_INT_EN };
+        uint8_t write_byte[] = {ADXL345_INT_ENABLE_REGISTER, ADXL345_INT_EN};
         err = EZPI_hal_i2c_master_write_to_device(&item->interface.i2c_master, write_byte, 2);
     }
     return err;
@@ -191,7 +191,7 @@ static esp_err_t reset_measure_mode(l_ezlopi_item_t *item)
     esp_err_t err = ESP_OK;
     if (item)
     {
-        uint8_t write_byte[] = { ADXL345_DEVICE_POWER_CTRL, ADXL345_POWER_CTRL_RESET };
+        uint8_t write_byte[] = {ADXL345_DEVICE_POWER_CTRL, ADXL345_POWER_CTRL_RESET};
         err = EZPI_hal_i2c_master_write_to_device(&item->interface.i2c_master, write_byte, 2);
     }
     return err;
@@ -201,7 +201,7 @@ static esp_err_t adxl345_check_data_ready_INTR(l_ezlopi_item_t *item, uint8_t *t
     esp_err_t err = ESP_OK;
     if (item)
     {
-        uint8_t write_buffer[] = { ADXL345_INT_SOURCE_REGISTER }; // REG_INTR_STATUS;
+        uint8_t write_buffer[] = {ADXL345_INT_SOURCE_REGISTER}; // REG_INTR_STATUS;
         EZPI_hal_i2c_master_write_to_device(&item->interface.i2c_master, write_buffer, 1);
         EZPI_hal_i2c_master_read_from_device(&item->interface.i2c_master, temp, 1);
         if (NULL != temp)
@@ -217,5 +217,5 @@ static esp_err_t adxl345_check_data_ready_INTR(l_ezlopi_item_t *item, uint8_t *t
 }
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

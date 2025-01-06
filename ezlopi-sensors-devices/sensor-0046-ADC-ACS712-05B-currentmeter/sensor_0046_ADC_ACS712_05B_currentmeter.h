@@ -34,39 +34,39 @@
  * @author  xx
  * @version 0.1
  * @date    xx
-*/
+ */
 
 #ifndef _SENSOR_0046_ADC_ACS712_05B_CURRENTMETER_H_
 #define _SENSOR_0046_ADC_ACS712_05B_CURRENTMETER_H_
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include "ezlopi_core_actions.h"
 #include "ezlopi_core_devices.h"
 #include "ezlopi_core_errors.h"
 
 /*******************************************************************************
-*                          C++ Declaration Wrapper
-*******************************************************************************/
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
     /*******************************************************************************
-    *                          Type & Macro Declarations
-    *******************************************************************************/
+     *                          Type & Macro Declarations
+     *******************************************************************************/
 #define ASC712TELC_05B_zero_point_mV 2350 // adc_value at the output ; when no current in input side
 #define DEFAULT_AC_FREQUENCY 50
 
     /*******************************************************************************
-    *                          Extern Data Declarations
-    *******************************************************************************/
+     *                          Extern Data Declarations
+     *******************************************************************************/
 
     /*******************************************************************************
-    *                          Extern Function Prototypes
-    *******************************************************************************/
+     *                          Extern Function Prototypes
+     *******************************************************************************/
     /**
      * Chip model : ACS712ELCTR-05B-T
      *
@@ -76,37 +76,36 @@ extern "C"
      *
      */
 
-     /**
-      *  NOTE : ACS712ELCTR-05B-T - module gives (0V - 5V) as analog output .
-      *  But ESP32- only allows upto 2.4V max input.
-      *
-      *  Remedy:  introduce a voltage divider of ratio [1:2 , i.e. 50%]  on the Sensor analog output , so that esp32 adc pin recieves half voltage only.
-      *             ( Half of 4.2) -> 2.1V
-      *
-      *  currentMeter > 5V---+
-      *                      |
-      *                     {1KOhm}
-      *                      |
-      *                      +------------+ 2.4V
-      *                      |                ^
-      *                     {1KOhm}           |  esp32 analog input
-      *                      |                v
-      *            > 0V------+------------+ 0V
-      *
-      *
-      */
+    /**
+     *  NOTE : ACS712ELCTR-05B-T - module gives (0V - 5V) as analog output .
+     *  But ESP32- only allows upto 2.4V max input.
+     *
+     *  Remedy:  introduce a voltage divider of ratio [1:2 , i.e. 50%]  on the Sensor analog output , so that esp32 adc pin recieves half voltage only.
+     *             ( Half of 4.2) -> 2.1V
+     *
+     *  currentMeter > 5V---+
+     *                      |
+     *                     {1KOhm}
+     *                      |
+     *                      +------------+ 2.4V
+     *                      |                ^
+     *                     {1KOhm}           |  esp32 analog input
+     *                      |                v
+     *            > 0V------+------------+ 0V
+     *
+     *
+     */
 
-      /**
-       * @brief Function to operate on actions
-       *
-       * @param action Current Action to Operate on
-       * @param item Target-Item node
-       * @param arg Arg for action
-       * @param user_arg User-arg
-       * @return ezlopi_error_t
-       */
+    /**
+     * @brief Function to operate on actions
+     *
+     * @param action Current Action to Operate on
+     * @param item Target-Item node
+     * @param arg Arg for action
+     * @param user_arg User-arg
+     * @return ezlopi_error_t
+     */
     ezlopi_error_t SENSOR_0046_adc_acs712_05b_currentmeter(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
-
 
 #ifdef __cplusplus
 }
@@ -115,5 +114,5 @@ extern "C"
 #endif // _SENSOR_0046_ADC_ACS712_05B_CURRENTMETER_H_
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

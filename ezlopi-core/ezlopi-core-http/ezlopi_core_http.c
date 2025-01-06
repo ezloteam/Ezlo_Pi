@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    ezlopi_core_http.c
-* @brief   Function to perform operation on http
-* @author  xx
-* @version 0.1
-* @date    12th DEC 2024
-*/
+ * @file    ezlopi_core_http.c
+ * @brief   Function to perform operation on http
+ * @author  xx
+ * @version 0.1
+ * @date    12th DEC 2024
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include <time.h>
 #include "esp_tls.h"
 // #ifdef CONFIG_ESP_TLS_USING_MBEDTLS
@@ -62,16 +62,16 @@
 #include "EZLOPI_USER_CONFIG.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 #define TAG __FILE__
 
 #define FREE_IF_NOT_NULL(ptr)               \
@@ -94,23 +94,23 @@
 #endif
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static void __ezlopi_http_req_via_mbedTLS(const char *host_web_server, int web_port_num, const char *url_req, char **resp_buf);
 static void __ezlopi_http_generate_request(s_ezlopi_core_http_mbedtls_t *config, char **request, int request_len);
 static void __ezlopi_http_free_rx_data(s_rx_chunk_t *rx_chunks);
 static esp_err_t __ezlopi_http_event_handler(esp_http_client_event_t *evt);
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 int EZPI_core_http_calc_empty_bufsize(char *dest_buff, int dest_size, int reqd_size)
 {
     int limit = dest_size - GET_STRING_SIZE(dest_buff);
@@ -376,8 +376,8 @@ s_ezlopi_http_data_t *EZPI_core_http_post_request(const char *cloud_url, const c
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 /**
  * @brief Function Trigger http_requests via mbedTLS.
  *
@@ -390,7 +390,7 @@ static void __ezlopi_http_req_via_mbedTLS(const char *host_web_server, int web_p
     uint32_t tmp_buf_size = 256;
     char tmp_buf[tmp_buf_size];
 
-    char web_port[10] = { 0 };
+    char web_port[10] = {0};
     snprintf(web_port, 10, "%d", web_port_num);
     web_port[9] = '\0';
 
@@ -414,7 +414,7 @@ static void __ezlopi_http_req_via_mbedTLS(const char *host_web_server, int web_p
     mbedtls_ssl_config_init(&conf);
     mbedtls_entropy_init(&entropy);
     if (0 != (ret = mbedtls_ctr_drbg_seed(&ctr_drbg, mbedtls_entropy_func, &entropy,
-        NULL, 0)))
+                                          NULL, 0)))
     {
         TRACE_E("mbedtls_ctr_drbg_seed returned %d", ret);
         goto exit;
@@ -438,9 +438,9 @@ static void __ezlopi_http_req_via_mbedTLS(const char *host_web_server, int web_p
 
     // TRACE_I("Setting up the SSL/TLS structure...");
     if (0 != (ret = mbedtls_ssl_config_defaults(&conf,
-        MBEDTLS_SSL_IS_CLIENT,
-        MBEDTLS_SSL_TRANSPORT_STREAM,
-        MBEDTLS_SSL_PRESET_DEFAULT)))
+                                                MBEDTLS_SSL_IS_CLIENT,
+                                                MBEDTLS_SSL_TRANSPORT_STREAM,
+                                                MBEDTLS_SSL_PRESET_DEFAULT)))
     {
         TRACE_E("mbedtls_ssl_config_defaults returned %d", ret);
         goto exit;
@@ -468,7 +468,7 @@ static void __ezlopi_http_req_via_mbedTLS(const char *host_web_server, int web_p
     // TRACE_I("Connecting to %s:%s...", host_web_server, web_port);
 
     if (0 != (ret = mbedtls_net_connect(&server_fd, host_web_server,
-        web_port, MBEDTLS_NET_PROTO_TCP)))
+                                        web_port, MBEDTLS_NET_PROTO_TCP)))
     {
         TRACE_E("mbedtls_net_connect returned -%x", -ret);
         goto exit;
@@ -515,7 +515,7 @@ static void __ezlopi_http_req_via_mbedTLS(const char *host_web_server, int web_p
     do
     {
         ret = mbedtls_ssl_write(&ssl, (const unsigned char *)url_req + written_bytes,
-            strlen(url_req) - written_bytes);
+                                strlen(url_req) - written_bytes);
         if (ret >= 0)
         {
             // TRACE_I("%d bytes written", ret);
@@ -866,12 +866,6 @@ static void __ezlopi_http_free_rx_data(s_rx_chunk_t *rx_chunks)
     }
 }
 
-
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
-
-
-
-
-
+ *                          End of File
+ *******************************************************************************/
