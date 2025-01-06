@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    ezlopi_core_processes.c
-* @brief   Function to perform operation on ezlopi-process/task
-* @author  xx
-* @version 0.1
-* @date    12th DEC 2024
-*/
+ * @file    ezlopi_core_processes.c
+ * @brief   Function to perform operation on ezlopi-process/task
+ * @author  xx
+ * @version 0.1
+ * @date    12th DEC 2024
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include "stdlib.h"
 #include "stdbool.h"
 #include "string.h"
@@ -52,42 +52,42 @@
 
 #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 typedef struct
 {
     TaskHandle_t task_handle;
     size_t stack_depth;
     bool is_deleted;
-}s_ezlopi_task_info_t;
+} s_ezlopi_task_info_t;
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static size_t __set_default_task_memory_usage(const char *default_task_name);
 static bool __check_ezlopi_task(TaskHandle_t task_handle);
 static void __set_task_to_arry(cJSON *cj_processes_array);
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 static s_ezlopi_task_info_t ezlopi_task_info_array[ENUM_TASK_MAX];
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 int ezlopi_core_get_processes_details(cJSON *cj_processes_array)
 {
     int ret = 0;
@@ -157,8 +157,8 @@ int EZPI_core_process_set_is_deleted(e_ezlopi_task_enum_t task_num)
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 
 static size_t __set_default_task_memory_usage(const char *default_task_name)
 {
@@ -245,5 +245,5 @@ static void __set_task_to_arry(cJSON *cj_processes_array)
 
 #endif // CONFIG_FREERTOS_USE_TRACE_FACILITY
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

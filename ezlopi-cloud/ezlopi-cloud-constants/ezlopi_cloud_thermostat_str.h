@@ -1,14 +1,5 @@
-
-
-/**
- * @file    ezlopi_cloud_thermostat_str.h
- * @brief
- * @author
- * @version
- * @date
- */
 /* ===========================================================================
-** Copyright (C) 2022 Ezlo Innovation Inc
+** Copyright (C) 2024 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -38,14 +29,36 @@
 ** ===========================================================================
 */
 
+/**
+ * @file    ezlopi_cloud_thermostat_str.h
+ * @brief   perform some function on data
+ * @author  John Doe
+ * @version 0.1
+ * @date    1st January 2024
+ */
+
 #ifndef __EZLOPI_THERMOSTAT_STR_H__
 #define __EZLOPI_THERMOSTAT_STR_H__
 
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
+    /*******************************************************************************
+     *                          Type & Macro Declarations
+     *******************************************************************************/
+
+    /*******************************************************************************
+     *                          Extern Data Declarations
+     *******************************************************************************/
     // extern const  char *thermostat_heating               = "heating";
     // extern const  char *thermostat_cooling               = "cooling";
     // extern const  char *thermostat_furnace               = "furnace";
@@ -57,6 +70,10 @@ extern "C"
     // extern const  char *thermostat_away_heating          = "away_heating";
     // extern const  char *thermostat_away_cooling          = "away_cooling";
     // extern const  char *thermostat_full_power            = "full_power";
+
+    /*******************************************************************************
+     *                          Extern Function Prototypes
+     *******************************************************************************/
 
 #ifdef __cplusplus
 }

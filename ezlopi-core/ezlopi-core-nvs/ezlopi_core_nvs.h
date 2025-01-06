@@ -34,37 +34,37 @@
  * @author  xx
  * @version 0.1
  * @date    12th DEC 2024
-*/
+ */
 
 #ifndef _EZLOPI_CORE_NVS_H_
 #define _EZLOPI_CORE_NVS_H_
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include "nvs_flash.h"
 #include "ezlopi_core_errors.h"
 
 /*******************************************************************************
-*                          C++ Declaration Wrapper
-*******************************************************************************/
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
     /*******************************************************************************
-    *                          Type & Macro Declarations
-    *******************************************************************************/
+     *                          Type & Macro Declarations
+     *******************************************************************************/
 #define NVS_WIFI_MAGIC 0x5647ABCD
 
     /*******************************************************************************
-    *                          Extern Data Declarations
-    *******************************************************************************/
+     *                          Extern Data Declarations
+     *******************************************************************************/
 
     /*******************************************************************************
-    *                          Extern Function Prototypes
-    *******************************************************************************/
+     *                          Extern Function Prototypes
+     *******************************************************************************/
 
     /**
      * @brief Function to initialize nvs service
@@ -343,10 +343,10 @@ extern "C"
      */
     ezlopi_error_t EZPI_core_nvs_write_scenes_expressions(char *data);
     /**
-    * @brief Function to read device_groups
-    *
-    * @return char*
-    */
+     * @brief Function to read device_groups
+     *
+     * @return char*
+     */
     char *EZPI_core_nvs_read_device_groups(void);
     /**
      * @brief Function to write device_groups
@@ -356,10 +356,10 @@ extern "C"
      */
     ezlopi_error_t EZPI_core_nvs_write_device_groups(char *data);
     /**
-    * @brief Function to read item_groups
-    *
-    * @return char*
-    */
+     * @brief Function to read item_groups
+     *
+     * @return char*
+     */
     char *EZPI_core_nvs_read_item_groups(void);
     /**
      * @brief Function to write item_groups
@@ -369,10 +369,10 @@ extern "C"
      */
     ezlopi_error_t EZPI_core_nvs_write_item_groups(char *data);
     /**
-    * @brief Function to read rooms
-    *
-    * @return char*
-    */
+     * @brief Function to read rooms
+     *
+     * @return char*
+     */
     char *EZPI_core_nvs_read_rooms(void);
     /**
      * @brief Function to write rooms
@@ -390,16 +390,16 @@ extern "C"
      */
     ezlopi_error_t EZPI_core_nvs_write_time_location(const char *time_loc, uint32_t len);
     /**
-    * @brief Function to read time_location
-    *
-    * @return char*
-    */
+     * @brief Function to read time_location
+     *
+     * @return char*
+     */
     char *EZPI_core_nvs_read_time_location(void);
     /**
-    * @brief Function to read modes
-    *
-    * @return char*
-    */
+     * @brief Function to read modes
+     *
+     * @return char*
+     */
     char *EZPI_core_nvs_read_modes(void);
     /**
      * @brief Function to write modes
@@ -409,10 +409,10 @@ extern "C"
      */
     ezlopi_error_t EZPI_core_nvs_write_modes(char *data);
     /**
-    * @brief Function to read latidtude_longitude
-    *
-    * @return char*
-    */
+     * @brief Function to read latidtude_longitude
+     *
+     * @return char*
+     */
     char *EZPI_core_nvs_read_latidtude_longitude();
     /**
      * @brief Function to write latitude_longitude
@@ -602,7 +602,6 @@ extern "C"
      */
     ezlopi_error_t EZPI_core_nvs_read_network_ping_timeout(uint32_t *ping_timeout);
 
-
 #ifdef __cplusplus
 }
 #endif
@@ -610,5 +609,5 @@ extern "C"
 #endif // _EZLOPI_CORE_NVS_H_
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

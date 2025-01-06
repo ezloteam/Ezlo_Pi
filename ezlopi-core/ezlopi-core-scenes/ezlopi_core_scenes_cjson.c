@@ -35,9 +35,9 @@
  * @version 0.1
  * @date    12th DEC 2024
  */
- //*******************************************************************************
- //*                          Include Files
- //*******************************************************************************
+//*******************************************************************************
+//*                          Include Files
+//*******************************************************************************
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
@@ -53,20 +53,20 @@
 #include "ezlopi_cloud_constants.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static void __cjson_add_fields(cJSON *cj_block, l_fields_v2_t *fields);
 static void __cjson_add_string(cJSON *root, const char *key, const char *value);
 static void __cjson_add_action_delay(cJSON *cj_then_block, s_action_delay_v2_t *action_delay);
@@ -79,16 +79,16 @@ static void __ezlopi_scenes_cjson_add_when_group_info(cJSON *cj_when_block, l_wh
 static void __ezlopi_scenes_cjson_add_when_block_info(cJSON *cj_when_block, l_when_block_v2_t *when_block);
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 
 cJSON *EZPI_scene_cjson_get_field(l_fields_v2_t *field_node)
 {
@@ -321,7 +321,7 @@ cJSON *EZPI_scenes_create_cjson_scene(l_scenes_list_v2_t *scene)
         cj_scene = cJSON_CreateObject(__FUNCTION__);
         if (cj_scene)
         {
-            char tmp_str[16] = { 0 };
+            char tmp_str[16] = {0};
             snprintf(tmp_str, sizeof(tmp_str), "%08x", scene->_id);
             cJSON_AddStringToObject(__FUNCTION__, cj_scene, ezlopi__id_str, tmp_str);
             cJSON_AddBoolToObject(__FUNCTION__, cj_scene, ezlopi_enabled_str, scene->enabled);
@@ -420,8 +420,8 @@ void EZPI_scenes_cjson_add_when_blocks(cJSON *root, l_when_block_v2_t *when_bloc
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 static void __ezlopi_scenes_cjson_add_user_notifications(cJSON *root, l_user_notification_v2_t *user_notifications)
 {
     if (root)
@@ -511,7 +511,7 @@ static void __ezlopi_scenes_cjson_add_when_group_info(cJSON *cj_when_block, l_wh
         if ((when_block->when_grp) && (0 < strlen(when_block->when_grp->grp_blockName)))
         {
             __cjson_add_string(cj_when_block, ezlopi_blockName_str, when_block->when_grp->grp_blockName); // group_blockName
-            char tmp_str[16] = { 0 };
+            char tmp_str[16] = {0};
             snprintf(tmp_str, sizeof(tmp_str), "%08x", when_block->when_grp->grp_id);
             cJSON_AddBoolToObject(__FUNCTION__, cj_when_block, ezlopi_is_group_str, true); // is_group flag
             __cjson_add_string(cj_when_block, ezlopi_group_id_str, tmp_str);               // group_id
@@ -526,7 +526,7 @@ static void __ezlopi_scenes_cjson_add_when_block_info(cJSON *cj_when_block, l_wh
         if (0 < when_block->blockId)
         {
             cJSON_AddBoolToObject(__FUNCTION__, cj_when_block, ezlopi_block_enable_str, when_block->block_enable);
-            char tmp_str[16] = { 0 };
+            char tmp_str[16] = {0};
             snprintf(tmp_str, sizeof(tmp_str), "%08x", when_block->blockId);
             __cjson_add_string(cj_when_block, ezlopi_blockId_str, tmp_str);
         }
@@ -821,7 +821,5 @@ static void __cjson_add_string(cJSON *root, const char *key, const char *value)
 #endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
-
-
+ *                          End of File
+ *******************************************************************************/

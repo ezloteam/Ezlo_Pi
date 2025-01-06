@@ -1,11 +1,3 @@
-
-/**
- * @file    ezlopi_service_ws_server.h
- * @brief
- * @author
- * @version
- * @date
- */
 /* ===========================================================================
 ** Copyright (C) 2024 Ezlo Innovation Inc
 **
@@ -37,18 +29,34 @@
 ** ===========================================================================
 */
 
+/**
+ * @file    main.c
+ * @brief   perform some function on data
+ * @author  John Doe
+ * @version 0.1
+ * @date    1st January 2024
+ */
+
 #ifndef __EZLOPI_SERVICE_WS_SERVER_H__
 #define __EZLOPI_SERVICE_WS_SERVER_H__
 
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
+#include "cjext.h"
+#include "ezlopi_service_ws_server_clients.h"
+
+/*******************************************************************************
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
-    /**
-     * @brief Enum that indicates the statss of the wbesocket server
-     *
-     */
+    /*******************************************************************************
+     *                          Type & Macro Declarations
+     *******************************************************************************/
     typedef enum e_ws_status
     {
         WS_STATUS_RUNNING = 0, /**< Status running */
@@ -56,8 +64,21 @@ extern "C"
         WS_STATUS_STOPPED,     /**< Status stopped */
     } e_ws_status_t;
 
+    /*******************************************************************************
+     *                          Extern Data Declarations
+     *******************************************************************************/
+
+    /*******************************************************************************
+     *                          Extern Function Prototypes
+     *******************************************************************************/
     /**
-     * @brief Function to stop websocket server
+     * @brief Global function template example
+     * Convention : Use capital letter for initial word on extern function
+     * maincomponent : Main component as hal, core, service etc.
+     * subcomponent : Sub component as i2c from hal, ble from service etc
+     * functiontitle : Title of the function
+     * eg : EZPI_hal_i2c_init()
+     * @param arg
      *
      */
     void EZPI_service_ws_server_stop(void);

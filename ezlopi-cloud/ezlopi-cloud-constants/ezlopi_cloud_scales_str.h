@@ -1,14 +1,5 @@
-
-
-/**
- * @file    ezlopi_cloud_scales_str.h
- * @brief
- * @author
- * @version
- * @date
- */
 /* ===========================================================================
-** Copyright (C) 2022 Ezlo Innovation Inc
+** Copyright (C) 2024 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -38,14 +29,37 @@
 ** ===========================================================================
 */
 
+/**
+ * @file    ezlopi_cloud_scales_str.h
+ * @brief
+ * @author  John Doe
+ * @version 0.1
+ * @date    1st January 2024
+ */
+
 #ifndef __EZLOPI_SCALES_STR_H__
 #define __EZLOPI_SCALES_STR_H__
 
+/// @brief https://api.ezlo.com/devices/item_value_types/index.html#scalable-types
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
+    /*******************************************************************************
+     *                          Type & Macro Declarations
+     *******************************************************************************/
+
+    /*******************************************************************************
+     *                          Extern Data Declarations
+     *******************************************************************************/
     /// @brief https://api.ezlo.com/devices/item_value_types/index.html#scalable-types
 
     /// @brief Temperature
@@ -126,6 +140,9 @@ extern "C"
     extern const char *scales_guass;
     extern const char *scales_tesla;
     extern const char *scales_weber_per_square_meter;
+    /*******************************************************************************
+     *                          Extern Function Prototypes
+     *******************************************************************************/
 
 #ifdef __cplusplus
 }

@@ -29,53 +29,53 @@
 ** ===========================================================================
 */
 /**
-* @file    TCS230.c
-* @brief   perform some function on TCS230
-* @author  xx
-* @version 0.1
-* @date    xx
-*/
+ * @file    TCS230.c
+ * @brief   perform some function on TCS230
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include "ezlopi_util_trace.h"
 #include "freertos/queue.h"
 #include "sensor_0040_other_TCS230.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 #define TCS230_QUEUE_SIZE 5
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static void IRAM_ATTR gpio_isr_handler(void *args); // argument => time_us
 static void Extract_TCS230_Pulse_Period_func(gpio_num_t gpio_pulse_output, int32_t *Time_period);
 static int MAP_color_value(int x, int fromLow, int fromHigh, int toLow, int toHigh);
 static void Get_mapped_color_value(uint32_t *color_value, gpio_num_t gpio_pulse_output, int32_t *period, int32_t min_time_limit, int32_t max_time_limit);
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 static QueueHandle_t tcs230_queue = NULL;
 static e_TCS230_queue_t QueueFlag = TCS230_QUEUE_RESET;
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 
 bool TCS230_set_filter_color(l_ezlopi_item_t *item, e_TCS230_color_t color_code)
 {
@@ -206,36 +206,36 @@ bool TCS230_get_sensor_value(l_ezlopi_item_t *item)
         int32_t Red_period = 0;
         TCS230_set_filter_color(item, COLOR_SENSOR_COLOR_RED);
         Extract_TCS230_Pulse_Period_func(_TCS230_user_data->TCS230_pin.gpio_pulse_output,
-            &Red_period);
+                                         &Red_period);
         Get_mapped_color_value(&_TCS230_user_data->red_mapped,                  // dest_var
-            _TCS230_user_data->TCS230_pin.gpio_pulse_output, // use this pin to populate src_var
-            &Red_period,                                     // src_var
-            _TCS230_user_data->calib_data.most_red_timeP,    // calib paramter
-            _TCS230_user_data->calib_data.least_red_timeP);  // calib paramter
+                               _TCS230_user_data->TCS230_pin.gpio_pulse_output, // use this pin to populate src_var
+                               &Red_period,                                     // src_var
+                               _TCS230_user_data->calib_data.most_red_timeP,    // calib paramter
+                               _TCS230_user_data->calib_data.least_red_timeP);  // calib paramter
         // TRACE_E("RED => %d....", _TCS230_user_data->red_mapped);
         //--------------------------------------------------
 
         int32_t Green_period = 0;
         TCS230_set_filter_color(item, COLOR_SENSOR_COLOR_GREEN);
         Extract_TCS230_Pulse_Period_func(_TCS230_user_data->TCS230_pin.gpio_pulse_output,
-            &Green_period);
+                                         &Green_period);
         Get_mapped_color_value(&_TCS230_user_data->green_mapped, // dest_var
-            _TCS230_user_data->TCS230_pin.gpio_pulse_output,
-            &Green_period,
-            _TCS230_user_data->calib_data.most_green_timeP,
-            _TCS230_user_data->calib_data.least_green_timeP);
+                               _TCS230_user_data->TCS230_pin.gpio_pulse_output,
+                               &Green_period,
+                               _TCS230_user_data->calib_data.most_green_timeP,
+                               _TCS230_user_data->calib_data.least_green_timeP);
         // TRACE_S("GREEN => %d....", _TCS230_user_data->green_mapped);
         //--------------------------------------------------
 
         int32_t Blue_period = 0;
         TCS230_set_filter_color(item, COLOR_SENSOR_COLOR_BLUE);
         Extract_TCS230_Pulse_Period_func(_TCS230_user_data->TCS230_pin.gpio_pulse_output,
-            &Blue_period);
+                                         &Blue_period);
         Get_mapped_color_value(&_TCS230_user_data->blue_mapped, // dest_var
-            _TCS230_user_data->TCS230_pin.gpio_pulse_output,
-            &Blue_period,
-            _TCS230_user_data->calib_data.most_blue_timeP,
-            _TCS230_user_data->calib_data.least_blue_timeP);
+                               _TCS230_user_data->TCS230_pin.gpio_pulse_output,
+                               &Blue_period,
+                               _TCS230_user_data->calib_data.most_blue_timeP,
+                               _TCS230_user_data->calib_data.least_blue_timeP);
         // TRACE_I("\t\t BLUE => %d....", _TCS230_user_data->blue_mapped);
         //--------------------------------------------------
 
@@ -246,8 +246,8 @@ bool TCS230_get_sensor_value(l_ezlopi_item_t *item)
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 static void IRAM_ATTR gpio_isr_handler(void *args) // argument => time_us
 {
     int32_t instant_uSec = (int32_t)esp_timer_get_time();
@@ -285,7 +285,7 @@ static void Extract_TCS230_Pulse_Period_func(gpio_num_t gpio_pulse_output, int32
             // loop through all the queue[0-5] values -> active low instants
             int32_t prev_us_time = 0;
             int32_t us_time = 0;
-            int32_t diff[TCS230_QUEUE_SIZE] = { 0 }; // correct data starts from 1-9, not zero
+            int32_t diff[TCS230_QUEUE_SIZE] = {0}; // correct data starts from 1-9, not zero
             // extract the 10 queued values
             for (uint8_t i = 0; i < TCS230_QUEUE_SIZE; i++)
             {
@@ -300,7 +300,7 @@ static void Extract_TCS230_Pulse_Period_func(gpio_num_t gpio_pulse_output, int32
             }
 
             // generate frequency of occurance for Time-period from "diff[]" array
-            uint8_t freq[TCS230_QUEUE_SIZE] = { 0 };
+            uint8_t freq[TCS230_QUEUE_SIZE] = {0};
             for (uint8_t x = 1; x < TCS230_QUEUE_SIZE; x++)
             {
                 for (uint8_t i = 1; i < TCS230_QUEUE_SIZE; i++)
@@ -364,5 +364,5 @@ static void Get_mapped_color_value(uint32_t *color_value, gpio_num_t gpio_pulse_
 }
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

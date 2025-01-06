@@ -34,31 +34,31 @@
  * @author  xx
  * @version 0.1
  * @date    12th DEC 2024
-*/
+ */
 #ifndef _EZLOPI_CORE_SCENES_OPERATORS_H_
 #define _EZLOPI_CORE_SCENES_OPERATORS_H_
 
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include <string.h>
 #include <stdint.h>
 
 #include "ezlopi_core_scenes_v2.h"
 
 /*******************************************************************************
-*                          C++ Declaration Wrapper
-*******************************************************************************/
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
     /*******************************************************************************
-    *                          Type & Macro Declarations
-    *******************************************************************************/
+     *                          Type & Macro Declarations
+     *******************************************************************************/
     typedef enum e_scene_num_cmp_operators
     {
 #define SCENES_NUM_COMP_OPERATORS(OPERATOR, op, name, method) SCENES_NUM_COMP_OPERATORS_##OPERATOR,
@@ -80,7 +80,7 @@ extern "C"
 #undef SCENES_STROPS_COMP_OPERATORES
     } e_scene_strops_cmp_operators_t;
 
-#if 0  /* Currently not in use --> check 'in_array' when-condition before removing */
+#if 0 /* Currently not in use --> check 'in_array' when-condition before removing */
     typedef enum e_scene_inarr_cmp_operators
     {
 #define SCENES_IN_ARRAY_OPERATORS(OPERATOR, op, name, method) SCENES_IN_ARRAY_OPERATORS_##OPERATOR,
@@ -103,55 +103,55 @@ extern "C"
     } e_scene_value_without_less_cmp_operators_t;
 
     /*******************************************************************************
-    *                          Extern Data Declarations
-    *******************************************************************************/
+     *                          Extern Data Declarations
+     *******************************************************************************/
 
     /*******************************************************************************
-    *                          Extern Function Prototypes
-    *******************************************************************************/
+     *                          Extern Function Prototypes
+     *******************************************************************************/
 
     /**
-    * @brief This function returns of operator symbols in string format.
-    *
-    * @param operator enum of corresponding operator symbol
-    * @return const char *
-    */
+     * @brief This function returns of operator symbols in string format.
+     *
+     * @param operator enum of corresponding operator symbol
+     * @return const char *
+     */
     const char *EZPI_scenes_numeric_comparator_operators_get_op(e_scene_num_cmp_operators_t operator);
     /**
-    * @brief This function returns 'operator_name' of operator symbol
-    *
-    * @param operator enum of corresponding operator symbol
-    * @return const char *
-    */
+     * @brief This function returns 'operator_name' of operator symbol
+     *
+     * @param operator enum of corresponding operator symbol
+     * @return const char *
+     */
     const char *EZPI_scenes_numeric_comparator_operators_get_name(e_scene_num_cmp_operators_t operator);
     /**
-    * @brief This function returns 'method_name' of operator symbol
-    *
-    * @param operator enum of corresponding operator symbol
-    * @return const char *
-    */
+     * @brief This function returns 'method_name' of operator symbol
+     *
+     * @param operator enum of corresponding operator symbol
+     * @return const char *
+     */
     const char *EZPI_scenes_numeric_comparator_operators_get_method(e_scene_num_cmp_operators_t operator);
     /**
-    * @brief This function compare 'number_value' from input args
-    *
-    * @param item_exp_field block with item_exp-field info
-    * @param value_field block with value-field info
-    * @param comparator_field block with comparator-field info
-    * @param devgrp_field block with device-group info
-    * @param itemgrp_field block with item-group info
-    * @return int
-    */
+     * @brief This function compare 'number_value' from input args
+     *
+     * @param item_exp_field block with item_exp-field info
+     * @param value_field block with value-field info
+     * @param comparator_field block with comparator-field info
+     * @param devgrp_field block with device-group info
+     * @param itemgrp_field block with item-group info
+     * @return int
+     */
     int EZPI_scenes_operators_value_number_operations(l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, l_fields_v2_t *comparator_field, l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field);
 
     /**
-    * @brief This function compare 'number_range_value' using given args
-    *
-    * @param start_value_field block with 'start_value_field' info
-    * @param end_value_field block with 'end_value_field' info
-    * @param item_exp_field block with 'item_exp_field' info
-    * @param comparator_choice compare-type : [0='between'; 1='Not_between'] .
-    * @return int
-    */
+     * @brief This function compare 'number_range_value' using given args
+     *
+     * @param start_value_field block with 'start_value_field' info
+     * @param end_value_field block with 'end_value_field' info
+     * @param item_exp_field block with 'item_exp_field' info
+     * @param comparator_choice compare-type : [0='between'; 1='Not_between'] .
+     * @return int
+     */
     int EZPI_scenes_operators_value_number_range_operations(l_fields_v2_t *item_exp_field, l_fields_v2_t *start_value_field, l_fields_v2_t *end_value_field, bool comparator_choice);
     /**
      * @brief This function compare 'number_range_values' using given args
@@ -344,17 +344,14 @@ extern "C"
      */
     int EZPI_scenes_operators_is_dictionary_changed_operations(l_scenes_list_v2_t *scene_node, uint32_t item_id, l_fields_v2_t *key_field, l_fields_v2_t *operation_field);
 
-
 #ifdef __cplusplus
 }
 #endif
 
-#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+#endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 #endif // _EZLOPI_CORE_SCENES_OPERATORS_H_
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
-
-
+ *                          End of File
+ *******************************************************************************/

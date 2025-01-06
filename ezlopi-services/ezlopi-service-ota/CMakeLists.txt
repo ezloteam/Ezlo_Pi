@@ -4,15 +4,15 @@ file(GLOB_RECURSE provisioning_src "*.c*")
 set(EZLOPI_SDK_COMPONENTS
         bootloader_support
 )
-set(EZLOPI_CORE_COMPONENTS 
+set(EZLOPI_CORE_COMPONENTS
         ezlopi-core-wifi
         ezlopi-core-processes
         ezlopi-core-errors
 )
-set(EZLOPI_CLOUD_COMPONENTS 
+set(EZLOPI_CLOUD_COMPONENTS
         ezlopi-cloud-ota
 )
-set(EZLOPI_SERVICE_COMPONENTS 
+set(EZLOPI_SERVICE_COMPONENTS
         ezlopi-service-webprov
 )
 
@@ -20,7 +20,7 @@ set(EZLOPI_SERVICE_COMPONENTS
 idf_component_register(SRCS  "${provisioning_src}"
     INCLUDE_DIRS "."
     REQUIRES    ${EZLOPI_SDK_COMPONENTS}
-                ${EZLOPI_CORE_COMPONENTS} 
-                ${EZLOPI_CLOUD_COMPONENTS} 
-                ${EZLOPI_SERVICE_COMPONENTS} 
+                ${EZLOPI_CORE_COMPONENTS}
+                ${EZLOPI_CLOUD_COMPONENTS}
+                ${EZLOPI_SERVICE_COMPONENTS}
 )

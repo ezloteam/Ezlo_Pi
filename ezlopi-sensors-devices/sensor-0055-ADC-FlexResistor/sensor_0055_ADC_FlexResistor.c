@@ -129,6 +129,7 @@ static void __prepare_device_adc_cloud_properties(l_ezlopi_device_t *device, cJS
     device->cloud_properties.info = NULL;
     device->cloud_properties.device_type_id = NULL;
 }
+
 static void __prepare_item_adc_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_data)
 {
 
@@ -220,6 +221,7 @@ static ezlopi_error_t __0055_get_cjson_value(l_ezlopi_item_t *item, void *arg)
     }
     return ret;
 }
+
 static ezlopi_error_t __0055_notify(l_ezlopi_item_t *item)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;

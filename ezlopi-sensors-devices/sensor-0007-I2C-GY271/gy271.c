@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    gy271.c
-* @brief   perform some function on gy271
-* @author  xx
-* @version 0.1
-* @date    xx
-*/
+ * @file    gy271.c
+ * @brief   perform some function on gy271
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include <math.h>
 #include "esp_err.h"
 #include "ezlopi_util_trace.h"
@@ -50,20 +50,20 @@
 #include "sensor_0007_I2C_GY271.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static esp_err_t activate_set_reset_period(l_ezlopi_item_t *item);
 static esp_err_t set_to_measure_mode(l_ezlopi_item_t *item);
 static esp_err_t enable_data_ready_interrupt(l_ezlopi_item_t *item);
@@ -71,16 +71,16 @@ static int __gy271_Get_azimuth(float dx, float dy);
 static void __gy271_correct_data(s_gy271_raw_data_t *RAW_DATA, s_gy271_data_t *user_data);
 static esp_err_t __gy271_check_status(l_ezlopi_item_t *item, uint8_t *temp);
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 ezlopi_error_t GY271_configure_init(l_ezlopi_item_t *item)
 {
     ezlopi_error_t ret = EZPI_FAILED;
@@ -99,8 +99,8 @@ bool GY271_update_value(l_ezlopi_item_t *item)
     bool valid_data = false;
     if (item)
     {
-        s_gy271_raw_data_t RAW_DATA = { 0 };
-        static uint8_t buffer_0, buffer_1;     // tempr
+        s_gy271_raw_data_t RAW_DATA = {0};
+        static uint8_t buffer_0, buffer_1;           // tempr
         static uint8_t tmp_buf[GY271_REG_COUNT_LEN]; // axis
         volatile uint8_t Check_Register = 0;
         volatile uint8_t address_val = 0;
@@ -193,8 +193,8 @@ void GY271_get_raw_max_min_values(l_ezlopi_item_t *item, int (*calibrationData)[
     {
         //------------------------------------------------------------------------------
         int x = 0, y = 0, z = 0;
-        uint8_t buffer_1;                         // tempr
-        uint8_t cal_tmp_buf[GY271_REG_COUNT_LEN] = { 0 }; // axis
+        uint8_t buffer_1;                               // tempr
+        uint8_t cal_tmp_buf[GY271_REG_COUNT_LEN] = {0}; // axis
         uint8_t Check_Register;
         uint8_t address_val;
         esp_err_t err = ESP_OK;
@@ -268,27 +268,27 @@ void GY271_get_raw_max_min_values(l_ezlopi_item_t *item, int (*calibrationData)[
         }
         //------------------------------------------------------------------------------
         TRACE_I("Calibrated :--- Xmin=%6d | Xmax=%6d | Ymin=%6d | Ymax=%6d | Zmin=%6d | Zmax=%6d \n",
-            calibrationData[0][0],
-            calibrationData[0][1],
-            calibrationData[1][0],
-            calibrationData[1][1],
-            calibrationData[2][0],
-            calibrationData[2][1]);
+                calibrationData[0][0],
+                calibrationData[0][1],
+                calibrationData[1][0],
+                calibrationData[1][1],
+                calibrationData[2][0],
+                calibrationData[2][1]);
     }
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 
 static esp_err_t activate_set_reset_period(l_ezlopi_item_t *item)
 {
     esp_err_t ret = ESP_FAIL;
     if (item)
     {
-        uint8_t write_buffer1[2] = { 0x0A, 0x80 };
+        uint8_t write_buffer1[2] = {0x0A, 0x80};
         ret = EZPI_hal_i2c_master_write_to_device(&item->interface.i2c_master, write_buffer1, 2);
-        uint8_t write_buffer2[2] = { GY271_SET_RESET_PERIOD_REGISTER, GY271_DEFAULT_SET_RESET_PERIOD }; // REG_INTR_STATUS;
+        uint8_t write_buffer2[2] = {GY271_SET_RESET_PERIOD_REGISTER, GY271_DEFAULT_SET_RESET_PERIOD}; // REG_INTR_STATUS;
         ret = EZPI_hal_i2c_master_write_to_device(&item->interface.i2c_master, write_buffer2, 2);
     }
     return ret;
@@ -298,7 +298,7 @@ static esp_err_t set_to_measure_mode(l_ezlopi_item_t *item)
     esp_err_t ret = ESP_FAIL;
     if (item)
     {
-        uint8_t write_buffer[2] = { GY271_CONTROL_REGISTER_1, GY271_OPERATION_MODE1 };
+        uint8_t write_buffer[2] = {GY271_CONTROL_REGISTER_1, GY271_OPERATION_MODE1};
         ret = EZPI_hal_i2c_master_write_to_device(&item->interface.i2c_master, write_buffer, 2);
     }
     return ret;
@@ -308,7 +308,7 @@ static esp_err_t enable_data_ready_interrupt(l_ezlopi_item_t *item)
     esp_err_t ret = ESP_FAIL;
     if (item)
     {
-        uint8_t write_buffer[2] = { GY271_CONTROL_REGISTER_2, GY271_OPERATION_MODE2 };
+        uint8_t write_buffer[2] = {GY271_CONTROL_REGISTER_2, GY271_OPERATION_MODE2};
         ret = EZPI_hal_i2c_master_write_to_device(&item->interface.i2c_master, write_buffer, 2);
     }
     return ret;
@@ -324,11 +324,11 @@ static void __gy271_correct_data(s_gy271_raw_data_t *RAW_DATA, s_gy271_data_t *u
 {
     // update the calibration parameters
     user_data->calib_factor.calibrated_axis[0] = (user_data->calib_factor.scale_axis[0]) *
-        (float)(((long)RAW_DATA->raw_x) - (user_data->calib_factor.bias_axis[0])); // x-axis value
+                                                 (float)(((long)RAW_DATA->raw_x) - (user_data->calib_factor.bias_axis[0])); // x-axis value
     user_data->calib_factor.calibrated_axis[1] = (user_data->calib_factor.scale_axis[1]) *
-        (float)(((long)RAW_DATA->raw_y) - (user_data->calib_factor.bias_axis[1])); // y-axis value
+                                                 (float)(((long)RAW_DATA->raw_y) - (user_data->calib_factor.bias_axis[1])); // y-axis value
     user_data->calib_factor.calibrated_axis[2] = (user_data->calib_factor.scale_axis[2]) *
-        (float)(((long)RAW_DATA->raw_z) - (user_data->calib_factor.bias_axis[2])); // z-axis value
+                                                 (float)(((long)RAW_DATA->raw_z) - (user_data->calib_factor.bias_axis[2])); // z-axis value
 
     // store the final data
     user_data->X = ((user_data->calib_factor.calibrated_axis[0]) / GY271_CONVERSION_TO_G);
@@ -336,7 +336,7 @@ static void __gy271_correct_data(s_gy271_raw_data_t *RAW_DATA, s_gy271_data_t *u
     user_data->Z = ((user_data->calib_factor.calibrated_axis[2]) / GY271_CONVERSION_TO_G);
     user_data->T = (((float)RAW_DATA->raw_temp) / GY271_TEMPERATURE_SENSITIVITY) + 32.53f;
     user_data->azimuth = __gy271_Get_azimuth((user_data->calib_factor.calibrated_axis[0]),
-        (user_data->calib_factor.calibrated_axis[1]));
+                                             (user_data->calib_factor.calibrated_axis[1]));
 
     // TRACE_W("Final Data :--- X = %.2fG | Y = %.2fG | Z = %.2fG | T = %.2f*C | AZI = %d*deg ",
     //         user_data->X,
@@ -349,7 +349,7 @@ static void __gy271_correct_data(s_gy271_raw_data_t *RAW_DATA, s_gy271_data_t *u
 static esp_err_t __gy271_check_status(l_ezlopi_item_t *item, uint8_t *temp)
 {
     esp_err_t err = ESP_OK;
-    uint8_t write_buffer[] = { GY271_STATUS_REGISTER };
+    uint8_t write_buffer[] = {GY271_STATUS_REGISTER};
     EZPI_hal_i2c_master_write_to_device(&item->interface.i2c_master, write_buffer, 1);
     EZPI_hal_i2c_master_read_from_device(&item->interface.i2c_master, temp, 1);
     if (NULL != temp)
@@ -364,5 +364,5 @@ static esp_err_t __gy271_check_status(l_ezlopi_item_t *item, uint8_t *temp)
 }
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

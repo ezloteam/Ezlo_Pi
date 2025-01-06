@@ -34,14 +34,14 @@
  * @author  xx
  * @version 0.1
  * @date    12th DEC 2024
-*/
+ */
 
 #ifndef _EZLOPI_CORE_PROCESSES_H_
 #define _EZLOPI_CORE_PROCESSES_H_
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
@@ -49,16 +49,16 @@
 #include "cjext.h"
 
 /*******************************************************************************
-*                          C++ Declaration Wrapper
-*******************************************************************************/
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
     /*******************************************************************************
-    *                          Type & Macro Declarations
-    *******************************************************************************/
+     *                          Type & Macro Declarations
+     *******************************************************************************/
 
 #define EZLOPI_MINIMAL_STACK_SIZE (2048)
 
@@ -160,12 +160,12 @@ extern "C"
     } e_ezlopi_task_enum_t;
 
     /*******************************************************************************
-    *                          Extern Data Declarations
-    *******************************************************************************/
+     *                          Extern Data Declarations
+     *******************************************************************************/
 
     /*******************************************************************************
-    *                          Extern Function Prototypes
-    *******************************************************************************/
+     *                          Extern Function Prototypes
+     *******************************************************************************/
 
 #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
     /**
@@ -193,11 +193,11 @@ extern "C"
     int EZPI_core_process_set_is_deleted(e_ezlopi_task_enum_t task_num);
 #else // CONFIG_FREERTOS_USE_TRACE_FACILITY
 
-    //---------- These are Not-required ---------------
-    // #define ezlopi_core_get_processes_details(x)
-    // #define EZPI_core_process_set_is_deleted(x)    
-    // #define EZPI_core_process_set_process_info(x, y, z)
-    //-------------------------------------------------
+//---------- These are Not-required ---------------
+// #define ezlopi_core_get_processes_details(x)
+// #define EZPI_core_process_set_is_deleted(x)
+// #define EZPI_core_process_set_process_info(x, y, z)
+//-------------------------------------------------
 
 #endif // CONFIG_FREERTOS_USE_TRACE_FACILITY
 
@@ -207,5 +207,5 @@ extern "C"
 
 #endif // _EZLOPI_CORE_PROCESSES_H_
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/
