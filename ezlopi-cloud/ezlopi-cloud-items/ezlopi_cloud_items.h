@@ -1,7 +1,45 @@
+
+
+/**
+ * @file    ezlopi_cloud_items.h
+ * @brief
+ * @author
+ * @version
+ * @date
+ */
+/* ===========================================================================
+** Copyright (C) 2022 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+
 #ifndef __HUB_ITEMS_LIST_H__
 #define __HUB_ITEMS_LIST_H__
-
-#include <string.h>
 
 #include "cjext.h"
 #include "ezlopi_core_devices_list.h"
@@ -10,17 +48,31 @@
 extern "C"
 {
 #endif
-    void items_list_v3(cJSON* cj_request, cJSON* cj_response);
-    void items_set_value_v3(cJSON* cj_request, cJSON* cj_response);
+
+    /**
+     * @brief Function to respond to hub.items.list method
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_items_list_v3(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function to respond to hub.items.set.value method
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_items_set_value_v3(cJSON *cj_request, cJSON *cj_response);
+
     // void items_update_v3(cJSON* cj_request, cJSON* cj_response);
 
-    void items_list(cJSON* cj_request, cJSON* cj_response);
-    void items_update(cJSON* cj_request, cJSON* cj_response);
-    void items_set_value(cJSON* cj_request, cJSON* cj_response);
+    // void items_list(cJSON *cj_request, cJSON *cj_response);
+    // void items_update(cJSON *cj_request, cJSON *cj_response);
+    // void items_set_value(cJSON *cj_request, cJSON *cj_response);
     // char *items_update_with_device_index(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count, int device_index);
     // char *items_update_from_sensor(int device_index, char *updated_value);
 #if 0 // v2.x
-    cJSON* ezlopi_cloud_items_updated_from_devices(l_ezlopi_configured_devices_t* registered_device);
+    cJSON *ezlopi_cloud_items_updated_from_devices(l_ezlopi_configured_devices_t *registered_device);
 #endif
 
     // cJSON* ezlopi_cloud_items_updated_from_devices_v3(l_ezlopi_device_t* device, l_ezlopi_item_t* item);
@@ -30,3 +82,7 @@ extern "C"
 #endif
 
 #endif // __HUB_ITEMS_LIST_H__
+
+/*******************************************************************************
+ *                          End of File
+ *******************************************************************************/

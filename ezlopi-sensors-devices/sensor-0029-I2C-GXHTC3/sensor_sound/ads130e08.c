@@ -33,64 +33,64 @@
  */
 
 #include "ads130e08.h"
-#include <esp_log.h>
+#include "esp_log.h"
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <string.h>
 
-#define ADS130E08_CMD_WAKEUP  (0x02)
+#define ADS130E08_CMD_WAKEUP (0x02)
 #define ADS130E08_CMD_STANDBY (0x04)
-#define ADS130E08_CMD_RESET   (0x06)
-#define ADS130E08_CMD_START   (0x08)
-#define ADS130E08_CMD_STOP    (0x0A)
-#define ADS130E08_CMD_RDATAC  (0x10)
-#define ADS130E08_CMD_SDATAC  (0x11)
-#define ADS130E08_CMD_RDATA   (0x12)
-#define ADS130E08_CMD_RREG    (0x20)
-#define ADS130E08_CMD_WREG    (0x40)
+#define ADS130E08_CMD_RESET (0x06)
+#define ADS130E08_CMD_START (0x08)
+#define ADS130E08_CMD_STOP (0x0A)
+#define ADS130E08_CMD_RDATAC (0x10)
+#define ADS130E08_CMD_SDATAC (0x11)
+#define ADS130E08_CMD_RDATA (0x12)
+#define ADS130E08_CMD_RREG (0x20)
+#define ADS130E08_CMD_WREG (0x40)
 
-#define ADS130E08_REG_ID          (0x00)
-#define ADS130E08_REG_CONFIG1     (0x01)
-#define ADS130E08_REG_CONFIG2     (0x02)
-#define ADS130E08_REG_CONFIG3     (0x03)
-#define ADS130E08_REG_FAULT       (0x04)
-#define ADS130E08_REG_CH1SET      (0x05)
-#define ADS130E08_REG_CH2SET      (0x06)
-#define ADS130E08_REG_CH3SET      (0x07)
-#define ADS130E08_REG_CH4SET      (0x08)
-#define ADS130E08_REG_CH5SET      (0x09)
-#define ADS130E08_REG_CH6SET      (0x0A)
-#define ADS130E08_REG_CH7SET      (0x0B)
-#define ADS130E08_REG_CH8SET      (0x0C)
+#define ADS130E08_REG_ID (0x00)
+#define ADS130E08_REG_CONFIG1 (0x01)
+#define ADS130E08_REG_CONFIG2 (0x02)
+#define ADS130E08_REG_CONFIG3 (0x03)
+#define ADS130E08_REG_FAULT (0x04)
+#define ADS130E08_REG_CH1SET (0x05)
+#define ADS130E08_REG_CH2SET (0x06)
+#define ADS130E08_REG_CH3SET (0x07)
+#define ADS130E08_REG_CH4SET (0x08)
+#define ADS130E08_REG_CH5SET (0x09)
+#define ADS130E08_REG_CH6SET (0x0A)
+#define ADS130E08_REG_CH7SET (0x0B)
+#define ADS130E08_REG_CH8SET (0x0C)
 #define ADS130E08_REG_FAULT_STATP (0x12)
 #define ADS130E08_REG_FAULT_STATN (0x13)
-#define ADS130E08_REG_GPIO        (0x14)
+#define ADS130E08_REG_GPIO (0x14)
 
-#define ID_MASK_LOW_BITS  (0x08)
+#define ID_MASK_LOW_BITS (0x08)
 #define ID_MASK_HIGH_BITS (0x10)
 
-#define CONFIG1_MASK_LOW_BITS    (0xDE)
-#define CONFIG1_MASK_HIGH_BITS   (0x01)
+#define CONFIG1_MASK_LOW_BITS (0xDE)
+#define CONFIG1_MASK_HIGH_BITS (0x01)
 #define CONFIG1_MASK_BITS_CLK_EN BIT(5)
 
-#define CONFIG2_MASK_LOW_BITS       (0x88)
-#define CONFIG2_MASK_HIGH_BITS      (0x60)
-#define CONFIG2_MASK_BITS_INT_TEST  BIT(4)
-#define CONFIG2_MASK_BITS_TEST_AMP  BIT(2)
+#define CONFIG2_MASK_LOW_BITS (0x88)
+#define CONFIG2_MASK_HIGH_BITS (0x60)
+#define CONFIG2_MASK_BITS_INT_TEST BIT(4)
+#define CONFIG2_MASK_BITS_TEST_AMP BIT(2)
 #define CONFIG2_MASK_BITS_TEST_FREQ (BIT(1) | BIT(0))
 
-#define CONFIG3_MASK_LOW_BITS       (0x13)
-#define CONFIG3_MASK_HIGH_BITS      (0x40)
+#define CONFIG3_MASK_LOW_BITS (0x13)
+#define CONFIG3_MASK_HIGH_BITS (0x40)
 #define CONFIG3_MASK_BITS_PD_REFBUF BIT(7)
-#define CONFIG3_MASK_BITS_VREF_4V   BIT(5)
+#define CONFIG3_MASK_BITS_VREF_4V BIT(5)
 #define CONFIG3_MASK_BITS_OPAMP_REF BIT(3)
-#define CONFIG3_MASK_BITS_PD_OPAMP  BIT(2)
+#define CONFIG3_MASK_BITS_PD_OPAMP BIT(2)
 
-#define FAULT_MASK_LOW_BITS     (0x1F)
+#define FAULT_MASK_LOW_BITS (0x1F)
 #define FAULT_MASK_BITS_COMP_TH (BIT(7) | BIT(6) | BIT(5))
 
 #define CHnSET_MASK_LOW_BITS (0x08)
-#define CHnSET_MASK_BITS_PD  BIT(7)
+#define CHnSET_MASK_BITS_PD BIT(7)
 #define CHnSET_MASK_BITS_PGA (BIT(6) | BIT(5) | BIT(4))
 #define CHnSET_MASK_BITS_MUX (BIT(2) | BIT(1) | BIT(0))
 
@@ -125,31 +125,29 @@
 
 #define ADS130E08_CONVERSION_CONST 0.0000732421875f /* 2.4 / 32768 */
 
-#define CHECK(x)                                                                                                       \
-    do                                                                                                                 \
-    {                                                                                                                  \
-        esp_err_t __;                                                                                                  \
-        if ((__ = x) != ESP_OK)                                                                                        \
-            return __;                                                                                                 \
-    }                                                                                                                  \
-    while (0)
-#define CHECK_ARG(VAL)                                                                                                 \
-    do                                                                                                                 \
-    {                                                                                                                  \
-        if (!(VAL))                                                                                                    \
-            return ESP_ERR_INVALID_ARG;                                                                                \
-    }                                                                                                                  \
-    while (0)
+#define CHECK(x)                \
+    do                          \
+    {                           \
+        esp_err_t __;           \
+        if ((__ = x) != ESP_OK) \
+            return __;          \
+    } while (0)
+#define CHECK_ARG(VAL)                  \
+    do                                  \
+    {                                   \
+        if (!(VAL))                     \
+            return ESP_ERR_INVALID_ARG; \
+    } while (0)
 #define BV(x) (1 << (x))
 
-static const char *TAG_ADS130E08 = "ads130e08";
+// static const char *TAG_ADS130E08 = "ads130e08";
 
 static esp_err_t write_reg_8(ads130e08_t *dev, uint8_t reg, uint8_t val)
 {
     spi_transaction_t t;
     memset(&t, 0, sizeof(spi_transaction_t));
 
-    uint8_t tx[] = { (reg | ADS130E08_CMD_WREG), 0, val, 0 };
+    uint8_t tx[] = {(reg | ADS130E08_CMD_WREG), 0, val, 0};
 
     t.tx_buffer = tx;
     t.length = sizeof(tx) * 8;
@@ -162,7 +160,7 @@ static esp_err_t read_reg_8(ads130e08_t *dev, uint8_t reg, uint8_t *val)
     spi_transaction_t t;
     memset(&t, 0, sizeof(spi_transaction_t));
 
-    uint8_t tx[] = { (reg | ADS130E08_CMD_RREG), 0, 0, 0 };
+    uint8_t tx[] = {(reg | ADS130E08_CMD_RREG), 0, 0, 0};
     uint8_t rx[sizeof(tx)];
 
     t.tx_buffer = tx;
@@ -205,7 +203,7 @@ esp_err_t ads130e08_send_system_cmd(ads130e08_t *dev, ads130e08_system_cmd_t cmd
     spi_transaction_t t;
     memset(&t, 0, sizeof(spi_transaction_t));
 
-    uint8_t tx[] = { (cmd), 0 };
+    uint8_t tx[] = {(cmd), 0};
 
     t.tx_buffer = tx;
     t.length = sizeof(tx) * 8;
@@ -220,7 +218,7 @@ esp_err_t ads130e08_send_data_read_cmd(ads130e08_t *dev, ads130e08_data_read_cmd
     spi_transaction_t t;
     memset(&t, 0, sizeof(spi_transaction_t));
 
-    uint8_t tx[] = { (cmd), 0 };
+    uint8_t tx[] = {(cmd), 0};
 
     t.tx_buffer = tx;
     t.length = sizeof(tx) * 8;
@@ -251,13 +249,11 @@ esp_err_t ads130e08_set_device_config(ads130e08_t *dev, ads130e08_dev_config_t c
 
     CHECK(write_reg_8(dev, ADS130E08_REG_CONFIG1, config1));
 
-    config2
-        = (config.int_test | config.test_amp | config.test_freq | CONFIG2_MASK_HIGH_BITS) & ~(CONFIG2_MASK_LOW_BITS);
+    config2 = (config.int_test | config.test_amp | config.test_freq | CONFIG2_MASK_HIGH_BITS) & ~(CONFIG2_MASK_LOW_BITS);
 
     CHECK(write_reg_8(dev, ADS130E08_REG_CONFIG2, config2));
 
-    config3 = (config.pd_refbuf | config.vref_4v | config.opamp_ref | config.pd_opamp | CONFIG3_MASK_HIGH_BITS)
-              & ~(CONFIG3_MASK_LOW_BITS);
+    config3 = (config.pd_refbuf | config.vref_4v | config.opamp_ref | config.pd_opamp | CONFIG3_MASK_HIGH_BITS) & ~(CONFIG3_MASK_LOW_BITS);
 
     CHECK(write_reg_8(dev, ADS130E08_REG_CONFIG3, config3));
 
@@ -305,8 +301,8 @@ esp_err_t ads130e08_get_rdata(ads130e08_t *dev, ads130e08_raw_data_t *raw_data)
     spi_transaction_t t;
     memset(&t, 0, sizeof(spi_transaction_t));
 
-    uint8_t tx[] = { (ADS130E08_CMD_RDATA), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-    uint8_t rx[sizeof(tx)] = { 0 };
+    uint8_t tx[] = {(ADS130E08_CMD_RDATA), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    uint8_t rx[sizeof(tx)] = {0};
 
     t.tx_buffer = tx;
     t.rx_buffer = rx;
@@ -384,7 +380,7 @@ esp_err_t ads130e08_set_channel_config(ads130e08_t *dev, ads130e08_channel_t cha
 }
 
 esp_err_t ads130e08_get_channel_config(ads130e08_t *dev, ads130e08_channel_t channel,
-    ads130e08_channel_config_t *config)
+                                       ads130e08_channel_config_t *config)
 {
     CHECK_ARG(dev && config);
 
@@ -465,7 +461,7 @@ esp_err_t ads130e08_get_gpio_pin_mode(ads130e08_t *dev, ads130e08_gpio_pin_t gpi
 }
 
 esp_err_t ads130e08_set_gpio_pin_level(ads130e08_t *dev, ads130e08_gpio_pin_t gpio_pin,
-    ads130e08_gpio_level_t gpio_level)
+                                       ads130e08_gpio_level_t gpio_level)
 {
     CHECK_ARG(dev && gpio_pin && gpio_level);
 
@@ -500,7 +496,7 @@ esp_err_t ads130e08_set_gpio_pin_level(ads130e08_t *dev, ads130e08_gpio_pin_t gp
 }
 
 esp_err_t ads130e08_get_gpio_pin_level(ads130e08_t *dev, ads130e08_gpio_pin_t gpio_pin,
-    ads130e08_gpio_level_t *gpio_level)
+                                       ads130e08_gpio_level_t *gpio_level)
 {
     CHECK_ARG(dev && gpio_pin && gpio_level);
 
@@ -542,42 +538,42 @@ esp_err_t ads130e08_detect_fault_auto(ads130e08_t *dev, uint8_t *fault_statp, ui
 
     if (fault_bits & MASK_BITS_IN1P_FAULT)
     {
-        ESP_LOGE(TAG_ADS130E08, "Automatic fault detection on positive input 1");
+        ESP_LOGE("ads130e08", "Automatic fault detection on positive input 1");
     }
 
     if (fault_bits & MASK_BITS_IN2P_FAULT)
     {
-        ESP_LOGE(TAG_ADS130E08, "Automatic fault detection on positive input 2");
+        ESP_LOGE("ads130e08", "Automatic fault detection on positive input 2");
     }
 
     if (fault_bits & MASK_BITS_IN3P_FAULT)
     {
-        ESP_LOGE(TAG_ADS130E08, "Automatic fault detection on positive input 3");
+        ESP_LOGE("ads130e08", "Automatic fault detection on positive input 3");
     }
 
     if (fault_bits & MASK_BITS_IN4P_FAULT)
     {
-        ESP_LOGE(TAG_ADS130E08, "Automatic fault detection on positive input 4");
+        ESP_LOGE("ads130e08", "Automatic fault detection on positive input 4");
     }
 
     if (fault_bits & MASK_BITS_IN5P_FAULT)
     {
-        ESP_LOGE(TAG_ADS130E08, "Automatic fault detection on positive input 5");
+        ESP_LOGE("ads130e08", "Automatic fault detection on positive input 5");
     }
 
     if (fault_bits & MASK_BITS_IN6P_FAULT)
     {
-        ESP_LOGE(TAG_ADS130E08, "Automatic fault detection on positive input 6");
+        ESP_LOGE("ads130e08", "Automatic fault detection on positive input 6");
     }
 
     if (fault_bits & MASK_BITS_IN7P_FAULT)
     {
-        ESP_LOGE(TAG_ADS130E08, "Automatic fault detection on positive input 7");
+        ESP_LOGE("ads130e08", "Automatic fault detection on positive input 7");
     }
 
     if (fault_bits & MASK_BITS_IN8P_FAULT)
     {
-        ESP_LOGE(TAG_ADS130E08, "Automatic fault detection on positive input 8");
+        ESP_LOGE("ads130e08", "Automatic fault detection on positive input 8");
     }
 
     CHECK(read_reg_8(dev, ADS130E08_REG_FAULT_STATN, &fault_bits));
@@ -585,42 +581,42 @@ esp_err_t ads130e08_detect_fault_auto(ads130e08_t *dev, uint8_t *fault_statp, ui
 
     if (fault_bits & MASK_BITS_IN1N_FAULT)
     {
-        ESP_LOGE(TAG_ADS130E08, "Automatic fault detection on negative input 1");
+        ESP_LOGE("ads130e08", "Automatic fault detection on negative input 1");
     }
 
     if (fault_bits & MASK_BITS_IN2N_FAULT)
     {
-        ESP_LOGE(TAG_ADS130E08, "Automatic fault detection on negative input 2");
+        ESP_LOGE("ads130e08", "Automatic fault detection on negative input 2");
     }
 
     if (fault_bits & MASK_BITS_IN3N_FAULT)
     {
-        ESP_LOGE(TAG_ADS130E08, "Automatic fault detection on negative input 3");
+        ESP_LOGE("ads130e08", "Automatic fault detection on negative input 3");
     }
 
     if (fault_bits & MASK_BITS_IN4N_FAULT)
     {
-        ESP_LOGE(TAG_ADS130E08, "Automatic fault detection on negative input 4");
+        ESP_LOGE("ads130e08", "Automatic fault detection on negative input 4");
     }
 
     if (fault_bits & MASK_BITS_IN5N_FAULT)
     {
-        ESP_LOGE(TAG_ADS130E08, "Automatic fault detection on negative input 5");
+        ESP_LOGE("ads130e08", "Automatic fault detection on negative input 5");
     }
 
     if (fault_bits & MASK_BITS_IN6N_FAULT)
     {
-        ESP_LOGE(TAG_ADS130E08, "Automatic fault detection on negative input 6");
+        ESP_LOGE("ads130e08", "Automatic fault detection on negative input 6");
     }
 
     if (fault_bits & MASK_BITS_IN7N_FAULT)
     {
-        ESP_LOGE(TAG_ADS130E08, "Automatic fault detection on negative input 7");
+        ESP_LOGE("ads130e08", "Automatic fault detection on negative input 7");
     }
 
     if (fault_bits & MASK_BITS_IN8N_FAULT)
     {
-        ESP_LOGE(TAG_ADS130E08, "Automatic fault detection on negative input 8");
+        ESP_LOGE("ads130e08", "Automatic fault detection on negative input 8");
     }
 
     return ESP_OK;

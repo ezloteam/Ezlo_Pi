@@ -1,21 +1,90 @@
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+/**
+ * @file    ezlopi_core_device_value_updated.c
+ * @brief   Function for sensor device operations
+ * @author  xx
+ * @version 0.1
+ * @date    12th DEC 2024
+ */
+
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
+
+// #include "ezlopi_core_errors.h"
+// #include "ezlopi_core_devices_list.h"
 #include <time.h>
 
-#include "ezlopi_core_broadcast.h"
-#include "ezlopi_core_devices_list.h"
+#include "ezlopi_core_sntp.h"
 #include "ezlopi_core_errors.h"
+#include "ezlopi_core_broadcast.h"
 
 #include "ezlopi_cloud_items.h"
 #include "ezlopi_cloud_settings.h"
 #include "ezlopi_cloud_constants.h"
 
 #include "ezlopi_service_webprov.h"
+#include "ezlopi_core_device_value_updated.h"
 
-/// static declarations
-static cJSON* __broadcast_message_items_updated_from_device(l_ezlopi_device_t* device, l_ezlopi_item_t* item);
-static cJSON* __broadcast_message_settings_updated_from_devices_v3(l_ezlopi_device_t* device, l_ezlopi_device_settings_v3_t* setting);
+/*******************************************************************************
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
-/// Global methods
-ezlopi_error_t ezlopi_device_value_updated_from_device_broadcast(l_ezlopi_item_t* item)
+/*******************************************************************************
+ *                          Extern Function Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Type & Macro Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Static Function Prototypes
+ *******************************************************************************/
+static cJSON *__broadcast_message_items_updated_from_device(l_ezlopi_device_t *device, l_ezlopi_item_t *item);
+static cJSON *__broadcast_message_settings_updated_from_devices_v3(l_ezlopi_device_t *device, l_ezlopi_device_settings_v3_t *setting);
+
+/*******************************************************************************
+ *                          Static Data Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Data Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Definitions
+ *******************************************************************************/
+ezlopi_error_t EZPI_core_device_value_updated_from_device_broadcast(l_ezlopi_item_t *item)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
 
@@ -23,10 +92,10 @@ ezlopi_error_t ezlopi_device_value_updated_from_device_broadcast(l_ezlopi_item_t
 
     if (item)
     {
-        l_ezlopi_device_t* curr_device = ezlopi_device_get_head();
+        l_ezlopi_device_t *curr_device = EZPI_core_device_get_head();
         while (curr_device)
         {
-            l_ezlopi_item_t* curr_item = curr_device->items;
+            l_ezlopi_item_t *curr_item = curr_device->items;
 
             while (curr_item)
             {
@@ -34,14 +103,14 @@ ezlopi_error_t ezlopi_device_value_updated_from_device_broadcast(l_ezlopi_item_t
                 {
                     // TRACE_D("%d -> here", xTaskGetTickCount());
 
-                    cJSON* cj_response = __broadcast_message_items_updated_from_device(curr_device, item);
+                    cJSON *cj_response = __broadcast_message_items_updated_from_device(curr_device, item);
 
                     // TRACE_D("%d -> here", xTaskGetTickCount());
 
                     // CJSON_TRACE("----------------- broadcasting - cj_response", cj_response);
                     if (cj_response)
                     {
-                        if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(cj_response))
+                        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_response, EZPI_core_sntp_get_current_time_sec()))
                         {
                             ret = EZPI_FAILED;
                             cJSON_Delete(__FUNCTION__, cj_response);
@@ -63,24 +132,24 @@ ezlopi_error_t ezlopi_device_value_updated_from_device_broadcast(l_ezlopi_item_t
     return ret;
 }
 
-ezlopi_error_t ezlopi_device_value_updated_from_device_broadcast_by_item_id(uint32_t item_id)
+ezlopi_error_t EZPI_core_device_value_updated_from_device_broadcast_by_item_id(uint32_t item_id)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
 
-    l_ezlopi_device_t* curr_device = ezlopi_device_get_head();
+    l_ezlopi_device_t *curr_device = EZPI_core_device_get_head();
     while (curr_device)
     {
-        l_ezlopi_item_t* curr_item = curr_device->items;
+        l_ezlopi_item_t *curr_item = curr_device->items;
 
         while (curr_item)
         {
             if (item_id == curr_item->cloud_properties.item_id)
             {
                 // cJSON* cj_response = NULL;
-                cJSON* cj_response = __broadcast_message_items_updated_from_device(curr_device, curr_item);
+                cJSON *cj_response = __broadcast_message_items_updated_from_device(curr_device, curr_item);
                 CJSON_TRACE("----------------- broadcasting - cj_response", cj_response);
 
-                ret = ezlopi_core_broadcast_add_to_queue(cj_response);
+                ret = EZPI_core_broadcast_add_to_queue(cj_response, EZPI_core_sntp_get_current_time_sec());
                 if (EZPI_SUCCESS != ret)
                 {
                     ret = EZPI_FAILED;
@@ -99,23 +168,23 @@ ezlopi_error_t ezlopi_device_value_updated_from_device_broadcast_by_item_id(uint
     return ret;
 }
 
-ezlopi_error_t ezlopi_core_device_value_updated_settings_broadcast(l_ezlopi_device_settings_v3_t* setting)
+ezlopi_error_t EZPI_core_device_value_updated_settings_broadcast(l_ezlopi_device_settings_v3_t *setting)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
 
     if (setting)
     {
-        l_ezlopi_device_t* curr_device = ezlopi_device_get_head();
+        l_ezlopi_device_t *curr_device = EZPI_core_device_get_head();
         while (curr_device)
         {
-            l_ezlopi_device_settings_v3_t* curr_setting = curr_device->settings;
+            l_ezlopi_device_settings_v3_t *curr_setting = curr_device->settings;
             while (curr_setting)
             {
                 if (setting == curr_setting)
                 {
-                    cJSON* cj_response = __broadcast_message_settings_updated_from_devices_v3(curr_device, setting);
+                    cJSON *cj_response = __broadcast_message_settings_updated_from_devices_v3(curr_device, setting);
                     CJSON_TRACE("----------------- broadcasting - cj_response", cj_response);
-                    ret = ezlopi_core_broadcast_add_to_queue(cj_response);
+                    ret = EZPI_core_broadcast_add_to_queue(cj_response, EZPI_core_sntp_get_current_time_sec());
 
                     if (EZPI_SUCCESS != ret)
                     {
@@ -140,17 +209,17 @@ int ezlopi_setting_value_updated_from_device_settings_id_v3(uint32_t setting_id)
 
     // if (setting)
     {
-        l_ezlopi_device_t* curr_device = ezlopi_device_get_head();
+        l_ezlopi_device_t *curr_device = EZPI_core_device_get_head();
         while (curr_device)
         {
-            l_ezlopi_device_settings_v3_t* curr_setting = curr_device->settings;
+            l_ezlopi_device_settings_v3_t *curr_setting = curr_device->settings;
             while (curr_setting)
             {
                 if (setting_id == curr_setting->cloud_properties.setting_id)
                 {
-                    cJSON* cj_response = __broadcast_message_settings_updated_from_devices_v3(curr_device, curr_setting);
+                    cJSON *cj_response = __broadcast_message_settings_updated_from_devices_v3(curr_device, curr_setting);
                     CJSON_TRACE("----------------- broadcasting - cj_response", cj_response);
-                    ret = ezlopi_core_broadcast_add_to_queue(cj_response);
+                    ret = EZPI_core_broadcast_add_to_queue(cj_response);
 
                     if (0 == ret)
                     {
@@ -168,32 +237,31 @@ int ezlopi_setting_value_updated_from_device_settings_id_v3(uint32_t setting_id)
 }
 #endif
 
-ezlopi_error_t ezlopi_core_device_value_update_wifi_scan_broadcast(cJSON* network_array)
+ezlopi_error_t EZPI_core_device_value_update_wifi_scan_broadcast(cJSON *network_array)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
     if (network_array)
     {
-        cJSON* cj_response = cJSON_CreateObject(__FUNCTION__);
+        cJSON *cj_response = cJSON_CreateObject(__FUNCTION__);
         if (cj_response)
         {
-            time_t now = 0;
-            time(&now);
-            cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_startTime_str, now);
+            // printf("%s[%u]\r\n", __FUNCTION__, __LINE__);
+            // cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_startTime_str, EZPI_core_sntp_get_current_time_sec());
 
             cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
             cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, method_hub_network_wifi_scan_progress);
-            // cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_msg_id_str, ezlopi_service_web_provisioning_get_message_count());
+            // cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_msg_id_str, EZPI_service_web_provisioning_get_message_count());
 
-            cJSON* result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, "result");
+            cJSON *result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
             if (result)
             {
-                cJSON_AddStringToObject(__FUNCTION__, result, "interfaceId", "wlan0");
-                cJSON_AddStringToObject(__FUNCTION__, result, "status", "process");
-                cJSON_AddItemToObject(__FUNCTION__, result, "networks", network_array);
+                cJSON_AddStringToObject(__FUNCTION__, result, ezlopi_interfaceId_str, ezlopi_wlan0_str);
+                cJSON_AddStringToObject(__FUNCTION__, result, ezlopi_status_str, ezlopi_process_str);
+                cJSON_AddItemToObject(__FUNCTION__, result, ezlopi_networks_str, network_array);
             }
 
             CJSON_TRACE("----------------- broadcasting - cj_response", cj_response);
-            ret = ezlopi_core_broadcast_add_to_queue(cj_response);
+            ret = EZPI_core_broadcast_add_to_queue(cj_response, EZPI_core_sntp_get_current_time_sec());
 
             if (EZPI_SUCCESS != ret)
             {
@@ -205,32 +273,34 @@ ezlopi_error_t ezlopi_core_device_value_update_wifi_scan_broadcast(cJSON* networ
     return ret;
 }
 
-/// static methods
-static cJSON* __broadcast_message_items_updated_from_device(l_ezlopi_device_t* device, l_ezlopi_item_t* item)
+/*******************************************************************************
+ *                         Static Function Definitions
+ *******************************************************************************/
+static cJSON *__broadcast_message_items_updated_from_device(l_ezlopi_device_t *device, l_ezlopi_item_t *item)
 {
-    cJSON* cjson_response = NULL;
+    cJSON *cjson_response = NULL;
 
     if (NULL != item && NULL != device)
     {
         cjson_response = cJSON_CreateObject(__FUNCTION__);
         if (cjson_response)
         {
-            time_t now = 0;
-            time(&now);
-            cJSON_AddNumberToObject(__FUNCTION__, cjson_response, ezlopi_startTime_str, now);
+            // cJSON_AddNumberToObject(__FUNCTION__, cjson_response, ezlopi_startTime_str, EZPI_core_sntp_get_current_time_sec());
 
             cJSON_AddStringToObject(__FUNCTION__, cjson_response, ezlopi_msg_subclass_str, method_hub_item_updated);
-            // cJSON_AddNumberToObject(__FUNCTION__, cjson_response, ezlopi_msg_id_str, ezlopi_service_web_provisioning_get_message_count());
+            // cJSON_AddNumberToObject(__FUNCTION__, cjson_response, ezlopi_msg_id_str, EZPI_service_web_provisioning_get_message_count());
             cJSON_AddStringToObject(__FUNCTION__, cjson_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
 
-            cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cjson_response, ezlopi_result_str);
+            cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cjson_response, ezlopi_result_str);
             if (cj_result)
             {
-                char tmp_string[64];
-                snprintf(tmp_string, sizeof(tmp_string), "%08x", item->cloud_properties.item_id);
-                cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi__id_str, tmp_string);
-                snprintf(tmp_string, sizeof(tmp_string), "%08x", device->cloud_properties.device_id);
-                cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_deviceId_str, tmp_string);
+                {
+                    char tmp_string[64];
+                    snprintf(tmp_string, sizeof(tmp_string), "%08x", item->cloud_properties.item_id);
+                    cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi__id_str, tmp_string);
+                    snprintf(tmp_string, sizeof(tmp_string), "%08x", device->cloud_properties.device_id);
+                    cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_deviceId_str, tmp_string);
+                }
                 cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_deviceName_str, device->cloud_properties.device_name);
                 cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_deviceCategory_str, device->cloud_properties.category);
                 cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_deviceSubcategory_str, device->cloud_properties.subcategory);
@@ -261,22 +331,20 @@ static cJSON* __broadcast_message_items_updated_from_device(l_ezlopi_device_t* d
     return cjson_response;
 }
 
-static cJSON* __broadcast_message_settings_updated_from_devices_v3(l_ezlopi_device_t* device, l_ezlopi_device_settings_v3_t* setting)
+static cJSON *__broadcast_message_settings_updated_from_devices_v3(l_ezlopi_device_t *device, l_ezlopi_device_settings_v3_t *setting)
 {
-    cJSON* cjson_response = cJSON_CreateObject(__FUNCTION__);
+    cJSON *cjson_response = cJSON_CreateObject(__FUNCTION__);
     if (cjson_response)
     {
-        time_t now = 0;
-        time(&now);
-        cJSON_AddNumberToObject(__FUNCTION__, cjson_response, ezlopi_startTime_str, now);
+        // cJSON_AddNumberToObject(__FUNCTION__, cjson_response, ezlopi_startTime_str, EZPI_core_sntp_get_current_time_sec());
 
         if (NULL != setting)
         {
             cJSON_AddStringToObject(__FUNCTION__, cjson_response, ezlopi_msg_subclass_str, method_hub_device_setting_updated);
-            // cJSON_AddNumberToObject(__FUNCTION__, cjson_response, ezlopi_msg_id_str, ezlopi_service_web_provisioning_get_message_count());
+            // cJSON_AddNumberToObject(__FUNCTION__, cjson_response, ezlopi_msg_id_str, EZPI_service_web_provisioning_get_message_count());
             cJSON_AddStringToObject(__FUNCTION__, cjson_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
 
-            cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cjson_response, ezlopi_result_str);
+            cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cjson_response, ezlopi_result_str);
             if (cj_result)
             {
                 char tmp_string[64];
@@ -294,3 +362,7 @@ static cJSON* __broadcast_message_settings_updated_from_devices_v3(l_ezlopi_devi
 
     return cjson_response;
 }
+
+/*******************************************************************************
+ *                          End of File
+ *******************************************************************************/

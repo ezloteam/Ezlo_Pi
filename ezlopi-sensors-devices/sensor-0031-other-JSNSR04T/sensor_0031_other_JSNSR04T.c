@@ -1,11 +1,48 @@
-#include "ezlopi_util_trace.h"
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+/**
+* @file    sensor_0031_other_JSNSR04T.c
+* @brief   perform some function on sensor_0031
+* @author  xx
+* @version 0.1
+* @date    xx
+*/
 
-// #include "ezlopi_core_timer.h"
+/*******************************************************************************
+*                          Include Files
+*******************************************************************************/
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
-#include "ezlopi_core_errors.h"
 
 #include "ezlopi_cloud_items.h"
 #include "ezlopi_cloud_constants.h"
@@ -14,12 +51,37 @@
 #include "sensor_0031_other_JSNSR04T.h"
 #include "EZLOPI_USER_CONFIG.h"
 
+/*******************************************************************************
+*                          Extern Data Declarations
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Extern Function Declarations
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Type & Macro Definitions
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Static Function Prototypes
+*******************************************************************************/
 static ezlopi_error_t __prepare(void *arg);
 static ezlopi_error_t __init(l_ezlopi_item_t *item);
 static ezlopi_error_t __notify(l_ezlopi_item_t *item);
 static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg);
+/*******************************************************************************
+*                          Static Data Definitions
+*******************************************************************************/
 
-ezlopi_error_t sensor_0031_other_JSNSR04T(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+/*******************************************************************************
+*                          Extern Data Definitions
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Extern Function Definitions
+*******************************************************************************/
+ezlopi_error_t SENSOR_0031_other_jsnsr04t(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
     switch (action)
@@ -53,9 +115,12 @@ ezlopi_error_t sensor_0031_other_JSNSR04T(e_ezlopi_actions_t action, l_ezlopi_it
     return ret;
 }
 
+/*******************************************************************************
+*                         Static Function Definitions
+*******************************************************************************/
 static ezlopi_error_t __notify(l_ezlopi_item_t *item)
 {
-    return ezlopi_device_value_updated_from_device_broadcast(item);
+    return EZPI_core_device_value_updated_from_device_broadcast(item);
 }
 
 static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg)
@@ -68,16 +133,16 @@ static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg)
         if (tmp_config)
         {
             jsn_sr04t_data_t jsn_sr04t_data;
-            ret = measurement(tmp_config, &jsn_sr04t_data);
+            ret = JSN_sr04t_measurement(tmp_config, &jsn_sr04t_data);
             if (ret)
             {
                 float distance = (jsn_sr04t_data.distance_cm / 100.0f);
-                ezlopi_valueformatter_float_to_cjson(cj_result, distance, scales_meter);
+                EZPI_core_valueformatter_float_to_cjson(cj_result, distance, scales_meter);
                 ret = EZPI_SUCCESS;
             }
             else
             {
-                ESP_LOGE(TAG1, "ERROR in getting measurement: ret=%d", ret);
+                ESP_LOGE("JSN_SR04T_V3", "ERROR in getting measurement: ret=%d", ret);
             }
         }
     }
@@ -101,7 +166,7 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
             memcpy(jsn_sr04t_config, &tmp_config, sizeof(jsn_sr04t_config_t));
             item->user_arg = (void *)jsn_sr04t_config;
 
-            if (ESP_OK == init_JSN_SR04T(jsn_sr04t_config))
+            if (ESP_OK == JSN_sr04t_init(jsn_sr04t_config))
             {
                 TRACE_S("JSN_SR04T initialized");
                 ret = EZPI_SUCCESS;
@@ -130,7 +195,7 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_dev
     item->cloud_properties.value_type = value_type_length;
     item->cloud_properties.scale = NULL;
     item->cloud_properties.show = true;
-    item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
+    item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
 }
 
 static void __prepare_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj_device)
@@ -161,11 +226,11 @@ static ezlopi_error_t __prepare(void *arg)
 
     if (prep_arg && prep_arg->cjson_device)
     {
-        l_ezlopi_device_t *device = ezlopi_device_add_device(prep_arg->cjson_device, NULL);
+        l_ezlopi_device_t *device = EZPI_core_device_add_device(prep_arg->cjson_device, NULL);
         if (device)
         {
             __prepare_device_cloud_properties(device, prep_arg->cjson_device);
-            l_ezlopi_item_t *item_temperature = ezlopi_device_add_item_to_device(device, sensor_0031_other_JSNSR04T);
+            l_ezlopi_item_t *item_temperature = EZPI_core_device_add_item_to_device(device, SENSOR_0031_other_jsnsr04t);
             if (item_temperature)
             {
                 __prepare_item_cloud_properties(item_temperature, prep_arg->cjson_device);
@@ -174,9 +239,13 @@ static ezlopi_error_t __prepare(void *arg)
             }
             else
             {
-                ezlopi_device_free_device(device);
+                EZPI_core_device_free_device(device);
             }
         }
     }
     return ret;
 }
+
+/*******************************************************************************
+*                          End of File
+*******************************************************************************/

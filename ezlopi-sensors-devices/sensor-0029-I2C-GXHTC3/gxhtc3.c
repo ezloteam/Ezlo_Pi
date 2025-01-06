@@ -1,9 +1,206 @@
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+/**
+* @file    gxhtc3.c
+* @brief   perform some function on gxhtc3
+* @author  xx
+* @version 0.1
+* @date    xx
+*/
 
+/*******************************************************************************
+*                          Include Files
+*******************************************************************************/
 #include "gxhtc3.h"
 #include "driver/i2c.h"
 #include "ezlopi_util_trace.h"
 #include "EZLOPI_USER_CONFIG.h"
 
+/*******************************************************************************
+*                          Extern Data Declarations
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Extern Function Declarations
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Type & Macro Definitions
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Static Function Prototypes
+*******************************************************************************/
+static uint8_t gxhtc3_get_crc8(uint8_t *data, int len);
+static bool gxhtc3_check_crc8(uint8_t calulated, uint8_t read);
+static bool gxhtc3_send_command(s_gxhtc3_sensor_handler_t *handler, uint16_t cmd);
+static bool gxhtc3_read_data(s_gxhtc3_sensor_handler_t *handler, uint8_t *read_buf, uint16_t len);
+static bool gxhtc3_reset(s_gxhtc3_sensor_handler_t *handler);
+static bool gxhtc3_read_id(s_gxhtc3_sensor_handler_t *handler);
+
+/*******************************************************************************
+*                          Static Data Definitions
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Extern Data Definitions
+*******************************************************************************/
+
+/*******************************************************************************
+*                          Extern Function Definitions
+*******************************************************************************/
+bool gxhtc3_wake_sensor(s_gxhtc3_sensor_handler_t *handler)
+{
+    bool ret = true;
+    if (handler)
+    {
+        if (!gxhtc3_send_command(handler, GXHTC3_I2C_CMD_WAKEUP))
+        {
+            ret = false;
+        }
+    }
+    return ret;
+}
+
+bool gxhtc3_sleep_sensor(s_gxhtc3_sensor_handler_t *handler)
+{
+    bool ret = true;
+    if (handler)
+    {
+        if (!gxhtc3_send_command(handler, GXHTC3_I2C_CMD_SLEEP))
+        {
+            ret = false;
+        }
+    }
+    return ret;
+}
+
+bool gxhtc3_start_measurement(s_gxhtc3_sensor_handler_t *handler)
+{
+    bool ret = true;
+    if (handler)
+    {
+        handler->read_status = false;
+        if (!gxhtc3_send_command(handler, GXHTC3_I2C_CMD_READ_NM_CSEN_TF))
+        {
+            ret = false;
+        }
+    }
+    return ret;
+}
+
+bool gxhtc3_compute_values(s_gxhtc3_sensor_handler_t *handler)
+{
+    bool ret = true;
+
+    if (handler->raw_data_reg)
+    {
+        {
+            handler->reading_temp_c = -45.0 + (175 * ((handler->raw_data_reg[0] << 8 | handler->raw_data_reg[1])) / 65536.0);
+            handler->reading_rh = 100.0 * (handler->raw_data_reg[3] << 8 | handler->raw_data_reg[4]) / 65536.0;
+
+            // handler->reading_temp_c = ((((handler->raw_data_reg[0] * 256.0) + handler->raw_data_reg[1]) * 175) / 65535.0) - 45;
+            // handler->reading_rh = ((((handler->raw_data_reg[3] * 256.0) + handler->raw_data_reg[4]) * 100) / 65535.0);
+        }
+    }
+    else
+    {
+        ret = false;
+    }
+
+    return ret;
+}
+
+bool GXHTC3_read_sensor(s_gxhtc3_sensor_handler_t *handler)
+{
+    bool ret = true;
+    if (handler)
+    {
+        if (!gxhtc3_wake_sensor(handler))
+            ret = false;
+        vTaskDelay(1 / portTICK_RATE_MS);
+        if (!gxhtc3_start_measurement(handler))
+            ret = false;
+        vTaskDelay(5 / portTICK_RATE_MS);
+        esp_err_t err = i2c_master_read_from_device(handler->i2c_ch_num, handler->i2c_slave_addr, handler->raw_data_reg, GXHTC3_I2C_RAW_DATA_LEN, (GXHTC3_I2C_TIMEOUT / portTICK_RATE_MS));
+        if (err != ESP_OK)
+        {
+            ret = false;
+        }
+
+        if ((gxhtc3_check_crc8(gxhtc3_get_crc8(handler->raw_data_reg, 2), handler->raw_data_reg[2])) && (gxhtc3_check_crc8(gxhtc3_get_crc8(&handler->raw_data_reg[3], 2), handler->raw_data_reg[5])))
+        {
+            if (!gxhtc3_compute_values(handler))
+                ret = false;
+        }
+        else
+        {
+            TRACE_E("CRC Did not match");
+            ret = false;
+        }
+
+        // if (gxhtc3_sleep_sensor(handler))
+        //     ret = false;
+    }
+
+    return ret;
+}
+
+s_gxhtc3_sensor_handler_t *GXHTC3_init(int32_t i2c_ch_num, uint8_t i2c_slave_addr)
+{
+    s_gxhtc3_sensor_handler_t *gxhtc3_handler = (s_gxhtc3_sensor_handler_t *)ezlopi_malloc(__FUNCTION__, sizeof(s_gxhtc3_sensor_handler_t));
+
+    if (gxhtc3_handler)
+    {
+        gxhtc3_handler->i2c_ch_num = i2c_ch_num;
+        gxhtc3_handler->i2c_slave_addr = i2c_slave_addr;
+        gxhtc3_handler->id.status = false;
+
+        if (!gxhtc3_reset(gxhtc3_handler))
+        {
+            ezlopi_free(__FUNCTION__, gxhtc3_handler);
+            gxhtc3_handler = NULL;
+        }
+        else
+        {
+            gxhtc3_read_id(gxhtc3_handler);
+        }
+    }
+
+    return gxhtc3_handler;
+}
+
+/*******************************************************************************
+*                         Static Function Definitions
+*******************************************************************************/
 static uint8_t gxhtc3_get_crc8(uint8_t *data, int len)
 {
     uint8_t crc = 0xff;
@@ -118,122 +315,6 @@ static bool gxhtc3_read_id(s_gxhtc3_sensor_handler_t *handler)
     return ret;
 }
 
-bool gxhtc3_wake_sensor(s_gxhtc3_sensor_handler_t *handler)
-{
-    bool ret = true;
-    if (handler)
-    {
-        if (!gxhtc3_send_command(handler, GXHTC3_I2C_CMD_WAKEUP))
-        {
-            ret = false;
-        }
-    }
-    return ret;
-}
-bool gxhtc3_sleep_sensor(s_gxhtc3_sensor_handler_t *handler)
-{
-    bool ret = true;
-    if (handler)
-    {
-        if (!gxhtc3_send_command(handler, GXHTC3_I2C_CMD_SLEEP))
-        {
-            ret = false;
-        }
-    }
-    return ret;
-}
-
-bool gxhtc3_start_measurement(s_gxhtc3_sensor_handler_t *handler)
-{
-    bool ret = true;
-    if (handler)
-    {
-        handler->read_status = false;
-        if (!gxhtc3_send_command(handler, GXHTC3_I2C_CMD_READ_NM_CSEN_TF))
-        {
-            ret = false;
-        }
-    }
-    return ret;
-}
-
-bool gxhtc3_compute_values(s_gxhtc3_sensor_handler_t *handler)
-{
-    bool ret = true;
-
-    if (handler->raw_data_reg)
-    {
-        {
-            handler->reading_temp_c = -45.0 + (175 * ((handler->raw_data_reg[0] << 8 | handler->raw_data_reg[1])) / 65536.0);
-            handler->reading_rh = 100.0 * (handler->raw_data_reg[3] << 8 | handler->raw_data_reg[4]) / 65536.0;
-
-            // handler->reading_temp_c = ((((handler->raw_data_reg[0] * 256.0) + handler->raw_data_reg[1]) * 175) / 65535.0) - 45;
-            // handler->reading_rh = ((((handler->raw_data_reg[3] * 256.0) + handler->raw_data_reg[4]) * 100) / 65535.0);
-        }
-    }
-    else
-    {
-        ret = false;
-    }
-
-    return ret;
-}
-
-bool GXHTC3_read_sensor(s_gxhtc3_sensor_handler_t *handler)
-{
-    bool ret = true;
-    if (handler)
-    {
-        if (!gxhtc3_wake_sensor(handler))
-            ret = false;
-        vTaskDelay(1 / portTICK_RATE_MS);
-        if (!gxhtc3_start_measurement(handler))
-            ret = false;
-        vTaskDelay(5 / portTICK_RATE_MS);
-        esp_err_t err = i2c_master_read_from_device(handler->i2c_ch_num, handler->i2c_slave_addr, handler->raw_data_reg, GXHTC3_I2C_RAW_DATA_LEN, (GXHTC3_I2C_TIMEOUT / portTICK_RATE_MS));
-        if (err != ESP_OK)
-        {
-            ret = false;
-        }
-
-        if ((gxhtc3_check_crc8(gxhtc3_get_crc8(handler->raw_data_reg, 2), handler->raw_data_reg[2])) && (gxhtc3_check_crc8(gxhtc3_get_crc8(&handler->raw_data_reg[3], 2), handler->raw_data_reg[5])))
-        {
-            if (!gxhtc3_compute_values(handler))
-                ret = false;
-        }
-        else
-        {
-            TRACE_E("CRC Did not match");
-            ret = false;
-        }
-
-        // if (gxhtc3_sleep_sensor(handler))
-        //     ret = false;
-    }
-
-    return ret;
-}
-
-s_gxhtc3_sensor_handler_t *GXHTC3_init(int32_t i2c_ch_num, uint8_t i2c_slave_addr)
-{
-    s_gxhtc3_sensor_handler_t *gxhtc3_handler = (s_gxhtc3_sensor_handler_t *)ezlopi_malloc(__FUNCTION__, sizeof(s_gxhtc3_sensor_handler_t));
-
-    if (gxhtc3_handler)
-    {
-        gxhtc3_handler->i2c_ch_num = i2c_ch_num;
-        gxhtc3_handler->i2c_slave_addr = i2c_slave_addr;
-        gxhtc3_handler->id.status = false;
-
-        if (!gxhtc3_reset(gxhtc3_handler))
-        {
-            ezlopi_free(__FUNCTION__, gxhtc3_handler);
-            gxhtc3_handler = NULL;
-        }
-        else
-        {
-            gxhtc3_read_id(gxhtc3_handler);
-        }
-    }
-
-    return gxhtc3_handler;
-}
+/*******************************************************************************
+*                          End of File
+*******************************************************************************/
