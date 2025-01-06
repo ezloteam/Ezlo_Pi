@@ -75,9 +75,8 @@ byte _error;
 
 boolean ltr303_begin(s_ezlopi_i2c_master_t *bme68x_i2c_master_conf)
 {
-
 	memcpy(&g_ltr303_i2c_master_conf, bme68x_i2c_master_conf, sizeof(s_ezlopi_i2c_master_t));
-	if (EZPI_hal_i2c_master_init(&g_ltr303_i2c_master_conf) != ESP_OK)
+	if (EZPI_FAILED == EZPI_hal_i2c_master_init(&g_ltr303_i2c_master_conf))
 	{
 		return false;
 	}

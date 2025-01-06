@@ -175,9 +175,11 @@ uint8_t DFROBOT_ens160_calc_misr(ens160_t *ens160, uint8_t data)
 
 int DFROBOT_ens160_i2c_begin(ens160_t *ens160)
 {
-  EZPI_hal_i2c_master_init(ens160->ezlopi_i2c);
-
-  return DFROBOT_ens160_begin(ens160); // Use the initialization function of the parent class
+  if (EZPI_SUCCESS == EZPI_hal_i2c_master_init(ens160->ezlopi_i2c))
+  {
+    return DFROBOT_ens160_begin(ens160); // Use the initialization function of the parent class
+  }
+  return EZPI_FAILED;
 }
 
 void DFROBOT_ens160_i2c_write_reg(ens160_t *ens160, uint8_t reg, const void *p_buf, size_t size)
