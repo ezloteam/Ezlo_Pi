@@ -28,13 +28,12 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_core_actions.c
+ * @brief   These functions perform operation on action-methods
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    12th DEC 2024
  */
 
 /*******************************************************************************
@@ -53,7 +52,11 @@
 /*******************************************************************************
  *                          Type & Macro Definitions
  *******************************************************************************/
-
+char *ezlopi_action_names[] = {
+#define EZLOPI_ACTION(action, name) name,
+#include "ezlopi_core_actions_list.h"
+#undef EZLOPI_ACTION
+};
 /*******************************************************************************
  *                          Static Function Prototypes
  *******************************************************************************/
@@ -61,10 +64,6 @@
 /*******************************************************************************
  *                          Static Data Definitions
  *******************************************************************************/
-char *ezlopi_action_names[] = {
-#define EZLOPI_ACTION(action, name) name,
-#include "ezlopi_core_actions_list.h"
-};
 
 /*******************************************************************************
  *                          Extern Data Definitions
@@ -73,13 +72,7 @@ char *ezlopi_action_names[] = {
 /*******************************************************************************
  *                          Extern Function Definitions
  *******************************************************************************/
-
-/**
- * @brief Global/extern function template example
- * Convention : Use capital letter for initial word on extern function
- * @param arg
- */
-char *ezlopi_actions_to_string(e_ezlopi_actions_t action)
+char *EZPI_core_actions_to_string(e_ezlopi_actions_t action)
 {
     char *ret = NULL;
 
@@ -90,14 +83,10 @@ char *ezlopi_actions_to_string(e_ezlopi_actions_t action)
 
     return ret;
 }
-
 /*******************************************************************************
- *                          Static Function Definitions
+ *                         Static Function Definitions
  *******************************************************************************/
 
 /*******************************************************************************
  *                          End of File
  *******************************************************************************/
-
-
-

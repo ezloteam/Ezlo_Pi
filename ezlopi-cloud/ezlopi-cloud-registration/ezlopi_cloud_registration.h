@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2022 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -30,21 +30,17 @@
 */
 
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
- * @version 0.1
- * @date    1st January 2024
+ * @file    ezlopi_cloud_registration.h
+ * @brief
+ * @author
+ * @version
+ * @date
  */
-
 #ifndef __HUB_REGISTERATION_H__
 #define __HUB_REGISTERATION_H__
-
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
-#include <string.h>
-
 #include "cjext.h"
 
 /*******************************************************************************
@@ -67,26 +63,34 @@ extern "C"
      *                          Extern Function Prototypes
      *******************************************************************************/
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
+     * @brief Function to initialize device regestration process
      *
      */
-    void registration_init(void);
-    void register_repeat(cJSON* cj_request, cJSON* cj_response);
-    void registered(cJSON* cj_request, cJSON* cj_response);
-    void ezpi_cloud_dummy(void);
-
+    void EZPI_registration_init(void);
+    /**
+     * @brief Function to respond to hub.nma.register.repeat method
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_register_repeat(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function to respond to registered method
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_registered(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function is a dummy function
+     *
+     */
+    void EZPI_cloud_dummy(void);
 #ifdef __cplusplus
 }
 #endif
 
 #endif // __HUB_REGISTERATION_H__
-
 /*******************************************************************************
  *                          End of File
  *******************************************************************************/

@@ -28,18 +28,19 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_core_ble_config.h
+ * @brief   perform some function on ble-configurations
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    12th DEC 2024
  */
-
 #ifndef _EZLOPI_CORE_BLE_CONFIG_H_
 #define _EZLOPI_CORE_BLE_CONFIG_H_
 
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_BLE_ENABLE
@@ -48,7 +49,6 @@
  *                          Include Files
  *******************************************************************************/
 #include "esp_gatts_api.h"
-
 /*******************************************************************************
  *                          C++ Declaration Wrapper
  *******************************************************************************/
@@ -68,7 +68,7 @@ extern "C"
         GATT_STATUS_MAX
     } e_gatt_status_t;
 
-    typedef void (*f_upcall_t)(esp_gatt_value_t* value, esp_ble_gatts_cb_param_t* param);
+    typedef void (*f_upcall_t)(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
 
     typedef struct s_gatt_descr
     {
@@ -80,8 +80,8 @@ extern "C"
         f_upcall_t write_upcall;
         f_upcall_t write_exce_upcall;
         esp_gatt_perm_t permission;
-        esp_attr_control_t* control;
-        struct s_gatt_descr* next;
+        esp_attr_control_t *control;
+        struct s_gatt_descr *next;
     } s_gatt_descr_t;
 
     typedef struct s_gatt_char
@@ -96,8 +96,8 @@ extern "C"
         f_upcall_t write_upcall;
         f_upcall_t write_exce_upcall;
         esp_attr_control_t control;
-        s_gatt_descr_t* descriptor;
-        struct s_gatt_char* next;
+        s_gatt_descr_t *descriptor;
+        struct s_gatt_char *next;
     } s_gatt_char_t;
 
     typedef struct s_gatt_service
@@ -109,8 +109,8 @@ extern "C"
         e_gatt_status_t status;
         uint16_t service_handle;
         esp_gatt_srvc_id_t service_id;
-        struct s_gatt_char* characteristics;
-        struct s_gatt_service* next;
+        struct s_gatt_char *characteristics;
+        struct s_gatt_service *next;
     } s_gatt_service_t;
 
     /*******************************************************************************
@@ -125,7 +125,7 @@ extern "C"
 }
 #endif
 
-#endif  // CONFIG_EZPI_BLE_ENABLE
+#endif // CONFIG_EZPI_BLE_ENABLE
 
 #endif // _EZLOPI_CORE_BLE_CONFIG_H_
 

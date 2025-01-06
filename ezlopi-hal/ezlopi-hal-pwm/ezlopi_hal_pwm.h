@@ -28,13 +28,12 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_hal_pwm.h
+ * @brief   perform some function on pwm
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    xx
  */
 
 #ifndef _EZLOPI_PWM_H_
@@ -43,9 +42,9 @@
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
+
 #include "driver/ledc.h"
 #include "ezlopi_core_errors.h"
-
 /*******************************************************************************
  *                          C++ Declaration Wrapper
  *******************************************************************************/
@@ -81,19 +80,33 @@ extern "C"
     /*******************************************************************************
      *                          Extern Function Prototypes
      *******************************************************************************/
+
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
+     * @brief Function to initialize pwm
      *
+     * @param pwm_gpio_num Target GPIO to set as pwm
+     * @param pwm_resln PWM resolution
+     * @param freq_hz Frequecy
+     * @param duty_cycle duty cycle
+     * @return s_ezlopi_channel_speed_t*
      */
-    s_ezlopi_channel_speed_t *ezlopi_pwm_init(uint8_t pwm_gpio_num, uint8_t pwm_resln, uint32_t freq_hz, uint32_t duty_cycle);
-    void ezlopi_pwm_change_duty(uint32_t channel, uint32_t speed, uint32_t duty);
-    uint32_t ezlopi_pwm_get_duty(uint32_t channel, uint32_t speed);
+    s_ezlopi_channel_speed_t *EZPI_hal_pwm_init(uint8_t pwm_gpio_num, uint8_t pwm_resln, uint32_t freq_hz, uint32_t duty_cycle);
+    /**
+     * @brief Function to set the pwm duty cycle
+     *
+     * @param channel Target- gpio Channel
+     * @param speed channel group with specified speed mode
+     * @param duty duty cycle
+     */
+    void EZPI_hal_pwm_change_duty(uint32_t channel, uint32_t speed_mode, uint32_t duty);
+    /**
+     * @brief Function to get the pwm duty cycle
+     *
+     * @param channel Target- gpio Channel
+     * @param speed_mode channel group with specified speed mode
+     * @return uint32_t
+     */
+    uint32_t EZPI_hal_pwm_get_duty(uint32_t channel, uint32_t speed_mode);
 
 #ifdef __cplusplus
 }

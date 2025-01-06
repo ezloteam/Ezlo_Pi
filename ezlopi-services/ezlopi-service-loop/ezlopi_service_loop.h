@@ -30,35 +30,32 @@
 */
 
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
- * @version 0.1
- * @date    1st January 2024
+ * @file    ezlopi_service_loop.h
+ * @brief
+ * @author
+ * @version
+ * @date
  */
-
 #ifndef _EZLOPI_SERVICE_TIMER_H_
 #define _EZLOPI_SERVICE_TIMER_H_
-
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
-#include "string.h"
-#include "stdint.h"
-
 /*******************************************************************************
  *                          C++ Declaration Wrapper
  *******************************************************************************/
-#ifdef __cplusplus
+#ifdef __cpluscplus
 extern "C"
 {
 #endif
-
     /*******************************************************************************
      *                          Type & Macro Declarations
      *******************************************************************************/
+    /**
+     * @brief Function pointer that a function has to be of to be registered as a loop
+     *
+     */
     typedef void (*f_loop_t)(void *arg);
-
     /*******************************************************************************
      *                          Extern Data Declarations
      *******************************************************************************/
@@ -66,21 +63,29 @@ extern "C"
     /*******************************************************************************
      *                          Extern Function Prototypes
      *******************************************************************************/
+
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
+     * @brief Function to initialize loop service
      *
      */
-    void ezlopi_service_loop_init(void);
-    void ezlopi_service_loop_remove(f_loop_t loop);
-    void ezlopi_service_loop_add(const char *name, f_loop_t loop, uint32_t period_ms, void *arg);
+    void EZPI_service_loop_init(void);
+    /**
+     * @brief Function to remove function loop from loop stack
+     *
+     * @param loop Function to remove from the loop stack
+     */
+    void EZPI_service_loop_remove(f_loop_t loop);
+    /**
+     * @brief Function to add function loop to loop stack
+     *
+     * @param[in] name Name for the loop function
+     * @param[in] loop Function to add to the loop stack
+     * @param[in] period_ms Time in ms for loop to be called
+     * @param[in] arg Argument to pass to the function loop
+     */
+    void EZPI_service_loop_add(const char *name, f_loop_t loop, uint32_t period_ms, void *arg);
 
-#ifdef __cplusplus
+#ifdef __cpluscplus
 }
 #endif
 

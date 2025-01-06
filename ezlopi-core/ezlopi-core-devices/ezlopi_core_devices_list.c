@@ -28,13 +28,12 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_core_devices_list.c
+ * @brief   Function list on device modules
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    12th DEC 2024
  */
 
 /*******************************************************************************
@@ -68,7 +67,6 @@ static s_ezlopi_device_v3_t gc_device_array_v3[] = {
 #include "ezlopi_core_devices_list_modules.h"
 #undef EZLOPI_DEVICE_LIST
 };
-
 /*******************************************************************************
  *                          Extern Data Definitions
  *******************************************************************************/
@@ -76,19 +74,12 @@ static s_ezlopi_device_v3_t gc_device_array_v3[] = {
 /*******************************************************************************
  *                          Extern Function Definitions
  *******************************************************************************/
-
-/**
- * @brief Global/extern function template example
- * Convention : Use capital letter for initial word on extern function
- * @param arg
- */
-s_ezlopi_device_v3_t *ezlopi_devices_list_get_list_v3(void)
+s_ezlopi_device_v3_t *EZPI_core_devices_list_get_list_v3(void)
 {
     return gc_device_array_v3;
 }
-
 /*******************************************************************************
- *                          Static Function Definitions
+ *                         Static Function Definitions
  *******************************************************************************/
 
 /*******************************************************************************

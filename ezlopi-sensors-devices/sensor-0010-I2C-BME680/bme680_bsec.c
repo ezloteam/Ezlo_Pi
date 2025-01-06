@@ -28,13 +28,12 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    bme680_bsec.c
+ * @brief   perform some function on bme680
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    xx
  */
 
 /*******************************************************************************
@@ -59,12 +58,26 @@
 /*******************************************************************************
  *                          Static Function Prototypes
  *******************************************************************************/
+/**
+ * @brief : This function is called by the BSEC library when a new output is available
+ * @param[in] input     : BME68X sensor data before processing
+ * @param[in] outputs   : Processed BSEC BSEC output data
+ * @param[in] bsec      : Instance of BSEC2 calling the callback
+ */
 static void bme680_data_callback(const bme68x_data data, const bsec_outputs outputs);
+/**
+ * @brief This function is called to copy bme280 sensor data
+ *
+ * @param dest Pointer to destination structure
+ * @param src Pointer to source structure
+ * @return true
+ * @return false
+ */
 static bool bme680_copy_data(bme680_data_t *dest, bme680_data_t *src);
-
 /*******************************************************************************
  *                          Static Data Definitions
  *******************************************************************************/
+#warning "NABIN: do not use global & static variable"
 static bool callback_status = false;
 static bme680_data_t bme680_data;
 
@@ -75,94 +88,6 @@ static bme680_data_t bme680_data;
 /*******************************************************************************
  *                          Extern Function Definitions
  *******************************************************************************/
-
-/**
- * @brief Global/extern function template example
- * Convention : Use capital letter for initial word on extern function
- * @param arg
- */
-/* Entry point for the example */
-void bme680_setup(uint32_t sda, uint32_t scl, bool initialize_i2c)
-{
-    /* Desired subscription list of BSEC2 outputs */
-    bsec_sensor sensor_list[] = {
-        BSEC_OUTPUT_IAQ,
-        BSEC_OUTPUT_RAW_TEMPERATURE,
-        BSEC_OUTPUT_RAW_PRESSURE,
-        BSEC_OUTPUT_RAW_HUMIDITY,
-        BSEC_OUTPUT_RAW_GAS,
-        BSEC_OUTPUT_CO2_EQUIVALENT,
-        BSEC_OUTPUT_BREATH_VOC_EQUIVALENT,
-        BSEC_OUTPUT_STABILIZATION_STATUS,
-        BSEC_OUTPUT_RUN_IN_STATUS};
-
-    s_ezlopi_i2c_master_t bme68x_i2c_master_conf = {
-        .enable = true,
-        .address = BME68X_I2C_ADDR_HIGH,
-        .channel = ACTIVE_I2C,
-        .sda = sda,
-        .scl = scl,
-        .clock_speed = I2C_MASTER_FREQ_HZ,
-    };
-
-    // bme68x_i2c_master_conf.enable = true;
-    // bme68x_i2c_master_conf.address = BME68X_I2C_ADDR_HIGH;
-    // bme68x_i2c_master_conf.channel = ACTIVE_I2C;
-    // bme68x_i2c_master_conf.sda = sda;
-    // bme68x_i2c_master_conf.scl = scl;
-    // bme68x_i2c_master_conf.clock_speed = I2C_MASTER_FREQ_HZ;
-
-    if (!initialize_i2c)
-    {
-        bme68x_i2c_master_conf.enable = false;
-    }
-
-    bsec2_setup(&bme68x_i2c_master_conf);
-    /* Initialize the library and interfaces */
-    if (!bsec2_begin())
-    {
-        check_bsec_status();
-    }
-
-    /* Subsribe to the desired BSEC2 outputs */
-    bool subscription_status = bsec2_update_subscription(sensor_list, ARRAY_LEN(sensor_list), BSEC_SAMPLE_RATE_LP);
-    // printf("subscription_status is %d\n", subscription_status);
-    if (!subscription_status)
-    {
-        check_bsec_status();
-    }
-
-    /* Whenever new data is available call the data_callback function */
-    bsec2_attach_callback(bme680_data_callback);
-
-    bsec_version_t bsec2_version = bsec2_get_version();
-    // printf("BSEC library version %d.%d.%d.%d\n", bsec2_version.major, bsec2_version.minor, bsec2_version.major_bugfix, bsec2_version.minor_bugfix);
-}
-
-/* Function that is looped forever */
-bool bme680_get_data(bme680_data_t *data)
-{
-    /* Call the run function often so that the library can
-     * check if it is time to read new data from the sensor
-     * and process it.
-     */
-    if (!bsec2_run())
-    {
-        check_bsec_status();
-        return false;
-    }
-    if (callback_status)
-    {
-        if (bme680_copy_data(data, &bme680_data))
-        {
-            callback_status = false;
-            return true;
-        }
-    }
-
-    return false;
-}
-
 float bme680_read_altitude(float pressure, float seaLevel)
 {
     // Equation taken from BMP180 datasheet (page 16):
@@ -224,15 +149,103 @@ bool get_data_status()
     return callback_status;
 }
 
+/* Function that is looped forever */
+bool bme680_get_data(bme680_data_t *data)
+{
+    /* Call the run function often so that the library can
+     * check if it is time to read new data from the sensor
+     * and process it.
+     */
+    if (!bsec2_run())
+    {
+        check_bsec_status();
+        return false;
+    }
+    if (callback_status)
+    {
+        if (bme680_copy_data(data, &bme680_data))
+        {
+            callback_status = false;
+            return true;
+        }
+    }
+
+    return false;
+}
+
+/* Entry point for the example */
+void bme680_setup(uint32_t sda, uint32_t scl, bool initialize_i2c)
+{
+    /* Desired subscription list of BSEC2 outputs */
+    bsec_sensor sensor_list[] = {
+        BSEC_OUTPUT_IAQ,
+        BSEC_OUTPUT_RAW_TEMPERATURE,
+        BSEC_OUTPUT_RAW_PRESSURE,
+        BSEC_OUTPUT_RAW_HUMIDITY,
+        BSEC_OUTPUT_RAW_GAS,
+        BSEC_OUTPUT_CO2_EQUIVALENT,
+        BSEC_OUTPUT_BREATH_VOC_EQUIVALENT,
+        BSEC_OUTPUT_STABILIZATION_STATUS,
+        BSEC_OUTPUT_RUN_IN_STATUS};
+
+    s_ezlopi_i2c_master_t bme68x_i2c_master_conf = {
+        .enable = true,
+        .address = BME68X_I2C_ADDR_HIGH,
+        .channel = ACTIVE_I2C,
+        .sda = sda,
+        .scl = scl,
+        .clock_speed = I2C_MASTER_FREQ_HZ,
+    };
+
+    // bme68x_i2c_master_conf.enable = true;
+    // bme68x_i2c_master_conf.address = BME68X_I2C_ADDR_HIGH;
+    // bme68x_i2c_master_conf.channel = ACTIVE_I2C;
+    // bme68x_i2c_master_conf.sda = sda;
+    // bme68x_i2c_master_conf.scl = scl;
+    // bme68x_i2c_master_conf.clock_speed = I2C_MASTER_FREQ_HZ;
+
+    if (!initialize_i2c)
+    {
+        bme68x_i2c_master_conf.enable = false;
+    }
+
+    bsec2_setup(&bme68x_i2c_master_conf);
+    /* Initialize the library and interfaces */
+    if (!bsec2_begin())
+    {
+        check_bsec_status();
+    }
+
+    /* Subsribe to the desired BSEC2 outputs */
+    bool subscription_status = bsec2_update_subscription(sensor_list, ARRAY_LEN(sensor_list), BSEC_SAMPLE_RATE_LP);
+    // printf("subscription_status is %d\n", subscription_status);
+    if (!subscription_status)
+    {
+        check_bsec_status();
+    }
+
+    /* Whenever new data is available call the data_callback function */
+    bsec2_attach_callback(bme680_data_callback);
+
+    // bsec_version_t bsec2_version = bsec2_get_version();
+    // printf("BSEC library version %d.%d.%d.%d\n", bsec2_version.major, bsec2_version.minor, bsec2_version.major_bugfix, bsec2_version.minor_bugfix);
+}
+
 /*******************************************************************************
- *                          Static Function Definitions
+ *                         Static Function Definitions
  *******************************************************************************/
-/**
- * @brief : This function is called by the BSEC library when a new output is available
- * @param[in] input     : BME68X sensor data before processing
- * @param[in] outputs   : Processed BSEC BSEC output data
- * @param[in] bsec      : Instance of BSEC2 calling the callback
- */
+/* Function to copy sensor data */
+static bool bme680_copy_data(bme680_data_t *dest, bme680_data_t *src)
+{
+    if ((dest == NULL) && (src == NULL))
+    {
+        return false;
+    }
+
+    memcpy(dest, src, sizeof(bme680_data_t));
+    return true;
+}
+
 static void bme680_data_callback(const bme68x_data data, const bsec_outputs outputs)
 {
     // printf("HERE!! %s\n", __func__);
@@ -321,18 +334,6 @@ static void bme680_data_callback(const bme68x_data data, const bsec_outputs outp
             break;
         }
     }
-}
-
-/* Function to copy sensor data */
-static bool bme680_copy_data(bme680_data_t *dest, bme680_data_t *src)
-{
-    if ((dest == NULL) && (src == NULL))
-    {
-        return false;
-    }
-
-    memcpy(dest, src, sizeof(bme680_data_t));
-    return true;
 }
 
 /*******************************************************************************

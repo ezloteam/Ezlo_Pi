@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2022 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -29,6 +29,13 @@
 ** ===========================================================================
 */
 
+/**
+ * @file    ezlopi_cloud_room_types_str.h
+ * @brief
+ * @author
+ * @version
+ * @date
+ */
 #ifndef __EZLOPI_ROOMTYPES_STR_H__
 #define __EZLOPI_ROOMTYPES_STR_H__
 
@@ -51,6 +58,7 @@ extern "C"
     /*******************************************************************************
      *                          Extern Data Declarations
      *******************************************************************************/
+
     extern const char *hub_room_type_livingroom_title;
     extern const char *hub_room_type_kitchen_title;
     extern const char *hub_room_type_bedroom_title;

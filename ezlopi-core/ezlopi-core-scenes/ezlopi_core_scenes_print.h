@@ -28,13 +28,12 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_core_scenes_print.h
+ * @brief   hese function print scene information
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    12th DEC 2024
  */
 
 #ifndef __EZLOPI_CORE_SCENES_PRINT_H__
@@ -47,6 +46,7 @@
  *******************************************************************************/
 #include "ezlopi_core_scenes_v2.h"
 
+#define ENABLE_SCENES_PRINT 0
 /*******************************************************************************
  *                          C++ Declaration Wrapper
  *******************************************************************************/
@@ -67,22 +67,51 @@ extern "C"
      *                          Extern Function Prototypes
      *******************************************************************************/
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
+     * @brief This function prints block-options
      *
+     * @param block_options Source 'block_options'k to extract info from.
+     * @param fields Source 'field-block' to extract info from.
+     * @param tab The starting 'tab-space' for scenes prints.
      */
-    void ezlopi_print_block_options(s_block_options_v2_t *block_options, l_fields_v2_t *fields, const char *tab);
-    void ezlopi_print_fields(l_fields_v2_t *fields, const char *tab);
-    void ezlopi_print_house_modes(l_house_modes_v2_t *house_modes);
-    void ezlopi_print_user_notifications(l_user_notification_v2_t *user_notification);
-    void ezlopi_print_when_blocks(l_when_block_v2_t *when_blocks, const char *tab);
-    void ezlopi_print_action_blocks(l_action_block_v2_t *action_block);
-    void ezlopi_scenes_print(l_scenes_list_v2_t *scene_link_list);
+    void EZPI_print_block_options(s_block_options_v2_t *block_options, l_fields_v2_t *fields, const char *tab);
+    /**
+     * @brief This function prints fields information
+     *
+     * @param fields Source 'field-block' to extract info from.
+     * @param tab  The starting 'tab-space' for scenes prints.
+     */
+    void EZPI_print_fields(l_fields_v2_t *fields, const char *tab);
+    /**
+     * @brief This function prints House-mode information
+     *
+     * @param house_modes Source 'house_modes-block' to extract info from.
+     */
+    void EZPI_print_house_modes(l_house_modes_v2_t *house_modes);
+    /**
+     * @brief This function prints 'user_notification' information
+     *
+     * @param user_notification Source 'user_notification' to extract info from.
+     */
+    void EZPI_print_user_notifications(l_user_notification_v2_t *user_notification);
+    /**
+     * @brief This function prints 'when_blocks' information
+     *
+     * @param when_blocks Source 'when_blocks' to extract info from.
+     * @param tab
+     */
+    void EZPI_print_when_blocks(l_when_block_v2_t *when_blocks, const char *tab);
+    /**
+     * @brief This function prints 'action_blocks' information
+     *
+     * @param action_block Source 'action_blocks' to extract info from.
+     */
+    void EZPI_print_action_blocks(l_action_block_v2_t *action_block);
+    /**
+     * @brief This function prints 'scene_link_list' information
+     *
+     * @param scene_link_list Source 'scene_link_list' to extract info from.
+     */
+    void EZPI_scenes_print(l_scenes_list_v2_t *scene_link_list);
 
 #ifdef __cplusplus
 }

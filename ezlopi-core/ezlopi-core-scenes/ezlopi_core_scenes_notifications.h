@@ -28,26 +28,21 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_core_scenes_notifications.h
+ * @brief   perform scenes_notification related operations
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    12th DEC 2024
  */
-
 #ifndef _EZLOPI_CORE_SCENES_NOTIFICATIONS_H_
 #define _EZLOPI_CORE_SCENES_NOTIFICATIONS_H_
 
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
-
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
 #include "cjext.h"
-
-#include "ezlopi_core_scenes_v2.h"
 
 /*******************************************************************************
  *                          C++ Declaration Wrapper
@@ -69,26 +64,17 @@ extern "C"
      *                          Extern Function Prototypes
      *******************************************************************************/
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
-     *
+     * @brief Function to add users to scene-notification
      */
-    // void ezlopi_scenes_notifications_add(cJSON *cj_notifications);
-    void ezlopi_scenes_notifications_remove(cJSON* cj_notifications);
+    void EZPI_scenes_notifications_add(cJSON *cj_notifications);
+    // void EZPI_scenes_notifications_remove(cJSON *cj_notifications);
 
 #ifdef __cplusplus
 }
 #endif
-
-#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+#endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 #endif // _EZLOPI_CORE_SCENES_NOTIFICATIONS_H_
-
 /*******************************************************************************
  *                          End of File
  *******************************************************************************/

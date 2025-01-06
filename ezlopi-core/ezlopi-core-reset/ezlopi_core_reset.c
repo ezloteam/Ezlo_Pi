@@ -28,18 +28,18 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_core_reset.c
+ * @brief   perform some function on system-reset
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    12th DEC 2024
  */
 
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
+
 #include <esp_system.h>
 
 #include <freertos/FreeRTOS.h>
@@ -53,7 +53,6 @@
 #include "ezlopi_service_ws_server.h"
 
 #include "ezlopi_util_trace.h"
-
 /*******************************************************************************
  *                          Extern Data Declarations
  *******************************************************************************/
@@ -82,33 +81,28 @@
  *                          Extern Function Definitions
  *******************************************************************************/
 
-/**
- * @brief Global/extern function template example
- * Convention : Use capital letter for initial word on extern function
- * @param arg
- */
-void EZPI_CORE_reset_reboot(void)
+void EZPI_core_reset_reboot(void)
 {
 #if defined(CONFIG_EZPI_WEBSOCKET_CLIENT)
-    ezlopi_service_web_provisioning_deinit();
+    EZPI_service_web_provisioning_deinit();
 #endif // CONFIG_EZPI_WEBSOCKET_CLIENT
 
 #ifdef CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER
-    ezlopi_service_ws_server_stop();
+    EZPI_service_ws_server_stop();
 #endif // CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER
 
     esp_restart();
 }
 
-void EZPI_CORE_reset_factory_restore(void)
+void EZPI_core_reset_factory_restore(void)
 {
-    ezlopi_error_t ret = ezlopi_factory_info_v3_factory_reset();
+    ezlopi_error_t ret = EZPI_core_factory_info_v3_factory_reset();
     if (EZPI_SUCCESS == ret)
     {
         TRACE_I("FLASH RESET WAS DONE SUCCESSFULLY");
     }
 
-    ret = ezlopi_nvs_factory_reset();
+    ret = EZPI_core_nvs_factory_reset();
     if (EZPI_SUCCESS == ret)
     {
         TRACE_I("NVS-RESET WAS DONE SUCCESSFULLY");
@@ -116,11 +110,10 @@ void EZPI_CORE_reset_factory_restore(void)
 
     TRACE_S("factory reset done, rebooting now .............................................");
     vTaskDelay(2000 / portTICK_RATE_MS);
-    EZPI_CORE_reset_reboot();
+    EZPI_core_reset_reboot();
 }
-
 /*******************************************************************************
- *                          Static Function Definitions
+ *                         Static Function Definitions
  *******************************************************************************/
 
 /*******************************************************************************

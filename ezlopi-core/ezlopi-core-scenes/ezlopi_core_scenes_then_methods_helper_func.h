@@ -28,13 +28,12 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_core_scenes_then_methods_helper_func.h
+ * @brief   These are sub-functions utilized in file 'ezlopi_core_scenes_then_methods.c'
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    12th DEC 2024
  */
 
 #ifndef _EZLOPI_CORE_SCENES_THEN_METHODS_HELPER_FUNCTIONS_H_
@@ -60,10 +59,9 @@ extern "C"
      *******************************************************************************/
     typedef struct s_sendhttp_method
     {
-        const char* field_name;
-        void (*field_func)(s_ezlopi_core_http_mbedtls_t* tmp_http_data, l_fields_v2_t* curr_field);
+        const char *field_name;
+        void (*field_func)(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fields_v2_t *curr_field);
     } s_sendhttp_method_t;
-
     /*******************************************************************************
      *                          Extern Data Declarations
      *******************************************************************************/
@@ -72,35 +70,87 @@ extern "C"
      *                          Extern Function Prototypes
      *******************************************************************************/
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
+     * @brief This function parses and populates 'HTTP_request_type' into a 's_ezlopi_core_http_mbedtls_t' struct
      *
+     * @param tmp_http_data Destination Struct to store parsed data
+     * @param curr_field Source of data
      */
-    void parse_http_request_type(s_ezlopi_core_http_mbedtls_t* tmp_http_data, l_fields_v2_t* curr_field);
-    void parse_http_url(s_ezlopi_core_http_mbedtls_t* tmp_http_data, l_fields_v2_t* curr_field);
-    void parse_http_content(s_ezlopi_core_http_mbedtls_t* tmp_http_data, l_fields_v2_t* curr_field);
-    void parse_http_content_type(s_ezlopi_core_http_mbedtls_t* tmp_http_data, l_fields_v2_t* curr_field);
-    void parse_http_headers(s_ezlopi_core_http_mbedtls_t* tmp_http_data, l_fields_v2_t* curr_field);
-    void parse_http_skipsecurity(s_ezlopi_core_http_mbedtls_t* tmp_http_data, l_fields_v2_t* curr_field);
-    void parse_http_creds(s_ezlopi_core_http_mbedtls_t* tmp_http_data, l_fields_v2_t* curr_field);
-    void free_http_mbedtls_struct(s_ezlopi_core_http_mbedtls_t* config);
-
-    ezlopi_error_t ezlopi_core_scene_then_helper_setexpression_setvariable(char * expression_name, const char * code_str, const char * value_type, cJSON * cj_metadata, cJSON * cj_params, l_fields_v2_t * var_value);
-
-    int ezlopi_core_scene_then_helper_toggleValue(uint32_t item_id, const char * item_id_str);
+    void EZPI_parse_http_request_type(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fields_v2_t *curr_field);
+    /**
+     * @brief This function parses and populates 'HTTP_url' into a 's_ezlopi_core_http_mbedtls_t' struct
+     *
+     * @param tmp_http_data
+     * @param curr_field
+     */
+    void EZPI_parse_http_url(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fields_v2_t *curr_field);
+    /**
+     * @brief This function parses and populates 'HTTP_content' into a 's_ezlopi_core_http_mbedtls_t' struct
+     *
+     * @param tmp_http_data
+     * @param curr_field
+     */
+    void EZPI_parse_http_content(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fields_v2_t *curr_field);
+    /**
+     * @brief This function parses and populates 'HTTP_content_type' into a 's_ezlopi_core_http_mbedtls_t' struct
+     *
+     * @param tmp_http_data
+     * @param curr_field
+     */
+    void EZPI_parse_http_content_type(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fields_v2_t *curr_field);
+    /**
+     * @brief This function parses and populates 'HTTP_headers' into a 's_ezlopi_core_http_mbedtls_t' struct
+     *
+     * @param tmp_http_data
+     * @param curr_field
+     */
+    void EZPI_parse_http_headers(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fields_v2_t *curr_field);
+    /**
+     * @brief This function parses and populates 'HTTP_skipsecurity' into a 's_ezlopi_core_http_mbedtls_t' struct
+     *
+     * @param tmp_http_data
+     * @param curr_field
+     */
+    void EZPI_parse_http_skipsecurity(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fields_v2_t *curr_field);
+    /**
+     * @brief This function parses and populates 'HTTP_creds' into a 's_ezlopi_core_http_mbedtls_t' struct
+     *
+     * @param tmp_http_data
+     * @param curr_field
+     */
+    void EZPI_parse_http_creds(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fields_v2_t *curr_field);
+    /**
+     * @brief This function free the custom_struct 's_ezlopi_core_http_mbedtls_t'
+     *
+     * @param config
+     */
+    void EZPI_free_http_mbedtls_struct(s_ezlopi_core_http_mbedtls_t *config);
+    /**
+     * @brief Function to update information in scene 'Expression/Variable'.
+     *
+     * @param expression_name Target expression name
+     * @param code_str  Target
+     * @param value_type
+     * @param cj_metadata
+     * @param cj_params
+     * @param var_value
+     * @return ezlopi_error_t
+     */
+    ezlopi_error_t EZPI_core_scenes_then_helper_set_expn_var(char *expression_name, const char *code_str, const char *value_type, cJSON *cj_metadata, cJSON *cj_params, l_fields_v2_t *var_value);
+    /**
+     * @brief Function to update the toggle value in
+     *
+     * @param item_id
+     * @param item_id_str
+     * @return int
+     */
+    int EZPI_core_scenes_then_helper_toggleValue(uint32_t item_id, const char *item_id_str);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
-
-#endif // _EZLOPI_CORE_SCENES_THEN_METHODS_HELPER_FUNCTIONS_H_
+#endif /*_EZLOPI_CORE_SCENES_THEN_METHODS_HELPER_FUNCTIONS_H_*/
 
 /*******************************************************************************
  *                          End of File

@@ -30,19 +30,18 @@
 */
 
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
- * @version 0.1
- * @date    1st January 2024
+ * @file    ezlopi_service_system_temperature_sensor.h
+ * @brief
+ * @author
+ * @version
+ * @date
  */
+#include "sdkconfig.h"
+#if defined(CONFIG_EZPI_ENABLE_SYSTEM_TEMPERATURE)
 
 #ifndef _EZLOPI_SERVICE_SYSTEM_TEMPERATURE_SENSOR_H_
 #define _EZLOPI_SERVICE_SYSTEM_TEMPERATURE_SENSOR_H_
 
-#include "sdkconfig.h"
-
-#if defined(CONFIG_EZPI_ENABLE_SYSTEM_TEMPERATURE)
 
 /*******************************************************************************
  *                          Include Files
@@ -67,17 +66,17 @@ extern "C"
     /*******************************************************************************
      *                          Extern Function Prototypes
      *******************************************************************************/
+
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
+     * @brief Function that handles different actions related to temperatore sensor
      *
+     * @param action Action to process
+     * @param item Pointer to item linked to temperature sensor
+     * @param arg Action related argument
+     * @param user_arg User argument
+     * @return int
      */
-    int ezlopi_system_temperature_device(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
+    int EZPI_system_temperature_device(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
 #ifdef __cplusplus
 }

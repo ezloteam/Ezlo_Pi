@@ -28,17 +28,13 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_core_scenes_method_types.h
+ * @brief   MACROS to generate enums for scene-methods
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    12th DEC 2024
  */
-
-// #ifndef __HEADER_H__
-// #define __HEADER_H__
 
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
@@ -54,86 +50,76 @@ extern "C"
 {
 #endif
 
-    /*******************************************************************************
-     *                          Type & Macro Declarations
-     *******************************************************************************/
-    EZLOPI_SCENE(METHOD_TYPE_NONE, "NULL", NULL, "NULL")
-    // when
-    EZLOPI_SCENE(WHEN_METHOD_IS_ITEM_STATE, "isItemState", ezlopi_scene_when_is_item_state, "null")
-    EZLOPI_SCENE(WHEN_METHOD_IS_ITEM_STATE_CHANGED, "isItemStateChanged", ezlopi_scene_when_is_item_state_changed, "null")
-    EZLOPI_SCENE(WHEN_METHOD_IS_BUTTON_STATE, "isButtonState", ezlopi_scene_when_is_button_state, "null")
-    EZLOPI_SCENE(WHEN_METHOD_IS_SUN_STATE, "isSunState", ezlopi_scene_when_is_sun_state, "when_category_time")
-    EZLOPI_SCENE(WHEN_METHOD_IS_DATE, "isDate", ezlopi_scene_when_is_date, "when_category_time")
-    EZLOPI_SCENE(WHEN_METHOD_IS_ONCE, "isOnce", ezlopi_scene_when_is_once, "when_category_time")
-    EZLOPI_SCENE(WHEN_METHOD_IS_INTERVAL, "isInterval", ezlopi_scene_when_is_interval, "when_category_time")
-    EZLOPI_SCENE(WHEN_METHOD_IS_DATE_RANGE, "isDateRange", ezlopi_scene_when_is_date_range, "when_category_time")
-    EZLOPI_SCENE(WHEN_METHOD_IS_USER_LOCK_OPERATION, "isUserLockOperation", ezlopi_scene_when_is_user_lock_operation, "null")
+        /*******************************************************************************
+         *                          Type & Macro Declarations
+         *******************************************************************************/
+        EZLOPI_SCENE(METHOD_TYPE_NONE, "NULL", NULL, METHOD_CATEGORY_NAN)
+        // when
+        EZLOPI_SCENE(WHEN_METHOD_IS_ITEM_STATE, "isItemState", EZPI_core_scenes_when_is_item_state, METHOD_CATEGORY_UNDEFINED)
+        EZLOPI_SCENE(WHEN_METHOD_IS_ITEM_STATE_CHANGED, "isItemStateChanged", EZPI_core_scenes_when_is_item_state_changed, METHOD_CATEGORY_UNDEFINED)
+        EZLOPI_SCENE(WHEN_METHOD_IS_BUTTON_STATE, "isButtonState", EZPI_core_scenes_when_is_button_state, METHOD_CATEGORY_UNDEFINED)
+        EZLOPI_SCENE(WHEN_METHOD_IS_SUN_STATE, "isSunState", EZPI_core_scenes_when_is_sun_state, METHOD_CATEGORY_WHEN_TIME)
+        EZLOPI_SCENE(WHEN_METHOD_IS_DATE, "isDate", EZPI_core_scenes_when_is_date, METHOD_CATEGORY_WHEN_TIME)
+        EZLOPI_SCENE(WHEN_METHOD_IS_ONCE, "isOnce", EZPI_core_scenes_when_is_once, METHOD_CATEGORY_WHEN_TIME)
+        EZLOPI_SCENE(WHEN_METHOD_IS_INTERVAL, "isInterval", EZPI_core_scenes_when_is_interval, METHOD_CATEGORY_WHEN_TIME)
+        EZLOPI_SCENE(WHEN_METHOD_IS_DATE_RANGE, "isDateRange", EZPI_core_scenes_when_is_date_range, METHOD_CATEGORY_WHEN_TIME)
+        EZLOPI_SCENE(WHEN_METHOD_IS_USER_LOCK_OPERATION, "isUserLockOperation", EZPI_core_scenes_when_is_user_lock_operation, METHOD_CATEGORY_UNDEFINED)
 
-    #if defined(CONFIG_EZPI_SERV_ENABLE_MODES)
-    EZLOPI_SCENE(WHEN_METHOD_IS_HOUSE_MODE_CHANGED_TO, "isHouseModeChangedTo", ezlopi_scene_when_is_house_mode_changed_to, "when_category_modes")
-    EZLOPI_SCENE(WHEN_METHOD_IS_HOUSE_MODE_CHANGED_FROM, "isHouseModeChangedFrom", ezlopi_scene_when_is_house_mode_changed_from, "when_category_modes")
-    EZLOPI_SCENE(WHEN_METHOD_IS_HOUSE_MODE_ALARM_PHASE_RANGE, "isHouseModeAlarmPhaseRange", ezlopi_scene_when_is_house_mode_alarm_phase_range, "when_category_modes")
-    EZLOPI_SCENE(WHEN_METHOD_IS_HOUSE_MODE_SWTICH_TO_RANGE, "isHouseModeSwitchToRange", ezlopi_scene_when_is_house_mode_switch_to_range, "when_category_modes")
-    #endif // CONFIG_EZPI_SERV_ENABLE_MODES
+#if defined(CONFIG_EZPI_SERV_ENABLE_MODES)
+        EZLOPI_SCENE(WHEN_METHOD_IS_HOUSE_MODE_CHANGED_TO, "isHouseModeChangedTo", EZPI_core_scenes_when_is_house_mode_changed_to, METHOD_CATEGORY_WHEN_MODES)
+        EZLOPI_SCENE(WHEN_METHOD_IS_HOUSE_MODE_CHANGED_FROM, "isHouseModeChangedFrom", EZPI_core_scenes_when_is_house_mode_changed_from, METHOD_CATEGORY_WHEN_MODES)
+        EZLOPI_SCENE(WHEN_METHOD_IS_HOUSE_MODE_ALARM_PHASE_RANGE, "isHouseModeAlarmPhaseRange", EZPI_core_scenes_when_is_house_mode_alarm_phase_range, METHOD_CATEGORY_WHEN_MODES)
+        EZLOPI_SCENE(WHEN_METHOD_IS_HOUSE_MODE_SWTICH_TO_RANGE, "isHouseModeSwitchToRange", EZPI_core_scenes_when_is_house_mode_switch_to_range, METHOD_CATEGORY_WHEN_MODES)
+#endif // CONFIG_EZPI_SERV_ENABLE_MODES
 
-    EZLOPI_SCENE(WHEN_METHOD_IS_DEVICE_STATE, "isDeviceState", ezlopi_scene_when_is_device_state, "null")
-    EZLOPI_SCENE(WHEN_METHOD_IS_NETWORK_STATE, "isNetworkState", ezlopi_scene_when_is_network_state, "null")
-    EZLOPI_SCENE(WHEN_METHOD_IS_SCENE_STATE, "isSceneState", ezlopi_scene_when_is_scene_state, "null")
-    EZLOPI_SCENE(WHEN_METHOD_IS_GROUP_STATE, "isGroupState", ezlopi_scene_when_is_group_state, "null")
-    EZLOPI_SCENE(WHEN_METHOD_IS_CLOUD_STATE, "isCloudState", ezlopi_scene_when_is_cloud_state, "null")
-    EZLOPI_SCENE(WHEN_METHOD_IS_BATTERY_STATE, "isBatteryState", ezlopi_scene_when_is_battery_state, "null")
-    EZLOPI_SCENE(WHEN_METHOD_IS_BATTERY_LEVEL, "isBatteryLevel", ezlopi_scene_when_is_battery_level, "null")
-    EZLOPI_SCENE(WHEN_METHOD_COMPARE_NUMBERS, "compareNumbers", ezlopi_scene_when_compare_numbers, "null")
-    EZLOPI_SCENE(WHEN_METHOD_COMPARE_NUMBER_RANGE, "compareNumberRange", ezlopi_scene_when_compare_number_range, "null")
-    EZLOPI_SCENE(WHEN_METHOD_COMPARE_STRINGS, "compareStrings", ezlopi_scene_when_compare_strings, "null")
-    EZLOPI_SCENE(WHEN_METHOD_STRING_OPERATION, "stringOperation", ezlopi_scene_when_string_operation, "null")
-    EZLOPI_SCENE(WHEN_METHOD_IN_ARRAY, "inArray", ezlopi_scene_when_in_array, "null")
-    EZLOPI_SCENE(WHEN_METHOD_COMPARE_VALUES, "compareValues", ezlopi_scene_when_compare_values, "null")
-    EZLOPI_SCENE(WHEN_METHOD_HAS_ATLEAST_ONE_DICTIONARY_VALUE, "hasAtLeastOneDictionaryValue", ezlopi_scene_when_has_atleast_one_dictionary_value, "null")
-    EZLOPI_SCENE(WHEN_METHOD_IS_FIRMWARE_UPDATE_STATE, "isFirmwareUpdateState", ezlopi_scene_when_is_firmware_update_state, "null")
-    EZLOPI_SCENE(WHEN_METHOD_IS_DICTIONARY_CHANGED, "isDictionaryChanged", ezlopi_scene_when_is_dictionary_changed, "null")
-    EZLOPI_SCENE(WHEN_METHOD_IS_DETECTED_IN_HOTZONE, "isDetectedInHotzone", ezlopi_scene_when_is_detected_in_hot_zone, "null")
-    EZLOPI_SCENE(WHEN_METHOD_AND, "and", ezlopi_scene_when_and, "when_category_logic")
-    EZLOPI_SCENE(WHEN_METHOD_NOT, "not", ezlopi_scene_when_not, "when_category_logic")
-    EZLOPI_SCENE(WHEN_METHOD_OR, "or", ezlopi_scene_when_or, "when_category_logic")
-    EZLOPI_SCENE(WHEN_METHOD_XOR, "xor", ezlopi_scene_when_xor, "when_category_logic")
-    EZLOPI_SCENE(WHEN_METHOD_FUNCTION, "function", ezlopi_scene_when_function, "when_category_function")
-    // then
-    EZLOPI_SCENE(THEN_METHOD_SET_ITEM_VALUE, "setItemValue", ezlopi_scene_then_set_item_value, "null")
-    EZLOPI_SCENE(THEN_METHOD_SET_DEVICE_ARMED, "setDeviceArmed", ezlopi_scene_then_set_device_armed, "null")
-    EZLOPI_SCENE(THEN_METHOD_SEND_CLOUD_ABSTRACT_COMMAND, "sendCloudAbstractCommand", ezlopi_scene_then_send_cloud_abstract_command, "null")
-    EZLOPI_SCENE(THEN_METHOD_SWITCH_HOUSE_MODE, "switchHouseMode", ezlopi_scene_then_switch_house_mode, "null")
-    EZLOPI_SCENE(THEN_METHOD_SEND_HTTP_REQUEST, "sendHttpRequest", ezlopi_scene_then_send_http_request, "null")
-    EZLOPI_SCENE(THEN_METHOD_RUN_CUSTOM_SCRIPT, "runCustomScript", ezlopi_scene_then_run_custom_script, "null")
-    EZLOPI_SCENE(THEN_METHOD_RUN_PLUGIN_SCRIPT, "runPluginScript", ezlopi_scene_then_run_plugin_script, "null")
-    EZLOPI_SCENE(THEN_METHOD_RUN_SCENE, "runScene", ezlopi_scene_then_run_scene, "null")
-    EZLOPI_SCENE(THEN_METHOD_SET_SCENE_STATE, "setSceneState", ezlopi_scene_then_set_scene_state, "null")
-    EZLOPI_SCENE(THEN_METHOD_RESET_LATCH, "resetLatch", ezlopi_scene_then_reset_latch, "null")
-    EZLOPI_SCENE(THEN_METHOD_RESET_SCENE_LATCHES, "resetSceneLatches", ezlopi_scene_then_reset_scene_latches, "null")
-    EZLOPI_SCENE(THEN_METHOD_REBOOT_HUB, "rebootHub", ezlopi_scene_then_reboot_hub, "null")
-    EZLOPI_SCENE(THEN_METHOD_RESET_HUB, "resetHub", ezlopi_scene_then_reset_hub, "null")
-    EZLOPI_SCENE(THEN_METHOD_CLOUD_API, "cloudAPI", ezlopi_scene_then_cloud_api, "null")
-    EZLOPI_SCENE(THEN_METHOD_SET_EXPRESSION, "setExpression", ezlopi_scene_then_set_expression, "null")
-    EZLOPI_SCENE(THEN_METHOD_SET_VARIABLE, "setVariable", ezlopi_scene_then_set_variable, "null")
-    EZLOPI_SCENE(THEN_METHOD_TOGGLE_VALUE, "toggleValue", ezlopi_scene_then_toggle_value, "null")
-    //
-    EZLOPI_SCENE(METHOD_TYPE_MAX, "max", NULL, "max")
-
-    /*******************************************************************************
-     *                          Extern Data Declarations
-     *******************************************************************************/
-
-    /*******************************************************************************
-     *                          Extern Function Prototypes
-     *******************************************************************************/
+        EZLOPI_SCENE(WHEN_METHOD_IS_DEVICE_STATE, "isDeviceState", EZPI_core_scenes_when_is_device_state, METHOD_CATEGORY_UNDEFINED)
+        EZLOPI_SCENE(WHEN_METHOD_IS_NETWORK_STATE, "isNetworkState", EZPI_core_scenes_when_is_network_state, METHOD_CATEGORY_UNDEFINED)
+        EZLOPI_SCENE(WHEN_METHOD_IS_SCENE_STATE, "isSceneState", EZPI_core_scenes_when_is_scene_state, METHOD_CATEGORY_UNDEFINED)
+        EZLOPI_SCENE(WHEN_METHOD_IS_GROUP_STATE, "isGroupState", EZPI_core_scenes_when_is_group_state, METHOD_CATEGORY_UNDEFINED)
+        EZLOPI_SCENE(WHEN_METHOD_IS_CLOUD_STATE, "isCloudState", EZPI_core_scenes_when_is_cloud_state, METHOD_CATEGORY_UNDEFINED)
+        EZLOPI_SCENE(WHEN_METHOD_IS_BATTERY_STATE, "isBatteryState", EZPI_core_scenes_when_is_battery_state, METHOD_CATEGORY_UNDEFINED)
+        EZLOPI_SCENE(WHEN_METHOD_IS_BATTERY_LEVEL, "isBatteryLevel", EZPI_core_scenes_when_is_battery_level, METHOD_CATEGORY_UNDEFINED)
+        EZLOPI_SCENE(WHEN_METHOD_COMPARE_NUMBERS, "compareNumbers", EZPI_core_scene_when_compare_numbers, METHOD_CATEGORY_UNDEFINED)
+        EZLOPI_SCENE(WHEN_METHOD_COMPARE_NUMBER_RANGE, "compareNumberRange", EZPI_core_scene_when_compare_number_range, METHOD_CATEGORY_UNDEFINED)
+        EZLOPI_SCENE(WHEN_METHOD_COMPARE_STRINGS, "compareStrings", EZPI_core_scene_when_compare_strings, METHOD_CATEGORY_UNDEFINED)
+        EZLOPI_SCENE(WHEN_METHOD_STRING_OPERATION, "stringOperation", EZPI_core_scene_when_string_operation, METHOD_CATEGORY_UNDEFINED)
+        EZLOPI_SCENE(WHEN_METHOD_IN_ARRAY, "inArray", EZPI_core_scene_when_in_array, METHOD_CATEGORY_UNDEFINED)
+        EZLOPI_SCENE(WHEN_METHOD_COMPARE_VALUES, "compareValues", EZPI_core_scene_when_compare_values, METHOD_CATEGORY_UNDEFINED)
+        EZLOPI_SCENE(WHEN_METHOD_HAS_ATLEAST_ONE_DICTIONARY_VALUE, "hasAtLeastOneDictionaryValue", EZPI_core_scene_when_has_atleast_one_dictionary_value, METHOD_CATEGORY_UNDEFINED)
+        EZLOPI_SCENE(WHEN_METHOD_IS_FIRMWARE_UPDATE_STATE, "isFirmwareUpdateState", EZPI_core_scenes_when_is_firmware_update_state, METHOD_CATEGORY_UNDEFINED)
+        EZLOPI_SCENE(WHEN_METHOD_IS_DICTIONARY_CHANGED, "isDictionaryChanged", EZPI_core_scenes_when_is_dictionary_changed, METHOD_CATEGORY_UNDEFINED)
+        EZLOPI_SCENE(WHEN_METHOD_IS_DETECTED_IN_HOTZONE, "isDetectedInHotzone", EZPI_core_scenes_when_is_detected_in_hot_zone, METHOD_CATEGORY_UNDEFINED)
+        EZLOPI_SCENE(WHEN_METHOD_AND, "and", EZPI_core_scene_when_and, METHOD_CATEGORY_WHEN_LOGIC)
+        EZLOPI_SCENE(WHEN_METHOD_NOT, "not", EZPI_core_scene_when_not, METHOD_CATEGORY_WHEN_LOGIC)
+        EZLOPI_SCENE(WHEN_METHOD_OR, "or", EZPI_core_scene_when_or, METHOD_CATEGORY_WHEN_LOGIC)
+        EZLOPI_SCENE(WHEN_METHOD_XOR, "xor", EZPI_core_scene_when_xor, METHOD_CATEGORY_WHEN_LOGIC)
+        EZLOPI_SCENE(WHEN_METHOD_FUNCTION, "function", EZPI_core_scene_when_function, METHOD_CATEGORY_WHEN_FUNCTION)
+        // then
+        EZLOPI_SCENE(THEN_METHOD_SET_ITEM_VALUE, "setItemValue", EZPI_core_scene_then_set_item_value, METHOD_CATEGORY_UNDEFINED)
+        EZLOPI_SCENE(THEN_METHOD_SET_DEVICE_ARMED, "setDeviceArmed", EZPI_core_scene_then_set_device_armed, METHOD_CATEGORY_UNDEFINED)
+        EZLOPI_SCENE(THEN_METHOD_SEND_CLOUD_ABSTRACT_COMMAND, "sendCloudAbstractCommand", EZPI_core_scene_then_send_cloud_abstract_command, METHOD_CATEGORY_UNDEFINED)
+        EZLOPI_SCENE(THEN_METHOD_SWITCH_HOUSE_MODE, "switchHouseMode", EZPI_core_scene_then_switch_house_mode, METHOD_CATEGORY_UNDEFINED)
+        EZLOPI_SCENE(THEN_METHOD_SEND_HTTP_REQUEST, "sendHttpRequest", EZPI_core_scene_then_send_http_request, METHOD_CATEGORY_UNDEFINED)
+        EZLOPI_SCENE(THEN_METHOD_RUN_CUSTOM_SCRIPT, "runCustomScript", EZPI_core_scene_then_run_custom_script, METHOD_CATEGORY_UNDEFINED)
+        EZLOPI_SCENE(THEN_METHOD_RUN_PLUGIN_SCRIPT, "runPluginScript", EZPI_core_scene_then_run_plugin_script, METHOD_CATEGORY_UNDEFINED)
+        EZLOPI_SCENE(THEN_METHOD_RUN_SCENE, "runScene", EZPI_core_scene_then_run_scene, METHOD_CATEGORY_UNDEFINED)
+        EZLOPI_SCENE(THEN_METHOD_SET_SCENE_STATE, "setSceneState", EZPI_core_scene_then_set_scene_state, METHOD_CATEGORY_UNDEFINED)
+        EZLOPI_SCENE(THEN_METHOD_RESET_LATCH, "resetLatch", EZPI_core_scene_then_reset_latch, METHOD_CATEGORY_UNDEFINED)
+        EZLOPI_SCENE(THEN_METHOD_RESET_SCENE_LATCHES, "resetSceneLatches", EZPI_core_scene_then_reset_scene_latches, METHOD_CATEGORY_UNDEFINED)
+        EZLOPI_SCENE(THEN_METHOD_REBOOT_HUB, "rebootHub", EZPI_core_scene_then_reboot_hub, METHOD_CATEGORY_UNDEFINED)
+        EZLOPI_SCENE(THEN_METHOD_RESET_HUB, "resetHub", EZPI_core_scene_then_reset_hub, METHOD_CATEGORY_UNDEFINED)
+        EZLOPI_SCENE(THEN_METHOD_CLOUD_API, "cloudAPI", EZPI_core_scene_then_cloud_api, METHOD_CATEGORY_UNDEFINED)
+        EZLOPI_SCENE(THEN_METHOD_SET_EXPRESSION, "setExpression", EZPI_core_scene_then_set_expression, METHOD_CATEGORY_UNDEFINED)
+        EZLOPI_SCENE(THEN_METHOD_SET_VARIABLE, "setVariable", EZPI_core_scene_then_set_variable, METHOD_CATEGORY_UNDEFINED)
+        EZLOPI_SCENE(THEN_METHOD_TOGGLE_VALUE, "toggleValue", EZPI_core_scene_then_toggle_value, METHOD_CATEGORY_UNDEFINED)
+        //
+        EZLOPI_SCENE(METHOD_TYPE_MAX, "max", NULL, METHOD_CATEGORY_MAX)
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
-
-// #endif // __HEADER_H__
 
 /*******************************************************************************
  *                          End of File

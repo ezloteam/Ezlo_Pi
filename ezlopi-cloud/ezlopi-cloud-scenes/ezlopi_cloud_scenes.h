@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2022 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -30,13 +30,12 @@
 */
 
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
- * @version 0.1
- * @date    1st January 2024
+ * @file    ezlopi_cloud_scenes.h
+ * @brief
+ * @author
+ * @version
+ * @date
  */
-
 #ifndef __HUB_SCENES_LIST_H__
 #define __HUB_SCENES_LIST_H__
 
@@ -45,7 +44,6 @@
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
-#include <string.h>
 #include "cjext.h"
 
 /*******************************************************************************
@@ -55,7 +53,6 @@
 extern "C"
 {
 #endif
-
     /*******************************************************************************
      *                          Type & Macro Declarations
      *******************************************************************************/
@@ -68,43 +65,189 @@ extern "C"
      *                          Extern Function Prototypes
      *******************************************************************************/
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
+     * @brief Function that responds to hub.scenes.list method
      *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
      */
-    void scenes_list(cJSON *cj_request, cJSON *cj_response);
-    void scenes_create(cJSON *cj_request, cJSON *cj_response);
-    void scenes_get(cJSON *cj_request, cJSON *cj_response);
-    void scenes_edit(cJSON *cj_request, cJSON *cj_response);
-    void scenes_delete(cJSON *cj_request, cJSON *cj_response);
-    void scenes_status_get(cJSON *cj_request, cJSON *cj_response);
-    void scenes_blocks_list(cJSON *cj_request, cJSON *cj_response);
-    void scenes_block_data_list(cJSON *cj_request, cJSON *cj_response);
-    void scenes_run(cJSON *cj_request, cJSON *cj_response);
-    void scenes_enable_set(cJSON *cj_request, cJSON *cj_response);
-    void scenes_notification_add(cJSON *cj_request, cJSON *cj_response);
-    void scenes_notification_remove(cJSON *cj_request, cJSON *cj_response);
-    void scenes_room_set(cJSON *cj_request, cJSON *cj_response);
-    void scenes_time_list(cJSON *cj_request, cJSON *cj_response);
-    void scenes_trigger_device_list(cJSON *cj_request, cJSON *cj_response);
-    void scenes_block_enabled_set(cJSON *cj_request, cJSON *cj_response);
-    void scenes_house_modes_set(cJSON *cj_request, cJSON *cj_response);
-    void scenes_action_block_test(cJSON *cj_request, cJSON *cj_response);
-    void scenes_block_status_reset(cJSON *cj_request, cJSON *cj_response);
-    void scenes_meta_set(cJSON *cj_request, cJSON *cj_response);
-    void scenes_blockmeta_set(cJSON *cj_request, cJSON *cj_response);
-    void scenes_stop(cJSON *cj_request, cJSON *cj_response);
-    void scenes_clone(cJSON *cj_request, cJSON *cj_response);
+    void EZPI_scenes_list(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function that responds to hub.scenes.create method
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_scenes_create(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function that responds to hub.scenes.get method
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_scenes_get(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function that responds to hub.scenes.edit method
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_scenes_edit(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function that responds to hub.scenes.delete method
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_scenes_delete(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function that responds to hub.scenes.status.get method
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_scenes_status_get(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function that responds to hub.scenes.blocks.list method
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_scenes_blocks_list(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function that responds to hub.scenes.block.data.list method
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_scenes_block_data_list(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function that responds to hub.scenes.run method
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_scenes_run(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function that responds to hub.scenes.enable.set method
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_scenes_enable_set(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function that responds to hub.scenes.notification.add method
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_scenes_notification_add(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function that responds to hub.scenes.notification.remove method
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_scenes_notification_remove(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function that responds to hub.scenes.room.set method
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_scenes_room_set(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function that responds to hub.scenes.time.list method
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_scenes_time_list(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function that responds to hub.scenes.trigger.device.list method
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_scenes_trigger_device_list(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function that responds to hub.scenes.block.enabled.set method
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_scenes_block_enabled_set(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function that responds to hub.scenes.house_modes.set method
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_scenes_house_modes_set(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function that responds to hub.scenes.action.block.test method
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_scenes_action_block_test(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function that responds to hub.scenes.block.status.reset method
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_scenes_block_status_reset(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function that responds to hub.scenes.meta.set method
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_scenes_meta_set(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function that responds to hub.scenes.block.meta.set method
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_scenes_blockmeta_set(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function that responds to hub.scenes.stop method
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_scenes_stop(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function that responds to hub.scenes.clone method
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_scenes_clone(cJSON *cj_request, cJSON *cj_response);
 
     ///////////// updaters
-    void scene_changed(cJSON *cj_request, cJSON *cj_response);
-    void scene_added(cJSON *cj_request, cJSON *cj_response);
-    void scene_deleted(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Updater function with method hub.scene.changed
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_scene_changed(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Updater function with method hub.scene.added
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_scene_added(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Updater function with method hub.scene.deleted
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_scene_deleted(cJSON *cj_request, cJSON *cj_response);
 
 #ifdef __cplusplus
 }

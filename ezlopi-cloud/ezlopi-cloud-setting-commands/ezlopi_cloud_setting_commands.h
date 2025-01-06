@@ -1,5 +1,6 @@
+
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2022 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -30,11 +31,11 @@
 */
 
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
- * @version 0.1
- * @date    1st January 2024
+ * @file    ezlopi_cloud_setting_commands.h
+ * @brief
+ * @author
+ * @version
+ * @date
  */
 
 #ifndef __EZLOPI_CLOUD_SETTING_COMMANDS_H__
@@ -64,20 +65,28 @@ extern "C"
     /*******************************************************************************
      *                          Extern Function Prototypes
      *******************************************************************************/
-    /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
-     *
-     */
-    void setting_value_set(cJSON* cj_request, cJSON* cj_response);
-    void settings_list(cJSON* cj_request, cJSON* cj_response);
 
-    void setting_value_set_broadcast_updater(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function that responds to hub.setting.value.set method
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_setting_value_set(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function that responds to hub.setting.list method
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_settings_list(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Updater function for setting value set with method hub.setting.updated
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_setting_value_set_broadcast_updater(cJSON *cj_request, cJSON *cj_response);
 
 #ifdef __cplusplus
 }

@@ -28,18 +28,20 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
+ * @file    main.h
  * @brief   perform some function on data
- * @author  John Doe
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
- */
+ * @date    12th DEC 2024
+*/
 
 #ifndef _EZLOPI_CORE_EVENT_QUEUE_H_
 #define _EZLOPI_CORE_EVENT_QUEUE_H_
 
+/*******************************************************************************
+*                          Include Files
+*******************************************************************************/
 #if 0
 
 /*******************************************************************************
@@ -49,42 +51,51 @@
 #include "ezlopi_core_errors.h"
 
 /*******************************************************************************
- *                          C++ Declaration Wrapper
- *******************************************************************************/
+*                          C++ Declaration Wrapper
+*******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
     /*******************************************************************************
-     *                          Type & Macro Declarations
-     *******************************************************************************/
+    *                          Type & Macro Declarations
+    *******************************************************************************/
+
     typedef struct s_ezlo_event
     {
         e_ezlopi_actions_t action;
         void *arg;
     } s_ezlo_event_t;
+    /*******************************************************************************
+    *                          Extern Data Declarations
+    *******************************************************************************/
 
     /*******************************************************************************
-     *                          Extern Data Declarations
-     *******************************************************************************/
+    *                          Extern Function Prototypes
+    *******************************************************************************/
 
-    /*******************************************************************************
-     *                          Extern Function Prototypes
-     *******************************************************************************/
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
+     * @brief Function to initialize event queue
      *
      */
-    void ezlopi_event_queue_init(void);
-    int ezlopi_event_queue_send(s_ezlo_event_t *event_data, int from_isr);
-    int ezlopi_event_queue_receive(s_ezlo_event_t **event_data, int time_out_ms);
+    void EZPI_core_event_queue_init(void);
+    /**
+     * @brief Function to send event queue
+     *
+     * @param event_data Pointer to data to be placed into queue
+     * @param from_isr flag from to define isr
+     * @return int
+     */
+    int EZPI_core_event_queue_send(s_ezlo_event_t *event_data, int from_isr);
+    /**
+     * @brief Function to receive event queue
+     *
+     * @param event_data Pointer to data to be placed into queue
+     * @param time_out_ms Time out to receive queue-data
+     * @return int
+     */
+    int EZPI_core_event_queue_receive(s_ezlo_event_t **event_data, int time_out_ms);
 
 #ifdef __cplusplus
 }
@@ -95,5 +106,8 @@ extern "C"
 #endif // _EZLOPI_CORE_EVENT_QUEUE_H_
 
 /*******************************************************************************
- *                          End of File
- *******************************************************************************/
+*                          End of File
+*******************************************************************************/
+
+
+

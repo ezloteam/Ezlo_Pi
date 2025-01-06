@@ -30,7 +30,7 @@
 */
 
 /**
- * @file    main.c
+ * @file    ezlopi_cloud_status_str.h
  * @brief   perform some function on data
  * @author  John Doe
  * @version 0.1

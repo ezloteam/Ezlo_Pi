@@ -28,13 +28,12 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    TCS230.c
+ * @brief   perform some function on TCS230
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    xx
  */
 
 /*******************************************************************************
@@ -60,10 +59,10 @@
 /*******************************************************************************
  *                          Static Function Prototypes
  *******************************************************************************/
+static void IRAM_ATTR gpio_isr_handler(void *args); // argument => time_us
 static void Extract_TCS230_Pulse_Period_func(gpio_num_t gpio_pulse_output, int32_t *Time_period);
 static int MAP_color_value(int x, int fromLow, int fromHigh, int toLow, int toHigh);
 static void Get_mapped_color_value(uint32_t *color_value, gpio_num_t gpio_pulse_output, int32_t *period, int32_t min_time_limit, int32_t max_time_limit);
-
 /*******************************************************************************
  *                          Static Data Definitions
  *******************************************************************************/
@@ -78,12 +77,7 @@ static e_TCS230_queue_t QueueFlag = TCS230_QUEUE_RESET;
  *                          Extern Function Definitions
  *******************************************************************************/
 
-/**
- * @brief Global/extern function template example
- * Convention : Use capital letter for initial word on extern function
- * @param arg
- */
-bool tcs230_set_filter_color(l_ezlopi_item_t *item, e_TCS230_color_t color_code)
+bool TCS230_set_filter_color(l_ezlopi_item_t *item, e_TCS230_color_t color_code)
 {
     bool ret = false;
     if (item)
@@ -123,7 +117,7 @@ bool tcs230_set_filter_color(l_ezlopi_item_t *item, e_TCS230_color_t color_code)
     return ret;
 }
 
-bool tcs230_set_frequency_scaling(l_ezlopi_item_t *item, e_TCS230_freq_scaling_t scale)
+bool TCS230_set_frequency_scaling(l_ezlopi_item_t *item, e_TCS230_freq_scaling_t scale)
 {
     bool ret = false;
     if (item)
@@ -164,7 +158,7 @@ bool tcs230_set_frequency_scaling(l_ezlopi_item_t *item, e_TCS230_freq_scaling_t
 }
 #if 0
 // function to calibrate the data for 30 seconds
-void calculate_max_min_color_values(gpio_num_t gpio_output_en, gpio_num_t gpio_pulse_output, int32_t *least_color_timeP, int32_t *most_color_timeP)
+void TCS230_get_maxmin_color_values(gpio_num_t gpio_output_en, gpio_num_t gpio_pulse_output, int32_t *least_color_timeP, int32_t *most_color_timeP)
 {
     int32_t Period = 0;
     *least_color_timeP = 0;
@@ -201,7 +195,7 @@ void calculate_max_min_color_values(gpio_num_t gpio_output_en, gpio_num_t gpio_p
 }
 #endif
 
-bool get_tcs230_sensor_value(l_ezlopi_item_t *item)
+bool TCS230_get_sensor_value(l_ezlopi_item_t *item)
 {
     if (item)
     { // 'void_type' addrress -> 's_TCS230_data_t' address
@@ -210,7 +204,7 @@ bool get_tcs230_sensor_value(l_ezlopi_item_t *item)
 
         //--------------------------------------------------
         int32_t Red_period = 0;
-        tcs230_set_filter_color(item, COLOR_SENSOR_COLOR_RED);
+        TCS230_set_filter_color(item, COLOR_SENSOR_COLOR_RED);
         Extract_TCS230_Pulse_Period_func(_TCS230_user_data->TCS230_pin.gpio_pulse_output,
                                          &Red_period);
         Get_mapped_color_value(&_TCS230_user_data->red_mapped,                  // dest_var
@@ -222,7 +216,7 @@ bool get_tcs230_sensor_value(l_ezlopi_item_t *item)
         //--------------------------------------------------
 
         int32_t Green_period = 0;
-        tcs230_set_filter_color(item, COLOR_SENSOR_COLOR_GREEN);
+        TCS230_set_filter_color(item, COLOR_SENSOR_COLOR_GREEN);
         Extract_TCS230_Pulse_Period_func(_TCS230_user_data->TCS230_pin.gpio_pulse_output,
                                          &Green_period);
         Get_mapped_color_value(&_TCS230_user_data->green_mapped, // dest_var
@@ -234,7 +228,7 @@ bool get_tcs230_sensor_value(l_ezlopi_item_t *item)
         //--------------------------------------------------
 
         int32_t Blue_period = 0;
-        tcs230_set_filter_color(item, COLOR_SENSOR_COLOR_BLUE);
+        TCS230_set_filter_color(item, COLOR_SENSOR_COLOR_BLUE);
         Extract_TCS230_Pulse_Period_func(_TCS230_user_data->TCS230_pin.gpio_pulse_output,
                                          &Blue_period);
         Get_mapped_color_value(&_TCS230_user_data->blue_mapped, // dest_var
@@ -252,7 +246,7 @@ bool get_tcs230_sensor_value(l_ezlopi_item_t *item)
 }
 
 /*******************************************************************************
- *                          Static Function Definitions
+ *                         Static Function Definitions
  *******************************************************************************/
 static void IRAM_ATTR gpio_isr_handler(void *args) // argument => time_us
 {

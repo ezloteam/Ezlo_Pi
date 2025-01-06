@@ -28,13 +28,12 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_core_wifi_ap.c
+ * @brief   perform some function on wifi-AP (captive portal)
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    12th DEC 2024
  */
 
 /*******************************************************************************
@@ -76,7 +75,7 @@
 /*******************************************************************************
  *                          Static Data Definitions
  *******************************************************************************/
-static esp_netif_t* ezlopi_ap_netif = NULL;
+static esp_netif_t *ezlopi_ap_netif = NULL;
 
 /*******************************************************************************
  *                          Extern Data Definitions
@@ -86,15 +85,10 @@ static esp_netif_t* ezlopi_ap_netif = NULL;
  *                          Extern Function Definitions
  *******************************************************************************/
 
-/**
- * @brief Global/extern function template example
- * Convention : Use capital letter for initial word on extern function
- * @param arg
- */
-void ezlopi_configure_wifi_ap()
+void EZPI_core_configure_wifi_ap()
 {
     char ezlopi_wifi_ap_ssid[32];
-    char* ezlopi_wifi_ap_pass = "123456789";
+    char *ezlopi_wifi_ap_pass = "123456789";
     // Check the return type, may be important.
     ezlopi_ap_netif = esp_netif_create_default_wifi_ap();
     wifi_init_config_t wifi_init_configurations = WIFI_INIT_CONFIG_DEFAULT();
@@ -108,10 +102,10 @@ void ezlopi_configure_wifi_ap()
         },
     };
 
-    const char* device_type = ezlopi_factory_info_v3_get_device_type();
+    const char *device_type = EZPI_core_factory_info_v3_get_device_type();
     if ((NULL != device_type) && (isprint(device_type[0])))
     {
-        snprintf(ezlopi_wifi_ap_ssid, sizeof(ezlopi_wifi_ap_ssid), "ezlopi_%s_%llu", device_type, ezlopi_factory_info_v3_get_id());
+        snprintf(ezlopi_wifi_ap_ssid, sizeof(ezlopi_wifi_ap_ssid), "ezlopi_%s_%llu", device_type, EZPI_core_factory_info_v3_get_id());
     }
     else
     {
@@ -119,12 +113,12 @@ void ezlopi_configure_wifi_ap()
         memset(mac, 0, sizeof(mac));
         esp_read_mac(mac, ESP_MAC_BT);
         snprintf(ezlopi_wifi_ap_ssid, sizeof(ezlopi_wifi_ap_ssid), "ezlopi_%02x%02x%02x%02x%02x%02x",
-            mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+                 mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
         ezlopi_wifi_ap_ssid[19] = '\0';
     }
 
-    strncpy((char*)wifi_cred_configurations.ap.ssid, ezlopi_wifi_ap_ssid, sizeof(wifi_cred_configurations.ap.ssid));
-    strncpy((char*)wifi_cred_configurations.ap.password, ezlopi_wifi_ap_pass, sizeof(wifi_cred_configurations.ap.password));
+    strncpy((char *)wifi_cred_configurations.ap.ssid, ezlopi_wifi_ap_ssid, sizeof(wifi_cred_configurations.ap.ssid));
+    strncpy((char *)wifi_cred_configurations.ap.password, ezlopi_wifi_ap_pass, sizeof(wifi_cred_configurations.ap.password));
 
     TRACE_I("Setting wifi mode to AP.");
     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_AP));
@@ -138,7 +132,7 @@ void ezlopi_configure_wifi_ap()
     TRACE_I("Wifi AP started!!");
 }
 
-void ezlopi_deconfigure_wifi_ap()
+void EZPI_core_deconfigure_wifi_ap()
 {
     esp_netif_destroy_default_wifi(ezlopi_ap_netif);
     ESP_ERROR_CHECK(esp_wifi_stop());
@@ -147,7 +141,7 @@ void ezlopi_deconfigure_wifi_ap()
     // TRACE_E("Wifi resources deinitialized.");
 }
 
-void ezlopi_start_dns_server()
+void EZPI_start_dns_server()
 {
     ip4_addr_t resolve_ip;
     inet_pton(AF_INET, "192.168.4.1", &resolve_ip);
@@ -163,7 +157,7 @@ void ezlopi_start_dns_server()
 }
 
 /*******************************************************************************
- *                          Static Function Definitions
+ *                         Static Function Definitions
  *******************************************************************************/
 
 #endif // CONFIG_EZPI_ENABLE_CAPTIVE_PORTAL

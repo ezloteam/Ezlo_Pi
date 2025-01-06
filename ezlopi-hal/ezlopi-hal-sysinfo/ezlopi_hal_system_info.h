@@ -28,13 +28,12 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_hal_system_info.h
+ * @brief   perform some function on system-info
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    xx
  */
 
 #ifndef _EZLOPI_HAL_SYSTEM_INFO_H_
@@ -66,18 +65,19 @@ extern "C"
     /*******************************************************************************
      *                          Extern Function Prototypes
      *******************************************************************************/
+
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
+     * @brief Function to get system chip_name
      *
+     * @return char*
      */
-    char *ezlopi_system_info_get_chip_name(void);
-    uint32_t ezlopi_system_info_get_boot_count(void);
+    char *EZPI_hal_system_info_get_chip_name(void);
+    /**
+     * @brief Function to get system boot_count
+     *
+     * @return uint32_t
+     */
+    uint32_t EZPI_hal_system_info_get_boot_count(void);
 
 #ifdef __cplusplus
 }

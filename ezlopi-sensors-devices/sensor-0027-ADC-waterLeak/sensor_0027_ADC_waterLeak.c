@@ -28,27 +28,22 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    sensor_0027_ADC_waterLeak.c
+ * @brief   perform some function on sensor_0027
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    xx
  */
 
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
 
-#include "ezlopi_util_trace.h"
-
-// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
-#include "ezlopi_core_errors.h"
 
 #include "ezlopi_hal_adc.h"
 
@@ -81,11 +76,6 @@ static ezlopi_error_t __get_item_list(l_ezlopi_item_t *item, void *arg);
 /*******************************************************************************
  *                          Static Data Definitions
  *******************************************************************************/
-const char *water_leak_alarm_states[] = {
-    "no_water_leak",
-    "water_leak_detected",
-    "unknown",
-};
 
 /*******************************************************************************
  *                          Extern Data Definitions
@@ -95,12 +85,7 @@ const char *water_leak_alarm_states[] = {
  *                          Extern Function Definitions
  *******************************************************************************/
 
-/**
- * @brief Global/extern function template example
- * Convention : Use capital letter for initial word on extern function
- * @param arg
- */
-ezlopi_error_t sensor_0027_ADC_waterLeak(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+ezlopi_error_t SENSOR_0027_adc_waterLeak(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
 
@@ -141,7 +126,7 @@ ezlopi_error_t sensor_0027_ADC_waterLeak(e_ezlopi_actions_t action, l_ezlopi_ite
 }
 
 /*******************************************************************************
- *                          Static Function Definitions
+ *                         Static Function Definitions
  *******************************************************************************/
 static void prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
@@ -160,7 +145,7 @@ static void prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_devic
     item->cloud_properties.item_name = ezlopi_item_name_water_leak_alarm;
     item->cloud_properties.value_type = value_type_token;
     item->cloud_properties.scale = NULL;
-    item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
+    item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
 }
 
 static void prepare_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj_device)
@@ -180,11 +165,11 @@ static ezlopi_error_t __prepare(void *arg)
         cJSON *cj_device = prep_arg->cjson_device;
         if (cj_device)
         {
-            l_ezlopi_device_t *parent_device = ezlopi_device_add_device(prep_arg->cjson_device, NULL);
+            l_ezlopi_device_t *parent_device = EZPI_core_device_add_device(prep_arg->cjson_device, NULL);
             if (parent_device)
             {
                 prepare_device_cloud_properties(parent_device, cj_device);
-                l_ezlopi_item_t *item = ezlopi_device_add_item_to_device(parent_device, sensor_0027_ADC_waterLeak);
+                l_ezlopi_item_t *item = EZPI_core_device_add_item_to_device(parent_device, SENSOR_0027_adc_waterLeak);
                 if (item)
                 {
                     prepare_item_cloud_properties(item, cj_device);
@@ -193,7 +178,7 @@ static ezlopi_error_t __prepare(void *arg)
                 }
                 else
                 {
-                    ezlopi_device_free_device(parent_device);
+                    EZPI_core_device_free_device(parent_device);
                 }
             }
         }
@@ -211,6 +196,11 @@ static ezlopi_error_t __get_item_list(l_ezlopi_item_t *item, void *arg)
         cJSON *json_array_enum = cJSON_CreateArray(__FUNCTION__);
         if (NULL != json_array_enum)
         {
+            char *water_leak_alarm_states[] = {
+                "no_water_leak",
+                "water_leak_detected",
+                "unknown",
+            };
             for (uint8_t i = 0; i < WATERLEAK_MAX; i++)
             {
                 cJSON *json_value = cJSON_CreateString(__FUNCTION__, water_leak_alarm_states[i]);
@@ -252,10 +242,10 @@ static ezlopi_error_t __notify(l_ezlopi_item_t *item)
 
     if (item)
     {
-        const char *curret_value = NULL;
-        s_ezlopi_analog_data_t ezlopi_analog_data = { .value = 0, .voltage = 0 };
+        char *curret_value = NULL;
+        s_ezlopi_analog_data_t ezlopi_analog_data = {.value = 0, .voltage = 0};
 
-        ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &ezlopi_analog_data);
+        EZPI_hal_adc_get_adc_data(item->interface.adc.gpio_num, &ezlopi_analog_data);
         TRACE_I("Value is: %d, voltage is: %d", ezlopi_analog_data.value, ezlopi_analog_data.voltage);
 
         if (1000 <= ezlopi_analog_data.voltage)
@@ -270,7 +260,7 @@ static ezlopi_error_t __notify(l_ezlopi_item_t *item)
         if (curret_value != (char *)item->user_arg)
         {
             item->user_arg = (void *)curret_value;
-            ezlopi_device_value_updated_from_device_broadcast(item);
+            EZPI_core_device_value_updated_from_device_broadcast(item);
             ret = EZPI_FAILED;
         }
     }
@@ -285,7 +275,7 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
     {
         if (GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
         {
-            if (EZPI_SUCCESS == ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
+            if (EZPI_SUCCESS == EZPI_hal_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
             {
                 ret = EZPI_SUCCESS;
             }

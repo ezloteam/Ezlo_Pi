@@ -39,7 +39,6 @@
 
 #ifndef __EZLOPI_SERVICE_MODES_H__
 #define __EZLOPI_SERVICE_MODES_H__
-
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
@@ -63,28 +62,13 @@ extern "C"
     /*******************************************************************************
      *                          Extern Function Prototypes
      *******************************************************************************/
-    /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
-     *
-     */
     void ezlopi_service_modes_init(void);
+
     bool ezlopi_service_modes_stop(uint32_t wait_ms);
     bool ezlopi_service_modes_start(uint32_t wait_ms);
-    bool ezlopi_service_modes_device_alert_start(uint32_t wait_ms, const char *alert_loop_name);
-    bool ezlopi_service_modes_device_alert_stop(uint32_t wait_ms, const char *alert_loop_name);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif // __EZLOPI_SERVICE_MODES_H__
 
-/*******************************************************************************
- *                          End of File
- *******************************************************************************/
+    /*******************************************************************************
+     *                          End of File
+     *******************************************************************************/

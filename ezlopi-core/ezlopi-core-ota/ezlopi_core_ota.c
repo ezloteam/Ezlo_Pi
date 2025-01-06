@@ -28,20 +28,17 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_core_ota.c
+ * @brief   Function to perform ota operation
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    12th DEC 2024
  */
 
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
-
-
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_ENABLE_OTA
@@ -90,27 +87,18 @@ typedef enum e_ezlopi_ota_state
     EZLOPI_OTA_STATE_FAILED,
     EZLOPI_OTA_STATE_MAX,
 } e_ezlopi_ota_state_t;
-
 /*******************************************************************************
  *                          Static Function Prototypes
  *******************************************************************************/
-static void ezlopi_ota_process(void *pv);
-static esp_err_t _http_event_handler(esp_http_client_event_t *evt);
 
 /*******************************************************************************
  *                          Static Data Definitions
  *******************************************************************************/
-#ifdef CONFIG_FIRMWARE_UPGRADE_BIND_IF
-/* The interface name value can refer to if_desc in esp_netif_defaults.h */
-#if CONFIG_FIRMWARE_UPGRADE_BIND_IF_ETH
-static const char *bind_interface_name = "eth";
-#elif CONFIG_FIRMWARE_UPGRADE_BIND_IF_STA
-static const char *bind_interface_name = "sta";
-#endif
-#endif
-
 static int32_t __byte_count = 0;
 static volatile uint32_t __ota_in_process = 0;
+
+static void ezlopi_ota_process(void *pv);
+static esp_err_t _http_event_handler(esp_http_client_event_t *evt);
 
 /*******************************************************************************
  *                          Extern Data Definitions
@@ -120,17 +108,12 @@ static volatile uint32_t __ota_in_process = 0;
  *                          Extern Function Definitions
  *******************************************************************************/
 
-/**
- * @brief Global/extern function template example
- * Convention : Use capital letter for initial word on extern function
- * @param arg
- */
-uint32_t __get_ota_state(void)
+uint32_t EPZI_core_ota_get_state(void)
 {
     return ((__ota_in_process < EZLOPI_OTA_STATE_MAX) ? __ota_in_process : EZLOPI_OTA_STATE_FINISH);
 }
 
-void ezlopi_ota_start(cJSON *url)
+void EZPI_core_ota_start(cJSON *url)
 {
     if (url && url->valuestring)
     {
@@ -142,7 +125,9 @@ void ezlopi_ota_start(cJSON *url)
             {
                 TaskHandle_t ezlopi_core_ota_process_task_handle = NULL;
                 xTaskCreate(ezlopi_ota_process, "EzpiOTAProcess", EZLOPI_CORE_OTA_PROCESS_TASK_DEPTH, ota_url, 3, &ezlopi_core_ota_process_task_handle);
-                ezlopi_core_process_set_process_info(ENUM_EZLOPI_CORE_OTA_PROCESS_TASK, &ezlopi_core_ota_process_task_handle, EZLOPI_CORE_OTA_PROCESS_TASK_DEPTH);
+#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
+                EZPI_core_process_set_process_info(ENUM_EZLOPI_CORE_OTA_PROCESS_TASK, &ezlopi_core_ota_process_task_handle, EZLOPI_CORE_OTA_PROCESS_TASK_DEPTH);
+#endif
             }
             else
             {
@@ -151,10 +136,6 @@ void ezlopi_ota_start(cJSON *url)
                 ota_url = NULL;
             }
         }
-    }
-    else
-    {
-        TRACE_E("URL is null");
     }
 }
 
@@ -179,15 +160,15 @@ static void ezlopi_ota_process(void *pv)
     TRACE_S("Bind interface name is %s", ifr.ifr_name);
 #endif
 
+#include "ca_mios.h"
     esp_http_client_config_t config = {
         .url = url,
         .event_handler = _http_event_handler,
-        .keep_alive_enable = true,
-        .transport_type = HTTP_TRANSPORT_OVER_SSL,
-        // .cert_pem = ezlopi_factory_info_v2_get_ca_certificate(),
-        // .client_cert_pem = ezlopi_factory_info_v2_get_ssl_shared_key(),
-        // .client_key_pem = ezlopi_factory_info_v2_get_ssl_private_key(),
-        .crt_bundle_attach = esp_crt_bundle_attach,
+        .cert_pem = ca_mios, // ezlopi_factory_info_v3_get_ssl_shared_key(),
+                             // .buffer_size = 1024,
+                             // .buffer_size_tx = 1024,
+    // .client_cert_pem = ezlopi_factory_info_v3_get_ssl_shared_key(),
+    // .client_key_pem = ezlopi_factory_info_v3_get_ssl_private_key(),
 
 #ifdef CONFIG_FIRMWARE_UPGRADE_BIND_IF
         .if_name = &ifr,
@@ -218,7 +199,7 @@ static void ezlopi_ota_process(void *pv)
     {
         __ota_in_process = EZLOPI_OTA_STATE_FINISH;
         TRACE_W("Firmware Upgrade Successful, restarting !");
-        EZPI_CORE_reset_reboot();
+        EZPI_core_reset_reboot();
     }
     else
     {
@@ -226,7 +207,9 @@ static void ezlopi_ota_process(void *pv)
         TRACE_E("Firmware upgrade failed");
     }
 
-    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_CORE_OTA_PROCESS_TASK);
+#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
+    EZPI_core_process_set_is_deleted(ENUM_EZLOPI_CORE_OTA_PROCESS_TASK);
+#endif
     vTaskDelete(NULL);
 
     if (url)
@@ -241,7 +224,8 @@ static esp_err_t _http_event_handler(esp_http_client_event_t *evt)
     {
     case HTTP_EVENT_ERROR:
     {
-        TRACE_D("HTTP_EVENT_ERROR");
+        TRACE_E("HTTP_EVENT_ERROR");
+        TRACE_E("HTTP_EVENT_ERROR, error code: %d", esp_http_client_get_errno(evt));
         break;
     }
     case HTTP_EVENT_ON_CONNECTED:
@@ -282,6 +266,9 @@ static esp_err_t _http_event_handler(esp_http_client_event_t *evt)
     }
     return ESP_OK;
 }
+/*******************************************************************************
+ *                         Static Function Definitions
+ *******************************************************************************/
 
 #endif // CONFIG_EZPI_ENABLE_OTA
 

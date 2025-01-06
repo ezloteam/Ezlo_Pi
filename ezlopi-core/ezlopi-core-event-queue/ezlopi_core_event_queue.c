@@ -28,13 +28,12 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_core_event_queue.c
+ * @brief   perform function for event queue
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    12th DEC 2024
  */
 
 /*******************************************************************************
@@ -51,40 +50,34 @@
 #include "ezlopi_core_errors.h"
 
 /*******************************************************************************
- *                          Extern Data Declarations
- *******************************************************************************/
+*                          Extern Data Declarations
+*******************************************************************************/
 
 /*******************************************************************************
- *                          Extern Function Declarations
- *******************************************************************************/
+*                          Extern Function Declarations
+*******************************************************************************/
 
 /*******************************************************************************
- *                          Type & Macro Definitions
- *******************************************************************************/
+*                          Type & Macro Definitions
+*******************************************************************************/
 
 /*******************************************************************************
- *                          Static Function Prototypes
- *******************************************************************************/
+*                          Static Function Prototypes
+*******************************************************************************/
 
 /*******************************************************************************
- *                          Static Data Definitions
- *******************************************************************************/
+*                          Static Data Definitions
+*******************************************************************************/
 static QueueHandle_t generic_queue = NULL;
 
 /*******************************************************************************
- *                          Extern Data Definitions
- *******************************************************************************/
+*                          Extern Data Definitions
+*******************************************************************************/
 
 /*******************************************************************************
- *                          Extern Function Definitions
- *******************************************************************************/
-
-/**
- * @brief Global/extern function template example
- * Convention : Use capital letter for initial word on extern function
- * @param arg
- */
-ezlopi_error_t ezlopi_event_queue_init(void)
+*                          Extern Function Definitions
+*******************************************************************************/
+ezlopi_error_t EZPI_core_event_queue_init(void)
 {
     ezlopi_error_t error = EZPI_SUCCESS;
     if (NULL == generic_queue)
@@ -95,7 +88,7 @@ ezlopi_error_t ezlopi_event_queue_init(void)
     return error;
 }
 
-ezlopi_error_t ezlopi_event_queue_send(s_ezlo_event_t *event_data, int from_isr)
+ezlopi_error_t EZPI_core_event_queue_send(s_ezlo_event_t *event_data, int from_isr)
 {
     ezlopi_error_t error = EZPI_ERR_EVENT_QUEUE_UNINITIALIZED;
 
@@ -140,7 +133,7 @@ ezlopi_error_t ezlopi_event_queue_send(s_ezlo_event_t *event_data, int from_isr)
     return error;
 }
 
-ezlopi_error_t ezlopi_event_queue_receive(s_ezlo_event_t **event_data, int time_out_ms)
+ezlopi_error_t EZPI_core_event_queue_receive(s_ezlo_event_t **event_data, int time_out_ms)
 {
     ezlopi_error_t error = EZPI_ERR_EVENT_QUEUE_UNINITIALIZED;
     if (generic_queue)
@@ -149,13 +142,11 @@ ezlopi_error_t ezlopi_event_queue_receive(s_ezlo_event_t **event_data, int time_
     }
     return error;
 }
-
 /*******************************************************************************
- *                          Static Function Definitions
- *******************************************************************************/
+*                         Static Function Definitions
+*******************************************************************************/
 
 #endif
-
 /*******************************************************************************
  *                          End of File
  *******************************************************************************/

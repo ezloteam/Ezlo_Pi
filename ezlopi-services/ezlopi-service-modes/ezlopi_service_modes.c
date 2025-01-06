@@ -48,6 +48,7 @@
 #include "ezlopi_cloud_modes.h"
 #include "ezlopi_cloud_constants.h"
 
+#include "ezlopi_core_sntp.h"
 #include "ezlopi_core_modes.h"
 #include "ezlopi_core_devices.h"
 #include "ezlopi_core_broadcast.h"
@@ -70,6 +71,17 @@
  *******************************************************************************/
 
 /*******************************************************************************
+ *                          Static Data Definitions
+ *******************************************************************************/
+static SemaphoreHandle_t sg_modes_loop_smphr = NULL;
+
+
+/*******************************************************************************
+ *                          Static Function Prototypes
+ *******************************************************************************/
+static void __modes_loop(void *pv);
+
+/*******************************************************************************
  *                          Type & Macro Definitions
  *******************************************************************************/
 typedef struct l_modes_alert
@@ -84,50 +96,135 @@ typedef struct l_modes_alert
     struct l_modes_alert *next;
 } l_modes_alert_t;
 
-/*******************************************************************************
- *                          Static Function Prototypes
- *******************************************************************************/
-static void __modes_loop(void *arg);
-static void __broadcast_modes_alarmed_for_uid(const char *dev_id_str);
-static bool __check_if_devid_in_alarm_off(s_house_modes_t *curr_house_mode, const char *device_id_str);
-static void __broadcast_alarmed_state_for_valid_ids(void);
-static bool __check_if_device_is_bypassed(cJSON *cj_bypass_devices, const char *device_id_str);
-static bool __check_if_entry_delay_finished(s_ezlopi_modes_t *ez_mode);
-static void __modes_create_non_bypass_alerts(s_ezlopi_modes_t *ez_mode, s_house_modes_t *curr_house_mode);
-static void __modes_check_main_for_trigger(s_ezlopi_modes_t *ez_mode);
-static void __modes_main_and_broadcast_status(s_ezlopi_modes_t *ez_mode);
-static ezlopi_error_t __check_mode_switch_condition(s_ezlopi_modes_t *ez_mode);
-static l_modes_alert_t *__create_alert(const char *u_id, s_ezlopi_modes_t *ez_mode);
-static void __ezlopi_service_remove_alert_node(l_modes_alert_t *node);
-static void __ezlopi_service_remove_alert_node_by_name(const char *_name_);
-static void __ezlopi_service_add_alert(const char *u_id, s_ezlopi_modes_t *ez_mode);
-static void __remove_all_alerts(l_modes_alert_t *curr_node);
-static void __ezlopi_service_remove_all_alerts(void);
-static void __modes_service(void *pv);
-
-/*******************************************************************************
- *                          Static Data Definitions
- *******************************************************************************/
-static SemaphoreHandle_t sg_modes_loop_smphr = NULL;
 static l_modes_alert_t *_alert_head = NULL;
 
-#if 0
-static TaskHandle_t sg_process_handle = NULL;
+static l_modes_alert_t *__create_alert(const char *u_id, s_ezlopi_modes_t *ez_mode)
+{
+    l_modes_alert_t *new_node = ezlopi_malloc(__FUNCTION__, sizeof(l_modes_alert_t));
+
+    if (new_node)
+    {
+        new_node->u_id_str = u_id;
+        new_node->alert_trig = false;
+        new_node->alarm_delay_ll = new_node->timeleft_to_alarm_ll = ez_mode->alarm_delay;
+        new_node->abort_window_ll = new_node->timeleft_to_abort_ll = ez_mode->abort_delay.default_delay_sec;
+        new_node->next = NULL;
+    }
+
+    return new_node;
+}
+
+#if 0 /* These two function maybe used in future */
+static void __ezlopi_service_remove_alert_node(l_modes_alert_t *node)
+{
+    if (node && _alert_head)
+    {
+        if (_alert_head == node)
+        {
+            l_modes_alert_t *__del_node = _alert_head;
+            _alert_head = _alert_head->next;
+            ezlopi_free(__FUNCTION__, __del_node);
+        }
+        else
+        {
+            l_modes_alert_t *curr_node = _alert_head;
+            while (curr_node->next)
+            {
+                if (curr_node->next == node)
+                {
+                    l_modes_alert_t *__del_node = curr_node->next;
+                    curr_node->next = curr_node->next->next;
+                    ezlopi_free(__FUNCTION__, __del_node);
+                    break;
+                }
+
+                curr_node = curr_node->next;
+            }
+        }
+    }
+}
+
+static void __ezlopi_service_remove_alert_node_by_name(const char *_name_)
+{
+    if (_name_ && _alert_head)
+    {
+        l_modes_alert_t *curr_node = _alert_head;
+        while (curr_node)
+        {
+            if ((curr_node->u_id_str) && (EZPI_STRNCMP_IF_EQUAL(curr_node->u_id_str, _name_, strlen(curr_node->u_id_str) + 1, strlen(_name_) + 1)))
+            {
+                __ezlopi_service_remove_alert_node(curr_node);
+                break;
+            }
+            curr_node = curr_node->next;
+        }
+    }
+}
 #endif
 
-/*******************************************************************************
- *                          Extern Data Definitions
- *******************************************************************************/
+static void __ezlopi_service_add_alert(const char *u_id, s_ezlopi_modes_t *ez_mode)
+{
+    if (u_id && ez_mode)
+    {
+        if (_alert_head)
+        {
+            l_modes_alert_t *curr_node = _alert_head;
+            while (curr_node->next)
+            {
+                curr_node = curr_node->next;
+            }
 
-/*******************************************************************************
- *                          Extern Function Definitions
- *******************************************************************************/
+            curr_node->next = __create_alert(u_id, ez_mode);
+        }
+        else
+        {
+            _alert_head = __create_alert(u_id, ez_mode);
+        }
+    }
+}
 
-/**
- * @brief Global/extern function template example
- * Convention : Use capital letter for initial word on extern function
- * @param arg
- */
+static void __remove_all_alerts(l_modes_alert_t *curr_node)
+{
+    if (curr_node)
+    {
+        if (curr_node->next)
+        {
+            __remove_all_alerts(curr_node->next);
+            curr_node->next = NULL;
+        }
+
+        if (curr_node->u_id_str)
+        {
+            ezlopi_free(__func__, &(curr_node->u_id_str));
+            curr_node->u_id_str = NULL;
+        }
+
+        ezlopi_free(__func__, curr_node);
+    }
+}
+
+static void __ezlopi_service_remove_all_alerts(void)
+{
+    if (_alert_head)
+    {
+        __remove_all_alerts(_alert_head);
+        _alert_head = NULL;
+    }
+    else
+    {
+        TRACE_E("Error!! [_alert_head] not found. ");
+    }
+}
+
+//---------------------------------------------------------------------------------------------
+void ezlopi_service_modes_init(void)
+{
+    // initialize modes-loop
+    sg_modes_loop_smphr = xSemaphoreCreateBinary();
+    xSemaphoreGive(sg_modes_loop_smphr);
+    ezlopi_service_modes_start(5000);
+}
+
 bool ezlopi_service_modes_stop(uint32_t wait_ms)
 {
     bool ret = false;
@@ -135,7 +232,7 @@ bool ezlopi_service_modes_stop(uint32_t wait_ms)
 
     if (sg_modes_loop_smphr && (xSemaphoreTake(sg_modes_loop_smphr, wait_ms / portTICK_RATE_MS)))
     {
-        ezlopi_service_loop_remove(__modes_loop);
+        EZPI_service_loop_remove(__modes_loop);
         xSemaphoreGive(sg_modes_loop_smphr);
         TRACE_W("removed modes-loop");
         ret = true;
@@ -148,99 +245,24 @@ bool ezlopi_service_modes_start(uint32_t wait_ms)
 {
     bool ret = false;
 
-    if (ezlopi_core_modes_get_custom_modes() && xSemaphoreTake(sg_modes_loop_smphr, wait_ms / portTICK_RATE_MS))
+    if (EZPI_core_modes_get_custom_modes() && xSemaphoreTake(sg_modes_loop_smphr, wait_ms / portTICK_RATE_MS))
     {
         ret = true;
         xSemaphoreGive(sg_modes_loop_smphr);
-        ezlopi_service_loop_add("modes-loop", __modes_loop, 1000, NULL);
+        EZPI_service_loop_add("modes-loop", __modes_loop, 1000, NULL);
         TRACE_I("added modes-loop");
     }
 
     return ret;
 }
 
-void ezlopi_service_modes_init(void)
-{
-    sg_modes_loop_smphr = xSemaphoreCreateBinary();
-    xSemaphoreGive(sg_modes_loop_smphr);
-    ezlopi_service_modes_start(5000);
-}
-
-#if 0
-int ezlopi_service_modes_stop(void)
-{
-    if (sg_process_handle)
-    {
-        ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SERVICE_MODES_TASK);
-        vTaskDelete(sg_process_handle);
-        sg_process_handle = NULL;
-        TRACE_W("Modes-service: Stopped!");
-    }
-
-    return 1;
-}
-
-int ezlopi_service_modes_start(5000void)
-{
-    int ret = 0;
-
-    if ((NULL == sg_process_handle) && ezlopi_core_modes_get_custom_modes())
-    {
-        ret = 1;
-        xTaskCreate(__modes_service, "modes-service", EZLOPI_SERVICE_MODES_TASK_DEPTH, NULL, 3, &sg_process_handle);
-        ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_MODES_TASK, &sg_process_handle, EZLOPI_SERVICE_MODES_TASK_DEPTH);
-        TRACE_I("Starting modes-service");
-    }
-
-    return ret;
-}
-#endif
-
-/*******************************************************************************
- *                          Static Function Definitions
- *******************************************************************************/
-static void __modes_loop(void *arg)
-{
-    if (pdTRUE == xSemaphoreTake(sg_modes_loop_smphr, 1000 / portTICK_PERIOD_MS))
-    {
-        s_ezlopi_modes_t *ez_mode = ezlopi_core_modes_get_custom_modes();
-        s_house_modes_t *curr_house_mode = ezlopi_core_modes_get_current_house_modes();
-        if (ez_mode && curr_house_mode)
-        {
-            // 1. check if the mode is to be switched.
-            if (EZPI_SUCCESS == __check_mode_switch_condition(ez_mode))
-            {
-                TRACE_D("Mode - Switch completed to [%d]", ez_mode->current_mode_id);
-                // after switching-modes ; Create unique trigger-event-loops for each devices in 'alarm-list'
-                if (true == curr_house_mode->armed) // if the new mode is armed ; create 'non_bypass_alert_ll'
-                {
-                    __modes_create_non_bypass_alerts(ez_mode, curr_house_mode);
-                }
-            }
-            else
-            { // After the switching is DONE.
-                // 2. Pre-alarming (ENTRY-DELAY) ; Operate on the 'cj_alarms' list to excluding 'cj_alarm_off_devices'
-                if (true == curr_house_mode->armed)
-                {
-                    if (true == __check_if_entry_delay_finished(ez_mode))
-                    {
-                        // 3. Perform --> 'MAIN' phase operations
-                        __modes_main_and_broadcast_status(ez_mode);
-                    }
-                }
-            }
-        }
-
-        xSemaphoreGive(sg_modes_loop_smphr);
-    }
-}
-
+//---------------------------------------------------------------------------------------------
 static void __broadcast_modes_alarmed_for_uid(const char *dev_id_str)
 {
-    cJSON *cj_update = ezlopi_core_modes_cjson_alarmed(dev_id_str);
+    cJSON *cj_update = EZPI_core_modes_cjson_alarmed(dev_id_str);
     // CJSON_TRACE("----------------- broadcasting - cj_update", cj_update);
 
-    if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(cj_update))
+    if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_update, EZPI_core_sntp_get_current_time_sec()))
     {
         cJSON_Delete(__FUNCTION__, cj_update);
     }
@@ -254,7 +276,7 @@ static bool __check_if_devid_in_alarm_off(s_house_modes_t *curr_house_mode, cons
         cJSON *cj_alarm_off = NULL;
         cJSON_ArrayForEach(cj_alarm_off, curr_house_mode->cj_alarms_off_devices) // 'alarm_devid' should not be here
         {
-            if (EZPI_STRNCMP_IF_EQUAL(device_id_str, cj_alarm_off->valuestring, strlen(device_id_str), cj_alarm_off->str_value_len))
+            if (EZPI_STRNCMP_IF_EQUAL(device_id_str, cj_alarm_off->valuestring, strlen(device_id_str) + 1, cj_alarm_off->str_value_len))
             {
                 ret = true;
                 break;
@@ -270,7 +292,7 @@ static void __broadcast_alarmed_state_for_valid_ids(void)
     l_modes_alert_t *curr_node = _alert_head;
     while (curr_node)
     {
-        if ((NULL != curr_node->u_id_str) && (false == __check_if_devid_in_alarm_off(ezlopi_core_modes_get_current_house_modes(), curr_node->u_id_str)))
+        if ((NULL != curr_node->u_id_str) && (false == __check_if_devid_in_alarm_off(EZPI_core_modes_get_current_house_modes(), curr_node->u_id_str)))
         {
             __broadcast_modes_alarmed_for_uid(curr_node->u_id_str);
         }
@@ -286,12 +308,12 @@ static bool __check_if_device_is_bypassed(cJSON *cj_bypass_devices, const char *
         cJSON *cj_bypass = NULL;
         cJSON_ArrayForEach(cj_bypass, cj_bypass_devices)
         {
-            if (EZPI_STRNCMP_IF_EQUAL(device_id_str, cj_bypass->valuestring, strlen(device_id_str), cj_bypass->str_value_len))
+            if (EZPI_STRNCMP_IF_EQUAL(device_id_str, cj_bypass->valuestring, strlen(device_id_str) + 1, cj_bypass->str_value_len))
             {
                 ret = true;
 
                 // Trigger 1 -> bypass 'DONE' broadcast.
-                s_ezlopi_modes_t *curr_mode = ezlopi_core_modes_get_custom_modes();
+                s_ezlopi_modes_t *curr_mode = EZPI_core_modes_get_custom_modes();
                 if (curr_mode)
                 {
                     curr_mode->alarmed.phase = EZLOPI_MODES_ALARM_PHASE_BYPASS;
@@ -468,7 +490,7 @@ static ezlopi_error_t __check_mode_switch_condition(s_ezlopi_modes_t *ez_mode)
         else
         {
             // find the 'house-mode', to switch to using 'switch_to_mode_id'.
-            s_house_modes_t *new_house_mode = ezlopi_core_modes_get_house_mode_by_id(ez_mode->switch_to_mode_id);
+            s_house_modes_t *new_house_mode = EZPI_core_modes_get_house_mode_by_id(ez_mode->switch_to_mode_id);
             if (new_house_mode)
             {
                 uint8_t bypass_clear_modeId = ez_mode->current_mode_id;
@@ -479,7 +501,7 @@ static ezlopi_error_t __check_mode_switch_condition(s_ezlopi_modes_t *ez_mode)
                 ez_mode->switch_to_mode_id = 0;
 
                 // After the transition, bypass devices list is cleared for the previous house mode.
-                s_house_modes_t *prev_house_mode = ezlopi_core_modes_get_house_mode_by_id(bypass_clear_modeId);
+                s_house_modes_t *prev_house_mode = EZPI_core_modes_get_house_mode_by_id(bypass_clear_modeId);
                 if (prev_house_mode && prev_house_mode->cj_bypass_devices)
                 {
                     // TRACE_D("clearing all alerts");
@@ -499,7 +521,7 @@ static ezlopi_error_t __check_mode_switch_condition(s_ezlopi_modes_t *ez_mode)
                 }
 
                 // set the new 'house-mode' as the active 'custom-mode'
-                if (EZPI_SUCCESS == ezlopi_core_modes_set_current_house_mode(new_house_mode))
+                if (EZPI_SUCCESS == EZPI_core_modes_set_current_house_mode(new_house_mode))
                 {
                     // 1. assign 'delayToSwitch'
                     ez_mode->time_is_left_to_switch_sec = ez_mode->switch_to_delay_sec = new_house_mode->switch_to_delay_sec;
@@ -517,11 +539,11 @@ static ezlopi_error_t __check_mode_switch_condition(s_ezlopi_modes_t *ez_mode)
                     }
 
                     // 4. Store to nvs
-                    ezlopi_core_modes_store_to_nvs();
-                    cJSON *cj_update = ezlopi_core_modes_cjson_changed();
+                    EZPI_core_modes_store_to_nvs();
+                    cJSON *cj_update = EZPI_core_modes_cjson_changed();
                     // CJSON_TRACE("----------------- broadcasting - cj_update", cj_update);
 
-                    if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(cj_update))
+                    if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_update, EZPI_core_sntp_get_current_time_sec()))
                     {
                         cJSON_Delete(__FUNCTION__, cj_update);
                     }
@@ -535,131 +557,84 @@ static ezlopi_error_t __check_mode_switch_condition(s_ezlopi_modes_t *ez_mode)
     return ret;
 }
 
-
-static l_modes_alert_t *__create_alert(const char *u_id, s_ezlopi_modes_t *ez_mode)
+static void __modes_loop(void *arg)
 {
-    l_modes_alert_t *new_node = ezlopi_malloc(__FUNCTION__, sizeof(l_modes_alert_t));
-
-    if (new_node)
+    if (pdTRUE == xSemaphoreTake(sg_modes_loop_smphr, 1000 / portTICK_PERIOD_MS))
     {
-        new_node->u_id_str = u_id;
-        new_node->alert_trig = false;
-        new_node->alarm_delay_ll = new_node->timeleft_to_alarm_ll = ez_mode->alarm_delay;
-        new_node->abort_window_ll = new_node->timeleft_to_abort_ll = ez_mode->abort_delay.default_delay_sec;
-        new_node->next = NULL;
-    }
-
-    return new_node;
-}
-
-#if 0 /* These two function maybe used in future */
-static void __ezlopi_service_remove_alert_node(l_modes_alert_t *node)
-{
-    if (node && _alert_head)
-    {
-        if (_alert_head == node)
+        s_ezlopi_modes_t *ez_mode = EZPI_core_modes_get_custom_modes();
+        s_house_modes_t *curr_house_mode = EZPI_core_modes_get_current_house_modes();
+        if (ez_mode && curr_house_mode)
         {
-            l_modes_alert_t *__del_node = _alert_head;
-            _alert_head = _alert_head->next;
-            ezlopi_free(__FUNCTION__, __del_node);
-        }
-        else
-        {
-            l_modes_alert_t *curr_node = _alert_head;
-            while (curr_node->next)
+            // 1. check if the mode is to be switched.
+            if (EZPI_SUCCESS == __check_mode_switch_condition(ez_mode))
             {
-                if (curr_node->next == node)
+                TRACE_D("Mode - Switch completed to [%d]", ez_mode->current_mode_id);
+                curr_house_mode = EZPI_core_modes_get_current_house_modes();
+                TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_INFO, "mode: switching to: %s (id: %u).", curr_house_mode->name, curr_house_mode->_id);
+                // after switching-modes ; Create unique trigger-event-loops for each devices in 'alarm-list'
+                if (true == curr_house_mode->armed) // if the new mode is armed ; create 'non_bypass_alert_ll'
                 {
-                    l_modes_alert_t *__del_node = curr_node->next;
-                    curr_node->next = curr_node->next->next;
-                    ezlopi_free(__FUNCTION__, __del_node);
-                    break;
+                    __modes_create_non_bypass_alerts(ez_mode, curr_house_mode);
                 }
-
-                curr_node = curr_node->next;
+            }
+            else
+            { // After the switching is DONE.
+                // 2. Pre-alarming (ENTRY-DELAY) ; Operate on the 'cj_alarms' list to excluding 'cj_alarm_off_devices'
+                if (true == curr_house_mode->armed)
+                {
+                    if (true == __check_if_entry_delay_finished(ez_mode))
+                    {
+                        // 3. Perform --> 'MAIN' phase operations
+                        __modes_main_and_broadcast_status(ez_mode);
+                    }
+                }
             }
         }
-    }
-}
 
-static void __ezlopi_service_remove_alert_node_by_name(const char *_name_)
-{
-    if (_name_ && _alert_head)
-    {
-        l_modes_alert_t *curr_node = _alert_head;
-        while (curr_node)
-        {
-            if ((curr_node->u_id_str) && (EZPI_STRNCMP_IF_EQUAL(curr_node->u_id_str, _name_, strlen(curr_node->u_id_str), strlen(_name_))))
-            {
-                __ezlopi_service_remove_alert_node(curr_node);
-                break;
-            }
-            curr_node = curr_node->next;
-        }
-    }
-}
-#endif
-
-static void __ezlopi_service_add_alert(const char *u_id, s_ezlopi_modes_t *ez_mode)
-{
-    if (u_id && ez_mode)
-    {
-        if (_alert_head)
-        {
-            l_modes_alert_t *curr_node = _alert_head;
-            while (curr_node->next)
-            {
-                curr_node = curr_node->next;
-            }
-
-            curr_node->next = __create_alert(u_id, ez_mode);
-        }
-        else
-        {
-            _alert_head = __create_alert(u_id, ez_mode);
-        }
-    }
-}
-
-static void __remove_all_alerts(l_modes_alert_t *curr_node)
-{
-    if (curr_node)
-    {
-        if (curr_node->next)
-        {
-            __remove_all_alerts(curr_node->next);
-            curr_node->next = NULL;
-        }
-
-        if (curr_node->u_id_str)
-        {
-            ezlopi_free(__func__, &(curr_node->u_id_str));
-            curr_node->u_id_str = NULL;
-        }
-
-        ezlopi_free(__func__, curr_node);
-    }
-}
-
-static void __ezlopi_service_remove_all_alerts(void)
-{
-    if (_alert_head)
-    {
-        __remove_all_alerts(_alert_head);
-        _alert_head = NULL;
-    }
-    else
-    {
-        TRACE_E("Error!! [_alert_head] not found. ");
+        xSemaphoreGive(sg_modes_loop_smphr);
     }
 }
 
 #if 0
+static TaskHandle_t sg_process_handle = NULL;
+
+int ezlopi_service_modes_stop(void)
+{
+    if (sg_process_handle)
+    {
+#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
+        EZPI_core_process_set_is_deleted(ENUM_EZLOPI_SERVICE_MODES_TASK);
+#endif
+        vTaskDelete(sg_process_handle);
+        sg_process_handle = NULL;
+        TRACE_W("Modes-service: Stopped!");
+    }
+
+    return 1;
+}
+
+int ezlopi_service_modes_start(5000void)
+{
+    int ret = 0;
+
+    if ((NULL == sg_process_handle) && EZPI_core_modes_get_custom_modes())
+    {
+        ret = 1;
+        xTaskCreate(__modes_service, "modes-service", EZLOPI_SERVICE_MODES_TASK_DEPTH, NULL, 3, &sg_process_handle);
+#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
+        EZPI_core_process_set_process_info(ENUM_EZLOPI_SERVICE_MODES_TASK, &sg_process_handle, EZLOPI_SERVICE_MODES_TASK_DEPTH);
+#endif
+        TRACE_I("Starting modes-service");
+    }
+
+    return ret;
+}
+
 static void __modes_service(void *pv)
 {
     while (1)
     {
-        s_ezlopi_modes_t *ez_mode = ezlopi_core_modes_get_custom_modes();
+        s_ezlopi_modes_t *ez_mode = EZPI_core_modes_get_custom_modes();
         if (ez_mode)
         {
             if (ez_mode->switch_to_mode_id)
@@ -671,7 +646,7 @@ static void __modes_service(void *pv)
                 }
                 else
                 {
-                    s_house_modes_t *new_house_mode = ezlopi_core_modes_get_house_mode_by_id(ez_mode->switch_to_mode_id);
+                    s_house_modes_t *new_house_mode = EZPI_core_modes_get_house_mode_by_id(ez_mode->switch_to_mode_id);
 
                     if (new_house_mode)
                     {
@@ -680,7 +655,7 @@ static void __modes_service(void *pv)
                         ez_mode->current_mode_id = ez_mode->switch_to_mode_id;
                         ez_mode->switch_to_mode_id = 0;
 
-                        ezlopi_core_modes_set_current_house_mode(new_house_mode);
+                        EZPI_core_modes_set_current_house_mode(new_house_mode);
 
                         if (new_house_mode->cj_bypass_devices)
                         {
@@ -688,12 +663,12 @@ static void __modes_service(void *pv)
                             new_house_mode->cj_bypass_devices = NULL;
                         }
 
-                        ezlopi_core_modes_store_to_nvs();
+                        EZPI_core_modes_store_to_nvs();
 
-                        cJSON *cj_update = ezlopi_core_modes_cjson_changed();
+                        cJSON *cj_update = EZPI_core_modes_cjson_changed();
                         CJSON_TRACE("----------------- broadcasting - cj_update", cj_update);
 
-                        if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(cj_update))
+                        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_update))
                         {
                             cJSON_Delete(__FUNCTION__, cj_update);
                         }
@@ -704,7 +679,9 @@ static void __modes_service(void *pv)
 
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
-    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SERVICE_MODES_TASK);
+#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
+    EZPI_core_process_set_is_deleted(ENUM_EZLOPI_SERVICE_MODES_TASK);
+#endif
     vTaskDelete(NULL);
 }
 #endif

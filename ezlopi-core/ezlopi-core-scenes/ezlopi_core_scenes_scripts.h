@@ -28,13 +28,12 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_core_scenes_scripts.h
+ * @brief   Perform operations on Scene-scipts
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    12th DEC 2024
  */
 
 #ifndef _EZLOPI_CORE_SCENES_SCRIPTS_H_
@@ -46,6 +45,7 @@
  *                          Include Files
  *******************************************************************************/
 #include <inttypes.h>
+#include "cjext.h"
 
 /*******************************************************************************
  *                          C++ Declaration Wrapper
@@ -86,36 +86,64 @@ extern "C"
      *                          Extern Function Prototypes
      *******************************************************************************/
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
+     * @brief This function initializes the scenes scripts
+     */
+    void EZPI_scenes_scripts_init(void);
+    /**
+     * @brief This function returns scene-script 'head-node'
+     *
+     * @return l_ezlopi_scenes_script_t*
+     */
+    l_ezlopi_scenes_script_t *EZPI_scenes_scripts_get_head(void);
+    /**
+     * @brief This function adds a node to scene-script
+     *
+     * @param script_id New script_id
+     * @param cj_script Scource of the new-script information
+     * @return uint32_t
+     */
+    uint32_t EZPI_scenes_scripts_add_to_head(uint32_t script_id, cJSON *cj_script);
+    /**
+     * @brief This function updates a existing node
+     *
+     * @param cj_script Scource of the new-script information
+     */
+    void EZPI_scenes_scripts_update(cJSON *cj_script);
+    /**
+     * @brief This function halts running scripts by id
+     *
+     * @param script_id Id of target script
+     */
+    void EZPI_scenes_scripts_stop_by_id(uint32_t script_id);
+    /**
+     * @brief This function halts running scripts by node
+     *
+     * @param script_node Target script node
+     */
+    void EZPI_scenes_scripts_stop(l_ezlopi_scenes_script_t *script_node);
+    /**
+     * @brief This function triggers activation of perticular script
+     *
+     * @param script_id Id of target script
+     */
+    void EZPI_scenes_scripts_run_by_id(uint32_t script_id);
+    /**
+     * @brief This function completely removes a perticular script from ll
+     *
+     * @param script_id Id of target script
+     */
+    void EZPI_scenes_scripts_delete_by_id(uint32_t script_id);
+    /**
+     * @brief Clear the script factory info
      *
      */
-    void ezlopi_scenes_scripts_init(void);
-
-    l_ezlopi_scenes_script_t *ezlopi_scenes_scripts_get_head(void);
-    uint32_t ezlopi_scenes_scripts_add_to_head(uint32_t script_id, cJSON *cj_script);
-
-    void ezlopi_scenes_scripts_update(cJSON *cj_script);
-
-    void ezlopi_scenes_scripts_stop_by_id(uint32_t script_id);
-    void ezlopi_scenes_scripts_stop(l_ezlopi_scenes_script_t *script_node);
-
-    void ezlopi_scenes_scripts_run_by_id(uint32_t script_id);
-    void ezlopi_scenes_scripts_delete_by_id(uint32_t script_id);
-
-    void ezlopi_scenes_scripts_factory_info_reset(void);
-
+    void EZPI_scenes_scripts_factory_info_reset(void);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+#endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 #endif // _EZLOPI_CORE_SCENES_SCRIPTS_H_
 

@@ -28,13 +28,12 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_core_scenes_status_changed.c
+ * @brief   These function operates on scene status info
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    12th DEC 2024
  */
 
 /*******************************************************************************
@@ -43,11 +42,12 @@
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
-
+#include <time.h>
 #include "ezlopi_util_trace.h"
 
 #include "ezlopi_cloud_constants.h"
 
+#include "ezlopi_core_sntp.h"
 #include "ezlopi_core_broadcast.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_scenes_status_changed.h"
@@ -79,13 +79,7 @@
 /*******************************************************************************
  *                          Extern Function Definitions
  *******************************************************************************/
-
-/**
- * @brief Global/extern function template example
- * Convention : Use capital letter for initial word on extern function
- * @param arg
- */
-int ezlopi_scenes_status_change_broadcast(l_scenes_list_v2_t* scene_node, const char* status_str)
+int EZPI_core_scenes_status_change_broadcast(l_scenes_list_v2_t *scene_node, const char *status_str, time_t time_stamp)
 {
     int ret = 0;
     if (scene_node)
@@ -93,6 +87,8 @@ int ezlopi_scenes_status_change_broadcast(l_scenes_list_v2_t* scene_node, const 
         cJSON *cj_response = cJSON_CreateObject(__FUNCTION__);
         if (cj_response)
         {
+            // cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_startTime_str, EZPI_core_sntp_get_current_time_sec());
+
             cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
             cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, method_hub_scene_run_progress);
             cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
@@ -133,7 +129,7 @@ int ezlopi_scenes_status_change_broadcast(l_scenes_list_v2_t* scene_node, const 
 
             CJSON_TRACE("----------------- broadcasting - cj_response", cj_response);
 
-            ret = ezlopi_core_broadcast_add_to_queue(cj_response);
+            ret = EZPI_core_broadcast_add_to_queue(cj_response, time_stamp);
 
             if (0 != ret)
             {
@@ -145,9 +141,9 @@ int ezlopi_scenes_status_change_broadcast(l_scenes_list_v2_t* scene_node, const 
     return ret;
 }
 
-const char* ezlopi_scenes_status_to_string(e_scene_status_v2_t scene_status)
+const char *EZPI_core_scenes_status_to_string(e_scene_status_v2_t scene_status)
 {
-    const char* ret = "";
+    const char *ret = "";
 #if (1 == ENABLE_TRACE)
     switch (scene_status)
     {
@@ -171,7 +167,7 @@ const char* ezlopi_scenes_status_to_string(e_scene_status_v2_t scene_status)
         ret = "EZLOPI_SCENE_STATUS_STOPPED";
         break;
     }
-    #warning "need to add status_failed";
+#warning "need to add status_failed";
     default:
     {
         ret = "EZLOPI_SCENE_STATUS_NONE";
@@ -184,10 +180,10 @@ const char* ezlopi_scenes_status_to_string(e_scene_status_v2_t scene_status)
 }
 
 /*******************************************************************************
- *                          Static Function Definitions
+ *                         Static Function Definitions
  *******************************************************************************/
 
-#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+#endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 /*******************************************************************************
  *                          End of File

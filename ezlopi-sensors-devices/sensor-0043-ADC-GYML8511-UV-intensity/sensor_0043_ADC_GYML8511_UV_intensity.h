@@ -28,19 +28,12 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    sensor_0043_ADC_GYML8511_UV_intensity.h
+ * @brief   perform some function on sensor_0043
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
- * @note
- *  -> GYML_8511 - UV sensor operates in 3.3V
- *
- *  -> Better to connect EN->3.3v
- *
- *  Output analog voltage range : [0.99v - 2.7V ] which is acceptable for esp32 input range with only small error.
+ * @date    xx
  */
 
 #ifndef _SENSOR_0043_ADC_UV_INTENSITY_H_
@@ -73,16 +66,23 @@ extern "C"
      *                          Extern Function Prototypes
      *******************************************************************************/
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
+     *  -> GYML_8511 - UV sensor operates in 3.3V
      *
+     *  -> Better to connect EN->3.3v
+     *
+     *  Output analog voltage range : [0.99v - 2.7V ] which is acceptable for esp32 input range with only small error.
      */
-    ezlopi_error_t sensor_0043_ADC_GYML8511_UV_intensity(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
+
+    /**
+     * @brief Function to operate on actions
+     *
+     * @param action Current Action to Operate on
+     * @param item Target-Item node
+     * @param arg Arg for action
+     * @param user_arg User-arg
+     * @return ezlopi_error_t
+     */
+    ezlopi_error_t SENSOR_0043_adc_gyml8511_uv_intensity(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
 #ifdef __cplusplus
 }

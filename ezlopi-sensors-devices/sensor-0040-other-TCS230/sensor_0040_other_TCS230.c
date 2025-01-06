@@ -28,13 +28,12 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    sensor_0040_other_TCS230.c
+ * @brief   perform some function on sensor_0040
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    xx
  */
 
 /*******************************************************************************
@@ -42,17 +41,15 @@
  *******************************************************************************/
 #include <string.h>
 #include <math.h>
-#include "ezlopi_util_trace.h"
 
+#include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
 #include "ezlopi_core_processes.h"
-#include "ezlopi_core_errors.h"
 
 #include "ezlopi_hal_adc.h"
 
@@ -82,7 +79,9 @@ static ezlopi_error_t __0040_init(l_ezlopi_item_t *item);
 static ezlopi_error_t __0040_get_cjson_value(l_ezlopi_item_t *item, void *arg);
 static ezlopi_error_t __0040_notify(l_ezlopi_item_t *item);
 static ezlopi_error_t __tcs230_setup_gpio(gpio_num_t s0_pin, gpio_num_t s1_pin, gpio_num_t s2_pin, gpio_num_t s3_pin, gpio_num_t gpio_output_en, gpio_num_t gpio_pulse_output);
-
+static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
+static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, void *user_data);
+static void __prepare_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj_device);
 static void __tcs230_calibration_task(void *params);
 
 /*******************************************************************************
@@ -96,13 +95,7 @@ static void __tcs230_calibration_task(void *params);
 /*******************************************************************************
  *                          Extern Function Definitions
  *******************************************************************************/
-
-/**
- * @brief Global/extern function template example
- * Convention : Use capital letter for initial word on extern function
- * @param arg
- */
-ezlopi_error_t sensor_0040_other_TCS230(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+ezlopi_error_t SENSOR_0040_other_tcs230(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
     switch (action)
@@ -128,14 +121,9 @@ ezlopi_error_t sensor_0040_other_TCS230(e_ezlopi_actions_t action, l_ezlopi_item
 }
 
 /*******************************************************************************
- *                          Static Function Definitions
+ *                         Static Function Definitions
  *******************************************************************************/
-static ezlopi_error_t __tcs230_setup_gpio(gpio_num_t s0_pin,
-    gpio_num_t s1_pin,
-    gpio_num_t s2_pin,
-    gpio_num_t s3_pin,
-    gpio_num_t gpio_output_en,
-    gpio_num_t gpio_pulse_output)
+static ezlopi_error_t __tcs230_setup_gpio(gpio_num_t s0_pin, gpio_num_t s1_pin, gpio_num_t s2_pin, gpio_num_t s3_pin, gpio_num_t gpio_output_en, gpio_num_t gpio_pulse_output)
 {
     ezlopi_error_t ret = EZPI_FAILED;
     // Configure GPIO ouput pins (S0, S1, S2, S3 & Freq_scale) for TCS230.
@@ -166,7 +154,6 @@ static ezlopi_error_t __tcs230_setup_gpio(gpio_num_t s0_pin,
     }
     return ret;
 }
-
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     device->cloud_properties.category = category_generic_sensor;
@@ -178,7 +165,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
 
 static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, void *user_data)
 {
-    item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
+    item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
     item->cloud_properties.item_name = ezlopi_item_name_rgbcolor;
@@ -187,7 +174,6 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, void *user_da
     item->cloud_properties.scale = NULL;
     item->user_arg = user_data;
 }
-
 static void __prepare_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj_device)
 {
     if (item && cj_device)
@@ -216,11 +202,11 @@ static ezlopi_error_t __0040_prepare(void *arg)
         s_TCS230_data_t *user_data = (s_TCS230_data_t *)ezlopi_malloc(__FUNCTION__, sizeof(s_TCS230_data_t));
         if (user_data)
         {
-            l_ezlopi_device_t *tcs230_device = ezlopi_device_add_device(cj_device, NULL);
+            l_ezlopi_device_t *tcs230_device = EZPI_core_device_add_device(cj_device, NULL);
             if (tcs230_device)
             {
                 __prepare_device_cloud_properties(tcs230_device, cj_device);
-                l_ezlopi_item_t *tcs230_item = ezlopi_device_add_item_to_device(tcs230_device, sensor_0040_other_TCS230);
+                l_ezlopi_item_t *tcs230_item = EZPI_core_device_add_item_to_device(tcs230_device, SENSOR_0040_other_tcs230);
                 if (tcs230_item)
                 {
                     __prepare_item_cloud_properties(tcs230_item, user_data);
@@ -229,7 +215,7 @@ static ezlopi_error_t __0040_prepare(void *arg)
                 }
                 else
                 {
-                    ezlopi_device_free_device(tcs230_device);
+                    EZPI_core_device_free_device(tcs230_device);
                     ezlopi_free(__FUNCTION__, user_data);
                 }
             }
@@ -258,22 +244,28 @@ static ezlopi_error_t __0040_init(l_ezlopi_item_t *item)
                 GPIO_IS_VALID_GPIO(user_data->TCS230_pin.gpio_pulse_output))
             {
                 if (EZPI_SUCCESS == __tcs230_setup_gpio(user_data->TCS230_pin.gpio_s0,
-                    user_data->TCS230_pin.gpio_s1,
-                    user_data->TCS230_pin.gpio_s2,
-                    user_data->TCS230_pin.gpio_s3,
-                    user_data->TCS230_pin.gpio_output_en,
-                    user_data->TCS230_pin.gpio_pulse_output))
+                                                        user_data->TCS230_pin.gpio_s1,
+                                                        user_data->TCS230_pin.gpio_s2,
+                                                        user_data->TCS230_pin.gpio_s3,
+                                                        user_data->TCS230_pin.gpio_output_en,
+                                                        user_data->TCS230_pin.gpio_pulse_output))
                 {
-                    TRACE_W("Entering Calibration Phase for 30 seconds.....");
+                    TRACE_W("Entering Calibration Phase .......");
 
                     // configure Freq_scale at 20%
-                    tcs230_set_frequency_scaling(item, COLOR_SENSOR_FREQ_SCALING_20_PERCENT);
+                    TCS230_set_frequency_scaling(item, COLOR_SENSOR_FREQ_SCALING_20_PERCENT);
 
-                    TaskHandle_t ezlopi_sensor_tcs230_callibration_task_handle = NULL;
+                    // TaskHandle_t ezlopi_sensor_tcs230_callibration_task_handle = NULL;
 
                     // activate a task to calibrate data
-                    xTaskCreate(__tcs230_calibration_task, "TCS230_Calibration_Task", EZLOPI_SENSOR_TCS230_CALLIBRATION_TASK_DEPTH, item, 1, &ezlopi_sensor_tcs230_callibration_task_handle);
-                    ezlopi_core_process_set_process_info(ENUM_EZLOPI_SENSOR_TCS230_CALLIBRATION_TASK, &ezlopi_sensor_tcs230_callibration_task_handle, EZLOPI_SENSOR_TCS230_CALLIBRATION_TASK_DEPTH);
+                    // xTaskCreate(__tcs230_calibration_task, "TCS230_Calibration_Task", EZLOPI_SENSOR_TCS230_CALLIBRATION_TASK_DEPTH, item, 1, &ezlopi_sensor_tcs230_callibration_task_handle);
+                    if (false == user_data->calibration_complete)
+                    {
+                        __tcs230_calibration_task(item);
+                    }
+                    // #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
+                    //                     EZPI_core_process_set_process_info(ENUM_EZLOPI_SENSOR_TCS230_CALLIBRATION_TASK, &ezlopi_sensor_tcs230_callibration_task_handle, EZLOPI_SENSOR_TCS230_CALLIBRATION_TASK_DEPTH);
+                    // #endif
                     ret = EZPI_SUCCESS;
                 }
             }
@@ -319,7 +311,7 @@ static ezlopi_error_t __0040_notify(l_ezlopi_item_t *item)
             uint32_t red = user_data->red_mapped;
             uint32_t green = user_data->green_mapped;
             uint32_t blue = user_data->blue_mapped;
-            bool valid_status = get_tcs230_sensor_value(item); // Informs and updates if valid data
+            bool valid_status = TCS230_get_sensor_value(item); // Informs and updates if valid data
             if (valid_status)
             {
                 if (fabs(red - user_data->red_mapped) > 10 ||
@@ -331,7 +323,7 @@ static ezlopi_error_t __0040_notify(l_ezlopi_item_t *item)
                     TRACE_S("Green :%d", user_data->green_mapped);
                     TRACE_S("Blue : %d", user_data->blue_mapped);
                     TRACE_S("---------------------------------------");
-                    ezlopi_device_value_updated_from_device_broadcast(item);
+                    EZPI_core_device_value_updated_from_device_broadcast(item);
                     ret = EZPI_SUCCESS;
                 }
             }
@@ -347,7 +339,7 @@ static void __tcs230_calibration_task(void *params) // calibration task
     if (item)
     { // extracting the 'user_args' from "item"
         s_TCS230_data_t *user_data = (s_TCS230_data_t *)item->user_arg;
-        if (user_data)
+        if (user_data && false == user_data->calibration_complete)
         {
 #if 0
             //--------------------------------------------------
@@ -359,8 +351,8 @@ static void __tcs230_calibration_task(void *params) // calibration task
                 vTaskDelay(1000 / portTICK_PERIOD_MS); // 4sec
             }
             // choose  RED filter
-            tcs230_set_filter_color(item, COLOR_SENSOR_COLOR_RED);
-            calculate_max_min_color_values(user_data->TCS230_pin.gpio_output_en,
+            TCS230_set_filter_color(item, COLOR_SENSOR_COLOR_RED);
+            TCS230_get_maxmin_color_values(user_data->TCS230_pin.gpio_output_en,
                 user_data->TCS230_pin.gpio_pulse_output,
                 &user_data->calib_data.least_red_timeP,
                 &user_data->calib_data.most_red_timeP);
@@ -374,8 +366,8 @@ static void __tcs230_calibration_task(void *params) // calibration task
                 vTaskDelay(1000 / portTICK_PERIOD_MS); // 4sec
             }
             // choose GREEN filter
-            tcs230_set_filter_color(item, COLOR_SENSOR_COLOR_GREEN);
-            calculate_max_min_color_values(user_data->TCS230_pin.gpio_output_en,
+            TCS230_set_filter_color(item, COLOR_SENSOR_COLOR_GREEN);
+            TCS230_get_maxmin_color_values(user_data->TCS230_pin.gpio_output_en,
                 user_data->TCS230_pin.gpio_pulse_output,
                 &user_data->calib_data.least_green_timeP,
                 &user_data->calib_data.most_green_timeP);
@@ -389,8 +381,8 @@ static void __tcs230_calibration_task(void *params) // calibration task
                 vTaskDelay(1000 / portTICK_PERIOD_MS); // 4sec
             }
             // choose BLUE filter
-            tcs230_set_filter_color(item, COLOR_SENSOR_COLOR_BLUE);
-            calculate_max_min_color_values(user_data->TCS230_pin.gpio_output_en,
+            TCS230_set_filter_color(item, COLOR_SENSOR_COLOR_BLUE);
+            TCS230_get_maxmin_color_values(user_data->TCS230_pin.gpio_output_en,
                 user_data->TCS230_pin.gpio_pulse_output,
                 &user_data->calib_data.least_blue_timeP,
                 &user_data->calib_data.most_blue_timeP);
@@ -414,8 +406,10 @@ static void __tcs230_calibration_task(void *params) // calibration task
             user_data->calibration_complete = true;
         }
     }
-    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SENSOR_TCS230_CALLIBRATION_TASK);
-    vTaskDelete(NULL);
+    // #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
+    //     EZPI_core_process_set_is_deleted(ENUM_EZLOPI_SENSOR_TCS230_CALLIBRATION_TASK);
+    // #endif
+    // vTaskDelete(NULL);
 }
 
 /*******************************************************************************

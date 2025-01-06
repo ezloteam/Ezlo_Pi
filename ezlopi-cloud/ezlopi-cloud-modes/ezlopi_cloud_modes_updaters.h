@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2022 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -30,13 +30,12 @@
 */
 
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
- * @version 0.1
- * @date    1st January 2024
+ * @file    ezlopi_cloud_modes_updaters.h
+ * @brief
+ * @author
+ * @version
+ * @date
  */
-
 #ifndef __EZLOPI_CLOUD_MODES_UPDATERS_H__
 #define __EZLOPI_CLOUD_MODES_UPDATERS_H__
 
@@ -44,7 +43,6 @@
  *                          Include Files
  *******************************************************************************/
 #include "cjext.h"
-#include "EZLOPI_USER_CONFIG.h"
 
 #if defined(CONFIG_EZPI_SERV_ENABLE_MODES)
 
@@ -67,38 +65,161 @@ extern "C"
     /*******************************************************************************
      *                          Extern Function Prototypes
      *******************************************************************************/
+
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
+     * @brief Updater function for modes switched
      *
+     * @param cj_request incoming JSON request
+     * @param cj_response Outgoing JSON response
      */
-    void ezlopi_cloud_modes_switched(cJSON *cj_request, cJSON *cj_response);
-    void ezlopi_cloud_modes_alarmed(cJSON *cj_request, cJSON *cj_response);
-    void ezlopi_cloud_modes_changed_alarmed(cJSON *cj_request, cJSON *cj_response);
-    void ezlopi_cloud_modes_notifications_notify_all(cJSON *cj_request, cJSON *cj_response);
-    void ezlopi_cloud_modes_notifications_added(cJSON *cj_request, cJSON *cj_response);
-    void ezlopi_cloud_modes_notifications_removed(cJSON *cj_request, cJSON *cj_response);
-    void ezlopi_cloud_modes_disarmed_devices_added(cJSON *cj_request, cJSON *cj_response);
-    void ezlopi_cloud_modes_disarmed_devices_removed(cJSON *cj_request, cJSON *cj_response);
-    void ezlopi_cloud_modes_alarms_off_added(cJSON *cj_request, cJSON *cj_response);
-    void ezlopi_cloud_modes_alarms_off_removed(cJSON *cj_request, cJSON *cj_response);
-    void ezlopi_cloud_modes_cameras_off_added(cJSON *cj_request, cJSON *cj_response);
-    void ezlopi_cloud_modes_cameras_off_removed(cJSON *cj_request, cJSON *cj_response);
-    void ezlopi_cloud_modes_bypass_devices_added(cJSON *cj_request, cJSON *cj_response);
-    void ezlopi_cloud_modes_bypass_devices_removed(cJSON *cj_request, cJSON *cj_response);
-    void ezlopi_cloud_modes_changed(cJSON *cj_request, cJSON *cj_response);
-    void ezlopi_cloud_modes_protect_buttons_added(cJSON *cj_request, cJSON *cj_response);
-    void ezlopi_cloud_modes_protect_buttons_updated(cJSON *cj_request, cJSON *cj_response);
-    void ezlopi_cloud_modes_protect_buttons_removed(cJSON *cj_request, cJSON *cj_response);
-    void ezlopi_cloud_modes_protect_button_set_broadcast(cJSON *cj_request, cJSON *cj_response);
-    void ezlopi_cloud_modes_protect_devices_added(cJSON *cj_request, cJSON *cj_response);
-    void ezlopi_cloud_modes_protect_devices_removed(cJSON *cj_request, cJSON *cj_response);
-    void ezlopi_cloud_modes_entry_delay_changed(cJSON *cj_request, cJSON *cj_response);
+    void EZPI_cloud_modes_switched(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Updater function for modes alarmed
+     *
+     * @param cj_request incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_cloud_modes_alarmed(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Updater function for modes changed alarmed
+     *
+     * @param cj_request incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_cloud_modes_changed_alarmed(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Updater function for modes notifications notify all
+     *
+     * @param cj_request incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_cloud_modes_notifications_notify_all(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Updater function for modes notifications added
+     *
+     * @param cj_request incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_cloud_modes_notifications_added(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Updater function for modes notifications removed
+     *
+     * @param cj_request incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_cloud_modes_notifications_removed(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Updater function for modes disarmed devices added
+     *
+     * @param cj_request incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_cloud_modes_disarmed_devices_added(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Updater function for modes disarmed devices removed
+     *
+     * @param cj_request incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_cloud_modes_disarmed_devices_removed(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Updater function for modes alarms off added
+     *
+     * @param cj_request incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_cloud_modes_alarms_off_added(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Updater function for modes alarms off removed
+     *
+     * @param cj_request incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_cloud_modes_alarms_off_removed(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Updater function for modes cameras off added
+     *
+     * @param cj_request incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_cloud_modes_cameras_off_added(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Updater function for modes cameras off removed
+     *
+     * @param cj_request incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_cloud_modes_cameras_off_removed(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Updater function for modes bypass added
+     *
+     * @param cj_request incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_cloud_modes_bypass_devices_added(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Updater function for modes bypass removed
+     *
+     * @param cj_request incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_cloud_modes_bypass_devices_removed(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Updater function for modes changed
+     *
+     * @param cj_request incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_cloud_modes_changed(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Updater function for modes protect buttons added
+     *
+     * @param cj_request incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_cloud_modes_protect_buttons_added(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Updater function for modes protect buttons updated
+     *
+     * @param cj_request incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_cloud_modes_protect_buttons_updated(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Updater function for modes protect buttons removed
+     *
+     * @param cj_request incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_cloud_modes_protect_buttons_removed(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Updater function for modes protect button set broadcast
+     *
+     * @param cj_request incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_cloud_modes_protect_button_set_broadcast(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Updater function for modes protect devices added
+     *
+     * @param cj_request incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_cloud_modes_protect_devices_added(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Updater function for modes protect devices removed
+     *
+     * @param cj_request incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_cloud_modes_protect_devices_removed(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Updater function for modes entry delay changed
+     *
+     * @param cj_request incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_cloud_modes_entry_delay_changed(cJSON *cj_request, cJSON *cj_response);
 
 #ifdef __cplusplus
 }

@@ -28,13 +28,12 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_hal_gpio.c
+ * @brief   perform some function on GPIO
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    xx
  */
 
 /*******************************************************************************
@@ -42,7 +41,6 @@
  *******************************************************************************/
 // #include "ezlopi_hal_gpio.h"
 // #include "ezlopi_core_devices.h"
-
 /*******************************************************************************
  *                          Extern Data Declarations
  *******************************************************************************/
@@ -71,11 +69,6 @@
  *                          Extern Function Definitions
  *******************************************************************************/
 
-/**
- * @brief Global/extern function template example
- * Convention : Use capital letter for initial word on extern function
- * @param arg
- */
 // int ezlopi_gpio_init(s_ezlopi_device_properties_t *properties)
 // {
 //     int ret = 0;
@@ -126,7 +119,7 @@
 // }
 
 /*******************************************************************************
- *                          Static Function Definitions
+ *                         Static Function Definitions
  *******************************************************************************/
 
 /*******************************************************************************

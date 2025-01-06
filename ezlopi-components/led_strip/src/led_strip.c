@@ -31,7 +31,7 @@
   * MIT Licensed as described in the file LICENSE
   */
 #include "led_strip.h"
-#include <esp_log.h>
+#include "esp_log.h"
 #include <esp_attr.h>
 #include <stdlib.h>
 #ifdef CONFIG_IDF_TARGET_ESP32S3

@@ -28,13 +28,12 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_hal_gpio.h
+ * @brief   perform some function on GPIO
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    xx
  */
 
 #ifndef _EZLOPI_HAL_GPIO_H_
@@ -43,6 +42,7 @@
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
+
 #include <stdio.h>
 #include "driver/gpio.h"
 
@@ -57,6 +57,7 @@ extern "C"
     /*******************************************************************************
      *                          Type & Macro Declarations
      *******************************************************************************/
+
     typedef gpio_num_t e_ezlopi_gpio_num_t;
     typedef gpio_mode_t e_ezlopi_gpio_mode_t;
     typedef gpio_pull_mode_t e_ezlopi_gpio_pull_mode_t;
@@ -100,17 +101,8 @@ extern "C"
     /*******************************************************************************
      *                          Extern Function Prototypes
      *******************************************************************************/
-    /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
-     *
-     */
-//  int ezlopi_gpio_init(s_ezlopi_device_properties_t *properties);
+
+    // int ezlopi_gpio_init(s_ezlopi_device_properties_t *properties);
 
 #ifdef __cplusplus
 }

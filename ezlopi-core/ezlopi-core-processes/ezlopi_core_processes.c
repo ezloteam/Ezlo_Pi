@@ -28,13 +28,12 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_core_processes.c
+ * @brief   Function to perform operation on ezlopi-process/task
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    12th DEC 2024
  */
 
 /*******************************************************************************
@@ -52,7 +51,6 @@
 #include "ezlopi_core_processes.h"
 
 #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
-
 /*******************************************************************************
  *                          Extern Data Declarations
  *******************************************************************************/
@@ -69,11 +67,14 @@ typedef struct
     TaskHandle_t task_handle;
     size_t stack_depth;
     bool is_deleted;
-}s_ezlopi_task_info_t;
+} s_ezlopi_task_info_t;
 
 /*******************************************************************************
  *                          Static Function Prototypes
  *******************************************************************************/
+static size_t __set_default_task_memory_usage(const char *default_task_name);
+static bool __check_ezlopi_task(TaskHandle_t task_handle);
+static void __set_task_to_arry(cJSON *cj_processes_array);
 
 /*******************************************************************************
  *                          Static Data Definitions
@@ -87,13 +88,50 @@ static s_ezlopi_task_info_t ezlopi_task_info_array[ENUM_TASK_MAX];
 /*******************************************************************************
  *                          Extern Function Definitions
  *******************************************************************************/
+int ezlopi_core_get_processes_details(cJSON *cj_processes_array)
+{
+    int ret = 0;
+    if (cj_processes_array && cj_processes_array->type == cJSON_Array)
+    {
+        __set_task_to_arry(cj_processes_array);
+        UBaseType_t total_task_numbers = uxTaskGetNumberOfTasks();
+        TRACE_E("Total tasks existing are: %d", total_task_numbers);
 
-/**
- * @brief Global/extern function template example
- * Convention : Use capital letter for initial word on extern function
- * @param arg
- */
-int ezlopi_core_process_set_process_info(e_ezlopi_task_enum_t task_num, TaskHandle_t* task_handle, size_t task_depth)
+        TaskStatus_t task_array[total_task_numbers];
+        uxTaskGetSystemState(task_array, total_task_numbers, NULL);
+
+        for (int i = 0; i < total_task_numbers; i++)
+        {
+            if (!__check_ezlopi_task(task_array[i].xHandle))
+            {
+                cJSON *cj_process = cJSON_CreateObject(__FUNCTION__);
+                if (cj_process)
+                {
+                    cJSON_AddNumberToObject(__FUNCTION__, cj_process, "pid", task_array[i].xTaskNumber);
+                    cJSON_AddStringToObject(__FUNCTION__, cj_process, "processName", task_array[i].pcTaskName);
+                    size_t default_task_stack_size = __set_default_task_memory_usage(task_array[i].pcTaskName);
+                    if (default_task_stack_size != 0)
+                    {
+                        cJSON_AddNumberToObject(__FUNCTION__, cj_process, "memoryUsage", default_task_stack_size);
+                        if (default_task_stack_size != 0)
+                        {
+                            cJSON_AddNumberToObject(__FUNCTION__, cj_process, "vmRss", (default_task_stack_size - task_array[i].usStackHighWaterMark));
+                        }
+                        cJSON_AddStringToObject(__FUNCTION__, cj_process, "units", "bytes");
+                        cJSON_AddItemToArray(cj_processes_array, cj_process);
+                    }
+                }
+            }
+        }
+    }
+    else
+    {
+        ret = 1;
+    }
+    return ret;
+}
+
+int EZPI_core_process_set_process_info(e_ezlopi_task_enum_t task_num, TaskHandle_t *task_handle, size_t task_depth)
 {
     int ret = 0;
     if (task_handle && *task_handle)
@@ -106,7 +144,7 @@ int ezlopi_core_process_set_process_info(e_ezlopi_task_enum_t task_num, TaskHand
     return ret;
 }
 
-int ezlopi_core_process_set_is_deleted(e_ezlopi_task_enum_t task_num)
+int EZPI_core_process_set_is_deleted(e_ezlopi_task_enum_t task_num)
 {
     int ret = 0;
     if (ezlopi_task_info_array[task_num].task_handle)
@@ -119,9 +157,10 @@ int ezlopi_core_process_set_is_deleted(e_ezlopi_task_enum_t task_num)
 }
 
 /*******************************************************************************
- *                          Static Function Definitions
+ *                         Static Function Definitions
  *******************************************************************************/
-static size_t set_default_task_memory_usage(const char* default_task_name)
+
+static size_t __set_default_task_memory_usage(const char *default_task_name)
 {
     size_t stack_size = 0;
     if (NULL != default_task_name)
@@ -166,7 +205,7 @@ static size_t set_default_task_memory_usage(const char* default_task_name)
     return stack_size;
 }
 
-static bool ezlopi_core_check_ezlopi_task(TaskHandle_t task_handle)
+static bool __check_ezlopi_task(TaskHandle_t task_handle)
 {
     bool ret = false;
     int ezlopi_task_info_array_size = ENUM_TASK_MAX;
@@ -182,13 +221,13 @@ static bool ezlopi_core_check_ezlopi_task(TaskHandle_t task_handle)
     return ret;
 }
 
-static void ezlopi_set_ezlopi_task_to_arry(cJSON* cj_processes_array)
+static void __set_task_to_arry(cJSON *cj_processes_array)
 {
     for (int i = 0; i < ENUM_TASK_MAX; i++)
     {
         if (!ezlopi_task_info_array[i].is_deleted && ezlopi_task_info_array[i].task_handle)
         {
-            cJSON* cj_process = cJSON_CreateObject(__FUNCTION__);
+            cJSON *cj_process = cJSON_CreateObject(__FUNCTION__);
             if (cj_process)
             {
                 TaskStatus_t task_details;
@@ -204,51 +243,7 @@ static void ezlopi_set_ezlopi_task_to_arry(cJSON* cj_processes_array)
     }
 }
 
-int ezlopi_core_get_processes_details(cJSON* cj_processes_array)
-{
-    int ret = 0;
-    if (cj_processes_array && cj_processes_array->type == cJSON_Array)
-    {
-        ezlopi_set_ezlopi_task_to_arry(cj_processes_array);
-        UBaseType_t total_task_numbers = uxTaskGetNumberOfTasks();
-        TRACE_E("Total tasks existing are: %d", total_task_numbers);
-
-        TaskStatus_t task_array[total_task_numbers];
-        uxTaskGetSystemState(task_array, total_task_numbers, NULL);
-
-        for (int i = 0; i < total_task_numbers; i++)
-        {
-            if (!ezlopi_core_check_ezlopi_task(task_array[i].xHandle))
-            {
-                cJSON* cj_process = cJSON_CreateObject(__FUNCTION__);
-                if (cj_process)
-                {
-                    cJSON_AddNumberToObject(__FUNCTION__, cj_process, "pid", task_array[i].xTaskNumber);
-                    cJSON_AddStringToObject(__FUNCTION__, cj_process, "processName", task_array[i].pcTaskName);
-                    size_t default_task_stack_size = set_default_task_memory_usage(task_array[i].pcTaskName);
-                    if (default_task_stack_size != 0)
-                    {
-                        cJSON_AddNumberToObject(__FUNCTION__, cj_process, "memoryUsage", default_task_stack_size);
-                        if (default_task_stack_size != 0)
-                        {
-                            cJSON_AddNumberToObject(__FUNCTION__, cj_process, "vmRss", (default_task_stack_size - task_array[i].usStackHighWaterMark));
-                        }
-                        cJSON_AddStringToObject(__FUNCTION__, cj_process, "units", "bytes");
-                        cJSON_AddItemToArray(cj_processes_array, cj_process);
-                    }
-                }
-            }
-        }
-    }
-    else
-    {
-        ret = 1;
-    }
-    return ret;
-}
-
 #endif // CONFIG_FREERTOS_USE_TRACE_FACILITY
-
 /*******************************************************************************
  *                          End of File
  *******************************************************************************/

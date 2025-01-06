@@ -28,13 +28,12 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    gxhtc3.c
+ * @brief   perform some function on gxhtc3
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    xx
  */
 
 /*******************************************************************************
@@ -78,12 +77,6 @@ static bool gxhtc3_read_id(s_gxhtc3_sensor_handler_t *handler);
 /*******************************************************************************
  *                          Extern Function Definitions
  *******************************************************************************/
-
-/**
- * @brief Global/extern function template example
- * Convention : Use capital letter for initial word on extern function
- * @param arg
- */
 bool gxhtc3_wake_sensor(s_gxhtc3_sensor_handler_t *handler)
 {
     bool ret = true;
@@ -96,6 +89,7 @@ bool gxhtc3_wake_sensor(s_gxhtc3_sensor_handler_t *handler)
     }
     return ret;
 }
+
 bool gxhtc3_sleep_sensor(s_gxhtc3_sensor_handler_t *handler)
 {
     bool ret = true;
@@ -205,7 +199,7 @@ s_gxhtc3_sensor_handler_t *GXHTC3_init(int32_t i2c_ch_num, uint8_t i2c_slave_add
 }
 
 /*******************************************************************************
- *                          Static Function Definitions
+ *                         Static Function Definitions
  *******************************************************************************/
 static uint8_t gxhtc3_get_crc8(uint8_t *data, int len)
 {
@@ -220,7 +214,7 @@ static uint8_t gxhtc3_get_crc8(uint8_t *data, int len)
         {
             bool xor = crc & 0x80;
             crc = crc << 1;
-            crc = xor ? crc ^ crc_poly : crc;
+            crc = xor? crc ^ crc_poly : crc;
         }
     }
 
@@ -244,7 +238,7 @@ static bool gxhtc3_send_command(s_gxhtc3_sensor_handler_t *handler, uint16_t cmd
     bool ret = true;
     if (handler)
     {
-        uint8_t data[2] = { cmd >> 8, cmd & 0xff };
+        uint8_t data[2] = {cmd >> 8, cmd & 0xff};
         esp_err_t err = i2c_master_write_to_device(handler->i2c_ch_num, handler->i2c_slave_addr, data, 2, GXHTC3_I2C_TIMEOUT);
         if (err != ESP_OK)
         {

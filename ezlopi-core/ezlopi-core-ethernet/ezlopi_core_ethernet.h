@@ -28,14 +28,13 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_core_ethernet.h
+ * @brief   Function to perform operation on ethernet module
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
- */
+ * @date    12th DEC 2024
+*/
 
 #ifndef _EZLOPI_CORE_ETHERNET_H_
 #define _EZLOPI_CORE_ETHERNET_H_
@@ -43,34 +42,34 @@
 #ifdef CONFIG_EZPI_CORE_ENABLE_ETH
 
 /*******************************************************************************
- *                          Include Files
- *******************************************************************************/
+*                          Include Files
+*******************************************************************************/
 
 /*******************************************************************************
- *                          C++ Declaration Wrapper
- *******************************************************************************/
+*                          C++ Declaration Wrapper
+*******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
     /*******************************************************************************
-     *                          Type & Macro Declarations
-     *******************************************************************************/
-    #if (EZLOPI_AMBIENT_TRACKER_PRO_REV_A == EZLOPI_BOARD_TYPE)
-    #define EZLOPI_ETHERNET_W5500_EN_PIN 13
-    #define EZLOPI_ETHERNET_W5500_RST_PIN 11
-    #define EZLOPI_ETHERNET_W5500_INTR_PIN 12
-    #define EZLOPI_ETHERNET_W5500_SPI_MOSI_PIN 2
-    #define EZLOPI_ETHERNET_W5500_SPI_MISO_PIN 1
-    #define EZLOPI_ETHERNET_W5500_SPI_SCLK_PIN 4
-    #define EZLOPI_ETHERNET_W5500_SPI_CS_PIN 5
-    #define EZLOPI_ETHERNET_W5500_SPI_HOST EZLOPI_SPI_2
-    #define EZLOPI_ETHERNET_W5500_SPI_CMD_BITS 16
-    #define EZLOPI_ETHERNET_W5500_SPI_ADDR_BITS 8
-    #define EZLOPI_ETHERNET_W5500_SPI_CLOCK_MHZ 12 // 12 MHz
-    #define EZLOPI_ETHERNET_W5500_PHY_ADDR -1
-    #endif
+    *                          Type & Macro Declarations
+    *******************************************************************************/
+#if (EZLOPI_AMBIENT_TRACKER_PRO_REV_A == EZLOPI_BOARD_TYPE)
+#define EZLOPI_ETHERNET_W5500_EN_PIN 13
+#define EZLOPI_ETHERNET_W5500_RST_PIN 11
+#define EZLOPI_ETHERNET_W5500_INTR_PIN 12
+#define EZLOPI_ETHERNET_W5500_SPI_MOSI_PIN 2
+#define EZLOPI_ETHERNET_W5500_SPI_MISO_PIN 1
+#define EZLOPI_ETHERNET_W5500_SPI_SCLK_PIN 4
+#define EZLOPI_ETHERNET_W5500_SPI_CS_PIN 5
+#define EZLOPI_ETHERNET_W5500_SPI_HOST EZLOPI_SPI_2
+#define EZLOPI_ETHERNET_W5500_SPI_CMD_BITS 16
+#define EZLOPI_ETHERNET_W5500_SPI_ADDR_BITS 8
+#define EZLOPI_ETHERNET_W5500_SPI_CLOCK_MHZ 12 // 12 MHz
+#define EZLOPI_ETHERNET_W5500_PHY_ADDR -1
+#endif
 
     typedef enum e_ethernet_status
     {
@@ -84,27 +83,37 @@ extern "C"
 
     } e_ethernet_status_t;
 
-    /*******************************************************************************
-     *                          Extern Data Declarations
-     *******************************************************************************/
 
     /*******************************************************************************
-     *                          Extern Function Prototypes
-     *******************************************************************************/
+    *                          Extern Data Declarations
+    *******************************************************************************/
+
+    /*******************************************************************************
+    *                          Extern Function Prototypes
+    *******************************************************************************/
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
+     * @brief Funtion to initialize ethernet
      *
      */
-    void ezlopi_ethernet_init(void);
-    void ezlopi_ethernet_deinit(void);
-    e_ethernet_status_t ezlopi_ethernet_get_status(void);
-    esp_netif_ip_info_t* ezlopi_ethernet_get_ip_info(void);
+    void EZPI_ethernet_init(void);
+    /**
+     * @brief Function to deinitialize ethernet service from the system
+     *
+     */
+    void EZPI_ethernet_deinit(void);
+    /**
+     * @brief Function to return ethernet status
+     *
+     * @return e_ethernet_status_t
+     */
+    e_ethernet_status_t EZPI_core_ethernet_get_status(void);
+    /**
+     * @brief Function to get IP info from ethernet
+     *
+     * @return esp_netif_ip_info_t*
+     */
+    esp_netif_ip_info_t *EZPI_core_ethernet_get_ip_info(void);
+
 
 #ifdef __cplusplus
 }
@@ -115,5 +124,5 @@ extern "C"
 #endif // _EZLOPI_CORE_ETHERNET_H_
 
 /*******************************************************************************
- *                          End of File
- *******************************************************************************/
+*                          End of File
+*******************************************************************************/

@@ -28,13 +28,12 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
  * @file    main.c
  * @brief   perform some function on data
- * @author  John Doe
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    xx
  */
 
 /*******************************************************************************
@@ -81,7 +80,8 @@ static ezlopi_error_t __0042_prepare(void *arg);
 static ezlopi_error_t __0042_init(l_ezlopi_item_t *item);
 static ezlopi_error_t __0042_get_cjson_value(l_ezlopi_item_t *item, void *arg);
 static ezlopi_error_t __0042_notify(l_ezlopi_item_t *item);
-
+static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
+static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_data);
 /*******************************************************************************
  *                          Static Data Definitions
  *******************************************************************************/
@@ -93,13 +93,7 @@ static ezlopi_error_t __0042_notify(l_ezlopi_item_t *item);
 /*******************************************************************************
  *                          Extern Function Definitions
  *******************************************************************************/
-
-/**
- * @brief Global/extern function template example
- * Convention : Use capital letter for initial word on extern function
- * @param arg
- */
-ezlopi_error_t sensor_0042_ADC_shunt_voltmeter(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+ezlopi_error_t SENSOR_0042_adc_shunt_voltmeter(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
     switch (action)
@@ -134,7 +128,7 @@ ezlopi_error_t sensor_0042_ADC_shunt_voltmeter(e_ezlopi_actions_t action, l_ezlo
 }
 
 /*******************************************************************************
- *                          Static Function Definitions
+ *                         Static Function Definitions
  *******************************************************************************/
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
@@ -147,7 +141,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
 
 static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_data)
 {
-    item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
+    item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
     item->cloud_properties.item_name = ezlopi_item_name_voltage;
@@ -175,11 +169,11 @@ static ezlopi_error_t __0042_prepare(void *arg)
         {
             memset(user_data, 0, sizeof(s_voltmeter_t));
 
-            l_ezlopi_device_t *voltmeter_device = ezlopi_device_add_device(device_prep_arg->cjson_device, NULL);
+            l_ezlopi_device_t *voltmeter_device = EZPI_core_device_add_device(device_prep_arg->cjson_device, NULL);
             if (voltmeter_device)
             {
                 __prepare_device_cloud_properties(voltmeter_device, device_prep_arg->cjson_device);
-                l_ezlopi_item_t *voltmeter_item = ezlopi_device_add_item_to_device(voltmeter_device, sensor_0042_ADC_shunt_voltmeter);
+                l_ezlopi_item_t *voltmeter_item = EZPI_core_device_add_item_to_device(voltmeter_device, SENSOR_0042_adc_shunt_voltmeter);
                 if (voltmeter_item)
                 {
                     __prepare_item_cloud_properties(voltmeter_item, device_prep_arg->cjson_device, user_data);
@@ -187,7 +181,7 @@ static ezlopi_error_t __0042_prepare(void *arg)
                 }
                 else
                 {
-                    ezlopi_device_free_device(voltmeter_device);
+                    EZPI_core_device_free_device(voltmeter_device);
                     ezlopi_free(__FUNCTION__, user_data);
                 }
             }
@@ -199,7 +193,6 @@ static ezlopi_error_t __0042_prepare(void *arg)
     }
     return ret;
 }
-
 static ezlopi_error_t __0042_init(l_ezlopi_item_t *item)
 {
     ezlopi_error_t ret = EZPI_ERR_INIT_DEVICE_FAILED;
@@ -211,7 +204,7 @@ static ezlopi_error_t __0042_init(l_ezlopi_item_t *item)
             if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num))
             {
                 // initialize analog_pin
-                if (EZPI_SUCCESS == ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
+                if (EZPI_SUCCESS == EZPI_hal_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
                 {
                     ret = EZPI_SUCCESS;
                 }
@@ -220,7 +213,6 @@ static ezlopi_error_t __0042_init(l_ezlopi_item_t *item)
     }
     return ret;
 }
-
 static ezlopi_error_t __0042_get_cjson_value(l_ezlopi_item_t *item, void *arg)
 {
     ezlopi_error_t ret = EZPI_FAILED;
@@ -233,9 +225,9 @@ static ezlopi_error_t __0042_get_cjson_value(l_ezlopi_item_t *item, void *arg)
             if (user_data)
             {
 #if VOLTAGE_DIVIDER_EN
-                ezlopi_valueformatter_float_to_cjson(cj_result, (user_data->volt) * 9.52f, item->cloud_properties.scale);
+                EZPI_core_valueformatter_float_to_cjson(cj_result, (user_data->volt) * 9.52f, item->cloud_properties.scale);
 #else
-                ezlopi_valueformatter_float_to_cjson(cj_result, (user_data->volt) * 4.2f, item->cloud_properties.scale);
+                EZPI_core_valueformatter_float_to_cjson(cj_result, (user_data->volt) * 4.2f, item->cloud_properties.scale);
 #endif
                 ret = EZPI_SUCCESS;
             }
@@ -243,7 +235,6 @@ static ezlopi_error_t __0042_get_cjson_value(l_ezlopi_item_t *item, void *arg)
     }
     return ret;
 }
-
 static ezlopi_error_t __0042_notify(l_ezlopi_item_t *item)
 {
     ezlopi_error_t ret = EZPI_FAILED;
@@ -252,14 +243,14 @@ static ezlopi_error_t __0042_notify(l_ezlopi_item_t *item)
         s_voltmeter_t *user_data = (s_voltmeter_t *)item->user_arg;
         if (user_data)
         {
-            s_ezlopi_analog_data_t ezlopi_analog_data = { .value = 0, .voltage = 0 };
-            ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &ezlopi_analog_data);
+            s_ezlopi_analog_data_t ezlopi_analog_data = {.value = 0, .voltage = 0};
+            EZPI_hal_adc_get_adc_data(item->interface.adc.gpio_num, &ezlopi_analog_data);
             float Vout = (ezlopi_analog_data.voltage) / 1000.0f; // millivolt -> voltage
 
             if (fabs(Vout - (user_data->volt)) > 0.5)
             {
                 user_data->volt = Vout;
-                ezlopi_device_value_updated_from_device_broadcast(item);
+                EZPI_core_device_value_updated_from_device_broadcast(item);
                 ret = EZPI_SUCCESS;
             }
         }

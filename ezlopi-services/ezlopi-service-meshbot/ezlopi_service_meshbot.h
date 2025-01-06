@@ -30,13 +30,12 @@
 */
 
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
- * @version 0.1
- * @date    1st January 2024
+ * @file    ezlopi_service_meshbot.h
+ * @brief
+ * @author
+ * @version
+ * @date
  */
-
 #ifndef _EZLOPI_SERVICE_MESHBOT_H_
 #define _EZLOPI_SERVICE_MESHBOT_H_
 
@@ -45,7 +44,6 @@
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
-#include <stdint.h>
 
 #include "ezlopi_core_scenes_v2.h"
 
@@ -68,25 +66,57 @@ extern "C"
     /*******************************************************************************
      *                          Extern Function Prototypes
      *******************************************************************************/
+
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
+     * @brief Function to initialize meshbot service
+     * @details Following operations are performed by the function
+     *  - Prepares data structures for scene node
+     *  - Adds function loop for meshbot
      *
      */
-    void ezlopi_scenes_meshbot_init(void);
-    uint32_t ezlopi_scenes_service_run_by_id(uint32_t _id);
-    uint32_t ezlopi_meshbot_service_start_scene(l_scenes_list_v2_t *scene_node);
-
-    ezlopi_error_t ezlopi_meshbot_stop_without_broadcast(l_scenes_list_v2_t *scene_node);
-    uint32_t ezlopi_meshbot_service_stop_for_scene_id(uint32_t _id);
-    uint32_t ezlopi_meshobot_service_stop_scene(l_scenes_list_v2_t *scene_node);
-
-    uint32_t ezlopi_meshbot_execute_scene_else_action_group(uint32_t scene_id);
+    void EZPI_scenes_meshbot_init(void);
+    /**
+     * @brief Function to run the scene identified by id
+     *
+     * @param[in] _id id of the scene to run
+     * @return uint32_t
+     */
+    uint32_t EZPI_scenes_service_run_by_id(uint32_t _id);
+    /**
+     * @brief Function to start scene provided
+     *
+     * @param[in] scene_node Pointer to the scene node to run
+     * @return uint32_t
+     */
+    uint32_t EZPI_meshbot_service_start_scene(l_scenes_list_v2_t *scene_node);
+    /**
+     * @brief Function to staop the meshbot service without broadcast sending to the cloud
+     *
+     * @param[in] scene_node Pointer to the scene node to run
+     * @return ezlopi_error_t
+     */
+    ezlopi_error_t EZPI_meshbot_stop_without_broadcast(l_scenes_list_v2_t *scene_node);
+    /**
+     * @brief Function to stop meshbot service for specific scene identified by id
+     *
+     * @param[in] _id id of the scene to stop meshbot for
+     * @return uint32_t
+     */
+    uint32_t EZPI_meshbot_service_stop_for_scene_id(uint32_t _id);
+    /**
+     * @brief Function to stop the meshbot service for the scene provided
+     *
+     * @param[in] scene_node Pointer to the scene node to run
+     * @return uint32_t
+     */
+    uint32_t EZPI_meshobot_service_stop_scene(l_scenes_list_v2_t *scene_node);
+    /**
+     * @brief Function to execute else action group for a scene
+     *
+     * @param[in] scene_id Pointer to the scene node to run
+     * @return uint32_t
+     */
+    uint32_t EZPI_meshbot_execute_scene_else_action_group(uint32_t scene_id);
 
 #ifdef __cplusplus
 }
@@ -95,7 +125,6 @@ extern "C"
 #endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 #endif // _EZLOPI_SERVICE_MESHBOT_H_
-
 /*******************************************************************************
  *                          End of File
  *******************************************************************************/

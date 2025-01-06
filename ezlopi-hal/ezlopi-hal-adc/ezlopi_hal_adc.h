@@ -28,13 +28,12 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_hal_adc.h
+ * @brief   perform some function on ADC
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    xx
  */
 
 #ifndef _EZLOPI_ADC_H_
@@ -59,8 +58,10 @@ extern "C"
     /*******************************************************************************
      *                          Type & Macro Declarations
      *******************************************************************************/
-    #if CONFIG_IDF_TARGET_ESP32
-    typedef enum e_ezlopi_gpio_channel {
+
+#if CONFIG_IDF_TARGET_ESP32
+    typedef enum e_ezlopi_gpio_channel
+    {
         EZLOPI_GPIO_CHANNEL_0 = 36,
         EZLOPI_GPIO_CHANNEL_1 = 37,
         EZLOPI_GPIO_CHANNEL_2 = 38,
@@ -70,41 +71,45 @@ extern "C"
         EZLOPI_GPIO_CHANNEL_6 = 34,
         EZLOPI_GPIO_CHANNEL_7 = 35,
         EZLOPI_GPIO_CHANNEL_MAX
-    }e_ezlopi_gpio_channel_t;
-    #elif CONFIG_IDF_TARGET_ESP32S3 ||  CONFIG_IDF_TARGET_ESP32S2
-    typedef enum e_ezlopi_gpio_channel {
-        EZLOPI_GPIO_CHANNEL_0 = 1,
-        EZLOPI_GPIO_CHANNEL_1 = 2,
-        EZLOPI_GPIO_CHANNEL_2 = 3,
-        EZLOPI_GPIO_CHANNEL_3 = 4,
-        EZLOPI_GPIO_CHANNEL_4 = 5,
-        EZLOPI_GPIO_CHANNEL_5 = 6,
-        EZLOPI_GPIO_CHANNEL_6 = 7,
-        EZLOPI_GPIO_CHANNEL_7 = 8,
-        EZLOPI_GPIO_CHANNEL_8 = 9,
-        EZLOPI_GPIO_CHANNEL_9 = 10,
-        EZLOPI_GPIO_CHANNEL_MAX
-    }e_ezlopi_gpio_channel_t;
-    #elif CONFIG_IDF_TARGET_ESP32C3
-    typedef enum e_ezlopi_gpio_channel {
-        EZLOPI_GPIO_CHANNEL_0 = 0,
-        EZLOPI_GPIO_CHANNEL_1 = 1,
-        EZLOPI_GPIO_CHANNEL_2 = 2,
-        EZLOPI_GPIO_CHANNEL_3 = 3,
-        EZLOPI_GPIO_CHANNEL_4 = 4,
-        EZLOPI_GPIO_CHANNEL_MAX
-    }e_ezlopi_gpio_channel_t;
-    #endif
+    } e_ezlopi_gpio_channel_t;
+#elif CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32S2
+typedef enum e_ezlopi_gpio_channel
+{
+    EZLOPI_GPIO_CHANNEL_0 = 1,
+    EZLOPI_GPIO_CHANNEL_1 = 2,
+    EZLOPI_GPIO_CHANNEL_2 = 3,
+    EZLOPI_GPIO_CHANNEL_3 = 4,
+    EZLOPI_GPIO_CHANNEL_4 = 5,
+    EZLOPI_GPIO_CHANNEL_5 = 6,
+    EZLOPI_GPIO_CHANNEL_6 = 7,
+    EZLOPI_GPIO_CHANNEL_7 = 8,
+    EZLOPI_GPIO_CHANNEL_8 = 9,
+    EZLOPI_GPIO_CHANNEL_9 = 10,
+    EZLOPI_GPIO_CHANNEL_MAX
+} e_ezlopi_gpio_channel_t;
+#elif CONFIG_IDF_TARGET_ESP32C3
+typedef enum e_ezlopi_gpio_channel
+{
+    EZLOPI_GPIO_CHANNEL_0 = 0,
+    EZLOPI_GPIO_CHANNEL_1 = 1,
+    EZLOPI_GPIO_CHANNEL_2 = 2,
+    EZLOPI_GPIO_CHANNEL_3 = 3,
+    EZLOPI_GPIO_CHANNEL_4 = 4,
+    EZLOPI_GPIO_CHANNEL_MAX
+} e_ezlopi_gpio_channel_t;
+#endif
 
-    typedef struct s_ezlopi_analog_data {
+    typedef struct s_ezlopi_analog_data
+    {
         uint32_t value;
         uint32_t voltage;
-    }s_ezlopi_analog_data_t;
+    } s_ezlopi_analog_data_t;
 
-    typedef struct s_ezlopi_adc {
+    typedef struct s_ezlopi_adc
+    {
         int gpio_num;
         uint8_t resln_bit;
-    }s_ezlopi_adc_t;
+    } s_ezlopi_adc_t;
 
     /*******************************************************************************
      *                          Extern Data Declarations
@@ -113,20 +118,30 @@ extern "C"
     /*******************************************************************************
      *                          Extern Function Prototypes
      *******************************************************************************/
-    /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
-     *
-     */
-    ezlopi_error_t ezlopi_adc_init(uint8_t gpio_num, uint8_t width);
-    int ezlopi_adc_get_adc_data(uint8_t gpio_num, s_ezlopi_analog_data_t* ezlopi_analog_data);
-    int ezlopi_adc_get_channel_number(uint8_t gpio_num);
 
+    /**
+     * @brief Function to initialize adc pin
+     *
+     * @param gpio_num Target pin to setup as ADC
+     * @param width ADC resolution width
+     * @return ezlopi_error_t
+     */
+    ezlopi_error_t EZPI_hal_adc_init(uint8_t gpio_num, uint8_t width);
+    /**
+     * @brief Function to get adc data
+     *
+     * @param gpio_num GPIO-pin number
+     * @param ezlopi_analog_data Pointer to structure containing req adc data
+     * @return int
+     */
+    int EZPI_hal_adc_get_adc_data(uint8_t gpio_num, s_ezlopi_analog_data_t *ezlopi_analog_data);
+    /**
+     * @brief Function to get channel of corresponding PIN
+     *
+     * @param gpio_num Target GPIO pin
+     * @return int
+     */
+    int EZPI_hal_adc_get_channel_number(uint8_t gpio_num);
 
 #ifdef __cplusplus
 }
@@ -137,5 +152,3 @@ extern "C"
 /*******************************************************************************
  *                          End of File
  *******************************************************************************/
-
-

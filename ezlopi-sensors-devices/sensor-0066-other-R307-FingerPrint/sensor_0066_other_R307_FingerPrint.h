@@ -28,13 +28,12 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    sensor_0066_other_R307_FingerPrint.h
+ * @brief   perform some function on sensor_0066
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    xx
  */
 
 #ifndef _SENSOR_0066_OTHER_R307_FINGERPRINT_H_
@@ -43,8 +42,10 @@
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
+#include <string.h>
 #include <stdbool.h>
-#include <stdint.h>
+#include <time.h>
+#include "esp_timer.h"
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -66,116 +67,118 @@ extern "C"
     /*******************************************************************************
      *                          Type & Macro Declarations
      *******************************************************************************/
-    #define FINGERPRINT_MAX_CAPACITY_LIMIT 5                                   // !< Setting the max quantity of fingerprints allowed to be stored >
-    #define FINGERPRINT_STARTING_USER_PAGE_ID 1                                // !< Setting the starting USER/PAGE ID >
-    #define MAX_PACKET_LENGTH_VAL 64                                           // !< Setting the max length of the transferring data package >
-    #define FINGERPRINT_UART_BAUDRATE ((int)FINGERPRINT_BAUDRATE_57600 * 9600) // !< Setting Baudrate for transferring data via uart >
-    //-----------------------------------------------------------------------------------------------------------
-    // Step 1: List the instructions cmds
-    #define FINGERPRINT_GETIMAGE 0x01       //!< Collect finger image
-    #define FINGERPRINT_IMAGE2TZ 0x02       //!< Generate character file from image
-    #define FINGERPRINT_MATCH 0x03          //!< Carry out precise matching of two templates
-    #define FINGERPRINT_SEARCH 0x04         //!< Search for fingerprint in slot/library
-    #define FINGERPRINT_REGMODEL 0x05       //!< Combine character files and generate template
-    #define FINGERPRINT_STORE 0x06          //!< Store template
-    #define FINGERPRINT_LOAD 0x07           //!< Read/load template
-    #define FINGERPRINT_UPLOAD_TEMP 0x08    //!< Upload template
-    #define FINGERPRINT_DOWNLOAD_TEMP 0x09  //!< Download template
-    #define FINGERPRINT_UPLOAD_IMG 0x0A     //!< Upload image
-    #define FINGERPRINT_DOWNLOAD_IMG 0x0B   //!< Download image
-    #define FINGERPRINT_DELETE 0x0C         //!< Delete templates
-    #define FINGERPRINT_EMPTY 0x0D          //!< Empty library
-    #define FINGERPRINT_SETSYSPARAM 0x0E    //!< Set system parameters [status register]
-    #define FINGERPRINT_READSYSPARAM 0x0F   //!< Read system parameters [status register]
-    #define FINGERPRINT_SETPASSWORD 0x12    //!< Sets passwords
-    #define FINGERPRINT_VERIFYPASSWORD 0x13 //!< Verifies the password
-    #define FINGERPRINT_SETADDRESS 0x15     //!< Set Address of the module [change 0xffffff]
-    #define FINGERPRINT_PORTCONTROL 0x17    //!< Control Port [On / Off]
-    #define FINGERPRINT_HISPEEDSEARCH 0x1B  //!< Asks the sensor to search [fastly] for a matching fingerprint template to the last model generated
-    #define FINGERPRINT_TEMPLATENUM 0x1D    //!< Read finger template numbers
-    #define FINGERPRINT_GR_IDENTIFY 0x34    //!< Automatic collect fingerprint, match captured fingerprint with fingerprint library
-    /*Fingerprint_LED CONFIGURATIONS*/
-    #define FINGERPRINT_AURALEDCONFIG 0x35 //!< Aura LED control
-    #define FINGERPRINT_LED_BREATHING 0x01 //!< Turns On ;Breathing light
-    #define FINGERPRINT_LED_BLUE 0x02      //!< Blue LED
-    #define FINGERPRINT_LED_OFF 0x04       //!< Turns OFF ; LED
-    //---------------------------------------------------------------------
-    // Step 2: Ack CMDS
-    #define ACK_OK 0x00               //: commad execution complete;
-    #define ACK_ERR_RECV 0x01         //: error when receiving data package;
-    #define ACK_ERR_DETECT_FP 0x02    //: no finger on the sensor;
-    #define ACK_ERR_ENROLL_FP 0x03    //: fail to enroll the finger;
-    #define ACK_ERR_DIS_FP 0x06       //: fail to generate character file due to the over-disorderly fingerprint image;
-    #define ACK_ERR_SMALL_FP 0x07     //: fail to generate character file due to lackness of character point or over-smallness of fingerprint image
-    #define ACK_ERR_MATCH 0x08        //: finger doesn’t match;
-    #define ACK_ERR_NO_LIB_MATCH 0x09 //: fail to find the matching finger in library (both the PageID and matching score are 0);
-    #define ACK_ERR_CMB_CHRFILE 0x0A  //: fail to combine the character files;
-    #define ACK_ERR_ID_BYND_LIB 0x0B  //: Addressed PageID is beyond the finger library;
-    #define ACK_ERR_LOAD_CHR 0x0C     //: error when reading template from flash library to => character_file/template buffer [CharBuffer1/CharBuffer2];
-    #define ACK_ERR_UP_CHR 0x0D       //: error when uploading character_file or template to computer;
-    #define ACK_ERR_DWN_IMG_CHR 0x0E  //: error when downloading image/template from computer;
-    #define ACK_ERR_UP_IMG 0x0F       //: error when uploading image to computer;
-    #define ACK_ERR_DEL 0x10          //: fail to delete the template;
-    #define ACK_ERR_CLR 0x11          //: fail to clear finger library;
-    #define ACK_ERR_WRONG_PASS 0x13   //: wrong password!
-    #define ACK_ERR_PRIM_IMG 0x15     //: fail to generate the image for the lackness of valid primary image;
-    #define ACK_ERR_STORE 0x18        //: error when writing/storing template into flash library;
-    #define ACK_ERR_WRNG_REGS 0x1A    //: wrong resgister number;
-    #define ACK_ERR_CONFIG 0x1B       //: incorrect configuration of register;
-    #define ACK_ERR_PAGE 0x1C         //: wrong notepad page number;
-    #define ACK_ERR_OP_FAIL 0x1D      //: fail to operate the communication port;
-    #define ACK_ERR_DUP_FP 0x45       //: Duplicate fingerprint
 
-    #if 0
+    //-----------------------------------------------------------------------------------------------------------
+#define FINGERPRINT_MAX_CAPACITY_LIMIT 5                                   // !< Setting the max quantity of fingerprints allowed to be stored >
+#define FINGERPRINT_STARTING_USER_PAGE_ID 1                                // !< Setting the starting USER/PAGE ID >
+#define MAX_PACKET_LENGTH_VAL 64                                           // !< Setting the max length of the transferring data package >
+#define FINGERPRINT_UART_BAUDRATE ((int)FINGERPRINT_BAUDRATE_57600 * 9600) // !< Setting Baudrate for transferring data via uart >
+//-----------------------------------------------------------------------------------------------------------
+// Step 1: List the instructions cmds
+#define FINGERPRINT_GETIMAGE 0x01       //!< Collect finger image
+#define FINGERPRINT_IMAGE2TZ 0x02       //!< Generate character file from image
+#define FINGERPRINT_MATCH 0x03          //!< Carry out precise matching of two templates
+#define FINGERPRINT_SEARCH 0x04         //!< Search for fingerprint in slot/library
+#define FINGERPRINT_REGMODEL 0x05       //!< Combine character files and generate template
+#define FINGERPRINT_STORE 0x06          //!< Store template
+#define FINGERPRINT_LOAD 0x07           //!< Read/load template
+#define FINGERPRINT_UPLOAD_TEMP 0x08    //!< Upload template
+#define FINGERPRINT_DOWNLOAD_TEMP 0x09  //!< Download template
+#define FINGERPRINT_UPLOAD_IMG 0x0A     //!< Upload image
+#define FINGERPRINT_DOWNLOAD_IMG 0x0B   //!< Download image
+#define FINGERPRINT_DELETE 0x0C         //!< Delete templates
+#define FINGERPRINT_EMPTY 0x0D          //!< Empty library
+#define FINGERPRINT_SETSYSPARAM 0x0E    //!< Set system parameters [status register]
+#define FINGERPRINT_READSYSPARAM 0x0F   //!< Read system parameters [status register]
+#define FINGERPRINT_SETPASSWORD 0x12    //!< Sets passwords
+#define FINGERPRINT_VERIFYPASSWORD 0x13 //!< Verifies the password
+#define FINGERPRINT_SETADDRESS 0x15     //!< Set Address of the module [change 0xffffff]
+#define FINGERPRINT_PORTCONTROL 0x17    //!< Control Port [On / Off]
+#define FINGERPRINT_HISPEEDSEARCH 0x1B  //!< Asks the sensor to search [fastly] for a matching fingerprint template to the last model generated
+#define FINGERPRINT_TEMPLATENUM 0x1D    //!< Read finger template numbers
+#define FINGERPRINT_GR_IDENTIFY 0x34    //!< Automatic collect fingerprint, match captured fingerprint with fingerprint library
+/*Fingerprint_LED CONFIGURATIONS*/
+#define FINGERPRINT_AURALEDCONFIG 0x35 //!< Aura LED control
+#define FINGERPRINT_LED_BREATHING 0x01 //!< Turns On ;Breathing light
+#define FINGERPRINT_LED_BLUE 0x02      //!< Blue LED
+#define FINGERPRINT_LED_OFF 0x04       //!< Turns OFF ; LED
+//---------------------------------------------------------------------
+// Step 2: Ack CMDS
+#define ACK_OK 0x00               //: commad execution complete;
+#define ACK_ERR_RECV 0x01         //: error when receiving data package;
+#define ACK_ERR_DETECT_FP 0x02    //: no finger on the sensor;
+#define ACK_ERR_ENROLL_FP 0x03    //: fail to enroll the finger;
+#define ACK_ERR_DIS_FP 0x06       //: fail to generate character file due to the over-disorderly fingerprint image;
+#define ACK_ERR_SMALL_FP 0x07     //: fail to generate character file due to lackness of character point or over-smallness of fingerprint image
+#define ACK_ERR_MATCH 0x08        //: finger doesn’t match;
+#define ACK_ERR_NO_LIB_MATCH 0x09 //: fail to find the matching finger in library (both the PageID and matching score are 0);
+#define ACK_ERR_CMB_CHRFILE 0x0A  //: fail to combine the character files;
+#define ACK_ERR_ID_BYND_LIB 0x0B  //: Addressed PageID is beyond the finger library;
+#define ACK_ERR_LOAD_CHR 0x0C     //: error when reading template from flash library to => character_file/template buffer [CharBuffer1/CharBuffer2];
+#define ACK_ERR_UP_CHR 0x0D       //: error when uploading character_file or template to computer;
+#define ACK_ERR_DWN_IMG_CHR 0x0E  //: error when downloading image/template from computer;
+#define ACK_ERR_UP_IMG 0x0F       //: error when uploading image to computer;
+#define ACK_ERR_DEL 0x10          //: fail to delete the template;
+#define ACK_ERR_CLR 0x11          //: fail to clear finger library;
+#define ACK_ERR_WRONG_PASS 0x13   //: wrong password!
+#define ACK_ERR_PRIM_IMG 0x15     //: fail to generate the image for the lackness of valid primary image;
+#define ACK_ERR_STORE 0x18        //: error when writing/storing template into flash library;
+#define ACK_ERR_WRNG_REGS 0x1A    //: wrong resgister number;
+#define ACK_ERR_CONFIG 0x1B       //: incorrect configuration of register;
+#define ACK_ERR_PAGE 0x1C         //: wrong notepad page number;
+#define ACK_ERR_OP_FAIL 0x1D      //: fail to operate the communication port;
+#define ACK_ERR_DUP_FP 0x45       //: Duplicate fingerprint
+
+#if 0
     // #define ACK_ERR_ 0x41 //: No finger on sensor when add fingerprint on second time.
     // #define ACK_ERR_ 0x42 //: fail to enroll the finger for second fingerprint add.
     // #define ACK_ERR_ 0x43 //: fail to generate character file ; lackness of character_point or over-smallness of second fingerprint image
     // #define ACK_ERR_ 0x44 //: fail to generate character file due to the over-disorderly fingerprint image for second fingerprint add;
-    #endif
-    //---------------------------------------------------------------------
-    // !< BAUDRATE Baudrate_control_register
-    #define FINGERPRINT_BAUDRATE_CONTROL 0x04 //!< Targets the baudrate control register
-    #define FINGERPRINT_BAUDRATE_57600 0x06   //!< UART baud 57600
+#endif
+//---------------------------------------------------------------------
+// !< BAUDRATE Baudrate_control_register
+#define FINGERPRINT_BAUDRATE_CONTROL 0x04 //!< Targets the baudrate control register
+#define FINGERPRINT_BAUDRATE_57600 0x06   //!< UART baud 57600
 
-    // !< BAUDRATE Security_control_register
-    #define FINGERPRINT_SECURITY_LEVEL 0x05 //!< Targets the security level register
-    #define FINGERPRINT_SECURITY_1 0x01     //!< Searching and matching security level 1
-    #define FINGERPRINT_SECURITY_2 0x02     //!< Searching and matching security level 2
-    #define FINGERPRINT_SECURITY_3 0x03     //!< Searching and matching security level 3
-    #define FINGERPRINT_SECURITY_4 0x04     //!< Searching and matching security level 4
-    #define FINGERPRINT_SECURITY_5 0x05     //!< Searching and matching security level 5
-    // !< BAUDRATE Datalength_control register
-    #define FINGERPRINT_DATA_PACKAGE_LENGTH 0x06 //!< Targets the Package length register
-    #define FINGERPRINT_DATA_LENGTH_32 0x00      //!< Max length of the transmitted data package = 32 bytes
-    #define FINGERPRINT_DATA_LENGTH_64 0x01      //!< Max length of the transmitted data package = 64 bytes
-    #define FINGERPRINT_DATA_LENGTH_128 0x02     //!< Max length of the transmitted data package = 128 bytes
-    #define FINGERPRINT_DATA_LENGTH_256 0x03     //!< Max length of the transmitted data package = 256 bytes
-    //----------------------------------------------------------------------------------------------------------------
-    // !< PACKET FORMAT
-    //----------------------------------------------------------------------------------------------------------------
-    // !< Packet Header Value >
-    #define FINGERPRINT_HEADER_MSB 0xEF //!< Fixed falue of EF01H; High byte transferred first
-    #define FINGERPRINT_HEADER_LSB 0x01 //!< Fixed falue of EF01H; High byte transferred first
-    // !< Packet Scanner Module Address [Default Value] >
-    #define FINGERPRINT_DEVICE_ADDR_BIT 0xFF //!< Fixed falue of 0xFFH; High byte transferred first
-    // !< PACKET TYPES:- [Packet Identifier codes] >
-    #define FINGERPRINT_PID_COMMANDPACKET 0x01 //!< Command packet
-    #define FINGERPRINT_PID_DATAPACKET 0x02    //!< Data packet, must follow command packet or acknowledge packet
-    #define FINGERPRINT_PID_ACKPACKET 0x07     //!< Acknowledge packet
-    #define FINGERPRINT_PID_ENDDATAPACKET 0x08 //!< End of data packet
-    //----------------------------------------------------------------------------------------------------------------
-    // !< SYSTEM STATUS/CONDITIONS
-    //----------------------------------------------------------------------------------------------------------------
-    #define SYSTEM_FREE (uint16_t)(0 << 0)             //!< system is free
-    #define SYSTEM_BUSY (uint16_t)(1 << 0)             //!< system is busy
-    #define SYSTEM_FINGERPRINT_PASS (uint16_t)(1 << 1) //!< matching fingerprint found
-    #define SYSTEM_HNDSHK_VERIFIED (uint16_t)(1 << 2)  //!< [0xFF] handshaking password verified
-    #define SYSTEM_IMGBUF_VALID (uint16_t)(1 << 3)     //!< imagebuffer doesnot have a valid image
-    //----------------------------------------------------------------------------------------------------------------
-    #define UART_PORT_ON (uint8_t)1  //!< Uart port is ON
-    #define UART_PORT_OFF (uint8_t)0 //!< Uart port is OFF
-    //----------------------------------------------------------------------------------------------------------------
-    // !< Custom enum for status response after executing a command >
+// !< BAUDRATE Security_control_register
+#define FINGERPRINT_SECURITY_LEVEL 0x05 //!< Targets the security level register
+#define FINGERPRINT_SECURITY_1 0x01     //!< Searching and matching security level 1
+#define FINGERPRINT_SECURITY_2 0x02     //!< Searching and matching security level 2
+#define FINGERPRINT_SECURITY_3 0x03     //!< Searching and matching security level 3
+#define FINGERPRINT_SECURITY_4 0x04     //!< Searching and matching security level 4
+#define FINGERPRINT_SECURITY_5 0x05     //!< Searching and matching security level 5
+// !< BAUDRATE Datalength_control register
+#define FINGERPRINT_DATA_PACKAGE_LENGTH 0x06 //!< Targets the Package length register
+#define FINGERPRINT_DATA_LENGTH_32 0x00      //!< Max length of the transmitted data package = 32 bytes
+#define FINGERPRINT_DATA_LENGTH_64 0x01      //!< Max length of the transmitted data package = 64 bytes
+#define FINGERPRINT_DATA_LENGTH_128 0x02     //!< Max length of the transmitted data package = 128 bytes
+#define FINGERPRINT_DATA_LENGTH_256 0x03     //!< Max length of the transmitted data package = 256 bytes
+//----------------------------------------------------------------------------------------------------------------
+// !< PACKET FORMAT
+//----------------------------------------------------------------------------------------------------------------
+// !< Packet Header Value >
+#define FINGERPRINT_HEADER_MSB 0xEF //!< Fixed falue of EF01H; High byte transferred first
+#define FINGERPRINT_HEADER_LSB 0x01 //!< Fixed falue of EF01H; High byte transferred first
+// !< Packet Scanner Module Address [Default Value] >
+#define FINGERPRINT_DEVICE_ADDR_BIT 0xFF //!< Fixed falue of 0xFFH; High byte transferred first
+// !< PACKET TYPES:- [Packet Identifier codes] >
+#define FINGERPRINT_PID_COMMANDPACKET 0x01 //!< Command packet
+#define FINGERPRINT_PID_DATAPACKET 0x02    //!< Data packet, must follow command packet or acknowledge packet
+#define FINGERPRINT_PID_ACKPACKET 0x07     //!< Acknowledge packet
+#define FINGERPRINT_PID_ENDDATAPACKET 0x08 //!< End of data packet
+//----------------------------------------------------------------------------------------------------------------
+// !< SYSTEM STATUS/CONDITIONS
+//----------------------------------------------------------------------------------------------------------------
+#define SYSTEM_FREE (uint16_t)(0 << 0)             //!< system is free
+#define SYSTEM_BUSY (uint16_t)(1 << 0)             //!< system is busy
+#define SYSTEM_FINGERPRINT_PASS (uint16_t)(1 << 1) //!< matching fingerprint found
+#define SYSTEM_HNDSHK_VERIFIED (uint16_t)(1 << 2)  //!< [0xFF] handshaking password verified
+#define SYSTEM_IMGBUF_VALID (uint16_t)(1 << 3)     //!< imagebuffer doesnot have a valid image
+//----------------------------------------------------------------------------------------------------------------
+#define UART_PORT_ON (uint8_t)1  //!< Uart port is ON
+#define UART_PORT_OFF (uint8_t)0 //!< Uart port is OFF
+                                 //----------------------------------------------------------------------------------------------------------------
+                                 // !< Custom enum for status response after executing a command >
     typedef enum fingerprint_status
     {
         FINGERPRINT_FAIL = 0,
@@ -209,7 +212,7 @@ extern "C"
         volatile e_fingerprint_op_mode_t opmode;                    /* Hold current operation mode*/
         volatile bool __busy_guard;                                 /* Gaurd_flag used during notification actions*/
         volatile bool notify_flag;                                  /* It triggers a reply after set_action*/
-        int intr_pin;                                           /* Stores custom interrupt pin num*/
+        int intr_pin;                                               /* Stores custom interrupt pin num*/
         uint16_t confidence_level;                                  /* 0~100*/
         uint16_t matched_confidence_level;                          /* Used to store most recently matched confidence*/
         uint16_t user_id;                                           /* Stores: Template or character_page ID (0~999)*/
@@ -230,29 +233,29 @@ extern "C"
     /*******************************************************************************
      *                          Extern Function Prototypes
      *******************************************************************************/
-    /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
-     *
-     */
-    ezlopi_error_t sensor_0066_other_R307_FingerPrint(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
+    /**
+     * @brief Function to operate on actions
+     *
+     * @param action Current Action to Operate on
+     * @param item Target-Item node
+     * @param arg Arg for action
+     * @param user_arg User-arg
+     * @return ezlopi_error_t
+     */
+    ezlopi_error_t SENSOR_0066_other_r307_fingerprint(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
     //-------------------------------------------------------------------------------------------------------------------
     //  FUNCTIONS Defination for Fingerprint Library
     //-------------------------------------------------------------------------------------------------------------------
-    #if 0
-    // bool UpImage(int uart_channel_num, uint8_t *recieved_buffer, uint32_t timeout);
-    // bool DownImage(int uart_channel_num, uint8_t *recieved_buffer, uint32_t timeout);
-    // bool SetPwd(int uart_channel_num, uint32_t new_password, uint8_t *recieved_buffer, uint32_t timeout);
-    // bool UpChar(int uart_channel_num, uint8_t CharBufferID, uint8_t *recieved_buffer, uint32_t timeout);
-    // bool DownChar(int uart_channel_num, uint8_t CharBufferID, uint8_t *recieved_buffer, uint32_t timeout);
-    #endif
+
+#if 0
+// bool UpImage(int uart_channel_num, uint8_t *recieved_buffer, uint32_t timeout);
+// bool DownImage(int uart_channel_num, uint8_t *recieved_buffer, uint32_t timeout);
+// bool SetPwd(int uart_channel_num, uint32_t new_password, uint8_t *recieved_buffer, uint32_t timeout);
+// bool UpChar(int uart_channel_num, uint8_t CharBufferID, uint8_t *recieved_buffer, uint32_t timeout);
+// bool DownChar(int uart_channel_num, uint8_t CharBufferID, uint8_t *recieved_buffer, uint32_t timeout);
+#endif
 
     /**
      * @brief #### This function delete all the templates in the Flash library.
@@ -525,6 +528,8 @@ extern "C"
      * @return [succcess='true'] & [failure='false']
      */
     bool r307_as606_wait_till_system_free(l_ezlopi_item_t *item, uint32_t timeout);
+
+    //-------------------------------------------------------------------------------------------------------------------
 
 #ifdef __cplusplus
 }

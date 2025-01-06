@@ -69,7 +69,7 @@
 /*******************************************************************************
  *                          Static Function Prototypes
  *******************************************************************************/
-static void ezpi_subcomponent_functiontitle( type_t arg );
+static void ezpi_subcomponent_functiontitle(type_t arg);
 
 /*******************************************************************************
  *                          Static Data Definitions
@@ -82,13 +82,12 @@ static void ezpi_subcomponent_functiontitle( type_t arg );
 /*******************************************************************************
  *                          Extern Function Definitions
  *******************************************************************************/
-
 /**
  * @brief Global/extern function template example
  * Convention : Use capital letters for initial word on extern functions
  * @param arg
  */
-void EZPI_maincomponent_subcomponent_functiontitle( type_t arg )
+void EZPI_maincomponent_subcomponent_functiontitle(type_t arg)
 {
     // func defintion here
 }
@@ -102,7 +101,7 @@ void EZPI_maincomponent_subcomponent_functiontitle( type_t arg )
  * Convention : Use lowercase letters for all words on static functions
  * @param arg
  */
-static void ezpi_subcomponent_functiontitle( type_t arg )
+static void ezpi_subcomponent_functiontitle(type_t arg)
 {
 }
 

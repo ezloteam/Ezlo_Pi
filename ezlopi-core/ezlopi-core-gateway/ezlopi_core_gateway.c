@@ -28,22 +28,19 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_core_gateway.c
+ * @brief   Function to operate on gateway
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    12th DEC 2024
  */
 
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
 #include <stdbool.h>
-
 #include "ezlopi_core_gateway.h"
-
 #include "ezlopi_cloud_constants.h"
 
 /*******************************************************************************
@@ -99,19 +96,13 @@ static s_ezlopi_gateway_t ezlopi_gateway = {
 /*******************************************************************************
  *                          Extern Function Definitions
  *******************************************************************************/
-
-/**
- * @brief Global/extern function template example
- * Convention : Use capital letter for initial word on extern function
- * @param arg
- */
-s_ezlopi_gateway_t *ezlopi_gateway_get(void)
+s_ezlopi_gateway_t *EZPI_core_gateway_get(void)
 {
     return &ezlopi_gateway;
 }
 
 /*******************************************************************************
- *                          Static Function Definitions
+ *                         Static Function Definitions
  *******************************************************************************/
 
 /*******************************************************************************

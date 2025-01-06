@@ -28,18 +28,18 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_hal_spi_master.c
+ * @brief   perform some function on SPI
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    xx
  */
 
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
+
 #include "../../build/config/sdkconfig.h"
 #include "esp_intr_alloc.h"
 
@@ -82,7 +82,7 @@ typedef enum e_spi_state
 /*******************************************************************************
  *                          Static Data Definitions
  *******************************************************************************/
-static e_spi_state_t spi_port_status[3] = { SPI_UNINITIALIZED, SPI_UNINITIALIZED, SPI_UNINITIALIZED };
+static e_spi_state_t spi_port_status[3] = {SPI_UNINITIALIZED, SPI_UNINITIALIZED, SPI_UNINITIALIZED};
 
 /*******************************************************************************
  *                          Extern Data Definitions
@@ -92,12 +92,7 @@ static e_spi_state_t spi_port_status[3] = { SPI_UNINITIALIZED, SPI_UNINITIALIZED
  *                          Extern Function Definitions
  *******************************************************************************/
 
-/**
- * @brief Global/extern function template example
- * Convention : Use capital letter for initial word on extern function
- * @param arg
- */
-ezlopi_error_t ezlopi_spi_master_init(s_ezlopi_spi_master_t* spi_config)
+ezlopi_error_t EZPI_hal_spi_master_init(s_ezlopi_spi_master_t *spi_config)
 {
     ezlopi_error_t ret = EZPI_ERR_HAL_INIT_FAILED;
 
@@ -147,25 +142,29 @@ ezlopi_error_t ezlopi_spi_master_init(s_ezlopi_spi_master_t* spi_config)
     return ret;
 }
 
-int ezlopi_spi_master_deinit(s_ezlopi_spi_master_t* spi_config)
+int EZPI_hal_spi_master_deinit(s_ezlopi_spi_master_t *spi_config)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_ERR_HAL_INIT_FAILED;
 
     if (NULL != spi_config)
     {
         if (SPI_INITIALIZED == spi_port_status[spi_config->channel])
         {
-            spi_bus_remove_device(spi_config->handle);
+            if (ESP_OK != spi_bus_remove_device(spi_config->handle))
+            {
+                TRACE_E("SPI-master 'spi_bus_de-initialize' failed!");
+            }
             spi_config->handle = NULL;
             spi_port_status[spi_config->channel] = SPI_UNINITIALIZED;
         }
+        ret = EZPI_SUCCESS;
     }
 
     return ret;
 }
 
 /*******************************************************************************
- *                          Static Function Definitions
+ *                         Static Function Definitions
  *******************************************************************************/
 
 /*******************************************************************************

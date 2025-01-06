@@ -28,13 +28,12 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_hal_i2c_master.h
+ * @brief   perform some function on I2C
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    xx
  */
 
 #ifndef _EZLOPI_HAL_I2C_MASTER_H_
@@ -58,6 +57,10 @@ extern "C"
     /*******************************************************************************
      *                          Type & Macro Declarations
      *******************************************************************************/
+
+#define EZLOPI_I2C_MASTER_DEFAULT_CONF \
+    {                                  \
+        .sda = 9, .scl = 10, .clock_speed = 100000, .channel = EZLOPI_I2C_0}
     typedef enum e_ezlopi_i2c_channel
     {
         EZLOPI_I2C_0 = 0,
@@ -75,10 +78,6 @@ extern "C"
         uint32_t address;
     } s_ezlopi_i2c_master_t;
 
-    #define EZLOPI_I2C_MASTER_DEFAULT_CONF \
-        {                                  \
-            .sda = 9, .scl = 10, .clock_speed = 100000, .channel = EZLOPI_I2C_0}
-
     /*******************************************************************************
      *                          Extern Data Declarations
      *******************************************************************************/
@@ -87,20 +86,37 @@ extern "C"
      *                          Extern Function Prototypes
      *******************************************************************************/
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
+     * @brief Function to initialize I2C
      *
+     * @param i2c_master_conf Configuration info
+     * @return ezlopi_error_t
      */
-    ezlopi_error_t ezlopi_i2c_master_init(s_ezlopi_i2c_master_t *i2c_master_conf);
-    void ezlopi_i2c_master_deinit(s_ezlopi_i2c_master_t *i2c_master_conf);
-    esp_err_t ezlopi_i2c_master_write_to_device(s_ezlopi_i2c_master_t *i2c_master_conf, uint8_t *write_buffer, uint32_t write_len);
-    esp_err_t ezlopi_i2c_master_read_from_device(s_ezlopi_i2c_master_t *i2c_master_conf, uint8_t *read_buffer, uint32_t read_len);
+    ezlopi_error_t EZPI_hal_i2c_master_init(s_ezlopi_i2c_master_t *i2c_master_conf);
+    /**
+     * @brief Function to de-initialize I2C
+     *
+     * @param i2c_master_conf Configuration info
+     */
+    void EZPI_hal_i2c_master_deinit(s_ezlopi_i2c_master_t *i2c_master_conf);
+    /**
+     * @brief Function to send data via I2C (Master to slave)
+     *
+     * @param i2c_master_conf I2C configuration
+     * @param write_buffer Pointer to buffer containing data
+     * @param write_len Length of data
+     * @return esp_err_t
+     */
 
+    esp_err_t EZPI_hal_i2c_master_write_to_device(s_ezlopi_i2c_master_t *i2c_master_conf, uint8_t *write_buffer, uint32_t write_len);
+    /**
+     * @brief Function to read data via I2C (slave to Master)
+     *
+     * @param i2c_master_conf I2C configuration
+     * @param read_buffer Pointer to buffer whach will store extracted data
+     * @param read_len Length of data
+     * @return esp_err_t
+     */
+    esp_err_t EZPI_hal_i2c_master_read_from_device(s_ezlopi_i2c_master_t *i2c_master_conf, uint8_t *read_buffer, uint32_t read_len);
 #ifdef __cplusplus
 }
 #endif

@@ -30,13 +30,12 @@
 */
 
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
- * @version 0.1
- * @date    1st January 2024
+ * @file    ezlopi_service_uart.h
+ * @brief
+ * @author
+ * @version
+ * @date
  */
-
 #ifndef _EZLOPI_SERVICE_UART_H_
 #define _EZLOPI_SERVICE_UART_H_
 
@@ -44,13 +43,6 @@
  *                          Include Files
  *******************************************************************************/
 #include "../../build/config/sdkconfig.h"
-
-#include <string.h>
-
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "EZLOPI_USER_CONFIG.h"
-
 /*******************************************************************************
  *                          C++ Declaration Wrapper
  *******************************************************************************/
@@ -73,35 +65,74 @@ extern "C"
     //     EZLOPI_ITEM_ADXL345 = 6,
     //     EZLOPI_ITEM_
     // } e_ezlopi_item_type_t;
-    #define EZLOPI_WIFI_MIN_PASS_CHAR 8
-    #define EZLOPI_WIFI_CONN_RETRY_ATTEMPT 2
-    #define EZLOPI_WIFI_CONN_ATTEMPT_INTERVAL 5000
+/**
+ * @brief Minimum length for the WiFi password
+ *
+ */
+#define EZLOPI_WIFI_MIN_PASS_CHAR 8
+/**
+ * @brief WiFi connection retries
+ *
+ */
+#define EZLOPI_WIFI_CONN_RETRY_ATTEMPT 2
+/**
+ * @brief Wifi reconnect interval incase of connection failed
+ *
+ */
+#define EZLOPI_WIFI_CONN_ATTEMPT_INTERVAL 5000
 
+    /**
+     * @brief Enum for UART command
+     *
+     */
     typedef enum e_ezlopi_uart_cmd
     {
-        EZPI_UART_CMD_RESET = 0,
-        EZPI_UART_CMD_INFO,
-        EZPI_UART_CMD_WIFI,
-        EZPI_UART_CMD_SET_CONFIG,
-        EZPI_UART_CMD_GET_CONFIG,
-        EZPI_UART_CMD_UART_CONFIG,
-        EZPI_UART_CMD_LOG_CONFIG,
-        EZPI_UART_CMD_SET_PROV,
-        EZPI_UART_CMD_MAX
+        EZPI_UART_CMD_RESET = 0,   /**< Command reset */
+        EZPI_UART_CMD_INFO,        /**< Command device info */
+        EZPI_UART_CMD_WIFI,        /**< Command WiFi */
+        EZPI_UART_CMD_SET_CONFIG,  /**< Command set configurations */
+        EZPI_UART_CMD_GET_CONFIG,  /**< Command get configurations */
+        EZPI_UART_CMD_UART_CONFIG, /**< Command uart configuration */
+        EZPI_UART_CMD_LOG_CONFIG,  /**< Command log configuration */
+        EZPI_UART_CMD_SET_PROV,    /**< Command set provisioning data */
+        EZPI_UART_CMD_MAX          /**< Command maximum */
     } e_ezlopi_uart_cmd_t;
 
+    /**
+     * @brief Enum for status of UART command
+     *
+     */
     typedef enum e_ezlopi_uart_cmd_status
     {
-        EZPI_UART_CMD_STATUS_FAIL = 0,
-        EZPI_UART_CMD_STATUS_SUCCESS,
-        EZPI_UART_CMD_STATUS_MAX
+        EZPI_UART_CMD_STATUS_FAIL = 0, /**< Status command failed */
+        EZPI_UART_CMD_STATUS_SUCCESS,  /**< Status command success */
+        EZPI_UART_CMD_STATUS_MAX       /**< Status maximum */
     } e_ezlopi_uart_cmd_status_t;
 
+    /**
+     * @brief Function to initialize UART task
+     *
+     */
     void EZPI_SERV_uart_init(void);
 
-    #ifndef CONFIG_IDF_TARGET_ESP32
+#ifndef CONFIG_IDF_TARGET_ESP32
+    /**
+     * @brief Function to initialize USB cdc
+     * @details Following tasks are performed
+     *  - Start binary semaphore
+     *  - Installs tiny USB driver
+     *  - Initializes CDC ACM
+     *
+     */
     void EZPI_SERV_cdc_init();
-    #endif // NOT defined CONFIG_IDF_TARGET_ESP32
+#endif // NOT defined CONFIG_IDF_TARGET_ESP32
+       /**
+        * @brief Function to send data through UART or CDC
+        *
+        * @param len Length of the data
+        * @param data Pointer to the data to transmit
+        * @return int
+        */
     int EZPI_SERV_uart_tx_data(int len, uint8_t *data);
 
     /*******************************************************************************

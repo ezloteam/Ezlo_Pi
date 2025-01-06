@@ -28,21 +28,12 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    sensor_0040_other_TCS230.h
+ * @brief   perform some function on sensor_0040
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
- * @note
- * ESP32 sample connections
- * gpio1 => gpio_s0             GPIO_NUM_25
- * gpio2 => gpio_s1             GPIO_NUM_26
- * gpio3 => gpio_s2             GPIO_NUM_12
- * gpio4 => gpio_s3             GPIO_NUM_14
- * gpio5 => gpio_output_en      GPIO_NUM_13
- * gpio6 => gpio_pulse_output   GPIO_NUM_15
+ * @date    xx
  */
 
 #ifndef _SENSOR_0040_OTHER_TCS230_H_
@@ -68,6 +59,16 @@ extern "C"
     /*******************************************************************************
      *                          Type & Macro Declarations
      *******************************************************************************/
+    /**
+     * ESP32 sample connections
+     * gpio1 => gpio_s0             GPIO_NUM_25
+     * gpio2 => gpio_s1             GPIO_NUM_26
+     * gpio3 => gpio_s2             GPIO_NUM_12
+     * gpio4 => gpio_s3             GPIO_NUM_14
+     * gpio5 => gpio_output_en      GPIO_NUM_13
+     * gpio6 => gpio_pulse_output   GPIO_NUM_15
+     */
+
     typedef enum e_TCS230_queue
     {
         TCS230_QUEUE_RESET = 0,
@@ -133,26 +134,53 @@ extern "C"
     /*******************************************************************************
      *                          Extern Function Prototypes
      *******************************************************************************/
+
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
+     * @brief Function to set the target filter color
      *
+     * @param item Item-structure
+     * @param color color-enum
+     * @return true
+     * @return false
      */
-    bool tcs230_set_filter_color(l_ezlopi_item_t *item, e_TCS230_color_t color);
-    bool tcs230_set_frequency_scaling(l_ezlopi_item_t *item, e_TCS230_freq_scaling_t scale);
+    bool TCS230_set_filter_color(l_ezlopi_item_t *item, e_TCS230_color_t color);
+    /**
+     * @brief Function to set freq scaling
+     *
+     * @param item Item-structure
+     * @param scale Enum
+     * @return true
+     * @return false
+     */
+    bool TCS230_set_frequency_scaling(l_ezlopi_item_t *item, e_TCS230_freq_scaling_t scale);
+    /**
+     * @brief Function to get maximum and minimum timeperiod to determine colors
+     *
+     * @param gpio_output_en Target EN-pin
+     * @param gpio_pulse_output Pulse Output-pin
+     * @param least_color_timeP Least time-period to get color
+     * @param most_color_timeP Longest time-period to get color
+     */
+    void TCS230_get_maxmin_color_values(gpio_num_t gpio_output_en, gpio_num_t gpio_pulse_output, int32_t *least_color_timeP, int32_t *most_color_timeP);
+    /**
+     * @brief Function to ge sensor values
+     *
+     * @param item Target item
+     * @return true
+     * @return false
+     */
+    bool TCS230_get_sensor_value(l_ezlopi_item_t *item);
 
-    void calculate_max_min_color_values(gpio_num_t gpio_output_en, gpio_num_t gpio_pulse_output, int32_t *least_color_timeP, int32_t *most_color_timeP);
-    bool get_tcs230_sensor_value(l_ezlopi_item_t *item);
-
-    //------------------------------------------------------------------------
-    //              Action
-    //------------------------------------------------------------------------
-    ezlopi_error_t sensor_0040_other_TCS230(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
+    /**
+     * @brief Function to operate on actions
+     *
+     * @param action Current Action to Operate on
+     * @param item Target-Item node
+     * @param arg Arg for action
+     * @param user_arg User-arg
+     * @return ezlopi_error_t
+     */
+    ezlopi_error_t SENSOR_0040_other_tcs230(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
 #ifdef __cplusplus
 }

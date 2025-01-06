@@ -28,17 +28,13 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    __value_without_less_comparision_operators_macros.h
+ * @brief   MACROS to generate enums for 'value_without_less' comparision operators
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    12th DEC 2024
  */
-
-// #ifndef __HEADER_H__
-// #define __HEADER_H__
 
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
@@ -76,9 +72,7 @@ extern "C"
 }
 #endif
 
-#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
-
-// #endif // __HEADER_H__
+#endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 /*******************************************************************************
  *                          End of File

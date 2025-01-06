@@ -1,3 +1,4 @@
+
 /* ===========================================================================
 ** Copyright (C) 2024 Ezlo Innovation Inc
 **
@@ -28,13 +29,12 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_hal_i2c_master.c
+ * @brief   perform some function on I2C
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    xx
  */
 
 /*******************************************************************************
@@ -69,23 +69,19 @@
 /*******************************************************************************
  *                          Static Data Definitions
  *******************************************************************************/
-static s_ezlopi_i2c_master_t *i2c_master_conf_ptr[I2C_NUM_MAX] = {NULL, NULL};
-static SemaphoreHandle_t i2c_semaphore = NULL;
 
 /*******************************************************************************
  *                          Extern Data Definitions
  *******************************************************************************/
+static s_ezlopi_i2c_master_t *i2c_master_conf_ptr[I2C_NUM_MAX] = {NULL, NULL};
+
+static SemaphoreHandle_t i2c_semaphore = NULL;
 
 /*******************************************************************************
  *                          Extern Function Definitions
  *******************************************************************************/
 
-/**
- * @brief Global/extern function template example
- * Convention : Use capital letter for initial word on extern function
- * @param arg
- */
-ezlopi_error_t ezlopi_i2c_master_init(s_ezlopi_i2c_master_t *i2c_master_conf)
+ezlopi_error_t EZPI_hal_i2c_master_init(s_ezlopi_i2c_master_t *i2c_master_conf)
 {
     ezlopi_error_t ret = EZPI_ERR_HAL_INIT_FAILED;
     if (NULL != i2c_master_conf)
@@ -127,7 +123,7 @@ ezlopi_error_t ezlopi_i2c_master_init(s_ezlopi_i2c_master_t *i2c_master_conf)
     return ret;
 }
 
-esp_err_t ezlopi_i2c_master_read_from_device(s_ezlopi_i2c_master_t *i2c_master_conf, uint8_t *read_buffer, uint32_t read_len)
+esp_err_t EZPI_hal_i2c_master_read_from_device(s_ezlopi_i2c_master_t *i2c_master_conf, uint8_t *read_buffer, uint32_t read_len)
 {
     int ret = EZPI_FAILED;
     if (i2c_semaphore)
@@ -145,7 +141,7 @@ esp_err_t ezlopi_i2c_master_read_from_device(s_ezlopi_i2c_master_t *i2c_master_c
     return ret;
 }
 
-esp_err_t ezlopi_i2c_master_write_to_device(s_ezlopi_i2c_master_t *i2c_master_conf, uint8_t *write_buffer, uint32_t write_len)
+esp_err_t EZPI_hal_i2c_master_write_to_device(s_ezlopi_i2c_master_t *i2c_master_conf, uint8_t *write_buffer, uint32_t write_len)
 {
     int ret = EZPI_FAILED;
     if (i2c_semaphore)
@@ -163,7 +159,7 @@ esp_err_t ezlopi_i2c_master_write_to_device(s_ezlopi_i2c_master_t *i2c_master_co
     return ret;
 }
 
-void ezlopi_i2c_master_deinit(s_ezlopi_i2c_master_t *i2c_master_conf)
+void EZPI_hal_i2c_master_deinit(s_ezlopi_i2c_master_t *i2c_master_conf)
 {
     if (NULL != i2c_master_conf)
     {
@@ -181,7 +177,7 @@ void ezlopi_i2c_master_deinit(s_ezlopi_i2c_master_t *i2c_master_conf)
 }
 
 /*******************************************************************************
- *                          Static Function Definitions
+ *                         Static Function Definitions
  *******************************************************************************/
 
 // static int ezlopi_i2c_check_channel(s_ezlopi_i2c_master_t *i2c_master_conf)

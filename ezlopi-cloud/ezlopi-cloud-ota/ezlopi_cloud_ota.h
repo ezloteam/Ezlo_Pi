@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2022 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -30,13 +30,12 @@
 */
 
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
- * @version 0.1
- * @date    1st January 2024
+ * @file    ezlopi_cloud_ota.h
+ * @brief
+ * @author
+ * @version
+ * @date
  */
-
 #ifndef __HUB_FIRMWARE_H__
 #define __HUB_FIRMWARE_H__
 
@@ -47,10 +46,7 @@
 
 #ifdef CONFIG_EZPI_ENABLE_OTA
 
-#include <string.h>
-
 #include "cjext.h"
-#include "EZLOPI_USER_CONFIG.h"
 
 /*******************************************************************************
  *                          C++ Declaration Wrapper
@@ -59,7 +55,6 @@
 extern "C"
 {
 #endif
-
     /*******************************************************************************
      *                          Type & Macro Declarations
      *******************************************************************************/
@@ -72,18 +67,25 @@ extern "C"
      *                          Extern Function Prototypes
      *******************************************************************************/
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
+     * @brief Function to respond to cloud.firmware.info.get method
      *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
      */
-    void firmware_info_get(cJSON* cj_request, cJSON* cj_response);
-    void firmware_update_start(cJSON* cj_request, cJSON* cj_response);
-    cJSON* firmware_send_firmware_query_to_nma_server(uint32_t message_count);
+    void EZPI_firmware_info_get(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function to respond to hub.firmware.update.start method
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_firmware_update_start(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function to send firmware query to NMA server
+     *
+     * @param message_count Count of the current message being sent
+     */
+    cJSON *EZPI_firmware_send_firmware_query_to_nma_server(uint32_t message_count);
 
 #ifdef __cplusplus
 }

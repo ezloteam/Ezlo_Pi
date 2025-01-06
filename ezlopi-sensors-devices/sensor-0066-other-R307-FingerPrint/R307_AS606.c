@@ -28,21 +28,21 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    R307_AS606.c
+ * @brief   perform some function on R307_AS606
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    xx
  */
 
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
-#include <string.h>
 #include "ezlopi_util_trace.h"
+
 #include "ezlopi_hal_uart.h"
+
 #include "sensor_0066_other_R307_FingerPrint.h"
 #include "EZLOPI_USER_CONFIG.h"
 
@@ -67,15 +67,13 @@ typedef struct fingerprint_packet_t
     uint8_t data[MAX_PACKET_LENGTH_VAL]; /* Inst_code + Data_content */
     uint8_t chk_sum[2];
 } fingerprint_packet_t;
-
 /*******************************************************************************
  *                          Static Function Prototypes
  *******************************************************************************/
-static void generate_packet(fingerprint_packet_t* txPacket, uint8_t PID, uint16_t length, uint8_t* Combined_data);
-static int send_uart_packets(int uart_channel_num, fingerprint_packet_t* txPacket);
-static bool SEND_PACKET(int uart_channel_num, uint8_t PID, uint16_t length, uint8_t* Combined_data);
-static fingerprint_status_t __Response_function(uint8_t* recieved_buffer, uint32_t timeout);
-
+static void generate_packet(fingerprint_packet_t *txPacket, uint8_t PID, uint16_t length, uint8_t *Combined_data);
+static int send_uart_packets(int uart_channel_num, fingerprint_packet_t *txPacket);
+static bool SEND_PACKET(int uart_channel_num, uint8_t PID, uint16_t length, uint8_t *Combined_data);
+static fingerprint_status_t __Response_function(uint8_t *recieved_buffer, uint32_t timeout);
 /*******************************************************************************
  *                          Static Data Definitions
  *******************************************************************************/
@@ -88,12 +86,11 @@ static fingerprint_status_t __Response_function(uint8_t* recieved_buffer, uint32
  *                          Extern Function Definitions
  *******************************************************************************/
 
-/**
- * @brief Global/extern function template example
- * Convention : Use capital letter for initial word on extern function
- * @param arg
- */
-bool VerifyPwd(int uart_channel_num, uint32_t the_password, uint8_t* recieved_buffer, uint32_t timeout)
+//---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// Function for Fingerprint Library
+//---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+bool VerifyPwd(int uart_channel_num, uint32_t the_password, uint8_t *recieved_buffer, uint32_t timeout)
 {
     // Reset the recieving buffer before new data is to be extracted.
     memset(recieved_buffer, 0, MAX_PACKET_LENGTH_VAL);
@@ -111,9 +108,9 @@ bool VerifyPwd(int uart_channel_num, uint32_t the_password, uint8_t* recieved_bu
 
     // TRACE_I("                          -------- VerifyPwd -------");
     bool res = SEND_PACKET(uart_channel_num,                  /* UART CHANNEL NUMBER */
-        FINGERPRINT_PID_COMMANDPACKET,     /* Packet Identifier CMD*/
-        (uint16_t)(sizeof(Combined_data)), /* length <= combined_data*/
-        Combined_data);                    /* Inst_code + Data_content*/
+                           FINGERPRINT_PID_COMMANDPACKET,     /* Packet Identifier CMD*/
+                           (uint16_t)(sizeof(Combined_data)), /* length <= combined_data*/
+                           Combined_data);                    /* Inst_code + Data_content*/
     //------------ Check of the appropriate responce  --------------------------------------------------------------------------------
     if (res)
     {
@@ -133,7 +130,7 @@ bool VerifyPwd(int uart_channel_num, uint32_t the_password, uint8_t* recieved_bu
     return (bool)F_res;
 }
 
-bool SetAdder(int uart_channel_num, uint32_t new_address, uint8_t* recieved_buffer, uint32_t timeout)
+bool SetAdder(int uart_channel_num, uint32_t new_address, uint8_t *recieved_buffer, uint32_t timeout)
 {
     // Reset the recieving buffer before new data is to be extracted.
     memset(recieved_buffer, 0, MAX_PACKET_LENGTH_VAL);
@@ -151,9 +148,9 @@ bool SetAdder(int uart_channel_num, uint32_t new_address, uint8_t* recieved_buff
 
     // TRACE_I("                          -------- SetAdder --------");
     bool res = SEND_PACKET(uart_channel_num,                  /* UART CHANNEL NUMBER */
-        FINGERPRINT_PID_COMMANDPACKET,     /* Packet Identifier CMD*/
-        (uint16_t)(sizeof(Combined_data)), /* length <= combined_data*/
-        Combined_data);                    /* Inst_code + Data_content*/
+                           FINGERPRINT_PID_COMMANDPACKET,     /* Packet Identifier CMD*/
+                           (uint16_t)(sizeof(Combined_data)), /* length <= combined_data*/
+                           Combined_data);                    /* Inst_code + Data_content*/
     //------------ Check of the appropriate responce  --------------------------------------------------------------------------------
     if (res)
     {
@@ -174,7 +171,7 @@ bool SetAdder(int uart_channel_num, uint32_t new_address, uint8_t* recieved_buff
     return (bool)F_res;
 }
 
-bool SetSysPara(int uart_channel_num, uint8_t Parameter_Number, uint8_t Parameter_content, uint8_t* recieved_buffer, uint32_t timeout)
+bool SetSysPara(int uart_channel_num, uint8_t Parameter_Number, uint8_t Parameter_content, uint8_t *recieved_buffer, uint32_t timeout)
 {
     // Reset the recieving buffer before new data is to be extracted.
     memset(recieved_buffer, 0, MAX_PACKET_LENGTH_VAL);
@@ -190,9 +187,9 @@ bool SetSysPara(int uart_channel_num, uint8_t Parameter_Number, uint8_t Paramete
 
     // TRACE_I("                          -------- SetSysPara -------");
     bool res = SEND_PACKET(uart_channel_num,                  /* UART CHANNEL NUMBER */
-        FINGERPRINT_PID_COMMANDPACKET,     /* Packet Identifier CMD*/
-        (uint16_t)(sizeof(Combined_data)), /* length <= combined_data*/
-        Combined_data);                    /* Inst_code + Data_content*/
+                           FINGERPRINT_PID_COMMANDPACKET,     /* Packet Identifier CMD*/
+                           (uint16_t)(sizeof(Combined_data)), /* length <= combined_data*/
+                           Combined_data);                    /* Inst_code + Data_content*/
     //------------ Check of the appropriate responce  --------------------------------------------------------------------------------
     if (res)
     {
@@ -213,7 +210,7 @@ bool SetSysPara(int uart_channel_num, uint8_t Parameter_Number, uint8_t Paramete
     return (bool)F_res;
 }
 
-bool PortControl(int uart_channel_num, uint8_t Control_code, uint8_t* recieved_buffer, uint32_t timeout)
+bool PortControl(int uart_channel_num, uint8_t Control_code, uint8_t *recieved_buffer, uint32_t timeout)
 {
     // Reset the recieving buffer before new data is to be extracted.
     memset(recieved_buffer, 0, MAX_PACKET_LENGTH_VAL);
@@ -228,9 +225,9 @@ bool PortControl(int uart_channel_num, uint8_t Control_code, uint8_t* recieved_b
 
     // TRACE_I("                          -------- PortControl ------");
     bool res = SEND_PACKET(uart_channel_num,                  /* UART CHANNEL NUMBER */
-        FINGERPRINT_PID_COMMANDPACKET,     /* Packet Identifier CMD*/
-        (uint16_t)(sizeof(Combined_data)), /* length <= combined_data*/
-        Combined_data);                    /* Inst_code + Data_content*/
+                           FINGERPRINT_PID_COMMANDPACKET,     /* Packet Identifier CMD*/
+                           (uint16_t)(sizeof(Combined_data)), /* length <= combined_data*/
+                           Combined_data);                    /* Inst_code + Data_content*/
     //------------ Check of the appropriate responce  --------------------------------------------------------------------------------
     if (res)
     {
@@ -251,7 +248,7 @@ bool PortControl(int uart_channel_num, uint8_t Control_code, uint8_t* recieved_b
     return (bool)F_res;
 }
 
-bool ReadSysPara(int uart_channel_num, uint16_t* Status_bits, uint8_t* recieved_buffer, uint32_t timeout)
+bool ReadSysPara(int uart_channel_num, uint16_t *Status_bits, uint8_t *recieved_buffer, uint32_t timeout)
 {
     uint16_t Status_register = *Status_bits;
     // Reset the recieving buffer before new data is to be extracted.
@@ -266,9 +263,9 @@ bool ReadSysPara(int uart_channel_num, uint16_t* Status_bits, uint8_t* recieved_
 
     //------------ Fill the packet container and send it via uart  --------------------------------------------------------------------------------
     bool res = SEND_PACKET(uart_channel_num,                  /* UART CHANNEL NUMBER */
-        FINGERPRINT_PID_COMMANDPACKET,     /* Packet Identifier CMD*/
-        (uint16_t)(sizeof(Combined_data)), /* length <= combined_data*/
-        Combined_data);                    /* Inst_code + Data_content*/
+                           FINGERPRINT_PID_COMMANDPACKET,     /* Packet Identifier CMD*/
+                           (uint16_t)(sizeof(Combined_data)), /* length <= combined_data*/
+                           Combined_data);                    /* Inst_code + Data_content*/
     //------------ Check of the appropriate responce  --------------------------------------------------------------------------------
     if (res)
     {
@@ -304,7 +301,7 @@ bool ReadSysPara(int uart_channel_num, uint16_t* Status_bits, uint8_t* recieved_
     return (bool)F_res;
 }
 
-bool ReadTempNum(int uart_channel_num, uint16_t* TempNum, uint8_t* recieved_buffer, uint32_t timeout)
+bool ReadTempNum(int uart_channel_num, uint16_t *TempNum, uint8_t *recieved_buffer, uint32_t timeout)
 {
     uint16_t TempleteNum = 0;
     // Reset the recieving buffer before new data is to be extracted.
@@ -319,9 +316,9 @@ bool ReadTempNum(int uart_channel_num, uint16_t* TempNum, uint8_t* recieved_buff
 
     // TRACE_I("                          -------- ReadTempNum --------");
     bool res = SEND_PACKET(uart_channel_num,                  /* UART CHANNEL NUMBER */
-        FINGERPRINT_PID_COMMANDPACKET,     /* Packet Identifier CMD*/
-        (uint16_t)(sizeof(Combined_data)), /* length <= combined_data*/
-        Combined_data);                    /* Inst_code + Data_content*/
+                           FINGERPRINT_PID_COMMANDPACKET,     /* Packet Identifier CMD*/
+                           (uint16_t)(sizeof(Combined_data)), /* length <= combined_data*/
+                           Combined_data);                    /* Inst_code + Data_content*/
     //------------ Check of the appropriate responce  --------------------------------------------------------------------------------
     if (res)
     {
@@ -346,7 +343,7 @@ bool ReadTempNum(int uart_channel_num, uint16_t* TempNum, uint8_t* recieved_buff
     return (bool)F_res;
 }
 
-bool GR_Identify(int uart_channel_num, uint16_t* PageID_ptr, uint16_t* MatchScore_ptr, uint8_t* recieved_buffer, uint32_t timeout)
+bool GR_Identify(int uart_channel_num, uint16_t *PageID_ptr, uint16_t *MatchScore_ptr, uint8_t *recieved_buffer, uint32_t timeout)
 {
     uint16_t Page_num = 0;
     uint16_t Match_score = 0;
@@ -362,9 +359,9 @@ bool GR_Identify(int uart_channel_num, uint16_t* PageID_ptr, uint16_t* MatchScor
 
     // TRACE_I("                          -------- GR_Identify --------");
     bool res = SEND_PACKET(uart_channel_num,                  /* UART CHANNEL NUMBER */
-        FINGERPRINT_PID_COMMANDPACKET,     /* Packet Identifier CMD*/
-        (uint16_t)(sizeof(Combined_data)), /* length <= combined_data*/
-        Combined_data);                    /* Inst_code + Data_content*/
+                           FINGERPRINT_PID_COMMANDPACKET,     /* Packet Identifier CMD*/
+                           (uint16_t)(sizeof(Combined_data)), /* length <= combined_data*/
+                           Combined_data);                    /* Inst_code + Data_content*/
     //------------ Check of the appropriate responce  --------------------------------------------------------------------------------
     if (res)
     {
@@ -373,11 +370,14 @@ bool GR_Identify(int uart_channel_num, uint16_t* PageID_ptr, uint16_t* MatchScor
         if (FINGERPRINT_OK == F_res)
         {
             Page_num = ((uint16_t)recieved_buffer[4] << 8) + ((uint16_t)recieved_buffer[5] & 0xFF);
-            Match_score = ((uint16_t)recieved_buffer[6] << 8) + ((uint16_t)recieved_buffer[7] & 0xFF);       // 0x0009
+            Match_score = ((uint16_t)recieved_buffer[6] << 8) + ((uint16_t)recieved_buffer[7] & 0xFF); // 0x0009
+
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
             uint16_t Checksum = ((uint16_t)recieved_buffer[8] << 8) + ((uint16_t)recieved_buffer[9] & 0xFF); //(1~12)
             TRACE_D("GR_Identify : Page_id [4]: %d", Page_num);
             TRACE_D("GR_Identify : Match_score [6]: %d", Match_score);
             TRACE_D("GR_Identify =>Checksum [8]: %#x", Checksum);
+#endif
         }
         // TRACE_W("---------------------------------------------------");
     }
@@ -389,7 +389,7 @@ bool GR_Identify(int uart_channel_num, uint16_t* PageID_ptr, uint16_t* MatchScor
     return (bool)F_res;
 }
 
-bool GenImg(int uart_channel_num, uint8_t* recieved_buffer, uint32_t timeout)
+bool GenImg(int uart_channel_num, uint8_t *recieved_buffer, uint32_t timeout)
 {
     // Reset the recieving buffer before new data is to be extracted.
     memset(recieved_buffer, 0, MAX_PACKET_LENGTH_VAL);
@@ -403,28 +403,27 @@ bool GenImg(int uart_channel_num, uint8_t* recieved_buffer, uint32_t timeout)
 
     // TRACE_I("                          -------- GenImg --------");
     bool res = SEND_PACKET(uart_channel_num,                  /* UART CHANNEL NUMBER */
-        FINGERPRINT_PID_COMMANDPACKET,     /* Packet Identifier CMD*/
-        (uint16_t)(sizeof(Combined_data)), /* length <= combined_data*/
-        Combined_data);                    /* Inst_code + Data_content*/
+                           FINGERPRINT_PID_COMMANDPACKET,     /* Packet Identifier CMD*/
+                           (uint16_t)(sizeof(Combined_data)), /* length <= combined_data*/
+                           Combined_data);                    /* Inst_code + Data_content*/
     //------------ Check of the appropriate responce  --------------------------------------------------------------------------------
     if (res)
     {
         TRACE_W("--------------- 'GenImg' Response ----------------");
         F_res = __Response_function(recieved_buffer, timeout);
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
         if (FINGERPRINT_OK == F_res)
         {
             uint16_t Checksum = ((uint16_t)recieved_buffer[4] << 8) + ((uint16_t)recieved_buffer[5] & 0xFF); //(1~12)
             TRACE_D("GenImg =>Checksum [4]: %#x", Checksum);
         }
-        // TRACE_W("---------------------------------------------------");
+#endif
     }
-    // TRACE_I("                          -------- XXXX --------");
-
     //----------------------------------------------------------------------------------------------------------------------
     return (bool)F_res;
 }
 
-bool Img2Tz(int uart_channel_num, uint8_t CharBufferID, uint8_t* recieved_buffer, uint32_t timeout)
+bool Img2Tz(int uart_channel_num, uint8_t CharBufferID, uint8_t *recieved_buffer, uint32_t timeout)
 {
     // Reset the recieving buffer before new data is to be extracted.
     memset(recieved_buffer, 0, MAX_PACKET_LENGTH_VAL);
@@ -439,9 +438,9 @@ bool Img2Tz(int uart_channel_num, uint8_t CharBufferID, uint8_t* recieved_buffer
 
     // TRACE_I("                          -------- Img2Tz --------");
     bool res = SEND_PACKET(uart_channel_num,                  /* UART CHANNEL NUMBER */
-        FINGERPRINT_PID_COMMANDPACKET,     /* Packet Identifier CMD*/
-        (uint16_t)(sizeof(Combined_data)), /* length <= combined_data*/
-        Combined_data);                    /* Inst_code + Data_content*/
+                           FINGERPRINT_PID_COMMANDPACKET,     /* Packet Identifier CMD*/
+                           (uint16_t)(sizeof(Combined_data)), /* length <= combined_data*/
+                           Combined_data);                    /* Inst_code + Data_content*/
     //------------ Check of the appropriate responce  --------------------------------------------------------------------------------
     if (res)
     {
@@ -462,7 +461,7 @@ bool Img2Tz(int uart_channel_num, uint8_t CharBufferID, uint8_t* recieved_buffer
     return (bool)F_res;
 }
 
-bool RegModel(int uart_channel_num, uint8_t* recieved_buffer, uint32_t timeout)
+bool RegModel(int uart_channel_num, uint8_t *recieved_buffer, uint32_t timeout)
 {
     // Reset the recieving buffer before new data is to be extracted.
     memset(recieved_buffer, 0, MAX_PACKET_LENGTH_VAL);
@@ -476,9 +475,9 @@ bool RegModel(int uart_channel_num, uint8_t* recieved_buffer, uint32_t timeout)
 
     // TRACE_I("                          -------- RegModel -------");
     bool res = SEND_PACKET(uart_channel_num,                  /* UART CHANNEL NUMBER */
-        FINGERPRINT_PID_COMMANDPACKET,     /* Packet Identifier CMD*/
-        (uint16_t)(sizeof(Combined_data)), /* length <= combined_data*/
-        Combined_data);                    /* Inst_code + Data_content*/
+                           FINGERPRINT_PID_COMMANDPACKET,     /* Packet Identifier CMD*/
+                           (uint16_t)(sizeof(Combined_data)), /* length <= combined_data*/
+                           Combined_data);                    /* Inst_code + Data_content*/
     //------------ Check of the appropriate responce  --------------------------------------------------------------------------------
     if (res)
     {
@@ -499,7 +498,7 @@ bool RegModel(int uart_channel_num, uint8_t* recieved_buffer, uint32_t timeout)
     return (bool)F_res;
 }
 
-bool Store(int uart_channel_num, uint8_t CharBufferID, uint16_t PageID, uint8_t* recieved_buffer, uint32_t timeout)
+bool Store(int uart_channel_num, uint8_t CharBufferID, uint16_t PageID, uint8_t *recieved_buffer, uint32_t timeout)
 {
     // Reset the recieving buffer before new data is to be extracted.
     memset(recieved_buffer, 0, MAX_PACKET_LENGTH_VAL);
@@ -516,9 +515,9 @@ bool Store(int uart_channel_num, uint8_t CharBufferID, uint16_t PageID, uint8_t*
 
     // TRACE_I("                          -------- Store --------");
     bool res = SEND_PACKET(uart_channel_num,                  /* UART CHANNEL NUMBER */
-        FINGERPRINT_PID_COMMANDPACKET,     /* Packet Identifier CMD*/
-        (uint16_t)(sizeof(Combined_data)), /* length <= combined_data*/
-        Combined_data);                    /* Inst_code + Data_content*/
+                           FINGERPRINT_PID_COMMANDPACKET,     /* Packet Identifier CMD*/
+                           (uint16_t)(sizeof(Combined_data)), /* length <= combined_data*/
+                           Combined_data);                    /* Inst_code + Data_content*/
     //------------ Check of the appropriate responce  --------------------------------------------------------------------------------
     if (res)
     {
@@ -539,7 +538,7 @@ bool Store(int uart_channel_num, uint8_t CharBufferID, uint16_t PageID, uint8_t*
     return (bool)F_res;
 }
 
-bool Load(int uart_channel_num, uint8_t CharBufferID, uint16_t PageID, uint8_t* recieved_buffer, uint32_t timeout)
+bool Load(int uart_channel_num, uint8_t CharBufferID, uint16_t PageID, uint8_t *recieved_buffer, uint32_t timeout)
 {
     // Reset the recieving buffer before new data is to be extracted.
     memset(recieved_buffer, 0, MAX_PACKET_LENGTH_VAL);
@@ -556,9 +555,9 @@ bool Load(int uart_channel_num, uint8_t CharBufferID, uint16_t PageID, uint8_t* 
 
     // TRACE_I("                          -------- Load -------");
     bool res = SEND_PACKET(uart_channel_num,                  /* UART CHANNEL NUMBER */
-        FINGERPRINT_PID_COMMANDPACKET,     /* Packet Identifier CMD*/
-        (uint16_t)(sizeof(Combined_data)), /* length <= combined_data*/
-        Combined_data);                    /* Inst_code + Data_content*/
+                           FINGERPRINT_PID_COMMANDPACKET,     /* Packet Identifier CMD*/
+                           (uint16_t)(sizeof(Combined_data)), /* length <= combined_data*/
+                           Combined_data);                    /* Inst_code + Data_content*/
     //------------ Check of the appropriate responce  --------------------------------------------------------------------------------
     if (res)
     {
@@ -577,7 +576,7 @@ bool Load(int uart_channel_num, uint8_t CharBufferID, uint16_t PageID, uint8_t* 
     return (bool)F_res;
 }
 
-bool Delete(int uart_channel_num, uint16_t PageID, uint16_t TempCount, uint8_t* recieved_buffer, uint32_t timeout)
+bool Delete(int uart_channel_num, uint16_t PageID, uint16_t TempCount, uint8_t *recieved_buffer, uint32_t timeout)
 {
     // Reset the recieving buffer before new data is to be extracted.
     memset(recieved_buffer, 0, MAX_PACKET_LENGTH_VAL);
@@ -596,9 +595,9 @@ bool Delete(int uart_channel_num, uint16_t PageID, uint16_t TempCount, uint8_t* 
     // TRACE_I("                          -------- Delete ---------");
     // -- -- -- -- -- --Fill the packet container and send it via uart-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
     bool res = SEND_PACKET(uart_channel_num,                  /* UART CHANNEL NUMBER */
-        FINGERPRINT_PID_COMMANDPACKET,     /* Packet Identifier CMD*/
-        (uint16_t)(sizeof(Combined_data)), /* length <= combined_data*/
-        Combined_data);                    /* Inst_code + Data_content*/
+                           FINGERPRINT_PID_COMMANDPACKET,     /* Packet Identifier CMD*/
+                           (uint16_t)(sizeof(Combined_data)), /* length <= combined_data*/
+                           Combined_data);                    /* Inst_code + Data_content*/
     //------------ Check of the appropriate responce  --------------------------------------------------------------------------------
     if (res)
     {
@@ -619,7 +618,7 @@ bool Delete(int uart_channel_num, uint16_t PageID, uint16_t TempCount, uint8_t* 
     return (bool)F_res;
 }
 
-bool Empty(int uart_channel_num, uint8_t* recieved_buffer, uint32_t timeout)
+bool Empty(int uart_channel_num, uint8_t *recieved_buffer, uint32_t timeout)
 {
     // Reset the recieving buffer before new data is to be extracted.
     memset(recieved_buffer, 0, MAX_PACKET_LENGTH_VAL);
@@ -633,9 +632,9 @@ bool Empty(int uart_channel_num, uint8_t* recieved_buffer, uint32_t timeout)
 
     //         TRACE_I("                          -------- Empty ---------");
     bool res = SEND_PACKET(uart_channel_num,                  /* UART CHANNEL NUMBER */
-        FINGERPRINT_PID_COMMANDPACKET,     /* Packet Identifier CMD*/
-        (uint16_t)(sizeof(Combined_data)), /* length <= combined_data*/
-        Combined_data);                    /* Inst_code + Data_content*/
+                           FINGERPRINT_PID_COMMANDPACKET,     /* Packet Identifier CMD*/
+                           (uint16_t)(sizeof(Combined_data)), /* length <= combined_data*/
+                           Combined_data);                    /* Inst_code + Data_content*/
     //------------ Check of the appropriate responce  --------------------------------------------------------------------------------
     if (res)
     {
@@ -656,7 +655,7 @@ bool Empty(int uart_channel_num, uint8_t* recieved_buffer, uint32_t timeout)
     return (bool)F_res;
 }
 
-bool LedControl(int uart_channel_num, bool LED_state, uint8_t* recieved_buffer, uint32_t timeout)
+bool LedControl(int uart_channel_num, bool LED_state, uint8_t *recieved_buffer, uint32_t timeout)
 {
     // Reset the recieving buffer before new data is to be extracted.
     memset(recieved_buffer, 0, MAX_PACKET_LENGTH_VAL);
@@ -674,9 +673,9 @@ bool LedControl(int uart_channel_num, bool LED_state, uint8_t* recieved_buffer, 
 
     // TRACE_I("                          -------- LedControl ---------");
     bool res = SEND_PACKET(uart_channel_num,                  /* UART CHANNEL NUMBER */
-        FINGERPRINT_PID_COMMANDPACKET,     /* Packet Identifier CMD*/
-        (uint16_t)(sizeof(Combined_data)), /* length <= combined_data*/
-        Combined_data);                    /* Inst_code + Data_content*/
+                           FINGERPRINT_PID_COMMANDPACKET,     /* Packet Identifier CMD*/
+                           (uint16_t)(sizeof(Combined_data)), /* length <= combined_data*/
+                           Combined_data);                    /* Inst_code + Data_content*/
     //------------ Check of the appropriate responce  --------------------------------------------------------------------------------
     if (res)
     {
@@ -695,7 +694,7 @@ bool LedControl(int uart_channel_num, bool LED_state, uint8_t* recieved_buffer, 
     return (bool)F_res;
 }
 
-bool Match(int uart_channel_num, uint16_t* InspectionScore, uint8_t* recieved_buffer, uint32_t timeout)
+bool Match(int uart_channel_num, uint16_t *InspectionScore, uint8_t *recieved_buffer, uint32_t timeout)
 {
     uint16_t Score = 0;
     // Reset the recieving buffer before new data is to be extracted.
@@ -711,9 +710,9 @@ bool Match(int uart_channel_num, uint16_t* InspectionScore, uint8_t* recieved_bu
     // TRACE_I("                          -------- Match --------");
     // -- -- -- -- -- --Fill the packet container and send it via uart-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
     bool res = SEND_PACKET(uart_channel_num,                  /* UART CHANNEL NUMBER */
-        FINGERPRINT_PID_COMMANDPACKET,     /* Packet Identifier CMD*/
-        (uint16_t)(sizeof(Combined_data)), /* length <= combined_data*/
-        Combined_data);                    /* Inst_code + Data_content*/
+                           FINGERPRINT_PID_COMMANDPACKET,     /* Packet Identifier CMD*/
+                           (uint16_t)(sizeof(Combined_data)), /* length <= combined_data*/
+                           Combined_data);                    /* Inst_code + Data_content*/
     //------------ Check of the appropriate responce  --------------------------------------------------------------------------------
     if (res)
     {
@@ -737,7 +736,7 @@ bool Match(int uart_channel_num, uint16_t* InspectionScore, uint8_t* recieved_bu
     return (bool)F_res;
 }
 
-bool Search(int uart_channel_num, uint8_t CharBufferID, uint16_t StartPage, uint16_t PageNum, uint16_t* PageID_ptr, uint16_t* MatchScore_ptr, uint8_t* recieved_buffer, uint32_t timeout)
+bool Search(int uart_channel_num, uint8_t CharBufferID, uint16_t StartPage, uint16_t PageNum, uint16_t *PageID_ptr, uint16_t *MatchScore_ptr, uint8_t *recieved_buffer, uint32_t timeout)
 {
     // use dummy variables
     uint16_t Page_num = *PageID_ptr;
@@ -759,9 +758,9 @@ bool Search(int uart_channel_num, uint8_t CharBufferID, uint16_t StartPage, uint
 
     // TRACE_I("                          --------- Search ---------");
     bool res = SEND_PACKET(uart_channel_num,                  /* UART CHANNEL NUMBER */
-        FINGERPRINT_PID_COMMANDPACKET,     /* Packet Identifier CMD*/
-        (uint16_t)(sizeof(Combined_data)), /* length <= combined_data*/
-        Combined_data);                    /* Inst_code + Data_content*/
+                           FINGERPRINT_PID_COMMANDPACKET,     /* Packet Identifier CMD*/
+                           (uint16_t)(sizeof(Combined_data)), /* length <= combined_data*/
+                           Combined_data);                    /* Inst_code + Data_content*/
     //------------ Check of the appropriate responce  --------------------------------------------------------------------------------
     if (res)
     {
@@ -769,7 +768,7 @@ bool Search(int uart_channel_num, uint8_t CharBufferID, uint16_t StartPage, uint
         if (FINGERPRINT_OK == F_res)
         {
             Page_num = ((uint16_t)recieved_buffer[4] << 8) + ((uint16_t)recieved_buffer[5] & 0xFF);
-            Match_score = ((uint16_t)recieved_buffer[6] << 8) + ((uint16_t)recieved_buffer[7] & 0xFF);       // 0x0009
+            Match_score = ((uint16_t)recieved_buffer[6] << 8) + ((uint16_t)recieved_buffer[7] & 0xFF); // 0x0009
 
 #if (ENABLE_TRACE)
             uint16_t Checksum = ((uint16_t)recieved_buffer[8] << 8) + ((uint16_t)recieved_buffer[9] & 0xFF); //(1~12)
@@ -797,14 +796,12 @@ bool Search(int uart_channel_num, uint8_t CharBufferID, uint16_t StartPage, uint
 //-----------------------------------------------------------------------------------------------------------------------------------------------
 // Function for Operation modes
 //-----------------------------------------------------------------------------------------------------------------------------------------------
-
-//----------------------------------------------------------------------------------------------------------------------
-bool r307_as606_wait_till_system_free(l_ezlopi_item_t* item, uint32_t timeout_ms) // wait_
+bool r307_as606_wait_till_system_free(l_ezlopi_item_t *item, uint32_t timeout_ms) // wait_
 {
     fingerprint_status_t F_res = FINGERPRINT_FAIL;
     if (NULL != item)
     {
-        server_packet_t* user_data = (server_packet_t*)item->user_arg;
+        server_packet_t *user_data = (server_packet_t *)item->user_arg;
         static uint16_t __FPreg_status;
         //<! us time
         // TRACE_I("  > ENTER - system_status");
@@ -823,15 +820,13 @@ bool r307_as606_wait_till_system_free(l_ezlopi_item_t* item, uint32_t timeout_ms
     }
     return (bool)F_res;
 }
-
-//----------------------------- Function to check if Specified ID is occupied or not -----------------------------------------------
-bool r307_as606_check_pageid_empty(l_ezlopi_item_t* item)
+bool r307_as606_check_pageid_empty(l_ezlopi_item_t *item)
 {
     bool ret = false;
     if (NULL != item)
     {
         // TRACE_D("                  <<< Check_PAGEID_Empty >>> ");
-        server_packet_t* user_data = (server_packet_t*)item->user_arg;
+        server_packet_t *user_data = (server_packet_t *)item->user_arg;
         fingerprint_status_t p = FINGERPRINT_FAIL; // status checker
         uint32_t start_time = 0, dummy_timer = 0;
         start_time = esp_timer_get_time() / 1000;  //  !< ms
@@ -856,13 +851,11 @@ bool r307_as606_check_pageid_empty(l_ezlopi_item_t* item)
     // Result: OK - Internal Empty!
     return (ret);
 }
-
-//---------------------------------- Function returns immediate vaccant ID -----------------------------------------
-uint16_t r307_as606_find_immediate_vaccant_id(l_ezlopi_item_t* item)
+uint16_t r307_as606_find_immediate_vaccant_id(l_ezlopi_item_t *item)
 {
     if (NULL != item)
     {
-        server_packet_t* user_data = (server_packet_t*)item->user_arg;
+        server_packet_t *user_data = (server_packet_t *)item->user_arg;
         for (uint16_t ids = 1; ids <= FINGERPRINT_MAX_CAPACITY_LIMIT; ids++)
         {
             user_data->user_id = ids;
@@ -874,15 +867,13 @@ uint16_t r307_as606_find_immediate_vaccant_id(l_ezlopi_item_t* item)
     }
     return 0; // if not found
 }
-
-//---------------------------------- Function that updates validity status of internal PAGEID to append the new -----------------------------------------
-bool r307_as606_update_id_status_list(l_ezlopi_item_t* item)
+bool r307_as606_update_id_status_list(l_ezlopi_item_t *item)
 {
     bool ret = false;
     if (NULL != item)
     {
         // TRACE_D("---------------------- ENTER: .[MODE:-2]. Update_ID_list ------------------------");
-        server_packet_t* user_data = (server_packet_t*)item->user_arg;
+        server_packet_t *user_data = (server_packet_t *)item->user_arg;
         uint16_t Temp_ID = user_data->user_id;
         for (uint16_t ids = 1; ids <= FINGERPRINT_MAX_CAPACITY_LIMIT; ids++)
         {
@@ -903,16 +894,14 @@ bool r307_as606_update_id_status_list(l_ezlopi_item_t* item)
     }
     return ret;
 }
-
-//---------------------------------- Function that searches, internal library to return PAGE_ID and confidence_level -----------------------------------------
-bool r307_as606_match_id(l_ezlopi_item_t* item)
+bool r307_as606_match_id(l_ezlopi_item_t *item)
 {
     bool ret = true;
     if (NULL != item)
     {
         // TRACE_D("---------------------- ENTER: .[MODE:-0]. Match_ID ------------------------");
         uint32_t start_time = 0, dummy_timer = 0;
-        server_packet_t* user_data = (server_packet_t*)item->user_arg;
+        server_packet_t *user_data = (server_packet_t *)item->user_arg;
         uint16_t custom_USER_ID = user_data->user_id;
         //-------------------- 4. Search for all the library and store only if no duplicates found -----------------------
         fingerprint_status_t p = FINGERPRINT_FAIL;
@@ -923,10 +912,10 @@ bool r307_as606_match_id(l_ezlopi_item_t* item)
         {
             LedControl(uart_channel_num, 1, (user_data->recieved_buffer), 200);
             p = GR_Identify(item->interface.uart.channel,   /*user_channel*/
-                &(user_data->user_id),          /*same_ID => */
-                &(user_data->confidence_level), /*[value=!0]=> */
-                (user_data->recieved_buffer),   /*Uart_buffer address*/
-                1000);
+                            &(user_data->user_id),          /*same_ID => */
+                            &(user_data->confidence_level), /*[value=!0]=> */
+                            (user_data->recieved_buffer),   /*Uart_buffer address*/
+                            1000);
             LedControl(uart_channel_num, 0, (user_data->recieved_buffer), 200);
             dummy_timer = esp_timer_get_time() / 1000;
             if ((p != FINGERPRINT_OK) && (dummy_timer - start_time) >= 2000)
@@ -941,16 +930,14 @@ bool r307_as606_match_id(l_ezlopi_item_t* item)
     }
     return ret;
 }
-
-//---------------------------------- Function that searches and erases specified range of IDs -----------------------------------------
-bool r307_as606_erase_specified_id(l_ezlopi_item_t* item)
+bool r307_as606_erase_specified_id(l_ezlopi_item_t *item)
 {
     bool ret = true;
     if (NULL != item)
     {
         TRACE_D("----------------------  ENTER: .[MODE:-3]. Erase_Specified_ID ------------------------");
         uint32_t start_time = 0, dummy_timer = 0;
-        server_packet_t* user_data = (server_packet_t*)item->user_arg;
+        server_packet_t *user_data = (server_packet_t *)item->user_arg;
         //-------------------- 4. Search for all the library and store only if no duplicates found ------------------------------------------------
         fingerprint_status_t p = FINGERPRINT_FAIL;
         start_time = esp_timer_get_time() / 1000; //  !< ms
@@ -958,10 +945,10 @@ bool r307_as606_erase_specified_id(l_ezlopi_item_t* item)
         while ((p != FINGERPRINT_OK) && ((dummy_timer - start_time) < 2000))
         {
             p = Delete(item->interface.uart.channel, /*user_channel*/
-                (user_data->user_id),         /*Starting_point*/
-                1,                            /*Quantity*/
-                (user_data->recieved_buffer), /*Uart_buffer address*/
-                1000);
+                       (user_data->user_id),         /*Starting_point*/
+                       1,                            /*Quantity*/
+                       (user_data->recieved_buffer), /*Uart_buffer address*/
+                       1000);
             dummy_timer = esp_timer_get_time() / 1000;
             if ((p != FINGERPRINT_OK) && (dummy_timer - start_time) >= 2000)
             {
@@ -975,16 +962,14 @@ bool r307_as606_erase_specified_id(l_ezlopi_item_t* item)
     }
     return ret;
 }
-
-//---------------------------------- Function erases all fingerprints from internal library  -----------------------------------------
-bool r307_as606_erase_all_id(l_ezlopi_item_t* item)
+bool r307_as606_erase_all_id(l_ezlopi_item_t *item)
 {
     bool ret = true;
     if (NULL != item)
     {
         TRACE_D("----------------------  ENTER: .[MODE:-4]. Erase_all_ID ------------------------");
         uint32_t start_time = 0, dummy_timer = 0;
-        server_packet_t* user_data = (server_packet_t*)item->user_arg;
+        server_packet_t *user_data = (server_packet_t *)item->user_arg;
         //-------------------- 4. Search for all the library and store only if no duplicates found ------------------------------------------------
         fingerprint_status_t p = FINGERPRINT_FAIL;
         start_time = esp_timer_get_time() / 1000; //  !< ms
@@ -992,8 +977,8 @@ bool r307_as606_erase_all_id(l_ezlopi_item_t* item)
         while ((p != FINGERPRINT_OK) && ((dummy_timer - start_time) < 1000))
         {
             p = Empty(item->interface.uart.channel, /*user_channel*/
-                (user_data->recieved_buffer), /*Uart_buffer address*/
-                800);
+                      (user_data->recieved_buffer), /*Uart_buffer address*/
+                      800);
             dummy_timer = esp_timer_get_time() / 1000;
             if ((p != FINGERPRINT_OK) && (dummy_timer - start_time) >= 1000)
             {
@@ -1006,16 +991,14 @@ bool r307_as606_erase_all_id(l_ezlopi_item_t* item)
     }
     return ret;
 }
-
-//----------------------------------- Function to store only valid fingerprint, in vacant PAGEID -----------------------------------------
-uint16_t r307_as606_enroll_fingerprint(l_ezlopi_item_t* item)
+uint16_t r307_as606_enroll_fingerprint(l_ezlopi_item_t *item)
 {
     uint16_t res_ID = 0; /* initially, set variable value to a invalid id*/
     if (NULL != item)
     {
         TRACE_D("----------------------  ENTER: .[MODE:-1]. Enroll_Fingerprint ------------------------");
         int uart_channel_num = item->interface.uart.channel;
-        server_packet_t* user_data = (server_packet_t*)item->user_arg;
+        server_packet_t *user_data = (server_packet_t *)item->user_arg;
         uint16_t custom_USER_ID = user_data->user_id;
         user_data->confidence_level = 0;
         uint32_t start_time = 0, dummy_timer = 0;
@@ -1111,13 +1094,13 @@ uint16_t r307_as606_enroll_fingerprint(l_ezlopi_item_t* item)
         while ((p != FINGERPRINT_OK) && ((dummy_timer - start_time) <= 2500))
         {
             p = Search(uart_channel_num,
-                1,                                 /*ChrBuffer = 1*/
-                FINGERPRINT_STARTING_USER_PAGE_ID, /*Page_id = starting_id*/
-                FINGERPRINT_MAX_CAPACITY_LIMIT,    /*Max_search_number = 500*/
-                &(user_data->user_id),             /*same_ID => */
-                &(user_data->confidence_level),    /*[value=!0]=> */
-                (user_data->recieved_buffer),
-                1000);
+                       1,                                 /*ChrBuffer = 1*/
+                       FINGERPRINT_STARTING_USER_PAGE_ID, /*Page_id = starting_id*/
+                       FINGERPRINT_MAX_CAPACITY_LIMIT,    /*Max_search_number = 500*/
+                       &(user_data->user_id),             /*same_ID => */
+                       &(user_data->confidence_level),    /*[value=!0]=> */
+                       (user_data->recieved_buffer),
+                       1000);
             dummy_timer = esp_timer_get_time() / 1000;
             if ((p != FINGERPRINT_OK) && (dummy_timer - start_time) > 2000)
             {
@@ -1170,9 +1153,9 @@ uint16_t r307_as606_enroll_fingerprint(l_ezlopi_item_t* item)
             while ((p != FINGERPRINT_OK) && ((dummy_timer - start_time) < 2000))
             {
                 p = Store(uart_channel_num,
-                    1,                                  /*ChrBuffer = 1*/
-                    custom_USER_ID,                     /*store at Desired Page_id*/
-                    (user_data->recieved_buffer), 800); /*need to change Page_id [default = 1]*/
+                          1,                                  /*ChrBuffer = 1*/
+                          custom_USER_ID,                     /*store at Desired Page_id*/
+                          (user_data->recieved_buffer), 800); /*need to change Page_id [default = 1]*/
 
                 dummy_timer = esp_timer_get_time() / 1000;
                 if ((p != FINGERPRINT_OK) && (dummy_timer - start_time) > 2000)
@@ -1190,14 +1173,12 @@ uint16_t r307_as606_enroll_fingerprint(l_ezlopi_item_t* item)
     }
     return res_ID; // return the ID (where operation is taking place)
 }
-
-//--------------------------------- Function to configure fingerprint sensor ------------------------------------------------------
-fingerprint_status_t r307_as606_fingerprint_config(l_ezlopi_item_t* item)
+fingerprint_status_t r307_as606_fingerprint_config(l_ezlopi_item_t *item)
 {
     fingerprint_status_t F_res = FINGERPRINT_FAIL;
     if (NULL != item)
     {
-        server_packet_t* user_data = (server_packet_t*)item->user_arg;
+        server_packet_t *user_data = (server_packet_t *)item->user_arg;
         int uart_channel_num = item->interface.uart.channel;
         vTaskDelay(200 / portTICK_PERIOD_MS); // waiting for necessary sensor boot-up delay 200ms
         PortControl(uart_channel_num, UART_PORT_ON, (user_data->recieved_buffer), 1000);
@@ -1232,7 +1213,7 @@ fingerprint_status_t r307_as606_fingerprint_config(l_ezlopi_item_t* item)
 }
 
 /*******************************************************************************
- *                          Static Function Definitions
+ *                         Static Function Definitions
  *******************************************************************************/
 /**
  * @brief This is a function generates/prepares appropriate transmission packets actions.
@@ -1244,7 +1225,7 @@ fingerprint_status_t r307_as606_fingerprint_config(l_ezlopi_item_t* item)
  *
  * @return Success=[>0] / Fail=[0].
  */
-static void generate_packet(fingerprint_packet_t* txPacket, uint8_t PID, uint16_t length, uint8_t* Combined_data)
+static void generate_packet(fingerprint_packet_t *txPacket, uint8_t PID, uint16_t length, uint8_t *Combined_data)
 {
     //------------ PID ------------------------------------------------------------------------------------------------------
     txPacket->PID = PID;
@@ -1281,7 +1262,7 @@ static void generate_packet(fingerprint_packet_t* txPacket, uint8_t PID, uint16_
  *
  * @return Success=[>0] / Fail=[0].
  */
-static int send_uart_packets(int uart_channel_num, fingerprint_packet_t* txPacket)
+static int send_uart_packets(int uart_channel_num, fingerprint_packet_t *txPacket)
 {
     int ret = 0;
     int len = ((int)((txPacket->Packet_len[0] << 8) + (txPacket->Packet_len[1] & 0xFF)) - 2);
@@ -1300,7 +1281,6 @@ static int send_uart_packets(int uart_channel_num, fingerprint_packet_t* txPacke
     uart_wait_tx_done(uart_channel_num, 100); // wait timeout is 100 RTOS ticks (TickType_t)
     return ret;
 }
-
 /**
  * @brief This is a function to execute sequential actions :- generate packet and send_packet them through UART_buffer
  *
@@ -1311,10 +1291,10 @@ static int send_uart_packets(int uart_channel_num, fingerprint_packet_t* txPacke
  *
  * @return Success=[true] / Fail=[false].
  */
-static bool SEND_PACKET(int uart_channel_num, uint8_t PID, uint16_t length, uint8_t* Combined_data)
+static bool SEND_PACKET(int uart_channel_num, uint8_t PID, uint16_t length, uint8_t *Combined_data)
 {
     bool ret = false;
-    fingerprint_packet_t* txPacket = (fingerprint_packet_t*)ezlopi_malloc(__FUNCTION__, sizeof(fingerprint_packet_t));
+    fingerprint_packet_t *txPacket = (fingerprint_packet_t *)ezlopi_malloc(__FUNCTION__, sizeof(fingerprint_packet_t));
     if (txPacket)
     {
         txPacket->header_code[0] = FINGERPRINT_HEADER_MSB;
@@ -1331,7 +1311,6 @@ static bool SEND_PACKET(int uart_channel_num, uint8_t PID, uint16_t length, uint
     }
     return ret;
 }
-
 /**
  * @brief Additional function that waits  for recieve_buffer to fill up, (utill 'time-out')  and return appropriate responses.
  *
@@ -1340,7 +1319,7 @@ static bool SEND_PACKET(int uart_channel_num, uint8_t PID, uint16_t length, uint
  *
  * @return [FINGERPRINT_OK : Successful] // [FINGERPRINT_FAIL : Error]
  */
-static fingerprint_status_t __Response_function(uint8_t* recieved_buffer, uint32_t timeout)
+static fingerprint_status_t __Response_function(uint8_t *recieved_buffer, uint32_t timeout)
 {
     fingerprint_status_t F_res = FINGERPRINT_FAIL;
     uint32_t start_time = esp_timer_get_time() / 1000;
@@ -1369,7 +1348,7 @@ static fingerprint_status_t __Response_function(uint8_t* recieved_buffer, uint32
          * ...
          * recieved_buffer[N] = Checksum  (2byte)
          */
-         /*check confirmation code*/
+        /*check confirmation code*/
         switch ((uint8_t)recieved_buffer[3])
         {
         case ACK_OK:
@@ -1456,7 +1435,6 @@ static fingerprint_status_t __Response_function(uint8_t* recieved_buffer, uint32
     }
     return F_res;
 }
-
 /*******************************************************************************
  *                          End of File
  *******************************************************************************/

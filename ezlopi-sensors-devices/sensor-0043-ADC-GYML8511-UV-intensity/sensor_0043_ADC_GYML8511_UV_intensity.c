@@ -28,27 +28,23 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    sensor_0043_ADC_GYML8511_UV_intensity.c
+ * @brief   perform some function on sensor_0043
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    xx
  */
 
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
 #include <math.h>
-#include "ezlopi_util_trace.h"
 
-// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
-#include "ezlopi_core_errors.h"
 
 #include "ezlopi_hal_adc.h"
 
@@ -77,11 +73,15 @@ typedef struct s_gyml8511_data
 /*******************************************************************************
  *                          Static Function Prototypes
  *******************************************************************************/
+
 static ezlopi_error_t __0043_prepare(void *arg);
 static ezlopi_error_t __0043_init(l_ezlopi_item_t *item);
 static ezlopi_error_t __0043_get_cjson_value(l_ezlopi_item_t *item, void *arg);
 static ezlopi_error_t __0043_notify(l_ezlopi_item_t *item);
 static float mapfloat(float x, float in_min, float in_max, float out_min, float out_max);
+static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
+static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, void *user_data);
+static void __prepare_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj_device);
 
 /*******************************************************************************
  *                          Static Data Definitions
@@ -94,13 +94,7 @@ static float mapfloat(float x, float in_min, float in_max, float out_min, float 
 /*******************************************************************************
  *                          Extern Function Definitions
  *******************************************************************************/
-
-/**
- * @brief Global/extern function template example
- * Convention : Use capital letter for initial word on extern function
- * @param arg
- */
-ezlopi_error_t sensor_0043_ADC_GYML8511_UV_intensity(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+ezlopi_error_t SENSOR_0043_adc_gyml8511_uv_intensity(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
     switch (action)
@@ -135,8 +129,9 @@ ezlopi_error_t sensor_0043_ADC_GYML8511_UV_intensity(e_ezlopi_actions_t action, 
 }
 
 /*******************************************************************************
- *                          Static Function Definitions
+ *                         Static Function Definitions
  *******************************************************************************/
+
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     device->cloud_properties.category = category_level_sensor;
@@ -148,7 +143,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
 
 static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, void *user_data)
 {
-    item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
+    item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
     item->cloud_properties.item_name = ezlopi_item_name_solar_radiation;
@@ -169,7 +164,6 @@ static void __prepare_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj
         item->interface.adc.resln_bit = 3;
     }
 }
-
 static ezlopi_error_t __0043_prepare(void *arg)
 {
     ezlopi_error_t ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
@@ -182,12 +176,12 @@ static ezlopi_error_t __0043_prepare(void *arg)
         if (NULL != gyml8511_value)
         {
             memset(gyml8511_value, 0, sizeof(s_gyml8511_data_t));
-            l_ezlopi_device_t *gyml8511_device = ezlopi_device_add_device(cj_device, NULL);
+            l_ezlopi_device_t *gyml8511_device = EZPI_core_device_add_device(cj_device, NULL);
             if (gyml8511_device)
             {
                 __prepare_device_cloud_properties(gyml8511_device, cj_device);
 
-                l_ezlopi_item_t *gyml8511_item = ezlopi_device_add_item_to_device(gyml8511_device, sensor_0043_ADC_GYML8511_UV_intensity);
+                l_ezlopi_item_t *gyml8511_item = EZPI_core_device_add_item_to_device(gyml8511_device, SENSOR_0043_adc_gyml8511_uv_intensity);
                 if (gyml8511_item)
                 {
                     __prepare_item_cloud_properties(gyml8511_item, gyml8511_value);
@@ -196,7 +190,7 @@ static ezlopi_error_t __0043_prepare(void *arg)
                 }
                 else
                 {
-                    ezlopi_device_free_device(gyml8511_device);
+                    EZPI_core_device_free_device(gyml8511_device);
                     ezlopi_free(__FUNCTION__, gyml8511_value);
                 }
             }
@@ -208,7 +202,6 @@ static ezlopi_error_t __0043_prepare(void *arg)
     }
     return ret;
 }
-
 static ezlopi_error_t __0043_init(l_ezlopi_item_t *item)
 {
     ezlopi_error_t ret = EZPI_ERR_INIT_DEVICE_FAILED;
@@ -219,7 +212,7 @@ static ezlopi_error_t __0043_init(l_ezlopi_item_t *item)
         {
             if (GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
             {
-                if (EZPI_SUCCESS == ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
+                if (EZPI_SUCCESS == EZPI_hal_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
                 {
                     ret = EZPI_SUCCESS;
                 }
@@ -228,7 +221,6 @@ static ezlopi_error_t __0043_init(l_ezlopi_item_t *item)
     }
     return ret;
 }
-
 static ezlopi_error_t __0043_get_cjson_value(l_ezlopi_item_t *item, void *arg)
 {
     ezlopi_error_t ret = EZPI_FAILED;
@@ -240,14 +232,13 @@ static ezlopi_error_t __0043_get_cjson_value(l_ezlopi_item_t *item, void *arg)
             s_gyml8511_data_t *user_data = (s_gyml8511_data_t *)item->user_arg;
             if (user_data)
             {
-                ezlopi_valueformatter_float_to_cjson(cj_result, (user_data->uv_data) / 10, NULL);
+                EZPI_core_valueformatter_float_to_cjson(cj_result, (user_data->uv_data) / 10, NULL);
                 ret = EZPI_SUCCESS;
             }
         }
     }
     return ret;
 }
-
 static ezlopi_error_t __0043_notify(l_ezlopi_item_t *item)
 {
     ezlopi_error_t ret = EZPI_FAILED;
@@ -256,21 +247,20 @@ static ezlopi_error_t __0043_notify(l_ezlopi_item_t *item)
         s_gyml8511_data_t *user_data = (s_gyml8511_data_t *)item->user_arg;
         if (user_data)
         {
-            s_ezlopi_analog_data_t adc_data = { .value = 0, .voltage = 0 };
-            ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &adc_data);
+            s_ezlopi_analog_data_t adc_data = {.value = 0, .voltage = 0};
+            EZPI_hal_adc_get_adc_data(item->interface.adc.gpio_num, &adc_data);
             float new_uvIntensity = mapfloat(((float)(adc_data.voltage) / 1000), 0.97, 2.7, 0.0, 15.0);
             TRACE_S("%dmv -> intensity: %.2f", adc_data.voltage, new_uvIntensity);
             if (fabs((user_data->uv_data) - new_uvIntensity) > 0.01)
             {
                 user_data->uv_data = new_uvIntensity;
-                ezlopi_device_value_updated_from_device_broadcast(item);
+                EZPI_core_device_value_updated_from_device_broadcast(item);
                 ret = EZPI_SUCCESS;
             }
         }
     }
     return ret;
 }
-
 static float mapfloat(float x, float in_min, float in_max, float out_min, float out_max)
 {
     float res = ((x - in_min) * ((out_max - out_min) / (in_max - in_min)) + out_min);

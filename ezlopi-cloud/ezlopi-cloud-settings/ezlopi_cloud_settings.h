@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2022 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -30,11 +30,11 @@
 */
 
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
- * @version 0.1
- * @date    1st January 2024
+ * @file    ezlopi_cloud_settings.h
+ * @brief
+ * @author
+ * @version
+ * @date
  */
 
 #ifndef __HUB_SETTINGS_H__
@@ -44,7 +44,6 @@
  *                          Include Files
  *******************************************************************************/
 #include <string.h>
-#include "cjext.h"
 
 #include "ezlopi_core_settings.h"
 #include "ezlopi_core_devices.h"
@@ -56,7 +55,6 @@
 extern "C"
 {
 #endif
-
     /*******************************************************************************
      *                          Type & Macro Declarations
      *******************************************************************************/
@@ -69,19 +67,36 @@ extern "C"
      *                          Extern Function Prototypes
      *******************************************************************************/
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
+     * @brief Function that responds to hub.device.settings.list method
      *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
      */
-    void ezlopi_device_settings_list_v3(cJSON* cj_request, cJSON* cj_response);
-    void ezlopi_device_settings_value_set_v3(cJSON* cj_request, cJSON* cj_response);
-    void ezlopi_device_settings_reset_v3(cJSON* cj_request, cJSON* cj_response);
-    cJSON* ezlopi_cloud_settings_updated_from_devices_v3(l_ezlopi_device_t* device, l_ezlopi_device_settings_v3_t* setting);
+    void EZPI_device_settings_list_v3(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function that responds to hub.device.settings.value.set method
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_device_settings_value_set_v3(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function that responds to hub.device.setting.reset method
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_device_settings_reset_v3(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Updater function to update device settings to the cloud
+     *
+     * @deprecated
+     *
+     * @param device
+     * @param setting
+     * @return cJSON*
+     */
+    cJSON *EZPI_cloud_settings_updated_from_devices_v3(l_ezlopi_device_t *device, l_ezlopi_device_settings_v3_t *setting);
 
 #ifdef __cplusplus
 }

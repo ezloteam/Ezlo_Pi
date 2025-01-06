@@ -28,13 +28,12 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_core_wifi_err_reason.c
+ * @brief   perform some function on wifi-error
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    12th DEC 2024
  */
 
 /*******************************************************************************
@@ -70,12 +69,7 @@
  *                          Extern Function Definitions
  *******************************************************************************/
 
-/**
- * @brief Global/extern function template example
- * Convention : Use capital letter for initial word on extern function
- * @param arg
- */
-const char *ezlopi_wifi_err_reason_str(wifi_err_reason_t wifi_err)
+const char *EZPI_core_wifi_err_reason_str(wifi_err_reason_t wifi_err)
 {
     switch (wifi_err)
     {
@@ -214,9 +208,8 @@ const char *ezlopi_wifi_err_reason_str(wifi_err_reason_t wifi_err)
     }
     }
 }
-
 /*******************************************************************************
- *                          Static Function Definitions
+ *                         Static Function Definitions
  *******************************************************************************/
 
 /*******************************************************************************

@@ -1,3 +1,4 @@
+
 /* ===========================================================================
 ** Copyright (C) 2024 Ezlo Innovation Inc
 **
@@ -28,17 +29,19 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_core_websocket_client.h
+ * @brief   perform some function on websocket_client
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    12th DEC 2024
  */
 
 #ifndef _EZLOPI_CORE_WEBSOCKET_CLIENT_H_
 #define _EZLOPI_CORE_WEBSOCKET_CLIENT_H_
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 
 /*******************************************************************************
  *                          Include Files
@@ -78,23 +81,46 @@ extern "C"
     /*******************************************************************************
      *                          Extern Function Prototypes
      *******************************************************************************/
-    /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
-     *
-     */
-    ezlopi_error_t ezlopi_websocket_client_send(char *data, uint32_t len);
-    // esp_websocket_client_handle_t ezlopi_websocket_client_init(cJSON *uri, void (*msg_upcall)(const char *, uint32_t), void (*connection_upcall)(bool connection));
-    esp_websocket_client_handle_t ezlopi_websocket_client_init(cJSON *uri, int (*msg_upcall)(const char *, uint32_t, time_t time_ms), void (*connection_upcall)(bool connection));
-    bool ezlopi_websocket_client_is_connected(void);
-    void ezlopi_websocket_client_kill(void);
 
-    #if 0
+    /**
+     * @brief  Function to send websocket client request
+     *
+     * @param client websocket client structure
+     * @param data  Target request-data
+     * @param len Length of data
+     * @param timeout_ms Timeout in ms
+     * @return ezlopi_error_t
+     */
+    ezlopi_error_t EZPI_core_websocket_client_send(esp_websocket_client_handle_t client, char *data, uint32_t len, uint32_t timeout_ms);
+    /**
+     * @brief  Function go initialize websocket client service
+     *
+     * @param uri Pointer to request url
+     * @param msg_upcall Function ptr to callback_msg_method
+     * @param connection_upcall  Function ptr to callback_connection_method
+     * @param ca_cert Certificate creds
+     * @param ssl_private SSL-privatet key
+     * @param ssl_shared SSL-shared key
+     * @return esp_websocket_client_handle_t
+     */
+    esp_websocket_client_handle_t EZPI_core_websocket_client_init(cJSON *uri, int (*msg_upcall)(char *, uint32_t, time_t time_stamp), void (*connection_upcall)(bool connected),
+                                                                  char *ca_cert, char *ssl_private, char *ssl_shared);
+    /**
+     * @brief Function to get websocket connection status
+     *
+     * @param client Target client
+     * @return true
+     * @return false
+     */
+    bool EZPI_core_websocket_client_is_connected(esp_websocket_client_handle_t client);
+    /**
+     * @brief Function to destroy websocket client
+     *
+     * @param client  Target Client
+     */
+    void EZPI_core_websocket_client_kill(esp_websocket_client_handle_t client);
+
+#if 0
     class websocket_client
     {
     private:
@@ -105,7 +131,7 @@ extern "C"
          *
          * @return esp_websocket_client_handle_t* object of the initiated client
          */
-        esp_websocket_client_handle_t websocket_app_start(std::string& uri, void (*upcall)(const char*, uint32_t));
+        esp_websocket_client_handle_t websocket_app_start(std::string &uri, void (*upcall)(const char *, uint32_t));
 
         /**
          * @brief      Write textual data to the WebSocket connection (data send with WS OPCODE=01, i.e. text)
@@ -116,8 +142,8 @@ extern "C"
          *     - Number of data was sent
          *     - (-1) if any errors
          */
-        int send(std::string& _str);
-        int send(char* c_str);
+        int send(std::string &_str);
+        int send(char *c_str);
 
         bool is_connected(void);
 
@@ -127,7 +153,7 @@ extern "C"
          */
         void websocket_client_kill(void);
     };
-    #endif
+#endif
 
 #ifdef __cplusplus
 }

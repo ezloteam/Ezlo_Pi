@@ -28,23 +28,25 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_core_offline_login.c
+ * @brief   Function to perform offine login operation
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    12th DEC 2024
  */
 
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
+
 #include "cjext.h"
 #include "ezlopi_core_nvs.h"
 #include "EZLOPI_USER_CONFIG.h"
 #include "ezlopi_core_factory_info.h"
 #include "ezlopi_core_offline_login.h"
+
+#define BYPASS_LOGIN 1
 
 /*******************************************************************************
  *                          Extern Data Declarations
@@ -74,13 +76,7 @@ static bool logged_in = false;
 /*******************************************************************************
  *                          Extern Function Definitions
  *******************************************************************************/
-
-/**
- * @brief Global/extern function template example
- * Convention : Use capital letter for initial word on extern function
- * @param arg
- */
-ezlopi_error_t ezlopi_core_offline_login_perform(cJSON *cj_params)
+ezlopi_error_t EZPI_core_offline_login_perform(cJSON *cj_params)
 {
     ezlopi_error_t error = EZPI_SUCCESS;
     if (logged_in)
@@ -89,18 +85,23 @@ ezlopi_error_t ezlopi_core_offline_login_perform(cJSON *cj_params)
     }
     else
     {
+#if (1 == BYPASS_LOGIN)
+        logged_in = true;
+#else  // BYPASS_LOGIN == 0
         cJSON *cj_user = cJSON_GetObjectItem(__FUNCTION__, cj_params, "user");
         cJSON *cj_token = cJSON_GetObjectItem(__FUNCTION__, cj_params, "token");
         if (cj_user && cj_token && (cJSON_IsString(cj_user)) && (cJSON_IsString(cj_token)))
         {
-            // char *stored_uesr_id = ezlopi_nvs_read_user_id_str();
+
+            // char *stored_uesr_id = EZPI_core_nvs_read_user_id_str();
             // if (NULL != stored_uesr_id)
             {
                 // if (0 == strncmp(stored_uesr_id, cj_user->valuestring, strlen(stored_uesr_id)))
                 {
-                    const char *password_saved = ezlopi_factory_info_v3_get_local_key();
+                    const char *password_saved = EZPI_core_factory_info_v3_get_local_key();
                     if (NULL != password_saved)
                     {
+                        TRACE_D("password: %s", password_saved);
                         if (0 == strncmp(password_saved, cj_token->valuestring, strlen(password_saved)))
                         {
                             logged_in = true;
@@ -109,7 +110,7 @@ ezlopi_error_t ezlopi_core_offline_login_perform(cJSON *cj_params)
                         {
                             error = EZPI_ERR_INVALID_CREDENTIALS;
                         }
-                        ezlopi_factory_info_v3_free(password_saved);
+                        EZPI_core_factory_info_v3_free(password_saved);
                     }
                     else
                     {
@@ -127,11 +128,13 @@ ezlopi_error_t ezlopi_core_offline_login_perform(cJSON *cj_params)
         {
             error = EZPI_ERR_WRONG_PARAM;
         }
+#endif // BYPASS_LOGIN == 0
     }
+
     return error;
 }
 
-ezlopi_error_t ezlopi_core_offline_logout_perform()
+ezlopi_error_t EZPI_core_offline_logout_perform()
 {
     ezlopi_error_t error = EZPI_FAILED;
     if (logged_in)
@@ -142,13 +145,13 @@ ezlopi_error_t ezlopi_core_offline_logout_perform()
     return error;
 }
 
-bool is_user_logged_in()
+bool EZPI_core_offline_is_user_logged_in()
 {
     return logged_in;
 }
 
 /*******************************************************************************
- *                          Static Function Definitions
+ *                         Static Function Definitions
  *******************************************************************************/
 
 /*******************************************************************************

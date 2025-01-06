@@ -29,6 +29,16 @@
 ** ===========================================================================
 */
 
+/**
+ * @file    ezlopi_cloud_room_types_str.c
+ * @brief
+ * @author
+ * @version
+ * @date
+ */
+#ifndef __EZLOPI_ROOMTYPES_STR_H__
+#define __EZLOPI_ROOMTYPES_STR_H__
+
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
@@ -56,6 +66,7 @@
 /*******************************************************************************
  *                          Extern Data Definitions
  *******************************************************************************/
+
 const char *hub_room_type_livingroom_title = "hub.room.type.livingroom.title";
 const char *hub_room_type_kitchen_title = "hub.room.type.kitchen.title";
 const char *hub_room_type_bedroom_title = "hub.room.type.bedroom.title";
@@ -77,7 +88,7 @@ const char *hub_room_type_bathroom_title = "hub.room.type.bathroom.title";
 /*******************************************************************************
  *                          Static Function Definitions
  *******************************************************************************/
-
+#endif // __EZLOPI_ROOMTYPES_STR_H__
 /*******************************************************************************
  *                          End of File
  *******************************************************************************/

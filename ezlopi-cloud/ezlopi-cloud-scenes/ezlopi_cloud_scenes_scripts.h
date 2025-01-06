@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2022 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -30,13 +30,12 @@
 */
 
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
- * @version 0.1
- * @date    1st January 2024
+ * @file    ezlopi_cloud_scenes_scripts.h
+ * @brief
+ * @author
+ * @version
+ * @date
  */
-
 #ifndef __SCENES_SCRIPTS_H__
 #define __SCENES_SCRIPTS_H__
 
@@ -67,27 +66,53 @@ extern "C"
      *                          Extern Function Prototypes
      *******************************************************************************/
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
+     * @brief Function that responds to hub.scenes.script.add method
      *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
      */
-    void scenes_scripts_add(cJSON* cj_request, cJSON* cj_response);
-    void scenes_scripts_get(cJSON* cj_request, cJSON* cj_response);
-    void scenes_scripts_list(cJSON* cj_request, cJSON* cj_response);
-    void scenes_scripts_delete(cJSON* cj_request, cJSON* cj_response);
-    void scenes_scripts_set(cJSON* cj_request, cJSON* cj_response);
-    void scenes_scripts_run(cJSON* cj_request, cJSON* cj_response);
+    void EZPI_scenes_scripts_add(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function that responds to hub.scenes.script.get method
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_scenes_scripts_get(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function that responds to hub.scenes.script.list method
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_scenes_scripts_list(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function that responds to hub.scenes.script.delete method
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_scenes_scripts_delete(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function that responds to hub.scenes.script.set method
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_scenes_scripts_set(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function that responds to hub.scenes.script.run method
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_scenes_scripts_run(cJSON *cj_request, cJSON *cj_response);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+#endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 #endif // __SCENES_SCRIPTS_H__
 

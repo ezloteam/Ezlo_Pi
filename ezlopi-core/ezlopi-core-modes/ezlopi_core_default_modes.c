@@ -28,13 +28,12 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_core_default_modes.c
+ * @brief   These files provide default values for house_modes
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    12th DEC 2024
  */
 
 /*******************************************************************************
@@ -136,18 +135,12 @@ static s_house_modes_t sg_default_house_mode = {
 /*******************************************************************************
  *                          Extern Function Definitions
  *******************************************************************************/
-
-/**
- * @brief Global/extern function template example
- * Convention : Use capital letter for initial word on extern function
- * @param arg
- */
-s_ezlopi_modes_t *ezlopi_core_default_mode_get(void)
+s_ezlopi_modes_t *EZPI_core_default_mode_get(void)
 {
     return &sg_default_mode;
 }
 
-void ezlopi_core_default_init(void)
+void EZPI_core_default_init(void)
 {
     sg_default_house_mode.cj_notifications = NULL;
     sg_default_house_mode.cj_bypass_devices = NULL;
@@ -197,16 +190,16 @@ void ezlopi_core_default_init(void)
 }
 
 /*******************************************************************************
- *                          Static Function Definitions
+ *                         Static Function Definitions
  *******************************************************************************/
 static void __cjson_add_security_device_to_array(cJSON *cj_device_array)
 {
     if (cj_device_array && (cj_device_array->type == cJSON_Array))
     {
-        l_ezlopi_device_t *curr_device = ezlopi_device_get_head();
+        l_ezlopi_device_t *curr_device = EZPI_core_device_get_head();
         while (curr_device)
         {
-            if (EZPI_STRNCMP_IF_EQUAL(category_security_sensor, curr_device->cloud_properties.category, strlen(category_security_sensor), strlen(curr_device->cloud_properties.category)))
+            if (EZPI_STRNCMP_IF_EQUAL(category_security_sensor, curr_device->cloud_properties.category, strlen(category_security_sensor) + 1, strlen(curr_device->cloud_properties.category) + 1))
             {
                 char temp[32];
                 memset(temp, 0, 32);
@@ -219,7 +212,6 @@ static void __cjson_add_security_device_to_array(cJSON *cj_device_array)
 }
 
 #endif // CONFIG_EZPI_SERV_ENABLE_MODES
-
 /*******************************************************************************
  *                          End of File
  *******************************************************************************/

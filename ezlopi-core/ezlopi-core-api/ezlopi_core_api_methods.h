@@ -28,17 +28,20 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_core_api_methods.h
+ * @brief   Functions perform operation for API-methods
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    12th DEC 2024
  */
 
-#ifndef __EZLOPI_CORE_EZLOPI_METHODS_H__
-#define __EZLOPI_CORE_EZLOPI_METHODS_H__
+#ifndef __EZPI_core_ezlopi_methods_H__
+#define __EZPI_core_ezlopi_methods_H__
+
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 
 /*******************************************************************************
  *                          Include Files
@@ -60,14 +63,13 @@ extern "C"
     /*******************************************************************************
      *                          Type & Macro Declarations
      *******************************************************************************/
-    typedef void (*f_method_func_t)(cJSON* cj_request, cJSON* cj_response);
+    typedef void (*f_method_func_t)(cJSON *cj_request, cJSON *cj_response);
     typedef struct s_method_list_v2
     {
-        char* method_name;
+        char *method_name;
         f_method_func_t method;
         f_method_func_t updater;
     } s_method_list_v2_t;
-
     /*******************************************************************************
      *                          Extern Data Declarations
      *******************************************************************************/
@@ -76,32 +78,65 @@ extern "C"
      *                          Extern Function Prototypes
      *******************************************************************************/
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
-     *
+     * @brief This function initializes the registration of all core-action methods
      */
-    void ezlopi_core_ezlopi_methods_registration_init(void);
-    bool ezlopi_core_elzlopi_methods_check_method_register(f_method_func_t method);
-
-    uint32_t ezlopi_core_ezlopi_methods_search_in_list(cJSON* cj_method);
-
-    char* ezlopi_core_ezlopi_methods_get_name_by_id(uint32_t method_id);
-    f_method_func_t ezlopi_core_ezlopi_methods_get_by_id(uint32_t method_id);
-    f_method_func_t ezlopi_core_ezlopi_methods_get_updater_by_id(uint32_t method_id);
-
-    void ezlopi_core_ezlopi_methods_reboot(cJSON* cj_request, cJSON* cj_response);
-    void ezlopi_core_ezlopi_methods_rpc_method_notfound(cJSON* cj_request, cJSON* cj_response);
+    void EZPI_core_ezlopi_methods_registration_init(void);
+    /**
+     * @brief
+     *
+     * @param method
+     * @return true
+     * @return false
+     */
+    bool EZPI_core_ezlopi_methods_check_method_register(f_method_func_t method);
+    /**
+     * @brief This funciton returns corresponding INDEX of given action-method
+     *
+     * @param cj_method CJSON containing target-method
+     * @return uint32_t
+     */
+    uint32_t EZPI_core_ezlopi_methods_search_in_list(cJSON *cj_method);
+    /**
+     * @brief This function return method-name of corresponding action-method
+     *
+     * @param method_id Target method_idx
+     * @return char*
+     */
+    char *EZPI_core_ezlopi_methods_get_name_by_id(uint32_t method_id);
+    /**
+     * @brief This function returns ptr to desired ezlopi-method
+     *
+     * @param method_id Target method_idx
+     * @return f_method_func_t
+     */
+    f_method_func_t EZPI_core_ezlopi_methods_get_by_id(uint32_t method_id);
+    /**
+     * @brief This function returns ptr to udpdated function of target-ezlopi-method
+     *
+     * @param method_id Target method_idx
+     * @return f_method_func_t
+     */
+    f_method_func_t EZPI_core_ezlopi_methods_get_updater_by_id(uint32_t method_id);
+    /**
+     * @brief This function triggers a soft-reset of the system
+     *
+     * @param cj_request Pointer to request obj
+     * @param cj_response Pointer to response obj
+     */
+    void EZPI_core_ezlopi_methods_reboot(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief This function prepares a 'method-not-found' reply for any invalid API-triggers
+     *
+     * @param cj_request Pointer to request obj
+     * @param cj_response Pointer to response obj
+     */
+    void EZPI_core_ezlopi_methods_rpc_method_notfound(cJSON *cj_request, cJSON *cj_response);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // __EZLOPI_CORE_EZLOPI_METHODS_H__
+#endif // __EZPI_core_ezlopi_methods_H__
 
 /*******************************************************************************
  *                          End of File

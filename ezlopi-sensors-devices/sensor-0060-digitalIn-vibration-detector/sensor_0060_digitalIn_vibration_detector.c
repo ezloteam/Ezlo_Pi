@@ -1,52 +1,7 @@
-/* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
-**
-** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
-**
-** Redistribution and use in source and binary forms, with or without
-** modification, are permitted provided that the following conditions are met:
-**
-** 1. Redistributions of source code must retain the above copyright notice,
-**    this list of conditions and the following disclaimer.
-** 2. Redistributions in binary form must reproduce the above copyright
-**    notice, this list of conditions and the following disclaimer in the
-**    documentation and/or other materials provided with the distribution.
-** 3. Neither the name of the copyright holder nor the names of its
-**    contributors may be used to endorse or promote products derived from
-**    this software without specific prior written permission.
-**
-** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
-** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-** POSSIBILITY OF SUCH DAMAGE.
-** ===========================================================================
-*/
 
-/**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
- * @version 0.1
- * @date    1st January 2024
- */
-
-/*******************************************************************************
- *                          Include Files
- *******************************************************************************/
-#include "ezlopi_util_trace.h"
-
-// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
-#include "ezlopi_core_errors.h"
 
 #include "ezlopi_hal_gpio.h"
 
@@ -67,7 +22,12 @@
 /*******************************************************************************
  *                          Type & Macro Definitions
  *******************************************************************************/
-
+const char *Sw420_vibration_activity_state_token[] = {
+    "no_activity",
+    "shake",
+    "tilt",
+    "drop",
+};
 /*******************************************************************************
  *                          Static Function Prototypes
  *******************************************************************************/
@@ -79,31 +39,8 @@ static ezlopi_error_t __0060_notify(l_ezlopi_item_t *item);
 
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
 static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device);
-
-/*******************************************************************************
- *                          Static Data Definitions
- *******************************************************************************/
-const char *Sw420_vibration_activity_state_token[] = {
-    "no_activity",
-    "shake",
-    "tilt",
-    "drop",
-};
-
-/*******************************************************************************
- *                          Extern Data Definitions
- *******************************************************************************/
-
-/*******************************************************************************
- *                          Extern Function Definitions
- *******************************************************************************/
-
-/**
- * @brief Global/extern function template example
- * Convention : Use capital letter for initial word on extern function
- * @param arg
- */
-ezlopi_error_t sensor_0060_digitalIn_vibration_detector(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+//---------------------------------------------------------------------------------------------------------
+ezlopi_error_t SENSOR_0060_digitalIn_vibration_detector(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
     switch (action)
@@ -161,7 +98,7 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_dev
     item->cloud_properties.item_name = ezlopi_item_name_activity;
     item->cloud_properties.value_type = value_type_token;
     item->cloud_properties.scale = NULL;
-    item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
+    item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
 
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
     CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_str, item->interface.gpio.gpio_in.gpio_num);
@@ -182,11 +119,11 @@ static ezlopi_error_t __0060_prepare(void *arg)
         s_ezlopi_prep_arg_t *dev_prep_arg = (s_ezlopi_prep_arg_t *)arg;
         if (dev_prep_arg && (NULL != dev_prep_arg->cjson_device))
         {
-            l_ezlopi_device_t *vibration_device = ezlopi_device_add_device(dev_prep_arg->cjson_device, NULL);
+            l_ezlopi_device_t *vibration_device = EZPI_core_device_add_device(dev_prep_arg->cjson_device, NULL);
             if (vibration_device)
             {
                 __prepare_device_cloud_properties(vibration_device, dev_prep_arg->cjson_device);
-                l_ezlopi_item_t *vibration_item = ezlopi_device_add_item_to_device(vibration_device, sensor_0060_digitalIn_vibration_detector);
+                l_ezlopi_item_t *vibration_item = EZPI_core_device_add_item_to_device(vibration_device, SENSOR_0060_digitalIn_vibration_detector);
                 if (vibration_item)
                 {
                     __prepare_item_cloud_properties(vibration_item, dev_prep_arg->cjson_device);
@@ -194,7 +131,7 @@ static ezlopi_error_t __0060_prepare(void *arg)
                 }
                 else
                 {
-                    ezlopi_device_free_device(vibration_device);
+                    EZPI_core_device_free_device(vibration_device);
                 }
             }
         }
@@ -299,7 +236,7 @@ static ezlopi_error_t __0060_notify(l_ezlopi_item_t *item)
     if (curret_value != (char *)item->user_arg) // calls update only if there is change in state
     {
         item->user_arg = (void *)curret_value;
-        ezlopi_device_value_updated_from_device_broadcast(item);
+        EZPI_core_device_value_updated_from_device_broadcast(item);
         ret = EZPI_SUCCESS;
     }
 

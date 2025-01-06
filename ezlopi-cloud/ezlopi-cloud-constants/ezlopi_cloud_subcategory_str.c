@@ -30,12 +30,15 @@
 */
 
 /**
- * @file    main.c
+ * @file    ezlopi_cloud_subcategory_str.c
  * @brief   perform some function on data
  * @author  John Doe
  * @version 0.1
  * @date    1st January 2024
  */
+
+#ifndef __EZLOPI_SUBCATEGORY_H__
+#define __EZLOPI_SUBCATEGORY_H__
 
 /*******************************************************************************
  *                          Include Files
@@ -111,7 +114,7 @@ const char *subcategory_moisture = "moisture";
 // const  char *subcategory_velocity = "velocity";
 // const  char *subcategory_capacity = "capacity";
 const char *subcategory_water = "water";
-const  char *subcategory_particulate_matter = "particulate_matter";
+const char *subcategory_particulate_matter = "particulate_matter";
 // const  char *subcategory_frequency = "frequency";
 // const  char *subcategory_health = "health";
 // const  char *subcategory_modulation = "modulation";
@@ -130,6 +133,8 @@ const char *subcategory_navigation = "navigation";
 /*******************************************************************************
  *                          Static Function Definitions
  *******************************************************************************/
+
+#endif // __EZLOPI_SUBCATEGORY_H__
 
 /*******************************************************************************
  *                          End of File

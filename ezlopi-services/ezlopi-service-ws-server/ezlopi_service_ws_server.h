@@ -59,9 +59,9 @@ extern "C"
      *******************************************************************************/
     typedef enum e_ws_status
     {
-        WS_STATUS_RUNNING = 0,
-        WS_STATUS_STARTED,
-        WS_STATUS_STOPPED,
+        WS_STATUS_RUNNING = 0, /**< Status running */
+        WS_STATUS_STARTED,     /**< Status started */
+        WS_STATUS_STOPPED,     /**< Status stopped */
     } e_ws_status_t;
 
     /*******************************************************************************
@@ -81,11 +81,24 @@ extern "C"
      * @param arg
      *
      */
-    void ezlopi_service_ws_server_stop(void);
-    void ezlopi_service_ws_server_start(void);
-
-    e_ws_status_t ezlopi_service_ws_server_status(void);
-    void ezlpi_service_ws_server_dummy(void);
+    void EZPI_service_ws_server_stop(void);
+    /**
+     * @brief Function to start websocket server
+     *
+     */
+    void EZPI_service_ws_server_start(void);
+    /**
+     * @brief Function that return current status of the websocket server
+     *
+     * @return e_ws_status_t
+     * @retval Current status of the websocket server
+     */
+    e_ws_status_t EZPI_service_ws_server_status(void);
+    /**
+     * @brief Function for dummy purpose
+     *
+     */
+    void EZPI_service_ws_server_dummy(void);
 
 #ifdef __cplusplus
 }

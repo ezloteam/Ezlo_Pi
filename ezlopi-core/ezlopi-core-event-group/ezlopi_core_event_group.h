@@ -28,13 +28,12 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_core_event_group.h
+ * @brief   Operation for event groups
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    12th DEC 2024
  */
 
 #ifndef _EZLOPI_CORE_EVENT_GROUP_H_
@@ -43,6 +42,7 @@
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
+
 #include "ezlopi_core_errors.h"
 
 /*******************************************************************************
@@ -56,7 +56,7 @@ extern "C"
     /*******************************************************************************
      *                          Type & Macro Declarations
      *******************************************************************************/
-    #define EZLOPI_EVENT_BASE 0x10
+#define EZLOPI_EVENT_BASE 0x10
 
     typedef enum e_ezlopi_event
     {
@@ -76,27 +76,45 @@ extern "C"
      *                          Extern Function Prototypes
      *******************************************************************************/
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
+     * @brief Function to create event-group
      *
      */
-    void ezlopi_event_group_create(void);
-    ezlopi_error_t ezlopi_event_group_set_event(e_ezlopi_event_t event);
-    ezlopi_error_t ezlopi_event_group_clear_event(e_ezlopi_event_t event);
-    ezlopi_error_t ezlopi_event_group_wait_for_event(e_ezlopi_event_t event, uint32_t wait_time_ms, uint32_t clear_on_exit);
-    e_ezlopi_event_t ezlopi_get_event_bit_status();
+    void EZPI_event_group_create(void);
+    /**
+     * @brief Function to set event
+     *
+     * @param event enum of target event
+     * @return ezlopi_error_t
+     */
+    ezlopi_error_t EZPI_core_event_group_set_event(e_ezlopi_event_t event);
+    /**
+     * @brief Funtion to clear event
+     *
+     * @param event enum of target event
+     * @return ezlopi_error_t
+     */
+    ezlopi_error_t EZPI_core_event_group_clear_event(e_ezlopi_event_t event);
+    /**
+     * @brief Funtion to trigger event
+     *
+     * @param event Target event
+     * @param wait_time_ms Wait time for event to occur
+     * @param clear_on_exit Clears event bits after occurance
+     * @return ezlopi_error_t
+     */
+    ezlopi_error_t EZPI_core_event_group_wait_for_event(e_ezlopi_event_t event, uint32_t wait_time_ms, uint32_t clear_on_exit);
+    /**
+     * @brief Funtion to get event-bit status
+     *
+     * @return e_ezlopi_event_t
+     */
+    e_ezlopi_event_t EZPI_core_event_group_get_eventbit_status();
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif // _EZLOPI_CORE_EVENT_GROUP_H_
-
 /*******************************************************************************
  *                          End of File
  *******************************************************************************/

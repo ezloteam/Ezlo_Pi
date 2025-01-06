@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2022 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -30,13 +30,12 @@
 */
 
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
- * @version 0.1
- * @date    1st January 2024
+ * @file    gateways_commands_str.h
+ * @brief
+ * @author
+ * @version
+ * @date
  */
-
 #ifndef __GATEWAYS_COMMANDS_STR_H__
 #define __GATEWAYS_COMMANDS_STR_H__
 

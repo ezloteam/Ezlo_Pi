@@ -1,3 +1,4 @@
+
 /* ===========================================================================
 ** Copyright (C) 2024 Ezlo Innovation Inc
 **
@@ -28,18 +29,18 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_core_valueformatter.c
+ * @brief   perform some function on valueformatting operation
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    12th DEC 2024
  */
 
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -75,19 +76,13 @@
 /*******************************************************************************
  *                          Extern Function Definitions
  *******************************************************************************/
-
-/**
- * @brief Global/extern function template example
- * Convention : Use capital letter for initial word on extern function
- * @param arg
- */
-void ezlopi_valueformatter_bool_to_cjson(cJSON* cj_root, bool value, const char * scale)
+void EZPI_core_valueformatter_bool_to_cjson(cJSON *cj_root, bool value, const char *scale)
 {
     cJSON_AddBoolToObject(__FUNCTION__, cj_root, ezlopi_value_str, value);
     cJSON_AddStringToObject(__FUNCTION__, cj_root, ezlopi_valueFormatted_str, value ? ezlopi_true_str : ezlopi_false_str);
 }
 
-void ezlopi_valueformatter_float_to_cjson(cJSON* cj_root, float value, const char * scale)
+void EZPI_core_valueformatter_float_to_cjson(cJSON *cj_root, float value, const char *scale)
 {
     cJSON_AddNumberToObject(__FUNCTION__, cj_root, ezlopi_value_str, value);
 
@@ -96,7 +91,7 @@ void ezlopi_valueformatter_float_to_cjson(cJSON* cj_root, float value, const cha
     cJSON_AddStringToObject(__FUNCTION__, cj_root, ezlopi_valueFormatted_str, valueFormatted);
 }
 
-void ezlopi_valueformatter_double_to_cjson(cJSON* cj_root, double value, const char * scale)
+void EZPI_core_valueformatter_double_to_cjson(cJSON *cj_root, double value, const char *scale)
 {
     cJSON_AddNumberToObject(__FUNCTION__, cj_root, ezlopi_value_str, value);
 
@@ -105,7 +100,7 @@ void ezlopi_valueformatter_double_to_cjson(cJSON* cj_root, double value, const c
     cJSON_AddStringToObject(__FUNCTION__, cj_root, ezlopi_valueFormatted_str, valueFormatted);
 }
 
-void ezlopi_valueformatter_int32_to_cjson(cJSON* cj_root, int value, const char * scale)
+void EZPI_core_valueformatter_int32_to_cjson(cJSON *cj_root, int value, const char *scale)
 {
     cJSON_AddNumberToObject(__FUNCTION__, cj_root, ezlopi_value_str, value);
 
@@ -114,7 +109,7 @@ void ezlopi_valueformatter_int32_to_cjson(cJSON* cj_root, int value, const char 
     cJSON_AddStringToObject(__FUNCTION__, cj_root, ezlopi_valueFormatted_str, valueFormatted);
 }
 
-void ezlopi_valueformatter_uint32_to_cjson(cJSON* cj_root, uint32_t value, const char * scale)
+void EZPI_core_valueformatter_uint32_to_cjson(cJSON *cj_root, uint32_t value, const char *scale)
 {
     cJSON_AddNumberToObject(__FUNCTION__, cj_root, ezlopi_value_str, value);
 
@@ -124,7 +119,7 @@ void ezlopi_valueformatter_uint32_to_cjson(cJSON* cj_root, uint32_t value, const
 }
 
 /*******************************************************************************
- *                          Static Function Definitions
+ *                         Static Function Definitions
  *******************************************************************************/
 
 /*******************************************************************************

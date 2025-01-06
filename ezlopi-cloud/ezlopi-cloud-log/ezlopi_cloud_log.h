@@ -1,5 +1,6 @@
+
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2022 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -30,11 +31,11 @@
 */
 
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
- * @version 0.1
- * @date    1st January 2024
+ * @file    ezlopi_cloud_log.c
+ * @brief
+ * @author
+ * @version
+ * @date
  */
 
 #ifndef _EZLOPI_CLOUD_LOG_H_
@@ -43,7 +44,6 @@
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_UTIL_TRACE_EN
-
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
@@ -68,26 +68,33 @@ extern "C"
     /*******************************************************************************
      *                          Extern Function Prototypes
      *******************************************************************************/
+
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
+     * @brief Function to respond to hub.log.set method
      *
+     * @param cj_request incoming JSON request
+     * @param cj_response Outgoing JSON response
      */
-    void ezlopi_hub_cloud_log_set(cJSON* cj_request, cJSON* cj_response);
+    void EZPI_hub_cloud_log_set(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function to respond to hub.log.local.set method
+     *
+     * @param cj_request incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_hub_serial_log_set(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function that sends serial log set updated response to the cloud
+     *
+     * @param cj_request incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_hub_serial_log_set_updater(cJSON *cj_request, cJSON *cj_response);
 
-    void ezlopi_hub_serial_log_set(cJSON* cj_request, cJSON* cj_response);
-    void ezlopi_hub_serial_log_set_updater(cJSON* cj_request, cJSON* cj_response);
-
+#endif // CONFIG_EZPI_UTIL_TRACE_EN
 #ifdef __cplusplus
 }
 #endif
-
-#endif  // CONFIG_EZPI_UTIL_TRACE_EN
 
 #endif // _EZLOPI_CLOUD_LOG_H_
 

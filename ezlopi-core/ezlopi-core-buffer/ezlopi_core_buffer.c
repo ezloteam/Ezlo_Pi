@@ -28,18 +28,18 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_core_buffer.c
+ * @brief   perform some function on system-buffer for messages
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    12th DEC 2024
  */
 
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
+
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <freertos/semphr.h>
@@ -79,22 +79,12 @@ static volatile e_buffer_state_t __buffer_lock_state = EZ_BUFFER_STATE_NOT_INITI
 /*******************************************************************************
  *                          Extern Function Definitions
  *******************************************************************************/
-
-/**
- * @brief Global/extern function template example
- * Convention : Use capital letter for initial word on extern function
- * @param arg
- */
-
-/*******************************************************************************
- *                          Static Function Definitions
- *******************************************************************************/
-e_buffer_state_t ezlopi_core_buffer_status(void)
+e_buffer_state_t EZPI_core_buffer_status(void)
 {
     return __buffer_lock_state;
 }
 
-void ezlopi_core_buffer_deinit(void)
+void EZPI_core_buffer_deinit(void)
 {
     if (__buffer_lock)
     {
@@ -109,7 +99,7 @@ void ezlopi_core_buffer_deinit(void)
     __buffer_lock_state = EZ_BUFFER_STATE_NOT_INITIATED;
 }
 
-void ezlopi_core_buffer_init(uint32_t len)
+void EZPI_core_buffer_init(uint32_t len)
 {
     if (__buffer_lock)
     {
@@ -165,7 +155,7 @@ void ezlopi_core_buffer_init(uint32_t len)
     }
 }
 
-char *ezlopi_core_buffer_acquire(const char *who, uint32_t *len, uint32_t wait_to_acquired_ms)
+char *EZPI_core_buffer_acquire(const char *who, uint32_t *len, uint32_t wait_to_acquired_ms)
 {
     char *ret = NULL;
     // uint32_t start_time = xTaskGetTickCount();
@@ -178,20 +168,24 @@ char *ezlopi_core_buffer_acquire(const char *who, uint32_t *len, uint32_t wait_t
             __buffer_lock_state = EZ_BUFFER_STATE_BUSY;
             TRACE_I("(%s): buffer acquired", who);
         }
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
         else
         {
             TRACE_E("(%s): buffer acquire failed!", who);
         }
+#endif
     }
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
     else
     {
         TRACE_E("(%s): __buffer_lock = NULL!", who);
     }
+#endif
 
     return ret;
 }
 
-void ezlopi_core_buffer_release(const char *who)
+void EZPI_core_buffer_release(const char *who)
 {
 #if 0
     if (__buffer_lock && (EZ_BUFFER_STATE_BUSY == __buffer_lock_state))
@@ -214,13 +208,19 @@ void ezlopi_core_buffer_release(const char *who)
         __buffer_lock_state = EZ_BUFFER_STATE_AVAILABLE;
         TRACE_I("(%s): buffer release success", who);
     }
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
     else
     {
         TRACE_E("__buffer_lock: %p", __buffer_lock);
         // TRACE_E("__buffer_lock_state: %d", __buffer_lock_state);
         TRACE_E("(%s): buffer release failed!", who);
     }
+#endif
 }
+
+/*******************************************************************************
+ *                         Static Function Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
  *                          End of File

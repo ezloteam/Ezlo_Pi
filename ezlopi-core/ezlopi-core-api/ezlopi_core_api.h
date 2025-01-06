@@ -28,15 +28,13 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
+ * @file    main.h
  * @brief   perform some function on data
- * @author  John Doe
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    12th DEC 2024
  */
-
 #ifndef __EZLOPI_CORE_API_H__
 #define __EZLOPI_CORE_API_H__
 
@@ -68,17 +66,21 @@ extern "C"
      *                          Extern Function Prototypes
      *******************************************************************************/
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
+     * @brief Function to parse and process the incoming API-request
      *
+     * @param cj_request Pointer to request cjson
+     * @return CJSON *
      */
-    cJSON *ezlopi_core_api_consume_cjson(const char *who, cJSON *cj_request);
-    cJSON* ezlopi_core_api_consume(const char * who, const char* payload, uint32_t len);
+    cJSON *EZPI_core_api_consume_cjson(const char *who, cJSON *cj_request, time_t time_stamp);
+    /**
+     * @brief This function parses incoming payload message
+     *
+     * @param who Pointer to callback-line and function-name
+     * @param payload Pointer to message payload
+     * @param len Length of the payload
+     * @return cJSON*
+     */
+    cJSON *EZPI_core_api_consume(const char *who, const char *payload, uint32_t len, time_t time_stamp);
 
 #ifdef __cplusplus
 }

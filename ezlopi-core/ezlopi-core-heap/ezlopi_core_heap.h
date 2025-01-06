@@ -28,13 +28,12 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_core_heap.h
+ * @brief   Function to operate on heap
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    12th DEC 2024
  */
 
 #ifndef __EZLOPI_UTIL_HEAP_TRACE_H__
@@ -68,22 +67,58 @@ extern "C"
      *                          Extern Function Prototypes
      *******************************************************************************/
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
+     * @brief Function to flush heap
      *
      */
-    void ezlopi_util_heap_flush(void);
-    void ezlopi_util_heap_trace(bool print_freed);
+    void EZPI_core_util_heap_flush(void);
+    /**
+     * @brief Function to trace the heap
+     *
+     * @param print_freed Flag to trigger free
+     */
+    void EZPI_core_util_heap_trace(bool print_freed);
+    /**
+     * @brief  Function to free heap
+     *
+     * @param who pointer to function triggering
+     * @param ptr Pointer to heap memory
+     * @param __file_name file name
+     * @param line_number Line number
+     */
+    void EZPI_core_util_heap_free(const char *who, void *ptr, const char *__file_name, uint32_t line_number);
 
-    void ezlopi_util_heap_free(const char * who, void *ptr, const char * __file_name, uint32_t line_number);
-    void* ezlopi_util_heap_malloc(const char * who, size_t size, const char * file_name, uint32_t line_no);
-    void* ezlopi_util_heap_calloc(const char * who, size_t count, size_t size, const char * file_name, uint32_t line_no);
-    void* ezlopi_util_heap_realloc(const char * who, void *ptr, size_t new_size, const char * file_name, uint32_t line_no);
+    /**
+     * @brief Function to allocate heap mem
+     *
+     * @param who pointer to func_name and line num
+     * @param size size to malloc
+     * @param file_name File name
+     * @param line_no Line number
+     * @return void*
+     */
+    void *EZPI_core_util_heap_malloc(const char *who, size_t size, const char *file_name, uint32_t line_no);
+    /**
+     * @brief Function to allocate heap mem
+     *
+     * @param who  pointer to func_name and line num
+     * @param count  Counter to mem slots
+     * @param size  size to malloc
+     * @param file_name  filename
+     * @param line_no  line number
+     * @return void*
+     */
+    void *EZPI_core_util_heap_calloc(const char *who, size_t count, size_t size, const char *file_name, uint32_t line_no);
+    /**
+     * @brief Function to reallocate heap mem
+     *
+     * @param who pointer to func_name and line num
+     * @param ptr Pointer to start address
+     * @param new_size new size to
+     * @param file_name Filename
+     * @param line_no Line number
+     * @return void*
+     */
+    void *EZPI_core_util_heap_realloc(const char *who, void *ptr, size_t new_size, const char *file_name, uint32_t line_no);
 
 #ifdef __cplusplus
 }

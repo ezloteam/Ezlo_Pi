@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2022 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -30,21 +30,18 @@
 */
 
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
- * @version 0.1
- * @date    1st January 2024
+ * @file    ezlopi_cloud_room.h
+ * @brief
+ * @author
+ * @version
+ * @date
  */
-
 #ifndef __HUB_ROOM_H__
 #define __HUB_ROOM_H__
 
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
-#include <string.h>
-
 #include "cjext.h"
 
 /*******************************************************************************
@@ -67,27 +64,82 @@ extern "C"
      *                          Extern Function Prototypes
      *******************************************************************************/
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
+     * @brief Function to respond to hub.room.get method
      *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
      */
-    void room_get(cJSON* cj_request, cJSON* cj_response);
-    void room_list(cJSON* cj_request, cJSON* cj_response);
-    void room_create(cJSON* cj_request, cJSON* cj_response);
-    void room_name_set(cJSON* cj_request, cJSON* cj_response);
-    void room_order_set(cJSON* cj_request, cJSON* cj_response);
-    void room_delete(cJSON* cj_request, cJSON* cj_response);
-    void room_all_delete(cJSON* cj_request, cJSON* cj_response);
-
-    void room_created(cJSON* cj_request, cJSON* cj_response);
-    void room_edited(cJSON* cj_request, cJSON* cj_response);
-    void room_deleted(cJSON* cj_request, cJSON* cj_response);
-    void room_reordered(cJSON* cj_request, cJSON* cj_response);
+    void EZPI_room_get(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function to respond to hub.room.list method
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_room_list(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function to respond to hub.room.create method
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_room_create(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function to respond to hub.room.name.set method
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_room_name_set(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function to respond to hub.room.order.set method
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_room_order_set(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function to respond to hub.room.delete method
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_room_delete(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function to respond to hub.room.all.delete method
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_room_all_delete(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Updater function to respond for room created
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_room_created(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Updater function to respond for room edited
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_room_edited(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Updater function to respond for room deleted
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_room_deleted(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Updater function to respond for room ordder
+     *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_room_reordered(cJSON *cj_request, cJSON *cj_response);
 
 #ifdef __cplusplus
 }

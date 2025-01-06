@@ -30,11 +30,11 @@
 */
 
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
- * @version 0.1
- * @date    1st January 2024
+ * @file    ezlopi_service_webprov.h
+ * @brief
+ * @author
+ * @version
+ * @date
  */
 
 #ifndef _EZLOPI_SERVICE_WEBPROV_H_
@@ -43,8 +43,8 @@
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
+#include "../../build/config/sdkconfig.h"
 #include <string.h>
-
 #include "cjext.h"
 #include "EZLOPI_USER_CONFIG.h"
 
@@ -55,7 +55,6 @@
 extern "C"
 {
 #endif
-
     /*******************************************************************************
      *                          Type & Macro Declarations
      *******************************************************************************/
@@ -67,21 +66,36 @@ extern "C"
     /*******************************************************************************
      *                          Extern Function Prototypes
      *******************************************************************************/
+#if defined(CONFIG_EZPI_WEBSOCKET_CLIENT)
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
+     * @brief Function to initialize web provisioning
+     * @details Following operatons are perfromed
+     *  - Start provisioning check task
+     *  - Start fetch WSS endpoint task
      *
      */
-    #if defined(CONFIG_EZPI_WEBSOCKET_CLIENT)
-        void ezlopi_service_web_provisioning_init(void);
-        void ezlopi_service_web_provisioning_deinit(void);
-        uint32_t ezlopi_service_web_provisioning_get_message_count(void);
-    #endif // CONFIG_EZPI_WEBSOCKET_CLIENT
+    void EZPI_service_web_provisioning_init(void);
+    /**
+     * @brief Function to deinitialize web provisioning
+     *
+     */
+    void EZPI_service_web_provisioning_deinit(void);
+    /**
+     * @brief Function to get the current message count
+     *
+     * @return uint32_t
+     * @retval currnet message count
+     */
+    uint32_t EZPI_service_web_provisioning_get_message_count(void);
+    /**
+     * @brief Function to return webprov status
+     *
+     * @return true
+     * @return false
+     */
+    bool EZPI_service_webprov_is_connected(void);
+
+#endif // CONFIG_EZPI_WEBSOCKET_CLIENT
 
 #ifdef __cplusplus
 }

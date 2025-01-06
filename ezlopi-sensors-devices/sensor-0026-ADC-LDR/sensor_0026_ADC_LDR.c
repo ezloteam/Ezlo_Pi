@@ -28,27 +28,21 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    sensor_0026_ADC_LDR.c
+ * @brief   perform some function on sensor_0026
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    xx
  */
 
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
-
-#include "ezlopi_util_trace.h"
-
-// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
-#include "ezlopi_core_errors.h"
 
 #include "ezlopi_hal_adc.h"
 
@@ -56,7 +50,6 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "sensor_0026_ADC_LDR.h"
-
 /*******************************************************************************
  *                          Extern Data Declarations
  *******************************************************************************/
@@ -83,12 +76,6 @@ static ezlopi_error_t _get_item_list(l_ezlopi_item_t *item, void *arg);
 /*******************************************************************************
  *                          Static Data Definitions
  *******************************************************************************/
-const char *light_alarm_states[] =
-{
-    "no_light",
-    "light_detected",
-    "unknown",
-};
 
 /*******************************************************************************
  *                          Extern Data Definitions
@@ -98,12 +85,7 @@ const char *light_alarm_states[] =
  *                          Extern Function Definitions
  *******************************************************************************/
 
-/**
- * @brief Global/extern function template example
- * Convention : Use capital letter for initial word on extern function
- * @param arg
- */
-ezlopi_error_t sensor_0026_ADC_LDR(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+ezlopi_error_t SENSOR_0026_adc_ldr(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
 
@@ -144,8 +126,9 @@ ezlopi_error_t sensor_0026_ADC_LDR(e_ezlopi_actions_t action, l_ezlopi_item_t *i
 }
 
 /*******************************************************************************
- *                          Static Function Definitions
+ *                         Static Function Definitions
  *******************************************************************************/
+
 static void __setup_device_cloud_params(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     device->cloud_properties.info = NULL;
@@ -165,7 +148,7 @@ static void __setup_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_devic
         item->cloud_properties.item_name = ezlopi_item_name_light_alarm;
         item->cloud_properties.value_type = value_type_token;
         item->cloud_properties.scale = NULL;
-        item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
+        item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
 
         item->interface_type = EZLOPI_DEVICE_INTERFACE_ANALOG_INPUT;
         item->interface.adc.resln_bit = 3;
@@ -182,11 +165,11 @@ static ezlopi_error_t __prepare(void *arg)
         cJSON *cj_device = prep_arg->cjson_device;
         if (cj_device)
         {
-            l_ezlopi_device_t *device = ezlopi_device_add_device(cj_device, NULL);
+            l_ezlopi_device_t *device = EZPI_core_device_add_device(cj_device, NULL);
             if (device)
             {
                 __setup_device_cloud_params(device, cj_device);
-                l_ezlopi_item_t *item = ezlopi_device_add_item_to_device(device, sensor_0026_ADC_LDR);
+                l_ezlopi_item_t *item = EZPI_core_device_add_item_to_device(device, SENSOR_0026_adc_ldr);
                 if (item)
                 {
                     __setup_item_cloud_properties(item, cj_device);
@@ -194,7 +177,7 @@ static ezlopi_error_t __prepare(void *arg)
                 }
                 else
                 {
-                    ezlopi_device_free_device(device);
+                    EZPI_core_device_free_device(device);
                 }
             }
         }
@@ -209,7 +192,7 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
     {
         if (GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
         {
-            if (EZPI_SUCCESS == ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
+            if (EZPI_SUCCESS == EZPI_hal_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
             {
                 ret = EZPI_SUCCESS;
             }
@@ -227,6 +210,11 @@ static ezlopi_error_t _get_item_list(l_ezlopi_item_t *item, void *arg)
         cJSON *json_array_enum = cJSON_CreateArray(__FUNCTION__);
         if (NULL != json_array_enum)
         {
+            char *light_alarm_states[] = {
+                "no_light",
+                "light_detected",
+                "unknown",
+            };
             for (uint8_t i = 0; i < LIGHT_ALARM_MAX; i++)
             {
                 cJSON *json_value = cJSON_CreateString(__FUNCTION__, light_alarm_states[i]);
@@ -237,8 +225,8 @@ static ezlopi_error_t _get_item_list(l_ezlopi_item_t *item, void *arg)
             }
             cJSON_AddItemToObject(__FUNCTION__, cj_result, ezlopi_enum_str, json_array_enum);
         }
-        cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, ((char *)item->user_arg) ? item->user_arg : light_alarm_states[0]);
-        cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, ((char *)item->user_arg) ? item->user_arg : light_alarm_states[0]);
+        cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, ((char *)item->user_arg) ? item->user_arg : "no_light");
+        cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, ((char *)item->user_arg) ? item->user_arg : "no_light");
         ret = EZPI_SUCCESS;
     }
 
@@ -251,8 +239,8 @@ static ezlopi_error_t __get_value_cjson(l_ezlopi_item_t *item, void *arg)
     cJSON *cj_result = (cJSON *)arg;
     if (cj_result && item)
     {
-        cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, ((char *)item->user_arg) ? item->user_arg : light_alarm_states[0]);
-        cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, ((char *)item->user_arg) ? item->user_arg : light_alarm_states[0]);
+        cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, ((char *)item->user_arg) ? item->user_arg : "no_light");
+        cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, ((char *)item->user_arg) ? item->user_arg : "no_light");
         ret = EZPI_SUCCESS;
     }
     return ret;
@@ -263,22 +251,22 @@ static ezlopi_error_t __notify(l_ezlopi_item_t *item)
     ezlopi_error_t ret = EZPI_FAILED;
     if (item)
     {
-        s_ezlopi_analog_data_t ezlopi_analog_data = { .value = 0, .voltage = 0 };
-        ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &ezlopi_analog_data);
+        s_ezlopi_analog_data_t ezlopi_analog_data = {.value = 0, .voltage = 0};
+        EZPI_hal_adc_get_adc_data(item->interface.adc.gpio_num, &ezlopi_analog_data);
         TRACE_I("Value is: %d, voltage is: %d", ezlopi_analog_data.value, ezlopi_analog_data.voltage);
-        const char *curr_ldr_state = NULL;
+        char *curr_ldr_state = NULL;
         if (((float)(4096 - ezlopi_analog_data.value) / 4096.0f) > 0.5f) // pot_val : [100% - 30%]
         {
-            curr_ldr_state = light_alarm_states[0]; // no light
+            curr_ldr_state = "no_light"; // no light
         }
         else
         {
-            curr_ldr_state = light_alarm_states[1]; // light detected
+            curr_ldr_state = "light_detected"; // light detected
         }
         if (curr_ldr_state != (char *)item->user_arg)
         {
             item->user_arg = (void *)curr_ldr_state;
-            ezlopi_device_value_updated_from_device_broadcast(item);
+            EZPI_core_device_value_updated_from_device_broadcast(item);
             ret = EZPI_SUCCESS;
         }
     }

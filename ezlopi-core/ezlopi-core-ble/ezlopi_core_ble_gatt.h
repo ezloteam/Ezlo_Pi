@@ -28,18 +28,20 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_core_ble_gatt.h
+ * @brief   perform some function on ble-gatt operations
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    12th DEC 2024
  */
 
 #ifndef _EZLOPI_CORE_BLE_GATT_H_
 #define _EZLOPI_CORE_BLE_GATT_H_
 
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_BLE_ENABLE
@@ -69,18 +71,27 @@ extern "C"
      *                          Extern Function Prototypes
      *******************************************************************************/
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
+     * @brief This function return max ble-data size
      *
+     * @return uint16_t
      */
-    uint16_t ezlopi_ble_gatt_get_max_data_size(void);
-    void ezlopi_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t* param);
-    void ezlopi_ble_gatts_characteristic_notify(s_gatt_service_t* service, s_gatt_char_t* characteristics, esp_gatt_value_t* value);
+    uint16_t EZPI_core_ble_gatt_get_max_data_size(void);
+    /**
+     * @brief Function to handle ble-gatt event
+     *
+     * @param event ble-event struct
+     * @param gatts_if ble-gatt interfaces
+     * @param param pointer to gatt-cb-params
+     */
+    void EZPI_core_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t *param);
+    /**
+     * @brief Function to notify ble-gatt characteristics
+     *
+     * @param service Pointer to ble-sevice-structure
+     * @param characteristics Pointer to ble-characteristics
+     * @param value Pointer to data value-structure
+     */
+    void EZPI_core_ble_gatts_characteristic_notify(s_gatt_service_t *service, s_gatt_char_t *characteristics, esp_gatt_value_t *value);
 
 #ifdef __cplusplus
 }

@@ -28,17 +28,19 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_core_ble_buffer.h
+ * @brief   perform some function on ble-operations
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    12th DEC 2024
  */
-
 #ifndef _EZLOPI_CORE_BLE_BUFFER_H_
 #define _EZLOPI_CORE_BLE_BUFFER_H_
+
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 
 #include "../../build/config/sdkconfig.h"
 
@@ -62,11 +64,10 @@ extern "C"
      *******************************************************************************/
     typedef struct s_linked_buffer
     {
-        struct s_linked_buffer* next;
+        struct s_linked_buffer *next;
         uint32_t len;
-        uint8_t* buffer;
+        uint8_t *buffer;
     } s_linked_buffer_t;
-
     /*******************************************************************************
      *                          Extern Data Declarations
      *******************************************************************************/
@@ -75,19 +76,31 @@ extern "C"
      *                          Extern Function Prototypes
      *******************************************************************************/
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
+     * @brief This function creates and return new ble-buffer
      *
+     * @param param Pointer to ble-gatts info struct
+     * @return s_linked_buffer_t *
      */
-    s_linked_buffer_t* ezlopi_ble_buffer_create(esp_ble_gatts_cb_param_t* param);
-    void ezlopi_ble_buffer_add_to_buffer(s_linked_buffer_t* buffer, esp_ble_gatts_cb_param_t* param);
-    void ezlopi_ble_buffer_free_buffer(s_linked_buffer_t* l_buffer);
-    void ezlopi_ble_buffer_accumulate_to_start(s_linked_buffer_t* l_buffer);
+    s_linked_buffer_t *EZPI_core_ble_buffer_create(esp_ble_gatts_cb_param_t *param);
+    /**
+     * @brief This function adds gatt params to ll-buffer
+     *
+     * @param buffer Destination buffer to append incoming chunk
+     * @param param Source of data
+     */
+    void EZPI_core_ble_buffer_add_to_buffer(s_linked_buffer_t *buffer, esp_ble_gatts_cb_param_t *param);
+    /**
+     * @brief This function frees a ble-buffer-node
+     *
+     * @param l_buffer Target node to free
+     */
+    void EZPI_core_ble_buffer_free_buffer(s_linked_buffer_t *l_buffer);
+    /**
+     * @brief This function combines all chunked data scattered in the linked list
+     *
+     * @param l_buffer The node in ll to start combining from.
+     */
+    void EZPI_core_ble_buffer_accumulate_to_start(s_linked_buffer_t *l_buffer);
 
 #ifdef __cplusplus
 }

@@ -28,17 +28,13 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    __string_op_comparision_operators_macros.h
+ * @brief   MACROS to generate enums for 'string_op' comparision operators
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    12th DEC 2024
  */
-
-// #ifndef __HEADER_H__
-// #define __HEADER_H__
 
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
@@ -69,7 +65,6 @@ extern "C"
     SCENES_STROPS_COMP_OPERATORES(NOT_LENGTH, "not_length", "length not equal to", "stringOperation")
     //////////////////////////////////////////////////////////////////////////////
     SCENES_STROPS_COMP_OPERATORES(MAX, NULL, NULL, NULL)
-
     /*******************************************************************************
      *                          Extern Data Declarations
      *******************************************************************************/
@@ -82,9 +77,7 @@ extern "C"
 }
 #endif
 
-#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
-
-// #endif // __HEADER_H__
+#endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 /*******************************************************************************
  *                          End of File

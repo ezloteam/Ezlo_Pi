@@ -1,3 +1,4 @@
+
 /* ===========================================================================
 ** Copyright (C) 2024 Ezlo Innovation Inc
 **
@@ -30,21 +31,18 @@
 */
 
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
- * @version 0.1
- * @date    1st January 2024
+ * @file    ezlopi_service_uri.h
+ * @brief
+ * @author
+ * @version
+ * @date
  */
 
 #ifndef _EZLOPI_SERVICE_URI_H_
 #define _EZLOPI_SERVICE_URI_H_
-
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
-#include "esp_err.h"
-#include "esp_http_server.h"
 
 /*******************************************************************************
  *                          C++ Declaration Wrapper
@@ -65,19 +63,27 @@ extern "C"
     /*******************************************************************************
      *                          Extern Function Prototypes
      *******************************************************************************/
+
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
+     * @brief Function to start AP server service
+     * @details Following operations are performed
+     *  - Configure and start HTTP server
+     *  - Register URI and error handlers
      *
      */
-    void ezlopi_begin_ap_server_service();
-    void ezlopi_end_ap_server_service();
-    int ezlopi_get_wifi_cred(char *wifi_cred);
+    void EZPI_begin_ap_server_service();
+    /**
+     * @brief function to end/stop AP server service
+     *
+     */
+    void EZPI_end_ap_server_service();
+    /**
+     * @brief Function to return Wifi credentials
+     *
+     * @param wifi_cred
+     * @return int
+     */
+    int EZPI_end_ap_server_serviceget_wifi_cred(char *wifi_cred);
 
 #ifdef __cplusplus
 }

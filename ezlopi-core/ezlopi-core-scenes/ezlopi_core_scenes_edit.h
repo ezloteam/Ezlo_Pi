@@ -28,13 +28,12 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
+ * @file    ezlopi_core_scenes_edit.h
  * @brief   perform some function on data
- * @author  John Doe
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    12th DEC 2024
  */
 
 #ifndef __EZLOPI_SCENES_EDIT_H__
@@ -45,8 +44,8 @@
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
-#include "string.h"
-#include "stdint.h"
+#include <string.h>
+// #include "stdint.h"
 #include "cjext.h"
 
 #include "ezlopi_core_errors.h"
@@ -71,23 +70,26 @@ extern "C"
      *                          Extern Function Prototypes
      *******************************************************************************/
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
+     * @brief This function returns a 'cjson-object' containing field info.
      *
+     * @param cj_updated_scene Node to generate obj from
+     * @return cJSON*
      */
-    ezlopi_error_t ezlopi_core_scene_edit_store_updated_to_nvs(cJSON* cj_updated_scene);
-    ezlopi_error_t ezlopi_core_scene_edit_update_id(uint32_t scene_id, cJSON* cj_updated_scene);
+    ezlopi_error_t EZPI_core_scenes_edit_store_updated_to_nvs(cJSON *cj_updated_scene);
+    /**
+     * @brief This function edits 'scene_id' using new info from 'cj_updated_scene'.
+     *
+     * @param scene_id The '_id' of scene to be updated
+     * @param cj_updated_scene Pointer to cjson containing new data
+     * @return ezlopi_error_t
+     */
+    ezlopi_error_t EZPI_core_scenes_edit_update_id(uint32_t scene_id, cJSON *cj_updated_scene);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+#endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 #endif // __EZLOPI_SCENES_EDIT_H__
 

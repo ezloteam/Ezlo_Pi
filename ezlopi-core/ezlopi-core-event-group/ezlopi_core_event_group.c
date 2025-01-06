@@ -28,13 +28,12 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_core_event_group.c
+ * @brief   Operation for event groups
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    12th DEC 2024
  */
 
 /*******************************************************************************
@@ -79,13 +78,7 @@ static EventGroupHandle_t ezlopi_event_group_handle = NULL;
 /*******************************************************************************
  *                          Extern Function Definitions
  *******************************************************************************/
-
-/**
- * @brief Global/extern function template example
- * Convention : Use capital letter for initial word on extern function
- * @param arg
- */
-void ezlopi_event_group_create(void)
+void EZPI_event_group_create(void)
 {
     if (NULL == ezlopi_event_group_handle)
     {
@@ -93,7 +86,7 @@ void ezlopi_event_group_create(void)
     }
 }
 
-ezlopi_error_t ezlopi_event_group_set_event(e_ezlopi_event_t event)
+ezlopi_error_t EZPI_core_event_group_set_event(e_ezlopi_event_t event)
 {
     // if (ezlopi_event_group_handle && (event < BIT31))
     // {
@@ -119,7 +112,7 @@ ezlopi_error_t ezlopi_event_group_set_event(e_ezlopi_event_t event)
     return error;
 }
 
-ezlopi_error_t ezlopi_event_group_clear_event(e_ezlopi_event_t event)
+ezlopi_error_t EZPI_core_event_group_clear_event(e_ezlopi_event_t event)
 {
     // if (ezlopi_event_group_handle && (event < BIT31))
     // {
@@ -145,7 +138,7 @@ ezlopi_error_t ezlopi_event_group_clear_event(e_ezlopi_event_t event)
     return error;
 }
 
-ezlopi_error_t ezlopi_event_group_wait_for_event(e_ezlopi_event_t event, uint32_t wait_time_ms, uint32_t clear_on_exit)
+ezlopi_error_t EZPI_core_event_group_wait_for_event(e_ezlopi_event_t event, uint32_t wait_time_ms, uint32_t clear_on_exit)
 {
     ezlopi_error_t error = EZPI_ERR_EVENT_GROUP_BIT_WAIT_FAILED;
     if (ezlopi_event_group_handle)
@@ -164,10 +157,9 @@ ezlopi_error_t ezlopi_event_group_wait_for_event(e_ezlopi_event_t event, uint32_
     return error;
 }
 
-e_ezlopi_event_t ezlopi_get_event_bit_status()
+e_ezlopi_event_t EZPI_core_event_group_get_eventbit_status()
 {
-    #warning("return statement always returns 0 i.e. OTA event at else")
-        e_ezlopi_event_t ret = 0;
+    e_ezlopi_event_t ret = 0;
     if (ezlopi_event_group_handle)
     {
         ret = xEventGroupGetBits(ezlopi_event_group_handle);
@@ -176,7 +168,7 @@ e_ezlopi_event_t ezlopi_get_event_bit_status()
 }
 
 /*******************************************************************************
- *                          Static Function Definitions
+ *                         Static Function Definitions
  *******************************************************************************/
 
 /*******************************************************************************

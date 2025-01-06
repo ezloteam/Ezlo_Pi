@@ -28,21 +28,20 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
+ * @file    main.h
  * @brief   perform some function on data
- * @author  John Doe
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    12th DEC 2024
  */
-
 #ifndef _EZLOPI_CORE_GATEWAY_H_
 #define _EZLOPI_CORE_GATEWAY_H_
 
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
+
 #include <stdlib.h>
 #include <stdint.h>
 
@@ -93,24 +92,19 @@ extern "C"
     /*******************************************************************************
      *                          Extern Function Prototypes
      *******************************************************************************/
+
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
+     * @brief Function to return gateway info
      *
+     * @return s_ezlopi_gateway_t*
      */
-    s_ezlopi_gateway_t *ezlopi_gateway_get(void);
+    s_ezlopi_gateway_t *EZPI_core_gateway_get(void);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif // _EZLOPI_CORE_GATEWAY_H_
-
 /*******************************************************************************
  *                          End of File
  *******************************************************************************/

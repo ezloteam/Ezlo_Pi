@@ -28,13 +28,12 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_core_info.c
+ * @brief   perform some function on system-info
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    12th DEC 2024
  */
 
 /*******************************************************************************
@@ -74,13 +73,7 @@ static const uint8_t EZPI_UART_SERV_FLW_CTRL_STR_SIZE = 10;
 /*******************************************************************************
  *                          Extern Function Definitions
  *******************************************************************************/
-
-/**
- * @brief Global/extern function template example
- * Convention : Use capital letter for initial word on extern function
- * @param arg
- */
-uart_parity_t EZPI_CORE_info_name_to_parity(const char* parity)
+uart_parity_t EZPI_core_info_name_to_parity(const char *parity)
 {
     uart_parity_t parity_val = UART_PARITY_DISABLE;
 
@@ -99,7 +92,7 @@ uart_parity_t EZPI_CORE_info_name_to_parity(const char* parity)
     return parity_val;
 }
 
-char EZPI_CORE_info_parity_to_name(const uart_parity_t parity_val)
+char EZPI_core_info_parity_to_name(const uart_parity_t parity_val)
 {
     char parity = 'N';
     switch (parity_val)
@@ -124,7 +117,7 @@ char EZPI_CORE_info_parity_to_name(const uart_parity_t parity_val)
     return parity;
 }
 
-void EZPI_CORE_info_get_flow_ctrl_to_name(uart_hw_flowcontrol_t flw_ctrl, char* flw_ctrl_str)
+void EZPI_core_info_get_flow_ctrl_to_name(uart_hw_flowcontrol_t flw_ctrl, char *flw_ctrl_str)
 {
     switch (flw_ctrl)
     {
@@ -146,7 +139,7 @@ void EZPI_CORE_info_get_flow_ctrl_to_name(uart_hw_flowcontrol_t flw_ctrl, char* 
     }
 }
 
-uart_hw_flowcontrol_t EZPI_CORE_info_get_flw_ctrl_from_name(char* flw_ctrl_str)
+uart_hw_flowcontrol_t EZPI_core_info_get_flw_ctrl_from_name(char *flw_ctrl_str)
 {
     uart_hw_flowcontrol_t flw_ctrl = UART_HW_FLOWCTRL_DISABLE;
     if (strncmp(flw_ctrl_str, "DISABLED", EZPI_UART_SERV_FLW_CTRL_STR_SIZE) == 0)
@@ -172,7 +165,7 @@ uart_hw_flowcontrol_t EZPI_CORE_info_get_flw_ctrl_from_name(char* flw_ctrl_str)
     return flw_ctrl;
 }
 
-uart_word_length_t EZPI_CORE_info_get_frame_size(const uint32_t frame_size)
+uart_word_length_t EZPI_core_info_get_frame_size(const uint32_t frame_size)
 {
     uart_word_length_t frame_size_val = UART_DATA_8_BITS;
     if (5 == frame_size)
@@ -190,7 +183,7 @@ uart_word_length_t EZPI_CORE_info_get_frame_size(const uint32_t frame_size)
     return frame_size_val;
 }
 
-char* EZPI_CORE_info_get_esp_reset_reason_to_name(esp_reset_reason_t reason)
+char *EZPI_core_info_get_esp_reset_reason_to_name(esp_reset_reason_t reason)
 {
     switch (reason)
     {
@@ -233,7 +226,7 @@ char* EZPI_CORE_info_get_esp_reset_reason_to_name(esp_reset_reason_t reason)
     }
 }
 
-char* EZPI_CORE_info_get_chip_type_to_name(int chip_type)
+char *EZPI_core_info_get_chip_type_to_name(int chip_type)
 {
     switch (chip_type)
     {
@@ -258,9 +251,9 @@ char* EZPI_CORE_info_get_chip_type_to_name(int chip_type)
     }
 }
 
-char* EZPI_CORE_info_get_wifi_mode_to_name(const wifi_mode_t mode_val)
+char *EZPI_core_info_get_wifi_mode_to_name(const wifi_mode_t mode_val)
 {
-    char* mode = NULL;
+    char *mode = NULL;
     switch (mode_val)
     {
     case WIFI_MODE_STA:
@@ -286,7 +279,7 @@ char* EZPI_CORE_info_get_wifi_mode_to_name(const wifi_mode_t mode_val)
     return mode;
 }
 
-void EZPI_CORE_info_get_tick_to_time_name(char* time_buff, uint32_t buff_len, uint32_t ms)
+void EZPI_core_info_get_tick_to_time_name(char *time_buff, uint32_t buff_len, uint32_t ms)
 {
     uint32_t seconds = ms / 1000;
     uint32_t minutes = seconds / 60;
@@ -304,7 +297,7 @@ void EZPI_CORE_info_get_tick_to_time_name(char* time_buff, uint32_t buff_len, ui
     }
 }
 
-int EZPI_CORE_info_get_ble_mac(uint8_t mac[6])
+int EZPI_core_info_get_ble_mac(uint8_t mac[6])
 {
     int ret = 0;
     if (ESP_OK == esp_read_mac(mac, ESP_MAC_BT))
@@ -315,7 +308,7 @@ int EZPI_CORE_info_get_ble_mac(uint8_t mac[6])
 }
 
 /*******************************************************************************
- *                          Static Function Definitions
+ *                         Static Function Definitions
  *******************************************************************************/
 
 /*******************************************************************************

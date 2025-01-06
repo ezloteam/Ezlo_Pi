@@ -1,5 +1,7 @@
 
-idf_component_register(SRCS "ezlopi_core_processes.c"
+file(GLOB_RECURSE config_src "*.c")
+
+idf_component_register(SRCS  "${config_src}"
                         INCLUDE_DIRS .
                         REQUIRES cjext
                                 ezlopi-util-trace)

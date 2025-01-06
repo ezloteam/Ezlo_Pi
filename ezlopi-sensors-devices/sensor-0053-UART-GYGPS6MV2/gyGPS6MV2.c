@@ -28,13 +28,12 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    gyGPS6MV2.c
+ * @brief   perform some function on gyGPS6MV2
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    xx
  */
 
 /*******************************************************************************
@@ -44,7 +43,6 @@
 #include "ezlopi_util_trace.h"
 #include "gyGPS6MV2.h"
 #include "EZLOPI_USER_CONFIG.h"
-
 /*******************************************************************************
  *                          Extern Data Declarations
  *******************************************************************************/
@@ -73,16 +71,10 @@
  *                          Extern Function Definitions
  *******************************************************************************/
 
-/**
- * @brief Global/extern function template example
- * Convention : Use capital letter for initial word on extern function
- * @param arg
- */
 //-------------------------------------------------------------------------
 // GPGGA MESSAGE PARSING FUNCTION
 //-------------------------------------------------------------------------
-
-void parse_and_assign_GPGGA_message(GPS6MV2_t *sensor_0053_UART_gps6mv2_data)
+void GYGPS6MV2_parse_gpgga_mesg(GPS6MV2_t *sensor_0053_UART_gps6mv2_data)
 {
     // TRACE_W("GPGGA_sentence => %s", sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.GPGGA_sentence);
     uint8_t len = strlen(sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.GPGGA_sentence); // length => contents
@@ -115,6 +107,7 @@ void parse_and_assign_GPGGA_message(GPS6MV2_t *sensor_0053_UART_gps6mv2_data)
             case 0:
                 break;
             case 1: // UTC time
+            {
                 if (dummy_container[start_index + 1] == ',')
                 { // applies only once
                     memset(&sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.UTC_time, 0, sizeof(sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.UTC_time));
@@ -142,7 +135,9 @@ void parse_and_assign_GPGGA_message(GPS6MV2_t *sensor_0053_UART_gps6mv2_data)
                     }
                 }
                 break;
+            }
             case 2: // Latitude
+            {
                 if (dummy_container[start_index + 1] == ',')
                 { // applies only once
                     memset(&sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Latitude, 0, sizeof(sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Latitude));
@@ -165,7 +160,9 @@ void parse_and_assign_GPGGA_message(GPS6MV2_t *sensor_0053_UART_gps6mv2_data)
                     }
                 }
                 break;
+            }
             case 3: // North/South indicator
+            {
                 if (dummy_container[start_index + 1] == ',')
                 { // applies only once
                     memset(&sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.N_S_indicator, 0, sizeof(sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.N_S_indicator));
@@ -179,7 +176,9 @@ void parse_and_assign_GPGGA_message(GPS6MV2_t *sensor_0053_UART_gps6mv2_data)
                     }
                 }
                 break;
+            }
             case 4: // Longitude
+            {
                 if (dummy_container[start_index + 1] == ',')
                 { // applies only once
                     memset(&sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Longitude, 0, sizeof(sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Longitude));
@@ -202,7 +201,9 @@ void parse_and_assign_GPGGA_message(GPS6MV2_t *sensor_0053_UART_gps6mv2_data)
                     }
                 }
                 break;
+            }
             case 5: // East/West indicator
+            {
                 if (dummy_container[start_index + 1] == ',')
                 { // applies only once
                     memset(&sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.E_W_indicator, 0, sizeof(sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.E_W_indicator));
@@ -216,7 +217,9 @@ void parse_and_assign_GPGGA_message(GPS6MV2_t *sensor_0053_UART_gps6mv2_data)
                     }
                 }
                 break;
+            }
             case 6: // Positon_Fix_Indicator
+            {
                 if (dummy_container[start_index + 1] == ',')
                 { // applies only once
                     memset(&sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Positon_fix_quality, 0, sizeof(sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Positon_fix_quality));
@@ -230,7 +233,9 @@ void parse_and_assign_GPGGA_message(GPS6MV2_t *sensor_0053_UART_gps6mv2_data)
                     }
                 }
                 break;
+            }
             case 7: // Satellites_used
+            {
                 if (dummy_container[start_index + 1] == ',')
                 { // applies only once
                     memset(&sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Satellites_used, 0, sizeof(sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Satellites_used));
@@ -248,7 +253,9 @@ void parse_and_assign_GPGGA_message(GPS6MV2_t *sensor_0053_UART_gps6mv2_data)
                     }
                 }
                 break;
+            }
             case 8: // HDOP
+            {
                 if (dummy_container[start_index + 1] == ',')
                 { // applies only once
                     memset(&sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.HDOP, 0, sizeof(sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.HDOP));
@@ -266,7 +273,9 @@ void parse_and_assign_GPGGA_message(GPS6MV2_t *sensor_0053_UART_gps6mv2_data)
                     }
                 }
                 break;
+            }
             case 9: // Mean_sea_lvl
+            {
                 if (dummy_container[start_index + 1] == ',')
                 { // applies only once
                     memset(&sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Mean_sea_level, 0, sizeof(sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Mean_sea_level));
@@ -284,7 +293,9 @@ void parse_and_assign_GPGGA_message(GPS6MV2_t *sensor_0053_UART_gps6mv2_data)
                     }
                 }
                 break;
+            }
             case 10: // MSL_Unit
+            {
                 if (dummy_container[start_index + 1] == ',')
                 { // applies only once
                     memset(&sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.MSL_Unit, 0, sizeof(sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.MSL_Unit));
@@ -298,7 +309,9 @@ void parse_and_assign_GPGGA_message(GPS6MV2_t *sensor_0053_UART_gps6mv2_data)
                     }
                 }
                 break;
+            }
             case 11: // Geoid_Separation
+            {
                 if (dummy_container[start_index + 1] == ',')
                 { // applies only once
                     memset(&sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Geoid_Separation, 0, sizeof(sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Geoid_Separation));
@@ -316,7 +329,9 @@ void parse_and_assign_GPGGA_message(GPS6MV2_t *sensor_0053_UART_gps6mv2_data)
                     }
                 }
                 break;
+            }
             case 12: // Goid Seperation_Unit
+            {
                 if (dummy_container[start_index + 1] == ',')
                 { // applies only once
                     memset(&sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.GS_Unit, 0, sizeof(sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.GS_Unit));
@@ -330,13 +345,17 @@ void parse_and_assign_GPGGA_message(GPS6MV2_t *sensor_0053_UART_gps6mv2_data)
                     }
                 }
                 break;
+            }
             case 13: // age_from_last
-                // TRACE_W("age_from_last:";
+            {        // TRACE_W("age_from_last:";
                 break;
+            }
             case 14: // station_ID
-                // TRACE_W("station_ID:"");
+            {        // TRACE_W("station_ID:"");
                 break;
+            }
             case 15: // Checksum
+            {
                 if (dummy_container[start_index + 1] == ',')
                 { // applies only once
                     memset(&sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Checksum, 0, sizeof(sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Checksum));
@@ -354,6 +373,7 @@ void parse_and_assign_GPGGA_message(GPS6MV2_t *sensor_0053_UART_gps6mv2_data)
                     }
                 }
                 break;
+            }
             }
         }
         ezlopi_free(__FUNCTION__, dummy_container);
@@ -385,7 +405,7 @@ void parse_and_assign_GPGGA_message(GPS6MV2_t *sensor_0053_UART_gps6mv2_data)
 //-------------------------------------------------------------------------
 
 /*******************************************************************************
- *                          Static Function Definitions
+ *                         Static Function Definitions
  *******************************************************************************/
 
 /*******************************************************************************

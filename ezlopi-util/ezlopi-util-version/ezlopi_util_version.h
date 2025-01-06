@@ -51,20 +51,19 @@
 extern "C"
 {
 #endif
-
     /*******************************************************************************
      *                          Type & Macro Declarations
      *******************************************************************************/
-    #define BUILD_DATE 1733304200
-    #define MAJOR 4
-    #define MINOR 2
-    #define BATCH 10
-    #define BUILD 200
-    #define VERSION_STR "4.2.10"
-    #define DEVELOPER "lomas.subedi@ezlo.com"
-    #define COMPILE_TIME "Wed Dec 04 15:08:20 PM +0545 2024"
-    #define CURRENT_BRANCH "development"
-    #define COMMIT_HASH "7b9332943693899f208e7f6168fb1b16b8ecfd69"
+#define BUILD_DATE 1735906897
+#define MAJOR 4
+#define MINOR 4
+#define PATCH 12
+#define BUILD 202
+#define VERSION_STR "4.4.12"
+#define DEVELOPER "lomas.subedi@ezlo.com"
+#define COMPILE_TIME "2025-01-03T18:06:37+0545"
+#define CURRENT_BRANCH "development"
+#define COMMIT_HASH "a8d37c757afb6c58aeb42be9a9a114508538e688"
 
     /*******************************************************************************
      *                          Extern Data Declarations

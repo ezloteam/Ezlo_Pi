@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2022 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -30,13 +30,12 @@
 */
 
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
- * @version 0.1
- * @date    1st January 2024
+ * @file    ezlopi_cloud_offline_login.c
+ * @brief
+ * @author
+ * @version
+ * @date
  */
-
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
@@ -45,10 +44,9 @@
 #include <stdio.h>
 
 #include "ezlopi_core_offline_login.h"
-
 #include "ezlopi_core_devices_list.h"
-#include "ezlopi_cloud_constants.h"
 
+#include "ezlopi_cloud_constants.h"
 /*******************************************************************************
  *                          Extern Data Declarations
  *******************************************************************************/
@@ -64,6 +62,14 @@
 /*******************************************************************************
  *                          Static Function Prototypes
  *******************************************************************************/
+/**
+ * @brief Function to prepare error response to the offline login request
+ *
+ * @param cj_response Outgoing JSON response
+ * @param error_code Error code to send
+ * @param error_message Message to attach to the response
+ * @param error_data Data that describes the error message
+ */
 static void ezlopi_cloud_prepare_error(cJSON *cj_response, int error_code, const char *error_message, const char *error_data);
 
 /*******************************************************************************
@@ -77,12 +83,6 @@ static void ezlopi_cloud_prepare_error(cJSON *cj_response, int error_code, const
 /*******************************************************************************
  *                          Extern Function Definitions
  *******************************************************************************/
-
-/**
- * @brief Global/extern function template example
- * Convention : Use capital letter for initial word on extern function
- * @param arg
- */
 void EZPI_CLOUD_offline_login(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
@@ -91,7 +91,7 @@ void EZPI_CLOUD_offline_login(cJSON *cj_request, cJSON *cj_response)
         cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
         if (cj_params)
         {
-            ezlopi_error_t error = ezlopi_core_offline_login_perform(cj_params);
+            ezlopi_error_t error = EZPI_core_offline_login_perform(cj_params);
             if (EZPI_ERR_WRONG_PARAM == error)
             {
                 ezlopi_cloud_prepare_error(cj_response, -32602, "Wrong params", "rpc.params.invalid");
@@ -115,6 +115,7 @@ void EZPI_CLOUD_offline_login(cJSON *cj_request, cJSON *cj_response)
 /*******************************************************************************
  *                          Static Function Definitions
  *******************************************************************************/
+
 static void ezlopi_cloud_prepare_error(cJSON *cj_response, int error_code, const char *error_message, const char *error_data)
 {
     cJSON *cj_error = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_error_str);

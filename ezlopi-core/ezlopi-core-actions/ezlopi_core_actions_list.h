@@ -28,18 +28,13 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_core_actions_list.h
+ * @brief   These are MACROs for ezlopi-core-action operations
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    12th DEC 2024
  */
-
-/* Needs to be included multiple times by design */
-// #ifndef __EZLOPI_CORE_ACTIONS_LIST_H__
-// #define __EZLOPI_CORE_ACTIONS_LIST_H__
 
 /*******************************************************************************
  *                          Include Files
@@ -72,8 +67,6 @@ extern "C"
     EZLOPI_ACTION(GET_EZLOPI_VALUE, "EZLOPI_ACTION_GET_EZLOPI_VALUE")
     EZLOPI_ACTION(SET_VALUE, "EZLOPI_ACTION_SET_VALUE")
     EZLOPI_ACTION(MAX, "EZLOPI_ACTION_MAX")
-    #undef EZLOPI_ACTION
-
     /*******************************************************************************
      *                          Extern Data Declarations
      *******************************************************************************/
@@ -85,8 +78,6 @@ extern "C"
 #ifdef __cplusplus
 }
 #endif
-
-// #endif // __EZLOPI_CORE_ACTIONS_LIST_H__
 
 /*******************************************************************************
  *                          End of File

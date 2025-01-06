@@ -28,13 +28,12 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ALS_LTR303.c
+ * @brief   perform some function on ALS_LTR303
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    xx
  */
 
 /*******************************************************************************
@@ -42,11 +41,16 @@
  *******************************************************************************/
 #include "ALS_LTR303.h"
 
-#warning "################### DO NOT USE printf ON PRODUCTION ###################"
+#warning "NABIN: do not use global and/or static variable in devices! PLEASE!!"
 
 /*******************************************************************************
  *                          Extern Data Declarations
  *******************************************************************************/
+unsigned char gain = LTR3XX_GAIN_1;                    // Gain setting, values = 0-7
+unsigned char integration_time = LTR3XX_INTEGTIME_200; // Integration ("shutter") time in milliseconds
+unsigned char measurement_rate = LTR3XX_MEASRATE_200;  // Interval between DATA_REGISTERS update
+bool valid = 0, intr_status = 0, data_status = 0;
+byte error;
 
 /*******************************************************************************
  *                          Extern Function Declarations
@@ -63,11 +67,6 @@
 /*******************************************************************************
  *                          Static Data Definitions
  *******************************************************************************/
-unsigned char gain = LTR3XX_GAIN_1;                    // Gain setting, values = 0-7
-unsigned char integration_time = LTR3XX_INTEGTIME_200; // Integration ("shutter") time in milliseconds
-unsigned char measurement_rate = LTR3XX_MEASRATE_200;  // Interval between DATA_REGISTERS update
-bool valid = 0, intr_status = 0, data_status = 0;
-byte error;
 
 /*******************************************************************************
  *                          Extern Data Definitions
@@ -77,11 +76,6 @@ byte error;
  *                          Extern Function Definitions
  *******************************************************************************/
 
-/**
- * @brief Global/extern function template example
- * Convention : Use capital letter for initial word on extern function
- * @param arg
- */
 bool ltr303_is_data_available(void)
 {
     ltr303_get_status(&valid, &gain, &intr_status, &data_status);
@@ -164,7 +158,7 @@ esp_err_t ltr303_get_val(ltr303_data_t *ltr303_data)
 }
 
 /*******************************************************************************
- *                          Static Function Definitions
+ *                         Static Function Definitions
  *******************************************************************************/
 
 /*******************************************************************************

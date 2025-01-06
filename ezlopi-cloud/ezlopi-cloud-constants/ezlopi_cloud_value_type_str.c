@@ -30,7 +30,7 @@
 */
 
 /**
- * @file    main.c
+ * @file    ezlopi_cloud_valye_type_str.c
  * @brief   perform some function on data
  * @author  John Doe
  * @version 0.1
@@ -69,7 +69,7 @@ const char *value_type_int = "int";
 // const  char *value_type_int64 = "int64";
 const char *value_type_bool = "bool";
 const char *value_type_float = "float";
-const  char *value_type_scalable = "scalable";
+const char *value_type_scalable = "scalable";
 const char *value_type_rgb = "rgb";
 // const  char *value_type_usercode = "userCode";
 // const  char *value_type_dailyintervalarray = "array.daily_interval";
@@ -107,7 +107,7 @@ const char *value_type_electrical_resistance = "electrical_resistance";
 // const  char *value_type_electrical_conductivity = "electrical_conductivity";
 // const  char *value_type_loudness = "loudness";
 const char *value_type_moisture = "moisture";
-// const  char *value_type_time = "time";
+// const char *value_type_time = "time";
 // const  char *value_type_radon_concentration = "radon_concentration";
 // const  char *value_type_blood_pressure = "blood_pressure";
 // const  char *value_type_energy = "energy";

@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2022 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -30,13 +30,12 @@
 */
 
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
- * @version 0.1
- * @date    1st January 2024
+ * @file    ezlopi_cloud_offline_login.h
+ * @brief
+ * @author
+ * @version
+ * @date
  */
-
 #ifndef EZLOPI_CLOUD_OFFLINE_LOGIN_H_
 #define EZLOPI_CLOUD_OFFLINE_LOGIN_H_
 
@@ -66,16 +65,12 @@ extern "C"
      *                          Extern Function Prototypes
      *******************************************************************************/
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
+     * @brief Function to respond to hub.offline.login.ui method
      *
+     * @param cj_request Incoming JSON request
+     * @param cj_response Outgoing JSON response
      */
-    void EZPI_CLOUD_offline_login(cJSON* cj_request, cJSON* cj_response);
+    void EZPI_CLOUD_offline_login(cJSON *cj_request, cJSON *cj_response);
 
 #ifdef __cplusplus
 }

@@ -28,28 +28,23 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    device_0004_digitalIn_generic.c
+ * @brief   perform some function on device_0004
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    xx
  */
 
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
 #include "../../build/config/sdkconfig.h"
-#include "ezlopi_util_trace.h"
 
-// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
-#include "ezlopi_core_errors.h"
-
 #include "ezlopi_hal_gpio.h"
 
 #include "ezlopi_cloud_items.h"
@@ -74,6 +69,7 @@
 /*******************************************************************************
  *                          Static Function Prototypes
  *******************************************************************************/
+
 static ezlopi_error_t __prepare(void *arg);
 static ezlopi_error_t __init(l_ezlopi_item_t *item);
 static void __interrupt_upcall(void *arg);
@@ -90,13 +86,7 @@ static ezlopi_error_t __get_value_cjson(l_ezlopi_item_t *item, void *arg);
 /*******************************************************************************
  *                          Extern Function Definitions
  *******************************************************************************/
-
-/**
- * @brief Global/extern function template example
- * Convention : Use capital letter for initial word on extern function
- * @param arg
- */
-ezlopi_error_t device_0004_digitalIn_generic(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+ezlopi_error_t DEVICE_0004_digitalIn_generic(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
 
@@ -134,8 +124,9 @@ ezlopi_error_t device_0004_digitalIn_generic(e_ezlopi_actions_t action, l_ezlopi
 }
 
 /*******************************************************************************
- *                          Static Function Definitions
+ *                         Static Function Definitions
  *******************************************************************************/
+
 static void __setup_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cjson_device)
 {
     device->cloud_properties.category = category_switch;
@@ -154,7 +145,7 @@ static void __setup_item_properties(l_ezlopi_item_t *item, cJSON *cjson_device)
     item->cloud_properties.value_type = value_type_bool;
     item->cloud_properties.show = true;
     item->cloud_properties.scale = NULL;
-    item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
+    item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
 
     item->interface.gpio.gpio_in.enable = true;
     CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_dev_type_str, item->interface_type);
@@ -167,27 +158,27 @@ static void __setup_item_properties(l_ezlopi_item_t *item, cJSON *cjson_device)
 
 static ezlopi_error_t __prepare(void *arg)
 {
-    int ret = EZPI_SUCCESS;
+    ezlopi_error_t ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
     if (arg)
     {
         s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
         cJSON *cjson_device = prep_arg->cjson_device;
         if (cjson_device)
         {
-            l_ezlopi_device_t *device = ezlopi_device_add_device(cjson_device, NULL);
+            l_ezlopi_device_t *device = EZPI_core_device_add_device(cjson_device, NULL);
             if (device)
             {
                 ret = 1;
                 __setup_device_cloud_properties(device, cjson_device);
-                l_ezlopi_item_t *item = ezlopi_device_add_item_to_device(device, device_0004_digitalIn_generic);
+                l_ezlopi_item_t *item = EZPI_core_device_add_item_to_device(device, DEVICE_0004_digitalIn_generic);
                 if (item)
                 {
                     __setup_item_properties(item, cjson_device);
+                    ret = EZPI_SUCCESS;
                 }
                 else
                 {
-                    ezlopi_device_free_device(device);
-                    ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
+                    EZPI_core_device_free_device(device);
                 }
             }
         }
@@ -198,7 +189,7 @@ static ezlopi_error_t __prepare(void *arg)
 
 static ezlopi_error_t __init(l_ezlopi_item_t *item)
 {
-    ezlopi_error_t ret = EZPI_SUCCESS;
+    ezlopi_error_t ret = EZPI_ERR_INIT_DEVICE_FAILED;
     if (item)
     {
         if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num) &&
@@ -223,16 +214,9 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
 
             if (0 == gpio_config(&io_conf))
             {
-                ezlopi_service_gpioisr_register_v3(item, __interrupt_upcall, 1000);
+                EZPI_service_gpioisr_register_v3(item, __interrupt_upcall, 1000);
+                ret = EZPI_SUCCESS;
             }
-            else
-            {
-                ret = EZPI_ERR_INIT_DEVICE_FAILED;
-            }
-        }
-        else
-        {
-            ret = EZPI_ERR_INIT_DEVICE_FAILED;
         }
     }
 
@@ -247,7 +231,7 @@ static ezlopi_error_t __get_value_cjson(l_ezlopi_item_t *item, void *arg)
         cJSON *cj_propertise = (cJSON *)arg;
         if (cj_propertise)
         {
-            ezlopi_valueformatter_bool_to_cjson(cj_propertise, item->interface.gpio.gpio_out.value, NULL);
+            EZPI_core_valueformatter_bool_to_cjson(cj_propertise, item->interface.gpio.gpio_out.value, NULL);
             ret = EZPI_SUCCESS;
         }
     }
@@ -261,7 +245,7 @@ static void __interrupt_upcall(void *arg)
     if (item)
     {
         item->interface.gpio.gpio_in.value = !item->interface.gpio.gpio_in.value;
-        ezlopi_device_value_updated_from_device_broadcast(item);
+        EZPI_core_device_value_updated_from_device_broadcast(item);
     }
 }
 

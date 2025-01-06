@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2022 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -30,11 +30,11 @@
 */
 
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
- * @version 0.1
- * @date    1st January 2024
+ * @file    ezlopi_cloud_scenes_expressions.h
+ * @brief
+ * @author
+ * @version
+ * @date
  */
 
 /*******************************************************************************
@@ -43,13 +43,14 @@
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
-
+#include <time.h>
 #include "ezlopi_util_trace.h"
 
+#include "ezlopi_core_sntp.h"
+#include "ezlopi_core_errors.h"
 #include "ezlopi_core_broadcast.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_scenes_expressions.h"
-#include "ezlopi_core_errors.h"
 
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_cloud_scenes_expressions.h"
@@ -69,9 +70,27 @@
 /*******************************************************************************
  *                          Static Function Prototypes
  *******************************************************************************/
-static void ____common_part_of_scenes_expressions_added_and_changed(cJSON* cj_request, cJSON* cj_response);
-static void scenes_expressions_added(cJSON *cj_request, cJSON *cj_response);
-static void scenes_expressions_changed(cJSON *cj_request, cJSON *cj_response);
+/**
+ * @brief Function to broadcast scenes expressions changed
+ *
+ * @param cj_request Incoming JSON request
+ * @param cj_response Outgoing JSON response
+ */
+static void ezpi_scenes_expressions_changed(cJSON *cj_request, cJSON *cj_response);
+/**
+ * @brief Function to broadcast scenes expressions added
+ *
+ * @param cj_request Incoming JSON request
+ * @param cj_response Outgoing JSON response
+ */
+static void ezpi_scenes_expressions_added(cJSON *cj_request, cJSON *cj_response);
+/**
+ * @brief Function to broadcast scenes expressions added and changed
+ *
+ * @param cj_request Incoming JSON request
+ * @param cj_response Outgoing JSON response
+ */
+static void ezpi_common_part_of_scenes_expressions_added_and_changed(cJSON *cj_request, cJSON *cj_response);
 
 /*******************************************************************************
  *                          Static Data Definitions
@@ -84,13 +103,7 @@ static void scenes_expressions_changed(cJSON *cj_request, cJSON *cj_response);
 /*******************************************************************************
  *                          Extern Function Definitions
  *******************************************************************************/
-
-/**
- * @brief Global/extern function template example
- * Convention : Use capital letter for initial word on extern function
- * @param arg
- */
-void scenes_expressions_delete(cJSON *cj_request, cJSON *cj_response)
+void EZPI_scenes_expressions_delete(cJSON *cj_request, cJSON *cj_response)
 {
     if (cj_request && cj_response)
     {
@@ -102,13 +115,13 @@ void scenes_expressions_delete(cJSON *cj_request, cJSON *cj_response)
             cJSON *cj_expression_name = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_name_str);
             if (cj_expression_name && cj_expression_name->valuestring)
             {
-                ezlopi_scenes_expressions_delete_by_name(cj_expression_name->valuestring);
+                EZPI_scenes_expressions_delete_by_name(cj_expression_name->valuestring);
             }
         }
     }
 }
 
-void scenes_expressions_list(cJSON *cj_request, cJSON *cj_response)
+void EZPI_scenes_expressions_list(cJSON *cj_request, cJSON *cj_response)
 {
     if (cj_request && cj_response)
     {
@@ -123,14 +136,14 @@ void scenes_expressions_list(cJSON *cj_request, cJSON *cj_response)
                 cJSON *cj_expressions_array = cJSON_AddArrayToObject(__FUNCTION__, cj_result, ezlopi_expressions_str);
                 if (cj_expressions_array)
                 {
-                    ezlopi_scenes_expressions_list_cjson(cj_expressions_array, cj_params);
+                    EZPI_scenes_expressions_list_cjson(cj_expressions_array, cj_params);
                 }
             }
         }
     }
 }
 
-void scenes_expressions_set(cJSON *cj_request, cJSON *cj_response)
+void EZPI_scenes_expressions_set(cJSON *cj_request, cJSON *cj_response)
 {
     if (cj_request && cj_response)
     {
@@ -140,41 +153,47 @@ void scenes_expressions_set(cJSON *cj_request, cJSON *cj_response)
         if (cj_params)
         {
             // CJSON_TRACE("expressions params", cj_params);
-            cJSON* cj_name = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_name_str);
+            cJSON *cj_name = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_name_str);
             if (cj_name && cj_name->valuestring)
             {
-                s_ezlopi_expressions_t* curr_expn_node = ezlopi_scenes_expression_get_by_name(cj_name->valuestring);
+                s_ezlopi_expressions_t *curr_expn_node = EZPI_scenes_expression_get_by_name(cj_name->valuestring);
                 if (NULL != curr_expn_node)
                 {
-                    ezlopi_scenes_expression_update_expr(curr_expn_node, cj_params);
+                    EZPI_scenes_expressions_update_expr(curr_expn_node, cj_params);
                 }
                 else
                 {
-                    ezlopi_scenes_expressions_add_to_head(0, cj_params);
+                    EZPI_scenes_expressions_add_to_head(0, cj_params);
                 }
             }
         }
     }
 }
 
-void scenes_expressions_added_changed(cJSON *cj_request, cJSON *cj_response)
+//-----------------------------------------------------------------------------------------------------------
+//                  EXPRESSION UPDATERS
+//-----------------------------------------------------------------------------------------------------------
+
+////// updater for scene.expressions
+////// for 'hub.scenes.expressions.set'
+void EZPI_scenes_expressions_added_changed(cJSON *cj_request, cJSON *cj_response)
 {
     // 1. broadcast 'added'
     cJSON *response1 = cJSON_CreateObject(__FUNCTION__);
     if (response1)
     {
-        scenes_expressions_added(cj_request, response1);
-        if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(response1))
+        ezpi_scenes_expressions_added(cj_request, response1);
+        if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(response1, EZPI_core_sntp_get_current_time_sec()))
         {
             cJSON_Delete(__FUNCTION__, response1);
         }
     }
 
     // 2. for 'changed' - return  'cj_response'
-    scenes_expressions_changed(cj_request, cj_response);
+    ezpi_scenes_expressions_changed(cj_request, cj_response);
 }
 
-void scenes_expressions_deleted(cJSON *cj_request, cJSON *cj_response)
+void EZPI_scenes_expressions_deleted(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_sender_str);
     cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_error_str);
@@ -197,12 +216,34 @@ void scenes_expressions_deleted(cJSON *cj_request, cJSON *cj_response)
     }
 }
 
-/*******************************************************************************
- *                          Static Function Definitions
- *******************************************************************************/
-static void ____common_part_of_scenes_expressions_added_and_changed(cJSON* cj_request, cJSON* cj_response)
+static void ezpi_scenes_expressions_added(cJSON *cj_request, cJSON *cj_response)
 {
-    cJSON* cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+    // time_t now = EZPI_core_sntp_get_current_time_sec();
+    // cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_startTime_str, now);
+
+    cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_sender_str);
+    cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_error_str);
+
+    cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
+    cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, ezlopi_hub_expression_added_str);
+
+    ezpi_common_part_of_scenes_expressions_added_and_changed(cj_request, cj_response);
+}
+
+static void ezpi_scenes_expressions_changed(cJSON *cj_request, cJSON *cj_response)
+{
+    cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_sender_str);
+    cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_error_str);
+
+    cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
+    cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, ezlopi_hub_expression_changed_str);
+
+    ezpi_common_part_of_scenes_expressions_added_and_changed(cj_request, cj_response);
+}
+
+static void ezpi_common_part_of_scenes_expressions_added_and_changed(cJSON *cj_request, cJSON *cj_response)
+{
+    cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     if (cj_result)
     {
         cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
@@ -229,7 +270,7 @@ static void ____common_part_of_scenes_expressions_added_and_changed(cJSON* cj_re
             cJSON *cj_metadata = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_metadata_str);
             if (cj_metadata)
             {
-                cJSON_AddItemToObject(__FUNCTION__, cj_result, ezlopi_metadata_str, cJSON_Duplicate(__FUNCTION__, cj_metadata, cJSON_True));
+                cJSON_AddItemToObject(__FUNCTION__, cj_result, ezlopi_metadata_str, cJSON_Duplicate(__FUNCTION__, cj_metadata, true));
             }
 
             cJSON *cj_variable = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_variable_str);
@@ -255,51 +296,31 @@ static void ____common_part_of_scenes_expressions_added_and_changed(cJSON* cj_re
                 }
                 case cJSON_True:
                 {
-                    cJSON_AddBoolToObject(__FUNCTION__, cj_result, ezlopi_value_str, cJSON_True);
+                    cJSON_AddBoolToObject(__FUNCTION__, cj_result, ezlopi_value_str, true);
                     break;
                 }
                 case cJSON_False:
                 {
-                    cJSON_AddBoolToObject(__FUNCTION__, cj_result, ezlopi_value_str, cJSON_False);
+                    cJSON_AddBoolToObject(__FUNCTION__, cj_result, ezlopi_value_str, false);
                     break;
                 }
                 case cJSON_Array:
                 case cJSON_Object:
                 {
-                    cJSON_AddItemToObject(__FUNCTION__, cj_result, ezlopi_value_str, cJSON_Duplicate(__FUNCTION__, cj_value, cJSON_True));
+                    cJSON_AddItemToObject(__FUNCTION__, cj_result, ezlopi_value_str, cJSON_Duplicate(__FUNCTION__, cj_value, true));
                     break;
                 }
                 default:
                 {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                     TRACE_E("Error: Undefined value type: %d", cj_value->type);
+#endif
                     break;
                 }
                 }
             }
         }
     }
-}
-
-static void scenes_expressions_added(cJSON *cj_request, cJSON *cj_response)
-{
-    cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_sender_str);
-    cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_error_str);
-
-    cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
-    cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, ezlopi_hub_expression_added_str);
-
-    ____common_part_of_scenes_expressions_added_and_changed(cj_request, cj_response);
-}
-
-static void scenes_expressions_changed(cJSON *cj_request, cJSON *cj_response)
-{
-    cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_sender_str);
-    cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_error_str);
-
-    cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
-    cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, ezlopi_hub_expression_changed_str);
-
-    ____common_part_of_scenes_expressions_added_and_changed(cj_request, cj_response);
 }
 
 #endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS

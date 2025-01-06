@@ -30,32 +30,22 @@
 */
 
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
- * @version 0.1
- * @date    1st January 2024
+ * @file    ezlopi_service_loop.c
+ * @brief
+ * @author
+ * @version
+ * @date
  */
-
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
-
-#include <string.h>
-#include <stdint.h>
-#include <time.h>
-
-#include "../../build/config/sdkconfig.h"
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
 #include "ezlopi_util_trace.h"
 
-#include "ezlopi_core_heap.h"
-#include "ezlopi_core_actions.h"
 #include "ezlopi_core_processes.h"
-#include "ezlopi_core_devices_list.h"
 
 #include "ezlopi_service_loop.h"
 
@@ -70,27 +60,49 @@
 /*******************************************************************************
  *                          Type & Macro Definitions
  *******************************************************************************/
+/**
+ * @brief Macro to get max len between two lengths
+ *
+ * @param str1_len
+ * @param str2_len
+ *
+ */
 #define MAX_LEN(str1_len, str2_len) ((str1_len > str2_len) ? str1_len : str2_len)
 
+/**
+ * @brief Linked list to store function loop details
+ *
+ */
 typedef struct s_loop_node
 {
-    void *arg;
-    f_loop_t loop;
-    const char *name;
-    uint32_t period_ms;
-    uint32_t _timer_ms;
-
-    struct s_loop_node *next;
+    void *arg;                /**< Argument to be passed to the function loop when called */
+    f_loop_t loop;            /**< Function loop */
+    const char *name;         /**< Name for the function loop */
+    uint32_t period_ms;       /**< Period ms for the function loop to be called */
+    uint32_t _timer_ms;       /**< Timer linked to a speific function loop */
+    struct s_loop_node *next; /**< Pointer to point to the next function loop detail hence becoming a linked list */
 } s_loop_node_t;
+
+/**
+ * @brief Task that handles calling function loop
+ *
+ * @param pv Task argument
+ */
+static void ezpi_loop(void *pv);
+/**
+ * @brief Function to create a s_loop_node_t node and then return the pointer
+ *
+ * @param name Name for the function loop
+ * @param loop Function loop
+ * @param period_ms Period ms for the function loop to be called
+ * @param arg Argument to be passed to the function loop when called
+ * @return s_loop_node_t*
+ * @retval Node pointer or NULL on error
+ */
+static s_loop_node_t *ezpi_create_node(const char *name, f_loop_t loop, uint32_t period_ms, void *arg);
 
 /*******************************************************************************
  *                          Static Function Prototypes
- *******************************************************************************/
-static void __loop(void *pv);
-static s_loop_node_t *__create_node(const char *name, f_loop_t loop, uint32_t period_ms, void *arg);
-
-/*******************************************************************************
- *                          Static Data Definitions
  *******************************************************************************/
 static s_loop_node_t *__loop_head = NULL;
 
@@ -101,15 +113,9 @@ static s_loop_node_t *__loop_head = NULL;
 /*******************************************************************************
  *                          Extern Function Definitions
  *******************************************************************************/
-
-/**
- * @brief Global/extern function template example
- * Convention : Use capital letter for initial word on extern function
- * @param arg
- */
-void ezlopi_service_loop_add(const char *name, f_loop_t loop, uint32_t period_ms, void *arg)
+void EZPI_service_loop_add(const char *name, f_loop_t loop, uint32_t period_ms, void *arg)
 {
-    if (loop && name) // adding to guard [check if 'loop' is already present]
+    if (loop && name)
     {
         if (__loop_head)
         {
@@ -119,16 +125,16 @@ void ezlopi_service_loop_add(const char *name, f_loop_t loop, uint32_t period_ms
                 __loop_node = __loop_node->next;
             }
 
-            __loop_node->next = __create_node(name, loop, (period_ms / portTICK_RATE_MS), arg);
+            __loop_node->next = ezpi_create_node(name, loop, (period_ms / portTICK_RATE_MS), arg);
         }
         else
         {
-            __loop_head = __create_node(name, loop, (period_ms / portTICK_RATE_MS), arg);
+            __loop_head = ezpi_create_node(name, loop, (period_ms / portTICK_RATE_MS), arg);
         }
     }
 }
 
-void ezlopi_service_loop_remove(f_loop_t loop)
+void EZPI_service_loop_remove(f_loop_t loop)
 {
     if (loop && __loop_head)
     {
@@ -157,18 +163,19 @@ void ezlopi_service_loop_remove(f_loop_t loop)
     }
 }
 
-void ezlopi_service_loop_init(void)
+void EZPI_service_loop_init(void)
 {
     TaskHandle_t ezlopi_service_timer_task_handle = NULL;
-    // xTaskCreate(event_process, "event_process", EZLOPI_SERVICE_TIMER_TASK_DEPTH, NULL, 4, &ezlopi_service_timer_task_handle);
-    xTaskCreate(__loop, "__loop", EZLOPI_SERVICE_LOOP_TASK_DEPTH, NULL, 4, &ezlopi_service_timer_task_handle);
-    ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_LOOP_TASK, &ezlopi_service_timer_task_handle, EZLOPI_SERVICE_LOOP_TASK_DEPTH);
-}
+    xTaskCreate(ezpi_loop, "ezpi_loop", EZLOPI_SERVICE_LOOP_TASK_DEPTH, NULL, 4, &ezlopi_service_timer_task_handle);
 
+#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
+    EZPI_core_process_set_process_info(ENUM_EZLOPI_SERVICE_LOOP_TASK, &ezlopi_service_timer_task_handle, EZLOPI_SERVICE_LOOP_TASK_DEPTH);
+#endif
+}
 /*******************************************************************************
  *                          Static Function Definitions
  *******************************************************************************/
-static void __loop(void* pv)
+static void ezpi_loop(void *pv)
 {
     while (1)
     {
@@ -202,7 +209,7 @@ static void __loop(void* pv)
     }
 }
 
-static s_loop_node_t *__create_node(const char *name, f_loop_t loop, uint32_t period_ms, void *arg)
+static s_loop_node_t *ezpi_create_node(const char *name, f_loop_t loop, uint32_t period_ms, void *arg)
 {
     s_loop_node_t *__loop_node = ezlopi_malloc(__FUNCTION__, sizeof(s_loop_node_t));
 

@@ -28,72 +28,75 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_core_wifi_ap.h
+ * @brief   perform some function on  wifi-AP (captive portal)
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
- */
+ * @date    12th DEC 2024
+*/
 
 #ifndef _EZLOPI_CORE_WIFI_AP_H_
 #define _EZLOPI_CORE_WIFI_AP_H_
 
-#include "sdkconfig.h"
-
+/*******************************************************************************
+*                          Include Files
+*******************************************************************************/
 #ifdef CONFIG_EZPI_ENABLE_CAPTIVE_PORTAL
 
-/*******************************************************************************
- *                          Include Files
- *******************************************************************************/
+#include "sdkconfig.h"
+
+
+
 
 /*******************************************************************************
- *                          C++ Declaration Wrapper
- *******************************************************************************/
+*                          C++ Declaration Wrapper
+*******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
     /*******************************************************************************
-     *                          Type & Macro Declarations
-     *******************************************************************************/
+    *                          Type & Macro Declarations
+    *******************************************************************************/
 
     /*******************************************************************************
-     *                          Extern Data Declarations
-     *******************************************************************************/
+    *                          Extern Data Declarations
+    *******************************************************************************/
 
     /*******************************************************************************
-     *                          Extern Function Prototypes
-     *******************************************************************************/
+    *                          Extern Function Prototypes
+    *******************************************************************************/
+  
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
+     * @brief Function to configure wifi-AP
      *
      */
-    void ezlopi_configure_wifi_ap();
-    void ezlopi_deconfigure_wifi_ap();
-    void ezlopi_start_dns_server();
+    void EZPI_core_configure_wifi_ap();
+    /**
+     * @brief Function to remove wifi-AP
+     *
+     */
+    void EZPI_core_deconfigure_wifi_ap();
+    /**
+     * @brief Function to start dns server
+     *
+     */
+    void EZPI_start_dns_server();
+
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // _EZLOPI_CORE_WIFI_AP_H_
-
 #endif // CONFIG_EZPI_ENABLE_CAPTIVE_PORTAL
 
+#endif // _EZLOPI_CORE_WIFI_AP_H_
+
 /*******************************************************************************
- *                          End of File
- *******************************************************************************/
-
-
+*                          End of File
+*******************************************************************************/
 
 
 

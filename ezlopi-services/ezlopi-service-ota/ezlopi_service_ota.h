@@ -30,16 +30,16 @@
 */
 
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
- * @version 0.1
- * @date    1st January 2024
+ * @file    ezlopi_service_ota.h
+ * @brief
+ * @author
+ * @version
+ * @date
  */
-
 #ifndef _EZLOPI_SERVICE_OTA_H_
 #define _EZLOPI_SERVICE_OTA_H_
 
+#ifdef CONFIG_EZPI_ENABLE_OTA
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
@@ -47,13 +47,10 @@
 /*******************************************************************************
  *                          C++ Declaration Wrapper
  *******************************************************************************/
-    #ifdef CONFIG_EZPI_ENABLE_OTA
-
 #ifdef __cplusplus
 extern "C"
 {
 #endif
-
     /*******************************************************************************
      *                          Type & Macro Declarations
      *******************************************************************************/
@@ -66,17 +63,13 @@ extern "C"
      *                          Extern Function Prototypes
      *******************************************************************************/
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
+     * @brief Function to initialize OTA update
+     * @details Following operations are performed in this function
+     *  - Sets event group's OTA bit
+     *  - Regsters a function loop to perform OTA operations
      *
      */
-    void ezlopi_service_ota_init(void);
-    bool ezlopi_service_ota_get_busy_state(void);
+    void EZPI_service_ota_init(void);
 
 #ifdef __cplusplus
 }

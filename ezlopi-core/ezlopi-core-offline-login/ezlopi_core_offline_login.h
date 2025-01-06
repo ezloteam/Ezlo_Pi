@@ -28,17 +28,19 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_core_offline_login.h
+ * @brief   Function to perform offine login operation
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    12th DEC 2024
  */
 
-#ifndef __EZLOPI_CORE_OFFLINE_LOGIN_H_
-#define __EZLOPI_CORE_OFFLINE_LOGIN_H_
+#ifndef _EZLOPI_CORE_OFFLINE_LOGIN_H_
+#define _EZLOPI_CORE_OFFLINE_LOGIN_H_
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 
 /*******************************************************************************
  *                          Include Files
@@ -65,25 +67,33 @@ extern "C"
     /*******************************************************************************
      *                          Extern Function Prototypes
      *******************************************************************************/
+
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
+     * @brief Function to trigger login check operation
      *
+     * @param cj_params cjson obj login info
+     * @return ezlopi_error_t
      */
-    ezlopi_error_t ezlopi_core_offline_login_perform(cJSON *cj_params);
-    ezlopi_error_t ezlopi_core_offline_logout_perform();
-    bool is_user_logged_in();
+    ezlopi_error_t EZPI_core_offline_login_perform(cJSON *cj_params);
+    /**
+     * @brief Function to perform logout operation
+     *
+     * @return ezlopi_error_t
+     */
+    ezlopi_error_t EZPI_core_offline_logout_perform();
+    /**
+     * @brief Function to check if user is logged in
+     *
+     * @return true
+     * @return false
+     */
+    bool EZPI_core_offline_is_user_logged_in();
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // __EZLOPI_CORE_OFFLINE_LOGIN_H_
+#endif // _EZLOPI_CORE_OFFLINE_LOGIN_H_
 
 /*******************************************************************************
  *                          End of File

@@ -28,25 +28,24 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_core_log.h
+ * @brief   Function operaters on system-logs
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    12th DEC 2024
  */
 
 #ifndef _EZLOPI_CORE_LOG_H_
 #define _EZLOPI_CORE_LOG_H_
 
-#include "../../build/config/sdkconfig.h"
-
-#ifdef CONFIG_EZPI_UTIL_TRACE_EN
-
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
+#include "../../build/config/sdkconfig.h"
+
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
+#include "ezlopi_util_trace.h"
 #include "ezlopi_core_errors.h"
 
 #include <stdbool.h>
@@ -62,15 +61,6 @@ extern "C"
     /*******************************************************************************
      *                          Type & Macro Declarations
      *******************************************************************************/
-    typedef enum {
-        ENUM_EZLOPI_LOG_SEVERITY_NONE = 0,
-        ENUM_EZLOPI_LOG_SEVERITY_ERROR,
-        ENUM_EZLOPI_LOG_SEVERITY_WARNING,
-        ENUM_EZLOPI_LOG_SEVERITY_INFO,
-        ENUM_EZLOPI_LOG_SEVERITY_DEBUG,
-        ENUM_EZLOPI_LOG_SEVERITY_TRACE,
-        ENUM_EZLOPI_LOG_SEVERITY_MAX,
-    }e_ezlopi_log_severity_t;
 
     /*******************************************************************************
      *                          Extern Data Declarations
@@ -80,30 +70,88 @@ extern "C"
      *                          Extern Function Prototypes
      *******************************************************************************/
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
+     * @brief Function to set the log severtity
      *
      */
-    void ezlopi_core_read_set_log_severities();
-    void ezlopi_core_read_set_log_severities_internal(e_ezlopi_log_severity_t severity);
-    ezlopi_error_t ezlopi_core_cloud_log_severity_process_str(bool severity_enable, const char* severity_str);
-    ezlopi_error_t ezlopi_core_cloud_log_severity_process_id(const e_ezlopi_log_severity_t severity_level_id);
-    const char** ezlopi_core_cloud_log_get_severity_enums();
-
-    const char* ezlopi_core_cloud_log_get_current_severity_enum_str();
-    e_ezlopi_log_severity_t ezlopi_core_cloud_log_get_current_severity_enum_val();
-    ezlopi_error_t ezlopi_core_send_cloud_log(int severity, const char* log_str);
-    void ezlopi_core_set_log_upcalls();
-
-    ezlopi_error_t ezlopi_core_serial_log_severity_process_str(const char* severity_str);
-    ezlopi_error_t ezlopi_core_serial_log_severity_process_id(const e_ezlopi_log_severity_t severity_level_id);
-    const char* ezlopi_core_serial_log_get_current_severity_enum_str();
-    e_ezlopi_log_severity_t ezlopi_core_serial_log_get_current_severity_enum_val();
+    void EZPI_core_read_set_log_severities(void);
+    /**
+     * @brief Function to set the log severity
+     *
+     * @param severity Target servertiy
+     */
+    void EZPI_core_read_set_log_severities_internal(e_trace_severity_t severity);
+    /**
+     * @brief Function to  send logs everity
+     *
+     * @param severity_enable Flag to enable severity
+     * @param severity_str Target severity
+     * @return ezlopi_error_t
+     */
+    ezlopi_error_t EZPI_core_cloud_log_severity_process_str(bool severity_enable, const char *severity_str);
+    /**
+     * @brief  Function to send log severity by id
+     *
+     * @param severity_level_id Target severity lvl
+     * @return ezlopi_error_t
+     */
+    ezlopi_error_t EZPI_core_cloud_log_severity_process_id(const e_trace_severity_t severity_level_id);
+    /**
+     * @brief Function to get severity values
+     *
+     * @return const char**
+     */
+    const char **EZPI_core_cloud_log_get_severity_enums();
+    /**
+     * @brief Funciton to get curr severity enum str
+     *
+     * @return const char*
+     */
+    const char *EZPI_core_cloud_log_get_current_severity_enum_str();
+    /**
+     * @brief Function to get curr severity enum val
+     *
+     * @return e_trace_severity_t
+     */
+    e_trace_severity_t EZPI_core_cloud_log_get_current_severity_enum_val();
+    /**
+     * @brief Function to send-cloud log severity info
+     *
+     * @param severity current severity
+     * @param log_str Log Message
+     * @return ezlopi_error_t
+     */
+    ezlopi_error_t EZPI_core_send_cloud_log(int severity, const char *log_str);
+    /**
+     * @brief Funciton to decide log methods (cloud or serial)
+     *
+     */
+    void EZPI_core_set_log_upcalls();
+    /**
+     * @brief Funciton to process cloud log severity
+     *
+     * @param severity_str src severity
+     * @return ezlopi_error_t
+     */
+    ezlopi_error_t EZPI_core_serial_log_severity_process_str(const char *severity_str);
+    /**
+     * @brief Funciton to process serial cloud log severity
+     *
+     * @param severity_level_id src severity lvl
+     * @return ezlopi_error_t
+     */
+    ezlopi_error_t EZPI_core_serial_log_severity_process_id(const e_trace_severity_t severity_level_id);
+    /**
+     * @brief Function to get current cloud log-severity str
+     *
+     * @return const char*
+     */
+    const char *EZPI_core_serial_log_get_current_severity_enum_str();
+    /**
+     * @brief Function to get current serial log-severity str
+     *
+     * @return e_trace_severity_t
+     */
+    e_trace_severity_t EZPI_core_serial_log_get_current_severity_enum_val();
 
 #ifdef __cplusplus
 }

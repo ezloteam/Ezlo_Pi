@@ -28,29 +28,26 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_core_modes_cjson.h
+ * @brief   These function perform operations related to house-mode cjsons
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    12th DEC 2024
  */
 
 #ifndef __EZLOPI_CORE_MODES_CJSON_H__
 #define __EZLOPI_CORE_MODES_CJSON_H__
 
-
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
-#include "cjext.h"
+// #include "cjext.h"
+// #include <stdint.h>
 #include <string.h>
-#include <stdint.h>
 
 #include "ezlopi_core_modes.h"
 #include "ezlopi_core_errors.h"
-
 
 /*******************************************************************************
  *                          C++ Declaration Wrapper
@@ -61,38 +58,68 @@ extern "C"
 #endif
 
 #if defined(CONFIG_EZPI_SERV_ENABLE_MODES)
-    /*******************************************************************************
-     *                          Type & Macro Declarations
-     *******************************************************************************/
-
-    /*******************************************************************************
-     *                          Extern Data Declarations
-     *******************************************************************************/
-
-    /*******************************************************************************
-     *                          Extern Function Prototypes
-     *******************************************************************************/
-    /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
-     *
-     */
-    ezlopi_error_t ezlopi_core_modes_cjson_get_modes(cJSON* cj_dest);
-    ezlopi_error_t ezlopi_core_modes_cjson_get_current_mode(cJSON* cj_dest);
-    s_ezlopi_modes_t* ezlopi_core_modes_cjson_parse_modes(cJSON* cj_modes);
+/*******************************************************************************
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
+#ifdef __cplusplus
+    extern "C"
+    {
 #endif
+
+        /*******************************************************************************
+         *                          Type & Macro Declarations
+         *******************************************************************************/
+
+        /*******************************************************************************
+         *                          Extern Data Declarations
+         *******************************************************************************/
+
+        /*******************************************************************************
+         *                          Extern Function Prototypes
+         *******************************************************************************/
+
+        /**
+         * @brief This function returns an oject containing current House-Modes information
+         *
+         * @param cj_dest Destination object for House-mode infomation.
+         * @return ezlopi_error_t
+         */
+        ezlopi_error_t EZPI_core_modes_cjson_get_modes(cJSON *cj_dest);
+        /**
+         * @brief This function returns object contaings modeId of currently active House-Modes
+         *
+         * @param cj_dest Destination object where house-mode id is stored
+         * @return ezlopi_error_t
+         */
+        ezlopi_error_t EZPI_core_modes_cjson_get_current_mode(cJSON *cj_dest);
+        /**
+         * @brief This function returns a new house-mode node from the source-obj 'cj_modes'
+         *
+         * @param cj_modes Source object used to extract info from.
+         * @return s_ezlopi_modes_t
+         */
+        s_ezlopi_modes_t *EZPI_core_modes_cjson_parse_modes(cJSON *cj_modes);
+        /**
+         * @brief This function returns cjson indicating MODES_status
+         *
+         * @return cJSON *
+         */
+        cJSON *EZPI_core_modes_cjson_changed(void);
+        /**
+         * @brief This function returns cjson indicating Alarmed_status of perticular mode
+         *
+         * @param dev_id_str Id of target MODE.
+         * @return cJSON *
+         */
+        cJSON *EZPI_core_modes_cjson_alarmed(const char *dev_id_str);
 
 #ifdef __cplusplus
-}
+    }
 #endif
 
-#endif // __EZLOPI_CORE_MODES_CJSON_H__
+#endif // CONFIG_EZPI_SERV_ENABLE_MODES
 
-/*******************************************************************************
- *                          End of File
- *******************************************************************************/
+#endif // __EZLOPI_CORE_MODES_CJSON_H__
+    /*******************************************************************************
+     *                          End of File
+     *******************************************************************************/

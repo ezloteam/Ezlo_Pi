@@ -28,13 +28,12 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_core_scenes_then_methods_helper_func.c
+ * @brief   These are sub-functions utilized in file 'ezlopi_core_scenes_then_methods.c'
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    12th DEC 2024
  */
 
 /*******************************************************************************
@@ -90,10 +89,8 @@
  *                          Static Function Prototypes
  *******************************************************************************/
 static int __ezlopi_core_scenes_then_sendhttp_relloc_header(s_ezlopi_core_http_mbedtls_t *tmp_http_data, int append_size, const char *append_str);
-static void __ezlopi_core_scenes_then_sendhttp_parse_host_name(s_ezlopi_core_http_mbedtls_t* tmp_http_data, const char* field_value_string);
 static int __ezlopi_core_scenes_then_create_fresh_header(s_ezlopi_core_http_mbedtls_t *tmp_http_data);
 static void __ezlopi_core_scenes_then_append_to_header(s_ezlopi_core_http_mbedtls_t *tmp_http_data, const char *str1, const char *str2);
-
 /*******************************************************************************
  *                          Static Data Definitions
  *******************************************************************************/
@@ -105,14 +102,8 @@ static void __ezlopi_core_scenes_then_append_to_header(s_ezlopi_core_http_mbedtl
 /*******************************************************************************
  *                          Extern Function Definitions
  *******************************************************************************/
-
-/**
- * @brief Global/extern function template example
- * Convention : Use capital letter for initial word on extern function
- * @param arg
- */
-//------------------------------- ezlopi_scene_then_sendhttp_request -----------------------------------------------
-void parse_http_request_type(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fields_v2_t *curr_field)
+//------------------------------- EZPI_core_scene_then_sendhttp_request -----------------------------------------------
+void EZPI_parse_http_request_type(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fields_v2_t *curr_field)
 {
     const char *field_value_string = curr_field->field_value.u_value.value_string;
     if ((EZLOPI_VALUE_TYPE_STRING == curr_field->value_type) && (NULL != field_value_string))
@@ -139,14 +130,13 @@ void parse_http_request_type(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fiel
         }
     }
 }
-
-void parse_http_url(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fields_v2_t *curr_field)
+void EZPI_parse_http_url(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fields_v2_t *curr_field)
 {
     const char *field_value_string = curr_field->field_value.u_value.value_string;
     if ((EZLOPI_VALUE_TYPE_STRING == curr_field->value_type) && (NULL != field_value_string))
     {
         // TRACE_W("Here! fresh url");
-        tmp_http_data->url_maxlen = (uint16_t)ezlopi_core_http_mem_malloc(&(tmp_http_data->url), field_value_string);
+        tmp_http_data->url_maxlen = (uint16_t)EZPI_core_http_mem_malloc(&(tmp_http_data->url), field_value_string);
         if (tmp_http_data->url_maxlen > 0)
         {
             //--------------------------------------------
@@ -220,8 +210,8 @@ void parse_http_url(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fields_v2_t *
                 TRACE_S("port = '%d'", port);
                 TRACE_S("page = '%s'", page);
 
-                tmp_http_data->web_server_maxlen = (uint16_t)ezlopi_core_http_mem_malloc(&(tmp_http_data->web_server), host);
-                tmp_http_data->targe_page_maxlen = (uint16_t)ezlopi_core_http_mem_malloc(&(tmp_http_data->target_page), page);
+                tmp_http_data->web_server_maxlen = (uint16_t)EZPI_core_http_mem_malloc(&(tmp_http_data->web_server), host);
+                tmp_http_data->targe_page_maxlen = (uint16_t)EZPI_core_http_mem_malloc(&(tmp_http_data->target_page), page);
                 tmp_http_data->web_port = port;
             }
             else
@@ -243,7 +233,7 @@ void parse_http_url(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fields_v2_t *
         }
     }
 }
-void parse_http_content_type(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fields_v2_t *curr_field)
+void EZPI_parse_http_content_type(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fields_v2_t *curr_field)
 {
     const char *field_value_string = curr_field->field_value.u_value.value_string;
     if ((EZLOPI_VALUE_TYPE_STRING == curr_field->value_type) && (NULL != field_value_string))
@@ -269,13 +259,13 @@ void parse_http_content_type(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fiel
         // }
     }
 }
-void parse_http_content(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fields_v2_t *curr_field)
+void EZPI_parse_http_content(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fields_v2_t *curr_field)
 {
     const char *field_value_string = curr_field->field_value.u_value.value_string;
     if ((EZLOPI_VALUE_TYPE_STRING == curr_field->value_type) && (NULL != field_value_string))
     {
         // TRACE_W("Here! fresh content");
-        tmp_http_data->content_maxlen = (uint16_t)ezlopi_core_http_mem_malloc(&(tmp_http_data->content), field_value_string);
+        tmp_http_data->content_maxlen = (uint16_t)EZPI_core_http_mem_malloc(&(tmp_http_data->content), field_value_string);
         if (tmp_http_data->content_maxlen > 0)
         {
             int content_size = __ezlopi_core_scenes_then_create_fresh_header(tmp_http_data);
@@ -299,7 +289,7 @@ void parse_http_content(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fields_v2
         }
     }
 }
-void parse_http_headers(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fields_v2_t *curr_field)
+void EZPI_parse_http_headers(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fields_v2_t *curr_field)
 {
     const cJSON *cj_value = curr_field->field_value.u_value.cj_value;
     if ((EZLOPI_VALUE_TYPE_DICTIONARY == curr_field->value_type) && cJSON_IsObject(cj_value))
@@ -326,7 +316,7 @@ void parse_http_headers(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fields_v2
         }
     }
 }
-void parse_http_skipsecurity(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fields_v2_t *curr_field)
+void EZPI_parse_http_skipsecurity(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fields_v2_t *curr_field)
 {
     // TRACE_W("Here! skipsecurity");
     if (EZLOPI_VALUE_TYPE_BOOL == curr_field->value_type)
@@ -337,7 +327,7 @@ void parse_http_skipsecurity(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fiel
         {
             // 5. adding 'skip_security' to header-buffer
             // TRACE_W("Appending!! skipsecurity -> header");
-            __ezlopi_core_scenes_then_append_to_header(tmp_http_data, "skipSecurity", ((curr_field->field_value.u_value.value_bool) ? "true" : "false"));
+            __ezlopi_core_scenes_then_append_to_header(tmp_http_data, "skipSecurity", ((curr_field->field_value.u_value.value_bool) ? ezlopi_true_str : ezlopi_false_str));
         }
         else
         {
@@ -345,7 +335,7 @@ void parse_http_skipsecurity(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fiel
         }
     }
 }
-void parse_http_creds(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fields_v2_t *curr_field)
+void EZPI_parse_http_creds(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fields_v2_t *curr_field)
 {
     const cJSON *cj_value = curr_field->field_value.u_value.cj_value;
     if ((EZLOPI_VALUE_TYPE_CREDENTIAL == curr_field->value_type) && cJSON_IsObject(cj_value))
@@ -358,13 +348,12 @@ void parse_http_creds(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fields_v2_t
             const char *passValue = cJSON_GetStringValue(passwordItem);
 
             // TRACE_W("Here! credential");
-            tmp_http_data->username_maxlen = (uint16_t)ezlopi_core_http_mem_malloc(&(tmp_http_data->username), userValue);
-            tmp_http_data->password_maxlen = (uint16_t)ezlopi_core_http_mem_malloc(&(tmp_http_data->password), passValue);
+            tmp_http_data->username_maxlen = (uint16_t)EZPI_core_http_mem_malloc(&(tmp_http_data->username), userValue);
+            tmp_http_data->password_maxlen = (uint16_t)EZPI_core_http_mem_malloc(&(tmp_http_data->password), passValue);
         }
     }
 }
-
-void free_http_mbedtls_struct(s_ezlopi_core_http_mbedtls_t *config)
+void EZPI_free_http_mbedtls_struct(s_ezlopi_core_http_mbedtls_t *config)
 {
     FREE_PTR_IF_NOT_NULL(config->url);
     FREE_PTR_IF_NOT_NULL(config->web_server);
@@ -375,12 +364,11 @@ void free_http_mbedtls_struct(s_ezlopi_core_http_mbedtls_t *config)
     FREE_PTR_IF_NOT_NULL(config->password);
     FREE_PTR_IF_NOT_NULL(config->response);
 }
-
 //------------------------------ SetExpression / SetVariable -------------------------------------------------------
-ezlopi_error_t ezlopi_core_scene_then_helper_setexpression_setvariable(char *expression_name, const char *code_str, const char *value_type, cJSON *cj_metadata, cJSON *cj_params, l_fields_v2_t *var_value)
+ezlopi_error_t EZPI_core_scenes_then_helper_set_expn_var(char *expression_name, const char *code_str, const char *value_type, cJSON *cj_metadata, cJSON *cj_params, l_fields_v2_t *var_value)
 {
     ezlopi_error_t ret = EZPI_FAILED;
-    s_ezlopi_expressions_t *curr_expr = ezlopi_scenes_get_expression_node_by_name(expression_name);
+    s_ezlopi_expressions_t *curr_expr = EZPI_scenes_expressions_get_node_by_name(expression_name);
     if (curr_expr)
     {
         // 1. set new code
@@ -401,7 +389,7 @@ ezlopi_error_t ezlopi_core_scene_then_helper_setexpression_setvariable(char *exp
         // 2. set new valueType
         if (value_type)
         {
-            curr_expr->value_type = ezlopi_scene_get_scene_value_type_enum(value_type);
+            curr_expr->value_type = EZPI_core_scene_get_scene_value_type_enum(value_type);
         }
 
         // 3. replace metadata CJSON
@@ -424,23 +412,23 @@ ezlopi_error_t ezlopi_core_scene_then_helper_setexpression_setvariable(char *exp
             {
                 if (curr_expr->items)
                 {
-                    ezlopi_scenes_expressions_delete_exp_item(curr_expr->items);
+                    EZPI_scenes_expressions_delete_items(curr_expr->items);
                     curr_expr->items->next = NULL;
                     curr_expr->items = NULL;
                 }
 
-                __get_expressions_items(curr_expr, cj_new_items);
+                EZPI_scenes_expressions_populate_items(curr_expr, cj_new_items);
             }
             cJSON *cj_new_device_item_names = NULL;
             if ((NULL != curr_expr->device_item_names) && (NULL != (cj_new_device_item_names = cJSON_GetObjectItem(__FUNCTION__, cj_params, "device_item_names"))))
             {
                 if (curr_expr->device_item_names)
                 {
-                    ezlopi_scenes_expressions_delete_exp_device_item_names(curr_expr->device_item_names);
+                    EZPI_scenes_expressions_delete_devitem_names(curr_expr->device_item_names);
                     curr_expr->device_item_names->next = NULL;
                     curr_expr->device_item_names = NULL;
                 }
-                __get_expressions_device_item_names(curr_expr, cj_new_device_item_names);
+                EZPI_scenes_expressions_populate_devitem_names(curr_expr, cj_new_device_item_names);
             }
         }
 
@@ -505,21 +493,19 @@ ezlopi_error_t ezlopi_core_scene_then_helper_setexpression_setvariable(char *exp
         }
 
         // TRACE_S("-------------- Updated_exp_name : %s  ------------", expression_name);
-        // ezlopi_scenes_expressions_print(ezlopi_scenes_get_expression_node_by_name(expression_name));
+        // EZPI_scenes_expressions_print(EZPI_scenes_expressions_get_node_by_name(expression_name));
         // TRACE_S("----------------- ll --------------------");
 
         // 5. Now to edit in nvs
         // A. read from  nvs
-        char *exp_id_list_str = ezlopi_nvs_read_scenes_expressions();
+        char *exp_id_list_str = EZPI_core_nvs_read_scenes_expressions();
         if (exp_id_list_str)
         {
             TRACE_D("exp_id_list_str: %s", exp_id_list_str);
             cJSON *cj_exp_id_list = cJSON_Parse(__FUNCTION__, exp_id_list_str);
             if (cj_exp_id_list)
             {
-                // uint32_t exp_idx = 0;
                 cJSON *cj_exp_id = NULL;
-                // while (NULL != (cj_exp_id = cJSON_GetArrayItem(cj_exp_id_list, exp_idx++)))
                 cJSON_ArrayForEach(cj_exp_id, cj_exp_id_list)
                 {
                     if (cj_exp_id && cj_exp_id->valuestring)
@@ -528,7 +514,7 @@ ezlopi_error_t ezlopi_core_scene_then_helper_setexpression_setvariable(char *exp
                         if (exp_id == curr_expr->exp_id)
                         {
                             TRACE_S("Found [%#x] in nvs ; req[%#x]", exp_id, curr_expr->exp_id);
-                            ret = ezlopi_scenes_expressions_update_nvs(cj_exp_id->valuestring, generate_expression_node_in_cjson(curr_expr));
+                            ret = EZPI_scenes_expressions_update_nvs(cj_exp_id->valuestring, EZPI_scenes_expressions_get_cjson(curr_expr));
                             break;
                         }
                     }
@@ -540,15 +526,13 @@ ezlopi_error_t ezlopi_core_scene_then_helper_setexpression_setvariable(char *exp
     }
     return ret;
 }
-
 //------------------------------ toggleValue + grouptoggleValue -------------------------------------------------------
-
-int ezlopi_core_scene_then_helper_toggleValue(uint32_t item_id, const char *item_id_str)
+int EZPI_core_scenes_then_helper_toggleValue(uint32_t item_id, const char *item_id_str)
 {
     int ret = 0;
     if (item_id && item_id_str)
     {
-        l_ezlopi_item_t *curr_item = ezlopi_device_get_item_by_id(item_id);
+        l_ezlopi_item_t *curr_item = EZPI_core_device_get_item_by_id(item_id);
         if ((curr_item) && (EZLOPI_DEVICE_INTERFACE_DIGITAL_OUTPUT == curr_item->interface_type))
         {
             cJSON *cj_tmp_value = cJSON_CreateObject(__FUNCTION__);
@@ -566,9 +550,9 @@ int ezlopi_core_scene_then_helper_toggleValue(uint32_t item_id, const char *item
                         {
                             cJSON_AddStringToObject(__FUNCTION__, cj_result_value, ezlopi__id_str, item_id_str);
 
-                            if ((EZPI_STRNCMP_IF_EQUAL(curr_item->cloud_properties.value_type, value_type_bool, strlen(curr_item->cloud_properties.value_type), 5)) && cJSON_IsBool(cj_val))
+                            if ((EZPI_STRNCMP_IF_EQUAL(curr_item->cloud_properties.value_type, value_type_bool, strlen(curr_item->cloud_properties.value_type) + 1, 5)) && cJSON_IsBool(cj_val))
                             {
-                                // TRACE_S("1. getting 'item_id[%d]' ; bool_value = %s ", item_id, (cj_val->type == cJSON_True) ? "true" : "false"); // "false" or "true"
+                                // TRACE_S("1. getting 'item_id[%d]' ; bool_value = %s ", item_id, (cj_val->type == cJSON_True) ? ezlopi_true_str : ezlopi_false_str); // ezlopi_false_str or ezlopi_true_str
                                 if (cj_val->type == cJSON_True)
                                 {
                                     cJSON_AddBoolToObject(__FUNCTION__, cj_result_value, ezlopi_value_str, false);
@@ -580,7 +564,7 @@ int ezlopi_core_scene_then_helper_toggleValue(uint32_t item_id, const char *item
                                 ret = 1;
                                 curr_item->func(EZLOPI_ACTION_SET_VALUE, curr_item, cj_result_value, curr_item->user_arg);
                             }
-                            else if ((EZPI_STRNCMP_IF_EQUAL(curr_item->cloud_properties.value_type, value_type_int, strlen(curr_item->cloud_properties.value_type), 4)) && cJSON_IsNumber(cj_val))
+                            else if ((EZPI_STRNCMP_IF_EQUAL(curr_item->cloud_properties.value_type, value_type_int, strlen(curr_item->cloud_properties.value_type) + 1, 4)) && cJSON_IsNumber(cj_val))
                             {
                                 // TRACE_S("2. getting 'item_id[%d]' ; int_value = %d ", item_id, (int)cj_val->valuedouble);
                                 if (cj_val->valuedouble == 0) // either  '0' or '1'.
@@ -613,7 +597,7 @@ int ezlopi_core_scene_then_helper_toggleValue(uint32_t item_id, const char *item
 }
 
 /*******************************************************************************
- *                          Static Function Definitions
+ *                         Static Function Definitions
  *******************************************************************************/
 /**
  * @brief This funtion is called, only to reallocate a '*header' of custom_structure 's_ezlopi_core_http_mbedtls_t'
@@ -631,7 +615,7 @@ static int __ezlopi_core_scenes_then_sendhttp_relloc_header(s_ezlopi_core_http_m
     uint8_t retry = 5;
     do
     {
-        if (EZPI_SUCCESS == ezlopi_core_http_dyna_relloc(&(tmp_http_data->header), new_size)) // rellocate: 'tmp_http_data->header' with  'new_size'
+        if (EZPI_SUCCESS == EZPI_core_http_dyna_relloc(&(tmp_http_data->header), new_size)) // rellocate: 'tmp_http_data->header' with  'new_size'
         {
             snprintf((tmp_http_data->header) + strlen(tmp_http_data->header), append_size, "%s", append_str);
             ret = new_size; // return new memory-block size
@@ -651,48 +635,48 @@ static int __ezlopi_core_scenes_then_sendhttp_relloc_header(s_ezlopi_core_http_m
 /**
  * @brief Function to extract "web_host" from "field_value_string".
  */
-static void __ezlopi_core_scenes_then_sendhttp_parse_host_name(s_ezlopi_core_http_mbedtls_t* tmp_http_data, const char* field_value_string)
+static void __ezlopi_core_scenes_then_sendhttp_parse_host_name(s_ezlopi_core_http_mbedtls_t *tmp_http_data, const char *field_value_string)
 {
     if (NULL != field_value_string)
     {
-        const char* start = strstr(field_value_string, "://");
+        const char *start = strstr(field_value_string, "://");
         if (start != NULL)
         {
             // TRACE_W("Here! fresh webserver");
             start += 3;
             int length = 0;
-            char* end = strchr(start, '/');
+            char *end = strchr(start, '/');
             if (end != NULL)
             {
                 length = (end - start);
                 if (length > 0)
                 {
                     length++;                                         // include null character
-                    char* tmp_string = ezlopi_malloc(__FUNCTION__, length); // tmp_string != NULL
+                    char *tmp_string = ezlopi_malloc(__FUNCTION__, length); // tmp_string != NULL
                     if (tmp_string)
                     {
                         bzero(tmp_string, length);
                         snprintf(tmp_string, length, "%s", start);
                         // TRACE_I("web_host_name : %s", tmp_string);
-                        tmp_http_data->web_server_maxlen = (uint16_t)ezlopi_core_http_mem_malloc(&(tmp_http_data->web_server), tmp_string);
+                        tmp_http_data->web_server_maxlen = (uint16_t)EZPI_core_http_mem_malloc(&(tmp_http_data->web_server), tmp_string);
                         ezlopi_free(__FUNCTION__, tmp_string);
                     }
                 }
             }
             else
             {
-                const char* ptr = field_value_string;
+                const char *ptr = field_value_string;
                 length = (int)strlen(field_value_string) - (int)(start - ptr);
                 if (length > 0)
                 {
                     length++;                                         // include null character
-                    char* tmp_string = ezlopi_malloc(__FUNCTION__, length); // tmp_string != NULL
+                    char *tmp_string = ezlopi_malloc(__FUNCTION__, length); // tmp_string != NULL
                     if (tmp_string)
                     {
                         bzero(tmp_string, length);
                         snprintf(tmp_string, length, "%s", (ptr + ((int)(start - ptr))));
                         // TRACE_I("web_host_name : %s", tmp_string);
-                        tmp_http_data->web_server_maxlen = (uint16_t)ezlopi_core_http_mem_malloc(&(tmp_http_data->web_server), tmp_string);
+                        tmp_http_data->web_server_maxlen = (uint16_t)EZPI_core_http_mem_malloc(&(tmp_http_data->web_server), tmp_string);
                         ezlopi_free(__FUNCTION__, tmp_string);
                     }
                 }
@@ -713,20 +697,19 @@ static int __ezlopi_core_scenes_then_create_fresh_header(s_ezlopi_core_http_mbed
     if ((NULL == tmp_http_data->header) && (0 == ret))
     {
         // TRACE_W("Here! fresh header init");
-        tmp_http_data->header_maxlen = (uint16_t)ezlopi_core_http_mem_malloc(&(tmp_http_data->header), "\r\0");
+        tmp_http_data->header_maxlen = (uint16_t)EZPI_core_http_mem_malloc(&(tmp_http_data->header), "\r\0");
         ret = STR_SIZE(tmp_http_data->header);
         // TRACE_W("Here!! Created fresh header-> [capacity: %d] , [occupied: %d]", tmp_http_data->header_maxlen, ret);
     }
     return ret;
 }
-
 /**
  * @brief Function to append values to header_member (within 's_ezlopi_core_http_mbedtls_t') only.
  */
 static void __ezlopi_core_scenes_then_append_to_header(s_ezlopi_core_http_mbedtls_t *tmp_http_data, const char *str1, const char *str2)
 {
     int append_size = (STR_SIZE(str1) + 4 + STR_SIZE(str2)) + 6;
-    int max_allowed = ezlopi_core_http_calc_empty_bufsize(tmp_http_data->header, (tmp_http_data->header_maxlen), append_size);
+    int max_allowed = EZPI_core_http_calc_empty_bufsize(tmp_http_data->header, (tmp_http_data->header_maxlen), append_size);
     if (max_allowed > 0)
     {
         snprintf(tmp_http_data->header + STR_SIZE(tmp_http_data->header), max_allowed, "%s: %s\r\n", str1, str2);

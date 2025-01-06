@@ -28,13 +28,12 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_core_http.h
+ * @brief   Function to perform operation on http
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    12th DEC 2024
  */
 
 #ifndef _EZLOPI_CORE_HTTP_H_
@@ -69,25 +68,25 @@ extern "C"
     /*******************************************************************************
      *                          Type & Macro Declarations
      *******************************************************************************/
+
     typedef struct s_rx_chunk
     {
         int len;
-        char* ptr;
-        struct s_rx_chunk* next;
+        char *ptr;
+        struct s_rx_chunk *next;
     } s_rx_chunk_t;
-
 
     typedef struct
     {
         int status;
         int content_length;
         int rx_len;
-        s_rx_chunk_t * rx_chunks;
+        s_rx_chunk_t *rx_chunks;
     } s_rx_data_t;
 
     typedef struct ezlopi_http_data
     {
-        char* response;
+        char *response;
         int response_len;
         HttpStatus_Code status_code;
 
@@ -98,14 +97,14 @@ extern "C"
         esp_http_client_method_t method; // default :- GET_METHOD
         bool skip_cert_common_name_check;
         int web_port;
-        char* url;        // ptr => complete_url [.eg. https://www.google.com/json?username=qqqq&password=zzzz ]
-        char* web_server; // ptr => web_sever_name [.eg. www.google.com]
-        char* target_page; // ptr => target_page [.eg. ...src/page... ]
-        char* header;     // ptr => headers [.eg. {"Accept" : "*/*", ....}]
-        char* content;
-        char* username;
-        char* password;
-        char* response;
+        char *url;         // ptr => complete_url [.eg. https://www.google.com/json?username=qqqq&password=zzzz ]
+        char *web_server;  // ptr => web_sever_name [.eg. www.google.com]
+        char *target_page; // ptr => target_page [.eg. ...src/page... ]
+        char *header;      // ptr => headers [.eg. {"Accept" : "*/*", ....}]
+        char *content;
+        char *username;
+        char *password;
+        char *response;
         uint8_t username_maxlen; // max @ 256 bytes
         uint8_t password_maxlen;
         uint16_t url_maxlen; // max @ 65536 = 60Kb
@@ -124,20 +123,11 @@ extern "C"
     /*******************************************************************************
      *                          Extern Function Prototypes
      *******************************************************************************/
-    /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
-     *
-     */
+
     /**
      * @brief Function to return remaining space in *dest_buffer.
      */
-    int ezlopi_core_http_calc_empty_bufsize(char* dest_buff, int dest_size, int reqd_size);
+    int EZPI_core_http_calc_empty_bufsize(char *dest_buff, int dest_size, int reqd_size);
 
     /**
      * @brief This function :- mallocs fresh memory_block to '__dest_ptr' , copies content of 'src_ptr' to '__dest_ptr' and returns malloced_size.
@@ -147,7 +137,7 @@ extern "C"
      *
      * @return (int) [size_of_malloced block]
      */
-    int ezlopi_core_http_mem_malloc(char** __dest_ptr, const char* src_ptr);
+    int EZPI_core_http_mem_malloc(char **__dest_ptr, const char *src_ptr);
 
     /**
      * @brief This function creates new_memory_block (size == 'reqSize') & Rellocates Original memory-block (*Buf) to new_memory_block_address
@@ -157,17 +147,37 @@ extern "C"
      *
      * @return (int) [EZPI_FAILED ==> Fail ; EZPI_SUCCESS ==> Success]
      */
-    ezlopi_error_t ezlopi_core_http_dyna_relloc(char** Buf, int reqSize);
+    ezlopi_error_t EZPI_core_http_dyna_relloc(char **Buf, int reqSize);
 
     /**
      * @brief This Task , generates a http request, by combining information contained in '*config'.
      *
      * @param config : config_struct [ complete_url + webserver-name + web_port + headers + content + username + password + response ]
      */
-    void ezlopi_core_http_mbedtls_req(s_ezlopi_core_http_mbedtls_t* tmp_http_data);
+    void EZPI_core_http_mbedtls_req(s_ezlopi_core_http_mbedtls_t *tmp_http_data);
 
-    s_ezlopi_http_data_t* ezlopi_http_get_request(const char* cloud_url, const char* private_key, const char* shared_key, const char* ca_certificate);
-    s_ezlopi_http_data_t* ezlopi_http_post_request(const char* cloud_url, const char* location, cJSON* headers, const char* private_key, const char* shared_key, const char* ca_certificate);
+    /**
+     * @brief Funciton to trigger a 'GET' http request
+     *
+     * @param cloud_url Target URL
+     * @param private_key Private-key
+     * @param shared_key Shared-key
+     * @param ca_certificate Certs
+     * @return s_ezlopi_http_data_t*
+     */
+    s_ezlopi_http_data_t *EZPI_core_http_get_request(const char *cloud_url, const char *private_key, const char *shared_key, const char *ca_certificate);
+    /**
+     * @brief Function to trigger a 'POST' http request
+     *
+     * @param cloud_url Target URL
+     * @param location Location data in url
+     * @param headers Headers for the request
+     * @param private_key Private-key
+     * @param shared_key Shared-key
+     * @param ca_certificate Certs
+     * @return s_ezlopi_http_data_t*
+     */
+    s_ezlopi_http_data_t *EZPI_core_http_post_request(const char *cloud_url, const char *location, cJSON *headers, const char *private_key, const char *shared_key, const char *ca_certificate);
 
 #ifdef __cplusplus
 }

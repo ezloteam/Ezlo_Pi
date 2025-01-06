@@ -28,13 +28,12 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_core_actions.h
+ * @brief   These functions perform operation on action-methods
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    12th DEC 2024
  */
 
 #ifndef _EZLOPI_CORE_ACTIONS_H_
@@ -58,10 +57,10 @@ extern "C"
      *******************************************************************************/
     typedef enum e_ezlopi_actions
     {
-        #define EZLOPI_ACTION(action, name) EZLOPI_ACTION_##action,
-        #include "ezlopi_core_actions_list.h"
+#define EZLOPI_ACTION(action, name) EZLOPI_ACTION_##action,
+#include "ezlopi_core_actions_list.h"
+#undef EZLOPI_ACTION
     } e_ezlopi_actions_t;
-
     /*******************************************************************************
      *                          Extern Data Declarations
      *******************************************************************************/
@@ -70,16 +69,12 @@ extern "C"
      *                          Extern Function Prototypes
      *******************************************************************************/
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
+     * @brief This function returns corresponding 'method-name' for provided 'action-method'
      *
+     * @param action Enum of the target method
+     * @return char *
      */
-    char *ezlopi_actions_to_string(e_ezlopi_actions_t action);
+    char *EZPI_core_actions_to_string(e_ezlopi_actions_t action);
 
 #ifdef __cplusplus
 }

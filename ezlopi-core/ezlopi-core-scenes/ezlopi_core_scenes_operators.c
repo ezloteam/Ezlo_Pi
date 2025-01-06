@@ -28,13 +28,12 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_core_scenes_operators.c
+ * @brief   These functions perform comparision operation for scenes
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    12th DEC 2024
  */
 
 /*******************************************************************************
@@ -88,6 +87,9 @@ typedef enum e_with_grp
 /*******************************************************************************
  *                          Static Function Prototypes
  *******************************************************************************/
+static int __evaluate_compareNumber_or_compareStrings(l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, char *comparator_str);
+static int __evaluate_compareNumbers_or_compareStrings_with_group(l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field, l_fields_v2_t *value_field, l_fields_v2_t *comparator_field);
+/* Numeric & String */
 static int ________compare_val_num(double item_exp_value, double value_to_compare_with, char *comparator_field_str);
 static int ________compare_val_str(const char *item_exp_value_str, const char *value_to_compare_with_str, char *comparator_field_str);
 static int ____compare_exp_vs_other(s_ezlopi_expressions_t *curr_expr_left, l_fields_v2_t *value_field, char *comparator_field_str);
@@ -96,7 +98,16 @@ static int ____compare_exp_vs_item(s_ezlopi_expressions_t *curr_expr_left, l_ezl
 static int ____compare_item_vs_other(l_ezlopi_item_t *item_left, l_fields_v2_t *value_field, char *comparator_field_str);
 static int ____compare_item_vs_exp(l_ezlopi_item_t *item_left, s_ezlopi_expressions_t *curr_expr_right, char *comparator_field_str);
 static int ____compare_item_vs_item(l_ezlopi_item_t *item_left, l_ezlopi_item_t *item_right, char *comparator_field_str);
+static int __evaluate_numrange(l_fields_v2_t *item_exp_field, l_fields_v2_t *start_value_field, l_fields_v2_t *end_value_field, bool comparator_choice);
+;
+static int __evaluate_compareNumber_or_compareStrings(l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, char *comparator_str);
+;
+static int __evaluate_compareNumbers_or_compareStrings_with_group(l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field, l_fields_v2_t *value_field, l_fields_v2_t *comparator_field);
+;
 static int __trigger_grp_functions(e_with_grp_t choice, l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field, l_fields_v2_t *operation_field, l_fields_v2_t *comparator_field, l_fields_v2_t *value_field, l_fields_v2_t *start_value_field, l_fields_v2_t *end_value_field, l_fields_v2_t *value_type_field, char *comparator_str, bool comparator_choice);
+/* Strings */
+static char *__get_item_strvalue_by_id(uint32_t item_id);
+/* Numeric_range */
 static int ________compare_numeric_range_num(double extract_data, double start_value_field_num, double end_value_field_num, bool comparator_choice);
 static int ________compare_numeric_range_str(const char *extract_data, const char *start_value_field_str, const char *end_value_field_str, bool comparator_choice);
 static int ____compare_range_exp_vs_other(s_ezlopi_expressions_t *curr_expr_left, l_fields_v2_t *start_value_field, l_fields_v2_t *end_value_field, bool comparator_choice);
@@ -104,18 +115,19 @@ static int ____compare_range_exp_vs_exp(s_ezlopi_expressions_t *curr_expr_left, 
 static int ____compare_range_item_vs_other(l_ezlopi_item_t *item, l_fields_v2_t *start_value_field, l_fields_v2_t *end_value_field, bool comparator_choice);
 static int ____compare_range_item_vs_exp(l_ezlopi_item_t *item, s_ezlopi_expressions_t *curr_expr_right_start, s_ezlopi_expressions_t *curr_expr_right_end, bool comparator_choice);
 static int __evaluate_numrange(l_fields_v2_t *item_exp_field, l_fields_v2_t *start_value_field, l_fields_v2_t *end_value_field, bool comparator_choice);
-static char *__ezlopi_core_scenes_operator_get_item_string_value_current_by_id(uint32_t item_id);
-static char *ezlopi_scenes_laststr_comp(const char *haystack, const char *needle);
+/* String_operations */
+static char *__ezlopi_stropr_laststr_comp(const char *haystack, const char *needle);
+/* Values in_array */
 static int __compare_inarry_str(char *item_exp_value_str, l_fields_v2_t *value_field, bool operation);
 static int __compare_inarry_num(double item_exp_value, l_fields_v2_t *value_field, bool operation);
 static int __compare_inarry_cj(cJSON *item_exp_value, l_fields_v2_t *value_field, bool operation);
-static int __evaluate_compareNumber_or_compareStrings(l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, char *comparator_str);
-static int __evaluate_compareNumbers_or_compareStrings_with_group(l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field, l_fields_v2_t *value_field, l_fields_v2_t *comparator_field);
+/* compareValues */
 static bool __check_valuetypes(const char *lhs_type_str, const char *rhs_type_str, const char *required_type_str);
 
 /*******************************************************************************
  *                          Static Data Definitions
  *******************************************************************************/
+/* Numeric */
 static const char *const ezlopi_scenes_num_cmp_operators_op[] = {
 #define SCENES_NUM_COMP_OPERATORS(OPERATOR, op, name, method) op,
 #include "__operators_macros/__numeric_comparision_operators_macros.h"
@@ -131,7 +143,7 @@ static const char *const ezlopi_scenes_num_cmp_operators_method[] = {
 #include "__operators_macros/__numeric_comparision_operators_macros.h"
 #undef SCENES_NUM_COMP_OPERATORS
 };
-
+/* Strings */
 static const char *const ezlopi_scenes_str_cmp_operators_op[] = {
 #define SCENES_STRINGS_OPERATORS(OPERATOR, op, name, method) op,
 #include "__operators_macros/__strings_comparision_operators_macros.h"
@@ -147,7 +159,7 @@ static const char *const ezlopi_scenes_str_cmp_operators_method[] = {
 #include "__operators_macros/__strings_comparision_operators_macros.h"
 #undef SCENES_STRINGS_OPERATORS
 };
-
+/* String_operations */
 static const char *const ezlopi_scenes_strops_cmp_operators_op[] = {
 #define SCENES_STROPS_COMP_OPERATORES(OPERATOR, op, name, method) op,
 #include "__operators_macros/__string_op_comparision_operators_macros.h"
@@ -163,7 +175,7 @@ static const char *const ezlopi_scenes_strops_cmp_operators_method[] = {
 #include "__operators_macros/__string_op_comparision_operators_macros.h"
 #undef SCENES_STROPS_COMP_OPERATORES
 };
-
+/* Values with Less */
 static const char *const ezlopi_scenes_value_with_less_cmp_operators_op[] = {
 #define SCENES_VALUES_WITH_LESS_OPERATORS(OPERATOR, op, name, method) op,
 #include "__operators_macros/__value_with_less_comparision_operators_macros.h"
@@ -179,7 +191,7 @@ static const char *const ezlopi_scenes_value_with_less_cmp_operators_method[] = 
 #include "__operators_macros/__value_with_less_comparision_operators_macros.h"
 #undef SCENES_VALUES_WITH_LESS_OPERATORS
 };
-
+/* Values without less */
 static const char *const ezlopi_scenes_value_without_less_cmp_operators_op[] = {
 #define SCENES_VALUES_WITHOUT_LESS_OPERATORS(OPERATOR, op, name, method) op,
 #include "__operators_macros/__value_without_less_comparision_operators_macros.h"
@@ -203,13 +215,8 @@ static const char *const ezlopi_scenes_value_without_less_cmp_operators_method[]
 /*******************************************************************************
  *                          Extern Function Definitions
  *******************************************************************************/
-
-/**
- * @brief Global/extern function template example
- * Convention : Use capital letter for initial word on extern function
- * @param arg
- */
-e_scene_num_cmp_operators_t ezlopi_scenes_numeric_comparator_operators_get_enum(char *operator_str)
+/* Numeric */
+e_scene_num_cmp_operators_t EZPI_scenes_numeric_comparator_operators_get_enum(char *operator_str)
 {
     e_scene_num_cmp_operators_t ret = SCENES_NUM_COMP_OPERATORS_NONE + 1;
     if (operator_str)
@@ -225,8 +232,7 @@ e_scene_num_cmp_operators_t ezlopi_scenes_numeric_comparator_operators_get_enum(
     }
     return ret;
 }
-
-const char *ezlopi_scenes_numeric_comparator_operators_get_op(e_scene_num_cmp_operators_t operator)
+const char *EZPI_scenes_numeric_comparator_operators_get_op(e_scene_num_cmp_operators_t operator)
 {
     const char *ret = NULL;
     if ((operator> SCENES_NUM_COMP_OPERATORS_NONE) && (operator<SCENES_NUM_COMP_OPERATORS_MAX))
@@ -235,7 +241,7 @@ const char *ezlopi_scenes_numeric_comparator_operators_get_op(e_scene_num_cmp_op
     }
     return ret;
 }
-const char *ezlopi_scenes_numeric_comparator_operators_get_name(e_scene_num_cmp_operators_t operator)
+const char *EZPI_scenes_numeric_comparator_operators_get_name(e_scene_num_cmp_operators_t operator)
 {
     const char *ret = NULL;
     if ((operator> SCENES_NUM_COMP_OPERATORS_NONE) && (operator<SCENES_NUM_COMP_OPERATORS_MAX))
@@ -245,7 +251,7 @@ const char *ezlopi_scenes_numeric_comparator_operators_get_name(e_scene_num_cmp_
     }
     return ret;
 }
-const char *ezlopi_scenes_numeric_comparator_operators_get_method(e_scene_num_cmp_operators_t operator)
+const char *EZPI_scenes_numeric_comparator_operators_get_method(e_scene_num_cmp_operators_t operator)
 {
     const char *ret = NULL;
     if ((operator> SCENES_NUM_COMP_OPERATORS_NONE) && (operator<SCENES_NUM_COMP_OPERATORS_MAX))
@@ -255,8 +261,7 @@ const char *ezlopi_scenes_numeric_comparator_operators_get_method(e_scene_num_cm
     }
     return ret;
 }
-
-int ezlopi_scenes_operators_value_number_operations(l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, l_fields_v2_t *comparator_field, l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field)
+int EZPI_scenes_operators_value_number_operations(l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, l_fields_v2_t *comparator_field, l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field)
 {
     int ret = 0;
     if (devgrp_field && itemgrp_field && value_field && comparator_field)
@@ -269,18 +274,17 @@ int ezlopi_scenes_operators_value_number_operations(l_fields_v2_t *item_exp_fiel
     }
     return ret;
 }
-
-int ezlopi_scenes_operators_value_number_range_operations(l_fields_v2_t *item_exp_field, l_fields_v2_t *start_value_field, l_fields_v2_t *end_value_field, bool comparator_choice)
+/* Numeric_Range */
+int EZPI_scenes_operators_value_number_range_operations(l_fields_v2_t *item_exp_field, l_fields_v2_t *start_value_field, l_fields_v2_t *end_value_field, bool comparator_choice)
 {
     return __evaluate_numrange(item_exp_field, start_value_field, end_value_field, comparator_choice);
 }
-
-int ezlopi_scenes_operators_value_number_range_operations_with_group(l_fields_v2_t *start_value_field, l_fields_v2_t *end_value_field, bool comparator_choice, l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field)
+int EZPI_scenes_operators_value_number_range_operations_with_group(l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field, l_fields_v2_t *start_value_field, l_fields_v2_t *end_value_field, bool comparator_choice)
 {
     return __trigger_grp_functions(COMPARE_NUM_RANGE, devgrp_field, itemgrp_field, NULL, NULL, NULL, start_value_field, end_value_field, NULL, NULL, comparator_choice);
 }
-
-e_scene_str_cmp_operators_t ezlopi_scenes_strings_comparator_operators_get_enum(char *operator_str)
+/* Strings */
+e_scene_str_cmp_operators_t EZPI_scenes_strings_comparator_operators_get_enum(char *operator_str)
 {
     e_scene_str_cmp_operators_t ret = SCENES_STRINGS_OPERATORS_NONE + 1;
     if (operator_str)
@@ -298,8 +302,7 @@ e_scene_str_cmp_operators_t ezlopi_scenes_strings_comparator_operators_get_enum(
 
     return ret;
 }
-
-const char *ezlopi_scenes_strings_comparator_operators_get_op(e_scene_str_cmp_operators_t operator)
+const char *EZPI_scenes_strings_comparator_operators_get_op(e_scene_str_cmp_operators_t operator)
 {
     const char *ret = NULL;
     if ((operator>= SCENES_STRINGS_OPERATORS_NONE) && (operator<SCENES_STRINGS_OPERATORS_MAX))
@@ -308,8 +311,7 @@ const char *ezlopi_scenes_strings_comparator_operators_get_op(e_scene_str_cmp_op
     }
     return ret;
 }
-
-const char *ezlopi_scenes_strings_comparator_operators_get_name(e_scene_str_cmp_operators_t operator)
+const char *EZPI_scenes_strings_comparator_operators_get_name(e_scene_str_cmp_operators_t operator)
 {
     const char *ret = NULL;
     if ((operator> SCENES_STRINGS_OPERATORS_NONE) && (operator<SCENES_STRINGS_OPERATORS_MAX))
@@ -318,8 +320,7 @@ const char *ezlopi_scenes_strings_comparator_operators_get_name(e_scene_str_cmp_
     }
     return ret;
 }
-
-const char *ezlopi_scenes_strings_comparator_operators_get_method(e_scene_str_cmp_operators_t operator)
+const char *EZPI_scenes_strings_comparator_operators_get_method(e_scene_str_cmp_operators_t operator)
 {
     const char *ret = NULL;
     if ((operator> SCENES_STRINGS_OPERATORS_NONE) && (operator<SCENES_STRINGS_OPERATORS_MAX))
@@ -328,9 +329,8 @@ const char *ezlopi_scenes_strings_comparator_operators_get_method(e_scene_str_cm
     }
     return ret;
 }
-
-/* Compare_string   [Not -->  string_operators] */
-int ezlopi_scenes_operators_value_strings_operations(l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, l_fields_v2_t *comparator_field, l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field)
+/* Compare_string */
+int EZPI_scenes_operators_value_strings_operations(l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field, l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, l_fields_v2_t *comparator_field)
 {
     int ret = 0;
     if (devgrp_field && itemgrp_field && value_field && comparator_field)
@@ -344,8 +344,8 @@ int ezlopi_scenes_operators_value_strings_operations(l_fields_v2_t *item_exp_fie
 
     return ret;
 }
-
-e_scene_strops_cmp_operators_t ezlopi_scenes_strops_comparator_operators_get_enum(char *operator_str)
+/* String_operations */
+e_scene_strops_cmp_operators_t EZPI_scenes_strops_comparator_operators_get_enum(char *operator_str)
 {
     e_scene_strops_cmp_operators_t ret = SCENES_STROPS_COMP_OPERATORES_NONE + 1;
     if (operator_str)
@@ -362,8 +362,7 @@ e_scene_strops_cmp_operators_t ezlopi_scenes_strops_comparator_operators_get_enu
     }
     return ret;
 }
-
-const char *ezlopi_scenes_strops_comparator_operators_get_op(e_scene_strops_cmp_operators_t operator)
+const char *EZPI_scenes_strops_comparator_operators_get_op(e_scene_strops_cmp_operators_t operator)
 {
     const char *ret = NULL;
     if ((operator>= SCENES_STROPS_COMP_OPERATORES_NONE) && (operator<SCENES_STROPS_COMP_OPERATORES_MAX))
@@ -372,8 +371,7 @@ const char *ezlopi_scenes_strops_comparator_operators_get_op(e_scene_strops_cmp_
     }
     return ret;
 }
-
-const char *ezlopi_scenes_strops_comparator_operators_get_name(e_scene_strops_cmp_operators_t operator)
+const char *EZPI_scenes_strops_comparator_operators_get_name(e_scene_strops_cmp_operators_t operator)
 {
     const char *ret = NULL;
     if ((operator> SCENES_STROPS_COMP_OPERATORES_NONE) && (operator<SCENES_STROPS_COMP_OPERATORES_MAX))
@@ -382,8 +380,7 @@ const char *ezlopi_scenes_strops_comparator_operators_get_name(e_scene_strops_cm
     }
     return ret;
 }
-
-const char *ezlopi_scenes_strops_comparator_operators_get_method(e_scene_strops_cmp_operators_t operator)
+const char *EZPI_scenes_strops_comparator_operators_get_method(e_scene_strops_cmp_operators_t operator)
 {
     const char *ret = NULL;
     if ((operator> SCENES_STROPS_COMP_OPERATORES_NONE) && (operator<SCENES_STROPS_COMP_OPERATORES_MAX))
@@ -392,8 +389,7 @@ const char *ezlopi_scenes_strops_comparator_operators_get_method(e_scene_strops_
     }
     return ret;
 }
-
-int ezlopi_scenes_operators_value_strops_operations(l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, l_fields_v2_t *operation_field)
+int EZPI_scenes_operators_value_strops_operations(l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, l_fields_v2_t *operation_field)
 {
     int ret = 0;
     if (item_exp_field && value_field && (operation_field->field_value.u_value.value_string))
@@ -405,7 +401,7 @@ int ezlopi_scenes_operators_value_strops_operations(l_fields_v2_t *item_exp_fiel
         // 1 . LHS => expression (only string values )
         if (EZLOPI_VALUE_TYPE_EXPRESSION == item_exp_field->value_type)
         {
-            s_ezlopi_expressions_t *curr_expr_left = ezlopi_scenes_get_expression_node_by_name(item_exp_field->field_value.u_value.value_string);
+            s_ezlopi_expressions_t *curr_expr_left = EZPI_scenes_expressions_get_node_by_name(item_exp_field->field_value.u_value.value_string);
             if (curr_expr_left)
             {
                 if (EZLOPI_VALUE_TYPE_STRING == curr_expr_left->value_type)
@@ -421,12 +417,14 @@ int ezlopi_scenes_operators_value_strops_operations(l_fields_v2_t *item_exp_fiel
         else // 1. LHS = item_value  (only string values )
         {
             uint32_t item_id = strtoul(item_exp_field->field_value.u_value.value_string, NULL, 16);
-            item_exp_value_str = __ezlopi_core_scenes_operator_get_item_string_value_current_by_id(item_id);
+            item_exp_value_str = __get_item_strvalue_by_id(item_id);
         }
 
         //---------------------- RHS (can only be INT_value ; if operation => 'length & not_length' ) -------------------------
-        if (((EZPI_STRNCMP_IF_EQUAL("length", operation_field->field_value.u_value.value_string, 8, strlen(operation_field->field_value.u_value.value_string))) ||
-             (EZPI_STRNCMP_IF_EQUAL("not_length", operation_field->field_value.u_value.value_string, 8, strlen(operation_field->field_value.u_value.value_string)))) &&
+        char *tmp_str = operation_field->field_value.u_value.value_string;
+        size_t len = (tmp_str) ? strlen(tmp_str) + 1 : 0;
+        if (((EZPI_STRNCMP_IF_EQUAL("length", tmp_str, 8, len)) ||
+             (EZPI_STRNCMP_IF_EQUAL("not_length", tmp_str, 8, len))) &&
             EZLOPI_VALUE_TYPE_INT == value_field->value_type)
         {
             value_to_compare_with_num = value_field->field_value.u_value.value_double;
@@ -439,7 +437,7 @@ int ezlopi_scenes_operators_value_strops_operations(l_fields_v2_t *item_exp_fiel
         //-------------- ITEM/EXPN must only have string as value ---------------------------
         if (item_exp_value_str && ((NULL != value_to_compare_with_str) || (value_to_compare_with_num > 0)))
         {
-            e_scene_strops_cmp_operators_t strops_operator = ezlopi_scenes_strops_comparator_operators_get_enum(operation_field->field_value.u_value.value_string);
+            e_scene_strops_cmp_operators_t strops_operator = EZPI_scenes_strops_comparator_operators_get_enum(tmp_str);
             switch (strops_operator)
             {
             case SCENES_STROPS_COMP_OPERATORES_BEGINS_WITH:
@@ -483,7 +481,7 @@ int ezlopi_scenes_operators_value_strops_operations(l_fields_v2_t *item_exp_fiel
             }
             case SCENES_STROPS_COMP_OPERATORES_ENDS_WITH:
             {
-                char *last = ezlopi_scenes_laststr_comp(item_exp_value_str, value_to_compare_with_str); // finds out the position of last occurance
+                char *last = __ezlopi_stropr_laststr_comp(item_exp_value_str, value_to_compare_with_str); // finds out the position of last occurance
                 if (NULL != last)
                 {
                     ret = (strlen(value_to_compare_with_str) == strlen(last)) ? 1 : 0;
@@ -492,7 +490,7 @@ int ezlopi_scenes_operators_value_strops_operations(l_fields_v2_t *item_exp_fiel
             }
             case SCENES_STROPS_COMP_OPERATORES_NOT_END:
             {
-                char *last = ezlopi_scenes_laststr_comp(item_exp_value_str, value_to_compare_with_str); // finds out the position of last occurance
+                char *last = __ezlopi_stropr_laststr_comp(item_exp_value_str, value_to_compare_with_str); // finds out the position of last occurance
                 if (NULL != last)
                 {
                     ret = (strlen(value_to_compare_with_str) != strlen(last)) ? 1 : 0;
@@ -520,14 +518,12 @@ int ezlopi_scenes_operators_value_strops_operations(l_fields_v2_t *item_exp_fiel
 
     return ret;
 }
-
-int ezlopi_scenes_operators_value_strops_operations_with_group(l_fields_v2_t *value_field, l_fields_v2_t *operation_field, l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field)
+int EZPI_scenes_operators_value_strops_operations_with_group(l_fields_v2_t *value_field, l_fields_v2_t *operation_field, l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field)
 {
     return __trigger_grp_functions(COMPARE_STROPS, devgrp_field, itemgrp_field, operation_field, NULL, value_field, NULL, NULL, NULL, NULL, 0);
 }
-
-/************* Values in_array ************/
-#if 0
+/* Values in_array */
+#if 0 /* Currently not in use --> check 'in_array' when-condition before removing */
 static const char *const ezlopi_scenes_inarr_cmp_operators_op[] = {
 #define SCENES_IN_ARRAY_OPERATORS(OPERATOR, op, name, method) op,
 #include "__operators_macros/__in_array_comparision_operators_macros.h"
@@ -570,7 +566,6 @@ const char *ezlopi_scenes_inarr_comparator_operators_get_op(e_scene_inarr_cmp_op
     }
     return ret;
 }
-
 const char *ezlopi_scenes_inarr_comparator_operators_get_name(e_scene_inarr_cmp_operators_t operator)
 {
     const char *ret = NULL;
@@ -580,7 +575,6 @@ const char *ezlopi_scenes_inarr_comparator_operators_get_name(e_scene_inarr_cmp_
     }
     return ret;
 }
-
 const char *ezlopi_scenes_inarr_comparator_operators_get_method(e_scene_inarr_cmp_operators_t operator)
 {
     const char *ret = NULL;
@@ -591,236 +585,18 @@ const char *ezlopi_scenes_inarr_comparator_operators_get_method(e_scene_inarr_cm
     return ret;
 }
 #endif
-
-int ezlopi_scenes_operators_value_comparevalues_with_less_operations(l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, l_fields_v2_t *value_type_field, l_fields_v2_t *comparator_field)
+int EZPI_scenes_operators_value_inarr_operations(l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, l_fields_v2_t *operation_field)
 {
     int ret = 0;
-    char *comparator_field_str = (NULL == comparator_field) ? "==" : comparator_field->field_value.u_value.value_string; // default '=='
-    if (item_exp_field && value_field && value_type_field && comparator_field_str)
+    if (item_exp_field && value_field && (operation_field->field_value.u_value.value_string))
     {
-        // 1. LHS = expression
-        if (EZLOPI_VALUE_TYPE_EXPRESSION == item_exp_field->value_type)
-        {
-            s_ezlopi_expressions_t *curr_expr_left = ezlopi_scenes_get_expression_node_by_name(item_exp_field->field_value.u_value.value_string);
-            if (curr_expr_left)
-            {
-                if (EZLOPI_VALUE_TYPE_EXPRESSION == value_field->value_type)
-                { // 2. exp vs exp
-                    s_ezlopi_expressions_t *curr_expr_right = ezlopi_scenes_get_expression_node_by_name(value_field->field_value.u_value.value_string);
-                    if (curr_expr_right)
-                    { // check if all have same data-type
-                        if (__check_valuetypes(ezlopi_scene_get_scene_value_type_name(curr_expr_left->value_type),
-                                               ezlopi_scene_get_scene_value_type_name(curr_expr_right->value_type),
-                                               value_type_field->field_value.u_value.value_string))
-                        {
-                            ret = ____compare_exp_vs_exp(curr_expr_left, curr_expr_right, comparator_field_str);
-                        }
-                    }
-                }
-                else if (EZLOPI_VALUE_TYPE_ITEM == value_field->value_type)
-                { // 2. exp vs item
-                    uint32_t item_id = strtoul(value_field->field_value.u_value.value_string, NULL, 16);
-                    l_ezlopi_item_t *item_right = ezlopi_device_get_item_by_id(item_id);
-                    if (item_right)
-                    {
-                        if (__check_valuetypes(ezlopi_scene_get_scene_value_type_name(curr_expr_left->value_type),
-                                               item_right->cloud_properties.value_type,
-                                               value_type_field->field_value.u_value.value_string))
-                        {
-                            ret = ____compare_exp_vs_item(curr_expr_left, item_right, comparator_field_str);
-                        }
-                    }
-                }
-                else
-                { // 2. exp vs other
-                    if (__check_valuetypes(ezlopi_scene_get_scene_value_type_name(curr_expr_left->value_type),
-                                           ezlopi_scene_get_scene_value_type_name(value_field->value_type),
-                                           value_type_field->field_value.u_value.value_string))
-                    {
-                        ret = ____compare_exp_vs_other(curr_expr_left, value_field, comparator_field_str);
-                    }
-                }
-            }
-        }
-        else
-        { // 1. LHS = item
-            uint32_t item_id = strtoul(item_exp_field->field_value.u_value.value_string, NULL, 16);
-            l_ezlopi_item_t *item_left = ezlopi_device_get_item_by_id(item_id);
-            if (item_left)
-            {
-                if (EZLOPI_VALUE_TYPE_EXPRESSION == value_field->value_type)
-                { // 2. RHS = expression
-                    s_ezlopi_expressions_t *curr_expr_right = ezlopi_scenes_get_expression_node_by_name(value_field->field_value.u_value.value_string);
-                    if (curr_expr_right)
-                    {
-                        if (__check_valuetypes(item_left->cloud_properties.value_type,
-                                               ezlopi_scene_get_scene_value_type_name(curr_expr_right->value_type),
-                                               value_type_field->field_value.u_value.value_string))
-                        {
-                            ret = ____compare_item_vs_exp(item_left, curr_expr_right, comparator_field_str);
-                        }
-                    }
-                }
-                else if (EZLOPI_VALUE_TYPE_ITEM == value_field->value_type)
-                { // 2. RHS = item_right
-                    uint32_t item_id = strtoul(value_field->field_value.u_value.value_string, NULL, 16);
-                    l_ezlopi_item_t *item_right = ezlopi_device_get_item_by_id(item_id);
-                    if (item_right)
-                    {
-                        if (__check_valuetypes(item_left->cloud_properties.value_type,
-                                               item_right->cloud_properties.value_type,
-                                               value_type_field->field_value.u_value.value_string))
-                        {
-                            ret = ____compare_item_vs_item(item_left, item_right, comparator_field_str);
-                        }
-                    }
-                }
-                else
-                { // 2. RHS = other
-                    if (__check_valuetypes(item_left->cloud_properties.value_type,
-                                           ezlopi_scene_get_scene_value_type_name(value_field->value_type),
-                                           value_type_field->field_value.u_value.value_string))
-                    {
-                        ret = ____compare_item_vs_other(item_left, value_field, comparator_field_str);
-                    }
-                }
-            }
-        }
-    }
-    return ret;
-}
-
-int ezlopi_scenes_operators_value_comparevalues_with_less_operations_with_group(l_fields_v2_t *value_field, l_fields_v2_t *value_type_field, l_fields_v2_t *comparator_field, l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field)
-{
-    return __trigger_grp_functions(COMPARE_VALUES, devgrp_field, itemgrp_field, NULL, comparator_field, value_field, NULL, NULL, value_type_field, NULL, 0);
-}
-
-/************* Has atleast one dictornary Value *************/
-int ezlopi_scenes_operators_has_atleastone_dictionary_value_operations(uint32_t item_id, l_fields_v2_t *value_field)
-{
-    int ret = 0;
-
-    if (item_id && value_field)
-    {
-        l_ezlopi_item_t *item = ezlopi_device_get_item_by_id(item_id);
-        if (item)
-        {
-            cJSON *cj_item_value = cJSON_CreateObject(__FUNCTION__);
-            if (cj_item_value)
-            {
-                item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item, (void *)cj_item_value, NULL);
-                cJSON *cj_valuetype = cJSON_GetObjectItem(__FUNCTION__, cj_item_value, ezlopi_valueType_str); // first check the item_type -> 'valueType'
-                if (cj_valuetype)                                                                             // type => dictionary
-                {
-                    if (STR_OP_COMP("dictionary", ==, cJSON_GetStringValue(cj_valuetype))) // 'dictionary' == 'dictionary'?
-                    {
-                        cJSON *cj_value = cJSON_GetObjectItem(__FUNCTION__, cj_item_value, ezlopi_value_str); // item_value -> dictionary ; [array or object]
-                        if (cj_value && cJSON_IsObject(cj_value))
-                        {
-                            CJSON_TRACE("cj_dictionary :", cj_value);
-                            // Check if ["low_battery":"..."] key is present
-                            /* need to use array here ; check against vales no keys. */
-                            cJSON *dictionaryValue = cJSON_GetObjectItem(__FUNCTION__, cj_value, value_field->field_value.u_value.value_string);
-                            if (NULL != dictionaryValue) // if the "eg. low_battery" element exists within the dictionary
-                            {
-                                ret = 1;
-                            }
-                            else
-                            {
-                                TRACE_E(" 'key : value[%s]' : not found", value_field->field_value.u_value.value_string);
-                            }
-                        }
-                    }
-                }
-                cJSON_Delete(__FUNCTION__, cj_item_value);
-            }
-        }
-    }
-
-    return ret;
-}
-
-/************* isDictornary Changed *************/
-int ezlopi_scenes_operators_is_dictionary_changed_operations(l_scenes_list_v2_t *scene_node, uint32_t item_id, l_fields_v2_t *key_field, l_fields_v2_t *operation_field)
-{
-    int ret = 0;
-    if (item_id && key_field && operation_field)
-    {
-        cJSON *item_value = NULL;
-        l_ezlopi_item_t *item = ezlopi_device_get_item_by_id(item_id);
-        if (item)
-        {
-            cJSON *cj_item_value = cJSON_CreateObject(__FUNCTION__);
-            if (cj_item_value)
-            {
-                item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item, (void *)cj_item_value, NULL);
-                cJSON *cj_valuetype = cJSON_GetObjectItem(__FUNCTION__, cj_item_value, ezlopi_valueType_str); // first check the item_type -> 'valueType'
-                if (cj_valuetype)                                                                             // type => dictionary
-                {
-                    if (STR_OP_COMP("dictionary", ==, cJSON_GetStringValue(cj_valuetype))) // 'dictionary' == 'dictionary'?
-                    {
-                        cJSON *cj_value = cJSON_GetObjectItem(__FUNCTION__, cj_item_value, ezlopi_value_str); // item_value -> dictionary ; [array or object]
-                        if (cj_value && cJSON_IsObject(cj_value))
-                        {
-                            item_value = cj_value;
-                        }
-                    }
-                }
-                cJSON_Delete(__FUNCTION__, cj_item_value);
-            }
-        }
-
-        if (NULL != item_value)
-        {
-            if (cJSON_IsObject(item_value)) // c
-            {
-                if (EZPI_STRNCMP_IF_EQUAL("added", operation_field->field_value.u_value.value_string, 6, strlen(operation_field->field_value.u_value.value_string)))
-                {
-                    // Check if ["key":"key_1"] key is present
-                    cJSON *dictionaryValue = cJSON_GetObjectItem(__FUNCTION__, item_value, key_field->field_value.u_value.value_string);
-                    if (NULL != dictionaryValue) // if the "eg. key_1" element exists within the dictionary
-                    {
-                        ret = 1;
-                    }
-                }
-                else if (EZPI_STRNCMP_IF_EQUAL("removed", operation_field->field_value.u_value.value_string, 8, strlen(operation_field->field_value.u_value.value_string)))
-                {
-                    // Check if ["key":"key_1"] key is absent
-                    cJSON *dictionaryValue = cJSON_GetObjectItem(__FUNCTION__, item_value, key_field->field_value.u_value.value_string);
-                    if (NULL == dictionaryValue) // if the "eg. key_1" element exists within the dictionary
-                    {
-                        ret = 1;
-                    }
-                }
-                else if (EZPI_STRNCMP_IF_EQUAL("updated", operation_field->field_value.u_value.value_string, 8, strlen(operation_field->field_value.u_value.value_string)))
-                {
-                    // Check if ["key":"key_1"] key is present and its elemnt
-                    cJSON *dictionaryValue = cJSON_GetObjectItem(__FUNCTION__, item_value, key_field->field_value.u_value.value_string);
-                    if (NULL != dictionaryValue) // if the "eg. key_1" element exists within the dictionary
-                    {
-                        cJSON *last_dictionary_item = (cJSON *)scene_node->when_block->fields->user_arg;
-                        ret = cJSON_Compare(last_dictionary_item, item_value, 0);
-                    }
-                }
-
-                // if the item exists ; Store current item_value into 'scene_node->when_block->fields->user_arg'
-                scene_node->when_block->fields->user_arg = (void *)item_value;
-            }
-        }
-    }
-    return ret;
-}
-
-int ezlopi_scenes_operators_value_inarr_operations(l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, l_fields_v2_t *operation_field)
-{
-    int ret = 0;
-    if (item_exp_field && value_field && operation_field)
-    {
-        bool operation = (EZPI_STRNCMP_IF_EQUAL(operation_field->field_value.u_value.value_string, "not_in", strlen(operation_field->field_value.u_value.value_string), 7)) ? 1 : 0; // default = 0 [IN]
+        char *tmp_str = operation_field->field_value.u_value.value_string;
+        size_t len = (tmp_str) ? strlen(tmp_str) + 1 : 0;
+        bool operation = (EZPI_STRNCMP_IF_EQUAL(tmp_str, "not_in", len, 7)) ? 1 : 0; // default = 0 [IN]
         //------------------------------------------------
         if (EZLOPI_VALUE_TYPE_EXPRESSION == item_exp_field->value_type)
         {
-            s_ezlopi_expressions_t *curr_expr_left = ezlopi_scenes_get_expression_node_by_name(item_exp_field->field_value.u_value.value_string);
+            s_ezlopi_expressions_t *curr_expr_left = EZPI_scenes_expressions_get_node_by_name(item_exp_field->field_value.u_value.value_string);
             if (curr_expr_left)
             {
                 switch (curr_expr_left->exp_value.type)
@@ -845,8 +621,8 @@ int ezlopi_scenes_operators_value_inarr_operations(l_fields_v2_t *item_exp_field
         else
         {
             uint32_t item_id = strtoul(item_exp_field->field_value.u_value.value_string, NULL, 16);
-            l_ezlopi_item_t *item = ezlopi_device_get_item_by_id(item_id);
-            if (item && (NULL != operation_field->field_value.u_value.value_string))
+            l_ezlopi_item_t *item = EZPI_core_device_get_item_by_id(item_id);
+            if (item)
             {
                 cJSON *cj_item = cJSON_CreateObject(__FUNCTION__);
                 if (cj_item)
@@ -882,14 +658,40 @@ int ezlopi_scenes_operators_value_inarr_operations(l_fields_v2_t *item_exp_field
 
     return ret;
 }
-
-int ezlopi_scenes_operators_value_inarr_operations_with_group(l_fields_v2_t *value_field, l_fields_v2_t *operation_field, l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field)
+int EZPI_scenes_operators_value_inarr_operations_with_group(l_fields_v2_t *value_field, l_fields_v2_t *operation_field, l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field)
 {
     return __trigger_grp_functions(COMPARE_INARRAY, devgrp_field, itemgrp_field, operation_field, NULL, value_field, NULL, NULL, NULL, NULL, 0);
 }
-/************* Values with Less ************/
-
-e_scene_value_with_less_cmp_operators_t ezlopi_scenes_value_with_less_comparator_operators_get_enum(char *operator_str)
+/* Values with Less */
+const char *EZPI_scenes_value_with_less_comparator_operators_get_op(e_scene_value_with_less_cmp_operators_t operator)
+{
+    const char *ret = NULL;
+    if ((operator>= SCENES_VALUES_WITH_LESS_OPERATORS_NONE) && (operator<SCENES_VALUES_WITH_LESS_OPERATORS_MAX))
+    {
+        ret = ezlopi_scenes_value_with_less_cmp_operators_op[operator];
+    }
+    return ret;
+}
+const char *EZPI_scenes_value_with_less_comparator_operators_get_name(e_scene_value_with_less_cmp_operators_t operator)
+{
+    const char *ret = NULL;
+    if ((operator> SCENES_VALUES_WITH_LESS_OPERATORS_NONE) && (operator<SCENES_VALUES_WITH_LESS_OPERATORS_MAX))
+    {
+        ret = ezlopi_scenes_value_with_less_cmp_operators_name[operator];
+    }
+    return ret;
+}
+const char *EZPI_scenes_value_with_less_comparator_operators_get_method(e_scene_value_with_less_cmp_operators_t operator)
+{
+    const char *ret = NULL;
+    if ((operator> SCENES_VALUES_WITH_LESS_OPERATORS_NONE) && (operator<SCENES_VALUES_WITH_LESS_OPERATORS_MAX))
+    {
+        ret = ezlopi_scenes_value_with_less_cmp_operators_method[operator];
+    }
+    return ret;
+}
+#if 0
+e_scene_value_with_less_cmp_operators_t EZPI_scenes_value_with_less_comparator_operators_get_enum(char *operator_str)
 {
     e_scene_value_with_less_cmp_operators_t ret = SCENES_VALUES_WITH_LESS_OPERATORS_NONE + 1;
     if (operator_str)
@@ -907,38 +709,6 @@ e_scene_value_with_less_cmp_operators_t ezlopi_scenes_value_with_less_comparator
 
     return ret;
 }
-
-const char *ezlopi_scenes_value_with_less_comparator_operators_get_op(e_scene_value_with_less_cmp_operators_t operator)
-{
-    const char *ret = NULL;
-    if ((operator>= SCENES_VALUES_WITH_LESS_OPERATORS_NONE) && (operator<SCENES_VALUES_WITH_LESS_OPERATORS_MAX))
-    {
-        ret = ezlopi_scenes_value_with_less_cmp_operators_op[operator];
-    }
-    return ret;
-}
-
-const char *ezlopi_scenes_value_with_less_comparator_operators_get_name(e_scene_value_with_less_cmp_operators_t operator)
-{
-    const char *ret = NULL;
-    if ((operator> SCENES_VALUES_WITH_LESS_OPERATORS_NONE) && (operator<SCENES_VALUES_WITH_LESS_OPERATORS_MAX))
-    {
-        ret = ezlopi_scenes_value_with_less_cmp_operators_name[operator];
-    }
-    return ret;
-}
-
-const char *ezlopi_scenes_value_with_less_comparator_operators_get_method(e_scene_value_with_less_cmp_operators_t operator)
-{
-    const char *ret = NULL;
-    if ((operator> SCENES_VALUES_WITH_LESS_OPERATORS_NONE) && (operator<SCENES_VALUES_WITH_LESS_OPERATORS_MAX))
-    {
-        ret = ezlopi_scenes_value_with_less_cmp_operators_method[operator];
-    }
-    return ret;
-}
-
-#if 0
 int ezlopi_scenes_operators_value_with_less_operations(uint32_t item_id, l_fields_v2_t *value_field, l_fields_v2_t *comparator_field)
 {
     int ret = 0;
@@ -946,7 +716,7 @@ int ezlopi_scenes_operators_value_with_less_operations(uint32_t item_id, l_field
     {
         double item_value = 0.0;
         cJSON *cj_item_value = cJSON_CreateObject(__FUNCTION__);
-        l_ezlopi_device_t *device = ezlopi_device_get_head();
+        l_ezlopi_device_t *device = EZPI_core_device_get_head();
         while (device)
         {
             l_ezlopi_item_t *item = device->items;
@@ -973,7 +743,7 @@ int ezlopi_scenes_operators_value_with_less_operations(uint32_t item_id, l_field
             device = device->next;
         }
 
-        e_scene_value_with_less_cmp_operators_t value_with_less_operator = ezlopi_scenes_value_with_less_comparator_operators_get_enum(comparator_field->field_value.u_value.value_string);
+        e_scene_value_with_less_cmp_operators_t value_with_less_operator = EZPI_scenes_value_with_less_comparator_operators_get_enum(comparator_field->field_value.u_value.value_string);
 
         switch (value_with_less_operator)
         {
@@ -1023,9 +793,36 @@ int ezlopi_scenes_operators_value_with_less_operations(uint32_t item_id, l_field
     return ret;
 }
 #endif
-/************* Values without less ************/
-
-e_scene_value_without_less_cmp_operators_t ezlopi_scenes_value_without_less_comparator_operators_get_enum(char *operator_str)
+/* Values without Less */
+const char *EZPI_scenes_value_without_less_comparator_operators_get_op(e_scene_value_without_less_cmp_operators_t operator)
+{
+    const char *ret = NULL;
+    if ((operator>= SCENES_VALUES_WITHOUT_LESS_OPERATORS_NONE) && (operator<SCENES_VALUES_WITHOUT_LESS_OPERATORS_MAX))
+    {
+        ret = ezlopi_scenes_value_without_less_cmp_operators_op[operator];
+    }
+    return ret;
+}
+const char *EZPI_scenes_value_without_less_comparator_operators_get_name(e_scene_value_without_less_cmp_operators_t operator)
+{
+    const char *ret = NULL;
+    if ((operator> SCENES_VALUES_WITHOUT_LESS_OPERATORS_NONE) && (operator<SCENES_VALUES_WITHOUT_LESS_OPERATORS_MAX))
+    {
+        ret = ezlopi_scenes_value_without_less_cmp_operators_name[operator];
+    }
+    return ret;
+}
+const char *EZPI_scenes_value_without_less_comparator_operators_get_method(e_scene_value_without_less_cmp_operators_t operator)
+{
+    const char *ret = NULL;
+    if ((operator> SCENES_VALUES_WITHOUT_LESS_OPERATORS_NONE) && (operator<SCENES_VALUES_WITHOUT_LESS_OPERATORS_MAX))
+    {
+        ret = ezlopi_scenes_value_without_less_cmp_operators_method[operator];
+    }
+    return ret;
+}
+#if 0
+e_scene_value_without_less_cmp_operators_t EZPI_scenes_value_without_less_comparator_operators_get_enum(char *operator_str)
 {
     e_scene_value_without_less_cmp_operators_t ret = SCENES_VALUES_WITHOUT_LESS_OPERATORS_NONE + 1; // 1st element of enum after *_NONE
     if (operator_str)
@@ -1044,37 +841,6 @@ e_scene_value_without_less_cmp_operators_t ezlopi_scenes_value_without_less_comp
     return ret;
 }
 
-const char *ezlopi_scenes_value_without_less_comparator_operators_get_op(e_scene_value_without_less_cmp_operators_t operator)
-{
-    const char *ret = NULL;
-    if ((operator>= SCENES_VALUES_WITHOUT_LESS_OPERATORS_NONE) && (operator<SCENES_VALUES_WITHOUT_LESS_OPERATORS_MAX))
-    {
-        ret = ezlopi_scenes_value_without_less_cmp_operators_op[operator];
-    }
-    return ret;
-}
-
-const char *ezlopi_scenes_value_without_less_comparator_operators_get_name(e_scene_value_without_less_cmp_operators_t operator)
-{
-    const char *ret = NULL;
-    if ((operator> SCENES_VALUES_WITHOUT_LESS_OPERATORS_NONE) && (operator<SCENES_VALUES_WITHOUT_LESS_OPERATORS_MAX))
-    {
-        ret = ezlopi_scenes_value_without_less_cmp_operators_name[operator];
-    }
-    return ret;
-}
-
-const char *ezlopi_scenes_value_without_less_comparator_operators_get_method(e_scene_value_without_less_cmp_operators_t operator)
-{
-    const char *ret = NULL;
-    if ((operator> SCENES_VALUES_WITHOUT_LESS_OPERATORS_NONE) && (operator<SCENES_VALUES_WITHOUT_LESS_OPERATORS_MAX))
-    {
-        ret = ezlopi_scenes_value_without_less_cmp_operators_method[operator];
-    }
-    return ret;
-}
-
-#if 0
 int ezlopi_scenes_operators_value_without_less_operations(uint32_t item_id, l_fields_v2_t *value_field, l_fields_v2_t *comparator_field)
 {
     int ret = 0;
@@ -1082,7 +848,7 @@ int ezlopi_scenes_operators_value_without_less_operations(uint32_t item_id, l_fi
     {
         double item_value = 0.0;
         cJSON *cj_item_value = cJSON_CreateObject(__FUNCTION__);
-        l_ezlopi_device_t *device = ezlopi_device_get_head();
+        l_ezlopi_device_t *device = EZPI_core_device_get_head();
         while (device)
         {
             l_ezlopi_item_t *item = device->items;
@@ -1111,7 +877,7 @@ int ezlopi_scenes_operators_value_without_less_operations(uint32_t item_id, l_fi
             device = device->next;
         }
 
-        e_scene_value_without_less_cmp_operators_t value_without_less_operator = ezlopi_scenes_value_without_less_comparator_operators_get_enum(comparator_field->field_value.u_value.value_string);
+        e_scene_value_without_less_cmp_operators_t value_without_less_operator = EZPI_scenes_value_without_less_comparator_operators_get_enum(comparator_field->field_value.u_value.value_string);
 
         switch (value_without_less_operator)
         {
@@ -1140,18 +906,17 @@ int ezlopi_scenes_operators_value_without_less_operations(uint32_t item_id, l_fi
 
     return ret;
 }
-#endif
 
-/************* compareValues ************/
-#if 0
-int ezlopi_scenes_operators_value_comparevalues_without_less_operations(uint32_t item_id, l_fields_v2_t *value_field, l_fields_v2_t *value_type_field, l_fields_v2_t *comparator_field)
+/* compareValues */
+
+int EZPI_scenes_operators_value_comparevalues_without_less_operations(uint32_t item_id, l_fields_v2_t *value_field, l_fields_v2_t *value_type_field, l_fields_v2_t *comparator_field)
 {
     int ret = 0;
     if (item_id && value_field && value_type_field && comparator_field)
     {
         cJSON *item_value = NULL;
 
-        l_ezlopi_device_t *device = ezlopi_device_get_head();
+        l_ezlopi_device_t *device = EZPI_core_device_get_head();
         while (device)
         {
             l_ezlopi_item_t *item = device->items;
@@ -1183,7 +948,7 @@ int ezlopi_scenes_operators_value_comparevalues_without_less_operations(uint32_t
         if (NULL != item_value)
         { // operating according to 'with-less or without-less' comparator
             char *op_str = (NULL == comparator_field) ? "==" : comparator_field->field_value.u_value.value_string;
-            e_scene_value_without_less_cmp_operators_t value_without_less_operator = ezlopi_scenes_value_without_less_comparator_operators_get_enum(op_str);
+            e_scene_value_without_less_cmp_operators_t value_without_less_operator = EZPI_scenes_value_without_less_comparator_operators_get_enum(op_str);
 
             switch (value_without_less_operator)
             {
@@ -1224,14 +989,293 @@ int ezlopi_scenes_operators_value_comparevalues_without_less_operations(uint32_t
     return ret;
 }
 #endif
+int EZPI_scenes_operators_value_comparevalues_with_less_operations(l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, l_fields_v2_t *value_type_field, l_fields_v2_t *comparator_field)
+{
+    int ret = 0;
+    char *comparator_field_str = (NULL == comparator_field) ? "==" : comparator_field->field_value.u_value.value_string; // default '=='
+    if (item_exp_field && value_field && value_type_field && comparator_field_str)
+    {
+        // 1. LHS = expression
+        if (EZLOPI_VALUE_TYPE_EXPRESSION == item_exp_field->value_type)
+        {
+            s_ezlopi_expressions_t *curr_expr_left = EZPI_scenes_expressions_get_node_by_name(item_exp_field->field_value.u_value.value_string);
+            if (curr_expr_left)
+            {
+                if (EZLOPI_VALUE_TYPE_EXPRESSION == value_field->value_type)
+                { // 2. exp vs exp
+                    s_ezlopi_expressions_t *curr_expr_right = EZPI_scenes_expressions_get_node_by_name(value_field->field_value.u_value.value_string);
+                    if (curr_expr_right)
+                    { // check if all have same data-type
+                        if (__check_valuetypes(EZPI_core_scenes_get_scene_value_type_name(curr_expr_left->value_type),
+                                               EZPI_core_scenes_get_scene_value_type_name(curr_expr_right->value_type),
+                                               value_type_field->field_value.u_value.value_string))
+                        {
+                            ret = ____compare_exp_vs_exp(curr_expr_left, curr_expr_right, comparator_field_str);
+                        }
+                    }
+                }
+                else if (EZLOPI_VALUE_TYPE_ITEM == value_field->value_type)
+                { // 2. exp vs item
+                    uint32_t item_id = strtoul(value_field->field_value.u_value.value_string, NULL, 16);
+                    l_ezlopi_item_t *item_right = EZPI_core_device_get_item_by_id(item_id);
+                    if (item_right)
+                    {
+                        if (__check_valuetypes(EZPI_core_scenes_get_scene_value_type_name(curr_expr_left->value_type),
+                                               item_right->cloud_properties.value_type,
+                                               value_type_field->field_value.u_value.value_string))
+                        {
+                            ret = ____compare_exp_vs_item(curr_expr_left, item_right, comparator_field_str);
+                        }
+                    }
+                }
+                else
+                { // 2. exp vs other
+                    if (__check_valuetypes(EZPI_core_scenes_get_scene_value_type_name(curr_expr_left->value_type),
+                                           EZPI_core_scenes_get_scene_value_type_name(value_field->value_type),
+                                           value_type_field->field_value.u_value.value_string))
+                    {
+                        ret = ____compare_exp_vs_other(curr_expr_left, value_field, comparator_field_str);
+                    }
+                }
+            }
+        }
+        else
+        { // 1. LHS = item
+            uint32_t item_id = strtoul(item_exp_field->field_value.u_value.value_string, NULL, 16);
+            l_ezlopi_item_t *item_left = EZPI_core_device_get_item_by_id(item_id);
+            if (item_left)
+            {
+                if (EZLOPI_VALUE_TYPE_EXPRESSION == value_field->value_type)
+                { // 2. RHS = expression
+                    s_ezlopi_expressions_t *curr_expr_right = EZPI_scenes_expressions_get_node_by_name(value_field->field_value.u_value.value_string);
+                    if (curr_expr_right)
+                    {
+                        if (__check_valuetypes(item_left->cloud_properties.value_type,
+                                               EZPI_core_scenes_get_scene_value_type_name(curr_expr_right->value_type),
+                                               value_type_field->field_value.u_value.value_string))
+                        {
+                            ret = ____compare_item_vs_exp(item_left, curr_expr_right, comparator_field_str);
+                        }
+                    }
+                }
+                else if (EZLOPI_VALUE_TYPE_ITEM == value_field->value_type)
+                { // 2. RHS = item_right
+                    uint32_t item_id = strtoul(value_field->field_value.u_value.value_string, NULL, 16);
+                    l_ezlopi_item_t *item_right = EZPI_core_device_get_item_by_id(item_id);
+                    if (item_right)
+                    {
+                        if (__check_valuetypes(item_left->cloud_properties.value_type,
+                                               item_right->cloud_properties.value_type,
+                                               value_type_field->field_value.u_value.value_string))
+                        {
+                            ret = ____compare_item_vs_item(item_left, item_right, comparator_field_str);
+                        }
+                    }
+                }
+                else
+                { // 2. RHS = other
+                    if (__check_valuetypes(item_left->cloud_properties.value_type,
+                                           EZPI_core_scenes_get_scene_value_type_name(value_field->value_type),
+                                           value_type_field->field_value.u_value.value_string))
+                    {
+                        ret = ____compare_item_vs_other(item_left, value_field, comparator_field_str);
+                    }
+                }
+            }
+        }
+    }
+    return ret;
+}
+int EZPI_scenes_operators_value_comparevalues_with_less_operations_with_group(l_fields_v2_t *value_field, l_fields_v2_t *value_type_field, l_fields_v2_t *comparator_field, l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field)
+{
+    return __trigger_grp_functions(COMPARE_VALUES, devgrp_field, itemgrp_field, NULL, comparator_field, value_field, NULL, NULL, value_type_field, NULL, 0);
+}
+/* Has atleast one dictornary Value */
+int EZPI_scenes_operators_has_atleastone_dictionary_value_operations(uint32_t item_id, l_fields_v2_t *value_field)
+{
+    int ret = 0;
+
+    if (item_id && value_field)
+    {
+        l_ezlopi_item_t *item = EZPI_core_device_get_item_by_id(item_id);
+        if (item)
+        {
+            cJSON *cj_item_value = cJSON_CreateObject(__FUNCTION__);
+            if (cj_item_value)
+            {
+                item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item, (void *)cj_item_value, NULL);
+                cJSON *cj_valuetype = cJSON_GetObjectItem(__FUNCTION__, cj_item_value, ezlopi_valueType_str); // first check the item_type -> 'valueType'
+                if (cj_valuetype)                                                                             // type => dictionary
+                {
+                    if (STR_OP_COMP("dictionary", ==, cJSON_GetStringValue(cj_valuetype))) // 'dictionary' == 'dictionary'?
+                    {
+                        cJSON *cj_value = cJSON_GetObjectItem(__FUNCTION__, cj_item_value, ezlopi_value_str); // item_value -> dictionary ; [array or object]
+                        if (cj_value && cJSON_IsObject(cj_value))
+                        {
+                            CJSON_TRACE("cj_dictionary :", cj_value);
+                            // Check if ["low_battery":"..."] key is present
+                            /* need to use array here ; check against vales no keys. */
+                            cJSON *dictionaryValue = cJSON_GetObjectItem(__FUNCTION__, cj_value, value_field->field_value.u_value.value_string);
+                            if (NULL != dictionaryValue) // if the "eg. low_battery" element exists within the dictionary
+                            {
+                                ret = 1;
+                            }
+                            else
+                            {
+                                TRACE_E(" 'key : value[%s]' : not found", value_field->field_value.u_value.value_string);
+                            }
+                        }
+                    }
+                }
+                cJSON_Delete(__FUNCTION__, cj_item_value);
+            }
+        }
+    }
+
+    return ret;
+}
+/* isDictornary Changed */
+int EZPI_scenes_operators_is_dictionary_changed_operations(l_scenes_list_v2_t *scene_node, uint32_t item_id, l_fields_v2_t *key_field, l_fields_v2_t *operation_field)
+{
+    int ret = 0;
+    if (item_id && key_field && (operation_field->field_value.u_value.value_string))
+    {
+        cJSON *item_value = NULL;
+        l_ezlopi_item_t *item = EZPI_core_device_get_item_by_id(item_id);
+        if (item)
+        {
+            cJSON *cj_item_value = cJSON_CreateObject(__FUNCTION__);
+            if (cj_item_value)
+            {
+                item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item, (void *)cj_item_value, NULL);
+                cJSON *cj_valuetype = cJSON_GetObjectItem(__FUNCTION__, cj_item_value, ezlopi_valueType_str); // first check the item_type -> 'valueType'
+                if (cj_valuetype)                                                                             // type => dictionary
+                {
+                    if (STR_OP_COMP("dictionary", ==, cJSON_GetStringValue(cj_valuetype))) // 'dictionary' == 'dictionary'?
+                    {
+                        cJSON *cj_value = cJSON_GetObjectItem(__FUNCTION__, cj_item_value, ezlopi_value_str); // item_value -> dictionary ; [array or object]
+                        if (cj_value && cJSON_IsObject(cj_value))
+                        {
+                            item_value = cj_value;
+                        }
+                    }
+                }
+                cJSON_Delete(__FUNCTION__, cj_item_value);
+            }
+        }
+
+        if (NULL != item_value)
+        {
+            if (cJSON_IsObject(item_value)) // c
+            {
+                char *tmp_str = operation_field->field_value.u_value.value_string;
+                size_t len = (NULL != tmp_str) ? strlen(tmp_str) + 1 : 0;
+                if (EZPI_STRNCMP_IF_EQUAL("added", tmp_str, 6, len))
+                {
+                    // Check if ["key":"key_1"] key is present
+                    cJSON *dictionaryValue = cJSON_GetObjectItem(__FUNCTION__, item_value, key_field->field_value.u_value.value_string);
+                    if (NULL != dictionaryValue) // if the "eg. key_1" element exists within the dictionary
+                    {
+                        ret = 1;
+                    }
+                }
+                else if (EZPI_STRNCMP_IF_EQUAL("removed", tmp_str, 8, len))
+                {
+                    // Check if ["key":"key_1"] key is absent
+                    cJSON *dictionaryValue = cJSON_GetObjectItem(__FUNCTION__, item_value, key_field->field_value.u_value.value_string);
+                    if (NULL == dictionaryValue) // if the "eg. key_1" element exists within the dictionary
+                    {
+                        ret = 1;
+                    }
+                }
+                else if (EZPI_STRNCMP_IF_EQUAL("updated", tmp_str, 8, len))
+                {
+                    // Check if ["key":"key_1"] key is present and its elemnt
+                    cJSON *dictionaryValue = cJSON_GetObjectItem(__FUNCTION__, item_value, key_field->field_value.u_value.value_string);
+                    if (NULL != dictionaryValue) // if the "eg. key_1" element exists within the dictionary
+                    {
+                        cJSON *last_dictionary_item = (cJSON *)scene_node->when_block->fields->user_arg;
+                        ret = cJSON_Compare(last_dictionary_item, item_value, 0);
+                    }
+                }
+
+                // if the item exists ; Store current item_value into 'scene_node->when_block->fields->user_arg'
+                scene_node->when_block->fields->user_arg = (void *)item_value;
+            }
+        }
+    }
+    return ret;
+}
 
 /*******************************************************************************
- *                          Static Function Definitions
+ *                         Static Function Definitions
  *******************************************************************************/
+static int __evaluate_compareNumber_or_compareStrings(l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, char *comparator_str)
+{
+    int ret = 0;
+
+    if (item_exp_field && value_field && (NULL != comparator_str))
+    {
+        // 1. LHS = expression
+        if (EZLOPI_VALUE_TYPE_EXPRESSION == item_exp_field->value_type)
+        {
+            s_ezlopi_expressions_t *curr_expr_left = EZPI_scenes_expressions_get_node_by_name(item_exp_field->field_value.u_value.value_string);
+            if (curr_expr_left)
+            {
+                if (EZLOPI_VALUE_TYPE_EXPRESSION != value_field->value_type)
+                {
+                    //---------------  expression_valueType  VS  other_valueType  --------------------
+                    ret = ____compare_exp_vs_other(curr_expr_left, value_field, comparator_str);
+                    //--------------------------------------------------------------------------------
+                }
+                else if (EZLOPI_VALUE_TYPE_EXPRESSION == value_field->value_type)
+                {
+                    s_ezlopi_expressions_t *curr_expr_right = EZPI_scenes_expressions_get_node_by_name(value_field->field_value.u_value.value_string);
+                    if (curr_expr_right)
+                    {
+                        //---------------  expression_valueType  VS  expression_valueType  ---------------
+                        ret = ____compare_exp_vs_exp(curr_expr_left, curr_expr_right, comparator_str);
+                        //--------------------------------------------------------------------------------
+                    }
+                }
+            }
+        }
+        else
+        { // 2. LHS = item
+            uint32_t item_id = strtoul(item_exp_field->field_value.u_value.value_string, NULL, 16);
+
+            l_ezlopi_item_t *item = EZPI_core_device_get_item_by_id(item_id);
+            if (item)
+            {
+                if (EZLOPI_VALUE_TYPE_EXPRESSION != value_field->value_type)
+                {
+                    //---------------  item_valueType  VS  other_valueType  --------------------
+                    ret = ____compare_item_vs_other(item, value_field, comparator_str);
+                    //--------------------------------------------------------------------------
+                }
+                else if (EZLOPI_VALUE_TYPE_EXPRESSION == value_field->value_type)
+                {
+                    s_ezlopi_expressions_t *curr_expr_right = EZPI_scenes_expressions_get_node_by_name(value_field->field_value.u_value.value_string);
+                    if (curr_expr_right)
+                    { //---------------  item_valueType  VS  expression_valueType  --------------------
+                        ret = ____compare_item_vs_exp(item, curr_expr_right, comparator_str);
+                        //--------------------------------------------------------------------------
+                    }
+                }
+            }
+        }
+    }
+    return ret;
+}
+static int __evaluate_compareNumbers_or_compareStrings_with_group(l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field, l_fields_v2_t *value_field, l_fields_v2_t *comparator_field)
+{
+    return __trigger_grp_functions(COMPARE_NUM_OR_STR, devgrp_field, itemgrp_field, NULL, comparator_field, value_field, NULL, NULL, NULL, NULL, 0);
+}
+/* Numeric & String */
 static int ________compare_val_num(double item_exp_value, double value_to_compare_with, char *comparator_field_str)
 {
     int ret = 0;
-    e_scene_num_cmp_operators_t numeric_operator = ezlopi_scenes_numeric_comparator_operators_get_enum(comparator_field_str);
+    e_scene_num_cmp_operators_t numeric_operator = EZPI_scenes_numeric_comparator_operators_get_enum(comparator_field_str);
     switch (numeric_operator)
     {
     case SCENES_NUM_COMP_OPERATORS_LESS:
@@ -1277,7 +1321,7 @@ static int ________compare_val_num(double item_exp_value, double value_to_compar
 static int ________compare_val_str(const char *item_exp_value_str, const char *value_to_compare_with_str, char *comparator_field_str)
 {
     int ret = 0;
-    e_scene_str_cmp_operators_t string_operator = ezlopi_scenes_strings_comparator_operators_get_enum(comparator_field_str);
+    e_scene_str_cmp_operators_t string_operator = EZPI_scenes_strings_comparator_operators_get_enum(comparator_field_str);
     switch (string_operator)
     {
     case SCENES_STRINGS_OPERATORS_LESS:
@@ -1319,7 +1363,6 @@ static int ________compare_val_str(const char *item_exp_value_str, const char *v
 
     return ret;
 }
-
 static int ____compare_exp_vs_other(s_ezlopi_expressions_t *curr_expr_left, l_fields_v2_t *value_field, char *comparator_field_str)
 {
     int ret = 0;
@@ -1370,7 +1413,7 @@ static int ____compare_exp_vs_other(s_ezlopi_expressions_t *curr_expr_left, l_fi
     }
     else
     {
-        TRACE_E(" LHS != RHS [ '%s' vs '%s' ]", ezlopi_scene_get_scene_value_type_name(curr_expr_left->value_type), ezlopi_scene_get_scene_value_type_name(value_field->value_type));
+        TRACE_E(" LHS != RHS [ '%s' vs '%s' ]", EZPI_core_scenes_get_scene_value_type_name(curr_expr_left->value_type), EZPI_core_scenes_get_scene_value_type_name(value_field->value_type));
     }
 
     return ret;
@@ -1426,7 +1469,7 @@ static int ____compare_exp_vs_exp(s_ezlopi_expressions_t *curr_expr_left, s_ezlo
     }
     else
     {
-        TRACE_E(" LHS != RHS [ '%s' vs '%s' ]", ezlopi_scene_get_scene_value_type_name(curr_expr_left->value_type), ezlopi_scene_get_scene_value_type_name(curr_expr_right->value_type));
+        TRACE_E(" LHS != RHS [ '%s' vs '%s' ]", EZPI_core_scenes_get_scene_value_type_name(curr_expr_left->value_type), EZPI_core_scenes_get_scene_value_type_name(curr_expr_right->value_type));
     }
 
     return ret;
@@ -1436,9 +1479,9 @@ static int ____compare_exp_vs_item(s_ezlopi_expressions_t *curr_expr_left, l_ezl
 {
     int ret = 0;
 
-    const char *lhs_str = ezlopi_scene_get_scene_value_type_name(curr_expr_left->value_type);
+    const char *lhs_str = EZPI_core_scenes_get_scene_value_type_name(curr_expr_left->value_type);
     const char *rhs_str = item_right->cloud_properties.value_type;
-    if (EZPI_STRNCMP_IF_EQUAL(lhs_str, rhs_str, strlen(rhs_str), strlen(rhs_str))) // humidity == humidity
+    if (EZPI_STRNCMP_IF_EQUAL(lhs_str, rhs_str, strlen(rhs_str) + 1, strlen(rhs_str) + 1)) // humidity == humidity
     {
         cJSON *cj_right = cJSON_CreateObject(__FUNCTION__);
         if (cj_right)
@@ -1499,14 +1542,13 @@ static int ____compare_exp_vs_item(s_ezlopi_expressions_t *curr_expr_left, l_ezl
 
     return ret;
 }
-
 static int ____compare_item_vs_other(l_ezlopi_item_t *item_left, l_fields_v2_t *value_field, char *comparator_field_str)
 {
     int ret = 0;
 
     const char *lhs_str = item_left->cloud_properties.value_type;
-    const char *rhs_str = ezlopi_scene_get_scene_value_type_name(value_field->value_type);
-    if (EZPI_STRNCMP_IF_EQUAL(lhs_str, rhs_str, strlen(lhs_str), strlen(rhs_str)))
+    const char *rhs_str = EZPI_core_scenes_get_scene_value_type_name(value_field->value_type);
+    if (EZPI_STRNCMP_IF_EQUAL(lhs_str, rhs_str, strlen(lhs_str) + 1, strlen(rhs_str) + 1))
     { // making sure :- 'string' == 'string'
 
         cJSON *cj_item = cJSON_CreateObject(__FUNCTION__);
@@ -1543,20 +1585,26 @@ static int ____compare_item_vs_other(l_ezlopi_item_t *item_left, l_fields_v2_t *
                     break;
                 }
                 case cJSON_False: // bool_values can be converted to 1/0s
-                case cJSON_True:  // bool_values can be converted to 1/0s
                 {
                     if (value_field->field_value.e_type == VALUE_TYPE_BOOL)
                     {
-                        ret = ________compare_val_num(
-                            (cJSON_True == cj_item_value->type) ? 1 : 0,
-                            value_field->field_value.u_value.value_bool,
-                            comparator_field_str);
+                        ret = ________compare_val_num(0, value_field->field_value.u_value.value_bool, comparator_field_str);
+                    }
+                    break;
+                }
+                case cJSON_True: // bool_values can be converted to 1/0s
+                {
+                    if (value_field->field_value.e_type == VALUE_TYPE_BOOL)
+                    {
+                        ret = ________compare_val_num(1, value_field->field_value.u_value.value_bool, comparator_field_str);
                     }
                     break;
                 }
                 default:
+                {
                     TRACE_W("Error!! can compare only :- string / bool / number ");
                     break;
+                }
                 }
             }
             cJSON_Delete(__FUNCTION__, cj_item);
@@ -1575,8 +1623,8 @@ static int ____compare_item_vs_exp(l_ezlopi_item_t *item_left, s_ezlopi_expressi
     int ret = 0;
 
     const char *lhs_str = item_left->cloud_properties.value_type;
-    const char *rhs_str = ezlopi_scene_get_scene_value_type_name(curr_expr_right->value_type);
-    if (EZPI_STRNCMP_IF_EQUAL(lhs_str, rhs_str, strlen(lhs_str), strlen(rhs_str)))
+    const char *rhs_str = EZPI_core_scenes_get_scene_value_type_name(curr_expr_right->value_type);
+    if (EZPI_STRNCMP_IF_EQUAL(lhs_str, rhs_str, strlen(lhs_str) + 1, strlen(rhs_str) + 1))
     { // making sure :- 'temperature' == 'temperature'
 
         cJSON *cj_item = cJSON_CreateObject(__FUNCTION__);
@@ -1612,15 +1660,19 @@ static int ____compare_item_vs_exp(l_ezlopi_item_t *item_left, s_ezlopi_expressi
                     }
                     break;
                 }
-                case cJSON_True:  // bool_values can be converted to 1/0s
+                case cJSON_True: // bool_values can be converted to 1/0s
+                {
+                    if (curr_expr_right->exp_value.type == EXPRESSION_VALUE_TYPE_BOOL)
+                    {
+                        ret = ________compare_val_num(1, curr_expr_right->exp_value.u_value.boolean_value, comparator_field_str);
+                    }
+                    break;
+                }
                 case cJSON_False: // bool_values can be converted to 1/0s
                 {
                     if (curr_expr_right->exp_value.type == EXPRESSION_VALUE_TYPE_BOOL)
                     {
-                        ret = ________compare_val_num(
-                            (cJSON_True == cj_item_value->type) ? 1 : 0,
-                            curr_expr_right->exp_value.u_value.boolean_value,
-                            comparator_field_str);
+                        ret = ________compare_val_num(0, curr_expr_right->exp_value.u_value.boolean_value, comparator_field_str);
                     }
                     break;
                 }
@@ -1646,7 +1698,7 @@ static int ____compare_item_vs_item(l_ezlopi_item_t *item_left, l_ezlopi_item_t 
 
     const char *lhs_str = item_left->cloud_properties.value_type;
     const char *rhs_str = item_right->cloud_properties.value_type;
-    if (EZPI_STRNCMP_IF_EQUAL(lhs_str, rhs_str, strlen(lhs_str), strlen(rhs_str)))
+    if (EZPI_STRNCMP_IF_EQUAL(lhs_str, rhs_str, strlen(lhs_str) + 1, strlen(rhs_str) + 1))
     { // making sure :- 'temperature' == 'temperature'
         // 1 . extracting LHS_item_value
         cJSON *cj_left = cJSON_CreateObject(__FUNCTION__);
@@ -1720,35 +1772,33 @@ static int ____compare_item_vs_item(l_ezlopi_item_t *item_left, l_ezlopi_item_t 
 
     return ret;
 }
-
+static int __evaluate_numrange(l_fields_v2_t *item_exp_field, l_fields_v2_t *start_value_field, l_fields_v2_t *end_value_field, bool comparator_choice);
+static int __evaluate_compareNumber_or_compareStrings(l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, char *comparator_str);
+static int __evaluate_compareNumbers_or_compareStrings_with_group(l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field, l_fields_v2_t *value_field, l_fields_v2_t *comparator_field);
 static int __trigger_grp_functions(e_with_grp_t choice, l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field, l_fields_v2_t *operation_field, l_fields_v2_t *comparator_field, l_fields_v2_t *value_field, l_fields_v2_t *start_value_field, l_fields_v2_t *end_value_field, l_fields_v2_t *value_type_field, char *comparator_str, bool comparator_choice)
 {
     int ret = 0;
     uint32_t device_group_id = strtoul(devgrp_field->field_value.u_value.value_string, NULL, 16);
     uint32_t item_group_id = strtoul(itemgrp_field->field_value.u_value.value_string, NULL, 16);
 
-    l_ezlopi_device_grp_t *curr_devgrp = ezlopi_core_device_group_get_by_id(device_group_id);
+    l_ezlopi_device_grp_t *curr_devgrp = EZPI_core_device_group_get_by_id(device_group_id);
     if (curr_devgrp)
     {
-        // int idx = 0;
         cJSON *cj_get_devarr = NULL;
-        // while (NULL != (cj_get_devarr = cJSON_GetArrayItem(curr_devgrp->devices, idx))) // ["102ec000" , "102ec001" ,..]
         cJSON_ArrayForEach(cj_get_devarr, curr_devgrp->devices)
         {
             uint32_t curr_devce_id = strtoul(cj_get_devarr->valuestring, NULL, 16);
-            l_ezlopi_device_t *curr_device = ezlopi_device_get_by_id(curr_devce_id); // immediately goto "102ec000" ...
+            l_ezlopi_device_t *curr_device = EZPI_core_device_get_by_id(curr_devce_id); // immediately goto "102ec000" ...
             if (curr_device)
             {
                 l_ezlopi_item_t *curr_item_node = curr_device->items; // perform operation on items of above device --> "102ec000"
                 while (curr_item_node)
                 {
                     // compare with items_list stored in item_group_id
-                    l_ezlopi_item_grp_t *curr_item_grp = ezlopi_core_item_group_get_by_id(item_group_id); // get  "ll_itemgrp_node"
+                    l_ezlopi_item_grp_t *curr_item_grp = EZPI_core_item_group_get_by_id(item_group_id); // get  "ll_itemgrp_node"
                     if (curr_item_grp)
                     {
-                        // int count = 0;
                         cJSON *cj_item_names = NULL;
-                        // while (NULL != (cj_item_names = cJSON_GetArrayItem(curr_item_grp->item_names, count))) // ["202ec000" , "202ec001" ,..]
                         cJSON_ArrayForEach(cj_item_names, curr_item_grp->item_names)
                         {
                             uint32_t req_item_id_from_itemgrp = strtoul(cj_item_names->valuestring, NULL, 16);
@@ -1778,17 +1828,17 @@ static int __trigger_grp_functions(e_with_grp_t choice, l_fields_v2_t *devgrp_fi
                                     }
                                     case COMPARE_VALUES:
                                     {
-                                        ret = ezlopi_scenes_operators_value_comparevalues_with_less_operations(dummy_item_field, value_field, value_type_field, comparator_field);
+                                        ret = EZPI_scenes_operators_value_comparevalues_with_less_operations(dummy_item_field, value_field, value_type_field, comparator_field);
                                         break;
                                     }
                                     case COMPARE_INARRAY:
                                     {
-                                        ret = ezlopi_scenes_operators_value_inarr_operations(dummy_item_field, value_field, operation_field);
+                                        ret = EZPI_scenes_operators_value_inarr_operations(dummy_item_field, value_field, operation_field);
                                         break;
                                     }
                                     case COMPARE_STROPS:
                                     {
-                                        ret = ezlopi_scenes_operators_value_strops_operations(dummy_item_field, value_field, operation_field);
+                                        ret = EZPI_scenes_operators_value_strops_operations(dummy_item_field, value_field, operation_field);
                                         break;
                                     }
 
@@ -1801,19 +1851,38 @@ static int __trigger_grp_functions(e_with_grp_t choice, l_fields_v2_t *devgrp_fi
                                 }
                                 break;
                             }
-                            // count++;
                         }
                     }
                     curr_item_node = curr_item_node->next;
                 }
             }
-            // idx++;
         }
     }
 
     return ret;
 }
-
+/* Strings */
+static char *__get_item_strvalue_by_id(uint32_t item_id)
+{
+    char *item_value_str = NULL;
+    l_ezlopi_item_t *item = EZPI_core_device_get_item_by_id(item_id);
+    if (item)
+    {
+        cJSON *cj_item_value = cJSON_CreateObject(__FUNCTION__);
+        if (cj_item_value)
+        {
+            item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item, (void *)cj_item_value, NULL);
+            cJSON *cj_value = cJSON_GetObjectItem(__FUNCTION__, cj_item_value, ezlopi_value_str);
+            if (cj_value && cJSON_IsString(cj_value))
+            {
+                item_value_str = cJSON_GetStringValue(cj_value);
+            }
+            cJSON_Delete(__FUNCTION__, cj_item_value);
+        }
+    }
+    return item_value_str;
+}
+/* Numeric_Range */
 static int ________compare_numeric_range_num(double extract_data, double start_value_field_num, double end_value_field_num, bool comparator_choice)
 {
     int ret = 0;
@@ -1864,7 +1933,6 @@ static int ________compare_numeric_range_str(const char *extract_data, const cha
     }
     return ret;
 }
-
 static int ____compare_range_exp_vs_other(s_ezlopi_expressions_t *curr_expr_left, l_fields_v2_t *start_value_field, l_fields_v2_t *end_value_field, bool comparator_choice)
 {
     int ret = 0;
@@ -1923,7 +1991,7 @@ static int ____compare_range_exp_vs_other(s_ezlopi_expressions_t *curr_expr_left
     }
     else
     {
-        TRACE_E(" LHS != RHS [ '%s' vs '%s' ]", ezlopi_scene_get_scene_value_type_name(start_value_field->value_type), ezlopi_scene_get_scene_value_type_name(end_value_field->value_type));
+        TRACE_E(" LHS != RHS [ '%s' vs '%s' ]", EZPI_core_scenes_get_scene_value_type_name(start_value_field->value_type), EZPI_core_scenes_get_scene_value_type_name(end_value_field->value_type));
     }
 
     return ret;
@@ -1987,19 +2055,18 @@ static int ____compare_range_exp_vs_exp(s_ezlopi_expressions_t *curr_expr_left, 
     }
     else
     {
-        TRACE_E(" LHS != RHS [ '%s' vs '%s' ]", ezlopi_scene_get_scene_value_type_name(curr_expr_right_start->value_type), ezlopi_scene_get_scene_value_type_name(curr_expr_right_end->value_type));
+        TRACE_E(" LHS != RHS [ '%s' vs '%s' ]", EZPI_core_scenes_get_scene_value_type_name(curr_expr_right_start->value_type), EZPI_core_scenes_get_scene_value_type_name(curr_expr_right_end->value_type));
     }
 
     return ret;
 }
-
 static int ____compare_range_item_vs_other(l_ezlopi_item_t *item, l_fields_v2_t *start_value_field, l_fields_v2_t *end_value_field, bool comparator_choice)
 {
     int ret = 0;
 
     const char *lhs_str = item->cloud_properties.value_type;
-    const char *rhs_str = ezlopi_scene_get_scene_value_type_name(start_value_field->value_type);
-    if ((EZPI_STRNCMP_IF_EQUAL(lhs_str, rhs_str, strlen(lhs_str), strlen(rhs_str)) &&
+    const char *rhs_str = EZPI_core_scenes_get_scene_value_type_name(start_value_field->value_type);
+    if ((EZPI_STRNCMP_IF_EQUAL(lhs_str, rhs_str, strlen(lhs_str) + 1, strlen(rhs_str) + 1) &&
          (start_value_field->value_type == end_value_field->value_type))) // making sure :- 'temperature' == 'temperature'
     {
         cJSON *cj_item = cJSON_CreateObject(__FUNCTION__);
@@ -2042,16 +2109,20 @@ static int ____compare_range_item_vs_other(l_ezlopi_item_t *item, l_fields_v2_t 
                     break;
                 }
                 case cJSON_False: // bool_values can be converted to 1/0s
-                case cJSON_True:  // bool_values can be converted to 1/0s
                 {
                     if ((start_value_field->field_value.e_type == VALUE_TYPE_BOOL &&
                          end_value_field->field_value.e_type == VALUE_TYPE_BOOL))
                     {
-                        ret = ________compare_numeric_range_num(
-                            (cJSON_True == cj_item_value->type) ? 1 : 0,
-                            start_value_field->field_value.u_value.value_bool,
-                            end_value_field->field_value.u_value.value_bool,
-                            comparator_choice);
+                        ret = ________compare_numeric_range_num(0, start_value_field->field_value.u_value.value_bool, end_value_field->field_value.u_value.value_bool, comparator_choice);
+                    }
+                    break;
+                }
+                case cJSON_True: // bool_values can be converted to 1/0s
+                {
+                    if ((start_value_field->field_value.e_type == VALUE_TYPE_BOOL &&
+                         end_value_field->field_value.e_type == VALUE_TYPE_BOOL))
+                    {
+                        ret = ________compare_numeric_range_num(1, start_value_field->field_value.u_value.value_bool, end_value_field->field_value.u_value.value_bool, comparator_choice);
                     }
                     break;
                 }
@@ -2075,8 +2146,8 @@ static int ____compare_range_item_vs_exp(l_ezlopi_item_t *item, s_ezlopi_express
     int ret = 0;
 
     const char *lhs_str = item->cloud_properties.value_type;
-    const char *rhs_str = ezlopi_scene_get_scene_value_type_name(curr_expr_right_start->value_type);
-    if ((EZPI_STRNCMP_IF_EQUAL(lhs_str, rhs_str, strlen(lhs_str), strlen(rhs_str))) &&
+    const char *rhs_str = EZPI_core_scenes_get_scene_value_type_name(curr_expr_right_start->value_type);
+    if ((EZPI_STRNCMP_IF_EQUAL(lhs_str, rhs_str, strlen(lhs_str) + 1, strlen(rhs_str) + 1)) &&
         (curr_expr_right_start->value_type == curr_expr_right_end->value_type)) // making sure :- 'temperature' == 'temperature'
     {
         cJSON *cj_item = cJSON_CreateObject(__FUNCTION__);
@@ -2119,22 +2190,28 @@ static int ____compare_range_item_vs_exp(l_ezlopi_item_t *item, s_ezlopi_express
                     break;
                 }
                 case cJSON_False: // bool_values can be converted to 1/0s
-                case cJSON_True:  // bool_values can be converted to 1/0s
                 {
                     if ((curr_expr_right_start->exp_value.type == EXPRESSION_VALUE_TYPE_BOOL &&
                          curr_expr_right_end->exp_value.type == EXPRESSION_VALUE_TYPE_BOOL))
                     {
-                        ret = ________compare_numeric_range_num(
-                            (cJSON_True == cj_item_value->type) ? 1 : 0,
-                            curr_expr_right_start->exp_value.u_value.boolean_value,
-                            curr_expr_right_end->exp_value.u_value.boolean_value,
-                            comparator_choice);
+                        ret = ________compare_numeric_range_num(0, curr_expr_right_start->exp_value.u_value.boolean_value, curr_expr_right_end->exp_value.u_value.boolean_value, comparator_choice);
+                    }
+                    break;
+                }
+                case cJSON_True: // bool_values can be converted to 1/0s
+                {
+                    if ((curr_expr_right_start->exp_value.type == EXPRESSION_VALUE_TYPE_BOOL &&
+                         curr_expr_right_end->exp_value.type == EXPRESSION_VALUE_TYPE_BOOL))
+                    {
+                        ret = ________compare_numeric_range_num(1, curr_expr_right_start->exp_value.u_value.boolean_value, curr_expr_right_end->exp_value.u_value.boolean_value, comparator_choice);
                     }
                     break;
                 }
                 default:
+                {
                     TRACE_W("Error!! can compare only :- string / bool / number ");
                     break;
+                }
                 }
             }
             cJSON_Delete(__FUNCTION__, cj_item);
@@ -2147,14 +2224,13 @@ static int ____compare_range_item_vs_exp(l_ezlopi_item_t *item, s_ezlopi_express
 
     return ret;
 }
-
 static int __evaluate_numrange(l_fields_v2_t *item_exp_field, l_fields_v2_t *start_value_field, l_fields_v2_t *end_value_field, bool comparator_choice)
 {
     int ret = 0;
     // 1. LHS = expression
     if (EZLOPI_VALUE_TYPE_EXPRESSION == item_exp_field->value_type)
     {
-        s_ezlopi_expressions_t *curr_expr_left = ezlopi_scenes_get_expression_node_by_name(item_exp_field->field_value.u_value.value_string);
+        s_ezlopi_expressions_t *curr_expr_left = EZPI_scenes_expressions_get_node_by_name(item_exp_field->field_value.u_value.value_string);
         if (curr_expr_left)
         {
             if (EZLOPI_VALUE_TYPE_EXPRESSION != start_value_field->value_type &&
@@ -2167,8 +2243,8 @@ static int __evaluate_numrange(l_fields_v2_t *item_exp_field, l_fields_v2_t *sta
             else if (EZLOPI_VALUE_TYPE_EXPRESSION == start_value_field->value_type &&
                      EZLOPI_VALUE_TYPE_EXPRESSION == end_value_field->value_type)
             {
-                s_ezlopi_expressions_t *curr_expr_right_start = ezlopi_scenes_get_expression_node_by_name(start_value_field->field_value.u_value.value_string);
-                s_ezlopi_expressions_t *curr_expr_right_end = ezlopi_scenes_get_expression_node_by_name(end_value_field->field_value.u_value.value_string);
+                s_ezlopi_expressions_t *curr_expr_right_start = EZPI_scenes_expressions_get_node_by_name(start_value_field->field_value.u_value.value_string);
+                s_ezlopi_expressions_t *curr_expr_right_end = EZPI_scenes_expressions_get_node_by_name(end_value_field->field_value.u_value.value_string);
                 if (curr_expr_right_start && curr_expr_right_end)
                 { //---------------  expression_valueType  VS  expression_valueType  ---------------
                     ret = ____compare_range_exp_vs_exp(curr_expr_left, curr_expr_right_start, curr_expr_right_end, comparator_choice);
@@ -2181,7 +2257,7 @@ static int __evaluate_numrange(l_fields_v2_t *item_exp_field, l_fields_v2_t *sta
     { // 2. LHS = item
         uint32_t item_id = strtoul(item_exp_field->field_value.u_value.value_string, NULL, 16);
 
-        l_ezlopi_item_t *item = ezlopi_device_get_item_by_id(item_id);
+        l_ezlopi_item_t *item = EZPI_core_device_get_item_by_id(item_id);
         if (item)
         {
             if (EZLOPI_VALUE_TYPE_EXPRESSION != start_value_field->value_type &&
@@ -2194,8 +2270,8 @@ static int __evaluate_numrange(l_fields_v2_t *item_exp_field, l_fields_v2_t *sta
             else if (EZLOPI_VALUE_TYPE_EXPRESSION == start_value_field->value_type &&
                      EZLOPI_VALUE_TYPE_EXPRESSION == end_value_field->value_type)
             {
-                s_ezlopi_expressions_t *curr_expr_right_start = ezlopi_scenes_get_expression_node_by_name(start_value_field->field_value.u_value.value_string);
-                s_ezlopi_expressions_t *curr_expr_right_end = ezlopi_scenes_get_expression_node_by_name(end_value_field->field_value.u_value.value_string);
+                s_ezlopi_expressions_t *curr_expr_right_start = EZPI_scenes_expressions_get_node_by_name(start_value_field->field_value.u_value.value_string);
+                s_ezlopi_expressions_t *curr_expr_right_end = EZPI_scenes_expressions_get_node_by_name(end_value_field->field_value.u_value.value_string);
                 if (curr_expr_right_start && curr_expr_right_end)
                 { //---------------  item_valueType  VS  expression_valueType  --------------------
                     ret = ____compare_range_item_vs_exp(item, curr_expr_right_start, curr_expr_right_end, comparator_choice);
@@ -2206,29 +2282,8 @@ static int __evaluate_numrange(l_fields_v2_t *item_exp_field, l_fields_v2_t *sta
     }
     return ret;
 }
-
-static char *__ezlopi_core_scenes_operator_get_item_string_value_current_by_id(uint32_t item_id)
-{
-    char *item_value_str = NULL;
-    l_ezlopi_item_t *item = ezlopi_device_get_item_by_id(item_id);
-    if (item)
-    {
-        cJSON *cj_item_value = cJSON_CreateObject(__FUNCTION__);
-        if (cj_item_value)
-        {
-            item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item, (void *)cj_item_value, NULL);
-            cJSON *cj_value = cJSON_GetObjectItem(__FUNCTION__, cj_item_value, ezlopi_value_str);
-            if (cj_value && cJSON_IsString(cj_value))
-            {
-                item_value_str = cJSON_GetStringValue(cj_value);
-            }
-            cJSON_Delete(__FUNCTION__, cj_item_value);
-        }
-    }
-    return item_value_str;
-}
-
-static char *ezlopi_scenes_laststr_comp(const char *haystack, const char *needle)
+/* String_operations */
+static char *__ezlopi_stropr_laststr_comp(const char *haystack, const char *needle)
 {
     char *loc = NULL;
     char *found = NULL;
@@ -2240,7 +2295,7 @@ static char *ezlopi_scenes_laststr_comp(const char *haystack, const char *needle
     }
     return loc;
 }
-
+/* Values in_array */
 static int __compare_inarry_str(char *item_exp_value_str, l_fields_v2_t *value_field, bool operation)
 {
     int ret = 0;
@@ -2329,7 +2384,7 @@ static int __compare_inarry_cj(cJSON *item_exp_value, l_fields_v2_t *value_field
         {
             cJSON_ArrayForEach(iterator, value_field->field_value.u_value.cj_value)
             {
-                if (cJSON_Compare(item_exp_value, iterator, cJSON_False)) // check for all array elements ; if exists then 'ret = 1' & break
+                if (cJSON_Compare(item_exp_value, iterator, false)) // check for all array elements ; if exists then 'ret = 1' & break
                 {
                     ret = 1;
                     break;
@@ -2342,7 +2397,7 @@ static int __compare_inarry_cj(cJSON *item_exp_value, l_fields_v2_t *value_field
             cJSON_ArrayForEach(iterator, value_field->field_value.u_value.cj_value)
             {
                 ret = 1;
-                if (cJSON_Compare(item_exp_value, iterator, cJSON_False)) // check for all array elements ; if exists then 'ret = 0' & break
+                if (cJSON_Compare(item_exp_value, iterator, false)) // check for all array elements ; if exists then 'ret = 0' & break
                 {
                     ret = 0;
                     break;
@@ -2354,75 +2409,12 @@ static int __compare_inarry_cj(cJSON *item_exp_value, l_fields_v2_t *value_field
     }
     return ret;
 }
-
-static int __evaluate_compareNumber_or_compareStrings(l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, char *comparator_str)
-{
-    int ret = 0;
-
-    if (item_exp_field && value_field && (NULL != comparator_str))
-    {
-        // 1. LHS = expression
-        if (EZLOPI_VALUE_TYPE_EXPRESSION == item_exp_field->value_type)
-        {
-            s_ezlopi_expressions_t *curr_expr_left = ezlopi_scenes_get_expression_node_by_name(item_exp_field->field_value.u_value.value_string);
-            if (curr_expr_left)
-            {
-                if (EZLOPI_VALUE_TYPE_EXPRESSION != value_field->value_type)
-                {
-                    //---------------  expression_valueType  VS  other_valueType  --------------------
-                    ret = ____compare_exp_vs_other(curr_expr_left, value_field, comparator_str);
-                    //--------------------------------------------------------------------------------
-                }
-                else if (EZLOPI_VALUE_TYPE_EXPRESSION == value_field->value_type)
-                {
-                    s_ezlopi_expressions_t *curr_expr_right = ezlopi_scenes_get_expression_node_by_name(value_field->field_value.u_value.value_string);
-                    if (curr_expr_right)
-                    {
-                        //---------------  expression_valueType  VS  expression_valueType  ---------------
-                        ret = ____compare_exp_vs_exp(curr_expr_left, curr_expr_right, comparator_str);
-                        //--------------------------------------------------------------------------------
-                    }
-                }
-            }
-        }
-        else
-        { // 2. LHS = item
-            uint32_t item_id = strtoul(item_exp_field->field_value.u_value.value_string, NULL, 16);
-
-            l_ezlopi_item_t *item = ezlopi_device_get_item_by_id(item_id);
-            if (item)
-            {
-                if (EZLOPI_VALUE_TYPE_EXPRESSION != value_field->value_type)
-                {
-                    //---------------  item_valueType  VS  other_valueType  --------------------
-                    ret = ____compare_item_vs_other(item, value_field, comparator_str);
-                    //--------------------------------------------------------------------------
-                }
-                else if (EZLOPI_VALUE_TYPE_EXPRESSION == value_field->value_type)
-                {
-                    s_ezlopi_expressions_t *curr_expr_right = ezlopi_scenes_get_expression_node_by_name(value_field->field_value.u_value.value_string);
-                    if (curr_expr_right)
-                    { //---------------  item_valueType  VS  expression_valueType  --------------------
-                        ret = ____compare_item_vs_exp(item, curr_expr_right, comparator_str);
-                        //--------------------------------------------------------------------------
-                    }
-                }
-            }
-        }
-    }
-    return ret;
-}
-
-static int __evaluate_compareNumbers_or_compareStrings_with_group(l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field, l_fields_v2_t *value_field, l_fields_v2_t *comparator_field)
-{
-    return __trigger_grp_functions(COMPARE_NUM_OR_STR, devgrp_field, itemgrp_field, NULL, comparator_field, value_field, NULL, NULL, NULL, NULL, 0);
-}
-
+/* compareValues */
 static bool __check_valuetypes(const char *lhs_type_str, const char *rhs_type_str, const char *required_type_str)
 {
     bool ret = false;
-    if ((EZPI_STRNCMP_IF_EQUAL(lhs_type_str, required_type_str, strlen(lhs_type_str), strlen(required_type_str))) &&
-        (EZPI_STRNCMP_IF_EQUAL(rhs_type_str, required_type_str, strlen(rhs_type_str), strlen(required_type_str)))) // humidity == humidity
+    if ((EZPI_STRNCMP_IF_EQUAL(lhs_type_str, required_type_str, strlen(lhs_type_str) + 1, strlen(required_type_str)) + 1) &&
+        (EZPI_STRNCMP_IF_EQUAL(rhs_type_str, required_type_str, strlen(rhs_type_str) + 1, strlen(required_type_str))) + 1) // humidity == humidity
     {
         ret = true;
     }
@@ -2430,7 +2422,6 @@ static bool __check_valuetypes(const char *lhs_type_str, const char *rhs_type_st
 }
 
 #endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
-
-/*******************************************************************************
- *                          End of File
- *******************************************************************************/
+       /*******************************************************************************
+        *                          End of File
+        *******************************************************************************/

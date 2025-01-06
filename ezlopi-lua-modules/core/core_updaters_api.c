@@ -92,7 +92,7 @@ int lcore_update_item_value(lua_State *lua_state)
     if (item_id_str)
     {
         uint32_t item_id = strtoul(item_id_str, NULL, 16);
-        l_ezlopi_item_t *item_node = ezlopi_device_get_item_by_id(item_id);
+        l_ezlopi_item_t *item_node = EZPI_core_device_get_item_by_id(item_id);
         if (item_node)
         {
             cJSON *cj_params = cJSON_CreateObject(__FUNCTION__);

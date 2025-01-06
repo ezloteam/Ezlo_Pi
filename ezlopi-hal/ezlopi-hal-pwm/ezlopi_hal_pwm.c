@@ -28,13 +28,12 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_hal_pwm.c
+ * @brief   perform some function on PWM
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    xx
  */
 
 /*******************************************************************************
@@ -72,12 +71,13 @@ static uint8_t get_available_channel();
 /*******************************************************************************
  *                          Static Data Definitions
  *******************************************************************************/
+
 #if CONFIG_IDF_TARGET_ESP32
-static bool available_channels[LEDC_CHANNEL_MAX] = { false, true, true, true, true, true, true };
+static bool available_channels[LEDC_CHANNEL_MAX] = {false, true, true, true, true, true, true};
 #elif CONFIG_IDF_TARGET_ESP32S2 || CONFIG_IDF_TARGET_ESP32S3
-static bool available_channels[LEDC_CHANNEL_MAX] = { true, true, true, true, true, true, true };
+static bool available_channels[LEDC_CHANNEL_MAX] = {true, true, true, true, true, true, true};
 #elif CONFIG_IDF_TARGET_ESP32C2 || CONFIG_IDF_TARGET_ESP32C3
-static bool available_channels[LEDC_CHANNEL_MAX] = { true, true, true, true, true };
+static bool available_channels[LEDC_CHANNEL_MAX] = {true, true, true, true, true};
 #endif
 
 /*******************************************************************************
@@ -88,12 +88,7 @@ static bool available_channels[LEDC_CHANNEL_MAX] = { true, true, true, true, tru
  *                          Extern Function Definitions
  *******************************************************************************/
 
-/**
- * @brief Global/extern function template example
- * Convention : Use capital letter for initial word on extern function
- * @param arg
- */
-s_ezlopi_channel_speed_t *ezlopi_pwm_init(uint8_t pwm_gpio_num, uint8_t pwm_resln, uint32_t freq_hz, uint32_t duty_cycle)
+s_ezlopi_channel_speed_t *EZPI_hal_pwm_init(uint8_t pwm_gpio_num, uint8_t pwm_resln, uint32_t freq_hz, uint32_t duty_cycle)
 {
 
     s_ezlopi_channel_speed_t *ezlopi_channel_speed = (s_ezlopi_channel_speed_t *)ezlopi_malloc(__FUNCTION__, sizeof(s_ezlopi_channel_speed_t));
@@ -148,7 +143,7 @@ s_ezlopi_channel_speed_t *ezlopi_pwm_init(uint8_t pwm_gpio_num, uint8_t pwm_resl
     return ezlopi_channel_speed;
 }
 
-void ezlopi_pwm_change_duty(uint32_t channel, uint32_t speed_mode, uint32_t duty)
+void EZPI_hal_pwm_change_duty(uint32_t channel, uint32_t speed_mode, uint32_t duty)
 {
     esp_err_t error = ledc_set_duty(speed_mode, channel, duty);
     error = ledc_update_duty(speed_mode, channel);
@@ -162,15 +157,14 @@ void ezlopi_pwm_change_duty(uint32_t channel, uint32_t speed_mode, uint32_t duty
     }
 }
 
-uint32_t ezlopi_pwm_get_duty(uint32_t channel, uint32_t speed)
+uint32_t EZPI_hal_pwm_get_duty(uint32_t channel, uint32_t speed_mode)
 {
-    return ledc_get_duty(speed, channel);
+    return ledc_get_duty(speed_mode, channel);
 }
 
 /*******************************************************************************
- *                          Static Function Definitions
+ *                         Static Function Definitions
  *******************************************************************************/
-
 static uint8_t get_available_channel()
 {
     uint8_t channel = 0;
@@ -189,7 +183,3 @@ static uint8_t get_available_channel()
 /*******************************************************************************
  *                          End of File
  *******************************************************************************/
-
-
-
-

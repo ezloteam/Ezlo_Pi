@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2022 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -29,6 +29,13 @@
 ** ===========================================================================
 */
 
+/**
+ * @file    ezlopi_cloud_methods_str.h
+ * @brief
+ * @author
+ * @version
+ * @date
+ */
 #ifndef __EZLOPI_METHODS_STR_H__
 #define __EZLOPI_METHODS_STR_H__
 
@@ -51,6 +58,10 @@ extern "C"
     /*******************************************************************************
      *                          Extern Data Declarations
      *******************************************************************************/
+
+    /*****************************************************************************************
+     *                                     Methods                                           *
+     *****************************************************************************************/
     extern const char *method_hub_item_updated;
     extern const char *method_add_device;
     extern const char *method_add_all_devices;
@@ -75,7 +86,7 @@ extern "C"
     // extern const  char *method_hub_device_force_remove ;
     // extern const  char *method_hub_device_firmware_update ;
     extern const char *method_hub_devices_list;
-    extern const  char *method_hub_device_armed_set;
+    extern const char *method_hub_device_armed_set;
     // extern const  char *method_hub_device_name_set;
     extern const  char *method_hub_device_room_set;
     // extern const  char *method_hub_device_setting_dictionary_value_set ;
@@ -85,7 +96,7 @@ extern "C"
     // extern const  char *method_hub_detection_devices_list ;
     // extern const  char *method_hub_detection_device_remove ;
     // extern const  char *method_hub_detection_device_set ;
-    // extern const  char *method_hub_setting_updated ;
+    extern const  char *method_hub_setting_updated;
     // extern const  char *method_hub_device_setting_reset ;
     // extern const  char *method_hub_device_settings_list;
     // extern const  char *method_hub_setting_value_set_request;
@@ -190,14 +201,25 @@ extern "C"
     extern const char *ezlopi_hub_item_group_deleted;
     extern const char *ezlopi_hub_item_group_updated;
 
-    /*******************************************************************************
-     *                          Extern Function Prototypes
-     *******************************************************************************/
+    extern const char *ezlopi_hub_device_updated;
+    extern const char *ezlopi_hub_modes_disarmed_devices_added;
+    extern const char *ezlopi_hub_modes_disarmed_devices_removed;
+    extern const char *ezlopi_hub_modes_alarms_off_added;
+    extern const char *ezlopi_hub_modes_alarms_off_removed;
+    extern const char *ezlopi_hub_modes_cameras_off_added;
+    extern const char *ezlopi_hub_modes_cameras_off_removed;
+    extern const char *ezlopi_hub_modes_bypass_devices_added;
+    extern const char *ezlopi_hub_modes_bypass_devices_removed;
+    extern const char *ezlopi_hub_modes_protect_button_added;
+    extern const char *ezlopi_hub_modes_protect_button_updated;
+    extern const char *ezlopi_hub_modes_protect_button_removed;
+    extern const char *ezlopi_hub_modes_protect_devices_added;
+    extern const char *ezlopi_hub_modes_protect_devices_removed;
+    extern const char *ezlopi_hub_modes_entry_delay_changed;
 
 #ifdef __cplusplus
 }
 #endif
-
 #endif // __EZLOPI_METHODS_STR_H__
 
 /*******************************************************************************

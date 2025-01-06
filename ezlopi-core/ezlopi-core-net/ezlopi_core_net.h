@@ -28,17 +28,19 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_core_net.h
+ * @brief   perform some function on core-net
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    12th DEC 2024
  */
 
 #ifndef _EZLOPI_CORE_NET_H_
 #define _EZLOPI_CORE_NET_H_
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 
 /*******************************************************************************
  *                          Include Files
@@ -61,9 +63,10 @@ extern "C"
     /*******************************************************************************
      *                          Type & Macro Declarations
      *******************************************************************************/
+
     typedef struct s_ezlopi_net_status
     {
-        ezlopi_wifi_status_t* wifi_status;
+        ezlopi_wifi_status_t *wifi_status;
         e_ping_status_t internet_status;
         bool nma_cloud_connection_status;
     } s_ezlopi_net_status_t;
@@ -75,22 +78,21 @@ extern "C"
     /*******************************************************************************
      *                          Extern Function Prototypes
      *******************************************************************************/
+
+#ifdef CONFIG_EZPI_CORE_ENABLE_ETH
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
+     * @brief Function to initialize new
      *
      */
-    #ifdef CONFIG_EZPI_CORE_ENABLE_ETH
-    void ezlopi_net_init(void);
-    #endif  // CONFIG_EZPI_CORE_ENABLE_ETH
+    void EZPI_net_init(void);
+#endif // CONFIG_EZPI_CORE_ENABLE_ETH
 
-    s_ezlopi_net_status_t* ezlopi_get_net_status(void);
-
+    /**
+     * @brief Function to get core-net status
+     *
+     * @return s_ezlopi_net_status_t*
+     */
+    s_ezlopi_net_status_t *EZPI_core_net_get_net_status(void);
 #ifdef __cplusplus
 }
 #endif

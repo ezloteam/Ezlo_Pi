@@ -1,26 +1,57 @@
+# Include all source files
+file(GLOB_RECURSE config_src "*.c")
 
+#Define SDK components
+set(ESP_IDF_COMPONENTS
+        #cjext
+        driver
+        led_strip
+)
 
-idf_component_register(SRCS "device_0009_other_RMT_SK6812.c"
-            INCLUDE_DIRS "."
-            REQUIRES
-                        driver
-                        led_strip
+# Define core components
+set(EZLOPI_CORE_COMPONENTS 
+        # ezlopi-core-timer 
+        ezlopi-core-cloud 
+        ezlopi-core-actions
+        ezlopi-core-devices 
+        ezlopi-core-valueformatter
+        ezlopi-core-errors
+)
 
-                        ezlopi-util-trace
+# Define HAL components
+set(EZLOPI_HAL_COMPONENTS 
+            #ezlopi-hal-i2c
+            #ezlopi-hal-spi
+)
 
-                        # ezlopi-core-timer
-                        ezlopi-core-cloud
-                        ezlopi-core-actions
-                        ezlopi-core-devices
-                        ezlopi-core-valueformatter
-                        ezlopi-core-errors
+# Define cloud components
+set(EZLOPI_CLOUD_COMPONENTS 
+        ezlopi-cloud-items 
+        ezlopi-cloud-constants
+)
 
-                        #ezlopi-hal-i2c
-                        #ezlopi-hal-spi
+# Define service components
+set(EZLOPI_SERV_COMPONENTS
+        ezlopi-service-gpioisr
+)
 
-                        ezlopi-cloud-items
-                        ezlopi-cloud-constants
+# Define sensor device components
+set(EZLOPI_SENSOR_DEVICE_COMPONENTS 
+)
 
-                        ezlopi-service-gpioisr
-                        )
+# Define ezlopi-utils components
+set(EZLOPI_UTIL_COMPONENTS
+        ezlopi-util-trace
+)
 
+# Register the components
+idf_component_register(SRCS "${config_src}"
+                        INCLUDE_DIRS "."
+                        REQUIRES        ${ESP_IDF_COMPONENTS}
+                                        ${EZLOPI_CORE_COMPONENTS}
+                                        ${EZLOPI_HAL_COMPONENTS}
+                                        ${EZLOPI_CLOUD_COMPONENTS}
+                                        ${EZLOPI_SERV_COMPONENTS}
+                                        ${EZLOPI_SENSOR_DEVICE_COMPONENTS}  
+                                        ${EZLOPI_UTIL_COMPONENTS}                
+)

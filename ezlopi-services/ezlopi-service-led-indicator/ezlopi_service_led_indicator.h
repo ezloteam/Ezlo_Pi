@@ -30,17 +30,18 @@
 */
 
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
- * @version 0.1
- * @date    1st January 2024
+ * @file    ezlopi_service_led_indicator.h
+ * @brief
+ * @author
+ * @version
+ * @date
  */
 
 #ifndef _EZLOPI_SERVICE_LED_INDICATOR_H_
 #define _EZLOPI_SERVICE_LED_INDICATOR_H_
 
 #ifdef CONFIG_EZPI_ENABLE_LED_INDICATOR
+
 
 /*******************************************************************************
  *                          Include Files
@@ -57,13 +58,20 @@ extern "C"
     /*******************************************************************************
      *                          Type & Macro Declarations
      *******************************************************************************/
-    typedef enum {
-        PRIORITY_POWER = 0,
-        PRIORITY_WIFI,
-        PRIORITY_INTERNET,
-        PRIORITY_CLOUD,
-        PRIORITY_MAX,
-    }e_indicator_led_priority_t;
+
+    /**
+     * @brief Enum to set the LED indocator
+     *
+     */
+    typedef enum
+    {
+        PRIORITY_POWER = 0, /**< Priority set at device powered */
+        PRIORITY_WIFI,      /**< Priority set at device is connected to WiFi */
+        PRIORITY_INTERNET,  /**< Priority set at device is connected to internet */
+        PRIORITY_CLOUD,     /**< Priority set at device is connected to cloud */
+        PRIORITY_MAX,       /**< Invalid priority state */
+    } e_indicator_led_priority_t;
+
 
     /*******************************************************************************
      *                          Extern Data Declarations
@@ -73,22 +81,17 @@ extern "C"
      *                          Extern Function Prototypes
      *******************************************************************************/
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
+     * @brief Function to initialize LED indicator
      *
+     * @return int
+     * @retval 1 on success or 0 on error
      */
-    int ezlopi_service_led_indicator_init();
-
+    int EZPI_service_led_indicator_init();
 #ifdef __cplusplus
 }
 #endif
 
-#endif //CONFIG_EZPI_ENABLE_LED_INDICATOR
+#endif // CONFIG_EZPI_ENABLE_LED_INDICATOR
 
 #endif // _EZLOPI_SERVICE_LED_INDICATOR_H_
 

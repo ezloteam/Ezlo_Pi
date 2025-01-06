@@ -1,5 +1,13 @@
+
+/**
+ * @file    ezlopi_service_broadcast.h
+ * @brief
+ * @author
+ * @version
+ * @date
+ */
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2022 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -29,52 +37,21 @@
 ** ===========================================================================
 */
 
-/**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
- * @version 0.1
- * @date    1st January 2024
- */
-
 #ifndef __EZLOPI_SERVICE_BROADCAST_H__
 #define __EZLOPI_SERVICE_BROADCAST_H__
 
-/*******************************************************************************
- *                          Include Files
- *******************************************************************************/
-#include <string.h>
-
-/*******************************************************************************
- *                          C++ Declaration Wrapper
- *******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
-
-    /*******************************************************************************
-     *                          Type & Macro Declarations
-     *******************************************************************************/
-
-    /*******************************************************************************
-     *                          Extern Data Declarations
-     *******************************************************************************/
-
-    /*******************************************************************************
-     *                          Extern Function Prototypes
-     *******************************************************************************/
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
+     * @brief Function to initialize broad cast service
+     * @details This function performs following operations
+     *  - Sets broadcast queue sender
+     *  - Initializes the broadcast loop
      *
      */
-    void ezlopi_service_broadcast_init(void);
+    void EZPI_service_broadcast_init(void);
 
 #ifdef __cplusplus
 }

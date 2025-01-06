@@ -30,12 +30,15 @@
 */
 
 /**
- * @file    main.c
+ * @file    ezlopi_cloud_thermostat_str.c
  * @brief   perform some function on data
  * @author  John Doe
  * @version 0.1
  * @date    1st January 2024
  */
+
+#ifndef __EZLOPI_THERMOSTAT_STR_H__
+#define __EZLOPI_THERMOSTAT_STR_H__
 
 /*******************************************************************************
  *                          Include Files
@@ -83,7 +86,7 @@
 /*******************************************************************************
  *                          Static Function Definitions
  *******************************************************************************/
-
+#endif // __EZLOPI_THERMOSTAT_STR_H__
 /*******************************************************************************
  *                          End of File
  *******************************************************************************/

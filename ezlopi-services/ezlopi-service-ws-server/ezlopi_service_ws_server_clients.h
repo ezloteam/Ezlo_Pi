@@ -30,7 +30,7 @@
 */
 
 /**
- * @file    main.c
+ * @file    ezlopi_service_ws_server_clients.h
  * @brief   perform some function on data
  * @author  John Doe
  * @version 0.1
@@ -55,13 +55,18 @@ extern "C"
     /*******************************************************************************
      *                          Type & Macro Declarations
      *******************************************************************************/
+
+    /**
+     * @brief Linked list for websoket clinet connection handler
+     *
+     */
     typedef struct l_ws_server_client_conn
     {
-        void *http_handle;
-        int http_descriptor;
-        uint32_t fail_count;
+        void *http_handle;   /**< HTTP connection handle */
+        int http_descriptor; /**< HTTP descriptor */
+        uint32_t fail_count; /**< Connection failed count */
 
-        struct l_ws_server_client_conn *next;
+        struct l_ws_server_client_conn *next; /**< Points to the next clinet handle */
     } l_ws_server_client_conn_t;
 
     /*******************************************************************************
@@ -72,20 +77,44 @@ extern "C"
      *                          Extern Function Prototypes
      *******************************************************************************/
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
+     * @brief Function to remove clinet connected to the websoket server using client connection handle
      *
+     * @param[in] http_handle Pointer to the connection handle belonging to the client to remove
+     * @return int
      */
-    int ezlopi_service_ws_server_clients_remove_by_handle(void *http_handle);
-    l_ws_server_client_conn_t *ezlopi_service_ws_server_clients_get_head(void);
-    l_ws_server_client_conn_t *ezlopi_service_ws_server_clients_pop(void *http_handle);
-    l_ws_server_client_conn_t *ezlopi_service_ws_server_clients_get_by_handle(void *http_handle);
-    l_ws_server_client_conn_t *ezlopi_service_ws_server_clients_add(void *http_handle, int http_desc);
+    int EZPI_service_ws_server_clients_remove_by_handle(void *http_handle);
+    /**
+     * @brief Function to get clinet list head
+     *
+     * @return l_ws_server_client_conn_t*
+     * @retval Head of the client handles list
+     */
+    l_ws_server_client_conn_t *EZPI_service_ws_server_clients_get_head(void);
+    /**
+     * @brief Function to pop client using client connection handle from the client list
+     *
+     * @param[in] http_handle Pointer to the connection handle belonging to the client to pop
+     * @return l_ws_server_client_conn_t*
+     * @retval Pointer to the client poped
+     */
+    l_ws_server_client_conn_t *EZPI_service_ws_server_clients_pop(void *http_handle);
+    /**
+     * @brief Function to get websocket client by handle
+     *
+     * @param[in] http_handle Pointer to the connection handle belonging to the client to get
+     * @return l_ws_server_client_conn_t*
+     * @retval Pointer to the required client handle
+     */
+    l_ws_server_client_conn_t *EZPI_service_ws_server_clients_get_by_handle(void *http_handle);
+    /**
+     * @brief Function to add new client to the websocket client handle list
+     *
+     * @param[in] http_handle Pointer to the client http handle
+     * @param[in] http_desc HTTP descriptro for the clinent
+     * @return l_ws_server_client_conn_t*
+     * @retval Pointer to the cliend handle added to the list
+     */
+    l_ws_server_client_conn_t *EZPI_service_ws_server_clients_add(void *http_handle, int http_desc);
 
 #ifdef __cplusplus
 }

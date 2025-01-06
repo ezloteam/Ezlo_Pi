@@ -1,5 +1,13 @@
+
+/**
+ * @file    ezlopi_cloud_keywords.c
+ * @brief
+ * @author
+ * @version
+ * @date
+ */
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2022 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -28,18 +36,13 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
-/**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
- * @version 0.1
- * @date    1st January 2024
- */
+#ifndef __EZLOPI_CLOUD_KEYWORDS_H__
+#define __EZLOPI_CLOUD_KEYWORDS_H__
 
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
+#include "stdio.h"
 
 /*******************************************************************************
  *                          Extern Data Declarations
@@ -64,22 +67,27 @@
 /*******************************************************************************
  *                          Extern Data Definitions
  *******************************************************************************/
+
 const char *ezlopi_ESP32_str = "ESP32";
 const char *ezlopi_ESP32S3_str = "ESP32S3";
 const char *ezlopi_ESP32S2_str = "ESP32S2";
 const char *ezlopi_ESP32C3_str = "ESP32C3";
 const char *ezlopi_ezlopi_str = "ezlopi";
+const char *ezlopi_EzloPI_str = "EzloPI";
 const char *ezlopi__str = "";
 const char *ezlopi_id_str = "id";
 const char *ezlopi_ids_str = "ids";
 const char *ezlopi__id_str = "_id";
 const char *ezlopi_deviceId_str = "deviceId";
+const char *ezlopi_itemId_str = "itemId";
 const char *ezlopi_device_ids_str = "deviceIds";
 const char *ezlopi_sender_str = "sender";
 const char *ezlopi_name_str = "name";
+const char *ezlopi_user_str = "user";
 const char *ezlopi_value_str = "value";
 const char *ezlopi_method_str = "method";
 const char *ezlopi_function_str = "function";
+const char *ezlopi_ruleTrigger_str = "ruleTrigger";
 const char *ezlopi_msg_id_str = "msg_id"; // message counter, number of data transferred to ezlopi-cloud
 const char *ezlopi_msg_subclass_str = "msg_subclass";
 const char *ezlopi_ui_broadcast_str = "ui_broadcast";
@@ -98,12 +106,15 @@ const char *ezlopi_syncNotification_str = "syncNotification";
 const char *ezlopi_room_id_str = "room_id";
 const char *ezlopi_room_name_str = "room_name";
 const char *ezlopi_error_str = "error";
+const char *ezlopi_expression_str = "expression";
 const char *ezlopi_expressions_str = "expressions";
 const char *ezlopi_is_group_str = "is_group";
 const char *ezlopi_user_notifications_str = "user_notifications";
 const char *ezlopi_house_modes_str = "house_modes";
-const char *ezlopi_block_enable_str = "block_enable";
+const char *ezlopi_block_str = "block";
+const char *ezlopi_blocks_str = "blocks";
 const char *ezlopi_blockId_str = "blockId";
+const char *ezlopi_block_enable_str = "block_enable";
 const char *ezlopi_blockOptions_str = "blockOptions";
 const char *ezlopi_blockName_str = "blockName";
 const char *ezlopi_version_str = "version";
@@ -116,6 +127,10 @@ const char *ezlopi_enabled_str = "enabled";
 const char *ezlopi_enable_str = "enable";
 const char *ezlopi_group_id_str = "group_id";
 const char *ezlopi_parent_id_str = "parent_id";
+const char *ezlopi_group_str = "group";
+const char *ezlopi_thenGroup_str = "thenGroup";
+const char *ezlopi_thenGroups_str = "thenGroups";
+const char *ezlopi_scene_str = "scene";
 const char *ezlopi_then_str = "then";
 const char *ezlopi_else_str = "else";
 const char *ezlopi_hasGetter_str = "hasGetter";
@@ -146,6 +161,7 @@ const char *ezlopi_ready_str = "ready";
 const char *ezlopi_not_ready_str = "not ready";
 const char *ezlopi_settings_str = "settings";
 const char *ezlopi_valueType_str = "valueType";
+const char *ezlopi_valueTypeFamily_str = "valueTypeFamily";
 const char *ezlopi_metadata_str = "metadata";
 const char *ezlopi_meta_str = "meta";
 const char *ezlopi_code_str = "code";
@@ -157,6 +173,7 @@ const char *ezlopi_null_str = "null";
 const char *ezlopi_firmware_version_str = "firmware_version";
 const char *ezlopi_uptime_str = "uptime";
 const char *ezlopi_mac_str = "mac";
+const char *ezlopi_base___mac_str = "base.mac";
 const char *ezlopi_uuid_str = "uuid";
 const char *ezlopi_cloud_uuid_str = "cloud_uuid";
 const char *ezlopi_config_version_str = "config_version";
@@ -164,6 +181,7 @@ const char *ezlopi_firmware_type_str = "firmware_type";
 const char *ezlopi_deviceTypeId_str = "deviceTypeId";
 const char *ezlopi_parentDeviceId_str = "parentDeviceId";
 const char *ezlopi_category_str = "category";
+const char *ezlopi_categories_str = "categories";
 const char *ezlopi_subcategory_str = "subcategory";
 const char *ezlopi_gatewayId_str = "gatewayId";
 const char *ezlopi_batteryPowered_str = "batteryPowered";
@@ -188,7 +206,10 @@ const char *ezlopi_has_setter_str = "has_setter";
 const char *ezlopi_scale_str = "scale";
 const char *ezlopi_value_type_str = "value_type";
 const char *ezlopi_device_id_str = "device_id";
-const char *ezlopi_None_str = "None";
+const char *ezlopi_none_str = "none";
+const char *ezlopi_role_str = "role";
+const char *ezlopi_lifeSafety_str = "lifeSafety";
+
 const char *ezlopi_device_type_id_str = "device_type_id";
 const char *ezlopi_parent_device_id_str = "parent_device_id";
 const char *ezlopi_manufacturer_str = "manufacturer";
@@ -219,6 +240,7 @@ const char *ezlopi_deviceName_str = "deviceName";
 const char *ezlopi_dev_name_str = "dev_name";
 const char *ezlopi_items_str = "items";
 const char *ezlopi_itemName_str = "itemName";
+const char *ezlopi_itemNames_str = "itemNames";
 const char *ezlopi_device_item_names_str = "device_item_names";
 const char *ezlopi_variable_str = "variable";
 const char *ezlopi_names_str = "names";
@@ -261,6 +283,7 @@ const char *ezlopi_total_len_str = "total_len";
 const char *ezlopi_sequence_str = "sequence";
 const char *ezlopi_user_id_str = "user_id";
 const char *ezlopi_userId_str = "userId";
+const char *ezlopi_userIds_str = "userIds";
 const char *ezlopi_coinfig_time_str = "coinfig_time";
 const char *ezlopi_wifi_password_str = "wifi_password";
 const char *ezlopi_ca_cert_str = "ca_cert";
@@ -315,6 +338,7 @@ const char *ezlopi_is_active_str = "is_active";
 
 const char *ezlopi_armed_str = "armed";
 const char *ezlopi_subtype_str = "subtype";
+const char *ezlopi_timezone_str = "timezone";
 const char *ezlopi_location_str = "location";
 const char *ezlopi_locations_str = "locations";
 const char *ezlopi_custom_timezone_str = "customTimezone";
@@ -329,6 +353,14 @@ const char *ezlopi_timeIsLeftToAlarm_str = "timeIsLeftToAlarm";
 const char *ezlopi_switchToDelay_str = "switchToDelay";
 const char *ezlopi_alarmDelay_str = "alarmDelay";
 const char *ezlopi_entryDelay_str = "entryDelay";
+const char *ezlopi_pendingDelay_str = "pendingDelay";
+const char *ezlopi_phase_str = "phase";
+const char *ezlopi_bypass_str = "bypass";
+const char *ezlopi_main_str = "main";
+const char *ezlopi_done_str = "done";
+const char *ezlopi_begin_str = "begin";
+const char *ezlopi_canceled_str = "canceled";
+const char *ezlopi_changed_str = "changed";
 const char *ezlopi_normal_str = "normal";
 const char *ezlopi_long_extended_str = "longExtended";
 const char *ezlopi_extended_str = "extended";
@@ -339,11 +371,21 @@ const char *ezlopi_maximum_str = "normal";
 const char *ezlopi_modes_str = "modes";
 const char *ezlopi_disarmedDefault_str = "disarmedDefault";
 const char *ezlopi_disarmedDevices_str = "disarmedDevices";
+const char *ezlopi_alarmsOffDevice_str = "alarmsOffDevice";
 const char *ezlopi_alarmsOffDevices_str = "alarmsOffDevices";
 const char *ezlopi_camerasOffDevices_str = "camerasOffDevices";
 const char *ezlopi_bypassDevices_str = "bypassDevices";
 const char *ezlopi_protect_str = "protect";
 const char *ezlopi_devices_str = "devices";
+const char *ezlopi_deviceGroup_str = "deviceGroup";
+const char *ezlopi_deviceGroups_str = "deviceGroups";
+const char *ezlopi_deviceGroupIds_str = "deviceGroupIds";
+const char *ezlopi_deviceGroupId_str = "deviceGroupId";
+const char *ezlopi_itemGroup_str = "itemGroup";
+const char *ezlopi_itemGroupId_str = "itemGroupId";
+const char *ezlopi_showItems_str = "showItems";
+const char *ezlopi_deviceFlag_str = "deviceFlag";
+
 const char *ezlopi_alarms_str = "alarms";
 const char *ezlopi_cameras_str = "cameras";
 const char *ezlopi_protectButtons_str = "protectButtons";
@@ -358,6 +400,7 @@ const char *ezlopi_Away_str = "Away";
 const char *ezlopi_Night_str = "Night";
 const char *ezlopi_Vacation_str = "Vacation";
 const char *ezlopi_houseMode_str = "houseMode";
+const char *ezlopi_disarmedDevice_str = "disarmedDevice";
 
 const char *ezlopi_client_id_str = "client_id";
 
@@ -404,6 +447,138 @@ const char *ezlopi_chipset_str = "chipset";
 const char *ezlopi_internet_str = "internet";
 const char *ezlopi_local_key_str = "local_key";
 
+////////////////// otel keywords
+const char *ezlopi_values_str = "values";
+const char *ezlopi_arrayValue_str = "arrayValue";
+const char *ezlopi_stringValue_str = "stringValue";
+const char *ezlopi_doubleValue_str = "doubleValue";
+const char *ezlopi_boolValue_str = "boolValue";
+const char *ezlopi_key_str = "key";
+const char *ezlopI_service___name_str = "service.name";
+const char *ezlopi_attributes_str = "attributes";
+const char *ezlopi_resource_str = "resource";
+const char *ezlopi_resourceSpans_str = "resourceSpans";
+const char *ezlopi_scopeSpans_str = "scopeSpans";
+const char *ezlopi_scope_str = "scope";
+const char *ezlopi_spans_str = "spans";
+const char *ezlopi_kind_str = "kind";
+const char *ezlopi_endTimeUnixNano_str = "endTimeUnixNano";
+const char *ezlopi_startTimeUnixNano_str = "startTimeUnixNano";
+const char *ezlopi_parentSpanId_str = "parentSpanId";
+const char *ezlopi_spanId_str = "spanId";
+const char *ezlopi_traceId_str = "traceId";
+const char *ezlopi_startTime_str = "startTime";
+const char *ezlopi_endTime_str = "endTime";
+const char *ezlopi_logTime_str = "logTime";
+const char *ezlopi_severityNumber_str = "severityNumber";
+const char *ezlopi_severityText_str = "severityText";
+const char *ezlopi_TRACE_str = "TRACE";
+const char *ezlopi_DEBUG_str = "DEBUG";
+const char *ezlopi_INFO_str = "INFO";
+const char *ezlopi_WARN_str = "WARN";
+const char *ezlopi_ERROR_str = "ERROR";
+const char *ezlopi_fileName_str = "fileName";
+const char *ezlopi_lineNumber_str = "lineNumber";
+
+const char *ezlopi_fwTimestampMs_str = "fwTimestampMs";
+const char *ezlopi_followEntry_str = "followEntry";
+const char *ezlopi_packageId_str = "packageId";
+const char *ezlopi_favorites_str = "favorites";
+const char *ezlopi_exceptions_str = "exceptions";
+const char *ezlopi_silent_str = "silent";
+const char *ezlopi_empty_str = "empty";
+const char *ezlopi_switchToDelayRunsOut_str = "switchToDelayRunsOut";
+const char *ezlopi_interfaceId_str = "interfaceId";
+const char *ezlopi_wlan0_str = "wlan0";
+const char *ezlopi_process_str = "process";
+const char *ezlopi_networks_str = "networks";
+
+const char *ezlopi_latch_str = "latch";
+const char *ezlopi_for_str = "for";
+const char *ezlopi_repeat_str = "repeat";
+const char *ezlopi_follow_str = "follow";
+const char *ezlopi_pulse_str = "pulse";
+const char *ezlopi_state_str = "state";
+
+const char *ezlopi_connected_str = "connected";
+const char *ezlopi_disconnected_str = "disconnected";
+const char *ezlopi_notbetween_str = "notbetween";
+const char *ezlopi_any_result_str = "any_result";
+const char *ezlopi_scene_enabled_str = "scene_enabled";
+const char *ezlopi_scene_disabled_str = "scene_disabled";
+const char *ezlopi_operation_str = "operation";
+
+const char *ezlopi_sunrise_str = "sunrise";
+const char *ezlopi_sunset_str = "sunset";
+const char *ezlopi_weekdays_str = "weekdays";
+const char *ezlopi_days_str = "days";
+const char *ezlopi_weeks_str = "weeks";
+const char *ezlopi_range_str = "range";
+
+const char *ezlopi_startDay_str = "startDay";
+const char *ezlopi_startMonth_str = "startMonth";
+const char *ezlopi_startYear_str = "startYear";
+const char *ezlopi_endDay_str = "endDay";
+const char *ezlopi_endMonth_str = "endMonth";
+const char *ezlopi_endYear_str = "endYear";
+
+const char *ezlopi_hours_str = "hours";
+const char *ezlopi_minutes_str = "minutes";
+const char *ezlopi_seconds_str = "seconds";
+const char *ezlopi_at_str = "at";
+const char *ezlopi_after_str = "after";
+const char *ezlopi_before_str = "before";
+
+const char *ezlopi_day_str = "day";
+const char *ezlopi_month_str = "month";
+const char *ezlopi_year_str = "year";
+const char *ezlopi_intime_str = "intime";
+const char *ezlopi_time_str = "time";
+const char *ezlopi_times_str = "times";
+const char *ezlopi_timeScenes_str = "timeScenes";
+const char *ezlopi_httpAnswerCode_str = "httpAnswerCode";
+
+const char *ezlopi_less_str = "less";
+const char *ezlopi_least_str = "least";
+
+const char *ezlopi_start_str = "start";
+const char *ezlopi_finish_str = "finish";
+const char *ezlopi_blockMeta_str = "blockMeta";
+
+const char *ezlopi_sceneName_str = "sceneName";
+const char *ezlopi_methodName_str = "methodName";
+const char *ezlopi_executionDate_str = "executionDate";
+
+const char *ezlopi_when_category_time_str = "when_category_time";
+const char *ezlopi_when_category_modes_str = "when_category_modes";
+const char *ezlopi_when_category_logic_str = "when_category_logic";
+const char *ezlopi_when_category_function_str = "when_category_function";
+
+const char *ezlopi_log_str = "log";
+const char *ezlopi_request_str = "request";
+const char *ezlopi_resourceLogs_str = "resourceLogs";
+const char *ezlopi_scopeLogs_str = "scopeLogs";
+const char *ezlopi_logRecords_str = "logRecords";
+const char *ezlopi_timeUnixNano_str = "timeUnixNano";
+const char *ezlopi_observedTimeUnixNano_str = "observedTimeUnixNano";
+const char *ezlopi_body_str = "body";
+const char *ezlopi_otel_c_str = "otel-c";
+const char *ezlopi_trace_str = "trace";
+const char *ezlopi_otel_version_str = "1.0.0";
+const char *ezlopi_timeOffset_str = "timeOffset";
+const char *ezlopi_register_str = "register";
+const char *ezlopi_media_str = "media";
+const char *ezlopi_radio_str = "radio";
+const char *ezlopi_hubType_str = "hubType";
+const char *ezlopi_controller_uuid_str = "controller_uuid";
+const char *ezlopi_mac_address_str = "mac_address";
+const char *ezlopi_maxFrameSize_str = "maxFrameSize";
+
+const char *ezlopi_uart_str = "uart";
+const char *ezlopi_bluetooth_str = "bluetooth";
+const char *ezlopi_websocket_server_str = "websocket.server";
+const char *ezlopi_websocket_client_str = "websocket.client";
+
 /*******************************************************************************
  *                          Extern Function Definitions
  *******************************************************************************/
@@ -411,7 +586,7 @@ const char *ezlopi_local_key_str = "local_key";
 /*******************************************************************************
  *                          Static Function Definitions
  *******************************************************************************/
-
+#endif // __EZLOPI_CLOUD_KEYWORDS_H__
 /*******************************************************************************
  *                          End of File
  *******************************************************************************/

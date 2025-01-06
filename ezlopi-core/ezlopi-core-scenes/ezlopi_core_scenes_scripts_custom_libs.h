@@ -28,17 +28,13 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_core_scenes_scripts_custom_libs.h
+ * @brief   MACROs for lua-scripts
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    12th DEC 2024
  */
-
-// #ifndef __HEADER_H__
-// #define __HEADER_H__
 
 /*******************************************************************************
  *                          Include Files
@@ -68,8 +64,6 @@ extern "C"
 #ifdef __cplusplus
 }
 #endif
-
-// #endif // __HEADER_H__
 
 /*******************************************************************************
  *                          End of File

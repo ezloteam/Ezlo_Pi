@@ -28,17 +28,20 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_core_mdns.h
+ * @brief   Function to operate on mdns service
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    12th DEC 2024
  */
 
 #ifndef __EZLOPI_CORE_MDNS_H_
 #define __EZLOPI_CORE_MDNS_H_
+
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 
 #include "../../build/config/sdkconfig.h"
 
@@ -62,14 +65,14 @@ extern "C"
     /*******************************************************************************
      *                          Type & Macro Declarations
      *******************************************************************************/
-    #define EZPI_MDNS_HOSTNAME_SIZE  100
-    #define EZPI_MDNS_CONTEX_COUNT 2
-    #define EZPI_MDNS_SERIAL_SIZE 10
+#define EZPI_MDNS_HOSTNAME_SIZE 100
+#define EZPI_MDNS_CONTEX_COUNT 2
+#define EZPI_MDNS_SERIAL_SIZE 10
 
     typedef struct l_ezlopi_mdns_context
     {
-        mdns_txt_item_t* mdns_context;
-        struct l_ezlopi_mdns_context* next;
+        mdns_txt_item_t *mdns_context;
+        struct l_ezlopi_mdns_context *next;
     } l_ezlopi_mdns_context_t;
 
     /*******************************************************************************
@@ -80,16 +83,11 @@ extern "C"
      *                          Extern Function Prototypes
      *******************************************************************************/
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
+     * @brief Function to initialize mdns service
      *
+     * @return ezlopi_error_t
      */
-    ezlopi_error_t EZPI_core_init_mdns();
+    ezlopi_error_t EZPI_init_mdns();
 
 #ifdef __cplusplus
 }

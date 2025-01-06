@@ -28,18 +28,19 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
+ * @file    main.h
  * @brief   perform some function on data
- * @author  John Doe
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    12th DEC 2024
  */
-
 #ifndef _EZLOPI_CORE_BLE_GAP_H_
 #define _EZLOPI_CORE_BLE_GAP_H_
 
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_BLE_ENABLE
@@ -69,23 +70,44 @@ extern "C"
     /*******************************************************************************
      *                          Extern Function Prototypes
      *******************************************************************************/
+
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
+     * @brief This function configures ble advertisement
+     */
+    void EZPI_core_ble_setup_adv_config(void);
+    /**
+     * @brief This funcion sets security passkey value
+     *
+     * @param passkey Key value
+     */
+    void EZPI_core_ble_gap_set_passkey(uint32_t passkey);
+    /**
+     * @brief This function dissociates the ble-device
      *
      */
-    void ezlopi_ble_setup_adv_config(void);
-    void ezlopi_ble_gap_set_passkey(uint32_t passkey);
-    void ezlopi_ble_gap_dissociate_bonded_devices(void);
-    void ezlopi_ble_gap_config_adv_data(void);
-    void ezlopi_ble_gap_config_scan_rsp_data(void);
-    void ezlopi_ble_gap_start_advertising(void);
-    void ezlopi_ble_gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t* param);
+    void EZPI_core_ble_gap_dissociate_bonded_devices(void);
+    /**
+     * @brief This function configures advertisement data
+     *
+     */
+    void EZPI_core_ble_gap_config_adv_data(void);
+    /**
+     * @brief This function configures scan properties of rsp_data
+     *
+     */
+    void EZPI_core_ble_gap_config_scan_rsp_data(void);
+    /**
+     * @brief This function start ble advertisement operation
+     *
+     */
+    void EZPI_core_ble_gap_start_advertising(void);
+    /**
+     * @brief This function handles ble-gap events
+     *
+     * @param event ble-gap event information
+     * @param param Pointer to ble-gap-params
+     */
+    void EZPI_core_ble_gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t *param);
 
 #ifdef __cplusplus
 }

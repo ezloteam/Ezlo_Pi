@@ -28,26 +28,22 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    sensor_0021_UART_MB1013.c
+ * @brief   perform some function on sensor_0021
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    xx
  */
 
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
-#include "ezlopi_util_trace.h"
 
-// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
-#include "ezlopi_core_errors.h"
 
 #include "ezlopi_hal_uart.h"
 
@@ -77,14 +73,14 @@ typedef struct s_mb1013_args
 /*******************************************************************************
  *                          Static Function Prototypes
  *******************************************************************************/
-static ezlopi_error_t __prepare(void *arg);
-static ezlopi_error_t __init(l_ezlopi_item_t *item);
-static ezlopi_error_t __notify(l_ezlopi_item_t *item);
-static ezlopi_error_t __get_value_cjson(l_ezlopi_item_t *item, void *arg);
 
 /*******************************************************************************
  *                          Static Data Definitions
  *******************************************************************************/
+static ezlopi_error_t __prepare(void *arg);
+static ezlopi_error_t __init(l_ezlopi_item_t *item);
+static ezlopi_error_t __notify(l_ezlopi_item_t *item);
+static ezlopi_error_t __get_value_cjson(l_ezlopi_item_t *item, void *arg);
 
 /*******************************************************************************
  *                          Extern Data Definitions
@@ -94,12 +90,7 @@ static ezlopi_error_t __get_value_cjson(l_ezlopi_item_t *item, void *arg);
  *                          Extern Function Definitions
  *******************************************************************************/
 
-/**
- * @brief Global/extern function template example
- * Convention : Use capital letter for initial word on extern function
- * @param arg
- */
-ezlopi_error_t sensor_0021_UART_MB1013(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+ezlopi_error_t SENSOR_0021_uart_mb1013(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
 
@@ -137,8 +128,9 @@ ezlopi_error_t sensor_0021_UART_MB1013(e_ezlopi_actions_t action, l_ezlopi_item_
 }
 
 /*******************************************************************************
- *                          Static Function Definitions
+ *                         Static Function Definitions
  *******************************************************************************/
+
 static ezlopi_error_t __get_value_cjson(l_ezlopi_item_t *item, void *arg)
 {
     ezlopi_error_t ret = EZPI_FAILED;
@@ -148,7 +140,7 @@ static ezlopi_error_t __get_value_cjson(l_ezlopi_item_t *item, void *arg)
         if (mb1013_args)
         {
             cJSON *cj_result = (cJSON *)arg;
-            ezlopi_valueformatter_float_to_cjson(cj_result, mb1013_args->current_value, scales_meter);
+            EZPI_core_valueformatter_float_to_cjson(cj_result, mb1013_args->current_value, scales_meter);
             ret = EZPI_SUCCESS;
         }
     }
@@ -193,8 +185,8 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
         {
             if (GPIO_IS_VALID_GPIO(item->interface.uart.tx) && GPIO_IS_VALID_GPIO(item->interface.uart.rx))
             {
-                s_ezlopi_uart_object_handle_t ezlopi_uart_object_handle = ezlopi_uart_init(item->interface.uart.baudrate, item->interface.uart.tx, item->interface.uart.rx, __uart_data_upcall, item);
-                item->interface.uart.channel = ezlopi_uart_get_channel(ezlopi_uart_object_handle);
+                s_ezlopi_uart_object_handle_t ezlopi_uart_object_handle = EZPI_hal_uart_init(item->interface.uart.baudrate, item->interface.uart.tx, item->interface.uart.rx, __uart_data_upcall, item);
+                item->interface.uart.channel = EZPI_hal_uart_get_channel(ezlopi_uart_object_handle);
                 ret = EZPI_SUCCESS;
             }
         }
@@ -219,7 +211,7 @@ static void __setup_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_devic
     item->cloud_properties.item_name = ezlopi_item_name_distance;
     item->cloud_properties.value_type = value_type_length;
     item->cloud_properties.scale = scales_centi_meter;
-    item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
+    item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
 }
 
 static void __setup_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj_device)
@@ -239,11 +231,11 @@ static ezlopi_error_t __prepare(void *arg)
         cJSON *cjson_device = prep_arg->cjson_device;
         if (cjson_device)
         {
-            l_ezlopi_device_t *device = ezlopi_device_add_device(prep_arg->cjson_device, NULL);
+            l_ezlopi_device_t *device = EZPI_core_device_add_device(prep_arg->cjson_device, NULL);
             if (device)
             {
                 __setup_device_cloud_properties(device, cjson_device);
-                l_ezlopi_item_t *item = ezlopi_device_add_item_to_device(device, sensor_0021_UART_MB1013);
+                l_ezlopi_item_t *item = EZPI_core_device_add_item_to_device(device, SENSOR_0021_uart_mb1013);
                 if (item)
                 {
                     __setup_item_cloud_properties(item, cjson_device);
@@ -261,7 +253,7 @@ static ezlopi_error_t __prepare(void *arg)
                 }
                 else
                 {
-                    ezlopi_device_free_device(device);
+                    EZPI_core_device_free_device(device);
                 }
             }
         }
@@ -280,7 +272,7 @@ static ezlopi_error_t __notify(l_ezlopi_item_t *item)
         {
             if (abs(mb1013_args->current_value - mb1013_args->previous_value) > 0.2) // accuracy of 0.5cm (i.e. 5mm)
             {
-                ezlopi_device_value_updated_from_device_broadcast(item);
+                EZPI_core_device_value_updated_from_device_broadcast(item);
                 mb1013_args->previous_value = mb1013_args->current_value;
                 ret = EZPI_SUCCESS;
             }

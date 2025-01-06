@@ -28,13 +28,12 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_core_broadcast.h
+ * @brief   Function to perform broadcast operations
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    12th DEC 2024
  */
 
 #ifndef __EZLOPI_CORE_EZLOPI_BROADCAST_H__
@@ -43,6 +42,7 @@
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
+
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
@@ -62,16 +62,37 @@ extern "C"
     /*******************************************************************************
      *                          Type & Macro Declarations
      *******************************************************************************/
-    typedef ezlopi_error_t (*f_broadcast_method_t)(char* data);
+
+    typedef ezlopi_error_t (*f_broadcast_method_t)(char *data);
 
     typedef struct l_broadcast_method
     {
         char method_name[32];
         uint32_t fail_retry;
         f_broadcast_method_t func;
-        struct l_broadcast_method* next;
+        struct l_broadcast_method *next;
 
     } l_broadcast_method_t;
+
+    typedef enum e_broadcast_source
+    {
+        E_BROADCAST_SOURCE_NONE = 0,
+        E_BROADCAST_SOURCE_UART,
+        E_BROADCAST_SOURCE_WSS_SERVER,
+        E_BROADCAST_SOURCE_WSS_CLIENT,
+        E_BROADCAST_SOURCE_BLE,
+        E_BROADCAST_SOURCE_MAX
+    } e_broadcast_source_t;
+
+    typedef struct s_broadcast_struct
+    {
+        time_t time_stamp;
+        uint32_t tick_count;
+        cJSON *cj_broadcast_data;
+        e_broadcast_source_t source;
+    } s_broadcast_struct_t;
+
+    typedef ezlopi_error_t (*f_broadcast_queue_func_t)(s_broadcast_struct_t *broadcast_data);
 
     /*******************************************************************************
      *                          Extern Data Declarations
@@ -80,24 +101,46 @@ extern "C"
     /*******************************************************************************
      *                          Extern Function Prototypes
      *******************************************************************************/
+    // int EZPI_core_broadcast_log_cjson(cJSON *cj_log_data);
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
+     * @brief Funtion to broadcast message from cjson
      *
+     * @param cj_data Pointer to data to be added into queue
+     * @return ezlopi_error_t
      */
-    ezlopi_error_t ezlopi_core_broadcast_cjson(cJSON* cj_data);
-    ezlopi_error_t ezlopi_core_broadcast_add_to_queue(cJSON* cj_data);
-    void ezlopi_core_broadcast_remove_method(f_broadcast_method_t broadcast_method);
+    ezlopi_error_t EZPI_core_broadcast_cjson(cJSON *cj_data);
+    /**
+     * @brief Function to add broadcast message to queue
+     *
+     * @param cj_data Pointer to data to be added into queue
+     * @return ezlopi_error_t
+     */
+    ezlopi_error_t EZPI_core_broadcast_add_to_queue(cJSON *cj_data, time_t time_stamp);
+    /**
+     * @brief Funtion to remove broadcast method from ll
+     *
+     * @param broadcast_method Target broadcast-method
+     */
+    void EZPI_core_broadcast_remove_method(f_broadcast_method_t broadcast_method);
+    /**
+     * @brief Function to set broadcast method into queue
+     *
+     * @param func Target method to add into queue
+     */
+    // void EZPI_core_broadcast_methods_set_queue(ezlopi_error_t (*func)(cJSON *));
 
-    void ezlopi_core_broadcast_methods_set_queue(ezlopi_error_t (*func)(cJSON*));
-    l_broadcast_method_t* ezlopi_core_broadcast_method_add(f_broadcast_method_t broadcast_method, char* method_name, uint32_t retries);
+    void EZPI_core_broadcast_methods_set_queue(f_broadcast_queue_func_t queue_func);
+    /**
+     * @brief Function to add broadcast method
+     *
+     * @param broadcast_method broadcast method to add
+     * @param method_name New Method name
+     * @param retries No of max retires to add into queue
+     * @return l_broadcast_method_t*
+     */
+    l_broadcast_method_t *EZPI_core_broadcast_method_add(f_broadcast_method_t broadcast_method, char *method_name, uint32_t retries);
 
-    int ezlopi_core_broadcast_log_cjson(cJSON* cj_log_data);
+    const char *EZPI_core_brodcast_source_to_name(e_broadcast_source_t source);
 
 #ifdef __cplusplus
 }

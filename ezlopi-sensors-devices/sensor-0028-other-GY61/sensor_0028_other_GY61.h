@@ -28,21 +28,20 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    sensor_0028_other_GY61.h
+ * @brief   perform some function on sensor_0028
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    xx
  */
-
 #ifndef _SENSOR_0028_OTHER_GY61_H_
 #define _SENSOR_0028_OTHER_GY61_H_
 
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
+
 #include "ezlopi_core_actions.h"
 #include "ezlopi_core_devices.h"
 #include "ezlopi_core_errors.h"
@@ -59,7 +58,7 @@ extern "C"
      *                          Type & Macro Declarations
      *******************************************************************************/
     // 1g = 9.80665 m/s^2
-    #define GY61_STANDARD_G_TO_ACCEL_CONVERSION_VALUE 9.80665f
+#define GY61_STANDARD_G_TO_ACCEL_CONVERSION_VALUE 9.80665f
 
     /*******************************************************************************
      *                          Extern Data Declarations
@@ -68,17 +67,17 @@ extern "C"
     /*******************************************************************************
      *                          Extern Function Prototypes
      *******************************************************************************/
+
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
+     * @brief Function to operate on actions
      *
+     * @param action Current Action to Operate on
+     * @param item Target-Item node
+     * @param arg Arg for action
+     * @param user_arg User-arg
+     * @return ezlopi_error_t
      */
-    ezlopi_error_t sensor_0028_other_GY61(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
+    ezlopi_error_t SENSOR_0028_other_gy61(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
 #ifdef __cplusplus
 }

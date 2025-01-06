@@ -28,23 +28,20 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_core_device_value_updated.h
+ * @brief   Function to trigger sensor-data broadcasts
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    12th DEC 2024
  */
-
 #ifndef _EZLOPI_CORE_DEVICE_VALUE_UPDATED_H_
 #define _EZLOPI_CORE_DEVICE_VALUE_UPDATED_H_
-
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
+
 #include "ezlopi_core_devices_list.h"
-#include "ezlopi_core_errors.h"
 
 /*******************************************************************************
  *                          C++ Declaration Wrapper
@@ -66,27 +63,40 @@ extern "C"
      *                          Extern Function Prototypes
      *******************************************************************************/
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
+     * @brief function to broadcast updated sensor data for perticular item node
      *
+     * @param item  Target item-node
+     * @return ezlopi_error_t
      */
-    ezlopi_error_t ezlopi_device_value_updated_from_device_broadcast(l_ezlopi_item_t* item);
-    ezlopi_error_t ezlopi_device_value_updated_from_device_broadcast_by_item_id(uint32_t item_id);
-    ezlopi_error_t ezlopi_core_device_value_updated_settings_broadcast(l_ezlopi_device_settings_v3_t* setting);
+    ezlopi_error_t EZPI_core_device_value_updated_from_device_broadcast(l_ezlopi_item_t *item);
+    /**
+     * @brief function to broadcast updated sensor data for perticular item_id
+     *
+     * @param item_id target item_id
+     * @return ezlopi_error_t
+     */
+    ezlopi_error_t EZPI_core_device_value_updated_from_device_broadcast_by_item_id(uint32_t item_id);
+    /**
+     * @brief function to broadcast updated setting data for perticular setting-node
+     *
+     * @param setting Target setting node
+     * @return ezlopi_error_t
+     */
+    ezlopi_error_t EZPI_core_device_value_updated_settings_broadcast(l_ezlopi_device_settings_v3_t *setting);
     // int ezlopi_setting_value_updated_from_device_settings_id_v3(uint32_t setting_id);
-    ezlopi_error_t ezlopi_core_device_value_update_wifi_scan_broadcast(cJSON* network_array);
+    /**
+     * @brief function to broadcast wifi scanned data
+     *
+     * @param network_array Network Data to be broadcast
+     * @return ezlopi_error_t
+     */
+    ezlopi_error_t EZPI_core_device_value_update_wifi_scan_broadcast(cJSON *network_array);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif // _EZLOPI_CORE_DEVICE_VALUE_UPDATED_H_
-
 /*******************************************************************************
  *                          End of File
  *******************************************************************************/

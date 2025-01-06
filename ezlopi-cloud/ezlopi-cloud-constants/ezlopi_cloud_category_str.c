@@ -64,6 +64,8 @@
 /*******************************************************************************
  *                          Extern Data Definitions
  *******************************************************************************/
+#ifndef __EZLOPI_CATEGORY_H__
+#define __EZLOPI_CATEGORY_H__
 /// @brief https://api.ezlo.com/devices/categories/index.html
 const char *category_not_defined = "";
 const char *category_interface = "interface";
@@ -112,6 +114,7 @@ const char *category_level_sensor = "level_sensor";
  *                          Static Function Definitions
  *******************************************************************************/
 
+#endif //__EZLOPI_CATEGORY_H__
 /*******************************************************************************
  *                          End of File
  *******************************************************************************/

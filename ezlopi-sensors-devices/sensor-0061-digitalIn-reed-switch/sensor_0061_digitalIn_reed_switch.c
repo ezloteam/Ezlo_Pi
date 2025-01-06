@@ -28,26 +28,21 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    sensor_0061_digitalIn_reed_switch.c
+ * @brief   perform some function on sensor_0061
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    xx
  */
 
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
-#include "ezlopi_util_trace.h"
-
-// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
-#include "ezlopi_core_errors.h"
 
 #include "ezlopi_hal_gpio.h"
 
@@ -80,15 +75,9 @@ static ezlopi_error_t __0061_get_cjson_value(l_ezlopi_item_t *item, void *arg);
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
 static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device);
 static void _0061_update_from_device(void *arg);
-
 /*******************************************************************************
  *                          Static Data Definitions
  *******************************************************************************/
-const char *reed_door_window_states[] = {
-    "dw_is_opened",
-    "dw_is_closed",
-    "unknown",
-};
 
 /*******************************************************************************
  *                          Extern Data Definitions
@@ -97,13 +86,7 @@ const char *reed_door_window_states[] = {
 /*******************************************************************************
  *                          Extern Function Definitions
  *******************************************************************************/
-
-/**
- * @brief Global/extern function template example
- * Convention : Use capital letter for initial word on extern function
- * @param arg
- */
-ezlopi_error_t sensor_0061_digitalIn_reed_switch(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+ezlopi_error_t SENSOR_0061_digitalIn_reed_switch(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
     switch (action)
@@ -137,8 +120,9 @@ ezlopi_error_t sensor_0061_digitalIn_reed_switch(e_ezlopi_actions_t action, l_ez
 }
 
 /*******************************************************************************
- *                          Static Function Definitions
+ *                         Static Function Definitions
  *******************************************************************************/
+
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     device->cloud_properties.category = category_security_sensor;
@@ -156,7 +140,7 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_dev
     item->cloud_properties.item_name = ezlopi_item_name_dw_state;
     item->cloud_properties.value_type = value_type_token;
     item->cloud_properties.scale = NULL;
-    item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
+    item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
 
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
     CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_str, item->interface.gpio.gpio_in.gpio_num);
@@ -177,11 +161,11 @@ static ezlopi_error_t __0061_prepare(void *arg)
         s_ezlopi_prep_arg_t *device_prep_arg = (s_ezlopi_prep_arg_t *)arg;
         if (device_prep_arg && (NULL != device_prep_arg->cjson_device))
         {
-            l_ezlopi_device_t *reed_device = ezlopi_device_add_device(device_prep_arg->cjson_device, NULL);
+            l_ezlopi_device_t *reed_device = EZPI_core_device_add_device(device_prep_arg->cjson_device, NULL);
             if (reed_device)
             {
                 __prepare_device_cloud_properties(reed_device, device_prep_arg->cjson_device);
-                l_ezlopi_item_t *reed_item = ezlopi_device_add_item_to_device(reed_device, sensor_0061_digitalIn_reed_switch);
+                l_ezlopi_item_t *reed_item = EZPI_core_device_add_item_to_device(reed_device, SENSOR_0061_digitalIn_reed_switch);
                 if (reed_item)
                 {
                     __prepare_item_cloud_properties(reed_item, device_prep_arg->cjson_device);
@@ -189,7 +173,7 @@ static ezlopi_error_t __0061_prepare(void *arg)
                 }
                 else
                 {
-                    ezlopi_device_free_device(reed_device);
+                    EZPI_core_device_free_device(reed_device);
                 }
             }
         }
@@ -221,7 +205,7 @@ static ezlopi_error_t __0061_init(l_ezlopi_item_t *item)
             if (ESP_OK == gpio_config(&input_conf))
             {
                 item->interface.gpio.gpio_in.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
-                ezlopi_service_gpioisr_register_v3(item, _0061_update_from_device, 200);
+                EZPI_service_gpioisr_register_v3(item, _0061_update_from_device, 200);
                 ret = EZPI_SUCCESS;
             }
         }
@@ -241,6 +225,11 @@ static ezlopi_error_t __0061_get_item(l_ezlopi_item_t *item, void *arg)
             cJSON *json_array_enum = cJSON_CreateArray(__FUNCTION__);
             if (NULL != json_array_enum)
             {
+                char *reed_door_window_states[] = {
+                    "dw_is_opened",
+                    "dw_is_closed",
+                    "unknown",
+                };
                 for (uint8_t i = 0; i < REED_DOOR_WINDOW_MAX; i++)
                 {
                     cJSON *json_value = cJSON_CreateString(__FUNCTION__, reed_door_window_states[i]);
@@ -253,8 +242,8 @@ static ezlopi_error_t __0061_get_item(l_ezlopi_item_t *item, void *arg)
             }
             //--------------------------------------------------------------------------------------
 
-            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, (char *)item->user_arg ? item->user_arg : reed_door_window_states[1]);
-            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, (char *)item->user_arg ? item->user_arg : reed_door_window_states[1]);
+            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, (char *)item->user_arg ? item->user_arg : "dw_is_closed");
+            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, (char *)item->user_arg ? item->user_arg : "dw_is_closed");
             ret = EZPI_SUCCESS;
         }
     }
@@ -269,8 +258,8 @@ static ezlopi_error_t __0061_get_cjson_value(l_ezlopi_item_t *item, void *arg)
         cJSON *cj_result = (cJSON *)arg;
         if (cj_result)
         {
-            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, (char *)item->user_arg ? item->user_arg : reed_door_window_states[1]);
-            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, (char *)item->user_arg ? item->user_arg : reed_door_window_states[1]);
+            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, (char *)item->user_arg ? item->user_arg : "dw_is_closed");
+            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, (char *)item->user_arg ? item->user_arg : "dw_is_closed");
             ret = EZPI_SUCCESS;
         }
     }
@@ -282,30 +271,29 @@ static void _0061_update_from_device(void *arg)
     l_ezlopi_item_t *item = (l_ezlopi_item_t *)arg;
     if (item)
     {
-        const char *curret_value = NULL;
+        char *curret_value = NULL;
         item->interface.gpio.gpio_in.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
 
         item->interface.gpio.gpio_in.value = (false == item->interface.gpio.gpio_in.invert)
-            ? (item->interface.gpio.gpio_in.value)
-            : (!item->interface.gpio.gpio_in.value);
+                                                 ? (item->interface.gpio.gpio_in.value)
+                                                 : (!item->interface.gpio.gpio_in.value);
 
         if (0 == (item->interface.gpio.gpio_in.value)) // when D0 -> 0V,
         {
-            curret_value = reed_door_window_states[0];
+            curret_value = "dw_is_opened";
         }
         else
         {
-            curret_value = reed_door_window_states[1];
+            curret_value = "dw_is_closed";
         }
 
         if (curret_value != (char *)item->user_arg) // calls update only if there is change in state
         {
             item->user_arg = (void *)curret_value;
-            ezlopi_device_value_updated_from_device_broadcast(item);
+            EZPI_core_device_value_updated_from_device_broadcast(item);
         }
     }
 }
-
 /*******************************************************************************
  *                          End of File
  *******************************************************************************/

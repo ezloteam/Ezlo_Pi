@@ -1,5 +1,6 @@
+
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2022 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -30,11 +31,11 @@
 */
 
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
- * @version 0.1
- * @date    1st January 2024
+ * @file    ezlopi_cloud_setting_commands.c
+ * @brief
+ * @author
+ * @version
+ * @date
  */
 
 /*******************************************************************************
@@ -74,13 +75,7 @@
 /*******************************************************************************
  *                          Extern Function Definitions
  *******************************************************************************/
-
-/**
- * @brief Global/extern function template example
- * Convention : Use capital letter for initial word on extern function
- * @param arg
- */
-void setting_value_set(cJSON *cj_request, cJSON *cj_response)
+void EZPI_setting_value_set(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     if (cj_result)
@@ -88,31 +83,31 @@ void setting_value_set(cJSON *cj_request, cJSON *cj_response)
         cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
         if (cj_params)
         {
-            ezlopi_core_setting_commands_process(cj_params);
+            EZPI_core_setting_commands_process(cj_params);
         }
     }
 }
 
-void settings_list(cJSON *cj_request, cJSON *cj_response)
+void EZPI_settings_list(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     if (cj_result)
     {
-        ezlopi_core_setting_commands_populate_settings(cj_result);
+        EZPI_core_setting_commands_populate_settings(cj_result);
     }
 }
 
-void setting_value_set_broadcast_updater(cJSON *cj_request, cJSON *cj_response)
+void EZPI_setting_value_set_broadcast_updater(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
-    cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, "hub.setting.updated");
+    cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, method_hub_setting_updated);
     cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     if (cj_result)
     {
         cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
         if (cj_params)
         {
-            ezlopi_core_setting_updated_broadcast(cj_params, cj_result);
+            EZPI_core_setting_updated_broadcast(cj_params, cj_result);
         }
     }
 }

@@ -1,7 +1,7 @@
 file( GLOB_RECURSE src_files "*.c*" )
 
-set(ESP_IDF_COMPONENTS
-        bt
+set(ESP_IDF_COMPONENTS 
+        bt        
 )
 set(EZLOPI_COMPONENTS
         ezlopi-util-trace

@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2022 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -30,26 +30,26 @@
 */
 
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
- * @version 0.1
- * @date    1st January 2024
+ * @file    ezlopi_cloud_gateway.c
+ * @brief
+ * @author
+ * @version
+ * @date
  */
-
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
 #include <string.h>
 
 #include "ezlopi_util_trace.h"
+
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_gateway.h"
+
 #include "ezlopi_cloud_constants.h"
-
 #include "ezlopi_cloud_gateways.h"
-#include "gateways_commands_str.h"
 
+#include "gateways_commands_str.h"
 /*******************************************************************************
  *                          Extern Data Declarations
  *******************************************************************************/
@@ -77,13 +77,7 @@
 /*******************************************************************************
  *                          Extern Function Definitions
  *******************************************************************************/
-
-/**
- * @brief Global/extern function template example
- * Convention : Use capital letter for initial word on extern function
- * @param arg
- */
-void gateways_list(cJSON *cj_request, cJSON *cj_response)
+void EZPI_gateways_list(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON *cjson_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     if (cjson_result)
@@ -95,7 +89,7 @@ void gateways_list(cJSON *cj_request, cJSON *cj_response)
             cJSON *cjson_gateway = cJSON_CreateObject(__FUNCTION__);
             if (cjson_gateway)
             {
-                s_ezlopi_gateway_t *gateway_prop = ezlopi_gateway_get();
+                s_ezlopi_gateway_t *gateway_prop = EZPI_core_gateway_get();
                 if (gateway_prop)
                 {
                     char tmp_buffer[32];
@@ -131,10 +125,6 @@ void gateways_list(cJSON *cj_request, cJSON *cj_response)
         }
     }
 }
-
-/*******************************************************************************
- *                          Static Function Definitions
- *******************************************************************************/
 
 /*******************************************************************************
  *                          End of File

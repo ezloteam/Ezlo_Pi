@@ -28,13 +28,12 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_core_scenes_status_changed.h
+ * @brief   Function to broadcast scene_status info
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    12th DEC 2024
  */
 
 #ifndef _EZLOPI_CORE_SCENES_STATUS_CHANGED_H_
@@ -67,23 +66,26 @@ extern "C"
      *                          Extern Function Prototypes
      *******************************************************************************/
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
+     * @brief This function returns 'scene_status' in string literal
      *
+     * @param scene_status
+     * @return const char*
      */
-    const char* ezlopi_scenes_status_to_string(e_scene_status_v2_t scene_status);
-    int ezlopi_scenes_status_change_broadcast(l_scenes_list_v2_t* scene_node, const char* status_str);
+    const char *EZPI_core_scenes_status_to_string(e_scene_status_v2_t scene_status);
+    /**
+     * @brief This funtion broadcast changes to 'scene_status' of a scene
+     *
+     * @param scene_node Target scene_node
+     * @param status_str The status to broadcast
+     * @return int
+     */
+    int EZPI_core_scenes_status_change_broadcast(l_scenes_list_v2_t *scene_node, const char *status_str, time_t time_stamp);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+#endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 #endif // _EZLOPI_CORE_SCENES_STATUS_CHANGED_H_
 

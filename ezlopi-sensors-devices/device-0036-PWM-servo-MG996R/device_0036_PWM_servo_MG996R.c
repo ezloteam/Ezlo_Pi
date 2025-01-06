@@ -28,26 +28,22 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    device_0036_PWM_servo_MG996R.c
+ * @brief   perform some function on device_0036
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    xx
  */
 
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
-#include "ezlopi_util_trace.h"
 
-// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
-#include "ezlopi_core_errors.h"
 
 #include "ezlopi_hal_pwm.h"
 
@@ -76,10 +72,8 @@ static ezlopi_error_t __prepare(void *arg);
 static ezlopi_error_t __init(l_ezlopi_item_t *item);
 static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg);
 static ezlopi_error_t __set_cjson_value(l_ezlopi_item_t *item, void *arg);
-
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
 static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device);
-
 /*******************************************************************************
  *                          Static Data Definitions
  *******************************************************************************/
@@ -92,12 +86,7 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_dev
  *                          Extern Function Definitions
  *******************************************************************************/
 
-/**
- * @brief Global/extern function template example
- * Convention : Use capital letter for initial word on extern function
- * @param arg
- */
-ezlopi_error_t device_0036_PWM_servo_MG996R(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+ezlopi_error_t DEVICE_0036_pwm_servo_mg996r(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
 
@@ -131,8 +120,9 @@ ezlopi_error_t device_0036_PWM_servo_MG996R(e_ezlopi_actions_t action, l_ezlopi_
 }
 
 /*******************************************************************************
- *                          Static Function Definitions
+ *                         Static Function Definitions
  *******************************************************************************/
+
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     device->cloud_properties.category = category_dimmable_light;
@@ -151,7 +141,7 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_dev
     item->cloud_properties.show = true;
     item->cloud_properties.scale = NULL;
     item->cloud_properties.value_type = value_type_int;
-    item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
+    item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
 
     CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_str, item->interface.pwm.gpio_num);
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_duty_cycle_str, item->interface.pwm.duty_cycle);
@@ -165,31 +155,27 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_dev
 
 static ezlopi_error_t __prepare(void *arg)
 {
-    ezlopi_error_t ret = EZPI_SUCCESS;
+    ezlopi_error_t ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
 
     s_ezlopi_prep_arg_t *dev_prep_arg = (s_ezlopi_prep_arg_t *)arg;
     if (dev_prep_arg->cjson_device)
     {
         cJSON *cj_device = dev_prep_arg->cjson_device;
 
-        l_ezlopi_device_t *servo_device = ezlopi_device_add_device(dev_prep_arg->cjson_device, NULL);
+        l_ezlopi_device_t *servo_device = EZPI_core_device_add_device(dev_prep_arg->cjson_device, NULL);
         if (servo_device)
         {
             __prepare_device_cloud_properties(servo_device, cj_device);
-            l_ezlopi_item_t *servo_item = ezlopi_device_add_item_to_device(servo_device, device_0036_PWM_servo_MG996R);
+            l_ezlopi_item_t *servo_item = EZPI_core_device_add_item_to_device(servo_device, DEVICE_0036_pwm_servo_mg996r);
             if (servo_item)
             {
                 __prepare_item_cloud_properties(servo_item, cj_device);
+                ret = EZPI_SUCCESS;
             }
             else
             {
-                ezlopi_device_free_device(servo_device);
-                ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
+                EZPI_core_device_free_device(servo_device);
             }
-        }
-        else
-        {
-            ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
         }
     }
     return ret;
@@ -197,27 +183,20 @@ static ezlopi_error_t __prepare(void *arg)
 
 static ezlopi_error_t __init(l_ezlopi_item_t *item)
 {
-    ezlopi_error_t ret = EZPI_SUCCESS;
+    ezlopi_error_t ret = EZPI_ERR_INIT_DEVICE_FAILED;
     if (item)
     {
         if (GPIO_IS_VALID_GPIO(item->interface.pwm.gpio_num))
         {
             static s_ezlopi_channel_speed_t *servo_item = NULL;
-            servo_item = ezlopi_pwm_init(item->interface.pwm.gpio_num, item->interface.pwm.pwm_resln,
-                item->interface.pwm.freq_hz, item->interface.pwm.duty_cycle);
+            servo_item = EZPI_hal_pwm_init(item->interface.pwm.gpio_num, item->interface.pwm.pwm_resln,
+                                           item->interface.pwm.freq_hz, item->interface.pwm.duty_cycle);
             if (servo_item)
             {
                 item->interface.pwm.channel = servo_item->channel;
                 item->interface.pwm.speed_mode = servo_item->speed_mode;
+                ret = EZPI_SUCCESS;
             }
-            else
-            {
-                ret = EZPI_ERR_INIT_DEVICE_FAILED;
-            }
-        }
-        else
-        {
-            ret = EZPI_ERR_INIT_DEVICE_FAILED;
         }
     }
     return ret;
@@ -242,7 +221,7 @@ static ezlopi_error_t __set_cjson_value(l_ezlopi_item_t *item, void *arg)
             {
                 int target_value = (int)(((value * 17) / 100) + 13);
                 TRACE_I("target value: %d", target_value);
-                ezlopi_pwm_change_duty(item->interface.pwm.channel, item->interface.pwm.speed_mode, target_value);
+                EZPI_hal_pwm_change_duty(item->interface.pwm.channel, item->interface.pwm.speed_mode, target_value);
                 ret = EZPI_SUCCESS;
             }
         }
@@ -258,7 +237,7 @@ static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg)
         cJSON *cj_result = (cJSON *)arg;
         if (cj_result)
         {
-            uint32_t duty = ezlopi_pwm_get_duty(item->interface.pwm.channel, item->interface.pwm.speed_mode);
+            uint32_t duty = EZPI_hal_pwm_get_duty(item->interface.pwm.channel, item->interface.pwm.speed_mode);
             TRACE_I("raw duty value: %d", duty);
 
             if (duty < 13)
@@ -275,7 +254,7 @@ static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg)
                 TRACE_W("new _ target duty value: %d", duty);
             }
 
-            ezlopi_valueformatter_int32_to_cjson(cj_result, target_duty, NULL);
+            EZPI_core_valueformatter_int32_to_cjson(cj_result, target_duty, NULL);
             ret = EZPI_SUCCESS;
         }
     }

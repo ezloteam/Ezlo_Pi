@@ -28,13 +28,12 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_hal_spi_master.h
+ * @brief   perform some function on SPI
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    xx
  */
 
 #ifndef _EZLOPI_HAL_SPI_MASTER_H_
@@ -43,6 +42,7 @@
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
+
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -50,7 +50,6 @@
 #include "driver/spi_master.h"
 
 #include "ezlopi_core_errors.h"
-
 /*******************************************************************************
  *                          C++ Declaration Wrapper
  *******************************************************************************/
@@ -73,7 +72,7 @@ extern "C"
     typedef enum e_ezlopi_spi_mode
     {
         EZLOPI_SPI_CPOL_LOW_CPHA_LOW = 0, // CPOL_LOW(polarity): Logic low, CPHA_LOW(phase) - Data sampled on rising edge and shifted out on the falling edge
-        EZLOPI_SPI_CPOL_LOW_CPHA_HIGH,    // CPOL_LOW(polarity): Logic low, CPHA_HIGH(phase) - Data sampled on the falling edge and shifted out on the rising edge
+        EZLOPI_SPI_CPOL_LOW_CPHA_HIGH,    // CPOL_LOWapolarity): Logic low, CPHA_HIGH(phase) - Data sampled on the falling edge and shifted out on the rising edge
         EZLOPI_SPI_CPOL_HIGH_CPHA_LOW,    // CPOL_HIGH(polarity): Logic high, CPHA_LOW(phase) - Data sampled on the rising edge and shifted out on the falling edge
         EZLOPI_SPI_CPOL_HIGH_CPHA_HIGH    // CPOL_HIGH(polarity): Logic high, CPHA_HIGH(phase) - Data sampled on the falling edge and shifted out on the rising edge
     } e_ezlopi_spi_mode_t;
@@ -104,17 +103,21 @@ extern "C"
     /*******************************************************************************
      *                          Extern Function Prototypes
      *******************************************************************************/
+
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
+     * @brief Function to initialize SPI master
      *
+     * @param spi_config Configuation for SPI
+     * @return ezlopi_error_t
      */
-    ezlopi_error_t ezlopi_spi_master_init(s_ezlopi_spi_master_t *spi_config);
+    ezlopi_error_t EZPI_hal_spi_master_init(s_ezlopi_spi_master_t *spi_config);
+    /**
+     * @brief Function to remove SPI from system
+     *
+     * @param spi_config
+     * @return int
+     */
+    int EZPI_hal_spi_master_deinit(s_ezlopi_spi_master_t *spi_config);
 
 #ifdef __cplusplus
 }

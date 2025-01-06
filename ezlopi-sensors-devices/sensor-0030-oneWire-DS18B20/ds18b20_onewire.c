@@ -28,13 +28,12 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ds18b20_onewire.c
+ * @brief   perform some function on ds18b20
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    xx
  */
 
 /*******************************************************************************
@@ -63,7 +62,7 @@
  *                          Static Function Prototypes
  *******************************************************************************/
 static esp_err_t one_wire_write_bit_to_line(uint8_t bit, uint32_t gpio_pin);
-static esp_err_t one_wire_read_bit_from_line(uint8_t* bit, uint32_t gpio_pin);
+static esp_err_t one_wire_read_bit_from_line(uint8_t *bit, uint32_t gpio_pin);
 
 /*******************************************************************************
  *                          Static Data Definitions
@@ -76,31 +75,24 @@ static esp_err_t one_wire_read_bit_from_line(uint8_t* bit, uint32_t gpio_pin);
 /*******************************************************************************
  *                          Extern Function Definitions
  *******************************************************************************/
-
-/**
- * @brief Global/extern function template example
- * Convention : Use capital letter for initial word on extern function
- * @param arg
- */
-esp_err_t one_wire_write_byte_to_line(uint8_t* data, uint32_t gpio_pin)
+esp_err_t DS18B20_write_byte_to_line(uint8_t *data, uint32_t gpio_pin)
 {
     esp_err_t error = ESP_OK;
     uint8_t count = 0;
     uint8_t bit = 0;
-    for(; count < 8; count++)
+    for (; count < 8; count++)
     {
         bit = (*data >> count) & 0x01;
         error = one_wire_write_bit_to_line(bit, gpio_pin);
     }
     return error;
 }
-
-esp_err_t one_wire_read_byte_from_line(uint8_t* data, uint32_t gpio_pin)
+esp_err_t DS18B20_read_byte_from_line(uint8_t *data, uint32_t gpio_pin)
 {
     esp_err_t error = ESP_OK;
     uint8_t count = 0;
     uint8_t bit = 0;
-    for(; count < 8; count++)
+    for (; count < 8; count++)
     {
         error = one_wire_read_bit_from_line(&bit, gpio_pin);
         // ESP_LOGI(ONEWIRE_TAG, "(%d, func: %s) REceived bit is %d", ONEWIRE_GET_LINE, __func__, bit);
@@ -109,7 +101,7 @@ esp_err_t one_wire_read_byte_from_line(uint8_t* data, uint32_t gpio_pin)
     return error;
 }
 
-bool one_wire_reset_line(uint32_t gpio_pin)
+bool DS18B20_reset_line(uint32_t gpio_pin)
 {
     uint8_t presence = 0;
 
@@ -126,16 +118,16 @@ bool one_wire_reset_line(uint32_t gpio_pin)
     ets_delay_us(ONE_WIRE_RESET_LINE_SAMPLING_US);
     onewireEXIT_CRITICAL_REGION();
 
-    return (presence == 0) ?  true: false;
+    return (presence == 0) ? true : false;
 }
 
 /*******************************************************************************
- *                          Static Function Definitions
+ *                         Static Function Definitions
  *******************************************************************************/
 static esp_err_t one_wire_write_bit_to_line(uint8_t bit, uint32_t gpio_pin)
 {
     esp_err_t error = ESP_OK;
-    if(1 == bit)
+    if (1 == bit)
     {
         gpio_set_direction(gpio_pin, GPIO_MODE_OUTPUT);
         gpio_set_pull_mode(gpio_pin, GPIO_FLOATING);
@@ -163,9 +155,7 @@ static esp_err_t one_wire_write_bit_to_line(uint8_t bit, uint32_t gpio_pin)
     }
     return error;
 }
-
-
-static esp_err_t one_wire_read_bit_from_line(uint8_t* bit, uint32_t gpio_pin)
+static esp_err_t one_wire_read_bit_from_line(uint8_t *bit, uint32_t gpio_pin)
 {
     esp_err_t error = ESP_OK;
     gpio_set_direction(gpio_pin, GPIO_MODE_OUTPUT);

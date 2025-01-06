@@ -74,8 +74,8 @@ const char *method_cloud_firmware_info_get = "cloud.firmware.info.get";
 // const  char *method_hub_offline_credentials_updated = "hub.offline.credentials.updated";
 // const  char *method_hub_bridge_controller_connection_list = "hub.bridge.connections.list";
 // const  char *method_hub_bridge_controller_connection_set = "hub.bridge.controller.connection.set";
-// const  char *method_hub_coordinates_get = "hub.coordinates.get";
-// const  char *method_hub_coordinates_set = "hub.coordinates.set";
+// const  char *method_EZPI_hub_coordinates_get = "hub.coordinates.get";
+// const  char *method_EZPI_hub_coordinates_set = "hub.coordinates.set";
 // const  char *method_hub_description_set = "hub.description.set";
 // const  char *method_hub_device_force_remove = "hub.device.force_remove";
 // const  char *method_hub_device_firmware_update = "hub.device.firmware.update";
@@ -90,7 +90,7 @@ const char *method_hub_device_room_set = "hub.device.room.set";
 // const  char *method_hub_detection_devices_list = "hub.detection.devices.list";
 // const  char *method_hub_detection_device_remove = "hub.detection.device.remove";
 // const  char *method_hub_detection_device_set = "hub.detection.device.set";
-// const  char *method_hub_setting_updated = "hub.setting.updated";
+const char *method_hub_setting_updated = "hub.setting.updated";
 // const  char *method_hub_device_setting_reset = "hub.device.setting.reset";
 // const  char *method_hub_device_settings_list = "hub.device.settings.list";
 // const  char *method_hub_setting_value_set_request = "hub.setting.value.set";
@@ -194,6 +194,22 @@ const char *ezlopi_hub_device_group_updated = "hub.device.group.updated";
 const char *ezlopi_hub_item_group_created = "hub.item.group.created";
 const char *ezlopi_hub_item_group_deleted = "hub.item.group.deleted";
 const char *ezlopi_hub_item_group_updated = "hub.item.group.updated";
+
+const char *ezlopi_hub_device_updated = "hub.device.updated";
+const char *ezlopi_hub_modes_disarmed_devices_added = "hub.modes.disarmed_devices.added";
+const char *ezlopi_hub_modes_disarmed_devices_removed = "hub.modes.disarmed_devices.removed";
+const char *ezlopi_hub_modes_alarms_off_added = "hub.modes.alarms_off.added";
+const char *ezlopi_hub_modes_alarms_off_removed = "hub.modes.alarms_off.removed";
+const char *ezlopi_hub_modes_cameras_off_added = "hub.modes.cameras_off.added";
+const char *ezlopi_hub_modes_cameras_off_removed = "hub.modes.cameras_off.removed";
+const char *ezlopi_hub_modes_bypass_devices_added = "hub.modes.bypass_devices.added";
+const char *ezlopi_hub_modes_bypass_devices_removed = "hub.modes.bypass_devices.removed";
+const char *ezlopi_hub_modes_protect_button_added = "hub.modes.protect.button.added";
+const char *ezlopi_hub_modes_protect_button_updated = "hub.modes.protect.button.updated";
+const char *ezlopi_hub_modes_protect_button_removed = "hub.modes.protect.button.removed";
+const char *ezlopi_hub_modes_protect_devices_added = "hub.modes.protect.devices.added";
+const char *ezlopi_hub_modes_protect_devices_removed = "hub.modes.protect.devices.removed";
+const char *ezlopi_hub_modes_entry_delay_changed = "hub.modes.entry_delay.changed";
 
 /*******************************************************************************
  *                          Extern Function Definitions

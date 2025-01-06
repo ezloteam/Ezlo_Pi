@@ -30,7 +30,7 @@
 */
 
 /**
- * @file    main.c
+ * @file    ezlopi_cloud_valye_type_str.h
  * @brief   perform some function on data
  * @author  John Doe
  * @version 0.1
@@ -39,6 +39,7 @@
 
 #ifndef __EZLOPI_VALUES_STR_H__
 #define __EZLIPI_VALUES_STR_H__
+#pragma once
 
 /*******************************************************************************
  *                          Include Files
@@ -59,12 +60,13 @@ extern "C"
     /*******************************************************************************
      *                          Extern Data Declarations
      *******************************************************************************/
+
     /// @brief https://api.ezlo.com/devices/item_value_types/index.html
     extern const char *value_type_int;
     // extern const  char *value_type_int64;
     extern const char *value_type_bool;
     extern const char *value_type_float;
-    extern const  char *value_type_scaleble;
+    extern const char *value_type_scaleble;
     extern const char *value_type_rgb;
     // extern const  char *value_type_usercode;
     // extern const  char *value_type_dailyintervalarraydaily_interval";
@@ -127,7 +129,6 @@ extern "C"
     // extern const  char *value_manual_not_fully_locked_operation;
     extern const char *value_type_fingerprint_action;
     extern const char *value_type_presence_operation_mode;
-
     /*******************************************************************************
      *                          Extern Function Prototypes
      *******************************************************************************/

@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2022 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -30,13 +30,12 @@
 */
 
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
- * @version 0.1
- * @date    1st January 2024
+ * @file    ezlopi_cloud_modes.h
+ * @brief
+ * @author
+ * @version
+ * @date
  */
-
 #ifndef __HUB_MODES_H__
 #define __HUB_MODES_H__
 
@@ -54,7 +53,6 @@
 extern "C"
 {
 #endif
-
     /*******************************************************************************
      *                          Type & Macro Declarations
      *******************************************************************************/
@@ -67,39 +65,173 @@ extern "C"
      *                          Extern Function Prototypes
      *******************************************************************************/
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
+     * @brief Function to respond to hub.modes.get method
      *
+     * @param cj_request incoming JSON request
+     * @param cj_response Outgoing JSON response
      */
-    void ezlopi_cloud_modes_get(cJSON* cj_request, cJSON* cj_response);
-    void ezlopi_cloud_modes_current_get(cJSON* cj_request, cJSON* cj_response);
-    void ezlopi_cloud_modes_switch(cJSON* cj_request, cJSON* cj_response);
-    void ezlopi_cloud_modes_cancel_switch(cJSON* cj_request, cJSON* cj_response);
-    void ezlopi_cloud_modes_entry_delay_cancel(cJSON* cj_request, cJSON* cj_response);
-    void ezlopi_cloud_modes_entry_delay_skip(cJSON* cj_request, cJSON* cj_response);
-    void ezlopi_cloud_modes_switch_to_delay_set(cJSON* cj_request, cJSON* cj_response);
-    void ezlopi_cloud_modes_alarm_delay_set(cJSON* cj_request, cJSON* cj_response);
-    void ezlopi_cloud_modes_notifications_set(cJSON* cj_request, cJSON* cj_response);
-    void ezlopi_cloud_modes_disarmed_default_set(cJSON* cj_request, cJSON* cj_response);
-    void ezlopi_cloud_modes_disarmed_devices_add(cJSON* cj_request, cJSON* cj_response);
-    void ezlopi_cloud_modes_disarmed_devices_remove(cJSON* cj_request, cJSON* cj_response);
-    void ezlopi_cloud_modes_alarms_off_add(cJSON* cj_request, cJSON* cj_response);
-    void ezlopi_cloud_modes_alarms_off_remove(cJSON* cj_request, cJSON* cj_response);
-    void ezlopi_cloud_modes_cameras_off_add(cJSON* cj_request, cJSON* cj_response);
-    void ezlopi_cloud_modes_cameras_off_remove(cJSON* cj_request, cJSON* cj_response);
-    void ezlopi_cloud_modes_bypass_devices_add(cJSON* cj_request, cJSON* cj_response);
-    void ezlopi_cloud_modes_bypass_devices_remove(cJSON* cj_request, cJSON* cj_response);
-    void ezlopi_cloud_modes_protect_set(cJSON* cj_request, cJSON* cj_response);
-    void ezlopi_cloud_modes_protect_buttons_set(cJSON* cj_request, cJSON* cj_response);
-    void ezlopi_cloud_modes_protect_devices_add(cJSON* cj_request, cJSON* cj_response);
-    void ezlopi_cloud_modes_protect_devices_remove(cJSON* cj_request, cJSON* cj_response);
-    void ezlopi_cloud_modes_entry_delay_set(cJSON* cj_request, cJSON* cj_response);
-    void ezlopi_cloud_modes_entry_delay_reset(cJSON* cj_request, cJSON* cj_response);
+    void EZPI_cloud_modes_get(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function to respond to hub.modes.current.get method
+     *
+     * @param cj_request incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_cloud_modes_current_get(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function to respond to hub.modes.switch method
+     *
+     * @param cj_request incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_cloud_modes_switch(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function to respond to hub.modes.cancel_switch method
+     *
+     * @param cj_request incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_cloud_modes_cancel_switch(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function to respond to hub.modes.entry_delay.cancel method
+     *
+     * @param cj_request incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_cloud_modes_entry_delay_cancel(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function to respond to hub.modes.entry_delay.skip method
+     *
+     * @param cj_request incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_cloud_modes_entry_delay_skip(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function to respond to hub.modes.switch_to_delay.set method
+     *
+     * @param cj_request incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_cloud_modes_switch_to_delay_set(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function to respond to hub.modes.switch_to_delay.set method
+     *
+     * @param cj_request incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_cloud_modes_alarm_delay_set(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function to respond to hub.modes.notifications.set method
+     *
+     * @param cj_request incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_cloud_modes_notifications_set(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function to respond to hub.modes.disarmed_default.set method
+     *
+     * @param cj_request incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_cloud_modes_disarmed_default_set(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function to respond to hub.modes.disarmed_devices.add method
+     *
+     * @param cj_request incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_cloud_modes_disarmed_devices_add(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function to respond to hub.modes.disarmed_devices.remove method
+     *
+     * @param cj_request incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_cloud_modes_disarmed_devices_remove(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function to respond to hub.modes.alarms_off.add method
+     *
+     * @param cj_request incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_cloud_modes_alarms_off_add(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function to respond to hub.modes.alarms_off.remove method
+     *
+     * @param cj_request incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_cloud_modes_alarms_off_remove(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function to respond to hub.modes.cameras_off.add method
+     *
+     * @param cj_request incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_cloud_modes_cameras_off_add(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function to respond to hub.modes.cameras_off.remove method
+     *
+     * @param cj_request incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_cloud_modes_cameras_off_remove(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function to respond to hub.modes.bypass_devices.add method
+     *
+     * @param cj_request incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_cloud_modes_bypass_devices_add(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function to respond to hub.modes.bypass_devices.remove method
+     *
+     * @param cj_request incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_cloud_modes_bypass_devices_remove(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function to respond to hub.modes.protect.set method
+     *
+     * @param cj_request incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_cloud_modes_protect_set(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function to respond to hub.modes.protect_buttons.set method
+     *
+     * @param cj_request incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_cloud_modes_protect_buttons_set(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function to respond to hub.modes.protect.devices.add method
+     *
+     * @param cj_request incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_cloud_modes_protect_devices_add(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function to respond to hub.modes.protect.devices.remove method
+     *
+     * @param cj_request incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_cloud_modes_protect_devices_remove(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function to respond to hub.modes.entry_delay.set method
+     *
+     * @param cj_request incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_cloud_modes_entry_delay_set(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function to respond to hub.modes.entry_delay.reset method
+     *
+     * @param cj_request incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_cloud_modes_entry_delay_reset(cJSON *cj_request, cJSON *cj_response);
 
 #ifdef __cplusplus
 }

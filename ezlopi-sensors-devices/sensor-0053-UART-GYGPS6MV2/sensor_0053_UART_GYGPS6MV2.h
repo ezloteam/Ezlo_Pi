@@ -28,13 +28,12 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    sensor_0053_UART_GYGPS6MV2.h
+ * @brief   perform some function on sensor_0053
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    xx
  */
 
 #ifndef _SENSOR_0053_UART_GYGPS6MV2_H_
@@ -43,6 +42,7 @@
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
+
 #include "ezlopi_core_actions.h"
 #include "ezlopi_core_devices.h"
 #include "ezlopi_core_errors.h"
@@ -58,6 +58,7 @@ extern "C"
     /*******************************************************************************
      *                          Type & Macro Declarations
      *******************************************************************************/
+
     /* 3.3V operating voltage */
     //-----------------------------------------------------------------------------------------
     //          Uncomment the message format you require from below
@@ -66,23 +67,23 @@ extern "C"
     //-----------------------------------------------------------------------------------------
     // #define RMC_MESSAGE_ENABLE
     // #define VTG_MESSAGE_ENABLE
-    #define GGA_MESSAGE_ENABLE
-    // #define GSA_MESSAGE_ENABLE
-    // #define GSV_MESSAGE_ENABLE
-    // #define GLL_MESSAGE_ENABLE
-    //-----------------------------------------------------------------------------------------
-    #define MAX_GPGGA_SENTENCE_SIZE 85 // (:'$GPGGA') + (:',') + (:'message')
-    // #define MAX_GPRMC_SENTENCE_SIZE 70 // (:'$GPRMC') + (:',') + (:'message')
-    // #define MAX_GPVTG_SENTENCE_SIZE 70 // (:'$GPGGA') + (:',') + (:'message')
-    // #define MAX_GPGSA_SENTENCE_SIZE 70 // (:'$GPGGA') + (:',') + (:'message')
-    // #define MAX_GPGSV_SENTENCE_SIZE 40 // (:'$GPGGA') + (:',') + (:'message')
-    // #define MAX_GPGLL_SENTENCE_SIZE 40 // (:'$GPGGA') + (:',') + (:'message')
+#define GGA_MESSAGE_ENABLE
+// #define GSA_MESSAGE_ENABLE
+// #define GSV_MESSAGE_ENABLE
+// #define GLL_MESSAGE_ENABLE
+//-----------------------------------------------------------------------------------------
+#define MAX_GPGGA_SENTENCE_SIZE 85 // (:'$GPGGA') + (:',') + (:'message')
+                                   // #define MAX_GPRMC_SENTENCE_SIZE 70 // (:'$GPRMC') + (:',') + (:'message')
+                                   // #define MAX_GPVTG_SENTENCE_SIZE 70 // (:'$GPGGA') + (:',') + (:'message')
+                                   // #define MAX_GPGSA_SENTENCE_SIZE 70 // (:'$GPGGA') + (:',') + (:'message')
+                                   // #define MAX_GPGSV_SENTENCE_SIZE 40 // (:'$GPGGA') + (:',') + (:'message')
+                                   // #define MAX_GPGLL_SENTENCE_SIZE 40 // (:'$GPGGA') + (:',') + (:'message')
 
-    //-----------------------------------------------------------------------------------------
-    /**
-     * circular buffer to store the complete message
-     */
-    #define CIR_BUFSIZE 768 // choose ( buf_size >= 768) to avoid faulty message
+//-----------------------------------------------------------------------------------------
+/**
+ * circular buffer to store the complete message
+ */
+#define CIR_BUFSIZE 768 // choose ( buf_size >= 768) to avoid faulty message
 
     /**
      * link: https://www.rfwireless-world.com/Terminology/GPS-sentences-or-NMEA-sentences.html
@@ -119,7 +120,7 @@ extern "C"
         char long_min[9];
     } longitude_t;
 
-    #ifdef RMC_MESSAGE_ENABLE
+#ifdef RMC_MESSAGE_ENABLE
     // 1.  Time, date, position, course and speed data
     typedef struct GPRMC_t
     {
@@ -139,9 +140,9 @@ extern "C"
         char mode;                                    // X                //  A-Autonomous ; D-Differential ; E-Estimated (dead reckoning) mode; M-Manual input; N-Data not valid
         char Checksum[3];                             // XX               // *53
     } GPRMC_t;
-    #endif
+#endif
 
-    #ifdef VTG_MESSAGE_ENABLE
+#ifdef VTG_MESSAGE_ENABLE
     // 2. Course and speed information relative to the ground
     typedef struct GPVTG_t
     {
@@ -158,9 +159,9 @@ extern "C"
         char mode;                                    // X                    // A-Autonomous ; D-Differential ; E-Estimated (dead reckoning) mode; M-Manual input; N-Data not valid
         char Checksum[3];                             // XX                   // *30
     } GPVTG_t;
-    #endif
+#endif
 
-    #ifdef GGA_MESSAGE_ENABLE
+#ifdef GGA_MESSAGE_ENABLE
     // 3. Global positioning system fix data (time, position, fix type data)
     typedef struct GPGGA_t
     {
@@ -183,9 +184,9 @@ extern "C"
         char Checksum[3];                             // XX                   // *48
     } GPGGA_t;
 
-    #endif
+#endif
 
-    #ifdef GSA_MESSAGE_ENABLE
+#ifdef GSA_MESSAGE_ENABLE
     // 4. GPS receiver operating mode, satellites used in the position solution, and DOP values.
     typedef struct GPGSA_t
     {
@@ -209,15 +210,15 @@ extern "C"
         char VDOP[4];                                 // X.X                    // Vertical dilution of precision
         char Checksum[3];                             // XX                     // *30
     } GPGSA_t;
-    #endif
+#endif
 
-    #ifdef GSV_MESSAGE_ENABLE
+#ifdef GSV_MESSAGE_ENABLE
     // 5. The number of GPS satellites in view satellite ID numbers, elevation, azimuth and SNR values
     typedef struct GPGSV_t
     {
         char GPGSV_sentence[MAX_GPGSV_SENTENCE_SIZE]; // this stores contents of GPGSV_data line
         char total_messages;                          // X                    // Total number of messages (1-9)
-        char message_num;                             // X                    // Message number (1-9)
+        char message_num;                             // X                    //	Message number (1-9)
         char Satellites_inView[3];                    // XX                   // Total number of satellites in view
 
         char Satellite_PRN[3]; // XX                   // Satellite PRN number
@@ -237,9 +238,9 @@ extern "C"
 
         char Checksum[3]; // XX                   // *78
     } GPGSV_t;
-    #endif
+#endif
 
-    #ifdef GLL_MESSAGE_ENABLE
+#ifdef GLL_MESSAGE_ENABLE
     // 6. Geographic position, latitude, longitude
     typedef struct GPGLL_t
     {
@@ -248,36 +249,36 @@ extern "C"
         char N_S_indicator;                           // X                   // Latitude direction (N = North, S = South)
         longitude_t Longitude;                        // XXXXX.XXXX          // Longitude (dddmm.mmmm)
         char E_W_indicator;                           // X                   // (E = East or W = West)
-        hms_t UTC_time;                               // XXXXXX.XX           // 161229.487  hhmmss.sss
+        hms_t UTC_time;                               // XXXXXX.XX           // 161229.487	hhmmss.sss
         char Data_status;                             // X                   // A = data valid or V = data not valid
         char mode;                                    // X                   // A-Autonomous ; D-Differential ; E-Estimated (dead reckoning) mode; M-Manual input; N-Data not valid
         char Checksum[3];                             // XX                  // *64
     } GPGLL_t;
-    #endif
+#endif
 
     /**
      * collective structure of individual data_sentences
      */
     typedef struct GPS6MV2_t
     {
-    #ifdef RMC_MESSAGE_ENABLE
+#ifdef RMC_MESSAGE_ENABLE
         GPRMC_t GPRMC_data_structure;
-    #endif
-    #ifdef VTG_MESSAGE_ENABLE
+#endif
+#ifdef VTG_MESSAGE_ENABLE
         GPVTG_t GPVTG_data_structure;
-    #endif
-    #ifdef GGA_MESSAGE_ENABLE
+#endif
+#ifdef GGA_MESSAGE_ENABLE
         GPGGA_t GPGGA_data_structure;
-    #endif
-    #ifdef GSA_MESSAGE_ENABLE
+#endif
+#ifdef GSA_MESSAGE_ENABLE
         GPGSA_t GPGSA_data_structure;
-    #endif
-    #ifdef GSV_MESSAGE_ENABLE
+#endif
+#ifdef GSV_MESSAGE_ENABLE
         GPGSV_t GPGSV_data_structure;
-    #endif
-    #ifdef GLL_MESSAGE_ENABLE
+#endif
+#ifdef GLL_MESSAGE_ENABLE
         GPGLL_t GPGLL_data_structure;
-    #endif
+#endif
 
         /*The global variables for operations of GPSmodule*/
         uint32_t Latitude_item_id;
@@ -297,7 +298,6 @@ extern "C"
         float prev_geoid;
 
     } GPS6MV2_t;
-
     /*******************************************************************************
      *                          Extern Data Declarations
      *******************************************************************************/
@@ -305,24 +305,23 @@ extern "C"
     /*******************************************************************************
      *                          Extern Function Prototypes
      *******************************************************************************/
+
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
+     * @brief Function to operate on actions
      *
+     * @param action Current Action to Operate on
+     * @param item Target-Item node
+     * @param arg Arg for action
+     * @param user_arg User-arg
+     * @return ezlopi_error_t
      */
-    ezlopi_error_t sensor_0053_UART_GYGPS6MV2(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
+    ezlopi_error_t SENSOR_0053_uart_gygps6mv2(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif //_SENSOR_0053_UART_GYGPS6MV2_H_
-
 /*******************************************************************************
  *                          End of File
  *******************************************************************************/

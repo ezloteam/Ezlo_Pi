@@ -28,13 +28,12 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_core_scenes_print.c
+ * @brief   These function print scene information
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    12th DEC 2024
  */
 
 /*******************************************************************************
@@ -43,16 +42,17 @@
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+#include "ezlopi_core_scenes_print.h"
 
-#include "ezlopi_util_trace.h"
+#if ENABLE_SCENES_PRINT
 
-#include "ezlopi_core_scenes_v2.h"
+// #include "ezlopi_util_trace.h"
+
+// #include "ezlopi_core_scenes_v2.h"
 #include "ezlopi_core_scenes_value.h"
 #include "ezlopi_core_cjson_macros.h"
 
 #include "ezlopi_cloud_constants.h"
-
-#include "ezlopi_core_scenes_print.h"
 
 /*******************************************************************************
  *                          Extern Data Declarations
@@ -81,13 +81,7 @@
 /*******************************************************************************
  *                          Extern Function Definitions
  *******************************************************************************/
-
-/**
- * @brief Global/extern function template example
- * Convention : Use capital letter for initial word on extern function
- * @param arg
- */
-void ezlopi_print_block_options(s_block_options_v2_t *block_options, l_fields_v2_t *fields, const char *tab)
+void EZPI_print_block_options(s_block_options_v2_t *block_options, l_fields_v2_t *fields, const char *tab)
 {
 #if (1 == ENABLE_TRACE)
     TRACE_D("%s\t\t|-- blockOptions:", (NULL != tab ? tab : ""));
@@ -123,7 +117,7 @@ void ezlopi_print_block_options(s_block_options_v2_t *block_options, l_fields_v2
 #endif
 }
 
-void ezlopi_print_fields(l_fields_v2_t *fields, const char *tab)
+void EZPI_print_fields(l_fields_v2_t *fields, const char *tab)
 {
 #if (1 == ENABLE_TRACE)
     static uint8_t block_tab_count = 0; // this is only used here ---> // to increase block-tabs
@@ -134,7 +128,7 @@ void ezlopi_print_fields(l_fields_v2_t *fields, const char *tab)
         TRACE_D("%s\t\t\t|---------- field_count: %d ----------", (NULL != tab ? tab : ""), ++field_count);
         TRACE_D("%s\t\t\t|-- name: %s", (NULL != tab ? tab : ""), fields->name);
 
-        const char *value_type_name = ezlopi_scene_get_scene_value_type_name(fields->value_type);
+        const char *value_type_name = EZPI_core_scenes_get_scene_value_type_name(fields->value_type);
         TRACE_D("%s\t\t\t|-- type: %s", (NULL != tab ? tab : ""), value_type_name ? value_type_name : ezlopi__str);
 
         switch (fields->value_type)
@@ -225,7 +219,7 @@ void ezlopi_print_fields(l_fields_v2_t *fields, const char *tab)
             append_tab[31] = '\0';
 
             block_tab_count++;
-            ezlopi_print_when_blocks((l_when_block_v2_t *)fields->field_value.u_value.when_block, append_tab);
+            EZPI_print_when_blocks((l_when_block_v2_t *)fields->field_value.u_value.when_block, append_tab);
             if (block_tab_count > 0)
             {
                 block_tab_count--;
@@ -318,7 +312,7 @@ void ezlopi_print_fields(l_fields_v2_t *fields, const char *tab)
 #endif
 }
 
-void ezlopi_print_house_modes(l_house_modes_v2_t *house_modes)
+void EZPI_print_house_modes(l_house_modes_v2_t *house_modes)
 {
 #if (1 == ENABLE_TRACE)
     TRACE_D("\t|-- house_modes: ");
@@ -330,7 +324,7 @@ void ezlopi_print_house_modes(l_house_modes_v2_t *house_modes)
 #endif
 }
 
-void ezlopi_print_user_notifications(l_user_notification_v2_t *user_notification)
+void EZPI_print_user_notifications(l_user_notification_v2_t *user_notification)
 {
 #if (1 == ENABLE_TRACE)
     TRACE_D("\t|-- user_notifications: ");
@@ -342,7 +336,7 @@ void ezlopi_print_user_notifications(l_user_notification_v2_t *user_notification
 #endif
 }
 
-void ezlopi_print_when_blocks(l_when_block_v2_t *when_blocks, const char *tab)
+void EZPI_print_when_blocks(l_when_block_v2_t *when_blocks, const char *tab)
 {
 #if (1 == ENABLE_TRACE)
     TRACE_D("%s\t|-- when: ", (NULL != tab ? tab : ""));
@@ -376,27 +370,27 @@ void ezlopi_print_when_blocks(l_when_block_v2_t *when_blocks, const char *tab)
             }
         }
 
-        ezlopi_print_block_options(&when_blocks->block_options, when_blocks->fields, tab);
+        EZPI_print_block_options(&when_blocks->block_options, when_blocks->fields, tab);
         TRACE_D("%s\t\t|-- blockType: when", (NULL != tab ? tab : ""));
-        ezlopi_print_fields(when_blocks->fields, tab);
+        EZPI_print_fields(when_blocks->fields, tab);
         when_blocks = when_blocks->next;
     }
 #endif
 }
 
-void ezlopi_print_action_blocks(l_action_block_v2_t *action_block)
+void EZPI_print_action_blocks(l_action_block_v2_t *action_block)
 {
 #if (1 == ENABLE_TRACE)
     while (action_block)
     {
-        TRACE_D("\t|-- %s: ", (SCENE_BLOCK_TYPE_THEN == action_block->block_type) ? "then" : "else");
-        ezlopi_print_block_options(&action_block->block_options, action_block->fields, NULL);
+        TRACE_D("\t|-- %s: ", (SCENE_BLOCK_TYPE_THEN == action_block->block_type) ? ezlopi_then_str : ezlopi_else_str);
+        EZPI_print_block_options(&action_block->block_options, action_block->fields, NULL);
         TRACE_D("\t\t|-- blockType: then");
         TRACE_D("\t\t|-- _tempId: %.*s", sizeof(action_block->_tempId), action_block->_tempId);
 
         TRACE_D("\t\t|-- Delay:: days: %d, hours: %d, minutes: %d, seconds: %d", action_block->delay.days, action_block->delay.hours, action_block->delay.minutes, action_block->delay.seconds);
 
-        ezlopi_print_fields(action_block->fields, NULL);
+        EZPI_print_fields(action_block->fields, NULL);
 
         action_block = action_block->next;
         if (action_block)
@@ -407,7 +401,7 @@ void ezlopi_print_action_blocks(l_action_block_v2_t *action_block)
 #endif
 }
 
-void ezlopi_scenes_print(l_scenes_list_v2_t *scene_link_list)
+void EZPI_scenes_print(l_scenes_list_v2_t *scene_link_list)
 {
 #if (1 == ENABLE_TRACE)
     int scene_count = 0;
@@ -422,11 +416,11 @@ void ezlopi_scenes_print(l_scenes_list_v2_t *scene_link_list)
         CJSON_TRACE("\t|-- meta: ", scene_link_list->meta);
 
         TRACE_D("\t|-- parent_id: %s", scene_link_list->parent_id);
-        ezlopi_print_user_notifications(scene_link_list->user_notifications);
-        ezlopi_print_house_modes(scene_link_list->house_modes);
-        ezlopi_print_when_blocks(scene_link_list->when_block, NULL);
-        ezlopi_print_action_blocks(scene_link_list->then_block);
-        ezlopi_print_action_blocks(scene_link_list->else_block);
+        EZPI_print_user_notifications(scene_link_list->user_notifications);
+        EZPI_print_house_modes(scene_link_list->house_modes);
+        EZPI_print_when_blocks(scene_link_list->when_block, NULL);
+        EZPI_print_action_blocks(scene_link_list->then_block);
+        EZPI_print_action_blocks(scene_link_list->else_block);
         TRACE_D("\t---------------------------------------------------------------");
 
         vTaskDelay(5);
@@ -437,11 +431,11 @@ void ezlopi_scenes_print(l_scenes_list_v2_t *scene_link_list)
 }
 
 /*******************************************************************************
- *                          Static Function Definitions
+ *                         Static Function Definitions
  *******************************************************************************/
 
+#endif // ENABLE_SCENES_PRINT
 #endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
-
 /*******************************************************************************
  *                          End of File
  *******************************************************************************/

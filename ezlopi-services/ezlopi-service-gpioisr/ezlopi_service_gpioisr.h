@@ -1,3 +1,11 @@
+
+/**
+ * @file    ezlopi_service_gpioisr.h
+ * @brief
+ * @author
+ * @version
+ * @date
+ */
 /* ===========================================================================
 ** Copyright (C) 2024 Ezlo Innovation Inc
 **
@@ -29,14 +37,6 @@
 ** ===========================================================================
 */
 
-/**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
- * @version 0.1
- * @date    1st January 2024
- */
-
 #ifndef _EZLOPI_SERVICE_GPIOISR_H_
 #define _EZLOPI_SERVICE_GPIOISR_H_
 
@@ -53,34 +53,31 @@ extern "C"
 {
 #endif
 
-    /*******************************************************************************
-     *                          Type & Macro Declarations
-     *******************************************************************************/
-    typedef void (*f_interrupt_upcall_t)(void *);
-
-    /*******************************************************************************
-     *                          Extern Data Declarations
-     *******************************************************************************/
-
-    /*******************************************************************************
-     *                          Extern Function Prototypes
-     *******************************************************************************/
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
+     * @brief Function handles the interrupt registered for corresponding GPIO
      *
      */
-    void ezlopi_service_gpioisr_init(void);
-    void ezlopi_service_gpioisr_register_v3(l_ezlopi_item_t *item, f_interrupt_upcall_t __upcall, TickType_t debounce_ms);
+    typedef void (*f_interrupt_upcall_t)(void *);
 
-    #if 0 // v2.x
-    void gpio_isr_service_register(s_ezlopi_device_properties_t *properties, f_interrupt_upcall_t __upcall, TickType_t debounce_ms);
-    #endif
+    /**
+     * @brief initializes the GPIO ISR for ezlopi
+     * @details This function performs following operations
+     *  - Initializes GPIO event queue
+     *  - Starts task for gpio process
+     *
+     */
+    void EZPI_service_gpioisr_init(void);
+    /**
+     * @brief Function to register GPIO ISR
+     * @details This function performs following operations
+     *  - Enables GPIO interrupt for the gpio the provided item is connected to
+     *  - Adds GPIO ISR handler
+     *
+     * @param[in] item  Item that contains pin information
+     * @param[in] __upcall  Interuupt upcall to be called on interrupt for the registered pin
+     * @param[in] debounce_ms Pin debounce to wait for
+     */
+    void EZPI_service_gpioisr_register_v3(l_ezlopi_item_t *item, f_interrupt_upcall_t __upcall, TickType_t debounce_ms);
 
 #ifdef __cplusplus
 }

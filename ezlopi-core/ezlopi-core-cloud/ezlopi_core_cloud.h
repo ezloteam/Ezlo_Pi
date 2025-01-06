@@ -28,15 +28,13 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_core_cloud.h
+ * @brief   perform some function on core-cloud properties
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    12th DEC 2024
  */
-
 #ifndef _EZLOPI_CORE_CLOUD_H_
 #define _EZLOPI_CORE_CLOUD_H_
 
@@ -153,50 +151,138 @@ extern "C"
      *                          Extern Function Prototypes
      *******************************************************************************/
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
+     * @brief Funtion return new device_id
      *
      */
-    uint32_t ezlopi_cloud_generate_device_id(void);
-    void ezlopi_cloud_update_device_id(uint32_t device_id);
+    uint32_t EZPI_core_cloud_generate_device_id(void);
+    /**
+     * @brief Funtion to update device_id
+     *
+     * @param device_id
+     */
+    void EZPI_core_cloud_update_device_id(uint32_t device_id);
+    /**
+     * @brief Function to generate new item_id
+     *
+     * @return uint32_t
+     */
+    uint32_t EZPI_core_cloud_generate_item_id(void);
+    /**
+     * @brief Function to generate new room_id
+     *
+     * @return uint32_t
+     */
+    uint32_t EZPI_core_cloud_generate_room_id(void);
 
-    uint32_t ezlopi_cloud_generate_item_id(void);
+    // uint32_t ezlopi_cloud_get_gateway_id(void);
+    /**
+     * @brief Function to generate new gateway_id
+     *
+     * @return uint32_t
+     */
+    uint32_t EZPI_core_cloud_generate_gateway_id(void);
+    /**
+     * @brief Function to generate new setting_id
+     *
+     * @return uint32_t
+     */
+    uint32_t EZPI_core_cloud_generate_settings_id(void);
+    /**
+     * @brief Function to generate new scene_id
+     *
+     * @return uint32_t
+     */
+    uint32_t EZPI_core_cloud_generate_scene_id(void);
+    /**
+     * @brief Function to update scene_id
+     *
+     * @param a_scene_id prev scene_id
+     */
+    void EZPI_core_cloud_update_scene_id(uint32_t a_scene_id);
+    /**
+     * @brief  Function to generate new when-block_id
+     *
+     * @return uint32_t
+     */
+    uint32_t EZPI_core_cloud_generate_scene_when_blockId(void);
+    /**
+     * @brief  Function to update new when-block_id
+     *
+     * @param a_when_blockId prev when-block_id
+     */
+    void EZPI_core_cloud_update_when_blockId(uint32_t a_when_blockId);
+    /**
+     * @brief Function to generate new script_id
+     *
+     * @return uint32_t
+     */
+    uint32_t EZPI_core_cloud_generate_script_id(void);
+    /**
+     * @brief  Function to update new script_id
+     *
+     * @param a_script_id prev script-id
+     */
+    void EZPI_core_cloud_update_script_id(uint32_t a_script_id);
+    /**
+     * @brief  Function to generate new exprn_id
+     */
+    uint32_t EZPI_core_cloud_generate_expression_id(void);
+    /**
+     * @brief  Function to update new exprn_id
+     *
+     * @param a_expression_id prev expression_id
+     */
+    void EZPI_core_cloud_update_expression_id(uint32_t a_expression_id);
+    /**
+     * @brief Function to generate new room_id
+     *
+     * @return uint32_t
+     */
+    uint32_t EZPI_core_cloud_generate_room_id(void);
+    /**
+     * @brief Function to update room_id
+     *
+     * @param a_room_id  prev room-id
+     */
+    void EZPI_core_cloud_update_room_id(uint32_t a_room_id);
+    /**
+     * @brief Function to generate new scene_group_id
+     *
+     * @return uint32_t
+     */
+    uint32_t EZPI_core_cloud_generate_scene_group_id(void);
+    /**
+     * @brief Function to update scene_group_id
+     *
+     * @param a_room_id  prev room-id
+     */
+    void EZPI_core_cloud_update_group_id(uint32_t a_group_id);
 
-    uint32_t ezlopi_cloud_generate_room_id(void);
+    /**
+     * @brief Function to generate new device_group_id
+     *
+     * @return uint32_t
+     */
+    uint32_t EZPI_core_cloud_generate_device_group_id(void);
+    /**
+     * @brief Function to update device_group_id
+     *
+     * @param a_room_id  prev room-id
+     */
+    void EZPI_core_cloud_update_device_group_id(uint32_t a_device_group_id);
 
-    uint32_t ezlopi_cloud_get_gateway_id(void);
-    uint32_t ezlopi_cloud_generate_gateway_id(void);
-
-    uint32_t ezlopi_cloud_generate_settings_id(void);
-
-    uint32_t ezlopi_cloud_generate_scene_id(void);
-    void ezlopi_cloud_update_scene_id(uint32_t a_scene_id);
-
-    uint32_t ezlopi_cloud_generate_scene_when_blockId(void);
-    void ezlopi_cloud_update_when_blockId(uint32_t a_when_blockId);
-
-    uint32_t ezlopi_cloud_generate_script_id(void);
-    void ezlopi_cloud_update_script_id(uint32_t a_script_id);
-
-    uint32_t ezlopi_cloud_generate_expression_id(void);
-    void ezlopi_cloud_update_expression_id(uint32_t a_expression_id);
-
-    uint32_t ezlopi_cloud_generate_room_id(void);
-    void ezlopi_cloud_update_room_id(uint32_t a_room_id);
-
-    uint32_t ezlopi_cloud_generate_scene_group_id(void);
-    void ezlopi_cloud_update_group_id(uint32_t a_group_id);
-
-    uint32_t ezlopi_cloud_generate_device_group_id(void);
-    void ezlopi_cloud_update_device_group_id(uint32_t a_device_group_id);
-
-    uint32_t ezlopi_cloud_generate_item_group_id(void);
-    void ezlopi_cloud_update_item_group_id(uint32_t a_item_group_id);
+    /**
+     * @brief Function to generate new item_group_id
+     *
+     * @return uint32_t
+     */
+    uint32_t EZPI_core_cloud_generate_item_group_id(void);
+    /**
+     * @brief Function to update item_group_id
+     *
+     * @param a_room_id  prev room-id
+     */
+    void EZPI_core_cloud_update_item_group_id(uint32_t a_item_group_id);
 
     // uint32_t ezlopi_cloud_get_modes_initial_id(void);
 

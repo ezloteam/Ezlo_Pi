@@ -30,7 +30,7 @@
 */
 
 /**
- * @file    main.c
+ * @file     ezlopi_cloud_item_name_str.c
  * @brief   perform some function on data
  * @author  John Doe
  * @version 0.1
@@ -84,7 +84,7 @@ const char *ezlopi_item_name_dw_state = "dw_state";
 // const  char *ezlopi_item_name_barrier_problem_sensors = "barrier_problem_sensors";
 // const  char *ezlopi_item_name_barrier_short_circuit = "barrier_short_circuit";
 // const  char *ezlopi_item_name_barrier_fail_events = "barrier_fail_events";
-// const  char *ezlopi_item_name_button_state = "button_state";
+const char *ezlopi_item_name_button_state = "button_state";
 // const  char *ezlopi_item_name_test_state = "test_state";
 // const  char *ezlopi_item_name_co_alarm = "co_alarm";
 // const  char *ezlopi_item_name_maintenance_state = "maintenance_state";
@@ -241,8 +241,8 @@ const char *ezlopi_item_name_water_flow = "water_flow";
 // const  char *ezlopi_item_name_outside_temperature = "outside_temperature";
 // // const  char *ezlopi_item_name_water_chlorine_level = "water_chlorine_level";
 // const  char *ezlopi_item_name_water_acidity = "water_acidity";
-const  char *ezlopi_item_name_particulate_matter_10 = "particulate_matter_10";
-const  char *ezlopi_item_name_particulate_matter_2_dot_5 = "particulate_matter_2_dot_5";
+const char *ezlopi_item_name_particulate_matter_10 = "particulate_matter_10";
+const char *ezlopi_item_name_particulate_matter_2_dot_5 = "particulate_matter_2_dot_5";
 // const  char *ezlopi_item_name_program_status = "program_status";
 // const  char *ezlopi_item_name_program_failures = "program_failures";
 // const  char *ezlopi_item_name_position = "position";
@@ -283,10 +283,10 @@ const char *ezlopi_item_name_applied_force_on_sensor = "applied_force_on_sensor"
 // const  char *ezlopi_item_name_evaporator_coil_temperature = "evaporator_coil_temperature";
 // const  char *ezlopi_item_name_lead = "lead";
 // const  char *ezlopi_item_name_liquid_line_temperature = "liquid_line_temperature";
-const  char *ezlopi_item_name_motion_direction = "motion_direction";
+const char *ezlopi_item_name_motion_direction = "motion_direction";
 // const  char *ezlopi_item_name_nitrogen_dioxide = "nitrogen_dioxide";
 // const  char *ezlopi_item_name_ozone = "ozone";
-const  char *ezlopi_item_name_particulate_matter_1 = "particulate_matter_1";
+const char *ezlopi_item_name_particulate_matter_1 = "particulate_matter_1";
 // const  char *ezlopi_item_name_return_air_temperature = "return_air_temperature";
 // const  char *ezlopi_item_name_suction_pressure = "suction_pressure";
 // const  char *ezlopi_item_name_sulfur_dioxide = "sulfur_dioxide";

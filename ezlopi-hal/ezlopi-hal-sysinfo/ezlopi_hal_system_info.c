@@ -28,18 +28,18 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_hal_system_info.c
+ * @brief   perform some function on System_info
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    xx
  */
 
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
+
 #include "../../build/config/sdkconfig.h"
 
 #include "ezlopi_core_nvs.h"
@@ -73,29 +73,22 @@ static uint32_t boot_count = 0;
 /*******************************************************************************
  *                          Extern Function Definitions
  *******************************************************************************/
-
-/**
- * @brief Global/extern function template example
- * Convention : Use capital letter for initial word on extern function
- * @param arg
- */
-uint32_t ezlopi_system_info_get_boot_count(void)
+uint32_t EZPI_hal_system_info_get_boot_count(void)
 {
     if (0 == boot_count)
     {
-        boot_count = ezlopi_nvs_get_boot_count();
+        boot_count = EZPI_core_nvs_get_boot_count();
     }
 
     return boot_count;
 }
 
-char *ezlopi_system_info_get_chip_name(void)
+char *EZPI_hal_system_info_get_chip_name(void)
 {
     return CONFIG_IDF_TARGET;
 }
-
 /*******************************************************************************
- *                          Static Function Definitions
+ *                         Static Function Definitions
  *******************************************************************************/
 
 /*******************************************************************************

@@ -1,5 +1,5 @@
-/* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+/** ===========================================================================
+** Copyright (C) 2022 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -30,18 +30,17 @@
 */
 
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file ezlopi_cloud_coordinates.c
+ * @author your name (you@domain.com)
+ * @brief
  * @version 0.1
- * @date    1st January 2024
+ * @date 2025-01-07
+ *
+ * @copyright Copyright (c) 2025
+ *
  */
 
-/*******************************************************************************
- *                          Include Files
- *******************************************************************************/
 #include "cjext.h"
-
 #include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_nvs.h"
@@ -85,29 +84,30 @@ static double sg_longitude;
  * Convention : Use capital letter for initial word on extern function
  * @param arg
  */
-void hub_coordinates_set(cJSON* cj_request, cJSON* cj_response)
+
+void EZPI_hub_coordinates_set(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     if (cj_request)
     {
-        cJSON* cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
+        cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
         if (cj_params)
         {
             CJSON_GET_VALUE_DOUBLE(cj_params, ezlopi_latitude_str, sg_latitude);
             CJSON_GET_VALUE_DOUBLE(cj_params, ezlopi_longitude_str, sg_longitude);
 
             char lat_long_str[256];
-            if (cJSON_PrintPreallocated(__FUNCTION__, cj_params, lat_long_str, sizeof(lat_long_str), false))
+            if (true == cJSON_PrintPreallocated(__FUNCTION__, cj_params, lat_long_str, sizeof(lat_long_str), false))
             {
-                ezlopi_nvs_write_latitude_longitude(lat_long_str);
+                EZPI_core_nvs_write_latitude_longitude(lat_long_str);
             }
         }
     }
 }
 
-void hub_coordinates_get(cJSON* cj_request, cJSON* cj_response)
+void EZPI_hub_coordinates_get(cJSON *cj_request, cJSON *cj_response)
 {
-    char* lat_long_vals = ezlopi_nvs_read_latidtude_longitude();
+    char *lat_long_vals = EZPI_core_nvs_read_latidtude_longitude();
     if (lat_long_vals)
     {
         cJSON_AddRawToObject(__FUNCTION__, cj_response, ezlopi_result_str, lat_long_vals);
@@ -115,12 +115,12 @@ void hub_coordinates_get(cJSON* cj_request, cJSON* cj_response)
     }
 }
 
-double ezlopi_cloud_get_latitude()
+double EZPI_cloud_get_latitude()
 {
     return sg_latitude;
 }
 
-double ezlopi_cloud_get_longitude()
+double EZPI_cloud_get_longitude()
 {
     return sg_longitude;
 }

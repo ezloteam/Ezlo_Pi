@@ -28,17 +28,20 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_core_valueformatter.h
+ * @brief   perform some function on valueformatting operation
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    12th DEC 2024
  */
 
-#ifndef EZLOPI_VALUEFORMATER_H
-#define EZLOPI_VALUEFORMATER_H
+#ifndef _EZLOPI_VALUEFORMATER_H_
+#define _EZLOPI_VALUEFORMATER_H_
+
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 
 /*******************************************************************************
  *                          Include Files
@@ -65,27 +68,53 @@ extern "C"
     /*******************************************************************************
      *                          Extern Function Prototypes
      *******************************************************************************/
+
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
+     * @brief Function to convert 'bool' to cjson obj
      *
+     * @param cj_root Destinaiton obj to store the converted values
+     * @param value New value 'bool'
+     * @param scale Scale of the value
      */
-    void ezlopi_valueformatter_bool_to_cjson(cJSON* cj_root, bool value, const char * scale);
-    void ezlopi_valueformatter_float_to_cjson(cJSON* cj_root, float value, const char * scale);
-    void ezlopi_valueformatter_double_to_cjson(cJSON* cj_root, double value, const char * scale);
-    void ezlopi_valueformatter_int32_to_cjson(cJSON* cj_root, int value, const char * scale);
-    void ezlopi_valueformatter_uint32_to_cjson(cJSON* cj_root, uint32_t value, const char * scale);
+    void EZPI_core_valueformatter_bool_to_cjson(cJSON *cj_root, bool value, const char *scale);
+    /**
+     * @brief Function to convert 'float' to cjson obj
+     *
+     * @param cj_root Destinaiton obj to store the converted values
+     * @param value New value 'float'
+     * @param scale Scale of the value
+     */
+    void EZPI_core_valueformatter_float_to_cjson(cJSON *cj_root, float value, const char *scale);
+    /**
+     * @brief Function to convert 'double' to cjson obj
+     *
+     * @param cj_root Destinaiton obj to store the converted values
+     * @param value New value 'double'
+     * @param scale Scale of the value
+     */
+    void EZPI_core_valueformatter_double_to_cjson(cJSON *cj_root, double value, const char *scale);
+    /**
+     * @brief Function to convert 'int32_t' to cjson obj
+     *
+     * @param cj_root Destinaiton obj to store the converted values
+     * @param value New value 'int32_t'
+     * @param scale Scale of the value
+     */
+    void EZPI_core_valueformatter_int32_to_cjson(cJSON *cj_root, int value, const char *scale);
+    /**
+     * @brief Function to convert 'uint32_t' to cjson obj
+     *
+     * @param cj_root Destinaiton obj to store the converted values
+     * @param value New value 'uint32_t'
+     * @param scale Scale of the value
+     */
+    void EZPI_core_valueformatter_uint32_to_cjson(cJSON *cj_root, uint32_t value, const char *scale);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // EZLOPI_VALUEFORMATER_H
+#endif // _EZLOPI_VALUEFORMATER_H_
 
 /*******************************************************************************
  *                          End of File

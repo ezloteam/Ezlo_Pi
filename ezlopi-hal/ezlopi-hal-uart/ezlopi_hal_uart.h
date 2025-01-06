@@ -28,13 +28,12 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_hal_uart.h
+ * @brief   perform some function on UART
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    xx
  */
 
 #ifndef _EZLOPI_HAL_UART_H_
@@ -70,14 +69,14 @@ extern "C"
         EZLOPI_UART_CHANNEL_UNDEFINED = -1,
         EZLOPI_UART_CHANNEL_0 = UART_NUM_0,
         EZLOPI_UART_CHANNEL_1 = UART_NUM_1,
-    #if UART_NUM_MAX > 2
+#if UART_NUM_MAX > 2
         EZLOPI_UART_CHANNEL_2 = UART_NUM_2,
-    #endif
-    #define EZLOPI_UART_CHANNEL_MAX UART_NUM_MAX
+#endif
+#define EZLOPI_UART_CHANNEL_MAX UART_NUM_MAX
     } e_ezlopi_uart_channel_t;
 
-    typedef struct s_ezlopi_uart_object* s_ezlopi_uart_object_handle_t;
-    typedef void (*__uart_upcall)(uint8_t* buffer, uint32_t output_len, s_ezlopi_uart_object_handle_t uart_object_handle);
+    typedef struct s_ezlopi_uart_object *s_ezlopi_uart_object_handle_t;
+    typedef void (*__uart_upcall)(uint8_t *buffer, uint32_t output_len, s_ezlopi_uart_object_handle_t uart_object_handle);
 
     typedef struct s_ezlopi_uart
     {
@@ -90,7 +89,7 @@ extern "C"
 
     struct s_ezlopi_uart_object
     {
-        void* arg;
+        void *arg;
         s_ezlopi_uart_t ezlopi_uart;
         __uart_upcall upcall;
         QueueHandle_t ezlopi_uart_queue_handle;
@@ -105,18 +104,28 @@ extern "C"
      *                          Extern Function Prototypes
      *******************************************************************************/
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
+     * @brief Function to setup UART on a target pin
+     *
+     * @param baudrate Target Baudrate
+     * @param tx TX-pin
+     * @param rx RX-pin
+     * @param upcall Callback function for uart events
+     * @param arg User-Args
+     * @return s_ezlopi_uart_object_handle_t
+     */
+    s_ezlopi_uart_object_handle_t EZPI_hal_uart_init(uint32_t baudrate, uint32_t tx, uint32_t rx, __uart_upcall upcall, void *arg);
+    /**
+     * @brief Function to get the channels of UART
+     *
+     * @param ezlopi_uart_object_handle UART obj handle
+     * @return ezlo_uart_channel_t
+     */
+    ezlo_uart_channel_t EZPI_hal_uart_get_channel(s_ezlopi_uart_object_handle_t ezlopi_uart_object_handle);
+    /**
+     * @brief Function to initialize UART service in main-file
      *
      */
-    s_ezlopi_uart_object_handle_t ezlopi_uart_init(uint32_t baudrate, uint32_t tx, uint32_t rx, __uart_upcall upcall, void* arg);
-    ezlo_uart_channel_t ezlopi_uart_get_channel(s_ezlopi_uart_object_handle_t ezlopi_uart_object_handle);
-    void EZPI_HAL_uart_init(void);
+    void EZPI_uart_main_init(void);
 
 #ifdef __cplusplus
 }

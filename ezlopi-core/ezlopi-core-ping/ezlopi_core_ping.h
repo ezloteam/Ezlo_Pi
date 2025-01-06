@@ -28,18 +28,16 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_core_ping.h
+ * @brief   Function to perfrom operation on ezlopi-ping-service
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    12th DEC 2024
  */
 
 #ifndef _EZLOPI_CORE_PING_H_
 #define _EZLOPI_CORE_PING_H_
-
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
@@ -56,6 +54,7 @@ extern "C"
     /*******************************************************************************
      *                          Type & Macro Declarations
      *******************************************************************************/
+
     typedef enum e_ping_status
     {
         EZLOPI_PING_STATUS_UNKNOWN = 0,
@@ -63,6 +62,7 @@ extern "C"
         EZLOPI_PING_STATUS_DISCONNECTED,
     } e_ping_status_t;
 
+#ifdef CONFIG_EZPI_ENABLE_PING
     /*******************************************************************************
      *                          Extern Data Declarations
      *******************************************************************************/
@@ -70,24 +70,24 @@ extern "C"
     /*******************************************************************************
      *                          Extern Function Prototypes
      *******************************************************************************/
+
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
+     * @brief Function to initialize ping service
      *
      */
-    #ifdef CONFIG_EZPI_ENABLE_PING
-    void ezlopi_ping_init(void);
-    e_ping_status_t ezlopi_ping_get_internet_status(void);
-    #endif // CONFIG_EZPI_ENABLE_PING
+    void EZPI_ping_init(void);
+    /**
+     * @brief Function to get internet status
+     *
+     * @return e_ping_status_t
+     */
+    e_ping_status_t EZPI_core_ping_get_internet_status(void);
 
 #ifdef __cplusplus
 }
 #endif
+
+#endif // CONFIG_EZPI_ENABLE_PING
 
 #endif // _EZLOPI_CORE_PING_H_
 

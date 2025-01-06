@@ -28,17 +28,13 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_core_room_subtype_macro.h
+ * @brief   Macros for room types
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    12th DEC 2024
  */
-
-// #ifndef __HEADER_H__
-// #define __HEADER_H__
 
 /*******************************************************************************
  *                          Include Files
@@ -55,12 +51,12 @@ extern "C"
     /*******************************************************************************
      *                          Type & Macro Declarations
      *******************************************************************************/
+
     ROOM_SUBTYPE("none", NONE)
     ROOM_SUBTYPE("room", ROOM)
 
     //////////////////////
     ROOM_SUBTYPE("max", MAX)
-
     /*******************************************************************************
      *                          Extern Data Declarations
      *******************************************************************************/
@@ -72,8 +68,6 @@ extern "C"
 #ifdef __cplusplus
 }
 #endif
-
-// #endif // __HEADER_H__
 
 /*******************************************************************************
  *                          End of File

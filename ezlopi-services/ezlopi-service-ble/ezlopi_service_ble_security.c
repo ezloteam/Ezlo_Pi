@@ -30,16 +30,12 @@
 */
 
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
- * @version 0.1
- * @date    1st January 2024
+ * @file    ezlopi_service_ble_security.c
+ * @brief   Security service related functionalities
+ * @author
+ * @version
+ * @date
  */
-
-/*******************************************************************************
- *                          Include Files
- *******************************************************************************/
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_BLE_ENABLE
@@ -47,8 +43,8 @@
 #include <string.h>
 
 #include "lwip/ip_addr.h"
-#include "cjext.h"
 
+#include "cjext.h"
 #include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_nvs.h"
@@ -65,72 +61,80 @@
 
 #include "ezlopi_service_ble.h"
 
-/*******************************************************************************
- *                          Extern Data Declarations
- *******************************************************************************/
+ /*******************************************************************************
+  *                          Type & Macro Definitions
+  *******************************************************************************/
 
-/*******************************************************************************
- *                          Extern Function Declarations
- *******************************************************************************/
+  /**
+   * @brief Returns number from the the json `root` which contains name member
+   * @note root is the JOSN and should exist before being called
+   *
+   */
+#define CJ_GET_NUMBER(name) cJSON_GetNumberValue(cJSON_GetObjectItem(__FUNCTION__, root, name))
 
-/*******************************************************************************
- *                          Type & Macro Definitions
- *******************************************************************************/
+   /**
+    * @brief Enum for security commands
+    *
+    */
 typedef enum e_ble_security_commands
 {
-    BLE_CMD_UNDEFINED = 0, // 0
-    BLE_CMD_REBOOT,        // 1
-    BLE_CMD_FACTORY_RESET, // 2
-    BLE_CMD_SOFTRESET,     // 3
-    BLE_CMD_HARDREST,      // 4
-    BLE_CMD_AUTHENTICATE,  // 5
-    BLE_CMD_MAX,
+    BLE_CMD_UNDEFINED = 0, /**< Command undefined(0) */
+    BLE_CMD_REBOOT,        /**< Command reboot(1) */
+    BLE_CMD_FACTORY_RESET, /**< Command facctory reset(2) */
+    BLE_CMD_SOFTRESET,     /**< Command soft reset(3) */
+    BLE_CMD_HARDREST,      /**< Command hard reset(4) */
+    BLE_CMD_AUTHENTICATE,  /**< Command authentication(5) */
+    BLE_CMD_MAX,           /**< Max value of enum(6) */
 } e_ble_security_commands_t;
-
-#define CJ_GET_NUMBER(name) cJSON_GetNumberValue(cJSON_GetObjectItem(__FUNCTION__, root, name))
 
 /*******************************************************************************
  *                          Static Function Prototypes
  *******************************************************************************/
-static s_gatt_char_t* factory_reset_characterstic = NULL;
-static void __process_auth_command(cJSON* root);
-static void __process_hard_reset_command(void);
-// static void __process_factory_reset_command(void);
-
-static void factory_reset_write_func(esp_gatt_value_t* value, esp_ble_gatts_cb_param_t* param);
-static void ezlopi_serv_ble_factory_reset_write_func(esp_gatt_value_t* value, esp_ble_gatts_cb_param_t* param);
-
-#if (1 == CONFIG_EZPI_BLE_ENABLE_PASSKEY)
-static void passkey_write_func(esp_gatt_value_t* value, esp_ble_gatts_cb_param_t* param);
+#if (1 == CONFIG_EZPI_BLE_ENALBE_PASSKEY)
+ /**
+  * @brief Function to set new BLE pass key
+  *
+  * @param[in] value pointer to the value for pass key characteristics for security service
+  * @param[in] param Pointer to the gatts callback parameter
+  */
+static void ezpi_passkey_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
 #endif
 
-/*******************************************************************************
- *                          Static Data Definitions
- *******************************************************************************/
-#if (1 == CONFIG_EZPI_BLE_ENABLE_PASSKEY)
+/**
+ * @brief Function that responds to authenticate command for BLE security service
+ *
+ * @param[in] root pointer to the incoming authentication JSON
+ */
+static void ezpi_process_auth_command(cJSON *root);
+/**
+ * @brief Function that responds to hard reset command for BLE security service
+ *
+ */
+static void ezpi_process_hard_reset_command(void);
+/**
+ * @brief Function that responds to factory reset command
+ *
+ * @param[in] value pointer to the command value
+ * @param[in] param Pointer to the gatts callback parameter
+ */
+static void ezpi_factory_reset_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
+/**
+ * @brief Function that responds to reset command
+ *
+ * @param[in] value Pointer to the command value
+ * @param[in] param Pointer to the gatts callback parameter
+ */
+static void ezpi_serv_ble_factory_reset_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
+
+#if (1 == CONFIG_EZPI_BLE_ENALBE_PASSKEY)
+s_gatt_char_t *passkey_characterstic = NULL;
 static uint32_t start_tick = 0;
 static uint32_t authenticated_flag = 0;
 #endif
-static s_gatt_service_t* security_service = NULL;
+static s_gatt_char_t *factory_reset_characterstic = NULL;
+static s_gatt_service_t *security_service = NULL;
 
-#if (1 == CONFIG_EZPI_BLE_ENABLE_PASSKEY)
-s_gatt_char_t* passkey_characterstic = NULL;
-#endif
-
-/*******************************************************************************
- *                          Extern Data Definitions
- *******************************************************************************/
-
-/*******************************************************************************
- *                          Extern Function Definitions
- *******************************************************************************/
-
-/**
- * @brief Global/extern function template example
- * Convention : Use capital letter for initial word on extern function
- * @param arg
- */
-void ezlopi_ble_service_security_init(void)
+void EZPI_ble_service_security_init(void)
 {
     esp_bt_uuid_t uuid;
     esp_gatt_perm_t permission;
@@ -138,54 +142,51 @@ void ezlopi_ble_service_security_init(void)
 
     uuid.len = ESP_UUID_LEN_16;
     uuid.uuid.uuid16 = BLE_SECURITY_SERVICE_UUID;
-    security_service = ezlopi_ble_gatt_create_service(BLE_SECURITY_SERVICE_HANDLE, &uuid);
+    security_service = EZPI_core_ble_gatt_create_service(BLE_SECURITY_SERVICE_HANDLE, &uuid);
 
-#if (1 == CONFIG_EZPI_BLE_ENABLE_PASSKEY)
+#if (1 == CONFIG_EZPI_BLE_ENALBE_PASSKEY)
     uuid.uuid.uuid16 = BLE_SECURITY_CHAR_PASSKEY_UUID;
     uuid.len = ESP_UUID_LEN_16;
     permission = ESP_GATT_PERM_WRITE;
     properties = ESP_GATT_CHAR_PROP_BIT_WRITE;
-    passkey_characterstic = ezlopi_ble_gatt_add_characteristic(security_service, &uuid, permission, properties, NULL, passkey_write_func, NULL);
+    passkey_characterstic = EZPI_core_ble_gatt_add_characteristic(security_service, &uuid, permission, properties, NULL, ezpi_passkey_write_func, NULL);
 #endif
 
     uuid.uuid.uuid16 = BLE_SECURITY_FACTORY_RESET_CHAR_UUID;
     uuid.len = ESP_UUID_LEN_16;
     permission = ESP_GATT_PERM_WRITE;
     properties = ESP_GATT_CHAR_PROP_BIT_WRITE;
-    factory_reset_characterstic = ezlopi_ble_gatt_add_characteristic(security_service, &uuid, permission, properties, NULL, factory_reset_write_func, NULL);
+    factory_reset_characterstic = EZPI_core_ble_gatt_add_characteristic(security_service, &uuid, permission, properties, NULL, ezpi_factory_reset_write_func, NULL);
 
     uuid.uuid.uuid16 = BLE_SECURITY_RESET_CHAR_UUID;
     uuid.len = ESP_UUID_LEN_16;
     permission = ESP_GATT_PERM_WRITE;
     properties = ESP_GATT_CHAR_PROP_BIT_WRITE;
-    factory_reset_characterstic = ezlopi_ble_gatt_add_characteristic(security_service, &uuid, permission, properties, NULL, ezlopi_serv_ble_factory_reset_write_func, NULL);
+    factory_reset_characterstic = EZPI_core_ble_gatt_add_characteristic(security_service, &uuid, permission, properties, NULL, ezpi_serv_ble_factory_reset_write_func, NULL);
 }
 
-/*******************************************************************************
- *                          Static Function Definitions
- *******************************************************************************/
-#if (1 == CONFIG_EZPI_BLE_ENABLE_PASSKEY)
-static void passkey_write_func(esp_gatt_value_t* value, esp_ble_gatts_cb_param_t* param)
+#if (1 == CONFIG_EZPI_BLE_ENALBE_PASSKEY)
+static void ezpi_passkey_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
 {
     if (param->write.len == 4)
     {
-        uint32_t passkey = *((uint32_t*)param->write.value);
+        uint32_t passkey = *((uint32_t *)param->write.value);
         if (passkey < 1000000)
         {
             TRACE_D("New passkey: %d", passkey);
-            ezlopi_ble_gap_set_passkey(passkey);
-            ezlopi_nvs_write_ble_passkey(passkey);
-            ezlopi_ble_gap_dissociate_bonded_devices();
+            EZPI_core_ble_gap_set_passkey(passkey);
+            EZPI_core_nvs_write_ble_passkey(passkey);
+            EZPI_core_ble_gap_dissociate_bonded_devices();
         }
     }
 }
 #endif
 
-static void factory_reset_write_func(esp_gatt_value_t* value, esp_ble_gatts_cb_param_t* param)
+static void ezpi_factory_reset_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
 {
     if (param && param->write.len && param->write.value)
     {
-        cJSON* root = cJSON_ParseWithLength(__FUNCTION__, (const char*)param->write.value, param->write.len);
+        cJSON *root = cJSON_ParseWithLength(__FUNCTION__, (const char *)param->write.value, param->write.len);
         if (root)
         {
 
@@ -197,18 +198,18 @@ static void factory_reset_write_func(esp_gatt_value_t* value, esp_ble_gatts_cb_p
             {
             case BLE_CMD_REBOOT:
             {
-                EZPI_CORE_reset_reboot();
+                EZPI_core_reset_reboot();
                 break;
             }
             case BLE_CMD_FACTORY_RESET: // factory reset command
             case BLE_CMD_HARDREST:
             {
-                __process_hard_reset_command();
+                ezpi_process_hard_reset_command();
                 break;
             }
             case BLE_CMD_AUTHENTICATE: // authentication request for soft-factory-reset
             {
-                __process_auth_command(root);
+                ezpi_process_auth_command(root);
                 break;
             }
             default:
@@ -223,14 +224,14 @@ static void factory_reset_write_func(esp_gatt_value_t* value, esp_ble_gatts_cb_p
     }
 }
 
-static void ezlopi_serv_ble_factory_reset_write_func(esp_gatt_value_t* value, esp_ble_gatts_cb_param_t* param)
+static void ezpi_serv_ble_factory_reset_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
 {
     if (param && param->write.len && param->write.value)
     {
-        cJSON* root = cJSON_ParseWithLength(__FUNCTION__, (const char*)param->write.value, param->write.len);
+        cJSON *root = cJSON_ParseWithLength(__FUNCTION__, (const char *)param->write.value, param->write.len);
         if (root)
         {
-            cJSON* cj_sub_cmd = cJSON_GetObjectItem(__FUNCTION__, root, ezlopi_sub_cmd_str);
+            cJSON *cj_sub_cmd = cJSON_GetObjectItem(__FUNCTION__, root, ezlopi_sub_cmd_str);
             if (cj_sub_cmd)
             {
                 uint8_t sub_cmd = cj_sub_cmd->valuedouble;
@@ -239,13 +240,13 @@ static void ezlopi_serv_ble_factory_reset_write_func(esp_gatt_value_t* value, es
                 case 0:
                 {
                     TRACE_E("Factory restore command");
-                    EZPI_CORE_reset_factory_restore();
+                    EZPI_core_reset_factory_restore();
                     break;
                 }
                 case 1:
                 {
                     TRACE_E("Reboot only command");
-                    EZPI_CORE_reset_reboot();
+                    EZPI_core_reset_reboot();
                     break;
                 }
                 default:
@@ -261,17 +262,16 @@ static void ezlopi_serv_ble_factory_reset_write_func(esp_gatt_value_t* value, es
     }
 }
 
-
-static void __process_hard_reset_command(void)
+static void ezpi_process_hard_reset_command(void)
 {
 
-#if (1 == CONFIG_EZPI_BLE_ENABLE_PASSKEY)
+#if (1 == CONFIG_EZPI_BLE_ENALBE_PASSKEY)
     uint32_t current_tick = xTaskGetTickCount();
     if ((1 == authenticated_flag) && (current_tick - start_tick) < (30 * 1000 / portTICK_RATE_MS)) // once authenticated, valid for 30 seconds only
     {
 #endif
-        EZPI_CORE_reset_factory_restore();
-#if (1 == CONFIG_EZPI_BLE_ENABLE_PASSKEY)
+        EZPI_core_reset_factory_restore();
+#if (1 == CONFIG_EZPI_BLE_ENALBE_PASSKEY)
     }
     else
     {
@@ -281,12 +281,12 @@ static void __process_hard_reset_command(void)
 #endif
 }
 
-static void __process_auth_command(cJSON* root)
+static void ezpi_process_auth_command(cJSON *root)
 {
-#if (1 == CONFIG_EZPI_BLE_ENABLE_PASSKEY)
+#if (1 == CONFIG_EZPI_BLE_ENALBE_PASSKEY)
     uint32_t passkey = CJ_GET_NUMBER("passkey");
     uint32_t original_passkey = 0;
-    ezlopi_nvs_read_ble_passkey(&original_passkey);
+    EZPI_core_nvs_read_ble_passkey(&original_passkey);
 
     TRACE_D("Old passkey: %u, current_passkey: %u", original_passkey, passkey);
 
@@ -303,7 +303,6 @@ static void __process_auth_command(cJSON* root)
     }
 #endif
 }
-
 #endif // CONFIG_EZPI_BLE_ENABLE
 
 /*******************************************************************************

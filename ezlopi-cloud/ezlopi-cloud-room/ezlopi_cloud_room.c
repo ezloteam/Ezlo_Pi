@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2022 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -30,24 +30,25 @@
 */
 
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
- * @version 0.1
- * @date    1st January 2024
+ * @file    ezlopi_cloud_room.c
+ * @brief
+ * @author
+ * @version
+ * @date
  */
-
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
 #include <string.h>
-#include "ezlopi_util_trace.h"
 
 #include "cjext.h"
+#include "ezlopi_util_trace.h"
+
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_room.h"
-#include "ezlopi_cloud_room.h"
 #include "ezlopi_core_devices_list.h"
+
+#include "ezlopi_cloud_room.h"
 #include "ezlopi_cloud_keywords.h"
 #include "ezlopi_cloud_methods_str.h"
 
@@ -78,15 +79,9 @@
 /*******************************************************************************
  *                          Extern Function Definitions
  *******************************************************************************/
-
-/**
- * @brief Global/extern function template example
- * Convention : Use capital letter for initial word on extern function
- * @param arg
- */
-void room_list(cJSON *cj_request, cJSON *cj_response)
+void EZPI_room_list(cJSON *cj_request, cJSON *cj_response)
 {
-    char *rooms_str = ezlopi_nvs_read_rooms();
+    char *rooms_str = EZPI_core_nvs_read_rooms();
     if (rooms_str)
     {
         cJSON_AddRawToObject(__FUNCTION__, cj_response, ezlopi_result_str, rooms_str);
@@ -98,7 +93,7 @@ void room_list(cJSON *cj_request, cJSON *cj_response)
     }
 }
 
-void room_get(cJSON *cj_request, cJSON *cj_response)
+void EZPI_room_get(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
     if (cj_params)
@@ -106,13 +101,11 @@ void room_get(cJSON *cj_request, cJSON *cj_response)
         cJSON *cj_result = cJSON_AddArrayToObject(__FUNCTION__, cj_response, ezlopi_result_str);
         if (cj_result)
         {
-            // int idx = 0;
             cJSON *cj_room_id = NULL;
-            // while (NULL != (cj_room_id = cJSON_GetArrayItem(cj_params, idx++)))
             cJSON_ArrayForEach(cj_room_id, cj_params)
             {
                 uint32_t room_id = strtoul(cj_room_id->valuestring, NULL, 16);
-                s_ezlopi_room_t *l_room_node = ezlopi_room_get_room_head();
+                s_ezlopi_room_t *l_room_node = EZPI_core_room_get_room_head();
                 while (l_room_node)
                 {
                     if (l_room_node->_id == room_id)
@@ -139,48 +132,48 @@ void room_get(cJSON *cj_request, cJSON *cj_response)
     }
 }
 
-void room_create(cJSON *cj_request, cJSON *cj_response)
+void EZPI_room_create(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
     if (cj_params)
     {
-        ezlopi_room_add_to_list(cj_params);
-        ezlopi_room_add_to_nvs(cj_params);
+        EZPI_core_room_add_to_list(cj_params);
+        EZPI_core_room_add_to_nvs(cj_params);
 
-        cJSON_AddItemToObject(__FUNCTION__, cj_response, ezlopi_result_str, cJSON_Duplicate(__FUNCTION__, cj_params, cJSON_True));
+        cJSON_AddItemToObject(__FUNCTION__, cj_response, ezlopi_result_str, cJSON_Duplicate(__FUNCTION__, cj_params, true));
     }
 }
 
-void room_name_set(cJSON *cj_request, cJSON *cj_response)
+void EZPI_room_name_set(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
 
     cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
     if (cj_params)
     {
-        ezlopi_room_name_set(cj_params);
+        EZPI_core_room_name_set(cj_params);
     }
 }
 
-void room_delete(cJSON *cj_request, cJSON *cj_response)
+void EZPI_room_delete(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
 
     cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
     if (cj_params)
     {
-        ezlopi_room_delete(cj_params);
+        EZPI_core_room_delete(cj_params);
     }
 }
 
-void room_all_delete(cJSON *cj_request, cJSON *cj_response)
+void EZPI_room_all_delete(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
 
-    ezlopi_room_delete_all();
+    EZPI_core_room_delete_all();
 }
 
-void room_order_set(cJSON *cj_request, cJSON *cj_response)
+void EZPI_room_order_set(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
     if (cj_params)
@@ -188,13 +181,13 @@ void room_order_set(cJSON *cj_request, cJSON *cj_response)
         cJSON *cj_rooms_ids = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_roomsId_str);
         if (cj_rooms_ids)
         {
-            ezlopi_room_reorder(cj_rooms_ids);
+            EZPI_core_room_reorder(cj_rooms_ids);
         }
     }
 }
 
 //////////////////
-void room_created(cJSON *cj_request, cJSON *cj_response)
+void EZPI_room_created(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_sender_str);
     cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_error_str);
@@ -203,10 +196,10 @@ void room_created(cJSON *cj_request, cJSON *cj_response)
     cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, ezlopi_hub_room_created_str);
 
     cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
-    cJSON_AddItemToObject(__FUNCTION__, cj_response, ezlopi_result_str, cJSON_Duplicate(__FUNCTION__, cj_params, cJSON_True));
+    cJSON_AddItemToObject(__FUNCTION__, cj_response, ezlopi_result_str, cJSON_Duplicate(__FUNCTION__, cj_params, true));
 }
 
-void room_edited(cJSON *cj_request, cJSON *cj_response)
+void EZPI_room_edited(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_id_str);
 
@@ -214,7 +207,7 @@ void room_edited(cJSON *cj_request, cJSON *cj_response)
     cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, ezlopi_hub_room_edited_str);
 }
 
-void room_deleted(cJSON *cj_request, cJSON *cj_response)
+void EZPI_room_deleted(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_id_str);
 
@@ -222,7 +215,7 @@ void room_deleted(cJSON *cj_request, cJSON *cj_response)
     cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, ezlopi_hub_room_deleted_str);
 
     cJSON *cj_method = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_method_str);
-    cJSON_AddItemToObject(__FUNCTION__, cj_response, ezlopi_method_str, cJSON_Duplicate(__FUNCTION__, cj_method, cJSON_True));
+    cJSON_AddItemToObject(__FUNCTION__, cj_response, ezlopi_method_str, cJSON_Duplicate(__FUNCTION__, cj_method, true));
 
     cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     if (cj_result)
@@ -231,12 +224,12 @@ void room_deleted(cJSON *cj_request, cJSON *cj_response)
         if (cj_params)
         {
             cJSON *cj__id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi__id_str);
-            cJSON_AddItemToObject(__FUNCTION__, cj_result, ezlopi__id_str, cJSON_Duplicate(__FUNCTION__, cj__id, cJSON_True));
+            cJSON_AddItemToObject(__FUNCTION__, cj_result, ezlopi__id_str, cJSON_Duplicate(__FUNCTION__, cj__id, true));
         }
     }
 }
 
-void room_reordered(cJSON *cj_request, cJSON *cj_response)
+void EZPI_room_reordered(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_id_str);
 
@@ -244,7 +237,7 @@ void room_reordered(cJSON *cj_request, cJSON *cj_response)
     cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, ezlopi_hub_room_reordered_str);
 
     cJSON *cj_method = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_method_str);
-    cJSON_AddItemToObject(__FUNCTION__, cj_response, ezlopi_method_str, cJSON_Duplicate(__FUNCTION__, cj_method, cJSON_True));
+    cJSON_AddItemToObject(__FUNCTION__, cj_response, ezlopi_method_str, cJSON_Duplicate(__FUNCTION__, cj_method, true));
 }
 
 /*******************************************************************************

@@ -1,3 +1,12 @@
+
+
+/**
+ * @file    ezlopi_cloud_devices_str.h
+ * @brief
+ * @author
+ * @version
+ * @date
+ */
 /* ===========================================================================
 ** Copyright (C) 2024 Ezlo Innovation Inc
 **
@@ -51,40 +60,153 @@ extern "C"
     /*******************************************************************************
      *                          Extern Data Declarations
      *******************************************************************************/
+
     /// @brief  https://api.ezlo.com/devices/devices/index.html
+
+    /**
+     * @brief Variable to be used for alarm device
+     *
+     */
     extern const char *device_alarm;
+    /**
+     * @brief Variable to be used for alarms device
+     *
+     */
     extern const char *device_alarms;
+    /**
+     * @brief Variable to be used for device device
+     *
+     */
     extern const char *device_device;
+    /**
+     * @brief Variable to be used for portabale controller device
+     *
+     */
     extern const char *device_portable_controller;
+    /**
+     * @brief Variable to be used for panic button device
+     *
+     */
     extern const char *device_panic_button;
+    /**
+     * @brief Variable to be used for remote controller device
+     *
+     */
     extern const char *device_remote_controller;
+    /**
+     * @brief Variable to be used for dimmer device
+     *
+     */
     extern const char *device_dimmer;
+    /**
+     * @brief Variable to be used for switch device
+     *
+     */
     extern const char *device_switch;
+    /**
+     * @brief Variable to be used for multisensor device
+     *
+     */
     extern const char *device_multisensor;
+    /**
+     * @brief Variable to be used for door window sensor device
+     *
+     */
     extern const char *device_door_window_sensor;
+    /**
+     * @brief Variable to be used for water leak sensor device
+     *
+     */
     extern const char *device_water_leak_sensor;
+    /**
+     * @brief Variable to be used for sensor device
+     *
+     */
     extern const char *device_sensor;
+    /**
+     * @brief Variable to be used for motion sensor device
+     *
+     */
     extern const char *device_motion_sensor;
+    /**
+     * @brief Variable to be used for tilt sensor device
+     *
+     */
     extern const char *device_tilt_sensor;
+    /**
+     * @brief Variable to be used for thermostats device
+     *
+     */
     extern const char *device_thermostats;
+    /**
+     * @brief Variable to be used for thermostat device
+     *
+     */
     extern const char *device_thermostat;
+    /**
+     * @brief Variable to be used for meter device
+     *
+     */
     extern const char *device_meter;
+    /**
+     * @brief Variable to be used for door lock device
+     *
+     */
     extern const char *device_door_lock;
+    /**
+     * @brief Variable to be used for gas sensor device
+     *
+     */
     extern const char *device_gas_sensor;
+    /**
+     * @brief Variable to be used for andle position device
+     *
+     */
     extern const char *device_angle_position;
+    /**
+     * @brief Variable to be used for athmo pressure device
+     *
+     */
     extern const char *device_athmo_pressure;
+    /**
+     * @brief Variable to be used for aux binary device
+     *
+     */
     extern const char *device_aux_binary;
+    /**
+     * @brief Variable to be used for barrier device
+     *
+     */
     extern const char *device_barrier;
+    /**
+     * @brief Variable to be used for battery device
+     *
+     */
     extern const char *device_battery;
+    /**
+     * @brief Variable to be used for co2 device
+     *
+     */
     extern const char *device_co2;
+    /**
+     * @brief Variable to be used for co2 binary device
+     *
+     */
     extern const char *device_co2_binary;
+    /**
+     * @brief Variable to be used for co binary device
+     *
+     */
     extern const char *device_co_binary;
+    /**
+     * @brief Variable to be used for current multilevel device
+     *
+     */
     extern const char *device_current_multilevel;
 
     /*******************************************************************************
      *                          Extern Function Prototypes
      *******************************************************************************/
-
 #ifdef __cplusplus
 }
 #endif

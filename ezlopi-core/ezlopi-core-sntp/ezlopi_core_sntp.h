@@ -28,13 +28,12 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_core_sntp.h
+ * @brief   perform some function on sntp
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    12th DEC 2024
  */
 
 #ifndef _EZLOPI_CORE_SNTP_H_
@@ -43,8 +42,8 @@
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
-#include <time.h>
 
+#include <time.h>
 #include "ezlopi_core_errors.h"
 
 /*******************************************************************************
@@ -67,23 +66,60 @@ extern "C"
      *                          Extern Function Prototypes
      *******************************************************************************/
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
+     * @brief Function to initialize sntp service
      *
+     * @return ezlopi_error_t
      */
-    ezlopi_error_t EZPI_CORE_sntp_init(void);
-    ezlopi_error_t EZPI_CORE_sntp_set_location(const char* location);
-    char* EZPI_CORE_sntp_get_location(void);
-    void EZPI_CORE_sntp_get_up_time(char* up_time_buf, uint32_t buf_len);
-    void EZPI_CORE_sntp_get_local_time(char* local_time_buf, uint32_t buf_len);
-    void EZPI_CORE_sntp_epoch_to_iso8601(char* time_buf, uint32_t buf_len, time_t t);
-    uint64_t EZPI_CORE_sntp_get_current_time_ms(void);
-    uint64_t EZPI_CORE_sntp_get_current_time_sec(void);
+    ezlopi_error_t EZPI_core_sntp_init(void);
+    /**
+     * @brief Function to set location
+     *
+     * @param location Pointer to target location
+     * @return ezlopi_error_t
+     */
+    ezlopi_error_t EZPI_core_sntp_set_location(const char *location);
+    /**
+     * @brief Function to get current location
+     *
+     * @return char*
+     */
+    char *EZPI_core_sntp_get_location(void);
+    /**
+     * @brief Function to get uptime
+     *
+     * @param up_time_buf Pointer to destination , to store extract data
+     * @param buf_len Buffer len
+     */
+    void EZPI_core_sntp_get_up_time(char *up_time_buf, uint32_t buf_len);
+    /**
+     * @brief Function to get local time
+     *
+     * @param local_time_buf Pointer to local time buffer
+     * @param buf_len Buffer len
+     */
+    void EZPI_core_sntp_get_local_time(char *local_time_buf, uint32_t buf_len);
+    /**
+     * @brief Function to get corresponding standard time
+     *
+     * @param time_buf Pointer to buffer to store extract val
+     * @param buf_len buffer len
+     * @param t Time val to convert
+     */
+    void EZPI_core_sntp_epoch_to_iso8601(char *time_buf, uint32_t buf_len, time_t t);
+    /**
+     * @brief Function to get current time in ms
+     *
+     * @return time_t
+     */
+    time_t EZPI_core_sntp_get_current_time_ms(void);
+    /**
+     * @brief Function to get current time in sec
+     *
+     * @return time_t
+     */
+    // time_t EZPI_core_sntp_get_current_time_sec(void);
+    time_t EZPI_core_sntp_get_current_time_sec_abc(const char *filename);
+#define EZPI_core_sntp_get_current_time_sec() EZPI_core_sntp_get_current_time_sec_abc(__FUNCTION__)
 
 #ifdef __cplusplus
 }

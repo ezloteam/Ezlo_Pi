@@ -1,3 +1,11 @@
+
+/**
+ * @file    ezlopi_service_ble_ble_auth.c
+ * @brief
+ * @author
+ * @version
+ * @date
+ */
 /* ===========================================================================
 ** Copyright (C) 2024 Ezlo Innovation Inc
 **
@@ -29,17 +37,6 @@
 ** ===========================================================================
 */
 
-/**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
- * @version 0.1
- * @date    1st January 2024
- */
-
-/*******************************************************************************
- *                          Include Files
- *******************************************************************************/
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_BLE_ENABLE
@@ -92,12 +89,12 @@ e_auth_status_t ezlopi_ble_auth_last_status(void)
     return sg_last_auth_status;
 }
 
-e_auth_status_t ezlopi_ble_auth_store_user_id(char* user_id)
+e_auth_status_t ezlopi_ble_auth_store_user_id(char *user_id)
 {
     if (user_id)
     {
         TRACE_D("here");
-        if (EZPI_SUCCESS == ezlopi_nvs_write_user_id_str(user_id))
+        if (EZPI_SUCCESS == EZPI_core_nvs_write_user_id_str(user_id))
         {
             sg_last_auth_status = BLE_AUTH_SUCCESS;
         }
@@ -110,9 +107,9 @@ e_auth_status_t ezlopi_ble_auth_store_user_id(char* user_id)
     return sg_last_auth_status;
 }
 
-e_auth_status_t ezlopi_ble_auth_check_user_id(char* user_id)
+e_auth_status_t ezlopi_ble_auth_check_user_id(char *user_id)
 {
-    char* stored_user_id = ezlopi_nvs_read_user_id_str();
+    char *stored_user_id = EZPI_core_nvs_read_user_id_str();
 
     if (NULL != stored_user_id)
     {
@@ -134,7 +131,7 @@ e_auth_status_t ezlopi_ble_auth_check_user_id(char* user_id)
     }
     else
     {
-        ezlopi_nvs_write_user_id_str(user_id);
+        EZPI_core_nvs_write_user_id_str(user_id);
         // sg_last_auth_status = BLE_AUTH_USER_ID_NOT_FOUND;
         sg_last_auth_status = BLE_AUTH_SUCCESS;
     }
@@ -142,9 +139,9 @@ e_auth_status_t ezlopi_ble_auth_check_user_id(char* user_id)
     return sg_last_auth_status;
 }
 
-char* ezlopi_ble_auth_status_to_string(e_auth_status_t status)
+char *ezlopi_ble_auth_status_to_string(e_auth_status_t status)
 {
-    char* ret = "BLE_AUTH_STATUS_UNKNOWN";
+    char *ret = "BLE_AUTH_STATUS_UNKNOWN";
 
     switch (status)
     {

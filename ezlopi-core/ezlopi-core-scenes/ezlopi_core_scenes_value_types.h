@@ -28,13 +28,12 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_core_scenes_value_types.h
+ * @brief   MACROs for scene-value-types
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    12th DEC 2024
  */
 
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
@@ -54,6 +53,15 @@ extern "C"
     /*******************************************************************************
      *                          Type & Macro Declarations
      *******************************************************************************/
+
+    /*******************************************************************************
+     *                          Extern Data Declarations
+     *******************************************************************************/
+
+    /*******************************************************************************
+     *                          Extern Function Prototypes
+     *******************************************************************************/
+
     EZLOPI_VALUE_TYPE(NONE, "none")
     //
     EZLOPI_VALUE_TYPE(INT, "int")
@@ -136,29 +144,11 @@ extern "C"
     //
     EZLOPI_VALUE_TYPE(MAX, NULL)
 
-    /*******************************************************************************
-     *                          Extern Data Declarations
-     *******************************************************************************/
-
-    /*******************************************************************************
-     *                          Extern Function Prototypes
-     *******************************************************************************/
-    /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
-     *
-     */
-
 #ifdef __cplusplus
 }
 #endif
 
-#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+#endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 /*******************************************************************************
  *                          End of File

@@ -30,38 +30,38 @@
 */
 
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
- * @version 0.1
- * @date    1st January 2024
+ * @file    ezlopi_service_ble.c
+ * @brief   Service related functionalities
+ * @author
+ * @version
+ * @date
  */
 
-/*******************************************************************************
- *                          Include Files
- *******************************************************************************/
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_BLE_ENABLE
 
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+#include "lwip/ip_addr.h"
+
 #include "esp_system.h"
 #include "esp_log.h"
-#include "cjext.h"
-#include "lwip/ip_addr.h"
-#include "ezlopi_util_trace.h"
-
-#include "EZLOPI_USER_CONFIG.h"
-
 #include "esp_bt.h"
 #include "esp_gap_ble_api.h"
 #include "esp_gatts_api.h"
 #include "esp_bt_defs.h"
 #include "esp_bt_main.h"
 #include "esp_gatt_common_api.h"
+
+#include "cjext.h"
+#include "ezlopi_util_trace.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_wifi.h"
@@ -74,61 +74,68 @@
 #include "ezlopi_service_ble.h"
 
 /*******************************************************************************
- *                          Extern Data Declarations
- *******************************************************************************/
-
-/*******************************************************************************
  *                          Extern Function Declarations
  *******************************************************************************/
-extern void ezlopi_ble_service_security_init(void);
-extern void ezlopi_ble_service_wifi_profile_init(void);
-extern void ezlopi_ble_service_provisioning_init(void);
-extern void ezlopi_ble_service_device_info_init(void);
-extern void ezlopi_ble_service_dynamic_config_init(void);
-
-/*******************************************************************************
- *                          Type & Macro Definitions
- *******************************************************************************/
+/**
+ * @brief Function to prepare BLE seurity services
+ */
+extern void EZPI_ble_service_security_init(void);
+/**
+ * @brief Function to prepare BLE WiFi services
+ */
+extern void EZPI_ble_service_wifi_profile_init(void);
+/**
+ * @brief Function to prepare BLE provisioning services
+ */
+extern void EZPI_ble_service_provisioning_init(void);
+/**
+ * @brief Function to prepare BLE device info services
+ */
+extern void EZPI_ble_service_device_info_init(void);
+/**
+ * @brief Function to prepare BLE dynamic device config services
+ */
+extern void EZPI_ble_service_dynamic_config_init(void);
 
 /*******************************************************************************
  *                          Static Function Prototypes
  *******************************************************************************/
+/**
+ * @brief Function to initialize BLE
+ * @details This function performs folloiwing operations
+ *  - Prepares and set BLE device name
+ *  - Configures and enables BLE
+ *  - Configures and enables bluedroid
+ *  - Registers callbacks for BLE gatts and GAP
+ */
 static void ezlopi_ble_basic_init(void);
 
-#if (1 == CONFIG_EZPI_BLE_ENABLE_PASSKEY)
-static void ezlopi_ble_start_secure_gatt_server(void);
-#endif
-
-#if (1 == CONFIG_EZPI_BLE_ENABLE_PAIRING)
+#ifdef CONFIG_EZPI_BLE_ENABLE_PAIRING
+/**
+ * @brief Function to set BLE pairing with pass key
+ *
+ */
 static void ezlopi_ble_start_secure_gatt_server_open_pairing(void);
-#endif
+#endif // CONFIG_EZPI_BLE_ENABLE_PAIRING
 
-/*******************************************************************************
- *                          Static Data Definitions
- *******************************************************************************/
-
-/*******************************************************************************
- *                          Extern Data Definitions
- *******************************************************************************/
-
-/*******************************************************************************
- *                          Extern Function Definitions
- *******************************************************************************/
+#ifdef CONFIG_EZPI_BLE_ENALBE_PASSKEY
 
 /**
- * @brief Global/extern function template example
- * Convention : Use capital letter for initial word on extern function
- * @param arg
+ * @brief Function to set BLE in pairing mode
+ *
  */
-void ezlopi_ble_service_init(void)
-{
-    ezlopi_ble_service_wifi_profile_init();
-    ezlopi_ble_service_security_init();
-    ezlopi_ble_service_provisioning_init();
-    ezlopi_ble_service_device_info_init();
-    ezlopi_ble_service_dynamic_config_init();
+static void ezlopi_ble_start_secure_gatt_server(void);
+#endif // CONFIG_EZPI_BLE_ENALBE_PASSKEY
 
-    // ezlopi_ble_profile_print();
+void EZPI_ble_service_init(void)
+{
+    EZPI_ble_service_wifi_profile_init();
+    EZPI_ble_service_security_init();
+    EZPI_ble_service_provisioning_init();
+    EZPI_ble_service_device_info_init();
+    EZPI_ble_service_dynamic_config_init();
+
+    // EZPI_core_ble_profile_print();
     ezlopi_ble_basic_init();
 
     CHECK_PRINT_ERROR(esp_ble_gatts_app_register(BLE_WIFI_SERVICE_HANDLE), "gatts 'wifi-app' register error");
@@ -148,7 +155,7 @@ void ezlopi_ble_service_init(void)
 #endif // 1 == CONFIG_EZPI_BLE_ENABLE_PAIRING
 }
 
-int ezlopi_ble_service_get_ble_mac(uint8_t mac[6])
+int EZPI_ble_service_get_ble_mac(uint8_t mac[6])
 {
     int ret = 0;
     if (ESP_OK == esp_read_mac(mac, ESP_MAC_BT))
@@ -159,14 +166,41 @@ int ezlopi_ble_service_get_ble_mac(uint8_t mac[6])
 }
 
 /*******************************************************************************
- *                          Static Function Definitions
+ *                         Static Function Definitions
  *******************************************************************************/
+#if (1 == CONFIG_EZPI_BLE_ENABLE_PAIRING)
+static void ezlopi_ble_start_secure_gatt_server_open_pairing(void)
+{
+    const esp_ble_auth_req_t auth_req = ESP_LE_AUTH_REQ_SC_MITM_BOND;
+    // ESP_LE_AUTH_REQ_SC_MITM_BOND;
+    // ESP_LE_AUTH_REQ_BOND_MITM;
+    const esp_ble_io_cap_t iocap = ESP_IO_CAP_NONE; // ESP_IO_CAP_OUT;
+    const uint8_t auth_option = ESP_BLE_ONLY_ACCEPT_SPECIFIED_AUTH_DISABLE;
+    const uint8_t oob_support = ESP_BLE_OOB_DISABLE; // ESP_BLE_OOB_ENABLE; // ESP_BLE_OOB_DISABLE;
+    const uint8_t init_key = (ESP_BLE_ENC_KEY_MASK | ESP_BLE_ID_KEY_MASK);
+    const uint8_t rsp_key = (ESP_BLE_ENC_KEY_MASK | ESP_BLE_ID_KEY_MASK);
+
+    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_AUTHEN_REQ_MODE, (void *)&auth_req, sizeof(uint8_t)),
+                      "failed -set - ESP_BLE_SM_AUTHEN_REQ_MODE");
+    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_IOCAP_MODE, (void *)&iocap, sizeof(uint8_t)),
+                      "failed -set - ESP_BLE_SM_IOCAP_MODE");
+    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_ONLY_ACCEPT_SPECIFIED_SEC_AUTH, (void *)&auth_option, sizeof(uint8_t)),
+                      "failed -set - ESP_BLE_SM_ONLY_ACCEPT_SPECIFIED_SEC_AUTH");
+    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_OOB_SUPPORT, (void *)&oob_support, sizeof(uint8_t)),
+                      "failed -set - ESP_BLE_SM_OOB_SUPPORT");
+    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_SET_INIT_KEY, (void *)&init_key, sizeof(uint8_t)),
+                      "failed -set - ESP_BLE_SM_SET_INIT_KEY");
+    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_SET_RSP_KEY, (void *)&rsp_key, sizeof(uint8_t)),
+                      "failed -set - ESP_BLE_SM_SET_RSP_KEY");
+}
+#endif
+
 #if (1 == CONFIG_EZPI_BLE_ENABLE_PASSKEY)
 static void ezlopi_ble_start_secure_gatt_server(void)
 {
     const uint32_t default_passkey = 123456;
     uint32_t passkey;
-    ezlopi_nvs_read_ble_passkey(&passkey);
+    EZPI_core_nvs_read_ble_passkey(&passkey);
     passkey = (0 == passkey) ? default_passkey : passkey;
     passkey = (passkey > 999999) ? default_passkey : passkey;
     TRACE_D("Ble passkey: %d", passkey);
@@ -197,13 +231,13 @@ static void ezlopi_ble_basic_init(void)
     memset(ble_device_name, 0, sizeof(ble_device_name));
 
     // s_ezlopi_factory_info_t *factory = ezlopi_factory_info_get_info();
-    // snprintf(ble_device_name, sizeof(ble_device_name), "ezlopi_%llu", ezlopi_factory_info_v3_get_id());
+    // snprintf(ble_device_name, sizeof(ble_device_name), "ezlopi_%llu", EZPI_core_factory_info_v3_get_id());
 
-    const char* device_type = ezlopi_factory_info_v3_get_device_type();
+    const char *device_type = EZPI_core_factory_info_v3_get_device_type();
 
-    if ((1 == ezlopi_factory_info_v3_get_provisioning_status()) && (NULL != device_type))
+    if ((1 == EZPI_core_factory_info_v3_get_provisioning_status()) && (NULL != device_type))
     {
-        snprintf(ble_device_name, sizeof(ble_device_name), "%s_%llu", device_type, ezlopi_factory_info_v3_get_id());
+        snprintf(ble_device_name, sizeof(ble_device_name), "%s_%llu", device_type, EZPI_core_factory_info_v3_get_id());
     }
     else
     {
@@ -211,7 +245,7 @@ static void ezlopi_ble_basic_init(void)
         memset(mac, 0, sizeof(mac));
         esp_read_mac(mac, ESP_MAC_BT);
         snprintf(ble_device_name, sizeof(ble_device_name), "ezlopi_%02x%02x%02x%02x%02x%02x",
-            mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+                 mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
     }
 
     // dump("ble_device_name", ble_device_name, 0, sizeof(ble_device_name));
@@ -228,37 +262,10 @@ static void ezlopi_ble_basic_init(void)
 
     CHECK_PRINT_ERROR(esp_bluedroid_init(), "init bluetooth failed");
     CHECK_PRINT_ERROR(esp_bluedroid_enable(), "enable bluetooth failed");
-    CHECK_PRINT_ERROR(esp_ble_gatts_register_callback(ezlopi_ble_gatts_event_handler), "gatts register error, error code");
-    CHECK_PRINT_ERROR(esp_ble_gap_register_callback(ezlopi_ble_gap_event_handler), "gap register error");
+    CHECK_PRINT_ERROR(esp_ble_gatts_register_callback(EZPI_core_ble_gatts_event_handler), "gatts register error, error code");
+    CHECK_PRINT_ERROR(esp_ble_gap_register_callback(EZPI_core_ble_gap_event_handler), "gap register error");
     CHECK_PRINT_ERROR(esp_ble_gap_set_device_name(ble_device_name), "Set device name failed!");
 }
-
-#if (1 == CONFIG_EZPI_BLE_ENABLE_PAIRING)
-static void ezlopi_ble_start_secure_gatt_server_open_pairing(void)
-{
-    const esp_ble_auth_req_t auth_req = ESP_LE_AUTH_REQ_SC_MITM_BOND;
-    // ESP_LE_AUTH_REQ_SC_MITM_BOND;
-    // ESP_LE_AUTH_REQ_BOND_MITM;
-    const esp_ble_io_cap_t iocap = ESP_IO_CAP_NONE; // ESP_IO_CAP_OUT;
-    const uint8_t auth_option = ESP_BLE_ONLY_ACCEPT_SPECIFIED_AUTH_DISABLE;
-    const uint8_t oob_support = ESP_BLE_OOB_DISABLE; // ESP_BLE_OOB_ENABLE; // ESP_BLE_OOB_DISABLE;
-    const uint8_t init_key = (ESP_BLE_ENC_KEY_MASK | ESP_BLE_ID_KEY_MASK);
-    const uint8_t rsp_key = (ESP_BLE_ENC_KEY_MASK | ESP_BLE_ID_KEY_MASK);
-
-    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_AUTHEN_REQ_MODE, (void*)&auth_req, sizeof(uint8_t)),
-        "failed -set - ESP_BLE_SM_AUTHEN_REQ_MODE");
-    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_IOCAP_MODE, (void*)&iocap, sizeof(uint8_t)),
-        "failed -set - ESP_BLE_SM_IOCAP_MODE");
-    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_ONLY_ACCEPT_SPECIFIED_SEC_AUTH, (void*)&auth_option, sizeof(uint8_t)),
-        "failed -set - ESP_BLE_SM_ONLY_ACCEPT_SPECIFIED_SEC_AUTH");
-    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_OOB_SUPPORT, (void*)&oob_support, sizeof(uint8_t)),
-        "failed -set - ESP_BLE_SM_OOB_SUPPORT");
-    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_SET_INIT_KEY, (void*)&init_key, sizeof(uint8_t)),
-        "failed -set - ESP_BLE_SM_SET_INIT_KEY");
-    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_SET_RSP_KEY, (void*)&rsp_key, sizeof(uint8_t)),
-        "failed -set - ESP_BLE_SM_SET_RSP_KEY");
-}
-#endif
 
 #endif // CONFIG_EZPI_BLE_ENABLE
 

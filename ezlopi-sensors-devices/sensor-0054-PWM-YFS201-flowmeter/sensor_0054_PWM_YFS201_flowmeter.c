@@ -28,28 +28,23 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
  * @file    main.c
  * @brief   perform some function on data
- * @author  John Doe
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    xx
  */
 
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
-#include "ezlopi_util_trace.h"
-
 #include "driver/gpio.h"
 
-// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
-#include "ezlopi_core_errors.h"
 
 #include "ezlopi_hal_pwm.h"
 
@@ -89,6 +84,8 @@ typedef struct yfs201_t
 /*******************************************************************************
  *                          Static Function Prototypes
  *******************************************************************************/
+static void IRAM_ATTR gpio_isr_handler(void *arg);
+
 static ezlopi_error_t __0054_prepare(void *arg);
 static ezlopi_error_t __0054_init(l_ezlopi_item_t *item);
 static ezlopi_error_t __0054_get_cjson_value(l_ezlopi_item_t *item, void *arg);
@@ -110,13 +107,7 @@ static QueueHandle_t yfs201_queue = NULL;
 /*******************************************************************************
  *                          Extern Function Definitions
  *******************************************************************************/
-
-/**
- * @brief Global/extern function template example
- * Convention : Use capital letter for initial word on extern function
- * @param arg
- */
-ezlopi_error_t sensor_0054_PWM_YFS201_flowmeter(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+ezlopi_error_t SENSOR_0054_pwm_yfs201_flowmeter(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
     switch (action)
@@ -156,7 +147,7 @@ ezlopi_error_t sensor_0054_PWM_YFS201_flowmeter(e_ezlopi_actions_t action, l_ezl
 }
 
 /*******************************************************************************
- *                          Static Function Definitions
+ *                         Static Function Definitions
  *******************************************************************************/
 static void IRAM_ATTR gpio_isr_handler(void *arg) // argument => time_us
 {
@@ -180,7 +171,7 @@ static void __prepare_item_properties(l_ezlopi_item_t *item, cJSON *cj_device, v
     item->cloud_properties.value_type = value_type_volume_flow;
     item->cloud_properties.show = true;
     item->cloud_properties.scale = scales_liter_per_hour;
-    item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
+    item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
 
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
     CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_str, item->interface.pwm.gpio_num);
@@ -202,11 +193,11 @@ static ezlopi_error_t __0054_prepare(void *arg)
         if (NULL != yfs201_data)
         {
             memset(yfs201_data, 0, sizeof(yfs201_t));
-            l_ezlopi_device_t *flowmeter_device = ezlopi_device_add_device(device_prep_arg->cjson_device, NULL);
+            l_ezlopi_device_t *flowmeter_device = EZPI_core_device_add_device(device_prep_arg->cjson_device, NULL);
             if (flowmeter_device)
             {
                 __prepare_device_cloud_properties(flowmeter_device, device_prep_arg->cjson_device);
-                l_ezlopi_item_t *flowmeter_item = ezlopi_device_add_item_to_device(flowmeter_device, sensor_0054_PWM_YFS201_flowmeter);
+                l_ezlopi_item_t *flowmeter_item = EZPI_core_device_add_item_to_device(flowmeter_device, SENSOR_0054_pwm_yfs201_flowmeter);
                 if (flowmeter_item)
                 {
                     __prepare_item_properties(flowmeter_item, device_prep_arg->cjson_device, yfs201_data);
@@ -214,7 +205,7 @@ static ezlopi_error_t __0054_prepare(void *arg)
                 }
                 else
                 {
-                    ezlopi_device_free_device(flowmeter_device);
+                    EZPI_core_device_free_device(flowmeter_device);
                     ezlopi_free(__FUNCTION__, yfs201_data);
                 }
             }
@@ -273,7 +264,7 @@ static ezlopi_error_t __0054_get_cjson_value(l_ezlopi_item_t *item, void *arg)
                 Lt_per_hr = (Lt_per_hr > 720) ? 720 : Lt_per_hr;
                 // TRACE_E(" Frequency : %.2f Hz --> FlowRate : %.2f [Lt_per_hr]", freq, Lt_per_hr);
 
-                ezlopi_valueformatter_float_to_cjson(cj_result, Lt_per_hr, scales_liter_per_hour);
+                EZPI_core_valueformatter_float_to_cjson(cj_result, Lt_per_hr, scales_liter_per_hour);
                 ret = EZPI_SUCCESS;
             }
         }
@@ -294,7 +285,7 @@ static ezlopi_error_t __0054_notify(l_ezlopi_item_t *item)
             __extract_YFS201_Pulse_Count_func(item);
             if (prev_yfs201_dominant_pulse_count != yfs201_data->yfs201_dominant_pulse_count)
             {
-                ezlopi_device_value_updated_from_device_broadcast(item);
+                EZPI_core_device_value_updated_from_device_broadcast(item);
             }
             ret = EZPI_SUCCESS;
         }
@@ -348,7 +339,7 @@ static void __extract_YFS201_Pulse_Count_func(l_ezlopi_item_t *item)
             if ((yfs201_data->yfs201_QueueFlag) == YFS201_QUEUE_FULL)
             {
                 // loop through all the queue[0-5] values -> pulse counts
-                int32_t P_count[YFS201_QUEUE_SIZE] = { 0 };
+                int32_t P_count[YFS201_QUEUE_SIZE] = {0};
                 int val = 0;
                 for (uint8_t i = 0; i < YFS201_QUEUE_SIZE; i++)
                 {
@@ -362,7 +353,7 @@ static void __extract_YFS201_Pulse_Count_func(l_ezlopi_item_t *item)
                 }
 
                 // generate frequency of occurance table from "P_count[]" array values
-                uint8_t freq[YFS201_QUEUE_SIZE] = { 0 };
+                uint8_t freq[YFS201_QUEUE_SIZE] = {0};
                 float error = 0;
                 for (uint8_t x = 0; x < YFS201_QUEUE_SIZE; x++)
                 {

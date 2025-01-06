@@ -30,7 +30,7 @@
 */
 
 /**
- * @file    main.c
+ * @file     ezlopi_cloud_coordinates.h
  * @brief   perform some function on data
  * @author  John Doe
  * @version 0.1
@@ -44,7 +44,6 @@
  *                          Include Files
  *******************************************************************************/
 #include "cjext.h"
-
 /*******************************************************************************
  *                          C++ Declaration Wrapper
  *******************************************************************************/
@@ -74,10 +73,29 @@ extern "C"
      * @param arg
      *
      */
-    void hub_coordinates_set(cJSON* cjson_request, cJSON* cjson_response);
-    void hub_coordinates_get(cJSON* cj_request, cJSON* cj_response);
-    double ezlopi_cloud_get_longitude();
-    double ezlopi_cloud_get_latitude();
+
+    void EZPI_hub_coordinates_set(cJSON *cjson_request, cJSON *cjson_response);
+    /**
+     * @brief Function to handle hub.coordinate.get method
+     *
+     * @param cjson_request Pointer to incoming JONS
+     * @param cjson_response Pointer to outgoing JONS
+     */
+    void EZPI_hub_coordinates_get(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function to return currnet longitude
+     *
+     * @return double
+     * @retval Current longitude
+     */
+    double EZPI_cloud_get_longitude();
+    /**
+     * @brief Function to return currnet latitude
+     *
+     * @return double
+     * @retval Current latitude
+     */
+    double EZPI_cloud_get_latitude();
 
 #ifdef __cplusplus
 }

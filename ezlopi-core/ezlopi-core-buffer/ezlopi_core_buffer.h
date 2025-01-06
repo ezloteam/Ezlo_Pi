@@ -28,17 +28,15 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_core_buffer.h
+ * @brief   perform some function on system-buffer for messages
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    12th DEC 2024
  */
-
-#ifndef __EZLOPI_CORE_BUFFER_H__
-#define __EZLOPI_CORE_BUFFER_H__
+#ifndef __EZPI_core_buffer_H__
+#define __EZPI_core_buffer_H__
 
 /*******************************************************************************
  *                          Include Files
@@ -73,32 +71,43 @@ extern "C"
      *                          Extern Function Prototypes
      *******************************************************************************/
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
+     * @brief Funtion return enum of system-buffer-status
+     *
+     * @return e_buffer_state_t
+     */
+    e_buffer_state_t EZPI_core_buffer_status(void);
+    /**
+     * @brief Funtion to deinit system-buffer
      *
      */
-    e_buffer_state_t ezlopi_core_buffer_status(void);
-
-    void ezlopi_core_buffer_deinit(void);
-    void ezlopi_core_buffer_init(uint32_t len);
-
-    // void ezlopi_core_buffer_release(void);
-    void ezlopi_core_buffer_release(const char *who);
-
-    // char *ezlopi_core_buffer_acquire(uint32_t *len, uint32_t wait_to_acquired_ms);
-    char *ezlopi_core_buffer_acquire(const char *who, uint32_t *len, uint32_t wait_to_acquired_ms);
+    void EZPI_core_buffer_deinit(void);
+    /**
+     * @brief Funtion to initialize system-buffer
+     *
+     * @param len Length of message buffer
+     */
+    void EZPI_core_buffer_init(uint32_t len);
+    /**
+     * @brief Function to release the lock of the buffer
+     *
+     * @param who Pointer to trigger-line and function-name
+     */
+    void EZPI_core_buffer_release(const char *who);
+    /**
+     * @brief Funtion to acquire message buffer
+     *
+     * @param who Pointer to trigger-line and function-name
+     * @param len Length of the buffer to utilize
+     * @param wait_to_acquired_ms Time to acquire (ms)
+     * @return char*
+     */
+    char *EZPI_core_buffer_acquire(const char *who, uint32_t *len, uint32_t wait_to_acquired_ms);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // __EZLOPI_CORE_BUFFER_H__
-
+#endif // __EZPI_core_buffer_H__
 /*******************************************************************************
  *                          End of File
  *******************************************************************************/

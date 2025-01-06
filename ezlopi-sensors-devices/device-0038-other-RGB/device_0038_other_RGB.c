@@ -28,27 +28,22 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    device_0038_other_RGB.c
+ * @brief   perform some function on device_0038
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    xx
  */
 
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
 
-#include "ezlopi_util_trace.h"
-
-// #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
-#include "ezlopi_core_errors.h"
 
 #include "ezlopi_hal_pwm.h"
 
@@ -69,6 +64,7 @@
 /*******************************************************************************
  *                          Type & Macro Definitions
  *******************************************************************************/
+
 typedef struct s_rgb_args
 {
     bool RGB_LED_initialized;
@@ -102,13 +98,7 @@ static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg);
 /*******************************************************************************
  *                          Extern Function Definitions
  *******************************************************************************/
-
-/**
- * @brief Global/extern function template example
- * Convention : Use capital letter for initial word on extern function
- * @param arg
- */
-ezlopi_error_t device_0038_other_RGB(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+ezlopi_error_t DEVICE_0038_other_rgb(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
 
@@ -149,19 +139,20 @@ ezlopi_error_t device_0038_other_RGB(e_ezlopi_actions_t action, l_ezlopi_item_t 
 }
 
 /*******************************************************************************
- *                          Static Function Definitions
+ *                         Static Function Definitions
  *******************************************************************************/
+
 static ezlopi_error_t RGB_LED_change_color_value(s_rgb_args_t *rgb_args)
 {
     ezlopi_error_t ret = EZPI_FAILED;
     if (rgb_args)
     {
         TRACE_D("Brightness value is %d, %d, %d", (uint8_t)(rgb_args->red_struct.value * rgb_args->brightness), (uint8_t)(rgb_args->green_struct.value * rgb_args->brightness),
-            (uint8_t)(rgb_args->blue_struct.value * rgb_args->brightness));
+                (uint8_t)(rgb_args->blue_struct.value * rgb_args->brightness));
 
-        ezlopi_pwm_change_duty(rgb_args->red_struct.channel, rgb_args->red_struct.speed_mode, (uint8_t)(rgb_args->red_struct.value * rgb_args->brightness));
-        ezlopi_pwm_change_duty(rgb_args->green_struct.channel, rgb_args->green_struct.speed_mode, (uint8_t)(rgb_args->green_struct.value * rgb_args->brightness));
-        ezlopi_pwm_change_duty(rgb_args->blue_struct.channel, rgb_args->blue_struct.speed_mode, (uint8_t)(rgb_args->blue_struct.value * rgb_args->brightness));
+        EZPI_hal_pwm_change_duty(rgb_args->red_struct.channel, rgb_args->red_struct.speed_mode, (uint8_t)(rgb_args->red_struct.value * rgb_args->brightness));
+        EZPI_hal_pwm_change_duty(rgb_args->green_struct.channel, rgb_args->green_struct.speed_mode, (uint8_t)(rgb_args->green_struct.value * rgb_args->brightness));
+        EZPI_hal_pwm_change_duty(rgb_args->blue_struct.channel, rgb_args->blue_struct.speed_mode, (uint8_t)(rgb_args->blue_struct.value * rgb_args->brightness));
         ret = EZPI_SUCCESS;
     }
     return ret;
@@ -174,7 +165,6 @@ static ezlopi_error_t RGB_LED_change_color_value(s_rgb_args_t *rgb_args)
 //     {
 //         cJSON* cj_properties = (cJSON*)arg;
 //         s_rgb_args_t* rgb_args = (s_rgb_args_t*)item->user_arg;
-
 //         if ((NULL != cj_properties) && (NULL != rgb_args))
 //         {
 //             if (ezlopi_item_name_rgbcolor == item->cloud_properties.item_name)
@@ -185,7 +175,6 @@ static ezlopi_error_t RGB_LED_change_color_value(s_rgb_args_t *rgb_args)
 //                     cJSON_AddNumberToObject(__FUNCTION__, color_values, ezlopi_red_str, rgb_args->red_struct.value);
 //                     cJSON_AddNumberToObject(__FUNCTION__, color_values, ezlopi_green_str, rgb_args->green_struct.value);
 //                     cJSON_AddNumberToObject(__FUNCTION__, color_values, ezlopi_blue_str, rgb_args->blue_struct.value);
-
 //                     char formatted_rgb_value[32];
 //                     snprintf(formatted_rgb_value, sizeof(formatted_rgb_value), "#%02x%02x%02x", rgb_args->red_struct.value, rgb_args->green_struct.value, rgb_args->blue_struct.value);
 //                     cJSON_AddStringToObject(__FUNCTION__, cj_properties, ezlopi_valueFormatted_str, formatted_rgb_value);
@@ -194,14 +183,14 @@ static ezlopi_error_t RGB_LED_change_color_value(s_rgb_args_t *rgb_args)
 //             }
 //             else if (ezlopi_item_name_switch == item->cloud_properties.item_name)
 //             {
-//                 ezlopi_valueformatter_bool_to_cjson(cj_properties, rgb_args->brightness, item->cloud_properties.scale);
+//                 EZPI_core_valueformatter_bool_to_cjson(cj_properties, rgb_args->brightness, item->cloud_properties.scale);
 //             }
 //             else if (ezlopi_item_name_dimmer == item->cloud_properties.item_name)
 //             {
 //                 int dim_percentage = (int)(rgb_args->brightness * 100);
 //                 cJSON_AddNumberToObject(__FUNCTION__, cj_properties, ezlopi_minValue_str, 0);
 //                 cJSON_AddNumberToObject(__FUNCTION__, cj_properties, ezlopi_maxValue_str, 100);
-//                 ezlopi_valueformatter_int32_to_cjson(cj_properties, dim_percentage, item->cloud_properties.scale);
+//                 EZPI_core_valueformatter_int32_to_cjson(cj_properties, dim_percentage, item->cloud_properties.scale);
 //             }
 //         }
 //     }
@@ -235,13 +224,13 @@ static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg)
             }
             else if (ezlopi_item_name_switch == item->cloud_properties.item_name)
             {
-                ezlopi_valueformatter_bool_to_cjson(cj_properties, rgb_args->brightness, NULL);
+                EZPI_core_valueformatter_bool_to_cjson(cj_properties, rgb_args->brightness, NULL);
                 ret = EZPI_SUCCESS;
             }
             else if (ezlopi_item_name_dimmer == item->cloud_properties.item_name)
             {
                 int dim_percentage = (int)(rgb_args->brightness * 100);
-                ezlopi_valueformatter_int32_to_cjson(cj_properties, dim_percentage, item->cloud_properties.scale);
+                EZPI_core_valueformatter_int32_to_cjson(cj_properties, dim_percentage, item->cloud_properties.scale);
                 ret = EZPI_SUCCESS;
             }
         }
@@ -280,9 +269,9 @@ static ezlopi_error_t __set_cjson_value(l_ezlopi_item_t *item, void *arg)
                 rgb_args->previous_dim_factor = ((0 == led_state) ? rgb_args->brightness : rgb_args->previous_dim_factor);
                 rgb_args->brightness = ((0 == led_state) ? 0.0 : ((0 == rgb_args->previous_dim_factor) ? 1.0 : rgb_args->previous_dim_factor));
                 TRACE_D("Brightness value is %d, %d, %d", (uint8_t)(rgb_args->red_struct.value * rgb_args->brightness), (uint8_t)(rgb_args->green_struct.value * rgb_args->brightness),
-                    (uint8_t)(rgb_args->blue_struct.value * rgb_args->brightness));
+                        (uint8_t)(rgb_args->blue_struct.value * rgb_args->brightness));
                 RGB_LED_change_color_value(rgb_args);
-                ezlopi_device_value_updated_from_device_broadcast(rgb_args->RGB_LED_dimmer_item);
+                EZPI_core_device_value_updated_from_device_broadcast(rgb_args->RGB_LED_dimmer_item);
                 ret = EZPI_SUCCESS;
             }
             if (ezlopi_item_name_dimmer == item->cloud_properties.item_name)
@@ -293,7 +282,7 @@ static ezlopi_error_t __set_cjson_value(l_ezlopi_item_t *item, void *arg)
                 TRACE_D("dim_percent %d, dim_brightness_factor is %f", dim_percent, dim_brightness_factor);
                 rgb_args->brightness = dim_brightness_factor;
                 RGB_LED_change_color_value(rgb_args);
-                ezlopi_device_value_updated_from_device_broadcast(rgb_args->RGB_LED_onoff_switch_item);
+                EZPI_core_device_value_updated_from_device_broadcast(rgb_args->RGB_LED_onoff_switch_item);
                 ret = EZPI_SUCCESS;
             }
         }
@@ -303,7 +292,7 @@ static ezlopi_error_t __set_cjson_value(l_ezlopi_item_t *item, void *arg)
 
 static ezlopi_error_t __init(l_ezlopi_item_t *item)
 {
-    ezlopi_error_t ret = EZPI_SUCCESS;
+    ezlopi_error_t ret = EZPI_ERR_INIT_DEVICE_FAILED;
 
     if (item)
     {
@@ -316,7 +305,7 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
             {
                 if (false == rgb_args->RGB_LED_initialized)
                 {
-                    s_ezlopi_channel_speed_t *RGB_LED_red_channel_speed = ezlopi_pwm_init(rgb_args->red_struct.gpio_num, rgb_args->red_struct.pwm_resln, rgb_args->red_struct.freq_hz, rgb_args->red_struct.duty_cycle);
+                    s_ezlopi_channel_speed_t *RGB_LED_red_channel_speed = EZPI_hal_pwm_init(rgb_args->red_struct.gpio_num, rgb_args->red_struct.pwm_resln, rgb_args->red_struct.freq_hz, rgb_args->red_struct.duty_cycle);
                     if (RGB_LED_red_channel_speed)
                     {
                         rgb_args->red_struct.channel = RGB_LED_red_channel_speed->channel;
@@ -325,7 +314,7 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
                         ezlopi_free(__FUNCTION__, RGB_LED_red_channel_speed);
                     }
 
-                    s_ezlopi_channel_speed_t *RGB_LED_green_channel_speed = ezlopi_pwm_init(rgb_args->green_struct.gpio_num, rgb_args->green_struct.pwm_resln, rgb_args->green_struct.freq_hz, rgb_args->green_struct.duty_cycle);
+                    s_ezlopi_channel_speed_t *RGB_LED_green_channel_speed = EZPI_hal_pwm_init(rgb_args->green_struct.gpio_num, rgb_args->green_struct.pwm_resln, rgb_args->green_struct.freq_hz, rgb_args->green_struct.duty_cycle);
                     if (RGB_LED_green_channel_speed)
                     {
                         rgb_args->green_struct.channel = RGB_LED_green_channel_speed->channel;
@@ -334,7 +323,7 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
                         ezlopi_free(__FUNCTION__, RGB_LED_green_channel_speed);
                     }
 
-                    s_ezlopi_channel_speed_t *RGB_LED_blue_channel_speed = ezlopi_pwm_init(rgb_args->blue_struct.gpio_num, rgb_args->blue_struct.pwm_resln, rgb_args->blue_struct.freq_hz, rgb_args->blue_struct.duty_cycle);
+                    s_ezlopi_channel_speed_t *RGB_LED_blue_channel_speed = EZPI_hal_pwm_init(rgb_args->blue_struct.gpio_num, rgb_args->blue_struct.pwm_resln, rgb_args->blue_struct.freq_hz, rgb_args->blue_struct.duty_cycle);
                     if (RGB_LED_blue_channel_speed)
                     {
                         rgb_args->blue_struct.channel = RGB_LED_blue_channel_speed->channel;
@@ -346,23 +335,11 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
                     RGB_LED_change_color_value(rgb_args);
 
                     rgb_args->RGB_LED_initialized = true;
+                    ret = EZPI_SUCCESS;
                 }
             }
-            else
-            {
-                ret = EZPI_ERR_INIT_DEVICE_FAILED;
-            }
-        }
-        else
-        {
-            ret = EZPI_ERR_INIT_DEVICE_FAILED;
         }
     }
-    else
-    {
-        ret = EZPI_ERR_INIT_DEVICE_FAILED;
-    }
-
     return ret;
 }
 
@@ -403,9 +380,9 @@ static void __prepare_RGB_LED_item(l_ezlopi_item_t *item, cJSON *cj_device, void
 {
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = true;
-    item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
+    item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
     item->cloud_properties.item_name = ezlopi_item_name_rgbcolor,
-        item->cloud_properties.show = true;
+    item->cloud_properties.show = true;
     item->cloud_properties.scale = NULL;
     item->cloud_properties.value_type = value_type_rgb;
     item->interface_type = EZLOPI_DEVICE_INTERFACE_PWM;
@@ -424,9 +401,9 @@ static void __prepare_RGB_LED_onoff_switch_item(l_ezlopi_item_t *item, cJSON *cj
 {
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = true;
-    item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
+    item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
     item->cloud_properties.item_name = ezlopi_item_name_switch,
-        item->cloud_properties.show = true;
+    item->cloud_properties.show = true;
     item->cloud_properties.scale = NULL;
     item->cloud_properties.value_type = value_type_bool;
     item->interface_type = EZLOPI_DEVICE_INTERFACE_DIGITAL_OUTPUT;
@@ -447,9 +424,9 @@ static void __prepare_RGB_LED_dimmer_item(l_ezlopi_item_t *item, cJSON *cj_devic
 {
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = true;
-    item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
+    item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
     item->cloud_properties.item_name = ezlopi_item_name_dimmer,
-        item->cloud_properties.show = true;
+    item->cloud_properties.show = true;
     item->cloud_properties.scale = NULL;
     item->cloud_properties.value_type = value_type_int;
     item->interface_type = EZLOPI_DEVICE_INTERFACE_PWM;
@@ -466,12 +443,12 @@ static void __prepare_RGB_LED_dimmer_item(l_ezlopi_item_t *item, cJSON *cj_devic
 
 static ezlopi_error_t __prepare(void *arg)
 {
-    ezlopi_error_t ret = EZPI_SUCCESS;
+    ezlopi_error_t ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
 
     s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
     if (prep_arg && prep_arg->cjson_device)
     {
-        l_ezlopi_device_t *RGB_device = ezlopi_device_add_device(prep_arg->cjson_device, NULL);
+        l_ezlopi_device_t *RGB_device = EZPI_core_device_add_device(prep_arg->cjson_device, NULL);
         if (RGB_device)
         {
             s_rgb_args_t *rgb_args = ezlopi_malloc(__FUNCTION__, sizeof(s_rgb_args_t));
@@ -483,41 +460,39 @@ static ezlopi_error_t __prepare(void *arg)
                 __prepare_device_cloud_properties(RGB_device, prep_arg->cjson_device);
                 __prepare_RGB_LED_user_args(rgb_args, prep_arg->cjson_device);
 
-                rgb_args->RGB_LED_item = ezlopi_device_add_item_to_device(RGB_device, device_0038_other_RGB);
+                rgb_args->RGB_LED_item = EZPI_core_device_add_item_to_device(RGB_device, DEVICE_0038_other_rgb);
                 if (rgb_args->RGB_LED_item)
                 {
                     __prepare_RGB_LED_item(rgb_args->RGB_LED_item, prep_arg->cjson_device, rgb_args);
                 }
 
-                rgb_args->RGB_LED_onoff_switch_item = ezlopi_device_add_item_to_device(RGB_device, device_0038_other_RGB);
+                rgb_args->RGB_LED_onoff_switch_item = EZPI_core_device_add_item_to_device(RGB_device, DEVICE_0038_other_rgb);
                 if (rgb_args->RGB_LED_onoff_switch_item)
                 {
                     __prepare_RGB_LED_onoff_switch_item(rgb_args->RGB_LED_onoff_switch_item, prep_arg->cjson_device, rgb_args);
                 }
 
-                rgb_args->RGB_LED_dimmer_item = ezlopi_device_add_item_to_device(RGB_device, device_0038_other_RGB);
+                rgb_args->RGB_LED_dimmer_item = EZPI_core_device_add_item_to_device(RGB_device, DEVICE_0038_other_rgb);
                 if (rgb_args->RGB_LED_dimmer_item)
                 {
                     __prepare_RGB_LED_dimmer_item(rgb_args->RGB_LED_dimmer_item, prep_arg->cjson_device, rgb_args);
                 }
-
+                //-----------------------------------------------------------------------------------------------------
                 if (!rgb_args->RGB_LED_item && !rgb_args->RGB_LED_onoff_switch_item && !rgb_args->RGB_LED_dimmer_item)
                 {
                     ezlopi_free(__FUNCTION__, rgb_args);
-                    ezlopi_device_free_device(RGB_device);
-                    ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
+                    EZPI_core_device_free_device(RGB_device);
+                }
+                else
+                {
+                    ret = EZPI_SUCCESS;
                 }
             }
             else
             {
-                ezlopi_device_free_device(RGB_device);
-                ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
+                EZPI_core_device_free_device(RGB_device);
             }
         }
-    }
-    else
-    {
-        ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
     }
 
     return ret;

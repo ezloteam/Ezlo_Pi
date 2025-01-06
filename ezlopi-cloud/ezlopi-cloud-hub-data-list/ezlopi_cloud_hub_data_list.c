@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2022 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -30,11 +30,11 @@
 */
 
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
- * @version 0.1
- * @date    1st January 2024
+ * @file    ezlopi_cloud_hub_data_list.c
+ * @brief
+ * @author
+ * @version
+ * @date
  */
 
 /*******************************************************************************
@@ -47,7 +47,6 @@
 
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_cloud_hub_data_list.h"
-
 /*******************************************************************************
  *                          Extern Data Declarations
  *******************************************************************************/
@@ -63,8 +62,22 @@
 /*******************************************************************************
  *                          Static Function Prototypes
  *******************************************************************************/
-static void ezlopi_core_hub_data_list_populate_settings_json(cJSON *cj_result_name, const char* field_str, const char *name_str);
-static void ezlopi_core_hub_data_list_process_settings_data_list(cJSON *cj_names, cJSON *cj_include, cJSON *cj_settings);
+/**
+ * @brief Function to process setting list data
+ *
+ * @param cj_names Array to the incoming list
+ * @param cj_include Items to include
+ * @param cj_settings Settings JSON to populate
+ */
+static void ezpi_core_hub_data_list_process_settings_data_list(cJSON *cj_names, cJSON *cj_include, cJSON *cj_settings);
+/**
+ * @brief Function that retrieves all the required settings data
+ *
+ * @param cj_result_name JSON to add to
+ * @param field_str Field to use a key
+ * @param name_str Name to fetch
+ */
+static void ezpi_core_hub_data_list_populate_settings_json(cJSON *cj_result_name, const char *field_str, const char *name_str);
 
 /*******************************************************************************
  *                          Static Data Definitions
@@ -77,13 +90,7 @@ static void ezlopi_core_hub_data_list_process_settings_data_list(cJSON *cj_names
 /*******************************************************************************
  *                          Extern Function Definitions
  *******************************************************************************/
-
-/**
- * @brief Global/extern function template example
- * Convention : Use capital letter for initial word on extern function
- * @param arg
- */
-void hub_data_list(cJSON *cj_request, cJSON *cj_response)
+void EZPI_hub_data_list(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     if (cj_result)
@@ -104,7 +111,7 @@ void hub_data_list(cJSON *cj_request, cJSON *cj_response)
                         cJSON *cj_include = cJSON_GetObjectItem(__FUNCTION__, cj_fileds, "include");
                         if (cj_include && cJSON_IsArray(cj_include))
                         {
-                            ezlopi_core_hub_data_list_process_settings_data_list(cj_names_array, cj_include, cj_settings);
+                            ezpi_core_hub_data_list_process_settings_data_list(cj_names_array, cj_include, cj_settings);
                         }
                     }
                 }
@@ -112,30 +119,29 @@ void hub_data_list(cJSON *cj_request, cJSON *cj_response)
         }
     }
 }
-
 /*******************************************************************************
  *                          Static Function Definitions
  *******************************************************************************/
-static void ezlopi_core_hub_data_list_populate_settings_json(cJSON *cj_result_name, const char* field_str, const char *name_str)
+static void ezpi_core_hub_data_list_populate_settings_json(cJSON *cj_result_name, const char *field_str, const char *name_str)
 {
-    e_ezlopi_core_setting_command_names_t settings_name_enum = ezlopi_core_setting_command_get_command_enum_from_str(name_str);
+    e_ezlopi_core_setting_command_names_t settings_name_enum = EZPI_core_setting_commands_get_cmd_enum_from_str(name_str);
     switch (settings_name_enum)
     {
     case SETTING_COMMAND_NAME_SCALE_TEMPERATURE:
     {
-        char *scale_str = (ezlopi_core_setting_get_temperature_scale() == TEMPERATURE_SCALE_FAHRENHEIT) ? "fahrenheit" : "celsius";
+        char *scale_str = (EZPI_core_setting_get_temperature_scale() == TEMPERATURE_SCALE_FAHRENHEIT) ? "fahrenheit" : "celsius";
         cJSON_AddStringToObject(__FUNCTION__, cj_result_name, field_str, scale_str);
         break;
     }
     case SETTING_COMMAND_NAME_DATE_FORMAT:
     {
-        char *date_format = (ezlopi_core_setting_get_date_format() == DATE_FORMAT_MMDDYY) ? "mmddyy" : "ddmmyy";
+        char *date_format = (EZPI_core_setting_get_date_format() == DATE_FORMAT_MMDDYY) ? "mmddyy" : "ddmmyy";
         cJSON_AddStringToObject(__FUNCTION__, cj_result_name, field_str, date_format);
         break;
     }
     case SETTING_COMMAND_NAME_TIME_FORMAT:
     {
-        char *time_format = (ezlopi_core_setting_get_time_format() == TIME_FORMAT_12) ? "12" : "24";
+        char *time_format = (EZPI_core_setting_get_time_format() == TIME_FORMAT_12) ? "12" : "24";
         cJSON_AddStringToObject(__FUNCTION__, cj_result_name, field_str, time_format);
         break;
     }
@@ -146,7 +152,7 @@ static void ezlopi_core_hub_data_list_populate_settings_json(cJSON *cj_result_na
     }
 }
 
-static void ezlopi_core_hub_data_list_process_settings_data_list(cJSON *cj_names, cJSON *cj_include, cJSON *cj_settings)
+static void ezpi_core_hub_data_list_process_settings_data_list(cJSON *cj_names, cJSON *cj_include, cJSON *cj_settings)
 {
     cJSON *cj_include_element = NULL;
     cJSON *cj_names_element = NULL;
@@ -157,9 +163,9 @@ static void ezlopi_core_hub_data_list_process_settings_data_list(cJSON *cj_names
         {
             cJSON_ArrayForEach(cj_include_element, cj_include)
             {
-                if (0 == strncmp(cj_include_element->valuestring, "value", 6))
+                if (0 == strncmp(cj_include_element->valuestring, ezlopi_value_str, 6))
                 {
-                    ezlopi_core_hub_data_list_populate_settings_json(cj_result_names, cj_include_element->valuestring, cj_names_element->valuestring);
+                    ezpi_core_hub_data_list_populate_settings_json(cj_result_names, cj_include_element->valuestring, cj_names_element->valuestring);
                 }
             }
         }

@@ -30,12 +30,15 @@
 */
 
 /**
- * @file    main.c
- * @brief   perform some function on data
+ * @file    ezlopi_cloud_scales_str.c
+ * @brief
  * @author  John Doe
  * @version 0.1
  * @date    1st January 2024
  */
+
+#ifndef __EZLOPI_SCALES_STR_H__
+#define __EZLOPI_SCALES_STR_H__
 
 /*******************************************************************************
  *                          Include Files
@@ -152,6 +155,8 @@ const char *scales_weber_per_square_meter = "weber_per_square_meter";
 /*******************************************************************************
  *                          Static Function Definitions
  *******************************************************************************/
+
+#endif // __EZLOPI_SCALES_STR_H__
 
 /*******************************************************************************
  *                          End of File

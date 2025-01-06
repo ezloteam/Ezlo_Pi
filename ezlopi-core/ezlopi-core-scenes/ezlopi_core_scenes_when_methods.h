@@ -28,13 +28,12 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_core_scenes_when_methods.h
+ * @brief   Functions that operates on scene-when-methods
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    12th DEC 2024
  */
 
 #ifndef _EZLOPI_CORE_SCENES_WHEN_METHODS_H_
@@ -66,52 +65,295 @@ extern "C"
     /*******************************************************************************
      *                          Extern Function Prototypes
      *******************************************************************************/
+    /* When methods */
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
+     * @brief Triggers when-condtion for :
      *
+     * @param scene_node Target scene-node
+     * @param arg User-Arg
+     * @return int
      */
-    int ezlopi_scene_when_is_item_state(l_scenes_list_v2_t *scene_node, void *arg);
-    int ezlopi_scene_when_is_interval(l_scenes_list_v2_t *scene_node, void *arg);
-    int ezlopi_scene_when_is_item_state_changed(l_scenes_list_v2_t *scene_node, void *arg);
-    int ezlopi_scene_when_is_button_state(l_scenes_list_v2_t *scene_node, void *arg);
-    int ezlopi_scene_when_is_sun_state(l_scenes_list_v2_t *scene_node, void *arg);
-    int ezlopi_scene_when_is_date(l_scenes_list_v2_t *scene_node, void *arg);
-    int ezlopi_scene_when_is_once(l_scenes_list_v2_t *scene_node, void *arg);
-    int ezlopi_scene_when_is_date_range(l_scenes_list_v2_t *scene_node, void *arg);
-    int ezlopi_scene_when_is_user_lock_operation(l_scenes_list_v2_t *scene_node, void *arg);
-    int ezlopi_scene_when_is_house_mode_changed_to(l_scenes_list_v2_t *scene_node, void *arg);
-    int ezlopi_scene_when_is_house_mode_changed_from(l_scenes_list_v2_t *scene_node, void *arg);
-    int ezlopi_scene_when_is_house_mode_alarm_phase_range(l_scenes_list_v2_t *scene_node, void *arg);
-    int ezlopi_scene_when_is_house_mode_switch_to_range(l_scenes_list_v2_t *scene_node, void *arg);
-    int ezlopi_scene_when_is_device_state(l_scenes_list_v2_t *scene_node, void *arg);
-    int ezlopi_scene_when_is_network_state(l_scenes_list_v2_t *scene_node, void *arg);
-    int ezlopi_scene_when_is_scene_state(l_scenes_list_v2_t *scene_node, void *arg);
-    int ezlopi_scene_when_is_group_state(l_scenes_list_v2_t *scene_node, void *arg);
-    int ezlopi_scene_when_is_cloud_state(l_scenes_list_v2_t *scene_node, void *arg);
-    int ezlopi_scene_when_is_battery_state(l_scenes_list_v2_t *scene_node, void *arg);
-    int ezlopi_scene_when_is_battery_level(l_scenes_list_v2_t *scene_node, void *arg);
-    int ezlopi_scene_when_compare_numbers(l_scenes_list_v2_t *scene_node, void *arg);
-    int ezlopi_scene_when_compare_number_range(l_scenes_list_v2_t *scene_node, void *arg);
-    int ezlopi_scene_when_compare_strings(l_scenes_list_v2_t *scene_node, void *arg);
-    int ezlopi_scene_when_string_operation(l_scenes_list_v2_t *scene_node, void *arg);
-    int ezlopi_scene_when_in_array(l_scenes_list_v2_t *scene_node, void *arg);
-    int ezlopi_scene_when_compare_values(l_scenes_list_v2_t *scene_node, void *arg);
-    int ezlopi_scene_when_has_atleast_one_dictionary_value(l_scenes_list_v2_t *scene_node, void *arg);
-    int ezlopi_scene_when_is_firmware_update_state(l_scenes_list_v2_t *scene_node, void *arg);
-    int ezlopi_scene_when_is_dictionary_changed(l_scenes_list_v2_t *scene_node, void *arg);
-    int ezlopi_scene_when_is_detected_in_hot_zone(l_scenes_list_v2_t *scene_node, void *arg);
-    int ezlopi_scene_when_and(l_scenes_list_v2_t *scene_node, void *arg);
-    int ezlopi_scene_when_not(l_scenes_list_v2_t *scene_node, void *arg);
-    int ezlopi_scene_when_or(l_scenes_list_v2_t *scene_node, void *arg);
-    int ezlopi_scene_when_xor(l_scenes_list_v2_t *scene_node, void *arg);
-    int ezlopi_scene_when_function(l_scenes_list_v2_t *scene_node, void *arg);
-    int ezlopi_scene_when_is_device_item_group(l_scenes_list_v2_t *scene_node, void *arg);
+    int EZPI_core_scenes_when_is_item_state(l_scenes_list_v2_t *scene_node, void *arg);
+    /**
+     * @brief Triggers when-condtion for : is_interva
+     *
+     * @param scene_node Target scene-node
+     * @param arg User-Arg
+     * @return int
+     */
+    int EZPI_core_scenes_when_is_interval(l_scenes_list_v2_t *scene_node, void *arg);
+    /**
+     * @brief Triggers when-condtion for : item_state_changed
+     *
+     * @param scene_node Target scene-node
+     * @param arg User-Arg
+     * @return int
+     */
+    int EZPI_core_scenes_when_is_item_state_changed(l_scenes_list_v2_t *scene_node, void *arg);
+    /**
+     * @brief Triggers when-condtion for : is_button_state
+     *
+     * @param scene_node Target scene-node
+     * @param arg User-Arg
+     * @return int
+     */
+    int EZPI_core_scenes_when_is_button_state(l_scenes_list_v2_t *scene_node, void *arg);
+    /**
+     * @brief Triggers when-condtion for : is_sun_state
+     *
+     * @param scene_node Target scene-node
+     * @param arg User-Arg
+     * @return int
+     */
+    int EZPI_core_scenes_when_is_sun_state(l_scenes_list_v2_t *scene_node, void *arg);
+    /**
+     * @brief Triggers when-condtion for : is_date
+     *
+     * @param scene_node Target scene-node
+     * @param arg User-Arg
+     * @return int
+     */
+    int EZPI_core_scenes_when_is_date(l_scenes_list_v2_t *scene_node, void *arg);
+    /**
+     * @brief Triggers when-condtion for : is_once
+     *
+     * @param scene_node Target scene-node
+     * @param arg User-Arg
+     * @return int
+     */
+    int EZPI_core_scenes_when_is_once(l_scenes_list_v2_t *scene_node, void *arg);
+    /**
+     * @brief Triggers when-condtion for : is_date_range
+     *
+     * @param scene_node Target scene-node
+     * @param arg User-Arg
+     * @return int
+     */
+    int EZPI_core_scenes_when_is_date_range(l_scenes_list_v2_t *scene_node, void *arg);
+    /**
+     * @brief Triggers when-condtion for : is_user_lock_operation
+     *
+     * @param scene_node Target scene-node
+     * @param arg User-Arg
+     * @return int
+     */
+    int EZPI_core_scenes_when_is_user_lock_operation(l_scenes_list_v2_t *scene_node, void *arg);
+    /**
+     * @brief Triggers when-condtion for : is_house_mode_changed_to
+     *
+     * @param scene_node Target scene-node
+     * @param arg User-Arg
+     * @return int
+     */
+    int EZPI_core_scenes_when_is_house_mode_changed_to(l_scenes_list_v2_t *scene_node, void *arg);
+    /**
+     * @brief Triggers when-condtion for : is_house_mode_changed_from
+     *
+     * @param scene_node Target scene-node
+     * @param arg User-Arg
+     * @return int
+     */
+    int EZPI_core_scenes_when_is_house_mode_changed_from(l_scenes_list_v2_t *scene_node, void *arg);
+    /**
+     * @brief Triggers when-condtion for : is_house_mode_alarm_phase_range
+     *
+     * @param scene_node Target scene-node
+     * @param arg User-Arg
+     * @return int
+     */
+    int EZPI_core_scenes_when_is_house_mode_alarm_phase_range(l_scenes_list_v2_t *scene_node, void *arg);
+    /**
+     * @brief Triggers when-condtion for : is_house_mode_switch_to_range
+     *
+     * @param scene_node Target scene-node
+     * @param arg User-Arg
+     * @return int
+     */
+    int EZPI_core_scenes_when_is_house_mode_switch_to_range(l_scenes_list_v2_t *scene_node, void *arg);
+    /**
+     * @brief Triggers when-condtion for : is_device_state
+     *
+     * @param scene_node Target scene-node
+     * @param arg User-Arg
+     * @return int
+     */
+    int EZPI_core_scenes_when_is_device_state(l_scenes_list_v2_t *scene_node, void *arg);
+    /**
+     * @brief Triggers when-condtion for : is_network_state
+     *
+     * @param scene_node Target scene-node
+     * @param arg User-Arg
+     * @return int
+     */
+    int EZPI_core_scenes_when_is_network_state(l_scenes_list_v2_t *scene_node, void *arg);
+    /**
+     * @brief Triggers when-condtion for : is_scene_state
+     *
+     * @param scene_node Target scene-node
+     * @param arg User-Arg
+     * @return int
+     */
+    int EZPI_core_scenes_when_is_scene_state(l_scenes_list_v2_t *scene_node, void *arg);
+    /**
+     * @brief Triggers when-condtion for : is_group_state
+     *
+     * @param scene_node Target scene-node
+     * @param arg User-Arg
+     * @return int
+     */
+    int EZPI_core_scenes_when_is_group_state(l_scenes_list_v2_t *scene_node, void *arg);
+    /**
+     * @brief Triggers when-condtion for : is_cloud_state
+     *
+     * @param scene_node Target scene-node
+     * @param arg User-Arg
+     * @return int
+     */
+    int EZPI_core_scenes_when_is_cloud_state(l_scenes_list_v2_t *scene_node, void *arg);
+    /**
+     * @brief Triggers when-condtion for : is_battery_state
+     *
+     * @param scene_node Target scene-node
+     * @param arg User-Arg
+     * @return int
+     */
+    int EZPI_core_scenes_when_is_battery_state(l_scenes_list_v2_t *scene_node, void *arg);
+    /**
+     * @brief Triggers when-condtion for : is_battery_level
+     *
+     * @param scene_node Target scene-node
+     * @param arg User-Arg
+     * @return int
+     */
+    int EZPI_core_scenes_when_is_battery_level(l_scenes_list_v2_t *scene_node, void *arg);
+    /**
+     * @brief Triggers when-condtion for : when_compare_numbrers
+     *
+     * @param scene_node Target scene-node
+     * @param arg User-Arg
+     * @return int
+     */
+    int EZPI_core_scene_when_compare_numbers(l_scenes_list_v2_t *scene_node, void *arg);
+    /**
+     * @brief Triggers when-condtion for : when_compare_num_range
+     *
+     * @param scene_node Target scene-node
+     * @param arg User-Arg
+     * @return int
+     */
+    int EZPI_core_scene_when_compare_number_range(l_scenes_list_v2_t *scene_node, void *arg);
+    /**
+     * @brief Triggers when-condtion for : when_compare_strings
+     *
+     * @param scene_node Target scene-node
+     * @param arg User-Arg
+     * @return int
+     */
+    int EZPI_core_scene_when_compare_strings(l_scenes_list_v2_t *scene_node, void *arg);
+    /**
+     * @brief Triggers when-condtion for : when_string_operation
+     *
+     * @param scene_node Target scene-node
+     * @param arg User-Arg
+     * @return int
+     */
+    int EZPI_core_scene_when_string_operation(l_scenes_list_v2_t *scene_node, void *arg);
+    /**
+     * @brief Triggers when-condtion for : when_in_array
+     *
+     * @param scene_node Target scene-node
+     * @param arg User-Arg
+     * @return int
+     */
+    int EZPI_core_scene_when_in_array(l_scenes_list_v2_t *scene_node, void *arg);
+    /**
+     * @brief Triggers when-condtion for : when_compare_values
+     *
+     * @param scene_node Target scene-node
+     * @param arg User-Arg
+     * @return int
+     */
+    int EZPI_core_scene_when_compare_values(l_scenes_list_v2_t *scene_node, void *arg);
+    /**
+     * @brief Triggers when-condtion for : has_atleast_one_dictionary_value
+     *
+     * @param scene_node Target scene-node
+     * @param arg User-Arg
+     * @return int
+     */
+    int EZPI_core_scene_when_has_atleast_one_dictionary_value(l_scenes_list_v2_t *scene_node, void *arg);
+    /**
+     * @brief Triggers when-condtion for : is_firmware_update_state
+     *
+     * @param scene_node Target scene-node
+     * @param arg User-Arg
+     * @return int
+     */
+    int EZPI_core_scenes_when_is_firmware_update_state(l_scenes_list_v2_t *scene_node, void *arg);
+    /**
+     * @brief Triggers when-condtion for : is_dictionary_changed
+     *
+     * @param scene_node Target scene-node
+     * @param arg User-Arg
+     * @return int
+     */
+    int EZPI_core_scenes_when_is_dictionary_changed(l_scenes_list_v2_t *scene_node, void *arg);
+    /**
+     * @brief Triggers when-condtion for : is_detected_in_hot_zone
+     *
+     * @param scene_node Target scene-node
+     * @param arg User-Arg
+     * @return int
+     */
+    int EZPI_core_scenes_when_is_detected_in_hot_zone(l_scenes_list_v2_t *scene_node, void *arg);
+    /**
+     * @brief Triggers when-condtion for : AND
+     *
+     * @param scene_node Target scene-node
+     * @param arg User-Arg
+     * @return int
+     */
+    int EZPI_core_scene_when_and(l_scenes_list_v2_t *scene_node, void *arg);
+    /**
+     * @brief Triggers when-condtion for : NOT
+     *
+     * @param scene_node Target scene-node
+     * @param arg User-Arg
+     * @return int
+     */
+    int EZPI_core_scene_when_not(l_scenes_list_v2_t *scene_node, void *arg);
+    /**
+     * @brief Triggers when-condtion for : OR
+     *
+     * @param scene_node Target scene-node
+     * @param arg User-Arg
+     * @return int
+     */
+    int EZPI_core_scene_when_or(l_scenes_list_v2_t *scene_node, void *arg);
+    /**
+     * @brief Triggers when-condtion for : XOR
+     *
+     * @param scene_node Target scene-node
+     * @param arg User-Arg
+     * @return int
+     */
+    int EZPI_core_scene_when_xor(l_scenes_list_v2_t *scene_node, void *arg);
+    /**
+     * @brief Triggers when-condtion for : function-condition
+     *
+     * @param scene_node Target scene-node
+     * @param arg User-Arg
+     * @return int
+     */
+    int EZPI_core_scene_when_function(l_scenes_list_v2_t *scene_node, void *arg);
+    /**
+     * @brief Triggers when-condtion for : is_device_item_group
+     *
+     * @param scene_node Target scene-node
+     * @param arg User-Arg
+     * @return int
+     */
+    int EZPI_core_scenes_when_is_device_item_group(l_scenes_list_v2_t *scene_node, void *arg);
 
 #ifdef __cplusplus
 }

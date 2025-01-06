@@ -28,18 +28,16 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_core_setting_commands.h
+ * @brief   perform some function on setting cmds
+ * @author  xx
  * @version 0.1
- * @date    1st January 2024
+ * @date    12th DEC 2024
  */
 
 #ifndef __EZLOPI_CORE_SETTING_COMMANDS_H__
 #define __EZLOPI_CORE_SETTING_COMMANDS_H__
-
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
@@ -94,29 +92,84 @@ extern "C"
     /*******************************************************************************
      *                          Extern Function Prototypes
      *******************************************************************************/
-    /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
-     *
-     */
-    int ezlopi_core_setting_commands_process(cJSON *cj_params);
-    e_ezlopi_core_setting_command_names_t ezlopi_core_setting_command_get_command_enum_from_str(const char *name);
-    int ezlopi_core_setting_commands_populate_settings(cJSON *cj_result);
-    int ezlopi_core_setting_commands_read_settings();
-    e_enum_temperature_scale_t ezlopi_core_setting_get_temperature_scale();
-    e_enum_date_format_t ezlopi_core_setting_get_date_format();
-    e_enum_time_format_t ezlopi_core_setting_get_time_format();
-    int ezlopi_core_setting_get_network_ping_timeout();
-    int ezlopi_core_setting_updated_broadcast(cJSON *cj_params, cJSON *cj_result);
 
-    const char *ezlopi_core_setting_get_temperature_scale_str();
-    const char *ezlopi_core_setting_get_date_format_str();
-    const char *ezlopi_core_setting_get_time_format_str();
+    /**
+     * @brief Function to process setting cmds
+     *
+     * @param cj_params pointer to settings obj
+     * @return int
+     */
+    int EZPI_core_setting_commands_process(cJSON *cj_params);
+    /**
+     * @brief Function to get setting cmds in enums
+     *
+     * @param name Target cmd name
+     * @return e_ezlopi_core_setting_command_names_t
+     */
+    e_ezlopi_core_setting_command_names_t EZPI_core_setting_commands_get_cmd_enum_from_str(const char *name);
+    /**
+     * @brief Function to populate settings cmds
+     *
+     * @param cj_result Store extracted data to this obj
+     * @return int
+     */
+    int EZPI_core_setting_commands_populate_settings(cJSON *cj_result);
+    /**
+     * @brief Function to read settings data from nvs
+     *
+     * @return int
+     */
+    int EZPI_core_setting_commands_read_settings();
+    /**
+     * @brief Function to get temp scale from nvs
+     *
+     * @return e_enum_temperature_scale_t
+     */
+    e_enum_temperature_scale_t EZPI_core_setting_get_temperature_scale();
+    /**
+     * @brief Function to get date format
+     *
+     * @return e_enum_date_format_t
+     */
+    e_enum_date_format_t EZPI_core_setting_get_date_format();
+    /**
+     * @brief Function to get time format
+     *
+     * @return e_enum_time_format_t
+     */
+    e_enum_time_format_t EZPI_core_setting_get_time_format();
+    /**
+     * @brief Function to get network timeout
+     *
+     * @return int
+     */
+    int EZPI_core_setting_get_network_ping_timeout();
+    /**
+     * @brief Function to send a broadcast for update settings data
+     *
+     * @param cj_params object to Extract data for broadcast.
+     * @param cj_result object to Store the generated broadcast meassage
+     * @return int
+     */
+    int EZPI_core_setting_updated_broadcast(cJSON *cj_params, cJSON *cj_result);
+    /**
+     * @brief Function to get temp_scale
+     *
+     * @return const char*
+     */
+    const char *EZPI_core_setting_get_temperature_scale_str();
+    /**
+     * @brief Function to get date format
+     *
+     * @return const char*
+     */
+    const char *EZPI_core_setting_get_date_format_str();
+    /**
+     * @brief Function to get time format
+     *
+     * @return const char*
+     */
+    const char *EZPI_core_setting_get_time_format_str();
 
 #ifdef __cplusplus
 }
