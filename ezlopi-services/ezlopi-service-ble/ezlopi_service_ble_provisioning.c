@@ -178,7 +178,11 @@ void EZPI_ble_service_provisioning_init(void)
 #endif // EZPI_SERV_BLE_ENABLE_STAT_PROV
 }
 
+/*******************************************************************************
+ *                          Static Function Definitions
+ *******************************************************************************/
 #ifdef EZPI_SERV_BLE_ENABLE_STAT_PROV
+
 static char *__provisioning_status_jsonify(void)
 {
     char *prov_status_jstr = NULL;

@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    sensor_0024_other_HCSR04.c
-* @brief   perform some function on sensor_0024
-* @author  xx
-* @version 0.1
-* @date    xx
-*/
+ * @file    sensor_0024_other_HCSR04.c
+ * @brief   perform some function on sensor_0024
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include "soc/rtc.h"
 #include "driver/gpio.h"
 #include "driver/mcpwm.h"
@@ -59,29 +59,29 @@
 #include "EZLOPI_USER_CONFIG.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 /**
  * Device descriptor
  */
 typedef struct
 {
-    int trigger_pin; //!< GPIO output pin for trigger
-    int echo_pin;    //!< GPIO input pin for echo
-    uint32_t distance;    // distance in cm
+    int trigger_pin;   //!< GPIO output pin for trigger
+    int echo_pin;      //!< GPIO input pin for echo
+    uint32_t distance; // distance in cm
 } s_ultrasonic_sensor_t;
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static ezlopi_error_t __prepare(void *arg);
 static ezlopi_error_t __init(l_ezlopi_item_t *item);
 static ezlopi_error_t __notify(l_ezlopi_item_t *item);
@@ -91,17 +91,17 @@ static esp_err_t ultrasonic_measure(const s_ultrasonic_sensor_t *dev, uint32_t m
 static esp_err_t ultrasonic_measure_raw(const s_ultrasonic_sensor_t *dev, uint32_t max_time_us, uint32_t *time_us);
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 static portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 
 ezlopi_error_t SENSOR_0024_other_HCSR04_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
@@ -140,8 +140,8 @@ ezlopi_error_t SENSOR_0024_other_HCSR04_v3(e_ezlopi_actions_t action, l_ezlopi_i
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 static ezlopi_error_t __get_value_cjson(l_ezlopi_item_t *item, void *arg)
 {
     ezlopi_error_t ret = EZPI_FAILED;
@@ -389,7 +389,6 @@ static esp_err_t ultrasonic_measure_raw(const s_ultrasonic_sensor_t *dev, uint32
     return ESP_OK;
 }
 
-
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

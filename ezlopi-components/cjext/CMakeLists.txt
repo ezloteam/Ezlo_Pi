@@ -2,7 +2,7 @@
 
 file(GLOB_RECURSE config_src "*.c")
 
-set(EZLOPI_COMPONENTS 
+set(EZLOPI_COMPONENTS
         ezlopi-util-trace
 )
 

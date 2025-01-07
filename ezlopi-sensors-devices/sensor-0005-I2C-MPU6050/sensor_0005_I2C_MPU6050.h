@@ -34,30 +34,29 @@
  * @author  xx
  * @version 0.1
  * @date    xx
-*/
+ */
 
 #ifndef _SENSOR_0005_I2C_MPU6050_H_
 #define _SENSOR_0005_I2C_MPU6050_H_
 
-
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include "ezlopi_core_actions.h"
 #include "ezlopi_core_devices.h"
 #include "ezlopi_core_errors.h"
 
 /*******************************************************************************
-*                          C++ Declaration Wrapper
-*******************************************************************************/
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
     /*******************************************************************************
-    *                          Type & Macro Declarations
-    *******************************************************************************/
+     *                          Type & Macro Declarations
+     *******************************************************************************/
 
 #define MPU6050_REG_COUNT_LEN 14 // the accelerometer , temperature and gyrodata is to be in one go .
 
@@ -146,19 +145,18 @@ extern "C"
 #define PWR_MGMT_1_PLL_Y_AXIS_INTERNAL_CLK_REF (BIT_1)         // When set, choose PLL with Y axis gyroscope reference
 #define PWR_MGMT_1_PLL_Z_AXIS_INTERNAL_CLK_REF (BIT_1 | BIT_0) // When set, choose PLL with Z axis gyroscope reference
 
+    //-----------------------------
+    // #CUSTOM DATA STORAGE STRUCTS
+    //-----------------------------
 
-//-----------------------------
-// #CUSTOM DATA STORAGE STRUCTS
-//-----------------------------
-
-// #### Custom structure to store processed data
+    // #### Custom structure to store processed data
     typedef struct s_mpu6050_data
     {
         bool calibration_complete;
         // uint16_t extract_counts;
         float tmp;
-        float ax, ay, az; // m/s2
-        float gx, gy, gz; // rpm
+        float ax, ay, az;                                  // m/s2
+        float gx, gy, gz;                                  // rpm
         float gyro_x_offset, gyro_y_offset, gyro_z_offset; // raw
         float acc_mpu6050_calib_val;
         float gyro_mpu6050_calib_val;
@@ -203,22 +201,22 @@ extern "C"
 #endif
 
     /*******************************************************************************
-    *                          Extern Data Declarations
-    *******************************************************************************/
+     *                          Extern Data Declarations
+     *******************************************************************************/
 
     /*******************************************************************************
-    *                          Extern Function Prototypes
-    *******************************************************************************/
+     *                          Extern Function Prototypes
+     *******************************************************************************/
 
     /**
-    * @brief Function to operate on actions
-    *
-    * @param action Current Action to Operate on
-    * @param item Target-Item node
-    * @param arg Arg for action
-    * @param user_arg User-arg
-    * @return ezlopi_error_t
-    */
+     * @brief Function to operate on actions
+     *
+     * @param action Current Action to Operate on
+     * @param item Target-Item node
+     * @param arg Arg for action
+     * @param user_arg User-arg
+     * @return ezlopi_error_t
+     */
     ezlopi_error_t SENSOR_0005_i2c_mpu6050(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
     /**
@@ -236,8 +234,6 @@ extern "C"
      */
     e_mpu6050_err_t MPU6050_config_device(l_ezlopi_item_t *item);
 
-
-
 #ifdef __cplusplus
 }
 #endif
@@ -245,5 +241,5 @@ extern "C"
 #endif //_SENSOR_0005_I2C_MPU6050_H_
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

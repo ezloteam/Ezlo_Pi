@@ -29,49 +29,49 @@
 ** ===========================================================================
 */
 /**
-* @file    TSL256_interface.c
-* @brief   perform some function on TSL256_interface
-* @author  xx
-* @version 0.1
-* @date    xx
-*/
+ * @file    TSL256_interface.c
+ * @brief   perform some function on TSL256_interface
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include "sensor_0044_I2C_TSL256_luminosity.h"
 #include "ezlopi_util_trace.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static uint32_t TSL2561_CalculateLux(uint16_t ch0, uint16_t ch1, integration_t conv_time, gain_t gain);
 static void Power_Up_tsl2561(s_ezlopi_i2c_master_t *i2c_master);
 static void Power_Down_tsl2561(s_ezlopi_i2c_master_t *i2c_master);
 static uint8_t readRegister8(s_ezlopi_i2c_master_t *i2c_master, uint8_t target_address, size_t address_len, uint8_t *reg, size_t reg_len);
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 bool TSL2561_check_partid(s_ezlopi_i2c_master_t *i2c_master)
 {
 
@@ -106,7 +106,7 @@ void SENSOR_0044_tsl2561_configure_device(s_ezlopi_i2c_master_t *i2c_master)
 
     uint8_t command_code = (SELECT_CMD_REGISTER | TSL2561_REGISTER_TIMING);
     uint8_t setup_code = (TSL2561_HIGH_GAIN_MODE_x16 | TSL2561_STOP_MANNUAL_INTEGRATION | TSL2561_INTEGRATION_TIME_101_MS);
-    uint8_t write_buffer_timing[] = { command_code, setup_code };
+    uint8_t write_buffer_timing[] = {command_code, setup_code};
     EZPI_hal_i2c_master_write_to_device(i2c_master, write_buffer_timing, 2);
 
     // Power_Down_tsl2561(i2c_master);
@@ -182,9 +182,9 @@ uint32_t TSL2561_get_intensity_value(s_ezlopi_i2c_master_t *i2c_master)
 
         // Calculate the lux value
         illuminance_value = TSL2561_CalculateLux(Visible_Ir,                    // CH0
-            IR,                            // CH1
-            TSL2561_INTEGRATIONTIME_101MS, // conv_time
-            TSL2561_GAIN_x1);              // adc_gain
+                                                 IR,                            // CH1
+                                                 TSL2561_INTEGRATIONTIME_101MS, // conv_time
+                                                 TSL2561_GAIN_x1);              // adc_gain
         // TRACE_I("IR : %d", IR);
         // TRACE_I("Visible : %d", Visible_Ir - IR);
         // TRACE_I("Lux : %d", Lux_intensity);
@@ -198,8 +198,8 @@ uint32_t TSL2561_get_intensity_value(s_ezlopi_i2c_master_t *i2c_master)
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 
 static uint32_t TSL2561_CalculateLux(uint16_t ch0, uint16_t ch1, integration_t conv_time, gain_t gain)
 {
@@ -305,7 +305,7 @@ static void Power_Up_tsl2561(s_ezlopi_i2c_master_t *i2c_master)
 {
     // first power-up the device
     uint8_t command_code = (SELECT_CMD_REGISTER | TSL2561_REGISTER_CONTROL);
-    uint8_t write_buffer_power_up[] = { command_code, TSL2561_POWER_ON };
+    uint8_t write_buffer_power_up[] = {command_code, TSL2561_POWER_ON};
     EZPI_hal_i2c_master_write_to_device(i2c_master, write_buffer_power_up, 2);
 }
 
@@ -313,7 +313,7 @@ static void Power_Down_tsl2561(s_ezlopi_i2c_master_t *i2c_master)
 {
     // Now, power-down the device
     uint8_t command_code = (SELECT_CMD_REGISTER | TSL2561_REGISTER_CONTROL);
-    uint8_t write_buffer_power_down[] = { command_code, TSL2561_POWER_OFF };
+    uint8_t write_buffer_power_down[] = {command_code, TSL2561_POWER_OFF};
     EZPI_hal_i2c_master_write_to_device(i2c_master, write_buffer_power_down, 2);
 }
 
@@ -324,5 +324,5 @@ static uint8_t readRegister8(s_ezlopi_i2c_master_t *i2c_master, uint8_t target_a
     return 1;
 }
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    sensor_0020_other_2axis_joystick.c
-* @brief   perform some function on sensor_0020
-* @author  xx
-* @version 0.1
-* @date    xx
-*/
+ * @file    sensor_0020_other_2axis_joystick.c
+ * @brief   perform some function on sensor_0020
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include <math.h>
 
 #include "ezlopi_core_cloud.h"
@@ -58,16 +58,16 @@
 #include "EZLOPI_USER_CONFIG.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 typedef struct s_joystick_data
 {
     uint32_t sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_MAX];
@@ -75,14 +75,13 @@ typedef struct s_joystick_data
     uint32_t adc_y;
 } s_joystick_data_t;
 
+/*******************************************************************************
+ *                          Static Function Prototypes
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
-
-/*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 static ezlopi_error_t __prepare(void *arg);
 static ezlopi_error_t __init(l_ezlopi_item_t *item);
 static ezlopi_error_t __get_value_cjson(l_ezlopi_item_t *item, void *arg);
@@ -90,12 +89,12 @@ static ezlopi_error_t __notify(l_ezlopi_item_t *item);
 static void __joystick_intr_callback(void *arg);
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 ezlopi_error_t SENSOR_0020_other_2axis_joystick(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
@@ -135,8 +134,8 @@ ezlopi_error_t SENSOR_0020_other_2axis_joystick(e_ezlopi_actions_t action, l_ezl
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 
 static void __setup_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
@@ -335,7 +334,7 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
                 }
             }
             else if (item->cloud_properties.item_id == user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_SWITCH] &&
-                (item->interface.gpio.gpio_in.enable))
+                     (item->interface.gpio.gpio_in.enable))
             {
                 if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num))
                 {
@@ -406,7 +405,7 @@ static ezlopi_error_t __notify(l_ezlopi_item_t *item)
             s_joystick_data_t *user_data = (s_joystick_data_t *)item->user_arg;
             if (user_data)
             {
-                s_ezlopi_analog_data_t ezlopi_analog_data = { .value = 0, .voltage = 0 };
+                s_ezlopi_analog_data_t ezlopi_analog_data = {.value = 0, .voltage = 0};
 
                 if (user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_X] == item->cloud_properties.item_id)
                 {
@@ -451,5 +450,5 @@ static void __joystick_intr_callback(void *arg)
 }
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

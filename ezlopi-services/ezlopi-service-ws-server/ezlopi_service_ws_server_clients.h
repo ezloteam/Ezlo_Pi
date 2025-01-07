@@ -1,11 +1,3 @@
-
-/**
- * @file    ezlopi_service_ws_server_clients.h
- * @brief
- * @author
- * @version
- * @date
- */
 /* ===========================================================================
 ** Copyright (C) 2024 Ezlo Innovation Inc
 **
@@ -37,13 +29,32 @@
 ** ===========================================================================
 */
 
+/**
+ * @file    ezlopi_service_ws_server_clients.h
+ * @brief   perform some function on data
+ * @author  John Doe
+ * @version 0.1
+ * @date    1st January 2024
+ */
+
 #ifndef __EZLOPI_SERVICE_WS_SERVER_CLIENTS_H__
 #define __EZLOPI_SERVICE_WS_SERVER_CLIENTS_H__
 
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
+
+    /*******************************************************************************
+     *                          Type & Macro Declarations
+     *******************************************************************************/
 
     /**
      * @brief Linked list for websoket clinet connection handler
@@ -58,6 +69,13 @@ extern "C"
         struct l_ws_server_client_conn *next; /**< Points to the next clinet handle */
     } l_ws_server_client_conn_t;
 
+    /*******************************************************************************
+     *                          Extern Data Declarations
+     *******************************************************************************/
+
+    /*******************************************************************************
+     *                          Extern Function Prototypes
+     *******************************************************************************/
     /**
      * @brief Function to remove clinet connected to the websoket server using client connection handle
      *

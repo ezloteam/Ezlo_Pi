@@ -31,10 +31,11 @@
 /**
  * @file    main.h
  * @brief   perform some function on data
- * @author  xx
+ * @author  John Doe
  * @version 0.1
- * @date    xx
-*/
+ * @date    1st January 2024
+ * @note    additional documentation
+ */
 
 #ifndef __HEADER_H__
 #define __HEADER_H__

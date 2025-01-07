@@ -7,25 +7,25 @@ set(ESP_IDF_COMPONENTS
 )
 
 # Define core components
-set(EZLOPI_CORE_COMPONENTS 
-        ezlopi-core-cloud 
+set(EZLOPI_CORE_COMPONENTS
+        ezlopi-core-cloud
         ezlopi-core-actions
-        ezlopi-core-devices 
+        ezlopi-core-devices
 )
 
 # Define HAL components
-set(EZLOPI_HAL_COMPONENTS 
+set(EZLOPI_HAL_COMPONENTS
         ezlopi-hal-gpio
         ezlopi-hal-adc
         ezlopi-hal-pwm
-        ezlopi-hal-onewire     
-        ezlopi-hal-uart                           
+        ezlopi-hal-onewire
+        ezlopi-hal-uart
         ezlopi-hal-i2c
         ezlopi-hal-spi
 )
 
 # Define cloud components
-set(EZLOPI_CLOUD_COMPONENTS 
+set(EZLOPI_CLOUD_COMPONENTS
         ezlopi-cloud-settings
 )
 
@@ -35,7 +35,7 @@ set(EZLOPI_SERV_COMPONENTS
 )
 
 # Define sensor device components
-set(EZLOPI_SENSOR_DEVICE_COMPONENTS 
+set(EZLOPI_SENSOR_DEVICE_COMPONENTS
         device-0001-digitalOut-generic
         # Add other sensor device components here
 )

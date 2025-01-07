@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    sensor_0028_other_GY61.c
-* @brief   perform some function on sensor_0028
-* @author  xx
-* @version 0.1
-* @date    xx
-*/
+ * @file    sensor_0028_other_GY61.c
+ * @brief   perform some function on sensor_0028
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include <math.h>
 
 #include "ezlopi_core_cloud.h"
@@ -56,16 +56,16 @@
 #include "EZLOPI_USER_CONFIG.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 typedef struct s_gy61_data
 {
     float x_data;
@@ -80,8 +80,8 @@ typedef struct s_gy61_data
 #endif
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static ezlopi_error_t __0028_prepare(void *arg);
 static ezlopi_error_t __0028_init(l_ezlopi_item_t *item);
 static ezlopi_error_t __0028_get_cjson_value(l_ezlopi_item_t *item, void *arg);
@@ -90,16 +90,16 @@ static ezlopi_error_t __0028_notify(l_ezlopi_item_t *item);
 static float __update_gy61_axis_value(l_ezlopi_item_t *item);
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 ezlopi_error_t SENSOR_0028_other_gy61(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
@@ -135,8 +135,8 @@ ezlopi_error_t SENSOR_0028_other_gy61(e_ezlopi_actions_t action, l_ezlopi_item_t
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     device->cloud_properties.category = category_level_sensor;
@@ -367,7 +367,7 @@ static float __update_gy61_axis_value(l_ezlopi_item_t *item)
     float G_data = 0;
     if (item)
     {
-        s_ezlopi_analog_data_t ezlopi_analog_data = { .value = 0, .voltage = 0 };
+        s_ezlopi_analog_data_t ezlopi_analog_data = {.value = 0, .voltage = 0};
         EZPI_hal_adc_get_adc_data(item->interface.adc.gpio_num, &ezlopi_analog_data);
         int temp_vol = ezlopi_analog_data.voltage;
 #if (CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32C3)
@@ -399,8 +399,8 @@ static float __update_gy61_axis_value(l_ezlopi_item_t *item)
 #endif
     }
     return G_data;
-        }
+}
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

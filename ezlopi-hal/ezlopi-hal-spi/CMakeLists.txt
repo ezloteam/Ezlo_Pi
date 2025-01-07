@@ -5,8 +5,8 @@ set(ESP_COMPONENTS
         driver
 )
 
-set(EZLOPI_CORE_COMPONENTS 
-        ezlopi-core-nvs 
+set(EZLOPI_CORE_COMPONENTS
+        ezlopi-core-nvs
         ezlopi-core-errors
 )
 

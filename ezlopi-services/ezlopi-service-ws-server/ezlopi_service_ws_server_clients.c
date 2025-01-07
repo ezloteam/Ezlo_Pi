@@ -1,12 +1,3 @@
-
-
-/**
- * @file    ezlopi_service_ws_server_clients.c
- * @brief
- * @author
- * @version
- * @date
- */
 /* ===========================================================================
 ** Copyright (C) 2024 Ezlo Innovation Inc
 **
@@ -38,6 +29,17 @@
 ** ===========================================================================
 */
 
+/**
+ * @file    ezlopi_service_ws_server_clients.c
+ * @brief   perform some function on data
+ * @author  John Doe
+ * @version 0.1
+ * @date    1st January 2024
+ */
+
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 #include <stdio.h>
 #include <string.h>
 
@@ -46,7 +48,21 @@
 
 #include "ezlopi_service_ws_server.h"
 #include "ezlopi_service_ws_server_clients.h"
+/*******************************************************************************
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
+/*******************************************************************************
+ *                          Extern Function Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Type & Macro Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Static Function Prototypes
+ *******************************************************************************/
 /**
  * @brief Function to create new clinet
  *
@@ -57,9 +73,24 @@
  */
 static l_ws_server_client_conn_t *ezpi_create_new_client(void *http_handle, int http_descriptor);
 
+/*******************************************************************************
+ *                          Static Data Definitions
+ *******************************************************************************/
 static l_ws_server_client_conn_t *l_client_conn_head = NULL;
 static uint32_t __number_of_clients = 0;
+/*******************************************************************************
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
+/*******************************************************************************
+ *                          Extern Function Definitions
+ *******************************************************************************/
+
+/**
+ * @brief Global/extern function template example
+ * Convention : Use capital letter for initial word on extern function
+ * @param arg
+ */
 l_ws_server_client_conn_t *EZPI_service_ws_server_clients_get_head(void)
 {
     return l_client_conn_head;
@@ -175,7 +206,9 @@ l_ws_server_client_conn_t *EZPI_service_ws_server_clients_pop(void *http_handle)
 
     return pop_con;
 }
-
+/*******************************************************************************
+ *                          Static Function Definitions
+ *******************************************************************************/
 static l_ws_server_client_conn_t *ezpi_create_new_client(void *http_handle, int http_descriptor)
 {
     l_ws_server_client_conn_t *ws_client_conn = ezlopi_malloc(__FUNCTION__, sizeof(l_ws_server_client_conn_t));

@@ -1,4 +1,3 @@
-    
 file(GLOB_RECURSE src_files "*.c*")
 
 
@@ -10,7 +9,7 @@ set(SDK_COMPONENTS
         esp_http_server
 )
 
-set(EZLOPI_CORE_COMPONENTS  
+set(EZLOPI_CORE_COMPONENTS
         ezlopi-core-api
         ezlopi-core-wifi
         ezlopi-core-buffer
@@ -19,16 +18,16 @@ set(EZLOPI_CORE_COMPONENTS
         ezlopi-core-offline-login
 )
 
-set(EZLOPI_CLOUD_COMPONENTS 
-        
+set(EZLOPI_CLOUD_COMPONENTS
+
 )
 
 
 
-idf_component_register(SRCS "ezlopi_service_ws_server_clients.c" "ezlopi_service_ws_server.c" "${src_files}"
+idf_component_register(SRCS "${src_files}"
     INCLUDE_DIRS "."
     REQUIRES    ${SDK_COMPONENTS}
-                ${EZLOPI_CORE_COMPONENTS} 
+                ${EZLOPI_CORE_COMPONENTS}
                 ${EZLOPI_UTIL_COMPONENTS}
-                # ${EZLOPI_CLOUD_COMPONENTS} 
+                # ${EZLOPI_CLOUD_COMPONENTS}
     )

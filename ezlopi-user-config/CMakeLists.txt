@@ -1,4 +1,4 @@
-idf_component_register(SRCS 
+idf_component_register(SRCS
     INCLUDE_DIRS "."
     REQUIRES ezlopi-core-heap
-) 
+)

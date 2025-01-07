@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    sensor_0068_ENS160_gas_sensor.c
-* @brief   perform some function on sensor_0068_ENS160
-* @author  xx
-* @version 0.1
-* @date    xx
-*/
+ * @file    sensor_0068_ENS160_gas_sensor.c
+ * @brief   perform some function on sensor_0068_ENS160
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include <stdlib.h>
 #include <math.h>
 
@@ -61,16 +61,16 @@
 #include "EZLOPI_USER_CONFIG.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 /*
 {\
   \"dev_type\":8,\
@@ -83,8 +83,8 @@
 */
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 
 static ezlopi_error_t __prepare(void *arg, void *user_arg);
 static ezlopi_error_t __init(l_ezlopi_item_t *item);
@@ -92,20 +92,20 @@ static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg);
 static ezlopi_error_t __notify(l_ezlopi_item_t *item);
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 
 // static uint32_t parent_device_id = 0;
 static uint32_t aqi_item_id = 0;
 static uint32_t voc_item_id = 0;
 static uint32_t co2_item_id = 0;
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 
 ezlopi_error_t SENSOR_0068_ens160_gas_sensor(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
@@ -141,8 +141,8 @@ ezlopi_error_t SENSOR_0068_ens160_gas_sensor(e_ezlopi_actions_t action, l_ezlopi
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 
 static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 {
@@ -352,8 +352,8 @@ static ezlopi_error_t __prepare(void *arg, void *user_arg)
         }
 
         if ((NULL == aqi_item) &&
-          (NULL == child_ens160_voc_device) &&
-          (NULL == child_ens160_co2_device))
+            (NULL == child_ens160_voc_device) &&
+            (NULL == child_ens160_co2_device))
         {
           EZPI_core_device_free_device(parent_ens160_aqi_device);
           ezlopi_free(__FUNCTION__, ens160_sensor);
@@ -373,5 +373,5 @@ static ezlopi_error_t __prepare(void *arg, void *user_arg)
   return ret;
 }
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

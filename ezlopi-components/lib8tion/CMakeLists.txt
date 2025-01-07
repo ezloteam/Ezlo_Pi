@@ -1,5 +1,5 @@
 if(${IDF_VERSION_MAJOR} STREQUAL 4 AND ${IDF_VERSION_MINOR} STREQUAL 1 AND ${IDF_VERSION_PATCH} STREQUAL 3)
-	set(req)	
+    set(req)
 else()
     set(req esp_timer)
 endif()

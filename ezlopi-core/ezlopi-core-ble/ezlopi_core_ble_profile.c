@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    ezlopi_core_ble_profile.c
-* @brief   perform some function on ble-profile info
-* @author  xx
-* @version 0.1
-* @date    12th DEC 2024
-*/
+ * @file    ezlopi_core_ble_profile.c
+ * @brief   perform some function on ble-profile info
+ * @author  xx
+ * @version 0.1
+ * @date    12th DEC 2024
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 
 #include "../../build/config/sdkconfig.h"
 
@@ -55,38 +55,37 @@
 #include "EZLOPI_USER_CONFIG.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static void EZPI_core_ble_gatt_append_descriptor_to_characteristic(s_gatt_char_t *characteristic, s_gatt_descr_t *descriptor);
 static void EZPI_core_ble_gatt_append_characterstic_to_service(s_gatt_service_t *service_obj, s_gatt_char_t *character_object);
 static void EZPI_core_ble_gatt_service_append_to_head(s_gatt_service_t *service_obj);
 static s_gatt_service_t *EZPI_core_ble_gatt_search_service_by_characteristic(s_gatt_char_t *characteristic);
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 static s_gatt_service_t *gatt_head_service = NULL;
 
+/*******************************************************************************
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
-
-/*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 s_gatt_service_t *EZPI_core_ble_profile_get_head(void)
 {
     return gatt_head_service;
@@ -238,7 +237,7 @@ s_gatt_service_t *EZPI_core_ble_gatt_create_service(uint16_t app_id, esp_bt_uuid
 }
 
 s_gatt_char_t *EZPI_core_ble_gatt_add_characteristic(s_gatt_service_t *service_obj, esp_bt_uuid_t *uuid, esp_gatt_perm_t permission, esp_gatt_char_prop_t properties,
-    f_upcall_t read_func, f_upcall_t write_func, f_upcall_t write_exec_func)
+                                                     f_upcall_t read_func, f_upcall_t write_func, f_upcall_t write_exec_func)
 {
     s_gatt_char_t *character_object = NULL;
     if (service_obj)
@@ -270,7 +269,7 @@ s_gatt_char_t *EZPI_core_ble_gatt_add_characteristic(s_gatt_service_t *service_o
 }
 
 s_gatt_descr_t *EZPI_core_ble_gatt_add_descriptor(s_gatt_char_t *charcteristic, esp_bt_uuid_t *uuid, esp_gatt_perm_t permission,
-    f_upcall_t read_func, f_upcall_t write_func, f_upcall_t write_exec_func)
+                                                  f_upcall_t read_func, f_upcall_t write_func, f_upcall_t write_exec_func)
 {
     s_gatt_descr_t *descriptor_obj = NULL;
 
@@ -413,19 +412,19 @@ void EZPI_core_ble_gatt_print_uuid(esp_bt_uuid_t *uuid, char *msg)
         else
         {
             TRACE_I("%s uuid: %02X%02X%02X%02X-%02X%02X-%02X%02X-%02X%02X-%02X%02X%02X%02X%02X%02X", msg,
-                uuid->uuid.uuid128[15], uuid->uuid.uuid128[14], uuid->uuid.uuid128[13], uuid->uuid.uuid128[12],
-                uuid->uuid.uuid128[11], uuid->uuid.uuid128[10],
-                uuid->uuid.uuid128[9], uuid->uuid.uuid128[8],
-                uuid->uuid.uuid128[7], uuid->uuid.uuid128[6],
-                uuid->uuid.uuid128[5], uuid->uuid.uuid128[4], uuid->uuid.uuid128[3], uuid->uuid.uuid128[2], uuid->uuid.uuid128[1], uuid->uuid.uuid128[0]);
+                    uuid->uuid.uuid128[15], uuid->uuid.uuid128[14], uuid->uuid.uuid128[13], uuid->uuid.uuid128[12],
+                    uuid->uuid.uuid128[11], uuid->uuid.uuid128[10],
+                    uuid->uuid.uuid128[9], uuid->uuid.uuid128[8],
+                    uuid->uuid.uuid128[7], uuid->uuid.uuid128[6],
+                    uuid->uuid.uuid128[5], uuid->uuid.uuid128[4], uuid->uuid.uuid128[3], uuid->uuid.uuid128[2], uuid->uuid.uuid128[1], uuid->uuid.uuid128[0]);
         }
     }
 #endif
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 
 static s_gatt_service_t *EZPI_core_ble_gatt_search_service_by_characteristic(s_gatt_char_t *characteristic)
 {
@@ -515,5 +514,5 @@ static void EZPI_core_ble_gatt_service_append_to_head(s_gatt_service_t *service_
 #endif // CONFIG_EZPI_BLE_ENABLE
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/
