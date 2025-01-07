@@ -100,7 +100,7 @@ s_ezlopi_channel_speed_t *EZPI_hal_pwm_init(uint8_t pwm_gpio_num, uint8_t pwm_re
         if (LEDC_CHANNEL_MAX == channel)
         {
             TRACE_E("No channels availalbe for PWM.");
-            ezlopi_free(ezlopi_channel_speed);
+            ezlopi_free(__func__, ezlopi_channel_speed);
             return NULL;
         }
         else
@@ -125,7 +125,7 @@ s_ezlopi_channel_speed_t *EZPI_hal_pwm_init(uint8_t pwm_gpio_num, uint8_t pwm_re
             if (error != ESP_OK)
             {
                 TRACE_E("Error configuring LEDC timer.(code:%s)", esp_err_to_name(error));
-                ezlopi_free(ezlopi_channel_speed);
+                ezlopi_free(__func__, ezlopi_channel_speed);
                 return NULL;
             }
             else
@@ -137,7 +137,7 @@ s_ezlopi_channel_speed_t *EZPI_hal_pwm_init(uint8_t pwm_gpio_num, uint8_t pwm_re
             if (error != ESP_OK)
             {
                 TRACE_E("Error configuring LEDC channel.(code:%s)", esp_err_to_name(error));
-                ezlopi_free(ezlopi_channel_speed);
+                ezlopi_free(__func__, ezlopi_channel_speed);
                 return NULL;
             }
             else
