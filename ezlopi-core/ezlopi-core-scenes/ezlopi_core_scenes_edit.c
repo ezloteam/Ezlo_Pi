@@ -29,15 +29,15 @@
 ** ===========================================================================
 */
 /**
-* @file    ezlopi_core_scenes_edit.c
-* @brief   This file contains function that edits scene data.
-* @author  xx
-* @version 0.1
-* @date    12th DEC 2024
-*/
+ * @file    ezlopi_core_scenes_edit.c
+ * @brief   This file contains function that edits scene data.
+ * @author  xx
+ * @version 0.1
+ * @date    12th DEC 2024
+ */
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
@@ -56,33 +56,33 @@
 #include "ezlopi_service_meshbot.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static void __edit_scene(l_scenes_list_v2_t *scene_node, cJSON *cj_scene);
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 ezlopi_error_t EZPI_core_scenes_edit_store_updated_to_nvs(cJSON *cj_updated_scene)
 {
     ezlopi_error_t error = EZPI_SUCCESS;
@@ -153,17 +153,16 @@ ezlopi_error_t EZPI_core_scenes_edit_update_id(uint32_t scene_id, cJSON *cj_upda
     return ret;
 }
 
-
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 static void __edit_scene(l_scenes_list_v2_t *scene_node, cJSON *cj_scene)
 {
     CJSON_GET_VALUE_BOOL(cj_scene, ezlopi_enabled_str, scene_node->enabled);
     CJSON_GET_VALUE_BOOL(cj_scene, ezlopi_is_group_str, scene_node->is_group);
 
     {
-        char tmp_grp_id[32] = { 0 };
+        char tmp_grp_id[32] = {0};
         CJSON_GET_VALUE_STRING_BY_COPY(cj_scene, ezlopi_group_id_str, tmp_grp_id);
         if (0 < strlen(tmp_grp_id))
         {
@@ -236,10 +235,7 @@ static void __edit_scene(l_scenes_list_v2_t *scene_node, cJSON *cj_scene)
 }
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
-
-
-
+ *                          End of File
+ *******************************************************************************/
 
 #endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS

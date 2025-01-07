@@ -77,16 +77,6 @@
  *                          Type & Macro Definitions
  *******************************************************************************/
 #define HASH_LEN 32
-
-#ifdef CONFIG_FIRMWARE_UPGRADE_BIND_IF
-/* The interface name value can refer to if_desc in esp_netif_defaults.h */
-#if CONFIG_FIRMWARE_UPGRADE_BIND_IF_ETH
-static const char *bind_interface_name = "eth";
-#elif CONFIG_FIRMWARE_UPGRADE_BIND_IF_STA
-static const char *bind_interface_name = "sta";
-#endif
-#endif
-
 #define OTA_URL_SIZE 512
 
 typedef enum e_ezlopi_ota_state
@@ -149,6 +139,9 @@ void EZPI_core_ota_start(cJSON *url)
     }
 }
 
+/*******************************************************************************
+ *                          Static Function Definitions
+ *******************************************************************************/
 static void ezlopi_ota_process(void *pv)
 {
     __ota_in_process = EZLOPI_OTA_STATE_STARTED;

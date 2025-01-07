@@ -128,9 +128,8 @@ ezlopi_error_t SENSOR_0015_oneWire_dht11(e_ezlopi_actions_t action, l_ezlopi_ite
 }
 
 /*******************************************************************************
- *                         Static Function Definitions
+ *                          Static Function Definitions
  *******************************************************************************/
-
 static ezlopi_error_t __0015_prepare(void *arg)
 {
     ezlopi_error_t ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;

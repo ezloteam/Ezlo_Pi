@@ -34,8 +34,7 @@
  * @author  xx
  * @version 0.1
  * @date    12th DEC 2024
-*/
-
+ */
 
 #ifndef __EZLOPI_CORE_SCENES_VALUE_H__
 #define __EZLOPI_CORE_SCENES_VALUE_H__
@@ -43,45 +42,61 @@
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 // #include "cjext.h"
 #include "ezlopi_core_scenes_v2.h"
 
 /*******************************************************************************
-*                          C++ Declaration Wrapper
-*******************************************************************************/
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
     /*******************************************************************************
-    *                          Type & Macro Declarations
-    *******************************************************************************/
+     *                          Type & Macro Declarations
+     *******************************************************************************/
 
     /*******************************************************************************
-    *                          Extern Data Declarations
-    *******************************************************************************/
+     *                          Extern Data Declarations
+     *******************************************************************************/
 
     /*******************************************************************************
-    *                          Extern Function Prototypes
-    *******************************************************************************/
+     *                          Extern Function Prototypes
+     *******************************************************************************/
 
+    /**
+     * @brief Function to return name of value-type
+     * 
+     * @param e_value_type enum of target value-type
+     * @return const char* 
+     */
     const char *EZPI_core_scenes_get_scene_value_type_name(e_scene_value_type_v2_t e_value_type);
+    /**
+     * @brief Function to get enum of corresponding value-type str
+     * 
+     * @param value_type_str pointer to value-type str
+     * @return e_scene_value_type_v2_t 
+     */
     e_scene_value_type_v2_t EZPI_core_scene_get_scene_value_type_enum(const char *value_type_str);
+    /**
+     * @brief Function to get scene-field value-type
+     * 
+     * @param cj_field Pointer to target field obj
+     * @param type_key_str pointer to target type str
+     * @return e_scene_value_type_v2_t 
+     */
     e_scene_value_type_v2_t EZPI_core_scenes_value_get_type(cJSON *cj_field, const char *type_key_str);
 
 #ifdef __cplusplus
 }
 #endif
-#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+#endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 #endif // __EZLOPI_CORE_SCENES_VALUE_H__
 
-
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
-
-
+ *                          End of File
+ *******************************************************************************/

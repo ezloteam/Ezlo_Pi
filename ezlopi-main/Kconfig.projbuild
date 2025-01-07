@@ -6,37 +6,37 @@ menu "EzloPi User Config"
         default n
         help
             Enables the allocation and free via ezlopi-util, helpful to track-down any memory leak in the stack
-            
+
     config EZPI_DEV_TYPE_TEST
         bool "Run device in test mode"
         default n
-        help 
+        help
             Run the device in test mode
-    
+
     config EZPI_UTIL_TRACE_EN
         bool "Enable trace component for logging"
         default y
         help
             ezlopi-util-trace component is enabled to log the outputs to the serial monitor
 
-    config EZPI_BLE_ENABLE        
+    config EZPI_BLE_ENABLE
         bool "Enable BLE"
         depends on IDF_TARGET_ESP32 || IDF_TARGET_ESP32C3 || IDF_TARGET_ESP32S3
         default n
         help
             Enable BLE
-    
-        config EZPI_BLE_ENALBE_PAIRING
+
+        config EZPI_BLE_ENABLE_PAIRING
             bool "Enable BLE pairing"
             depends on EZPI_BLE_ENABLE
             default y
             help
                 Enable BLE pairing
-                    
-        config EZPI_BLE_ENALBE_PASSKEY
+
+        config EZPI_BLE_ENABLE_PASSKEY
             bool "Enable BLE pass key"
             default n
-            depends on EZPI_BLE_ENALBE_PAIRING
+            depends on EZPI_BLE_ENABLE_PAIRING
             help
                 Enable BLE pass key
 
@@ -44,13 +44,13 @@ menu "EzloPi User Config"
         bool "Enable ethernet"
         depends on ETH_USE_SPI_ETHERNET
         default n
-        help 
+        help
             ezlopi-core-ethernet component is enabled
 
     config EZPI_ENABLE_WIFI
         bool "Enable Wi-Fi"
         default y
-        help 
+        help
             ezlopi-core-wifi component is enabled
     
     config EZPI_ENABLE_OPENTELEMETRY
@@ -92,10 +92,10 @@ menu "EzloPi User Config"
     config EZPI_SERV_MDNS_EN
         bool "Enable mDNS service"
         default y
-        help 
+        help
             Enable mDNS service. mDNS broadcast informations of device.
 
-    config EZPI_ENABLE_PING 
+    config EZPI_ENABLE_PING
         depends on EZPI_ENABLE_WIFI || EZPI_CORE_ENABLE_ETH
         bool "Enable ping"
         default y
@@ -106,54 +106,54 @@ menu "EzloPi User Config"
         depends on (HTTPD_WS_SUPPORT && (EZPI_CORE_ENABLE_ETH || EZPI_ENABLE_WIFI ))
         bool "Enable local websocket server"
         default n
-        help 
+        help
             Enable local websocket server
 
     config EZPI_WEBSOCKET_CLIENT
         depends on (EZPI_CORE_ENABLE_ETH || EZPI_ENABLE_WIFI )
         bool "Enable Web-Socket client"
         default n
-        help 
+        help
             Enable Web-Socket client, required for connecting with cloud
 
     config EZPI_CORE_STATIC_BUFFER_SIZE
         depends on EZPI_WEBSOCKET_CLIENT || EZPI_LOCAL_WEBSOCKET_SERVER
         int "Static buffer size:"
         default 10240
-        help 
+        help
             Static buffer is used to broadcast data. Data is broadcasted by local-websocket-server and websocket-client. Default value is 10KB"
 
-    config EZPI_SERV_ENABLE_MESHBOTS 
+    config EZPI_SERV_ENABLE_MESHBOTS
         depends on (EZPI_WEBSOCKET_CLIENT || EZPI_LOCAL_WEBSOCKET_SERVER)
         bool "Enable meshbot service"
         default n
         help
             Enable meshbot services for scenes
-    
+
         config EZPI_SERV_ENABLE_MODES
             depends on EZPI_SERV_ENABLE_MESHBOTS
             bool "Enable mode services"
             default n
             help
                 Enable mode services
-    
+
     config EZPI_ENABLE_LED_INDICATOR
         bool "Enable indicator LED available in the device"
         default y
-        help 
+        help
             Enable indicator LED available in the device
-    
+
     config EZPI_ENABLE_CAPTIVE_PORTAL
         bool "Enable captive portal"
         default n
         help
             Enable captive portal in EzloPi firmware
-    
+
     config EZPI_ENABLE_SYSTEM_TEMPERATURE
         depends on IDF_TARGET_ESP32S3 || IDF_TARGET_ESP32C3 || IDF_TARGET_ESP32S2
         bool "Enable system temperature monitoring uisng inbuilt temperature sensor"
         default n
-        help 
+        help
             Enable system temperature monitoring uisng inbuilt temperature sensor
     
     choice 
@@ -181,34 +181,34 @@ menu "EzloPi User Config"
             bool "mDNS enable extra services"
             default n
             help
-                Enable extra services such as manufacturer, brand, etc. 
-        
+                Enable extra services such as manufacturer, brand, etc.
+
         config EZPI_MDNS_ENABLE_MANUFACTURER_SERVICE
             bool "mDNS enable manufacturer service"
             depends on EZPI_MDNS_ENABLE_EXTRA_SERVICES
             default n
-            help 
+            help
                 Enable manufacturer extra service in ezlopi mDNS
-        
+
         config EZPI_MDNS_ENABLE_BRAND_SERVICE
             bool "mDNS enable brand service"
             depends on EZPI_MDNS_ENABLE_EXTRA_SERVICES
             default n
-            help 
+            help
                 Enable brand extra service in ezlopi mDNS
-        
+
         config EZPI_MDNS_ENABLE_MODEL_SERVICE
             bool "mDNS enable model service"
             depends on EZPI_MDNS_ENABLE_EXTRA_SERVICES
             default n
-            help 
+            help
                 Enable model extra service in ezlopi mDNS
-        
+
         config EZPI_MDNS_ENABLE_NAME_SERVICE
             bool "mDNS enable name service"
             depends on EZPI_MDNS_ENABLE_EXTRA_SERVICES
             default n
-            help 
+            help
                 Enable name extra service in ezlopi mDNS
     endmenu
 

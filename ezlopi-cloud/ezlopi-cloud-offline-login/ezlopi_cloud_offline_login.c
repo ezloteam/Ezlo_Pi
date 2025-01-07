@@ -1,11 +1,3 @@
-
-/**
- * @file    ezlopi_cloud_offline_login.c
- * @brief
- * @author
- * @version
- * @date
- */
 /* ===========================================================================
 ** Copyright (C) 2022 Ezlo Innovation Inc
 **
@@ -37,6 +29,16 @@
 ** ===========================================================================
 */
 
+/**
+ * @file    ezlopi_cloud_offline_login.c
+ * @brief
+ * @author
+ * @version
+ * @date
+ */
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -45,7 +47,21 @@
 #include "ezlopi_core_devices_list.h"
 
 #include "ezlopi_cloud_constants.h"
+/*******************************************************************************
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
+/*******************************************************************************
+ *                          Extern Function Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Type & Macro Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Static Function Prototypes
+ *******************************************************************************/
 /**
  * @brief Function to prepare error response to the offline login request
  *
@@ -56,6 +72,17 @@
  */
 static void ezlopi_cloud_prepare_error(cJSON *cj_response, int error_code, const char *error_message, const char *error_data);
 
+/*******************************************************************************
+ *                          Static Data Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Data Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Definitions
+ *******************************************************************************/
 void EZPI_CLOUD_offline_login(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
@@ -84,6 +111,10 @@ void EZPI_CLOUD_offline_login(cJSON *cj_request, cJSON *cj_response)
         }
     }
 }
+
+/*******************************************************************************
+ *                          Static Function Definitions
+ *******************************************************************************/
 
 static void ezlopi_cloud_prepare_error(cJSON *cj_response, int error_code, const char *error_message, const char *error_data)
 {

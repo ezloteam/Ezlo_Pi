@@ -1,4 +1,33 @@
-
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
 
 /**
  * @file    ezlopi_service_ble.c
@@ -7,44 +36,14 @@
  * @version
  * @date
  */
- /* ===========================================================================
- ** Copyright (C) 2024 Ezlo Innovation Inc
- **
- ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
- **
- ** Redistribution and use in source and binary forms, with or without
- ** modification, are permitted provided that the following conditions are met:
- **
- ** 1. Redistributions of source code must retain the above copyright notice,
- **    this list of conditions and the following disclaimer.
- ** 2. Redistributions in binary form must reproduce the above copyright
- **    notice, this list of conditions and the following disclaimer in the
- **    documentation and/or other materials provided with the distribution.
- ** 3. Neither the name of the copyright holder nor the names of its
- **    contributors may be used to endorse or promote products derived from
- **    this software without specific prior written permission.
- **
- ** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- ** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- ** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- ** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- ** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- ** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- ** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- ** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- ** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- ** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- ** POSSIBILITY OF SUCH DAMAGE.
- ** ===========================================================================
- */
 
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_BLE_ENABLE
 
- /*******************************************************************************
-  *                          Include Files
-  *******************************************************************************/
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -74,12 +73,12 @@
 
 #include "ezlopi_service_ble.h"
 
-  /*******************************************************************************
-   *                          Extern Function Declarations
-   *******************************************************************************/
-   /**
-    * @brief Function to prepare BLE seurity services
-    */
+/*******************************************************************************
+ *                          Extern Function Declarations
+ *******************************************************************************/
+/**
+ * @brief Function to prepare BLE seurity services
+ */
 extern void EZPI_ble_service_security_init(void);
 /**
  * @brief Function to prepare BLE WiFi services
@@ -101,29 +100,32 @@ extern void EZPI_ble_service_dynamic_config_init(void);
 /*******************************************************************************
  *                          Static Function Prototypes
  *******************************************************************************/
- /**
-  * @brief Function to initialize BLE
-  * @details This function performs folloiwing operations
-  *  - Prepares and set BLE device name
-  *  - Configures and enables BLE
-  *  - Configures and enables bluedroid
-  *  - Registers callbacks for BLE gatts and GAP
-  */
-static void ezlopi_ble_basic_init(void);
-#if (1 == CONFIG_EZPI_BLE_ENALBE_PASSKEY)
 /**
- * @brief Function to set BLE in pairing mode
- *
+ * @brief Function to initialize BLE
+ * @details This function performs folloiwing operations
+ *  - Prepares and set BLE device name
+ *  - Configures and enables BLE
+ *  - Configures and enables bluedroid
+ *  - Registers callbacks for BLE gatts and GAP
  */
-static void ezlopi_ble_start_secure_gatt_server(void);
-#endif
-#if (1 == CONFIG_EZPI_BLE_ENALBE_PAIRING)
+static void ezlopi_ble_basic_init(void);
+
+#ifdef CONFIG_EZPI_BLE_ENABLE_PAIRING
 /**
  * @brief Function to set BLE pairing with pass key
  *
  */
 static void ezlopi_ble_start_secure_gatt_server_open_pairing(void);
-#endif
+#endif // CONFIG_EZPI_BLE_ENABLE_PAIRING
+
+#ifdef CONFIG_EZPI_BLE_ENALBE_PASSKEY
+
+/**
+ * @brief Function to set BLE in pairing mode
+ *
+ */
+static void ezlopi_ble_start_secure_gatt_server(void);
+#endif // CONFIG_EZPI_BLE_ENALBE_PASSKEY
 
 void EZPI_ble_service_init(void)
 {
@@ -144,13 +146,13 @@ void EZPI_ble_service_init(void)
 
     CHECK_PRINT_ERROR(esp_ble_gatt_set_local_mtu(517), "set local  MTU failed");
 
-#if (1 == CONFIG_EZPI_BLE_ENALBE_PAIRING)
-#if (1 == CONFIG_EZPI_BLE_ENALBE_PASSKEY)
+#if (1 == CONFIG_EZPI_BLE_ENABLE_PAIRING)
+#if (1 == CONFIG_EZPI_BLE_ENABLE_PASSKEY)
     ezlopi_ble_start_secure_gatt_server();
 #else
     ezlopi_ble_start_secure_gatt_server_open_pairing();
-#endif // 1 == CONFIG_EZPI_BLE_ENALBE_PASSKEY
-#endif // 1 == CONFIG_EZPI_BLE_ENALBE_PAIRING
+#endif // 1 == CONFIG_EZPI_BLE_ENABLE_PASSKEY
+#endif // 1 == CONFIG_EZPI_BLE_ENABLE_PAIRING
 }
 
 int EZPI_ble_service_get_ble_mac(uint8_t mac[6])
@@ -166,7 +168,7 @@ int EZPI_ble_service_get_ble_mac(uint8_t mac[6])
 /*******************************************************************************
  *                         Static Function Definitions
  *******************************************************************************/
-#if (1 == CONFIG_EZPI_BLE_ENALBE_PAIRING)
+#if (1 == CONFIG_EZPI_BLE_ENABLE_PAIRING)
 static void ezlopi_ble_start_secure_gatt_server_open_pairing(void)
 {
     const esp_ble_auth_req_t auth_req = ESP_LE_AUTH_REQ_SC_MITM_BOND;
@@ -179,21 +181,21 @@ static void ezlopi_ble_start_secure_gatt_server_open_pairing(void)
     const uint8_t rsp_key = (ESP_BLE_ENC_KEY_MASK | ESP_BLE_ID_KEY_MASK);
 
     CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_AUTHEN_REQ_MODE, (void *)&auth_req, sizeof(uint8_t)),
-        "failed -set - ESP_BLE_SM_AUTHEN_REQ_MODE");
+                      "failed -set - ESP_BLE_SM_AUTHEN_REQ_MODE");
     CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_IOCAP_MODE, (void *)&iocap, sizeof(uint8_t)),
-        "failed -set - ESP_BLE_SM_IOCAP_MODE");
+                      "failed -set - ESP_BLE_SM_IOCAP_MODE");
     CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_ONLY_ACCEPT_SPECIFIED_SEC_AUTH, (void *)&auth_option, sizeof(uint8_t)),
-        "failed -set - ESP_BLE_SM_ONLY_ACCEPT_SPECIFIED_SEC_AUTH");
+                      "failed -set - ESP_BLE_SM_ONLY_ACCEPT_SPECIFIED_SEC_AUTH");
     CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_OOB_SUPPORT, (void *)&oob_support, sizeof(uint8_t)),
-        "failed -set - ESP_BLE_SM_OOB_SUPPORT");
+                      "failed -set - ESP_BLE_SM_OOB_SUPPORT");
     CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_SET_INIT_KEY, (void *)&init_key, sizeof(uint8_t)),
-        "failed -set - ESP_BLE_SM_SET_INIT_KEY");
+                      "failed -set - ESP_BLE_SM_SET_INIT_KEY");
     CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_SET_RSP_KEY, (void *)&rsp_key, sizeof(uint8_t)),
-        "failed -set - ESP_BLE_SM_SET_RSP_KEY");
+                      "failed -set - ESP_BLE_SM_SET_RSP_KEY");
 }
 #endif
 
-#if (1 == CONFIG_EZPI_BLE_ENALBE_PASSKEY)
+#if (1 == CONFIG_EZPI_BLE_ENABLE_PASSKEY)
 static void ezlopi_ble_start_secure_gatt_server(void)
 {
     const uint32_t default_passkey = 123456;
@@ -243,7 +245,7 @@ static void ezlopi_ble_basic_init(void)
         memset(mac, 0, sizeof(mac));
         esp_read_mac(mac, ESP_MAC_BT);
         snprintf(ble_device_name, sizeof(ble_device_name), "ezlopi_%02x%02x%02x%02x%02x%02x",
-            mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+                 mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
     }
 
     // dump("ble_device_name", ble_device_name, 0, sizeof(ble_device_name));

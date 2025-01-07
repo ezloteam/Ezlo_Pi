@@ -34,14 +34,14 @@
  * @author  xx
  * @version 0.1
  * @date    xx
-*/
+ */
 
 #ifndef _SENSOR_0007_I2C_GY271_H_
 #define _SENSOR_0007_I2C_GY271_H_
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include <stdbool.h>
 
 #include "ezlopi_core_actions.h"
@@ -49,20 +49,20 @@
 #include "ezlopi_core_errors.h"
 
 /*******************************************************************************
-*                          C++ Declaration Wrapper
-*******************************************************************************/
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
     /*******************************************************************************
-    *                          Type & Macro Declarations
-    *******************************************************************************/
+     *                          Type & Macro Declarations
+     *******************************************************************************/
     // Calculation parameters
 #define PI (3.1416f)
 #define GY271_REG_COUNT_LEN 6 // magnetometer data is to be read in one go .
-#define GY271_ADDR 0x0D // this chipset uses [QMC5883L chip]
+#define GY271_ADDR 0x0D       // this chipset uses [QMC5883L chip]
 /*******************************************************************/
 // REGISTER ADDRESS
 /*******************************************************************/
@@ -140,7 +140,7 @@ extern "C"
 // At Field_Range = +-2G (), the conversion LSB per G => 12000 LSB/Gauss.
 #define GY271_CONVERSION_TO_G 12000.0f
 
-// CUSTOM GY271 Data storage structure
+    // CUSTOM GY271 Data storage structure
     typedef struct s_gy271_calib
     {
         long bias_axis[3];        // (max_ + min_)/2
@@ -168,22 +168,22 @@ extern "C"
     } s_gy271_data_t;
 
     /*******************************************************************************
-    *                          Extern Data Declarations
-    *******************************************************************************/
+     *                          Extern Data Declarations
+     *******************************************************************************/
 
     /*******************************************************************************
-    *                          Extern Function Prototypes
-    *******************************************************************************/
+     *                          Extern Function Prototypes
+     *******************************************************************************/
 
     /**
-    * @brief Function to operate on actions
-    *
-    * @param action Current Action to Operate on
-    * @param item Target-Item node
-    * @param arg Arg for action
-    * @param user_arg User-arg
-    * @return ezlopi_error_t
-    */
+     * @brief Function to operate on actions
+     *
+     * @param action Current Action to Operate on
+     * @param item Target-Item node
+     * @param arg Arg for action
+     * @param user_arg User-arg
+     * @return ezlopi_error_t
+     */
     ezlopi_error_t SENSOR_0007_i2c_gy271(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
     /**
@@ -217,5 +217,5 @@ extern "C"
 #endif // _SENSOR_0007_I2C_GY271_H_
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

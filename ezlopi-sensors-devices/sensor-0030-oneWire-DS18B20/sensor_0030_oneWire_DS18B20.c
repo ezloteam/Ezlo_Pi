@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    sensor_0030_oneWire_DS18B20.c
-* @brief   perform some function on sensor_0030
-* @author  xx
-* @version 0.1
-* @date    xx
-*/
+ * @file    sensor_0030_oneWire_DS18B20.c
+ * @brief   perform some function on sensor_0030
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include <math.h>
 
 #include "ezlopi_core_cloud.h"
@@ -55,20 +55,20 @@
 #include "EZLOPI_USER_CONFIG.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static ezlopi_error_t __prepare(void *arg);
 static ezlopi_error_t __init(l_ezlopi_item_t *item);
 static ezlopi_error_t __notify(l_ezlopi_item_t *item);
@@ -83,16 +83,16 @@ static esp_err_t ds18b20_get_temperature_data(double *temperature_data, uint32_t
 static uint8_t ds18b20_calculate_crc(const uint8_t *data, uint8_t len);
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 ezlopi_error_t SENSOR_0030_oneWire_DS18B20(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
 
@@ -129,8 +129,8 @@ ezlopi_error_t SENSOR_0030_oneWire_DS18B20(e_ezlopi_actions_t action, l_ezlopi_i
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 static ezlopi_error_t __notify(l_ezlopi_item_t *item)
 {
     ezlopi_error_t ret = EZPI_FAILED;
@@ -188,7 +188,6 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
                 ds18b20_write_to_scratchpad(DS18B20_TH_HIGHER_THRESHOLD, DS18B20_TL_LOWER_THRESHOLD, 12, item->interface.onewire_master.onewire_pin);
                 ds18b20_get_temperature_data(temperature_prev_value, item->interface.onewire_master.onewire_pin);
                 ret = EZPI_SUCCESS;
-
             }
         }
     }
@@ -419,5 +418,5 @@ static uint8_t ds18b20_calculate_crc(const uint8_t *data, uint8_t len)
 }
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

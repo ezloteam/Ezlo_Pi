@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    sensor_0007_I2C_GY271.c
-* @brief   perform some function on sensor_0007
-* @author  xx
-* @version 0.1
-* @date    xx
-*/
+ * @file    sensor_0007_I2C_GY271.c
+ * @brief   perform some function on sensor_0007
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include <math.h>
 
 #include "ezlopi_core_cloud.h"
@@ -56,20 +56,20 @@
 #include "EZLOPI_USER_CONFIG.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static ezlopi_error_t __prepare(void *arg);
 static ezlopi_error_t __init(l_ezlopi_item_t *item);
 static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg);
@@ -79,16 +79,16 @@ static void __prepare_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj
 static void __gy271_calibration_task(void *params);
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 ezlopi_error_t SENSOR_0007_i2c_gy271(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
@@ -124,8 +124,8 @@ ezlopi_error_t SENSOR_0007_i2c_gy271(e_ezlopi_actions_t action, l_ezlopi_item_t 
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 
 static void __prepare_device_cloud_properties_parent_x(l_ezlopi_device_t *device, cJSON *cj_device)
 {
@@ -417,7 +417,7 @@ static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 
 static ezlopi_error_t __notify(l_ezlopi_item_t *item)
 {
-    static float __prev[5] = { 0 };
+    static float __prev[5] = {0};
     ezlopi_error_t ret = EZPI_FAILED;
     if (item)
     {
@@ -468,7 +468,6 @@ static ezlopi_error_t __notify(l_ezlopi_item_t *item)
                 }
             }
             ret = EZPI_SUCCESS;
-
         }
     }
     return ret;
@@ -480,9 +479,9 @@ static void __gy271_calibration_task(void *params) // calibrate task
     l_ezlopi_item_t *item = (l_ezlopi_item_t *)params;
     if (item)
     {
-        int calibrationData[3][2] = { {0, 0},  // xmin,xmax
+        int calibrationData[3][2] = {{0, 0},  // xmin,xmax
                                      {0, 0},  // ymin,ymax
-                                     {0, 0} }; // zmin,zmax// Initialization added!
+                                     {0, 0}}; // zmin,zmax// Initialization added!
         s_gy271_data_t *user_data = (s_gy271_data_t *)item->user_arg;
         if (user_data && (false == user_data->calibration_complete))
         {
@@ -506,9 +505,9 @@ static void __gy271_calibration_task(void *params) // calibrate task
 
             // 3. delta_avg
             user_data->calib_factor.delta_avg = ((float)((user_data->calib_factor.delta_axis[0]) +
-                (user_data->calib_factor.delta_axis[1]) +
-                (user_data->calib_factor.delta_axis[2])) /
-                3.0f);
+                                                         (user_data->calib_factor.delta_axis[1]) +
+                                                         (user_data->calib_factor.delta_axis[2])) /
+                                                 3.0f);
 
             // 4. Scale_axis{x,y,z}
             user_data->calib_factor.scale_axis[0] = user_data->calib_factor.delta_avg / user_data->calib_factor.delta_axis[0]; // x-axis
@@ -516,20 +515,20 @@ static void __gy271_calibration_task(void *params) // calibrate task
             user_data->calib_factor.scale_axis[2] = user_data->calib_factor.delta_avg / user_data->calib_factor.delta_axis[2]; // z-axis
 
             TRACE_I("Bias :--- _Xaxis=%6ld | _Yaxis=%6ld | _Zaxis=%6ld ",
-                user_data->calib_factor.bias_axis[0],
-                user_data->calib_factor.bias_axis[1],
-                user_data->calib_factor.bias_axis[2]);
+                    user_data->calib_factor.bias_axis[0],
+                    user_data->calib_factor.bias_axis[1],
+                    user_data->calib_factor.bias_axis[2]);
 
             TRACE_I("Delta :--- _Xaxis=%6ld | _Yaxis=%6ld | _Zaxis=%6ld ",
-                user_data->calib_factor.delta_axis[0],
-                user_data->calib_factor.delta_axis[1],
-                user_data->calib_factor.delta_axis[2]);
+                    user_data->calib_factor.delta_axis[0],
+                    user_data->calib_factor.delta_axis[1],
+                    user_data->calib_factor.delta_axis[2]);
             TRACE_I("Delta_AVG :--- %6f", user_data->calib_factor.delta_avg);
 
             TRACE_I("Scale :--- _Xaxis=%6f | _Yaxis=%6f | _Zaxis=%6f ",
-                user_data->calib_factor.scale_axis[0],
-                user_data->calib_factor.scale_axis[1],
-                user_data->calib_factor.scale_axis[0]);
+                    user_data->calib_factor.scale_axis[0],
+                    user_data->calib_factor.scale_axis[1],
+                    user_data->calib_factor.scale_axis[0]);
             TRACE_W("......................CALIBRATION COMPLETE.....................");
             user_data->calibration_complete = true;
         }
@@ -541,5 +540,5 @@ static void __gy271_calibration_task(void *params) // calibrate task
 }
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

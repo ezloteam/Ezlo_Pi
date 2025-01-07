@@ -130,7 +130,7 @@ bool VerifyPwd(int uart_channel_num, uint32_t the_password, uint8_t *recieved_bu
     return (bool)F_res;
 }
 
-bool SetAdder(int uart_channel_num, uint32_t new_address, uint8_t *recieved_buffer, uint32_t timeout) 
+bool SetAdder(int uart_channel_num, uint32_t new_address, uint8_t *recieved_buffer, uint32_t timeout)
 {
     // Reset the recieving buffer before new data is to be extracted.
     memset(recieved_buffer, 0, MAX_PACKET_LENGTH_VAL);
@@ -389,7 +389,7 @@ bool GR_Identify(int uart_channel_num, uint16_t *PageID_ptr, uint16_t *MatchScor
     return (bool)F_res;
 }
 
-bool GenImg(int uart_channel_num, uint8_t *recieved_buffer, uint32_t timeout) 
+bool GenImg(int uart_channel_num, uint8_t *recieved_buffer, uint32_t timeout)
 {
     // Reset the recieving buffer before new data is to be extracted.
     memset(recieved_buffer, 0, MAX_PACKET_LENGTH_VAL);
@@ -423,7 +423,7 @@ bool GenImg(int uart_channel_num, uint8_t *recieved_buffer, uint32_t timeout)
     return (bool)F_res;
 }
 
-bool Img2Tz(int uart_channel_num, uint8_t CharBufferID, uint8_t *recieved_buffer, uint32_t timeout) 
+bool Img2Tz(int uart_channel_num, uint8_t CharBufferID, uint8_t *recieved_buffer, uint32_t timeout)
 {
     // Reset the recieving buffer before new data is to be extracted.
     memset(recieved_buffer, 0, MAX_PACKET_LENGTH_VAL);
@@ -461,7 +461,7 @@ bool Img2Tz(int uart_channel_num, uint8_t CharBufferID, uint8_t *recieved_buffer
     return (bool)F_res;
 }
 
-bool RegModel(int uart_channel_num, uint8_t *recieved_buffer, uint32_t timeout) 
+bool RegModel(int uart_channel_num, uint8_t *recieved_buffer, uint32_t timeout)
 {
     // Reset the recieving buffer before new data is to be extracted.
     memset(recieved_buffer, 0, MAX_PACKET_LENGTH_VAL);
@@ -618,7 +618,7 @@ bool Delete(int uart_channel_num, uint16_t PageID, uint16_t TempCount, uint8_t *
     return (bool)F_res;
 }
 
-bool Empty(int uart_channel_num, uint8_t *recieved_buffer, uint32_t timeout) 
+bool Empty(int uart_channel_num, uint8_t *recieved_buffer, uint32_t timeout)
 {
     // Reset the recieving buffer before new data is to be extracted.
     memset(recieved_buffer, 0, MAX_PACKET_LENGTH_VAL);
@@ -694,7 +694,7 @@ bool LedControl(int uart_channel_num, bool LED_state, uint8_t *recieved_buffer, 
     return (bool)F_res;
 }
 
-bool Match(int uart_channel_num, uint16_t *InspectionScore, uint8_t *recieved_buffer, uint32_t timeout) 
+bool Match(int uart_channel_num, uint16_t *InspectionScore, uint8_t *recieved_buffer, uint32_t timeout)
 {
     uint16_t Score = 0;
     // Reset the recieving buffer before new data is to be extracted.
@@ -736,7 +736,7 @@ bool Match(int uart_channel_num, uint16_t *InspectionScore, uint8_t *recieved_bu
     return (bool)F_res;
 }
 
-bool Search(int uart_channel_num, uint8_t CharBufferID, uint16_t StartPage, uint16_t PageNum, uint16_t *PageID_ptr, uint16_t *MatchScore_ptr, uint8_t *recieved_buffer, uint32_t timeout) 
+bool Search(int uart_channel_num, uint8_t CharBufferID, uint16_t StartPage, uint16_t PageNum, uint16_t *PageID_ptr, uint16_t *MatchScore_ptr, uint8_t *recieved_buffer, uint32_t timeout)
 {
     // use dummy variables
     uint16_t Page_num = *PageID_ptr;

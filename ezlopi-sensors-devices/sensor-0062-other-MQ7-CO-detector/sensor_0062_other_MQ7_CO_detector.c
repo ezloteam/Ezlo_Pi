@@ -245,7 +245,6 @@ static ezlopi_error_t __0062_init(l_ezlopi_item_t *item)
     return ret;
 }
 
-//------------------------------------------------------------------------------------------------------
 static void __prepare_device_digi_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     device->cloud_properties.category = category_security_sensor;
@@ -254,6 +253,7 @@ static void __prepare_device_digi_cloud_properties(l_ezlopi_device_t *device, cJ
     device->cloud_properties.info = NULL;
     device->cloud_properties.device_type_id = NULL;
 }
+
 static void __prepare_item_digi_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device)
 {
     item->cloud_properties.has_getter = true;
@@ -268,7 +268,7 @@ static void __prepare_item_digi_cloud_properties(l_ezlopi_item_t *item, cJSON *c
     CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio1_str, item->interface.gpio.gpio_in.gpio_num);
     TRACE_S("MQ7-> DIGITAL_PIN: %d ", item->interface.gpio.gpio_in.gpio_num);
 }
-//------------------------------------------------------------------------------------------------------
+
 static void __prepare_device_adc_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     device->cloud_properties.category = category_level_sensor;
@@ -277,6 +277,7 @@ static void __prepare_device_adc_cloud_properties(l_ezlopi_device_t *device, cJS
     device->cloud_properties.info = NULL;
     device->cloud_properties.device_type_id = NULL;
 }
+
 static void __prepare_item_adc_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_data)
 {
     item->cloud_properties.has_getter = true;
@@ -297,7 +298,6 @@ static void __prepare_item_adc_cloud_properties(l_ezlopi_item_t *item, cJSON *cj
     item->user_arg = user_data; // since 'item->user_arg' exist in only one-child [item_adc]
 }
 
-//------------------------------------------------------------------------------------------------------
 static ezlopi_error_t __0062_get_item(l_ezlopi_item_t *item, void *arg)
 {
     ezlopi_error_t ret = EZPI_FAILED;
@@ -423,7 +423,7 @@ static ezlopi_error_t __0062_notify(l_ezlopi_item_t *item)
     }
     return ret;
 }
-//------------------------------------------------------------------------------------------------------
+
 static float __extract_MQ7_sensor_ppm(l_ezlopi_item_t *item)
 {
     s_mq7_value_t *MQ7_value = (s_mq7_value_t *)item->user_arg;

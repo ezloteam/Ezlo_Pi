@@ -1,11 +1,3 @@
-
-/**
- * @file    ezlopi_service_ble_ble_auth.h
- * @brief   
- * @author  
- * @version 
- * @date    
- */
 /* ===========================================================================
 ** Copyright (C) 2024 Ezlo Innovation Inc
 **
@@ -36,7 +28,13 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
+/**
+ * @file    ezlopi_service_ble_ble_auth.h
+ * @brief
+ * @author
+ * @version
+ * @date
+ */
 #ifndef _EZLOPI_SERVICE_BLE_BLE_AUT_H_
 #define _EZLOPI_SERVICE_BLE_BLE_AUT_H_
 

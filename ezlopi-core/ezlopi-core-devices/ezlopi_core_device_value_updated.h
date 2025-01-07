@@ -34,40 +34,40 @@
  * @author  xx
  * @version 0.1
  * @date    12th DEC 2024
-*/
+ */
 #ifndef _EZLOPI_CORE_DEVICE_VALUE_UPDATED_H_
 #define _EZLOPI_CORE_DEVICE_VALUE_UPDATED_H_
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 
 #include "ezlopi_core_devices_list.h"
 
 /*******************************************************************************
-*                          C++ Declaration Wrapper
-*******************************************************************************/
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
     /*******************************************************************************
-    *                          Type & Macro Declarations
-    *******************************************************************************/
+     *                          Type & Macro Declarations
+     *******************************************************************************/
 
     /*******************************************************************************
-    *                          Extern Data Declarations
-    *******************************************************************************/
+     *                          Extern Data Declarations
+     *******************************************************************************/
 
     /*******************************************************************************
-    *                          Extern Function Prototypes
-    *******************************************************************************/
+     *                          Extern Function Prototypes
+     *******************************************************************************/
     /**
-    * @brief function to broadcast updated sensor data for perticular item node
-    *
-    * @param item  Target item-node
-    * @return ezlopi_error_t
-    */
+     * @brief function to broadcast updated sensor data for perticular item node
+     *
+     * @param item  Target item-node
+     * @return ezlopi_error_t
+     */
     ezlopi_error_t EZPI_core_device_value_updated_from_device_broadcast(l_ezlopi_item_t *item);
     /**
      * @brief function to broadcast updated sensor data for perticular item_id
@@ -92,13 +92,11 @@ extern "C"
      */
     ezlopi_error_t EZPI_core_device_value_update_wifi_scan_broadcast(cJSON *network_array);
 
-
 #ifdef __cplusplus
 }
 #endif
 
 #endif // _EZLOPI_CORE_DEVICE_VALUE_UPDATED_H_
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
-
+ *                          End of File
+ *******************************************************************************/

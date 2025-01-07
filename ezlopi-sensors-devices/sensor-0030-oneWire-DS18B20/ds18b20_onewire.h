@@ -35,14 +35,14 @@
  * @author  xx
  * @version 0.1
  * @date    xx
-*/
+ */
 
 #ifndef _DS18B20_ONEWIRE_H_
 #define _DS18B20_ONEWIRE_H_
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include <stdbool.h>
 #include "esp_err.h"
 #include "freertos/FreeRTOS.h"
@@ -50,49 +50,50 @@
 #include "freertos/semphr.h"
 
 /*******************************************************************************
-*                          C++ Declaration Wrapper
-*******************************************************************************/
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
     /*******************************************************************************
-    *                          Type & Macro Declarations
-    *******************************************************************************/
+     *                          Type & Macro Declarations
+     *******************************************************************************/
 
     // Reference for onewire: https://www.analog.com/en/technical-articles/1wire-communication-through-software.html
 
-#define ONEWIRE_TAG             __FILE__
-#define ONEWIRE_GET_LINE        __LINE__
+#define ONEWIRE_TAG __FILE__
+#define ONEWIRE_GET_LINE __LINE__
 
-#define onewireENTER_CRITICAL_REGION() portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;taskENTER_CRITICAL(&mux)
-#define onewireEXIT_CRITICAL_REGION()  taskEXIT_CRITICAL(&mux)
+#define onewireENTER_CRITICAL_REGION()               \
+    portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED; \
+    taskENTER_CRITICAL(&mux)
+#define onewireEXIT_CRITICAL_REGION() taskEXIT_CRITICAL(&mux)
 
     // One wire timing delays for different data values
-#define ONE_WIRE_WRITE_1_LINE_PULL_DOWN_HOLD_US                 6       // 6us
-#define ONE_WIRE_WRITE_1_LINE_RELEASE_HOLD_US                   64      // 64us
+#define ONE_WIRE_WRITE_1_LINE_PULL_DOWN_HOLD_US 6 // 6us
+#define ONE_WIRE_WRITE_1_LINE_RELEASE_HOLD_US 64  // 64us
 
-#define ONE_WIRE_WRITE_0_LINE_PULL_DOWN_HOLD_US                 60      // 60us
-#define ONE_WIRE_WRITE_0_LINE_RELEASE_HOLD_US                   10      // 10us
+#define ONE_WIRE_WRITE_0_LINE_PULL_DOWN_HOLD_US 60 // 60us
+#define ONE_WIRE_WRITE_0_LINE_RELEASE_HOLD_US 10   // 10us
 
-#define ONE_WIRE_READ_LINE_PULL_DOWN_HOLD_US                    6       // 6us
-#define ONE_WIRE_READ_LINE_RELEASE_HOLD_US                      9       // 9us
-#define ONE_WIRE_READ_LINE_SAMPLING_US                          55      // 55us
+#define ONE_WIRE_READ_LINE_PULL_DOWN_HOLD_US 6 // 6us
+#define ONE_WIRE_READ_LINE_RELEASE_HOLD_US 9   // 9us
+#define ONE_WIRE_READ_LINE_SAMPLING_US 55      // 55us
 
-#define ONE_WIRE_HOLD_BEFORE_RESET_US                           0       // 0us
-#define ONE_WIRE_RESET_LINE_PULL_DOWN_HOLD_US                   480     // 470us
-#define ONE_WIRE_RESET_LINE_RELEASE_HOLD_US                     70      // 70us
-#define ONE_WIRE_RESET_LINE_SAMPLING_US                         410     // 410us
-
-
-    /*******************************************************************************
-    *                          Extern Data Declarations
-    *******************************************************************************/
+#define ONE_WIRE_HOLD_BEFORE_RESET_US 0           // 0us
+#define ONE_WIRE_RESET_LINE_PULL_DOWN_HOLD_US 480 // 470us
+#define ONE_WIRE_RESET_LINE_RELEASE_HOLD_US 70    // 70us
+#define ONE_WIRE_RESET_LINE_SAMPLING_US 410       // 410us
 
     /*******************************************************************************
-    *                          Extern Function Prototypes
-    *******************************************************************************/
+     *                          Extern Data Declarations
+     *******************************************************************************/
+
+    /*******************************************************************************
+     *                          Extern Function Prototypes
+     *******************************************************************************/
     /**
      * @brief Function to write byte to line
      *
@@ -125,5 +126,5 @@ extern "C"
 #endif // _DS18B20_ONEWIRE_H_
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

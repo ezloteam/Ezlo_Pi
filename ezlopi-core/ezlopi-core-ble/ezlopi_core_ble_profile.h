@@ -34,36 +34,36 @@
  * @author  xx
  * @version 0.1
  * @date    12th DEC 2024
-*/
+ */
 
 #ifndef _EZLOPI_CORE_BLE_PROFILE_H_
 #define _EZLOPI_CORE_BLE_PROFILE_H_
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_BLE_ENABLE
 /*******************************************************************************
-*                          C++ Declaration Wrapper
-*******************************************************************************/
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
     /*******************************************************************************
-    *                          Type & Macro Declarations
-    *******************************************************************************/
+     *                          Type & Macro Declarations
+     *******************************************************************************/
 
     /*******************************************************************************
-    *                          Extern Data Declarations
-    *******************************************************************************/
+     *                          Extern Data Declarations
+     *******************************************************************************/
 
     /*******************************************************************************
-    *                          Extern Function Prototypes
-    *******************************************************************************/
+     *                          Extern Function Prototypes
+     *******************************************************************************/
     /**
      * @brief This function return ble-profile by app_id
      *
@@ -125,7 +125,7 @@ extern "C"
      * @return s_gatt_descr_t*
      */
     s_gatt_descr_t *EZPI_core_ble_gatt_add_descriptor(s_gatt_char_t *charcteristic, esp_bt_uuid_t *uuid, esp_gatt_perm_t permission,
-        f_upcall_t read_func, f_upcall_t write_func, f_upcall_t write_exec_func);
+                                                      f_upcall_t read_func, f_upcall_t write_func, f_upcall_t write_exec_func);
     /**
      * @brief Function to add characteristics in ble-gatt
      *
@@ -139,7 +139,7 @@ extern "C"
      * @return s_gatt_char_t*
      */
     s_gatt_char_t *EZPI_core_ble_gatt_add_characteristic(s_gatt_service_t *service_obj, esp_bt_uuid_t *uuid, esp_gatt_perm_t permission, esp_gatt_char_prop_t properties,
-        f_upcall_t read_func, f_upcall_t write_func, f_upcall_t write_exec_func);
+                                                         f_upcall_t read_func, f_upcall_t write_func, f_upcall_t write_exec_func);
     /**
      * @brief Function to return ble-profile head-node from ll
      *
@@ -191,9 +191,5 @@ extern "C"
 
 #endif // _EZLOPI_CORE_BLE_PROFILE_H_
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
-
-
-
-
+ *                          End of File
+ *******************************************************************************/

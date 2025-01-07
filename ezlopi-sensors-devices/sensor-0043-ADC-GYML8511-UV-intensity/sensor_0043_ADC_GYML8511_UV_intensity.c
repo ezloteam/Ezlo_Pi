@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    sensor_0043_ADC_GYML8511_UV_intensity.c
-* @brief   perform some function on sensor_0043
-* @author  xx
-* @version 0.1
-* @date    xx
-*/
+ * @file    sensor_0043_ADC_GYML8511_UV_intensity.c
+ * @brief   perform some function on sensor_0043
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include <math.h>
 
 #include "ezlopi_core_cloud.h"
@@ -55,24 +55,24 @@
 #include "EZLOPI_USER_CONFIG.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 typedef struct s_gyml8511_data
 {
     float uv_data;
 } s_gyml8511_data_t;
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 
 static ezlopi_error_t __0043_prepare(void *arg);
 static ezlopi_error_t __0043_init(l_ezlopi_item_t *item);
@@ -84,16 +84,16 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, void *user_da
 static void __prepare_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj_device);
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 ezlopi_error_t SENSOR_0043_adc_gyml8511_uv_intensity(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
@@ -128,10 +128,9 @@ ezlopi_error_t SENSOR_0043_adc_gyml8511_uv_intensity(e_ezlopi_actions_t action, 
     return ret;
 }
 
-
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
@@ -141,6 +140,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
     device->cloud_properties.info = NULL;
     device->cloud_properties.device_type = dev_type_sensor;
 }
+
 static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, void *user_data)
 {
     item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
@@ -154,6 +154,7 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, void *user_da
     item->is_user_arg_unique = true;
     item->user_arg = user_data;
 }
+
 static void __prepare_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj_device)
 {
     if (item && cj_device)
@@ -246,7 +247,7 @@ static ezlopi_error_t __0043_notify(l_ezlopi_item_t *item)
         s_gyml8511_data_t *user_data = (s_gyml8511_data_t *)item->user_arg;
         if (user_data)
         {
-            s_ezlopi_analog_data_t adc_data = { .value = 0, .voltage = 0 };
+            s_ezlopi_analog_data_t adc_data = {.value = 0, .voltage = 0};
             EZPI_hal_adc_get_adc_data(item->interface.adc.gpio_num, &adc_data);
             float new_uvIntensity = mapfloat(((float)(adc_data.voltage) / 1000), 0.97, 2.7, 0.0, 15.0);
             TRACE_S("%dmv -> intensity: %.2f", adc_data.voltage, new_uvIntensity);
@@ -271,5 +272,5 @@ static float mapfloat(float x, float in_min, float in_max, float out_min, float 
 }
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/
