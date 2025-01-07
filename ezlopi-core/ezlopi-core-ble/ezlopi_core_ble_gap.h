@@ -38,9 +38,6 @@
 #ifndef _EZLOPI_CORE_BLE_GAP_H_
 #define _EZLOPI_CORE_BLE_GAP_H_
 
-/*******************************************************************************
- *                          Include Files
- *******************************************************************************/
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_BLE_ENABLE

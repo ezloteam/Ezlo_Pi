@@ -22,7 +22,7 @@ set(EZLOPI_SERVICES
         ezlopi-service-otel
 )
 
-idf_component_register(SRCS "ezlopi_service_webprov.c" "${provisioning_src}"
+idf_component_register(SRCS "${provisioning_src}"
     INCLUDE_DIRS "."
     REQUIRES    ${EZLOPI_UTIL_COMPONENTS}
                 ${EZLOPI_CORE_COMPONENTS} 

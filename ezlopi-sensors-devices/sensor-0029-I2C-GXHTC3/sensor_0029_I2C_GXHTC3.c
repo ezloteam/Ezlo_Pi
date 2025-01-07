@@ -141,12 +141,10 @@ static ezlopi_error_t gxhtc3_sensor_init(l_ezlopi_item_t *item)
         s_gxhtc3_value_t *gxhtce_val = (s_gxhtc3_value_t *)item->user_arg;
         if (gxhtce_val)
         {
-            ret = 1;
-            if (NULL == gxhtce_val->gxhtc3)
+            if ((NULL == gxhtce_val->gxhtc3) && (item->interface.i2c_master.enable))
             {
-                if (item->interface.i2c_master.enable)
+                if (EZPI_SUCCESS == EZPI_hal_i2c_master_init(&item->interface.i2c_master))
                 {
-                    EZPI_hal_i2c_master_init(&item->interface.i2c_master);
                     gxhtce_val->gxhtc3 = GXHTC3_init(item->interface.i2c_master.channel, item->interface.i2c_master.address);
                     if (gxhtce_val->gxhtc3)
                     {
@@ -160,6 +158,10 @@ static ezlopi_error_t gxhtc3_sensor_init(l_ezlopi_item_t *item)
                             TRACE_E("GXHTC3 Chip ID not ready!");
                         }
                     }
+                }
+                else
+                {
+                    TRACE_E("I2C init failed");
                 }
             }
         }

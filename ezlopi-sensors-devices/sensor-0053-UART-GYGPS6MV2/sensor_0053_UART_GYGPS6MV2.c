@@ -374,9 +374,16 @@ static ezlopi_error_t __0053_init(l_ezlopi_item_t *item)
                 if (true == item->interface.uart.enable)
                 {
                     s_ezlopi_uart_object_handle_t ezlopi_uart_object_handle = EZPI_hal_uart_init(item->interface.uart.baudrate, item->interface.uart.tx, item->interface.uart.rx, __uart_gps6mv2_upcall, item);
-                    item->interface.uart.channel = EZPI_hal_uart_get_channel(ezlopi_uart_object_handle);
-                    TRACE_S("GPS6MV2 Init complete......");
-                    ret = EZPI_SUCCESS;
+                    if (ezlopi_uart_object_handle)
+                    {
+                        item->interface.uart.channel = EZPI_hal_uart_get_channel(ezlopi_uart_object_handle);
+                        TRACE_S("GPS6MV2 Init complete......");
+                        ret = EZPI_SUCCESS;
+                    }
+                    else
+                    {
+                        TRACE_E("Failed to initialize GPS6MV2-uart");
+                    }
                 }
             }
         }

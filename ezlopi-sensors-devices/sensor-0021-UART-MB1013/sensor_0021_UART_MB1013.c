@@ -186,8 +186,15 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
             if (GPIO_IS_VALID_GPIO(item->interface.uart.tx) && GPIO_IS_VALID_GPIO(item->interface.uart.rx))
             {
                 s_ezlopi_uart_object_handle_t ezlopi_uart_object_handle = EZPI_hal_uart_init(item->interface.uart.baudrate, item->interface.uart.tx, item->interface.uart.rx, __uart_data_upcall, item);
-                item->interface.uart.channel = EZPI_hal_uart_get_channel(ezlopi_uart_object_handle);
-                ret = EZPI_SUCCESS;
+                if (ezlopi_uart_object_handle)
+                {
+                    item->interface.uart.channel = EZPI_hal_uart_get_channel(ezlopi_uart_object_handle);
+                    ret = EZPI_SUCCESS;
+                }
+                else
+                {
+                    TRACE_E("Failed to initialize mb1013-uart");
+                }
             }
         }
     }

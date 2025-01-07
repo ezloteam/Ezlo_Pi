@@ -31,14 +31,6 @@
 /**
  * @file    main.h
  * @brief   perform some function on data
- * @author  xx
- * @version 0.1
- * @date    xx
-*/
-
-/**
- * @file    main.c
- * @brief   perform some function on data
  * @author  John Doe
  * @version 0.1
  * @date    1st January 2024

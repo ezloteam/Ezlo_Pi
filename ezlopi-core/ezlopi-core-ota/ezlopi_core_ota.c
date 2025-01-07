@@ -177,7 +177,7 @@ static void ezlopi_ota_process(void *pv)
 
 #ifdef CONFIG_FIRMWARE_UPGRADE_URL_FROM_STDIN
     char url_buf[OTA_URL_SIZE];
-    if (strcmp(config.url, "FROM_STDIN") == 0)
+    if (strncmp(config.url, "FROM_STDIN", ((strlen(config.url) + 1) > 11 ? (strlen(config.url) + 1) : 11)) == 0)
     {
         example_configure_stdin_stdout();
         fgets(url_buf, OTA_URL_SIZE, stdin);

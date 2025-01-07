@@ -27,8 +27,8 @@ THE SOFTWARE.
 version 0.1
 */
 
-#ifndef LTR303_h
-#define LTR303_h
+#ifndef _LTR303_h_
+#define _LTR303_h_
 
 // Edited
 #include <stdio.h>
@@ -445,8 +445,8 @@ boolean ltr303_read_uint(byte address, unsigned int *value);
  */
 boolean ltr303_write_uint(byte address, unsigned int value);
 
-#ifdef __cplusplus
-}
-#endif
-
 #endif // _LTR303_h_
+
+/*******************************************************************************
+*                          End of File
+*******************************************************************************/

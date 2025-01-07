@@ -353,7 +353,7 @@ void EZPI_scenes_notification_remove(cJSON *cj_request, cJSON *cj_response)
                         cJSON *cj_user_id = NULL;
                         cJSON_ArrayForEach(cj_user_id, cj_user_notifications)
                         {
-                            if (0 == strcmp(cj_user_id->valuestring, cj_user_id_del->valuestring))
+                            if (EZPI_STRNCMP_IF_EQUAL(cj_user_id->valuestring, cj_user_id_del->valuestring, cj_user_id->str_value_len, cj_user_id_del->str_value_len))
                             {
                                 cJSON_DeleteItemFromArray(__FUNCTION__, cj_user_notifications, idx);
                             }
@@ -379,7 +379,7 @@ void EZPI_scenes_notification_remove(cJSON *cj_request, cJSON *cj_response)
                 l_scenes_list_v2_t *scene_node = EZPI_core_scenes_get_by_id_v2(scene_id);
                 if (scene_node)
                 {
-                    if (0 == strcmp(scene_node->user_notifications->user_id, cj_user_id_del->valuestring))
+                    if (EZPI_STRNCMP_IF_EQUAL(scene_node->user_notifications->user_id, cj_user_id_del->valuestring, strlen(scene_node->user_notifications->user_id) + 1, cj_user_id_del->str_value_len))
                     {
                         l_user_notification_v2_t *user_id_del = scene_node->user_notifications;
                         scene_node->user_notifications = scene_node->user_notifications->next;
@@ -391,7 +391,7 @@ void EZPI_scenes_notification_remove(cJSON *cj_request, cJSON *cj_response)
                         l_user_notification_v2_t *user_node = scene_node->user_notifications;
                         while (user_node->next)
                         {
-                            if (0 == strcmp(user_node->user_id, cj_user_id_del->valuestring))
+                            if (EZPI_STRNCMP_IF_EQUAL(user_node->user_id, cj_user_id_del->valuestring, strlen(user_node->user_id) + 1, cj_user_id_del->str_value_len))
                             {
                                 l_user_notification_v2_t *user_id_del = user_node;
                                 user_node = user_node->next;

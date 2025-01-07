@@ -47,7 +47,6 @@ extern "C"
     /*******************************************************************************
      *                          Type & Macro Declarations
      *******************************************************************************/
-    typedef int32_t ezlopi_error_t;
 
 #define EZPI_SUCCESS 0
 #define EZPI_FAILED -1

@@ -170,13 +170,19 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
         {
             if (item->interface.i2c_master.enable)
             {
-                EZPI_hal_i2c_master_init(&item->interface.i2c_master);
-                TRACE_I("I2C channel is %d", item->interface.i2c_master.channel);
-                if (TSL2561_check_partid(&item->interface.i2c_master))
+                if (EZPI_SUCCESS == EZPI_hal_i2c_master_init(&item->interface.i2c_master))
                 {
-                    TRACE_I("TSL561 initialization finished.........");
-                    SENSOR_0044_tsl2561_configure_device(&item->interface.i2c_master);
-                    ret = EZPI_SUCCESS;
+                    TRACE_I("I2C channel is %d", item->interface.i2c_master.channel);
+                    if (TSL2561_check_partid(&item->interface.i2c_master))
+                    {
+                        TRACE_I("TSL561 initialization finished.........");
+                        SENSOR_0044_tsl2561_configure_device(&item->interface.i2c_master);
+                        ret = EZPI_SUCCESS;
+                    }
+                }
+                else
+                {
+                    TRACE_E("I2C init failed");
                 }
             }
         }

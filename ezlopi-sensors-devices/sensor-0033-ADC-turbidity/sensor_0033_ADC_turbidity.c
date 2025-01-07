@@ -197,8 +197,9 @@ static ezlopi_error_t __notify(l_ezlopi_item_t *item)
         {
             tmp_sensor_state = "water_filter_ok";
         }
-        if (strcmp(turbidity_sensor_state, tmp_sensor_state) != 0)
+        if (!EZPI_STRNCMP_IF_EQUAL(turbidity_sensor_state, tmp_sensor_state, strlen(turbidity_sensor_state) + 1, strlen(tmp_sensor_state) + 1))
         {
+            // if not same state
             memcpy(turbidity_sensor_state, tmp_sensor_state, (40 * sizeof(char)));
             EZPI_core_device_value_updated_from_device_broadcast(item);
             ret = EZPI_SUCCESS;

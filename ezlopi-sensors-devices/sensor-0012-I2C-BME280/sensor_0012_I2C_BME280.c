@@ -242,11 +242,17 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
         {
             if (item->interface.i2c_master.enable)
             {
-                EZPI_hal_i2c_master_init(&item->interface.i2c_master);
-                bmp280_init_default_params(&bmp280_sensor_params->bmp280_params);
-                bmp280_init(&bmp280_sensor_params->bmp280_dev, &bmp280_sensor_params->bmp280_params, &item->interface.i2c_master);
-                bmp280_read_float(&item->interface.i2c_master, &bmp280_sensor_params->bmp280_dev, &bmp280_sensor_params->temperature, &bmp280_sensor_params->pressure, &bmp280_sensor_params->humidity);
-                ret = EZPI_SUCCESS;
+                if (EZPI_SUCCESS == EZPI_hal_i2c_master_init(&item->interface.i2c_master))
+                {
+                    bmp280_init_default_params(&bmp280_sensor_params->bmp280_params);
+                    bmp280_init(&bmp280_sensor_params->bmp280_dev, &bmp280_sensor_params->bmp280_params, &item->interface.i2c_master);
+                    bmp280_read_float(&item->interface.i2c_master, &bmp280_sensor_params->bmp280_dev, &bmp280_sensor_params->temperature, &bmp280_sensor_params->pressure, &bmp280_sensor_params->humidity);
+                    ret = EZPI_SUCCESS;
+                }
+                else
+                {
+                    TRACE_E("I2C init failed");
+                }
             }
         }
     }

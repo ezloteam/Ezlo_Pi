@@ -1013,9 +1013,6 @@ static void ___create_lua_subtable(lua_State *lua_state, l_ezlopi_item_t *item_p
     }
 }
 
-/*******************************************************************************
- *                          Static Function Definitions
- *******************************************************************************/
 static void __get_expressions_value(s_ezlopi_expressions_t *exp_node, cJSON *cj_value)
 {
     if (exp_node && cj_value)

@@ -92,53 +92,62 @@ s_ezlopi_channel_speed_t *EZPI_hal_pwm_init(uint8_t pwm_gpio_num, uint8_t pwm_re
 {
 
     s_ezlopi_channel_speed_t *ezlopi_channel_speed = (s_ezlopi_channel_speed_t *)ezlopi_malloc(__FUNCTION__, sizeof(s_ezlopi_channel_speed_t));
-    memset(ezlopi_channel_speed, 0, sizeof(s_ezlopi_channel_speed_t));
-
-    uint8_t channel = get_available_channel();
-    if (LEDC_CHANNEL_MAX == channel)
+    if (ezlopi_channel_speed)
     {
-        TRACE_E("No channels availalbe for PWM.");
-    }
-    else
-    {
-        ledc_timer_config_t ezlopi_pwm_timer_cfg = {
-            .speed_mode = LEDC_LOW_SPEED_MODE,
-            .duty_resolution = pwm_resln,
-            .timer_num = LEDC_TIMER_3,
-            .freq_hz = freq_hz,
-            .clk_cfg = LEDC_AUTO_CLK,
-        };
-        ledc_channel_config_t ezlopi_pwm_channel_cfg = {
-            .gpio_num = pwm_gpio_num,
-            .speed_mode = LEDC_LOW_SPEED_MODE,
-            .channel = channel,
-            .intr_type = LEDC_INTR_DISABLE,
-            .timer_sel = LEDC_TIMER_3,
-            .duty = duty_cycle,
-        };
+        memset(ezlopi_channel_speed, 0, sizeof(s_ezlopi_channel_speed_t));
 
-        esp_err_t error = ledc_timer_config(&ezlopi_pwm_timer_cfg);
-        if (error != ESP_OK)
+        uint8_t channel = get_available_channel();
+        if (LEDC_CHANNEL_MAX == channel)
         {
-            TRACE_E("Error configuring LEDC timer.(code:%s)", esp_err_to_name(error));
+            TRACE_E("No channels availalbe for PWM.");
+            ezlopi_free(__func__, ezlopi_channel_speed);
+            return NULL;
         }
         else
         {
-            TRACE_S("LEDC timer configured successfully.");
-        }
+            ledc_timer_config_t ezlopi_pwm_timer_cfg = {
+                .speed_mode = LEDC_LOW_SPEED_MODE,
+                .duty_resolution = pwm_resln,
+                .timer_num = LEDC_TIMER_3,
+                .freq_hz = freq_hz,
+                .clk_cfg = LEDC_AUTO_CLK,
+            };
+            ledc_channel_config_t ezlopi_pwm_channel_cfg = {
+                .gpio_num = pwm_gpio_num,
+                .speed_mode = LEDC_LOW_SPEED_MODE,
+                .channel = channel,
+                .intr_type = LEDC_INTR_DISABLE,
+                .timer_sel = LEDC_TIMER_3,
+                .duty = duty_cycle,
+            };
 
-        error = ledc_channel_config(&ezlopi_pwm_channel_cfg);
-        if (error != ESP_OK)
-        {
-            TRACE_E("Error configuring LEDC channel.(code:%s)", esp_err_to_name(error));
-        }
-        else
-        {
-            TRACE_S("LEDC channel configured successfully.");
-        }
+            esp_err_t error = ledc_timer_config(&ezlopi_pwm_timer_cfg);
+            if (error != ESP_OK)
+            {
+                TRACE_E("Error configuring LEDC timer.(code:%s)", esp_err_to_name(error));
+                ezlopi_free(__func__, ezlopi_channel_speed);
+                return NULL;
+            }
+            else
+            {
+                TRACE_S("LEDC timer configured successfully.");
+            }
 
-        ezlopi_channel_speed->channel = channel;
-        ezlopi_channel_speed->speed_mode = ezlopi_pwm_channel_cfg.speed_mode;
+            error = ledc_channel_config(&ezlopi_pwm_channel_cfg);
+            if (error != ESP_OK)
+            {
+                TRACE_E("Error configuring LEDC channel.(code:%s)", esp_err_to_name(error));
+                ezlopi_free(__func__, ezlopi_channel_speed);
+                return NULL;
+            }
+            else
+            {
+                TRACE_S("LEDC channel configured successfully.");
+            }
+
+            ezlopi_channel_speed->channel = channel;
+            ezlopi_channel_speed->speed_mode = ezlopi_pwm_channel_cfg.speed_mode;
+        }
     }
     return ezlopi_channel_speed;
 }

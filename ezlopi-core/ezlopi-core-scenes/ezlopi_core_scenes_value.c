@@ -99,7 +99,7 @@ e_scene_value_type_v2_t EZPI_core_scene_get_scene_value_type_enum(const char *va
     {
         for (int i = EZLOPI_VALUE_TYPE_NONE; i < EZLOPI_VALUE_TYPE_MAX; i++)
         {
-            if (0 == strcmp(sg_scenes_value_type_name[i], value_type_str))
+            if (EZPI_STRNCMP_IF_EQUAL(sg_scenes_value_type_name[i], value_type_str, strlen(sg_scenes_value_type_name[i]) + 1, strlen(value_type_str) + 1))
             {
                 ret = i;
                 break;

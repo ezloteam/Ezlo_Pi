@@ -40,10 +40,6 @@
 #ifndef __EZLOPI_SUBCATEGORY_H__
 #define __EZLOPI_SUBCATEGORY_H__
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
 
 /*******************************************************************************
  *                          Include Files

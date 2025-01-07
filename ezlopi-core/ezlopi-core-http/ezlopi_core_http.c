@@ -739,7 +739,7 @@ static esp_err_t __ezlopi_http_event_handler(esp_http_client_event_t *evt)
     case HTTP_EVENT_ON_HEADER:
     {
         // TRACE_D("HTTP_EVENT_ON_HEADER, key=%s, value=%s\r\n", evt->header_key, evt->header_value);
-        if (0 == strcmp("Content-Length", evt->header_key))
+        if (0 == strncmp("Content-Length", evt->header_key, ((strlen(evt->header_key) + 1) > 15) ? (strlen(evt->header_key) + 1) : 15))
         {
             s_rx_data_t *my_data = evt->user_data;
             if (my_data)

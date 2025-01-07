@@ -360,21 +360,27 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
         {
             if (item->interface.i2c_master.enable)
             {
-                EZPI_hal_i2c_master_init(&item->interface.i2c_master);
-                if (MPU6050_ERR_OK == MPU6050_config_device(item))
+                if (EZPI_SUCCESS == EZPI_hal_i2c_master_init(&item->interface.i2c_master))
                 {
-                    // TRACE_I("Configuration Complete.... ");
-                    // TaskHandle_t ezlopi_sensor_mpu6050_task_handle = NULL;
-                    // xTaskCreate(__mpu6050_calibration_task, "MPU6050_Calibration_Task", EZLOPI_SENSOR_MPU6050_TASK_DEPTH, item, 1, &ezlopi_sensor_mpu6050_task_handle);
-                    // EZPI_service_loop_add("mpu6050_calibration", __mpu6050_calibration_task, 1000, (void *)item);
-                    if (false == user_data->calibration_complete)
+                    if (MPU6050_ERR_OK == MPU6050_config_device(item))
                     {
-                        __mpu6050_calibration_task(item);
+                        // TRACE_I("Configuration Complete.... ");
+                        // TaskHandle_t ezlopi_sensor_mpu6050_task_handle = NULL;
+                        // xTaskCreate(__mpu6050_calibration_task, "MPU6050_Calibration_Task", EZLOPI_SENSOR_MPU6050_TASK_DEPTH, item, 1, &ezlopi_sensor_mpu6050_task_handle);
+                        // EZPI_service_loop_add("mpu6050_calibration", __mpu6050_calibration_task, 1000, (void *)item);
+                        if (false == user_data->calibration_complete)
+                        {
+                            __mpu6050_calibration_task(item);
+                        }
+                        // #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
+                        //                     EZPI_core_process_set_process_info(ENUM_EZLOPI_SENSOR_MPU6050_TASK, &ezlopi_sensor_mpu6050_task_handle, EZLOPI_SENSOR_MPU6050_TASK_DEPTH);
+                        // #endif
+                        ret = EZPI_SUCCESS;
                     }
-                    // #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
-                    //                     EZPI_core_process_set_process_info(ENUM_EZLOPI_SENSOR_MPU6050_TASK, &ezlopi_sensor_mpu6050_task_handle, EZLOPI_SENSOR_MPU6050_TASK_DEPTH);
-                    // #endif
-                    ret = EZPI_SUCCESS;
+                }
+                else
+                {
+                    TRACE_E("I2C init failed");
                 }
             }
         }

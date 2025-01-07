@@ -62,9 +62,27 @@ extern "C"
     /*******************************************************************************
      *                          Extern Function Prototypes
      *******************************************************************************/
-    void ezlopi_service_modes_init(void);
 
+    /**
+     * @brief Function to initialize service modes
+     * 
+     */
+    void ezlopi_service_modes_init(void);
+    /**
+     * @brief Function to stop service-mode loop
+     * 
+     * @param wait_ms 
+     * @return true 
+     * @return false 
+     */
     bool ezlopi_service_modes_stop(uint32_t wait_ms);
+    /**
+     * @brief Function to start service-mode loop
+     * 
+     * @param wait_ms 
+     * @return true 
+     * @return false 
+     */
     bool ezlopi_service_modes_start(uint32_t wait_ms);
 
 #endif // __EZLOPI_SERVICE_MODES_H__

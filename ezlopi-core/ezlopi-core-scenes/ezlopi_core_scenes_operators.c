@@ -99,11 +99,9 @@ static int ____compare_item_vs_other(l_ezlopi_item_t *item_left, l_fields_v2_t *
 static int ____compare_item_vs_exp(l_ezlopi_item_t *item_left, s_ezlopi_expressions_t *curr_expr_right, char *comparator_field_str);
 static int ____compare_item_vs_item(l_ezlopi_item_t *item_left, l_ezlopi_item_t *item_right, char *comparator_field_str);
 static int __evaluate_numrange(l_fields_v2_t *item_exp_field, l_fields_v2_t *start_value_field, l_fields_v2_t *end_value_field, bool comparator_choice);
-;
 static int __evaluate_compareNumber_or_compareStrings(l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, char *comparator_str);
-;
 static int __evaluate_compareNumbers_or_compareStrings_with_group(l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field, l_fields_v2_t *value_field, l_fields_v2_t *comparator_field);
-;
+
 static int __trigger_grp_functions(e_with_grp_t choice, l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field, l_fields_v2_t *operation_field, l_fields_v2_t *comparator_field, l_fields_v2_t *value_field, l_fields_v2_t *start_value_field, l_fields_v2_t *end_value_field, l_fields_v2_t *value_type_field, char *comparator_str, bool comparator_choice);
 /* Strings */
 static char *__get_item_strvalue_by_id(uint32_t item_id);
@@ -223,7 +221,7 @@ e_scene_num_cmp_operators_t EZPI_scenes_numeric_comparator_operators_get_enum(ch
     {
         while ((ret <= SCENES_NUM_COMP_OPERATORS_MAX) && ezlopi_scenes_num_cmp_operators_op[ret])
         {
-            if (0 == strcmp(ezlopi_scenes_num_cmp_operators_op[ret], operator_str))
+            if (EZPI_STRNCMP_IF_EQUAL(ezlopi_scenes_num_cmp_operators_op[ret], operator_str, strlen(ezlopi_scenes_num_cmp_operators_op[ret]) + 1, strlen(operator_str) + 1))
             {
                 break;
             }
@@ -291,7 +289,7 @@ e_scene_str_cmp_operators_t EZPI_scenes_strings_comparator_operators_get_enum(ch
     {
         while ((ret <= SCENES_STRINGS_OPERATORS_MAX) && ezlopi_scenes_str_cmp_operators_op[ret])
         {
-            if (0 == strcmp(ezlopi_scenes_str_cmp_operators_op[ret], operator_str))
+            if (EZPI_STRNCMP_IF_EQUAL(ezlopi_scenes_str_cmp_operators_op[ret], operator_str, strlen(ezlopi_scenes_str_cmp_operators_op[ret]) + 1, strlen(operator_str) + 1))
             {
                 break;
             }
@@ -352,7 +350,7 @@ e_scene_strops_cmp_operators_t EZPI_scenes_strops_comparator_operators_get_enum(
     {
         while ((ret <= SCENES_STROPS_COMP_OPERATORES_MAX) && ezlopi_scenes_strops_cmp_operators_op[ret])
         {
-            if (0 == strcmp(ezlopi_scenes_strops_cmp_operators_op[ret], operator_str))
+            if (EZPI_STRNCMP_IF_EQUAL(ezlopi_scenes_strops_cmp_operators_op[ret], operator_str, strlen(ezlopi_scenes_strops_cmp_operators_op[ret]) + 1, strlen(operator_str) + 1))
             {
                 break;
             }
@@ -547,7 +545,7 @@ e_scene_inarr_cmp_operators_t ezlopi_scenes_inarr_comparator_operators_get_enum(
     {
         while ((ret <= SCENES_IN_ARRAY_OPERATORS_MAX) && ezlopi_scenes_inarr_cmp_operators_op[ret])
         {
-            if (0 == strcmp(ezlopi_scenes_inarr_cmp_operators_op[ret], operator_inarr))
+            if (EZPI_STRNCMP_IF_EQUAL(ezlopi_scenes_inarr_cmp_operators_op[ret], operator_inarr, strlen(ezlopi_scenes_num_cmp_operators_op[ret]) + 1, strlen(operator_str) + 1))
             {
                 break;
             }
@@ -698,7 +696,7 @@ e_scene_value_with_less_cmp_operators_t EZPI_scenes_value_with_less_comparator_o
     {
         while ((ret <= SCENES_VALUES_WITH_LESS_OPERATORS_MAX) && ezlopi_scenes_value_with_less_cmp_operators_op[ret])
         {
-            if (0 == strcmp(ezlopi_scenes_value_with_less_cmp_operators_op[ret], operator_str))
+            if (EZPI_STRNCMP_IF_EQUAL(ezlopi_scenes_value_with_less_cmp_operators_op[ret], operator_str, strlen(ezlopi_scenes_value_with_less_cmp_operators_op[ret]) + 1, strlen(operator_str) + 1))
             {
                 break;
             }
@@ -829,7 +827,7 @@ e_scene_value_without_less_cmp_operators_t EZPI_scenes_value_without_less_compar
     {
         while ((ret <= SCENES_VALUES_WITHOUT_LESS_OPERATORS_MAX) && ezlopi_scenes_value_without_less_cmp_operators_op[ret])
         {
-            if (0 == strcmp(ezlopi_scenes_value_without_less_cmp_operators_op[ret], operator_str))
+            if (EZPI_STRNCMP_IF_EQUAL(ezlopi_scenes_value_without_less_cmp_operators_op[ret], operator_str, strlen(ezlopi_scenes_value_without_less_cmp_operators_op[ret]) + 1, strlen(operator_str) + 1))
             {
                 break;
             }

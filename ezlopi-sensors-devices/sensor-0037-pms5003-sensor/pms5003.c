@@ -40,6 +40,7 @@
  *                          Include Files
  *******************************************************************************/
 #include "pms5003.h"
+#include "ezlopi_util_trace.h"
 
 /*******************************************************************************
  *                          Extern Data Declarations
@@ -189,7 +190,10 @@ void pms_set_data_available_to_false(PM25_AQI_Data *data)
 */
 static void pms_uart_setup(s_pms5003_sensor_object *pms_object)
 {
-  EZPI_hal_uart_init(pms_object->pms_baud_rate, pms_object->pms_tx_pin, pms_object->pms_rx_pin, ezlopi_pms5003_upcall, &pms_object->pms_data);
+  if (NULL == EZPI_hal_uart_init(pms_object->pms_baud_rate, pms_object->pms_tx_pin, pms_object->pms_rx_pin, ezlopi_pms5003_upcall, &pms_object->pms_data))
+  {
+    TRACE_E("Failed to initialize PMS_uart");
+  }
 }
 
 /*!

@@ -270,11 +270,17 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
         {
             if (item->interface.i2c_master.enable)
             {
-                EZPI_hal_i2c_master_init(&item->interface.i2c_master);
-                if (0 == ADXL345_configure_device(item)) // ESP_OK
+                if (EZPI_SUCCESS == EZPI_hal_i2c_master_init(&item->interface.i2c_master))
                 {
-                    TRACE_S("Configuration Complete...");
-                    ret = EZPI_SUCCESS;
+                    if (EZPI_SUCCESS == ADXL345_configure_device(item)) // ESP_OK
+                    {
+                        TRACE_S("Configuration Complete...");
+                        ret = EZPI_SUCCESS;
+                    }
+                }
+                else
+                {
+                    TRACE_E("I2C init failed");
                 }
             }
         }
@@ -355,10 +361,6 @@ static ezlopi_error_t __notify(l_ezlopi_item_t *item)
     }
     return ret;
 }
-
-/*******************************************************************************
- *                          End of File
- *******************************************************************************/
 
 /*******************************************************************************
  *                          End of File

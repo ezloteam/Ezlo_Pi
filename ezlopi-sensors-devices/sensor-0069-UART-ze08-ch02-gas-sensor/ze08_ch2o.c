@@ -76,7 +76,10 @@ bool ZE08_ch2o_sensor_init(s_ezlopi_uart_t *ze08_uart_config, ze08_ch2o_sensor_d
 {
     if (ze08_uart_config->enable)
     {
-        return EZPI_hal_uart_init(ze08_uart_config->baudrate, ze08_uart_config->tx, ze08_uart_config->rx, ezlopi_ze08_ch2o_upcall, data);
+        if (NULL != EZPI_hal_uart_init(ze08_uart_config->baudrate, ze08_uart_config->tx, ze08_uart_config->rx, ezlopi_ze08_ch2o_upcall, data))
+        {
+            return true;
+        }
     }
 
     return false;
