@@ -407,10 +407,8 @@ void EZPI_device_group_update(cJSON *cj_request, cJSON *cj_response)
 #ifdef CONFIG_EZPI_UTIL_TRACE_EN
                     // CJSON_TRACE("dev-grp [new] : ", cj_devgrp_id);
 #endif
-                    uint32_t req_devgrp_id = strtoul(cj_devgrp_id->valuestring, NULL, 16);
-
                     // edit in nvs and populate again
-                    EZPI_core_device_group_edit_by_id(req_devgrp_id, cj_params);
+                    EZPI_core_device_group_edit_by_id(strtoul(cj_devgrp_id->valuestring, NULL, 16), cj_params);
                 }
             }
         }
@@ -703,10 +701,8 @@ void EZPI_item_group_update(cJSON *cj_request, cJSON *cj_response)
 #ifdef CONFIG_EZPI_UTIL_TRACE_EN
                     // CJSON_TRACE("dev-grp [new] : ", cj_itemgrp_id);
 #endif
-                    uint32_t req_devgrp_id = strtoul(cj_itemgrp_id->valuestring, NULL, 16);
-
                     // edit in nvs and populate again
-                    EZPI_core_item_group_edit_by_id(req_devgrp_id, cj_params);
+                    EZPI_core_item_group_edit_by_id(strtoul(cj_itemgrp_id->valuestring, NULL, 16), cj_params);
                 }
             }
         }

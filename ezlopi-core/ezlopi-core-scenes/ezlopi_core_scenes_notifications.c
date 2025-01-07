@@ -108,13 +108,13 @@ void EZPI_scenes_notifications_add(cJSON *cj_notifications)
 #ifdef CONFIG_EZPI_UTIL_TRACE_EN
                     CJSON_TRACE("updated-scene", cj_scene);
 #endif
+
                     char *updated_scene_str = cJSON_PrintBuffered(__FUNCTION__, cj_scene, 4096, false);
+                    cJSON_Delete(__FUNCTION__, cj_scene);
 
 #ifdef CONFIG_EZPI_UTIL_TRACE_EN
                     TRACE_D("length of 'updated_scene_str': %d", strlen(updated_scene_str));
 #endif
-
-                    cJSON_Delete(__FUNCTION__, cj_scene);
 
                     if (updated_scene_str)
                     {

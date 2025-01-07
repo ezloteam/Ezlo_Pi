@@ -21,7 +21,7 @@ void EZPI_core_cjson_get_value_bool(cJSON *cj_root, char *item_name_str, bool *i
         if (o_item->type & cJSON_True)
         {
             *item_val = true;
-        }
+        } 
     }
 }
 

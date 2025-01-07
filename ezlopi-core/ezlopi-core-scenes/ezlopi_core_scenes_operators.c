@@ -87,8 +87,6 @@ typedef enum e_with_grp
 /*******************************************************************************
  *                          Static Function Prototypes
  *******************************************************************************/
-static int __evaluate_compareNumber_or_compareStrings(l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, char *comparator_str);
-static int __evaluate_compareNumbers_or_compareStrings_with_group(l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field, l_fields_v2_t *value_field, l_fields_v2_t *comparator_field);
 /* Numeric & String */
 static int ________compare_val_num(double item_exp_value, double value_to_compare_with, char *comparator_field_str);
 static int ________compare_val_str(const char *item_exp_value_str, const char *value_to_compare_with_str, char *comparator_field_str);
@@ -99,11 +97,8 @@ static int ____compare_item_vs_other(l_ezlopi_item_t *item_left, l_fields_v2_t *
 static int ____compare_item_vs_exp(l_ezlopi_item_t *item_left, s_ezlopi_expressions_t *curr_expr_right, char *comparator_field_str);
 static int ____compare_item_vs_item(l_ezlopi_item_t *item_left, l_ezlopi_item_t *item_right, char *comparator_field_str);
 static int __evaluate_numrange(l_fields_v2_t *item_exp_field, l_fields_v2_t *start_value_field, l_fields_v2_t *end_value_field, bool comparator_choice);
-;
 static int __evaluate_compareNumber_or_compareStrings(l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, char *comparator_str);
-;
 static int __evaluate_compareNumbers_or_compareStrings_with_group(l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field, l_fields_v2_t *value_field, l_fields_v2_t *comparator_field);
-;
 static int __trigger_grp_functions(e_with_grp_t choice, l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field, l_fields_v2_t *operation_field, l_fields_v2_t *comparator_field, l_fields_v2_t *value_field, l_fields_v2_t *start_value_field, l_fields_v2_t *end_value_field, l_fields_v2_t *value_type_field, char *comparator_str, bool comparator_choice);
 /* Strings */
 static char *__get_item_strvalue_by_id(uint32_t item_id);

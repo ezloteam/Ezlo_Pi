@@ -590,11 +590,13 @@ static void __EZPI_core_device_group_print(l_ezlopi_device_grp_t *device_grp_nod
         CJSON_TRACE("\t|-- Devices", device_grp_node->devices);
         CJSON_TRACE("\t|-- Exceptions", device_grp_node->exceptions);
         TRACE_D("\t|-- Persistent: %s", device_grp_node->persistent ? ezlopi_true_str : ezlopi_false_str);
+
         TRACE_D("\t|-- Entry_Delay: %s", (EZLOPI_DEVICE_GRP_ENTRYDELAY_NORMAL == device_grp_node->entry_delay)          ? ezlopi_normal_str
                                          : (EZLOPI_DEVICE_GRP_ENTRYDELAY_LONG_EXTENDED == device_grp_node->entry_delay) ? ezlopi_long_extended_str
                                          : (EZLOPI_DEVICE_GRP_ENTRYDELAY_EXTENDED == device_grp_node->entry_delay)      ? ezlopi_extended_str
                                          : (EZLOPI_DEVICE_GRP_ENTRYDELAY_INSTANT == device_grp_node->entry_delay)       ? ezlopi_instant_str
                                                                                                                         : ezlopi_none_str);
+
         TRACE_D("\t|-- Follow_Entry: %s", device_grp_node->follow_entry ? ezlopi_true_str : ezlopi_false_str);
         TRACE_D("\t|-- Role: %s", (EZLOPI_DEVICE_GRP_ROLE_HOUSE_MODES == device_grp_node->role) ? ezlopi_house_modes_str : ezlopi_user_str);
         TRACE_D("\t|-- Package_Id: %s", device_grp_node->package_id);
@@ -617,8 +619,11 @@ static void __EZPI_core_item_group_print(l_ezlopi_item_grp_t *item_grp_node)
         TRACE_D("\t|-- Value_Type: %s", item_grp_node->value_type);
         CJSON_TRACE("\t|-- Enum", item_grp_node->enum_values);
         TRACE_D("\t|-- Value_Type_Family: %s", item_grp_node->value_type_family);
-        TRACE_D("\t|-- Role: %s", (EZLOPI_ITEM_GRP_ROLE_HOUSE_MODES == item_grp_node->role) ? ezlopi_house_modes_str : (EZLOPI_ITEM_GRP_ROLE_LIFE_SAFETY == item_grp_node->role) ? ezlopi_lifeSafety_str
-                                                                                                                                                                                 : ezlopi_empty_str);
+
+        TRACE_D("\t|-- Role: %s", (EZLOPI_ITEM_GRP_ROLE_HOUSE_MODES == item_grp_node->role)   ? ezlopi_house_modes_str
+                                  : (EZLOPI_ITEM_GRP_ROLE_LIFE_SAFETY == item_grp_node->role) ? ezlopi_lifeSafety_str
+                                                                                              : ezlopi_empty_str);
+
         CJSON_TRACE("\t|-- Info", item_grp_node->info);
         TRACE_D("\t|-- ----------------- ----------- --------------------");
     }
@@ -632,7 +637,6 @@ static void __EZPI_core_item_group_print(l_ezlopi_item_grp_t *item_grp_node)
  */
 static void __edit_devgrp_from_ll(l_ezlopi_device_grp_t *req_devgrp_node, cJSON *cj_devgrp_new)
 {
-
     (NULL != cJSON_GetObjectItem(__FUNCTION__, cj_devgrp_new, ezlopi_name_str))
         ? (CJSON_GET_VALUE_STRING_BY_COPY_INTO_PTR(cj_devgrp_new, ezlopi_name_str, req_devgrp_node->name))
         : cJSON_AddStringToObject(__FUNCTION__, cj_devgrp_new, ezlopi_packageId_str, req_devgrp_node->name);
@@ -759,6 +763,7 @@ static void __edit_devgrp_from_ll(l_ezlopi_device_grp_t *req_devgrp_node, cJSON 
     }
     __EZPI_core_device_group_print(req_devgrp_node);
 }
+
 static void __edit_itemgrp_from_ll(l_ezlopi_item_grp_t *req_itemgrp_node, cJSON *cj_itemgrp_new)
 {
     (NULL != cJSON_GetObjectItem(__FUNCTION__, cj_itemgrp_new, ezlopi_name_str))

@@ -555,10 +555,12 @@ static void __cjson_add_action_block_options(cJSON *cj_block_array, l_action_blo
                     const char *method_type_name = EZPI_scene_get_scene_method_name(action_block->block_options.method.type);
                     __cjson_add_string(cj_method, ezlopi_name_str, method_type_name ? method_type_name : ezlopi__str);
                 }
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                 else
                 {
                     TRACE_E("Method type error");
                 }
+#endif
 
                 cJSON *cj_args = cJSON_AddObjectToObject(__FUNCTION__, cj_method, ezlopi_args_str);
                 if (cj_args)

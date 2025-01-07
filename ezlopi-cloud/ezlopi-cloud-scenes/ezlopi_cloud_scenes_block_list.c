@@ -45,7 +45,6 @@
 #include <stdint.h>
 
 #include "ezlopi_util_trace.h"
-// #include "cjext.h"
 
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_devices.h"
@@ -146,8 +145,9 @@ void EZPI_scenes_trigger_device_list(cJSON *cj_request, cJSON *cj_response)
         cJSON *cj_devices_array = cJSON_AddArrayToObject(__FUNCTION__, cj_result, ezlopi_devices_str);
         if (cj_devices_array)
         {
+#ifndef CONFIG_EZPI_UTIL_TRACE_EN
             __scenes_block_trigger_device_list(cj_devices_array);
-#ifdef CONFIG_EZPI_UTIL_TRACE_EN
+#else
             if (0 < __scenes_block_trigger_device_list(cj_devices_array))
             {
                 CJSON_TRACE("trigger-device-list", cj_devices_array);
@@ -476,8 +476,8 @@ static int __scenes_block_trigger_device_list(cJSON *cj_devices_array)
     int ret = 0;
     if (cj_devices_array)
     {
-        char device_id_str[32] = {0};
         bool found_item = false;
+        char device_id_str[32] = {0};
         l_ezlopi_device_t *device_node = EZPI_core_device_get_head();
         while (device_node)
         {

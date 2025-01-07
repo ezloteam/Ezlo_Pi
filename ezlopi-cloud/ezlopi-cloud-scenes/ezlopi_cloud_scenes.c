@@ -704,6 +704,7 @@ void EZPI_scenes_clone(cJSON *cj_request, cJSON *cj_response)
                     cJSON *cj_org_scene = cJSON_Parse(__FUNCTION__, scene_str);
                     if (cj_org_scene)
                     {
+#warning "KRISHNA|RIKEN: need to discuss about scene duplicating"
                         cJSON *cj_dup_scene = cJSON_Duplicate(__FUNCTION__, cj_org_scene, 1);
                         if (cj_dup_scene)
                         {
