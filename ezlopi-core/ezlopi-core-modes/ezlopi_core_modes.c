@@ -74,13 +74,14 @@
 /*******************************************************************************
  *                          Static Function Prototypes
  *******************************************************************************/
-
+static l_modes_alert_t *__create_alert(uint32_t u_id, s_ezlopi_modes_t *ez_mode);
+static void __remove_all_alerts(l_modes_alert_t *curr_node);
 /*******************************************************************************
  *                          Static Data Definitions
  *******************************************************************************/
 static s_ezlopi_modes_t *sg_custom_modes = NULL;
 static s_house_modes_t *sg_current_house_mode = NULL;
-
+static l_modes_alert_t *_alert_head = NULL;
 /*******************************************************************************
  *                          Extern Data Definitions
  *******************************************************************************/
@@ -88,6 +89,44 @@ static s_house_modes_t *sg_current_house_mode = NULL;
 /*******************************************************************************
  *                          Extern Function Definitions
  *******************************************************************************/
+l_modes_alert_t *EZPI_core_modes_get_alert_head(void)
+{
+    return _alert_head;
+}
+
+void EZPI_core_modes_add_alert(uint32_t u_id, s_ezlopi_modes_t *ez_mode)
+{
+    if ((u_id > DEVICE_ID_START) && ez_mode)
+    {
+        if (_alert_head)
+        {
+            l_modes_alert_t *curr_node = _alert_head;
+            while (curr_node->next)
+            {
+                curr_node = curr_node->next;
+            }
+
+            curr_node->next = __create_alert(u_id, ez_mode);
+        }
+        else
+        {
+            _alert_head = __create_alert(u_id, ez_mode);
+        }
+    }
+}
+
+void EZPI_core_modes_remove_all_alerts(void)
+{
+    if (_alert_head)
+    {
+        __remove_all_alerts(_alert_head);
+        _alert_head = NULL;
+    }
+    else
+    {
+        TRACE_E("Error!! [_alert_head] not found. ");
+    }
+}
 
 s_ezlopi_modes_t *EZPI_core_modes_get_custom_modes(void)
 {
@@ -1009,6 +1048,84 @@ void EZPI_core_modes_init(void)
 /*******************************************************************************
  *                         Static Function Definitions
  *******************************************************************************/
+
+static l_modes_alert_t *__create_alert(uint32_t u_id, s_ezlopi_modes_t *ez_mode)
+{
+    l_modes_alert_t *new_node = ezlopi_malloc(__FUNCTION__, sizeof(l_modes_alert_t));
+
+    if (new_node)
+    {
+        new_node->u_id = u_id;
+        new_node->alert_trig = false;
+        new_node->alarm_delay_ll = new_node->timeleft_to_alarm_ll = ez_mode->alarm_delay;
+        new_node->abort_window_ll = new_node->timeleft_to_abort_ll = ez_mode->abort_delay.default_delay_sec;
+        new_node->next = NULL;
+    }
+
+    return new_node;
+}
+
+static void __remove_all_alerts(l_modes_alert_t *curr_node)
+{
+    if (curr_node)
+    {
+        if (curr_node->next)
+        {
+            __remove_all_alerts(curr_node->next);
+            curr_node->next = NULL;
+        }
+
+        ezlopi_free(__func__, curr_node);
+    }
+}
+
+#if 0 /* These two function maybe used in future */
+static void __ezlopi_service_remove_alert_node(l_modes_alert_t *node)
+{
+    if (node && _alert_head)
+    {
+        if (_alert_head == node)
+        {
+            l_modes_alert_t *__del_node = _alert_head;
+            _alert_head = _alert_head->next;
+            ezlopi_free(__FUNCTION__, __del_node);
+        }
+        else
+        {
+            l_modes_alert_t *curr_node = _alert_head;
+            while (curr_node->next)
+            {
+                if (curr_node->next == node)
+                {
+                    l_modes_alert_t *__del_node = curr_node->next;
+                    curr_node->next = curr_node->next->next;
+                    ezlopi_free(__FUNCTION__, __del_node);
+                    break;
+                }
+
+                curr_node = curr_node->next;
+            }
+        }
+    }
+}
+
+static void __ezlopi_service_remove_alert_node_by_name(const char *_name_)
+{
+    if (_name_ && _alert_head)
+    {
+        l_modes_alert_t *curr_node = _alert_head;
+        while (curr_node)
+        {
+            if ((curr_node->u_id) && (EZPI_STRNCMP_IF_EQUAL(curr_node->u_id, _name_, strlen(curr_node->u_id) + 1, strlen(_name_) + 1)))
+            {
+                __ezlopi_service_remove_alert_node(curr_node);
+                break;
+            }
+            curr_node = curr_node->next;
+        }
+    }
+}
+#endif
 
 #endif // CONFIG_EZPI_SERV_ENABLE_MODES
        /*******************************************************************************

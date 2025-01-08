@@ -198,6 +198,18 @@ extern "C"
 
     } s_ezlopi_modes_t;
 
+    typedef struct l_modes_alert
+    {
+        bool alert_trig;               // default 'false' [guard to trigger alert]
+        uint32_t u_id;                 // ID of security device 'uuid'
+        uint32_t abort_window_ll;      // abort alarm-broadcast with this time   (Phase 1)
+        uint32_t alarm_delay_ll;       // delay before triggering an alert       (Phase 2)
+        uint32_t timeleft_to_abort_ll; // time limit within which it is possible to abort a trigger-alert
+        uint32_t timeleft_to_alarm_ll; // custome delay-time assigned before alarm triggers
+
+        struct l_modes_alert *next;
+    } l_modes_alert_t;
+
     /*******************************************************************************
      *                          Extern Data Declarations
      *******************************************************************************/
@@ -205,6 +217,23 @@ extern "C"
     /*******************************************************************************
      *                          Extern Function Prototypes
      *******************************************************************************/
+    /**
+     * @brief Function return 'alert_ll' head_node
+     *
+     */
+    l_modes_alert_t *EZPI_core_modes_get_alert_head(void);
+    /**
+     * @brief Function to add alert triggers for target device_id
+     *
+     * @param u_id Target device_id
+     * @param ez_mode Pointer to current HouseMode
+     */
+    void EZPI_core_modes_add_alert(uint32_t u_id, s_ezlopi_modes_t *ez_mode);
+    /**
+     * @brief Function to remove all alerts
+     *
+     */
+    void EZPI_core_modes_remove_all_alerts(void);
 
     /**
      * @brief This function initializes House-mode task

@@ -57,6 +57,17 @@ extern "C"
     /*******************************************************************************
      *                          Type & Macro Declarations
      *******************************************************************************/
+
+    typedef struct s_swinger_info
+    {
+        uint32_t stat_hits;        // total hit counts from system start-up
+        uint32_t stat_added;       // the first hit instant
+        uint32_t stat_updated;     // latest hit instant
+        uint32_t hitsLimit;        // max-limit for no of hits allowed
+        uint32_t inactivityWindow; // Inactivity duration (sec)
+        bool shutdown_en;          // Guard flag for swinger activations
+    } s_swinger_info_t;
+
     typedef struct s_ezlopi_cloud_controller
     {
         char parent_device_id[40]; // 'parentDeviceId' -> https://api.ezlo.com/hub/devices_api/index.html
@@ -95,6 +106,7 @@ extern "C"
 
     typedef struct s_ezlopi_cloud_device
     {
+        s_swinger_info_t swinger;  // 'swinger' -> [armed] keep track of security-device's activity.
         uint32_t device_id;        // '_id' -> https://api.ezlo.com/hub/devices_api/index.html
         uint32_t parent_device_id; // 'parentDeviceId' -> https://log.ezlo.com/new/hub/devices_api/
         uint32_t room_id;          // 'roomId' -> https://api.ezlo.com/hub/devices_api/index.html

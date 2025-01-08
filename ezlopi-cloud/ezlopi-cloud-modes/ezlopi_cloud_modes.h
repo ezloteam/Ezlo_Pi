@@ -232,7 +232,13 @@ extern "C"
      * @param cj_response Outgoing JSON response
      */
     void EZPI_cloud_modes_entry_delay_reset(cJSON *cj_request, cJSON *cj_response);
-
+    /**
+     * @brief Function to respond to hub.modes.swinger.shutdown.list
+     *
+     * @param cj_request incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_cloud_modes_swinger_shutdown_list(cJSON *cj_request, cJSON *cj_response);
 #ifdef __cplusplus
 }
 #endif

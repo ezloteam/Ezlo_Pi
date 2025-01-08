@@ -516,6 +516,16 @@ void EZPI_cloud_modes_entry_delay_reset(cJSON *cj_request, cJSON *cj_response)
     }
 }
 
+void EZPI_cloud_modes_swinger_shutdown_list(cJSON *cj_request, cJSON *cj_response)
+{
+    cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+    if (cj_result)
+    {
+        cJSON_AddStringToObject(__func__, cj_result, "version", "1"); // need to generate version
+        // EZPI_core_modes_api_swinger_shutdown_list(cJSON_AddArrayToObject(__FUNCTION__, cj_result, ezlopi_devices_str));
+    }
+}
+
 /*******************************************************************************
  *                          Static Function Definitions
  *******************************************************************************/
