@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    sensor_0040_other_TCS230.c
-* @brief   perform some function on sensor_0040
-* @author  xx
-* @version 0.1
-* @date    xx
-*/
+ * @file    sensor_0040_other_TCS230.c
+ * @brief   perform some function on sensor_0040
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include <string.h>
 #include <math.h>
 
@@ -60,20 +60,20 @@
 #include "EZLOPI_USER_CONFIG.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static ezlopi_error_t __0040_prepare(void *arg);
 static ezlopi_error_t __0040_init(l_ezlopi_item_t *item);
 static ezlopi_error_t __0040_get_cjson_value(l_ezlopi_item_t *item, void *arg);
@@ -85,16 +85,16 @@ static void __prepare_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj
 static void __tcs230_calibration_task(void *params);
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 ezlopi_error_t SENSOR_0040_other_tcs230(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
@@ -121,8 +121,8 @@ ezlopi_error_t SENSOR_0040_other_tcs230(e_ezlopi_actions_t action, l_ezlopi_item
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 static ezlopi_error_t __tcs230_setup_gpio(gpio_num_t s0_pin, gpio_num_t s1_pin, gpio_num_t s2_pin, gpio_num_t s3_pin, gpio_num_t gpio_output_en, gpio_num_t gpio_pulse_output)
 {
     ezlopi_error_t ret = EZPI_FAILED;
@@ -181,12 +181,12 @@ static void __prepare_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj
         if (user_data)
         {
             item->interface_type = EZLOPI_DEVICE_INTERFACE_MAX;
-            CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio1_str, user_data->TCS230_pin.gpio_s0);           // gpio_s0
-            CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio2_str, user_data->TCS230_pin.gpio_s1);           // gpio_s1
-            CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio3_str, user_data->TCS230_pin.gpio_s2);           // gpio_s2
-            CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio4_str, user_data->TCS230_pin.gpio_s3);           // gpio_s3
-            CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio5_str, user_data->TCS230_pin.gpio_output_en);    // gpio_output_en
-            CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio6_str, user_data->TCS230_pin.gpio_pulse_output); // gpio_pulse_output
+            CJSON_GET_VALUE_UINT32(cj_device, ezlopi_gpio1_str, user_data->TCS230_pin.gpio_s0);           // gpio_s0
+            CJSON_GET_VALUE_UINT32(cj_device, ezlopi_gpio2_str, user_data->TCS230_pin.gpio_s1);           // gpio_s1
+            CJSON_GET_VALUE_UINT32(cj_device, ezlopi_gpio3_str, user_data->TCS230_pin.gpio_s2);           // gpio_s2
+            CJSON_GET_VALUE_UINT32(cj_device, ezlopi_gpio4_str, user_data->TCS230_pin.gpio_s3);           // gpio_s3
+            CJSON_GET_VALUE_UINT32(cj_device, ezlopi_gpio5_str, user_data->TCS230_pin.gpio_output_en);    // gpio_output_en
+            CJSON_GET_VALUE_UINT32(cj_device, ezlopi_gpio6_str, user_data->TCS230_pin.gpio_pulse_output); // gpio_pulse_output
         }
     }
 }
@@ -243,11 +243,11 @@ static ezlopi_error_t __0040_init(l_ezlopi_item_t *item)
                 GPIO_IS_VALID_GPIO(user_data->TCS230_pin.gpio_pulse_output))
             {
                 if (EZPI_SUCCESS == __tcs230_setup_gpio(user_data->TCS230_pin.gpio_s0,
-                    user_data->TCS230_pin.gpio_s1,
-                    user_data->TCS230_pin.gpio_s2,
-                    user_data->TCS230_pin.gpio_s3,
-                    user_data->TCS230_pin.gpio_output_en,
-                    user_data->TCS230_pin.gpio_pulse_output))
+                                                        user_data->TCS230_pin.gpio_s1,
+                                                        user_data->TCS230_pin.gpio_s2,
+                                                        user_data->TCS230_pin.gpio_s3,
+                                                        user_data->TCS230_pin.gpio_output_en,
+                                                        user_data->TCS230_pin.gpio_pulse_output))
                 {
                     TRACE_W("Entering Calibration Phase .......");
 
@@ -408,9 +408,9 @@ static void __tcs230_calibration_task(void *params) // calibration task
     // #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
     //     EZPI_core_process_set_is_deleted(ENUM_EZLOPI_SENSOR_TCS230_CALLIBRATION_TASK);
     // #endif
-        // vTaskDelete(NULL);
+    // vTaskDelete(NULL);
 }
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

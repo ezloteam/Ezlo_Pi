@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    sensor_0023_digitalIn_touch_switch_TTP223B.c
-* @brief   perform some function on sensor_0023
-* @author  xx
-* @version 0.1
-* @date    xx
-*/
+ * @file    sensor_0023_digitalIn_touch_switch_TTP223B.c
+ * @brief   perform some function on sensor_0023
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include "driver/gpio.h"
 
 #include "ezlopi_core_cloud.h"
@@ -54,20 +54,20 @@
 #include "sensor_0023_digitalIn_touch_switch_TTP223B.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static ezlopi_error_t __prepare(void *arg);
 static void __prepare_touch_switch_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
 static void __prepare_touch_switch_properties(l_ezlopi_item_t *item, cJSON *cj_device);
@@ -76,16 +76,16 @@ static void touch_switch_callback(void *arg);
 static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg);
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 /**
  * @brief Public function to interface bme280. This is used to handles all the action on the bme280 sensor and is the entry point to interface the sensor.
  *
@@ -123,8 +123,8 @@ ezlopi_error_t SENSOR_0023_digitalIn_touch_switch_TTP223B(e_ezlopi_actions_t act
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 
 static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 {
@@ -218,7 +218,9 @@ static void __prepare_touch_switch_device_cloud_properties(l_ezlopi_device_t *de
 
 static void __prepare_touch_switch_properties(l_ezlopi_item_t *item, cJSON *cj_device)
 {
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type);
+    int val_ip = 0;
+
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type);
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
     item->cloud_properties.item_name = ezlopi_item_name_switch;
@@ -227,9 +229,8 @@ static void __prepare_touch_switch_properties(l_ezlopi_item_t *item, cJSON *cj_d
     item->cloud_properties.scale = NULL;
 
     CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_str, item->interface.gpio.gpio_in.gpio_num);
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_ip_inv_str, item->interface.gpio.gpio_in.invert);
-    int val_ip = 0;
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_val_ip_str, val_ip);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_ip_inv_str, item->interface.gpio.gpio_in.invert);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_val_ip_str, val_ip);
 
     item->interface.gpio.gpio_in.value = (true == item->interface.gpio.gpio_in.invert) ? !val_ip : val_ip;
     item->interface.gpio.gpio_in.enable = true;
@@ -238,5 +239,5 @@ static void __prepare_touch_switch_properties(l_ezlopi_item_t *item, cJSON *cj_d
 }
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

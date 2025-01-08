@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    sensor_0008_I2C_LTR303ALS.c
-* @brief   perform some function on sensor_0008
-* @author  xx
-* @version 0.1
-* @date    xx
-*/
+ * @file    sensor_0008_I2C_LTR303ALS.c
+ * @brief   perform some function on sensor_0008
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 
 #include "../../build/config/sdkconfig.h"
 #include <math.h>
@@ -58,36 +58,36 @@
 #include "EZLOPI_USER_CONFIG.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static ezlopi_error_t __prepare(void *arg);
 static ezlopi_error_t __init(l_ezlopi_item_t *item);
 static ezlopi_error_t __notify(l_ezlopi_item_t *item);
 static ezlopi_error_t __get_value_cjson(l_ezlopi_item_t *item, void *arg);
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 
 ezlopi_error_t SENSOR_0008_i2c_ltr303als(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
@@ -125,8 +125,8 @@ ezlopi_error_t SENSOR_0008_i2c_ltr303als(e_ezlopi_actions_t action, l_ezlopi_ite
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 
 static ezlopi_error_t __get_value_cjson(l_ezlopi_item_t *item, void *arg)
 {
@@ -199,7 +199,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
 
 static void __prepare_item_properties(l_ezlopi_item_t *item, cJSON *cj_param)
 {
-    CJSON_GET_VALUE_DOUBLE(cj_param, ezlopi_dev_type_str, item->interface_type);
+    CJSON_GET_VALUE_INT(cj_param, ezlopi_dev_type_str, item->interface_type);
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
     item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
@@ -250,5 +250,5 @@ static ezlopi_error_t __prepare(void *arg)
     return ret;
 }
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

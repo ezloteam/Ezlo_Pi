@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    sensor_0053_UART_GYGPS6MV2.c
-* @brief   perform some function on sensor_0053
-* @author  xx
-* @version 0.1
-* @date    xx
-*/
+ * @file    sensor_0053_UART_GYGPS6MV2.c
+ * @brief   perform some function on sensor_0053
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include <string.h>
 
 #include "ezlopi_core_cloud.h"
@@ -56,20 +56,20 @@
 #include "EZLOPI_USER_CONFIG.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static ezlopi_error_t __0053_prepare(void *arg);
 static ezlopi_error_t __0053_init(l_ezlopi_item_t *item);
 static ezlopi_error_t __0053_get_value_cjson(l_ezlopi_item_t *item, void *arg);
@@ -87,18 +87,17 @@ static void __prepare_sea_level_item_cloud_properties(l_ezlopi_item_t *item, cJS
 static void __prepare_geiod_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, GPS6MV2_t *gps_arg);
 static void __prepare_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj_device);
 
+/*******************************************************************************
+ *                          Static Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
-
-/*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 ezlopi_error_t SENSOR_0053_uart_gygps6mv2(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
@@ -135,8 +134,8 @@ ezlopi_error_t SENSOR_0053_uart_gygps6mv2(e_ezlopi_actions_t action, l_ezlopi_it
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
@@ -215,10 +214,10 @@ static void __prepare_geiod_item_cloud_properties(l_ezlopi_item_t *item, cJSON *
 
 static void __prepare_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj_device)
 {
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type);
     CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_tx_str, item->interface.uart.tx);
     CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_rx_str, item->interface.uart.rx);
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_baud_str, item->interface.uart.baudrate);
+    CJSON_GET_VALUE_UINT32(cj_device, ezlopi_baud_str, item->interface.uart.baudrate);
 
     /*Here we decide, when uart is allowed to initialize*/
     GPS6MV2_t *sensor_0053_UART_gps6mv2_data = (GPS6MV2_t *)item->user_arg;
@@ -619,5 +618,5 @@ static void __retrieve_GPGGA_sentence(l_ezlopi_item_t *item)
 }
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

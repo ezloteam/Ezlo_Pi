@@ -617,7 +617,7 @@ static int __provision_update(char *arg)
             CJSON_GET_VALUE_STRING_BY_COPY(cj_root_data, ezlopi_id_str, tmp_id_str);
             CJSON_GET_VALUE_STRING_BY_COPY(cj_root_data, ezlopi_uuid_str, tmp_dev_uuid);
             CJSON_GET_VALUE_STRING_BY_COPY(cj_root_data, ezlopi_cloud_uuid_str, tmp_prov_uuid);
-            CJSON_GET_VALUE_DOUBLE(cj_root_data, ezlopi_version_str, config_check_factoryInfo.config_version);
+            CJSON_GET_VALUE_UINT16(cj_root_data, ezlopi_version_str, config_check_factoryInfo.config_version);
             CJSON_GET_VALUE_STRING_BY_COPY(cj_root_data, ezlopi_coordinator_url_str, tmp_cloud_server);
             CJSON_GET_VALUE_STRING_BY_COPY(cj_root_data, ezlopi_provision_token_str, tmp_provision_token);
 
@@ -644,7 +644,7 @@ static int __provision_update(char *arg)
             }
 
             uint32_t provision_order = 0;
-            CJSON_GET_VALUE_DOUBLE(cj_root_prov_data, "provision_order", provision_order);
+            CJSON_GET_VALUE_UINT32(cj_root_prov_data, "provision_order", provision_order);
 #endif
 
             config_check_factoryInfo.brand = NULL;

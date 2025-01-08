@@ -830,7 +830,7 @@ static ezlopi_error_t ezlopi_device_parse_json_v3(cJSON *cjson_config)
                                 error = EZPI_ERR_JSON_PARSE_FAILED;
                             }
 
-                            CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_id_item_str, id_item);
+                            CJSON_GET_VALUE_INT(cjson_device, ezlopi_id_item_str, id_item);
 
                             if (0 != id_item)
                             {

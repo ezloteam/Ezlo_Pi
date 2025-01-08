@@ -1,6 +1,30 @@
 #include "cjext.h"
-#include "ezlopi_util_trace.h"
 #include "ezlopi_core_cjson_macros.h"
+
+#ifndef EZPI_USE_CJSON_MACRO
+
+#include "ezlopi_util_trace.h"
+#include "ezlopi_cloud_constants.h"
+
+void EZPI_core_cjson_get_value_uint8(cJSON *cj_root, char *item_name_str, uint8_t *item_val)
+{
+    *item_val = 0;
+    cJSON *o_item = cJSON_GetObjectItem(__FUNCTION__, cj_root, item_name_str);
+    if (o_item && (o_item->type & cJSON_Number))
+    {
+        *item_val = o_item->valuedouble;
+    }
+}
+
+void EZPI_core_cjson_get_value_float(cJSON *cj_root, char *item_name_str, float *item_val)
+{
+    *item_val = 0;
+    cJSON *o_item = cJSON_GetObjectItem(__FUNCTION__, cj_root, item_name_str);
+    if (o_item)
+    {
+        *item_val = (float)o_item->valuedouble;
+    }
+}
 
 void EZPI_core_cjson_get_value_double(cJSON *cj_root, char *item_name_str, double *item_val)
 {
@@ -9,6 +33,36 @@ void EZPI_core_cjson_get_value_double(cJSON *cj_root, char *item_name_str, doubl
     if (o_item && (o_item->type & cJSON_Number))
     {
         *item_val = o_item->valuedouble;
+    }
+}
+
+void EZPI_core_cjson_get_value_int(cJSON *cj_root, char *item_name_str, int *item_val)
+{
+    *item_val = 0;
+    cJSON *o_item = cJSON_GetObjectItem(__FUNCTION__, cj_root, item_name_str);
+    if (o_item && (o_item->type & cJSON_Number))
+    {
+        *item_val = (int)o_item->valuedouble;
+    }
+}
+
+void EZPI_core_cjson_get_value_uint16(cJSON *cj_root, char *item_name_str, uint16_t *item_val)
+{
+    *item_val = 0;
+    cJSON *o_item = cJSON_GetObjectItem(__FUNCTION__, cj_root, item_name_str);
+    if (o_item && (o_item->type & cJSON_Number))
+    {
+        *item_val = (uint16_t)o_item->valuedouble;
+    }
+}
+
+void EZPI_core_cjson_get_value_uint32(cJSON *cj_root, char *item_name_str, uint32_t *item_val)
+{
+    *item_val = 0;
+    cJSON *o_item = cJSON_GetObjectItem(__FUNCTION__, cj_root, item_name_str);
+    if (o_item && (o_item->type & cJSON_Number))
+    {
+        *item_val = (uint32_t)o_item->valuedouble;
     }
 }
 
@@ -21,7 +75,7 @@ void EZPI_core_cjson_get_value_bool(cJSON *cj_root, char *item_name_str, bool *i
         if (o_item->type & cJSON_True)
         {
             *item_val = true;
-        } 
+        }
     }
 }
 
@@ -41,6 +95,8 @@ void EZPI_core_cjson_trace(char *name_str, cJSON *cj_object)
         TRACE_E("%s: Null", name_str ? name_str : "");
     }
 }
+
+#endif // EZPI_USE_CJSON_MACRO
 
 #if 0
 #define CJSON_GET_VALUE_STRING_BY_COPY(cj_root, char *item_name_str, item_val)                        \

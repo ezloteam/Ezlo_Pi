@@ -336,7 +336,7 @@ static void ezpi_provisioning_info_write_func(esp_gatt_value_t *value, esp_ble_g
                                         // memset(device_type, 0, sizeof(device_type));
 
                                         CJSON_GET_VALUE_DOUBLE(cj_config, ezlopi_serial_str, ezlopi_config_basic->id);
-                                        CJSON_GET_VALUE_DOUBLE(cj_config, ezlopi_version_str, ezlopi_config_basic->config_version);
+                                        CJSON_GET_VALUE_UINT16(cj_config, ezlopi_version_str, ezlopi_config_basic->config_version);
 
                                         CJSON_GET_VALUE_STRING_BY_COPY(cj_config, ezlopi_device_name_str, device_name);
                                         CJSON_GET_VALUE_STRING_BY_COPY(cj_config, ezlopi_manufacturer_name_str, manufacturer);

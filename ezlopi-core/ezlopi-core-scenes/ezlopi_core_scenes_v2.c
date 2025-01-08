@@ -1227,10 +1227,10 @@ static void _____new_action_delay(s_action_delay_v2_t *action_delay, cJSON *cj_d
 {
     if (action_delay && cj_delay)
     {
-        CJSON_GET_VALUE_DOUBLE(cj_delay, ezlopi_days_str, action_delay->days);
-        CJSON_GET_VALUE_DOUBLE(cj_delay, ezlopi_hours_str, action_delay->hours);
-        CJSON_GET_VALUE_DOUBLE(cj_delay, ezlopi_minutes_str, action_delay->minutes);
-        CJSON_GET_VALUE_DOUBLE(cj_delay, ezlopi_seconds_str, action_delay->seconds);
+        CJSON_GET_VALUE_UINT16(cj_delay, ezlopi_days_str, action_delay->days);
+        CJSON_GET_VALUE_UINT16(cj_delay, ezlopi_hours_str, action_delay->hours);
+        CJSON_GET_VALUE_UINT16(cj_delay, ezlopi_minutes_str, action_delay->minutes);
+        CJSON_GET_VALUE_UINT16(cj_delay, ezlopi_seconds_str, action_delay->seconds);
     }
 }
 static l_fields_v2_t *_____fields_populate(cJSON *cj_fields)

@@ -448,10 +448,10 @@ void EZPI_scenes_populate_assign_action_delay(s_action_delay_v2_t *action_delay,
 {
     if (action_delay && cj_delay)
     {
-        CJSON_GET_VALUE_DOUBLE(cj_delay, ezlopi_days_str, action_delay->days);
-        CJSON_GET_VALUE_DOUBLE(cj_delay, ezlopi_hours_str, action_delay->hours);
-        CJSON_GET_VALUE_DOUBLE(cj_delay, ezlopi_minutes_str, action_delay->minutes);
-        CJSON_GET_VALUE_DOUBLE(cj_delay, ezlopi_seconds_str, action_delay->seconds);
+        CJSON_GET_VALUE_UINT16(cj_delay, ezlopi_days_str, action_delay->days);
+        CJSON_GET_VALUE_UINT16(cj_delay, ezlopi_hours_str, action_delay->hours);
+        CJSON_GET_VALUE_UINT16(cj_delay, ezlopi_minutes_str, action_delay->minutes);
+        CJSON_GET_VALUE_UINT16(cj_delay, ezlopi_seconds_str, action_delay->seconds);
     }
 }
 

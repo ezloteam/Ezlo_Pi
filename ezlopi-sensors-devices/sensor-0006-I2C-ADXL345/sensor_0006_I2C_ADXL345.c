@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    sensor_0006_I2C_ADXL345.c
-* @brief   perform some function on sensor_0006
-* @author  xx
-* @version 0.1
-* @date    xx
-*/
+ * @file    sensor_0006_I2C_ADXL345.c
+ * @brief   perform some function on sensor_0006
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include <math.h>
 
 #include "ezlopi_core_cloud.h"
@@ -55,20 +55,20 @@
 #include "EZLOPI_USER_CONFIG.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static ezlopi_error_t __prepare(void *arg);
 static ezlopi_error_t __init(l_ezlopi_item_t *item);
 static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg);
@@ -78,16 +78,16 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, void *user_da
 static void __prepare_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj_device);
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 ezlopi_error_t SENSOR_0006_i2c_adxl345(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
@@ -123,8 +123,8 @@ ezlopi_error_t SENSOR_0006_i2c_adxl345(e_ezlopi_actions_t action, l_ezlopi_item_
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     device->cloud_properties.category = category_level_sensor;
@@ -159,10 +159,10 @@ static void __prepare_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj
         {
             item->interface.i2c_master.enable = true;
             item->interface.i2c_master.channel = I2C_NUM_0;
-            CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type);
+            CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type);
             CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_sda_str, item->interface.i2c_master.sda);
             CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_scl_str, item->interface.i2c_master.scl);
-            CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_slave_addr_str, item->interface.i2c_master.address);
+            CJSON_GET_VALUE_UINT32(cj_device, ezlopi_slave_addr_str, item->interface.i2c_master.address);
             item->interface.i2c_master.clock_speed = 100000;
             if (0 == item->interface.i2c_master.address)
             {
@@ -319,7 +319,7 @@ static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 static ezlopi_error_t __notify(l_ezlopi_item_t *item)
 {
     ezlopi_error_t ret = EZPI_FAILED;
-    static float __prev[3] = { 0 };
+    static float __prev[3] = {0};
     if (item)
     {
         s_adxl345_data_t *user_data = (s_adxl345_data_t *)item->user_arg;
@@ -356,7 +356,6 @@ static ezlopi_error_t __notify(l_ezlopi_item_t *item)
     return ret;
 }
 
-
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

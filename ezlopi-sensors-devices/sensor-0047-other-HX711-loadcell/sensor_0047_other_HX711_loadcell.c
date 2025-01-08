@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    sensor_0047_other_HX711_loadcell.c
-* @brief   perform some function on sensor_0047
-* @author  xx
-* @version 0.1
-* @date    xx
-*/
+ * @file    sensor_0047_other_HX711_loadcell.c
+ * @brief   perform some function on sensor_0047
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include <math.h>
 
 #include "ezlopi_core_cloud.h"
@@ -54,16 +54,16 @@
 #include "EZLOPI_USER_CONFIG.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 #define PORT_ENTER_CRITICAL() portENTER_CRITICAL(&mux)
 #define PORT_EXIT_CRITICAL() portEXIT_CRITICAL(&mux)
 
@@ -84,8 +84,8 @@ typedef struct s_hx711_data
 } s_hx711_data_t;
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static ezlopi_error_t __0047_prepare(void *arg);
 static ezlopi_error_t __0047_init(l_ezlopi_item_t *item);
 static ezlopi_error_t __0047_get_cjson_value(l_ezlopi_item_t *item, void *arg);
@@ -97,16 +97,16 @@ static float __hx711_rawdata(l_ezlopi_item_t *item, hx711_gain_t _gain);
 static float __hx711_avg_reading(l_ezlopi_item_t *item, uint8_t sample_iteration);
 static void __Calculate_hx711_tare_wt(void *params);
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 static portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 ezlopi_error_t SENSOR_0047_other_hx711_loadcell(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
@@ -145,8 +145,8 @@ ezlopi_error_t SENSOR_0047_other_hx711_loadcell(e_ezlopi_actions_t action, l_ezl
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     device->cloud_properties.category = category_level_sensor;
@@ -168,11 +168,12 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_dev
     item->is_user_arg_unique = true;
     item->user_arg = user_data;
 
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio1_str, user_data->HX711_SCK_pin);
-    TRACE_I("hx711_SCL_PIN: %d ", user_data->HX711_SCK_pin);
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio2_str, user_data->HX711_DT_pin);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio1_str, user_data->HX711_SCK_pin);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio2_str, user_data->HX711_DT_pin);
+
     TRACE_I("hx711_DT_PIN: %d ", user_data->HX711_DT_pin);
+    TRACE_I("hx711_SCL_PIN: %d ", user_data->HX711_SCK_pin);
 }
 static ezlopi_error_t __0047_prepare(void *arg)
 {
@@ -337,7 +338,7 @@ static void __Calculate_hx711_tare_wt(void *params)
     // #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
     //     EZPI_core_process_set_is_deleted(ENUM_EZLOPI_SENSOR_HX711_TASK);
     // #endif
-        // vTaskDelete(NULL);
+    // vTaskDelete(NULL);
 }
 static float __hx711_rawdata(l_ezlopi_item_t *item, hx711_gain_t _gain)
 {
@@ -448,5 +449,5 @@ static void __hx711_power_reset(l_ezlopi_item_t *item)
 }
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

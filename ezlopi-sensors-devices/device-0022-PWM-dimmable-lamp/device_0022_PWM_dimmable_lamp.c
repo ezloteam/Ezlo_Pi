@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    device_0022_PWM_dimmable_lamp.c
-* @brief   perform some function on device_0022
-* @author  xx
-* @version 0.1
-* @date    xx
-*/
+ * @file    device_0022_PWM_dimmable_lamp.c
+ * @brief   perform some function on device_0022
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include <math.h>
 
 #include "ezlopi_core_cloud.h"
@@ -55,16 +55,16 @@
 #include "EZLOPI_USER_CONFIG.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 typedef struct s_dimmable_bulb_properties
 {
     bool dimmable_bulb_initialized;
@@ -79,8 +79,8 @@ typedef struct s_dimmable_bulb_properties
 } s_dimmable_bulb_properties_t;
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static ezlopi_error_t __prepare(void *arg);
 static ezlopi_error_t __init(l_ezlopi_item_t *item);
 static ezlopi_error_t __list_cjson_value(l_ezlopi_item_t *item, void *arg);
@@ -88,16 +88,16 @@ static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg);
 static ezlopi_error_t __set_cjson_value(l_ezlopi_item_t *item, void *arg);
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 
 ezlopi_error_t DEVICE_0022_pwm_dimmable_lamp(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
@@ -138,8 +138,8 @@ ezlopi_error_t DEVICE_0022_pwm_dimmable_lamp(e_ezlopi_actions_t action, l_ezlopi
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 
 static ezlopi_error_t __set_cjson_value(l_ezlopi_item_t *item, void *arg)
 {
@@ -154,7 +154,7 @@ static ezlopi_error_t __set_cjson_value(l_ezlopi_item_t *item, void *arg)
             if (ezlopi_item_name_dimmer == item->cloud_properties.item_name)
             {
                 int value = 0;
-                CJSON_GET_VALUE_DOUBLE(device_details, ezlopi_value_str, value);
+                CJSON_GET_VALUE_INT(device_details, ezlopi_value_str, value);
                 int target_value = (int)ceil(((value * 4095.0) / 100.0));
                 EZPI_hal_pwm_change_duty(item->interface.pwm.channel, item->interface.pwm.speed_mode, target_value);
                 dimmable_bulb_arg->previous_brightness_value = dimmable_bulb_arg->current_brightness_value;
@@ -218,7 +218,6 @@ static ezlopi_error_t __list_cjson_value(l_ezlopi_item_t *item, void *arg)
     return ret;
 }
 
-
 static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 {
     ezlopi_error_t ret = EZPI_FAILED;
@@ -254,7 +253,6 @@ static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg)
     return ret;
 }
 
-
 static ezlopi_error_t __init(l_ezlopi_item_t *item)
 {
     ezlopi_error_t ret = EZPI_ERR_INIT_DEVICE_FAILED;
@@ -268,7 +266,7 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
                 if (0 == dimmable_bulb_arg->dimmable_bulb_initialized)
                 {
                     s_ezlopi_channel_speed_t *ezlopi_dimmable_channel_speed = EZPI_hal_pwm_init(item->interface.pwm.gpio_num, item->interface.pwm.pwm_resln,
-                        item->interface.pwm.freq_hz, item->interface.pwm.duty_cycle);
+                                                                                                item->interface.pwm.freq_hz, item->interface.pwm.duty_cycle);
                     if (ezlopi_dimmable_channel_speed)
                     {
                         item->interface.pwm.channel = ezlopi_dimmable_channel_speed->channel;
@@ -303,7 +301,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
 
 static void __prepare_dimmer_item_properties(l_ezlopi_item_t *item, cJSON *cj_device)
 {
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type);
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = true;
     item->cloud_properties.show = true;
@@ -313,14 +311,14 @@ static void __prepare_dimmer_item_properties(l_ezlopi_item_t *item, cJSON *cj_de
     item->cloud_properties.scale = NULL;
 
     CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_str, item->interface.pwm.gpio_num);
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_duty_cycle_str, item->interface.pwm.duty_cycle);
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_freq_hz_str, item->interface.pwm.freq_hz);
+    CJSON_GET_VALUE_UINT32(cj_device, ezlopi_duty_cycle_str, item->interface.pwm.duty_cycle);
+    CJSON_GET_VALUE_UINT32(cj_device, ezlopi_freq_hz_str, item->interface.pwm.freq_hz);
     item->interface.pwm.pwm_resln = 12;
 }
 
 static void __prepare_dimmer_up_item_properties(l_ezlopi_item_t *item, cJSON *cj_device)
 {
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type);
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = true;
     item->cloud_properties.show = true;
@@ -330,14 +328,14 @@ static void __prepare_dimmer_up_item_properties(l_ezlopi_item_t *item, cJSON *cj
     item->cloud_properties.scale = NULL;
 
     CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_str, item->interface.pwm.gpio_num);
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_duty_cycle_str, item->interface.pwm.duty_cycle);
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_freq_hz_str, item->interface.pwm.freq_hz);
+    CJSON_GET_VALUE_UINT32(cj_device, ezlopi_duty_cycle_str, item->interface.pwm.duty_cycle);
+    CJSON_GET_VALUE_UINT32(cj_device, ezlopi_freq_hz_str, item->interface.pwm.freq_hz);
     item->interface.pwm.pwm_resln = 12;
 }
 
 static void __prepare_dimmer_down_item_properties(l_ezlopi_item_t *item, cJSON *cj_device)
 {
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type);
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = true;
     item->cloud_properties.show = true;
@@ -347,14 +345,14 @@ static void __prepare_dimmer_down_item_properties(l_ezlopi_item_t *item, cJSON *
     item->cloud_properties.scale = NULL;
 
     CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_str, item->interface.pwm.gpio_num);
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_duty_cycle_str, item->interface.pwm.duty_cycle);
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_freq_hz_str, item->interface.pwm.freq_hz);
+    CJSON_GET_VALUE_UINT32(cj_device, ezlopi_duty_cycle_str, item->interface.pwm.duty_cycle);
+    CJSON_GET_VALUE_UINT32(cj_device, ezlopi_freq_hz_str, item->interface.pwm.freq_hz);
     item->interface.pwm.pwm_resln = 12;
 }
 
 static void __prepare_dimmer_stop_item_properties(l_ezlopi_item_t *item, cJSON *cj_device)
 {
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type);
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = true;
     item->cloud_properties.show = true;
@@ -364,8 +362,8 @@ static void __prepare_dimmer_stop_item_properties(l_ezlopi_item_t *item, cJSON *
     item->cloud_properties.scale = NULL;
 
     CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_str, item->interface.pwm.gpio_num);
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_duty_cycle_str, item->interface.pwm.duty_cycle);
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_freq_hz_str, item->interface.pwm.freq_hz);
+    CJSON_GET_VALUE_UINT32(cj_device, ezlopi_duty_cycle_str, item->interface.pwm.duty_cycle);
+    CJSON_GET_VALUE_UINT32(cj_device, ezlopi_freq_hz_str, item->interface.pwm.freq_hz);
     item->interface.pwm.pwm_resln = 12;
 }
 
@@ -475,5 +473,5 @@ static ezlopi_error_t __prepare(void *arg)
     return ret;
 }
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

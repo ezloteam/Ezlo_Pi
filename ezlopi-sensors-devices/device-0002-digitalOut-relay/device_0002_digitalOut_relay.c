@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    device_0002_digitalOut_relay.c
-* @brief   perform some function on device_0002
-* @author  xx
-* @version 0.1
-* @date    xx
-*/
+ * @file    device_0002_digitalOut_relay.c
+ * @brief   perform some function on device_0002
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include "../../build/config/sdkconfig.h"
 
 #include "ezlopi_core_cloud.h"
@@ -56,20 +56,20 @@
 #include "device_0002_digitalOut_relay.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static ezlopi_error_t __prepare(void *arg);
 static ezlopi_error_t __init(l_ezlopi_item_t *item);
 static ezlopi_error_t __set_value(l_ezlopi_item_t *item, void *arg);
@@ -80,18 +80,17 @@ static void __toggle_gpio(l_ezlopi_item_t *item);
 static void __write_gpio_value(l_ezlopi_item_t *item);
 static void __set_gpio_value(l_ezlopi_item_t *item, int value);
 
+/*******************************************************************************
+ *                          Static Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
-
-/*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 ezlopi_error_t DEVICE_0002_digitalOut_relay(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t error = 0;
@@ -129,10 +128,9 @@ ezlopi_error_t DEVICE_0002_digitalOut_relay(e_ezlopi_actions_t action, l_ezlopi_
     return error;
 }
 
-
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 static void __setup_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cjson_device)
 {
     device->cloud_properties.category = category_switch;
@@ -153,16 +151,16 @@ static void __setup_item_properties(l_ezlopi_item_t *item, cJSON *cjson_device)
     item->cloud_properties.scale = NULL;
     item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
 
-    CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_dev_type_str, item->interface_type);
+    CJSON_GET_VALUE_INT(cjson_device, ezlopi_dev_type_str, item->interface_type);
 
     CJSON_GET_VALUE_BOOL(cjson_device, ezlopi_is_ip_str, item->interface.gpio.gpio_in.enable);
 
     if (item->interface.gpio.gpio_in.enable)
     {
         CJSON_GET_VALUE_GPIO(cjson_device, ezlopi_gpio_in_str, item->interface.gpio.gpio_in.gpio_num);
-        CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_ip_inv_str, item->interface.gpio.gpio_in.invert);
-        CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_val_ip_str, item->interface.gpio.gpio_in.value);
-        CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_pullup_ip_str, tmp_var);
+        CJSON_GET_VALUE_INT(cjson_device, ezlopi_ip_inv_str, item->interface.gpio.gpio_in.invert);
+        CJSON_GET_VALUE_INT(cjson_device, ezlopi_val_ip_str, item->interface.gpio.gpio_in.value);
+        CJSON_GET_VALUE_INT(cjson_device, ezlopi_pullup_ip_str, tmp_var);
         item->interface.gpio.gpio_in.pull = tmp_var ? GPIO_PULLUP_ONLY : GPIO_PULLDOWN_ONLY;
         item->interface.gpio.gpio_in.interrupt = GPIO_INTR_DISABLE;
     }
@@ -174,9 +172,9 @@ static void __setup_item_properties(l_ezlopi_item_t *item, cJSON *cjson_device)
     item->interface.gpio.gpio_out.enable = true;
     CJSON_GET_VALUE_GPIO(cjson_device, ezlopi_gpio_out_str, item->interface.gpio.gpio_out.gpio_num);
 
-    CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_op_inv_str, item->interface.gpio.gpio_out.invert);
-    CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_val_op_str, item->interface.gpio.gpio_out.value);
-    CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_pullup_op_str, tmp_var);
+    CJSON_GET_VALUE_INT(cjson_device, ezlopi_op_inv_str, item->interface.gpio.gpio_out.invert);
+    CJSON_GET_VALUE_INT(cjson_device, ezlopi_val_op_str, item->interface.gpio.gpio_out.value);
+    CJSON_GET_VALUE_INT(cjson_device, ezlopi_pullup_op_str, tmp_var);
     item->interface.gpio.gpio_out.interrupt = GPIO_INTR_DISABLE;
     item->interface.gpio.gpio_out.pull = tmp_var ? GPIO_PULLUP_ONLY : GPIO_PULLDOWN_ONLY;
 }
@@ -398,5 +396,5 @@ static void __toggle_gpio(l_ezlopi_item_t *item)
 }
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

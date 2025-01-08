@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    pms_dev_items_prepare.c
-* @brief   perform some function to prepare 'pms_dev_items'
-* @author  xx
-* @version 0.1
-* @date    xx
-*/
+ * @file    pms_dev_items_prepare.c
+ * @brief   perform some function to prepare 'pms_dev_items'
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 
 #include "ezlopi_core_devices_list.h"
 #include "ezlopi_core_devices.h"
@@ -51,20 +51,20 @@
 #include "EZLOPI_USER_CONFIG.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static int __prepare_particulate_matter_particles_0_dot_3_um_device_and_items(cJSON *cj_properties, uint32_t *parent_id, void *user_arg);
 static int __prepare_particulate_matter_particles_0_dot_5_um_device_and_items(cJSON *cj_properties, uint32_t parent_id, void *user_arg);
 static int __prepare_particulate_matter_particles_1_um_device_and_items(cJSON *cj_properties, uint32_t parent_id, void *user_arg);
@@ -76,16 +76,16 @@ static int __prepare_particulate_matter_standard_particles_2_dot_5_um_device_and
 static int __prepare_particulate_matter_standard_particles_10_um_device_and_items(cJSON *cj_properties, uint32_t parent_id, void *user_arg);
 static int pms5003_set_pms_object_details(cJSON *cj_properties, s_pms5003_sensor_object *pms_object);
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 ezlopi_error_t PMS5003_sensor_prepare_devices_and_items(cJSON *cj_properties, uint32_t *parent_id)
 {
     ezlopi_error_t ret = EZPI_FAILED;
@@ -110,8 +110,8 @@ ezlopi_error_t PMS5003_sensor_prepare_devices_and_items(cJSON *cj_properties, ui
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 
 // Device 0
 static int __prepare_particulate_matter_particles_0_dot_3_um_device_and_items(cJSON *cj_properties, uint32_t *parent_id, void *user_arg)
@@ -554,10 +554,10 @@ static int pms5003_set_pms_object_details(cJSON *cj_properties, s_pms5003_sensor
 
     assert(pms_object != NULL);
 
-    CJSON_GET_VALUE_DOUBLE(cj_properties, ezlopi_gpio1_str, pms_object->pms_tx_pin);
-    CJSON_GET_VALUE_DOUBLE(cj_properties, ezlopi_gpio2_str, pms_object->pms_rx_pin);
-    CJSON_GET_VALUE_DOUBLE(cj_properties, ezlopi_gpio3_str, pms_object->pms_set_pin);
-    CJSON_GET_VALUE_DOUBLE(cj_properties, "gpio4", pms_object->pms_reset_pin);
+    CJSON_GET_VALUE_UINT32(cj_properties, ezlopi_gpio1_str, pms_object->pms_tx_pin);
+    CJSON_GET_VALUE_UINT32(cj_properties, ezlopi_gpio2_str, pms_object->pms_rx_pin);
+    CJSON_GET_VALUE_UINT32(cj_properties, ezlopi_gpio3_str, pms_object->pms_set_pin);
+    CJSON_GET_VALUE_UINT32(cj_properties, "gpio4", pms_object->pms_reset_pin);
     pms_object->pms_baud_rate = 9600;
 
     pms_object->pms_active_time = 30;
@@ -572,7 +572,6 @@ static int pms5003_set_pms_object_details(cJSON *cj_properties, s_pms5003_sensor
     return ret;
 }
 
-
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/
