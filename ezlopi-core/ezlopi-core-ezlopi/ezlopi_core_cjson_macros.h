@@ -56,6 +56,8 @@ extern "C"
      *                          Type & Macro Declarations
      *******************************************************************************/
 
+    // 0x17d6e0
+    // 0x17bb30
     // #define EZPI_USE_CJSON_MACRO
 
 #ifndef EZPI_USE_CJSON_MACRO
@@ -67,16 +69,18 @@ extern "C"
     void EZPI_core_cjson_get_value_double(cJSON *cj_root, char *item_name_str, double *item_val);
     void EZPI_core_cjson_get_value_uint16(cJSON *cj_root, char *item_name_str, uint16_t *item_val);
     void EZPI_core_cjson_get_value_uint32(cJSON *cj_root, char *item_name_str, uint32_t *item_val);
+    void EZPI_core_cjson_get_value_string_by_copy(cJSON *cj_root, char *item_name_str, char *item_val, uint32_t item_val_len);
 
 #define CJSON_TRACE(name_str, cj_object) EZPI_core_cjson_trace(name_str, cj_object)
 
 #define CJSON_GET_VALUE_INT(cj_root, item_name_str, item_val) EZPI_core_cjson_get_value_int(cj_root, item_name_str, &item_val)
 #define CJSON_GET_VALUE_BOOL(cj_root, item_name_str, item_val) EZPI_core_cjson_get_value_bool(cj_root, item_name_str, &item_val)
+#define CJSON_GET_VALUE_FLOAT(cj_root, item_name_str, item_val) EZPI_core_cjson_get_value_float(cj_root, item_name_str, &item_val)
 #define CJSON_GET_VALUE_UINT8(cj_root, item_name_str, item_val) EZPI_core_cjson_get_value_uint8(cj_root, item_name_str, &item_val)
 #define CJSON_GET_VALUE_DOUBLE(cj_root, item_name_str, item_val) EZPI_core_cjson_get_value_double(cj_root, item_name_str, &item_val)
 #define CJSON_GET_VALUE_UINT16(cj_root, item_name_str, item_val) EZPI_core_cjson_get_value_uint16(cj_root, item_name_str, &item_val)
 #define CJSON_GET_VALUE_UINT32(cj_root, item_name_str, item_val) EZPI_core_cjson_get_value_uint32(cj_root, item_name_str, &item_val)
-#define CJSON_GET_VALUE_FLOAT(cj_root, item_name_str, item_val) EZPI_core_cjson_get_value_float(cj_root, item_name_str, &item_val)
+#define CJSON_GET_VALUE_STRING_BY_COPY(cj_root, item_name_str, item_val) EZPI_core_cjson_get_value_string_by_copy(cj_root, item_name_str, item_val, sizeof(item_val))
 
 #else // EZPI_USE_CJSON_MACRO
 #define CJSON_GET_VALUE_DOUBLE(root, item_name, item_val)                   \
@@ -131,8 +135,6 @@ extern "C"
         }                                                                                   \
     }
 
-#endif // EZPI_USE_CJSON_MACRO
-
 #define CJSON_GET_VALUE_STRING_BY_COPY(root, item_name, item_val)                                     \
     {                                                                                                 \
         cJSON *o_item = cJSON_GetObjectItem(__FUNCTION__, root, item_name);                           \
@@ -141,6 +143,7 @@ extern "C"
             snprintf(item_val, sizeof(item_val), "%.*s", o_item->str_value_len, o_item->valuestring); \
         }                                                                                             \
     }
+#endif // EZPI_USE_CJSON_MACRO
 
 #define CJSON_GET_VALUE_STRING_BY_COPY_INTO_PTR(root, item_name, item_val_ptr)                                       \
     {                                                                                                                \
@@ -217,6 +220,12 @@ extern "C"
             TRACE_E("%s not found!", item_name);                            \
         }                                                                   \
     }
+
+#define CJSON_GET_VALUE_INT CJSON_GET_VALUE_DOUBLE
+#define CJSON_GET_VALUE_FLOAT CJSON_GET_VALUE_DOUBLE
+#define CJSON_GET_VALUE_UINT8 CJSON_GET_VALUE_DOUBLE
+#define CJSON_GET_VALUE_UINT16 CJSON_GET_VALUE_DOUBLE
+#define CJSON_GET_VALUE_UINT32 CJSON_GET_VALUE_DOUBLE
 
     /*******************************************************************************
      *                          Extern Data Declarations
