@@ -46,8 +46,6 @@
 #include "ezlopi_core_factory_info.h"
 #include "ezlopi_core_offline_login.h"
 
-#define BYPASS_LOGIN 1
-
 /*******************************************************************************
  *                          Extern Data Declarations
  *******************************************************************************/
@@ -85,9 +83,6 @@ ezlopi_error_t EZPI_core_offline_login_perform(cJSON *cj_params)
     }
     else
     {
-#if (1 == BYPASS_LOGIN)
-        logged_in = true;
-#else  // BYPASS_LOGIN == 0
         cJSON *cj_user = cJSON_GetObjectItem(__FUNCTION__, cj_params, "user");
         cJSON *cj_token = cJSON_GetObjectItem(__FUNCTION__, cj_params, "token");
         if (cj_user && cj_token && (cJSON_IsString(cj_user)) && (cJSON_IsString(cj_token)))
@@ -128,7 +123,6 @@ ezlopi_error_t EZPI_core_offline_login_perform(cJSON *cj_params)
         {
             error = EZPI_ERR_WRONG_PARAM;
         }
-#endif // BYPASS_LOGIN == 0
     }
 
     return error;
