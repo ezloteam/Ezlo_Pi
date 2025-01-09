@@ -351,8 +351,8 @@ void ezlopi_wifi_try_connect_task(void *params)
         {
             char ssid[32];
             char pass[32];
-            CJSON_GET_VALUE_STRING_BY_COPY(cj_network, ezlopi_ssid_str, ssid);
-            CJSON_GET_VALUE_STRING_BY_COPY(cj_network, ezlopi_key_str, pass);
+            CJSON_GET_VALUE_STRING_BY_COPY(cj_network, ezlopi_ssid_str, ssid, sizeof(ssid));
+            CJSON_GET_VALUE_STRING_BY_COPY(cj_network, ezlopi_key_str, pass, sizeof(pass));
             if (('\0' != ssid[0]) && ('\0' != pass))
             {
                 TRACE_D("Trying to connect to %s with password %s", ssid, pass);

@@ -680,7 +680,7 @@ static int __setting_set_pre_defined_setting(void *arg, l_ezlopi_device_settings
         s_hilink_predefined_setting_value_t *setting_value = (s_hilink_predefined_setting_value_t *)setting->user_arg;
         if (setting_value)
         {
-            CJSON_GET_VALUE_STRING_BY_COPY(cj_properties, ezlopi_value_str, setting_value->setting_value);
+            CJSON_GET_VALUE_STRING_BY_COPY(cj_properties, ezlopi_value_str, setting_value->setting_value, sizeof(setting_value->setting_value));
             if (EZPI_SUCCESS != EZPI_core_nvs_write_str(setting_value->setting_value, strlen(setting_value->setting_value), "predef"))
             {
                 TRACE_E("Failed to write to NVS");

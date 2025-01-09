@@ -190,7 +190,7 @@ void EZPI_network_wifi_try_connect(cJSON *cj_request, cJSON *cj_response)
     if (cj_params)
     {
         char interfaceId[16];
-        CJSON_GET_VALUE_STRING_BY_COPY(cj_params, ezlopi_interfaceId_str, interfaceId);
+        CJSON_GET_VALUE_STRING_BY_COPY(cj_params, ezlopi_interfaceId_str, interfaceId, sizeof(interfaceId));
         if (0 == strncmp(ezlopi_wlan0_str, interfaceId, 6))
         {
             cJSON *cj_network = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_network_str);

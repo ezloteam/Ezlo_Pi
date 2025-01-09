@@ -378,11 +378,11 @@ static int ezpi_service_uart_set_uart_config(const cJSON *root)
     bool flag_new_config = false;
 
     CJSON_GET_VALUE_UINT32(root, ezlopi_baud_str, baud);
-    CJSON_GET_VALUE_STRING_BY_COPY(root, ezlopi_parity_str, parity);
+    CJSON_GET_VALUE_STRING_BY_COPY(root, ezlopi_parity_str, parity, sizeof(parity));
     CJSON_GET_VALUE_UINT32(root, ezlopi_start_bits_str, start_bits);
     CJSON_GET_VALUE_UINT32(root, ezlopi_stop_bits_str, stop_bits);
     CJSON_GET_VALUE_UINT32(root, ezlopi_frame_size_str, frame_size);
-    CJSON_GET_VALUE_STRING_BY_COPY(root, ezlopi_flow_control_str, flow_control);
+    CJSON_GET_VALUE_STRING_BY_COPY(root, ezlopi_flow_control_str, flow_control, sizeof(flow_control));
 
     EZPI_core_nvs_read_baud(&baud_current);
     EZPI_core_nvs_read_parity(&parity_val_current);
@@ -554,17 +554,17 @@ static ezlopi_error_t ezpi_service_uart_process_provisioning_api(const cJSON *ro
                 CJSON_GET_VALUE_DOUBLE(cj_data, ezlopi_serial_str, ezlopi_config_basic->id); // id => OK
                 CJSON_GET_VALUE_UINT16(cj_data, ezlopi_version_str, ezlopi_config_basic->config_version);
 
-                CJSON_GET_VALUE_STRING_BY_COPY(cj_data, ezlopi_device_name_str, device_name);
-                CJSON_GET_VALUE_STRING_BY_COPY(cj_data, ezlopi_manufacturer_name_str, manufacturer);
-                CJSON_GET_VALUE_STRING_BY_COPY(cj_data, ezlopi_brand_str, brand);
-                CJSON_GET_VALUE_STRING_BY_COPY(cj_data, ezlopi_model_number_str, model_number);
-                CJSON_GET_VALUE_STRING_BY_COPY(cj_data, ezlopi_uuid_str, device_uuid);
-                CJSON_GET_VALUE_STRING_BY_COPY(cj_data, ezlopi_mac_str, device_mac);
-                CJSON_GET_VALUE_STRING_BY_COPY(cj_data, "provisioning_uuid", prov_uuid);
-                CJSON_GET_VALUE_STRING_BY_COPY(cj_data, ezlopi_provision_server_str, provision_server);
-                CJSON_GET_VALUE_STRING_BY_COPY(cj_data, ezlopi_cloud_server_str, cloud_server);
-                CJSON_GET_VALUE_STRING_BY_COPY(cj_data, ezlopi_provision_token_str, provision_token);
-                CJSON_GET_VALUE_STRING_BY_COPY(cj_data, "local_key", local_key);
+                CJSON_GET_VALUE_STRING_BY_COPY(cj_data, ezlopi_device_name_str, device_name, sizeof(device_name));
+                CJSON_GET_VALUE_STRING_BY_COPY(cj_data, ezlopi_manufacturer_name_str, manufacturer, sizeof(manufacturer));
+                CJSON_GET_VALUE_STRING_BY_COPY(cj_data, ezlopi_brand_str, brand, sizeof(brand));
+                CJSON_GET_VALUE_STRING_BY_COPY(cj_data, ezlopi_model_number_str, model_number, sizeof(model_number));
+                CJSON_GET_VALUE_STRING_BY_COPY(cj_data, ezlopi_uuid_str, device_uuid, sizeof(device_uuid));
+                CJSON_GET_VALUE_STRING_BY_COPY(cj_data, ezlopi_mac_str, device_mac, sizeof(device_mac));
+                CJSON_GET_VALUE_STRING_BY_COPY(cj_data, "provisioning_uuid", prov_uuid, sizeof(prov_uuid));
+                CJSON_GET_VALUE_STRING_BY_COPY(cj_data, ezlopi_provision_server_str, provision_server, sizeof(provision_server));
+                CJSON_GET_VALUE_STRING_BY_COPY(cj_data, ezlopi_cloud_server_str, cloud_server, sizeof(cloud_server));
+                CJSON_GET_VALUE_STRING_BY_COPY(cj_data, ezlopi_provision_token_str, provision_token, sizeof(provision_token));
+                CJSON_GET_VALUE_STRING_BY_COPY(cj_data, "local_key", local_key, sizeof(local_key));
 
                 ezlopi_config_basic->device_name = device_name;
                 ezlopi_config_basic->manufacturer = manufacturer;

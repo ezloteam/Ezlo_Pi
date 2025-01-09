@@ -108,7 +108,7 @@ void EZPI_CLOUD_location_set(cJSON *cj_request, cJSON *cj_response)
     {
         char location_str[128];
         memset(location_str, 0, sizeof(location_str));
-        CJSON_GET_VALUE_STRING_BY_COPY(cj_params, ezlopi_location_str, location_str);
+        CJSON_GET_VALUE_STRING_BY_COPY(cj_params, ezlopi_location_str, location_str, sizeof(location_str));
 
         if ('\0' != location_str[0])
         {

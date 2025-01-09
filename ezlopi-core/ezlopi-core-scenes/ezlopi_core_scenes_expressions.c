@@ -1243,7 +1243,7 @@ static s_exp_items_t *__expressions_items_create(cJSON *cj_item)
         if (new_item_node)
         {
             memset(new_item_node, 0, sizeof(s_exp_items_t));
-            CJSON_GET_VALUE_STRING_BY_COPY(cj_item, ezlopi_name_str, new_item_node->name);
+            CJSON_GET_VALUE_STRING_BY_COPY(cj_item, ezlopi_name_str, new_item_node->name, sizeof(new_item_node->name));
             CJSON_GET_ID(new_item_node->_id, cJSON_GetObjectItem(__FUNCTION__, cj_item, ezlopi__id_str));
         }
         else
@@ -1265,9 +1265,9 @@ static s_exp_device_item_names_t *__expressions_device_item_names_create(cJSON *
         if (new_device_item_name)
         {
             memset(new_device_item_name, 0, sizeof(s_exp_device_item_names_t));
-            CJSON_GET_VALUE_STRING_BY_COPY(cj_device_item_name, ezlopi_name_str, new_device_item_name->name);
-            CJSON_GET_VALUE_STRING_BY_COPY(cj_device_item_name, ezlopi_deviceName_str, new_device_item_name->device_name);
-            CJSON_GET_VALUE_STRING_BY_COPY(cj_device_item_name, ezlopi_itemName_str, new_device_item_name->item_name);
+            CJSON_GET_VALUE_STRING_BY_COPY(cj_device_item_name, ezlopi_name_str, new_device_item_name->name, sizeof(new_device_item_name->name));
+            CJSON_GET_VALUE_STRING_BY_COPY(cj_device_item_name, ezlopi_deviceName_str, new_device_item_name->device_name, sizeof(new_device_item_name->device_name));
+            CJSON_GET_VALUE_STRING_BY_COPY(cj_device_item_name, ezlopi_itemName_str, new_device_item_name->item_name, sizeof(new_device_item_name->item_name));
         }
     }
 
@@ -1282,7 +1282,7 @@ static s_ezlopi_expressions_t *__expressions_create_node(uint32_t exp_id, cJSON 
     {
         memset(new_exp_node, 0, sizeof(s_ezlopi_expressions_t));
 
-        CJSON_GET_VALUE_STRING_BY_COPY(cj_expression, ezlopi_name_str, new_exp_node->name);
+        CJSON_GET_VALUE_STRING_BY_COPY(cj_expression, ezlopi_name_str, new_exp_node->name, sizeof(new_exp_node->name));
 
         cJSON *cj_code = cJSON_GetObjectItem(__FUNCTION__, cj_expression, ezlopi_code_str);
         if (cj_code && cj_code->valuestring && cj_code->str_value_len)

@@ -585,12 +585,12 @@ static int __provision_update(char *arg)
             char tmp_cloud_server[128];
             char tmp_provision_token[300];
 
-            CJSON_GET_VALUE_STRING_BY_COPY(cj_root_data, ezlopi_id_str, tmp_id_str);
-            CJSON_GET_VALUE_STRING_BY_COPY(cj_root_data, ezlopi_uuid_str, tmp_dev_uuid);
-            CJSON_GET_VALUE_STRING_BY_COPY(cj_root_data, ezlopi_cloud_uuid_str, tmp_prov_uuid);
+            CJSON_GET_VALUE_STRING_BY_COPY(cj_root_data, ezlopi_id_str, tmp_id_str, sizeof(tmp_id_str));
+            CJSON_GET_VALUE_STRING_BY_COPY(cj_root_data, ezlopi_uuid_str, tmp_dev_uuid, sizeof(tmp_dev_uuid));
+            CJSON_GET_VALUE_STRING_BY_COPY(cj_root_data, ezlopi_cloud_uuid_str, tmp_prov_uuid, sizeof(tmp_prov_uuid));
             CJSON_GET_VALUE_UINT16(cj_root_data, ezlopi_version_str, config_check_factoryInfo.config_version);
-            CJSON_GET_VALUE_STRING_BY_COPY(cj_root_data, ezlopi_coordinator_url_str, tmp_cloud_server);
-            CJSON_GET_VALUE_STRING_BY_COPY(cj_root_data, ezlopi_provision_token_str, tmp_provision_token);
+            CJSON_GET_VALUE_STRING_BY_COPY(cj_root_data, ezlopi_coordinator_url_str, tmp_cloud_server, sizeof(tmp_cloud_server));
+            CJSON_GET_VALUE_STRING_BY_COPY(cj_root_data, ezlopi_provision_token_str, tmp_provision_token, sizeof(tmp_provision_token));
 
             config_check_factoryInfo.id = strtoul(tmp_id_str, NULL, 10);
             config_check_factoryInfo.device_uuid = tmp_dev_uuid;

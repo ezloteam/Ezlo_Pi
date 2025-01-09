@@ -165,7 +165,7 @@ static void __edit_scene(l_scenes_list_v2_t *scene_node, cJSON *cj_scene)
 
     {
         char tmp_grp_id[32] = {0};
-        CJSON_GET_VALUE_STRING_BY_COPY(cj_scene, ezlopi_group_id_str, tmp_grp_id);
+        CJSON_GET_VALUE_STRING_BY_COPY(cj_scene, ezlopi_group_id_str, tmp_grp_id, sizeof(tmp_grp_id));
         if (0 < strlen(tmp_grp_id))
         {
             scene_node->group_id = (uint32_t)strtoul(tmp_grp_id, NULL, 16);
@@ -174,8 +174,8 @@ static void __edit_scene(l_scenes_list_v2_t *scene_node, cJSON *cj_scene)
         }
     }
 
-    CJSON_GET_VALUE_STRING_BY_COPY(cj_scene, ezlopi_name_str, scene_node->name);
-    CJSON_GET_VALUE_STRING_BY_COPY(cj_scene, ezlopi_parent_id_str, scene_node->parent_id);
+    CJSON_GET_VALUE_STRING_BY_COPY(cj_scene, ezlopi_name_str, scene_node->name, sizeof(scene_node->name));
+    CJSON_GET_VALUE_STRING_BY_COPY(cj_scene, ezlopi_parent_id_str, scene_node->parent_id, sizeof(scene_node->parent_id));
 
     {
         cJSON *cj_meta = cJSON_GetObjectItem(__FUNCTION__, cj_scene, ezlopi_meta_str);

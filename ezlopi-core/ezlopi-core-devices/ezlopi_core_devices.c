@@ -343,7 +343,7 @@ l_ezlopi_device_t *EZPI_core_device_add_device(cJSON *cj_device, const char *las
         // 2. Add default Values
         {
             // A. Populate Device_name
-            CJSON_GET_VALUE_STRING_BY_COPY(cj_device, ezlopi_dev_name_str, tmp_device_name);
+            CJSON_GET_VALUE_STRING_BY_COPY(cj_device, ezlopi_dev_name_str, tmp_device_name, sizeof(tmp_device_name));
             if (NULL != last_name)
             {
                 snprintf(new_device->cloud_properties.device_name, sizeof(new_device->cloud_properties.device_name), "%s_%s", tmp_device_name, last_name);

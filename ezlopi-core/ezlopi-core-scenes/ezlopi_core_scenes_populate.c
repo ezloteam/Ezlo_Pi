@@ -91,7 +91,7 @@ void EZPI_scenes_populate_scene(l_scenes_list_v2_t *new_scene, cJSON *cj_scene, 
 
         {
             char tmp_grp_id[32] = {0};
-            CJSON_GET_VALUE_STRING_BY_COPY(cj_scene, ezlopi_group_id_str, tmp_grp_id);
+            CJSON_GET_VALUE_STRING_BY_COPY(cj_scene, ezlopi_group_id_str, tmp_grp_id, sizeof(tmp_grp_id));
             if (0 < strlen(tmp_grp_id))
             {
                 new_scene->group_id = (uint32_t)strtoul(tmp_grp_id, NULL, 16);
@@ -100,8 +100,8 @@ void EZPI_scenes_populate_scene(l_scenes_list_v2_t *new_scene, cJSON *cj_scene, 
             }
         }
 
-        CJSON_GET_VALUE_STRING_BY_COPY(cj_scene, ezlopi_name_str, new_scene->name);
-        CJSON_GET_VALUE_STRING_BY_COPY(cj_scene, ezlopi_parent_id_str, new_scene->parent_id);
+        CJSON_GET_VALUE_STRING_BY_COPY(cj_scene, ezlopi_name_str, new_scene->name, sizeof(new_scene->name));
+        CJSON_GET_VALUE_STRING_BY_COPY(cj_scene, ezlopi_parent_id_str, new_scene->parent_id, sizeof(new_scene->parent_id));
 
         {
             cJSON *cj_meta = cJSON_GetObjectItem(__FUNCTION__, cj_scene, ezlopi_meta_str);
@@ -371,14 +371,14 @@ void EZPI_scenes_populate_assign_when_block(l_when_block_v2_t *new_when_block, c
             if (new_when_block->when_grp)
             {
                 memset(new_when_block->when_grp, 0, sizeof(l_group_block_type_t));
-                CJSON_GET_VALUE_STRING_BY_COPY(cj_when_block, ezlopi_blockName_str, new_when_block->when_grp->grp_blockName);
+                CJSON_GET_VALUE_STRING_BY_COPY(cj_when_block, ezlopi_blockName_str, new_when_block->when_grp->grp_blockName, sizeof(new_when_block->when_grp->grp_blockName));
                 if (0 < strlen(new_when_block->when_grp->grp_blockName))
                 {
                     TRACE_D("group_blockName (edit): %s ", new_when_block->when_grp->grp_blockName);
                 }
 
                 char grp_id_str[32] = {0};
-                CJSON_GET_VALUE_STRING_BY_COPY(cj_when_block, ezlopi_group_id_str, grp_id_str);
+                CJSON_GET_VALUE_STRING_BY_COPY(cj_when_block, ezlopi_group_id_str, grp_id_str, sizeof(grp_id_str));
                 if (0 < strlen(grp_id_str))
                 {
                     new_when_block->when_grp->grp_id = (uint32_t)strtoul(grp_id_str, NULL, 16);
@@ -389,7 +389,7 @@ void EZPI_scenes_populate_assign_when_block(l_when_block_v2_t *new_when_block, c
 
         {
             char tmp_block_id[32] = {0};
-            CJSON_GET_VALUE_STRING_BY_COPY(cj_when_block, ezlopi_blockId_str, tmp_block_id);
+            CJSON_GET_VALUE_STRING_BY_COPY(cj_when_block, ezlopi_blockId_str, tmp_block_id, sizeof(tmp_block_id));
             if (0 < strlen(tmp_block_id))
             {
                 new_when_block->blockId = (uint32_t)strtoul(tmp_block_id, NULL, 16);
@@ -440,7 +440,7 @@ void EZPI_scenes_populate_assign_block_options(s_block_options_v2_t *p_block_opt
 
 void EZPI_scenes_populate_assign_method(s_method_v2_t *p_method, cJSON *cj_method)
 {
-    CJSON_GET_VALUE_STRING_BY_COPY(cj_method, ezlopi_name_str, p_method->name);
+    CJSON_GET_VALUE_STRING_BY_COPY(cj_method, ezlopi_name_str, p_method->name, sizeof(p_method->name));
     p_method->type = EZPI_scenes_method_get_type_enum(p_method->name);
 }
 
@@ -633,7 +633,7 @@ void EZPI_scenes_populate_assign_field(l_fields_v2_t *new_field, cJSON *cj_field
 {
     if (cj_field && new_field)
     {
-        CJSON_GET_VALUE_STRING_BY_COPY(cj_field, ezlopi_name_str, new_field->name);
+        CJSON_GET_VALUE_STRING_BY_COPY(cj_field, ezlopi_name_str, new_field->name, sizeof(new_field->name));
         new_field->value_type = EZPI_core_scenes_value_get_type(cj_field, ezlopi_type_str);
         EZPI_scenes_populate_fields_get_value(new_field, cJSON_GetObjectItem(__FUNCTION__, cj_field, ezlopi_value_str));
     }

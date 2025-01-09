@@ -57,7 +57,11 @@ extern "C"
      *******************************************************************************/
 
     // 0x17d6e0
+    // 0x17c2b0
+    // 0x17bc70
     // 0x17bb30
+    // 0x17bb20
+
     // #define EZPI_USE_CJSON_MACRO
 
 #ifndef EZPI_USE_CJSON_MACRO
@@ -80,7 +84,7 @@ extern "C"
 #define CJSON_GET_VALUE_DOUBLE(cj_root, item_name_str, item_val) EZPI_core_cjson_get_value_double(cj_root, item_name_str, &item_val)
 #define CJSON_GET_VALUE_UINT16(cj_root, item_name_str, item_val) EZPI_core_cjson_get_value_uint16(cj_root, item_name_str, &item_val)
 #define CJSON_GET_VALUE_UINT32(cj_root, item_name_str, item_val) EZPI_core_cjson_get_value_uint32(cj_root, item_name_str, &item_val)
-#define CJSON_GET_VALUE_STRING_BY_COPY(cj_root, item_name_str, item_val) EZPI_core_cjson_get_value_string_by_copy(cj_root, item_name_str, item_val, sizeof(item_val))
+#define CJSON_GET_VALUE_STRING_BY_COPY(cj_root, item_name_str, item_val, item_val_size) EZPI_core_cjson_get_value_string_by_copy(cj_root, item_name_str, item_val, item_val_size)
 
 #else // EZPI_USE_CJSON_MACRO
 #define CJSON_GET_VALUE_DOUBLE(root, item_name, item_val)                   \
@@ -143,6 +147,13 @@ extern "C"
             snprintf(item_val, sizeof(item_val), "%.*s", o_item->str_value_len, o_item->valuestring); \
         }                                                                                             \
     }
+
+#define CJSON_GET_VALUE_INT CJSON_GET_VALUE_DOUBLE
+#define CJSON_GET_VALUE_FLOAT CJSON_GET_VALUE_DOUBLE
+#define CJSON_GET_VALUE_UINT8 CJSON_GET_VALUE_DOUBLE
+#define CJSON_GET_VALUE_UINT16 CJSON_GET_VALUE_DOUBLE
+#define CJSON_GET_VALUE_UINT32 CJSON_GET_VALUE_DOUBLE
+
 #endif // EZPI_USE_CJSON_MACRO
 
 #define CJSON_GET_VALUE_STRING_BY_COPY_INTO_PTR(root, item_name, item_val_ptr)                                       \
@@ -220,12 +231,6 @@ extern "C"
             TRACE_E("%s not found!", item_name);                            \
         }                                                                   \
     }
-
-#define CJSON_GET_VALUE_INT CJSON_GET_VALUE_DOUBLE
-#define CJSON_GET_VALUE_FLOAT CJSON_GET_VALUE_DOUBLE
-#define CJSON_GET_VALUE_UINT8 CJSON_GET_VALUE_DOUBLE
-#define CJSON_GET_VALUE_UINT16 CJSON_GET_VALUE_DOUBLE
-#define CJSON_GET_VALUE_UINT32 CJSON_GET_VALUE_DOUBLE
 
     /*******************************************************************************
      *                          Extern Data Declarations

@@ -503,11 +503,11 @@ static void ezpi_service_ble_serial_config_write(esp_gatt_value_t *value, esp_bl
                 bool flag_new_config = false;
 
                 CJSON_GET_VALUE_UINT32(root, ezlopi_baud_str, baud);
-                CJSON_GET_VALUE_STRING_BY_COPY(root, ezlopi_parity_str, str_parity);
+                CJSON_GET_VALUE_STRING_BY_COPY(root, ezlopi_parity_str, str_parity, sizeof(str_parity));
                 CJSON_GET_VALUE_UINT32(root, ezlopi_start_bits_str, start_bits);
                 CJSON_GET_VALUE_UINT32(root, ezlopi_stop_bits_str, stop_bits);
                 CJSON_GET_VALUE_UINT32(root, ezlopi_frame_size_str, frame_size);
-                CJSON_GET_VALUE_STRING_BY_COPY(root, ezlopi_flow_control_str, str_flowcontrol);
+                CJSON_GET_VALUE_STRING_BY_COPY(root, ezlopi_flow_control_str, str_flowcontrol, sizeof(str_flowcontrol));
 
                 EZPI_core_nvs_read_baud(&baud_current);
                 EZPI_core_nvs_read_parity(&parity_val_current);

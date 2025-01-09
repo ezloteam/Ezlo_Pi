@@ -96,12 +96,16 @@ void EZPI_core_cjson_trace(char *name_str, cJSON *cj_object)
     }
 }
 
+// void EZPI_core_cjson_get_value_string_by_copy(cJSON *cj_root, char *item_name_str, char *item_val, uint32_t item_val_len)
 void EZPI_core_cjson_get_value_string_by_copy(cJSON *cj_root, char *item_name_str, char *item_val, uint32_t item_val_len)
 {
-    cJSON *o_item = cJSON_GetObjectItem(__FUNCTION__, cj_root, item_name_str);
-    if (o_item && o_item->valuestring && o_item->str_value_len)
+    if (cj_root && item_name_str && item_val && item_val_len)
     {
-        snprintf(item_val, item_val_len, "%.*s", o_item->str_value_len, o_item->valuestring);
+        cJSON *o_item = cJSON_GetObjectItem(__FUNCTION__, cj_root, item_name_str);
+        if (o_item && o_item->valuestring && o_item->str_value_len)
+        {
+            snprintf(item_val, item_val_len, "%.*s", o_item->str_value_len, o_item->valuestring);
+        }
     }
 }
 
