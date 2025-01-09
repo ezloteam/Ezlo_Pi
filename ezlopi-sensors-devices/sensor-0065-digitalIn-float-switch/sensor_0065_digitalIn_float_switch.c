@@ -133,6 +133,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
     device->cloud_properties.info = NULL;
     device->cloud_properties.device_type_id = NULL;
 }
+
 static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device)
 {
     item->cloud_properties.show = true;
@@ -153,6 +154,7 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_dev
     item->interface.gpio.gpio_in.pull = GPIO_PULLDOWN_ONLY;
     item->interface.gpio.gpio_in.interrupt = GPIO_INTR_ANYEDGE;
 }
+
 static ezlopi_error_t __0065_prepare(void *arg)
 {
     ezlopi_error_t ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
@@ -213,6 +215,7 @@ static ezlopi_error_t __0065_init(l_ezlopi_item_t *item)
     }
     return ret;
 }
+
 static ezlopi_error_t __0065_get_item(l_ezlopi_item_t *item, void *arg)
 {
     ezlopi_error_t ret = EZPI_FAILED;
@@ -243,8 +246,8 @@ static ezlopi_error_t __0065_get_item(l_ezlopi_item_t *item, void *arg)
             }
             //--------------------------------------------------------------------------------------
 
-            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, (char *)item->user_arg ? item->user_arg :  "water_level_ok");
-            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, (char *)item->user_arg ? item->user_arg :  "water_level_ok");
+            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, (char *)item->user_arg ? item->user_arg : "water_level_ok");
+            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, (char *)item->user_arg ? item->user_arg : "water_level_ok");
             ret = EZPI_SUCCESS;
         }
     }
@@ -259,15 +262,14 @@ static ezlopi_error_t __0065_get_cjson_value(l_ezlopi_item_t *item, void *arg)
         cJSON *cj_result = (cJSON *)arg;
         if (cj_result)
         {
-            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, (char *)item->user_arg ? item->user_arg :  "water_level_ok");
-            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, (char *)item->user_arg ? item->user_arg :  "water_level_ok");
+            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, (char *)item->user_arg ? item->user_arg : "water_level_ok");
+            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, (char *)item->user_arg ? item->user_arg : "water_level_ok");
             ret = EZPI_SUCCESS;
         }
     }
     return ret;
 }
 
-//------------------------------------------------------------------------------------------------------------
 static void __0065_update_from_device(void *arg)
 {
     l_ezlopi_item_t *item = (l_ezlopi_item_t *)arg;
@@ -278,7 +280,7 @@ static void __0065_update_from_device(void *arg)
         item->interface.gpio.gpio_in.value = (false == item->interface.gpio.gpio_in.invert) ? (item->interface.gpio.gpio_in.value) : (!item->interface.gpio.gpio_in.value);
         if (0 == (item->interface.gpio.gpio_in.value)) // when D0 -> 0V,
         {
-            curret_value =  "water_level_ok";
+            curret_value = "water_level_ok";
         }
         else
         {

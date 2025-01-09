@@ -34,29 +34,29 @@
  * @author  xx
  * @version 0.1
  * @date    xx
-*/
+ */
 
 #ifndef _SENSOR_0056_ADC_FORCE_SENSITIVE_RESISTOR_H_
 #define _SENSOR_0056_ADC_FORCE_SENSITIVE_RESISTOR_H_
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include "ezlopi_core_actions.h"
 #include "ezlopi_core_devices.h"
 #include "ezlopi_core_errors.h"
 
 /*******************************************************************************
-*                          C++ Declaration Wrapper
-*******************************************************************************/
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
     /*******************************************************************************
-    *                          Type & Macro Declarations
-    *******************************************************************************/
+     *                          Type & Macro Declarations
+     *******************************************************************************/
     /**
      *  NOTE : 1) FSR - works with [3.3V]. {Don't use 5V. The pins are only 3.3V tolerant}
      *         2) Force accuracy ranges from approximately ± 5% to ± 25% depending on the consistency of the measurement and actuation system.
@@ -136,7 +136,7 @@ extern "C"
      *
      **/
 
-     // measure the resistor value using multimeter
+    // measure the resistor value using multimeter
 #define FSR_Rout 10000.0f // Rout = 10000.0 Ohm
 #define FSR_Vin 3.3f      // Vin = 3.3V  {Don't use 5V. The pins are only 3.3V tolerant}
 #define m_slope_FSR -0.7703f
@@ -150,23 +150,22 @@ extern "C"
     } fsr_t;
 
     /*******************************************************************************
-    *                          Extern Data Declarations
-    *******************************************************************************/
+     *                          Extern Data Declarations
+     *******************************************************************************/
 
     /*******************************************************************************
-    *                          Extern Function Prototypes
-    *******************************************************************************/
+     *                          Extern Function Prototypes
+     *******************************************************************************/
     /**
-    * @brief Function to operate on actions
-    *
-    * @param action Current Action to Operate on
-    * @param item Target-Item node
-    * @param arg Arg for action
-    * @param user_arg User-arg
-    * @return ezlopi_error_t
-    */
+     * @brief Function to operate on actions
+     *
+     * @param action Current Action to Operate on
+     * @param item Target-Item node
+     * @param arg Arg for action
+     * @param user_arg User-arg
+     * @return ezlopi_error_t
+     */
     ezlopi_error_t SENSOR_0056_adc_force_sensitive_resistor(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
-
 
 #ifdef __cplusplus
 }
@@ -175,5 +174,5 @@ extern "C"
 #endif //_SENSOR_0056_ADC_FORCE_SENSITIVE_RESISTOR_H_
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

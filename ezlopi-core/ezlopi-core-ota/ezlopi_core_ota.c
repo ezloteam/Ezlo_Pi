@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    ezlopi_core_ota.c
-* @brief   Function to perform ota operation
-* @author  xx
-* @version 0.1
-* @date    12th DEC 2024
-*/
+ * @file    ezlopi_core_ota.c
+ * @brief   Function to perform ota operation
+ * @author  xx
+ * @version 0.1
+ * @date    12th DEC 2024
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_ENABLE_OTA
@@ -66,27 +66,17 @@
 #include "EZLOPI_USER_CONFIG.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 #define HASH_LEN 32
-
-#ifdef CONFIG_FIRMWARE_UPGRADE_BIND_IF
-/* The interface name value can refer to if_desc in esp_netif_defaults.h */
-#if CONFIG_FIRMWARE_UPGRADE_BIND_IF_ETH
-static const char *bind_interface_name = "eth";
-#elif CONFIG_FIRMWARE_UPGRADE_BIND_IF_STA
-static const char *bind_interface_name = "sta";
-#endif
-#endif
-
 #define OTA_URL_SIZE 512
 
 typedef enum e_ezlopi_ota_state
@@ -98,12 +88,12 @@ typedef enum e_ezlopi_ota_state
     EZLOPI_OTA_STATE_MAX,
 } e_ezlopi_ota_state_t;
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 static int32_t __byte_count = 0;
 static volatile uint32_t __ota_in_process = 0;
 
@@ -111,12 +101,12 @@ static void ezlopi_ota_process(void *pv);
 static esp_err_t _http_event_handler(esp_http_client_event_t *evt);
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 
 uint32_t EPZI_core_ota_get_state(void)
 {
@@ -149,6 +139,9 @@ void EZPI_core_ota_start(cJSON *url)
     }
 }
 
+/*******************************************************************************
+ *                          Static Function Definitions
+ *******************************************************************************/
 static void ezlopi_ota_process(void *pv)
 {
     __ota_in_process = EZLOPI_OTA_STATE_STARTED;
@@ -184,7 +177,7 @@ static void ezlopi_ota_process(void *pv)
 
 #ifdef CONFIG_FIRMWARE_UPGRADE_URL_FROM_STDIN
     char url_buf[OTA_URL_SIZE];
-    if (strcmp(config.url, "FROM_STDIN") == 0)
+    if (strncmp(config.url, "FROM_STDIN", ((strlen(config.url) + 1) > 11 ? (strlen(config.url) + 1) : 11)) == 0)
     {
         example_configure_stdin_stdout();
         fgets(url_buf, OTA_URL_SIZE, stdin);
@@ -274,11 +267,11 @@ static esp_err_t _http_event_handler(esp_http_client_event_t *evt)
     return ESP_OK;
 }
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 
 #endif // CONFIG_EZPI_ENABLE_OTA
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

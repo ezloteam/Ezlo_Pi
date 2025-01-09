@@ -604,7 +604,7 @@ static int __setting_set_change_setting_template(ld2410_template_t template, uin
         {
             s_hilink_predefined_setting_value_t *predef_value = (s_hilink_predefined_setting_value_t *)hilink_presence_sensor_predefined_setting->user_arg;
             // If setting change request comes from user defined setting, check if predefined setting mode is set to user defined mode; in this case 9th index in enum str array.
-            if (predef_value && (0 == strcmp(predef_value->setting_value, "user_defined_mode")))
+            if (predef_value && (0 == strncmp(predef_value->setting_value, "user_defined_mode", ((strlen(predef_value->setting_value) + 1) > 18 ? (strlen(predef_value->setting_value) + 1) : 18))))
             {
                 __setting_set_change_user_defined_template(true);
                 EZPI_core_device_value_updated_settings_broadcast(hilink_presence_sensor_predefined_setting);
@@ -621,43 +621,43 @@ static int __setting_set_change_setting_template(ld2410_template_t template, uin
 static int __setting_set_find_predefined_setting_template(s_hilink_predefined_setting_value_t *setting_value, ld2410_template_t *template)
 {
     int ret = 0;
-    if (0 == strcmp(setting_value->setting_value, "sleep_mode_close")) // sleep_mode_close
+    if (0 == strncmp(setting_value->setting_value, "sleep_mode_close", ((strlen(setting_value->setting_value) + 1) > 17 ? (strlen(setting_value->setting_value) + 1) : 17))) // sleep_mode_close
     {
         *template = SLEEP_TEMPLATE_CLOSE_RANGE;
     }
-    else if (0 == strcmp(setting_value->setting_value, "sleep_mode_mid")) // sleep_mode_mid
+    else if (0 == strncmp(setting_value->setting_value, "sleep_mode_mid", ((strlen(setting_value->setting_value) + 1) > 15 ? (strlen(setting_value->setting_value) + 1) : 15))) // sleep_mode_mid
     {
         *template = SLEEP_TEMPLATE_MID_RANGE;
     }
-    else if (0 == strcmp(setting_value->setting_value, "sleep_mode_long")) // sleep_mode_long
+    else if (0 == strncmp(setting_value->setting_value, "sleep_mode_long", ((strlen(setting_value->setting_value) + 1) > 16 ? (strlen(setting_value->setting_value) + 1) : 16))) // sleep_mode_long
     {
         *template = SLEEP_TEMPLATE_LONG_RANGE;
     }
-    else if (0 == strcmp(setting_value->setting_value, "movement_mode_close")) // movement_mode_close
+    else if (0 == strncmp(setting_value->setting_value, "movement_mode_close", ((strlen(setting_value->setting_value) + 1) > 20 ? (strlen(setting_value->setting_value) + 1) : 20))) // movement_mode_close
     {
         *template = MOVEMENT_TEMPLATE_CLOSE_RANGE;
     }
-    else if (0 == strcmp(setting_value->setting_value, "movement_mode_mid")) // movement_mode_mid
+    else if (0 == strncmp(setting_value->setting_value, "movement_mode_mid", ((strlen(setting_value->setting_value) + 1) > 18 ? (strlen(setting_value->setting_value) + 1) : 18))) // movement_mode_mid
     {
         *template = MOVEMENT_TEMPLATE_MID_RANGE;
     }
-    else if (0 == strcmp(setting_value->setting_value, "movement_mode_long")) // movement_mode_long
+    else if (0 == strncmp(setting_value->setting_value, "movement_mode_long", ((strlen(setting_value->setting_value) + 1) > 19 ? (strlen(setting_value->setting_value) + 1) : 19))) // movement_mode_long
     {
         *template = MOVEMENT_TEMPLATE_LONG_RANGE;
     }
-    else if (0 == strcmp(setting_value->setting_value, "basic_routine_mode_close")) // basic_routine_mode_close
+    else if (0 == strncmp(setting_value->setting_value, "basic_routine_mode_close", ((strlen(setting_value->setting_value) + 1) > 25 ? (strlen(setting_value->setting_value) + 1) : 25))) // basic_routine_mode_close
     {
         *template = BASIC_TEMPLATE_CLOSE_RANGE;
     }
-    else if (0 == strcmp(setting_value->setting_value, "basic_routine_mode_mid")) // basic_routine_mode_mid
+    else if (0 == strncmp(setting_value->setting_value, "basic_routine_mode_mid", ((strlen(setting_value->setting_value) + 1) > 23 ? (strlen(setting_value->setting_value) + 1) : 23))) // basic_routine_mode_mid
     {
         *template = BASIC_TEMPLATE_MID_RANGE;
     }
-    else if (0 == strcmp(setting_value->setting_value, "basic_routine_mode_long")) // basic_routine_mode_long
+    else if (0 == strncmp(setting_value->setting_value, "basic_routine_mode_long", ((strlen(setting_value->setting_value) + 1) > 24 ? (strlen(setting_value->setting_value) + 1) : 24))) // basic_routine_mode_long
     {
         *template = BASIC_TEMPLATE_LONG_RANGE;
     }
-    else if (0 == strcmp(setting_value->setting_value, "user_defined_mode")) // user_defined_mode
+    else if (0 == strncmp(setting_value->setting_value, "user_defined_mode", ((strlen(setting_value->setting_value) + 1) > 18 ? (strlen(setting_value->setting_value) + 1) : 18))) // user_defined_mode
     {
         *template = CUSTOM_TEMPLATE;
     }

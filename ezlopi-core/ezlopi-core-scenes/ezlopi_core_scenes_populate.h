@@ -34,7 +34,7 @@
  * @author  xx
  * @version 0.1
  * @date    12th DEC 2024
-*/
+ */
 
 #ifndef _EZLOPI_CORE_SCENES_POPULATE_H_
 #define _EZLOPI_CORE_SCENES_POPULATE_H_
@@ -42,38 +42,38 @@
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 // #include "cjext.h"
 // #include <stdint.h>
 
 #include "ezlopi_core_scenes_v2.h"
 
 /*******************************************************************************
-*                          C++ Declaration Wrapper
-*******************************************************************************/
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
     /*******************************************************************************
-    *                          Type & Macro Declarations
-    *******************************************************************************/
+     *                          Type & Macro Declarations
+     *******************************************************************************/
 
     /*******************************************************************************
-    *                          Extern Data Declarations
-    *******************************************************************************/
+     *                          Extern Data Declarations
+     *******************************************************************************/
 
     /*******************************************************************************
-    *                          Extern Function Prototypes
-    *******************************************************************************/
+     *                          Extern Function Prototypes
+     *******************************************************************************/
     /**
-    * @brief This function populates new field values from 'cj_field'
-    *
-    * @param cj_field source cjson-obj to extract data from.
-    * @return l_fields_v2_t *
-    */
+     * @brief This function populates new field values from 'cj_field'
+     *
+     * @param cj_field source cjson-obj to extract data from.
+     * @return l_fields_v2_t *
+     */
     l_fields_v2_t *EZPI_scenes_populate_fields(cJSON *cj_fields);
     /**
      * @brief This function populates field values from 'cj_field' to 'new_field' struct
@@ -174,17 +174,10 @@ extern "C"
 }
 #endif
 
-#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+#endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 #endif // _EZLOPI_CORE_SCENES_POPULATE_H_
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
-
-
-
-
-
-
-
+ *                          End of File
+ *******************************************************************************/

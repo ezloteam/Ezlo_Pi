@@ -34,16 +34,18 @@
  * @author  xx
  * @version 0.1
  * @date    12th DEC 2024
-*/
+ */
 
 #ifndef _EZLOPI_CORE_DEVICES_H_
 #define _EZLOPI_CORE_DEVICES_H_
 
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
-
+ *                          Include Files
+ *******************************************************************************/
 #include "cjext.h"
 
 #include "ezlopi_core_cloud.h"
@@ -59,18 +61,17 @@
 #include "ezlopi_hal_i2c_master.h"
 #include "ezlopi_hal_spi_master.h"
 
-
 /*******************************************************************************
-*                          C++ Declaration Wrapper
-*******************************************************************************/
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
     /*******************************************************************************
-    *                          Type & Macro Declarations
-    *******************************************************************************/
+     *                          Type & Macro Declarations
+     *******************************************************************************/
     typedef enum e_ezlopi_device_interface_type
     {
         EZLOPI_DEVICE_INTERFACE_NONE = 0,
@@ -111,7 +112,7 @@ extern "C"
 
         void *user_arg;
         bool is_user_arg_unique;
-        ezlopi_error_t(*func)(e_ezlopi_actions_t action, struct l_ezlopi_item *item, void *arg, void *user_arg);
+        ezlopi_error_t (*func)(e_ezlopi_actions_t action, struct l_ezlopi_item *item, void *arg, void *user_arg);
 
         struct l_ezlopi_item *next;
     } l_ezlopi_item_t;
@@ -134,13 +135,12 @@ extern "C"
     } l_ezlopi_device_t;
 
     /*******************************************************************************
-    *                          Extern Data Declarations
-    *******************************************************************************/
+     *                          Extern Data Declarations
+     *******************************************************************************/
 
     /*******************************************************************************
-    *                          Extern Function Prototypes
-    *******************************************************************************/
-
+     *                          Extern Function Prototypes
+     *******************************************************************************/
 
     /**
      * @brief function to prepare the devices
@@ -181,17 +181,17 @@ extern "C"
      * @param settings_id Target setting id
      * @return l_ezlopi_device_settings_v3_t*
      */
-     // l_ezlopi_device_settings_v3_t *EZPI_core_device_settings_get_by_id(uint32_t settings_id);
+    // l_ezlopi_device_settings_v3_t *EZPI_core_device_settings_get_by_id(uint32_t settings_id);
 
-     /**
-      * @brief function to add new-item to device-node
-      *
-      * @param device target device node
-      * @param item_func item-function to trigger
-      * @return l_ezlopi_item_t*
-      */
-      // l_ezlopi_item_t *EZPI_core_device_add_item_to_device(l_ezlopi_device_t *device, ezlopi_error_t(*item_func)(e_ezlopi_actions_t action, struct l_ezlopi_item *item, void *arg, void *user_arg));
-    l_ezlopi_item_t *EZPI_core_device_add_item_to_device(l_ezlopi_device_t *device, ezlopi_error_t(*item_func)(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg));
+    /**
+     * @brief function to add new-item to device-node
+     *
+     * @param device target device node
+     * @param item_func item-function to trigger
+     * @return l_ezlopi_item_t*
+     */
+    // l_ezlopi_item_t *EZPI_core_device_add_item_to_device(l_ezlopi_device_t *device, ezlopi_error_t(*item_func)(e_ezlopi_actions_t action, struct l_ezlopi_item *item, void *arg, void *user_arg));
+    l_ezlopi_item_t *EZPI_core_device_add_item_to_device(l_ezlopi_device_t *device, ezlopi_error_t (*item_func)(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg));
     /**
      * @brief Function to add new-setting to device
      *
@@ -259,7 +259,6 @@ extern "C"
 
 #endif // _EZLOPI_CORE_DEVICES_H_
 
-
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

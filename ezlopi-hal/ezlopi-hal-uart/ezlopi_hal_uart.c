@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    ezlopi_hal_uart.c
-* @brief   perform some function on UART
-* @author  xx
-* @version 0.1
-* @date    xx
-*/
+ * @file    ezlopi_hal_uart.c
+ * @brief   perform some function on UART
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include <string.h>
 
 #include "freertos/FreeRTOS.h"
@@ -58,89 +58,107 @@
 #include "EZLOPI_USER_CONFIG.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static void ezlopi_uart_channel_task(void *args);
 static ezlo_uart_channel_t get_available_channel();
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 
 s_ezlopi_uart_object_handle_t EZPI_hal_uart_init(uint32_t baudrate, uint32_t tx, uint32_t rx, __uart_upcall upcall, void *arg)
 {
     static QueueHandle_t ezlo_uart_channel_queue;
     s_ezlopi_uart_object_handle_t uart_object_handle = (struct s_ezlopi_uart_object *)ezlopi_malloc(__FUNCTION__, sizeof(struct s_ezlopi_uart_object));
-    memset(uart_object_handle, 0, sizeof(struct s_ezlopi_uart_object));
-    uart_object_handle->arg = arg;
-    ezlo_uart_channel_t channel = get_available_channel();
-    if (NULL == upcall)
+    if (uart_object_handle)
     {
-        TRACE_E("NULL upcall found.");
-    }
-    else if (-1 != channel)
-    {
-        uart_config_t uart_config = {
-            .baud_rate = baudrate,
-            .data_bits = UART_DATA_8_BITS,
-            .parity = UART_PARITY_DISABLE,
-            .stop_bits = UART_STOP_BITS_1,
-            .flow_ctrl = UART_HW_FLOWCTRL_DISABLE,
-            .rx_flow_ctrl_thresh = 0,
-            .source_clk = UART_SCLK_APB,
-        };
-
-        if (EZLOPI_UART_CHANNEL_1 == channel)
+        bool uart_init_success = false;
+        memset(uart_object_handle, 0, sizeof(struct s_ezlopi_uart_object));
+        uart_object_handle->arg = arg;
+        ezlo_uart_channel_t channel = get_available_channel();
+        if (NULL == upcall)
         {
-            ESP_ERROR_CHECK(uart_driver_install(channel, 256, 256, 32, &ezlo_uart_channel_queue, 0));
-            uart_object_handle->ezlopi_uart_queue_handle = ezlo_uart_channel_queue;
+            TRACE_E("NULL upcall found.");
         }
+        else if (-1 != channel)
+        {
+            uart_config_t uart_config = {
+                .baud_rate = baudrate,
+                .data_bits = UART_DATA_8_BITS,
+                .parity = UART_PARITY_DISABLE,
+                .stop_bits = UART_STOP_BITS_1,
+                .flow_ctrl = UART_HW_FLOWCTRL_DISABLE,
+                .rx_flow_ctrl_thresh = 0,
+                .source_clk = UART_SCLK_APB,
+            };
+
+            if (EZLOPI_UART_CHANNEL_1 == channel)
+            {
+                ESP_ERROR_CHECK(uart_driver_install(channel, 256, 256, 32, &ezlo_uart_channel_queue, 0));
+                uart_object_handle->ezlopi_uart_queue_handle = ezlo_uart_channel_queue;
+            }
 #ifdef EZLOPI_UART_CHANNEL_2
-        else if (EZLOPI_UART_CHANNEL_2 == channel)
-        {
-            ESP_ERROR_CHECK(uart_driver_install(channel, 256, 256, 32, &ezlo_uart_channel_queue, 0));
-            uart_object_handle->ezlopi_uart_queue_handle = ezlo_uart_channel_queue;
-        }
+            else if (EZLOPI_UART_CHANNEL_2 == channel)
+            {
+                ESP_ERROR_CHECK(uart_driver_install(channel, 256, 256, 32, &ezlo_uart_channel_queue, 0));
+                uart_object_handle->ezlopi_uart_queue_handle = ezlo_uart_channel_queue;
+            }
 #endif
-        ESP_ERROR_CHECK(uart_param_config(channel, &uart_config));
-        ESP_ERROR_CHECK(uart_set_pin(channel, tx, rx, -1, -1));
-        TRACE_S("UART configured successfully.");
-        uart_object_handle->ezlopi_uart.channel = channel;
-        uart_object_handle->ezlopi_uart.baudrate = baudrate;
-        uart_object_handle->ezlopi_uart.tx = tx;
-        uart_object_handle->ezlopi_uart.rx = rx;
-        uart_object_handle->ezlopi_uart.enable = true;
-        uart_object_handle->upcall = upcall;
+            ESP_ERROR_CHECK(uart_param_config(channel, &uart_config));
+            ESP_ERROR_CHECK(uart_set_pin(channel, tx, rx, -1, -1));
+            TRACE_S("UART configured successfully.");
+            uart_init_success = true;
 
-        xTaskCreate(ezlopi_uart_channel_task, "EzpiUartChnTask", EZLOPI_HAL_UART_TASK_DEPTH, (void *)uart_object_handle, 13, &(uart_object_handle->taskHandle));
+            uart_object_handle->ezlopi_uart.channel = channel;
+            uart_object_handle->ezlopi_uart.baudrate = baudrate;
+            uart_object_handle->ezlopi_uart.tx = tx;
+            uart_object_handle->ezlopi_uart.rx = rx;
+            uart_object_handle->ezlopi_uart.enable = true;
+            uart_object_handle->upcall = upcall;
+
+            xTaskCreate(ezlopi_uart_channel_task, "EzpiUartChnTask", EZLOPI_HAL_UART_TASK_DEPTH, (void *)uart_object_handle, 13, &(uart_object_handle->taskHandle));
 
 #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
-        EZPI_core_process_set_process_info(ENUM_EZLOPI_HAL_UART_TASK, &uart_object_handle->taskHandle, EZLOPI_HAL_UART_TASK_DEPTH);
+            EZPI_core_process_set_process_info(ENUM_EZLOPI_HAL_UART_TASK, &uart_object_handle->taskHandle, EZLOPI_HAL_UART_TASK_DEPTH);
 #endif
-    }
-    else
-    {
-        TRACE_E("All channels are busy.");
+        }
+        else
+        {
+            TRACE_E("All channels are busy.");
+        }
+
+        // Clean malloc if uart_init failed
+        if (!uart_init_success)
+        {
+            if (uart_object_handle->arg)
+            {
+                ezlopi_free(__func__, uart_object_handle->arg);
+                uart_object_handle->arg = NULL;
+            }
+            ezlopi_free(__func__, uart_object_handle);
+            uart_object_handle = NULL;
+        }
     }
 
     return uart_object_handle;
@@ -214,7 +232,7 @@ void EZPI_uart_main_init(void)
         .source_clk = UART_SCLK_APB,
     };
 
-    // Uninstall previous initialized drivers 
+    // Uninstall previous initialized drivers
     // uart_driver_delete(EZPI_SERV_UART_NUM_DEFAULT);
     // vTaskDelay(10);
     // We won't use a buffer for sending data.
@@ -225,8 +243,8 @@ void EZPI_uart_main_init(void)
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 
 static ezlo_uart_channel_t get_available_channel()
 {
@@ -300,7 +318,6 @@ static void ezlopi_uart_channel_task(void *args)
     }
 }
 
-
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

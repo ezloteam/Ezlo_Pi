@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    ezlopi_hal_pwm.c
-* @brief   perform some function on PWM
-* @author  xx
-* @version 0.1
-* @date    xx
-*/
+ * @file    ezlopi_hal_pwm.c
+ * @brief   perform some function on PWM
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include <string.h>
 #include <stdlib.h>
 
@@ -46,18 +46,17 @@
 #include "ezlopi_util_trace.h"
 #include "EZLOPI_USER_CONFIG.h"
 
+/*******************************************************************************
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
-
-/*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 struct s_ezlopi_pwm_object
 {
     ledc_timer_config_t *ledc_timer_configuration;
@@ -65,81 +64,90 @@ struct s_ezlopi_pwm_object
 };
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static uint8_t get_available_channel();
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 
-#if CONFIG_IDF_TARGET_ESP32 
-static bool available_channels[LEDC_CHANNEL_MAX] = { false, true, true, true, true, true, true };
+#if CONFIG_IDF_TARGET_ESP32
+static bool available_channels[LEDC_CHANNEL_MAX] = {false, true, true, true, true, true, true};
 #elif CONFIG_IDF_TARGET_ESP32S2 || CONFIG_IDF_TARGET_ESP32S3
-static bool available_channels[LEDC_CHANNEL_MAX] = { true, true, true, true, true, true, true };
+static bool available_channels[LEDC_CHANNEL_MAX] = {true, true, true, true, true, true, true};
 #elif CONFIG_IDF_TARGET_ESP32C2 || CONFIG_IDF_TARGET_ESP32C3
-static bool available_channels[LEDC_CHANNEL_MAX] = { true, true, true, true, true };
+static bool available_channels[LEDC_CHANNEL_MAX] = {true, true, true, true, true};
 #endif
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 
 s_ezlopi_channel_speed_t *EZPI_hal_pwm_init(uint8_t pwm_gpio_num, uint8_t pwm_resln, uint32_t freq_hz, uint32_t duty_cycle)
 {
 
     s_ezlopi_channel_speed_t *ezlopi_channel_speed = (s_ezlopi_channel_speed_t *)ezlopi_malloc(__FUNCTION__, sizeof(s_ezlopi_channel_speed_t));
-    memset(ezlopi_channel_speed, 0, sizeof(s_ezlopi_channel_speed_t));
-
-    uint8_t channel = get_available_channel();
-    if (LEDC_CHANNEL_MAX == channel)
+    if (ezlopi_channel_speed)
     {
-        TRACE_E("No channels availalbe for PWM.");
-    }
-    else
-    {
-        ledc_timer_config_t ezlopi_pwm_timer_cfg = {
-            .speed_mode = LEDC_LOW_SPEED_MODE,
-            .duty_resolution = pwm_resln,
-            .timer_num = LEDC_TIMER_3,
-            .freq_hz = freq_hz,
-            .clk_cfg = LEDC_AUTO_CLK,
-        };
-        ledc_channel_config_t ezlopi_pwm_channel_cfg = {
-            .gpio_num = pwm_gpio_num,
-            .speed_mode = LEDC_LOW_SPEED_MODE,
-            .channel = channel,
-            .intr_type = LEDC_INTR_DISABLE,
-            .timer_sel = LEDC_TIMER_3,
-            .duty = duty_cycle,
-        };
+        memset(ezlopi_channel_speed, 0, sizeof(s_ezlopi_channel_speed_t));
 
-        esp_err_t error = ledc_timer_config(&ezlopi_pwm_timer_cfg);
-        if (error != ESP_OK)
+        uint8_t channel = get_available_channel();
+        if (LEDC_CHANNEL_MAX == channel)
         {
-            TRACE_E("Error configuring LEDC timer.(code:%s)", esp_err_to_name(error));
+            TRACE_E("No channels availalbe for PWM.");
+            ezlopi_free(__func__, ezlopi_channel_speed);
+            return NULL;
         }
         else
         {
-            TRACE_S("LEDC timer configured successfully.");
-        }
+            ledc_timer_config_t ezlopi_pwm_timer_cfg = {
+                .speed_mode = LEDC_LOW_SPEED_MODE,
+                .duty_resolution = pwm_resln,
+                .timer_num = LEDC_TIMER_3,
+                .freq_hz = freq_hz,
+                .clk_cfg = LEDC_AUTO_CLK,
+            };
+            ledc_channel_config_t ezlopi_pwm_channel_cfg = {
+                .gpio_num = pwm_gpio_num,
+                .speed_mode = LEDC_LOW_SPEED_MODE,
+                .channel = channel,
+                .intr_type = LEDC_INTR_DISABLE,
+                .timer_sel = LEDC_TIMER_3,
+                .duty = duty_cycle,
+            };
 
-        error = ledc_channel_config(&ezlopi_pwm_channel_cfg);
-        if (error != ESP_OK)
-        {
-            TRACE_E("Error configuring LEDC channel.(code:%s)", esp_err_to_name(error));
-        }
-        else
-        {
-            TRACE_S("LEDC channel configured successfully.");
-        }
+            esp_err_t error = ledc_timer_config(&ezlopi_pwm_timer_cfg);
+            if (error != ESP_OK)
+            {
+                TRACE_E("Error configuring LEDC timer.(code:%s)", esp_err_to_name(error));
+                ezlopi_free(__func__, ezlopi_channel_speed);
+                return NULL;
+            }
+            else
+            {
+                TRACE_S("LEDC timer configured successfully.");
+            }
 
-        ezlopi_channel_speed->channel = channel;
-        ezlopi_channel_speed->speed_mode = ezlopi_pwm_channel_cfg.speed_mode;
+            error = ledc_channel_config(&ezlopi_pwm_channel_cfg);
+            if (error != ESP_OK)
+            {
+                TRACE_E("Error configuring LEDC channel.(code:%s)", esp_err_to_name(error));
+                ezlopi_free(__func__, ezlopi_channel_speed);
+                return NULL;
+            }
+            else
+            {
+                TRACE_S("LEDC channel configured successfully.");
+            }
+
+            ezlopi_channel_speed->channel = channel;
+            ezlopi_channel_speed->speed_mode = ezlopi_pwm_channel_cfg.speed_mode;
+        }
     }
     return ezlopi_channel_speed;
 }
@@ -164,8 +172,8 @@ uint32_t EZPI_hal_pwm_get_duty(uint32_t channel, uint32_t speed_mode)
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 static uint8_t get_available_channel()
 {
     uint8_t channel = 0;
@@ -182,5 +190,5 @@ static uint8_t get_available_channel()
 }
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

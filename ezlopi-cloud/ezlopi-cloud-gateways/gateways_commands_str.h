@@ -1,11 +1,3 @@
-
-/**
- * @file    gateways_commands_str.h
- * @brief
- * @author
- * @version
- * @date
- */
 /* ===========================================================================
 ** Copyright (C) 2022 Ezlo Innovation Inc
 **
@@ -37,24 +29,68 @@
 ** ===========================================================================
 */
 
+/**
+ * @file    gateways_commands_str.h
+ * @brief
+ * @author
+ * @version
+ * @date
+ */
 #ifndef __GATEWAYS_COMMANDS_STR_H__
 #define __GATEWAYS_COMMANDS_STR_H__
 
-extern const char *gw_addItemDictionaryValueCommand_str;
-extern const char *gw_checkDeviceCommand_str;
-extern const char *gw_clearItemDictionaryCommand_str;
-extern const char *gw_forceRemoveDeviceCommand_str;
-extern const char *gw_manualDeviceAdding_str;
-extern const char *gw_pluginId_str;
-extern const char *gw_not_ready_str;
-extern const char *gw_removeItemDictionaryValueCommand_str;
-extern const char *gw_resetSettingCommand_str;
-extern const char *gw_setGatewaySettingValueCommand_str;
-extern const char *gw_setItemDictionaryValueCommand_str;
-extern const char *gw_setItemValueCommand_str;
-extern const char *gw_setSettingDictionaryValueCommand_str;
-extern const char *gw_setSettingValueCommand_str;
-extern const char *gw_updateDeviceFirmwareCommand_str;
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+    /*******************************************************************************
+     *                          Type & Macro Declarations
+     *******************************************************************************/
+
+    /*******************************************************************************
+     *                          Extern Data Declarations
+     *******************************************************************************/
+
+    /*******************************************************************************
+     *                          Extern Function Prototypes
+     *******************************************************************************/
+    /**
+     * @brief Global function template example
+     * Convention : Use capital letter for initial word on extern function
+     * maincomponent : Main component as hal, core, service etc.
+     * subcomponent : Sub component as i2c from hal, ble from service etc
+     * functiontitle : Title of the function
+     * eg : EZPI_hal_i2c_init()
+     * @param arg
+     *
+     */
+    extern const char *gw_addItemDictionaryValueCommand_str;
+    extern const char *gw_checkDeviceCommand_str;
+    extern const char *gw_clearItemDictionaryCommand_str;
+    extern const char *gw_forceRemoveDeviceCommand_str;
+    extern const char *gw_manualDeviceAdding_str;
+    extern const char *gw_pluginId_str;
+    extern const char *gw_not_ready_str;
+    extern const char *gw_removeItemDictionaryValueCommand_str;
+    extern const char *gw_resetSettingCommand_str;
+    extern const char *gw_setGatewaySettingValueCommand_str;
+    extern const char *gw_setItemDictionaryValueCommand_str;
+    extern const char *gw_setItemValueCommand_str;
+    extern const char *gw_setSettingDictionaryValueCommand_str;
+    extern const char *gw_setSettingValueCommand_str;
+    extern const char *gw_updateDeviceFirmwareCommand_str;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // __GATEWAYS_COMMANDS_STR_H__
 

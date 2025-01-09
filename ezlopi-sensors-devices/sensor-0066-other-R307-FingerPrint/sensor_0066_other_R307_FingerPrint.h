@@ -34,14 +34,14 @@
  * @author  xx
  * @version 0.1
  * @date    xx
-*/
+ */
 
 #ifndef _SENSOR_0066_OTHER_R307_FINGERPRINT_H_
 #define _SENSOR_0066_OTHER_R307_FINGERPRINT_H_
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include <string.h>
 #include <stdbool.h>
 #include <time.h>
@@ -57,16 +57,16 @@
 #include "ezlopi_hal_gpio.h"
 
 /*******************************************************************************
-*                          C++ Declaration Wrapper
-*******************************************************************************/
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
     /*******************************************************************************
-    *                          Type & Macro Declarations
-    *******************************************************************************/
+     *                          Type & Macro Declarations
+     *******************************************************************************/
 
     //-----------------------------------------------------------------------------------------------------------
 #define FINGERPRINT_MAX_CAPACITY_LIMIT 5                                   // !< Setting the max quantity of fingerprints allowed to be stored >
@@ -130,10 +130,10 @@ extern "C"
 #define ACK_ERR_DUP_FP 0x45       //: Duplicate fingerprint
 
 #if 0
-// #define ACK_ERR_ 0x41 //: No finger on sensor when add fingerprint on second time.
-// #define ACK_ERR_ 0x42 //: fail to enroll the finger for second fingerprint add.
-// #define ACK_ERR_ 0x43 //: fail to generate character file ; lackness of character_point or over-smallness of second fingerprint image
-// #define ACK_ERR_ 0x44 //: fail to generate character file due to the over-disorderly fingerprint image for second fingerprint add;
+    // #define ACK_ERR_ 0x41 //: No finger on sensor when add fingerprint on second time.
+    // #define ACK_ERR_ 0x42 //: fail to enroll the finger for second fingerprint add.
+    // #define ACK_ERR_ 0x43 //: fail to generate character file ; lackness of character_point or over-smallness of second fingerprint image
+    // #define ACK_ERR_ 0x44 //: fail to generate character file due to the over-disorderly fingerprint image for second fingerprint add;
 #endif
 //---------------------------------------------------------------------
 // !< BAUDRATE Baudrate_control_register
@@ -177,8 +177,8 @@ extern "C"
 //----------------------------------------------------------------------------------------------------------------
 #define UART_PORT_ON (uint8_t)1  //!< Uart port is ON
 #define UART_PORT_OFF (uint8_t)0 //!< Uart port is OFF
-//----------------------------------------------------------------------------------------------------------------
-// !< Custom enum for status response after executing a command >
+                                 //----------------------------------------------------------------------------------------------------------------
+                                 // !< Custom enum for status response after executing a command >
     typedef enum fingerprint_status
     {
         FINGERPRINT_FAIL = 0,
@@ -212,7 +212,7 @@ extern "C"
         volatile e_fingerprint_op_mode_t opmode;                    /* Hold current operation mode*/
         volatile bool __busy_guard;                                 /* Gaurd_flag used during notification actions*/
         volatile bool notify_flag;                                  /* It triggers a reply after set_action*/
-        int intr_pin;                                           /* Stores custom interrupt pin num*/
+        int intr_pin;                                               /* Stores custom interrupt pin num*/
         uint16_t confidence_level;                                  /* 0~100*/
         uint16_t matched_confidence_level;                          /* Used to store most recently matched confidence*/
         uint16_t user_id;                                           /* Stores: Template or character_page ID (0~999)*/
@@ -226,24 +226,23 @@ extern "C"
         e_sensor_fp_items_t sensor_fp_item_ids[SENSOR_FP_ITEM_ID_MAX];
     } server_packet_t;
 
+    /*******************************************************************************
+     *                          Extern Data Declarations
+     *******************************************************************************/
 
     /*******************************************************************************
-    *                          Extern Data Declarations
-    *******************************************************************************/
-
-    /*******************************************************************************
-    *                          Extern Function Prototypes
-    *******************************************************************************/
+     *                          Extern Function Prototypes
+     *******************************************************************************/
 
     /**
-    * @brief Function to operate on actions
-    *
-    * @param action Current Action to Operate on
-    * @param item Target-Item node
-    * @param arg Arg for action
-    * @param user_arg User-arg
-    * @return ezlopi_error_t
-    */
+     * @brief Function to operate on actions
+     *
+     * @param action Current Action to Operate on
+     * @param item Target-Item node
+     * @param arg Arg for action
+     * @param user_arg User-arg
+     * @return ezlopi_error_t
+     */
     ezlopi_error_t SENSOR_0066_other_r307_fingerprint(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
     //-------------------------------------------------------------------------------------------------------------------
@@ -258,15 +257,15 @@ extern "C"
 // bool DownChar(int uart_channel_num, uint8_t CharBufferID, uint8_t *recieved_buffer, uint32_t timeout);
 #endif
 
-/**
- * @brief #### This function delete all the templates in the Flash library.
- *
- * @param (int)uart_channel_num: The UART channel number
- * @param (uint8_t*)recieved_buffer: Holds the address to a uart_buffer with recieved and filtered message
- * @param (uint32_t)timeout: Timeout(N*1ms) for uart message polling
- *
- * @return succcess[>0] or failure[0]
- */
+    /**
+     * @brief #### This function delete all the templates in the Flash library.
+     *
+     * @param (int)uart_channel_num: The UART channel number
+     * @param (uint8_t*)recieved_buffer: Holds the address to a uart_buffer with recieved and filtered message
+     * @param (uint32_t)timeout: Timeout(N*1ms) for uart message polling
+     *
+     * @return succcess[>0] or failure[0]
+     */
     bool Empty(int uart_channel_num, uint8_t *recieved_buffer, uint32_t timeout);
 
     /**
@@ -539,5 +538,5 @@ extern "C"
 #endif //_SENSOR_0066_OTHER_R307_FINGERPRINT_H_
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

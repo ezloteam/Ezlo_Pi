@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    sensor_0056_ADC_Force_Sensitive_Resistor.c
-* @brief   perform some function on sensor_0056
-* @author  xx
-* @version 0.1
-* @date    xx
-*/
+ * @file    sensor_0056_ADC_Force_Sensitive_Resistor.c
+ * @brief   perform some function on sensor_0056
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include <math.h>
 
 #include "ezlopi_core_cjson_macros.h"
@@ -54,20 +54,20 @@
 #include "EZLOPI_USER_CONFIG.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static ezlopi_error_t __0056_prepare(void *arg);
 static ezlopi_error_t __0056_init(l_ezlopi_item_t *item);
 static ezlopi_error_t __0056_get_cjson_value(l_ezlopi_item_t *item, void *arg);
@@ -76,16 +76,16 @@ static float Calculate_GramForce(float Vout);
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
 static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_data);
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 ezlopi_error_t SENSOR_0056_adc_force_sensitive_resistor(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
@@ -121,8 +121,8 @@ ezlopi_error_t SENSOR_0056_adc_force_sensitive_resistor(e_ezlopi_actions_t actio
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
@@ -132,6 +132,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
     device->cloud_properties.info = NULL;
     device->cloud_properties.device_type_id = NULL;
 }
+
 static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_data)
 {
     item->cloud_properties.has_getter = true;
@@ -151,7 +152,6 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_dev
     item->user_arg = user_data;
 }
 
-//----------------------------------------------------
 static ezlopi_error_t __0056_prepare(void *arg)
 {
     ezlopi_error_t ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
@@ -235,7 +235,7 @@ static ezlopi_error_t __0056_notify(l_ezlopi_item_t *item)
         fsr_t *fsr_struct = (fsr_t *)item->user_arg;
         if (fsr_struct)
         {
-            s_ezlopi_analog_data_t ezlopi_analog_data = { .value = 0, .voltage = 0 };
+            s_ezlopi_analog_data_t ezlopi_analog_data = {.value = 0, .voltage = 0};
             EZPI_hal_adc_get_adc_data(item->interface.adc.gpio_num, &ezlopi_analog_data);
             float Vout = (ezlopi_analog_data.voltage) / 1000.0f; // millivolt -> voltage
 
@@ -252,7 +252,7 @@ static ezlopi_error_t __0056_notify(l_ezlopi_item_t *item)
     }
     return ret;
 }
-//-------------------------------------------------------------------------------------------
+
 static float Calculate_GramForce(float Vout)
 {
     float Rs = 0, gramForce = 0;
@@ -288,5 +288,5 @@ static float Calculate_GramForce(float Vout)
 }
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

@@ -89,6 +89,7 @@ static s_ezlopi_room_t *l_room_head = NULL;
 static const char *sc_room_subtype_name[] = {
 #ifndef ROOM_SUBTYPE
 #define ROOM_SUBTYPE(name, e_num) name,
+#include "ezlopi_core_room_subtype_macro.h"
 #undef ROOM_SUBTYPE
 #endif
 };
@@ -531,23 +532,18 @@ static void __sort_by_pos(void)
 
 static e_room_subtype_t __get_subtype_enum(char *subtype_str)
 {
-    e_room_subtype_t ret = ROOM_SUBTYPE_NONE + 1;
-
+    e_room_subtype_t ret = ROOM_SUBTYPE_NONE;
     if (subtype_str)
     {
-        // for (int idx = ROOM_SUBTYPE_NONE; idx < ROOM_SUBTYPE_MAX; idx++)
         while ((ret <= ROOM_SUBTYPE_MAX) && sc_room_subtype_name[ret])
         {
-            // if (0 == strcmp(sc_room_subtype_name[idx], subtype_str))
             if (EZPI_STRNCMP_IF_EQUAL(sc_room_subtype_name[ret], subtype_str, strlen(sc_room_subtype_name[ret]) + 1, strlen(subtype_str) + 1))
             {
-                // ret = idx;
                 break;
             }
             ret++;
         }
     }
-
     return ret;
 }
 

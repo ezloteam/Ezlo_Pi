@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    sensor_0021_UART_MB1013.c
-* @brief   perform some function on sensor_0021
-* @author  xx
-* @version 0.1
-* @date    xx
-*/
+ * @file    sensor_0021_UART_MB1013.c
+ * @brief   perform some function on sensor_0021
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
@@ -54,16 +54,16 @@
 #include "EZLOPI_USER_CONFIG.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 typedef struct s_mb1013_args
 {
     float current_value;
@@ -71,24 +71,24 @@ typedef struct s_mb1013_args
 } s_mb1013_args_t;
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 static ezlopi_error_t __prepare(void *arg);
 static ezlopi_error_t __init(l_ezlopi_item_t *item);
 static ezlopi_error_t __notify(l_ezlopi_item_t *item);
 static ezlopi_error_t __get_value_cjson(l_ezlopi_item_t *item, void *arg);
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 
 ezlopi_error_t SENSOR_0021_uart_mb1013(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
@@ -128,8 +128,8 @@ ezlopi_error_t SENSOR_0021_uart_mb1013(e_ezlopi_actions_t action, l_ezlopi_item_
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 
 static ezlopi_error_t __get_value_cjson(l_ezlopi_item_t *item, void *arg)
 {
@@ -186,8 +186,15 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
             if (GPIO_IS_VALID_GPIO(item->interface.uart.tx) && GPIO_IS_VALID_GPIO(item->interface.uart.rx))
             {
                 s_ezlopi_uart_object_handle_t ezlopi_uart_object_handle = EZPI_hal_uart_init(item->interface.uart.baudrate, item->interface.uart.tx, item->interface.uart.rx, __uart_data_upcall, item);
-                item->interface.uart.channel = EZPI_hal_uart_get_channel(ezlopi_uart_object_handle);
-                ret = EZPI_SUCCESS;
+                if (ezlopi_uart_object_handle)
+                {
+                    item->interface.uart.channel = EZPI_hal_uart_get_channel(ezlopi_uart_object_handle);
+                    ret = EZPI_SUCCESS;
+                }
+                else
+                {
+                    TRACE_E("Failed to initialize mb1013-uart");
+                }
             }
         }
     }
@@ -283,5 +290,5 @@ static ezlopi_error_t __notify(l_ezlopi_item_t *item)
 }
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

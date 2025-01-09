@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    sensor_0046_ADC_ACS712_05B_currentmeter.c
-* @brief   perform some function on sensor_0046
-* @author  xx
-* @version 0.1
-* @date    xx
-*/
+ * @file    sensor_0046_ADC_ACS712_05B_currentmeter.c
+ * @brief   perform some function on sensor_0046
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include <math.h>
 
 #include "ezlopi_core_cjson_macros.h"
@@ -54,24 +54,24 @@
 #include "EZLOPI_USER_CONFIG.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 typedef struct s_currentmeter
 {
     float amp_value;
 } s_currentmeter_t;
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static ezlopi_error_t __0046_prepare(void *arg);
 static ezlopi_error_t __0046_init(l_ezlopi_item_t *item);
 static ezlopi_error_t __0046_get_cjson_value(l_ezlopi_item_t *item, void *arg);
@@ -79,16 +79,16 @@ static ezlopi_error_t __0046_notify(l_ezlopi_item_t *item);
 static void __calculate_current_value(l_ezlopi_item_t *item);
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 ezlopi_error_t SENSOR_0046_adc_acs712_05b_currentmeter(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
@@ -124,8 +124,8 @@ ezlopi_error_t SENSOR_0046_adc_acs712_05b_currentmeter(e_ezlopi_actions_t action
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
@@ -135,6 +135,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
     device->cloud_properties.info = NULL;
     device->cloud_properties.device_type = dev_type_sensor;
 }
+
 static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_data)
 {
     item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
@@ -249,7 +250,7 @@ static void __calculate_current_value(l_ezlopi_item_t *item)
         s_currentmeter_t *user_data = (s_currentmeter_t *)item->user_arg;
         if (user_data)
         {
-            s_ezlopi_analog_data_t ezlopi_analog_data = { .value = 0, .voltage = 0 };
+            s_ezlopi_analog_data_t ezlopi_analog_data = {.value = 0, .voltage = 0};
 
             uint32_t period_dur = (1000000 / DEFAULT_AC_FREQUENCY); // 20000uS
             int Vnow = 0;
@@ -295,5 +296,5 @@ static void __calculate_current_value(l_ezlopi_item_t *item)
 }
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

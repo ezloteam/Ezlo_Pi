@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    sensor_0019_digitalIn_PIR.c
-* @brief   perform some function on sensor_0019
-* @author  xx
-* @version 0.1
-* @date    xx
-*/
+ * @file    sensor_0019_digitalIn_PIR.c
+ * @brief   perform some function on sensor_0019
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
@@ -53,20 +53,20 @@
 #include "sensor_0019_digitalIn_PIR.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static ezlopi_error_t sensor_pir_prepare_v3(void *arg);
 static ezlopi_error_t sensor_pir_init_v3(l_ezlopi_item_t *item);
 static void sensor_pir_value_updated_from_device_v3(void *arg);
@@ -74,16 +74,16 @@ static ezlopi_error_t sensor_pir_get_value_cjson_v3(l_ezlopi_item_t *item, void 
 static void sensor_pir_setup_item_properties_v3(l_ezlopi_item_t *item, cJSON *cj_device);
 static void sensor_pir_setup_device_cloud_properties_v3(l_ezlopi_device_t *device, cJSON *cj_device);
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 
 ezlopi_error_t SENSOR_0019_digitalIn_PIR(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *args, void *user_arg)
 {
@@ -118,8 +118,8 @@ ezlopi_error_t SENSOR_0019_digitalIn_PIR(e_ezlopi_actions_t action, l_ezlopi_ite
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 static ezlopi_error_t sensor_pir_get_value_cjson_v3(l_ezlopi_item_t *item, void *args)
 {
     ezlopi_error_t ret = EZPI_FAILED;
@@ -238,5 +238,5 @@ static void sensor_pir_setup_item_properties_v3(l_ezlopi_item_t *item, cJSON *cj
 }
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

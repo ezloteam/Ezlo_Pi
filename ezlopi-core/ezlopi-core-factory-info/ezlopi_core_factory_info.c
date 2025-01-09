@@ -46,7 +46,6 @@
 
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_factory_info.h"
-// #include "ezlopi_core_errors.h"
 #include "EZLOPI_USER_CONFIG.h"
 
 /*******************************************************************************

@@ -1,11 +1,3 @@
-
-/**
- * @file    ezlopi_service_meshbot.c
- * @brief
- * @author
- * @version
- * @date
- */
 /* ===========================================================================
 ** Copyright (C) 2024 Ezlo Innovation Inc
 **
@@ -37,6 +29,17 @@
 ** ===========================================================================
 */
 
+/**
+ * @file    ezlopi_service_meshbot.c
+ * @brief
+ * @author
+ * @version
+ * @date
+ */
+
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
@@ -57,6 +60,18 @@
 #include "ezlopi_service_loop.h"
 #include "ezlopi_service_meshbot.h"
 
+/*******************************************************************************
+ *                          Extern Data Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Type & Macro Definitions
+ *******************************************************************************/
+
 /**
  * @brief Struct that holds the thread context
  *
@@ -70,7 +85,9 @@ typedef struct s_thread_ctx
     uint32_t delay_ms;                /**< Delay for the thread */
     l_action_block_v2_t *action_node; /**< Action node for thread context */
 } s_thread_ctx_t;
-
+/*******************************************************************************
+ *                          Static Function Prototypes
+ *******************************************************************************/
 /**
  * @brief Function registered as function loop
  *
@@ -107,8 +124,17 @@ static int ezpi_execute_scene_start(l_scenes_list_v2_t *scene_node);
  * @return int
  */
 static int ezpi_execute_action_block(l_scenes_list_v2_t *scene_node, l_action_block_v2_t *action_block);
+/*******************************************************************************
+ *                          Static Data Definitions
+ *******************************************************************************/
 
-////////// Global functions ///////////////////
+/*******************************************************************************
+ *                          Extern Data Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Definitions
+ *******************************************************************************/
 uint32_t EZPI_meshbot_service_stop_for_scene_id(uint32_t _id)
 {
     uint32_t ret = 0;
@@ -412,6 +438,9 @@ PT_THREAD(ezpi_scene_proto_thread(l_scenes_list_v2_t *scene_node, uint32_t routi
     PT_END(&ctx->pt);
 }
 
+/*******************************************************************************
+ *                          Static Function Definitions
+ *******************************************************************************/
 static void __scenes_loop(void *arg)
 {
     l_scenes_list_v2_t *scene_node = EZPI_core_scenes_get_scene_head_v2();

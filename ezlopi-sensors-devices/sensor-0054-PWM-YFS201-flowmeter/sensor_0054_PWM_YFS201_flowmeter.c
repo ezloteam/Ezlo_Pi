@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    main.c
-* @brief   perform some function on data
-* @author  xx
-* @version 0.1
-* @date    xx
-*/
+ * @file    main.c
+ * @brief   perform some function on data
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include "driver/gpio.h"
 
 #include "ezlopi_core_cloud.h"
@@ -54,19 +54,19 @@
 #include "sensor_0054_PWM_YFS201_flowmeter.h"
 #include "EZLOPI_USER_CONFIG.h"
 
+/*******************************************************************************
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
-
-/*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 #define YFS201_QUEUE_SIZE 5
+
 typedef enum YFS201_queue_enum
 {
     YFS201_QUEUE_RESET = 0,
@@ -82,8 +82,8 @@ typedef struct yfs201_t
 } yfs201_t;
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static void IRAM_ATTR gpio_isr_handler(void *arg);
 
 static ezlopi_error_t __0054_prepare(void *arg);
@@ -96,17 +96,17 @@ static void __prepare_item_properties(l_ezlopi_item_t *item, cJSON *cj_device, v
 static void __extract_YFS201_Pulse_Count_func(l_ezlopi_item_t *item);
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 static QueueHandle_t yfs201_queue = NULL;
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 ezlopi_error_t SENSOR_0054_pwm_yfs201_flowmeter(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     ezlopi_error_t ret = EZPI_SUCCESS;
@@ -147,8 +147,8 @@ ezlopi_error_t SENSOR_0054_pwm_yfs201_flowmeter(e_ezlopi_actions_t action, l_ezl
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 static void IRAM_ATTR gpio_isr_handler(void *arg) // argument => time_us
 {
     *((uint32_t *)arg) = *((uint32_t *)arg) + 1;
@@ -162,6 +162,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
     device->cloud_properties.info = NULL;
     device->cloud_properties.device_type_id = NULL;
 }
+
 static void __prepare_item_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_data)
 {
     item->cloud_properties.has_getter = true;
@@ -179,7 +180,7 @@ static void __prepare_item_properties(l_ezlopi_item_t *item, cJSON *cj_device, v
     item->is_user_arg_unique = true;
     item->user_arg = user_data;
 }
-//------------------------------------------------------------------------------------------------------
+
 static ezlopi_error_t __0054_prepare(void *arg)
 {
     ezlopi_error_t ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
@@ -270,7 +271,7 @@ static ezlopi_error_t __0054_get_cjson_value(l_ezlopi_item_t *item, void *arg)
     }
     return ret;
 }
-//------------------------------------------------------------------------------------------------------
+
 static ezlopi_error_t __0054_notify(l_ezlopi_item_t *item)
 {
     ezlopi_error_t ret = EZPI_FAILED;
@@ -292,7 +293,6 @@ static ezlopi_error_t __0054_notify(l_ezlopi_item_t *item)
     return ret;
 }
 
-//------------------------------------------------------------------------------
 // This function is used to get the time_period of incoming pulses . [NOTE: call 'gpio_install_isr_service()' before using this function]
 static void __extract_YFS201_Pulse_Count_func(l_ezlopi_item_t *item)
 {
@@ -339,7 +339,7 @@ static void __extract_YFS201_Pulse_Count_func(l_ezlopi_item_t *item)
             if ((yfs201_data->yfs201_QueueFlag) == YFS201_QUEUE_FULL)
             {
                 // loop through all the queue[0-5] values -> pulse counts
-                int32_t P_count[YFS201_QUEUE_SIZE] = { 0 };
+                int32_t P_count[YFS201_QUEUE_SIZE] = {0};
                 int val = 0;
                 for (uint8_t i = 0; i < YFS201_QUEUE_SIZE; i++)
                 {
@@ -353,7 +353,7 @@ static void __extract_YFS201_Pulse_Count_func(l_ezlopi_item_t *item)
                 }
 
                 // generate frequency of occurance table from "P_count[]" array values
-                uint8_t freq[YFS201_QUEUE_SIZE] = { 0 };
+                uint8_t freq[YFS201_QUEUE_SIZE] = {0};
                 float error = 0;
                 for (uint8_t x = 0; x < YFS201_QUEUE_SIZE; x++)
                 {
@@ -394,5 +394,5 @@ static void __extract_YFS201_Pulse_Count_func(l_ezlopi_item_t *item)
 }
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

@@ -1,12 +1,3 @@
-
-
-/**
- * @file    ezlopi_service_webprov.c
- * @brief
- * @author
- * @version
- * @date
- */
 /* ===========================================================================
 ** Copyright (C) 2024 Ezlo Innovation Inc
 **
@@ -37,6 +28,13 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
+/**
+ * @file    ezlopi_service_webprov.c
+ * @brief
+ * @author
+ * @version
+ * @date
+ */
 
 #include "../../build/config/sdkconfig.h"
 #include "EZLOPI_USER_CONFIG.h"
@@ -78,6 +76,17 @@
 
 #if defined(CONFIG_EZPI_WEBSOCKET_CLIENT)
 
+/*******************************************************************************
+ *                          Extern Data Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 typedef struct
 {
     char *payload;
@@ -85,12 +94,17 @@ typedef struct
     uint32_t tick_count;
 } s_rx_message_t;
 
+/*******************************************************************************
+ *                          Static Data Definitions
+ *******************************************************************************/
 static uint32_t message_counter = 0;
 static xTaskHandle _task_handle = NULL;
 static QueueHandle_t _wss_message_queue = NULL;
 static esp_websocket_client_handle_t wss_client = NULL;
 static TaskHandle_t __web_socket_initialize_handler = NULL;
-
+/*******************************************************************************
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static void __provision_check(void *pv);
 static int __provision_update(char *arg);
 static void __fetch_wss_endpoint(void *pv);
@@ -106,7 +120,13 @@ bool EZPI_service_webprov_is_connected(void)
 {
     return esp_websocket_client_is_connected(wss_client);
 }
+/*******************************************************************************
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
+/*******************************************************************************
+ *                          Extern Function Definitions
+ *******************************************************************************/
 uint32_t EZPI_service_web_provisioning_get_message_count(void)
 {
     return message_counter;
@@ -139,6 +159,9 @@ void EZPI_service_web_provisioning_deinit(void)
     EZPI_core_websocket_client_kill(wss_client);
 }
 
+/*******************************************************************************
+ *                          Static Function Definitions
+ *******************************************************************************/
 static void __connection_upcall(bool connected)
 {
     static int prev_status; // 0: never connected, 1: Not-connected, 2: connected
@@ -709,3 +732,7 @@ static int __provision_update(char *arg)
 }
 
 #endif // CONFIG_EZPI_WEBSOCKET_CLIENT
+
+/*******************************************************************************
+ *                          End of File
+ *******************************************************************************/

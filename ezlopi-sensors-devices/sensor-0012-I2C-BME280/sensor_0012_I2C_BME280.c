@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    sensor_0012_I2C_BME280.c
-* @brief   perform some function on sensor_0012
-* @author  xx
-* @version 0.1
-* @date    xx
-*/
+ * @file    sensor_0012_I2C_BME280.c
+ * @brief   perform some function on sensor_0012
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include <math.h>
 
 #include "ezlopi_core_cloud.h"
@@ -56,16 +56,16 @@
 #include "EZLOPI_USER_CONFIG.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 typedef struct s_ezlopi_bmp280
 {
     float pressure;
@@ -77,8 +77,8 @@ typedef struct s_ezlopi_bmp280
 } s_ezlopi_bmp280_t;
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static void __prepare_item_humidity_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_arg);
 static void __prepare_item_pressure_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_arg);
 static void __prepare_item_temperature_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_arg);
@@ -91,16 +91,16 @@ static ezlopi_error_t __prepare(void *arg);
 static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg);
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 
 ezlopi_error_t SENSOR_0012_i2c_bme280(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
@@ -137,8 +137,8 @@ ezlopi_error_t SENSOR_0012_i2c_bme280(e_ezlopi_actions_t action, l_ezlopi_item_t
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 
 static bool check_double_val_equal(double first, double second)
 {
@@ -242,11 +242,17 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
         {
             if (item->interface.i2c_master.enable)
             {
-                EZPI_hal_i2c_master_init(&item->interface.i2c_master);
-                bmp280_init_default_params(&bmp280_sensor_params->bmp280_params);
-                bmp280_init(&bmp280_sensor_params->bmp280_dev, &bmp280_sensor_params->bmp280_params, &item->interface.i2c_master);
-                bmp280_read_float(&item->interface.i2c_master, &bmp280_sensor_params->bmp280_dev, &bmp280_sensor_params->temperature, &bmp280_sensor_params->pressure, &bmp280_sensor_params->humidity);
-                ret = EZPI_SUCCESS;
+                if (EZPI_SUCCESS == EZPI_hal_i2c_master_init(&item->interface.i2c_master))
+                {
+                    bmp280_init_default_params(&bmp280_sensor_params->bmp280_params);
+                    bmp280_init(&bmp280_sensor_params->bmp280_dev, &bmp280_sensor_params->bmp280_params, &item->interface.i2c_master);
+                    bmp280_read_float(&item->interface.i2c_master, &bmp280_sensor_params->bmp280_dev, &bmp280_sensor_params->temperature, &bmp280_sensor_params->pressure, &bmp280_sensor_params->humidity);
+                    ret = EZPI_SUCCESS;
+                }
+                else
+                {
+                    TRACE_E("I2C init failed");
+                }
             }
         }
     }
@@ -406,5 +412,5 @@ static void __prepare_item_pressure_properties(l_ezlopi_item_t *item, cJSON *cj_
 }
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

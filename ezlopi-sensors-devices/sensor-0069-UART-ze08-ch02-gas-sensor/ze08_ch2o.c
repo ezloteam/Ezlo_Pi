@@ -76,7 +76,10 @@ bool ZE08_ch2o_sensor_init(s_ezlopi_uart_t *ze08_uart_config, ze08_ch2o_sensor_d
 {
     if (ze08_uart_config->enable)
     {
-        return EZPI_hal_uart_init(ze08_uart_config->baudrate, ze08_uart_config->tx, ze08_uart_config->rx, ezlopi_ze08_ch2o_upcall, data);
+        if (NULL != EZPI_hal_uart_init(ze08_uart_config->baudrate, ze08_uart_config->tx, ze08_uart_config->rx, ezlopi_ze08_ch2o_upcall, data))
+        {
+            return true;
+        }
     }
 
     return false;
@@ -86,7 +89,7 @@ bool ZE08_ch2o_sensor_init(s_ezlopi_uart_t *ze08_uart_config, ze08_ch2o_sensor_d
  *                         Static Function Definitions
  *******************************************************************************/
 
-static uint8_t ze08_ch2o_sensor_checksum(uint8_t array[], uint8_t length) 
+static uint8_t ze08_ch2o_sensor_checksum(uint8_t array[], uint8_t length)
 {
     uint8_t sum = 0;
 
@@ -101,7 +104,7 @@ static uint8_t ze08_ch2o_sensor_checksum(uint8_t array[], uint8_t length)
     return sum;
 }
 
-static void ezlopi_ze08_ch2o_upcall(uint8_t *buffer, uint32_t output_len, s_ezlopi_uart_object_handle_t uart_object_handle) 
+static void ezlopi_ze08_ch2o_upcall(uint8_t *buffer, uint32_t output_len, s_ezlopi_uart_object_handle_t uart_object_handle)
 {
     ze08_ch2o_sensor_data_t *data = (ze08_ch2o_sensor_data_t *)uart_object_handle->arg;
 

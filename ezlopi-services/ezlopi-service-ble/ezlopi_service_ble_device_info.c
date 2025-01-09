@@ -246,6 +246,9 @@ void EZPI_ble_service_device_info_init(void)
     EZPI_core_ble_gatt_add_characteristic(g_device_info_service, &uuid, permission, properties, ezpi_service_ble_net_info, NULL, NULL);
 }
 
+/*******************************************************************************
+ *                          Static Function Definitions
+ *******************************************************************************/
 static void ble_device_info_send_data(const cJSON *cj_response_data, esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
 {
     char *send_data = cJSON_Print(__FUNCTION__, cj_response_data);

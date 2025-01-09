@@ -1,3 +1,33 @@
+/* ===========================================================================
+** Copyright (C) 2022 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
 
 /**
  * @file    ezlopi_cloud_scenes.c
@@ -6,37 +36,9 @@
  * @version
  * @date
  */
- /* ===========================================================================
- ** Copyright (C) 2022 Ezlo Innovation Inc
- **
- ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
- **
- ** Redistribution and use in source and binary forms, with or without
- ** modification, are permitted provided that the following conditions are met:
- **
- ** 1. Redistributions of source code must retain the above copyright notice,
- **    this list of conditions and the following disclaimer.
- ** 2. Redistributions in binary form must reproduce the above copyright
- **    notice, this list of conditions and the following disclaimer in the
- **    documentation and/or other materials provided with the distribution.
- ** 3. Neither the name of the copyright holder nor the names of its
- **    contributors may be used to endorse or promote products derived from
- **    this software without specific prior written permission.
- **
- ** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- ** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- ** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- ** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- ** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- ** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- ** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- ** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- ** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- ** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- ** POSSIBILITY OF SUCH DAMAGE.
- ** ===========================================================================
- */
-
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
@@ -62,6 +64,33 @@
 
 #include "ezlopi_service_meshbot.h"
 
+/*******************************************************************************
+ *                          Extern Data Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Type & Macro Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Static Function Prototypes
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Static Data Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Data Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Definitions
+ *******************************************************************************/
 void EZPI_scenes_list(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str); // For NULL broadcast
@@ -324,7 +353,7 @@ void EZPI_scenes_notification_remove(cJSON *cj_request, cJSON *cj_response)
                         cJSON *cj_user_id = NULL;
                         cJSON_ArrayForEach(cj_user_id, cj_user_notifications)
                         {
-                            if (0 == strcmp(cj_user_id->valuestring, cj_user_id_del->valuestring))
+                            if (EZPI_STRNCMP_IF_EQUAL(cj_user_id->valuestring, cj_user_id_del->valuestring, cj_user_id->str_value_len, cj_user_id_del->str_value_len))
                             {
                                 cJSON_DeleteItemFromArray(__FUNCTION__, cj_user_notifications, idx);
                             }
@@ -350,7 +379,7 @@ void EZPI_scenes_notification_remove(cJSON *cj_request, cJSON *cj_response)
                 l_scenes_list_v2_t *scene_node = EZPI_core_scenes_get_by_id_v2(scene_id);
                 if (scene_node)
                 {
-                    if (0 == strcmp(scene_node->user_notifications->user_id, cj_user_id_del->valuestring))
+                    if (EZPI_STRNCMP_IF_EQUAL(scene_node->user_notifications->user_id, cj_user_id_del->valuestring, strlen(scene_node->user_notifications->user_id) + 1, cj_user_id_del->str_value_len))
                     {
                         l_user_notification_v2_t *user_id_del = scene_node->user_notifications;
                         scene_node->user_notifications = scene_node->user_notifications->next;
@@ -362,7 +391,7 @@ void EZPI_scenes_notification_remove(cJSON *cj_request, cJSON *cj_response)
                         l_user_notification_v2_t *user_node = scene_node->user_notifications;
                         while (user_node->next)
                         {
-                            if (0 == strcmp(user_node->user_id, cj_user_id_del->valuestring))
+                            if (EZPI_STRNCMP_IF_EQUAL(user_node->user_id, cj_user_id_del->valuestring, strlen(user_node->user_id) + 1, cj_user_id_del->str_value_len))
                             {
                                 l_user_notification_v2_t *user_id_del = user_node;
                                 user_node = user_node->next;
@@ -548,7 +577,7 @@ void EZPI_scenes_action_block_test(cJSON *cj_request, cJSON *cj_response)
                         if (tmp_http_data->response)
                         {
                             int code = 400;
-                            char detail[100] = { 0 };
+                            char detail[100] = {0};
                             if (sscanf(tmp_http_data->response, "HTTP/1.1 %d %99s[^\n]", &code, detail) == 2)
                             {
                                 cJSON_AddNumberToObject(__FUNCTION__, cj_result, ezlopi_httpAnswerCode_str, code);
@@ -644,7 +673,7 @@ void EZPI_scenes_blockmeta_set(cJSON *cj_request, cJSON *cj_response)
             cJSON *cj_block_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_blockId_str);
             if ((cj_scene_id && cj_scene_id->valuestring) && (cj_block_id && cj_block_id->valuestring))
             {
-                #warning "The 'block_id' facility is only for 'when-blocks' [ 'Action-blocks' is not added in UI ]";
+#warning "The 'block_id' facility is only for 'when-blocks' [ 'Action-blocks' is not added in UI ]";
                 EZPI_core_scenes_set_meta_by_id(cj_scene_id->valuestring, cj_block_id->valuestring, cj_meta);
             }
         }
@@ -663,7 +692,7 @@ void EZPI_scenes_stop(cJSON *cj_request, cJSON *cj_response)
             cJSON *cj_scene_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_sceneId_str);
             if (cj_scene_id && cj_scene_id->valuestring)
             {
-                #warning "add support for thenGroup or elseGroups";
+#warning "add support for thenGroup or elseGroups";
                 uint32_t u32_scene_id = strtoul(cj_scene_id->valuestring, NULL, 16);
                 EZPI_meshbot_service_stop_for_scene_id(u32_scene_id);
             }
@@ -691,7 +720,7 @@ void EZPI_scenes_clone(cJSON *cj_request, cJSON *cj_response)
                         cJSON *cj_dup_scene = cJSON_Duplicate(__FUNCTION__, cj_org_scene, 1);
                         if (cj_dup_scene)
                         {
-                            char name_buf[32] = { 0 };
+                            char name_buf[32] = {0};
                             cJSON *cj_custom_name = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_name_str);
                             if (cj_custom_name && cj_custom_name->valuestring && (0 < cj_custom_name->str_value_len))
                             {
@@ -871,6 +900,11 @@ void EZPI_scene_deleted(cJSON *cj_request, cJSON *cj_response)
         cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     }
 }
+
+/*******************************************************************************
+ *                          Static Function Definitions
+ *******************************************************************************/
+
 #endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 /*******************************************************************************

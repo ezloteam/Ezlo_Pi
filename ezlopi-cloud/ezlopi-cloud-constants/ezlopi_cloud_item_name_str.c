@@ -1,14 +1,5 @@
-
-
-/**
- * @file    ezlopi_cloud_item_name_str.c
- * @brief
- * @author
- * @version
- * @date
- */
 /* ===========================================================================
-** Copyright (C) 2022 Ezlo Innovation Inc
+** Copyright (C) 2024 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -38,6 +29,41 @@
 ** ===========================================================================
 */
 
+/**
+ * @file     ezlopi_cloud_item_name_str.c
+ * @brief   perform some function on data
+ * @author  John Doe
+ * @version 0.1
+ * @date    1st January 2024
+ */
+
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Data Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Type & Macro Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Static Function Prototypes
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Static Data Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Data Definitions
+ *******************************************************************************/
 /// @brief https://api.ezlo.com/devices/items/index.html
 const char *ezlopi_item_name_undefined = "";
 const char *ezlopi_item_name_acceleration_x_axis = "acceleration_x_axis";
@@ -58,7 +84,7 @@ const char *ezlopi_item_name_dw_state = "dw_state";
 // const  char *ezlopi_item_name_barrier_problem_sensors = "barrier_problem_sensors";
 // const  char *ezlopi_item_name_barrier_short_circuit = "barrier_short_circuit";
 // const  char *ezlopi_item_name_barrier_fail_events = "barrier_fail_events";
-const  char *ezlopi_item_name_button_state = "button_state";
+const char *ezlopi_item_name_button_state = "button_state";
 // const  char *ezlopi_item_name_test_state = "test_state";
 // const  char *ezlopi_item_name_co_alarm = "co_alarm";
 // const  char *ezlopi_item_name_maintenance_state = "maintenance_state";
@@ -287,6 +313,14 @@ const char *ezlopi_item_name_particles_1_um = "particles_1_um";
 const char *ezlopi_item_name_particles_2_dot_5_um = "particles_2_dot_5_um";
 const char *ezlopi_item_name_particles_5_um = "particles_5_um";
 const char *ezlopi_item_name_particles_10_um = "particles_10_um";
+
+/*******************************************************************************
+ *                          Extern Function Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Static Function Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
  *                          End of File

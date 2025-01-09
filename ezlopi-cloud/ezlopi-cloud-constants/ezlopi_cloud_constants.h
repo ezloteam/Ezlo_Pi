@@ -1,13 +1,5 @@
-
-/**
- * @file    ezlopi_cloud_constants.h
- * @brief
- * @author
- * @version
- * @date
- */
 /* ===========================================================================
-** Copyright (C) 2022 Ezlo Innovation Inc
+** Copyright (C) 2024 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -37,9 +29,27 @@
 ** ===========================================================================
 */
 
+/**
+ * @file    main.c
+ * @brief   perform some function on data
+ * @author  John Doe
+ * @version 0.1
+ * @date    1st January 2024
+ */
+
 #ifndef __EZLOPI_CLOUD_CONSTANTS_H__
 #define __EZLOPI_CLOUD_CONSTANTS_H__
+/*******************************************************************************
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
+/*******************************************************************************
+ *                          Type & Macro Declarations
+ *******************************************************************************/
 //------------------- MACRO FOR COMPARING EQUAL STR ------------------------------------------------------------
 
 /**
@@ -56,7 +66,7 @@
 #define COMPARE_IF_EQUAL(STR1, STR2, STR1_LEN, STR2_LEN) (strncmp(STR1, STR2, BIGGER_LEN(STR1_LEN, STR2_LEN)) == 0)
 /**
  * @brief Macro to compre two strings if they are equal
- *
+ * @note - Add '+1' to the input_str_length for both : STR1_LEN & STR1_LEN . (consider the '\0' char also)
  *
  */
 #define EZPI_STRNCMP_IF_EQUAL(STR1, STR2, STR1_LEN, STR2_LEN) \
@@ -77,6 +87,19 @@
 #include "ezlopi_cloud_value_type_str.h"
 #include "ezlopi_cloud_subcategory_str.h"
 #include "ezlopi_cloud_device_types_str.h"
+
+
+    /*******************************************************************************
+     *                          Extern Data Declarations
+     *******************************************************************************/
+
+    /*******************************************************************************
+     *                          Extern Function Prototypes
+     *******************************************************************************/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // __EZLOPI_CLOUD_CONSTANTS_H__
 

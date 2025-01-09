@@ -34,52 +34,51 @@
  * @author  xx
  * @version 0.1
  * @date    12th DEC 2024
-*/
+ */
 
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          C++ Declaration Wrapper
-*******************************************************************************/
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
     /*******************************************************************************
-    *                          Type & Macro Declarations
-    *******************************************************************************/
+     *                          Type & Macro Declarations
+     *******************************************************************************/
 
     SCENES_STRINGS_OPERATORS(NONE, NULL, NULL, NULL)
-        //////////////////////////////////////////////////////////////////////////////
-        SCENES_STRINGS_OPERATORS(LESS, "<", "less", "compareStrings")
-        SCENES_STRINGS_OPERATORS(GREATER, ">", "greater", "compareStrings")
-        SCENES_STRINGS_OPERATORS(LESS_EQUAL, "<=", "less equal", "compareStrings")
-        SCENES_STRINGS_OPERATORS(GREATER_EQUAL, ">=", "greater equal", "compareStrings")
-        SCENES_STRINGS_OPERATORS(EQUAL, "==", "equal", "compareStrings")
-        SCENES_STRINGS_OPERATORS(NOT_EQUAL, "!=", "not equal", "compareStrings")
-        //////////////////////////////////////////////////////////////////////////////
-        SCENES_STRINGS_OPERATORS(MAX, NULL, NULL, NULL)
+    //////////////////////////////////////////////////////////////////////////////
+    SCENES_STRINGS_OPERATORS(LESS, "<", "less", "compareStrings")
+    SCENES_STRINGS_OPERATORS(GREATER, ">", "greater", "compareStrings")
+    SCENES_STRINGS_OPERATORS(LESS_EQUAL, "<=", "less equal", "compareStrings")
+    SCENES_STRINGS_OPERATORS(GREATER_EQUAL, ">=", "greater equal", "compareStrings")
+    SCENES_STRINGS_OPERATORS(EQUAL, "==", "equal", "compareStrings")
+    SCENES_STRINGS_OPERATORS(NOT_EQUAL, "!=", "not equal", "compareStrings")
+    //////////////////////////////////////////////////////////////////////////////
+    SCENES_STRINGS_OPERATORS(MAX, NULL, NULL, NULL)
 
-        /*******************************************************************************
-        *                          Extern Data Declarations
-        *******************************************************************************/
+    /*******************************************************************************
+     *                          Extern Data Declarations
+     *******************************************************************************/
 
-        /*******************************************************************************
-        *                          Extern Function Prototypes
-        *******************************************************************************/
-
+    /*******************************************************************************
+     *                          Extern Function Prototypes
+     *******************************************************************************/
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+#endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

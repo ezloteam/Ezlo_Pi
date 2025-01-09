@@ -43,7 +43,7 @@ This section is for declaring any types or macros that will be used in the file.
 This section is for declaring any external data that will be used in the file. It is denoted by the comment `/* Extern Data Declarations */`.
 
 ### Extern Function Prototypes
-This section is for declaring the prototypes of any external functions that will be used in the file. It is denoted by the comment `/* Extern Function Prototypes */`. The function prototype should follow the naming convention `EZPI_maincomponent_subcomponent_functiontitle(type_t arg)`, where `maincomponent` is the main component such as hal, core, service etc., `subcomponent` is the sub component such as i2c from hal, ble from service etc, and `functiontitle` is the title of the function.
+This section is for declaring the prototypes of any external functions that will be used in the file. It is denoted by the comment `/* Extern Function Prototypes */`. The function prototype should follow the naming convention `EZPI_maincomponent_subcomponent_functiontitle( type_t arg )`, where `maincomponent` is the main component such as hal, core, service etc., `subcomponent` is the sub component such as i2c from hal, ble from service etc, and `functiontitle` is the title of the function.
 
 # Source File Template Documentation
 

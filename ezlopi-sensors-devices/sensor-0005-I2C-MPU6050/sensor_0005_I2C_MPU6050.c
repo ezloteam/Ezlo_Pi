@@ -29,16 +29,16 @@
 ** ===========================================================================
 */
 /**
-* @file    sensor_0005_I2C_MPU6050.c
-* @brief   perform some function on sensor_0005
-* @author  xx
-* @version 0.1
-* @date    xx
-*/
+ * @file    sensor_0005_I2C_MPU6050.c
+ * @brief   perform some function on sensor_0005
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include <math.h>
 
 #include "ezlopi_core_cloud.h"
@@ -55,20 +55,20 @@
 #include "sensor_0005_I2C_MPU6050.h"
 #include "EZLOPI_USER_CONFIG.h"
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static ezlopi_error_t __prepare(void *arg);
 static ezlopi_error_t __init(l_ezlopi_item_t *item);
 static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg);
@@ -79,16 +79,16 @@ static void __prepare_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj
 static void __mpu6050_calibration_task(void *params);
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 
 ezlopi_error_t SENSOR_0005_i2c_mpu6050(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
@@ -125,8 +125,8 @@ ezlopi_error_t SENSOR_0005_i2c_mpu6050(e_ezlopi_actions_t action, l_ezlopi_item_
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     device->cloud_properties.category = category_level_sensor;
@@ -360,21 +360,27 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
         {
             if (item->interface.i2c_master.enable)
             {
-                EZPI_hal_i2c_master_init(&item->interface.i2c_master);
-                if (MPU6050_ERR_OK == MPU6050_config_device(item))
+                if (EZPI_SUCCESS == EZPI_hal_i2c_master_init(&item->interface.i2c_master))
                 {
-                    // TRACE_I("Configuration Complete.... ");
-                    // TaskHandle_t ezlopi_sensor_mpu6050_task_handle = NULL;
-                    // xTaskCreate(__mpu6050_calibration_task, "MPU6050_Calibration_Task", EZLOPI_SENSOR_MPU6050_TASK_DEPTH, item, 1, &ezlopi_sensor_mpu6050_task_handle); 
-                    // EZPI_service_loop_add("mpu6050_calibration", __mpu6050_calibration_task, 1000, (void *)item);
-                    if (false == user_data->calibration_complete)
+                    if (MPU6050_ERR_OK == MPU6050_config_device(item))
                     {
-                        __mpu6050_calibration_task(item);
+                        // TRACE_I("Configuration Complete.... ");
+                        // TaskHandle_t ezlopi_sensor_mpu6050_task_handle = NULL;
+                        // xTaskCreate(__mpu6050_calibration_task, "MPU6050_Calibration_Task", EZLOPI_SENSOR_MPU6050_TASK_DEPTH, item, 1, &ezlopi_sensor_mpu6050_task_handle);
+                        // EZPI_service_loop_add("mpu6050_calibration", __mpu6050_calibration_task, 1000, (void *)item);
+                        if (false == user_data->calibration_complete)
+                        {
+                            __mpu6050_calibration_task(item);
+                        }
+                        // #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
+                        //                     EZPI_core_process_set_process_info(ENUM_EZLOPI_SENSOR_MPU6050_TASK, &ezlopi_sensor_mpu6050_task_handle, EZLOPI_SENSOR_MPU6050_TASK_DEPTH);
+                        // #endif
+                        ret = EZPI_SUCCESS;
                     }
-                    // #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
-                    //                     EZPI_core_process_set_process_info(ENUM_EZLOPI_SENSOR_MPU6050_TASK, &ezlopi_sensor_mpu6050_task_handle, EZLOPI_SENSOR_MPU6050_TASK_DEPTH);
-                    // #endif
-                    ret = EZPI_SUCCESS;
+                }
+                else
+                {
+                    TRACE_E("I2C init failed");
                 }
             }
         }
@@ -529,15 +535,15 @@ static void __mpu6050_calibration_task(void *params) // calibrate task
         s_mpu6050_data_t *user_data = (s_mpu6050_data_t *)item->user_arg;
         if (user_data && (false == user_data->calibration_complete))
         {
-            uint8_t buf[MPU6050_REG_COUNT_LEN] = { 0 }; // 0 - 13
-            uint8_t dummy[MPU6050_REG_COUNT_LEN] = { 0 };
+            uint8_t buf[MPU6050_REG_COUNT_LEN] = {0}; // 0 - 13
+            uint8_t dummy[MPU6050_REG_COUNT_LEN] = {0};
 
-            float calibrationData[3] = { 0 };
+            float calibrationData[3] = {0};
             uint8_t Check_Register = 0;
             esp_err_t err = ESP_OK;
             TRACE_W(".....................Calculating Paramter");
 
-            uint8_t write_buffer[] = { REG_INTR_STATUS }; // REG_INTR_STATUS;
+            uint8_t write_buffer[] = {REG_INTR_STATUS}; // REG_INTR_STATUS;
             uint8_t address_val = (ACCEL_X_H);
 
             for (uint8_t i = CALIBRATION_SAMPLES + 50; i > 0; i--)
@@ -588,9 +594,9 @@ static void __mpu6050_calibration_task(void *params) // calibrate task
             user_data->gyro_z_offset = calibrationData[2] / (CALIBRATION_SAMPLES);
 
             TRACE_S("Scale :--- new_gy_offset_X=%.2f | new_gy_offset_Y=%.2f | new_gy_offset_Z=%.2f ",
-                user_data->gyro_x_offset,
-                user_data->gyro_y_offset,
-                user_data->gyro_z_offset);
+                    user_data->gyro_x_offset,
+                    user_data->gyro_y_offset,
+                    user_data->gyro_z_offset);
             TRACE_W("......................CALIBRATION COMPLETE");
             user_data->calibration_complete = true;
         }
@@ -600,7 +606,6 @@ static void __mpu6050_calibration_task(void *params) // calibrate task
     // #endif
 }
 
-
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

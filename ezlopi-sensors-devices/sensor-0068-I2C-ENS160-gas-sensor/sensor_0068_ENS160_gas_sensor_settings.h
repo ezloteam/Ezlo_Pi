@@ -35,30 +35,30 @@
  * @author  xx
  * @version 0.1
  * @date    xx
-*/
+ */
 
 #ifndef _SENSOR_ENS160_GAS_SENSOR_SETTINGS_H_
 #define _SENSOR_ENS160_GAS_SENSOR_SETTINGS_H_
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 
 #include "cjext.h"
 #include "ezlopi_util_trace.h"
 #include "ezlopi_core_devices.h"
 
 /*******************************************************************************
-*                          C++ Declaration Wrapper
-*******************************************************************************/
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
     /*******************************************************************************
-    *                          Type & Macro Declarations
-    *******************************************************************************/
+     *                          Type & Macro Declarations
+     *******************************************************************************/
 
 #define SENSOR_ENS160_GAS_SENSOR_SETTING_AMBIENT_TEMPERATURE_LABEL_TEXT "Set ENS160 gas sensor ambient temperature"
 #define SENSOR_ENS160_GAS_SENSOR_SETTING_AMBIENT_TEMPERATURE_DESCRIPTION_TEXT "Setter for ENS160 gas sensor ambient temperature value. Sensor can operate on different surroundings depending on the ambeint temperature"
@@ -74,20 +74,20 @@ extern "C"
     {
         float ambient_temperature;
         void *user_arg;
-    }s_sensor_ens160_gas_sensor_setting_ambient_temperature_t;
+    } s_sensor_ens160_gas_sensor_setting_ambient_temperature_t;
 
     typedef struct s_sensor_ens160_gas_sensor_setting_relative_humidity
     {
         float relative_humidity;
         void *user_arg;
-    }s_sensor_ens160_gas_sensor_setting_relative_humidity_t;
+    } s_sensor_ens160_gas_sensor_setting_relative_humidity_t;
     /*******************************************************************************
-    *                          Extern Data Declarations
-    *******************************************************************************/
+     *                          Extern Data Declarations
+     *******************************************************************************/
 
     /*******************************************************************************
-    *                          Extern Function Prototypes
-    *******************************************************************************/
+     *                          Extern Function Prototypes
+     *******************************************************************************/
 
     /**
      * @brief Function to initialize setting for ens160
@@ -126,16 +126,10 @@ extern "C"
 }
 #endif
 
-
 #endif // _SENSOR_ENS160_GAS_SENSOR_SETTINGS_H_
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
-
-
+ *                          End of File
+ *******************************************************************************/
 
 ;
-
-
-
