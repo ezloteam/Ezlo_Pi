@@ -107,6 +107,9 @@ extern "C"
     CLOUD_METHOD("hub.modes.protect.devices.remove", EZPI_cloud_modes_protect_devices_remove, EZPI_cloud_modes_protect_devices_removed)
     CLOUD_METHOD("hub.modes.entry_delay.set", EZPI_cloud_modes_entry_delay_set, EZPI_cloud_modes_entry_delay_changed)
     CLOUD_METHOD("hub.modes.entry_delay.reset", EZPI_cloud_modes_entry_delay_reset, EZPI_cloud_modes_entry_delay_changed)
+
+    CLOUD_METHOD("hub.modes.swinger.shutdown.list", EZPI_cloud_modes_swinger_shutdown_list, NULL)
+
 #endif // CONFIG_EZPI_SERV_ENABLE_MODES
 
     CLOUD_METHOD("hub.favorite.list", EZPI_favorite_list_v3, NULL)

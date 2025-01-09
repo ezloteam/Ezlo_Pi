@@ -310,15 +310,15 @@ s_ezlopi_modes_t *EZPI_core_modes_cjson_parse_modes(cJSON *cj_modes) // This fun
             cJSON *cj_devices = cJSON_GetObjectItem(__FUNCTION__, cj_modes, ezlopi_devices_str);
             if (cj_devices)
             {
-                parsed_mode->cj_devices = cJSON_Duplicate(__FUNCTION__, cj_devices, true);
+                parsed_mode->cj_devices = cJSON_Duplicate(__FUNCTION__, cj_devices, true);  // Array of device id with security sensors
             }
         }
 
         {
-            cJSON *cj_alarms = cJSON_GetObjectItem(__FUNCTION__, cj_modes, ezlopi_alarms_str);
+            cJSON *cj_alarms = cJSON_GetObjectItem(__FUNCTION__, cj_modes, ezlopi_alarms_str); // Array of device id which make alarms after trips
             if (cj_alarms)
             {
-                parsed_mode->cj_alarms = cJSON_Duplicate(__FUNCTION__, cj_alarms, true);
+                parsed_mode->cj_alarms = cJSON_Duplicate(__FUNCTION__, cj_alarms, true); // Array of camera device identifiers with items named 'make_recording'
             }
         }
 

@@ -151,12 +151,15 @@ void EZPI_core_default_init(void)
     sg_default_mode.cj_alarms = NULL;
     sg_default_mode.cj_cameras = NULL;
 
-    // Adding valid 'security_device' from 'l_ezlopi_device_t' .
+    // Adding valid 'security_sensor_device' from 'l_ezlopi_device_t' .
     sg_default_mode.cj_devices = cJSON_CreateArray(__func__);
     if (sg_default_mode.cj_devices)
     {
         __cjson_add_security_device_to_array(sg_default_mode.cj_devices);
     }
+
+    // Adding valid 'alarm_devices' from 'l_ezlopi_device_t' .
+    #warning "need to dicuss about the alarm in this default case";
 
     sg_default_mode.current_mode_id = EZLOPI_HOUSE_MODE_REF_ID_HOME;
 

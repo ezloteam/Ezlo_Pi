@@ -43,6 +43,7 @@
 
 // #include "ezlopi_core_modes.h"
 // #include "ezlopi_core_errors.h"
+#include "cjext.h"
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_sntp.h"
 #include "ezlopi_core_devices.h"
@@ -127,6 +128,37 @@ void EZPI_core_modes_remove_all_alerts(void)
         TRACE_E("Error!! [_alert_head] not found. ");
     }
 }
+
+ezlopi_error_t EZPI_core_modes_api_swinger_shutdown_list(cJSON *cj_des_arr)
+{
+    ezlopi_error_t ret = EZPI_SUCCESS;
+    if (_alert_head && cj_des_arr)
+    {
+        l_modes_alert_t *curr_node = _alert_head;
+        while (curr_node)
+        {
+            l_ezlopi_device_t *curr_device = EZPI_core_device_get_by_id(curr_node->u_id);
+            if (curr_device &&
+                (curr_device->cloud_properties.armed) &&
+                (curr_device->cloud_properties.swinger.shutdown_en)) // list all the alert/security devices with 'swinger_enabled'
+            {
+                cJSON *cj_device = cJSON_CreateObject(__func__);
+                if (cj_device)
+                {
+                    // add the swinger devices
+                    if (!cJSON_AddItemToArray(cj_des_arr, cj_device))
+                    {
+                        cJSON_Delete(__func__, cj_device);
+                    }
+                }
+            }
+            curr_node = curr_node->next;
+        }
+    }
+    return ret;
+}
+
+//------------------------------------------------
 
 s_ezlopi_modes_t *EZPI_core_modes_get_custom_modes(void)
 {
@@ -329,10 +361,10 @@ ezlopi_error_t EZPI_core_modes_api_set_notifications(uint8_t modeId, bool all, c
             }
 
             // Refreshing the notification list.
-            mode_to_upate->cj_notifications = cJSON_CreateArray(__FUNCTION__);
+            mode_to_upate->cj_notifications = cJSON_CreateArray(__func__);
             if (mode_to_upate->cj_notifications)
             {
-                mode_to_upate->cj_notifications = cJSON_Duplicate(__FUNCTION__, user_id_aray, cJSON_True);
+                mode_to_upate->cj_notifications = cJSON_Duplicate(__func__, user_id_aray, cJSON_True);
             }
 
             mode_to_upate->disarmed_default = false;
@@ -447,7 +479,7 @@ ezlopi_error_t EZPI_core_modes_api_add_cameras_off(uint8_t modeId, const char *d
             {
                 if (NULL == mode_to_update->cj_cameras_off_devices)
                 {
-                    mode_to_update->cj_cameras_off_devices = cJSON_CreateArray(__FUNCTION__);
+                    mode_to_update->cj_cameras_off_devices = cJSON_CreateArray(__func__);
                 }
                 cJSON_AddItemToArray(mode_to_update->cj_cameras_off_devices, cJSON_CreateString(__func__, device_id_str));
 
@@ -478,7 +510,7 @@ ezlopi_error_t EZPI_core_modes_api_remove_cameras_off(uint8_t modeId, const char
             {
                 if (EZPI_STRNCMP_IF_EQUAL(device_id_str, remove_element->valuestring, strlen(device_id_str) + 1, remove_element->str_value_len))
                 {
-                    cJSON_DeleteItemFromArray(__FUNCTION__, mode_to_update->cj_cameras_off_devices, array_index);
+                    cJSON_DeleteItemFromArray(__func__, mode_to_update->cj_cameras_off_devices, array_index);
 
                     mode_to_update->disarmed_default = false; // disarmedDefault state will change to **false**
                     EZPI_core_modes_store_to_nvs();
@@ -661,7 +693,7 @@ ezlopi_error_t EZPI_core_modes_api_set_protect_button(char *service_str, uint32_
                     else // ### Adding the 'new button', to last-node of ll
                     {
                         TRACE_D("[Tail->next==NULL] ; adding new 'protect_button' to the tail_node  ");
-                        curr_button->next = (s_protect_buttons_t *)ezlopi_malloc(__FUNCTION__, sizeof(s_protect_buttons_t));
+                        curr_button->next = (s_protect_buttons_t *)ezlopi_malloc(__func__, sizeof(s_protect_buttons_t));
                         if (curr_button->next)
                         {
                             *status = BIT0; // 'added-flag' is set
@@ -678,7 +710,7 @@ ezlopi_error_t EZPI_core_modes_api_set_protect_button(char *service_str, uint32_
             }
             else // ### Adding to the head node :- 'sg_custom_modes->l_protect_buttons'
             {
-                sg_custom_modes->l_protect_buttons = (s_protect_buttons_t *)ezlopi_malloc(__FUNCTION__, sizeof(s_protect_buttons_t));
+                sg_custom_modes->l_protect_buttons = (s_protect_buttons_t *)ezlopi_malloc(__func__, sizeof(s_protect_buttons_t));
                 if (sg_custom_modes->l_protect_buttons)
                 {
                     *status = BIT0; // 'added-flag' is set
@@ -727,9 +759,9 @@ ezlopi_error_t EZPI_core_modes_api_add_protect_devices(cJSON *user_id_aray)
                 {
                     if (NULL == sg_custom_modes->cj_devices)
                     {
-                        sg_custom_modes->cj_devices = cJSON_CreateArray(__FUNCTION__);
+                        sg_custom_modes->cj_devices = cJSON_CreateArray(__func__);
                     }
-                    cJSON_AddItemToArray(sg_custom_modes->cj_devices, cJSON_CreateString(__FUNCTION__, dev_to_add->valuestring));
+                    cJSON_AddItemToArray(sg_custom_modes->cj_devices, cJSON_CreateString(__func__, dev_to_add->valuestring));
                 }
             }
             EZPI_core_modes_store_to_nvs();
@@ -757,7 +789,7 @@ ezlopi_error_t EZPI_core_modes_api_remove_protect_devices(cJSON *user_id_aray)
             {
                 if (EZPI_STRNCMP_IF_EQUAL(element_to_remove->valuestring, element_to_check->valuestring, (element_to_remove->str_value_len), (element_to_check->str_value_len)))
                 {
-                    cJSON_DeleteItemFromArray(__FUNCTION__, sg_custom_modes->cj_devices, element_index);
+                    cJSON_DeleteItemFromArray(__func__, sg_custom_modes->cj_devices, element_index);
                     break;
                 }
                 element_index++;
@@ -884,7 +916,7 @@ ezlopi_error_t EZPI_core_modes_api_add_disarmed_device(uint8_t modeId, const cha
             {
                 if (NULL == mode_to_update->cj_disarmed_devices)
                 {
-                    mode_to_update->cj_disarmed_devices = cJSON_CreateArray(__FUNCTION__);
+                    mode_to_update->cj_disarmed_devices = cJSON_CreateArray(__func__);
                 }
                 cJSON_AddItemToArray(mode_to_update->cj_disarmed_devices, cJSON_CreateString(__func__, device_id_str));
 
@@ -915,7 +947,7 @@ ezlopi_error_t EZPI_core_modes_api_remove_disarmed_device(uint8_t modeId, const 
             {
                 if (EZPI_STRNCMP_IF_EQUAL(device_id_str, remove_element->valuestring, strlen(device_id_str) + 1, remove_element->str_value_len))
                 {
-                    cJSON_DeleteItemFromArray(__FUNCTION__, mode_to_update->cj_disarmed_devices, array_index);
+                    cJSON_DeleteItemFromArray(__func__, mode_to_update->cj_disarmed_devices, array_index);
 
                     mode_to_update->disarmed_default = false; // disarmedDefault state will change to **false**
                     EZPI_core_modes_store_to_nvs();
@@ -994,19 +1026,19 @@ ezlopi_error_t EZPI_core_modes_set_unset_device_armed_status(cJSON *cj_device_ar
 ezlopi_error_t EZPI_core_modes_store_to_nvs(void)
 {
     ezlopi_error_t ret = EZPI_ERR_MODES_FAILED;
-    cJSON *cj_modes = cJSON_CreateObject(__FUNCTION__);
+    cJSON *cj_modes = cJSON_CreateObject(__func__);
     if (cj_modes)
     {
         EZPI_core_modes_cjson_get_modes(cj_modes);
-        char *modes_str = cJSON_PrintBuffered(__FUNCTION__, cj_modes, 4096, false);
+        char *modes_str = cJSON_PrintBuffered(__func__, cj_modes, 4096, false);
         TRACE_D("length of 'modes_str': %d", strlen(modes_str));
 
-        cJSON_Delete(__FUNCTION__, cj_modes);
+        cJSON_Delete(__func__, cj_modes);
 
         if (modes_str)
         {
             ret = EZPI_core_nvs_write_modes(modes_str);
-            ezlopi_free(__FUNCTION__, modes_str);
+            ezlopi_free(__func__, modes_str);
         }
     }
 
@@ -1020,8 +1052,8 @@ void EZPI_core_modes_init(void)
 
     if (custom_modes_str)
     {
-        cJSON *cj_custom_modes = cJSON_Parse(__FUNCTION__, custom_modes_str);
-        ezlopi_free(__FUNCTION__, custom_modes_str);
+        cJSON *cj_custom_modes = cJSON_Parse(__func__, custom_modes_str);
+        ezlopi_free(__func__, custom_modes_str);
 
         // CJSON_TRACE("cj_custom-modes", cj_custom_modes);
 
@@ -1030,7 +1062,7 @@ void EZPI_core_modes_init(void)
             _is_custom_mode_ok = 1;
             sg_custom_modes = EZPI_core_modes_cjson_parse_modes(cj_custom_modes);
             EZPI_core_modes_set_current_house_mode(EZPI_core_modes_get_house_mode_by_id(sg_custom_modes->current_mode_id));
-            cJSON_Delete(__FUNCTION__, cj_custom_modes);
+            cJSON_Delete(__func__, cj_custom_modes);
         }
     }
 
@@ -1051,7 +1083,7 @@ void EZPI_core_modes_init(void)
 
 static l_modes_alert_t *__create_alert(uint32_t u_id, s_ezlopi_modes_t *ez_mode)
 {
-    l_modes_alert_t *new_node = ezlopi_malloc(__FUNCTION__, sizeof(l_modes_alert_t));
+    l_modes_alert_t *new_node = ezlopi_malloc(__func__, sizeof(l_modes_alert_t));
 
     if (new_node)
     {
@@ -1088,7 +1120,7 @@ static void __ezlopi_service_remove_alert_node(l_modes_alert_t *node)
         {
             l_modes_alert_t *__del_node = _alert_head;
             _alert_head = _alert_head->next;
-            ezlopi_free(__FUNCTION__, __del_node);
+            ezlopi_free(__func__, __del_node);
         }
         else
         {
@@ -1099,7 +1131,7 @@ static void __ezlopi_service_remove_alert_node(l_modes_alert_t *node)
                 {
                     l_modes_alert_t *__del_node = curr_node->next;
                     curr_node->next = curr_node->next->next;
-                    ezlopi_free(__FUNCTION__, __del_node);
+                    ezlopi_free(__func__, __del_node);
                     break;
                 }
 

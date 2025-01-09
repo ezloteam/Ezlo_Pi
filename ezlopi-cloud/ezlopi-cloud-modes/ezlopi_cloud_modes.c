@@ -228,7 +228,7 @@ void EZPI_cloud_modes_disarmed_default_set(cJSON *cj_request, cJSON *cj_response
             if (cj_modeId && cj_disarmedDefault)
             {
                 uint8_t modeId = strtoul(cj_modeId->valuestring, NULL, 10);
-                bool disarmedDefault = cj_disarmedDefault->type == cJSON_True ? true : false;
+                bool disarmedDefault = (cj_disarmedDefault->type == cJSON_True) ? true : false;
 
                 // toggle the flag in - inactive and active mode
                 EZPI_core_modes_api_set_disarmed_default(modeId, disarmedDefault);
@@ -522,7 +522,7 @@ void EZPI_cloud_modes_swinger_shutdown_list(cJSON *cj_request, cJSON *cj_respons
     if (cj_result)
     {
         cJSON_AddStringToObject(__func__, cj_result, "version", "1"); // need to generate version
-        // EZPI_core_modes_api_swinger_shutdown_list(cJSON_AddArrayToObject(__FUNCTION__, cj_result, ezlopi_devices_str));
+        EZPI_core_modes_api_swinger_shutdown_list(cJSON_AddArrayToObject(__FUNCTION__, cj_result, ezlopi_devices_str));
     }
 }
 

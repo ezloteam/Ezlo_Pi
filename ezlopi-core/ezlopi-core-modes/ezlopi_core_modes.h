@@ -113,7 +113,7 @@ extern "C"
         uint32_t alarm_delay_sec;     // Delay before sending alert if armed sensors (door/window or motion sensor) tripped .
         bool armed;                   // flag to indicate if the mode enters the alarmed mode. // Default values: [Home: false], [Away: true], [Night: true], [Vacation: true]
         bool protect;                 // Enables or disables Ezlo Protect for a particular house mode. // Default values: [Home: false], [Away: true], [Night: true], [Vacation: true]
-        bool disarmed_default;        // if true ; utilize the disarmed devices.
+        bool disarmed_default;        // if true ; set all security sensor (in curr houseMode) is disarmed by default.
         bool notify_all;              // This Flag indicates, notifiations trigger to all user_IDs
 
         cJSON *cj_notifications;       // Specific list of user_IDs to notify
@@ -181,7 +181,7 @@ extern "C"
         uint32_t alarm_delay;                //  Delay (sec) before sending alert if armed sensors (door/window or motion sensor) tripped. // [https://log.ezlo.com/new/hub/house_modes_manager/#hubmodesget-version-20] 	Delay (sec) before sending alert to the all modes   // NOTE : [(alarm_delay_sec > 0) === means 'mode->alarmed' member exists ]
         uint32_t switch_to_delay_runs_out;   //  A period of 'exit-time-delay' ; switching to/from the armed mode.
 
-        cJSON *cj_alarms;  // Array of device id which make alarms after trips (Main alert list)
+        cJSON *cj_alarms;  // Array of sensors/devices with ability to alarm us after it trips.
         cJSON *cj_cameras; // Array of camera device identifiers with items named make_recording
         cJSON *cj_devices; // Array of device id with security sensors
         s_protect_buttons_t *l_protect_buttons;
@@ -250,7 +250,7 @@ extern "C"
     ezlopi_error_t EZPI_core_modes_store_to_nvs(void);
 
     /**
-     * @brief This function initializes default house-mode information
+     * @brief This function returns default house-mode information
      */
     s_ezlopi_modes_t *EZPI_core_default_mode_get(void);
     /**
@@ -483,6 +483,13 @@ extern "C"
      * @return ezlopi_error_t
      */
     ezlopi_error_t EZPI_core_modes_api_reset_entry_delay(void);
+    /**
+     * @brief Functio to list 'armed' security-devices with [alert + swinger_en]
+     *
+     * @param cj_des_arr
+     * @return ezlopi_error_t
+     */
+    ezlopi_error_t EZPI_core_modes_api_swinger_shutdown_list(cJSON *cj_des_arr);
 
 #ifdef __cplusplus
 }
