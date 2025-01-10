@@ -248,7 +248,7 @@ static ezlopi_error_t __0062_init(l_ezlopi_item_t *item)
 static void __prepare_device_digi_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     device->cloud_properties.category = category_security_sensor;
-    device->cloud_properties.subcategory = subcategory_gas;
+    device->cloud_properties.subcategory = subcategory_co;
     device->cloud_properties.device_type = dev_type_sensor;
     device->cloud_properties.info = NULL;
     device->cloud_properties.device_type_id = NULL;
@@ -258,7 +258,7 @@ static void __prepare_item_digi_cloud_properties(l_ezlopi_item_t *item, cJSON *c
 {
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
-    item->cloud_properties.item_name = ezlopi_item_name_gas_alarm;
+    item->cloud_properties.item_name = ezlopi_item_name_co_alarm;
     item->cloud_properties.value_type = value_type_token;
     item->cloud_properties.show = true;
     item->cloud_properties.scale = NULL;
@@ -313,9 +313,8 @@ static ezlopi_error_t __0062_get_item(l_ezlopi_item_t *item, void *arg)
                 if (NULL != json_array_enum)
                 {
                     char *mq7_sensor_gas_alarm_token[] = {
-                        "no_gas",
-                        "combustible_gas_detected",
-                        "toxic_gas_detected",
+                        "no_co",
+                        "co_detected",
                         "unknown",
                     };
                     for (uint8_t i = 0; i < MQ7_GAS_ALARM_MAX; i++)
@@ -329,8 +328,8 @@ static ezlopi_error_t __0062_get_item(l_ezlopi_item_t *item, void *arg)
                     cJSON_AddItemToObject(__FUNCTION__, cj_result, ezlopi_enum_str, json_array_enum);
                 }
                 //--------------------------------------------------------------------------------------
-                cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, (char *)item->user_arg ? item->user_arg : "no_gas");
-                cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, (char *)item->user_arg ? item->user_arg : "no_gas");
+                cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, (char *)item->user_arg ? item->user_arg : "no_co");
+                cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, (char *)item->user_arg ? item->user_arg : "no_co");
             }
             if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
             {
@@ -356,8 +355,8 @@ static ezlopi_error_t __0062_get_cjson_value(l_ezlopi_item_t *item, void *arg)
         {
             if (ezlopi_item_name_gas_alarm == item->cloud_properties.item_name)
             {
-                cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, (char *)item->user_arg ? item->user_arg : "no_gas");
-                cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, (char *)item->user_arg ? item->user_arg : "no_gas");
+                cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, (char *)item->user_arg ? item->user_arg : "no_co");
+                cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, (char *)item->user_arg ? item->user_arg : "no_co");
             }
             if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
             {
@@ -383,11 +382,11 @@ static ezlopi_error_t __0062_notify(l_ezlopi_item_t *item)
             const char *curret_value = NULL;
             if (0 == gpio_get_level(item->interface.gpio.gpio_in.gpio_num)) // when D0 -> 0V,
             {
-                curret_value = "combustible_gas_detected";
+                curret_value = "co_detected";
             }
             else
             {
-                curret_value = "no_gas";
+                curret_value = "no_co";
             }
             if (curret_value != (char *)item->user_arg) // calls update only if there is change in state
             {

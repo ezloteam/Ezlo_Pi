@@ -230,14 +230,6 @@ static const char *ezlopi_config_test =
             \"id_room\": \"\",\
             \"gpio1\": 25,\
             \"gpio2\": 33\
-        },\
-        {\
-            \"dev_name\": \"MQ2_LPG\",\
-            \"dev_type\": 10,\
-            \"id_item\": 49,\
-            \"id_room\": \"\",\
-            \"gpio1\": 15,\
-            \"gpio2\": 34\
         }\
     ],\
     \"config_id\":\"1234567\",\

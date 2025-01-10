@@ -77,7 +77,7 @@
         extern const char *subcategory_motion;
         // extern const  char *subcategory_glass;
         // extern const  char *subcategory_smoke;
-        // extern const  char *subcategory_co;
+        extern const  char *subcategory_co;
         // extern const  char *subcategory_co2;
         extern const char *subcategory_gas;
         extern const char *subcategory_heat;

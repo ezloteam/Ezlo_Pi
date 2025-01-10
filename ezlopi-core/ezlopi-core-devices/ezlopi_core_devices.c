@@ -367,7 +367,7 @@ l_ezlopi_device_t *EZPI_core_device_add_device(cJSON *cj_device, const char *las
 
         // 3. Check for modified info , stored in nvs. If not ; procced as usual.
         {
-            char __device_id_str[32];
+            char __device_id_str[32] = {0};
             snprintf(__device_id_str, sizeof(__device_id_str), "%08x", new_device->cloud_properties.device_id); // convert (uint32_t) to ('0x1002e001')
 
             char *device_mod_str = EZPI_core_nvs_read_str(__device_id_str); // use 'device_id' generated after parent/child-categorization.
@@ -949,7 +949,7 @@ static void ezlopi_device_free_all_device_setting(l_ezlopi_device_t *curr_device
 static int ____store_bool_in_nvs_dev_mod_info(uint32_t nvs_device_id, const char *string_key, bool bool_value)
 {
     int ret = 0;
-    char __device_id_str[32];
+    char __device_id_str[32] = {0};
     snprintf(__device_id_str, sizeof(__device_id_str), "%08x", nvs_device_id); // convert (uint32_t) to ('0x1002e001')
 
     char *device_mod_str = EZPI_core_nvs_read_str(__device_id_str);
@@ -1029,7 +1029,7 @@ static int ____store_bool_in_nvs_dev_mod_info(uint32_t nvs_device_id, const char
 static int ____store_string_in_nvs_dev_mod_info(uint32_t nvs_device_id, const char *string_key, const char *string_value)
 {
     int ret = 0;
-    char __device_id_str[32];
+    char __device_id_str[32] = {0};
     snprintf(__device_id_str, sizeof(__device_id_str), "%08x", nvs_device_id); // convert (uint32_t) to ('0x1002e001')
 
     char *device_mod_str = EZPI_core_nvs_read_str(__device_id_str);

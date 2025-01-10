@@ -313,6 +313,7 @@ static void __modes_create_non_bypass_alerts(s_ezlopi_modes_t *ez_mode, s_house_
     if (ez_mode && curr_house_mode && (NULL == EZPI_core_modes_get_alert_head()))
     {
         cJSON *cj_alarm = NULL;
+        CJSON_TRACE("cj_alarms: ", ez_mode->cj_alarms);
         cJSON_ArrayForEach(cj_alarm, ez_mode->cj_alarms) // 'alarm_device_id' to trigger alerts
         {
             // 1.1.  Non-bypass-loop creation for listed 'device_id'
