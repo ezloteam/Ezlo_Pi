@@ -521,8 +521,12 @@ void EZPI_cloud_modes_swinger_shutdown_list(cJSON *cj_request, cJSON *cj_respons
     cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     if (cj_result)
     {
+        //1 . check the verson
         cJSON_AddStringToObject(__func__, cj_result, "version", "1"); // need to generate version
-        EZPI_core_modes_api_swinger_shutdown_list(cJSON_AddArrayToObject(__FUNCTION__, cj_result, ezlopi_devices_str));
+
+        if (EZPI_SUCCESS == EZPI_core_modes_api_swinger_shutdown_list(cj_result))
+        {
+        }
     }
 }
 

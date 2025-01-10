@@ -310,7 +310,7 @@ s_ezlopi_modes_t *EZPI_core_modes_cjson_parse_modes(cJSON *cj_modes) // This fun
             cJSON *cj_devices = cJSON_GetObjectItem(__FUNCTION__, cj_modes, ezlopi_devices_str);
             if (cj_devices)
             {
-                parsed_mode->cj_devices = cJSON_Duplicate(__FUNCTION__, cj_devices, true);  // Array of device id with security sensors
+                parsed_mode->cj_devices = cJSON_Duplicate(__FUNCTION__, cj_devices, true); // Array of device id with security sensors
             }
         }
 
@@ -459,7 +459,7 @@ cJSON *EZPI_core_modes_cjson_changed(void) //  (IN core-service-loop) // For bro
     return cj_root;
 }
 
-cJSON *EZPI_core_modes_cjson_alarmed(const char *dev_id_str) // (IN core-service-loop) // For broadcasting alarm-info on active 'MODE'
+cJSON *EZPI_core_modes_cjson_prep_alarm_mesg(const char *dev_id_str) // (IN core-service-loop) // For broadcasting alarm-info on active 'MODE'
 {
     cJSON *cj_root = cJSON_CreateObject(__FUNCTION__);
     if (cj_root)

@@ -60,11 +60,11 @@ extern "C"
 
     typedef struct s_swinger_info
     {
-        uint32_t stat_hits;        // total hit counts from system start-up
-        uint32_t stat_added;       // the first hit instant
-        uint32_t stat_updated;     // latest hit instant
+        uint32_t stat_hits;        // Number of hits per device
+        uint32_t stat_added;       // Timestamp when the first hit is made
+        uint32_t stat_updated;     // Timestamp when the latest hit is made
         uint32_t hitsLimit;        // max-limit for no of hits allowed
-        uint32_t inactivityWindow; // Inactivity duration (sec)
+        uint32_t inactivityWindow; // Individual inactivity window for a device
         bool shutdown_en;          // Guard flag for swinger activations
     } s_swinger_info_t;
 

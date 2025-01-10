@@ -372,6 +372,7 @@ extern "C"
     extern const char *ezlopi_bypassDevices_str;
     extern const char *ezlopi_protect_str;
     extern const char *ezlopi_devices_str;
+    extern const char *ezlopi_disabledDevices_str;
     extern const char *ezlopi_deviceGroup_str;
     extern const char *ezlopi_deviceGroups_str;
     extern const char *ezlopi_deviceGroupIds_str;

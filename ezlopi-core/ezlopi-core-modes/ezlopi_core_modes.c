@@ -95,8 +95,9 @@ l_modes_alert_t *EZPI_core_modes_get_alert_head(void)
     return _alert_head;
 }
 
-void EZPI_core_modes_add_alert(uint32_t u_id, s_ezlopi_modes_t *ez_mode)
+ezlopi_error_t EZPI_core_modes_add_alert(uint32_t u_id, s_ezlopi_modes_t *ez_mode)
 {
+    ezlopi_error_t ret = EZPI_SUCCESS;
     if ((u_id > DEVICE_ID_START) && ez_mode)
     {
         if (_alert_head)
@@ -114,6 +115,11 @@ void EZPI_core_modes_add_alert(uint32_t u_id, s_ezlopi_modes_t *ez_mode)
             _alert_head = __create_alert(u_id, ez_mode);
         }
     }
+    else
+    {
+        return EZPI_FAILED;
+    }
+    return ret;
 }
 
 void EZPI_core_modes_remove_all_alerts(void)
@@ -129,30 +135,68 @@ void EZPI_core_modes_remove_all_alerts(void)
     }
 }
 
-ezlopi_error_t EZPI_core_modes_api_swinger_shutdown_list(cJSON *cj_des_arr)
+ezlopi_error_t EZPI_core_modes_api_swinger_shutdown_list(cJSON *cj_result)
 {
-    ezlopi_error_t ret = EZPI_SUCCESS;
-    if (_alert_head && cj_des_arr)
+    ezlopi_error_t ret = EZPI_FAILED;
+    if (_alert_head && cj_result)
     {
-        l_modes_alert_t *curr_node = _alert_head;
-        while (curr_node)
+        ret = EZPI_SUCCESS;
+
+        char dev_id_str[32] = {0};
+        cJSON *cj_devices = cJSON_AddArrayToObject(__FUNCTION__, cj_result, ezlopi_devices_str);
+        cJSON *cj_disabled_devices = cJSON_AddArrayToObject(__FUNCTION__, cj_result, ezlopi_disabledDevices_str);
+        if (cj_devices && cj_disabled_devices)
         {
-            l_ezlopi_device_t *curr_device = EZPI_core_device_get_by_id(curr_node->u_id);
-            if (curr_device &&
-                (curr_device->cloud_properties.armed) &&
-                (curr_device->cloud_properties.swinger.shutdown_en)) // list all the alert/security devices with 'swinger_enabled'
+            l_modes_alert_t *curr_node = _alert_head;
+            while (curr_node)
             {
-                cJSON *cj_device = cJSON_CreateObject(__func__);
-                if (cj_device)
+                snprintf(dev_id_str, sizeof(dev_id_str), "%08x", curr_node->u_id);
+                l_ezlopi_device_t *curr_device = EZPI_core_device_get_by_id(curr_node->u_id); // checking security-devices which trigger alerts
+                if (curr_device)
                 {
-                    // add the swinger devices
-                    if (!cJSON_AddItemToArray(cj_des_arr, cj_device))
+                    if (curr_device->cloud_properties.swinger.shutdown_en)
                     {
-                        cJSON_Delete(__func__, cj_device);
+                        cJSON *cj_tmp = cJSON_CreateObject(__func__);
+                        if (cj_tmp)
+                        {
+                            cJSON_AddStringToObject(__func__, cj_tmp, ezlopi_deviceId_str, dev_id_str); // 1. add the device_Id
+
+                            cJSON *cj_stat = cJSON_CreateObject(__func__); // 2. prepare the swinger "stat"-info.
+                            if (cj_stat)
+                            {
+                                cJSON_AddNumberToObject(__func__, cj_stat, "hits", curr_device->cloud_properties.swinger.stat_hits);
+                                cJSON_AddNumberToObject(__func__, cj_stat, "added", curr_device->cloud_properties.swinger.stat_added);
+                                cJSON_AddNumberToObject(__func__, cj_stat, "updated", curr_device->cloud_properties.swinger.stat_updated);
+                                if (!cJSON_AddItemToObject(__func__, cj_tmp, "stat", cj_stat))
+                                {
+                                    cJSON_Delete(__func__, cj_stat);
+                                }
+                            }
+
+                            cJSON *cj_limits = cJSON_CreateObject(__func__); // 3. prepare the swinger "limits"-info.
+                            if (cj_limits)
+                            {
+                                cJSON_AddNumberToObject(__func__, cj_limits, "hitsLimit", curr_device->cloud_properties.swinger.hitsLimit);
+                                cJSON_AddNumberToObject(__func__, cj_limits, "inactivityWindow", curr_device->cloud_properties.swinger.inactivityWindow);
+                                if (!cJSON_AddItemToObject(__func__, cj_tmp, "limits", cj_limits))
+                                {
+                                    cJSON_Delete(__func__, cj_limits);
+                                }
+                            }
+
+                            if (!cJSON_AddItemToArray(cj_devices, cj_tmp)) //  Now, Add this swinger information to the 'cj_devices' array
+                            {
+                                cJSON_Delete(__func__, cj_tmp);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        cJSON_AddItemToArray(cj_disabled_devices, cJSON_CreateString(__FUNCTION__, dev_id_str));
                     }
                 }
+                curr_node = curr_node->next;
             }
-            curr_node = curr_node->next;
         }
     }
     return ret;
@@ -1003,12 +1047,10 @@ ezlopi_error_t EZPI_core_modes_set_unset_device_armed_status(cJSON *cj_device_ar
                                 {
                                     // TRACE_E("freeing cj_response");
                                     cJSON_Delete(__func__, cj_response);
-                                    ret = EZPI_ERR_MODES_FAILED;
                                 }
                                 else
                                 {
                                     // TRACE_D("Sending--> broadcast for device armed toggle");
-                                    // The 'cj_response' is freed automatically after broadcast.
                                     ret = EZPI_SUCCESS;
                                 }
                             }
@@ -1160,6 +1202,7 @@ static void __ezlopi_service_remove_alert_node_by_name(const char *_name_)
 #endif
 
 #endif // CONFIG_EZPI_SERV_ENABLE_MODES
-       /*******************************************************************************
-        *                          End of File
-        *******************************************************************************/
+
+/*******************************************************************************
+ *                          End of File
+ *******************************************************************************/

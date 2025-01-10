@@ -161,12 +161,12 @@ bool ezlopi_service_modes_start(uint32_t wait_ms)
 //---------------------------------------------------------------------------------------------
 static void __broadcast_modes_alarmed_for_uid(const char *dev_id_str)
 {
-    cJSON *cj_update = EZPI_core_modes_cjson_alarmed(dev_id_str);
-    // CJSON_TRACE("----------------- broadcasting - cj_update", cj_update);
+    cJSON *cj_alarm_mesg = EZPI_core_modes_cjson_prep_alarm_mesg(dev_id_str);
+    // CJSON_TRACE("----------------- broadcasting - cj_alarm_mesg", cj_alarm_mesg);
 
-    if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_update, EZPI_core_sntp_get_current_time_sec()))
+    if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_alarm_mesg, EZPI_core_sntp_get_current_time_sec()))
     {
-        cJSON_Delete(__FUNCTION__, cj_update);
+        cJSON_Delete(__FUNCTION__, cj_alarm_mesg);
     }
 }
 
@@ -197,12 +197,16 @@ static void __broadcast_alarmed_state_for_valid_ids(void)
     l_modes_alert_t *curr_node = EZPI_core_modes_get_alert_head();
     while (curr_node)
     {
-        if ((curr_node->u_id) && (false == __check_if_devid_in_alarm_off(EZPI_core_modes_get_current_house_modes(), curr_node->u_id)))
+        l_ezlopi_device_t *target_device = EZPI_core_device_get_by_id(curr_node->u_id);
+        if (target_device && target_device->cloud_properties.armed) // allow to broadcast alert only for valid & armed 'device'.
         {
-            char dev_id_str[32] = {0};
-            snprintf(dev_id_str, sizeof(dev_id_str), "%08x", curr_node->u_id);
-            // send alarmed-broadcast for target 'device_id'
-            __broadcast_modes_alarmed_for_uid(dev_id_str);
+            if (false == __check_if_devid_in_alarm_off(EZPI_core_modes_get_current_house_modes(), curr_node->u_id))
+            {
+                char dev_id_str[32] = {0};
+                snprintf(dev_id_str, sizeof(dev_id_str), "%08x", curr_node->u_id);
+                // send alarmed-broadcast for target 'device_id'
+                __broadcast_modes_alarmed_for_uid(dev_id_str);
+            }
         }
         curr_node = curr_node->next;
     }
@@ -306,21 +310,27 @@ static bool __check_if_entry_delay_finished(s_ezlopi_modes_t *ez_mode)
 
 static void __modes_create_non_bypass_alerts(s_ezlopi_modes_t *ez_mode, s_house_modes_t *curr_house_mode)
 {
-    if (ez_mode && curr_house_mode)
+    if (ez_mode && curr_house_mode && (NULL == EZPI_core_modes_get_alert_head()))
     {
-        if (NULL == EZPI_core_modes_get_alert_head())
+        cJSON *cj_alarm = NULL;
+        cJSON_ArrayForEach(cj_alarm, ez_mode->cj_alarms) // 'alarm_device_id' to trigger alerts
         {
-            cJSON *cj_alarm = NULL;
-            cJSON_ArrayForEach(cj_alarm, ez_mode->cj_alarms) // 'alarm_device_id' to trigger alerts
+            // 1.1.  Non-bypass-loop creation for listed 'device_id'
+            if (cj_alarm->valuestring && cj_alarm->str_value_len)
             {
-                // 1.1.  Non-bypass-loop creation for listed 'device_id'
-                if (cj_alarm->valuestring && cj_alarm->str_value_len)
+                if (false == __check_if_device_is_bypassed(curr_house_mode->cj_bypass_devices, cj_alarm->valuestring)) // donot trigger alert if device is bypassed
                 {
-                    TRACE_S("checking id: %s", cj_alarm->valuestring);
-                    if (false == __check_if_device_is_bypassed(curr_house_mode->cj_bypass_devices, cj_alarm->valuestring)) // donot trigger alert if device is bypassed
+                    uint32_t devId_to_add = (uint32_t)strtoul(cj_alarm->valuestring, NULL, 16);
+                    if (EZPI_SUCCESS == EZPI_core_modes_add_alert(devId_to_add, ez_mode))
                     {
-                        EZPI_core_modes_add_alert((uint32_t)strtoul(cj_alarm->valuestring, NULL, 16), ez_mode); // Append suitable nodes to 'alert_ll'.
-                        TRACE_D("alert_ll --> Adding :%s", cj_alarm->valuestring);
+                        TRACE_D("alert_ll --> Adding :%s [%08x]", cj_alarm->valuestring, devId_to_add);
+#warning "need to discuss about toggle devices's : arm_flag-->true";
+                        l_ezlopi_device_t *target_security_device = EZPI_core_device_get_by_id(devId_to_add);
+                        if (target_security_device && (false == target_security_device->cloud_properties.armed))
+                        {
+                            TRACE_D("Device :%08x --> Armed = true", devId_to_add);
+                            target_security_device->cloud_properties.armed = true; //
+                        }
                     }
                 }
             }

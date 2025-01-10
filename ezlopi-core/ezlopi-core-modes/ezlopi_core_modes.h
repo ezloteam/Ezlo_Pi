@@ -227,8 +227,9 @@ extern "C"
      *
      * @param u_id Target device_id
      * @param ez_mode Pointer to current HouseMode
+     * @return ezlopi_error_t
      */
-    void EZPI_core_modes_add_alert(uint32_t u_id, s_ezlopi_modes_t *ez_mode);
+    ezlopi_error_t EZPI_core_modes_add_alert(uint32_t u_id, s_ezlopi_modes_t *ez_mode);
     /**
      * @brief Function to remove all alerts
      *
@@ -484,12 +485,12 @@ extern "C"
      */
     ezlopi_error_t EZPI_core_modes_api_reset_entry_delay(void);
     /**
-     * @brief Functio to list 'armed' security-devices with [alert + swinger_en]
+     * @brief Function to List limitations and statistics for devices under Swinger Shutdown.
      *
-     * @param cj_des_arr
+     * @param cj_result Pointer to resultant list.
      * @return ezlopi_error_t
      */
-    ezlopi_error_t EZPI_core_modes_api_swinger_shutdown_list(cJSON *cj_des_arr);
+    ezlopi_error_t EZPI_core_modes_api_swinger_shutdown_list(cJSON *cj_result);
 
 #ifdef __cplusplus
 }
