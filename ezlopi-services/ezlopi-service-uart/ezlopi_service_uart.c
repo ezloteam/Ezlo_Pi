@@ -253,6 +253,13 @@ static void ezpi_service_uart_get_config(void);
  * @param arg Task arguments
  */
 static void ezpi_service_uart_task(void *arg);
+/**
+ * @brief Function loop that handles UART communication
+ *
+ * @param arg loop arguments
+ */
+static void __uart_loop(void *arg);
+
 #if !defined(CONFIG_IDF_TARGET_ESP32) && !defined(CONFIG_IDF_TARGET_ESP32C3)
 /**
  * @brief Function that will be called on incoming data at CDC
@@ -302,8 +309,11 @@ void EZPI_SERV_cdc_init()
 
 void EZPI_SERV_uart_init(void)
 {
-    // EZPI_service_loop_add("uart-loop", __uart_loop, 1, NULL);
 #if 1
+    EZPI_service_loop_add("uart-loop", __uart_loop, 1, NULL);
+#endif
+
+#if 0
     TaskHandle_t __uart_loop_handle = NULL;
     xTaskCreate(ezpi_service_uart_task, "serv_uart_task", EZLOPI_SERVICE_UART_TASK_DEPTH, NULL, configMAX_PRIORITIES - 4, &__uart_loop_handle);
 
@@ -560,11 +570,11 @@ static ezlopi_error_t ezpi_service_uart_process_provisioning_api(const cJSON *ro
                 CJSON_GET_VALUE_STRING_BY_COPY(cj_data, ezlopi_model_number_str, model_number, sizeof(model_number));
                 CJSON_GET_VALUE_STRING_BY_COPY(cj_data, ezlopi_uuid_str, device_uuid, sizeof(device_uuid));
                 CJSON_GET_VALUE_STRING_BY_COPY(cj_data, ezlopi_mac_str, device_mac, sizeof(device_mac));
-                CJSON_GET_VALUE_STRING_BY_COPY(cj_data, "provisioning_uuid", prov_uuid, sizeof(prov_uuid));
+                CJSON_GET_VALUE_STRING_BY_COPY(cj_data, ezlopi_provisioning_uuid_str, prov_uuid, sizeof(prov_uuid));
                 CJSON_GET_VALUE_STRING_BY_COPY(cj_data, ezlopi_provision_server_str, provision_server, sizeof(provision_server));
                 CJSON_GET_VALUE_STRING_BY_COPY(cj_data, ezlopi_cloud_server_str, cloud_server, sizeof(cloud_server));
                 CJSON_GET_VALUE_STRING_BY_COPY(cj_data, ezlopi_provision_token_str, provision_token, sizeof(provision_token));
-                CJSON_GET_VALUE_STRING_BY_COPY(cj_data, "local_key", local_key, sizeof(local_key));
+                CJSON_GET_VALUE_STRING_BY_COPY(cj_data, ezlopi_local_key_str, local_key, sizeof(local_key));
 
                 ezlopi_config_basic->device_name = device_name;
                 ezlopi_config_basic->manufacturer = manufacturer;
@@ -609,7 +619,7 @@ static ezlopi_error_t ezpi_service_uart_process_provisioning_api(const cJSON *ro
 
 static int ezpi_service_uart_parser(const char *data)
 {
-    cJSON *root = cJSON_ParseWithRef(__FUNCTION__, data);
+    cJSON *root = cJSON_Parse(__FUNCTION__, data);
 
     if (root)
     {
@@ -685,6 +695,7 @@ static int ezpi_service_uart_parser(const char *data)
     return 1;
 }
 
+#if 0
 static void ezpi_service_uart_task(void *arg)
 {
     static const char *RX_TASK_TAG = "RX_TASK";
@@ -738,6 +749,56 @@ static void ezpi_service_uart_task(void *arg)
     EZPI_core_process_set_is_deleted(ENUM___uart_loop);
 #endif
     vTaskDelete(NULL);
+}
+#endif
+
+static void __uart_loop(void *arg)
+{
+    uint32_t tmp_len = 0;
+    uint32_t buffred_data_len = 0;
+    uart_get_buffered_data_len(EZPI_SERV_UART_NUM_DEFAULT, &tmp_len);
+
+    if (tmp_len > 0)
+    {
+        while (tmp_len != buffred_data_len)
+        {
+            buffred_data_len = tmp_len;
+            vTaskDelay(10 / portTICK_RATE_MS);
+            uart_get_buffered_data_len(EZPI_SERV_UART_NUM_DEFAULT, &tmp_len);
+
+            if (tmp_len > (12 * 1024))
+            {
+                buffred_data_len = tmp_len;
+                break;
+            }
+        }
+
+        if (buffred_data_len)
+        {
+            uint8_t *uart_rx_data = (uint8_t *)ezlopi_malloc(__FUNCTION__, buffred_data_len + 1);
+
+            if (uart_rx_data)
+            {
+                memset(uart_rx_data, 0, buffred_data_len);
+
+                int rxBytes = uart_read_bytes(EZPI_SERV_UART_NUM_DEFAULT, uart_rx_data, buffred_data_len, 100 / portTICK_RATE_MS);
+
+                if (rxBytes > 0)
+                {
+                    uart_rx_data[rxBytes] = 0;
+                    printf("%s(%u):: uart-data(%u|%u): %s \r\n", __FILENAME__, __LINE__, buffred_data_len, rxBytes, uart_rx_data);
+                    TRACE_I("%s", uart_rx_data);
+                    ezpi_service_uart_parser((const char *)uart_rx_data);
+                }
+
+                ezlopi_free(__FUNCTION__, uart_rx_data);
+            }
+            else
+            {
+                uart_flush_input(EZPI_SERV_UART_NUM_DEFAULT);
+            }
+        }
+    }
 }
 
 static int ezpi_service_uart_firmware_info(cJSON *parent)

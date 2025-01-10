@@ -96,7 +96,6 @@ void EZPI_core_cjson_trace(char *name_str, cJSON *cj_object)
     }
 }
 
-// void EZPI_core_cjson_get_value_string_by_copy(cJSON *cj_root, char *item_name_str, char *item_val, uint32_t item_val_len)
 void EZPI_core_cjson_get_value_string_by_copy(cJSON *cj_root, char *item_name_str, char *item_val, uint32_t item_val_len)
 {
     if (cj_root && item_name_str && item_val && item_val_len)
@@ -109,23 +108,26 @@ void EZPI_core_cjson_get_value_string_by_copy(cJSON *cj_root, char *item_name_st
     }
 }
 
+void EZPI_core_cjson_get_value_string_by_alloc(cJSON *cj_root, char *item_name_str, char **item_val_ptr_address)
+{
+    cJSON *o_item = cJSON_GetObjectItem(__FUNCTION__, cj_root, item_name_str);
+
+    if (o_item && o_item->valuestring && o_item->str_value_len)
+    {
+        uint32_t value_len = o_item->str_value_len + 1;
+        ezlopi_free(__func__, *item_val_ptr_address);
+        *item_val_ptr_address = ezlopi_malloc(__func__, value_len);
+        if (NULL != *item_val_ptr_address)
+        {
+            snprintf(*item_val_ptr_address, value_len, "%.*s", o_item->str_value_len, o_item->valuestring);
+            printf("%s(%u):: %s: %s\r\n", __FILENAME__, __LINE__, item_name_str, *item_val_ptr_address);
+        }
+    }
+}
+
 #endif // EZPI_USE_CJSON_MACRO
 
 #if 0
-
-#define CJSON_GET_VALUE_STRING_BY_COPY_INTO_PTR(cj_root, char *item_name_str, item_val_ptr)                          \
-    {                                                                                                                \
-        cJSON *o_item = cJSON_GetObjectItem(__FUNCTION__, cj_root, char *item_name_str);                             \
-        if (o_item && o_item->valuestring && o_item->str_value_len)                                                  \
-        {                                                                                                            \
-            ezlopi_free(__func__, item_val_ptr);                                                                     \
-            item_val_ptr = ezlopi_malloc(__func__, (o_item->str_value_len + 1));                                     \
-            if (NULL != item_val_ptr)                                                                                \
-            {                                                                                                        \
-                snprintf(item_val_ptr, (o_item->str_value_len), "%.*s", o_item->str_value_len, o_item->valuestring); \
-            }                                                                                                        \
-        }                                                                                                            \
-    }
 
 #define ASSIGN_DEVICE_NAME_V2(device, dev_name)                        \
     {                                                                  \

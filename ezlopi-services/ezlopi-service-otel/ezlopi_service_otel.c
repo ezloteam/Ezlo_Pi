@@ -261,10 +261,12 @@ static void __connection_upcall(bool connected)
         if (0 == pre_status)
         {
             TRACE_S("WSS-connected!");
+            printf("otel: WSS-connected!\r\n");
         }
         else
         {
             TRACE_S("WSS-reconnected!");
+            printf("otel: WSS-reconnected!\r\n");
         }
 
         pre_status = 1;
@@ -272,6 +274,7 @@ static void __connection_upcall(bool connected)
     else
     {
         TRACE_E("WSS-disconnected!");
+        printf("otel: WSS-disconnected!\r\n");
         pre_status = -1;
     }
 }

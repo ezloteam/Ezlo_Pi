@@ -241,6 +241,7 @@ const char *ezlopi_provisioned_status_str = "provisioned_status";
 const char *ezlopi_provisioned_str = "provisioned";
 const char *ezlopi_model_number_str = "model_number";
 const char *ezlopi_serial_str = "serial";
+const char *ezlopi_provisioning_uuid_str = "provisioning_uuid";
 const char *ezlopi_uuid_provisioning_str = "uuid_provisioning";
 const char *ezlopi_provision_server_str = "provision_server";
 const char *ezlopi_cloud_server_str = "cloud_server";

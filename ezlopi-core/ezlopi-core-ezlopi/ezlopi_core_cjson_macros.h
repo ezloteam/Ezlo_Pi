@@ -56,6 +56,7 @@ extern "C"
      *                          Type & Macro Declarations
      *******************************************************************************/
 
+    // 0x17d4f0
     // 0x17d6e0
     // 0x17c2b0
     // 0x17bc70
@@ -73,6 +74,8 @@ extern "C"
     void EZPI_core_cjson_get_value_double(cJSON *cj_root, char *item_name_str, double *item_val);
     void EZPI_core_cjson_get_value_uint16(cJSON *cj_root, char *item_name_str, uint16_t *item_val);
     void EZPI_core_cjson_get_value_uint32(cJSON *cj_root, char *item_name_str, uint32_t *item_val);
+
+    void EZPI_core_cjson_get_value_string_by_alloc(cJSON *cj_root, char *item_name_str, char **item_val_ptr_address);
     void EZPI_core_cjson_get_value_string_by_copy(cJSON *cj_root, char *item_name_str, char *item_val, uint32_t item_val_len);
 
 #define CJSON_TRACE(name_str, cj_object) EZPI_core_cjson_trace(name_str, cj_object)
@@ -84,6 +87,8 @@ extern "C"
 #define CJSON_GET_VALUE_DOUBLE(cj_root, item_name_str, item_val) EZPI_core_cjson_get_value_double(cj_root, item_name_str, &item_val)
 #define CJSON_GET_VALUE_UINT16(cj_root, item_name_str, item_val) EZPI_core_cjson_get_value_uint16(cj_root, item_name_str, &item_val)
 #define CJSON_GET_VALUE_UINT32(cj_root, item_name_str, item_val) EZPI_core_cjson_get_value_uint32(cj_root, item_name_str, &item_val)
+
+#define CJSON_GET_VALUE_STRING_BY_COPY_INTO_PTR(cj_root, item_name_str, item_val_ptr_address) EZPI_core_cjson_get_value_string_by_alloc(cj_root, item_name_str, item_val_ptr_address)
 #define CJSON_GET_VALUE_STRING_BY_COPY(cj_root, item_name_str, item_val, item_val_size) EZPI_core_cjson_get_value_string_by_copy(cj_root, item_name_str, item_val, item_val_size)
 
 #else // EZPI_USE_CJSON_MACRO
@@ -154,8 +159,6 @@ extern "C"
 #define CJSON_GET_VALUE_UINT16 CJSON_GET_VALUE_DOUBLE
 #define CJSON_GET_VALUE_UINT32 CJSON_GET_VALUE_DOUBLE
 
-#endif // EZPI_USE_CJSON_MACRO
-
 #define CJSON_GET_VALUE_STRING_BY_COPY_INTO_PTR(root, item_name, item_val_ptr)                                       \
     {                                                                                                                \
         cJSON *o_item = cJSON_GetObjectItem(__FUNCTION__, root, item_name);                                          \
@@ -169,6 +172,8 @@ extern "C"
             }                                                                                                        \
         }                                                                                                            \
     }
+
+#endif // EZPI_USE_CJSON_MACRO
 
 #define ASSIGN_DEVICE_NAME_V2(device, dev_name)                        \
     {                                                                  \

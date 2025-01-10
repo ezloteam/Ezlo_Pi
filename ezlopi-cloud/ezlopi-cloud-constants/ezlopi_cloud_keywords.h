@@ -248,6 +248,7 @@ extern "C"
     extern const char *ezlopi_provisioned_str;
     extern const char *ezlopi_model_number_str;
     extern const char *ezlopi_serial_str;
+    extern const char *ezlopi_provisioning_uuid_str;
     extern const char *ezlopi_uuid_provisioning_str;
     extern const char *ezlopi_provision_server_str;
     extern const char *ezlopi_cloud_server_str;
