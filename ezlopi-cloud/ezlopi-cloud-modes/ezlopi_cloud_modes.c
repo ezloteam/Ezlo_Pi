@@ -528,6 +528,24 @@ void EZPI_cloud_modes_swinger_shutdown_list(cJSON *cj_request, cJSON *cj_respons
     }
 }
 
+void EZPI_cloud_modes_swinger_shutdown_reset(cJSON *cj_request, cJSON *cj_response)
+{
+    cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+    if (cj_result)
+    {
+        cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
+        if (cj_params)
+        {
+            cJSON *cj_dev_id = cJSON_GetObjectItem(__func__, cj_params, ezlopi_deviceId_str);
+            if (cj_dev_id && cj_dev_id->valuestring)
+            {
+                uint32_t devId = strtoul(cj_dev_id->valuestring, NULL, 16);
+                EZPI_core_modes_api_swinger_shutdown_reset(devId);
+            }
+        }
+    }
+}
+
 /*******************************************************************************
  *                          Static Function Definitions
  *******************************************************************************/

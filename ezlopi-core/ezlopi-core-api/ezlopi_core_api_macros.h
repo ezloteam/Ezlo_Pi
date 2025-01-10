@@ -109,6 +109,7 @@ extern "C"
     CLOUD_METHOD("hub.modes.entry_delay.reset", EZPI_cloud_modes_entry_delay_reset, EZPI_cloud_modes_entry_delay_changed)
 
     CLOUD_METHOD("hub.modes.swinger.shutdown.list", EZPI_cloud_modes_swinger_shutdown_list, NULL)
+    CLOUD_METHOD("hub.modes.swinger.shutdown.reset", EZPI_cloud_modes_swinger_shutdown_reset, NULL)
 
 #endif // CONFIG_EZPI_SERV_ENABLE_MODES
 

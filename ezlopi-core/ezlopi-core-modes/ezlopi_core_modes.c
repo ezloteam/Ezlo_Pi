@@ -202,6 +202,27 @@ ezlopi_error_t EZPI_core_modes_api_swinger_shutdown_list(cJSON *cj_result)
     return ret;
 }
 
+ezlopi_error_t EZPI_core_modes_api_swinger_shutdown_reset(uint32_t u_id)
+{
+    ezlopi_error_t ret = EZPI_FAILED;
+    if (u_id > DEVICE_ID_START)
+    {
+
+        l_ezlopi_device_t *curr_device = EZPI_core_device_get_by_id(u_id); // checking security-devices which trigger alerts
+        if (curr_device)
+        {
+            if (curr_device->cloud_properties.swinger.shutdown_en)
+            {
+                curr_device->cloud_properties.swinger.stat_hits = 0;
+                curr_device->cloud_properties.swinger.stat_added = 0;
+                curr_device->cloud_properties.swinger.stat_updated = 0;
+                ret = EZPI_SUCCESS;
+            }
+        }
+    }
+    return ret;
+}
+
 //------------------------------------------------
 
 s_ezlopi_modes_t *EZPI_core_modes_get_custom_modes(void)

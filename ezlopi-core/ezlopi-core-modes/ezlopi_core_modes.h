@@ -491,6 +491,13 @@ extern "C"
      * @return ezlopi_error_t
      */
     ezlopi_error_t EZPI_core_modes_api_swinger_shutdown_list(cJSON *cj_result);
+    /**
+     * @brief Function to reset swinger info
+     *
+     * @param u_id Target Device_id
+     * @return ezlopi_error_t
+     */
+    ezlopi_error_t EZPI_core_modes_api_swinger_shutdown_reset(uint32_t u_id);
 
 #ifdef __cplusplus
 }
