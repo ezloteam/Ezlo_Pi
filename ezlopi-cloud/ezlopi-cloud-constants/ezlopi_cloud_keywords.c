@@ -579,6 +579,9 @@ const char *ezlopi_bluetooth_str = "bluetooth";
 const char *ezlopi_websocket_server_str = "websocket.server";
 const char *ezlopi_websocket_client_str = "websocket.client";
 
+const char *ezlopi_hits_limit_str = "hitsLimit";
+const char *ezlopi_inactivity_window_str = "inactivityWindow";
+
 /*******************************************************************************
  *                          Extern Function Definitions
  *******************************************************************************/

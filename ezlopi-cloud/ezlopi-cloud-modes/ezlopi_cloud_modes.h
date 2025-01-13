@@ -239,13 +239,41 @@ extern "C"
      * @param cj_response Outgoing JSON response
      */
     void EZPI_cloud_modes_swinger_shutdown_list(cJSON *cj_request, cJSON *cj_response);
-     /**
+    /**
      * @brief Function to respond to hub.modes.swinger.shutdown.reset
      *
      * @param cj_request incoming JSON request
      * @param cj_response Outgoing JSON response
      */
     void EZPI_cloud_modes_swinger_shutdown_reset(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Funtion to disable swinger shutdown ability of a sensor-device
+     *
+     * @param cj_request incoming JSON request
+     * @param cj_response Outgoing JSON request
+     */
+    void EZPI_cloud_modes_swinger_shutdown_disabled_add(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Funtion to enable swinger shutdown ability of a sensor-device
+     *
+     * @param cj_request incoming JSON request
+     * @param cj_response Outgoing JSON request
+     */
+    void EZPI_cloud_modes_swinger_shutdown_disabled_remove(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function to set limits for swinger shutdown
+     *
+     * @param cj_request  incoming JSON request
+     * @param cj_response Outgoing JSON request
+     */
+    void EZPI_cloud_modes_swinger_shutdown_limit_set(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function to reset limits for swinger shutdown
+     *
+     * @param cj_request  incoming JSON request
+     * @param cj_response Outgoing JSON request
+     */
+    void EZPI_cloud_modes_swinger_shutdown_limit_reset(cJSON *cj_request, cJSON *cj_response);
 #ifdef __cplusplus
 }
 #endif

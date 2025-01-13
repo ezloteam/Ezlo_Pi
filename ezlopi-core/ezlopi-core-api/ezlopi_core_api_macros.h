@@ -109,7 +109,12 @@ extern "C"
     CLOUD_METHOD("hub.modes.entry_delay.reset", EZPI_cloud_modes_entry_delay_reset, EZPI_cloud_modes_entry_delay_changed)
 
     CLOUD_METHOD("hub.modes.swinger.shutdown.list", EZPI_cloud_modes_swinger_shutdown_list, NULL)
-    CLOUD_METHOD("hub.modes.swinger.shutdown.reset", EZPI_cloud_modes_swinger_shutdown_reset, NULL)
+    CLOUD_METHOD("hub.modes.swinger.shutdown.reset", EZPI_cloud_modes_swinger_shutdown_reset, EZPI_cloud_modes_swinger_shutdown_reset_done) 
+    CLOUD_METHOD("hub.modes.swinger.shutdown.disable.add", EZPI_cloud_modes_swinger_shutdown_disabled_add, EZPI_cloud_modes_swinger_shutdown_disable_added)
+    CLOUD_METHOD("hub.modes.swinger.shutdown.disable.remove", EZPI_cloud_modes_swinger_shutdown_disabled_remove, EZPI_cloud_modes_swinger_shutdown_disable_removed)
+    CLOUD_METHOD("hub.modes.swinger.shutdown.limit.set", EZPI_cloud_modes_swinger_shutdown_limit_set, EZPI_cloud_modes_swinger_shutdown_limit_changed)
+    CLOUD_METHOD("hub.modes.swinger.shutdown.limit.reset", EZPI_cloud_modes_swinger_shutdown_limit_reset, EZPI_cloud_modes_swinger_shutdown_limit_changed)
+    
 
 #endif // CONFIG_EZPI_SERV_ENABLE_MODES
 

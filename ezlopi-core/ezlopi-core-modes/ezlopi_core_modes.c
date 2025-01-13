@@ -223,6 +223,69 @@ ezlopi_error_t EZPI_core_modes_api_swinger_shutdown_reset(uint32_t u_id)
     return ret;
 }
 
+ezlopi_error_t EZPI_core_modes_api_swinger_shutdown_disable_add(uint32_t u_id)
+{
+    ezlopi_error_t ret = EZPI_FAILED;
+    if (u_id > DEVICE_ID_START)
+    {
+        l_ezlopi_device_t *curr_device = EZPI_core_device_get_by_id(u_id); // checking security-devices which trigger alerts
+        if (curr_device)
+        {
+            curr_device->cloud_properties.swinger.shutdown_en = false;
+            ret = EZPI_SUCCESS;
+        }
+    }
+    return ret;
+}
+
+ezlopi_error_t EZPI_core_modes_api_swinger_shutdown_disable_remove(uint32_t u_id)
+{
+    ezlopi_error_t ret = EZPI_FAILED;
+    if (u_id > DEVICE_ID_START)
+    {
+        l_ezlopi_device_t *curr_device = EZPI_core_device_get_by_id(u_id); // checking security-devices which trigger alerts
+        if (curr_device)
+        {
+            curr_device->cloud_properties.swinger.shutdown_en = true;
+            ret = EZPI_SUCCESS;
+        }
+    }
+    return ret;
+}
+
+ezlopi_error_t EZPI_core_modes_api_swinger_shutdown_limit_set(uint32_t u_id, uint32_t hitslimit, uint32_t inactivity_sec)
+{
+    ezlopi_error_t ret = EZPI_FAILED;
+    if (u_id > DEVICE_ID_START)
+    {
+        l_ezlopi_device_t *curr_device = EZPI_core_device_get_by_id(u_id); // checking security-devices which trigger alerts
+        if (curr_device)
+        {
+            curr_device->cloud_properties.swinger.hitsLimit = hitslimit;
+            curr_device->cloud_properties.swinger.inactivityWindow = inactivity_sec;
+            ret = EZPI_SUCCESS;
+        }
+    }
+    return ret;
+}
+
+ezlopi_error_t EZPI_core_modes_api_swinger_shutdown_limit_reset(uint32_t u_id)
+{
+    ezlopi_error_t ret = EZPI_FAILED;
+    if (u_id > DEVICE_ID_START)
+    {
+        l_ezlopi_device_t *curr_device = EZPI_core_device_get_by_id(u_id); // checking security-devices which trigger alerts
+        if (curr_device)
+        {
+#warning "Reset the device's individual limits. device will use global limits";
+            curr_device->cloud_properties.swinger.hitsLimit = 0;
+            curr_device->cloud_properties.swinger.inactivityWindow = 0;
+            ret = EZPI_SUCCESS;
+        }
+    }
+    return ret;
+}
+
 //------------------------------------------------
 
 s_ezlopi_modes_t *EZPI_core_modes_get_custom_modes(void)

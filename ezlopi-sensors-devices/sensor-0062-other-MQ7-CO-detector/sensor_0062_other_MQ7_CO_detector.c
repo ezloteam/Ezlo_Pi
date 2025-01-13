@@ -317,7 +317,7 @@ static ezlopi_error_t __0062_get_item(l_ezlopi_item_t *item, void *arg)
                         "co_detected",
                         "unknown",
                     };
-                    for (uint8_t i = 0; i < MQ7_GAS_ALARM_MAX; i++)
+                    for (uint8_t i = 0; i < MQ7_CO_ALARM_MAX; i++)
                     {
                         cJSON *json_value = cJSON_CreateString(__FUNCTION__, mq7_sensor_gas_alarm_token[i]);
                         if (NULL != json_value)

@@ -182,12 +182,11 @@ extern "C"
 
    typedef enum
    {
-      MQ7_GAS_ALARM_NO_GAS,
-      MQ7_GAS_ALARM_COMBUSTIBLE_GAS_DETECTED,
-      MQ7_GAS_ALARM_TOXIC_GAS_DETECTED,
-      MQ7_GAS_ALARM_UNKNOWN,
-      MQ7_GAS_ALARM_MAX
-   } e_mq7_gas_alarm_states_t;
+      MQ7_CO_ALARM_CO_GAS,
+      MQ7_CO_ALARM_CO_DETECTED,
+      MQ7_CO_ALARM_UNKNOWN,
+      MQ7_CO_ALARM_MAX
+   } e_mq7_co_alarm_states_t;
 
    /*******************************************************************************
     *                          Extern Data Declarations

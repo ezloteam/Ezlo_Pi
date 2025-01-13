@@ -498,6 +498,36 @@ extern "C"
      * @return ezlopi_error_t
      */
     ezlopi_error_t EZPI_core_modes_api_swinger_shutdown_reset(uint32_t u_id);
+    /**
+     * @brief Function to disable swinger shutdown for target device
+     *
+     * @param u_id Target device id
+     * @return ezlopi_error_t
+     */
+    ezlopi_error_t EZPI_core_modes_api_swinger_shutdown_disable_add(uint32_t u_id);
+    /**
+     * @brief Function to activate swinger shutdown for target device
+     *
+     * @param u_id Target device id
+     * @return ezlopi_error_t
+     */
+    ezlopi_error_t EZPI_core_modes_api_swinger_shutdown_disable_remove(uint32_t u_id);
+    /**
+     * @brief Function to set the limits for swinger shutdown of Target device_id
+     *
+     * @param u_id Target device_id
+     * @param hitslimit New hitsLimit for device
+     * @param inactivity_sec New Inactivity Window
+     * @return ezlopi_error_t
+     */
+    ezlopi_error_t EZPI_core_modes_api_swinger_shutdown_limit_set(uint32_t u_id, uint32_t hitslimit, uint32_t inactivity_sec);
+    /**
+     * @brief Function to reset Limit values of target device_id to 'global_default' value.
+     *
+     * @param u_id Target device_id
+     * @return ezlopi_error_t
+     */
+    ezlopi_error_t EZPI_core_modes_api_swinger_shutdown_limit_reset(uint32_t u_id);
 
 #ifdef __cplusplus
 }

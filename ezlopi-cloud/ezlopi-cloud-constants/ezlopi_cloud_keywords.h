@@ -575,6 +575,9 @@ extern "C"
     extern const char *ezlopi_websocket_server_str;
     extern const char *ezlopi_websocket_client_str;
 
+    extern const char *ezlopi_hits_limit_str;
+    extern const char *ezlopi_inactivity_window_str;
+
 #ifdef __cplusplus
 }
 #endif

@@ -518,7 +518,7 @@ void EZPI_cloud_modes_entry_delay_reset(cJSON *cj_request, cJSON *cj_response)
 
 void EZPI_cloud_modes_swinger_shutdown_list(cJSON *cj_request, cJSON *cj_response)
 {
-    cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+    cJSON *cj_result = cJSON_AddObjectToObject(__func__, cj_response, ezlopi_result_str);
     if (cj_result)
     {
 #warning checking 'version_str' remains;
@@ -530,10 +530,10 @@ void EZPI_cloud_modes_swinger_shutdown_list(cJSON *cj_request, cJSON *cj_respons
 
 void EZPI_cloud_modes_swinger_shutdown_reset(cJSON *cj_request, cJSON *cj_response)
 {
-    cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+    cJSON *cj_result = cJSON_AddObjectToObject(__func__, cj_response, ezlopi_result_str);
     if (cj_result)
     {
-        cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
+        cJSON *cj_params = cJSON_GetObjectItem(__func__, cj_request, ezlopi_params_str);
         if (cj_params)
         {
             cJSON *cj_dev_id = cJSON_GetObjectItem(__func__, cj_params, ezlopi_deviceId_str);
@@ -546,6 +546,81 @@ void EZPI_cloud_modes_swinger_shutdown_reset(cJSON *cj_request, cJSON *cj_respon
     }
 }
 
+void EZPI_cloud_modes_swinger_shutdown_disabled_add(cJSON *cj_request, cJSON *cj_response)
+{
+    cJSON *cj_result = cJSON_AddObjectToObject(__func__, cj_response, ezlopi_result_str);
+    if (cj_result)
+    {
+        cJSON *cj_params = cJSON_GetObjectItem(__func__, cj_request, ezlopi_params_str);
+        if (cj_params)
+        {
+            cJSON *cj_dev_id = cJSON_GetObjectItem(__func__, cj_params, ezlopi_deviceId_str);
+            if (cj_dev_id && cj_dev_id->valuestring)
+            {
+                uint32_t devId = strtoul(cj_dev_id->valuestring, NULL, 16);
+                EZPI_core_modes_api_swinger_shutdown_disable_add(devId);
+            }
+        }
+    }
+}
+
+void EZPI_cloud_modes_swinger_shutdown_disabled_remove(cJSON *cj_request, cJSON *cj_response)
+{
+    cJSON *cj_result = cJSON_AddObjectToObject(__func__, cj_response, ezlopi_result_str);
+    if (cj_result)
+    {
+        cJSON *cj_params = cJSON_GetObjectItem(__func__, cj_request, ezlopi_params_str);
+        if (cj_params)
+        {
+            cJSON *cj_dev_id = cJSON_GetObjectItem(__func__, cj_params, ezlopi_deviceId_str);
+            if (cj_dev_id && cj_dev_id->valuestring)
+            {
+                uint32_t devId = strtoul(cj_dev_id->valuestring, NULL, 16);
+                EZPI_core_modes_api_swinger_shutdown_disable_remove(devId);
+            }
+        }
+    }
+}
+
+void EZPI_cloud_modes_swinger_shutdown_limit_set(cJSON *cj_request, cJSON *cj_response)
+{
+    cJSON *cj_result = cJSON_AddObjectToObject(__func__, cj_response, ezlopi_result_str);
+    if (cj_result)
+    {
+        cJSON *cj_params = cJSON_GetObjectItem(__func__, cj_request, ezlopi_params_str);
+        if (cj_params)
+        {
+            cJSON *cj_dev_id = cJSON_GetObjectItem(__func__, cj_params, ezlopi_deviceId_str);
+            cJSON *cj_hits_limit = cJSON_GetObjectItem(__func__, cj_params, ezlopi_hits_limit_str);
+            cJSON *cj_inactivity_sec = cJSON_GetObjectItem(__func__, cj_params, ezlopi_inactivity_window_str);
+            if ((cj_dev_id && cj_dev_id->valuestring) && cj_hits_limit && cj_inactivity_sec)
+            {
+                uint32_t devId = strtoul(cj_dev_id->valuestring, NULL, 16);
+                uint32_t hitslimit = cj_hits_limit->valuedouble;
+                uint32_t inactivity_sec = cj_inactivity_sec->valuedouble;
+                EZPI_core_modes_api_swinger_shutdown_limit_set(devId, hitslimit, inactivity_sec);
+            }
+        }
+    }
+}
+
+void EZPI_cloud_modes_swinger_shutdown_limit_reset(cJSON *cj_request, cJSON *cj_response)
+{
+    cJSON *cj_result = cJSON_AddObjectToObject(__func__, cj_response, ezlopi_result_str);
+    if (cj_result)
+    {
+        cJSON *cj_params = cJSON_GetObjectItem(__func__, cj_request, ezlopi_params_str);
+        if (cj_params)
+        {
+            cJSON *cj_dev_id = cJSON_GetObjectItem(__func__, cj_params, ezlopi_deviceId_str);
+            if (cj_dev_id && cj_dev_id->valuestring)
+            {
+                uint32_t devId = strtoul(cj_dev_id->valuestring, NULL, 16);
+                EZPI_core_modes_api_swinger_shutdown_limit_reset(devId);
+            }
+        }
+    }
+}
 /*******************************************************************************
  *                          Static Function Definitions
  *******************************************************************************/
