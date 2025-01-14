@@ -763,7 +763,7 @@ static void ezpi_service_uart_task(void *arg)
     }
 
 #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
-    EZPI_core_process_set_is_deleted(ENUM___uart_loop);
+    EZPI_core_process_set_is_deleted(ENUM_EZLOPI_SERVICE_UART_TASK);
 #endif
     vTaskDelete(NULL);
 }
