@@ -31,10 +31,10 @@
 
 /**
  * @file    ezlopi_service_meshbot.h
- * @brief
- * @author
- * @version
- * @date
+ * @brief   Contains function declarations for meshbot related operations
+ * @author  ezlopi_team_np
+ * @version 1.0
+ * @date    January 22, 2024
  */
 #ifndef _EZLOPI_SERVICE_MESHBOT_H_
 #define _EZLOPI_SERVICE_MESHBOT_H_

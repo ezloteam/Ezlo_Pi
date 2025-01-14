@@ -31,10 +31,10 @@
 
 /**
  * @file    ezlopi_service_meshbot.c
- * @brief
- * @author
- * @version
- * @date
+ * @brief   Contains function definitions for meshbot related operations
+ * @author  ezlopi_team_np
+ * @version 1.0
+ * @date    January 22, 2024
  */
 
 /*******************************************************************************
