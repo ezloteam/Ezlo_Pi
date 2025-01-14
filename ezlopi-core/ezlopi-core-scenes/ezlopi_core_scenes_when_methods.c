@@ -823,13 +823,16 @@ int EZPI_core_scenes_when_is_house_mode_changed_to(l_scenes_list_v2_t *scene_nod
             curr_field = curr_field->next;
         }
 
-        cJSON *cj_house_mdoe_id = NULL;
-
-        cJSON_ArrayForEach(cj_house_mdoe_id, house_mode_id_array->field_value.u_value.cj_value)
+        if (NULL == house_mode_id_array)
         {
-            if (cj_house_mdoe_id->valuestring)
+            return 0;
+        }
+        cJSON *cj_house_mode_id = NULL;
+        cJSON_ArrayForEach(cj_house_mode_id, house_mode_id_array->field_value.u_value.cj_value)
+        {
+            if (cj_house_mode_id->valuestring)
             {
-                uint32_t house_mode_id = strtoul(cj_house_mdoe_id->valuestring, NULL, 16);
+                uint32_t house_mode_id = strtoul(cj_house_mode_id->valuestring, NULL, 16);
                 s_ezlopi_modes_t *modes = EZPI_core_modes_get_custom_modes();
                 if ((uint32_t)house_mode_id_array->user_arg != modes->current_mode_id) /* first check if there is transition */
                 {
@@ -882,6 +885,10 @@ int EZPI_core_scenes_when_is_house_mode_changed_from(l_scenes_list_v2_t *scene_n
             curr_field = curr_field->next;
         }
 
+        if (NULL == house_mode_id_array)
+        {
+            return 0;
+        }
         cJSON *cj_house_mode_id = NULL;
         cJSON_ArrayForEach(cj_house_mode_id, house_mode_id_array->field_value.u_value.cj_value)
         {
