@@ -31,10 +31,10 @@
 
 /**
  * @file    ezlopi_service_system_temperature_sensor.c
- * @brief
- * @author
- * @version
- * @date
+ * @brief   Contains function definitions related to system temperature sensor
+ * @author  ezlopi_team_np
+ * @version 1.0
+ * @date    September 9, 2023
  */
 
 /*******************************************************************************

@@ -31,11 +31,12 @@
 
 /**
  * @file    ezlopi_service_system_temperature_sensor.h
- * @brief
- * @author
- * @version
- * @date
+ * @brief   Contains function declarations related to system temperature sensor
+ * @author  ezlopi_team_np
+ * @version 1.0
+ * @date    September 9, 2023
  */
+
 #include "sdkconfig.h"
 #if defined(CONFIG_EZPI_ENABLE_SYSTEM_TEMPERATURE)
 
