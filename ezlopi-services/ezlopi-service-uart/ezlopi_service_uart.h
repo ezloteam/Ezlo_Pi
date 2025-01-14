@@ -31,13 +31,13 @@
 
 /**
  * @file    ezlopi_service_uart.h
- * @brief
- * @author
- * @version
- * @date
- */
-#ifndef _EZLOPI_SERVICE_UART_H_
-#define _EZLOPI_SERVICE_UART_H_
+ * @brief   Contains function declarations related to UART communication
+ * @author  ezlopi_team_np
+ * @version 1.0
+ * @date    January 22, 2024
+ */ 
+#ifndef __EZLOPI_SERVICE_UART_H__
+#define __EZLOPI_SERVICE_UART_H__
 
 /*******************************************************************************
  *                          Include Files
@@ -157,7 +157,7 @@ extern "C"
 }
 #endif
 
-#endif // _EZLOPI_SERVICE_UART_H_
+#endif // __EZLOPI_SERVICE_UART_H__
 
 /*******************************************************************************
  *                          End of File

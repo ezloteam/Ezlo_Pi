@@ -40,8 +40,8 @@
 #include "sdkconfig.h"
 #if defined(CONFIG_EZPI_ENABLE_SYSTEM_TEMPERATURE)
 
-#ifndef _EZLOPI_SERVICE_SYSTEM_TEMPERATURE_SENSOR_H_
-#define _EZLOPI_SERVICE_SYSTEM_TEMPERATURE_SENSOR_H_
+#ifndef __EZLOPI_SERVICE_SYSTEM_TEMPERATURE_SENSOR_H__
+#define __EZLOPI_SERVICE_SYSTEM_TEMPERATURE_SENSOR_H__
 
 
 /*******************************************************************************
@@ -83,7 +83,7 @@ extern "C"
 }
 #endif
 
-#endif // _EZLOPI_SERVICE_SYSTEM_TEMPERATURE_SENSOR_H_
+#endif // __EZLOPI_SERVICE_SYSTEM_TEMPERATURE_SENSOR_H__
 
 #endif // CONFIG_EZPI_ENABLE_SYSTEM_TEMPERATURE
 

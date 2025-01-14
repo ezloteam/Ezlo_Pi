@@ -31,10 +31,10 @@
 
 /**
  * @file    ezlopi_service_uart.c
- * @brief
- * @author
- * @version
- * @date
+ * @brief   Contains function definitions related to UART communication
+ * @author  ezlopi_team_np
+ * @version 1.0
+ * @date    January 22, 2024
  */
 
 /*******************************************************************************
