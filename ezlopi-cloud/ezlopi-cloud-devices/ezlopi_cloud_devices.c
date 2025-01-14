@@ -30,11 +30,11 @@
 */
 
 /**
- * @file     ezlopi_cloud_devices.c
- * @brief   perform some function on data
+ * @file    ezlopi_cloud_devices.h
+ * @brief   Declarations for cloud device functions
  * @author  ezlopi_team_np
- * @version 0.1
- * @date    1st January 2024
+ * @version 1.0
+ * @date    January 20, 2024
  */
 
 /*******************************************************************************
@@ -72,7 +72,7 @@
 /*******************************************************************************
  *                          Static Function Prototypes
  *******************************************************************************/
-//------------------------------------------------------------------------------------------------------------------
+
 /**
  * @brief Function to generate sha1 for src
  *
@@ -93,7 +93,7 @@ static char *ezpi_generate_sha1_of_src(const char *src);
 /*******************************************************************************
  *                          Extern Function Definitions
  *******************************************************************************/
-//------------------------------------------------------------------------------------------------------------------
+
 void EZPI_devices_list_v3(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON *cjson_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
