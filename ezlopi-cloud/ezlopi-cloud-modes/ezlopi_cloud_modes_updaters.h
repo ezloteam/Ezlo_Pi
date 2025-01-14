@@ -220,6 +220,34 @@ extern "C"
      * @param cj_response Outgoing JSON response
      */
     void EZPI_cloud_modes_entry_delay_changed(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Updater function for modes swinger shutdown reset done
+     *
+     * @param cj_request incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_cloud_modes_swinger_shutdown_reset_done(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Updater function for modes swinger shutdown disable added
+     *
+     * @param cj_request incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_cloud_modes_swinger_shutdown_disable_added(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Updater function for modes swinger shutdown disable removed
+     *
+     * @param cj_request incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_cloud_modes_swinger_shutdown_disable_removed(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Updater function for modes swinger shutdown limit changed
+     *
+     * @param cj_request incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_cloud_modes_swinger_shutdown_limit_changed(cJSON *cj_request, cJSON *cj_response);
 
 #ifdef __cplusplus
 }

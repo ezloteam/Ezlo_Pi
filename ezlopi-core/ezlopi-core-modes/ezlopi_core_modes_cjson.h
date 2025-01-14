@@ -57,60 +57,60 @@
 extern "C"
 {
 #endif
-        /*******************************************************************************
-         *                          Type & Macro Declarations
-         *******************************************************************************/
+    /*******************************************************************************
+     *                          Type & Macro Declarations
+     *******************************************************************************/
 
-        /*******************************************************************************
-         *                          Extern Data Declarations
-         *******************************************************************************/
+    /*******************************************************************************
+     *                          Extern Data Declarations
+     *******************************************************************************/
 
-        /*******************************************************************************
-         *                          Extern Function Prototypes
-         *******************************************************************************/
+    /*******************************************************************************
+     *                          Extern Function Prototypes
+     *******************************************************************************/
 
-        /**
-         * @brief This function returns an oject containing current House-Modes information
-         *
-         * @param cj_dest Destination object for House-mode infomation.
-         * @return ezlopi_error_t
-         */
-        ezlopi_error_t EZPI_core_modes_cjson_get_modes(cJSON *cj_dest);
-        /**
-         * @brief This function returns object contaings modeId of currently active House-Modes
-         *
-         * @param cj_dest Destination object where house-mode id is stored
-         * @return ezlopi_error_t
-         */
-        ezlopi_error_t EZPI_core_modes_cjson_get_current_mode(cJSON *cj_dest);
-        /**
-         * @brief This function returns a new house-mode node from the source-obj 'cj_modes'
-         *
-         * @param cj_modes Source object used to extract info from.
-         * @return s_ezlopi_modes_t
-         */
-        s_ezlopi_modes_t *EZPI_core_modes_cjson_parse_modes(cJSON *cj_modes);
-        /**
-         * @brief This function returns cjson indicating MODES_status
-         *
-         * @return cJSON *
-         */
-        cJSON *EZPI_core_modes_cjson_changed(void);
-        /**
-         * @brief This function returns cjson indicating Alarmed_status of perticular mode
-         *
-         * @param dev_id_str Id of target MODE.
-         * @return cJSON *
-         */
-        cJSON *EZPI_core_modes_cjson_alarmed(const char *dev_id_str);
+    /**
+     * @brief This function returns an oject containing current House-Modes information
+     *
+     * @param cj_dest Destination object for House-mode infomation.
+     * @return ezlopi_error_t
+     */
+    ezlopi_error_t EZPI_core_modes_cjson_get_modes(cJSON *cj_dest);
+    /**
+     * @brief This function returns object contaings modeId of currently active House-Modes
+     *
+     * @param cj_dest Destination object where house-mode id is stored
+     * @return ezlopi_error_t
+     */
+    ezlopi_error_t EZPI_core_modes_cjson_get_current_mode(cJSON *cj_dest);
+    /**
+     * @brief This function returns a new house-mode node from the source-obj 'cj_modes'
+     *
+     * @param cj_modes Source object used to extract info from.
+     * @return s_ezlopi_modes_t
+     */
+    s_ezlopi_modes_t *EZPI_core_modes_cjson_parse_modes(cJSON *cj_modes);
+    /**
+     * @brief This function returns cjson indicating MODES_status
+     *
+     * @return cJSON *
+     */
+    cJSON *EZPI_core_modes_cjson_changed(void);
+    /**
+     * @brief This function prepares and returns cjson message containing 'Alarmed_status' of an alert-device
+     *
+     * @param dev_id_str Id of target alert-device.
+     * @return cJSON *
+     */
+    cJSON *EZPI_core_modes_cjson_prep_alarm_mesg(const char *dev_id_str);
 
 #ifdef __cplusplus
-    }
+}
 #endif
 
 #endif // CONFIG_EZPI_SERV_ENABLE_MODES
 
 #endif // __EZLOPI_CORE_MODES_CJSON_H__
-    /*******************************************************************************
-     *                          End of File
-     *******************************************************************************/
+/*******************************************************************************
+ *                          End of File
+ *******************************************************************************/

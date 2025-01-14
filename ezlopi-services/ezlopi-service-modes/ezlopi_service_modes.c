@@ -40,6 +40,7 @@
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
+#include <string.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 
@@ -75,146 +76,23 @@
  *******************************************************************************/
 static SemaphoreHandle_t sg_modes_loop_smphr = NULL;
 
-
 /*******************************************************************************
  *                          Static Function Prototypes
  *******************************************************************************/
-static void __modes_loop(void *pv);
+static void __broadcast_modes_alarmed_for_uid(const char *dev_id_str);
+static bool __check_if_devid_in_alarm_off(s_house_modes_t *curr_house_mode, uint32_t u_id);
+static void __broadcast_alarmed_state_for_valid_ids(void);
+static bool __check_if_device_is_bypassed(cJSON *cj_bypass_devices, const char *device_id_str);
+static bool __check_if_entry_delay_finished(s_ezlopi_modes_t *ez_mode);
+static void __modes_create_non_bypass_alerts(s_ezlopi_modes_t *ez_mode, s_house_modes_t *curr_house_mode);
+static void __modes_check_main_for_trigger(s_ezlopi_modes_t *ez_mode);
+static void __modes_main_phase_broadcast(s_ezlopi_modes_t *ez_mode);
+static ezlopi_error_t __check_mode_switch_condition(s_ezlopi_modes_t *ez_mode);
+static void __modes_loop(void *arg);
 
 /*******************************************************************************
  *                          Type & Macro Definitions
  *******************************************************************************/
-typedef struct l_modes_alert
-{
-    bool alert_trig;               // default 'false' [guard to trigger alert]
-    const char *u_id_str;          // unique arg for a
-    uint32_t abort_window_ll;      // abort alarm-broadcast with this time   (Phase 1)
-    uint32_t alarm_delay_ll;       // delay before triggering an alert       (Phase 2)
-    uint32_t timeleft_to_abort_ll; //
-    uint32_t timeleft_to_alarm_ll; //
-
-    struct l_modes_alert *next;
-} l_modes_alert_t;
-
-static l_modes_alert_t *_alert_head = NULL;
-
-static l_modes_alert_t *__create_alert(const char *u_id, s_ezlopi_modes_t *ez_mode)
-{
-    l_modes_alert_t *new_node = ezlopi_malloc(__FUNCTION__, sizeof(l_modes_alert_t));
-
-    if (new_node)
-    {
-        new_node->u_id_str = u_id;
-        new_node->alert_trig = false;
-        new_node->alarm_delay_ll = new_node->timeleft_to_alarm_ll = ez_mode->alarm_delay;
-        new_node->abort_window_ll = new_node->timeleft_to_abort_ll = ez_mode->abort_delay.default_delay_sec;
-        new_node->next = NULL;
-    }
-
-    return new_node;
-}
-
-#if 0 /* These two function maybe used in future */
-static void __ezlopi_service_remove_alert_node(l_modes_alert_t *node)
-{
-    if (node && _alert_head)
-    {
-        if (_alert_head == node)
-        {
-            l_modes_alert_t *__del_node = _alert_head;
-            _alert_head = _alert_head->next;
-            ezlopi_free(__FUNCTION__, __del_node);
-        }
-        else
-        {
-            l_modes_alert_t *curr_node = _alert_head;
-            while (curr_node->next)
-            {
-                if (curr_node->next == node)
-                {
-                    l_modes_alert_t *__del_node = curr_node->next;
-                    curr_node->next = curr_node->next->next;
-                    ezlopi_free(__FUNCTION__, __del_node);
-                    break;
-                }
-
-                curr_node = curr_node->next;
-            }
-        }
-    }
-}
-
-static void __ezlopi_service_remove_alert_node_by_name(const char *_name_)
-{
-    if (_name_ && _alert_head)
-    {
-        l_modes_alert_t *curr_node = _alert_head;
-        while (curr_node)
-        {
-            if ((curr_node->u_id_str) && (EZPI_STRNCMP_IF_EQUAL(curr_node->u_id_str, _name_, strlen(curr_node->u_id_str) + 1, strlen(_name_) + 1)))
-            {
-                __ezlopi_service_remove_alert_node(curr_node);
-                break;
-            }
-            curr_node = curr_node->next;
-        }
-    }
-}
-#endif
-
-static void __ezlopi_service_add_alert(const char *u_id, s_ezlopi_modes_t *ez_mode)
-{
-    if (u_id && ez_mode)
-    {
-        if (_alert_head)
-        {
-            l_modes_alert_t *curr_node = _alert_head;
-            while (curr_node->next)
-            {
-                curr_node = curr_node->next;
-            }
-
-            curr_node->next = __create_alert(u_id, ez_mode);
-        }
-        else
-        {
-            _alert_head = __create_alert(u_id, ez_mode);
-        }
-    }
-}
-
-static void __remove_all_alerts(l_modes_alert_t *curr_node)
-{
-    if (curr_node)
-    {
-        if (curr_node->next)
-        {
-            __remove_all_alerts(curr_node->next);
-            curr_node->next = NULL;
-        }
-
-        if (curr_node->u_id_str)
-        {
-            ezlopi_free(__func__, &(curr_node->u_id_str));
-            curr_node->u_id_str = NULL;
-        }
-
-        ezlopi_free(__func__, curr_node);
-    }
-}
-
-static void __ezlopi_service_remove_all_alerts(void)
-{
-    if (_alert_head)
-    {
-        __remove_all_alerts(_alert_head);
-        _alert_head = NULL;
-    }
-    else
-    {
-        TRACE_E("Error!! [_alert_head] not found. ");
-    }
-}
 
 //---------------------------------------------------------------------------------------------
 void ezlopi_service_modes_init(void)
@@ -232,7 +110,14 @@ bool ezlopi_service_modes_stop(uint32_t wait_ms)
 
     if (sg_modes_loop_smphr && (xSemaphoreTake(sg_modes_loop_smphr, wait_ms / portTICK_RATE_MS)))
     {
+        // 1. Stop the mode-looping process
         EZPI_service_loop_remove(__modes_loop);
+        // 2. Clear the alert-loop
+        if (NULL != EZPI_core_modes_get_alert_head())
+        {
+            EZPI_core_modes_remove_all_alerts();
+        }
+
         xSemaphoreGive(sg_modes_loop_smphr);
         TRACE_W("removed modes-loop");
         ret = true;
@@ -248,6 +133,23 @@ bool ezlopi_service_modes_start(uint32_t wait_ms)
     if (EZPI_core_modes_get_custom_modes() && xSemaphoreTake(sg_modes_loop_smphr, wait_ms / portTICK_RATE_MS))
     {
         ret = true;
+
+        // 1. Check if valid-alerts are ready for curr_houseMode
+        if (NULL == EZPI_core_modes_get_alert_head())
+        {
+            s_ezlopi_modes_t *ez_mode = EZPI_core_modes_get_custom_modes();
+            s_house_modes_t *curr_house_mode = EZPI_core_modes_get_current_house_modes();
+            if (ez_mode && curr_house_mode)
+            {
+                TRACE_D("*_alert_head -> empty ==> creating list of alerts");
+                if (true == curr_house_mode->armed) // if the new Mode is armed ; create 'non_bypass_alert_ll'
+                {
+                    __modes_create_non_bypass_alerts(ez_mode, curr_house_mode);
+                }
+            }
+        }
+
+        // 2. Start the modes-loop
         xSemaphoreGive(sg_modes_loop_smphr);
         EZPI_service_loop_add("modes-loop", __modes_loop, 1000, NULL);
         TRACE_I("added modes-loop");
@@ -259,21 +161,24 @@ bool ezlopi_service_modes_start(uint32_t wait_ms)
 //---------------------------------------------------------------------------------------------
 static void __broadcast_modes_alarmed_for_uid(const char *dev_id_str)
 {
-    cJSON *cj_update = EZPI_core_modes_cjson_alarmed(dev_id_str);
-    // CJSON_TRACE("----------------- broadcasting - cj_update", cj_update);
+    cJSON *cj_alarm_mesg = EZPI_core_modes_cjson_prep_alarm_mesg(dev_id_str);
+    // CJSON_TRACE("----------------- broadcasting - cj_alarm_mesg", cj_alarm_mesg);
 
-    if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_update, EZPI_core_sntp_get_current_time_sec()))
+    if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_alarm_mesg, EZPI_core_sntp_get_current_time_sec()))
     {
-        cJSON_Delete(__FUNCTION__, cj_update);
+        cJSON_Delete(__FUNCTION__, cj_alarm_mesg);
     }
 }
 
-static bool __check_if_devid_in_alarm_off(s_house_modes_t *curr_house_mode, const char *device_id_str)
+static bool __check_if_devid_in_alarm_off(s_house_modes_t *curr_house_mode, uint32_t u_id)
 {
     bool ret = false;
-    if (curr_house_mode && device_id_str)
+    if (curr_house_mode && u_id)
     {
         cJSON *cj_alarm_off = NULL;
+        char device_id_str[32] = {0};
+        snprintf(device_id_str, sizeof(device_id_str), "%08x", u_id);
+
         cJSON_ArrayForEach(cj_alarm_off, curr_house_mode->cj_alarms_off_devices) // 'alarm_devid' should not be here
         {
             if (EZPI_STRNCMP_IF_EQUAL(device_id_str, cj_alarm_off->valuestring, strlen(device_id_str) + 1, cj_alarm_off->str_value_len))
@@ -289,12 +194,19 @@ static bool __check_if_devid_in_alarm_off(s_house_modes_t *curr_house_mode, cons
 static void __broadcast_alarmed_state_for_valid_ids(void)
 {
     // iterate throught the 'alert_ll' and send broadcast to 'valid_ids'
-    l_modes_alert_t *curr_node = _alert_head;
+    l_modes_alert_t *curr_node = EZPI_core_modes_get_alert_head();
     while (curr_node)
     {
-        if ((NULL != curr_node->u_id_str) && (false == __check_if_devid_in_alarm_off(EZPI_core_modes_get_current_house_modes(), curr_node->u_id_str)))
+        l_ezlopi_device_t *target_device = EZPI_core_device_get_by_id(curr_node->u_id);
+        if (target_device && target_device->cloud_properties.armed) // allow to broadcast alert only for valid & armed 'device'.
         {
-            __broadcast_modes_alarmed_for_uid(curr_node->u_id_str);
+            if (false == __check_if_devid_in_alarm_off(EZPI_core_modes_get_current_house_modes(), curr_node->u_id))
+            {
+                char dev_id_str[32] = {0};
+                snprintf(dev_id_str, sizeof(dev_id_str), "%08x", curr_node->u_id);
+                // send alarmed-broadcast for target 'device_id'
+                __broadcast_modes_alarmed_for_uid(dev_id_str);
+            }
         }
         curr_node = curr_node->next;
     }
@@ -319,7 +231,7 @@ static bool __check_if_device_is_bypassed(cJSON *cj_bypass_devices, const char *
                     curr_mode->alarmed.phase = EZLOPI_MODES_ALARM_PHASE_BYPASS;
                     curr_mode->alarmed.status = EZLOPI_MODES_ALARM_STATUS_DONE;
 
-                    // send alarmed-broadcast
+                    // send alarmed-broadcast for target 'device_id'
                     __broadcast_modes_alarmed_for_uid(device_id_str);
                 }
                 break;
@@ -398,18 +310,30 @@ static bool __check_if_entry_delay_finished(s_ezlopi_modes_t *ez_mode)
 
 static void __modes_create_non_bypass_alerts(s_ezlopi_modes_t *ez_mode, s_house_modes_t *curr_house_mode)
 {
-    if (ez_mode && curr_house_mode)
+    if (ez_mode && curr_house_mode && (NULL == EZPI_core_modes_get_alert_head()))
     {
         cJSON *cj_alarm = NULL;
+        CJSON_TRACE("cj_alarms: ", ez_mode->cj_alarms);
         cJSON_ArrayForEach(cj_alarm, ez_mode->cj_alarms) // 'alarm_device_id' to trigger alerts
         {
             // 1.1.  Non-bypass-loop creation for listed 'device_id'
-
-            TRACE_S("checking id: %s", cj_alarm->valuestring);
-            if (false == __check_if_device_is_bypassed(curr_house_mode->cj_bypass_devices, cj_alarm->valuestring)) // donot trigger alert if device is bypassed
+            if (cj_alarm->valuestring && cj_alarm->str_value_len)
             {
-                __ezlopi_service_add_alert(cj_alarm->valuestring, ez_mode); // Append suitable nodes to 'alert_ll'.
-                TRACE_D("alert_ll --> Adding :%s", cj_alarm->valuestring);
+                if (false == __check_if_device_is_bypassed(curr_house_mode->cj_bypass_devices, cj_alarm->valuestring)) // donot trigger alert if device is bypassed
+                {
+                    uint32_t devId_to_add = (uint32_t)strtoul(cj_alarm->valuestring, NULL, 16);
+                    if (EZPI_SUCCESS == EZPI_core_modes_add_alert(devId_to_add, ez_mode))
+                    {
+                        TRACE_D("alert_ll --> Adding :%s [%08x]", cj_alarm->valuestring, devId_to_add);
+#warning "need to discuss about toggle devices's : arm_flag-->true";
+                        l_ezlopi_device_t *target_security_device = EZPI_core_device_get_by_id(devId_to_add);
+                        if (target_security_device && (false == target_security_device->cloud_properties.armed))
+                        {
+                            TRACE_D("Device :%08x --> Armed = true", devId_to_add);
+                            target_security_device->cloud_properties.armed = true; //
+                        }
+                    }
+                }
             }
         }
     }
@@ -417,9 +341,9 @@ static void __modes_create_non_bypass_alerts(s_ezlopi_modes_t *ez_mode, s_house_
 
 static void __modes_check_main_for_trigger(s_ezlopi_modes_t *ez_mode)
 {
-    if (_alert_head)
+    if (ez_mode)
     {
-        l_modes_alert_t *curr_node = _alert_head;
+        l_modes_alert_t *curr_node = EZPI_core_modes_get_alert_head();
         while (curr_node)
         { // check if the alert has been triggered for any of node in 'alert_ll'.
             if (true == curr_node->alert_trig)
@@ -452,9 +376,9 @@ static void __modes_check_main_for_trigger(s_ezlopi_modes_t *ez_mode)
     }
 }
 
-static void __modes_main_and_broadcast_status(s_ezlopi_modes_t *ez_mode)
+static void __modes_main_phase_broadcast(s_ezlopi_modes_t *ez_mode)
 {
-    if (ez_mode && _alert_head) // must have 'alert_ll'
+    if (ez_mode && (NULL != EZPI_core_modes_get_alert_head())) // must have atleast one alert device
     {
         // 1. broadcast 'MAIN-begin' status (Should happen only Once)
         if (EZLOPI_MODES_ALARM_PHASE_ENTRYDELAY == ez_mode->alarmed.phase &&
@@ -514,7 +438,7 @@ static ezlopi_error_t __check_mode_switch_condition(s_ezlopi_modes_t *ez_mode)
                     }
 #endif
                     // Also Remove all the 'alert-nodes'
-                    __ezlopi_service_remove_all_alerts();
+                    EZPI_core_modes_remove_all_alerts();
 
                     cJSON_Delete(__FUNCTION__, prev_house_mode->cj_bypass_devices);
                     prev_house_mode->cj_bypass_devices = NULL;
@@ -571,21 +495,22 @@ static void __modes_loop(void *arg)
                 TRACE_D("Mode - Switch completed to [%d]", ez_mode->current_mode_id);
                 curr_house_mode = EZPI_core_modes_get_current_house_modes();
                 TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_INFO, "mode: switching to: %s (id: %u).", curr_house_mode->name, curr_house_mode->_id);
+
                 // after switching-modes ; Create unique trigger-event-loops for each devices in 'alarm-list'
-                if (true == curr_house_mode->armed) // if the new mode is armed ; create 'non_bypass_alert_ll'
+                if (true == curr_house_mode->armed) // if the new Mode is armed ; create 'non_bypass_alert_ll'
                 {
                     __modes_create_non_bypass_alerts(ez_mode, curr_house_mode);
                 }
             }
             else
-            { // After the switching is DONE.
+            { // In next second, after switching is DONE. Perform 'MAIN' alarming-phase.
                 // 2. Pre-alarming (ENTRY-DELAY) ; Operate on the 'cj_alarms' list to excluding 'cj_alarm_off_devices'
                 if (true == curr_house_mode->armed)
                 {
                     if (true == __check_if_entry_delay_finished(ez_mode))
                     {
                         // 3. Perform --> 'MAIN' phase operations
-                        __modes_main_and_broadcast_status(ez_mode);
+                        __modes_main_phase_broadcast(ez_mode);
                     }
                 }
             }

@@ -377,6 +377,7 @@ const char *ezlopi_camerasOffDevices_str = "camerasOffDevices";
 const char *ezlopi_bypassDevices_str = "bypassDevices";
 const char *ezlopi_protect_str = "protect";
 const char *ezlopi_devices_str = "devices";
+const char *ezlopi_disabledDevices_str = "disabledDevices";
 const char *ezlopi_deviceGroup_str = "deviceGroup";
 const char *ezlopi_deviceGroups_str = "deviceGroups";
 const char *ezlopi_deviceGroupIds_str = "deviceGroupIds";
@@ -385,7 +386,6 @@ const char *ezlopi_itemGroup_str = "itemGroup";
 const char *ezlopi_itemGroupId_str = "itemGroupId";
 const char *ezlopi_showItems_str = "showItems";
 const char *ezlopi_deviceFlag_str = "deviceFlag";
-
 const char *ezlopi_alarms_str = "alarms";
 const char *ezlopi_cameras_str = "cameras";
 const char *ezlopi_protectButtons_str = "protectButtons";
@@ -578,6 +578,9 @@ const char *ezlopi_uart_str = "uart";
 const char *ezlopi_bluetooth_str = "bluetooth";
 const char *ezlopi_websocket_server_str = "websocket.server";
 const char *ezlopi_websocket_client_str = "websocket.client";
+
+const char *ezlopi_hits_limit_str = "hitsLimit";
+const char *ezlopi_inactivity_window_str = "inactivityWindow";
 
 /*******************************************************************************
  *                          Extern Function Definitions

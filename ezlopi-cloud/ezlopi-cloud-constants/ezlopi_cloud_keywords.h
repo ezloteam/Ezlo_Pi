@@ -372,6 +372,7 @@ extern "C"
     extern const char *ezlopi_bypassDevices_str;
     extern const char *ezlopi_protect_str;
     extern const char *ezlopi_devices_str;
+    extern const char *ezlopi_disabledDevices_str;
     extern const char *ezlopi_deviceGroup_str;
     extern const char *ezlopi_deviceGroups_str;
     extern const char *ezlopi_deviceGroupIds_str;
@@ -573,6 +574,9 @@ extern "C"
     extern const char *ezlopi_bluetooth_str;
     extern const char *ezlopi_websocket_server_str;
     extern const char *ezlopi_websocket_client_str;
+
+    extern const char *ezlopi_hits_limit_str;
+    extern const char *ezlopi_inactivity_window_str;
 
 #ifdef __cplusplus
 }

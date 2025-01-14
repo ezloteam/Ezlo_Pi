@@ -88,7 +88,7 @@ extern "C"
     extern const char *method_hub_devices_list;
     extern const char *method_hub_device_armed_set;
     // extern const  char *method_hub_device_name_set;
-    extern const  char *method_hub_device_room_set;
+    extern const char *method_hub_device_room_set;
     // extern const  char *method_hub_device_setting_dictionary_value_set ;
     // extern const  char *method_hub_device_setting_value_set ;
     // extern const  char *method_hub_gateway_setting_value_set ;
@@ -96,7 +96,7 @@ extern "C"
     // extern const  char *method_hub_detection_devices_list ;
     // extern const  char *method_hub_detection_device_remove ;
     // extern const  char *method_hub_detection_device_set ;
-    extern const  char *method_hub_setting_updated;
+    extern const char *method_hub_setting_updated;
     // extern const  char *method_hub_device_setting_reset ;
     // extern const  char *method_hub_device_settings_list;
     // extern const  char *method_hub_setting_value_set_request;
@@ -131,8 +131,8 @@ extern "C"
     // extern const  char *method_hub_modes_switch ;
     // extern const  char *method_hub_modes_switch_to_delay_set;
     // extern const  char *method_hub_modes_alarm_delay_set ;
-    extern const  char *method_hub_modes_alarms_off_add;
-    extern const  char *method_hub_modes_alarms_off_remove;
+    extern const char *method_hub_modes_alarms_off_add;
+    extern const char *method_hub_modes_alarms_off_remove;
     // extern const  char *method_hub_modes_switch_cancel ;
     // extern const  char *method_hub_modes_notification_add;
     // extern const  char *method_hub_modes_notificationnotifyallset ;
@@ -216,6 +216,10 @@ extern "C"
     extern const char *ezlopi_hub_modes_protect_devices_added;
     extern const char *ezlopi_hub_modes_protect_devices_removed;
     extern const char *ezlopi_hub_modes_entry_delay_changed;
+    extern const char *ezlopi_hub_modes_swinger_shutdown_reset_done;
+    extern const char *ezlopi_hub_modes_swinger_shutdown_disable_added;
+    extern const char *ezlopi_hub_modes_swinger_shutdown_disable_removed;
+    extern const char *ezlopi_hub_modes_swinger_shutdown_limit_changed;
 
 #ifdef __cplusplus
 }

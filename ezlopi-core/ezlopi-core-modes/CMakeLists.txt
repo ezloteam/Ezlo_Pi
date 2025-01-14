@@ -1,5 +1,9 @@
 file(GLOB_RECURSE config_src "*.c")
 
+set(ESP_IDF_COMPONENTS
+        cjext
+)
+
 set(EZLOPI_CORE_COMPONENTS
         ezlopi-core-cloud
         ezlopi-core-devices
@@ -22,7 +26,8 @@ set(EZLOPI_SERVICE_COMPONENTS
 
 idf_component_register(SRCS  "${config_src}"
                         INCLUDE_DIRS "."
-                        REQUIRES        ${EZLOPI_CORE_COMPONENTS}
+                        REQUIRES        ${ESP_IDF_COMPONENTS}
+                                        ${EZLOPI_CORE_COMPONENTS}
                                         ${EZLOPI_HAL_COMPONENTS}
                                         ${EZLOPI_CLOUD_COMPONENTS}
                                         ${EZLOPI_SENSOR_DEVICE_COMPONENTS}
