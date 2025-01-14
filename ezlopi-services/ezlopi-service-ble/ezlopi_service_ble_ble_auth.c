@@ -1,7 +1,7 @@
 
 
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **

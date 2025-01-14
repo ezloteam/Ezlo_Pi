@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,17 +31,17 @@
 /**
  * @file    jsn_sr04t.h
  * @brief   perform some function on jsn_sr04t
- * @author  xx
+ * @author  ezlopi_team_np
  * @version 0.1
  * @date    xx
-*/
+ */
 
 #ifndef _JSN_SR04T_H_
 #define _JSN_SR04T_H_
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include <stdio.h>
 #include "driver/gpio.h"
 #include "driver/rmt.h"
@@ -61,16 +61,16 @@
 #include "cjext.h"
 
 /*******************************************************************************
-*                          C++ Declaration Wrapper
-*******************************************************************************/
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
     /*******************************************************************************
-    *                          Type & Macro Declarations
-    *******************************************************************************/
+     *                          Type & Macro Declarations
+     *******************************************************************************/
     typedef struct
     {
         bool is_init;                /*!< Has this component instance been initialized? */
@@ -124,22 +124,22 @@ extern "C"
 #define maximum_detection_value_in_cm 600
 
     /*******************************************************************************
-    *                          Extern Data Declarations
-    *******************************************************************************/
+     *                          Extern Data Declarations
+     *******************************************************************************/
 
     /*******************************************************************************
-    *                          Extern Function Prototypes
-    *******************************************************************************/
+     *                          Extern Function Prototypes
+     *******************************************************************************/
 
     /**
-    * @brief Function to operate on actions
-    *
-    * @param action Current Action to Operate on
-    * @param item Target-Item node
-    * @param arg Arg for action
-    * @param user_arg User-arg
-    * @return ezlopi_error_t
-    */
+     * @brief Function to operate on actions
+     *
+     * @param action Current Action to Operate on
+     * @param item Target-Item node
+     * @param arg Arg for action
+     * @param user_arg User-arg
+     * @return ezlopi_error_t
+     */
     // void jsn_sr04t_print_data(jsn_sr04t_data_t jsn_sr04t_data);
 
     /**
@@ -173,5 +173,5 @@ extern "C"
 #endif //_JSN_SR04T_H_
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

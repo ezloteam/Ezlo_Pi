@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,7 +31,7 @@
 /**
  * @file    dht22.h
  * @brief   perform some function on dht22
- * @author  xx
+ * @author  ezlopi_team_np
  * @version 0.1
  * @date    xx
  */
@@ -103,20 +103,20 @@ extern "C"
      *******************************************************************************/
     /**
      * @brief Function to read dht22 data
-     * 
-     * @param temperature_dht22 
-     * @param humidity_dht22 
-     * @param DHT22gpio 
-     * @return int 
+     *
+     * @param temperature_dht22
+     * @param humidity_dht22
+     * @param DHT22gpio
+     * @return int
      */
     int readDHT22(float *temperature_dht22, float *humidity_dht22, int DHT22gpio);
     /**
      * @brief Get current dht22 signal level
-     * 
-     * @param DHT22gpio 
-     * @param usTimeOut 
-     * @param state 
-     * @return int 
+     *
+     * @param DHT22gpio
+     * @param usTimeOut
+     * @param state
+     * @return int
      */
     int dht22_getSignalLevel(int DHT22gpio, int usTimeOut, bool state);
     // void errorHandler(int response);

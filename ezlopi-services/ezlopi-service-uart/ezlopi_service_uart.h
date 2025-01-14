@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -35,7 +35,7 @@
  * @author  ezlopi_team_np
  * @version 1.0
  * @date    January 22, 2024
- */ 
+ */
 #ifndef __EZLOPI_SERVICE_UART_H__
 #define __EZLOPI_SERVICE_UART_H__
 

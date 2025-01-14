@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2022 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -88,7 +88,7 @@ extern "C"
     extern const char *method_hub_devices_list;
     extern const char *method_hub_device_armed_set;
     // extern const  char *method_hub_device_name_set;
-    extern const  char *method_hub_device_room_set;
+    extern const char *method_hub_device_room_set;
     // extern const  char *method_hub_device_setting_dictionary_value_set ;
     // extern const  char *method_hub_device_setting_value_set ;
     // extern const  char *method_hub_gateway_setting_value_set ;
@@ -96,7 +96,7 @@ extern "C"
     // extern const  char *method_hub_detection_devices_list ;
     // extern const  char *method_hub_detection_device_remove ;
     // extern const  char *method_hub_detection_device_set ;
-    extern const  char *method_hub_setting_updated;
+    extern const char *method_hub_setting_updated;
     // extern const  char *method_hub_device_setting_reset ;
     // extern const  char *method_hub_device_settings_list;
     // extern const  char *method_hub_setting_value_set_request;
@@ -131,8 +131,8 @@ extern "C"
     // extern const  char *method_hub_modes_switch ;
     // extern const  char *method_hub_modes_switch_to_delay_set;
     // extern const  char *method_hub_modes_alarm_delay_set ;
-    extern const  char *method_hub_modes_alarms_off_add;
-    extern const  char *method_hub_modes_alarms_off_remove;
+    extern const char *method_hub_modes_alarms_off_add;
+    extern const char *method_hub_modes_alarms_off_remove;
     // extern const  char *method_hub_modes_switch_cancel ;
     // extern const  char *method_hub_modes_notification_add;
     // extern const  char *method_hub_modes_notificationnotifyallset ;

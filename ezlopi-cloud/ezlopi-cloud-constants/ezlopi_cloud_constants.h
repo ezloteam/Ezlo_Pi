@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -32,7 +32,7 @@
 /**
  * @file    main.c
  * @brief   perform some function on data
- * @author  John Doe
+ * @author  ezlopi_team_np
  * @version 0.1
  * @date    1st January 2024
  */
@@ -74,7 +74,7 @@ extern "C"
      : (NULL == STR2)                       ? false           \
      : ((0 == STR1_LEN) && (0 == STR2_LEN)) ? false           \
                                             : COMPARE_IF_EQUAL(STR1, STR2, STR1_LEN, STR2_LEN))
-//-------------------------------------------------------------------------------------------------------------
+    //-------------------------------------------------------------------------------------------------------------
 
 #include "ezlopi_cloud_keywords.h"
 #include "ezlopi_cloud_scales_str.h"
@@ -87,7 +87,6 @@ extern "C"
 #include "ezlopi_cloud_value_type_str.h"
 #include "ezlopi_cloud_subcategory_str.h"
 #include "ezlopi_cloud_device_types_str.h"
-
 
     /*******************************************************************************
      *                          Extern Data Declarations

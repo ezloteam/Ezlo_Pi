@@ -8,7 +8,7 @@ set(EZPI_COMPONENTS
 )
 
 
-idf_component_register(SRCS "${config_src}"
+idf_component_register(SRCS "ezlopi_core_cloud.c" "${config_src}"
     INCLUDE_DIRS "."
     REQUIRES    ${ESP_IDF_COMPONENTS}
                 ${EZPI_COMPONENTS}

@@ -8,7 +8,7 @@
  * @date
  */
 /* ===========================================================================
-** Copyright (C) 2022 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -61,10 +61,10 @@ extern "C"
    *                          Extern Data Declarations
    *******************************************************************************/
   /// @brief https://api.ezlo.com/devices/items/index.html
-    /**
-     * @brief Variable to be used for undefined items
-     *
-     */
+  /**
+   * @brief Variable to be used for undefined items
+   *
+   */
   extern const char *ezlopi_item_name_undefined;
   /**
    * @brief Variable to be used for acceleration-x items
@@ -100,7 +100,7 @@ extern "C"
   // extern const  char *ezlopi_item_name_barrier_problem_sensors;
   // extern const  char *ezlopi_item_name_barrier_short_circuit;
   // extern const  char *ezlopi_item_name_barrier_fail_events;
-  extern const  char *ezlopi_item_name_button_state;
+  extern const char *ezlopi_item_name_button_state;
   // extern const  char *ezlopi_item_name_test_state;
   // extern const  char *ezlopi_item_name_co_alarm;
   // extern const  char *ezlopi_item_name_maintenance_state;

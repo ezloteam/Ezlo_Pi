@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,7 +31,7 @@
 /**
  * @file    sensor_0043_ADC_GYML8511_UV_intensity.h
  * @brief   perform some function on sensor_0043
- * @author  xx
+ * @author  ezlopi_team_np
  * @version 0.1
  * @date    xx
  */

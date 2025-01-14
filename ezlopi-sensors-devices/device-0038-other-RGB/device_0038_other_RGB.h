@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,7 +31,7 @@
 /**
  * @file    device_0038_other_RGB.h
  * @brief   perform some function on device_0038
- * @author  xx
+ * @author  ezlopi_team_np
  * @version 0.1
  * @date    xx
  */

@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -32,7 +32,7 @@
 /**
  * @file    main.c
  * @brief   perform some function on data
- * @author  John Doe
+ * @author  ezlopi_team_np
  * @version 0.1
  * @date    1st January 2024
  */
@@ -99,7 +99,7 @@ void data_list(cJSON* cj_request, cJSON* cj_response)
                 cJSON_AddNumberToObject(__FUNCTION__, cj_first_start, ezlopi_value_str, 0);
             }
 
-            #warning "WARNING: work required here!"
+#warning "WARNING: work required here!"
 #if 0
                 l_ezlopi_configured_devices_t* registered_devices = ezlopi_devices_list_get_configured_items();
             while (NULL != registered_devices)

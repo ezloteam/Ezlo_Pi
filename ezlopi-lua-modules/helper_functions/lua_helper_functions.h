@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -32,7 +32,7 @@
 /**
  * @file    main.c
  * @brief   perform some function on data
- * @author  John Doe
+ * @author  ezlopi_team_np
  * @version 0.1
  * @date    1st January 2024
  */
@@ -52,36 +52,36 @@ extern "C"
 {
 #endif
 
-    /*******************************************************************************
-     *                          Type & Macro Declarations
-     *******************************************************************************/
-    #define lua_create_table_string_key_value(key, value)           \
-        {                                                           \
-            lua_pushstring(lua_state, key);                         \
-            lua_pushstring(lua_state, value ? value : ezlopi__str); \
-            lua_settable(lua_state, -3);                            \
-        }
-    // #warning "Compile and check the warning details, Krishna needs to resolve it."
-    #define lua_create_table_bool_key_value(key, value) \
-        {                                               \
-            lua_pushstring(lua_state, key);             \
-            lua_pushboolean(lua_state, value);          \
-            lua_settable(lua_state, -3);                \
-        }
+/*******************************************************************************
+ *                          Type & Macro Declarations
+ *******************************************************************************/
+#define lua_create_table_string_key_value(key, value)           \
+    {                                                           \
+        lua_pushstring(lua_state, key);                         \
+        lua_pushstring(lua_state, value ? value : ezlopi__str); \
+        lua_settable(lua_state, -3);                            \
+    }
+// #warning "Compile and check the warning details, Krishna needs to resolve it."
+#define lua_create_table_bool_key_value(key, value) \
+    {                                               \
+        lua_pushstring(lua_state, key);             \
+        lua_pushboolean(lua_state, value);          \
+        lua_settable(lua_state, -3);                \
+    }
 
-    #define lua_create_table_number_key_value(key, value) \
-        {                                                 \
-            lua_pushstring(lua_state, key);               \
-            lua_pushnumber(lua_state, value);             \
-            lua_settable(lua_state, -3);                  \
-        }
+#define lua_create_table_number_key_value(key, value) \
+    {                                                 \
+        lua_pushstring(lua_state, key);               \
+        lua_pushnumber(lua_state, value);             \
+        lua_settable(lua_state, -3);                  \
+    }
 
-    #define lua_create_table_string_value(idx, value)               \
-        {                                                           \
-            lua_pushnumber(lua_state, idx);                         \
-            lua_pushstring(lua_state, value ? value : ezlopi__str); \
-            lua_settable(lua_state, -3);                            \
-        }
+#define lua_create_table_string_value(idx, value)               \
+    {                                                           \
+        lua_pushnumber(lua_state, idx);                         \
+        lua_pushstring(lua_state, value ? value : ezlopi__str); \
+        lua_settable(lua_state, -3);                            \
+    }
 
     /*******************************************************************************
      *                          Extern Data Declarations

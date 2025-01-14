@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -32,7 +32,7 @@
 /**
  * @file    main.c
  * @brief   perform some function on data
- * @author  John Doe
+ * @author  ezlopi_team_np
  * @version 0.1
  * @date    1st January 2024
  */
@@ -52,14 +52,14 @@ extern "C"
 {
 #endif
 
-    /*******************************************************************************
-     *                          Type & Macro Declarations
-     *******************************************************************************/
-    #define RAND_LENGTH 4
+/*******************************************************************************
+ *                          Type & Macro Declarations
+ *******************************************************************************/
+#define RAND_LENGTH 4
 
     typedef unsigned char ezlopi_uuid_t[16];
 
-    #define uuid_generate(out) ezlopi_util_uuid_generate_random(out)
+#define uuid_generate(out) ezlopi_util_uuid_generate_random(out)
 
     /*******************************************************************************
      *                          Extern Data Declarations
@@ -70,29 +70,29 @@ extern "C"
      *******************************************************************************/
     /**
      * @brief Function to generate random uuid
-     * 
-     * @param out 
+     *
+     * @param out
      */
     void ezlopi_util_uuid_generate_random(ezlopi_uuid_t out);
     /**
      * @brief Function to unparse uuid
-     * 
+     *
      * @param uuid Target uuid
-     * @param out pointer to destination 
+     * @param out pointer to destination
      */
     void ezlopi_util_uuid_unparse(const ezlopi_uuid_t uuid, char *out);
     /**
      * @brief Function to copy uuid
-     * 
-     * @param dst 
-     * @param src 
+     *
+     * @param dst
+     * @param src
      */
     void ezlopi_util_uuid_copy(ezlopi_uuid_t dst, const ezlopi_uuid_t src);
     /**
      * @brief Function to parse uuid
-     * 
-     * @param in 
-     * @param uuid 
+     *
+     * @param in
+     * @param uuid
      */
     void ezlopi_util_uuid_parse(const char *in, ezlopi_uuid_t uuid);
 

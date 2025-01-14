@@ -1,6 +1,6 @@
 
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -32,14 +32,14 @@
 
 /**
  * @file    ezlopi_service_uri.h
- * @brief
- * @author
- * @version
- * @date
+ * @brief   Contains function declaration related URI
+ * @author  ezlopi_team_np
+ * @version 1.0
+ * @date    January 22, 2024
  */
 
-#ifndef _EZLOPI_SERVICE_URI_H_
-#define _EZLOPI_SERVICE_URI_H_
+#ifndef __EZLOPI_SERVICE_URI_H__
+#define __EZLOPI_SERVICE_URI_H__
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
@@ -89,7 +89,7 @@ extern "C"
 }
 #endif
 
-#endif // _EZLOPI_SERVICE_URI_H_
+#endif // __EZLOPI_SERVICE_URI_H__
 
 /*******************************************************************************
  *                          End of File

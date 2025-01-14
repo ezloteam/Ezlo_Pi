@@ -41,7 +41,7 @@ set(EZLOPI_UTIL_COMPONENTS
 )
 
 # Register the components
-idf_component_register(SRCS "${config_src}"
+idf_component_register(SRCS "ze08_ch2o.c" "${config_src}"
                         INCLUDE_DIRS "."
                         REQUIRES        ${ESP_IDF_COMPONENTS}
                                         ${EZLOPI_CORE_COMPONENTS}
@@ -50,4 +50,6 @@ idf_component_register(SRCS "${config_src}"
                                         ${EZLOPI_SERV_COMPONENTS}
                                         ${EZLOPI_SENSOR_DEVICE_COMPONENTS}  
                                         ${EZLOPI_UTIL_COMPONENTS}                
+)
+NTS}                
 )

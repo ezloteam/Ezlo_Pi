@@ -1,7 +1,7 @@
 
 
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -33,11 +33,16 @@
 
 /**
  * @file    ezlopi_service_uri.c
- * @brief
- * @author
- * @version
- * @date
+ * @brief   Contains function definitions related URI
+ * @author  ezlopi_team_np
+ * @version 1.0
+ * @date    January 22, 2024
  */
+
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
+
 #include <string.h>
 
 #include "nvs_flash.h"
@@ -89,6 +94,10 @@ static esp_err_t ezpi_capture_config_uri_handle(httpd_req_t *req);
  * @return esp_err_t
  */
 esp_err_t ezpi_http_404_error_handler(httpd_req_t *req, httpd_err_code_t err);
+
+/*******************************************************************************
+ *                          Static Data Definitions
+ *******************************************************************************/
 
 static const char *error_page_data = "\
     <!DOCTYPE html>\
