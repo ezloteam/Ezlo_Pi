@@ -451,10 +451,7 @@ static float __extract_MQ2_sensor_ppm(l_ezlopi_item_t *item)
 
         // 1.1 Calculate @ 'ratio' during LPG presence
         double _ratio = (Rs_gas / ((MQ2_value->MQ2_R0_constant <= 0) ? (1.0f) : (MQ2_value->MQ2_R0_constant))); // avoid dividing by zero??
-        if (_ratio <= 0)
-        {
-            _ratio = 0;
-        }
+        
         //-------------------------------------------------
 
         // 1.2 Calculate _LPG_ppm

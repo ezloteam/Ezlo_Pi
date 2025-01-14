@@ -441,10 +441,7 @@ static float __extract_MQ8_sensor_ppm(l_ezlopi_item_t *item)
 
         // 1.1 Calculate @ 'ratio' during H2 presence
         double _ratio = (Rs_gas / ((MQ8_value->MQ8_R0_constant <= 0) ? (1.0f) : (MQ8_value->MQ8_R0_constant))); // avoid dividing by zero??
-        if (_ratio <= 0)
-        {
-            _ratio = 0;
-        }
+        
         //-------------------------------------------------
 
         // 1.2 Calculate _H2_ppm
