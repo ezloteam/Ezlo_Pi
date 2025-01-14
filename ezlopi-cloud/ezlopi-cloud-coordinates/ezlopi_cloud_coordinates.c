@@ -30,15 +30,18 @@
 */
 
 /**
- * @file ezlopi_cloud_coordinates.c
- * @author your name (you@domain.com)
- * @brief
+ * @file    ezlopi_cloud_coordinates.c
+ * @brief   Definitions for cloud coordinate functions
+ * @author  ezlopi_team_np
  * @version 0.1
- * @date 2025-01-07
+ * @date    January 7, 2025
  *
- * @copyright Copyright (c) 2025
  *
  */
+
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 
 #include "cjext.h"
 #include "ezlopi_util_trace.h"

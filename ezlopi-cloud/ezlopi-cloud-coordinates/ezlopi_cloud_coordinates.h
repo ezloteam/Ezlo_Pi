@@ -30,15 +30,15 @@
 */
 
 /**
- * @file     ezlopi_cloud_coordinates.h
- * @brief   perform some function on data
+ * @file    ezlopi_cloud_coordinates.c
+ * @brief   Declarations for cloud coordinate functions
  * @author  ezlopi_team_np
  * @version 0.1
- * @date    1st January 2024
+ * @date    January 7, 2025
  */
 
-#ifndef _EZLOPI_CLOUD_COORDINSTES_H_
-#define _EZLOPI_CLOUD_COORDINSTES_H_
+#ifndef __EZLOPI_CLOUD_COORDINSTES_H__
+#define __EZLOPI_CLOUD_COORDINSTES_H__
 
 /*******************************************************************************
  *                          Include Files
@@ -96,7 +96,7 @@ extern "C"
 }
 #endif
 
-#endif // _EZLOPI_CLOUD_COORDINSTES_H_
+#endif // __EZLOPI_CLOUD_COORDINSTES_H__
 
 /*******************************************************************************
  *                          End of File
