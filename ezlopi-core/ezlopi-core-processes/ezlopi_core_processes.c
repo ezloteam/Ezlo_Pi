@@ -204,11 +204,11 @@ static size_t __set_default_task_memory_usage(const char *default_task_name)
     }
     return stack_size;
 }
-
+    
 static bool __check_ezlopi_task(TaskHandle_t task_handle)
 {
     bool ret = false;
-    int ezlopi_task_info_array_size = ENUM_TASK_MAX;
+    int ezlopi_task_info_array_size = ENUM_TASK_MAX - 1;
     while (ezlopi_task_info_array_size >= 0)
     {
         if (ezlopi_task_info_array[ezlopi_task_info_array_size].task_handle == task_handle)
