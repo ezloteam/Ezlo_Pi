@@ -1672,7 +1672,7 @@ int EZPI_core_scene_when_string_operation(l_scenes_list_v2_t *scene_node, void *
         {
             ret = EZPI_scenes_operators_value_strops_operations_with_group(value_field, operation_field, devgrp_field, itemgrp_field);
         }
-        else
+        else if (item_exp_field && value_field && operation_field)
         {
             ret = EZPI_scenes_operators_value_strops_operations(item_exp_field, value_field, operation_field);
         }
@@ -1847,7 +1847,7 @@ int EZPI_core_scene_when_compare_values(l_scenes_list_v2_t *scene_node, void *ar
         {
             ret = EZPI_scenes_operators_value_comparevalues_with_less_operations_with_group(value_field, value_type_field, comparator_field, devgrp_field, itemgrp_field);
         }
-        else
+        else if (item_exp_field && value_field && value_type_field && comparator_field)
         {
             ret = EZPI_scenes_operators_value_comparevalues_with_less_operations(item_exp_field, value_field, value_type_field, comparator_field);
         }
