@@ -31,10 +31,10 @@
 
 /**
  * @file    ezlopi_service_loop.c
- * @brief
- * @author
- * @version
- * @date
+ * @brief   Contains function definitions related to loop implementation
+ * @author  ezlopi_team_np
+ * @version 1.0
+ * @date    June 20, 2024
  */
 /*******************************************************************************
  *                          Include Files
