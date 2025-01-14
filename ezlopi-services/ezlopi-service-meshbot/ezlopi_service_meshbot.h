@@ -36,8 +36,8 @@
  * @version 1.0
  * @date    January 22, 2024
  */
-#ifndef _EZLOPI_SERVICE_MESHBOT_H_
-#define _EZLOPI_SERVICE_MESHBOT_H_
+#ifndef __EZLOPI_SERVICE_MESHBOT_H__
+#define __EZLOPI_SERVICE_MESHBOT_H__
 
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
@@ -124,7 +124,7 @@ extern "C"
 
 #endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
-#endif // _EZLOPI_SERVICE_MESHBOT_H_
+#endif // __EZLOPI_SERVICE_MESHBOT_H__
 /*******************************************************************************
  *                          End of File
  *******************************************************************************/

@@ -30,11 +30,11 @@
 */
 
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
- * @version 0.1
- * @date    1st January 2024
+ * @file    ezlopi_service_modes.c
+ * @brief   Contains function definitions for mode operations
+ * @author  ezlopi_team_np
+ * @version 1.0
+ * @date    February 9, 2024
  */
 
 /*******************************************************************************
@@ -71,17 +71,6 @@
  *******************************************************************************/
 
 /*******************************************************************************
- *                          Static Data Definitions
- *******************************************************************************/
-static SemaphoreHandle_t sg_modes_loop_smphr = NULL;
-
-
-/*******************************************************************************
- *                          Static Function Prototypes
- *******************************************************************************/
-static void __modes_loop(void *pv);
-
-/*******************************************************************************
  *                          Type & Macro Definitions
  *******************************************************************************/
 typedef struct l_modes_alert
@@ -96,23 +85,28 @@ typedef struct l_modes_alert
     struct l_modes_alert *next;
 } l_modes_alert_t;
 
+/*******************************************************************************
+ *                          Static Function Prototypes
+ *******************************************************************************/
+static void __modes_loop(void *pv);
+static l_modes_alert_t *__create_alert(const char *u_id, s_ezlopi_modes_t *ez_mode);
+static void __ezlopi_service_add_alert(const char *u_id, s_ezlopi_modes_t *ez_mode);
+static void __remove_all_alerts(l_modes_alert_t *curr_node);
+static void __ezlopi_service_remove_all_alerts(void);
+
+/*******************************************************************************
+ *                          Static Data Definitions
+ *******************************************************************************/
+static SemaphoreHandle_t sg_modes_loop_smphr = NULL;
 static l_modes_alert_t *_alert_head = NULL;
 
-static l_modes_alert_t *__create_alert(const char *u_id, s_ezlopi_modes_t *ez_mode)
-{
-    l_modes_alert_t *new_node = ezlopi_malloc(__FUNCTION__, sizeof(l_modes_alert_t));
+/*******************************************************************************
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
-    if (new_node)
-    {
-        new_node->u_id_str = u_id;
-        new_node->alert_trig = false;
-        new_node->alarm_delay_ll = new_node->timeleft_to_alarm_ll = ez_mode->alarm_delay;
-        new_node->abort_window_ll = new_node->timeleft_to_abort_ll = ez_mode->abort_delay.default_delay_sec;
-        new_node->next = NULL;
-    }
-
-    return new_node;
-}
+/*******************************************************************************
+ *                          Extern Function Definitions
+ *******************************************************************************/
 
 #if 0 /* These two function maybe used in future */
 static void __ezlopi_service_remove_alert_node(l_modes_alert_t *node)
@@ -161,6 +155,66 @@ static void __ezlopi_service_remove_alert_node_by_name(const char *_name_)
     }
 }
 #endif
+
+//---------------------------------------------------------------------------------------------
+void ezlopi_service_modes_init(void)
+{
+    // initialize modes-loop
+    sg_modes_loop_smphr = xSemaphoreCreateBinary();
+    xSemaphoreGive(sg_modes_loop_smphr);
+    ezlopi_service_modes_start(5000);
+}
+
+bool ezlopi_service_modes_stop(uint32_t wait_ms)
+{
+    bool ret = false;
+    // uint32_t start_tick = xTaskGetTickCount() / portTICK_PERIOD_MS;
+
+    if (sg_modes_loop_smphr && (xSemaphoreTake(sg_modes_loop_smphr, wait_ms / portTICK_RATE_MS)))
+    {
+        EZPI_service_loop_remove(__modes_loop);
+        xSemaphoreGive(sg_modes_loop_smphr);
+        TRACE_W("removed modes-loop");
+        ret = true;
+    }
+
+    return ret;
+}
+
+bool ezlopi_service_modes_start(uint32_t wait_ms)
+{
+    bool ret = false;
+
+    if (EZPI_core_modes_get_custom_modes() && xSemaphoreTake(sg_modes_loop_smphr, wait_ms / portTICK_RATE_MS))
+    {
+        ret = true;
+        xSemaphoreGive(sg_modes_loop_smphr);
+        EZPI_service_loop_add("modes-loop", __modes_loop, 1000, NULL);
+        TRACE_I("added modes-loop");
+    }
+
+    return ret;
+}
+
+/*******************************************************************************
+ *                          Static Function Definitions
+ *******************************************************************************/
+
+static l_modes_alert_t *__create_alert(const char *u_id, s_ezlopi_modes_t *ez_mode)
+{
+    l_modes_alert_t *new_node = ezlopi_malloc(__FUNCTION__, sizeof(l_modes_alert_t));
+
+    if (new_node)
+    {
+        new_node->u_id_str = u_id;
+        new_node->alert_trig = false;
+        new_node->alarm_delay_ll = new_node->timeleft_to_alarm_ll = ez_mode->alarm_delay;
+        new_node->abort_window_ll = new_node->timeleft_to_abort_ll = ez_mode->abort_delay.default_delay_sec;
+        new_node->next = NULL;
+    }
+
+    return new_node;
+}
 
 static void __ezlopi_service_add_alert(const char *u_id, s_ezlopi_modes_t *ez_mode)
 {
@@ -216,47 +270,6 @@ static void __ezlopi_service_remove_all_alerts(void)
     }
 }
 
-//---------------------------------------------------------------------------------------------
-void ezlopi_service_modes_init(void)
-{
-    // initialize modes-loop
-    sg_modes_loop_smphr = xSemaphoreCreateBinary();
-    xSemaphoreGive(sg_modes_loop_smphr);
-    ezlopi_service_modes_start(5000);
-}
-
-bool ezlopi_service_modes_stop(uint32_t wait_ms)
-{
-    bool ret = false;
-    // uint32_t start_tick = xTaskGetTickCount() / portTICK_PERIOD_MS;
-
-    if (sg_modes_loop_smphr && (xSemaphoreTake(sg_modes_loop_smphr, wait_ms / portTICK_RATE_MS)))
-    {
-        EZPI_service_loop_remove(__modes_loop);
-        xSemaphoreGive(sg_modes_loop_smphr);
-        TRACE_W("removed modes-loop");
-        ret = true;
-    }
-
-    return ret;
-}
-
-bool ezlopi_service_modes_start(uint32_t wait_ms)
-{
-    bool ret = false;
-
-    if (EZPI_core_modes_get_custom_modes() && xSemaphoreTake(sg_modes_loop_smphr, wait_ms / portTICK_RATE_MS))
-    {
-        ret = true;
-        xSemaphoreGive(sg_modes_loop_smphr);
-        EZPI_service_loop_add("modes-loop", __modes_loop, 1000, NULL);
-        TRACE_I("added modes-loop");
-    }
-
-    return ret;
-}
-
-//---------------------------------------------------------------------------------------------
 static void __broadcast_modes_alarmed_for_uid(const char *dev_id_str)
 {
     cJSON *cj_update = EZPI_core_modes_cjson_alarmed(dev_id_str);

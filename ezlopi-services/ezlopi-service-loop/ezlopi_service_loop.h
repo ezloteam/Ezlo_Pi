@@ -36,8 +36,8 @@
  * @version 1.0
  * @date    June 20, 2024
  */
-#ifndef _EZLOPI_SERVICE_TIMER_H_
-#define _EZLOPI_SERVICE_TIMER_H_
+#ifndef __EZLOPI_SERVICE_TIMER_H__
+#define __EZLOPI_SERVICE_TIMER_H__
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
@@ -89,7 +89,7 @@ extern "C"
 }
 #endif
 
-#endif // _EZLOPI_SERVICE_TIMER_H_
+#endif // __EZLOPI_SERVICE_TIMER_H__
 
 /*******************************************************************************
  *                          End of File

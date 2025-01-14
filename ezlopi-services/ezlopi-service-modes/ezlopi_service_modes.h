@@ -30,11 +30,11 @@
 */
 
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
- * @version 0.1
- * @date    1st January 2024
+ * @file    ezlopi_service_modes.h
+ * @brief   Contains function declarations for mode operations
+ * @author  ezlopi_team_np
+ * @version 1.0
+ * @date    February 9, 2024
  */
 
 #ifndef __EZLOPI_SERVICE_MODES_H__
@@ -84,6 +84,10 @@ extern "C"
      * @return false 
      */
     bool ezlopi_service_modes_start(uint32_t wait_ms);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // __EZLOPI_SERVICE_MODES_H__
 
