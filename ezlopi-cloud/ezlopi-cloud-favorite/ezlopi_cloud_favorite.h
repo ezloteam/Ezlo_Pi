@@ -28,12 +28,13 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
+
 /**
  * @file    ezlopi_cloud_favorite.h
- * @brief
- * @author
- * @version
- * @date
+ * @brief   Declarations for cloud favorite functions
+ * @author  ezlopi_team_np
+ * @version 1.0
+ * @date    January 20, 2024
  */
 #ifndef __HUB_FAVORITE_LIST_H__
 #define __HUB_FAVORITE_LIST_H__

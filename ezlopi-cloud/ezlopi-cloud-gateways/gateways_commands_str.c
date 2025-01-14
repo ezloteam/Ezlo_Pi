@@ -31,10 +31,10 @@
 
 /**
  * @file    gateways_commands_str.c
- * @brief
- * @author
- * @version
- * @date
+ * @brief   Definitions for gateway commands strings
+ * @author  ezlopi_team_np
+ * @version 1.0
+ * @date    January 20, 2024
  */
 /*******************************************************************************
  *                          Include Files

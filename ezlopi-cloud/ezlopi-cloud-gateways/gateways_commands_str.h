@@ -31,10 +31,10 @@
 
 /**
  * @file    gateways_commands_str.h
- * @brief
- * @author
- * @version
- * @date
+ * @brief   Declerations for gateway commands strings
+ * @author  ezlopi_team_np
+ * @version 1.0
+ * @date    January 20, 2024
  */
 #ifndef __GATEWAYS_COMMANDS_STR_H__
 #define __GATEWAYS_COMMANDS_STR_H__
