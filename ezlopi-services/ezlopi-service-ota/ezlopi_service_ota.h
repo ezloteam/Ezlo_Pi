@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,13 +31,13 @@
 
 /**
  * @file    ezlopi_service_ota.h
- * @brief
- * @author
- * @version
- * @date
+ * @brief   Contains function declarations related to OTA operations
+ * @author  ezlopi_team_np
+ * @version 1.0
+ * @date    January 22, 2024
  */
-#ifndef _EZLOPI_SERVICE_OTA_H_
-#define _EZLOPI_SERVICE_OTA_H_
+#ifndef __EZLOPI_SERVICE_OTA_H__
+#define __EZLOPI_SERVICE_OTA_H__
 
 #ifdef CONFIG_EZPI_ENABLE_OTA
 /*******************************************************************************
@@ -77,7 +77,7 @@ extern "C"
 
 #endif // CONFIG_EZPI_ENABLE_OTA
 
-#endif // _EZLOPI_SERVICE_OTA_H_
+#endif // __EZLOPI_SERVICE_OTA_H__
 
 /*******************************************************************************
  *                          End of File

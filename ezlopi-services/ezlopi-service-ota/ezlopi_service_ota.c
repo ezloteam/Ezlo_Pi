@@ -31,10 +31,10 @@
 
 /**
  * @file    ezlopi_service_ota.c
- * @brief
- * @author
- * @version
- * @date
+ * @brief   Contains function definitions related to OTA operations
+ * @author  ezlopi_team_np
+ * @version 1.0
+ * @date    January 22, 2024
  */
 
 /*******************************************************************************
