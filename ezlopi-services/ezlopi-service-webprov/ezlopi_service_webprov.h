@@ -31,14 +31,14 @@
 
 /**
  * @file    ezlopi_service_webprov.h
- * @brief
- * @author
- * @version
- * @date
+ * @brief   Contains function declarations related to web provisioning
+ * @author  ezlopi_team_np
+ * @version 1.0
+ * @date    January 22, 2024
  */
 
-#ifndef _EZLOPI_SERVICE_WEBPROV_H_
-#define _EZLOPI_SERVICE_WEBPROV_H_
+#ifndef __EZLOPI_SERVICE_WEBPROV_H__
+#define __EZLOPI_SERVICE_WEBPROV_H__
 
 /*******************************************************************************
  *                          Include Files
@@ -101,7 +101,7 @@ extern "C"
 }
 #endif
 
-#endif // _EZLOPI_SERVICE_WEBPROV_H_
+#endif // __EZLOPI_SERVICE_WEBPROV_H__
 
 /*******************************************************************************
  *                          End of File

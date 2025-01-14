@@ -30,7 +30,7 @@
 */
 
 /**
- * @file    main.c
+ * @file    ezlopi_test_prov.c
  * @brief   perform some function on data
  * @author  ezlopi_team_np
  * @version 0.1
