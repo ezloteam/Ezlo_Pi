@@ -2,11 +2,12 @@
 
 /**
  * @file    ezlopi_cloud_item_name_str.h
- * @brief
- * @author
- * @version
- * @date
+ * @brief   Declarations for cloud item name strings
+ * @author  ezlopi_team_np
+ * @version 0.1
+ * @date    1st January 2024
  */
+
 /* ===========================================================================
 ** Copyright (C) 2025 Ezlo Innovation Inc
 **

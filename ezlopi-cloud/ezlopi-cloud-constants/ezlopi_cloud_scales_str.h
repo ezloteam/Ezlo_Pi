@@ -31,7 +31,7 @@
 
 /**
  * @file    ezlopi_cloud_scales_str.h
- * @brief
+ * @brief   Declarations for cloud scales strings
  * @author  ezlopi_team_np
  * @version 0.1
  * @date    1st January 2024

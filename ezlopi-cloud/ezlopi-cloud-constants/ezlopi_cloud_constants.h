@@ -30,8 +30,8 @@
 */
 
 /**
- * @file    main.c
- * @brief   perform some function on data
+ * @file    ezlopi_cloud_constants.h
+ * @brief   Definitions for cloud constants
  * @author  ezlopi_team_np
  * @version 0.1
  * @date    1st January 2024

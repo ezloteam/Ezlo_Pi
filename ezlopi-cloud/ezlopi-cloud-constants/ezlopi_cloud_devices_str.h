@@ -1,12 +1,4 @@
 
-
-/**
- * @file    ezlopi_cloud_devices_str.h
- * @brief
- * @author
- * @version
- * @date
- */
 /* ===========================================================================
 ** Copyright (C) 2025 Ezlo Innovation Inc
 **
@@ -37,6 +29,14 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
+
+/**
+ * @file    ezlopi_cloud_devices_str.h
+ * @brief   Declarations for cloud device constants
+ * @author  ezlopi_team_np
+ * @version 0.1
+ * @date    1st January 2024
+ */
 
 #ifndef __EZLOPI_DEVICES_STR_H__
 #define __EZLOPI_DEVICES_STR_H__

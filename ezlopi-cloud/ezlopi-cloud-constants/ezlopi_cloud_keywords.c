@@ -1,11 +1,5 @@
 
-/**
- * @file    ezlopi_cloud_keywords.c
- * @brief
- * @author
- * @version
- * @date
- */
+
 /* ===========================================================================
 ** Copyright (C) 2025 Ezlo Innovation Inc
 **
@@ -36,6 +30,15 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
+
+/**
+ * @file    ezlopi_cloud_keywords.c
+ * @brief   Definitions for cloud keywords
+ * @author  ezlopi_team_np
+ * @version 1.0
+ * @date    January 20, 2024
+ */
+
 #ifndef __EZLOPI_CLOUD_KEYWORDS_H__
 #define __EZLOPI_CLOUD_KEYWORDS_H__
 

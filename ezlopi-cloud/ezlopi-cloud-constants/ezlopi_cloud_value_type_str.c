@@ -31,7 +31,7 @@
 
 /**
  * @file    ezlopi_cloud_valye_type_str.c
- * @brief   perform some function on data
+ * @brief   Definitions for cloud value type strings
  * @author  ezlopi_team_np
  * @version 0.1
  * @date    1st January 2024

@@ -30,8 +30,8 @@
 */
 
 /**
- * @file    main.c
- * @brief   perform some function on data
+ * @file    ezlopi_cloud_device_types_str.c
+ * @brief   Definitions for cloud device type strings 
  * @author  ezlopi_team_np
  * @version 0.1
  * @date    1st January 2024

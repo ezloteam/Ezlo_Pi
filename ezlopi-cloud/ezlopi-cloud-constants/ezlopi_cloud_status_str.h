@@ -31,7 +31,7 @@
 
 /**
  * @file    ezlopi_cloud_status_str.h
- * @brief   perform some function on data
+ * @brief   Declarations for cloud status strings
  * @author  ezlopi_team_np
  * @version 0.1
  * @date    1st January 2024

@@ -30,8 +30,8 @@
 */
 
 /**
- * @file     ezlopi_cloud_item_name_str.c
- * @brief   perform some function on data
+ * @file    ezlopi_cloud_item_name_str.c
+ * @brief   Definitions for cloud item name strings
  * @author  ezlopi_team_np
  * @version 0.1
  * @date    1st January 2024

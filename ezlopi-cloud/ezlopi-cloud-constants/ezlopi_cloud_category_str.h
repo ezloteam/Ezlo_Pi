@@ -30,8 +30,8 @@
 */
 
 /**
- * @file    main.c
- * @brief   perform some function on data
+ * @file    ezlopi_cloud_category_str.h
+ * @brief   Contains declarations of cloud string constants
  * @author  ezlopi_team_np
  * @version 0.1
  * @date    1st January 2024
@@ -40,12 +40,26 @@
 #ifndef __EZLOPI_CATEGORY_H__
 #define __EZLOPI_CATEGORY_H__
 
-#pragma once
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
+
+/*******************************************************************************
+*                          C++ Declaration Wrapper
+*******************************************************************************/
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
+
+    /*******************************************************************************
+    *                          Type & Macro Declarations
+    *******************************************************************************/
+
+    /*******************************************************************************
+    *                          Extern Data Declarations
+    *******************************************************************************/
 
     /// @brief https://api.ezlo.com/devices/categories/index.html
 
@@ -240,6 +254,9 @@ extern "C"
      */
     // extern const  char *category_clock;
 
+    /*******************************************************************************
+    *                          Extern Function Prototypes
+    *******************************************************************************/
 #ifdef __cplusplus
 }
 #endif

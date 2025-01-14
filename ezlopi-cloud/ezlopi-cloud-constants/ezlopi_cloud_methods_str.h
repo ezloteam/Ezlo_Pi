@@ -31,11 +31,12 @@
 
 /**
  * @file    ezlopi_cloud_methods_str.h
- * @brief
- * @author
- * @version
- * @date
+ * @brief   Declarations for cloud method strings
+ * @author  ezlopi_team_np
+ * @version 1.0
+ * @date    January 20, 2024
  */
+
 #ifndef __EZLOPI_METHODS_STR_H__
 #define __EZLOPI_METHODS_STR_H__
 

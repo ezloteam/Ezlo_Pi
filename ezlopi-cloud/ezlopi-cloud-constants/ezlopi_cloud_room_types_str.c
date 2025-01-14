@@ -31,11 +31,12 @@
 
 /**
  * @file    ezlopi_cloud_room_types_str.c
- * @brief
- * @author
- * @version
- * @date
+ * @brief   Definitions for cloud room types strings
+ * @author  ezlopi_team_np
+ * @version 1.0
+ * @date    January 20, 2024
  */
+
 #ifndef __EZLOPI_ROOMTYPES_STR_H__
 #define __EZLOPI_ROOMTYPES_STR_H__
 

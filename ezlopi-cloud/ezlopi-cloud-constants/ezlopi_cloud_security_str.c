@@ -31,10 +31,10 @@
 
 /**
  * @file    ezlopi_cloud_security_str.c
- * @brief
- * @author
- * @version
- * @date
+ * @brief   Definitions for cloud security strings
+ * @author  ezlopi_team_np
+ * @version 1.0
+ * @date    January 22, 2024
  */
 
 #ifndef __EZLOPI_CLOUD_SECURITY_STR_H__

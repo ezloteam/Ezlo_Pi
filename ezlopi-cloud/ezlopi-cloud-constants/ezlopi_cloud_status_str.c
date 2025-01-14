@@ -30,8 +30,8 @@
 */
 
 /**
- * @file    main.c
- * @brief   perform some function on data
+ * @file    ezlopi_cloud_status_strs.c
+ * @brief   Definitions for cloud status strings
  * @author  ezlopi_team_np
  * @version 0.1
  * @date    1st January 2024
