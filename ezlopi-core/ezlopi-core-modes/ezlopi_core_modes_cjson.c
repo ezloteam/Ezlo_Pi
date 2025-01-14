@@ -396,19 +396,25 @@ s_ezlopi_modes_t *EZPI_core_modes_cjson_parse_modes(cJSON *cj_modes) // This fun
                 if (cj_sources_arr)
                 {
                     cJSON *cj_source = NULL;
-                    s_sources_t *curr_source = NULL;
+                    s_sources_t *curr_source = parsed_mode->alarmed.sources;
 
                     cJSON_ArrayForEach(cj_source, cj_sources_arr)
                     {
-                        if (parsed_mode->alarmed.sources)
+                        if (curr_source)
                         {
                             curr_source->next = (s_sources_t *)ezlopi_malloc(__FUNCTION__, sizeof(s_sources_t));
-                            curr_source = curr_source->next;
+                            if (curr_source->next)
+                            {
+                                curr_source = curr_source->next;
+                            }
                         }
                         else
                         {
                             parsed_mode->alarmed.sources = (s_sources_t *)ezlopi_malloc(__FUNCTION__, sizeof(s_sources_t));
-                            curr_source = parsed_mode->alarmed.sources;
+                            if (parsed_mode->alarmed.sources)
+                            {
+                                curr_source = parsed_mode->alarmed.sources;
+                            }
                         }
 
                         if (curr_source)
