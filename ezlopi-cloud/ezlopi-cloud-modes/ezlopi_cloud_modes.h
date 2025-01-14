@@ -31,10 +31,10 @@
 
 /**
  * @file    ezlopi_cloud_modes.h
- * @brief
- * @author
- * @version
- * @date
+ * @brief   Declerations for cloud modes functions
+ * @author  ezlopi_team_np
+ * @version 1.0
+ * @date    January 20, 2024
  */
 #ifndef __HUB_MODES_H__
 #define __HUB_MODES_H__

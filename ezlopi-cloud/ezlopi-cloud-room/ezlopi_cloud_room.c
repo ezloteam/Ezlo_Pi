@@ -31,10 +31,10 @@
 
 /**
  * @file    ezlopi_cloud_room.c
- * @brief
- * @author
- * @version
- * @date
+ * @brief   Definitions for cloud rooms functions
+ * @author  ezlopi_team_np
+ * @version 1.0
+ * @date    January 20, 2024
  */
 /*******************************************************************************
  *                          Include Files

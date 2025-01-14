@@ -31,10 +31,10 @@
 
 /**
  * @file    ezlopi_cloud_registration.c
- * @brief
- * @author
- * @version
- * @date
+ * @brief   Definitions for cloud registration functions
+ * @author  ezlopi_team_np
+ * @version 1.0
+ * @date    January 20, 2024
  */
 
 /*******************************************************************************

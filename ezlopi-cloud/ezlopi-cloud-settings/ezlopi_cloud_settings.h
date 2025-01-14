@@ -31,10 +31,10 @@
 
 /**
  * @file    ezlopi_cloud_settings.h
- * @brief
- * @author
- * @version
- * @date
+ * @brief   Decleration for cloud settings functions
+ * @author  ezlopi_team_np
+ * @version 1.0
+ * @date    January 20, 2024
  */
 
 #ifndef __HUB_SETTINGS_H__

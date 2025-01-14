@@ -31,11 +31,12 @@
 
 /**
  * @file    ezlopi_cloud_scenes_expressions.h
- * @brief
- * @author
- * @version
- * @date
+ * @brief   Decleration for cloud scenes expressions functions
+ * @author  ezlopi_team_np
+ * @version 1.0
+ * @date    January 20, 2024
  */
+
 #ifndef __SCENES_EXPRESSIONS_H__
 #define __SCENES_EXPRESSIONS_H__
 

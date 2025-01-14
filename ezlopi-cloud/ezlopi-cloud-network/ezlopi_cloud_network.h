@@ -31,10 +31,10 @@
 
 /**
  * @file    ezlopi_cloud_network.h
- * @brief
- * @author
- * @version
- * @date
+ * @brief   Declerations for cloud network functions
+ * @author  ezlopi_team_np
+ * @version 1.0
+ * @date    January 20, 2024
  */
 #ifndef __NETWORK_H__
 #define __NETWORK_H__

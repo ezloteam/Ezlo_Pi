@@ -31,10 +31,10 @@
 
 /**
  * @file    ezlopi_cloud_log.h
- * @brief
- * @author
- * @version
- * @date
+ * @brief   Definitions for cloud log functions
+ * @author  ezlopi_team_np
+ * @version 1.0
+ * @date    January 20, 2024
  */
 
 /*******************************************************************************

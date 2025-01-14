@@ -30,11 +30,11 @@
 */
 
 /**
- * @file    main.c
- * @brief   perform some function on data
+ * @file    ezlopi_cloud_settings.c
+ * @brief   Definitions for cloud settings functions
  * @author  ezlopi_team_np
- * @version 0.1
- * @date    1st January 2024
+ * @version 1.0
+ * @date    January 20, 2024
  */
 
 /*******************************************************************************

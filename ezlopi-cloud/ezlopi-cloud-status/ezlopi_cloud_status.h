@@ -31,13 +31,13 @@
 
 /**
  * @file    ezlopi_cloud_status.h
- * @brief
- * @author
- * @version
- * @date
+ * @brief   Declaration for cloud status functions
+ * @author  ezlopi_team_np
+ * @version 1.0
+ * @date    January 20, 2024
  */
-#ifndef _EZLOPI_CLOUD_STATUS_H_
-#define _EZLOPI_CLOUD_STATUS_H_
+#ifndef __EZLOPI_CLOUD_STATUS_H__
+#define __EZLOPI_CLOUD_STATUS_H__
 
 /*******************************************************************************
  *                          Include Files
@@ -76,7 +76,7 @@ extern "C"
 }
 #endif
 
-#endif // _EZLOPI_CLOUD_STATUS_H_
+#endif // __EZLOPI_CLOUD_STATUS_H__
 
 /*******************************************************************************
  *                          End of File

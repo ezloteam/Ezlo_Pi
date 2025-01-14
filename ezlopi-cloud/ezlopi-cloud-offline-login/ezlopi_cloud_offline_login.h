@@ -31,13 +31,13 @@
 
 /**
  * @file    ezlopi_cloud_offline_login.h
- * @brief
- * @author
- * @version
- * @date
+ * @brief   Definitions for cloud offline login functions
+ * @author  ezlopi_team_np
+ * @version 1.0
+ * @date    January 20, 2024
  */
-#ifndef EZLOPI_CLOUD_OFFLINE_LOGIN_H_
-#define EZLOPI_CLOUD_OFFLINE_LOGIN_H_
+#ifndef __EZLOPI_CLOUD_OFFLINE_LOGIN_H__
+#define __EZLOPI_CLOUD_OFFLINE_LOGIN_H__
 
 /*******************************************************************************
  *                          Include Files
@@ -76,7 +76,7 @@ extern "C"
 }
 #endif
 
-#endif // EZLOPI_CLOUD_OFFLINE_LOGIN_H_
+#endif // __EZLOPI_CLOUD_OFFLINE_LOGIN_H__
 
 /*******************************************************************************
  *                          End of File

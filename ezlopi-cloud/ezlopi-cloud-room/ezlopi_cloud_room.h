@@ -31,10 +31,10 @@
 
 /**
  * @file    ezlopi_cloud_room.h
- * @brief
- * @author
- * @version
- * @date
+ * @brief   Declerations for cloud room functions
+ * @author  ezlopi_team_np
+ * @version 1.0
+ * @date    January 20, 2024
  */
 #ifndef __HUB_ROOM_H__
 #define __HUB_ROOM_H__

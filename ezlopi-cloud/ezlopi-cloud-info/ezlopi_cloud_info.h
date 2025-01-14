@@ -31,10 +31,10 @@
 
 /**
  * @file    ezlopi_cloud_info.h
- * @brief
- * @author
- * @version
- * @date
+ * @brief   Declarations for cloud info functions
+ * @author  ezlopi_team_np
+ * @version 1.0
+ * @date    January 20, 2024
  */
 #ifndef __HUB_INFO_H__
 #define __HUB_INFO_H__

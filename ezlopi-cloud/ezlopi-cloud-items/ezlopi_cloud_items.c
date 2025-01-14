@@ -31,11 +31,12 @@
 
 /**
  * @file    ezlopi_cloud_items.c
- * @brief
- * @author
- * @version
- * @date
+ * @brief   Definitions for cloud items functions
+ * @author  ezlopi_team_np
+ * @version 1.0
+ * @date    January 20, 2024
  */
+
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/

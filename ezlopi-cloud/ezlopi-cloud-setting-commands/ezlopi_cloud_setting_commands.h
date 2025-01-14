@@ -32,10 +32,10 @@
 
 /**
  * @file    ezlopi_cloud_setting_commands.h
- * @brief
- * @author
- * @version
- * @date
+ * @brief   Declaration for cloud stting commands functions
+ * @author  ezlopi_team_np
+ * @version 1.0
+ * @date    January 20, 2024
  */
 
 #ifndef __EZLOPI_CLOUD_SETTING_COMMANDS_H__

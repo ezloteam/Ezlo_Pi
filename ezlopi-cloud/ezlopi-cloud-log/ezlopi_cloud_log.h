@@ -32,14 +32,14 @@
 
 /**
  * @file    ezlopi_cloud_log.c
- * @brief
- * @author
- * @version
- * @date
+ * @brief   Declerations for cloud log functions
+ * @author  ezlopi_team_np
+ * @version 1.0
+ * @date    January 20, 2024
  */
 
-#ifndef _EZLOPI_CLOUD_LOG_H_
-#define _EZLOPI_CLOUD_LOG_H_
+#ifndef __EZLOPI_CLOUD_LOG_H__
+#define __EZLOPI_CLOUD_LOG_H__
 
 #include "../../build/config/sdkconfig.h"
 
@@ -96,7 +96,7 @@ extern "C"
 }
 #endif
 
-#endif // _EZLOPI_CLOUD_LOG_H_
+#endif // __EZLOPI_CLOUD_LOG_H__
 
 /*******************************************************************************
  *                          End of File

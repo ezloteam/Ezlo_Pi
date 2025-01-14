@@ -31,10 +31,10 @@
 
 /**
  * @file    ezlopi_cloud_modes_updaters.h
- * @brief
- * @author
- * @version
- * @date
+ * @brief   Declerations for cloud modes updater functions
+ * @author  ezlopi_team_np
+ * @version 1.0
+ * @date    January 20, 2024
  */
 #ifndef __EZLOPI_CLOUD_MODES_UPDATERS_H__
 #define __EZLOPI_CLOUD_MODES_UPDATERS_H__

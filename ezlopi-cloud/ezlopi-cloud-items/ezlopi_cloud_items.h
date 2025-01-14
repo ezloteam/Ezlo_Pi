@@ -1,4 +1,4 @@
-/* ===========================================================================
+    /* ===========================================================================
 ** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
@@ -31,10 +31,10 @@
 
 /**
  * @file    ezlopi_cloud_items.h
- * @brief
- * @author
- * @version
- * @date
+ * @brief   Declarations for cloud items functions
+ * @author  ezlopi_team_np
+ * @version 1.0
+ * @date    January 20, 2024
  */
 #ifndef __HUB_ITEMS_LIST_H__
 #define __HUB_ITEMS_LIST_H__
