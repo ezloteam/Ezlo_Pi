@@ -1,13 +1,7 @@
 
-/**
- * @file    ezlopi_service_ble_dynamic_config.c
- * @brief   Dynamic config service related functionalities
- * @author
- * @version
- * @date
- */
+
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -36,6 +30,18 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
+
+/**
+ * @file    ezlopi_service_ble_dynamic_config.c
+ * @brief   Dynamic config service related functionalities
+ * @author  ezlopi_team_np
+ * @version 1.0
+ * @date    January 22, 2024
+ */
+
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 
 #include "../../build/config/sdkconfig.h"
 
@@ -71,6 +77,14 @@
 #include "ezlopi_service_ble_ble_auth.h"
 
 #include "EZLOPI_USER_CONFIG.h"
+
+/*******************************************************************************
+ *                          Extern Data Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
  *                          Type & Macro Definitions
@@ -128,6 +142,14 @@ static void ezpi_dynamic_config_read_func(esp_gatt_value_t *value, esp_ble_gatts
 static s_gatt_service_t *g_dynamic_config_service = NULL;
 static s_linked_buffer_t *g_dynamic_config_linked_buffer = NULL;
 
+/*******************************************************************************
+ *                          Extern Data Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Definitions
+ *******************************************************************************/
+
 void EZPI_ble_service_dynamic_config_init(void)
 {
     esp_bt_uuid_t uuid;
@@ -144,6 +166,10 @@ void EZPI_ble_service_dynamic_config_init(void)
     properties = ESP_GATT_CHAR_PROP_BIT_WRITE | ESP_GATT_CHAR_PROP_BIT_READ | ESP_GATT_CHAR_PROP_BIT_NOTIFY | ESP_GATT_CHAR_PROP_BIT_INDICATE;
     EZPI_core_ble_gatt_add_characteristic(g_dynamic_config_service, &uuid, permission, properties, ezpi_dynamic_config_read_func, ezpi_dynamic_config_write_func, NULL); // reliable-write is not implemented for now
 }
+
+/*******************************************************************************
+ *                          Static Function Definitions
+ *******************************************************************************/
 
 static void ezpi_dynamic_config_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
 {

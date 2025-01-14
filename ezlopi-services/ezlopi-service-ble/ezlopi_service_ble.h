@@ -1,11 +1,5 @@
 
-/**
- * @file    ezlopi_service_ble.h
- * @brief   Service related functionalities
- * @author
- * @version
- * @date
- */
+
 /* ===========================================================================
 ** Copyright (C) 2024 Ezlo Innovation Inc
 **
@@ -37,6 +31,14 @@
 ** ===========================================================================
 */
 
+/**
+ * @file    ezlopi_service_ble.h
+ * @brief   Service related functionalities
+ * @author  ezlopi_team_np
+ * @version 1.0
+ * @date    Janyary 22, 2024
+ */
+
 #ifndef _EZLOPI_SERVICE_BLE_H_
 #define _EZLOPI_SERVICE_BLE_H_
 
@@ -54,7 +56,9 @@
 extern "C"
 {
 #endif // __cpluplus
-
+    /*******************************************************************************
+    *                          Type & Macro Declarations
+    *******************************************************************************/
 /**
  * @brief Checks for any error if found logs the message and returns
  *
@@ -258,6 +262,14 @@ extern "C"
     /*******************************************************************************
      *                          Dynamic Config Service Macros end
      *******************************************************************************/
+    
+    /*******************************************************************************
+    *                          Extern Data Declarations
+    *******************************************************************************/
+
+    /*******************************************************************************
+    *                          Extern Function Prototypes
+    *******************************************************************************/
 
     /**
      * @brief Function to initialize BLE services

@@ -1,14 +1,7 @@
 
 
-/**
- * @file    ezlopi_service_ble_device_info.c
- * @brief   Dynamic config service related functionalities
- * @author
- * @version
- * @date
- */
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -37,6 +30,18 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
+
+/**
+ * @file    ezlopi_service_ble_device_info.c
+ * @brief   Dynamic config service related functionalities
+ * @author  ezlopi_team_np
+ * @version 1.0
+ * @date    January 22, 2024
+ */
+
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 
 #include "../../build/config/sdkconfig.h"
 
@@ -77,6 +82,22 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "ezlopi_service_ble.h"
+
+/*******************************************************************************
+ *                          Extern Data Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Type & Macro Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Static Function Prototypes
+ *******************************************************************************/
 
 /**
  * @brief Function to jsonify the device info in ransferable manner
@@ -171,7 +192,19 @@ static void ezpi_service_ble_oem_info(esp_gatt_value_t *value, esp_ble_gatts_cb_
  */
 static void ezpi_service_ble_net_info(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
 
+/*******************************************************************************
+ *                          Static Data Definitions
+ *******************************************************************************/
+
 static s_gatt_service_t *g_device_info_service = NULL;
+
+/*******************************************************************************
+ *                          Extern Data Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Definitions
+ *******************************************************************************/
 
 void EZPI_ble_service_device_info_init(void)
 {
@@ -828,7 +861,7 @@ static char *ezpi_device_info_jsonify(void)
     return device_info;
 }
 
-void __add_factory_info_to_root(cJSON *root, char *key, char *value)
+static void __add_factory_info_to_root(cJSON *root, char *key, char *value)
 {
     if (value)
     {

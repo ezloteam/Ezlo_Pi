@@ -1,14 +1,6 @@
 
-
-/**
- * @file    ezlopi_service_ble_provisioning.c
- * @brief   Provisioning service related functionalities
- * @author
- * @version
- * @date
- */
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -38,9 +30,21 @@
 ** ===========================================================================
 */
 
+/**
+ * @file    ezlopi_service_ble_provisioning.c
+ * @brief   Provisioning service related functionalities
+ * @author  ezlopi_team_np
+ * @version 1.0
+ * @date    January 22, 2024
+ */
+
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_BLE_ENABLE
+
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 
 #include <string.h>
 #include <time.h>
@@ -72,6 +76,14 @@
 
 #include "ezlopi_service_ble_ble_auth.h"
 #include "ezlopi_service_ble.h"
+
+/*******************************************************************************
+ *                          Extern Data Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
  *                          Type & Macro Definitions
@@ -145,6 +157,14 @@ static char *ezpi_base64_decode_provisioning_info(uint32_t total_size);
  *******************************************************************************/
 static s_gatt_service_t *g_provisioning_service;
 static s_linked_buffer_t *g_provisioning_linked_buffer = NULL;
+
+/*******************************************************************************
+ *                          Extern Data Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Definitions
+ *******************************************************************************/
 
 void EZPI_ble_service_provisioning_init(void)
 {
@@ -306,7 +326,7 @@ static void ezpi_provisioning_info_write_func(esp_gatt_value_t *value, esp_ble_g
                                 char user_id[32];
                                 CJSON_GET_VALUE_STRING_BY_COPY(cj_config, ezlopi_user_id_str, user_id);
 
-                                if (BLE_AUTH_SUCCESS == ezlopi_ble_auth_check_user_id(user_id))
+                                if (BLE_AUTH_SUCCESS == EZPI_ble_auth_check_user_id(user_id))
                                 {
                                     s_basic_factory_info_t *ezlopi_config_basic = ezlopi_malloc(__FUNCTION__, sizeof(s_basic_factory_info_t));
                                     if (ezlopi_config_basic)
