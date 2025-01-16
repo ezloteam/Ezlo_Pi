@@ -84,6 +84,7 @@ static ezlopi_error_t __ezlopi_mdns_add_service_context(l_ezlopi_mdns_context_t 
 static l_ezlopi_mdns_context_t *__ezlopi_mdns_get_service_context();
 static ezlopi_error_t __ezlopi_mdns_init_service_context();
 static mdns_txt_item_t *__prepare_mdns_item_service_context(int *service_size);
+static void __ezlopi_free_mdns_service_context(l_ezlopi_mdns_context_t *mdns_context_head);
 static void __mdns_init(void *pv);
 
 /*******************************************************************************
@@ -382,57 +383,100 @@ static mdns_txt_item_t *__prepare_mdns_item_service_context(int *service_size)
     return mdns_context;
 }
 
+static void __ezlopi_free_mdns_service_context(l_ezlopi_mdns_context_t *mdns_context_head)
+{
+    if (!mdns_context_head)
+    {
+        return;
+    }
+
+    if (mdns_context_head->next)
+    {
+        __ezlopi_free_mdns_service_context(mdns_context_head->next);
+    }
+
+    if (mdns_context_head->mdns_context->value && 0 != strncmp(mdns_context_head->mdns_context->value, "ezlopi_generic", 14))
+    {
+        TRACE_E("Freering key: %s and value: %s", mdns_context_head->mdns_context->key, mdns_context_head->mdns_context->value);
+        ezlopi_free(__FUNCTION__, (char *)mdns_context_head->mdns_context->value);
+    }
+
+    ezlopi_free(__FUNCTION__, mdns_context_head->mdns_context);
+}
+
 static void __mdns_init(void *pv)
 {
+    int mdns_retries = 0;
     int service_size;
     __ezlopi_mdns_init_service_context();
     while (1)
     {
         EZPI_core_wait_for_wifi_to_connect(portMAX_DELAY);
+        mdns_retries++;
+        if (mdns_retries > 5)
+        {
+            __ezlopi_free_mdns_service_context(__ezlopi_mdns_get_service_context());
+            break;
+        }
 
         esp_err_t err = mdns_init();
-        if (err == ESP_OK)
+        if (ESP_OK != err)
         {
-
-            uint32_t serial_last4 = 0;
-            uint64_t id_val = EZPI_core_factory_info_v3_get_id();
-            if (id_val)
-            {
-                serial_last4 = id_val % 10000;
-            }
-
-            char hostname[EZPI_MDNS_HOSTNAME_SIZE];
-            snprintf(hostname, EZPI_MDNS_HOSTNAME_SIZE, "%s_%d", ezlopi_ezlopi_str, serial_last4);
-
-            err = mdns_hostname_set(hostname);
-            mdns_instance_name_set("EzloPi mdns string");
-            TRACE_I("Successful mDNS Initialization, %s", esp_err_to_name(err));
-
-            mdns_txt_item_t *mdns_context = __prepare_mdns_item_service_context(&service_size);
-            if (mdns_context)
-            {
-                TRACE_I("-------- Adding mDNS Service(count: %d) ------------ ", service_size);
-                if (service_size)
-                {
-                    TRACE_I("\tKEY\t\t\tValue");
-                }
-
-                for (int i = 0; i < service_size; i++)
-                {
-                    TRACE_I("\t%s\t\t%s", mdns_context[i].key, mdns_context[i].value);
-                }
-                mdns_service_add("EzloPi", "_ezlo", "_tcp", 17001, mdns_context, service_size);
-                break;
-            }
-            else
-            {
-                TRACE_E("No mDNS context found.");
-            }
+            TRACE_E("Unable to initialize mdns(code: %s)", esp_err_to_name(err));
+            continue;
         }
-        else
+
+        uint32_t serial_last4 = 0;
+        uint64_t id_val = EZPI_core_factory_info_v3_get_id();
+        if (id_val)
         {
-            TRACE_E("Error mDNS Initialization");
+            serial_last4 = id_val % 10000;
         }
+
+        char hostname[EZPI_MDNS_HOSTNAME_SIZE];
+        snprintf(hostname, EZPI_MDNS_HOSTNAME_SIZE, "%s_%d", ezlopi_ezlopi_str, serial_last4);
+
+        err = mdns_hostname_set(hostname);
+        if (ESP_OK != err)
+        {
+            TRACE_E("Error setting hostname");
+            continue;
+        }
+
+        err = mdns_instance_name_set("EzloPi mdns string");
+        if (ESP_OK != err)
+        {
+            TRACE_E("Error setting instance name");
+            continue;
+        }
+
+        TRACE_I("mDNS instance initialization finished, %s", esp_err_to_name(err));
+        mdns_txt_item_t *mdns_context = __prepare_mdns_item_service_context(&service_size);
+        if (!mdns_context)
+        {
+            TRACE_E("No mDNS context found");
+            continue;
+        }
+
+        TRACE_I("-------- Adding mDNS Service(count: %d) ------------ ", service_size);
+        if (service_size)
+        {
+            TRACE_I("\tKEY\t\t\tValue");
+        }
+
+        for (int i = 0; i < service_size; i++)
+        {
+            TRACE_I("\t%s\t\t%s", mdns_context[i].key, mdns_context[i].value);
+        }
+
+        err = mdns_service_add("EzloPi", "_ezlo", "_tcp", 17001, mdns_context, service_size);
+        ezlopi_free(__FUNCTION__, mdns_context);
+        if (ESP_OK == err)
+        {
+            __ezlopi_free_mdns_service_context(__ezlopi_mdns_get_service_context());
+            break;
+        }
+
         vTaskDelay(5000 / portTICK_PERIOD_MS);
     }
 #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
