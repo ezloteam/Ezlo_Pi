@@ -454,10 +454,7 @@ static float __extract_MQ7_sensor_ppm(l_ezlopi_item_t *item)
 
         // 1.1 Calculate @ 'ratio' during CO presence
         double _ratio = (Rs_gas / ((MQ7_value->MQ7_R0_constant <= 0) ? (1.0f) : (MQ7_value->MQ7_R0_constant))); // avoid dividing by zero??
-        if (_ratio <= 0)
-        {
-            _ratio = 0;
-        }
+        
         //-------------------------------------------------
 
         // 1.2 Calculate _CO_ppm

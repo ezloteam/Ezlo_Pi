@@ -227,7 +227,7 @@ extern "C"
      * @param comparator_field block with 'comparator_field' info
      * @return int
      */
-    int EZPI_scenes_operators_value_strops_operations(l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, l_fields_v2_t *comparator_field);
+    int EZPI_scenes_operators_value_strops_operations(l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, l_fields_v2_t *operation_field);
     /**
      * @brief This function compare 'string_operators' with device/item-groups using given args
      *

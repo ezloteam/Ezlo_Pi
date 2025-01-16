@@ -354,7 +354,7 @@ l_when_block_v2_t *EZPI_scenes_populate_when_blocks(cJSON *cj_when_blocks)
 
 void EZPI_scenes_populate_assign_when_block(l_when_block_v2_t *new_when_block, cJSON *cj_when_block)
 {
-    if (new_when_block)
+    if (new_when_block && cj_when_block)
     {
         cJSON *cj_blockEnable = cJSON_GetObjectItem(__FUNCTION__, cj_when_block, ezlopi_block_enable_str);
         if ((cj_blockEnable) && cJSON_IsBool(cj_blockEnable))
@@ -581,11 +581,11 @@ void EZPI_scenes_populate_fields_get_value(l_fields_v2_t *field, cJSON *cj_value
             {
                 field->field_value.e_type = VALUE_TYPE_BLOCK;
                 // CJSON_TRACE("blocks_value (edit)", cj_value);
-                l_when_block_v2_t *curr_when_block = NULL;
+                l_when_block_v2_t *curr_when_block = field->field_value.u_value.when_block;
 
                 cJSON_ArrayForEach(cj_block, cj_value)
                 {
-                    if (field->field_value.u_value.when_block)
+                    if (curr_when_block)
                     {
                         curr_when_block->next = (l_when_block_v2_t *)ezlopi_malloc(__FUNCTION__, sizeof(l_when_block_v2_t));
                         if (curr_when_block->next)

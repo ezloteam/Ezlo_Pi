@@ -1755,9 +1755,9 @@ static void __generate_device_list_with_specific_itemgroup_id(cJSON *cj_destinat
                             cJSON *cj_showitems = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_showItems_str);
                             if (cj_showitems && (cj_showitems->type == cJSON_True))
                             {
-#ifdef CONFIG_EZPI_UTIL_TRACE_EN
-                                TRACE_E("Since, [showItems==TRUE] ; attaching items_list ");
-#endif
+// #ifdef CONFIG_EZPI_UTIL_TRACE_EN
+//                                 TRACE_E("Since, [showItems==TRUE] ; attaching items_list ");
+// #endif
 
                                 // C2 . add "items" : [...]
                                 ______add_items_list_to_dest_array(cj_main_device_list, curr_dev_node);

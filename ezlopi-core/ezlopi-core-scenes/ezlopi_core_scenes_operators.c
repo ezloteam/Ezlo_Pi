@@ -390,7 +390,7 @@ const char *EZPI_scenes_strops_comparator_operators_get_method(e_scene_strops_cm
 int EZPI_scenes_operators_value_strops_operations(l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, l_fields_v2_t *operation_field)
 {
     int ret = 0;
-    if (item_exp_field && value_field && (operation_field->field_value.u_value.value_string))
+    if (item_exp_field && value_field && operation_field && (operation_field->field_value.u_value.value_string))
     {
         char *item_exp_value_str = NULL;
         char *value_to_compare_with_str = NULL;
@@ -586,7 +586,7 @@ const char *ezlopi_scenes_inarr_comparator_operators_get_method(e_scene_inarr_cm
 int EZPI_scenes_operators_value_inarr_operations(l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, l_fields_v2_t *operation_field)
 {
     int ret = 0;
-    if (item_exp_field && value_field && (operation_field->field_value.u_value.value_string))
+    if (item_exp_field && value_field && operation_field && (operation_field->field_value.u_value.value_string))
     {
         char *tmp_str = operation_field->field_value.u_value.value_string;
         size_t len = (tmp_str) ? strlen(tmp_str) + 1 : 0;
@@ -1136,7 +1136,7 @@ int EZPI_scenes_operators_has_atleastone_dictionary_value_operations(uint32_t it
 int EZPI_scenes_operators_is_dictionary_changed_operations(l_scenes_list_v2_t *scene_node, uint32_t item_id, l_fields_v2_t *key_field, l_fields_v2_t *operation_field)
 {
     int ret = 0;
-    if (item_id && key_field && (operation_field->field_value.u_value.value_string))
+    if (item_id && key_field && operation_field && (operation_field->field_value.u_value.value_string))
     {
         cJSON *item_value = NULL;
         l_ezlopi_item_t *item = EZPI_core_device_get_item_by_id(item_id);

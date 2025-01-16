@@ -22,12 +22,7 @@
 /*******************************************************************************
  *                          Type & Macro Definitions
  *******************************************************************************/
-const char *Sw420_vibration_activity_state_token[] = {
-    "no_activity",
-    "shake",
-    "tilt",
-    "drop",
-};
+
 /*******************************************************************************
  *                          Static Function Prototypes
  *******************************************************************************/
@@ -181,6 +176,12 @@ static ezlopi_error_t __0060_get_item(l_ezlopi_item_t *item, void *arg)
             cJSON *json_array_enum = cJSON_CreateArray(__FUNCTION__);
             if (NULL != json_array_enum)
             {
+                char *Sw420_vibration_activity_state_token[] = {
+                    "no_activity",
+                    "shake",
+                    "tilt",
+                    "drop",
+                };
                 for (uint8_t i = 0; i < SW420_VIBRATION_ACTIVITY_MAX; i++)
                 {
                     cJSON *json_value = cJSON_CreateString(__FUNCTION__, Sw420_vibration_activity_state_token[i]);
@@ -193,8 +194,8 @@ static ezlopi_error_t __0060_get_item(l_ezlopi_item_t *item, void *arg)
             }
             //--------------------------------------------------------------------------------------
 
-            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, (char *)item->user_arg ? item->user_arg : Sw420_vibration_activity_state_token[0]);
-            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, (char *)item->user_arg ? item->user_arg : Sw420_vibration_activity_state_token[0]);
+            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, (char *)item->user_arg ? item->user_arg : "no_activity");
+            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, (char *)item->user_arg ? item->user_arg : "no_activity");
             ret = EZPI_SUCCESS;
         }
     }
@@ -209,8 +210,8 @@ static ezlopi_error_t __0060_get_cjson_value(l_ezlopi_item_t *item, void *arg)
         cJSON *cj_result = (cJSON *)arg;
         if (cj_result)
         {
-            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, (char *)item->user_arg ? item->user_arg : Sw420_vibration_activity_state_token[0]);
-            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, (char *)item->user_arg ? item->user_arg : Sw420_vibration_activity_state_token[0]);
+            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, (char *)item->user_arg ? item->user_arg : "no_activity");
+            cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, (char *)item->user_arg ? item->user_arg : "no_activity");
             ret = EZPI_SUCCESS;
         }
     }
@@ -226,11 +227,11 @@ static ezlopi_error_t __0060_notify(l_ezlopi_item_t *item)
 
     if (0 == (item->interface.gpio.gpio_in.value)) // when D0 -> 0V,
     {
-        curret_value = Sw420_vibration_activity_state_token[0];
+        curret_value = "no_activity";
     }
     else
     {
-        curret_value = Sw420_vibration_activity_state_token[1];
+        curret_value = "shake";
     }
 
     if (curret_value != (char *)item->user_arg) // calls update only if there is change in state
