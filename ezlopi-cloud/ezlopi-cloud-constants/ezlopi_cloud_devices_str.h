@@ -3,7 +3,10 @@
 /**
  * @file    ezlopi_cloud_devices_str.h
  * @brief
- * @author
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version
  * @date
  */
@@ -123,67 +126,67 @@ extern "C"
      *
      */
     extern const char *device_thermostats;
-     /**
+    /**
      * @brief Variable to be used for thermostat device
      *
      */
     extern const char *device_thermostat;
-     /**
+    /**
      * @brief Variable to be used for meter device
      *
      */
     extern const char *device_meter;
-     /**
+    /**
      * @brief Variable to be used for door lock device
      *
      */
     extern const char *device_door_lock;
-     /**
+    /**
      * @brief Variable to be used for gas sensor device
      *
      */
     extern const char *device_gas_sensor;
-     /**
+    /**
      * @brief Variable to be used for andle position device
      *
      */
     extern const char *device_angle_position;
-     /**
+    /**
      * @brief Variable to be used for athmo pressure device
      *
      */
     extern const char *device_athmo_pressure;
-     /**
+    /**
      * @brief Variable to be used for aux binary device
      *
      */
     extern const char *device_aux_binary;
-     /**
+    /**
      * @brief Variable to be used for barrier device
      *
      */
     extern const char *device_barrier;
-     /**
+    /**
      * @brief Variable to be used for battery device
      *
      */
     extern const char *device_battery;
-     /**
+    /**
      * @brief Variable to be used for co2 device
      *
      */
     extern const char *device_co2;
-     /**
+    /**
      * @brief Variable to be used for co2 binary device
      *
      */
     extern const char *device_co2_binary;
-     /**
+    /**
      * @brief Variable to be used for co binary device
      *
      */
     extern const char *device_co_binary;
-     /**
+    /**
      * @brief Variable to be used for current multilevel device
      *
      */

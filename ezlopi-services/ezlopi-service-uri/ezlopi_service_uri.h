@@ -1,10 +1,13 @@
 
 /**
  * @file    ezlopi_service_uri.h
- * @brief   
- * @author  
- * @version 
- * @date    
+ * @brief
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
+ * @version
+ * @date
  */
 /* ===========================================================================
 ** Copyright (C) 2024 Ezlo Innovation Inc

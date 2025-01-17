@@ -2,7 +2,7 @@
 /**
  * @file    ezlopi_cloud_keywords.h
  * @brief
- * @author
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version
  * @date
  */
@@ -184,6 +184,7 @@ extern "C"
     extern const char *ezlopi_scale_str;
     extern const char *ezlopi_value_type_str;
     extern const char *ezlopi_device_id_str;
+    extern const char *ezlopi_child_linked_parent_id_str;
     extern const char *ezlopi_none_str;
     extern const char *ezlopi_role_str;
     extern const char *ezlopi_lifeSafety_str;

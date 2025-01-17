@@ -3,7 +3,9 @@
 /**
  * @file    ezlopi_cloud_setting_commands.c
  * @brief
- * @author
+ * @authors Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version
  * @date
  */

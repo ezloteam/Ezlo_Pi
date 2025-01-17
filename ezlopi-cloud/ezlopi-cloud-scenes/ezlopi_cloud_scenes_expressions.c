@@ -2,7 +2,10 @@
 /**
  * @file    ezlopi_cloud_scenes_expressions.h
  * @brief
- * @author
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version
  * @date
  */

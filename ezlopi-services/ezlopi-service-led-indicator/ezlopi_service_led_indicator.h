@@ -2,7 +2,9 @@
 /**
  * @file    ezlopi_service_led_indicator.h
  * @brief
- * @author
+ * @authors Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version
  * @date
  */

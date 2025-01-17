@@ -2,7 +2,7 @@
 /**
  * @file    ezlopi_cloud_network.h
  * @brief
- * @author
+ * @author  Nabin Dangi
  * @version
  * @date
  */

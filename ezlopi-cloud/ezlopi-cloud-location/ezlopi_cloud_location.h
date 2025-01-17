@@ -3,7 +3,10 @@
 /**
  * @file    ezlopi_cloud_location.h
  * @brief
- * @author
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version
  * @date
  */

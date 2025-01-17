@@ -3,7 +3,9 @@
 /**
  * @file    ezlopi_cloud_thermostat_str.h
  * @brief
- * @author
+ * @author  Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version
  * @date
  */

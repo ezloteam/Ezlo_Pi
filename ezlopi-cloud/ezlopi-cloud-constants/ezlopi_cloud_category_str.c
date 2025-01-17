@@ -1,10 +1,13 @@
 
 /**
  * @file    ezlopi_cloud_category_str.c
- * @brief   
- * @author  
- * @version 
- * @date    
+ * @brief
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
+ * @version
+ * @date
  */
 /* ===========================================================================
 ** Copyright (C) 2022 Ezlo Innovation Inc
@@ -36,8 +39,6 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
-
-
 
 /// @brief https://api.ezlo.com/devices/categories/index.html
 const char *category_not_defined = "";
@@ -78,6 +79,3 @@ const char *category_flow_meter = "flow_meter";
 // const  char *category_state_sensor = "state_sensor";
 const char *category_level_sensor = "level_sensor";
 // const  char *category_clock = "clock";
-
-
-

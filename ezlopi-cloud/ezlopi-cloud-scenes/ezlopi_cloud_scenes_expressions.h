@@ -2,7 +2,10 @@
 /**
  * @file    ezlopi_cloud_scenes_expressions.h
  * @brief
- * @author
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version
  * @date
  */
@@ -47,24 +50,24 @@
 #ifdef __cplusplus
 extern "C"
 {
-#endif  
+#endif
     /**
      * @brief Function that responds to hub.scenes.expressions.list.add method
-     * 
+     *
      * @param cj_request Incoming JSON request
      * @param cj_response Outgoing JSON response
      */
     void EZPI_scenes_expressions_list(cJSON *cj_request, cJSON *cj_response);
     /**
      * @brief Function that responds to hub.scenes.script.set method
-     * 
+     *
      * @param cj_request Incoming JSON request
      * @param cj_response Outgoing JSON response
      */
     void EZPI_scenes_expressions_set(cJSON *cj_request, cJSON *cj_response);
     /**
      * @brief Function that responds to hub.scenes.script.delete method
-     * 
+     *
      * @param cj_request Incoming JSON request
      * @param cj_response Outgoing JSON response
      */
@@ -73,14 +76,14 @@ extern "C"
     ///////////// updaters
     /**
      * @brief Updater function with method hub.expression.changed
-     * 
+     *
      * @param cj_request Incoming JSON request
      * @param cj_response Outgoing JSON response
      */
     void EZPI_scenes_expressions_added_changed(cJSON *cj_request, cJSON *cj_response);
     /**
      * @brief Updater function with method hub.expression.deleted
-     * 
+     *
      * @param cj_request Incoming JSON request
      * @param cj_response Outgoing JSON response
      */

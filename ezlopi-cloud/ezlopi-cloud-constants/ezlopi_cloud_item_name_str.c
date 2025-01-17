@@ -3,7 +3,7 @@
 /**
  * @file    ezlopi_cloud_item_name_str.c
  * @brief
- * @author
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version
  * @date
  */
@@ -58,7 +58,7 @@ const char *ezlopi_item_name_dw_state = "dw_state";
 // const  char *ezlopi_item_name_barrier_problem_sensors = "barrier_problem_sensors";
 // const  char *ezlopi_item_name_barrier_short_circuit = "barrier_short_circuit";
 // const  char *ezlopi_item_name_barrier_fail_events = "barrier_fail_events";
-const  char *ezlopi_item_name_button_state = "button_state";
+const char *ezlopi_item_name_button_state = "button_state";
 // const  char *ezlopi_item_name_test_state = "test_state";
 // const  char *ezlopi_item_name_co_alarm = "co_alarm";
 // const  char *ezlopi_item_name_maintenance_state = "maintenance_state";

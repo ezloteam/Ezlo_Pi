@@ -34,55 +34,51 @@
  * @author  xx
  * @version 0.1
  * @date    12th DEC 2024
-*/
-
-
-/*******************************************************************************
-*                          Include Files
-*******************************************************************************/
-
+ */
 
 /*******************************************************************************
-*                          C++ Declaration Wrapper
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
     /*******************************************************************************
-    *                          Type & Macro Declarations
-    *******************************************************************************/
+     *                          Type & Macro Declarations
+     *******************************************************************************/
     EZLOPI_ACTION(NONE, "EZLOPI_ACTION_NONE")
-        EZLOPI_ACTION(PREPARE, "EZLOPI_ACTION_PREPARE")
-        EZLOPI_ACTION(INITIALIZE, "EZLOPI_ACTION_INITIALIZE")
-        EZLOPI_ACTION(NOTIFY_50_MS, "EZLOPI_ACTION_NOTIFY_50_MS")
-        EZLOPI_ACTION(NOTIFY_100_MS, "EZLOPI_ACTION_NOTIFY_100_MS")
-        EZLOPI_ACTION(NOTIFY_200_MS, "EZLOPI_ACTION_NOTIFY_200_MS")
-        EZLOPI_ACTION(NOTIFY_500_MS, "EZLOPI_ACTION_NOTIFY_500_MS")
-        EZLOPI_ACTION(NOTIFY_1000_MS, "EZLOPI_ACTION_NOTIFY_1000_MS")
-        EZLOPI_ACTION(NOTIFY_DEFAULT, "EZLOPI_ACTION_NOTIFY_DEFAULT") // default is of 1000 ms
-        EZLOPI_ACTION(HUB_GET_ITEM, "EZLOPI_ACTION_HUB_GET_ITEM")
-        EZLOPI_ACTION(HUB_GET_DEVICE, "EZLOPI_ACTION_HUB_GET_DEVICE")
-        EZLOPI_ACTION(HUB_UPDATE, "EZLOPI_ACTION_HUB_GET_ITEM")
-        EZLOPI_ACTION(GET_VALUE, "EZLOPI_ACTION_GET_VALUE")
-        EZLOPI_ACTION(GET_EZLOPI_VALUE, "EZLOPI_ACTION_GET_EZLOPI_VALUE")
-        EZLOPI_ACTION(SET_VALUE, "EZLOPI_ACTION_SET_VALUE")
-        EZLOPI_ACTION(MAX, "EZLOPI_ACTION_MAX")
-        /*******************************************************************************
-        *                          Extern Data Declarations
-        *******************************************************************************/
+    EZLOPI_ACTION(PREPARE, "EZLOPI_ACTION_PREPARE")
+    EZLOPI_ACTION(INITIALIZE, "EZLOPI_ACTION_INITIALIZE")
+    EZLOPI_ACTION(NOTIFY_50_MS, "EZLOPI_ACTION_NOTIFY_50_MS")
+    EZLOPI_ACTION(NOTIFY_100_MS, "EZLOPI_ACTION_NOTIFY_100_MS")
+    EZLOPI_ACTION(NOTIFY_200_MS, "EZLOPI_ACTION_NOTIFY_200_MS")
+    EZLOPI_ACTION(NOTIFY_500_MS, "EZLOPI_ACTION_NOTIFY_500_MS")
+    EZLOPI_ACTION(NOTIFY_1000_MS, "EZLOPI_ACTION_NOTIFY_1000_MS")
+    EZLOPI_ACTION(NOTIFY_DEFAULT, "EZLOPI_ACTION_NOTIFY_DEFAULT") // default is of 1000 ms
+    EZLOPI_ACTION(HUB_GET_ITEM, "EZLOPI_ACTION_HUB_GET_ITEM")
+    EZLOPI_ACTION(HUB_GET_DEVICE, "EZLOPI_ACTION_HUB_GET_DEVICE")
+    EZLOPI_ACTION(HUB_UPDATE, "EZLOPI_ACTION_HUB_GET_ITEM")
+    EZLOPI_ACTION(GET_VALUE, "EZLOPI_ACTION_GET_VALUE")
+    EZLOPI_ACTION(GET_EZLOPI_VALUE, "EZLOPI_ACTION_GET_EZLOPI_VALUE")
+    EZLOPI_ACTION(SET_VALUE, "EZLOPI_ACTION_SET_VALUE")
+    EZLOPI_ACTION(MAX, "EZLOPI_ACTION_MAX")
+    /*******************************************************************************
+     *                          Extern Data Declarations
+     *******************************************************************************/
 
-        /*******************************************************************************
-        *                          Extern Function Prototypes
-        *******************************************************************************/
-
+    /*******************************************************************************
+     *                          Extern Function Prototypes
+     *******************************************************************************/
 
 #ifdef __cplusplus
 }
 #endif
 
-
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

@@ -1,7 +1,9 @@
 /**
  * @file    ezlopi_cloud_security_str.c
  * @brief
- * @author
+ * @author  Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version
  * @date
  */

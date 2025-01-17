@@ -3,7 +3,10 @@
 /**
  * @file    ezlopi_cloud_ota.c
  * @brief
- * @author
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version
  * @date
  */
@@ -135,7 +138,6 @@ void EZPI_firmware_info_get(cJSON *cj_request, cJSON *cj_response)
         // cJSON_Delete(__FUNCTION__, result);
     }
 }
-
 
 cJSON *EZPI_firmware_send_firmware_query_to_nma_server(uint32_t message_count)
 {

@@ -2,7 +2,10 @@
 /**
  * @file    ezlopi_cloud_scenes.h
  * @brief
- * @author
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version
  * @date
  */
@@ -50,161 +53,161 @@ extern "C"
 #endif
     /**
      * @brief Function that responds to hub.scenes.list method
-     * 
+     *
      * @param cj_request Incoming JSON request
      * @param cj_response Outgoing JSON response
      */
     void EZPI_scenes_list(cJSON *cj_request, cJSON *cj_response);
     /**
      * @brief Function that responds to hub.scenes.create method
-     * 
+     *
      * @param cj_request Incoming JSON request
      * @param cj_response Outgoing JSON response
      */
     void EZPI_scenes_create(cJSON *cj_request, cJSON *cj_response);
     /**
      * @brief Function that responds to hub.scenes.get method
-     * 
+     *
      * @param cj_request Incoming JSON request
      * @param cj_response Outgoing JSON response
      */
     void EZPI_scenes_get(cJSON *cj_request, cJSON *cj_response);
     /**
      * @brief Function that responds to hub.scenes.edit method
-     * 
+     *
      * @param cj_request Incoming JSON request
      * @param cj_response Outgoing JSON response
      */
     void EZPI_scenes_edit(cJSON *cj_request, cJSON *cj_response);
     /**
      * @brief Function that responds to hub.scenes.delete method
-     * 
+     *
      * @param cj_request Incoming JSON request
      * @param cj_response Outgoing JSON response
      */
     void EZPI_scenes_delete(cJSON *cj_request, cJSON *cj_response);
     /**
      * @brief Function that responds to hub.scenes.status.get method
-     * 
+     *
      * @param cj_request Incoming JSON request
      * @param cj_response Outgoing JSON response
      */
     void EZPI_scenes_status_get(cJSON *cj_request, cJSON *cj_response);
     /**
      * @brief Function that responds to hub.scenes.blocks.list method
-     * 
+     *
      * @param cj_request Incoming JSON request
      * @param cj_response Outgoing JSON response
      */
     void EZPI_scenes_blocks_list(cJSON *cj_request, cJSON *cj_response);
     /**
      * @brief Function that responds to hub.scenes.block.data.list method
-     * 
+     *
      * @param cj_request Incoming JSON request
      * @param cj_response Outgoing JSON response
      */
     void EZPI_scenes_block_data_list(cJSON *cj_request, cJSON *cj_response);
     /**
      * @brief Function that responds to hub.scenes.run method
-     * 
+     *
      * @param cj_request Incoming JSON request
      * @param cj_response Outgoing JSON response
      */
     void EZPI_scenes_run(cJSON *cj_request, cJSON *cj_response);
     /**
      * @brief Function that responds to hub.scenes.enable.set method
-     * 
+     *
      * @param cj_request Incoming JSON request
      * @param cj_response Outgoing JSON response
      */
     void EZPI_scenes_enable_set(cJSON *cj_request, cJSON *cj_response);
     /**
      * @brief Function that responds to hub.scenes.notification.add method
-     * 
+     *
      * @param cj_request Incoming JSON request
      * @param cj_response Outgoing JSON response
      */
     void EZPI_scenes_notification_add(cJSON *cj_request, cJSON *cj_response);
     /**
      * @brief Function that responds to hub.scenes.notification.remove method
-     * 
+     *
      * @param cj_request Incoming JSON request
      * @param cj_response Outgoing JSON response
      */
     void EZPI_scenes_notification_remove(cJSON *cj_request, cJSON *cj_response);
     /**
      * @brief Function that responds to hub.scenes.room.set method
-     * 
+     *
      * @param cj_request Incoming JSON request
      * @param cj_response Outgoing JSON response
      */
     void EZPI_scenes_room_set(cJSON *cj_request, cJSON *cj_response);
     /**
      * @brief Function that responds to hub.scenes.time.list method
-     * 
+     *
      * @param cj_request Incoming JSON request
      * @param cj_response Outgoing JSON response
      */
     void EZPI_scenes_time_list(cJSON *cj_request, cJSON *cj_response);
     /**
      * @brief Function that responds to hub.scenes.trigger.device.list method
-     * 
+     *
      * @param cj_request Incoming JSON request
      * @param cj_response Outgoing JSON response
      */
     void EZPI_scenes_trigger_device_list(cJSON *cj_request, cJSON *cj_response);
     /**
      * @brief Function that responds to hub.scenes.block.enabled.set method
-     * 
+     *
      * @param cj_request Incoming JSON request
      * @param cj_response Outgoing JSON response
      */
     void EZPI_scenes_block_enabled_set(cJSON *cj_request, cJSON *cj_response);
     /**
      * @brief Function that responds to hub.scenes.house_modes.set method
-     * 
+     *
      * @param cj_request Incoming JSON request
      * @param cj_response Outgoing JSON response
      */
     void EZPI_scenes_house_modes_set(cJSON *cj_request, cJSON *cj_response);
     /**
      * @brief Function that responds to hub.scenes.action.block.test method
-     * 
+     *
      * @param cj_request Incoming JSON request
      * @param cj_response Outgoing JSON response
      */
     void EZPI_scenes_action_block_test(cJSON *cj_request, cJSON *cj_response);
     /**
      * @brief Function that responds to hub.scenes.block.status.reset method
-     * 
+     *
      * @param cj_request Incoming JSON request
      * @param cj_response Outgoing JSON response
      */
     void EZPI_scenes_block_status_reset(cJSON *cj_request, cJSON *cj_response);
     /**
      * @brief Function that responds to hub.scenes.meta.set method
-     * 
+     *
      * @param cj_request Incoming JSON request
      * @param cj_response Outgoing JSON response
      */
     void EZPI_scenes_meta_set(cJSON *cj_request, cJSON *cj_response);
     /**
      * @brief Function that responds to hub.scenes.block.meta.set method
-     * 
+     *
      * @param cj_request Incoming JSON request
      * @param cj_response Outgoing JSON response
      */
     void EZPI_scenes_blockmeta_set(cJSON *cj_request, cJSON *cj_response);
     /**
      * @brief Function that responds to hub.scenes.stop method
-     * 
+     *
      * @param cj_request Incoming JSON request
      * @param cj_response Outgoing JSON response
      */
     void EZPI_scenes_stop(cJSON *cj_request, cJSON *cj_response);
     /**
      * @brief Function that responds to hub.scenes.clone method
-     * 
+     *
      * @param cj_request Incoming JSON request
      * @param cj_response Outgoing JSON response
      */
@@ -213,21 +216,21 @@ extern "C"
     ///////////// updaters
     /**
      * @brief Updater function with method hub.scene.changed
-     * 
+     *
      * @param cj_request Incoming JSON request
      * @param cj_response Outgoing JSON response
      */
     void EZPI_scene_changed(cJSON *cj_request, cJSON *cj_response);
     /**
      * @brief Updater function with method hub.scene.added
-     * 
+     *
      * @param cj_request Incoming JSON request
      * @param cj_response Outgoing JSON response
      */
     void EZPI_scene_added(cJSON *cj_request, cJSON *cj_response);
     /**
      * @brief Updater function with method hub.scene.deleted
-     * 
+     *
      * @param cj_request Incoming JSON request
      * @param cj_response Outgoing JSON response
      */

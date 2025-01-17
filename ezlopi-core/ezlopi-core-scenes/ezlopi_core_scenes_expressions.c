@@ -1244,7 +1244,9 @@ static s_exp_items_t *__expressions_items_create(cJSON *cj_item)
         {
             memset(new_item_node, 0, sizeof(s_exp_items_t));
             CJSON_GET_VALUE_STRING_BY_COPY(cj_item, ezlopi_name_str, new_item_node->name, sizeof(new_item_node->name));
-            CJSON_GET_ID(new_item_node->_id, cJSON_GetObjectItem(__FUNCTION__, cj_item, ezlopi__id_str));
+
+            new_item_node->_id = EZPI_core_cjson_get_id(cj_item, ezlopi__id_str);
+            // CJSON_GET_ID(new_item_node->_id, cJSON_GetObjectItem(__FUNCTION__, cj_item, ezlopi__id_str));
         }
         else
         {

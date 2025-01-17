@@ -650,8 +650,8 @@ static void __edit_devgrp_from_ll(l_ezlopi_device_grp_t *req_devgrp_node, cJSON 
         : cJSON_AddBoolToObject(__FUNCTION__, cj_devgrp_new, ezlopi_followEntry_str, req_devgrp_node->follow_entry);
 
     (NULL != cJSON_GetObjectItem(__FUNCTION__, cj_devgrp_new, ezlopi_packageId_str))
-        ? (CJSON_GET_VALUE_STRING_BY_COPY_INTO_PTR(cj_devgrp_new, ezlopi_packageId_str, req_devgrp_node->package_id))
-        : cJSON_AddStringToObject(__FUNCTION__, cj_devgrp_new, ezlopi_packageId_str, &req_devgrp_node->package_id);
+        ? (CJSON_GET_VALUE_STRING_BY_COPY_INTO_PTR(cj_devgrp_new, ezlopi_packageId_str, &req_devgrp_node->package_id))
+        : cJSON_AddStringToObject(__FUNCTION__, cj_devgrp_new, ezlopi_packageId_str, req_devgrp_node->package_id);
 
     // ------------- categories -------------
     {
@@ -783,14 +783,14 @@ static void __edit_itemgrp_from_ll(l_ezlopi_item_grp_t *req_itemgrp_node, cJSON 
         : cJSON_AddBoolToObject(__FUNCTION__, cj_itemgrp_new, ezlopi_persistent_str, req_itemgrp_node->persistent);
 
     (NULL != cJSON_GetObjectItem(__FUNCTION__, cj_itemgrp_new, ezlopi_valueType_str))
-        ? (CJSON_GET_VALUE_STRING_BY_COPY_INTO_PTR(cj_itemgrp_new, ezlopi_valueType_str, req_itemgrp_node->value_type))
-        : cJSON_AddStringToObject(__FUNCTION__, cj_itemgrp_new, ezlopi_valueType_str, &req_itemgrp_node->value_type);
+        ? (CJSON_GET_VALUE_STRING_BY_COPY_INTO_PTR(cj_itemgrp_new, ezlopi_valueType_str, &req_itemgrp_node->value_type))
+        : cJSON_AddStringToObject(__FUNCTION__, cj_itemgrp_new, ezlopi_valueType_str, req_itemgrp_node->value_type);
 
     if (req_itemgrp_node->value_type && strlen(req_itemgrp_node->value_type))
     {
         (NULL != cJSON_GetObjectItem(__FUNCTION__, cj_itemgrp_new, ezlopi_valueTypeFamily_str))
-            ? (CJSON_GET_VALUE_STRING_BY_COPY_INTO_PTR(cj_itemgrp_new, ezlopi_valueTypeFamily_str, req_itemgrp_node->value_type_family))
-            : cJSON_AddStringToObject(__FUNCTION__, cj_itemgrp_new, ezlopi_valueTypeFamily_str, &req_itemgrp_node->value_type_family);
+            ? (CJSON_GET_VALUE_STRING_BY_COPY_INTO_PTR(cj_itemgrp_new, ezlopi_valueTypeFamily_str, &req_itemgrp_node->value_type_family))
+            : cJSON_AddStringToObject(__FUNCTION__, cj_itemgrp_new, ezlopi_valueTypeFamily_str, req_itemgrp_node->value_type_family);
     }
 
     // ------------- itemNames -------------

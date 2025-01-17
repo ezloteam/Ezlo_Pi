@@ -2,7 +2,10 @@
 /**
  * @file    ezlopi_cloud_scenes_scripts.h
  * @brief
- * @author
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version
  * @date
  */
@@ -50,42 +53,42 @@ extern "C"
 #endif
     /**
      * @brief Function that responds to hub.scenes.script.add method
-     * 
+     *
      * @param cj_request Incoming JSON request
      * @param cj_response Outgoing JSON response
      */
     void EZPI_scenes_scripts_add(cJSON *cj_request, cJSON *cj_response);
     /**
      * @brief Function that responds to hub.scenes.script.get method
-     * 
+     *
      * @param cj_request Incoming JSON request
      * @param cj_response Outgoing JSON response
      */
     void EZPI_scenes_scripts_get(cJSON *cj_request, cJSON *cj_response);
     /**
      * @brief Function that responds to hub.scenes.script.list method
-     * 
+     *
      * @param cj_request Incoming JSON request
      * @param cj_response Outgoing JSON response
      */
     void EZPI_scenes_scripts_list(cJSON *cj_request, cJSON *cj_response);
     /**
      * @brief Function that responds to hub.scenes.script.delete method
-     * 
+     *
      * @param cj_request Incoming JSON request
      * @param cj_response Outgoing JSON response
      */
     void EZPI_scenes_scripts_delete(cJSON *cj_request, cJSON *cj_response);
     /**
      * @brief Function that responds to hub.scenes.script.set method
-     * 
+     *
      * @param cj_request Incoming JSON request
      * @param cj_response Outgoing JSON response
      */
     void EZPI_scenes_scripts_set(cJSON *cj_request, cJSON *cj_response);
     /**
      * @brief Function that responds to hub.scenes.script.run method
-     * 
+     *
      * @param cj_request Incoming JSON request
      * @param cj_response Outgoing JSON response
      */

@@ -2,7 +2,9 @@
 /**
  * @file    ezlopi_cloud_status.c
  * @brief
- * @author
+ * @authors Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version
  * @date
  */

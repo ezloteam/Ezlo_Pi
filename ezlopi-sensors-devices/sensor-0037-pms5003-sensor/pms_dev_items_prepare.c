@@ -123,7 +123,6 @@ static int __prepare_particulate_matter_particles_0_dot_3_um_device_and_items(cJ
     {
         ret = 1;
         // char *dev_name = "Dust Particles 0.3 um";
-        // ASSIGN_DEVICE_NAME_V2(particles_0_dot_3_um_device, dev_name);
         particles_0_dot_3_um_device->cloud_properties.category = category_level_sensor;
         particles_0_dot_3_um_device->cloud_properties.subcategory = subcategory_particulate_matter;
         particles_0_dot_3_um_device->cloud_properties.device_type = dev_type_sensor;
@@ -174,7 +173,6 @@ static int __prepare_particulate_matter_particles_0_dot_5_um_device_and_items(cJ
     {
         ret = 1;
         // char *dev_name = "Dust Particles 0.5 um";
-        // ASSIGN_DEVICE_NAME_V2(particles_0_dot_5_um_device, dev_name);
         particles_0_dot_5_um_device->cloud_properties.category = category_level_sensor;
         particles_0_dot_5_um_device->cloud_properties.subcategory = subcategory_particulate_matter;
         particles_0_dot_5_um_device->cloud_properties.device_type = dev_type_sensor;
@@ -222,7 +220,6 @@ static int __prepare_particulate_matter_particles_1_um_device_and_items(cJSON *c
     {
         ret = 1;
         // char *dev_name = "Dust Particles 1 um";
-        // ASSIGN_DEVICE_NAME_V2(particles_1_um_device, dev_name);
         particles_1_um_device->cloud_properties.category = category_level_sensor;
         particles_1_um_device->cloud_properties.subcategory = subcategory_particulate_matter;
         particles_1_um_device->cloud_properties.device_type = dev_type_sensor;
@@ -270,7 +267,6 @@ static int __prepare_particulate_matter_particles_2_dot_5_um_device_and_items(cJ
     {
         ret = 1;
         // char *dev_name = "Dust Particles 2.5 um";
-        // ASSIGN_DEVICE_NAME_V2(particles_2_dot_5_um_device, dev_name);
         particles_2_dot_5_um_device->cloud_properties.category = category_level_sensor;
         particles_2_dot_5_um_device->cloud_properties.subcategory = subcategory_particulate_matter;
         particles_2_dot_5_um_device->cloud_properties.device_type = dev_type_sensor;
@@ -318,7 +314,6 @@ static int __prepare_particulate_matter_particles_5_um_device_and_items(cJSON *c
     {
         ret = 1;
         // char *dev_name = "Dust Particles 5 um";
-        // ASSIGN_DEVICE_NAME_V2(particles_5_um_device, dev_name);
         particles_5_um_device->cloud_properties.category = category_level_sensor;
         particles_5_um_device->cloud_properties.subcategory = subcategory_particulate_matter;
         particles_5_um_device->cloud_properties.device_type = dev_type_sensor;
@@ -366,7 +361,6 @@ static int __prepare_particulate_matter_particles_10_um_device_and_items(cJSON *
     {
         ret = 1;
         // char *dev_name = "Dust Particles 10 um";
-        // ASSIGN_DEVICE_NAME_V2(particles_10_um_device, dev_name);
         particles_10_um_device->cloud_properties.category = category_level_sensor;
         particles_10_um_device->cloud_properties.subcategory = subcategory_particulate_matter;
         particles_10_um_device->cloud_properties.device_type = dev_type_sensor;
@@ -414,7 +408,6 @@ static int __prepare_particulate_matter_standard_particles_1_um_device_and_items
     {
         ret = 1;
         // char *dev_name = "Dust Particles PM 1 um";
-        // ASSIGN_DEVICE_NAME_V2(standard_particles_1_um_device, dev_name);
         standard_particles_1_um_device->cloud_properties.category = category_level_sensor;
         standard_particles_1_um_device->cloud_properties.subcategory = subcategory_particulate_matter;
         standard_particles_1_um_device->cloud_properties.device_type = dev_type_sensor;
@@ -462,7 +455,6 @@ static int __prepare_particulate_matter_standard_particles_2_dot_5_um_device_and
     {
         ret = 1;
         // char *dev_name = "Dust Particles PM 2.5 um";
-        // ASSIGN_DEVICE_NAME_V2(standard_particles_2_dot_5_um_device, dev_name);
         standard_particles_2_dot_5_um_device->cloud_properties.category = category_level_sensor;
         standard_particles_2_dot_5_um_device->cloud_properties.subcategory = subcategory_particulate_matter;
         standard_particles_2_dot_5_um_device->cloud_properties.device_type = dev_type_sensor;
@@ -510,7 +502,6 @@ static int __prepare_particulate_matter_standard_particles_10_um_device_and_item
     {
         ret = 1;
         // char *dev_name = "Dust Particles PM 10 um";
-        // ASSIGN_DEVICE_NAME_V2(standard_particles_10_um_device, dev_name);
         standard_particles_10_um_device->cloud_properties.category = category_level_sensor;
         standard_particles_10_um_device->cloud_properties.subcategory = subcategory_particulate_matter;
         standard_particles_10_um_device->cloud_properties.device_type = dev_type_sensor;

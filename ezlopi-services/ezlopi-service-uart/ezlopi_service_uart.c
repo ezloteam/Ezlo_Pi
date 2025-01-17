@@ -3,7 +3,10 @@
 /**
  * @file    ezlopi_service_uart.c
  * @brief
- * @author
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version
  * @date
  */
@@ -309,19 +312,7 @@ void EZPI_SERV_cdc_init()
 
 void EZPI_SERV_uart_init(void)
 {
-#if 1
     EZPI_service_loop_add("uart-loop", __uart_loop, 1, NULL);
-#endif
-
-#if 0
-    TaskHandle_t __uart_loop_handle = NULL;
-    xTaskCreate(ezpi_service_uart_task, "serv_uart_task", EZLOPI_SERVICE_UART_TASK_DEPTH, NULL, configMAX_PRIORITIES - 4, &__uart_loop_handle);
-
-#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
-    EZPI_core_process_set_process_info(ENUM_EZLOPI_SERVICE_UART_TASK, &__uart_loop_handle, EZLOPI_SERVICE_UART_TASK_DEPTH);
-#endif // CONFIG_FREERTOS_USE_TRACE_FACILITY
-
-#endif
 }
 
 static int ezpi_service_uart_reset(cJSON *root)
@@ -695,63 +686,6 @@ static int ezpi_service_uart_parser(const char *data)
     return 1;
 }
 
-#if 0
-static void ezpi_service_uart_task(void *arg)
-{
-    static const char *RX_TASK_TAG = "RX_TASK";
-    esp_log_level_set(RX_TASK_TAG, ESP_LOG_INFO);
-
-    while (1)
-    {
-        uint32_t tmp_len = 0;
-        uint32_t buffred_data_len = 0;
-        uart_get_buffered_data_len(EZPI_SERV_UART_NUM_DEFAULT, &tmp_len);
-
-        if (tmp_len > 0)
-        {
-            while (tmp_len != buffred_data_len)
-            {
-                buffred_data_len = tmp_len;
-                vTaskDelay(10 / portTICK_RATE_MS);
-                uart_get_buffered_data_len(EZPI_SERV_UART_NUM_DEFAULT, &tmp_len);
-            }
-
-            if (buffred_data_len)
-            {
-                uint8_t *uart_rx_data = (uint8_t *)ezlopi_malloc(__FUNCTION__, buffred_data_len + 1);
-
-                if (uart_rx_data)
-                {
-                    memset(uart_rx_data, 0, buffred_data_len);
-
-                    int rxBytes = uart_read_bytes(EZPI_SERV_UART_NUM_DEFAULT, uart_rx_data, buffred_data_len, 1000 / portTICK_RATE_MS);
-
-                    if (rxBytes > 0)
-                    {
-                        uart_rx_data[rxBytes] = 0;
-                        TRACE_I("%s", uart_rx_data);
-                        ezpi_service_uart_parser((const char *)uart_rx_data);
-                    }
-
-                    ezlopi_free(__FUNCTION__, uart_rx_data);
-                }
-                else
-                {
-                    uart_flush_input(EZPI_SERV_UART_NUM_DEFAULT);
-                }
-            }
-        }
-
-        vTaskDelay(100 / portTICK_RATE_MS);
-    }
-
-#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
-    EZPI_core_process_set_is_deleted(ENUM___uart_loop);
-#endif
-    vTaskDelete(NULL);
-}
-#endif
-
 static void __uart_loop(void *arg)
 {
     uint32_t tmp_len = 0;
@@ -786,7 +720,6 @@ static void __uart_loop(void *arg)
                 if (rxBytes > 0)
                 {
                     uart_rx_data[rxBytes] = 0;
-                    printf("%s(%u):: uart-data(%u|%u): %s \r\n", __FILENAME__, __LINE__, buffred_data_len, rxBytes, uart_rx_data);
                     TRACE_I("%s", uart_rx_data);
                     ezpi_service_uart_parser((const char *)uart_rx_data);
                 }

@@ -2,7 +2,7 @@
 /**
  * @file    ezlopi_cloud_keywords.c
  * @brief
- * @author
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version
  * @date
  */
@@ -179,6 +179,7 @@ const char *ezlopi_has_setter_str = "has_setter";
 const char *ezlopi_scale_str = "scale";
 const char *ezlopi_value_type_str = "value_type";
 const char *ezlopi_device_id_str = "device_id";
+const char *ezlopi_child_linked_parent_id_str = "child_linked_parent_id";
 const char *ezlopi_none_str = "none";
 const char *ezlopi_role_str = "role";
 const char *ezlopi_lifeSafety_str = "lifeSafety";

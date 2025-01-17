@@ -304,16 +304,20 @@ l_ezlopi_device_t *EZPI_core_device_add_device(cJSON *cj_device, const char *las
     if (new_device)
     {
         char tmp_device_name[32];
-        memset(tmp_device_name, 0, sizeof(tmp_device_name));
+
         memset(new_device, 0, sizeof(l_ezlopi_device_t));
+        memset(tmp_device_name, 0, sizeof(tmp_device_name));
 
         // 1. generate and update device_ID for ll
         {
-            CJSON_GET_ID(new_device->cloud_properties.device_id, cJSON_GetObjectItem(__FUNCTION__, cj_device, ezlopi_device_id_str));
-            CJSON_GET_ID(new_device->cloud_properties.parent_device_id, cJSON_GetObjectItem(__FUNCTION__, cj_device, "child_linked_parent_id"));
+            new_device->cloud_properties.device_id = EZPI_core_cjson_get_id(cj_device, ezlopi_device_id_str);
+            new_device->cloud_properties.parent_device_id = EZPI_core_cjson_get_id(cj_device, ezlopi_child_linked_parent_id_str);
+
+            // CJSON_GET_ID(new_device->cloud_properties.device_id, cJSON_GetObjectItem(__FUNCTION__, cj_device, ezlopi_device_id_str));
+            // CJSON_GET_ID(new_device->cloud_properties.parent_device_id, cJSON_GetObjectItem(__FUNCTION__, cj_device, "child_linked_parent_id"));
 
             TRACE_D("Device Id (before): %08x", new_device->cloud_properties.device_id);
-            if (new_device->cloud_properties.device_id)
+            if (new_device->cloud_properties.device_id) //
             {
                 l_ezlopi_device_t *curr_dev_node = l_device_head;
                 while (curr_dev_node)
@@ -334,10 +338,15 @@ l_ezlopi_device_t *EZPI_core_device_add_device(cJSON *cj_device, const char *las
             {
                 new_device->cloud_properties.device_id = EZPI_core_cloud_generate_device_id();
                 CJSON_ASSIGN_ID(cj_device, new_device->cloud_properties.device_id, ezlopi_device_id_str);
-                CJSON_ASSIGN_ID(cj_device, new_device->cloud_properties.device_id, "child_linked_parent_id");
+                CJSON_ASSIGN_ID(cj_device, new_device->cloud_properties.device_id, ezlopi_child_linked_parent_id_str);
+
+                printf("%s(%u):: %s: %08x\r\n", __FILENAME__, __LINE__, ezlopi_device_id_str, new_device->cloud_properties.device_id);
+
                 g_store_dev_config_with_id = 1;
             }
-            TRACE_D("Device Id (after): %08x", new_device->cloud_properties.device_id);
+
+            // printf("%s(%u):: Device Id (after): %08x\r\n", __FILENAME__, __LINE__, new_device->cloud_properties.device_id);
+            // TRACE_D("Device Id (after): %08x", new_device->cloud_properties.device_id);
         }
 
         // 2. Add default Values

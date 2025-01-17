@@ -3,7 +3,10 @@
 /**
  * @file    ezlopi_service_ble_provisioning.c
  * @brief   Provisioning service related functionalities
- * @author
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version
  * @date
  */

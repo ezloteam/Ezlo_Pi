@@ -2,7 +2,10 @@
 /**
  * @file    ezlopi_cloud_constants.c
  * @brief
- * @author
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version
  * @date
  */
@@ -37,8 +40,6 @@
 ** ===========================================================================
 */
 
-
-
 #include "ezlopi_cloud_category_str.h"
 #include "ezlopi_cloud_device_types_str.h"
 #include "ezlopi_cloud_devices_str.h"
@@ -50,7 +51,6 @@
 #include "ezlopi_cloud_thermostat_str.h"
 #include "ezlopi_cloud_value_type_str.h"
 #include "ezlopi_cloud_item_name_str.h"
-
 
 /*******************************************************************************
  *                          End of File

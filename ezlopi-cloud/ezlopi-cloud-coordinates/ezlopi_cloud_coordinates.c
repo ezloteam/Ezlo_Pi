@@ -2,7 +2,9 @@
 /**
  * @file    ezlopi_cloud_coordinates.c
  * @brief
- * @author
+ * @author  Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version
  * @date
  */

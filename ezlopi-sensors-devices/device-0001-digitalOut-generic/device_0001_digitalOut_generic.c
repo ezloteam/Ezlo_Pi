@@ -31,7 +31,10 @@
 /**
  * @file    device_0001_digitalOut_generic.c
  * @brief   perform some function on device_0001
- * @author  xx
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version 0.1
  * @date    xx
  */

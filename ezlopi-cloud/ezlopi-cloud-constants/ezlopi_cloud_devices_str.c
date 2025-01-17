@@ -2,7 +2,10 @@
 /**
  * @file    ezlopi_cloud_devices_str.c
  * @brief
- * @author
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version
  * @date
  */
@@ -37,8 +40,6 @@
 ** ===========================================================================
 */
 
-
-
 /// @brief  https://api.ezlo.com/devices/devices/index.html
 const char *device_alarm = "alarm";
 const char *device_alarms = "alarms";
@@ -68,4 +69,3 @@ const char *device_co2 = "co2";
 const char *device_co2_binary = "co2_binary";
 const char *device_co_binary = "co_binary";
 const char *device_current_multilevel = "current_multilevel";
-

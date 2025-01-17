@@ -2,7 +2,9 @@
 /**
  * @file    ezlopi_service_system_temperature_sensor.h
  * @brief
- * @author
+ * @authors Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version
  * @date
  */

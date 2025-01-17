@@ -3,40 +3,42 @@
 /**
  * @file    ezlopi_service_led_indicator.c
  * @brief
- * @author
+ * @authors Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version
  * @date
  */
- /* ===========================================================================
- ** Copyright (C) 2024 Ezlo Innovation Inc
- **
- ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
- **
- ** Redistribution and use in source and binary forms, with or without
- ** modification, are permitted provided that the following conditions are met:
- **
- ** 1. Redistributions of source code must retain the above copyright notice,
- **    this list of conditions and the following disclaimer.
- ** 2. Redistributions in binary form must reproduce the above copyright
- **    notice, this list of conditions and the following disclaimer in the
- **    documentation and/or other materials provided with the distribution.
- ** 3. Neither the name of the copyright holder nor the names of its
- **    contributors may be used to endorse or promote products derived from
- **    this software without specific prior written permission.
- **
- ** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- ** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- ** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- ** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- ** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- ** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- ** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- ** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- ** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- ** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- ** POSSIBILITY OF SUCH DAMAGE.
- ** ===========================================================================
- */
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
 
 #include "../../build/config/sdkconfig.h"
 
@@ -62,108 +64,108 @@
 #include "ezlopi_service_led_indicator.h"
 
 #if defined(CONFIG_IDF_TARGET_ESP32S3) || defined(CONFIG_IDF_TARGET_ESP32C3)
- /**
-  * @brief Macro to extract red part of color on RGB format color
-  *
-  * @param[in] x 24-bit color code
-  * Example
-  * @code
-  * int magenta = 0xFF00FF;
-  * int red = COLOR_GET_RED(magenta)
-  * @endcode
-  *
-  */
+/**
+ * @brief Macro to extract red part of color on RGB format color
+ *
+ * @param[in] x 24-bit color code
+ * Example
+ * @code
+ * int magenta = 0xFF00FF;
+ * int red = COLOR_GET_RED(magenta)
+ * @endcode
+ *
+ */
 #define COLOR_GET_RED(x) (0xFF & (x >> 16))
-  /**
-   * @brief Macro to extract green part of color on RGB format color
-   *
-   * @param[in] x 24-bit color code
-   * Example
-   * @code
-   * int yellow = 0xFFFF00;
-   * int green = COLOR_GET_GREEN(yellow)
-   * @endcode
-   *
-   */
+/**
+ * @brief Macro to extract green part of color on RGB format color
+ *
+ * @param[in] x 24-bit color code
+ * Example
+ * @code
+ * int yellow = 0xFFFF00;
+ * int green = COLOR_GET_GREEN(yellow)
+ * @endcode
+ *
+ */
 #define COLOR_GET_GREEN(x) (0xFF & (x >> 8))
-   /**
-    * @brief Macro to extract blue part of color on RGB format color
-    *
-    * @param[in] x 24-bit color code
-    * Example
-    * @code
-    * int magenta = 0xFF00FF;
-    * int blue = COLOR_GET_BLUE(magenta)
-    * @endcode
-    *
-    */
+/**
+ * @brief Macro to extract blue part of color on RGB format color
+ *
+ * @param[in] x 24-bit color code
+ * Example
+ * @code
+ * int magenta = 0xFF00FF;
+ * int blue = COLOR_GET_BLUE(magenta)
+ * @endcode
+ *
+ */
 #define COLOR_GET_BLUE(x) (0xFF & x)
 
-    /**
-     * @brief Color to be set to the indicator when device is just powered on
-     *
-     */
+/**
+ * @brief Color to be set to the indicator when device is just powered on
+ *
+ */
 #define DEVICE_POWERED_ON_LED_COLOR 0xFFFFFF
-     /**
-      * @brief Time indicator will take to fade in and fade out
-      *
-      */
+/**
+ * @brief Time indicator will take to fade in and fade out
+ *
+ */
 #define INDICATOR_LED_FADE_TIME_MS 20
 
 #ifdef CONFIG_IDF_TARGET_ESP32S3
-      /**
-       * @brief Pin number the onboard LED strip is connected to on ESP32S3
-       *
-       */
+/**
+ * @brief Pin number the onboard LED strip is connected to on ESP32S3
+ *
+ */
 #define INDICATOR_LED_PIN 48
 #elif CONFIG_IDF_TARGET_ESP32C3
-      /**
-       * @brief Pin number the onboard LED strip is connected to on ESP32C3
-       *
-       */
+/**
+ * @brief Pin number the onboard LED strip is connected to on ESP32C3
+ *
+ */
 #define INDICATOR_LED_PIN 8
 #endif
-       /**
-        * @brief Default RMT channel to use for LED strip
-        *
-        */
+/**
+ * @brief Default RMT channel to use for LED strip
+ *
+ */
 #define INDICATOR_RGB_RMT_TX_CHANNEL RMT_CHANNEL_1
 
 #elif defined(CONFIG_IDF_TARGET_ESP32) // CONFIG_IDF_TARGET_ESP32S3 OR OR CONFIG_IDF_TARGET_ESP32C3 OR CONFIG_IDF_TARGET_ESP32
 
- /**
-  * @brief Pin number the onboard LED is connected to on ESP32
-  *
-  */
+/**
+ * @brief Pin number the onboard LED is connected to on ESP32
+ *
+ */
 #define INDICATOR_LED_PIN 2
-  /**
-   * @brief Time indicator will take to fade in and fade out when powered on
-   *
-   */
+/**
+ * @brief Time indicator will take to fade in and fade out when powered on
+ *
+ */
 #define INDICATTOR_LED_POWER_STATUS_BLINK_MS 20
-   /**
-    * @brief Time indicator will take to fade in and fade out when WiFi is connected
-    *
-    */
+/**
+ * @brief Time indicator will take to fade in and fade out when WiFi is connected
+ *
+ */
 #define INDICATTOR_LED_WIFI_STATUS_BLINK_MS 50
-    /**
-     * @brief Time indicator will take to fade in and fade out when internet is connected
-     *
-     */
+/**
+ * @brief Time indicator will take to fade in and fade out when internet is connected
+ *
+ */
 #define INDICATTOR_LED_INTERNET_STATUS_BLINK_MS 100
-     /**
-      * @brief Time indicator will take to fade in and fade out when connected to cloud
-      *
-      */
+/**
+ * @brief Time indicator will take to fade in and fade out when connected to cloud
+ *
+ */
 #define INDICATTOR_LED_CLOUD_STATUS_BLINK_MS 200
 
 #endif // CONFIG_IDF_TARGET_ESP32S3 OR OR CONFIG_IDF_TARGET_ESP32C3 OR CONFIG_IDF_TARGET_ESP32
 
-      /**
-       * @brief Function to change the indicator LED indicator according to the priority
-       *
-       * @param[in] arg Loop argument
-       */
+/**
+ * @brief Function to change the indicator LED indicator according to the priority
+ *
+ * @param[in] arg Loop argument
+ */
 static void ezpi_indicator_LED_loop(void *arg);
 /**
  * @brief Function to set LED indicator on power on effect

@@ -3,7 +3,10 @@
 /**
  * @file    ezlopi_cloud_info.h
  * @brief
- * @author
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version
  * @date
  */
@@ -50,7 +53,7 @@ extern "C"
 
     /**
      * @brief Function to respond to hub.info.list
-     * 
+     *
      * @param cj_request Incoming JSON request
      * @param cj_response Outgoing JSON response
      */
