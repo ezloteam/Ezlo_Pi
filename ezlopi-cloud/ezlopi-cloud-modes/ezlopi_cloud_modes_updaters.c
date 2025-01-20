@@ -684,6 +684,18 @@ void EZPI_cloud_modes_swinger_shutdown_limit_changed(cJSON *cj_request, cJSON *c
     }
 }
 
+void EZPI_cloud_modes_local_alarmed_turned_off(cJSON *cj_request, cJSON *cj_response)
+{
+    cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_id_str);
+    cJSON_DeleteItemFromObject(__FUNCTION__, cj_response, ezlopi_method_str);
+
+    cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
+    cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_msg_subclass_str, ezlopi_hub_modes_local_alarmed_turned_off);
+    cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+    if (cj_result)
+    { // empty
+    }
+}
 /*******************************************************************************
  *                          Static Function Definitions
  *******************************************************************************/

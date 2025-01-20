@@ -274,6 +274,13 @@ extern "C"
      * @param cj_response Outgoing JSON request
      */
     void EZPI_cloud_modes_swinger_shutdown_limit_reset(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function to Turn off the local alarm raised by the sensor in disarmed mode
+     *
+     * @param cj_request incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_cloud_modes_local_alarm_off(cJSON *cj_request, cJSON *cj_response);
 #ifdef __cplusplus
 }
 #endif

@@ -248,6 +248,13 @@ extern "C"
      * @param cj_response Outgoing JSON response
      */
     void EZPI_cloud_modes_swinger_shutdown_limit_changed(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Updater Function for local alarmed turned off
+     *
+     * @param cj_request incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_cloud_modes_local_alarmed_turned_off(cJSON *cj_request, cJSON *cj_response);
 
 #ifdef __cplusplus
 }

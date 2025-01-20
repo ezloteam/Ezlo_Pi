@@ -528,6 +528,13 @@ extern "C"
      * @return ezlopi_error_t
      */
     ezlopi_error_t EZPI_core_modes_api_swinger_shutdown_limit_reset(uint32_t u_id);
+    /**
+     * @brief Function to Turn off the local alarm raised by the sensor in disarmed mode
+     *
+     * @param modeId Target-Mode
+     * @return ezlopi_error_t
+     */
+    ezlopi_error_t EZPI_core_modes_api_local_alarm_off(uint8_t modeId);
 
 #ifdef __cplusplus
 }

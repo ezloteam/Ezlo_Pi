@@ -1149,6 +1149,23 @@ ezlopi_error_t EZPI_core_modes_set_unset_device_armed_status(cJSON *cj_device_ar
     return ret;
 }
 
+ezlopi_error_t EZPI_core_modes_api_local_alarm_off(uint8_t modeId)
+{
+    ezlopi_error_t ret = EZPI_ERR_MODES_FAILED;
+    if ((EZLOPI_HOUSE_MODE_REF_ID_NONE < modeId) && (EZLOPI_HOUSE_MODE_REF_ID_MAX > modeId))
+    {
+        ezlopi_service_modes_stop(5000); // 1. delete all the alerts
+        s_house_modes_t *curr_mode = EZPI_core_modes_get_house_mode_by_id(modeId);
+        if (curr_mode)
+        {
+            curr_mode->armed = false; // 2. Disable the alarm capability of target-house-mode [modeId]
+            ret = EZPI_SUCCESS;
+        }
+        ezlopi_service_modes_start(5000); // 3. start the modes loop ; also check if 'curr_mode->armed' before creating 'new-alerts-ll'
+    }
+    return ret;
+}
+
 ezlopi_error_t EZPI_core_modes_store_to_nvs(void)
 {
     ezlopi_error_t ret = EZPI_ERR_MODES_FAILED;

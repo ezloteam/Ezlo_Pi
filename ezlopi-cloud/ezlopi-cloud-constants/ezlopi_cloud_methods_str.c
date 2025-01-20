@@ -214,6 +214,7 @@ const char *ezlopi_hub_modes_swinger_shutdown_reset_done = "hub.modes.swinger.sh
 const char *ezlopi_hub_modes_swinger_shutdown_disable_added = "hub.modes.swinger.shutdown.disable.added";
 const char *ezlopi_hub_modes_swinger_shutdown_disable_removed = "hub.modes.swinger.shutdown.disable.remved";
 const char *ezlopi_hub_modes_swinger_shutdown_limit_changed = "hub.modes.swinger.shutdown.limits.changed";
+const char *ezlopi_hub_modes_local_alarmed_turned_off = "hub.modes.local.alarmed.turned.off";
 
 /*******************************************************************************
  *                          Extern Function Definitions

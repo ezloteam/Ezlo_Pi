@@ -310,7 +310,8 @@ l_ezlopi_device_t *EZPI_core_device_add_device(cJSON *cj_device, const char *las
         // 1. generate and update device_ID for ll
         {
             CJSON_GET_ID(new_device->cloud_properties.device_id, cJSON_GetObjectItem(__FUNCTION__, cj_device, ezlopi_device_id_str));
-            CJSON_GET_ID(new_device->cloud_properties.parent_device_id, cJSON_GetObjectItem(__FUNCTION__, cj_device, "child_linked_parent_id"));
+            // CJSON_GET_ID(new_device->cloud_properties.parent_device_id, cJSON_GetObjectItem(__FUNCTION__, cj_device, "child_linked_parent_id"));
+            new_device->cloud_properties.parent_device_id = new_device->cloud_properties.device_id;
 
             TRACE_D("Device Id (before): %08x", new_device->cloud_properties.device_id);
             if (new_device->cloud_properties.device_id)
@@ -334,7 +335,7 @@ l_ezlopi_device_t *EZPI_core_device_add_device(cJSON *cj_device, const char *las
             {
                 new_device->cloud_properties.device_id = EZPI_core_cloud_generate_device_id();
                 CJSON_ASSIGN_ID(cj_device, new_device->cloud_properties.device_id, ezlopi_device_id_str);
-                CJSON_ASSIGN_ID(cj_device, new_device->cloud_properties.device_id, "child_linked_parent_id");
+                // CJSON_ASSIGN_ID(cj_device, new_device->cloud_properties.device_id, "child_linked_parent_id");
                 g_store_dev_config_with_id = 1;
             }
             TRACE_D("Device Id (after): %08x", new_device->cloud_properties.device_id);
