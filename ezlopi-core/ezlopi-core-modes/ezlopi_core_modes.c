@@ -1155,13 +1155,37 @@ ezlopi_error_t EZPI_core_modes_api_local_alarm_off(uint8_t modeId)
     if ((EZLOPI_HOUSE_MODE_REF_ID_NONE < modeId) && (EZLOPI_HOUSE_MODE_REF_ID_MAX > modeId))
     {
         ezlopi_service_modes_stop(5000); // 1. delete all the alerts
-        s_house_modes_t *curr_mode = EZPI_core_modes_get_house_mode_by_id(modeId);
-        if (curr_mode)
+        s_house_modes_t *target_mode = EZPI_core_modes_get_house_mode_by_id(modeId);
+        if (target_mode)
         {
-            curr_mode->armed = false; // 2. Disable the alarm capability of target-house-mode [modeId]
+            target_mode->armed = false; // 2. Disable the alarm capability of target-house-mode [modeId]
             ret = EZPI_SUCCESS;
         }
-        ezlopi_service_modes_start(5000); // 3. start the modes loop ; also check if 'curr_mode->armed' before creating 'new-alerts-ll'
+        ezlopi_service_modes_start(5000); // 3. start the modes loop ; also check if 'target_mode->armed' before creating 'new-alerts-ll'
+    }
+    return ret;
+}
+
+ezlopi_error_t EZPI_core_modes_api_force_disarm(uint8_t modeId)
+{
+    ezlopi_error_t ret = EZPI_ERR_MODES_FAILED;
+    if ((EZLOPI_HOUSE_MODE_REF_ID_NONE < modeId) && (EZLOPI_HOUSE_MODE_REF_ID_MAX > modeId))
+    {
+        ezlopi_service_modes_stop(5000); // 1. delete all the alerts
+        s_house_modes_t *target_house_mode = EZPI_core_modes_get_house_mode_by_id(modeId);
+        s_ezlopi_modes_t *curr_ez_mode = EZPI_core_modes_get_custom_modes();
+        if (target_house_mode && curr_ez_mode && (modeId == curr_ez_mode->current_mode_id)) // given 'modeId' should match 'curr_ez_mode->id'
+        {
+            TRACE_W("Before force-disarm --> \n ----> alarm.phase = [%d] / alarm.status = [%d]", ez_mode->alarmed.phase, ez_mode->alarmed.status);
+            target_house_mode->armed = false;           // Disarm current: 'modeId' and clear all alerts for it.
+            curr_ez_mode->alarmed.time_is_left_sec = 0; // This 'entry_delay_sec' must be zero to jump past the pre-alarm phase ; direct to 'main-phase'
+
+            curr_ez_mode->alarmed.phase = EZLOPI_MODES_ALARM_PHASE_MAIN;
+            curr_ez_mode->alarmed.phase = EZLOPI_MODES_ALARM_STATUS_DONE;
+
+            ret = EZPI_SUCCESS;
+        }
+        ezlopi_service_modes_start(5000); // 3. start the modes loop ; also check if 'curr_ez_mode->armed' before creating 'new-alerts-ll'
     }
     return ret;
 }

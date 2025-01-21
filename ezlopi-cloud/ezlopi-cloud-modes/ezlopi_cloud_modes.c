@@ -640,6 +640,28 @@ void EZPI_cloud_modes_local_alarm_off(cJSON *cj_request, cJSON *cj_response)
         }
     }
 }
+
+void EZPI_cloud_modes_force_disarm(cJSON *cj_request, cJSON *cj_response)
+{
+    cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
+    if (cj_result)
+    {
+        cJSON *cj_params = cJSON_GetObjectItem(__func__, cj_request, ezlopi_params_str);
+        if (cj_params)
+        {
+            cJSON *cj_modeId = cJSON_GetObjectItem(__func__, cj_params, ezlopi_modeId_str);
+            if (cj_modeId)
+            {
+                double timestamp = 0;
+                CJSON_GET_VALUE_DOUBLE(cj_params, ezlopi_timestamp_str, timestamp); // timestamp not needed rightnow
+
+                uint8_t modeId = strtoul(cj_modeId->valuestring, NULL, 10);
+                // cJSON *cj_armed = cJSON_GetObjectItem(__func__, cj_params, ezlopi_deviceId_str);
+                EZPI_core_modes_api_force_disarm(modeId);
+            }
+        }
+    }
+}
 /*******************************************************************************
  *                          Static Function Definitions
  *******************************************************************************/

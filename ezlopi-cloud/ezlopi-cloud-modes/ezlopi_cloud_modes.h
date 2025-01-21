@@ -281,6 +281,13 @@ extern "C"
      * @param cj_response Outgoing JSON response
      */
     void EZPI_cloud_modes_local_alarm_off(cJSON *cj_request, cJSON *cj_response);
+    /**
+     * @brief Function to  Cancel all security events when the system alarmed during the disarmed mode 
+     *
+     * @param cj_request incoming JSON request
+     * @param cj_response Outgoing JSON response
+     */
+    void EZPI_cloud_modes_force_disarm(cJSON *cj_request, cJSON *cj_response);
 #ifdef __cplusplus
 }
 #endif

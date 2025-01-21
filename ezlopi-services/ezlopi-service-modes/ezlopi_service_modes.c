@@ -460,8 +460,10 @@ static ezlopi_error_t __check_mode_switch_condition(s_ezlopi_modes_t *ez_mode)
                     if (0 < ez_mode->alarmed.entry_delay_sec)
                     {
                         ez_mode->alarmed.time_is_left_sec = ez_mode->alarmed.entry_delay_sec;
+                        ez_mode->alarmed.phase =EZLOPI_MODES_ALARM_PHASE_IDLE;  // after switching the phase ---> idle .
+                        
                     }
-
+                    
                     // 4. Store to nvs
                     EZPI_core_modes_store_to_nvs();
                     cJSON *cj_update = EZPI_core_modes_cjson_changed();

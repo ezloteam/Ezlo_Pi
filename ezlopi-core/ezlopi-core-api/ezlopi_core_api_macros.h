@@ -115,6 +115,7 @@ extern "C"
     CLOUD_METHOD("hub.modes.swinger.shutdown.limit.set", EZPI_cloud_modes_swinger_shutdown_limit_set, EZPI_cloud_modes_swinger_shutdown_limit_changed)
     CLOUD_METHOD("hub.modes.swinger.shutdown.limit.reset", EZPI_cloud_modes_swinger_shutdown_limit_reset, EZPI_cloud_modes_swinger_shutdown_limit_changed)
     CLOUD_METHOD("hub.modes.local.alarm.off", EZPI_cloud_modes_local_alarm_off, EZPI_cloud_modes_local_alarmed_turned_off)
+    CLOUD_METHOD("hub.modes.local.alarm.off", EZPI_cloud_modes_force_disarm, EZPI_cloud_modes_alarmed)
 
 #endif // CONFIG_EZPI_SERV_ENABLE_MODES
 
