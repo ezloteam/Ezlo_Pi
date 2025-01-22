@@ -31,17 +31,20 @@
 /**
  * @file    ezlopi_core_api_methods.h
  * @brief   Functions perform operation for API-methods
- * @author  xx
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version 0.1
  * @date    12th DEC 2024
-*/
+ */
 
 #ifndef __EZPI_core_ezlopi_methods_H__
 #define __EZPI_core_ezlopi_methods_H__
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 
 #include <stdio.h>
 #include <ctype.h>
@@ -50,16 +53,16 @@
 #include <stdint.h>
 
 /*******************************************************************************
-*                          C++ Declaration Wrapper
-*******************************************************************************/
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
     /*******************************************************************************
-    *                          Type & Macro Declarations
-    *******************************************************************************/
+     *                          Type & Macro Declarations
+     *******************************************************************************/
     typedef void (*f_method_func_t)(cJSON *cj_request, cJSON *cj_response);
     typedef struct s_method_list_v2
     {
@@ -68,12 +71,12 @@ extern "C"
         f_method_func_t updater;
     } s_method_list_v2_t;
     /*******************************************************************************
-    *                          Extern Data Declarations
-    *******************************************************************************/
+     *                          Extern Data Declarations
+     *******************************************************************************/
 
     /*******************************************************************************
-    *                          Extern Function Prototypes
-    *******************************************************************************/
+     *                          Extern Function Prototypes
+     *******************************************************************************/
     /**
      * @brief This function initializes the registration of all core-action methods
      */
@@ -129,7 +132,6 @@ extern "C"
      */
     void EZPI_core_ezlopi_methods_rpc_method_notfound(cJSON *cj_request, cJSON *cj_response);
 
-
 #ifdef __cplusplus
 }
 #endif
@@ -137,9 +139,5 @@ extern "C"
 #endif // __EZPI_core_ezlopi_methods_H__
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
-
-
-
-
+ *                          End of File
+ *******************************************************************************/

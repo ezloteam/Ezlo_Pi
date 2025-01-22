@@ -31,7 +31,9 @@
 /**
  * @file    ezlopi_core_scenes_then_methods_helper_func.c
  * @brief   These are sub-functions utilized in file 'ezlopi_core_scenes_then_methods.c'
- * @author  xx
+ * @author  Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version 0.1
  * @date    12th DEC 2024
  */

@@ -29,16 +29,19 @@
 ** ===========================================================================
 */
 /**
-* @file    ezlopi_core_scenes_scripts.c
-* @brief   Perform operations on Scene-scipts
-* @author  xx
-* @version 0.1
-* @date    12th DEC 2024
-*/
+ * @file    ezlopi_core_scenes_scripts.c
+ * @brief   Perform operations on Scene-scipts
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
+ * @version 0.1
+ * @date    12th DEC 2024
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
@@ -67,24 +70,24 @@
 #include "EZLOPI_USER_CONFIG.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 typedef struct s_lua_scripts_modules
 {
     char *name;
     lua_CFunction func;
 } s_lua_scripts_modules_t;
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static ezlopi_error_t __scripts_nvs_parse(void);
 static void __script_process(void *arg);
 static void __scripts_process_runner(void);
@@ -97,8 +100,8 @@ static const char *__script_report(lua_State *lua_state, int status);
 static l_ezlopi_scenes_script_t *__scripts_create_node(uint32_t script_id, cJSON *cj_script);
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 static l_ezlopi_scenes_script_t *script_head = NULL;
 
 static s_lua_scripts_modules_t lua_scripts_modules[] = {
@@ -108,12 +111,12 @@ static s_lua_scripts_modules_t lua_scripts_modules[] = {
     {.name = NULL, .func = NULL},
 };
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 l_ezlopi_scenes_script_t *EZPI_scenes_scripts_get_head(void)
 {
     return script_head;
@@ -304,10 +307,9 @@ void EZPI_scenes_scripts_init(void)
     __scripts_process_runner();
 }
 
-
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 
 static void __run_script(l_ezlopi_scenes_script_t *script_node)
 {
@@ -550,7 +552,6 @@ static l_ezlopi_scenes_script_t *__scripts_create_node(uint32_t script_id, cJSON
                 // uint32_t script_name_size = strlen(cj_script_name->valuestring) + 1;
                 snprintf(new_script->name, sizeof(new_script->name), "%s", cj_script_name->valuestring);
 
-
                 uint32_t script_code_size = strlen(cj_script_code->valuestring) + 1;
                 new_script->code = (char *)ezlopi_malloc(__FUNCTION__, script_code_size);
                 if (new_script->code)
@@ -596,8 +597,8 @@ static void __load_custom_libs(lua_State *lua_state)
     }
 }
 
-#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+#endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

@@ -31,54 +31,55 @@
 /**
  * @file    __value_with_less_comparision_operators_macros.h
  * @brief   MACROS to generate enums for 'value_with_less' comparision operators
- * @author  xx
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version 0.1
  * @date    12th DEC 2024
-*/
+ */
 
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          C++ Declaration Wrapper
-*******************************************************************************/
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
     /*******************************************************************************
-    *                          Type & Macro Declarations
-    *******************************************************************************/
+     *                          Type & Macro Declarations
+     *******************************************************************************/
     SCENES_VALUES_WITH_LESS_OPERATORS(NONE, NULL, NULL, NULL)
-        //////////////////////////////////////////////////////////////////////////////
-        SCENES_VALUES_WITH_LESS_OPERATORS(LESS, "<", "less", "compareValues")
-        SCENES_VALUES_WITH_LESS_OPERATORS(GREATER, ">", "greater", "compareValues")
-        SCENES_VALUES_WITH_LESS_OPERATORS(LESS_EQUAL, "<=", "less equal", "compareValues")
-        SCENES_VALUES_WITH_LESS_OPERATORS(GREATER_EQUAL, ">=", "greater equal", "compareValues")
-        SCENES_VALUES_WITH_LESS_OPERATORS(EQUAL, "==", "equal", "compareValues")
-        SCENES_VALUES_WITH_LESS_OPERATORS(NOT_EQUAL, "!=", "not equal", "compareValues")
-        //////////////////////////////////////////////////////////////////////////////
-        SCENES_VALUES_WITH_LESS_OPERATORS(MAX, NULL, NULL, NULL)
-        /*******************************************************************************
-        *                          Extern Data Declarations
-        *******************************************************************************/
+    //////////////////////////////////////////////////////////////////////////////
+    SCENES_VALUES_WITH_LESS_OPERATORS(LESS, "<", "less", "compareValues")
+    SCENES_VALUES_WITH_LESS_OPERATORS(GREATER, ">", "greater", "compareValues")
+    SCENES_VALUES_WITH_LESS_OPERATORS(LESS_EQUAL, "<=", "less equal", "compareValues")
+    SCENES_VALUES_WITH_LESS_OPERATORS(GREATER_EQUAL, ">=", "greater equal", "compareValues")
+    SCENES_VALUES_WITH_LESS_OPERATORS(EQUAL, "==", "equal", "compareValues")
+    SCENES_VALUES_WITH_LESS_OPERATORS(NOT_EQUAL, "!=", "not equal", "compareValues")
+    //////////////////////////////////////////////////////////////////////////////
+    SCENES_VALUES_WITH_LESS_OPERATORS(MAX, NULL, NULL, NULL)
+    /*******************************************************************************
+     *                          Extern Data Declarations
+     *******************************************************************************/
 
-        /*******************************************************************************
-        *                          Extern Function Prototypes
-        *******************************************************************************/
-
+    /*******************************************************************************
+     *                          Extern Function Prototypes
+     *******************************************************************************/
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+#endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
-
+ *                          End of File
+ *******************************************************************************/

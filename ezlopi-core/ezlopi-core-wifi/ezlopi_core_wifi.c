@@ -31,7 +31,10 @@
 /**
  * @file    ezlopi_core_wifi.c
  * @brief   perform some function on wifi-operations
- * @author  xx
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version 0.1
  * @date    12th DEC 2024
  */

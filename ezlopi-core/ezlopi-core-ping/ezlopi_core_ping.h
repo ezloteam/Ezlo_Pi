@@ -31,57 +31,58 @@
 /**
  * @file    ezlopi_core_ping.h
  * @brief   Function to perfrom operation on ezlopi-ping-service
- * @author  xx
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version 0.1
  * @date    12th DEC 2024
-*/
+ */
 
 #ifndef _EZLOPI_CORE_PING_H_
 #define _EZLOPI_CORE_PING_H_
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include "../../build/config/sdkconfig.h"
 
 /*******************************************************************************
-*                          C++ Declaration Wrapper
-*******************************************************************************/
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
     /*******************************************************************************
-    *                          Type & Macro Declarations
-    *******************************************************************************/
+     *                          Type & Macro Declarations
+     *******************************************************************************/
 
-typedef enum e_ping_status
-{
-    EZLOPI_PING_STATUS_UNKNOWN = 0,
-    EZLOPI_PING_STATUS_LIVE,
-    EZLOPI_PING_STATUS_DISCONNECTED,
-} e_ping_status_t;
-
+    typedef enum e_ping_status
+    {
+        EZLOPI_PING_STATUS_UNKNOWN = 0,
+        EZLOPI_PING_STATUS_LIVE,
+        EZLOPI_PING_STATUS_DISCONNECTED,
+    } e_ping_status_t;
 
 #ifdef CONFIG_EZPI_ENABLE_PING
     /*******************************************************************************
-    *                          Extern Data Declarations
-    *******************************************************************************/
+     *                          Extern Data Declarations
+     *******************************************************************************/
 
     /*******************************************************************************
-    *                          Extern Function Prototypes
-    *******************************************************************************/
+     *                          Extern Function Prototypes
+     *******************************************************************************/
 
-   
     /**
      * @brief Function to initialize ping service
-     * 
+     *
      */
     void EZPI_ping_init(void);
     /**
      * @brief Function to get internet status
-     * 
-     * @return e_ping_status_t 
+     *
+     * @return e_ping_status_t
      */
     e_ping_status_t EZPI_core_ping_get_internet_status(void);
 
@@ -94,5 +95,5 @@ typedef enum e_ping_status
 #endif // _EZLOPI_CORE_PING_H_
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/        
+ *                          End of File
+ *******************************************************************************/

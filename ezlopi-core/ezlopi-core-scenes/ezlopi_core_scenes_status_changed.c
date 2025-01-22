@@ -31,7 +31,10 @@
 /**
  * @file    ezlopi_core_scenes_status_changed.c
  * @brief   These function operates on scene status info
- * @author  xx
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version 0.1
  * @date    12th DEC 2024
  */

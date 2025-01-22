@@ -31,7 +31,10 @@
 /**
  * @file    ezlopi_core_modes_cjson.c
  * @brief   These functions perform operations related to house-mode cjsons
- * @author  xx
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version 0.1
  * @date    12th DEC 2024
  */

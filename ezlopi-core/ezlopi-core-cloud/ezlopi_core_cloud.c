@@ -29,41 +29,44 @@
 ** ===========================================================================
 */
 /**
-* @file    ezlopi_core_cloud.c
-* @brief   perform some function on core-cloud properties
-* @author  xx
-* @version 0.1
-* @date    12th DEC 2024
-*/
+ * @file    ezlopi_core_cloud.c
+ * @brief   perform some function on core-cloud properties
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
+ * @version 0.1
+ * @date    12th DEC 2024
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include <esp_system.h>
 
 #include "ezlopi_core_cloud.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 #define CRC16_POLY 0x4460
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static uint32_t ezlopi_get_mac_crc(void);
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 static uint32_t g_device_id = 0;
 static uint32_t g_item_id = 0;
 static uint32_t g_room_id = 0;
@@ -78,8 +81,8 @@ static uint32_t g_device_group_id = 0;
 static uint32_t g_item_group_id = 0;
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 const uint32_t DEVICE_ID_START = 0x10000000;
 const uint32_t ITEM_ID_START = 0x20000000;
 const uint32_t ROOM_ID_START = 0x30000000;
@@ -94,8 +97,8 @@ const uint32_t DEVICE_GROUPID_START = 0xC0000000;
 const uint32_t ITEM_GROUPID_START = 0xD0000000;
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 void EZPI_core_cloud_update_device_id(uint32_t device_id)
 {
     g_device_id = (device_id > g_device_id) ? device_id : g_device_id;
@@ -243,12 +246,12 @@ void EZPI_core_cloud_update_item_group_id(uint32_t a_item_group_id)
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 static uint32_t ezlopi_get_mac_crc(void)
 {
     uint32_t crc = 0;
-    uint8_t mac_base[6] = { 0 };
+    uint8_t mac_base[6] = {0};
     esp_efuse_mac_get_default((uint8_t *)mac_base);
 
     // Perform CRC calculation on each byte of the MAC address
@@ -273,9 +276,5 @@ static uint32_t ezlopi_get_mac_crc(void)
 }
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
-
-
-
-
+ *                          End of File
+ *******************************************************************************/

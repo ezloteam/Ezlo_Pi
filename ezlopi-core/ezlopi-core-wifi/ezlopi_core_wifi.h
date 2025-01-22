@@ -31,17 +31,20 @@
 /**
  * @file    ezlopi_core_wifi.h
  * @brief   perform some function on wifi-operations
- * @author  xx
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version 0.1
  * @date    12th DEC 2024
-*/
+ */
 
 #ifndef _EZLOPI_CORE_WIFI_H_
 #define _EZLOPI_CORE_WIFI_H_
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 
 #include "esp_netif_types.h"
 #include "esp_wifi_types.h"
@@ -50,16 +53,17 @@
 #include "ezlopi_core_errors.h"
 
 /*******************************************************************************
-*                          C++ Declaration Wrapper
-*******************************************************************************/
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
     /*******************************************************************************
-    *                          Type & Macro Declarations
-    *******************************************************************************/typedef void (*f_ezlopi_wifi_event_upcall)(esp_event_base_t event, int32_t event_id, void *arg);
+     *                          Type & Macro Declarations
+     *******************************************************************************/
+    typedef void (*f_ezlopi_wifi_event_upcall)(esp_event_base_t event, int32_t event_id, void *arg);
 
     typedef struct ll_ezlopi_wifi_event_upcall
     {
@@ -76,12 +80,12 @@ extern "C"
     } ezlopi_wifi_status_t;
 
     /*******************************************************************************
-    *                          Extern Data Declarations
-    *******************************************************************************/
+     *                          Extern Data Declarations
+     *******************************************************************************/
 
     /*******************************************************************************
-    *                          Extern Function Prototypes
-    *******************************************************************************/
+     *                          Extern Function Prototypes
+     *******************************************************************************/
 
     /**
      * @brief Function to get wifi IP
@@ -179,5 +183,5 @@ extern "C"
 #endif // _EZLOPI_CORE_WIFI_H_
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

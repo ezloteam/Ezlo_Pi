@@ -31,7 +31,9 @@
 /**
  * @file    ezlopi_core_device_group.c
  * @brief   These function perform operation on device-groups
- * @author  xx
+ * @author  Riken Maharjan
+ *          Lomas Subedi
+ *          Nabin Dangi
  * @version 0.1
  * @date    12th DEC 2024
  */

@@ -31,32 +31,35 @@
 /**
  * @file    ezlopi_core_cloud.h
  * @brief   perform some function on core-cloud properties
- * @author  xx
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version 0.1
  * @date    12th DEC 2024
-*/
+ */
 #ifndef _EZLOPI_CORE_CLOUD_H_
 #define _EZLOPI_CORE_CLOUD_H_
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include <stdbool.h>
 #include <stdint.h>
 
 #include "cjext.h"
 
 /*******************************************************************************
-*                          C++ Declaration Wrapper
-*******************************************************************************/
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
     /*******************************************************************************
-    *                          Type & Macro Declarations
-    *******************************************************************************/
+     *                          Type & Macro Declarations
+     *******************************************************************************/
     typedef struct s_ezlopi_cloud_controller
     {
         char parent_device_id[40]; // 'parentDeviceId' -> https://api.ezlo.com/hub/devices_api/index.html
@@ -133,8 +136,8 @@ extern "C"
     } s_ezlopi_cloud_info_t;
 
     /*******************************************************************************
-    *                          Extern Data Declarations
-    *******************************************************************************/
+     *                          Extern Data Declarations
+     *******************************************************************************/
     extern const uint32_t DEVICE_ID_START;
     extern const uint32_t ITEM_ID_START;
     extern const uint32_t ROOM_ID_START;
@@ -148,8 +151,8 @@ extern "C"
     extern const uint32_t DEVICE_GROUPID_START;
 
     /*******************************************************************************
-    *                          Extern Function Prototypes
-    *******************************************************************************/
+     *                          Extern Function Prototypes
+     *******************************************************************************/
     /**
      * @brief Funtion return new device_id
      *
@@ -293,9 +296,5 @@ extern "C"
 #endif // _EZLOPI_CORE_CLOUD_H_
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
-
-
-
-
+ *                          End of File
+ *******************************************************************************/

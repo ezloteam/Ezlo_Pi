@@ -31,31 +31,34 @@
 /**
  * @file    ezlopi_core_scenes_methods.h
  * @brief   perform some function on data
- * @author  xx
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version 0.1
  * @date    12th DEC 2024
-*/
+ */
 #ifndef _EZLOPI_CORE_SCENES_METHODS_H_
 #define _EZLOPI_CORE_SCENES_METHODS_H_
 
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include <string.h>
 
 /*******************************************************************************
-*                          C++ Declaration Wrapper
-*******************************************************************************/
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
     /*******************************************************************************
-    *                          Type & Macro Declarations
-    *******************************************************************************/
+     *                          Type & Macro Declarations
+     *******************************************************************************/
     typedef enum e_scenes_method_category
     {
         METHOD_CATEGORY_NAN = 0,
@@ -65,7 +68,7 @@ extern "C"
         METHOD_CATEGORY_WHEN_FUNCTION,
         METHOD_CATEGORY_UNDEFINED,
         METHOD_CATEGORY_MAX
-    }e_scenes_method_category_t;
+    } e_scenes_method_category_t;
 
     typedef enum e_scene_method_type
     {
@@ -75,12 +78,12 @@ extern "C"
     } e_scene_method_type_t;
 
     /*******************************************************************************
-    *                          Extern Data Declarations
-    *******************************************************************************/
+     *                          Extern Data Declarations
+     *******************************************************************************/
 
     /*******************************************************************************
-    *                          Extern Function Prototypes
-    *******************************************************************************/
+     *                          Extern Function Prototypes
+     *******************************************************************************/
     /**
      * @brief Returns the enum equivalent of scene method with 'method_name'
      *
@@ -103,23 +106,16 @@ extern "C"
      */
     e_scenes_method_category_t EZPI_scene_get_scene_method_category_enum(char *method_name);
 
-
 #ifdef __cplusplus
 }
 #endif
-
 
 #endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 #endif // _EZLOPI_CORE_SCENES_METHODS_H_
 
-
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
-
-
-
-
+ *                          End of File
+ *******************************************************************************/
 
 /* then methods */

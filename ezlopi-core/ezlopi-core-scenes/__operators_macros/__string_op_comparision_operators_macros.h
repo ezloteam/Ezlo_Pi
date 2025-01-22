@@ -31,55 +31,57 @@
 /**
  * @file    __string_op_comparision_operators_macros.h
  * @brief   MACROS to generate enums for 'string_op' comparision operators
- * @author  xx
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version 0.1
  * @date    12th DEC 2024
-*/
+ */
 
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          C++ Declaration Wrapper
-*******************************************************************************/
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
     /*******************************************************************************
-    *                          Type & Macro Declarations
-    *******************************************************************************/
+     *                          Type & Macro Declarations
+     *******************************************************************************/
     SCENES_STROPS_COMP_OPERATORES(NONE, NULL, NULL, NULL)
-        //////////////////////////////////////////////////////////////////////////////
-        SCENES_STROPS_COMP_OPERATORES(BEGINS_WITH, "begin", "begins with", "stringOperation")
-        SCENES_STROPS_COMP_OPERATORES(ENDS_WITH, "end", "ends with", "stringOperation")
-        SCENES_STROPS_COMP_OPERATORES(CONTAINS, "contain", "contains", "stringOperation")
-        SCENES_STROPS_COMP_OPERATORES(LENGTH, "length", "length equal to", "stringOperation")
-        SCENES_STROPS_COMP_OPERATORES(NOT_BEGIN, "not_begin", "doesn't begin with", "stringOperation")
-        SCENES_STROPS_COMP_OPERATORES(NOT_END, "not_end", "doesn't end with", "stringOperation")
-        SCENES_STROPS_COMP_OPERATORES(NOT_CONTAIN, "not_contain", "doesn't contain", "stringOperation")
-        SCENES_STROPS_COMP_OPERATORES(NOT_LENGTH, "not_length", "length not equal to", "stringOperation")
-        //////////////////////////////////////////////////////////////////////////////
-        SCENES_STROPS_COMP_OPERATORES(MAX, NULL, NULL, NULL)
-        /*******************************************************************************
-        *                          Extern Data Declarations
-        *******************************************************************************/
+    //////////////////////////////////////////////////////////////////////////////
+    SCENES_STROPS_COMP_OPERATORES(BEGINS_WITH, "begin", "begins with", "stringOperation")
+    SCENES_STROPS_COMP_OPERATORES(ENDS_WITH, "end", "ends with", "stringOperation")
+    SCENES_STROPS_COMP_OPERATORES(CONTAINS, "contain", "contains", "stringOperation")
+    SCENES_STROPS_COMP_OPERATORES(LENGTH, "length", "length equal to", "stringOperation")
+    SCENES_STROPS_COMP_OPERATORES(NOT_BEGIN, "not_begin", "doesn't begin with", "stringOperation")
+    SCENES_STROPS_COMP_OPERATORES(NOT_END, "not_end", "doesn't end with", "stringOperation")
+    SCENES_STROPS_COMP_OPERATORES(NOT_CONTAIN, "not_contain", "doesn't contain", "stringOperation")
+    SCENES_STROPS_COMP_OPERATORES(NOT_LENGTH, "not_length", "length not equal to", "stringOperation")
+    //////////////////////////////////////////////////////////////////////////////
+    SCENES_STROPS_COMP_OPERATORES(MAX, NULL, NULL, NULL)
+    /*******************************************************************************
+     *                          Extern Data Declarations
+     *******************************************************************************/
 
-        /*******************************************************************************
-        *                          Extern Function Prototypes
-        *******************************************************************************/
-
+    /*******************************************************************************
+     *                          Extern Function Prototypes
+     *******************************************************************************/
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+#endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

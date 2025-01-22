@@ -29,16 +29,19 @@
 ** ===========================================================================
 */
 /**
-* @file    ezlopi_hal_pwm.c
-* @brief   perform some function on PWM
-* @author  xx
-* @version 0.1
-* @date    xx
-*/
+ * @file    ezlopi_hal_pwm.c
+ * @brief   perform some function on PWM
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
+ * @version 0.1
+ * @date    xx
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include <string.h>
 #include <stdlib.h>
 
@@ -46,18 +49,17 @@
 #include "ezlopi_util_trace.h"
 #include "EZLOPI_USER_CONFIG.h"
 
+/*******************************************************************************
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
-
-/*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 struct s_ezlopi_pwm_object
 {
     ledc_timer_config_t *ledc_timer_configuration;
@@ -65,29 +67,29 @@ struct s_ezlopi_pwm_object
 };
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static uint8_t get_available_channel();
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 
-#if CONFIG_IDF_TARGET_ESP32 
-static bool available_channels[LEDC_CHANNEL_MAX] = { false, true, true, true, true, true, true };
+#if CONFIG_IDF_TARGET_ESP32
+static bool available_channels[LEDC_CHANNEL_MAX] = {false, true, true, true, true, true, true};
 #elif CONFIG_IDF_TARGET_ESP32S2 || CONFIG_IDF_TARGET_ESP32S3
-static bool available_channels[LEDC_CHANNEL_MAX] = { true, true, true, true, true, true, true };
+static bool available_channels[LEDC_CHANNEL_MAX] = {true, true, true, true, true, true, true};
 #elif CONFIG_IDF_TARGET_ESP32C2 || CONFIG_IDF_TARGET_ESP32C3
-static bool available_channels[LEDC_CHANNEL_MAX] = { true, true, true, true, true };
+static bool available_channels[LEDC_CHANNEL_MAX] = {true, true, true, true, true};
 #endif
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 
 s_ezlopi_channel_speed_t *EZPI_hal_pwm_init(uint8_t pwm_gpio_num, uint8_t pwm_resln, uint32_t freq_hz, uint32_t duty_cycle)
 {
@@ -164,8 +166,8 @@ uint32_t EZPI_hal_pwm_get_duty(uint32_t channel, uint32_t speed_mode)
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 static uint8_t get_available_channel()
 {
     uint8_t channel = 0;
@@ -182,5 +184,5 @@ static uint8_t get_available_channel()
 }
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

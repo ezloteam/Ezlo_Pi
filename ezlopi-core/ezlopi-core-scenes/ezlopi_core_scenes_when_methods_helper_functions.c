@@ -31,7 +31,10 @@
 /**
  * @file    ezlopi_core_scenes_when_methods_helper_functions.c
  * @brief   Functions that operates on scene-when-methods
- * @author  xx
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version 0.1
  * @date    12th DEC 2024
  */

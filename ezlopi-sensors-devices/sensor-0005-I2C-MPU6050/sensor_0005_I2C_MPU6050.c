@@ -31,7 +31,9 @@
 /**
  * @file    sensor_0005_I2C_MPU6050.c
  * @brief   perform some function on sensor_0005
- * @author  xx
+ * @author  Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version 0.1
  * @date    xx
  */

@@ -31,40 +31,42 @@
 /**
  * @file    ezlopi_core_valueformatter.h
  * @brief   perform some function on valueformatting operation
- * @author  xx
+ * @author  Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version 0.1
  * @date    12th DEC 2024
-*/
+ */
 
 #ifndef _EZLOPI_VALUEFORMATER_H_
 #define _EZLOPI_VALUEFORMATER_H_
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 
 #include <stdbool.h>
 #include "cjext.h"
 
 /*******************************************************************************
-*                          C++ Declaration Wrapper
-*******************************************************************************/
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
     /*******************************************************************************
-    *                          Type & Macro Declarations
-    *******************************************************************************/
+     *                          Type & Macro Declarations
+     *******************************************************************************/
 
     /*******************************************************************************
-    *                          Extern Data Declarations
-    *******************************************************************************/
+     *                          Extern Data Declarations
+     *******************************************************************************/
 
     /*******************************************************************************
-    *                          Extern Function Prototypes
-    *******************************************************************************/
+     *                          Extern Function Prototypes
+     *******************************************************************************/
 
     /**
      * @brief Function to convert 'bool' to cjson obj
@@ -75,38 +77,37 @@ extern "C"
      */
     void EZPI_core_valueformatter_bool_to_cjson(cJSON *cj_root, bool value, const char *scale);
     /**
-    * @brief Function to convert 'float' to cjson obj
-    *
-    * @param cj_root Destinaiton obj to store the converted values
-    * @param value New value 'float'
-    * @param scale Scale of the value
-    */
+     * @brief Function to convert 'float' to cjson obj
+     *
+     * @param cj_root Destinaiton obj to store the converted values
+     * @param value New value 'float'
+     * @param scale Scale of the value
+     */
     void EZPI_core_valueformatter_float_to_cjson(cJSON *cj_root, float value, const char *scale);
     /**
-    * @brief Function to convert 'double' to cjson obj
-    *
-    * @param cj_root Destinaiton obj to store the converted values
-    * @param value New value 'double'
-    * @param scale Scale of the value
-    */
+     * @brief Function to convert 'double' to cjson obj
+     *
+     * @param cj_root Destinaiton obj to store the converted values
+     * @param value New value 'double'
+     * @param scale Scale of the value
+     */
     void EZPI_core_valueformatter_double_to_cjson(cJSON *cj_root, double value, const char *scale);
     /**
-    * @brief Function to convert 'int32_t' to cjson obj
-    *
-    * @param cj_root Destinaiton obj to store the converted values
-    * @param value New value 'int32_t'
-    * @param scale Scale of the value
-    */
+     * @brief Function to convert 'int32_t' to cjson obj
+     *
+     * @param cj_root Destinaiton obj to store the converted values
+     * @param value New value 'int32_t'
+     * @param scale Scale of the value
+     */
     void EZPI_core_valueformatter_int32_to_cjson(cJSON *cj_root, int value, const char *scale);
     /**
-    * @brief Function to convert 'uint32_t' to cjson obj
-    *
-    * @param cj_root Destinaiton obj to store the converted values
-    * @param value New value 'uint32_t'
-    * @param scale Scale of the value
-    */
+     * @brief Function to convert 'uint32_t' to cjson obj
+     *
+     * @param cj_root Destinaiton obj to store the converted values
+     * @param value New value 'uint32_t'
+     * @param scale Scale of the value
+     */
     void EZPI_core_valueformatter_uint32_to_cjson(cJSON *cj_root, uint32_t value, const char *scale);
-
 
 #ifdef __cplusplus
 }
@@ -115,8 +116,5 @@ extern "C"
 #endif // _EZLOPI_VALUEFORMATER_H_
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
-
-
-
+ *                          End of File
+ *******************************************************************************/

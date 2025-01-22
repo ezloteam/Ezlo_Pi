@@ -1,8 +1,11 @@
 
 /**
- * @file    ezlopi_cloud_keywords.c
+ * @file    ezlopi_cloud_device_types_str.c
  * @brief
  * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version
  * @date
  */

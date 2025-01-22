@@ -31,54 +31,53 @@
 /**
  * @file    ezlopi_core_scenes_notifications.h
  * @brief   perform scenes_notification related operations
- * @author  xx
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version 0.1
  * @date    12th DEC 2024
-*/
+ */
 #ifndef _EZLOPI_CORE_SCENES_NOTIFICATIONS_H_
 #define _EZLOPI_CORE_SCENES_NOTIFICATIONS_H_
 
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include "cjext.h"
 
 /*******************************************************************************
-*                          C++ Declaration Wrapper
-*******************************************************************************/
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
     /*******************************************************************************
-    *                          Type & Macro Declarations
-    *******************************************************************************/
+     *                          Type & Macro Declarations
+     *******************************************************************************/
 
     /*******************************************************************************
-    *                          Extern Data Declarations
-    *******************************************************************************/
+     *                          Extern Data Declarations
+     *******************************************************************************/
 
     /*******************************************************************************
-    *                          Extern Function Prototypes
-    *******************************************************************************/
+     *                          Extern Function Prototypes
+     *******************************************************************************/
     /**
-    * @brief Function to add users to scene-notification
-    */
+     * @brief Function to add users to scene-notification
+     */
     void EZPI_scenes_notifications_add(cJSON *cj_notifications);
     // void EZPI_scenes_notifications_remove(cJSON *cj_notifications);
 
 #ifdef __cplusplus
 }
 #endif
-#endif  // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+#endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 #endif // _EZLOPI_CORE_SCENES_NOTIFICATIONS_H_
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
-
-
-
-
+ *                          End of File
+ *******************************************************************************/

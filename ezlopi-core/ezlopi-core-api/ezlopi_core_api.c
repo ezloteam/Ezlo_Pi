@@ -32,7 +32,10 @@
 /**
  * @file    ezlopi_core_api.c
  * @brief   These function perform operation on API-methods
- * @author  xx
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version 0.1
  * @date    12th DEC 2024
  */

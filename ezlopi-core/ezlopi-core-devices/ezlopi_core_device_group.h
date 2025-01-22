@@ -31,29 +31,31 @@
 /**
  * @file    ezlopi_core_device_group.h
  * @brief   These function perform operation on device-groups
- * @author  xx
+ * @author  Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version 0.1
  * @date    12th DEC 2024
-*/
+ */
 #ifndef _EZLOPI_CORE_DEVICES_GROUP_H_
 #define _EZLOPI_CORE_DEVICES_GROUP_H_
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include "ezlopi_core_devices.h"
 
 /*******************************************************************************
-*                          C++ Declaration Wrapper
-*******************************************************************************/
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
     /*******************************************************************************
-    *                          Type & Macro Declarations
-    *******************************************************************************/
+     *                          Type & Macro Declarations
+     *******************************************************************************/
     typedef enum e_ezlopi_device_grp_entrydelay_type
     {
         EZLOPI_DEVICE_GRP_ENTRYDELAY_UNDEFINED = 0,
@@ -63,7 +65,7 @@ extern "C"
         EZLOPI_DEVICE_GRP_ENTRYDELAY_EXTENDED,
         EZLOPI_DEVICE_GRP_ENTRYDELAY_INSTANT,
         EZLOPI_DEVICE_GRP_ENTRYDELAY_MAX
-    }e_ezlopi_device_grp_entrydelay_type_t;
+    } e_ezlopi_device_grp_entrydelay_type_t;
 
     typedef enum e_ezlopi_device_grp_role_type
     {
@@ -71,7 +73,7 @@ extern "C"
         EZLOPI_DEVICE_GRP_ROLE_USER,
         EZLOPI_DEVICE_GRP_ROLE_HOUSE_MODES,
         EZLOPI_DEVICE_GRP_ROLE_MAX
-    }e_ezlopi_device_grp_role_type_t;
+    } e_ezlopi_device_grp_role_type_t;
 
     typedef enum e_ezlopi_item_grp_role_type
     {
@@ -79,46 +81,46 @@ extern "C"
         EZLOPI_ITEM_GRP_ROLE_LIFE_SAFETY,
         EZLOPI_ITEM_GRP_ROLE_HOUSE_MODES,
         EZLOPI_ITEM_GRP_ROLE_MAX
-    }e_ezlopi_item_grp_role_type_t;
+    } e_ezlopi_item_grp_role_type_t;
 
     typedef struct l_ezlopi_device_grp
     {
-        cJSON *categories;         // array containing required categories/sub-categories
-        cJSON *devices;            // array containing DeviceIds to be added
-        cJSON *exceptions;         // array of DeviceIds to exclude from this group
-        char *name;             // device_group_name
+        cJSON *categories; // array containing required categories/sub-categories
+        cJSON *devices;    // array containing DeviceIds to be added
+        cJSON *exceptions; // array of DeviceIds to exclude from this group
+        char *name;        // device_group_name
         char *package_id;
         e_ezlopi_device_grp_entrydelay_type_t entry_delay;
         e_ezlopi_device_grp_role_type_t role;
-        uint32_t _id;               // perticular device_group_id
+        uint32_t _id; // perticular device_group_id
         bool persistent;
         bool follow_entry;
         struct l_ezlopi_device_grp *next;
-    }l_ezlopi_device_grp_t;
+    } l_ezlopi_device_grp_t;
 
     typedef struct l_ezlopi_item_grp
     {
-        cJSON *item_names;                 // array containing 'Item_names' as filters
-        cJSON *enum_values;                // array of strings ; used to filter specifice 'tokens' [from valueType -> token]
-        cJSON *info;                       // Description of an item group.
+        cJSON *item_names;  // array containing 'Item_names' as filters
+        cJSON *enum_values; // array of strings ; used to filter specifice 'tokens' [from valueType -> token]
+        cJSON *info;        // Description of an item group.
         char *name;
-        char *value_type;                // 'valueType' -> https://api.ezlo.com/hub/items_api/index.html, // ezlopi-cloud/constants/values_str.h 
-        char *value_type_family;          // [yes, if there is no valueType field] 'valueType_family' :- one of ["numeric" / "string" / "valuesWithLess" / "valuesWithoutLess"]
+        char *value_type;                   // 'valueType' -> https://api.ezlo.com/hub/items_api/index.html, // ezlopi-cloud/constants/values_str.h
+        char *value_type_family;            // [yes, if there is no valueType field] 'valueType_family' :- one of ["numeric" / "string" / "valuesWithLess" / "valuesWithoutLess"]
         e_ezlopi_item_grp_role_type_t role; // default : empty
         uint32_t _id;
         bool has_getter;
         bool has_setter;
         bool persistent;
         struct l_ezlopi_item_grp *next;
-    }l_ezlopi_item_grp_t;
+    } l_ezlopi_item_grp_t;
 
     /*******************************************************************************
-    *                          Extern Data Declarations
-    *******************************************************************************/
+     *                          Extern Data Declarations
+     *******************************************************************************/
 
     /*******************************************************************************
-    *                          Extern Function Prototypes
-    *******************************************************************************/
+     *                          Extern Function Prototypes
+     *******************************************************************************/
 
     /**
      * @brief This function return 'device_group_head' node from ll
@@ -150,11 +152,11 @@ extern "C"
      */
     cJSON *EZPI_core_device_group_create_cjson(l_ezlopi_device_grp_t *devgrp_node);
     /**
-    * @brief This function generates equivalent 'cjson' object of the input 'l_ezlopi_item_grp_t*'
-    *
-    * @param itemgrp_node The node to be converted
-    * @return cJSON* : ( NOTE!! Must be freed after use )
-    */
+     * @brief This function generates equivalent 'cjson' object of the input 'l_ezlopi_item_grp_t*'
+     *
+     * @param itemgrp_node The node to be converted
+     * @return cJSON* : ( NOTE!! Must be freed after use )
+     */
     cJSON *EZPI_core_item_group_create_cjson(l_ezlopi_item_grp_t *itemgrp_node);
     /**
      * @brief This function handles editing of req_id in ll & nvs
@@ -265,18 +267,14 @@ extern "C"
      */
     void EZPI_item_group_init(void);
 
-
-
 #ifdef __cplusplus
 }
 #endif
 
-#endif//_EZLOPI_CORE_DEVICES_GROUP_H_
+#endif //_EZLOPI_CORE_DEVICES_GROUP_H_
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
-
-
+ *                          End of File
+ *******************************************************************************/
 
 // ----------------------------------------------------

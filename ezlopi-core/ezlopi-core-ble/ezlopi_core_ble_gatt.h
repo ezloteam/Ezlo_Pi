@@ -31,17 +31,20 @@
 /**
  * @file    ezlopi_core_ble_gatt.h
  * @brief   perform some function on ble-gatt operations
- * @author  xx
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version 0.1
  * @date    12th DEC 2024
-*/
+ */
 
 #ifndef _EZLOPI_CORE_BLE_GATT_H_
 #define _EZLOPI_CORE_BLE_GATT_H_
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_BLE_ENABLE
@@ -49,29 +52,29 @@
 #include "ezlopi_core_ble_config.h"
 
 /*******************************************************************************
-*                          C++ Declaration Wrapper
-*******************************************************************************/
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
     /*******************************************************************************
-    *                          Type & Macro Declarations
-    *******************************************************************************/
+     *                          Type & Macro Declarations
+     *******************************************************************************/
 
     /*******************************************************************************
-    *                          Extern Data Declarations
-    *******************************************************************************/
+     *                          Extern Data Declarations
+     *******************************************************************************/
 
     /*******************************************************************************
-    *                          Extern Function Prototypes
-    *******************************************************************************/
+     *                          Extern Function Prototypes
+     *******************************************************************************/
     /**
-    * @brief This function return max ble-data size
-    *
-    * @return uint16_t
-    */
+     * @brief This function return max ble-data size
+     *
+     * @return uint16_t
+     */
     uint16_t EZPI_core_ble_gatt_get_max_data_size(void);
     /**
      * @brief Function to handle ble-gatt event
@@ -99,5 +102,5 @@ extern "C"
 #endif // _EZLOPI_CORE_BLE_GATT_H_
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

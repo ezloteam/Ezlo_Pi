@@ -31,10 +31,13 @@
 /**
  * @file    ezlopi_core_scenes_when_methods_helper_functions.h
  * @brief   Functions that operates on scene-when-methods
- * @author  xx
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version 0.1
  * @date    12th DEC 2024
-*/
+ */
 
 #ifndef _EZLOPI_CORE_SCENES_WHEN_METHODS_HELPER_FUNCTIONS_H_
 #define _EZLOPI_CORE_SCENES_WHEN_METHODS_HELPER_FUNCTIONS_H_
@@ -42,23 +45,23 @@
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include <time.h>
 #include <stdint.h>
 #include "cjext.h"
 
 /*******************************************************************************
-*                          C++ Declaration Wrapper
-*******************************************************************************/
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
     /*******************************************************************************
-    *                          Type & Macro Declarations
-    *******************************************************************************/
+     *                          Type & Macro Declarations
+     *******************************************************************************/
     typedef enum e_isdate_modes
     {
         ISDATE_DAILY_MODE = 0,
@@ -81,19 +84,19 @@ extern "C"
     typedef struct s_isdate_method
     {
         const char *field_name;
-        uint8_t(*field_func)(e_isdate_modes_t *mode_type, struct tm *info, l_fields_v2_t *curr_field);
+        uint8_t (*field_func)(e_isdate_modes_t *mode_type, struct tm *info, l_fields_v2_t *curr_field);
     } s_isdate_method_t;
 
     typedef struct s_issunstate_method
     {
         const char *field_name;
-        uint8_t(*field_func)(l_scenes_list_v2_t *scene_node, l_fields_v2_t *curr_field, struct tm *info, uint8_t curr_sunstate_mode);
+        uint8_t (*field_func)(l_scenes_list_v2_t *scene_node, l_fields_v2_t *curr_field, struct tm *info, uint8_t curr_sunstate_mode);
     } s_issunstate_method_t;
 
     typedef struct s_isonce_method
     {
         const char *field_name;
-        uint8_t(*field_func)(l_fields_v2_t *curr_field, struct tm *info);
+        uint8_t (*field_func)(l_fields_v2_t *curr_field, struct tm *info);
     } s_isonce_method_t;
 
     typedef struct s_isdate_range_method
@@ -110,25 +113,24 @@ extern "C"
 
     typedef union s_item_expn_data
     {
-        e_value_type_t e_type;  // the data's nature
+        e_value_type_t e_type;      // the data's nature
         u_field_value_v2_t u_value; // reutilizing the field structure to store extracted data
     } s_item_expn_data_t;
 
     typedef struct s_item_exp_data
     {
-        s_item_expn_data_t sample_data;     // this contains value 
+        s_item_expn_data_t sample_data;     // this contains value
         e_scene_value_type_v2_t value_type; // all scenes_value_types
-        uint8_t status;                 // This is used to identify what to do next. | [BIT2 =activation_flag , BIT1 =finish_flag , BIT2 =start_flag]
+        uint8_t status;                     // This is used to identify what to do next. | [BIT2 =activation_flag , BIT1 =finish_flag , BIT2 =start_flag]
     } s_item_exp_data_t;
 
+    /*******************************************************************************
+     *                          Extern Data Declarations
+     *******************************************************************************/
 
     /*******************************************************************************
-    *                          Extern Data Declarations
-    *******************************************************************************/
-
-    /*******************************************************************************
-    *                          Extern Function Prototypes
-    *******************************************************************************/
+     *                          Extern Function Prototypes
+     *******************************************************************************/
 
     //------------------------------- EZPI_core_scenes_when_is_itemState ------------------------------------------
     int ISITEM_state_single_condition(uint32_t item_id, l_fields_v2_t *value_field);
@@ -185,7 +187,6 @@ extern "C"
     //------------------------------- EZPI_core_scene_when_isItemStateChanged_method -----------------------------------
     int IS_itemstate_changed(s_item_exp_data_t *new_user_data, l_fields_v2_t *start_field, l_fields_v2_t *finish_field, l_scenes_list_v2_t *scene_node);
 
-
 #ifdef __cplusplus
 }
 #endif
@@ -193,6 +194,6 @@ extern "C"
 #endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 #endif /*_EZLOPI_CORE_SCENES_WHEN_METHODS_HELPER_FUNCTIONS_H_*/
-/*******************************************************************************
-*                          End of File
-*******************************************************************************/
+       /*******************************************************************************
+        *                          End of File
+        *******************************************************************************/

@@ -31,17 +31,20 @@
 /**
  * @file    ezlopi_core_http.h
  * @brief   Function to perform operation on http
- * @author  xx
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version 0.1
  * @date    12th DEC 2024
-*/
+ */
 
 #ifndef _EZLOPI_CORE_HTTP_H_
 #define _EZLOPI_CORE_HTTP_H_
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include <stdio.h>
 #include <string.h>
 
@@ -58,16 +61,16 @@
 #include "ezlopi_core_errors.h"
 
 /*******************************************************************************
-*                          C++ Declaration Wrapper
-*******************************************************************************/
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
     /*******************************************************************************
-    *                          Type & Macro Declarations
-    *******************************************************************************/
+     *                          Type & Macro Declarations
+     *******************************************************************************/
 
     typedef struct s_rx_chunk
     {
@@ -75,7 +78,6 @@ extern "C"
         char *ptr;
         struct s_rx_chunk *next;
     } s_rx_chunk_t;
-
 
     typedef struct
     {
@@ -98,10 +100,10 @@ extern "C"
         esp_http_client_method_t method; // default :- GET_METHOD
         bool skip_cert_common_name_check;
         int web_port;
-        char *url;        // ptr => complete_url [.eg. https://www.google.com/json?username=qqqq&password=zzzz ]
-        char *web_server; // ptr => web_sever_name [.eg. www.google.com]
+        char *url;         // ptr => complete_url [.eg. https://www.google.com/json?username=qqqq&password=zzzz ]
+        char *web_server;  // ptr => web_sever_name [.eg. www.google.com]
         char *target_page; // ptr => target_page [.eg. ...src/page... ]
-        char *header;     // ptr => headers [.eg. {"Accept" : "*/*", ....}]
+        char *header;      // ptr => headers [.eg. {"Accept" : "*/*", ....}]
         char *content;
         char *username;
         char *password;
@@ -118,12 +120,12 @@ extern "C"
     } s_ezlopi_core_http_mbedtls_t;
 
     /*******************************************************************************
-    *                          Extern Data Declarations
-    *******************************************************************************/
+     *                          Extern Data Declarations
+     *******************************************************************************/
 
     /*******************************************************************************
-    *                          Extern Function Prototypes
-    *******************************************************************************/
+     *                          Extern Function Prototypes
+     *******************************************************************************/
 
     /**
      * @brief Function to return remaining space in *dest_buffer.
@@ -180,14 +182,12 @@ extern "C"
      */
     s_ezlopi_http_data_t *EZPI_core_http_post_request(const char *cloud_url, const char *location, cJSON *headers, const char *private_key, const char *shared_key, const char *ca_certificate);
 
-
 #ifdef __cplusplus
 }
 #endif
 
 #endif // _EZLOPI_CORE_HTTP_H_
 
-
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

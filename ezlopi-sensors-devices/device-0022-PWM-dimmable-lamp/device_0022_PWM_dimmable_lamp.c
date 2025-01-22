@@ -31,7 +31,9 @@
 /**
  * @file    device_0022_PWM_dimmable_lamp.c
  * @brief   perform some function on device_0022
- * @author  xx
+ * @author  Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version 0.1
  * @date    xx
  */

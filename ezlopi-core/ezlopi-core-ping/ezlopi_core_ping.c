@@ -29,16 +29,19 @@
 ** ===========================================================================
 */
 /**
-* @file    ezlopi_core_ping.c
-* @brief   Function to perfrom operation on ezlopi-ping-service
-* @author  xx
-* @version 0.1
-* @date    12th DEC 2024
-*/
+ * @file    ezlopi_core_ping.c
+ * @brief   Function to perfrom operation on ezlopi-ping-service
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
+ * @version 0.1
+ * @date    12th DEC 2024
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 
 #include "../../build/config/sdkconfig.h"
 #ifdef CONFIG_EZPI_ENABLE_PING
@@ -62,38 +65,38 @@
 #include "ezlopi_core_ping.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static void __on_ping_end(esp_ping_handle_t hdl, void *args);
 static void __on_ping_success(esp_ping_handle_t hdl, void *args);
 static void __on_ping_timeout(esp_ping_handle_t hdl, void *args);
 
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 
 static uint32_t __ping_fail_count = 0;
 static esp_ping_handle_t __ping_handle = NULL;
 static e_ping_status_t __ping_status = EZLOPI_PING_STATUS_UNKNOWN;
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 e_ping_status_t EZPI_core_ping_get_internet_status(void)
 {
     return __ping_status;
@@ -148,7 +151,7 @@ void EZPI_ping_init(void)
         .on_ping_success = __on_ping_success,
         .on_ping_timeout = __on_ping_timeout,
         .on_ping_end = __on_ping_end,
-        .cb_args = NULL };
+        .cb_args = NULL};
 
     EZPI_ping_new_session(&config, &cbs, &__ping_handle);
     EZPI_ping_start_by_handle(__ping_handle);
@@ -167,8 +170,8 @@ void ezlopi_ping_stop(void)
 }
 
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 
 static void __on_ping_success(esp_ping_handle_t hdl, void *args)
 {
@@ -182,7 +185,7 @@ static void __on_ping_success(esp_ping_handle_t hdl, void *args)
     EZPI_ping_get_profile(hdl, ESP_PING_PROF_SIZE, &recv_len, sizeof(recv_len));
     EZPI_ping_get_profile(hdl, ESP_PING_PROF_TIMEGAP, &elapsed_time, sizeof(elapsed_time));
     TRACE_I("%d bytes from %s icmp_seq=%d ttl=%d time=%d ms\n",
-        recv_len, inet_ntoa(target_addr.u_addr.ip4), seqno, ttl, elapsed_time);
+            recv_len, inet_ntoa(target_addr.u_addr.ip4), seqno, ttl, elapsed_time);
     __ping_fail_count = 0;
     __ping_status = EZLOPI_PING_STATUS_LIVE;
 }
@@ -227,7 +230,7 @@ static void __on_ping_end(esp_ping_handle_t hdl, void *args)
     }
 
     TRACE_D("%d packets transmitted, %d received, %d%% packet loss, time %dms\n",
-        transmitted, received, loss, total_time_ms);
+            transmitted, received, loss, total_time_ms);
 #endif
     // delete the ping_handle sessions, so that we clean up all resources and can create a new ping_handle session
     // we don't have to call delete function in the callback, instead we can call delete function from other tasks
@@ -240,5 +243,5 @@ static void __on_ping_end(esp_ping_handle_t hdl, void *args)
 #endif // CONFIG_EZPI_ENABLE_PING
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

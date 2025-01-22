@@ -29,16 +29,19 @@
 ** ===========================================================================
 */
 /**
-* @file    ezlopi_hal_adc.c
-* @brief   Function to operate on ADC
-* @author  xx
-* @version 0.1
-* @date    xx
-*/
+ * @file    ezlopi_hal_adc.c
+ * @brief   Function to operate on ADC
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
+ * @version 0.1
+ * @date    xx
+ */
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include <string.h>
 #include <stdlib.h>
 
@@ -53,16 +56,16 @@
 #include "EZLOPI_USER_CONFIG.h"
 
 /*******************************************************************************
-*                          Extern Data Declarations
-*******************************************************************************/
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Function Declarations
-*******************************************************************************/
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Type & Macro Definitions
-*******************************************************************************/
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 typedef struct s_ezlopi_analog_object
 {
     uint32_t vRef;
@@ -75,45 +78,40 @@ typedef struct s_ezlopi_analog_object
 } ezlopi_analog_object_handle_t;
 
 /*******************************************************************************
-*                          Static Function Prototypes
-*******************************************************************************/
+ *                          Static Function Prototypes
+ *******************************************************************************/
 static void __check_eFuse_support(void);
 static int __get_adc_channel(uint8_t gpio_num);
 static void __fill_adc_characteristics(esp_adc_cal_characteristics_t *chars, adc_unit_t unit, adc_atten_t attenuation, adc_bits_width_t width, uint32_t vRef);
 
-
 /*******************************************************************************
-*                          Static Data Definitions
-*******************************************************************************/
+ *                          Static Data Definitions
+ *******************************************************************************/
 // object handle array to check if a channel is already configured.
-static ezlopi_analog_object_handle_t *ezlopi_analog_object_array[ADC1_CHANNEL_MAX] = { NULL };
+static ezlopi_analog_object_handle_t *ezlopi_analog_object_array[ADC1_CHANNEL_MAX] = {NULL};
 
 #if CONFIG_IDF_TARGET_ESP32
 static e_ezlopi_gpio_channel_t ezlopi_channel_to_gpio_map[ADC1_CHANNEL_MAX] = {
     EZLOPI_GPIO_CHANNEL_0, EZLOPI_GPIO_CHANNEL_1, EZLOPI_GPIO_CHANNEL_2, EZLOPI_GPIO_CHANNEL_3,
-    EZLOPI_GPIO_CHANNEL_4, EZLOPI_GPIO_CHANNEL_5, EZLOPI_GPIO_CHANNEL_6, EZLOPI_GPIO_CHANNEL_7
-};
+    EZLOPI_GPIO_CHANNEL_4, EZLOPI_GPIO_CHANNEL_5, EZLOPI_GPIO_CHANNEL_6, EZLOPI_GPIO_CHANNEL_7};
 #elif CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32S2
 static e_ezlopi_gpio_channel_t ezlopi_channel_to_gpio_map[ADC1_CHANNEL_MAX] = {
     EZLOPI_GPIO_CHANNEL_0, EZLOPI_GPIO_CHANNEL_1, EZLOPI_GPIO_CHANNEL_2, EZLOPI_GPIO_CHANNEL_3,
     EZLOPI_GPIO_CHANNEL_4, EZLOPI_GPIO_CHANNEL_5, EZLOPI_GPIO_CHANNEL_6, EZLOPI_GPIO_CHANNEL_7,
-    EZLOPI_GPIO_CHANNEL_8, EZLOPI_GPIO_CHANNEL_9
-};
+    EZLOPI_GPIO_CHANNEL_8, EZLOPI_GPIO_CHANNEL_9};
 #elif CONFIG_IDF_TARGET_ESP32C3
 static e_ezlopi_gpio_channel_t ezlopi_channel_to_gpio_map[ADC1_CHANNEL_MAX] = {
     EZLOPI_GPIO_CHANNEL_0, EZLOPI_GPIO_CHANNEL_1, EZLOPI_GPIO_CHANNEL_2, EZLOPI_GPIO_CHANNEL_3,
-    EZLOPI_GPIO_CHANNEL_4
-};
+    EZLOPI_GPIO_CHANNEL_4};
 #endif
 
+/*******************************************************************************
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
 /*******************************************************************************
-*                          Extern Data Definitions
-*******************************************************************************/
-
-/*******************************************************************************
-*                          Extern Function Definitions
-*******************************************************************************/
+ *                          Extern Function Definitions
+ *******************************************************************************/
 
 ezlopi_error_t EZPI_hal_adc_init(uint8_t gpio_num, uint8_t width)
 {
@@ -145,7 +143,7 @@ ezlopi_error_t EZPI_hal_adc_init(uint8_t gpio_num, uint8_t width)
 #endif
         ezlopi_analog_object_handle->vRef = 1100;
         __fill_adc_characteristics(&ezlopi_analog_object_handle->adc_characteristics, ezlopi_analog_object_handle->unit,
-            ezlopi_analog_object_handle->attenuation, ezlopi_analog_object_handle->width, ezlopi_analog_object_handle->vRef);
+                                   ezlopi_analog_object_handle->attenuation, ezlopi_analog_object_handle->width, ezlopi_analog_object_handle->vRef);
         TRACE_D("Checking for eFuse support.");
         __check_eFuse_support();
 
@@ -191,10 +189,9 @@ int EZPI_hal_adc_get_adc_data(uint8_t gpio_num, s_ezlopi_analog_data_t *ezlopi_a
     return channel;
 }
 
-
 /*******************************************************************************
-*                         Static Function Definitions
-*******************************************************************************/
+ *                         Static Function Definitions
+ *******************************************************************************/
 static int __get_adc_channel(uint8_t gpio_num)
 {
     int ret = -1;
@@ -263,5 +260,5 @@ static void __fill_adc_characteristics(esp_adc_cal_characteristics_t *chars, adc
 }
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

@@ -31,20 +31,23 @@
 /**
  * @file    ezlopi_core_scenes_when_methods.c
  * @brief   Functions that operates on scene-when-methods
- * @author  xx
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version 0.1
  * @date    12th DEC 2024
  */
 
- /*******************************************************************************
-  *                          Include Files
-  *******************************************************************************/
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
-  // #include <time.h>
-  // #include <string.h>
+// #include <time.h>
+// #include <string.h>
 #include "ezlopi_util_trace.h"
 
 // #include "ezlopi_core_devices.h"
@@ -69,29 +72,29 @@
  *                          Extern Data Declarations
  *******************************************************************************/
 
- /*******************************************************************************
-  *                          Extern Function Declarations
-  *******************************************************************************/
+/*******************************************************************************
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
-  /*******************************************************************************
-   *                          Type & Macro Definitions
-   *******************************************************************************/
+/*******************************************************************************
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 
-   /*******************************************************************************
-    *                          Static Function Prototypes
-    *******************************************************************************/
+/*******************************************************************************
+ *                          Static Function Prototypes
+ *******************************************************************************/
 
-    /*******************************************************************************
-     *                          Static Data Definitions
-     *******************************************************************************/
+/*******************************************************************************
+ *                          Static Data Definitions
+ *******************************************************************************/
 
-     /*******************************************************************************
-      *                          Extern Data Definitions
-      *******************************************************************************/
+/*******************************************************************************
+ *                          Extern Data Definitions
+ *******************************************************************************/
 
-      /*******************************************************************************
-       *                          Extern Function Definitions
-       *******************************************************************************/
+/*******************************************************************************
+ *                          Extern Function Definitions
+ *******************************************************************************/
 
 int EZPI_core_scenes_when_is_item_state(l_scenes_list_v2_t *scene_node, void *arg)
 {
@@ -577,7 +580,7 @@ int EZPI_core_scenes_when_is_sun_state(l_scenes_list_v2_t *scene_node, void *arg
                 if (EZPI_STRNCMP_IF_EQUAL(__issunstate_field[i].field_name, curr_field->name, strlen(__issunstate_field[i].field_name) + 1, strlen(curr_field->name) + 1))
                 {
                     flag_check |= (__issunstate_field[i].field_func)(scene_node, curr_field, info, ((0 == i) ? 1 : (1 == i) ? 2
-                        : 0));
+                                                                                                                            : 0));
                     break;
                 }
             }
@@ -761,7 +764,7 @@ int EZPI_core_scenes_when_is_date_range(l_scenes_list_v2_t *scene_node, void *ar
             }
 
             // Check for time,day,month and year validity
-            uint8_t(*ISDATE_range_check_flags[])(struct tm *start, struct tm *end, struct tm *info) = {
+            uint8_t (*ISDATE_range_check_flags[])(struct tm *start, struct tm *end, struct tm *info) = {
                 ISDATE_range_check_tm,
                 ISDATE_range_check_day,
                 ISDATE_range_check_month,
@@ -939,11 +942,11 @@ int EZPI_core_scenes_when_is_house_mode_alarm_phase_range(l_scenes_list_v2_t *sc
                 {
                     s_ezlopi_modes_t *curr_mode = EZPI_core_modes_get_custom_modes();
 
-                    const char *phase_name = ((EZLOPI_MODES_ALARM_PHASE_IDLE == curr_mode->alarmed.phase) ? ezlopi_idle_str
-                        : (EZLOPI_MODES_ALARM_PHASE_BYPASS == curr_mode->alarmed.phase) ? ezlopi_bypass_str
-                        : (EZLOPI_MODES_ALARM_PHASE_ENTRYDELAY == curr_mode->alarmed.phase) ? ezlopi_entryDelay_str
-                        : (EZLOPI_MODES_ALARM_PHASE_MAIN == curr_mode->alarmed.phase) ? ezlopi_main_str
-                        : ezlopi_null_str);
+                    const char *phase_name = ((EZLOPI_MODES_ALARM_PHASE_IDLE == curr_mode->alarmed.phase)         ? ezlopi_idle_str
+                                              : (EZLOPI_MODES_ALARM_PHASE_BYPASS == curr_mode->alarmed.phase)     ? ezlopi_bypass_str
+                                              : (EZLOPI_MODES_ALARM_PHASE_ENTRYDELAY == curr_mode->alarmed.phase) ? ezlopi_entryDelay_str
+                                              : (EZLOPI_MODES_ALARM_PHASE_MAIN == curr_mode->alarmed.phase)       ? ezlopi_main_str
+                                                                                                                  : ezlopi_null_str);
 
                     // TRACE_D(" req_mode : %s vs mode : %s ", curr_field->field_value.u_value.value_string, phase_name);
                     if (EZPI_STRNCMP_IF_EQUAL(curr_field->field_value.u_value.value_string, phase_name, strlen(curr_field->field_value.u_value.value_string) + 1, strlen(phase_name) + 1))
@@ -1063,7 +1066,7 @@ int EZPI_core_scenes_when_is_device_state(l_scenes_list_v2_t *scene_node, void *
                 s_ezlopi_cloud_controller_t *controller_info = EZPI_core_device_get_controller_information();
                 if (controller_info)
                 {
-                    #warning "we need to change from 'controller' to 'device_id' specific";
+#warning "we need to change from 'controller' to 'device_id' specific";
                     ret = ((value_armed == controller_info->armed) ? 1 : 0) && ((value_reachable == controller_info->service_notification) ? 1 : 0);
                 }
             }
@@ -1084,7 +1087,7 @@ int EZPI_core_scenes_when_is_device_state(l_scenes_list_v2_t *scene_node, void *
                         s_ezlopi_cloud_controller_t *controller_info = EZPI_core_device_get_controller_information();
                         if (controller_info)
                         {
-                            #warning "we need to change from 'controller' to 'device_id' specific";
+#warning "we need to change from 'controller' to 'device_id' specific";
                             ret = ((value_armed == controller_info->armed) ? 1 : 0) && ((value_reachable == controller_info->service_notification) ? 1 : 0);
                         }
                     }
@@ -1184,7 +1187,7 @@ int EZPI_core_scenes_when_is_scene_state(l_scenes_list_v2_t *scene_node, void *a
                     {
                         ret = (EZLOPI_SCENE_STATUS_STOPPED == curr_scene->status) ? 1 : 0;
                     }
-                    #warning "need to add 'FAILED' status for scene";
+#warning "need to add 'FAILED' status for scene";
                     // else if (EZPI_STRNCMP_IF_EQUAL("failed", tmp_str, 7,tmp_str_len))
                     // {
                     //     ret = (false == curr_scene->enabled)? 1:0;
@@ -2234,6 +2237,6 @@ int EZPI_core_scenes_when_is_device_item_group(l_scenes_list_v2_t *scene_node, v
  *******************************************************************************/
 
 #endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
- /*******************************************************************************
-  *                          End of File
-  *******************************************************************************/
+       /*******************************************************************************
+        *                          End of File
+        *******************************************************************************/

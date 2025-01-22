@@ -31,10 +31,13 @@
 /**
  * @file    ezlopi_core_scenes_expressions.h
  * @brief   These function performs operation on scene-expression data
- * @author  xx
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version 0.1
  * @date    12th DEC 2024
-*/
+ */
 
 #ifndef _EZLOPI_CORE_SCENES_EXPRESSIONS_H_
 #define _EZLOPI_CORE_SCENES_EXPRESSIONS_H_
@@ -42,8 +45,8 @@
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include <string.h>
 #include <inttypes.h>
 // #include <stdbool.h>
@@ -52,16 +55,16 @@
 #include "ezlopi_core_scenes_v2.h"
 
 /*******************************************************************************
-*                          C++ Declaration Wrapper
-*******************************************************************************/
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
     /*******************************************************************************
-    *                          Type & Macro Declarations
-    *******************************************************************************/
+     *                          Type & Macro Declarations
+     *******************************************************************************/
     typedef struct s_exp_items
     {
         char name[48];
@@ -121,12 +124,12 @@ extern "C"
     } s_ezlopi_expressions_t;
 
     /*******************************************************************************
-    *                          Extern Data Declarations
-    *******************************************************************************/
+     *                          Extern Data Declarations
+     *******************************************************************************/
 
     /*******************************************************************************
-    *                          Extern Function Prototypes
-    *******************************************************************************/
+     *                          Extern Function Prototypes
+     *******************************************************************************/
     /**
      * @brief Fetch expressions from NVS flash and populate to linklist
      */
@@ -260,8 +263,6 @@ extern "C"
      */
     int EZPI_scenes_expressions_eval_simple(cJSON *cj_des, const char *exp_name, const char *exp_code);
 
-
-
 #ifdef __cplusplus
 }
 #endif
@@ -270,5 +271,5 @@ extern "C"
 
 #endif // _EZLOPI_CORE_SCENES_EXPRESSIONS_H_
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

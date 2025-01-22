@@ -31,17 +31,20 @@
 /**
  * @file    main.h
  * @brief   perform some function on data
- * @author  xx
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version 0.1
  * @date    12th DEC 2024
-*/
+ */
 
 #ifndef _EZLOPI_CORE_EVENT_QUEUE_H_
 #define _EZLOPI_CORE_EVENT_QUEUE_H_
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #if 0
 #include "ezlopi_core_actions.h"
 #include "ezlopi_core_errors.h"
@@ -101,8 +104,5 @@ extern "C"
 #endif // _EZLOPI_CORE_EVENT_QUEUE_H_
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
-
-
-
+ *                          End of File
+ *******************************************************************************/
