@@ -1,12 +1,3 @@
-
-
-/**
- * @file    ezlopi_service_led_indicator.c
- * @brief
- * @author
- * @version
- * @date
- */
 /* ===========================================================================
 ** Copyright (C) 2024 Ezlo Innovation Inc
 **
@@ -37,6 +28,16 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
+
+/**
+ * @file    ezlopi_service_led_indicator.c
+ * @brief
+ * @authors Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi 
+ * @version 1.0
+ * @date    April 3rd, 2024 6:33 PM 
+ */
 
 #include "../../build/config/sdkconfig.h"
 

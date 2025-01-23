@@ -306,7 +306,7 @@ static int __create_lua_table_for_device(lua_State *lua_state, l_ezlopi_device_t
     }
     else
     {
-        lua_create_table_string_key_value(ezlopi_room_id_str, "");
+        lua_create_table_string_key_value(ezlopi_room_id_str, ezlopi__str);
     }
     // lua_create_table_string_key_value(ezlopi_room_id_str, controller_info->room_id);
 

@@ -31,8 +31,10 @@
 /**
  * @file    ezlopi_core_offline_login.h
  * @brief   Function to perform offine login operation
- * @author  xx
- * @version 0.1
+ * @author  Lomas Subedi
+ *          Nabin Dangi
+ *          Riken Maharjan
+ * @version 1.0
  * @date    12th DEC 2024
  */
 

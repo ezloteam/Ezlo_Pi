@@ -31,9 +31,12 @@
 /**
  * @file    ezlopi_core_devices.h
  * @brief   perform some function on core-devices
- * @author  xx
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version 0.1
- * @date    12th DEC 2024
+ * @date    May 4th, 2023 6:32 PM
  */
 
 #ifndef _EZLOPI_CORE_DEVICES_H_
@@ -43,9 +46,6 @@
  *                          Include Files
  *******************************************************************************/
 
-/*******************************************************************************
- *                          Include Files
- *******************************************************************************/
 #include "cjext.h"
 
 #include "ezlopi_core_cloud.h"

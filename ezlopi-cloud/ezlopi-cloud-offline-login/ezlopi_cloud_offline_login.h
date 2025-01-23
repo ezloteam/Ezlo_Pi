@@ -32,10 +32,13 @@
 /**
  * @file    ezlopi_cloud_offline_login.h
  * @brief
- * @author
- * @version
- * @date
+ * @author  Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
+ * @version 1.0
+ * @date    March 26th, 2024 10:59 PM
  */
+
 #ifndef EZLOPI_CLOUD_OFFLINE_LOGIN_H_
 #define EZLOPI_CLOUD_OFFLINE_LOGIN_H_
 

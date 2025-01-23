@@ -6,4 +6,5 @@ idf_component_register(SRCS  "${config_src}"
     REQUIRES
                 ezlopi-util-trace
                 ezlopi-user-config
+                ezlopi-cloud-constants
 )

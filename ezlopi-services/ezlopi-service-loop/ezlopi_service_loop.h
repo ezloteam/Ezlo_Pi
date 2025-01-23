@@ -32,10 +32,14 @@
 /**
  * @file    ezlopi_service_loop.h
  * @brief
- * @author
- * @version
- * @date
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Nabin Dangi
+ *          Riken Maharjan
+ * @version 1.0
+ * @date    Jan 24, 2023
  */
+
 #ifndef _EZLOPI_SERVICE_TIMER_H_
 #define _EZLOPI_SERVICE_TIMER_H_
 /*******************************************************************************

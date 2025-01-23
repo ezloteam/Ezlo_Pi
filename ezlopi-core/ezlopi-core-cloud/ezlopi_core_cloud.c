@@ -31,9 +31,12 @@
 /**
  * @file    ezlopi_core_cloud.c
  * @brief   perform some function on core-cloud properties
- * @author  xx
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Nabin Dangi
+ *          Riken Maharjan
  * @version 0.1
- * @date    12th DEC 2024
+ * @date    October 31st, 2023 6:55 PM
  */
 
 /*******************************************************************************

@@ -31,7 +31,10 @@
 /**
  * @file    device_0002_digitalOut_relay.h
  * @brief   perform some function on device_0002
- * @author  xx
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version 0.1
  * @date    xx
  */

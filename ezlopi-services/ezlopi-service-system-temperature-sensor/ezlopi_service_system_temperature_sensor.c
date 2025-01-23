@@ -32,9 +32,12 @@
 /**
  * @file    ezlopi_service_system_temperature_sensor.c
  * @brief
- * @author
- * @version
- * @date
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Nabin Dangi
+ *          Riken Maharjan
+ * @version 1.0
+ * @date    September 9th, 2024 7:15 PM
  */
 
 /*******************************************************************************

@@ -31,7 +31,10 @@
 /**
  * @file    ezlopi_core_modes.c
  * @brief   These function perform opertation on HouseModes
- * @author  xx
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version 0.1
  * @date    12th DEC 2024
  */
@@ -984,7 +987,9 @@ void EZPI_core_modes_init(void)
         cJSON *cj_custom_modes = cJSON_Parse(__FUNCTION__, custom_modes_str);
         ezlopi_free(__FUNCTION__, custom_modes_str);
 
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
         // CJSON_TRACE("cj_custom-modes", cj_custom_modes);
+#endif
 
         if (cj_custom_modes)
         {

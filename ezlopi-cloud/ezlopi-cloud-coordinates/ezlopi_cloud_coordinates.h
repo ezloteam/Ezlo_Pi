@@ -30,11 +30,13 @@
 */
 
 /**
- * @file     ezlopi_cloud_coordinates.h
- * @brief   perform some function on data
- * @author  John Doe
- * @version 0.1
- * @date    1st January 2024
+ * @file    ezlopi_cloud_coordinates.h
+ * @brief
+ * @author  Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
+ * @version 1.0
+ * @date    February 19th, 2024 12:00 PM
  */
 
 #ifndef _EZLOPI_CLOUD_COORDINSTES_H_

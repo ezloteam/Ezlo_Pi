@@ -34,9 +34,12 @@
 /**
  * @file    ezlopi_service_uri.c
  * @brief
- * @author
- * @version
- * @date
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
+ * @version 1.0
+ * @date    January 6th, 2024 11:03 PM
  */
 #include <string.h>
 

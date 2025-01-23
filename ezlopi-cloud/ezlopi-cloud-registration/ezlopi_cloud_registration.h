@@ -32,10 +32,14 @@
 /**
  * @file    ezlopi_cloud_registration.h
  * @brief
- * @author
- * @version
- * @date
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
+ * @version 1.0
+ * @date    July 21st, 2022 9:28 PM
  */
+
 #ifndef __HUB_REGISTERATION_H__
 #define __HUB_REGISTERATION_H__
 /*******************************************************************************

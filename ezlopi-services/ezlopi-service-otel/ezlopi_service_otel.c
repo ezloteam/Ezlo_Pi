@@ -329,14 +329,6 @@ static cJSON *__otel_trace_decorate_struct(s_otel_trace_t *otel_data)
                 }
             }
         }
-#if 0
-        char *tmp_str = cJSON_Print(__FUNCTION__, cj_telemetry);
-        if (tmp_str)
-        {
-            printf("otel-trace-struct:\r\n%s\r\n", tmp_str);
-            ezlopi_free(__FUNCTION__, tmp_str);
-        }
-#endif
     }
 
     return cj_telemetry;
@@ -354,7 +346,7 @@ static cJSON *__otel_create_span_struct(s_otel_trace_t *otel_data)
 
         __fill_random_hexstring(unique_id, OTEL_SPAN_ID_LEN + 1); //  +1 for zero termination
         cJSON_AddStringToObject(__FUNCTION__, cj_span, ezlopi_spanId_str, unique_id);
-        cJSON_AddStringToObject(__FUNCTION__, cj_span, ezlopi_parentSpanId_str, "");
+        cJSON_AddStringToObject(__FUNCTION__, cj_span, ezlopi_parentSpanId_str, ezlopi__str);
         cJSON_AddNumberToObject(__FUNCTION__, cj_span, ezlopi_kind_str, otel_data->kind);
 
         if (otel_data->name)
@@ -558,14 +550,6 @@ static cJSON *__otel_logs_decorate_struct(s_otel_log_t *log_data)
                 }
             }
         }
-#if 0
-        char *_data_str = cJSON_Print(__FUNCTION__, cj_telemetry);
-        if (_data_str)
-        {
-            printf("otel-logs:\r\n%s\r\n", _data_str);
-            ezlopi_free(__FUNCTION__, _data_str);
-        }
-#endif
     }
 
     return cj_telemetry;
@@ -855,11 +839,6 @@ static void __free_telemetry_queue_data(s_otel_queue_data_t *otel_data)
         {
             if (otel_data->otel.trace_data)
             {
-                printf("%s(%u): id = %s\r\n", __FILENAME__, __LINE__, otel_data->otel.trace_data->id ? otel_data->otel.trace_data->id : "NULL");
-                printf("%s(%u): error = %s\r\n", __FILENAME__, __LINE__, otel_data->otel.trace_data->error ? otel_data->otel.trace_data->error : "NULL");
-                printf("%s(%u): method = %s\r\n", __FILENAME__, __LINE__, otel_data->otel.trace_data->method ? otel_data->otel.trace_data->method : "NULL");
-                printf("%s(%u): msg-subclass = %s\r\n", __FILENAME__, __LINE__, otel_data->otel.trace_data->msg_subclass ? otel_data->otel.trace_data->msg_subclass : "NULL");
-
                 ezlopi_free(__FUNCTION__, otel_data->otel.trace_data->id);
                 ezlopi_free(__FUNCTION__, otel_data->otel.trace_data->error);
                 ezlopi_free(__FUNCTION__, otel_data->otel.trace_data->method);

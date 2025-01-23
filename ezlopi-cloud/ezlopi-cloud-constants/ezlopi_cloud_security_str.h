@@ -31,10 +31,12 @@
 
 /**
  * @file    ezlopi_cloud_security_str.h
- * @brief   
- * @author  John Doe
- * @version 0.1
- * @date    1st January 2024
+ * @brief
+ * @author  Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
+ * @version 1.0
+ * @date    May 3rd, 2023 6:25 PM
  */
 
 #ifndef __EZLOPI_CLOUD_SECURITY_STR_H__

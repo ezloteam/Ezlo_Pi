@@ -31,9 +31,12 @@
 /**
  * @file    ezlopi_core_devices_list_modules.h
  * @brief   Macros to list device modeles
- * @author  xx
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version 0.1
- * @date    12th DEC 2024
+ * @date    November 10th, 2023 6:49 PM
  */
 
 /*******************************************************************************

@@ -31,9 +31,12 @@
 /**
  * @file    ezlopi_core_ping.h
  * @brief   Function to perfrom operation on ezlopi-ping-service
- * @author  xx
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version 0.1
- * @date    12th DEC 2024
+ * @date    April 24th, 2023 6:32 PM
  */
 
 #ifndef _EZLOPI_CORE_PING_H_

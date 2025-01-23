@@ -31,9 +31,12 @@
 /**
  * @file    ezlopi_core_nvs.c
  * @brief   Function to perform that nvs-operation
- * @author  xx
- * @version 0.1
- * @date    12th DEC 2024
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Nabin Dangi
+ *          Riken Maharjan
+ * @version 1.0
+ * @date    July 21st, 2022 9:28 PM
  */
 
 /*******************************************************************************
@@ -129,8 +132,6 @@ ezlopi_error_t EZPI_nvs_init(void)
         {
             TRACE_E("```nvs_open``` Error!");
             error = EZPI_ERR_NVS_INIT_FAILED;
-
-            // vTaskDelay(2000 / portTICK_RATE_MS);
         }
         else
         {

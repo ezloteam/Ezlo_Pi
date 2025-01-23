@@ -31,10 +31,13 @@
 
 /**
  * @file    ezlopi_cloud_valye_type_str.h
- * @brief   perform some function on data
- * @author  John Doe
- * @version 0.1
- * @date    1st January 2024
+ * @brief
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
+ * @version 1.0
+ * @date    February 24th, 2023 11:18 AM
  */
 
 #ifndef __EZLOPI_VALUES_STR_H__

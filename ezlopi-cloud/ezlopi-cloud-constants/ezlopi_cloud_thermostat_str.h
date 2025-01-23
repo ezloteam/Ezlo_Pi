@@ -32,9 +32,11 @@
 /**
  * @file    ezlopi_cloud_thermostat_str.h
  * @brief   perform some function on data
- * @author  John Doe
- * @version 0.1
- * @date    1st January 2024
+ * @author  Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
+ * @version 1.0
+ * @date    October 13th, 2022 7:24 PM
  */
 
 #ifndef __EZLOPI_THERMOSTAT_STR_H__

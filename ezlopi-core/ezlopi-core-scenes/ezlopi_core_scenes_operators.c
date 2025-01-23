@@ -31,9 +31,12 @@
 /**
  * @file    ezlopi_core_scenes_operators.c
  * @brief   These functions perform comparision operation for scenes
- * @author  xx
- * @version 0.1
- * @date    12th DEC 2024
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Nabin Dangi
+ *          Riken Maharjan
+ * @version 1.0
+ * @date    August 11th, 2023 7:16 PM
  */
 
 /*******************************************************************************
@@ -87,8 +90,6 @@ typedef enum e_with_grp
 /*******************************************************************************
  *                          Static Function Prototypes
  *******************************************************************************/
-static int __evaluate_compareNumber_or_compareStrings(l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, char *comparator_str);
-static int __evaluate_compareNumbers_or_compareStrings_with_group(l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field, l_fields_v2_t *value_field, l_fields_v2_t *comparator_field);
 /* Numeric & String */
 static int ________compare_val_num(double item_exp_value, double value_to_compare_with, char *comparator_field_str);
 static int ________compare_val_str(const char *item_exp_value_str, const char *value_to_compare_with_str, char *comparator_field_str);
@@ -101,7 +102,6 @@ static int ____compare_item_vs_item(l_ezlopi_item_t *item_left, l_ezlopi_item_t 
 static int __evaluate_numrange(l_fields_v2_t *item_exp_field, l_fields_v2_t *start_value_field, l_fields_v2_t *end_value_field, bool comparator_choice);
 static int __evaluate_compareNumber_or_compareStrings(l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, char *comparator_str);
 static int __evaluate_compareNumbers_or_compareStrings_with_group(l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field, l_fields_v2_t *value_field, l_fields_v2_t *comparator_field);
-
 static int __trigger_grp_functions(e_with_grp_t choice, l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field, l_fields_v2_t *operation_field, l_fields_v2_t *comparator_field, l_fields_v2_t *value_field, l_fields_v2_t *start_value_field, l_fields_v2_t *end_value_field, l_fields_v2_t *value_type_field, char *comparator_str, bool comparator_choice);
 /* Strings */
 static char *__get_item_strvalue_by_id(uint32_t item_id);
@@ -1110,7 +1110,9 @@ int EZPI_scenes_operators_has_atleastone_dictionary_value_operations(uint32_t it
                         cJSON *cj_value = cJSON_GetObjectItem(__FUNCTION__, cj_item_value, ezlopi_value_str); // item_value -> dictionary ; [array or object]
                         if (cj_value && cJSON_IsObject(cj_value))
                         {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                             CJSON_TRACE("cj_dictionary :", cj_value);
+#endif
                             // Check if ["low_battery":"..."] key is present
                             /* need to use array here ; check against vales no keys. */
                             cJSON *dictionaryValue = cJSON_GetObjectItem(__FUNCTION__, cj_value, value_field->field_value.u_value.value_string);
@@ -2420,6 +2422,7 @@ static bool __check_valuetypes(const char *lhs_type_str, const char *rhs_type_st
 }
 
 #endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
-       /*******************************************************************************
-        *                          End of File
-        *******************************************************************************/
+
+/*******************************************************************************
+ *                          End of File
+ *******************************************************************************/

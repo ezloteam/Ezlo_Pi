@@ -350,7 +350,7 @@ static void __prepare_device_cloud_properties_child_pressure(l_ezlopi_device_t *
 
 static void __prepare_item_temperature_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_arg)
 {
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type);
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
 
@@ -365,7 +365,7 @@ static void __prepare_item_temperature_properties(l_ezlopi_item_t *item, cJSON *
     item->interface.i2c_master.clock_speed = 100000;
     CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_scl_str, item->interface.i2c_master.scl);
     CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_sda_str, item->interface.i2c_master.sda);
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_slave_addr_str, item->interface.i2c_master.address);
+    CJSON_GET_VALUE_UINT32(cj_device, ezlopi_slave_addr_str, item->interface.i2c_master.address);
 
     item->is_user_arg_unique = true;
     item->user_arg = user_arg;
@@ -373,7 +373,7 @@ static void __prepare_item_temperature_properties(l_ezlopi_item_t *item, cJSON *
 
 static void __prepare_item_humidity_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_arg)
 {
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type);
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
     item->cloud_properties.scale = scales_percent;
@@ -385,7 +385,7 @@ static void __prepare_item_humidity_properties(l_ezlopi_item_t *item, cJSON *cj_
     item->interface.i2c_master.clock_speed = 100000;
     CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_scl_str, item->interface.i2c_master.scl);
     CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_sda_str, item->interface.i2c_master.sda);
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_slave_addr_str, item->interface.i2c_master.address);
+    CJSON_GET_VALUE_UINT32(cj_device, ezlopi_slave_addr_str, item->interface.i2c_master.address);
 
     item->is_user_arg_unique = true;
     item->user_arg = user_arg;
@@ -393,7 +393,7 @@ static void __prepare_item_humidity_properties(l_ezlopi_item_t *item, cJSON *cj_
 
 static void __prepare_item_pressure_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_arg)
 {
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type);
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
     item->cloud_properties.scale = scales_kilo_pascal;
@@ -405,7 +405,7 @@ static void __prepare_item_pressure_properties(l_ezlopi_item_t *item, cJSON *cj_
     item->interface.i2c_master.clock_speed = 100000;
     CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_scl_str, item->interface.i2c_master.scl);
     CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_sda_str, item->interface.i2c_master.sda);
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_slave_addr_str, item->interface.i2c_master.address);
+    CJSON_GET_VALUE_UINT32(cj_device, ezlopi_slave_addr_str, item->interface.i2c_master.address);
 
     item->is_user_arg_unique = false;
     item->user_arg = user_arg;

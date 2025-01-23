@@ -31,9 +31,12 @@
 /**
  * @file    ezlopi_core_ble_buffer.c
  * @brief   perform some function on ble-operations
- * @author  xx
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Nabin Dangi
+ *          Riken Maharjan
  * @version 0.1
- * @date    12th DEC 2024
+ * @date    January 22nd, 2024 1:12 AM
  */
 
 /*******************************************************************************

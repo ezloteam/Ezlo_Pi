@@ -31,7 +31,9 @@
 /**
  * @file    mpu6050.c
  * @brief   perform some function on mpu6050
- * @author  xx
+ * @author  Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version 0.1
  * @date    xx
  */

@@ -32,9 +32,12 @@
 /**
  * @file    ezlopi_cloud_scenes_scripts.c
  * @brief
- * @author
- * @version
- * @date
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Nabin Dangi
+ *          Riken Maharjan
+ * @version 1.0
+ * @date    October 4th, 2023 11:21 PM
  */
 
 /*******************************************************************************

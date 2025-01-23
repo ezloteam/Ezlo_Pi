@@ -32,9 +32,11 @@
 /**
  * @file    ezlopi_cloud_settings.h
  * @brief
- * @author
- * @version
- * @date
+ * @authors Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
+ * @version 1.0
+ * @date    November 1st, 2023 2:00 PM
  */
 
 #ifndef __HUB_SETTINGS_H__

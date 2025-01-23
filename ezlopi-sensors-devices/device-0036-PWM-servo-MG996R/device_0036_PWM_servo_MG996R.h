@@ -31,7 +31,9 @@
 /**
  * @file    device_0036_PWM_servo_MG996R.h
  * @brief   perform some function on device_0036
- * @author  xx
+ * @author  Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version 0.1
  * @date    xx
  */

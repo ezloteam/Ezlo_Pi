@@ -1,3 +1,4 @@
+
 /* ===========================================================================
 ** Copyright (C) 2024 Ezlo Innovation Inc
 **
@@ -30,11 +31,14 @@
 */
 
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
- * @version 0.1
- * @date    1st January 2024
+ * @file    ezlopi_cloud_constants.h
+ * @brief
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
+ * @version 1.0
+ * @date    November 22nd, 2023 3:27 PM
  */
 
 #ifndef __EZLOPI_CLOUD_CONSTANTS_H__
@@ -74,7 +78,7 @@ extern "C"
      : (NULL == STR2)                       ? false           \
      : ((0 == STR1_LEN) && (0 == STR2_LEN)) ? false           \
                                             : COMPARE_IF_EQUAL(STR1, STR2, STR1_LEN, STR2_LEN))
-//-------------------------------------------------------------------------------------------------------------
+    //-------------------------------------------------------------------------------------------------------------
 
 #include "ezlopi_cloud_keywords.h"
 #include "ezlopi_cloud_scales_str.h"
@@ -87,7 +91,6 @@ extern "C"
 #include "ezlopi_cloud_value_type_str.h"
 #include "ezlopi_cloud_subcategory_str.h"
 #include "ezlopi_cloud_device_types_str.h"
-
 
     /*******************************************************************************
      *                          Extern Data Declarations

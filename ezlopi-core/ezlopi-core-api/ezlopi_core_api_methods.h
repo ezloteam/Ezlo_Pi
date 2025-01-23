@@ -31,9 +31,12 @@
 /**
  * @file    ezlopi_core_api_methods.h
  * @brief   Functions perform operation for API-methods
- * @author  xx
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Nabin Dangi
+ *          Riken Maharjan
  * @version 0.1
- * @date    12th DEC 2024
+ * @date    February 25th, 2024 12:37 AM
  */
 
 #ifndef __EZPI_core_ezlopi_methods_H__

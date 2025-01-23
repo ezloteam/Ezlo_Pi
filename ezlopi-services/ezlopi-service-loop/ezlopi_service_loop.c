@@ -32,9 +32,12 @@
 /**
  * @file    ezlopi_service_loop.c
  * @brief
- * @author
- * @version
- * @date
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Nabin Dangi
+ *          Riken Maharjan
+ * @version 1.0
+ * @date    Jan 24, 2023
  */
 /*******************************************************************************
  *                          Include Files
@@ -194,7 +197,7 @@ static void ezpi_loop(void *pv)
                 __loop_node->_timer_ms = xTaskGetTickCount();
                 __loop_time = (xTaskGetTickCount() - __loop_time);
 
-                // TRACE_D("'%s': \t\t %u(period: %d(cmp: %d))", __loop_node->name ? __loop_node->name : "", __loop_time);
+                // TRACE_D("'%s': \t\t %u(period: %d(cmp: %d))", __loop_node->name ? __loop_node->name : ezlopi__str, __loop_time);
 
                 vTaskDelay(1 / portTICK_RATE_MS);
             }

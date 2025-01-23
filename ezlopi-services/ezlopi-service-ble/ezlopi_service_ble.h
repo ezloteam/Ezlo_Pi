@@ -2,7 +2,10 @@
 /**
  * @file    ezlopi_service_ble.h
  * @brief   Service related functionalities
- * @author
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version
  * @date
  */

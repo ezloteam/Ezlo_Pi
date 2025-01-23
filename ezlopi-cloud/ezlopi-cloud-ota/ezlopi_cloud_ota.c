@@ -32,9 +32,12 @@
 /**
  * @file    ezlopi_cloud_ota.c
  * @brief
- * @author
- * @version
- * @date
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
+ * @version 1.0
+ * @date    March 7th, 2023 8:52 PM
  */
 
 /*******************************************************************************

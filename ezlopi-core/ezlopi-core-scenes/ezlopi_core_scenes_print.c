@@ -31,9 +31,12 @@
 /**
  * @file    ezlopi_core_scenes_print.c
  * @brief   These function print scene information
- * @author  xx
- * @version 0.1
- * @date    12th DEC 2024
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Nabin Dangi
+ *          Riken Maharjan
+ * @version 1.0
+ * @date    June 9th, 2023 6:45 PM
  */
 
 /*******************************************************************************
@@ -84,33 +87,30 @@
 void EZPI_print_block_options(s_block_options_v2_t *block_options, l_fields_v2_t *fields, const char *tab)
 {
 #if (1 == ENABLE_TRACE)
-    TRACE_D("%s\t\t|-- blockOptions:", (NULL != tab ? tab : ""));
-    TRACE_D("%s\t\t\t|-- method", (NULL != tab ? tab : ""));
-    TRACE_D("%s\t\t\t\t|-- name: %s", (NULL != tab ? tab : ""), block_options->method.name);
-    TRACE_D("%s\t\t\t\t|-- args:", (NULL != tab ? tab : ""));
+    TRACE_D("%s\t\t|-- blockOptions:", (NULL != tab ? tab : ezlopi__str));
+    TRACE_D("%s\t\t\t|-- method", (NULL != tab ? tab : ezlopi__str));
+    TRACE_D("%s\t\t\t\t|-- name: %s", (NULL != tab ? tab : ezlopi__str), block_options->method.name);
+    TRACE_D("%s\t\t\t\t|-- args:", (NULL != tab ? tab : ezlopi__str));
 
     while (fields)
     {
-        TRACE_D("%s\t\t\t\t\t|-- %s: %s", (NULL != tab ? tab : ""), fields->name, fields->name);
+        TRACE_D("%s\t\t\t\t\t|-- %s: %s", (NULL != tab ? tab : ezlopi__str), fields->name, fields->name);
         fields = fields->next;
     }
 
     if (0 == strncmp(ezlopi_function_str, block_options->method.name, 9) && (NULL != block_options->cj_function))
     {
+        TRACE_D("%s\t\t\t|-- function", (NULL != tab ? tab : ezlopi__str));
+        const char *name = "\t\t\t\t|--";
+        char *obj_str = cJSON_Print(__FUNCTION__, block_options->cj_function);
+        if (obj_str)
         {
-            // CJSON_TRACE("\t\t\t\t|-- ", block_options->cj_funct ion);
-            TRACE_D("%s\t\t\t|-- function", (NULL != tab ? tab : ""));
-            const char *name = "\t\t\t\t|--";
-            char *obj_str = cJSON_Print(__FUNCTION__, block_options->cj_function);
-            if (obj_str)
-            {
-                TRACE_D("%s%s[%d]: %s", (NULL != tab ? tab : ""), (name ? name : ezlopi__str), strlen(obj_str), obj_str);
-                ezlopi_free(__FUNCTION__, obj_str);
-            }
-            else
-            {
-                TRACE_E("%s\t\t|--%s: Null", (NULL != tab ? tab : ""), (name ? name : ""));
-            }
+            TRACE_D("%s%s[%d]: %s", (NULL != tab ? tab : ezlopi__str), (name ? name : ezlopi__str), strlen(obj_str), obj_str);
+            ezlopi_free(__FUNCTION__, obj_str);
+        }
+        else
+        {
+            TRACE_E("%s\t\t|--%s: Null", (NULL != tab ? tab : ezlopi__str), (name ? name : ezlopi__str));
         }
     }
 
@@ -121,15 +121,15 @@ void EZPI_print_fields(l_fields_v2_t *fields, const char *tab)
 {
 #if (1 == ENABLE_TRACE)
     static uint8_t block_tab_count = 0; // this is only used here ---> // to increase block-tabs
-    TRACE_D("%s\t\t|-- fields: ", (NULL != tab ? tab : ""));
+    TRACE_D("%s\t\t|-- fields: ", (NULL != tab ? tab : ezlopi__str));
     int field_count = 0;
     while (fields)
     {
-        TRACE_D("%s\t\t\t|---------- field_count: %d ----------", (NULL != tab ? tab : ""), ++field_count);
-        TRACE_D("%s\t\t\t|-- name: %s", (NULL != tab ? tab : ""), fields->name);
+        TRACE_D("%s\t\t\t|---------- field_count: %d ----------", (NULL != tab ? tab : ezlopi__str), ++field_count);
+        TRACE_D("%s\t\t\t|-- name: %s", (NULL != tab ? tab : ezlopi__str), fields->name);
 
         const char *value_type_name = EZPI_core_scenes_get_scene_value_type_name(fields->value_type);
-        TRACE_D("%s\t\t\t|-- type: %s", (NULL != tab ? tab : ""), value_type_name ? value_type_name : ezlopi__str);
+        TRACE_D("%s\t\t\t|-- type: %s", (NULL != tab ? tab : ezlopi__str), value_type_name ? value_type_name : ezlopi__str);
 
         switch (fields->value_type)
         {
@@ -169,12 +169,12 @@ void EZPI_print_fields(l_fields_v2_t *fields, const char *tab)
         case EZLOPI_VALUE_TYPE_AMOUNT_OF_USEFUL_ENERGY:
         case EZLOPI_VALUE_TYPE_REACTIVE_POWER_CONSUMPTION:
         {
-            TRACE_D("%s\t\t\t|-- value: %d", (NULL != tab ? tab : ""), (int)fields->field_value.u_value.value_double);
+            TRACE_D("%s\t\t\t|-- value: %d", (NULL != tab ? tab : ezlopi__str), (int)fields->field_value.u_value.value_double);
             break;
         }
         case EZLOPI_VALUE_TYPE_BOOL:
         {
-            TRACE_D("%s\t\t\t|-- value: [%d]%s", (NULL != tab ? tab : ""), fields->field_value.u_value.value_bool, fields->field_value.u_value.value_bool ? ezlopi_true_str : ezlopi_false_str);
+            TRACE_D("%s\t\t\t|-- value: [%d]%s", (NULL != tab ? tab : ezlopi__str), fields->field_value.u_value.value_bool, fields->field_value.u_value.value_bool ? ezlopi_true_str : ezlopi_false_str);
             break;
         }
         case EZLOPI_VALUE_TYPE_FLOAT:
@@ -184,7 +184,7 @@ void EZPI_print_fields(l_fields_v2_t *fields, const char *tab)
         case EZLOPI_VALUE_TYPE_POWER:
         case EZLOPI_VALUE_TYPE_ACCELERATION:
         {
-            TRACE_D("%s\t\t\t|-- value: %f", (NULL != tab ? tab : ""), fields->field_value.u_value.value_double);
+            TRACE_D("%s\t\t\t|-- value: %f", (NULL != tab ? tab : ezlopi__str), fields->field_value.u_value.value_double);
             break;
         }
         case EZLOPI_VALUE_TYPE_STRING:
@@ -197,14 +197,14 @@ void EZPI_print_fields(l_fields_v2_t *fields, const char *tab)
         case EZLOPI_VALUE_TYPE_EXPRESSION:
         case EZLOPI_VALUE_TYPE_HOUSE_MODE_ID:
         {
-            TRACE_D("%s\t\t\t|-- value: %s", (NULL != tab ? tab : ""), fields->field_value.u_value.value_string);
+            TRACE_D("%s\t\t\t|-- value: %s", (NULL != tab ? tab : ezlopi__str), fields->field_value.u_value.value_string);
             break;
         }
         case EZLOPI_VALUE_TYPE_BLOCK:
         case EZLOPI_VALUE_TYPE_BLOCKS:
         {
-            TRACE_D("%s\t\t\t|-- value:", (NULL != tab ? tab : ""));
-            // TRACE_S("%s\t\t\t|-- block_tab_count : [%d]", (NULL != tab ? tab : ""), block_tab_count);
+            TRACE_D("%s\t\t\t|-- value:", (NULL != tab ? tab : ezlopi__str));
+            // TRACE_S("%s\t\t\t|-- block_tab_count : [%d]", (NULL != tab ? tab : ezlopi__str), block_tab_count);
 
             char append_tab[32] = {
                 '\t',
@@ -238,20 +238,18 @@ void EZPI_print_fields(l_fields_v2_t *fields, const char *tab)
         case EZLOPI_VALUE_TYPE_RGB:
         case EZLOPI_VALUE_TYPE_OBJECT:
         {
+            const char *name = "\t\t\t|-- value";
+            char *obj_str = cJSON_Print(__FUNCTION__, fields->field_value.u_value.cj_value);
+            if (obj_str)
             {
-                // CJSON_TRACE("\t\t\t|-- value", fields->field_value.u_value.cj_value);
-                const char *name = "\t\t\t|-- value";
-                char *obj_str = cJSON_Print(__FUNCTION__, fields->field_value.u_value.cj_value);
-                if (obj_str)
-                {
-                    TRACE_D("%s%s[%d]: %s", (NULL != tab ? tab : ""), (name ? name : ezlopi__str), strlen(obj_str), obj_str);
-                    ezlopi_free(__FUNCTION__, obj_str);
-                }
-                else
-                {
-                    TRACE_E("%s\t\t|--%s: Null", (NULL != tab ? tab : ""), (name ? name : ""));
-                }
+                TRACE_D("%s%s[%d]: %s", (NULL != tab ? tab : ezlopi__str), (name ? name : ezlopi__str), strlen(obj_str), obj_str);
+                ezlopi_free(__FUNCTION__, obj_str);
             }
+            else
+            {
+                TRACE_E("%s\t\t|--%s: Null", (NULL != tab ? tab : ezlopi__str), (name ? name : ezlopi__str));
+            }
+
             break;
         }
         case EZLOPI_VALUE_TYPE_ENUM:
@@ -259,23 +257,20 @@ void EZPI_print_fields(l_fields_v2_t *fields, const char *tab)
         {
             if (VALUE_TYPE_STRING == fields->field_value.e_type)
             {
-                TRACE_D("%s\t\t\t|-- value: %s", (NULL != tab ? tab : ""), fields->field_value.u_value.value_string);
+                TRACE_D("%s\t\t\t|-- value: %s", (NULL != tab ? tab : ezlopi__str), fields->field_value.u_value.value_string);
             }
             else if (VALUE_TYPE_CJSON == fields->field_value.e_type)
             {
+                const char *name = "\t\t\t|-- value";
+                char *obj_str = cJSON_Print(__FUNCTION__, fields->field_value.u_value.cj_value);
+                if (obj_str)
                 {
-                    // CJSON_TRACE("\t\t\t|-- value", fields->field_value.u_value.cj_value);
-                    const char *name = "\t\t\t|-- value";
-                    char *obj_str = cJSON_Print(__FUNCTION__, fields->field_value.u_value.cj_value);
-                    if (obj_str)
-                    {
-                        TRACE_D("%s%s[%d]: %s", (NULL != tab ? tab : ""), (name ? name : ezlopi__str), strlen(obj_str), obj_str);
-                        ezlopi_free(__FUNCTION__, obj_str);
-                    }
-                    else
-                    {
-                        TRACE_E("%s\t\t|--%s: Null", (NULL != tab ? tab : ""), (name ? name : ""));
-                    }
+                    TRACE_D("%s%s[%d]: %s", (NULL != tab ? tab : ezlopi__str), (name ? name : ezlopi__str), strlen(obj_str), obj_str);
+                    ezlopi_free(__FUNCTION__, obj_str);
+                }
+                else
+                {
+                    TRACE_E("%s\t\t|--%s: Null", (NULL != tab ? tab : ezlopi__str), (name ? name : ezlopi__str));
                 }
             }
             else
@@ -308,7 +303,7 @@ void EZPI_print_fields(l_fields_v2_t *fields, const char *tab)
 
         fields = fields->next;
     }
-    TRACE_D("%s\t\t\t|------------------------------------", (NULL != tab ? tab : ""));
+    TRACE_D("%s\t\t\t|------------------------------------", (NULL != tab ? tab : ezlopi__str));
 #endif
 }
 
@@ -339,39 +334,39 @@ void EZPI_print_user_notifications(l_user_notification_v2_t *user_notification)
 void EZPI_print_when_blocks(l_when_block_v2_t *when_blocks, const char *tab)
 {
 #if (1 == ENABLE_TRACE)
-    TRACE_D("%s\t|-- when: ", (NULL != tab ? tab : ""));
+    TRACE_D("%s\t|-- when: ", (NULL != tab ? tab : ezlopi__str));
     while (when_blocks)
     {
         if (0 < when_blocks->blockId)
         {
-            TRACE_D("%s\t\t|-- block_enable: %d", (NULL != tab ? tab : ""), when_blocks->block_enable);
-            TRACE_D("%s\t\t|-- blockId: %08x", (NULL != tab ? tab : ""), when_blocks->blockId);
+            TRACE_D("%s\t\t|-- block_enable: %d", (NULL != tab ? tab : ezlopi__str), when_blocks->block_enable);
+            TRACE_D("%s\t\t|-- blockId: %08x", (NULL != tab ? tab : ezlopi__str), when_blocks->blockId);
         }
 
         if (when_blocks->when_grp->grp_blockName && (0 < strlen(when_blocks->when_grp->grp_blockName)))
         {
-            TRACE_S("%s\t\t|-- group_blockName: %s", (NULL != tab ? tab : ""), when_blocks->when_grp->grp_blockName);
-            TRACE_S("%s\t\t|-- group_blockId: %08x", (NULL != tab ? tab : ""), when_blocks->when_grp->grp_id);
+            TRACE_S("%s\t\t|-- group_blockName: %s", (NULL != tab ? tab : ezlopi__str), when_blocks->when_grp->grp_blockName);
+            TRACE_S("%s\t\t|-- group_blockId: %08x", (NULL != tab ? tab : ezlopi__str), when_blocks->when_grp->grp_id);
         }
 
-        TRACE_D("%s\t\t|-- block_status_reset_once: %d", (NULL != tab ? tab : ""), when_blocks->block_status_reset_once);
+        TRACE_D("%s\t\t|-- block_status_reset_once: %d", (NULL != tab ? tab : ezlopi__str), when_blocks->block_status_reset_once);
 
         {
             const char *name = "\t\t|-- block_meta:";
             char *obj_str = cJSON_Print(__FUNCTION__, when_blocks->cj_block_meta);
             if (obj_str)
             {
-                TRACE_D("%s%s[%d]: %s", (NULL != tab ? tab : ""), (name ? name : ezlopi__str), strlen(obj_str), obj_str);
+                TRACE_D("%s%s[%d]: %s", (NULL != tab ? tab : ezlopi__str), (name ? name : ezlopi__str), strlen(obj_str), obj_str);
                 ezlopi_free(__FUNCTION__, obj_str);
             }
             else
             {
-                TRACE_E("%s%s: Null", (NULL != tab ? tab : ""), (name ? name : ""));
+                TRACE_E("%s%s: Null", (NULL != tab ? tab : ezlopi__str), (name ? name : ezlopi__str));
             }
         }
 
         EZPI_print_block_options(&when_blocks->block_options, when_blocks->fields, tab);
-        TRACE_D("%s\t\t|-- blockType: when", (NULL != tab ? tab : ""));
+        TRACE_D("%s\t\t|-- blockType: when", (NULL != tab ? tab : ezlopi__str));
         EZPI_print_fields(when_blocks->fields, tab);
         when_blocks = when_blocks->next;
     }
@@ -436,6 +431,7 @@ void EZPI_scenes_print(l_scenes_list_v2_t *scene_link_list)
 
 #endif // ENABLE_SCENES_PRINT
 #endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+
 /*******************************************************************************
  *                          End of File
  *******************************************************************************/

@@ -32,10 +32,14 @@
 /**
  * @file    ezlopi_cloud_scenes_expressions.h
  * @brief
- * @author
- * @version
- * @date
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Nabin Dangi
+ *          Riken Maharjan
+ * @version 1.0
+ * @date    December 7th, 2023 7:42 PM
  */
+
 #ifndef __SCENES_EXPRESSIONS_H__
 #define __SCENES_EXPRESSIONS_H__
 

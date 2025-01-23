@@ -32,8 +32,10 @@
 /**
  * @file    ezlopi_cloud_status_str.h
  * @brief   perform some function on data
- * @author  John Doe
- * @version 0.1
+ * @author  Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
+ * @version 1.0
  * @date    1st January 2024
  */
 

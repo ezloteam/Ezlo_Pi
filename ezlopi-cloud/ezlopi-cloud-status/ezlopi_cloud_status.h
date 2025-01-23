@@ -32,10 +32,13 @@
 /**
  * @file    ezlopi_cloud_status.h
  * @brief
- * @author
- * @version
- * @date
+ * @author  Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
+ * @version 1.0
+ * @date    March 7th, 2024 6:27 PM
  */
+
 #ifndef _EZLOPI_CLOUD_STATUS_H_
 #define _EZLOPI_CLOUD_STATUS_H_
 

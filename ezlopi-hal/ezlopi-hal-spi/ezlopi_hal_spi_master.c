@@ -31,9 +31,12 @@
 /**
  * @file    ezlopi_hal_spi_master.c
  * @brief   perform some function on SPI
- * @author  xx
- * @version 0.1
- * @date    xx
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Nabin Dangi
+ *          Riken Maharjan
+ * @version 1.0
+ * @date    October 17th, 2022 5:52 PM
  */
 
 /*******************************************************************************

@@ -31,7 +31,9 @@
 /**
  * @file    ezlopi_core_valueformatter.h
  * @brief   perform some function on valueformatting operation
- * @author  xx
+ * @author  Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version 0.1
  * @date    12th DEC 2024
  */

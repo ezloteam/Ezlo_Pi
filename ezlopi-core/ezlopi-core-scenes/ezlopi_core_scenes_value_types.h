@@ -31,7 +31,10 @@
 /**
  * @file    ezlopi_core_scenes_value_types.h
  * @brief   MACROs for scene-value-types
- * @author  xx
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version 0.1
  * @date    12th DEC 2024
  */

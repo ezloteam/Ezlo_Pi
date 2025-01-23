@@ -32,9 +32,12 @@
 /**
  * @file    ezlopi_cloud_registration.c
  * @brief
- * @author
- * @version
- * @date
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
+ * @version 1.0
+ * @date    August 15th, 2022 11:57 AM
  */
 
 /*******************************************************************************

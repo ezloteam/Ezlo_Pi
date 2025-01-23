@@ -31,9 +31,12 @@
 /**
  * @file    ezlopi_cloud_devices.h
  * @brief
- * @author
- * @version
- * @date
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
+ * @version 1.0
+ * @date    May 24th, 2023 4:58 PM
  */
 #ifndef __HUB_DEVICE_LIST_H__
 #define __HUB_DEVICE_LIST_H__

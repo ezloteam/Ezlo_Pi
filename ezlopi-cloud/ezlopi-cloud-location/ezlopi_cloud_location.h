@@ -32,10 +32,14 @@
 /**
  * @file    ezlopi_cloud_location.h
  * @brief
- * @author
- * @version
- * @date
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
+ * @version 1.0
+ * @date    January 30th, 2024 9:22 PM
  */
+
 #ifndef _EZLOPI_CLOUD_LOCATION_H_
 #define _EZLOPI_CLOUD_LOCATION_H_
 

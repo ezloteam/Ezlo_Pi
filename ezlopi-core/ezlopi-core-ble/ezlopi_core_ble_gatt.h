@@ -31,14 +31,20 @@
 /**
  * @file    ezlopi_core_ble_gatt.h
  * @brief   perform some function on ble-gatt operations
- * @author  xx
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Nabin Dangi
+ *          Riken Maharjan
  * @version 0.1
- * @date    12th DEC 2024
+ * @date    January 22nd, 2024 1:12 AM
  */
 
 #ifndef _EZLOPI_CORE_BLE_GATT_H_
 #define _EZLOPI_CORE_BLE_GATT_H_
 
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_BLE_ENABLE

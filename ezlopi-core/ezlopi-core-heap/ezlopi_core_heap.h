@@ -31,7 +31,10 @@
 /**
  * @file    ezlopi_core_heap.h
  * @brief   Function to operate on heap
- * @author  xx
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version 0.1
  * @date    12th DEC 2024
  */
@@ -46,6 +49,10 @@
 #include <string.h>
 #include <stdint.h>
 #include <stdbool.h>
+
+#include "EZLOPI_USER_CONFIG.h"
+
+#ifdef CONFIG_EZPI_HEAP_ENABLE
 
 /*******************************************************************************
  *                          C++ Declaration Wrapper
@@ -124,6 +131,7 @@ extern "C"
 }
 #endif
 
+#endif // CONFIG_EZPI_HEAP_ENABLE
 #endif // __EZLOPI_UTIL_HEAP_TRACE_H__
 
 /*******************************************************************************

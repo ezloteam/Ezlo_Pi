@@ -31,7 +31,9 @@
 /**
  * @file    device_0009_other_RMT_SK6812.h
  * @brief   perform some function on device_0009
- * @author  xx
+ * @author  Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version 0.1
  * @date    xx
  */

@@ -680,7 +680,7 @@ static int __setting_set_pre_defined_setting(void *arg, l_ezlopi_device_settings
         s_hilink_predefined_setting_value_t *setting_value = (s_hilink_predefined_setting_value_t *)setting->user_arg;
         if (setting_value)
         {
-            CJSON_GET_VALUE_STRING_BY_COPY(cj_properties, ezlopi_value_str, setting_value->setting_value);
+            CJSON_GET_VALUE_STRING_BY_COPY(cj_properties, ezlopi_value_str, setting_value->setting_value, sizeof(setting_value->setting_value));
             if (EZPI_SUCCESS != EZPI_core_nvs_write_str(setting_value->setting_value, strlen(setting_value->setting_value), "predef"))
             {
                 TRACE_E("Failed to write to NVS");
@@ -757,7 +757,7 @@ static int __setting_set_radar_distance_sensitivity_setting(void *arg, l_ezlopi_
     s_hilink_radar_distance_sensitivity_value_t *setting_val = (s_hilink_radar_distance_sensitivity_value_t *)setting->user_arg;
     if (cj_properties && setting && setting_val)
     {
-        CJSON_GET_VALUE_DOUBLE(cj_properties, ezlopi_value_str, setting_val->distance_sensitivity_value);
+        CJSON_GET_VALUE_INT(cj_properties, ezlopi_value_str, setting_val->distance_sensitivity_value);
         if (EZPI_SUCCESS != EZPI_core_nvs_write_int32(setting_val->distance_sensitivity_value, "rdrsens"))
         {
             TRACE_E("Failed to write to NVS");
@@ -1046,12 +1046,12 @@ static inline cJSON *__setting_add_text_and_lang_tag(const char *const object_te
 }
 static inline void __setting_extract_user_defined_setting(cJSON *cj_value, s_hilink_userdefined_setting_value_t *user_defined_setting_val)
 {
-    CJSON_GET_VALUE_DOUBLE(cj_value, ezlopi_min_move_distance_str, user_defined_setting_val->min_move_distance);
-    CJSON_GET_VALUE_DOUBLE(cj_value, ezlopi_max_move_distance_str, user_defined_setting_val->max_move_distance);
-    CJSON_GET_VALUE_DOUBLE(cj_value, ezlopi_min_still_distance_str, user_defined_setting_val->min_still_distance);
-    CJSON_GET_VALUE_DOUBLE(cj_value, ezlopi_max_still_distance_str, user_defined_setting_val->max_still_distance);
-    CJSON_GET_VALUE_DOUBLE(cj_value, ezlopi_timeout_str, user_defined_setting_val->timeout);
-    CJSON_GET_VALUE_DOUBLE(cj_value, ezlopi_is_active_str, user_defined_setting_val->is_active);
+    CJSON_GET_VALUE_FLOAT(cj_value, ezlopi_min_move_distance_str, user_defined_setting_val->min_move_distance);
+    CJSON_GET_VALUE_FLOAT(cj_value, ezlopi_max_move_distance_str, user_defined_setting_val->max_move_distance);
+    CJSON_GET_VALUE_FLOAT(cj_value, ezlopi_min_still_distance_str, user_defined_setting_val->min_still_distance);
+    CJSON_GET_VALUE_FLOAT(cj_value, ezlopi_max_still_distance_str, user_defined_setting_val->max_still_distance);
+    CJSON_GET_VALUE_UINT8(cj_value, ezlopi_timeout_str, user_defined_setting_val->timeout);
+    CJSON_GET_VALUE_BOOL(cj_value, ezlopi_is_active_str, user_defined_setting_val->is_active);
 }
 static inline int __prepare_user_defined_setting_cjson(cJSON *cj_value, s_hilink_userdefined_setting_value_t *setting_val)
 {

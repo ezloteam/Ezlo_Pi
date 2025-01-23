@@ -123,8 +123,8 @@ void EZPI_device_settings_value_set_v3(cJSON *cj_request, cJSON *cj_response)
     cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
     if (cj_params)
     {
-        uint32_t setting_id = 0;
-        CJSON_GET_ID(setting_id, cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi__id_str));
+        uint32_t setting_id = EZPI_core_cjson_get_id(cj_params, ezlopi__id_str);
+        // CJSON_GET_ID(setting_id, cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi__id_str));
 
         l_ezlopi_device_t *curr_device = EZPI_core_device_get_head();
         uint32_t found_setting = 0;
@@ -164,8 +164,8 @@ void EZPI_device_settings_reset_v3(cJSON *cj_request, cJSON *cj_response)
             // check for deviceId first
             if (cJSON_HasObjectItem(__FUNCTION__, cj_params, ezlopi_deviceId_str))
             {
-                uint32_t device_id = 0;
-                CJSON_GET_ID(device_id, cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_deviceId_str));
+                uint32_t device_id = EZPI_core_cjson_get_id(cj_params, ezlopi_deviceId_str);
+                // CJSON_GET_ID(device_id, cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_deviceId_str));
 
                 if (device_id == curr_device->cloud_properties.device_id)
                 {
@@ -185,8 +185,8 @@ void EZPI_device_settings_reset_v3(cJSON *cj_request, cJSON *cj_response)
             else if (cJSON_HasObjectItem(__FUNCTION__, cj_params, ezlopi__id_str))
             {
                 bool found_id = false;
-                uint32_t setting_id = 0;
-                CJSON_GET_ID(setting_id, cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi__id_str));
+                uint32_t setting_id = EZPI_core_cjson_get_id(cj_params, ezlopi__id_str);
+                // CJSON_GET_ID(setting_id, cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi__id_str));
 
                 l_ezlopi_device_settings_v3_t *curr_setting = curr_device->settings;
                 while (curr_setting)

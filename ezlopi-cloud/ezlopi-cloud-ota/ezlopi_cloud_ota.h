@@ -32,10 +32,14 @@
 /**
  * @file    ezlopi_cloud_ota.h
  * @brief
- * @author
- * @version
- * @date
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
+ * @version 1.0
+ * @date    March 7th, 2023 8:52 PM
  */
+
 #ifndef __HUB_FIRMWARE_H__
 #define __HUB_FIRMWARE_H__
 
