@@ -1176,7 +1176,7 @@ ezlopi_error_t EZPI_core_modes_api_force_disarm(uint8_t modeId)
         s_ezlopi_modes_t *curr_ez_mode = EZPI_core_modes_get_custom_modes();
         if (target_house_mode && curr_ez_mode && (modeId == curr_ez_mode->current_mode_id)) // given 'modeId' should match 'curr_ez_mode->id'
         {
-            TRACE_W("Before force-disarm --> \n ----> alarm.phase = [%d] / alarm.status = [%d]", ez_mode->alarmed.phase, ez_mode->alarmed.status);
+            TRACE_W("Before force-disarm --> \n ----> alarm.phase = [%d] / alarm.status = [%d]", curr_ez_mode->alarmed.phase, curr_ez_mode->alarmed.status);
             target_house_mode->armed = false;           // Disarm current: 'modeId' and clear all alerts for it.
             curr_ez_mode->alarmed.time_is_left_sec = 0; // This 'entry_delay_sec' must be zero to jump past the pre-alarm phase ; direct to 'main-phase'
 

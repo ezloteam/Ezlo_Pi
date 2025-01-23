@@ -160,14 +160,25 @@ extern "C"
 
     } s_sources_t;
 
+    typedef struct s_system_test
+    {
+        uint32_t started_at;      // Timestamp of the moment when the test was started
+        uint32_t duration;        // The initial or modified duration of a test. Contains initial test duration interval, or actual test duration + test duration interval, if the test was extended.
+        uint32_t time_is_left;    // How much time is left till the end of the test
+        const char *operation_id; // Operation identifier of a test, can be used to identify all events that belong to the test.
+        const char *type;         // Type of a system test, walk for sensor walk test.
+        struct s_sources *next;
+
+    } s_system_test_t;
+
     typedef struct s_alarmed
     {
         char type[32];                      // default is 'global' ( Indicates that the alarmDelay value was taken from the house modes settings)
         uint32_t entry_delay_sec;           // If house modes alarmed, and HouseModes.alarmDelay > 0, entry delay period is started . [The default value is given from 'MODE->s_entry_delay_t' choice]
         volatile uint32_t time_is_left_sec; // Number of seconds left to the end of the Entry delay.
         bool silent;                        // Default: false ... When : true ; websocket clients should treat the alarm as the silent alarm: no indication of alarm is allowed.
-        e_modes_alarm_phase_t phase;        // --> [Not in  documentation ; Added for broadcast purpose] === alarm_phases_type : [idle / bypassed / entryDelay / main]
         e_modes_alarm_status_t status;      // --> [Not in  documentation ; Added for broadcast purpose] === House_mode status for 'alaram_phase'
+        e_modes_alarm_phase_t phase;        // --> [Not in  documentation ; Added for broadcast purpose] === alarm_phases_type : [idle / bypassed / entryDelay / main]
         s_sources_t *sources;               // Contains an array of devices that waiting for the entry delay to finish. They are security devices which emitted security events
     } s_alarmed_t;
 
