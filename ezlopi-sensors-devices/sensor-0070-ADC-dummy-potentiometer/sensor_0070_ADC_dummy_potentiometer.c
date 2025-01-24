@@ -156,7 +156,7 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_dev
     item->user_arg = user_data;
 
     item->interface_type = EZLOPI_DEVICE_INTERFACE_ANALOG_INPUT; // other
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_str, item->interface.adc.gpio_num);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_str, item->interface.adc.gpio_num);
     item->interface.adc.resln_bit = 3;
 }
 
@@ -225,7 +225,9 @@ static ezlopi_error_t __0070_set_value(l_ezlopi_item_t *item, void *arg)
             s_dummy_potentiometer_t *user_data = (s_dummy_potentiometer_t *)item->user_arg;
             if (user_data)
             {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                 CJSON_TRACE("cjson_params  [dummy_potentiometer]:", cjson_params);
+#endif
 
                 float value_double = 0;
                 bool update_flag = false;

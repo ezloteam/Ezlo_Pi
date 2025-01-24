@@ -31,7 +31,9 @@
 /**
  * @file    ezlopi_hal_system_info.h
  * @brief   perform some function on system-info
- * @author  xx
+ * @author  Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version 0.1
  * @date    xx
  */

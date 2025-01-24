@@ -160,7 +160,7 @@ static cJSON* ezlopi_cloud_data_list_settings(l_ezlopi_configured_devices_t* ezl
             cJSON_AddStringToObject(__FUNCTION__, cjson_settings, ezlopi_category_str, ezlopi_device->properties->ezlopi_cloud.category);
             cJSON_AddStringToObject(__FUNCTION__, cjson_settings, ezlopi_subcategory_str, ezlopi_device->properties->ezlopi_cloud.subcategory);
             cJSON_AddBoolToObject(__FUNCTION__, cjson_settings, ezlopi_batteryPowered_str, ezlopi_device->properties->ezlopi_cloud.battery_powered);
-            cJSON_AddStringToObject(__FUNCTION__, cjson_settings, "name", ezlopi_device->properties->ezlopi_cloud.device_name);
+            cJSON_AddStringToObject(__FUNCTION__, cjson_settings, ezlopi_name_str, ezlopi_device->properties->ezlopi_cloud.device_name);
             cJSON_AddStringToObject(__FUNCTION__, cjson_settings, ezlopi_type_str, ezlopi_device->properties->ezlopi_cloud.device_type);
             cJSON_AddBoolToObject(__FUNCTION__, cjson_settings, ezlopi_reachable_str, ezlopi_device->properties->ezlopi_cloud.reachable);
             cJSON_AddBoolToObject(__FUNCTION__, cjson_settings, ezlopi_persistent_str, true);

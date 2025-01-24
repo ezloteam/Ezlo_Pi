@@ -32,10 +32,14 @@
 /**
  * @file    ezlopi_service_uart.h
  * @brief
- * @author
- * @version
- * @date
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Nabin Dangi
+ *          Riken Maharjan
+ * @version 1.0
+ * @date    July 21st, 2022 9:28 PM
  */
+
 #ifndef _EZLOPI_SERVICE_UART_H_
 #define _EZLOPI_SERVICE_UART_H_
 

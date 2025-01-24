@@ -31,7 +31,9 @@
 /**
  * @file    device_0038_other_RGB.h
  * @brief   perform some function on device_0038
- * @author  xx
+ * @author  Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version 0.1
  * @date    xx
  */

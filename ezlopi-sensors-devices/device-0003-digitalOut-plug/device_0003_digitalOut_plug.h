@@ -31,7 +31,10 @@
 /**
  * @file    device_0003_digitalOut_plug.h
  * @brief   perform some function on device_0003
- * @author  xx
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version 0.1
  * @date    xx
  */

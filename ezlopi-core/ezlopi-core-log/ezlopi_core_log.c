@@ -31,7 +31,9 @@
 /**
  * @file    ezlopi_core_log.c
  * @brief   Function operaters on system-logs
- * @author  xx
+ * @author  Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version 0.1
  * @date    12th DEC 2024
  */

@@ -155,7 +155,7 @@ esp_err_t pms_read_upcall(uint8_t *buffer, PM25_AQI_Data *data)
 
   if (sum != data->checksum)
   {
-    ESP_LOGE("", "CheckSum Failed");
+    ESP_LOGE(__FILENAME__, "CheckSum Failed");
     return ESP_FAIL;
   }
   /* success! */

@@ -32,9 +32,12 @@
 /**
  * @file    ezlopi_cloud_scales_str.h
  * @brief
- * @author  John Doe
- * @version 0.1
- * @date    1st January 2024
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
+ * @version 1.0
+ * @date    October 13th, 2022 7:24 PM
  */
 
 #ifndef __EZLOPI_SCALES_STR_H__

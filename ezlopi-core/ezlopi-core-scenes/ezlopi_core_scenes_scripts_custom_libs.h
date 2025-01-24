@@ -31,7 +31,10 @@
 /**
  * @file    ezlopi_core_scenes_scripts_custom_libs.h
  * @brief   MACROs for lua-scripts
- * @author  xx
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version 0.1
  * @date    12th DEC 2024
  */

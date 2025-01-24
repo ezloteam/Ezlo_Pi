@@ -30,11 +30,14 @@
 */
 
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
- * @version 0.1
- * @date    1st January 2024
+ * @file    ezlopi_service_ws_server.h
+ * @brief
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Nabin Dangi
+ *          Riken Maharjan
+ * @version 1.0
+ * @date    February 25th, 2024 12:37 AM
  */
 
 #ifndef __EZLOPI_SERVICE_WS_SERVER_H__
@@ -73,7 +76,7 @@ extern "C"
      *******************************************************************************/
     /**
      * @brief Function to stop websocket server
-     * 
+     *
      */
     void EZPI_service_ws_server_stop(void);
     /**

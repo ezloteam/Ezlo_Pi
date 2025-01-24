@@ -31,9 +31,12 @@
 /**
  * @file    ezlopi_core_modes_cjson.h
  * @brief   These function perform operations related to house-mode cjsons
- * @author  xx
- * @version 0.1
- * @date    12th DEC 2024
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
+ * @version 1.0
+ * @date    February 6th, 2024 11:19 AM
  */
 
 #ifndef __EZLOPI_CORE_MODES_CJSON_H__
@@ -42,8 +45,7 @@
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
-// #include "cjext.h"
-// #include <stdint.h>
+
 #include <string.h>
 
 #include "ezlopi_core_modes.h"
@@ -60,6 +62,7 @@ extern "C"
     /*******************************************************************************
      *                          Type & Macro Declarations
      *******************************************************************************/
+
 
     /*******************************************************************************
      *                          Extern Data Declarations
@@ -97,9 +100,9 @@ extern "C"
      */
     cJSON *EZPI_core_modes_cjson_changed(void);
     /**
-     * @brief This function prepares and returns cjson message containing 'Alarmed_status' of an alert-device
+     * @brief This function returns cjson indicating Alarmed_status of perticular mode
      *
-     * @param dev_id_str Id of target alert-device.
+     * @param dev_id_str Id of target MODE.
      * @return cJSON *
      */
     cJSON *EZPI_core_modes_cjson_prep_alarm_mesg(const char *dev_id_str);

@@ -30,4 +30,3 @@ idf_component_register(SRCS "${src_files}"
             ${EZLOPI_CORE_COMPONENTS}
             ${EZLOPI_CLOUD_COMPONENTS}
             )
-

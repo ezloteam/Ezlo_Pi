@@ -31,9 +31,12 @@
 /**
  * @file    ezlopi_core_devices_list.h
  * @brief   Function to list devices
- * @author  xx
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Nabin Dangi
+ *          Riken Maharjan
  * @version 0.1
- * @date    12th DEC 2024
+ * @date    October 31st, 2023 6:55 PM
  */
 
 #ifndef _EZLOPI_CORE_DEVICES_LIST_H_

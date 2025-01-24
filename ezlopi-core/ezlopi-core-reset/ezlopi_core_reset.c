@@ -31,9 +31,12 @@
 /**
  * @file    ezlopi_core_reset.c
  * @brief   perform some function on system-reset
- * @author  xx
- * @version 0.1
- * @date    12th DEC 2024
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Nabin Dangi
+ *          Riken Maharjan
+ * @version 1.0
+ * @date    February 5th, 2024 10:26 PM
  */
 
 /*******************************************************************************

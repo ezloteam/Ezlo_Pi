@@ -31,7 +31,9 @@
 /**
  * @file    ezlopi_core_boards.h
  * @brief   perform some function on ezlopi-board-type
- * @author  xx
+ * @author  Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version 0.1
  * @date    12th DEC 2024
 */

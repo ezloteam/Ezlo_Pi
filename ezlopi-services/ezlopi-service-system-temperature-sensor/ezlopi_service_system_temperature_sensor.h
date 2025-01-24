@@ -32,16 +32,18 @@
 /**
  * @file    ezlopi_service_system_temperature_sensor.h
  * @brief
- * @author
- * @version
- * @date
+ * @authors Lomas Subedi
+ *          Nabin Dangi
+ *          Riken Maharjan
+ * @version 1.0
+ * @date    September 9th, 2024 7:15 PM
  */
+
 #include "sdkconfig.h"
 #if defined(CONFIG_EZPI_ENABLE_SYSTEM_TEMPERATURE)
 
 #ifndef _EZLOPI_SERVICE_SYSTEM_TEMPERATURE_SENSOR_H_
 #define _EZLOPI_SERVICE_SYSTEM_TEMPERATURE_SENSOR_H_
-
 
 /*******************************************************************************
  *                          Include Files

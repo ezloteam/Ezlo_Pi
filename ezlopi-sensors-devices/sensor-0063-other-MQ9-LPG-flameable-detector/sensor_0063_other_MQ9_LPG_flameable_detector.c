@@ -265,7 +265,7 @@ static void __prepare_item_digi_cloud_properties(l_ezlopi_item_t *item, cJSON *c
     item->cloud_properties.scale = NULL;
     item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
 
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
     CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio1_str, item->interface.gpio.gpio_in.gpio_num);
     TRACE_S("MQ9-> DIGITAL_PIN: %d ", item->interface.gpio.gpio_in.gpio_num);
 }
@@ -289,7 +289,7 @@ static void __prepare_item_adc_cloud_properties(l_ezlopi_item_t *item, cJSON *cj
     item->cloud_properties.scale = scales_parts_per_million;
     item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
 
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
     CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio2_str, item->interface.adc.gpio_num);
     TRACE_S("MQ9-> ADC_PIN: %d ", item->interface.adc.gpio_num);
     item->interface.adc.resln_bit = 3; // ADC 12_bit
@@ -455,11 +455,8 @@ static float __extract_MQ9_sensor_ppm(l_ezlopi_item_t *item)
 
         // 1.1 Calculate @ 'ratio' during LPG_flameable presence
         double _ratio = (Rs_gas / ((MQ9_value->MQ9_R0_constant <= 0) ? (1.0f) : (MQ9_value->MQ9_R0_constant))); // avoid dividing by zero??
-        if (_ratio <= 0)
-        {
-            _ratio = 0;
-        }
-        //-------------------------------------------------
+       
+       //-------------------------------------------------
 
         // 1.2 Calculate _LPG_flameable_ppm
         float _LPG_flameable_ppm = (float)pow(10, (((float)log10(_ratio)) - b_coeff_mq9) / m_slope_mq9); // ---> _LPG_flameable_ppm = 10 ^ [ ( log(ratio) - b ) / m ]

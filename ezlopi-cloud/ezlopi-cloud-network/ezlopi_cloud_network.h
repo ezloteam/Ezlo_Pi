@@ -32,10 +32,14 @@
 /**
  * @file    ezlopi_cloud_network.h
  * @brief
- * @author
- * @version
- * @date
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Nabin Dangi
+ *          Riken Maharjan
+ * @version 1.0
+ * @date    August 15th, 2022 11:57 AM
  */
+
 #ifndef __NETWORK_H__
 #define __NETWORK_H__
 

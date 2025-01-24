@@ -31,7 +31,10 @@
 /**
  * @file    ezlopi_core_scenes_operators.h
  * @brief   These functions perform comparision operation for scenes
- * @author  xx
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version 0.1
  * @date    12th DEC 2024
  */
@@ -227,7 +230,7 @@ extern "C"
      * @param comparator_field block with 'comparator_field' info
      * @return int
      */
-    int EZPI_scenes_operators_value_strops_operations(l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, l_fields_v2_t *comparator_field);
+    int EZPI_scenes_operators_value_strops_operations(l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, l_fields_v2_t *operation_field);
     /**
      * @brief This function compare 'string_operators' with device/item-groups using given args
      *

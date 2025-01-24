@@ -31,9 +31,12 @@
 /**
  * @file    ezlopi_core_http.h
  * @brief   Function to perform operation on http
- * @author  xx
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Nabin Dangi
+ *          Riken Maharjan
  * @version 0.1
- * @date    12th DEC 2024
+ * @date    November 2nd, 2022 5:30 PM
  */
 
 #ifndef _EZLOPI_CORE_HTTP_H_
@@ -52,7 +55,6 @@
 #include "esp_log.h"
 #include "esp_event.h"
 #include "esp_http_client.h"
-// #include "esp_crt_bundle.h"
 #include "cjext.h"
 
 #include "ezlopi_core_errors.h"

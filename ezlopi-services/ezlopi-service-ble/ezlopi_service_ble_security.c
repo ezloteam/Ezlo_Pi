@@ -32,10 +32,14 @@
 /**
  * @file    ezlopi_service_ble_security.c
  * @brief   Security service related functionalities
- * @author
- * @version
- * @date
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Nabin Dangi
+ *          Riken Maharjan
+ * @version 1.0
+ * @date    July 10, 2022
  */
+
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_BLE_ENABLE
@@ -61,21 +65,21 @@
 
 #include "ezlopi_service_ble.h"
 
- /*******************************************************************************
-  *                          Type & Macro Definitions
-  *******************************************************************************/
+/*******************************************************************************
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 
-  /**
-   * @brief Returns number from the the json `root` which contains name member
-   * @note root is the JOSN and should exist before being called
-   *
-   */
+/**
+ * @brief Returns number from the the json `root` which contains name member
+ * @note root is the JOSN and should exist before being called
+ *
+ */
 #define CJ_GET_NUMBER(name) cJSON_GetNumberValue(cJSON_GetObjectItem(__FUNCTION__, root, name))
 
-   /**
-    * @brief Enum for security commands
-    *
-    */
+/**
+ * @brief Enum for security commands
+ *
+ */
 typedef enum e_ble_security_commands
 {
     BLE_CMD_UNDEFINED = 0, /**< Command undefined(0) */
@@ -91,12 +95,12 @@ typedef enum e_ble_security_commands
  *                          Static Function Prototypes
  *******************************************************************************/
 #if (1 == CONFIG_EZPI_BLE_ENALBE_PASSKEY)
- /**
-  * @brief Function to set new BLE pass key
-  *
-  * @param[in] value pointer to the value for pass key characteristics for security service
-  * @param[in] param Pointer to the gatts callback parameter
-  */
+/**
+ * @brief Function to set new BLE pass key
+ *
+ * @param[in] value pointer to the value for pass key characteristics for security service
+ * @param[in] param Pointer to the gatts callback parameter
+ */
 static void ezpi_passkey_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
 #endif
 

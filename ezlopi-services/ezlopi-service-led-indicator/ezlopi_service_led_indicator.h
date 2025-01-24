@@ -32,16 +32,17 @@
 /**
  * @file    ezlopi_service_led_indicator.h
  * @brief
- * @author
- * @version
- * @date
+ * @authors Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
+ * @version 1.0
+ * @date    April 3rd, 2024 6:33 PM
  */
 
 #ifndef _EZLOPI_SERVICE_LED_INDICATOR_H_
 #define _EZLOPI_SERVICE_LED_INDICATOR_H_
 
 #ifdef CONFIG_EZPI_ENABLE_LED_INDICATOR
-
 
 /*******************************************************************************
  *                          Include Files
@@ -71,7 +72,6 @@ extern "C"
         PRIORITY_CLOUD,     /**< Priority set at device is connected to cloud */
         PRIORITY_MAX,       /**< Invalid priority state */
     } e_indicator_led_priority_t;
-
 
     /*******************************************************************************
      *                          Extern Data Declarations

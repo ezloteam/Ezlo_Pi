@@ -30,11 +30,14 @@
 */
 
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
- * @version 0.1
- * @date    1st January 2024
+ * @file    ezlopi_cloud_category_str.h
+ * @brief
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
+ * @version 1.0
+ * @date    October 12th, 2022 8:24 PM
  */
 
 #ifndef __EZLOPI_CATEGORY_H__

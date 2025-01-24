@@ -31,7 +31,10 @@
 /**
  * @file    ezlopi_hal_uart.h
  * @brief   perform some function on UART
- * @author  xx
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version 0.1
  * @date    xx
  */

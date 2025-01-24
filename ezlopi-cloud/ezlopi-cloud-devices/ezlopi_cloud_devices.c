@@ -30,11 +30,14 @@
 */
 
 /**
- * @file     ezlopi_cloud_devices.c
- * @brief   perform some function on data
- * @author  John Doe
- * @version 0.1
- * @date    1st January 2024
+ * @file    ezlopi_cloud_devices.c
+ * @brief
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
+ * @version 1.0
+ * @date    May 24th, 2023 4:58 PM
  */
 
 /*******************************************************************************
@@ -233,7 +236,7 @@ void EZPI_device_updated(cJSON *cj_request, cJSON *cj_response)
                             }
                             else
                             {
-                                cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_roomId_str, "");
+                                cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_roomId_str, ezlopi__str);
                             }
 
                             s_ezlopi_cloud_controller_t *controller_info = EZPI_core_device_get_controller_information();
@@ -432,11 +435,11 @@ void EZPI_device_group_update(cJSON *cj_request, cJSON *cj_response)
                 cJSON *cj_devgrp_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_id_str); // "id"
                 if (cj_devgrp_id && cj_devgrp_id->valuestring)
                 {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                     // CJSON_TRACE("dev-grp [new] : ", cj_devgrp_id);
-                    uint32_t req_devgrp_id = strtoul(cj_devgrp_id->valuestring, NULL, 16);
-
+#endif
                     // edit in nvs and populate again
-                    EZPI_core_device_group_edit_by_id(req_devgrp_id, cj_params);
+                    EZPI_core_device_group_edit_by_id(strtoul(cj_devgrp_id->valuestring, NULL, 16), cj_params);
                 }
             }
         }
@@ -726,11 +729,11 @@ void EZPI_item_group_update(cJSON *cj_request, cJSON *cj_response)
                 cJSON *cj_itemgrp_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_id_str);
                 if (cj_itemgrp_id && cj_itemgrp_id->valuestring)
                 {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                     // CJSON_TRACE("dev-grp [new] : ", cj_itemgrp_id);
-                    uint32_t req_devgrp_id = strtoul(cj_itemgrp_id->valuestring, NULL, 16);
-
+#endif
                     // edit in nvs and populate again
-                    EZPI_core_item_group_edit_by_id(req_devgrp_id, cj_params);
+                    EZPI_core_item_group_edit_by_id(strtoul(cj_itemgrp_id->valuestring, NULL, 16), cj_params);
                 }
             }
         }

@@ -2,7 +2,10 @@
 /**
  * @file    ezlopi_service_ble_wifi.c
  * @brief   WiFi service related functionalities
- * @author
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version
  * @date
  */
@@ -63,12 +66,12 @@
 #include "ezlopi_service_ble_ble_auth.h"
 #include "ezlopi_service_ble.h"
 
- /*******************************************************************************
-  *                          Static Function Prototypes
-  *******************************************************************************/
-  /**
-   * @brief Function callback that responds to ESP_GATTS_WRITE_EVT gatts event for WiFi service
-   */
+/*******************************************************************************
+ *                          Static Function Prototypes
+ *******************************************************************************/
+/**
+ * @brief Function callback that responds to ESP_GATTS_WRITE_EVT gatts event for WiFi service
+ */
 static void ezlpi_wifi_creds_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
 /**
  * @brief Function callback that responds to ESP_GATTS_EXEC_WRITE_EVT gatts event for WiFi service

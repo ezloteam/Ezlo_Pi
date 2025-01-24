@@ -31,9 +31,12 @@
 /**
  * @file    ezlopi_core_scenes_notifications.c
  * @brief   These function performes operation on scene-notifications
- * @author  xx
- * @version 0.1
- * @date    12th DEC 2024
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Nabin Dangi
+ *          Riken Maharjan
+ * @version 1.0
+ * @date    December 31st, 2023 11:52 AM
  */
 
 /*******************************************************************************
@@ -105,11 +108,16 @@ void EZPI_scenes_notifications_add(cJSON *cj_notifications)
                         cJSON_AddItemReferenceToArray(__FUNCTION__, cj_user_notifications, cj_user_id);
                     }
 
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                     CJSON_TRACE("updated-scene", cj_scene);
-                    char *updated_scene_str = cJSON_PrintBuffered(__FUNCTION__, cj_scene, 4096, false);
-                    TRACE_D("length of 'updated_scene_str': %d", strlen(updated_scene_str));
+#endif
 
+                    char *updated_scene_str = cJSON_PrintBuffered(__FUNCTION__, cj_scene, 4096, false);
                     cJSON_Delete(__FUNCTION__, cj_scene);
+
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
+                    TRACE_D("length of 'updated_scene_str': %d", strlen(updated_scene_str));
+#endif
 
                     if (updated_scene_str)
                     {
@@ -150,6 +158,7 @@ void EZPI_scenes_notifications_add(cJSON *cj_notifications)
  *******************************************************************************/
 
 #endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+
 /*******************************************************************************
  *                          End of File
  *******************************************************************************/

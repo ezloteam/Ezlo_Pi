@@ -32,10 +32,14 @@
 /**
  * @file    ezlopi_service_ota.h
  * @brief
- * @author
- * @version
- * @date
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Nabin Dangi
+ *          Riken Maharjan
+ * @version 1.0
+ * @date    April 27th, 2023 6:21 PM
  */
+
 #ifndef _EZLOPI_SERVICE_OTA_H_
 #define _EZLOPI_SERVICE_OTA_H_
 

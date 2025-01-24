@@ -31,9 +31,12 @@
 /**
  * @file    ezlopi_hal_adc.c
  * @brief   Function to operate on ADC
- * @author  xx
- * @version 0.1
- * @date    xx
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Nabin Dangi
+ *          Riken Maharjan
+ * @version 1.0
+ * @date    November 10th, 2022 5:37 PM
  */
 
 /*******************************************************************************

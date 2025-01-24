@@ -32,10 +32,14 @@
 /**
  * @file    ezlopi_cloud_modes_updaters.h
  * @brief
- * @author
- * @version
- * @date
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
+ * @version 1.0
+ * @date    January 30th, 2024 6:39 PM
  */
+
 #ifndef __EZLOPI_CLOUD_MODES_UPDATERS_H__
 #define __EZLOPI_CLOUD_MODES_UPDATERS_H__
 

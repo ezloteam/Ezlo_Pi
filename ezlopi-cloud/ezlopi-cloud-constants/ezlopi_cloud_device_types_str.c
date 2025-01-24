@@ -30,11 +30,14 @@
 */
 
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
- * @version 0.1
- * @date    1st January 2024
+ * @file    ezlopi_cloud_device_types_str.c
+ * @brief
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
+ * @version 1.0
+ * @date    November 22nd, 2023 3:27 PM
  */
 
 /*******************************************************************************

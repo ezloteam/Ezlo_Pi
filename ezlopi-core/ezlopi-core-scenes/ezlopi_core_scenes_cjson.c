@@ -31,9 +31,12 @@
 /**
  * @file    ezlopi_core_scenes_cjson.c
  * @brief   file includes functions that operate on scene data
- * @author  xx
- * @version 0.1
- * @date    12th DEC 2024
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Nabin Dangi
+ *          Riken Maharjan
+ * @version 1.0
+ * @date    June 14th, 2023 6:39 PM
  */
 //*******************************************************************************
 //*                          Include Files
@@ -188,8 +191,10 @@ cJSON *EZPI_scene_cjson_get_field(l_fields_v2_t *field_node)
                     cj_when_block = EZPI_scenes_cjson_create_when_block(curr_when_block);
                     if (cj_when_block)
                     {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                         TRACE_S(" adding : __ EZLOPI_VALUE_TYPE_BLOCK __");
                         CJSON_TRACE(ezlopi_value_str, cj_when_block);
+#endif
                         cJSON_AddItemReferenceToObject(__FUNCTION__, cj_field, ezlopi_value_str, cj_when_block);
                     }
                 }
@@ -214,7 +219,9 @@ cJSON *EZPI_scene_cjson_get_field(l_fields_v2_t *field_node)
                         curr_when_block = curr_when_block->next;
                     }
 
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                     // CJSON_TRACE(ezlopi_value_str, vlaue_block_array);
+#endif
                 }
                 break;
             }
@@ -551,10 +558,12 @@ static void __cjson_add_action_block_options(cJSON *cj_block_array, l_action_blo
                     const char *method_type_name = EZPI_scene_get_scene_method_name(action_block->block_options.method.type);
                     __cjson_add_string(cj_method, ezlopi_name_str, method_type_name ? method_type_name : ezlopi__str);
                 }
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                 else
                 {
                     TRACE_E("Method type error");
                 }
+#endif
 
                 cJSON *cj_args = cJSON_AddObjectToObject(__FUNCTION__, cj_method, ezlopi_args_str);
                 if (cj_args)
@@ -686,8 +695,10 @@ static void __cjson_add_fields(cJSON *cj_block, l_fields_v2_t *fields)
                             cj_when_block = EZPI_scenes_cjson_create_when_block(curr_when_block);
                             if (cj_when_block)
                             {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                                 // TRACE_S(" adding : __ EZLOPI_VALUE_TYPE_BLOCK __");
                                 CJSON_TRACE(ezlopi_value_str, cj_when_block);
+#endif
                                 cJSON_AddItemReferenceToObject(__FUNCTION__, cj_field, ezlopi_value_str, cj_when_block);
                             }
                         }
@@ -715,7 +726,9 @@ static void __cjson_add_fields(cJSON *cj_block, l_fields_v2_t *fields)
                                 }
                                 curr_when_block = curr_when_block->next;
                             }
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                             // CJSON_TRACE(ezlopi_value_str, vlaue_block_array);
+#endif
                         }
                         break;
                     }

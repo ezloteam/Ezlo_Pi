@@ -31,7 +31,10 @@
 /**
  * @file    ezlopi_core_device_macros.h
  * @brief   Macros for device-sensors-operations
- * @author  xx
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version 0.1
  * @date    12th DEC 2024
  */

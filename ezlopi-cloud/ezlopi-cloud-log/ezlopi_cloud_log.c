@@ -32,9 +32,11 @@
 /**
  * @file    ezlopi_cloud_log.h
  * @brief
- * @author
- * @version
- * @date
+ * @author  Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
+ * @version 1.0
+ * @date    May 3rd, 2024 8:34 PM
  */
 
 /*******************************************************************************

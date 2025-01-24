@@ -467,7 +467,6 @@ static ezlopi_error_t __check_mode_switch_condition(s_ezlopi_modes_t *ez_mode)
                     // 4. Store to nvs
                     EZPI_core_modes_store_to_nvs();
                     cJSON *cj_update = EZPI_core_modes_cjson_changed();
-                    // CJSON_TRACE("----------------- broadcasting - cj_update", cj_update);
 
                     if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_update, EZPI_core_sntp_get_current_time_sec()))
                     {
@@ -593,7 +592,10 @@ static void __modes_service(void *pv)
                         EZPI_core_modes_store_to_nvs();
 
                         cJSON *cj_update = EZPI_core_modes_cjson_changed();
+
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                         CJSON_TRACE("----------------- broadcasting - cj_update", cj_update);
+#endif
 
                         if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_update))
                         {

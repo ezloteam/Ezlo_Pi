@@ -32,10 +32,14 @@
 /**
  * @file    ezlopi_cloud_info.h
  * @brief
- * @author
- * @version
- * @date
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
+ * @version 1.0
+ * @date    May 3rd, 2024 10:49 PM
  */
+
 #ifndef __HUB_INFO_H__
 #define __HUB_INFO_H__
 

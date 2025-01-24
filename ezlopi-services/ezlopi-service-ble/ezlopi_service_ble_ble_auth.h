@@ -28,13 +28,18 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
+
 /**
  * @file    ezlopi_service_ble_ble_auth.h
  * @brief
- * @author
- * @version
- * @date
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Nabin Dangi
+ *          Riken Maharjan
+ * @version 1.0
+ * @date    April 19th, 2023 7:35 PM
  */
+
 #ifndef _EZLOPI_SERVICE_BLE_BLE_AUT_H_
 #define _EZLOPI_SERVICE_BLE_BLE_AUT_H_
 

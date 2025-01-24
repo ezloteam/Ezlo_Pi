@@ -31,7 +31,10 @@
 /**
  * @file    ezlopi_hal_i2c_master.h
  * @brief   perform some function on I2C
- * @author  xx
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version 0.1
  * @date    xx
  */

@@ -28,8 +28,7 @@ version 0.1
 */
 
 #include "LTR303.h"
-
-#warning "################### DO NOT USE printf ON PRODUCTION ###################"
+#include "ezlopi_util_trace.h"
 
 s_ezlopi_i2c_master_t g_ltr303_i2c_master_conf;
 byte _error;
@@ -366,9 +365,6 @@ boolean ltr303_get_interrupt_control(boolean *polarity, boolean *intr_mode)
 
 		// Extract mode
 		*intr_mode = (intr_control & 0x02) ? true : false;
-
-		// return if successful
-		// printf("Interrupt Mode = %d, Interrupt Polarity %d\n",*intr_mode, *polarity);
 		return (true);
 	}
 	return (false);
@@ -658,25 +654,25 @@ void ltr303_print_error(byte error)
 	// If there's an I2C error, this function will
 	// print out an explanation.
 
-	//   printf("I2C error: %d,", error);
+	//   TRACE_W("I2C error: %d,", error);
 
 	//   switch(error) {
 	//     case 0:
-	//       printf("success");
+	//       TRACE_W("success");
 	//       break;
 	//     case 1:
-	//       printf("data too long for transmit buffer\n");
+	//       TRACE_W("data too long for transmit buffer\n");
 	//       break;
 	//     case 2:
-	//       printf("received NACK on address (disconnected?)\n");
+	//       TRACE_W("received NACK on address (disconnected?)\n");
 	//       break;
 	//     case 3:
-	//       printf("received NACK on data\n");
+	//       TRACE_W("received NACK on data\n");
 	//       break;
 	//     case 4:
-	//       printf("other error\n");
+	//       TRACE_W("other error\n");
 	//       break;
 	//     default:
-	//       printf("unknown error\n");
+	//       TRACE_W("unknown error\n");
 	//   }
 }

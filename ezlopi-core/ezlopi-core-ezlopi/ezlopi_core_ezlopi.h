@@ -31,9 +31,12 @@
 /**
  * @file    ezlopi_core_ezlopi.h
  * @brief   perform initialization of ezlopi modules and services
- * @author  xx
- * @version 0.1
- * @date    12th DEC 2024
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Nabin Dangi
+ *          Riken Maharjan
+ * @version 1.0
+ * @date    October 19th, 2022 7:52 PM
  */
 
 #ifndef _EZLOPI_CORE_EZLOPI_H_

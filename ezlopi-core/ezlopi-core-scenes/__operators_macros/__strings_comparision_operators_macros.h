@@ -31,7 +31,10 @@
 /**
  * @file    __strings_comparision_operators_macros.h
  * @brief   MACROS to generate enums for 'strings' comparision operators
- * @author  xx
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version 0.1
  * @date    12th DEC 2024
  */

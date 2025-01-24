@@ -31,22 +31,17 @@
 /**
  * @file    ezlopi_core_modes_cjson.c
  * @brief   These functions perform operations related to house-mode cjsons
- * @author  xx
- * @version 0.1
- * @date    12th DEC 2024
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Nabin Dangi
+ *          Riken Maharjan
+ * @version 1.0
+ * @date    February 6th, 2024 11:19 AM
  */
 
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
-
-// #include <time.h>
-// #include "cjext.h"
-
-// #include "ezlopi_util_trace.h"
-
-// #include "ezlopi_core_modes.h"
-// #include "ezlopi_core_errors.h"
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_devices.h"
@@ -168,27 +163,30 @@ s_ezlopi_modes_t *EZPI_core_modes_cjson_parse_modes(cJSON *cj_modes) // This fun
     {
         memset(parsed_mode, 0, sizeof(s_ezlopi_modes_t));
 
-        CJSON_GET_ID(parsed_mode->current_mode_id, cJSON_GetObjectItem(__FUNCTION__, cj_modes, ezlopi_current_str));
-        CJSON_GET_ID(parsed_mode->switch_to_mode_id, cJSON_GetObjectItem(__FUNCTION__, cj_modes, ezlopi_switchTo_str));
-        CJSON_GET_VALUE_DOUBLE(cj_modes, ezlopi_timeIsLeftToSwitch_str, parsed_mode->time_is_left_to_switch_sec);
-        CJSON_GET_VALUE_DOUBLE(cj_modes, ezlopi_switchToDelay_str, parsed_mode->switch_to_delay_sec);
-        CJSON_GET_VALUE_DOUBLE(cj_modes, ezlopi_alarmDelay_str, parsed_mode->alarm_delay); // "delay used" before switching to alarm assigned to this 'MODE'
+        parsed_mode->current_mode_id = EZPI_core_cjson_get_id(cj_modes, ezlopi_current_str);
+        parsed_mode->switch_to_mode_id = EZPI_core_cjson_get_id(cj_modes, ezlopi_switchTo_str);
+        // CJSON_GET_ID(parsed_mode->current_mode_id, cJSON_GetObjectItem(__FUNCTION__, cj_modes, ezlopi_current_str));
+        // CJSON_GET_ID(parsed_mode->switch_to_mode_id, cJSON_GetObjectItem(__FUNCTION__, cj_modes, ezlopi_switchTo_str));
+
+        CJSON_GET_VALUE_UINT32(cj_modes, ezlopi_timeIsLeftToSwitch_str, parsed_mode->time_is_left_to_switch_sec);
+        CJSON_GET_VALUE_UINT32(cj_modes, ezlopi_switchToDelay_str, parsed_mode->switch_to_delay_sec);
+        CJSON_GET_VALUE_UINT32(cj_modes, ezlopi_alarmDelay_str, parsed_mode->alarm_delay); // "delay used" before switching to alarm assigned to this 'MODE'
 
         cJSON *cj_entry_delay = cJSON_GetObjectItem(__FUNCTION__, cj_modes, ezlopi_entryDelay_str);
         if (cj_entry_delay)
         {
-            CJSON_GET_VALUE_DOUBLE(cj_entry_delay, ezlopi_normal_str, parsed_mode->entry_delay.normal_delay_sec);
-            CJSON_GET_VALUE_DOUBLE(cj_entry_delay, ezlopi_long_extended_str, parsed_mode->entry_delay.long_extended_delay_sec);
-            CJSON_GET_VALUE_DOUBLE(cj_entry_delay, ezlopi_extended_str, parsed_mode->entry_delay.extended_delay_sec);
-            CJSON_GET_VALUE_DOUBLE(cj_entry_delay, ezlopi_instant_str, parsed_mode->entry_delay.instant_delay_sec);
+            CJSON_GET_VALUE_UINT32(cj_entry_delay, ezlopi_normal_str, parsed_mode->entry_delay.normal_delay_sec);
+            CJSON_GET_VALUE_UINT32(cj_entry_delay, ezlopi_long_extended_str, parsed_mode->entry_delay.long_extended_delay_sec);
+            CJSON_GET_VALUE_UINT32(cj_entry_delay, ezlopi_extended_str, parsed_mode->entry_delay.extended_delay_sec);
+            CJSON_GET_VALUE_UINT32(cj_entry_delay, ezlopi_instant_str, parsed_mode->entry_delay.instant_delay_sec);
         }
 
         cJSON *cj_abort_window = cJSON_GetObjectItem(__FUNCTION__, cj_modes, ezlopi_abortWindow_str);
         if (cj_abort_window)
         {
-            CJSON_GET_VALUE_DOUBLE(cj_abort_window, ezlopi_default_str, parsed_mode->abort_delay.default_delay_sec);
-            CJSON_GET_VALUE_DOUBLE(cj_abort_window, ezlopi_minimum_str, parsed_mode->abort_delay.minimum_delay_sec);
-            CJSON_GET_VALUE_DOUBLE(cj_abort_window, ezlopi_maximum_str, parsed_mode->abort_delay.maximum_delay_sec);
+            CJSON_GET_VALUE_UINT32(cj_abort_window, ezlopi_default_str, parsed_mode->abort_delay.default_delay_sec);
+            CJSON_GET_VALUE_UINT32(cj_abort_window, ezlopi_minimum_str, parsed_mode->abort_delay.minimum_delay_sec);
+            CJSON_GET_VALUE_UINT32(cj_abort_window, ezlopi_maximum_str, parsed_mode->abort_delay.maximum_delay_sec);
         }
 
         cJSON *cj_house_modes = cJSON_GetObjectItem(__FUNCTION__, cj_modes, ezlopi_modes_str);
@@ -198,12 +196,15 @@ s_ezlopi_modes_t *EZPI_core_modes_cjson_parse_modes(cJSON *cj_modes) // This fun
 
             cJSON_ArrayForEach(cj_house_mod, cj_house_modes)
             {
+
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                 CJSON_TRACE("cj_house_mod", cj_house_mod);
-                uint32_t _mode_id = 0;
-                CJSON_GET_ID(_mode_id, cJSON_GetObjectItem(__FUNCTION__, cj_house_mod, ezlopi__id_str));
-                // TRACE_D("Mode-id: %d", _mode_id);
+#endif
 
                 s_house_modes_t *cur_house_mode = NULL;
+
+                uint32_t _mode_id = EZPI_core_cjson_get_id(cj_house_mod, ezlopi__id_str);
+                // CJSON_GET_ID(_mode_id, cJSON_GetObjectItem(__FUNCTION__, cj_house_mod, ezlopi__id_str));
 
                 switch (_mode_id)
                 {
@@ -298,11 +299,14 @@ s_ezlopi_modes_t *EZPI_core_modes_cjson_parse_modes(cJSON *cj_modes) // This fun
 
                 CJSON_GET_VALUE_BOOL(cj_house_mod, ezlopi_protect_str, cur_house_mode->protect);
                 CJSON_GET_VALUE_BOOL(cj_house_mod, ezlopi_armed_str, cur_house_mode->armed);
+
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                 // CJSON_TRACE("cur_house_mode->cj_notifications", cur_house_mode->cj_notifications);
                 // CJSON_TRACE("cur_house_mode->cj_disarmed_devices", cur_house_mode->cj_disarmed_devices);
                 // CJSON_TRACE("cur_house_mode->cj_alarms_off_devices", cur_house_mode->cj_alarms_off_devices);
                 // CJSON_TRACE("cur_house_mode->cj_cameras_off_devices", cur_house_mode->cj_cameras_off_devices);
                 // CJSON_TRACE("cur_house_mode->cj_bypass_devices", cur_house_mode->cj_bypass_devices);
+#endif
             }
         }
 
@@ -334,7 +338,10 @@ s_ezlopi_modes_t *EZPI_core_modes_cjson_parse_modes(cJSON *cj_modes) // This fun
             cJSON *cj_protect_buttons = cJSON_GetObjectItem(__FUNCTION__, cj_modes, ezlopi_protectButtons_str);
             if (cj_protect_buttons)
             {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                 // CJSON_TRACE("protect_ll", cj_protect_buttons);
+#endif
+
                 cJSON *cj_button = NULL;
                 s_protect_buttons_t *curr_button = parsed_mode->l_protect_buttons;
 
@@ -354,8 +361,11 @@ s_ezlopi_modes_t *EZPI_core_modes_cjson_parse_modes(cJSON *cj_modes) // This fun
                     if (curr_button)
                     {
                         memset(curr_button, 0, sizeof(s_protect_buttons_t));
-                        CJSON_GET_ID(curr_button->device_id, cJSON_GetObjectItem(__FUNCTION__, cj_button, ezlopi_id_str));
-                        CJSON_GET_VALUE_STRING_BY_COPY(cj_button, ezlopi_service_str, curr_button->service_name);
+
+                        curr_button->device_id = EZPI_core_cjson_get_id(cj_button, ezlopi_id_str);
+                        // CJSON_GET_ID(curr_button->device_id, cJSON_GetObjectItem(__FUNCTION__, cj_button, ezlopi_id_str));
+
+                        CJSON_GET_VALUE_STRING_BY_COPY(cj_button, ezlopi_service_str, curr_button->service_name, sizeof(curr_button->service_name));
                         curr_button->next = NULL; // making sure, tail is null;
                     }
                 }
@@ -366,14 +376,14 @@ s_ezlopi_modes_t *EZPI_core_modes_cjson_parse_modes(cJSON *cj_modes) // This fun
             cJSON *cj_alarmed = cJSON_GetObjectItem(__FUNCTION__, cj_modes, ezlopi_alarmed_str);
             if (cj_alarmed)
             {
-                CJSON_GET_VALUE_DOUBLE(cj_alarmed, ezlopi_entryDelay_str, parsed_mode->alarmed.entry_delay_sec);
-                CJSON_GET_VALUE_DOUBLE(cj_alarmed, ezlopi_timeIsLeft_str, parsed_mode->alarmed.time_is_left_sec);
+                CJSON_GET_VALUE_UINT32(cj_alarmed, ezlopi_entryDelay_str, parsed_mode->alarmed.entry_delay_sec);
+                CJSON_GET_VALUE_UINT32(cj_alarmed, ezlopi_timeIsLeft_str, parsed_mode->alarmed.time_is_left_sec);
 
-                CJSON_GET_VALUE_STRING_BY_COPY(cj_alarmed, ezlopi_type_str, parsed_mode->alarmed.type);
+                CJSON_GET_VALUE_STRING_BY_COPY(cj_alarmed, ezlopi_type_str, parsed_mode->alarmed.type, sizeof(parsed_mode->alarmed.type));
                 CJSON_GET_VALUE_BOOL(cj_alarmed, ezlopi_silent_str, parsed_mode->alarmed.silent);
 
                 char tmp_str[32] = {0};
-                CJSON_GET_VALUE_STRING_BY_COPY(cj_alarmed, ezlopi_phase_str, tmp_str);
+                CJSON_GET_VALUE_STRING_BY_COPY(cj_alarmed, ezlopi_phase_str, tmp_str, sizeof(tmp_str));
                 {
                     size_t tmp_len = strlen(tmp_str) + 1;
                     (EZPI_STRNCMP_IF_EQUAL(ezlopi_idle_str, tmp_str, 5, tmp_len))          ? (parsed_mode->alarmed.phase = EZLOPI_MODES_ALARM_PHASE_IDLE)
@@ -383,7 +393,7 @@ s_ezlopi_modes_t *EZPI_core_modes_cjson_parse_modes(cJSON *cj_modes) // This fun
                                                                                            : (parsed_mode->alarmed.phase = EZLOPI_MODES_ALARM_PHASE_NONE); // this "NONE"-phase exists only at the beginning .
                 }
 
-                CJSON_GET_VALUE_STRING_BY_COPY(cj_alarmed, ezlopi_status_str, tmp_str);
+                CJSON_GET_VALUE_STRING_BY_COPY(cj_alarmed, ezlopi_status_str, tmp_str, sizeof(tmp_str));
                 {
                     size_t tmp_len = strlen(tmp_str) + 1;
                     (EZPI_STRNCMP_IF_EQUAL(ezlopi_done_str, tmp_str, 5, tmp_len))       ? (parsed_mode->alarmed.status = EZLOPI_MODES_ALARM_STATUS_DONE)
@@ -396,28 +406,38 @@ s_ezlopi_modes_t *EZPI_core_modes_cjson_parse_modes(cJSON *cj_modes) // This fun
                 if (cj_sources_arr)
                 {
                     cJSON *cj_source = NULL;
-                    s_sources_t *curr_source = NULL;
+                    s_sources_t *curr_source = parsed_mode->alarmed.sources;
 
                     cJSON_ArrayForEach(cj_source, cj_sources_arr)
                     {
-                        if (parsed_mode->alarmed.sources)
+                        if (curr_source)
                         {
                             curr_source->next = (s_sources_t *)ezlopi_malloc(__FUNCTION__, sizeof(s_sources_t));
-                            curr_source = curr_source->next;
+                            if (curr_source->next)
+                            {
+                                curr_source = curr_source->next;
+                            }
                         }
                         else
                         {
                             parsed_mode->alarmed.sources = (s_sources_t *)ezlopi_malloc(__FUNCTION__, sizeof(s_sources_t));
-                            curr_source = parsed_mode->alarmed.sources;
+                            if (parsed_mode->alarmed.sources)
+                            {
+                                curr_source = parsed_mode->alarmed.sources;
+                            }
                         }
 
                         if (curr_source)
                         {
                             memset(curr_source, 0, sizeof(s_sources_t));
 
-                            CJSON_GET_ID(curr_source->device_id, cJSON_GetObjectItem(__FUNCTION__, cj_source, ezlopi_deviceId_str));
-                            CJSON_GET_VALUE_DOUBLE(cj_source, ezlopi_timestamp_str, curr_source->time_stamp);
-                            CJSON_GET_VALUE_DOUBLE(cj_source, ezlopi_delay_str, curr_source->delay);
+                            curr_source->device_id = EZPI_core_cjson_get_id(cj_source, ezlopi_deviceId_str);
+
+                            uint32_t time_stamp = 0;
+                            CJSON_GET_VALUE_UINT32(cj_source, ezlopi_timestamp_str, time_stamp);
+                            curr_source->time_stamp = time_stamp;
+
+                            CJSON_GET_VALUE_UINT32(cj_source, ezlopi_delay_str, curr_source->delay);
                         }
                     }
                 }

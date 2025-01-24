@@ -32,10 +32,14 @@
 /**
  * @file    ezlopi_cloud_modes.c
  * @brief
- * @author
- * @version
- * @date
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
+ * @version 1.0
+ * @date    August 15th, 2022 11:57 AM
  */
+
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
@@ -401,14 +405,14 @@ void EZPI_cloud_modes_protect_set(cJSON *cj_request, cJSON *cj_response)
     cJSON *cj_result = cJSON_AddObjectToObject(__FUNCTION__, cj_response, ezlopi_result_str);
     if (cj_result)
     {
+        // double timestamp = 0;
         bool protect_state = false;
-        double timestamp = 0;
 
         cJSON *cj_params = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_params_str);
         if (cj_params)
         {
             CJSON_GET_VALUE_BOOL(cj_params, ezlopi_protect_str, protect_state);
-            CJSON_GET_VALUE_DOUBLE(cj_params, ezlopi_timestamp_str, timestamp); // timestamp not needed rightnow
+            // CJSON_GET_VALUE_DOUBLE(cj_params, ezlopi_timestamp_str, timestamp); // timestamp not needed rightnow
 
             cJSON *cj_mode_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_modeId_str);
             if (cj_mode_id && cj_mode_id->valuestring)

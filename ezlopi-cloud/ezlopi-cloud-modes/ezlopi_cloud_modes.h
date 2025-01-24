@@ -32,10 +32,14 @@
 /**
  * @file    ezlopi_cloud_modes.h
  * @brief
- * @author
- * @version
- * @date
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
+ * @version 1.0
+ * @date    July 21st, 2022 9:28 PM
  */
+
 #ifndef __HUB_MODES_H__
 #define __HUB_MODES_H__
 

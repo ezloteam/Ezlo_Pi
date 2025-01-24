@@ -31,7 +31,10 @@
 /**
  * @file    ezlopi_core_scenes_then_methods.c
  * @brief   Funtions that performs scene-Action/Then method operations
- * @author  xx
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version 0.1
  * @date    12th DEC 2024
  */
@@ -436,13 +439,13 @@ int EZPI_core_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void 
             l_fields_v2_t *curr_field = curr_then->fields;
 
             const s_sendhttp_method_t __sendhttp_method[] = {
-                {.field_name = "request", .field_func = EZPI_parse_http_request_type},
-                {.field_name = "url", .field_func = EZPI_parse_http_url},
-                {.field_name = "credential", .field_func = EZPI_parse_http_creds},
-                {.field_name = "contentType", .field_func = EZPI_parse_http_content_type},
-                {.field_name = "content", .field_func = EZPI_parse_http_content},
-                {.field_name = "headers", .field_func = EZPI_parse_http_headers},
-                {.field_name = "skipSecurity", .field_func = EZPI_parse_http_skipsecurity},
+                {.field_name = ezlopi_request_str, .field_func = EZPI_parse_http_request_type},
+                {.field_name = ezlopi_url_str, .field_func = EZPI_parse_http_url},
+                {.field_name = ezlopi_credential_str, .field_func = EZPI_parse_http_creds},
+                {.field_name = ezlopi_contentType_str, .field_func = EZPI_parse_http_content_type},
+                {.field_name = ezlopi_content_str, .field_func = EZPI_parse_http_content},
+                {.field_name = ezlopi_headers_str, .field_func = EZPI_parse_http_headers},
+                {.field_name = ezlopi_skipSecurity_str, .field_func = EZPI_parse_http_skipsecurity},
                 {.field_name = NULL, .field_func = NULL},
             };
 
@@ -798,7 +801,9 @@ int EZPI_core_scene_then_set_expression(l_scenes_list_v2_t *curr_scene, void *ar
                     if ((EZLOPI_VALUE_TYPE_OBJECT == curr_field->value_type) && (NULL != curr_field->field_value.u_value.cj_value))
                     {
                         cj_metadata = curr_field->field_value.u_value.cj_value;
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                         CJSON_TRACE("params", cj_metadata);
+#endif
                     }
                 }
                 else if (EZPI_STRNCMP_IF_EQUAL(curr_field->name, ezlopi_params_str, len, 7))
@@ -806,7 +811,9 @@ int EZPI_core_scene_then_set_expression(l_scenes_list_v2_t *curr_scene, void *ar
                     if ((EZLOPI_VALUE_TYPE_EXPRESSION == curr_field->value_type) && (NULL != curr_field->field_value.u_value.cj_value))
                     {
                         cj_params = curr_field->field_value.u_value.cj_value;
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                         CJSON_TRACE("params", cj_params);
+#endif
                     }
                 }
                 curr_field = curr_field->next;
@@ -863,7 +870,6 @@ int EZPI_core_scene_then_set_variable(l_scenes_list_v2_t *curr_scene, void *arg)
                     if ((EZLOPI_VALUE_TYPE_OBJECT == curr_field->value_type) && (NULL != curr_field->field_value.u_value.cj_value))
                     {
                         cj_metadata = curr_field->field_value.u_value.cj_value;
-                        // CJSON_TRACE("metadata", cj_metadata);
                     }
                 }
                 curr_field = curr_field->next;

@@ -32,10 +32,14 @@
 /**
  * @file    gateways_commands_str.c
  * @brief
- * @author
- * @version
- * @date
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ *          Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
+ * @version 1.0
+ * @date    December 25th, 2023 9:01 PM
  */
+
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/

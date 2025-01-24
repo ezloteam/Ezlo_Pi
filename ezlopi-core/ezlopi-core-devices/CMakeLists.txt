@@ -104,5 +104,3 @@ idf_component_register(SRCS "${config_src}"
                                         ${EZLOPI_CLOUD_COMPONENTS}
                                         ${EZLOPI_SENSOR_DEVICE_COMPONENTS}
                         )
-
-

@@ -31,7 +31,9 @@
 /**
  * @file    ezlopi_core_setting_commands.h
  * @brief   perform some function on setting cmds
- * @author  xx
+ * @author  Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version 0.1
  * @date    12th DEC 2024
  */
