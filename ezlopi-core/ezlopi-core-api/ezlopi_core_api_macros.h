@@ -214,6 +214,11 @@ extern "C"
     CLOUD_METHOD("hub.setting.value.set", EZPI_setting_value_set, EZPI_setting_value_set_broadcast_updater)
     CLOUD_METHOD("hub.settings.list", EZPI_settings_list, NULL)
 
+    CLOUD_METHOD("hub.protect.signal.list", EZPI_, NULL)
+    CLOUD_METHOD("hub.protect.security.config.list", EZPI_settings_list, NULL)
+
+    
+
 #endif // (defined(CONFIG_EZPI_WEBSOCKET_CLIENT) || defined(EZPI_LOCAL_WEBSOCKET_SERVER))
 
     /*******************************************************************************

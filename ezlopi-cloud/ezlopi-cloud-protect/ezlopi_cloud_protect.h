@@ -30,25 +30,22 @@
 */
 
 /**
- * @file    ezlopi_cloud_settings.h
- * @brief
- * @authors Lomas Subedi
+ * @file    ezlopi_cloud_protect.h
+ * @brief   These function are responsible for broadcast of 'hub.protect.signal.list' & 'hub.protect.security.config.list'
+ * @author  Lomas Subedi
  *          Riken Maharjan
  *          Nabin Dangi
  * @version 1.0
- * @date    November 1st, 2023 2:00 PM
+ * @date    March 7th, 2024 6:27 PM
  */
 
-#ifndef __HUB_SETTINGS_H__
-#define __HUB_SETTINGS_H__
+#ifndef _EZLOPI_CLOUD_PROTECT_H_
+#define _EZLOPI_CLOUD_PROTECT_H_
 
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
-#include <string.h>
-
-#include "ezlopi_core_settings.h"
-#include "ezlopi_core_devices.h"
+#include "cjext.h"
 
 /*******************************************************************************
  *                          C++ Declaration Wrapper
@@ -57,6 +54,7 @@
 extern "C"
 {
 #endif
+
     /*******************************************************************************
      *                          Type & Macro Declarations
      *******************************************************************************/
@@ -68,43 +66,20 @@ extern "C"
     /*******************************************************************************
      *                          Extern Function Prototypes
      *******************************************************************************/
+
     /**
-     * @brief Function that responds to hub.device.settings.list method
+     * @brief Function to Return an array of Contact Ids.
      *
      * @param cj_request Incoming JSON request
      * @param cj_response Outgoing JSON response
      */
-    void EZPI_device_settings_list_v3(cJSON *cj_request, cJSON *cj_response);
-    /**
-     * @brief Function that responds to hub.device.settings.value.set method
-     *
-     * @param cj_request Incoming JSON request
-     * @param cj_response Outgoing JSON response
-     */
-    void EZPI_device_settings_value_set_v3(cJSON *cj_request, cJSON *cj_response);
-    /**
-     * @brief Function that responds to hub.device.setting.reset method
-     *
-     * @param cj_request Incoming JSON request
-     * @param cj_response Outgoing JSON response
-     */
-    void EZPI_device_settings_reset_v3(cJSON *cj_request, cJSON *cj_response);
-    /**
-     * @brief Updater function to update device settings to the cloud
-     *
-     * @deprecated
-     *
-     * @param device
-     * @param setting
-     * @return cJSON*
-     */
-    // cJSON *EZPI_cloud_settings_updated_from_devices_v3(l_ezlopi_device_t *device, l_ezlopi_device_settings_v3_t *setting);
+    void EZPI_cloud_protect_signal_list(cJSON *cj_request, cJSON *cj_response);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // __HUB_SETTINGS_H__
+#endif // _EZLOPI_CLOUD_PROTECT_H_
 
 /*******************************************************************************
  *                          End of File
