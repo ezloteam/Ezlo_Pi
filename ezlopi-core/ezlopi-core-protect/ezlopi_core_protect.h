@@ -71,15 +71,15 @@ extern "C"
         EZLOPI_SECURITY_EVENT_MAX,
     } e_sound_type_t;
 
-    typedef enum e_entry_delay
+    typedef enum e_protect_entrydelay
     {
-        EZLOPI_ENTRY_DELAY_NONE = 0,
-        EZLOPI_ENTRY_DELAY_NORMAL,
-        EZLOPI_ENTRY_DELAY_LONG_EXTENDED,
-        EZLOPI_ENTRY_DELAY_EXTENDED,
-        EZLOPI_ENTRY_DELAY_INSTANT,
-        EZLOPI_ENTRY_DELAY_MAX,
-    } e_entry_delay_t;
+        EZLOPI_PROTECT_ENTRYDELAY_NONE = 0,
+        EZLOPI_PROTECT_ENTRYDELAY_NORMAL,
+        EZLOPI_PROTECT_ENTRYDELAY_LONG_EXTENDED,
+        EZLOPI_PROTECT_ENTRYDELAY_EXTENDED,
+        EZLOPI_PROTECT_ENTRYDELAY_INSTANT,
+        EZLOPI_PROTECT_ENTRYDELAY_MAX,
+    } e_protect_entrydelay_t;
 
     typedef struct s_security_config
     {
@@ -93,8 +93,8 @@ extern "C"
         bool alarm;              // Default is true. If true, alarm is caused by security and protect events of the devices. If false, no security events are initiated.
         bool chime;              // If true, chime should ring
 
-        e_sound_type_t sound_type;  // Sound type that should be played by annunciators In response on the security event.
-        e_entry_delay_t entryDelay; // Entry Delay name. Security event should have that entry delay if it happens to a device that belongs to the group.
+        e_sound_type_t sound_type;         // Sound type that should be played by annunciators In response on the security event.
+        e_protect_entrydelay_t entryDelay; // Entry Delay name. Security event should have that entry delay if it happens to a device that belongs to the group.
 
         cJSON *armedWhen; // enum ArmingType[] // Arming modes. Devices that belong to the Security Config should be armed in all listed modes, and disarmed in all non-listed modes
         cJSON *tags;      // Device groups to reconnect when pairing

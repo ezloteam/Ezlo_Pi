@@ -31,8 +31,10 @@
 
 /**
  * @file    ezlopi_core_protect.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @brief   perform some function Based on the security configuration, using which broadcasts are tuned to have parts related to the Protect services.
+ * @author  Lomas Subedi
+ *          Riken Maharjan
+ *          Nabin Dangi
  * @version 0.1
  * @date    1st January 2024
  */

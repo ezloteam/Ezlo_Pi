@@ -9,6 +9,7 @@ set(EZLOPI_CORE_COMPONENTS
         ezlopi-core-actions
         ezlopi-core-devices
         ezlopi-core-errors
+        ezlopi-core-protect
 )
 set(EZLOPI_HAL_COMPONENTS
         ezlopi-hal-gpio

@@ -12,6 +12,7 @@ set(EZLOPI_CORE_COMPONENTS
         ezlopi-core-factory-info
         ezlopi-cloud-constants
         ezlopi-core-sntp
+        ezlopi-core-protect
 )
 
 # Define HAL components

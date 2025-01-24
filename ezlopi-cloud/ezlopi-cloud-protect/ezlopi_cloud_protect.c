@@ -100,7 +100,7 @@ void EZPI_cloud_protect_signal_list(cJSON *cj_request, cJSON *cj_response)
 
         if (reply_flag)
         {
-            EZPI_core_modes_api_get_current_mode(cj_result);
+            // EZPI_core_modes_api_get_current_mode(cj_result);
         }
     }
 }

@@ -57,15 +57,15 @@ extern "C"
     /*******************************************************************************
      *                          Type & Macro Declarations
      *******************************************************************************/
-    // typedef enum e_ezlopi_device_grp_entrydelay_type
+    // typedef enum e_EZLOPI_PROTECT_ENTRYDELAY_type
     // {
-    //     EZLOPI_DEVICE_GRP_ENTRYDELAY_NONE = 0,
-    //     EZLOPI_DEVICE_GRP_ENTRYDELAY_NORMAL,
-    //     EZLOPI_DEVICE_GRP_ENTRYDELAY_LONG_EXTENDED,
-    //     EZLOPI_DEVICE_GRP_ENTRYDELAY_EXTENDED,
-    //     EZLOPI_DEVICE_GRP_ENTRYDELAY_INSTANT,
-    //     EZLOPI_DEVICE_GRP_ENTRYDELAY_MAX
-    // } e_ezlopi_device_grp_entrydelay_type_t;
+    //     EZLOPI_PROTECT_ENTRYDELAY_NONE = 0,
+    //     EZLOPI_PROTECT_ENTRYDELAY_NORMAL,
+    //     EZLOPI_PROTECT_ENTRYDELAY_LONG_EXTENDED,
+    //     EZLOPI_PROTECT_ENTRYDELAY_EXTENDED,
+    //     EZLOPI_PROTECT_ENTRYDELAY_INSTANT,
+    //     EZLOPI_PROTECT_ENTRYDELAY_MAX
+    // } e_EZLOPI_PROTECT_ENTRYDELAY_type_t;
 
     typedef enum e_ezlopi_device_grp_role_type
     {
@@ -90,7 +90,7 @@ extern "C"
         cJSON *exceptions; // array of DeviceIds to exclude from this group
         char *name;        // device_group_name
         char *package_id;
-        e_entry_delay_t entry_delay;
+        e_protect_entrydelay_t entry_delay; // e
         e_ezlopi_device_grp_role_type_t role;
         uint32_t _id; // perticular device_group_id
         bool persistent;
