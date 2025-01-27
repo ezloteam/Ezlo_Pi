@@ -754,6 +754,10 @@ static void __uart_loop(void *arg)
             }
         }
     }
+#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
+    EZPI_core_process_set_is_deleted(ENUM_EZLOPI_SERVICE_UART_TASK);
+#endif
+    vTaskDelete(NULL);
 }
 
 static int ezpi_service_uart_firmware_info(cJSON *cj_parent)
