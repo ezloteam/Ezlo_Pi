@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,8 +31,8 @@
 /**
  * @file    ezlopi_core_offline_login.c
  * @brief   Function to perform offine login operation
- * @author  xx
- * @version 0.1
+ * @author
+ * @version 1.0
  * @date    12th DEC 2024
  */
 
@@ -45,8 +45,6 @@
 #include "EZLOPI_USER_CONFIG.h"
 #include "ezlopi_core_factory_info.h"
 #include "ezlopi_core_offline_login.h"
-
-#define BYPASS_LOGIN 1
 
 /*******************************************************************************
  *                          Extern Data Declarations
@@ -85,20 +83,18 @@ ezlopi_error_t EZPI_core_offline_login_perform(cJSON *cj_params)
     }
     else
     {
-#if (1 == BYPASS_LOGIN)
-        logged_in = true;
-#else  // BYPASS_LOGIN == 0
         cJSON *cj_user = cJSON_GetObjectItem(__FUNCTION__, cj_params, "user");
         cJSON *cj_token = cJSON_GetObjectItem(__FUNCTION__, cj_params, "token");
         if (cj_user && cj_token && (cJSON_IsString(cj_user)) && (cJSON_IsString(cj_token)))
         {
 
+#warning "Lomas: user-id verification disabled!"
             // char *stored_uesr_id = EZPI_core_nvs_read_user_id_str();
             // if (NULL != stored_uesr_id)
             {
                 // if (0 == strncmp(stored_uesr_id, cj_user->valuestring, strlen(stored_uesr_id)))
                 {
-                    const char *password_saved = EZPI_core_factory_info_v3_get_local_key();
+                    char *password_saved = EZPI_core_factory_info_v3_get_local_key();
                     if (NULL != password_saved)
                     {
                         TRACE_D("password: %s", password_saved);
@@ -117,6 +113,8 @@ ezlopi_error_t EZPI_core_offline_login_perform(cJSON *cj_params)
                         error = EZPI_ERR_INVALID_CREDENTIALS;
                     }
                 }
+
+#warning "Lomas: user-id verification disabled!"
                 // else
                 // {
                 //     error = EZPI_ERR_WRONG_PARAM;
@@ -128,7 +126,6 @@ ezlopi_error_t EZPI_core_offline_login_perform(cJSON *cj_params)
         {
             error = EZPI_ERR_WRONG_PARAM;
         }
-#endif // BYPASS_LOGIN == 0
     }
 
     return error;

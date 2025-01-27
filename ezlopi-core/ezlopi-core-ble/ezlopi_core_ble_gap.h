@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,9 +31,9 @@
 /**
  * @file    main.h
  * @brief   perform some function on data
- * @author  xx
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 0.1
- * @date    12th DEC 2024
+ * @date    December 4th, 2022 7:31 PM
  */
 #ifndef _EZLOPI_CORE_BLE_GAP_H_
 #define _EZLOPI_CORE_BLE_GAP_H_

@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,9 +31,9 @@
 /**
  * @file    ezlopi_core_ble_gatt.h
  * @brief   perform some function on ble-gatt operations
- * @author  xx
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 0.1
- * @date    12th DEC 2024
+ * @date    January 22nd, 2024 1:12 AM
  */
 
 #ifndef _EZLOPI_CORE_BLE_GATT_H_

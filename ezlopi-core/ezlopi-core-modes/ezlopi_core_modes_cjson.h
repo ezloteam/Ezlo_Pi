@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,9 +31,9 @@
 /**
  * @file    ezlopi_core_modes_cjson.h
  * @brief   These function perform operations related to house-mode cjsons
- * @author  xx
- * @version 0.1
- * @date    12th DEC 2024
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ * @version 1.0
+ * @date    February 6th, 2024 11:19 AM
  */
 
 #ifndef __EZLOPI_CORE_MODES_CJSON_H__
@@ -42,13 +42,13 @@
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
-// #include "cjext.h"
-// #include <stdint.h>
+
 #include <string.h>
 
 #include "ezlopi_core_modes.h"
 #include "ezlopi_core_errors.h"
 
+#if defined(CONFIG_EZPI_SERV_ENABLE_MODES)
 /*******************************************************************************
  *                          C++ Declaration Wrapper
  *******************************************************************************/
@@ -56,70 +56,60 @@
 extern "C"
 {
 #endif
+    /*******************************************************************************
+     *                          Type & Macro Declarations
+     *******************************************************************************/
 
-#if defined(CONFIG_EZPI_SERV_ENABLE_MODES)
-/*******************************************************************************
- *                          C++ Declaration Wrapper
- *******************************************************************************/
-#ifdef __cplusplus
-    extern "C"
-    {
-#endif
+    /*******************************************************************************
+     *                          Extern Data Declarations
+     *******************************************************************************/
 
-        /*******************************************************************************
-         *                          Type & Macro Declarations
-         *******************************************************************************/
+    /*******************************************************************************
+     *                          Extern Function Prototypes
+     *******************************************************************************/
 
-        /*******************************************************************************
-         *                          Extern Data Declarations
-         *******************************************************************************/
-
-        /*******************************************************************************
-         *                          Extern Function Prototypes
-         *******************************************************************************/
-
-        /**
-         * @brief This function returns an oject containing current House-Modes information
-         *
-         * @param cj_dest Destination object for House-mode infomation.
-         * @return ezlopi_error_t
-         */
-        ezlopi_error_t EZPI_core_modes_cjson_get_modes(cJSON *cj_dest);
-        /**
-         * @brief This function returns object contaings modeId of currently active House-Modes
-         *
-         * @param cj_dest Destination object where house-mode id is stored
-         * @return ezlopi_error_t
-         */
-        ezlopi_error_t EZPI_core_modes_cjson_get_current_mode(cJSON *cj_dest);
-        /**
-         * @brief This function returns a new house-mode node from the source-obj 'cj_modes'
-         *
-         * @param cj_modes Source object used to extract info from.
-         * @return s_ezlopi_modes_t
-         */
-        s_ezlopi_modes_t *EZPI_core_modes_cjson_parse_modes(cJSON *cj_modes);
-        /**
-         * @brief This function returns cjson indicating MODES_status
-         *
-         * @return cJSON *
-         */
-        cJSON *EZPI_core_modes_cjson_changed(void);
-        /**
-         * @brief This function returns cjson indicating Alarmed_status of perticular mode
-         *
-         * @param dev_id_str Id of target MODE.
-         * @return cJSON *
-         */
-        cJSON *EZPI_core_modes_cjson_alarmed(const char *dev_id_str);
+    /**
+     * @brief This function returns an oject containing current House-Modes information
+     *
+     * @param cj_dest Destination object for House-mode infomation.
+     * @return ezlopi_error_t
+     */
+    ezlopi_error_t EZPI_core_modes_cjson_get_modes(cJSON *cj_dest);
+    /**
+     * @brief This function returns object contaings modeId of currently active House-Modes
+     *
+     * @param cj_dest Destination object where house-mode id is stored
+     * @return ezlopi_error_t
+     */
+    ezlopi_error_t EZPI_core_modes_cjson_get_current_mode(cJSON *cj_dest);
+    /**
+     * @brief This function returns a new house-mode node from the source-obj 'cj_modes'
+     *
+     * @param cj_modes Source object used to extract info from.
+     * @return s_ezlopi_modes_t
+     */
+    s_ezlopi_modes_t *EZPI_core_modes_cjson_parse_modes(cJSON *cj_modes);
+    /**
+     * @brief This function returns cjson indicating MODES_status
+     *
+     * @return cJSON *
+     */
+    cJSON *EZPI_core_modes_cjson_changed(void);
+    /**
+     * @brief This function returns cjson indicating Alarmed_status of perticular mode
+     *
+     * @param dev_id_str Id of target MODE.
+     * @return cJSON *
+     */
+    cJSON *EZPI_core_modes_cjson_alarmed(const char *dev_id_str);
 
 #ifdef __cplusplus
-    }
+}
 #endif
 
 #endif // CONFIG_EZPI_SERV_ENABLE_MODES
 
 #endif // __EZLOPI_CORE_MODES_CJSON_H__
-    /*******************************************************************************
-     *                          End of File
-     *******************************************************************************/
+/*******************************************************************************
+ *                          End of File
+ *******************************************************************************/

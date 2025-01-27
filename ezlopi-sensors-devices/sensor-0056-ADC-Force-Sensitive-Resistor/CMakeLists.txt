@@ -41,7 +41,7 @@ set(EZLOPI_UTIL_COMPONENTS
 )
 
 # Register the components
-idf_component_register(SRCS "${config_src}"
+idf_component_register(SRCS "sensor_0056_ADC_Force_Sensitive_Resistor.c" "${config_src}"
                         INCLUDE_DIRS "."
                         REQUIRES        ${ESP_IDF_COMPONENTS}
                                         ${EZLOPI_CORE_COMPONENTS}

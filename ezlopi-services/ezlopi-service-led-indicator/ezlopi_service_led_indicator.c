@@ -1,14 +1,5 @@
-
-
-/**
- * @file    ezlopi_service_led_indicator.c
- * @brief
- * @author
- * @version
- * @date
- */
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -37,6 +28,17 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
+
+/**
+ * @file    ezlopi_service_led_indicator.c
+ * @brief   This file contains blinks LED according to the status of the device such as, device started, internet connected, device registered, etc.
+ * @details If the device is ESP32S3, ESP32C3 or ESP32S2 the color will change from red on device started, orange on WiFi connected, blue on internet available and
+            green on device connected to cloud. If the device is ESP32, indicator LED will blink for 20, 50, 100 and 200 ms on device on, WiFi connected, internet available
+            and device connected to cloud.
+ * @author
+ * @version 1.0
+ * @date    April 3, 2024
+ */
 
 #include "../../build/config/sdkconfig.h"
 

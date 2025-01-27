@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,7 +31,7 @@
 /**
  * @file    sensor_0067_hilink_presence_sensor.h
  * @brief   perform some function on sensor_0067
- * @author  xx
+ * @author  
  * @version 0.1
  * @date    xx
  */

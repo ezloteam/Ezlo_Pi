@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,10 +31,10 @@
 
 /**
  * @file    ezlopi_cloud_valye_type_str.h
- * @brief   perform some function on data
- * @author  John Doe
- * @version 0.1
- * @date    1st January 2024
+ * @brief   Declarations for cloud value type strings
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ * @version 1.0
+ * @date    February 24th, 2023 11:18 AM
  */
 
 #ifndef __EZLOPI_VALUES_STR_H__

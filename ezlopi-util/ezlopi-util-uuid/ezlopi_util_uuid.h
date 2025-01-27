@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -32,7 +32,7 @@
 /**
  * @file    main.c
  * @brief   perform some function on data
- * @author  John Doe
+ * @author  
  * @version 0.1
  * @date    1st January 2024
  */
@@ -52,14 +52,14 @@ extern "C"
 {
 #endif
 
-    /*******************************************************************************
-     *                          Type & Macro Declarations
-     *******************************************************************************/
-    #define RAND_LENGTH 4
+/*******************************************************************************
+ *                          Type & Macro Declarations
+ *******************************************************************************/
+#define RAND_LENGTH 4
 
     typedef unsigned char ezlopi_uuid_t[16];
 
-    #define uuid_generate(out) ezlopi_util_uuid_generate_random(out)
+#define uuid_generate(out) ezlopi_util_uuid_generate_random(out)
 
     /*******************************************************************************
      *                          Extern Data Declarations
@@ -69,18 +69,31 @@ extern "C"
      *                          Extern Function Prototypes
      *******************************************************************************/
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
+     * @brief Function to generate random uuid
      *
+     * @param out
      */
     void ezlopi_util_uuid_generate_random(ezlopi_uuid_t out);
+    /**
+     * @brief Function to unparse uuid
+     *
+     * @param uuid Target uuid
+     * @param out pointer to destination
+     */
     void ezlopi_util_uuid_unparse(const ezlopi_uuid_t uuid, char *out);
+    /**
+     * @brief Function to copy uuid
+     *
+     * @param dst
+     * @param src
+     */
     void ezlopi_util_uuid_copy(ezlopi_uuid_t dst, const ezlopi_uuid_t src);
+    /**
+     * @brief Function to parse uuid
+     *
+     * @param in
+     * @param uuid
+     */
     void ezlopi_util_uuid_parse(const char *in, ezlopi_uuid_t uuid);
 
 #ifdef __cplusplus

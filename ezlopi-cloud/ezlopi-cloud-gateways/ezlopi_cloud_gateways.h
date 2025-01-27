@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2022 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,11 +31,12 @@
 
 /**
  * @file    ezlopi_cloud_gateway.h
- * @brief
- * @author
- * @version
- * @date
+ * @brief   Declarations for cloud gateway functions
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ * @version 1.0
+ * @date    July 21st, 2022 9:28 PM
  */
+
 #ifndef __HUB_GATEWAYS_H__
 #define __HUB_GATEWAYS_H__
 

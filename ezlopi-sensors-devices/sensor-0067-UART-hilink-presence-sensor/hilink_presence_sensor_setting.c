@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,7 +31,7 @@
 /**
  * @file    hilink_presence_sensor_setting.c
  * @brief   perform some function on hilink_presence_sensor_setting
- * @author  xx
+ * @author
  * @version 0.1
  * @date    xx
  */
@@ -604,7 +604,7 @@ static int __setting_set_change_setting_template(ld2410_template_t template, uin
         {
             s_hilink_predefined_setting_value_t *predef_value = (s_hilink_predefined_setting_value_t *)hilink_presence_sensor_predefined_setting->user_arg;
             // If setting change request comes from user defined setting, check if predefined setting mode is set to user defined mode; in this case 9th index in enum str array.
-            if (predef_value && (0 == strcmp(predef_value->setting_value, "user_defined_mode")))
+            if (predef_value && (0 == strncmp(predef_value->setting_value, "user_defined_mode", ((strlen(predef_value->setting_value) + 1) > 18 ? (strlen(predef_value->setting_value) + 1) : 18))))
             {
                 __setting_set_change_user_defined_template(true);
                 EZPI_core_device_value_updated_settings_broadcast(hilink_presence_sensor_predefined_setting);
@@ -621,43 +621,43 @@ static int __setting_set_change_setting_template(ld2410_template_t template, uin
 static int __setting_set_find_predefined_setting_template(s_hilink_predefined_setting_value_t *setting_value, ld2410_template_t *template)
 {
     int ret = 0;
-    if (0 == strcmp(setting_value->setting_value, "sleep_mode_close")) // sleep_mode_close
+    if (0 == strncmp(setting_value->setting_value, "sleep_mode_close", ((strlen(setting_value->setting_value) + 1) > 17 ? (strlen(setting_value->setting_value) + 1) : 17))) // sleep_mode_close
     {
         *template = SLEEP_TEMPLATE_CLOSE_RANGE;
     }
-    else if (0 == strcmp(setting_value->setting_value, "sleep_mode_mid")) // sleep_mode_mid
+    else if (0 == strncmp(setting_value->setting_value, "sleep_mode_mid", ((strlen(setting_value->setting_value) + 1) > 15 ? (strlen(setting_value->setting_value) + 1) : 15))) // sleep_mode_mid
     {
         *template = SLEEP_TEMPLATE_MID_RANGE;
     }
-    else if (0 == strcmp(setting_value->setting_value, "sleep_mode_long")) // sleep_mode_long
+    else if (0 == strncmp(setting_value->setting_value, "sleep_mode_long", ((strlen(setting_value->setting_value) + 1) > 16 ? (strlen(setting_value->setting_value) + 1) : 16))) // sleep_mode_long
     {
         *template = SLEEP_TEMPLATE_LONG_RANGE;
     }
-    else if (0 == strcmp(setting_value->setting_value, "movement_mode_close")) // movement_mode_close
+    else if (0 == strncmp(setting_value->setting_value, "movement_mode_close", ((strlen(setting_value->setting_value) + 1) > 20 ? (strlen(setting_value->setting_value) + 1) : 20))) // movement_mode_close
     {
         *template = MOVEMENT_TEMPLATE_CLOSE_RANGE;
     }
-    else if (0 == strcmp(setting_value->setting_value, "movement_mode_mid")) // movement_mode_mid
+    else if (0 == strncmp(setting_value->setting_value, "movement_mode_mid", ((strlen(setting_value->setting_value) + 1) > 18 ? (strlen(setting_value->setting_value) + 1) : 18))) // movement_mode_mid
     {
         *template = MOVEMENT_TEMPLATE_MID_RANGE;
     }
-    else if (0 == strcmp(setting_value->setting_value, "movement_mode_long")) // movement_mode_long
+    else if (0 == strncmp(setting_value->setting_value, "movement_mode_long", ((strlen(setting_value->setting_value) + 1) > 19 ? (strlen(setting_value->setting_value) + 1) : 19))) // movement_mode_long
     {
         *template = MOVEMENT_TEMPLATE_LONG_RANGE;
     }
-    else if (0 == strcmp(setting_value->setting_value, "basic_routine_mode_close")) // basic_routine_mode_close
+    else if (0 == strncmp(setting_value->setting_value, "basic_routine_mode_close", ((strlen(setting_value->setting_value) + 1) > 25 ? (strlen(setting_value->setting_value) + 1) : 25))) // basic_routine_mode_close
     {
         *template = BASIC_TEMPLATE_CLOSE_RANGE;
     }
-    else if (0 == strcmp(setting_value->setting_value, "basic_routine_mode_mid")) // basic_routine_mode_mid
+    else if (0 == strncmp(setting_value->setting_value, "basic_routine_mode_mid", ((strlen(setting_value->setting_value) + 1) > 23 ? (strlen(setting_value->setting_value) + 1) : 23))) // basic_routine_mode_mid
     {
         *template = BASIC_TEMPLATE_MID_RANGE;
     }
-    else if (0 == strcmp(setting_value->setting_value, "basic_routine_mode_long")) // basic_routine_mode_long
+    else if (0 == strncmp(setting_value->setting_value, "basic_routine_mode_long", ((strlen(setting_value->setting_value) + 1) > 24 ? (strlen(setting_value->setting_value) + 1) : 24))) // basic_routine_mode_long
     {
         *template = BASIC_TEMPLATE_LONG_RANGE;
     }
-    else if (0 == strcmp(setting_value->setting_value, "user_defined_mode")) // user_defined_mode
+    else if (0 == strncmp(setting_value->setting_value, "user_defined_mode", ((strlen(setting_value->setting_value) + 1) > 18 ? (strlen(setting_value->setting_value) + 1) : 18))) // user_defined_mode
     {
         *template = CUSTOM_TEMPLATE;
     }
@@ -680,7 +680,7 @@ static int __setting_set_pre_defined_setting(void *arg, l_ezlopi_device_settings
         s_hilink_predefined_setting_value_t *setting_value = (s_hilink_predefined_setting_value_t *)setting->user_arg;
         if (setting_value)
         {
-            CJSON_GET_VALUE_STRING_BY_COPY(cj_properties, ezlopi_value_str, setting_value->setting_value);
+            CJSON_GET_VALUE_STRING_BY_COPY(cj_properties, ezlopi_value_str, setting_value->setting_value, sizeof(setting_value->setting_value));
             if (EZPI_SUCCESS != EZPI_core_nvs_write_str(setting_value->setting_value, strlen(setting_value->setting_value), "predef"))
             {
                 TRACE_E("Failed to write to NVS");
@@ -757,7 +757,7 @@ static int __setting_set_radar_distance_sensitivity_setting(void *arg, l_ezlopi_
     s_hilink_radar_distance_sensitivity_value_t *setting_val = (s_hilink_radar_distance_sensitivity_value_t *)setting->user_arg;
     if (cj_properties && setting && setting_val)
     {
-        CJSON_GET_VALUE_DOUBLE(cj_properties, ezlopi_value_str, setting_val->distance_sensitivity_value);
+        CJSON_GET_VALUE_INT(cj_properties, ezlopi_value_str, setting_val->distance_sensitivity_value);
         if (EZPI_SUCCESS != EZPI_core_nvs_write_int32(setting_val->distance_sensitivity_value, "rdrsens"))
         {
             TRACE_E("Failed to write to NVS");
@@ -1046,12 +1046,12 @@ static inline cJSON *__setting_add_text_and_lang_tag(const char *const object_te
 }
 static inline void __setting_extract_user_defined_setting(cJSON *cj_value, s_hilink_userdefined_setting_value_t *user_defined_setting_val)
 {
-    CJSON_GET_VALUE_DOUBLE(cj_value, ezlopi_min_move_distance_str, user_defined_setting_val->min_move_distance);
-    CJSON_GET_VALUE_DOUBLE(cj_value, ezlopi_max_move_distance_str, user_defined_setting_val->max_move_distance);
-    CJSON_GET_VALUE_DOUBLE(cj_value, ezlopi_min_still_distance_str, user_defined_setting_val->min_still_distance);
-    CJSON_GET_VALUE_DOUBLE(cj_value, ezlopi_max_still_distance_str, user_defined_setting_val->max_still_distance);
-    CJSON_GET_VALUE_DOUBLE(cj_value, ezlopi_timeout_str, user_defined_setting_val->timeout);
-    CJSON_GET_VALUE_DOUBLE(cj_value, ezlopi_is_active_str, user_defined_setting_val->is_active);
+    CJSON_GET_VALUE_FLOAT(cj_value, ezlopi_min_move_distance_str, user_defined_setting_val->min_move_distance);
+    CJSON_GET_VALUE_FLOAT(cj_value, ezlopi_max_move_distance_str, user_defined_setting_val->max_move_distance);
+    CJSON_GET_VALUE_FLOAT(cj_value, ezlopi_min_still_distance_str, user_defined_setting_val->min_still_distance);
+    CJSON_GET_VALUE_FLOAT(cj_value, ezlopi_max_still_distance_str, user_defined_setting_val->max_still_distance);
+    CJSON_GET_VALUE_UINT8(cj_value, ezlopi_timeout_str, user_defined_setting_val->timeout);
+    CJSON_GET_VALUE_BOOL(cj_value, ezlopi_is_active_str, user_defined_setting_val->is_active);
 }
 static inline int __prepare_user_defined_setting_cjson(cJSON *cj_value, s_hilink_userdefined_setting_value_t *setting_val)
 {

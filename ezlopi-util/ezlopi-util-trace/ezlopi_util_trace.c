@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -32,7 +32,7 @@
 /**
  * @file    main.c
  * @brief   perform some function on data
- * @author  John Doe
+ * @author
  * @version 0.1
  * @date    1st January 2024
  */
@@ -205,14 +205,6 @@ void trace_color_print(const char *txt_color, uint8_t severity, const char *file
 
 #endif // ENABLE_TRACE
 
-/*******************************************************************************
- *                          Static Function Definitions
- *******************************************************************************/
-
-/*******************************************************************************
- *                          End of File
- *******************************************************************************/
-
 #ifdef CONFIG_EZPI_OPENTELEMETRY_ENABLE_LOGS
 
 static uint32_t max_otel_log_length = 0;
@@ -241,3 +233,11 @@ void ezlopi_util_log_otel(uint8_t severity, const char *file, int line, const ch
     }
 }
 #endif // CONFIG_EZPI_OPENTELEMETRY_ENABLE_LOGS
+
+/*******************************************************************************
+ *                          Static Function Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          End of File
+ *******************************************************************************/

@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,9 +31,8 @@
 /**
  * @file    ezlopi_hal_system_info.c
  * @brief   perform some function on System_info
- * @author  xx
- * @version 0.1
- * @date    xx
+ * @author
+ * @date    January 13th, 2023 5:59 PM
  */
 
 /*******************************************************************************

@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,9 +31,9 @@
 /**
  * @file    ezlopi_core_devices_list_modules.h
  * @brief   Macros to list device modeles
- * @author  xx
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 0.1
- * @date    12th DEC 2024
+ * @date    November 10th, 2023 6:49 PM
  */
 
 /*******************************************************************************

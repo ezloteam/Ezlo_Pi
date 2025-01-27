@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2022 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,14 +31,14 @@
 
 /**
  * @file    ezlopi_cloud_hub_data_list.h
- * @brief
- * @author
- * @version
- * @date
+ * @brief   Declarations for hub data list functions
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ * @version 1.0
+ * @date    November 22nd, 2023 3:27 PM
  */
 
-#ifndef _EZLOPI_CLOUD_DATA_LIST_H_
-#define _EZLOPI_CLOUD_DATA_LIST_H_
+#ifndef __EZLOPI_CLOUD_DATA_LIST_H__
+#define __EZLOPI_CLOUD_DATA_LIST_H__
 
 /*******************************************************************************
  *                          Include Files
@@ -77,7 +77,7 @@ extern "C"
 }
 #endif
 
-#endif // _EZLOPI_CLOUD_DATA_LIST_H_
+#endif // __EZLOPI_CLOUD_DATA_LIST_H__
 
 /*******************************************************************************
  *                          End of File

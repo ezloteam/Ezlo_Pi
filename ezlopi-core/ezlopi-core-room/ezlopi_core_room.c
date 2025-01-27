@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,7 +31,7 @@
 /**
  * @file    ezlopi_core_room.c
  * @brief   perform some function on rooms
- * @author  xx
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 0.1
  * @date    12th DEC 2024
  */
@@ -89,6 +89,7 @@ static s_ezlopi_room_t *l_room_head = NULL;
 static const char *sc_room_subtype_name[] = {
 #ifndef ROOM_SUBTYPE
 #define ROOM_SUBTYPE(name, e_num) name,
+#include "ezlopi_core_room_subtype_macro.h"
 #undef ROOM_SUBTYPE
 #endif
 };
@@ -202,12 +203,18 @@ int EZPI_core_room_delete(cJSON *cj_room)
     int ret = 0;
     if (cj_room)
     {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
         CJSON_TRACE("cj_room", cj_room);
+#endif
+
         cJSON *cj_room_id = cJSON_GetObjectItem(__FUNCTION__, cj_room, ezlopi__id_str);
 
         if (cj_room_id && cj_room_id->valuestring)
         {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
             CJSON_TRACE("cj_room_id", cj_room_id);
+#endif
+
             uint32_t room_id = strtoul(cj_room_id->valuestring, NULL, 16);
 
             if (room_id)
@@ -239,7 +246,9 @@ int EZPI_core_room_delete_all(void)
 
 int EZPI_core_room_add_to_nvs(cJSON *cj_room)
 {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
     CJSON_TRACE("cj_room", cj_room);
+#endif
 
     int ret = 0;
     if (cj_room)
@@ -259,14 +268,18 @@ int EZPI_core_room_add_to_nvs(cJSON *cj_room)
             ezlopi_free(__FUNCTION__, rooms_str);
         }
 
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
         CJSON_TRACE("cj_rooms", cj_rooms);
+#endif
 
         if (cj_rooms)
         {
             if (cJSON_AddItemReferenceToArray(__FUNCTION__, cj_rooms, cj_room))
             {
-
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                 CJSON_TRACE("cj_rooms", cj_rooms);
+#endif
+
                 char *updated_rooms_str = cJSON_PrintBuffered(__FUNCTION__, cj_rooms, 4096, false);
                 TRACE_D("length of 'updated_rooms_str': %d", strlen(updated_rooms_str));
 
@@ -295,7 +308,10 @@ int EZPI_core_room_reorder(cJSON *cj_rooms_ids)
 
     if (cj_rooms_ids)
     {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
         CJSON_TRACE("new-order ids", cj_rooms_ids);
+#endif
+
         uint32_t rooms_id_arr_size = cJSON_GetArraySize(cj_rooms_ids);
 
         if (rooms_id_arr_size)
@@ -470,7 +486,9 @@ static void __update_cloud_room_deleted(uint32_t room_id)
             cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi__id_str, tmp_str);
         }
 
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
         CJSON_TRACE("----------------- broadcasting - cj_response", cj_response);
+#endif
 
         if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_response, EZPI_core_sntp_get_current_time_sec()))
         {
@@ -531,23 +549,18 @@ static void __sort_by_pos(void)
 
 static e_room_subtype_t __get_subtype_enum(char *subtype_str)
 {
-    e_room_subtype_t ret = ROOM_SUBTYPE_NONE + 1;
-
+    e_room_subtype_t ret = ROOM_SUBTYPE_NONE;
     if (subtype_str)
     {
-        // for (int idx = ROOM_SUBTYPE_NONE; idx < ROOM_SUBTYPE_MAX; idx++)
         while ((ret <= ROOM_SUBTYPE_MAX) && sc_room_subtype_name[ret])
         {
-            // if (0 == strcmp(sc_room_subtype_name[idx], subtype_str))
             if (EZPI_STRNCMP_IF_EQUAL(sc_room_subtype_name[ret], subtype_str, strlen(sc_room_subtype_name[ret]) + 1, strlen(subtype_str) + 1))
             {
-                // ret = idx;
                 break;
             }
             ret++;
         }
     }
-
     return ret;
 }
 
@@ -604,19 +617,25 @@ static int __remove_room_from_nvs_by_id(uint32_t a_room_id)
 
         if (cj_rooms)
         {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
             CJSON_TRACE("cj_rooms", cj_rooms);
+#endif
 
             int idx = 0;
             cJSON *cj_room_tmp = NULL;
 
             cJSON_ArrayForEach(cj_room_tmp, cj_rooms)
             {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                 CJSON_TRACE("cj_room_tmp", cj_room_tmp);
+#endif
 
                 cJSON *cj_room_tmp_id = cJSON_GetObjectItem(__FUNCTION__, cj_room_tmp, ezlopi__id_str);
                 if (cj_room_tmp_id && cj_room_tmp_id->valuestring)
                 {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                     CJSON_TRACE("cj_room_tmp_id", cj_room_tmp_id);
+#endif
 
                     uint32_t tmp_room_id = strtoul(cj_room_tmp_id->valuestring, NULL, 16);
                     if (a_room_id == tmp_room_id)
@@ -633,7 +652,9 @@ static int __remove_room_from_nvs_by_id(uint32_t a_room_id)
 
             if (ret)
             {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                 CJSON_TRACE("cj_rooms", cj_rooms);
+#endif
                 char *updated_rooms = cJSON_PrintBuffered(__FUNCTION__, cj_rooms, 4096, false);
                 TRACE_D("length of 'updated_rooms': %d", strlen(updated_rooms));
 

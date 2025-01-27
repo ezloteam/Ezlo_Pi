@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,7 +31,7 @@
 /**
  * @file    sensor_0050_other_MQ3_alcohol_detector.c
  * @brief   perform some function on sensor_0050
- * @author  xx
+ * @author
  * @version 0.1
  * @date    xx
  */
@@ -263,7 +263,7 @@ static void __prepare_item_digi_cloud_properties(l_ezlopi_item_t *item, cJSON *c
     item->cloud_properties.scale = NULL;
     item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
 
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
     CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio1_str, item->interface.gpio.gpio_in.gpio_num);
     TRACE_S("MQ3-> DIGITAL_PIN: %d ", item->interface.gpio.gpio_in.gpio_num);
 }
@@ -287,7 +287,7 @@ static void __prepare_item_adc_cloud_properties(l_ezlopi_item_t *item, cJSON *cj
     item->cloud_properties.scale = scales_parts_per_million;
     item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
 
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
     CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio2_str, item->interface.adc.gpio_num);
     TRACE_S("MQ3-> ADC_PIN: %d ", item->interface.adc.gpio_num);
     item->interface.adc.resln_bit = 3; // ADC 12_bit
@@ -452,10 +452,7 @@ static float __extract_MQ3_sensor_ppm(l_ezlopi_item_t *item)
 
         // 1.1 Calculate @ 'ratio' during alcohol presence
         double _ratio = (Rs_gas / ((MQ3_value->MQ3_R0_constant <= 0) ? (1.0f) : (MQ3_value->MQ3_R0_constant))); // avoid dividing by zero??
-        if (_ratio <= 0)
-        {
-            _ratio = 0;
-        }
+
         //-------------------------------------------------
 
         // 1.2 Calculate _alcohol_ppm

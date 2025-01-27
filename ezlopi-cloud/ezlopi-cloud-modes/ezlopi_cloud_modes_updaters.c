@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2022 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,10 +31,10 @@
 
 /**
  * @file    ezlopi_cloud_modes_updaters.c
- * @brief
- * @author
- * @version
- * @date
+ * @brief   Definitions for cloud modes updater functions
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ * @version 1.0
+ * @date    February 7th, 2024 5:28 PM
  */
 
 /*******************************************************************************

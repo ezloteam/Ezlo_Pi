@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,7 +31,7 @@
 /**
  * @file    sensor_0007_I2C_GY271.c
  * @brief   perform some function on sensor_0007
- * @author  xx
+ * @author
  * @version 0.1
  * @date    xx
  */
@@ -192,10 +192,10 @@ static void __prepare_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj
             item->is_user_arg_unique = true;
             item->interface.i2c_master.enable = true;
             item->interface.i2c_master.channel = I2C_NUM_0;
-            CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type);
+            CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type);
             CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_sda_str, item->interface.i2c_master.sda);
             CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_scl_str, item->interface.i2c_master.scl);
-            CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_slave_addr_str, item->interface.i2c_master.address);
+            CJSON_GET_VALUE_UINT32(cj_device, ezlopi_slave_addr_str, item->interface.i2c_master.address);
 
             item->interface.i2c_master.clock_speed = 100000;
             if (0 == item->interface.i2c_master.address)
@@ -351,21 +351,27 @@ static ezlopi_error_t __init(l_ezlopi_item_t *item)
         {
             if (item->interface.i2c_master.enable)
             {
-                EZPI_hal_i2c_master_init(&item->interface.i2c_master);
-                TRACE_I("I2C initialized to channel %d", item->interface.i2c_master.channel);
-                if (0 == GY271_configure_init(item)) // ESP_OK
+                if (EZPI_SUCCESS == EZPI_hal_i2c_master_init(&item->interface.i2c_master))
                 {
-                    // TRACE_D(" CONFIGURATION  Compplete _____ Calibration Started _____");
-                    // TaskHandle_t ezlopi_sensor_gy271_callibrationb_task_handle = NULL;
-                    // xTaskCreate(__gy271_calibration_task, "GY271_Calibration_Task", EZLOPI_SENSOR_GY271_CALLIBRATION_TASK_DEPTH, item, 1, &ezlopi_sensor_gy271_callibrationb_task_handle);
-                    if (false == user_data->calibration_complete)
+                    TRACE_I("I2C initialized to channel %d", item->interface.i2c_master.channel);
+                    if (EZPI_SUCCESS == GY271_configure_init(item)) // ESP_OK
                     {
-                        __gy271_calibration_task(item);
+                        // TRACE_D(" CONFIGURATION  Compplete _____ Calibration Started _____");
+                        // TaskHandle_t ezlopi_sensor_gy271_callibrationb_task_handle = NULL;
+                        // xTaskCreate(__gy271_calibration_task, "GY271_Calibration_Task", EZLOPI_SENSOR_GY271_CALLIBRATION_TASK_DEPTH, item, 1, &ezlopi_sensor_gy271_callibrationb_task_handle);
+                        if (false == user_data->calibration_complete)
+                        {
+                            __gy271_calibration_task(item);
+                        }
+                        // #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
+                        //                     EZPI_core_process_set_process_info(ENUM_EZLOPI_SENSOR_GY271_CALLIBRATION_TASK, &ezlopi_sensor_gy271_callibrationb_task_handle, EZLOPI_SENSOR_GY271_CALLIBRATION_TASK_DEPTH);
+                        // #endif
+                        ret = EZPI_SUCCESS;
                     }
-                    // #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
-                    //                     EZPI_core_process_set_process_info(ENUM_EZLOPI_SENSOR_GY271_CALLIBRATION_TASK, &ezlopi_sensor_gy271_callibrationb_task_handle, EZLOPI_SENSOR_GY271_CALLIBRATION_TASK_DEPTH);
-                    // #endif
-                    ret = EZPI_SUCCESS;
+                }
+                else
+                {
+                    TRACE_E("I2C init failed");
                 }
             }
         }

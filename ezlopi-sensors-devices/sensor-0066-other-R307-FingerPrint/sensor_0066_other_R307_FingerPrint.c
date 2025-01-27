@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,7 +31,7 @@
 /**
  * @file    sensor_0066_other_R307_FingerPrint.c
  * @brief   perform some function on sensor_0066
- * @author  xx
+ * @author
  * @version 0.1
  * @date    xx
  */
@@ -303,7 +303,7 @@ static ezlopi_error_t __0066_prepare(void *arg)
                     __prepare_item_interface_properties(fingerprint_item_enroll, cj_device);
                 }
 
-                l_ezlopi_device_t *child_fingerprint_action_device = EZPI_core_device_add_device(cj_device, "action");
+                l_ezlopi_device_t *child_fingerprint_action_device = EZPI_core_device_add_device(cj_device, ezlopi_action_str);
                 if (child_fingerprint_action_device)
                 {
                     TRACE_I("Child_fingerprint_action_device-[0x%x] ", child_fingerprint_action_device->cloud_properties.device_id);
@@ -374,55 +374,62 @@ static ezlopi_error_t __0066_init(l_ezlopi_item_t *item)
                     gpio_num_t intr_pin = user_data->intr_pin;
                     // #warning "Riken needs to fix this warning, compile and check about the warning details !"
                     s_ezlopi_uart_object_handle_t ezlopi_uart_object_handle = EZPI_hal_uart_init(item->interface.uart.baudrate, item->interface.uart.tx, item->interface.uart.rx, __uart_0066_fingerprint_upcall, item);
-                    item->interface.uart.channel = EZPI_hal_uart_get_channel(ezlopi_uart_object_handle);
-
-                    const gpio_config_t FingerPrint_intr_gpio_config = {
-                        .pin_bit_mask = (1ULL << (intr_pin)),
-                        .intr_type = GPIO_INTR_NEGEDGE,
-                        .mode = GPIO_MODE_INPUT,
-                        .pull_up_en = GPIO_PULLUP_DISABLE,
-                        .pull_down_en = GPIO_PULLDOWN_DISABLE,
-                    };
-
-                    if (0 == gpio_config(&FingerPrint_intr_gpio_config))
+                    if (ezlopi_uart_object_handle)
                     {
-                        if (FINGERPRINT_OK == r307_as606_fingerprint_config(item))
-                        {
-                            if (0 == gpio_isr_handler_add(intr_pin, gpio_notify_isr, item))
-                            {
-                                if (NULL == (user_data->notifyHandler))
-                                {
-                                    TRACE_I(" ---->>> Creating Fingerprint_activation Task <<<----");
-                                    xTaskCreate(__fingerprint_operation_task, "Fingerprint_activation", EZLOPI_SENSOR_R307_FINGER_PRINT_TASK_DEPTH, item, 1, &(user_data->notifyHandler));
-#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
-                                    EZPI_core_process_set_process_info(ENUM_EZLOPI_SENSOR_R307_FINGER_PRINT_TASK, &user_data->notifyHandler, EZLOPI_SENSOR_R307_FINGER_PRINT_TASK_DEPTH);
-#endif
-                                }
+                        item->interface.uart.channel = EZPI_hal_uart_get_channel(ezlopi_uart_object_handle);
 
-                                const esp_timer_create_args_t esp_timer_create_args = {
-                                    .callback = __timer_callback,
-                                    .arg = (void *)item,
-                                    .name = "Enrollment timer"};
-                                if (ESP_OK == esp_timer_create(&esp_timer_create_args, &(user_data->timerHandler)))
+                        const gpio_config_t FingerPrint_intr_gpio_config = {
+                            .pin_bit_mask = (1ULL << (intr_pin)),
+                            .intr_type = GPIO_INTR_NEGEDGE,
+                            .mode = GPIO_MODE_INPUT,
+                            .pull_up_en = GPIO_PULLUP_DISABLE,
+                            .pull_down_en = GPIO_PULLDOWN_DISABLE,
+                        };
+
+                        if (0 == gpio_config(&FingerPrint_intr_gpio_config))
+                        {
+                            if (FINGERPRINT_OK == r307_as606_fingerprint_config(item))
+                            {
+                                if (0 == gpio_isr_handler_add(intr_pin, gpio_notify_isr, item))
                                 {
-                                    ret = EZPI_SUCCESS;
-                                    TRACE_I(" ---->>> Creating Enrollment Timer <<<----");
+                                    if (NULL == (user_data->notifyHandler))
+                                    {
+                                        TRACE_I(" ---->>> Creating Fingerprint_activation Task <<<----");
+                                        xTaskCreate(__fingerprint_operation_task, "Fingerprint_activation", EZLOPI_SENSOR_R307_FINGER_PRINT_TASK_DEPTH, item, 1, &(user_data->notifyHandler));
+#if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
+                                        EZPI_core_process_set_process_info(ENUM_EZLOPI_SENSOR_R307_FINGER_PRINT_TASK, &user_data->notifyHandler, EZLOPI_SENSOR_R307_FINGER_PRINT_TASK_DEPTH);
+#endif
+                                    }
+
+                                    const esp_timer_create_args_t esp_timer_create_args = {
+                                        .callback = __timer_callback,
+                                        .arg = (void *)item,
+                                        .name = "Enrollment timer"};
+                                    if (ESP_OK == esp_timer_create(&esp_timer_create_args, &(user_data->timerHandler)))
+                                    {
+                                        ret = EZPI_SUCCESS;
+                                        TRACE_I(" ---->>> Creating Enrollment Timer <<<----");
+                                    }
+                                }
+                                else
+                                {
+                                    gpio_isr_handler_remove(intr_pin);
+                                    TRACE_E("Error!! : Failed to add GPIO ISR handler.");
                                 }
                             }
                             else
                             {
-                                gpio_isr_handler_remove(intr_pin);
-                                TRACE_E("Error!! : Failed to add GPIO ISR handler.");
+                                TRACE_E("Need to Reconfigure : Fingerprint sensor ..... Please, Reset ESP32.");
                             }
                         }
                         else
                         {
-                            TRACE_E("Need to Reconfigure : Fingerprint sensor ..... Please, Reset ESP32.");
+                            TRACE_E("Error!! : Problem is 'GPIO_intr_pin' Config......");
                         }
                     }
                     else
                     {
-                        TRACE_E("Error!! : Problem is 'GPIO_intr_pin' Config......");
+                        TRACE_E("Failed to initialize Fingerprint-Uart");
                     }
                 }
             }

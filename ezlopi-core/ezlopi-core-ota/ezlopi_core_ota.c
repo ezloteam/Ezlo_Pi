@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,9 +31,9 @@
 /**
  * @file    ezlopi_core_ota.c
  * @brief   Function to perform ota operation
- * @author  xx
- * @version 0.1
- * @date    12th DEC 2024
+ * @author
+ * @version 1.0
+ * @date    March 7th, 2023 8:52 PM
  */
 
 /*******************************************************************************
@@ -177,7 +177,7 @@ static void ezlopi_ota_process(void *pv)
 
 #ifdef CONFIG_FIRMWARE_UPGRADE_URL_FROM_STDIN
     char url_buf[OTA_URL_SIZE];
-    if (strcmp(config.url, "FROM_STDIN") == 0)
+    if (strncmp(config.url, "FROM_STDIN", ((strlen(config.url) + 1) > 11 ? (strlen(config.url) + 1) : 11)) == 0)
     {
         example_configure_stdin_stdout();
         fgets(url_buf, OTA_URL_SIZE, stdin);

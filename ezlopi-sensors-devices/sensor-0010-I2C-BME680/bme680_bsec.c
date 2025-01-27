@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,7 +31,7 @@
 /**
  * @file    bme680_bsec.c
  * @brief   perform some function on bme680
- * @author  xx
+ * @author
  * @version 0.1
  * @date    xx
  */
@@ -40,8 +40,7 @@
  *                          Include Files
  *******************************************************************************/
 #include "bme680_bsec.h"
-
-#warning "################### DO NOT USE printf ON PRODUCTION ###################"
+#include "ezlopi_util_trace.h"
 
 /*******************************************************************************
  *                          Extern Data Declarations
@@ -105,20 +104,20 @@ void check_bsec_status()
 {
     if (bsec2_get_status() < BSEC_OK)
     {
-        // printf("BSEC error code : %d\n", bsec2_get_status());
+        // TRACE_D("BSEC error code : %d\n", bsec2_get_status());
     }
     else if (bsec2_get_status() > BSEC_OK)
     {
-        // printf("BSEC warning code : %d\n", bsec2_get_status());
+        // TRACE_D("BSEC warning code : %d\n", bsec2_get_status());
     }
 
     if (bsec2_get_sensor_status() < BME68X_OK)
     {
-        // printf("BME68X error code : %d\n", bsec2_get_sensor_status());
+        // TRACE_D("BME68X error code : %d\n", bsec2_get_sensor_status());
     }
     else if (bsec2_get_sensor_status() > BME68X_OK)
     {
-        // printf("BME68X warning code : 0x%X\n", bsec2_get_sensor_status());
+        // TRACE_D("BME68X warning code : 0x%X\n", bsec2_get_sensor_status());
     }
 }
 
@@ -129,18 +128,18 @@ bool bme680_print_data(bme680_data_t *data)
         return false;
     }
 
-    // printf("BSEC Outputs:\n");
-    // printf("\tiaq = %0.2f\n", data->iaq);
-    // printf("\tiaq accuracy = %d\n", (int)data->iaq_accuracy);
-    // printf("\ttemperature = %0.2f °C\n", data->temperature);
-    // printf("\tpressure = %0.2f hPa\n", data->pressure / 100.0f);
-    // printf("\thumidity = %0.2f %%\n", data->humidity);
-    // printf("\tgas resistance = %0.2f KΩ\n", data->gas_resistance / 1000.0);
-    // printf("\taltitude = %0.2f m\n", data->altitude);
-    // printf("\tCO2 Equivalent = %0.2f\n", data->co2_equivalent);
-    // printf("\tVOC Equivalent = %0.2f\n", data->voc_equivalent);
-    // printf("\tstabilization status = %d\n", data->stabilization_status);
-    // printf("\trun in status = %d\n", data->run_in_status);
+    // TRACE_D("BSEC Outputs:\n");
+    // TRACE_D("\tiaq = %0.2f\n", data->iaq);
+    // TRACE_D("\tiaq accuracy = %d\n", (int)data->iaq_accuracy);
+    // TRACE_D("\ttemperature = %0.2f °C\n", data->temperature);
+    // TRACE_D("\tpressure = %0.2f hPa\n", data->pressure / 100.0f);
+    // TRACE_D("\thumidity = %0.2f %%\n", data->humidity);
+    // TRACE_D("\tgas resistance = %0.2f KΩ\n", data->gas_resistance / 1000.0);
+    // TRACE_D("\taltitude = %0.2f m\n", data->altitude);
+    // TRACE_D("\tCO2 Equivalent = %0.2f\n", data->co2_equivalent);
+    // TRACE_D("\tVOC Equivalent = %0.2f\n", data->voc_equivalent);
+    // TRACE_D("\tstabilization status = %d\n", data->stabilization_status);
+    // TRACE_D("\trun in status = %d\n", data->run_in_status);
     return true;
 }
 
@@ -218,7 +217,7 @@ void bme680_setup(uint32_t sda, uint32_t scl, bool initialize_i2c)
 
     /* Subsribe to the desired BSEC2 outputs */
     bool subscription_status = bsec2_update_subscription(sensor_list, ARRAY_LEN(sensor_list), BSEC_SAMPLE_RATE_LP);
-    // printf("subscription_status is %d\n", subscription_status);
+    // TRACE_D("subscription_status is %d\n", subscription_status);
     if (!subscription_status)
     {
         check_bsec_status();
@@ -228,7 +227,7 @@ void bme680_setup(uint32_t sda, uint32_t scl, bool initialize_i2c)
     bsec2_attach_callback(bme680_data_callback);
 
     // bsec_version_t bsec2_version = bsec2_get_version();
-    // printf("BSEC library version %d.%d.%d.%d\n", bsec2_version.major, bsec2_version.minor, bsec2_version.major_bugfix, bsec2_version.minor_bugfix);
+    // TRACE_D("BSEC library version %d.%d.%d.%d\n", bsec2_version.major, bsec2_version.minor, bsec2_version.major_bugfix, bsec2_version.minor_bugfix);
 }
 
 /*******************************************************************************
@@ -248,13 +247,13 @@ static bool bme680_copy_data(bme680_data_t *dest, bme680_data_t *src)
 
 static void bme680_data_callback(const bme68x_data data, const bsec_outputs outputs)
 {
-    // printf("HERE!! %s\n", __func__);
+    // TRACE_D("HERE!! %s\n", __func__);
     if (!outputs.n_outputs)
     {
         return;
     }
 #if BME680_TEST
-    printf("BSEC outputs:\n\ttimestamp = %d\n", (int)(outputs.output[0].time_stamp / INT64_C(1000000)));
+    TRACE_D("BSEC outputs:\n\ttimestamp = %d\n", (int)(outputs.output[0].time_stamp / INT64_C(1000000)));
 #endif
 
     callback_status = true;
@@ -266,8 +265,8 @@ static void bme680_data_callback(const bme68x_data data, const bsec_outputs outp
         {
         case BSEC_OUTPUT_IAQ:
 #if BME680_TEST
-            printf("\tiaq = %0.2f\n", output.signal);
-            printf("\tiaq accuracy = %d\n", (int)output.accuracy);
+            TRACE_D("\tiaq = %0.2f\n", output.signal);
+            TRACE_D("\tiaq accuracy = %d\n", (int)output.accuracy);
 #endif
             bme680_data.iaq = output.signal;
             bme680_data.iaq_accuracy = output.accuracy;
@@ -275,14 +274,14 @@ static void bme680_data_callback(const bme68x_data data, const bsec_outputs outp
 
         case BSEC_OUTPUT_RAW_TEMPERATURE:
 #if BME680_TEST
-            printf("\ttemperature = %0.2f\n", output.signal);
+            TRACE_D("\ttemperature = %0.2f\n", output.signal);
 #endif
             bme680_data.temperature = output.signal;
             break;
 
         case BSEC_OUTPUT_RAW_PRESSURE:
 #if BME680_TEST
-            printf("\tpressure = %0.2f\n", output.signal);
+            TRACE_D("\tpressure = %0.2f\n", output.signal);
 #endif
             bme680_data.pressure = output.signal;
             bme680_data.altitude = bme680_read_altitude(bme680_data.pressure, SEALEVELPRESSURE_HPA);
@@ -290,42 +289,42 @@ static void bme680_data_callback(const bme68x_data data, const bsec_outputs outp
 
         case BSEC_OUTPUT_RAW_HUMIDITY:
 #if BME680_TEST
-            printf("\thumidity = %0.2f\n", output.signal);
+            TRACE_D("\thumidity = %0.2f\n", output.signal);
 #endif
             bme680_data.humidity = output.signal;
             break;
 
         case BSEC_OUTPUT_RAW_GAS:
 #if BME680_TEST
-            printf("\tgas resistance = %0.2f\n", output.signal);
+            TRACE_D("\tgas resistance = %0.2f\n", output.signal);
 #endif
             bme680_data.gas_resistance = output.signal;
             break;
 
         case BSEC_OUTPUT_CO2_EQUIVALENT:
 #if BME680_TEST
-            printf("\tCO2 Equivalent = %0.2f\n", output.signal);
+            TRACE_D("\tCO2 Equivalent = %0.2f\n", output.signal);
 #endif
             bme680_data.co2_equivalent = output.signal;
             break;
 
         case BSEC_OUTPUT_BREATH_VOC_EQUIVALENT:
 #if BME680_TEST
-            printf("\tVOC Equivalent = %0.2f\n", output.signal);
+            TRACE_D("\tVOC Equivalent = %0.2f\n", output.signal);
 #endif
             bme680_data.voc_equivalent = output.signal;
             break;
 
         case BSEC_OUTPUT_STABILIZATION_STATUS:
 #if BME680_TEST
-            printf("\tstabilization status = %0.2f\n", output.signal);
+            TRACE_D("\tstabilization status = %0.2f\n", output.signal);
 #endif
             bme680_data.stabilization_status = output.signal;
             break;
 
         case BSEC_OUTPUT_RUN_IN_STATUS:
 #if BME680_TEST
-            printf("\trun in status = %0.2f\n", output.signal);
+            TRACE_D("\trun in status = %0.2f\n", output.signal);
 #endif
             bme680_data.run_in_status = output.signal;
             break;

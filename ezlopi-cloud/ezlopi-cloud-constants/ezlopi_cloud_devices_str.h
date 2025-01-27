@@ -3,12 +3,12 @@
 /**
  * @file    ezlopi_cloud_devices_str.h
  * @brief
- * @author
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version
  * @date
  */
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -37,6 +37,14 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
+
+/**
+ * @file    ezlopi_cloud_devices_str.h
+ * @brief   Declarations for cloud device constants
+ * @author
+ * @version 0.1
+ * @date    1st January 2024
+ */
 
 #ifndef __EZLOPI_DEVICES_STR_H__
 #define __EZLOPI_DEVICES_STR_H__

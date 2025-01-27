@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2022 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,11 +31,12 @@
 
 /**
  * @file    ezlopi_cloud_info.h
- * @brief
- * @author
- * @version
- * @date
+ * @brief   Declarations for cloud info functions
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ * @version 1.0
+ * @date    May 3rd, 2024 10:49 PM
  */
+
 #ifndef __HUB_INFO_H__
 #define __HUB_INFO_H__
 

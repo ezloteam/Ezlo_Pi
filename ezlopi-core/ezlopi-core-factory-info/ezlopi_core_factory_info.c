@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,7 +31,7 @@
 /**
  * @file    ezlopi_core_factory_info.c
  * @brief   perform function on factory-data
- * @author  xx
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 0.1
  * @date    12th DEC 2024
  */
@@ -358,7 +358,7 @@ unsigned long long EZPI_core_factory_info_v3_get_id(void)
 
         for (int i = 0; i < 8; i++)
         {
-            _id |= tmp_id_arr[i] << (i * 8);
+            _id |= ((unsigned long long)tmp_id_arr[i]) << (i * 8);
         }
     }
     else

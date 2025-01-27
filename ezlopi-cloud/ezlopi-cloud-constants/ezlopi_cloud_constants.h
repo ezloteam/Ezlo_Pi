@@ -1,5 +1,6 @@
+
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -30,11 +31,11 @@
 */
 
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
- * @version 0.1
- * @date    1st January 2024
+ * @file    ezlopi_cloud_constants.h
+ * @brief
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ * @version 1.0
+ * @date    November 22nd, 2023 3:27 PM
  */
 
 #ifndef __EZLOPI_CLOUD_CONSTANTS_H__
@@ -66,7 +67,7 @@ extern "C"
 #define COMPARE_IF_EQUAL(STR1, STR2, STR1_LEN, STR2_LEN) (strncmp(STR1, STR2, BIGGER_LEN(STR1_LEN, STR2_LEN)) == 0)
 /**
  * @brief Macro to compre two strings if they are equal
- *
+ * @note - Add '+1' to the input_str_length for both : STR1_LEN & STR1_LEN . (consider the '\0' char also)
  *
  */
 #define EZPI_STRNCMP_IF_EQUAL(STR1, STR2, STR1_LEN, STR2_LEN) \
@@ -74,7 +75,7 @@ extern "C"
      : (NULL == STR2)                       ? false           \
      : ((0 == STR1_LEN) && (0 == STR2_LEN)) ? false           \
                                             : COMPARE_IF_EQUAL(STR1, STR2, STR1_LEN, STR2_LEN))
-//-------------------------------------------------------------------------------------------------------------
+    //-------------------------------------------------------------------------------------------------------------
 
 #include "ezlopi_cloud_keywords.h"
 #include "ezlopi_cloud_scales_str.h"
@@ -87,7 +88,6 @@ extern "C"
 #include "ezlopi_cloud_value_type_str.h"
 #include "ezlopi_cloud_subcategory_str.h"
 #include "ezlopi_cloud_device_types_str.h"
-
 
     /*******************************************************************************
      *                          Extern Data Declarations

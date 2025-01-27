@@ -1,6 +1,5 @@
-
 /* ===========================================================================
-** Copyright (C) 2022 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,15 +30,15 @@
 */
 
 /**
- * @file    ezlopi_cloud_log.c
- * @brief
- * @author
- * @version
- * @date
+ * @file    ezlopi_cloud_log.h
+ * @brief   Declerations for cloud log functions
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ * @version 1.0
+ * @date    May 2nd, 2024 5:21 PM
  */
 
-#ifndef _EZLOPI_CLOUD_LOG_H_
-#define _EZLOPI_CLOUD_LOG_H_
+#ifndef __EZLOPI_CLOUD_LOG_H__
+#define __EZLOPI_CLOUD_LOG_H__
 
 #include "../../build/config/sdkconfig.h"
 
@@ -96,7 +95,7 @@ extern "C"
 }
 #endif
 
-#endif // _EZLOPI_CLOUD_LOG_H_
+#endif // __EZLOPI_CLOUD_LOG_H__
 
 /*******************************************************************************
  *                          End of File

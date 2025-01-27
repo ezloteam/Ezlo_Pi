@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -30,11 +30,11 @@
 */
 
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
- * @version 0.1
- * @date    1st January 2024
+ * @file    ezlopi_service_modes.h
+ * @brief   Contains function declarations for mode operations
+ * @author  
+ * @version 1.0
+ * @date    February 9, 2024
  */
 
 #ifndef __EZLOPI_SERVICE_MODES_H__
@@ -62,10 +62,32 @@ extern "C"
     /*******************************************************************************
      *                          Extern Function Prototypes
      *******************************************************************************/
-    void ezlopi_service_modes_init(void);
 
+    /**
+     * @brief Function to initialize service modes
+     * 
+     */
+    void ezlopi_service_modes_init(void);
+    /**
+     * @brief Function to stop service-mode loop
+     * 
+     * @param wait_ms 
+     * @return true 
+     * @return false 
+     */
     bool ezlopi_service_modes_stop(uint32_t wait_ms);
+    /**
+     * @brief Function to start service-mode loop
+     * 
+     * @param wait_ms 
+     * @return true 
+     * @return false 
+     */
     bool ezlopi_service_modes_start(uint32_t wait_ms);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // __EZLOPI_SERVICE_MODES_H__
 

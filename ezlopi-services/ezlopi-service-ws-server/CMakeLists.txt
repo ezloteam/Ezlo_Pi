@@ -24,7 +24,7 @@ set(EZLOPI_CLOUD_COMPONENTS
 
 
 
-idf_component_register(SRCS "ezlopi_service_ws_server_clients.c" "ezlopi_service_ws_server.c" "${src_files}"
+idf_component_register(SRCS "ezlopi_service_ws_server.c" "ezlopi_service_ws_server_clients.c" "${src_files}"
     INCLUDE_DIRS "."
     REQUIRES    ${SDK_COMPONENTS}
                 ${EZLOPI_CORE_COMPONENTS}

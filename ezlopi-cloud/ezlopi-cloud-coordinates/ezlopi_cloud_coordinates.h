@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -30,15 +30,15 @@
 */
 
 /**
- * @file     ezlopi_cloud_coordinates.h
- * @brief   perform some function on data
- * @author  John Doe
- * @version 0.1
- * @date    1st January 2024
+ * @file    ezlopi_cloud_coordinates.h
+ * @brief   Declarations for cloud coordinate functions
+ * @author
+ * @version 1.0
+ * @date    February 19th, 2024 12:00 PM
  */
 
-#ifndef _EZLOPI_CLOUD_COORDINSTES_H_
-#define _EZLOPI_CLOUD_COORDINSTES_H_
+#ifndef __EZLOPI_CLOUD_COORDINSTES_H__
+#define __EZLOPI_CLOUD_COORDINSTES_H__
 
 /*******************************************************************************
  *                          Include Files
@@ -64,16 +64,11 @@ extern "C"
      *                          Extern Function Prototypes
      *******************************************************************************/
     /**
-     * @brief Global function template example
-     * Convention : Use capital letter for initial word on extern function
-     * maincomponent : Main component as hal, core, service etc.
-     * subcomponent : Sub component as i2c from hal, ble from service etc
-     * functiontitle : Title of the function
-     * eg : EZPI_hal_i2c_init()
-     * @param arg
+     * @brief Function to handle hub.coordinate.set method
      *
+     * @param cjson_request Pointer to incoming JONS
+     * @param cjson_response Pointer to outgoing JONS
      */
-
     void EZPI_hub_coordinates_set(cJSON *cjson_request, cJSON *cjson_response);
     /**
      * @brief Function to handle hub.coordinate.get method
@@ -101,7 +96,7 @@ extern "C"
 }
 #endif
 
-#endif // _EZLOPI_CLOUD_COORDINSTES_H_
+#endif // __EZLOPI_CLOUD_COORDINSTES_H__
 
 /*******************************************************************************
  *                          End of File

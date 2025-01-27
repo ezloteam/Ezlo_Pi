@@ -50,6 +50,7 @@
 #pragma GCC visibility pop
 #endif
 
+#include "ezlopi_cloud_constants.h"
 #include "cjext_utils.h"
 #include "EZLOPI_USER_CONFIG.h"
 
@@ -57,7 +58,7 @@ static unsigned char *cJSONUtils_strdup(const char *who, const unsigned char *co
 {
     unsigned char *copy = NULL;
 
-    size_t length = strlen((const char *)string) + sizeof("");
+    size_t length = strlen((const char *)string) + 1;
     copy = (unsigned char *)ezlopi_malloc(who, length);
     if (copy == NULL)
     {
@@ -197,7 +198,7 @@ char *cJSONUtils_FindPointerFromObjectTo(const char *who, const cJSON *const obj
     if (object == target)
     {
         /* found */
-        return (char *)cJSONUtils_strdup(who, (const unsigned char *)"");
+        return (char *)cJSONUtils_strdup(who, (const unsigned char *)ezlopi__str);
     }
 
     /* recursively search all children of the object or array */
@@ -1289,7 +1290,7 @@ cJSON *cJSONUtils_GeneratePatches(const char *who, cJSON *const from, cJSON *con
     }
 
     patches = cJSON_CreateArray(who);
-    create_patches(who, patches, (const unsigned char *)"", from, to, false);
+    create_patches(who, patches, (const unsigned char *)ezlopi__str, from, to, false);
 
     return patches;
 }
@@ -1304,7 +1305,7 @@ cJSON *cJSONUtils_GeneratePatchesCaseSensitive(const char *who, cJSON *const fro
     }
 
     patches = cJSON_CreateArray(who);
-    create_patches(who, patches, (const unsigned char *)"", from, to, true);
+    create_patches(who, patches, (const unsigned char *)ezlopi__str, from, to, true);
 
     return patches;
 }

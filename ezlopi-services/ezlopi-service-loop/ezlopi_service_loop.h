@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -32,12 +32,12 @@
 /**
  * @file    ezlopi_service_loop.h
  * @brief
- * @author
- * @version
- * @date
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
+ * @version 1.0
+ * @date    Jan 24, 2023
  */
-#ifndef _EZLOPI_SERVICE_TIMER_H_
-#define _EZLOPI_SERVICE_TIMER_H_
+#ifndef __EZLOPI_SERVICE_TIMER_H__
+#define __EZLOPI_SERVICE_TIMER_H__
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
@@ -89,7 +89,7 @@ extern "C"
 }
 #endif
 
-#endif // _EZLOPI_SERVICE_TIMER_H_
+#endif // __EZLOPI_SERVICE_TIMER_H__
 
 /*******************************************************************************
  *                          End of File

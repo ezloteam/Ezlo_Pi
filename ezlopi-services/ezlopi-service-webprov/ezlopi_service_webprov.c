@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -28,12 +28,13 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
+
 /**
  * @file    ezlopi_service_webprov.c
- * @brief
- * @author
- * @version
- * @date
+ * @brief    Contains function definitions related to web provisioning
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
+ * @version 1.0
+ * @date    August 15th, 2022 11:57 AM
  */
 
 #include "../../build/config/sdkconfig.h"
@@ -95,14 +96,6 @@ typedef struct
 } s_rx_message_t;
 
 /*******************************************************************************
- *                          Static Data Definitions
- *******************************************************************************/
-static uint32_t message_counter = 0;
-static xTaskHandle _task_handle = NULL;
-static QueueHandle_t _wss_message_queue = NULL;
-static esp_websocket_client_handle_t wss_client = NULL;
-static TaskHandle_t __web_socket_initialize_handler = NULL;
-/*******************************************************************************
  *                          Static Function Prototypes
  *******************************************************************************/
 static void __provision_check(void *pv);
@@ -115,6 +108,16 @@ static int __message_upcall(char *payload, uint32_t len, time_t time_stamp);
 
 static int __send_cjson_data_to_nma_websocket(cJSON *cj_data);
 static ezlopi_error_t __send_str_data_to_nma_websocket(char *str_data);
+
+/*******************************************************************************
+ *                          Static Data Definitions
+ *******************************************************************************/
+
+static uint32_t message_counter = 0;
+static xTaskHandle _task_handle = NULL;
+static QueueHandle_t _wss_message_queue = NULL;
+static esp_websocket_client_handle_t wss_client = NULL;
+static TaskHandle_t __web_socket_initialize_handler = NULL;
 
 bool EZPI_service_webprov_is_connected(void)
 {
@@ -252,12 +255,14 @@ static void __fetch_wss_endpoint(void *pv)
 
                 if (rx_message)
                 {
+#ifdef CONFIG_EZPI_OPENTELEMETRY_ENABLE_TRACES
                     char *id_str = NULL;
                     char *error_str = NULL;
                     char *method_str = NULL;
 
                     time_t time_stamp = rx_message->time_stamp;
                     uint32_t tick_count = rx_message->tick_count;
+#endif // CONFIG_EZPI_OPENTELEMETRY_ENABLE_TRACES
 
                     if (rx_message->payload)
                     {
@@ -269,44 +274,13 @@ static void __fetch_wss_endpoint(void *pv)
                             error_str = ezlopi_service_otel_fetch_string_value_from_cjson(cj_request, ezlopi_error_str);
                             method_str = ezlopi_service_otel_fetch_string_value_from_cjson(cj_request, ezlopi_method_str);
 #endif
-#if 0
-                            cJSON *cj_id = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_id_str);
-                            if (cj_id && cj_id->valuestring && (cj_id->type == cJSON_String) && cj_id->str_value_len)
-                            {
-                                id_str = ezlopi_malloc(__FUNCTION__, cj_id->str_value_len + 1);
-                                if (id_str)
-                                {
-                                    snprintf(id_str, cj_id->str_value_len + 1, "%.*s", cj_id->str_value_len, cj_id->valuestring);
-                                }
-                            }
 
-                            cJSON *cj_error = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_error_str);
-                            if (cj_error && cj_error->valuestring && (cj_error->type == cJSON_String) && cj_error->str_value_len)
-                            {
-                                error_str = ezlopi_malloc(__FUNCTION__, cj_error->str_value_len + 1);
-                                if (error_str)
-                                {
-                                    snprintf(error_str, cj_error->str_value_len + 1, "%.*s", cj_error->str_value_len, cj_error->valuestring);
-                                }
-                            }
-
-                            cJSON *cj_method = cJSON_GetObjectItem(__FUNCTION__, cj_request, ezlopi_method_str);
-                            if (cj_method)
-                            {
-                                method_str = ezlopi_malloc(__FUNCTION__, cj_method->str_value_len + 1);
-                                if (method_str)
-                                {
-                                    snprintf(method_str, cj_method->str_value_len + 1, "%.*s", cj_method->str_value_len, cj_method->valuestring);
-                                }
-
-                                ezlopi_free(__FUNCTION__, rx_message->payload);
-                                rx_message->payload = NULL;
-                            }
-#endif
+#ifdef CONFIG_EZPI_OPENTELEMETRY_ENABLE_LOGS
                             if (NULL == method_str)
                             {
                                 TRACE_OTEL(ENUM_EZLOPI_TRACE_SEVERITY_ERROR, "web-provisioning [method: null], payload: %s", rx_message->payload);
                             }
+#endif // CONFIG_EZPI_OPENTELEMETRY_ENABLE_LOGS
 
                             __message_process_cjson(cj_request, rx_message->time_stamp);
                             cJSON_Delete(__FUNCTION__, cj_request);
@@ -637,12 +611,12 @@ static int __provision_update(char *arg)
             char tmp_cloud_server[128];
             char tmp_provision_token[300];
 
-            CJSON_GET_VALUE_STRING_BY_COPY(cj_root_data, ezlopi_id_str, tmp_id_str);
-            CJSON_GET_VALUE_STRING_BY_COPY(cj_root_data, ezlopi_uuid_str, tmp_dev_uuid);
-            CJSON_GET_VALUE_STRING_BY_COPY(cj_root_data, ezlopi_cloud_uuid_str, tmp_prov_uuid);
-            CJSON_GET_VALUE_DOUBLE(cj_root_data, ezlopi_version_str, config_check_factoryInfo.config_version);
-            CJSON_GET_VALUE_STRING_BY_COPY(cj_root_data, ezlopi_coordinator_url_str, tmp_cloud_server);
-            CJSON_GET_VALUE_STRING_BY_COPY(cj_root_data, ezlopi_provision_token_str, tmp_provision_token);
+            CJSON_GET_VALUE_STRING_BY_COPY(cj_root_data, ezlopi_id_str, tmp_id_str, sizeof(tmp_id_str));
+            CJSON_GET_VALUE_STRING_BY_COPY(cj_root_data, ezlopi_uuid_str, tmp_dev_uuid, sizeof(tmp_dev_uuid));
+            CJSON_GET_VALUE_STRING_BY_COPY(cj_root_data, ezlopi_cloud_uuid_str, tmp_prov_uuid, sizeof(tmp_prov_uuid));
+            CJSON_GET_VALUE_UINT16(cj_root_data, ezlopi_version_str, config_check_factoryInfo.config_version);
+            CJSON_GET_VALUE_STRING_BY_COPY(cj_root_data, ezlopi_coordinator_url_str, tmp_cloud_server, sizeof(tmp_cloud_server));
+            CJSON_GET_VALUE_STRING_BY_COPY(cj_root_data, ezlopi_provision_token_str, tmp_provision_token, sizeof(tmp_provision_token));
 
             config_check_factoryInfo.id = strtoul(tmp_id_str, NULL, 10);
             config_check_factoryInfo.device_uuid = tmp_dev_uuid;
@@ -667,7 +641,7 @@ static int __provision_update(char *arg)
             }
 
             uint32_t provision_order = 0;
-            CJSON_GET_VALUE_DOUBLE(cj_root_prov_data, "provision_order", provision_order);
+            CJSON_GET_VALUE_UINT32(cj_root_prov_data, "provision_order", provision_order);
 #endif
 
             config_check_factoryInfo.brand = NULL;

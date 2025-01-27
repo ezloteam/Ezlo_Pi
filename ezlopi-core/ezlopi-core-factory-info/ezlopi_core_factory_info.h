@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,7 +31,7 @@
 /**
  * @file    ezlopi_core_factory_info.h
  * @brief   perform some function on factory-data
- * @author  xx
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 0.1
  * @date    12th DEC 2024
  */
@@ -177,72 +177,49 @@ static const char *ezlopi_config_test =
     \"cmd\":3,\
     \"dev_detail\":[\
         {\
-        \"dev_type\":5,\
-        \"dev_name\":\"Dimmer_riken\",\
-        \"id_room\":\"\",\
-        \"id_item\":22,\
-        \"gpio\":18,\
-        \"pwm_resln\":3,\
-        \"freq_hz\":50,\
-        \"duty_cycle\":0\
-        },\
-        {\
-            \"dev_type\":1,\
-            \"dev_name\":\"switch_temp_riken\",\
-            \"id_room\":\"\",\
-            \"id_item\":2,\
-            \"gpio_in\":0,\
-            \"gpio_out\":25,\
-            \"pullup_ip\":false,\
-            \"pullup_op\":false,\
-            \"is_ip\":false,\
-            \"ip_inv\":false,\
-            \"op_inv\":false,\
-            \"val_ip\":false,\
-            \"val_op\":false\
-        },\
-        {\
-            \"dev_type\":1,\
-            \"dev_name\":\"Bulb_riken\",\
-            \"id_room\":\"\",\
-            \"id_item\":1,\
-            \"gpio_in\":\"\",\
-            \"gpio_out\":22,\
-            \"pullup_ip\":false,\
-            \"pullup_op\":false,\
-            \"is_ip\":false,\
-            \"ip_inv\":false,\
-            \"op_inv\":false,\
-            \"val_ip\":false,\
-            \"val_op\":false\
-        },\
-        {\
-            \"dev_type\":7,\
-            \"dev_name\":\"DHT22_temp_humi_riken\",\
-            \"id_room\":\"\",\
-            \"id_item\":16,\
-            \"gpio\":21\
-        },\
-        {\
-            \"dev_name\": \"MQ4_LPG\",\
-            \"dev_type\": 10,\
-            \"id_item\": 48,\
+            \"dev_type\": 2,\
+            \"dev_name\": \"DigitalIn_LDR\",\
             \"id_room\": \"\",\
-            \"gpio1\": 25,\
-            \"gpio2\": 33\
+            \"id_item\": 25,\
+            \"gpio\": 18,\
+            \"val_ip\": 1,\
+            \"logic_inv\": false\
+        },\
+        {\
+            \"dev_type\": 2,\
+            \"dev_name\": \"TPP223B_TouchSensor\",\
+            \"id_room\": \"\",\
+            \"id_item\": 35,\
+            \"gpio\": 25,\
+            \"val_ip\": 1,\
+            \"logic_inv\": false\
+        },\
+        {\
+            \"dev_type\": 3,\
+            \"dev_name\": \"Water_leak\",\
+            \"id_room\": \"\",\
+            \"id_item\": 27,\
+            \"gpio\": 32\
         },\
         {\
             \"dev_name\": \"MQ2_LPG\",\
             \"dev_type\": 10,\
             \"id_item\": 49,\
             \"id_room\": \"\",\
-            \"gpio1\": 15,\
-            \"gpio2\": 34\
+            \"gpio1\": 26,\
+            \"gpio2\": 33\
+        },\
+        {\
+            \"dev_type\": 3,\
+            \"dev_name\": \"FC28_soilmoisture\",\
+            \"id_room\": \"\",\
+            \"id_item\": 41,\
+            \"gpio\": 34\
         }\
     ],\
     \"config_id\":\"1234567\",\
     \"config_time\":1696508363,\
-    \"config_name\":\"My moisture sensor\",\
+    \"config_name\":\"Digital LDR test\",\
     \"chipset\":\"ESP32\"\
 }";
 // "{\"cmd\":3,\"dev_detail\":[{\"dev_type\":8,\"dev_name\":\"BME 280\",\"id_room\":\"\",\"id_item\":12,\"gpio_sda\":21,\"gpio_scl\":22,\"pullup_scl\":true,\"pullup_sda\":true,\"slave_addr\":118},{\"dev_type\":8,\"dev_name\":\"TSL2561_luminosity\",\"id_room\":\"\",\"id_item\":44,\"gpio_sda\":21,\"gpio_scl\":22,\"slave_addr\":57}],\"config_id\":\"1234567\",\"config_time\":1696508363,\"config_name\":\"My moisture sensor\",\"chipset\":\"ESP32\"}";

@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,7 +31,7 @@
 /**
  * @file    sensor_0016_oneWire_DHT22.c
  * @brief   perform some function on sensor_0016
- * @author  xx
+ * @author
  * @version 0.1
  * @date    xx
  */
@@ -333,7 +333,7 @@ static ezlopi_error_t dht22_sensor_setup_item_properties_temperature(l_ezlopi_it
         item->is_user_arg_unique = true;
         item->user_arg = user_arg;
 
-        CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type);
+        CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type);
 
         item->interface.onewire_master.enable = true;
         CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_str, item->interface.onewire_master.onewire_pin);
@@ -361,7 +361,7 @@ static ezlopi_error_t dht22_sensor_setup_item_properties_humidity(l_ezlopi_item_
         item->is_user_arg_unique = false;
         item->user_arg = user_arg;
 
-        CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type);
+        CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type);
 
         item->interface.onewire_master.enable = true;
         CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_str, item->interface.onewire_master.onewire_pin);

@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,9 +31,9 @@
 /**
  * @file    ezlopi_core_scenes_operators.c
  * @brief   These functions perform comparision operation for scenes
- * @author  xx
- * @version 0.1
- * @date    12th DEC 2024
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ * @version 1.0
+ * @date    August 11th, 2023 7:16 PM
  */
 
 /*******************************************************************************
@@ -87,8 +87,6 @@ typedef enum e_with_grp
 /*******************************************************************************
  *                          Static Function Prototypes
  *******************************************************************************/
-static int __evaluate_compareNumber_or_compareStrings(l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, char *comparator_str);
-static int __evaluate_compareNumbers_or_compareStrings_with_group(l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field, l_fields_v2_t *value_field, l_fields_v2_t *comparator_field);
 /* Numeric & String */
 static int ________compare_val_num(double item_exp_value, double value_to_compare_with, char *comparator_field_str);
 static int ________compare_val_str(const char *item_exp_value_str, const char *value_to_compare_with_str, char *comparator_field_str);
@@ -99,11 +97,8 @@ static int ____compare_item_vs_other(l_ezlopi_item_t *item_left, l_fields_v2_t *
 static int ____compare_item_vs_exp(l_ezlopi_item_t *item_left, s_ezlopi_expressions_t *curr_expr_right, char *comparator_field_str);
 static int ____compare_item_vs_item(l_ezlopi_item_t *item_left, l_ezlopi_item_t *item_right, char *comparator_field_str);
 static int __evaluate_numrange(l_fields_v2_t *item_exp_field, l_fields_v2_t *start_value_field, l_fields_v2_t *end_value_field, bool comparator_choice);
-;
 static int __evaluate_compareNumber_or_compareStrings(l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, char *comparator_str);
-;
 static int __evaluate_compareNumbers_or_compareStrings_with_group(l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field, l_fields_v2_t *value_field, l_fields_v2_t *comparator_field);
-;
 static int __trigger_grp_functions(e_with_grp_t choice, l_fields_v2_t *devgrp_field, l_fields_v2_t *itemgrp_field, l_fields_v2_t *operation_field, l_fields_v2_t *comparator_field, l_fields_v2_t *value_field, l_fields_v2_t *start_value_field, l_fields_v2_t *end_value_field, l_fields_v2_t *value_type_field, char *comparator_str, bool comparator_choice);
 /* Strings */
 static char *__get_item_strvalue_by_id(uint32_t item_id);
@@ -223,7 +218,7 @@ e_scene_num_cmp_operators_t EZPI_scenes_numeric_comparator_operators_get_enum(ch
     {
         while ((ret <= SCENES_NUM_COMP_OPERATORS_MAX) && ezlopi_scenes_num_cmp_operators_op[ret])
         {
-            if (0 == strcmp(ezlopi_scenes_num_cmp_operators_op[ret], operator_str))
+            if (EZPI_STRNCMP_IF_EQUAL(ezlopi_scenes_num_cmp_operators_op[ret], operator_str, strlen(ezlopi_scenes_num_cmp_operators_op[ret]) + 1, strlen(operator_str) + 1))
             {
                 break;
             }
@@ -291,7 +286,7 @@ e_scene_str_cmp_operators_t EZPI_scenes_strings_comparator_operators_get_enum(ch
     {
         while ((ret <= SCENES_STRINGS_OPERATORS_MAX) && ezlopi_scenes_str_cmp_operators_op[ret])
         {
-            if (0 == strcmp(ezlopi_scenes_str_cmp_operators_op[ret], operator_str))
+            if (EZPI_STRNCMP_IF_EQUAL(ezlopi_scenes_str_cmp_operators_op[ret], operator_str, strlen(ezlopi_scenes_str_cmp_operators_op[ret]) + 1, strlen(operator_str) + 1))
             {
                 break;
             }
@@ -352,7 +347,7 @@ e_scene_strops_cmp_operators_t EZPI_scenes_strops_comparator_operators_get_enum(
     {
         while ((ret <= SCENES_STROPS_COMP_OPERATORES_MAX) && ezlopi_scenes_strops_cmp_operators_op[ret])
         {
-            if (0 == strcmp(ezlopi_scenes_strops_cmp_operators_op[ret], operator_str))
+            if (EZPI_STRNCMP_IF_EQUAL(ezlopi_scenes_strops_cmp_operators_op[ret], operator_str, strlen(ezlopi_scenes_strops_cmp_operators_op[ret]) + 1, strlen(operator_str) + 1))
             {
                 break;
             }
@@ -392,7 +387,7 @@ const char *EZPI_scenes_strops_comparator_operators_get_method(e_scene_strops_cm
 int EZPI_scenes_operators_value_strops_operations(l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, l_fields_v2_t *operation_field)
 {
     int ret = 0;
-    if (item_exp_field && value_field && (operation_field->field_value.u_value.value_string))
+    if (item_exp_field && value_field && operation_field && (operation_field->field_value.u_value.value_string))
     {
         char *item_exp_value_str = NULL;
         char *value_to_compare_with_str = NULL;
@@ -547,7 +542,7 @@ e_scene_inarr_cmp_operators_t ezlopi_scenes_inarr_comparator_operators_get_enum(
     {
         while ((ret <= SCENES_IN_ARRAY_OPERATORS_MAX) && ezlopi_scenes_inarr_cmp_operators_op[ret])
         {
-            if (0 == strcmp(ezlopi_scenes_inarr_cmp_operators_op[ret], operator_inarr))
+            if (EZPI_STRNCMP_IF_EQUAL(ezlopi_scenes_inarr_cmp_operators_op[ret], operator_inarr, strlen(ezlopi_scenes_num_cmp_operators_op[ret]) + 1, strlen(operator_str) + 1))
             {
                 break;
             }
@@ -588,7 +583,7 @@ const char *ezlopi_scenes_inarr_comparator_operators_get_method(e_scene_inarr_cm
 int EZPI_scenes_operators_value_inarr_operations(l_fields_v2_t *item_exp_field, l_fields_v2_t *value_field, l_fields_v2_t *operation_field)
 {
     int ret = 0;
-    if (item_exp_field && value_field && (operation_field->field_value.u_value.value_string))
+    if (item_exp_field && value_field && operation_field && (operation_field->field_value.u_value.value_string))
     {
         char *tmp_str = operation_field->field_value.u_value.value_string;
         size_t len = (tmp_str) ? strlen(tmp_str) + 1 : 0;
@@ -698,7 +693,7 @@ e_scene_value_with_less_cmp_operators_t EZPI_scenes_value_with_less_comparator_o
     {
         while ((ret <= SCENES_VALUES_WITH_LESS_OPERATORS_MAX) && ezlopi_scenes_value_with_less_cmp_operators_op[ret])
         {
-            if (0 == strcmp(ezlopi_scenes_value_with_less_cmp_operators_op[ret], operator_str))
+            if (EZPI_STRNCMP_IF_EQUAL(ezlopi_scenes_value_with_less_cmp_operators_op[ret], operator_str, strlen(ezlopi_scenes_value_with_less_cmp_operators_op[ret]) + 1, strlen(operator_str) + 1))
             {
                 break;
             }
@@ -829,7 +824,7 @@ e_scene_value_without_less_cmp_operators_t EZPI_scenes_value_without_less_compar
     {
         while ((ret <= SCENES_VALUES_WITHOUT_LESS_OPERATORS_MAX) && ezlopi_scenes_value_without_less_cmp_operators_op[ret])
         {
-            if (0 == strcmp(ezlopi_scenes_value_without_less_cmp_operators_op[ret], operator_str))
+            if (EZPI_STRNCMP_IF_EQUAL(ezlopi_scenes_value_without_less_cmp_operators_op[ret], operator_str, strlen(ezlopi_scenes_value_without_less_cmp_operators_op[ret]) + 1, strlen(operator_str) + 1))
             {
                 break;
             }
@@ -1112,7 +1107,9 @@ int EZPI_scenes_operators_has_atleastone_dictionary_value_operations(uint32_t it
                         cJSON *cj_value = cJSON_GetObjectItem(__FUNCTION__, cj_item_value, ezlopi_value_str); // item_value -> dictionary ; [array or object]
                         if (cj_value && cJSON_IsObject(cj_value))
                         {
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                             CJSON_TRACE("cj_dictionary :", cj_value);
+#endif
                             // Check if ["low_battery":"..."] key is present
                             /* need to use array here ; check against vales no keys. */
                             cJSON *dictionaryValue = cJSON_GetObjectItem(__FUNCTION__, cj_value, value_field->field_value.u_value.value_string);
@@ -1138,7 +1135,7 @@ int EZPI_scenes_operators_has_atleastone_dictionary_value_operations(uint32_t it
 int EZPI_scenes_operators_is_dictionary_changed_operations(l_scenes_list_v2_t *scene_node, uint32_t item_id, l_fields_v2_t *key_field, l_fields_v2_t *operation_field)
 {
     int ret = 0;
-    if (item_id && key_field && (operation_field->field_value.u_value.value_string))
+    if (item_id && key_field && operation_field && (operation_field->field_value.u_value.value_string))
     {
         cJSON *item_value = NULL;
         l_ezlopi_item_t *item = EZPI_core_device_get_item_by_id(item_id);
@@ -2422,6 +2419,7 @@ static bool __check_valuetypes(const char *lhs_type_str, const char *rhs_type_st
 }
 
 #endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
-       /*******************************************************************************
-        *                          End of File
-        *******************************************************************************/
+
+/*******************************************************************************
+ *                          End of File
+ *******************************************************************************/

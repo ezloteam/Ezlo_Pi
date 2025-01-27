@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -32,9 +32,9 @@
 /**
  * @file    ezlopi_core_scenes_cjson.h
  * @brief   file includes functions that operate on scene data
- * @author  xx
- * @version 0.1
- * @date    1st January 2024
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ * @version 1.0
+ * @date    June 14th, 2023 6:39 PM
  */
 #ifndef _EZLOPI_CORE_SCENES_CJSON_H_
 #define _EZLOPI_CORE_SCENES_CJSON_H_

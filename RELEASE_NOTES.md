@@ -4,6 +4,38 @@
 
 # RELEASE NOTES
 
+# Version 4.3.12 Build 202
+
+## New
+
+1. Implement : Header source with the updated templates on EzloPi Local Scenes [EZPI-557](https://jira.mios.com/browse/EZPI-557)
+2. Implement : Header source with the updated templates on EzloPi Cores [EZPI-558](https://jira.mios.com/browse/EZPI-558)
+3. Implement : Add Config Chipset check support for ESP32S2 [EZPI-580](https://jira.mios.com/browse/EZPI-580)
+4. Implement : Add K-Config for Otel Enable Disable [EZPI-553](https://jira.mios.com/browse/EZPI-553)
+5. Implement : header & source templates on Ezlopi_hal components [EZPI-567](https://jira.mios.com/browse/EZPI-567)
+
+## Fixes
+
+1. Fix: ESP32-C3 Device is not responding [EZPI-519](https://jira.mios.com/browse/EZPI-519)
+2. Fix: EzloPi Core OTA Testing and fixing [EZPI-566](https://jira.mios.com/browse/EZPI-566)
+3. Fix: Decrease delay while broadcasting WSS messages [EZPI-552](https://jira.mios.com/browse/EZPI-552)
+4. Fix: Stack overflow on MQ Calibration Tasks [EZPI-568](https://jira.mios.com/browse/EZPI-568)
+5. Fix: Remove global/static variables from sensor-devices [EZPI-572](https://jira.mios.com/browse/EZPI-572)
+6. Fix: Potential array bounds issues [EZPI-554](https://jira.mios.com/browse/EZPI-554)
+7. Fix: Potential memory leak issues [EZPI-556](https://jira.mios.com/browse/EZPI-556)
+8. Fix: Moving from tasks to loop for memory optimization [EZPI-578](https://jira.mios.com/browse/EZPI-578)
+9. Fix: Debugging, Fixing errors and memory leaks [EZPI-579](https://jira.mios.com/browse/EZPI-579)
+
+## What's Changed
+
+- Ezpi 568 remove sensor tasks by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/214
+- Feature kconfig ot by @krishna-ezlo in https://github.com/ezloteam/Ezlo_Pi/pull/215
+- Removing global statics in sensor devices by @ezlo-rikenm in https://github.com/ezloteam/Ezlo_Pi/pull/219
+- Current config freeing by @NDJ-EZLO in https://github.com/ezloteam/Ezlo_Pi/pull/218
+- Ezpi 566 ota test and fix by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/220
+- fix memoryleak tendencies https://jira.mios.com/browse/EZPI-556. by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/221
+- fix array out of bounds issue : https://jira.mios.com/browse/EZPI-554 by @lomasSE89 in https://github.com/ezloteam/Ezlo_Pi/pull/222
+
 # Version 4.3.11 Build 201
 
 ## New

@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,16 +31,13 @@
 /**
  * @file    ezlopi_core_net.h
  * @brief   perform some function on core-net
- * @author  xx
+ * @author
  * @version 0.1
  * @date    12th DEC 2024
  */
 
 #ifndef _EZLOPI_CORE_NET_H_
 #define _EZLOPI_CORE_NET_H_
-/*******************************************************************************
- *                          Include Files
- *******************************************************************************/
 
 /*******************************************************************************
  *                          Include Files

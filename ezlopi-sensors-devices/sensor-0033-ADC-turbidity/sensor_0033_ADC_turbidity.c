@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,7 +31,7 @@
 /**
  * @file    sensor_0033_ADC_turbidity.c
  * @brief   perform some function on sensor_0033
- * @author  xx
+ * @author
  * @version 0.1
  * @date    xx
  */
@@ -197,8 +197,9 @@ static ezlopi_error_t __notify(l_ezlopi_item_t *item)
         {
             tmp_sensor_state = "water_filter_ok";
         }
-        if (strcmp(turbidity_sensor_state, tmp_sensor_state) != 0)
+        if (!EZPI_STRNCMP_IF_EQUAL(turbidity_sensor_state, tmp_sensor_state, strlen(turbidity_sensor_state) + 1, strlen(tmp_sensor_state) + 1))
         {
+            // if not same state
             memcpy(turbidity_sensor_state, tmp_sensor_state, (40 * sizeof(char)));
             EZPI_core_device_value_updated_from_device_broadcast(item);
             ret = EZPI_SUCCESS;

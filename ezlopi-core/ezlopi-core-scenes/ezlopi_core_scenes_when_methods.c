@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,7 +31,7 @@
 /**
  * @file    ezlopi_core_scenes_when_methods.c
  * @brief   Functions that operates on scene-when-methods
- * @author  xx
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 0.1
  * @date    12th DEC 2024
  */
@@ -823,13 +823,16 @@ int EZPI_core_scenes_when_is_house_mode_changed_to(l_scenes_list_v2_t *scene_nod
             curr_field = curr_field->next;
         }
 
-        cJSON *cj_house_mdoe_id = NULL;
-
-        cJSON_ArrayForEach(cj_house_mdoe_id, house_mode_id_array->field_value.u_value.cj_value)
+        if (NULL == house_mode_id_array)
         {
-            if (cj_house_mdoe_id->valuestring)
+            return 0;
+        }
+        cJSON *cj_house_mode_id = NULL;
+        cJSON_ArrayForEach(cj_house_mode_id, house_mode_id_array->field_value.u_value.cj_value)
+        {
+            if (cj_house_mode_id->valuestring)
             {
-                uint32_t house_mode_id = strtoul(cj_house_mdoe_id->valuestring, NULL, 16);
+                uint32_t house_mode_id = strtoul(cj_house_mode_id->valuestring, NULL, 16);
                 s_ezlopi_modes_t *modes = EZPI_core_modes_get_custom_modes();
                 if ((uint32_t)house_mode_id_array->user_arg != modes->current_mode_id) /* first check if there is transition */
                 {
@@ -882,6 +885,10 @@ int EZPI_core_scenes_when_is_house_mode_changed_from(l_scenes_list_v2_t *scene_n
             curr_field = curr_field->next;
         }
 
+        if (NULL == house_mode_id_array)
+        {
+            return 0;
+        }
         cJSON *cj_house_mode_id = NULL;
         cJSON_ArrayForEach(cj_house_mode_id, house_mode_id_array->field_value.u_value.cj_value)
         {
@@ -1665,7 +1672,7 @@ int EZPI_core_scene_when_string_operation(l_scenes_list_v2_t *scene_node, void *
         {
             ret = EZPI_scenes_operators_value_strops_operations_with_group(value_field, operation_field, devgrp_field, itemgrp_field);
         }
-        else
+        else if (item_exp_field && value_field && operation_field)
         {
             ret = EZPI_scenes_operators_value_strops_operations(item_exp_field, value_field, operation_field);
         }
@@ -1840,7 +1847,7 @@ int EZPI_core_scene_when_compare_values(l_scenes_list_v2_t *scene_node, void *ar
         {
             ret = EZPI_scenes_operators_value_comparevalues_with_less_operations_with_group(value_field, value_type_field, comparator_field, devgrp_field, itemgrp_field);
         }
-        else
+        else if (item_exp_field && value_field && value_type_field && comparator_field)
         {
             ret = EZPI_scenes_operators_value_comparevalues_with_less_operations(item_exp_field, value_field, value_type_field, comparator_field);
         }

@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,10 +31,10 @@
 
 /**
  * @file    ezlopi_cloud_thermostat_str.h
- * @brief   perform some function on data
- * @author  John Doe
- * @version 0.1
- * @date    1st January 2024
+ * @brief   Declarations for cloud thermostat strings
+ * @author
+ * @version 1.0
+ * @date    October 13th, 2022 7:24 PM
  */
 
 #ifndef __EZLOPI_THERMOSTAT_STR_H__

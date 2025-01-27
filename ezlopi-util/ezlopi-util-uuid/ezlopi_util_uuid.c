@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -32,7 +32,7 @@
 /**
  * @file    main.c
  * @brief   perform some function on data
- * @author  John Doe
+ * @author
  * @version 0.1
  * @date    1st January 2024
  */
@@ -109,7 +109,7 @@ void ezlopi_util_uuid_generate_random(ezlopi_uuid_t out)
     out[8] = (out[8] & 0x0f) | 0xa0;
 }
 
-void ezlopi_util_uuid_parse(const char* in, ezlopi_uuid_t uuid)
+void ezlopi_util_uuid_parse(const char *in, ezlopi_uuid_t uuid)
 {
     int i, j;
 
@@ -134,7 +134,7 @@ void ezlopi_util_uuid_parse(const char* in, ezlopi_uuid_t uuid)
     } while (j < 16 && i < 36);
 }
 
-void ezlopi_util_uuid_unparse(const ezlopi_uuid_t uuid, char* out)
+void ezlopi_util_uuid_unparse(const ezlopi_uuid_t uuid, char *out)
 {
     int i, j;
 

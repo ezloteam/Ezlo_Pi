@@ -2,12 +2,12 @@
 /**
  * @file    ezlopi_service_ble.h
  * @brief   Service related functionalities
- * @author
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version
  * @date
  */
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -37,6 +37,14 @@
 ** ===========================================================================
 */
 
+/**
+ * @file    ezlopi_service_ble.h
+ * @brief   Service related functionalities
+ * @author  
+ * @version 1.0
+ * @date    Janyary 22, 2024
+ */
+
 #ifndef _EZLOPI_SERVICE_BLE_H_
 #define _EZLOPI_SERVICE_BLE_H_
 
@@ -54,7 +62,9 @@
 extern "C"
 {
 #endif // __cpluplus
-
+    /*******************************************************************************
+     *                          Type & Macro Declarations
+     *******************************************************************************/
 /**
  * @brief Checks for any error if found logs the message and returns
  *
@@ -257,6 +267,14 @@ extern "C"
 #define BLE_DYNAMIC_CONFIG_CHAR_UUID 0xE501
     /*******************************************************************************
      *                          Dynamic Config Service Macros end
+     *******************************************************************************/
+
+    /*******************************************************************************
+     *                          Extern Data Declarations
+     *******************************************************************************/
+
+    /*******************************************************************************
+     *                          Extern Function Prototypes
      *******************************************************************************/
 
     /**

@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,7 +31,7 @@
 /**
  * @file    pms5003.c
  * @brief   perform some function on pms5003
- * @author  xx
+ * @author
  * @version 0.1
  * @date    xx
  */
@@ -40,6 +40,7 @@
  *                          Include Files
  *******************************************************************************/
 #include "pms5003.h"
+#include "ezlopi_util_trace.h"
 
 /*******************************************************************************
  *                          Extern Data Declarations
@@ -154,7 +155,7 @@ esp_err_t pms_read_upcall(uint8_t *buffer, PM25_AQI_Data *data)
 
   if (sum != data->checksum)
   {
-    ESP_LOGE("", "CheckSum Failed");
+    ESP_LOGE(__FILENAME__, "CheckSum Failed");
     return ESP_FAIL;
   }
   /* success! */
@@ -189,7 +190,10 @@ void pms_set_data_available_to_false(PM25_AQI_Data *data)
 */
 static void pms_uart_setup(s_pms5003_sensor_object *pms_object)
 {
-  EZPI_hal_uart_init(pms_object->pms_baud_rate, pms_object->pms_tx_pin, pms_object->pms_rx_pin, ezlopi_pms5003_upcall, &pms_object->pms_data);
+  if (NULL == EZPI_hal_uart_init(pms_object->pms_baud_rate, pms_object->pms_tx_pin, pms_object->pms_rx_pin, ezlopi_pms5003_upcall, &pms_object->pms_data))
+  {
+    TRACE_E("Failed to initialize PMS_uart");
+  }
 }
 
 /*!

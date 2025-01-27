@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -30,9 +30,9 @@
 */
 
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_cloud_data.h
+ * @brief   Declarations for cloud data function
+ * @author  
  * @version 0.1
  * @date    1st January 2024
  */
@@ -90,4 +90,3 @@ extern "C"
 /*******************************************************************************
  *                          End of File
  *******************************************************************************/
-

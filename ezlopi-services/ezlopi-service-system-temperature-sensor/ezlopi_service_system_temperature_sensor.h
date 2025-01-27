@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,17 +31,17 @@
 
 /**
  * @file    ezlopi_service_system_temperature_sensor.h
- * @brief
- * @author
- * @version
- * @date
+ * @brief   Contains function declarations related to system temperature sensor
+ * @authors
+ * @version 1.0
+ * @date    September 9th, 2024 7:15 PM
  */
+
 #include "sdkconfig.h"
 #if defined(CONFIG_EZPI_ENABLE_SYSTEM_TEMPERATURE)
 
-#ifndef _EZLOPI_SERVICE_SYSTEM_TEMPERATURE_SENSOR_H_
-#define _EZLOPI_SERVICE_SYSTEM_TEMPERATURE_SENSOR_H_
-
+#ifndef __EZLOPI_SERVICE_SYSTEM_TEMPERATURE_SENSOR_H__
+#define __EZLOPI_SERVICE_SYSTEM_TEMPERATURE_SENSOR_H__
 
 /*******************************************************************************
  *                          Include Files
@@ -82,7 +82,7 @@ extern "C"
 }
 #endif
 
-#endif // _EZLOPI_SERVICE_SYSTEM_TEMPERATURE_SENSOR_H_
+#endif // __EZLOPI_SERVICE_SYSTEM_TEMPERATURE_SENSOR_H__
 
 #endif // CONFIG_EZPI_ENABLE_SYSTEM_TEMPERATURE
 

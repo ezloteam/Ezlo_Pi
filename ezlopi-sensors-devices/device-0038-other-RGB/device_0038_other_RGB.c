@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,7 +31,7 @@
 /**
  * @file    device_0038_other_RGB.c
  * @brief   perform some function on device_0038
- * @author  xx
+ * @author
  * @version 0.1
  * @date    xx
  */
@@ -250,13 +250,16 @@ static ezlopi_error_t __set_cjson_value(l_ezlopi_item_t *item, void *arg)
             if (ezlopi_item_name_rgbcolor == item->cloud_properties.item_name)
             {
                 cJSON *cjson_params_rgb_values = cJSON_GetObjectItem(__FUNCTION__, cjson_params, ezlopi_value_str);
+
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                 CJSON_TRACE("cjson_params_rgb_values", cjson_params_rgb_values);
+#endif
 
                 if (cjson_params_rgb_values)
                 {
-                    CJSON_GET_VALUE_DOUBLE(cjson_params_rgb_values, ezlopi_red_str, rgb_args->red_struct.value);
-                    CJSON_GET_VALUE_DOUBLE(cjson_params_rgb_values, ezlopi_green_str, rgb_args->green_struct.value);
-                    CJSON_GET_VALUE_DOUBLE(cjson_params_rgb_values, ezlopi_blue_str, rgb_args->blue_struct.value);
+                    CJSON_GET_VALUE_INT(cjson_params_rgb_values, ezlopi_red_str, rgb_args->red_struct.value);
+                    CJSON_GET_VALUE_INT(cjson_params_rgb_values, ezlopi_green_str, rgb_args->green_struct.value);
+                    CJSON_GET_VALUE_INT(cjson_params_rgb_values, ezlopi_blue_str, rgb_args->blue_struct.value);
                 }
 
                 RGB_LED_change_color_value(rgb_args);
@@ -265,7 +268,7 @@ static ezlopi_error_t __set_cjson_value(l_ezlopi_item_t *item, void *arg)
             if (ezlopi_item_name_switch == item->cloud_properties.item_name)
             {
                 int led_state = 0;
-                CJSON_GET_VALUE_DOUBLE(cjson_params, ezlopi_value_str, led_state);
+                CJSON_GET_VALUE_INT(cjson_params, ezlopi_value_str, led_state);
                 rgb_args->previous_dim_factor = ((0 == led_state) ? rgb_args->brightness : rgb_args->previous_dim_factor);
                 rgb_args->brightness = ((0 == led_state) ? 0.0 : ((0 == rgb_args->previous_dim_factor) ? 1.0 : rgb_args->previous_dim_factor));
                 TRACE_D("Brightness value is %d, %d, %d", (uint8_t)(rgb_args->red_struct.value * rgb_args->brightness), (uint8_t)(rgb_args->green_struct.value * rgb_args->brightness),
@@ -277,7 +280,7 @@ static ezlopi_error_t __set_cjson_value(l_ezlopi_item_t *item, void *arg)
             if (ezlopi_item_name_dimmer == item->cloud_properties.item_name)
             {
                 int dim_percent = 0;
-                CJSON_GET_VALUE_DOUBLE(cjson_params, ezlopi_value_str, dim_percent);
+                CJSON_GET_VALUE_INT(cjson_params, ezlopi_value_str, dim_percent);
                 float dim_brightness_factor = dim_percent / 100.0;
                 TRACE_D("dim_percent %d, dim_brightness_factor is %f", dim_percent, dim_brightness_factor);
                 rgb_args->brightness = dim_brightness_factor;
@@ -354,9 +357,9 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
 
 static void __prepare_RGB_LED_user_args(s_rgb_args_t *rgb_args, cJSON *cj_device)
 {
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio1_str, rgb_args->red_struct.gpio_num);
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio2_str, rgb_args->green_struct.gpio_num);
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio3_str, rgb_args->blue_struct.gpio_num);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio1_str, rgb_args->red_struct.gpio_num);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio2_str, rgb_args->green_struct.gpio_num);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio3_str, rgb_args->blue_struct.gpio_num);
 
     rgb_args->red_struct.duty_cycle = 0;
     rgb_args->green_struct.duty_cycle = 0;

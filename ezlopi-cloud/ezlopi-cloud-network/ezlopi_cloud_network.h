@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2022 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,11 +31,12 @@
 
 /**
  * @file    ezlopi_cloud_network.h
- * @brief
- * @author
- * @version
- * @date
+ * @brief   Declerations for cloud network functions
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ * @version 1.0
+ * @date    August 15th, 2022 11:57 AM
  */
+
 #ifndef __NETWORK_H__
 #define __NETWORK_H__
 
