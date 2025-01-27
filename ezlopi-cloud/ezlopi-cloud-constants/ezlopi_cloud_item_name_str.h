@@ -2,13 +2,14 @@
 
 /**
  * @file    ezlopi_cloud_item_name_str.h
- * @brief
+ * @brief   Declarations for cloud item name strings
  * @author
- * @version
- * @date
+ * @version 0.1
+ * @date    1st January 2024
  */
+
 /* ===========================================================================
-** Copyright (C) 2022 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -38,6 +39,14 @@
 ** ===========================================================================
 */
 
+/**
+ * @file    ezlopi_cloud_item_name_str.h
+ * @brief
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ * @version 1.0
+ * @date    October 21st, 2022 7:47 PM
+ */
+
 #ifndef __EZLOPI_ITEM_NAME_STR_H__
 #define __EZLOPI_ITEM_NAME_STR_H__
 
@@ -61,10 +70,10 @@ extern "C"
    *                          Extern Data Declarations
    *******************************************************************************/
   /// @brief https://api.ezlo.com/devices/items/index.html
-    /**
-     * @brief Variable to be used for undefined items
-     *
-     */
+  /**
+   * @brief Variable to be used for undefined items
+   *
+   */
   extern const char *ezlopi_item_name_undefined;
   /**
    * @brief Variable to be used for acceleration-x items
@@ -100,7 +109,7 @@ extern "C"
   // extern const  char *ezlopi_item_name_barrier_problem_sensors;
   // extern const  char *ezlopi_item_name_barrier_short_circuit;
   // extern const  char *ezlopi_item_name_barrier_fail_events;
-  extern const  char *ezlopi_item_name_button_state;
+  extern const char *ezlopi_item_name_button_state;
   // extern const  char *ezlopi_item_name_test_state;
   // extern const  char *ezlopi_item_name_co_alarm;
   // extern const  char *ezlopi_item_name_maintenance_state;

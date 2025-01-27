@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,61 +31,60 @@
 /**
  * @file    ping.h
  * @brief   Function to operate on ping
- * @author  xx
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 0.1
  * @date    12th DEC 2024
-*/
+ */
 
 #ifndef _LWIP_PING_H_
 #define _LWIP_PING_H_
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 /**
-* Include Sequence
-* 1. C standard libraries eg. stdint, string etc.
-* 2. Third party component eg. cJSON, freeRTOS etc etc
-* 3. ESP-IDF specific eg. driver/gpio, esp_log etc.
-* 4. EzloPi HAL specific eg ezlopi_hal_i2c
-* 5. EzloPi core specific eg. ezlopi_core_ble
-* 6. EzloPi cloud specific eg. ezlopi_cloud_items
-* 7. EzloPi Service specific eg ezlopi_service_ble
-* 8. EzloPi Sensors and Device Specific eg. ezlopi_device_0001_digitalout_generic
-*/
+ * Include Sequence
+ * 1. C standard libraries eg. stdint, string etc.
+ * 2. Third party component eg. cJSON, freeRTOS etc etc
+ * 3. ESP-IDF specific eg. driver/gpio, esp_log etc.
+ * 4. EzloPi HAL specific eg ezlopi_hal_i2c
+ * 5. EzloPi core specific eg. ezlopi_core_ble
+ * 6. EzloPi cloud specific eg. ezlopi_cloud_items
+ * 7. EzloPi Service specific eg ezlopi_service_ble
+ * 8. EzloPi Sensors and Device Specific eg. ezlopi_device_0001_digitalout_generic
+ */
 
 /*******************************************************************************
-*                          C++ Declaration Wrapper
-*******************************************************************************/
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
     /*******************************************************************************
-    *                          Type & Macro Declarations
-    *******************************************************************************/
-
-
-    /*******************************************************************************
-    *                          Extern Data Declarations
-    *******************************************************************************/
+     *                          Type & Macro Declarations
+     *******************************************************************************/
 
     /*******************************************************************************
-    *                          Extern Function Prototypes
-    *******************************************************************************/
-  
+     *                          Extern Data Declarations
+     *******************************************************************************/
+
+    /*******************************************************************************
+     *                          Extern Function Prototypes
+     *******************************************************************************/
+
     /**
      * PING_USE_SOCKETS: Set to 1 to use sockets, otherwise the raw api is used
      */
 #ifndef PING_USE_SOCKETS
-#define PING_USE_SOCKETS    LWIP_SOCKET
+#define PING_USE_SOCKETS LWIP_SOCKET
 #endif
 
-     /**
-      * @brief Function to initialize ping service
-      *
-      */
+    /**
+     * @brief Function to initialize ping service
+     *
+     */
     int EZPI_ping_init(void) __attribute__((deprecated));
 
 #ifdef ESP_PING
@@ -104,7 +103,6 @@ extern "C"
     void ping_send_now(void);
 #endif /* !PING_USE_SOCKETS */
 
-
 #ifdef __cplusplus
 }
 #endif
@@ -112,5 +110,5 @@ extern "C"
 #endif /* _LWIP_PING_H_ */
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

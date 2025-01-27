@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,7 +31,7 @@
 /**
  * @file    pms5003.c
  * @brief   perform some function on pms5003
- * @author  xx
+ * @author
  * @version 0.1
  * @date    xx
  */
@@ -155,7 +155,7 @@ esp_err_t pms_read_upcall(uint8_t *buffer, PM25_AQI_Data *data)
 
   if (sum != data->checksum)
   {
-    ESP_LOGE("", "CheckSum Failed");
+    ESP_LOGE(__FILENAME__, "CheckSum Failed");
     return ESP_FAIL;
   }
   /* success! */

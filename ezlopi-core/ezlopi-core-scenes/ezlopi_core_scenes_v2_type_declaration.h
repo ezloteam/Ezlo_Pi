@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,17 +31,17 @@
 /**
  * @file    ezlopi_core_scenes_v2_type_declaration.h
  * @brief   This file contains all scene-related Type-defines
- * @author  xx
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 0.1
  * @date    12th DEC 2024
-*/
+ */
 
 #ifndef _EZLOPI_CORE_SCENES_V2_TYPE_DECLARATION_H_
 #define _EZLOPI_CORE_SCENES_V2_TYPE_DECLARATION_H_
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 // #include <stdbool.h>
 // #include <stdint.h>
 // #include <ctype.h>
@@ -50,16 +50,16 @@
 #include "ezlopi_core_scenes_methods.h"
 
 /*******************************************************************************
-*                          C++ Declaration Wrapper
-*******************************************************************************/
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
     /*******************************************************************************
-    *                          Type & Macro Declarations
-    *******************************************************************************/
+     *                          Type & Macro Declarations
+     *******************************************************************************/
     typedef struct s_when_function
     {
         uint32_t transtion_instant;
@@ -172,13 +172,13 @@ extern "C"
     typedef struct l_when_block_v2
     {
         s_block_options_v2_t block_options;
-        l_group_block_type_t *when_grp;         //   if(!NULL) ------------> //  indicates the 'when-block' is 'group_type'.
-        l_fields_v2_t *fields;                  //
-        cJSON *cj_block_meta;                   //   Block metadata information. Intended to save data needed for user interfaces
-        e_scenes_block_type_v2_t block_type;    //  
-        uint32_t blockId;                       //   actual -> '_ID'         //  The ID of a normal when-condition scene-block;
-        bool block_enable;                      //   actual -> '_enable'     //  flag that allows blocks to return 1;
-        bool block_status_reset_once;           //   NOT-NVS parameter [don't populate ; since not needed] // just a dummy flag to trigger function reset.
+        l_group_block_type_t *when_grp;      //   if(!NULL) ------------> //  indicates the 'when-block' is 'group_type'.
+        l_fields_v2_t *fields;               //
+        cJSON *cj_block_meta;                //   Block metadata information. Intended to save data needed for user interfaces
+        e_scenes_block_type_v2_t block_type; //
+        uint32_t blockId;                    //   actual -> '_ID'         //  The ID of a normal when-condition scene-block;
+        bool block_enable;                   //   actual -> '_enable'     //  flag that allows blocks to return 1;
+        bool block_status_reset_once;        //   NOT-NVS parameter [don't populate ; since not needed] // just a dummy flag to trigger function reset.
         struct l_when_block_v2 *next;
     } l_when_block_v2_t;
 
@@ -230,13 +230,12 @@ extern "C"
 
     typedef int (*f_scene_method_v2_t)(l_scenes_list_v2_t *curr_scene, void *arg);
     /*******************************************************************************
-    *                          Extern Data Declarations
-    *******************************************************************************/
+     *                          Extern Data Declarations
+     *******************************************************************************/
 
     /*******************************************************************************
-    *                          Extern Function Prototypes
-    *******************************************************************************/
-
+     *                          Extern Function Prototypes
+     *******************************************************************************/
 
 #ifdef __cplusplus
 }
@@ -245,5 +244,5 @@ extern "C"
 #endif // _EZLOPI_CORE_SCENES_V2_TYPE_DECLARATION_H_
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
+ *                          End of File
+ *******************************************************************************/

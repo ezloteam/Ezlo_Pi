@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,7 +31,7 @@
 /**
  * @file    sensor_0066_other_R307_FingerPrint.c
  * @brief   perform some function on sensor_0066
- * @author  xx
+ * @author
  * @version 0.1
  * @date    xx
  */
@@ -303,7 +303,7 @@ static ezlopi_error_t __0066_prepare(void *arg)
                     __prepare_item_interface_properties(fingerprint_item_enroll, cj_device);
                 }
 
-                l_ezlopi_device_t *child_fingerprint_action_device = EZPI_core_device_add_device(cj_device, "action");
+                l_ezlopi_device_t *child_fingerprint_action_device = EZPI_core_device_add_device(cj_device, ezlopi_action_str);
                 if (child_fingerprint_action_device)
                 {
                     TRACE_I("Child_fingerprint_action_device-[0x%x] ", child_fingerprint_action_device->cloud_properties.device_id);

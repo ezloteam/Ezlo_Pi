@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2022 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -28,13 +28,15 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
+
 /**
  * @file    ezlopi_cloud_favorite.h
- * @brief
- * @author
- * @version
- * @date
+ * @brief   Declarations for cloud favorite functions
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ * @version 1.0
+ * @date    July 21st, 2022 9:28 PM
  */
+
 #ifndef __HUB_FAVORITE_LIST_H__
 #define __HUB_FAVORITE_LIST_H__
 

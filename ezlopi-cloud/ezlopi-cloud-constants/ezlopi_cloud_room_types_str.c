@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,11 +31,12 @@
 
 /**
  * @file    ezlopi_cloud_room_types_str.c
- * @brief
- * @author
- * @version
- * @date
+ * @brief   Definitions for cloud room types strings
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ * @version 1.0
+ * @date    November 22nd, 2023 3:27 PM
  */
+
 #ifndef __EZLOPI_ROOMTYPES_STR_H__
 #define __EZLOPI_ROOMTYPES_STR_H__
 

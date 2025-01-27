@@ -3,12 +3,12 @@
 /**
  * @file    ezlopi_service_ws_server.c
  * @brief
- * @author
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version
  * @date
  */
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -37,6 +37,18 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ** ===========================================================================
 */
+
+/**
+ * @file    ezlopi_service_ws_server.c
+ * @brief   Contains function definitions for WS server
+ * @author
+ * @version 1.0
+ * @date    February 25, 2024
+ */
+
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 
 /* WebSocket Echo Server Example
 
@@ -82,6 +94,18 @@
 #include "ezlopi_service_ws_server.h"
 #include "ezlopi_service_ws_server_clients.h"
 
+/*******************************************************************************
+ *                          Extern Data Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Type & Macro Definitions
+ *******************************************************************************/
+
 /**
  * @brief Structure that wraps websocket response
  *
@@ -91,6 +115,10 @@ typedef struct s_async_resp_arg
     int fd;            /**< Connection file descriptors */
     httpd_handle_t hd; /**< HTTP handle */
 } s_async_resp_arg_t;
+
+/*******************************************************************************
+ *                          Static Function Prototypes
+ *******************************************************************************/
 
 /**
  * @brief Function to stop server
@@ -149,11 +177,21 @@ static esp_err_t ezpi_msg_handler(httpd_req_t *req);
  */
 static ezlopi_error_t ezpi_ws_server_broadcast(char *data);
 
+/*******************************************************************************
+ *                          Static Data Definitions
+ *******************************************************************************/
 static uint32_t __message_counter = 0;
 static httpd_handle_t __ws_handle = NULL;
 static SemaphoreHandle_t __send_lock = NULL;
 static volatile e_ws_status_t __ws_status = WS_STATUS_STOPPED;
 
+/*******************************************************************************
+ *                          Extern Data Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Definitions
+ *******************************************************************************/
 e_ws_status_t EZPI_service_ws_server_status(void)
 {
     return __ws_status;
@@ -204,7 +242,10 @@ void EZPI_service_ws_server_stop(void)
     }
 }
 
-///////// Static Functions Definations
+/*******************************************************************************
+ *                          Static Function Definitions
+ *******************************************************************************/
+
 static ezlopi_error_t ezpi_ws_server_broadcast(char *data)
 {
     ezlopi_error_t ret = EZPI_FAILED;

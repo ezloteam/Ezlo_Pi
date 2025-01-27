@@ -1,6 +1,6 @@
 
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -32,7 +32,7 @@
 /**
  * @file    sensor_0068_ENS160_gas_sensor_settings.h
  * @brief   perform some function on sensor_0068_ENS160
- * @author  xx
+ * @author  
  * @version 0.1
  * @date    xx
  */

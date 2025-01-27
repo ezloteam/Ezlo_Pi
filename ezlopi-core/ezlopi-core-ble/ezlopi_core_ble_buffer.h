@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,12 +31,16 @@
 /**
  * @file    ezlopi_core_ble_buffer.h
  * @brief   perform some function on ble-operations
- * @author  xx
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 0.1
- * @date    12th DEC 2024
+ * @date    December 7th, 2022 10:22 PM
  */
 #ifndef _EZLOPI_CORE_BLE_BUFFER_H_
 #define _EZLOPI_CORE_BLE_BUFFER_H_
+
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 
 #include "../../build/config/sdkconfig.h"
 

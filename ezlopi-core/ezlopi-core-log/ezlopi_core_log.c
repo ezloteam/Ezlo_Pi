@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,8 +31,7 @@
 /**
  * @file    ezlopi_core_log.c
  * @brief   Function operaters on system-logs
- * @author  xx
- * @version 0.1
+ * @author
  * @date    12th DEC 2024
  */
 

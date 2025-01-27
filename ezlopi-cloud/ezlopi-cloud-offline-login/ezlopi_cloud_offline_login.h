@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2022 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,13 +31,13 @@
 
 /**
  * @file    ezlopi_cloud_offline_login.h
- * @brief
+ * @brief   Definitions for cloud offline login functions
  * @author
- * @version
- * @date
+ * @version 1.0
+ * @date    March 26th, 2024 10:59 PM
  */
-#ifndef EZLOPI_CLOUD_OFFLINE_LOGIN_H_
-#define EZLOPI_CLOUD_OFFLINE_LOGIN_H_
+#ifndef __EZLOPI_CLOUD_OFFLINE_LOGIN_H__
+#define __EZLOPI_CLOUD_OFFLINE_LOGIN_H__
 
 /*******************************************************************************
  *                          Include Files
@@ -76,7 +76,7 @@ extern "C"
 }
 #endif
 
-#endif // EZLOPI_CLOUD_OFFLINE_LOGIN_H_
+#endif // __EZLOPI_CLOUD_OFFLINE_LOGIN_H__
 
 /*******************************************************************************
  *                          End of File

@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -30,11 +30,11 @@
 */
 
 /**
- * @file    main.c
+ * @file    ezlopi_service_ws_server.h
  * @brief   perform some function on data
- * @author  John Doe
- * @version 0.1
- * @date    1st January 2024
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
+ * @version 1.0
+ * @date    February 25th, 2024 12:37 AM
  */
 
 #ifndef __EZLOPI_SERVICE_WS_SERVER_H__
@@ -73,7 +73,7 @@ extern "C"
      *******************************************************************************/
     /**
      * @brief Function to stop websocket server
-     * 
+     *
      */
     void EZPI_service_ws_server_stop(void);
     /**

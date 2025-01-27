@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2022 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,11 +31,12 @@
 
 /**
  * @file    ezlopi_cloud_location.c
- * @brief
- * @author
- * @version
- * @date
+ * @brief   Definitions for cloud location functions
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ * @version 1.0
+ * @date    February 2nd, 2024 8:09 PM
  */
+
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
@@ -137,7 +138,7 @@ void EZPI_CLOUD_location_set(cJSON *cj_request, cJSON *cj_response)
     {
         char location_str[128];
         memset(location_str, 0, sizeof(location_str));
-        CJSON_GET_VALUE_STRING_BY_COPY(cj_params, ezlopi_location_str, location_str);
+        CJSON_GET_VALUE_STRING_BY_COPY(cj_params, ezlopi_location_str, location_str, sizeof(location_str));
 
         if ('\0' != location_str[0])
         {

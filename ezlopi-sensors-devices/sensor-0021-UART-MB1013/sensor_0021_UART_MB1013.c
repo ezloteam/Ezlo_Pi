@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,7 +31,7 @@
 /**
  * @file    sensor_0021_UART_MB1013.c
  * @brief   perform some function on sensor_0021
- * @author  xx
+ * @author
  * @version 0.1
  * @date    xx
  */
@@ -224,7 +224,7 @@ static void __setup_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_devic
 static void __setup_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj_device)
 {
     item->interface_type = EZLOPI_DEVICE_INTERFACE_UART;
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_baud_str, item->interface.uart.baudrate);
+    CJSON_GET_VALUE_UINT32(cj_device, ezlopi_baud_str, item->interface.uart.baudrate);
     CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_tx_str, item->interface.uart.tx);
     CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_rx_str, item->interface.uart.rx);
 }

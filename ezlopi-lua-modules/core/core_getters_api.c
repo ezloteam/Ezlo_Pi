@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -32,7 +32,7 @@
 /**
  * @file    main.c
  * @brief   perform some function on data
- * @author  John Doe
+ * @author
  * @version 0.1
  * @date    1st January 2024
  */
@@ -109,7 +109,7 @@ int lcore_get_product_name(lua_State *lua_state)
 int lcore_get_gateways(lua_State *lua_state)
 {
     lua_newtable(lua_state);
-    lua_pushnumber(lua_state, 1);                                    // table index
+    lua_pushnumber(lua_state, 1);                                       // table index
     __create_lua_table_for_gateway(lua_state, EZPI_core_gateway_get()); // individual device table
     lua_settable(lua_state, -3);
 
@@ -306,7 +306,7 @@ static int __create_lua_table_for_device(lua_State *lua_state, l_ezlopi_device_t
     }
     else
     {
-        lua_create_table_string_key_value(ezlopi_room_id_str, "");
+        lua_create_table_string_key_value(ezlopi_room_id_str, ezlopi__str);
     }
     // lua_create_table_string_key_value(ezlopi_room_id_str, controller_info->room_id);
 

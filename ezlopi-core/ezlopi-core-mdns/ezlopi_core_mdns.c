@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,9 +31,9 @@
 /**
  * @file    ezlopi_core_mdns.c
  * @brief   Function to operate on mdns
- * @author  xx
- * @version 0.1
- * @date    12th DEC 2024
+ * @author
+ * @version 1.0
+ * @date    February 24th, 2024 12:20 AM
  */
 
 /*******************************************************************************
@@ -103,7 +103,10 @@ ezlopi_error_t EZPI_init_mdns(void)
     ezlopi_error_t ret = EZPI_SUCCESS;
 
     TaskHandle_t ezlopi_core_mdns_service_task_handle = NULL;
+
+#warning "__mdns_init task can be shifted to loop"
     xTaskCreate(__mdns_init, "mdns_svc", EZLOPI_CORE_MDNS_SERVICE_TASK_DEPTH, NULL, 4, &ezlopi_core_mdns_service_task_handle);
+
 #if defined(CONFIG_FREERTOS_USE_TRACE_FACILITY)
     EZPI_core_process_set_process_info(ENUM_EZLOPI_CORE_MDNS_SERVICE_TASK, &ezlopi_core_mdns_service_task_handle, EZLOPI_CORE_MDNS_SERVICE_TASK_DEPTH);
 #endif
@@ -331,6 +334,8 @@ static void __mdns_init(void *pv)
 {
     int service_size;
     __ezlopi_mdns_init_service_context();
+
+#warning "NABIN: mdns_init() is called in a continuous while loop"
     while (1)
     {
         EZPI_core_wait_for_wifi_to_connect(portMAX_DELAY);

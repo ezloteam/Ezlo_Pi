@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2022 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,11 +31,12 @@
 
 /**
  * @file    ezlopi_cloud_scenes_scripts.h
- * @brief
- * @author
- * @version
- * @date
+ * @brief   Decleration for cloud scenes scripts functions
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
+ * @version 1.0
+ * @date    October 4th, 2023 11:21 PM
  */
+
 #ifndef __SCENES_SCRIPTS_H__
 #define __SCENES_SCRIPTS_H__
 

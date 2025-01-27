@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -29,11 +29,11 @@
 ** ===========================================================================
 */
 /**
- * @file    ezlopi_core_setting_commands.c
- * @brief   perform some function on setting cmds
- * @author  xx
- * @version 0.1
- * @date    12th DEC 2024
+ * @file     ezlopi_core_setting_commands.c
+ * @brief    perform some function on setting cmds
+ * @author
+ * @version  1.0
+ * @date     12th DEC 2024
  */
 
 /*******************************************************************************

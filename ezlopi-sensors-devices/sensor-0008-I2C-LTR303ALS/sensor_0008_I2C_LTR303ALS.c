@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,7 +31,7 @@
 /**
  * @file    sensor_0008_I2C_LTR303ALS.c
  * @brief   perform some function on sensor_0008
- * @author  xx
+ * @author
  * @version 0.1
  * @date    xx
  */
@@ -199,7 +199,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
 
 static void __prepare_item_properties(l_ezlopi_item_t *item, cJSON *cj_param)
 {
-    CJSON_GET_VALUE_DOUBLE(cj_param, ezlopi_dev_type_str, item->interface_type);
+    CJSON_GET_VALUE_INT(cj_param, ezlopi_dev_type_str, item->interface_type);
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
     item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();

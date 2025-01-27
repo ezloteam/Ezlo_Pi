@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,10 +31,10 @@
 
 /**
  * @file    ezlopi_service_ota.c
- * @brief
- * @author
- * @version
- * @date
+ * @brief   Contains function definitions related to OTA operations
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)n
+ * @version 1.0
+ * @date    April 27th, 2023 6:21 PM
  */
 
 /*******************************************************************************
@@ -155,7 +155,6 @@ static void ota_service_process(void *pv)
             // uint32_t message_counter = EZPI_service_web_provisioning_get_message_count();
             cJSON *cj_firmware_info_request = EZPI_firmware_send_firmware_query_to_nma_server(esp_random());
 
-            // CJSON_TRACE("----------------- broadcasting - cj_firmware_info_request", cj_firmware_info_request);
 
             if (0 == EZPI_core_broadcast_add_to_queue(cj_firmware_info_request))
             {

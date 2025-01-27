@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -30,22 +30,36 @@
 */
 
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
- * @version 0.1
- * @date    1st January 2024
+ * @file    ezlopi_cloud_category_str.h
+ * @brief
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ * @version 1.0
+ * @date    October 12th, 2022 8:24 PM
  */
 
 #ifndef __EZLOPI_CATEGORY_H__
 #define __EZLOPI_CATEGORY_H__
 
-#pragma once
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
+
+    /*******************************************************************************
+     *                          Type & Macro Declarations
+     *******************************************************************************/
+
+    /*******************************************************************************
+     *                          Extern Data Declarations
+     *******************************************************************************/
 
     /// @brief https://api.ezlo.com/devices/categories/index.html
 
@@ -240,6 +254,9 @@ extern "C"
      */
     // extern const  char *category_clock;
 
+    /*******************************************************************************
+     *                          Extern Function Prototypes
+     *******************************************************************************/
 #ifdef __cplusplus
 }
 #endif

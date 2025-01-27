@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,7 +31,7 @@
 /**
  * @file    ezlopi_core_device_value_updated.c
  * @brief   Function for sensor device operations
- * @author  xx
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 0.1
  * @date    12th DEC 2024
  */
@@ -107,7 +107,10 @@ ezlopi_error_t EZPI_core_device_value_updated_from_device_broadcast(l_ezlopi_ite
 
                     // TRACE_D("%d -> here", xTaskGetTickCount());
 
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                     // CJSON_TRACE("----------------- broadcasting - cj_response", cj_response);
+#endif
+
                     if (cj_response)
                     {
                         if (EZPI_SUCCESS != EZPI_core_broadcast_add_to_queue(cj_response, EZPI_core_sntp_get_current_time_sec()))
@@ -147,7 +150,10 @@ ezlopi_error_t EZPI_core_device_value_updated_from_device_broadcast_by_item_id(u
             {
                 // cJSON* cj_response = NULL;
                 cJSON *cj_response = __broadcast_message_items_updated_from_device(curr_device, curr_item);
+
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                 CJSON_TRACE("----------------- broadcasting - cj_response", cj_response);
+#endif
 
                 ret = EZPI_core_broadcast_add_to_queue(cj_response, EZPI_core_sntp_get_current_time_sec());
                 if (EZPI_SUCCESS != ret)
@@ -183,7 +189,10 @@ ezlopi_error_t EZPI_core_device_value_updated_settings_broadcast(l_ezlopi_device
                 if (setting == curr_setting)
                 {
                     cJSON *cj_response = __broadcast_message_settings_updated_from_devices_v3(curr_device, setting);
+
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                     CJSON_TRACE("----------------- broadcasting - cj_response", cj_response);
+#endif
                     ret = EZPI_core_broadcast_add_to_queue(cj_response, EZPI_core_sntp_get_current_time_sec());
 
                     if (EZPI_SUCCESS != ret)
@@ -218,7 +227,11 @@ int ezlopi_setting_value_updated_from_device_settings_id_v3(uint32_t setting_id)
                 if (setting_id == curr_setting->cloud_properties.setting_id)
                 {
                     cJSON *cj_response = __broadcast_message_settings_updated_from_devices_v3(curr_device, curr_setting);
+
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                     CJSON_TRACE("----------------- broadcasting - cj_response", cj_response);
+#endif
+
                     ret = EZPI_core_broadcast_add_to_queue(cj_response);
 
                     if (0 == ret)
@@ -245,7 +258,6 @@ ezlopi_error_t EZPI_core_device_value_update_wifi_scan_broadcast(cJSON *network_
         cJSON *cj_response = cJSON_CreateObject(__FUNCTION__);
         if (cj_response)
         {
-            // printf("%s[%u]\r\n", __FUNCTION__, __LINE__);
             // cJSON_AddNumberToObject(__FUNCTION__, cj_response, ezlopi_startTime_str, EZPI_core_sntp_get_current_time_sec());
 
             cJSON_AddStringToObject(__FUNCTION__, cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
@@ -260,7 +272,10 @@ ezlopi_error_t EZPI_core_device_value_update_wifi_scan_broadcast(cJSON *network_
                 cJSON_AddItemToObject(__FUNCTION__, result, ezlopi_networks_str, network_array);
             }
 
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
             CJSON_TRACE("----------------- broadcasting - cj_response", cj_response);
+#endif
+
             ret = EZPI_core_broadcast_add_to_queue(cj_response, EZPI_core_sntp_get_current_time_sec());
 
             if (EZPI_SUCCESS != ret)

@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2022 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,10 +31,10 @@
 
 /**
  * @file    ezlopi_cloud_log.h
- * @brief
+ * @brief    Definitions for cloud log functions
  * @author
- * @version
- * @date
+ * @version 1.0
+ * @date    May 3rd, 2024 8:34 PM
  */
 
 /*******************************************************************************

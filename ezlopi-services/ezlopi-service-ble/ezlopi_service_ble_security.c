@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -32,13 +32,18 @@
 /**
  * @file    ezlopi_service_ble_security.c
  * @brief   Security service related functionalities
- * @author
- * @version
- * @date
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
+ * @version 1.0
+ * @date    July 10, 2022
  */
+
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_BLE_ENABLE
+
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 
 #include <string.h>
 
@@ -61,21 +66,29 @@
 
 #include "ezlopi_service_ble.h"
 
- /*******************************************************************************
-  *                          Type & Macro Definitions
-  *******************************************************************************/
+/*******************************************************************************
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
-  /**
-   * @brief Returns number from the the json `root` which contains name member
-   * @note root is the JOSN and should exist before being called
-   *
-   */
+/*******************************************************************************
+ *                          Extern Function Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Type & Macro Definitions
+ *******************************************************************************/
+
+/**
+ * @brief Returns number from the the json `root` which contains name member
+ * @note root is the JOSN and should exist before being called
+ *
+ */
 #define CJ_GET_NUMBER(name) cJSON_GetNumberValue(cJSON_GetObjectItem(__FUNCTION__, root, name))
 
-   /**
-    * @brief Enum for security commands
-    *
-    */
+/**
+ * @brief Enum for security commands
+ *
+ */
 typedef enum e_ble_security_commands
 {
     BLE_CMD_UNDEFINED = 0, /**< Command undefined(0) */
@@ -91,12 +104,12 @@ typedef enum e_ble_security_commands
  *                          Static Function Prototypes
  *******************************************************************************/
 #if (1 == CONFIG_EZPI_BLE_ENALBE_PASSKEY)
- /**
-  * @brief Function to set new BLE pass key
-  *
-  * @param[in] value pointer to the value for pass key characteristics for security service
-  * @param[in] param Pointer to the gatts callback parameter
-  */
+/**
+ * @brief Function to set new BLE pass key
+ *
+ * @param[in] value pointer to the value for pass key characteristics for security service
+ * @param[in] param Pointer to the gatts callback parameter
+ */
 static void ezpi_passkey_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
 #endif
 
@@ -125,6 +138,18 @@ static void ezpi_factory_reset_write_func(esp_gatt_value_t *value, esp_ble_gatts
  * @param[in] param Pointer to the gatts callback parameter
  */
 static void ezpi_serv_ble_factory_reset_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
+
+/*******************************************************************************
+ *                          Static Data Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Data Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Definitions
+ *******************************************************************************/
 
 #if (1 == CONFIG_EZPI_BLE_ENALBE_PASSKEY)
 s_gatt_char_t *passkey_characterstic = NULL;
@@ -164,6 +189,10 @@ void EZPI_ble_service_security_init(void)
     properties = ESP_GATT_CHAR_PROP_BIT_WRITE;
     factory_reset_characterstic = EZPI_core_ble_gatt_add_characteristic(security_service, &uuid, permission, properties, NULL, ezpi_serv_ble_factory_reset_write_func, NULL);
 }
+
+/*******************************************************************************
+ *                          Static Function Definitions
+ *******************************************************************************/
 
 #if (1 == CONFIG_EZPI_BLE_ENALBE_PASSKEY)
 static void ezpi_passkey_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)

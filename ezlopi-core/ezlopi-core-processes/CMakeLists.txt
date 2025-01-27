@@ -5,6 +5,7 @@ set(ESP_IDF_COMPONENTS
 )
 set(EZLOPI_UTIL_COMPONENTS
         ezlopi-util-trace
+        ezlopi-cloud-constants
 )
 
 idf_component_register(SRCS  "${config_src}"

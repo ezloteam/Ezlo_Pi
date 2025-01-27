@@ -1,6 +1,5 @@
-
 /* ===========================================================================
-** Copyright (C) 2022 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -32,10 +31,10 @@
 
 /**
  * @file    ezlopi_cloud_setting_commands.c
- * @brief
- * @author
- * @version
- * @date
+ * @brief   Definitions for cloud setting commands functions
+ * @authors
+ * @version 1.0
+ * @date    August 13th, 2024 5:49 PM
  */
 
 /*******************************************************************************

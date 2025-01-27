@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,9 +31,9 @@
 /**
  * @file    ezlopi_core_http.c
  * @brief   Function to perform operation on http
- * @author  xx
- * @version 0.1
- * @date    12th DEC 2024
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ * @version 1.0
+ * @date    November 2nd, 2022 5:30 PM
  */
 
 /*******************************************************************************
@@ -41,7 +41,6 @@
  *******************************************************************************/
 #include <time.h>
 #include "esp_tls.h"
-// #ifdef CONFIG_ESP_TLS_USING_MBEDTLS
 #include "mbedtls/platform.h"
 #include "mbedtls/net_sockets.h"
 #include "mbedtls/esp_debug.h"
@@ -51,15 +50,15 @@
 #include "mbedtls/error.h"
 #include "mbedtls/certs.h"
 #include "esp_crt_bundle.h"
-// #endif
 
 #include "ezlopi_util_trace.h"
 
+#include "ezlopi_cloud_constants.h"
+
 #include "ezlopi_core_sntp.h"
 #include "ezlopi_core_http.h"
-#include "ezlopi_core_event_group.h"
-// #include "ezlopi_core_errors.h"
 #include "EZLOPI_USER_CONFIG.h"
+#include "ezlopi_core_event_group.h"
 
 /*******************************************************************************
  *                          Extern Data Declarations
@@ -84,14 +83,6 @@
     }
 
 #define GET_STRING_SIZE(str) ((NULL != str) ? (strlen(str)) : 0)
-#if 0
-// typedef struct ll_resp_buf
-// {
-//     uint32_t len;
-//     uint8_t *buffer;
-//     struct ll_resp_buf *next;
-// } ll_resp_buf_t; // implementation for response
-#endif
 
 /*******************************************************************************
  *                          Static Function Prototypes
@@ -135,9 +126,7 @@ int EZPI_core_http_mem_malloc(char **__dest_ptr, const char *src_ptr)
         {
             bzero(tmp_ptr, (ret));
             snprintf(tmp_ptr, ret, "%s", src_ptr);
-            // TRACE_D("1. *Malloc_New_buffer : (%p)->(%p) : [%d]", *__dest_ptr, tmp_ptr, ret);
             *__dest_ptr = tmp_ptr; // old gets replaced by new address
-            // TRACE_D("2.__dest_ptr(%p) : size=> [%d]", *__dest_ptr, GET_STRING_SIZE(*__dest_ptr));
         }
     }
     else
@@ -159,7 +148,6 @@ ezlopi_error_t EZPI_core_http_dyna_relloc(char **Buf, int reqSize)
         }
         else
         {
-            // TRACE_D("Relocating [%p] to [%p]: NewBuf[%d]", *Buf, NewBuf, reqSize);
             *Buf = NewBuf;
             ret = EZPI_SUCCESS; // return success
         }
@@ -295,7 +283,7 @@ s_ezlopi_http_data_t *EZPI_core_http_post_request(const char *cloud_url, const c
         memset(&my_data, 0, sizeof(s_rx_data_t));
 
         char uri[256];
-        snprintf(uri, sizeof(uri), "%s/%s", cloud_url, location ? location : "");
+        snprintf(uri, sizeof(uri), "%s/%s", cloud_url, location ? location : ezlopi__str);
         TRACE_D("URL: %s", uri);
 
         esp_http_client_config_t config = {
@@ -399,18 +387,11 @@ static void __ezlopi_http_req_via_mbedTLS(const char *host_web_server, int web_p
     mbedtls_ssl_context ssl;
     mbedtls_x509_crt cacert;
     mbedtls_ssl_config conf;
-    // mbedtls_entropy_context* entropy = ezlopi_malloc(sizeof(mbedtls_entropy_context));
-    // mbedtls_ctr_drbg_context* ctr_drbg = ezlopi_malloc(sizeof(mbedtls_ctr_drbg_context));
-    // mbedtls_ssl_context* ssl = ezlopi_malloc(sizeof(mbedtls_ssl_context));
-    // mbedtls_x509_crt* cacert = ezlopi_malloc(sizeof(mbedtls_x509_crt));
-    // mbedtls_ssl_config* conf = ezlopi_malloc(sizeof(mbedtls_ssl_config));
-    // if (entropy && ctr_drbg && ssl && cacert && conf)
-    // {
+
     mbedtls_net_context server_fd;
     mbedtls_ssl_init(&ssl);
     mbedtls_x509_crt_init(&cacert);
     mbedtls_ctr_drbg_init(&ctr_drbg);
-    // TRACE_I("Seeding the random number generator");
     mbedtls_ssl_config_init(&conf);
     mbedtls_entropy_init(&entropy);
     if (0 != (ret = mbedtls_ctr_drbg_seed(&ctr_drbg, mbedtls_entropy_func, &entropy,
@@ -419,7 +400,6 @@ static void __ezlopi_http_req_via_mbedTLS(const char *host_web_server, int web_p
         TRACE_E("mbedtls_ctr_drbg_seed returned %d", ret);
         goto exit;
     }
-    // TRACE_I("Attaching the certificate bundle...");
 
     ret = esp_crt_bundle_attach(&conf);
     if (ret < 0)
@@ -427,7 +407,6 @@ static void __ezlopi_http_req_via_mbedTLS(const char *host_web_server, int web_p
         TRACE_E("esp_crt_bundle_attach returned -0x%x\n\n", -ret);
         goto exit;
     }
-    // TRACE_I("Setting hostname for TLS session...");
 
     /* Hostname set here should match CN in server certificate */
     if (0 != (ret = mbedtls_ssl_set_hostname(&ssl, host_web_server)))
@@ -436,7 +415,6 @@ static void __ezlopi_http_req_via_mbedTLS(const char *host_web_server, int web_p
         goto exit;
     }
 
-    // TRACE_I("Setting up the SSL/TLS structure...");
     if (0 != (ret = mbedtls_ssl_config_defaults(&conf,
                                                 MBEDTLS_SSL_IS_CLIENT,
                                                 MBEDTLS_SSL_TRANSPORT_STREAM,
@@ -465,7 +443,6 @@ static void __ezlopi_http_req_via_mbedTLS(const char *host_web_server, int web_p
     }
 
     mbedtls_net_init(&server_fd);
-    // TRACE_I("Connecting to %s:%s...", host_web_server, web_port);
 
     if (0 != (ret = mbedtls_net_connect(&server_fd, host_web_server,
                                         web_port, MBEDTLS_NET_PROTO_TCP)))
@@ -473,13 +450,13 @@ static void __ezlopi_http_req_via_mbedTLS(const char *host_web_server, int web_p
         TRACE_E("mbedtls_net_connect returned -%x", -ret);
         goto exit;
     }
-    // TRACE_I("Connected.");
+
     mbedtls_ssl_set_bio(&ssl, &server_fd, mbedtls_net_send, mbedtls_net_recv, NULL);
 
-    // TRACE_I("Performing the SSL/TLS handshake...");
     time_t start_tm = 0, now = 0; // now keeping track of time
-    time(&start_tm);
     time(&now);
+    start_tm = now;
+
     while (0 != (ret = mbedtls_ssl_handshake(&ssl)))
     {
         TRACE_W("ret => %x", -ret); // mbedtls_ssl_conf_async_private_cb()
@@ -488,6 +465,7 @@ static void __ezlopi_http_req_via_mbedTLS(const char *host_web_server, int web_p
             TRACE_E("mbedtls_ssl_handshake returned -0x%x", -ret);
             goto exit;
         }
+
         time(&now);
         if ((now - start_tm) > (time_t)5) // 5sec
         {
@@ -495,7 +473,6 @@ static void __ezlopi_http_req_via_mbedTLS(const char *host_web_server, int web_p
         }
     }
 
-    // TRACE_I("Verifying peer X.509 certificate...");
     if (0 != (flags = mbedtls_ssl_get_verify_result(&ssl)))
     {
         /* In real life, we probably want to close connection if ret != 0 */
@@ -505,12 +482,7 @@ static void __ezlopi_http_req_via_mbedTLS(const char *host_web_server, int web_p
         TRACE_E("verification Error_info: %s", tmp_buf);
         goto exit;
     }
-    else
-    {
-        // TRACE_I("Certificate verified.");
-    }
-    // TRACE_I("Cipher suite is %s", mbedtls_ssl_get_ciphersuite(ssl));
-    // TRACE_I("Writing HTTP request...");
+
     size_t written_bytes = 0;
     do
     {
@@ -518,7 +490,6 @@ static void __ezlopi_http_req_via_mbedTLS(const char *host_web_server, int web_p
                                 strlen(url_req) - written_bytes);
         if (ret >= 0)
         {
-            // TRACE_I("%d bytes written", ret);
             written_bytes += ret;
         }
         else if (ret != MBEDTLS_ERR_SSL_WANT_WRITE && ret != MBEDTLS_ERR_SSL_WANT_READ)
@@ -528,7 +499,6 @@ static void __ezlopi_http_req_via_mbedTLS(const char *host_web_server, int web_p
         }
     } while (written_bytes < strlen(url_req));
 
-    // TRACE_I("Reading HTTP response...");
     uint32_t resp_buf_size = tmp_buf_size + 1;
     char *resp_buf_dummy = (char *)ezlopi_malloc(__FUNCTION__, resp_buf_size); // points to a memory-block
     if (resp_buf_dummy)
@@ -556,13 +526,14 @@ static void __ezlopi_http_req_via_mbedTLS(const char *host_web_server, int web_p
                 TRACE_E("mbedtls_ssl_read returned -0x%x", -ret);
                 break;
             }
+
             if (ret == 0)
             {
-                // TRACE_I("connection closed");
                 break;
             }
+
             len = ret;
-            // TRACE_D("ret[%d]: %s", len, tmp_buf);
+
             if (ret > 0)
             {
                 reply_count++;
@@ -588,7 +559,6 @@ static void __ezlopi_http_req_via_mbedTLS(const char *host_web_server, int web_p
         if (strlen(resp_buf_dummy) > 0)
         {
             *resp_buf = resp_buf_dummy;
-            // TRACE_I("&result==[%p] --> *resp_buf=>[%p]  ", resp_buf, *resp_buf);
         }
         else
         {
@@ -598,6 +568,7 @@ static void __ezlopi_http_req_via_mbedTLS(const char *host_web_server, int web_p
     }
 
     mbedtls_ssl_close_notify(&ssl);
+
 exit:
     mbedtls_ssl_session_reset(&ssl);
     mbedtls_net_free(&server_fd);
@@ -614,12 +585,6 @@ exit:
     mbedtls_ctr_drbg_free(&ctr_drbg);
     mbedtls_entropy_free(&entropy);
 
-    // ezlopi_free(__FUNCTION__, ssl);
-    // ezlopi_free(__FUNCTION__, conf);
-    // ezlopi_free(__FUNCTION__, ctr_drbg);
-    // ezlopi_free(__FUNCTION__, entropy);
-    // ezlopi_free(__FUNCTION__, cacert);
-    // }
     TRACE_I("Completed a request");
 }
 
@@ -639,7 +604,6 @@ static void __ezlopi_http_generate_request(s_ezlopi_core_http_mbedtls_t *config,
         {
         case HTTP_METHOD_GET:
         {
-            // TRACE_S("HTTP GET-METHOD [%d]", config->method);
             if (((NULL != config->username) && (GET_STRING_SIZE(config->username) > 0)) &&
                 ((NULL != config->password) && (GET_STRING_SIZE(config->password) > 0)))
             {
@@ -653,19 +617,16 @@ static void __ezlopi_http_generate_request(s_ezlopi_core_http_mbedtls_t *config,
         }
         case HTTP_METHOD_POST:
         {
-            // TRACE_S("HTTP POST-METHOD [%d]", config->method);
             snprintf(*request, request_len, "POST /%s HTTP/1.1\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->target_page);
             break;
         }
         case HTTP_METHOD_PUT:
         {
-            // TRACE_S("HTTP PUT-METHOD [%d]", config->method);
             snprintf(*request, request_len, "PUT /%s HTTP/1.1\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->target_page);
             break;
         }
         case HTTP_METHOD_DELETE:
         {
-            // TRACE_S("HTTP DELETE-METHOD [%d]", config->method);
             snprintf(*request, request_len, "DELETE /%s HTTP/1.1\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->target_page);
             break;
         }
@@ -733,12 +694,10 @@ static esp_err_t __ezlopi_http_event_handler(esp_http_client_event_t *evt)
     }
     case HTTP_EVENT_HEADER_SENT:
     {
-        // TRACE_D("HTTP_EVENT_HEADER_SENT");
         break;
     }
     case HTTP_EVENT_ON_HEADER:
     {
-        // TRACE_D("HTTP_EVENT_ON_HEADER, key=%s, value=%s\r\n", evt->header_key, evt->header_value);
         if (0 == strncmp("Content-Length", evt->header_key, ((strlen(evt->header_key) + 1) > 15) ? (strlen(evt->header_key) + 1) : 15))
         {
             s_rx_data_t *my_data = evt->user_data;
@@ -772,7 +731,6 @@ static esp_err_t __ezlopi_http_event_handler(esp_http_client_event_t *evt)
 
                         my_data->rx_len += evt->data_len;
                         my_data->status = 0;
-                        // TRACE_W("chunk-count: 1");
                     }
                     else
                     {

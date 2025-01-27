@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,24 +31,19 @@
 /**
  * @file    ezlopi_core_mdns.h
  * @brief   Function to operate on mdns service
- * @author  xx
- * @version 0.1
- * @date    12th DEC 2024
+ * @author
+ * @version 1.0
+ * @date    February 28th, 2024 7:13 PM
  */
 
 #ifndef __EZLOPI_CORE_MDNS_H_
 #define __EZLOPI_CORE_MDNS_H_
 
-
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_SERV_MDNS_EN
 
-/*******************************************************************************
- *                          Include Files
- *******************************************************************************/
 #include "mdns.h"
-
 #include "ezlopi_core_errors.h"
 
 /*******************************************************************************

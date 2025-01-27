@@ -3,12 +3,12 @@
 /**
  * @file    ezlopi_service_ble_provisioning.c
  * @brief   Provisioning service related functionalities
- * @author
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version
  * @date
  */
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -38,9 +38,21 @@
 ** ===========================================================================
 */
 
+/**
+ * @file    ezlopi_service_ble_provisioning.c
+ * @brief   Provisioning service related functionalities
+ * @author
+ * @version 1.0
+ * @date    January 22, 2024
+ */
+
 #include "../../build/config/sdkconfig.h"
 
 #ifdef CONFIG_EZPI_BLE_ENABLE
+
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 
 #include <string.h>
 #include <time.h>
@@ -72,6 +84,14 @@
 
 #include "ezlopi_service_ble_ble_auth.h"
 #include "ezlopi_service_ble.h"
+
+/*******************************************************************************
+ *                          Extern Data Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
 /*******************************************************************************
  *                          Type & Macro Definitions
@@ -145,6 +165,14 @@ static char *ezpi_base64_decode_provisioning_info(uint32_t total_size);
  *******************************************************************************/
 static s_gatt_service_t *g_provisioning_service;
 static s_linked_buffer_t *g_provisioning_linked_buffer = NULL;
+
+/*******************************************************************************
+ *                          Extern Data Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Definitions
+ *******************************************************************************/
 
 void EZPI_ble_service_provisioning_init(void)
 {
@@ -304,9 +332,9 @@ static void ezpi_provisioning_info_write_func(esp_gatt_value_t *value, esp_ble_g
                             if (cj_config)
                             {
                                 char user_id[32];
-                                CJSON_GET_VALUE_STRING_BY_COPY(cj_config, ezlopi_user_id_str, user_id);
+                                CJSON_GET_VALUE_STRING_BY_COPY(cj_config, ezlopi_user_id_str, user_id, sizeof(user_id));
 
-                                if (BLE_AUTH_SUCCESS == ezlopi_ble_auth_check_user_id(user_id))
+                                if (BLE_AUTH_SUCCESS == EZPI_ble_auth_check_user_id(user_id))
                                 {
                                     s_basic_factory_info_t *ezlopi_config_basic = ezlopi_malloc(__FUNCTION__, sizeof(s_basic_factory_info_t));
                                     if (ezlopi_config_basic)
@@ -339,21 +367,24 @@ static void ezpi_provisioning_info_write_func(esp_gatt_value_t *value, esp_ble_g
                                         memset(local_key, 0, EZLOPI_FINFO_LEN_LOCAL_KEY);
                                         // memset(device_type, 0, sizeof(device_type));
 
-                                        CJSON_GET_VALUE_DOUBLE(cj_config, ezlopi_serial_str, ezlopi_config_basic->id);
-                                        CJSON_GET_VALUE_DOUBLE(cj_config, ezlopi_version_str, ezlopi_config_basic->config_version);
+                                        uint32_t _id = 0;
+                                        CJSON_GET_VALUE_UINT32(cj_config, ezlopi_serial_str, _id);
+                                        ezlopi_config_basic->id = _id;
 
-                                        CJSON_GET_VALUE_STRING_BY_COPY(cj_config, ezlopi_device_name_str, device_name);
-                                        CJSON_GET_VALUE_STRING_BY_COPY(cj_config, ezlopi_manufacturer_name_str, manufacturer);
-                                        CJSON_GET_VALUE_STRING_BY_COPY(cj_config, ezlopi_brand_str, brand);
-                                        CJSON_GET_VALUE_STRING_BY_COPY(cj_config, ezlopi_model_number_str, model_number);
-                                        CJSON_GET_VALUE_STRING_BY_COPY(cj_config, ezlopi_uuid_str, device_uuid);
-                                        CJSON_GET_VALUE_STRING_BY_COPY(cj_config, ezlopi_uuid_provisioning_str, prov_uuid);
-                                        CJSON_GET_VALUE_STRING_BY_COPY(cj_config, ezlopi_mac_str, device_mac);
-                                        CJSON_GET_VALUE_STRING_BY_COPY(cj_config, ezlopi_provision_server_str, provision_server);
-                                        CJSON_GET_VALUE_STRING_BY_COPY(cj_config, ezlopi_cloud_server_str, cloud_server);
-                                        CJSON_GET_VALUE_STRING_BY_COPY(cj_config, ezlopi_provision_token_str, provision_toke);
-                                        CJSON_GET_VALUE_STRING_BY_COPY(cj_config, ezlopi_local_key_str, local_key);
-                                        // CJSON_GET_VALUE_STRING_BY_COPY(cj_config, ezlopi_device_type_ezlopi_str, device_type);
+                                        CJSON_GET_VALUE_UINT16(cj_config, ezlopi_version_str, ezlopi_config_basic->config_version);
+
+                                        CJSON_GET_VALUE_STRING_BY_COPY(cj_config, ezlopi_device_name_str, device_name, sizeof(device_name));
+                                        CJSON_GET_VALUE_STRING_BY_COPY(cj_config, ezlopi_manufacturer_name_str, manufacturer, sizeof(manufacturer));
+                                        CJSON_GET_VALUE_STRING_BY_COPY(cj_config, ezlopi_brand_str, brand, sizeof(brand));
+                                        CJSON_GET_VALUE_STRING_BY_COPY(cj_config, ezlopi_model_number_str, model_number, sizeof(model_number));
+                                        CJSON_GET_VALUE_STRING_BY_COPY(cj_config, ezlopi_uuid_str, device_uuid, sizeof(device_uuid));
+                                        CJSON_GET_VALUE_STRING_BY_COPY(cj_config, ezlopi_uuid_provisioning_str, prov_uuid, sizeof(prov_uuid));
+                                        CJSON_GET_VALUE_STRING_BY_COPY(cj_config, ezlopi_mac_str, device_mac, sizeof(device_mac));
+                                        CJSON_GET_VALUE_STRING_BY_COPY(cj_config, ezlopi_provision_server_str, provision_server, sizeof(provision_server));
+                                        CJSON_GET_VALUE_STRING_BY_COPY(cj_config, ezlopi_cloud_server_str, cloud_server, sizeof(cloud_server));
+                                        CJSON_GET_VALUE_STRING_BY_COPY(cj_config, ezlopi_provision_token_str, provision_toke, sizeof(provision_toke));
+                                        CJSON_GET_VALUE_STRING_BY_COPY(cj_config, ezlopi_local_key_str, local_key, sizeof(local_key));
+                                        // CJSON_GET_VALUE_STRING_BY_COPY(cj_config, ezlopi_device_type_ezlopi_str, device_type, sizeof(device_type));
 
                                         ezlopi_config_basic->device_name = device_name;
                                         ezlopi_config_basic->manufacturer = manufacturer;

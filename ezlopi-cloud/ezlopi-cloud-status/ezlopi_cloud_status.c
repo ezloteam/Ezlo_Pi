@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2022 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,10 +31,10 @@
 
 /**
  * @file    ezlopi_cloud_status.c
- * @brief
- * @author
- * @version
- * @date
+ * @brief   Definitions for cloud status functions
+ * @authors
+ * @version 1.0
+ * @date    March 7th, 2024 6:27 PM
  */
 
 /*******************************************************************************

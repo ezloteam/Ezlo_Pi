@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,17 +31,17 @@
 /**
  * @file    device_0001_digitalOut_generic.h
  * @brief   perform some function on device_0001
- * @author  xx
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
  * @version 0.1
  * @date    xx
-*/
+ */
 
 #ifndef _DEVICE_0001_DIGITALOUT_GENERIC_H_
 #define _DEVICE_0001_DIGITALOUT_GENERIC_H_
 
 /*******************************************************************************
-*                          Include Files
-*******************************************************************************/
+ *                          Include Files
+ *******************************************************************************/
 #include "ezlopi_core_device_macros.h"
 
 #if defined(DEVICE_0001_DIGITALOUT_GENERIC)
@@ -50,28 +50,28 @@
 #include "ezlopi_core_devices.h"
 #include "ezlopi_core_errors.h"
 /*******************************************************************************
-*                          C++ Declaration Wrapper
-*******************************************************************************/
+ *                          C++ Declaration Wrapper
+ *******************************************************************************/
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
     /*******************************************************************************
-    *                          Type & Macro Declarations
-    *******************************************************************************/
+     *                          Type & Macro Declarations
+     *******************************************************************************/
     typedef struct s_digio_settings
     {
         int32_t settings_int_data;
     } s_digio_settings_t;
 
     /*******************************************************************************
-    *                          Extern Data Declarations
-    *******************************************************************************/
+     *                          Extern Data Declarations
+     *******************************************************************************/
 
     /*******************************************************************************
-    *                          Extern Function Prototypes
-    *******************************************************************************/
+     *                          Extern Function Prototypes
+     *******************************************************************************/
 
     /**
      * @brief Function to operate on actions
@@ -84,7 +84,6 @@ extern "C"
      */
     ezlopi_error_t DEVICE_0001_digitalOut_generic(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
-
 #ifdef __cplusplus
 }
 #endif
@@ -94,12 +93,5 @@ extern "C"
 #endif // _DEVICE_0001_DIGITALOUT_GENERIC_H_
 
 /*******************************************************************************
-*                          End of File
-*******************************************************************************/
-
-
-
-
-
-
-
+ *                          End of File
+ *******************************************************************************/

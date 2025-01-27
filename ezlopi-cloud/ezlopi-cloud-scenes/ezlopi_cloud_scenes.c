@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2022 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,11 +31,12 @@
 
 /**
  * @file    ezlopi_cloud_scenes.c
- * @brief
- * @author
- * @version
- * @date
+ * @brief   Definitions for cloud scenes functions
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
+ * @version 1.0
+ * @date    August 15th, 2022 11:57 AM
  */
+
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
@@ -152,7 +153,11 @@ void EZPI_scenes_edit(cJSON *cj_request, cJSON *cj_response)
     {
         cJSON *cj_eo = cJSON_GetObjectItem(__FUNCTION__, cj_params, "eo");
         cJSON *cj_id = cJSON_GetObjectItem(__FUNCTION__, cj_eo, ezlopi__id_str);
+
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
         // CJSON_TRACE("scene-edit eo", cj_eo);
+#endif
+
         if (cj_eo && (cj_id && cj_id->valuestring))
         {
             uint32_t u_id = strtoul(cj_id->valuestring, NULL, 16);
@@ -297,7 +302,10 @@ void EZPI_scenes_notification_add(cJSON *cj_request, cJSON *cj_response)
                         cJSON_AddItemReferenceToArray(__FUNCTION__, cj_user_notifications, cj_user_id);
                     }
 
-                    CJSON_TRACE("updated-scene", cj_scene);
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
+                    // CJSON_TRACE("updated-scene", cj_scene);
+#endif
+
                     char *updated_scene_str = cJSON_PrintBuffered(__FUNCTION__, cj_scene, 4096, false);
                     cJSON_Delete(__FUNCTION__, cj_scene);
 
@@ -361,7 +369,10 @@ void EZPI_scenes_notification_remove(cJSON *cj_request, cJSON *cj_response)
                         }
                     }
 
-                    CJSON_TRACE("updated-scene", cj_scene);
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
+                    // CJSON_TRACE("updated-scene", cj_scene);
+#endif
+
                     char *updated_scene_str = cJSON_PrintBuffered(__FUNCTION__, cj_scene, 4096, false);
                     cJSON_Delete(__FUNCTION__, cj_scene);
 
@@ -464,7 +475,7 @@ void EZPI_scenes_house_modes_set(cJSON *cj_request, cJSON *cj_response)
     if (cj_result && cj_params)
     {
         cJSON *cj_scene_id = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi__id_str);
-        cJSON *cj_house_mode_arr = cJSON_GetObjectItem(__FUNCTION__, cj_params, "houseModes");
+        cJSON *cj_house_mode_arr = cJSON_GetObjectItem(__FUNCTION__, cj_params, ezlopi_houseMode_str);
 
         if (cj_scene_id && cj_scene_id->valuestring && cj_house_mode_arr && cJSON_IsArray(cj_house_mode_arr))
         {
@@ -480,11 +491,13 @@ void EZPI_scenes_house_modes_set(cJSON *cj_request, cJSON *cj_response)
 
                     cJSON_AddItemToObject(__FUNCTION__, cj_scene, ezlopi_house_modes_str, cJSON_Duplicate(__FUNCTION__, cj_house_mode_arr, true));
 
-                    cJSON *cj_test = cJSON_GetObjectItem(__FUNCTION__, cj_scene, ezlopi_house_modes_str);
-                    if (cj_test)
-                    {
-                        CJSON_TRACE("new-house_mode:", cj_test);
-                    }
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
+                    // cJSON *cj_test = cJSON_GetObjectItem(__FUNCTION__, cj_scene, ezlopi_house_modes_str);
+                    // if (cj_test)
+                    // {
+                    //     CJSON_TRACE("new-house_mode:", cj_test);
+                    // }
+#endif
 
                     char *updated_scene_str = cJSON_PrintBuffered(__FUNCTION__, cj_scene, 4096, false);
                     cJSON_Delete(__FUNCTION__, cj_scene);
@@ -535,7 +548,11 @@ void EZPI_scenes_action_block_test(cJSON *cj_request, cJSON *cj_response)
                     if (dupli) // duplicate the 'cj_block' to avoid crashes
                     {
                         EZPI_scenes_populate_assign_action_block(test_then_block, dupli, SCENE_BLOCK_TYPE_THEN);
+
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                         // CJSON_TRACE("test_then:", dupli);
+#endif
+
                         cJSON_Delete(__FUNCTION__, dupli);
                     }
 
@@ -547,13 +564,13 @@ void EZPI_scenes_action_block_test(cJSON *cj_request, cJSON *cj_response)
                         l_fields_v2_t *curr_field = test_then_block->fields;
 
                         const s_sendhttp_method_t __sendhttp_method[] = {
-                            {.field_name = "request", .field_func = EZPI_parse_http_request_type},
-                            {.field_name = "url", .field_func = EZPI_parse_http_url},
-                            {.field_name = "credential", .field_func = EZPI_parse_http_creds},
-                            {.field_name = "contentType", .field_func = EZPI_parse_http_content_type},
-                            {.field_name = "content", .field_func = EZPI_parse_http_content},
-                            {.field_name = "headers", .field_func = EZPI_parse_http_headers},
-                            {.field_name = "skipSecurity", .field_func = EZPI_parse_http_skipsecurity},
+                            {.field_name = ezlopi_request_str, .field_func = EZPI_parse_http_request_type},
+                            {.field_name = ezlopi_url_str, .field_func = EZPI_parse_http_url},
+                            {.field_name = ezlopi_credential_str, .field_func = EZPI_parse_http_creds},
+                            {.field_name = ezlopi_contentType_str, .field_func = EZPI_parse_http_content_type},
+                            {.field_name = ezlopi_content_str, .field_func = EZPI_parse_http_content},
+                            {.field_name = ezlopi_headers_str, .field_func = EZPI_parse_http_headers},
+                            {.field_name = ezlopi_skipSecurity_str, .field_func = EZPI_parse_http_skipsecurity},
                             {.field_name = NULL, .field_func = NULL},
                         };
 
@@ -717,6 +734,7 @@ void EZPI_scenes_clone(cJSON *cj_request, cJSON *cj_response)
                     cJSON *cj_org_scene = cJSON_Parse(__FUNCTION__, scene_str);
                     if (cj_org_scene)
                     {
+#warning "KRISHNA|RIKEN: need to discuss about scene duplicating"
                         cJSON *cj_dup_scene = cJSON_Duplicate(__FUNCTION__, cj_org_scene, 1);
                         if (cj_dup_scene)
                         {
@@ -761,7 +779,10 @@ void EZPI_scenes_clone(cJSON *cj_request, cJSON *cj_response)
                             cJSON_DeleteItemFromObject(__FUNCTION__, cj_dup_scene, ezlopi__id_str);
                             cJSON_DeleteItemFromObject(__FUNCTION__, cj_dup_scene, ezlopi_name_str);
                             cJSON_AddStringToObject(__FUNCTION__, cj_dup_scene, ezlopi_name_str, name_buf);
+
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
                             CJSON_TRACE("__duplicated :", cj_dup_scene);
+#endif
 
                             // store the 'new_scene' in nvs
                             uint32_t new_scene_id = EZPI_core_scenes_store_new_scene_v2(cj_dup_scene);

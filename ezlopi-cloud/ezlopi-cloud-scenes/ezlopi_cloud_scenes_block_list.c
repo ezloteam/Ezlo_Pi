@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2022 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,11 +31,12 @@
 
 /**
  * @file    ezlopi_cloud_scenes_block_list.c
- * @brief
- * @author
- * @version
- * @date
+ * @brief   Definitions for cloud scenes block list functions
+ * @authors Krishna Kumar Sah (work.krishnasah@gmail.com)
+ * @version 1.0
+ * @date    December 18th, 2023 2:59 PM
  */
+
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
@@ -47,7 +48,6 @@
 #include <stdint.h>
 
 #include "ezlopi_util_trace.h"
-// #include "cjext.h"
 
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_devices.h"
@@ -81,7 +81,8 @@
  * @param when_block Pointer to the when block to convert
  * @return cJSON*
  */
-static cJSON *__create_when_block_cjson(l_when_block_v2_t *when_block);
+static cJSON *
+__create_when_block_cjson(l_when_block_v2_t *when_block);
 /**
  * @brief Function to add block optiosn and fields to the JSON
  *
@@ -174,10 +175,14 @@ void EZPI_scenes_trigger_device_list(cJSON *cj_request, cJSON *cj_response)
         cJSON *cj_devices_array = cJSON_AddArrayToObject(__FUNCTION__, cj_result, ezlopi_devices_str);
         if (cj_devices_array)
         {
+#ifndef CONFIG_EZPI_UTIL_TRACE_EN
+            __scenes_block_trigger_device_list(cj_devices_array);
+#else
             if (0 < __scenes_block_trigger_device_list(cj_devices_array))
             {
                 CJSON_TRACE("trigger-device-list", cj_devices_array);
             }
+#endif
         }
     }
 }
@@ -504,8 +509,8 @@ static int __scenes_block_trigger_device_list(cJSON *cj_devices_array)
     int ret = 0;
     if (cj_devices_array)
     {
-        char device_id_str[32] = {0};
         bool found_item = false;
+        char device_id_str[32] = {0};
         l_ezlopi_device_t *device_node = EZPI_core_device_get_head();
         while (device_node)
         {

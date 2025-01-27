@@ -22,7 +22,7 @@ set(EZLOPI_CLOUD_COMPONENTS
 )
 
 
-idf_component_register(SRCS "${src_files}"
+idf_component_register(SRCS "ezlopi_cloud_scenes_expressions.c" "ezlopi_cloud_scenes_block_data_list.c" "ezlopi_cloud_scenes_scripts.c" "ezlopi_cloud_scenes_block_list.c" "ezlopi_cloud_scenes.c" "${src_files}"
     INCLUDE_DIRS "."
     REQUIRES
             ${ESP_COMPONENTS}
@@ -30,4 +30,7 @@ idf_component_register(SRCS "${src_files}"
             ${EZLOPI_CORE_COMPONENTS}
             ${EZLOPI_CLOUD_COMPONENTS}
             )
+
+
+
 

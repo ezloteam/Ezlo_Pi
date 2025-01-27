@@ -37,6 +37,7 @@
  */
 
 #include "bme68xLibrary.h"
+#include "ezlopi_cloud_constants.h"
 
 /* Maximum transaction size. Field size 17 x 3 */
 #define BME68X_MAX_READ_LENGTH 51
@@ -462,7 +463,7 @@ int8_t bme68xlib_check_status(void)
  */
 const char *bme68xlib_status_string(void)
 {
-    const char *ret = "";
+    const char *ret = ezlopi__str;
     switch (status)
     {
     case BME68X_OK:

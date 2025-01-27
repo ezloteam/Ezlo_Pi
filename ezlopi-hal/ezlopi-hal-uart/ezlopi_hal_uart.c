@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -31,9 +31,9 @@
 /**
  * @file    ezlopi_hal_uart.c
  * @brief   perform some function on UART
- * @author  xx
- * @version 0.1
- * @date    xx
+ * @author  Krishna Kumar Sah (work.krishnasah@gmail.com)
+ * @version 1.0
+ * @date    November 28th, 2022 3:11 PM
  */
 
 /*******************************************************************************
@@ -89,6 +89,7 @@ static ezlo_uart_channel_t get_available_channel();
 
 s_ezlopi_uart_object_handle_t EZPI_hal_uart_init(uint32_t baudrate, uint32_t tx, uint32_t rx, __uart_upcall upcall, void *arg)
 {
+#warning "NABIN: 'ezlo_uart_channel_queue' is static which is not recommended!"
     static QueueHandle_t ezlo_uart_channel_queue;
     s_ezlopi_uart_object_handle_t uart_object_handle = (struct s_ezlopi_uart_object *)ezlopi_malloc(__FUNCTION__, sizeof(struct s_ezlopi_uart_object));
     if (uart_object_handle)

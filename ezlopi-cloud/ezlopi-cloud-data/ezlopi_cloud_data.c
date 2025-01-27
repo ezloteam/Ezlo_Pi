@@ -1,5 +1,5 @@
 /* ===========================================================================
-** Copyright (C) 2024 Ezlo Innovation Inc
+** Copyright (C) 2025 Ezlo Innovation Inc
 **
 ** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
 **
@@ -30,9 +30,9 @@
 */
 
 /**
- * @file    main.c
- * @brief   perform some function on data
- * @author  John Doe
+ * @file    ezlopi_cloud_data.c
+ * @brief   Definitions for cloud data function
+ * @author
  * @version 0.1
  * @date    1st January 2024
  */
@@ -99,7 +99,7 @@ void data_list(cJSON* cj_request, cJSON* cj_response)
                 cJSON_AddNumberToObject(__FUNCTION__, cj_first_start, ezlopi_value_str, 0);
             }
 
-            #warning "WARNING: work required here!"
+#warning "WARNING: work required here!"
 #if 0
                 l_ezlopi_configured_devices_t* registered_devices = ezlopi_devices_list_get_configured_items();
             while (NULL != registered_devices)
@@ -160,7 +160,7 @@ static cJSON* ezlopi_cloud_data_list_settings(l_ezlopi_configured_devices_t* ezl
             cJSON_AddStringToObject(__FUNCTION__, cjson_settings, ezlopi_category_str, ezlopi_device->properties->ezlopi_cloud.category);
             cJSON_AddStringToObject(__FUNCTION__, cjson_settings, ezlopi_subcategory_str, ezlopi_device->properties->ezlopi_cloud.subcategory);
             cJSON_AddBoolToObject(__FUNCTION__, cjson_settings, ezlopi_batteryPowered_str, ezlopi_device->properties->ezlopi_cloud.battery_powered);
-            cJSON_AddStringToObject(__FUNCTION__, cjson_settings, "name", ezlopi_device->properties->ezlopi_cloud.device_name);
+            cJSON_AddStringToObject(__FUNCTION__, cjson_settings, ezlopi_name_str, ezlopi_device->properties->ezlopi_cloud.device_name);
             cJSON_AddStringToObject(__FUNCTION__, cjson_settings, ezlopi_type_str, ezlopi_device->properties->ezlopi_cloud.device_type);
             cJSON_AddBoolToObject(__FUNCTION__, cjson_settings, ezlopi_reachable_str, ezlopi_device->properties->ezlopi_cloud.reachable);
             cJSON_AddBoolToObject(__FUNCTION__, cjson_settings, ezlopi_persistent_str, true);
